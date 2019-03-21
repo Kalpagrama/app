@@ -31,6 +31,19 @@ module.exports = {
 
   // add your custom rules here
   rules: {
+    'max-len': ['off', { 'code': 140 }],
+    'indent': ['off', 4],
+    "trailing-comma": [true, {
+        "singleline": "ignore",
+        "multiline": {
+          "objects": "ignore",
+          "arrays": "ignore",
+          "functions": "never",
+          "typeLiterals": "ignore"
+        }
+      }],
+      'no-plusplus': 'off',
+
     'no-param-reassign': 'off',
 
     'import/first': 'off',

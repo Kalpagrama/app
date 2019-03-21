@@ -1,43 +1,50 @@
-<template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="glossy">
-        <q-toolbar-title>
-          Kalpagramma
-        </q-toolbar-title>
-    </q-header>
+<template lang="pug">
+  q-layout(view='lHh Lpr lFf')
+    q-header.glossy(elevated='')
+      q-toolbar-title Kalpagramma
 
-    <q-page-container>
-      <router-view />
-    </q-page-container>
+    q-page-container
+      router-view
 
-    <q-footer bordered class="bg-white text-primary">
-      <q-tabs no-caps active-color="primary" indicator-color="transparent" class="text-grey"
-      v-model="tab">
-          <q-tab name="images">
-            <q-btn flat color="primary" :icon="'home'"></q-btn>
-          </q-tab>
-          <q-tab name="videos" label="Videos" />
-          <q-tab name="articles" label="Articles" />
-        </q-tabs>
-    </q-footer>
-
-  </q-layout>
+    q-footer.bg-white.kp-menu_main(bordered)
+        <q-btn v-for="(btn, ix) in BUTTONS" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)"/>
 </template>
 
 <script>
-import { openURL } from 'quasar';
+const BUTTONS = [
+    { icon: 'home', path: '/home' },
+    { icon: 'search', path: '/search' },
+    { icon: 'add_circle_outline', path: '/create' },
+    { icon: 'notifications', path: '/bell' },
+    { icon: 'person', path: '/profile' },
+];
 
 export default {
   name: 'GuestMobileLayout',
   data() {
     return {
-      tab: null,
+      btn: null,
+      BUTTONS,
     };
   },
+  computed: {},
   methods: {
-    openURL,
+      click(btn) {
+          this.btn = btn;
+          this.$router.push(btn.path);
+      },
+      buttonColor(btn) {
+          return this.btn === btn ? 'primary' : 'black';
+      },
   },
 };
 </script>
 
-<style></style>
+<style lang="stylus">
+.kp-menu
+    &_main
+        display grid
+        grid-template-columns 1fr 1fr 1fr 1fr 1fr
+        align-items center
+        justify-items center
+</style>
