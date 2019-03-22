@@ -1,8 +1,10 @@
 <template lang="pug">
   q-layout(view='lHh Lpr lFf')
-    q-header.glossy(elevated='')
-      q-toolbar-title Kalpagramma
-
+    q-header.bg-white.text-black(elevated='')
+        q-toolbar
+            q-btn.q-mr-sm(flat='', round='', dense='', icon='menu')
+            q-toolbar-title Кальпаграмма
+            q-btn(flat='', round='', dense='', icon='more_vert')
     q-page-container
       router-view
 
@@ -15,8 +17,8 @@ const BUTTONS = [
     { icon: 'home', path: '/home' },
     { icon: 'search', path: '/search' },
     { icon: 'add_circle_outline', path: '/create' },
-    { icon: 'notifications', path: '/bell' },
-    { icon: 'person', path: '/profile' },
+    { icon: 'notifications_none', path: '/bell' },
+    { icon: 'person_outline', path: '/profile' },
 ];
 
 export default {
