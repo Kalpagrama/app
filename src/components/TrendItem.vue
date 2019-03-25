@@ -32,6 +32,7 @@
             margin-right 0
         &__label
             text-align center
-            text-shadow 5px 5px 5px rgba(0,0,0,0.5)
+            text-shadow 0px 2px 6px black, 0px -2px 6px black, -2px 0px 6px black, 2px 0px 6px black
             margin-top 60px
+
 </style>

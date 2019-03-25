@@ -3,7 +3,14 @@
     q-header.bg-white.text-black(elevated='')
         q-toolbar
             q-btn.q-mr-sm(flat='', round='', dense='', icon='menu')
-            q-toolbar-title Кальпаграмма
+            q-toolbar-title(v-if="isTitle()") Кальпаграмма
+            q-toolbar-title(v-if="isSearch()")
+                q-input.text-black(borderless standout  color="purple-12" v-model="search" size="sm")
+                    template(v-slot:prepend)
+                        q-icon(v-if="search === ''" name="search")
+                        q-icon(v-else name="clear" class="cursor-pointer" @click="search = ''")
+
+
             q-btn(flat='', round='', dense='', icon='more_vert')
     q-page-container
       router-view
@@ -27,10 +34,16 @@ export default {
     return {
       btn: null,
       BUTTONS,
+      search: '',
     };
   },
-  computed: {},
   methods: {
+      isTitle() {
+          return this.$route.path !== '/search';
+      },
+      isSearch() {
+          return this.$route.path === '/search';
+      },
       click(btn) {
           this.btn = btn;
           this.$router.push(btn.path);
