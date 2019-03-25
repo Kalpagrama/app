@@ -1,9 +1,9 @@
 <template lang="pug">
     .q-pa-md
-        q-page(class='text-center bold')
-            h5(class="text-weight-bold") Войти с помощью
+        q-page.text-center.bold.kp-auth
+            h5.text-weight-bold.kp-auth__title Войти с помощью
             .q-pa-md.q-gutter-y-sm
-                q-btn(v-for="(button,ix) in buttons" :style='`background: ${button.color}`' :icon="button.icon" elevated no-caps type="a" :href="`${ button.url ? button.url : 'javascript:void(0)'}`" :key="ix" text-color='white' :label='`${button.label}`' class='full-width btn-register')
+                q-btn(v-for="(button,ix) in buttons" :style='`background: ${button.color}`' :icon="button.icon" elevated no-caps type="a" :href="`${ button.url ? button.url : 'javascript:void(0)'}`" :key="ix" text-color='white' :label='`${button.label}`' class='full-width btn-register kp-auth__item')
 </template>
 
 <script>

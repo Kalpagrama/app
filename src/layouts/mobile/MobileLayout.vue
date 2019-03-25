@@ -32,6 +32,7 @@ export default {
   computed: {},
   methods: {
       click(btn) {
+          console.log(btn);
           this.btn = btn;
           this.$router.push(btn.path);
       },
