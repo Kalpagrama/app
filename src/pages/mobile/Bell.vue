@@ -22,7 +22,7 @@
 
         &__item
             display grid
-            padding 4px
+            padding 4px 8px
             grid-template-columns 48px auto
             min-height 50px
 
