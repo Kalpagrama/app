@@ -88,6 +88,7 @@
         &-grain
             max-width 99vw
             margin 6px auto
+            border 1px solid #d0
 
             &__header
                 padding 0 8px

@@ -1,6 +1,6 @@
 <template lang="pug">
   q-page
-    grain(flat bordered v-for="(card, ix) in cards" :key="ix" :item="{id: card}" :ix="ix")
+    grain-list(:source="cards")
 </template>
 
 <style lang="stylus">
@@ -8,12 +8,12 @@
 </style>
 
 <script>
-import grain from '../../components/Grain';
+import GrainList from '../../components/GrainList';
 
 export default {
   name: 'PageMobileHome',
   components: {
-      grain,
+      'grain-list': GrainList,
   },
   data() {
       return {
