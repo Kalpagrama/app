@@ -1,7 +1,7 @@
 <template lang="pug">
     .kp-grain-list(ref="list" v-touch-swipe.up="swipeUp" v-touch-swipe.down="swipeDown")
         //.kp-grain-list__container(v-touch-swipe.mouse.up.down="switchGrain")
-        .kp-grain-list__container()
+        .kp-grain-list__container
             grain(flat bordered v-for="(card, ix) in source" :key="ix" :item="{id: card}" :ix="ix" :ref="'card-' + ix")
     // button.test(@click="scroll(100)") Scroll
 </template>
@@ -27,13 +27,18 @@
         },
         methods: {
             scroll(by) {
+                // if (this.timer) return;
+
                 const MARGIN = 6;
                 const ref = this.$refs.list;
                 const rect = this.$refs['card-0'][0].$el.getBoundingClientRect();
+                const mainRect = ref.getBoundingClientRect();
+                console.log('main', mainRect);
 
                 // eslint-disable-next-line
                 let { target, timer } = this;
-                const delta = rect.top > 0 ? 30 : 0; // смещение для позиционирования по центру
+                let delta = rect.top > 0 ? 30 : 0; // смещение для позиционирования по центру
+                if (mainRect.height <= rect.height) delta = 0;
 
                 target += Math.sign(by) * (rect.height + MARGIN - delta);
                 this.timer = setInterval(() => {
@@ -44,6 +49,7 @@
                     }
                     if (!ref || target === 0) {
                         clearInterval(timer);
+                        timer = 0;
                     }
                 }, 50);
             },
