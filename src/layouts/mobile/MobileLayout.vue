@@ -10,6 +10,7 @@
 
     q-footer.bg-white.kp-menu_main(bordered)
         <q-btn v-for="(btn, ix) in BUTTONS" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)"/>
+        <q-btn v-for="(btn, ixs) in BUTTONSREG" :key="'reg_'+ixs" flat :color="buttonColor(btn)" :icon="btn.icon" size="md" @click="click(btn)" active-class="active"/>
 </template>
 
 <script>
@@ -21,12 +22,18 @@ const BUTTONS = [
     { icon: 'person_outline', path: '/profile' },
 ];
 
+const BUTTONSREG = [
+    { icon: 'fas fa-sign-in-alt', path: '/registration' },
+    { icon: 'fas fa-user-tag', path: '/promo' },
+];
+
 export default {
   name: 'GuestMobileLayout',
   data() {
     return {
       btn: null,
       BUTTONS,
+      BUTTONSREG,
     };
   },
   computed: {},

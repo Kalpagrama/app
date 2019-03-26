@@ -1,9 +1,9 @@
 <template lang="pug">
     .q-pa-md
         q-page.text-center.bold.kp-auth
-            h5.text-weight-bold.kp-auth__title Войти с помощью
+            h5.text-weight-bold.kp-auth__title.head-title Войти с помощью
             .q-pa-md.q-gutter-y-sm
-                q-btn(v-for="(button,ix) in buttons" :style='`background: ${button.color}`' :icon="button.icon" elevated no-caps type="a" :href="`${ button.url ? button.url : 'javascript:void(0)'}`" :key="ix" text-color='white' :label='`${button.label}`' class='full-width btn-register kp-auth__item')
+                q-btn(v-for="(button,ix) in buttons" :style='`background: ${button.color}`' :icon="button.icon" elevated no-caps type="a" :key="ix" text-color='white' :label='`${button.label}`' class='full-width btn-register kp-auth__button' :to="button.url")
 </template>
 
 <script>
@@ -15,8 +15,8 @@
         { id: 5, label: 'Instagram', icon: 'fab fa-instagram', color: '#9E5396', url: '' },
         { id: 6, label: 'Yandex', icon: 'fab fa-yandex', color: '#EC514D', url: '' },
         { id: 8, label: 'Telegram Passport', icon: 'fab fa-telegram', color: '#51B3DE', url: '' },
-        { id: 9, label: 'Email', icon: 'mail', color: '#5b5b5b', url: '' },
-        { id: 10, label: 'Номера телефона', icon: 'phone', color: '#5b5b5b', url: '' },
+        { id: 9, label: 'Email', icon: 'mail', color: '#5b5b5b', url: '/registration-email' },
+        { id: 10, label: 'Номера телефона', icon: 'phone', color: 'green', url: '' },
     ];
 
     export default {
@@ -26,14 +26,16 @@
                 buttons: BUTTONS,
             };
         },
-        methods: {},
     };
 
 </script>
 
 <style>
-    h5 {
+   * {
         font-family: Montserrat;
+    }
+    .head-title {
+        margin: 20px 0;
     }
     .btn-register i {
         position: absolute;
