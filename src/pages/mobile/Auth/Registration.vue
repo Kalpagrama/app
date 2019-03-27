@@ -15,7 +15,7 @@
         { id: 5, label: 'Instagram', icon: 'fab fa-instagram', color: '#9E5396', url: '' },
         { id: 6, label: 'Yandex', icon: 'fab fa-yandex', color: '#EC514D', url: '' },
         { id: 8, label: 'Telegram Passport', icon: 'fab fa-telegram', color: '#51B3DE', url: '' },
-        { id: 9, label: 'Email', icon: 'mail', color: '#5b5b5b', url: '/registration-email' },
+        { id: 9, label: 'Email', icon: 'mail', color: '#5b5b5b', url: '/login' },
         { id: 10, label: 'Номера телефона', icon: 'phone', color: 'green', url: '' },
     ];
 
@@ -35,7 +35,7 @@
         font-family: Montserrat;
     }
     .head-title {
-        margin: 20px 0;
+        margin: 10px 0;
     }
     .btn-register i {
         position: absolute;

@@ -6,19 +6,16 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/mobile/Home.vue') },
       { path: '/home', component: () => import('pages/mobile/Home.vue') },
-      {
-          path: '/registration',
-          component: () => import('pages/mobile/Auth/Registration.vue'),
-          children: [
-          { path: 'registration-email', component: () => import('pages/mobile/Auth/RegistrationEmail.vue') },
-          ],
-      },
+      { path: '/promo', component: () => import('pages/mobile/Promo.vue') },
+      { path: '/login', component: () => import('pages/mobile/Auth/Login.vue') },
+      { path: '/registration', component: () => import('pages/mobile/Auth/Registration.vue') },
+      { path: '/restore', component: () => import('pages/mobile/Auth/RecoverPassword.vue') },
       { path: 'registration-email', component: () => import('pages/mobile/Auth/RegistrationEmail.vue') },
-      { path: '/promo', component: () => import('pages/mobile/Auth/Promo.vue') },
       { path: '/search', component: () => import('pages/mobile/Search.vue') },
       { path: '/create', component: () => import('pages/mobile/Create.vue') },
       { path: '/bell', component: () => import('pages/mobile/Bell.vue') },
       { path: '/profile', component: () => import('pages/mobile/Profile.vue') },
+      { path: '/greeting', component: () => import('pages/mobile/Greeting.vue') },
     ],
   },
 ];

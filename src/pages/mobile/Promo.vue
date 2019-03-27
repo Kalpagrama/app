@@ -25,9 +25,6 @@
 </script>
 
 <style lang="stylus">
-    .head-title {
-        margin: 20px 0;
-    }
     .kp-promo {
         display: flex;
         flex-direction: column;
@@ -35,8 +32,5 @@
     }
     .kp-promo__button {
         margin-bottom: 2%;
-    }
-    * {
-        font-family: Montserrat;
     }
 </style>
