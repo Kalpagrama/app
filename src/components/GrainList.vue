@@ -82,7 +82,6 @@
         top 50px
         left 50px
     .kp-grain-list
-        outline 1px solid red
         position absolute
         top 0
         bottom 0
