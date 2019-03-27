@@ -1,6 +1,6 @@
 <template lang="pug">
   q-layout(view='lHh Lpr lFf')
-    q-header.bg-white.text-black(elevated='')
+    q-header.bg-white.text-black(elevated='' v-show="!isGrainView()")
         q-toolbar
             q-btn.q-mr-sm(flat='', round='', dense='', icon='menu')
             q-toolbar-title(v-if="isTitle()") Кальпаграмма
@@ -43,6 +43,9 @@ export default {
       },
       isSearch() {
           return this.$route.path === '/search';
+      },
+      isGrainView() {
+          return /\/view\//.test(this.$route.path);
       },
       click(btn) {
           this.btn = btn;
