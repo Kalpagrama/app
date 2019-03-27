@@ -9,9 +9,9 @@
 
         .kp-voter__simple(v-else)
             .kp-voter__views 2K
-            q-btn(round :color="color('red')" :outline="isOutline(0)" @mouseover.stop="say('Нет', 0)" icon="clear" @click="vote(0)")
-            q-btn(round :color="color('primary')" :outline="isOutline(50)" @mouseover.stop="say('Может быть', 50)" icon="change_history" @click="vote(50)")
-            q-btn(round :color="color('green')" :outline="isOutline(100)" @mouseover.stop="say('Да', 100)" icon="check" @click="vote(100)")
+            q-btn.kp-voter__button(round :color="color('red')" :outline="isOutline(0)" @mouseover.stop="say('Нет', 0)" icon="clear" @click="vote(0)")
+            q-btn.kp-voter__button(round :color="color('primary')" :outline="isOutline(50)" @mouseover.stop="say('Может быть', 50)" icon="change_history" @click="vote(50)")
+            q-btn.kp-voter__button(round :color="color('green')" :outline="isOutline(100)" @mouseover.stop="say('Да', 100)" icon="check" @click="vote(100)")
             .kp-voter__vote 75%
 
         .kp-voter__text(v-if="text && tooltip !== 'none'")
@@ -45,6 +45,12 @@
             },
         },
         methods: {
+            clearCloser() {
+                if (this.closer) {
+                    clearTimeout(this.closer);
+                }
+                this.closer = false;
+            },
             tapCloser() {
                 this.isTapped = false;
                 this.text = '';
@@ -56,12 +62,11 @@
                 return (this.value !== vote) && (this.hoverValue !== vote);
             },
             startTap() {
+                this.clearCloser();
                 this.isTapped = true;
             },
             endTap() {
-                if (this.isTapped) {
-                    this.closer = setTimeout(this.tapCloser.bind(this), 1000);
-                }
+                this.closer = setTimeout(this.tapCloser.bind(this), 1000);
             },
             say(text, hoveredValue) {
                 this.text = text;
@@ -69,11 +74,8 @@
             },
             vote(vote) {
                 this.value = vote;
-                if (this.closer) {
-                    clearTimeout(this.closer);
-                    this.closer = false;
-                    // this.closer = setTimeout(this.tapCloser.bind(this), 1000);
-                }
+                this.clearCloser();
+                this.endTap();
             },
         },
     };
@@ -105,11 +107,13 @@
             display grid
             grid-template-columns 1fr 1fr 1fr 1fr 1fr
             grid-column-gap 16px
+            text-align center
 
         &__advanced
             display grid
             grid-template-columns 1fr 1fr 1fr 1fr 1fr
             grid-column-gap 16px
+            text-align center
 
         &__views
         &__vote
@@ -121,5 +125,6 @@
 
         &__button
             align-self center
+            text-align center
             justify-self center
 </style>
