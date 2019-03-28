@@ -11,11 +11,13 @@ const routes = [
       { path: '/registration', component: () => import('pages/mobile/Auth/Registration.vue') },
       { path: '/restore', component: () => import('pages/mobile/Auth/RecoverPassword.vue') },
       { path: 'registration-email', component: () => import('pages/mobile/Auth/RegistrationEmail.vue') },
+      { path: '/registration-phone', component: () => import('pages/mobile/Auth/RegistrationPhone.vue') },
       { path: '/search', component: () => import('pages/mobile/Search.vue') },
       { path: '/create', component: () => import('pages/mobile/Create.vue') },
       { path: '/bell', component: () => import('pages/mobile/Bell.vue') },
       { path: '/profile', component: () => import('pages/mobile/Profile.vue') },
       { path: '/greeting', component: () => import('pages/mobile/Greeting.vue') },
+      { path: '/lessons', component: () => import('pages/mobile/Lessons.vue') },
     ],
   },
 ];

@@ -49,10 +49,4 @@
 
 </script>
 
-<style lang="stylus">
-    .head-title {
-        margin: 10px 0;
-    }
-    .warning
-        color red
-</style>
+<style lang="stylus"></style>
