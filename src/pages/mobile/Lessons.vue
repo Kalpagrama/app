@@ -3,7 +3,7 @@
         .q-pa-md
             h5.text-weight-bold.head-title.text-center Обучение
             p.text-weight-regular.small-text Чтобы получать удовольствие от Кальпаграммы посмотри коротенький обучающий ролик. Это поможет тебе быстрее понять суть и начать делиться с другими своими смыслами
-        q-video.kp-promo__video(:src='videoUrl' class="kp-promo__video")
+        q-video.kp-promo__video(:src='videoUrl')
         .text-center
             q-btn.q-mt-md.outline(size='10px' style="color: primary; color: black; width: 220px;" to="/home") Пропустить
 
@@ -18,8 +18,6 @@
                 visibleSkip: false,
             };
         },
-        methods: {},
-        created: {},
     };
 </script>
 

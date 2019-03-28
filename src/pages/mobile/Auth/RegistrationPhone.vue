@@ -3,51 +3,70 @@
         .q-pa-md
             h6.text-weight-bold.head-title Регистрация через Телефон
         .q-pa-md.q-gutter-y-sm
-            form(ref="form")
-                q-input(ref="bePhone" lazy-rules dense="dense" v-model="pnohe" type="phone" mask="(###) ### - ####" hint="(###) ### - ####" :rules="[ val => !!val || '* Введи номер телефона', val => val.length > 7 || 'Минимально 16 символов']")
-                    template(v-slot:before)
-                        span(style="font-size:10px;") Введи номер телефона
+            form(ref="form" @submit.prevent="onSubmitEmail")
+                q-input.flex-double(ref="bePhone" lazy-rules v-model="phone" dense="dense" type="phone" mask="(###) ### - ####" hint="(###) ### - ####")
+                    template(v-slot:before style="width: 50%;")
+                        span.extra-small-text Введи номер телефона:
                 .q-gutter-y-sm.full-height.q-pa-md.q-mt-sm
-                    q-btn(size='12px' style="background: #7030A0; color: white; width: 240px;" type="submit" @click="onSubmitEmail" :loading="submitting") Выслать код (повторно)
-                q-input(lazy-rules dense="dense" v-model="number" type="number" mask="(###) ### - ####" hint="(###) ### - ####")
-                    template(v-slot:before)
-                        span(style="font-size:10px;") Проверочный код
-
+                    q-btn(size='12px' :disabled="disabled" style="background: #7030A0; color: white; width: 240px;" type="submit" :loading="submitting") {{textButton}}
+                p.text-left.success.text-caption.q-mt-sm(v-if="successPhoneCode") Проверочный код выслан по указанному номеру телефона.
+                q-input.text-right.flex-double(v-if="visibleCodeBlock" lazy-rules dense="dense" v-model.number="number" type="password" mask="####" hint="####" )
+                    template(v-slot:before style="width: 50%;")
+                        span.extra-small-text Проверочный код:
+                //p.text-left.warning.text-caption.q-mt-sm(v-if="errorPhoneCode") Неверный проверочный код, попробуйте отправить повторно
 </template>
 
 <script>
     export default {
-        name: 'PageMobileRegisterEmail',
+        name: 'PageMobileRegisterPhone',
         data() {
         return {
-            password: null,
+            phone: '',
             disabled: true,
-            testMail: 'test@test.ru',
+            successPhoneCode: false,
+/*
+            errorPhoneCode: false,
+*/
+            visibleCodeBlock: false,
             submitting: false,
+            textButton: 'Выслать код',
+            number: null,
+            num: null,
         };
     },
     methods: {
             onSubmitEmail() {
-                const user = {
-                    password: this.password,
-                };
-                    this.submitting = true;
-                    setTimeout(() => {
-                        if (this.$refs.emailReg.value === 'test@test.ru') {
-                        this.submitting = false;
-                    } else {
-                        this.submitting = false;
-                        alert(user.password);
-                        this.$router.push('greeting');
-                    }
+                this.submitting = true;
+                setTimeout(() => {
+                    this.textButton = 'Выслать код повторно';
+                    this.submitting = false;
+                    this.successPhoneCode = true;
+                    this.visibleCodeBlock = true;
                 }, 3000);
             },
-            created() {
-                console.log(this.$refs);
+        },
+        watch: {
+            phone() {
+                if (this.phone.length >= 16) {
+                    this.disabled = false;
+                } else {
+                    this.disabled = true;
+                }
+            },
+            number(val) {
+                this.num = Number(val);
+                if (this.num === 1234) {
+                    this.$router.push('greeting');
+                }
             },
         },
     };
 
 </script>
 
-<style lang="stylus"></style>
+<style lang="stylus">
+    .flex-double > div {
+        width: 50% !important;
+    }
+
+</style>
