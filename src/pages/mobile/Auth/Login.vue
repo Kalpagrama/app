@@ -18,8 +18,6 @@
         name: 'PageMobileLogin',
         data() {
         return {
-            rulesEmail: [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'],
-            rulesPassword: [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'],
             email: null,
             password: null,
             disabled: true,
@@ -39,13 +37,21 @@
                 if (this.$refs.emailReg.value === 'test@test.ru') {
                     this.bemail = true;
                     this.submitting = false;
-                    this.$router.push('home');
+                    this.$router.push('/home');
                 } else {
                     this.submitting = false;
                     this.bemail = true;
                     alert(user.email);
                 }
             }, 3000);
+        },
+    },
+    computed: {
+        rulesEmail() {
+            return [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'];
+        },
+        rulesPassword() {
+            return [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'];
         },
     },
     };

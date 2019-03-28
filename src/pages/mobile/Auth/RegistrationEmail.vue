@@ -18,8 +18,6 @@
         data() {
         return {
             email: null,
-            rulesEmail: [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'],
-            rulesPassword: [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'],
             password: null,
             disabled: true,
             bemail: false,
@@ -29,11 +27,6 @@
     },
     methods: {
         onSubmitEmail() {
-            const user = {
-                email: this.email,
-                password: this.password,
-            };
-            console.log(this.$router.currentRoute);
             this.submitting = true;
             setTimeout(() => {
                 if (this.$refs.emailReg.value === 'test@test.ru') {
@@ -42,7 +35,6 @@
                 } else {
                     this.submitting = false;
                     this.bemail = false;
-                    alert(user.email);
                     this.$router.push('/greeting');
                 }
             }, 3000);
@@ -51,8 +43,15 @@
             return this.$router.back();
         },
       },
+      computed: {
+          rulesEmail() {
+              return [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'];
+          },
+          rulesPassword() {
+              return [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'];
+          },
+       },
     };
-
 </script>
 
 <style lang="stylus"></style>

@@ -15,7 +15,6 @@
         name: 'PageMobileGreeting',
             data() {
                 return {
-                    checkedname: [val => !!val || '* Заполните поле!', val => val.length >= 2 || '* Все таки хочется увидеть имя. Будь пожалуйста честным и открытым!'],
                     submitting: false,
                     disabled: false,
                     nameUser: '',
@@ -32,6 +31,11 @@
                             this.submitting = false;
                         }
                     }, 3000);
+                },
+            },
+            computed: {
+                checkedname() {
+                    return [val => !!val || '* Заполните поле!', val => val.length >= 2 || '* Все таки хочется увидеть имя. Будь пожалуйста честным и открытым!'];
                 },
             },
         };

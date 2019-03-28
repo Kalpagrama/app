@@ -26,6 +26,7 @@ const routes = [
       { path: '/profile', component: () => import('pages/mobile/Profile.vue') },
       { path: '/greeting', component: () => import('pages/mobile/Greeting.vue') },
       { path: '/lessons', component: () => import('pages/mobile/Lessons.vue') },
+      { path: '/test', component: () => import('pages/mobile/Test.vue') },
     ],
   },
 ];

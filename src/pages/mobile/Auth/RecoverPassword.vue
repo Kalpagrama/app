@@ -18,7 +18,6 @@
         data() {
         return {
             email: null,
-            rulesEmail: [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'],
             password: null,
             disabled: true,
             showBtnAuth: false,
@@ -52,6 +51,11 @@
             setTimeout(() => {
                 this.$router.push('/auth/login');
             }, 500);
+        },
+    },
+    computed: {
+        rulesEmail() {
+            return [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'];
         },
     },
     };

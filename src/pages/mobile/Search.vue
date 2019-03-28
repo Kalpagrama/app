@@ -3,7 +3,6 @@
     .kp-search__trends
         .kp-search__trend-list
             trend-item(v-for="(item,ix) in trends" :key="ix" :item="item" @click="openTrend")
-
 </template>
 
 <style lang='stylus'>
