@@ -7,10 +7,9 @@
             q-btn(flat='', round='', dense='', icon='more_vert')
     q-page-container
       router-view
-
     q-footer.bg-white.kp-menu_main(bordered)
-        <q-btn v-for="(btn, ix) in BUTTONS" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)"/>
-        <q-btn v-for="(btn, ixs) in BUTTONSREG" :key="'reg_'+ixs" flat :color="buttonColor(btn)" :icon="btn.icon" size="md" @click="click(btn)" active-class="active"/>
+        q-btn(v-for="(btn, ix) in BUTTONS" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)")
+        q-btn(v-for="(btn, ixs) in BUTTONSREG" :key="'reg_'+ixs" flat :color="buttonColor(btn)" :icon="btn.icon" size="md" @click="click(btn)" active-class="active")
 </template>
 
 <script>
@@ -23,7 +22,7 @@ const BUTTONS = [
 ];
 
 const BUTTONSREG = [
-    { icon: 'fas fa-sign-in-alt', path: '/registration' },
+    { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
     { icon: 'fas fa-user-tag', path: '/promo' },
 ];
 
@@ -39,7 +38,6 @@ export default {
   computed: {},
   methods: {
       click(btn) {
-          console.log(btn);
           this.btn = btn;
           this.$router.push(btn.path);
       },

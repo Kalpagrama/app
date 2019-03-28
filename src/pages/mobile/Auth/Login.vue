@@ -4,13 +4,13 @@
             h6.text-weight-bold.head-title Вход через E-mail
         .q-pa-md.q-gutter-y-sm
             form(ref="form")
-                q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="[ val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail']")
-                q-input(type="password" ref="passwordReg" v-model="password" label="Придумай пароль" dense="dense" :rules="[ val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов']")
+                q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="rulesEmail")
+                q-input(type="password" ref="passwordReg" v-model="password" label="Придумай пароль" dense="dense" :rules="rulesPassword")
                 p.text-left.warning.text-caption.q-mt-sm(v-if="bemail") Пользователь с таким Email не найден! Пожалуйста зарегистрируйтесь!
                 .q-gutter-y-sm.full-height.q-pa-md.q-mt-sm
-                    q-btn(size='12px' style="background: #7030A0; color: white; width: 240px;" type="submit" @click="onSubmitEmail" :loading="submitting") Войти
-                    q-btn(size='12px' style="background: #7030A0; color: white; width: 240px;" to="/registration-email") Зарегистрироваться
-                    q-btn(size='12px' style="background: #7030A0; color: white; width: 240px;" to="/restore") Восстановить пароль
+                    q-btn.btn-auth(size='12px' type="submit" @click="onSubmitEmail" :loading="submitting") Войти
+                    q-btn.btn-auth(size='12px' to="/auth/register/email") Зарегистрироваться
+                    q-btn.btn-auth(size='12px' to="/auth/restore") Восстановить пароль
 </template>
 
 <script>
@@ -18,6 +18,8 @@
         name: 'PageMobileLogin',
         data() {
         return {
+            rulesEmail: [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'],
+            rulesPassword: [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'],
             email: null,
             password: null,
             disabled: true,
@@ -50,8 +52,4 @@
 
 </script>
 
-<style lang="stylus">
-    .warning {
-        color: red;
-    }
-</style>
+<style lang="stylus"></style>

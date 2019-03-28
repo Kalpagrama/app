@@ -3,7 +3,7 @@
         q-page.text-center.bold.kp-auth
             h5.text-weight-bold.kp-auth__title.head-title Войти с помощью
             .q-pa-md.q-gutter-y-sm
-                q-btn(v-for="(button,ix) in buttons" :style='`background: ${button.color}`' :icon="button.icon" elevated no-caps type="a" :key="ix" text-color='white' :label='`${button.label}`' class='full-width btn-register kp-auth__button' :to="button.url")
+                q-btn.full-width.btn-register.kp-auth__button(v-for="(button,ix) in buttons" :style='`background: ${button.color}`' :icon="button.icon" elevated no-caps type="a" :key="ix" text-color='white' :label='`${button.label}`' :to="button.url")
 </template>
 
 <script>
@@ -15,10 +15,9 @@
         { id: 5, label: 'Instagram', icon: 'fab fa-instagram', color: '#9E5396', url: '' },
         { id: 6, label: 'Yandex', icon: 'fab fa-yandex', color: '#EC514D', url: '' },
         { id: 8, label: 'Telegram Passport', icon: 'fab fa-telegram', color: '#51B3DE', url: '' },
-        { id: 9, label: 'Email', icon: 'mail', color: '#5b5b5b', url: '/login' },
-        { id: 10, label: 'Номера телефона', icon: 'phone', color: 'green', url: '/registration-phone' },
+        { id: 9, label: 'Email', icon: 'mail', color: '#5b5b5b', url: '/auth/login' },
+        { id: 10, label: 'Номера телефона', icon: 'phone', color: 'green', url: '/auth/register/phone' },
     ];
-
     export default {
         name: 'PageMobileRegistration',
         data() {
@@ -26,11 +25,16 @@
                 buttons: BUTTONS,
             };
         },
+        methods: {
+        },
+        created() {
+            console.log(this.$router.currentRoute.path);
+        },
     };
 
 </script>
 
-<style>
+<style lang='stylus'>
     .btn-register i {
         position: absolute;
         left: 4%;

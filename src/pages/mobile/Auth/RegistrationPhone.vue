@@ -5,13 +5,13 @@
         .q-pa-md.q-gutter-y-sm
             form(ref="form" @submit.prevent="onSubmitEmail")
                 q-input.flex-double(ref="bePhone" lazy-rules v-model="phone" dense="dense" type="phone" mask="(###) ### - ####" hint="(###) ### - ####")
-                    template(v-slot:before style="width: 50%;")
+                    template(v-slot:before)
                         span.extra-small-text Введи номер телефона:
                 .q-gutter-y-sm.full-height.q-pa-md.q-mt-sm
-                    q-btn(size='12px' :disabled="disabled" style="background: #7030A0; color: white; width: 240px;" type="submit" :loading="submitting") {{textButton}}
+                    q-btn.btn-auth(size='12px' :disabled="disabled" type="submit" :loading="submitting") {{textButton}}
                 p.text-left.success.text-caption.q-mt-sm(v-if="successPhoneCode") Проверочный код выслан по указанному номеру телефона.
                 q-input.text-right.flex-double(v-if="visibleCodeBlock" lazy-rules dense="dense" v-model.number="number" type="password" mask="####" hint="####" )
-                    template(v-slot:before style="width: 50%;")
+                    template(v-slot:before)
                         span.extra-small-text Проверочный код:
                 //p.text-left.warning.text-caption.q-mt-sm(v-if="errorPhoneCode") Неверный проверочный код, попробуйте отправить повторно
 </template>
@@ -56,7 +56,7 @@
             number(val) {
                 this.num = Number(val);
                 if (this.num === 1234) {
-                    this.$router.push('greeting');
+                    this.$router.push('/greeting');
                 }
             },
         },
@@ -65,8 +65,6 @@
 </script>
 
 <style lang="stylus">
-    .flex-double > div {
-        width: 50% !important;
-    }
-
+    .flex-double > div
+        width 50% !important
 </style>
