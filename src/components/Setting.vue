@@ -1,12 +1,13 @@
 <template lang="pug">
     .kp-setting
-        h3 Title
+        h3 Setting section
+        p Some setting point
 </template>
 
 <script>
     export default {
-        name: 'Setting'
-    }
+        name: 'Setting',
+    };
 </script>
 
 <style lang="stylus">

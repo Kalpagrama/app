@@ -1,6 +1,6 @@
 <template lang="pug">
-    .kp-grain-list(ref="list" v-touch-swipe.up="swipeUp" v-touch-swipe.down="swipeDown"
-    v-touch-pan.up="panUp" v-touch-pan.down="panDown"  @wheel.prevent="catchScroll")
+    // .kp-grain-list(ref="list" v-touch-swipe.up="swipeUp" v-touch-swipe.down="swipeDown" v-touch-pan.up="panUp" v-touch-pan.down="panDown"  @wheel.prevent="catchScroll")
+    .kp-grain-list()
         //.kp-grain-list__container(v-touch-swipe.mouse.up.down="switchGrain")
         .kp-grain-list__container
             grain(flat bordered v-for="(card, ix) in source" :key="ix" :item="{id: card}" :ix="ix" :ref="'card-' + ix")
@@ -54,21 +54,33 @@
                     }
                 }, 10);
             },
-            swipeUp() {
-                this.scroll(1);
+            swipeUp(e) {
+                console.log(e);
+                // this.scroll(1);
+                // eslint-disable-next-line
+                const ref = this.$refs.list;
+                ref.scrollBy(e.distance);
+                this.$emit('swipeUp', e);
             },
-            swipeDown() {
-                this.scroll(-1);
+            swipeDown(e) {
+                console.log(e);
+                // this.scroll(-1);
+                // eslint-disable-next-line
+                const ref = this.$refs.list;
+                ref.scrollBy(e.distance);
+                this.$emit('swipeDown', e);
             },
             panUp() {
-                if (!this.timer) this.scroll(1);
+                // if (!this.timer) this.scroll(1);
             },
             panDown() {
-                if (!this.timer) this.scroll(-1);
+                // if (!this.timer) this.scroll(-1);
             },
             catchScroll(e) {
-                if (e.deltaY > 0) this.scroll(1);
-                else if (e.deltaY < 0) this.scroll(-1);
+                return e;
+                // e.target.dispatchEvent(e);
+                // if (e.deltaY > 0) this.scroll(1);
+                // else if (e.deltaY < 0) this.scroll(-1);
             },
         },
     };
