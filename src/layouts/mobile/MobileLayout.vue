@@ -1,6 +1,6 @@
 <template lang="pug">
   q-layout(view='lHh Lpr lFf')
-    q-header.bg-white.text-black(elevated='' v-show="!showHeader()")
+    q-header.bg-white.text-black(elevated='' v-show="headerVisible()")
         q-toolbar
             q-btn.q-mr-sm(flat='', round='', dense='', icon='menu')
             q-toolbar-title(v-if="isTitle()") Кальпаграмма
@@ -43,8 +43,11 @@ export default {
       isSearch() {
           return this.$route.path === '/search';
       },
-      showHeader() {
-          return /\/view\//.test(this.$route.path) || /\/sphere\//.test(this.$route.path);
+      headerVisible() {
+          return !(/\/view\//.test(this.$route.path)
+              || /\/sphere\//.test(this.$route.path)
+              || /\/create/.test(this.$route.path)
+          );
       },
       click(btn) {
           this.btn = btn;
