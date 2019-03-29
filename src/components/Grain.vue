@@ -1,5 +1,5 @@
 <template lang="pug">
-    q-card.kp-grain
+    q-card.kp-grain(@click="openGrain")
         q-item.kp-grain__header
             q-item-section.kp-avatar(avatar)
                 q-avatar.kp-avatar__image
@@ -10,8 +10,9 @@
             img(:src='randomImage(0)')
             //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls=0&showinfo=0')
 
-        q-item
-            q-item-section.text-center.text-capitalize {{ randomText() }}
+        .kp-grain__sense
+            span.kp-grain__sense-text.shadow-4 {{ randomText() }}
+
 
         .kp-grain__content
             img(:src='randomImage(1)')
@@ -34,7 +35,7 @@
     ];
 
     const TEXTS = [
-        'Время', 'Победа', 'Здоровье', 'Вечность', 'Милосердие', 'Вера', 'Жизнь', 'Благоденствие', 'Защита',
+        'Время', 'Победа', 'Здоровье', 'Вечность', 'Милосердие и здоровье', 'Вера', 'Жизнь', 'Благоденствие', 'Защита',
     ];
     export default {
         name: 'Grain',
@@ -75,6 +76,9 @@
                 const ix = Math.floor(Math.random() * TEXTS.length);
                 return TEXTS[ix];
             },
+            openGrain() {
+                this.$router.push('/view/1');
+            },
         },
     };
 </script>
@@ -84,6 +88,7 @@
         &-grain
             max-width 99vw
             margin 6px auto
+            border 1px solid #d0
 
             &__header
                 padding 0 8px
@@ -102,6 +107,21 @@
             &__footer
                 display grid
                 grid-template-columns 1fr 1fr 1fr
+
+            &__sense
+                position: relative;
+                display: block;
+                height: 40px;
+                width: 300px;
+                padding 5px
+                background: none
+                margin: -20px auto;
+                text-align center
+                &-text
+                    font-size 20px
+                    padding: 8px 16px
+                    background white
+                    border-radius 6px
 
         &-avatar
             min-width 40px

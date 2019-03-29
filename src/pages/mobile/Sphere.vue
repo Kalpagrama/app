@@ -1,33 +1,30 @@
 <template lang="pug">
-  q-page.flex.kp-profile
-    .kp-profile__header(@click="toggle" @scroll="scrollProfile")
-        q-card.kp-profile__visitcard(flat dense v-show="mode > 0" :class="{'kp-profile__visitcard_mode-2': mode === 2}")
+  q-page.flex.kp-sphere
+    .kp-sphere__header(@click="toggle")
+        q-card.kp-sphere__visitcard(flat dense v-show="mode > 0" :class="{'kp-sphere__visitcard_mode-2': mode === 2}")
 
-            .kp-profile__face
-                img.kp-profile__image(:src='imageSrc()' :class="{'kp-profile__image_mode-2': mode === 2}")
+            .kp-sphere__face
+                img.kp-sphere__image(src='http://lorempixel.com/100/100/' :class="{'kp-sphere__image_mode-2': mode === 2}")
 
-            .kp-profile__info(:class="{'kp-profile__info_mode-2': mode === 2}")
-                .kp-profile__username(:class="{'kp-profile__username_mode-2': mode === 2}") Username
-                .kp-profile__quote(v-if="mode !== 2") {{ statusText }}
+            .kp-sphere__info(:class="{'kp-sphere__info_mode-2': mode === 2}")
+                .kp-sphere__name(:class="{'kp-sphere__name_mode-2': mode === 2}") Название сферы
+                .kp-sphere__descript
+                    span.kp-sphere__text 20K
+                    q-btn(size="sm" outline) Подписаться
 
-        .kp-profile__quote_mode-2(v-if="mode === 2") {{ statusText }}
 
-        .kp-profile__settings(v-if="mode === 2")
-            setting
-            setting
-            setting
-            .kp-profile__quit
-                q-btn(color="white" text-color="black" label="Выйти из аккаунта" size="sm" @click="queryLogout")
+        .kp-sphere__filter(v-show="mode < 2")
+            .kp-sphere__chips
+                q-chip(v-for="(item, ix) in TAGS" :key="ix" :label="item.label")
 
-        q-card.kp-profile__filter(v-show="mode < 2")
-            q-btn-group(outline)
-                q-btn(outline :label="item.label" v-for="(item,ix) in BUTTONS" :key="ix" size="sm")
+    grain-list.kp-sphere__grains(:source="cards" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2"
+    @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
 
-    grain-list.kp-profile__grains(:source="cards" :class="{'kp-profile_mode-0': mode === 0}" v-show="mode < 2" @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
+    beads.kp-sphere__beads
 </template>
 
 <style lang="stylus">
-    .kp-profile
+    .kp-sphere
         display block
         width 100%
 
@@ -39,8 +36,8 @@
             display grid
             grid-template-columns 95px auto
             grid-gap 16px
-            height 130px
-            padding 16px
+            height 110px
+            padding 8px
             border-bottom 1px solid #c0
 
             &_mode-2
@@ -69,7 +66,8 @@
         &__info
             padding-top 8px
 
-        &__username
+        &__name
+            padding-top 8px
             font-size 18px
 
             &_mode-2
@@ -91,10 +89,20 @@
 
         &__filter
             text-align center
-            padding 16px
+            padding 4px
+            max-height 50px
+            overflow auto
+
+        &__chips
+            display inline-block
+            white-space nowrap
+            width auto
+            max-height 40px
+
 
         &__grains
-            top 190px
+            top 160px
+            bottom 50px
 
         &_mode-0
             top 60px
@@ -104,12 +112,18 @@
             padding 16px
             border-top 1px solid silver
 
+        &__beads
+            position absolute !important
+            bottom 0
+            left 0
+            right 0
 
 </style>
 
 <script>
 import GrainList from '../../components/GrainList';
 import Setting from '../../components/Setting';
+import Beads from '../../components/Beads';
 
 const BUTTONS = [
     { id: 1, label: 'Ядра' },
@@ -117,9 +131,23 @@ const BUTTONS = [
     { id: 3, label: 'Связи' },
 ];
 
+const TAGS = [
+    { id: 1, label: 'Параллепипед', path: '', weight: '20K' },
+    { id: 2, label: 'Счастье', path: '', weight: '150K' },
+    { id: 3, label: 'Любовь', path: '', weight: '430K' },
+    { id: 4, label: 'Гармония', path: '', weight: '100K' },
+    { id: 5, label: 'Дети', path: '', weight: '385K' },
+    { id: 6, label: 'Продукты', path: '', weight: '385K' },
+    { id: 7, label: 'Животные', path: '', weight: '35K' },
+    { id: 8, label: 'Математика', path: '', weight: '8K' },
+    { id: 9, label: 'Политика', path: '', weight: '2M' },
+    { id: 10, label: 'Обучение', path: '', weight: '1.5M' },
+];
+
 export default {
-  name: 'PageMobileProfile',
+  name: 'PageMobileSphere',
   components: {
+      Beads,
       'grain-list': GrainList,
       Setting,
   },
@@ -128,6 +156,7 @@ export default {
           cards: [],
           mode: 1,
           BUTTONS,
+          TAGS,
           statusText: 'Свайп пока не работает, для просмотра состояний кликни на визитку',
       };
   },
@@ -142,27 +171,9 @@ export default {
       },
   },
   methods: {
-      imageSrc() {
-          return this.mode === 1 ? 'https://placebeard.it/95x95' : 'https://placebeard.it/400x400';
-      },
-      scrollProfile(e) {
-          console.log(e);
-      },
       toggle() {
           this.mode += 1;
-          if (this.mode === 3) this.mode = 0;
-      },
-      onSwipeUp(e) {
-          console.log('swipe up', e);
-      },
-      onSwipeDown(e) {
-          console.log('swipe down', e);
-      },
-      queryLogout() {
-          // eslint-disable-next-line
-          if (confirm('Завершить работу?')) {
-            console.log('exit');
-          }
+          if (this.mode === 2) this.mode = 0;
       },
   },
 };

@@ -42,8 +42,9 @@ module.exports = {
           "typeLiterals": "ignore"
         }
       }],
-      'object-curly-newline': ['off',{}],
-      'no-plusplus': 'off',
+    'object-curly-newline': ['off',{}],
+    'no-plusplus': 'off',
+    'linebreak-style': 'off',
 
     'no-param-reassign': 'off',
 

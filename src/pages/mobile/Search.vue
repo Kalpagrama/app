@@ -3,6 +3,9 @@
     .kp-search__trends
         .kp-search__trend-list
             trend-item(v-for="(item,ix) in trends" :key="ix" :item="item" @click="openTrend")
+    .kp-search__results
+        .kp-search__grain-list
+            grain(v-for="(item,ix) in trends" :key="ix" :item="item")
 
 </template>
 
@@ -16,7 +19,6 @@
                 left 0
                 right 0
                 height 100px
-                border-bottom 1px solid silver
                 overflow-y hidden
                 overflow-x auto
 
@@ -27,10 +29,24 @@
                 max-height 100px
                 padding 8px
 
+        &__results
+            //border 1px solid red
+            position absolute
+            top 100px
+            left 0
+            right 0
+            bottom 0
+            overflow-x hidden
+            overflow-y auto
+
+        &__grain-list
+            background silver
+
 </style>
 
 <script>
 import TrendItem from '../../components/TrendItem';
+import grain from '../../components/Grain';
 
 const TRENDS = [
     { id: 1, label: 'Природа', image: 'http://lorempixel.com/150/100/' },
@@ -51,6 +67,7 @@ export default {
   name: 'PageMobileSearch',
   components: {
       'trend-item': TrendItem,
+      grain,
   },
   data() {
       return {

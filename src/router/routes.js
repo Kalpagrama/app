@@ -10,6 +10,8 @@ const routes = [
       { path: '/create', component: () => import('pages/mobile/Create.vue') },
       { path: '/bell', component: () => import('pages/mobile/Bell.vue') },
       { path: '/profile', component: () => import('pages/mobile/Profile.vue') },
+      { path: '/view/:id', component: () => import('pages/mobile/View.vue') },
+      { path: '/sphere/:id', component: () => import('pages/mobile/Sphere.vue') },
     ],
   },
 ];
