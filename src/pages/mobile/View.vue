@@ -21,7 +21,9 @@
 
     .kp-grain-view__footer
         .kp-grain-view__tags
-            q-chip(dense color="primary" text-color="white" icon="event" v-for="(item,ix) in TAGS" :key="ix") {{ item.label }}
+            q-chip(rounded @click.native="openSphere(item)" v-for="(item,ix) in TAGS" :key="ix")
+                q-avatar(color="blue" text-color="white" font-size="12px") {{ item.weight }}
+                | {{ item.label }}
         .kp-grain-view__share
             q-btn.kp-grain-view__share-btn(flat icon="share" size="lg")
     voter.kp-grain-view__voter
@@ -90,10 +92,11 @@
 import voter from '../../components/Voter';
 
 const TAGS = [
-    { id: 1, label: 'Текст тега', path: '' },
-    { id: 2, label: 'Текст тега', path: '' },
-    { id: 3, label: 'Текст тега', path: '' },
-    { id: 4, label: 'Текст тега', path: '' },
+    { id: 1, label: 'Параллепипед', path: '', weight: '20K' },
+    { id: 2, label: 'Счастье', path: '', weight: '150K' },
+    { id: 3, label: 'Любовь', path: '', weight: '430K' },
+    { id: 4, label: 'Гармония', path: '', weight: '100K' },
+    { id: 5, label: 'Дети', path: '', weight: '385K' },
 ];
 
 export default {
@@ -111,6 +114,11 @@ export default {
           },
           TAGS,
       };
+  },
+  methods: {
+      openSphere(item) {
+          this.$router.push(`/sphere/${item.id}`);
+      },
   },
 };
 </script>
