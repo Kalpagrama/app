@@ -25,11 +25,7 @@
                 buttons: BUTTONS,
             };
         },
-        methods: {
-        },
-        created() {
-            console.log(this.$router.currentRoute.path);
-        },
+        methods: {},
     };
 
 </script>

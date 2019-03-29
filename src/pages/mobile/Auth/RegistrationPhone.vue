@@ -3,7 +3,7 @@
         .q-pa-md
             h6.text-weight-bold.head-title Регистрация через Телефон
         .q-pa-md.q-gutter-y-sm
-            form(ref="form" @submit.prevent="onSubmitEmail")
+            form(ref="form" @submit.prevent="onSubmit")
                 q-input.flex-double(ref="bePhone" lazy-rules v-model="phone" dense="dense" type="phone" mask="(###) ### - ####" hint="(###) ### - ####")
                     template(v-slot:before)
                         span.extra-small-text Введи номер телефона:
@@ -35,7 +35,7 @@
         };
     },
     methods: {
-            onSubmitEmail() {
+            onSubmit() {
                 this.submitting = true;
                 setTimeout(() => {
                     this.textButton = 'Выслать код повторно';

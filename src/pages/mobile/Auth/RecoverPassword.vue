@@ -4,7 +4,7 @@
             h6.text-weight-bold.head-title Восcтановление пароля
         .q-pa-md.q-gutter-y-sm
             form(ref="form")
-                q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="rulesEmail")
+                q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="checkEmail")
                 p.text-left.success.text-caption.q-mt-sm(v-if="successRestore") Новый пароль отправлен на указанный почтовый ящик!
                 p.text-left.warning.text-caption.q-mt-sm(v-if="falseEmail") Данный email не найден, пожалуйста пройдите этап регистрации!
                 .q-gutter-y-sm.full-height.q-pa-md.q-mt-sm
@@ -54,7 +54,7 @@
         },
     },
     computed: {
-        rulesEmail() {
+        checkEmail() {
             return [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'];
         },
     },
