@@ -1,6 +1,6 @@
 <template lang="pug">
   q-layout(view='lHh Lpr lFf')
-    q-header.bg-white.text-black(elevated='' v-show="!isGrainView()")
+    q-header.bg-white.text-black(elevated='' v-show="!showHeader()")
         q-toolbar
             q-btn.q-mr-sm(flat='', round='', dense='', icon='menu')
             q-toolbar-title(v-if="isTitle()") Кальпаграмма
@@ -9,7 +9,6 @@
                     template(v-slot:prepend)
                         q-icon(v-if="search === ''" name="search")
                         q-icon(v-else name="clear" class="cursor-pointer" @click="search = ''")
-
 
             q-btn(flat='', round='', dense='', icon='more_vert')
     q-page-container
@@ -44,8 +43,8 @@ export default {
       isSearch() {
           return this.$route.path === '/search';
       },
-      isGrainView() {
-          return /\/view\//.test(this.$route.path);
+      showHeader() {
+          return /\/view\//.test(this.$route.path) || /\/sphere\//.test(this.$route.path);
       },
       click(btn) {
           this.btn = btn;
