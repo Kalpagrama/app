@@ -11,6 +11,7 @@
     "build": "quasar build",
     "gql": "apollo schema:download -k --endpoint=https://api.kalpagramma.com/graphql ./src/schema/graphql.schema.json",
     "lint": "eslint --ext .js,.vue src",
+    "start": "quasar dev",
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
