@@ -40,6 +40,7 @@ export default {
     return {
       btn: null,
       BUTTONS,
+      BUTTONSREG,
     };
   },
   methods: {

@@ -1,18 +1,18 @@
 <template lang="pug">
-    // .kp-grain-list(ref="list" v-touch-swipe.up="swipeUp" v-touch-swipe.down="swipeDown" v-touch-pan.up="panUp" v-touch-pan.down="panDown"  @wheel.prevent="catchScroll")
-    .kp-grain-list()
-        //.kp-grain-list__container(v-touch-swipe.mouse.up.down="switchGrain")
-        .kp-grain-list__container
-            grain(flat bordered v-for="(card, ix) in source" :key="ix" :item="{id: card}" :ix="ix" :ref="'card-' + ix")
+    // .kp-node-list(ref="list" v-touch-swipe.up="swipeUp" v-touch-swipe.down="swipeDown" v-touch-pan.up="panUp" v-touch-pan.down="panDown"  @wheel.prevent="catchScroll")
+    .kp-node-list()
+        //.kp-node-list__container(v-touch-swipe.mouse.up.down="switchGrain")
+        .kp-node-list__container
+            node(flat bordered v-for="(card, ix) in source" :key="ix" :item="{id: card}" :ix="ix" :ref="'card-' + ix")
     // button.test(@click="scroll(100)") Scroll
 </template>
 
 <script>
-    import grain from './Grain';
+    import node from './Node';
 
     export default {
-        name: 'GrainList',
-        components: { grain },
+        name: 'NodeList',
+        components: { node },
         props: {
             source: {
                 type: Array,
@@ -93,7 +93,7 @@
         position fixed
         top 50px
         left 50px
-    .kp-grain-list
+    .kp-node-list
         position absolute
         top 0
         bottom 0
