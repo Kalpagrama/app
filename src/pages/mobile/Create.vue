@@ -9,7 +9,12 @@
 
         content-creator(@create="showSelectContent")
 
-    select-content-dialog(:active="true" @close="mode = MODE_NONE")
+    .test
+        q-btn(@click="gqlRefresh") TEST
+        .test-1(v-for="(item, ix) in services()" :key="ix") {{ item.name }}&nbsp;
+            a(:href="item.url") {{ item.url }}
+
+    //select-content-dialog(:active="true" @close="mode = MODE_NONE")
     //select-content-dialog(:active="mode === MODE_SELECT_CONTENT" @close="mode = MODE_NONE")
 </template>
 
@@ -18,6 +23,10 @@
         display block
         width 100%
         text-align center
+    .test
+        text-align center
+        display block
+        width 100%
 </style>
 
 <script>
@@ -35,11 +44,37 @@ export default {
           mode: MODE_NONE,
           MODE_NONE,
           MODE_SELECT_CONTENT,
+          response: {},
       };
     },
     methods: {
         showSelectContent() {
           this.mode = MODE_SELECT_CONTENT;
+        },
+        services() {
+            return this.response;
+        },
+        gqlRefresh() {
+            const request = {
+                query: gql`query{
+                    response: discoverServices {
+                        name
+                        url
+                    }
+                }`
+            };
+
+            const self = this;
+
+            return new Promise((resolve) => {
+                // const selfie = self;
+                this.$apollo.subscribe(request).subscribe({
+                    next: ({ data: { response } }) => {
+                        self.response = response;
+                        resolve(response);
+                }
+                })
+            });
         },
     },
 };
