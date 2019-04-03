@@ -28,11 +28,11 @@ const BUTTONS = [
     { icon: 'person_outline', path: '/profile' },
 ];
 
-const BUTTONSREG = [
-    { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
-    { icon: 'fas fa-user-tag', path: '/promo' },
-    { icon: 'settings', path: '/test' },
-];
+// const BUTTONSREG = [
+//     { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
+//     { icon: 'fas fa-user-tag', path: '/promo' },
+//     { icon: 'settings', path: '/test' },
+// ];
 
 export default {
   name: 'GuestMobileLayout',
