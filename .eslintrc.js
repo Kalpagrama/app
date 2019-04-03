@@ -42,7 +42,8 @@ module.exports = {
         'comma-dangle': 0,
         'space-before-function-paren': 0,
         'no-alert': 0,
-        
+        'object-shorthand': 0,
+        'no-unused-vars': 0,
         'object-curly-newline': ['off', {}],
         'no-plusplus': 'off',
         'linebreak-style': 'off',
