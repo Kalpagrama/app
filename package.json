@@ -11,7 +11,6 @@
     "build": "quasar build",
     "gql": "apollo schema:download -k --endpoint=https://api.kalpagramma.com/graphql ./src/schema/graphql.schema.json",
     "lint": "eslint --ext .js,.vue src",
-    "start": "quasar dev",
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
@@ -30,7 +29,8 @@
     "eslint-loader": "^2.1.1",
     "eslint-plugin-vue": "^5.0.0",
     "pug-plain-loader": "^1.0.0",
-    "strip-ansi": "=3.0.1"
+    "strip-ansi": "=3.0.1",
+    "vuelidate": "^0.7.4"
   },
   "engines": {
     "node": ">= 8.9.0",

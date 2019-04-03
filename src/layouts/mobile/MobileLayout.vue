@@ -9,7 +9,6 @@
                     template(v-slot:prepend)
                         q-icon(v-if="search === ''" name="search")
                         q-icon(v-else name="clear" class="cursor-pointer" @click="search = ''")
-
             q-btn(flat='', round='', dense='', icon='more_vert')
     q-page-container
       router-view
@@ -40,6 +39,7 @@ export default {
     return {
       btn: null,
       BUTTONS,
+      BUTTONSREG,
     };
   },
   methods: {

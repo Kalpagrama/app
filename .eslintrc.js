@@ -45,9 +45,7 @@ module.exports = {
     'object-curly-newline': ['off',{}],
     'no-plusplus': 'off',
     'linebreak-style': 'off',
-
     'no-param-reassign': 'off',
-
     'import/first': 'off',
     'import/named': 'error',
     'import/namespace': 'error',
