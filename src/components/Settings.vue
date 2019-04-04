@@ -59,10 +59,7 @@ const SECTION_NOTICE = {
     type: ELEMENT_TYPE_ENUM.section,
     iconName: 'add_alert',
     name: 'Уведомления',
-    elements: [
-        { type: ELEMENT_TYPE_ENUM.listView, name: 'Список активных сессий', enabled: false, value: ['сессия №1', 'сессия №2', 'сессия №3'], selectedValue: 'сессия №1' },
-        { type: ELEMENT_TYPE_ENUM.button, name: 'Завершить все сессии', enabled: true, value: null },
-    ], // todo
+    elements: [], // todo
 };
 const SECTION_ACCOUNT = {
     type: ELEMENT_TYPE_ENUM.section,

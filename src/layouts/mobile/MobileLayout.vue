@@ -30,7 +30,7 @@ const BUTTONS = [
 const BUTTONSREG = [
     { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
     { icon: 'fas fa-user-tag', path: '/promo' },
-    { icon: 'settings', path: '/test' },
+    { icon: 'settings', path: '/setting' },
 ];
 
 export default {

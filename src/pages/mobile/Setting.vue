@@ -1,6 +1,7 @@
 <template lang="pug">
     div
         q-page.text-center.bold
+            q-btn(@click="getItems" :label="query")
             settings-item
 </template>
 
@@ -13,9 +14,10 @@ export default {
     },
     data() {
         return {
-            name: 'TEST',
+            name: 'Setting',
         };
     },
-    created() {},
+    methods: {},
+    mounted() {},
 };
 </script>
