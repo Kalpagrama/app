@@ -39,7 +39,9 @@
                 if (!this.isLoading) {
                     const rect = this.$refs.list.getBoundingClientRect();
                     const { body } = window.document;
-                    const limit = body.clientHeight + 100; // body.clientWidth;
+                    const delta = Math.abs(this.prevScroll - e.srcElement.scrollTop);
+                    const koef = Math.floor(delta / 20);
+                    const limit = body.clientHeight * (2 + koef);
 
                     let direction = 'none';
                     if (e.srcElement.scrollTop > this.prevScroll) direction = 'down';
@@ -50,6 +52,7 @@
 
                         this.isLoading = true;
                         this.$emit('end', item.oid);
+                        console.log('========= end', item.oid);
                     }
                     /*
                     // Подгрузка сверху отключена как дорогая операция
@@ -60,6 +63,9 @@
                     }
                     */
                 }
+                const a = this.prevScroll;
+                const b = e.srcElement.scrollTop;
+                console.log('prev =', a, ' scroll =', b, ' delta =', a - b);
                 this.prevScroll = e.srcElement.scrollTop;
             },
             scroll(by) {

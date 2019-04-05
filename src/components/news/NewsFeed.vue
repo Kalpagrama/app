@@ -7,7 +7,7 @@
 import NodeList from '../NodeList';
 import NewsProvider, { DIRECTION_BACKWARD } from '../../store/api/NewsProvider';
 
-const AUTOLOAD_STEP = 5;
+const AUTOLOAD_STEP = 20;
 
 export default {
     name: 'NewsFeed',
