@@ -47,6 +47,7 @@ module.exports = {
         'object-curly-newline': ['off', {}],
         'no-plusplus': 'off',
         'linebreak-style': 'off',
+        'class-methods-use-this': 'off',
 
         'no-param-reassign': 'off',
 
