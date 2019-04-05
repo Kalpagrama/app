@@ -17,7 +17,7 @@
             .kp-sphere__chips
                 q-chip(v-for="(item, ix) in TAGS" :key="ix" :label="item.label")
 
-    grain-list.kp-sphere__grains(:source="cards" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2"
+    node-list.kp-sphere__nodes(:source="cards" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2"
     @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
 
     beads.kp-sphere__beads
@@ -100,7 +100,7 @@
             max-height 40px
 
 
-        &__grains
+        &__nodes
             top 160px
             bottom 50px
 
@@ -121,7 +121,7 @@
 </style>
 
 <script>
-import GrainList from '../../components/GrainList';
+import NodeList from '../../components/NodeList';
 import Setting from '../../components/Setting';
 import Beads from '../../components/Beads';
 
@@ -148,7 +148,7 @@ export default {
   name: 'PageMobileSphere',
   components: {
       Beads,
-      'grain-list': GrainList,
+      'node-list': NodeList,
       Setting,
   },
   data() {

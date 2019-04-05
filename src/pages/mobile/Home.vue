@@ -1,6 +1,6 @@
 <template lang="pug">
-    q-page
-        grain-list(:source="cards")
+  q-page
+    node-list(:source="cards")
 </template>
 
 <style lang="stylus">
@@ -8,22 +8,22 @@
 </style>
 
 <script>
-    import GrainList from '../../components/GrainList'
+import NodeList from '../../components/NodeList';
 
-    export default {
-        name: 'PageMobileHome',
-        components: {
-            'grain-list': GrainList
-        },
-        data () {
-            return {
-                cards: []
-            }
-        },
-        beforeMount () {
-            for (let i = 0; i < 20; i += 1) {
-                this.cards.push(i)
-            }
-        }
-    }
+export default {
+  name: 'PageMobileHome',
+  components: {
+      'node-list': NodeList,
+  },
+  data() {
+      return {
+          cards: [],
+      };
+  },
+  beforeMount() {
+      for (let i = 0; i < 20; i += 1) {
+        this.cards.push(i);
+      }
+  },
+};
 </script>

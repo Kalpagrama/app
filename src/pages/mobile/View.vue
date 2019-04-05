@@ -1,38 +1,38 @@
 <template lang="pug">
-    q-page.flex
-        q-card.kp-grain-view(flat)
-            q-item.kp-grain-view__header
-                q-item-section.kp-avatar(avatar)
-                    q-avatar.kp-avatar__image
-                        img(src='https://cdn.quasar-framework.org/img/avatar2.jpg')
-                q-item-section
-                    q-item-label {{ user.name }}
-            .kp-grain-view__content
-                img(src='https://images.unsplash.com/photo-1476820865390-c52aeebb9891')
-                //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls
+  q-page.flex
+    q-card.kp-node-view(flat)
+        q-item.kp-node-view__header
+            q-item-section.kp-avatar(avatar)
+                q-avatar.kp-avatar__image
+                    img(src='https://cdn.quasar-framework.org/img/avatar2.jpg')
+            q-item-section
+                q-item-label {{ user.name }}
+        .kp-node-view__content
+            img(src='https://images.unsplash.com/photo-1476820865390-c52aeebb9891')
+            //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls
 
-            q-item
-                q-item-section
-                    spank.kp-grain-view__sense-text {{ sense.name }}
+        q-item
+            q-item-section
+                spank.kp-node-view__sense-text {{ sense.name }}
 
 
-            .kp-grain-view__content
-                img(src='https://images.unsplash.com/photo-1476820865390-c52aeebb9891')
+        .kp-node-view__content
+            img(src='https://images.unsplash.com/photo-1476820865390-c52aeebb9891')
 
-        .kp-grain-view__footer
-            .kp-grain-view__tags
-                q-chip(rounded @click.native="openSphere(item)" v-for="(item,ix) in TAGS" :key="ix")
-                    q-avatar(color="blue" text-color="white" font-size="12px") {{ item.weight }}
-                    | {{ item.label }}
-            .kp-grain-view__share
-                q-btn.kp-grain-view__share-btn(flat icon="share" size="lg")
-        voter.kp-grain-view__voter
+    .kp-node-view__footer
+        .kp-node-view__tags
+            q-chip(rounded @click.native="openSphere(item)" v-for="(item,ix) in TAGS" :key="ix")
+                q-avatar(color="blue" text-color="white" font-size="12px") {{ item.weight }}
+                | {{ item.label }}
+        .kp-node-view__share
+            q-btn.kp-node-view__share-btn(flat icon="share" size="lg")
+    voter.kp-node-view__voter
 </template>
 
 <style lang="stylus">
 
     .kp
-        &-grain-view
+        &-node-view
             max-width 99vw
             margin 0px auto
 
@@ -70,7 +70,6 @@
                 padding 5px
                 background: none
                 margin: -20px auto;
-
                 &-text
                     text-align center
                     font-size 20px
@@ -90,36 +89,36 @@
 </style>
 
 <script>
-    import voter from '../../components/Voter'
+import voter from '../../components/Voter';
 
-    const TAGS = [
-        { id: 1, label: 'Параллепипед', path: '', weight: '20K' },
-        { id: 2, label: 'Счастье', path: '', weight: '150K' },
-        { id: 3, label: 'Любовь', path: '', weight: '430K' },
-        { id: 4, label: 'Гармония', path: '', weight: '100K' },
-        { id: 5, label: 'Дети', path: '', weight: '385K' }
-    ]
+const TAGS = [
+    { id: 1, label: 'Параллепипед', path: '', weight: '20K' },
+    { id: 2, label: 'Счастье', path: '', weight: '150K' },
+    { id: 3, label: 'Любовь', path: '', weight: '430K' },
+    { id: 4, label: 'Гармония', path: '', weight: '100K' },
+    { id: 5, label: 'Дети', path: '', weight: '385K' },
+];
 
-    export default {
-        name: 'PageMobileView',
-        components: {
-            voter
-        },
-        data () {
-            return {
-                user: {
-                    name: 'Коля Иванов'
-                },
-                sense: {
-                    name: 'Природа'
-                },
-                TAGS
-            }
-        },
-        methods: {
-            openSphere (item) {
-                this.$router.push(`/sphere/${item.id}`)
-            }
-        }
-    }
+export default {
+  name: 'PageMobileView',
+  components: {
+      voter,
+  },
+  data() {
+      return {
+          user: {
+              name: 'Коля Иванов',
+          },
+          sense: {
+              name: 'Природа',
+          },
+          TAGS,
+      };
+  },
+  methods: {
+      openSphere(item) {
+          this.$router.push(`/sphere/${item.id}`);
+      },
+  },
+};
 </script>

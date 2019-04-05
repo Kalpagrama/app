@@ -23,7 +23,7 @@
             q-btn-group(outline)
                 q-btn(outline :label="item.label" v-for="(item,ix) in BUTTONS" :key="ix" size="sm")
 
-    grain-list.kp-profile__grains(:source="cards" :class="{'kp-profile_mode-0': mode === 0}" v-show="mode < 2" @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
+    node-list.kp-profile__nodes(:source="cards" :class="{'kp-profile_mode-0': mode === 0}" v-show="mode < 2" @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
 </template>
 
 <style lang="stylus">
@@ -93,7 +93,7 @@
             text-align center
             padding 16px
 
-        &__grains
+        &__nodes
             top 190px
 
         &_mode-0
@@ -108,7 +108,7 @@
 </style>
 
 <script>
-import GrainList from '../../components/GrainList';
+import NodeList from '../../components/NodeList';
 import Setting from '../../components/Setting';
 
 const BUTTONS = [
@@ -120,7 +120,7 @@ const BUTTONS = [
 export default {
   name: 'PageMobileProfile',
   components: {
-      'grain-list': GrainList,
+      'node-list': NodeList,
       Setting,
   },
   data() {
