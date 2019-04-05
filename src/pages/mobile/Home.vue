@@ -1,6 +1,6 @@
 <template lang="pug">
   q-page
-    node-list(:source="cards")
+    news-feed
 </template>
 
 <style lang="stylus">
@@ -8,22 +8,15 @@
 </style>
 
 <script>
-import NodeList from '../../components/NodeList';
+import NewsFeed from '../../components/news/NewsFeed';
 
 export default {
   name: 'PageMobileHome',
   components: {
-      'node-list': NodeList,
+      NewsFeed,
   },
   data() {
-      return {
-          cards: [],
-      };
-  },
-  beforeMount() {
-      for (let i = 0; i < 20; i += 1) {
-        this.cards.push(i);
-      }
+      return {};
   },
 };
 </script>

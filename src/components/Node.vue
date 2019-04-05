@@ -6,15 +6,15 @@
                     img(src='https://cdn.quasar-framework.org/img/avatar2.jpg')
             q-item-section
                 q-item-label Маша Мимими
-        .kp-node__content
-            img(:src='randomImage(0)')
+        .kp-node__preview
+            img(:src='item.thumbUrl')
             //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls=0&showinfo=0')
 
         .kp-node__sense
-            span.kp-node__sense-text.shadow-4 {{ randomText() }}
+            span.kp-node__sense-text.shadow-4 {{ item.name }}
 
 
-        .kp-node__content
+        //.kp-node__content
             img(:src='randomImage(1)')
 
 
@@ -99,10 +99,15 @@
                 display block
                 min-height 56vw
                 max-height 56vw
+            &__preview
+                display block
+                min-height 112vw
+                max-height 112vw
+                overflow hidden
 
                 & img
                     width 100%
-                    height 56vw
+                    height 112vw
 
             &__footer
                 display grid
@@ -117,6 +122,7 @@
                 background: none
                 margin: -20px auto;
                 text-align center
+                top -210px
                 &-text
                     font-size 20px
                     padding: 8px 16px

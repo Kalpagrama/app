@@ -1,9 +1,9 @@
 <template lang="pug">
     // .kp-node-list(ref="list" v-touch-swipe.up="swipeUp" v-touch-swipe.down="swipeDown" v-touch-pan.up="panUp" v-touch-pan.down="panDown"  @wheel.prevent="catchScroll")
-    .kp-node-list()
+    .kp-node-list(@scroll="touchMove")
         //.kp-node-list__container(v-touch-swipe.mouse.up.down="switchGrain")
-        .kp-node-list__container
-            node(flat bordered v-for="(card, ix) in source" :key="ix" :item="{id: card}" :ix="ix" :ref="'card-' + ix")
+        .kp-node-list__container( ref="list")
+            node(flat bordered v-for="(card, ix) in source" :key="ix" :item="card" :ix="ix" :ref="'card-' + ix")
     // button.test(@click="scroll(100)") Scroll
 </template>
 
@@ -24,9 +24,44 @@
                 index: 0,
                 timer: 0,
                 target: 0,
+
+                prevScroll: 0,
+                isLoading: false,
             };
         },
+        watch: {
+            source() {
+                this.isLoading = false;
+            }
+        },
         methods: {
+            touchMove(e) {
+                if (!this.isLoading) {
+                    const rect = this.$refs.list.getBoundingClientRect();
+                    const { body } = window.document;
+                    const limit = body.clientHeight + 100; // body.clientWidth;
+
+                    let direction = 'none';
+                    if (e.srcElement.scrollTop > this.prevScroll) direction = 'down';
+                    else if (e.srcElement.scrollTop < this.prevScroll) direction = 'up';
+
+                    if (direction === 'down' && (rect.top + rect.height) < limit) {
+                        const item = this.source[this.source.length - 1];
+
+                        this.isLoading = true;
+                        this.$emit('end', item.oid);
+                    }
+                    /*
+                    // Подгрузка сверху отключена как дорогая операция
+                    else if (direction === 'up' && rect.top < (rect.height - limit)) {
+                        const item = this.source[0];
+                        // this.$emit('begin', item.oid);
+                        console.log('prePEND!!!');
+                    }
+                    */
+                }
+                this.prevScroll = e.srcElement.scrollTop;
+            },
             scroll(by) {
                 // if (this.timer) return;
 
@@ -82,6 +117,7 @@
                 // if (e.deltaY > 0) this.scroll(1);
                 // else if (e.deltaY < 0) this.scroll(-1);
             },
+
         },
     };
 </script>

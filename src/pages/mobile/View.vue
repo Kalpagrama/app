@@ -13,7 +13,7 @@
 
         q-item
             q-item-section
-                spank.kp-node-view__sense-text {{ sense.name }}
+                span.kp-node-view__sense-text {{ sense.name }}
 
 
         .kp-node-view__content
