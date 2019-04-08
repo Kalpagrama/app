@@ -1,5 +1,5 @@
 export function newsApi ([from, limit, direction]) {
-    const pagination = { from, limit, direction };
+    const pagination = { from, limit, direction }
 
     return {
         query: gql`query($pagination: PaginationInput!, $preferWidth: Int!, $preferHeight: Int!) {
@@ -13,31 +13,30 @@ export function newsApi ([from, limit, direction]) {
         variables: {
             pagination: pagination,
             preferWidth: 370,
-            preferHeight: 420,
+            preferHeight: 420
         }
-    };
+    }
 }
 
-
-export function isUserAuthorizedApi() {
+export function isUserAuthorizedApi () {
     return {
         query: gql`query {
             query{
                 userIsAuthorized
             }
         }`
-    };
+    }
 }
 
-export function isUserConfirmedApi() {
+export function isUserConfirmedApi () {
     return {
         query: gql`query {
             userIsConfirmed
         }`
-    };
+    }
 }
 
-export function listAuthActionsApi() {
+export function listAuthActionsApi () {
     return {
         query: gql`query {
             AuthActions{
@@ -46,29 +45,5 @@ export function listAuthActionsApi() {
                 params
             }
         }`
-    };
-}
-
-export function loginApi() {
-    return {
-        query: gql`query {
-            AuthActions{
-                action
-                url
-                params
-            }
-        }`
-    };
-}
-
-export function logoutApi() {
-
-}
-
-export function restoreApi() {
-
-}
-
-export function confirmApi() {
-
+    }
 }

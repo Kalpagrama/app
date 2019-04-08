@@ -1,56 +1,62 @@
 /* eslint-disable */
 
-import DataProvider from './DataProvider';
-import { isUserAuthorizedApi, isUserConfirmedApi, listAuthActionsApi } from './api';
+import DataProvider from './DataProvider'
+import { isUserAuthorizedApi, isUserConfirmedApi, listAuthActionsApi } from './api'
 
 export default class AuthProvider extends DataProvider {
-    constructor(scope) {
-        super(scope, null, null);
+    constructor (scope) {
+        super(scope, null, null)
 
-        const self = this;
+        const self = this
 
-        this.actions = [];
-        this.cacheIsAuthorized = false;
-        this.cacheIsConfirmed = false;
+        this.actions = []
+        this.cacheIsAuthorized = false
+        this.cacheIsConfirmed = false
 
         this.isAuthorized(true)
         this.isConfirmed(true)
 
         this.requestApi(listAuthActionsApi).then((data) => {
-            self.actions = data;
-        });
+            self.actions = data
+        })
     }
 
-    checkAutorized() {
-        this.cacheIsAuthorized = this.requestApi(isUserAuthorizedApi);
-    }
-    checkConfirmed() {
-        this.cacheIsConfirmed= this.requestApi(isUserConfirmedApi);
+    checkAutorized () {
+        this.cacheIsAuthorized = this.requestApi(isUserAuthorizedApi)
     }
 
-    isAuthorized(force = false) {
-        if (force) this.checkAutorized();
-        return this.cacheIsAuthorized;
+    checkConfirmed () {
+        this.cacheIsConfirmed = this.requestApi(isUserConfirmedApi)
     }
 
-    isConfirmed() {
-        if (force) this.checkConfirmed();
-        return this.cacheIsConfirmed;
+    isAuthorized (force = false) {
+        if (force) this.checkAutorized()
+        return this.cacheIsAuthorized
     }
 
- /*   login(method) {
-        //return this.requestApi(loginApi);
-        axios.get(URL, {parmas}).then(data => ...)
-    }*/
-    logout(){}
-    confirm(){}
-    restore(){}
+    isConfirmed () {
+        if (force) this.checkConfirmed()
+        return this.cacheIsConfirmed
+    }
+
+    /*   login(method) {
+           //return this.requestApi(loginApi);
+           axios.get(URL, {parmas}).then(data => ...)
+       }*/
+    logout () {
+    }
+
+    confirm () {
+    }
+
+    restore () {
+    }
 
 
-    action(key) {
-        const found = this.actions.filter(el => el.key === key);
+    action (key) {
+        const found = this.actions.filter(el => el.key === key)
 
-        return found && found[0] || null;
+        return found && found[0] || null
     }
 }
 /*
