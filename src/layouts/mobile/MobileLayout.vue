@@ -9,30 +9,34 @@
                     template(v-slot:prepend)
                         q-icon(v-if="search === ''" name="search")
                         q-icon(v-else name="clear" class="cursor-pointer" @click="search = ''")
-
             q-btn(flat='', round='', dense='', icon='more_vert')
     q-page-container
       router-view
 
     q-footer.bg-white.kp-menu_main(bordered)
-        q-btn(v-for="(btn, ix) in BUTTONS" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)")
-        q-btn(v-for="(btn, ix) in BUTTONSREG" :key="'reg_'+ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="md" @click="click(btn)" active-class="active")
+        q-btn(v-if="isAuth" v-for="(btn, ix) in BUTTONS" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)")
+        q-btn(v-if="isAuth" flat color="black" icon='exit_to_app' size="lg" @click="logOut")
+        // q-btn(v-if="!isAuth" v-for="(btn, ix) in BUTTONSREG" :key="'reg_'+ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)" active-class="active")
+    q-circular-progress(v-if="progress" indeterminate size="50px" color="blue" class="q-ma-md progress")
 </template>
 
 <script>
+import { Auth } from '../../store/auth';
+import * as store from '../../store/store';
+
 const BUTTONS = [
     { icon: 'home', path: '/home' },
     { icon: 'search', path: '/search' },
     { icon: 'add_circle_outline', path: '/create' },
     { icon: 'notifications_none', path: '/bell' },
-    { icon: 'person_outline', path: '/profile' },
+    { icon: 'person_outline', path: '/profile' }
 ];
 
-const BUTTONSREG = [
+/* const BUTTONSREG = [
     { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
     { icon: 'fas fa-user-tag', path: '/promo' },
-    { icon: 'settings', path: '/test' },
-];
+    { icon: 'settings', path: '/setting' },
+]; */
 
 export default {
   name: 'GuestMobileLayout',
@@ -40,7 +44,7 @@ export default {
     return {
       btn: null,
       BUTTONS,
-      BUTTONSREG,
+      progress: false,
     };
   },
   methods: {
@@ -59,10 +63,34 @@ export default {
       click(btn) {
           this.btn = btn;
           this.$router.push(btn.path);
+          console.log(store.store.user.oid);
       },
       buttonColor(btn) {
           return this.btn === btn ? 'primary' : 'black';
       },
+      logOut() {
+          this.progress = true;
+          setTimeout(() => {
+              this.progress = false;
+              store.store.isAuth = false;
+              store.store.user.oid = null;
+              this.$router.push('/promo');
+          }, 2000);
+      },
+  },
+  computed: {
+      isAuth() {
+          return store.stateMutations.getUser();
+      }
+  },
+  created() {
+    const auth = new Auth();
+    this.isAuth = store.stateMutations.getUser();
+    if (this.isAuth === false) {
+        this.$router.push('/promo');
+    } else if (store.store.user.oid === null) {
+        this.$router.push('/');
+    }
   },
 };
 </script>

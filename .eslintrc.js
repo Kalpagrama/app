@@ -48,7 +48,6 @@ module.exports = {
         'no-plusplus': 'off',
         'linebreak-style': 'off',
         'class-methods-use-this': 'off',
-
         'no-param-reassign': 'off',
 
         'import/first': 'off',
