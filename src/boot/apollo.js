@@ -75,8 +75,8 @@ export default ({ vue, store, app }) => {
         // split based on operation type
         ({ query }) => {
             const { kind, operation } = getMainDefinition(query)
-            return kind === 'OperationDefinition'
-                && operation === 'subscription'
+            return kind === 'OperationDefinition' &&
+                operation === 'subscription'
         },
         wsLink,
         uploadLink // httpLink

@@ -13,10 +13,8 @@
         .kp-node__sense
             span.kp-node__sense-text.shadow-4 {{ item.name }}
 
-
         //.kp-node__content
             img(:src='randomImage(1)')
-
 
         q-item-section.kp-node__footer
             q-chip(dense disable icon='remove_red_eye' size='10px' color='white') {{ randomViews() }}
@@ -31,56 +29,54 @@
         'https://images.unsplash.com/photo-1533591084922-7da563f75388',
         'https://images.unsplash.com/photo-1541174710317-c464dc175229',
         'https://images.unsplash.com/photo-1476820865390-c52aeebb9891',
-        'https://images.unsplash.com/photo-1501236570302-906143a7c9f8',
-    ];
+        'https://images.unsplash.com/photo-1501236570302-906143a7c9f8'
+    ]
 
     const TEXTS = [
-        'Время', 'Победа', 'Здоровье', 'Вечность', 'Милосердие и здоровье', 'Вера', 'Жизнь', 'Благоденствие', 'Защита',
-    ];
+        'Время', 'Победа', 'Здоровье', 'Вечность', 'Милосердие и здоровье', 'Вера', 'Жизнь', 'Благоденствие', 'Защита'
+    ]
     export default {
         name: 'Node',
         props: {
             item: {
                 type: Object,
-                default: () => ({}),
+                default: () => ({})
             },
             ix: {
                 type: Number,
-                default: 0,
-            },
+                default: 0
+            }
         },
-        data() {
-            return {
-
-            };
+        data () {
+            return {}
         },
         methods: {
-            randomRate(ix) {
-                if (ix % 5 === 0) return 'Так и есть';
-                if (ix % 4 === 0) return 'Скорее так';
-                if (ix % 3 === 0) return 'Может быть';
-                if (ix % 2 === 0) return 'Скорее нет';
-                return 'Точно нет';
+            randomRate (ix) {
+                if (ix % 5 === 0) return 'Так и есть'
+                if (ix % 4 === 0) return 'Скорее так'
+                if (ix % 3 === 0) return 'Может быть'
+                if (ix % 2 === 0) return 'Скорее нет'
+                return 'Точно нет'
             },
-            randomViews() {
-                return `${parseInt(Math.random() * 200, 0)}K`;
+            randomViews () {
+                return `${parseInt(Math.random() * 200, 0)}K`
             },
-            randomLinks() {
-                return parseInt(Math.random() * 1000, 0);
+            randomLinks () {
+                return parseInt(Math.random() * 1000, 0)
             },
-            randomImage(koef) {
-                const ix = Math.floor(Math.random() * IMAGES.length + koef);
-                return IMAGES[ix >= IMAGES.length ? 0 : ix];
+            randomImage (koef) {
+                const ix = Math.floor(Math.random() * IMAGES.length + koef)
+                return IMAGES[ix >= IMAGES.length ? 0 : ix]
             },
-            randomText() {
-                const ix = Math.floor(Math.random() * TEXTS.length);
-                return TEXTS[ix];
+            randomText () {
+                const ix = Math.floor(Math.random() * TEXTS.length)
+                return TEXTS[ix]
             },
-            open() {
-                this.$router.push('/view/1');
-            },
-        },
-    };
+            open () {
+                this.$router.push('/view/1')
+            }
+        }
+    }
 </script>
 
 <style lang="stylus">
@@ -99,6 +95,7 @@
                 display block
                 min-height 56vw
                 max-height 56vw
+
             &__preview
                 display block
                 min-height 112vw
@@ -123,6 +120,7 @@
                 margin: -20px auto;
                 text-align center
                 top -210px
+
                 &-text
                     font-size 20px
                     padding: 8px 16px
