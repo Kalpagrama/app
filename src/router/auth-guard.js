@@ -4,6 +4,7 @@ export default function(to, from, next) {
     if (store.store.isAuth) {
         next();
     } else {
-        next('/promo');
+        next();
+        // next('/promo');
     }
 }

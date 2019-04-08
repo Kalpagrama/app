@@ -1,5 +1,6 @@
 import DataProvider from './DataProvider';
 
+<<<<<<< HEAD
     function isAuthApi() {
         return {
             query: gql`query {
@@ -76,3 +77,10 @@ beforeMount() {
     *!/
 }
 */
+=======
+export default class AuthProvider extends DataProvider {
+    constructor(scope) {
+        super(scope, null, null);
+    }
+}
+>>>>>>> 067acb24d6183f1961a20e525e4bdaf2abdf4422
