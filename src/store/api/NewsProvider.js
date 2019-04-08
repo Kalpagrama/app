@@ -5,12 +5,12 @@ export const DIRECTION_FORWARD = 'forward';
 export const DIRECTION_BACKWARD = 'backward';
 
 export default class NewsProvider extends DataProvider {
-    constructor(scope, cb) {
-        super(scope, newsApi, cb);
+    constructor(scope) {
+        super(scope, newsApi);
         this.direction = DIRECTION_FORWARD;
     }
 
     request(from, limit, direction = DIRECTION_FORWARD) {
-        return this.requestApi(null, null, from, limit, direction);
+        return this.requestApi(null, from, limit, direction);
     }
 }

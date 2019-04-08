@@ -2,6 +2,7 @@
     q-page.text-center.bold
         .q-pa-md
             h6.text-weight-bold.head-title Регистрация через E-mail
+            q-btn(label="Клик" @click="test")
         .q-pa-md.q-gutter-y-sm
             form(ref="form" @submit.prevent="onSubmit")
                 q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="checkEmail")
@@ -13,8 +14,7 @@
 </template>
 
 <script>
-import { Auth } from '../../../store/auth';
-import * as store from '../../../store/store';
+import Auth from '../../../store/api/AuthProvider';
 
     export default {
         name: 'PageMobileRegisterEmail',
@@ -29,6 +29,10 @@ import * as store from '../../../store/store';
         };
     },
     methods: {
+        test() {
+            const auth = new Auth();
+            console.log(auth.checkAutorized);
+        },
         generate_token (length) {
             const a = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'.split('');
             const b = [];
@@ -44,6 +48,7 @@ import * as store from '../../../store/store';
                     email: this.email,
                     password: this.password,
                 };
+                /*
                 this.submitting = true;
                 const auth = new Auth();
                 auth.login('EMAIL_LOGIN', user)
@@ -66,6 +71,7 @@ import * as store from '../../../store/store';
                         }, 3000)
                     }
                 })
+                */
             } else {
                 this.showNotify(false, 'Скорее всего вы допустили ошибку!');
             }

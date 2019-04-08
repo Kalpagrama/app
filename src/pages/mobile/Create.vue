@@ -32,7 +32,7 @@
 <script>
 import ContentCreator from '../../components/create/ContentCreator';
 import SelectContentDialog from '../../components/create/SelectContentDialog';
-import { Auth } from '../../store/auth';
+// import { Auth } from '../../store/auth-old';
 
 const MODE_NONE = 'mode.none';
 const MODE_SELECT_CONTENT = 'mode.select-content';
@@ -78,9 +78,11 @@ export default {
             });
         },
         async test() {
+            /*
             const auth = new Auth(this);
             const a = await auth.listServices();
             return a;
+            */
         },
     },
 };

@@ -23,7 +23,7 @@ export default {
     // ...mapGetters([''])
     },
     beforeMount() {
-        this.provider = new NewsProvider(this, this.load);
+        this.provider = new NewsProvider(this);
         this.appendNews();
     },
     methods: {
@@ -40,7 +40,8 @@ export default {
         },
         appendNews(oid) {
             // подгрузка новостей снизу
-            this.provider.request(oid, AUTOLOAD_STEP);
+            this.provider.request(oid, AUTOLOAD_STEP)
+                .then(this.load);
         },
     },
 }
