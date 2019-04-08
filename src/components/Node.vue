@@ -17,9 +17,9 @@
             img(:src='randomImage(1)')
 
         q-item-section.kp-node__footer
-            q-chip(dense disable icon='remove_red_eye' size='10px' color='white') {{ randomViews() }}
-            q-chip.text-center(dense disable icon='star_border' size='10px' color='white') {{ randomRate(ix) }}
-            q-chip.text-right(dense disable icon='link' size='10px' color='white') {{ randomLinks() }}
+            q-chip(dense disable icon='remove_red_eye' size='10px' color='white') {{ item.viewed }}
+            q-chip.text-center(dense disable icon='star_border' size='10px' color='white') {{ item.rate }}
+            q-chip.text-right(dense disable icon='link' size='10px' color='white') {{ item.chainCnt }}
 </template>
 
 <script>

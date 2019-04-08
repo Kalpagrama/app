@@ -18,6 +18,31 @@ export function newsApi ([from, limit, direction]) {
     }
 }
 
+export function objectFullApi(oids) {
+    return {
+        query: gql`query($oids: [OID!]!){
+            objectsFull(oids: $oids){
+                oid
+                type
+                name
+                ...on Node{
+                    rate
+                    rateUser
+                    viewed
+                    chainCnt
+                    hashTags{
+                        type
+                        name
+                    }
+                }
+            }
+        }`,
+        variables: {
+            oids,
+        }
+    }
+}
+
 export function isUserAuthorizedApi () {
     return {
         query: gql`query {

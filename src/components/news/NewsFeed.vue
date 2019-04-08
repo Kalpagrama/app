@@ -30,8 +30,21 @@ export default {
         load(data) {
             // вставляем пока ТОЛЬКО В КОНЕЦ ленты, тк вставка в начало дорогая, требуется математика
             if (this.provider.direction !== DIRECTION_BACKWARD) {
-                data.forEach(el => this.news.push(el));
+                const self = this;
+
+                data.forEach(el => {
+                    this.news.push(el);
+                    this.provider.getInfo(el.oid).then(response => {
+                        self.onGetInfo(el, response[0]);
+                    });
+                });
             }
+        },
+        onGetInfo(node, data) {
+          // console.log('Подгрузка информации о ядре', node, data);
+            Object.keys(data).forEach(prop => {
+                node[prop] = data[prop];
+            })
         },
         prependNews(oid) {
             // подгрузка новостей сверху
