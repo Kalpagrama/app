@@ -1,7 +1,6 @@
 <template lang="pug">
     div
         q-page.text-center.bold
-            q-btn(@click="getItems" :label="query")
             settings-item
 </template>
 

@@ -5,7 +5,6 @@
             .q-pa-md.q-gutter-y-sm
                 q-btn.full-width.btn-register.kp-auth__button(v-for="(button,ix) in globalAuth" :style='`background: ${button.color}`' :icon="button.icon" :href="button.url" elevated no-caps type="a" :key="'global_'+ix" text-color='white' :label='`${button.label}`')
                 q-btn.full-width.btn-register.kp-auth__button(v-for="(button,ix) in localAuth" :style='`background: ${button.color}`' :icon="button.icon" :to="button.url" elevated no-caps type="a" :key="'loc_'+ix" text-color='white' :label='`${button.label}`')
-
 </template>
 
 <script>
@@ -31,6 +30,7 @@
             };
         },
         methods: {
+
         },
     };
 

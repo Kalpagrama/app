@@ -1,57 +1,61 @@
 <template lang="pug">
     q-page.text-center.bold
         .q-pa-md
-            h6.text-weight-bold.head-title Вход через E-mail
+            h6.text-weight-bold.head-title Восcтановление пароля
         .q-pa-md.q-gutter-y-sm
             form(ref="form")
                 q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="checkEmail")
-                q-input(type="password" ref="passwordReg" v-model="password" label="Придумай пароль" dense="dense" :rules="checkPassword")
-                p.text-left.warning.text-caption.q-mt-sm(v-if="bemail") Пользователь с таким Email не найден! Пожалуйста зарегистрируйтесь!
+                p.text-left.success.text-caption.q-mt-sm(v-if="successRestore") Новый пароль отправлен на указанный почтовый ящик!
+                p.text-left.warning.text-caption.q-mt-sm(v-if="falseEmail") Данный email не найден, пожалуйста пройдите этап регистрации!
                 .q-gutter-y-sm.full-height.q-pa-md.q-mt-sm
-                    q-btn.btn-auth(size='12px' type="submit" @click="onSubmit" :loading="submitting") Войти
-                    q-btn.btn-auth(size='12px' to="/auth/register/email") Зарегистрироваться
-                    q-btn.btn-auth(size='12px' to="/auth/restore") Восстановить пароль
+                    q-btn.btn-auth(size='12px' type="submit" @click="onSubmitRestore" :loading="submitting") Восстановить пароль
+                    q-btn.btn-auth(size='12px' type="text" @click="redirectToRegister" v-if="showBtnAuth") Перейти к авторизации
 </template>
 
 <script>
     export default {
-        name: 'PageMobileLogin',
+        name: 'PageMobileRecoverPassword',
         data() {
         return {
             email: null,
             password: null,
             disabled: true,
-            bemail: false,
+            showBtnAuth: false,
+            successRestore: false,
+            falseEmail: false,
             testMail: 'test@test.ru',
             submitting: false,
         };
     },
     methods: {
-        onSubmit() {
+        onSubmitRestore() {
             const user = {
                 email: this.email,
-                password: this.password,
             };
             this.submitting = true;
             setTimeout(() => {
                 if (this.$refs.emailReg.value === 'test@test.ru') {
-                this.bemail = true;
+                this.successRestore = false;
+                this.falseEmail = true;
                 this.submitting = false;
-                this.$router.push('/home');
             } else {
                 this.submitting = false;
-                this.bemail = true;
+                this.successRestore = true;
+                this.falseEmail = false;
+                this.showBtnAuth = true;
                 alert(user.email);
             }
         }, 3000);
+        },
+        redirectToRegister() {
+            setTimeout(() => {
+                this.$router.push('/auth/login');
+        }, 500);
         },
     },
     computed: {
         checkEmail() {
             return [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'];
-        },
-        checkPassword() {
-            return [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'];
         },
     },
     };

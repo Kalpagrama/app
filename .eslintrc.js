@@ -49,6 +49,7 @@ module.exports = {
         'linebreak-style': 'off',
         'class-methods-use-this': 'off',
         'no-param-reassign': 'off',
+
         'import/first': 'off',
         'import/named': 'error',
         'import/namespace': 'error',

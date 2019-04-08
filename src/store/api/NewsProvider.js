@@ -1,5 +1,7 @@
 import DataProvider from './DataProvider';
 
+// это запрос к каждому вызову сервера (на каждый тип операции)
+// в данном ключе это просто вызов ленты
 function newsApi ([from, limit, direction]) {
     const pagination = { from, limit, direction };
 
@@ -23,6 +25,8 @@ function newsApi ([from, limit, direction]) {
 export const DIRECTION_FORWARD = 'forward';
 export const DIRECTION_BACKWARD = 'backward';
 
+
+// Это класс наследник, который обслуживает (перекрывает) метод request
 export default class NewsProvider extends DataProvider {
     constructor(scope, cb) {
         super(scope, newsApi, cb);
