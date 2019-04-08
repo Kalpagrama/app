@@ -1,24 +1,24 @@
 <template lang="pug">
-    q-card.kp-grain(@click="openGrain")
-        q-item.kp-grain__header
+    q-card.kp-node(@click="open")
+        q-item.kp-node__header
             q-item-section.kp-avatar(avatar)
                 q-avatar.kp-avatar__image
                     img(src='https://cdn.quasar-framework.org/img/avatar2.jpg')
             q-item-section
                 q-item-label Маша Мимими
-        .kp-grain__content
-            img(:src='randomImage(0)')
+        .kp-node__preview
+            img(:src='item.thumbUrl')
             //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls=0&showinfo=0')
 
-        .kp-grain__sense
-            span.kp-grain__sense-text.shadow-4 {{ randomText() }}
+        .kp-node__sense
+            span.kp-node__sense-text.shadow-4 {{ item.name }}
 
 
-        .kp-grain__content
+        //.kp-node__content
             img(:src='randomImage(1)')
 
 
-        q-item-section.kp-grain__footer
+        q-item-section.kp-node__footer
             q-chip(dense disable icon='remove_red_eye' size='10px' color='white') {{ randomViews() }}
             q-chip.text-center(dense disable icon='star_border' size='10px' color='white') {{ randomRate(ix) }}
             q-chip.text-right(dense disable icon='link' size='10px' color='white') {{ randomLinks() }}
@@ -38,7 +38,7 @@
         'Время', 'Победа', 'Здоровье', 'Вечность', 'Милосердие и здоровье', 'Вера', 'Жизнь', 'Благоденствие', 'Защита',
     ];
     export default {
-        name: 'Grain',
+        name: 'Node',
         props: {
             item: {
                 type: Object,
@@ -76,7 +76,7 @@
                 const ix = Math.floor(Math.random() * TEXTS.length);
                 return TEXTS[ix];
             },
-            openGrain() {
+            open() {
                 this.$router.push('/view/1');
             },
         },
@@ -85,7 +85,7 @@
 
 <style lang="stylus">
     .kp
-        &-grain
+        &-node
             max-width 99vw
             margin 6px auto
             border 1px solid #d0
@@ -99,10 +99,15 @@
                 display block
                 min-height 56vw
                 max-height 56vw
+            &__preview
+                display block
+                min-height 112vw
+                max-height 112vw
+                overflow hidden
 
                 & img
                     width 100%
-                    height 56vw
+                    height 112vw
 
             &__footer
                 display grid
@@ -117,6 +122,7 @@
                 background: none
                 margin: -20px auto;
                 text-align center
+                top -210px
                 &-text
                     font-size 20px
                     padding: 8px 16px

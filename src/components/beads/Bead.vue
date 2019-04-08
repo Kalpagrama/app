@@ -17,8 +17,8 @@ export default {
             default: false,
         },
         text: {
-            type: Boolean,
-            default: false,
+            type: Number,
+            default: 0,
         },
     },
     data() {
