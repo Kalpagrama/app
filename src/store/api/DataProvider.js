@@ -1,32 +1,30 @@
+/* eslint-disable */
+
 import Vue from 'vue';
 
 export default class DataProvider {
-    constructor(scope, api, cb) {
+    constructor(scope, api) {
         this.scope = scope;
         this.api = api;
-        this.callback = cb;
+        //this.callback = cb;
     }
 
-    requestApi(api, callback, ...args) {
+    requestApi(api, ...args) {
         const request = api ? api(args) : this.api(args);
         const provider = this;
         const { scope } = this;
-
-        callback = callback || this.callback;
 
         return new Promise((resolve) => {
             scope.$apollo.subscribe(request).subscribe({
                 next: ({ data }) => {
                     const key = Object.keys(data)[0];
-
-                    callback(data[key]);
-                    resolve();
+                    resolve(data[key]);
                 }
             })
         });
     }
 
     request(...args) {
-        return this.requestApi(null, null, args);
+        return this.requestApi(null, args);
     }
 }

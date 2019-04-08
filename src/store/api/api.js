@@ -18,20 +18,47 @@ export function newsApi ([from, limit, direction]) {
     };
 }
 
-export function listAuthActionsApi() {
-
-}
 
 export function isUserAuthorizedApi() {
-
+    return {
+        query: gql`query {
+            query{
+                userIsAuthorized
+            }
+        }`
+    };
 }
 
 export function isUserConfirmedApi() {
+    return {
+        query: gql`query {
+            userIsConfirmed
+        }`
+    };
+}
 
+export function listAuthActionsApi() {
+    return {
+        query: gql`query {
+            AuthActions{
+                action
+                url
+                params
+            }
+        }`
+    };
 }
 
 export function loginApi() {
-
+    return {
+        query: gql`query {
+            AuthActions{
+                action
+                url
+                params
+            }
+        }`
+    };
 }
 
 export function logoutApi() {
@@ -39,5 +66,9 @@ export function logoutApi() {
 }
 
 export function restoreApi() {
+
+}
+
+export function confirmApi() {
 
 }
