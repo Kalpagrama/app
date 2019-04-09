@@ -8,11 +8,11 @@
             q-btn.kp-voter__button(round :color="color('green')" :outline="isOutline(100)" @mouseover.stop="say('Точно да', 100)" icon="done_all" @click="vote(100)")
 
         .kp-voter__simple(v-else)
-            .kp-voter__views 2K
+            .kp-voter__views {{ node.viewed }}
             q-btn.kp-voter__button(round :color="color('red')" :outline="isOutline(0)" @mouseover.stop="say('Нет', 0)" icon="clear" @click="vote(0)")
             q-btn.kp-voter__button(round :color="color('primary')" :outline="isOutline(50)" @mouseover.stop="say('Может быть', 50)" icon="change_history" @click="vote(50)")
             q-btn.kp-voter__button(round :color="color('green')" :outline="isOutline(100)" @mouseover.stop="say('Да', 100)" icon="check" @click="vote(100)")
-            .kp-voter__vote 75%
+            .kp-voter__vote {{ node.rate }}
 
         .kp-voter__text(v-if="text && tooltip !== 'none'")
             span {{ text }}
@@ -28,6 +28,10 @@
             tooltip: {
                 type: String,
                 default: 'top' // 'none', 'bottom'
+            },
+            node: {
+                type: Object,
+                default: () => ({})
             }
         },
         data () {

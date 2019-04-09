@@ -34,13 +34,13 @@ export default {
 
                 data.forEach(el => {
                     this.news.push(el);
-                    this.provider.getInfo(el.oid).then(response => {
-                        self.onGetInfo(el, response[0]);
+                    this.provider.nodeCounters(el.oid).then(response => {
+                        self.onGetNodeCounters(el, response[0]);
                     });
                 });
             }
         },
-        onGetInfo(node, data) {
+        onGetNodeCounters(node, data) {
           // console.log('Подгрузка информации о ядре', node, data);
             Object.keys(data).forEach(prop => {
                 node[prop] = data[prop];

@@ -18,7 +18,7 @@ export function newsApi ([from, limit, direction]) {
     }
 }
 
-export function objectFullApi(oids) {
+export function nodeCountersApi(oids) {
     return {
         query: gql`query($oids: [OID!]!){
             objectsFull(oids: $oids){
@@ -30,9 +30,53 @@ export function objectFullApi(oids) {
                     rateUser
                     viewed
                     chainCnt
+                    author{
+                        oid
+                        name
+                        thumbUrl(preferWidth:50, preferHeight:50)
+                    }                    
+                }
+            }
+        }`,
+        variables: {
+            oids,
+        }
+    }
+}
+
+export function nodeFullApi(oids) {
+    return {
+        query: gql`query($oids: [OID!]!){
+            objectsFull(oids: $oids){
+                oid
+                type
+                name
+                isSubscribed
+                createdAt
+                updatedAt
+                ... on Node {
+                    thumbUrl(preferWidth:378, preferHeight:400)
+                    name
                     hashTags{
                         type
                         name
+                    }                    
+                    author{
+                        oid
+                        name
+                        thumbUrl(preferWidth:50, preferHeight:50)
+                    }                    
+                    fragmentRoot{
+                        content{
+                            oid
+                            thumbUrl(preferWidth:378, preferHeight:200)
+                        }
+                    }
+                    fragmentSecondary{
+                        content{
+                            oid
+                            thumbUrl(preferWidth:378, preferHeight:200)
+                        }
                     }
                 }
             }

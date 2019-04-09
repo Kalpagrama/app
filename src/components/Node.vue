@@ -3,9 +3,9 @@
         q-item.kp-node__header
             q-item-section.kp-avatar(avatar)
                 q-avatar.kp-avatar__image
-                    img(src='https://cdn.quasar-framework.org/img/avatar2.jpg')
+                    img(:src='authorPic')
             q-item-section
-                q-item-label Маша Мимими
+                q-item-label {{ authorName }}
         .kp-node__preview
             img(:src='item.thumbUrl')
             //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls=0&showinfo=0')
@@ -50,6 +50,18 @@
         data () {
             return {}
         },
+        computed: {
+            authorName() {
+                return (this.item &&
+                    this.item.author &&
+                    this.item.author.name) || '?';
+            },
+            authorPic() {
+                return (this.item &&
+                    this.item.author &&
+                    this.item.author.thumbUrl) || '';
+            }
+        },
         methods: {
             randomRate (ix) {
                 if (ix % 5 === 0) return 'Так и есть'
@@ -73,7 +85,7 @@
                 return TEXTS[ix]
             },
             open () {
-                this.$router.push('/view/1')
+                this.$router.push('/view/' + this.item.oid);
             }
         }
     }

@@ -4,28 +4,28 @@
             q-item.kp-node-view__header
                 q-item-section.kp-avatar(avatar)
                     q-avatar.kp-avatar__image
-                        img(src='https://cdn.quasar-framework.org/img/avatar2.jpg')
+                        img(:src='authorPic')
                 q-item-section
-                    q-item-label {{ user.name }}
+                    q-item-label {{ authorName }}
             .kp-node-view__content
-                img(src='https://images.unsplash.com/photo-1476820865390-c52aeebb9891')
+                img(:src='itemSrcRoot')
                 //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls
 
             q-item
                 q-item-section
-                    span.kp-node-view__sense-text {{ sense.name }}
+                    span.kp-node-view__sense-text {{ itemName }}
 
             .kp-node-view__content
-                img(src='https://images.unsplash.com/photo-1476820865390-c52aeebb9891')
+                img(:src='itemSrcSec')
 
         .kp-node-view__footer
             .kp-node-view__tags
-                q-chip(rounded @click.native="openSphere(item)" v-for="(item,ix) in TAGS" :key="ix")
-                    q-avatar(color="blue" text-color="white" font-size="12px") {{ item.weight }}
-                    | {{ item.label }}
+                q-chip(rounded @click.native="openSphere(item)" v-for="(item,ix) in itemTags" :key="ix")
+                    q-avatar(color="blue" text-color="white" font-size="12px") {{ 0 }}
+                    | {{ item.name }}
             .kp-node-view__share
                 q-btn.kp-node-view__share-btn(flat icon="share" size="lg")
-        voter.kp-node-view__voter
+        voter.kp-node-view__voter(:node="node")
 </template>
 
 <style lang="stylus">
@@ -90,6 +90,7 @@
 
 <script>
     import voter from '../../components/Voter'
+    import NodeProvider from '../../store/api/NodeProvider';
 
     const TAGS = [
         { id: 1, label: 'Параллепипед', path: '', weight: '20K' },
@@ -112,8 +113,57 @@
                 sense: {
                     name: 'Природа'
                 },
-                TAGS
+                TAGS,
+
+                node: null,
+                provider: null,
             }
+        },
+        beforeMount() {
+            const self = this;
+
+            this.provider = new NodeProvider(this);
+            this.provider.request(this.$route.params.id).then(data => {
+                self.node = data[0];
+                self.provider = null;
+                console.log('NODE ===', self.node);
+            })
+        },
+        computed: {
+            authorName() {
+                return (this.node &&
+                    this.node.author &&
+                    this.node.author.name) || '?';
+            },
+            authorPic() {
+                return (this.node &&
+                    this.node.author &&
+                    this.node.author.thumbUrl) || '';
+            },
+            itemName() {
+                const { node } = this;
+
+                return (node && node.name) || '?';
+            },
+            itemSrcRoot() {
+                const { node } = this;
+
+                return (node && node.fragmentRoot &&
+                    node.fragmentRoot.content &&
+                    node.fragmentRoot.content.thumbUrl) || '';
+            },
+            itemSrcSec() {
+                const { node } = this;
+
+                return (node && node.fragmentSecondary &&
+                    node.fragmentSecondary.content &&
+                    node.fragmentSecondary.content.thumbUrl) || '';
+            },
+            itemTags() {
+                    const { node } = this;
+
+                    return (node && node.hashTags) || [];
+            },
         },
         methods: {
             openSphere (item) {

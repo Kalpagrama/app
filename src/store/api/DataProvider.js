@@ -4,6 +4,8 @@ import Vue from 'vue'
 
 export default class DataProvider {
     constructor (scope, api) {
+        if (!scope) throw "Отсутствует ссылка на this!";
+
         this.scope = scope
         this.api = api
         //this.callback = cb;
