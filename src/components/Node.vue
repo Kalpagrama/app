@@ -3,9 +3,9 @@
         q-item.kp-node__header
             q-item-section.kp-avatar(avatar)
                 q-avatar.kp-avatar__image
-                    img(:src='authorPic')
+                    img(:src='authorPic()')
             q-item-section
-                q-item-label {{ authorName }}
+                q-item-label {{ authorName() }}
         .kp-node__preview
             img(:src='item.thumbUrl')
             //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls=0&showinfo=0')
@@ -51,6 +51,8 @@
             return {}
         },
         computed: {
+        },
+        methods: {
             authorName() {
                 return (this.item &&
                     this.item.author &&
@@ -60,9 +62,7 @@
                 return (this.item &&
                     this.item.author &&
                     this.item.author.thumbUrl) || '';
-            }
-        },
-        methods: {
+            },
             randomRate (ix) {
                 if (ix % 5 === 0) return 'Так и есть'
                 if (ix % 4 === 0) return 'Скорее так'
