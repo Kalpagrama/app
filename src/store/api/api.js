@@ -21,9 +21,7 @@ export function newsApi ([from, limit, direction]) {
 export function isUserAuthorizedApi () {
     return {
         query: gql`query {
-            query{
-                userIsAuthorized
-            }
+            userIsAuthorized
         }`
     }
 }

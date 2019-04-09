@@ -29,9 +29,14 @@ export default class AuthProvider extends DataProvider {
 
     }
 
-    checkAutorized() {
+/*  checkAutorized() {
         this.cacheIsAuthorized = this.requestApi(isUserAuthorizedApi)
+    } */
+
+    checkAutorized() {
+        return this.requestApi(isUserAuthorizedApi)
     }
+
 
     checkConfirmed() {
         this.cacheIsConfirmed = this.requestApi(isUserConfirmedApi)
@@ -49,9 +54,7 @@ export default class AuthProvider extends DataProvider {
 
     async login(method, params = undefined) {
         let action = await this.action(method)
-        if(method !== 'LOGIN_EMAIL' && method !== 'LOGIN_PHONE' && method === 'LOGIN_VK'){
-           return action.url
-        } else {
+        if (method === 'LOGIN_EMAIL') {
             let event = axios.get(action.url, {
                 params: {
                     login: params.email,
@@ -59,15 +62,19 @@ export default class AuthProvider extends DataProvider {
                 }
             })
             return event;
+        } else if (method === 'LOGIN_PHONE') {
+            console.log('LOGIN_PHONE recieved!!!!!')
+            console.log(action)
+            console.log(params, 'Номер который приходит')
+            let event = axios.get(action.url, {
+                params: {
+                    login: params
+                }
+            })
+            return event;
+        } else {
+            return action.url
         }
-        /* .then(function (response) {
-            // console.log('response recieved!!!!!!!',response);
-            this.$router.push('/')
-        })
-        .catch(function (error) {
-            console.log('error recieved!!!!!!!',error);
-            this.$router.push('auth/register/email')
-        }) */
     }
 
     logout() {

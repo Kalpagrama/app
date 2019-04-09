@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import AuthProvider from '../../../store/api/AuthProvider';
+
     export default {
         name: 'PageMobileRegisterPhone',
         data() {
@@ -35,16 +37,31 @@
         };
     },
     methods: {
-            onSubmit() {
+            async onSubmit() {
                 this.submitting = true;
-                setTimeout(() => {
-                    this.textButton = 'Выслать код повторно';
-                    this.submitting = false;
-                    this.successPhoneCode = true;
-                    this.visibleCodeBlock = true;
-                }, 3000);
+                if (!this.$refs.bePhone.hasError && this.$refs.bePhone.value) {
+                    this.submitting = true;
+                    const provider = new AuthProvider(this);
+                    await provider.login('LOGIN_PHONE', this.phone)
+                        .then((res) => {
+                            console.log(res)
+                        this.textButton = 'Выслать код повторно';
+                        this.successPhoneCode = true;
+                        this.visibleCodeBlock = true;
+                        alert('Добро пожаловать!');
+                        this.submitting = false;
+                        this.$router.push('/greeting')
+                    })
+                .catch((err) => {
+                        console.log(err)
+                        this.submitting = false;
+                        alert(err.message);
+                    })
+                } else {
+                    alert('Скорее всего вы допустили ошибку при вводе данных!');
+                }
             },
-        },
+    },
         watch: {
             phone() {
                 if (this.phone.length >= 16) {

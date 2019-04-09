@@ -2,6 +2,7 @@
     q-page.text-center.bold
         .q-pa-md
             h6.text-weight-bold.head-title Регистрация через E-mail
+            q-btn(@click="test" label="клик")
         .q-pa-md.q-gutter-y-sm
             form(ref="form" @submit.prevent="onSubmit")
                 q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="checkEmail")
@@ -38,6 +39,13 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
         };
     },
     methods: {
+        async test() {
+            const provider = new AuthProvider(this);
+            console.log(provider.checkAutorized());
+            await provider.checkAutorized()
+                .then((response) => console.log(response))
+                .catch((err) => console.log(err))
+        },
         async onSubmit() {
             if (!this.$refs.emailReg.hasError && !this.$refs.passwordReg.hasError && this.$refs.passwordReg.value && this.$refs.emailReg.value) {
                 this.submitting = true;
@@ -48,14 +56,10 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
                 const provider = new AuthProvider(this);
                 await provider.login('LOGIN_EMAIL', user)
                     .then((res) => {
-                        if (res.data === 'fail') {
-                            this.showNotify(false, 'Похоже в базе уже имеется твой Email! Переходи к процедуре авторизации!');
-                            this.submitting = false;
-                        } else {
-                            this.showNotify(true, 'Доброго пожаловать, ты уже на шаг ближе к сути!');
-                            this.submitting = true;
-                            this.$router.push('/greeting')
-                        }
+                        console.log(res.request.response, 'Ответ')
+                        this.showNotify(false, 'Добро пожаловать!');
+                        this.submitting = false;
+                        this.$router.push('/greeting')
                     })
                     .catch((err) => {
                         console.log(err)
