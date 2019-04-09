@@ -2,7 +2,6 @@
     q-page.text-center.bold
         .q-pa-md
             h6.text-weight-bold.head-title Регистрация через E-mail
-            q-btn(label="Клик" @click="test")
         .q-pa-md.q-gutter-y-sm
             form(ref="form" @submit.prevent="onSubmit")
                 q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="checkEmail")
@@ -14,7 +13,14 @@
 </template>
 
 <script>
-import Auth from '../../../store/api/AuthProvider';
+import AuthProvider from '../../../store/api/AuthProvider';
+
+const RESULT_ENUM = Object.freeze({ 'SUCCESS': 0, 'FAIL': 1 })
+// Object.freeze(ResultEnum);
+const EVENT_ENUM = Object.freeze({ 'USER_LOGIN': 0, 'USER_LOGOUT': 1, 'USER_CONFIRM': 2 })
+// Object.freeze(EventEnum);
+const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 'UNCONFIRMED_LOGIN_DISABLED': 2 })
+// Object.freeze(EventEnum);
 
     export default {
         name: 'PageMobileRegisterEmail',
@@ -26,54 +32,38 @@ import Auth from '../../../store/api/AuthProvider';
             bemail: false,
             testMail: 'test@test.ru',
             submitting: false,
+            resultEnum: RESULT_ENUM,
+            eventEnum: EVENT_ENUM,
+            errorEnum: ERROR_ENUM,
         };
     },
     methods: {
-        test() {
-            const auth = new Auth();
-            console.log(auth.checkAutorized);
-        },
-        generate_token (length) {
-            const a = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'.split('');
-            const b = [];
-            for (let i = 0; i < length; i++) {
-                const j = (Math.random() * (a.length - 1)).toFixed(0);
-                b[i] = a[j];
-            }
-            return b.join('');
-        },
-        onSubmit() {
+        async onSubmit() {
             if (!this.$refs.emailReg.hasError && !this.$refs.passwordReg.hasError && this.$refs.passwordReg.value && this.$refs.emailReg.value) {
+                this.submitting = true;
                 const user = {
                     email: this.email,
                     password: this.password,
                 };
-                /*
-                this.submitting = true;
-                const auth = new Auth();
-                auth.login('EMAIL_LOGIN', user)
+                const provider = new AuthProvider(this);
+                await provider.login('LOGIN_EMAIL', user)
                     .then((res) => {
-                    if (res === true) {
-                        setTimeout(() => {
-                            this.showNotify(true, 'Доброго пожаловать, ты уже на шаг ближе к сути!');
-                            store.stateMutations.setUser(true);
-                            store.store.user.oid = this.generate_token(32);
-                            const uid = this.generate_token(32);
-                            document.cookie = 'userName=MSX; path=/; expires=440;';
-                            console.log(document.cookie.userName);
-                            this.$router.push('/greeting')
-                        }, 3000)
-                    } else {
-                        setTimeout(() => {
+                        if (res.data === 'fail') {
+                            this.showNotify(false, 'Похоже в базе уже имеется твой Email! Переходи к процедуре авторизации!');
                             this.submitting = false;
-                            this.showNotify(false, 'Такой email уже существует! Попробуйте пройти процедуру авторизации или восстановить пароль!');
-                            store.stateMutations.setUser(false);
-                        }, 3000)
-                    }
-                })
-                */
+                        } else {
+                            this.showNotify(true, 'Доброго пожаловать, ты уже на шаг ближе к сути!');
+                            this.submitting = true;
+                            this.$router.push('/greeting')
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                        this.submitting = false;
+                        this.showNotify(false, err.message);
+                    })
             } else {
-                this.showNotify(false, 'Скорее всего вы допустили ошибку!');
+                this.showNotify(false, 'Скорее всего вы допустили ошибку при вводе данных!');
             }
         },
         showNotify(bool, text) {
@@ -98,6 +88,9 @@ import Auth from '../../../store/api/AuthProvider';
               return [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'];
           },
        },
+        beforeMount() {
+            console.log('Go')
+        },
     };
 </script>
 
