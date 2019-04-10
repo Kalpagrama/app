@@ -1,7 +1,7 @@
 {
     "name": "com.kalpagramma.app",
     "displayName": "Kalpagramma Mobile",
-    "version": "1.0.0",
+    "version": "1.0.6",
     "description": "A sample Apache Cordova application that responds to the deviceready event.",
     "main": "index.js",
     "scripts": {
