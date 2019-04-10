@@ -3,7 +3,7 @@
 </template>
 
 <script>
-// import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import NodeList from '../NodeList';
 import NewsProvider, { DIRECTION_BACKWARD } from '../../store/api/NewsProvider';
 
@@ -16,14 +16,12 @@ export default {
     data() {
         return {
             news: [],
-            provider: null,
         };
     },
     computed: {
-    // ...mapGetters([''])
+        ...mapState('providers', { provider: state => state.news }),
     },
     beforeMount() {
-        this.provider = new NewsProvider(this);
         this.appendNews();
     },
     methods: {

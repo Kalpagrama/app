@@ -1,5 +1,4 @@
 /* eslint-disable */
-
 import Vue from 'vue'
 
 export default class DataProvider {
@@ -8,9 +7,7 @@ export default class DataProvider {
 
         this.scope = scope
         this.api = api
-        //this.callback = cb;
     }
-
     requestApi (api, ...args) {
         const request = api ? api(args) : this.api(args)
         const provider = this

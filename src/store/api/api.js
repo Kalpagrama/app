@@ -90,9 +90,7 @@ export function nodeFullApi(oids) {
 export function isUserAuthorizedApi () {
     return {
         query: gql`query {
-            query{
-                userIsAuthorized
-            }
+            userIsAuthorized
         }`
     }
 }

@@ -5,6 +5,5 @@ export default function(to, from, next) {
         next();
     } else {
         next();
-        // next('/promo');
     }
 }

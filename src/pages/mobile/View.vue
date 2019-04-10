@@ -89,16 +89,8 @@
 </style>
 
 <script>
+    import { mapState } from 'vuex';
     import voter from '../../components/Voter'
-    import NodeProvider from '../../store/api/NodeProvider';
-
-    const TAGS = [
-        { id: 1, label: 'Параллепипед', path: '', weight: '20K' },
-        { id: 2, label: 'Счастье', path: '', weight: '150K' },
-        { id: 3, label: 'Любовь', path: '', weight: '430K' },
-        { id: 4, label: 'Гармония', path: '', weight: '100K' },
-        { id: 5, label: 'Дети', path: '', weight: '385K' }
-    ]
 
     export default {
         name: 'PageMobileView',
@@ -107,29 +99,19 @@
         },
         data () {
             return {
-                user: {
-                    name: 'Коля Иванов'
-                },
-                sense: {
-                    name: 'Природа'
-                },
-                TAGS,
-
                 node: null,
-                provider: null,
             }
         },
         beforeMount() {
             const self = this;
 
-            this.provider = new NodeProvider(this);
             this.provider.request(this.$route.params.id).then(data => {
                 self.node = data[0];
                 self.provider = null;
-                console.log('NODE ===', self.node);
             })
         },
         computed: {
+            ...mapState('providers', { provider: state => state.node }),
             authorName() {
                 return (this.node &&
                     this.node.author &&

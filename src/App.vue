@@ -5,7 +5,10 @@
 
 <script>
 export default {
-  name: 'App',
+    name: 'App',
+    beforeMount() {
+      this.$store.commit('providers/init', this);
+    }
 };
 </script>
 

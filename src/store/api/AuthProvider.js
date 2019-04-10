@@ -2,85 +2,114 @@
 
 import DataProvider from './DataProvider'
 import { isUserAuthorizedApi, isUserConfirmedApi, listAuthActionsApi } from './api'
+import axios from 'axios'
 
 export default class AuthProvider extends DataProvider {
-    constructor (scope) {
+    constructor(scope) {
         super(scope, null, null)
-
         const self = this
 
-        this.actions = []
+        this.actions = null
         this.cacheIsAuthorized = false
         this.cacheIsConfirmed = false
 
-        this.isAuthorized(true)
-        this.isConfirmed(true)
-
-        this.requestApi(listAuthActionsApi).then((data) => {
-            self.actions = data
-        })
+        this.isAuthorized()
+        this.isConfirmed()
     }
 
-    checkAutorized () {
+    async action(key) {
+        if(!this.actions){
+          this.actions = await this.requestApi(listAuthActionsApi)
+        }
+        console.log(key, JSON.stringify(this.actions))
+        const found = this.actions.filter(el => el.action === key)
+        console.log('found:', found)
+        console.log('found[0]:', found[0])
+        return found[0]
+
+    }
+
+/*  checkAutorized() {
         this.cacheIsAuthorized = this.requestApi(isUserAuthorizedApi)
+    } */
+
+    checkAutorized() {
+        return this.requestApi(isUserAuthorizedApi)
     }
 
-    checkConfirmed () {
+
+    checkConfirmed() {
         this.cacheIsConfirmed = this.requestApi(isUserConfirmedApi)
     }
 
-    isAuthorized (force = false) {
+    isAuthorized(force = false) {
         if (force) this.checkAutorized()
         return this.cacheIsAuthorized
     }
 
-    isConfirmed () {
+    isConfirmed(force = false) {
         if (force) this.checkConfirmed()
         return this.cacheIsConfirmed
     }
 
-    /*   login(method) {
-           //return this.requestApi(loginApi);
-           axios.get(URL, {parmas}).then(data => ...)
-       }*/
-    logout () {
+    async login(method, params = undefined) {
+        let action = await this.action(method)
+        if (method === 'LOGIN_EMAIL') {
+            let event = axios.get(action.url, {
+                params: {
+                    login: params.email,
+                    password: params.password
+                }
+            })
+            return event;
+        } else if (method === 'LOGIN_PHONE') {
+            console.log('LOGIN_PHONE recieved!!!!!')
+            console.log(action)
+            console.log(params, 'Номер который приходит')
+            let event = axios.get(action.url, {
+                params: {
+                    login: params
+                }
+            })
+            return event;
+        } else {
+            return action.url
+        }
     }
 
-    confirm () {
+    logout() {
+
     }
 
-    restore () {
+    confirm() {
     }
 
-
-    action (key) {
-        const found = this.actions.filter(el => el.key === key)
-
-        return found && found[0] || null
+    restore() {
     }
+
 }
 /*
 
-beforeMount() {
-    this.auth = new AuthProvider(this);
-    this.auth.login().TEHN(this.onLogin); // я закончил Максим спасибо. Мне нужно еще раз это все посмотреть
-    // Но в целом я понял задумку
+ beforeMount() {
+ this.auth = new AuthProvider(this);
+ this.auth.login().TEHN(this.onLogin); // я закончил Максим спасибо. Мне нужно еще раз это все посмотреть
+ // Но в целом я понял задумку
 
-    // до того как ты начнешь писать я хотел бы услышать как ты организуешь класс
-    /!*то есть будешь ли выносить какие то сущноти
-    для этого настоятельно рекомендую тебе составить диаграмму переходов (состояний)
-    тогда ты поймешь, что и как надо делать
-    Хорошо
+ // до того как ты начнешь писать я хотел бы услышать как ты организуешь класс
+ /!*то есть будешь ли выносить какие то сущноти
+ для этого настоятельно рекомендую тебе составить диаграмму переходов (состояний)
+ тогда ты поймешь, что и как надо делать
+ Хорошо
 
-    сейчас я тебе кину ссылку где это удобно сделать
-    тк задача у тебя сложная и ответственная, тебе стоит ее хорошо проработать,
-        и  потом будет очень легко писать
-    Хорошо
+ сейчас я тебе кину ссылку где это удобно сделать
+ тк задача у тебя сложная и ответственная, тебе стоит ее хорошо проработать,
+ и  потом будет очень легко писать
+ Хорошо
 
-    я кину сслку в слак
-    если найду
-    *!/
-}
+ я кину сслку в слак
+ если найду
+ *!/
+ }
 
 
  {
@@ -93,4 +122,4 @@ beforeMount() {
  params: ['email', 'password'],
  },
 
-*/
+ */
