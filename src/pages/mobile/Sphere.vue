@@ -1,0 +1,178 @@
+<template lang="pug">
+    q-page.flex.kp-sphere
+        .kp-sphere__header(@click="toggle")
+            q-card.kp-sphere__visitcard(flat dense v-show="mode > 0" :class="{'kp-sphere__visitcard_mode-2': mode === 2}")
+
+                .kp-sphere__face
+                    img.kp-sphere__image(src='http://lorempixel.com/100/100/' :class="{'kp-sphere__image_mode-2': mode === 2}")
+
+                .kp-sphere__info(:class="{'kp-sphere__info_mode-2': mode === 2}")
+                    .kp-sphere__name(:class="{'kp-sphere__name_mode-2': mode === 2}") Название сферы
+                    .kp-sphere__descript
+                        span.kp-sphere__text 20K
+                        q-btn(size="sm" outline) Подписаться
+
+            .kp-sphere__filter(v-show="mode < 2")
+                .kp-sphere__chips
+                    q-chip(v-for="(item, ix) in TAGS" :key="ix" :label="item.label")
+
+        node-list.kp-sphere__nodes(:source="cards" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2"
+        @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
+
+        beads.kp-sphere__beads
+</template>
+
+<style lang="stylus">
+    .kp-sphere
+        display block
+        width 100%
+
+        &__header
+            display block
+            border-bottom 1px solid #c0
+
+        &__visitcard
+            display grid
+            grid-template-columns 95px auto
+            grid-gap 16px
+            height 110px
+            padding 8px
+            border-bottom 1px solid #c0
+
+            &_mode-2
+                display block
+                height 400px
+                padding 0
+
+        &__face
+            display block
+
+        &__image
+            width 95px
+            height 95px
+            border 1px solid silver
+            background #f0
+            border-radius 50%
+            overflow hidden
+
+            &_mode-2
+                display block
+                height 400px
+                width 100%
+                border-radius 0
+                border none
+
+        &__info
+            padding-top 8px
+
+        &__name
+            padding-top 8px
+            font-size 18px
+
+            &_mode-2
+                font-size 24px
+                display block
+                position relative
+                color white
+                text-shadow 0px 2px 6px black, 0px -2px 6px black, -2px 0px 6px black, 2px 0px 6px black
+                top -50px
+                left 16px
+
+        &__quote
+            color gray
+            font-size 14px
+
+            &_mode-2
+                font-size 20px
+                padding 16px
+
+        &__filter
+            text-align center
+            padding 4px
+            max-height 50px
+            overflow auto
+
+        &__chips
+            display inline-block
+            white-space nowrap
+            width auto
+            max-height 40px
+
+        &__nodes
+            top 160px
+            bottom 50px
+
+        &_mode-0
+            top 60px
+
+        &__quit
+            text-align center
+            padding 16px
+            border-top 1px solid silver
+
+        &__beads
+            position absolute !important
+            bottom 0
+            left 0
+            right 0
+
+</style>
+
+<script>
+    import NodeList from '../../components/NodeList'
+    import Setting from '../../components/Setting'
+    import Beads from '../../components/Beads'
+
+    const BUTTONS = [
+        { id: 1, label: 'Ядра' },
+        { id: 2, label: 'Оценки' },
+        { id: 3, label: 'Связи' }
+    ]
+
+    const TAGS = [
+        { id: 1, label: 'Параллепипед', path: '', weight: '20K' },
+        { id: 2, label: 'Счастье', path: '', weight: '150K' },
+        { id: 3, label: 'Любовь', path: '', weight: '430K' },
+        { id: 4, label: 'Гармония', path: '', weight: '100K' },
+        { id: 5, label: 'Дети', path: '', weight: '385K' },
+        { id: 6, label: 'Продукты', path: '', weight: '385K' },
+        { id: 7, label: 'Животные', path: '', weight: '35K' },
+        { id: 8, label: 'Математика', path: '', weight: '8K' },
+        { id: 9, label: 'Политика', path: '', weight: '2M' },
+        { id: 10, label: 'Обучение', path: '', weight: '1.5M' }
+    ]
+
+    export default {
+        name: 'PageMobileSphere',
+        components: {
+            Beads,
+            'node-list': NodeList,
+            Setting
+        },
+        data () {
+            return {
+                cards: [],
+                mode: 1,
+                BUTTONS,
+                TAGS,
+                statusText: 'Свайп пока не работает, для просмотра состояний кликни на визитку'
+            }
+        },
+        beforeMount () {
+            for (let i = 0; i < 20; i += 1) {
+                this.cards.push(i)
+            }
+        },
+        computed: {
+            isVisible () {
+                return this.mode > 0
+            }
+        },
+        methods: {
+            toggle () {
+                this.mode += 1
+                if (this.mode === 2) this.mode = 0
+            }
+        }
+    }
+</script>
