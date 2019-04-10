@@ -82,19 +82,9 @@
         computed: {
             isAuth () {
                 return true
-//          return store.stateMutations.getUser();
             }
         },
         created () {
-            /*
-            const auth = new Auth();
-            this.isAuth = store.stateMutations.getUser();
-            if (this.isAuth === false) {
-                this.$router.push('/promo');
-            } else if (store.store.user.oid === null) {
-                this.$router.push('/');
-            }
-            */
             this.$router.push('/home')
         }
     }
