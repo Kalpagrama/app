@@ -23,14 +23,18 @@
             };
         },
         computed: {
-            ...mapState('providers', { provider: state => state.sphere }),
+            ...mapState('providers', { provider: state => state.sphere })
         },
-        beforeMount() {
-            this.refresh();
+        watch: {
+            parentOid(newVal) {
+                if (newVal) {
+                    this.refresh();
+                }
+            }
         },
         methods: {
-            refresh(oid) {
-                this.provider.request(oid).then((data) => {
+            refresh() {
+                this.provider.related(this.parentOid).then((data) => {
                     this.src = [];
                     if (Array.isArray(data)) {
                         data.forEach(el => this.src.push(el));

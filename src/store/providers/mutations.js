@@ -4,7 +4,6 @@ import BellProvider from '../api/BellProvider'
 import SphereProvider from '../api/SphereProvider'
 
 export function init(state, scope) {
-    console.log('STORE INIT');
     state.news = new NewsProvider(scope);
     state.bells = new BellProvider(scope);
     state.node = new NodeProvider(scope);

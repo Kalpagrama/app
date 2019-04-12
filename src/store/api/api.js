@@ -28,6 +28,7 @@ export function sphereApi ([oid]) {
                 name
                 thumbUrl(preferWidth:400 preferHeight: 300)
                 isSubscribed
+                subscriberCnt
                 subscribers{
                     name
                     thumbUrl(preferWidth:50 preferHeight: 50)
@@ -41,13 +42,34 @@ export function sphereApi ([oid]) {
     }
 }
 
+// Список тегов (Связанных сфер)
 export function sphereListApi ([oid, from, limit, direction]) {
-    console.log(oid, from, limit, direction) // oid: ATdoe3tBItw= , from: ATgV32KAoUs=, limit: 10, direction: forward
     return {
-            query: gql`query($sphereOid: OID!, $fromOid: OID, $limit: Int!, $direction: DirectionEnum!){
-            sphereList(sphereOid: $sphereOid, pagination: {from: $fromOid, limit: $limit, direction: $direction}){
+            query: gql`query($oid: OID!, $from: OID, $limit: Int!, $direction: DirectionEnum!){
+            relatedSpheres(sphereOid: $oid, pagination: {from: $from, limit: $limit, direction: $direction}){
                 oid
                 name
+                thumbUrl(preferWidth:400 preferHeight: 300)
+            }
+        }`,
+        variables: {
+            oid: oid,
+            from: from,
+            limit: limit,
+            direction: direction
+        }
+    }
+}
+
+// Список ядер выбранной сферы
+export function sphereNodeListApi ([oid, from, limit, direction]) {
+    return {
+            query: gql`query($sphereOid: OID!, $fromOid: OID, $limit: Int!, $direction: DirectionEnum!){
+            sphereNodeList(sphereOid: $sphereOid, pagination: {from: $fromOid, limit: $limit, direction: $direction}){
+                oid
+                name
+                weight
+                rate
                 thumbUrl(preferWidth:400 preferHeight: 300)
             }
         }`,
@@ -62,7 +84,6 @@ export function sphereListApi ([oid, from, limit, direction]) {
 
 export function newsApi ([from, limit, direction]) {
     const pagination = { from, limit, direction }
-    console.log(pagination)
 
     return {
         query: gql`query($pagination: PaginationInput!, $preferWidth: Int!, $preferHeight: Int!) {

@@ -1,5 +1,5 @@
 import DataProvider from './DataProvider'
-import { sphereApi, sphereListApi } from './api'
+import { sphereApi, sphereListApi, sphereNodeListApi } from './api'
 
 export const DIRECTION_FORWARD = 'FORWARD'
 export const DIRECTION_BACKWARD = 'BACKWARD'
@@ -14,7 +14,11 @@ export default class SphereProvider extends DataProvider {
         return this.requestApi(sphereApi, oid);
     }
 
-    list(oid, from, limit, direction = DIRECTION_BACKWARD) {
-        return this.requestApi(sphereListApi, oid, from, limit, direction);
+    related(oid, limit = 50) {
+        return this.requestApi(sphereListApi, oid, oid, limit, this.direction);
+    }
+
+    nodes(oid, limit = 50) {
+        return this.requestApi(sphereNodeListApi, oid, oid, limit, this.direction);
     }
 }

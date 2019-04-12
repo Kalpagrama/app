@@ -10,14 +10,14 @@
                 .kp-sphere__info(:class="{'kp-sphere__info_mode-2': mode === 2}")
                     .kp-sphere__name(:class="{'kp-sphere__name_mode-2': mode === 2}") {{item.name}}
                     .kp-sphere__descript
-                        span.kp-sphere__text 20K
+                        span.kp-sphere__text {{ item.subscriberCnt | bigNumbers }}
                         q-btn(size="sm" outline) Подписаться
 
             .kp-sphere__filter
                 sphere-chips.kp-sphere__chips(:parent-oid="sphereOid" @clicked="open")
 
         // node-list.kp-sphere__nodes(:source="cards" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2")
-        node-list(:source="nodes" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2")
+        node-list.kp-sphere__nodes(:source="nodes" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2")
 
         beads.kp-sphere__beads
 </template>
@@ -74,7 +74,13 @@
         }
     },
     beforeMount () {
-        this.sphere.one(this.$route.params.id).then(this.load.bind(this));
+        this.refresh();
+    },
+    filters: {
+        bigNumbers(val) {
+            // 1000 = 1K, 1000000 = 1M
+            return val;
+        }
     },
     computed: {
         ...mapState('providers', {
@@ -94,13 +100,18 @@
             if (this.mode === 2) this.mode = 0
         },
         load(data) {
-            console.log('=== LOAD DATA', data);
             this.item = data;
-            this.sphere.list(data.oid);
+            this.sphere.nodes(data.oid).then((nodes) => {
+                this.nodes = nodes;
+            })
         },
         open (oid) {
             this.$router.push(`/sphere/${oid}`);
-        }
+            this.refresh();
+        },
+        refresh() {
+            this.sphere.one(this.$route.params.id).then(this.load.bind(this));
+        },
     },
 
     }
