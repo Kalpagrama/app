@@ -27,7 +27,7 @@
     import Beads from '../../components/Beads';
     import SphereChips from '../../components/sphere/SphereChips';
     import NodeList from '../../components/NodeList';
-
+    import { bigNumbers } from '../../helpers/numbers';
     import { mapState } from 'vuex';
 
     const AUTOLOAD_STEP = 20;
@@ -63,27 +63,7 @@
     },
     filters: {
         bigNumbers(val) {
-            // 1000 = 1K, 1000000 = 1M
-            val += val;
-            let units = '';
-            const steps = [
-                { value: 10 ** 9, unit: 'B' },
-                { value: 10 ** 6, unit: 'M' },
-                { value: 10 ** 3, unit: 'K' },
-            ];
-// 5 sek
-            if (Number.isNaN(val)) return '';
-
-            steps.forEach(el => {
-                if (units === '' && val > el.value) {
-                    units = el.unit;
-                    val = val / el.value;
-                }
-            });
-
-            const intVal = parseInt(val, 10);
-
-            return `${(intVal < val ? (val).toFixed(1) : intVal)}${units}`;
+            return bigNumbers(val);
         }
     },
     computed: {
