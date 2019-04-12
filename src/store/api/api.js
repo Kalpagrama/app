@@ -128,6 +128,33 @@ export function loginEmailApi([variables]) {
     }
 }
 
+export function loginPhoneApi([phone]) {
+    return {
+        query: gql`query($phone: String!) {
+            loginPhone(phone: $phone) {
+                token
+                expires
+                role
+            }
+        }`,
+        variables: {
+            phone
+        }
+    }
+}
+
+export function confirmPhoneApi([phone, code]) {
+    return {
+        query: gql`query($phone: String!, $code: String!) {
+            confirmPhone(phone: $phone, code: $code) 
+        }`,
+        variables: {
+            phone,
+            code
+        }
+    }
+}
+
 export function refreshTokenApi () {
     return {
         query: gql`query {

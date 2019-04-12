@@ -1,11 +1,18 @@
 /* eslint-disable */
 
 import DataProvider from './DataProvider'
-import { isUserAuthorizedApi, isUserConfirmedApi, listAuthActionsApi, loginEmailApi, refreshTokenApi } from './api';
+import {
+    confirmPhoneApi,
+    isUserAuthorizedApi,
+    isUserConfirmedApi,
+    listAuthActionsApi,
+    loginEmailApi,
+    refreshTokenApi
+} from './api';
 import axios from 'axios'
 
-const MSG_COLOR_SUCCESS = 'green';
-const MSG_COLOR_ERROR = 'red';
+export const MSG_COLOR_SUCCESS = 'green';
+export const MSG_COLOR_ERROR = 'red';
 
 const ITEM_TOKEN = 'token';
 const ITEM_ROLE = 'role';
@@ -13,9 +20,9 @@ const ITEM_EXPIRES = 'expires';
 const ITEM_STRATEGY = 'strategy';
 const ITEM_PARAMS = 'params';
 
-const ROLE_GUEST = 'guest';
-const ROLE_RESETER = 'reseter';
-const ROLE_MEMBER = 'member';
+const ROLE_GUEST = 'GUEST';
+const ROLE_RESETER = 'RESETER';
+const ROLE_MEMBER = 'MEMBER';
 
 export default class AuthProvider extends DataProvider {
     constructor(scope) {
@@ -23,8 +30,19 @@ export default class AuthProvider extends DataProvider {
 
         this.actions = null
 
-        this.checkAutorized();
-        //this.refresh();
+        if (this.token) {
+            console.log('=== found TOKEN', this.token);
+            this.refresh().catch((...args) => {
+                console.log('=== REFRESH ERRORR!!!!!', args);
+                return this.checkAutorized.bind(this);
+            }).then((data) => {
+                if (!data) return this.checkAutorized();
+            })
+        }
+        else
+            console.log('=== NO TOKEN');
+
+
     }
 
     async action(key) {
@@ -36,21 +54,17 @@ export default class AuthProvider extends DataProvider {
 
         const found = this.actions.filter(el => el.action === key);
 
-        console.log('found:', found);
-        console.log('found[0]:', found[0]);
+        // console.log('found:', found);
+        // console.log('found[0]:', found[0]);
 
         return found[0]
 
     }
 
-/*  checkAutorized() {
-        this.cacheIsAuthorized = this.requestApi(isUserAuthorizedApi)
-    } */
-
     checkAutorized() {
+        console.log('checking');
         return this.requestApi(isUserAuthorizedApi)
     }
-
 
     checkConfirmed() {
         this.cacheIsConfirmed = this.requestApi(isUserConfirmedApi)
@@ -74,63 +88,47 @@ export default class AuthProvider extends DataProvider {
     }
 
     async login(method, params) {
-        let action = await this.action(method)
-        if (method === 'LOGIN_PHONE') {
-            console.log('LOGIN_PHONE recieved!!!!!')
-            console.log(action)
-            console.log(params, 'Номер который приходит')
-            let event = axios.get(action.url, {
-                params: {
-                    login: params
-                }
-            })
-            return event;
-        } else {
-            return action.url
-        }
+        throw 'Login method cant be used directly.';
     }
 
     async loginEmail(params) {
         const self = this;
 
-        self.cache(ITEM_STRATEGY, 'loginEmail');
+        self.cache(ITEM_STRATEGY, 'Email');
 
-        this.requestApi(loginEmailApi, params)
+        return this.requestApi(loginEmailApi, params)
             .then(self.onSuccessLogin.bind(self))
-            /*
-            .then(({expires, role, token}) => {
-                self.cache(ITEM_TOKEN, token);
-                self.cache(ITEM_EXPIRES, expires);
-                self.cache(ITEM_ROLE, role);
-
-                self.scope.$router.push('/home');
-            })
-            */
             .catch((error) => {
                 self.notify(error, MSG_COLOR_ERROR);
-            })
+            });
     }
 
     async loginPhone(params) {
-        this.login('LOGIN_PHONE', params)
-            .then((data) => {
-                console.log('LOGIN_PHONE RESULT', data);
-                scope.$router.push('/home');
-            })
+        const self = this;
+
+        self.cache(ITEM_STRATEGY, 'Phone');
+
+        return this.requestApi(loginPhoneApi, params)
+            .then(self.onSuccessLogin.bind(self))
             .catch((error) => {
-                this.notify(error, MSG_COLOR_ERROR);
-            })
+                self.notify(error, MSG_COLOR_ERROR);
+            });
+    }
+
+    async confirmPhone(params) {
+        return this.requestApi(confirmPhoneApi, params);
     }
 
     onSuccessLogin({expires, role, token}) {
-        debugger;
-
-        console.log('===========', this);
+        console.log('=== SUCCESS ??');
         this.cache(ITEM_TOKEN, token);
         this.cache(ITEM_EXPIRES, expires);
         this.cache(ITEM_ROLE, role);
 
-        this.scope.$router.push('/home');
+        // this.scope.$router.push('/home');
+        console.log('=== SUCCESS !!!!!!');
+
+        return true;
     }
 
     confirm() {
@@ -139,7 +137,8 @@ export default class AuthProvider extends DataProvider {
     refresh() {
         const self = this;
 
-        this.requestApi(refreshTokenApi).then(self.onSuccessLogin.bind(self));
+        return this.requestApi(refreshTokenApi, this.token, this.cache(ITEM_EXPIRES), this.cache(ITEM_ROLE))
+            .then(self.onSuccessLogin.bind(self));
     }
 
     restore() {
@@ -147,6 +146,14 @@ export default class AuthProvider extends DataProvider {
 
     notify(message, color = MSG_COLOR_SUCCESS) {
         this.scope.$q.notify({ message, color });
+    }
+
+    notifyError(message) {
+        this.scope.$q.notify({ message, MSG_COLOR_ERROR });
+    }
+
+    notifySuccess(message) {
+        this.scope.$q.notify({ message, MSG_COLOR_SUCCESS });
     }
 
     cache(name, value) {

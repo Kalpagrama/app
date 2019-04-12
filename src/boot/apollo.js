@@ -81,7 +81,7 @@ export default ({ vue, store, app }) => {
 
             // debugger;
             if (token) {
-                options.headers['Autorization'] = token;
+                options.headers['Authorization'] = token;
             }
 
             return fetch(uri, options)
