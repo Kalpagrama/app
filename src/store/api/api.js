@@ -19,8 +19,50 @@ export function bellApi () {
     }
 }
 
+export function sphereApi ([oid]) {
+    return {
+        query: gql`query($sphereOid: OID!){
+            sphere(oid: $sphereOid){
+                oid
+                type
+                name
+                thumbUrl(preferWidth:400 preferHeight: 300)
+                isSubscribed
+                subscribers{
+                    name
+                    thumbUrl(preferWidth:50 preferHeight: 50)
+                }
+                nodeCnt
+            }
+        }`,
+        variables: {
+            sphereOid: oid
+        }
+    }
+}
+
+export function sphereListApi ([oid, from, limit, direction]) {
+    console.log(oid, from, limit, direction) // oid: ATdoe3tBItw= , from: ATgV32KAoUs=, limit: 10, direction: forward
+    return {
+            query: gql`query($sphereOid: OID!, $fromOid: OID, $limit: Int!, $direction: DirectionEnum!){
+            sphereList(sphereOid: $sphereOid, pagination: {from: $fromOid, limit: $limit, direction: $direction}){
+                oid
+                name
+                thumbUrl(preferWidth:400 preferHeight: 300)
+            }
+        }`,
+        variables: {
+            sphereOid: oid,
+            fromOid: from,
+            limit: limit,
+            direction: direction
+        }
+    }
+}
+
 export function newsApi ([from, limit, direction]) {
     const pagination = { from, limit, direction }
+    console.log(pagination)
 
     return {
         query: gql`query($pagination: PaginationInput!, $preferWidth: Int!, $preferHeight: Int!) {
