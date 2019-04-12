@@ -42,6 +42,7 @@
         data () {
             return {
                 btn: null,
+                search: '',
                 BUTTONS,
                 BUTTONSREG,
                 progress: false
