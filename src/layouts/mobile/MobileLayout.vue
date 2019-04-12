@@ -34,7 +34,7 @@
         { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
         { icon: 'fas fa-user-tag', path: '/promo' },
         { icon: 'settings', path: '/setting' },
-        { icon: 'bell', path: '/bell' }
+        { icon: 'bell', path: '/sphere/ATdoe3tBItw=' }, // тестовая иконка
     ]
 
     export default {
