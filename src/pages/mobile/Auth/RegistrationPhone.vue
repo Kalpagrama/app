@@ -18,9 +18,11 @@
 
 <script>
 import AuthProvider from '../../../store/api/AuthProvider';
+import AuthMixin from './AuthMixin';
 
     export default {
         name: 'PageMobileRegisterPhone',
+        mixins: [AuthMixin],
         data() {
         return {
             phone: '',
@@ -41,22 +43,22 @@ import AuthProvider from '../../../store/api/AuthProvider';
                 this.submitting = true;
                 if (!this.$refs.bePhone.hasError && this.$refs.bePhone.value) {
                     this.submitting = true;
-                    const provider = new AuthProvider(this);
-                    await provider.login('LOGIN_PHONE', this.phone)
-                        .then((res) => {
-                            console.log(res)
-                        this.textButton = 'Выслать код повторно';
-                        this.successPhoneCode = true;
-                        this.visibleCodeBlock = true;
-                        alert('Добро пожаловать!');
-                        this.submitting = false;
-                        this.$router.push('/greeting')
-                    })
-                .catch((err) => {
-                        console.log(err)
-                        this.submitting = false;
-                        alert(err.message);
-                    })
+
+                    this.auth.loginPhone(this.phone)
+                        .then((data) => {
+                            console.log('Register Phone data', data);
+                            this.textButton = 'Выслать код повторно';
+                            this.successPhoneCode = true;
+                            this.visibleCodeBlock = true;
+                            alert('Добро пожаловать!');
+                            this.submitting = false;
+                            this.$router.push('/greeting')
+                        })
+                        .catch((err) => {
+                                console.log(err)
+                                this.submitting = false;
+                                alert(err.message);
+                            });
                 } else {
                     alert('Скорее всего вы допустили ошибку при вводе данных!');
                 }

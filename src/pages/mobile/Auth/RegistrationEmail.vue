@@ -2,7 +2,6 @@
     q-page.text-center.bold
         .q-pa-md
             h6.text-weight-bold.head-title Регистрация через E-mail
-            q-btn(@click="test" label="клик")
         .q-pa-md.q-gutter-y-sm
             form(ref="form" @submit.prevent="onSubmit")
                 q-input(type="email" ref="emailReg" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="checkEmail")
@@ -14,8 +13,7 @@
 </template>
 
 <script>
-import AuthProvider from '../../../store/api/AuthProvider';
-import { mapState } from 'vuex';
+import AuthMixin from './AuthMixin';
 
 const RESULT_ENUM = Object.freeze({ 'SUCCESS': 0, 'FAIL': 1 })
 // Object.freeze(ResultEnum);
@@ -26,6 +24,7 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
 
     export default {
         name: 'PageMobileRegisterEmail',
+        mixins: [AuthMixin],
         data() {
         return {
             email: null,
@@ -49,23 +48,9 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
             checkPassword() {
                 return [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'];
             },
-            ...mapState('providers', { auth: state => state.auth }),
         },
         methods: {
-        async test() {
-            const provider = new AuthProvider(this);
-            console.log(provider.checkAutorized());
-            await provider.checkAutorized()
-                .then((response) => console.log(response))
-                .catch((err) => console.log(err))
-        },
         async onSubmit() {
-            if (!this.auth) {
-                alert('no auth!');
-                debugger;
-                return;
-            }
-
             if (!this.$refs.emailReg.hasError && !this.$refs.passwordReg.hasError && this.$refs.passwordReg.value && this.$refs.emailReg.value) {
                 this.submitting = true;
                 const params = {
@@ -73,22 +58,11 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
                     password: this.password,
                 };
 
-                this.auth.loginEmail(params);
-            } else {
-                this.showNotify(false, 'Скорее всего вы допустили ошибку при вводе данных!');
-            }
-        },
-        showNotify(bool, text) {
-            if (bool === true) {
-                this.$q.notify({
-                    message: text,
-                    color: 'green'
+                this.auth.loginEmail(params).then(() => {
+                    this.submitting = false;
                 })
             } else {
-                this.$q.notify({
-                    message: text,
-                    color: 'red'
-                })
+                this.auth.notifyError('Скорее всего вы допустили ошибку при вводе данных!');
             }
         },
       },
