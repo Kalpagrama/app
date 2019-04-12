@@ -74,7 +74,7 @@ export default ({ vue, store, app }) => {
         // headers: {
         //   'X-Session-Token': store.state.app.user.auth.token
         // },
-        request,
+        // request,
 
         fetch: (uri, options) => {
             const token = localStorage.getItem('ap.token');

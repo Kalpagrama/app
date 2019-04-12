@@ -81,9 +81,6 @@
         computed: {
             isAuth () {
                 return true
-            }
-        },
-        created () {
 //          return store.stateMutations.getUser();
             }
         },
