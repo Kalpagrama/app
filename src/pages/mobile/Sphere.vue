@@ -19,7 +19,7 @@
         // node-list.kp-sphere__nodes(:source="cards" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2")
         node-list.kp-sphere__nodes(:source="nodes" :class="{'kp-sphere_mode-0': mode === 0}" v-show="mode < 2")
 
-        beads.kp-sphere__beads
+        // beads.kp-sphere__beads
 </template>
 
 <script>
@@ -195,7 +195,8 @@
 
         &__nodes
             top 160px
-            bottom 50px
+            /*bottom 50px*/
+            bottom 0
 
         &_mode-0
             top 60px
