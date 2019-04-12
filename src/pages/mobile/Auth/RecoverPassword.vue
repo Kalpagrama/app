@@ -35,22 +35,22 @@
             this.submitting = true;
             setTimeout(() => {
                 if (this.$refs.emailReg.value === 'test@test.ru') {
-                    this.successRestore = false;
-                    this.falseEmail = true;
-                    this.submitting = false;
-                } else {
-                    this.submitting = false;
-                    this.successRestore = true;
-                    this.falseEmail = false;
-                    this.showBtnAuth = true;
-                    alert(user.email);
-                }
-            }, 3000);
+                this.successRestore = false;
+                this.falseEmail = true;
+                this.submitting = false;
+            } else {
+                this.submitting = false;
+                this.successRestore = true;
+                this.falseEmail = false;
+                this.showBtnAuth = true;
+                alert(user.email);
+            }
+        }, 3000);
         },
         redirectToRegister() {
             setTimeout(() => {
                 this.$router.push('/auth/login');
-            }, 500);
+        }, 500);
         },
     },
     computed: {

@@ -1,18 +1,18 @@
 <template lang="pug">
-    // .kp-grain-list(ref="list" v-touch-swipe.up="swipeUp" v-touch-swipe.down="swipeDown" v-touch-pan.up="panUp" v-touch-pan.down="panDown"  @wheel.prevent="catchScroll")
-    .kp-grain-list()
-        //.kp-grain-list__container(v-touch-swipe.mouse.up.down="switchGrain")
-        .kp-grain-list__container
-            grain(flat bordered v-for="(card, ix) in source" :key="ix" :item="{id: card}" :ix="ix" :ref="'card-' + ix")
+    // .kp-node-list(ref="list" v-touch-swipe.up="swipeUp" v-touch-swipe.down="swipeDown" v-touch-pan.up="panUp" v-touch-pan.down="panDown"  @wheel.prevent="catchScroll")
+    .kp-node-list(@scroll="touchMove")
+        //.kp-node-list__container(v-touch-swipe.mouse.up.down="switchGrain")
+        .kp-node-list__container( ref="list")
+            node(flat bordered v-for="(card, ix) in source" :key="ix" :item="card" :ix="ix" :ref="'card-' + ix")
     // button.test(@click="scroll(100)") Scroll
 </template>
 
 <script>
-    import grain from './Grain';
+    import node from './Node';
 
     export default {
-        name: 'GrainList',
-        components: { grain },
+        name: 'NodeList',
+        components: { node },
         props: {
             source: {
                 type: Array,
@@ -24,9 +24,50 @@
                 index: 0,
                 timer: 0,
                 target: 0,
+
+                prevScroll: 0,
+                isLoading: false,
             };
         },
+        watch: {
+            source() {
+                this.isLoading = false;
+            }
+        },
         methods: {
+            touchMove(e) {
+                // генерация события @end по мере приближения к концу ленты
+                if (!this.isLoading) {
+                    const rect = this.$refs.list.getBoundingClientRect();
+                    const { body } = window.document;
+                    const delta = Math.abs(this.prevScroll - e.srcElement.scrollTop);
+                    const koef = Math.floor(delta / 20);
+                    const limit = body.clientHeight * (2 + koef);
+
+                    let direction = 'none';
+                    if (e.srcElement.scrollTop > this.prevScroll) direction = 'down';
+                    else if (e.srcElement.scrollTop < this.prevScroll) direction = 'up';
+
+                    if (direction === 'down' && (rect.top + rect.height) < limit) {
+                        const item = this.source[this.source.length - 1];
+
+                        this.isLoading = true;
+                        this.$emit('end', item.oid);
+                    }
+                    /*
+                    // Подгрузка сверху отключена как дорогая операция
+                    else if (direction === 'up' && rect.top < (rect.height - limit)) {
+                        const item = this.source[0];
+                        // this.$emit('begin', item.oid);
+                        console.log('prePEND!!!');
+                    }
+                    */
+                }
+                const a = this.prevScroll;
+                const b = e.srcElement.scrollTop;
+                // console.log('prev =', a, ' scroll =', b, ' delta =', a - b);
+                this.prevScroll = e.srcElement.scrollTop;
+            },
             scroll(by) {
                 // if (this.timer) return;
 
@@ -55,7 +96,7 @@
                 }, 10);
             },
             swipeUp(e) {
-                console.log(e);
+//                console.log(e);
                 // this.scroll(1);
                 // eslint-disable-next-line
                 const ref = this.$refs.list;
@@ -63,7 +104,7 @@
                 this.$emit('swipeUp', e);
             },
             swipeDown(e) {
-                console.log(e);
+//                console.log(e);
                 // this.scroll(-1);
                 // eslint-disable-next-line
                 const ref = this.$refs.list;
@@ -82,6 +123,7 @@
                 // if (e.deltaY > 0) this.scroll(1);
                 // else if (e.deltaY < 0) this.scroll(-1);
             },
+
         },
     };
 </script>
@@ -93,7 +135,7 @@
         position fixed
         top 50px
         left 50px
-    .kp-grain-list
+    .kp-node-list
         position absolute
         top 0
         bottom 0

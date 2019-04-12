@@ -13,9 +13,10 @@ export default {
     },
     data() {
         return {
-            name: 'TEST',
+            name: 'Setting',
         };
     },
-    created() {},
+    methods: {},
+    mounted() {},
 };
 </script>
