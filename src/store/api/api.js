@@ -166,3 +166,87 @@ export function refreshTokenApi () {
         }`,
     }
 }
+
+export function bellApi () {
+    return {
+        query: gql`query {
+            notifications(limit: 10){
+                date
+                subject{
+                    name
+                    thumbUrl(preferWidth: 50, preferHeight: 50)
+                }
+                object{
+                    type
+                    name
+                    thumbUrl(preferWidth:50,preferHeight:50)
+                }
+                action
+                actionValue
+            }
+        }`
+    }
+}
+
+export function sphereApi ([oid]) {
+    return {
+        query: gql`query($sphereOid: OID!){
+            sphere(oid: $sphereOid){
+                oid
+                type
+                name
+                thumbUrl(preferWidth:400 preferHeight: 300)
+                isSubscribed
+                subscriberCnt
+                subscribers{
+                    name
+                    thumbUrl(preferWidth:50 preferHeight: 50)
+                }
+                nodeCnt
+            }
+        }`,
+        variables: {
+            sphereOid: oid
+        }
+    }
+}
+
+// Список тегов (Связанных сфер)
+export function sphereListApi ([oid, from, limit, direction]) {
+    return {
+        query: gql`query($oid: OID!, $from: OID, $limit: Int!, $direction: DirectionEnum!){
+            relatedSpheres(sphereOid: $oid, pagination: {from: $from, limit: $limit, direction: $direction}){
+                oid
+                name
+                thumbUrl(preferWidth:400 preferHeight: 300)
+            }
+        }`,
+        variables: {
+            oid: oid,
+            from: from,
+            limit: limit,
+            direction: direction
+        }
+    }
+}
+
+// Список ядер выбранной сферы
+export function sphereNodeListApi ([oid, from, limit, direction]) {
+    return {
+        query: gql`query($sphereOid: OID!, $fromOid: OID, $limit: Int!, $direction: DirectionEnum!){
+            sphereNodeList(sphereOid: $sphereOid, pagination: {from: $fromOid, limit: $limit, direction: $direction}){
+                oid
+                name
+                weight
+                rate
+                thumbUrl(preferWidth:400 preferHeight: 300)
+            }
+        }`,
+        variables: {
+            sphereOid: oid,
+            fromOid: from,
+            limit: limit,
+            direction: direction
+        }
+    }
+}

@@ -22,8 +22,6 @@
 
 <script>
     // import { Auth } from '../../store/auth-old';
-    import * as store from '../../store/store'
-
     const BUTTONS = [
         { icon: 'home', path: '/home' },
         { icon: 'search', path: '/search' },
@@ -35,7 +33,8 @@
     const BUTTONSREG = [
         { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
         { icon: 'fas fa-user-tag', path: '/promo' },
-        { icon: 'settings', path: '/setting' }
+        { icon: 'settings', path: '/setting' },
+        { icon: 'bell', path: '/sphere/ATdoe3tBItw=' }, // тестовая иконка
     ]
 
     export default {
@@ -64,19 +63,18 @@
             click (btn) {
                 this.btn = btn
                 this.$router.push(btn.path)
-                console.log(store.store.user.oid)
             },
             buttonColor (btn) {
                 return this.btn === btn ? 'primary' : 'black'
             },
             logOut () {
                 this.progress = true
-                setTimeout(() => {
+               /* setTimeout(() => {
                     this.progress = false
                     store.store.isAuth = false
                     store.store.user.oid = null
                     this.$router.push('/promo')
-                }, 2000)
+                }, 2000) */
             }
         },
         computed: {
@@ -85,6 +83,19 @@
             }
         },
         created () {
+//          return store.stateMutations.getUser();
+            }
+        },
+        created () {
+            /*
+            const auth = new Auth();
+            this.isAuth = store.stateMutations.getUser();
+            if (this.isAuth === false) {
+                this.$router.push('/promo');
+            } else if (store.store.user.oid === null) {
+                this.$router.push('/');
+            }
+            */
             this.$router.push('/home')
         }
     }

@@ -53,7 +53,6 @@
 
                         this.isLoading = true;
                         this.$emit('end', item.oid);
-                        console.log('========= end', item.oid);
                     }
                     /*
                     // Подгрузка сверху отключена как дорогая операция
@@ -97,7 +96,7 @@
                 }, 10);
             },
             swipeUp(e) {
-                console.log(e);
+//                console.log(e);
                 // this.scroll(1);
                 // eslint-disable-next-line
                 const ref = this.$refs.list;
@@ -105,7 +104,7 @@
                 this.$emit('swipeUp', e);
             },
             swipeDown(e) {
-                console.log(e);
+//                console.log(e);
                 // this.scroll(-1);
                 // eslint-disable-next-line
                 const ref = this.$refs.list;
