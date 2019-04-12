@@ -114,3 +114,28 @@ export function listAuthActionsApi () {
         }`
     }
 }
+
+export function loginEmailApi([variables]) {
+    return {
+        query: gql`query($email: String!, $password: String!) {
+            loginEmail(email: $email, password: $password) {
+                token
+                expires
+                role
+            }
+        }`,
+        variables
+    }
+}
+
+export function refreshTokenApi () {
+    return {
+        query: gql`query {
+            refreshSession {
+                token
+                expires
+                role
+            }
+        }`,
+    }
+}

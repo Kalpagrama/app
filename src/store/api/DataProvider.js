@@ -14,11 +14,9 @@ export default class DataProvider {
         const { scope } = this
 
         return new Promise((resolve) => {
-            scope.$apollo.subscribe(request).subscribe({
-                next: ({ data }) => {
+            scope.$apollo.query(request).then(({ data }) => {
                     const key = Object.keys(data)[0]
                     resolve(data[key])
-                }
             })
         })
     }

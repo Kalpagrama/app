@@ -4,5 +4,6 @@ export default {
       node: null,
       sphere: null,
       notifications: null,
+      auth: null,
   }
 };

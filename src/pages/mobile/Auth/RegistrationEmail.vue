@@ -15,6 +15,7 @@
 
 <script>
 import AuthProvider from '../../../store/api/AuthProvider';
+import { mapState } from 'vuex';
 
 const RESULT_ENUM = Object.freeze({ 'SUCCESS': 0, 'FAIL': 1 })
 // Object.freeze(ResultEnum);
@@ -38,7 +39,19 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
             errorEnum: ERROR_ENUM,
         };
     },
-    methods: {
+        beforeMount() {
+            console.log('Go')
+        },
+        computed: {
+            checkEmail() {
+                return [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'];
+            },
+            checkPassword() {
+                return [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'];
+            },
+            ...mapState('providers', { auth: state => state.auth }),
+        },
+        methods: {
         async test() {
             const provider = new AuthProvider(this);
             console.log(provider.checkAutorized());
@@ -47,25 +60,20 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
                 .catch((err) => console.log(err))
         },
         async onSubmit() {
+            if (!this.auth) {
+                alert('no auth!');
+                debugger;
+                return;
+            }
+
             if (!this.$refs.emailReg.hasError && !this.$refs.passwordReg.hasError && this.$refs.passwordReg.value && this.$refs.emailReg.value) {
                 this.submitting = true;
-                const user = {
+                const params = {
                     email: this.email,
                     password: this.password,
                 };
-                const provider = new AuthProvider(this);
-                await provider.login('LOGIN_EMAIL', user)
-                    .then((res) => {
-                        console.log(res.request.response, 'Ответ')
-                        this.showNotify(false, 'Добро пожаловать!');
-                        this.submitting = false;
-                        this.$router.push('/greeting')
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                        this.submitting = false;
-                        this.showNotify(false, err.message);
-                    })
+
+                this.auth.loginEmail(params);
             } else {
                 this.showNotify(false, 'Скорее всего вы допустили ошибку при вводе данных!');
             }
@@ -84,17 +92,6 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
             }
         },
       },
-      computed: {
-          checkEmail() {
-              return [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'];
-          },
-          checkPassword() {
-              return [val => !!val || '* Пароль не должен быть пустым!', val => val.length >= 6 || 'Минимально 6 символов'];
-          },
-       },
-        beforeMount() {
-            console.log('Go')
-        },
     };
 </script>
 

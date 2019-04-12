@@ -28,6 +28,17 @@ const CONFIG = process.env.APP_CONFIG
 Vue.use(VueApollo)
 
 export default ({ vue, store, app }) => {
+    const { providers } = store.state;
+
+    const request = async (operation) => {
+        const { token } = await providers.auth;
+        operation.setContext({
+            headers: {
+                authorization: token
+            }
+        });
+    };
+
     // Create the subscription websocket link
     const wsLink = new WebSocketLink({
         uri: utils.getAddress('backend', CONFIG.graphql.socket, CONFIG.graphql.wss ? 'wss' : 'ws'),
@@ -63,10 +74,19 @@ export default ({ vue, store, app }) => {
         // headers: {
         //   'X-Session-Token': store.state.app.user.auth.token
         // },
+        request,
+
         fetch: (uri, options) => {
-            if (store.state.app) options.headers['X-Session-Token'] = store.state.app.user.auth.token
+            const token = localStorage.getItem('ap.token');
+
+            // debugger;
+            if (token) {
+                options.headers['Autorization'] = token;
+            }
+
             return fetch(uri, options)
         }
+
     })
 
     // Using the ability to split links, you can send data to each link

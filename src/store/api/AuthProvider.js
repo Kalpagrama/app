@@ -1,30 +1,44 @@
 /* eslint-disable */
 
 import DataProvider from './DataProvider'
-import { isUserAuthorizedApi, isUserConfirmedApi, listAuthActionsApi } from './api'
+import { isUserAuthorizedApi, isUserConfirmedApi, listAuthActionsApi, loginEmailApi, refreshTokenApi } from './api';
 import axios from 'axios'
+
+const MSG_COLOR_SUCCESS = 'green';
+const MSG_COLOR_ERROR = 'red';
+
+const ITEM_TOKEN = 'token';
+const ITEM_ROLE = 'role';
+const ITEM_EXPIRES = 'expires';
+const ITEM_STRATEGY = 'strategy';
+const ITEM_PARAMS = 'params';
+
+const ROLE_GUEST = 'guest';
+const ROLE_RESETER = 'reseter';
+const ROLE_MEMBER = 'member';
 
 export default class AuthProvider extends DataProvider {
     constructor(scope) {
         super(scope, null, null)
-        const self = this
 
         this.actions = null
-        this.cacheIsAuthorized = false
-        this.cacheIsConfirmed = false
 
-        this.isAuthorized()
-        this.isConfirmed()
+        this.checkAutorized();
+        //this.refresh();
     }
 
     async action(key) {
         if(!this.actions){
           this.actions = await this.requestApi(listAuthActionsApi)
         }
-        console.log(key, JSON.stringify(this.actions))
-        const found = this.actions.filter(el => el.action === key)
-        console.log('found:', found)
-        console.log('found[0]:', found[0])
+
+        console.log(key, JSON.stringify(this.actions));
+
+        const found = this.actions.filter(el => el.action === key);
+
+        console.log('found:', found);
+        console.log('found[0]:', found[0]);
+
         return found[0]
 
     }
@@ -52,17 +66,16 @@ export default class AuthProvider extends DataProvider {
         return this.cacheIsConfirmed
     }
 
-    async login(method, params = undefined) {
+    async logout() {
+        return this.requestApi(logoutApi)
+            .finally(() => {
+
+            });
+    }
+
+    async login(method, params) {
         let action = await this.action(method)
-        if (method === 'LOGIN_EMAIL') {
-            let event = axios.get(action.url, {
-                params: {
-                    login: params.email,
-                    password: params.password
-                }
-            })
-            return event;
-        } else if (method === 'LOGIN_PHONE') {
+        if (method === 'LOGIN_PHONE') {
             console.log('LOGIN_PHONE recieved!!!!!')
             console.log(action)
             console.log(params, 'Номер который приходит')
@@ -77,16 +90,85 @@ export default class AuthProvider extends DataProvider {
         }
     }
 
-    logout() {
+    async loginEmail(params) {
+        const self = this;
 
+        self.cache(ITEM_STRATEGY, 'loginEmail');
+
+        this.requestApi(loginEmailApi, params)
+            .then(self.onSuccessLogin.bind(self))
+            /*
+            .then(({expires, role, token}) => {
+                self.cache(ITEM_TOKEN, token);
+                self.cache(ITEM_EXPIRES, expires);
+                self.cache(ITEM_ROLE, role);
+
+                self.scope.$router.push('/home');
+            })
+            */
+            .catch((error) => {
+                self.notify(error, MSG_COLOR_ERROR);
+            })
+    }
+
+    async loginPhone(params) {
+        this.login('LOGIN_PHONE', params)
+            .then((data) => {
+                console.log('LOGIN_PHONE RESULT', data);
+                scope.$router.push('/home');
+            })
+            .catch((error) => {
+                this.notify(error, MSG_COLOR_ERROR);
+            })
+    }
+
+    onSuccessLogin({expires, role, token}) {
+        debugger;
+
+        console.log('===========', this);
+        this.cache(ITEM_TOKEN, token);
+        this.cache(ITEM_EXPIRES, expires);
+        this.cache(ITEM_ROLE, role);
+
+        this.scope.$router.push('/home');
     }
 
     confirm() {
     }
 
+    refresh() {
+        const self = this;
+
+        this.requestApi(refreshTokenApi).then(self.onSuccessLogin.bind(self));
+    }
+
     restore() {
     }
 
+    notify(message, color = MSG_COLOR_SUCCESS) {
+        this.scope.$q.notify({ message, color });
+    }
+
+    cache(name, value) {
+        const prefix = 'ap.';
+        if (typeof value === 'undefined')
+            return localStorage.getItem(prefix + name);
+        localStorage.setItem(prefix + name, value)
+    }
+
+    get token() {
+        return this.cache(ITEM_TOKEN);
+    }
+
+    get confirmed() {
+        return this.cache(ITEM_ROLE) === ROLE_MEMBER;
+    }
+
+    get expired() {
+        const value = this.cache(ITEM_EXPIRES);
+
+        return !value || (+value < Date.now() / 1000) ;
+    }
 }
 /*
 

@@ -107,7 +107,7 @@ module.exports = function (ctx) {
             before (app) {
                 const cors = require('cors')
                 app.use(cors({
-                    origin: '*',
+                    origin: 'api.kalpagramma.com',
                     credentials: true
                 }))
             },
