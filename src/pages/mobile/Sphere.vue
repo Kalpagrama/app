@@ -11,7 +11,7 @@
                     .kp-sphere__name(:class="{'kp-sphere__name_mode-2': mode === 2}") {{item.name}}
                     .kp-sphere__descript
                         span.kp-sphere__text {{ item.subscriberCnt | bigNumbers }}
-                        q-btn(size="sm" outline) Подписаться
+                        q-btn.kp-sphere__subscribe(size="sm" color="primary") Подписаться
 
             .kp-sphere__filter
                 sphere-chips.kp-sphere__chips(:parent-oid="sphereOid" @clicked="open")
@@ -36,20 +36,7 @@
         { id: 1, label: 'Ядра' },
         { id: 2, label: 'Оценки' },
         { id: 3, label: 'Связи' }
-    ]
-/*
-    const TAGS = [
-        { id: 1, label: 'Параллепипед', path: '', weight: '20K' },
-        { id: 2, label: 'Счастье', path: '', weight: '150K' },
-        { id: 3, label: 'Любовь', path: '', weight: '430K' },
-        { id: 4, label: 'Гармония', path: '', weight: '100K' },
-        { id: 5, label: 'Дети', path: '', weight: '385K' },
-        { id: 6, label: 'Продукты', path: '', weight: '385K' },
-        { id: 7, label: 'Животные', path: '', weight: '35K' },
-        { id: 8, label: 'Математика', path: '', weight: '8K' },
-        { id: 9, label: 'Политика', path: '', weight: '2M' },
-        { id: 10, label: 'Обучение', path: '', weight: '1.5M' }
-    ] */
+    ];
 
     export default {
         name: 'PageMobileSphere',
@@ -63,9 +50,7 @@
         return {
             mode: 1,
             BUTTONS,
-/*
-            TAGS,
-*/
+
             statusText: 'Свайп пока не работает, для просмотра состояний кликни на визитку',
             test: 'John',
 
@@ -79,7 +64,26 @@
     filters: {
         bigNumbers(val) {
             // 1000 = 1K, 1000000 = 1M
-            return val;
+            val += val;
+            let units = '';
+            const steps = [
+                { value: 10 ** 9, unit: 'B' },
+                { value: 10 ** 6, unit: 'M' },
+                { value: 10 ** 3, unit: 'K' },
+            ];
+// 5 sek
+            if (Number.isNaN(val)) return '';
+
+            steps.forEach(el => {
+                if (units === '' && val > el.value) {
+                    units = el.unit;
+                    val = val / el.value;
+                }
+            });
+
+            const intVal = parseInt(val, 10);
+
+            return `${(intVal < val ? (val).toFixed(1) : intVal)}${units}`;
         }
     },
     computed: {
@@ -159,10 +163,26 @@
 
         &__info
             padding-top 8px
+            padding 5px
+
+        &__descript
+            display block
+
+        &__text
+            display inline-block
+            margin-right 16px
+
+        &__subscribe
+            display inline-block
 
         &__name
-            padding-top 8px
+            padding-top 12px
             font-size 18px
+            overflow hidden
+            text-overflow ellipsis
+            white-space nowrap
+            max-width 60vw
+            margin-bottom 8px
 
             &_mode-2
                 font-size 24px
