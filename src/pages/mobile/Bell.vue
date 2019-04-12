@@ -1,15 +1,15 @@
 <template lang="pug">
   q-page.flex.kp-notify__list
-    q-card.kp-notify__item(flat bordered v-for="(items,ixs) in bells" :key="ixs")
+    q-card.kp-notify__item(flat bordered v-for="(items, ix) in bells" :key="ix")
         q-avatar.kp-notify__avatar
-            img(:src="items.subject.thumbUrl")
+            img(:src="item.subject.thumbUrl")
         div.kp__notify__text.text-faded
-            router-link.text-light-blue-7(to="#") {{ items.subject.name }}&nbsp;
-            span &nbsp;{{ items.action | action }}&nbsp;
-            router-link.text-light-blue-7(to='#') {{ items.object.name }}
-            span &nbsp;как "{{ items.actionValue }}"
-            div.kp-notify__date {{ items.date | date }}
-    div.border-grey
+            router-link.text-light-blue-7(to="#") {{ item.subject.name }}&nbsp;
+            span &nbsp;{{ item.action | verbose }}&nbsp;
+            router-link.text-light-blue-7(to='#') {{ item.object.name }}
+            span &nbsp;как "{{ item.actionValue | format }}"
+            div.kp-notify__date {{ item.date | date }}
+    <!--div.border-grey-->
     <!-- q-card.kp-notify__item(flat bordered v-for="(item,ix) in notifs" :key="ix")
         q-avatar.kp-notify__avatar
             img(:src="item.user.avatar")
@@ -100,7 +100,7 @@ export default {
             }
             return new Intl.DateTimeFormat().format(val);
         },
-        action: (act) => {
+        verbose: (act) => {
             let value = '';
             switch (act) {
                 case 'CREATE':
@@ -117,6 +117,11 @@ export default {
             }
             return value;
         },
+        format: (x) => {
+            let z = '';
+            (x === null) ? z = '0' : z = x;
+            return z;
+        },
     },
     computed: {
         ...mapState('providers', { provider: state => state.bells }),
@@ -129,8 +134,8 @@ export default {
             const self = this;
             data.forEach(el => this.bells.push(el));
         },
-        appendBell(oid) {
-            this.provider.request(oid, 10)
+        appendBell() {
+            this.provider.request()
                 .then(this.load)
         },
     },
