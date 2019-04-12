@@ -25,11 +25,11 @@ export default {
     },
     watch: {
         active(value) {
-            console.log('active', value);
+//            console.log('active', value);
             this.isActive = value;
         },
         isActive(value) {
-            console.log('isActive', value);
+//            console.log('isActive', value);
             if (!value) this.$emit('close');
         },
     },

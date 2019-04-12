@@ -8,11 +8,11 @@
             q-btn.kp-voter__button(round :color="color('green')" :outline="isOutline(100)" @mouseover.stop="say('Точно да', 100)" icon="done_all" @click="vote(100)")
 
         .kp-voter__simple(v-else)
-            .kp-voter__views 2K
+            .kp-voter__views {{ node.viewed }}
             q-btn.kp-voter__button(round :color="color('red')" :outline="isOutline(0)" @mouseover.stop="say('Нет', 0)" icon="clear" @click="vote(0)")
             q-btn.kp-voter__button(round :color="color('primary')" :outline="isOutline(50)" @mouseover.stop="say('Может быть', 50)" icon="change_history" @click="vote(50)")
             q-btn.kp-voter__button(round :color="color('green')" :outline="isOutline(100)" @mouseover.stop="say('Да', 100)" icon="check" @click="vote(100)")
-            .kp-voter__vote 75%
+            .kp-voter__vote {{ node.rate }}
 
         .kp-voter__text(v-if="text && tooltip !== 'none'")
             span {{ text }}
@@ -27,59 +27,63 @@
         props: {
             tooltip: {
                 type: String,
-                default: 'top', // 'none', 'bottom'
+                default: 'top' // 'none', 'bottom'
             },
+            node: {
+                type: Object,
+                default: () => ({})
+            }
         },
-        data() {
+        data () {
             return {
                 isTapped: false,
                 text: '',
                 value: 50,
                 hoverValue: -1,
-                closer: false,
-            };
+                closer: false
+            }
         },
         computed: {
-            tapped() {
-                return this.isTapped;
-            },
+            tapped () {
+                return this.isTapped
+            }
         },
         methods: {
-            clearCloser() {
+            clearCloser () {
                 if (this.closer) {
-                    clearTimeout(this.closer);
+                    clearTimeout(this.closer)
                 }
-                this.closer = false;
+                this.closer = false
             },
-            tapCloser() {
-                this.isTapped = false;
-                this.text = '';
+            tapCloser () {
+                this.isTapped = false
+                this.text = ''
             },
-            color(color) {
-                return this.vote ? color : 'white';
+            color (color) {
+                return this.vote ? color : 'white'
             },
-            isOutline(vote) {
-                return (this.value !== vote) && (this.hoverValue !== vote);
+            isOutline (vote) {
+                return (this.value !== vote) && (this.hoverValue !== vote)
             },
-            startTap() {
-                this.clearCloser();
-                this.isTapped = true;
+            startTap () {
+                this.clearCloser()
+                this.isTapped = true
             },
-            endTap() {
-                this.closer = setTimeout(this.tapCloser.bind(this), 1000);
+            endTap () {
+                this.closer = setTimeout(this.tapCloser.bind(this), 1000)
             },
-            say(text, hoveredValue) {
-                this.text = text;
-                this.hoverValue = hoveredValue;
+            say (text, hoveredValue) {
+                this.text = text
+                this.hoverValue = hoveredValue
             },
-            vote(vote) {
-                this.value = vote;
-                this.clearCloser();
-                this.endTap();
-            },
-        },
-    };
-    </script>
+            vote (vote) {
+                this.value = vote
+                this.clearCloser()
+                this.endTap()
+            }
+        }
+    }
+</script>
 
 <style lang="stylus">
     .kp-voter
@@ -101,7 +105,6 @@
                 position relative
                 padding 16px
                 font-size 20px
-
 
         &__simple
             display grid

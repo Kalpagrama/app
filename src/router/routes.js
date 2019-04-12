@@ -1,3 +1,4 @@
+// import AuthGuard from './auth-guard';
 
 const routes = [
   {
@@ -20,7 +21,7 @@ const routes = [
       { path: '/auth/register/phone', component: () => import('pages/mobile/Auth/RegistrationPhone.vue') },
       { path: '/greeting', component: () => import('pages/mobile/Greeting.vue') },
       { path: '/lessons', component: () => import('pages/mobile/Lessons.vue') },
-      { path: '/test', component: () => import('pages/mobile/Test.vue') },
+      { path: '/setting', component: () => import('pages/mobile/Setting.vue') },
     ],
   },
 ];

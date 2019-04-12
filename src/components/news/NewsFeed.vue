@@ -3,7 +3,7 @@
 </template>
 
 <script>
-// import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import NodeList from '../NodeList';
 import NewsProvider, { DIRECTION_BACKWARD } from '../../store/api/NewsProvider';
 
@@ -16,22 +16,33 @@ export default {
     data() {
         return {
             news: [],
-            provider: null,
         };
     },
     computed: {
-    // ...mapGetters([''])
+        ...mapState('providers', { provider: state => state.news }),
     },
     beforeMount() {
-        this.provider = new NewsProvider(this, this.load);
         this.appendNews();
     },
     methods: {
         load(data) {
             // вставляем пока ТОЛЬКО В КОНЕЦ ленты, тк вставка в начало дорогая, требуется математика
             if (this.provider.direction !== DIRECTION_BACKWARD) {
-                data.forEach(el => this.news.push(el));
+                const self = this;
+
+                data.forEach(el => {
+                    this.news.push(el);
+                    this.provider.nodeCounters(el.oid).then(response => {
+                        self.onGetNodeCounters(el, response[0]);
+                    });
+                });
             }
+        },
+        onGetNodeCounters(node, data) {
+          // console.log('Подгрузка информации о ядре', node, data);
+            Object.keys(data).forEach(prop => {
+                node[prop] = data[prop];
+            })
         },
         prependNews(oid) {
             // подгрузка новостей сверху
@@ -40,7 +51,8 @@ export default {
         },
         appendNews(oid) {
             // подгрузка новостей снизу
-            this.provider.request(oid, AUTOLOAD_STEP);
+            this.provider.request(oid, AUTOLOAD_STEP)
+                .then(this.load);
         },
     },
 }

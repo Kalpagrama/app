@@ -36,6 +36,7 @@
         },
         methods: {
             touchMove(e) {
+                // генерация события @end по мере приближения к концу ленты
                 if (!this.isLoading) {
                     const rect = this.$refs.list.getBoundingClientRect();
                     const { body } = window.document;
@@ -52,7 +53,6 @@
 
                         this.isLoading = true;
                         this.$emit('end', item.oid);
-                        console.log('========= end', item.oid);
                     }
                     /*
                     // Подгрузка сверху отключена как дорогая операция
@@ -65,7 +65,7 @@
                 }
                 const a = this.prevScroll;
                 const b = e.srcElement.scrollTop;
-                console.log('prev =', a, ' scroll =', b, ' delta =', a - b);
+                // console.log('prev =', a, ' scroll =', b, ' delta =', a - b);
                 this.prevScroll = e.srcElement.scrollTop;
             },
             scroll(by) {
@@ -96,7 +96,7 @@
                 }, 10);
             },
             swipeUp(e) {
-                console.log(e);
+//                console.log(e);
                 // this.scroll(1);
                 // eslint-disable-next-line
                 const ref = this.$refs.list;
@@ -104,7 +104,7 @@
                 this.$emit('swipeUp', e);
             },
             swipeDown(e) {
-                console.log(e);
+//                console.log(e);
                 // this.scroll(-1);
                 // eslint-disable-next-line
                 const ref = this.$refs.list;
