@@ -40,12 +40,12 @@ export default ({ vue, store, app }) => {
     };
 
     // Create the subscription websocket link
-    // const wsLink = new WebSocketLink({
-    //     uri: utils.getAddress('backend', CONFIG.graphql.socket, CONFIG.graphql.wss ? 'wss' : 'ws'),
-    //     options: {
-    //         reconnect: true
-    //     }
-    // })
+    const wsLink = new WebSocketLink({
+        uri: utils.getAddress('backend', CONFIG.graphql.socket, CONFIG.graphql.wss ? 'wss' : 'ws'),
+        options: {
+            reconnect: true
+        }
+    })
 
     // Error handler
     const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
@@ -98,7 +98,7 @@ export default ({ vue, store, app }) => {
             return kind === 'OperationDefinition' &&
                 operation === 'subscription'
         },
-        // wsLink,
+        wsLink,
         uploadLink // httpLink
     )
 
