@@ -143,8 +143,6 @@
             itemTags() {
                     const { node } = this;
 
-                    console.log('=== READING item Tags', node, node.hashTags);
-
                     return (node && node.hashTags) || [];
             },
         },

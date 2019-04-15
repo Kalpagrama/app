@@ -1,5 +1,5 @@
 <template lang="pug">
-    .kp-voter(v-touch-hold.mouse="startTap" @click="endTap" @mouseover.stop="say('', -1)")
+    .kp-voter(v-if="node" v-touch-hold.mouse="startTap" @click="endTap" @mouseover.stop="say('', -1)")
         .kp-voter__advanced(v-if="tapped")
             q-btn.kp-voter__button(round :color="color('red')" :outline="isOutline(0)" @mouseover.stop="say('Точно нет', 0)" icon="clear" @click="vote(0)")
             q-btn.kp-voter__button(round :color="color('warning')" size="sm" :outline="isOutline(25)" @mouseover.stop="say('Скорее нет', 25)" icon="clear" @click="vote(25)")
