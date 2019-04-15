@@ -3,13 +3,12 @@
         q-page.text-center.bold.kp-auth
             h5.text-weight-bold.kp-auth__title.head-title Войти с помощью
             .q-pa-md.q-gutter-y-sm
-                q-btn.full-width.btn-register.kp-auth__button(v-for="(button,ix) in globalAuth" :style='`background: ${button.color}`' :icon="button.icon" :action="button.action" :href="button.url"  elevated no-caps type="a" :key="'global_'+ix" text-color='white' :label='`${button.label}`')
-                q-btn.full-width.btn-register.kp-auth__button(v-for="(button,ix) in localAuth" :style='`background: ${button.color}`' :icon="button.icon" :to="button.url" elevated no-caps type="a" :key="'loc_'+ix" text-color='white' :label='`${button.label}`')
+                q-btn.full-width.btn-register.kp-auth__button(v-for="(button,ix) in buttons" :key="ix"
+                :style='`background: ${button.color}`' :icon="button.icon" :to="button.url" elevated no-caps type="a"
+                text-color='white' :label='`${button.label}`')
 </template>
 
 <script>
-    import AuthProvider from '../../../../store/api/AuthProvider';
-
     const GLOBAL_AUTH = [
         { id: 1, action: '', label: 'Google', icon: 'fab fa-google-plus-g', color: '#dd4b39', url: '' },
         { id: 2, action: '', label: 'Facebook', icon: 'fab fa-facebook', color: '#3b5998', url: '' },
@@ -26,45 +25,14 @@
     export default {
         name: 'PageMobileRegistration',
         data() {
-            return {
-                globalAuth: GLOBAL_AUTH,
-                localAuth: LOCAL_AUTH
-            };
+            return {};
         },
-        methods: {
-          async onSubmit(e) {
-                /* console.log(e.target.getAttribute('action'))
-                const provider = new AuthProvider(this);
-                await provider.login(e.target.getAttribute('action'))
-                    .then((res) => {
-                        e.target.setAttribute('href', res)
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                    }) */
-
-                const provider = new AuthProvider(this);
-                await provider.login(e.target.getAttribute('action'))
-                .then((res) => {
-                    this.$router.push(res)
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
+        computed: {
+            buttons() {
+                return [...LOCAL_AUTH]; //  ...GLOBAL_AUTH];
             },
         },
-        created() {
-/*            const provider = new AuthProvider(this);
-                this.globalAuth.forEach((item, idx) => {
-                    provider.login(item.action)
-                        .then((res) => {
-                        this.linkGlobalAuth = res;
-                        console.log(res)
-                    })
-                    .catch((err) => {
-                        console.log(err)
-                    })
-                }) */
+        methods: {
         },
     };
 

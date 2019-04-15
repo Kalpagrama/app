@@ -156,6 +156,21 @@ export function confirmPhoneApi([phone, code]) {
     }
 }
 
+export function restorePasswordApi([login]) {
+    return {
+        query: gql`query($login: String!) {
+            restorePassword(login: $login) {
+                token
+                expires
+                role
+            }
+        }`,
+        variables: {
+            login
+        }
+    }
+}
+
 export function refreshTokenApi () {
     return {
         query: gql`query {
