@@ -120,13 +120,11 @@ export default class AuthProvider extends DataProvider {
     }
 
     onSuccessLogin({expires, role, token}) {
-        console.log('=== SUCCESS ??');
         this.cache(ITEM_TOKEN, token);
         this.cache(ITEM_EXPIRES, expires);
         this.cache(ITEM_ROLE, role);
 
         // this.scope.$router.push('/home');
-        console.log('=== SUCCESS !!!!!!');
 
         return true;
     }

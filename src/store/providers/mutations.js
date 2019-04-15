@@ -11,6 +11,4 @@ export function init(state, scope) {
     state.notifications = new BellProvider(scope);
     state.node = new NodeProvider(scope);
     state.sphere = new SphereProvider(scope);
-
-    process.env.DEV && console.log('STORE INIT OK');
 }
