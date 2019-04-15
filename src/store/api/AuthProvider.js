@@ -7,6 +7,7 @@ import {
     isUserConfirmedApi,
     listAuthActionsApi,
     loginEmailApi,
+    loginPhoneApi,
     refreshTokenApi
 } from './api';
 import axios from 'axios'

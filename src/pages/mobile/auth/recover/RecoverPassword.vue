@@ -13,8 +13,11 @@
 </template>
 
 <script>
+    import AuthMixin from '../AuthMixin';
+
     export default {
         name: 'PageMobileRecoverPassword',
+        mixins: [AuthMixin],
         data() {
         return {
             email: null,
