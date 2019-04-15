@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import AuthProvider from '../../../store/api/AuthProvider';
-import AuthMixin from './AuthMixin';
+import AuthProvider from '../../../../store/api/AuthProvider';
+import AuthMixin from '../AuthMixin';
 
     export default {
         name: 'PageMobileRegisterPhone',

@@ -8,12 +8,12 @@
                 q-input(type="password" ref="passwordReg" v-model="password" label="Придумай пароль" dense="dense" :rules="checkPassword")
                 p.text-left.warning.text-caption.q-mt-sm(v-if="bemail") Email уже зарегистрирован! Нажмите Восстановить чтобы сбросить старый пароль
                 .q-gutter-y-sm.full-height.q-pa-md.q-mt-sm
-                    q-btn.btn-auth(size='12px' type="submit" :loading="submitting") Зарегистрироваться
+                    q-btn.btn-auth(size='12px' type="submit" :loading="submitting" :disabled="!email || !password") Зарегистрироваться
                     q-btn.btn-auth(size='12px' to="/auth/restore") Восстановить пароль
 </template>
 
 <script>
-import AuthMixin from './AuthMixin';
+import AuthMixin from '../AuthMixin';
 
 const RESULT_ENUM = Object.freeze({ 'SUCCESS': 0, 'FAIL': 1 })
 // Object.freeze(ResultEnum);
@@ -38,9 +38,6 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
             errorEnum: ERROR_ENUM,
         };
     },
-        beforeMount() {
-            console.log('Go')
-        },
         computed: {
             checkEmail() {
                 return [val => !!val || '* Заполните поле email!', val => /^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(val) || 'Введите корректный e-mail'];
@@ -51,19 +48,20 @@ const ERROR_ENUM = Object.freeze({ 'UNKNOWN_ERROR': 0, 'PASSWORD_INCORRECT': 1, 
         },
         methods: {
         async onSubmit() {
-            if (!this.$refs.emailReg.hasError && !this.$refs.passwordReg.hasError && this.$refs.passwordReg.value && this.$refs.emailReg.value) {
-                this.submitting = true;
-                const params = {
-                    email: this.email,
-                    password: this.password,
-                };
-
-                this.auth.loginEmail(params).then(() => {
-                    this.submitting = false;
-                })
-            } else {
-                this.auth.notifyError('Скорее всего вы допустили ошибку при вводе данных!');
+            if (this.$refs.emailReg.hasError || this.$refs.passwordReg.hasError) {
+                this.auth.notifyError('Неверно введены данные');
             }
+
+            this.submitting = true;
+            const params = {
+                email: this.email,
+                password: this.password,
+            };
+
+            this.auth.loginEmail(params).then(() => {
+                this.submitting = false;
+                this.$router.push('/auth/login');
+            })
         },
       },
     };

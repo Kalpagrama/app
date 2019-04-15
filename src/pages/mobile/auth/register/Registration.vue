@@ -8,7 +8,7 @@
 </template>
 
 <script>
-    import AuthProvider from '../../../store/api/AuthProvider';
+    import AuthProvider from '../../../../store/api/AuthProvider';
 
     const GLOBAL_AUTH = [
         { id: 1, action: '', label: 'Google', icon: 'fab fa-google-plus-g', color: '#dd4b39', url: '' },

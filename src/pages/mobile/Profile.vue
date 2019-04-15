@@ -23,7 +23,8 @@
                 q-btn-group(outline)
                     q-btn(outline :label="item.label" v-for="(item,ix) in BUTTONS" :key="ix" size="sm")
 
-        node-list.kp-profile__nodes(:source="cards" :class="{'kp-profile_mode-0': mode === 0}" v-show="mode < 2" @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
+        //node-list.kp-profile__nodes(:source="cards" :class="{'kp-profile_mode-0': mode === 0}" v-show="mode < 2" @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
+        news-feed.kp-profile__nodes(:class="{'kp-profile_mode-0': mode === 0}" v-show="mode < 2" @swipe-up="onSwipeUp" @swipe-down="onSwipeDown")
 </template>
 
 <style lang="stylus">
@@ -109,6 +110,8 @@
 <script>
     import NodeList from '../../components/NodeList'
     import Setting from '../../components/Setting'
+    import AuthMixin from './auth/AuthMixin';
+    import NewsFeed from '../../components/news/NewsFeed';
 
     const BUTTONS = [
         { id: 1, label: 'Ядра' },
@@ -118,7 +121,9 @@
 
     export default {
         name: 'PageMobileProfile',
+        mixins: [AuthMixin],
         components: {
+            NewsFeed,
             'node-list': NodeList,
             Setting
         },
@@ -160,7 +165,7 @@
             queryLogout () {
                 // eslint-disable-next-line
                 if (confirm('Завершить работу?')) {
-                    console.log('exit')
+                    this.auth.logout();
                 }
             }
         }

@@ -8,14 +8,17 @@
             q-input(type="password" ref="password" v-model="password" label="Придумай пароль" dense="dense" :rules="checkPassword")
             p.text-left.warning.text-caption.q-mt-sm(v-if="bemail") Пользователь с таким Email не найден! Пожалуйста зарегистрируйтесь!
             .q-gutter-y-sm.full-height.q-pa-md.q-mt-sm
-                q-btn.btn-auth(size='12px' type="submit" @click="onSubmit" :loading="submitting") Войти
+                q-btn.btn-auth(size='12px' type="submit" @click="onSubmit" :loading="submitting" :disabled="!email || !password") Войти
                 q-btn.btn-auth(size='12px' to="/auth/register/email") Зарегистрироваться
                 q-btn.btn-auth(size='12px' to="/auth/restore") Восстановить пароль
 </template>
 
 <script>
+    import AuthMixin from '../AuthMixin';
+
     export default {
         name: 'PageMobileLogin',
+        mixins: [AuthMixin],
         data() {
         return {
             email: null,
@@ -28,24 +31,24 @@
     },
     methods: {
         onSubmit() {
-            const user = {
+            if (this.$refs.email.hasError || this.$refs.password.hasError) {
+              this.auth.notifyError('Данные введены с ошибкой');
+            };
+
+            const params = {
                 email: this.email,
                 password: this.password,
             };
-            if (!this.$refs.email.hasError && !this.$refs.password.hasError && this.$refs.password.value !== '' && this.$refs.email.value !== '') {
-                this.submitting = true;
-                setTimeout(() => {
-                        if (this.$refs.email.value === 'test@test.ru') {
-                        this.bemail = true;
-                        this.submitting = false;
-                        this.$router.push('/home');
-                    } else {
-                        this.submitting = false;
-                        this.bemail = true;
-                        alert(user.email);
-                    }
-                }, 3000);
-            }
+
+            this.submitting = true;
+
+            this.auth.loginEmail(params)
+                .then(() => {
+                    this.$router.push('/home');
+                })
+                .finally(() => {
+                    this.submitting = false;
+                });
         },
     },
     computed: {

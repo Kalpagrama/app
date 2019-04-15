@@ -24,6 +24,8 @@ const ROLE_GUEST = 'GUEST';
 const ROLE_RESETER = 'RESETER';
 const ROLE_MEMBER = 'MEMBER';
 
+const PREFIX = 'ap.';
+
 export default class AuthProvider extends DataProvider {
     constructor(scope) {
         super(scope, null, null)
@@ -129,6 +131,11 @@ export default class AuthProvider extends DataProvider {
         return true;
     }
 
+    logout() {
+        [ITEM_TOKEN, ITEM_EXPIRES, ITEM_ROLE].forEach(el => localStorage.removeItem(PREFIX + el));
+        this.scope.$router.push('/home');
+    }
+
     confirm() {
     }
 
@@ -155,10 +162,9 @@ export default class AuthProvider extends DataProvider {
     }
 
     cache(name, value) {
-        const prefix = 'ap.';
         if (typeof value === 'undefined')
-            return localStorage.getItem(prefix + name);
-        localStorage.setItem(prefix + name, value)
+            return localStorage.getItem(PREFIX + name);
+        localStorage.setItem(PREFIX + name, value)
     }
 
     get token() {

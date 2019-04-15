@@ -14,14 +14,14 @@
             router-view
 
         q-footer.bg-white.kp-menu_main(bordered)
-            q-btn(v-for="(btn, ix) in buttons" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)")
+            q-btn(v-for="(btn, ix) in buttons()" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)")
 
         q-circular-progress(v-if="progress" indeterminate size="50px" color="blue" class="q-ma-md progress")
 </template>
 
 <script>
-    // import { Auth } from '../../store/auth-old';
-    import { mapState } from 'vuex';
+
+    import AuthMixin from '../../pages/mobile/auth/AuthMixin';
 
     const BUTTONS = [
         { icon: 'home', path: '/home' },
@@ -41,6 +41,7 @@
 
     export default {
         name: 'GuestMobileLayout',
+        mixins: [AuthMixin],
         data () {
             return {
                 btn: null,
@@ -53,15 +54,14 @@
             this.$router.push('/home')
         },
         computed: {
-            ...mapState('providers', { auth: state => state.notifications }),
+        },
+        methods: {
             buttons() {
                 if (this.auth && this.auth.authorized) {
                     return BUTTONS;
                 }
                 return BUTTONSREG;
             },
-        },
-        methods: {
             isTitle () {
                 return this.$route.path !== '/search'
             },
@@ -75,7 +75,7 @@
                 )
             },
             click (btn) {
-                this.btn = btn
+                this.btn = btn;
 
                 if (btn.path === '/logout') {
                     // todo logout
