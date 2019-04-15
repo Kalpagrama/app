@@ -14,14 +14,15 @@
             router-view
 
         q-footer.bg-white.kp-menu_main(bordered)
-            q-btn(v-if="isAuth" v-for="(btn, ix) in BUTTONS" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)")
-            q-btn(v-if="isAuth" flat color="black" icon='exit_to_app' size="lg" @click="logOut")
-            q-btn(v-for="(btn, ix) in BUTTONSREG" :key="'reg_'+ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)" active-class="active")
+            q-btn(v-for="(btn, ix) in buttons" :key="ix" flat :color="buttonColor(btn)" :icon="btn.icon" size="lg" @click="click(btn)")
+
         q-circular-progress(v-if="progress" indeterminate size="50px" color="blue" class="q-ma-md progress")
 </template>
 
 <script>
     // import { Auth } from '../../store/auth-old';
+    import { mapState } from 'vuex';
+
     const BUTTONS = [
         { icon: 'home', path: '/home' },
         { icon: 'search', path: '/search' },
@@ -34,7 +35,8 @@
         { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
         { icon: 'fas fa-user-tag', path: '/promo' },
         { icon: 'settings', path: '/setting' },
-        { icon: 'bell', path: '/sphere/ATdoe3tBItw=' } // тестовая иконка
+        // { icon: 'door-open', path: '/logout' },
+        { icon: 'paw', path: '/sphere/ATdoe3tBItw=' } // тестовая иконка
     ]
 
     export default {
@@ -46,6 +48,18 @@
                 BUTTONSREG,
                 progress: false
             }
+        },
+        created () {
+            this.$router.push('/home')
+        },
+        computed: {
+            ...mapState('providers', { auth: state => state.notifications }),
+            buttons() {
+                if (this.auth && this.auth.authorized) {
+                    return BUTTONS;
+                }
+                return BUTTONSREG;
+            },
         },
         methods: {
             isTitle () {
@@ -62,46 +76,28 @@
             },
             click (btn) {
                 this.btn = btn
+
+                if (btn.path === '/logout') {
+                    // todo logout
+                }
+
                 this.$router.push(btn.path)
             },
             buttonColor (btn) {
                 return this.btn === btn ? 'primary' : 'black'
             },
-            logOut () {
-                this.progress = true
-                /* setTimeout(() => {
-                     this.progress = false
-                     store.store.isAuth = false
-                     store.store.user.oid = null
-                     this.$router.push('/promo')
-                 }, 2000) */
-            }
         },
-        computed: {
-            isAuth () {
-                return true
-//          return store.stateMutations.getUser();
-            }
-        },
-        created () {
-            /*
-            const auth = new Auth();
-            this.isAuth = store.stateMutations.getUser();
-            if (this.isAuth === false) {
-                this.$router.push('/promo');
-            } else if (store.store.user.oid === null) {
-                this.$router.push('/');
-            }
-            */
-            this.$router.push('/home')
-        }
     }
 </script>
 
 <style lang="stylus">
+    $btn = 45px
+
     .kp-menu
         &_main
             display grid
+            width 100%
+            /*grid-template-columns 1fr 1fr 1fr 1fr 1fr*/
             grid-template-columns 1fr 1fr 1fr 1fr 1fr
             align-items center
             justify-items center

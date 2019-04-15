@@ -62,7 +62,7 @@ export default class AuthProvider extends DataProvider {
     }
 
     checkAutorized() {
-        console.log('checking');
+        // console.log('checking');
         return this.requestApi(isUserAuthorizedApi)
     }
 
@@ -163,6 +163,10 @@ export default class AuthProvider extends DataProvider {
 
     get token() {
         return this.cache(ITEM_TOKEN);
+    }
+
+    get authorized() {
+        return this.token && !this.expired;
     }
 
     get confirmed() {

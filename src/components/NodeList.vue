@@ -30,8 +30,9 @@
             };
         },
         watch: {
-            source() {
+            source(val) {
                 this.isLoading = false;
+                // console.log('=== SOURCE', val);
             }
         },
         methods: {
