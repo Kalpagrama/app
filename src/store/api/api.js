@@ -58,6 +58,7 @@ export function nodeFullApi(oids) {
                     thumbUrl(preferWidth:378, preferHeight:400)
                     name
                     hashTags{
+                        oid
                         type
                         name
                     }                    

@@ -107,7 +107,6 @@
 
             this.provider.request(this.$route.params.id).then(data => {
                 self.node = data[0];
-                self.provider = null;
             })
         },
         computed: {
@@ -144,12 +143,14 @@
             itemTags() {
                     const { node } = this;
 
+                    console.log('=== READING item Tags', node, node.hashTags);
+
                     return (node && node.hashTags) || [];
             },
         },
         methods: {
             openSphere (item) {
-                this.$router.push(`/sphere/${item.id}`)
+                this.$router.push(`/sphere/${item.oid}`)
             }
         }
     }

@@ -34,7 +34,7 @@
         { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
         { icon: 'fas fa-user-tag', path: '/promo' },
         { icon: 'settings', path: '/setting' },
-        { icon: 'bell', path: '/sphere/ATdoe3tBItw=' }, // тестовая иконка
+        { icon: 'bell', path: '/sphere/ATdoe3tBItw=' } // тестовая иконка
     ]
 
     export default {
@@ -42,7 +42,6 @@
         data () {
             return {
                 btn: null,
-                search: '',
                 BUTTONS,
                 BUTTONSREG,
                 progress: false
@@ -70,12 +69,12 @@
             },
             logOut () {
                 this.progress = true
-               /* setTimeout(() => {
-                    this.progress = false
-                    store.store.isAuth = false
-                    store.store.user.oid = null
-                    this.$router.push('/promo')
-                }, 2000) */
+                /* setTimeout(() => {
+                     this.progress = false
+                     store.store.isAuth = false
+                     store.store.user.oid = null
+                     this.$router.push('/promo')
+                 }, 2000) */
             }
         },
         computed: {
