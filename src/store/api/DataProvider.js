@@ -17,6 +17,10 @@ export default class DataProvider {
             scope.$apollo.query(request).then(({ data }) => {
                     const key = Object.keys(data)[0]
                     resolve(data[key])
+            }).catch((error) => {
+                console.log('=== login email ERROR');
+                console.log('CODE=', error.code);
+                console.log('message=', error.message);
             })
         )
     }

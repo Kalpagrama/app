@@ -28,16 +28,16 @@ const CONFIG = process.env.APP_CONFIG
 Vue.use(VueApollo)
 
 export default ({ vue, store, app }) => {
-    const { providers } = store.state;
+    const { providers } = store.state
 
     const request = async (operation) => {
-        const { token } = await providers.auth;
+        const { token } = await providers.auth
         operation.setContext({
             headers: {
                 authorization: token
             }
-        });
-    };
+        })
+    }
 
     // Create the subscription websocket link
     const wsLink = new WebSocketLink({
@@ -49,11 +49,18 @@ export default ({ vue, store, app }) => {
 
     // Error handler
     const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
+        let codes = []
         if (graphQLErrors) {
-            graphQLErrors.map(({ message, locations, path }) => vue.$log.warn(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`))
+            // throw new Error(graphQLErrors.message)
+            graphQLErrors.map((currentValue) => {
+                // console.error('=== ERROR LINK', JSON.stringify(currentValue))
+                codes.push(currentValue.code)
+                // vue.$log.warn(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`)
+            })
         }
+        // console.error('=== ERROR LINK graphQLErrors', JSON.stringify(graphQLErrors))
         Notify.create({
-            message: 'Произошла ошибка при обращении к серверу',
+            message: `Произошла ошибка при обращении к серверу. code=${codes}`,
             icon: 'warning',
             color: 'red',
             detail: graphQLErrors ? graphQLErrors[0].message : 'Произошла непредвиденная ошибка',
@@ -62,7 +69,7 @@ export default ({ vue, store, app }) => {
         })
 
         if (networkError) {
-            console.error(networkError)
+            console.error('=== ERROR LINK networkError', JSON.stringify(networkError))
             // vue.$log.warn(`[Network error]: ${networkError}`)
         }
     })
@@ -77,11 +84,11 @@ export default ({ vue, store, app }) => {
         // request,
 
         fetch: (uri, options) => {
-            const token = localStorage.getItem('ap.token');
+            const token = localStorage.getItem('ap.token')
 
             // debugger;
             if (token) {
-                options.headers['Authorization'] = token;
+                options.headers['Authorization'] = token
             }
 
             return fetch(uri, options)

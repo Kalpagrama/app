@@ -46,6 +46,9 @@
                 .then(() => {
                     this.$router.push('/home');
                 })
+                .catch((error) => {
+                    console.log('=== login email ERROR', error);
+                })
                 .finally(() => {
                     this.submitting = false;
                 });
