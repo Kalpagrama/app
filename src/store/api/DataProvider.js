@@ -12,7 +12,7 @@ export default class DataProvider {
         const request = api ? api(args) : this.api(args)
         const provider = this
         const { scope } = this
-
+// console.log('==== API', api, args);
         return new Promise((resolve) =>
             scope.$apollo.query(request).then(({ data }) => {
                     const key = Object.keys(data)[0]

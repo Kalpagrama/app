@@ -32,11 +32,11 @@
     ]
 
     const BUTTONSREG = [
-        { icon: 'fas fa-sign-in-alt', path: '/auth/register' },
-        { icon: 'fas fa-user-tag', path: '/promo' },
-        { icon: 'settings', path: '/setting' },
+        { icon: 'fas fa-sign-in-alt', path: '/auth/login' },
+        // { icon: 'fas fa-user-tag', path: '/promo' },
+        // { icon: 'settings', path: '/setting' },
         // { icon: 'door-open', path: '/logout' },
-        { icon: 'paw', path: '/sphere/ATdoe3tBItw=' } // тестовая иконка
+        // { icon: 'paw', path: '/sphere/ATdoe3tBItw=' } // тестовая иконка
     ]
 
     export default {

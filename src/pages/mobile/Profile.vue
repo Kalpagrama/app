@@ -13,9 +13,6 @@
             .kp-profile__quote_mode-2(v-if="mode === 2") {{ statusText }}
 
             .kp-profile__settings(v-if="mode === 2")
-                setting
-                setting
-                setting
                 .kp-profile__quit
                     q-btn(color="white" text-color="black" label="Выйти из аккаунта" size="sm" @click="queryLogout")
 
@@ -109,7 +106,6 @@
 
 <script>
     import NodeList from '../../components/NodeList'
-    import Setting from '../../components/Setting'
     import AuthMixin from './auth/AuthMixin';
     import NewsFeed from '../../components/news/NewsFeed';
 
@@ -125,7 +121,6 @@
         components: {
             NewsFeed,
             'node-list': NodeList,
-            Setting
         },
         data () {
             return {

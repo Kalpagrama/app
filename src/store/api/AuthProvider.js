@@ -11,6 +11,7 @@ import {
     refreshTokenApi
 } from './query/api-query';
 import axios from 'axios'
+import { urlGet } from 'src/helpers/url'
 
 export const MSG_COLOR_SUCCESS = 'green';
 export const MSG_COLOR_ERROR = 'red';
@@ -33,19 +34,35 @@ export default class AuthProvider extends DataProvider {
 
         this.actions = null
 
+        // Првоерка переданных параметров внешней авторизации
+        this.checkUrlParams();
+
         if (this.token) {
-            console.log('=== found TOKEN', this.token);
+            // console.log('=== found TOKEN', this.token);
             this.refresh().catch((...args) => {
-                console.log('=== REFRESH ERRORR!!!!!', args);
+                // console.log('=== REFRESH ERRORR!!!!!', args);
                 return this.checkAutorized.bind(this);
             }).then((data) => {
                 if (!data) return this.checkAutorized();
             })
         }
-        else
-            console.log('=== NO TOKEN');
+        else {
+            scope.$router.push('/auth/login');
+        }
+    }
 
+    checkUrlParams() {
+        if (urlGet('token')) {
+            const tempToken = urlGet('token');
+            const tempRole = urlGet('role');
+            const tempExp = urlGet('expires');
 
+            this.cache(ITEM_TOKEN, tempToken);
+            this.cache(ITEM_ROLE, tempRole);
+            this.cache(ITEM_EXPIRES, tempExp);
+
+            location.href = location.origin;
+        }
     }
 
     async action(key) {
@@ -124,8 +141,8 @@ export default class AuthProvider extends DataProvider {
             });
     }
 
-    async confirmPhone(params) {
-        return this.requestApi(confirmPhoneApi, params);
+    async confirmPhone({phone, code}) {
+        return this.requestApi(confirmPhoneApi, phone, code);
     }
 
     onSuccessLogin({expires, role, token}) {
@@ -140,7 +157,7 @@ export default class AuthProvider extends DataProvider {
 
     logout() {
         [ITEM_TOKEN, ITEM_EXPIRES, ITEM_ROLE].forEach(el => localStorage.removeItem(PREFIX + el));
-        this.scope.$router.push('/home');
+        this.scope.$router.push('/auth/login');
     }
 
     confirm() {

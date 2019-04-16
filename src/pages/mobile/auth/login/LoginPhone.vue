@@ -1,7 +1,7 @@
 <template lang="pug">
     q-page.text-center.bold
         .q-pa-md
-            h6.text-weight-bold.head-title Регистрация через Телефон
+            h6.text-weight-bold.head-title Вход по номеру телефона
         .q-pa-md.q-gutter-y-sm
             form(ref="form" @submit.prevent="onSubmit")
                 q-input.flex-double(ref="phone" lazy-rules v-model="phone" dense="dense" type="phone" mask="(###) ### - ####" hint="(###) ### - ####")
@@ -18,11 +18,10 @@
 </template>
 
 <script>
-import AuthProvider from '../../../../store/api/AuthProvider';
 import AuthMixin from '../AuthMixin';
 
     export default {
-        name: 'PageMobileRegisterPhone',
+        name: 'PageMobileLoginPhone',
         mixins: [AuthMixin],
         data() {
         return {
@@ -66,15 +65,28 @@ import AuthMixin from '../AuthMixin';
             },
         validateCode(code) {
             if (code > 999 && code < 10000) {
+                console.log('== CODE OK', code);
                 const params = {
                     phone: this.phone,
                     code: String(code)
                 }
 
-                this.auth.confirmPhone(params).then(() => {
-                    this.$router.push('/greeting');
+                this.auth.confirmPhone(params).then((result) => {
+                    console.log('== GQL OK', code);
+                    if (result) {
+                        this.$router.push('/greeting');
+                    } else {
+                        this.error('Ошибка: Проверьте правильность ввода телефона и кода подтвеврждения');
+                    }
+                }).catch((error) => {
+                    console.log('== CODE error', error);
                 })
+            } else {
+                // console.log('== CODE failed');
             }
+        },
+        error(text) {
+            this.auth.notifyError(text);
         },
     },
 };
