@@ -1,5 +1,5 @@
 import DataProvider from './DataProvider'
-import { nodeFullApi } from './api';
+import { nodeFullApi } from './query/api-query';
 
 export default class NodeProvider extends DataProvider {
     constructor (scope) {

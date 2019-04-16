@@ -1,5 +1,5 @@
 import DataProvider from './DataProvider'
-import { bellApi } from './api'
+import { bellApi } from './query/api-query'
 
 export default class BellProvider extends DataProvider {
     constructor(scope) {

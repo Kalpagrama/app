@@ -9,7 +9,7 @@ import {
     loginEmailApi,
     loginPhoneApi,
     refreshTokenApi
-} from './api';
+} from './query/api-query';
 import axios from 'axios'
 
 export const MSG_COLOR_SUCCESS = 'green';
@@ -73,20 +73,26 @@ export default class AuthProvider extends DataProvider {
         this.cacheIsConfirmed = this.requestApi(isUserConfirmedApi)
     }
 
+    // fixme Под вопросом, есть геттер authorized
     isAuthorized(force = false) {
         if (force) this.checkAutorized()
         return this.cacheIsAuthorized
     }
 
+    // fixme Под вопросом
     isConfirmed(force = false) {
         if (force) this.checkConfirmed()
         return this.cacheIsConfirmed
     }
 
-    async logout() {
+    async idatePhone(code) {
+
+    }
+
+    async logout(callback) {
         return this.requestApi(logoutApi)
             .finally(() => {
-
+                callback && callback();
             });
     }
 
