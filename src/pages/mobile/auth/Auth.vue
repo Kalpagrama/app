@@ -12,12 +12,7 @@
     const GLOBAL_AUTH = [
         { id: 1, action: '', label: 'Google', icon: 'fab fa-google-plus-g', color: '#dd4b39', url: '' },
         { id: 2, action: '', label: 'Facebook', icon: 'fab fa-facebook', color: '#3b5998', url: '' },
-        { id: 3,
-action: 'LOGIN_VK',
-label: 'VK',
-icon: 'fab fa-vk',
-color: '#45668e',
-            url: 'https://oauth.vk.com/authorize?client_id=6911684&display=mobile&redirect_uri=https://api.kalpagramma.com/auth/login/VK&scope=email&response_type=code&v=5.92' },
+        { id: 3, action: 'LOGIN_VK', label: 'VK', icon: 'fab fa-vk', color: '#45668e', url: 'https://oauth.vk.com/authorize?client_id=6911684&display=mobile&redirect_uri=https://api.kalpagramma.com/auth/login/VK&scope=email&response_type=code&v=5.92' },
         { id: 4, action: '', label: 'Twitter', icon: 'fab fa-twitter-square', color: '#00aced', url: '' },
         { id: 5, action: '', label: 'Instagram', icon: 'fab fa-instagram', color: '#9E5396', url: '' },
         { id: 6, action: '', label: 'Yandex', icon: 'fab fa-yandex', color: '#EC514D', url: '' },
