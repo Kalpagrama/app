@@ -1,20 +1,15 @@
 <template lang="pug">
   q-page.flex
     .kp-create
-        content-creator(@create="showSelectContent")
+        content-creator(@create="showSelectContent(0)")
 
         q-item
             q-item-section
                 span.kp-create__sense-text Текст сути
 
-        content-creator(@create="showSelectContent")
+        content-creator(@create="showSelectContent(1)")
 
-    .test
-        q-btn(@click="gqlRefresh") TEST
-        .test-1(v-for="(item, ix) in services()" :key="ix") {{ item.name }}&nbsp;
-            a(:href="item.url") {{ item.url }}
-
-    //select-content-dialog(:active="true" @close="mode = MODE_NONE")
+    select-content-dialog(:model="selectVisible" @close="closeDialog")
     //select-content-dialog(:active="mode === MODE_SELECT_CONTENT" @close="mode = MODE_NONE")
 </template>
 
@@ -32,10 +27,10 @@
 <script>
 import ContentCreator from '../../components/create/ContentCreator';
 import SelectContentDialog from '../../components/create/SelectContentDialog';
-// import { Auth } from '../../store/auth-old';
 
 const MODE_NONE = 'mode.none';
 const MODE_SELECT_CONTENT = 'mode.select-content';
+const INDEX_NO_CONTENT = -1;
 
 export default {
   name: 'PageMobileCreate',
@@ -43,47 +38,28 @@ export default {
     data() {
       return {
           mode: MODE_NONE,
-          MODE_NONE,
-          MODE_SELECT_CONTENT,
+          selectVisible: false,
           response: {},
+          targetContentIndex: INDEX_NO_CONTENT,
       };
     },
+    watch: {
+      mode(val) {
+          this.selectVisible = (val === MODE_SELECT_CONTENT);
+      }
+    },
     methods: {
-        showSelectContent() {
+        showSelectContent(index) {
           this.mode = MODE_SELECT_CONTENT;
+          this.targetContentIndex = index;
         },
         services() {
             return this.response;
         },
-        gqlRefresh() {
-            const request = {
-                query: gql`query{
-                    response: discoverServices {
-                        name
-                        url
-                    }
-                }`
-            };
-
-            const self = this;
-
-            return new Promise((resolve) => {
-                // const selfie = self;
-                this.$apollo.subscribe(request).subscribe({
-                    next: ({ data: { response } }) => {
-                        self.response = response;
-                        resolve(response);
-                }
-                })
-            });
-        },
-        async test() {
-            /*
-            const auth = new Auth(this);
-            const a = await auth.listServices();
-            return a;
-            */
-        },
+        closeDialog() {
+            this.mode = MODE_NONE;
+            this.targetContentIndex = INDEX_NO_CONTENT;
+        }
     },
 };
 </script>
