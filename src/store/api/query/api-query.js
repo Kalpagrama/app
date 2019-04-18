@@ -91,6 +91,56 @@ export function nodeFullApi(oids) {
     }
 }
 
+export function nodeFullApi2(oids) {
+    return {
+        query: gql`query($oids: [OID!]!){
+            objectList(oids:$oids){
+                oid
+                type
+                name
+                isSubscribed
+                subscribers{
+                    name
+                }
+                thumbUrl(preferWidth:378, preferHeight:400)
+                ... on Node{
+                    hashTags{
+                        oid
+                        type
+                        name
+                    }
+                    author{
+                        oid
+                        name
+                        thumbUrl(preferWidth:50, preferHeight:50)
+                    }
+                    fragments{
+                        contentDetails{
+                            oid
+                            type
+                            name
+                            ... on Video{
+                                url
+                            }
+                            ... on Image{
+                                url
+                            }
+                        }
+                        selectedScope{
+                            begin
+                            end
+                        }
+                    }
+                    rateUser
+                    viewed
+                }
+            }        }`,
+        variables: {
+            oids,
+        }
+    }
+}
+
 export function isUserAuthorizedApi () {
     return {
         query: gql`query {

@@ -4,7 +4,7 @@
 
 <script>
 import { mapState } from 'vuex'
-import NodeList from '../NodeList';
+import NodeList from '../node/NodeList';
 import NewsProvider, { DIRECTION_BACKWARD } from '../../store/api/NewsProvider';
 
 const AUTOLOAD_STEP = 20;

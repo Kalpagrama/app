@@ -105,7 +105,7 @@
 </style>
 
 <script>
-    import NodeList from '../../components/NodeList'
+    import NodeList from '../../components/node/NodeList'
     import AuthMixin from './auth/AuthMixin';
     import NewsFeed from '../../components/news/NewsFeed';
 

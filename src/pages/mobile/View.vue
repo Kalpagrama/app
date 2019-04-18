@@ -7,16 +7,14 @@
                         img(:src='authorPic')
                 q-item-section
                     q-item-label {{ authorName }}
-            .kp-node-view__content
-                img(:src='itemSrcRoot')
-                //q-video(src='https://www.youtube.com/embed/DxPF_SQLp78?rel=0&controls
+
+            node-content.kp-node-view__content(:fragment="fragment(0)")
 
             q-item
                 q-item-section
                     span.kp-node-view__sense-text {{ itemName }}
 
-            .kp-node-view__content
-                img(:src='itemSrcSec')
+            node-content.kp-node-view__content(:fragment="fragment(1)")
 
         .kp-node-view__footer
             .kp-node-view__tags
@@ -32,8 +30,9 @@
 
     .kp
         &-node-view
-            max-width 99vw
-            margin 0px auto
+            min-width 100vw
+            max-width 100vw
+            margin 0
 
             &__voter
                 display block
@@ -91,10 +90,12 @@
 <script>
     import { mapState } from 'vuex';
     import voter from '../../components/Voter'
+    import NodeContent from 'src/components/node/NodeContent'
 
     export default {
         name: 'PageMobileView',
         components: {
+            NodeContent,
             voter
         },
         data () {
@@ -149,6 +150,11 @@
         methods: {
             openSphere (item) {
                 this.$router.push(`/sphere/${item.oid}`)
+            },
+            fragment(index) {
+                const fragments = this.node && this.node.fragments;
+
+                return fragments && fragments[index];
             }
         }
     }
