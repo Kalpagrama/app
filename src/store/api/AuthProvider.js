@@ -123,10 +123,7 @@ export default class AuthProvider extends DataProvider {
         self.cache(ITEM_STRATEGY, 'Email');
 
         return this.requestApi(loginEmailApi, params)
-            .then(self.onSuccessLogin.bind(self))
-            .catch((error) => {
-                self.notify(error, MSG_COLOR_ERROR);
-            });
+            .then(self.onSuccessLogin.bind(self));
     }
 
     async loginPhone(params) {
@@ -135,10 +132,7 @@ export default class AuthProvider extends DataProvider {
         self.cache(ITEM_STRATEGY, 'Phone');
 
         return this.requestApi(loginPhoneApi, params)
-            .then(self.onSuccessLogin.bind(self))
-            .catch((error) => {
-                self.notify(error, MSG_COLOR_ERROR);
-            });
+            .then(self.onSuccessLogin.bind(self));
     }
 
     async confirmPhone({phone, code}) {

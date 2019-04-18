@@ -6,7 +6,7 @@
             form(ref="form")
             q-input(type="email" ref="email" v-model="email" label="Введи email" lazy-rules dense="dense" :rules="checkEmail")
             q-input(type="password" ref="password" v-model="password" label="Придумай пароль" dense="dense" :rules="checkPassword")
-            p.text-left.warning.text-caption.q-mt-sm(v-if="bemail") Пользователь с таким Email не найден! Пожалуйста зарегистрируйтесь!
+
             .q-gutter-y-sm.full-height.q-pa-md.q-mt-sm
                 q-btn.btn-auth(size='12px' type="submit" @click="login" :loading="submitting" :disabled="!email || !password || submitting") Войти
                 q-btn.btn-auth(size='12px' @click="register" :disabled="!email || !password || submitting") Зарегистрироваться
@@ -24,13 +24,15 @@
             email: null,
             password: null,
             disabled: true,
-            bemail: false,
+            errors: '',
             testMail: 'test@test.ru',
             submitting: false,
         };
     },
     methods: {
         login() {
+            this.errors = '';
+
             if (this.$refs.email.hasError || this.$refs.password.hasError) {
               this.auth.notifyError('Данные введены с ошибкой');
             };
@@ -45,9 +47,18 @@
             this.auth.loginEmail(params)
                 .then(() => {
                     this.$router.push('/home');
+                    alert('gut');
                 })
-                .catch((error) => {
-                    console.log('=== login email ERROR', error);
+                .catch(({ graphQLErrors }) => {
+                    let msg = [];
+                    if (graphQLErrors && graphQLErrors.length) {
+                        graphQLErrors.forEach(el => {
+                            msg.push(this.verbose(el.code));
+                        })
+                    }
+
+                    this.errors = msg.join('. ');
+                    this.auth.notifyError(this.errors);
                 })
                 .finally(() => {
                     this.submitting = false;

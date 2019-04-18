@@ -12,16 +12,13 @@ export default class DataProvider {
         const request = api ? api(args) : this.api(args)
         const provider = this
         const { scope } = this
-// console.log('==== API', api, args);
-        return new Promise((resolve) =>
-            scope.$apollo.query(request).then(({ data }) => {
+
+        return new Promise((resolve, reject) => {
+                return scope.$apollo.query(request).then(({ data }) => {
                     const key = Object.keys(data)[0]
                     resolve(data[key])
-            }).catch((error) => {
-                console.log('=== login email ERROR');
-                console.log('CODE=', error.code);
-                console.log('message=', error.message);
-            })
+                }).catch(reject);
+            }
         )
     }
 
