@@ -1,16 +1,15 @@
 <template lang="pug">
   q-page.flex
     .kp-create
-        content-creator(@create="showSelectContent(0)")
+        content-creator(@create="showSelectContent(0)" :item="items[0]")
 
-        q-item
-            q-item-section
-                span.kp-create__sense-text Текст сути
+        q-input.kp-create__sense-text(v-model="text" autogrow input-style="text-align: center;" label="Текст сути")
 
-        content-creator(@create="showSelectContent(1)")
+        content-creator(@create="showSelectContent(1)" :item="items[1]")
 
     select-content-dialog(:model="selectVisible" @close="closeDialog")
     //select-content-dialog(:active="mode === MODE_SELECT_CONTENT" @close="mode = MODE_NONE")
+
 </template>
 
 <style lang="stylus">
@@ -18,10 +17,8 @@
         display block
         width 100%
         text-align center
-    .test
-        text-align center
-        display block
-        width 100%
+        &__sense-text
+            color currentColor
 </style>
 
 <script>
@@ -41,6 +38,11 @@ export default {
           selectVisible: false,
           response: {},
           targetContentIndex: INDEX_NO_CONTENT,
+          text: '',
+          items: [
+              { videoId: null, imageSrc: null, },
+              { videoId: null, imageSrc: null, },
+          ],
       };
     },
     watch: {
@@ -56,9 +58,10 @@ export default {
         services() {
             return this.response;
         },
-        closeDialog() {
-            this.mode = MODE_NONE;
+        closeDialog(videoId) {
+            this.items[this.targetContentIndex].videoId = videoId;
             this.targetContentIndex = INDEX_NO_CONTENT;
+            this.mode = MODE_NONE;
         }
     },
 };
