@@ -54,6 +54,9 @@ export function nodeFullApi(oids) {
                 isSubscribed
                 createdAt
                 updatedAt
+                ... on Video {
+                    url
+                }
                 ... on Node {
                     thumbUrl(preferWidth:378, preferHeight:400)
                     name
