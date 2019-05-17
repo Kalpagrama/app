@@ -17,7 +17,7 @@ module.exports = {
       static: '/static'
     },
     graphql: {
-      wss: false,
+      wss: true,
       path: '/graphql',
       socket: '/subscriptions'
     },

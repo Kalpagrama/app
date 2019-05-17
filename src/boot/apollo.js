@@ -41,7 +41,8 @@ export default ({ vue, store, app }) => {
 
     // Create the subscription websocket link
     const wsLink = new WebSocketLink({
-        uri: utils.getAddress('backend', CONFIG.graphql.socket, CONFIG.graphql.wss ? 'wss' : 'ws'),
+         // uri: utils.getAddress('backend', CONFIG.graphql.socket, CONFIG.graphql.wss ? 'wss' : 'ws'),
+         uri: `${CONFIG.graphql.wss ? 'wss' : 'ws'}://${CONFIG.backend.host}/subscriptions`,
         options: {
             reconnect: true
         }
