@@ -439,7 +439,7 @@
             "deprecationReason": null
           },
           {
-            "name": "settings",
+            "name": "userSettings",
             "description": "настройки текущего пользователя",
             "args": [],
             "type": {
@@ -3070,35 +3070,8 @@
             "deprecationReason": null
           },
           {
-            "name": "userUpdateProfile",
-            "description": "изменить текущего пользователя",
-            "args": [
-              {
-                "name": "profile",
-                "description": "",
-                "type": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "UserProfileInput",
-                  "ofType": null
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "userUpdateSettings",
-            "description": "",
+            "description": "изменить настройки текущего пользователя",
             "args": [
               {
                 "name": "settings",
@@ -3132,26 +3105,96 @@
             "deprecationReason": null
           },
           {
-            "name": "contentLoad",
+            "name": "userAvatarUpload",
+            "description": "",
+            "args": [
+              {
+                "name": "avatar",
+                "description": "",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Upload",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uploadContentFile",
             "description": "Загрузить новые данные для создания ядра",
             "args": [
               {
                 "name": "file",
                 "description": "",
                 "type": {
-                  "kind": "SCALAR",
-                  "name": "Upload",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Upload",
+                    "ofType": null
+                  }
                 },
                 "defaultValue": null
-              },
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "ObjectShort",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uploadContentUrl",
+            "description": "Загрузить новые данные для создания ядра",
+            "args": [
               {
                 "name": "url",
                 "description": "",
                 "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "type",
+                "description": "",
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "ObjectTypeEnum",
+                    "ofType": null
+                  }
                 },
                 "defaultValue": null
               }
@@ -3468,107 +3511,6 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "UserProfileInput",
-        "description": "Необязательно всегда заполнять польностью. Указывть следует только параметры, которые изменились. Пустые параметры игнорируются.",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "avatar",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Upload",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "nameFirst",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "nameSecond",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "dateBirth",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "gender",
-            "description": "",
-            "type": {
-              "kind": "ENUM",
-              "name": "GenderEnum",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "country",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "city",
-            "description": "",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "lang",
-            "description": "",
-            "type": {
-              "kind": "ENUM",
-              "name": "LangEnum",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "SCALAR",
-        "name": "Upload",
-        "description": "The `Upload` scalar type represents a file upload.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
         "name": "SettingElementInput",
         "description": "изменившийся элемент настроек. тут может быть любой элемент, кроме section",
         "fields": null,
@@ -3598,6 +3540,16 @@
             "defaultValue": null
           }
         ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "SCALAR",
+        "name": "Upload",
+        "description": "The `Upload` scalar type represents a file upload.",
+        "fields": null,
+        "inputFields": null,
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
