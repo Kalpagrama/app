@@ -6,12 +6,12 @@ export default {
             if (config[name].https) {
                 protocol = 'https'
             } else {
-                protocol = 'http'
+                protocol = 'https'
             }
         }
-
-        return `${protocol}://${config[name].host}${
-             (config[name].port) ? `:${config[name].port}` : ''
-             }${url}`
+        return 'https://api.kalpagramma.com/graphql'
+        // return `${protocol}://${config[name].host}${
+        //      (config[name].port) ? `:${config[name].port}` : ''
+        //      }${url}`
     }
 }

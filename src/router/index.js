@@ -33,12 +33,5 @@ export default function (/* { store, ssrContext } */) {
     base: process.env.VUE_ROUTER_BASE,
   });
 
-  Router.beforeEach((to, from, next) => {
-      if (!isAuthorized()) {
-          if (to.path.indexOf('/auth') === -1) next('/auth/login');
-          else next()
-      } else next();
-  });
-
   return Router;
 }

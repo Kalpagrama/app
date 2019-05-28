@@ -1,11 +1,11 @@
 <template lang="pug">
-    .q-pa-md
-        q-page.text-center.bold.kp-auth
-            h5.text-weight-bold.kp-auth__title.head-title Войти с помощью
-            .q-pa-md.q-gutter-y-sm
-                q-btn.full-width.btn-register.kp-auth__button(v-for="(item,ix) in buttons" :key="ix"
-                :style='`background: ${item.color}`' :icon="item.icon" @click="open(item)" elevated no-caps type="a"
-                text-color='white' :label='`${item.label}`')
+    //- .q-pa-md
+    q-page.text-center.bold.kp-auth.column.justify-center
+        h5.kp-auth__title.head-title Войти с помощью
+        .q-pa-md.q-gutter-y-sm
+            q-btn.full-width.btn-register.kp-auth__button(v-for="(item,ix) in buttons" :key="ix"
+            :style=`{background: item.color, height: '50px'}` :icon="item.icon" @click="open(item)" elevated no-caps type="a"
+            text-color='white' :label='`${item.label}`')
 </template>
 
 <script>

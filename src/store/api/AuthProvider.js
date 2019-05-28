@@ -47,7 +47,7 @@ export default class AuthProvider extends DataProvider {
             })
         }
         else {
-            scope.$router.push('/auth/login');
+            // scope.$router.push('/auth/login');
         }
     }
 
