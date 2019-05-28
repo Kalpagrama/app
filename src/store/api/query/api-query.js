@@ -54,10 +54,14 @@ export function nodeFullApi(oids) {
                 isSubscribed
                 createdAt
                 updatedAt
+                ... on Video {
+                    url
+                }
                 ... on Node {
                     thumbUrl(preferWidth:378, preferHeight:400)
                     name
                     hashTags{
+                        oid
                         type
                         name
                     }                    
@@ -81,6 +85,56 @@ export function nodeFullApi(oids) {
                 }
             }
         }`,
+        variables: {
+            oids,
+        }
+    }
+}
+
+export function nodeFullApi2(oids) {
+    return {
+        query: gql`query($oids: [OID!]!){
+            objectList(oids:$oids){
+                oid
+                type
+                name
+                isSubscribed
+                subscribers{
+                    name
+                }
+                thumbUrl(preferWidth:378, preferHeight:400)
+                ... on Node{
+                    hashTags{
+                        oid
+                        type
+                        name
+                    }
+                    author{
+                        oid
+                        name
+                        thumbUrl(preferWidth:50, preferHeight:50)
+                    }
+                    fragments{
+                        contentDetails{
+                            oid
+                            type
+                            name
+                            ... on Video{
+                                url
+                            }
+                            ... on Image{
+                                url
+                            }
+                        }
+                        selectedScope{
+                            begin
+                            end
+                        }
+                    }
+                    rateUser
+                    viewed
+                }
+            }        }`,
         variables: {
             oids,
         }
@@ -151,6 +205,21 @@ export function confirmPhoneApi([phone, code]) {
         variables: {
             phone,
             code
+        }
+    }
+}
+
+export function restorePasswordApi([login]) {
+    return {
+        query: gql`query($login: String!) {
+            restorePassword(login: $login) {
+                token
+                expires
+                role
+            }
+        }`,
+        variables: {
+            login
         }
     }
 }

@@ -1,6 +1,6 @@
 <template lang="pug">
   q-page.flex.kp-notify__list
-    q-card.kp-notify__item(flat bordered v-for="(items, ix) in bells" :key="ix")
+    q-card.kp-notify__item(flat bordered v-for="(item, ix) in bells" :key="ix")
         q-avatar.kp-notify__avatar
             img(:src="item.subject.thumbUrl")
         div.kp__notify__text.text-faded

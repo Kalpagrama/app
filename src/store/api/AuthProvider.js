@@ -7,9 +7,11 @@ import {
     isUserConfirmedApi,
     listAuthActionsApi,
     loginEmailApi,
+    loginPhoneApi,
     refreshTokenApi
-} from './api';
+} from './query/api-query';
 import axios from 'axios'
+import { urlGet } from 'src/helpers/url'
 
 export const MSG_COLOR_SUCCESS = 'green';
 export const MSG_COLOR_ERROR = 'red';
@@ -24,25 +26,43 @@ const ROLE_GUEST = 'GUEST';
 const ROLE_RESETER = 'RESETER';
 const ROLE_MEMBER = 'MEMBER';
 
+const PREFIX = 'ap.';
+
 export default class AuthProvider extends DataProvider {
     constructor(scope) {
         super(scope, null, null)
 
         this.actions = null
 
+        // Првоерка переданных параметров внешней авторизации
+        this.checkUrlParams();
+
         if (this.token) {
-            console.log('=== found TOKEN', this.token);
+            // console.log('=== found TOKEN', this.token);
             this.refresh().catch((...args) => {
-                console.log('=== REFRESH ERRORR!!!!!', args);
+                // console.log('=== REFRESH ERRORR!!!!!', args);
                 return this.checkAutorized.bind(this);
             }).then((data) => {
                 if (!data) return this.checkAutorized();
             })
         }
-        else
-            console.log('=== NO TOKEN');
+        else {
+            // scope.$router.push('/auth/login');
+        }
+    }
 
+    checkUrlParams() {
+        if (urlGet('token')) {
+            const tempToken = urlGet('token');
+            const tempRole = urlGet('role');
+            const tempExp = urlGet('expires');
 
+            this.cache(ITEM_TOKEN, tempToken);
+            this.cache(ITEM_ROLE, tempRole);
+            this.cache(ITEM_EXPIRES, tempExp);
+
+            location.href = location.origin;
+        }
     }
 
     async action(key) {
@@ -62,7 +82,7 @@ export default class AuthProvider extends DataProvider {
     }
 
     checkAutorized() {
-        console.log('checking');
+        // console.log('checking');
         return this.requestApi(isUserAuthorizedApi)
     }
 
@@ -70,20 +90,26 @@ export default class AuthProvider extends DataProvider {
         this.cacheIsConfirmed = this.requestApi(isUserConfirmedApi)
     }
 
+    // fixme Под вопросом, есть геттер authorized
     isAuthorized(force = false) {
         if (force) this.checkAutorized()
         return this.cacheIsAuthorized
     }
 
+    // fixme Под вопросом
     isConfirmed(force = false) {
         if (force) this.checkConfirmed()
         return this.cacheIsConfirmed
     }
 
-    async logout() {
+    async idatePhone(code) {
+
+    }
+
+    async logout(callback) {
         return this.requestApi(logoutApi)
             .finally(() => {
-
+                callback && callback();
             });
     }
 
@@ -97,10 +123,7 @@ export default class AuthProvider extends DataProvider {
         self.cache(ITEM_STRATEGY, 'Email');
 
         return this.requestApi(loginEmailApi, params)
-            .then(self.onSuccessLogin.bind(self))
-            .catch((error) => {
-                self.notify(error, MSG_COLOR_ERROR);
-            });
+            .then(self.onSuccessLogin.bind(self));
     }
 
     async loginPhone(params) {
@@ -109,26 +132,26 @@ export default class AuthProvider extends DataProvider {
         self.cache(ITEM_STRATEGY, 'Phone');
 
         return this.requestApi(loginPhoneApi, params)
-            .then(self.onSuccessLogin.bind(self))
-            .catch((error) => {
-                self.notify(error, MSG_COLOR_ERROR);
-            });
+            .then(self.onSuccessLogin.bind(self));
     }
 
-    async confirmPhone(params) {
-        return this.requestApi(confirmPhoneApi, params);
+    async confirmPhone({phone, code}) {
+        return this.requestApi(confirmPhoneApi, phone, code);
     }
 
     onSuccessLogin({expires, role, token}) {
-        console.log('=== SUCCESS ??');
         this.cache(ITEM_TOKEN, token);
         this.cache(ITEM_EXPIRES, expires);
         this.cache(ITEM_ROLE, role);
 
         // this.scope.$router.push('/home');
-        console.log('=== SUCCESS !!!!!!');
 
         return true;
+    }
+
+    logout() {
+        [ITEM_TOKEN, ITEM_EXPIRES, ITEM_ROLE].forEach(el => localStorage.removeItem(PREFIX + el));
+        this.scope.$router.push('/auth/login');
     }
 
     confirm() {
@@ -157,14 +180,17 @@ export default class AuthProvider extends DataProvider {
     }
 
     cache(name, value) {
-        const prefix = 'ap.';
         if (typeof value === 'undefined')
-            return localStorage.getItem(prefix + name);
-        localStorage.setItem(prefix + name, value)
+            return localStorage.getItem(PREFIX + name);
+        localStorage.setItem(PREFIX + name, value)
     }
 
     get token() {
         return this.cache(ITEM_TOKEN);
+    }
+
+    get authorized() {
+        return this.token && !this.expired;
     }
 
     get confirmed() {

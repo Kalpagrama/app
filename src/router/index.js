@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-
+import { globalVar } from 'src/store';
 import routes from './routes';
 
 Vue.use(VueRouter);
@@ -9,6 +9,17 @@ Vue.use(VueRouter);
  * If not building with SSR mode, you can
  * directly export the Router instantiation
  */
+
+function isAuthorized() {
+    try {
+        const { auth } = globalVar.store.state.providers;
+
+        return (auth.token && !auth.expired);
+    } catch ($e) {
+
+    }
+    return false;
+}
 
 export default function (/* { store, ssrContext } */) {
   const Router = new VueRouter({
@@ -21,17 +32,6 @@ export default function (/* { store, ssrContext } */) {
     mode: process.env.VUE_ROUTER_MODE,
     base: process.env.VUE_ROUTER_BASE,
   });
-
-  /*
-  Router.beforeEach((to, from, next) => {
-    const isAuthorized = false;
-    if (isAuthorized) {
-      next(USER_ROUTES.indexOf(to.path) > -1 ? undefined : '/');
-    } else {
-      next(GUEST_ROUTES.indexOf(to.path) > -1 ? undefined : '/');
-    }
-  });
-    */
 
   return Router;
 }

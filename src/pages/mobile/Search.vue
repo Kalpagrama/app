@@ -46,7 +46,7 @@
 
 <script>
 import TrendItem from '../../components/TrendItem';
-import node from '../../components/Node';
+import node from '../../components/node/Node';
 
 const TRENDS = [
     { id: 1, label: 'Природа', image: 'http://lorempixel.com/150/100/' },

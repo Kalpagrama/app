@@ -26,7 +26,7 @@
     import Setting from '../../components/Setting';
     import Beads from '../../components/Beads';
     import SphereChips from '../../components/sphere/SphereChips';
-    import NodeList from '../../components/NodeList';
+    import NodeList from '../../components/node/NodeList';
     import { bigNumbers } from '../../helpers/numbers';
     import { mapState } from 'vuex';
 

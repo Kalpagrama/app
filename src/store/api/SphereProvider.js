@@ -1,5 +1,5 @@
 import DataProvider from './DataProvider'
-import { sphereApi, sphereListApi, sphereNodeListApi } from './api'
+import { sphereApi, sphereListApi, sphereNodeListApi } from './query/api-query'
 
 export const DIRECTION_FORWARD = 'FORWARD'
 export const DIRECTION_BACKWARD = 'BACKWARD'

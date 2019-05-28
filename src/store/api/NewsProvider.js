@@ -1,5 +1,5 @@
 import DataProvider from './DataProvider'
-import { newsApi, nodeCountersApi } from './api';
+import { newsApi, nodeCountersApi } from './query/api-query';
 
 export const DIRECTION_FORWARD = 'FORWARD'
 export const DIRECTION_BACKWARD = 'BACKWARD'

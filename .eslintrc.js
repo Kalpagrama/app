@@ -49,6 +49,7 @@ module.exports = {
         'linebreak-style': 'off',
         'class-methods-use-this': 'off',
         'no-param-reassign': 'off',
+        'space-before-blocks': 'off',
 
         'import/first': 'off',
 
@@ -65,6 +66,7 @@ module.exports = {
 
         // custom
         'no-return-await': 0,
-        'vue/require-valid-default-prop': 0
+        'vue/require-valid-default-prop': 0,
+        'object-curly-spacing': 0
     }
 }

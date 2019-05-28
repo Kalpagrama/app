@@ -13,11 +13,12 @@ export default class DataProvider {
         const provider = this
         const { scope } = this
 
-        return new Promise((resolve) =>
-            scope.$apollo.query(request).then(({ data }) => {
+        return new Promise((resolve, reject) => {
+                return scope.$apollo.query(request).then(({ data }) => {
                     const key = Object.keys(data)[0]
                     resolve(data[key])
-            })
+                }).catch(reject);
+            }
         )
     }
 
