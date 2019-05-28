@@ -81,7 +81,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted', this.$route)
+    this.$log('mounted', window.location)
     let token = this.$route.query.token
     if (token) localStorage.setItem('ktoken', token)
     // this.$log('ui/store', this.$store.state.ui.show_right_drawer)
