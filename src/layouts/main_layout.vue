@@ -1,13 +1,11 @@
 <template lang="pug">
   q-layout(view='lHh Lpr lFf' :style=`{height: height+'px'}` @resize="handleResize")
-    //- progress
-    q-circular-progress(v-if="loading" indeterminate size="50px" color="blue" class="q-ma-md progress")
     //- left drawer
     //- q-drawer(v-model="show_left_drawer")
     //-     .column.fit.bg-white.justify-center.items-center
     //-         span Menu
     //- right drawer
-    q-drawer(:value="$store.state.ui.show_right_drawer" side="right" @input="$store.commit('ui/state', ['show_right_drawer', false])")
+    q-drawer(v-if="!loading" :value="$store.state.ui.show_right_drawer" side="right" @input="$store.commit('ui/state', ['show_right_drawer', false])")
       settings
     //- q-header.bg-white.text-black(elevated='' v-show="headerVisible()")
     //-   q-toolbar
@@ -23,10 +21,17 @@
     //- TODO: add route transitions
     q-page-container.fit
       q-page.fit
+        div(v-if="loading").row.fit.items-center.justify-center.content-center
+          .row.full-width.justify-center
+            span.q-ma-sm Connecting kalpagramma...
+          .row.full-width.justify-center
+            small {{ SERVICES_URL }}
+          div(style=`height: 80px`).row.full-width.items-center.justify-center
+            q-spinner(size="50px" color="blue")
         //- transition(enter-active-class="fadeIn" leave-active-class="animated fadeOut")
-        router-view
+        router-view(v-if="!loading")
     //- footer
-    q-footer(v-if="show_footer" bordered).row.full-width.justify-between.bg-white.q-px-sm
+    q-footer(v-if="!loading && show_footer" bordered).row.full-width.justify-between.bg-white.q-px-sm
       q-btn(v-if="page" v-for="(p, pi) in pages" :key="pi" flat round
         :color="page.id === p.id ? 'primary' : 'grey'"
         :icon="p.icon" size="16px" @click="pageClick(p)")
@@ -40,7 +45,8 @@ export default {
   components: { settings },
   data () {
     return {
-      loading: false,
+      loading: true,
+      SERVICES_URL: process.env.SERVICES_URL,
       height: window.innerHeight,
       width: window.innerWidth,
       show_footer: true,
@@ -80,8 +86,12 @@ export default {
       this.$set(this, 'page', p)
     }
   },
-  mounted () {
-    this.$log('mounted', window.location)
+  async mounted () {
+    this.$log('mounted')
+    await this.$wait(1000)
+    let {data} = await this.$apollo.query({query: gql`query userIsAuthorized {userIsAuthorized}`})
+    // this.$log('data', data)
+    if (!data.userIsAuthorized) this.$router.push('/login')
     let token = this.$route.query.token
     if (token) localStorage.setItem('ktoken', token)
     // this.$log('ui/store', this.$store.state.ui.show_right_drawer)
@@ -94,6 +104,7 @@ export default {
       if (findPage) this.$set(this, 'page', findPage)
       else this.$set(this, 'page', this.pages[0])
     }
+    this.loading = false
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

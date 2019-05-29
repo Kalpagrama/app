@@ -16,8 +16,29 @@ import axios from 'axios'
 
 export default async ({ Vue, app }) => {
   debug('start')
+  // axios
+  axios.interceptors.request.use((request) => {
+    // Do something with response data
+    debug('axios request', request)
+    request.headers['Authorization'] = localStorage.getItem('ktoken')
+    return request
+  }, (error) => {
+    // Do something with response error
+    return Promise.reject(error)
+  })
+  axios.interceptors.response.use(response => {
+    debug('axios response', response)
+    if (response.request) {
+    } else {
+    }
+    return response
+  }, (error) => {
+    return Promise.reject(error)
+  })
+  Vue.prototype.$axios = axios
+  // apollo
   Vue.use(VueApollo)
-  let SERVICES_URL = process.env.SERVICES_URL
+  let SERVICES_URL = process.env.SERVICES_URL || 'https://api.kalpagramma.com/graphql'
   debug('SERVICES_URL', SERVICES_URL)
   let { data } = await axios.post(SERVICES_URL, {query: `query { services }`})
   debug('data', data)
@@ -33,7 +54,6 @@ export default async ({ Vue, app }) => {
   //     debug('onError networkError', JSON.stringify(networkError))
   //   }
   // })
-
   // Links
   // let linkHttp = ApolloLink.from([errorLink, data.data.services.API])
   // let linkWs = ApolloLink.from([errorLink, data.data.services.SUBSCRIPTIONS])
@@ -56,7 +76,7 @@ export default async ({ Vue, app }) => {
     link: createHttpLink({
       uri: linkHttp,
       fetch (uri, options) {
-        // debug('fetch!', options)
+        debug('FETCH HTTP')
         options.headers['Authorization'] = localStorage.getItem('ktoken')
         return fetch(uri, options)
       }
@@ -72,6 +92,7 @@ export default async ({ Vue, app }) => {
         lazy: true,
         reconnect: true,
         connectionParams: async () => {
+          debug('FETCH SUBSCRIBE')
           const token = localStorage.getItem('ktoken')
           return {
             headers: {
@@ -88,6 +109,7 @@ export default async ({ Vue, app }) => {
     link: createUploadLink({
       uri: linkUpload,
       fetch (uri, options) {
+        debug('FETCH UPLOAD')
         options.headers['Authorization'] = localStorage.getItem('ktoken')
         return fetch(uri, options)
       }

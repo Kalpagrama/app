@@ -7,7 +7,6 @@ module.exports = function (ctx) {
     preFetch: true,
     boot: [
       'i18n',
-      'axios',
       'apollo',
       'filters',
       'main'
@@ -125,7 +124,13 @@ module.exports = function (ctx) {
         orientation: 'portrait',
         background_color: '#ffffff',
         theme_color: '#027be3',
-        icons: []
+        icons: [
+          {
+            'src': 'statics/icons/icon-256x256.png',
+            'sizes': '256x256',
+            'type': 'image/png'
+          }
+        ]
       }
     },
     cordova: {

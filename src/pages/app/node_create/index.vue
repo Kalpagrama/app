@@ -1,30 +1,32 @@
 <template lang="pug">
 .column.fit.bg-white
-  //- div(style=`height: 50px`).row.full-width.items-center.q-px-md
-  //-   span header
-  //-   q-btn(icon="settings" color="primary")
   .col
     content-add(ref="addOne")
-  div(style=`height: 130px`).row.items-between
-    //- core name
+  div(style=`height: 60px`).row.items-between
     .row.full-width.justify-center
-      q-input(v-model="core.name" input-style=`fontSize: 18px` :input-class="['text-center']"
-        placeholder="Заголовок").full-width
-    //- core tags
-    //- .row.full-width
-    //-   q-btn(v-show="core.tags.length === 0" label="add tags" no-caps outline color="primary")
-    //-   div(v-show="core.tags.length > 0"
-    //-     style=`overflow: hidden; height: 60px`).row.no-wrap.full-width.items-center.justify-center
-    //-     div(v-for="(t, ti) in core.tags" :key="t" style=`minWidth: 100px; borderRadius: 18px`
-    //-       ).row.full-width.items-center.q-pa-sm.bg-grey-3.justify-between
-    //-       span #
-    //-       span {{ t }}
-    //-       q-btn(dense round icon="clear" @click="tagDelete(t, ti)" flat size="xs")
+      q-input(v-model="node.name" input-style=`fontSize: 18px` :input-class="['text-center']"
+        placeholder="В чем суть?").full-width
   .col
     content-add(ref="addTwo")
-  div(style=`height: 50px`).row.full-width.items-center.justify-between.q-px-md
-    q-btn(no-caps icon="settings" flat round dense color="grey" @click="settingsClick")
-    q-btn(no-caps label="Создать" color="primary" dense @click="nodeCreate")
+  div(style=`height: 60px`).row.full-width.items-center.justify-between.q-px-md
+    //- q-input(v-model="hashTags" placeholder="Добавь тэги").full-width
+    q-select(
+      v-model="hashTags" use-input use-chips multiple
+      :label="hashTags.length > 0 ? 'Тэги' : 'Добавь тэги'"
+      :input-debounce="1000" :option-label="(item) => '#' + item.name"
+      @new-value="hashTagCreate" @filter="hashTagFilter"
+      :options="hashTagsOptions").full-width
+      template(v-slot:no-option)
+        q-item
+          q-item-section(class="text-grey") Нечего!
+    //- q-btn(v-show="node.hashTags.length === 0" label="Добавь тэги" no-caps outline color="primary")
+    //- div(v-show="node.hashTags.length > 0"
+    //-   style=`overflow: hidden; height: 60px`).row.no-wrap.full-width.items-center.justify-center
+    //-   div(v-for="(t, ti) in node.hashTags" :key="t" style=`minWidth: 100px; borderRadius: 18px`
+    //-     ).row.full-width.items-center.q-pa-sm.bg-grey-3.justify-between
+    //-     span #
+    //-     span {{ t }}
+    //-     q-btn(dense round icon="clear" @click="tagDelete(t, ti)" flat size="xs")
 </template>
 
 <script>
@@ -34,22 +36,48 @@ export default {
   components: {contentAdd},
   data () {
     return {
-      core: {
+      hashTags: [],
+      hashTagsOptions: [],
+      node: {
         name: '',
-        tags: [
-          'сталин',
-          'смерть',
-          'мощь',
-          'усы'
-        ]
+        fragments: [],
+        hashTags: []
       }
     }
   },
-  computed: {
-  },
   methods: {
-    tagDelete (t, ti) {
-      this.$log('tagDelete', t, ti)
+    hashTagCreate (val, done) {
+      this.$log('hashTagCreate', val)
+      if (val.length > 0) {
+        this.hashTagsOptions.push({name: val})
+        done(val, 'toggle')
+      }
+      // done({name: val}, 'add-unique')
+    },
+    hashTagFilter (val, update, abort) {
+      this.$log('hashTagFilter')
+      update(async () => {
+        if (val === '' || val.length < 2) {
+          // this.filterOptions = stringOptions
+        } else {
+          const needle = val.toLowerCase()
+          let tags = await this.$apollo.query({
+            query: gql`
+              query autocomplete ($searchStr: String!) {
+                autocomplete(objectTypes: WORD, searchStr: $searchStr) {
+                  name
+                  oid
+                }
+              },
+            `,
+            variables: {
+              searchStr: needle
+            }
+          })
+          this.$log('tags', tags)
+          this.hashTagsOptions = tags.data.autocomplete
+        }
+      })
     },
     async nodeCreate () {
       this.$log('nodeCreate')
@@ -76,15 +104,6 @@ export default {
       })
       this.$log('nodeCreate', res)
       this.$log('nodeCreate done')
-    },
-    settingsClick () {
-      this.$log('settingsClick')
-      this.$q.bottomSheet({
-        message: 'Настройки',
-        actions: [
-          {id: 'description', label: 'Добавить описание'}
-        ]
-      })
     }
   },
   mounted () {
