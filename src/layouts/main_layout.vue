@@ -22,12 +22,12 @@
     q-page-container.fit
       q-page.fit
         div(v-if="loading").row.fit.items-center.justify-center.content-center
-          .row.full-width.justify-center
-            span.q-ma-sm Connecting kalpagramma...
-          .row.full-width.justify-center
-            small {{ SERVICES_URL }}
+          //- .row.full-width.justify-center
+          //-   span.q-ma-sm Connecting kalpagramma...
+          //- .row.full-width.justify-center
+          //-   small {{ SERVICES_URL }}
           div(style=`height: 80px`).row.full-width.items-center.justify-center
-            q-spinner(size="50px" color="blue")
+            //- q-spinner(size="50px" color="blue")
         //- transition(enter-active-class="fadeIn" leave-active-class="animated fadeOut")
         router-view(v-if="!loading")
     //- footer
@@ -88,7 +88,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(1000)
+    await this.$wait(500)
     let {data} = await this.$apollo.query({query: gql`query userIsAuthorized {userIsAuthorized}`})
     // this.$log('data', data)
     if (!data.userIsAuthorized) this.$router.push('/login')

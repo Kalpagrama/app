@@ -17,8 +17,9 @@
 </template>
 
 <script>
+// import { animate } from 'quasar'
 export default {
-  name: 'findYoutube',
+  name: 'findVideo',
   data () {
     return {
       headerHeight: this.$store.state.ui.width,
@@ -30,6 +31,17 @@ export default {
       this.$log('searchClick')
       // TODO: animation with quasar??
       this.headerHeight = 70
+      // animate.start({
+      //   from: this.headerHeight,
+      //   to: 70,
+      //   duration: 300,
+      //   apply (pos) {
+      //     this.headerHeight = pos
+      //   },
+      //   done () {
+      //     this.$log(`we're done!`)
+      //   }
+      // })
     }
   },
   // watch: {},

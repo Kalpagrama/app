@@ -46,14 +46,15 @@ export default {
     }
   },
   methods: {
+    // TODO: how to create tags
     hashTagCreate (val, done) {
       this.$log('hashTagCreate', val)
       if (val.length > 0) {
         this.hashTagsOptions.push({name: val})
         done(val, 'toggle')
       }
-      // done({name: val}, 'add-unique')
     },
+    // TODO: how to filter tags
     hashTagFilter (val, update, abort) {
       this.$log('hashTagFilter')
       update(async () => {
@@ -80,7 +81,10 @@ export default {
       })
     },
     async nodeCreate () {
-      this.$log('nodeCreate')
+      // TODO: error from  server? error wrong?
+      // save to drafts? and how to see your drafts?
+      // some drafts can be what?
+      this.$log('nodeCreate start')
       let u1 = await this.$refs.addOne.photoUpload()
       let u2 = await this.$refs.addTwo.photoUpload()
       let res = await this.$apollo.mutate({

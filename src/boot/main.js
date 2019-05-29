@@ -1,4 +1,5 @@
 import VueVirtualScroller from 'vue-virtual-scroller'
+import { LoadingBar } from 'quasar'
 
 export default async ({ Vue }) => {
   Vue.use(VueVirtualScroller)
@@ -8,4 +9,9 @@ export default async ({ Vue }) => {
     debug.enabled = true
     debug(...msg)
   }
+  LoadingBar.setDefaults({
+    color: 'primary',
+    size: '2px',
+    position: 'bottom'
+  })
 }
