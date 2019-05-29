@@ -1,5 +1,5 @@
 const debug = require('debug')('[boot]:apollo')
-debug.enabled = true
+// debug.enabled = true
 import { Notify } from 'quasar'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
@@ -20,7 +20,7 @@ export default async ({ Vue, app }) => {
   axios.interceptors.request.use((request) => {
     // Do something with response data
     debug('axios request', request)
-    request.headers['Authorization'] = localStorage.getItem('ktoken')
+    // request.headers['Authorization'] = localStorage.getItem('ktoken')
     return request
   }, (error) => {
     // Do something with response error

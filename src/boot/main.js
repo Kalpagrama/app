@@ -1,3 +1,5 @@
+const debug = require('debug')('[boot]:main')
+// debug.enabled = true
 import VueVirtualScroller from 'vue-virtual-scroller'
 import { LoadingBar } from 'quasar'
 

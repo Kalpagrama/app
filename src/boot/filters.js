@@ -11,4 +11,8 @@ export default async ({ Vue }) => {
     if (value <= 0.8) return 'Скорее да'
     return 'Да'
   })
+  Vue.filter('cut', function (text, length) {
+    let add = text.length > length ? '...' : ''
+    return text.slice(0, length) + add
+  })
 }
