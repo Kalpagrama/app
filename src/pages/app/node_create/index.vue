@@ -1,48 +1,18 @@
 <template lang="pug">
 .column.fit.bg-white
-  .col
-    content-add(ref="addOne")
-  div(style=`height: 60px`).row.items-between
-    .row.full-width.justify-center
-      q-input(v-model="node.name" input-style=`fontSize: 18px` :input-class="['text-center']"
-        placeholder="В чем суть?").full-width
-  .col
-    content-add(ref="addTwo")
-  div(style=`height: 60px`).row.full-width.items-center.justify-between.q-px-md
-    //- q-input(v-model="hashTags" placeholder="Добавь тэги").full-width
-    q-select(
-      v-model="hashTags" use-input use-chips multiple
-      :label="hashTags.length > 0 ? 'Тэги' : 'Добавь тэги'"
-      :input-debounce="1000" :option-label="(item) => '#' + item.name"
-      @new-value="hashTagCreate" @filter="hashTagFilter"
-      :options="hashTagsOptions").full-width
-      template(v-slot:no-option)
-        q-item
-          q-item-section(class="text-grey") Нечего!
-    //- q-btn(v-show="node.hashTags.length === 0" label="Добавь тэги" no-caps outline color="primary")
-    //- div(v-show="node.hashTags.length > 0"
-    //-   style=`overflow: hidden; height: 60px`).row.no-wrap.full-width.items-center.justify-center
-    //-   div(v-for="(t, ti) in node.hashTags" :key="t" style=`minWidth: 100px; borderRadius: 18px`
-    //-     ).row.full-width.items-center.q-pa-sm.bg-grey-3.justify-between
-    //-     span #
-    //-     span {{ t }}
-    //-     q-btn(dense round icon="clear" @click="tagDelete(t, ti)" flat size="xs")
+  //- workspace(v-if="false")
+  editor-node(v-if="true")
 </template>
 
 <script>
+// TODO: if user has drafts of nodes in his workspace, he must see them?
+import editorNode from './editor_node'
 import contentAdd from './content_add'
 export default {
-  name: 'pageAppNodeCreate',
-  components: {contentAdd},
+  name: 'pageApp_NodeCreate',
+  components: {editorNode, contentAdd},
   data () {
     return {
-      hashTags: [],
-      hashTagsOptions: [],
-      node: {
-        name: '',
-        fragments: [],
-        hashTags: []
-      }
     }
   },
   methods: {
@@ -80,6 +50,9 @@ export default {
         }
       })
     },
+    handleNext () {
+      this.$log('handleNext')
+    },
     async nodeCreate () {
       // TODO: error from  server? error wrong?
       // save to drafts? and how to see your drafts?
@@ -108,6 +81,13 @@ export default {
       })
       this.$log('nodeCreate', res)
       this.$log('nodeCreate done')
+    },
+    onReady (e) {
+      this.$log('onReady', e)
+      e.target.playVideo()
+    },
+    onChange (e) {
+      this.$log('onChange', e)
     }
   },
   mounted () {

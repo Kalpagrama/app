@@ -1,12 +1,13 @@
 <template lang="pug">
-  q-layout(view='lHh Lpr lFf' :style=`{height: height+'px'}` @resize="handleResize")
+  q-layout(view='lHh Lpr lFf' :style=`{height: height+'px'}`
+    @resize="handleResize")
     //- left drawer
     //- q-drawer(v-model="show_left_drawer")
     //-     .column.fit.bg-white.justify-center.items-center
     //-         span Menu
     //- right drawer
-    q-drawer(v-if="!loading" :value="$store.state.ui.show_right_drawer" side="right" @input="$store.commit('ui/state', ['show_right_drawer', false])")
-      settings
+    //- q-drawer(v-if="!loading" :value="$store.state.ui.show_right_drawer" side="right" @input="$store.commit('ui/state', ['show_right_drawer', false])")
+    //-   settings
     //- q-header.bg-white.text-black(elevated='' v-show="headerVisible()")
     //-   q-toolbar
     //-       q-btn.q-mr-sm(flat='', round='', dense='', icon='menu')
@@ -28,7 +29,8 @@
           //-   small {{ SERVICES_URL }}
           div(style=`height: 80px`).row.full-width.items-center.justify-center
             //- q-spinner(size="50px" color="blue")
-        //- transition(enter-active-class="fadeIn" leave-active-class="animated fadeOut")
+        //- TODO:
+        //- transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutLeft")
         router-view(v-if="!loading")
     //- footer
     q-footer(v-if="!loading && show_footer" bordered).row.full-width.justify-between.bg-white.q-px-sm
@@ -58,9 +60,8 @@ export default {
         { id: 'home', icon: 'home', name: 'Лента' },
         { id: 'search', icon: 'search', name: 'Поиск' },
         { id: 'create', icon: 'add_circle_outline', name: 'Создать' },
-        { id: 'bell', icon: 'notifications_none', name: 'Уведомления' },
-        // { id: 'chat', icon: 'send', name: 'Сообщения' },
-        { id: 'settings', icon: 'perm_identity', name: 'Профиль' }
+        { id: 'notifications', icon: 'notifications_none', name: 'Уведомления' },
+        { id: 'settings', icon: 'menu', name: 'Меню' }
       ]
     }
   },
@@ -74,6 +75,9 @@ export default {
     }
   },
   methods: {
+    handleScroll (e) {
+      this.$log('handleScroll', e)
+    },
     handleResize (e) {
       this.height = e.height
       this.width = e.width
@@ -87,7 +91,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$log('mounted', window)
     await this.$wait(500)
     let {data} = await this.$apollo.query({query: gql`query userIsAuthorized {userIsAuthorized}`})
     // this.$log('data', data)

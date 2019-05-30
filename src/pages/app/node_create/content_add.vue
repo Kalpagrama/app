@@ -1,17 +1,5 @@
 <template lang="pug">
 .row.fit.items-center.content-center.justify-center.bg-grey-2
-  //- choose type
-  q-dialog(v-model="showChooseType" ref="showChooseType"
-    transition-show="slide-up" transition-hide="slide-down")
-    div(style=`width: 150px; height: 450px`).row.bg-white
-      //- TODO: maybe horizontal orientation??
-      div(
-        v-for="t in types" :key="t.id" @click="chooseType(t)"
-        style=`height: 150px; width: 150px; borderBottom: 1px solid #eee`
-        ).row.items-center.justify-center.content-center.hr
-        q-icon(:name="t.icon" :color="t.color || 'grey'" size="90px")
-        .row.full-width.justify-center
-          span.text-black {{ t.label }}
   //- finders
   //- find video
   q-dialog(ref="showFindVideo" :maximized="true"
@@ -26,21 +14,25 @@
   q-dialog(ref="showEditorQuote" :maximized="true"
     transition-show="slide-up" transition-hide="slide-down")
     editor-quote(v-if="showEditorQuote" @close="$refs.showEditorQuote.hide()")
+  q-dialog(ref="showEditorVideo" :maximized="true"
+    transition-show="slide-up" transition-hide="slide-down")
+    editor-video(v-if="showEditorVideo" @close="$refs.showEditorVideo.hide()")
   //- TODO: editor quote...
   //- add btn
-  q-btn(v-if="showAddBtn" icon="add" outline color="primary" round @click="showChooseType = true" size="lg")
+  q-btn(v-if="showAddBtn" icon="add" outline color="primary" round @click="showChooseType = true" size="xl")
   //- TODO: add label under add btn
   input(type="file" hidden ref="photo"  @change="photoChanged")
-  img(v-if="type === 'image' && photoUrl" :src="photoUrl" height="100%")
 </template>
 
 <script>
 import findVideo from './find_video'
 import findImage from './find_image'
-import editorQuote from './editorQuote'
+import editorQuote from './editor_quote'
+import editorVideo from './editor_video'
+// TODO: editors of vk image
 export default {
   name: 'contentAdd',
-  components: { findVideo, findImage, editorQuote },
+  components: { findVideo, findImage, editorQuote, editorVideo },
   props: {},
   data () {
     return {
@@ -48,16 +40,18 @@ export default {
       showFindImage: false,
       showChooseType: false,
       showEditorQuote: false,
+      showEditorVideo: false,
       type: '',
       types: [
         {id: 'image', label: 'Изображение', icon: 'image', color: 'green'},
         {id: 'video', label: 'Видео', icon: 'fab fa-youtube', color: 'red'},
         {id: 'quote', label: 'Цитата', icon: 'format_quote', color: 'grey'},
-        // {id: 'vkpost', label: 'Пост ВК', icon: 'menu'}
+        {id: 'vkpost', label: 'Пост ВК', icon: 'fab fa-vk', color: 'blue'}
       ],
       showAddBtn: true,
       photoUrl: null,
-      photoFile: null
+      photoFile: null,
+      player: null
     }
   },
   apollo: {
@@ -95,29 +89,6 @@ export default {
           reject(e)
         }
       })
-    },
-    chooseType (type) {
-      this.$log('chooseType', type)
-      switch (type.id) {
-        case 'image': {
-          this.$log('load findImage')
-          this.showFindImage = true
-          this.$refs.showFindImage.show()
-          break
-        }
-        case 'video': {
-          this.$log('load findVideo')
-          this.showFindVideo = true
-          this.$refs.showFindVideo.show()
-          break
-        }
-        case 'quote': {
-          this.$log('load editorQuote')
-          this.showEditorQuote = true
-          this.$refs.showEditorQuote.show()
-          break
-        }
-      }
     }
   },
   mounted () {

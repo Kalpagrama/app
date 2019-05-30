@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: 'pageAppBell',
+  name: 'pageAppNotifications',
   data () {
     return {
     }

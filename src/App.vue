@@ -11,6 +11,7 @@ export default {
     },
     mounted () {
       this.$log('mounted', this.$route)
+      window.HELP_IMPROVE_VIDEOJS = false
     }
 }
 </script>

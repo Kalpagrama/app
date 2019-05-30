@@ -13,7 +13,7 @@ export default async ({ Vue }) => {
   }
   LoadingBar.setDefaults({
     color: 'primary',
-    size: '2px',
-    position: 'bottom'
+    size: '1px',
+    position: 'top'
   })
 }

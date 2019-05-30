@@ -1,12 +1,14 @@
 <template lang="pug">
 .column.fit
-  div(style=`height: 50px`).row.full-width.items-center.q-px-sm.bg-white
+  div(v-show="show_header" style=`height: 50px; position: fixed; top: 0px; background: white; zIndex: 1000`
+    ).row.full-width.items-center.q-px-sm.bg-white
     .col.full-height.q-py-sm.q-pr-sm
       div(style=`borderRadius: 5px`).row.fit.items-center.bg-grey-2.q-pa-xs
         q-icon(name="search" size="18px").q-mr-xs
         span.text-grey-9 Search kalpagramma
     div(style=`height: 30px; width: 30px; borderRadius: 50%` @click="$store.commit('ui/state', ['show_right_drawer', true])").row.items-center.justify-center.bg-primary
-  .col.scroll.bg-grey-3
+  div(style=`paddingTop: 50px`).col.scroll.bg-grey-3
+    q-scroll-observer(@scroll="handleScroll")
     div(v-if="show_refresh" style=`height: 50px`).row.full-width
       q-spinner(size="50px" color="primary")
     apollo-query(:query="query")
@@ -21,25 +23,32 @@
 <script>
 import nodeCard from './node_card'
 export default {
-  name: 'pageAppHome',
+  name: 'pageApp_Home',
   components: { nodeCard },
   data () {
     return {
       show_refresh: false,
+      show_header: false,
       filter: {},
       page: 12,
       queryFull: `full () { name }`,
-      query: gql`query newsFeed{
-        newsFeed(pagination: {direction: FORWARD, limit: 50}) {
-          type
-          thumbUrl(preferWidth: 400, preferHeight: 225)
-          name
-          oid
-        }
-      }`
+      query: gql`
+        query newsFeed {
+          newsFeed(pagination: {direction: FORWARD, limit: 50}) {
+            type
+            thumbUrl(preferWidth: 400, preferHeight: 225)
+            name
+            oid
+          }
+        }`
     }
   },
   methods: {
+    handleScroll (e) {
+      // this.$log('handleScroll', e)
+      if (e.direction === 'down') this.show_header = false
+      else this.show_header = true
+    },
     async refresh () {
       this.$log('refresh')
       this.show_refresh = true

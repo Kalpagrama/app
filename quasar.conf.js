@@ -7,9 +7,9 @@ module.exports = function (ctx) {
     preFetch: true,
     boot: [
       'i18n',
+      'main',
       'apollo',
-      'filters',
-      'main'
+      'filters'
     ],
     css: [
       'fonts.variables.styl',
