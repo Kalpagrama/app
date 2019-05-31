@@ -58,7 +58,7 @@ export default {
     async done () {
       let points = [{x: this.startSec}, {x: this.endSec}]
       this.$log('done', points)
-      await this.$wait(3000)
+      // await this.$wait(3000)
       this.$emit('done', points)
     }
   },
