@@ -11,13 +11,13 @@
     q-scroll-observer(@scroll="handleScroll")
     div(v-if="show_refresh" style=`height: 50px`).row.full-width
       q-spinner(size="50px" color="primary")
-    apollo-query(:query="query")
-      template(v-slot="{ result: { loading, error, data } }")
-        //- recycle-scroller(v-if="data" :items="data.newsFeed" :item-size="10" key-field="oid" v-slot="{item}")
-          //- q-pull-to-refresh(@refresh="refresh" :no-mouse="false" icon="menu" color="primary")
-          node-card(:item="item" style=`height: 500px`)
-        template(v-if="data && data.newsFeed")
-          node-card(v-for="(item, itemi) in data.newsFeed" :key="item.oid" :item="item")
+    //- apollo-query(:query="query")
+    //-   template(v-slot="{ result: { loading, error, data } }")
+    //-     //- recycle-scroller(v-if="data" :items="data.newsFeed" :item-size="10" key-field="oid" v-slot="{item}")
+    //-       //- q-pull-to-refresh(@refresh="refresh" :no-mouse="false" icon="menu" color="primary")
+    //-       node-card(:item="item" style=`height: 500px`)
+    //-     template(v-if="data && data.newsFeed")
+    //-       node-card(v-for="(item, itemi) in data.newsFeed" :key="item.oid" :item="item")
 </template>
 
 <script>

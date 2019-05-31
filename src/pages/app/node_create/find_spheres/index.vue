@@ -12,29 +12,30 @@
       .row.fit.items-center.content-center
         .row.full-width
           .col.q-pl-sm
-            q-input(v-model="search" filled placeholder="Найти сферы сути" @click="searchClick"
+            q-input(v-model="search" filled placeholder="Найти тэги" @click="searchClick"
               :maxlength="50"
               :class="{'q-pr-sm': bodyType === 'device'}").fit
               template(v-slot:prepend)
                 q-icon(name="search")
           div(v-if="bodyType === 'list'" style=`height: 60px; width: 60px`).row.items-center.justify-center
             q-btn(flat round icon="clear" @click="cancelClick" color="primary")
-  //- tags list
+  //- shperes list
   .col.scroll.bg-grey-2
     apollo-query(v-if="bodyType === 'list'" :query="query" :variables="variables" :throttle="5000" @result="handleResult")
       template(v-slot="{ result: { loading, error, data } }")
         template(v-if="data && data.feed")
-          div(v-for="(t, ti) in data.feed.items" :key="ti" @click="$emit('tagAdd', t), $emit('close')"
+          //- sphere item
+          div(v-for="(s, si) in data.feed.items" :key="si" @click="$emit('sphereAdd', {oid: s.oid, name: s.name}), $emit('close')"
             style=`height: 40px; borderTop: 1px solid #eee`
               ).row.full-width.items-center.q-px-sm.bg-white.hr.cursor-pointer
             span #
-            span {{ t.name }}
+            span {{ s.name }}
 </template>
 
 <script>
 import gql from 'graphql-tag'
 export default {
-  name: 'findTags',
+  name: 'findSpheres',
   data () {
     return {
       mounted: false,
@@ -43,8 +44,8 @@ export default {
       tagsOptions: [],
       bodyType: 'device',
       query: gql`
-        query feed ($filter: String!) {
-          feed(type: AUTOCOMPLETE pagination: {pageSize:10}  filter: {text: $filter, types: [WORD, SENTENCE]} ){
+        query feed ($search: String!) {
+          feed(type: AUTOCOMPLETE, pagination: {pageSize: 50}, filter: {text: $search, types: [WORD, SENTENCE]} ){
             count
             totalCount
             nextPageToken
@@ -73,7 +74,7 @@ export default {
   computed: {
     variables () {
       return {
-        filter: this.search
+        search: this.search
       }
     }
   },

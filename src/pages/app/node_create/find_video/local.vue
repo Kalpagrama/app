@@ -7,12 +7,14 @@
     .row.full-width.justify-center
       q-icon(name="add_photo_alternate" size="100px" color="primary")
     .row.full-width.justify-center
-      span Pick from device
+      span или выбери с {{ deviceType }}
 </template>
 
 <script>
+import { Platform } from 'quasar'
+
 export default {
-  name: 'findVideoDevice',
+  name: 'findVideo_Local',
   data () {
     return {
     }
@@ -23,6 +25,15 @@ export default {
       // this.photoFile = e.target.files[0]
       // this.showAddBtn = false
       // this.photoUrl = URL.createObjectURL(this.photoFile)
+    }
+  },
+  computed: {
+    deviceType () {
+      if (Platform.is.desktop) {
+        return `компьютера`
+      } else {
+        return `телефона`
+      }
     }
   },
   mounted () {
