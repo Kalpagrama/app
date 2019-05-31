@@ -17,7 +17,7 @@ div(style=`position: relative`).column.fit.bg-black
       source(type="video/youtube" :src="youtubeUrl")
     //- slider wrapper
     div(style=`position: absolute; zIndex: 100; height: 190px; bottom: 0px`
-      ).row.full-width.bg-black
+      ).row.full-width.bg-black.q-px-xl
       slider(
         v-if="editorReady"
         :editor="editor"
