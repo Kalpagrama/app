@@ -54,7 +54,7 @@ export default {
         part: 'snippet',
         videoType: 'any',
         type: 'video',
-        q: encodeURIComponent(this.search || 'Добро'),
+        q: this.search || 'Добро', // encodeURIComponent(this.search || 'Добро'),
         key: 'AIzaSyB8GBdF67E-F0P8eG3o5egrylnepVAsPLg',
       }
       let { data: { items, nextPageToken } } = await this.$axios.get('https://www.googleapis.com/youtube/v3/search', { params })
