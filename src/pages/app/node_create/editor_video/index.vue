@@ -17,7 +17,7 @@ div(style=`position: relative`).column.fit.bg-black
       source(type="video/youtube" :src="youtubeUrl")
     //- slider wrapper
     div(style=`position: absolute; zIndex: 100; height: 190px; bottom: 0px`
-      ).row.full-width.bg-black
+      ).row.full-width.bg-black.q-px-xl
       slider(
         v-if="editorReady"
         :editor="editor"
@@ -58,7 +58,7 @@ export default {
     async done () {
       let points = [{x: this.startSec}, {x: this.endSec}]
       this.$log('done', points)
-      await this.$wait(3000)
+      // await this.$wait(3000)
       this.$emit('done', points)
     }
   },

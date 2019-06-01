@@ -29,7 +29,7 @@
     style=`position: relative`).row.fit
     div(style=`position: absolute; bottom: 0px; height: 50px`
       ).row.full-width.items-center.justify-end.q-px-sm
-      span.text-white {{ relativePoints }}
+      //- span.text-white {{ relativePoints }}
       q-btn(round dense color="primary" icon="edit" @click="videoEdit")
     img(:src="video.snippet.thumbnails.high.url" width="100%" height="100%")
 </template>
