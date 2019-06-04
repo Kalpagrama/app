@@ -2,6 +2,7 @@ const debug = require('debug')('[boot]:main')
 // debug.enabled = true
 import VueVirtualScroller from 'vue-virtual-scroller'
 import { LoadingBar } from 'quasar'
+import TweenMax from 'gsap/TweenMax'
 
 export default async ({ Vue }) => {
   Vue.use(VueVirtualScroller)
@@ -16,4 +17,5 @@ export default async ({ Vue }) => {
     size: '1px',
     position: 'top'
   })
+  Vue.prototype.$tween = TweenMax
 }

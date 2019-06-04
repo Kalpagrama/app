@@ -1,18 +1,27 @@
 <template lang="pug">
 div(style=`position: relative`).column.fit
-  div(style=`position: absolute; zIndex: 1000; top: 10px`).row.full-width.justify-center
-    q-btn(rounded style=`height: 40px; width: 250px` color="primary" no-caps @click="nodeCreate()") Опубликовать
+  transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(style=`position: absolute; zIndex: 1000; bottom: 10px`).row.full-width.justify-center
+      q-btn(rounded style=`height: 50px; width: 250px` color="primary" no-caps @click="nodeCreate()" :loading="nodeCreating") Опубликовать
   //- find spheres
   q-dialog(ref="showFindSpheres" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     findSpheres(v-if="showFindSpheres" @sphereAdd="sphereAdd" @close="$refs.showFindSpheres.hide()")
-  .col
-    fragment(ref="fone")
-  //- node name
-  div(style="height: 57px").row.full-width
-    q-input(v-model="node.name" input-style=`fontSize: 18px`
-      :input-class="['text-center']" placeholder="В чем суть?").full-width
-  .col
-    fragment(ref="ftwo")
+  //- .col
+  //-   fragment(ref="fone")
+  //- //- node name
+  //- div(style="height: 57px").row.full-width
+  //-   q-input(v-model="node.name" input-style=`fontSize: 18px`
+  //-     :input-class="['text-center']" placeholder="В чем суть?").full-width
+  //- .col
+  //-   fragment(ref="ftwo")
+  .row.bg-grey-3.q-pa-md
+    node
+      template(v-slot:actions_top)
+        q-btn(dense round flat icon="clear" color="white")
+        q-btn(round flat dense icon="edit" color="white")
+      template(v-slot:actions_bottom)
+        q-btn(dense round flat icon="clear" color="white")
+        q-btn(round flat dense icon="edit" color="white")
   //- spheres
   div(style=`borderTop: 1px solid #eee; height: 50px`).row.full-width.items-center
     .col.full-height
@@ -29,12 +38,13 @@ div(style=`position: relative`).column.fit
 </template>
 
 <script>
+import node from 'components/node'
 import editorVideo from '../editor_video'
 import fragment from './fragment'
 import findSpheres from '../find_spheres'
 export default {
   name: 'editorNode',
-  components: {fragment, findSpheres, editorVideo},
+  components: {node, fragment, findSpheres, editorVideo},
   data () {
     return {
       node: {
@@ -42,6 +52,7 @@ export default {
         spheres: [],
         fragments: []
       },
+      nodeCreating: false,
       showFindSpheres: false
     }
   },
@@ -67,32 +78,35 @@ export default {
     async nodeCreate () {
       try {
         this.$log('nodeCreate start', this.node)
+        this.nodeCreating = true
         await this.$wait(3000)
-        // get contents
-        let contentOne = await this.$refs.fone.uploadContent()
-        let contentTwo = await this.$refs.ftwo.uploadContent()
-        // this.$log('contents', )
-        // mutate
-        let res = await this.$apollo.mutate({
-          mutation: gql`
-            mutation nodeCreate ($node: NodeInput!) {
-              nodeCreate (node: $node) {
-                oid
-                type
-                name
-              }
-            }
-          `,
-          variables: {
-            node: {
-              name: this.node.name,
-              fragments: [contentOne, contentTwo],
-              spheres: this.node.spheres
-            }
-          }
-        })
-        // done!
-        this.$log('nodeCreate', res)
+        this.nodeCreating = false
+        this.$router.push({name: 'home'})
+        // // get contents
+        // let contentOne = await this.$refs.fone.uploadContent()
+        // let contentTwo = await this.$refs.ftwo.uploadContent()
+        // // this.$log('contents', )
+        // // mutate
+        // let res = await this.$apollo.mutate({
+        //   mutation: gql`
+        //     mutation nodeCreate ($node: NodeInput!) {
+        //       nodeCreate (node: $node) {
+        //         oid
+        //         type
+        //         name
+        //       }
+        //     }
+        //   `,
+        //   variables: {
+        //     node: {
+        //       name: this.node.name,
+        //       fragments: [contentOne, contentTwo],
+        //       spheres: this.node.spheres
+        //     }
+        //   }
+        // })
+        // // done!
+        // this.$log('nodeCreate', res)
         this.$log('nodeCreate done')
       } catch (e) {
         this.$log('nodeCreate error', e)

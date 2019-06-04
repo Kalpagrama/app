@@ -5,7 +5,8 @@
   div(v-else @click="$refs.kimage.click()").row.fit.items-center.content-center.justify-center
     input(type="file" hidden ref="kimage"  @change="imageChanged")
     .row.full-width.justify-center
-      q-icon(name="add_photo_alternate" size="100px" color="primary")
+      //- q-icon(name="add_photo_alternate" size="100px" color="primary")
+      div(style=`height: 200px; border-bottom-left-radius: 100%35px; border-bottom-right-radius: 100%35px;`).row.full-width.bg-red x
     .row.full-width.justify-center
       span или выбери с {{ deviceType }}
 </template>

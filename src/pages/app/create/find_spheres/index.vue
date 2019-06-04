@@ -30,6 +30,9 @@
               ).row.full-width.items-center.q-px-sm.bg-white.hr.cursor-pointer
             span #
             span {{ s.name }}
+        template(v-if="loading")
+          div.row.fit.items-center.justify-center
+            q-spinner(size="50px")
 </template>
 
 <script>

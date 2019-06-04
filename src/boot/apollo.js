@@ -38,9 +38,12 @@ export default async ({ Vue, app }) => {
   Vue.prototype.$axios = axios
   // apollo
   Vue.use(VueApollo)
-  let SERVICES_URL = process.env.SERVICES_URL || 'https://api.kalpagramma.com/graphql'
+  let SERVICES_URL = process.env.SERVICES_URL || 'http://api.kalpagramma.com/graphql'
   debug('SERVICES_URL', SERVICES_URL)
-  let { data } = await axios.post(SERVICES_URL, {query: `query { services }`})
+  let { data, error } = await axios.post(SERVICES_URL, {query: `query { services }`})
+  if (error) {
+    debug('error', error)
+  }
   debug('data', data)
   // Error
   // const errorLink = onError(({graphQLErrors, networkError, operation}) => {

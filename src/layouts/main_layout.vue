@@ -42,6 +42,8 @@
 
 <script>
 import settings from 'pages/app/settings'
+import yi from 'youtube-info'
+
 export default {
   name: 'mainLayout',
   components: { settings },
@@ -72,6 +74,13 @@ export default {
       handler (to, from) {
         this.$router.push({ name: to.id, params: { page: to.id } })
       }
+    },
+    '$route': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route CHANGED', to)
+      }
     }
   },
   methods: {
@@ -91,11 +100,13 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted', window)
+    this.$log('mounted', yi)
+    let video = await yi('06CPuM0UVVM')
+    this.$log('video', video)
     await this.$wait(500)
-    let {data} = await this.$apollo.query({query: gql`query userIsAuthorized {userIsAuthorized}`})
+    // let {data} = await this.$apollo.query({query: gql`query userIsAuthorized {userIsAuthorized}`})
     // this.$log('data', data)
-    if (!data.userIsAuthorized) this.$router.push('/login')
+    // if (!data.userIsAuthorized) this.$router.push('/login')
     let token = this.$route.query.token
     if (token) localStorage.setItem('ktoken', token)
     // this.$log('ui/store', this.$store.state.ui.show_right_drawer)
