@@ -1,35 +1,33 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  div(v-if="state === 'loading'").row.fit.items-center.justify-center
-    //- q-spinner(size="50px" color="primary" :thickness="3"
+  //- div(style=`position: absolute`).row.full-width
+  //- node-preview(v-if="!visible")
+  div(v-if="!visible").row.fit.items-center.justify-center.bg-grey-2
+    q-spinner(size="50px" color="primary" :thickness="2")
   //- preview video
   //- view video
-  div(v-if="type === 'video' && state === 'view'").row.fit
-    div(style="position: absolute; zIndex: 200").row.full-width.justify-end.q-pa-xs
-      slot(name="actions")
-      q-btn(dense round flat icon="volume_up" color="white")
-    div(style=`height: 200px; overflow: auto`).row.full-width
-      div(style=`height: 300px`).row.full-width
-        video(
-          ref="kplayer"
-          width="100%"
-          playsinline
-          controls="false"
-          preload="auto"
-          muted="true"
-          height="100%")
-          source(type="video/youtube" src="https://www.youtube.com/embed/5D0xD-YG64k")
-  div(v-if="type === 'none'").row.fit.items-center.justify-center
-    q-btn(icon="add" color="primary" flat round size="lg")
+  node-video(v-if="visible && type === 'VIDEO'" :fragment="fragment")
+  node-image(v-if="visible && type === 'IMAGE'" :fragment="fragment")
+  //- node-quote
+  //- node-audio
+  slot(v-if="type === 'none'" name="none" :type="type" :state="state")
 </template>
 
 <script>
-import 'mediaelement/build/mediaelementplayer.min.css'
-import 'mediaelement/full'
-
+import nodeVideo from './node_video'
+import nodeImage from './node_image'
 export default {
   name: 'fragment',
+  components: { nodeVideo, nodeImage },
   props: {
+    state: {
+      type: String,
+      default: 'preview'
+    },
+    type: {
+      type: String,
+      default: 'none'
+    },
     fragment: {
       default: () => {
         return {
@@ -39,49 +37,34 @@ export default {
           }
         }
       }
+    },
+    visible: {
+      type: Boolean
+    }
+  },
+  watch: {
+    state: {
+      handler (to, from) {
+        this.$log('state CHANGED', to)
+      }
+    },
+    type: {
+      async handler (to, from) {
+        this.$log('type CHANGED', to)
+        if (to === 'VIDEO') {
+        }
+      }
     }
   },
   data () {
     return {
-      id: Date.now().toString(),
-      state: 'loading',
+      // state: 'loading',
       states: ['loading', 'preview', 'editing', 'ready', 'new'],
-      type: 'none',
+      // type: 'none',
       types: ['image', 'video', 'none'],
       editor: null,
       editorReady: false
     }
-  },
-  computed: {
-    getHeight () {
-      return 300
-    }
-  },
-  methods: {
-    start () {
-      this.start()
-    }
-  },
-  async mounted () {
-    await this.$wait(2000)
-    this.state = 'preview'
-    // this.editor = new window.MediaElementPlayer(this.$refs.kplayer, {
-    //   // pluginPath: '/path/to/shims/',
-    //   // When using `MediaElementPlayer`, an `instance` argument
-    //   // is available in the `success` callback
-    //   autoplay: true,
-    //   // controls: false,
-    //   showPosterWhenPaused: false,
-    //   clickToPlayPause: true,
-    //   iPadUseNativeControls: false,
-    //   iPhoneUseNativeControls: false,
-    //   AndroidUseNativeControls: false,
-    //   success: async (mediaElement, originalNode, instance) => {
-    //     await this.$wait(1500)
-    //     this.editorReady = true
-    //     // this.editor.play()
-    //   }
-    // })
   }
 }
 </script>

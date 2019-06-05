@@ -2,7 +2,7 @@
 .column.fit.bg-white
   //- header with animated height
   div(:style=`{height: headerHeight+'px', borderBottom: '1px solid #eee'}`
-    ).column.full-width
+    ).column.full-width.kheader
     //- header
     div(v-if="bodyType === 'device'" style=`height: 60px`).row.full-width.items-center.justify-end
       div(style=`height: 60px; width: 60px`).row.items-center.justify-center
@@ -88,18 +88,12 @@ export default {
     cancelClick () {
       this.$log('cancelClick')
       this.bodyType = 'device'
-      var interval = setInterval(() => {
-        if (this.headerHeight < this.$store.state.ui.width) this.headerHeight = this.headerHeight + 3
-        else clearInterval(interval)
-      }, 1)
+      this.$tween.to('.kheader', 0.5, {height: this.$store.state.ui.width + 'px'})
     },
     searchClick () {
       this.$log('searchClick')
       this.bodyType = 'list'
-      var interval = setInterval(() => {
-        if (this.headerHeight > 70) this.headerHeight = this.headerHeight - 3
-        else clearInterval(interval)
-      }, 1)
+      this.$tween.to('.kheader', 0.5, {height: '70px'})
     }
   },
   async mounted () {

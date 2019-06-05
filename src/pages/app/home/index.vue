@@ -1,29 +1,25 @@
 <template lang="pug">
 .column.fit
-  //- transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-  div(style=`height: 50px; position: fixed; top: 0px; background: white; zIndex: 1000`
-      ).row.full-width.items-center.q-px-sm.bg-white
-      .col.full-height.q-py-sm.q-pr-sm
-        div(style=`borderRadius: 5px`).row.fit.items-center.bg-grey-2.q-pa-xs
-          q-icon(name="search" size="18px").q-mr-xs
-          span.text-grey-9 Найти
-      div(style=`height: 30px; width: 30px; borderRadius: 50%` @click="$store.commit('ui/state', ['show_right_drawer', true])").row.items-center.justify-center.bg-primary
-  div(style=`paddingTop: 50px`).col.scroll.bg-grey-3
-    q-scroll-observer(@scroll="handleScroll")
-    div(v-if="show_refresh" style=`height: 50px`).row.full-width
-      q-spinner(size="50px" color="primary")
-    node-card
-    //- apollo-query(:query="query")
-    //-   template(v-slot="{ result: { loading, error, data } }")
-    //-     //- recycle-scroller(v-if="data" :items="data.newsFeed" :item-size="10" key-field="oid" v-slot="{item}")
-    //-       //- q-pull-to-refresh(@refresh="refresh" :no-mouse="false" icon="menu" color="primary")
-    //-       node-card(:item="item" style=`height: 500px`)
-    //-     template(v-if="data && data.newsFeed")
-    //-       node-card(v-for="(item, itemi) in data.newsFeed" :key="item.oid" :item="item")
+  div(style=`paddingTop: 0px`).col.scroll.bg-grey-3
+    apollo-query(:query="query2" :variables="variables")
+      template(v-slot="{ result: { loading, error, data } }")
+        div(v-if="loading").row.fit.items-center.justify-center
+            q-spinner(size="50px")
+        div(v-else-if="error").row.fit.items-center.justify-center
+          span {{ error }}
+        template(v-else-if="data && data.sphereNodesFeed")
+          node-card(v-for="(n, ni) in data.sphereNodesFeed.items" :key="n.oid" :node="n" :active="false"
+            v-observe-visibility=`{
+              callback: (isVisible, entry) => visibilityChanged(isVisible, entry, n, ni),
+              throttle: 600
+            }`)
+        div(v-else).row.fit.items-center.justify-centers
+          span Nothing found!
 </template>
 
 <script>
-import nodeCard from './node_card'
+import nodeCard from 'components/node/node_card'
+
 export default {
   name: 'pageApp_Home',
   components: { nodeCard },
@@ -33,12 +29,41 @@ export default {
       show_header: false,
       filter: {},
       page: 12,
-      queryFull: `full () { name }`,
-      // query: gql`
-      //   query feed {
-      //     feed(pagination: {direction: FORWARD, limit: 50}) {
-      //     }
-      //   }`
+      query: gql`
+        query feed {
+          impersonate(login: "4321ip@mail.ru")
+          feed (type: NEWS, pagination: {pageSize: 2}) {
+            totalCount
+            items {
+              oid
+              type
+              thumbUrl (preferWidth: 400, preferHeight: 200)
+              createdAt
+              name
+            }
+            nextPageToken
+          }
+        }
+      `,
+      query2: gql`
+        query nodes($oid: OID!) {
+          # impersonate(login: "4321ip@mail.ru")
+          sphereNodesFeed (sphereOid: $oid, pagination: {pageSize: 20}) {
+            totalCount
+            items {
+              oid
+              type
+              thumbUrl (preferWidth: 400, preferHeight: 200)
+              createdAt
+              name
+            }
+            nextPageToken
+          }
+        }
+      `,
+      variables: {
+        oid: this.$store.state.auth.user.oid
+      }
     }
   },
   methods: {
@@ -52,6 +77,14 @@ export default {
       this.show_refresh = true
       await this.$wait(3000)
       this.show_refresh = false
+    },
+    visibilityChanged (isVisible, entry, n, ni) {
+      // this.$log('vc', ni)
+      if (isVisible) {
+        this.$set(n, 'visible', true)
+      } else {
+        this.$set(n, 'visible', false)
+      }
     }
   },
   mounted () {

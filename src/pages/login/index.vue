@@ -20,6 +20,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    localStorage.removeItem('ktoken')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

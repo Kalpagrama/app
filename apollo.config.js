@@ -1,10 +1,10 @@
-// apollo.config.js
+require('dotenv').config()
+
 module.exports = {
   client: {
     service: {
       name: 'kalpagramma',
-      // URL to the GraphQL API
-      url: 'https://api.kalpagramma.com:8443/graphql'
+      url: JSON.stringify(process.env.SERVICES_URL)
     },
     // Files processed by the extension
     includes: [

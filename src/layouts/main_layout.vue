@@ -19,19 +19,14 @@
     //-                   q-icon(v-else name="clear" class="cursor-pointer" @click="search = ''")
     //-       q-btn(flat='', round='', dense='', icon='more_vert')
     //- page
-    //- TODO: add route transitions
     q-page-container.fit
       q-page.fit
         div(v-if="loading").row.fit.items-center.justify-center.content-center
-          //- .row.full-width.justify-center
-          //-   span.q-ma-sm Connecting kalpagramma...
-          //- .row.full-width.justify-center
-          //-   small {{ SERVICES_URL }}
           div(style=`height: 80px`).row.full-width.items-center.justify-center
-            //- q-spinner(size="50px" color="blue")
-        //- TODO:
+            q-spinner(size="50px" color="primary" :thickness="2")
+        //- TODO: route level transitions
         //- transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutLeft")
-        router-view(v-if="!loading")
+        router-view(v-else)
     //- footer
     q-footer(v-if="!loading && show_footer" bordered).row.full-width.justify-between.bg-white.q-px-sm
       q-btn(v-if="page" v-for="(p, pi) in pages" :key="pi" flat round
@@ -50,7 +45,6 @@ export default {
   data () {
     return {
       loading: true,
-      SERVICES_URL: process.env.SERVICES_URL,
       height: window.innerHeight,
       width: window.innerWidth,
       show_footer: true,
@@ -100,13 +94,9 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted', yi)
-    let video = await yi('06CPuM0UVVM')
-    this.$log('video', video)
-    await this.$wait(500)
-    // let {data} = await this.$apollo.query({query: gql`query userIsAuthorized {userIsAuthorized}`})
-    // this.$log('data', data)
-    // if (!data.userIsAuthorized) this.$router.push('/login')
+    this.$log('mounted')
+    this.loading = true
+    // check token
     let token = this.$route.query.token
     if (token) localStorage.setItem('ktoken', token)
     // this.$log('ui/store', this.$store.state.ui.show_right_drawer)
@@ -119,6 +109,15 @@ export default {
       if (findPage) this.$set(this, 'page', findPage)
       else this.$set(this, 'page', this.pages[0])
     }
+    await this.$wait(1000)
+    // check user auth
+    let {data: { userIsAuthorized }} = await this.$apollo.query({query: gql`query userIsAuthorized {userIsAuthorized}`})
+    // this.$log('userIsAuthorized', userIsAuthorized)
+    if (!userIsAuthorized) this.$router.push('/login')
+    // get user and save it to vuex
+    let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name } }`})
+    // this.$log('user', user)
+    this.$store.commit('auth/state', ['user', user])
     this.loading = false
   },
   beforeDestroy () {

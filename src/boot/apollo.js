@@ -14,7 +14,7 @@ import { createUploadLink } from 'apollo-upload-client'
 import VueApollo from 'vue-apollo'
 import axios from 'axios'
 
-export default async ({ Vue, app }) => {
+export default async ({ Vue, store, app }) => {
   debug('start')
   // axios
   axios.interceptors.request.use((request) => {
@@ -39,12 +39,13 @@ export default async ({ Vue, app }) => {
   // apollo
   Vue.use(VueApollo)
   let SERVICES_URL = process.env.SERVICES_URL || 'http://api.kalpagramma.com/graphql'
-  debug('SERVICES_URL', SERVICES_URL)
-  let { data, error } = await axios.post(SERVICES_URL, {query: `query { services }`})
+  // debug('SERVICES_URL', SERVICES_URL)
+  store.commit('auth/state', ['SERVICES_URL', SERVICES_URL])
+  let { data: {data: {services}}, error } = await axios.post(SERVICES_URL, {query: `query { services }`})
   if (error) {
     debug('error', error)
   }
-  debug('data', data)
+  // debug('services', services)
   // Error
   // const errorLink = onError(({graphQLErrors, networkError, operation}) => {
   //   Notify.create({message: 'Server ERROR', color: 'red', textColor: 'white'})
@@ -61,9 +62,10 @@ export default async ({ Vue, app }) => {
   // let linkHttp = ApolloLink.from([errorLink, data.data.services.API])
   // let linkWs = ApolloLink.from([errorLink, data.data.services.SUBSCRIPTIONS])
   // let linkUpload = ApolloLink.from([errorLink, data.data.services.UPLOAD])
-  let linkHttp = data.data.services.API
-  let linkWs = data.data.services.SUBSCRIPTIONS
-  let linkUpload = data.data.services.UPLOAD
+  let linkHttp = services.API
+  let linkWs = services.SUBSCRIPTIONS
+  let linkUpload = services.UPLOAD
+  store.commit('auth/state', ['AUTH_VK', services.AUTH_VK])
   // Cache
   const cache = new InMemoryCache()
   // persistCache({

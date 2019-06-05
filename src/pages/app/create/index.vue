@@ -8,7 +8,7 @@
 // user drafs in workspace
 import editorNode from './editor_node'
 export default {
-  name: 'pageApp_NodeCreate',
+  name: 'pageApp_Create',
   components: {editorNode},
   data () {
     return {

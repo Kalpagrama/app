@@ -15,13 +15,17 @@ export default {
   name: 'pageLoginVk',
   data () {
     return {
-      url: 'https://oauth.vk.com/authorize?client_id=6911684&display=mobile&redirect_uri=https://api.kalpagramma.com/auth/login/VK&scope=email&response_type=code&v=5.92&state=' + window.location.origin
+    }
+  },
+  computed: {
+    getUrl () {
+      return this.$store.state.auth.AUTH_VK.url + `&state=${window.location.origin}`
     }
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(1300)
-    location.href = this.url
+    await this.$wait(500)
+    location.href = this.getUrl
   }
 }
 </script>

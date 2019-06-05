@@ -1,10 +1,26 @@
 <template lang="pug">
 .column.fit.bg-white
+  //- header
   div(
     @click="userClick"
     style=`height: 100px; borderBottom: 1px solid #eee; paddingLeft: 20px`).row.items-center.full-width
-    div(style=`height: 45px; width: 45px; borderRadius: 50%`).row.items-center.justify-center.bg-primary
-    span.q-ml-sm Мотовилов Иван
+    //- optimistic UI
+    div(v-if="!$store.state.auth.user").row.full-width
+      div(style=`height: 45px; width: 45px; borderRadius: 50%`).row.items-center.justify-center.bg-grey-2
+      .col
+        .row.fit.content-center.q-px-sm
+          div(style=`height: 20px; minHeight: 20px; borderRadius: 4px; width: 250px`).row.bg-grey-2.q-mb-xs
+          div(style=`height: 18px; minHeight: 18px; borderRadius: 4px; width: 130px`).row.bg-grey-2
+    //- user info
+    div(v-else).row.full-width
+      div(style=`height: 45px; width: 45px; borderRadius: 50%`).row.items-center.justify-center.bg-grey-2
+      .col
+        .row.fit.content-center.q-px-sm
+          .row.full-width
+            span {{ $store.state.auth.user.name }}
+          .row.full-width
+            small {{ $store.state.auth.user.oid }}
+  //- body
   .col.scroll
     div(v-for="(s, si) in settings" :key="si"
       style=`height: 50px`).row.full-width.items-center.q-px-md.hr.cursor-pointer

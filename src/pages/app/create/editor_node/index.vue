@@ -1,27 +1,26 @@
 <template lang="pug">
 div(style=`position: relative`).column.fit
-  transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(style=`position: absolute; zIndex: 1000; bottom: 10px`).row.full-width.justify-center
-      q-btn(rounded style=`height: 50px; width: 250px` color="primary" no-caps @click="nodeCreate()" :loading="nodeCreating") Опубликовать
-  //- find spheres
-  q-dialog(ref="showFindSpheres" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    findSpheres(v-if="showFindSpheres" @sphereAdd="sphereAdd" @close="$refs.showFindSpheres.hide()")
-  //- .col
-  //-   fragment(ref="fone")
-  //- //- node name
-  //- div(style="height: 57px").row.full-width
-  //-   q-input(v-model="node.name" input-style=`fontSize: 18px`
-  //-     :input-class="['text-center']" placeholder="В чем суть?").full-width
-  //- .col
-  //-   fragment(ref="ftwo")
+  //- //- publish node
+  //- transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  //-   div(style=`position: absolute; zIndex: 1000; bottom: 10px`).row.full-width.justify-center
+  //-     q-btn(rounded style=`height: 50px; width: 250px` color="primary" no-caps @click="nodeCreate()" :loading="nodeCreating") Опубликовать
+  //- dialogs
+  q-dialog(ref="showDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    find-spheres(v-if="showShperesFind" @sphereAdd="sphereAdd" @close="$refs.showDialog.hide(), showShperesFind = false")
+    find-type(v-if="showTypeFind" @type="$event => (typeChoosen($event), $refs.showDialog.hide(), showTypeFind = false)")
+    find-video(v-if="showVideoFind" @video="videoChoosen" @close="$refs.showDialog.hide(), showVideoFind = false")
+    find-image(v-if="showImageFind" @close="$refs.showDialog.hide(), showImageFind = false")
+    video-edit(v-if="showVideoEdit" @close="$refs.showDialog.hide(), showVideoEdit = false")
+  //- node
   .row.bg-grey-3.q-pa-md
-    node
-      template(v-slot:actions_top)
-        q-btn(dense round flat icon="clear" color="white")
-        q-btn(round flat dense icon="edit" color="white")
-      template(v-slot:actions_bottom)
-        q-btn(dense round flat icon="clear" color="white")
-        q-btn(round flat dense icon="edit" color="white")
+    node(:node="node" :types="types")
+      //- template(v-slot:name)
+      //-   q-input(v-model="node.name" borderless :input-class="['text-center']" placeholder="В чем суть?").fit
+      template(v-slot:fragment_none="{id}")
+        .row.fit.items-center.justify-center
+          q-btn(flat round color="primary" icon="add" size="lg" @click="typeFind(id)")
+      template(v-slot:fragment_actions)
+        q-btn(flat round icon="clear" color="white" @click="typeOne = 'none'")
   //- spheres
   div(style=`borderTop: 1px solid #eee; height: 50px`).row.full-width.items-center
     .col.full-height
@@ -42,25 +41,66 @@ import node from 'components/node'
 import editorVideo from '../editor_video'
 import fragment from './fragment'
 import findSpheres from '../find_spheres'
+import findType from 'components/find_type'
+import findImage from 'components/find_image'
+import findVideo from 'components/find_video'
+import videoEdit from 'components/video_edit'
+
 export default {
   name: 'editorNode',
-  components: {node, fragment, findSpheres, editorVideo},
+  components: {node, fragment, videoEdit, findType, findVideo, findImage, findSpheres, editorVideo},
   data () {
     return {
+      typeId: 'one',
+      types: {
+        one: 'none',
+        two: 'none'
+      },
       node: {
-        name: '',
+        name: 'Some name',
         spheres: [],
         fragments: []
       },
       nodeCreating: false,
-      showFindSpheres: false
+      showDialog: false,
+      showTypeFind: false,
+      showShperesFind: false,
+      showVideoFind: false,
+      showImageFind: false,
+      showVideoEdit: false,
+      showImageEdit: false,
+      showQuoteEdit: false
     }
   },
   methods: {
+    typeFind (id) {
+      this.$log('typeFind', id)
+      this.typeId = id
+      this.showTypeFind = true
+      this.$refs.showDialog.show()
+    },
+    async typeChoosen (t) {
+      await this.$wait(400)
+      this.$log('typeChoosen', t)
+      // this.types[this.typeId] = t.id
+      if (t.id === 'video') {
+        this.showVideoFind = true
+        this.$refs.showDialog.show()
+      } else if (t.id === 'image') {
+        this.showImageFind = true
+        this.$refs.showDialog.show()
+      }
+    },
+    async videoChoosen (t) {
+      await this.$wait(400)
+      this.$log('videoChoosen', t)
+      this.showVideoEdit = true
+      this.$refs.showDialog.show()
+    },
     spheresFind () {
       this.$log('spheresFind')
-      this.showFindSpheres = true
-      this.$refs.showFindSpheres.show()
+      this.showShperesFind = true
+      this.$refs.showDialog.show()
     },
     sphereAdd (s) {
       this.$log('sphereAdd', s)
