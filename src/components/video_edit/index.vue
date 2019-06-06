@@ -13,13 +13,13 @@ div(style=`position: relative`).column.fit.bg-black
       playsinline
       width="100%"
       height="100%")
-      source(type="video/youtube" :src="youtubeUrl")
+      source(type="video/youtube" :src="url")
     //- slider wrapper
-    div(style=`position: absolute; zIndex: 100; height: 190px; bottom: 0px`
+    div(v-if="true" style=`position: absolute; zIndex: 100; height: 190px; bottom: 0px`
       ).row.full-width.bg-black.q-px-xl
       slider(
         v-if="editorReady"
-        :editor="editor"
+        :editor="editor" :currentSec="currentSec"
         @startSec="$event => startSec = $event"
         @endSec="$event => endSec = $event"
         :start="points.length > 0 ? points[0][0] : 0"
@@ -32,25 +32,21 @@ import 'mediaelement/full'
 import slider from './slider'
 
 export default {
-  name: 'pageApp_EditorVideo',
+  name: 'pageApp__VideoEdit',
   components: { slider },
   props: {
     type: {type: String},
-    id: {type: String, required: true},
-    video: {type: Object, required: true},
-    points: {type: Array}
+    points: {type: Array},
+    url: {type: String}
   },
   data () {
     return {
       editor: null,
       editorReady: false,
       startSec: 0,
-      endSec: 0
-    }
-  },
-  computed: {
-    youtubeUrl () {
-      return `http://www.youtube.com/watch?v=` + this.video.id.videoId
+      endSec: 0,
+      currentSec: 0,
+      video: null
     }
   },
   methods: {
@@ -59,15 +55,17 @@ export default {
       this.$log('done', points)
       // await this.$wait(3000)
       this.$emit('done', points)
+      this.$emit('close')
+    },
+    timeUpdate (e) {
+      // this.$log('timeUpdate', e)
+      this.currentSec = e.timeStamp
     }
   },
   async mounted () {
     this.$log('mounted')
     this.$log('video', this.video)
     this.editor = new window.MediaElementPlayer('kvideo', {
-      // pluginPath: '/path/to/shims/',
-      // When using `MediaElementPlayer`, an `instance` argument
-      // is available in the `success` callback
       // autoplay: true,
       showPosterWhenPaused: false,
       clickToPlayPause: true,
@@ -75,13 +73,16 @@ export default {
       iPhoneUseNativeControls: false,
       AndroidUseNativeControls: false,
       success: async (mediaElement, originalNode, instance) => {
-        await this.$wait(1500)
+        await this.$wait(1000)
         this.editorReady = true
+        this.video = document.getElementById('kvideo')
+        this.video.addEventListener('timeupdate', this.timeUpdate, false)
       }
     })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.video.removeEventListener('timeupdate', this.timeUpdate)
   }
 }
 </script>

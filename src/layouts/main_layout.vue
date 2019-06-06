@@ -37,7 +37,6 @@
 
 <script>
 import settings from 'pages/app/settings'
-import yi from 'youtube-info'
 
 export default {
   name: 'mainLayout',

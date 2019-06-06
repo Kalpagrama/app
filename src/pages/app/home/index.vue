@@ -1,5 +1,14 @@
 <template lang="pug">
 .column.fit
+  div(style=`height: 60px; borderBottom: 1px solid #eee`
+    ).row.full-width.bg-white
+    div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+      q-btn(icon="home" flat round color="primary")
+    .col
+      .row.fit.items-center.justify-center
+        span Моя лента
+    div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+      q-btn(icon="more_vert" flat round color="primary")
   div(style=`paddingTop: 0px`).col.scroll.bg-grey-3
     apollo-query(:query="query2" :variables="variables")
       template(v-slot="{ result: { loading, error, data } }")
@@ -11,7 +20,7 @@
           node-card(v-for="(n, ni) in data.sphereNodesFeed.items" :key="n.oid" :node="n" :active="false"
             v-observe-visibility=`{
               callback: (isVisible, entry) => visibilityChanged(isVisible, entry, n, ni),
-              throttle: 600
+              throttle: ni <  2 ? 0 : 700
             }`)
         div(v-else).row.fit.items-center.justify-centers
           span Nothing found!
@@ -31,7 +40,6 @@ export default {
       page: 12,
       query: gql`
         query feed {
-          impersonate(login: "4321ip@mail.ru")
           feed (type: NEWS, pagination: {pageSize: 2}) {
             totalCount
             items {
@@ -47,7 +55,6 @@ export default {
       `,
       query2: gql`
         query nodes($oid: OID!) {
-          # impersonate(login: "4321ip@mail.ru")
           sphereNodesFeed (sphereOid: $oid, pagination: {pageSize: 20}) {
             totalCount
             items {
@@ -78,10 +85,13 @@ export default {
       await this.$wait(3000)
       this.show_refresh = false
     },
-    visibilityChanged (isVisible, entry, n, ni) {
+    visibilityChanged (isVisible, entry, n, ni, next) {
       // this.$log('vc', ni)
+      // TODO: function to detect friend based on positions...
+      // we need an array of nodes
       if (isVisible) {
         this.$set(n, 'visible', true)
+        // this.$set(next[0], 'visible', true)
       } else {
         this.$set(n, 'visible', false)
       }

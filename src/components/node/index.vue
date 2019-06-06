@@ -10,23 +10,22 @@ div(
     borderBottomLeftRadius: '100%10px',
     borderBottomRightRadius: '100%10px',
     overflow: 'hidden'}`).col.bg-grey-4
-    node-fragment(:state="state" :type="types.one" :fragment="node.fragments[0]" :visible="visible")
+    node-fragment(:type="types.one" :visible="node.visible" :preview="node.thumbUrl[0]" :fragment="nodeFull.fragments[0]")
       template(v-slot:none)
         slot(name="fragment_none" :id="'one'")
       template(v-slot:actions)
         slot(name="fragment_actions")
   //- name
   div(style=`height: 50px`).row.full-width.items-center.justify-center
-    //- span(v-if="!!$slots.name") {{ node.name }}
-    span {{ node.name }}
-    //- slot(name="name")
+    span(v-if="!!$slots.name") {{ nodeFull.name }}
+    slot(name="name")
   //- bottom
   div(
     :style=`{
     borderTopLeftRadius: '100%10px',
     borderTopRightRadius: '100%10px',
     overflow: 'hidden'}`).col.bg-grey-4
-    node-fragment(:state="state" :type="types.two" :fragment="node.fragments[1]" :visible="visible")
+    node-fragment(:type="types.two" :visible="node.visible" :preview="node.thumbUrl[1]" :fragment="nodeFull.fragments[1]")
       template(v-slot:none)
         slot(name="fragment_none" :id="'two'")
       template(v-slot:actions)
@@ -39,25 +38,16 @@ export default {
   name: 'node',
   components: { nodeFragment },
   props: {
-    state: {
-      type: String,
-      default: 'preview'
-    },
     types: {
       type: Object
     },
     node: {
-      default: () => {
-        return {
-          name: 'Сила в правде',
-          fragments: [],
-          spheres: []
-        }
-      }
+      type: Object,
+      required: true
     },
-    visible: {
-      type: Boolean,
-      default: false
+    nodeFull: {
+      type: Object,
+      required: true
     }
   }
 }

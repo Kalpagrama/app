@@ -15,7 +15,7 @@ div(:style=`{
         div(style=`minHeight: 18px; height: 18px; borderRadius: 8px; width: 230px`).row.items-center.bg-grey-3.q-mb-xs
         div(style=`minHeight: 15px; height: 15px; borderRadius: 8px; width: 180px`).row.items-center.bg-grey-3
   //- node body
-  node(:previews="node.thumbUrl" :visible="node.visible" :node="nodeFull" :types="getTypes")
+  node(:node="node" :nodeFull="nodeFull" :types="getTypes")
   //- node spheres
   div(v-if="nodeFull.spheres.length > 0" style=`height: 50px`).row.full-width
     div(style=`height: 50px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
@@ -145,8 +145,8 @@ export default {
     }
   },
   async mounted () {
-    // this.$log('mounted')
-    // this.$log('node', this.node)
+    this.$log('mounted')
+    this.$log('node', this.node)
   }
 }
 </script>

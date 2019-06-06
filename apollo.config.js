@@ -4,7 +4,7 @@ module.exports = {
   client: {
     service: {
       name: 'kalpagramma',
-      url: JSON.stringify(process.env.SERVICES_URL)
+      url: 'https://api.kalpagramma.com/graphql'
     },
     // Files processed by the extension
     includes: [

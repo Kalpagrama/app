@@ -1,13 +1,15 @@
 <template lang="pug">
 .column.fit
   .col
-    .row.fit.content-center.items-center.q-px-sm
-      q-input(v-model="email" outlined label="Почта").full-width.q-mb-sm
-      q-input(v-model="password" outlined label="Пароль" type="password").full-width.q-mb-sm
-      .row.full-width.justify-end.q-px-sm
-        small Забыли пароль?
-      .row.full-width.q-my-sm
-        q-btn(no-caps style=`height: 50px` color="primary" label="Войти" @click="handleLogin").full-width
+    div(v-if="!codeConfirmed").row.fit.content-center.items-center.q-px-md
+      div(v-if="!codeWaiting").row.full-width.q-mb-sm
+        q-input(v-model="email" type="email" outlined label="Почта" @keyup.enter="emailSend").full-width.q-mb-sm
+        q-btn(style=`height: 50px` color="primary" label="Далее" @click="emailSend" :loading="emailSending").full-width
+      div(v-else).row.full-width
+        q-input(v-model="code" outlined label="Код подтверждения" @keyup.enter="codeSend").full-width.q-mb-sm
+        q-btn(style=`height: 50px` color="primary" label="Войти" @click="codeSend" :loading="codeSending").full-width
+    div(v-else).row.fit.justify-center.content-center.items-center
+      q-icon(name="email" size="100px" color="primary")
 </template>
 
 <script>
@@ -15,15 +17,50 @@ export default {
   name: 'pageLoginEmail',
   data () {
     return {
-      email: '',
-      password: ''
+      email: 'ivanmoto254@gmail.com',
+      emailSending: false,
+      code: '',
+      codeFake: 'xxxx',
+      codeWaiting: false,
+      codeSending: false,
+      codeConfirmed: false
     }
   },
   methods: {
-    handleLogin () {
-      this.$log('handleLogin')
-      // TODO: login real
-      this.$router.push('/app')
+    async emailSend () {
+      try {
+        this.$log('emailSend start')
+        this.emailSending = true
+        if (this.email.length === 0) throw {message: 'Wrong email!'}
+        await this.$wait(500)
+        this.$log('emailSend done')
+        this.emailSending = false
+        this.codeWaiting = true
+      } catch (error) {
+        this.$log('emailSend error', error)
+        this.$q.notify(error.message || JSON.stringify(error))
+        this.emailSending = false
+      }
+    },
+    async codeSend () {
+      try {
+        this.$log('codeSend start')
+        this.codeSending = true
+        this.codeConfirmed = false
+        if (this.code.length !== 4) throw {message: 'Wrong code!'}
+        await this.$wait(500)
+        if (this.code !== this.codeFake) throw {message: 'Wrong code!'}
+        this.$log('codeSend done')
+        this.codeSending = false
+        this.codeWaiting = false
+        this.codeConfirmed = true
+        await this.$wait(1000)
+        this.$router.push({name: 'home'})
+      } catch (error) {
+        this.$log('codeSend error', error)
+        this.$q.notify(error.message || JSON.stringify(error))
+        this.codeSending = false
+      }
     }
   },
   mounted () {

@@ -2,7 +2,7 @@
 .row.fit
   div(v-if="$q.platform.is.cordova").row.fit
     span Give me access to see your photos, please
-  div(v-else @click="$refs.kimage.click()").row.fit.items-center.content-center.justify-center
+  div(v-else @click="handleInputClick").row.fit.items-center.content-center.justify-center
     input(type="file" hidden ref="kimage"  @change="imageChanged")
     .row.full-width.justify-center
       q-icon(name="add_photo_alternate" size="100px" color="primary")
@@ -26,6 +26,10 @@ export default {
       // this.photoFile = e.target.files[0]
       // this.showAddBtn = false
       // this.photoUrl = URL.createObjectURL(this.photoFile)
+    },
+    handleInputClick () {
+      this.$log('handleInputClick')
+      // this.$refs.kimage.click()
     }
   },
   computed: {

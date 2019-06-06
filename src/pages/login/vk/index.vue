@@ -1,13 +1,13 @@
 <template lang="pug">
-.row.fit.items-center.content-start.justify-center
-  .row.full-width.justify-center
-    q-icon(name="add" size="45px")
+.row.fit.items-center.content-center.justify-center
+  //- .row.full-width.justify-center
+  //-   q-icon(name="add" size="45px")
   .row.full-width.items-center.justify-center
     q-icon(name="fab fa-vk" size="100px" style="color: #45668e")
-  .row.full-width.justify-center
-    span(style=`fontSize: 45px`) =
-  .row.full-width.items-center.justify-center
-    span(style=`fontSize: 100px`) 💘
+  //- .row.full-width.justify-center
+  //-   span(style=`fontSize: 45px`) =
+  //- .row.full-width.items-center.justify-center
+  //-   span(style=`fontSize: 100px`) 💘
 </template>
 
 <script>

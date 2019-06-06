@@ -11,9 +11,8 @@ div(style=`position: relative; height: 200px; overflow: auto`).row.full-width
           playsinline
           controls="false"
           preload="auto"
-          :poster="fragment.content.poster"
           height="100%")
-          source(type="video/youtube" :src="fragment.content.url")
+          source(type="video/youtube" :src="url")
 </template>
 
 <script>
@@ -23,28 +22,35 @@ import 'mediaelement/full'
 export default {
   name: 'nodeVideo',
   props: {
-    fragment: {
-      type: Object,
-      default: () => {
-        return {
-          content: {
-            url: 'https://www.youtube.com/embed/7Bms6Hba-3A'
-          }
-        }
-      }
+    url: {
+      type: String,
+      required: true
+    },
+    startSec: {
+      type: Number
+    },
+    endSec: {
+      type: Number
     }
   },
   data () {
     return {
-      player: null
+      player: null,
+      currentSec: 0,
+      videoSec: 0
+    }
+  },
+  methods: {
+    timeUpdate (e) {
+      this.$log('timeUpdate', e)
+      this.videoSec = e.timeStamp
+      if (e.timeStamp > this.startSec) this.editor.setCurrentTime(this.startSec)
     }
   },
   mounted () {
+    this.$log('mounted')
     this.editor = new window.MediaElementPlayer(this.$refs.kplayer, {
-      // pluginPath: '/path/to/shims/',
-      // When using `MediaElementPlayer`, an `instance` argument
-      // is available in the `success` callback
-      autoplay: false,
+      autoplay: true,
       // controls: false,
       showPosterWhenPaused: false,
       clickToPlayPause: true,
@@ -55,10 +61,16 @@ export default {
         await this.$wait(600)
         this.$log('editorCreate sussess')
         // this.editorReady = true
-        // this.editor.play()
+        this.editor.play()
+        this.editor.setCurrentTime(this.startSec)
         this.$refs.kvideoWrapper.scrollTop = 50
+        this.$refs.kplayer.addEventListener('timeupdate', this.timeUpdate, false)
       }
     })
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.$refs.kplayer.removeEventListener('timeupdate', this.timeUpdate)
   }
 }
 </script>
