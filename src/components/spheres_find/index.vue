@@ -56,7 +56,7 @@ export default {
               oid
               type
               name
-              thumbUrl(preferWidth:10 preferHeight:20)
+              thumbUrl(preferWidth:10)
               createdAt
               ... on FeedItem {
                 id

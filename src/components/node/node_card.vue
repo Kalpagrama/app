@@ -1,10 +1,10 @@
 <template lang="pug">
 div(:style=`{
-  height: $store.state.ui.width+160+'px',
+  height: $store.state.ui.width+180+'px',
   maxWidth: $store.state.ui.width+'px'}`
   ).column.full-width.q-mt-xs.q-mb-sm.bg-white.q-px-md.bg-grey-1
   //- node author
-  div(style=`height: 60px`).row.full-width.items-center
+  div(style=`height: 60px`).row.full-width.items-center.q-pl-sm
     div(style=`height: 35px; width: 35px; borderRadius: 50%`).row.bg-grey-3.q-ml-xs
     .col.q-px-sm
       div(v-if="nodeFull.author.name.length > 0").row.fit.items-center
@@ -14,25 +14,28 @@ div(:style=`{
       div(v-else).row.full-width
         div(style=`minHeight: 18px; height: 18px; borderRadius: 8px; width: 230px`).row.items-center.bg-grey-3.q-mb-xs
         div(style=`minHeight: 15px; height: 15px; borderRadius: 8px; width: 180px`).row.items-center.bg-grey-3
+    div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+      q-btn(icon="more_vert" color="grey-8" flat round dense)
   //- node body
   node(:node="node" :nodeFull="nodeFull" :types="getTypes")
-  //- node spheres
-  div(v-if="nodeFull.spheres.length > 0" style=`height: 50px`).row.full-width
-    div(style=`height: 50px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
-      div(v-for="(s, si) in nodeFull.hspheres" :key="s.oid" style=`height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3
-        span #
-        span sphere
   //- node actions
-  div(style=`height: 40px`).row.full-width.items-center.justify-between
-    div.row.full-height.items-center
-      q-btn(icon="track_changes" flat round dense)
-      span.q-mb-xs {{ nodeFull.rate || 0 }}
+  div(style=`order: 51; height: 50px`).row.full-width.q-px-sm
     .col
-      .row.fit.items-center.justify-end
+      .row.fit.items-center.justify-start
         div.row.full-height.items-center
-          q-btn(icon="share" flat round dense).q-mr-md
-        div.row.full-height.items-center
-          q-btn(icon="more_horiz" flat round dense)
+          q-btn(icon="reply_all" color="grey-8" flat no-caps dense).q-ml-xs Share
+    div.row.full-height.items-center
+      span 1233
+      q-btn(icon="share" size="md" color="grey-8" flat round dense).q-mr-md
+      small 5 /
+      span.q-mb-xs 3.45
+      q-btn(icon="track_changes" size="lg" color="grey-8" flat round dense)
+  //- node spheres
+  div(style=`order: 50; height: 46px`).row.full-width.items-end.content-end.q-px-md
+    div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
+      div(v-for="(s, si) in spheres" :key="s.oid" style=`height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3
+        span #
+        span {{ s.name }}
 </template>
 
 <script>
@@ -95,7 +98,7 @@ export default {
                   oid
                   type
                   name
-                  thumbUrl(preferWidth:50, preferHeight: 50)
+                  thumbUrl(preferWidth: 600)
                   __typename
                 }
                 spheres {
@@ -107,7 +110,7 @@ export default {
                     oid
                     type
                     name
-                    thumbUrl(preferWidth:400, preferHeight: 200)
+                    thumbUrl(preferWidth: 600)
                     ...on Video {
                     url
                     }
@@ -145,8 +148,8 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
-    this.$log('node', this.node)
+    // this.$log('mounted')
+    // this.$log('node', this.node)
   }
 }
 </script>

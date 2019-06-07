@@ -2,11 +2,13 @@
 div(style=`position: relative; height: 200px; overflow: auto`).row.full-width
     div(style="position: absolute; zIndex: 200").row.full-width.items-center.justify-end.q-pa-sm
       slot(name="actions")
-      q-btn(dense round flat icon="volume_up" color="white")
+      q-btn(dense round flat :icon="muted ? 'volume_up' : 'volume_off'" color="white" @click="toggleMute")
     div(style=`height: 200px; overflow: hidden` ref="kvideoWrapper").row.full-width
       div(style=`height: 300px`).row.full-width
         video(
+          id="kvideo"
           ref="kplayer"
+          @timeupdate.native="timeUpdate"
           width="100%"
           playsinline
           controls="false"
@@ -27,24 +29,33 @@ export default {
       required: true
     },
     startSec: {
-      type: Number
+      type: Number,
+      default: 10
     },
     endSec: {
-      type: Number
+      type: Number,
+      default: 11
     }
   },
   data () {
     return {
       player: null,
       currentSec: 0,
-      videoSec: 0
+      videoSec: 0,
+      video: null,
+      muted: false
     }
   },
   methods: {
+    toggleMute () {
+      this.editor.setMuted(this.muted)
+      this.muted = !this.muted
+    },
     timeUpdate (e) {
-      this.$log('timeUpdate', e)
+      // this.$log('timeUpdate', e)
       this.videoSec = e.timeStamp
-      if (e.timeStamp > this.startSec) this.editor.setCurrentTime(this.startSec)
+      if (this.video.currentTime > this.endSec) this.editor.setCurrentTime(this.startSec)
+      // if (e.timeStamp > this.endSec) this.editor.setCurrentTime(this.startSec)
     }
   },
   mounted () {
@@ -61,16 +72,17 @@ export default {
         await this.$wait(600)
         this.$log('editorCreate sussess')
         // this.editorReady = true
-        this.editor.play()
+        // this.editor.play()
         this.editor.setCurrentTime(this.startSec)
         this.$refs.kvideoWrapper.scrollTop = 50
-        this.$refs.kplayer.addEventListener('timeupdate', this.timeUpdate, false)
+        this.video = document.getElementById('kvideo')
+        this.video.addEventListener('timeupdate', this.timeUpdate, false)
       }
     })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$refs.kplayer.removeEventListener('timeupdate', this.timeUpdate)
+    this.video.removeEventListener('timeupdate', this.timeUpdate)
   }
 }
 </script>

@@ -108,11 +108,22 @@ export default {
       if (findPage) this.$set(this, 'page', findPage)
       else this.$set(this, 'page', this.pages[0])
     }
-    await this.$wait(1000)
-    // check user auth
-    let {data: { userIsAuthorized }} = await this.$apollo.query({query: gql`query userIsAuthorized {userIsAuthorized}`})
-    // this.$log('userIsAuthorized', userIsAuthorized)
-    if (!userIsAuthorized) this.$router.push('/login')
+    await this.$wait(500)
+    // user check
+    let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
+      query: gql`
+      query userCheck {
+        userIsAuthorized
+        userIsConfirmed
+        }`
+      })
+    this.$log('userIsAuthorized', userIsAuthorized)
+    this.$log('userIsConfirmed', userIsConfirmed)
+    if (!userIsAuthorized || !userIsConfirmed) {
+      this.$log('GO LOGIN')
+      this.$router.push('/login')
+      this.$q.notify('Go login')
+    }
     // get user and save it to vuex
     let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name } }`})
     // this.$log('user', user)

@@ -76,6 +76,7 @@ export default async ({ Vue, store, app }) => {
   //   let cachedData = JSON.parse(localStorage['apollo-cache-persist'])
   //   cache.restore(cachedData)
   // }
+  // TODO: IntrospectionFragmentMatcher
   // default client
   const defaultClient = new ApolloClient({
     link: createHttpLink({

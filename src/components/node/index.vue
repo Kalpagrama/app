@@ -17,7 +17,7 @@ div(
         slot(name="fragment_actions")
   //- name
   div(style=`height: 50px`).row.full-width.items-center.justify-center
-    span(v-if="!!$slots.name") {{ nodeFull.name }}
+    span(v-if="!$slots.name") {{ nodeFull.name }}
     slot(name="name")
   //- bottom
   div(

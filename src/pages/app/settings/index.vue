@@ -31,7 +31,7 @@
       div(style=`height: 50px; width: 50px`).row.items-center.justify-center
         q-icon(name="refresh" size="30px" color="grey")
       span Обновить кэш
-    div(@click="$router.push('/login')").row.full-width.items-center.q-px-md.hr.cursor-pointer
+    div(@click="logout").row.full-width.items-center.q-px-md.hr.cursor-pointer
       div(style=`height: 50px; width: 50px`).row.items-center.justify-center
         q-icon(name="power_off" size="30px" color="grey")
       span Выйти
@@ -66,6 +66,17 @@ export default {
     refresh () {
       this.$log('refresh')
       window.location.reload(true)
+    },
+    async logout () {
+      this.$log('logout')
+      await this.$apollo.query({
+        query: gql`
+          query logout {
+            logout
+          }
+        `
+      })
+      this.$router.push('/login')
     }
   },
   mounted () {

@@ -45,7 +45,7 @@ export default {
             items {
               oid
               type
-              thumbUrl (preferWidth: 400, preferHeight: 200)
+              thumbUrl (preferWidth: 600)
               createdAt
               name
             }
@@ -60,7 +60,7 @@ export default {
             items {
               oid
               type
-              thumbUrl (preferWidth: 400, preferHeight: 200)
+              thumbUrl (preferWidth: 600)
               createdAt
               name
             }

@@ -32,7 +32,25 @@ export default {
         this.$log('emailSend start')
         this.emailSending = true
         if (this.email.length === 0) throw {message: 'Wrong email!'}
-        await this.$wait(500)
+        // await this.$wait(500)
+        let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.query({
+          query: gql`
+            query loginEmail ($email: String!){
+              loginEmail(email: $email){
+                token
+                expires
+                role
+              }
+            }
+          `,
+          variables: {
+            email: this.email
+          }
+        })
+        this.$log('token', token)
+        localStorage.setItem('ktoken', token)
+        localStorage.setItem('ktoken_expires', expires)
+        this.$log('role', role)
         this.$log('emailSend done')
         this.emailSending = false
         this.codeWaiting = true
@@ -48,9 +66,24 @@ export default {
         this.codeSending = true
         this.codeConfirmed = false
         if (this.code.length !== 4) throw {message: 'Wrong code!'}
-        await this.$wait(500)
-        if (this.code !== this.codeFake) throw {message: 'Wrong code!'}
-        this.$log('codeSend done')
+        // await this.$wait(500)
+        // if (this.code !== this.codeFake) throw {message: 'Wrong code!'}
+        let { data: { confirm: { result, attempts } } } = await this.$apollo.query({
+          query: gql`
+            query codeConfirm ($code: String!) {
+              confirm(code: $code){
+                result
+                nextAttemptDate
+                attempts
+                failReason
+              }
+            }
+          `,
+          variables: {
+            code: this.code
+          }
+        })
+        this.$log('codeSend done', result)
         this.codeSending = false
         this.codeWaiting = false
         this.codeConfirmed = true
