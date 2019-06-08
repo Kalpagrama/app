@@ -39,7 +39,7 @@ import sourceLink from './source_link'
 import list from './list'
 import local from './local'
 export default {
-  name: 'findVideo',
+  name: 'videoFind',
   components: { sourceLink, list, local },
   data () {
     return {
@@ -67,10 +67,6 @@ export default {
     cancelClick () {
       this.$log('cancelClick')
       this.type = 'local'
-      // var interval = setInterval(() => {
-      //   if (this.headerHeight < this.$store.state.ui.width) this.headerHeight = this.headerHeight + 3
-      //   else clearInterval(interval)
-      // }, 1)
     }
   },
   watch: {

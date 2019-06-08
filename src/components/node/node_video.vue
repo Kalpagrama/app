@@ -30,11 +30,11 @@ export default {
     },
     startSec: {
       type: Number,
-      default: 10
+      default: 0
     },
     endSec: {
       type: Number,
-      default: 11
+      default: 10
     }
   },
   data () {
@@ -60,6 +60,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$log('startSec', this.startSec)
+    this.$log('endSec', this.endSec)
+    // load player
     this.editor = new window.MediaElementPlayer(this.$refs.kplayer, {
       autoplay: true,
       // controls: false,

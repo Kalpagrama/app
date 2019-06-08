@@ -7,7 +7,7 @@ div(style=`position: relative; height: 190px`).row.full-width
   //- slider
   div(style=`position: relative; height: 130px`).row.full-width.items-center.content-center
     //- debug
-    div(v-if="false" style=`position: absolute; height: 100px; top: -200px; color: white; opacity: 0.6`
+    div(v-if="true" style=`position: absolute; height: 100px; top: -200px; color: white; opacity: 0.6`
       ).row.full-width.items-start.conent-start.q-px-sm.bg-green
       small.row.full-width startSec/startPx  {{startSec}} / {{startPx}}
       small.row.full-width endSec/endPx {{endSec}} / {{endPx}}
@@ -60,14 +60,14 @@ export default {
     startSec: {
       immediate: true,
       handler (to, from) {
-        this.$log('emit startSec', to)
+        // this.$log('emit startSec', to)
         this.$emit('startSec', to)
       }
     },
     endSec: {
       immediate: true,
       handler (to, from) {
-        this.$log('emit endSec', to)
+        // this.$log('emit endSec', to)
         this.$emit('endSec', to)
       }
     },

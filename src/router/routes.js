@@ -8,7 +8,7 @@ const routes = [
     children: [
       { name: 'home', path: 'home', component: () => import('pages/app/home') },
       { name: 'node', path: 'node', component: () => import('pages/app/node') },
-      { name: 'search', path: 'search', component: () => import('pages/app/hot') },
+      { name: 'search', path: 'search', component: () => import('pages/app/search') },
       { name: 'create', path: 'create', component: () => import('pages/app/create') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
       { name: 'settings', path: 'settings', component: () => import('pages/app/settings') }

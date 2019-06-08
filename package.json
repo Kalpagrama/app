@@ -1,10 +1,10 @@
 {
-  "name": "front",
-  "version": "0.0.1",
-  "description": "Kalpagramma App",
-  "productName": "Kalpagramma",
+  "name": "kalpa",
+  "version": "0.0.2",
+  "description": "kalpa",
+  "productName": "kalpa",
   "cordovaId": "com.kalpagramma.app",
-  "author": "Maksim Tikhonov <bnr17@yandex.ru>",
+  "author": "Ivan Motovilov <ivanmoto@pm.me>",
   "private": true,
   "main": "index.js",
   "scripts": {

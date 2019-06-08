@@ -98,7 +98,7 @@ export default async ({ Vue, store, app }) => {
         lazy: true,
         reconnect: true,
         connectionParams: async () => {
-          debug('FETCH SUBSCRIBE')
+          debug('FETCH WS')
           const token = localStorage.getItem('ktoken')
           return {
             headers: {

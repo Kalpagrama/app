@@ -44,13 +44,13 @@ export default {
     return {
       setting: null,
       settings: [
-        {id: 'nodes', name: 'Мои ядра', icon: 'menu'},
-        {id: 'spheres', name: 'Мои сферы', icon: 'menu'},
-        {id: 'bookmarks', name: 'Закладки', icon: 'bookmark'},
-        {id: 'profile', name: 'Профиль', icon: 'menu'},
-        {id: 'journal', name: 'Бортовой журнал', icon: 'menu'},
-        {id: 'stories', name: 'Истории', icon: 'menu'},
-        {id: 'weekly', name: 'Лучшее за неделю', icon: 'menu'},
+        // {id: 'nodes', name: 'Мои ядра', icon: 'menu'},
+        // {id: 'spheres', name: 'Мои сферы', icon: 'menu'},
+        // {id: 'bookmarks', name: 'Закладки', icon: 'bookmark'},
+        // {id: 'profile', name: 'Профиль', icon: 'menu'},
+        // {id: 'journal', name: 'Бортовой журнал', icon: 'menu'},
+        // {id: 'stories', name: 'Истории', icon: 'menu'},
+        // {id: 'weekly', name: 'Лучшее за неделю', icon: 'menu'},
         {id: 'settings', name: 'Настройки', icon: 'settings'}
       ]
     }

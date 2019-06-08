@@ -22,8 +22,8 @@ div(style=`position: relative`).column.fit.bg-black
         :editor="editor" :currentSec="currentSec"
         @startSec="$event => startSec = $event"
         @endSec="$event => endSec = $event"
-        :start="points.length > 0 ? points[0][0] : 0"
-        :end="points.length > 0 ? points[1][0] : 10")
+        :start="start"
+        :end="end")
 </template>
 
 <script>
@@ -32,11 +32,13 @@ import 'mediaelement/full'
 import slider from './slider'
 
 export default {
-  name: 'pageApp__VideoEdit',
+  name: 'VideoEdit',
   components: { slider },
   props: {
     type: {type: String},
-    points: {type: Array},
+    // points: {type: Array},
+    start: {type: Number},
+    end: {type: Number},
     url: {type: String}
   },
   data () {
@@ -64,7 +66,8 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.$log('video', this.video)
+    this.$log('start', this.start)
+    this.$log('end', this.end)
     this.editor = new window.MediaElementPlayer('kvideo', {
       // autoplay: true,
       showPosterWhenPaused: false,
@@ -73,7 +76,7 @@ export default {
       iPhoneUseNativeControls: false,
       AndroidUseNativeControls: false,
       success: async (mediaElement, originalNode, instance) => {
-        await this.$wait(1000)
+        await this.$wait(2000)
         this.editorReady = true
         this.video = document.getElementById('kvideo')
         this.video.addEventListener('timeupdate', this.timeUpdate, false)

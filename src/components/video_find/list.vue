@@ -9,7 +9,8 @@ div(style=`position: relative`).row.full-width
       v-for="v in 6" :key="v"
       style=`height: 90px`).row.full-width.bg-white.q-my-sm.q-px-sm
       div(style=`height: 90px; width: 120px`).row.q-pa-xs
-        .row.fit.bg-grey-2
+        div(style=`borderRadius: 4px`).row.fit.items-center.justify-center.bg-grey-2
+          q-icon(name="fab fa-youtube" color="grey-4" size="30px")
       .col
         .row.fit.items-start.content-start.q-pa-sm
           div(style=`height: 20px; minHeight: 20px; borderRadius: 4px`).row.full-width.bg-grey-2
@@ -20,9 +21,9 @@ div(style=`position: relative`).row.full-width
       ).row.full-width.bg-white.q-my-sm.q-px-sm
       //- preview
       div(@click="videoClick(v, vi)" v-if="v.id !== videoSelectedId").row.full-width
-        div(style=`height: 90px; width: 120px`).row.items-center.justify-center.bg-red
-          //- q-icon(name="fab fa-youtube" color="white" size="30px")
-          img(:src="v.thumbnailUrl" width="100%" height="100%")
+        div(style=`height: 90px; width: 120px`).row.items-center.justify-center.q-pa-xs
+          div(style=`borderRadius: 4px; overflow: hidden`).row.fit
+            img(:src="v.thumbnailUrl" width="100%" height="100%")
         .col
           .row.fit.items-start.content-start.q-pa-sm
             .row.full-width
@@ -32,10 +33,11 @@ div(style=`position: relative`).row.full-width
             //-   small.text-grey-8 Views: {{ v.views }}
       //- select video
       div(v-if="v.id === videoSelectedId").row.full-width.items-center.justify-end
-        div(style=`height: 200px`).row.full-width
-          img(:src="v.thumbnailUrl" width="100%" height="100%")
+        div(style=`height: 200px`).row.full-width.q-mt-sm
+          div(style=`borderRadius: 4px; overflow: hidden;`).row.fit
+            img(:src="v.thumbnailUrl" width="100%" height="100%")
         div(style=`height: 70px;`).row.full-width.items-center.justify-end
-          q-btn(cancel flat color="primary" no-caps @click="videoSelectedId = undefined").q-mr-sm Отмена
+          q-btn(rounded style=`height: 50px` outline color="primary" no-caps @click="videoSelectedId = undefined").q-mr-sm Отмена
           q-btn(rounded style=`height: 50px` color="primary" @click="videoSelect(v, vi)" no-caps) Выбрать видео
     //- show more
     div(style=`height: 70px`).row.full-width.items-center.justify-center

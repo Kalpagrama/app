@@ -9,11 +9,13 @@ div(:style=`{
     .col.q-px-sm
       div(v-if="nodeFull.author.name.length > 0").row.fit.items-center
         span {{ nodeFull.author.name }}
-        .row.full-width
-          small.text-grey-8 14.05.19 18:18 923892
+        .row.full-width.items-center
+          q-icon(name="remove_red_eye" size="14px" color="grey-6").q-mr-xs
+          small 12114
+          small.text-grey-8.q-ml-sm yesterday
       div(v-else).row.full-width
-        div(style=`minHeight: 18px; height: 18px; borderRadius: 8px; width: 230px`).row.items-center.bg-grey-3.q-mb-xs
-        div(style=`minHeight: 15px; height: 15px; borderRadius: 8px; width: 180px`).row.items-center.bg-grey-3
+        div(style=`minHeight: 18px; height: 18px; borderRadius: 4px; width: 230px`).row.items-center.bg-grey-3.q-mb-xs
+        div(style=`minHeight: 15px; height: 15px; borderRadius: 4px; width: 180px`).row.items-center.bg-grey-3
     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
       q-btn(icon="more_vert" color="grey-8" flat round dense)
   //- node body
@@ -69,10 +71,10 @@ export default {
   },
   computed: {
     getTypes () {
-      return {
-        one: this.nodeFull.fragments[0]['content']['type'] || 'none',
-        two: this.nodeFull.fragments[1]['content']['type'] || 'none'
-      }
+      return [
+        this.nodeFull.fragments[0]['content']['type'] || 'none',
+        this.nodeFull.fragments[1]['content']['type'] || 'none'
+      ]
     }
   },
   methods: {
@@ -82,7 +84,7 @@ export default {
     },
     async nodeLoad () {
       this.$log('nodeLoad start')
-      // console.time('nodeLoad')
+      console.time('nodeLoad')
       let { data: { objectList: nodeFull } } = await this.$apollo.query({
         query: gql`
           query getExtendedNodesProps($oid: OID!) {
@@ -132,7 +134,7 @@ export default {
       this.$log('nodeFull', nodeFull[0])
       this.nodeFull = nodeFull[0]
       this.$log('nodeLoad done')
-      // console.timeEnd('nodeLoad')
+      console.timeEnd('nodeLoad')
     }
   },
   watch: {

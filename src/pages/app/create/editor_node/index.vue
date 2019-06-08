@@ -1,30 +1,47 @@
 <template lang="pug">
 div(style=`position: relative`).column.fit
-  //- //- publish node
-  //- transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-  div(style=`position: absolute; zIndex: 1000; bottom: 10px`).row.full-width.justify-center
-    q-btn(rounded style=`height: 50px; width: 250px` color="primary" no-caps @click="nodeCreate()" :loading="nodeCreating") Опубликовать
+  //- =======
+  //- dialogs
+  q-dialog(ref="showDialogTypeFind" position="bottom" transition-show="slide-up" transition-hide="slide-down")
+    type-find(v-if="showTypeFind" @type="typeChoosen" @close="$refs.showDialogTypeFind.hide(), showTypeFind = false")
   //- dialogs
   q-dialog(ref="showDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    spheres-find(v-if="showShperesFind" @sphereAdd="sphereAdd" @close="$refs.showDialog.hide(), showShperesFind = false")
-    find-type(v-if="showTypeFind" @type="$event => (typeChoosen($event), $refs.showDialog.hide(), showTypeFind = false)")
-    find-video(v-if="showVideoFind" @video="videoChoosen" @close="$refs.showDialog.hide(), showVideoFind = false")
-    find-image(v-if="showImageFind" @close="$refs.showDialog.hide(), showImageFind = false")
-    video-edit(v-if="showVideoEdit" @close="$refs.showDialog.hide(), showVideoEdit = false" :url="url" :points="[]")
+    //- image
+    image-find(v-if="showImageFind" @close="$refs.showDialog.hide(), showImageFind = false")
+    image-edit(v-if="showImageEdit" @close="$refs.showDialog.hide(), showImageEdit = false")
+    //- video
+    video-find(v-if="showVideoFind" @video="videoChoosen" @close="$refs.showDialog.hide(), showVideoFind = false")
+    video-edit(v-if="showVideoEdit"
+      @close="$refs.showDialog.hide(), showVideoEdit = false"
+      :url="nodeFull.fragments[typeIndex]['content']['url']"
+      :start="nodeFull.fragments[typeIndex].relativePoints[0]['x']"
+      @start="nodeFull.fragments[typeIndex].relativePoints[0]['x'] = $event"
+      :end="nodeFull.fragments[typeIndex].relativePoints[1]['x']"
+      @end="nodeFull.fragments[typeIndex].relativePoints[1]['x'] = $event"
+      @done="videoEdited")
+    //- sphere
+    sphere-find(v-if="showShpereFind" @sphereAdd="sphereAdd" @close="$refs.showDialog.hide(), showShpereFind = false")
+  //- ====
   //- node
   .row.bg-grey-3.q-pa-md
     node(:node="node" :nodeFull="nodeFull" :types="types")
+      //- name
       template(v-slot:name)
-        q-input(v-model="nodeFull.name" borderless :input-class="['text-center']" placeholder="В чем суть?").fit
-      template(v-slot:fragment_none="{id}")
+        .row.fit.items-center
+          q-input(v-model="nodeFull.name" borderless :maxlength="45"
+            :input-class="['text-center']" placeholder="В чем суть?").fit
+      //- fragment none
+      template(v-slot:fragment_none="{ index }")
         .row.fit.items-center.justify-center
-          q-btn(flat round color="primary" icon="add" size="lg" @click="typeFind(id)")
+          q-btn(flat round color="primary" icon="add" size="lg" @click="typeFind(index)")
+      //- actions
       template(v-slot:fragment_actions)
         q-btn(flat round icon="clear" color="white" @click="typeOne = 'none'")
+  //- =======
   //- spheres
-  div(style=`borderTop: 1px solid #eee; height: 50px`).row.full-width.items-center
+  div(style=`borderTop: 1px solid #eee; borderBottom: 1px solid #eee; height: 50px`).row.full-width.items-center
     .col.full-height
-      div(v-if="nodeFull.spheres.length === 0" @click="spheresFind").row.fit.items-center.hr.cursor-pointer
+      div(v-if="nodeFull.spheres.length === 0" @click="sphereFind").row.fit.items-center.hr.cursor-pointer
         span.text-grey-8.q-ml-md Добавь тэги
       div(v-else).row.fit.q-px-sm
         div(style=`maxWidth: 100%`).row.fit.items-center.bg-white.no-wrap.scroll
@@ -33,81 +50,124 @@ div(style=`position: relative`).column.fit
             span {{ t.name }}
             //- div(style=`height: 30px; width: 30px`)
             q-btn(icon="clear" @click="sphereDelete(t, ti)" dense flat round size="xs" color="black")
-    q-btn(v-if="nodeFull.spheres.length < 4" flat round dense icon="add" color="primary" size="md" @click="spheresFind").q-mx-sm
+    q-btn(v-if="nodeFull.spheres.length < 4" outline round dense icon="add" color="primary" size="md" @click="sphereFind()").q-mx-md
+  .col.scroll
+  //- ============
+  //- form publish
+  div(style=`minHeight: 100px; borderTop: 1px solid #eee`).row.full-width.items-center.justify-between.q-px-md
+    .col
+      .row.fit.items-center.q-pr-md
+        q-btn(rounded outline style=`height: 50px;` color="primary" no-caps @click="nodeSave()" :loading="nodeSaving").full-width Сохранить
+    q-btn(rounded style=`height: 50px; width: 250px` color="primary" no-caps @click="nodeCreate()" :loading="nodeCreating") Опубликовать
 </template>
 
 <script>
 import node from 'components/node'
-import editorVideo from '../editor_video'
-import fragment from './fragment'
-import spheresFind from 'components/spheres_find'
-import findType from 'components/find_type'
-import findImage from 'components/find_image'
-import findVideo from 'components/find_video'
+import sphereFind from 'components/sphere_find'
+import typeFind from 'components/type_find'
+import imageFind from 'components/image_find'
+import imageEdit from 'components/image_edit'
+import videoFind from 'components/video_find'
 import videoEdit from 'components/video_edit'
 
 export default {
   name: 'editorNode',
-  components: {node, fragment, videoEdit, findType, findVideo, findImage, spheresFind, editorVideo},
+  components: {node, typeFind, videoEdit, videoFind, imageFind, imageEdit, sphereFind},
   data () {
     return {
-      typeId: 'one',
-      types: {
-        one: 'none',
-        two: 'none'
-      },
+      typeIndex: 0,
+      types: ['none', 'none'],
       node: {
         type: 'NODE',
         name: '',
         oid: '',
-        thumbUrl: []
+        thumbUrl: [],
+        visible: true
       },
       nodeFull: {
-        name: '',
+        name: 'name from editor_node',
         spheres: [],
-        fragments: []
+        fragments: [
+          {
+            content: {url: ''},
+            relativePoints: [{x: 0}, {x: 10}]
+          },
+          {
+            content: {url: ''},
+            relativePoints: [{x: 0}, {x: 10}]
+          }
+        ]
       },
-      url: '',
-      nodeCreating: false,
       showDialog: false,
+      // type
       showTypeFind: false,
-      showShperesFind: false,
+      // sphere
+      showShpereFind: false,
+      // video
       showVideoFind: false,
-      showImageFind: false,
       showVideoEdit: false,
+      // image
       showImageEdit: false,
-      showQuoteEdit: false
+      showImageFind: false,
+      // quote
+      showQuoteEdit: false,
+      // book
+      showBookFind: false,
+      showBookEdit: false,
+      // node
+      nodeCreating: false,
+      nodeSaving: false
     }
   },
   methods: {
-    typeFind (id) {
-      this.$log('typeFind', id)
-      this.typeId = id
+    typeFind (index) {
+      this.$log('typeFind', index)
+      this.typeIndex = index
       this.showTypeFind = true
-      this.$refs.showDialog.show()
+      this.$refs.showDialogTypeFind.show()
     },
     async typeChoosen (t) {
       await this.$wait(400)
       this.$log('typeChoosen', t)
-      // this.types[this.typeId] = t.id
-      if (t.id === 'video') {
-        this.showVideoFind = true
-        this.$refs.showDialog.show()
-      } else if (t.id === 'image') {
-        this.showImageFind = true
-        this.$refs.showDialog.show()
+      this.$set(this.types, this.typeIndex, t.id)
+      switch (t.id) {
+        case 'VIDEO': {
+          this.showVideoFind = true
+          this.$refs.showDialog.show()
+          break
+        }
+        case 'IMAGE': {
+          this.showImageFind = true
+          this.$refs.showDialog.show()
+          break
+        }
       }
     },
     async videoChoosen (v) {
       await this.$wait(400)
       this.$log('videoChoosen', v)
-      this.url = v.url
+      this.$set(this.node.thumbUrl, this.typeIndex, v.thumbnailUrl)
+      this.$set(this.nodeFull.fragments[this.typeIndex]['content'], 'url', v.url)
+      // this.node.thumbUrl[this.typeIndex] = v.thumbnailUrl
+      // this.nodeFull.fragments[this.typeIndex]['content']['url'] = v.url
+      this.$log('videoChoosen', this.nodeFull)
       this.showVideoEdit = true
       this.$refs.showDialog.show()
     },
-    spheresFind () {
-      this.$log('spheresFind')
-      this.showShperesFind = true
+    videoEdited (points) {
+      this.$log('videoEdited', points)
+      this.$set(this.nodeFull.fragments[this.typeIndex], 'relativePoints', points)
+      // this.nodeFull.fragments[this.typeIndex].relativePoints = points
+    },
+    async imageChoosen (i) {
+      await this.$wait(400)
+      this.$log('imageChoosen', i)
+      // set url to appropriate fragment content url
+    },
+    // sphere
+    sphereFind () {
+      this.$log('sphereFind')
+      this.showShpereFind = true
       this.$refs.showDialog.show()
     },
     sphereAdd (s) {
@@ -123,45 +183,90 @@ export default {
       this.$log('sphereDelete')
       this.nodeFull.spheres = this.nodeFull.spheres.filter(sphere => sphere.name !== s.name)
     },
+    // node
     async nodeCreate () {
       try {
-        this.$log('nodeCreate start', this.nodeFull)
+        this.$log('nodeCreate start')
         this.nodeCreating = true
-        await this.$wait(3000)
-        this.nodeCreating = false
-        // // get contents
-        // let contentOne = await this.$refs.fone.uploadContent()
-        // let contentTwo = await this.$refs.ftwo.uploadContent()
-        // // this.$log('contents', )
-        // // mutate
-        // let res = await this.$apollo.mutate({
-        //   mutation: gql`
-        //     mutation nodeCreate ($node: NodeInput!) {
-        //       nodeCreate (node: $node) {
-        //         oid
-        //         type
-        //         name
-        //       }
-        //     }
-        //   `,
-        //   variables: {
-        //     node: {
-        //       name: this.node.name,
-        //       fragments: [contentOne, contentTwo],
-        //       spheres: this.node.spheres
-        //     }
-        //   }
-        // })
-        // // done!
-        // this.$log('nodeCreate', res)
+        await this.$wait(2000)
+        // get contents ids
+        let { data: { uploadContentUrl: { oid: oid1 } } } = await this.$apollo.mutate({
+          mutation: gql`
+            mutation uploadContentUrl ($url: String!) {
+              uploadContentUrl(url: $url) {
+                oid
+              }
+            }
+          `,
+          variables: {
+            url: this.nodeFull.fragments[0].content.url
+          }
+        })
+        let { data: { uploadContentUrl: { oid: oid2 } } } = await this.$apollo.mutate({
+          mutation: gql`
+            mutation uploadContentUrl ($url: String!) {
+              uploadContentUrl(url: $url) {
+                oid
+              }
+            }
+          `,
+          variables: {
+            url: this.nodeFull.fragments[1].content.url
+          }
+        })
+        this.$log('oid1', oid1)
+        this.$log('oid2', oid2)
+        // mutate
+        let res = await this.$apollo.mutate({
+          mutation: gql`
+            mutation nodeCreate ($node: NodeInput!) {
+              nodeCreate (node: $node) {
+                oid
+                type
+                name
+              }
+            }
+          `,
+          variables: {
+            node: {
+              name: this.nodeFull.name,
+              fragments: [
+                {oid: oid1, relativePoints: this.nodeFull.fragments[0].relativePoints, relativeScale: 1000},
+                {oid: oid2, relativePoints: this.nodeFull.fragments[1].relativePoints, relativeScale: 1000}
+              ],
+              spheres: this.nodeFull.spheres
+            }
+          }
+        })
+        // done!
+        this.$log('nodeCreate', res)
         this.$log('nodeCreate done')
-      } catch (e) {
-        this.$log('nodeCreate error', e)
+        this.$q.notify({message: `Ядро создано!`, color: 'primary', textColor: 'white'})
+        this.nodeCreating = false
+      } catch (error) {
+        this.$log('nodeCreate error', error)
+        this.nodeCreating = false
+        this.$q.notify({message: error.message || JSON.stringify(error), color: 'red', textColor: 'white'})
+      }
+    },
+    async nodeSave () {
+      try {
+        this.$log('nodeSave start')
+        this.nodeSaving = true
+        await this.$wait(2000)
+        this.$log('nodeSave done')
+        this.nodeSaving = false
+        this.$q.notify({message: `Ядро сохранено!`, color: 'primary', textColor: 'white'})
+      } catch (error) {
+        this.nodeSaving = false
+        this.$q.notify({message: error.message || JSON.stringify(error), color: 'red', textColor: 'white'})
+        this.$log('nodeSave error', error)
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$log('mounted nodeFull', this.nodeFull)
+    // TODO: load saved nodeFull from localStorage
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

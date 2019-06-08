@@ -17,7 +17,7 @@ export default {
   name: 'pageLoginEmail',
   data () {
     return {
-      email: 'ivanmoto254@gmail.com',
+      email: '',
       emailSending: false,
       code: '',
       codeFake: 'xxxx',

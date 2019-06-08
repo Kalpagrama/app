@@ -1,16 +1,19 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  //- node-preview
-  div(v-if="state === 'preview' && !$slots.none").row.fit.items-center.justify-center.bg-grey-2
-    img(:src="preview" width="100%" height="100%" @click="state = 'active'")
-  //- node-video
-  node-video(v-if="visible && state === 'active' && type === 'VIDEO'" :url="fragment.content.url")
-  //- node image
-  node-image(v-if="visible && state === 'active' && type === 'IMAGE'" :url="fragment.content.url")
-  //- node-quote
-  //- node-audio
-  //- none
-  slot(v-if="type === 'none'" name="none" :type="type" :state="state")
+  div(v-if="type === 'none'").row.fit.bg-yellow
+    slot(name="none")
+  div(v-else-if="type !== 'none' && state === 'preview'" @click="state = 'active'"
+    ).row.fit.bg-pink
+    img(:src="preview" width="100%" height="100%")
+  div(v-else-if="type === 'VIDEO' && state === 'active'").row.fit.bg-red
+    node-video(
+      :url="fragment.content.url"
+      :startSec="getStartSec"
+      :endSec="getEndSec")
+      template(v-slot:actions)
+        slot(name="fragment_actions")
+  div(v-else-if="type === 'IMAGE' && state === 'active'").row.fit.bg-green
+    node-image(:url="fragment.content.url")
 </template>
 
 <script>
@@ -22,7 +25,7 @@ export default {
   props: {
     type: {
       type: String,
-      default: 'none'
+      default: 'VIDEO'
     },
     fragment: {
       default: () => {
@@ -41,6 +44,22 @@ export default {
       type: String
     }
   },
+  computed: {
+    getStartSec () {
+      if (this.fragment.relativePoints.length > 0) {
+        return this.fragment.relativePoints[0]['x']
+      } else {
+        return 0
+      }
+    },
+    getEndSec () {
+      if (this.fragment.relativePoints.length > 1) {
+        return this.fragment.relativePoints[1]['x']
+      } else {
+        return 10
+      }
+    }
+  },
   watch: {
     type: {
       async handler (to, from) {
@@ -53,12 +72,15 @@ export default {
   data () {
     return {
       state: 'preview',
-      states: ['preview', 'active'],
+      states: ['none', 'preview', 'active'],
       // type: 'none',
       types: ['image', 'video', 'none'],
       editor: null,
       editorReady: false
     }
+  },
+  mounted () {
+    // this.$refs.kpreviewWrapper.scrollTop = 50
   }
 }
 </script>

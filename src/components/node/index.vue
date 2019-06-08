@@ -10,14 +10,15 @@ div(
     borderBottomLeftRadius: '100%10px',
     borderBottomRightRadius: '100%10px',
     overflow: 'hidden'}`).col.bg-grey-4
-    node-fragment(:type="types.one" :visible="node.visible" :preview="node.thumbUrl[0]" :fragment="nodeFull.fragments[0]")
+    node-fragment(:type="types[0]" :visible="node.visible" :preview="node.thumbUrl[0]" :fragment="nodeFull.fragments[0]")
       template(v-slot:none)
-        slot(name="fragment_none" :id="'one'")
+        slot(name="fragment_none" :index="0")
       template(v-slot:actions)
-        slot(name="fragment_actions")
+        slot(name="fragment_actions" :index="0")
   //- name
-  div(style=`height: 50px`).row.full-width.items-center.justify-center
+  div(style=`height: 50px`).row.full-width.items-center.content-center.justify-center
     span(v-if="!$slots.name") {{ nodeFull.name }}
+    //- span.bg {{ nodeFull.name }}
     slot(name="name")
   //- bottom
   div(
@@ -25,11 +26,11 @@ div(
     borderTopLeftRadius: '100%10px',
     borderTopRightRadius: '100%10px',
     overflow: 'hidden'}`).col.bg-grey-4
-    node-fragment(:type="types.two" :visible="node.visible" :preview="node.thumbUrl[1]" :fragment="nodeFull.fragments[1]")
+    node-fragment(:type="types[1]" :visible="node.visible" :preview="node.thumbUrl[1]" :fragment="nodeFull.fragments[1]")
       template(v-slot:none)
-        slot(name="fragment_none" :id="'two'")
+        slot(name="fragment_none" :index="1")
       template(v-slot:actions)
-        slot(name="fragment_actions")
+        slot(name="fragment_actions" :index="1")
 </template>
 
 <script>
@@ -39,7 +40,7 @@ export default {
   components: { nodeFragment },
   props: {
     types: {
-      type: Object
+      type: Array
     },
     node: {
       type: Object,

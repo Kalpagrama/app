@@ -12,7 +12,7 @@
 
 <script>
 export default {
-  name: 'pageLoginVk',
+  name: 'pageLogin__Vk',
   data () {
     return {
     }
