@@ -30,13 +30,14 @@ div(style=`position: relative`).column.fit
         .row.fit.items-center
           q-input(v-model="nodeFull.name" borderless :maxlength="45"
             :input-class="['text-center']" placeholder="В чем суть?").fit
-      //- fragment none
-      template(v-slot:fragment_none="{ index }")
-        .row.fit.items-center.justify-center
+      //- editor slot
+      template(v-slot:editor="{ index }")
+        div(v-if="types[index] === 'none'").row.fit.items-center.justify-center
           q-btn(flat round color="primary" icon="add" size="lg" @click="typeFind(index)")
-      //- actions
-      template(v-slot:fragment_actions)
-        q-btn(flat round icon="clear" color="white" @click="typeOne = 'none'")
+        div(v-if="types[index] === 'VIDEO'" style=`position: absolute; zIndex: 100; height: 50px`
+          ).row.full-width.items-center.justify-start.q-px-sm
+          q-btn(flat round dense color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
+          q-btn(flat round dense color="white" icon="edit" @click="fragmentEdit(index)").shadow-10
   //- =======
   //- spheres
   div(style=`borderTop: 1px solid #eee; borderBottom: 1px solid #eee; height: 50px`).row.full-width.items-center
@@ -85,7 +86,7 @@ export default {
         visible: true
       },
       nodeFull: {
-        name: 'name from editor_node',
+        name: '',
         spheres: [],
         fragments: [
           {
@@ -143,6 +144,18 @@ export default {
         }
       }
     },
+    fragmentEdit (index) {
+      this.$log('fragmentEdit', index)
+      this.showVideoEdit = true
+      this.$refs.showDialog.show()
+    },
+    fragmentDelete (index) {
+      this.$log('fragmentDelete', index)
+      this.$set(this.types, index, 'none')
+      this.$set(this.node.thumbUrl, index, '')
+      this.$set(this.nodeFull.fragments[index]['content'], 'url', '')
+      this.$set(this.nodeFull.fragments[index], 'relativePoints', [{x: 0}, {x: 3}])
+    },
     async videoChoosen (v) {
       await this.$wait(400)
       this.$log('videoChoosen', v)
@@ -187,8 +200,9 @@ export default {
     async nodeCreate () {
       try {
         this.$log('nodeCreate start')
+        // TODO: add validation of the node???
         this.nodeCreating = true
-        await this.$wait(2000)
+        // await this.$wait(2000)
         // get contents ids
         let { data: { uploadContentUrl: { oid: oid1 } } } = await this.$apollo.mutate({
           mutation: gql`

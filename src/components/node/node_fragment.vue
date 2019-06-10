@@ -1,17 +1,20 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  div(v-if="type === 'none'").row.fit.bg-yellow
-    slot(name="none")
-  div(v-else-if="type !== 'none' && state === 'preview'" @click="state = 'active'"
+  //- div(v-if="type === 'none'").row.fit.bg-grey-3
+  //-   slot(name="empty")
+  //- div(v-if="$slots.editor" style=`position: absolute; zIndex: 100`).row.bg
+  slot(name="editor")
+  div(v-if="type !== 'none' && state === 'preview'" @click="state = 'active'"
     ).row.fit.bg-pink
     img(:src="preview" width="100%" height="100%")
   div(v-else-if="type === 'VIDEO' && state === 'active'").row.fit.bg-red
     node-video(
+      :index="index"
       :url="fragment.content.url"
       :startSec="getStartSec"
       :endSec="getEndSec")
       template(v-slot:actions)
-        slot(name="fragment_actions")
+        slot(name="actions")
   div(v-else-if="type === 'IMAGE' && state === 'active'").row.fit.bg-green
     node-image(:url="fragment.content.url")
 </template>
@@ -23,6 +26,9 @@ export default {
   name: 'nodeFragment',
   components: { nodeVideo, nodeImage },
   props: {
+    index: {
+      type: Number
+    },
     type: {
       type: String,
       default: 'VIDEO'

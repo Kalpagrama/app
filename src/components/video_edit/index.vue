@@ -7,21 +7,17 @@ div(style=`position: relative`).column.fit.bg-black
   //- tools
   div(style=`position: relative; overflow: hidden`).col.full-width
     div(style=`position: absolute; zIndex: 100; top: 0px; height: 60px`).row.full-width.bg-black
-    //- video :poster="video.snippet.thumbnails.high.url"
-    video(
-      id="kvideo"
-      playsinline
-      width="100%"
-      height="100%")
+    video(v-show="videoShow" ref="kplayer" playsinline width="100%" height="100%" preload="auto")
       source(type="video/youtube" :src="url")
     //- slider wrapper
     div(v-if="true" style=`position: absolute; zIndex: 100; height: 190px; bottom: 0px`
       ).row.full-width.bg-black.q-px-xl
       slider(
-        v-if="editorReady"
-        :editor="editor" :currentSec="currentSec"
+        v-if="duration"
+        :mediaElement="mediaElement" :duration="duration"
         @startSec="$event => startSec = $event"
         @endSec="$event => endSec = $event"
+        :current="currentSec"
         :start="start"
         :end="end")
 </template>
@@ -35,57 +31,61 @@ export default {
   name: 'VideoEdit',
   components: { slider },
   props: {
-    type: {type: String},
-    // points: {type: Array},
     start: {type: Number},
     end: {type: Number},
     url: {type: String}
   },
   data () {
     return {
+      videoShow: false,
       editor: null,
-      editorReady: false,
+      mediaElement: null,
       startSec: 0,
       endSec: 0,
       currentSec: 0,
+      duration: undefined,
       video: null
     }
   },
   methods: {
     async done () {
       let points = [{x: this.startSec}, {x: this.endSec}]
-      this.$log('done', points)
-      // await this.$wait(3000)
+      this.$log('done points', points)
       this.$emit('done', points)
       this.$emit('close')
     },
     timeUpdate (e) {
-      // this.$log('timeUpdate', e)
-      this.currentSec = e.timeStamp
+      this.duration = this.mediaElement.duration
+      this.currentSec = this.mediaElement.currentTime
+      if (this.mediaElement.currentTime >= this.endSec) this.mediaElement.setCurrentTime(this.startSec)
     }
   },
   async mounted () {
     this.$log('mounted')
     this.$log('start', this.start)
     this.$log('end', this.end)
-    this.editor = new window.MediaElementPlayer('kvideo', {
-      // autoplay: true,
+    this.editor = new window.MediaElementPlayer(this.$refs.kplayer, {
+      autoplay: true,
+      controls: false,
       showPosterWhenPaused: false,
       clickToPlayPause: true,
       iPadUseNativeControls: false,
       iPhoneUseNativeControls: false,
       AndroidUseNativeControls: false,
       success: async (mediaElement, originalNode, instance) => {
-        await this.$wait(2000)
-        this.editorReady = true
-        this.video = document.getElementById('kvideo')
-        this.video.addEventListener('timeupdate', this.timeUpdate, false)
+        this.$log('mediaElement success!')
+        this.mediaElement = mediaElement
+        this.mediaElement.addEventListener('timeupdate', this.timeUpdate, false)
+        this.mediaElement.setCurrentTime(this.startSec)
+        // await this.$wait(2000)
+        this.videoShow = true
+        this.$log('duration!? ', this.mediaElement.duration)
       }
     })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.video.removeEventListener('timeupdate', this.timeUpdate)
+    this.mediaElement.removeEventListener('timeupdate', this.timeUpdate)
   }
 }
 </script>

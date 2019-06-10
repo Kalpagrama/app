@@ -12,8 +12,9 @@ div(style=`position: relative`).row.full-width
         div(style=`borderRadius: 4px`).row.fit.items-center.justify-center.bg-grey-2
           q-icon(name="fab fa-youtube" color="grey-4" size="30px")
       .col
-        .row.fit.items-start.content-start.q-pa-sm
-          div(style=`height: 20px; minHeight: 20px; borderRadius: 4px`).row.full-width.bg-grey-2
+        .row.fit.items-start.content-start.q-pa-xs
+          div(style=`height: 20px; minHeight: 20px; borderRadius: 4px`).row.full-width.bg-grey-2.q-mb-xs
+          div(style=`height: 20px; minHeight: 20px; borderRadius: 4px; width: 180px`).row.bg-grey-2
   //- real
   div(v-else).row.full-width
     div(v-for="(v, vi) in videos" :key="v.id"

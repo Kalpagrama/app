@@ -11,10 +11,10 @@ div(style=`position: relative; height: 190px`).row.full-width
       ).row.full-width.items-start.conent-start.q-px-sm.bg-green
       small.row.full-width startSec/startPx  {{startSec}} / {{startPx}}
       small.row.full-width endSec/endPx {{endSec}} / {{endPx}}
-      small.row.full-width currentSec/currentPx {{currentSec}} / {{currentPx}}
+      small.row.full-width currentSec/currentPx {{current}} / {{currentPx}}
       small.row.full-width durationSec/durationPx {{durationSec}} / {{durationPx}}
       small.row.full-width durationTotalSec/durationTotalPx {{durationTotalSec}} / {{durationTotalPx}}
-      small.row.full-width {{ editor.duration }}
+      small.row.full-width {{ mediaElement.duration }}
     //- frame
     //- length
     div(style=`position: relative; height: 3px;`).row.full-width.bg-grey-7
@@ -46,12 +46,11 @@ div(style=`position: relative; height: 190px`).row.full-width
 <script>
 export default {
   name: 'slider',
-  props: ['editor', 'start', 'end'],
+  props: ['mediaElement', 'duration', 'current', 'start', 'end'],
   data () {
     return {
       startSec: 0,
       endSec: 0,
-      currentSec: 0,
       time: null,
       muted: false
     }
@@ -70,13 +69,6 @@ export default {
         // this.$log('emit endSec', to)
         this.$emit('endSec', to)
       }
-    },
-    currentSec: {
-      handler (to, from) {
-        if (to >= this.endSec) {
-          this.editor.setCurrentTime(this.startSec)
-        }
-      }
     }
   },
   computed: {
@@ -87,10 +79,10 @@ export default {
       return this.startPx + this.durationPx
     },
     currentPx () {
-      return this.secPx(this.currentSec)
+      return this.secPx(this.current)
     },
     durationTotalSec () {
-      return this.editor.duration
+      return this.duration
     },
     durationTotalPx () {
       return window.innerWidth
@@ -105,9 +97,9 @@ export default {
   methods: {
     mute () {
       if (this.muted) {
-        this.editor.setMuted(false)
+        this.mediaElement.setMuted(false)
       } else {
-        this.editor.setMuted(true)
+        this.mediaElement.setMuted(true)
       }
       this.muted = !this.muted
     },
@@ -127,14 +119,14 @@ export default {
       if (p > 0) {
         // this.$log('dragStart p', this.pxSec(p))
         this.startSec = this.pxSec(p)
-        this.editor.setCurrentTime(this.startSec)
+        this.mediaElement.setCurrentTime(this.startSec)
       }
     },
     dragCenter (e) {
       // this.$log('dragCenter', e.position.left)
       let p = e.position.left
       if (p >= this.startPx && p <= this.endPx) {
-        this.editor.setCurrentTime(this.pxSec(p))
+        this.mediaElement.setCurrentTime(this.pxSec(p))
       }
     },
     dragEnd (e) {
@@ -143,26 +135,20 @@ export default {
       this.draggingEnd = true
       if (p < this.durationTotalPx) {
         // this.$log('dragEnd p', this.pxSec(p))
-        this.editor.setCurrentTime(this.pxSec(p))
+        this.mediaElement.setCurrentTime(this.pxSec(p))
         this.endSec = this.pxSec(p)
       }
     }
   },
   mounted () {
     this.$log('mounted', this.start, this.end)
-    this.editor.setVolume(1)
+    this.mediaElement.setVolume(1)
     this.startSec = this.start
-    this.editor.setCurrentTime(this.start)
-    this.currentSec = this.start
+    this.mediaElement.setCurrentTime(this.start)
     this.endSec = this.end
-    // update function
-    this.time = setInterval(() => {
-      this.currentSec = this.editor.currentTime
-    }, 500)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    clearInterval(this.time)
   }
 }
 </script>

@@ -6,7 +6,7 @@
 
 <script>
 // user drafs in workspace
-import editorNode from './editor_node'
+import editorNode from 'components/editor_node'
 export default {
   name: 'pageApp_Create',
   components: {editorNode},
