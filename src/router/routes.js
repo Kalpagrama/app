@@ -26,6 +26,10 @@ const routes = [
     ]
   },
   {
+    path: '/share',
+    component: () => import('layouts/share_layout.vue')
+  },
+  {
     path: '*',
     component: () => import('pages/Error404.vue')
   }

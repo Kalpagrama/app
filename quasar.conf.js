@@ -131,7 +131,17 @@ module.exports = function (ctx) {
             'sizes': '256x256',
             'type': 'image/png'
           }
-        ]
+        ],
+        share_target: {
+          action: '/share-target/',
+          method: 'GET',
+          enctype: 'application/x-www-form-urlencoded',
+          params: {
+            title: 'SHaRe kalpagramma',
+            text: 'what u want to sshrare JSON.stringify',
+            url: '/share'
+          }
+        }
       }
     },
     cordova: {
