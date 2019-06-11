@@ -61,18 +61,20 @@ export default {
     }
   },
   watch: {
-    page: {
-      deep: true,
-      immediate: false,
-      handler (to, from) {
-        this.$router.push({ name: to.id, params: { page: to.id } })
-      }
-    },
     '$route': {
       deep: true,
       immediate: true,
       handler (to, from) {
         this.$log('$route CHANGED', to)
+        if (!to.name) {
+          // this.$log('NO PAGE')
+          this.$set(this, 'page', this.pages[0])
+        } else {
+          // this.$log('GOT PAGE', this.$route.name)
+          let findPage = this.pages.find(p => p.id === to.name)
+          if (findPage) this.$set(this, 'page', findPage)
+          else this.$set(this, 'page', this.pages[0])
+        }
       }
     }
   },
@@ -88,8 +90,7 @@ export default {
     },
     pageClick (p) {
       this.$log('pageClick', p)
-      this.$set(this, 'pageId', p.id)
-      this.$set(this, 'page', p)
+      this.$router.push({name: p.id})
     }
   },
   async mounted () {
@@ -98,17 +99,6 @@ export default {
     // check token
     let token = this.$route.query.token
     if (token) localStorage.setItem('ktoken', token)
-    // this.$log('ui/store', this.$store.state.ui.show_right_drawer)
-    if (!this.$route.name) {
-      // this.$log('NO PAGE')
-      this.$set(this, 'page', this.pages[0])
-    } else {
-      // this.$log('GOT PAGE', this.$route.name)
-      let findPage = this.pages.find(p => p.id === this.$route.name)
-      if (findPage) this.$set(this, 'page', findPage)
-      else this.$set(this, 'page', this.pages[0])
-    }
-    await this.$wait(500)
     // user check
     let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
       query: gql`

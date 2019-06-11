@@ -23,7 +23,7 @@
           span {{ error }} : (
         //- items
         template(v-else-if="data && data.feed")
-          node-card(v-for="(n, ni) in data.feed.items" :key="n.oid" :node="n" :active="true")
+          node-card(v-for="(n, ni) in data.feed.items" :key="n.oid" :node="getNode(n)")
         //- nothing
         div(v-else style=`height: 100px;`).row.full-width.items-center.justify-center
           q-spinner(size="50px" :thickness="2" color="primary")
@@ -49,6 +49,7 @@ export default {
             totalCount
             nextPageToken
             items {
+              oid
               type
               name
               thumbUrl(preferWidth: 600)
@@ -63,6 +64,12 @@ export default {
       return {
         search: this.search
       }
+    }
+  },
+  methods: {
+    getNode (n) {
+      this.$log('getNode', n)
+      return {visible: true, ...n}
     }
   },
   mounted () {

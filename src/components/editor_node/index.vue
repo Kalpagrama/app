@@ -20,7 +20,7 @@ div(style=`position: relative`).column.fit
       @end="nodeFull.fragments[typeIndex].relativePoints[1]['x'] = $event"
       @done="videoEdited")
     //- sphere
-    sphere-find(v-if="showShpereFind" @sphereAdd="sphereAdd" @close="$refs.showDialog.hide(), showShpereFind = false")
+    sphere-find(v-if="showShpereFind" @sphere="sphereAdd" @close="$refs.showDialog.hide(), showShpereFind = false")
   //- ====
   //- node
   .row.bg-grey-3.q-pa-md
@@ -40,22 +40,20 @@ div(style=`position: relative`).column.fit
           q-btn(flat round dense color="white" icon="edit" @click="fragmentEdit(index)").shadow-10
   //- =======
   //- spheres
-  div(style=`borderTop: 1px solid #eee; borderBottom: 1px solid #eee; height: 50px`).row.full-width.items-center
-    .col.full-height
-      div(v-if="nodeFull.spheres.length === 0" @click="sphereFind").row.fit.items-center.hr.cursor-pointer
-        span.text-grey-8.q-ml-md Добавь тэги
-      div(v-else).row.fit.q-px-sm
-        div(style=`maxWidth: 100%`).row.fit.items-center.bg-white.no-wrap.scroll
-          div(v-for="(t, ti) in nodeFull.spheres" :key="ti" style=`height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-2
-            span #
-            span {{ t.name }}
-            //- div(style=`height: 30px; width: 30px`)
-            q-btn(icon="clear" @click="sphereDelete(t, ti)" dense flat round size="xs" color="black")
-    q-btn(v-if="nodeFull.spheres.length < 4" outline round dense icon="add" color="primary" size="md" @click="sphereFind()").q-mx-md
+  div(v-if="nodeFull.spheres.length > 0" :style=`{height: '46px', borderBottom: '1px solid #eee', width: $store.state.ui.width+'px'}`).row.items-end.content-end.q-px-lg
+    div(style=`height: 40px; maxWidth: 100%; overflowY: hidden; overflowX: auto`).row.full-width.items-center.no-wrap.scroll
+      div(v-for="(s, si) in nodeFull.spheres" :key="si"
+        style=`display: inline-block; height: 30px; borderRadius: 5px; white-space: nowrap`
+        ).row.items-center.q-pa-xs.q-mr-sm.bg-grey-3
+        span(style=`white-space: nowrap`) {{ `#${s.name}` }}
+        q-btn(flat round icon="clear" @click="sphereDelete(s, si)" dense size="xs").q-ml-xs
+  .row.full-width.justify-end.q-px-lg.q-py-sm
+    //- q-btn(@click="sphereDeleteAll()" no-caps outline rounded color="primary" v-if="nodeFull.spheres.length > 0").q-mr-sm Удалить все
+    q-btn(@click="sphereFind()" no-caps rounded color="primary" v-if="nodeFull.spheres.length < 4") Добвить тэг
   .col.scroll
   //- ============
   //- form publish
-  div(style=`minHeight: 100px; borderTop: 1px solid #eee`).row.full-width.items-center.justify-between.q-px-md
+  div(style=`height: 80px; borderTop: 1px solid #eee`).row.full-width.items-center.justify-between.q-px-md
     .col
       .row.fit.items-center.q-pr-md
         q-btn(rounded outline style=`height: 50px;` color="primary" no-caps @click="nodeSave()" :loading="nodeSaving").full-width Сохранить
@@ -195,6 +193,10 @@ export default {
     sphereDelete (s, si) {
       this.$log('sphereDelete')
       this.nodeFull.spheres = this.nodeFull.spheres.filter(sphere => sphere.name !== s.name)
+    },
+    sphereDeleteAll () {
+      this.$log('sphereDeleteAll')
+      this.nodeFull.spheres = []
     },
     // node
     async nodeCreate () {

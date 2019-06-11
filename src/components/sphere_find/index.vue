@@ -12,8 +12,10 @@
       .row.fit.items-center.content-center
         .row.full-width
           .col.q-pl-sm
-            q-input(v-model="search" filled placeholder="Найти тэги" @click="searchClick"
-              :maxlength="50"
+            q-input(v-model="search" filled placeholder="Найти тэги"
+              @keyup.esc="cancelClick"
+              @keyup.enter="sphereClick({name: search})"
+              :maxlength="30" autofocus
               :class="{'q-pr-sm': bodyType === 'device'}").fit
               template(v-slot:prepend)
                 q-icon(name="search")
@@ -25,7 +27,7 @@
       template(v-slot="{ result: { loading, error, data } }")
         template(v-if="data && data.feed")
           //- sphere item
-          div(v-for="(s, si) in data.feed.items" :key="si" @click="$emit('sphereAdd', {oid: s.oid, name: s.name}), $emit('close')"
+          div(v-for="(s, si) in data.feed.items" :key="si" @click="sphereClick(s)"
             style=`height: 40px; borderTop: 1px solid #eee`
               ).row.full-width.items-center.q-px-sm.bg-white.hr.cursor-pointer
             span #
@@ -81,19 +83,33 @@ export default {
       }
     }
   },
+  watch: {
+    search: {
+      handler (to, from) {
+        if (to.length === 0) {
+          this.bodyType = 'device'
+          this.$tween.to('.kheader', 0.5, {height: this.$store.state.ui.width + 'px'})
+        } else {
+          this.bodyType = 'list'
+          this.$tween.to('.kheader', 0.5, {height: '70px'})
+        }
+      }
+    }
+  },
   methods: {
+    sphereClick (s) {
+      this.$log('sphereClick', s)
+      this.$emit('sphere', {name: s.name})
+      this.$emit('close')
+    },
     handleResult (e) {
       this.$log('handleResult', e)
     },
     cancelClick () {
       this.$log('cancelClick')
+      this.search = ''
       this.bodyType = 'device'
       this.$tween.to('.kheader', 0.5, {height: this.$store.state.ui.width + 'px'})
-    },
-    searchClick () {
-      this.$log('searchClick')
-      this.bodyType = 'list'
-      this.$tween.to('.kheader', 0.5, {height: '70px'})
     }
   },
   async mounted () {

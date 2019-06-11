@@ -25,19 +25,19 @@ div(:style=`{
     .col
       .row.fit.items-center.justify-start
         div.row.full-height.items-center
-          q-btn(icon="reply_all" color="grey-8" flat no-caps dense @click="shareClick").q-ml-xs Share
+          q-btn(icon="reply_all" color="grey-8" flat no-caps dense @click="shareClick()").q-ml-xs Share
     div.row.full-height.items-center
       span 1233
-      q-btn(icon="share" size="md" color="grey-8" flat round dense).q-mr-md
+      q-btn(icon="share" size="md" color="grey-8" flat round dense @click="nodeChain()").q-mr-md
       small 5 /
       span.q-mb-xs 3.45
-      q-btn(icon="track_changes" size="lg" color="grey-8" flat round dense)
+      q-btn(icon="track_changes" size="lg" color="grey-8" flat round dense @click="nodeRate()")
   //- node spheres
   div(style=`order: 50; height: 46px`).row.full-width.items-end.content-end.q-px-md
     div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
-      div(v-for="(s, si) in spheres" :key="s.oid" style=`height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3
-        span #
-        span {{ s.name }}
+      div(v-for="(s, si) in nodeFull.spheres" :key="s.oid" @click="sphereClick(s, si)"
+        style=`display: inline-block; height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3
+        span(style=`white-space: nowrap`) {{ `#${s.name}` }}
 </template>
 
 <script>
@@ -53,10 +53,10 @@ export default {
   data () {
     return {
       spheres: [
-        {oid: 't1', name: 'смерть'},
-        {oid: 't2', name: 'сталин'},
-        {oid: 't3', name: 'справедливость'},
-        {oid: 't4', name: 'неприкосновенность'}
+        {oid: 't1', name: 'смертьkla sklmaslk  slkas'},
+        {oid: 't2', name: 'сталин  kakask laks '},
+        {oid: 't3', name: 'справедливость lkasl'},
+        {oid: 't4', name: 'неприкосновенность a  anan an alnaslknl'}
       ],
       nodeLoaded: false,
       nodeFull: {
@@ -90,11 +90,40 @@ export default {
           .catch((error) => this.$log('Error sharing', error))
       } else {
         this.$log('Cant share')
+        this.$q.notify({
+          message: 'Cant share now :(',
+          color: 'green',
+          textColor: 'white'
+        })
       }
+    },
+    sphereClick (s, si) {
+      this.$log('sphereClick', s, si)
+      this.$q.notify({
+        message: 'Cant go to sphere now :(',
+        color: 'green',
+        textColor: 'white'
+      })
     },
     nodeClick () {
       this.$log('nodeClick', this.item)
       // this.$router.push({name: 'node'})
+    },
+    nodeRate () {
+      this.$log('nodeRate')
+      this.$q.notify({
+        message: 'Cant rate now :(',
+        color: 'green',
+        textColor: 'white'
+      })
+    },
+    nodeChain () {
+      this.$log('nodeChain')
+      this.$q.notify({
+        message: 'Cant chain now :(',
+        color: 'green',
+        textColor: 'white'
+      })
     },
     async nodeLoad () {
       this.$log('nodeLoad start')
@@ -154,6 +183,7 @@ export default {
   watch: {
     node: {
       deep: true,
+      immediate: true,
       handler (to, from) {
         // this.$log('node CHANGED', to)
         if (to.visible === true && this.nodeLoaded === false) {

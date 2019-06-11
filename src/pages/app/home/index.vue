@@ -25,7 +25,7 @@
           node-card(v-for="(n, ni) in data.sphereNodesFeed.items" :key="n.oid" :node="n" :active="false"
             v-observe-visibility=`{
               callback: (isVisible, entry) => visibilityChanged(isVisible, entry, n, ni),
-              throttle: ni <  2 ? 0 : 700
+              throttle: ni <  2 ? 0 : 300
             }`)
         //- nothing
         div(v-else style=`height: 100px;`).row.full-width.items-center.justify-center
