@@ -1,5 +1,5 @@
 <template lang="pug">
-div(style=`position: relative; height: 200px; overflow: auto`).row.full-width
+div(style=`position: relative; zIndex: 20; height: 200px; overflow: auto`).row.full-width
     div(style="position: absolute; zIndex: 200").row.full-width.items-center.justify-end.q-pa-sm
       q-btn(dense round flat :icon="muted ? 'volume_off' : 'volume_up'" color="white" @click="toggleMute").shadow-5
     div(style=`height: 200px; overflow: hidden` ref="kvideoWrapper").row.full-width

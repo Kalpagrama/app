@@ -16,9 +16,9 @@ export default {
     return {
       types: [
         {id: 'IMAGE', label: 'Изображение', icon: 'image', color: 'green'},
-        {id: 'VIDEO', label: 'Видео', icon: 'fab fa-youtube', color: 'red'}
-        // {id: 'quote', label: 'Цитата', icon: 'format_quote', color: 'grey'},
-        // {id: 'vkpost', label: 'Пост ВК', icon: 'fab fa-vk', color: 'blue'}
+        {id: 'VIDEO', label: 'Видео', icon: 'fab fa-youtube', color: 'red'},
+        // {id: 'BOOK', label: 'Книга', icon: 'format_quote', color: 'grey'},
+        // {id: 'AUDIO', label: 'Аудио', icon: 'audiotrack', color: 'blue'}
       ]
     }
   },

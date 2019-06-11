@@ -5,7 +5,7 @@ div(:style=`{position: 'relative'}`).row.fit
   //- div(v-if="$slots.editor" style=`position: absolute; zIndex: 100`).row.bg
   slot(name="editor")
   div(v-if="type !== 'none' && state === 'preview'" @click="state = 'active'"
-    ).row.fit.bg-pink
+    ).row.fit
     img(:src="preview" width="100%" height="100%")
   div(v-else-if="type === 'VIDEO' && state === 'active'").row.fit.bg-red
     node-video(

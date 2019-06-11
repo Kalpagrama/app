@@ -33,7 +33,7 @@ div(style=`position: relative`).column.fit
       //- editor slot
       template(v-slot:editor="{ index }")
         div(v-if="types[index] === 'none'").row.fit.items-center.justify-center
-          q-btn(flat round color="primary" icon="add" size="lg" @click="typeFind(index)")
+          q-btn(outline round color="primary" icon="add" size="lg" @click="typeFind(index)")
         div(v-if="types[index] === 'VIDEO'" style=`position: absolute; zIndex: 100; height: 50px`
           ).row.full-width.items-center.justify-start.q-px-sm
           q-btn(flat round dense color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
@@ -256,6 +256,7 @@ export default {
         this.$log('nodeCreate', res)
         this.$log('nodeCreate done')
         this.$q.notify({message: `Ядро создано!`, color: 'primary', textColor: 'white'})
+        this.$router.push({name: 'home'})
         this.nodeCreating = false
       } catch (error) {
         this.$log('nodeCreate error', error)

@@ -25,7 +25,7 @@ div(:style=`{
     .col
       .row.fit.items-center.justify-start
         div.row.full-height.items-center
-          q-btn(icon="reply_all" color="grey-8" flat no-caps dense).q-ml-xs Share
+          q-btn(icon="reply_all" color="grey-8" flat no-caps dense @click="shareClick").q-ml-xs Share
     div.row.full-height.items-center
       span 1233
       q-btn(icon="share" size="md" color="grey-8" flat round dense).q-mr-md
@@ -78,6 +78,20 @@ export default {
     }
   },
   methods: {
+    shareClick () {
+      this.$log('shareClick')
+      if (navigator.share) {
+        navigator.share({
+            title: 'Web Fundamentals',
+            text: 'Check out Web Fundamentals — it rocks!',
+            url: 'https://developers.google.com/web',
+        })
+          .then(() => this.$log('Successful share'))
+          .catch((error) => this.$log('Error sharing', error))
+      } else {
+        this.$log('Cant share')
+      }
+    },
     nodeClick () {
       this.$log('nodeClick', this.item)
       // this.$router.push({name: 'node'})

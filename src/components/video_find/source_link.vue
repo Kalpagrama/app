@@ -2,7 +2,7 @@
 .row.fit
   div(style=`position: absolute; bottom: 0px; zIndex: 100; height: 60px`).row.full-width.justify-center.items-center
     q-btn(
-      @click="$emit('video', {url: link})"
+      @click="$emit('video', {url: link}), $emit('close')"
       style=`height: 50px; width: 250px; bottom: 10px;` rounded no-caps color="primary") Выбрать видео
   iframe(
     v-if="type === 'youtube'"

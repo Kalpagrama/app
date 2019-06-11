@@ -7,6 +7,7 @@ div(
   //- top
   div(
     :style=`{
+    zIndex: 100,
     borderBottomLeftRadius: '100%10px',
     borderBottomRightRadius: '100%10px',
     overflow: 'hidden'}`).col.bg-grey-4
@@ -21,6 +22,7 @@ div(
   //- bottom
   div(
     :style=`{
+    zIndex: 100,
     borderTopLeftRadius: '100%10px',
     borderTopRightRadius: '100%10px',
     overflow: 'hidden'}`).col.bg-grey-4
