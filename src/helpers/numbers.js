@@ -1,4 +1,4 @@
-export function bigNumber(val) {
+export function bigNumbers(val) {
     let units = '';
     const steps = [
         { value: 10 ** 9, unit: 'B' },

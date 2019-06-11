@@ -1,0 +1,92 @@
+<template lang="pug">
+div(:style=`{position: 'relative'}`).row.fit
+  //- div(v-if="type === 'none'").row.fit.bg-grey-3
+  //-   slot(name="empty")
+  //- div(v-if="$slots.editor" style=`position: absolute; zIndex: 100`).row.bg
+  slot(name="editor")
+  div(v-if="type !== 'none' && state === 'preview'" @click="state = 'active'"
+    ).row.fit
+    img(:src="preview" width="100%" height="100%")
+  div(v-else-if="type === 'VIDEO' && state === 'active'").row.fit.bg-red
+    node-video(
+      :index="index"
+      :url="fragment.content.url"
+      :startSec="getStartSec"
+      :endSec="getEndSec")
+      template(v-slot:actions)
+        slot(name="actions")
+  div(v-else-if="type === 'IMAGE' && state === 'active'").row.fit.bg-green
+    node-image(:url="fragment.content.url")
+</template>
+
+<script>
+import nodeVideo from './node_video'
+import nodeImage from './node_image'
+export default {
+  name: 'nodeFragment',
+  components: { nodeVideo, nodeImage },
+  props: {
+    index: {
+      type: Number
+    },
+    type: {
+      type: String,
+      default: 'VIDEO'
+    },
+    fragment: {
+      default: () => {
+        return {
+          name: '',
+          content: {
+            type: 'VIDEO'
+          }
+        }
+      }
+    },
+    visible: {
+      type: Boolean
+    },
+    preview: {
+      type: String
+    }
+  },
+  computed: {
+    getStartSec () {
+      if (this.fragment.relativePoints.length > 0) {
+        return this.fragment.relativePoints[0]['x']
+      } else {
+        return 0
+      }
+    },
+    getEndSec () {
+      if (this.fragment.relativePoints.length > 1) {
+        return this.fragment.relativePoints[1]['x']
+      } else {
+        return 10
+      }
+    }
+  },
+  watch: {
+    type: {
+      async handler (to, from) {
+        this.$log('type CHANGED', to)
+        if (to === 'VIDEO') {
+        }
+      }
+    }
+  },
+  data () {
+    return {
+      state: 'preview',
+      states: ['none', 'preview', 'active'],
+      // type: 'none',
+      types: ['image', 'video', 'none'],
+      editor: null,
+      editorReady: false
+    }
+  },
+  mounted () {
+    // this.$refs.kpreviewWrapper.scrollTop = 50
+  }
+}
+</script>

@@ -2,9 +2,9 @@ module.exports = {
   APP_CONFIG: {
     name: 'app - common',
     backend: {
-      https: false,
+      https: true,
       host: 'api.kalpagramma.com',
-      port: 80
+      port: 443
     },
     frontend: {
       https: true,
@@ -17,7 +17,7 @@ module.exports = {
       static: '/static'
     },
     graphql: {
-      wss: false,
+      wss: true,
       path: '/graphql',
       socket: '/subscriptions'
     },

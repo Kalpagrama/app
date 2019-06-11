@@ -7,10 +7,11 @@
 export default {
     name: 'App',
     beforeMount() {
-      this.$store.commit('providers/init', this);
+      // this.$store.commit('providers/init', this);
+    },
+    mounted () {
+      this.$log('mounted', this.$route)
+      window.HELP_IMPROVE_VIDEOJS = false
     }
-};
+}
 </script>
-
-<style>
-</style>
