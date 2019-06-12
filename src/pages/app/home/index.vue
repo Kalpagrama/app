@@ -21,8 +21,8 @@
         div(v-else-if="error" style=`height: 100px`).row.full-width.items-center.justify-center
           span {{ error }} : (
         //- items
-        template(v-else-if="data && data.sphereNodesFeed")
-          node-card(v-for="(n, ni) in data.sphereNodesFeed.items" :key="n.oid" :node="n" :active="false"
+        template(v-else-if="data && data.sphereNodes")
+          node-card(v-for="(n, ni) in data.sphereNodes.items" :key="n.oid" :node="n" :active="false"
             v-observe-visibility=`{
               callback: (isVisible, entry) => visibilityChanged(isVisible, entry, n, ni),
               throttle: ni <  2 ? 0 : 300
@@ -61,7 +61,7 @@ export default {
       `,
       query2: gql`
         query nodes($oid: OID!) {
-          sphereNodesFeed (sphereOid: $oid, pagination: {pageSize: 50}) {
+          sphereNodes (sphereOid: $oid, pagination: {pageSize: 50}) {
             totalCount
             items {
               oid
