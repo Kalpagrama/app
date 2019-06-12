@@ -7,7 +7,7 @@ div(style=`position: relative; height: 190px`).row.full-width
   //- slider
   div(style=`position: relative; height: 130px`).row.full-width.items-center.content-center
     //- debug
-    div(v-if="true" style=`position: absolute; height: 100px; top: -200px; color: white; opacity: 0.6`
+    div(v-if="false" style=`position: absolute; height: 100px; top: -200px; color: white; opacity: 0.6`
       ).row.full-width.items-start.conent-start.q-px-sm.bg-green
       small.row.full-width startSec/startPx  {{startSec}} / {{startPx}}
       small.row.full-width endSec/endPx {{endSec}} / {{endPx}}
@@ -25,9 +25,9 @@ div(style=`position: relative; height: 190px`).row.full-width
       div(:style=`{position: 'absolute', zIndex: 100, width: '80px', height: '40px', borderRadius: '20px', top: '-44px', left: startPx-35+'px'}`
         v-touch-pan.mouse="dragStart").row.items-center.justify-between.bg-yellow
         div(style=`height: 40px; width: 40px`).row.items-center.justify-center
-          q-btn(round dense flat color="black" icon="keyboard_arrow_left" @click="startSec--")
+          q-btn(round dense flat color="black" icon="keyboard_arrow_left" @click="startSec--, mediaElement.setCurrentTime(startSec)")
         div(style=`height: 40px; width: 40px`).row.items-center.justify-center
-          q-btn(round dense flat color="black" icon="keyboard_arrow_right" @click="startSec++")
+          q-btn(round dense flat color="black" icon="keyboard_arrow_right" @click="startSec++, mediaElement.setCurrentTime(startSec)")
       //- center
       div(:style=`{position: 'absolute', zIndex: 100, width: '10px', height: '10px', borderRadius: '50%', top: '-3px', left: currentPx+'px'}`
         v-touch-pan.mouse="dragCenter").bg-yellow
@@ -38,9 +38,9 @@ div(style=`position: relative; height: 190px`).row.full-width
       div(:style=`{position: 'absolute', zIndex: 100, width: '80px', height: '40px', borderRadius: '20px', bottom: '-44px', left: endPx-35+'px'}`
         v-touch-pan.mouse="dragEnd").row.items-center.justify-between.bg-yellow
         div(style=`height: 40px; width: 40px`).row.items-center.content-center.justify-center
-          q-btn(round dense flat color="black" icon="keyboard_arrow_left" @click="endSec--")
+          q-btn(round dense flat color="black" icon="keyboard_arrow_left" @click="endSec--, mediaElement.setCurrentTime(endSec)")
         div(style=`height: 40px; width: 40px`).row.items-center.content-center.justify-center
-          q-btn(round dense flat color="black" icon="keyboard_arrow_right" @click="endSec++")
+          q-btn(round dense flat color="black" icon="keyboard_arrow_right" @click="endSec++, mediaElement.setCurrentTime(endSec)")
 </template>
 
 <script>

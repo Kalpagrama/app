@@ -15,7 +15,7 @@ export default {
   data () {
     return {
       types: [
-        {id: 'IMAGE', label: 'Изображение', icon: 'image', color: 'green'},
+        // {id: 'IMAGE', label: 'Изображение', icon: 'image', color: 'green'},
         {id: 'VIDEO', label: 'Видео', icon: 'fab fa-youtube', color: 'red'},
         // {id: 'BOOK', label: 'Книга', icon: 'format_quote', color: 'grey'},
         // {id: 'AUDIO', label: 'Аудио', icon: 'audiotrack', color: 'blue'}

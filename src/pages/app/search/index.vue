@@ -2,7 +2,7 @@
 .column.fit
   div(style=`height: 70px`
     ).row.full-width.items-end.content-end.q-px-sm
-    q-input(filled label="Найти" v-model="search").fit
+    q-input(filled label="Найти" v-model="search" @input="handleSearch").fit
       template(v-slot:prepend)
         q-icon(name="search")
       template(v-slot:append)
@@ -66,7 +66,21 @@ export default {
       }
     }
   },
+  watch: {
+    '$route': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        let q = to.query.q
+        if (q) this.search = q
+      }
+    }
+  },
   methods: {
+    handleSearch (e) {
+      this.$log('handleSearch')
+      this.$router.push({query: {q: e}})
+    },
     getNode (n) {
       this.$log('getNode', n)
       return {visible: true, ...n}

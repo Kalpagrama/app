@@ -1,9 +1,11 @@
 <template lang="pug">
 div(
   :style=`{
+    position: 'relative',
     height: $store.state.ui.width+10+'px',
     borderRadius: '20px', zIndex: 2, overflow: 'hidden', marginBottom: '-1px'}`
   ).column.full-width.shadow-3.bg-white
+  slot(name="rate")
   //- top
   div(
     :style=`{

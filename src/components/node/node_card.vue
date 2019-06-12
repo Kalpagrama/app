@@ -20,24 +20,34 @@ div(:style=`{
       q-btn(icon="more_vert" color="grey-8" flat round dense)
   //- node body
   node(:node="node" :nodeFull="nodeFull" :types="getTypes")
-  //- node actions
-  div(style=`order: 51; height: 50px`).row.full-width.q-px-sm
-    .col
-      .row.fit.items-center.justify-start
-        div.row.full-height.items-center
-          q-btn(icon="reply_all" color="grey-8" flat no-caps dense @click="shareClick()").q-ml-xs Share
-    div.row.full-height.items-center
-      span 1233
-      q-btn(icon="share" size="md" color="grey-8" flat round dense @click="nodeChain()").q-mr-md
-      small 5 /
-      span.q-mb-xs 3.45
-      q-btn(icon="track_changes" size="lg" color="grey-8" flat round dense @click="nodeRate()")
+    //- node rate
+    template(v-slot:rate)
+      transition(appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
+        div(v-if="rateShow" style=`position: absolute; zIndex: 1000`).row.fit.items-center.justify-center
+          div(style=`position: relative`).row.fit.items-center.justify-center
+            q-icon(name="favorite" size="400px" color="primary")
+            div(style=`position: absolute; zIndex: 1100`).row.fit.items-center.justify-center
+              h6.text-white.text-bold {{ rate.name }}
+            //- div(style=`position: absolute: zIndex: 2000`).row.full-width.bg-green
+            //-   span.text-white rate {{ rate }}
   //- node spheres
-  div(style=`order: 50; height: 46px`).row.full-width.items-end.content-end.q-px-md
+  div(style=`height: 46px`).row.full-width.items-end.content-end.q-px-md
     div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
       div(v-for="(s, si) in nodeFull.spheres" :key="s.oid" @click="sphereClick(s, si)"
         style=`display: inline-block; height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3
         span(style=`white-space: nowrap`) {{ `#${s.name}` }}
+  //- node actions
+  div(style=`height: 60px`).row.full-width.q-px-sm
+    .col
+      .row.fit.items-center.justify-start
+        div.row.full-height.items-center
+          q-btn(icon="reply_all" color="grey-8" flat no-caps dense @click="shareClick()").q-ml-xs
+    div.row.full-height.items-center
+      //- span 1233
+      //- q-btn(icon="share" size="md" color="grey-8" flat round dense @click="nodeChain()").q-mr-md
+      small {{ rate.id }} /
+      span.q-mb-xs 3.45
+      q-btn(icon="track_changes" size="lg" color="grey-8" flat round @click="nodeRate()")
 </template>
 
 <script>
@@ -66,7 +76,17 @@ export default {
           {content: { type: 'none', poster: this.node.thumbUrl[1] }}
         ],
         spheres: []
-      }
+      },
+      rate: {id: 1, name: 'Нет', rate: 0.0},
+      rateNext: {id: 2, name: 'Cкорее нет', rate: 0.25},
+      rateShow: false,
+      rates: [
+        {id: 1, name: 'Нет', rate: 0.0},
+        {id: 2, name: 'Скорее нет', rate: 0.25},
+        {id: 3, name: 'Может быть', rate: 0.5},
+        {id: 4, name: 'Скорее да', rate: 0.75},
+        {id: 5, name: 'Да', rate: 1.0}
+      ]
     }
   },
   computed: {
@@ -99,23 +119,33 @@ export default {
     },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
-      this.$q.notify({
-        message: 'Cant go to sphere now :(',
-        color: 'green',
-        textColor: 'white'
-      })
+      this.$router.push({name: 'search', query: {q: s.name}})
     },
     nodeClick () {
       this.$log('nodeClick', this.item)
       // this.$router.push({name: 'node'})
     },
-    nodeRate () {
-      this.$log('nodeRate')
-      this.$q.notify({
-        message: 'Cant rate now :(',
-        color: 'green',
-        textColor: 'white'
+    async nodeRate () {
+      this.rate = this.rateNext
+      this.rateShow = false
+      this.rateShow = true
+      await this.$wait(500)
+      this.rateShow = false
+      if (this.rate.id === 5) this.rateNext = this.rates[0]
+      else this.rateNext = this.rates[this.rate.id]
+      // rate mutation
+      let {data: { nodeRate }} = await this.$apollo.mutate({
+        mutation: gql`
+          mutation nodeRate($oid: OID!, $rate: Float!) {
+            nodeRate(oid: $oid, rate: $rate)
+          }
+        `,
+        variables: {
+          oid: this.node.oid,
+          rate: this.rate.rate
+        }
       })
+      this.$log('nodeRate', nodeRate)
     },
     nodeChain () {
       this.$log('nodeChain')

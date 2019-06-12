@@ -83,6 +83,8 @@ export default {
         part: 'id',
         videoType: 'any',
         type: 'video',
+        // eventType: 'completed',
+        // videoDimension: '2d',
         q: this.search,
         key: 'AIzaSyB8GBdF67E-F0P8eG3o5egrylnepVAsPLg',
       }
