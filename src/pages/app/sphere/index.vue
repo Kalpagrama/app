@@ -26,7 +26,7 @@
   div(v-show="sphereSpheresShow" style=`minHeight: 40px; borderBottom: 1px solid #eee; overflowY: hidden` body-scroll-lock-ignore).row.full-width.q-pa-sm.scroll
     //- rows
     div(
-      v-for="(r, ri) in 3" :key="ri"
+      v-for="(r, ri) in getRows" :key="ri"
       style=`height: 40px`).row.full-width.no-wrap
       //- spheres
       div(
@@ -93,6 +93,15 @@ export default {
     variables () {
       return {
         oid: this.$route.query.sphere
+      }
+    },
+    getRows () {
+      if (this.spheres.length <= 4) {
+        return 1
+      } else if (this.spheres.length <= 8) {
+        return 2
+      } else {
+        return 3
       }
     }
   },
@@ -171,7 +180,7 @@ export default {
     spheresShow(ri, si) {
       // ri
       let l = this.spheres.length
-      let rl = Math.ceil(this.spheres.length / 3)
+      let rl = Math.ceil(this.spheres.length / this.getRows)
       if (ri === 0) {
         return si < (ri + 1) * rl
       } else {
