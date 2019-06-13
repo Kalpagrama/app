@@ -12,7 +12,7 @@
       q-btn(icon="more_vert" flat round color="primary")
   //- body
   div(style=`paddingTop: 0px` body-scroll-lock-ignore).col.scroll.bg-grey-3
-    apollo-query(v-if="true" :query="query" :variables="variables")
+    apollo-query(v-if="true" :query="query2" :variables="variables")
       template(v-slot="{ result: { loading, error, data } }")
         //- loading
         div(v-if="loading" style=`height: 100px`).row.full-width.items-center.justify-center
