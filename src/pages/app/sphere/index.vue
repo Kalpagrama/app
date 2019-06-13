@@ -35,7 +35,7 @@
         style=`borderRadius: 4px`
         :class=`{'bg-grey-3': s.oid !== $route.query.sphere, 'bg-grey-5': s.oid === $route.query.sphere}`
         ).row.items-center.q-pa-xs.q-ma-xs.bg-grey-3.hr.cursor-pointer
-        span {{ `#${s.name}` }}
+        span(style=`white-space: nowrap`) {{ `#${s.name}` }}
   //- sphere nodes
   div(body-scroll-lock-ignore).col.scroll.bg-grey-3
     apollo-query(v-if="!loading && sphere" :query="query" :variables="variables" @result="handleResult" :deep="true")
