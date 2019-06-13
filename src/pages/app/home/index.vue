@@ -60,9 +60,14 @@ export default {
         }
       `,
       query2: gql`
+<<<<<<< HEAD
         query feed {
           feed(type: NEWS, pagination: {pageSize: 5, pageToken: null} filter: {types:[NODE]} ){
             count
+=======
+        query nodes($oid: OID!) {
+          sphereNodes (sphereOid: $oid, pagination: {pageSize: 50}) {
+>>>>>>> 936686b087f8bab86f56cfb869f0d8331ccbc953
             totalCount
             nextPageToken
             items {
