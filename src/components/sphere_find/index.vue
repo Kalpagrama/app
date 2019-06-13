@@ -61,14 +61,13 @@ export default {
               thumbUrl(preferWidth:10)
               createdAt
               ... on FeedItem {
-                id
-                  description
-                  weight
-                  rate
-                  viewed
-                  author {
-                    name        
-                  }
+                description
+                weight
+                rate
+                viewed
+                author {
+                  name        
+                }
               }         
             }
           }

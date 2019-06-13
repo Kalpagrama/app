@@ -11,7 +11,8 @@ const routes = [
       { name: 'search', path: 'search', component: () => import('pages/app/search') },
       { name: 'create', path: 'create', component: () => import('pages/app/create') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
-      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') }
+      { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
+      { name: 'sphere', path: 'sphere', component: () => import('pages/app/sphere') }
     ]
   },
   {

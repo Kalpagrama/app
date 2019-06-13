@@ -1,46 +1,33 @@
 <template lang="pug">
-  q-layout(view='lHh Lpr lFf' :style=`{height: height+'px'}`
-    @resize="handleResize")
-    //- left drawer
-    //- q-drawer(v-model="show_left_drawer")
-    //-     .column.fit.bg-white.justify-center.items-center
-    //-         span Menu
-    //- right drawer
-    //- q-drawer(v-if="!loading" :value="$store.state.ui.show_right_drawer" side="right" @input="$store.commit('ui/state', ['show_right_drawer', false])")
-    //-   settings
-    //- q-header.bg-white.text-black(elevated='' v-show="headerVisible()")
-    //-   q-toolbar
-    //-       q-btn.q-mr-sm(flat='', round='', dense='', icon='menu')
-    //-       q-toolbar-title(v-if="isTitle()") Кальпаграмма
-    //-       q-toolbar-title(v-if="isSearch()")
-    //-           q-input.text-black(borderless standout  color="purple-12" v-model="search" size="sm")
-    //-               template(v-slot:prepend)
-    //-                   q-icon(v-if="search === ''" name="search")
-    //-                   q-icon(v-else name="clear" class="cursor-pointer" @click="search = ''")
-    //-       q-btn(flat='', round='', dense='', icon='more_vert')
-    //- page
-    q-page-container.fit
-      q-page.fit
-        div(v-if="loading").row.fit.items-center.justify-center.content-center
-          div(style=`height: 80px`).row.full-width.items-center.justify-center
-            q-spinner(size="50px" color="primary" :thickness="2")
-        //- TODO: route level transitions
-        //- transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutLeft")
-        router-view(v-else)
-    //- footer
-    q-footer(v-if="!loading && show_footer" bordered).row.full-width.justify-between.bg-white.q-px-sm
-      q-btn(v-if="page" v-for="(p, pi) in pages" :key="pi" flat round
-        :color="page.id === p.id ? 'primary' : 'grey'"
-        :icon="p.icon" size="16px" @click="pageClick(p)")
+  q-layout(view='lHh Lpr lFf' :style=`{height: height+'px'}` @resize="handleResize")
+    div(:style=`{height: $q.screen.height+'px', width: $q.screen.width+'px'}`).column
+      .col.full-width
+        router-view(v-if="!loading").fit
+        div(v-else).row.fit.items-center.justify-center
+          q-spinner(size="50px" :thickness="2" color="primary")
+      div(style=`height: 50px; borderTop: 1px solid #eee`).row.full-width.justify-between.q-px-sm
+        q-btn(v-if="page" v-for="(p, pi) in pages" :key="pi" flat round v-touch-hold="btnHolded"
+          :color="page.id === p.id ? 'primary' : 'grey'"
+          :icon="p.icon" size="16px" @click="pageClick(p)")
+    //- q-page-container.fit
+    //-   q-page.fit
+    //-     div(v-if="loading").row.fit.items-center.justify-center.content-center
+    //-       div(style=`height: 80px`).row.full-width.items-center.justify-center
+    //-         q-spinner(size="50px" color="primary" :thickness="2")
+    //-     //- TODO: route level transitions
+    //-     //- transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutLeft")
+    //-     router-view(v-else)
+    //- q-footer(v-if="!loading && show_footer" bordered).row.full-width.justify-between.bg-white.q-px-sm
+    //-   q-btn(v-if="page" v-for="(p, pi) in pages" :key="pi" flat round
+    //-     :color="page.id === p.id ? 'primary' : 'grey'"
+    //-     :icon="p.icon" size="16px" @click="pageClick(p)")
         //- q-badge(color="red" floating transparent style=`padding: 3px`).q-mr-sm.q-mt-sm 1
 </template>
 
 <script>
-import settings from 'pages/app/settings'
-
 export default {
   name: 'mainLayout',
-  components: { settings },
+  components: {},
   data () {
     return {
       loading: true,
@@ -56,7 +43,7 @@ export default {
         { id: 'search', icon: 'search', name: 'Поиск' },
         { id: 'create', icon: 'add_circle_outline', name: 'Создать' },
         { id: 'notifications', icon: 'notifications_none', name: 'Уведомления' },
-        { id: 'settings', icon: 'menu', name: 'Меню' }
+        { id: 'menu', icon: 'menu', name: 'Меню' }
       ]
     }
   },
@@ -67,18 +54,21 @@ export default {
       handler (to, from) {
         this.$log('$route CHANGED', to)
         if (!to.name) {
-          // this.$log('NO PAGE')
+          this.$log('NO PAGE')
           this.$set(this, 'page', this.pages[0])
         } else {
-          // this.$log('GOT PAGE', this.$route.name)
+          this.$log('GOT PAGE', this.$route.name)
           let findPage = this.pages.find(p => p.id === to.name)
           if (findPage) this.$set(this, 'page', findPage)
-          else this.$set(this, 'page', this.pages[0])
+          else this.$set(this, 'page', this.pages[this.pages.length - 1])
         }
       }
     }
   },
   methods: {
+    btnHolded () {
+      window.location.reload(true)
+    },
     handleScroll (e) {
       this.$log('handleScroll', e)
     },
@@ -109,6 +99,7 @@ export default {
       })
     this.$log('userIsAuthorized', userIsAuthorized)
     this.$log('userIsConfirmed', userIsConfirmed)
+    // TODO: create with try/catch this...
     if (!userIsAuthorized || !userIsConfirmed) {
       this.$log('GO LOGIN')
       this.$router.push('/login')

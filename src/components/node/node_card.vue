@@ -17,7 +17,7 @@ div(:style=`{
         div(style=`minHeight: 18px; height: 18px; borderRadius: 4px; width: 230px`).row.items-center.bg-grey-3.q-mb-xs
         div(style=`minHeight: 15px; height: 15px; borderRadius: 4px; width: 180px`).row.items-center.bg-grey-3
     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      q-btn(icon="more_vert" color="grey-8" flat round dense)
+      //- q-btn(icon="more_vert" color="grey-8" flat round dense)
   //- node body
   node(:node="node" :nodeFull="nodeFull" :types="getTypes")
     //- node rate
@@ -45,9 +45,10 @@ div(:style=`{
     div.row.full-height.items-center
       //- span 1233
       //- q-btn(icon="share" size="md" color="grey-8" flat round dense @click="nodeChain()").q-mr-md
-      small {{ rate.id }} /
+      //- small {{ rate.id }} /
       span.q-mb-xs 3.45
-      q-btn(icon="track_changes" size="lg" color="grey-8" flat round @click="nodeRate()")
+      q-btn(size="lg" color="grey-8" flat round @click="nodeRate()")
+        q-icon(name="track_changes" size="50px")
 </template>
 
 <script>
@@ -119,7 +120,7 @@ export default {
     },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
-      this.$router.push({name: 'search', query: {q: s.name}})
+      this.$router.push({name: 'sphere', query: {sphere: s.oid}})
     },
     nodeClick () {
       this.$log('nodeClick', this.item)
@@ -156,8 +157,8 @@ export default {
       })
     },
     async nodeLoad () {
-      this.$log('nodeLoad start')
-      console.time('nodeLoad')
+      // this.$log('nodeLoad start')
+      // console.time('nodeLoad')
       let { data: { objectList: nodeFull } } = await this.$apollo.query({
         query: gql`
           query getExtendedNodesProps($oid: OID!) {
@@ -204,10 +205,10 @@ export default {
           oid: this.node.oid
         }
       })
-      this.$log('nodeFull', nodeFull[0])
+      // this.$log('nodeFull', nodeFull[0])
       this.nodeFull = nodeFull[0]
-      this.$log('nodeLoad done')
-      console.timeEnd('nodeLoad')
+      // this.$log('nodeLoad done')
+      // console.timeEnd('nodeLoad')
     }
   },
   watch: {

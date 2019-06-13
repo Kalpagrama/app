@@ -12,7 +12,7 @@
     div(v-for="(t, ti) in tags" :key="ti").row
       q-btn(:flat="!tagsSelected.includes(t)" :outline="tagsSelected.includes(t)"
         :disabled="!tagsSelected.includes(t)" color="primary" no-caps) {{ t }}
-  .col.scroll.bg-grey-2
+  div(body-scroll-lock-ignore).col.scroll.bg-grey-2
     apollo-query(:query="query" :variables="variables")
       template(v-slot="{ result: { loading, error, data } }")
         //- loading

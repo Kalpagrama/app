@@ -22,7 +22,7 @@
             small {{ $store.state.auth.user.oid }}
   //- body
   .col.scroll
-    div(v-for="(s, si) in settings" :key="si"
+    div(v-for="(s, si) in settings" :key="si" @click="$router.push({name: s.id})"
       style=`height: 50px`).row.full-width.items-center.q-px-md.hr.cursor-pointer
       div(style=`height: 50px; width: 50px`).row.items-center.justify-center
         q-icon(:name="s.icon" size="30px" color="grey")
@@ -39,7 +39,7 @@
 
 <script>
 export default {
-  name: 'pageAppSettings',
+  name: 'pageApp__Menu',
   data () {
     return {
       setting: null,
@@ -50,7 +50,7 @@ export default {
         // {id: 'profile', name: 'Профиль', icon: 'menu'},
         // {id: 'journal', name: 'Бортовой журнал', icon: 'menu'},
         // {id: 'stories', name: 'Истории', icon: 'menu'},
-        // {id: 'weekly', name: 'Лучшее за неделю', icon: 'menu'},
+        {id: 'sphere', name: 'Сферы', icon: 'blur_circular'},
         {id: 'settings', name: 'Настройки', icon: 'settings'}
       ]
     }

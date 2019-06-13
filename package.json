@@ -34,6 +34,7 @@
     "apollo-upload-client": "^10.0.0",
     "apollo-utilities": "^1.2.1",
     "axios": "^0.18.0",
+    "body-scroll-lock": "^2.6.1",
     "connect-history-api-fallback": "^1.6.0",
     "debug": "^4.1.1",
     "dotenv": "^8.0.0",
