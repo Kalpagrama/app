@@ -205,7 +205,7 @@ export default {
           oid: this.node.oid
         }
       })
-      // this.$log('nodeFull', nodeFull[0])
+      this.$log('nodeFull', nodeFull[0])
       this.nodeFull = nodeFull[0]
       // this.$log('nodeLoad done')
       // console.timeEnd('nodeLoad')
@@ -226,7 +226,7 @@ export default {
   },
   async mounted () {
     // this.$log('mounted')
-    // this.$log('node', this.node)
+    this.$log('node', this.node)
   }
 }
 </script>

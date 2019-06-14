@@ -3,20 +3,20 @@
   //- header
   div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.items-center
     .col
-      .row.fit.items-center.q-px-sm
-        h6(v-if="sphere").q-ma-xs {{ `#${sphere.name}` }}
+      .row.fit.items-center.q-px-sm.scroll
+        h6(v-if="sphere" style=`white-space: nowrap`).q-ma-xs {{ `#${sphere.name}` }}
     div(style=`height: 60px; minWidth: 60px`).row.items-center.justify-center.q-px-sm
       //- q-btn(round flat icon="search")
       q-btn(round flat :icon=`sphereSpheresShow ? 'keyboard_arrow_up' : 'keyboard_arrow_down'` @click="sphereSpheresShow = !sphereSpheresShow")
-      q-btn(round flat icon="more_vert")
-        q-menu()
-          div(style=`minWidth: 150px`).column.fit
-            div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-              span Подписаться
-            div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-              span Поделиться
-            div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-              span Сохранить
+      //- q-btn(round flat icon="more_vert")
+      //-   q-menu()
+      //-     div(style=`minWidth: 150px`).column.fit
+      //-       div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+      //-         span Подписаться
+      //-       div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+      //-         span Поделиться
+      //-       div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+      //-         span Сохранить
   //- spheres find
   //- div(v-if="sphereSpheresShow" style=`height: 60px`).row.items-end.full-width.q-px-sm
   //-   q-input(v-model="search" filled :placeholder="sphere.name" label="Найти сферу").full-width.q-px-xs

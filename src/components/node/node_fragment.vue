@@ -4,6 +4,8 @@ div(:style=`{position: 'relative'}`).row.fit
   div(v-if="state === 'preview'" @click="state = 'active'"
     ).row.fit
     img(:src="preview" width="100%" height="100%")
+  //- div(v-else-if="type === 'VIDEO' && fragment.content.urlGif").row.fit.bg-green
+  //-   span GIF
   div(v-else-if="type === 'VIDEO' && state === 'active'").row.fit.bg-red
     node-video(
       :index="index"
