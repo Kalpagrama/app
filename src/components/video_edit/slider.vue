@@ -128,13 +128,14 @@ export default {
       if (e.direction === 'left') {
         if (p > 0 && this.durationSec < this.durationMax) {
           this.startSec = this.pxSec(p)
+          this.mediaElement.setCurrentTime(this.startSec)
         }
       } else {
         if (this.pxSec(p) < this.endSec) {
            this.startSec = this.pxSec(p)
+           this.mediaElement.setCurrentTime(this.startSec)
         }
       }
-      this.mediaElement.setCurrentTime(this.startSec)
     },
     dragNow (e) {
       // this.$log('dragNow', e.position.left)
@@ -152,9 +153,9 @@ export default {
         if (nextEndSec <= this.durationTotalSec && nextStartSec > 0) {
           this.startSec = nextStartSec
           this.endSec = nextEndSec
+          this.mediaElement.setCurrentTime(this.startSec)
         }
       }
-      this.mediaElement.setCurrentTime(this.startSec)
     },
     dragEnd (e) {
       let p = e.position.left - 50
@@ -162,13 +163,14 @@ export default {
       if (e.direction === 'right') {
         if (p < this.durationTotalPx && this.durationSec < this.durationMax) {
           this.endSec = this.pxSec(p)
+          this.mediaElement.setCurrentTime(this.pxSec(p) - 0.01)
         }
       } else {
         if (this.pxSec(p) > this.startSec && p > 0) {
           this.endSec = this.pxSec(p)
+          this.mediaElement.setCurrentTime(this.pxSec(p) - 0.01)
         }
       }
-      this.mediaElement.setCurrentTime(this.pxSec(p) - 0.01)
     },
     tickStartLeft () {
       // this.$log('tickStartLeft')
