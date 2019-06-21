@@ -51,7 +51,7 @@ export default {
     async done () {
       let points = [{x: this.startSec}, {x: this.endSec}]
       this.$log('done points', points)
-      this.$emit('done', points)
+      this.$emit('done', points, this.duration)
       this.$emit('close')
     },
     timeUpdate (e) {

@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view='lHh Lpr lFf' :style=`{height: height+'px'}` @resize="handleResize")
   q-header.bg-white
-    div(:style=`{height: width+'px', borderBottom: '1px solid #eee'}` @click="$router.push({name: 'index'})").row.full-width.items-center.content-center.justify-center
+    div(:style=`{height: width+'px', maxHeight: '500px', borderBottom: '1px solid #eee'}` @click="$router.push({name: 'index'})").row.full-width.items-center.content-center.justify-center
       div(style=`height: 150px; width: 150px; borderRadius: 50%`).row.items-center.justify-center.bg-primary
         q-icon(name="vertical_align_center" color="white" size="80px")
       .row.full-width.justify-center

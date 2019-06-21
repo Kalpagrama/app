@@ -2,8 +2,8 @@
 div(
   :style=`{
     position: 'relative',
-    height: $store.state.ui.width+10+'px',
-    borderRadius: '20px', zIndex: 2, overflow: 'hidden', marginBottom: '-1px'}`
+    height: '540px',
+    borderRadius: '10px', zIndex: 2, overflow: 'hidden', marginBottom: '-1px'}`
   ).column.full-width.shadow-3.bg-white
   slot(name="rate")
   //- top
@@ -17,7 +17,9 @@ div(
       template(v-slot:editor)
         slot(name="editor" :index="0")
   //- name
-  div(style=`height: 50px`).row.full-width.items-center.content-center.justify-center
+  div(style=`height: 50px`
+    @click="!$slots.name ? $router.push({name: 'node', path: '/app/node', query: {node: node.oid}}) : ''"
+    ).row.full-width.items-center.content-center.justify-center
     span(v-if="!$slots.name") {{ nodeFull.name }}
     //- span.bg {{ nodeFull.name }}
     slot(name="name")

@@ -1,5 +1,5 @@
 const debug = require('debug')('[boot]:apollo')
-// debug.enabled = true
+debug.enabled = true
 import { Notify } from 'quasar'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'

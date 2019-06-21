@@ -1,5 +1,5 @@
 <template lang="pug">
-div(style=`position: relative`).column.fit
+div(style=`position: relative`).column.fit.bg-grey-2
   //- =======
   //- dialogs
   q-dialog(ref="showDialogTypeFind" position="bottom" transition-show="slide-up" transition-hide="slide-down")
@@ -23,41 +23,46 @@ div(style=`position: relative`).column.fit
     sphere-find(v-if="showShpereFind" @sphere="sphereAdd" @close="$refs.showDialog.hide(), showShpereFind = false")
   //- ====
   //- node
-  .row.bg-grey-3.q-pa-md
-    node(:node="node" :nodeFull="nodeFull" :types="types")
-      //- name
-      template(v-slot:name)
-        .row.fit.items-center
-          q-input(v-model="nodeFull.name" borderless :maxlength="45"
-            :input-class="['text-center']" placeholder="В чем суть?").fit
-      //- editor slot
-      template(v-slot:editor="{ index }")
-        div(v-if="types[index] === 'none'").row.fit.items-center.justify-center
-          q-btn(outline round color="primary" icon="add" size="lg" @click="typeFind(index)")
-        div(v-if="types[index] === 'VIDEO'" style=`position: absolute; zIndex: 100; height: 50px`
-          ).row.full-width.items-center.justify-start.q-px-sm
-          q-btn(flat round dense color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
-          q-btn(flat round dense color="white" icon="edit" @click="fragmentEdit(index)").shadow-10
+  .row.full-width.justify-center
+    div(style=`maxWidth: 540px`).row.full-width.q-pa-md
+      node(:node="node" :nodeFull="nodeFull" :types="types")
+        //- name
+        template(v-slot:name)
+          .row.fit.items-center
+            q-input(v-model="nodeFull.name" borderless :maxlength="45"
+              :input-class="['text-center']" placeholder="В чем суть?").fit
+        //- editor slot
+        template(v-slot:editor="{ index }")
+          div(v-if="types[index] === 'none'").row.fit.items-center.justify-center
+            q-btn(outline round color="primary" icon="add" size="lg" @click="typeFind(index)")
+          div(v-if="types[index] === 'VIDEO'" style=`position: absolute; zIndex: 100; height: 50px`
+            ).row.full-width.items-center.justify-start.q-px-sm
+            q-btn(flat round dense color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
+            q-btn(flat round dense color="white" icon="edit" @click="fragmentEdit(index)").shadow-10
   //- =======
   //- spheres
-  div(v-if="nodeFull.spheres.length > 0" :style=`{height: '46px', borderBottom: '1px solid #eee', width: $store.state.ui.width+'px'}`).row.items-end.content-end.q-px-lg
-    div(style=`height: 40px; maxWidth: 100%; overflowY: hidden; overflowX: auto`).row.full-width.items-center.no-wrap.scroll
-      div(v-for="(s, si) in nodeFull.spheres" :key="si"
-        style=`display: inline-block; height: 30px; borderRadius: 5px; white-space: nowrap`
-        ).row.items-center.q-pa-xs.q-mr-sm.bg-grey-3
-        span(style=`white-space: nowrap`) {{ `#${s.name}` }}
-        q-btn(flat round icon="clear" @click="sphereDelete(s, si)" dense size="xs").q-ml-xs
-  .row.full-width.justify-end.q-px-lg.q-py-sm
-    //- q-btn(@click="sphereDeleteAll()" no-caps outline rounded color="primary" v-if="nodeFull.spheres.length > 0").q-mr-sm Удалить все
-    q-btn(@click="sphereFind()" no-caps rounded color="primary" v-if="nodeFull.spheres.length < 4") Добвить тэг
+  div(style=`minHeight: 60px`).row.full-width.justify-center.bg
+    div(v-if="nodeFull.spheres.length > 0"
+      :style=`{maxWidth: '540px', height: '46px', borderBottom: '1px solid #eee', width: $store.state.ui.width+'px'}`).row.full-width.items-end.content-end.q-px-lg
+      div(style=`height: 40px; maxWidth: 100%; overflowY: hidden; overflowX: auto`).row.full-width.items-center.no-wrap.scroll
+        div(v-for="(s, si) in nodeFull.spheres" :key="si"
+          style=`display: inline-block; height: 30px; borderRadius: 5px; white-space: nowrap`
+          ).row.items-center.q-pa-xs.q-mr-sm.bg-grey-3
+          span(style=`white-space: nowrap`) {{ `#${s.name}` }}
+          q-btn(flat round icon="clear" @click="sphereDelete(s, si)" dense size="xs").q-ml-xs
+  div(style=`height: 60px`).row.full-width.justify-center.bg
+    div(style=`maxWidth: 540px`).row.full-width.justify-end.q-px-lg.q-py-sm
+      //- q-btn(@click="sphereDeleteAll()" no-caps outline rounded color="primary" v-if="nodeFull.spheres.length > 0").q-mr-sm Удалить все
+      q-btn(@click="sphereFind()" no-caps rounded color="primary" v-if="nodeFull.spheres.length < 4") Добвить тэг
   .col.scroll
   //- ============
   //- form publish
-  div(style=`height: 80px; borderTop: 1px solid #eee`).row.full-width.items-center.justify-between.q-px-md
-    .col
-      .row.fit.items-center.q-pr-md
-        q-btn(rounded outline style=`height: 50px;` color="primary" no-caps @click="nodeSave()" :loading="nodeSaving").full-width Сохранить
-    q-btn(rounded style=`height: 50px; width: 250px` color="primary" no-caps @click="nodeCreate()" :loading="nodeCreating") Опубликовать
+  div(style=`height: 60px`).row.full-width.justify-center.bg
+    div(style=`height: 80px; maxWidth: 540px; borderTop: 1px solid #eee`).row.full-width.items-center.justify-between.q-px-md
+      .col
+        .row.fit.items-center.q-pr-md
+          q-btn(rounded outline style=`height: 50px;` color="primary" no-caps @click="nodeSave()" :loading="nodeSaving").full-width Сохранить
+      q-btn(rounded style=`height: 50px; width: 250px` color="primary" no-caps @click="nodeCreate()" :loading="nodeCreating") Опубликовать
 </template>
 
 <script>
@@ -165,9 +170,10 @@ export default {
       this.showVideoEdit = true
       this.$refs.showDialog.show()
     },
-    videoEdited (points) {
-      this.$log('videoEdited', points)
+    videoEdited (points, duration) {
+      this.$log('videoEdited', points, duration)
       this.$set(this.nodeFull.fragments[this.typeIndex], 'relativePoints', points)
+      this.$set(this.nodeFull.fragments[this.typeIndex], 'relativeScale', duration)
       // this.nodeFull.fragments[this.typeIndex].relativePoints = points
     },
     async imageChoosen (i) {
@@ -247,8 +253,14 @@ export default {
             node: {
               name: this.nodeFull.name,
               fragments: [
-                {oid: oid1, relativePoints: this.nodeFull.fragments[0].relativePoints, relativeScale: 1000},
-                {oid: oid2, relativePoints: this.nodeFull.fragments[1].relativePoints, relativeScale: 1000}
+                {
+                  oid: oid1,
+                  relativePoints: this.nodeFull.fragments[0].relativePoints,
+                  relativeScale: this.nodeFull.fragments[0].relativeScale},
+                {
+                  oid: oid2,
+                  relativePoints: this.nodeFull.fragments[1].relativePoints,
+                  relativeScale: this.nodeFull.fragments[1].relativeScale}
               ],
               spheres: this.nodeFull.spheres
             }

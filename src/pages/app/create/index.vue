@@ -1,7 +1,8 @@
 <template lang="pug">
 .column.fit.bg-white
   //- workspace(v-if="false")
-  editor-node(v-if="true")
+  //- editor-node(v-if="true")
+  router-view
 </template>
 
 <script>

@@ -1,57 +1,53 @@
 <template lang="pug">
 .column.fit.bg-white
-  //- header
-  div(
-    @click="userClick"
-    style=`height: 100px; borderBottom: 1px solid #eee; paddingLeft: 20px`).row.items-center.full-width
-    //- optimistic UI
-    div(v-if="!$store.state.auth.user").row.full-width
-      div(style=`height: 45px; width: 45px; borderRadius: 50%`).row.items-center.justify-center.bg-grey-2
-      .col
-        .row.fit.content-center.q-px-sm
-          div(style=`height: 20px; minHeight: 20px; borderRadius: 4px; width: 250px`).row.bg-grey-2.q-mb-xs
-          div(style=`height: 18px; minHeight: 18px; borderRadius: 4px; width: 130px`).row.bg-grey-2
-    //- user info
-    div(v-else).row.full-width
-      div(style=`height: 45px; width: 45px; borderRadius: 50%`).row.items-center.justify-center.bg-grey-2
-      .col
-        .row.fit.content-center.q-px-sm
-          .row.full-width
-            span {{ $store.state.auth.user.name }}
-          .row.full-width
-            small {{ $store.state.auth.user.oid }}
   //- body
   .col.scroll
-    div(v-for="(s, si) in settings" :key="si" @click="$router.push({name: s.id})"
-      style=`height: 50px`).row.full-width.items-center.q-px-md.hr.cursor-pointer
-      div(style=`height: 50px; width: 50px`).row.items-center.justify-center
-        q-icon(:name="s.icon" size="30px" color="grey")
-      span {{ s.name }}
-    div(@click="refresh").row.full-width.items-center.q-px-md.hr.cursor-pointer
-      div(style=`height: 50px; width: 50px`).row.items-center.justify-center
-        q-icon(name="refresh" size="30px" color="grey")
-      span Обновить кэш
-    div(@click="logout").row.full-width.items-center.q-px-md.hr.cursor-pointer
-      div(style=`height: 50px; width: 50px`).row.items-center.justify-center
-        q-icon(name="power_off" size="30px" color="grey")
-      span Выйти
+    div(v-for="(m, mi) in menus" :key="m.id" v-if="menu && !m.hidden" @click="menuItemClick(m, mi)"
+      :style=`{height: '40px', background: m.id === menu.id ? '#eee' : 'none'}`
+        ).row.full-width.items-center.hr.cursor-pointer
+      div(style=`height: 40px; width: 40px`).row.items-center.justify-center
+        q-icon(:name="m.icon" size="24px" color="grey")
+        q-tooltip {{ m.name }}
+      span(v-if="!mini") {{ m.name }}
+    //- refresh
+    div(@click="refresh").row.full-width.items-center.hr.cursor-pointer
+      div(style=`height: 40px; width: 40px`).row.items-center.justify-center
+        q-icon(name="refresh" size="24px" color="grey")
+        q-tooltip Обновить кэш
+      span(v-if="!mini") Обновить кэш
+    //- logout
+    div(@click="logout").row.full-width.items-center.hr.cursor-pointer
+      div(style=`height: 40px; width: 40px`).row.items-center.justify-center
+        q-icon(name="power_off" size="24px" color="grey")
+        q-tooltip Выйти
+      span(v-if="!mini") Выйти
+  //- mini
+  div(@click="$emit('mini')" style=`height: 40px; borderTop: 1px solid #eee`
+    ).row.full-width.items-center.hr.cursor-pointer
+    div(style=`height: 40px; width: 40px`).row.items-center.justify-center
+      q-icon(:name="mini ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" size="24px" color="grey")
+      q-tooltip {{mini ? 'Развернуть' : 'Свернуть' }}
+    span(v-if="!mini") Свернуть
 </template>
 
 <script>
 export default {
   name: 'pageApp__Menu',
+  props: {
+    mini: {
+      type: Boolean
+    }
+  },
   data () {
     return {
-      setting: null,
-      settings: [
-        // {id: 'nodes', name: 'Мои ядра', icon: 'menu'},
-        // {id: 'spheres', name: 'Мои сферы', icon: 'menu'},
-        // {id: 'bookmarks', name: 'Закладки', icon: 'bookmark'},
-        // {id: 'profile', name: 'Профиль', icon: 'menu'},
-        // {id: 'journal', name: 'Бортовой журнал', icon: 'menu'},
-        // {id: 'stories', name: 'Истории', icon: 'menu'},
-        {id: 'sphere', name: 'Сферы', icon: 'blur_circular'},
-        {id: 'settings', name: 'Настройки', icon: 'settings'}
+      menu: null,
+      menus: [
+        {id: 'home', name: 'Домашняя', icon: 'home', hidden: false},
+        {id: 'node', name: 'Ядро', icon: 'menu', hidden: true},
+        {id: 'sphere', name: 'Сферы', icon: 'blur_circular', hidden: false},
+        {id: 'workspace', name: 'Мастерская', icon: 'cloud_queue', hidden: false},
+        {id: 'settings', name: 'Настройки', icon: 'settings', hidden: false},
+        {id: 'create/editor', name: 'Создать', icon: 'add', hidden: false}
       ]
     }
   },
@@ -62,6 +58,10 @@ export default {
     settingClick (s) {
       this.$log('settingClick', s)
       this.$set(this, 'setting', s)
+    },
+    menuItemClick (m, mi) {
+      this.$log('menuItemClick', m, mi)
+      this.$router.push('/app/' + m.id)
     },
     refresh () {
       this.$log('refresh')
@@ -77,6 +77,18 @@ export default {
         `
       })
       this.$router.push('/login')
+    }
+  },
+  watch: {
+    '$route': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route CHANGED', to.matched)
+        if (to.matched[1]) {
+          this.$set(this, 'menu', this.menus.find(i => i.id === to.matched[1].name))
+        }
+      }
     }
   },
   mounted () {

@@ -1,8 +1,5 @@
 <template lang="pug">
-div(:style=`{
-  height: $store.state.ui.width+180+'px',
-  maxWidth: $store.state.ui.width+'px'}`
-  ).column.full-width.q-mt-xs.q-mb-sm.bg-white.q-px-md.bg-grey-1
+div(:style=`{maxWidth: '540px', borderRadius: '8px'}`).column.full-width.q-mb-md.q-pa-md.bg-white
   //- node author
   div(style=`height: 60px`).row.full-width.items-center.q-pl-sm
     div(style=`height: 35px; width: 35px; borderRadius: 50%`).row.bg-grey-3.q-ml-xs
@@ -34,7 +31,7 @@ div(:style=`{
   div(style=`height: 46px`).row.full-width.items-end.content-end.q-px-md
     div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
       div(v-for="(s, si) in nodeFull.spheres" :key="s.oid" @click="sphereClick(s, si)"
-        style=`display: inline-block; height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3
+        style=`display: inline-block; height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3.cursor-pointer.hr
         span(style=`white-space: nowrap`) {{ `#${s.name}` }}
   //- node actions
   div(style=`height: 60px`).row.full-width.q-px-sm
@@ -182,16 +179,18 @@ export default {
                   name
                 }
                 fragments {
+                  url
                   content {
                     oid
                     type
                     name
                     thumbUrl(preferWidth: 600)
                     ...on Video {
-                    url
+                      url
+                      urlType
                     }
                     ...on Image {
-                    url
+                      url
                     }
                   }
                   relativePoints { x y z }
@@ -205,7 +204,7 @@ export default {
           oid: this.node.oid
         }
       })
-      this.$log('nodeFull', nodeFull[0])
+      // this.$log('nodeFull', nodeFull[0])
       this.nodeFull = nodeFull[0]
       // this.$log('nodeLoad done')
       // console.timeEnd('nodeLoad')
@@ -226,7 +225,7 @@ export default {
   },
   async mounted () {
     // this.$log('mounted')
-    this.$log('node', this.node)
+    // this.$log('node', this.node)
   }
 }
 </script>
