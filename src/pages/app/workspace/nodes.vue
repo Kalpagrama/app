@@ -3,8 +3,6 @@ div(style=`position: relative`).column.fit
   q-btn(round icon="add" style=`position: absolute; bottom: 10px; right: 10px` color="primary" size="lg")
   slot(name="header")
   .col.scroll
-    div(style=`height: 60px`).row.full-width.items-center.justify-center
-      span No saved nodes
 </template>
 
 <script>

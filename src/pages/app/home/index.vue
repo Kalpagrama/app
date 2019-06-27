@@ -2,28 +2,30 @@
 .column.fit
   div(body-scroll-lock-ignore).col.scroll.bg-grey-2
     .row.fit.justify-center
-      div(style=`maxWidth: 1130px`).row.fit.justify-start
+      div(style=`maxWidth: 1130px`).row.fit.justify-center
         slot(name="menu")
-        div(style=`maxWidth: 540px; marginLeft: 14px !important; marginRight: 14px !important`).row.full-width.justify-center.q-py-md
-          apollo-query(v-if="true" :query="query2" :variables="variables").full-width
-            template(v-slot="{ result: { loading, error, data } }")
-              //- loading
-              div(v-if="loading" style=`height: 100px`).row.full-width.items-center.justify-center
-                  q-spinner(size="50px" color="primary" :thickness="2")
-              //- error
-              div(v-else-if="error" style=`height: 100px`).row.full-width.items-center.justify-center
-                span {{ error }} : (
-              //- items
-              template(v-else-if="data && data.feed")
-                node-card(v-for="(n, ni) in data.feed.items" :key="n.oid" :node="n" :active="false"
-                  v-observe-visibility=`{
-                    callback: (isVisible, entry) => visibilityChanged(isVisible, entry, n, ni),
-                    throttle: ni <  2 ? 0 : 300
-                  }`)
-              //- nothing
-              div(v-else style=`height: 100px;`).row.full-width.items-center.justify-center
-                q-spinner(size="50px" :thickness="2" color="primary")
-        div(v-if="true" style=`position: relative; width: 280px; maxHeight: 100%`).column.full-height.q-py-md
+        .col
+          .row.full-width.justify-center.q-py-md
+            apollo-query(v-if="true" :query="query2" :variables="variables")
+              template(v-slot="{ result: { loading, error, data } }")
+                //- loading
+                div(v-if="loading" style=`height: 100px`).row.full-width.items-center.justify-center
+                    q-spinner(size="50px" color="primary" :thickness="2")
+                //- error
+                div(v-else-if="error" style=`height: 100px`).row.full-width.items-center.justify-center
+                  span {{ error }} : (
+                //- items
+                template(v-else-if="data && data.feed")
+                  node-card(v-for="(n, ni) in data.feed.items" :key="n.oid" :node="n" :active="false"
+                    v-observe-visibility=`{
+                      callback: (isVisible, entry) => visibilityChanged(isVisible, entry, n, ni),
+                      throttle: ni <  2 ? 0 : 300
+                    }`)
+                //- nothing
+                div(v-else style=`height: 100px;`).row.full-width.items-center.justify-center
+                  q-spinner(size="50px" :thickness="2" color="primary")
+        //- right menu
+        div(v-if="$q.screen.width > 830" style=`position: relative; width: 280px; maxHeight: 100%`).column.full-height.q-py-md
           div(style=`position: fixed; width: 280px; height: 700px`).row
             div(style=`borderRadius: 8px`).row.fit.items-center.justify-center.bg-white
               q-icon(name="flash_on")

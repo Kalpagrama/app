@@ -2,7 +2,7 @@
   q-layout(view='lHh Lpr lFf' :style=`{height: $q.screen.height+'px'}` @resize="handleResize").window-height.bg-grey-2
     q-header(reveal)
       div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.justify-center.bg-white
-        div(style=`maxWidth: 1130px` :class=`{'q-px-sm': $q.screen.width < 600}`).row.fit.justify-center
+        div(style=`maxWidth: 1130px` :class=`{'q-px-sm': $q.screen.width < 600}`).row.fit.justify-center.q-px-sm
           .row.full-height.items-center
             div(style=`height: 40px; width: 40px; borderRadius: 50%`
               @click="$router.push('/app/home')"
@@ -11,13 +11,13 @@
             h6(v-if="$q.screen.width >= 600").q-ma-xs.q-ml-sm.text-black.text-bold kalpa
           .col
             .row.fit.justify-end.items-center.content.center
-              div(style=`height: 40px; overflow: hidden; borderRadius: 8px`).col-6
-                .row.fit.items-end
+              div(v-if="$q.screen.width >= 400" style=`height: 40px; overflow: hidden; borderRadius: 8px`).col.q-px-sm
+                div(style=`borderRadius: 8px; overflow: hidden`).row.fit.items-end
                   q-input(v-model="search" filled).fit.items-end
                     template(v-slot:prepend)
                       q-icon(name="search")
-              q-btn(rounded color="primary" no-caps style=`height: 40px`
-                @click="$router.push('/app/create')").q-mx-md Создать
+              //- q-btn(v-if="$q.screen.width >= 400" rounded color="primary" no-caps style=`height: 40px`
+              //-   @click="$router.push('/app/create')").q-mx-md Создать
               div(style=`height: 40px; width: 40px; borderRadius: 50%`
                 @click="$router.push('/app/settings')"
                 ).row.items-center.justify-center.bg-grey-7.cursor-pointer
@@ -32,26 +32,13 @@
                   k-menu(:mini="mini" @mini="handleMini")
         div(v-else).row.fit.items-center.justify-center
           q-spinner(size="50px" :thickness="2" color="primary")
-    div(
-      v-if="$q.screen.width < 600"
-      style=`height: 50px; position: absolute; zIndex: 2000; bottom: 0px`
-      ).row.full-width.justify-between.q-px-sm.bg-white
-      q-btn(v-if="page" v-for="(p, pi) in pages" :key="pi" flat round v-touch-hold="btnHolded"
-        :color="page.id === p.id ? 'primary' : 'grey'"
-        :icon="p.icon" size="16px" @click="pageClick(p)")
-    //- q-page-container.fit
-    //-   q-page.fit
-    //-     div(v-if="loading").row.fit.items-center.justify-center.content-center
-    //-       div(style=`height: 80px`).row.full-width.items-center.justify-center
-    //-         q-spinner(size="50px" color="primary" :thickness="2")
-    //-     //- TODO: route level transitions
-    //-     //- transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutLeft")
-    //-     router-view(v-else)
-    //- q-footer(v-if="!loading && show_footer" bordered).row.full-width.justify-between.bg-white.q-px-sm
-    //-   q-btn(v-if="page" v-for="(p, pi) in pages" :key="pi" flat round
-    //-     :color="page.id === p.id ? 'primary' : 'grey'"
-    //-     :icon="p.icon" size="16px" @click="pageClick(p)")
-        //- q-badge(color="red" floating transparent style=`padding: 3px`).q-mr-sm.q-mt-sm 1
+    q-footer(v-if="$q.screen.width < 600").bg-white
+      div(
+        style=`height: 50px; borderTop: 1px solid #eee`
+        ).row.full-width.justify-between.q-px-sm
+        //- :color="page.id === p.id ? 'primary' : 'grey'"
+        q-btn(v-for="(p, pi) in pages" :key="pi" flat round v-touch-hold="btnHolded"
+          color="grey" :icon="p.icon" size="16px" @click="pageClick(p)")
 </template>
 
 <script>
@@ -118,7 +105,7 @@ export default {
     },
     pageClick (p) {
       this.$log('pageClick', p)
-      this.$router.push({name: p.id})
+      this.$router.push({path: p.id})
     }
   },
   async mounted () {

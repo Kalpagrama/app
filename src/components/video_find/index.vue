@@ -1,47 +1,63 @@
 <template lang="pug">
-.column.fit.bg-white
-  //- header with animated height
-  div(ref="kheader" :style=`{height: $store.state.ui.width+'px', borderBottom: '1px solid #eee'}`).column.full-width.kheader
-    //- header
-    div(v-if="type !== 'youtube'" style=`height: 60px`).row.full-width.items-center.justify-end
-      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        q-btn(flat round dense icon="clear" color="primary" @click="$emit('close')")
-    //- body
-    .col
-      .row.fit.items-center.content-center
-        .row.full-width
-          .col.q-pl-sm
-            q-input(v-model="input" @input="handleInput" @keyup.enter="startSearch"
-              filled placeholder="Поиск"
-              :class="{'q-pr-sm': type !== 'youtube'}").fit
-              template(v-slot:prepend)
-                q-icon(name="search")
-              template(v-slot:append)
-                //- q-btn(round flat icon="clear" color="primary" v-if="input.length > 0")
-                q-btn(no-caps color="primary" v-if="input.length > 0" @click="startSearch") Найти
-          div(v-if="type === 'youtube'" style=`height: 60px; width: 60px`).row.items-center.justify-center
-            q-btn(flat round icon="clear" @click="cancelClick" color="primary")
-        div(v-if="type === 'local'").row.full-width.justify-center
-          small.text-center.text-grey-8.q-my-sm Найди видео или вставь ссылку из YouTube
-  //- videos list
+div(style=`maxWidth: 540px`).column.fit.bg-white
+  //- header
+  //- div(:style=`{height: '76px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center
+  //-   div(style=`maxWidth: 1110px`).row.full-width
+  //-     .col.q-pl-sm
+  //-       q-input(v-model="input" @input="handleInput" @keyup.enter="startSearch"
+  //-         filled placeholder="Поиск").fit
+  //-         template(v-slot:prepend)
+  //-           q-icon(name="search")
+  //-         template(v-slot:append)
+  //-     div(style=`height: 76px; width: 76px`).row.items-center.justify-center
+  //-       q-btn(flat round dense icon="clear" color="primary" @click="$emit('close')")
+  //- body
   div(style=`overflowX: hidden`).col.scroll.bg-grey-2
-    //- from yotube link
-    source-link(v-if="type === 'link'" type="youtube" :link="input"
-      @video="$event => $emit('video', $event)"
-      @close="$emit('close')")
-    //- from youtube search
-    source-youtube(v-else-if="type === 'youtube'"
-      :search="search"
-      @video="$event => $emit('video', $event)"
-      @close="$emit('close')")
-    //- local on device
-    source-local(v-else-if="type === 'local'")
-    //- loading
-    div(v-else-if="type === 'loading'").row.fit.items-center.justify-center
-      q-spinner(size="50px")
-    //- nothing
-    div(v-else style=`height: 60px`).row.full-width.items-center.justify-center
-      span Nothing found!
+    .row.full-width
+      .col
+        span Image
+      .col
+        span Video
+    .row.full-width
+      div(:style=`{height: getHeight+'px'}`).col-3.hr.cursor-pointer
+        .row.fit.items-center.content-center.justify-center
+          q-icon(name="fab fa-youtube" size="50px" color="grey")
+          .row.full-width.justify-center
+            span From camera
+      div(:style=`{height: getHeight+'px'}`).col-3.hr.cursor-pointer
+        .row.fit.items-center.content-center.justify-center
+          q-icon(name="fab fa-youtube" size="50px" color="grey")
+          .row.full-width.justify-center
+            span From device
+      div(:style=`{height: getHeight+'px'}`).col-3.hr.cursor-pointer
+        .row.fit.items-center.content-center.justify-center
+          q-icon(name="fab fa-youtube" size="50px" color="red")
+          .row.full-width.justify-center
+            span Find in YouTube
+      div(:style=`{height: getHeight+'px'}`).col-3.hr.cursor-pointer
+        .row.fit.items-center.content-center.justify-center
+          q-icon(name="fab fa-youtube" size="50px" color="red-5")
+          .row.full-width.justify-center
+            span Paste link
+    //- .row.full-width.justify-center
+    //-   div(style=`maxWidth: 1110px`).row.full-width
+    //-     //- from yotube link
+    //-     source-link(v-if="type === 'link'" type="youtube" :link="input"
+    //-       @video="$event => $emit('video', $event)"
+    //-       @close="$emit('close')")
+    //-     //- from youtube search
+    //-     source-youtube(v-else-if="type === 'youtube'"
+    //-       :search="search"
+    //-       @video="$event => $emit('video', $event)"
+    //-       @close="$emit('close')")
+    //-     //- local on device
+    //-     source-local(v-else-if="type === 'local'")
+    //-     //- loading
+    //-     div(v-else-if="type === 'loading'").row.fit.items-center.justify-center
+    //-       q-spinner(size="50px")
+    //-     //- nothing
+    //-     div(v-else style=`height: 60px`).row.full-width.items-center.justify-center
+    //-       span Nothing found!
 </template>
 
 <script>
@@ -57,6 +73,16 @@ export default {
       search: '',
       type: 'local',
       types: ['link', 'local', 'youtube', 'loading']
+    }
+  },
+  computed: {
+    getHeight () {
+      let w = this.$q.screen.width
+      if (w > 540) {
+        return 540 / 4
+      } else {
+        return w / 4
+      }
     }
   },
   methods: {

@@ -1,111 +1,308 @@
 <template lang="pug">
-div(style=`overflowX: hidden`).row.fit.justify-center.bg-grey-2
-  div(style=`maxWidth: 1140px`).row.fit.justify-center
+div(style=`position: relative; overflowX: hidden`).row.fit.justify-center.bg-white
+  div(v-if="loading" style=`position: absolute; zIndex: 400; opacity: 0.7`).row.fit.items-center.justify-center.bg-white
+    q-spinner(size="50px" :thickness="2" color="primary")
+  div(style=`maxWidth: 1140px`).row.fit.justify-center.q-py-md
     slot(name="menu")
     .col.full-height
-      div().row.fit.justify-center.items-start.content-start.q-pa-lg
-        div(style=`position: relative; width: 640px; height: 360px; borderRadius: 8px; overflow: hidden`).row
-          //- div(v-if="loading" style=`position: absolute; zIndex: 100;`).row.fit.bg-grey-4
-          //-   span Loading, please wait
-          video(ref="kvideo" width="100%" height="100%" playsinline preload="auto")
-            //- source(type="video/youtube" :src="url")
-            source(type="video/mp4" :src="content.url" v-if="content")
+      div(style=`position: relative`).row.fit.justify-center.items-start.content-start
+        //- video container
+        div(:style=`{position: 'relative', width: videoWidth+'px', height: videoHeight+'px', borderRadius: '8px', overflow: 'hidden'}`).row
+          video(ref="kvideo" width="100%" height="100%" playsinline preload="auto" style=`borderRadius: 8px`)
+            source(type="video/youtube" :src="content.url" v-if="content && content.urlType === 'YOUTUBE'")
+            source(type="video/mp4" :src="content.url" v-else-if="content")
           div(v-if="!content").row.fit.items-center.justify-center
             q-spinner(size="50px" color="primary" :thickness="2")
-        div(style=`position: relative; width: 640px; height: 160px`).row
-          div(
-            v-touch-pan.mouse="draggingFrames"
-            :style=`{position: 'absolute', left: left+'px', top: '55px', height: '50px', width: getLength+'px'}`
-            ).row.no-wrap.bg-green
-            //- fragment
-            div(:style=`{position: 'absolute', zIndex: 100, left: start+'px', top: '-24px', height: '98px', width: '640px'}`
-              ).row.items-center.justify-center
-              div(style=`height: 20px`).row.full-width.justify-start.q-px-sm
-                small 0.23
-              div(style=`height: 58px; borderRadius: 8px; border: 4px solid red`).row.full-width
-              div(style=`height: 20px`).row.full-width.justify-end.q-px-sm
-                small 12.23
-              h6.text-red.text-bold.q-ma-xs 180sec/{{content.duration}}
-            //- frames images
-            div(style=`borderRadius: 8px; overflow: hidden !important`).row
-              div(
-                v-for="(f, fi) in Math.ceil(content.duration / 10)" :key="fi"
-                :style=`{position: 'absolute', left: ((fi-1)*35.5555)+'px', width: '88px', height: '50px'}`
-                  ).row.items-center.justify-center
-                //- img(width="100%" height="100%" :src="getFrame(fi)")
-                small {{ fi+1 }}
-        .row.full-width
-          .row.full-width
-            small secs {{secs}} /
-            small frames {{frames}}
-          .row.full-width
-            small start: {{ start }}
-            small left: {{ left }}
-          .row.full-width
-            small length: {{ getLength }}
-          .row.full-width
-            small length - left: {{getLength + left}}
-          .row.full-width
-            small framesLength {{ content.frameUrls.length }}
-        //- .row.full-width
-        //-   small {{content}}
+        div(v-if="!loading" :style=`{position: 'relative', width: videoWidth+'px', height: '150px'}`).row.justify-center
+            //- frames
+            div(
+              id="frames"
+              :style=`{position: 'absolute', oveflow: 'hidden', zIndex: 100, left: framesLeft+'px', top: '50px', width: framesWidth+'px', height: '50px', borderRadius: '6px'}`
+              v-touch-pan.mouse.stop="framesDrag").row.bg-grey-3
+              //- pics
+              //- div(style=`borderRadius: 4px; overflow: hidden`).row
+              div(id="frames" style=`borderRadius: 4px; overflow: hidden`).row.no-wrap
+                div(
+                  id="frames"
+                  v-for="(f, fi) in framesFilter" :key="fi"
+                  :style=`{width: frameWidth+'px', height: '50px', overflow: 'hidden'}`
+                    ).row.items-center.justify-center.bg-grey-4
+                  img(id="frames" width="80px" height="50px" :src="f")
+                  //- small.text-black {{ fi+1 }}
+              //- now
+              div(v-if="!dragging" :style=`{position: 'absolute', zIndex: 199, left: secToPx(nowSec)+'px', top: '0px', width: '2px', height: '50px'}`).bg-primary
+              //- frame
+              div(id="frame" :style=`{position: 'absolute', zIndex: 200, left: secToPx(startSec)+'px', top: '-4px', width: secToPx(endSec - startSec)+'px', height: '58px', border: '3px solid #027BE3', borderRadius: '8px'}`
+                ).row
+                //- start
+                //- start label
+                div(:style=`{position: 'absolute', zIndex: 300, height: '34px', top: '-40px', minWidth: '130px', left: getLabelOffset+'px', borderRadius: '8px'}`
+                  ).row.items-center.content-center.justify-between.bg-grey-2
+                  q-btn(round dense flat icon="keyboard_arrow_left" color="grey-9" @click="startTickLeft")
+                  div(v-touch-pan.mouse="startDrag" :style=`{cursor: 'e-resize'}`).col
+                    span {{getTime(startSec)}}
+                  q-btn(round dense flat icon="keyboard_arrow_right" color="grey-9" @click="startTickRight")
+                //- start drag
+                div(:style=`{position: 'absolute', zIndex: 300, height: '46px', top: '2px', width: '10px', left: '-10px', borderRadius: '4px 0px 0px 4px', cursor: 'e-resize'}`
+                  v-touch-pan.mouse="startDrag").bg-primary
+                //- end
+                //- end label
+                div(:style=`{position: 'absolute', zIndex: 300, height: '34px', top: '-40px', minWidth: '130px', right: getLabelOffset+'px', borderRadius: '8px'}`
+                  ).row.items-center.content-center.justify-between.bg-grey-2
+                  q-btn(round dense flat icon="keyboard_arrow_left" color="grey-9" @click="endTickLeft")
+                  div(v-touch-pan.mouse="endDrag" :style=`{cursor: 'e-resize'}`).col
+                    span {{getTime(endSec)}}
+                  q-btn(round dense flat icon="keyboard_arrow_right" color="grey-9" @click="endTickRight")
+                //- end drag
+                div(:style=`{position: 'absolute', zIndex: 300, height: '46px', top: '2px', width: '10px', right: '-10px', borderRadius: '4px', cursor: 'e-resize'}`
+                  v-touch-pan.mouse="endDrag").bg-primary
+                //- total time label
+                div(:style=`{position: 'absolute', zIndex: 300, height: '34px', bottom: '-40px', width: '100%'}`).row.items-start.justify-center
+                  div(style=`minWidth: 140px; height: 34px; borderRadius: 8px`).row.justify-between.items-center.contenet-center.bg-grey-2
+                    q-btn(round dense flat icon="keyboard_arrow_left" color="grey-9" @click="startTickLeft() + endTickLeft()")
+                    div(v-touch-pan.mouse="totalDrag" :style=`{cursor: 'e-resize'}`).col
+                      span {{getTime(endSec - startSec)}}
+                    q-btn(round dense flat icon="keyboard_arrow_right" color="grey-9" @click="startTickRight() + endTickRight()")
+        //- tools
+        div(v-if="!loading" :style=`{width: videoWidth+'px', height: '60px'}`).row.justify-end.items-center.q-px-sm
+          //- q-btn(round dense color="grey-9" icon="refresh" @click="handleReload")
+          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` outline no-caps :color="loop ? 'primary' : 'grey-9'" @click="toggleLoop").q-mr-sm
+            span.text-bold Loop
+          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` outline no-caps :color="muted ? 'primary' : 'grey-9'" @click="toggleMute").q-mr-sm
+            span.text-bold Muted
+          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` color="primary" no-caps @click="handleReady")
+            span.text-bold Готово
+        //- debug
+        div(v-if="false" :style=`{position: 'relative', width: videoWidth+'px', height: '150px'}`).row.justify-center.items-start.content-start.bg-green-1
+          span.full-width debug:
+          small.full-width start: {{startSec}}
+          small.full-width end: {{endSec}}
+          small.full-width now: {{nowSec}}
 </template>
 
 <script>
 export default {
   name: 'videoEditor',
+  meta: {
+    title: 'Kalpa video editor'
+  },
+  props: {
+    start: {type: Number, default: 10},
+    end: {type: Number, default: 20},
+    url: {type: String, default: 'https://www.youtube.com/watch?v=XFzlTWx-MY0'}
+  },
   data () {
     return {
-      loading: true,
-      content: null,
-      left: 0,
-      start: 0,
-      player: null
+      loading: false,
+      content: {
+        duration: 0,
+        frameUrls: []
+      },
+      dragging: false,
+      draggingTarget: '',
+      loop: false,
+      muted: false,
+      framesLeft: 0,
+      startSec: 0,
+      nowSec: 0,
+      endSec: 180,
+      player: null,
+      videoWidthMax: 640,
+      fragmentWidthSecMax: 180,
+      fragmentWidthPxMax: 640
     }
   },
   computed: {
-    getLength () {
-      return (this.content.duration * 640) / 180
+    videoWidth () {
+      let w = this.$q.screen.width
+      if (w <= this.videoWidthMax) return w
+      else return this.videoWidthMax
     },
-    secs () {
-      return Math.ceil(this.content.duration)
+    videoHeight () {
+      return this.videoWidth * 0.56
     },
-    frames () {
-      return this.content.frameUrls.length
+    framesWidth () {
+      return this.secToPx(this.content.duration)
+    },
+    frameWidth () {
+      // this.videoWidth / 18
+      return this.framesWidth / (this.content.frameUrls.length / 1)
+    },
+    framesFilter () {
+      return this.content.frameUrls.filter((f, fi) => {
+        return fi % 1 === 0
+      })
+    },
+    getLabelOffset () {
+      let d = this.secToPx(this.endSec - this.startSec)
+      if (d < 250) {
+        return -(10 + 130)
+      } else {
+        return -10
+      }
+    }
+  },
+  watch: {
+    startSec: {
+      handler (to, from) {
+        if (this.player) this.player.setCurrentTime(to)
+      }
+    },
+    dragging: {
+      async handler (to, from) {
+        this.$log('dragging CHANGED ', to)
+        if (to === true) return
+        await this.$wait(350)
+        this.framesAnimate()
+      }
     }
   },
   methods: {
-    getFrame (index) {
-      if (this.secs === this.frames) {
-        return this.content.frameUrls[index]
-      } else {
-        let d = this.secs - this.frames
-        let x = Math.ceil(d / this.secs)
-        let indexNew = index - x
-        let indexNext = index
-        if (indexNew >= 0) indexNext = 0
-        else indexNext = indexNew
-        return this.content.framUrls[indexNext]
+    getTime (sec) {
+      let hrs = ~~(sec / 3600)
+      let mins = ~~((sec % 3600) / 60)
+      let secs = ~~sec % 60
+      let arr = sec.toString().split('.')
+      let ms = ''
+      if (arr.length > 1) ms = arr[1]
+
+      let ret = ''
+      if (hrs > 0) ret += '' + hrs + ':' + (mins < 10 ? '0' : '')
+
+      ret += '' + mins + ':' + (secs < 10 ? '0' : '')
+      ret += '' + secs
+      if (ms !== '') ret += ':' + ms.substring(0, 3)
+      return ret
+    },
+    handleReload () {
+      this.$log('handleReload')
+      window.location.reload(true)
+    },
+    handleReady () {
+      this.$log('handleReady')
+      let points = [{x: this.startSec}, {x: this.endSec}]
+      this.$log('done points', points)
+      this.$emit('done', points, this.content.duration)
+      this.$emit('close')
+    },
+    toggleMute () {
+      this.$log('toggleMute')
+      this.player.setMuted(!this.muted)
+      this.muted = !this.muted
+    },
+    toggleLoop () {
+      this.$log('toggleLoop')
+      this.loop = !this.loop
+    },
+    pxToSec (px) {
+      return px * this.fragmentWidthSecMax / this.videoWidth
+    },
+    secToPx (sec) {
+      return sec * this.videoWidth / 180
+    },
+    timeUpdate (e) {
+      this.nowSec = this.player.currentTime
+      if (this.loop) {
+        if (this.player.currentTime >= this.endSec) this.player.setCurrentTime(this.startSec)
       }
     },
-    draggingFrames (e) {
-      // this.$log('d', e.delta.x)
-      let leftNext = this.left + e.delta.x
-      if (this.left <= 0 && leftNext <= 0 && this.getLength + leftNext - 640 >= 0) {
-        if (e.delta.x > 0) {
-          // this.$log('right')
-          this.left += e.delta.x
-          this.start -= e.delta.x
-        } else if (e.delta.x < 0) {
-          // this.$log('LEFT')
-          this.left += e.delta.x
-          this.start -= e.delta.x
+    seeked (e) {
+      this.$log('seeked', e)
+      if (this.dragging) return
+      let nextStartSec = this.player.currentTime
+      if (nextStartSec >= this.endSec) {
+        this.startSec = this.player.currentTime
+        let newEndSec = this.startSec + 180
+        if (this.startSec + newEndSec > this.content.duration) {
+          this.endSec = this.content.duration
+        } else {
+          this.endSec = newEndSec
+        }
+      } else {
+        this.startSec = this.player.currentTime
+        let d = this.endSec - this.startSec
+        if (d >= 180) {
+          this.endSec = this.startSec + 180
         }
       }
+      this.framesAnimate()
     },
-    async uploadContent () {
-      this.$log('uploadContent start')
-      console.time('uploadContent')
+    framesAnimate () {
+      this.$log('framesAnimate')
+      let d = this.secToPx(this.endSec - this.startSec)
+      let left = ((this.videoWidth - d) / 2) - this.secToPx(this.startSec)
+      this.$tween.to(this, 0.66, {framesLeft: left})
+    },
+    framesDrag (e) {
+      let ids = ['frame', 'frames']
+      if (e.isFirst && ids.includes(e.evt.target.id)) this.draggingTarget = e.evt.target.id
+      if (!ids.includes(this.draggingTarget)) return
+      this.$log('framesDrag', e)
+      if (e.isFirst) this.dragging = true
+      if (e.isFinal) {
+        this.dragging = false
+        this.draggingTarget = ''
+      }
+      let newStartSec = this.startSec - this.pxToSec(e.delta.x)
+      let newEndSec = this.endSec - this.pxToSec(e.delta.x)
+      if (newStartSec > 0 && newEndSec <= this.content.duration) {
+        this.startSec = newStartSec
+        this.endSec = newEndSec
+        this.framesLeft += e.delta.x
+      }
+    },
+    startDrag (e) {
+      this.$log('startDrag', e.delta.x)
+      if (e.isFirst) this.dragging = true
+      if (e.isFinal) this.dragging = false
+      let newStartSec = this.startSec + this.pxToSec(e.delta.x)
+      if (newStartSec >= 0 && this.endSec - newStartSec <= 180) {
+        this.startSec = newStartSec
+      }
+    },
+    endDrag (e) {
+      this.$log('endDrag', e.delta.x)
+      if (e.isFirst) this.dragging = true
+      if (e.isFinal) this.dragging = false
+      let newEndSec = this.endSec + this.pxToSec(e.delta.x)
+      if (newEndSec > this.startSec && newEndSec - this.startSec <= 180 && this.endSec <= this.content.duration) {
+        this.endSec = newEndSec
+      }
+    },
+    totalDrag (e) {
+      this.startDrag(e)
+      this.endDrag(e)
+    },
+    startTickLeft () {
+      this.$log('startTickLeft')
+      let newStartSec = this.startSec - 0.100
+      if (this.endSec - newStartSec > 180) this.startSec = this.endSec - 180
+      else if (newStartSec >= 0) this.startSec = newStartSec
+      else if (newStartSec < 0) this.startSec = 0
+    },
+    startTickRight () {
+      this.$log('startTickRight')
+      let newStartSec = this.startSec + 0.100
+      if (this.endSec - newStartSec > 180) this.startSec = this.endSec - 180
+      else if (newStartSec < this.endSec && newStartSec < this.content.duration) this.startSec = newStartSec
+    },
+    endTickLeft () {
+      this.$log('endTickLeft')
+      let newEndSec = this.endSec - 0.100
+      if (newEndSec - this.startSec > 180) this.endSec = this.startSec + 180
+      else if (newEndSec > this.startSec && newEndSec > 0) this.endSec = newEndSec
+    },
+    endTickRight () {
+      this.$log('endTickRight')
+      let newEndSec = this.endSec + 0.100
+      if (newEndSec - this.startSec > 180) this.endSec = this.startSec + 180
+      else if (newEndSec <= this.content.duration) this.endSec = newEndSec
+      else if (newEndSec > this.content.duration) this.endSec = this.content.duration
+    },
+    async getVideo () {
+      this.$log('getVideo start')
+      console.time('getVideo')
+      // try to upload video
       let { data: { uploadContentUrl: { oid } } } = await this.$apollo.mutate({
         mutation: gql`
           mutation uploadContentUrl ($url: String!) {
@@ -115,19 +312,14 @@ export default {
           }
         `,
         variables: {
-          url: 'https://www.youtube.com/watch?v=6f7WccGetpc'
+          url: this.url
         }
       })
-      this.$log('oid', oid)
-      this.$log('uploadContent done')
-      console.timeEnd('uploadContent')
-      await this.getContent(oid)
-    },
-    async getContent (oid) {
-      this.$log('getContent start')
+      this.$log('uploadContentUrl oid', oid)
+      // get video by oid
       let { data: { objectList } } = await this.$apollo.query({
         query: gql`
-          query getContent ($oid: OID!) {
+          query getVideo ($oid: OID!) {
             objectList(oids: [$oid]) {
               oid
               name
@@ -147,34 +339,52 @@ export default {
       })
       this.$log('getContent done', objectList[0])
       this.content = objectList[0]
+      console.timeEnd('getVideo')
+    },
+    startVideo () {
+      this.$log('startVideo')
+      let p = new window.MediaElementPlayer(this.$refs.kvideo, {
+        loop: true,
+        autoplay: false,
+        controls: true,
+        showPosterWhenPaused: false,
+        clickToPlayPause: true,
+        iPadUseNativeControls: false,
+        iPhoneUseNativeControls: false,
+        AndroidUseNativeControls: false,
+        success: async (mediaElement, originalNode, instance) => {
+          this.player = mediaElement
+          this.player.addEventListener('timeupdate', this.timeUpdate, false)
+          this.player.addEventListener('seeked', this.seeked, false)
+          this.player.setCurrentTime(this.startSec)
+          this.player.play()
+          this.$log('START PLAYING')
+        }
+      })
     }
   },
   async mounted () {
     this.$log('mounted start')
-    await this.uploadContent()
-    let p = new window.MediaElementPlayer(this.$refs.kvideo, {
-      loop: true,
-      autoplay: true,
-      controls: true,
-      showPosterWhenPaused: false,
-      clickToPlayPause: true,
-      iPadUseNativeControls: false,
-      iPhoneUseNativeControls: false,
-      AndroidUseNativeControls: false,
-      success: async (mediaElement, originalNode, instance) => {
-        this.player = mediaElement
-        // this.mediaElement.addEventListener('timeupdate', this.timeUpdate, false)
-        this.player.setCurrentTime(10)
-        this.player.play()
-        this.$log('START PLAYING')
-        // await this.$wait(600)
-        // this.started = true
-        // this.$emit('started')
-      }
-    })
+    this.loading = true
+    // await this.$wait(3000)
+    this.startSec = this.start
+    this.endSec = this.end
+    await this.getVideo()
+    this.loading = false
+    this.framesAnimate()
+    this.startVideo()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.player.removeEventListener('timeupdate', this.timeUpdate)
+    this.player.removeEventListener('seeked', this.seeked)
   }
 }
 </script>
+
+<style lang="stylus">
+.mejs__overlay-button
+  display: none !important
+.mejs__overlay-loading
+  display: none !important
+</style>

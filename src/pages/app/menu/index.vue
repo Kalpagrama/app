@@ -47,7 +47,7 @@ export default {
         {id: 'sphere', name: 'Сферы', icon: 'blur_circular', hidden: false},
         {id: 'workspace', name: 'Мастерская', icon: 'cloud_queue', hidden: false},
         {id: 'settings', name: 'Настройки', icon: 'settings', hidden: false},
-        {id: 'create/editor', name: 'Создать', icon: 'add', hidden: false}
+        {id: 'create', name: 'Создать', icon: 'add', hidden: false}
       ]
     }
   },

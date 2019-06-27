@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{maxWidth: '540px', borderRadius: '8px'}`).column.full-width.q-mb-md.q-pa-md.bg-white
+div(:style=`{maxWidth: '540px', borderRadius: '8px'}`).column.items-center.q-mb-md.bg-white
   //- node author
   div(style=`height: 60px`).row.full-width.items-center.q-pl-sm
     div(style=`height: 35px; width: 35px; borderRadius: 50%`).row.bg-grey-3.q-ml-xs

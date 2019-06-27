@@ -1,8 +1,9 @@
 <template lang="pug">
 .column.fit.bg-white
-  //- workspace(v-if="false")
-  //- editor-node(v-if="true")
-  router-view
+  //- div(style=`height: 50px`).row.full-width.justify-center.bg-grey-3
+  //-   div(style=`maxWidth: 1110px`).row.full-width
+  .col
+    router-view
 </template>
 
 <script>

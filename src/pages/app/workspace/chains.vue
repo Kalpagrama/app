@@ -2,8 +2,6 @@
 .column.fit
   slot(name="header")
   .col.scroll
-    div(style=`height: 60px`).row.full-width.items-center.justify-center
-      span No saved chains
 </template>
 
 <script>

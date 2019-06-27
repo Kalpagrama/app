@@ -1,12 +1,11 @@
 <template lang="pug">
 .column.fit
-  slot(name="header")
-  .col.scroll
+  span image_editor
 </template>
 
 <script>
 export default {
-  name: 'pageApp__Workspace__Images',
+  name: 'imageEditor',
   data () {
     return {
     }
