@@ -1,30 +1,25 @@
 <template lang="pug">
 div(style=`position: relative`).row.full-width
-  //- loading
-  div(v-if="loading" style=`position: absolute; zIndex: 100`).row.fit.items-center.justify-center
+  //- input header
+  div(:style=`{height: headerHeight+'px'}`).row.full-width.items-center.content-center.q-px-sm
+    .col
+      q-input(v-model="search" filled :label="$t('search')" @keyup.enter="startSearch()").full-width
+        template(v-slot:append)
+          q-btn(v-if="search.length > 0" round flat dense icon="clear" @click="cancelSearch()")
+    q-btn(style=`height: 56px` color="primary" @click="startSearch()" :loading="loading").q-ml-sm {{$t('find')}}
+  //- video results
+  div(v-if="loading" style=`height: 200px`).row.full-width.justify-center.items-center
     q-spinner(size="50px" :thickness="2" color="primary")
-  //- fake
-  div(v-if="videos.length === 0").row.full-width
-    div(
-      v-for="v in 6" :key="v"
-      style=`height: 90px`).row.full-width.bg-white.q-my-sm.q-px-sm
-      div(style=`height: 90px; width: 120px`).row.q-pa-xs
-        div(style=`borderRadius: 4px`).row.fit.items-center.justify-center.bg-grey-2
-          q-icon(name="fab fa-youtube" color="grey-4" size="30px")
-      .col
-        .row.fit.items-start.content-start.q-pa-xs
-          div(style=`height: 20px; minHeight: 20px; borderRadius: 4px`).row.full-width.bg-grey-2.q-mb-xs
-          div(style=`height: 20px; minHeight: 20px; borderRadius: 4px; width: 180px`).row.bg-grey-2
-  //- real
-  div(v-else).row.full-width
+  div(v-if="!loading").row.full-width
+    q-resize-observer(@resize="onResize")
     div(v-for="(v, vi) in videos" :key="v.id"
-      style=`minHeight: 90px`
-      ).row.full-width.bg-white.q-my-sm.q-px-sm
+      style=`minHeight: 90px; borderBottom: 1px solid #eee`
+      ).row.full-width.bg-white.q-pa-sm.hr
       //- preview
       div(@click="videoClick(v, vi)" v-if="v.id !== videoSelectedId").row.full-width
-        div(style=`height: 90px; width: 120px`).row.items-center.justify-center.q-pa-xs
-          div(style=`borderRadius: 4px; overflow: hidden`).row.fit
-            img(:src="v.thumbnailUrl" width="100%" height="100%")
+        div(style=`height: 90px; width: 153px`).row.items-center.justify-center
+          div(style=`borderRadius: 4px; overflow: hidden`).row.full-width
+            img(:src="v.thumbnailUrl" width="100%" height="90px")
         .col
           .row.fit.items-start.content-start.q-pa-sm
             .row.full-width
@@ -34,33 +29,74 @@ div(style=`position: relative`).row.full-width
             //-   small.text-grey-8 Views: {{ v.views }}
       //- select video
       div(v-if="v.id === videoSelectedId").row.full-width.items-center.justify-end
-        div(style=`height: 200px`).row.full-width.q-mt-sm
-          div(style=`borderRadius: 4px; overflow: hidden;`).row.fit
-            img(:src="v.thumbnailUrl" width="100%" height="100%")
+        div(style=`minHeight: 200px`).row.full-width.q-mt-sm
+          div(:style=`{borderRadius: '4px', overflow: 'hidden', height: width*0.56+'px'}`).row.full-width
+            img(:src="v.thumbnailUrl" width="100%")
         div(style=`height: 70px;`).row.full-width.items-center.justify-end
-          q-btn(rounded style=`height: 50px` outline color="primary" no-caps @click="videoSelectedId = undefined").q-mr-sm Отмена
-          q-btn(rounded style=`height: 50px` color="primary" @click="videoSelect(v, vi)" no-caps) Выбрать видео
+          q-btn(style=`height: 50px; borderRadius: 4px` outline color="primary" no-caps @click="videoSelectedId = undefined").q-mr-sm {{$t('cancel')}}
+          q-btn(style=`height: 50px; borderRadius: 4px` color="primary" @click="videoSelect(v, vi)" no-caps) {{$t('choose_video')}}
     //- show more
-    div(style=`height: 70px`).row.full-width.items-center.justify-center
-      q-btn(style=`height: 50px; minWidth: 300px` rounded outline color="primary" @click="showMore") Показать еще
+    //- div(style=`height: 70px`).row.full-width.items-center.justify-center
+    //-   q-btn(style=`height: 50px; minWidth: 300px` rounded outline color="primary" @click="showMore") {{$t('show_more')}}
+  //- //- loading
+  //- div(v-if="loading" style=`position: absolute; zIndex: 100`).row.fit.items-center.justify-center
+  //-   q-spinner(size="50px" :thickness="2" color="primary")
+  //- //- fake
+  //- div(v-if="videos.length === 0").row.full-width
+  //-   div(
+  //-     v-for="v in 6" :key="v"
+  //-     style=`height: 90px`).row.full-width.bg-white.q-my-sm.q-px-sm
+  //-     div(style=`height: 90px; width: 120px`).row.q-pa-xs
+  //-       div(style=`borderRadius: 4px`).row.fit.items-center.justify-center.bg-grey-2
+  //-         q-icon(name="fab fa-youtube" color="grey-4" size="30px")
+  //-     .col
+  //-       .row.fit.items-start.content-start.q-pa-xs
+  //-         div(style=`height: 20px; minHeight: 20px; borderRadius: 4px`).row.full-width.bg-grey-2.q-mb-xs
+  //-         div(style=`height: 20px; minHeight: 20px; borderRadius: 4px; width: 180px`).row.bg-grey-2
+  //- //- real
+  //- div(v-else).row.full-width
 </template>
 
 <script>
 // import { throttle } from 'quasar'
 export default {
   name: 'findVideoList',
-  props: {
-    search: {type: String}
-  },
   data () {
     return {
       loading: false,
+      headerHeight: 300,
       videos: [],
       videoSelectedId: undefined,
-      nextPageToken: null
+      nextPageToken: null,
+      search: '',
+      width: 600
     }
   },
   methods: {
+    onResize (e) {
+      this.$log('onResize', e)
+      this.width = e.width
+    },
+    cancelSearch () {
+      this.$log('cancelSearch')
+      this.search = ''
+      this.$tween.to(this, 0.66, {headerHeight: 300})
+    },
+    async startSearch () {
+      try {
+        this.$log('startSearch start')
+        if (this.search.length === 0) return
+        this.loading = true
+        this.$tween.to(this, 0.66, {headerHeight: 70})
+        // await this.$wait(1000)
+        await this.itemsFind()
+        this.loading = false
+        this.$log('startSearch done')
+      } catch (error) {
+        this.loading = false
+        this.$log('startSearch error', error)
+      }
+    },
     showMore () {
       this.$log('showMore')
       // TODO: update nextPageToken and ?
@@ -71,12 +107,10 @@ export default {
     },
     videoSelect (v, vi) {
       this.$log('videoSelect', v, vi)
-      this.$emit('video', v)
+      this.$emit('content', v)
       this.$emit('close')
     },
     async itemsFind () {
-      if (this.search.length === 0) return
-      this.loading = true
       console.time('itemsFind')
       const params = {
         maxResults: 9,
@@ -106,21 +140,9 @@ export default {
       console.timeEnd('itemsFind')
       this.$log('videos', videos)
       this.videos = videos
-      this.loading = false
     }
   },
-  watch: {
-    search: {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('search UPDATED: ', to)
-        if (to !== from) {
-          await this.itemsFind()
-        }
-      }
-    }
-  },
-  async mounted () {
+  mounted () {
     this.$log('mounted')
   },
   beforeDestroy () {

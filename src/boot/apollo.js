@@ -115,7 +115,7 @@ export default async ({ Vue, store, app }) => {
     link: createUploadLink({
       uri: linkUpload,
       fetch (uri, options) {
-        debug('FETCH UPLOAD')
+        debug('FETCH UPLOAD', uri, options)
         options.headers['Authorization'] = localStorage.getItem('ktoken')
         return fetch(uri, options)
       }

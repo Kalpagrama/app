@@ -1,18 +1,18 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  slot(name="editor")
-  //- div(v-if="!started" @click="state = 'active'"
-  //-   style=`position: absolute; zIndex: 500`).row.fit
-  //-   img(:src="preview" width="100%" height="100%")
-  //- div(v-if="type === 'VIDEO' && state === 'active'").row.fit
-  //-   node-video(
-  //-     @started="started = true"
-  //-     :index="index"
-  //-     :url="fragment.url"
-  //-     :startSec="getStartSec"
-  //-     :endSec="getEndSec")
-  //-     template(v-slot:actions)
-  //-       slot(name="actions")
+  div(v-if="state !== 'active'" @click="state = 'active'"
+    style=`position: absolute; zIndex: 500`).row.fit
+    slot(name="editor")
+    //- img(v-if="preview" :src="preview" width="100%" height="100%")
+  div(v-if="type === 'VIDEO' && state === 'active'").row.fit
+    node-video(
+      @started="started = true"
+      :index="index"
+      :url="fragment.url"
+      :startSec="getStartSec"
+      :endSec="getEndSec")
+      template(v-slot:actions)
+        slot(name="actions")
   //- div(v-else-if="type === 'IMAGE' && state === 'active'").row.fit.bg-green
   //-   node-image(:url="fragment.content.url")
 </template>

@@ -37,9 +37,9 @@ export default {
     return {
       menuShow: false,
       menuItems: [
-        // {id: 'images', name: 'Изображения'},
-        // {id: 'videos', name: 'Видео'},
-        // {id: 'books', name: 'Книги'},
+        {id: 'images', name: 'Изображения'},
+        {id: 'videos', name: 'Видео'},
+        {id: 'books', name: 'Книги'},
         {id: 'nodes', name: 'Ядра'},
         // {id: 'chains', name: 'Цепочки'}
       ],

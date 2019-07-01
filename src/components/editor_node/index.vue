@@ -3,15 +3,10 @@ div(style=`position: relative`).column.fit.bg-grey-2
   //- =======
   //- dialogs
   q-dialog(ref="showDialogTypeFind" :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down")
-    type-find(v-if="showTypeFind" @type="typeChoosen" @close="$refs.showDialogTypeFind.hide(), showTypeFind = false"
+    content-find(v-if="showTypeFind" @type="typeChoosen" @close="$refs.showDialogTypeFind.hide(), showTypeFind = false"
       @result="videoChoosen")
-  //- dialogs :maximized="true"
+  //- dialogs
   q-dialog(ref="showDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    //- image
-    //- image-find(v-if="showImageFind" @close="$refs.showDialog.hide(), showImageFind = false")
-    //- image-edit(v-if="showImageEdit" @close="$refs.showDialog.hide(), showImageEdit = false")
-    //- video
-    //- video-find(v-if="showVideoFind" @video="videoChoosen" @close="$refs.showDialog.hide(), showVideoFind = false")
     video-editor(v-if="showVideoEdit"
       @close="$refs.showDialog.hide(), showVideoEdit = false"
       :url="nodeFull.fragments[typeIndex]['content']['url']"
@@ -20,6 +15,7 @@ div(style=`position: relative`).column.fit.bg-grey-2
       :end="nodeFull.fragments[typeIndex].relativePoints[1]['x']"
       @end="nodeFull.fragments[typeIndex].relativePoints[1]['x'] = $event"
       @done="videoEdited")
+    //- image-editor
     //- sphere
     //- sphere-find(v-if="showShpereFind" @sphere="sphereAdd" @close="$refs.showDialog.hide(), showShpereFind = false")
   //- ====
@@ -68,7 +64,7 @@ div(style=`position: relative`).column.fit.bg-grey-2
 <script>
 import node from 'components/node'
 import sphereFind from 'components/sphere_find'
-import typeFind from 'components/type_find'
+import contentFind from 'components/content_find'
 import imageFind from 'components/image_find'
 import imageEditor from 'components/image_editor'
 import videoFind from 'components/video_find'
@@ -76,7 +72,7 @@ import videoEditor from 'components/video_editor'
 
 export default {
   name: 'editorNode',
-  components: {node, typeFind, videoEditor, videoFind, imageFind, imageEditor, sphereFind},
+  components: {node, contentFind, videoEditor, videoFind, imageFind, imageEditor, sphereFind},
   data () {
     return {
       typeIndex: 0,
