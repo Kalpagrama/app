@@ -7,11 +7,11 @@ div(style=`position: relative`).column.fit.bg-black
   //- tools
   div(style=`position: relative; overflow: hidden`).col.full-width
     div(style=`position: absolute; zIndex: 100; top: 0px; height: 60px`).row.full-width.bg-black
-    video(v-show="videoShow" ref="kplayer" playsinline width="100%" height="100%" preload="auto")
+    video(v-show="videoShow" ref="kplayer" playsinline muted="true" autoplay width="100%" height="100%" preload="auto")
       source(type="video/youtube" :src="url")
     //- slider wrapper
-    div(v-if="true" style=`position: absolute; zIndex: 100; height: 190px; bottom: 0px`
-      ).row.full-width.bg-black.q-px-xl
+    div(v-if="true" style=`position: absolute; zIndex: 100; height: 260px; bottom: 0px; paddingLeft: 50px; paddingRight: 50px`
+      ).row.full-width.bg-black
       slider(
         v-if="duration"
         :mediaElement="mediaElement" :duration="duration"
@@ -51,7 +51,7 @@ export default {
     async done () {
       let points = [{x: this.startSec}, {x: this.endSec}]
       this.$log('done points', points)
-      this.$emit('done', points)
+      this.$emit('done', points, this.duration)
       this.$emit('close')
     },
     timeUpdate (e) {

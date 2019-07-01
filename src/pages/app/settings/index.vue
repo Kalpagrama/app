@@ -1,82 +1,68 @@
 <template lang="pug">
-.column.fit.bg-white
-  //- header
-  div(
-    @click="userClick"
-    style=`height: 100px; borderBottom: 1px solid #eee; paddingLeft: 20px`).row.items-center.full-width
-    //- optimistic UI
-    div(v-if="!$store.state.auth.user").row.full-width
-      div(style=`height: 45px; width: 45px; borderRadius: 50%`).row.items-center.justify-center.bg-grey-2
-      .col
-        .row.fit.content-center.q-px-sm
-          div(style=`height: 20px; minHeight: 20px; borderRadius: 4px; width: 250px`).row.bg-grey-2.q-mb-xs
-          div(style=`height: 18px; minHeight: 18px; borderRadius: 4px; width: 130px`).row.bg-grey-2
-    //- user info
-    div(v-else).row.full-width
-      div(style=`height: 45px; width: 45px; borderRadius: 50%`).row.items-center.justify-center.bg-grey-2
-      .col
-        .row.fit.content-center.q-px-sm
-          .row.full-width
-            span {{ $store.state.auth.user.name }}
-          .row.full-width
-            small {{ $store.state.auth.user.oid }}
-  //- body
-  .col.scroll
-    div(v-for="(s, si) in settings" :key="si"
-      style=`height: 50px`).row.full-width.items-center.q-px-md.hr.cursor-pointer
-      div(style=`height: 50px; width: 50px`).row.items-center.justify-center
-        q-icon(:name="s.icon" size="30px" color="grey")
-      span {{ s.name }}
-    div(@click="refresh").row.full-width.items-center.q-px-md.hr.cursor-pointer
-      div(style=`height: 50px; width: 50px`).row.items-center.justify-center
-        q-icon(name="refresh" size="30px" color="grey")
-      span Обновить кэш
-    div(@click="logout").row.full-width.items-center.q-px-md.hr.cursor-pointer
-      div(style=`height: 50px; width: 50px`).row.items-center.justify-center
-        q-icon(name="power_off" size="30px" color="grey")
-      span Выйти
+.row.fit.justify-center
+  div(style=`maxWidth: 1130px`).row.fit.justify-start
+    slot(name="menu")
+    .col.full-height.q-pa-md
+      div(style=`borderRadius: 8px 8px 8px 8px`).col.full-height.bg-white
+        router-view(@menu="menuShow = !menuShow")
+          template(v-slot:header)
+            div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+              .col
+                div(v-if="menuItem").row.fit.items-center.q-px-md
+                  span {{menuItem.name}}
+    div(style=`width: 180px`).row.full-height.q-py-md
+      div(style=`width: 180px; borderRadius: 8px; overflow: hidden`
+        ).column.full-height.bg-white
+        div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+          q-icon(name="settings" size="24px" color="grey").q-mr-sm
+          span Настройки
+        .col.scroll
+          div(v-for="(m, mi) in menuItems" :key="m.id" @click="menuItemClick(m, mi)"
+            :style=`{
+              height: '35px',
+              background: menuItem.id === m.id ? '#eee' : 'none',
+              borderLeft: menuItem.id === m.id ? '2px solid #027BE3' : 'none'
+              }`
+            ).row.full-width.items-center.q-px-sm.cursor-pointer.hr
+            span {{ m.name }}
 </template>
 
 <script>
+import kMenu from 'pages/app/menu'
+
 export default {
-  name: 'pageAppSettings',
+  name: 'pageApp__Settings',
+  components: {kMenu},
   data () {
     return {
-      setting: null,
-      settings: [
-        // {id: 'nodes', name: 'Мои ядра', icon: 'menu'},
-        // {id: 'spheres', name: 'Мои сферы', icon: 'menu'},
-        // {id: 'bookmarks', name: 'Закладки', icon: 'bookmark'},
-        // {id: 'profile', name: 'Профиль', icon: 'menu'},
-        // {id: 'journal', name: 'Бортовой журнал', icon: 'menu'},
-        // {id: 'stories', name: 'Истории', icon: 'menu'},
-        // {id: 'weekly', name: 'Лучшее за неделю', icon: 'menu'},
-        {id: 'settings', name: 'Настройки', icon: 'settings'}
-      ]
+      menuShow: false,
+      menuItems: [
+        {id: 'general', name: 'Основные'},
+        {id: 'security', name: 'Безопасность'},
+        {id: 'privacy', name: 'Приватность'},
+        {id: 'notifications', name: 'Уведомления'},
+        {id: 'payments', name: 'Плетежи и подписки'}
+      ],
+      menuItem: null
     }
   },
   methods: {
-    userClick () {
-      this.$log('userClick')
-    },
-    settingClick (s) {
-      this.$log('settingClick', s)
-      this.$set(this, 'setting', s)
-    },
-    refresh () {
-      this.$log('refresh')
-      window.location.reload(true)
-    },
-    async logout () {
-      this.$log('logout')
-      await this.$apollo.query({
-        query: gql`
-          query logout {
-            logout
-          }
-        `
-      })
-      this.$router.push('/login')
+    menuItemClick (m, mi) {
+      this.$log('menuItemClick', m, mi)
+      this.$router.push({name: m.id})
+    }
+  },
+  watch: {
+    '$route': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route CHANGED', to)
+        // if (this.$q.screen.width >= 600) this.menuShow = true
+        if (to.matched[2]) {
+          this.$set(this, 'menuItem', this.menuItems.find(i => i.id === to.matched[2].name))
+        }
+      }
     }
   },
   mounted () {

@@ -1,5 +1,5 @@
 const debug = require('debug')('[boot]:apollo')
-// debug.enabled = true
+debug.enabled = true
 import { Notify } from 'quasar'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
@@ -115,7 +115,7 @@ export default async ({ Vue, store, app }) => {
     link: createUploadLink({
       uri: linkUpload,
       fetch (uri, options) {
-        debug('FETCH UPLOAD')
+        debug('FETCH UPLOAD', uri, options)
         options.headers['Authorization'] = localStorage.getItem('ktoken')
         return fetch(uri, options)
       }

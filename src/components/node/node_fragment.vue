@@ -1,22 +1,20 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  //- div(v-if="type === 'none'").row.fit.bg-grey-3
-  //-   slot(name="empty")
-  //- div(v-if="$slots.editor" style=`position: absolute; zIndex: 100`).row.bg
-  slot(name="editor")
-  div(v-if="type !== 'none' && state === 'preview'" @click="state = 'active'"
-    ).row.fit
-    img(:src="preview" width="100%" height="100%")
-  div(v-else-if="type === 'VIDEO' && state === 'active'").row.fit.bg-red
+  div(v-if="state !== 'active'" @click="state = 'active'"
+    style=`position: absolute; zIndex: 500`).row.fit
+    slot(name="editor")
+    //- img(v-if="preview" :src="preview" width="100%" height="100%")
+  div(v-if="type === 'VIDEO' && state === 'active'").row.fit
     node-video(
+      @started="started = true"
       :index="index"
-      :url="fragment.content.url"
+      :url="fragment.url"
       :startSec="getStartSec"
       :endSec="getEndSec")
       template(v-slot:actions)
         slot(name="actions")
-  div(v-else-if="type === 'IMAGE' && state === 'active'").row.fit.bg-green
-    node-image(:url="fragment.content.url")
+  //- div(v-else-if="type === 'IMAGE' && state === 'active'").row.fit.bg-green
+  //-   node-image(:url="fragment.content.url")
 </template>
 
 <script>
@@ -82,11 +80,9 @@ export default {
       // type: 'none',
       types: ['image', 'video', 'none'],
       editor: null,
-      editorReady: false
+      editorReady: false,
+      started: false
     }
-  },
-  mounted () {
-    // this.$refs.kpreviewWrapper.scrollTop = 50
   }
 }
 </script>

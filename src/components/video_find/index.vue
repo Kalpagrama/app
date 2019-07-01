@@ -1,63 +1,38 @@
 <template lang="pug">
-.column.fit.bg-white
-  //- header with animated height
-  div(ref="kheader" :style=`{height: $store.state.ui.width+'px', borderBottom: '1px solid #eee'}`).column.full-width.kheader
-    //- header
-    div(v-if="type !== 'youtube'" style=`height: 60px`).row.full-width.items-center.justify-end
-      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        q-btn(flat round dense icon="clear" color="primary" @click="$emit('close')")
-    //- body
-    .col
-      .row.fit.items-center.content-center
-        .row.full-width
-          .col.q-pl-sm
-            q-input(v-model="input" @input="handleInput" @keyup.enter="startSearch"
-              filled placeholder="Поиск"
-              :class="{'q-pr-sm': type !== 'youtube'}").fit
-              template(v-slot:prepend)
-                q-icon(name="search")
-              template(v-slot:append)
-                //- q-btn(round flat icon="clear" color="primary" v-if="input.length > 0")
-                q-btn(no-caps color="primary" v-if="input.length > 0" @click="startSearch") Найти
-          div(v-if="type === 'youtube'" style=`height: 60px; width: 60px`).row.items-center.justify-center
-            q-btn(flat round icon="clear" @click="cancelClick" color="primary")
-        div(v-if="type === 'local'").row.full-width.justify-center
-          small.text-center.text-grey-8.q-my-sm Найди видео или вставь ссылку из YouTube
-  //- videos list
-  div(style=`overflowX: hidden`).col.scroll.bg-grey-2
-    //- from yotube link
-    source-link(v-if="type === 'link'" type="youtube" :link="input"
-      @video="$event => $emit('video', $event)"
-      @close="$emit('close')")
-    //- from youtube search
-    source-youtube(v-else-if="type === 'youtube'"
-      :search="search"
-      @video="$event => $emit('video', $event)"
-      @close="$emit('close')")
-    //- local on device
-    source-local(v-else-if="type === 'local'")
-    //- loading
-    div(v-else-if="type === 'loading'").row.fit.items-center.justify-center
-      q-spinner(size="50px")
-    //- nothing
-    div(v-else style=`height: 60px`).row.full-width.items-center.justify-center
-      span Nothing found!
+.row.full-width
+  div(v-if="source === 'camera'").row.fit.items-center.justify-center
+    source-camera
+  div(v-else-if="source === 'device'").row.fit.items-center.justify-center
+    source-device
+  div(v-else-if="source === 'youtube'").row.fit.items-center.justify-center
+    source-youtube(@select="$event => $emit('select', $event)")
+  div(v-else-if="source === 'link'").row.fit.items-center.justify-center
+    source-link
+  div(v-else-if="source === 'workspace'").row.fit.items-center.justify-center
+    source-workspace
+  div(v-else).row.fit.items-center.justify-center
+    span {{$t('no_such_source')}}
 </template>
 
 <script>
-import sourceLink from './source_link'
+import sourceCamera from './source_camera'
+import sourceDevice from './source_device'
 import sourceYoutube from './source_youtube'
-import sourceLocal from './source_local'
+import sourceLink from './source_link'
+import sourceWorkspace from './source_workspace'
+
 export default {
   name: 'videoFind',
-  components: { sourceLink, sourceYoutube, sourceLocal },
+  props: {
+    source: {type: String, required: true}
+  },
+  components: { sourceCamera, sourceDevice, sourceYoutube, sourceLink, sourceWorkspace },
   data () {
     return {
-      input: '',
-      search: '',
-      type: 'local',
-      types: ['link', 'local', 'youtube', 'loading']
+      sources: ['camera', 'device', 'youtube', 'link', 'workspace']
     }
+  },
+  computed: {
   },
   methods: {
     handleInput (e) {
@@ -82,15 +57,6 @@ export default {
       this.type = 'local'
       this.input = ''
       this.search = ''
-    }
-  },
-  watch: {
-    type: {
-      handler (to, from) {
-        if (to === 'youtube') {
-          this.$tween.to('.kheader', 0.5, {height: '70px'})
-        }
-      }
     }
   },
   mounted () {

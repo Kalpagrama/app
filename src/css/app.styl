@@ -27,9 +27,31 @@ html, body
     font-family: 'Merriweather', serif;
 .bg
     border: 1px solid green
+.bp
+    border: 1px solid pink
 .br
     border: 1px solid red
 .hr:hover
     background: #eee !important
 *, html, body
     box-sizing: border-box
+    oveflow: hidden
+
+@media screen and (min-width: 320px) and (max-width: 767px) and (orientation: landscape) {
+  html {
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vh;
+    overflow: hidden;
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+}
+::-webkit-scrollbar {
+  width: 1px
+  height: 1px !important
+}
+::-webkit-scrollbar-thumb {
+  background: black
+}

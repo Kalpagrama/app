@@ -1,49 +1,56 @@
 <template lang="pug">
-  q-layout(view='lHh Lpr lFf' :style=`{height: height+'px'}`
-    @resize="handleResize")
-    //- left drawer
-    //- q-drawer(v-model="show_left_drawer")
-    //-     .column.fit.bg-white.justify-center.items-center
-    //-         span Menu
-    //- right drawer
-    //- q-drawer(v-if="!loading" :value="$store.state.ui.show_right_drawer" side="right" @input="$store.commit('ui/state', ['show_right_drawer', false])")
-    //-   settings
-    //- q-header.bg-white.text-black(elevated='' v-show="headerVisible()")
-    //-   q-toolbar
-    //-       q-btn.q-mr-sm(flat='', round='', dense='', icon='menu')
-    //-       q-toolbar-title(v-if="isTitle()") Кальпаграмма
-    //-       q-toolbar-title(v-if="isSearch()")
-    //-           q-input.text-black(borderless standout  color="purple-12" v-model="search" size="sm")
-    //-               template(v-slot:prepend)
-    //-                   q-icon(v-if="search === ''" name="search")
-    //-                   q-icon(v-else name="clear" class="cursor-pointer" @click="search = ''")
-    //-       q-btn(flat='', round='', dense='', icon='more_vert')
-    //- page
+  q-layout(view='lHh Lpr lFf' :style=`{height: $q.screen.height+'px'}` @resize="handleResize").window-height.bg-grey-2
+    q-header(reveal)
+      div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.justify-center.bg-white
+        div(style=`maxWidth: 1130px` :class=`{'q-px-sm': $q.screen.width < 600}`).row.fit.justify-center.q-px-sm
+          .row.full-height.items-center
+            div(style=`height: 40px; width: 40px; borderRadius: 50%`
+              @click="$router.push('/app/home')"
+              ).row.items-center.justify-center.bg-primary.cursor-pointer
+              q-icon(name="vertical_align_center" size="20px" color="white")
+            h6(v-if="$q.screen.width >= 600").q-ma-xs.q-ml-sm.text-black.text-bold kalpa
+          .col
+            .row.fit.justify-end.items-center.content.center
+              div(v-if="$q.screen.width >= 400" style=`height: 40px; overflow: hidden; borderRadius: 8px`).col.q-px-sm
+                div(style=`borderRadius: 8px; overflow: hidden`).row.fit.items-end
+                  q-input(v-model="search" filled).fit.items-end
+                    template(v-slot:prepend)
+                      q-icon(name="search")
+              //- q-btn(v-if="$q.screen.width >= 400" rounded color="primary" no-caps style=`height: 40px`
+              //-   @click="$router.push('/app/create')").q-mx-md Создать
+              div(style=`height: 40px; width: 40px; borderRadius: 50%`
+                @click="$router.push('/app/settings')"
+                ).row.items-center.justify-center.bg-grey-7.cursor-pointer
+                q-icon(name="face" size="20px" color="white")
     q-page-container.fit
       q-page.fit
-        div(v-if="loading").row.fit.items-center.justify-center.content-center
-          div(style=`height: 80px`).row.full-width.items-center.justify-center
-            q-spinner(size="50px" color="primary" :thickness="2")
-        //- TODO: route level transitions
-        //- transition(enter-active-class="animated slideInRight" leave-active-class="animated slideOutLeft")
-        router-view(v-else)
-    //- footer
-    q-footer(v-if="!loading && show_footer" bordered).row.full-width.justify-between.bg-white.q-px-sm
-      q-btn(v-if="page" v-for="(p, pi) in pages" :key="pi" flat round
-        :color="page.id === p.id ? 'primary' : 'grey'"
-        :icon="p.icon" size="16px" @click="pageClick(p)")
-        //- q-badge(color="red" floating transparent style=`padding: 3px`).q-mr-sm.q-mt-sm 1
+        router-view(v-if="!loading").fit
+          template(v-slot:menu v-if="$q.screen.width > 850")
+            div(:style=`{position: 'relative', width: mini ? 40+'px' : 240+'px'}`).row.full-height.q-py-md
+              div(:style=`{position: 'fixed', width: mini ? 40+'px' : 240+'px', height: $q.screen.height-100+'px'}`).row
+                div(style=`overflow: hidden; borderRadius: 8px`).row.fit
+                  k-menu(:mini="mini" @mini="handleMini")
+        div(v-else).row.fit.items-center.justify-center
+          q-spinner(size="50px" :thickness="2" color="primary")
+    q-footer(v-if="$q.screen.width < 600").bg-white
+      div(
+        style=`height: 50px; borderTop: 1px solid #eee`
+        ).row.full-width.justify-between.q-px-sm
+        //- :color="page.id === p.id ? 'primary' : 'grey'"
+        q-btn(v-for="(p, pi) in pages" :key="pi" flat round v-touch-hold="btnHolded"
+          color="grey" :icon="p.icon" size="16px" @click="pageClick(p)")
 </template>
 
 <script>
-import settings from 'pages/app/settings'
+import kMenu from 'pages/app/menu'
 
 export default {
   name: 'mainLayout',
-  components: { settings },
+  components: {kMenu},
   data () {
     return {
       loading: true,
+      search: '',
       height: window.innerHeight,
       width: window.innerWidth,
       show_footer: true,
@@ -56,27 +63,37 @@ export default {
         { id: 'search', icon: 'search', name: 'Поиск' },
         { id: 'create', icon: 'add_circle_outline', name: 'Создать' },
         { id: 'notifications', icon: 'notifications_none', name: 'Уведомления' },
-        { id: 'settings', icon: 'menu', name: 'Меню' }
-      ]
+        { id: 'menu', icon: 'menu', name: 'Меню' }
+      ],
+      mini: false
     }
   },
   watch: {
-    page: {
-      deep: true,
-      immediate: false,
-      handler (to, from) {
-        this.$router.push({ name: to.id, params: { page: to.id } })
-      }
-    },
-    '$route': {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$log('$route CHANGED', to)
-      }
-    }
+    // '$route': {
+    //   deep: true,
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.$log('$route CHANGED', to)
+    //     if (!to.name) {
+    //       this.$log('NO PAGE')
+    //       this.$set(this, 'page', this.pages[0])
+    //     } else {
+    //       this.$log('GOT PAGE', this.$route.name)
+    //       let findPage = this.pages.find(p => p.id === to.name)
+    //       if (findPage) this.$set(this, 'page', findPage)
+    //       else this.$set(this, 'page', this.pages[this.pages.length - 1])
+    //     }
+    //   }
+    // }
   },
   methods: {
+    handleMini () {
+      this.$log('handleMini')
+      this.$set(this, 'mini', !this.mini)
+    },
+    btnHolded () {
+      window.location.reload(true)
+    },
     handleScroll (e) {
       this.$log('handleScroll', e)
     },
@@ -88,8 +105,7 @@ export default {
     },
     pageClick (p) {
       this.$log('pageClick', p)
-      this.$set(this, 'pageId', p.id)
-      this.$set(this, 'page', p)
+      this.$router.push({path: p.id})
     }
   },
   async mounted () {
@@ -98,17 +114,6 @@ export default {
     // check token
     let token = this.$route.query.token
     if (token) localStorage.setItem('ktoken', token)
-    // this.$log('ui/store', this.$store.state.ui.show_right_drawer)
-    if (!this.$route.name) {
-      // this.$log('NO PAGE')
-      this.$set(this, 'page', this.pages[0])
-    } else {
-      // this.$log('GOT PAGE', this.$route.name)
-      let findPage = this.pages.find(p => p.id === this.$route.name)
-      if (findPage) this.$set(this, 'page', findPage)
-      else this.$set(this, 'page', this.pages[0])
-    }
-    await this.$wait(500)
     // user check
     let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
       query: gql`
@@ -119,6 +124,7 @@ export default {
       })
     this.$log('userIsAuthorized', userIsAuthorized)
     this.$log('userIsConfirmed', userIsConfirmed)
+    // TODO: create with try/catch this...
     if (!userIsAuthorized || !userIsConfirmed) {
       this.$log('GO LOGIN')
       this.$router.push('/login')
@@ -129,6 +135,22 @@ export default {
     // this.$log('user', user)
     this.$store.commit('auth/state', ['user', user])
     this.loading = false
+    // const observer = this.$apollo.subscribe({
+    //   client: 'ws',
+    //   query: gql`
+    //     subscription uploadProgress {
+    //       uploadProgress
+    //     }
+    //   `,
+    // })
+    // observer.subscribe({
+    //   next: (data) => {
+    //     this.$log('sub data', data)
+    //   },
+    //   error: (error) => {
+    //     this.$log('sub error', error)
+    //   }
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
