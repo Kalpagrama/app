@@ -41,7 +41,7 @@ div(style=`maxWidth: 600px`).column.fit.bg-white
           :style=`{height: '100px', borderRight: '1px solid #eee', background: skey == source ? '#eee' : 'none'}`).col.hr.cursor-pointer
             .row.fit.items-center.content-center.justify-center
               span {{ s.name }}
-      video-find(:source="source" @select="")
+      video-find(:source="source" @content="contentSelected")
     //- book
     div(v-else-if="type === 'BOOK'").row.full-width
       div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
@@ -70,9 +70,6 @@ export default {
   data () {
     return {
       type: '',
-      typeVideo: '',
-      typeImage: '',
-      typeBook: '',
       source: '',
       types: {
         IMAGE: {
@@ -117,6 +114,9 @@ export default {
     }
   },
   methods: {
+    contentSelected (val) {
+      this.$log('contentSelected')
+    },
     getHeight (l) {
       let w = this.$q.screen.width
       if (w > 600) {

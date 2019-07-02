@@ -21,7 +21,7 @@ div(style=`position: relative`).column.fit.bg-grey-2
   //- ====
   //- node
   .row.full-width.justify-center.q-py-md
-    node(:node="node" :nodeFull="nodeFull" :types="types")
+    node(:node="node" :nodeFull="nodeFull" :types="types" :visible="true")
       //- name
       template(v-slot:name)
         .row.fit.items-center

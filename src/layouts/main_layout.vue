@@ -1,21 +1,21 @@
 <template lang="pug">
   q-layout(view='lHh Lpr lFf' :style=`{height: $q.screen.height+'px'}` @resize="handleResize").window-height.bg-grey-2
     q-header(reveal)
-      div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.justify-center.bg-white
+      div(style=`height: 60px; borderBottom: 1px solid #eee; zIndex: 1000`).row.full-width.justify-center.bg-white
         div(style=`maxWidth: 1130px` :class=`{'q-px-sm': $q.screen.width < 600}`).row.fit.justify-center.q-px-sm
           .row.full-height.items-center
             div(style=`height: 40px; width: 40px; borderRadius: 50%`
               @click="$router.push('/app/home')"
               ).row.items-center.justify-center.bg-primary.cursor-pointer
               q-icon(name="vertical_align_center" size="20px" color="white")
-            h6(v-if="$q.screen.width >= 600").q-ma-xs.q-ml-sm.text-black.text-bold kalpa
+            h6(v-if="$q.screen.width >= 600").q-ma-xs.q-ml-sm.text-black.text-bold 0.02
           .col
             .row.fit.justify-end.items-center.content.center
               div(v-if="$q.screen.width >= 400" style=`height: 40px; overflow: hidden; borderRadius: 8px`).col.q-px-sm
-                div(style=`borderRadius: 8px; overflow: hidden`).row.fit.items-end
-                  q-input(v-model="search" filled).fit.items-end
-                    template(v-slot:prepend)
-                      q-icon(name="search")
+                //- div(style=`borderRadius: 8px; overflow: hidden`).row.fit.items-end
+                //-   q-input(v-model="search" filled).fit.items-end
+                //-     template(v-slot:prepend)
+                //-       q-icon(name="search")
               //- q-btn(v-if="$q.screen.width >= 400" rounded color="primary" no-caps style=`height: 40px`
               //-   @click="$router.push('/app/create')").q-mx-md Создать
               div(style=`height: 40px; width: 40px; borderRadius: 50%`

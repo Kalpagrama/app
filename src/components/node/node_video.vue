@@ -2,11 +2,9 @@
 div(style=`position: relative; zIndex: 200; overflow: auto`).row.fit
   div(style="position: absolute; zIndex: 200").row.full-width.items-center.justify-end.q-pa-sm
     q-btn(dense round flat :icon="muted ? 'volume_off' : 'volume_up'" color="white" @click="toggleMute").shadow-5
-  div(style=`position: relative; height: 100%; overflow: hidden` ref="kvideoWrapper").row.full-width
+  div(style=`position: relative; height: 100%; overflow: hidden`).row.full-width
     div(style=`position: relative; height: 100%`).row.full-width.items-center.content-center
-      video(:ref="ref" width="100%" height="100%" playsinline preload="auto")
-        //- source(type="video/youtube" :src="url")
-        source(type="video/mp4" :src="url")
+      video(:ref="ref" width="100%" height="100%" playsinline preload="auto" :src="url" type="video/mp4" autoplay)
 </template>
 
 <script>
@@ -25,12 +23,29 @@ export default {
     return {
       player: null,
       mediaElement: null,
-      muted: true
+      muted: false,
+      urlFull: '',
+      urls: [
+        'https://cs.kalpagramma.com/thumbs/sc/us/108394685759791108_fragments/92.29942356687899-181.09380573248407_600.mp4',
+        'https://cs.kalpagramma.com/thumbs/sc/us/108394685759791108_fragments/136.69661464968152-181.09380573248407_600.mp4'
+      ],
+      switching: false
     }
   },
   computed: {
     ref () {
-      return `kplayer-${this.index}`
+      return `kplayer-${this.index}-${Date.now()}`
+    }
+  },
+  watch: {
+    url: {
+      async handler (to, from) {
+        // this.switching = true
+        this.$log('url CHANGED')
+        // await this.$wait(2000)
+        this.$emit('ready', true)
+        // this.switching = false
+      }
     }
   },
   methods: {
@@ -39,14 +54,11 @@ export default {
       this.muted = !this.muted
     },
     timeUpdate (e) {
-      if (this.mediaElement.currentTime >= this.endSec) this.mediaElement.setCurrentTime(this.startSec)
+      // if (this.mediaElement.currentTime >= this.endSec) this.mediaElement.setCurrentTime(this.startSec)
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
-    this.$log('startSec', this.startSec)
-    this.$log('endSec', this.endSec)
-    this.$log('url', this.url)
     // load player
     this.player = new window.MediaElementPlayer(this.$refs[this.ref], {
       loop: true,
@@ -59,19 +71,21 @@ export default {
       AndroidUseNativeControls: false,
       success: async (mediaElement, originalNode, instance) => {
         this.mediaElement = mediaElement
-        this.mediaElement.addEventListener('timeupdate', this.timeUpdate, false)
-        this.mediaElement.setCurrentTime(this.startSec)
         this.mediaElement.play()
-        this.$log('START PLAYING')
-        await this.$wait(600)
-        // this.started = true
         this.$emit('started')
       }
     })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.mediaElement.removeEventListener('timeupdate', this.timeUpdate)
+    // this.mediaElement.removeEventListener('timeupdate', this.timeUpdate)
   }
 }
 </script>
+
+<style lang="stylus">
+.mejs__overlay-button
+  display: none !important
+.mejs__overlay-loading
+  display: none !important
+</style>
