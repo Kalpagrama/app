@@ -1,20 +1,20 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  div(v-if="$slots.editor" style=`position: absolute; zIndex: 110`).row.fit
-    slot(name="editor")
-  div(v-if="!ready" style=`position: absolute; zIndex: 100`).row.fit
-    img(v-if="preview" :src="preview" width="100%" height="100%")
-  div(v-if="type === 'VIDEO'").row.fit
+  div(v-if="!fragment" style=`position: absolute; zIndex: 1000`).row.fit
+    slot(name="empty")
+  div(v-if="fragment" style=`position: absolute; zIndex: 900; height: 60px; right: 0px; top: 0px`).row.items-center.q-px-xs
+    slot(name="actions")
+  div(v-if="!ready && preview" style=`position: absolute; zIndex: 800`).row.fit
+    img(v-if="preview" :src="preview" width="100%" height="100%" @click="ready = true")
+  div(v-else-if="type === 'VIDEO'").row.fit
     node-video(
-      @ready="contentReady"
       :index="index"
-      :url="fragment.url"
+      :url="mini ? fragment.url : fragment.content.url"
       :startSec="getStartSec"
-      :endSec="getEndSec")
-      template(v-slot:actions)
-        slot(name="actions")
-  div(v-else-if="type === 'IMAGE' && state === 'active'").row.fit.bg-green
-    node-image(:url="fragment.content.url")
+      :endSec="getEndSec"
+      :mini="mini")
+  div(v-else-if="type === 'IMAGE'").row.fit.bg-green
+  //-   node-image(:url="fragment.content.url")
 </template>
 
 <script>
@@ -24,29 +24,11 @@ export default {
   name: 'nodeFragment',
   components: { nodeVideo, nodeImage },
   props: {
-    index: {
-      type: Number
-    },
-    type: {
-      type: String,
-      default: 'VIDEO'
-    },
-    fragment: {
-      default: () => {
-        return {
-          name: '',
-          content: {
-            type: 'VIDEO'
-          }
-        }
-      }
-    },
-    visible: {
-      type: Boolean
-    },
-    preview: {
-      type: String
-    }
+    index: {type: Number},
+    fragment: {type: Object},
+    preview: {type: String},
+    visible: {type: Boolean},
+    mini: {type: Boolean}
   },
   methods: {
     contentReady (val) {
@@ -55,6 +37,10 @@ export default {
     }
   },
   computed: {
+    type () {
+      if (this.fragment) return this.fragment.content.type
+      else return null
+    },
     getStartSec () {
       if (this.fragment.relativePoints.length > 0) {
         return this.fragment.relativePoints[0]['x']
@@ -69,22 +55,6 @@ export default {
         return 10
       }
     }
-  },
-  watch: {
-    // type: {
-    //   async handler (to, from) {
-    //     this.$log('type CHANGED', to)
-    //     if (to === 'VIDEO') {
-    //     }
-    //   }
-    // },
-    // fragment: {
-    //   deep: true,
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('fragment CHANGED', to)
-    //   }
-    // }
   },
   data () {
     return {

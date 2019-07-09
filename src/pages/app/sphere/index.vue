@@ -1,60 +1,52 @@
 <template lang="pug">
-.column.fit
-  div(body-scroll-lock-ignore).col.scroll.bg-grey-2
-    .row.fit.justify-center
-      div(style=`maxWidth: 1130px`).row.fit.justify-start
-        slot(name="menu")
-        div(style=`maxWidth: 540px; marginLeft: 14px !important; marginRight: 14px !important`).row.full-width.justify-center.q-py-md
-          //- sphere spheres
-          div(style=`borderRadius: 8px`).row.full-width.justify-center.bg-white.q-mb-md
-            div(style=`height: 60px`).row.full-width.items-center.no-wrap.q-px-sm.scroll
-              h6(v-if="sphere" style=`white-space: nowrap`).q-ma-xs {{`#${sphere.name}`}}
-            div(v-show="sphereSpheresShow"
-              style=`minHeight: 40px; borderBottom: 1px solid #eee; overflowY: hidden`
-              ).row.full-width.q-pa-sm.scroll
-              //- rows
+.row.fit.justify-center
+  div(style=`maxWidth: 1130px`).row.fit.justify-start.q-px-md
+    //- left menu
+    slot(name="menu")
+    //- body
+    .col.full-height.q-px-md.q-py-md
+      .column.fit
+        //- sphere header + spheres
+        div(style=`borderRadius: 8px`).row.full-width.justify-center.bg-white.q-mb-md
+          div(style=`height: 60px`).row.full-width.items-center.no-wrap.q-px-sm.scroll
+            h6(v-if="sphere" style=`white-space: nowrap`).q-ma-xs {{`#${sphere.name}`}}
+          div(v-show="sphereSpheresShow"
+            style=`minHeight: 40px; borderBottom: 1px solid #eee; overflowY: hidden`
+            ).row.full-width.q-pa-sm.scroll
+            //- rows
+            div(
+              v-for="(r, ri) in getRows" :key="ri"
+              style=`height: 40px`).row.full-width.no-wrap
+              //- spheres
               div(
-                v-for="(r, ri) in getRows" :key="ri"
-                style=`height: 40px`).row.full-width.no-wrap
-                //- spheres
-                div(
-                  v-for="(s, si) in spheres" :key="s.oid" v-if="spheresShow(ri, si)"
-                  @click="sphereClick(s, si)" v-touch-hold="$event => sphereHold(s, si, $event)"
-                  style=`borderRadius: 4px`
-                  :class=`{'bg-grey-3': s.oid !== $route.query.sphere, 'bg-grey-5': s.oid === $route.query.sphere}`
-                  ).row.items-center.q-pa-xs.q-ma-xs.bg-grey-3.hr.cursor-pointer
-                  span(style=`white-space: nowrap`) {{ `#${s.name}` }}
-          apollo-query(v-if="!loading && sphere" :query="query" :variables="variables" @result="handleResult" :deep="true").full-width
-            template(v-slot="{ result: { loading, error, data } }")
-              //- loading
-              div(v-if="loading" style=`height: 100px`).row.full-width.items-center.justify-center
-                  q-spinner(size="50px" color="primary" :thickness="2")
-              //- error
-              div(v-else-if="error" style=`height: 100px`).row.full-width.items-center.justify-center
-                span {{ error }} : (
-              //- items
-              template(v-else-if="data && data.sphereNodes")
-                node-card(v-for="(n, ni) in data.sphereNodes.items" :key="n.oid" :node="getNode(n)")
-              //- nothing
-              div(v-else style=`height: 100px;`).row.full-width.items-center.justify-center
-                q-spinner(size="50px" :thickness="2" color="primary")
+                v-for="(s, si) in spheres" :key="s.oid" v-if="spheresShow(ri, si)"
+                @click="sphereClick(s, si)" v-touch-hold="$event => sphereHold(s, si, $event)"
+                style=`borderRadius: 4px`
+                :class=`{'bg-grey-3': s.oid !== $route.query.sphere, 'bg-grey-5': s.oid === $route.query.sphere}`
+                ).row.items-center.q-pa-xs.q-ma-xs.bg-grey-3.hr.cursor-pointer
+                span(style=`white-space: nowrap`) {{ `#${s.name}` }}
+        //- body
+        .col.scroll
+          k-feed(v-if="!loading && sphere" :query="query" :variables="variables" :mini="true" queryKey="sphereNodes")
           //- swithing spheres
           div(v-else).row.fit.items-center.justify-center
             q-spinner(size="50px" :thickness="2" color="primary")
-        div(v-if="$q.screen.width >= 1100" style=`position: relative; width: 280px; maxHeight: 100%`).column.full-height.q-py-md
-          div(style=`position: fixed; width: 280px; height: 700px`).row
-            div(style=`borderRadius: 8px`).row.fit.items-center.justify-center.bg-white
-              q-icon(name="flash_on")
-              span Some popular tags and sh*t
+    //- right menu
+    div(style=`position: relative; width: 280px; maxHeight: 100%`).column.full-height.q-py-md
+      div(style=`position: fixed; width: 240px; height: 800px`).row
+        div(style=`borderRadius: 8px`).row.fit.items-center.justify-center.bg-white
+          q-icon(name="flash_on")
+          span Some popular
 </template>
 
 <script>
 import nodeCard from 'components/node/node_card'
 import kMenu from 'pages/app/menu'
+import kFeed from 'components/kFeed'
 
 export default {
   name: 'pageApp__Sphere',
-  components: { nodeCard, kMenu },
+  components: { nodeCard, kFeed, kMenu },
   data () {
     return {
       loading: false,

@@ -1,7 +1,7 @@
 const debug = require('debug')('[boot]:main')
 // debug.enabled = true
 import VueVirtualScroller from 'vue-virtual-scroller'
-import { LoadingBar } from 'quasar'
+import { LoadingBar, date } from 'quasar'
 import TweenMax from 'gsap/TweenMax'
 import VueObserveVisibility from 'vue-observe-visibility'
 
@@ -20,4 +20,10 @@ export default async ({ Vue }) => {
     position: 'top'
   })
   Vue.prototype.$tween = TweenMax
+  Vue.prototype.$date = (ts, format) => {
+    return date.formatDate(ts, format || 'YYYY.MM.DD', {
+      dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+      monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+    })
+  }
 }

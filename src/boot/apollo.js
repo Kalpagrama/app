@@ -1,5 +1,5 @@
 const debug = require('debug')('[boot]:apollo')
-debug.enabled = true
+// debug.enabled = true
 import { Notify } from 'quasar'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
@@ -67,7 +67,7 @@ export default async ({ Vue, store, app }) => {
   let linkUpload = services.UPLOAD
   store.commit('auth/state', ['AUTH_VK', services.AUTH_VK])
   // Cache
-  const cache = new InMemoryCache()
+  const cache = new InMemoryCache({addTypename: false})
   // persistCache({
   //   cache,
   //   storage: localStorage

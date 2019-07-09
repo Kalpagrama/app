@@ -38,27 +38,9 @@ div(style=`position: relative`).row.full-width
     //- show more
     //- div(style=`height: 70px`).row.full-width.items-center.justify-center
     //-   q-btn(style=`height: 50px; minWidth: 300px` rounded outline color="primary" @click="showMore") {{$t('show_more')}}
-  //- //- loading
-  //- div(v-if="loading" style=`position: absolute; zIndex: 100`).row.fit.items-center.justify-center
-  //-   q-spinner(size="50px" :thickness="2" color="primary")
-  //- //- fake
-  //- div(v-if="videos.length === 0").row.full-width
-  //-   div(
-  //-     v-for="v in 6" :key="v"
-  //-     style=`height: 90px`).row.full-width.bg-white.q-my-sm.q-px-sm
-  //-     div(style=`height: 90px; width: 120px`).row.q-pa-xs
-  //-       div(style=`borderRadius: 4px`).row.fit.items-center.justify-center.bg-grey-2
-  //-         q-icon(name="fab fa-youtube" color="grey-4" size="30px")
-  //-     .col
-  //-       .row.fit.items-start.content-start.q-pa-xs
-  //-         div(style=`height: 20px; minHeight: 20px; borderRadius: 4px`).row.full-width.bg-grey-2.q-mb-xs
-  //-         div(style=`height: 20px; minHeight: 20px; borderRadius: 4px; width: 180px`).row.bg-grey-2
-  //- //- real
-  //- div(v-else).row.full-width
 </template>
 
 <script>
-// import { throttle } from 'quasar'
 export default {
   name: 'findVideoList',
   data () {
@@ -80,6 +62,7 @@ export default {
     cancelSearch () {
       this.$log('cancelSearch')
       this.search = ''
+      this.videos = []
       this.$tween.to(this, 0.66, {headerHeight: 300})
     },
     async startSearch () {
@@ -102,12 +85,13 @@ export default {
       // TODO: update nextPageToken and ?
     },
     videoClick (v, vi) {
-      this.$log('itemClick', v, vi)
+      this.$log('videoClick', v, vi)
       this.videoSelectedId = v.id
     },
     videoSelect (v, vi) {
       this.$log('videoSelect', v, vi)
-      this.$emit('content', v)
+      let options = {type: 'VIDEO', source: 'from_youtube'}
+      this.$emit('ready', {...v, ...options})
       this.$emit('close')
     },
     async itemsFind () {

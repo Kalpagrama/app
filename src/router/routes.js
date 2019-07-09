@@ -10,7 +10,7 @@ const routes = [
       {
         name: 'workspace',
         path: 'workspace',
-        redirect: 'workspace/videos',
+        redirect: 'workspace/nodes',
         component: () => import('pages/app/workspace'),
         children: [
           {name: 'videos', path: 'videos', component: () => import('pages/app/workspace/videos')},
@@ -24,8 +24,8 @@ const routes = [
         path: 'create',
         component: () => import('pages/app/create'),
         children: [
-          {path: '', component: () => import('components/editor_node')},
-          {name: 'editor', path: 'editor', component: () => import('components/video_editor')}
+          {path: '', component: () => import('components/node_creator')}
+          // {name: 'editor', path: 'editor', component: () => import('components/video_editor')}
         ]
       },
       {

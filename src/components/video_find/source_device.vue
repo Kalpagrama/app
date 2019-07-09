@@ -1,18 +1,17 @@
 <template lang="pug">
 div(style=`minHeight: 300px`).row.full-width.justify-center.items-start.content-start
   //- header
-  div(:style=`{minHeight: headerHeight+'px'}`).row.full-width.items-center.justify-center.content-center.bg
-    q-btn(v-if="!file" @click="$refs.input.click()" color="primary" style=`height: 50px; borderRadius: 4px`) {{$t('choose_video')}}
-    div(v-if="file").row.full-width.justify-center.br
+  div(:style=`{minHeight: headerHeight+'px'}`).row.full-width.items-center.justify-center.content-center
+    q-btn(v-if="!file" @click="handleInputClick()" color="primary" style=`height: 50px; borderRadius: 4px`) {{$t('choose_video')}}
+    div(v-if="file").row.full-width.justify-center
       .col
         .row.fit.items-center.justify-start.q-px-sm
           span {{ file.name }}
       div(style=`height: 70px; width: 70px`).row.items-center.justify-center
         q-btn(round flat icon="clear" @click="videoClear()")
-      .row.full-width.bg-red
+      .row.full-width
         node-video(:url="url" :index="0")
-        //- video(v-if="url" :src="url" width="100%" height="100%" playsinline preload="auto")
-    input(type="file" ref="input" hidden @change="videoChanged" accept="video/mp4,video/x-m4v,video/*")
+    input(type="file" ref="kvideoinput" hidden @change="videoChanged" accept="video/mp4,video/x-m4v,video/*")
 </template>
 
 <script>
@@ -39,23 +38,12 @@ export default {
       this.$tween.to(this, 0.33, {headerHeight: 70})
       this.file = file
       this.url = URL.createObjectURL(file)
-      this.$log('url', this.url)
-      // await this.$wait(5000)
-      // let {data: {uploadContentFile: {oid}}} = await this.$apollo.mutate({
-      //   client: 'upload',
-      //   mutation: gql`
-      //     mutation uploadContentFile ($file: Upload!) {
-      //       uploadContentFile (file: $file) {
-      //         oid
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     file: file
-      //   }
-      // })
-      // this.$log('file uploaded!', oid)
-      // this.$emit('result', file)
+      this.$emit('ready', {type: 'VIDEO', source: 'from_device', file: file})
+    },
+    handleInputClick () {
+      this.$log('handleInputClick', this.$refs.kvideoinput)
+      this.$q.notify({color: 'green', colorText: 'white', message: 'Input click!'})
+      this.$refs.kvideoinput.click()
     }
   },
   mounted () {

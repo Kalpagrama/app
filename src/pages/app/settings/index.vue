@@ -1,7 +1,9 @@
 <template lang="pug">
 .row.fit.justify-center
-  div(style=`maxWidth: 1130px`).row.fit.justify-start
+  div(style=`maxWidth: 1130px`).row.fit.justify-start.q-px-md.br
+    //- left meny
     slot(name="menu")
+    //- body
     .col.full-height.q-pa-md
       div(style=`borderRadius: 8px 8px 8px 8px`).col.full-height.bg-white
         router-view(@menu="menuShow = !menuShow")
@@ -10,6 +12,7 @@
               .col
                 div(v-if="menuItem").row.fit.items-center.q-px-md
                   span {{menuItem.name}}
+    //- right menu
     div(style=`width: 180px`).row.full-height.q-py-md
       div(style=`width: 180px; borderRadius: 8px; overflow: hidden`
         ).column.full-height.bg-white

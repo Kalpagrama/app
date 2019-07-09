@@ -2,14 +2,14 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import ui from './ui'
 import auth from './auth'
-import feed from './feed'
+import workspace from './workspace'
 
 Vue.use(Vuex)
 
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      feed,
+      workspace,
       auth,
       ui
     },

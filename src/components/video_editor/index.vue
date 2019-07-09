@@ -8,11 +8,12 @@ div(style=`position: relative; overflowX: hidden`).row.fit.justify-center.bg-whi
       div(style=`position: relative`).row.fit.justify-center.items-start.content-start
         //- video container
         div(:style=`{position: 'relative', width: videoWidth+'px', height: videoHeight+'px', borderRadius: '8px', overflow: 'hidden'}`).row
-          video(ref="kvideo" width="100%" height="100%" playsinline preload="auto" style=`borderRadius: 8px`)
-            source(type="video/youtube" :src="content.url" v-if="content && content.urlType === 'YOUTUBE'")
-            source(type="video/mp4" :src="content.url" v-else-if="content")
-          div(v-if="!content").row.fit.items-center.justify-center
+          video(v-if="fragment.content.url" ref="kvideo" width="100%" height="100%" style=`borderRadius: 8px`
+            playsinline preload="auto" crossorigin="Anonymous"
+            type="video/mp4" :src="fragment.content.url")
+          div(v-else).row.fit.items-center.justify-center
             q-spinner(size="50px" color="primary" :thickness="2")
+            span Loading video {{fragment}}
         div(v-if="!loading" :style=`{position: 'relative', width: videoWidth+'px', height: '150px'}`).row.justify-center
             //- frames
             div(
@@ -67,11 +68,14 @@ div(style=`position: relative; overflowX: hidden`).row.fit.justify-center.bg-whi
         div(v-if="!loading" :style=`{width: videoWidth+'px', height: '60px'}`).row.justify-end.items-center.q-px-sm
           //- q-btn(round dense color="grey-9" icon="refresh" @click="handleReload")
           q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` outline no-caps :color="loop ? 'primary' : 'grey-9'" @click="toggleLoop").q-mr-sm
-            span.text-bold Loop
+            span.text-bold {{$t('loop')}}
           q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` outline no-caps :color="muted ? 'primary' : 'grey-9'" @click="toggleMute").q-mr-sm
-            span.text-bold Muted
+            span.text-bold {{$t('mute')}}
           q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` color="primary" no-caps @click="handleReady")
-            span.text-bold Готово
+            span.text-bold {{$t('next')}}
+        //- div(style=`minHeight: 400px`).row.full-width.br
+        //-   //- canvas(ref="kcanvas" crossorigin="Anonymous")
+        //-   img(v-if="preview" :src="preview" width="100%" height="100%" crossorigin="Anonymous")
         //- debug
         div(v-if="false" :style=`{position: 'relative', width: videoWidth+'px', height: '150px'}`).row.justify-center.items-start.content-start.bg-green-1
           span.full-width debug:
@@ -87,20 +91,15 @@ export default {
     title: 'Kalpa video editor'
   },
   props: {
-    start: {type: Number, default: 10},
-    end: {type: Number, default: 20},
-    url: {type: String, default: 'https://www.youtube.com/watch?v=XFzlTWx-MY0'}
+    fragment: {type: Object}
   },
   data () {
     return {
+      tick: 0,
       loading: false,
-      content: {
-        duration: 0,
-        frameUrls: []
-      },
       dragging: false,
       draggingTarget: '',
-      loop: false,
+      loop: true,
       muted: false,
       framesLeft: 0,
       startSec: 0,
@@ -109,7 +108,8 @@ export default {
       player: null,
       videoWidthMax: 640,
       fragmentWidthSecMax: 180,
-      fragmentWidthPxMax: 640
+      fragmentWidthPxMax: 640,
+      preview: null
     }
   },
   computed: {
@@ -122,16 +122,17 @@ export default {
       return this.videoWidth * 0.56
     },
     framesWidth () {
-      return this.secToPx(this.content.duration)
+      return this.secToPx(this.fragment.content.duration)
     },
     frameWidth () {
       // this.videoWidth / 18
-      return this.framesWidth / (this.content.frameUrls.length / 1)
+      return this.framesWidth / (this.fragment.content.frameUrls.length / 1)
     },
     framesFilter () {
-      return this.content.frameUrls.filter((f, fi) => {
-        return fi % 1 === 0
-      })
+      return this.fragment.content.frameUrls
+      // return this.fragment.content.frameUrls.filter((f, fi) => {
+      //   return fi % 1 === 0
+      // })
     },
     getLabelOffset () {
       let d = this.secToPx(this.endSec - this.startSec)
@@ -178,11 +179,22 @@ export default {
       this.$log('handleReload')
       window.location.reload(true)
     },
-    handleReady () {
+    async handleReady () {
       this.$log('handleReady')
-      let points = [{x: this.startSec}, {x: this.endSec}]
-      this.$log('done points', points)
-      this.$emit('done', points, this.content.duration)
+      this.player.setCurrentTime(this.startSec)
+      this.player.pause()
+      await this.$wait(500)
+      this.fragment.relativePoints = [{x: this.startSec}, {x: this.endSec}]
+      // create preview of startSec
+      let canvas = document.createElement('canvas')
+      canvas.width = this.videoWidth
+      canvas.height = this.videoHeight
+      let ctx = canvas.getContext('2d')
+      ctx.drawImage(this.$refs.kvideo, 0, 0, canvas.width, canvas.height)
+      this.preview = canvas.toDataURL()
+      await this.$wait(500)
+      // emit ready fragment
+      this.$emit('ready', this.fragment, this.preview)
       this.$emit('close')
     },
     toggleMute () {
@@ -207,14 +219,14 @@ export default {
       }
     },
     seeked (e) {
-      this.$log('seeked', e)
+      // this.$log('seeked', e)
       if (this.dragging) return
       let nextStartSec = this.player.currentTime
       if (nextStartSec >= this.endSec) {
         this.startSec = this.player.currentTime
         let newEndSec = this.startSec + 180
-        if (this.startSec + newEndSec > this.content.duration) {
-          this.endSec = this.content.duration
+        if (this.startSec + newEndSec > this.fragment.content.duration) {
+          this.endSec = this.fragment.content.duration
         } else {
           this.endSec = newEndSec
         }
@@ -237,7 +249,7 @@ export default {
       let ids = ['frame', 'frames']
       if (e.isFirst && ids.includes(e.evt.target.id)) this.draggingTarget = e.evt.target.id
       if (!ids.includes(this.draggingTarget)) return
-      this.$log('framesDrag', e)
+      // this.$log('framesDrag', e)
       if (e.isFirst) this.dragging = true
       if (e.isFinal) {
         this.dragging = false
@@ -245,14 +257,14 @@ export default {
       }
       let newStartSec = this.startSec - this.pxToSec(e.delta.x)
       let newEndSec = this.endSec - this.pxToSec(e.delta.x)
-      if (newStartSec > 0 && newEndSec <= this.content.duration) {
+      if (newStartSec > 0 && newEndSec <= this.fragment.content.duration) {
         this.startSec = newStartSec
         this.endSec = newEndSec
         this.framesLeft += e.delta.x
       }
     },
     startDrag (e) {
-      this.$log('startDrag', e.delta.x)
+      // this.$log('startDrag', e.delta.x)
       if (e.isFirst) this.dragging = true
       if (e.isFinal) this.dragging = false
       let newStartSec = this.startSec + this.pxToSec(e.delta.x)
@@ -261,11 +273,11 @@ export default {
       }
     },
     endDrag (e) {
-      this.$log('endDrag', e.delta.x)
+      // this.$log('endDrag', e.delta.x)
       if (e.isFirst) this.dragging = true
       if (e.isFinal) this.dragging = false
       let newEndSec = this.endSec + this.pxToSec(e.delta.x)
-      if (newEndSec > this.startSec && newEndSec - this.startSec <= 180 && this.endSec <= this.content.duration) {
+      if (newEndSec > this.startSec && newEndSec - this.startSec <= 180 && this.endSec <= this.fragment.content.duration) {
         this.endSec = newEndSec
       }
     },
@@ -284,7 +296,7 @@ export default {
       this.$log('startTickRight')
       let newStartSec = this.startSec + 0.100
       if (this.endSec - newStartSec > 180) this.startSec = this.endSec - 180
-      else if (newStartSec < this.endSec && newStartSec < this.content.duration) this.startSec = newStartSec
+      else if (newStartSec < this.endSec && newStartSec < this.fragment.content.duration) this.startSec = newStartSec
     },
     endTickLeft () {
       this.$log('endTickLeft')
@@ -296,32 +308,19 @@ export default {
       this.$log('endTickRight')
       let newEndSec = this.endSec + 0.100
       if (newEndSec - this.startSec > 180) this.endSec = this.startSec + 180
-      else if (newEndSec <= this.content.duration) this.endSec = newEndSec
-      else if (newEndSec > this.content.duration) this.endSec = this.content.duration
+      else if (newEndSec <= this.fragment.content.duration) this.endSec = newEndSec
+      else if (newEndSec > this.fragment.content.duration) this.endSec = this.fragment.content.duration
     },
-    async getVideo () {
+    async getVideo (oid) {
       this.$log('getVideo start')
       console.time('getVideo')
-      // try to upload video
-      let { data: { uploadContentUrl: { oid } } } = await this.$apollo.mutate({
-        mutation: gql`
-          mutation uploadContentUrl ($url: String!) {
-            uploadContentUrl(url: $url) {
-              oid
-            }
-          }
-        `,
-        variables: {
-          url: this.url
-        }
-      })
-      this.$log('uploadContentUrl oid', oid)
       // get video by oid
       let { data: { objectList } } = await this.$apollo.query({
         query: gql`
           query getVideo ($oid: OID!) {
             objectList(oids: [$oid]) {
               oid
+              type
               name
               ... on Video {
                 frameUrls
@@ -337,8 +336,9 @@ export default {
           oid: oid
         }
       })
-      this.$log('getContent done', objectList[0])
-      this.content = objectList[0]
+      this.$log('getVideo done', objectList[0])
+      this.$emit('fragment', {...this.fragment, ...{content: objectList[0]}})
+      this.$set(this, 'tick', this.tick + 1)
       console.timeEnd('getVideo')
     },
     startVideo () {
@@ -366,10 +366,16 @@ export default {
   async mounted () {
     this.$log('mounted start')
     this.loading = true
-    // await this.$wait(3000)
-    this.startSec = this.start
-    this.endSec = this.end
-    await this.getVideo()
+    if (!this.fragment.content.oid) {
+      this.$q.notify('No fragment.content.oid!!!')
+    }
+    // set startSec & endSec
+    if (this.fragment.relativePoints && this.fragment.relativePoints.length > 0) {
+      this.startSec = this.fragment.relativePoints[0]['x']
+      this.endSec = this.fragment.relativePoints[1]['x']
+    }
+    await this.getVideo(this.fragment.content.oid)
+    this.fragment.relativeScale = this.fragment.content.duration
     this.loading = false
     this.framesAnimate()
     this.startVideo()

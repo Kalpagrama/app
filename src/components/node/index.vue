@@ -10,7 +10,7 @@ div(
     borderBottomRightRadius: '100%18px'}`
   v-observe-visibility=`{
     callback: (isVisible, entry) => visibilityChanged(isVisible, entry),
-    throttle: 0,
+    throttle: 250,
     intersection: {
       threshold: 1
     }}`
@@ -23,9 +23,11 @@ div(
     borderBottomLeftRadius: '100%18px',
     borderBottomRightRadius: '100%18px',
     overflow: 'hidden'}`).col.bg-grey-4
-    node-fragment(:index="0" :type="types[0]" :preview="node.thumbUrl[0]" :fragment="nodeFull.fragments[0]")
-      template(v-slot:editor)
-        slot(name="editor" :index="0")
+    node-fragment(:index="0" :preview="node.thumbUrl[0]" :fragment="nodeFull.fragments[0]" :mini="mini")
+      template(v-slot:empty)
+        slot(name="empty" :index="0")
+      template(v-slot:actions)
+        slot(name="actions" :index="0")
   //- name @click="!$slots.name ? $router.push({name: 'node', path: '/app/node', query: {node: node.oid}}) : ''"
   div(style=`height: 50px`
     ).row.full-width.items-center.content-center.justify-center
@@ -40,9 +42,11 @@ div(
     borderTopLeftRadius: '100%18px',
     borderTopRightRadius: '100%18px',
     overflow: 'hidden'}`).col.bg-grey-4
-    node-fragment(:index="0" :type="types[1]" :preview="node.thumbUrl[1]" :fragment="nodeFull.fragments[1]")
-      template(v-slot:editor)
-        slot(name="editor" :index="1")
+    node-fragment(:index="0" :preview="node.thumbUrl[1]" :fragment="nodeFull.fragments[1]" :mini="mini")
+      template(v-slot:empty)
+        slot(name="empty" :index="1")
+      template(v-slot:actions)
+        slot(name="actions" :index="1")
 </template>
 
 <script>
@@ -51,13 +55,14 @@ export default {
   name: 'node',
   components: { nodeFragment },
   props: {
-    types: { type: Array },
     node: { type: Object, required: true },
     nodeFull: { type: Object, required: true },
-    visible: {type: Boolean}
+    visible: {type: Boolean},
+    mini: {type: Boolean}
   },
   methods: {
     visibilityChanged (isVisible, entry) {
+      // this.$log('visibilityChanged')
       if (isVisible) {
         this.$log('visibilityChanged')
         this.$emit('visible', true)
@@ -73,9 +78,9 @@ export default {
     nodeWidth () {
       let w = this.$q.screen.width
       if (w >= 540) {
-        return 540 - 20
+        return 540
       } else {
-        return w - 20
+        return w
       }
     }
   }

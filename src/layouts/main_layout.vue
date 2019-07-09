@@ -1,14 +1,17 @@
 <template lang="pug">
   q-layout(view='lHh Lpr lFf' :style=`{height: $q.screen.height+'px'}` @resize="handleResize").window-height.bg-grey-2
     q-header(reveal)
-      div(style=`height: 60px; borderBottom: 1px solid #eee; zIndex: 1000`).row.full-width.justify-center.bg-white
-        div(style=`maxWidth: 1130px` :class=`{'q-px-sm': $q.screen.width < 600}`).row.fit.justify-center.q-px-sm
+      div(style=`height: 60px; zIndex: 1000`).row.full-width.justify-center.bg-white
+        div(style=`maxWidth: 1130px` :class=`{'q-px-sm': $q.screen.width < 600}`).row.fit.justify-center.q-px-md
           .row.full-height.items-center
             div(style=`height: 40px; width: 40px; borderRadius: 50%`
               @click="$router.push('/app/home')"
               ).row.items-center.justify-center.bg-primary.cursor-pointer
               q-icon(name="vertical_align_center" size="20px" color="white")
-            h6(v-if="$q.screen.width >= 600").q-ma-xs.q-ml-sm.text-black.text-bold 0.02
+            .col
+              .row.fit.items-center
+                h6(v-if="$q.screen.width >= 600").q-ma-xs.q-ml-sm.text-black.text-bold kalpa
+                small.text-black.q-pt-sm v0.03
           .col
             .row.fit.justify-end.items-center.content.center
               div(v-if="$q.screen.width >= 400" style=`height: 40px; overflow: hidden; borderRadius: 8px`).col.q-px-sm
@@ -27,7 +30,7 @@
         router-view(v-if="!loading").fit
           template(v-slot:menu v-if="$q.screen.width > 850")
             div(:style=`{position: 'relative', width: mini ? 40+'px' : 240+'px'}`).row.full-height.q-py-md
-              div(:style=`{position: 'fixed', width: mini ? 40+'px' : 240+'px', height: $q.screen.height-100+'px'}`).row
+              div(:style=`{position: 'fixed', width: mini ? 40+'px' : 240+'px', height: $q.screen.height-90+'px'}`).row
                 div(style=`overflow: hidden; borderRadius: 8px`).row.fit
                   k-menu(:mini="mini" @mini="handleMini")
         div(v-else).row.fit.items-center.justify-center
@@ -69,22 +72,26 @@ export default {
     }
   },
   watch: {
-    // '$route': {
-    //   deep: true,
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('$route CHANGED', to)
-    //     if (!to.name) {
-    //       this.$log('NO PAGE')
-    //       this.$set(this, 'page', this.pages[0])
-    //     } else {
-    //       this.$log('GOT PAGE', this.$route.name)
-    //       let findPage = this.pages.find(p => p.id === to.name)
-    //       if (findPage) this.$set(this, 'page', findPage)
-    //       else this.$set(this, 'page', this.pages[this.pages.length - 1])
-    //     }
-    //   }
-    // }
+    '$store.state.workspace.workspace': {
+      deep: true,
+      immediate: false,
+      async handler (to, from) {
+        this.$log('workspace CHANGED', to, from)
+        // sync it ? version? from the server?
+        // TODO: this shit
+        let {data: {userWorkspaceUpdate}} = await this.$apollo.mutate({
+          mutation: gql`
+            mutation userWorkspaceUpdate ($workspace: RawJSON) {
+              userWorkspaceUpdate(workspace: $workspace)
+            }
+          `,
+          variables: {
+            workspace: to
+          }
+        })
+        this.$log('userWorkspaceUpdate', userWorkspaceUpdate)
+      }
+    }
   },
   methods: {
     handleMini () {
@@ -133,7 +140,18 @@ export default {
     // get user and save it to vuex
     let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name } }`})
     // this.$log('user', user)
+    // userWorkspace
     this.$store.commit('auth/state', ['user', user])
+    let {data: {userWorkspace}} = await this.$apollo.query({
+      query: gql`
+        query userWorkspace {
+          userWorkspace
+        }
+      `
+    })
+    this.$log('userWorkspace', userWorkspace)
+    // if (!userWorkspace.version) userWorkspace = this.$store.state.workspace.workspace
+    this.$store.commit('workspace/state', ['workspace', userWorkspace])
     this.loading = false
     // const observer = this.$apollo.subscribe({
     //   client: 'ws',
