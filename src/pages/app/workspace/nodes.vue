@@ -10,7 +10,7 @@ div(style=`position: relative`).column.fit
   //- body
   .col.scroll.q-mt-md
     kFeed(queryKey="feed" :items="getNodes" :workspace="true" @nodeCreateFromNode="nodeCreateFromNode" :mini="true")
-      template(v-slot:footer)
+      template(v-slot:footer="{index, node, nodeFull}")
         div(style=`height: 60px`).row.full-width.items-center.justify-between.q-px-sm
           .col
           q-btn(icon="more_vert" round flat color="grey-9")
@@ -20,8 +20,13 @@ div(style=`position: relative`).column.fit
                   span {{ m.name }}
       template(v-slot:actions="{index, node, nodeFull}")
         .row.q-pa-sm
-          q-btn(round dense color="primary" icon="hdr_strong" @click="nodeCreateFromFragment(index, node, nodeFull)").shadow-1
-            q-tooltip {{$t('create_node_from_fragment')}}
+          //- @click="nodeCreateFromFragment(index, node, nodeFull)"
+          q-btn(round dense color="primary" icon="more_vert")
+            q-menu
+              .row.fit.bg-white
+                div(v-for="(m, mkey) in menusFragment" :key="mkey"
+                  style=`height: 40px; borderBottom: 1px solid #eee`
+                  ).row.full-width.items-center
 </template>
 
 <script>
@@ -59,6 +64,11 @@ export default {
         details: {name: 'node_details'},
         copy: {name: 'node_copy'},
         delete: {name: 'node_delete'}
+      },
+      menusFragment: {
+        fork: {name: 'fork'},
+        toContent: {name: 'to_content'},
+        addContent: {name: 'add_content'}
       }
     }
   },

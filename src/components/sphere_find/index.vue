@@ -12,7 +12,7 @@
       q-btn(flat round dense icon="clear" color="primary" @click="$emit('close')")
   //- shperes list
   .col.scroll.bg-grey-2
-    apollo-query(v-if="search.length > 0" :query="query" :variables="variables" :throttle="500" @result="handleResult")
+    apollo-query(v-if="search.length > 1" :query="query" :variables="variables" :throttle="500" @result="handleResult")
       template(v-slot="{ result: { loading, error, data } }")
         //- loading
         div(v-if="loading" style=`height: 100px`).row.full-width.items-center.justify-center

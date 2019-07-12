@@ -47,6 +47,16 @@ const routes = [
         ]
       },
       {
+        name: 'explore',
+        path: 'explore',
+        component: () => import('pages/app/explore')
+      },
+      {
+        name: 'notifications',
+        path: 'notifications',
+        component: () => import('pages/app/notifications')
+      },
+      {
         name: 'menu',
         path: 'menu',
         component: () => import('pages/app/menu')

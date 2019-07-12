@@ -8,6 +8,7 @@ div(:style=`{position: 'relative'}`).row.fit
     img(v-if="preview" :src="preview" width="100%" height="100%" @click="ready = true")
   div(v-else-if="type === 'VIDEO'").row.fit
     node-video(
+      @started="$emit('started', started = true)"
       :index="index"
       :url="mini ? fragment.url : fragment.content.url"
       :startSec="getStartSec"
@@ -34,6 +35,14 @@ export default {
     contentReady (val) {
       this.$log('contentReady', val)
       this.ready = true
+    }
+  },
+  watch: {
+    fragment: {
+      deep: true,
+      handler (to, from) {
+        this.$log('fragment CHANGED', to)
+      }
     }
   },
   computed: {

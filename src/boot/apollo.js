@@ -67,7 +67,7 @@ export default async ({ Vue, store, app }) => {
   let linkUpload = services.UPLOAD
   store.commit('auth/state', ['AUTH_VK', services.AUTH_VK])
   // Cache
-  const cache = new InMemoryCache({addTypename: false})
+  const cache = new InMemoryCache({addTypename: true})
   // persistCache({
   //   cache,
   //   storage: localStorage

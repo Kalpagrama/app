@@ -1,5 +1,5 @@
 <template lang="pug">
-div(style=`position: relative`).row.fit.content-start.items-start.bg-grey-2
+div(style=`position: relative`).row.fit.content-start.items-start
   //- content, spheres find
   q-dialog(ref="typeDialog" :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down" @hide="showSphereFind = false, showContentFind = false")
     content-find(v-if="showContentFind" @close="$refs.typeDialog.hide(), showContentFind = false" @ready="contentChoosen")
@@ -14,6 +14,10 @@ div(style=`position: relative`).row.fit.content-start.items-start.bg-grey-2
       @fragment="fragmentEdited"
       @ready="videoEdited")
     //- book-editor
+  //- header
+  div(:style=`{borderRadius: $store.state.ui.radiusDefault+'px', height: '60px'}`
+    ).row.full-width.items-center.bg-white.q-px-md
+    span {{$t('node_creator')}}
   //- ====
   //- node
   .row.full-width.justify-center.q-py-md
@@ -38,7 +42,7 @@ div(style=`position: relative`).row.fit.content-start.items-start.bg-grey-2
   div(style=`minHeight: 60px`).row.full-width.justify-center
     div(v-if="nodeFull.spheres.length > 0"
       :style=`{maxWidth: '540px', height: '46px', borderBottom: '1px solid #eee', width: $store.state.ui.width+'px'}`
-        ).row.full-width.items-end.content-end
+        ).row.full-width.items-end.content-end.bg-white
       div(style=`height: 40px; maxWidth: 100%; overflowY: hidden; overflowX: auto`).row.full-width.items-center.no-wrap.scroll
         div(v-for="(s, si) in nodeFull.spheres" :key="si"
           style=`display: inline-block; height: 30px; borderRadius: 5px; white-space: nowrap`
@@ -46,8 +50,8 @@ div(style=`position: relative`).row.fit.content-start.items-start.bg-grey-2
           span(style=`white-space: nowrap`) {{ `#${s.name}` }}
           q-btn(flat round icon="clear" @click="sphereDelete(s, si)" dense size="xs").q-ml-xs
   //- spheres tools
-  div(style=`height: 60px`).row.full-width.justify-center.bg
-    div(style=`maxWidth: 540px`).row.full-width.justify-end.items-center
+  div(style=`height: 60px`).row.full-width.justify-center
+    div(style=`maxWidth: 540px`).row.full-width.justify-end.items-center.bg-white.q-px-sm
       q-btn(@click="sphereDeleteAll()"
         style=`borderRadius: 8px; height: 40px` no-caps outline rounded color="primary"
         ).q-mr-sm {{$t('spheres_delete_all')}}
@@ -55,9 +59,9 @@ div(style=`position: relative`).row.fit.content-start.items-start.bg-grey-2
         style=`borderRadius: 8px; height: 40px` no-caps rounded color="primary") {{$t('sphere_find')}}
   //- ============
   //- node publish
-  div(style=`height: 60px`).row.full-width.justify-center.bg
+  div(style=`height: 60px`).row.full-width.justify-center
     div(style=`height: 60px; maxWidth: 540px; borderTop: 1px solid #eee`
-      ).row.full-width.items-center.justify-end
+      ).row.full-width.items-center.justify-end.bg-white.q-px-sm
       //- save
       q-btn(@click="nodeSave()" :loading="nodeSaving"
         rounded outline style=`height: 40px; borderRadius: 8px` color="primary" no-caps ).q-mr-sm {{$t('node_save')}}

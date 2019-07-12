@@ -4,7 +4,7 @@ import VueVirtualScroller from 'vue-virtual-scroller'
 import { LoadingBar, date } from 'quasar'
 import TweenMax from 'gsap/TweenMax'
 import VueObserveVisibility from 'vue-observe-visibility'
-
+// import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 export default async ({ Vue }) => {
   Vue.use(VueVirtualScroller)
   Vue.use(VueObserveVisibility)

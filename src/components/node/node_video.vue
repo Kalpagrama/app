@@ -3,7 +3,7 @@ div(style=`position: relative; zIndex: 200; overflow: auto`).row.fit
   //- video actions
   div(style="position: absolute; bottom: 0px; right: 0px; minHeight: 60px; zIndex: 200").row.items-center.justify-end.q-pa-sm
     //- slot(name="actions")
-    q-btn(dense round flat :icon="muted ? 'volume_off' : 'volume_up'" color="white" @click="toggleMute").shadow-5
+    q-btn(round :icon="muted ? 'volume_off' : 'volume_up'" color="primary" @click="toggleMute").shadow-5
   //- video wrapper
   div(style=`position: relative; height: 100%; overflow: hidden`).row.full-width
     div(style=`position: relative; height: 100%`).row.full-width.items-center.content-center
@@ -27,12 +27,22 @@ export default {
     return {
       me: null,
       player: null,
-      muted: false
+      muted: false,
+      now: 0
     }
   },
   computed: {
     ref () {
       return `kplayer-${this.index}-${Date.now()}`
+    }
+  },
+  watch: {
+    url: {
+      handler (to, from) {
+        this.$log('url CHANGED', to)
+        // this.$emit('started')
+        if (this.index !== 0) this.player.setMuted(true)
+      }
     }
   },
   methods: {
@@ -41,6 +51,7 @@ export default {
       this.muted = !this.muted
     },
     timeUpdate (e) {
+      this.now = this.player.currentTime
       if (this.player.currentTime >= this.endSec) {
         this.$log('LOOP REPEAT')
         this.player.setCurrentTime(this.startSec)
@@ -50,15 +61,16 @@ export default {
   async mounted () {
     this.$log('mounted')
     // load player this.$refs[this.ref]
-    this.me = new window.MediaElementPlayer(this.ref, {
+    this.me = new self.MediaElementPlayer(this.ref, {
       loop: true,
-      autoplay: true,
-      controls: false,
+      autoplay: false,
+      controls: true,
       showPosterWhenPaused: false,
       clickToPlayPause: true,
       iPadUseNativeControls: false,
       iPhoneUseNativeControls: false,
       AndroidUseNativeControls: false,
+      pauseOtherPlayers: false,
       success: async (mediaElement, originalNode, instance) => {
         this.player = mediaElement
         if (!this.mini) {
@@ -66,9 +78,10 @@ export default {
           this.player.setCurrentTime(this.startSec)
         }
         // this.player.addEventListener('seeked', this.seeked, false)
-        this.player.play()
-        this.$log('START PLAYING', this.mini)
-        this.$emit('started')
+        // this.player.play()
+        this.$log('START PLAYING', this.index)
+        // if (this.index !== 0) this.player.setMuted(true)
+        // this.$emit('started')
       }
     })
   },

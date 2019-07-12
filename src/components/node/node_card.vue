@@ -1,12 +1,12 @@
 <template lang="pug">
-div(v-if="nodeFull.oid" :style=`{position: 'relative', maxWidth: '540px', borderRadius: '8px'}`).column.items-center.q-mb-md.bg-white
+div(:style=`{position: 'relative', maxWidth: $store.state.ui.nodeMaxWidth+'px', borderRadius: getRadius+'px'}`).column.items-center.bg-white
   //- node author
   div(style=`height: 60px`).row.full-width.items-center.q-pl-sm
-    div(style=`height: 35px; width: 35px; borderRadius: 50%`).row.bg-grey-3.q-ml-xs
+    div(style=`height: 35px; width: 35px; borderRadius: 50%`).row.bg-grey-5.q-ml-xs
     .col.q-px-sm
       div(v-if="nodeFull.author.name.length > 0").row.fit.items-center
         span {{ nodeFull.author.name }}
-        //- span(v-if="absolute").text-red RED RED RED
+        //- small.text-red needFull::{{needFull}}
         .row.full-width.items-center
           //- q-icon(name="remove_red_eye" size="14px" color="grey-6").q-mr-xs
           //- small 12114
@@ -15,13 +15,17 @@ div(v-if="nodeFull.oid" :style=`{position: 'relative', maxWidth: '540px', border
         div(style=`minHeight: 18px; height: 18px; borderRadius: 4px; width: 230px`).row.items-center.bg-grey-3.q-mb-xs
         div(style=`minHeight: 15px; height: 15px; borderRadius: 4px; width: 180px`).row.items-center.bg-grey-3
     //- node to workspace or create from
-    div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      q-btn(v-if="workspace === true" icon="hdr_strong" color="grey-8" flat round dense @click="$emit('nodeCreateFromNode', {node, nodeFull})")
-        q-tooltip {{$t('create_node_from_this_node')}}
-      q-btn(v-else :icon="nodeIcon" color="grey-8" flat round dense @click="nodeToWorkspace()")
-        q-tooltip {{$t('save_node_to_workspace')}}
+    div(style=`height: 60px; minWidth: 60px`).row.items-center.justify-center.q-px-sm
+      q-icon(:name="nodeIcon" round flat dense color="grey-7" size="20px").q-mx-sm
+      q-btn(icon="more_vert" round flat color="grey-9").q-mr-xs
+        //- TODO: proxy node menu
+        q-menu(fit anchor="bottom right" self="top right" content-style=`{borderRadius: '8px'}`)
+          div(style=`width: 200px; borderRadius: 8px`).row.bg-white
+            div(v-for="(m, mi) in menus" :key="mi" @click="menuClick(m, mi)"
+              style=`height: 40px`).row.full-width.items-center.hr.cursor-pointer.q-px-md
+              span(:style=`{color: m.color}`) {{$t(m.name)}}
   //- node body
-  node(:node="node" :nodeFull="nodeFull" :mini="mini" @visible="$event => $emit('visible', $event, index, node)")
+  node(:node="node" :nodeFull="nodeFull" :mini="mini" @visible="$event => $emit('visible', $event, index, node, nodeFull)")
     //- node rate
     template(v-slot:rate)
       transition(appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
@@ -33,7 +37,9 @@ div(v-if="nodeFull.oid" :style=`{position: 'relative', maxWidth: '540px', border
             //- div(style=`position: absolute: zIndex: 2000`).row.full-width.bg-green
             //-   span.text-white rate {{ rate }}
     template(v-slot:actions="{index}")
+      //- .row.full-width {{needFull}}
       slot(name="actions" :index="index" :node="node" :nodeFull="nodeFull")
+  //- .row.full-width {{needFull}}
   //- node spheres
   div(style=`height: 46px`).row.full-width.items-end.content-end.q-px-md
     div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
@@ -42,7 +48,7 @@ div(v-if="nodeFull.oid" :style=`{position: 'relative', maxWidth: '540px', border
         span(style=`white-space: nowrap`) {{ `#${s.name}` }}
   slot(name="footer" :index="index" :node="node" :nodeFull="nodeFull")
   //- node actions
-  div(v-if="$slots.footer" style=`height: 76px`).row.full-width
+  div(v-if="!$slots.footer || !$scopedSlots.footer" style=`height: 76px`).row.full-width
     .col
       .row.fit.items-center.justify-start.q-px-sm
         div.row.full-height.items-center
@@ -65,6 +71,7 @@ export default {
     index: {type: Number},
     node: {type: Object, required: true},
     needFull: {type: Boolean},
+    nodeFullReady: {type: Object},
     workspace: {type: Boolean},
     mini: {type: Boolean}
   },
@@ -88,6 +95,14 @@ export default {
         {id: 3, name: 'Может быть', rate: 0.5},
         {id: 4, name: 'Скорее да', rate: 0.75},
         {id: 5, name: 'Да', rate: 1.0}
+      ],
+      menus: [
+        {id: 'to_node', name: 'to_node', color: 'black'},
+        {id: 'to_workspace', name: 'to_workspace', color: 'black'},
+        // {id: 'to_chain', name: 'to_chain', color: 'black},
+        {id: 'follow', name: 'follow', color: 'black'},
+        {id: 'share', name: 'share', color: 'black'},
+        {id: 'report', name: 'report', color: 'red'}
       ]
     }
   },
@@ -96,6 +111,10 @@ export default {
       let nodeFind = this.$store.state.workspace.workspace.nodes.find(n => this.node.oid === n.oid)
       if (nodeFind) return 'cloud_done'
       else return 'cloud_queue'
+    },
+    getRadius () {
+      if (this.$q.screen.width <= this.$store.state.ui.nodeMaxWidth) return this.$store.state.ui.radiusMobile
+      else return this.$store.state.ui.radiusDesktop
     }
   },
   methods: {
@@ -124,7 +143,33 @@ export default {
     },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
-      this.$router.push({name: 'sphere', query: {sphere: s.oid}})
+      // this.$router.push({name: 'sphere', query: {sphere: s.oid}})
+    },
+    menuClick ({id, name, color}, mi) {
+      this.$log('menuClick')
+      switch (id) {
+        case 'to_node': {
+          this.$log('menuClick to_node')
+          break
+        }
+        case 'to_workspace': {
+          this.$log('menuClick to_workspace')
+          this.nodeToWorkspace()
+          break
+        }
+        case 'follow': {
+          this.$log('menuClick to follow')
+          break
+        }
+        case 'share': {
+          this.$log('menuClick share')
+          break
+        }
+        case 'report': {
+          this.$log('menuClick report')
+          break
+        }
+      }
     },
     nodeClick () {
       this.$log('nodeClick', this.item)
@@ -162,6 +207,7 @@ export default {
     },
     async nodeLoad () {
       this.$log('nodeLoad start')
+      // this.$set(this, 'nodeFull', null)
       let { data: { objectList: nodeFull } } = await this.$apollo.query({
         query: gql`
           query getExtendedNodesProps($oid: OID!) {
@@ -216,20 +262,29 @@ export default {
   },
   watch: {
     node: {
-      deep: false,
-      immediate: true,
+      immediate: false,
+      deep: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
-        if (this.index < 4) {
+        this.$log('node changed', to)
+        if (this.needFull) {
           this.nodeLoad()
         } else {
-          if (this.needFull) this.nodeLoad()
+        }
+      }
+    },
+    needFull: {
+      immediate: true,
+      handler (to, from) {
+        if (to) {
+          this.$log('needFull changed', to)
+          this.nodeLoad()
+        } else {
         }
       }
     }
   },
   async mounted () {
-    // this.$log('mounted')
+    this.$log('mounted')
     // this.$log('node', this.node)
   }
 }

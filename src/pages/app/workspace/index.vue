@@ -30,13 +30,15 @@
 </template>
 
 <script>
+import kDummy from 'components/kDummy'
 import kMenu from 'pages/app/menu'
 
 export default {
   name: 'pageApp__Workspace',
-  components: { kMenu },
+  components: { kMenu, kDummy },
   data () {
     return {
+      name: 'oleg',
       menuShow: false,
       menuItems: [
         {id: 'images', name: 'images', implemented: false},

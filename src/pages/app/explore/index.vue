@@ -1,24 +1,20 @@
 <template lang="pug">
 .column.fit
-  k-menu
+  div(style=`height: 60px; borderBottom: 1px solid #eee`
+    ).row.full-width.items-center.bg-white.q-px-md
+      span {{$t('explore')}}
+  .col.scroll
 </template>
 
 <script>
-import kMenu from 'components/kMenu'
-
 export default {
-  name: 'pageApp__Menu',
-  components: { kMenu },
-  props: {
-    mini: {type: Boolean}
+  name: 'pageApp__Explore',
+  meta: {
+    title: 'Kalpa - Explore'
   },
   data () {
     return {
     }
-  },
-  methods: {
-  },
-  watch: {
   },
   mounted () {
     this.$log('mounted')

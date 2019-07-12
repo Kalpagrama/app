@@ -1,8 +1,8 @@
 <template lang="pug">
-  q-layout(view='lHh Lpr lFf' :style=`{height: $q.screen.height+'px'}` @resize="handleResize").window-height.bg-grey-2
-    q-header(reveal)
+  q-layout(view='lHh Lpr lFf' :style=`{height: $q.screen.height+'px'}` @resize="handleResize")
+    q-header(reveal v-if="false")
       div(style=`height: 60px; zIndex: 1000`).row.full-width.justify-center.bg-white
-        div(style=`maxWidth: 1130px` :class=`{'q-px-sm': $q.screen.width < 600}`).row.fit.justify-center.q-px-md
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.fit.justify-center.q-px-xs
           .row.full-height.items-center
             div(style=`height: 40px; width: 40px; borderRadius: 50%`
               @click="$router.push('/app/home')"
@@ -11,7 +11,7 @@
             .col
               .row.fit.items-center
                 h6(v-if="$q.screen.width >= 600").q-ma-xs.q-ml-sm.text-black.text-bold kalpa
-                small.text-black.q-pt-sm v0.03
+                small.text-black.q-pt-sm.q-ml-xs v0.03
           .col
             .row.fit.justify-end.items-center.content.center
               div(v-if="$q.screen.width >= 400" style=`height: 40px; overflow: hidden; borderRadius: 8px`).col.q-px-sm
@@ -21,24 +21,28 @@
                 //-       q-icon(name="search")
               //- q-btn(v-if="$q.screen.width >= 400" rounded color="primary" no-caps style=`height: 40px`
               //-   @click="$router.push('/app/create')").q-mx-md Создать
+              q-btn(round flat dense color="grey-9" icon="search").q-mr-xs
+              q-btn(round flat dense color="grey-9" icon="notifications").q-mr-xs
               div(style=`height: 40px; width: 40px; borderRadius: 50%`
                 @click="$router.push('/app/settings')"
-                ).row.items-center.justify-center.bg-grey-7.cursor-pointer
+                ).row.items-center.justify-center.bg-grey-7.cursor-pointer.q-ml-xs
                 q-icon(name="face" size="20px" color="white")
-    q-page-container.fit
-      q-page.fit
-        router-view(v-if="!loading").fit
-          template(v-slot:menu v-if="$q.screen.width > 850")
-            div(:style=`{position: 'relative', width: mini ? 40+'px' : 240+'px'}`).row.full-height.q-py-md
-              div(:style=`{position: 'fixed', width: mini ? 40+'px' : 240+'px', height: $q.screen.height-90+'px'}`).row
-                div(style=`overflow: hidden; borderRadius: 8px`).row.fit
-                  k-menu(:mini="mini" @mini="handleMini")
-        div(v-else).row.fit.items-center.justify-center
-          q-spinner(size="50px" :thickness="2" color="primary")
-    q-footer(v-if="$q.screen.width < 600").bg-white
+    q-page-container
+      q-page.row.full-width.justify-center.bg-grey-2
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+          div(v-if="$q.screen.width >= $store.state.ui.nodeMaxWidth+$store.state.ui.menuMaxWidth"
+            :style=`{position: 'relative', width: '200px'}`).row.q-py-md
+            div(:style=`{position: 'fixed', width: '200px', height: '500px', borderRadius: $store.state.ui.radiusDefault+'px'}`).row.bg-white
+              k-menu
+          .col.q-pt-md
+            keep-alive
+              router-view(v-if="!loading")
+              div(v-else).row.fit.items-center.justify-center
+                q-spinner(size="50px" :thickness="2" color="primary")
+    q-footer(v-if="$q.screen.width < $store.state.ui.nodeMaxWidth+$store.state.ui.menuMaxWidth").bg-white
       div(
-        style=`height: 50px; borderTop: 1px solid #eee`
-        ).row.full-width.justify-between.q-px-sm
+        style=`height: 56px; borderTop: 1px solid #eee`
+        ).row.full-width.justify-between.items-center.q-px-sm
         //- :color="page.id === p.id ? 'primary' : 'grey'"
         q-btn(v-for="(p, pi) in pages" :key="pi" flat round v-touch-hold="btnHolded"
           color="grey" :icon="p.icon" size="16px" @click="pageClick(p)")
@@ -62,11 +66,11 @@ export default {
       page: null,
       pageId: '',
       pages: [
-        { id: 'home', icon: 'home', name: 'Лента' },
-        { id: 'search', icon: 'search', name: 'Поиск' },
-        { id: 'create', icon: 'add_circle_outline', name: 'Создать' },
-        { id: 'notifications', icon: 'notifications_none', name: 'Уведомления' },
-        { id: 'menu', icon: 'menu', name: 'Меню' }
+        { id: 'home', icon: 'home', name: 'home' },
+        { id: 'explore', icon: 'explore', name: 'explore' },
+        { id: 'create', icon: 'add_circle_outline', name: 'create' },
+        { id: 'notifications', icon: 'notifications_none', name: 'notifications' },
+        { id: 'menu', icon: 'menu', name: 'menu' }
       ],
       mini: false
     }

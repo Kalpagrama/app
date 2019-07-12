@@ -3,5 +3,10 @@ export default {
   height: window.innerHeight,
   show_right_drawer: false,
   show_left_drawer: false,
-  default_border_radius: '5px'
+  radiusDesktop: 8,
+  radiusDefault: 8,
+  radiusMobile: 0,
+  pageMaxWidth: 1100,
+  menuMaxWidth: 240,
+  nodeMaxWidth: 540
 }

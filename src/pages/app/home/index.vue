@@ -1,19 +1,15 @@
 <template lang="pug">
-.row.fit.justify-center
-  div(style=`maxWidth: 1130px`).row.fit.justify-start.q-px-md
-    slot(name="menu")
-    div.full-height.q-pa-md
-      div(style=`position: relative`).column.fit
-        //- body
-        .col.scroll
-          kFeed(:mini="true" queryDataKey="feed")
-    div(style=`width: 200px`).row.full-height.q-py-md
-      div(style=`borderRadius: 8px`).row.fit.items-center.justify-center.bg-white
-        span Right menu
+.row.fit.justify-start
+  div(:class=`{'q-px-md': $q.screen.width > $store.state.ui.nodeMaxWidth+10}`)
+    k-feed(:mini="true" queryKey="feed")
+  //- right menu
+  div(v-if="false" style=`position: relative; width: 200px`).row.full-height.q-py-md
+    div(:style=`{position: 'fixed', width: '200px', height: '500px', borderRadius: $store.state.ui.radiusDefault+'px'}`).row.bg-white
+      span Right menu
 </template>
 
 <script>
-import kMenu from 'pages/app/menu'
+import kMenu from 'components/kMenu'
 import kFeed from 'components/kFeed'
 
 export default {
