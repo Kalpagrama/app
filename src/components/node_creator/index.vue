@@ -1,11 +1,11 @@
 <template lang="pug">
 div(style=`position: relative`).row.fit.content-start.items-start
   //- content, spheres find
-  q-dialog(ref="typeDialog" :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down" @hide="showSphereFind = false, showContentFind = false")
+  q-dialog(ref="typeDialog" no-route-dismiss :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down" @hide="showSphereFind = false, showContentFind = false, $router.push({query: {step: 'start'}})")
     content-find(v-if="showContentFind" @close="$refs.typeDialog.hide(), showContentFind = false" @ready="contentChoosen")
     sphere-find(v-if="showSphereFind" @close="$refs.typeDialog.hide(), showSphereFind = false" @ready="sphereChoosen")
   //- editors
-  q-dialog(ref="defaultDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+  q-dialog(ref="defaultDialog" no-route-dismiss :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     //- image-editor
     video-editor(
       v-if="showVideoEditor"
@@ -15,63 +15,58 @@ div(style=`position: relative`).row.fit.content-start.items-start
       @ready="videoEdited")
     //- book-editor
   //- header
-  div(:style=`{borderRadius: $store.state.ui.radiusDefault+'px', height: '60px'}`
-    ).row.full-width.items-center.bg-white.q-px-md
-    span {{$t('node_creator')}}
-  //- ====
-  //- node
-  .row.full-width.justify-center.q-py-md
-    node(:node="node" :nodeFull="nodeFull" :visible="true")
-      //- name slot
-      template(v-slot:name)
-        .row.fit.items-center
-          q-input(v-model="nodeFull.name" borderless :maxlength="45"
-            :input-class="['text-center']" placeholder="В чем суть?").fit
-      //- empty slot
-      template(v-slot:empty="{ index }")
-        .row.fit.items-center.justify-center
-          q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
-      //- actions slot
-      template(v-slot:actions="{ index }")
-        q-btn(flat round dense color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
-          q-tooltip {{$t('fragment_delete')}}
-        q-btn(flat round dense color="white" icon="edit" @click="fragmentEdit(index)").q-mr-sm.shadow-10
-          q-tooltip {{$t('fragment_edit')}}
-  //- =======
-  //- spheres
-  div(style=`minHeight: 60px`).row.full-width.justify-center
-    div(v-if="nodeFull.spheres.length > 0"
-      :style=`{maxWidth: '540px', height: '46px', borderBottom: '1px solid #eee', width: $store.state.ui.width+'px'}`
-        ).row.full-width.items-end.content-end.bg-white
-      div(style=`height: 40px; maxWidth: 100%; overflowY: hidden; overflowX: auto`).row.full-width.items-center.no-wrap.scroll
-        div(v-for="(s, si) in nodeFull.spheres" :key="si"
-          style=`display: inline-block; height: 30px; borderRadius: 5px; white-space: nowrap`
-          ).row.items-center.q-pa-xs.q-mr-sm.bg-grey-3
-          span(style=`white-space: nowrap`) {{ `#${s.name}` }}
-          q-btn(flat round icon="clear" @click="sphereDelete(s, si)" dense size="xs").q-ml-xs
-  //- spheres tools
-  div(style=`height: 60px`).row.full-width.justify-center
-    div(style=`maxWidth: 540px`).row.full-width.justify-end.items-center.bg-white.q-px-sm
-      q-btn(@click="sphereDeleteAll()"
-        style=`borderRadius: 8px; height: 40px` no-caps outline rounded color="primary"
-        ).q-mr-sm {{$t('spheres_delete_all')}}
-      q-btn(@click="sphereFind()"
-        style=`borderRadius: 8px; height: 40px` no-caps rounded color="primary") {{$t('sphere_find')}}
-  //- ============
-  //- node publish
-  div(style=`height: 60px`).row.full-width.justify-center
-    div(style=`height: 60px; maxWidth: 540px; borderTop: 1px solid #eee`
-      ).row.full-width.items-center.justify-end.bg-white.q-px-sm
-      //- save
-      q-btn(@click="nodeSave()" :loading="nodeSaving"
-        rounded outline style=`height: 40px; borderRadius: 8px` color="primary" no-caps ).q-mr-sm {{$t('node_save')}}
-      //- publish
-      q-btn(@click="nodeCreate()" :loading="nodeCreating"
-        rounded style=`height: 40px; width: 250px; borderRadius: 8px` color="primary" no-caps ) {{$t('node_publish')}}
-  //- =====
-  //- debug
-  //- .row.full-width
-  //-   small {{nodeFull}}
+  div(:style=`{height: '60px'}`
+    ).row.full-width.items-center.q-px-md
+    div(:style=`{borderRadius: $store.state.ui.radiusDefault+'px'}`
+      ).row.fit.items-center.bg-white.q-px-md
+      span {{$t('node_creator')}}
+  //- wrapper
+  div.row.full-width.justify-center.q-py-md
+    div(:style=`{maxWidth: $store.state.ui.nodeMaxWidth+'px'}`).row.full-width
+      node(:node="node" :nodeFull="nodeFull" :visible="true")
+        //- name slot
+        template(v-slot:name)
+          .row.fit.items-center
+            q-input(v-model="nodeFull.name" borderless :maxlength="45"
+              :input-class="['text-center']" placeholder="В чем суть?").fit
+        //- empty slot
+        template(v-slot:empty="{ index }")
+          .row.fit.items-center.justify-center
+            q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
+        //- actions slot
+        template(v-slot:actions="{ index }")
+          q-btn(flat round dense color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
+            q-tooltip {{$t('fragment_delete')}}
+          q-btn(flat round dense color="white" icon="edit" @click="fragmentEdit(index)").q-mr-sm.shadow-10
+            q-tooltip {{$t('fragment_edit')}}
+      //- spheres
+      div(style=`height: 50px`).row.full-width.justify-center
+        div(style=`height: 40px; maxWidth: 100%; overflowY: hidden; overflowX: auto`).row.full-width.items-center.no-wrap.scroll
+          div(v-for="(s, si) in nodeFull.spheres" :key="si"
+            style=`display: inline-block; height: 30px; borderRadius: 5px; white-space: nowrap`
+            ).row.items-center.q-pa-xs.q-mr-sm.bg-grey-3
+            span(style=`white-space: nowrap`) {{ `#${s.name}` }}
+            q-btn(flat round icon="clear" @click="sphereDelete(s, si)" dense size="xs").q-ml-xs
+      //- spheres tools
+      div(style=`height: 60px`).row.full-width.justify-end.items-center.bg-white.q-px-sm
+        q-btn(v-if="nodeFull.spheres.length > 0" @click="sphereDeleteAll()"
+          style=`borderRadius: 4px; height: 40px` no-caps outline rounded color="primary"
+          ).q-mr-sm {{$t('spheres_delete_all')}}
+        .col
+          q-btn(@click="sphereFind()"
+            style=`borderRadius: 4px; height: 40px` no-caps outline rounded color="primary").full-width {{$t('add_spheres')}}
+      //- publish or saves
+      div(v-if="nodeCreateShow" style=`height: 70px`).row.full-width.items-center.justify-end.bg-white.q-px-sm
+        //- save
+        q-btn(v-if="false" @click="nodeSave()" :loading="nodeSaving"
+          rounded outline style=`height: 40px; borderRadius: 4px` color="primary" no-caps ).q-mr-sm {{$t('node_save')}}
+        //- publish
+        .col
+          q-btn(@click="nodeCreate()" :loading="nodeCreating"
+            rounded style=`height: 50px; width: 200px; borderRadius: 4px` color="primary" no-caps ).full-width {{$t('node_publish')}}
+      //- debug
+      div(v-if="false").row.full-width.justify-center
+        small {{nodeFull}}
 </template>
 
 <script>
@@ -99,6 +94,8 @@ export default {
         name: '',
         spheres: [],
         fragments: [
+          null,
+          null
           // {
           //   content: {type: 'VIDEO', name: '', url: ''},
           //   relativePoints: [{x: 0}, {x: 10}],
@@ -122,12 +119,44 @@ export default {
       nodeSaving: false
     }
   },
+  watch: {
+    '$route': {
+      deep: true,
+      immediate: false,
+      handler (to, from) {
+        this.$log('$route CHANGED', to)
+        if (to.query.step) {
+          switch (to.query.step) {
+            case 'content-find': {
+              this.$log('content-find GO', this.$refs.typeDialog)
+              this.showContentFind = true
+              this.$refs.typeDialog.show()
+              break
+            }
+          }
+          this.$log('to.query', to.query)
+        }
+      }
+    }
+  },
+  computed: {
+    nodeCreateShow () {
+      if (this.nodeFull.fragments[0] !== null &&
+        this.nodeFull.fragments[1] !== null &&
+        this.nodeFull.name.length > 2) {
+        return true
+      } else {
+        return false
+      }
+    }
+  },
   methods: {
     contentFind (index) {
       this.$log('contentFind', index)
+      this.$router.push({query: {step: 'content-find'}})
       this.typeIndex = index
-      this.showContentFind = true
-      this.$refs.typeDialog.show()
+      // this.showContentFind = true
+      // this.$refs.typeDialog.show()
     },
     contentChoosen ({type, source, oid}) {
       this.$log('contentChoosen', type, source, oid)
@@ -249,6 +278,7 @@ export default {
         })
         this.$log('nodeCreate done', nodeCreate)
         this.$q.notify({message: this.$t('node_published'), color: 'primary', textColor: 'white'})
+        this.$set(this, 'nodeFull', {name: '', spheres: [], fragments: [null, null]})
         this.$router.push({name: 'home'})
         this.nodeCreating = false
       } catch (error) {
@@ -289,11 +319,11 @@ export default {
         this.$set(this, 'nodeFull', JSON.parse(data))
       } else if (from === 'empty') {
         this.$log('from EMPTY')
-        this.$q.notify('from EMPTY')
+        // this.$q.notify('from EMPTY')
       }
     } else {
       this.$log('from EMPTY')
-      this.$q.notify('from EMPTY')
+      // this.$q.notify('from EMPTY')
     }
   },
   beforeDestroy () {

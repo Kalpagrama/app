@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    height: nodeHeight+'px', minWidth: nodeWidth+'px', width: nodeWidth+'px',
+    height: nodeHeight+'px', width: nodeWidth+'px',
     zIndex: 2, overflow: 'hidden',
     borderTopLeftRadius: '100%'+getRadius+'px',
     borderTopRightRadius: '100%'+getRadius+'px',
@@ -29,7 +29,7 @@ div(
       template(v-slot:actions)
         slot(name="actions" :index="0")
   //- name @click="!$slots.name ? $router.push({name: 'node', path: '/app/node', query: {node: node.oid}}) : ''"
-  div(style=`height: 50px`
+  div(style=`height: 40px`
     ).row.full-width.items-center.content-center.justify-center
     span(v-if="!$slots.name") {{ node.name }}
     slot(name="name")
@@ -64,7 +64,7 @@ export default {
     },
     nodeWidth () {
       let w = this.$q.screen.width
-      if (w >= 540) {
+      if (w >= this.$store.state.ui.nodeMaxWidth) {
         return 540
       } else {
         return w

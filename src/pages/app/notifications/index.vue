@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  name: 'pageAppNotifications',
+  name: 'pageApp__Notifications',
   data () {
     return {
     }

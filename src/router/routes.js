@@ -6,6 +6,7 @@ const routes = [
     component: () => import('layouts/main_layout'),
     children: [
       { name: 'home', path: 'home', component: () => import('pages/app/home') },
+      { name: 'account', path: 'account', component: () => import('pages/app/account') },
       { name: 'node', path: 'node', component: () => import('pages/app/node') },
       {
         name: 'workspace',

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './routes'
 const debug = require('debug')('[router]:index')
-debug.enabled = true
+// debug.enabled = true
 Vue.use(VueRouter)
 
 export default function (/* { store, ssrContext } */) {

@@ -1,65 +1,78 @@
 <template lang="pug">
 div(style=`maxWidth: 600px`).column.fit.bg-white
-  //- header
-  //- div(style=`height: 74px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-md
-  //-   span {{$t('choose_content')}}
+  div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.items-center
+    //- span Find
+    div(v-if="type" style=`height: 60px; width: 50px`).row.items-center.justify-center
+      q-icon(v-if="type" :name="type.icon" :color="type.color" size="40px")
+    span(v-if="source") from {{source}}
+    .col.full-height
+      div(v-if="type && source").row.fit.justify-end.items-center.q-px-sm
+        q-btn(v-if="type && source" outline dense color="primary" no-caps @click="returnToTypeChoose()" icon="keyboard_arrow_left").q-px-sm {{$t('change_type')}}
+      div(v-else).row.fit.items-center.q-px-sm
+        span.q-mr-sm Choose
+        span(v-if="!type").q-mr-sm type &
+        span(v-if="!source") source
+    div(v-if="!type && !source" style=`height: 60px; width: 60px`).row.items-center.justify-center
+      q-btn(flat round icon="clear" @click="$emit('close')")
   //- body
-  .col.scroll
-    //- choose type header
-    //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.content-center.q-px-sm
-    //-   h6.q-ma-xs 1.
-    //-   span.q-pt-xs {{$t('choose_type')}}
-    //- types
-    div(style=`borderBottom: 1px solid #eee`).row.full-width.items-start.content-start
-      div(
-        v-for="(t, tkey) in types" :key="tkey" @click="typeClick(t, tkey)"
-        :style=`{
-          height: getHeight(Object.keys(types).length)+'px',
-          width: getHeight(Object.keys(types).length)+'px',
-          borderRight: '1px solid #eee',
-          background: type === tkey ? '#eee' : 'none'}`
-        ).col
-        .row.fit.items-center.content-center.justify-center.hr.cursor-pointer
-          q-icon(:name="t.icon" :color="tkey === type ? t.color : 'grey'" size="90px")
-          div(style=`overflow: hidden`).row.full-width.justify-center
-            span.text-black {{ t.name }}::{{getHeight(Object.keys(types).length)}}
-    //- image
-    div(v-if="type === 'IMAGE'").row.full-width
-      //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-      //-   h6.q-ma-xs 2.
-      //-   span.q-pt-xs {{$t('choose_image_source')}}
-      div(style=`borderBottom: 1px solid #eee`).row.full-width
-        div(v-for="(s, skey) in types[type].sources" :key="skey" @click="source = skey"
-          :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
-            div(style=`overflow: hidden`).row.fit.items-center.content-center.justify-center
-              span {{ s.name }}
-      image-find(:source="source")
-    //- video
-    div(v-else-if="type === 'VIDEO'").row.full-width
-      //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-      //-   h6.q-ma-xs 2.
-      //-   span.q-pt-xs {{$t('choose_video_source')}}
-      div(style=`borderBottom: 1px solid #eee`).row.full-width
-        div(v-for="(s, skey) in types[type].sources" :key="skey" @click="source = skey"
-          :style=`{height: '100px', borderRight: '1px solid #eee', background: skey == source ? '#eee' : 'none'}`).col.hr.cursor-pointer
-            .row.fit.items-center.content-center.justify-center
-              span {{ s.name }}
-      video-find(:source="source" @ready="handleReady")
-    //- book
-    div(v-else-if="type === 'BOOK'").row.full-width
-      //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-      //-   h6.q-ma-xs 2.
-      //-   span.q-pt-xs {{$t('choose_book_source')}}
-      div(style=`borderBottom: 1px solid #eee`).row.full-width
-        div(v-for="(s, skey) in types[type].sources" :key="skey" @click="source = skey"
-          :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
-            .row.fit.items-center.content-center.justify-center
-              span {{ s.name }}
-      book-find(:source="source")
-  //- footer
-  div(style=`height: 74px; borderTop: 1px solid #eee`).row.full-width.justify-end.items-center.content-center.q-px-md
-    q-btn(style=`borderRadius: 4px; height: 50px` no-caps color="primary" outline @click="handleCancel" :loading="canceling").q-mr-md {{$t('cancel')}}
-    q-btn(style=`borderRadius: 4px; height: 50px; minWidth: 120px` no-caps color="primary" @click="handleNext" :loading="nexting") {{$t('next')}}
+  .col
+    .column.fit
+      //- types
+      div(:style=`{borderBottom: '1px solid #eee', maxHeight: typesMaxHeight+'px'}`).row.full-width.items-start.content-start.types-wrapper
+        div(
+          v-for="(t, tkey) in types" :key="tkey" @click="typeClick(t, tkey)"
+          :style=`{
+            height: getHeight(Object.keys(types).length)+'px',
+            width: getHeight(Object.keys(types).length)+'px',
+            borderRight: '1px solid #eee',
+            background: tkey === typeKey ? '#eee' : 'none'}`
+          ).col
+          .row.fit.items-center.content-center.justify-center.hr.cursor-pointer
+            q-icon(:name="t.icon" :color="tkey === typeKey ? t.color : 'grey'" size="90px")
+            div(style=`overflow: hidden`).row.full-width.justify-center
+              span.text-black {{ $t(t.name) }}
+      //- image
+      div(v-if="typeKey === 'IMAGE'" style=`overflow: hidden`).row.full-width.types-wrapper
+        //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+        //-   h6.q-ma-xs 2.
+        //-   span.q-pt-xs {{$t('choose_image_source')}}
+        div(style=`borderBottom: 1px solid #eee`).row.full-width
+          div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
+            :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
+              div(style=`overflow: hidden`).row.fit.items-center.content-center.justify-center
+                span {{ s.name }}
+      //- video
+      div(v-else-if="typeKey === 'VIDEO'" style=`overflow: hidden`).row.full-width.types-wrapper
+        //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+        //-   h6.q-ma-xs 2.
+        //-   span.q-pt-xs {{$t('choose_video_source')}}
+        div(style=`borderBottom: 1px solid #eee`).row.full-width
+          div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
+            :style=`{height: '100px', borderRight: '1px solid #eee', background: skey == source ? '#eee' : 'none'}`).col.hr.cursor-pointer
+              .row.fit.items-center.content-center.justify-center
+                span {{ s.name }}
+      //- book
+      div(v-else-if="typeKey === 'BOOK'" style=`overflow: hidden`).row.full-width.types-wrapper
+        //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+        //-   h6.q-ma-xs 2.
+        //-   span.q-pt-xs {{$t('choose_book_source')}}
+        div(style=`borderBottom: 1px solid #eee`).row.full-width
+          div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
+            :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
+              .row.fit.items-center.content-center.justify-center
+                span {{ s.name }}
+      .col
+        image-find(v-if="typeKey === 'IMAGE' && source" :source="source")
+        video-find(v-if="typeKey === 'VIDEO' && source" :source="source" @ready="handleReady")
+          template(v-slot:progress)
+            div(v-if="nexting" style=`position: absolute; zIndex: 100; opacity: 0.9`).row.fit.items-start.content-start.justify-center.bg-white
+              div(v-if="progress" style=`height: 500px`).row.full-width.justify-center.items-center.content-center
+                q-spinner(:thickness="2" color="primary" size="50px")
+                .row.full-width.justify-center.q-py-sm
+                  small {{$t('loading')}}
+                .row.full-width.q-px-md
+                  q-linear-progress(:value="progress.progress/100" class="q-mt-md" color="primary" stripe rounded style="height: 20px").full-width
+        book-find(v-if="typeKey === 'BOOK' && source" :source="source")
 </template>
 
 <script>
@@ -74,15 +87,15 @@ export default {
     return {
       canceling: false,
       nexting: false,
-      type: '',
-      source: '',
+      type: null,
+      typeKey: null,
+      source: null,
       types: {
         IMAGE: {
           name: 'image',
-          icon: 'image',
+          icon: 'panorama',
           color: 'green',
           sources: {
-            // camera: {name: 'from_camera'},
             device: {name: 'from_device', implemented: false},
             google: {name: 'from_google', implemented: false},
             link: {name: 'from_link', implemented: true},
@@ -91,12 +104,11 @@ export default {
         },
         VIDEO: {
           name: 'video',
-          icon: 'fab fa-youtube',
+          icon: 'movie_creation',
           color: 'red',
           sources: {
-            // camera: {name: 'from_camera'},
             device: {name: 'from_device', implemented: true},
-            youtube: {name: 'from_youtube', implemented: true},
+            youtube: {name: 'from_youtube', icon: 'fab fa-youtube', implemented: true},
             link: {name: 'from_link', implemented: true},
             workspace: {name: 'from_workspace', implemented: false}
           }
@@ -108,20 +120,37 @@ export default {
           sources: {
             device: {name: 'from_device', implemented: false},
             link: {name: 'from_link', implemented: false},
+            litres: {name: 'from_litres', implemented: false},
             workspace: {name: 'from_workspace', implemented: false}
           }
         }
       },
+      typesMaxHeight: 400,
       content: null,
-      contents: []
+      progress: null
+    }
+  },
+  watch: {
+    type: {
+      handler (to, from) {
+        this.$log('type CHANGED', to)
+        // what to do here?
+      }
+    },
+    source: {
+      handler (to, from) {
+        this.$log('source CHANGED', to)
+        if (to) {
+          this.$tween.to('.types-wrapper', 0.33, {maxHeight: 0, opacity: 0, display: 'none'})
+        }
+      }
     }
   },
   methods: {
     handleReady (val) {
       this.$log('handleReady', val)
       this.content = val
-      // switch case to validate type, source, url, file...
-      // to be able to use next
+      this.handleNext()
     },
     getHeight (l) {
       let w = this.$q.screen.width
@@ -133,8 +162,17 @@ export default {
     },
     typeClick (t, tkey) {
       this.$log('typeClick', t)
-      this.type = tkey
+      this.typeKey = tkey
+      this.type = t
       this.source = ''
+    },
+    returnToTypeChoose () {
+      this.$log('returnToTypeChoose')
+      this.typeKey = null
+      this.type = null
+      this.content = null
+      this.source = null
+      this.$tween.to('.types-wrapper', 0.33, {maxHeight: 400, opacity: 1, display: 'flex'})
     },
     image () {
       this.$log('imageSelected')
@@ -186,7 +224,7 @@ export default {
         this.$log('handleNext start!')
         this.$log('handleNext content', this.content)
         this.nexting = true
-        await this.$wait(2000)
+        // await this.$wait(2000)
         if (this.content.type === 'VIDEO') {
           this.$log('next VIDEO')
           if (this.content.source === 'from_device') {
@@ -204,8 +242,11 @@ export default {
             this.$emit('ready', {type: 'VIDEO', source: 'from_youtube', oid: oid})
             this.$emit('close')
           } else if (this.content.source === 'from_link') {
-            this.$log('next from_link')
-            // TODO:
+            this.$log('next from_link', this.content)
+            if (!this.content.url) throw new Error('No url in content!')
+            let oid = await this.urlUpload(this.content.url)
+            this.$emit('ready', {type: 'VIDEO', source: 'from_link', oid: oid})
+            this.$emit('close')
           } else if (this.content.source === 'from_workspace') {
             this.$log('next from_workspace')
             // TODO:
@@ -228,6 +269,29 @@ export default {
       // TODO: save content to where? to what cache?
       this.$emit('close')
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    const observer = this.$apollo.subscribe({
+      client: 'ws',
+      query: gql`
+        subscription uploadProgress {
+          progress {
+            action
+            progress
+          }
+        }
+      `
+    })
+    observer.subscribe({
+      next: ({data: {progress}}) => {
+        this.$log('progress', progress)
+        this.$set(this, 'progress', progress)
+      },
+      error: (error) => {
+        this.$log('progress error', error)
+      }
+    })
   }
 }
 </script>

@@ -6,9 +6,8 @@ div(style=`position: relative`).row.full-width
     small.full-width counts{{itemsCount}}/{{totalCount}}
     small.full-width {{indexFrom}}/{{indexNow}}/{{indexTo}}
   div(v-if="node"
-    :style=`{position: 'absolute', zIndex: 900, left: '0px', top: top+'px', height: '50px', opacity: 1}`).row
-    //- :nodeFullReady="nodeFull"
-    node-card(:node="node" :needFull="true" :mini="mini").bg-white
+    :style=`{position: 'absolute', zIndex: 900, left: '0px', top: top+'px', opacity: 1}`).row
+    node-card(:node="node" :needFull="true" :mini="mini")
   div(v-if="feed").row.full-width
     //- loading
     div(v-if="$apollo.queries.feed.loading").row.full-width Loading...
@@ -22,52 +21,6 @@ div(style=`position: relative`).row.full-width
     //- fetching more
     div(v-if="fetchingMore" style=`height: 70px`).row.full-width.items-center.justify-center.bg-red
       q-spinner(size="50px" color="primary" :thickness="2")
-  //- div(v-if="items.length === 0"
-  //-   style=`height: 500px`
-  //-   ).row.items-center.justify-center
-  //- k-dummy(v-for="(n, ni) in 40" :key="n" :name="ni")
-  //- div(style=`position: relative`).col.scroll
-  //-   div(style=`position: relative`).row.full-width.items-start.content-start.justify-center
-      //- absolute node
-      //- div(v-if="true" :style=`{position: 'absolute', zIndex: 900, left: '0px', top: top+'px'}`
-      //-   ).row.full-width.justify-center
-      //-   node-card(v-if="node" :node="node" :nodeFullReady="nodeFull" :index="0" :needFull="needFull" :workspace="workspace"
-      //-     @nodeCreateFromNode="$event => $emit('nodeCreateFromNode', $event)" :mini="mini").bg-red-1
-      //-     template(v-slot:actions="{index, node, nodeFull}")
-      //-       slot(name="actions" :index="index" :node="node" :nodeFull="nodeFull")
-      //-     template(v-slot:footer="{index, node, nodeFull}")
-      //-       slot(name="footer" :index="index" :node="node" :nodeFull="nodeFull")
-      //- items
-      //- template(v-if="items").row.full-width.items-start.content-start
-      //-   node-card(v-for="(n, ni) in items" :key="n.oid" :index="ni" :node="n" :ref="'node_'+n.oid"
-      //-     :mini="mini"
-      //-     :needFull="ni >= indexFrom &&  ni < indexTo"
-      //-     :workspace="workspace"
-      //-     @visible="nodeVisible").bg-grey-1
-      //- no items
-  //- apollo-query(:query="query" :variables="getVariables" @result="queryResult" :update="queryUpdate")
-  //-   template(v-slot="{ result: { loading, error, data }, query }")
-  //-     //- loading
-  //-     div(v-if="loading" style=`height: 100px`).row.full-width.items-center.justify-center
-  //-       q-spinner(size="50px" color="primary" :thickness="2")
-  //-     //- error
-  //-     div(v-else-if="error" style=`height: 100px`).row.full-width.items-center.justify-center
-  //-       span {{ error }} : (
-  //-     //- items
-  //-     template(v-else-if="data")
-  //-       node-card(v-for="(n, ni) in data[queryKey].items" :key="n.oid" :index="ni" :node="n" :ref="'node_'+n.oid"
-  //-         :mini="mini"
-  //-         :needFull="ni >= indexFrom && ni < indexTo"
-  //-         :workspace="workspace"
-  //-         @visible="(...$event) => nodeVisible(...$event, query)").bg-white.q-mt-md
-  //-         template(v-slot:footer)
-  //-           slot(name="footer")
-  //-       //- fetch more
-  //-       div(v-if="fetchingMore" style=`height: 70px`).row.full-width.items-center.justify-center.bg-red
-  //-         q-spinner(size="50px" color="primary" :thickness="2")
-  //-     //- nothing
-  //-     div(v-else style=`height: 100px;`).row.full-width.items-center.justify-center
-  //-       q-spinner(size="50px" :thickness="2" color="primary")
 </template>
 
 <script>

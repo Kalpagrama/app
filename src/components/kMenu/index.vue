@@ -14,53 +14,41 @@
   //-     span {{ $store.state.auth.user.name | cut(40) }}
   //- body
   .col.scroll
-    div(v-for="(m, mi) in menus" :key="m.id" @click="menuItemClick(m, mi)"
+    div(v-for="(m, mi) in getPages" :key="m.id" @click="menuItemClick(m, mi)"
       :style=`{height: '40px'}`
         ).row.full-width.items-center.hr.cursor-pointer
       div(style=`height: 40px; width: 50px`).row.items-center.justify-center
         q-icon(:name="m.icon" size="24px" color="grey")
         q-tooltip {{ m.name }}
-      span(v-if="!mini") {{ m.name }}
+      span {{ m.name }}
     //- refresh
     div(@click="refresh").row.full-width.items-center.hr.cursor-pointer
       div(style=`height: 40px; width: 50px`).row.items-center.justify-center
         q-icon(name="refresh" size="24px" color="grey")
-        q-tooltip Обновить кэш
-      span(v-if="!mini") Обновить кэш
+        q-tooltip {{$t('clear_cache')}}
+      span {{$t('clear_cache')}}
     //- logout
     div(@click="logout").row.full-width.items-center.hr.cursor-pointer
       div(style=`height: 40px; width: 50px`).row.items-center.justify-center
         q-icon(name="power_off" size="24px" color="grey")
-        q-tooltip Выйти
-      span(v-if="!mini") Выйти
+        q-tooltip {{$t('logout')}}
+      span {{$t('logout')}}
   div(style=`height: 30px; borderTop: 1px solid #eee`).row.full-width.items-center.q-px-md
     small v0.0.4
-  //- //- mini
-  //- div(@click="$emit('mini')" style=`height: 40px; borderTop: 1px solid #eee`
-  //-   ).row.full-width.items-center.hr.cursor-pointer
-  //-   div(style=`height: 40px; width: 40px`).row.items-center.justify-center
-  //-     q-icon(:name="mini ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" size="24px" color="grey")
-  //-     q-tooltip {{mini ? 'Развернуть' : 'Свернуть' }}
-  //-   span(v-if="!mini") Свернуть
 </template>
 
 <script>
 export default {
   name: 'kMenu',
-  props: {
-    mini: {type: Boolean}
-  },
   data () {
     return {
-      menu: null,
-      menus: [
-        {id: 'home', name: 'home', icon: 'home', hidden: false},
-        // {id: 'node', name: 'Ядро', icon: 'menu', hidden: true},
-        {id: 'explore', name: 'explore', icon: 'explore', hidden: false},
-        {id: 'workspace', name: 'workspace', icon: 'cloud_queue', hidden: false},
-        {id: 'settings', name: 'settings', icon: 'settings', hidden: false},
-        {id: 'create', name: 'create', icon: 'add', hidden: false}
-      ]
+    }
+  },
+  computed: {
+    getPages () {
+      return this.$store.state.ui.pages.filter(p => {
+        return p.hidden !== true
+      })
     }
   },
   methods: {
@@ -73,7 +61,7 @@ export default {
     },
     menuItemClick (m, mi) {
       this.$log('menuItemClick', m, mi)
-      this.$router.push('/app/' + m.id)
+      this.$router.push(m.id)
     },
     refresh () {
       this.$log('refresh')
@@ -91,18 +79,18 @@ export default {
       this.$router.push('/login')
     }
   },
-  watch: {
-    '$route': {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$log('$route CHANGED', to.matched)
-        if (to.matched[1]) {
-          this.$set(this, 'menu', this.menus.find(i => i.id === to.matched[1].name))
-        }
-      }
-    }
-  },
+  // watch: {
+  //   '$route': {
+  //     deep: true,
+  //     immediate: true,
+  //     handler (to, from) {
+  //       this.$log('$route CHANGED', to.matched)
+  //       if (to.matched[1]) {
+  //         this.$set(this, 'menu', this.menus.find(i => i.id === to.matched[1].name))
+  //       }
+  //     }
+  //   }
+  // },
   mounted () {
     this.$log('mounted')
   },

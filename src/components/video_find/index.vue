@@ -1,5 +1,6 @@
 <template lang="pug">
-.row.full-width
+div(style=`position: relative`).column.fit
+  slot(name="progress")
   component(v-if="sources.includes(source)" :is="`source-${source}`" @ready="handleReady")
   div(v-else).row.fit.items-center.justify-center
     span {{$t('no_such_source')}}
@@ -30,7 +31,6 @@ export default {
       this.$log('handleReady', e)
       let options = {type: 'VIDEO'}
       this.$emit('ready', {...e, ...options})
-      // this.$emit('close')
     }
   },
   mounted () {

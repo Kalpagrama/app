@@ -2,13 +2,14 @@
 div(style=`position: relative; overflowX: hidden`).row.fit.justify-center.bg-white
   div(v-if="loading" style=`position: absolute; zIndex: 400; opacity: 0.7`).row.fit.items-center.justify-center.bg-white
     q-spinner(size="50px" :thickness="2" color="primary")
-  div(style=`maxWidth: 1140px`).row.fit.justify-center.q-py-md
+  div(:style=`{maxWidth: '1140px'}` :class=`{'q-py-md': $q.screen.width > videoWidth}`).row.fit.justify-center
     slot(name="menu")
     .col.full-height
       div(style=`position: relative`).row.fit.justify-center.items-start.content-start
         //- video container
-        div(:style=`{position: 'relative', width: videoWidth+'px', height: videoHeight+'px', borderRadius: '8px', overflow: 'hidden'}`).row
-          video(v-if="fragment.content.url" ref="kvideo" width="100%" height="100%" style=`borderRadius: 8px`
+        div(:style=`{position: 'relative', width: videoWidth+'px', height: videoHeight+'px',
+          borderRadius: $q.screen.width <= videoWidth ? '0px' : '4px', overflow: 'hidden'}`).row
+          video(v-if="fragment.content.url" ref="kvideo" width="100%" height="100%"
             playsinline preload="auto" crossorigin="Anonymous"
             type="video/mp4" :src="fragment.content.url")
           div(v-else).row.fit.items-center.justify-center
@@ -67,11 +68,11 @@ div(style=`position: relative; overflowX: hidden`).row.fit.justify-center.bg-whi
         //- tools
         div(v-if="!loading" :style=`{width: videoWidth+'px', height: '60px'}`).row.justify-end.items-center.q-px-sm
           //- q-btn(round dense color="grey-9" icon="refresh" @click="handleReload")
-          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` outline no-caps :color="loop ? 'primary' : 'grey-9'" @click="toggleLoop").q-mr-sm
+          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 4px` outline no-caps :color="loop ? 'primary' : 'grey-9'" @click="toggleLoop").q-mr-sm
             span.text-bold {{$t('loop')}}
-          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` outline no-caps :color="muted ? 'primary' : 'grey-9'" @click="toggleMute").q-mr-sm
+          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 4px` outline no-caps :color="muted ? 'primary' : 'grey-9'" @click="toggleMute").q-mr-sm
             span.text-bold {{$t('mute')}}
-          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 8px` color="primary" no-caps @click="handleReady")
+          q-btn(style=`height: 50px; maxWidth: 100px; borderRadius: 4px` color="primary" no-caps @click="handleReady")
             span.text-bold {{$t('next')}}
         //- div(style=`minHeight: 400px`).row.full-width.br
         //-   //- canvas(ref="kcanvas" crossorigin="Anonymous")
@@ -126,13 +127,13 @@ export default {
     },
     frameWidth () {
       // this.videoWidth / 18
-      return this.framesWidth / (this.fragment.content.frameUrls.length / 1)
+      return this.framesWidth / (this.fragment.content.frameUrls.length / 10)
     },
     framesFilter () {
-      return this.fragment.content.frameUrls
-      // return this.fragment.content.frameUrls.filter((f, fi) => {
-      //   return fi % 1 === 0
-      // })
+      // return this.fragment.content.frameUrls
+      return this.fragment.content.frameUrls.filter((f, fi) => {
+        return fi % 10 === 0
+      })
     },
     getLabelOffset () {
       let d = this.secToPx(this.endSec - this.startSec)
@@ -272,12 +273,14 @@ export default {
         this.startSec = newStartSec
       }
     },
-    endDrag (e) {
+    async endDrag (e) {
       // this.$log('endDrag', e.delta.x)
       if (e.isFirst) this.dragging = true
       if (e.isFinal) this.dragging = false
       let newEndSec = this.endSec + this.pxToSec(e.delta.x)
       if (newEndSec > this.startSec && newEndSec - this.startSec <= 180 && this.endSec <= this.fragment.content.duration) {
+        let nowSec = this.nowSec
+        this.player.setCurrentTime(this.endSec)
         this.endSec = newEndSec
       }
     },
@@ -361,6 +364,11 @@ export default {
           this.$log('START PLAYING')
         }
       })
+    },
+    getEnd () {
+      this.$log('getEnd')
+      let d = this.fragment.content.duration
+      if (d <= this.endSec) this.endSec = d
     }
   },
   async mounted () {
@@ -375,6 +383,7 @@ export default {
       this.endSec = this.fragment.relativePoints[1]['x']
     }
     await this.getVideo(this.fragment.content.oid)
+    this.getEnd()
     this.fragment.relativeScale = this.fragment.content.duration
     this.loading = false
     this.framesAnimate()

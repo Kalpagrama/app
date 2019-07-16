@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.fit.justify-center.q-px-md
+.row.fit.justify-center
   router-view
 </template>
 

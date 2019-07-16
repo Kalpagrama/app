@@ -16,12 +16,12 @@ div(:style=`{position: 'relative', maxWidth: $store.state.ui.nodeMaxWidth+'px', 
         div(style=`minHeight: 15px; height: 15px; borderRadius: 4px; width: 180px`).row.items-center.bg-grey-3
     //- node to workspace or create from
     div(style=`height: 60px; minWidth: 60px`).row.items-center.justify-center.q-px-sm
-      q-icon(:name="nodeIcon" round flat dense color="grey-7" size="20px").q-mx-sm
+      //- q-icon(:name="nodeIcon" round flat dense color="grey-7" size="20px").q-mx-sm
       q-btn(icon="more_vert" round flat color="grey-9").q-mr-xs
         //- TODO: proxy node menu
-        q-menu(fit anchor="bottom right" self="top right" content-style=`{borderRadius: '8px'}`)
+        q-menu(ref="nmenu" fit anchor="bottom right" self="top right" content-style=`{borderRadius: '8px'}`)
           div(style=`width: 200px; borderRadius: 8px`).row.bg-white
-            div(v-for="(m, mi) in menus" :key="mi" @click="menuClick(m, mi)"
+            div(v-for="(m, mi) in menus" :key="mi" @click="menuClick(m, mi), $refs.nmenu.hide()"
               style=`height: 40px`).row.full-width.items-center.hr.cursor-pointer.q-px-md
               span(:style=`{color: m.color}`) {{$t(m.name)}}
   //- node body

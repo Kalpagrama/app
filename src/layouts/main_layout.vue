@@ -35,6 +35,9 @@
             div(:style=`{position: 'fixed', width: '200px', height: '500px', borderRadius: $store.state.ui.radiusDefault+'px'}`).row.bg-white
               k-menu
           .col.q-pt-md
+            //- debug
+            div(v-if="false" style=`position: fixed; zIndex: 100000; right: 0px; top: 50%`).row.bg-green-1
+              small {{$store.state.ui.page}}
             keep-alive
               router-view(v-if="!loading")
               div(v-else).row.fit.items-center.justify-center
@@ -43,9 +46,8 @@
       div(
         style=`height: 56px; borderTop: 1px solid #eee`
         ).row.full-width.justify-between.items-center.q-px-sm
-        //- :color="page.id === p.id ? 'primary' : 'grey'"
-        q-btn(v-for="(p, pi) in pages" :key="pi" flat round v-touch-hold="btnHolded"
-          color="grey" :icon="p.icon" size="16px" @click="pageClick(p)")
+        q-btn(v-for="(p, pi) in getPages" :key="pi" flat round v-touch-hold="btnHolded"
+          :color="getColor(p)" :icon="p.icon" size="16px" @click="pageClick(p)")
 </template>
 
 <script>
@@ -75,7 +77,29 @@ export default {
       mini: false
     }
   },
+  computed: {
+    getPages () {
+      return this.$store.state.ui.pages.filter(p => {
+        return p.mobile === true
+      })
+    }
+  },
   watch: {
+    '$route': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route CHANGED', to)
+        if (to.path) {
+          let findPage = this.$store.state.ui.pages.find(p => {
+            return p.id === to.path
+          })
+          this.$log('findPage', findPage)
+          if (findPage) this.$store.commit('ui/state', ['page', findPage])
+          else this.$router.push({path: this.getPages[0].id})
+        }
+      }
+    },
     '$store.state.workspace.workspace': {
       deep: true,
       immediate: false,
@@ -98,6 +122,14 @@ export default {
     }
   },
   methods: {
+    getColor (p) {
+      if (this.$store.state.ui.page) {
+        if (p.id === this.$store.state.ui.page.id) return 'primary'
+        else return 'grey'
+      } else {
+        return 'grey'
+      }
+    },
     handleMini () {
       this.$log('handleMini')
       this.$set(this, 'mini', !this.mini)
@@ -157,22 +189,6 @@ export default {
     // if (!userWorkspace.version) userWorkspace = this.$store.state.workspace.workspace
     this.$store.commit('workspace/state', ['workspace', userWorkspace])
     this.loading = false
-    // const observer = this.$apollo.subscribe({
-    //   client: 'ws',
-    //   query: gql`
-    //     subscription uploadProgress {
-    //       uploadProgress
-    //     }
-    //   `,
-    // })
-    // observer.subscribe({
-    //   next: (data) => {
-    //     this.$log('sub data', data)
-    //   },
-    //   error: (error) => {
-    //     this.$log('sub error', error)
-    //   }
-    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
