@@ -47,7 +47,7 @@ export default {
   computed: {
     getPages () {
       return this.$store.state.ui.pages.filter(p => {
-        return p.hidden !== true
+        return p.hidden === false && p.desktop === true
       })
     }
   },

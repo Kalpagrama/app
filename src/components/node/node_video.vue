@@ -1,13 +1,6 @@
 <template lang="pug">
-div(style=`position: relative; zIndex: 200; overflow: auto`).row.fit
-  //- video actions
-  div(style="position: absolute; bottom: 0px; right: 0px; minHeight: 60px; zIndex: 200").row.items-center.justify-end.q-pa-sm
-    //- slot(name="actions")
-    q-btn(round :icon="muted ? 'volume_off' : 'volume_up'" color="primary" @click="toggleMute").shadow-5
-  //- video wrapper
-  div(style=`position: relative; height: 100%; overflow: hidden`).row.full-width
-    div(style=`position: relative; height: 100%`).row.full-width.items-center.content-center
-      video(:id="ref" width="100%" height="100%" playsinline preload="auto" :src="url" type="video/mp4" autoplay)
+.row.fit
+  video(:id="ref" playsinline height="100%" width="100%" preload="auto" :src="url" type="video/mp4" autoplay)
 </template>
 
 <script>
@@ -18,6 +11,8 @@ export default {
   name: 'nodeVideo',
   props: {
     index: { type: Number, },
+    height: { type: Number },
+    width: { type: Number },
     url: { type: String, required: true },
     startSec: { type: Number, default: 0 },
     endSec: { type: Number, default: 10 },
@@ -42,6 +37,7 @@ export default {
         this.$log('url CHANGED', to)
         // this.$emit('started')
         if (this.index !== 0) this.player.setMuted(true)
+        this.$emit('started')
       }
     }
   },
@@ -52,7 +48,7 @@ export default {
     },
     timeUpdate (e) {
       this.now = this.player.currentTime
-      if (this.player.currentTime >= this.endSec) {
+      if (this.player.currentTime > this.endSec) {
         this.$log('LOOP REPEAT')
         this.player.setCurrentTime(this.startSec)
       }
@@ -67,10 +63,11 @@ export default {
       controls: true,
       showPosterWhenPaused: false,
       clickToPlayPause: true,
-      iPadUseNativeControls: false,
-      iPhoneUseNativeControls: false,
-      AndroidUseNativeControls: false,
+      iPadUseNativeControls: true,
+      iPhoneUseNativeControls: true,
+      AndroidUseNativeControls: true,
       pauseOtherPlayers: false,
+      alwaysShowControls: false,
       success: async (mediaElement, originalNode, instance) => {
         this.player = mediaElement
         if (!this.mini) {
@@ -81,7 +78,7 @@ export default {
         // this.player.play()
         this.$log('START PLAYING', this.index)
         // if (this.index !== 0) this.player.setMuted(true)
-        // this.$emit('started')
+        this.$emit('started')
       }
     })
   },

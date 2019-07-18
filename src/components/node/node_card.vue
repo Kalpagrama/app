@@ -25,7 +25,7 @@ div(:style=`{position: 'relative', maxWidth: $store.state.ui.nodeMaxWidth+'px', 
               style=`height: 40px`).row.full-width.items-center.hr.cursor-pointer.q-px-md
               span(:style=`{color: m.color}`) {{$t(m.name)}}
   //- node body
-  node(:node="node" :nodeFull="nodeFull" :mini="mini" @visible="$event => $emit('visible', $event, index, node, nodeFull)")
+  node(:node="node" :nodeFull="nodeFull" :visible="visible" @visible="$event => $emit('visible', $event, index, node, nodeFull)")
     //- node rate
     template(v-slot:rate)
       transition(appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
@@ -41,11 +41,11 @@ div(:style=`{position: 'relative', maxWidth: $store.state.ui.nodeMaxWidth+'px', 
       slot(name="actions" :index="index" :node="node" :nodeFull="nodeFull")
   //- .row.full-width {{needFull}}
   //- node spheres
-  div(style=`height: 46px`).row.full-width.items-end.content-end.q-px-md
-    div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
-      div(v-for="(s, si) in nodeFull.spheres" :key="s.oid" @click="sphereClick(s, si)"
-        style=`display: inline-block; height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3.cursor-pointer.hr
-        span(style=`white-space: nowrap`) {{ `#${s.name}` }}
+  //- div(style=`height: 46px`).row.full-width.items-end.content-end.q-px-md
+  //-   div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
+  //-     div(v-for="(s, si) in nodeFull.spheres" :key="s.oid" @click="sphereClick(s, si)"
+  //-       style=`display: inline-block; height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3.cursor-pointer.hr
+  //-       span(style=`white-space: nowrap`) {{ `#${s.name}` }}
   slot(name="footer" :index="index" :node="node" :nodeFull="nodeFull")
   //- node actions
   div(v-if="!$slots.footer || !$scopedSlots.footer" style=`height: 76px`).row.full-width
@@ -73,7 +73,7 @@ export default {
     needFull: {type: Boolean},
     nodeFullReady: {type: Object},
     workspace: {type: Boolean},
-    mini: {type: Boolean}
+    visible: {type: Boolean}
   },
   data () {
     return {
@@ -118,6 +118,12 @@ export default {
     }
   },
   methods: {
+    nodeStop () {
+      this.$log('nodeStop')
+    },
+    nodeStart () {
+      this.$log('nodeStart')
+    },
     nodeToWorkspace () {
       this.$log('nodeToWorkspace')
       this.$store.commit('workspace/addNode', this.node)
@@ -240,6 +246,8 @@ export default {
                     ...on Video {
                       url
                       urlType
+                      width
+                      height
                     }
                     ...on Image {
                       url

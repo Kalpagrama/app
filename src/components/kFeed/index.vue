@@ -1,13 +1,13 @@
 <template lang="pug">
 div(style=`position: relative`).row.full-width
-  div(v-if="false" style=`position: absolute; zIndex: 1000; top: 0px; opacity: 0.85`).row.full-width.bg-green-1
+  div(v-if="true" style=`position: fixed; zIndex: 1000; top: 0px; opacity: 0.85`).row.full-width.bg-green-1
     small.full-width needFull::{{needFull}}
     small.full-width pageToken::{{pageToken}}
     small.full-width counts{{itemsCount}}/{{totalCount}}
     small.full-width {{indexFrom}}/{{indexNow}}/{{indexTo}}
-  div(v-if="node"
-    :style=`{position: 'absolute', zIndex: 900, left: '0px', top: top+'px', opacity: 1}`).row
-    node-card(:node="node" :needFull="true" :mini="mini")
+  //- div(v-if="node"
+  //-   :style=`{position: 'absolute', zIndex: 900, left: '0px', top: top+'px', opacity: 1}`).row
+  //-   node-card(:node="node" :needFull="true" :mini="mini").bg-red-1
   div(v-if="feed").row.full-width
     //- loading
     div(v-if="$apollo.queries.feed.loading").row.full-width Loading...
@@ -17,6 +17,7 @@ div(style=`position: relative`).row.full-width
         v-for="(n, ni) in feed.items" :key="n.oid" :ref="'node_'+n.oid"
         :node="n" :index="ni" :mini="mini"
         :needFull="ni >= indexFrom && ni < indexTo"
+        :visible="node ? node.oid == n.oid : false"
         @visible="nodeVisible").q-mb-md
     //- fetching more
     div(v-if="fetchingMore" style=`height: 70px`).row.full-width.items-center.justify-center.bg-red
@@ -98,15 +99,6 @@ export default {
       fetchPolicy: 'cache-and-network'
     }
   },
-  computed: {
-    getVariables () {
-      if (this.variables) {
-        return this.variables
-      } else {
-        return {}
-      }
-    }
-  },
   watch: {
     indexNow: {
       handler (to, from) {
@@ -139,12 +131,8 @@ export default {
         }
       })
     },
-    async nodeSwitch () {
-      this.nodeShow = false
-      await this.$wait(300)
-      this.nodeShow = true
-    },
     async nodeVisible (visible, index, node, nodeFull) {
+      let n = this.$refs['node_' + node.oid][0]
       if (visible) {
         this.$log('nodeVisible', visible, index, node.name)
         this.indexNow = index
@@ -156,14 +144,15 @@ export default {
           this.indexTo = index + 3
         }
         // absolute node
-        // this.$set(this, 'node', node)
-        // this.$set(this, 'nodeFull', nodeFull)
         this.node = node
         this.nodeFull = nodeFull
-        // this.nodeSwitch()
-        await this.$wait(240)
-        let n = this.$refs['node_' + node.oid]
-        this.top = n[0].$el.offsetTop
+        n.nodeStart()
+        // TODO: await this.$wait(300)
+        this.top = n.$el.offsetTop
+      } else {
+        if (this.node && node.oid === this.node.oid) {
+          n.nodeStop()
+        }
       }
     }
   },

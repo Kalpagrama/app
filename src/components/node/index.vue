@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    height: nodeHeight+'px', width: nodeWidth+'px',
+    width: nodeWidth+'px',
     zIndex: 2, overflow: 'hidden',
     borderTopLeftRadius: '100%'+getRadius+'px',
     borderTopRightRadius: '100%'+getRadius+'px',
@@ -12,39 +12,46 @@ div(
     callback: (isVisible) => $emit('visible', isVisible),
     throttle: 250,
     intersection: {
-      threshold: 0.95
+      threshold: 1
     }}`
-  ).column.bg-white
-  slot(name="rate")
+  ).row.bg-white
+  //- rate
+  //- slot(name="rate")
   //- top
   div(
     :style=`{
-    zIndex: 100,
-    borderBottomLeftRadius: '100%'+getRadius+'px',
-    borderBottomRightRadius: '100%'+getRadius+'px',
-    overflow: 'hidden'}`).col.bg-grey-4
-    node-fragment(:index="0" :preview="node.thumbUrl[0]" :fragment="nodeFull.fragments[0]" :mini="mini")
-      template(v-slot:empty)
-        slot(name="empty" :index="0")
-      template(v-slot:actions)
-        slot(name="actions" :index="0")
-  //- name @click="!$slots.name ? $router.push({name: 'node', path: '/app/node', query: {node: node.oid}}) : ''"
-  div(style=`height: 40px`
+      zIndex: 100,
+      borderBottomLeftRadius: '100%'+getRadius+'px',
+      borderBottomRightRadius: '100%'+getRadius+'px',
+      overflow: 'hidden'
+    }`).row.full-width.bg-grey-4
+    node-fragment(
+      :index="0"
+      :preview="node.thumbUrl[0]"
+      :fragment="nodeFull.fragments[0]"
+      :visible="visible"
+      :width="nodeWidth"
+      :height="getFragmentHeight(0)")
+  //- name
+  div(style=`height: 48px`
     ).row.full-width.items-center.content-center.justify-center
     span(v-if="!$slots.name") {{ node.name }}
     slot(name="name")
   //- bottom
   div(
     :style=`{
-    zIndex: 100,
-    borderTopLeftRadius: '100%'+getRadius+'px',
-    borderTopRightRadius: '100%'+getRadius+'px',
-    overflow: 'hidden'}`).col.bg-grey-4
-    node-fragment(:index="0" :preview="node.thumbUrl[1]" :fragment="nodeFull.fragments[1]" :mini="mini")
-      template(v-slot:empty)
-        slot(name="empty" :index="1")
-      template(v-slot:actions)
-        slot(name="actions" :index="1")
+      zIndex: 100,
+      borderTopLeftRadius: '100%'+getRadius+'px',
+      borderTopRightRadius: '100%'+getRadius+'px',
+      overflow: 'hidden'
+    }`).row.full-width.bg-grey-4
+    node-fragment(
+      :index="0"
+      :preview="node.thumbUrl[1]"
+      :fragment="nodeFull.fragments[1]"
+      :visible="visible"
+      :width="nodeWidth"
+      :height="getFragmentHeight(1)")
 </template>
 
 <script>
@@ -59,19 +66,22 @@ export default {
     mini: {type: Boolean}
   },
   computed: {
-    nodeHeight () {
-      return this.nodeWidth
-    },
     nodeWidth () {
       let w = this.$q.screen.width
-      if (w >= this.$store.state.ui.nodeMaxWidth) {
-        return 540
-      } else {
-        return w
-      }
+      let wm = this.$store.state.ui.nodeMaxWidth
+      if (w >= wm) return wm
+      else return w
     },
     getRadius () {
-      return 10
+      return 8
+    }
+  },
+  methods: {
+    getFragmentHeight (index) {
+      let w = this.nodeFull.fragments[index].content.width
+      let h = this.nodeFull.fragments[index].content.height
+      let k = h / w
+      return this.nodeWidth * k
     }
   }
 }

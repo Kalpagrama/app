@@ -1,26 +1,43 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit
-  div(v-if="!fragment" style=`position: absolute; zIndex: 1000`).row.fit
-    slot(name="empty")
-  div(v-if="fragment" style=`position: absolute; zIndex: 900; height: 60px; right: 0px; top: 0px`).row.items-center.q-px-xs
-    slot(name="actions")
-  div(v-if="!ready && preview" style=`position: absolute; zIndex: 800`).row.fit
-    img(v-if="preview" :src="preview" width="100%" height="100%" @click="ready = true")
-  div(v-else-if="type === 'VIDEO'").row.fit
+div(:style=`{position: 'relative', width: width+'px', height: height+'px'}`).row
+  slot(v-if="!fragment" name="empty")
+  //- preview
+  div(v-if="!visible || !readyContent" style=`position: absolute; zIndex: 800` @click="ready = true").row.fit
+    img(v-if="preview" :src="preview" :width="width+'px'" :height="height+'px'")
+  //- actions
+  div(:style=`{position: 'absolute', zIndex: 900, right: '0px', top: (height/2)-15+'px'}`).row
+    q-btn(round flat icon="more_vert" color="white" size="md").q-mr-sm
+      q-menu(anchor="center left" self="center right")
+        div(style=`width: 220px`).row
+          div(v-for="(a, ai) in actions" :key="a.id" @click="actionClick(a, ai)"
+            style=`height: 40px; borderBottom: 1px solid #eee`
+              ).row.full-width.items-center.cursor-pointer.hr.q-px-sm
+            span {{$t(a.name)}}
+  //- content
+  div(v-if="visible").row.fit
     node-video(
-      @started="$emit('started', started = true)"
+      v-if="getType === 'VIDEO'"
+      @started="videoStarted"
       :index="index"
-      :url="mini ? fragment.url : fragment.content.url"
+      :url="fragment.url"
       :startSec="getStartSec"
       :endSec="getEndSec"
-      :mini="mini")
-  div(v-else-if="type === 'IMAGE'").row.fit.bg-green
-  //-   node-image(:url="fragment.content.url")
+      :width="width"
+      :height="height")
+    node-image(
+      v-if="getType === 'IMAGE'"
+      :url="fragment.url"
+      :width="width"
+      :height="height")
+    //- node-book(v-if="type === 'BOOK'")
+    //- node-code(v-if="type === 'CODE'")
+    //- node-audio(v-if="type === 'AUDIO'")
 </template>
 
 <script>
 import nodeVideo from './node_video'
 import nodeImage from './node_image'
+
 export default {
   name: 'nodeFragment',
   components: { nodeVideo, nodeImage },
@@ -29,26 +46,58 @@ export default {
     fragment: {type: Object},
     preview: {type: String},
     visible: {type: Boolean},
-    mini: {type: Boolean}
+    mini: {type: Boolean},
+    height: {type: Number},
+    width: {type: Number}
   },
-  methods: {
-    contentReady (val) {
-      this.$log('contentReady', val)
-      this.ready = true
+  data () {
+    return {
+      ready: false,
+      readyContent: false,
+      action: null,
+      actions: [
+        {id: 'explore_content', name: 'explore_content'},
+        {id: 'fork_fragment', name: 'fork_fragment'},
+        {id: 'add_content_to_workspace', name: 'add_content_to_workspace'},
+        {id: 'add_node_to_workspace', name: 'add_node_to_workspace'}
+      ]
     }
   },
-  watch: {
-    fragment: {
-      deep: true,
-      handler (to, from) {
-        this.$log('fragment CHANGED', to)
+  methods: {
+    async videoStarted () {
+      this.$log('videoStarted')
+      await this.$wait(500)
+      this.readyContent = true
+    },
+    actionClick (a, ai) {
+      this.$log('actionClick', this.fragment)
+      switch (a.id) {
+        case 'explore_content': {
+          this.$log('explore_content')
+          break
+        }
+        case 'fork_fragment': {
+          this.$log('fork_fragment')
+          break
+        }
+        case 'add_content_to_workspace': {
+          this.$log('add_content_to_workpsace')
+          break
+        }
+        case 'add_node_to_workspace': {
+          this.$log('add_node_to_workspace')
+          break
+        }
       }
     }
   },
   computed: {
-    type () {
+    getType () {
       if (this.fragment) return this.fragment.content.type
       else return null
+    },
+    getHeight () {
+      return this.fragment.content.height
     },
     getStartSec () {
       if (this.fragment.relativePoints.length > 0) {
@@ -63,18 +112,6 @@ export default {
       } else {
         return 10
       }
-    }
-  },
-  data () {
-    return {
-      state: 'preview',
-      states: ['none', 'preview', 'active'],
-      // type: 'none',
-      types: ['image', 'video', 'none'],
-      editor: null,
-      editorReady: false,
-      started: false,
-      ready: false
     }
   }
 }

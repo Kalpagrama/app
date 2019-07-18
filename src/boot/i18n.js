@@ -10,6 +10,7 @@ export default async ({ app, Vue }) => {
   //   messages,
   // })
   Vue.prototype.$t = function (str) {
+    // this.$options.name = 'main_layert'
     // this.$options.name
     return str
   }

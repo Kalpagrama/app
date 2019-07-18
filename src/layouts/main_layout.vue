@@ -80,7 +80,7 @@ export default {
   computed: {
     getPages () {
       return this.$store.state.ui.pages.filter(p => {
-        return p.mobile === true
+        return p.hidden === false && p.mobile === true
       })
     }
   },

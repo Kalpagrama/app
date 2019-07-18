@@ -9,9 +9,14 @@ const routes = [
       { name: 'account', path: 'account', component: () => import('pages/app/account') },
       { name: 'node', path: 'node', component: () => import('pages/app/node') },
       {
+        name: 'content',
+        path: 'content/:id',
+        component: () => import('pages/app/content')
+      },
+      {
         name: 'workspace',
         path: 'workspace',
-        redirect: 'workspace/nodes',
+        // redirect: 'workspace/nodes',
         component: () => import('pages/app/workspace'),
         children: [
           {name: 'videos', path: 'videos', component: () => import('pages/app/workspace/videos')},
