@@ -2,23 +2,25 @@
 div(:style=`{position: 'relative', width: width+'px', height: height+'px'}`).row
   slot(v-if="!fragment" name="empty")
   //- preview
-  div(v-if="!visible || !readyContent" style=`position: absolute; zIndex: 800` @click="ready = true").row.fit
-    img(v-if="preview" :src="preview" :width="width+'px'" :height="height+'px'")
+  div(v-if="mini && !readyContent").row.fit
+    img(v-if="preview" :src="preview" :width="width+'px'")
   //- actions
-  div(:style=`{position: 'absolute', zIndex: 900, right: '0px', top: (height/2)-15+'px'}`).row
+  div(:style=`{position: 'absolute', zIndex: zIndex+500, right: '0px', top: (height/2)-15+'px'}`).row
     q-btn(round flat icon="more_vert" color="white" size="md").q-mr-sm
-      q-menu(anchor="center left" self="center right")
+      q-menu(auto-close anchor="center left" self="center right")
         div(style=`width: 220px`).row
           div(v-for="(a, ai) in actions" :key="a.id" @click="actionClick(a, ai)"
             style=`height: 40px; borderBottom: 1px solid #eee`
               ).row.full-width.items-center.cursor-pointer.hr.q-px-sm
             span {{$t(a.name)}}
   //- content
-  div(v-if="visible").row.fit
+  div(v-if="!mini && visible").row.fit
     node-video(
       v-if="getType === 'VIDEO'"
       @started="videoStarted"
       :index="index"
+      :zIndex="zIndex"
+      :preview="preview"
       :url="fragment.url"
       :startSec="getStartSec"
       :endSec="getEndSec"
@@ -26,6 +28,8 @@ div(:style=`{position: 'relative', width: width+'px', height: height+'px'}`).row
       :height="height")
     node-image(
       v-if="getType === 'IMAGE'"
+      :index="index"
+      :zIndex="zIndex"
       :url="fragment.url"
       :width="width"
       :height="height")
@@ -43,6 +47,7 @@ export default {
   components: { nodeVideo, nodeImage },
   props: {
     index: {type: Number},
+    zIndex: {type: Number},
     fragment: {type: Object},
     preview: {type: String},
     visible: {type: Boolean},
@@ -66,7 +71,6 @@ export default {
   methods: {
     async videoStarted () {
       this.$log('videoStarted')
-      await this.$wait(500)
       this.readyContent = true
     },
     actionClick (a, ai) {
@@ -74,6 +78,7 @@ export default {
       switch (a.id) {
         case 'explore_content': {
           this.$log('explore_content')
+          this.$router.push({path: '/app/content/' + this.fragment.content.oid})
           break
         }
         case 'fork_fragment': {

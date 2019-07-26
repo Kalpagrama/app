@@ -1,18 +1,28 @@
 <template lang="pug">
-.row.fit
-  video(:id="ref" playsinline height="100%" width="100%" preload="auto" :src="url" type="video/mp4" autoplay)
+div(style='position: relative').row.fit
+  div(v-if="false" style=`position: absolute; zIndex: 300; top: 0px; opacity: 0.5`).row.full-width.q-pa-xs.bg-green-1
+    small.full-width start:{{startSec}}
+    small.full-width end:{{endSec}}
+    small.full-width duration:{{endSec-startSec}}
+  //- preview
+  div(v-show="showPoster" :style=`{position: 'absolute', zIndex: zIndex+400}`).row.fit
+    img(:src="preview" :width="width+'px'")
+  video(:ref="ref" playsinline :height="height+'px'" :width="width+'px'" preload="none" :src="url" type="video/mp4" autoplay
+    style=`zIndex: 200 `)
 </template>
 
 <script>
-import 'mediaelement/build/mediaelementplayer.min.css'
-import 'mediaelement/full'
+// import 'mediaelement/build/mediaelementplayer.min.css'
+// import 'mediaelement/full'
 
 export default {
   name: 'nodeVideo',
   props: {
     index: { type: Number, },
+    zIndex: { type: Number },
     height: { type: Number },
     width: { type: Number },
+    preview: { type: String },
     url: { type: String, required: true },
     startSec: { type: Number, default: 0 },
     endSec: { type: Number, default: 10 },
@@ -23,7 +33,9 @@ export default {
       me: null,
       player: null,
       muted: false,
-      now: 0
+      now: 0,
+      showPoster: true
+      // url: 'https://storage.yandexcloud.net/kalpa-content/8h/65/110124177519845405.mp4'
     }
   },
   computed: {
@@ -34,10 +46,8 @@ export default {
   watch: {
     url: {
       handler (to, from) {
-        this.$log('url CHANGED', to)
-        // this.$emit('started')
-        if (this.index !== 0) this.player.setMuted(true)
-        this.$emit('started')
+        // this.$log('*** --- URL CHANGED --- ***', to)
+        this.showPoster = true
       }
     }
   },
@@ -48,43 +58,38 @@ export default {
     },
     timeUpdate (e) {
       this.now = this.player.currentTime
-      if (this.player.currentTime > this.endSec) {
-        this.$log('LOOP REPEAT')
-        this.player.setCurrentTime(this.startSec)
-      }
+    },
+    playing (e) {
+      // this.$log('=== *** VIDEO STARTED *** ===')
+      this.showPoster = false
     }
   },
   async mounted () {
     this.$log('mounted')
-    // load player this.$refs[this.ref]
-    this.me = new self.MediaElementPlayer(this.ref, {
+    this.me = new self.MediaElementPlayer(this.$refs[this.ref], {
       loop: true,
-      autoplay: false,
-      controls: true,
+      autoplay: true,
+      controls: false,
+      muted: true,
       showPosterWhenPaused: false,
       clickToPlayPause: true,
-      iPadUseNativeControls: true,
-      iPhoneUseNativeControls: true,
-      AndroidUseNativeControls: true,
+      iPadUseNativeControls: false,
+      iPhoneUseNativeControls: false,
+      AndroidUseNativeControls: false,
       pauseOtherPlayers: false,
       alwaysShowControls: false,
       success: async (mediaElement, originalNode, instance) => {
         this.player = mediaElement
-        if (!this.mini) {
-          this.player.addEventListener('timeupdate', this.timeUpdate, false)
-          this.player.setCurrentTime(this.startSec)
-        }
-        // this.player.addEventListener('seeked', this.seeked, false)
-        // this.player.play()
+        this.player.addEventListener('timeupdate', this.timeUpdate, false)
+        this.player.addEventListener('playing', this.playing, false)
         this.$log('START PLAYING', this.index)
-        // if (this.index !== 0) this.player.setMuted(true)
-        this.$emit('started')
       }
     })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    if (!this.mini) this.player.removeEventListener('timeupdate', this.timeUpdate)
+    this.player.removeEventListener('timeupdate', this.timeUpdate)
+    this.player.removeEventListener('playing', this.playing)
   }
 }
 </script>
@@ -94,4 +99,6 @@ export default {
   display: none !important
 .mejs__overlay-loading
   display: none !important
+// .mejs__controls
+//   display: none !important
 </style>

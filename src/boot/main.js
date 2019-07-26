@@ -6,6 +6,8 @@ import TweenMax from 'gsap/TweenMax'
 import VueObserveVisibility from 'vue-observe-visibility'
 // import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { sync } from 'vuex-router-sync'
+import 'mediaelement/build/mediaelementplayer.min.css'
+import 'mediaelement/full'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -28,7 +30,9 @@ export default async ({ Vue, store, router }) => {
   Vue.use(VueVirtualScroller)
   Vue.use(VueObserveVisibility)
   Vue.prototype.$wait = (msg) => new Promise(resolve => setTimeout(resolve, msg))
+  let banned = {'App': 1, 'mainLayout': 1}
   Vue.prototype.$log = function (...msg) {
+    // if (banned[this.$options.name]) return
     const debug = require('debug')(`[${this.$options.name}] `)
     debug.enabled = true
     debug(...msg)

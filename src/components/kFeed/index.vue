@@ -1,27 +1,27 @@
 <template lang="pug">
-div(style=`position: relative`).row.full-width
-  div(v-if="true" style=`position: fixed; zIndex: 1000; top: 0px; opacity: 0.85`).row.full-width.bg-green-1
+div(style=`position: relative`).row.full-width.items-start.content-start
+  div(v-if="false" style=`position: fixed; zIndex: 1200; top: 0px; opacity: 0.5`).row.full-width.bg-green-1
     small.full-width needFull::{{needFull}}
     small.full-width pageToken::{{pageToken}}
     small.full-width counts{{itemsCount}}/{{totalCount}}
     small.full-width {{indexFrom}}/{{indexNow}}/{{indexTo}}
-  //- div(v-if="node"
-  //-   :style=`{position: 'absolute', zIndex: 900, left: '0px', top: top+'px', opacity: 1}`).row
-  //-   node-card(:node="node" :needFull="true" :mini="mini").bg-red-1
-  div(v-if="feed").row.full-width
+    small.full-width top {{top}}
+  //- .bg-red-3
+  div(v-if="node" v-show="showNode"
+    :style=`{position: 'absolute', zIndex: 1000, left: '0px', top: top+'px', opacity: opacity}`).row
+    node-card(:node="node" :needFull="needFullAbsolute" :nodeFullReady="nodeFull" :visible="true" :mini="false" :zIndex="1000").bg-white
+  //- div(v-if="feed").row.full-width.items-start.content-start
     //- loading
-    div(v-if="$apollo.queries.feed.loading").row.full-width Loading...
+    //- div(v-if="$apollo.queries.feed.loading").row.full-width Loading...
     //- items
-    div(v-if="feed.items").row.full-width
-      node-card(
-        v-for="(n, ni) in feed.items" :key="n.oid" :ref="'node_'+n.oid"
-        :node="n" :index="ni" :mini="mini"
-        :needFull="ni >= indexFrom && ni < indexTo"
-        :visible="node ? node.oid == n.oid : false"
-        @visible="nodeVisible").q-mb-md
-    //- fetching more
-    div(v-if="fetchingMore" style=`height: 70px`).row.full-width.items-center.justify-center.bg-red
-      q-spinner(size="50px" color="primary" :thickness="2")
+  div(v-if="feed && feed.items").row.full-width.items-start.content-start
+    node-card(
+      v-for="(n, ni) in feed.items" :key="n.oid" :ref="'node_'+n.oid"
+      :node="n" :index="ni" :zIndex="200"
+      :needFull="ni >= indexFrom && ni < indexTo"
+      :visible="node ? node.oid == n.oid : false"
+      :mini="true"
+      @visible="nodeVisible").q-mb-md
 </template>
 
 <script>
@@ -39,7 +39,7 @@ export default {
       default () {
         return gql`
           query feed($pageToken: RawJSON) {
-            feed(type: NEWS, pagination: {pageSize: 8, pageToken: $pageToken} filter: {types:[NODE]} ){
+            feed(type: NEWS, pagination: {pageSize: 6, pageToken: $pageToken} filter: {types:[NODE]} ){
               count
               totalCount
               nextPageToken
@@ -66,6 +66,7 @@ export default {
   data () {
     return {
       top: 0,
+      opacity: 1,
       node: null,
       nodeFull: null,
       needFull: false,
@@ -77,7 +78,8 @@ export default {
       totalCount: 0,
       itemsCount: 0,
       fetchingMore: false,
-      nodeShow: true
+      nodeShow: true,
+      needFullAbsolute: true
     }
   },
   apollo: {
@@ -117,15 +119,15 @@ export default {
           pageToken: this.pageTokenNext
         },
         updateQuery: (from, {fetchMoreResult: to}) => {
-          this.$log('updateQuery from', from)
-          this.$log('updateQuery to', to)
+          // this.$log('updateQuery from', from)
+          // this.$log('updateQuery to', to)
           let res = {
             feed: {
               ...to.feed,
               items: [...from.feed.items, ...to.feed.items]
             }
           }
-          this.$log('updateQuery res', res)
+          // this.$log('updateQuery res', res)
           this.fetchingMore = false
           return res
         }
@@ -144,15 +146,18 @@ export default {
           this.indexTo = index + 3
         }
         // absolute node
-        this.node = node
-        this.nodeFull = nodeFull
-        n.nodeStart()
-        // TODO: await this.$wait(300)
+        this.showNode = false
+        this.opacity = 0
+        this.needFullAbsolute = false
+        if (this.node) this.$set(this.node, 'thumbUrl', [null, null])
+        await this.$wait(100)
+        this.needFullAbsolute = true
+        this.$set(this, 'node', JSON.parse(JSON.stringify(node)))
+        this.$set(this, 'nodeFull', JSON.parse(JSON.stringify(nodeFull)))
         this.top = n.$el.offsetTop
-      } else {
-        if (this.node && node.oid === this.node.oid) {
-          n.nodeStop()
-        }
+        await this.$wait(400)
+        this.opacity = 1
+        this.showNode = true
       }
     }
   },

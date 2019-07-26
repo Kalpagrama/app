@@ -1,18 +1,15 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'relative',
-    width: nodeWidth+'px',
-    zIndex: 2, overflow: 'hidden',
-    borderTopLeftRadius: '100%'+getRadius+'px',
-    borderTopRightRadius: '100%'+getRadius+'px',
-    borderBottomLeftRadius: '100%'+getRadius+'px',
-    borderBottomRightRadius: '100%'+getRadius+'px'}`
+    position: 'relative', zIndex: zIndex || 200,
+    width: nodeWidth+'px', overflow: 'hidden',
+    borderTopLeftRadius: '100%'+getRadius+'px', borderTopRightRadius: '100%'+getRadius+'px',
+    borderBottomLeftRadius: '100%'+getRadius+'px', borderBottomRightRadius: '100%'+getRadius+'px'}`
   v-observe-visibility=`{
     callback: (isVisible) => $emit('visible', isVisible),
     throttle: 250,
     intersection: {
-      threshold: 1
+      threshold: 0.8
     }}`
   ).row.bg-white
   //- rate
@@ -25,17 +22,22 @@ div(
       borderBottomRightRadius: '100%'+getRadius+'px',
       overflow: 'hidden'
     }`).row.full-width.bg-grey-4
+    div(v-if="!nodeFull").row.full-width
+      img(:src="node.thumbUrl[0]" width="100%")
     node-fragment(
+      v-else
       :index="0"
+      :zIndex="zIndex"
       :preview="node.thumbUrl[0]"
       :fragment="nodeFull.fragments[0]"
       :visible="visible"
+      :mini="mini"
       :width="nodeWidth"
       :height="getFragmentHeight(0)")
   //- name
   div(style=`height: 48px`
     ).row.full-width.items-center.content-center.justify-center
-    span(v-if="!$slots.name") {{ node.name }}
+    small(v-if="!$slots.name") {{ node.name }}
     slot(name="name")
   //- bottom
   div(
@@ -45,11 +47,16 @@ div(
       borderTopRightRadius: '100%'+getRadius+'px',
       overflow: 'hidden'
     }`).row.full-width.bg-grey-4
+    div(v-if="!nodeFull").row.full-width
+      img(:src="node.thumbUrl[1]" width="100%")
     node-fragment(
+      v-else
       :index="0"
+      :zIndex="zIndex"
       :preview="node.thumbUrl[1]"
       :fragment="nodeFull.fragments[1]"
       :visible="visible"
+      :mini="mini"
       :width="nodeWidth"
       :height="getFragmentHeight(1)")
 </template>
@@ -60,8 +67,9 @@ export default {
   name: 'node',
   components: { nodeFragment },
   props: {
+    zIndex: {type: Number},
     node: { type: Object, required: true },
-    nodeFull: { type: Object, required: true },
+    nodeFull: { type: Object },
     visible: {type: Boolean},
     mini: {type: Boolean}
   },
