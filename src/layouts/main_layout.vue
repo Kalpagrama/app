@@ -1,6 +1,6 @@
 <template lang="pug">
-  q-layout(view='lHh Lpr lFf' :style=`{height: $q.screen.height+'px'}` @resize="handleResize")
-    q-header
+  q-layout(view='hHh Lpr fFf')
+    q-header(reveal v-if="false")
       div(style=`height: 60px`).row.full-width.items-center.justify-between.bg-white.q-pl-md.q-pr-sm
         q-btn(round flat color="grey-6" @click="$router.push('/app/home')")
           template(v-slot:default)
@@ -23,35 +23,30 @@
             q-menu(auto-close)
               div(style=`width: 200px`).row
                 div(v-for="(m, mi) in menus" :key="m.id" @click="menuClick(m, mi)"
-                  style=`height: 50px; borderBottom: 1px solid #eee`
+                  style=`height: 40px; borderBottom: 1px solid #eee`
                   ).row.full-width.items-center.hr.cursor-pointer.q-px-md
                   span {{m.name}}
     q-page-container
       q-page.bg-grey-2
-        //- debug
-        div(v-if="false" style=`position: fixed; zIndex: 100000; right: 0px; top: 50%`).row.bg-green-1
-          //- small {{$store.state.ui.page}}
-          small.full-width {{width}}/{{height}}
-          small.full-width {{widthPage}}/{{heightPage}}
+        q-resize-observer(@resize="onResize" :debounce="200")
         keep-alive
           router-view(v-if="!loading" :width="widthPage" :height="heightPage")
           div(v-else).row.fit.items-center.justify-center
             q-spinner(size="50px" :thickness="2" color="primary")
-    q-footer(v-if="isMobile" reveal).bg-white
-      div(
-        style=`height: 60px; borderTop: 1px solid #eee`
-        ).row.full-width.justify-between.items-center.q-px-sm
-        q-btn(v-for="(p, pi) in pages" :key="pi" flat round
-          :color="getColor(p)" :icon="p.icon" size="16px" @click="pageClick(p)")
+    //- q-footer(v-if="isMobile" reveal).bg-white
+    //-   div(
+    //-     style=`height: 60px; borderTop: 1px solid #eee`
+    //-     ).row.full-width.justify-between.items-center.q-px-sm
+    //-     q-btn(v-for="(p, pi) in pages" :key="pi" flat round
+    //-       :color="getColor(p)" :icon="p.icon" size="16px" @click="pageClick(p)")
 </template>
 
 <script>
-import kMenu from 'pages/app/menu'
-import kSearch from 'components/kSearch'
+import kSearch from 'components/k_search'
 
 export default {
   name: 'mainLayout',
-  components: {kMenu, kSearch},
+  components: {kSearch},
   data () {
     return {
       loading: true,
@@ -64,11 +59,11 @@ export default {
       page: null,
       pageId: '',
       pages: [
-        { id: 'home', icon: 'home', name: 'home' },
+        { id: '/app/home', icon: 'home', name: 'home' },
         // { id: 'sphere', icon: 'explore', name: 'explore' },
-        { id: 'create', icon: 'add_circle_outline', name: 'create' },
-        { id: 'notifications', icon: 'notifications_none', name: 'notifications' },
-        { id: 'account', icon: 'perm_identity', name: 'account' }
+        { id: '/app/create/node', icon: 'add_circle_outline', name: 'create' },
+        // { id: 'notifications', icon: 'notifications_none', name: 'notifications' },
+        { id: '/app/user', icon: 'perm_identity', name: 'account' }
         // { id: 'menu', icon: 'more_vert', name: 'menu' }
       ],
       menus: [
@@ -99,8 +94,9 @@ export default {
       return this.width
     },
     heightPage () {
-      if (!this.menuShow) return this.height - 60
-      else return this.height - 60
+      // if (!this.menuShow) return this.height - 60
+      // else return this.height - 60
+      return this.height
     }
   },
   watch: {
@@ -108,7 +104,7 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('$route CHANGED', to)
+        // this.$log('$route CHANGED', to)
         // if (to.path) {
         //   let findPage = this.$store.state.ui.pages.find(p => {
         //     return p.id === to.path
@@ -173,12 +169,10 @@ export default {
         return 'grey'
       }
     },
-    handleResize (e) {
-      // this.$log('handleResize', e.width)
+    onResize (e) {
+      this.$log('onResize', e.width)
       this.height = e.height
       this.width = e.width
-      this.$store.commit('ui/state', ['width', e.width])
-      this.$store.commit('ui/state', ['height', e.height])
     },
     pageClick (p) {
       this.$log('pageClick', p)
@@ -199,8 +193,8 @@ export default {
         userIsConfirmed
         }`
       })
-    this.$log('userIsAuthorized', userIsAuthorized)
-    this.$log('userIsConfirmed', userIsConfirmed)
+    // this.$log('userIsAuthorized', userIsAuthorized)
+    // this.$log('userIsConfirmed', userIsConfirmed)
     // TODO: create with try/catch this...
     if (!userIsAuthorized || !userIsConfirmed) {
       this.$log('GO LOGIN')

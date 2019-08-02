@@ -8,7 +8,7 @@
         borderTopLeftRadius: '100%'+getRadius+'px', borderTopRightRadius: '100%'+getRadius+'px',
         borderBottomLeftRadius: '100%'+getRadius+'px', borderBottomRightRadius: '100%'+getRadius+'px'}`
       ).q-pa-sm.bg-white.hr.cursor-pointer.q-mb-md
-      node(:node="n" style=`width: 100%`)
+      node(:node="n" style=`width: 200px; height: auto`)
 </template>
 
 <script>

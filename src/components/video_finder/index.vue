@@ -14,7 +14,7 @@ import sourceLink from './source_link'
 import sourceWorkspace from './source_workspace'
 
 export default {
-  name: 'videoFind',
+  name: 'videoFinder',
   props: {
     source: {type: String, required: true}
   },

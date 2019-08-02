@@ -38,7 +38,7 @@
 <script>
 import gql from 'graphql-tag'
 export default {
-  name: 'sphereFind',
+  name: 'sphereFinder',
   data () {
     return {
       mounted: false,

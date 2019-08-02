@@ -1,17 +1,15 @@
 <template lang="pug">
 .row.fit.justify-center
-  div(style=`maxWidth: 600px`).row
-    div(:class=`{'q-pa-md': $q.screen.width > $store.state.ui.nodeMaxWidth+10}`)
-      k-feed(:mini="true" queryKey="feed")
+  div(style=`maxWidth: 500px`).row.q-pt-md
+    node-feed(:mini="true" queryKey="feed")
 </template>
 
 <script>
-import kMenu from 'components/kMenu'
-import kFeed from 'components/kFeed'
+import nodeFeed from 'components/node_feed'
 
 export default {
   name: 'pageApp__Home',
-  components: { kMenu, kFeed },
+  components: { nodeFeed },
   data () {
     return {
       query: gql`

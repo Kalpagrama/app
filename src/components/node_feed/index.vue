@@ -1,36 +1,21 @@
 <template lang="pug">
 div(style=`position: relative`).row.full-width.items-start.content-start
-  div(v-if="false" style=`position: fixed; zIndex: 1200; top: 0px; opacity: 0.5`).row.full-width.bg-green-1
-    small.full-width needFull::{{needFull}}
-    small.full-width pageToken::{{pageToken}}
-    small.full-width counts{{itemsCount}}/{{totalCount}}
-    small.full-width {{indexFrom}}/{{indexNow}}/{{indexTo}}
-    small.full-width top {{top}}
-  //- .bg-red-3
-  div(v-if="node" v-show="showNode"
-    :style=`{position: 'absolute', zIndex: 1000, left: '0px', top: top+'px', opacity: opacity}`).row
-    node-card(:node="node" :needFull="needFullAbsolute" :nodeFullReady="nodeFull" :visible="true" :mini="false" :zIndex="1000").bg-white
-  //- div(v-if="feed").row.full-width.items-start.content-start
-    //- loading
-    //- div(v-if="$apollo.queries.feed.loading").row.full-width Loading...
-    //- items
+  div(:style=`{position: 'absolute', zIndex: 1000, top: top+'px', opacity: opacity}`).row.full-width
+    node-card(v-if="node" ref="anode" :node="node" :needFull="true" :zIndex="1000" :mini="false").bg-red-1
   div(v-if="feed && feed.items").row.full-width.items-start.content-start
     node-card(
       v-for="(n, ni) in feed.items" :key="n.oid" :ref="'node_'+n.oid"
-      :node="n" :index="ni" :zIndex="200"
+      :node="n" :index="ni" :zIndex="200" :mini="true"
       :needFull="ni >= indexFrom && ni < indexTo"
-      :visible="node ? node.oid == n.oid : false"
-      :mini="true"
       @visible="nodeVisible").q-mb-md
 </template>
 
 <script>
 import nodeCard from 'components/node/node_card'
-import kDummy from 'components/kDummy'
 
 export default {
-  name: 'kFeed',
-  components: {nodeCard, kDummy},
+  name: 'node_feed',
+  components: {nodeCard},
   props: {
     items: {type: Array},
     mini: {type: Boolean},
@@ -136,7 +121,7 @@ export default {
     async nodeVisible (visible, index, node, nodeFull) {
       let n = this.$refs['node_' + node.oid][0]
       if (visible) {
-        this.$log('nodeVisible', visible, index, node.name)
+        this.$log('nodeVisible  TRUE', visible, index, node.name)
         this.indexNow = index
         if (index < 2) {
           this.indexFrom = 0
@@ -146,18 +131,17 @@ export default {
           this.indexTo = index + 3
         }
         // absolute node
-        this.showNode = false
         this.opacity = 0
-        this.needFullAbsolute = false
-        if (this.node) this.$set(this.node, 'thumbUrl', [null, null])
-        await this.$wait(100)
-        this.needFullAbsolute = true
-        this.$set(this, 'node', JSON.parse(JSON.stringify(node)))
-        this.$set(this, 'nodeFull', JSON.parse(JSON.stringify(nodeFull)))
+        this.$set(this, 'node', node)
+        this.$set(this, 'nodeFull', nodeFull)
+        if (this.$refs.anode) this.$refs.anode.nodeLoad(node.oid)
+        await this.$wait(200)
         this.top = n.$el.offsetTop
-        await this.$wait(400)
         this.opacity = 1
-        this.showNode = true
+      } else {
+        if (this.node && this.node.oid === node.oid) {
+          this.$log('nodeVisible FALSE', visible, index, node.name)
+        }
       }
     }
   },

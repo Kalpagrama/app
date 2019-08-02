@@ -2,10 +2,10 @@
 .column.fit
   div(:style=`{zIndex: 100, minHeight: '70px', height: headerHeight+'px'}`).row.full-width.items-center.content-center.q-px-sm
     .col
-      q-input(v-model="link" filled :label="$t('paste_link_here')" :loading="loading" @keyup.enter="startSearch()" autofocus).full-width
+      q-input(v-model="link" filled :placeholder="$t('Найдите видео или вставьте ссылку на видео')" :loading="loading" @keyup.enter="startSearch()" autofocus).full-width
         template(v-slot:append)
-          q-btn(v-if="!loading" round flat dense icon="clear" @click="cancelSearch()")
-    q-btn(style=`height: 56px` color="primary" @click="startSearch()" :loading="loading").q-ml-sm {{$t('find')}}
+          q-btn(v-if="!loading && link.length > 0" round flat dense icon="clear" @click="cancelSearch()")
+    q-btn(style=`height: 56px` color="primary" @click="startSearch()" :loading="loading" no-caps).q-ml-sm {{$t('Найти')}}
   div(v-if="linkValidated").col.scroll
     q-resize-observer(@resize="onResize")
     div(:style=`{height: width*0.56+'px'}`).row.full-width.q-px-sm
@@ -45,15 +45,23 @@ export default {
     },
     async startSearch () {
       try {
+        this.$log('search start')
         this.loading = true
-        await this.$wait(1000)
-        await this.linkValidate()
-        this.$tween.to(this, 0.33, {headerHeight: 70})
+        // await this.$wait(1000)
+        let link = await this.linkValidate(this.link)
+        if (link) {
+          this.$log('link', link)
+          this.$tween.to(this, 0.33, {headerHeight: 70})
+          this.$log('search URL')
+        } else {
+          this.$log('search YOUTUBE')
+        }
+        this.$log('search done')
         this.loading = false
       } catch (error) {
+        this.$log('search error', error)
         this.loading = false
       }
-      this.$log('startSearch')
     },
     cancelSearch () {
       this.$log('cancelSearch')
@@ -61,9 +69,14 @@ export default {
       this.linkValidated = false
       this.$tween.to(this, 0.33, {headerHeight: 400})
     },
-    linkValidate () {
-      this.$log('linkValidate')
-      this.linkValidated = true
+    linkValidate (link) {
+      try {
+        // this.$log('linkValidate')
+        let l = new URL(link)
+        return l
+      } catch (e) {
+        return false
+      }
     },
     videoSelect () {
       this.$log('videoSelect')

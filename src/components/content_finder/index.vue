@@ -1,5 +1,6 @@
 <template lang="pug">
 div(style=`maxWidth: 600px`).column.fit.bg-white
+  q-resize-observer(@resize="onResize")
   div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.items-center
     //- span Find
     div(v-if="type" style=`height: 60px; width: 50px`).row.items-center.justify-center
@@ -17,74 +18,82 @@ div(style=`maxWidth: 600px`).column.fit.bg-white
   //- body
   .col
     .column.fit
+      //- link
+      //- .col
+      link-find(:width="width" :height="height" @ready="handleReady")
+      //- source-link
       //- types
-      div(:style=`{borderBottom: '1px solid #eee', maxHeight: typesMaxHeight+'px'}`).row.full-width.items-start.content-start.types-wrapper
-        div(
-          v-for="(t, tkey) in types" :key="tkey" @click="typeClick(t, tkey)"
-          :style=`{
-            height: getHeight(Object.keys(types).length)+'px',
-            width: getHeight(Object.keys(types).length)+'px',
-            borderRight: '1px solid #eee',
-            background: tkey === typeKey ? '#eee' : 'none'}`
-          ).col
-          .row.fit.items-center.content-center.justify-center.hr.cursor-pointer
-            q-icon(:name="t.icon" :color="tkey === typeKey ? t.color : 'grey'" size="90px")
-            div(style=`overflow: hidden`).row.full-width.justify-center
-              span.text-black {{ $t(t.name) }}
+      //- div(:style=`{borderTop: '1px solid #eee', borderBottom: '1px solid #eee', maxHeight: typesMaxHeight+'px'}`).row.full-width.items-start.content-start.types-wrapper
+      //-   div(
+      //-     v-for="(t, tkey) in types" :key="tkey" @click="typeClick(t, tkey)"
+      //-     :style=`{
+      //-       height: getHeight(Object.keys(types).length)+'px',
+      //-       width: getHeight(Object.keys(types).length)+'px',
+      //-       borderRight: '1px solid #eee',
+      //-       background: tkey === typeKey ? '#eee' : 'none'}`
+      //-     ).col
+      //-     .row.fit.items-center.content-center.justify-center.hr.cursor-pointer
+      //-       q-icon(:name="t.icon" :color="tkey === typeKey ? t.color : 'grey'" size="90px")
+      //-       div(style=`overflow: hidden`).row.full-width.justify-center
+      //-         span.text-black {{ $t(t.name) }}
       //- image
-      div(v-if="typeKey === 'IMAGE'" style=`overflow: hidden`).row.full-width.types-wrapper
-        //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-        //-   h6.q-ma-xs 2.
-        //-   span.q-pt-xs {{$t('choose_image_source')}}
-        div(style=`borderBottom: 1px solid #eee`).row.full-width
-          div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
-            :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
-              div(style=`overflow: hidden`).row.fit.items-center.content-center.justify-center
-                span {{ s.name }}
+      //- div(v-if="typeKey === 'IMAGE'" style=`overflow: hidden`).row.full-width.types-wrapper
+      //-   //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+      //-   //-   h6.q-ma-xs 2.
+      //-   //-   span.q-pt-xs {{$t('choose_image_source')}}
+      //-   div(style=`borderBottom: 1px solid #eee`).row.full-width
+      //-     div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
+      //-       :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
+      //-         div(style=`overflow: hidden`).row.fit.items-center.content-center.justify-center
+      //-           span {{ s.name }}
       //- video
-      div(v-else-if="typeKey === 'VIDEO'" style=`overflow: hidden`).row.full-width.types-wrapper
-        //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-        //-   h6.q-ma-xs 2.
-        //-   span.q-pt-xs {{$t('choose_video_source')}}
-        div(style=`borderBottom: 1px solid #eee`).row.full-width
-          div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
-            :style=`{height: '100px', borderRight: '1px solid #eee', background: skey == source ? '#eee' : 'none'}`).col.hr.cursor-pointer
-              .row.fit.items-center.content-center.justify-center
-                span {{ s.name }}
+      //- div(v-else-if="typeKey === 'VIDEO'" style=`overflow: hidden`).row.full-width.types-wrapper
+      //-   //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+      //-   //-   h6.q-ma-xs 2.
+      //-   //-   span.q-pt-xs {{$t('choose_video_source')}}
+      //-   div(style=`borderBottom: 1px solid #eee`).row.full-width
+      //-     div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
+      //-       :style=`{height: '100px', borderRight: '1px solid #eee', background: skey == source ? '#eee' : 'none'}`).col.hr.cursor-pointer
+      //-         .row.fit.items-center.content-center.justify-center
+      //-           span {{ s.name }}
       //- book
-      div(v-else-if="typeKey === 'BOOK'" style=`overflow: hidden`).row.full-width.types-wrapper
-        //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-        //-   h6.q-ma-xs 2.
-        //-   span.q-pt-xs {{$t('choose_book_source')}}
-        div(style=`borderBottom: 1px solid #eee`).row.full-width
-          div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
-            :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
-              .row.fit.items-center.content-center.justify-center
-                span {{ s.name }}
-      .col
-        image-find(v-if="typeKey === 'IMAGE' && source" :source="source")
-        video-find(v-if="typeKey === 'VIDEO' && source" :source="source" @ready="handleReady")
-          template(v-slot:progress)
-            div(v-if="nexting" style=`position: absolute; zIndex: 100; opacity: 0.9`).row.fit.items-start.content-start.justify-center.bg-white
-              div(v-if="progress" style=`height: 500px`).row.full-width.justify-center.items-center.content-center
-                q-spinner(:thickness="2" color="primary" size="50px")
-                .row.full-width.justify-center.q-py-sm
-                  small {{$t('loading')}}
-                .row.full-width.q-px-md
-                  q-linear-progress(:value="progress.progress/100" class="q-mt-md" color="primary" stripe rounded style="height: 20px").full-width
-        book-find(v-if="typeKey === 'BOOK' && source" :source="source")
+      //- div(v-else-if="typeKey === 'BOOK'" style=`overflow: hidden`).row.full-width.types-wrapper
+      //-   //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
+      //-   //-   h6.q-ma-xs 2.
+      //-   //-   span.q-pt-xs {{$t('choose_book_source')}}
+      //-   div(style=`borderBottom: 1px solid #eee`).row.full-width
+      //-     div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
+      //-       :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
+      //-         .row.fit.items-center.content-center.justify-center
+      //-           span {{ s.name }}
+      //- .col
+      //-   image-find(v-if="typeKey === 'IMAGE' && source" :source="source")
+      //-   video-find(v-if="typeKey === 'VIDEO' && source" :source="source" @ready="handleReady")
+      //-     template(v-slot:progress)
+      //-       div(v-if="nexting" style=`position: absolute; zIndex: 100; opacity: 0.9`).row.fit.items-start.content-start.justify-center.bg-white
+      //-         div(v-if="progress" style=`height: 500px`).row.full-width.justify-center.items-center.content-center
+      //-           q-spinner(:thickness="2" color="primary" size="50px")
+      //-           .row.full-width.justify-center.q-py-sm
+      //-             small {{$t('loading')}}
+      //-           .row.full-width.q-px-md
+      //-             q-linear-progress(:value="progress.progress/100" class="q-mt-md" color="primary" stripe rounded style="height: 20px").full-width
+      //-   book-find(v-if="typeKey === 'BOOK' && source" :source="source")
 </template>
 
 <script>
-import imageFind from 'components/image_find'
-import videoFind from 'components/video_find'
-import bookFind from 'components/book_find'
+import imageFinder from 'components/image_finder'
+import videoFinder from 'components/video_finder'
+import bookFinder from 'components/book_finder'
+import linkFinder from 'components/link_finder'
+import sourceLink from 'components/video_finder/source_link'
 
 export default {
-  name: 'contentFind',
-  components: {imageFind, videoFind, bookFind},
+  name: 'contentFinder',
+  components: {imageFinder, videoFinder, bookFinder, linkFinder, sourceLink},
   data () {
     return {
+      width: 400,
+      height: 600,
       canceling: false,
       nexting: false,
       type: null,
@@ -99,7 +108,7 @@ export default {
             device: {name: 'from_device', implemented: false},
             google: {name: 'from_google', implemented: false},
             link: {name: 'from_link', implemented: true},
-            workspace: {name: 'from_workspace', implemented: true}
+            // workspace: {name: 'from_workspace', implemented: true}
           }
         },
         VIDEO: {
@@ -110,7 +119,7 @@ export default {
             device: {name: 'from_device', implemented: true},
             youtube: {name: 'from_youtube', icon: 'fab fa-youtube', implemented: true},
             link: {name: 'from_link', implemented: true},
-            workspace: {name: 'from_workspace', implemented: false}
+            // workspace: {name: 'from_workspace', implemented: false}
           }
         },
         BOOK: {
@@ -121,7 +130,7 @@ export default {
             device: {name: 'from_device', implemented: false},
             link: {name: 'from_link', implemented: false},
             litres: {name: 'from_litres', implemented: false},
-            workspace: {name: 'from_workspace', implemented: false}
+            // workspace: {name: 'from_workspace', implemented: false}
           }
         }
       },
@@ -147,6 +156,11 @@ export default {
     }
   },
   methods: {
+    onResize (e) {
+      this.$log('onResize', e)
+      this.width = e.width
+      this.height = e.height
+    },
     handleReady (val) {
       this.$log('handleReady', val)
       this.content = val
@@ -271,7 +285,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$log('======= mounted')
     const observer = this.$apollo.subscribe({
       client: 'ws',
       query: gql`
@@ -292,6 +306,14 @@ export default {
         this.$log('progress error', error)
       }
     })
+    // get clipboard
+    navigator.clipboard.readText().then(clipText => {
+      this.$log('clipText', clipText)
+    })
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.$emit('close')
   }
 }
 </script>

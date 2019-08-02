@@ -130,7 +130,7 @@ export default {
       return this.framesWidth / (this.fragment.content.frameUrls.length / 10)
     },
     framesFilter () {
-      // return this.fragment.content.frameUrls
+      if (!this.fragment.content.frameUrls) return []
       return this.fragment.content.frameUrls.filter((f, fi) => {
         return fi % 10 === 0
       })
@@ -370,6 +370,9 @@ export default {
       let d = this.fragment.content.duration
       if (d <= this.endSec) this.endSec = d
     }
+  },
+  created () {
+    this.$log('created')
   },
   async mounted () {
     this.$log('mounted start')

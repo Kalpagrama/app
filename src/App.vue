@@ -4,14 +4,11 @@
 </template>
 
 <script>
-import { disableBodyScroll } from 'body-scroll-lock'
+// import { disableBodyScroll } from 'body-scroll-lock'
 export default {
     name: 'App',
-    beforeMount() {
-      // this.$store.commit('providers/init', this);
-    },
     mounted () {
-      this.$log('mounted', this.$route)
+      // this.$log('mounted', this.$route)
       // disableBodyScroll(this.$refs.app, {
       //   allowTouchMove: el => {
       //     while (el && el !== document.body) {

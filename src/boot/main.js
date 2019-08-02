@@ -8,6 +8,7 @@ import VueObserveVisibility from 'vue-observe-visibility'
 import { sync } from 'vuex-router-sync'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
+import Carousel3d from 'vue-carousel-3d'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -29,6 +30,7 @@ const time = (sec) => {
 export default async ({ Vue, store, router }) => {
   Vue.use(VueVirtualScroller)
   Vue.use(VueObserveVisibility)
+  Vue.use(Carousel3d)
   Vue.prototype.$wait = (msg) => new Promise(resolve => setTimeout(resolve, msg))
   let banned = {'App': 1, 'mainLayout': 1}
   Vue.prototype.$log = function (...msg) {
@@ -51,8 +53,12 @@ export default async ({ Vue, store, router }) => {
   }
   sync(store, router, { moduleName: 'route' })
   Vue.prototype.$time = time
+  Vue.prototype.$random = function (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+  }
   Vue.config.errorHandler = function(err, vm, info) {
     debug(`### VUE ERROR ### ${err.toString()}\nInfo: ${info}`)
+    debug(err.stack)
     Notify.create({message: err.toString(), color: 'red', colorText: 'red'})
   }
   window.onerror = function(msg, src, linenum, colnum, error) {

@@ -27,7 +27,7 @@
                 span(style=`white-space: nowrap`) {{ `#${s.name}` }}
         //- body
         .col.scroll
-          k-feed(v-if="!loading && sphere" :query="query" :variables="variables" :mini="true" queryKey="sphereNodes")
+          node-feed(v-if="!loading && sphere" :query="query" :variables="variables" :mini="true" queryKey="sphereNodes")
           //- swithing spheres
           div(v-else).row.fit.items-center.justify-center
             q-spinner(size="50px" :thickness="2" color="primary")
@@ -41,12 +41,11 @@
 
 <script>
 import nodeCard from 'components/node/node_card'
-import kMenu from 'pages/app/menu'
-import kFeed from 'components/kFeed'
+import nodeFeed from 'components/node_feed'
 
 export default {
   name: 'pageApp__Sphere',
-  components: { nodeCard, kFeed, kMenu },
+  components: { nodeCard, nodeFeed },
   data () {
     return {
       loading: false,

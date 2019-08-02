@@ -1,24 +1,26 @@
 <template lang="pug">
-div(:style=`{position: 'relative', width: nodeWidth+'px', borderRadius: getRadius+'px'}`).column.items-center.bg-white
+div(:style=`{position: 'relative', borderRadius: getRadius+'px'}`).row.full-width.bg-white
   //- node author
-  div(style=`height: 60px`).row.full-width.items-center.content-center
+  div(v-if="true" style=`height: 60px`).row.full-width.items-center.content-center
     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
       div(@click="$router.push(`/app/user/`+nodeFull.author.oid+'/nodes')"
         style=`height: 35px; width: 35px; borderRadius: 50%`
         ).row.bg-grey-4.cursor-pointer.hr
     .col.q-px-sm
+      //- slot(name="header")
       .row
         div(v-if="nodeFull.author.name.length > 0").row.fit.items-center.cotent-center
           .row.full-width
             //- a(href="/app/account/nodes").cursor-pointer {{ nodeFull.author.name }}
-            router-link(:to="'/app/user/'+nodeFull.author.oid+'/nodes'") {{nodeFull.author.name}}
+            //- router-link(:to="'/app/user/'+nodeFull.author.oid+'/nodes'") {{nodeFull.author.name}}
+            span {{ nodeFull.author.name }}
           .row.full-width.items-center
             small.text-grey-8 {{$date(node.createdAt, 'DD.MM.YYYY HH:mm')}}
-        //- div(v-else).row.full-width.items-center.content-center
-        //-   .row.full-width
-        //-     div(style=`height: 16px; borderRadius: 4px; width: 250px`).row.bg-grey-3.q-mb-xs
-        //-   .row.full-width
-        //-     div(style=`height: 13px; borderRadius: 4px; width: 200px`).row.bg-grey-3.q-mb-xs
+        div(v-else).row.full-width.items-center.content-center
+          .row.full-width
+            div(style=`height: 16px; borderRadius: 4px; width: 250px`).row.bg-grey-3.q-mb-xs
+          .row.full-width
+            div(style=`height: 13px; borderRadius: 4px; width: 200px`).row.bg-grey-3.q-mb-xs
     //- node to workspace or create from
     div(style=`height: 60px; minWidth: 60px`).row.items-center.justify-center.q-px-sm
       q-btn(icon="more_vert" round flat color="grey-6").q-mr-xs
@@ -41,18 +43,19 @@ div(:style=`{position: 'relative', width: nodeWidth+'px', borderRadius: getRadiu
             //- div(style=`position: absolute: zIndex: 2000`).row.full-width.bg-green
             //-   span.text-white rate {{ rate }}
     template(v-slot:actions="{index}")
-      //- .row.full-width {{needFull}}
       slot(name="actions" :index="index" :node="node" :nodeFull="nodeFull")
+    template(v-slot:node="{index}")
+      slot(name="node" :index="index" :node="node" :nodeFull="nodeFull")
   //- .row.full-width {{needFull}}
   //- node spheres
-  div(style=`height: 46px`).row.full-width.items-end.content-end.q-px-md
-    div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
-      div(v-for="(s, si) in nodeFull.spheres" :key="s.oid" @click="sphereClick(s, si)"
-        style=`display: inline-block; height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3.cursor-pointer.hr
-        span(style=`white-space: nowrap`) {{ `#${s.name}` }}
-  slot(name="footer" :index="index" :node="node" :nodeFull="nodeFull")
+  //- div(v-if="false" style=`height: 46px`).row.full-width.items-end.content-end.q-px-md
+  //-   div(style=`height: 40px; maxWidth: 100%`).row.full-width.items-center.no-wrap.scroll
+  //-     div(v-for="(s, si) in nodeFull.spheres" :key="s.oid" @click="sphereClick(s, si)"
+  //-       style=`display: inline-block; height: 30px; borderRadius: 5px`).q-pa-xs.q-mr-sm.bg-grey-3.cursor-pointer.hr
+  //-       span(style=`white-space: nowrap`) {{ `#${s.name}` }}
+  //- slot(name="footer" :index="index" :node="node" :nodeFull="nodeFull")
   //- node actions
-  div(v-if="!$slots.footer || !$scopedSlots.footer" style=`height: 76px`).row.full-width
+  div(v-if="true" style=`height: 76px`).row.full-width
     .col
       .row.fit.items-center.justify-start.q-px-sm
         div.row.full-height.items-center
@@ -61,7 +64,8 @@ div(:style=`{position: 'relative', width: nodeWidth+'px', borderRadius: getRadiu
       //- span 1233
       //- q-btn(icon="share" size="md" color="grey-8" flat round dense @click="nodeChain()").q-mr-md
       small {{ rate.id }} /
-      span.q-mb-xs 3.45
+      //- span.q-mb-xs 3.45
+      //- small {{top}}
       q-btn(size="lg" color="grey-8" flat round @click="nodeRate()")
         q-icon(name="track_changes" size="40px")
 </template>
@@ -83,6 +87,7 @@ export default {
   },
   data () {
     return {
+      nodeFullLoaded: false,
       nodeFull: {
         oid: null,
         author: {name: ''},
@@ -104,11 +109,11 @@ export default {
       ],
       menus: [
         {id: 'to_node', name: 'to_node', color: 'black'},
-        // {id: 'to_workspace', name: 'to_workspace', color: 'black'},
-        // // {id: 'to_chain', name: 'to_chain', color: 'black},
-        // {id: 'follow', name: 'follow', color: 'black'},
-        // {id: 'share', name: 'share', color: 'black'},
-        // {id: 'report', name: 'report', color: 'red'}
+        {id: 'to_workspace', name: 'to_workspace', color: 'black'},
+        {id: 'to_chain', name: 'to_chain', color: 'black'},
+        {id: 'follow', name: 'follow', color: 'black'},
+        {id: 'share', name: 'share', color: 'black'},
+        {id: 'report', name: 'report', color: 'red'}
       ],
       opacity: 1
     }
@@ -145,9 +150,9 @@ export default {
       this.$log('shareClick')
       if (navigator.share) {
         navigator.share({
-            title: 'Web Fundamentals',
-            text: 'Check out Web Fundamentals — it rocks!',
-            url: 'https://developers.google.com/web',
+            title: this.node.name,
+            // text: 'Check out Web Fundamentals — it rocks!',
+            url: `https://kalpagramma.com/share/node/${this.node.oid}`,
         })
           .then(() => this.$log('Successful share'))
           .catch((error) => this.$log('Error sharing', error))
@@ -162,7 +167,7 @@ export default {
     },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
-      this.$router.push(`/app/sphere/${s.oid}`)
+      // this.$router.push(`/app/sphere/${s.oid}`)
     },
     menuClick ({id, name, color}, mi) {
       this.$log('menuClick')
@@ -225,10 +230,8 @@ export default {
         textColor: 'white'
       })
     },
-    async nodeLoad () {
-      this.$log('nodeLoad start')
-      // this.$set(this, 'nodeFull', null)
-      this.opacity = 0
+    async nodeLoad (oid) {
+      // this.$log('nodeLoad start')
       let { data: { objectList: nodeFull } } = await this.$apollo.query({
         query: gql`
           query getExtendedNodesProps($oid: OID!) {
@@ -276,23 +279,26 @@ export default {
           }
         `,
         variables: {
-          oid: this.node.oid
+          oid: oid
         },
         fetchPolicy: 'cache-first'
       })
-      this.$log('nodeFull', nodeFull[0])
+      this.$log('nodeFull loaded', nodeFull[0].name)
       this.$set(this, 'nodeFull', nodeFull[0])
-      this.opacity = 1
     }
   },
   watch: {
     needFull: {
       immediate: true,
       handler (to, from) {
-        if (this.nodeFullReady) this.$set(this, 'nodeFull', this.nodeFullReady)
-        if (to && !this.nodeFullReady) {
-          this.$log('needFull changed', to, this.node.name)
-          this.nodeLoad()
+        // if (this.nodeFullReady) this.nodeSet()
+        // else if (to === true && this.nodeFullLoaded === false) {
+        //   this.nodeFullLoaded = true
+        //   this.$log('needFull changed', to, this.node.name)
+        //   this.nodeLoad()
+        // }
+        if (to) {
+          this.nodeLoad(this.node.oid)
         }
       }
     }

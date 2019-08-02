@@ -1,11 +1,12 @@
 <template lang="pug">
 div(:style=`{height: height+'px'}`).column.full-width
-  div(style=`height: 60px`).row.full-width.items-center.q-px-md
+  div(style=`height: 70px`).row.full-width.items-center.q-px-md
     //- h6.q-ma-xs {{content.name}}/{{width}}/{{height}}
     //- q-btn(round flat color="grey-9" icon="keyboard_arrow_left")
     q-icon(name="movie_creation" color='red' size="40px").q-mr-sm
-    span {{content.name}}
-    .col
+    .col.full-height
+      .row.fit.items-center.no-wrap.scroll
+        span(style=`whiteSpace: nowrap`).text-bold {{content.name}}
     q-btn(round flat color="grey-9" icon="more_vert")
   .col.full-width
     .row.full-width.justify-center.items-start.content-start
@@ -24,8 +25,8 @@ div(:style=`{height: height+'px'}`).column.full-width
 </template>
 
 <script>
-import 'mediaelement/build/mediaelementplayer.min.css'
-import 'mediaelement/full'
+// import 'mediaelement/build/mediaelementplayer.min.css'
+// import 'mediaelement/full'
 
 export default {
   name: 'Content__ContentVideo',
