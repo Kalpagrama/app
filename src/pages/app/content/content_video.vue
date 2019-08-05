@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{height: height+'px'}`).column.full-width
+.column.full-width.window-height
   div(style=`height: 70px`).row.full-width.items-center.q-px-md
     //- h6.q-ma-xs {{content.name}}/{{width}}/{{height}}
     //- q-btn(round flat color="grey-9" icon="keyboard_arrow_left")

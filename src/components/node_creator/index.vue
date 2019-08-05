@@ -2,8 +2,6 @@
 div(style=`position: relative`).row.fit.content-start.items-start
   q-dialog(ref="contentFindDialog" no-route-dismiss :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down")
     content-finder(@ready="contentChoosen" @close="$refs.contentFindDialog.hide()")
-  q-dialog(ref="sphereFindDialog" no-route-dismiss :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down")
-    sphere-finder(@ready="sphereChoosen")
   q-dialog(ref="videoEditorDialog" no-route-dismiss :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(
       v-if="nodeFull.fragments[fragmentIndex]"
@@ -16,38 +14,26 @@ div(style=`position: relative`).row.fit.content-start.items-start
   //- wrapper
   div.row.full-width.justify-center.q-pt-md
     div(:style=`{maxWidth: '500px'}`).row.full-width
-      node(:node="node" :nodeFull="nodeFull" :visible="true" :width="500" :zIndex="100" :mini="true" :inEditor="true")
+      node(:node="node" :nodeFull="nodeFull" noHeader noActions noSpheres noFragmentActions :style=`{maxHeight: '85vh', maxWidth: '500px', ...getRadius, overflow: 'hidden'}`
+        ).bg-white.q-py-sm.q-my-sm
         //- name slot
         template(v-slot:name)
           .row.fit.items-center
             q-input(v-model="nodeFull.name" borderless :maxlength="45"
               :input-class="['text-center']" placeholder="В чем суть?").fit
-        //- empty slot
-        template(v-slot:empty="{ index }")
+        template(v-slot:fragment="{index}")
           div(:style=`{minHeight: '220px'}`).row.fit.items-center.justify-center
             q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
+        //- empty slot
+        //- template(v-slot:empty="{ index }")
         //- actions slot
         template(v-slot:actions="{ index }")
           q-btn(flat round color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
             q-tooltip {{$t('fragment_delete')}}
           q-btn(flat round color="white" icon="edit" @click="fragmentEdit(index)").q-mr-sm.shadow-10
             q-tooltip {{$t('fragment_edit')}}
-      //- spheres
-      //- div(style=`height: 50px`).row.full-width.justify-center
-      //-   div(style=`height: 40px; maxWidth: 100%; overflowY: hidden; overflowX: auto`).row.full-width.items-center.no-wrap.scroll
-      //-     div(v-for="(s, si) in nodeFull.spheres" :key="si"
-      //-       style=`display: inline-block; height: 30px; borderRadius: 5px; white-space: nowrap`
-      //-       ).row.items-center.q-pa-xs.q-mr-sm.bg-grey-3
-      //-       span(style=`white-space: nowrap`) {{ `#${s.name}` }}
-      //-       q-btn(flat round icon="clear" @click="sphereDelete(s, si)" dense size="xs").q-ml-xs
-      //- spheres tools
-      //- div(style=`height: 60px`).row.full-width.justify-end.items-center.bg-white.q-px-sm
-      //-   q-btn(v-if="nodeFull.spheres.length > 0" @click="sphereDeleteAll()"
-      //-     style=`borderRadius: 4px; height: 40px` no-caps outline rounded color="primary"
-      //-     ).q-mr-sm {{$t('spheres_delete_all')}}
-      //-   .col
-      //-     q-btn(@click="sphereFind()"
-      //-       style=`borderRadius: 4px; height: 40px` no-caps outline rounded color="primary").full-width {{$t('add_spheres')}}
+      //- sphere finder
+      sphere-finder
       //- create
       div(v-if="true" style=`height: 70px`).row.full-width.items-center.justify-end.bg-white.q-px-sm
         q-btn(@click="nodeCreate()" :loading="nodeCreating"
@@ -73,6 +59,7 @@ export default {
   components: {node, contentFinder, imageEditor, videoEditor, bookEditor, sphereFinder},
   data () {
     return {
+      spheres: '',
       fragmentIndex: 0,
       node: {
         type: 'NODE',
@@ -112,6 +99,14 @@ export default {
         return true
       } else {
         return false
+      }
+    },
+    getRadius () {
+      return {
+        borderBottomLeftRadius: '100%8px',
+        borderBottomRightRadius: '100%8px',
+        borderTopLeftRadius: '100%8px',
+        borderTopRightRadius: '100%8px'
       }
     }
   },

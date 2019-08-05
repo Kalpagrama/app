@@ -1,8 +1,8 @@
 <template lang="pug">
-.row.fit
-  .col.full-height.bg-white
+.row.window-height.full-width.bg-white
+  .col.full-height
     content-video(v-if="content && content.type === 'VIDEO'" :content="content" :width="width/2" :height="height" @now="now = $event")
-  .col.full-height.bg-grey-3
+  .col.full-height
     content-nodes(v-if="content" :content="content" :width="width/2" :height="height" :now="now")
 </template>
 

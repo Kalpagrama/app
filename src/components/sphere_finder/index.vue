@@ -1,38 +1,19 @@
 <template lang="pug">
-.column.fit.bg-white
-  //- header
-  div(style=`height: 70px; borderBottom: 1px solid #eee`).row.full-width.items-center.justify-end
-    .col.q-pl-sm
-      q-input(v-model="search" filled :placeholder="$t('spheres_find')"
-        @keyup.esc="cancelClick"
-        :maxlength="30" autofocus).fit
-        template(v-slot:prepend)
-          q-icon(name="search")
-    div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      q-btn(flat round dense icon="clear" color="primary" @click="$emit('close')")
-  //- shperes list
-  .col.scroll.bg-grey-2
-    apollo-query(v-if="search.length > 1" :query="query" :variables="variables" :throttle="500" @result="handleResult")
-      template(v-slot="{ result: { loading, error, data } }")
-        //- loading
-        div(v-if="loading" style=`height: 100px`).row.full-width.items-center.justify-center
-            q-spinner(size="50px" color="primary" :thickness="2")
-        //- error
-        div(v-else-if="error" style=`height: 100px`).row.full-width.items-center.justify-center
-          span {{ error }} : (
-        //- data
-        template(v-else-if="data")
-          div(v-if="data.feed.items && data.feed.items.length > 0").row.full-width.items-start.content-start
-            div(v-for="(s, si) in data.feed.items" :key="si" @click="sphereClick(s)"
-              style=`height: 40px; borderTop: 1px solid #eee`
-                ).row.full-width.items-center.q-px-sm.bg-white.hr.cursor-pointer
-              span #
-              span {{ s.name }}
-          div(v-else style=`height: 70px`).row.full-width.items-center.justify-center
-            q-btn(no-caps style=`height: 40px; borderRadius: 8px` color="primary" @click="sphereClick({name: search})") Create: {{search}}
-        //- nothing
-        div(v-else style=`height: 100px;`).row.full-width.items-center.justify-center
-          q-spinner(size="50px" :thickness="2" color="primary")
+div(:style=`{position: 'relative', height: '70px'}`).row.full-width.items-center.q-px-sm.bg-white
+  .row.full-width
+    //- options
+    q-menu(v-if="!spheresLoading" v-model="sphereOptions.length > 0" no-focus anchor="top middle" self="bottom middle" fit).q-pa-sm
+      div(v-for="(s, si) in sphereOptions" :key="si" @click="sphereClick(s, si)"
+        :style=`{height: '40px'}`).row.full-width.items-center.q-px-md.hr.cursor-pointer
+        span {{ `#${s.name}` }}
+  //- input
+  q-input(v-model="sphere"
+    filled :debounce="350"
+    @keydown.enter="onEnter"
+    @keydown.backspace="onBackspace"
+    ).full-width
+    template(v-if="spheres.length > 0" v-slot:prepend)
+      small {{getSpheres}}
 </template>
 
 <script>
@@ -41,67 +22,77 @@ export default {
   name: 'sphereFinder',
   data () {
     return {
-      mounted: false,
-      search: '',
-      headerHeight: this.$store.state.ui.width,
-      tagsOptions: [],
-      bodyType: 'device',
-      query: gql`
-        query feed ($search: String!) {
-          feed(type: AUTOCOMPLETE, pagination: {pageSize: 50}, filter: {text: $search, types: [WORD, SENTENCE]} ){
-            count
-            totalCount
-            nextPageToken
-            items {
-              oid
-              type
-              name       
-            }
-          }
-        }
-      `
+      sphere: '',
+      spheres: [],
+      spheresLoading: false,
+      sphereOptions: []
     }
   },
   computed: {
-    variables () {
-      return {
-        search: this.search
+    getSpheres () {
+      let res = ``
+      this.spheres.map(s => (res += `${s.name}, `))
+      return res
+    }
+  },
+  watch: {
+    sphere: {
+      immediate: false,
+      async handler (to, from) {
+        this.$log('sphere CHANGED', to)
+        if (to.length < 2) return
+        this.sphereOptions = []
+        this.sphereOptions = await this.spheresLoad(to)
       }
     }
   },
-  // watch: {
-  //   search: {
-  //     handler (to, from) {
-  //       if (to.length === 0) {
-  //         this.bodyType = 'device'
-  //         this.$tween.to('.kheader', 0.5, {height: this.$store.state.ui.width + 'px'})
-  //       } else {
-  //         this.bodyType = 'list'
-  //         this.$tween.to('.kheader', 0.5, {height: '70px'})
-  //       }
-  //     }
-  //   }
-  // },
   methods: {
+    onEnter () {
+      this.$log('onEnter')
+      this.spheres.push({name: this.sphere})
+      this.sphere = ``
+    },
+    onBackspace () {
+      this.$log('onBackspace')
+      if (this.sphere.length === 0) {
+        this.spheres.pop()
+      }
+    },
+    async spheresLoad (sphere) {
+      this.$log('spheresLoad start')
+      this.spheresLoading = true
+      let {data: {feed: {items}}} = await this.$apollo.query({
+        query: gql`
+          query feed ($search: String!) {
+            feed(type: AUTOCOMPLETE, pagination: {pageSize: 50}, filter: {text: $search, types: [WORD, SENTENCE]} ){
+              count
+              totalCount
+              nextPageToken
+              items {
+                oid
+                type
+                name       
+              }
+            }
+          }
+        `,
+        variables: {
+          search: sphere
+        }
+      })
+      this.spheresLoading = false
+      this.$log('spheresLoad done')
+      return items
+    },
     sphereClick (s) {
       this.$log('sphereClick', s)
-      this.$emit('ready', {name: s.name})
-      this.$emit('close')
-    },
-    handleResult (e) {
-      this.$log('handleResult', e)
-    },
-    cancelClick () {
-      this.$log('cancelClick')
-      this.search = ''
-      this.bodyType = 'device'
-      this.$tween.to('.kheader', 0.5, {height: this.$store.state.ui.width + 'px'})
+      // TODO: check for duplicate in spheres!
+      this.sphere = ``
+      this.spheres.push(s)
     }
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(2000)
-    this.mounted = true
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

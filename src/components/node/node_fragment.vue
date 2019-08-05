@@ -1,32 +1,57 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.full-height
-  slot(v-if="!getFragment" name="empty" :index="index")
-  slot(name="node" :index="index")
-  //- preview :style=`{minHeight: '200px'}`
-  img(v-if="getPreview && !imgError" :src="getPreview"
-    width="100%" height="200px" @error="imageError" draggable="false" style=`object-fit: cover`)
-  //- actions
-  div(v-if="getFragment" :style=`{position: 'absolute', zIndex: zIndex+100, right: '0px'}`).row
-    slot(name="actions" :index="index")
-    q-btn(v-if="!$slots.actions" round outline dense icon="more_vert" color="white" size="md").q-ma-sm
-      q-menu(auto-close anchor="bottom right" self="top right")
-        div(style=`width: 220px`).row
-          div(v-for="(a, ai) in actions" :key="a.id" @click="actionClick(a, ai)"
-            style=`height: 40px; borderBottom: 1px solid #eee`
-              ).row.full-width.items-center.cursor-pointer.hr.q-px-sm
-            span {{$t(a.name)}}
+div(:style=`{position: 'relative', overflow: 'hidden', ...getRadius}`
+  v-on:mouseover="$wait(180).then(() => (hover = true))"
+  v-on:mouseleave="hover = false").col.bg-grey-3
+  //- menu
+  q-btn(
+    v-show="!noFragmentActions && menuBtnShow"
+    round flat icon="more_vert" color="white"
+    :style=`{position: 'absolute', right: '6px', top: '40%'}`).shadow-1
+    q-popup-proxy(position="bottom" auto-close anchor="bottom right" self="top right")
+      div(:style=`{maxWidth: $q.screen.width < 451 ? '100%' : '230px'}` :class="{'q-pa-md': $q.screen.width <= 450}").row.fit
+        div(:style=`{borderRadius: '4px'}`).row.full-width.bg-white
+          div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.items-center.q-px-md
+            span(v-if="fragment").text-bold {{ fragment.content.name || fragment.content.oid }}
+          div(v-for="(m, mi) in menus" :key="m.id" @click="menuClick(m)"
+            :style=`{height: '50px'}`
+            ).row.full-width.items-center.q-px-md.hr.cursor-pointer
+            span(:style=`{color: m.color}`) {{ m.name }}
+        //- cancel
+        div(:style=`{height: '50px', borderRadius: '4px'}`
+          ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
+          span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
+  //- preview
+  img(v-if="preview" :src="preview" width="100%" height="100%" draggable="false" style=`object-fit: cover`)
+  slot
+  //- fragment
+  //- div(:style=`{position: 'relative'}`).row.full-width
+  //-   slot(v-if="!getFragment" name="empty" :index="index")
+  //-   slot(name="node" :index="index")
+  //-   //- preview :style=`{minHeight: '200px'}`
+  //-   img(v-if="getPreview && !imgError" :src="getPreview"
+  //-     width="100%" height="100%" @error="imageError" draggable="false" style=`object-fit: contain`)
+  //-   //- actions
+  //-   div(v-if="getFragment" :style=`{position: 'absolute', zIndex: zIndex+100, right: '0px'}`).row
+  //-     slot(name="actions" :index="index")
+  //-     q-btn(v-if="!$slots.actions" round outline dense icon="more_vert" color="white" size="md").q-ma-sm
+  //-       q-menu(auto-close anchor="bottom right" self="top right")
+  //-         div(style=`width: 220px`).row
+  //-           div(v-for="(a, ai) in actions" :key="a.id" @click="actionClick(a, ai)"
+  //-             style=`height: 40px; borderBottom: 1px solid #eee`
+  //-               ).row.full-width.items-center.cursor-pointer.hr.q-px-sm
+  //-             span {{$t(a.name)}}
   //- content
-  div(v-if="!mini" :style=`{position: 'absolute', top: '0px', zIndex: zIndex+50, maxWidth: '100%', maxHeight: '100%'}`).row.fit
-    node-video(
-      v-if="getType === 'VIDEO'"
-      @started="videoStarted"
-      :index="index"
-      :zIndex="zIndex"
-      :preview="getPreview"
-      :url="getUrl"
-      :startSec="getStartSec"
-      :endSec="getEndSec"
-      :visible="visible")
+  //- div(v-if="!mini" :style=`{position: 'absolute', top: '0px', zIndex: zIndex+50, maxWidth: '100%', maxHeight: '100%'}`).row.fit
+  //-   node-video(
+  //-     v-if="getType === 'VIDEO'"
+  //-     @started="videoStarted"
+  //-     :index="index"
+  //-     :zIndex="zIndex"
+  //-     :preview="getPreview"
+  //-     :url="getUrl"
+  //-     :startSec="getStartSec"
+  //-     :endSec="getEndSec"
+  //-     :visible="visible")
 </template>
 
 <script>
@@ -38,72 +63,48 @@ export default {
   components: { nodeVideo, nodeImage },
   props: {
     index: {type: Number},
-    zIndex: {type: Number},
-    node: {type: Object, required: true},
-    nodeFull: {type: Object},
+    preview: {type: String},
+    fragment: {type: Object},
     visible: {type: Boolean},
-    mini: {type: Boolean}
+    mini: {type: Boolean},
+    noFragmentActions: {type: Boolean}
   },
   data () {
     return {
-      ready: false,
-      readyContent: false,
-      action: null,
-      actions: [
-        {id: 'explore_content', name: 'explore_content'},
-        {id: 'fork_fragment', name: 'fork_fragment'},
-        {id: 'add_content_to_workspace', name: 'add_content_to_workspace'},
-        {id: 'add_node_to_workspace', name: 'add_node_to_workspace'}
+      menus: [
+        {id: 'explore_content', name: 'Исследовать контент'},
+        {id: 'fork_fragment', name: 'Форкнуть фрагмент'},
+        {id: 'add_content_to_workspace', name: 'Добавить конент в мастерскую'}
       ],
       imgError: false,
-      imgSrc: 'https://c8.alamy.com/comp/F5FHA4/vertical-new-york-the-flatiron-building-one-of-the-first-skyscrapers-F5FHA4.jpg'
+      imgSrc: 'https://c8.alamy.com/comp/F5FHA4/vertical-new-york-the-flatiron-building-one-of-the-first-skyscrapers-F5FHA4.jpg',
+      hover: false
     }
   },
   computed: {
-    getFragment () {
-      if (this.nodeFull) return this.nodeFull.fragments[this.index]
-      else return null
-    },
-    getType () {
-      if (this.getFragment) return this.getFragment.content.type
-      else return null
-    },
-    getHeight () {
-      if (this.getFragment) return this.getFragment.content.height
-      else return 300
-    },
-    getWidth () {
-      if (this.getFragment) return this.getFragment.content.width
-      else return 300
-    },
-    getPreview () {
-      return this.node.thumbUrl[this.index]
-    },
-    getUrl () {
-      if (this.getFragment) {
-        return this.getFragment.url
-      } else {
-        return null
+    getRadius () {
+      return {
+        borderBottomLeftRadius: '100%8px',
+        borderBottomRightRadius: '100%8px',
+        borderTopLeftRadius: '100%8px',
+        borderTopRightRadius: '100%8px'
       }
     },
-    getStartSec () {
-      if (this.getType === 'VIDEO') {
-        if (this.getFragment.relativePoints.length > 0) return this.getFragment.relativePoints[0]['x']
-        else return 0
+    menuBtnShow () {
+      if (this.$q.platform.is.mobile) {
+        return true
       } else {
-        return null
-      }
-    },
-    getEndSec () {
-      if (this.getType === 'VIDEO') {
-        if (this.getFragment.relativePoints.length > 1) return this.getFragment.relativePoints[1]['x']
-        else return 10
-      } else {
-        return null
+        return this.hover
       }
     }
   },
   methods: {
+    onMouseover (e) {
+      this.$log('onMouserover', e)
+    },
+    onMouseleave (e) {
+      this.$log('onMouseleave', e)
+    },
     imageError (e) {
       this.$log('*** imageError', e)
       // this.imgError = true
@@ -113,24 +114,24 @@ export default {
       this.$log('videoStarted')
       this.readyContent = true
     },
-    actionClick (a, ai) {
+    menuClick (m, mi) {
       this.$log('actionClick')
-      switch (a.id) {
+      switch (m.id) {
         case 'explore_content': {
-          this.$log('explore_content')
-          this.$router.push({path: '/app/content/' + this.getFragment.content.oid})
+          this.$log('actionClick', m.id)
+          this.$router.push(`/app/content/${this.fragment.content.oid}`)
           break
         }
         case 'fork_fragment': {
-          this.$log('fork_fragment')
+          this.$log('actionClick', m.id)
           break
         }
         case 'add_content_to_workspace': {
-          this.$log('add_content_to_workpsace')
+          this.$log('actionClick', m.id)
           break
         }
         case 'add_node_to_workspace': {
-          this.$log('add_node_to_workspace')
+          this.$log('actionClick', m.id)
           break
         }
       }

@@ -1,42 +1,6 @@
 <template lang="pug">
-.row.fit.justify-center
-  div(style=`maxWidth: 1130px`).row.fit.justify-start.q-px-md
-    //- left menu
-    slot(name="menu")
-    //- body
-    .col.full-height.q-px-md.q-py-md
-      .column.fit
-        //- sphere header + spheres
-        div(style=`borderRadius: 8px`).row.full-width.justify-center.bg-white.q-mb-md
-          div(style=`height: 60px`).row.full-width.items-center.no-wrap.q-px-sm.scroll
-            h6(v-if="sphere" style=`white-space: nowrap`).q-ma-xs {{`#${sphere.name}`}}
-          div(v-show="sphereSpheresShow"
-            style=`minHeight: 40px; borderBottom: 1px solid #eee; overflowY: hidden`
-            ).row.full-width.q-pa-sm.scroll
-            //- rows
-            div(
-              v-for="(r, ri) in getRows" :key="ri"
-              style=`height: 40px`).row.full-width.no-wrap
-              //- spheres
-              div(
-                v-for="(s, si) in spheres" :key="s.oid" v-if="spheresShow(ri, si)"
-                @click="sphereClick(s, si)" v-touch-hold="$event => sphereHold(s, si, $event)"
-                style=`borderRadius: 4px`
-                :class=`{'bg-grey-3': s.oid !== $route.query.sphere, 'bg-grey-5': s.oid === $route.query.sphere}`
-                ).row.items-center.q-pa-xs.q-ma-xs.bg-grey-3.hr.cursor-pointer
-                span(style=`white-space: nowrap`) {{ `#${s.name}` }}
-        //- body
-        .col.scroll
-          node-feed(v-if="!loading && sphere" :query="query" :variables="variables" :mini="true" queryKey="sphereNodes")
-          //- swithing spheres
-          div(v-else).row.fit.items-center.justify-center
-            q-spinner(size="50px" :thickness="2" color="primary")
-    //- right menu
-    div(style=`position: relative; width: 280px; maxHeight: 100%`).column.full-height.q-py-md
-      div(style=`position: fixed; width: 240px; height: 800px`).row
-        div(style=`borderRadius: 8px`).row.fit.items-center.justify-center.bg-white
-          q-icon(name="flash_on")
-          span Some popular
+.row.full-width
+  span sphereExplorer
 </template>
 
 <script>
@@ -94,15 +58,15 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('$route CHANGED', to)
-        if (to.query.sphere) {
-          // TODO: check for from !== value
-          this.sphereLoad(to.query.sphere)
-          this.spheresLoad(to.query.sphere)
-        } else {
-          let sphereLast = localStorage.getItem('zspherelast')
-          if (sphereLast) this.$router.push({query: {sphere: sphereLast}})
-          else this.$router.push({query: {sphere: 'AYedgFVAIYQ='}})
-        }
+        // if (to.query.sphere) {
+        //   // TODO: check for from !== value
+        //   this.sphereLoad(to.query.sphere)
+        //   this.spheresLoad(to.query.sphere)
+        // } else {
+        //   let sphereLast = localStorage.getItem('zspherelast')
+        //   if (sphereLast) this.$router.push({query: {sphere: sphereLast}})
+        //   else this.$router.push({query: {sphere: 'AYedgFVAIYQ='}})
+        // }
       }
     }
   },

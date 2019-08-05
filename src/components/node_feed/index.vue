@@ -1,21 +1,29 @@
 <template lang="pug">
-div(style=`position: relative`).row.full-width.items-start.content-start
-  div(:style=`{position: 'absolute', zIndex: 1000, top: top+'px', opacity: opacity}`).row.full-width
-    node-card(v-if="node" ref="anode" :node="node" :needFull="true" :zIndex="1000" :mini="false").bg-red-1
-  div(v-if="feed && feed.items").row.full-width.items-start.content-start
-    node-card(
-      v-for="(n, ni) in feed.items" :key="n.oid" :ref="'node_'+n.oid"
-      :node="n" :index="ni" :zIndex="200" :mini="true"
-      :needFull="ni >= indexFrom && ni < indexTo"
-      @visible="nodeVisible").q-mb-md
+div(:style=`{position: 'relative'}`).row.full-width
+  template(v-if="feed && feed.items")
+    node(:node="feed.items[indexNow]" :needFull="needFull" nodeFullReady
+      :zIndex="1000"
+      :style=`{position: 'absolute', zIndex: 1000, top: top+'px', maxHeight: '85vh', overflow: 'hidden !important'}`).bg-red-1
+    node(
+      v-for="(n, ni) in feed.items" :key="n.oid" :title="ni"
+      :zIndex="200"
+      :style=`{maxHeight: '85vh', overflow: 'hidden'}` :visible="ni === indexNow"
+      :node="n" :needFull="ni >= indexFrom && ni < indexTo"
+      v-observe-visibility=`{
+        callback: nodeVisible,
+        throttle: 330,
+        intersection: {
+          threshold: 0.7
+        }
+      }`).bg-white.q-mb-md
 </template>
 
 <script>
-import nodeCard from 'components/node/node_card'
+import node from 'components/node'
 
 export default {
   name: 'node_feed',
-  components: {nodeCard},
+  components: {node},
   props: {
     items: {type: Array},
     mini: {type: Boolean},
@@ -54,7 +62,7 @@ export default {
       opacity: 1,
       node: null,
       nodeFull: null,
-      needFull: false,
+      needFull: true,
       indexFrom: 0,
       indexNow: 0,
       indexTo: 2,
@@ -118,10 +126,10 @@ export default {
         }
       })
     },
-    async nodeVisible (visible, index, node, nodeFull) {
-      let n = this.$refs['node_' + node.oid][0]
-      if (visible) {
-        this.$log('nodeVisible  TRUE', visible, index, node.name)
+    async nodeVisible (isVisible, entry) {
+      if (isVisible) {
+        this.$log('nodeVisible YES', entry.target.title)
+        let index = parseInt(entry.target.title)
         this.indexNow = index
         if (index < 2) {
           this.indexFrom = 0
@@ -132,16 +140,13 @@ export default {
         }
         // absolute node
         this.opacity = 0
-        this.$set(this, 'node', node)
-        this.$set(this, 'nodeFull', nodeFull)
-        if (this.$refs.anode) this.$refs.anode.nodeLoad(node.oid)
+        this.needFull = false
         await this.$wait(200)
-        this.top = n.$el.offsetTop
+        this.needFull = true
         this.opacity = 1
+        this.top = entry.target.offsetTop
       } else {
-        if (this.node && this.node.oid === node.oid) {
-          this.$log('nodeVisible FALSE', visible, index, node.name)
-        }
+        this.$log('nodeVisible NO')
       }
     }
   },

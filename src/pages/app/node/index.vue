@@ -1,42 +1,31 @@
 <template lang="pug">
-.row.fit.bg-red
+.row.full-width.justify-center.bg-grey-3
+  //- node-explorer
   q-dialog(ref='dialogExploreNode' :maximized="true" transition-show="slide-right" transition-hide="slide-left")
     node-explorer(:width="width" :height="height" :node="node" @close="$refs.dialogExploreNode.hide()")
-  q-btn(@click="$refs.dialogExploreNode.show()" color="primary" no-caps) explore node
+  //- q-btn(icon="vibration" color="primary" round)
+  //- explore
+  //- page wrapper
+  div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-py-md
+    node(v-if="node" :node="node" :style=`{maxHeight: '85vh'}` :needFull="true").bg-white
+  //- div(:style=`{minHeight: '100vh'}`).row.full-width.bg-white
 </template>
 
 <script>
-import nodeFragment from 'components/node/node_fragment'
-import nodeCard from 'components/node/node_card'
 import node from 'components/node'
 import nodeExplorer from 'components/node_explorer'
 
 export default {
   name: 'pageApp__Node',
-  components: { node, nodeCard, nodeFragment, nodeExplorer },
+  components: { node, nodeExplorer },
   props: ['width', 'height'],
   data () {
     return {
-      mode: 'second',
       node: null,
-      nodes: [],
-      needFull: true,
-      name: '',
-      lefts: [0, 0],
-      isScrolling: false,
-      isTweening: false,
-      fragmentCurrentIndex: 0
+      nodes: []
     }
   },
   computed: {
-    getHeight () {
-      return this.height - 50
-    },
-    getWidth () {
-      let w = this.width
-      if (w >= 400) return 400
-      else return w - 30
-    }
   },
   watch: {
     '$route': {
@@ -61,6 +50,7 @@ export default {
               oid
               type
               name
+              createdAt
               thumbUrl(preferWidth: 600)
               ...on Node {
                 rate

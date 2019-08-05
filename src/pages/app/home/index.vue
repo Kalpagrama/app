@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.fit.justify-center
-  div(style=`maxWidth: 500px`).row.q-pt-md
+.row.full-width.justify-center
+  div(:style=`{maxWidth: '500px'}`).row.full-width.q-pt-md
     node-feed(:mini="true" queryKey="feed")
 </template>
 

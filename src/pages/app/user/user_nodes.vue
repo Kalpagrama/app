@@ -2,13 +2,11 @@
 .row.full-width.justify-center.q-pa-sm.bg-grey-4
   div(
     :style=`{columnCount: getColumns, columnFill: 'balance'}`).justify-center.full-width
-    div(v-for="(n, ni) in nodes" :key="n.oid" @click="nodeClick(n, ni)"
-      :style=`{
-        width: '180px', borderRadius: '4px', display: 'inline-block',
-        borderTopLeftRadius: '100%'+getRadius+'px', borderTopRightRadius: '100%'+getRadius+'px',
-        borderBottomLeftRadius: '100%'+getRadius+'px', borderBottomRightRadius: '100%'+getRadius+'px'}`
-      ).q-pa-sm.bg-white.hr.cursor-pointer.q-mb-md
-      node(:node="n" style=`width: 200px; height: auto`)
+    //- div( @click="nodeClick(n, ni)")
+    node(
+      v-for="(n, ni) in nodes" :key="n.oid"
+      :node="n" noHeader noActions noSpheres
+      :style=`{maxHeight: '300px', maxWidth: '200px'}`).q-mb-md
 </template>
 
 <script>

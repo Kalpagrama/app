@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{height: height+'px'}`).column.full-width.q-px-md
+.column.fit.q-px-md
   //- debug
   div(v-if="false").row.full-width.bg-green-1
     small.full-width {{width}}/{{height}}
@@ -25,8 +25,8 @@ div(:style=`{height: height+'px'}`).column.full-width.q-px-md
           borderRadius: '4px', display: 'inline-block',
           borderTopLeftRadius: '100%'+getRadius+'px', borderTopRightRadius: '100%'+getRadius+'px',
           borderBottomLeftRadius: '100%'+getRadius+'px', borderBottomRightRadius: '100%'+getRadius+'px'}`
-        ).q-pa-sm.bg-white.hr.cursor-pointer.q-mb-md
-        node(:node="n.objectShort" style=`width: 100%`)
+        ).q-pa-sm.bg-white.hr.cursor-pointer.q-mb-lg
+        node(:node="n.objectShort" style=`maxWidth: 300px; maxHeight: 400px` noHeader noFooter noActions noSpheres)
 </template>
 
 <script>

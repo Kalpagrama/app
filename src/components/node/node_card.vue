@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: getRadius+'px'}`).row.full-width.bg-white
+div(:style=`{position: 'relative', borderRadius: getRadius+'px', maxHeight: '100%'}`).row.full-width.bg-white
   //- node author
   div(v-if="true" style=`height: 60px`).row.full-width.items-center.content-center
     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
@@ -31,7 +31,7 @@ div(:style=`{position: 'relative', borderRadius: getRadius+'px'}`).row.full-widt
               style=`height: 40px`).row.full-width.items-center.hr.cursor-pointer.q-px-md
               span(:style=`{color: m.color}`) {{$t(m.name)}}
   //- node body
-  node(:node="node" :nodeFull="nodeFull" :visible="visible" :mini="mini" @visible="$event => $emit('visible', $event, index, node, nodeFull)" :zIndex="zIndex")
+  node(:node="node" :nodeFull="nodeFull" :visible="visible" :mini="mini" @visible="$event => $emit('visible', $event, index, node, nodeFull)" :zIndex="zIndex").fit
     //- node rate
     template(v-slot:rate)
       transition(appear enter-active-class="animated zoomIn" leave-active-class="animated zoomOut")
@@ -83,7 +83,9 @@ export default {
     nodeFullReady: {type: Object},
     workspace: {type: Boolean},
     visible: {type: Boolean},
-    mini: {type: Boolean}
+    mini: {type: Boolean},
+    width: {type: Number},
+    height: {type: Number}
   },
   data () {
     return {
@@ -106,14 +108,6 @@ export default {
         {id: 3, name: 'Может быть', rate: 0.5},
         {id: 4, name: 'Скорее да', rate: 0.75},
         {id: 5, name: 'Да', rate: 1.0}
-      ],
-      menus: [
-        {id: 'to_node', name: 'to_node', color: 'black'},
-        {id: 'to_workspace', name: 'to_workspace', color: 'black'},
-        {id: 'to_chain', name: 'to_chain', color: 'black'},
-        {id: 'follow', name: 'follow', color: 'black'},
-        {id: 'share', name: 'share', color: 'black'},
-        {id: 'report', name: 'report', color: 'red'}
       ],
       opacity: 1
     }
@@ -239,6 +233,7 @@ export default {
               oid
               type
               name
+              createdAt
               ...on Node {
                 rate
                 # viewCnt

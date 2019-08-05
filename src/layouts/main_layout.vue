@@ -1,6 +1,6 @@
 <template lang="pug">
   q-layout(view='hHh Lpr fFf')
-    q-header(reveal v-if="false")
+    q-header(reveal v-if="true")
       div(style=`height: 60px`).row.full-width.items-center.justify-between.bg-white.q-pl-md.q-pr-sm
         q-btn(round flat color="grey-6" @click="$router.push('/app/home')")
           template(v-slot:default)
@@ -17,21 +17,38 @@
               span(v-if="$store.state.auth.user").q-mx-sm {{$store.state.auth.user.name | cut(30)}}
               div(v-else style=`width: 100px`)
         //- notifications and chats
-        div().row.full-height.items-center
-          //- q-btn(round flat color="grey-6" icon="notifications")
+        div.row.full-height.items-center
+          q-btn(round flat color="grey-6" icon="notifications")
+          //- menu app
           q-btn(round flat icon="more_vert" color="grey-6")
-            q-menu(auto-close)
-              div(style=`width: 200px`).row
-                div(v-for="(m, mi) in menus" :key="m.id" @click="menuClick(m, mi)"
-                  style=`height: 40px; borderBottom: 1px solid #eee`
-                  ).row.full-width.items-center.hr.cursor-pointer.q-px-md
-                  span {{m.name}}
+            q-popup-proxy(position="bottom" auto-close anchor="bottom right" self="top right")
+              div(
+                :style=`{maxWidth: $q.screen.width < 451 ? '100%' : '230px'}`
+                :class="{'q-pa-md': $q.screen.width <= 450}").row.fit
+                div(:style=`{borderRadius: '4px'}`).row.full-width.bg-white
+                  //- header
+                  div(
+                    v-if="$q.screen.width <= 450 && $store.state.auth.user"
+                    @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)"
+                    :style=`{height: '50px', borderBottom: '1px solid #eee'}`
+                    ).row.full-width.items-center.justify-center.q-px-md
+                    span.text-bold {{ $store.state.auth.user.name | cut(30) }}
+                  //- menus
+                  div(:style=`{borderRadius: '4px'}`).row.full-width.bg-white
+                    div(v-for="(m, mi) in menus" :key="m.id" @click="menuClick(m, mi)"
+                      :style=`{height: '50px'}`
+                      ).row.full-width.items-center.justify-center.hr.cursor-pointer.q-px-md
+                      span(:style=`{color: m.color}`) {{m.name}}
+                //- cancel
+                div(:style=`{height: '50px', borderRadius: '4px'}`
+                  ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
+                  span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
     q-page-container
       q-page.bg-grey-2
-        q-resize-observer(@resize="onResize" :debounce="200")
+        //- q-resize-observer(@resize="onResize" :debounce="200")
         keep-alive
           router-view(v-if="!loading" :width="widthPage" :height="heightPage")
-          div(v-else).row.fit.items-center.justify-center
+          div(v-else :style=`{minHeight: '500px'}`).row.fit.items-center.justify-center
             q-spinner(size="50px" :thickness="2" color="primary")
     //- q-footer(v-if="isMobile" reveal).bg-white
     //-   div(
@@ -49,6 +66,7 @@ export default {
   components: {kSearch},
   data () {
     return {
+      d: false,
       loading: true,
       search: '',
       height: window.innerHeight,
@@ -66,17 +84,21 @@ export default {
         { id: '/app/user', icon: 'perm_identity', name: 'account' }
         // { id: 'menu', icon: 'more_vert', name: 'menu' }
       ],
-      menus: [
-        {id: 'settings', name: 'Настройки'},
-        {id: 'refresh', name: 'Обновить'},
-        {id: 'logout', name: 'Выйти'},
-      ],
+      // menus: [],
       mini: false,
       menuWidth: 200,
       menuHeight: 500
     }
   },
   computed: {
+    menus () {
+      return [
+        {id: 'settings', name: 'Настройки', color: 'black'},
+        {id: 'refresh', name: 'Обновить', color: 'black'},
+        {id: 'logout', name: 'Выйти', color: 'red'},
+        {id: 'debug', name: this.d ? 'debug ON' : 'debug OFF', color: 'green'}
+      ]
+    },
     getPages () {
       return this.$store.state.ui.pages.filter(p => {
         return p.hidden === false && p.mobile === true
@@ -138,17 +160,19 @@ export default {
   },
   methods: {
     async menuClick (m) {
-      this.$log('menuClick', m)
       switch (m.id) {
         case 'settings': {
+          this.$log('menuClick', m.id)
           this.$router.push(`/app/user/${this.$store.state.auth.user.oid}/settings`)
           break
         }
         case 'refresh': {
+          this.$log('menuClick', m.id)
           window.location.reload(true)
           break
         }
         case 'logout': {
+          this.$log('menuClick', m.id)
           await this.$apollo.query({
             query: gql`
               query logout {
@@ -157,6 +181,19 @@ export default {
             `
           })
           this.$router.push('/login')
+          break
+        }
+        case 'debug': {
+          this.$log('menuClick', m.id)
+          let d = localStorage.getItem('kdebug')
+          if (d) {
+            this.d = false
+            localStorage.removeItem('kdebug')
+          } else {
+            this.d = true
+            localStorage.setItem('kdebug', 'kdebug')
+          }
+          window.location.reload(true)
           break
         }
       }
@@ -182,6 +219,7 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.loading = true
+    if (localStorage.getItem('kdebug')) this.d = true
     // check token
     let token = this.$route.query.token
     if (token) localStorage.setItem('ktoken', token)

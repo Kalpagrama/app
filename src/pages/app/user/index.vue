@@ -12,13 +12,20 @@
         div(style=`height: 40px`).row.full-width.items-center
           //- add menu
           q-btn(round flat color="grey-6" no-caps icon="add").q-mr-xs
-            q-menu(auto-close)
-              div(style=`width: 200px`).row
-                div(
-                  v-for="(a, ai) in menuAdd" :key="a.id" @click="menuAddClick(a, ai)"
-                  :style=`{height: '40px', borderTop: ai === 0 ? 'none' : '1px solid #eee'}`
-                  ).row.full-width.items-center.q-px-md.hr.cursor-pointer
-                  span {{ a.name }}
+            q-popup-proxy(position="bottom" auto-close anchor="bottom right" self="top right")
+              div(
+                :style=`{maxWidth: $q.screen.width < 451 ? '100%' : '230px'}`
+                :class="{'q-pa-md': $q.screen.width <= 450}").row.fit
+                div(:style=`{borderRadius: '4px'}`).row.full-width.bg-white
+                  div(
+                    v-for="(a, ai) in menuAdd" :key="a.id" @click="menuAddClick(a, ai)"
+                    :style=`{height: '50px', borderTop: ai === 0 ? 'none' : '1px solid #eee'}`
+                    ).row.full-width.items-center.justify-center.q-px-md.hr.cursor-pointer
+                    span {{ a.name }}
+                //- cancel
+                div(:style=`{height: '50px', borderRadius: '4px'}`
+                  ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
+                  span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
           //- settings
           q-btn(round flat color="grey-6" no-caps icon="edit" @click="$router.push({params: {page: 'settings'}})").q-mr-xs
           //- share menu
@@ -86,9 +93,9 @@ export default {
             let pageFind = this.getPages.find(p => (p.id === to.params.page))
             this.$log('pageFind', pageFind)
             if (pageFind) this.page = pageFind
-            else this.$router.push({params: {page: 'nodes'}})
+            // else this.$router.push({params: {page: 'nodes'}})
           } else {
-            this.$router.push({params: {page: 'nodes'}})
+            // this.$router.push({params: {page: 'nodes'}})
           }
         } else {
           this.$log('NO USER OID!')
