@@ -141,7 +141,7 @@ export default {
         // absolute node
         this.opacity = 0
         this.needFull = false
-        await this.$wait(200)
+        await this.$wait(280)
         this.needFull = true
         this.opacity = 1
         this.top = entry.target.offsetTop

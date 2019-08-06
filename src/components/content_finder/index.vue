@@ -20,7 +20,7 @@ div(style=`maxWidth: 600px`).column.fit.bg-white
     .column.fit
       //- link
       //- .col
-      link-find(:width="width" :height="height" @ready="handleReady")
+      link-finder(:width="width" :height="height" @ready="handleReady")
       //- source-link
       //- types
       //- div(:style=`{borderTop: '1px solid #eee', borderBottom: '1px solid #eee', maxHeight: typesMaxHeight+'px'}`).row.full-width.items-start.content-start.types-wrapper
@@ -306,10 +306,10 @@ export default {
         this.$log('progress error', error)
       }
     })
-    // get clipboard
-    navigator.clipboard.readText().then(clipText => {
-      this.$log('clipText', clipText)
-    })
+    // // get clipboard
+    // navigator.clipboard.readText().then(clipText => {
+    //   this.$log('clipText', clipText)
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

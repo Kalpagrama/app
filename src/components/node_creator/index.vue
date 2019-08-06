@@ -12,10 +12,10 @@ div(style=`position: relative`).row.fit.content-start.items-start
   //- book-editor
   //- code-editor
   //- wrapper
-  div.row.full-width.justify-center.q-pt-md
+  div.row.full-width.justify-center
     div(:style=`{maxWidth: '500px'}`).row.full-width
-      node(:node="node" :nodeFull="nodeFull" noHeader noActions noSpheres noFragmentActions :style=`{maxHeight: '85vh', maxWidth: '500px', ...getRadius, overflow: 'hidden'}`
-        ).bg-white.q-py-sm.q-my-sm
+      node(:node="node" :nodeFull="nodeFull" noHeader noActions noSpheres noFragmentActions :style=`{maxHeight: '70vh', maxWidth: '500px', ...getRadius, overflow: 'hidden'}`
+        ).bg-white.q-py-sm.q-mt-md
         //- name slot
         template(v-slot:name)
           .row.fit.items-center
@@ -103,8 +103,8 @@ export default {
     },
     getRadius () {
       return {
-        borderBottomLeftRadius: '100%8px',
-        borderBottomRightRadius: '100%8px',
+        // borderBottomLeftRadius: '100%8px',
+        // borderBottomRightRadius: '100%8px',
         borderTopLeftRadius: '100%8px',
         borderTopRightRadius: '100%8px'
       }

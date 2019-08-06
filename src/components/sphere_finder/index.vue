@@ -11,9 +11,10 @@ div(:style=`{position: 'relative', height: '70px'}`).row.full-width.items-center
     filled :debounce="350"
     @keydown.enter="onEnter"
     @keydown.backspace="onBackspace"
+    :placeholder="$t('Поиск')"
     ).full-width
     template(v-if="spheres.length > 0" v-slot:prepend)
-      small {{getSpheres}}
+      small(:style=`{fontSize: '14px', color: 'grey'}`) {{getSpheres}}
 </template>
 
 <script>
@@ -31,7 +32,7 @@ export default {
   computed: {
     getSpheres () {
       let res = ``
-      this.spheres.map(s => (res += `${s.name}, `))
+      this.spheres.map(s => (res += `#${s.name}, `))
       return res
     }
   },
@@ -49,6 +50,7 @@ export default {
   methods: {
     onEnter () {
       this.$log('onEnter')
+      if (this.sphere.length < 3) return
       this.spheres.push({name: this.sphere})
       this.sphere = ``
     },
@@ -88,6 +90,7 @@ export default {
       this.$log('sphereClick', s)
       // TODO: check for duplicate in spheres!
       this.sphere = ``
+      this.sphereOptions = []
       this.spheres.push(s)
     }
   },

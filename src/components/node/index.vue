@@ -4,9 +4,9 @@ div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRa
   div(v-if="!noHeader" :style=`{height: '50px'}`).row.full-width.items-center.justify-between.q-px-sm
     //- author
     router-link(v-if="nodeFull" :style=`{height: '35px', width: '35px', borderRadius: '50%'}`
-      :to="`/app/user/${nodeFull.author.oid}`").row.bg-grey-3
+      :to="`/app/user/${nodeFull.author.oid}/nodes`").row.bg-grey-3
     div(v-if="nodeFull").row.q-px-md
-      router-link(:to="`/app/user/${nodeFull.author.oid}`").full-width {{nodeFull.author.name}}
+      router-link(:to="`/app/user/${nodeFull.author.oid}/nodes`").full-width {{nodeFull.author.name}}
       small.full-width.text-grey-8 {{$date(node.createdAt, 'DD.MM.YYYY HH:mm')}}
     .col
     //- menu
@@ -25,7 +25,7 @@ div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRa
               ).row.full-width.items-center.justify-center.q-px-md.hr.cursor-pointer
               span(:style=`{color: m.color}`) {{ m.name }}
           //- cancel
-          div(:style=`{height: '50px', borderRadius: '4px'}`
+          div(v-if="$q.screen.width < 451" :style=`{height: '50px', borderRadius: '4px'}`
             ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
             span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
   //- fragments
@@ -57,10 +57,10 @@ div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRa
       :style=`{position: 'relative', width: '40px', height: '40px'}`)
       q-btn(
         v-if="nodeRating" round :icon="rates[rate].icon" color="primary" size="lg" :loading="nodeRateSending"
-        :style=`{position: 'absolute', height: '480px', width: '480px', right: '-210px', bottom: '-210px', zIndex: zIndex+1000}`)
+        :style=`{position: 'absolute', height: '480px', width: '480px', right: '-210px', bottom: '-210px', zIndex: zIndex+10000}`)
       h6(
         v-if="nodeRating"
-        :style=`{position: 'absolute', left: '-120px', top: '-120px', zIndex: zIndex+1100}`
+        :style=`{position: 'absolute', left: '-120px', top: '-120px', zIndex: zIndex+11000}`
         ).text-white.text-bold {{ rates[rate].name }}
 </template>
 

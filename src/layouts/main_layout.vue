@@ -40,7 +40,7 @@
                       ).row.full-width.items-center.justify-center.hr.cursor-pointer.q-px-md
                       span(:style=`{color: m.color}`) {{m.name}}
                 //- cancel
-                div(:style=`{height: '50px', borderRadius: '4px'}`
+                div(v-if="$q.screen.width < 451" :style=`{height: '50px', borderRadius: '4px'}`
                   ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
                   span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
     q-page-container
