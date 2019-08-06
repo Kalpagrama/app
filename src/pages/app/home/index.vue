@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.justify-center
   div(:style=`{maxWidth: '500px'}`).row.full-width.q-pt-md
-    node-feed(:mini="true" queryKey="feed")
+    node-feed(queryKey="feed")
 </template>
 
 <script>

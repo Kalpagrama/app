@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative', height: '70px'}`).row.full-width.items-center.q-px-sm.bg-white
+div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-center.q-px-sm.bg-white
   .row.full-width
     //- options
     q-menu(v-if="!spheresLoading" v-model="sphereOptions.length > 0" no-focus anchor="top middle" self="bottom middle" fit).q-pa-sm
@@ -9,8 +9,9 @@ div(:style=`{position: 'relative', height: '70px'}`).row.full-width.items-center
   //- input
   q-input(v-model="sphere"
     filled :debounce="350"
-    @keydown.enter="onEnter"
+    @keydown.enter.native="onEnter"
     @keydown.backspace="onBackspace"
+    autogrow
     :placeholder="$t('Поиск')"
     ).full-width
     template(v-if="spheres.length > 0" v-slot:prepend)
@@ -45,14 +46,21 @@ export default {
         this.sphereOptions = []
         this.sphereOptions = await this.spheresLoad(to)
       }
+    },
+    spheres: {
+      handler (to, from) {
+        this.$emit('spheres', to)
+      }
     }
   },
   methods: {
     onEnter () {
       this.$log('onEnter')
       if (this.sphere.length < 3) return
-      this.spheres.push({name: this.sphere})
-      this.sphere = ``
+      // this.spheres.push({name: this.sphere})
+      this.$set(this.spheres, this.spheres.length, {name: this.sphere})
+      this.$set(this, 'sphere', '')
+      // this.sphere = ``
     },
     onBackspace () {
       this.$log('onBackspace')

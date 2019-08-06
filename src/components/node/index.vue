@@ -30,7 +30,7 @@ div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRa
             span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
   //- fragments
   node-fragment(
-    v-for="(f, fi) in 2" :key="fi" :index="fi" :style=`{order: fi*2}`
+    v-for="(f, fi) in 2" :key="fi" :zIndex="zIndex" :index="fi" :style=`{order: fi*2}`
     :preview="node.thumbUrl[fi]" :fragment="nodeFull ? nodeFull.fragments[fi] : null" :mini="mini" :visible="visible"
     :noFragmentActions="noFragmentActions")
     slot(name="fragment" :index="fi")
@@ -73,7 +73,7 @@ export default {
   props: {
     zIndex: {type: Number, default () { return 200 }},
     node: { type: Object, required: true },
-    nodeFullReady: { type: Boolean },
+    nodeFullReady: { type: Object },
     needFull: { type: Boolean },
     visible: {type: Boolean},
     mini: {type: Boolean},
@@ -113,24 +113,28 @@ export default {
     needFull: {
       immediate: true,
       async handler (to, from) {
-        if (to) {
-          if (this.nodeFullReady) {
-            this.nodeFull = await this.nodeLoad(this.node.oid)
-          } else {
-            if (!this.nodeFull) {
-              this.nodeFull = await this.nodeLoad(this.node.oid)
-            }
-          }
+        if (to && !this.nodeFull && !this.nodeFullReady) {
+          this.nodeFull = await this.nodeLoad(this.node.oid)
         }
       }
     },
-    // visible: {
-    //   immediate: false,
-    //   async hanlder (to, from) {
-    //     if (to) {
-    //     }
-    //   }
-    // }
+    nodeFullReady: {
+      deep: true,
+      immediate: true,
+      async handler (to, from) {
+        if (to) {
+          // this.nodeFull
+          // this.$set(this, 'nodeFull', null)
+          this.$set(this, 'nodeFull', to)
+        }
+      }
+    },
+    visible: {
+      immediate: true,
+      handler (to, from) {
+        if (to) this.$emit('nodeFull', this.nodeFull)
+      }
+    }
   },
   methods: {
     menuClick (m) {

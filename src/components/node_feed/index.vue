@@ -1,19 +1,22 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width
   template(v-if="feed && feed.items")
-    node(:node="feed.items[indexNow]" :needFull="needFull" nodeFullReady
-      :zIndex="1000"
-      :style=`{position: 'absolute', zIndex: 1000, top: top+'px', maxHeight: '85vh', overflow: 'hidden !important'}`).bg-red-1
+    node(:node="feed.items[indexNow]" :needFull="true" :nodeFullReady="nodeFull"
+      :zIndex="1000" :mini="false"
+      :style=`{position: 'absolute', zIndex: 1000, top: top+'px',
+        maxHeight: '85vh', overflow: 'hidden !important', opacity: opacity}`
+      ).bg-white
     node(
       v-for="(n, ni) in feed.items" :key="n.oid" :title="ni"
-      :zIndex="200"
+      :zIndex="200" :mini="true"
       :style=`{maxHeight: '85vh', overflow: 'hidden'}` :visible="ni === indexNow"
       :node="n" :needFull="ni >= indexFrom && ni < indexTo"
+      @nodeFull="nodeFull = $event"
       v-observe-visibility=`{
         callback: nodeVisible,
-        throttle: 330,
+        throttle: 300,
         intersection: {
-          threshold: 0.7
+          threshold: 0.6
         }
       }`).bg-white.q-mb-md
 </template>
@@ -26,7 +29,6 @@ export default {
   components: {node},
   props: {
     items: {type: Array},
-    mini: {type: Boolean},
     queryKey: {type: String, default: 'feed'},
     query: {
       default () {
@@ -129,6 +131,7 @@ export default {
     async nodeVisible (isVisible, entry) {
       if (isVisible) {
         this.$log('nodeVisible YES', entry.target.title)
+        this.opacity = 0
         let index = parseInt(entry.target.title)
         this.indexNow = index
         if (index < 2) {
@@ -139,11 +142,10 @@ export default {
           this.indexTo = index + 3
         }
         // absolute node
-        this.opacity = 0
-        this.needFull = false
-        await this.$wait(280)
-        this.needFull = true
-        this.opacity = 1
+        // this.opacity
+        await this.$wait(440)
+        this.$tween.to(this, 0.2, {opacity: 1})
+        // await this.$wait(500)
         this.top = entry.target.offsetTop
       } else {
         this.$log('nodeVisible NO')

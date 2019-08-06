@@ -1,5 +1,5 @@
 <template lang="pug">
-div(style=`position: relative`).row.fit.content-start.items-start
+div(style=`position: relative`).row.full-width.content-start.items-start
   q-dialog(ref="contentFindDialog" no-route-dismiss :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down")
     content-finder(@ready="contentChoosen" @close="$refs.contentFindDialog.hide()")
   q-dialog(ref="videoEditorDialog" no-route-dismiss :maximized="true" transition-show="slide-up" transition-hide="slide-down")
@@ -14,7 +14,7 @@ div(style=`position: relative`).row.fit.content-start.items-start
   //- wrapper
   div.row.full-width.justify-center
     div(:style=`{maxWidth: '500px'}`).row.full-width
-      node(:node="node" :nodeFull="nodeFull" noHeader noActions noSpheres noFragmentActions :style=`{maxHeight: '70vh', maxWidth: '500px', ...getRadius, overflow: 'hidden'}`
+      node(:node="node" :nodeFullReady="nodeFull" :mini="false" noHeader noActions noSpheres noFragmentActions :style=`{maxHeight: '70vh', maxWidth: '500px', ...getRadius, overflow: 'hidden'}`
         ).bg-white.q-py-sm.q-mt-md
         //- name slot
         template(v-slot:name)
@@ -33,7 +33,7 @@ div(style=`position: relative`).row.fit.content-start.items-start
           q-btn(flat round color="white" icon="edit" @click="fragmentEdit(index)").q-mr-sm.shadow-10
             q-tooltip {{$t('fragment_edit')}}
       //- sphere finder
-      sphere-finder
+      sphere-finder(@spheres="nodeFull.spheres = $event")
       //- create
       div(v-if="true" style=`height: 70px`).row.full-width.items-center.justify-end.bg-white.q-px-sm
         q-btn(@click="nodeCreate()" :loading="nodeCreating"

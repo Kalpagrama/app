@@ -1,7 +1,8 @@
 <template lang="pug">
-div(style=`position: relative; maxWidth: 100%`).row.fit
-  //- img(v-show="!started" :src="preview" :style=`{position: 'absolute', zIndex: index+20, objectFit: 'cover'}` width="100%" draggable="false")
-  video(:ref="ref" playsinline preload="none" :src="url" type="video/mp4" height="100%" width="100%" @error="videoError" autoplay :poster="preview")
+.row.fit
+  video(:ref="ref" playsinline preload="none" :src="url" type="video/mp4"
+    height="100%" width="100%" @error="videoError" autoplay
+    :style=`{maxHeight: '100%', height: '100%', objectFit: 'cover', maxWidth: '100%'}`)
 </template>
 
 <script>
@@ -26,7 +27,8 @@ export default {
       now: 0,
       showPoster: true,
       urlFake: 'https://storage.yandexcloud.net/kalpa-content/8h/65/110124177519845405.mp4',
-      started: false
+      started: false,
+      z: 0
     }
   },
   computed: {
@@ -35,14 +37,16 @@ export default {
     }
   },
   watch: {
-    // visible: {
-    //   immediate: false,
-    //   handler (to, from) {
-    //     this.$log('visible CHANGED', to)
-    //     if (to) this.player.play()
-    //     else this.player.pause()
-    //   }
-    // }
+    url: {
+      immediate: false,
+      async handler (to, from) {
+        // this.$log('URL changed')
+        // this.started = false
+        // this.z = 0
+        // await this.$wait(330)
+        // this.started = true
+      }
+    }
   },
   methods: {
     videoError () {
@@ -59,7 +63,11 @@ export default {
     playing (e) {
       // this.$log('=== *** VIDEO STARTED *** ===')
       // this.showPoster = false
-      this.started = true
+      // setTimeout(() => {
+      //   this.started = true
+      // }, 200)
+      // this.started = true
+      // this.$tween.to(this, 0.2, {z: 2000})
       this.$emit('started')
       this.$log('STARTED', this.index)
     }
@@ -76,12 +84,13 @@ export default {
       iPadUseNativeControls: false,
       iPhoneUseNativeControls: false,
       AndroidUseNativeControls: false,
+      stretching: 'fill',
       pauseOtherPlayers: false,
       alwaysShowControls: false,
       success: async (mediaElement, originalNode, instance) => {
         this.player = mediaElement
         // this.player.addEventListener('timeupdate', this.timeUpdate, false)
-        this.player.addEventListener('playing', this.playing, false)
+        // this.player.addEventListener('playing', this.playing, false)
         // this.player.setCurrentTime(this.startSec)
       }
     })
@@ -89,7 +98,7 @@ export default {
   beforeDestroy () {
     this.$log('beforeDestroy')
     // this.player.removeEventListener('timeupdate', this.timeUpdate)
-    this.player.removeEventListener('playing', this.playing)
+    // this.player.removeEventListener('playing', this.playing)
   }
 }
 </script>
@@ -99,6 +108,6 @@ export default {
   display: none !important
 .mejs__overlay-loading
   display: none !important
-// .mejs__controls
-//   display: none !important
+.mejs__controls
+  display: none !important
 </style>
