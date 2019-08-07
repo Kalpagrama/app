@@ -25,7 +25,7 @@ export default async ({ Vue, store, app }) => {
     return request
   }, (error) => {
     // Do something with response error
-    localStorage.removeItem('kdebug')
+    // localStorage.removeItem('kdebug')
     return Promise.reject(error)
   })
   axios.interceptors.response.use(response => {

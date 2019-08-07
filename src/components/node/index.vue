@@ -34,8 +34,8 @@ div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRa
   //-   :preview="node.thumbUrl[fi]" :fragment="nodeFull ? nodeFull.fragments[fi] : null" :mini="mini" :visible="visible"
   //-   :noFragmentActions="noFragmentActions")
   //-   slot(name="fragment" :index="fi")
-  img(:src="node.thumbUrl[0]" width="100%" :style=`{order: 0}` @load="$event => imgLoad(0, $event)")
-  img(:src="node.thumbUrl[1]" width="100%" :style=`{order: 2}` @load="$event => imgLoad(1, $event)")
+  img(src="https://c7.alamy.com/comp/F5FHA4/vertical-new-york-the-flatiron-building-one-of-the-first-skyscrapers-F5FHA4.jpg" width="100%" :style=`{order: 0}` @load="$event => imgLoad(0, $event)")
+  //- img(:src="node.thumbUrl[1]" width="100%" :style=`{order: 2}` @load="$event => imgLoad(1, $event)")
   //- name
   div(v-if="!noName" :style=`{order: 1, height: '40px'}`).row.full-width.justify-center.items-center
       //- span {{node.name}}
@@ -140,7 +140,7 @@ export default {
   },
   methods: {
     imgLoad (i, e) {
-      this.$log('imgLoad', i, e)
+      this.$log('imgLoad', this.node.name, i, e.target.height)
     },
     menuClick (m) {
       this.$log('menuClick', m)
