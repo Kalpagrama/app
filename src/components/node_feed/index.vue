@@ -9,7 +9,7 @@ div(:style=`{position: 'relative'}`).row.full-width
     node(
       v-for="(n, ni) in feed.items" :key="n.oid" :title="ni"
       :zIndex="200" :mini="true"
-      :style=`{maxHeight: '85vh', overflow: 'hidden'}` :visible="ni === indexNow"
+      :style=`{maxHeight: '40vh', overflow: 'hidden'}` :visible="ni === indexNow"
       :node="n" :needFull="ni >= indexFrom && ni < indexTo"
       @nodeFull="nodeFull = $event"
       v-observe-visibility=`{

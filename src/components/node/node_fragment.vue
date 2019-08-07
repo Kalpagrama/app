@@ -23,7 +23,8 @@ div(
           span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
   //- preview
   .row.fit
-    img(v-if="preview" :src="preview" width="100%" draggable="false" :style=`{objectFit: index === 0 ? 'cover' : 'cover'}`)
+    img(v-if="preview" :src="preview" width="100%" draggable="false" :style=`{objectFit: index === 0 ? 'cover' : 'cover'}`
+      @load="imageLoaded")
     slot
     //- div(:style=`{position: 'relative'}`).row.fit
     //- div(:style=`{position: 'absolute', zIndex: zIndex}`).row.fit.br.bg-yellow
@@ -122,6 +123,9 @@ export default {
     },
     onMouseleave (e) {
       this.$log('onMouseleave', e)
+    },
+    imageLoaded (e) {
+      this.$log('imageLoaded', e.path[0].height)
     },
     imageError (e) {
       this.$log('*** imageError', e)

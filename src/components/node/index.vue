@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRadius: '4px', overflow: 'hidden !important'}`).column.full-width.full-height
+div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRadius: '4px'}`).column.full-width.full-height
   //- header
   div(v-if="!noHeader" :style=`{height: '50px'}`).row.full-width.items-center.justify-between.q-px-sm
     //- author
@@ -29,11 +29,13 @@ div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRa
             ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
             span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
   //- fragments
-  node-fragment(
-    v-for="(f, fi) in 2" :key="fi" :zIndex="zIndex" :index="fi" :style=`{order: fi*2}`
-    :preview="node.thumbUrl[fi]" :fragment="nodeFull ? nodeFull.fragments[fi] : null" :mini="mini" :visible="visible"
-    :noFragmentActions="noFragmentActions")
-    slot(name="fragment" :index="fi")
+  //- node-fragment(
+  //-   v-for="(f, fi) in 2" :key="fi" :zIndex="zIndex" :index="fi" :style=`{order: fi*2}`
+  //-   :preview="node.thumbUrl[fi]" :fragment="nodeFull ? nodeFull.fragments[fi] : null" :mini="mini" :visible="visible"
+  //-   :noFragmentActions="noFragmentActions")
+  //-   slot(name="fragment" :index="fi")
+  img(:src="node.thumbUrl[0]" width="100%" :style=`{order: 0}` @load="$event => imgLoad(0, $event)")
+  img(:src="node.thumbUrl[1]" width="100%" :style=`{order: 2}` @load="$event => imgLoad(1, $event)")
   //- name
   div(v-if="!noName" :style=`{order: 1, height: '40px'}`).row.full-width.justify-center.items-center
       //- span {{node.name}}
@@ -137,6 +139,9 @@ export default {
     }
   },
   methods: {
+    imgLoad (i, e) {
+      this.$log('imgLoad', i, e)
+    },
     menuClick (m) {
       this.$log('menuClick', m)
       switch (m.id) {
