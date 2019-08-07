@@ -14,7 +14,7 @@ div(style=`position: relative`).row.full-width.content-start.items-start
   //- wrapper
   div.row.full-width.justify-center
     div(:style=`{maxWidth: '500px'}`).row.full-width
-      node(:node="node" :nodeFullReady="nodeFull" :mini="false" noHeader noActions noSpheres noFragmentActions :style=`{maxHeight: '70vh', maxWidth: '500px', ...getRadius, overflow: 'hidden'}`
+      node(:node="node" :nodeFullReady="nodeFull" :mini="true" noHeader noActions noSpheres noFragmentActions :style=`{maxHeight: '70vh', maxWidth: '500px', ...getRadius, overflow: 'hidden'}`
         ).bg-white.q-py-sm.q-mt-md
         //- name slot
         template(v-slot:name)
@@ -24,7 +24,7 @@ div(style=`position: relative`).row.full-width.content-start.items-start
         template(v-slot:fragment="{index}")
           div(:style=`{minHeight: '220px'}`).row.fit.items-center.justify-center
             q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
-        //- empty slot
+        //- empty slot--
         //- template(v-slot:empty="{ index }")
         //- actions slot
         template(v-slot:actions="{ index }")

@@ -8,7 +8,8 @@
   //- page wrapper
   div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-py-md
     node(v-if="node" :node="node" :style=`{maxHeight: '85vh'}` :needFull="true").bg-white
-  //- div(:style=`{minHeight: '100vh'}`).row.full-width.bg-white
+  div(:style=`{minHeight: '100vh'}`).row.full-width.bg-white
+    q-btn(@click="$refs.dialogExploreNode.show()")
 </template>
 
 <script>

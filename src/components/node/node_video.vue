@@ -1,5 +1,7 @@
 <template lang="pug">
-.row.fit
+div(
+  @mouseenter="player.play()"
+).row.fit
   video(:ref="ref" playsinline preload="none" :src="url" type="video/mp4"
     height="100%" width="100%" @error="videoError" autoplay
     :style=`{maxHeight: '100%', height: '100%', objectFit: 'cover', maxWidth: '100%'}`)
@@ -85,7 +87,7 @@ export default {
       iPhoneUseNativeControls: false,
       AndroidUseNativeControls: false,
       stretching: 'fill',
-      pauseOtherPlayers: false,
+      pauseOtherPlayers: true,
       alwaysShowControls: false,
       success: async (mediaElement, originalNode, instance) => {
         this.player = mediaElement
@@ -108,6 +110,6 @@ export default {
   display: none !important
 .mejs__overlay-loading
   display: none !important
-.mejs__controls
-  display: none !important
+// .mejs__controls
+//   display: none !important
 </style>

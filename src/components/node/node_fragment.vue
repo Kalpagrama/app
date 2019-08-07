@@ -4,32 +4,32 @@ div(
   v-on:mouseover="$wait(180).then(() => (hover = true))"
   v-on:mouseleave="hover = false").col.bg-grey-3
   //- menu
-  //- q-btn(
-  //-   v-show="!noFragmentActions && menuBtnShow"
-  //-   round flat icon="more_vert" color="white"
-  //-   :style=`{position: 'absolute', right: '6px', top: '40%'}`).shadow-1
-  //-   q-popup-proxy(position="bottom" auto-close anchor="bottom right" self="top right")
-  //-     div(:style=`{maxWidth: $q.screen.width < 451 ? '100%' : '230px'}` :class="{'q-pa-md': $q.screen.width <= 450}").row.fit
-  //-       div(:style=`{borderRadius: '4px'}`).row.full-width.bg-white
-  //-         div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.items-center.q-px-md
-  //-           span(v-if="fragment").text-bold {{ fragment.content.name || fragment.content.oid }}
-  //-         div(v-for="(m, mi) in menus" :key="m.id" @click="menuClick(m)"
-  //-           :style=`{height: '50px'}`
-  //-           ).row.full-width.items-center.q-px-md.hr.cursor-pointer
-  //-           span(:style=`{color: m.color}`) {{ m.name }}
-  //-       //- cancel
-  //-       div(v-if="$q.screen.width < 451" :style=`{height: '50px', borderRadius: '4px'}`
-  //-         ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
-  //-         span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
+  q-btn(
+    v-show="!noFragmentActions && menuBtnShow"
+    round flat icon="more_vert" color="white"
+    :style=`{position: 'absolute', zIndex: zIndex+2000, right: '6px', top: '40%'}`).shadow-1
+    q-popup-proxy(position="bottom" auto-close anchor="bottom right" self="top right")
+      div(:style=`{maxWidth: $q.screen.width < 451 ? '100%' : '230px'}` :class="{'q-pa-md': $q.screen.width <= 450}").row.fit
+        div(:style=`{borderRadius: '4px'}`).row.full-width.bg-white
+          div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.items-center.q-px-md
+            span(v-if="fragment").text-bold {{ fragment.content.name || fragment.content.oid }}
+          div(v-for="(m, mi) in menus" :key="m.id" @click="menuClick(m)"
+            :style=`{height: '50px'}`
+            ).row.full-width.items-center.q-px-md.hr.cursor-pointer
+            span(:style=`{color: m.color}`) {{ m.name }}
+        //- cancel
+        div(v-if="$q.screen.width < 451" :style=`{height: '50px', borderRadius: '4px'}`
+          ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
+          span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
   //- preview
   .row.fit
-    img(v-if="preview" :src="preview" width="100%" height="100%" draggable="false" :style=`{objectFit: 'cover'}`)
+    img(v-if="preview" :src="preview" width="100%" draggable="false" :style=`{objectFit: index === 0 ? 'cover' : 'cover'}`)
     slot
     //- div(:style=`{position: 'relative'}`).row.fit
     //- div(:style=`{position: 'absolute', zIndex: zIndex}`).row.fit.br.bg-yellow
     node-video(
       v-if="fragment && !mini && getType === 'VIDEO'"
-      :style=`{position: 'absolute', maxHeight: '100%'}`
+      :style=`{position: 'absolute', zIndex: zIndex+1000, maxHeight: '100%'}`
       @started="videoStarted"
       :index="index"
       :zIndex="zIndex"

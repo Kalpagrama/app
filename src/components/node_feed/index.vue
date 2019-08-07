@@ -1,11 +1,11 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width
   template(v-if="feed && feed.items")
-    node(:node="feed.items[indexNow]" :needFull="true" :nodeFullReady="nodeFull"
-      :zIndex="1000" :mini="false"
-      :style=`{position: 'absolute', zIndex: 1000, top: top+'px',
-        maxHeight: '85vh', overflow: 'hidden !important', opacity: opacity}`
-      ).bg-white
+    //- node(:node="feed.items[indexNow]" :needFull="true" :nodeFullReady="nodeFull"
+    //-   :zIndex="1000" :mini="false"
+    //-   :style=`{position: 'absolute', zIndex: 1000, top: top+'px',
+    //-     maxHeight: '85vh', overflow: 'hidden !important', opacity: opacity}`
+    //-   ).bg-white
     node(
       v-for="(n, ni) in feed.items" :key="n.oid" :title="ni"
       :zIndex="200" :mini="true"
