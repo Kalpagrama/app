@@ -4,12 +4,9 @@
 </template>
 
 <script>
-import nodeCard from 'components/node/node_card'
-import nodeFeed from 'components/node_feed'
-
 export default {
   name: 'pageApp__Sphere',
-  components: { nodeCard, nodeFeed },
+  components: {},
   data () {
     return {
       loading: false,
@@ -58,15 +55,6 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('$route CHANGED', to)
-        // if (to.query.sphere) {
-        //   // TODO: check for from !== value
-        //   this.sphereLoad(to.query.sphere)
-        //   this.spheresLoad(to.query.sphere)
-        // } else {
-        //   let sphereLast = localStorage.getItem('zspherelast')
-        //   if (sphereLast) this.$router.push({query: {sphere: sphereLast}})
-        //   else this.$router.push({query: {sphere: 'AYedgFVAIYQ='}})
-        // }
       }
     }
   },

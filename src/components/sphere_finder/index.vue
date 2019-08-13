@@ -99,7 +99,7 @@ export default {
       // TODO: check for duplicate in spheres!
       this.sphere = ``
       this.sphereOptions = []
-      this.spheres.push(s)
+      this.spheres.push({name: s.name, oid: s.oid})
     }
   },
   async mounted () {

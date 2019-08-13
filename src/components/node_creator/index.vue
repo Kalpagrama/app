@@ -12,9 +12,12 @@ div(style=`position: relative`).row.full-width.content-start.items-start
   //- book-editor
   //- code-editor
   //- wrapper
-  div.row.full-width.justify-center
+  div.row.full-width.justify-center.bg-grey-4
     div(:style=`{maxWidth: '500px'}`).row.full-width
-      node(:node="node" :nodeFullReady="nodeFull" :mini="true" noHeader noActions noSpheres noFragmentActions :style=`{maxHeight: '70vh', maxWidth: '500px', ...getRadius, overflow: 'hidden'}`
+      node(:node="node" :nodeFullReady="nodeFull" :mini="true" noHeader noActions noSpheres
+        :style=`{...getRadius}`
+        :width="500"
+        :maxHeight="0.7*$q.screen.height"
         ).bg-white.q-py-sm.q-mt-md
         //- name slot
         template(v-slot:name)
@@ -22,7 +25,7 @@ div(style=`position: relative`).row.full-width.content-start.items-start
             q-input(v-model="nodeFull.name" borderless :maxlength="45"
               :input-class="['text-center']" placeholder="В чем суть?").fit
         template(v-slot:fragment="{index}")
-          div(:style=`{minHeight: '220px'}`).row.fit.items-center.justify-center
+          div(:style=`{minHeight: '200px'}`).row.full-width.items-center.justify-center.bg-red
             q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
         //- empty slot--
         //- template(v-slot:empty="{ index }")

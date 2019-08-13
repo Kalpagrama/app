@@ -1,10 +1,16 @@
 <template lang="pug">
-div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRadius: '4px'}`).column.full-width.full-height
+div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRadius: '4px', overflow: 'hidden'}`).row.full-width
+  //- debug
+  div(v-if="false" style=`color: white; fontSize: 10px`).row.full-width.bg-purple.q-pa-sm
+    small.full-width index: {{index}} / oid: {{node.oid}} / active: {{active}}
+    small.full-width fragments: {{fragments}} / fragmentsMaxHeight: {{fragmentsMaxHeight}}
+    small.full-width fragmentsStyles: {{fragmentsStyles}}
   //- header
   div(v-if="!noHeader" :style=`{height: '50px'}`).row.full-width.items-center.justify-between.q-px-sm
     //- author
-    router-link(v-if="nodeFull" :style=`{height: '35px', width: '35px', borderRadius: '50%'}`
-      :to="`/app/user/${nodeFull.author.oid}/nodes`").row.bg-grey-3
+    router-link(v-if="nodeFull" :style=`{height: '35px', width: '35px', borderRadius: '50%', overflow: 'hidden'}`
+      :to="`/app/user/${nodeFull.author.oid}/nodes`").row.bg-grey-4
+      img(v-if="nodeFull" :src="nodeFull.author.thumbUrl[0]" :style=`{width: '35px', height: '35px'}` @error="avatarError")
     div(v-if="nodeFull").row.q-px-md
       router-link(:to="`/app/user/${nodeFull.author.oid}/nodes`").full-width {{nodeFull.author.name}}
       small.full-width.text-grey-8 {{$date(node.createdAt, 'DD.MM.YYYY HH:mm')}}
@@ -29,22 +35,23 @@ div(:style=`{position: 'relative', maxHeight: '100%', maxWidth: '100%', borderRa
             ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
             span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
   //- fragments
-  //- node-fragment(
-  //-   v-for="(f, fi) in 2" :key="fi" :zIndex="zIndex" :index="fi" :style=`{order: fi*2}`
-  //-   :preview="node.thumbUrl[fi]" :fragment="nodeFull ? nodeFull.fragments[fi] : null" :mini="mini" :visible="visible"
-  //-   :noFragmentActions="noFragmentActions")
-  //-   slot(name="fragment" :index="fi")
-  img(src="https://c7.alamy.com/comp/F5FHA4/vertical-new-york-the-flatiron-building-one-of-the-first-skyscrapers-F5FHA4.jpg" width="100%" :style=`{order: 0}` @load="$event => imgLoad(0, $event)")
-  //- img(:src="node.thumbUrl[1]" width="100%" :style=`{order: 2}` @load="$event => imgLoad(1, $event)")
+  node-fragment(
+    v-for="(f, fi) in 2" :key="fi" :index="fi" :name="node.name" :active="active" :preview="node.thumbUrl[fi]" :mini="mini"
+    :style=`{order: fi*2, ...fragmentsStyles[fi]}` @height="fragments[fi].initialHeight = $event" :needFull="needFull"
+    :fragment="nodeFull ? nodeFull.fragments[fi] : null" @ready="$event => $emit('ready', $event)"
+    :height="fragmentsStyles[fi].maxHeight")
+    slot(name="fragment" :index="fi")
+    template(v-slot:fragmentExplorer)
+      //- h1 helloooo
+      slot(name="fragmentExplorer" :index="fi")
   //- name
   div(v-if="!noName" :style=`{order: 1, height: '40px'}`).row.full-width.justify-center.items-center
-      //- span {{node.name}}
-      router-link(v-if="!$slots.name" :to="`/app/node/${node.oid}`")
-        span {{ node.name | cut(40) }}
-      slot(name="name")
+    router-link(v-if="!$slots.name" :to="`/app/node/${node.oid}`")
+      span(v-if="node") {{ node.name | cut(45) }}
+    slot(name="name")
   //- spheres
   div(v-if="!noSpheres" :style=`{order: 3, height: '45px', overflowX: 'auto', overflowY: 'hidden'}`).row.full-width.items-center
-    div(v-if="nodeFull").row.no-wrap.scroll.q-px-sm
+    div(v-if="nodeFull").row.no-wrap.scroll.q-pl-sm
       div(
         v-for="(s, si) in nodeFull.spheres" :key="si" @click="sphereClick(s, si)"
         :style=`{height: '30px', borderRadius: '4px'}`
@@ -73,18 +80,21 @@ export default {
   name: 'node',
   components: { nodeFragment },
   props: {
+    index: {type: Number},
     zIndex: {type: Number, default () { return 200 }},
-    node: { type: Object, required: true },
+    node: {},
     nodeFullReady: { type: Object },
     needFull: { type: Boolean },
-    visible: {type: Boolean},
+    active: {type: Boolean},
     mini: {type: Boolean},
     inEditor: {type: Boolean},
     noHeader: {type: Boolean},
     noName: {type: Boolean},
     noActions: {type: Boolean},
     noSpheres: {type: Boolean},
-    noFragmentActions: {type: Boolean}
+    noFragmentActions: {type: Boolean},
+    width: {type: Number},
+    maxHeight: {type: Number}
   },
   data () {
     return {
@@ -106,42 +116,52 @@ export default {
         {id: 3, name: 'Может быть', rate: 0.5, icon: 'gps_not_fixed', opacity: 1},
         {id: 4, name: 'Скорее да', rate: 0.75, icon: 'gps_fixed', opacity: 0.7},
         {id: 5, name: 'Да', rate: 1.0, icon: 'gps_fixed', opacity: 1}
+      ],
+      fragments: [
+        {initialHeight: 0},
+        {initialHeight: 0}
       ]
     }
   },
   computed: {
+    fragmentsMaxHeight () {
+      let h = this.maxHeight
+      return h
+    },
+    fragmentsStyles () {
+      let hMax = this.fragmentsMaxHeight
+      let h1 = this.fragments[0].initialHeight
+      let h2 = this.fragments[1].initialHeight
+      if (hMax >= h1 + h2) return [{}, {}]
+      let h1p = h1 / (h1 + h2)
+      let h2p = 1 - h1p
+      return [
+        {maxHeight: h1p * hMax + 'px'},
+        {maxHeight: h2p * hMax + 'px'}
+      ]
+    }
   },
   watch: {
     needFull: {
       immediate: true,
       async handler (to, from) {
-        if (to && !this.nodeFull && !this.nodeFullReady) {
-          this.nodeFull = await this.nodeLoad(this.node.oid)
-        }
-      }
-    },
-    nodeFullReady: {
-      deep: true,
-      immediate: true,
-      async handler (to, from) {
         if (to) {
-          // this.nodeFull
-          // this.$set(this, 'nodeFull', null)
-          this.$set(this, 'nodeFull', to)
+          this.$log('needFull CHANGED', this.index, this.node.name)
+          this.nodeFull = await this.nodeLoad(this.node.oid)
+          this.$emit('nodeFull', this.nodeFull)
         }
       }
     },
-    visible: {
+    active: {
       immediate: true,
       handler (to, from) {
-        if (to) this.$emit('nodeFull', this.nodeFull)
+        if (to) {
+          this.$log('active CHANGED', this.index, this.node.name, to)
+        }
       }
     }
   },
   methods: {
-    imgLoad (i, e) {
-      this.$log('imgLoad', this.node.name, i, e.target.height)
-    },
     menuClick (m) {
       this.$log('menuClick', m)
       switch (m.id) {
@@ -172,22 +192,26 @@ export default {
         }
       }
     },
+    avatarError (e) {
+      // this.$log('avatarError', e)
+      e.target.src = 'https://storage.yandexcloud.net/kalpa-thumbs/90/9u/108271081881665538_50.jpg'
+    },
     nameClick () {
-      this.$log('nameClick')
+      this.$log('nameClick', this.node.name)
       if (this.inEditor) {
       } else {
         this.$router.push(`/app/node/${this.node.oid}`)
       }
     },
     sphereClick (s, si) {
-      this.$log('sphereClick')
+      this.$log('sphereClick', s.name)
       if (this.inEditor) {
       } else {
         this.$router.push(`/app/sphere/${s.oid}`)
       }
     },
     nodeChain () {
-      this.$log('nodeChain')
+      this.$log('nodeChain', this.node.name)
     },
     async nodeRateSend (rate) {
       this.$log('nodeRateSend start')
@@ -228,7 +252,7 @@ export default {
       }
     },
     async nodeLoad (oid) {
-      this.$log('nodeLoad')
+      // this.$log('nodeLoad start', this.index, this.node.name)
       let { data: { objectList: [nodeFull] } } = await this.$apollo.query({
         query: gql`
           query getExtendedNodesProps($oid: OID!) {
@@ -245,7 +269,7 @@ export default {
                   oid
                   type
                   name
-                  thumbUrl(preferWidth: 600)
+                  thumbUrl(preferWidth: 50)
                   __typename
                 }
                 spheres {
@@ -281,6 +305,7 @@ export default {
         },
         fetchPolicy: 'cache-first'
       })
+      this.$log('nodeLoad done', this.index, this.node.name)
       return nodeFull
     }
   }

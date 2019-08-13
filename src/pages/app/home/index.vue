@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center
+.row.full-width.justify-center.bg-grey-4
   div(:style=`{maxWidth: '500px'}`).row.full-width.q-pt-md
     node-feed(queryKey="feed")
 </template>

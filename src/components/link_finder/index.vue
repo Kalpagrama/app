@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.fit
+.row.full-width
   div(:style=`{height: headerHeight+'px'}`).row.full-width.items-center.content-center.q-px-sm
     q-input(v-model="link" placeholder="Вставьте ссылку или начните поиск" autofocus
       filled @keyup.enter="find()").col
@@ -11,20 +11,18 @@
       ).row.cursor-pointer.q-pa-sm.hr
       span {{s.name}}
   div(v-if="mode === 'link'").row.full-width
-    //- :style=`{height: width*0.56+'px'}`
-    div(:style=`{height: '300px'}`).row.full-width.q-px-sm
-      div(style=`borderRadius: 4px; overflow: hidden`).row.fit
+    .row.full-width.q-px-sm
+      div(style=`borderRadius: 4px; overflow: hidden`).row.full-width
         iframe(
-          width="100%"
-          height="100%"
           :src="videoLink"
+          :style=`{width: '100%', height: width*0.56+'px', objectFit: 'contain !important'}`
           frameborder="0"
           autoplay
           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
           allowfullscreen)
         //- div(v-else).row.fit.bg-grey-3
     //- video actions
-    .row.full-width.justify-end.q-my-sm.q-px-sm
+    .row.full-width.justify-end.q-my-md.q-px-sm
       q-btn(style=`height: 50px; borderRadius: 4px` flat color="primary" no-caps @click="findCancel()").q-mr-sm {{$t('Отмена')}}
       q-btn(style=`height: 50px; borderRadius: 4px` color="primary" @click="videoSelect({})" no-caps) {{$t('Выбрать видео')}}
 </template>

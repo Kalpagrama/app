@@ -32,11 +32,10 @@ div(style=`position: relative`).column.fit
 <script>
 import kFeed from 'components/kFeed'
 import kVisible from 'components/kVisible'
-import nodeCard from 'components/node/node_card'
 
 export default {
   name: 'pageApp__Workspace__Nodes',
-  components: {kFeed, kVisible, nodeCard},
+  components: {kFeed, kVisible},
   data () {
     return {
       query: gql`

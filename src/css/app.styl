@@ -36,7 +36,8 @@ html, body
 *, html, body
     box-sizing: border-box
     oveflow: hidden
-
+:root
+    box-sizing: border-box
 @media screen and (min-width: 320px) and (max-width: 767px) and (orientation: landscape) {
   html {
     transform: rotate(-90deg);
@@ -49,8 +50,8 @@ html, body
   }
 }
 ::-webkit-scrollbar {
-  width: 0px
-  height: 0px !important
+  width: 4px
+  height: 4px !important
 }
 ::-webkit-scrollbar-thumb {
   background: black

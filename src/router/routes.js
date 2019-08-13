@@ -44,6 +44,10 @@ const routes = [
       { name: 'phone', path: 'phone', component: () => import('pages/login/phone') },
       { name: '404', path: '*', component: () => import('pages/Error404.vue') }
     ]
+  },
+  {
+    path: '/dev',
+    component: () => import('layouts/dev_layout.vue')
   }
 ]
 

@@ -45,11 +45,10 @@
                   span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
     q-page-container
       q-page.bg-grey-2
-        //- q-resize-observer(@resize="onResize" :debounce="200")
-        keep-alive
-          router-view(v-if="!loading" :width="widthPage" :height="heightPage")
-          div(v-else :style=`{minHeight: '500px'}`).row.fit.items-center.justify-center
-            q-spinner(size="50px" :thickness="2" color="primary")
+        //- keep-alive
+        router-view(v-if="!loading" :width="width" :height="height")
+        div(v-else :style=`{minHeight: '500px'}`).row.fit.items-center.justify-center
+          q-spinner(size="50px" :thickness="2" color="primary")
     //- q-footer(v-if="isMobile" reveal).bg-white
     //-   div(
     //-     style=`height: 60px; borderTop: 1px solid #eee`
@@ -217,13 +216,15 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
+    // console.time('loading')
     this.loading = true
     if (localStorage.getItem('kdebug')) this.d = true
     // check token
     let token = this.$route.query.token
     if (token) localStorage.setItem('ktoken', token)
     // user check
+    // this.$log('Checking user...')
     let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
       query: gql`
       query userCheck {
@@ -240,6 +241,7 @@ export default {
       this.$q.notify('Go login')
     }
     // user
+    // this.$log('Getting user...')
     let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name } }`})
     // this.$log('user', user)
     this.$store.commit('auth/state', ['user', user])
@@ -253,12 +255,8 @@ export default {
     // })
     // this.$log('userWorkspace', userWorkspace)
     // this.$store.commit('workspace/state', ['workspace', userWorkspace])
+    // console.timeEnd('loading')
     this.loading = false
-    // let p = await this.$axios.get('https://script.google.com/macros/s/AKfycbwXTp9upWTuMEsnXfvu-a5R8KfsFobj43kV-lvBFC6-l5m7WA/exec', {
-    //   collection: 'review_call',
-    //   phone: '666'
-    // })
-    // this.$log('p', p)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

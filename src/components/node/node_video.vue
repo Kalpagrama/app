@@ -1,25 +1,24 @@
 <template lang="pug">
-div(
-  @mouseenter="player.play()"
-).row.fit
-  video(:ref="ref" playsinline preload="none" :src="url" type="video/mp4"
-    height="100%" width="100%" @error="videoError" autoplay
-    :style=`{maxHeight: '100%', height: '100%', objectFit: 'cover', maxWidth: '100%'}`)
+video(
+  :ref="ref" playsinline preload="none" :src="url" type="video/mp4"
+  @error="videoError" autoplay
+  @load="videoLoaded"
+  @playing="videoStarted"
+  :style=`{width: '100%', maxHeight: '100%', objectFit: 'contain'}`
+  ).bg-grey-4
+  //- @mouseenter="player.play()"
 </template>
 
 <script>
 export default {
   name: 'nodeVideo',
   props: {
+    mini: {type: Boolean},
     index: { type: Number, },
     zIndex: { type: Number },
-    url: { type: String, required: true },
-    startSec: { type: Number, default: 0 },
-    endSec: { type: Number, default: 10 },
-    mini: {type: Boolean},
-    height: {type: Number},
     preview: {type: String},
-    visible: {type: Boolean}
+    active: {type: Boolean},
+    fragment: {type: Object, required: true}
   },
   data () {
     return {
@@ -35,24 +34,32 @@ export default {
   },
   computed: {
     ref () {
-      return `kplayer-${this.index}-${Date.now()}`
+      return `kplayer`
+    },
+    url () {
+      return this.fragment.url
+    },
+    startSec () {
+      return this.fragments.relativePoints[0]['x']
+    },
+    endSec () {
+      return this.fragments.relativePoints[1]['x']
     }
   },
   watch: {
     url: {
       immediate: false,
       async handler (to, from) {
-        // this.$log('URL changed')
-        // this.started = false
-        // this.z = 0
-        // await this.$wait(330)
-        // this.started = true
+        this.$log('URL changed')
       }
     }
   },
   methods: {
-    videoError () {
-      this.$log('*** videoError')
+    videoError (e) {
+      this.$log('videoError', e)
+    },
+    videoLoaded (e) {
+      this.$log('videoLoaded', e)
     },
     toggleMute () {
       this.player.setMuted(!this.muted)
@@ -62,16 +69,9 @@ export default {
       this.now = this.player.currentTime
       if (this.now > this.endSec) this.player.setCurrentTime(this.startSec)
     },
-    playing (e) {
-      // this.$log('=== *** VIDEO STARTED *** ===')
-      // this.showPoster = false
-      // setTimeout(() => {
-      //   this.started = true
-      // }, 200)
-      // this.started = true
-      // this.$tween.to(this, 0.2, {z: 2000})
+    videoStarted (e) {
+      this.$log('videoStarted')
       this.$emit('started')
-      this.$log('STARTED', this.index)
     }
   },
   async mounted () {
@@ -87,20 +87,19 @@ export default {
       iPhoneUseNativeControls: false,
       AndroidUseNativeControls: false,
       stretching: 'fill',
-      pauseOtherPlayers: true,
+      pauseOtherPlayers: false,
       alwaysShowControls: false,
       success: async (mediaElement, originalNode, instance) => {
         this.player = mediaElement
+        // this.player.addEventListener('playing', this.videoStarted, false)
         // this.player.addEventListener('timeupdate', this.timeUpdate, false)
-        // this.player.addEventListener('playing', this.playing, false)
-        // this.player.setCurrentTime(this.startSec)
       }
     })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    // this.player.removeEventListener('playing', this.videoStarted)
     // this.player.removeEventListener('timeupdate', this.timeUpdate)
-    // this.player.removeEventListener('playing', this.playing)
   }
 }
 </script>
@@ -110,6 +109,6 @@ export default {
   display: none !important
 .mejs__overlay-loading
   display: none !important
-// .mejs__controls
-//   display: none !important
+.mejs__controls
+  display: none !important
 </style>

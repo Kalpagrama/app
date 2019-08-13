@@ -1,24 +1,23 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width
+  q-resize-observer(@resize="onResize")
+  div(v-if="false" :style=`{position: 'fixed', zIndex: 10000, top: '0px', width: width+'px', color: 'white'}`).row.bg-purple.q-pa-sm
+    small.full-width activeNode: {{activeNode}} / visibleNodes: {{visibleNodes}} / itemsCount: {{itemsCount}}
+    small.full-width fullNodes: {{fullNodes}}
   template(v-if="feed && feed.items")
-    //- node(:node="feed.items[indexNow]" :needFull="true" :nodeFullReady="nodeFull"
-    //-   :zIndex="1000" :mini="false"
-    //-   :style=`{position: 'absolute', zIndex: 1000, top: top+'px',
-    //-     maxHeight: '85vh', overflow: 'hidden !important', opacity: opacity}`
-    //-   ).bg-white
     node(
-      v-for="(n, ni) in feed.items" :key="n.oid" :title="ni"
-      :zIndex="200" :mini="true"
-      :style=`{maxHeight: '300vh', overflow: 'hidden'}` :visible="ni === indexNow"
-      :node="n" :needFull="ni >= indexFrom && ni < indexTo"
-      @nodeFull="nodeFull = $event"
+      v-for="(n, ni) in feed.items" :key="n.oid" :index="ni" :node="n" :lang="ni" :title="n.name"
+      :zIndex="200" :mini="true" :width="width" :maxHeight="0.7*$q.screen.height"
+      :active="activeNode ? activeNode[0] === ni : false" @active="nodeFull = $event"
+      :needFull="ni >= fullNodes[0] && ni <= fullNodes[1]"
+      :class=`{'bg-grey-3': activeNode ? activeNode[0] !== ni : false, 'bg-white': activeNode ? activeNode[0] === ni : false }`
       v-observe-visibility=`{
         callback: nodeVisible,
         throttle: 300,
         intersection: {
-          threshold: 0.6
+          threshold: 0.5
         }
-      }`).bg-white.q-mb-md
+      }`).q-mb-md
 </template>
 
 <script>
@@ -61,20 +60,16 @@ export default {
   data () {
     return {
       top: 0,
-      opacity: 1,
+      width: 500,
+      opacity: 0,
       node: null,
       nodeFull: null,
       needFull: true,
-      indexFrom: 0,
-      indexNow: 0,
-      indexTo: 2,
       pageToken: null,
-      pageTokenNext: null,
       totalCount: 0,
       itemsCount: 0,
-      fetchingMore: false,
-      nodeShow: true,
-      needFullAbsolute: true
+      visibleNodes: [],
+      fetchingMore: false
     }
   },
   apollo: {
@@ -97,14 +92,39 @@ export default {
     }
   },
   watch: {
-    indexNow: {
-      handler (to, from) {
-        this.$log('*** indexNow CHANGED', to)
-        if (this.itemsCount - this.indexNow < 4) this.fetchMore(this.q)
+    activeNode: {
+      async handler (to, from) {
+        if (to && to !== from && this.itemsCount - to[0] < 4) {
+          if (!this.fetchingMore) {
+            this.$log('activeNode CHANGED', to)
+            this.fetchMore(this.q)
+          }
+        }
       }
     }
   },
+  computed: {
+    fullNodes () {
+      if (this.activeNode) {
+        let index = this.activeNode[0]
+        let res = []
+        if (index < 3) res = [0, index + 3]
+        else res = [index - 3, index + 3]
+        return res
+      } else {
+        return [0, 0]
+      }
+    },
+    activeNode () {
+      if (this.visibleNodes.length > 0) return this.visibleNodes[0]
+      else return null
+    }
+  },
   methods: {
+    onResize (e) {
+      // this.$log('onResize width', e.width)
+      this.width = e.width
+    },
     fetchMore () {
       this.$log('fetchMore')
       this.pageTokenNext = this.pageToken
@@ -129,26 +149,15 @@ export default {
       })
     },
     async nodeVisible (isVisible, entry) {
+      let top = entry.target.offsetTop
+      let name = entry.target.title
+      let index = parseInt(entry.target.lang)
       if (isVisible) {
-        this.$log('nodeVisible YES', entry.target.title)
-        this.opacity = 0
-        let index = parseInt(entry.target.title)
-        this.indexNow = index
-        if (index < 2) {
-          this.indexFrom = 0
-          this.indexTo = index + 3
-        } else {
-          this.indexFrom = index - 3
-          this.indexTo = index + 3
-        }
-        // absolute node
-        // this.opacity
-        await this.$wait(440)
-        this.$tween.to(this, 0.2, {opacity: 1})
-        // await this.$wait(500)
-        this.top = entry.target.offsetTop
-      } else {
-        this.$log('nodeVisible NO')
+        this.$log('nodeVisible SHOW', index, name)
+        this.visibleNodes.unshift([index, top])
+      } else if (this.visibleNodes.find(([i, t]) => (i === index)) && this.visibleNodes.length > 1) {
+        this.$log('nodeVisible HIDE', index, name)
+        this.visibleNodes = this.visibleNodes.filter(([i, t]) => (i !== index))
       }
     }
   },
