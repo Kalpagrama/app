@@ -5,6 +5,7 @@ div(
   ).row.full-width.bg-grey-2
   //- menu
   q-btn(
+    v-if="false"
     v-show="menuBtnShow"
     round flat icon="more_vert" color="white"
     :style=`{position: 'absolute', zIndex: zIndex+2000, right: '6px', top: '40%'}`).shadow-1
@@ -70,10 +71,10 @@ export default {
   computed: {
     getRadius () {
       return {
-        borderBottomLeftRadius: '100%14px',
-        borderBottomRightRadius: '100%14px',
-        borderTopLeftRadius: '100%14px',
-        borderTopRightRadius: '100%14px'
+        borderBottomLeftRadius: '100%7px',
+        borderBottomRightRadius: '100%7px',
+        borderTopLeftRadius: '100%7px',
+        borderTopRightRadius: '100%7px'
       }
     },
     menuBtnShow () {

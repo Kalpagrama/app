@@ -105,10 +105,10 @@ export default {
 </script>
 
 <style lang="stylus">
-.mejs__overlay-button
-  display: none !important
-.mejs__overlay-loading
-  display: none !important
-.mejs__controls
-  display: none !important
+// .mejs__overlay-button
+//   display: none !important
+// .mejs__overlay-loading
+//   display: none !important
+// .mejs__controls
+//   display: none !important
 </style>

@@ -1,11 +1,12 @@
 <template lang="pug">
 .row.full-width
   div(:style=`{height: headerHeight+'px'}`).row.full-width.items-center.content-center.q-px-sm
-    q-input(v-model="link" placeholder="Вставьте ссылку или начните поиск" autofocus
+    q-input(v-model="link" placeholder="Вставьте ссылку" autofocus
       filled @keyup.enter="find()").col
       template(v-slot:append)
         q-btn(v-if="link.length > 0" flat round dense icon="clear" @click="findCancel()" color="primary")
-    q-btn(color="primary" @click="find()" :loading="loading" style=`height: 56px` no-caps).q-ml-sm {{$t('Найти')}}
+    //- q-btn(color="primary" @click="find()" :loading="loading" style=`height: 56px` no-caps).q-ml-sm {{$t('Найти')}}
+    q-btn(color="primary" @click="find()" :loading="loading" style=`height: 56px; width: 56px` no-caps icon="search").q-ml-sm
   div(v-if="mode === 'word'" style=`height: 40px`).row.full-width.justify-center
     div(v-if="mode === 'word'" v-for="s in sources" :key="s.id" @click="sourceClick(s)"
       ).row.cursor-pointer.q-pa-sm.hr
@@ -24,13 +25,13 @@
     //- video actions
     .row.full-width.justify-end.q-my-md.q-px-sm
       q-btn(style=`height: 50px; borderRadius: 4px` flat color="primary" no-caps @click="findCancel()").q-mr-sm {{$t('Отмена')}}
-      q-btn(style=`height: 50px; borderRadius: 4px` color="primary" @click="videoSelect({})" no-caps) {{$t('Выбрать видео')}}
+      q-btn(style=`height: 50px; borderRadius: 4px` color="primary" :loading="nexting" @click="videoSelect({})" no-caps) {{$t('Выбрать видео')}}
 </template>
 
 <script>
 export default {
   name: 'linkFinder',
-  props: ['width', 'height'],
+  props: ['width', 'height', 'nexting'],
   data () {
     return {
       loading: false,

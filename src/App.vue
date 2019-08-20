@@ -4,7 +4,7 @@
 </template>
 
 <script>
-// import { disableBodyScroll } from 'body-scroll-lock'
+import { disableBodyScroll } from 'body-scroll-lock'
 export default {
     name: 'App',
     mounted () {

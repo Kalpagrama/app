@@ -1,68 +1,30 @@
 <template lang="pug">
   q-layout(view='hHh Lpr fFf')
-    q-header(reveal v-if="true")
-      div(style=`height: 60px`).row.full-width.items-center.justify-between.bg-white.q-pl-md.q-pr-sm
-        q-btn(round flat color="grey-6" @click="$router.push('/app/home')")
-          template(v-slot:default)
-            img(:src="`statics/logo.png`" width="40px" height="40px")
-        //- span.text-black.q-mx-sm Kalpagramma
-        .col.q-px-sm
-          k-search
-        //- main btns
-        div(v-if="!isMobile").row.full-height.items-center.justify-end
-          q-btn(rounded flat no-caps color="grey-6" @click="$router.push('/app/home')") Home
-          q-btn(v-if="$store.state.auth.user" rounded flat no-caps color="grey-6" @click="$router.push(`/app/user/${$store.state.auth.user.oid}/nodes`)").q-px-xs
-            template(v-slot:default)
-              div(style=`height: 30px; width: 30px; borderRadius: 50%`).bg-grey-4
-              span(v-if="$store.state.auth.user").q-mx-sm {{$store.state.auth.user.name | cut(30)}}
-              div(v-else style=`width: 100px`)
-        //- notifications and chats
-        div.row.full-height.items-center
-          q-btn(round flat color="grey-6" icon="notifications")
-          //- menu app
-          q-btn(round flat icon="more_vert" color="grey-6")
-            q-popup-proxy(position="bottom" auto-close anchor="bottom right" self="top right")
-              div(
-                :style=`{maxWidth: $q.screen.width < 451 ? '100%' : '230px'}`
-                :class="{'q-pa-md': $q.screen.width <= 450}").row.fit
-                div(:style=`{borderRadius: '4px'}`).row.full-width.bg-white
-                  //- header
-                  div(
-                    v-if="$q.screen.width <= 450 && $store.state.auth.user"
-                    @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)"
-                    :style=`{height: '50px', borderBottom: '1px solid #eee'}`
-                    ).row.full-width.items-center.justify-center.q-px-md
-                    span.text-bold {{ $store.state.auth.user.name | cut(30) }}
-                  //- menus
-                  div(:style=`{borderRadius: '4px'}`).row.full-width.bg-white
-                    div(v-for="(m, mi) in menus" :key="m.id" @click="menuClick(m, mi)"
-                      :style=`{height: '50px'}`
-                      ).row.full-width.items-center.justify-center.hr.cursor-pointer.q-px-md
-                      span(:style=`{color: m.color}`) {{m.name}}
-                //- cancel
-                div(v-if="$q.screen.width < 451" :style=`{height: '50px', borderRadius: '4px'}`
-                  ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
-                  span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
+    q-drawer(side="left" ref="drawerLeft").bg-white
+      k-menu
     q-page-container
       q-page.bg-grey-2
-        //- keep-alive
-        router-view(v-if="!loading" :width="width" :height="height")
-        div(v-else :style=`{minHeight: '500px'}`).row.fit.items-center.justify-center
-          q-spinner(size="50px" :thickness="2" color="primary")
-    //- q-footer(v-if="isMobile" reveal).bg-white
-    //-   div(
-    //-     style=`height: 60px; borderTop: 1px solid #eee`
-    //-     ).row.full-width.justify-between.items-center.q-px-sm
-    //-     q-btn(v-for="(p, pi) in pages" :key="pi" flat round
-    //-       :color="getColor(p)" :icon="p.icon" size="16px" @click="pageClick(p)")
+        div(:style=`{position: 'relative'}`).row.fit
+          q-btn(
+            v-if="$q.screen.width <= 600"
+            @click="$refs.drawerLeft.toggle()"
+            icon="menu" round color="primary" size="md"
+            :style=`{position: 'fixed', zIndex: 30000, left: '10px', bottom: '10px'}`)
+          k-menu(v-if="$q.screen.width > 600" :style=`{maxWidth: '60px', width: '60px', overflow: 'hidden', position: 'fixed'}` :mini="true").bg-white
+          //- div(v-if="$q.screen.width > 600" :style=`{width: '60px', height: $q.screen.height+'px', position: 'fixed', left: '0px', zIndex: 1000}`).column.items-center.bg-white
+          div(:style=`{paddingLeft: $q.screen.width > 600 ? '60px' : '0px'}`).col
+            //- keep-alive
+            router-view(v-if="!loading" :width="width" :height="heightPage")
+            div(v-else :style=`{minHeight: '500px'}`).row.fit.items-center.justify-center
+              q-spinner(size="50px" :thickness="2" color="primary")
 </template>
 
 <script>
-import kSearch from 'components/k_search'
+import kMenu from 'components/k_menu'
 
 export default {
   name: 'mainLayout',
-  components: {kSearch},
+  components: {kMenu},
   data () {
     return {
       d: false,
@@ -78,7 +40,7 @@ export default {
       pages: [
         { id: '/app/home', icon: 'home', name: 'home' },
         // { id: 'sphere', icon: 'explore', name: 'explore' },
-        { id: '/app/create/node', icon: 'add_circle_outline', name: 'create' },
+        { id: '/app/create/node', icon: 'add', name: 'create' },
         // { id: 'notifications', icon: 'notifications_none', name: 'notifications' },
         { id: '/app/user', icon: 'perm_identity', name: 'account' }
         // { id: 'menu', icon: 'more_vert', name: 'menu' }
@@ -216,47 +178,44 @@ export default {
     }
   },
   async mounted () {
-    // this.$log('mounted')
-    // console.time('loading')
-    this.loading = true
-    if (localStorage.getItem('kdebug')) this.d = true
-    // check token
-    let token = this.$route.query.token
-    if (token) localStorage.setItem('ktoken', token)
-    // user check
-    // this.$log('Checking user...')
-    let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
-      query: gql`
-      query userCheck {
-        userIsAuthorized
-        userIsConfirmed
-        }`
-      })
-    // this.$log('userIsAuthorized', userIsAuthorized)
-    // this.$log('userIsConfirmed', userIsConfirmed)
-    // TODO: create with try/catch this...
-    if (!userIsAuthorized || !userIsConfirmed) {
-      this.$log('GO LOGIN')
-      this.$router.push('/login')
-      this.$q.notify('Go login')
+    try {
+      this.$log('mounted')
+      console.time('loading')
+      this.loading = true
+      if (localStorage.getItem('kdebug')) this.d = true
+      // check token
+      let token = this.$route.query.token
+      if (token) localStorage.setItem('ktoken', token)
+      // user check
+      this.$log('Checking user...')
+      let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
+        query: gql`
+        query userCheck {
+          userIsAuthorized
+          userIsConfirmed
+          }`
+        })
+      this.$log('userIsAuthorized', userIsAuthorized)
+      this.$log('userIsConfirmed', userIsConfirmed)
+      // TODO: create with try/catch this...
+      if (!userIsAuthorized || !userIsConfirmed) {
+        this.$log('GO LOGIN')
+        this.$router.push('/login')
+        this.$q.notify('Go login')
+        throw new Error(`No auth!`)
+        // TODO: error code? switch...
+      }
+      // user
+      this.$log('Getting user...')
+      let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name thumbUrl(preferWidth: 50) } }`})
+      this.$log('user', user)
+      this.$store.commit('auth/state', ['user', user])
+      this.loading = false
+      console.timeEnd('loading')
+    } catch (error) {
+      this.$log('error', error)
+      // this.loading = false
     }
-    // user
-    // this.$log('Getting user...')
-    let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name } }`})
-    // this.$log('user', user)
-    this.$store.commit('auth/state', ['user', user])
-    // userWorkspace
-    // let {data: {userWorkspace}} = await this.$apollo.query({
-    //   query: gql`
-    //     query userWorkspace {
-    //       userWorkspace
-    //     }
-    //   `
-    // })
-    // this.$log('userWorkspace', userWorkspace)
-    // this.$store.commit('workspace/state', ['workspace', userWorkspace])
-    // console.timeEnd('loading')
-    this.loading = false
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -11,17 +11,17 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
     filled :debounce="350"
     @keydown.enter.native="onEnter"
     @keydown.backspace="onBackspace"
-    autogrow
     :placeholder="$t('Поиск')"
     ).full-width
-    template(v-if="spheres.length > 0" v-slot:prepend)
-      small(:style=`{fontSize: '14px', color: 'grey'}`) {{getSpheres}}
+    //- template(v-if="spheres.length > 0" v-slot:prepend)
+    //-   small(:style=`{fontSize: '14px', color: 'grey'}`) {{getSpheres}}
 </template>
 
 <script>
 import gql from 'graphql-tag'
 export default {
   name: 'sphereFinder',
+  props: ['spheresReady'],
   data () {
     return {
       sphere: '',
@@ -45,6 +45,11 @@ export default {
         if (to.length < 2) return
         this.sphereOptions = []
         this.sphereOptions = await this.spheresLoad(to)
+      }
+    },
+    spheresReady: {
+      handler (to, from) {
+        if (to.length > 0) this.spheres = to
       }
     },
     spheres: {

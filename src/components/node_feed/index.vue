@@ -1,27 +1,31 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width
+div(:style=`{position: 'relative'}` body-scroll-lock-ignore).row.full-width
   q-resize-observer(@resize="onResize")
   div(v-if="false" :style=`{position: 'fixed', zIndex: 10000, top: '0px', width: width+'px', color: 'white'}`).row.bg-purple.q-pa-sm
     small.full-width activeNode: {{activeNode}} / visibleNodes: {{visibleNodes}} / itemsCount: {{itemsCount}}
     small.full-width fullNodes: {{fullNodes}}
   template(v-if="feed && feed.items")
-    node(
-      v-for="(n, ni) in feed.items" :key="n.oid" :index="ni" :node="n" :lang="ni" :title="n.name"
-      :zIndex="200" :mini="true" :width="width" :maxHeight="0.7*$q.screen.height"
-      :active="activeNode ? activeNode[0] === ni : false" @active="nodeFull = $event"
-      :needFull="ni >= fullNodes[0] && ni <= fullNodes[1]"
-      :class=`{'bg-grey-3': activeNode ? activeNode[0] !== ni : false, 'bg-white': activeNode ? activeNode[0] === ni : false }`
-      v-observe-visibility=`{
-        callback: nodeVisible,
-        throttle: 300,
-        intersection: {
-          threshold: 0.5
-        }
-      }`).q-mb-md
+    div(v-for="(n, ni) in feed.items" :key="n.oid").row.full-width.justify-center.items-start.content-start.q-pt-md
+      node(
+        :index="ni" :node="n" :lang="ni" :title="n.name"
+        :zIndex="200" maxHeight="70vh"
+        :needFull="ni >= fullNodes[0] && ni <= fullNodes[1]"
+        :active="activeNode ? activeNode[0] === ni : false"
+        :class=`{'bg-grey-3': activeNode ? activeNode[0] !== ni : false, 'bg-white': activeNode ? activeNode[0] === ni : false }`
+        :style=`{maxWidth: '500px', borderRadius: '4px'}`
+        v-observe-visibility=`{
+          callback: nodeVisible,
+          throttle: 300,
+          intersection: {
+            threshold: 0.5
+          }
+        }`
+        ).q-mb-md
 </template>
 
 <script>
-import node from 'components/node'
+// import node from 'components/node'
+import node from 'components/node/node_css'
 
 export default {
   name: 'node_feed',

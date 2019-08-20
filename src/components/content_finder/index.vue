@@ -1,18 +1,20 @@
 <template lang="pug">
 div(style=`maxWidth: 600px`).column.fit.bg-white
   q-resize-observer(@resize="onResize")
-  div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.items-center
-    //- span Find
-    div(v-if="type" style=`height: 60px; width: 50px`).row.items-center.justify-center
-      q-icon(v-if="type" :name="type.icon" :color="type.color" size="40px")
-    span(v-if="source") from {{source}}
-    .col.full-height
-      div(v-if="type && source").row.fit.justify-end.items-center.q-px-sm
-        q-btn(v-if="type && source" outline dense color="primary" no-caps @click="returnToTypeChoose()" icon="keyboard_arrow_left").q-px-sm {{$t('change_type')}}
-      div(v-else).row.fit.items-center.q-px-sm
-        span.q-mr-sm Choose
-        span(v-if="!type").q-mr-sm type &
-        span(v-if="!source") source
+  div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-pl-md
+    span Найти видео по ссылке
+    .col
+    //- //- span Find
+    //- div(v-if="type" style=`height: 60px; width: 50px`).row.items-center.justify-center
+    //-   q-icon(v-if="type" :name="type.icon" :color="type.color" size="40px")
+    //- span(v-if="source") from {{source}}
+    //- .col.full-height
+    //-   div(v-if="type && source").row.fit.justify-end.items-center.q-px-sm
+    //-     q-btn(v-if="type && source" outline dense color="primary" no-caps @click="returnToTypeChoose()" icon="keyboard_arrow_left").q-px-sm {{$t('change_type')}}
+    //-   div(v-else).row.fit.items-center.q-px-sm
+    //-     span.q-mr-sm Choose
+    //-     span(v-if="!type").q-mr-sm type &
+    //-     span(v-if="!source") source
     div(v-if="!type && !source" style=`height: 60px; width: 60px`).row.items-center.justify-center
       q-btn(flat round icon="clear" @click="$emit('close')")
   //- body
@@ -20,7 +22,7 @@ div(style=`maxWidth: 600px`).column.fit.bg-white
     .column.fit
       //- link
       //- .col
-      link-finder(:width="width" :height="height" @ready="handleReady")
+      link-finder(:width="width" :height="height" @ready="handleReady" :nexting="nexting")
       //- source-link
       //- types
       //- div(:style=`{borderTop: '1px solid #eee', borderBottom: '1px solid #eee', maxHeight: typesMaxHeight+'px'}`).row.full-width.items-start.content-start.types-wrapper
@@ -255,6 +257,7 @@ export default {
             let oid = await this.urlUpload(this.content.url)
             this.$emit('ready', {type: 'VIDEO', source: 'from_youtube', oid: oid})
             this.$emit('close')
+            this.nexting = false
           } else if (this.content.source === 'from_link') {
             this.$log('next from_link', this.content)
             if (!this.content.url) throw new Error('No url in content!')
@@ -286,27 +289,7 @@ export default {
   },
   mounted () {
     this.$log('======= mounted')
-    const observer = this.$apollo.subscribe({
-      client: 'ws',
-      query: gql`
-        subscription uploadProgress {
-          progress {
-            action
-            progress
-          }
-        }
-      `
-    })
-    observer.subscribe({
-      next: ({data: {progress}}) => {
-        this.$log('progress', progress)
-        this.$set(this, 'progress', progress)
-      },
-      error: (error) => {
-        this.$log('progress error', error)
-      }
-    })
-    // // get clipboard
+    // get clipboard
     // navigator.clipboard.readText().then(clipText => {
     //   this.$log('clipText', clipText)
     // })

@@ -1,130 +1,178 @@
 <template lang="pug">
-div(:style=`{position: 'relative', height: height+'px', paddingTop: '25px', overflow: 'hidden'}`
-  ).row.full-width.justify-center.items-start.content-start.bg-grey-4
-  //- go back
-  div(:style=`{position: 'absolute', top: '0px', height: '50px'}`).row.full-width.items-center
-    q-btn(round flat icon="keyboard_arrow_left" color="grey-9" @click="goBack()")
-  //- wrapper
-  div(ref="kwrapper" :style=`{position: 'relative', height: getHeight+'px', width: getWidth+'px'}`).row.items-center.content-center.bg
-    //- name
-    div(:style=`{height: getWidth+'px', borderRadius: '50%'}`).row.full-width.items-center.content-center.bg-white
-      div(style=`height: 50px`).row.full-width.items-center.justify-center
-        span.text-bold {{getName}}//{{isScrolling}}
-  //- slider top
-  div(v-if="true" ref="kslideswrapper" :style=`{position: 'absolute', zIndex: 1000, bottom: getBottom+'px'}`).row.full-width.items-center.scroll
-    q-scroll-observer(horizontal @scroll="$event => onScroll($event, 0)")
-    //- slides wrapper
-    div(:style=`{paddingLeft: getLeft+'px'}`
-      ).row.full-width.items-end.no-wrap.q-pb-md
-      //- slide wrapper
-      div(v-for="(n, ni) in 50" :key="ni"
-        :style=`{height: '200px', minWidth: getWidth+'px'}`).q-px-md
-        //- slide
-        div(:style=`{position: 'relative', borderTopLeftRadius: '100%'+getRadius+'px', borderTopRightRadius: '100%'+getRadius+'px',
-          borderBottomLeftRadius: '100%'+getRadius+'px', borderBottomRightRadius: '100%'+getRadius+'px', overflow: 'hidden'}`
-          ).row.fit.bg-grey-3.shadow-5
-          //- slide name
-          span(style=`position: absolute; bottom: 10px; left: 10px`) hello {{ni}}
-          //- slide fragment
-          //- node-fragment(v-if="node" :node="node" :nodeFull="nodeFull" :index="0" :mini="true")
+.row.fit
+  div(:style=`{maxWidth: isDesktop ? '600px' : '100%'}`).col.full-height
+    q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
+      //- top fragment on the left
+      q-tab-panel(name="top" :style=`{padding: '0px', background: 'none'}` v-if="!isDesktop").column.fit
+        div(:style=`{height: '50px'}`).row.full-width.items-center.justify-between.bg-grey-4.q-px-sm
+          span.text-bold.q-ml-xs Ядра на верхний фрагмент
+          .col
+          q-btn(round flat icon="keyboard_arrow_right" no-caps @click="$refs.kpanels.goTo('node')")
+        .col.scroll.bg-grey-4
+          .row.full-width.justify-center
+            node-masonry(key="top" :nodes="$nodesDistinct(nodes[0])").full-width.justify-center
+      //- node in the middle
+      q-tab-panel(name="node" :style=`{padding: '0px', background: 'none', maxWidth: '100%'}`)
+        .col
+          //- div(:class=`{'q-pt-md': isDesktop}`).row.full-width.justify-center.items-start
+          div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-md
+            node-css(v-if="node" :node="node" maxHeight='60vh' :needFull="true" :index="0" @nodeFull="nodeFullLoaded" :active="true"
+              :style=`{borderRadius: '4px', maxWidth: '500px'}`).bg-white.q-mt-md
+      //- bottom fragment on the right
+      q-tab-panel(name="bottom" :style=`{padding: '0px'}` v-if="!isDesktop").column.fit
+        div(:style=`{height: '50px'}`).row.full-width.items-center.justify-between.bg-grey-4.q-px-sm
+          q-btn(round flat icon="keyboard_arrow_left" no-caps @click="$refs.kpanels.goTo('node')")
+          .col
+          span.text-bold.q-mr-xs Ядра на нижний фрагмент
+        .col.scroll.bg-grey-4
+          .row.full-width.justify-center
+            node-masonry(key="bottom" :nodes="$nodesDistinct(nodes[1])" @nodeClick="nodeClick").full-width.justify-center
+  //- desktop view
+  div(v-if="isDesktop").col.full-height.bg-grey-4
+    .column.fit
+      div(body-scroll-lock-ignore).col.scroll.q-pt-md
+        node-masonry(key="desktop" :nodes="$nodesDistinct([...nodes[0], ...nodes[1]])" @nodeClick="nodeClick")
 </template>
 
 <script>
+import node from 'components/node'
+import nodeCss from 'components/node/node_css'
+import nodeMasonry from 'components/node_masonry'
+// TODO: cant click in mobile mode...
+// TODO: on hover event on node fragment
+// TODO: fragment menu? in masonry
+// TODO: reuse node component?
+// TODO: filter in desktop mode nodes width fragments...
+// TODO: how to navigate withing top and bottom fragments?
+// TODO: how to navigate back?
+// TODO: clicking on the same node route adress route doesnt goes to node tab...
 export default {
   name: 'nodeExplorer',
-  props: ['width', 'height', 'node'],
+  components: {node, nodeCss, nodeMasonry},
   data () {
     return {
-      nodes: [],
-      name: '',
-      lefts: [0, 0],
-      isScrolling: false,
-      isTweening: false,
-      fragmentCurrentIndex: 0
+      tab: 'node',
+      node: null,
+      needFull: false,
+      nodeFull: null,
+      active: false,
+      nodes: [[], []],
+      nodesCurrent: [null, null]
     }
   },
   computed: {
-    getHeight () {
-      return this.height - 50
-    },
-    getWidth () {
-      let w = this.width
-      if (w >= 400) return 400
-      else return w - 30
-    },
-    getName () {
-      if (this.node) return this.node.name
-      else return null
-    },
-    getLeft () {
-      return (this.width / 2) - (this.getWidth / 2)
-    },
-    getTop () {
-      return (this.height / 2) + 50
-    },
-    getBottom () {
-      return (this.height / 2) + 50
-    },
-    getRadius () {
-      return 8
-    },
-    getFragmentMaxHeight () {
-      return (this.height - 50 - 100) / 2
-    },
-    getWrapper () {
-      let w = this.$refs.wrapper
-      if (w) return w[0]
-      else return null
+    isDesktop () {
+      return this.$q.screen.width > 850
     }
   },
   watch: {
-    isScrolling: {
-      handler (to, from) {
-        if (to === false) {
-          this.$log('scroll END')
-          this.isTweening = true
-          this.$tween.to(
-            this.$refs.kslideswrapper,
-            0.5,
-            {
-              scrollLeft: this.getWidth * (this.fragmentCurrentIndex),
-              onComplete: (e) => {
-                this.isTweening = false
-                this.$log('tween DONE')
-              }
-            })
+    '$route': {
+      immediate: true,
+      async handler (to, from) {
+        if (to.params.oid) {
+          this.$log('$route CHANGED', to.params.oid)
+          this.tab = 'node'
+          this.node = null
+          this.active = false
+          this.node = await this.nodeLoad(to.params.oid)
+          this.needFull = false
+          await this.$wait(100)
+          this.needFull = true
+        }
+      }
+    },
+    'tab': {
+      async handler (to, from) {
+        this.$log('tab CHANGED', to)
+        if (to === 'node') {
+          this.active = false
+          await this.$wait(100)
+          this.active = true
         }
       }
     }
   },
   methods: {
-    async scrolled (ms) {
-      await this.$wait(ms)
-      this.isScrolling = false
+    fragmentInput (f) {
+      let oid = f.content.oid
+      let points = f.relativePoints
+      points.map(p => (delete p['__typename']))
+      let scale = f.relativeScale
+      return {oid, relativePoints: points, relativeScale: scale}
     },
-    onScroll (e, index) {
-      this.$log('onScroll', e, index)
-      if (this.isTweening) return
-      let i = Math.round(e.position / this.getWidth)
-      this.$log('i', i)
-      this.fragmentCurrentIndex = i
-      if (!this.isScrolling) this.scrolled(500)
-      this.isScrolling = true
+    async fragmentNodes (fragment) {
+      this.$log('fragmentNodes start', fragment)
+      let { data: { fragmentTopNodes } } = await this.$apollo.query({
+        query: gql`
+          query fragmentTopNodes($fragment: FragmentInput!) {
+            fragmentTopNodes(fragment: $fragment) {
+              objectShort {
+                oid
+                type
+                name
+                createdAt
+                thumbUrl(preferWidth: 600)
+              }
+              fragments {
+                fragmentIndx
+                relativeScale
+                relativePoints {
+                  x
+                }
+              }
+            }
+          }
+        `,
+        variables: {
+          fragment: fragment
+        }
+      })
+      this.$log('fragmentNodes done', fragmentTopNodes)
+      return fragmentTopNodes.map(n => n.objectShort)
+      // return fragmentTopNodes
     },
-    fragmentClick (f) {
-      this.$log('fragmentClick', f)
-      // if this fragment is current watch it
-      // else make this fragment current / and then tween to it..
-      // in a special function?
+    async nodesLoad () {
+      this.$log('nodesLoad start')
+      let nodes = [
+        await this.fragmentNodes(this.fragmentInput(this.nodeFull.fragments[0])),
+        await this.fragmentNodes(this.fragmentInput(this.nodeFull.fragments[1]))
+      ]
+      this.$log('nodesLoad done', nodes)
+      return nodes
     },
-    goBack () {
-      this.$log('goBack')
-      this.$emit('close')
-      // explore chains
-      // explore sphere
-      // explore content
-      // explore fragment/node
-      // commit to chain...
+    nodeClick (n, ni) {
+      this.$log('nodeClick', n, ni)
+      // this.$q.notify('nodeClick')
+      this.$router.push(`/app/node/${n.oid}`)
+    },
+    async nodeFullLoaded (n) {
+      this.$log('nodeFullLoaded')
+      this.nodeFull = n
+      this.nodes = await this.nodesLoad()
+      this.nodesCurrent = [this.nodes[0][0]['oid'], this.nodes[1][0]['oid']]
+      this.active = true
+    },
+    async nodeLoad (oid) {
+      this.$log('nodeLoad start')
+      let { data: { objectList: [node] } } = await this.$apollo.query({
+        query: gql`
+          query getExtendedNodesProps($oid: OID!) {
+            objectList(oids: [$oid]) {
+              oid
+              type
+              name
+              createdAt
+              thumbUrl(preferWidth: 600)
+            }
+          }
+        `,
+        variables: {
+          oid: oid
+        },
+        fetchPolicy: 'cache-first'
+      })
+      this.$log('nodeLoad done', node.name)
+      return node
     }
   },
   mounted () {

@@ -1,23 +1,17 @@
 <template lang="pug">
-.row.full-width.justify-center.q-pa-sm.bg-grey-4
-  div(
-    :style=`{columnCount: getColumns, columnFill: 'balance'}`).justify-center.full-width
-    //- div( @click="nodeClick(n, ni)")
-    node(
-      v-for="(n, ni) in nodes" :key="n.oid"
-      :node="n" noHeader noActions noSpheres
-      :style=`{maxHeight: '300px', maxWidth: '200px'}`).q-mb-md
+.row.full-width.justify-center.q-pt-md.bg-grey-4
+  node-masonry(:nodes="nodes").full-width
 </template>
 
 <script>
-import node from 'components/node'
+import nodeMasonry from 'components/node_masonry'
 
 export default {
   name: 'userNodes',
   props: {
     user: {type: Object}
   },
-  components: {node},
+  components: {nodeMasonry},
   data () {
     return {
       nodes: []

@@ -8,5 +8,6 @@ export default {
   },
   version: 0,
   synced: false,
-  syncing: false
+  syncing: false,
+  fork: null
 }

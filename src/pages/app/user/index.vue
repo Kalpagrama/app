@@ -1,17 +1,18 @@
 <template lang="pug">
-.row.full-width.justify-center.q-py-md.bg-white
-  //- div(style=`borderRadius: 4px`).row.full-width.justify-center.q-px-md.bg-white
-  div(v-if="user" style=`height: 180px; maxWidth: 800px`).row.full-width.q-px-sm
+.column.full-width.window-height
+  div(v-if="user" style=`height: 100px; maxWidth: 800px`).row.full-width.q-px-sm
     //- avatar big
-    div(v-if="$q.screen.width > 500" style=`width: 180px`).row.full-height.items-center.justify-center
-      div(style=`width: 100px; height: 100px; borderRadius: 50%`).row.bg-grey-3
+    div(v-if="user" style=`width: 100px`).row.full-height.items-center.justify-center
+      img(style=`width: 60px; height: 60px; borderRadius: 50%; oveflow: hidden` @error="avatarError"
+        :src="user.thumbUrl[0]").row.bg-grey-3
     .col
       .row.fit.items-center.content-center
         h6.text-bold.q-ma-sm.q-px-sm {{user.name}}
         //- account actions
-        div(style=`height: 40px`).row.full-width.items-center
+        div(v-if="false" style=`height: 40px`).row.full-width.items-center
+          q-btn(v-if="false" flat icon="add" no-caps color="grey-9" @click="$router.push(`/app/create/node`)").q-px-sm Создать ядро
           //- add menu
-          q-btn(round flat color="grey-6" no-caps icon="add").q-mr-xs
+          q-btn(v-if="false" round flat color="grey-6" no-caps icon="add").q-mr-xs
             q-popup-proxy(position="bottom" auto-close anchor="bottom right" self="top right")
               div(
                 :style=`{maxWidth: $q.screen.width < 451 ? '100%' : '230px'}`
@@ -26,16 +27,16 @@
                 div(v-if="$q.screen.width < 451" :style=`{height: '50px', borderRadius: '4px'}`
                   ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
                   span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
-          //- settings
-          q-btn(round flat color="grey-6" no-caps icon="edit" @click="$router.push({params: {page: 'settings'}})").q-mr-xs
           //- share menu
-          q-btn(round flat color="grey-6" no-caps icon="share").q-mr-xs
+          q-btn(v-if="false" round flat color="grey-6" no-caps icon="share").q-mr-xs
             q-menu(auto-close)
               div(style=`width: 240px`).row
                 div(style=`height: 50px`).row.full-width.items-center.q-px-md.hr.cursor-pointer
                   span share user menu
+          //- settings
+          q-btn(v-if="false" round flat color="grey-6" no-caps icon="edit" @click="$router.push({params: {page: 'settings'}})").q-mr-xs
         //- account pages
-        div(style=`height: 50px`).row.full-width.items-center
+        div(style=`height: 50px` v-if="false").row.full-width.items-center
           q-btn(
             v-for="(p, pi) in getPages" :key="p.id" v-if="!p.hidden"
             @click="pageClick(p, pi)"
@@ -43,12 +44,13 @@
             flat rounded no-caps).q-mr-sm
               span.text-bold {{p.name}}
   //- account pages
-  div(v-if="user && page").row.full-width
-    keep-alive
-      user-settings(v-if="page.id === 'settings'" :user="user")
-      user-nodes(v-if="page.id === 'nodes'" :user="user")
-      user-chains(v-if="page.id === 'chains'" :user="user")
-      user-workspace(v-if="page.id === 'workspace'" :user="user")
+  .col.scroll
+    user-nodes(v-if="user" :user="user")
+    //- keep-alive
+    //-   user-settings(v-if="page.id === 'settings'" :user="user")
+    //-   user-nodes(v-if="page.id === 'nodes'" :user="user")
+    //-   user-chains(v-if="page.id === 'chains'" :user="user")
+    //-   user-workspace(v-if="page.id === 'workspace'" :user="user")
 </template>
 
 <script>
@@ -89,14 +91,15 @@ export default {
         // if (to.params.oid === from.params.oid) return
         if (to.params.oid) {
           if (!this.user) this.user = await this.userLoad(to.params.oid)
-          if (to.params.page) {
-            let pageFind = this.getPages.find(p => (p.id === to.params.page))
-            this.$log('pageFind', pageFind)
-            if (pageFind) this.page = pageFind
-            // else this.$router.push({params: {page: 'nodes'}})
-          } else {
-            // this.$router.push({params: {page: 'nodes'}})
-          }
+          this.page = this.getPages[0]
+          // if (to.params.page) {
+          //   let pageFind = this.getPages.find(p => (p.id === to.params.page))
+          //   this.$log('pageFind', pageFind)
+          //   if (pageFind) this.page = pageFind
+          //   // else this.$router.push({params: {page: 'nodes'}})
+          // } else {
+          //   // this.$router.push({params: {page: 'nodes'}})
+          // }
         } else {
           this.$log('NO USER OID!')
         }
@@ -113,7 +116,7 @@ export default {
               oid
               type
               name
-              thumbUrl(preferWidth: 600)
+              thumbUrl(preferWidth: 50)
               createdAt
             }
           }
@@ -149,6 +152,10 @@ export default {
           break
         }
       }
+    },
+    avatarError (e) {
+      // this.$log('avatarError', e)
+      e.target.src = 'statics/logo.png'
     }
   },
   mounted () {

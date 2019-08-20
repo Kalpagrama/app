@@ -1,55 +1,56 @@
 <template lang="pug">
-.column.fit
-  div(style=`height: 60px; borderBottom: 1px solid #eee`
-    ).row.full-width.items-center.content-center.q-px-sm
-    div(style=`height: 35px; width: 35px; borderRadius: 50%`).row.items-center.justify-center.bg-primary
-      q-icon(name="vertical_align_center" size="20px" color="white")
-    .col
-      span.q-mx-md kalpa
-  //- div(style=`height: 60px; borderBottom: 1px solid #eee`
-  //-   ).row.full-width.items-center.bg-white.q-px-sm
-  //-   div(style=`height: 35px; width: 35px; borderRadius: 50%`).row.items-center.justify-center.bg-grey-3
-  //-     q-icon(name="face" size="20px" color="primary")
-  //-   .col.q-px-md
-  //-     span {{ $store.state.auth.user.name | cut(40) }}
-  //- body
+.column.window-height.full-width
+  //- header
+  div(:style=`{height: '60px'}`).row.full-width.items-center
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      q-btn(round flat color="grey-6" @click="$router.push('/app/home')")
+        template(v-slot:default)
+          img(:src="`statics/logo.png`" width="40px" height="40px")
+    div(v-if="!mini").col
+      span(:style=`{fontSize: '18px'}`) Кальпаграмма
   .col.scroll
-    div(v-for="(m, mi) in getPages" :key="m.id" @click="menuItemClick(m, mi)"
-      :style=`{height: '40px'}`
-        ).row.full-width.items-center.hr.cursor-pointer
-      div(style=`height: 40px; width: 50px`).row.items-center.justify-center
-        q-icon(:name="m.icon" size="24px" color="grey")
-        q-tooltip {{ m.name }}
-      span {{ m.name }}
+    div(:style=`{height: '60px'}` @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)").row.full-width.items-center.hr.cursor-pointer
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(v-if="$store.state.auth.user" round flat color="grey-6" @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)")
+          q-tooltip {{$store.state.auth.user.name}}
+          template(v-slot:default)
+            img(:src="$store.state.auth.user.thumbUrl[0]" width="36px" height="36px" :style=`{borderRadius: '50%'}`)
+      div(v-if="!mini").col
+        span(v-if="$store.state.auth.user") {{$store.state.auth.user.name}}
+    div(:style=`{height: '60px'}` @click="$router.push(`/app/create/node`)").row.full-width.items-center.hr.cursor-pointer
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(icon="add" round flat color="grey-9")
+          q-tooltip Создать ядро
+      div(v-if="!mini").col
+        span Создать ядро
     //- refresh
-    div(@click="refresh").row.full-width.items-center.hr.cursor-pointer
-      div(style=`height: 40px; width: 50px`).row.items-center.justify-center
-        q-icon(name="refresh" size="24px" color="grey")
-        q-tooltip {{$t('clear_cache')}}
-      span {{$t('clear_cache')}}
+    div(:style=`{height: '60px'}` @click="refresh").row.full-width.items-center.hr.cursor-pointer
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(round flat icon="refresh" color="grey-9")
+          q-tooltip Обновить
+      div(v-if="!mini").col
+        span {{$t('Обновить')}}
     //- logout
-    div(@click="logout").row.full-width.items-center.hr.cursor-pointer
-      div(style=`height: 40px; width: 50px`).row.items-center.justify-center
-        q-icon(name="power_off" size="24px" color="grey")
-        q-tooltip {{$t('logout')}}
-      span {{$t('logout')}}
-  div(style=`height: 30px; borderTop: 1px solid #eee`).row.full-width.items-center.q-px-md
-    small v0.0.4
+    div(:style=`{height: '60px'}` @click="logout").row.full-width.items-center.hr.cursor-pointer
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(round flat icon="power_off" color="grey-9")
+          q-tooltip Выйти
+      div(v-if="!mini").col
+        span {{$t('Выйти')}}
+    .row.full-width.justify-start
+      div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+        small.text-grey-6 0.0.9
 </template>
 
 <script>
 export default {
   name: 'kMenu',
+  props: ['mini'],
   data () {
     return {
     }
   },
   computed: {
-    getPages () {
-      return this.$store.state.ui.pages.filter(p => {
-        return p.hidden === false && p.desktop === true
-      })
-    }
   },
   methods: {
     userClick () {
@@ -79,18 +80,6 @@ export default {
       this.$router.push('/login')
     }
   },
-  // watch: {
-  //   '$route': {
-  //     deep: true,
-  //     immediate: true,
-  //     handler (to, from) {
-  //       this.$log('$route CHANGED', to.matched)
-  //       if (to.matched[1]) {
-  //         this.$set(this, 'menu', this.menus.find(i => i.id === to.matched[1].name))
-  //       }
-  //     }
-  //   }
-  // },
   mounted () {
     this.$log('mounted')
   },

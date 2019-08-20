@@ -1,20 +1,22 @@
 <template lang="pug">
 .row.full-width.justify-center.bg-grey-4
-  div(:style=`{maxWidth: '500px'}`).row.full-width.q-pt-md
-    node-feed(queryKey="feed")
+  node-feed(queryKey="feed")
+  //- node-masonry(:nodes="nodes" @more="more")
 </template>
 
 <script>
 import nodeFeed from 'components/node_feed'
+import nodeMasonry from 'components/node_masonry'
 
 export default {
   name: 'pageApp__Home',
-  components: { nodeFeed },
+  components: { nodeFeed, nodeMasonry },
   data () {
     return {
+      nodes: [],
       query: gql`
-        query feed {
-          feed(type: NEWS, pagination: {pageSize: 10, pageToken: null} filter: {types:[NODE]} ){
+        query feed($pageToken: RawJSON) {
+          feed(type: NEWS, pagination: {pageSize: 6, pageToken: $pageToken} filter: {types:[NODE]} ){
             count
             totalCount
             nextPageToken
@@ -31,6 +33,11 @@ export default {
       variables: {
         oid: this.$store.state.auth.user.oid
       }
+    }
+  },
+  methods: {
+    more () {
+      this.$log('more')
     }
   },
   mounted () {

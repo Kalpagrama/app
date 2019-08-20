@@ -1,7 +1,7 @@
 <template lang="pug">
 div(style=`position: relative; overflowX: hidden`).column.full-width.window-height.bg-white
   //- debug
-  div(v-if="true && !loading" :style=`{position: 'fixed', zIndex: 10000, right: '0px', top: '50%', width: '300px', color: 'white', fontSize: '11px'}`).row.scroll.bg-purple.q-pa-xs
+  div(v-if="false && !loading" :style=`{position: 'fixed', zIndex: 10000, right: '0px', top: '50%', width: '300px', color: 'white', fontSize: '11px'}`).row.scroll.bg-purple.q-pa-xs
     small.full-width {{fragment.content.duration}}
     span.full-width startSec {{startSec}}
     span.full-width endSec {{endSec}}
@@ -10,6 +10,8 @@ div(style=`position: relative; overflowX: hidden`).column.full-width.window-heig
     small.full-width videoWidth/videoWidthOriginal {{videoWidth}}/{{videoWidthOriginal}}
     small.full-width videoHeight/vidoeHeightOriginal {{videoHeight}}/{{videoHeightOriginal}}
     small.full-width framesCount {{framesCount}}
+    small.full-width framesCountNew {{framesCountNew}}
+    small.full-width framesLess {{framesLess}}
     small.full-width frameStartIndex {{frameStartIndex}}
     small.full-width frameWidthMax {{frameWidthMax}}
     //- small.full-width framesStart {{framesStart}}
@@ -27,19 +29,20 @@ div(style=`position: relative; overflowX: hidden`).column.full-width.window-heig
           span(style=`whiteSpace: nowrap`).text-bold {{ fragment.content.name }}
         q-btn(round flat color="grey-9" icon="link" @click="contentLinkClick()").q-ml-sm
       //- body
-      .col.q-pa-sm
+      div(:style=`{padding: '10px'}`).col
         div(:style=`{position: 'relative'}`).row.fit.justify-center
           //- video wrapper
           video(ref="kvideo"
             :style=`{height: videoHeight+'px', width: videoWidth+'px', objectFit: 'contain'}`
             playsinline preload="auto" crossorigin="Anonymous"
             type="video/mp4" :src="fragment.content.url").bg-white
+          //- img(v-if="preview" :src="preview")
           //- actions
           div(v-if="true" :style=`{position: 'absolute', zIndex: 100, bottom: '10px', height: '50px'}`).row.full-width.justify-center.items-center.q-px-sm
             div(:style=`{width: videoWidth+'px'}`).row.justify-center.items-center
-              q-btn(style=`height: 40px; width: 110px` dense color="primary" @click="refresh" no-caps).q-mr-sm
+              q-btn(style=`height: 40px; width: 100px` dense color="primary" @click="refresh" no-caps).q-mr-sm
                 span.text-bold {{'В начало'}}
-              q-btn(style=`height: 40px` :outline="!loop" no-caps icon="refresh" color="primary" @click="toggleLoop").q-mr-sm
+              q-btn(style=`height: 40px; width: 40px` :outline="!loop" no-caps icon="refresh" color="primary" @click="toggleLoop").q-mr-sm
               q-btn(style=`height: 40px; width: 110px` :outline="mute" no-caps color="primary" @click="toggleMute")
                 span.text-bold {{mute ? 'Без звука' : 'Со звуком'}}
       //- fragments wrapper
@@ -54,7 +57,7 @@ div(style=`position: relative; overflowX: hidden`).column.full-width.window-heig
                 v-for="(f, fi) in frames" :key="fi"
                 :style=`{width: frameWidth+'px', height: '50px', overflow: 'hidden'}`
                 ).row.items-center.justify-center.bg-grey-4
-                img(height="50px" :src="f" draggable="false")
+                img(height="50px" :src="f" draggable="false" :style=`{objectFit: 'cover'}`)
             //- frame
             div(
               :style=`{position: 'absolute', zIndex: 90, left: secToPx(startSec)+'px', top: '-5px', width: secToPx(endSec-startSec)+'px',
@@ -117,6 +120,8 @@ div(style=`position: relative; overflowX: hidden`).column.full-width.window-heig
 </template>
 
 <script>
+// TODO: when seeking with video controls and more than endSec...
+
 export default {
   name: 'videoEditor',
   meta: {
@@ -144,7 +149,9 @@ export default {
   },
   computed: {
     videoWidthMax () {
-      return this.$q.screen.width - 100
+      let w = this.$q.screen.width
+      if (w < 600) return w - 20
+      else return w - 100
     },
     videoHeightMax () {
       return this.$q.screen.height - 60 - 150 - 66 - 20
@@ -166,19 +173,32 @@ export default {
       return this.videoHeightMax
     },
     frames () {
-      return this.fragment.content.frameUrls || []
+      // return this.fragment.content.frameUrls || []
+      if (!this.fragment.content.frameUrls) return []
+      // let newCount = this.framesWidth / this.frameWidth
+      return this.fragment.content.frameUrls.filter((f, i) => {
+        return i % this.framesLess === 0
+        // return i % 10 === 0
+      })
     },
     framesWidth () {
       return this.secToPx(this.fragment.content.duration)
     },
+    framesLess () {
+      return Math.floor(this.framesCount / this.framesCountNew)
+    },
+    framesCountNew () {
+      return Math.floor(this.framesWidth / this.frameWidth)
+    },
     framesCount () {
-      return this.frames.length
+      return this.fragment.content.frameUrls.length
     },
     frameWidthMax () {
       return Math.floor((this.videoWidthOriginal * 50) / this.videoHeightOriginal)
     },
     frameWidth () {
-      return this.framesWidth / this.framesCount
+      // return this.framesWidth / this.framesCount
+      return this.frameWidthMax / 3
     },
     frameSec () {
       return this.pxToSec(this.frameWidth)
@@ -290,6 +310,7 @@ export default {
     },
     goBackClick () {
       this.$log('goBackClick')
+      this.handleReady()
     },
     pxToSec (px) {
       return px * this.fragmentLengthMax / this.videoWidth
@@ -306,10 +327,11 @@ export default {
       }
     },
     seeked (e) {
-      // this.$log('seeked', e)
+      this.$log('seeked')
       if (this.dragging) return
       let nextStartSec = this.player.currentTime
       if (nextStartSec >= this.endSec) {
+        this.$log('seeked MORE THAN END SEC', nextStartSec, this.endSec)
         this.startSec = this.player.currentTime
         let newEndSec = this.startSec + this.fragmentLengthMax
         if (this.startSec + newEndSec > this.fragment.content.duration) {
@@ -318,9 +340,11 @@ export default {
           this.endSec = newEndSec
         }
       } else {
-        // this.startSec = this.player.currentTime
+        this.$log('seeked LESS THAN END SEC', nextStartSec, this.endSec)
+        // this.startSec = nextStartSec
         // let d = this.endSec - this.startSec
         // if (d >= this.fragmentLengthMax) {
+        //   // this.$log('seeked ')
         //   this.endSec = this.startSec + this.fragmentLengthMax
         // }
       }
@@ -396,36 +420,6 @@ export default {
         this.player.setCurrentTime(newEndSec - 2)
       }
     },
-    totalDrag (e) {
-      this.startDrag(e)
-      this.endDrag(e)
-    },
-    startTickLeft () {
-      this.$log('startTickLeft')
-      let newStartSec = this.startSec - 0.100
-      if (this.endSec - newStartSec > this.fragmentLengthMax) this.startSec = this.endSec - this.fragmentLengthMax
-      else if (newStartSec >= 0) this.startSec = newStartSec
-      else if (newStartSec < 0) this.startSec = 0
-    },
-    startTickRight () {
-      this.$log('startTickRight')
-      let newStartSec = this.startSec + 0.100
-      if (this.endSec - newStartSec > this.fragmentLengthMax) this.startSec = this.endSec - this.fragmentLengthMax
-      else if (newStartSec < this.endSec && newStartSec < this.fragment.content.duration) this.startSec = newStartSec
-    },
-    endTickLeft () {
-      this.$log('endTickLeft')
-      let newEndSec = this.endSec - 0.100
-      if (newEndSec - this.startSec > this.fragmentLengthMax) this.endSec = this.startSec + this.fragmentLengthMax
-      else if (newEndSec > this.startSec && newEndSec > 0) this.endSec = newEndSec
-    },
-    endTickRight () {
-      this.$log('endTickRight')
-      let newEndSec = this.endSec + 0.100
-      if (newEndSec - this.startSec > this.fragmentLengthMax) this.endSec = this.startSec + this.fragmentLengthMax
-      else if (newEndSec <= this.fragment.content.duration) this.endSec = newEndSec
-      else if (newEndSec > this.fragment.content.duration) this.endSec = this.fragment.content.duration
-    },
     async getVideo (oid) {
       this.$log('getVideo start')
       console.time('getVideo')
@@ -497,6 +491,7 @@ export default {
     this.$log('mounted start')
     this.loading = true
     // set startSec & endSec
+    // TODO: move startSec and endSec to computed props
     if (this.fragment.relativePoints && this.fragment.relativePoints.length > 0) {
       this.startSec = this.fragment.relativePoints[0]['x']
       this.endSec = this.fragment.relativePoints[1]['x']

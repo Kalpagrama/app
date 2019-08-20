@@ -14,7 +14,7 @@
     "dev_pwa": "quasar dev -m pwa",
     "dev_cordova": "quasar dev -m cordova",
     "dev_electron": "quasar dev -m electron",
-    "build": "quasar build",
+    "build": "quasar build -m pwa",
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",
     "build_cordova": "quasar build -m cordova",
@@ -52,6 +52,7 @@
     "vue-apollo": "^3.0.0-beta.28",
     "vue-carousel-3d": "^0.2.0",
     "vue-i18n": "^7.3.3",
+    "vue-masonry-css": "^1.0.3",
     "vue-observe-visibility": "^0.4.4",
     "vue-virtual-scroller": "^1.0.0-rc.2",
     "vuex-router-sync": "^5.0.0"

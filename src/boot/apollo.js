@@ -1,5 +1,5 @@
 const debug = require('debug')('[boot]:apollo')
-// debug.enabled = true
+debug.enabled = true
 import { Notify } from 'quasar'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
@@ -41,7 +41,8 @@ export default async ({ Vue, store, app }) => {
   // apollo
   Vue.use(VueApollo)
   let SERVICES_URL = process.env.SERVICES_URL || 'http://api.kalpagramma.com/graphql'
-  // debug('SERVICES_URL', SERVICES_URL)
+  // let SERVICES_URL = 'https://backend-compose.kalpagramma.com/graphql'
+  debug('SERVICES_URL', SERVICES_URL)
   store.commit('auth/state', ['SERVICES_URL', SERVICES_URL])
   let { data: {data: {services}}, error } = await axios.post(SERVICES_URL, {query: `query { services }`})
   if (error) {
