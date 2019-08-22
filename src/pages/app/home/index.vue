@@ -1,7 +1,7 @@
 <template lang="pug">
-.row.full-width.justify-center.bg-grey-4
-  node-feed(queryKey="feed")
-  //- node-masonry(:nodes="nodes" @more="more")
+.column.fit.bg-grey-2
+  div(body-scroll-lock-ignore).col.full-width.scroll.q-pt-md
+    node-feed(queryKey="feed")
 </template>
 
 <script>

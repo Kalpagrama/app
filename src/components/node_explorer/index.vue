@@ -1,43 +1,30 @@
 <template lang="pug">
 .row.fit
-  div(:style=`{maxWidth: isDesktop ? '600px' : '100%'}`).col.full-height
+  div(:style=`{maxWidth: isDesktop ? '500px' : '100%'}`).col.full-height
     q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
-      //- top fragment on the left
-      q-tab-panel(name="top" :style=`{padding: '0px', background: 'none'}` v-if="!isDesktop").column.fit
-        div(:style=`{height: '50px'}`).row.full-width.items-center.justify-between.bg-grey-4.q-px-sm
-          span.text-bold.q-ml-xs Ядра на верхний фрагмент
-          .col
-          q-btn(round flat icon="keyboard_arrow_right" no-caps @click="$refs.kpanels.goTo('node')")
-        .col.scroll.bg-grey-4
-          .row.full-width.justify-center
-            node-masonry(key="top" :nodes="$nodesDistinct(nodes[0])").full-width.justify-center
-      //- node in the middle
+      //- node on the left
       q-tab-panel(name="node" :style=`{padding: '0px', background: 'none', maxWidth: '100%'}`)
-        .col
-          //- div(:class=`{'q-pt-md': isDesktop}`).row.full-width.justify-center.items-start
-          div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-md
-            node-css(v-if="node" :node="node" maxHeight='60vh' :needFull="true" :index="0" @nodeFull="nodeFullLoaded" :active="true"
-              :style=`{borderRadius: '4px', maxWidth: '500px'}`).bg-white.q-mt-md
-      //- bottom fragment on the right
-      q-tab-panel(name="bottom" :style=`{padding: '0px'}` v-if="!isDesktop").column.fit
-        div(:style=`{height: '50px'}`).row.full-width.items-center.justify-between.bg-grey-4.q-px-sm
-          q-btn(round flat icon="keyboard_arrow_left" no-caps @click="$refs.kpanels.goTo('node')")
-          .col
-          span.text-bold.q-mr-xs Ядра на нижний фрагмент
-        .col.scroll.bg-grey-4
-          .row.full-width.justify-center
-            node-masonry(key="bottom" :nodes="$nodesDistinct(nodes[1])" @nodeClick="nodeClick").full-width.justify-center
+        .column.fit
+          //- div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm.bg-grey-1
+          //-   .col
+          //-   q-btn(flat style=`width: 40px; height: 40px` color="grey-9" icon="more_vert")
+          .col.full-width.scroll.bg-grey-2
+            div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-md
+              node-css(v-if="node" :node="node" maxHeight='60vh' :needFull="true" :index="0" @nodeFull="nodeFullLoaded" :active="true"
+                :style=`{borderRadius: '4px', maxWidth: '500px'}`).bg-white.q-mt-md
+      //- fragments
+      q-tab-panel(name="fragments" :style=`{padding: '0px'}` v-if="!isDesktop")
+        nodes(v-if="nodeFull" :node="node" :nodeFull="nodeFull" :nodes="nodes")
   //- desktop view
   div(v-if="isDesktop").col.full-height.bg-grey-4
-    .column.fit
-      div(body-scroll-lock-ignore).col.scroll.q-pt-md
-        node-masonry(key="desktop" :nodes="$nodesDistinct([...nodes[0], ...nodes[1]])" @nodeClick="nodeClick")
+    nodes(v-if="nodeFull" :node="node" :nodeFull="nodeFull" :nodes="nodes")
 </template>
 
 <script>
 import node from 'components/node'
 import nodeCss from 'components/node/node_css'
 import nodeMasonry from 'components/node_masonry'
+import nodes from './nodes'
 // TODO: cant click in mobile mode...
 // TODO: on hover event on node fragment
 // TODO: fragment menu? in masonry
@@ -48,7 +35,7 @@ import nodeMasonry from 'components/node_masonry'
 // TODO: clicking on the same node route adress route doesnt goes to node tab...
 export default {
   name: 'nodeExplorer',
-  components: {node, nodeCss, nodeMasonry},
+  components: {node, nodeCss, nodeMasonry, nodes},
   data () {
     return {
       tab: 'node',
@@ -72,7 +59,7 @@ export default {
         if (to.params.oid) {
           this.$log('$route CHANGED', to.params.oid)
           this.tab = 'node'
-          this.node = null
+          // this.node = null
           this.active = false
           this.node = await this.nodeLoad(to.params.oid)
           this.needFull = false
@@ -128,8 +115,11 @@ export default {
         }
       })
       this.$log('fragmentNodes done', fragmentTopNodes)
-      return fragmentTopNodes.map(n => n.objectShort)
       // return fragmentTopNodes
+      // return fragmentTopNodes.map(n => n.objectShort)
+      return fragmentTopNodes.map(n => {
+        return {fragmentsPoints: n.fragments, ...n.objectShort}
+      })
     },
     async nodesLoad () {
       this.$log('nodesLoad start')
@@ -146,7 +136,7 @@ export default {
       this.$router.push(`/app/node/${n.oid}`)
     },
     async nodeFullLoaded (n) {
-      this.$log('nodeFullLoaded')
+      this.$log('nodeFullLoaded', n)
       this.nodeFull = n
       this.nodes = await this.nodesLoad()
       this.nodesCurrent = [this.nodes[0][0]['oid'], this.nodes[1][0]['oid']]
@@ -183,3 +173,6 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+</style>

@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.full-width.window-height
+.column.fit
   div(v-if="user" style=`height: 100px; maxWidth: 800px`).row.full-width.q-px-sm
     //- avatar big
     div(v-if="user" style=`width: 100px`).row.full-height.items-center.justify-center
@@ -44,7 +44,7 @@
             flat rounded no-caps).q-mr-sm
               span.text-bold {{p.name}}
   //- account pages
-  .col.scroll
+  .col.scroll.full-width
     user-nodes(v-if="user" :user="user")
     //- keep-alive
     //-   user-settings(v-if="page.id === 'settings'" :user="user")
@@ -90,7 +90,7 @@ export default {
         // load user
         // if (to.params.oid === from.params.oid) return
         if (to.params.oid) {
-          if (!this.user) this.user = await this.userLoad(to.params.oid)
+          this.user = await this.userLoad(to.params.oid)
           this.page = this.getPages[0]
           // if (to.params.page) {
           //   let pageFind = this.getPages.find(p => (p.id === to.params.page))

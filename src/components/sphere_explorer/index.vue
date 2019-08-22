@@ -3,49 +3,43 @@
   div(:style=`{maxWidth: isDesktop ? '500px' : '100%'}`).col.full-height
     q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
       //- spheres
-      q-tab-panel(name="sphere" :style=`{padding: '0px', background: 'none'}`).column.fit
-        div(:style=`{height: '60px'}`).row.full-width.items-center.scroll.q-pr-sm
-          .col
-            .row.fit.scroll
-              h4(:style=`{whiteSpace: 'nowrap'}`).q-pa-xs.q-ma-xs {{`#${sphere.name}`}}
-          q-btn(
-            v-if="!isDesktop"
-            icon-right="keyboard_arrow_right" no-caps flat dense color="grey-9"
-            @click="$refs.kpanels.goTo('nodes')").row.items-center {{nodes.length}} nodes
-        div(v-if="false" :style=`{height: '40px'}`).row.full-width.justify-end.q-px-sm
-          //- span sphere actions
-          q-btn(round flat dense color="grey-9" icon="search")
-          q-btn(round flat dense color="grey-9" icon="more_vert")
-        //- spheres
-        .col.scroll
-          div.row.full-width.q-px-sm.q-pt-md
-            div(v-for="(s, si) in spheres" :key="s.oid" @click="sphereClick(s, si)"
-              :style=`{borderRadius: '4px'}`
-              ).bg-grey-5.q-pa-xs.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
-              span(:style=`{whiteSpace: 'nowrap'}`) {{`#${s.name}` | cut(40)}}
+      q-tab-panel(name="sphere" :style=`{padding: '0px', background: 'none'}`)
+        .column.fit
+          //- header
+          div(:style=`{height: '60px'}`).row.full-width.items-center.scroll.q-px-sm.bg-grey-1
+            h4(:style=`{whiteSpace: 'nowrap'}`).q-pa-xs.q-ma-xs {{`#${sphere.name}`}}
+          //- tools
+          div(v-if="false" :style=`{height: '40px'}`).row.full-width.items-center.justify-end.q-px-sm.bg-grey-1
+            q-btn(flat color="grey-9" style=`width: 40px; height: 40px` icon="search")
+            q-btn(flat color="grey-9" style=`width: 40px; height: 40px` icon="more_vert")
+            q-btn(flat color="grey-9" style=`height: 40px` icon-right="keyboard_arrow_right" no-caps ) {{nodes.length}} nodes
+          //- spheres
+          div(body-scroll-lock-ignore).col.scroll.full-width.bg-grey-2
+            div.row.full-width.q-px-md.q-pt-md
+              div(v-for="(s, si) in spheres" :key="s.oid" @click="sphereClick(s, si)"
+                :style=`{borderRadius: '4px'}`
+                ).bg-grey-5.q-pa-xs.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
+                span(:style=`{whiteSpace: 'nowrap'}`) {{`#${s.name}` | cut(40)}}
+          div(v-if="true" style=`height: 60px`).row.full-width.items-center.justify-end.q-px-sm
+            q-btn(color="primary" icon-right="keyboard_arrow_right" no-caps
+              @click="$refs.kpanels.goTo('nodes')") {{nodes.length}} nodes
       //- nodes
-      q-tab-panel(name="nodes" :style=`{padding: '0px'}` v-if="!isDesktop").column.fit
-        div(:style=`{height: '50px'}`).row.full-width.items-center.justify-between.bg-grey-4.q-pl-sm
-          q-btn(v-if="!isDesktop" dense flat icon="keyboard_arrow_left" color="grey-9" no-caps @click="$refs.kpanels.goTo('sphere')")
-            span {{spheres.length}} spheres
-        .col.scroll.bg-grey-4
-          .row.full-width.justify-center
-            node-masonry(:nodes="$nodesDistinct(nodes)" @nodeClick="nodeClick").full-width.justify-center
+      q-tab-panel(name="nodes" :style=`{padding: '0px'}` v-if="!isDesktop")
+        nodes(:nodes="nodes" @nodeClick="nodeClick")
   //- desktop
   div(v-if="isDesktop").col.full-height.bg-grey-4
-    .column.fit
-      div(body-scroll-lock-ignore).col.scroll.q-pt-md
-        node-masonry(:nodes="$nodesDistinct(nodes)" @nodeClick="nodeClick")
+    nodes(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>
 // TODO: hide scroll class
 // TODO: node name fontSize dynamic depends on what??
 import nodeMasonry from 'components/node_masonry'
+import nodes from './nodes'
 
 export default {
   name: 'sphereExplorer',
-  components: {nodeMasonry},
+  components: {nodeMasonry, nodes},
   props: ['sphere'],
   data () {
     return {
@@ -134,6 +128,7 @@ export default {
 
 <style lang="stylus" scoped>
 .ksphere:hover {
-  background: red !important
+  background #027BE3 !important
+  color white !important
 }
 </style>

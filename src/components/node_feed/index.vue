@@ -1,18 +1,16 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}` body-scroll-lock-ignore).row.full-width
+div(:style=`{position: 'relative'}`).row.full-width
   q-resize-observer(@resize="onResize")
-  div(v-if="false" :style=`{position: 'fixed', zIndex: 10000, top: '0px', width: width+'px', color: 'white'}`).row.bg-purple.q-pa-sm
-    small.full-width activeNode: {{activeNode}} / visibleNodes: {{visibleNodes}} / itemsCount: {{itemsCount}}
-    small.full-width fullNodes: {{fullNodes}}
   template(v-if="feed && feed.items")
-    div(v-for="(n, ni) in feed.items" :key="n.oid").row.full-width.justify-center.items-start.content-start.q-pt-md
+    div(v-for="(n, ni) in feed.items" :key="n.oid").row.full-width.justify-center.items-start.content-start
       node(
         :index="ni" :node="n" :lang="ni" :title="n.name"
-        :zIndex="200" maxHeight="70vh"
+        :zIndex="200" maxHeight="75vh"
         :needFull="ni >= fullNodes[0] && ni <= fullNodes[1]"
         :active="activeNode ? activeNode[0] === ni : false"
         :class=`{'bg-grey-3': activeNode ? activeNode[0] !== ni : false, 'bg-white': activeNode ? activeNode[0] === ni : false }`
-        :style=`{maxWidth: '500px', borderRadius: '4px'}`
+        :style=`{maxWidth: '500px'}`
+        v-touch-swipe.mouse.left="swipeLeft"
         v-observe-visibility=`{
           callback: nodeVisible,
           throttle: 300,
@@ -20,7 +18,7 @@ div(:style=`{position: 'relative'}` body-scroll-lock-ignore).row.full-width
             threshold: 0.5
           }
         }`
-        ).q-mb-md
+        )
 </template>
 
 <script>
@@ -125,6 +123,9 @@ export default {
     }
   },
   methods: {
+    swipeLeft (e) {
+      this.$log('swipeLeft')
+    },
     onResize (e) {
       // this.$log('onResize width', e.width)
       this.width = e.width

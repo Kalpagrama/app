@@ -1,18 +1,20 @@
 <template lang="pug">
-.row
+.row.full-width
   //- div(:style=`{color: 'white'}`).row.full-width.bg-purple
   //-   small colCount: {{colCount}}
   q-resize-observer(ref="kresize" @resize="onResize")
-  q-scroll-observer(@scroll="onScroll")
-  div(v-if="ready" :style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-start
-    masonry(
-      :cols=`colCount`
-      :gutter="{default: colGap}").row.full-width.justify-start
-      node-css(
-        v-for="(n, ni) in nodes" :key="n.oid" :index="ni" :node="n" maxHeight="80vh"
-        @click.native="$emit('nodeClick', n, ni)" :active="false" :needFull="false"
-        noHeader noActions noSpheres noFragmentMenu
-        :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px', ...getRadius}`).q-mb-md.bg-white
+  //- q-scroll-observer(@scroll="onScroll")
+  div(v-if="ready" :style=`{position: 'relative'}`).row.full-width.justify-center
+    masonry(:cols=`colCount` :gutter="{default: colGap}" :style=`{}`).full-width
+      //- div(
+      //-   v-for="n in 100" :key="n"
+      //-   :style=`{width: '50px', height: '50px'}`).row.bg-red hello
+      div(v-for="(n, ni) in nodes" :key="n.oid").row.items-start.content-start
+        node-css(
+          :index="ni" :node="n" maxHeight="30vh"
+          @click.native="$emit('nodeClick', n, ni)" :active="false" :needFull="false"
+          noHeader noActions noSpheres noFragmentMenu :nameAtTheBottom="nameAtTheBottom"
+          :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px', ...getRadius}`).bg-white.q-mb-md
 </template>
 
 <script>
@@ -26,9 +28,8 @@ export default {
   name: 'nodeMasonry',
   components: {node, nodeCss},
   props: {
-    nodes: {
-      type: Array
-    }
+    nodes: {type: Array},
+    nameAtTheBottom: {type: Boolean}
   },
   data () {
     return {
@@ -40,7 +41,7 @@ export default {
   },
   computed: {
     colWidth () {
-      return 120
+      return 90
     },
     colGap () {
       return 10

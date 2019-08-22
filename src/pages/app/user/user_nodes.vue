@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center.q-pt-md.bg-grey-4
+.row.fit.q-pt-md.bg-grey-4
   node-masonry(:nodes="nodes").full-width
 </template>
 

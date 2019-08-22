@@ -28,23 +28,22 @@
         div(v-if="false").row.full-width.bg-purple
           small width: {{width}}
       //- nodes mobile
-      q-tab-panel(name="nodes" :style=`{padding: '0px'}` v-if="!isDesktop").column.fit
-        .col.scroll.bg-grey-4
-          .row.full-width.justify-center.q-pa-md
-            node-masonry(key="nodes" :nodes="$nodesDistinct(nodes)" @nodeClick="nodeClick").full-width.justify-center
+      q-tab-panel(name="nodes" :style=`{padding: '0px'}` v-if="!isDesktop")
+        content-video-nodes(:nodes="nodes" @nodeClick="nodeClick" @back="$refs.kpanels.goTo('content')")
   //- nodes desktop
   div(v-if="isDesktop").col.full-height.bg-grey-4
-    .column.fit
-      div(body-scroll-lock-ignore).col.scroll.q-pt-md.q-px-md
-        node-masonry(key="desktop" :nodes="$nodesDistinct(nodes)" @nodeClick="nodeClick")
+    content-video-nodes(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>
-import nodeMasonry from 'components/node_masonry'
+import contentVideoNodes from './content_video_nodes'
 
+// TODO: when nodeClick not go to this node? find this node in this content? logic yeah
+// TODO: remember extra information of the route for caching
+// TODO: remembering last route when opens the app again? like node creator?
 export default {
   name: 'contentExplorer__contentVideo',
-  components: {nodeMasonry},
+  components: {contentVideoNodes},
   props: {
     content: {type: Object}
   },
@@ -82,9 +81,12 @@ export default {
     },
     nodeClick (n, ni) {
       this.$log('nodeClick', n, ni)
-      this.$router.push(`/app/node/${n.oid}`)
+      // this.$router.push(`/app/node/${n.oid}`)
       // TODO: open context menu for  desiding what to do
       // TODO: context menu for app?
+      // TODO: what fragment to take? first or second? takes first...
+      if (!this.isDesktop) this.$refs.kpanels.goTo('content')
+      this.player.setCurrentTime(n.fragmentsPoints[0].relativePoints[0]['x'])
     },
     async nodesLoad (oid) {
       this.$log('nodesLoad start')
@@ -112,7 +114,10 @@ export default {
       })
       this.$log('nodesLoad done', nodes)
       // return nodes
-      return nodes.map(n => n.objectShort)
+      // return nodes.map(n => n.objectShort)
+      return nodes.map(n => {
+        return {fragmentsPoints: n.fragments, ...n.objectShort}
+      })
     },
     timeUpdate (e) {
       this.nowSec = this.player.currentTime

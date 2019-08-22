@@ -1,9 +1,9 @@
 <template lang="pug">
-div(:style=`{position: 'relative', zIndex: zIndex+100, ...getRadius, overflow: 'hidden'}`).row.fit.bg-grey-3
+div(:style=`{position: 'relative', zIndex: zIndex+100, ...getRadius, overflow: 'hidden'}`).row.full-width.items-start.bg-grey-3
   //- menu
   q-btn(
     v-if="!noFragmentMenu"
-    round flat icon="more_vert" color="white"
+    round outline icon="more_vert" color="grey-3"
     :style=`{position: 'absolute', zIndex: zIndex+2000, right: '8px', top: '8px'}`).shadow-1
     q-popup-proxy(position="bottom" auto-close anchor="bottom right" self="top right")
       div(:style=`{maxWidth: $q.screen.width < 451 ? '100%' : '230px'}` :class="{'q-pa-md': $q.screen.width <= 450}").row.fit
@@ -21,7 +21,7 @@ div(:style=`{position: 'relative', zIndex: zIndex+100, ...getRadius, overflow: '
           ).row.full-width.items-center.justify-center.q-mt-sm.q-px-md.bg-grey-1
           span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
   //- preview for size
-  img(v-if="preview" :src="preview" :style=`{zIndex: zIndex+20, width: '100%', objectFit: 'contain', maxHeight: 'calc('+maxHeight+' / 2)'}` @error="previewError" draggable="false")
+  img(v-if="preview" :src="preview" :style=`{zIndex: zIndex+20, width: '100%', ...getStyles}` @error="previewError" draggable="false")
   //- active fragment
   div(
     v-if="needFull && fragment"
@@ -53,10 +53,16 @@ export default {
   computed: {
     getRadius () {
       return {
-        borderBottomLeftRadius: '100%12px',
-        borderBottomRightRadius: '100%12px',
-        borderTopLeftRadius: '100%12px',
-        borderTopRightRadius: '100%12px'
+        borderBottomLeftRadius: '100%8px',
+        borderBottomRightRadius: '100%8px',
+        borderTopLeftRadius: '100%8px',
+        borderTopRightRadius: '100%8px'
+      }
+    },
+    getStyles () {
+      return {
+        objectFit: 'contain',
+        maxHeight: 'calc(' + this.maxHeight + ' / 2 - 20px)'
       }
     }
   },

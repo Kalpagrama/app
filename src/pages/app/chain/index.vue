@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center.q-py-md.bg-white
+.row.fit
   div(style=`maxWidth: 800px; borderRadius: 4px; minHeight: 400px`).row.full-width.q-px-md.bg-white
     span Chain: {{oid}}
 </template>

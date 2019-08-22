@@ -1,5 +1,5 @@
 <template lang="pug">
-div(style=`position: relative`).row.full-width.window-height.content-start.items-start
+div(style=`position: relative`).row.fit.content-start.items-start.justify-center.bg-grey-4
   q-dialog(ref="contentFindDialog" no-route-dismiss :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down")
     content-finder(@ready="contentChoosen" @close="$refs.contentFindDialog.hide()")
   q-dialog(ref="videoEditorDialog" no-route-dismiss :maximized="true" transition-show="slide-up" transition-hide="slide-down")
@@ -12,53 +12,53 @@ div(style=`position: relative`).row.full-width.window-height.content-start.items
   //- book-editor
   //- code-editor
   //- wrapper
-  div.row.fit.justify-center.items-start.content-start.bg-grey-4
-    div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
-      //- node(:node="node" :nodeFullReady="nodeFull" :mini="true" noHeader noActions noSpheres
-      //-   :style=`{...getRadius}`
-      //-   :width="500"
-      //-   :maxHeight="0.7*$q.screen.height"
-      //-   ).bg-white.q-py-sm.q-mt-md
-      //-   //- name slot
-      //-   template(v-slot:name)
-      //-     .row.fit.items-center
-      //-       q-input(v-model="nodeFull.name" borderless :maxlength="45"
-      //-         :input-class="['text-center']" placeholder="В чем суть?").fit
-      //-   template(v-slot:fragment="{index}")
-      //-     div(:style=`{minHeight: '200px'}`).row.full-width.items-center.justify-center.bg-red
-      //-       q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
-      //-   //- empty slot--
-      //-   //- template(v-slot:empty="{ index }")
-      //-   //- actions slot
-      //-   template(v-slot:actions="{ index }")
-      //-     q-btn(flat round color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
-      //-       q-tooltip {{$t('fragment_delete')}}
-      //-     q-btn(flat round color="white" icon="edit" @click="fragmentEdit(index)").q-mr-sm.shadow-10
-      //-       q-tooltip {{$t('fragment_edit')}}
-      node(:node="node" :nodeFullReady="nodeFull" :index="0" :zIndex="100" noActions noFragmentMenu noNodeMenu needFull
-        :inEditor="true"
-        :style=`{maxWidth: '500px', borderRadius: '4px'}` :active="true").bg-white.q-my-md
-        template(v-slot:name)
-          .row.fit.items-center
-            q-input(v-model="nodeFull.name" borderless :maxlength="45"
-              :input-class="['text-center']" placeholder="В чем суть?").fit
-        template(v-slot:fragment="{index, empty}")
-          div(:style=`{zIndex: 100, position: empty ? 'relative' : 'absolute', height: '150px'}`).row.full-width.items-center.justify-center.bg-grey-5
-            q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
-          div(v-if="!empty" :style=`{position: 'absolute', zIndex: 10000, top: '8px', right: '8px', width: '40px'}`).row.justify-end
-            q-btn(round flat dense color="white" icon="edit" @click="fragmentEdit(index)").shadow-1.q-mb-sm
-            q-btn(round flat dense color="white" icon="clear" @click="fragmentDelete(index)").shadow-1
-      //- actions
-      div(:style=`{borderRadius: '4px', overflow: 'hidden'}`).row.full-width
-        //- sphere finder
-        sphere-finder(:spheresReady="nodeFull.spheres" @spheres="nodeFull.spheres = $event")
-        //- create
-        div(v-if="true" style=`height: 70px`).row.full-width.items-center.justify-end.bg-white.q-px-sm
-          q-btn(@click="nodeCreate()" :loading="nodeCreating"
-            rounded style=`height: 50px; width: 200px; borderRadius: 4px` color="primary" no-caps ).full-width {{$t('Создать')}}
-        //- debug
-        div(v-if="false" style=`minHeight: 70px`).row.full-width.justify-center.bg-green-1
-          small {{nodeFull}}
+  //- div.row.fit.justify-center.items-start.content-start.bg-grey-4
+  div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
+    //- node(:node="node" :nodeFullReady="nodeFull" :mini="true" noHeader noActions noSpheres
+    //-   :style=`{...getRadius}`
+    //-   :width="500"
+    //-   :maxHeight="0.7*$q.screen.height"
+    //-   ).bg-white.q-py-sm.q-mt-md
+    //-   //- name slot
+    //-   template(v-slot:name)
+    //-     .row.fit.items-center
+    //-       q-input(v-model="nodeFull.name" borderless :maxlength="45"
+    //-         :input-class="['text-center']" placeholder="В чем суть?").fit
+    //-   template(v-slot:fragment="{index}")
+    //-     div(:style=`{minHeight: '200px'}`).row.full-width.items-center.justify-center.bg-red
+    //-       q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
+    //-   //- empty slot--
+    //-   //- template(v-slot:empty="{ index }")
+    //-   //- actions slot
+    //-   template(v-slot:actions="{ index }")
+    //-     q-btn(flat round color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
+    //-       q-tooltip {{$t('fragment_delete')}}
+    //-     q-btn(flat round color="white" icon="edit" @click="fragmentEdit(index)").q-mr-sm.shadow-10
+    //-       q-tooltip {{$t('fragment_edit')}}
+    node(:node="node" :nodeFullReady="nodeFull" :index="0" :zIndex="100" noActions noFragmentMenu noNodeMenu needFull
+      :inEditor="true" maxHeight="70vh"
+      :style=`{maxWidth: '500px', borderRadius: '4px'}` :active="true").bg-white.q-my-md
+      template(v-slot:name)
+        .row.fit.items-center
+          q-input(v-model="nodeFull.name" borderless :maxlength="45"
+            :input-class="['text-center']" placeholder="В чем суть?").fit
+      template(v-slot:fragment="{index, empty}")
+        div(:style=`{zIndex: 100, position: empty ? 'relative' : 'absolute', height: '150px'}`).row.full-width.items-center.justify-center.bg-grey-5
+          q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
+        div(v-if="!empty" :style=`{position: 'absolute', zIndex: 10000, top: '8px', right: '8px', width: '40px'}`).row.justify-end
+          q-btn(round flat dense color="white" icon="edit" @click="fragmentEdit(index)").shadow-1.q-mb-sm
+          q-btn(round flat dense color="white" icon="clear" @click="fragmentDelete(index)").shadow-1
+    //- actions
+    div(:style=`{borderRadius: '4px', overflow: 'hidden'}`).row.full-width
+      //- sphere finder
+      sphere-finder(:spheresReady="nodeFull.spheres" @spheres="nodeFull.spheres = $event")
+      //- create
+      div(v-if="true" style=`height: 70px`).row.full-width.items-center.justify-end.bg-white.q-px-sm
+        q-btn(@click="nodeCreate()" :loading="nodeCreating"
+          rounded style=`height: 50px; width: 200px; borderRadius: 4px` color="primary" no-caps ).full-width {{$t('Создать')}}
+      //- debug
+      div(v-if="false" style=`minHeight: 70px`).row.full-width.justify-center.bg-green-1
+        small {{nodeFull}}
 </template>
 
 <script>
@@ -112,6 +112,13 @@ export default {
       nodeSaving: false,
       progress: null,
       active: false
+    }
+  },
+  watch: {
+    nodeFull: {
+      handler (to, from) {
+        this.$log('nodeFull CHANGED', to)
+      }
     }
   },
   computed: {

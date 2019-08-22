@@ -52,19 +52,20 @@ div(
             span(:style=`{color: 'red'}`).text-bold {{ $t('Отмена') }}
   //- fragments
   node-fragment-css(
-    v-if="noFragment !== fi" v-for="(f, fi) in 2" :key="fi" :index="fi" :zIndex="zIndex" :maxHeight="maxHeight" :active="active"
+    v-if="fragmentShow(node, fi)" v-for="(f, fi) in 2" :key="fi" :index="fi" :zIndex="zIndex" :maxHeight="maxHeight" :active="active"
     :oid="node.oid" :name="node.name" :noFragmentMenu="noFragmentMenu" :needFull="needFull" :inEditor="inEditor"
     :preview="node.thumbUrl[fi]" :fragment="nodeFull ? nodeFull.fragments[fi] : null"
     :style=`{order: fi*2}`)
     template(v-slot:fragment="{index}")
       slot(name="fragment" :index="index" :empty="nodeFull ? nodeFull.fragments[fi] ? false : true : true")
   //- name
-  div(v-if="!noName" :style=`{order: 1, height: '40px'}`).row.full-width.items-center.justify-center
+  div(v-if="!noName" :style=`{order: nameAtTheBottom ? 10 : 1, height: '40px'}`).row.full-width.items-center.justify-center
     router-link(v-if="!$slots.name" :to="`/app/node/${node.oid}`")
-      span(v-if="node" :style=`{whiteSpace: 'nowrap'}`).text-bold {{ node.name | cut(45) }}
+      small(v-if="node" :style=`{whiteSpace: 'nowrap'}`).text-bold {{ node.name | cut(45) }}
+    //- small {{node.fragmentsPoints}}
     slot(name="name")
   //- spheres !noSpheres && nodeFull && nodeFull.spheres.length > 0
-  div(v-if="!noSpheres" :style=`{order: 400, maxWidth: '100%', height: '45px', overflowX: 'auto', overflowY: 'hidden'}`).row.full-width.items-center.scroll
+  div(v-if="!noSpheres" :style=`{order: 400, maxWidth: '100%', height: '45px', overflowX: 'auto', overflowY: 'hidden'}` body-scroll-lock-ignore).row.full-width.items-center.scroll
     div(v-if="nodeFull").row.no-wrap.q-pl-sm
       div(
         v-for="(s, si) in nodeFull.spheres" :key="si" @click="sphereClick(s, si)"
@@ -106,7 +107,8 @@ export default {
     maxHeight: {type: String},
     active: {type: Boolean},
     needFull: {type: Boolean},
-    inEditor: {type: Boolean}
+    inEditor: {type: Boolean},
+    nameAtTheBottom: {type: Boolean}
   },
   components: {nodeFragmentCss},
   data () {
@@ -204,6 +206,14 @@ export default {
     },
     nodeChain () {
       this.$log('nodeChain')
+    },
+    fragmentShow (n, fi) {
+      if (n.fragmentsPoints) {
+        if (n.fragmentsPoints[0].fragmentIndx === fi) return false
+        else return true
+      } else {
+        return true
+      }
     },
     async nodeRateSend () {
       this.$log('NODE RATE SEND start')

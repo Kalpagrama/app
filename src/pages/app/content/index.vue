@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{height: height+'px'}`).row.full-width
+.row.fit
   content-explorer
 </template>
 

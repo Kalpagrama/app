@@ -1,22 +1,22 @@
 <template lang="pug">
-  q-layout(view='hHh Lpr fFf')
-    q-drawer(side="left" ref="drawerLeft").bg-white
-      k-menu
-    q-page-container
-      q-page.bg-grey-2
-        div(:style=`{position: 'relative'}`).row.fit
-          q-btn(
-            v-if="$q.screen.width <= 600"
-            @click="$refs.drawerLeft.toggle()"
-            icon="menu" round color="primary" size="md"
-            :style=`{position: 'fixed', zIndex: 30000, left: '10px', bottom: '10px'}`)
-          k-menu(v-if="$q.screen.width > 600" :style=`{maxWidth: '60px', width: '60px', overflow: 'hidden', position: 'fixed'}` :mini="true").bg-white
-          //- div(v-if="$q.screen.width > 600" :style=`{width: '60px', height: $q.screen.height+'px', position: 'fixed', left: '0px', zIndex: 1000}`).column.items-center.bg-white
-          div(:style=`{paddingLeft: $q.screen.width > 600 ? '60px' : '0px'}`).col
-            //- keep-alive
-            router-view(v-if="!loading" :width="width" :height="heightPage")
-            div(v-else :style=`{minHeight: '500px'}`).row.fit.items-center.justify-center
-              q-spinner(size="50px" :thickness="2" color="primary")
+  q-layout(view='hHh Lpr fFf' :style=`{height: $q.screen.height+'px'}`)
+    q-header(v-if="true")
+      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm.bg-white
+        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row
+          q-btn(round flat color="grey-6" @click="$router.push('/app/home')")
+            template(v-slot:default)
+              img(:src="`statics/logo.png`" width="40px" height="40px")
+        .col
+        small.text-grey-9.q-mr-sm 0.0.91
+        q-btn(round flat color="grey-9" icon="refresh" @click="refresh").q-mr-sm
+        //- q-btn(round flat color="grey-9" icon="search").q-mr-sm
+        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row.items-center.justify-center.cursor-pointer
+          img(v-if="$store.state.auth.user" @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)" :src="$store.state.auth.user.thumbUrl[0]" width="40px" height="40px")
+    q-page-container.fit
+      q-page.fit
+        router-view(v-if="!loading")
+        div(v-else).row.full-width.window-height.items-center.justify-center
+          q-spinner(size="50px" :thickness="2" color="primary")
 </template>
 
 <script>
@@ -175,6 +175,9 @@ export default {
     pageClick (p) {
       this.$log('pageClick', p)
       this.$router.push({path: p.id})
+    },
+    refresh () {
+      window.location.reload(true)
     }
   },
   async mounted () {

@@ -173,13 +173,13 @@ export default {
       return this.videoHeightMax
     },
     frames () {
-      // return this.fragment.content.frameUrls || []
-      if (!this.fragment.content.frameUrls) return []
+      return this.fragment.content.frameUrls || []
+      // if (!this.fragment.content.frameUrls) return []
       // let newCount = this.framesWidth / this.frameWidth
-      return this.fragment.content.frameUrls.filter((f, i) => {
-        return i % this.framesLess === 0
-        // return i % 10 === 0
-      })
+      // return this.fragment.content.frameUrls.filter((f, i) => {
+      //   return i % this.framesLess === 0
+      //   // return i % 10 === 0
+      // })
     },
     framesWidth () {
       return this.secToPx(this.fragment.content.duration)
@@ -518,6 +518,6 @@ export default {
 <style lang="stylus">
 // .mejs__overlay-button
 //   display: none !important
-// .mejs__overlay-loading
-//   display: none !important
+.mejs__overlay-loading
+  display: none !important
 </style>

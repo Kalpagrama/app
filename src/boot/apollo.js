@@ -42,7 +42,7 @@ export default async ({ Vue, store, app }) => {
   Vue.use(VueApollo)
   // let SERVICES_URL = process.env.SERVICES_URL || 'http://api.kalpagramma.com/graphql'
   let SERVICES_URL = 'https://backend-compose.kalpagramma.com/graphql'
-  debug('SERVICES_URL', SERVICES_URL)
+  // debug('SERVICES_URL', SERVICES_URL)
   store.commit('auth/state', ['SERVICES_URL', SERVICES_URL])
   let { data: {data: {services}}, error } = await axios.post(SERVICES_URL, {query: `query { services }`})
   if (error) {
