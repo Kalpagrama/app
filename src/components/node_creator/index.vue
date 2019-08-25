@@ -8,33 +8,7 @@ div(style=`position: relative`).row.fit.content-start.items-start.justify-center
       :fragment="nodeFull.fragments[fragmentIndex]"
       @fragment="fragmentEdited"
       @ready="videoEdited")
-  //- image-editor
-  //- book-editor
-  //- code-editor
-  //- wrapper
-  //- div.row.fit.justify-center.items-start.content-start.bg-grey-4
-  div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start
-    //- node(:node="node" :nodeFullReady="nodeFull" :mini="true" noHeader noActions noSpheres
-    //-   :style=`{...getRadius}`
-    //-   :width="500"
-    //-   :maxHeight="0.7*$q.screen.height"
-    //-   ).bg-white.q-py-sm.q-mt-md
-    //-   //- name slot
-    //-   template(v-slot:name)
-    //-     .row.fit.items-center
-    //-       q-input(v-model="nodeFull.name" borderless :maxlength="45"
-    //-         :input-class="['text-center']" placeholder="В чем суть?").fit
-    //-   template(v-slot:fragment="{index}")
-    //-     div(:style=`{minHeight: '200px'}`).row.full-width.items-center.justify-center.bg-red
-    //-       q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
-    //-   //- empty slot--
-    //-   //- template(v-slot:empty="{ index }")
-    //-   //- actions slot
-    //-   template(v-slot:actions="{ index }")
-    //-     q-btn(flat round color="white" icon="clear" @click="fragmentDelete(index)").q-mr-sm.shadow-10
-    //-       q-tooltip {{$t('fragment_delete')}}
-    //-     q-btn(flat round color="white" icon="edit" @click="fragmentEdit(index)").q-mr-sm.shadow-10
-    //-       q-tooltip {{$t('fragment_edit')}}
+  div(v-if="!loading" :style=`{maxWidth: '500px'}` body-scroll-lock-ignore).row.full-width.items-start.content-start.scroll
     node(:node="node" :nodeFullReady="nodeFull" :index="0" :zIndex="100" noActions noFragmentMenu noNodeMenu needFull
       :inEditor="true" maxHeight="70vh"
       :style=`{maxWidth: '500px', borderRadius: '4px'}` :active="true").bg-white.q-my-md
@@ -59,6 +33,8 @@ div(style=`position: relative`).row.fit.content-start.items-start.justify-center
       //- debug
       div(v-if="false" style=`minHeight: 70px`).row.full-width.justify-center.bg-green-1
         small {{nodeFull}}
+  div(v-else).row.fit.items-center.justify-center
+    q-spinner(:thickness="2" color="primary" size="50px")
 </template>
 
 <script>
@@ -79,6 +55,7 @@ export default {
   components: {node, contentFinder, imageEditor, videoEditor, bookEditor, sphereFinder},
   data () {
     return {
+      loading: false,
       spheres: '',
       fragmentIndex: 0,
       node: {
@@ -118,6 +95,13 @@ export default {
     nodeFull: {
       handler (to, from) {
         this.$log('nodeFull CHANGED', to)
+        localStorage.setItem('nodeFull', JSON.stringify(to))
+      }
+    },
+    node: {
+      handler (to, from) {
+        this.$log('node CHANGED', to)
+        localStorage.setItem('node', JSON.stringify(to))
       }
     }
   },
@@ -199,6 +183,8 @@ export default {
       this.$set(this.node.thumbUrl, this.fragmentIndex, preview)
       this.$set(this.nodeFull.fragments, this.fragmentIndex, fragment)
       this.$refs.videoEditorDialog.hide()
+      localStorage.setItem('node', JSON.stringify(this.node))
+      localStorage.setItem('nodeFull', JSON.stringify(this.nodeFull))
     },
     imageEdited (fragment, preview) {
       this.$log('imageEdited', fragment, preview)
@@ -258,6 +244,8 @@ export default {
         this.$q.notify({message: this.$t('node_published'), color: 'primary', textColor: 'white'})
         this.$set(this, 'nodeFull', {name: '', spheres: [], fragments: [null, null]})
         await this.$wait(700)
+        localStorage.removeItem('node')
+        localStorage.removeItem('nodeFull')
         this.$router.push(`/app/node/${nodeCreate.oid}`)
         this.nodeCreating = false
       } catch (error) {
@@ -283,8 +271,10 @@ export default {
     nodeLoad () {
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    this.loading = true
+    await this.$wait(500)
     // subscribe for progress, any progress
     const observer = this.$apollo.subscribe({
       client: 'ws',
@@ -315,7 +305,15 @@ export default {
       this.nodeFull = node
     } else {
       this.$log('FROM EMPTY')
+      let nodeCache = localStorage.getItem('node')
+      if (nodeCache) {
+        this.node = JSON.parse(nodeCache)
+        this.nodeFull = JSON.parse(localStorage.getItem('nodeFull'))
+        this.$log('node', this.node)
+        this.$log('nodeFull', this.nodeFull)
+      }
     }
+    this.loading = false
     // workspace had fragments and nodes
   },
   beforeDestroy () {

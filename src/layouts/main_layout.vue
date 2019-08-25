@@ -7,7 +7,8 @@
             template(v-slot:default)
               img(:src="`statics/logo.png`" width="40px" height="40px")
         .col
-        small.text-grey-9.q-mr-sm 0.0.91
+        small.text-grey-9.q-mr-sm 0.0.92
+        q-btn(round flat color="grey-9" icon="add" @click="$router.push(`/app/create/node`)").q-mr-sm
         q-btn(round flat color="grey-9" icon="refresh" @click="refresh").q-mr-sm
         //- q-btn(round flat color="grey-9" icon="search").q-mr-sm
         div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row.items-center.justify-center.cursor-pointer
@@ -87,7 +88,7 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        // this.$log('$route CHANGED', to)
+        this.$log('$route CHANGED', to)
         // if (to.path) {
         //   let findPage = this.$store.state.ui.pages.find(p => {
         //     return p.id === to.path
