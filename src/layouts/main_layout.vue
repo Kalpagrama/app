@@ -1,54 +1,34 @@
 <template lang="pug">
-  q-layout(view='lHh Lpr lFf' :style=`{height: $q.screen.height+'px'}` @resize="handleResize").window-height.bg-grey-2
-    q-header(reveal)
-      div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.justify-center.bg-white
-        div(style=`maxWidth: 1130px` :class=`{'q-px-sm': $q.screen.width < 600}`).row.fit.justify-center.q-px-sm
-          .row.full-height.items-center
-            div(style=`height: 40px; width: 40px; borderRadius: 50%`
-              @click="$router.push('/app/home')"
-              ).row.items-center.justify-center.bg-primary.cursor-pointer
-              q-icon(name="vertical_align_center" size="20px" color="white")
-            h6(v-if="$q.screen.width >= 600").q-ma-xs.q-ml-sm.text-black.text-bold kalpa
-          .col
-            .row.fit.justify-end.items-center.content.center
-              div(v-if="$q.screen.width >= 400" style=`height: 40px; overflow: hidden; borderRadius: 8px`).col.q-px-sm
-                div(style=`borderRadius: 8px; overflow: hidden`).row.fit.items-end
-                  q-input(v-model="search" filled).fit.items-end
-                    template(v-slot:prepend)
-                      q-icon(name="search")
-              //- q-btn(v-if="$q.screen.width >= 400" rounded color="primary" no-caps style=`height: 40px`
-              //-   @click="$router.push('/app/create')").q-mx-md Создать
-              div(style=`height: 40px; width: 40px; borderRadius: 50%`
-                @click="$router.push('/app/settings')"
-                ).row.items-center.justify-center.bg-grey-7.cursor-pointer
-                q-icon(name="face" size="20px" color="white")
+  q-layout(view='hHh Lpr fFf' :style=`{height: $q.screen.height+'px'}`)
+    q-header(v-if="true")
+      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm.bg-white
+        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row
+          q-btn(round flat color="grey-6" @click="$router.push('/app/home')")
+            template(v-slot:default)
+              img(:src="`statics/logo.png`" width="40px" height="40px")
+        .col
+        small.text-grey-9.q-mr-sm 0.0.92
+        q-btn(round flat color="grey-9" icon="add" @click="$router.push(`/app/create/node`)").q-mr-sm
+        q-btn(round flat color="grey-9" icon="refresh" @click="refresh").q-mr-sm
+        //- q-btn(round flat color="grey-9" icon="search").q-mr-sm
+        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row.items-center.justify-center.cursor-pointer
+          img(v-if="$store.state.auth.user" @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)" :src="$store.state.auth.user.thumbUrl[0]" width="40px" height="40px")
     q-page-container.fit
       q-page.fit
-        router-view(v-if="!loading").fit
-          template(v-slot:menu v-if="$q.screen.width > 850")
-            div(:style=`{position: 'relative', width: mini ? 40+'px' : 240+'px'}`).row.full-height.q-py-md
-              div(:style=`{position: 'fixed', width: mini ? 40+'px' : 240+'px', height: $q.screen.height-100+'px'}`).row
-                div(style=`overflow: hidden; borderRadius: 8px`).row.fit
-                  k-menu(:mini="mini" @mini="handleMini")
-        div(v-else).row.fit.items-center.justify-center
+        router-view(v-if="!loading")
+        div(v-else).row.full-width.window-height.items-center.justify-center
           q-spinner(size="50px" :thickness="2" color="primary")
-    q-footer(v-if="$q.screen.width < 600").bg-white
-      div(
-        style=`height: 50px; borderTop: 1px solid #eee`
-        ).row.full-width.justify-between.q-px-sm
-        //- :color="page.id === p.id ? 'primary' : 'grey'"
-        q-btn(v-for="(p, pi) in pages" :key="pi" flat round v-touch-hold="btnHolded"
-          color="grey" :icon="p.icon" size="16px" @click="pageClick(p)")
 </template>
 
 <script>
-import kMenu from 'pages/app/menu'
+import kMenu from 'components/k_menu'
 
 export default {
   name: 'mainLayout',
   components: {kMenu},
   data () {
     return {
+      d: false,
       loading: true,
       search: '',
       height: window.innerHeight,
@@ -59,98 +39,187 @@ export default {
       page: null,
       pageId: '',
       pages: [
-        { id: 'home', icon: 'home', name: 'Лента' },
-        { id: 'search', icon: 'search', name: 'Поиск' },
-        { id: 'create', icon: 'add_circle_outline', name: 'Создать' },
-        { id: 'notifications', icon: 'notifications_none', name: 'Уведомления' },
-        { id: 'menu', icon: 'menu', name: 'Меню' }
+        { id: '/app/home', icon: 'home', name: 'home' },
+        // { id: 'sphere', icon: 'explore', name: 'explore' },
+        { id: '/app/create/node', icon: 'add', name: 'create' },
+        // { id: 'notifications', icon: 'notifications_none', name: 'notifications' },
+        { id: '/app/user', icon: 'perm_identity', name: 'account' }
+        // { id: 'menu', icon: 'more_vert', name: 'menu' }
       ],
-      mini: false
+      // menus: [],
+      mini: false,
+      menuWidth: 200,
+      menuHeight: 500
+    }
+  },
+  computed: {
+    menus () {
+      return [
+        {id: 'settings', name: 'Настройки', color: 'black'},
+        {id: 'refresh', name: 'Обновить', color: 'black'},
+        {id: 'logout', name: 'Выйти', color: 'red'},
+        {id: 'debug', name: this.d ? 'debug ON' : 'debug OFF', color: 'green'}
+      ]
+    },
+    getPages () {
+      return this.$store.state.ui.pages.filter(p => {
+        return p.hidden === false && p.mobile === true
+      })
+    },
+    isMobile () {
+      return this.$q.screen.width <= 600
+    },
+    menuShow () {
+      return this.width >= this.$store.state.ui.nodeMaxWidth + this.$store.state.ui.menuMaxWidth
+    },
+    widthPage () {
+      // if (this.menuShow) return this.width - this.menuWidth
+      // else return this.width
+      return this.width
+    },
+    heightPage () {
+      // if (!this.menuShow) return this.height - 60
+      // else return this.height - 60
+      return this.height
     }
   },
   watch: {
-    // '$route': {
+    '$route': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route CHANGED', to)
+        // if (to.path) {
+        //   let findPage = this.$store.state.ui.pages.find(p => {
+        //     return p.id === to.path
+        //   })
+        //   this.$log('findPage', findPage)
+        //   if (findPage) this.$store.commit('ui/state', ['page', findPage])
+        //   else this.$router.push({path: this.getPages[0].id})
+        // }
+      }
+    },
+    // '$store.state.workspace.workspace': {
     //   deep: true,
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('$route CHANGED', to)
-    //     if (!to.name) {
-    //       this.$log('NO PAGE')
-    //       this.$set(this, 'page', this.pages[0])
-    //     } else {
-    //       this.$log('GOT PAGE', this.$route.name)
-    //       let findPage = this.pages.find(p => p.id === to.name)
-    //       if (findPage) this.$set(this, 'page', findPage)
-    //       else this.$set(this, 'page', this.pages[this.pages.length - 1])
-    //     }
+    //   immediate: false,
+    //   async handler (to, from) {
+    //     this.$log('workspace CHANGED', to, from)
+    //     // sync it ? version? from the server?
+    //     // TODO: this shit
+    //     let {data: {userWorkspaceUpdate}} = await this.$apollo.mutate({
+    //       mutation: gql`
+    //         mutation userWorkspaceUpdate ($workspace: RawJSON) {
+    //           userWorkspaceUpdate(workspace: $workspace)
+    //         }
+    //       `,
+    //       variables: {
+    //         workspace: to
+    //       }
+    //     })
+    //     this.$log('userWorkspaceUpdate', userWorkspaceUpdate)
     //   }
     // }
   },
   methods: {
-    handleMini () {
-      this.$log('handleMini')
-      this.$set(this, 'mini', !this.mini)
+    async menuClick (m) {
+      switch (m.id) {
+        case 'settings': {
+          this.$log('menuClick', m.id)
+          this.$router.push(`/app/user/${this.$store.state.auth.user.oid}/settings`)
+          break
+        }
+        case 'refresh': {
+          this.$log('menuClick', m.id)
+          window.location.reload(true)
+          break
+        }
+        case 'logout': {
+          this.$log('menuClick', m.id)
+          await this.$apollo.query({
+            query: gql`
+              query logout {
+                logout
+              }
+            `
+          })
+          this.$router.push('/login')
+          break
+        }
+        case 'debug': {
+          this.$log('menuClick', m.id)
+          let d = localStorage.getItem('kdebug')
+          if (d) {
+            this.d = false
+            localStorage.removeItem('kdebug')
+          } else {
+            this.d = true
+            localStorage.setItem('kdebug', 'kdebug')
+          }
+          window.location.reload(true)
+          break
+        }
+      }
     },
-    btnHolded () {
-      window.location.reload(true)
+    getColor (p) {
+      if (this.$store.state.ui.page) {
+        if (p.id === this.$store.state.ui.page.id) return 'primary'
+        else return 'grey'
+      } else {
+        return 'grey'
+      }
     },
-    handleScroll (e) {
-      this.$log('handleScroll', e)
-    },
-    handleResize (e) {
+    onResize (e) {
+      this.$log('onResize', e.width)
       this.height = e.height
       this.width = e.width
-      this.$store.commit('ui/state', ['width', e.width])
-      this.$store.commit('ui/state', ['height', e.height])
     },
     pageClick (p) {
       this.$log('pageClick', p)
       this.$router.push({path: p.id})
+    },
+    refresh () {
+      window.location.reload(true)
     }
   },
   async mounted () {
-    this.$log('mounted')
-    this.loading = true
-    // check token
-    let token = this.$route.query.token
-    if (token) localStorage.setItem('ktoken', token)
-    // user check
-    let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
-      query: gql`
-      query userCheck {
-        userIsAuthorized
-        userIsConfirmed
-        }`
-      })
-    this.$log('userIsAuthorized', userIsAuthorized)
-    this.$log('userIsConfirmed', userIsConfirmed)
-    // TODO: create with try/catch this...
-    if (!userIsAuthorized || !userIsConfirmed) {
-      this.$log('GO LOGIN')
-      this.$router.push('/login')
-      this.$q.notify('Go login')
+    try {
+      this.$log('mounted')
+      console.time('loading')
+      this.loading = true
+      if (localStorage.getItem('kdebug')) this.d = true
+      // check token
+      let token = this.$route.query.token
+      if (token) localStorage.setItem('ktoken', token)
+      // user check
+      this.$log('Checking user...')
+      let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
+        query: gql`
+        query userCheck {
+          userIsAuthorized
+          userIsConfirmed
+          }`
+        })
+      this.$log('userIsAuthorized', userIsAuthorized)
+      this.$log('userIsConfirmed', userIsConfirmed)
+      // TODO: create with try/catch this...
+      if (!userIsAuthorized || !userIsConfirmed) {
+        this.$log('GO LOGIN')
+        this.$router.push('/login')
+        this.$q.notify('Go login')
+        throw new Error(`No auth!`)
+        // TODO: error code? switch...
+      }
+      // user
+      this.$log('Getting user...')
+      let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name thumbUrl(preferWidth: 50) } }`})
+      this.$log('user', user)
+      this.$store.commit('auth/state', ['user', user])
+      this.loading = false
+      console.timeEnd('loading')
+    } catch (error) {
+      this.$log('error', error)
+      // this.loading = false
     }
-    // get user and save it to vuex
-    let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name } }`})
-    // this.$log('user', user)
-    this.$store.commit('auth/state', ['user', user])
-    this.loading = false
-    // const observer = this.$apollo.subscribe({
-    //   client: 'ws',
-    //   query: gql`
-    //     subscription uploadProgress {
-    //       uploadProgress
-    //     }
-    //   `,
-    // })
-    // observer.subscribe({
-    //   next: (data) => {
-    //     this.$log('sub data', data)
-    //   },
-    //   error: (error) => {
-    //     this.$log('sub error', error)
-    //   }
-    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

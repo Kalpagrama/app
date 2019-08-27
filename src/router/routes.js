@@ -6,50 +6,31 @@ const routes = [
     component: () => import('layouts/main_layout'),
     children: [
       { name: 'home', path: 'home', component: () => import('pages/app/home') },
-      { name: 'node', path: 'node', component: () => import('pages/app/node') },
-      {
-        name: 'workspace',
-        path: 'workspace',
-        redirect: 'workspace/videos',
-        component: () => import('pages/app/workspace'),
-        children: [
-          {name: 'videos', path: 'videos', component: () => import('pages/app/workspace/videos')},
-          {name: 'images', path: 'images', component: () => import('pages/app/workspace/images')},
-          {name: 'books', path: 'books', component: () => import('pages/app/workspace/books')},
-          {name: 'nodes', path: 'nodes', component: () => import('pages/app/workspace/nodes')},
-          {name: 'chains', path: 'chains', component: () => import('pages/app/workspace/chains')}
-        ]
-      },
+      { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
+      { name: 'sphere', path: 'sphere/:oid', component: () => import('pages/app/sphere') },
+      { name: 'content', path: 'content/:oid', component: () => import('pages/app/content') },
+      { name: 'chain', path: 'chain/:oid', component: () => import('pages/app/chain') },
+      { name: 'node', path: 'node/:oid', component: () => import('pages/app/node') },
+      // {
+      //   name: 'workspace',
+      //   path: 'workspace',
+      //   // redirect: 'workspace/nodes',
+      //   component: () => import('pages/app/workspace'),
+      //   children: [
+      //     {name: 'videos', path: 'videos', component: () => import('pages/app/workspace/videos')},
+      //     {name: 'images', path: 'images', component: () => import('pages/app/workspace/images')},
+      //     {name: 'books', path: 'books', component: () => import('pages/app/workspace/books')},
+      //     {name: 'nodes', path: 'nodes', component: () => import('pages/app/workspace/nodes')},
+      //     {name: 'chains', path: 'chains', component: () => import('pages/app/workspace/chains')}
+      //   ]
+      // },
       {
         path: 'create',
         component: () => import('pages/app/create'),
         children: [
-          {path: '', component: () => import('components/editor_node')},
-          {name: 'editor', path: 'editor', component: () => import('components/video_editor')}
+          { path: 'node', component: () => import('components/node_creator') },
+          { path: 'chain', component: () => import('components/chain_creator') }
         ]
-      },
-      {
-        name: 'sphere',
-        path: 'sphere',
-        component: () => import('pages/app/sphere')
-      },
-      {
-        name: 'settings',
-        path: 'settings',
-        redirect: 'settings/general',
-        component: () => import('pages/app/settings'),
-        children: [
-          {name: 'general', path: 'general', component: () => import('pages/app/settings/general')},
-          {name: 'security', path: 'security', component: () => import('pages/app/settings/security')},
-          {name: 'privacy', path: 'privacy', component: () => import('pages/app/settings/privacy')},
-          {name: 'notifications', path: 'notifications', component: () => import('pages/app/settings/notifications')},
-          {name: 'payments', path: 'payments', component: () => import('pages/app/settings/payments')}
-        ]
-      },
-      {
-        name: 'menu',
-        path: 'menu',
-        component: () => import('pages/app/menu')
       }
     ]
   },
@@ -63,6 +44,10 @@ const routes = [
       { name: 'phone', path: 'phone', component: () => import('pages/login/phone') },
       { name: '404', path: '*', component: () => import('pages/Error404.vue') }
     ]
+  },
+  {
+    path: '/dev',
+    component: () => import('layouts/dev_layout.vue')
   }
 ]
 

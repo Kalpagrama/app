@@ -1,68 +1,22 @@
 <template lang="pug">
-.column.fit
-  div(body-scroll-lock-ignore).col.scroll.bg-grey-2
-    .row.fit.justify-center
-      div(style=`maxWidth: 1130px`).row.fit.justify-center
-        slot(name="menu")
-        .col
-          .row.full-width.justify-center.q-py-md
-            apollo-query(v-if="true" :query="query2" :variables="variables")
-              template(v-slot="{ result: { loading, error, data } }")
-                //- loading
-                div(v-if="loading" style=`height: 100px`).row.full-width.items-center.justify-center
-                    q-spinner(size="50px" color="primary" :thickness="2")
-                //- error
-                div(v-else-if="error" style=`height: 100px`).row.full-width.items-center.justify-center
-                  span {{ error }} : (
-                //- items
-                template(v-else-if="data && data.feed")
-                  node-card(v-for="(n, ni) in data.feed.items" :key="n.oid" :node="n" :active="false"
-                    v-observe-visibility=`{
-                      callback: (isVisible, entry) => visibilityChanged(isVisible, entry, n, ni),
-                      throttle: ni <  2 ? 0 : 300
-                    }`)
-                //- nothing
-                div(v-else style=`height: 100px;`).row.full-width.items-center.justify-center
-                  q-spinner(size="50px" :thickness="2" color="primary")
-        //- right menu
-        div(v-if="$q.screen.width > 830" style=`position: relative; width: 280px; maxHeight: 100%`).column.full-height.q-py-md
-          div(style=`position: fixed; width: 280px; height: 700px`).row
-            div(style=`borderRadius: 8px`).row.fit.items-center.justify-center.bg-white
-              q-icon(name="flash_on")
-              span Some popular tags and sh*t
+.column.fit.bg-grey-2
+  div(body-scroll-lock-ignore).col.full-width.scroll.q-pt-md
+    node-feed(queryKey="feed")
 </template>
 
 <script>
-import nodeCard from 'components/node/node_card'
-import kMenu from 'pages/app/menu'
+import nodeFeed from 'components/node_feed'
+import nodeMasonry from 'components/node_masonry'
 
 export default {
   name: 'pageApp__Home',
-  components: { nodeCard, kMenu },
+  components: { nodeFeed, nodeMasonry },
   data () {
     return {
-      show_refresh: false,
-      show_header: false,
-      filter: {},
-      page: 12,
+      nodes: [],
       query: gql`
-        query sphereNodes($oid: OID!) {
-          sphereNodes (sphereOid: $oid, pagination: {pageSize: 20}) {
-            totalCount
-            items {
-              oid
-              type
-              thumbUrl (preferWidth: 600)
-              createdAt
-              name
-            }
-            nextPageToken
-          }
-        }
-      `,
-      query2: gql`
-        query feed {
-          feed(type: NEWS, pagination: {pageSize: 5, pageToken: null} filter: {types:[NODE]} ){
+        query feed($pageToken: RawJSON) {
+          feed(type: NEWS, pagination: {pageSize: 6, pageToken: $pageToken} filter: {types:[NODE]} ){
             count
             totalCount
             nextPageToken
@@ -82,27 +36,8 @@ export default {
     }
   },
   methods: {
-    handleScroll (e) {
-      // this.$log('handleScroll', e)
-      if (e.direction === 'down') this.show_header = false
-      else this.show_header = true
-    },
-    async refresh () {
-      this.$log('refresh')
-      this.show_refresh = true
-      await this.$wait(3000)
-      this.show_refresh = false
-    },
-    visibilityChanged (isVisible, entry, n, ni, next) {
-      // this.$log('vc', ni)
-      // TODO: function to detect friend based on positions...
-      // we need an array of nodes
-      if (isVisible) {
-        this.$set(n, 'visible', true)
-        // this.$set(next[0], 'visible', true)
-      } else {
-        this.$set(n, 'visible', false)
-      }
+    more () {
+      this.$log('more')
     }
   },
   mounted () {

@@ -1,77 +1,114 @@
 <template lang="pug">
-div(style=`position: relative; zIndex: 200; overflow: auto`).row.fit
-  div(style="position: absolute; zIndex: 200").row.full-width.items-center.justify-end.q-pa-sm
-    q-btn(dense round flat :icon="muted ? 'volume_off' : 'volume_up'" color="white" @click="toggleMute").shadow-5
-  div(style=`position: relative; height: 100%; overflow: hidden` ref="kvideoWrapper").row.full-width
-    div(style=`position: relative; height: 100%`).row.full-width.items-center.content-center
-      video(:ref="ref" width="100%" height="100%" playsinline preload="auto")
-        //- source(type="video/youtube" :src="url")
-        source(type="video/mp4" :src="url")
+video(
+  :ref="ref" playsinline preload="none" :src="url" type="video/mp4"
+  @error="videoError" autoplay
+  @load="videoLoaded"
+  @playing="videoStarted"
+  :style=`{width: '100%', maxHeight: '100%', objectFit: 'contain'}`
+  ).bg-grey-4
+  //- @mouseenter="player.play()"
 </template>
 
 <script>
-import 'mediaelement/build/mediaelementplayer.min.css'
-import 'mediaelement/full'
-
 export default {
   name: 'nodeVideo',
   props: {
+    mini: {type: Boolean},
     index: { type: Number, },
-    url: { type: String, required: true },
-    startSec: { type: Number, default: 0 },
-    endSec: { type: Number, default: 10 }
+    zIndex: { type: Number },
+    preview: {type: String},
+    active: {type: Boolean},
+    fragment: {type: Object, required: true}
   },
   data () {
     return {
+      me: null,
       player: null,
-      mediaElement: null,
-      muted: true
+      muted: false,
+      now: 0,
+      showPoster: true,
+      urlFake: 'https://storage.yandexcloud.net/kalpa-content/8h/65/110124177519845405.mp4',
+      started: false,
+      z: 0
     }
   },
   computed: {
     ref () {
-      return `kplayer-${this.index}`
+      return `kplayer`
+    },
+    url () {
+      return this.fragment.url
+    },
+    startSec () {
+      return this.fragments.relativePoints[0]['x']
+    },
+    endSec () {
+      return this.fragments.relativePoints[1]['x']
+    }
+  },
+  watch: {
+    url: {
+      immediate: false,
+      async handler (to, from) {
+        this.$log('URL changed')
+      }
     }
   },
   methods: {
+    videoError (e) {
+      this.$log('videoError', e)
+    },
+    videoLoaded (e) {
+      this.$log('videoLoaded', e)
+    },
     toggleMute () {
-      this.mediaElement.setMuted(!this.muted)
+      this.player.setMuted(!this.muted)
       this.muted = !this.muted
     },
     timeUpdate (e) {
-      if (this.mediaElement.currentTime >= this.endSec) this.mediaElement.setCurrentTime(this.startSec)
+      this.now = this.player.currentTime
+      if (this.now > this.endSec) this.player.setCurrentTime(this.startSec)
+    },
+    videoStarted (e) {
+      this.$log('videoStarted')
+      this.$emit('started')
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
-    this.$log('startSec', this.startSec)
-    this.$log('endSec', this.endSec)
-    this.$log('url', this.url)
-    // load player
-    this.player = new window.MediaElementPlayer(this.$refs[this.ref], {
+    this.me = new window.MediaElementPlayer(this.$refs[this.ref], {
       loop: true,
       autoplay: true,
-      controls: true,
+      controls: false,
+      muted: true,
       showPosterWhenPaused: false,
       clickToPlayPause: true,
       iPadUseNativeControls: false,
       iPhoneUseNativeControls: false,
       AndroidUseNativeControls: false,
+      stretching: 'fill',
+      pauseOtherPlayers: false,
+      alwaysShowControls: false,
       success: async (mediaElement, originalNode, instance) => {
-        this.mediaElement = mediaElement
-        this.mediaElement.addEventListener('timeupdate', this.timeUpdate, false)
-        this.mediaElement.setCurrentTime(this.startSec)
-        this.mediaElement.play()
-        this.$log('START PLAYING')
-        await this.$wait(600)
-        // this.started = true
-        this.$emit('started')
+        this.player = mediaElement
+        // this.player.addEventListener('playing', this.videoStarted, false)
+        // this.player.addEventListener('timeupdate', this.timeUpdate, false)
       }
     })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.mediaElement.removeEventListener('timeupdate', this.timeUpdate)
+    // this.player.removeEventListener('playing', this.videoStarted)
+    // this.player.removeEventListener('timeupdate', this.timeUpdate)
   }
 }
 </script>
+
+<style lang="stylus">
+// .mejs__overlay-button
+//   display: none !important
+// .mejs__overlay-loading
+//   display: none !important
+// .mejs__controls
+//   display: none !important
+</style>

@@ -20,10 +20,12 @@ export default async ({ Vue, store, app }) => {
   axios.interceptors.request.use((request) => {
     // Do something with response data
     debug('axios request', request)
-    // request.headers['Authorization'] = localStorage.getItem('ktoken')
+    let d = localStorage.getItem('kdebug')
+    if (d) request.headers['X-Kalpagramma-debug'] = d
     return request
   }, (error) => {
     // Do something with response error
+    // localStorage.removeItem('kdebug')
     return Promise.reject(error)
   })
   axios.interceptors.response.use(response => {
@@ -38,14 +40,16 @@ export default async ({ Vue, store, app }) => {
   Vue.prototype.$axios = axios
   // apollo
   Vue.use(VueApollo)
-  let SERVICES_URL = process.env.SERVICES_URL || 'http://api.kalpagramma.com/graphql'
+  let SERVICES_URL = process.env.SERVICES_URL || 'http://backend-compose.kalpagramma.com/graphql'
+  // let SERVICES_URL = 'https://backend-compose.kalpagramma.com/graphql'
   // debug('SERVICES_URL', SERVICES_URL)
   store.commit('auth/state', ['SERVICES_URL', SERVICES_URL])
   let { data: {data: {services}}, error } = await axios.post(SERVICES_URL, {query: `query { services }`})
   if (error) {
     debug('error', error)
+    localStorage.removeItem('kdebug')
   }
-  // debug('services', services)
+  debug('services', services)
   // Error
   // const errorLink = onError(({graphQLErrors, networkError, operation}) => {
   //   Notify.create({message: 'Server ERROR', color: 'red', textColor: 'white'})
@@ -67,7 +71,7 @@ export default async ({ Vue, store, app }) => {
   let linkUpload = services.UPLOAD
   store.commit('auth/state', ['AUTH_VK', services.AUTH_VK])
   // Cache
-  const cache = new InMemoryCache()
+  const cache = new InMemoryCache({addTypename: true})
   // persistCache({
   //   cache,
   //   storage: localStorage
@@ -83,7 +87,10 @@ export default async ({ Vue, store, app }) => {
       uri: linkHttp,
       fetch (uri, options) {
         debug('FETCH HTTP')
-        options.headers['Authorization'] = localStorage.getItem('ktoken')
+        const token = localStorage.getItem('ktoken')
+        const d = localStorage.getItem('kdebug')
+        if (token) options.headers['Authorization'] = token
+        if (d) options.headers['X-Kalpagramma-debug'] = d
         return fetch(uri, options)
       }
     }),
@@ -99,12 +106,12 @@ export default async ({ Vue, store, app }) => {
         reconnect: true,
         connectionParams: async () => {
           debug('FETCH WS')
+          let options = {}
           const token = localStorage.getItem('ktoken')
-          return {
-            headers: {
-              Authorization: token
-            }
-          }
+          const d = localStorage.getItem('kdebug')
+          if (token) options.headers['Authorization'] = token
+          if (d) options.headers['X-Kalpagramma-debug'] = d
+          return options
         }
       }
     }),
@@ -116,7 +123,10 @@ export default async ({ Vue, store, app }) => {
       uri: linkUpload,
       fetch (uri, options) {
         debug('FETCH UPLOAD', uri, options)
-        options.headers['Authorization'] = localStorage.getItem('ktoken')
+        const token = localStorage.getItem('ktoken')
+        const d = localStorage.getItem('kdebug')
+        if (token) options.headers['Authorization'] = token
+        if (d) options.headers['X-Kalpagramma-debug'] = d
         return fetch(uri, options)
       }
     }),
