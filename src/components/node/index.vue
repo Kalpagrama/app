@@ -218,7 +218,7 @@ export default {
       this.nodeRateSending = true
       let {data: { nodeRate }} = await this.$apollo.mutate({
         mutation: gql`
-          mutation nodeRate($oid: OID!, $rate: Float!) {
+          mutation nodeRate1($oid: OID!, $rate: Float!) {
             nodeRate(oid: $oid, rate: $rate)
           }
         `,
@@ -255,7 +255,7 @@ export default {
       // this.$log('nodeLoad start', this.index, this.node.name)
       let { data: { objectList: [nodeFull] } } = await this.$apollo.query({
         query: gql`
-          query getExtendedNodesProps($oid: OID!) {
+          query getExtendedNodesPropsNode($oid: OID!) {
             objectList(oids: [$oid]) {
               oid
               type

@@ -1,9 +1,10 @@
 <template lang="pug">
 .row.fit.q-pt-md.bg-grey-4
-  node-masonry(:nodes="nodes").full-width
+  node-list(:nodes="nodes").full-width
 </template>
 
 <script>
+import nodeList from 'components/node_list'
 import nodeMasonry from 'components/node_masonry'
 
 export default {
@@ -11,7 +12,7 @@ export default {
   props: {
     user: {type: Object}
   },
-  components: {nodeMasonry},
+  components: {nodeMasonry, nodeList},
   data () {
     return {
       nodes: []

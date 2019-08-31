@@ -69,6 +69,7 @@ module.exports = {
         'no-return-await': 0,
         'vue/require-valid-default-prop': 0,
         'object-curly-spacing': 0,
-        'no-throw-literal': 0
+        'no-throw-literal': 0,
+        'no-unneeded-ternary': 0
     }
 }

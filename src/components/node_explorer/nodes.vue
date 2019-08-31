@@ -1,15 +1,15 @@
 <template lang="pug">
 .column.fit.bg-grey-3
-  div(:style=`{height: '60px', zIndex: 100000}`).row.full-width.items-center.bg-grey-3
+  div(:style=`{height: '100px', zIndex: 100000}`).row.full-width.items-center.bg-grey-3
     //- q-btn(flat color="grey-6" icon="keyboard_arrow_left" no-caps style=`width: 40px; height: 40px`)
     div(
       v-for="(f, fi) in nodeFull.fragments" :key="fi"
       @click="fragmentClick(f, fi)"
-      :class=`{'bg-grey-3': fi === fragmentActive, 'bg-grey-4': fi !== fragmentActive}`
+      :class=`{'bg-grey-3': fi === fragmentActive, 'bg-grey-5': fi !== fragmentActive}`
       ).col.full-height.cursor-pointer
       .row.full-height.justify-center.items-center
-        div(:style=`{height: '40px', width: '70px', overflow: 'hidden', ...getRadius}`).row
-          img(:src="node.thumbUrl[fi]" :style=`{width: '100%', objectFit: 'cover'}`)
+        div(:style=`{height: '80px', overflow: 'hidden', ...getRadius}`).row
+          img(:src="node.thumbUrl[fi]" :style=`{height: '100%', objectFit: 'contain'}`)
   div(body-scroll-lock-ignore).col.full-width.scroll.q-pt-md
     node-masonry(:nodes="$nodesDistinct(nodes[fragmentActive])" @nodeClick="nodeClick" nameAtTheBottom)
     //- div(v-for="n in 1" :key="n" style=`height: 300px`).row.full-width {{n}}

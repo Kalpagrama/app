@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.fit
+.row.full-width.window-height
   content-video(v-if="content && content.type === 'VIDEO'" :content="content")
   //- content-image
   //- content-book

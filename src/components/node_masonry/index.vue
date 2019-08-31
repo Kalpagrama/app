@@ -4,17 +4,25 @@
   //-   small colCount: {{colCount}}
   q-resize-observer(ref="kresize" @resize="onResize")
   //- q-scroll-observer(@scroll="onScroll")
-  div(v-if="ready" :style=`{position: 'relative'}`).row.full-width.justify-center
-    masonry(:cols=`colCount` :gutter="{default: colGap}" :style=`{}`).full-width
+  div(v-if="ready" :style=`{position: 'relative'}`).row.full-width.justify-s.q-px-md
+    masonry(:cols=`colCount` :gutter="{default: colGap}" :style=`{}`)
       //- div(
       //-   v-for="n in 100" :key="n"
       //-   :style=`{width: '50px', height: '50px'}`).row.bg-red hello
-      div(v-for="(n, ni) in nodes" :key="n.oid").row.items-start.content-start
-        node-css(
-          :index="ni" :node="n" maxHeight="30vh"
-          @click.native="$emit('nodeClick', n, ni)" :active="false" :needFull="false"
-          noHeader noActions noSpheres noFragmentMenu :nameAtTheBottom="nameAtTheBottom"
-          :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px', ...getRadius}`).bg-white.q-mb-md
+      div(v-for="(n, ni) in nodes" :key="n.oid" @click="$router.push(`/app/node/${n.oid}`)"
+        :style=`{borderRadius: '8px', overflow: 'hidden'}`
+          ).row.items-start.content-start.bg-white.q-mb-xl
+        div(:style=`{overflow: 'hidden', ...getRadius}`).row.full-width
+          img(:src="n.thumbUrl[0]" :style=`{width: '100%', objectFit: 'cover'}`)
+        div(:style=`{minHeight: '40px'}`).row.full-width.items-center.q-px-sm
+          span {{n.name}}
+        div(v-if="false").row.full-width.justify-end.q-pa-xs
+          q-btn(round flat dense icon="more_horiz" color="grey-5")
+        //- node-css(
+        //-   :index="ni" :node="n" maxHeight="30vh"
+        //-   @click.native="$emit('nodeClick', n, ni)" :active="false" :needFull="false"
+        //-   noHeader noActions noSpheres noFragmentMenu :nameAtTheBottom="nameAtTheBottom"
+        //-   :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px', ...getRadius}`).bg-white.q-mb-md
 </template>
 
 <script>
@@ -41,20 +49,18 @@ export default {
   },
   computed: {
     colWidth () {
-      return 90
+      return 250
     },
     colGap () {
-      return 10
+      return 20
     },
     colCount () {
       return Math.floor(this.width / (this.colWidth + this.colGap))
     },
     getRadius () {
       return {
-        borderBottomLeftRadius: '100%12px !important',
-        borderBottomRightRadius: '100%12px !important',
-        borderTopLeftRadius: '100%12px !important',
-        borderTopRightRadius: '100%12px !important'
+        borderBottomLeftRadius: '100%6px !important',
+        borderBottomRightRadius: '100%6px !important'
       }
     }
   },

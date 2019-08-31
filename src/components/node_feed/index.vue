@@ -15,7 +15,7 @@ div(:style=`{position: 'relative'}`).row.full-width
           callback: nodeVisible,
           throttle: 300,
           intersection: {
-            threshold: 0.5
+            threshold: 0.8
           }
         }`
         )
@@ -23,7 +23,8 @@ div(:style=`{position: 'relative'}`).row.full-width
 
 <script>
 // import node from 'components/node'
-import node from 'components/node/node_css'
+// import node from 'components/node/node_css'
+import node from 'components/node_inst'
 
 export default {
   name: 'node_feed',

@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.fit
+.row.full-width
   content-explorer
 </template>
 

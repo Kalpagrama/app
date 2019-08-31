@@ -1,31 +1,25 @@
 <template lang="pug">
-  q-layout(view='hHh Lpr fFf' :style=`{height: $q.screen.height+'px'}`)
-    q-header(v-if="true")
-      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm.bg-white
-        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row
-          q-btn(round flat color="grey-6" @click="$router.push('/app/home')")
-            template(v-slot:default)
-              img(:src="`statics/logo.png`" width="40px" height="40px")
-        .col
-        small.text-grey-9.q-mr-sm 0.0.92
-        q-btn(round flat color="grey-9" icon="add" @click="$router.push(`/app/create/node`)").q-mr-sm
-        q-btn(round flat color="grey-9" icon="refresh" @click="refresh").q-mr-sm
-        //- q-btn(round flat color="grey-9" icon="search").q-mr-sm
-        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row.items-center.justify-center.cursor-pointer
-          img(v-if="$store.state.auth.user" @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)" :src="$store.state.auth.user.thumbUrl[0]" width="40px" height="40px")
-    q-page-container.fit
-      q-page.fit
-        router-view(v-if="!loading")
-        div(v-else).row.full-width.window-height.items-center.justify-center
-          q-spinner(size="50px" :thickness="2" color="primary")
+  q-layout(view='hHh Lpr fFf')
+    q-page-container
+      q-page
+        k-menu-vert(:style=`{position: 'fixed', zIndex: 100000, maxWidth: '60px'}`).gt-sm
+        div(:style=`{marginLeft: $q.screen.gt.sm ? '0px' : '0px'}`).col
+          //- TODO: how to padding?
+          //- keep-alive
+          router-view(v-if="!loading" :style=`{paddingLeft: $q.screen.gt.sm ? '60px' : '0px'}`)
+          div(v-else).row.full-width.window-height.items-center.justify-center
+            q-spinner(size="50px" :thickness="2" color="primary")
+    q-footer(reveal).lt-md
+      k-menu-horiz
 </template>
 
 <script>
-import kMenu from 'components/k_menu'
+import kMenuVert from 'components/k_menu_vert'
+import kMenuHoriz from 'components/k_menu_horiz'
 
 export default {
   name: 'mainLayout',
-  components: {kMenu},
+  components: {kMenuHoriz, kMenuVert},
   data () {
     return {
       d: false,
@@ -89,6 +83,7 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('$route CHANGED', to)
+        if (!this.loading) localStorage.setItem('path', to.path)
         // if (to.path) {
         //   let findPage = this.$store.state.ui.pages.find(p => {
         //     return p.id === to.path
@@ -186,7 +181,8 @@ export default {
       this.$log('mounted')
       console.time('loading')
       this.loading = true
-      if (localStorage.getItem('kdebug')) this.d = true
+      // save last route to state
+      // if (localStorage.getItem('kdebug')) this.d = true
       // check token
       let token = this.$route.query.token
       if (token) localStorage.setItem('ktoken', token)
@@ -214,6 +210,10 @@ export default {
       let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name thumbUrl(preferWidth: 50) } }`})
       this.$log('user', user)
       this.$store.commit('auth/state', ['user', user])
+      // return to path
+      // let path = localStorage.getItem('path')
+      // this.$log('path', path)
+      // if (path) this.$router.push(path)
       this.loading = false
       console.timeEnd('loading')
     } catch (error) {

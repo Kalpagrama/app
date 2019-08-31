@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.fit
+.row.full-width.window-height
   div(:style=`{maxWidth: isDesktop ? '500px' : '100%'}`).col.full-height
     q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
       //- node on the left
@@ -10,8 +10,8 @@
           //-   q-btn(flat style=`width: 40px; height: 40px` color="grey-9" icon="more_vert")
           .col.full-width.scroll.bg-grey-2
             div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-md
-              node-css(v-if="node" :node="node" maxHeight='60vh' :needFull="true" :index="0" @nodeFull="nodeFullLoaded" :active="true"
-                :style=`{borderRadius: '4px', maxWidth: '500px'}`).bg-white.q-mt-md
+              node(v-if="node" :node="node" :needFull="true" :index="0" @nodeFull="nodeFullLoaded" :active="true"
+                :style=`{borderRadius: '4px', maxWidth: '500px', marginBottom: '200px'}`).bg-white.q-mt-md
       //- fragments
       q-tab-panel(name="fragments" :style=`{padding: '0px'}` v-if="!isDesktop")
         nodes(v-if="nodeFull" :node="node" :nodeFull="nodeFull" :nodes="nodes")
@@ -21,9 +21,7 @@
 </template>
 
 <script>
-import node from 'components/node'
-import nodeCss from 'components/node/node_css'
-import nodeMasonry from 'components/node_masonry'
+import node from 'components/node_inst'
 import nodes from './nodes'
 // TODO: cant click in mobile mode...
 // TODO: on hover event on node fragment
@@ -35,7 +33,7 @@ import nodes from './nodes'
 // TODO: clicking on the same node route adress route doesnt goes to node tab...
 export default {
   name: 'nodeExplorer',
-  components: {node, nodeCss, nodeMasonry, nodes},
+  components: {node, nodes},
   data () {
     return {
       tab: 'node',
@@ -146,7 +144,7 @@ export default {
       this.$log('nodeLoad start')
       let { data: { objectList: [node] } } = await this.$apollo.query({
         query: gql`
-          query getExtendedNodesProps($oid: OID!) {
+          query getExtendedNodesPropsExplorer($oid: OID!) {
             objectList(oids: [$oid]) {
               oid
               type

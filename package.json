@@ -18,7 +18,7 @@
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",
     "build_cordova": "quasar build -m cordova",
-    "gql": "apollo schema:download -k --endpoint=http://api.kalpagramma.com/graphql ./src/schema/graphql.schema.json",
+    "gql": "apollo schema:download -k --endpoint=https://test.kalpagramma.com/graphql/ ./src/schema/graphql.schema.json",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0"
   },

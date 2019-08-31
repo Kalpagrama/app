@@ -15,16 +15,16 @@ const time = (sec) => {
   let hrs = ~~(sec / 3600)
   let mins = ~~((sec % 3600) / 60)
   let secs = ~~sec % 60
-  let arr = sec.toString().split('.')
-  let ms = ''
-  if (arr.length > 1) ms = arr[1]
+  // let arr = sec.toString().split('.')
+  // let ms = ''
+  // if (arr.length > 1) ms = arr[1]
 
   let result = ''
   if (hrs > 0) result += '' + hrs + ':' + (mins < 10 ? '0' : '')
 
   result += '' + mins + ':' + (secs < 10 ? '0' : '')
   result += '' + secs
-  if (ms !== '') result += ':' + ms.substring(0, 3)
+  // if (ms !== '') result += ':' + ms.substring(0, 3)
   return result
 }
 
@@ -78,6 +78,13 @@ export default async ({ Vue, store, router }) => {
   //   debug('### ERROR ###', msg.toString())
   //   Notify.create({message: msg.toString(), color: 'red', colorText: 'red'})
   // }
+  // components
+  // const components = ['k_menu_popup']
+  // const cName = (c) => {
+  //   let s = c.split('/')
+  //   return s[s.length - 1]
+  // }
+  // components.map(c => Vue.component(cName(c), () => import(`components/${c}`)))
 }
 
 export { time }
