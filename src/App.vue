@@ -14,18 +14,18 @@ export default {
       const log = (msg) => {
         console.log('log', msg)
       }
-      disableBodyScroll(this.$refs.kapp, {
-        allowTouchMove: el => {
-          while (el && el !== document.body) {
-            if (el.getAttribute('body-scroll-lock-ignore') !== null) {
-              // this.$q.notify('el')
-              // log('el', el)
-              return true
-            }
-            el = el.parentNode
-          }
-        }
-      })
+      // disableBodyScroll(this.$refs.kapp, {
+      //   allowTouchMove: el => {
+      //     while (el && el !== document.body) {
+      //       if (el.getAttribute('body-scroll-lock-ignore') !== null) {
+      //         // this.$q.notify('el')
+      //         // log('el', el)
+      //         return true
+      //       }
+      //       el = el.parentNode
+      //     }
+      //   }
+      // })
       // window.HELP_IMPROVE_VIDEOJS = false
     }
 }

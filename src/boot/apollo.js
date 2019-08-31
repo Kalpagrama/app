@@ -6,7 +6,8 @@ import { createHttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
 import { onError } from 'apollo-link-error'
 import { split, ApolloLink } from 'apollo-link'
-import { InMemoryCache } from 'apollo-cache-inmemory'
+import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
+import introspectionQueryResultData from '../schema/graphql.schema.json'
 import { getMainDefinition } from 'apollo-utilities'
 // import { setContext } from 'apollo-link-context'
 import { createUploadLink } from 'apollo-upload-client'
@@ -40,9 +41,8 @@ export default async ({ Vue, store, app }) => {
   Vue.prototype.$axios = axios
   // apollo
   Vue.use(VueApollo)
-  let SERVICES_URL = process.env.SERVICES_URL || 'http://backend-compose.kalpagramma.com/graphql'
-  // let SERVICES_URL = 'https://backend-compose.kalpagramma.com/graphql'
-  // debug('SERVICES_URL', SERVICES_URL)
+  let SERVICES_URL = process.env.SERVICES_URL || 'https://test.kalpagramma.com/graphql/'
+  debug('SERVICES_URL', SERVICES_URL)
   store.commit('auth/state', ['SERVICES_URL', SERVICES_URL])
   let { data: {data: {services}}, error } = await axios.post(SERVICES_URL, {query: `query { services }`})
   if (error) {
@@ -71,7 +71,10 @@ export default async ({ Vue, store, app }) => {
   let linkUpload = services.UPLOAD
   store.commit('auth/state', ['AUTH_VK', services.AUTH_VK])
   // Cache
-  const cache = new InMemoryCache({addTypename: true})
+  const fragmentMatcher = new IntrospectionFragmentMatcher({
+    introspectionQueryResultData
+  })
+  const cache = new InMemoryCache({addTypename: true, fragmentMatcher})
   // persistCache({
   //   cache,
   //   storage: localStorage
@@ -80,7 +83,6 @@ export default async ({ Vue, store, app }) => {
   //   let cachedData = JSON.parse(localStorage['apollo-cache-persist'])
   //   cache.restore(cachedData)
   // }
-  // TODO: IntrospectionFragmentMatcher
   // default client
   const defaultClient = new ApolloClient({
     link: createHttpLink({

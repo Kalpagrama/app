@@ -221,7 +221,7 @@ export default {
       this.nodeRateSending = true
       let {data: { nodeRate }} = await this.$apollo.mutate({
         mutation: gql`
-          mutation nodeRate($oid: OID!, $rate: Float!) {
+          mutation nodeRate2($oid: OID!, $rate: Float!) {
             nodeRate(oid: $oid, rate: $rate)
           }
         `,

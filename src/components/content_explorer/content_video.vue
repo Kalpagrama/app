@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.fit
-  div(:style=`{maxWidth: isDesktop ? '600px' : '100%'}`).col.full-height
+.row.window-height.full-width
+  div(:style=`{maxWidth: isDesktop ? '800px' : '100%'}`).col.full-height
     q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
       //- content video
       q-tab-panel(name="content" :style=`{padding: '0px', background: 'none'}`).column.fit

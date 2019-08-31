@@ -1,13 +1,13 @@
 <template lang="pug">
-.row.fit
+.row.full-width.window-height
   div(:style=`{maxWidth: isDesktop ? '500px' : '100%'}`).col.full-height
     q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
       //- spheres
       q-tab-panel(name="sphere" :style=`{padding: '0px', background: 'none'}`)
         .column.fit
           //- header
-          div(:style=`{height: '60px'}`).row.full-width.items-center.scroll.q-px-sm.bg-grey-1
-            h4(:style=`{whiteSpace: 'nowrap'}`).q-pa-xs.q-ma-xs {{`#${sphere.name}`}}
+          div(:style=`{minHeight: '60px'}`).row.full-width.items-center.scroll.q-px-sm.bg-grey-1
+            h4(:style=`{}`).q-pa-xs.q-ma-xs {{`#${sphere.name}`}}
           //- tools
           div(v-if="false" :style=`{height: '40px'}`).row.full-width.items-center.justify-end.q-px-sm.bg-grey-1
             q-btn(flat color="grey-9" style=`width: 40px; height: 40px` icon="search")
