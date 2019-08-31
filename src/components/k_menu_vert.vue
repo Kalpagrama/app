@@ -14,7 +14,7 @@
     router-link(to="/login" :style=`{height: '60px'}`).row.full-width.items-center.justify-center
       q-btn(round flat :color="'grey-6'" size="md" icon="power_off" @click="logout()")
   div(:style=`{height: '40px'}`).row.full-width.justify-center.items-center
-    small.text-grey-6 0.1.0
+    small.text-grey-6 0.1.1
   div(:style=`{height: '60px'}`).row.full-width.items-center.justify-center
     div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row.items-center.justify-center.cursor-pointer
       img(v-if="$store.state.auth.user" @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)" :src="$store.state.auth.user.thumbUrl[0]" width="40px" height="40px")
