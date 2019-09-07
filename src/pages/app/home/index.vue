@@ -1,14 +1,16 @@
 <template lang="pug">
-.row.full-width.justify-center.bg-grey-4.q-pt-md
-  node-loader(mode="feed" :query="query" queryKey="feed" :variables="variables" :style=`{maxWidth: '550px'}`)
+k-page
+  template(v-slot:body)
+    node-loader(mode="feed" :query="query" queryKey="feed" :variables="variables")
 </template>
 
 <script>
+import kPage from 'components/k_page'
 import nodeLoader from 'components/node_loader'
 
 export default {
   name: 'pageApp__home',
-  components: { nodeLoader },
+  components: { kPage, nodeLoader },
   data () {
     return {
       nodes: [],

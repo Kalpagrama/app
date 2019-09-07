@@ -5,7 +5,7 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
     div(
       v-if="nodeFull"
       :style=`{position: 'relative', maxWidth: '550px', height: '80vh', width: 'calc(100% - 20px)', borderRadius: '16px 16px 0px 0px', overflow: 'hidden'}`
-      ).row.justify-center.items-start.content-start.bg-white.q-mx-md
+      ).row.justify-center.items-start.content-start.bg-white.q-mx-sm
         div(:style=`{height: '100px'}`).row.full-width.items-center.justify-center.q-px-sm
           h3 {{rateCurrent.name}}
           //- h3(v-if="nodeFull") {{nodeFull.rate}}
@@ -24,12 +24,12 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
         div(
           v-if="nodeFull && !nodeFull.rateUser"
           :style=`{position: 'absolute', bottom: '0px', height: '70px'}`).row.full-width.items-center.q-px-sm
-          q-btn(color="primary" :style=`{height: '50px'}` :loading="nodeRating" @click="nodeRateJob()").full-width {{`Проголосовать`}}
+          q-btn(color="primary" :style=`{height: '50px', borderRadius: '10px'}` :loading="nodeRating" @click="nodeRateJob()").full-width {{`Проголосовать`}}
   //- share
   q-dialog(ref="shareDialog" position="bottom")
     div(
       :style=`{maxWidth: '550px', height: '80vh', width: 'calc(100% - 20px)', borderRadius: '16px 16px 0px 0px', overflow: 'hidden'}`
-      ).row.justify-center.items-start.content-start.bg-white.q-mx-md
+      ).row.justify-center.items-start.content-start.bg-white.q-mx-sm
       div(:style=`{borderRadius: '16px 16px 0px 0px', height: '70vh', maxWidth: '500px !important'}`).row.full-width.items-start.content-start.bg-white
         div(:style=`{height: '100px', borderBottom: '1px solid #eee'}`).row.full-width.items-center.justify-center.q-px-sm.cursor-pointer
           span Отправить на почту
@@ -39,25 +39,25 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
           span Отправить в Telegram
         div(:style=`{height: '100px'}`).row.full-width.items-center.justify-center.q-px-sm.cursor-pointer
           span Получить ссылку
-  //- chain
-  q-dialog(ref="chainDialog" position="bottom")
+  //- workspace
+  q-dialog(ref="workspaceDialog" position="bottom")
     div(
       :style=`{maxWidth: '550px', height: '80vh', width: 'calc(100% - 20px)', borderRadius: '16px 16px 0px 0px', overflow: 'hidden'}`
-      ).row.justify-center.items-start.content-start.bg-white.q-mx-md
+      ).row.justify-center.items-start.content-start.bg-white.q-mx-sm
       div(:style=`{borderRadius: '16px 16px 0px 0px', height: '70vh', maxWidth: '500px !important'}`).row.full-width.bg-white
-        div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-          //- span Выберите цепочку
-        div(:style=`{height: '60px'}`).row.full-width.items-center.justify-center.q-px-sm
-          //- span Создать цепочку
-          q-btn(icon-right="add" color="grey-7" flat) Создать цепочку
+        //- div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+        //-   //- span Выберите цепочку
+        //- div(:style=`{height: '60px'}`).row.full-width.items-center.justify-center.q-px-sm
+        //-   //- span Создать цепочку
+        //-   q-btn(icon-right="add" color="grey-7" flat) Создать цепочку
   //- share
   q-btn(color="grey-9" round flat @click="nodeShare()")
     q-icon(name="call_made" size="26px" color="grey-8").rotate-270
   //- chain
-  q-btn(:icon="nodeChained ? 'bookmark' : 'bookmark_outline'" color="grey-8" round flat @click="nodeChain()")
+  q-btn(:icon="nodeWorkspaced ? 'cloud' : 'cloud_queue'" color="grey-8" round flat @click="nodeWorkspace()")
   //- chain name and selector
   .col
-    div(v-if="nodeChained && false") Some chain name
+    //- div(v-if="true") Some chain name
   //- rate
   div(v-if="nodeFull && nodeFull.rateUser").q-mr-sm
     small {{Math.ceil(nodeFull.rateUser*100)}}/
@@ -92,8 +92,10 @@ export default {
     }
   },
   computed: {
-    nodeChained () {
-      return this.index % 2 === 0
+    nodeWorkspaced () {
+      let findNode = this.$store.state.workspace.workspace.nodes.find(n => (n.oid === this.node.oid))
+      if (findNode) return true
+      else return false
     },
     rateCurrent () {
       let v = this.value
@@ -140,9 +142,9 @@ export default {
       this.nodeRated = true
       this.$log('nodeRateJob done')
     },
-    nodeChain () {
-      this.$log('nodeChain')
-      this.$refs.chainDialog.show()
+    nodeWorkspace () {
+      this.$log('nodeWorkspace')
+      this.$refs.workspaceDialog.show()
     }
   }
 }

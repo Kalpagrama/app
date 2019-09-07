@@ -4,44 +4,31 @@ div().row.full-width.items-start.content-start
     template(v-slot:actions)
       k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
         q-btn(icon="brush" color="grey-5" round flat)
-  //- ...getRadius, overflow: 'hidden'
-  div(:style=`{position: 'relative', zIndex: zIndex+100, maxHeight: getHeight+'px'}`
-    ).row.full-width.items-start.content-start.bg-grey-3
+  div(:style=`{position: 'relative', zIndex: zIndex+100}`).row.full-width.items-start.content-start.bg-grey-3
     //- actions
-    //- .row.full-width.justify-end
-    k-menu-popup(v-if="active && nodeFull"
-      :style=`{position: 'absolute', zIndex: zIndex+1000, top: '8px', right: '8px'}`
-      :name="nodeFull.fragments[fragmentActive].content.name" :actions="fragmentActions"
-      @action="$event => fragmentAction($event, fragmentActive)")
-      q-btn(icon="more_horiz" color="white" round flat
-        :style=`{}`).shadow-1
-    //- forward
-    div(@click="forwardClick()"
-      :style=`{position: 'absolute', zIndex: zIndex+200, width: '100px', bottom: '20px', right: '20px', borderRadius: '4px', overflow: 'hidden', opacity: 0.7}`
-      ).row.items-center.justify-center.cursor-pointer
-      img(
-        v-for="(p, pi) in 2" :key="pi"
-        v-show="fragmentActive !== pi"
-        :src="node.thumbUrl[pi]"
-        :style=`{width: '100%', height: '100%', objectFit: 'contain'}` draggable="false"
-        @load="$event => imgLoaded($event, `mini:${pi}`)"
-        @error="$event => imgError($event, `mini:${pi}`)")
+    node-name(:node="node" :style=`{order: 1}`)
     //- previews
-    img(
-      v-for="(p, pi) in 2" :key="pi"
-      v-show="fragmentActive === pi"
-      :src="node.thumbUrl[pi]"
-      :style=`{width: '100%', minHeight: '150px', objectFit: 'contain', zIndex: zIndex+50}`
-      draggable="false"
-      @load="$event => imgLoaded($event, `preview:${pi}`)"
-      @error="$event => imgError($event, `preview:${pi}`)")
-    //- active
-    div(v-if="needFull && nodeFull" :style=`{position: 'absolute', zIndex: zIndex+90}`).row.fit
-      div(v-for="(f, fi) in 2" :key="fi" v-show="fragmentActive === fi").row.fit
-        node-fragment-video(v-if="nodeFull.fragments[fi].content.type === 'VIDEO'" :zIndex="zIndex" :url="nodeFull.fragments[fi].url" :visible="fi === fragmentActive && active")
-        node-fragment-image(v-if="nodeFull.fragments[fi].content.type === 'IMAGE'" :zIndex="zIndex" :url="nodeFull.fragments[fi].url" :visible="fi === fragmentActive && active")
+    div(
+       v-for="(p, pi) in 2" :key="pi"
+       :style=`{position: 'relative', order: pi*2, overflow: 'hidden', ...getRadius}`
+      ).row.full-width.items-start
+      k-menu-popup(v-if="active && nodeFull"
+        :style=`{position: 'absolute', zIndex: zIndex+1000, top: '8px', right: '8px'}`
+        :name="nodeFull.fragments[pi].content.name" :actions="fragmentActions"
+        @action="$event => fragmentAction($event, pi)")
+        q-btn(icon="more_horiz" color="white" round flat
+          :style=`{}`).shadow-1
+      img(
+        :src="node.thumbUrl[pi]"
+        :style=`{width: '100%', objectFit: 'contain', zIndex: zIndex+50}`
+        draggable="false"
+        @load="$event => imgLoaded($event, `preview:${pi}`)"
+        @error="$event => imgError($event, `preview:${pi}`)")
+      //- active
+      div(v-if="needFull && nodeFull" :style=`{position: 'absolute', zIndex: zIndex+90}`).row.fit
+        node-fragment-video(v-if="nodeFull.fragments[pi].content.type === 'VIDEO'" :zIndex="zIndex" :url="nodeFull.fragments[pi].url" :visible="active && pi === 0")
+        node-fragment-image(v-if="nodeFull.fragments[pi].content.type === 'IMAGE'" :zIndex="zIndex" :url="nodeFull.fragments[pi].url" :visible="active")
   //- name
-  node-name(:node="node")
   node-actions(:node="node" :nodeFull="nodeFull")
   node-spheres(:node="node" :nodeFull="nodeFull")
   node-timestamp(:node="node" :nodeFull="nodeFull")
@@ -60,7 +47,7 @@ import kMenuPopup from 'components/k_menu_popup'
 export default {
   name: 'nodeTemplate__pip',
   components: {nodeName, nodeHeader, nodeActions, nodeSpheres, nodeTimestamp, nodeFragmentVideo, nodeFragmentImage, kMenuPopup},
-  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates'],
+  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates', 'inCreator'],
   data () {
     return {
       fragmentActive: 0,
@@ -72,13 +59,6 @@ export default {
     }
   },
   computed: {
-    fragment () {
-      if (this.nodeFull) {
-        return this.nodeFull.fragments[this.fragmentActive]
-      } else {
-        return null
-      }
-    },
     getHeight () {
       let w = this.$q.screen.width
       if (w > 500) return 500
@@ -134,14 +114,6 @@ export default {
           break
         }
       }
-    },
-    forwardClick () {
-      this.$log('forwardClick')
-      let a = this.fragmentActive === 0 ? 1 : 0
-      this.fragmentActive = a
-      this.$nextTick(() => {
-        if (this.$refs.kvideo) this.$refs.kvideo[this.fragmentActive].play()
-      })
     },
     imgError (e, msg) {
       // this.$log('imgError', msg)

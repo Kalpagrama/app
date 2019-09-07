@@ -26,7 +26,7 @@ import kMenuPopup from 'components/k_menu_popup'
 export default {
   name: 'nodeTemplateCards',
   components: {nodeHeader, nodeActions, nodeTimestamp, kMenuPopup},
-  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates'],
+  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates', 'inCreator'],
   data () {
     return {
     }

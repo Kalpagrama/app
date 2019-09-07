@@ -1,320 +1,245 @@
 <template lang="pug">
-div(style=`position: relative`).row.fit.content-start.items-start.justify-center.bg-grey-4
-  q-dialog(ref="contentFindDialog" no-route-dismiss :maximized="$q.screen.width < 600" transition-show="slide-up" transition-hide="slide-down")
-    content-finder(@ready="contentChoosen" @close="$refs.contentFindDialog.hide()")
-  q-dialog(ref="videoEditorDialog" no-route-dismiss :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    video-editor(
-      v-if="nodeFull.fragments[fragmentIndex]"
-      :fragment="nodeFull.fragments[fragmentIndex]"
-      @fragment="fragmentEdited"
-      @ready="videoEdited")
-  div(v-if="!loading" :style=`{maxWidth: '500px'}` body-scroll-lock-ignore).row.full-width.items-start.content-start.scroll
-    node(:node="node" :nodeFullReady="nodeFull" :index="0" :zIndex="100" noActions noFragmentMenu noNodeMenu needFull
-      :inEditor="true" maxHeight="70vh"
-      :style=`{maxWidth: '500px', borderRadius: '4px'}` :active="true").bg-white.q-my-md
-      template(v-slot:name)
-        .row.fit.items-center
-          q-input(v-model="nodeFull.name" borderless :maxlength="45"
-            :input-class="['text-center']" placeholder="В чем суть?").fit
-      template(v-slot:fragment="{index, empty}")
-        div(:style=`{zIndex: 100, position: empty ? 'relative' : 'absolute', height: '150px'}`).row.full-width.items-center.justify-center.bg-grey-5
-          q-btn(outline round color="primary" icon="add" size="lg" @click="contentFind(index)")
-        div(v-if="!empty" :style=`{position: 'absolute', zIndex: 10000, top: '8px', right: '8px', width: '40px'}`).row.justify-end
-          q-btn(round flat dense color="white" icon="edit" @click="fragmentEdit(index)").shadow-1.q-mb-sm
-          q-btn(round flat dense color="white" icon="clear" @click="fragmentDelete(index)").shadow-1
-    //- actions
-    div(:style=`{borderRadius: '4px', overflow: 'hidden'}`).row.full-width
-      //- sphere finder
-      sphere-finder(:spheresReady="nodeFull.spheres" @spheres="nodeFull.spheres = $event")
-      //- create
-      div(v-if="true" style=`height: 70px`).row.full-width.items-center.justify-end.bg-white.q-px-sm
-        q-btn(@click="nodeCreate()" :loading="nodeCreating"
-          rounded style=`height: 50px; width: 200px; borderRadius: 4px` color="primary" no-caps ).full-width {{$t('Создать')}}
-      //- debug
-      div(v-if="false" style=`minHeight: 70px`).row.full-width.justify-center.bg-green-1
-        small {{nodeFull}}
-  div(v-else).row.fit.items-center.justify-center
-    q-spinner(:thickness="2" color="primary" size="50px")
+div(:style=`{overflowX: 'auto', overflowY: 'hidden', height: $q.screen.gt.sm ? 'calc(100vh)' : 'calc(100vh - 60px)'}`).row.full-width.scroll
+  //- content find dialog
+  q-dialog(ref="contentFindDialog" position="bottom")
+    content-finder
+  //- editors
+  q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    video-editor(v-if="videoEditorShow && fragments[fragmentEditing]" :fragment="fragments[fragmentEditing]" @fragment="fragmentSync" @ready="fragmentEdited" @close="videoEditorShow = false, $refs.videoEditorDialog.hide()")
+  //- wrapper
+  .row.full-height.no-wrap
+    //- fragments from workspace
+    div(v-show="fragmentsWorkspaceShow" :style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height
+      nodes-workspace(@nodeClick="nodeWorkspaceClick")
+    //- fragment selected
+    div(:style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height.q-px-sm
+      .column.full-height
+        //- header
+        div(v-if="false" :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+          q-btn(v-show="!fragmentsWorkspaceShow" icon="keyboard_arrow_left" round flat color="grey-6" @click="fragmentsWorkspaceShow = true")
+          span.text-grey-8 Фрагменты
+          .col
+          //- q-btn(round flat color="grey-6" icon="search")
+          q-btn(round flat color="grey-6" icon="more_vert")
+        //- body
+        .col.scroll
+          .row.full-width.items-start.q-pt-md
+          //- fragments list
+          div(
+            v-for="(f, fi) in fragments" :key="fi"
+            :style=`{position: 'relative', minHeight: '150px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-white.q-mb-md
+            //- fragment actions top right
+            div(:style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', height: '40px', opacity: 0.3}`).row
+              q-btn(round flat dense color="white" icon="edit" @click="fragmentEdit(f, fi)").bg-grey-9
+            //- fragment actions top left
+            div(:style=`{position: 'absolute', zIndex: 100, top: '8px', left: '8px', height: '40px', opacity: 0.3}`).row
+              q-btn(round flat dense color="white" icon="clear" @click="fragmentDelete(fi)").bg-grey-9
+            //- fragment actions bottom left
+            div(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', height: '40px', opacity: 0.3}`).row
+              q-btn(round flat dense color="white" icon="keyboard_arrow_down" @click="fragmentDuplicate(f, fi)").bg-grey-9
+            //- fragment preview only?
+            img(
+              :src="f.preview || f.content.thumbUrl[0]"
+              :style=`{width: '100%', objectFit: 'contain'}` draggable="false")
+          //- fragment add
+          div(
+            v-if="true"
+            :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden'}`
+            ).row.full-width.items-center.justify-center.bg-white
+            q-btn(icon="add" color="primary" round outline size="lg" @click="fragmentAdd()")
+          //- toggle fragments from workspace
+          q-btn(
+            :icon="fragmentsWorkspaceShow ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" outline color="grey-6"
+            style=`height: 50px; borderRadius: 8px` no-caps
+            @click="fragmentsWorkspaceShow = !fragmentsWorkspaceShow").full-width.q-mt-md
+            span {{fragmentsWorkspaceShow ? 'Скрыть фрагменты из мастерской' : 'Показать фрагменты из мастерской'}}
+          //- margin bottom
+          div(:style=`{height: '100px'}`).row.full-width
+    //- node preview
+    div(:style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height.q-px-sm
+      .column.full-height
+        //- header
+        div(v-if="false" :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+          span.text-grey-8 Ядро
+          .col
+          q-btn(round flat color="grey-6" icon="more_vert")
+        //- body
+        .col.scroll.q-pt-md
+          //- node for preview
+          node(:node="node" :nodeFullReady="node" inCreator
+            :style=`{borderRadius: '10px', overflow: 'hidden'}`).bg-white
+          //- name
+          div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-pa-sm.q-mt-md
+            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
+              q-input(v-model="name" filled type="textarea" :rows="3" autogrow :maxlength="130" label="В чем суть?").full-width
+          //- spheres
+          div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-pa-sm.q-mt-md
+            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
+              q-input(v-model="spheresInput" filled type="textarea" autogrow placeholder="Сфера1, сфера2, сфера3").full-width
+          //- save
+          //- publish
+          q-btn(no-caps color="primary" style=`height: 60px; borderRadius: 10px` :loading="nodePublishing" @click="nodePublish()").full-width.q-mt-md
+            span.text-bold.text-white Опубликовать
+          q-btn(no-caps color="primary" style=`height: 45px; borderRadius: 10px` outline :loading="nodeSaving" @click="nodeSave()").full-width.q-mt-sm Сохранить в мастерскую
+          div(style=`height: 60px`).row.full-width
 </template>
 
 <script>
-// import node from 'components/node'
-import node from 'components/node/node_css'
-import sphereFinder from 'components/sphere_finder'
+import node from 'components/node'
 import contentFinder from 'components/content_finder'
-import imageEditor from 'components/image_editor'
+import nodesWorkspace from 'pages/app/workspace/nodes'
 import videoEditor from 'components/video_editor'
-import bookEditor from 'components/book_editor'
 
-// TODO: very long waiting after click to uploadcontenturl
 export default {
   name: 'nodeCreator',
-  meta: {
-    title: 'Kalpa node creator'
-  },
-  components: {node, contentFinder, imageEditor, videoEditor, bookEditor, sphereFinder},
+  components: {node, contentFinder, nodesWorkspace, videoEditor},
+  props: ['draft'],
   data () {
     return {
-      loading: false,
-      spheres: '',
-      fragmentIndex: 0,
-      node: {
-        type: 'NODE',
-        name: '',
-        oid: '',
-        thumbUrl: []
-      },
-      nodeFull: {
-        author: this.$store.state.auth.user,
-        name: '',
-        spheres: [],
-        fragments: [
-          null,
-          null
-          // {
-          //   content: {type: 'VIDEO', name: '', url: ''},
-          //   relativePoints: [{x: 0}, {x: 10}],
-          //   relativeScale: 1000,
-          //   url: ''
-          // },
-          // {
-          //   content: {type: 'IMAGE', name: '', url: ''},
-          //   relativePoints: [{x: 0, y: 0, z: 0}, {x: 10, y: 0, z: 0}],
-          //   relativeScale: 1000,
-          //   url: ''
-          // }
-        ]
-      },
-      nodeCreating: false,
+      fragments: [],
+      fragmentsWorkspaceShow: true,
+      fragmentEditing: undefined,
+      name: '',
+      spheres: [],
+      spheresInput: '',
+      videoEditorShow: false,
       nodeSaving: false,
-      progress: null,
-      active: false
-    }
-  },
-  watch: {
-    nodeFull: {
-      handler (to, from) {
-        this.$log('nodeFull CHANGED', to)
-        localStorage.setItem('nodeFull', JSON.stringify(to))
-      }
-    },
-    node: {
-      handler (to, from) {
-        this.$log('node CHANGED', to)
-        localStorage.setItem('node', JSON.stringify(to))
-      }
+      nodePublishing: false
     }
   },
   computed: {
-    nodeCreateBtnShow () {
-      if (this.nodeFull.fragments[0] !== null &&
-        this.nodeFull.fragments[1] !== null &&
-        this.nodeFull.name.length > 2) {
-        return true
-      } else {
-        return false
+    node: {
+      get () {
+        return {
+          name: this.name,
+          author: this.$store.state.auth.user,
+          thumbUrl: this.fragments.map(f => {
+            return f.preview || ''
+          }),
+          fragments: this.fragments,
+          spheres: this.spheres,
+          createdAt: Date.now()
+        }
+      },
+      set (val) {
+        // this.nodeRaw = val
       }
     },
-    getRadius () {
-      return {
-        // borderBottomLeftRadius: '100%8px',
-        // borderBottomRightRadius: '100%8px',
-        borderTopLeftRadius: '100%8px',
-        borderTopRightRadius: '100%8px'
+    nodesWorkspace () {
+      return this.$store.state.workspace.workspace.nodes
+    },
+    colWidth () {
+      let w = this.$q.screen.width
+      if (w > 500) return 500
+      else return w
+    }
+  },
+  watch: {
+    node: {
+      handler (to, from) {
+        this.$log('node CHANGED', to)
+        localStorage.setItem('nodeDraft', JSON.stringify(to))
+      }
+    },
+    draft: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('draft CHANGED', to)
+        if (to) {
+          to.fragments.map((f, fi) => {
+            f.preview = to.thumbUrl[fi]
+            this.fragments.push(f)
+          })
+        }
       }
     }
   },
   methods: {
-    contentFind (index) {
-      this.$log('contentFind', index)
-      this.active = false
-      this.fragmentIndex = index
+    fragmentAdd () {
+      this.$log('fragmentAdd')
       this.$refs.contentFindDialog.show()
+      // if (this.fragments.length > 3) return
+      // open content finder dialog
+      // find content then prepare fragment
+      // emit on fragment?
+      // then add fragment
+      // this.$set(
+      //   this.fragments,
+      //   this.fragments.length,
+      //   {
+      //     url: '',
+      //     content: {
+      //       type: 'VIDEO',
+      //       url: ''
+      //     }
+      //   }
+      // )
     },
-    contentChoosen ({type, source, oid}) {
-      this.$log('contentChoosen', type, source, oid)
-      this.$refs.contentFindDialog.hide()
-      if (type === 'VIDEO') {
-        this.$set(
-          this.nodeFull.fragments,
-          this.fragmentIndex,
-          {
-            oid: oid,
-            url: '',
-            relativePoints: [],
-            relativeScale: 0,
-            content: {
-              type: type,
-              oid: oid
-            }
-          })
-        this.$refs.videoEditorDialog.show()
-      } else if (type === 'IMAGE') {
-        this.$refs.imageEditorDialog.show()
-      } else if (type === 'BOOK') {
-        this.$refs.bookEditorDialog.show()
-      } else if (type === 'CODE') {
-        this.$refs.codeEditorDialog.show()
+    fragmentDuplicate (f, index) {
+      this.$log('fragmentDuplicate')
+      // TODO: duplicate to the next position!
+      let ff = JSON.parse(JSON.stringify(f))
+      this.fragments.push(ff)
+    },
+    fragmentEdit (f, index) {
+      this.$log('fragmentEdit', f, index)
+      this.$set(this, 'fragmentEditing', index)
+      switch (f.content.type) {
+        case 'VIDEO': {
+          this.$log('fragmentEdit', f.content.type)
+          this.videoEditorShow = true
+          this.$refs.videoEditorDialog.show()
+          break
+        }
+        case 'IMAGE': {
+          this.$log('fragmentEdit', f.content.type)
+          // this.$refs.imageEditorDialog.show()
+          break
+        }
       }
     },
-    fragmentEdit (index) {
-      this.fragmentIndex = index
-      let type = this.nodeFull.fragments[this.fragmentIndex].content.type
-      this.$log('fragmentEdit', index, type)
-      if (type === 'VIDEO') {
-        this.$refs.videoEditorDialog.show()
-      } else if (type === 'IMAGE') {
-        this.$refs.imageEditorDialog.show()
-      } else if (type === 'BOOK') {
-        this.$refs.bookeEditorDialog.show()
-      }
+    fragmentSync (f) {
+      this.$log('fragmentSync')
+      this.$set(this.fragments, this.fragmentEditing, f)
     },
-    fragmentEdited (e) {
-      this.$log('fragmentEdited', e)
-      this.$set(this.nodeFull.fragments, this.fragmentIndex, e)
+    fragmentEdited (f) {
+      this.$log('fragmentEdited')
+      this.$set(this.fragments, this.fragmentEditing, f)
+      this.fragmentEditing = undefined
+      this.$refs.videoEditorDialog.hide()
     },
     fragmentDelete (index) {
-      this.$log('fragmentDelete: ', index)
-      this.$set(this.node.thumbUrl, index, '')
-      this.$set(this.nodeFull.fragments, index, null)
+      this.$log('fragmentDelete', index)
+      this.$delete(this.fragments, index)
     },
-    videoEdited (fragment, preview) {
-      this.$log('videoEdited', fragment)
-      this.$set(this.node.thumbUrl, this.fragmentIndex, preview)
-      this.$set(this.nodeFull.fragments, this.fragmentIndex, fragment)
-      this.$refs.videoEditorDialog.hide()
-      localStorage.setItem('node', JSON.stringify(this.node))
-      localStorage.setItem('nodeFull', JSON.stringify(this.nodeFull))
+    templateClick (t, ti) {
+      this.$log('templateClick', t.id)
+      this.$set(this, 'nodeTemplate', t.id)
     },
-    imageEdited (fragment, preview) {
-      this.$log('imageEdited', fragment, preview)
-    },
-    bookEdited (fragment, preview) {
-      this.$log('bookEdited', fragment, preview)
-    },
-    sphereFind () {
-      this.$log('sphereFind')
-      this.showSphereFind = true
-      this.$refs.typeDialog.show()
-    },
-    sphereChoosen (s) {
-      this.$log('sphereChoosen', s)
-      if (!this.nodeFull.spheres.find(sphere => sphere.name === s.name)) {
-        this.nodeFull.spheres.push(s)
-      } else {
-        this.$log('the SAME sphere', s)
-      }
-    },
-    sphereDelete (s, si) {
-      this.$log('sphereDelete')
-      this.nodeFull.spheres = this.nodeFull.spheres.filter(sphere => sphere.name !== s.name)
-    },
-    sphereDeleteAll () {
-      this.$log('sphereDeleteAll')
-      this.$set(this.nodeFull, 'spheres', [])
-    },
-    async nodeCreate () {
-      try {
-        this.$log('nodeCreate start', this.nodeFull)
-        let n = JSON.parse(JSON.stringify(this.nodeFull))
-        delete n.author
-        delete n.fragments[0].content
-        delete n.fragments[0].url
-        delete n.fragments[1].content
-        delete n.fragments[1].url
-        delete n.thumbUrl
-        // TODO: add validation of the node
-        this.nodeCreating = true
-        // mutate
-        let {data: {nodeCreate}} = await this.$apollo.mutate({
-          mutation: gql`
-            mutation nodeCreate ($node: NodeInput!) {
-              nodeCreate (node: $node) {
-                oid
-                type
-                name
-              }
-            }
-          `,
-          variables: {
-            node: n
-          }
-        })
-        this.$log('nodeCreate done', nodeCreate)
-        this.$q.notify({message: this.$t('node_published'), color: 'primary', textColor: 'white'})
-        this.$set(this, 'nodeFull', {name: '', spheres: [], fragments: [null, null]})
-        await this.$wait(700)
-        localStorage.removeItem('node')
-        localStorage.removeItem('nodeFull')
-        this.$router.push(`/app/node/${nodeCreate.oid}`)
-        this.nodeCreating = false
-      } catch (error) {
-        this.$log('nodeCreate error', error)
-        this.nodeCreating = false
-        this.$q.notify({message: error.message || JSON.stringify(error), color: 'red', textColor: 'white'})
-      }
+    nodeWorkspaceClick (n) {
+      this.$log('nodeWorkspaceClick', n)
+      n.fragments.map((f, fi) => {
+        let fRaw = JSON.parse(JSON.stringify(f))
+        fRaw.preview = n.thumbUrl[fi]
+        this.fragments.push(fRaw)
+      })
     },
     async nodeSave () {
-      try {
-        this.$log('nodeSave start')
-        this.nodeSaving = true
-        await this.$wait(2000)
-        this.$log('nodeSave done')
-        this.nodeSaving = false
-        this.$q.notify({message: this.$t('node_saved'), color: 'primary', textColor: 'white'})
-      } catch (error) {
-        this.nodeSaving = false
-        this.$q.notify({message: error.message || JSON.stringify(error), color: 'red', textColor: 'white'})
-        this.$log('nodeSave error', error)
-      }
+      this.$log('nodeSave')
+      this.nodeSaving = true
+      // await this.$wait(2000)
+      this.$store.commit('workspace/updateNode', this.node)
+      this.nodeSaving = false
     },
-    nodeLoad () {
+    async nodePublish () {
+      this.$log('nodePublish')
+      this.nodePublishing = true
+      // await this.$wait(2000)
+      this.nodePublishing = false
     }
   },
-  async mounted () {
+  mounted () {
     this.$log('mounted')
-    this.loading = true
-    await this.$wait(500)
-    // subscribe for progress, any progress
-    const observer = this.$apollo.subscribe({
-      client: 'ws',
-      query: gql`
-        subscription uploadProgress {
-          progress {
-            action
-            progress
-          }
-        }
-      `
-    })
-    observer.subscribe({
-      next: ({data: {progress}}) => {
-        this.$log('progress', progress)
-        this.$set(this, 'progress', progress)
-      },
-      error: (error) => {
-        this.$log('progress error', error)
-      }
-    })
-    // get fork, only once? cos if u have fragment to fork?
-    // maybe set it to workspace
-    let node = this.$store.state.workspace.node
-    if (node) {
-      this.$log('node', node)
-      this.node = node
-      this.nodeFull = node
-    } else {
-      this.$log('FROM EMPTY')
-      let nodeCache = localStorage.getItem('node')
-      if (nodeCache) {
-        this.node = JSON.parse(nodeCache)
-        this.nodeFull = JSON.parse(localStorage.getItem('nodeFull'))
-        this.$log('node', this.node)
-        this.$log('nodeFull', this.nodeFull)
-      }
-    }
-    this.loading = false
-    // workspace had fragments and nodes
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

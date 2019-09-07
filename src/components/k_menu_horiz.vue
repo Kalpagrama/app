@@ -1,11 +1,21 @@
 <template lang="pug">
-div(:style=`{height: '60px'}`).row.full-width.items-center.justify-between.bg-white.q-px-md
-  q-btn(round flat color="grey-9" icon="home" @click="menuClick('/app/home')")
-  q-btn(round flat color="grey-9" icon="whatshot" @click="menuClick('/app/hot')")
-  q-btn(round flat color="grey-9" icon="add" @click="menuClick('/app/create/node')")
-  q-btn(round flat color="grey-9" icon="bookmark_outline" @click="menuClick('/app/workspace')")
-  div(:style=`{height: '36px', width: '36px', borderRadius: '50%', overflow: 'hidden'}`).row.items-center.justify-center.cursor-pointer
-    img(v-if="$store.state.auth.user" @click="$router.push(`/app/user/${$store.state.auth.user.oid}`)" :src="$store.state.auth.user.thumbUrl[0]" width="36px" height="36px")
+.row.full-width.q-px-sm
+  div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '20px 20px 0 0'}`).row.full-width.items-center.justify-between.bg-white.q-px-md.q-mx-md
+    //- home
+    q-btn(round flat color="grey-6" :style=`{overflow: 'hidden', borderRadius: '50%', width: '40px', height: '40px', border: $route.path === '/app/home' ? '1px solid #027BE3' : 'none'}`
+      @click="menuClick('/app/home')")
+      template(v-slot:default)
+        img(:src="`statics/logo.png`" width="40px" height="40px")
+    //- hot
+    q-btn(round flat icon="whatshot" :color="$route.path === '/app/hot' ? 'primary' : 'grey-8'" @click="menuClick('/app/hot')")
+    //- add
+    q-btn(round flat icon="add" :color="$route.path === '/app/create' ? 'primary' : 'grey-8'" @click="menuClick('/app/create')")
+    //- workspace
+    q-btn(round flat icon="cloud_queue" :color="$route.path === '/app/workspace' ? 'primary' : 'grey-8'" @click="menuClick('/app/workspace')")
+    //- user
+    q-btn(round flat color="grey-6" :style=`{overflow: 'hidden', borderRadius: '50%', width: '40px', height: '40px', border: $route.name === 'user' ? '1px solid #027BE3' : 'none'}` @click="menuClick('/app/user')")
+      template(v-slot:default)
+        img(v-if="$store.state.auth.user" :src="$store.state.auth.user.thumbUrl[0]" style=`width: 42px; height: 42px`)
 </template>
 
 <script>
@@ -13,12 +23,20 @@ export default {
   name: 'kMenuHoriz',
   data () {
     return {
+      pages: {
+        'home': {name: 'Home', path: '/app/home'},
+        'hot': {name: 'Hot', path: '/app/hot'},
+        'create': {name: 'Create', path: '/app/create'},
+        'workspace': {name: 'Workspace', path: '/app/workspace'},
+        'user': {name: 'User', path: '/app/user'}
+      }
     }
   },
   methods: {
     menuClick (path) {
       this.$log('menuClick')
       this.$router.push(path)
+      this.$root.$emit('path', path)
     }
   }
 }

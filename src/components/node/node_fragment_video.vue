@@ -9,8 +9,10 @@ div(
     small.full-width playing: {{playing}}
     small.full-width now: {{$time(now)}}
   //- actions
-  div(v-if="false" :style=`{position: 'absolute', zIndex: zIndex+10, top: '8px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
-    q-btn(round flat color="white" icon="fullscreen" @click="videoToggleFullscreen").shadow-1
+  div(v-if="true" :style=`{position: 'absolute', zIndex: zIndex+10, top: '8px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
+    //- q-btn(round flat color="white" icon="fullscreen" @click="videoToggleFullscreen").shadow-1
+    //- TODO: align items in node...
+    q-btn(v-if="!playing && visible" round color="primary" icon="flash_on" style=`width: 30px; height: 30px` @click="videoToggleMute").shadow-1
   div(:style=`{position: 'absolute', zIndex: zIndex+10, bottom: '20px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
     q-btn(round flat color="white" :icon="muted ? 'volume_off' : 'volume_up'" @click="videoToggleMute").shadow-1
     div(:style=`{color: 'white', borderRadius: '4px', opacity: 0.7}`).bg-grey-10.q-px-xs.q-ml-sm
@@ -18,13 +20,13 @@ div(
   //- timeline
   div(v-if="now > 0" :style=`{position: 'absolute', zIndex: zIndex+100, bottom: '0px', left: '0px', height: '20px'}` @click="videoTimelineClick"
     ).row.full-width.items-end.cursor-pointer
-    div(:style=`{width: videoNow+'%', height: '8px', borderRight: '3px solid #027BE3', pointerEvents: 'none'}`).row.bg-primary
-  //- video
+    div(:style=`{width: videoNow+'%', height: '20px', borderRight: '3px solid #027BE3', pointerEvents: 'none'}`).row.bg-primary
+  //- video autoPictureInPicture
   video(
     ref="kvideo"
     :src="url"
     :style=`{width: '100%', objectFit: 'contain'}`
-    :muted="muted" loop :playsinline="playsinline" autoPictureInPicture
+    :muted="muted" loop playsinline
     @click="videoClick"
     @playing="videoPlaying"
     @timeupdate="videoTimeupdate")
@@ -86,6 +88,7 @@ export default {
       // let x = e.offsetX
       // let w = e.path[0].clientWidth
       // this.$q.notify(`${x.toString()}/${w.toString()} !!!`)
+      // TODO: click on mobile devices
       if (e && e.path && e.path[0] && e.path[0].clientWidth && e.offsetX) {
         this.$log('videoTimelineClick', e.offsetX, e.path[0].clientWidth)
         let k = e.offsetX / e.path[0].clientWidth

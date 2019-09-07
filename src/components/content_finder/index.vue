@@ -1,206 +1,213 @@
 <template lang="pug">
-div(style=`maxWidth: 600px`).column.fit.bg-white
-  q-resize-observer(@resize="onResize")
-  div(style=`height: 60px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-pl-md
-    span Найти видео по ссылке
-    .col
-    //- //- span Find
-    //- div(v-if="type" style=`height: 60px; width: 50px`).row.items-center.justify-center
-    //-   q-icon(v-if="type" :name="type.icon" :color="type.color" size="40px")
-    //- span(v-if="source") from {{source}}
-    //- .col.full-height
-    //-   div(v-if="type && source").row.fit.justify-end.items-center.q-px-sm
-    //-     q-btn(v-if="type && source" outline dense color="primary" no-caps @click="returnToTypeChoose()" icon="keyboard_arrow_left").q-px-sm {{$t('change_type')}}
-    //-   div(v-else).row.fit.items-center.q-px-sm
-    //-     span.q-mr-sm Choose
-    //-     span(v-if="!type").q-mr-sm type &
-    //-     span(v-if="!source") source
-    div(v-if="!type && !source" style=`height: 60px; width: 60px`).row.items-center.justify-center
-      q-btn(flat round icon="clear" @click="$emit('close')")
-  //- body
-  .col
-    .column.fit
-      //- link
-      //- .col
-      link-finder(:width="width" :height="height" @ready="handleReady" :nexting="nexting")
-      //- source-link
-      //- types
-      //- div(:style=`{borderTop: '1px solid #eee', borderBottom: '1px solid #eee', maxHeight: typesMaxHeight+'px'}`).row.full-width.items-start.content-start.types-wrapper
-      //-   div(
-      //-     v-for="(t, tkey) in types" :key="tkey" @click="typeClick(t, tkey)"
-      //-     :style=`{
-      //-       height: getHeight(Object.keys(types).length)+'px',
-      //-       width: getHeight(Object.keys(types).length)+'px',
-      //-       borderRight: '1px solid #eee',
-      //-       background: tkey === typeKey ? '#eee' : 'none'}`
-      //-     ).col
-      //-     .row.fit.items-center.content-center.justify-center.hr.cursor-pointer
-      //-       q-icon(:name="t.icon" :color="tkey === typeKey ? t.color : 'grey'" size="90px")
-      //-       div(style=`overflow: hidden`).row.full-width.justify-center
-      //-         span.text-black {{ $t(t.name) }}
-      //- image
-      //- div(v-if="typeKey === 'IMAGE'" style=`overflow: hidden`).row.full-width.types-wrapper
-      //-   //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-      //-   //-   h6.q-ma-xs 2.
-      //-   //-   span.q-pt-xs {{$t('choose_image_source')}}
-      //-   div(style=`borderBottom: 1px solid #eee`).row.full-width
-      //-     div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
-      //-       :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
-      //-         div(style=`overflow: hidden`).row.fit.items-center.content-center.justify-center
-      //-           span {{ s.name }}
-      //- video
-      //- div(v-else-if="typeKey === 'VIDEO'" style=`overflow: hidden`).row.full-width.types-wrapper
-      //-   //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-      //-   //-   h6.q-ma-xs 2.
-      //-   //-   span.q-pt-xs {{$t('choose_video_source')}}
-      //-   div(style=`borderBottom: 1px solid #eee`).row.full-width
-      //-     div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
-      //-       :style=`{height: '100px', borderRight: '1px solid #eee', background: skey == source ? '#eee' : 'none'}`).col.hr.cursor-pointer
-      //-         .row.fit.items-center.content-center.justify-center
-      //-           span {{ s.name }}
-      //- book
-      //- div(v-else-if="typeKey === 'BOOK'" style=`overflow: hidden`).row.full-width.types-wrapper
-      //-   //- div(style=`height: 50px; borderBottom: 1px solid #eee`).row.full-width.items-center.q-px-sm
-      //-   //-   h6.q-ma-xs 2.
-      //-   //-   span.q-pt-xs {{$t('choose_book_source')}}
-      //-   div(style=`borderBottom: 1px solid #eee`).row.full-width
-      //-     div(v-for="(s, skey) in types[typeKey].sources" :key="skey" @click="source = skey"
-      //-       :style=`{height: '100px', borderRight: '1px solid #eee'}`).col.hr.cursor-pointer
-      //-         .row.fit.items-center.content-center.justify-center
-      //-           span {{ s.name }}
-      //- .col
-      //-   image-find(v-if="typeKey === 'IMAGE' && source" :source="source")
-      //-   video-find(v-if="typeKey === 'VIDEO' && source" :source="source" @ready="handleReady")
-      //-     template(v-slot:progress)
-      //-       div(v-if="nexting" style=`position: absolute; zIndex: 100; opacity: 0.9`).row.fit.items-start.content-start.justify-center.bg-white
-      //-         div(v-if="progress" style=`height: 500px`).row.full-width.justify-center.items-center.content-center
-      //-           q-spinner(:thickness="2" color="primary" size="50px")
-      //-           .row.full-width.justify-center.q-py-sm
-      //-             small {{$t('loading')}}
-      //-           .row.full-width.q-px-md
-      //-             q-linear-progress(:value="progress.progress/100" class="q-mt-md" color="primary" stripe rounded style="height: 20px").full-width
-      //-   book-find(v-if="typeKey === 'BOOK' && source" :source="source")
+div(
+  :style=`{maxWidth: '500px', height: '80vh', width: 'calc(100% - 20px)', borderRadius: '20px 20px 0px 0px', overflow: 'hidden'}`
+  ).row.justify-center.items-start.content-start.bg-white.q-mx-sm
+  //- header
+  div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+    q-btn(round flat icon="keyboard_arrow_left" color="grey-8" @click="prev()")
+    q-icon(v-if="contentType" :name="contentTypes[contentType].icon" :color="contentTypes[contentType].color" size="37px").q-ml-xs
+    .col.q-px-sm
+      span {{ steps[step].name }}
+    q-btn(round flat icon="check" color="primary" @click="next()")
+  //- find type
+  div(v-show="step === 'findType'").row.full-width.items-start.content-start
+    div(
+      v-for="(c, ckey) in contentTypes" :key="ckey" @click="contentTypeClick(c, ckey)"
+      :style=`{height: '200px'}`
+      ).col
+      .row.fit.justify-center.items-center.content-center.hr.cursor-pointer
+        .row.full-width.justify-center
+          q-icon(:name="c.icon" :color="c.color" size="60px")
+        .row.full-width.justify-center
+          span {{ c.name }}
+  //- find image content
+  div(v-show="step === 'findContent' && contentType === 'IMAGE'").row.full-width.q-pa-md
+    q-input(v-model="imageUrlInput" filled placeholder="Вставье ссылку" @click="imageUrlInputChanged").full-width
+    div(:style=`{height: '80px'}`).row.full-width.items-end.justify-center.q-pb-md
+      span или возьмите с устройства
+    .row.full-width.justify-center
+      div(
+        @click="$refs.imageFileInput.click()"
+        :style=`{width: '100px', height: '100px', borderRadius: '4px'}`
+        ).row.items-center.justify-center.bg-grey-3.hr.cursor-pointer
+        input(type="file" hidden ref="imageFileInput" accept="image/*" @change="imageFileChanged")
+        q-icon(name="attachment" size="50px" color="grey-8").rotate-90
+  //- find video content
+  div(v-show="step === 'findContent' && contentType === 'VIDEO'").row.full-width.q-pa-md
+    q-input(v-model="videoUrlInput" filled placeholder="Вставьте ссылку на YouTube" @input="videoUrlInputChanged").full-width
+    div(:style=`{height: '80px'}`).row.full-width.items-end.justify-center.q-pb-md
+    //-   span или возьмите с устройства
+    .row.full-width.justify-center
+      .col
+        .row.fit.items-center.justify-center
+          div(
+            @click="$refs.videoFileInput.click()"
+            :style=`{width: '100px', height: '100px', borderRadius: '4px'}`
+            ).row.items-center.justify-center.bg-grey-3.hr.cursor-pointer
+            input(type="file" hidden ref="videoFileInput" accept="video/mp4,video/x-m4v,video/*" @change="videoFileChanged")
+            q-icon(name="cloud_queue" size="50px" color="grey-8")
+      .col
+        .row.fit.items-center.justify-center
+          div(
+            @click="$refs.videoFileInput.click()"
+            :style=`{width: '100px', height: '100px', borderRadius: '4px'}`
+            ).row.items-center.justify-center.bg-grey-3.hr.cursor-pointer
+            input(type="file" hidden ref="videoFileInput" accept="video/mp4,video/x-m4v,video/*" @change="videoFileChanged")
+            q-icon(name="attachment" size="50px" color="grey-8").rotate-90
+  //- preview image content
+  div(v-if="step === 'previewContent' && contentType === 'IMAGE'").row.full-width.items-start
+    img(:src="imageUrl" :style=`{width: '100%', maxHeight: '400px', objectFit: 'contain'}`)
+  //- preview video content
+  div(v-if="step === 'previewContent' && contentType === 'VIDEO'").row.full-width.items-start
+    //- iframe(
+    //-   :src="videoLinkYoutube"
+    //-   :style=`{width: '100%', height: '100vh', maxHeight: '400px', objectFit: 'contain'}`
+    //-   frameborder="0"
+    //-   autoplay
+    //-   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+    //-   allowfullscreen)
+    node-video(:url="videoUrl" :zIndex="100" :active="true" :visible="true" :style=`{maxHeight: '400px', objectFit: 'contain'}`)
+  //- upload content
+  div(v-if="step === 'uploadContent'").row.full-width.justify-center.items-start
+    span {{contentUploadProgress}}
+    span {{contentUploadDone}}
 </template>
 
 <script>
-import imageFinder from 'components/image_finder'
-import videoFinder from 'components/video_finder'
-import bookFinder from 'components/book_finder'
-import linkFinder from 'components/link_finder'
-import sourceLink from 'components/video_finder/source_link'
+import nodeVideo from 'components/node/node_fragment_video'
+import nodeImage from 'components/node/node_fragment_image'
 
 export default {
-  name: 'contentFinder',
-  components: {imageFinder, videoFinder, bookFinder, linkFinder, sourceLink},
+  name: 'nodeCreator__contentFinder',
+  components: {nodeVideo, nodeImage},
   data () {
     return {
-      width: 400,
-      height: 600,
-      canceling: false,
-      nexting: false,
-      type: null,
-      typeKey: null,
-      source: null,
-      types: {
-        IMAGE: {
-          name: 'image',
-          icon: 'panorama',
-          color: 'green',
-          sources: {
-            device: {name: 'from_device', implemented: false},
-            google: {name: 'from_google', implemented: false},
-            link: {name: 'from_link', implemented: true},
-            // workspace: {name: 'from_workspace', implemented: true}
-          }
-        },
-        VIDEO: {
-          name: 'video',
-          icon: 'movie_creation',
-          color: 'red',
-          sources: {
-            device: {name: 'from_device', implemented: true},
-            youtube: {name: 'from_youtube', icon: 'fab fa-youtube', implemented: true},
-            link: {name: 'from_link', implemented: true},
-            // workspace: {name: 'from_workspace', implemented: false}
-          }
-        },
-        BOOK: {
-          name: 'book',
-          icon: 'format_quote',
-          color: 'black',
-          sources: {
-            device: {name: 'from_device', implemented: false},
-            link: {name: 'from_link', implemented: false},
-            litres: {name: 'from_litres', implemented: false},
-            // workspace: {name: 'from_workspace', implemented: false}
-          }
-        }
+      step: 'findType',
+      steps: {
+        findType: {name: 'Выберите тип контента'},
+        findContent: {name: 'Поиск'},
+        previewContent: {name: 'Предосмотр'},
+        uploadContent: {name: 'Загрузка'}
       },
-      typesMaxHeight: 400,
-      content: null,
-      progress: null
+      contentTypes: {
+        VIDEO: {name: 'Видео', icon: 'movie_creation', color: 'red'},
+        IMAGE: {name: 'Изображение', icon: 'panorama', color: 'green'},
+        // BOOK: {name: 'Книга'},
+        // CODE: {name: 'Репозиторий'},
+        // HTML: {name: 'Веб-страница'}
+      },
+      contentSource: undefined,
+      contentType: undefined,
+      contentUploadProgress: 0,
+      contentUploadDone: false,
+      videoLinkValidated: false,
+      videoFile: undefined,
+      videoUrl: undefined,
+      videoUrlInput: undefined,
+      imageUrl: undefined,
+      imageUrlInput: undefined,
+      imageFile: undefined
+    }
+  },
+  computed: {
+    videoLinkYoutube () {
+      if (!this.videoUrl) return
+      let id = ''
+      let arr = this.videoUrl.split('/')
+      if (arr[arr.length - 2] === 'embed') {
+        id = arr[arr.length - 1]
+      } else {
+        let s = this.videoUrl.split('=')
+        id = s[1]
+      }
+      return `https://www.youtube.com/embed/${id}`
     }
   },
   watch: {
-    type: {
+    imageLink: {
       handler (to, from) {
-        this.$log('type CHANGED', to)
-        // what to do here?
+        this.$log('imageLink CHANGED', to)
       }
     },
-    source: {
-      handler (to, from) {
-        this.$log('source CHANGED', to)
-        if (to) {
-          this.$tween.to('.types-wrapper', 0.33, {maxHeight: 0, opacity: 0, display: 'none'})
+    step: {
+      async handler (to, from) {
+        this.$log('step CHANGED', to)
+        switch (to) {
+          case 'findType': {
+            this.$log('findType')
+            break
+          }
+          case 'findContent': {
+            this.$log('findContent')
+            break
+          }
+          case 'previewContent': {
+            this.$log('previewContent')
+            break
+          }
+          case 'uploadContent': {
+            this.$log('uploadContent')
+            // TODO: validation
+            // if (this.)
+            let oid
+            if (this.contentType === 'VIDEO') {
+              if (this.contentSource === 'youtube') {
+                oid = await this.uploadUrl(this.videoUrl)
+              } else if (this.contentSource === 'device') {
+                oid = await this.uploadFile(this.videoFile)
+              }
+            } else if (this.contentType === 'IMAGE') {
+              if (this.contentSource === 'internet') {
+                oid = await this.uploadUrl(this.imageUrl)
+              } else if (this.contentSource) {
+                oid = await this.uploadFile(this.imageFile)
+              }
+            }
+            this.$log('uploadContent done', oid)
+            break
+          }
         }
       }
     }
   },
   methods: {
-    onResize (e) {
-      this.$log('onResize', e)
-      this.width = e.width
-      this.height = e.height
-    },
-    handleReady (val) {
-      this.$log('handleReady', val)
-      this.content = val
-      this.handleNext()
-    },
-    getHeight (l) {
-      let w = this.$q.screen.width
-      if (w >= 600) {
-        return 600 / l
-      } else {
-        return w / l
+    linkValidate (link) {
+      try {
+        let l = new URL(link)
+        return l
+      } catch (e) {
+        return false
       }
     },
-    typeClick (t, tkey) {
-      this.$log('typeClick', t)
-      this.typeKey = tkey
-      this.type = t
-      this.source = ''
+    contentTypeClick (c, ckey) {
+      this.$log('contentTypeClick', c, ckey)
+      this.$set(this, 'contentType', ckey)
+      this.step = 'findContent'
     },
-    returnToTypeChoose () {
-      this.$log('returnToTypeChoose')
-      this.typeKey = null
-      this.type = null
-      this.content = null
-      this.source = null
-      this.$tween.to('.types-wrapper', 0.33, {maxHeight: 400, opacity: 1, display: 'flex'})
+    videoUrlInputChanged (val) {
+      this.$log('videoUrlInputChanged', val)
+      this.contentSource = 'youtube'
     },
-    image () {
-      this.$log('imageSelected')
+    async videoFileChanged ({ target: { validity, files: [file] } }) {
+      this.$log('videoFileChanged', file)
+      this.contentSource = 'device'
+      this.videoFile = file
+      this.videoUrl = URL.createObjectURL(file)
+      this.step = 'previewContent'
     },
-    videoSelected () {
-      this.$log('videoSelected')
+    imageUrlInputChanged (val) {
+      this.$log('imageUrlInputChanged', val)
+      this.contentSource = 'internet'
     },
-    bookSelected () {
-      this.$log('bookSelected')
+    async imageFileChanged ({ target: { validity, files: [file] } }) {
+      this.$log('imageFileChanged', file)
+      this.contentSource = 'device'
+      this.imageFile = file
+      this.imageUrl = URL.createObjectURL(file)
+      this.step = 'previewContent'
     },
-    async fileUpload (file) {
-      this.$log('fileUpload')
+    async uploadFile (file) {
+      this.$log('uploadFile')
       let {data: {uploadContentFile: {oid}}} = await this.$apollo.mutate({
         client: 'upload',
         mutation: gql`
@@ -217,8 +224,8 @@ export default {
       })
       return oid
     },
-    async urlUpload (url) {
-      this.$log('urlUpload')
+    async uploadUrl (url) {
+      this.$log('uploadUrl')
       let {data: {uploadContentUrl: {oid}}} = await this.$apollo.mutate({
         client: 'upload',
         mutation: gql`
@@ -235,68 +242,78 @@ export default {
       })
       return oid
     },
-    async handleNext () {
-      try {
-        this.$log('handleNext start!')
-        this.$log('handleNext content', this.content)
-        this.nexting = true
-        // await this.$wait(2000)
-        if (this.content.type === 'VIDEO') {
-          this.$log('next VIDEO')
-          if (this.content.source === 'from_device') {
-            this.$log('next from_device')
-            if (!this.content.file) throw new Error('No File in content!')
-            let oid = await this.fileUpload(this.content.file)
-            this.$log('handleNext done!')
-            this.nexting = false
-            this.$emit('ready', {type: 'VIDEO', source: 'from_device', oid: oid})
-            this.$emit('close')
-          } else if (this.content.source === 'from_youtube') {
-            this.$log('next from_youtube')
-            if (!this.content.url) throw new Error('No url in content!')
-            let oid = await this.urlUpload(this.content.url)
-            this.$emit('ready', {type: 'VIDEO', source: 'from_youtube', oid: oid})
-            this.$emit('close')
-            this.nexting = false
-          } else if (this.content.source === 'from_link') {
-            this.$log('next from_link', this.content)
-            if (!this.content.url) throw new Error('No url in content!')
-            let oid = await this.urlUpload(this.content.url)
-            this.$emit('ready', {type: 'VIDEO', source: 'from_link', oid: oid})
-            this.$emit('close')
-          } else if (this.content.source === 'from_workspace') {
-            this.$log('next from_workspace')
-            // TODO:
+    next () {
+      this.$log('next')
+      switch (this.step) {
+        case 'findType': {
+          this.$log('next findType')
+          if (!this.contentType) {
+            this.showError('Сначала выберите тип контента!')
+            return
           }
-        } else if (this.content.type === 'IMAGE') {
-          this.$log('next IMAGE')
-          // TODO:
-        } else if (this.content.type === 'BOOK') {
-          this.$log('next BOOK')
-          // TODO:
+          this.step = 'findContent'
+          break
         }
-      } catch (e) {
-        this.$log('handleNext error', e)
-        this.nexting = false
-        this.$q.notify({color: 'red', colorText: 'white', message: `Error ${e.toString()}`})
+        case 'findContent': {
+          this.$log('next findContent')
+          this.step = 'previewContent'
+          this.contentLoading = true
+          break
+        }
+        case 'previewContent': {
+          this.$log('next previewContent')
+          this.$set(this, 'step', 'uploadContent')
+          // this.step = 'uploadContent'
+          break
+        }
+        case 'uploadContent': {
+          this.$log('next loadContent')
+          this.contentLoading = false
+          if (!this.videoUrl) {
+            this.showError('Сначала выберите видео!')
+            return
+          }
+          this.step = 'previewContent'
+          break
+        }
       }
     },
-    handleCancel () {
-      this.$log('handleCancel')
-      // TODO: save content to where? to what cache?
-      this.$emit('close')
+    prev () {
+      this.$log('prev')
+      switch (this.step) {
+        case 'findType': {
+          this.$log('prev findType')
+          this.$emit('close')
+          break
+        }
+        case 'findContent': {
+          this.$log('prev findContent')
+          this.contentType = undefined
+          this.step = 'findType'
+          break
+        }
+        case 'previewContent': {
+          this.$log('prev previewContent')
+          this.step = 'findContent'
+          break
+        }
+        case 'uploadContent': {
+          this.$log('prev loadContent')
+          this.contentLoading = false
+          this.step = 'findContent'
+          break
+        }
+      }
+    },
+    showError (msg) {
+      this.$q.notify({message: msg, color: 'red', textColor: 'white'})
     }
   },
   mounted () {
-    this.$log('======= mounted')
-    // get clipboard
-    // navigator.clipboard.readText().then(clipText => {
-    //   this.$log('clipText', clipText)
-    // })
+    this.$log('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$emit('close')
   }
 }
 </script>

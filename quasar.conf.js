@@ -123,8 +123,8 @@ module.exports = function (ctx) {
         description: 'Find your gala-effect',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#ffffff',
-        theme_color: '#027be3',
+        background_color: '#000',
+        theme_color: '#000',
         icons: [
           {
             'src': 'statics/icons/icon-256x256.png',

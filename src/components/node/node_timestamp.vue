@@ -12,8 +12,9 @@ export default {
       let now = Date.now()
       let from = this.node.createdAt
       // TODO: live ago shit? only when the node is active?
-      if (now - from < 1000 * 60 * 60) return 'minutes'
-      else return this.$date(from)
+      // if (now - from < 1000 * 60 * 60) return 'minutes'
+      // else return this.$date(from)
+      return this.$date(from)
     }
   }
 }

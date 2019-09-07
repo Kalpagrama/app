@@ -1,6 +1,6 @@
 <template lang="pug">
 .column.fit
-  div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm.bg-grey-3
+  div(v-if="false" :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm.bg-grey-3
     .col
     q-btn(flat color="grey-9" style=`height: 40px; width: 40px` icon="search")
     q-btn(flat color="grey-9" style=`height: 40px; width: 40px` icon="more_vert")
