@@ -1,28 +1,32 @@
 <template lang="pug">
-.row.full-width.window-height
+div(:style=`{height: $q.screen.gt.sm ? '100vh' : 'calc(100vh - 60px)'}`).row.full-width.q-px-sm
   div(:style=`{maxWidth: isDesktop ? '500px' : '100%'}`).col.full-height
     q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
       //- spheres
       q-tab-panel(name="sphere" :style=`{padding: '0px', background: 'none'}`)
-        .column.fit
-          //- header
-          div(:style=`{minHeight: '60px'}`).row.full-width.items-center.scroll.q-px-sm.bg-grey-1
-            h4(:style=`{}`).q-pa-xs.q-ma-xs {{`#${sphere.name}`}}
-          //- tools
-          div(v-if="false" :style=`{height: '40px'}`).row.full-width.items-center.justify-end.q-px-sm.bg-grey-1
-            q-btn(flat color="grey-9" style=`width: 40px; height: 40px` icon="search")
-            q-btn(flat color="grey-9" style=`width: 40px; height: 40px` icon="more_vert")
-            q-btn(flat color="grey-9" style=`height: 40px` icon-right="keyboard_arrow_right" no-caps ) {{nodes.length}} nodes
-          //- spheres
-          div(body-scroll-lock-ignore).col.scroll.full-width.bg-grey-2
-            div.row.full-width.q-px-md.q-pt-md
-              div(v-for="(s, si) in spheres" :key="s.oid" @click="sphereClick(s, si)"
-                :style=`{borderRadius: '4px'}`
-                ).bg-grey-5.q-pa-xs.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
-                span(:style=`{whiteSpace: 'nowrap'}`) {{`#${s.name}` | cut(40)}}
-          div(v-if="true" style=`height: 60px`).row.full-width.items-center.justify-end.q-px-sm
-            q-btn(color="primary" icon-right="keyboard_arrow_right" no-caps
-              @click="$refs.kpanels.goTo('nodes')") {{nodes.length}} nodes
+        .row.fit.q-py-md
+          .column.fit
+            //- header
+            div(v-if="noHeader" :style=`{minHeight: '60px', borderRadius: '10px'}`).row.full-width.items-center.scroll.q-px-sm.bg-grey-1
+              h4(:style=`{}`).q-pa-xs.q-ma-xs {{`#${sphere.name}`}}
+            //- tools
+            div(v-if="false" :style=`{height: '40px'}`).row.full-width.items-center.justify-end.q-px-sm.bg-grey-1
+              q-btn(flat color="grey-9" style=`width: 40px; height: 40px` icon="search")
+              q-btn(flat color="grey-9" style=`width: 40px; height: 40px` icon="more_vert")
+              q-btn(flat color="grey-9" style=`height: 40px` icon-right="keyboard_arrow_right" no-caps ) {{nodes.length}} nodes
+            //- spheres
+            div(body-scroll-lock-ignore).col.scroll.full-width
+              div.row.full-width.q-px-sm
+                div(v-for="(s, si) in spheres" :key="s.oid" @click="sphereClick(s, si)"
+                  :style=`{borderRadius: '4px'}`
+                  ).bg-grey-5.q-pa-xs.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
+                  small(:style=`{whiteSpace: 'nowrap'}`) {{`#${s.name}` | cut(50)}}
+            //- nodes btn
+            div(v-if="false" style=`position: fixed; bottom: 60px; height: 70px`).row.full-width.items-center.justify-end.q-px-sm
+              q-btn(
+                color="primary" icon-right="keyboard_arrow_right" no-caps
+                :style=`{borderRadius: '10px', height: '50px'}`
+                @click="$refs.kpanels.goTo('nodes')").full-width {{nodes.length}} nodes
       //- nodes
       q-tab-panel(name="nodes" :style=`{padding: '0px'}` v-if="!isDesktop")
         nodes(:nodes="nodes" @nodeClick="nodeClick")
@@ -40,7 +44,7 @@ import nodes from './nodes'
 export default {
   name: 'sphereExplorer',
   components: {nodeMasonry, nodes},
-  props: ['sphere'],
+  props: ['sphere', 'noHeader'],
   data () {
     return {
       tab: 'sphere',

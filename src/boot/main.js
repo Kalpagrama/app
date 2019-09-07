@@ -58,6 +58,16 @@ export default async ({ Vue, store, router }) => {
   Vue.prototype.$random = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
   }
+  Vue.prototype.$strip = function (obj) {
+    let round = (obj) => {
+      if (obj['__typename']) delete obj['__typename']
+      for (const k in obj) {
+        if (obj[k] === Object(obj[k])) round(obj[k])
+      }
+    }
+    round(obj)
+    return obj
+  }
   Vue.prototype.$nodesDistinct = function (nodes) {
     const result = []
     const map = new Map()
@@ -79,12 +89,14 @@ export default async ({ Vue, store, router }) => {
   //   Notify.create({message: msg.toString(), color: 'red', colorText: 'red'})
   // }
   // components
-  // const components = ['k_menu_popup']
+  // const components = ['k_page']
   // const cName = (c) => {
   //   let s = c.split('/')
   //   return s[s.length - 1]
   // }
   // components.map(c => Vue.component(cName(c), () => import(`components/${c}`)))
+  Vue.component('kPage', () => import(`components/k_page`))
+  Vue.component('kMenuPopup', () => import(`components/k_menu_popup`))
 }
 
 export { time }

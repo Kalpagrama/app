@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.window-height
+div(:style=`{height: $q.screen.gt.sm ? '100vh' : 'calc(100vh - 60px)'}`).row.full-width
   content-video(v-if="content && content.type === 'VIDEO'" :content="content")
   //- content-image
   //- content-book
@@ -11,48 +11,9 @@ import contentVideo from './content_video'
 export default {
   name: 'contentExplorer',
   components: {contentVideo},
+  props: ['content'],
   data () {
     return {
-      content: null,
-    }
-  },
-  watch: {
-    '$route': {
-      immediate: true,
-      async handler (to, from) {
-        if (to.params.oid) {
-          this.$log('$route CHANGED', to.params.oid)
-          this.content = await this.contentLoad(to.params.oid)
-        }
-      }
-    },
-  },
-  methods: {
-    async contentLoad (oid) {
-      this.$log('contentLoad start', oid)
-      let {data: {objectList: [content]}} = await this.$apollo.query({
-        query: gql`
-          query objectList ($oid: OID!) {
-            objectList(oids: [$oid]) {
-              oid
-              type
-              name
-              ...on Video {
-                duration
-                thumbUrl(preferWidth: 600)
-                url
-                height
-                width
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
-      this.$log('contentLoad done', content)
-      return content
     }
   },
   mounted () {

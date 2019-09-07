@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.fit.q-pt-md.bg-grey-4
-  node-list(:nodes="nodes").full-width
+  node-list(:nodes="nodes" @nodeClick="nodeClick").full-width
 </template>
 
 <script>

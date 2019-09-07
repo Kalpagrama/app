@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.window-height.full-width
-  div(:style=`{maxWidth: isDesktop ? '800px' : '100%'}`).col.full-height
+.row.fit
+  div(:style=`{maxWidth: isDesktop ? '100%' : '100%'}`).col.full-height
     q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
       //- content video
       q-tab-panel(name="content" :style=`{padding: '0px', background: 'none'}`).column.fit
@@ -31,8 +31,8 @@
       q-tab-panel(name="nodes" :style=`{padding: '0px'}` v-if="!isDesktop")
         content-video-nodes(:nodes="nodes" @nodeClick="nodeClick" @back="$refs.kpanels.goTo('content')")
   //- nodes desktop
-  div(v-if="isDesktop").col.full-height.bg-grey-4
-    content-video-nodes(:nodes="nodes" @nodeClick="nodeClick")
+  //- div(v-if="isDesktop").col.full-height.bg-black
+  //-   content-video-nodes(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>

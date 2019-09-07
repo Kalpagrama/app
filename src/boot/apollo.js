@@ -1,5 +1,5 @@
 const debug = require('debug')('[boot]:apollo')
-debug.enabled = true
+// debug.enabled = true
 import { Notify } from 'quasar'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
@@ -74,7 +74,11 @@ export default async ({ Vue, store, app }) => {
   const fragmentMatcher = new IntrospectionFragmentMatcher({
     introspectionQueryResultData
   })
-  const cache = new InMemoryCache({addTypename: true, fragmentMatcher})
+  const cache = new InMemoryCache({
+    addTypename: true,
+    fragmentMatcher,
+    // dataIdFromObject: object => object.oid || null
+  })
   // persistCache({
   //   cache,
   //   storage: localStorage

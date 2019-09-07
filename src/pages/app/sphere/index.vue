@@ -1,18 +1,31 @@
 <template lang="pug">
-.row.fit
-  sphere-explorer(v-if="sphere" :sphere="sphere")
+k-page(:name="'Путешествия по сферам'" :items="pages" :item="page" @item="page = $event")
+  template(v-slot:body)
+    keep-alive
+      sphere-explorer(v-if="page === 'sphere' && sphere" :sphere="sphere" noHeader)
+      div(v-else).row.fit.q-pa-md
+        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-start.content-start.bg-white.q-pa-sm
+          h4 {{ pages[page].name }}
 </template>
 
 <script>
 import sphereExplorer from 'components/sphere_explorer'
 
 export default {
-  name: 'pageApp__Sphere',
-  props: ['height', 'width'],
+  name: 'page_app_sphere',
   components: {sphereExplorer},
   data () {
     return {
-      sphere: null
+      sphere: null,
+      page: undefined
+    }
+  },
+  computed: {
+    pages () {
+      return {
+        sphere: {name: this.sphere ? `#${this.sphere.name}` : '#'},
+        settings: {name: 'Настройки'}
+      }
     }
   },
   watch: {
@@ -20,9 +33,12 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
+        this.page = 'sphere'
         if (to.params.oid) {
           this.$log('$route CHANGED', to)
           this.sphere = await this.sphereLoad(to.params.oid)
+        } else {
+          this.$router.push(`/app/sphere/${this.$store.state.auth.user.oid}`)
         }
       }
     }

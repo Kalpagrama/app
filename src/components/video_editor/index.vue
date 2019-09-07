@@ -1,444 +1,236 @@
 <template lang="pug">
-div(style=`position: relative; overflowX: hidden`).column.full-width.window-height.bg-white
-  //- debug
-  div(v-if="false && !loading" :style=`{position: 'fixed', zIndex: 10000, right: '0px', top: '50%', width: '300px', color: 'white', fontSize: '11px'}`).row.scroll.bg-purple.q-pa-xs
-    small.full-width {{fragment.content.duration}}
-    span.full-width startSec {{startSec}}
-    span.full-width endSec {{endSec}}
-    small.full-width width/height {{$q.screen.width}}/{{$q.screen.height}}
-    small.full-width videoWidthMax/videoHeightMax {{videoWidthMax}}/{{videoHeightMax}}
-    small.full-width videoWidth/videoWidthOriginal {{videoWidth}}/{{videoWidthOriginal}}
-    small.full-width videoHeight/vidoeHeightOriginal {{videoHeight}}/{{videoHeightOriginal}}
-    small.full-width framesCount {{framesCount}}
-    small.full-width framesCountNew {{framesCountNew}}
-    small.full-width framesLess {{framesLess}}
-    small.full-width frameStartIndex {{frameStartIndex}}
-    small.full-width frameWidthMax {{frameWidthMax}}
-    //- small.full-width framesStart {{framesStart}}
-    //- small.full-width framesEnd {{framesEnd}}
-  //- loading
-  div(v-if="loading" ).col.full-width
-    .row.fit.items-center.justify-center
-      q-spinner(size="50px" :thickness="2" color="primary")
-  div(v-else).col.full-width
-    .column.fit.bg-white
-      //- header
-      div(:style=`{height: '60px', borderBottom: '1px solid #eee'}`).row.full-width.justify-between.items-center.q-px-sm
-        q-btn(round flat color="grey-9" icon="keyboard_arrow_left" @click="goBackClick()").q-mr-sm
-        div(style=`{overflowX: auto}`).col.scroll
-          span(style=`whiteSpace: nowrap`).text-bold {{ fragment.content.name }}
-        q-btn(round flat color="grey-9" icon="link" @click="contentLinkClick()").q-ml-sm
-      //- body
-      div(:style=`{padding: '10px'}`).col
-        div(:style=`{position: 'relative'}`).row.fit.justify-center
-          //- video wrapper
-          video(ref="kvideo"
-            :style=`{height: videoHeight+'px', width: videoWidth+'px', objectFit: 'contain'}`
-            playsinline preload="auto" crossorigin="Anonymous"
-            type="video/mp4" :src="fragment.content.url").bg-white
-          //- img(v-if="preview" :src="preview")
-          //- actions
-          div(v-if="true" :style=`{position: 'absolute', zIndex: 100, bottom: '10px', height: '50px'}`).row.full-width.justify-center.items-center.q-px-sm
-            div(:style=`{width: videoWidth+'px'}`).row.justify-center.items-center
-              q-btn(style=`height: 40px; width: 100px` dense color="primary" @click="refresh" no-caps).q-mr-sm
-                span.text-bold {{'В начало'}}
-              q-btn(style=`height: 40px; width: 40px` :outline="!loop" no-caps icon="refresh" color="primary" @click="toggleLoop").q-mr-sm
-              q-btn(style=`height: 40px; width: 110px` :outline="mute" no-caps color="primary" @click="toggleMute")
-                span.text-bold {{mute ? 'Без звука' : 'Со звуком'}}
-      //- fragments wrapper
-      div(:style=`{height: '150px'}`).row.full-width.justify-center
-        div(:style=`{position: 'relative', maxWidth: videoWidth+'px'}`).row.full-width
-          //- frames bar
+div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.bg-black
+  div(v-if="false" style=`position: absolute; zIndex: 300; left: 0px; width: 250px; top: 50%; color: white`).row.bg-purple.q-pa-sm
+    small(v-for="(d, di) in debug").full-width {{d}}:{{get(d)}}
+  k-menu(ref="kmenu" :fragments="fragments" :colors="colors" :duration="duration")
+  video(
+    ref="kvideo" :src="fragment.content.url" autoplay playsinline type="video/mp4"
+    :style=`{position: 'relative', height: '100%', maxWidth: '100%'}`
+    @click="videoClick" @playing="videoPlaying" @timeupdate="videoTimeupdate")
+  //- actions
+  div(v-show="duration > 0" :style=`{position: 'absolute', zIndex: 200, top: '16px', height: '60px', opacity: 0.6}`).row.full-width.justify-between.q-px-md
+    q-btn(round flat icon="menu" color="white" @click="$refs.kmenu.toggle()").bg-grey-9
+    //- q-btn(round flat icon="menu" color="white").bg-grey-9
+    div(:style=`{height: '30px', borderRadius: '10px'}`).row.items-center.bg-grey-9.q-px-sm
+      span.text-white {{ $time(now) }}/{{ $time(duration) }}
+    q-btn(round icon="keyboard_arrow_left" color="primary" @click="$refs.kvideo.playBackwards()")
+    q-btn(round icon="check" color="primary" @click="$emit('close')")
+  //- relative points
+  div(:style=`{position: 'absolute', bottom: '85px', height: '80px', paddingLeft: $q.screen.width/2+'px'}`).row.full-width
+    div(v-for="(f, fi) in fragments" :key="fi")
+      div(
+        v-for="(point, pi) in f.points" :key="pi" v-show="f.visible"
+        :style=`{position: 'absolute', zIndex: 400, bottom: '-10px', width: '2px', height: '80px',
+          left: -framesScrollLeft+$q.screen.width/2+(point*k)+'px', background: randomColor(fi)}`).row
+        div(
+          :style=`{position: 'relative'}`
+          v-touch-pan.mouse.stop="$event => pointDrag(fi, pi, $event)").row.cursor-pointer
+          //- point active @click="$event => pointClick(fi, pi, $event)"
           div(
-            :style=`{position: 'absolute', zIndex: 100, left: framesLeft+'px', width: framesWidth+'px', height: '50px', top: '60px', borderRadius: '4px'}`).row.no-wrap
-            //- frames
-            div(v-touch-pan.mouse.stop="framesDrag" :style=`{zIndex: 100, borderRadius: '4px', overflow: 'hidden'}`).row.fit
-              div(
-                v-for="(f, fi) in frames" :key="fi"
-                :style=`{width: frameWidth+'px', height: '50px', overflow: 'hidden'}`
-                ).row.items-center.justify-center.bg-grey-4
-                img(height="50px" :src="f" draggable="false" :style=`{objectFit: 'cover'}`)
-            //- frame
-            div(
-              :style=`{position: 'absolute', zIndex: 90, left: secToPx(startSec)+'px', top: '-5px', width: secToPx(endSec-startSec)+'px',
-                borderRadius: '5px', height: '60px', border: '5px solid #027BE3'}`).row
-            //- start
-            div(
-              v-touch-pan.mouse="startDrag"
-              :style=`{position: 'absolute', zIndex: 200, top: '-5px', left: secToPx(startSec)-20+'px', width: '40px', height: '60px', cursor: 'e-resize'}`
-                ).row.justify-center
-              div(:style=`{height: '60px', width: '8px', borderRadius: '5px 0px 0px 5px'}`).row.bg-primary
-            //- start zoom
-            div(
-              v-show="dragging && draggingTarget === 'start'"
-              :style=`{position: 'absolute', zIndex: 200, top: -60+'px', height: '50px', borderRadius: '4px',
-                left: secToPx(startSec)+'px', marginLeft: -frameWidthMax*(framesStart.length/2)+'px', overflow: 'hidden'}`
-              ).row.justify-center.bg-grey-4
-              div(:style=`{borderRadius: '4px', overflow: 'hidden'}`).row.full-width.justify-start.nowrap
-                div(
-                  v-for="(f, fi) in framesStart" :key="fi"
-                  :style=`{width: frameWidthMax+'px', height: '50px', overflow: 'hidden'}`
-                  ).row.bg-grey-4
-                  img(height="50px" width="100%" :src="f" draggable="false" @error="frameError" style=`objectFit: cover`)
-            //- end
-            div(
-              v-touch-pan.mouse="endDrag"
-              :style=`{position: 'absolute', zIndex: 220, top: '-5px', left: secToPx(endSec)-20+'px', width: '40px', height: '60px', cursor: 'e-resize'}`
-                ).row.justify-center
-              div(:style=`{height: '60px', width: '8px', borderRadius: '0px 5px 5px 0px'}`).row.bg-primary
-            //- end zoom
-            div(
-              v-show="dragging && draggingTarget === 'end'"
-              :style=`{position: 'absolute', zIndex: 200, top: -60+'px', height: '50px', borderRadius: '4px',
-                left: secToPx(endSec)+'px', marginLeft: -frameWidthMax*(framesEnd.length/2)+'px', overflow: 'hidden'}`
-              ).row.justify-center.bg-grey-4
-              div(:style=`{borderRadius: '4px'}`).row.full-width.justify-start.nowrap
-                div(
-                  v-for="(f, fi) in framesEnd" :key="fi"
-                  :style=`{width: frameWidthMax+'px', height: '50px'}`
-                  ).row.bg-grey-4
-                  img(height="50px" width="100%" :src="f" draggable="false" @error="frameError" style=`objectFit: cover`)
-            //- add
-            div(
-              v-show="false"
-              :style=`{position: 'absolute', zIndex: 200, top: -5+'px', left: secToPx(endSec)+10+'px', width: '60px', height: '60px',
-                borderRadius: '4px', opacity: 0.5}`
-              ).row.items-center.justify-center.bg-primary
-              q-btn(round dense flat icon="add" color="white")
-            //- now
-            div(
-              v-show="!dragging"
-              :style=`{position: 'absolute', zIndex: 190, left: secToPx(nowSec)+'px', width: '4px', height: '50px'}`).row.bg-yellow
-      //- footer
-      div(v-if="true" :style=`{height: '66px'}`).row.full-width.justify-center.items-center.q-px-sm
-        div(:style=`{width: videoWidth+'px'}`).row.justify-center
-          q-btn(style=`height: 50px; width: 180px; borderRadius: 4px` color="primary" no-caps @click="handleReady")
-            span.text-bold {{$t('Готово')}}
-      //- debug
-      div(v-if="false" style=`color: white; fontSize: 10px; maxHeight: 30vh`).row.full-width.bg-purple.q-pa-xs.scroll
-        small.full-width {{ fragment }}
+            v-if="pointActive === `${fi+pi}`"
+            :style=`{marginLeft: '-37px', minWidth: '74px', height: '40px', borderRadius: '20px', background: randomColor(fi)}`
+            ).row.items-center.justify-center
+            q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="pointTickLeft(fi, pi)")
+            q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="pointTickRight(fi, pi)")
+          //- point inactive
+          div(
+            v-else
+            :style=`{
+              position: 'absolute',
+              zIndex: pointDragging === fi+pi ? 1000 : 200,
+              left: pointDragging === fi+pi ? -pointDraggingHeight/2+'px' : -20+'px',
+              top: pointDragging === fi+pi ? -pointDraggingHeight/2+'px' : '0px',
+              minWidth: pointDragging === fi+pi ? pointDraggingHeight+'px' : 40+'px',
+              height: pointDragging === fi+pi ? pointDraggingHeight+'px' : 40+'px',
+              borderRadius: '50%',
+              background: randomColor(fi)}`
+            ).row.items-center.justify-center.shadow-22
+            span(style=`user-select: none`).text-white {{fi+1}}
+  //- timeline
+  div(:style=`{position: 'absolute', bottom: '0px', height: '120px'}`).row.full-width.justify-center.items-center.content-center
+    //- frames
+    div(ref="kframes" :style=`{position: 'relative'}` @scroll="framesScroll").row.full-width.scroll
+      div(:style=`{borderRadius: '10px'}`).row.no-wrap.q-my-lg
+        div(:style=`{height: '50px', width: $q.screen.width/2+'px'}`).row
+        div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap.shadow-9
+          div(
+            v-for="(f, fi) in frames" :key="f" @click="$event => frameClick(f, fi, $event)"
+            :style=`{height: '50px'}`
+            ).row.items-center.justify-center.bg-black
+            img(:src="f" draggable="false" :style=`{height: '50px', objectFit: 'cover'}`)
+          div(:style=`{position: 'absolute', left: now*k+'px', width: '5px', height: '50px'}`).row.bg-primary
+        div(:style=`{height: '50px', width: $q.screen.width/2+'px'}`).row
+  //- timeline middle time
+  div(v-if="false").row.full-width.justify-center.q-py-xs
+    div(:style=`{height: '30px', borderRadius: '10px', opacity: 0.5}`).row.items-center.bg-grey-9.q-px-sm
+      small.text-white {{ $time(framesMiddle/k) }}
 </template>
 
 <script>
-// TODO: when seeking with video controls and more than endSec...
+import kMenu from './menu'
 
 export default {
   name: 'videoEditor',
-  meta: {
-    title: 'Kalpa video editor'
-  },
-  props: {
-    fragment: {type: Object}
-  },
+  components: {kMenu},
+  props: ['fragment'],
   data () {
     return {
-      tick: 0,
-      loading: false,
-      dragging: false,
-      draggingTarget: '',
-      loop: true,
-      mute: false,
+      playing: false,
+      duration: 0,
+      now: 0,
+      frames: [],
+      fragmentMaxLength: 60,
       framesLeft: 0,
-      startSec: 0,
-      nowSec: 0,
-      endSec: 180,
-      player: null,
-      fragmentLengthMax: 180,
-      preview: null
+      framesScrollLeft: 0,
+      framesScrollWidth: 0,
+      frameClicks: 0,
+      clicks: 0,
+      clickDelay: 300,
+      clickTimer: null,
+      fragments: [
+        {name: 'Ест паука', points: [0, 100.5], visible: true},
+        {name: 'Вот это кикфлип', points: [20, 23], visible: true},
+        {name: 'Тут так закатывает глаза 🤢😱', points: [5, 17], visible: true},
+        {name: 'Bad girl 💀', points: [10, 34], visible: true}
+      ],
+      pointActive: undefined,
+      pointDragging: undefined,
+      pointDraggingHeight: 40,
+      debug: ['k', 'now', 'duration', 'framesCount', 'frameDuration', 'fragments', 'framesMiddle', 'framesScrollLeft', 'framesScrollWidth'],
+      colors: {}
     }
   },
   computed: {
-    videoWidthMax () {
-      let w = this.$q.screen.width
-      if (w < 600) return w - 20
-      else return w - 100
-    },
-    videoHeightMax () {
-      return this.$q.screen.height - 60 - 150 - 66 - 20
-    },
-    videoWidthOriginal () {
-      return this.fragment.content.width
-    },
-    videoHeightOriginal () {
-      return this.fragment.content.height
-    },
-    videoWidth () {
-      let w = this.$q.screen.width
-      if (w >= this.videoWidthMax) return this.videoWidthMax
-      else return w
-    },
-    videoHeight () {
-      let h = this.videoHeightOriginal * this.videoWidth / this.videoWidthOriginal
-      if (h <= this.videoHeightMax) return h
-      return this.videoHeightMax
-    },
-    frames () {
-      return this.fragment.content.frameUrls || []
-      // if (!this.fragment.content.frameUrls) return []
-      // let newCount = this.framesWidth / this.frameWidth
-      // return this.fragment.content.frameUrls.filter((f, i) => {
-      //   return i % this.framesLess === 0
-      //   // return i % 10 === 0
-      // })
-    },
-    framesWidth () {
-      return this.secToPx(this.fragment.content.duration)
-    },
-    framesLess () {
-      return Math.floor(this.framesCount / this.framesCountNew)
-    },
-    framesCountNew () {
-      return Math.floor(this.framesWidth / this.frameWidth)
-    },
     framesCount () {
-      return this.fragment.content.frameUrls.length
+      return this.frames.length
     },
-    frameWidthMax () {
-      return Math.floor((this.videoWidthOriginal * 50) / this.videoHeightOriginal)
+    framesMiddle () {
+      // return this.framesScrollWidth - this.framesScrollLeft
+      return (this.$q.screen.width / 2) + this.framesScrollLeft
     },
-    frameWidth () {
-      // return this.framesWidth / this.framesCount
-      return this.frameWidthMax / 3
+    frameDuration () {
+      // return this.duration / this.framesCount
+      return 3
     },
-    frameSec () {
-      return this.pxToSec(this.frameWidth)
-    },
-    frameStartIndex () {
-      return Math.round(this.startSec / this.frameSec)
-    },
-    framesStart () {
-      return this.frames.filter((f, fi) => {
-        return fi > this.frameStartIndex - 4 && fi < this.frameStartIndex + 4
-      })
-    },
-    framesEndIndex () {
-      return Math.round(this.endSec / this.frameSec)
-    },
-    framesEnd () {
-      return this.frames.filter((f, fi) => {
-        return fi > this.framesEndIndex - 4 && fi < this.framesEndIndex + 4
-      })
-    },
-    getLabelOffset () {
-      let d = this.secToPx(this.endSec - this.startSec)
-      if (d < 250) {
-        return -(10 + 130)
-      } else {
-        return -10
-      }
-    }
-  },
-  watch: {
-    startSec: {
-      handler (to, from) {
-        if (this.player) this.player.setCurrentTime(to)
-        if (to < 0) {
-          this.$log('startSec < 0!')
-          this.startSec = 0
-        }
-      }
-    },
-    endSec: {
-      handler (to, from) {
-        if (to > this.fragment.content.duration) {
-          this.$log('endSec > duration!')
-          this.endSec = this.fragment.content.duration
-        }
-      }
-    },
-    dragging: {
-      async handler (to, from) {
-        this.$log('dragging CHANGED ', to)
-        if (to === true) return
-        await this.$wait(350)
-        if (this.dragging === true) return
-        this.framesAnimate()
-      }
+    k () {
+      return this.framesScrollWidth / this.duration
     }
   },
   methods: {
-    getTime (sec) {
-      let hrs = ~~(sec / 3600)
-      let mins = ~~((sec % 3600) / 60)
-      let secs = ~~sec % 60
-      let arr = sec.toString().split('.')
-      let ms = ''
-      if (arr.length > 1) ms = arr[1]
-
-      let ret = ''
-      if (hrs > 0) ret += '' + hrs + ':' + (mins < 10 ? '0' : '')
-
-      ret += '' + mins + ':' + (secs < 10 ? '0' : '')
-      ret += '' + secs
-      if (ms !== '') ret += ':' + ms.substring(0, 3)
-      return ret
+    randomColor(id) {
+      const r = () => Math.floor(256 * Math.random())
+      return this.colors[id] || (this.colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
     },
-    handleReload () {
-      this.$log('handleReload')
-      window.location.reload(true)
+    get (key) {
+      return this[key]
     },
-    async handleReady () {
-      this.$log('handleReady')
-      this.player.setCurrentTime(this.startSec)
-      this.player.pause()
-      await this.$wait(500)
-      this.fragment.relativePoints = [{x: this.startSec}, {x: this.endSec}]
-      // create preview of startSec
-      let canvas = document.createElement('canvas')
-      canvas.width = this.videoWidthOriginal
-      canvas.height = this.videoHeightOriginal
-      let ctx = canvas.getContext('2d')
-      ctx.drawImage(this.$refs.kvideo, 0, 0, canvas.width, canvas.height)
-      this.preview = canvas.toDataURL()
-      await this.$wait(500)
-      // emit ready fragment
-      this.$emit('ready', this.fragment, this.preview)
-      this.$emit('close')
+    pointClick (fi, pi, e) {
+      this.$log('pointClick', fi, pi, e)
+      this.pointActive = `${fi + pi}`
     },
-    toggleMute () {
-      this.$log('toggleMute')
-      this.player.setMuted(!this.mute)
-      this.mute = !this.mute
-    },
-    toggleLoop () {
-      this.$log('toggleLoop')
-      this.loop = !this.loop
-    },
-    refresh () {
-      this.$log('refresh')
-      this.player.setCurrentTime(this.startSec)
-    },
-    goBackClick () {
-      this.$log('goBackClick')
-      this.handleReady()
-    },
-    pxToSec (px) {
-      return px * this.fragmentLengthMax / this.videoWidth
-    },
-    secToPx (sec) {
-      return sec * this.videoWidth / this.fragmentLengthMax
-    },
-    timeUpdate (e) {
-      let playerTime = this.player.currentTime
-      this.nowSec = playerTime
-      if (playerTime >= this.endSec) {
-        if (this.loop) this.player.setCurrentTime(this.startSec)
-        else this.player.pause()
+    pointDrag (fi, pi, e) {
+      this.$log('pointDrag', fi, pi, e.delta.x)
+      this.pointDragging = `${fi + pi}`
+      if (e.isFirst) this.$tween.to(this, 0.5, {pointDraggingHeight: 60})
+      if (e.isFinal) {
+        this.$tween.to(this, 0.5, {pointDraggingHeight: 40})
+        this.pointActive = `${fi + pi}`
       }
+      // let from = this.fragments[fi][pi]
+      // let to = from + e.delta.x
+      // if (to >= 0 && to <= 1000) {
+      //   this.fragments[fi][pi] += e.delta.x
+      // }
+      this.$set(this.fragments[fi].points, pi, this.fragments[fi].points[pi] + e.delta.x / this.k)
+      this.$refs.kvideo.currentTime = this.fragments[fi].points[pi]
+      // this.fragments[fi].points[pi] += e.delta.x / this.k
     },
-    seeked (e) {
-      this.$log('seeked')
-      if (this.dragging) return
-      let nextStartSec = this.player.currentTime
-      if (nextStartSec >= this.endSec) {
-        this.$log('seeked MORE THAN END SEC', nextStartSec, this.endSec)
-        this.startSec = this.player.currentTime
-        let newEndSec = this.startSec + this.fragmentLengthMax
-        if (this.startSec + newEndSec > this.fragment.content.duration) {
-          this.endSec = this.fragment.content.duration
-        } else {
-          this.endSec = newEndSec
-        }
-      } else {
-        this.$log('seeked LESS THAN END SEC', nextStartSec, this.endSec)
-        // this.startSec = nextStartSec
-        // let d = this.endSec - this.startSec
-        // if (d >= this.fragmentLengthMax) {
-        //   // this.$log('seeked ')
-        //   this.endSec = this.startSec + this.fragmentLengthMax
-        // }
-      }
-      this.framesAnimate()
+    pointTickLeft (fi, pi) {
+      this.$log('pointTickLeft', fi, pi)
+      let points = this.fragments[fi].points
+      let from = this.fragments[fi].points[pi]
+      // let to = from - 0.3
+      // if (to >= 0 && to <= 1000) {
+      //   this.fragments[fi][pi] -= 0.3
+      // }
+      this.$set(points, pi, from - 0.1)
+      // this.fragments[fi].points[pi] -= 0.3
     },
-    frameError (e) {
-      this.$log('frameError', e)
-    },
-    framesAnimate () {
-      this.$log('framesAnimate')
-      let d = this.secToPx(this.endSec - this.startSec)
-      let left = ((this.videoWidth - d) / 2) - this.secToPx(this.startSec)
-      this.$tween.to(this, 0.66, {framesLeft: left})
+    pointTickRight (fi, pi) {
+      this.$log('pointTickRight', fi, pi)
+      // let from = this.fragments[fi][pi]
+      // let to = from - 0.3
+      // if (to >= 0) {
+      //   this.fragments[fi][pi] += 0.3
+      // }
+      this.fragments[fi].points[pi] += 0.3
     },
     framesDrag (e) {
-      // this.$log('framesDrag', e.delta.x)
-      if (!this.loop) this.player.pause()
-      if (e.isFirst) {
-        this.$log('framesDrag FIRST')
-        this.dragging = true
-        this.draggingTarget = 'frames'
-      }
-      if (e.isFinal) {
-        this.$log('framesDrag FINAL')
-        this.dragging = false
-        this.draggingTarget = ''
-      }
-      let d = e.delta.x
-      let newStartSec = this.startSec - this.pxToSec(d)
-      let newEndSec = this.endSec - this.pxToSec(d)
-      if (newStartSec >= 0 && newEndSec <= this.fragment.content.duration) {
-        this.startSec = newStartSec
-        this.endSec = newEndSec
-        this.framesLeft += e.delta.x
+      // this.$log('framesDrag', e)
+      this.framesLeft += e.delta.x
+    },
+    framesScroll (e) {
+      // this.$log('framesScroll', e.target.scrollLeft, e)
+      this.framesScrollWidth = e.target.scrollWidth - this.$q.screen.width
+      this.framesScrollLeft = e.target.scrollLeft
+    },
+    frameClick (f, fi, e) {
+      this.$log('frameClick', fi, e)
+      // this.$log('frameClick ONE')
+      let time = this.frameDuration * (fi) + this.frameDuration / 2
+      this.$refs.kvideo.currentTime = time
+      this.$log('time', time)
+      let px = time * this.k
+      this.$log('px', px)
+      // this.$tween.to(this.$refs.kframes, 0.5, {scrollLeft: (time * this.k)})
+      // this.frameClicks++
+      // if (this.frameClicks === 1) {
+      // } else {
+      //   this.$log('frameClick DOUBLE')
+      //   this.frameClicks = 0
+      // }
+    },
+    videoClick (e) {
+      // this.$log('videoClick')
+      this.clicks++
+      if (this.clicks === 1) {
+        this.$log('CLICK')
+        this.clickTimer = setTimeout(() => {
+          this.clicks = 0
+        }, this.clickDelay)
+        // job
+        if (this.playing) {
+          this.$refs.kvideo.pause()
+          this.playing = false
+        } else {
+          this.$refs.kvideo.play()
+          this.playing = true
+        }
+      } else {
+        this.$log('CLICK DB')
+        clearTimeout(this.clickTimer)
+        this.clicks = 0
+        // job
+        this.$refs.kvideo.currentTime = this.now += 10
       }
     },
-    startDrag (e) {
-      // this.$log('startDrag', e.delta.x)
-      if (!this.loop) this.player.pause()
-      if (e.isFirst) {
-        this.dragging = true
-        this.draggingTarget = 'start'
-        this.$log('startDrag FIRST')
-      }
-      if (e.isFinal) {
-        this.dragging = false
-        this.draggingTarget = ''
-        this.$log('startDrag FINAL')
-      }
-      let d = e.delta.x
-      let newStartSec = this.startSec + this.pxToSec(d)
-      if (newStartSec >= 0 && this.endSec - newStartSec <= this.fragmentLengthMax && newStartSec < this.endSec) {
-        this.startSec = newStartSec
-      }
+    videoPlaying () {
+      // this.$log('videoPlaying')
+      this.playing = true
+      if (this.$refs.kvideo) this.duration = this.$refs.kvideo.duration
     },
-    async endDrag (e) {
-      // this.$log('endDrag', e.delta.x)
-      if (!this.loop) this.player.pause()
-      if (e.isFirst) {
-        this.$log('endDrag FIRST')
-        this.dragging = true
-        this.draggingTarget = 'end'
-      }
-      if (e.isFinal) {
-        this.$log('endDrag FINAL')
-        this.dragging = false
-        this.draggingTaget = ''
-      }
-      let d = e.delta.x
-      let newEndSec = this.endSec + this.pxToSec(d)
-      if (newEndSec > this.startSec && newEndSec - this.startSec <= this.fragmentLengthMax && newEndSec <= this.fragment.content.duration) {
-        this.endSec = newEndSec
-        this.player.setCurrentTime(newEndSec - 2)
-      }
+    videoTimeupdate () {
+      // this.$log('videoTimeupdate')
+      if (this.$refs.kvideo) this.now = this.$refs.kvideo.currentTime
     },
-    async getVideo (oid) {
-      this.$log('getVideo start')
-      console.time('getVideo')
-      // get video by oid
-      let { data: { objectList } } = await this.$apollo.query({
+    async framesLoad (oid) {
+      this.$log('framesLoad start')
+      let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
         query: gql`
           query getVideo ($oid: OID!) {
             objectList(oids: [$oid]) {
-              oid
-              type
-              name
               ... on Video {
                 frameUrls
-                url
-                urlType
-                duration
-                tags
-                width
-                height
               }
             }
           }
@@ -447,77 +239,31 @@ export default {
           oid: oid
         }
       })
-      this.$log('getVideo done', objectList[0])
-      this.$emit('fragment', {...this.fragment, ...{content: objectList[0]}})
-      this.$set(this, 'tick', this.tick + 1)
-      console.timeEnd('getVideo')
-    },
-    startVideo () {
-      this.$log('startVideo START')
-      let p = new window.MediaElementPlayer(this.$refs.kvideo, {
-        loop: true,
-        autoplay: false,
-        controls: true,
-        // stretching: 'fill',
-        showPosterWhenPaused: false,
-        clickToPlayPause: true,
-        iPadUseNativeControls: false,
-        iPhoneUseNativeControls: false,
-        AndroidUseNativeControls: false,
-        success: async (mediaElement, originalNode, instance) => {
-          this.player = mediaElement
-          this.player.addEventListener('timeupdate', this.timeUpdate, false)
-          this.player.addEventListener('seeked', this.seeked, false)
-          this.player.setCurrentTime(this.startSec)
-          this.player.play()
-          this.$log('startVideo DONE')
-        }
-      })
-    },
-    getEndSec () {
-      // this.$log('getEndSec')
-      let d = this.fragment.content.duration
-      if (d <= this.endSec) return d
-      else return this.fragmentLengthMax
-    },
-    contentLinkClick () {
-      this.$log('contentLinkClick')
+      this.$log('framesLoad done')
+      return frameUrls
     }
-  },
-  created () {
-    this.$log('created')
   },
   async mounted () {
-    this.$log('mounted start')
-    this.loading = true
-    // set startSec & endSec
-    // TODO: move startSec and endSec to computed props
-    if (this.fragment.relativePoints && this.fragment.relativePoints.length > 0) {
-      this.startSec = this.fragment.relativePoints[0]['x']
-      this.endSec = this.fragment.relativePoints[1]['x']
+    this.$log('created', this.fragment)
+    this.$set(this, 'frames', [])
+    this.$set(this, 'frames', await this.framesLoad(this.fragment.content.oid))
+    await this.$wait(4000)
+    this.$refs.kvideo.playBackwards = function () {
+      this.pause()
+      var video = this
+      var fps = 25
+      var intervalRewind = setInterval(function () {
+        if (video.currentTime === 0) {
+          clearInterval(intervalRewind)
+          video.pause();
+        } else {
+          video.currentTime += -(1 / fps)
+        }
+      }, 1000 / fps)
     }
-    await this.getVideo(this.fragment.content.oid)
-    this.endSec = this.getEndSec()
-    this.fragment.relativeScale = this.fragment.content.duration
-    this.loading = false
-    this.$nextTick(() => {
-      this.framesAnimate()
-      this.startVideo()
-    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    if (this.player) {
-      this.player.removeEventListener('timeupdate', this.timeUpdate)
-      this.player.removeEventListener('seeked', this.seeked)
-    }
   }
 }
 </script>
-
-<style lang="stylus">
-// .mejs__overlay-button
-//   display: none !important
-.mejs__overlay-loading
-  display: none !important
-</style>

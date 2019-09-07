@@ -9,5 +9,6 @@ export default {
   version: 0,
   synced: false,
   syncing: false,
-  fork: null
+  fork: null,
+  draft: null
 }

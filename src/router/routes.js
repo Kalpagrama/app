@@ -8,9 +8,9 @@ const routes = [
       { name: 'home', path: 'home', component: () => import('pages/app/home') },
       { name: 'hot', path: 'hot', component: () => import('pages/app/hot') },
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
-      { name: 'sphere', path: 'sphere/:oid', component: () => import('pages/app/sphere') },
-      { name: 'content', path: 'content/:oid', component: () => import('pages/app/content') },
-      { name: 'chain', path: 'chain/:oid', component: () => import('pages/app/chain') },
+      { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
+      { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
+      { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       { name: 'node', path: 'node/:oid', component: () => import('pages/app/node') },
       {
         name: 'workspace',
@@ -26,12 +26,13 @@ const routes = [
         ]
       },
       {
+        name: 'create',
         path: 'create',
         component: () => import('pages/app/create'),
-        children: [
-          { path: 'node', component: () => import('components/node_creator_inst') },
-          { path: 'chain', component: () => import('components/chain_creator') }
-        ]
+        // children: [
+        //   { path: 'node', component: () => import('components/node_creator') },
+        //   { path: 'chain', component: () => import('components/chain_creator') }
+        // ]
       }
     ]
   },
@@ -43,7 +44,7 @@ const routes = [
       { name: 'vk', path: 'vk', component: () => import('pages/login/vk') },
       { name: 'email', path: 'email', component: () => import('pages/login/email') },
       { name: 'phone', path: 'phone', component: () => import('pages/login/phone') },
-      { name: '404', path: '*', component: () => import('pages/Error404.vue') }
+      // { name: '404', path: '*', component: () => import('pages/Error404.vue') }
     ]
   },
   {

@@ -7,13 +7,8 @@
 import { disableBodyScroll } from 'body-scroll-lock'
 export default {
     name: 'App',
-    methods: {
-    },
     mounted () {
-      this.$log('mounted')
-      const log = (msg) => {
-        console.log('log', msg)
-      }
+      // this.$log('mounted')
       // disableBodyScroll(this.$refs.kapp, {
       //   allowTouchMove: el => {
       //     while (el && el !== document.body) {

@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{minHeight: '40px'}`).row.full-width.items-center.justify-center.q-px-sm
+div(:style=`{minHeight: '40px'}`).row.full-width.items-center.justify-center.text-center.q-pa-sm
   router-link(:to="`/app/node/${node.oid}`")
     span.text-bold {{node.name}}
 </template>

@@ -1,8 +1,7 @@
 <template lang="pug">
-.column.fit.bg-grey-2
-  div(body-scroll-lock-ignore).col.full-width.scroll.bg-grey-4
-    .row.full-width.items-start.justify-center
-      node-loader(mode="feed" :query="query" queryKey="feed" :variables="variables" :style=`{maxWidth: '500px'}`)
+k-page(name="Чего горячего есть" :items="items" :item="item" @item="item = $event")
+  template(v-slot:body)
+    node-loader(mode="feed" :query="query" queryKey="feed" :variables="variables" )
 </template>
 
 <script>
@@ -32,6 +31,12 @@ export default {
       `,
       variables: {
         oid: this.$store.state.auth.user.oid
+      },
+      item: 'cats',
+      items: {
+        cats: {name: 'Кошечки'},
+        mems: {name: 'Мемы'},
+        pies: {name: 'Пирожки'}
       }
     }
   },

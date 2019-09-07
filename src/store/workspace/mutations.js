@@ -12,13 +12,24 @@ export function state(state, [key, val]) {
 export function addNode(state, node) {
   debug('addNode start')
   // add only unique node
-  let findNode = state.workspace.nodes.find(n => n.oid === node.oid)
-  if (findNode) {
+  let findIndex = state.workspace.nodes.findIndex(n => n.oid === node.oid)
+  if (findIndex) {
     debug('addNode duplicate!')
   } else {
     debug('addNode add')
     state.workspace.nodes.push(node)
   }
+}
+export function updateNode(state, node) {
+  debug('updateNode start')
+  let findIndex = state.workspace.nodes.findIndex(n => n.oid === node.oid)
+  if (findIndex) {
+    state.workspace.nodes[findIndex] = node
+  } else {
+    debug('updateNode NOTHING TO UPDATE create')
+    state.workspace.nodes.push(node)
+  }
+  debug('updateNode done')
 }
 
 export function deleteNode(state, oid) {

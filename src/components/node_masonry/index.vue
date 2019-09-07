@@ -28,13 +28,12 @@
 <script>
 import { scroll } from 'quasar'
 import node from 'components/node'
-import nodeCss from 'components/node/node_css'
 
 // TODO: justify-start for items in masonry columns...
 // TODO: element with toggling dummy render element of this...
 export default {
   name: 'nodeMasonry',
-  components: {node, nodeCss},
+  components: {node},
   props: {
     nodes: {type: Array},
     nameAtTheBottom: {type: Boolean}

@@ -30,16 +30,24 @@ export default {
   data () {
     return {
       actions: [
-        {id: 'to_node', name: 'К ядру', color: 'black'},
+        {id: 'to_node', name: 'Перейти к ядру', color: 'black'},
         {id: 'to_workspace', name: 'Добавить в мастерскую', color: 'black'},
-        {id: 'to_chain', name: 'Добавить в цепочку', color: 'black'},
-        {id: 'follow', name: 'Подписаться', color: 'black'},
-        {id: 'share', name: 'Поделиться', color: 'black'},
+        {id: 'to_create', name: 'Создать на основании', color: 'black'},
+        // {id: 'to_collection', name: 'Добавить в коллекцию', color: 'black'},
+        // {id: 'follow', name: 'Подписаться', color: 'black'},
+        // {id: 'share', name: 'Поделиться', color: 'black'},
         {id: 'report', name: 'Пожаловаться', color: 'red'}
       ]
     }
   },
   methods: {
+    nodeWorkspace () {
+      let r = this.$strip(JSON.parse(JSON.stringify(this.nodeFull)))
+      r.thumbUrl = this.node.thumbUrl
+      r.createdAt = Date.now()
+      this.$store.commit('workspace/addNode', r)
+      return r
+    },
     async handleAction (a) {
       this.$log('handleAction', a)
       switch (a.id) {
@@ -50,12 +58,26 @@ export default {
           break
         }
         case 'to_workspace': {
-          this.$log('handleAction', a.id)
-          // TODO: add this node to workspace?
+          this.$log('handleAction', a.id, this.node, this.nodeFull)
+          this.nodeWorkspace()
+          break
+        }
+        case 'to_create': {
+          this.$log('handleAction', a.id, this.node, this.nodeFull)
+          // add to workspace
+          let n = this.nodeWorkspace()
+          // add to store
+          this.$store.commit('workspace/state', ['draft', n])
+          await this.$wait(200)
+          // go to create
+          this.$router.push('/app/create')
           break
         }
         case 'report': {
           this.$log('handleAction', a.id)
+          var r = confirm('Report ?')
+          if (!r) return
+          this.$log('reporting...')
           await this.$apollo.mutate({
             mutation: gql`
               mutation deleteNode($oid: OID!) {
@@ -66,6 +88,7 @@ export default {
               oid: this.node.oid
             }
           })
+          this.$log('reported!')
         }
       }
     }

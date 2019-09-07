@@ -11,7 +11,7 @@
           .col.full-width.scroll.bg-grey-2
             div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-md
               node(v-if="node" :node="node" :needFull="true" :index="0" @nodeFull="nodeFullLoaded" :active="true"
-                :style=`{borderRadius: '4px', maxWidth: '500px', marginBottom: '200px'}`).bg-white.q-mt-md
+                :style=`{borderRadius: '10px', maxWidth: '500px', marginBottom: '200px'}`).bg-white.q-mt-md
       //- fragments
       q-tab-panel(name="fragments" :style=`{padding: '0px'}` v-if="!isDesktop")
         nodes(v-if="nodeFull" :node="node" :nodeFull="nodeFull" :nodes="nodes")
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import node from 'components/node_inst'
+import node from 'components/node'
 import nodes from './nodes'
 // TODO: cant click in mobile mode...
 // TODO: on hover event on node fragment

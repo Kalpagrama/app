@@ -29,7 +29,7 @@ import nodeVideo from './node_fragment_video'
 export default {
   name: 'nodeTempalteVert',
   components: {nodeHeader, nodeSpheres, nodeActions, nodeTimestamp, kMenuPopup, nodeVideo},
-  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates'],
+  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates', 'inCreator'],
   data () {
     return {
     }
