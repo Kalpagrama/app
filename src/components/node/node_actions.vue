@@ -54,7 +54,7 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
   q-btn(color="grey-9" round flat @click="nodeShare()")
     q-icon(name="call_made" size="26px" color="grey-8").rotate-270
   //- chain
-  q-btn(:icon="nodeWorkspaced ? 'cloud' : 'cloud_queue'" color="grey-8" round flat @click="nodeWorkspace()")
+  //- q-btn(:icon="nodeWorkspaced ? 'cloud' : 'cloud_queue'" color="grey-8" round flat @click="nodeWorkspace()")
   //- chain name and selector
   .col
     //- div(v-if="true") Some chain name

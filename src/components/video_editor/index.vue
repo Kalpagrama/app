@@ -13,7 +13,7 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
     //- q-btn(round flat icon="menu" color="white").bg-grey-9
     div(:style=`{height: '30px', borderRadius: '10px'}`).row.items-center.bg-grey-9.q-px-sm
       span.text-white {{ $time(now) }}/{{ $time(duration) }}
-    q-btn(round icon="keyboard_arrow_left" color="primary" @click="$refs.kvideo.playBackwards()")
+    //- q-btn(round icon="keyboard_arrow_left" color="primary" @click="$refs.kvideo.playBackwards()")
     q-btn(round icon="check" color="primary" @click="$emit('close')")
   //- relative points
   div(:style=`{position: 'absolute', bottom: '85px', height: '80px', paddingLeft: $q.screen.width/2+'px'}`).row.full-width
@@ -247,20 +247,20 @@ export default {
     this.$log('created', this.fragment)
     this.$set(this, 'frames', [])
     this.$set(this, 'frames', await this.framesLoad(this.fragment.content.oid))
-    await this.$wait(4000)
-    this.$refs.kvideo.playBackwards = function () {
-      this.pause()
-      var video = this
-      var fps = 25
-      var intervalRewind = setInterval(function () {
-        if (video.currentTime === 0) {
-          clearInterval(intervalRewind)
-          video.pause();
-        } else {
-          video.currentTime += -(1 / fps)
-        }
-      }, 1000 / fps)
-    }
+    // await this.$wait(4000)
+    // this.$refs.kvideo.playBackwards = function () {
+    //   this.pause()
+    //   var video = this
+    //   var fps = 25
+    //   var intervalRewind = setInterval(function () {
+    //     if (video.currentTime === 0) {
+    //       clearInterval(intervalRewind)
+    //       video.pause();
+    //     } else {
+    //       video.currentTime += -(1 / fps)
+    //     }
+    //   }, 1000 / fps)
+    // }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

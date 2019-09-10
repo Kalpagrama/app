@@ -1,21 +1,21 @@
 <template lang="pug">
 div(:style=`{overflowX: 'auto', overflowY: 'hidden', height: $q.screen.gt.sm ? 'calc(100vh)' : 'calc(100vh - 60px)'}`).row.full-width.scroll
   //- content find dialog
-  q-dialog(ref="contentFindDialog" position="bottom")
-    content-finder
+  q-dialog(ref="contentFinderDialog" position="bottom")
+    content-finder(@content="fragmentAdd($event), $refs.contentFinderDialog.hide()")
   //- editors
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(v-if="videoEditorShow && fragments[fragmentEditing]" :fragment="fragments[fragmentEditing]" @fragment="fragmentSync" @ready="fragmentEdited" @close="videoEditorShow = false, $refs.videoEditorDialog.hide()")
   //- wrapper
   .row.full-height.no-wrap
     //- fragments from workspace
-    div(v-show="fragmentsWorkspaceShow" :style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height
+    div(v-if="false" v-show="fragmentsWorkspaceShow" :style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height
       nodes-workspace(@nodeClick="nodeWorkspaceClick")
     //- fragment selected
     div(:style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height.q-px-sm
-      .column.full-height
+      .column.full-height.q-py-md
         //- header
-        div(v-if="false" :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+        div(v-if="true" :style=`{height: '60px', borderRadius: '10px'}`).row.full-width.items-center.q-px-sm.bg-white
           q-btn(v-show="!fragmentsWorkspaceShow" icon="keyboard_arrow_left" round flat color="grey-6" @click="fragmentsWorkspaceShow = true")
           span.text-grey-8 Фрагменты
           .col
@@ -27,7 +27,7 @@ div(:style=`{overflowX: 'auto', overflowY: 'hidden', height: $q.screen.gt.sm ? '
           //- fragments list
           div(
             v-for="(f, fi) in fragments" :key="fi"
-            :style=`{position: 'relative', minHeight: '150px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-white.q-mb-md
+            :style=`{position: 'relative', minHeight: '150px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-white.q-mb-md.shadow-1
             //- fragment actions top right
             div(:style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', height: '40px', opacity: 0.3}`).row
               q-btn(round flat dense color="white" icon="edit" @click="fragmentEdit(f, fi)").bg-grey-9
@@ -41,15 +41,15 @@ div(:style=`{overflowX: 'auto', overflowY: 'hidden', height: $q.screen.gt.sm ? '
             img(
               :src="f.preview || f.content.thumbUrl[0]"
               :style=`{width: '100%', objectFit: 'contain'}` draggable="false")
-          //- fragment add
+          //- content add
           div(
             v-if="true"
             :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.justify-center.bg-white
-            q-btn(icon="add" color="primary" round outline size="lg" @click="fragmentAdd()")
+            q-btn(icon="add" color="primary" round outline size="lg" @click="contentAdd()")
           //- toggle fragments from workspace
           q-btn(
-            :icon="fragmentsWorkspaceShow ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" outline color="grey-6"
+            v-if="false" :icon="fragmentsWorkspaceShow ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" outline color="grey-6"
             style=`height: 50px; borderRadius: 8px` no-caps
             @click="fragmentsWorkspaceShow = !fragmentsWorkspaceShow").full-width.q-mt-md
             span {{fragmentsWorkspaceShow ? 'Скрыть фрагменты из мастерской' : 'Показать фрагменты из мастерской'}}
@@ -146,6 +146,8 @@ export default {
       handler (to, from) {
         this.$log('draft CHANGED', to)
         if (to) {
+          this.name = to.name
+          this.spheres = to.spheres
           to.fragments.map((f, fi) => {
             f.preview = to.thumbUrl[fi]
             this.fragments.push(f)
@@ -155,25 +157,25 @@ export default {
     }
   },
   methods: {
-    fragmentAdd () {
-      this.$log('fragmentAdd')
-      this.$refs.contentFindDialog.show()
-      // if (this.fragments.length > 3) return
-      // open content finder dialog
-      // find content then prepare fragment
-      // emit on fragment?
-      // then add fragment
-      // this.$set(
-      //   this.fragments,
-      //   this.fragments.length,
-      //   {
-      //     url: '',
-      //     content: {
-      //       type: 'VIDEO',
-      //       url: ''
-      //     }
-      //   }
-      // )
+    contentAdd () {
+      this.$log('contentAdd')
+      this.$refs.contentFinderDialog.show()
+    },
+    fragmentAdd (content) {
+      this.$log('fragmentAdd', content)
+      this.$set(
+        this.fragments,
+        this.fragments.length,
+        {
+          id: Date.now().toString(),
+          url: '',
+          tags: [],
+          relativePoints: [],
+          relativeScale: 0,
+          preview: content.thumbUrl[0],
+          content: content
+        }
+      )
     },
     fragmentDuplicate (f, index) {
       this.$log('fragmentDuplicate')
@@ -212,10 +214,6 @@ export default {
       this.$log('fragmentDelete', index)
       this.$delete(this.fragments, index)
     },
-    templateClick (t, ti) {
-      this.$log('templateClick', t.id)
-      this.$set(this, 'nodeTemplate', t.id)
-    },
     nodeWorkspaceClick (n) {
       this.$log('nodeWorkspaceClick', n)
       n.fragments.map((f, fi) => {
@@ -234,7 +232,22 @@ export default {
     async nodePublish () {
       this.$log('nodePublish')
       this.nodePublishing = true
-      // await this.$wait(2000)
+      await this.$wait(500)
+      let n = this.node
+      let {data: {nodeCreate}} = await this.$apollo.mutate({
+        mutation: gql`
+          mutation nodeCreate ($node: NodeInput!) {
+            nodeCreate (node: $node) {
+              oid
+              type
+              name
+            }
+          }
+        `,
+        variables: {
+          node: n
+        }
+      })
       this.nodePublishing = false
     }
   },

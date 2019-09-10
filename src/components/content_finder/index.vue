@@ -58,15 +58,16 @@ div(
   div(v-if="step === 'previewContent' && contentType === 'IMAGE'").row.full-width.items-start
     img(:src="imageUrl" :style=`{width: '100%', maxHeight: '400px', objectFit: 'contain'}`)
   //- preview video content
-  div(v-if="step === 'previewContent' && contentType === 'VIDEO'").row.full-width.items-start
-    //- iframe(
-    //-   :src="videoLinkYoutube"
-    //-   :style=`{width: '100%', height: '100vh', maxHeight: '400px', objectFit: 'contain'}`
-    //-   frameborder="0"
-    //-   autoplay
-    //-   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-    //-   allowfullscreen)
-    node-video(:url="videoUrl" :zIndex="100" :active="true" :visible="true" :style=`{maxHeight: '400px', objectFit: 'contain'}`)
+  div(v-if="step === 'previewContent' && contentType === 'VIDEO'" :style=`{height: '400px'}`).row.full-width.items-start.content-start
+    iframe(
+      v-if="videoUrlYoutube"
+      :src="videoUrlYoutube"
+      :style=`{width: '100%', height: '100%', objectPosition: '0% 50%', objectFit: 'cover'}`
+      frameborder="0"
+      autoplay
+      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen)
+    node-video(v-else :url="videoUrl" :zIndex="100" :active="true" :visible="true" :style=`{maxHeight: '400px', objectFit: 'contain'}` @duration="videoFileDuration = $event")
   //- upload content
   div(v-if="step === 'uploadContent'").row.full-width.justify-center.items-start
     span {{contentUploadProgress}}
@@ -100,27 +101,17 @@ export default {
       contentType: undefined,
       contentUploadProgress: 0,
       contentUploadDone: false,
+      contentUploading: false,
       videoLinkValidated: false,
       videoFile: undefined,
+      videoFileDuration: 0,
       videoUrl: undefined,
       videoUrlInput: undefined,
+      videoUrlYoutube: undefined,
       imageUrl: undefined,
       imageUrlInput: undefined,
-      imageFile: undefined
-    }
-  },
-  computed: {
-    videoLinkYoutube () {
-      if (!this.videoUrl) return
-      let id = ''
-      let arr = this.videoUrl.split('/')
-      if (arr[arr.length - 2] === 'embed') {
-        id = arr[arr.length - 1]
-      } else {
-        let s = this.videoUrl.split('=')
-        id = s[1]
-      }
-      return `https://www.youtube.com/embed/${id}`
+      imageFile: undefined,
+      progress: null
     }
   },
   watch: {
@@ -146,24 +137,26 @@ export default {
             break
           }
           case 'uploadContent': {
-            this.$log('uploadContent')
-            // TODO: validation
-            // if (this.)
+            this.$log('uploadContent start')
+            this.contentUploading = true
             let oid
             if (this.contentType === 'VIDEO') {
               if (this.contentSource === 'youtube') {
                 oid = await this.uploadUrl(this.videoUrl)
               } else if (this.contentSource === 'device') {
-                oid = await this.uploadFile(this.videoFile)
+                oid = await this.uploadFile(this.videoFile, this.videoFileDuration)
               }
             } else if (this.contentType === 'IMAGE') {
               if (this.contentSource === 'internet') {
                 oid = await this.uploadUrl(this.imageUrl)
               } else if (this.contentSource) {
-                oid = await this.uploadFile(this.imageFile)
+                oid = await this.uploadFile(this.imageFile, 0)
               }
             }
             this.$log('uploadContent done', oid)
+            this.contentUploading = false
+            let content = await this.contentGet(oid)
+            this.$emit('content', content)
             break
           }
         }
@@ -186,6 +179,12 @@ export default {
     },
     videoUrlInputChanged (val) {
       this.$log('videoUrlInputChanged', val)
+      let regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/
+      let match = val.match(regExp)
+      if (match && match[1] && match[1].length === 11) {
+        this.videoUrlYoutube = `https://www.youtube.com/embed/${match[1]}`
+      }
+      this.videoUrl = val
       this.contentSource = 'youtube'
     },
     async videoFileChanged ({ target: { validity, files: [file] } }) {
@@ -206,20 +205,18 @@ export default {
       this.imageUrl = URL.createObjectURL(file)
       this.step = 'previewContent'
     },
-    async uploadFile (file) {
+    async uploadFile (file, length) {
       this.$log('uploadFile')
       let {data: {uploadContentFile: {oid}}} = await this.$apollo.mutate({
         client: 'upload',
         mutation: gql`
-          mutation uploadContentFile ($file: Upload!) {
-            uploadContentFile (file: $file) {
-              oid
-              type
-            }
+          mutation uploadContentFile ($file: Upload!, $length: Float!) {
+            uploadContentFile (file: $file, length: $length) { oid }
           }
         `,
         variables: {
-          file: file
+          file: file,
+          length: length
         }
       })
       return oid
@@ -230,10 +227,7 @@ export default {
         client: 'upload',
         mutation: gql`
           mutation uploadContentUrl ($url: String!) {
-            uploadContentUrl(url: $url) {
-              oid
-              type
-            }
+            uploadContentUrl(url: $url) { oid }
           }
         `,
         variables: {
@@ -241,6 +235,31 @@ export default {
         }
       })
       return oid
+    },
+    async contentGet (oid) {
+      this.$log('contentGet start', oid)
+      let {data: {objectList: [content]}} = await this.$apollo.query({
+        query: gql`
+          query contentGet ($oid: OID!) {
+            objectList(oids: [$oid]) {
+              oid
+              type
+              name
+              thumbUrl(preferWidth: 600)
+              name
+              ... on Video {
+                url
+                urlOriginal
+              }
+            }
+          }
+        `,
+        variables: {
+          oid: oid
+        }
+      })
+      this.$log('contentGet done', content)
+      return content
     },
     next () {
       this.$log('next')
@@ -311,6 +330,26 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    const observer = this.$apollo.subscribe({
+      client: 'ws',
+      query: gql`
+        subscription uploadProgress {
+          progress {
+            action
+            progress
+          }
+        }
+      `
+    })
+    observer.subscribe({
+      next: ({data: {progress}}) => {
+        this.$log('progress', progress)
+        this.$set(this, 'progress', progress)
+      },
+      error: (error) => {
+        this.$log('progress error', error)
+      }
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

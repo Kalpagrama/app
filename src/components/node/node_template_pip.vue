@@ -14,8 +14,8 @@
       :style=`{position: 'absolute', zIndex: zIndex+1000, top: '8px', right: '8px'}`
       :name="nodeFull.fragments[fragmentActive].content.name" :actions="fragmentActions"
       @action="$event => fragmentAction($event, fragmentActive)")
-      q-btn(icon="more_horiz" color="white" round flat
-        :style=`{}`).shadow-1
+      q-btn(icon="more_horiz" color="white" round flat dense
+        :style=`{opacity: 0.5}`).shadow-1.bg-grey-9
     //- forward
     div(@click="forwardClick()"
       :style=`{position: 'absolute', zIndex: zIndex+200, width: '100px', bottom: '10px', right: '10px', borderRadius: '10px', overflow: 'hidden', opacity: 0.7}`
