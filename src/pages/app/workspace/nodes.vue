@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative', height: $q.screen.gt.sm ? '100vh' : 'calc(100vh - 60px)'}`).column.full-width.q-pt-md
+div(:style=`{position: 'relative'}`).column.fit
   //- header
   div(v-if="true" :style=`{height: '60px'}`).row.full-width.q-px-sm
     div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.bg-white.q-px-sm

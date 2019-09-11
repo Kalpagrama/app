@@ -1,18 +1,19 @@
 <template lang="pug">
-div(:style=`{marginBottom: '200px'}`).row.full-width.items-start.content-start.justify-start.q-px-sm
+div(:style=`{marginBottom: '60px'}`).row.full-width.items-start.content-start.justify-start
   //- node item
-  div(v-for="(n, ni) in nodes" :key="n.oid"
+  div(
+    v-for="(n, ni) in nodes" :key="n.oid"
     @click="nodeClick(n, ni)"
     @mouseover="nodeOver = n.oid"
     @mouseleave="nodeOver = undefined"
-    :style=`{position: 'relative', marginBottom: '40px'}`
-    ).q-mr-md.cursor-pointer
-    div(:style=`{position: 'relative'}`).row.full-width.justify-start
-      div(:style=`{position: 'relative', height: nodeHeight+'px', borderRadius: '10px', overflow: 'hidden', border: '3px solid none'}`).row.full-width
-        img(v-for="(t, ti) in n.thumbUrl" :key="ti" :src="t" :style=`{height: nodeHeight+'px'}` draggable="false").col
-        //- img(:src="n.thumbUrl[1]" :style=`{height: '75px'}`).col
-      div(:style=`{position: 'absolute', left: '8px', top: nodeHeight+'px', zIndex: 100, maxHeight: '18px', overflow: 'hidden'}`).row.full-width.q-pr-md
-        small.text-black {{n.name | cut(30)}}
+    :style=`{position: 'relative', height: '50px', marginBottom: '40px'}`
+    ).row.no-wrap.reverse.items-end.content-end.q-mr-md.cursor-pointer
+    img(v-for="(t, ti) in nodeThumbs(n)" :key="ti" :src="t"
+      :style=`{zIndex: 10, borderRadius: '10px', marginRight: ti === 0 ? '0px' : '-15px', height: 50+'px'}` draggable="false")
+    div(
+      :style=`{position: 'absolute', borderRadius: '0px 0px 10px 10px', left: '0px', top: nodeHeight-10+'px', zIndex: 1, maxHeight: '36px', overflow: 'hidden'}`
+      ).row.full-width.q-px-sm.q-pt-sm.bg-white
+      small.text-black {{n.name | cut(60)}}
 </template>
 
 <script>
@@ -26,16 +27,15 @@ export default {
     }
   },
   computed: {
-    getRadius () {
-      return {
-        borderBottomLeftRadius: '100%12px',
-        borderBottomRightRadius: '100%12px',
-        borderTopLeftRadius: '100%12px',
-        borderTopRightRadius: '100%12px'
-      }
-    }
   },
   methods: {
+    nodeThumbs (n) {
+      if (n.thumbUrl) {
+        let arr = JSON.parse(JSON.stringify(n.thumbUrl))
+        let arrr = arr.reverse()
+        return arrr
+      }
+    },
     nodeClick (n, ni) {
       this.$log('nodeClick', n, ni)
       this.$emit('nodeClick', n, ni)

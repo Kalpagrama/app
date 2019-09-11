@@ -1,14 +1,17 @@
 <template lang="pug">
-  q-layout(view='hHh Lpr fFf'
-    :class=`{'bg-black': $route.name === 'content', 'bg-grey-4': $route.name !== 'content'}`)
-    q-page-container
-      q-page
-        k-menu-vert(:loading="loading").gt-sm
-        router-view(v-if="!loading")
-        div(v-else).row.full-width.window-height.items-center.justify-center
-          q-spinner(size="50px" :thickness="2" color="primary")
-    q-footer(reveal :style=`{background: 'none'}`).lt-md
-      k-menu-horiz(v-if="$store.state.auth.user")
+q-layout(view='hHh Lpr fFf').bg-primary
+  q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
+    k-menu-vert(:style=`{borderRadius: '0px 30px 30px 0px', overflow: 'hidden'}`).bg-primary
+  q-btn(round color="primary" size="md" @click="menuToggle"
+    :style=`{position: 'fixed', zIndex: 1000, top: '20px', left: showLeftDrawer ? 210+20+'px' : 20+'px'}`)
+    q-icon(name="menu").rotate-90
+  q-page-container
+    q-page(:style=`{borderRadius: $q.screen.gt.sm ? radius+'px 0 0 '+radius+'px' : '0px', overflow: 'hidden'}`)
+      q-resize-observer(ref="zresize" @resize="onResize")
+      //- keep-alive
+      router-view(v-if="!loading" :width="width" :height="height")
+      div(v-else).row.full-width.window-height.items-center.justify-center
+        q-spinner(size="50px" :thickness="2" color="primary")
 </template>
 
 <script>
@@ -21,28 +24,52 @@ export default {
   data () {
     return {
       loading: true,
-      showLeftDrawer: true
+      showLeftDrawer: true,
+      radius: 30,
+      width: 0,
+      height: 0
     }
   },
   watch: {
-    // '$store.state.workspace.workspace': {
-    //   deep: true,
-    //   immediate: false,
-    //   async handler (to, from) {
-    //     if (this.loading) return
-    //     this.$log('workspace CHANGED', to)
-    //     let {data: {userWorkspaceUpdate}} = await this.$apollo.mutate({
-    //       mutation: gql`
-    //         mutation userWorkspaceUpdate ($workspace: RawJSON) {
-    //           userWorkspaceUpdate(workspace: $workspace)
-    //         }
-    //       `,
-    //       variables: {
-    //         workspace: to
-    //       }
-    //     })
-    //   }
-    // }
+    '$route': {
+      handler (to, from) {
+        this.$log('$route CHANGED', to)
+        // window.history.length = 0
+        // window.history.replaceState([], null, null)
+        // window.browser.history.deleteAll()
+        // delete window.history
+        // window.history.replaceState(null, null, '#' + url)
+        // document.location.hash = to.path
+        // window.history.replaceState(null, null, to.path)
+        // this.$q.notify('route changed')
+      }
+    }
+  },
+  methods: {
+    onResize (e) {
+      this.$log('onResize', e)
+      this.width = e.width
+      this.height = e.height
+    },
+    menuToggle () {
+      this.$log('menuToggle')
+      if (this.showLeftDrawer) {
+        this.$tween.to(this, 0.5, {radius: 0})
+      } else {
+        this.$tween.to(this, 0.5, {radius: 30})
+      }
+      this.$set(this, 'showLeftDrawer', !this.showLeftDrawer)
+    }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.$refs.zresize.trigger()
+    let vh = window.innerHeight * 0.01
+    // Then we set the value in the --vh custom property to the root of the document
+    document.documentElement.style.setProperty('--vh', `${vh}px`)
+    this.$root.$on('toggle_menu', () => {
+      if (this.$q.screen.lt.md) this.menuToggle()
+    })
   },
   async created () {
     try {

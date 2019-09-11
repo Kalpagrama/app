@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{height: $q.screen.gt.sm ? '100vh' : 'calc(100vh - 60px)'}`).row.full-width
+.row.fit
   content-video(v-if="content && content.type === 'VIDEO'" :content="content")
   //- content-image
   //- content-book

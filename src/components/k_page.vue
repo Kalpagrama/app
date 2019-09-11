@@ -37,7 +37,7 @@
       div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end.q-px-md
         q-btn(v-show="!mini" round flat icon="keyboard_arrow_left" color="grey-6" @click="menuToggle()")
   //- body
-  div(:style=`{paddingLeft: $q.screen.gt.sm ? menuWidth+60+16+'px' : '0px'}`).col
+  div(:style=`{paddingLeft: $q.screen.gt.sm ? menuWidth+60+16-20+'px' : '0px'}`).col
     slot(name="body")
 </template>
 

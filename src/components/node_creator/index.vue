@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{overflowX: 'auto', overflowY: 'hidden', height: $q.screen.gt.sm ? 'calc(100vh)' : 'calc(100vh - 60px)'}`).row.full-width.scroll
+div(v-touch-swipe.down="swipeDown").row.fit.scroll
   //- content find dialog
   q-dialog(ref="contentFinderDialog" position="bottom")
     content-finder(@content="fragmentAdd($event), $refs.contentFinderDialog.hide()")
@@ -8,14 +8,16 @@ div(:style=`{overflowX: 'auto', overflowY: 'hidden', height: $q.screen.gt.sm ? '
     video-editor(v-if="videoEditorShow && fragments[fragmentEditing]" :fragment="fragments[fragmentEditing]" @fragment="fragmentSync" @ready="fragmentEdited" @close="videoEditorShow = false, $refs.videoEditorDialog.hide()")
   //- wrapper
   .row.full-height.no-wrap
+    div(:style=`{width: '76px'}`).row.full-height.gt-sms
     //- fragments from workspace
     div(v-if="false" v-show="fragmentsWorkspaceShow" :style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height
       nodes-workspace(@nodeClick="nodeWorkspaceClick")
     //- fragment selected
     div(:style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height.q-px-sm
-      .column.full-height.q-py-md
+      .column.full-height
         //- header
-        div(v-if="true" :style=`{height: '60px', borderRadius: '10px'}`).row.full-width.items-center.q-px-sm.bg-white
+        div(v-if="false" :style=`{height: '66px', borderRadius: '30px'}`).row.full-width.items-center.q-pr-md.bg-white
+          div(:style=`{width: '66px', height: '66px'}`).row
           q-btn(v-show="!fragmentsWorkspaceShow" icon="keyboard_arrow_left" round flat color="grey-6" @click="fragmentsWorkspaceShow = true")
           span.text-grey-8 Фрагменты
           .col
@@ -23,7 +25,7 @@ div(:style=`{overflowX: 'auto', overflowY: 'hidden', height: $q.screen.gt.sm ? '
           q-btn(round flat color="grey-6" icon="more_vert")
         //- body
         .col.scroll
-          .row.full-width.items-start.q-pt-md
+          .row.full-width.items-start.q-pt-sm
           //- fragments list
           div(
             v-for="(f, fi) in fragments" :key="fi"
@@ -64,24 +66,16 @@ div(:style=`{overflowX: 'auto', overflowY: 'hidden', height: $q.screen.gt.sm ? '
           .col
           q-btn(round flat color="grey-6" icon="more_vert")
         //- body
-        .col.scroll.q-pt-md
+        .col.scroll.q-pt-sm
           //- node for preview
-          node(:node="node" :nodeFullReady="node" inCreator
-            :style=`{borderRadius: '10px', overflow: 'hidden'}`).bg-white
-          //- name
-          div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-pa-sm.q-mt-md
-            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
-              q-input(v-model="name" filled type="textarea" :rows="3" autogrow :maxlength="130" label="В чем суть?").full-width
-          //- spheres
-          div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-pa-sm.q-mt-md
-            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
-              q-input(v-model="spheresInput" filled type="textarea" autogrow placeholder="Сфера1, сфера2, сфера3").full-width
-          //- save
-          //- publish
-          q-btn(no-caps color="primary" style=`height: 60px; borderRadius: 10px` :loading="nodePublishing" @click="nodePublish()").full-width.q-mt-md
-            span.text-bold.text-white Опубликовать
-          q-btn(no-caps color="primary" style=`height: 45px; borderRadius: 10px` outline :loading="nodeSaving" @click="nodeSave()").full-width.q-mt-sm Сохранить в мастерскую
-          div(style=`height: 60px`).row.full-width
+          node(:node="node" :nodeFullReady="node" inCreator :style=`{borderRadius: '10px', overflow: 'hidden'}`).bg-white.shadow-1
+          //- node creation tools
+          div(:style=`{borderRadius: '10px'}`).row.full-width.bg-white.q-py-sm.q-mt-md
+            name-creator(@name="name = $event")
+            .row.full-width.q-px-sm
+              q-btn(no-caps color="primary" style=`height: 60px; borderRadius: 10px` :loading="nodePublishing" @click="nodePublish()").full-width.q-mt-md
+                span.text-bold.text-white Опубликовать
+          div(:style=`{height: '60px'}`).row.full-width
 </template>
 
 <script>
@@ -89,10 +83,11 @@ import node from 'components/node'
 import contentFinder from 'components/content_finder'
 import nodesWorkspace from 'pages/app/workspace/nodes'
 import videoEditor from 'components/video_editor'
+import nameCreator from './name_creator'
 
 export default {
   name: 'nodeCreator',
-  components: {node, contentFinder, nodesWorkspace, videoEditor},
+  components: {node, contentFinder, nodesWorkspace, videoEditor, nameCreator},
   props: ['draft'],
   data () {
     return {
@@ -125,9 +120,6 @@ export default {
         // this.nodeRaw = val
       }
     },
-    nodesWorkspace () {
-      return this.$store.state.workspace.workspace.nodes
-    },
     colWidth () {
       let w = this.$q.screen.width
       if (w > 500) return 500
@@ -157,6 +149,11 @@ export default {
     }
   },
   methods: {
+    swipeDown () {
+      this.$log('swipeDown')
+      this.$q.notify('swipe down!')
+      document.activeElement.blur()
+    },
     contentAdd () {
       this.$log('contentAdd')
       this.$refs.contentFinderDialog.show()
@@ -170,8 +167,8 @@ export default {
           id: Date.now().toString(),
           url: '',
           tags: [],
-          relativePoints: [],
-          relativeScale: 0,
+          relativePoints: [{x: 0}, {x: 10}],
+          relativeScale: 0.00,
           preview: content.thumbUrl[0],
           content: content
         }
@@ -230,25 +227,44 @@ export default {
       this.nodeSaving = false
     },
     async nodePublish () {
-      this.$log('nodePublish')
-      this.nodePublishing = true
-      await this.$wait(500)
-      let n = this.node
-      let {data: {nodeCreate}} = await this.$apollo.mutate({
-        mutation: gql`
-          mutation nodeCreate ($node: NodeInput!) {
-            nodeCreate (node: $node) {
-              oid
-              type
-              name
+      try {
+        this.$log('nodePublish start', this.node)
+        this.nodePublishing = true
+        // prepare node
+        let n = JSON.parse(JSON.stringify(this.node))
+        n.fragments.map(f => {
+          f.oid = f.content.oid
+          f.relativeScale = f.content.duration || 0
+          delete f.id
+          delete f.content
+          delete f.url
+          delete f.preview
+        })
+        delete n.author
+        delete n.createdAt
+        delete n.thumbUrl
+        let {data: {nodeCreate}} = await this.$apollo.mutate({
+          mutation: gql`
+            mutation nodeCreate ($node: NodeInput!) {
+              nodeCreate (node: $node) {
+                oid
+                type
+                name
+              }
             }
+          `,
+          variables: {
+            node: n
           }
-        `,
-        variables: {
-          node: n
-        }
-      })
-      this.nodePublishing = false
+        })
+        this.$log('nodePublish done', nodeCreate)
+        this.nodePublishing = false
+        // TODO: create new one? or go to node page?
+      } catch (e) {
+        this.$log('nodePublish error', e)
+        this.nodePublishing = false
+        this.nodePublishingError = e
+      }
     }
   },
   mounted () {

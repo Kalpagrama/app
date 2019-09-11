@@ -1,9 +1,10 @@
 <template lang="pug">
-k-page(:name="user ? user.name : ''" :items="pages" @item="page = $event" :item="page")
-  template(v-slot:body)
-    div(:style=`{position: 'relative', height: $q.screen.gt.sm ? '100vh' : 'calc(100vh - 60px)'}`).column.full-width.q-px-sm.q-py-md
+div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
+  div(:style=`{width: '76px'}`).row.full-height.gt-sm
+  .col
+    div(:style=`{position: 'relative', height: $q.screen.gt.sm ? '100vh' : 'calc(100vh - 60px)'}`).column.full-width.q-px-sm.q-py-sm
       //- header
-      div(v-if="user" style=`height: 100px; borderRadius: 20px`).row.full-width.q-px-sm.bg-white
+      div(v-if="user" style=`height: 100px; borderRadius: 30px`).row.full-width.q-px-sm.bg-white
         //- avatar big
         div(v-if="user" style=`width: 100px`).row.full-height.items-center.justify-center
           img(style=`width: 60px; height: 60px; borderRadius: 50%; oveflow: hidden` @error="avatarError"

@@ -1,6 +1,6 @@
 <template lang="pug">
-k-page(name="Ядрогенератор" :items="items" :item="item" @item="item = $event")
-  template(v-slot:body)
+div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width.bg-grey-4
+  .col
     node-creator(:draft="draft")
 </template>
 

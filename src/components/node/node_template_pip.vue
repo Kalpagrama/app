@@ -1,12 +1,12 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
-  node-header(:node="node" :nodeFull="nodeFull" :inCreator="inCreator")
-    template(v-slot:actions)
-      k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
-        q-btn(icon="brush" color="grey-5" round flat)
+  node-header(v-if="false" :node="node" :nodeFull="nodeFull" :inCreator="inCreator")
+    //- template(v-slot:actions)
+    //-   k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
+    //-     q-btn(icon="brush" color="grey-5" round flat)
   //- wrapper maxHeight: getHeight+'px'
   div(
-    :style=`{position: 'relative', zIndex: zIndex+100}`
+    :style=`{position: 'relative', zIndex: zIndex+100, maxHeight: '100vh', overflow: 'hidden', borderRadius: '10px'}`
     ).row.full-width.items-start.content-start.bg-grey-3
     //- actions
     //- .row.full-width.justify-end

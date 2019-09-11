@@ -1,30 +1,42 @@
 <template lang="pug">
 div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
-  //- rate
+  //- rate v-touch-swipe.mouse.down="$refs.rateDialog ? $refs.rateDialog.hide() : false"
   q-dialog(ref="rateDialog" position="bottom")
     div(
-      v-if="nodeFull"
-      :style=`{position: 'relative', maxWidth: '550px', height: '80vh', width: 'calc(100% - 20px)', borderRadius: '16px 16px 0px 0px', overflow: 'hidden'}`
-      ).row.justify-center.items-start.content-start.bg-white.q-mx-sm
-        div(:style=`{height: '100px'}`).row.full-width.items-center.justify-center.q-px-sm
-          h3 {{rateCurrent.name}}
-          //- h3(v-if="nodeFull") {{nodeFull.rate}}
-        q-knob(
-          v-if="showNodeRate"
-          :value="nodeFull.rate*100" readonly show-value
-          size="300px" :thickness="0.9" color="grey-6" center-color="black"
-          :style=`{position: 'absolute', bottom: '80px', zIndex: zIndex+20}`)
-          small.text-white {{Math.ceil(value)}}
-        q-knob(
-          v-model="value" :readonly="showNodeRate ? true : false" show-value
-          size="200px" :thickness="0.60" color="primary" center-color="white"
-          :style=`{position: 'absolute', bottom: '130px', zIndex: zIndex+10, borderRadius: '50%'}`
-          ).bg-grey-3
-          small.text-black {{Math.ceil(value)}}
-        div(
-          v-if="nodeFull && !nodeFull.rateUser"
-          :style=`{position: 'absolute', bottom: '0px', height: '70px'}`).row.full-width.items-center.q-px-sm
-          q-btn(color="primary" :style=`{height: '50px', borderRadius: '10px'}` :loading="nodeRating" @click="nodeRateJob()").full-width {{`Проголосовать`}}
+      :style=`{position: 'relative', borderRadius: '30px 30px 0 0', pointerEvents: 'none', height: '80vh'}`).row.full-width.items-start.content-start.bg-white
+      div(:style=`{height: '80px'}`).row.full-width.justify-center.items-center
+        h3.q-ma-xs Далеко
+      .row.full-width.justify-center
+        q-icon(name="blur_on" :style=`{fontSize: '300px'}`)
+          q-btn(round color="primary" :style=`{position: 'absolute', right: '0px', bottom: '15px'}` size="xl")
+      div(:style=`{height: '100px'}`).row.full-width.justify-center.items-end
+        h4.q-mr-sm 67 /
+        h3.text-bold 99
+      div(v-if="true" :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', height: '70px'}`).row.full-width.q-px-sm
+        q-btn(color="primary" :style=`{height: '60px', borderRadius: '20px'}` :loading="nodeRating" @click="nodeRateJob()").full-width {{`Проголосовать`}}
+    //- div(
+    //-   v-if="nodeFull"
+    //-   :style=`{position: 'relative', maxWidth: '550px', height: '80vh', width: 'calc(100% - 20px)', borderRadius: '16px 16px 0px 0px', overflow: 'hidden'}`
+    //-   ).row.justify-center.items-start.content-start.bg-white
+    //-     div(:style=`{height: '100px'}`).row.full-width.items-center.justify-center
+    //-       h3 {{rateCurrent.name}}
+    //-       //- h3(v-if="nodeFull") {{nodeFull.rate}}
+    //-     q-knob(
+    //-       v-if="showNodeRate"
+    //-       :value="nodeFull.rate*100" readonly show-value
+    //-       size="300px" :thickness="0.9" color="grey-6" center-color="black"
+    //-       :style=`{position: 'absolute', bottom: '80px', zIndex: zIndex+20}`)
+    //-       small.text-white {{Math.ceil(value)}}
+    //-     q-knob(
+    //-       v-model="value" :readonly="showNodeRate ? true : false" show-value
+    //-       size="200px" :thickness="0.60" color="primary" center-color="white"
+    //-       :style=`{position: 'absolute', bottom: '130px', zIndex: zIndex+10, borderRadius: '50%'}`
+    //-       ).bg-grey-3
+    //-       small.text-black {{Math.ceil(value)}}
+    //-     div(
+    //-       v-if="nodeFull && !nodeFull.rateUser"
+    //-       :style=`{position: 'absolute', bottom: '0px', height: '70px'}`).row.full-width.items-center.q-px-sm
+    //-       q-btn(color="primary" :style=`{height: '60px', borderRadius: '10px'}` :loading="nodeRating" @click="nodeRateJob()").full-width {{`Проголосовать`}}
   //- share
   q-dialog(ref="shareDialog" position="bottom")
     div(
@@ -54,7 +66,7 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
   q-btn(color="grey-9" round flat @click="nodeShare()")
     q-icon(name="call_made" size="26px" color="grey-8").rotate-270
   //- chain
-  //- q-btn(:icon="nodeWorkspaced ? 'cloud' : 'cloud_queue'" color="grey-8" round flat @click="nodeWorkspace()")
+  q-btn(:icon="nodeWorkspaced ? 'turned_in' : 'turned_in_not'" color="grey-8" round flat @click="nodeWorkspace()")
   //- chain name and selector
   .col
     //- div(v-if="true") Some chain name
@@ -115,6 +127,9 @@ export default {
     }
   },
   methods: {
+    handleDrag (e) {
+      this.$log('handleDrag')
+    },
     nodeShare () {
       this.$log('nodeShare')
       this.$refs.shareDialog.show()

@@ -250,6 +250,7 @@ export default {
               ... on Video {
                 url
                 urlOriginal
+                duration
               }
             }
           }
