@@ -25,24 +25,24 @@ export default {
     }
   },
   watch: {
-    '$store.state.workspace.workspace': {
-      deep: true,
-      immediate: false,
-      async handler (to, from) {
-        if (this.loading) return
-        this.$log('workspace CHANGED', to)
-        let {data: {userWorkspaceUpdate}} = await this.$apollo.mutate({
-          mutation: gql`
-            mutation userWorkspaceUpdate ($workspace: RawJSON) {
-              userWorkspaceUpdate(workspace: $workspace)
-            }
-          `,
-          variables: {
-            workspace: to
-          }
-        })
-      }
-    }
+    // '$store.state.workspace.workspace': {
+    //   deep: true,
+    //   immediate: false,
+    //   async handler (to, from) {
+    //     if (this.loading) return
+    //     this.$log('workspace CHANGED', to)
+    //     let {data: {userWorkspaceUpdate}} = await this.$apollo.mutate({
+    //       mutation: gql`
+    //         mutation userWorkspaceUpdate ($workspace: RawJSON) {
+    //           userWorkspaceUpdate(workspace: $workspace)
+    //         }
+    //       `,
+    //       variables: {
+    //         workspace: to
+    //       }
+    //     })
+    //   }
+    // }
   },
   async created () {
     try {
@@ -81,9 +81,9 @@ export default {
       this.$store.commit('auth/state', ['user', user])
       // workspace
       // this.$log('Getting user workspace')
-      let { data: { userWorkspace } } = await this.$apollo.query({query: gql`query getUserWorkspace { userWorkspace }`})
-      this.$log('userWorkspace', userWorkspace)
-      this.$store.commit('workspace/state', ['workspace', userWorkspace])
+      // let { data: { userWorkspace } } = await this.$apollo.query({query: gql`query getUserWorkspace { userWorkspace }`})
+      // this.$log('userWorkspace', userWorkspace)
+      // this.$store.commit('workspace/state', ['workspace', userWorkspace])
       // return to path
       // let path = localStorage.getItem('path')
       // this.$log('path', path)

@@ -12,15 +12,16 @@ div(
   div(v-if="true" :style=`{position: 'absolute', zIndex: zIndex+10, top: '8px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
     //- q-btn(round flat color="white" icon="fullscreen" @click="videoToggleFullscreen").shadow-1
     //- TODO: align items in node...
-    q-btn(v-if="!playing && visible" round color="primary" icon="flash_on" style=`width: 30px; height: 30px` @click="videoToggleMute").shadow-1
-  div(:style=`{position: 'absolute', zIndex: zIndex+10, bottom: '20px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
-    q-btn(round flat color="white" :icon="muted ? 'volume_off' : 'volume_up'" @click="videoToggleMute").shadow-1
+    //- q-btn(v-if="!playing && visible" round color="primary" icon="flash_on" style=`width: 30px; height: 30px` @click="videoToggleMute").shadow-1
+  div(:style=`{position: 'absolute', zIndex: zIndex+10, bottom: '20px', height: '40px', opacity: 0.7}`).row.full-width.justify-center.items-center
+    //- q-btn(round flat color="white" dense @click="videoToggleMute").shadow-1.bg-grey-9
+    //-   q-icon(:name="muted ? 'volume_off' : 'volume_up'" color="white" size="19px")
     div(:style=`{color: 'white', borderRadius: '4px', opacity: 0.7}`).bg-grey-10.q-px-xs.q-ml-sm
       small {{$time(now)}} / {{$time(duration)}}
   //- timeline
-  div(v-if="now > 0" :style=`{position: 'absolute', zIndex: zIndex+100, bottom: '0px', left: '0px', height: '20px'}` @click="videoTimelineClick"
+  div(v-if="now > 0" :style=`{position: 'absolute', zIndex: zIndex+100, bottom: '0px', left: '0px', height: '10px'}` @click="videoTimelineClick"
     ).row.full-width.items-end.cursor-pointer
-    div(:style=`{width: videoNow+'%', height: '20px', borderRight: '3px solid #027BE3', pointerEvents: 'none'}`).row.bg-primary
+    div(:style=`{width: videoNow+'%', height: '10px', borderRight: '3px solid #027BE3', pointerEvents: 'none'}`).row.bg-primary
   //- video autoPictureInPicture
   video(
     ref="kvideo"
@@ -29,7 +30,8 @@ div(
     :muted="muted" loop playsinline
     @click="videoClick"
     @playing="videoPlaying"
-    @timeupdate="videoTimeupdate")
+    @timeupdate="videoTimeupdate"
+    @loadeddata="videoLoaded")
 </template>
 
 <script>
@@ -98,15 +100,23 @@ export default {
     videoPlaying () {
       this.$log('videoPlaying')
       this.playing = true
-      if (this.$refs.kvideo) this.duration = this.$refs.kvideo.duration
+      // if (this.$refs.kvideo) this.duration = this.$refs.kvideo.duration
     },
     videoTimeupdate () {
       // this.$log('videoTimeupdate')
       if (this.$refs.kvideo) this.now = this.$refs.kvideo.currentTime
       // TODO: loop again bitch...
     },
+    videoLoaded (e) {
+      // this.$log('videoLoaded', e)
+      let duration = e.target.duration
+      this.$log('duration', duration)
+      this.$set(this, 'duration', duration)
+      this.$emit('duration', duration)
+    },
     videoToggleFullscreen () {
       this.$log('videoToggleFullscreen')
+      // TODO: toggle fullscreen request
       // this.playsinline = !this.playsinline
       // this.$refs.kvideo.requestFullScreen()
     },
@@ -121,7 +131,7 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     // this.$log('mounted')
     // localStorage.setItem('kvideo_debug', 'all')
     localStorage.removeItem('kvideo_debug')
