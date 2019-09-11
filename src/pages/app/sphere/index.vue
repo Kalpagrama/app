@@ -1,11 +1,10 @@
 <template lang="pug">
-k-page(:name="'Путешествия по сферам'" :items="pages" :item="page" @item="page = $event")
-  template(v-slot:body)
-    keep-alive
-      sphere-explorer(v-if="page === 'sphere' && sphere" :sphere="sphere" noHeader)
-      div(v-else).row.fit.q-pa-md
-        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-start.content-start.bg-white.q-pa-sm
-          h4 {{ pages[page].name }}
+div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width.bg-grey-4
+  .col
+    sphere-explorer(v-if="page === 'sphere' && sphere" :sphere="sphere" noHeader)
+    div(v-else).row.fit.q-pa-md
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-start.content-start.bg-white.q-pa-sm
+        h4 {{ pages[page].name }}
 </template>
 
 <script>

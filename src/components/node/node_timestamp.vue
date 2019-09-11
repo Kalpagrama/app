@@ -1,6 +1,7 @@
 <template lang="pug">
-div(style=`height: 25px`).row.full-width.items-center.q-px-sm
+div(:style=`{height: '38px', paddingLeft: '20px'}`).row.full-width.items-center.justify-between.q-pr-xs
   small.text-grey-6 {{getTime}}
+  q-btn(round flat dense color="grey-6" icon="more_horiz").q-mr-sm
 </template>
 
 <script>

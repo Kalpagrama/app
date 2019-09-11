@@ -1,27 +1,44 @@
 <template lang="pug">
 div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.bg-black
-  div(v-if="false" style=`position: absolute; zIndex: 300; left: 0px; width: 250px; top: 50%; color: white`).row.bg-purple.q-pa-sm
+  q-resize-observer(@resize="onResize")
+  div(v-if="false" style=`position: absolute; zIndex: 300; left: 16px; width: 250px; top: 50%; color: white`).row.bg-purple.q-pa-sm
     small(v-for="(d, di) in debug").full-width {{d}}:{{get(d)}}
-  k-menu(ref="kmenu" :fragments="fragments" :colors="colors" :duration="duration")
+  //- k-menu(ref="kmenu" :fragments="fragments" :colors="colors" :duration="duration")
   video(
-    ref="kvideo" :src="fragment.content.url" autoplay playsinline type="video/mp4"
+    ref="kvideo" :src="fragment.content.url" autoplay playsinline type="video/mp4" muted
     :style=`{position: 'relative', height: '100%', maxWidth: '100%'}`
     @click="videoClick" @playing="videoPlaying" @timeupdate="videoTimeupdate")
   //- actions
-  div(v-show="duration > 0" :style=`{position: 'absolute', zIndex: 200, top: '16px', height: '60px', opacity: 0.6}`).row.full-width.justify-between.q-px-md
-    q-btn(round flat icon="menu" color="white" @click="$refs.kmenu.toggle()").bg-grey-9
-    //- q-btn(round flat icon="menu" color="white").bg-grey-9
-    div(:style=`{height: '30px', borderRadius: '10px'}`).row.items-center.bg-grey-9.q-px-sm
+  //- close with no changes!
+  //- TODO: save initial state of fragments!
+  q-btn(
+    :style=`{position: 'absolute', top: '16px', left: left ? left+16+'px' : 16+'px', opacity: 0.5}`
+    round icon="clear" color="white" @click="$emit('close')").bg-grey-9
+  //- save changes
+  q-btn(
+    :style=`{position: 'absolute', top: '16px', right: 16+'px', opacity: 0.8}`
+    round icon="check" color="primary" @click="$emit('close')")
+  //- menu-time-menu
+  div(v-show="duration > 0" :style=`{position: 'absolute', zIndex: 200, bottom: '160px', height: '40px', opacity: 0.6}`).row.full-width.justify-between.q-px-md
+    q-btn(round flat icon="menu" color="white").bg-grey-9.q-ml-md
+      q-menu(ref="leftmenu" cover anchor="bottom left" :max-height="height+'px'" persistent  transition-show="slide-up" transition-hide="slide-up")
+        div(:style=`{position: 'relative', borderRadius: '20px', width: width/2-32+'px', height: height-160-70+'px', overflow: 'hidden', background: 'rgba(255, 255, 255, 0.5)'}`).row.shadow-1
+          q-btn(:style=`{position: 'absolute', left: '0px', bottom: '0px'}` icon="menu" color="grey-9" round @click="$refs.leftmenu.hide()")
+          //- h1 hello
+    div(:style=`{height: '30px', borderRadius: '10px', border: framesSynced ? '2px solid #5f277a' : 'none'}` @click="framesSynced = !framesSynced"
+      ).row.items-center.bg-grey-9.q-px-sm.cursor-pointer
       span.text-white {{ $time(now) }}/{{ $time(duration) }}
-    //- q-btn(round icon="keyboard_arrow_left" color="primary" @click="$refs.kvideo.playBackwards()")
-    q-btn(round icon="check" color="primary" @click="$emit('close')")
+    q-btn(round flat icon="keyboard_arrow_left" color="white").bg-grey-9
+      q-menu(ref="rightmenu" cover anchor="bottom right" :max-height="height+'px'" persistent  transition-show="slide-up" transition-hide="slide-up")
+        div(:style=`{position: 'relative', borderRadius: '20px', width: width/2-32+'px', height: height-160-70+'px', overflow: 'hidden', background: 'rgba(255, 255, 255, 0.5)'}`).row.shadow-1
+          q-btn(:style=`{position: 'absolute', right: '0px', bottom: '0px'}` icon="menu" color="grey-9" round @click="$refs.rightmenu.hide()")
   //- relative points
-  div(:style=`{position: 'absolute', bottom: '85px', height: '80px', paddingLeft: $q.screen.width/2+'px'}`).row.full-width
+  div(:style=`{position: 'absolute', bottom: '66px', height: '80px', paddingLeft: width/2+'px'}`).row.full-width
     div(v-for="(f, fi) in fragments" :key="fi")
       div(
         v-for="(point, pi) in f.points" :key="pi" v-show="f.visible"
-        :style=`{position: 'absolute', zIndex: 400, bottom: '-10px', width: '2px', height: '80px',
-          left: -framesScrollLeft+$q.screen.width/2+(point*k)+'px', background: randomColor(fi)}`).row
+        :style=`{position: 'absolute', zIndex: 400, bottom: '-50px', width: '2px', height: '120px',
+          left: -framesScrollLeft+width/2+(point*k)+'px', background: randomColor(fi)}`).row
         div(
           :style=`{position: 'relative'}`
           v-touch-pan.mouse.stop="$event => pointDrag(fi, pi, $event)").row.cursor-pointer
@@ -47,23 +64,24 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
             ).row.items-center.justify-center.shadow-22
             span(style=`user-select: none`).text-white {{fi+1}}
   //- timeline
-  div(:style=`{position: 'absolute', bottom: '0px', height: '120px'}`).row.full-width.justify-center.items-center.content-center
+  div(:style=`{position: 'absolute', bottom: '0px', height: '82px'}`).row.full-width.justify-center.items-center.content-center
     //- frames
     div(ref="kframes" :style=`{position: 'relative'}` @scroll="framesScroll").row.full-width.scroll
-      div(:style=`{borderRadius: '10px'}`).row.no-wrap.q-my-lg
-        div(:style=`{height: '50px', width: $q.screen.width/2+'px'}`).row
+      div(:style=`{borderRadius: '10px', marginTop: '16px', marginBottom: '16px'}`).row.no-wrap
+        //- left box for padding
+        div(:style=`{height: '50px', width: width/2+'px'}`).row
+        //- frames wrapper no-wrap :)
         div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap.shadow-9
+          //- frame
           div(
             v-for="(f, fi) in frames" :key="f" @click="$event => frameClick(f, fi, $event)"
             :style=`{height: '50px'}`
             ).row.items-center.justify-center.bg-black
-            img(:src="f" draggable="false" :style=`{height: '50px', objectFit: 'cover'}`)
+            //- frame img
+            img(:src="f" draggable="false" :style=`{height: '50px', objectFit: 'cover'}` @load="frameLoaded")
           div(:style=`{position: 'absolute', left: now*k+'px', width: '5px', height: '50px'}`).row.bg-primary
-        div(:style=`{height: '50px', width: $q.screen.width/2+'px'}`).row
-  //- timeline middle time
-  div(v-if="false").row.full-width.justify-center.q-py-xs
-    div(:style=`{height: '30px', borderRadius: '10px', opacity: 0.5}`).row.items-center.bg-grey-9.q-px-sm
-      small.text-white {{ $time(framesMiddle/k) }}
+        //- right box for padding
+        div(:style=`{height: '50px', width: width/2+'px'}`).row
 </template>
 
 <script>
@@ -72,31 +90,35 @@ import kMenu from './menu'
 export default {
   name: 'videoEditor',
   components: {kMenu},
-  props: ['fragment'],
+  props: ['fragment', 'left'],
   data () {
     return {
+      width: 0,
+      height: 0,
       playing: false,
       duration: 0,
       now: 0,
       frames: [],
       fragmentMaxLength: 60,
+      framesLoaded: 0,
       framesLeft: 0,
       framesScrollLeft: 0,
       framesScrollWidth: 0,
+      framesSynced: false,
       frameClicks: 0,
       clicks: 0,
       clickDelay: 300,
       clickTimer: null,
       fragments: [
-        {name: 'Ест паука', points: [0, 100.5], visible: true},
-        {name: 'Вот это кикфлип', points: [20, 23], visible: true},
-        {name: 'Тут так закатывает глаза 🤢😱', points: [5, 17], visible: true},
-        {name: 'Bad girl 💀', points: [10, 34], visible: true}
+        {id: 'f1', name: 'Ест паука', points: [0, 100.5], visible: true},
+        {id: 'f2', name: 'Вот это кикфлип', points: [20, 23], visible: true},
+        {id: 'f3', name: 'Тут так закатывает глаза 🤢😱', points: [5, 17], visible: true},
+        {id: 'f4', name: 'Bad girl 💀', points: [10, 34], visible: true}
       ],
       pointActive: undefined,
       pointDragging: undefined,
       pointDraggingHeight: 40,
-      debug: ['k', 'now', 'duration', 'framesCount', 'frameDuration', 'fragments', 'framesMiddle', 'framesScrollLeft', 'framesScrollWidth'],
+      debug: ['width', 'height', 'k', 'now', 'duration', 'framesCount', 'frameDuration', 'fragments', 'framesMiddle', 'framesScrollLeft', 'framesScrollWidth'],
       colors: {}
     }
   },
@@ -106,7 +128,7 @@ export default {
     },
     framesMiddle () {
       // return this.framesScrollWidth - this.framesScrollLeft
-      return (this.$q.screen.width / 2) + this.framesScrollLeft
+      return (this.width / 2) + this.framesScrollLeft
     },
     frameDuration () {
       // return this.duration / this.framesCount
@@ -116,7 +138,23 @@ export default {
       return this.framesScrollWidth / this.duration
     }
   },
+  watch: {
+    now: {
+      handler (to, from) {
+        // this.$log('now CHANGED', to)
+        if (this.$refs.kframes && this.framesSynced) {
+          // this.$refs.kframes.scrollLeft = (this.width / 2) + (to * this.k)
+          this.$tween.to(this.$refs.kframes, 0.4, {scrollLeft: (to * this.k)})
+        }
+      }
+    }
+  },
   methods: {
+    onResize (e) {
+      this.$log('onResize', e)
+      this.$set(this, 'width', e.width)
+      this.$set(this, 'height', e.height)
+    },
     randomColor(id) {
       const r = () => Math.floor(256 * Math.random())
       return this.colors[id] || (this.colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
@@ -129,7 +167,7 @@ export default {
       this.pointActive = `${fi + pi}`
     },
     pointDrag (fi, pi, e) {
-      this.$log('pointDrag', fi, pi, e.delta.x)
+      // this.$log('pointDrag', fi, pi, e.delta.x)
       this.pointDragging = `${fi + pi}`
       if (e.isFirst) this.$tween.to(this, 0.5, {pointDraggingHeight: 60})
       if (e.isFinal) {
@@ -170,9 +208,19 @@ export default {
       this.framesLeft += e.delta.x
     },
     framesScroll (e) {
-      // this.$log('framesScroll', e.target.scrollLeft, e)
-      this.framesScrollWidth = e.target.scrollWidth - this.$q.screen.width
+      // this.$log('framesScroll', e.target.scrollLeft)
       this.framesScrollLeft = e.target.scrollLeft
+      // if (this.framesSynced) {
+      //   this.$refs.kvideo.currentTime = this.framesScrollLeft / this.k
+      // }
+    },
+    frameLoaded (e) {
+      // this.$log('frameLoaded')
+      this.framesLoaded++
+      if (this.framesLoaded === this.framesCount) {
+        this.$log('frames LOADED!')
+        if (this.$refs.kframes) this.$tween.to(this, 0.5, {framesScrollWidth: this.$refs.kframes.scrollWidth - this.width})
+      }
     },
     frameClick (f, fi, e) {
       this.$log('frameClick', fi, e)
@@ -244,7 +292,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('created', this.fragment)
+    this.$log('mounted', this.fragment)
     this.$set(this, 'frames', [])
     this.$set(this, 'frames', await this.framesLoad(this.fragment.content.oid))
     // await this.$wait(4000)
@@ -267,3 +315,6 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+</style>

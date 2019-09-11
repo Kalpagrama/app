@@ -2,6 +2,7 @@
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center
   //- div(:style=`{position: 'absolute', zIndex: 100, opacity: 0.3}`).row.fit.bg-black
   div(:style=`{maxWidth: '550px'}`).row.full-width.q-pt-md
+    //- .q-px-sm
     div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width.q-px-sm
       //- :title="n.name"
       //- 'shadow-1': activeNode ? activeNode[0] === ni : false}

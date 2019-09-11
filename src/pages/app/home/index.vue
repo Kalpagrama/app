@@ -1,6 +1,6 @@
 <template lang="pug">
-k-page
-  template(v-slot:body)
+.column.window-height.full-width.bg-grey-4
+  .col.scroll
     node-loader(mode="feed" :query="query" queryKey="feed" :variables="variables")
 </template>
 

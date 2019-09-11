@@ -1,6 +1,6 @@
 <template lang="pug">
-k-page(name="Content explorer" :items="items" :item="item" @item="item = $event")
-  template(v-slot:body)
+div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width
+  .col
     content-explorer(v-if="content" :content="content")
 </template>
 
@@ -10,7 +10,7 @@ import contentExplorer from 'components/content_explorer'
 export default {
   name: 'page_app_content',
   components: {contentExplorer},
-  props: [],
+  props: ['width', 'height'],
   data () {
     return {
       item: 'content',

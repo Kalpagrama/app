@@ -1,11 +1,11 @@
 <template lang="pug">
-k-page(name="Мастерская" :items="pages" :item="page" @item="page = $event")
-  template(v-slot:body)
-    keep-alive
-      nodes(v-if="page === 'nodes'" @click="nodeClick")
-      div(v-else).row.fit.q-pa-md
-        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-start.content-start.bg-white.q-pa-sm
-          h4 {{ pages[page].name }}
+div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
+  div(:style=`{width: '76px'}`).row.full-height.gt-sm
+  .col
+    nodes(v-if="page === 'nodes'" @click="nodeClick")
+    div(v-else).row.fit.q-pa-md
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-start.content-start.bg-white.q-pa-sm
+        h4 {{ pages[page].name }}
 </template>
 
 <script>
