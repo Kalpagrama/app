@@ -27,15 +27,18 @@
         :style=`{width: '100%', height: '100%', objectFit: 'contain'}` draggable="false"
         @load="$event => imgLoaded($event, `mini:${pi}`)"
         @error="$event => imgError($event, `mini:${pi}`)")
-    //- previews
+    //- previews v-if="node.thumbUrl[pi]"
     img(
       v-for="(p, pi) in 2" :key="pi"
-      v-show="fragmentActive === pi"
+      v-show="node.thumbUrl[pi] && fragmentActive === pi"
       :src="node.thumbUrl[pi]"
       :style=`{width: '100%', minHeight: '150px', objectFit: 'contain', zIndex: zIndex+50}`
       draggable="false"
       @load="$event => imgLoaded($event, `preview:${pi}`)"
       @error="$event => imgError($event, `preview:${pi}`)")
+    //- div(
+    //-   v-for="(p, pi) in 2" :key="pi"
+    //-   :style=`{height: '240px'}`).row.full-width.bg-grey-3.br
     //- active
     div(v-if="needFull && nodeFull && nodeFull.fragments" :style=`{position: 'absolute', zIndex: zIndex+90}`).row.fit
       div(v-for="(f, fi) in 2" :key="fi" v-show="fragmentActive === fi").row.fit
