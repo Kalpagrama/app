@@ -4,7 +4,7 @@ q-layout(view='hHh Lpr fFf').bg-primary
     k-menu-vert(:style=`{borderRadius: '0px 30px 30px 0px', overflow: 'hidden'}`).bg-primary
   q-btn(round color="primary" size="md" @click="menuToggle"
     :style=`{position: 'fixed', zIndex: 1000, top: '20px', left: showLeftDrawer ? 210+20+'px' : 20+'px'}`)
-    q-icon(name="menu").rotate-90
+    q-icon(name="blur_on")
   q-page-container
     q-page(:style=`{borderRadius: $q.screen.gt.sm ? radius+'px 0 0 '+radius+'px' : '0px', overflow: 'hidden'}`)
       q-resize-observer(ref="zresize" @resize="onResize")
@@ -12,6 +12,8 @@ q-layout(view='hHh Lpr fFf').bg-primary
       router-view(v-if="!loading" :width="width" :height="height")
       div(v-else).row.full-width.window-height.items-center.justify-center
         q-spinner(size="50px" :thickness="2" color="primary")
+  //- q-footer(reveal :style=`{background: 'none', borderRadius: '10px', overflow: 'hidden'}`)
+  //-   k-menu-horiz
 </template>
 
 <script>

@@ -354,6 +354,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.observer = null
   }
 }
 </script>

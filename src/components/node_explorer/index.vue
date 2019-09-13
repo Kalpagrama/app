@@ -14,7 +14,7 @@
                 :style=`{borderRadius: '10px', maxWidth: '500px', marginBottom: '200px'}`).bg-white.q-mt-md
       //- fragments
       q-tab-panel(name="fragments" :style=`{padding: '0px'}` v-if="!isDesktop")
-        nodes(v-if="nodeFull" :node="node" :nodeFull="nodeFull" :nodes="nodes")
+        nodes(v-if="nodeFull" :node="node" :nodeFull="nodeFull" :needFull="true" :nodes="nodes" :active="active")
   //- desktop view
   div(v-if="isDesktop").col.full-height.bg-grey-4
     nodes(v-if="nodeFull" :node="node" :nodeFull="nodeFull" :nodes="nodes")

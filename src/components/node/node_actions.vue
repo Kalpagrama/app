@@ -9,11 +9,12 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
       .row.full-width.justify-center
         q-icon(name="blur_on" :style=`{fontSize: '300px'}`)
           q-btn(round color="primary" :style=`{position: 'absolute', right: '0px', bottom: '15px'}` size="xl")
-      div(:style=`{height: '100px'}`).row.full-width.justify-center.items-end
-        h4.q-mr-sm 67 /
-        h3.text-bold 99
+      div(:style=`{height: '80px'}`).row.full-width.justify-center.items-end
+        h4.q-ma-xs.q-mr-sm 67 /
+        h3.q-ma-xs.text-bold 99
       div(v-if="true" :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', height: '70px'}`).row.full-width.q-px-sm
-        q-btn(color="primary" :style=`{height: '60px', borderRadius: '20px'}` :loading="nodeRating" @click="nodeRateJob()").full-width {{`Проголосовать`}}
+        q-btn(color="primary" :style=`{height: '60px', borderRadius: '20px'}` :loading="nodeRating" @click="nodeRateJob()" no-caps).full-width
+          span.text-bold.text-white {{`Проголосовать`}}
     //- div(
     //-   v-if="nodeFull"
     //-   :style=`{position: 'relative', maxWidth: '550px', height: '80vh', width: 'calc(100% - 20px)', borderRadius: '16px 16px 0px 0px', overflow: 'hidden'}`

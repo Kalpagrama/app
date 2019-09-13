@@ -1,14 +1,17 @@
 <template lang="pug">
-div(v-touch-swipe.down="swipeDown").row.fit.scroll
+div(:style=`{overflowX: 'auto'}`).row.full-height
   //- content find dialog
   q-dialog(ref="contentFinderDialog" position="bottom")
     content-finder(@content="fragmentAdd($event), $refs.contentFinderDialog.hide()")
   //- editors
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(v-if="videoEditorShow && fragments[fragmentEditing]" :fragment="fragments[fragmentEditing]" @fragment="fragmentSync" @ready="fragmentEdited" @close="videoEditorShow = false, $refs.videoEditorDialog.hide()")
+  //- node editor dialog
+  q-dialog(ref="nodeEditorDialog" position="bottom")
+    node-editor(:node="node" @node="node = $event" @close="$refs.nodeEditorDialog.hide()" :style=`{maxWidth: '500px'}`)
   //- wrapper
-  .row.full-height.no-wrap
-    div(:style=`{width: '76px'}`).row.full-height.gt-sms
+  div.row.full-height.no-wrap
+    div(:style=`{width: '76px'}`).row.full-height.gt-sm
     //- fragments from workspace
     div(v-if="false" v-show="fragmentsWorkspaceShow" :style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height
       nodes-workspace(@nodeClick="nodeWorkspaceClick")
@@ -66,16 +69,32 @@ div(v-touch-swipe.down="swipeDown").row.fit.scroll
           .col
           q-btn(round flat color="grey-6" icon="more_vert")
         //- body
-        .col.scroll.q-pt-sm
+        div(:style=`{position: 'relative'}`).col.scroll.q-pt-sm
           //- node for preview
-          node(:node="node" :nodeFullReady="node" inCreator :style=`{borderRadius: '10px', overflow: 'hidden'}`).bg-white.shadow-1
-          //- node creation tools
-          div(:style=`{borderRadius: '10px'}`).row.full-width.bg-white.q-py-sm.q-mt-md
-            name-creator(@name="name = $event")
-            .row.full-width.q-px-sm
-              q-btn(no-caps color="primary" style=`height: 60px; borderRadius: 10px` :loading="nodePublishing" @click="nodePublish()").full-width.q-mt-md
-                span.text-bold.text-white Опубликовать
-          div(:style=`{height: '60px'}`).row.full-width
+          node(:node="node" :nodeFullReady="node" inCreator :style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).bg-white
+          //- node edit btn
+          q-btn(v-if="false" :style=`{position: 'absolute', zIndex: 1000, right: '15px', top: '20px', opacity: 0.9}`
+            round flat dense icon="edit" color="white").bg-grey-9
+          //- //- node creation tools
+          //- div(:style=`{borderRadius: '10px'}`).row.full-width.bg-white.q-py-sm.q-mt-md
+          //-   name-creator(:name="name" :spheres="spheres" @name="name = $event" @spheres="spheres = $event")
+          //-   //- create button
+          //-   .row.full-width.q-px-sm
+          //-     q-btn(
+          //-       no-caps color="primary" style=`height: 60px; borderRadius: 10px`
+          //-       :disable="!nodePublishPossible"
+          //-       :loading="nodePublishing" @click="nodePublish()").full-width.q-mt-md
+          //-       span.text-bold.text-white Опубликовать
+          //- //- bottom block for mobile
+          //- div(:style=`{height: '60px'}`).row.full-width
+          div(:style=`{zIndex: 10, marginTop: '-10px', borderRadius: '0 0 10px 10px', opacity: 0.8}`).row.full-width.items-end.bg-grey-2.q-pa-sm
+            q-btn(outline color="primary" no-caps style=`height: 50px; borderRadius: 10px` @click="nodeEdit()").full-width.q-mt-lg.q-mb-sm
+              span.text-bold Редактировать
+            q-btn(
+              no-caps color="primary" style=`height: 60px; borderRadius: 10px`
+              :disable="!nodePublishPossible"
+              :loading="nodePublishing" @click="nodePublish()").full-width.q-mb-sm
+              span.text-bold.text-white Опубликовать
 </template>
 
 <script>
@@ -83,11 +102,11 @@ import node from 'components/node'
 import contentFinder from 'components/content_finder'
 import nodesWorkspace from 'pages/app/workspace/nodes'
 import videoEditor from 'components/video_editor'
-import nameCreator from './name_creator'
+import nodeEditor from './node_editor'
 
 export default {
   name: 'nodeCreator',
-  components: {node, contentFinder, nodesWorkspace, videoEditor, nameCreator},
+  components: {node, contentFinder, nodesWorkspace, videoEditor, nodeEditor},
   props: ['draft'],
   data () {
     return {
@@ -120,6 +139,9 @@ export default {
         // this.nodeRaw = val
       }
     },
+    nodePublishPossible () {
+      return this.fragments.length > 1 && this.name.length > 0
+    },
     colWidth () {
       let w = this.$q.screen.width
       if (w > 500) return 500
@@ -142,7 +164,7 @@ export default {
           this.spheres = to.spheres
           to.fragments.map((f, fi) => {
             f.preview = to.thumbUrl[fi]
-            this.fragments.push(f)
+            this.$set(this.fragments, this.fragments.length, f)
           })
         }
       }
@@ -219,6 +241,10 @@ export default {
         this.fragments.push(fRaw)
       })
     },
+    nodeEdit () {
+      this.$log('nodeEdit')
+      this.$refs.nodeEditorDialog.show()
+    },
     async nodeSave () {
       this.$log('nodeSave')
       this.nodeSaving = true
@@ -229,8 +255,10 @@ export default {
     async nodePublish () {
       try {
         this.$log('nodePublish start', this.node)
+        if (this.fragments.lenth < 2) return
         this.nodePublishing = true
         // prepare node
+        // TODO: not prepare node but create node INPUT
         let n = JSON.parse(JSON.stringify(this.node))
         n.fragments.map(f => {
           f.oid = f.content.oid
@@ -260,6 +288,8 @@ export default {
         this.$log('nodePublish done', nodeCreate)
         this.nodePublishing = false
         // TODO: create new one? or go to node page?
+        // TODO: delete current node and from node draft
+        // TODO: create draft or update draft from workspace
       } catch (e) {
         this.$log('nodePublish error', e)
         this.nodePublishing = false
