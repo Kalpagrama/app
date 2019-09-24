@@ -1,4 +1,6 @@
-const debug = require('debug')('$workspace:mutations')
+import { stat } from 'fs'
+
+const debug = require('debug')('$workspace:mutation')
 debug.enabled = true
 
 export function state(state, [key, val]) {
@@ -9,6 +11,46 @@ export function state(state, [key, val]) {
   }
 }
 
+// content
+export const addWSContent = (state, content) => {
+  debug('addWSContent start')
+  state.workspace.contents.push(content)
+  debug('addWSContent done')
+}
+export const updateWSContent = (state, content) => {
+  debug('updateWSContent start')
+  let i = state.workspace.contents.findIndex(c => c.uid === content.uid)
+  state.workspace.contents[i] = content
+  debug('updateWSContent done')
+}
+export const deleteWSContent = (state, content) => {
+  debug('deleteWSContenet start')
+  let i = state.workspace.contents.findIndex(c => c.uid === content.uid)
+  state.workspace.splice(i, 1)
+  debug('deleteWSContent done')
+}
+
+// tag
+export const addWSTag = (state, tag) => {
+  debug('addWSTag start')
+  state.workspace.tags.push(tag)
+  debug('addWSTag done')
+}
+export const updateWSTag = (state, tag) => {
+  debug('updateWSTag start')
+  let i = state.workspace.tags.findIndex(t => t.uid === tag.uid)
+  state.workspace.tags[i] = tag
+  debug('updateWSTag done')
+}
+export const deleteWSTag = (state, tag) => {
+  debug('deleteWSTag start')
+  let i = state.workspace.tags.findIndex(t => t.uid === tag.uid)
+  state.workspace.tags.splice(i, 1)
+  // TODO: delete this tag from all contents drafts and nodes
+  debug('deleteWSTag done')
+}
+
+// node
 export function addNode(state, node) {
   debug('addNode start')
   // add only unique node

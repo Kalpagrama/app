@@ -1,6 +1,6 @@
 <template lang="pug">
-.column.window-height.full-width.bg-grey-4
-  .col.scroll
+div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width.bg-grey-4
+  div(body-scroll-lock-ignore).col.scroll
     node-loader(mode="feed" :query="query" queryKey="feed" :variables="variables")
 </template>
 

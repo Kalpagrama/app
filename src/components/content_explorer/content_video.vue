@@ -33,7 +33,7 @@
   //- nodes desktop
   //- div(v-if="isDesktop").col.full-height.bg-black
   //-   content-video-nodes(:nodes="nodes" @nodeClick="nodeClick")
-  video-editor(:fragment="fragment" :left="20")
+  video-editor(:fragment="fragment" :left="20" :content="content")
 </template>
 
 <script>

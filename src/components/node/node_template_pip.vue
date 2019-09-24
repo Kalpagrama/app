@@ -1,9 +1,9 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   node-header(v-if="false" :node="node" :nodeFull="nodeFull" :inCreator="inCreator")
-    //- template(v-slot:actions)
-    //-   k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
-    //-     q-btn(icon="brush" color="grey-5" round flat)
+    template(v-slot:actions)
+      k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
+        q-btn(icon="brush" color="grey-5" round flat)
   //- wrapper maxHeight: getHeight+'px'
   div(
     :style=`{position: 'relative', zIndex: zIndex+100, maxHeight: '100vh', overflow: 'hidden', borderRadius: '10px'}`
@@ -46,6 +46,9 @@
         node-fragment-image(v-if="nodeFull.fragments[fi].content.type === 'IMAGE'" :zIndex="zIndex" :url="nodeFull.fragments[fi].url" :visible="fi === fragmentActive && active")
   node-name(:node="node")
   node-actions(:node="node" :nodeFull="nodeFull")
+    template(v-slot:actions)
+      k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
+        q-btn(icon="brush" color="grey-5" round flat)
   node-spheres(:node="node" :nodeFull="nodeFull")
   node-timestamp(:node="node" :nodeFull="nodeFull")
 </template>
@@ -69,7 +72,8 @@ export default {
       fragmentActive: 0,
       fragmentActions: [
         {id: 'content_explore', name: 'Исследовать контент'},
-        {id: 'fragment_workspace', name: 'Добавить в мастерскую'},
+        {id: 'content_workspace', name: 'Добавить контент в мастерскую'},
+        {id: 'fragment_workspace', name: 'Добавить фрагмент в мастерскую'},
         {id: 'fragment_create', name: 'Создать ядро с этим фрагментом'}
       ]
     }
@@ -98,6 +102,12 @@ export default {
         case 'content_explore': {
           this.$log('fragmentAction', a.id)
           this.$router.push(`/app/content/${this.nodeFull.fragments[fi].content.oid}`)
+          break
+        }
+        case 'content_workspace': {
+          this.$log('fragmentAction', a.id)
+          // add contentWorksapce aciton dispatch
+          await this.$store.dispatch('workspace/addWSContent', this.nodeFull.fragments[fi].content)
           break
         }
         case 'fragment_workspace': {

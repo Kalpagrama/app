@@ -1,12 +1,12 @@
 <template lang="pug">
 .row.fit
-  div(:style=`{width: '76px'}`).row.full-height.gt-sms
+  //- div(:style=`{width: '76px'}`).row.full-height.gt-sm
   .col.full-height
     div(:style=`{maxWidth: isDesktop ? '500px' : '100%'}`).col.full-height
       q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
         //- spheres
         q-tab-panel(name="sphere" :style=`{padding: '0px', background: 'none'}`)
-          .row.fit.q-py-md
+          .row.fit.q-py-sm
             .column.fit
               //- header
               div(v-if="noHeader" :style=`{minHeight: '60px', borderRadius: '10px'}`).row.full-width.items-center.scroll.q-px-sm.bg-grey-1
@@ -20,7 +20,7 @@
               div(body-scroll-lock-ignore).col.scroll.full-width
                 div.row.full-width.q-px-sm
                   div(v-for="(s, si) in spheres" :key="s.oid" @click="sphereClick(s, si)"
-                    :style=`{borderRadius: '4px'}`
+                    :style=`{borderRadius: '10px'}`
                     ).bg-grey-5.q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
                     span(:style=`{whiteSpace: 'nowrap'}`) {{`#${s.name}` | cut(50)}}
               //- nodes btn
@@ -33,8 +33,8 @@
         //- q-tab-panel(name="nodes" :style=`{padding: '0px'}` v-if="!isDesktop")
         //-   nodes(:nodes="nodes" @nodeClick="nodeClick")
   //- desktop
-  //- div(v-if="isDesktop").col.full-height.bg-grey-4
-  //-   nodes(:nodes="nodes" @nodeClick="nodeClick")
+  div(v-if="isDesktop").col.full-height.bg-grey-4
+    nodes(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>
@@ -134,7 +134,7 @@ export default {
 
 <style lang="stylus" scoped>
 .ksphere:hover {
-  background #027BE3 !important
+  background #7d389e !important
   color white !important
 }
 </style>

@@ -10,6 +10,7 @@ import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 import Carousel3d from 'vue-carousel-3d'
 import VueMasonry from 'vue-masonry-css'
+import PortalVue from 'portal-vue'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -29,6 +30,7 @@ const time = (sec) => {
 }
 
 export default async ({ Vue, store, router }) => {
+  Vue.use(PortalVue)
   Vue.use(VueMasonry)
   Vue.use(VueVirtualScroller)
   Vue.use(VueObserveVisibility)
@@ -57,6 +59,12 @@ export default async ({ Vue, store, router }) => {
   Vue.prototype.$time = time
   Vue.prototype.$random = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
+  }
+  var colors = {}
+  Vue.prototype.$randomColor = function (id, opacity) {
+    const r = () => Math.floor(256 * Math.random())
+    if (opacity) return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()}, ${opacity})`)
+    else return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
   }
   Vue.prototype.$strip = function (obj) {
     let round = (obj) => {
@@ -97,6 +105,7 @@ export default async ({ Vue, store, router }) => {
   // components.map(c => Vue.component(cName(c), () => import(`components/${c}`)))
   Vue.component('kPage', () => import(`components/k_page`))
   Vue.component('kMenuPopup', () => import(`components/k_menu_popup`))
+  Vue.component('kDialog', () => import(`components/k_dialog`))
 }
 
 export { time }
