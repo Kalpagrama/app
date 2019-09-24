@@ -3,7 +3,7 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
   //- rate v-touch-swipe.mouse.down="$refs.rateDialog ? $refs.rateDialog.hide() : false"
   q-dialog(ref="rateDialog" position="bottom")
     div(
-      :style=`{position: 'relative', borderRadius: '30px 30px 0 0', pointerEvents: 'none', height: '80vh'}`).row.full-width.items-start.content-start.bg-white
+      :style=`{position: 'relative', borderRadius: '10px 10px 0 0', height: '80vh'}`).row.full-width.items-start.content-start.bg-white
       div(:style=`{height: '80px'}`).row.full-width.justify-center.items-center
         h3.q-ma-xs Далеко
       .row.full-width.justify-center
@@ -67,7 +67,8 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
   q-btn(color="grey-9" round flat @click="nodeShare()")
     q-icon(name="call_made" size="26px" color="grey-8").rotate-270
   //- chain
-  q-btn(:icon="nodeWorkspaced ? 'turned_in' : 'turned_in_not'" color="grey-8" round flat @click="nodeWorkspace()")
+  q-btn(:icon="nodeWorkspaced ? 'turned_in' : 'turned_in_not'" color="grey-8" round flat @click="nodeBookmark()")
+  slot(name="actions")
   //- chain name and selector
   .col
     //- div(v-if="true") Some chain name
@@ -106,9 +107,10 @@ export default {
   },
   computed: {
     nodeWorkspaced () {
-      let findNode = this.$store.state.workspace.workspace.nodes.find(n => (n.oid === this.node.oid))
-      if (findNode) return true
-      else return false
+      // let findNode = this.$store.state.workspace.workspace.nodes.find(n => (n.oid === this.node.oid))
+      // if (findNode) return true
+      // else return false
+      return false
     },
     rateCurrent () {
       let v = this.value
@@ -158,9 +160,12 @@ export default {
       this.nodeRated = true
       this.$log('nodeRateJob done')
     },
-    nodeWorkspace () {
-      this.$log('nodeWorkspace')
-      this.$refs.workspaceDialog.show()
+    async nodeBookmark () {
+      this.$log('nodeBookmark')
+      let n = JSON.parse(JSON.stringify(this.nodeFull))
+      let r = await this.$store.dispatch('workspace/addWSNode', this.$strip(n))
+      this.$log('r', r)
+      // this.$refs.workspaceDialog.show()
     }
   }
 }

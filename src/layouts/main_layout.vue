@@ -1,19 +1,16 @@
 <template lang="pug">
 q-layout(view='hHh Lpr fFf').bg-primary
   q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
-    k-menu-vert(:style=`{borderRadius: '0px 30px 30px 0px', overflow: 'hidden'}`).bg-primary
-  q-btn(round color="primary" size="md" @click="menuToggle"
-    :style=`{position: 'fixed', zIndex: 1000, top: '20px', left: showLeftDrawer ? 210+20+'px' : 20+'px'}`)
-    q-icon(name="blur_on")
+    k-menu-vert.bg-primary
   q-page-container
-    q-page(:style=`{borderRadius: $q.screen.gt.sm ? radius+'px 0 0 '+radius+'px' : '0px', overflow: 'hidden'}`)
+    q-page(:style=`{borderRadius: $q.screen.gt.sm ? '10px 0 0 10px' : '0 0 10px 10px', overflow: 'hidden'}`)
       q-resize-observer(ref="zresize" @resize="onResize")
       //- keep-alive
       router-view(v-if="!loading" :width="width" :height="height")
       div(v-else).row.full-width.window-height.items-center.justify-center
         q-spinner(size="50px" :thickness="2" color="primary")
-  //- q-footer(reveal :style=`{background: 'none', borderRadius: '10px', overflow: 'hidden'}`)
-  //-   k-menu-horiz
+  q-footer(reveal :style=`{background: 'none '}`).lt-md
+    k-menu-horiz
 </template>
 
 <script>
@@ -29,7 +26,8 @@ export default {
       showLeftDrawer: true,
       radius: 30,
       width: 0,
-      height: 0
+      height: 0,
+      noPointerEvents: true
     }
   },
   watch: {
@@ -45,11 +43,21 @@ export default {
         // window.history.replaceState(null, null, to.path)
         // this.$q.notify('route changed')
       }
+    },
+    '$q.screen.gt.sm': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('gt.sm CHANGED', to)
+        let vh = window.innerHeight
+        if (to) vh = vh * 0.01
+        else vh = (vh - 60) * 0.01
+        document.documentElement.style.setProperty('--vh', `${vh}px`)
+      }
     }
   },
   methods: {
     onResize (e) {
-      this.$log('onResize', e)
+      // this.$log('onResize', e)
       this.width = e.width
       this.height = e.height
     },
@@ -65,12 +73,16 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$refs.zresize.trigger()
-    let vh = window.innerHeight * 0.01
+    // this.$refs.zresize.trigger()
+    // let vh = (window.innerHeight - 60) * 0.01
     // Then we set the value in the --vh custom property to the root of the document
-    document.documentElement.style.setProperty('--vh', `${vh}px`)
+    // document.documentElement.style.setProperty('--vh', `${vh}px`)
     this.$root.$on('toggle_menu', () => {
       if (this.$q.screen.lt.md) this.menuToggle()
+    })
+    this.$root.$on('kdialog_toggle', (val) => {
+      this.$q.notify('kdialog_toggle' + val)
+      this.$set(this, 'noPointerEvents', val)
     })
   },
   async created () {
@@ -109,10 +121,9 @@ export default {
       // this.$log('user', user)
       this.$store.commit('auth/state', ['user', user])
       // workspace
-      // this.$log('Getting user workspace')
-      // let { data: { userWorkspace } } = await this.$apollo.query({query: gql`query getUserWorkspace { userWorkspace }`})
-      // this.$log('userWorkspace', userWorkspace)
-      // this.$store.commit('workspace/state', ['workspace', userWorkspace])
+      this.$log('Getting user workspace')
+      let userWorkspace = await this.$store.dispatch('workspace/userWorkspace', this.$apollo)
+      this.$log('userWorkspace', userWorkspace)
       // return to path
       // let path = localStorage.getItem('path')
       // this.$log('path', path)

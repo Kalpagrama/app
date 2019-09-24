@@ -4,7 +4,7 @@
     .col
     q-btn(flat color="grey-9" style=`height: 40px; width: 40px` icon="search")
     q-btn(flat color="grey-9" style=`height: 40px; width: 40px` icon="more_vert")
-  div(body-scroll-lock-ignore).col.full-width.scroll.q-pt-md
+  div(body-scroll-lock-ignore).col.full-width.scroll.q-pt-sm
     //- div(v-for="n in 100" :key="n" :style=`{height: '300px'}`).row.full-width {{n}}
     node-list(:nodes="nodes")
 </template>

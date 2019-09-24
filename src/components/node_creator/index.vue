@@ -1,146 +1,111 @@
 <template lang="pug">
-div(:style=`{overflowX: 'auto'}`).row.full-height
-  //- content find dialog
-  q-dialog(ref="contentFinderDialog" position="bottom")
-    content-finder(@content="fragmentAdd($event), $refs.contentFinderDialog.hide()")
+.row.fit
   //- editors
+  k-dialog(ref="nodeEditorDialog")
+    node-editor(:node="node" @hide="$refs.nodeEditorFormDialog.hide()"
+      @name="name = $event" @spheres="spheres = $event" @meta="meta = $event")
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    video-editor(v-if="videoEditorShow && fragments[fragmentEditing]" :fragment="fragments[fragmentEditing]" @fragment="fragmentSync" @ready="fragmentEdited" @close="videoEditorShow = false, $refs.videoEditorDialog.hide()")
-  //- node editor dialog
-  q-dialog(ref="nodeEditorDialog" position="bottom")
-    node-editor(:node="node" @node="node = $event" @close="$refs.nodeEditorDialog.hide()" :style=`{maxWidth: '500px'}`)
-  //- wrapper
-  div.row.full-height.no-wrap
-    div(:style=`{width: '76px'}`).row.full-height.gt-sm
-    //- fragments from workspace
-    div(v-if="false" v-show="fragmentsWorkspaceShow" :style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height
-      nodes-workspace(@nodeClick="nodeWorkspaceClick")
-    //- fragment selected
-    div(:style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height.q-px-sm
-      .column.full-height
-        //- header
-        div(v-if="false" :style=`{height: '66px', borderRadius: '30px'}`).row.full-width.items-center.q-pr-md.bg-white
-          div(:style=`{width: '66px', height: '66px'}`).row
-          q-btn(v-show="!fragmentsWorkspaceShow" icon="keyboard_arrow_left" round flat color="grey-6" @click="fragmentsWorkspaceShow = true")
-          span.text-grey-8 Фрагменты
-          .col
-          //- q-btn(round flat color="grey-6" icon="search")
-          q-btn(round flat color="grey-6" icon="more_vert")
-        //- body
-        .col.scroll
-          .row.full-width.items-start.q-pt-sm
-          //- fragments list
-          div(
-            v-for="(f, fi) in fragments" :key="fi"
-            :style=`{position: 'relative', minHeight: '150px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-white.q-mb-md.shadow-1
-            //- fragment actions top right
-            div(:style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', height: '40px', opacity: 0.3}`).row
-              q-btn(round flat dense color="white" icon="edit" @click="fragmentEdit(f, fi)").bg-grey-9
-            //- fragment actions top left
-            div(:style=`{position: 'absolute', zIndex: 100, top: '8px', left: '8px', height: '40px', opacity: 0.3}`).row
-              q-btn(round flat dense color="white" icon="clear" @click="fragmentDelete(fi)").bg-grey-9
-            //- fragment actions bottom left
-            div(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', height: '40px', opacity: 0.3}`).row
-              q-btn(round flat dense color="white" icon="keyboard_arrow_down" @click="fragmentDuplicate(f, fi)").bg-grey-9
-            //- fragment preview only?
-            img(
-              :src="f.preview || f.content.thumbUrl[0]"
-              :style=`{width: '100%', objectFit: 'contain'}` draggable="false")
-          //- content add
-          div(
-            v-if="true"
-            :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.items-center.justify-center.bg-white
-            q-btn(icon="add" color="primary" round outline size="lg" @click="contentAdd()")
-          //- toggle fragments from workspace
-          q-btn(
-            v-if="false" :icon="fragmentsWorkspaceShow ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" outline color="grey-6"
-            style=`height: 50px; borderRadius: 8px` no-caps
-            @click="fragmentsWorkspaceShow = !fragmentsWorkspaceShow").full-width.q-mt-md
-            span {{fragmentsWorkspaceShow ? 'Скрыть фрагменты из мастерской' : 'Показать фрагменты из мастерской'}}
-          //- margin bottom
-          div(:style=`{height: '100px'}`).row.full-width
-    //- node preview
-    div(:style=`{width: colWidth+'px', maxWidth: colWidth+'px', display: 'block'}`).full-height.q-px-sm
-      .column.full-height
-        //- header
-        div(v-if="false" :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-          span.text-grey-8 Ядро
-          .col
-          q-btn(round flat color="grey-6" icon="more_vert")
-        //- body
-        div(:style=`{position: 'relative'}`).col.scroll.q-pt-sm
-          //- node for preview
-          node(:node="node" :nodeFullReady="node" inCreator :style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).bg-white
-          //- node edit btn
-          q-btn(v-if="false" :style=`{position: 'absolute', zIndex: 1000, right: '15px', top: '20px', opacity: 0.9}`
-            round flat dense icon="edit" color="white").bg-grey-9
-          //- //- node creation tools
-          //- div(:style=`{borderRadius: '10px'}`).row.full-width.bg-white.q-py-sm.q-mt-md
-          //-   name-creator(:name="name" :spheres="spheres" @name="name = $event" @spheres="spheres = $event")
-          //-   //- create button
-          //-   .row.full-width.q-px-sm
-          //-     q-btn(
-          //-       no-caps color="primary" style=`height: 60px; borderRadius: 10px`
-          //-       :disable="!nodePublishPossible"
-          //-       :loading="nodePublishing" @click="nodePublish()").full-width.q-mt-md
-          //-       span.text-bold.text-white Опубликовать
-          //- //- bottom block for mobile
-          //- div(:style=`{height: '60px'}`).row.full-width
-          div(:style=`{zIndex: 10, marginTop: '-10px', borderRadius: '0 0 10px 10px', opacity: 0.8}`).row.full-width.items-end.bg-grey-2.q-pa-sm
-            q-btn(outline color="primary" no-caps style=`height: 50px; borderRadius: 10px` @click="nodeEdit()").full-width.q-mt-lg.q-mb-sm
-              span.text-bold Редактировать
-            q-btn(
-              no-caps color="primary" style=`height: 60px; borderRadius: 10px`
-              :disable="!nodePublishPossible"
-              :loading="nodePublishing" @click="nodePublish()").full-width.q-mb-sm
-              span.text-bold.text-white Опубликовать
+    video-editor(
+      v-if="content" :content="content" :fragments="fragmentsEditing"
+      @create="$event => fragmentCreate(content, $event)" @update="fragmentUpdate" @delete="fragmentDelete"
+      @hide="$refs.videoEditorDialog.hide(), content = null")
+  //- content finder dialog position="bottom"
+  k-dialog(ref="contentFinderDialog")
+    content-finder(@content="contentSelected" @close="$refs.contentFinderDialog.hide()")
+  //- panels wrapper
+  q-tab-panels(ref="kpanels" v-model="tab" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).row.fit
+    //- main desktop panel
+    q-tab-panel(name="main" style=`margin: 0; padding: 0`).row.fit
+      .row.fit.scroll
+        div.row.full-height.no-wrap
+          //- content finder wrapper
+          div(v-if="true" :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).full-height.q-pa-sm.gt-sm
+            content-finder(:style=`{
+              borderRadius: '10px', overflow: 'hidden', zIndex: 100, maxHeight: '100%'}` @content="contentSelected")
+          //- fragments selected wrapper
+          div(v-if="true" :style=`{position: 'relative', maxWidth: colWidth+'px'}`).full-height
+            node-fragments(:fragments="fragments" :colWidth="colWidth" @add="contentFind" @edit="$event => fragmentEdit($event.content)" @delete="fragmentDelete" @copy="fragmentCopy")
+          //- node preview wrapper
+          div(v-if="true" :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).gt-sm
+            node-preview(
+              :node="node" @edit="nodeEdit" @reset="nodeReset" @publish="nodePublish"
+              :nodePublishPossible="nodePublishPossible" :nodePublishing="nodePublishing" :nodeSaving="nodeSaving")
+    //- mobile panel
+    q-tab-panel(name="preview" style=`margin: 0; padding: 0`)
+      .row.fit
+        node-preview(
+          :node="node" @edit="nodeEdit" @reset="nodeReset" @publish="nodePublish"
+          :nodePublishPossible="nodePublishPossible" :nodePublishing="nodePublishing" :nodeSaving="nodeSaving")
 </template>
 
 <script>
-import node from 'components/node'
 import contentFinder from 'components/content_finder'
-import nodesWorkspace from 'pages/app/workspace/nodes'
 import videoEditor from 'components/video_editor'
+import nodeFragments from './node_fragments'
+import nodePreview from './node_preview'
 import nodeEditor from './node_editor'
 
 export default {
   name: 'nodeCreator',
-  components: {node, contentFinder, nodesWorkspace, videoEditor, nodeEditor},
+  components: {contentFinder, videoEditor, nodeFragments, nodePreview, nodeEditor},
   props: ['draft'],
   data () {
     return {
-      fragments: [],
-      fragmentsWorkspaceShow: true,
-      fragmentEditing: undefined,
+      tab: 'main',
+      content: null,
+      fragments: {},
       name: '',
       spheres: [],
-      spheresInput: '',
-      videoEditorShow: false,
-      nodeSaving: false,
-      nodePublishing: false
+      layout: 'PIP',
+      layoutPolicy: 'DEFAULT',
+      nodePublishing: false,
+      nodeSaving: false
     }
   },
   computed: {
-    node: {
-      get () {
-        return {
-          name: this.name,
-          author: this.$store.state.auth.user,
-          thumbUrl: this.fragments.map(f => {
-            return f.preview || ''
-          }),
-          fragments: this.fragments,
-          spheres: this.spheres,
-          createdAt: Date.now()
+    node () {
+      let fragments = []
+      for (const f in this.fragments) {
+        fragments.push(this.fragments[f])
+      }
+      return {
+        name: this.name,
+        author: this.$store.state.auth.user,
+        thumbUrl: fragments.map(f => {
+          return f.thumbUrl
+        }),
+        fragments: fragments.map(f => {
+          return {
+            uid: f.uid,
+            oid: f.content.oid,
+            label: f.label,
+            thumbUrl: f.thumbUrl,
+            relativePoints: f.relativePoints,
+            relativeScale: f.relativeScale
+          }
+        }),
+        spheres: this.spheres,
+        createdAt: Date.now(),
+        meta: {
+          layout: this.layout,
+          layoutPolicy: this.layoutPolicy,
+          fragments: fragments.map(f => {
+            return {uid: f.uid}
+          })
         }
-      },
-      set (val) {
-        // this.nodeRaw = val
       }
     },
     nodePublishPossible () {
-      return this.fragments.length > 1 && this.name.length > 0
+      return true
+    },
+    fragmentsEditing () {
+      let fragments = {}
+      for (const f in this.fragments) {
+        if (this.fragments[f].content.oid === this.content.oid) {
+          fragments[f] = this.fragments[f]
+        }
+      }
+      return fragments
     },
     colWidth () {
       let w = this.$q.screen.width
@@ -152,105 +117,133 @@ export default {
     node: {
       handler (to, from) {
         this.$log('node CHANGED', to)
-        localStorage.setItem('nodeDraft', JSON.stringify(to))
+        // localStorage.setItem('nodeDraft', JSON.stringify(to))
       }
     },
     draft: {
       immediate: true,
       handler (to, from) {
         this.$log('draft CHANGED', to)
-        if (to) {
-          this.name = to.name
-          this.spheres = to.spheres
-          to.fragments.map((f, fi) => {
-            f.preview = to.thumbUrl[fi]
-            this.$set(this.fragments, this.fragments.length, f)
-          })
-        }
+        // if (to) {
+        //   this.name = to.name
+        //   this.spheres = to.spheres
+        //   to.fragments.map((f, fi) => {
+        //     f.preview = to.thumbUrl[fi]
+        //     this.$set(this.fragments, this.fragments.length, f)
+        //   })
+        // }
       }
     }
   },
   methods: {
-    swipeDown () {
-      this.$log('swipeDown')
-      this.$q.notify('swipe down!')
-      document.activeElement.blur()
-    },
-    contentAdd () {
-      this.$log('contentAdd')
+    contentFind () {
+      this.$log('contentFind')
       this.$refs.contentFinderDialog.show()
     },
-    fragmentAdd (content) {
-      this.$log('fragmentAdd', content)
-      this.$set(
-        this.fragments,
-        this.fragments.length,
-        {
-          id: Date.now().toString(),
-          url: '',
-          tags: [],
-          relativePoints: [{x: 0}, {x: 10}],
-          relativeScale: 0.00,
-          preview: content.thumbUrl[0],
-          content: content
-        }
-      )
+    async contentSelected (content) {
+      this.$log('contentSelected', content)
+      // close content finder dialog
+      this.$refs.contentFinderDialog.hide()
+      await this.$wait(300)
+      // save content
+      await this.contentSave(content.oid)
+      // open editor
+      this.fragmentEdit(content)
     },
-    fragmentDuplicate (f, index) {
-      this.$log('fragmentDuplicate')
-      // TODO: duplicate to the next position!
-      let ff = JSON.parse(JSON.stringify(f))
-      this.fragments.push(ff)
+    async contentSave (oid) {
+      this.$log('contentSave')
+      let contentFind = this.$store.state.workspace.workspace.contents.find(c => (c.content.oid === oid))
+      if (!contentFind) await this.$store.dispatch('workspace/addWSContent', {oid})
+      else {
+        // this.$q.notify(`This content is already in your workspace`)
+      }
     },
-    fragmentEdit (f, index) {
-      this.$log('fragmentEdit', f, index)
-      this.$set(this, 'fragmentEditing', index)
-      switch (f.content.type) {
+    fragmentCreate (content, f) {
+      this.$log('fragmentCreate', content)
+      let uid = f && f.uid ? f.uid : `${content.oid}-${Date.now()}`
+      let fragment = null
+      this.$set(this, 'content', content)
+      switch (content.type) {
         case 'VIDEO': {
-          this.$log('fragmentEdit', f.content.type)
-          this.videoEditorShow = true
+          fragment = {
+            uid: uid,
+            url: '',
+            label: f && f.label ? f.label : '',
+            relativePoints: f && f.relativePoints ? f.relativePoints : [],
+            relativeScale: content.duration,
+            content: content,
+            thumbUrl: content.thumbUrl[0]
+          }
+          this.$set(this.fragments, uid, fragment)
           this.$refs.videoEditorDialog.show()
           break
         }
         case 'IMAGE': {
-          this.$log('fragmentEdit', f.content.type)
-          // this.$refs.imageEditorDialog.show()
+          fragment = {
+            uid: uid,
+            url: '',
+            label: '',
+            relativePoints: [],
+            relativeScale: 0.00,
+            content: content,
+            thumbUrl: content.thumbUrl[0]
+          }
+          this.$set(this.fragments, uid, fragment)
+          this.$refs.imageEditorDialog.show()
           break
         }
       }
     },
-    fragmentSync (f) {
-      this.$log('fragmentSync')
-      this.$set(this.fragments, this.fragmentEditing, f)
+    fragmentCopy (f, fkey) {
+      this.$log('fragmentCopy')
+      let uid = `${f.content.oid}-${Date.now()}`
+      let fragment = JSON.parse(JSON.stringify(f))
+      fragment.uid = uid
+      this.$set(this.fragments, uid, fragment)
     },
-    fragmentEdited (f) {
-      this.$log('fragmentEdited')
-      this.$set(this.fragments, this.fragmentEditing, f)
-      this.fragmentEditing = undefined
-      this.$refs.videoEditorDialog.hide()
+    fragmentUpdate () {
+      this.$log('fragmentUpdate')
     },
-    fragmentDelete (index) {
-      this.$log('fragmentDelete', index)
-      this.$delete(this.fragments, index)
+    fragmentEdit (content) {
+      this.$log('fragmentEdit', content)
+      this.$set(this, 'content', content)
+      switch (content.type) {
+        case 'VIDEO': {
+          this.$log('fragmentEdit', content.type)
+          this.$refs.videoEditorDialog.show()
+          break
+        }
+        case 'IMAGE': {
+          this.$log('fragmentEdit', content.type)
+          this.$refs.imageEditorDialog.show()
+          break
+        }
+      }
     },
-    nodeWorkspaceClick (n) {
-      this.$log('nodeWorkspaceClick', n)
-      n.fragments.map((f, fi) => {
-        let fRaw = JSON.parse(JSON.stringify(f))
-        fRaw.preview = n.thumbUrl[fi]
-        this.fragments.push(fRaw)
-      })
+    fragmentDelete (f, fkey) {
+      this.$log('fragmentDelete', f, fkey)
+      this.$delete(this.fragments, f.uid)
     },
     nodeEdit () {
       this.$log('nodeEdit')
       this.$refs.nodeEditorDialog.show()
     },
+    nodeReset () {
+      this.$log('nodeReset')
+      // save this node as draft
+      // delete this node?
+    },
     async nodeSave () {
-      this.$log('nodeSave')
-      this.nodeSaving = true
-      // await this.$wait(2000)
-      this.$store.commit('workspace/updateNode', this.node)
-      this.nodeSaving = false
+      try {
+        this.$log('nodeSave start')
+        this.nodeSaving = true
+        // this.$store.commit('workspace/updateNode', this.node)
+        this.nodeSaving = false
+        this.$log('nodeSave done')
+      } catch (e) {
+        this.$log('nodeSave error', e)
+        this.nodeSaving = false
+      }
     },
     async nodePublish () {
       try {
@@ -261,12 +254,7 @@ export default {
         // TODO: not prepare node but create node INPUT
         let n = JSON.parse(JSON.stringify(this.node))
         n.fragments.map(f => {
-          f.oid = f.content.oid
-          f.relativeScale = f.content.duration || 0
-          delete f.id
-          delete f.content
-          delete f.url
-          delete f.preview
+          delete f.thumbUrl
         })
         delete n.author
         delete n.createdAt
@@ -305,3 +293,6 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+</style>

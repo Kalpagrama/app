@@ -12,28 +12,8 @@ const routes = [
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       { name: 'node', path: 'node/:oid', component: () => import('pages/app/node') },
-      {
-        name: 'workspace',
-        path: 'workspace',
-        // redirect: 'workspace/nodes',
-        component: () => import('pages/app/workspace'),
-        children: [
-          // {name: 'videos', path: 'videos', component: () => import('pages/app/workspace/videos')},
-          // {name: 'images', path: 'images', component: () => import('pages/app/workspace/images')},
-          // {name: 'books', path: 'books', component: () => import('pages/app/workspace/books')},
-          // {name: 'nodes', path: 'nodes', component: () => import('pages/app/workspace/nodes')},
-          // {name: 'chains', path: 'chains', component: () => import('pages/app/workspace/chains')}
-        ]
-      },
-      {
-        name: 'create',
-        path: 'create',
-        component: () => import('pages/app/create'),
-        // children: [
-        //   { path: 'node', component: () => import('components/node_creator') },
-        //   { path: 'chain', component: () => import('components/chain_creator') }
-        // ]
-      }
+      { name: 'workspace', path: 'workspace', component: () => import('pages/app/workspace') },
+      { name: 'create', path: 'create', component: () => import('pages/app/create') }
     ]
   },
   {
