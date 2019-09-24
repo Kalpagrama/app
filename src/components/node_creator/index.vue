@@ -19,7 +19,7 @@
       .row.fit.scroll
         div.row.full-height.no-wrap
           //- content finder wrapper
-          div(v-if="true" :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).full-height.q-pa-sm.gt-sm
+          div(v-if="false" :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).full-height.q-pa-sm.gt-sm
             content-finder(:style=`{
               borderRadius: '10px', overflow: 'hidden', zIndex: 100, maxHeight: '100%'}` @content="contentSelected")
           //- fragments selected wrapper

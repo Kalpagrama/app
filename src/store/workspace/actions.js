@@ -9,7 +9,36 @@ export const userWorkspace = async (state, a) => {
     query: gql`
       query userWorkspace {
         userWorkspace {
+          bookmarks {oid}
           tags {uid name color icon}
+          fragments {
+            uid
+            label
+            thumbUrl
+            relativePoints {x y z}
+            relativeScale
+            tagUids
+            content {
+              uid
+              name
+              tagUids
+              content {
+                oid
+                type
+                name
+                thumbUrl(preferWidth: 600)
+                ... on Video {
+                  url
+                  urlOriginal
+                  duration
+                }
+                ... on Image {
+                  url
+                  urlOriginal
+                }
+              }
+            }
+          }
           contents {
             uid
             name
@@ -30,21 +59,15 @@ export const userWorkspace = async (state, a) => {
               }
             }
           }
-          nodes {
+          drafts {
             uid
             name
-            tagUids
-            node {
-              oid
-              type
-              name
-              author {
-                oid
-                type
-                name
-                thumbUrl(preferWidth:600)
-              }
-              fragments {
+            fragments {
+              uid
+              label
+              relativePoints { x y z }
+              relativeScale
+              content {
                 content {
                   oid
                   type
@@ -60,14 +83,10 @@ export const userWorkspace = async (state, a) => {
                     urlOriginal
                   }
                 }
-                uid
-                label
-                relativePoints { x y z }
-                relativeScale
-                url
               }
-              spheres {oid type name }
             }
+            spheres {oid type name }
+            tagUids
           }
         }
       }
@@ -127,7 +146,9 @@ export const updateWSNode = async (state, node) => {
   debug('updateWSNode start')
   let r = await apollo.mutate({
     mutation: gql`
-      mutation updateWSNode ($uid: String!, $node: WSNodeInput!)
+      mutation updateWSNode ($uid: String!, $node: WSNodeInput!) {
+        upadeWSNode ()
+      }
     `,
     variables: {
       uid: node.uid,
