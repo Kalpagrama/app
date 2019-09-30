@@ -168,7 +168,7 @@ export default {
           fragment = {
             uid: uid,
             url: '',
-            label: f && f.label ? f.label : '',
+            name: f && f.name ? f.name : '',
             relativePoints: f && f.relativePoints ? f.relativePoints : [],
             relativeScale: content.duration,
             content: content,
@@ -182,7 +182,7 @@ export default {
           fragment = {
             uid: uid,
             url: '',
-            label: '',
+            name: '',
             relativePoints: [],
             relativeScale: 0.00,
             content: content,

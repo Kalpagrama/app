@@ -1,112 +1,116 @@
 <template lang="pug">
-.column.fit.bg-white
-  div(v-if="false").row.full-width
-    small.full-width selected:
-    small.full-width {{ selected }}
-  //- header
-  slot(name="header")
-  //- div(v-if="!$scopedSlots.header" :style=`{height: '70px'}`).row.full-width.items-center.q-px-md
-  //-   span Workspace, type, tag, name, sort
-  .row.full-width.items-center.q-py-sm
-    div().row.full-height.items-center
-      slot(name="presearch")
-    .col
-      .row.full-width.q-px-sm
-        div(style=`borderRadius: 10px; overflow: hidden`).row.full-width
-          q-input(v-model="search" filled placeholder="Поиск по мастерской").full-width
-            template(v-slot:append)
-              q-btn(v-if="search.length > 0" round flat dense icon="clear" @click="searchClear()")
-              q-btn(round flat icon="filter_list" @click="toggleFilters()")
-  //- types
-  div(v-if="false" :style=`{height: '50px'}`).row.full-width.items-center.content-center.scroll.q-px-sm
-    .row.full-width.no-wrap.bg
-      div(
-        v-if="reactive > 0"
-        v-for="(t, tkey) in types" :key="tkey" @click="contentTypeClick(t, tkey)"
-        :style=`{width: '40px', minWidth: '40px', height: '40px'}`).row.items-center.justify-center.bp
-          q-btn(round dense
-            :style=`contentStyle(t, tkey)`)
-            q-icon(color="white" :name="t.icon" size="18px")
-  //- tags
-  div(v-if="false" :style=`{height: '70px'}`).row.full-width.scroll.q-px-sm
-    span #tag1, #tag2, #tag3, #tag4
-  //- sort
-  div(v-if="false" :style=`{height: '70px'}`).row.full-width.justify-between.q-px-md
-    span field to sort
-    span asc desc
-  //- body
-  div(body-scroll-lock-ignore).col.scroll
-    .row.full-width.items-start.content-start.q-px-sm
-      div(
-        v-for="(i, ii) in videos" :key="ii" @click="contentClick(i, ii)"
-        :style=`{height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-2.q-mb-md
-        //- preview
-        div(:style=`{borderRadius: '10px', width: '124.25px', overflow: 'hidden'}`).row.full-height.bg-black
-          img(:src="i.content.thumbUrl[0]" :style=`{height: '100%', width: '100%', objectFit: 'cover'}`)
-        .col.full-height
-          .row.fit.items-start.q-pa-sm
-            //- name
-            small.text-bold {{ i.content.name || i.name || i.uid }}
-            //- span {{ i }}
+div(:style=`{position: 'relative'}`).row.fit
+  //- menu backdrop
+  transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="menusShow"
+      :style=`{position: 'absolute', left: 0, top: 0, zIndex: 100, background: 'rgba(0, 0, 0, 0.5)'}` @click.self="menuToggle()").row.fit
+  //- menu
+  div(:style=`{position: 'absolute', left: '0px', zIndex: 200, width: menusWidth+'px', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`
+    ).column.full-height.bg-grey-2
+    //- menu header
+    div(:style=`{height: '70px'}`).row.full-width.items-center.justify-center
+      div(:style=`{height: '70px', width: '60px'}`).row.items-center.justify-center
+        q-btn(icon="keyboard_arrow_left" round flat color="primary" @click="menuToggle()").q-mx-sm
+      .col
+    //- menu body
+    div(ignore-body-scroll-lock).col.scroll
+      .row.full-width.items-start.content-start
+        div(
+          v-for="(m, mkey) in menus" :key="mkey" @click="menusClick(m, mkey)"
+          :style=`{height: '70px'}`
+          ).row.full-width.items-center.hr.cursor-pointer
+          div(:style=`{width: '40px', height: '70px'}`).row.items-center.justify-end
+            q-icon(:name="m.icon" :color="menu === mkey ? 'primary' : 'grey-9'" :size="menu === mkey ? '25px' : '20px'")
+          .col
+            .row.fit.items-center.q-px-sm
+              span(:class=`{'text-primary': menu === mkey}`).text-bold {{ m.name }}
+  ws-bookmarks(v-if="menu === 'bookmarks'" @menu="menuToggle()")
+  ws-contents(v-else-if="menu === 'contents'" @menu="menuToggle()")
+  ws-fragments(v-else-if="menu === 'fragments'" @menu="menuToggle()")
+  ws-drafts(v-else-if="menu === 'drafts'" @menu="menuToggle()")
+  ws-settings(v-else-if="menu === 'settings'" @menu="menuToggle()")
+  ws-tags(v-else-if="menu === 'tags'" @menu="menuToggle()")
+  ws-dashboard(v-else @menu="menuToggle()")
 </template>
 
 <script>
+import wsBookmarks from './ws_bookmarks'
+import wsFragments from './ws_fragments'
+import wsContents from './ws_contents'
+import wsSettings from './ws_settings'
+import wsDrafts from './ws_drafts'
+import wsDashboard from './ws_dashboard'
+import wsTags from './ws_tags'
+
 export default {
   name: 'workspace',
+  components: {wsBookmarks, wsFragments, wsContents, wsSettings, wsDrafts, wsDashboard, wsTags},
   props: ['source'],
   data () {
     return {
       reactive: 1,
       selected: {},
-      search: ''
+      search: '',
+      filtersShow: false,
+      filtersHeight: 0,
+      menusShow: false,
+      menusWidth: 0,
+      menu: undefined,
+      menus: {
+        dashboard: {name: 'Дэшборд', icon: 'dashboard'},
+        bookmarks: {name: 'Закладки', icon: 'bookmark_outline'},
+        contents: {name: 'Контент', icon: 'photo_size_select_actual'},
+        fragments: {name: 'Фрагменты', icon: 'aspect_ratio'},
+        drafts: {name: 'Черновики', icon: 'post_add'},
+        tags: {name: 'Тэги', icon: 'style'},
+        settings: {name: 'Настройки', icon: 'settings'}
+      }
     }
   },
-  computed: {
-    types () {
-      return this.$store.state.workspace.contentTypes
-    },
-    nodes () {
-      return this.$store.state.workspace.workspace.nodes
-    },
-    videos () {
-      return this.$store.state.workspace.workspace.contents.filter(c => {
-        return c.content.type === 'VIDEO'
-      })
+  watch: {
+    '$route': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route CHANGED', to)
+        if (to.params.menu) {
+          this.$set(this, 'menu', to.params.menu)
+        } else {
+          this.$set(this, 'menu', 'dashboard')
+        }
+      }
     }
   },
   methods: {
-    toggleFilters () {
-      this.$log('toggleFilters')
+    async menusClick (m, mkey) {
+      this.$log('menusClick', m, mkey)
+      await this.menuToggle()
+      // this.$set(this, 'menu', mkey)
+      if (mkey === 'dashboard') this.$router.push('/app/workspace')
+      else this.$router.push({params: {menu: mkey}})
     },
-    contentClick (c, ci) {
-      this.$log('contentClick', c, ci)
-      let content = {oid: c.content.oid, ...c}
-      this.$emit('contentClick', content)
-    },
-    contentStyle (t, tkey) {
-      if (this.selected[tkey]) {
-        return {
-          background: t.color,
-          color: 'white'
+    menuToggle () {
+      return new Promise((resolve, reject) => {
+        this.$log('menuToggle')
+        if (this.menusShow) {
+          this.$tween.to(this, 0.3, {
+            menusWidth: 0,
+            onComplete: () => {
+              this.menusShow = false
+              resolve()
+            }
+          })
+        } else {
+          this.menusShow = true
+          this.$tween.to(this, 0.3, {
+            menusWidth: 240,
+            onComplete: () => {
+              this.menusShow = true
+              resolve()
+            }
+          })
         }
-      } else {
-        return {
-          background: 'grey',
-          color: '#eee'
-        }
-      }
-    },
-    contentTypeClick (t, tkey) {
-      this.$log('contentTypeClick', t, tkey)
-      if (this.selected[tkey]) {
-        this.$delete(this.selected, tkey)
-      } else {
-        this.$set(this.selected, tkey, tkey)
-      }
-    },
-    searchClear () {
-      this.$log('searchClear')
-      this.$set(this, 'search', '')
+      })
     }
   },
   mounted () {

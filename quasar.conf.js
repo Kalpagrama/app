@@ -98,8 +98,8 @@ module.exports = function (ctx) {
     },
     devServer: {
       before (app) {
-        const cors = require('cors')
-        app.use(cors())
+        // const cors = require('cors')
+        // app.use(cors())
         // app.use(cors({
         //   origin: 'api.kalpagramma.com',
         //   credentials: true
