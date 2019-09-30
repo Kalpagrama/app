@@ -1,7 +1,8 @@
 export default {
   workspace: {
+    bookmarks: [],
     contents: [],
-    nodes: [],
+    fragments: [],
     drafts: [],
     tags: []
   },
@@ -9,7 +10,6 @@ export default {
   synced: false,
   syncing: false,
   fork: null,
-  draft: null,
   contentTypes: {
     VIDEO: {name: 'Видео', icon: 'movie_creation', color: 'red'},
     IMAGE: {name: 'Изображение', icon: 'panorama', color: 'green'},
@@ -17,5 +17,18 @@ export default {
     HTML: {name: 'Веб-страница', icon: 'language', color: 'blue'},
     BOOK: {name: 'Книга', icon: 'menu_book', color: 'brown'},
     CODE: {name: 'Репозиторий', icon: 'code', color: 'black'}
-  }
+  },
+  menuOpened: false,
+  content: null,
+  contentFragment: null,
+  contentEditorDialogOpened: false,
+  fragment: null,
+  fragmentDraft: null,
+  fragmentEditorDialogOpened: false,
+  bookmark: null,
+  bookmarkContent: null,
+  bookmarkEditorDialogOpened: false,
+  draft: null,
+  draftNode: null,
+  draftEditorDialogOpened: false
 }

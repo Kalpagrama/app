@@ -27,7 +27,7 @@ div(
     ref="kvideo"
     :src="url"
     :style=`{width: '100%', objectFit: 'contain'}`
-    loop playsinline
+    loop playsinline muted
     @click="videoClick"
     @playing="videoPlaying"
     @timeupdate="videoTimeupdate"
@@ -110,7 +110,7 @@ export default {
     videoLoaded (e) {
       // this.$log('videoLoaded', e)
       let duration = e.target.duration
-      this.$log('duration', duration)
+      // this.$log('duration', duration)
       this.$set(this, 'duration', duration)
       this.$emit('duration', duration)
     },

@@ -21,7 +21,7 @@ import sourceYoutube from './source_youtube'
 import sourceDevice from './source_device'
 
 export default {
-  name: 'nodeCreator__contentFinder',
+  name: 'contentFinder',
   components: {sources, sourceUrl, sourceWorkspace, sourceYoutube, sourceDevice},
   data () {
     return {
@@ -138,6 +138,11 @@ export default {
         this.$log('progress error', error)
       }
     })
+    let bookmarkContent = this.$store.state.workspace.bookmarkContent
+    this.$log('bookmarkContent', bookmarkContent)
+    if (bookmarkContent) {
+      // this.source = 'url'
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

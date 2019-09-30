@@ -1,14 +1,17 @@
 <template lang="pug">
 q-layout(view='hHh Lpr fFf').bg-primary
+  k-dialog(:value="$store.state.workspace.contentEditorDialogOpened"
+    @hide="$store.commit('workspace/state', ['contentEditorDialogOpened', false]), $store.commit('workspace/state', ['content', null])")
+    ws-content-editor(name="global" :content="$store.state.workspace.content")
   q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
     k-menu-vert.bg-primary
   q-page-container
     q-page(:style=`{borderRadius: $q.screen.gt.sm ? '10px 0 0 10px' : '0 0 10px 10px', overflow: 'hidden'}`)
-      q-resize-observer(ref="zresize" @resize="onResize")
+      //- q-resize-observer(ref="zresize" @resize="onResize")
       //- keep-alive
       router-view(v-if="!loading" :width="width" :height="height")
       div(v-else).row.full-width.window-height.items-center.justify-center
-        q-spinner(size="50px" :thickness="2" color="primary")
+        q-spinner(size="50px" :thickness="2" color="white")
   q-footer(reveal :style=`{background: 'none '}`).lt-md
     k-menu-horiz
 </template>
@@ -16,6 +19,7 @@ q-layout(view='hHh Lpr fFf').bg-primary
 <script>
 import kMenuVert from 'components/k_menu_vert'
 import kMenuHoriz from 'components/k_menu_horiz'
+// import wsContentEditor from 'components/workspace/ws_content_editor'
 
 export default {
   name: 'mainLayout',
@@ -71,8 +75,9 @@ export default {
       this.$set(this, 'showLeftDrawer', !this.showLeftDrawer)
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    // TODO: handle page height...
     // this.$refs.zresize.trigger()
     // let vh = (window.innerHeight - 60) * 0.01
     // Then we set the value in the --vh custom property to the root of the document
@@ -80,15 +85,12 @@ export default {
     this.$root.$on('toggle_menu', () => {
       if (this.$q.screen.lt.md) this.menuToggle()
     })
-    this.$root.$on('kdialog_toggle', (val) => {
-      this.$q.notify('kdialog_toggle' + val)
-      this.$set(this, 'noPointerEvents', val)
-    })
   },
   async created () {
     try {
       // this.$log('created')
       // console.time('created')
+      // this.$q.notify('Created start')
       this.loading = true
       // save last route to state
       // await this.$wait(3000)
@@ -96,6 +98,7 @@ export default {
       // check token
       let token = this.$route.query.token
       if (token) localStorage.setItem('ktoken', token)
+      // this.$q.notify('token', token)
       // user check
       // this.$log('Checking user...')
       let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
@@ -107,6 +110,8 @@ export default {
         })
       // this.$log('userIsAuthorized', userIsAuthorized)
       // this.$log('userIsConfirmed', userIsConfirmed)
+      // this.$q.notify('userIsAuthorized', userIsAuthorized)
+      // this.$q.notify('userIsConfirmed', userIsConfirmed)
       // TODO: create with try/catch this...
       if (!userIsAuthorized || !userIsConfirmed) {
         this.$log('GO LOGIN')
@@ -122,6 +127,7 @@ export default {
       this.$store.commit('auth/state', ['user', user])
       // workspace
       this.$log('Getting user workspace')
+      // this.$q.notify('Getting user workspace!')
       let userWorkspace = await this.$store.dispatch('workspace/userWorkspace', this.$apollo)
       this.$log('userWorkspace', userWorkspace)
       // return to path

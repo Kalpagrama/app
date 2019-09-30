@@ -1,14 +1,32 @@
-import { stat } from 'fs'
-
 const debug = require('debug')('$workspace:mutation')
 debug.enabled = true
 
 export function state(state, [key, val]) {
-  if (val) {
-    state[key] = val
-  } else {
-    return state[key]
-  }
+  // if (val) {
+  //   state[key] = val
+  // } else {
+  //   return state[key]
+  // }
+  state[key] = val
+}
+
+// bookmark
+export const addWSBookmark = (state, bookmark) => {
+  debug('addWSBookmark start')
+  state.workspace.bookmarks.push(bookmark)
+  debug('addWSBookmark done')
+}
+export const deleteWSBookmark = (state, uid) => {
+  debug('deleteWSBookmark start')
+  let i = state.workspace.bookmarks.findIndex(b => b.uid === uid)
+  state.workspace.bookmarks.splice(i, 1)
+  debug('deleteWSBookmark done')
+}
+export const updateWSBookmark = (state, bookmark) => {
+  debug('updateWSBookmark start')
+  let i = state.workspace.bookmarks.findIndex(b => b.uid === bookmark.uid)
+  state.workspace.bookmarks[i] = bookmark
+  debug('updateWSBookmark done')
 }
 
 // content
@@ -17,17 +35,55 @@ export const addWSContent = (state, content) => {
   state.workspace.contents.push(content)
   debug('addWSContent done')
 }
+export const deleteWSContent = (state, uid) => {
+  debug('deleteWSContenet start')
+  let i = state.workspace.contents.findIndex(c => c.uid === uid)
+  state.workspace.contents.splice(i, 1)
+  debug('deleteWSContent done')
+}
 export const updateWSContent = (state, content) => {
   debug('updateWSContent start')
   let i = state.workspace.contents.findIndex(c => c.uid === content.uid)
   state.workspace.contents[i] = content
   debug('updateWSContent done')
 }
-export const deleteWSContent = (state, content) => {
-  debug('deleteWSContenet start')
-  let i = state.workspace.contents.findIndex(c => c.uid === content.uid)
-  state.workspace.splice(i, 1)
-  debug('deleteWSContent done')
+
+// fragment
+export const addWSFragment = (state, fragment) => {
+  debug('addWSFragment start')
+  state.workspace.fragments.push(fragment)
+  debug('addWSFragment done')
+}
+export const deleteWSFragment = (state, uid) => {
+  debug('deleteWSFragment start')
+  let i = state.workspace.fragments.findIndex(f => f.uid === uid)
+  state.workspace.fragments.splice(i, 1)
+  debug('deleteWSFragment done')
+}
+export const updateWSFragment = (state, fragment) => {
+  debug('updateWSFragment start')
+  let i = state.workspace.fragments.findIndex(f => f.uid === fragment.uid)
+  state.workspace.fragments[i] = fragment
+  debug('updateWSFragment done')
+}
+
+// draft
+export const addWSDraft = (state, draft) => {
+  debug('addWSDraft start')
+  state.workspace.drafts.push(draft)
+  debug('addWSDraft done')
+}
+export const deleteWSDraft = (state, uid) => {
+  debug('deleteWSDraft start')
+  let i = state.workspace.drafts.findIndex(d => d.uid === uid)
+  state.workspace.drafts.splice(i, 1)
+  debug('deleteWSDraft done')
+}
+export const updateWSDraft = (state, draft) => {
+  debug('updateWSDraft start')
+  let i = state.workspace.drafts.findIndex(d => d.uid === draft.uid)
+  state.workspace.drafts[i] = draft
+  debug('updateWSDraft done')
 }
 
 // tag
@@ -36,51 +92,16 @@ export const addWSTag = (state, tag) => {
   state.workspace.tags.push(tag)
   debug('addWSTag done')
 }
+export const deleteWSTag = (state, uid) => {
+  debug('deleteWSTag start', uid)
+  let i = state.workspace.tags.findIndex(t => t.uid === uid)
+  state.workspace.tags.splice(i, 1)
+  // TODO: delete this tag from all contents drafts and nodes
+  debug('deleteWSTag done')
+}
 export const updateWSTag = (state, tag) => {
   debug('updateWSTag start')
   let i = state.workspace.tags.findIndex(t => t.uid === tag.uid)
   state.workspace.tags[i] = tag
   debug('updateWSTag done')
-}
-export const deleteWSTag = (state, tag) => {
-  debug('deleteWSTag start')
-  let i = state.workspace.tags.findIndex(t => t.uid === tag.uid)
-  state.workspace.tags.splice(i, 1)
-  // TODO: delete this tag from all contents drafts and nodes
-  debug('deleteWSTag done')
-}
-
-// node
-export function addNode(state, node) {
-  debug('addNode start')
-  // add only unique node
-  let findIndex = state.workspace.nodes.findIndex(n => n.oid === node.oid)
-  if (findIndex) {
-    debug('addNode duplicate!')
-  } else {
-    debug('addNode add')
-    state.workspace.nodes.push(node)
-  }
-}
-export function updateNode(state, node) {
-  debug('updateNode start')
-  let findIndex = state.workspace.nodes.findIndex(n => n.oid === node.oid)
-  if (findIndex) {
-    state.workspace.nodes[findIndex] = node
-  } else {
-    debug('updateNode NOTHING TO UPDATE create')
-    state.workspace.nodes.push(node)
-  }
-  debug('updateNode done')
-}
-
-export function deleteNode(state, oid) {
-  debug('deleteNode')
-  let nodes = state.workspace.nodes
-  if (nodes.includes(oid)) {
-    debug('deleteNode start')
-    state.workspace.nodes = nodes.filter(n => n.oid !== oid)
-  } else {
-    debug('no such node!')
-  }
 }

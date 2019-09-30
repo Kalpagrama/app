@@ -16,7 +16,7 @@ export default {
       nodes: [],
       query: gql`
         query feed($pageToken: RawJSON) {
-          feed(type: NEWS, pagination: {pageSize: 10, pageToken: $pageToken} filter: {types:[NODE]} ){
+          feed(type: NEWS, pagination: {pageSize: 100, pageToken: $pageToken} filter: {types:[NODE]} ) {
             count
             totalCount
             nextPageToken

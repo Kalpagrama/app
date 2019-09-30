@@ -106,6 +106,7 @@ export default async ({ Vue, store, router }) => {
   Vue.component('kPage', () => import(`components/k_page`))
   Vue.component('kMenuPopup', () => import(`components/k_menu_popup`))
   Vue.component('kDialog', () => import(`components/k_dialog`))
+  Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
 }
 
 export { time }

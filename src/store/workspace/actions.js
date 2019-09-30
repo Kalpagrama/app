@@ -9,35 +9,44 @@ export const userWorkspace = async (state, a) => {
     query: gql`
       query userWorkspace {
         userWorkspace {
-          bookmarks {oid}
-          tags {uid name color icon}
+          drafts {
+            uid
+            name
+            tagUids
+            createdAt
+            updatedAt
+            spheres {
+              oid
+              type
+              name
+            }
+          }
+          tags {
+            uid
+            name
+            color
+            icon
+            createdAt
+            updatedAt
+          }
+          bookmarks {
+            uid
+            type
+            name
+            url
+            thumbUrl(preferWidth: 600)
+            tagUids
+            createdAt
+            updatedAt
+          }
           fragments {
             uid
-            label
-            thumbUrl
+            name
+            thumbUrl(preferWidth: 600)
             relativePoints {x y z}
             relativeScale
             tagUids
-            content {
-              uid
-              name
-              tagUids
-              content {
-                oid
-                type
-                name
-                thumbUrl(preferWidth: 600)
-                ... on Video {
-                  url
-                  urlOriginal
-                  duration
-                }
-                ... on Image {
-                  url
-                  urlOriginal
-                }
-              }
-            }
+            contentUid
           }
           contents {
             uid
@@ -59,35 +68,6 @@ export const userWorkspace = async (state, a) => {
               }
             }
           }
-          drafts {
-            uid
-            name
-            fragments {
-              uid
-              label
-              relativePoints { x y z }
-              relativeScale
-              content {
-                content {
-                  oid
-                  type
-                  thumbUrl(preferWidth: 600)
-                  name
-                  ... on Video {
-                    duration
-                    url
-                    urlOriginal
-                  }
-                  ... on Image {
-                    url
-                    urlOriginal
-                  }
-                }
-              }
-            }
-            spheres {oid type name }
-            tagUids
-          }
         }
       }
     `
@@ -97,66 +77,78 @@ export const userWorkspace = async (state, a) => {
   return userWorkspace
 }
 
-export const addWSNode = async (state, node) => {
-  debug('addWSNode start', node)
-  // prepare input
-  let input = {
-    oid: node.oid,
-    name: node.name,
-    spheres: node.spheres,
-    fragments: node.fragments.map(f => {
-      return {
-        oid: f.content.oid,
-        tags: f.tags || ['other'],
-        relativePoints: f.relativePoints,
-        relativeScale: f.relativeScale
-      }
-    }),
-    tags: node.tags || ['other']
-  }
-  let r = await apollo.mutate({
+export const addWSBookmark = async (store, bookmark) => {
+  debug('addWSBookmark start')
+  let {data: {addWSBookmark}} = await apollo.mutate({
     mutation: gql`
-      mutation addWSNode ($node: WSNodeInput!) {
-        addWSNode(node: $node)
+      mutation addWSBookmark ($bookmark: WSBookmarkInput!) {
+        addWSBookmark (bookmark: $bookmark) {
+          uid
+          type
+          name
+          url
+          thumbUrl(preferWidth: 600)
+          tagUids
+          createdAt
+          updatedAt
+        }
       }
     `,
     variables: {
-      node: input
+      bookmark: bookmark
     }
   })
-  debug('r', r)
-  // add to store
+  debug('addWSBookmark done', addWSBookmark)
+  store.commit('addWSBookmark', addWSBookmark)
+  return addWSBookmark
 }
 
-export const deleteWSNode = async (state, node) => {
-  debug('deleteWSNode start')
-  let r = await apollo.mutate({
+export const deleteWSBookmark = async (store, uid) => {
+  debug('deleteWSBookmark start')
+  let {data: {deleteWSBookmark}} = await apollo.mutate({
     mutation: gql`
-      mutation deleteWSNode ($uid: String!)
-    `,
-    variables: {
-      uid: node.uid
-    }
-  })
-  debug('deleteWSNode done', r)
-  // delete from the store
-}
-
-export const updateWSNode = async (state, node) => {
-  debug('updateWSNode start')
-  let r = await apollo.mutate({
-    mutation: gql`
-      mutation updateWSNode ($uid: String!, $node: WSNodeInput!) {
-        upadeWSNode ()
+      mutation deleteWSBookmark ($uid: String!) {
+        deleteWSBookmark(uid: $uid)
       }
     `,
     variables: {
-      uid: node.uid,
-      node: node
+      uid: uid
     }
   })
-  debug('updateWSNode done', r)
-  // TODO: update in state
+  debug('deleteWSBookmark done', deleteWSBookmark)
+  store.commit('deleteWSBookmark', uid)
+  return deleteWSBookmark
+}
+
+export const updateWSBookmark = async (store, bookmark) => {
+  debug('updateWSBookmark start')
+  let {data: {updateWSBookmark}} = await apollo.mutate({
+    mutation: gql`
+      mutation updateWSBookmark ($uid: String!, $bookmark: WSBookmarkInput!) {
+        updateWSBookmark(uid: $uid, bookmark: $bookmark) {
+          uid
+          type
+          name
+          url
+          createdAt
+          thumbUrl(preferWidth: 600)
+          updatedAt
+          tagUids
+        }
+      }
+    `,
+    variables: {
+      uid: bookmark.uid,
+      bookmark: {
+        name: bookmark.name,
+        url: bookmark.url,
+        tagUids: bookmark.tagUids
+      }
+    }
+  })
+  debug('updateWSBookmark done', updateWSBookmark)
+  store.commit('updateWSBookmark', bookmark)
+  return updateWSBookmark
 }
 
 export const addWSContent = async (store, content) => {
@@ -166,9 +158,11 @@ export const addWSContent = async (store, content) => {
       mutation addWSContent ($content: WSContentInput!) {
         addWSContent (content: $content) {
           uid
-          urlOriginal
           name
           tagUids
+          thumbUrl(preferWidth: 600)
+          createdAt
+          updatedAt
           content {
             oid
             type
@@ -212,18 +206,28 @@ export const updateWSContent = async (store, content) => {
   return true
 }
 
-export const deleteWSContent = async (store, content) => {
+export const deleteWSContent = async (store, uid) => {
   debug('deleteWSContent start')
-  debug('deleteWSContent done')
-  // TODO: delete from state
-  // return r
+  let {data: {deleteWSContent}} = await apollo.mutate({
+    mutation: gql`
+      mutation deleteWSContent ($uid: String!) {
+        deleteWSContent (uid: $uid)
+      }
+    `,
+    variables: {
+      uid: uid
+    }
+  })
+  debug('deleteWSContent done', deleteWSContent)
+  store.commit('deleteWSContent', uid)
+  return deleteWSContent
 }
 
 export const addWSTag = async (store, tag) => {
   debug('addWSTag start')
   let {data: {addWSTag}} = await apollo.mutate({
     mutation: gql`
-      mutation addWSTag ($tag: WSTagInput) {
+      mutation addWSTag ($tag: WSTagInput!) {
         addWSTag (tag: $tag) {
           uid
           name
@@ -238,38 +242,52 @@ export const addWSTag = async (store, tag) => {
   })
   store.commit('addWSTag', addWSTag)
   debug('addWSTag done', addWSTag)
+  return addWSTag
 }
 
 export const updateWSTag = async (store, tag) => {
   debug('updateWSTag start')
   let {data: {updateWSTag}} = await apollo.mutate({
     mutation: gql`
-      mutation updateWSTag ($uid: String!, $tag: WSTagInput) {
-        uid
-        name
-        color
-        icon
+      mutation updateWSTag ($uid: String!, $tag: WSTagInput!) {
+        updateWSTag (uid: $uid, tag: $tag) {
+          uid
+          name
+          color
+          icon
+          createdAt
+          updatedAt
+        }
       }
     `,
     variables: {
       uid: tag.uid,
-      tag: tag
+      tag: {
+        name: tag.name,
+        color: tag.color,
+        icon: tag.icon
+      }
     }
   })
-  store.commit('updateWSTag', tag)
-  debug('updateWSTag done')
+  store.commit('updateWSTag', updateWSTag)
+  debug('updateWSTag done', updateWSTag)
+  return updateWSTag
 }
 
-export const deleteWSTag = async (store, tag) => {
-  debug('deleteWSTag start')
+export const deleteWSTag = async (store, uid) => {
+  debug('deleteWSTag start', uid)
   let {data: {deleteWSTag}} = await apollo.mutate({
     mutation: gql`
       mutation deleteWSTag ($uid: String!) {
-        uid
+        deleteWSTag (uid: $uid)
       }
-    `
+    `,
+    variables: {
+      uid: uid
+    }
   })
-  store.commit('deleteWSTag', tag)
+  store.commit('deleteWSTag', uid)
   // TODO: delete this tag from all tagUids
   debug('deleteWSTag done')
+  return deleteWSTag
 }

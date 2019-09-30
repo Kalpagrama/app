@@ -1,6 +1,6 @@
 <template lang="pug">
 div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width.bg-grey-4
-  div(body-scroll-lock-ignore).col.scroll
+  .col
     workspace
 </template>
 

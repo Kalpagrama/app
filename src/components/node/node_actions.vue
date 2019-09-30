@@ -68,7 +68,7 @@ div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
     q-icon(name="call_made" size="26px" color="grey-8").rotate-270
   //- chain
   q-btn(:icon="nodeWorkspaced ? 'turned_in' : 'turned_in_not'" color="grey-8" round flat @click="nodeBookmark()")
-  slot(name="actions")
+  //- slot(name="actions")
   //- chain name and selector
   .col
     //- div(v-if="true") Some chain name
@@ -162,9 +162,10 @@ export default {
     },
     async nodeBookmark () {
       this.$log('nodeBookmark')
-      let n = JSON.parse(JSON.stringify(this.nodeFull))
-      let r = await this.$store.dispatch('workspace/addWSNode', this.$strip(n))
-      this.$log('r', r)
+      this.$root.$emit('addWSBookmarkDialog')
+      // let n = JSON.parse(JSON.stringify(this.nodeFull))
+      // let r = await this.$store.dispatch('workspace/addWSNode', this.$strip(n))
+      // this.$log('r', r)
       // this.$refs.workspaceDialog.show()
     }
   }

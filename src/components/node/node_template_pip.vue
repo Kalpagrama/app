@@ -101,29 +101,32 @@ export default {
       switch (a.id) {
         case 'content_explore': {
           this.$log('fragmentAction', a.id)
-          this.$router.push(`/app/content/${this.nodeFull.fragments[fi].content.oid}`)
+          // this.$router.push(`/app/content/${this.nodeFull.fragments[fi].content.oid}`)
           break
         }
         case 'content_workspace': {
           this.$log('fragmentAction', a.id)
-          // add contentWorksapce aciton dispatch
-          await this.$store.dispatch('workspace/addWSContent', this.nodeFull.fragments[fi].content)
+          let content = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi].content))
+          this.$store.commit('workspace/state', ['content', content])
+          this.$nextTick(() => {
+            this.$root.$emit('contentEditorToggle')
+          })
           break
         }
         case 'fragment_workspace': {
           this.$log('fragmentAction', a.id)
-          this.fragmentWorkspace(fi)
+          // this.fragmentWorkspace(fi)
           break
         }
         case 'fragment_create': {
           this.$log('fragmentAction', a.id)
           // add to workspace
-          let n = this.fragmentWorkspace(fi)
+          // let n = this.fragmentWorkspace(fi)
           // save node to store
-          this.$store.commit('workspace/state', ['draft', n])
-          await this.$wait(200)
+          // this.$store.commit('workspace/state', ['draft', n])
+          // await this.$wait(200)
           // go to create
-          this.$router.push('/app/create')
+          // this.$router.push('/app/create')
           break
         }
       }

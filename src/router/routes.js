@@ -12,7 +12,7 @@ const routes = [
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       { name: 'node', path: 'node/:oid', component: () => import('pages/app/node') },
-      { name: 'workspace', path: 'workspace', component: () => import('pages/app/workspace') },
+      { name: 'workspace', path: 'workspace/:menu?', component: () => import('pages/app/workspace') },
       { name: 'create', path: 'create', component: () => import('pages/app/create') }
     ]
   },
