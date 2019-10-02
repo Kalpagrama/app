@@ -2,7 +2,7 @@
 .row.fit
   //- editors
   k-dialog(ref="nodeEditorDialog")
-    node-editor(:node="node" @hide="$refs.nodeEditorFormDialog.hide()"
+    node-editor(:node="node" @hide="$refs.nodeEditorDialog.hide()"
       @name="name = $event" @spheres="spheres = $event" @meta="meta = $event")
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(
@@ -48,12 +48,14 @@ import nodeEditor from './node_editor'
 export default {
   name: 'nodeCreator',
   components: {contentFinder, videoEditor, nodeFragments, nodePreview, nodeEditor},
-  props: ['draft'],
+  props: [],
   data () {
     return {
       tab: 'main',
       content: null,
+      draft: null,
       fragments: {},
+      uid: undefined,
       name: '',
       spheres: [],
       layout: 'PIP',
@@ -69,6 +71,7 @@ export default {
         fragments.push(this.fragments[f])
       }
       return {
+        uid: this.uid,
         name: this.name,
         author: this.$store.state.auth.user,
         thumbUrl: fragments.map(f => {
@@ -78,6 +81,7 @@ export default {
           return {
             uid: f.uid,
             oid: f.content.oid,
+            content: f.content,
             label: f.label,
             thumbUrl: f.thumbUrl,
             relativePoints: f.relativePoints,
@@ -116,22 +120,8 @@ export default {
   watch: {
     node: {
       handler (to, from) {
-        this.$log('node CHANGED', to)
-        // localStorage.setItem('nodeDraft', JSON.stringify(to))
-      }
-    },
-    draft: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('draft CHANGED', to)
-        // if (to) {
-        //   this.name = to.name
-        //   this.spheres = to.spheres
-        //   to.fragments.map((f, fi) => {
-        //     f.preview = to.thumbUrl[fi]
-        //     this.$set(this.fragments, this.fragments.length, f)
-        //   })
-        // }
+        // this.$log('node CHANGED', to)
+        localStorage.setItem('draft', JSON.stringify(to))
       }
     }
   },
@@ -145,18 +135,9 @@ export default {
       // close content finder dialog
       this.$refs.contentFinderDialog.hide()
       await this.$wait(300)
-      // save content
-      await this.contentSave(content.oid)
+      let WSContent = await this.$store.dispatch('workspace/addWSContent', {name: content.name, content: {oid: content.oid}})
       // open editor
-      this.fragmentEdit(content)
-    },
-    async contentSave (oid) {
-      this.$log('contentSave')
-      let contentFind = this.$store.state.workspace.workspace.contents.find(c => (c.content.oid === oid))
-      if (!contentFind) await this.$store.dispatch('workspace/addWSContent', {oid})
-      else {
-        // this.$q.notify(`This content is already in your workspace`)
-      }
+      this.fragmentEdit(WSContent.content)
     },
     fragmentCreate (content, f) {
       this.$log('fragmentCreate', content)
@@ -233,16 +214,22 @@ export default {
       // save this node as draft
       // delete this node?
     },
-    async nodeSave () {
-      try {
-        this.$log('nodeSave start')
-        this.nodeSaving = true
-        // this.$store.commit('workspace/updateNode', this.node)
-        this.nodeSaving = false
-        this.$log('nodeSave done')
-      } catch (e) {
-        this.$log('nodeSave error', e)
-        this.nodeSaving = false
+    nodeInput (input) {
+      let node = this.$strip(JSON.parse(JSON.stringify(input)))
+      return {
+        name: node.name,
+        spheres: node.spheres,
+        fragments: node.fragments.map(f => {
+          return {
+            uid: f.uid,
+            oid: f.content.oid,
+            name: f.name,
+            thumbUrl: f.thumbUrl,
+            relativePoints: f.relativePoints,
+            relativeScale: f.relativeScale
+          }
+        }),
+        meta: node.meta
       }
     },
     async nodePublish () {
@@ -250,15 +237,6 @@ export default {
         this.$log('nodePublish start', this.node)
         if (this.fragments.lenth < 2) return
         this.nodePublishing = true
-        // prepare node
-        // TODO: not prepare node but create node INPUT
-        let n = JSON.parse(JSON.stringify(this.node))
-        n.fragments.map(f => {
-          delete f.thumbUrl
-        })
-        delete n.author
-        delete n.createdAt
-        delete n.thumbUrl
         let {data: {nodeCreate}} = await this.$apollo.mutate({
           mutation: gql`
             mutation nodeCreate ($node: NodeInput!) {
@@ -270,23 +248,74 @@ export default {
             }
           `,
           variables: {
-            node: n
+            node: this.nodeInput(this.node)
           }
         })
+        // delete ws draft
+        if (this.draft) {
+          let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
+          this.$log('deleteWSDraft', deleteWSDraft)
+        }
+        // remove draftLocal
+        localStorage.removeItem('draft')
+        // remove draftStorage
+        this.$store.commit('workspace/state', ['draft', null])
         this.$log('nodePublish done', nodeCreate)
         this.nodePublishing = false
-        // TODO: create new one? or go to node page?
-        // TODO: delete current node and from node draft
-        // TODO: create draft or update draft from workspace
+        // go to node page?
+        this.$router.push(`/app/node/${nodeCreate.oid}`)
       } catch (e) {
         this.$log('nodePublish error', e)
         this.nodePublishing = false
         this.nodePublishingError = e
       }
+    },
+    useDraft (draft) {
+      this.$set(this, 'uid', draft.uid)
+      this.$set(this, 'name', draft.name)
+      this.$set(this, 'spheres', draft.spheres)
+      // this.$set(this, '')
+      draft.fragments.map((f, fi) => {
+        this.$set(this.fragments, f.uid, f)
+      })
+      this.$set(this, 'draft', draft)
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    // draft
+    let draftLocal = this.$store.state.workspace.draft
+    let draftStorage = this.$q.localStorage.getItem('draft')
+    this.$log('draftLocal', draftLocal)
+    this.$log('draftStorage', draftStorage)
+    if (draftLocal) {
+      if (draftStorage !== null && draftStorage !== 'null' && draftStorage !== 'undefined' && draftStorage !== undefined) {
+        this.$log('DRAFTS: local, storage')
+        // save old draft
+        let d = JSON.parse(draftStorage)
+        if (d.uid) await this.$store.dispatch('workspace/updateWSDraft', d)
+        else await this.$store.dispatch('workspace/addWSDraft', d)
+        // use draft
+        this.useDraft(draftLocal)
+        // remove draft local
+        this.$store.commit('workspace/state', ['draft', null])
+      } else {
+        this.$log('DRAFTS: local')
+        // use draft
+        this.useDraft(draftLocal)
+        // remove draft local
+        this.$store.commit('workspace/state', ['draft', null])
+      }
+    } else {
+      if (draftStorage !== null && draftStorage !== 'null' && draftStorage !== 'undefined' && draftStorage !== undefined) {
+        this.$log('DRAFTS: storage')
+        // use draft
+        this.useDraft(JSON.parse(draftStorage))
+      } else {
+        this.$log('DRAFTS: none')
+        // do nothing
+      }
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

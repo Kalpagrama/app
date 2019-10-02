@@ -54,14 +54,16 @@ export const addWSFragment = (state, fragment) => {
   state.workspace.fragments.push(fragment)
   debug('addWSFragment done')
 }
-export const deleteWSFragment = (state, uid) => {
+export const deleteWSFragment = (state, fragment) => {
   debug('deleteWSFragment start')
-  let i = state.workspace.fragments.findIndex(f => f.uid === uid)
+  if (!fragment.uid) return
+  let i = state.workspace.fragments.findIndex(f => f.uid === fragment.uid)
   state.workspace.fragments.splice(i, 1)
   debug('deleteWSFragment done')
 }
 export const updateWSFragment = (state, fragment) => {
   debug('updateWSFragment start')
+  if (!fragment.uid) return
   let i = state.workspace.fragments.findIndex(f => f.uid === fragment.uid)
   state.workspace.fragments[i] = fragment
   debug('updateWSFragment done')
@@ -73,14 +75,16 @@ export const addWSDraft = (state, draft) => {
   state.workspace.drafts.push(draft)
   debug('addWSDraft done')
 }
-export const deleteWSDraft = (state, uid) => {
+export const deleteWSDraft = (state, draft) => {
   debug('deleteWSDraft start')
-  let i = state.workspace.drafts.findIndex(d => d.uid === uid)
+  if (!draft.uid) return
+  let i = state.workspace.drafts.findIndex(d => d.uid === draft.uid)
   state.workspace.drafts.splice(i, 1)
   debug('deleteWSDraft done')
 }
 export const updateWSDraft = (state, draft) => {
   debug('updateWSDraft start')
+  if (!draft.uid) return
   let i = state.workspace.drafts.findIndex(d => d.uid === draft.uid)
   state.workspace.drafts[i] = draft
   debug('updateWSDraft done')

@@ -17,7 +17,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px', overflow: 'hi
     //- wrapper
     .row.full-width.items-start.content-start
       //- url
-      .row.full-width.q-px-sm
+      div(v-if="!bookmarkLocal.oid").row.full-width.q-px-sm
         .row.full-width.q-px-sm
           span Ссылка
         div(style=`borderRadius: 10px; overflow: hidden; zIndex: 200`).row.full-width
@@ -36,13 +36,9 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px', overflow: 'hi
   //- create / update btn
   div(:style=`{height: '80px'}`).row.full-width.items-center.content-center.q-px-sm
     q-btn(
-      v-if="!bookmark" color="primary" no-caps :disable="!bookmarkLocal.url" :loading="bookmarkCreating" @click="bookmarkCreate()"
+      color="primary" no-caps :loading="bookmarkCreating" @click="bookmark && bookmark.uid ? bookmarkDraft () : bookmarkCreate()"
       style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-      span.text-bold.text-white Создать закладку
-    q-btn(
-      v-else color="primary" no-caps @click="bookmarkContent()"
-      style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-      span.text-bold.text-white Создать контент
+      span.text-bold.text-white {{bookmark && bookmark.uid ? 'Создать ядро' : 'Создать закладку'}}
 </template>
 
 <script>
@@ -51,7 +47,7 @@ import wsTagsInput from './ws_tags_input'
 export default {
   name: 'wsBookmarkEditor',
   components: {wsTagsInput},
-  props: ['bookmark'],
+  props: ['type', 'bookmark'],
   data () {
     return {
       loading: true,
@@ -118,19 +114,54 @@ export default {
         this.$emit('hide')
         this.$store.commit('workspace/state', ['contentEditorDialogOpened', true])
       })
+    },
+    async bookmarkDraft () {
+      try {
+        this.$log('bookmarkDraft start')
+        this.contentDrafting = true
+        await this.$wait(600)
+        // create content...
+        // // create fragments
+        // let fragments = [
+        //   {
+        //     name: '',
+        //     tagUids: [],
+        //     thumbUrl: '',
+        //     relativePoints: [],
+        //     relativeScale: 0,
+        //     contentOid: this.contentLocal.content.oid
+        //   }
+        // ]
+        // this.$log('fragments', fragments)
+        // let res = await this.$store.dispatch('workspace/addWSDraft', {fragments})
+        // this.$log('res', res)
+        // go to node_creator
+        // this.$store.commit('workspace/state', ['draft', res])
+        // this.$router.push('/app/create')
+        this.$log('bookmarkDraft done')
+        this.bookmarkDrafting = false
+        this.$emit('hide')
+      } catch (e) {
+        this.$log('bookmarkDraft error', e)
+        this.contentDrafting = false
+      }
     }
   },
   mounted () {
     this.$log('mounted', this.bookmark)
-    if (this.bookmark) this.$set(this, 'bookmarkLocal', JSON.parse(JSON.stringify(this.bookmark)))
-    else this.$refs.urlInput.focus()
+    if (this.bookmark) {
+      this.$set(this, 'bookmarkLocal', {...this.bookmarkLocal, ...JSON.parse(JSON.stringify(this.bookmark))})
+      this.$refs.nameInput.focus()
+    } else {
+      this.$refs.urlInput.focus()
+    }
     this.$nextTick(() => {
       this.loading = false
     })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.bookmarkUpdate()
+    // if (this.type === 'update') this.bookmarkUpdate()
   }
 }
 </script>

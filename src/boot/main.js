@@ -87,6 +87,7 @@ export default async ({ Vue, store, router }) => {
     }
     return result
   }
+  // errors
   Vue.config.errorHandler = function(err, vm, info) {
     debug(`### VUE ERROR ### ${err.toString()}\nInfo: ${info}`)
     debug(err.stack)
@@ -96,17 +97,12 @@ export default async ({ Vue, store, router }) => {
   //   debug('### ERROR ###', msg.toString())
   //   Notify.create({message: msg.toString(), color: 'red', colorText: 'red'})
   // }
-  // components
-  // const components = ['k_page']
-  // const cName = (c) => {
-  //   let s = c.split('/')
-  //   return s[s.length - 1]
-  // }
-  // components.map(c => Vue.component(cName(c), () => import(`components/${c}`)))
   Vue.component('kPage', () => import(`components/k_page`))
   Vue.component('kMenuPopup', () => import(`components/k_menu_popup`))
   Vue.component('kDialog', () => import(`components/k_dialog`))
   Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
+  Vue.component('wsBookmarkEditor', () => import('components/workspace/ws_bookmark_editor'))
+  Vue.component('wsFragmentEditor', () => import('components/workspace/ws_fragment_editor'))
 }
 
 export { time }

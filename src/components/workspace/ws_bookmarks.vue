@@ -2,10 +2,10 @@
 div(:style=`{position: 'relative'}`).column.fit.bg-white
   //- editor dialog
   k-dialog(ref="wsBookmarkEditor" @hide="bookmark = null")
-    ws-bookmark-editor(:bookmark="bookmark" @hide="$refs.wsBookmarkEditor.hide()")
+    ws-bookmark-editor(type="create" :bookmark="bookmark" @hide="$refs.wsBookmarkEditor.hide()")
   //- action create
   q-btn(
-    round color="primary" size="lg" icon="add" @click="bookmarkCreate"
+    round color="primary" size="lg" icon="add" @click="bookmarkCreate()"
     :style=`{position: 'absolute', bottom: '10px', right: '10px', zIndex: 200}`)
   //- header
   div(:style=`{height: '70px'}`).row.full-width.items-center.content-center
@@ -24,7 +24,7 @@ div(:style=`{position: 'relative'}`).column.fit.bg-white
     ws-filters(ref="wsFilters" :items="bookmarks")
       template(v-slot:items="{items}")
         div(:style=`{paddingBottom: '80px'}`).row.full-width.items-start.content-start.q-pt-sm.q-px-sm
-          ws-bookmark-item(v-for="(b, bi) in items" :key="b.uid" :item="b" @clicked="bookmarkClick")
+          ws-bookmark-item(v-for="(b, bi) in items" :key="bi" :item="b" @clicked="bookmarkClick")
 </template>
 
 <script>

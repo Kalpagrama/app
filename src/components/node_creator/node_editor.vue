@@ -1,16 +1,37 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit.bg-white
+div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.bg-white
   //- header
-  div(:style=`{height: '70px'}`).row.full-width
-  //- body
-  .col.scroll
+  div(
+    v-if="true"
+    :style=`{minHeight: '70px'}`).row.full-width.q-pa-sm
     //- name
-    div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-md
+    div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-sm
       span.text-bold В чем суть?
     //- name in out
-    .row.full-width.q-px-sm
+    .row.full-width
         div(:style=`{borderRadius: '10px', overflow: 'hidden !important', zIndex: 900}`).row.full-width
           q-input(ref="kinput" :value="node.name" filled type="textarea" autogrow :maxlength="130" @input="nameInput").full-width
+  //- body
+  div(:style=`{padding: '0 0 80px 0'}`).col.scroll.full-width
+    //- category header
+    div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-md
+      span.text-bold Категория
+    .row.full-width.q-px-sm
+      div(:style=`{height: '56px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.q-px-sm.bg-grey-3
+        span Выберите категорию
+        .col
+        q-icon(name="keyboard_arrow_down" size="30px" color="grey-7").q-mr-sm
+    //- layout header
+    div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-md
+      span.text-bold Шаблон
+    //- layout input
+    .row.full-width.q-px-sm
+      div(:style=`{height: '56px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.q-px-sm.bg-grey-3
+        span Выберите шаблон
+        .col
+        q-icon(name="keyboard_arrow_down" size="30px" color="grey-7").q-mr-sm
     //- spheres header
     div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-md
       span.text-bold Сферы
@@ -33,6 +54,12 @@ div(:style=`{position: 'relative'}`).column.fit.bg-white
               span #
     .row.full-width.bg-red
       //- small.text-black {{ node }}
+  //- footer
+  div(:style=`{position: 'absolute', bottom: '0px', zIndex: 1000, height: '70px', background: 'rgba(255, 255, 255, 0.5)'}`).row.full-width.items-start.q-px-sm
+    q-btn(
+      color="primary" no-caps @click="$emit('hide')"
+      style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
+      span.text-white.text-bold Сохранить
 </template>
 
 <script>
@@ -48,7 +75,7 @@ export default {
   },
   methods: {
     nameInput (e) {
-      this.$log('nameInput', e)
+      // this.$log('nameInput', e)
       this.$emit('name', e)
     },
     spheresInput (e) {

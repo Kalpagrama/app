@@ -1,8 +1,18 @@
 <template lang="pug">
 q-layout(view='hHh Lpr fFf').bg-primary
+  //- bookmark
+  k-dialog(:value="$store.state.workspace.bookmarkEditorDialogOpened"
+    @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false]), $store.commit('workspace/state', ['bookmark', null])")
+    ws-bookmark-editor(type="create" :bookmark="$store.state.workspace.bookmark" @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
+  //- content
   k-dialog(:value="$store.state.workspace.contentEditorDialogOpened"
     @hide="$store.commit('workspace/state', ['contentEditorDialogOpened', false]), $store.commit('workspace/state', ['content', null])")
-    ws-content-editor(name="global" :content="$store.state.workspace.content")
+    ws-content-editor(type="create" :content="$store.state.workspace.content" @hide="$store.commit('workspace/state', ['contentEditorDialogOpened', false])")
+  //- fragment
+  k-dialog(:value="$store.state.workspace.fragmentEditorDialogOpened"
+    @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false]), $store.commit('workspace/state', ['fragment', null])")
+    ws-fragment-editor(type="create" :fragment="$store.state.workspace.fragment" @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false])")
+  //- drawer
   q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
     k-menu-vert.bg-primary
   q-page-container
@@ -19,7 +29,6 @@ q-layout(view='hHh Lpr fFf').bg-primary
 <script>
 import kMenuVert from 'components/k_menu_vert'
 import kMenuHoriz from 'components/k_menu_horiz'
-// import wsContentEditor from 'components/workspace/ws_content_editor'
 
 export default {
   name: 'mainLayout',
