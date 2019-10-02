@@ -1,44 +1,44 @@
 <template lang="pug">
 div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).row.fit.bg-white
-  div(v-if="content").column.fit.bg-white
-    div(:style=`{minHeight: '70px'}`).row.full-width.items-center.content-center
+  div(:style=`{position: 'relative'}`).column.fit.bg-white
+    //- header
+    div(:style=`{position: 'absolute', zIndex: 1000, top: '0px', height: '70px', background: 'rgba(255, 255, 255, 0.9)'}`).row.full-width.items-center.content-center
       //- div(:style=`{width: '70px'}`).row.full-height.br
       //- name
       .col.full-height
         .row.fit.items-center.content-center.q-px-sm
-          span {{ contentLocal.name | cut(50) }}
+          span.text-bold {{ contentLocal.name || content.name | cut(40) }}
       //- delete
       div(:style=`{width: '70px'}`).row.full-height.items-center.content-center.justify-center
-        k-menu-popup(v-if="content" :name="'Точно удалить контент?'" :actions="actions" @action="contentDelete")
+        k-menu-popup(v-if="content" :name="'Удалить контент?'" :actions="actions" @action="contentDelete")
           q-btn(round flat icon="delete_outline" color="grey-6")
-    div(ignore-body-scroll-lock).col.scroll
+    //- body
+    div(ignore-body-scroll-lock style=`padding: 80px 0`).col.scroll.full-width
+      ws-tags-input(ref="wsTags" :tags="contentLocal.tagOids" @tags="contentLocal.tagOids = $event")
+      //- .row.full-width
+      //-   small {{ content }}
+      //- .row.full-width
+      //-   small {{ contentLocal }}
     //- footer
-    div(:style=`{height: '80px'}`).row.full-width.items-center.content-center.q-pa-sm
+    div(:style=`{position: 'absolute', zIndex: 1000, bottom: '0px', height: '76px', background: 'rgba(255, 255, 255, 0.9)'}`).row.full-width.q-pa-sm
       q-btn(
-        v-if="!content"
-        color="primary" no-caps @click="contentCreate()"
+        color="primary" no-caps @click="content.uid ? contentDraft() : contentCreate()"
         style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-        span.text-bold.text-white Создать контент
-      q-btn(
-        v-else
-        color="primary" no-caps @click="contentFragment()"
-        style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-        span.text-bold.text-white Выделить фрагмент
-  content-finder(v-else source="url")
+        span.text-white.text-bold {{ content.uid ? 'Создать ядро' : 'Создать контент'}}
 </template>
 
 <script>
-import contentFinder from 'components/content_finder'
+import wsTagsInput from './ws_tags_input'
 
 export default {
   name: 'wsContentEditor',
-  components: {contentFinder},
-  props: ['content'],
+  components: {wsTagsInput},
+  props: ['type', 'content'],
   data () {
     return {
       contentLocal: {
         name: '',
-        tagsOids: [],
+        tagOids: [],
         content: {
           name: ''
         }
@@ -46,6 +46,7 @@ export default {
       contentCreating: false,
       contentUpdating: false,
       contentDeleting: false,
+      contentDrafting: false,
       actions: [
         {id: 'delete', name: 'Удалить', color: 'red'}
       ]
@@ -57,7 +58,7 @@ export default {
         this.$log('contentCreate start')
         this.contentCreating = true
         await this.$wait(600)
-        // let res = await this.$store.dispatch('workspace/addWSContent', this.contentLocal)
+        let res = await this.$store.dispatch('workspace/addWSContent', this.contentLocal)
         this.$log('contentCreate done')
         this.contentCreating = false
         this.$emit('hide')
@@ -96,31 +97,46 @@ export default {
         this.$q.notify({color: 'red', textColor: 'white', message: e.toString()})
       }
     },
-    async contentFragment () {
-      this.$log('contentFragment')
-      switch (this.content.content.type) {
-        case 'VIDEO': {
-          this.$log('contentFragment VIDEO')
-          break
-        }
-        case 'IMAGE': {
-          this.$log('contentFragment IMAGE')
-          break
-        }
+    async contentDraft () {
+      try {
+        this.$log('contentDraft start')
+        this.contentDrafting = true
+        // create fragments
+        let fragments = [
+          {
+            name: '',
+            tagUids: [],
+            thumbUrl: '',
+            relativePoints: [{x: 0}, {x: 10}],
+            relativeScale: 0,
+            contentOid: this.contentLocal.content.oid
+          }
+        ]
+        this.$log('fragments', fragments)
+        let res = await this.$store.dispatch('workspace/addWSDraft', {fragments})
+        this.$log('res', res)
+        // go to node_creator
+        this.$store.commit('workspace/state', ['draft', res])
+        this.$router.push('/app/create')
+        this.$log('contentDraft done')
+        this.contentDrafting = false
+        this.$emit('hide')
+      } catch (e) {
+        this.$log('contentDraft error', e)
+        this.contentDrafting = false
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.content)
     if (this.content) {
-      this.$set(this, 'contentLocal', JSON.parse(JSON.stringify(this.content)))
-    } else {
-      this.$log('creating content')
+      if (this.content.uid) this.$set(this, 'contentLocal', JSON.parse(JSON.stringify(this.content)))
+      else this.$set(this.contentLocal, 'content', JSON.parse(JSON.stringify(this.content)))
     }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.contentUpdate()
+    // if (this.content.uid) // this.contentUpdate()
   }
 }
 </script>

@@ -2,11 +2,12 @@
 div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.bg-white
   //- actions
   q-btn(
+    v-if="false"
     round color="primary" size="lg" icon="add" @click="contentCreate()"
     :style=`{position: 'absolute', right: '10px', bottom: '10px'}`)
   //- dialogs
   k-dialog(ref="wsContentEditorDialog" @hide="content = null")
-    ws-content-editor(name="contents" :content="content" @hide="$refs.wsContentEditorDialog.hide()")
+    ws-content-editor(type="update" :content="content" @hide="$refs.wsContentEditorDialog.hide()")
   //- header
   div(:style=`{minHeight: '70px'}`).row.full-width.items-center
     //- menu

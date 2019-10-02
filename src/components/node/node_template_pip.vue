@@ -74,7 +74,7 @@ export default {
         {id: 'content_explore', name: 'Исследовать контент'},
         {id: 'content_workspace', name: 'Добавить контент в мастерскую'},
         {id: 'fragment_workspace', name: 'Добавить фрагмент в мастерскую'},
-        {id: 'fragment_create', name: 'Создать ядро с этим фрагментом'}
+        {id: 'fragment_draft', name: 'Создать ядро'}
       ]
     }
   },
@@ -86,51 +86,6 @@ export default {
     }
   },
   methods: {
-    fragmentWorkspace (fi) {
-      let r = this.$strip(JSON.parse(JSON.stringify(this.nodeFull)))
-      r.oid = `${r.oid}-${Date.now()}`
-      r.fragments = r.fragments.filter((f, i) => (i === fi))
-      r.thumbUrl = this.node.thumbUrl.filter((t, i) => (i === fi))
-      r.createdAt = Date.now()
-      this.$store.commit('workspace/addNode', r)
-      return r
-    },
-    async fragmentAction (a, fi) {
-      this.$log('fragmentAction', a)
-      await this.$wait(200)
-      switch (a.id) {
-        case 'content_explore': {
-          this.$log('fragmentAction', a.id)
-          // this.$router.push(`/app/content/${this.nodeFull.fragments[fi].content.oid}`)
-          break
-        }
-        case 'content_workspace': {
-          this.$log('fragmentAction', a.id)
-          let content = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi].content))
-          this.$store.commit('workspace/state', ['content', content])
-          this.$nextTick(() => {
-            this.$root.$emit('contentEditorToggle')
-          })
-          break
-        }
-        case 'fragment_workspace': {
-          this.$log('fragmentAction', a.id)
-          // this.fragmentWorkspace(fi)
-          break
-        }
-        case 'fragment_create': {
-          this.$log('fragmentAction', a.id)
-          // add to workspace
-          // let n = this.fragmentWorkspace(fi)
-          // save node to store
-          // this.$store.commit('workspace/state', ['draft', n])
-          // await this.$wait(200)
-          // go to create
-          // this.$router.push('/app/create')
-          break
-        }
-      }
-    },
     forwardClick () {
       this.$log('forwardClick')
       let a = this.fragmentActive === 0 ? 1 : 0
@@ -144,6 +99,43 @@ export default {
     },
     imgLoaded (e, msg) {
       // this.$log('imgLoaded', msg)
+    },
+    async fragmentAction (a, fi) {
+      this.$log('fragmentAction', a)
+      await this.$wait(200)
+      switch (a.id) {
+        case 'content_explore': {
+          this.$log('fragmentAction', a.id)
+          this.$router.push(`/app/content/${this.nodeFull.fragments[fi].content.oid}`)
+          break
+        }
+        case 'content_workspace': {
+          this.$log('fragmentAction', a.id)
+          let content = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi].content))
+          this.$store.commit('workspace/state', ['content', content])
+          this.$nextTick(() => {
+            this.$store.commit('workspace/state', ['contentEditorDialogOpened', true])
+          })
+          break
+        }
+        case 'fragment_workspace': {
+          this.$log('fragmentAction', a.id)
+          let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
+          fragment.thumbUrl = this.node.thumbUrl[fi]
+          this.$store.commit('workspace/state', ['fragment', fragment])
+          this.$nextTick(() => {
+            this.$store.commit('workspace/state', ['fragmentEditorDialogOpened', true])
+          })
+          break
+        }
+        case 'fragment_draft': {
+          this.$log('fragmentAction', a.id)
+          // add to workspace
+          // create draft
+          // go to node creator
+          break
+        }
+      }
     }
   },
   mounted () {

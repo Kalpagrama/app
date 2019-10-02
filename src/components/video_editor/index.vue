@@ -383,7 +383,7 @@ export default {
         await this.$wait(500)
         ctx.drawImage(this.$refs.kvideo, 0, 0, canvas.width, canvas.height)
         await this.$wait(500)
-        fragment.thumbUrl = canvas.toDataURL()
+        fragment.thumbUrl = canvas.toDataURL('image/jpeg', 0.5)
       }
       this.loading = false
       this.$emit('hide')

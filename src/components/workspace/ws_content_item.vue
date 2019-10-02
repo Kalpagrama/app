@@ -3,7 +3,7 @@ div(
   @click="$emit('clicked', item)"
   :style=`{height: '80px', borderRadius: '10px', overflow: 'hidden'}`
   ).row.full-width.bg-white.q-mb-sm
-  img(:src="item.content.thumbUrl[0]" :style=`{height: '100%', borderRadius: '10px', overflow: 'hidden'}`)
+  img(:src="item.content.thumbUrl[0]" :style=`{height: '100%', width: '142px', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}`).bg-black
   .col
     .row.fit.items-start.content-start.q-px-sm
       span {{ item.name | cut(50) }}
