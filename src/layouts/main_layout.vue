@@ -1,24 +1,21 @@
 <template lang="pug">
 q-layout(view='hHh Lpr fFf').bg-primary
-  //- bookmark
-  k-dialog(:value="$store.state.workspace.bookmarkEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false]), $store.commit('workspace/state', ['bookmark', null])")
-    ws-bookmark-editor(type="create" :bookmark="$store.state.workspace.bookmark" @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
-  //- content
-  k-dialog(:value="$store.state.workspace.contentEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['contentEditorDialogOpened', false]), $store.commit('workspace/state', ['content', null])")
-    ws-content-editor(type="create" :content="$store.state.workspace.content" @hide="$store.commit('workspace/state', ['contentEditorDialogOpened', false])")
-  //- fragment
-  k-dialog(:value="$store.state.workspace.fragmentEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false]), $store.commit('workspace/state', ['fragment', null])")
-    ws-fragment-editor(type="create" :fragment="$store.state.workspace.fragment" @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false])")
+  //- //- bookmark
+  //- k-dialog(:value="$store.state.workspace.bookmarkEditorDialogOpened"
+  //-   @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false]), $store.commit('workspace/state', ['bookmark', null])")
+  //-   ws-bookmark-editor(type="create" :bookmark="$store.state.workspace.bookmark" @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
+  //- //- fragment
+  //- k-dialog(:value="$store.state.workspace.fragmentEditorDialogOpened"
+  //-   @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false]), $store.commit('workspace/state', ['fragment', null])")
+  //-   ws-fragment-editor(type="create" :fragment="$store.state.workspace.fragment" @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false])")
+  //- rate dialog
+  k-dialog(v-if="$store.state.node.rateDialogOpened" :value="$store.state.node.rateDialogOpened" @hide="$store.commit('node/state', ['rateDialogOpened', false])")
+    node-rate(@hide="$store.commit('node/state', ['rateDialogOpened', false])")
   //- drawer
   q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
     k-menu-vert.bg-primary
   q-page-container
     q-page(:style=`{borderRadius: $q.screen.gt.sm ? '10px 0 0 10px' : '0 0 10px 10px', overflow: 'hidden'}`)
-      //- q-resize-observer(ref="zresize" @resize="onResize")
-      //- keep-alive
       router-view(v-if="!loading" :width="width" :height="height")
       div(v-else).row.full-width.window-height.items-center.justify-center
         q-spinner(size="50px" :thickness="2" color="white")

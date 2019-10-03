@@ -1,6 +1,8 @@
 <template lang="pug">
-component(:is="nodeTemplate" :index="index" :zIndex="zIndex" :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
-  :nodeTemplates="$store.state.ui.nodeTemplates" :nodeTemplate="nodeTemplate" @nodeTemplate="nodeTemplateChanged" :inCreator="inCreator")
+component(
+  :is="nodeTemplate" :index="index" :zIndex="zIndex" :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
+  :nodeTemplates="$store.state.ui.nodeTemplates" :nodeTemplate="nodeTemplate" @nodeTemplate="nodeTemplateChanged" :inCreator="inCreator"
+  :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
 </template>
 
 <script>
@@ -21,7 +23,11 @@ export default {
     nodeFullReady: {type: Object},
     active: {type: Boolean},
     template: {type: String},
-    inCreator: {type: Boolean}
+    inCreator: {type: Boolean},
+    noActions: {type: Boolean},
+    noTimestamp: {type: Boolean},
+    noName: {type: Boolean},
+    noSpheres: {type: Boolean}
   },
   data () {
     return {
@@ -87,30 +93,6 @@ export default {
     }
   },
   methods: {
-    async nodeShare () {
-      this.$log('nodeShare')
-      this.nodeSharing = true
-      await this.$wait(3000)
-      this.nodeSharing = false
-    },
-    async nodeRate () {
-      this.$log('nodeRate')
-      this.nodeRating = true
-      await this.$wait(3000)
-      this.nodeRating = false
-    },
-    async nodeChain () {
-      this.$log('nodeChain')
-      this.nodeChaining = true
-      await this.$wait(3000)
-      this.nodeChaining = false
-    },
-    async nodeWorkspaceSend () {
-      this.$log('nodeWorkspaceSend')
-      this.nodeWorkspacing = true
-      await this.$wait(3000)
-      this.nodeWorkspacing = false
-    },
     async nodeTemplateChanged (t) {
       this.$log('nodeTemplateChanged', t)
       this.$set(this, 'nodeTemplate', t)
@@ -174,12 +156,6 @@ export default {
       // this.$log('nodeLoad done', this.index, this.node.name)
       return nodeFull
     }
-  },
-  mounted () {
-    // this.$log('mounted')
-  },
-  beforeDestroy () {
-    // this.$log('beforeDestroy')
   }
 }
 </script>

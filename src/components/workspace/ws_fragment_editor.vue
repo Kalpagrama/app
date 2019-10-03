@@ -69,10 +69,12 @@ export default {
         let res = await this.$store.dispatch('workspace/addWSFragment', this.fragmentLocal)
         this.$log('fragmentCreate done')
         this.fragmentCreating = false
-        this.$set(this, 'fragmentLocal', res)
-        // this.$emit('hide')
+        // this.$set(this, 'fragmentLocal', res)
+        this.$emit('hide')
       } catch (e) {
         this.$log('fragmentCrete error', e)
+        this.fragmentCreating = false
+        this.$emit('hide')
       }
     },
     async fragmentUpdate () {

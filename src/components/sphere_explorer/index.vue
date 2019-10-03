@@ -99,9 +99,9 @@ export default {
     },
     async nodesLoad (oid) {
       this.$log('nodesLoad start', oid)
-      let {data: {sphereNodes}} = await this.$apollo.query({
+      let {data: {nodesLoad}} = await this.$apollo.query({
         query: gql`
-          query sphereNodes($oid: OID!) {
+          query nodesLoad($oid: OID!) {
             sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}) {
               totalCount
               items {
@@ -119,8 +119,8 @@ export default {
           oid: oid
         }
       })
-      this.$log('nodesLoad done', sphereNodes)
-      return sphereNodes.items
+      this.$log('nodesLoad done', nodesLoad)
+      return nodesLoad.items
     }
   },
   mounted () {

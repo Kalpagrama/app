@@ -30,5 +30,7 @@ export default {
   bookmarkEditorDialogOpened: false,
   draft: null,
   draftNode: null,
-  draftEditorDialogOpened: false
+  draftEditorDialogOpened: false,
+  answer: null,
+  answerDialogOpened: false
 }

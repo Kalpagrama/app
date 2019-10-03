@@ -23,12 +23,12 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
       template(v-slot:items="{items}")
         .row.full-width.items-start.content-start.q-pa-sm
           div(
-            v-for="(f, fi) in fragments" :key="f.uid"
+            v-for="(f, fi) in fragments" :key="f.uid" @click="fragmentClick(f, fi)"
             :style=`{minHeight: '50px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-white.q-mb-sm
             img(
               :src="f.thumbUrl"
-              :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`)
+              :style=`{height: '50px', width: '89px', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}`).bg-black
             .col
               .row.fit.items-center.q-px-sm
                 span.text-bold {{ f.name }}

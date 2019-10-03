@@ -100,34 +100,35 @@ export default {
     },
     async nodesLoad (oid) {
       this.$log('nodesLoad start')
-      let {data: {contentTopNodes: nodes}} = await this.$apollo.query({
-        query: gql`
-          query contentTopNodes($oid: OID!) {
-            contentTopNodes (contentOid: $oid) {
-              objectShort{
-                oid
-                name
-                type
-                createdAt
-                thumbUrl(preferWidth: 600)
-              }
-              fragments{
-                relativePoints{x}
-                relativeScale
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
-      this.$log('nodesLoad done', nodes)
+      // let {data: {contentTopNodes: nodes}} = await this.$apollo.query({
+      //   query: gql`
+      //     query contentTopNodes($oid: OID!) {
+      //       contentTopNodes (contentOid: $oid) {
+      //         objectShort{
+      //           oid
+      //           name
+      //           type
+      //           createdAt
+      //           thumbUrl(preferWidth: 600)
+      //         }
+      //         fragments{
+      //           relativePoints{x}
+      //           relativeScale
+      //         }
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   }
+      // })
+      // this.$log('nodesLoad done', nodes)
       // return nodes
       // return nodes.map(n => n.objectShort)
-      return nodes.map(n => {
-        return {fragmentsPoints: n.fragments, ...n.objectShort}
-      })
+      // return nodes.map(n => {
+      //   return {fragmentsPoints: n.fragments, ...n.objectShort}
+      // })
+      return []
     },
     timeUpdate (e) {
       this.nowSec = this.player.currentTime

@@ -76,28 +76,9 @@ export default {
     async spheresLoad (sphere) {
       this.$log('spheresLoad start')
       this.spheresLoading = true
-      let {data: {feed: {items}}} = await this.$apollo.query({
-        query: gql`
-          query feed ($search: String!) {
-            feed(type: AUTOCOMPLETE, pagination: {pageSize: 50}, filter: {text: $search, types: [WORD, SENTENCE]} ){
-              count
-              totalCount
-              nextPageToken
-              items {
-                oid
-                type
-                name       
-              }
-            }
-          }
-        `,
-        variables: {
-          search: sphere
-        }
-      })
       this.spheresLoading = false
       this.$log('spheresLoad done')
-      return items
+      return []
     },
     sphereClick (s) {
       this.$log('sphereClick', s)

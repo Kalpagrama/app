@@ -75,9 +75,9 @@ export default {
   methods: {
     async userLoad (oid) {
       this.$log('userLoad start')
-      let {data: {objectList}} = await this.$apollo.query({
+      let {data: {userLoad: [user]}} = await this.$apollo.query({
         query: gql`
-          query objectList ($oid: OID!) {
+          query userLoad ($oid: OID!) {
             objectList(oids: [$oid]) {
               oid
               type
@@ -91,8 +91,8 @@ export default {
           oid
         }
       })
-      this.$log('userLoad done', objectList[0])
-      return objectList[0]
+      this.$log('userLoad done', user)
+      return user
     },
     pageClick (p) {
       this.$log('pageClick', p)

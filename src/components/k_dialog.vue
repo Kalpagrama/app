@@ -1,9 +1,8 @@
 <template lang="pug">
 q-dialog(ref="kdialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="$emit('hide')")
-  //- maxHeight: 'calc(var(--vh, 1vh) * 100)',
   div(@click.self="$refs.kdialog.hide()").row.fit.justify-center.items-end
-    div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden', maxHeight: 'calc(var(--vh, 1vh) * 100 - 60px)', maxWidth: '600px'}`).row.fit
-      slot(name="default")
+    div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden', maxHeight: 'calc(var(--vh, 1vh) * 100 - 0px)', maxWidth: '600px'}`).row.fit
+      slot(name="default" @shit="shit")
 </template>
 
 <script>
@@ -27,37 +26,28 @@ export default {
     }
   },
   methods: {
-    scroll (e) {
-      this.$log('scroll', e)
-      this.$q.notify('scroll')
+    shit (e) {
+      this.$log('shit', e)
     },
     show () {
       this.$refs.kdialog.show()
-      // this.$root.$emit('kdialog_toggle', true)
-      // this.showDialog = true
-      // this.$refs.kdialog.show()
     },
     hide () {
       this.$refs.kdialog.hide()
-      // this.$refs.kdialog.hide()
-      // this.showDialog = false
-      // this.$root.$emit('kdialog_toggle', false)
     },
     toggle () {
       this.$refs.kdialog.toggle()
     }
   },
   mounted () {
-    // this.$log('mounted')
+    this.$log('KDIALOG MOUNTED')
+    this.$refs.kdialog.show()
   },
   beforeDestroy () {
-    // this.$log('beforeDestroy')
+    this.$log('KDIALOG DESTROYED')
   }
 }
 </script>
 
 <style lang="stylus">
-.no-pointer-events
-  // background: red
-  // pointer-events: auto !important
 </style>
