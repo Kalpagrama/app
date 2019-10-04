@@ -6,15 +6,15 @@
     //-   @click="menuClick('/app/home')")
     //-   template(v-slot:default)
     //-     img(:src="`statics/logo.png`" width="40px" height="40px")
-    q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'white' : 'grey-3'" @click="menuClick('/app/home')")
+    q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'white' : 'grey-3'" @click="menuClick(pages.home)")
     //- hot
-    q-btn(round flat icon="whatshot" :color="$route.path === '/app/hot' ? 'white' : 'grey-3'" @click="menuClick('/app/hot')")
+    q-btn(round flat icon="whatshot" :color="$route.path === '/app/hot' ? 'white' : 'grey-3'" @click="menuClick(pages.hot)")
     //- add
-    q-btn(round flat icon="add" :color="$route.path === '/app/create' ? 'white' : 'grey-3'" @click="menuClick('/app/create')")
+    q-btn(round flat icon="add" :color="$route.path === '/app/create' ? 'white' : 'grey-3'" @click="menuClick(pages.create)")
     //- workspace
-    q-btn(round flat icon="cloud_queue" :color="$route.path === '/app/workspace' ? 'white' : 'grey-3'" @click="menuClick('/app/workspace')")
+    q-btn(round flat icon="cloud_queue" :color="$route.path === '/app/workspace' ? 'white' : 'grey-3'" @click="menuClick(pages.workspace)")
     //- user
-    q-btn(round flat icon="menu" :color="$route.path === '/app/menu' ? 'white' : 'grey-3'" @click="menuClick('/app/user')")
+    q-btn(round flat icon="menu" :color="$route.path === '/app/menu' ? 'white' : 'grey-3'" @click="menuClick(pages.user)")
     //- q-btn(round flat color="grey-6" :style=`{overflow: 'hidden', borderRadius: '50%', width: '40px', height: '40px', border: $route.name === 'user' ? '1px solid #027BE3' : 'none'}` @click="menuClick('/app/user')")
     //-   template(v-slot:default)
     //-     img(v-if="$store.state.auth.user" :src="$store.state.auth.user.thumbUrl[0]" style=`width: 42px; height: 42px`)
@@ -26,19 +26,22 @@ export default {
   data () {
     return {
       pages: {
-        'home': {name: 'Home', path: '/app/home'},
-        'hot': {name: 'Hot', path: '/app/hot'},
-        'create': {name: 'Create', path: '/app/create'},
-        'workspace': {name: 'Workspace', path: '/app/workspace'},
-        'user': {name: 'User', path: '/app/user'}
+        'home': {id: 'home', name: 'Home', path: '/app/home'},
+        'hot': {id: 'hot', name: 'Hot', path: '/app/hot'},
+        'create': {id: 'create', name: 'Create', path: '/app/create'},
+        'workspace': {id: 'workspace', name: 'Workspace', path: '/app/workspace'},
+        'user': {id: 'user', name: 'User', path: '/app/user'}
       }
     }
   },
   methods: {
-    menuClick (path) {
+    menuClick (page) {
       this.$log('menuClick')
-      this.$router.push(path)
-      this.$root.$emit('path', path)
+      if (this.$route.name !== page.id) {
+        this.$router.push(page.path)
+      } else {
+        this.$root.$emit('page')
+      }
     }
   }
 }

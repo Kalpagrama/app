@@ -1,15 +1,24 @@
 <template lang="pug">
 q-layout(view='hHh Lpr fFf').bg-primary
-  //- //- bookmark
-  //- k-dialog(:value="$store.state.workspace.bookmarkEditorDialogOpened"
-  //-   @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false]), $store.commit('workspace/state', ['bookmark', null])")
-  //-   ws-bookmark-editor(type="create" :bookmark="$store.state.workspace.bookmark" @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
-  //- //- fragment
-  //- k-dialog(:value="$store.state.workspace.fragmentEditorDialogOpened"
-  //-   @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false]), $store.commit('workspace/state', ['fragment', null])")
-  //-   ws-fragment-editor(type="create" :fragment="$store.state.workspace.fragment" @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false])")
+  //- bookmark
+  k-dialog(
+    v-if="$store.state.workspace.bookmarkEditorDialogOpened" :value="$store.state.workspace.bookmarkEditorDialogOpened"
+    @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false]), $store.commit('workspace/state', ['bookmark', null])")
+    ws-bookmark-editor(type="create" :bookmark="$store.state.workspace.bookmark" @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
+  //- fragment
+  k-dialog(
+    v-if="$store.state.workspace.fragmentEditorDialogOpened" :value="$store.state.workspace.fragmentEditorDialogOpened"
+    @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false]), $store.commit('workspace/state', ['fragment', null])")
+    ws-fragment-editor(type="create" :fragment="$store.state.workspace.fragment" @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false])")
+  //- boomark dialog
+  k-dialog(
+    v-if="$store.state.workspace.bookmarkEditorDialogOpened" :value="$store.state.workspace.bookmarkEditorDialogOpened"
+    @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
+    ws-bookmark-editor(@hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
   //- rate dialog
-  k-dialog(v-if="$store.state.node.rateDialogOpened" :value="$store.state.node.rateDialogOpened" @hide="$store.commit('node/state', ['rateDialogOpened', false])")
+  k-dialog(
+    v-if="$store.state.node.rateDialogOpened" :value="$store.state.node.rateDialogOpened"
+    @hide="$store.commit('node/state', ['rateDialogOpened', false])")
     node-rate(@hide="$store.commit('node/state', ['rateDialogOpened', false])")
   //- drawer
   q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
@@ -131,10 +140,14 @@ export default {
       let { data: { user } } = await this.$apollo.query({query: gql`query getCurrentUser { user { oid name thumbUrl(preferWidth: 50) } }`})
       // this.$log('user', user)
       this.$store.commit('auth/state', ['user', user])
+      // catagories
+      let categories = await this.$store.dispatch('node/categories')
+      // this.$log('catagories', categories)
+      this.$store.commit('node/state', ['categories', categories])
       // workspace
       this.$log('Getting user workspace')
       // this.$q.notify('Getting user workspace!')
-      let userWorkspace = await this.$store.dispatch('workspace/userWorkspace', this.$apollo)
+      let userWorkspace = await this.$store.dispatch('workspace/userWorkspace')
       this.$log('userWorkspace', userWorkspace)
       // return to path
       // let path = localStorage.getItem('path')

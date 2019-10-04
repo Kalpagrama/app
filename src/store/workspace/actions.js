@@ -1,6 +1,6 @@
 const debug = require('debug')('$workspace:action')
 debug.enabled = true
-var apollo = null
+import {apollo} from 'boot/apollo'
 
 const content = gql`
   fragment content on Object {
@@ -90,10 +90,9 @@ const WSTag = gql`
   }
 `
 
-export const userWorkspace = async (state, a) => {
+export const userWorkspace = async (state) => {
   debug('userWorkspace start')
-  if (!apollo) apollo = a
-  let {data: {userWorkspace}} = await a.query({
+  let {data: {userWorkspace}} = await apollo.query({
     query: gql`
       ${WSContent} ${WSFragment} ${WSBookmark} ${WSTag} ${WSDraft}
       query userWorkspace {

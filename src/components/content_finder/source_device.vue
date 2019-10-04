@@ -1,20 +1,11 @@
 <template lang="pug">
-.column.fit
-  div(:style=`{minHeight: '70px'}`).row.full-width
-    div(:style=`{height: '70px'}`).row.full-width.items-center.justify-between.q-px-md
-      q-btn(round color="primary" :icon="source.icon" @click="$emit('sourcesToggle')")
-      span.text-bold {{ source.name }}
-      q-btn(round flat icon="more_horiz" color="grey-8")
-    //- div(:style=`{height: '70px'}`).full-width.scroll
-    //-   .row.full-width.no-wrap
-    //-     div(
-    //-       v-for="(t, ti) in $store.state.workspace.contentTypes" :key="ti"
-    //-       :style=`{width: '70px', minWidth: '70px', height: '70px'}`).row.items-center.justify-center
-    //-         q-btn(round  :style=`{background: t.color, color: 'white'}` :icon="t.icon")
+div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.bg-white
   .col.scroll
     .row.full-width.q-px-sm
       input(style=`display: none` ref="fileinput" type="file")
-      q-btn(icon="attachment" color="primary" style=`height: 60px; borderRadius: 10px; overflow: hidden` no-caps @click="$refs.fileinput.click()").full-width.q-my-xl
+      q-btn(
+        icon="attachment" color="primary" no-caps @click="$refs.fileinput.click()"
+        style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width.q-my-xl
         span.text-white.text-bold.q-ml-sm Выбрать файл
     //- div(body-scroll-lock-ignore).col.scroll
     //-   .row.full-width.items-start.content-start

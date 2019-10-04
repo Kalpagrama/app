@@ -70,6 +70,7 @@ export default {
       switch (id) {
         case 'to_bookmark': {
           this.$log('nodeShare', id)
+          this.nodeBookmark()
           break
         }
         case 'to_telegram': {
@@ -82,34 +83,18 @@ export default {
         }
       }
     },
-    nodeRate () {
+    async nodeRate () {
       this.$log('nodeRate')
       this.$store.commit('node/state', ['node', this.node])
       this.$store.commit('node/state', ['nodeFull', this.nodeFull])
-      this.$store.commit('node/state', ['rateDialogOpened', true])
-    },
-    async nodeRateJob () {
-      this.$log('nodeRateJob start')
-      this.nodeRating = true
-      let {data: { nodeRate }} = await this.$apollo.mutate({
-        mutation: gql`
-          mutation nodeRate2($oid: OID!, $rate: Float!) {
-            nodeRate(oid: $oid, rate: $rate)
-          }
-        `,
-        variables: {
-          oid: this.node.oid,
-          rate: this.value / 100
-        }
+      await this.$wait(300)
+      this.$nextTick(() => {
+        this.$store.commit('node/state', ['rateDialogOpened', true])
       })
-      await this.$wait(200)
-      this.nodeRating = false
-      this.nodeRated = true
-      this.$log('nodeRateJob done')
     },
     async nodeBookmark () {
       this.$log('nodeBookmark')
-      this.$store.commit('workspace/state', ['bookmark', {oid: this.node.oid}])
+      this.$store.commit('workspace/state', ['bookmark', {url: this.node.oid}])
       await this.$wait(300)
       this.$nextTick(() => {
         this.$store.commit('workspace/state', ['bookmarkEditorDialogOpened', true])

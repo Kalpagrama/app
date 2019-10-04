@@ -9,5 +9,6 @@ export default {
   },
   node: null,
   nodeFull: null,
-  rateDialogOpened: false
+  rateDialogOpened: false,
+  categories: []
 }

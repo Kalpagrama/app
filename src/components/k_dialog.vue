@@ -20,6 +20,7 @@ export default {
   watch: {
     value: {
       handler (to, from) {
+        this.$log('value CHANGED', to)
         if (to) this.show()
         else this.hide()
       }
@@ -41,7 +42,7 @@ export default {
   },
   mounted () {
     this.$log('KDIALOG MOUNTED')
-    this.$refs.kdialog.show()
+    if (this.value) this.$refs.kdialog.show()
   },
   beforeDestroy () {
     this.$log('KDIALOG DESTROYED')

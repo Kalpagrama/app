@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.fit
   //- editors
-  k-dialog(ref="nodeEditorDialog")
+  k-dialog(ref="nodeEditorDialog" :value="false")
     node-editor(:node="node" @hide="$refs.nodeEditorDialog.hide()"
       @name="name = $event" @spheres="spheres = $event" @meta="meta = $event")
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
@@ -10,7 +10,7 @@
       @create="$event => fragmentCreate(content, $event)" @update="fragmentUpdate" @delete="fragmentDelete"
       @hide="$refs.videoEditorDialog.hide(), content = null")
   //- content finder dialog position="bottom"
-  k-dialog(ref="contentFinderDialog")
+  k-dialog(ref="contentFinderDialog" :value="false")
     content-finder(@content="contentSelected" @close="$refs.contentFinderDialog.hide()")
   //- panels wrapper
   q-tab-panels(ref="kpanels" v-model="tab" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).row.fit
@@ -229,7 +229,8 @@ export default {
             relativeScale: f.relativeScale
           }
         }),
-        meta: node.meta
+        meta: node.meta,
+        categories: ['POLITICS', 'SPIRIT', 'EDUCATION', 'FUN', 'SCIENCE', 'HEALTH', 'SPORT']
       }
     },
     async nodePublish () {

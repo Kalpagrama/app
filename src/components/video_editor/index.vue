@@ -13,7 +13,7 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
   q-dialog(ref="menuRightDialog" :maximized="true")
     //- menu-right
   q-resize-observer(@resize="onResize")
-  div(v-if="true" style=`position: absolute; pointerEvents: none; zIndex: 300; right: 16px; width: 350px; opacity: 0.4; borderRadius: 10px; maxHeight: 500px; top: 76px; color: white`
+  div(v-if="false" style=`position: absolute; pointerEvents: none; zIndex: 300; right: 16px; width: 350px; opacity: 0.4; borderRadius: 10px; maxHeight: 500px; top: 76px; color: white`
     ).row.bg-purple.q-pa-sm.scroll
     small(v-for="(d, di) in debug").full-width {{d}}:{{get(d)}}
   //- k-menu(ref="kmenu" :fragments="fragments" :colors="colors" :duration="duration")
@@ -35,7 +35,7 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
     round icon="check" color="primary" @click="ready()")
   //- menu-time-menu
   div(v-show="duration > 0" :style=`{position: 'absolute', zIndex: 200, bottom: timelineBottom+160+'px', height: '50px', opacity: 0.6}`
-    ).row.full-width.items-center.justify-between.q-px-md.br
+    ).row.full-width.items-center.justify-between.q-px-md
     //- actions left
     div(:style=`{minWidth: '80px'}`).row.full-height.items-center
       q-btn(round flat icon="menu" color="white" @click="menuLeftToggle()").bg-grey-9
@@ -51,7 +51,7 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
       q-btn(round flat :icon="timelineBottom === 0 ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" color="white" @click="timelineToggle()").bg-grey-9.q-mr-sm
       q-btn(round flat icon="menu" color="white" @click="menuRightToggle()").bg-grey-9
   //- relative points
-  div(:style=`{position: 'absolute', bottom: timelineBottom+82+'px', height: '80px', paddingLeft: width/2+'px'}`).row.full-width.bo
+  div(:style=`{position: 'absolute', bottom: timelineBottom+82+'px', height: '80px', paddingLeft: width/2+'px'}`).row.full-width
     div(v-for="(f, fkey, fi) in fragments" :key="fkey" v-show="fragmentsVisible[fkey]")
       div(v-for="(p, pi) in f.relativePoints"
         :style=`{position: 'absolute', top: '0px', zIndex: 400, height: '160px', width: '1px',
@@ -71,7 +71,7 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
             ).row.items-center.justify-center.cursor-pointer
             span(style=`user-select: none`).text-white.text-bold {{ fi+1 }}
   //- timeline
-  div(:style=`{position: 'absolute', bottom: timelineBottom+'px', height: '82px'}`).row.full-width.justify-center.items-center.content-center.bg
+  div(:style=`{position: 'absolute', bottom: timelineBottom+'px', height: '82px'}`).row.full-width.justify-center.items-center.content-center
     //- frames
     div(ref="kframes" :style=`{position: 'relative'}` v-touch-pan.mouse.stop="framesDrag" @scroll="framesScroll" body-scroll-lock-ignore).row.full-width.scroll
       div(:style=`{borderRadius: '10px', marginTop: '16px', marginBottom: '16px'}`).row.no-wrap

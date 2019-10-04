@@ -6,7 +6,7 @@ const routes = [
     component: () => import('layouts/main_layout'),
     children: [
       { name: 'home', path: 'home', component: () => import('pages/app/home') },
-      { name: 'hot', path: 'hot', component: () => import('pages/app/hot') },
+      { name: 'hot', path: 'hot/:category?', component: () => import('pages/app/hot') },
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
