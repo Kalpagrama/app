@@ -82,7 +82,7 @@ export default {
       let { data: { sphereSpheres: { items: spheres } } } = await this.$apollo.query({
         query: gql`
           query sphereSpheres ($oid: OID!){
-            sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}) {
+            sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
               items {
                 oid
                 name
@@ -99,10 +99,10 @@ export default {
     },
     async nodesLoad (oid) {
       this.$log('nodesLoad start', oid)
-      let {data: {nodesLoad}} = await this.$apollo.query({
+      let {data: {sphereNodes}} = await this.$apollo.query({
         query: gql`
           query nodesLoad($oid: OID!) {
-            sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}) {
+            sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}, sortStrategy: HOT) {
               totalCount
               items {
                 oid
@@ -119,8 +119,8 @@ export default {
           oid: oid
         }
       })
-      this.$log('nodesLoad done', nodesLoad)
-      return nodesLoad.items
+      this.$log('nodesLoad done', sphereNodes)
+      return sphereNodes.items
     }
   },
   mounted () {

@@ -5,18 +5,15 @@ div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width.bg-grey-4
 </template>
 
 <script>
-import kPage from 'components/k_page'
-import nodeLoader from 'components/node_loader'
-
 export default {
   name: 'pageApp__home',
-  components: { kPage, nodeLoader },
+  components: {},
   data () {
     return {
       nodes: [],
       query: gql`
         query feed($pageToken: RawJSON) {
-          feed(type: NEWS, pagination: {pageSize: 100, pageToken: $pageToken} filter: {types:[NODE]} ) {
+          feed(pagination: {pageSize: 100, pageToken: $pageToken}) {
             count
             totalCount
             nextPageToken
@@ -26,6 +23,12 @@ export default {
               thumbUrl (preferWidth: 600)
               createdAt
               name
+              meta {
+                ...on MetaNode {
+                  layout
+                  fragments { uid width height color }
+                }
+              }
             }
           }
         }

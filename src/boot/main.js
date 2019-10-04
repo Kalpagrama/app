@@ -103,9 +103,9 @@ export default async ({ Vue, store, router }) => {
   Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
   Vue.component('wsBookmarkEditor', () => import('components/workspace/ws_bookmark_editor'))
   Vue.component('wsFragmentEditor', () => import('components/workspace/ws_fragment_editor'))
-  Vue.component('wsAnswer', () => import('components/workspace/ws_answer'))
   Vue.component('node', () => import('components/node'))
   Vue.component('nodeRate', () => import('components/node/node_rate'))
+  Vue.component('nodeLoader', () => import('components/node_loader'))
 }
 
 export { time }

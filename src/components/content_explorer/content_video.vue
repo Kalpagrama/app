@@ -100,29 +100,23 @@ export default {
     },
     async nodesLoad (oid) {
       this.$log('nodesLoad start')
-      // let {data: {contentTopNodes: nodes}} = await this.$apollo.query({
-      //   query: gql`
-      //     query contentTopNodes($oid: OID!) {
-      //       contentTopNodes (contentOid: $oid) {
-      //         objectShort{
-      //           oid
-      //           name
-      //           type
-      //           createdAt
-      //           thumbUrl(preferWidth: 600)
-      //         }
-      //         fragments{
-      //           relativePoints{x}
-      //           relativeScale
-      //         }
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     oid: oid
-      //   }
-      // })
-      // this.$log('nodesLoad done', nodes)
+      let {data: {sphereNodes}} = await this.$apollo.query({
+        query: gql`
+          query contentNodes($oid: OID!) {
+            sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}, sortStrategy: HOT) {
+              items {
+                oid
+                type
+                name
+              }
+            }
+          }
+        `,
+        variables: {
+          oid: oid
+        }
+      })
+      this.$log('nodesLoad done', sphereNodes)
       // return nodes
       // return nodes.map(n => n.objectShort)
       // return nodes.map(n => {

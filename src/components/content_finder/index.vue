@@ -1,16 +1,26 @@
 <template lang="pug">
-div(
-  :style=`{position: 'relative'}`
-  ).row.fit.justify-center.bg-white
-  div(v-show="sourcesShow").row.full-height.bg-grey-2
-    sources(:sources="sources" :source="source" @source="source = $event" :disable="disableSourcesSwitch")
-  .col.full-height
-    keep-alive
-      component(v-if="sources[source]" :is="`source-${sources[source].type}`" :source="sources[source]"
-        @sourcesToggle="sourcesShow = !sourcesShow"
-        :progress="progress" @uploading="uploading" @uploaded="uploaded")
-      div(v-else).row.fit.items-center.justify-center
-        q-spinner(:thickness="2" color="primary" size="50px")
+.column.fit.bg-white
+  div(:style=`{height: '70px'}`).row.full-width
+    div(:style=`{height: '70px', width: '70px'}` :class=`{'bg-grey-2': sourcesShow}`).row.items-center.justify-center
+      q-btn(color="primary" round flat icon="menu" @click="sourcesShow = !sourcesShow")
+    .col.full-height
+      .row.fit.items-center.content-center.q-px-md
+        span.text-bold Добавить фрагмент
+        .row.full-width
+          span {{ sources[source].name }}
+  .col
+    div(
+      :style=`{position: 'relative'}`
+      ).row.fit.justify-center.bg-white
+      div(v-show="sourcesShow").row.full-height.bg-grey-2
+        sources(:sources="sources" :source="source" @source="source = $event" :disable="disableSourcesSwitch")
+      .col.full-height
+        keep-alive
+          component(v-if="sources[source]" :is="`source-${sources[source].type}`" :source="sources[source]"
+            @sourcesToggle="sourcesShow = !sourcesShow"
+            :progress="progress" @uploading="uploading" @uploaded="uploaded")
+          div(v-else).row.fit.items-center.justify-center
+            q-spinner(:thickness="2" color="primary" size="50px")
 </template>
 
 <script>
@@ -25,23 +35,23 @@ export default {
   components: {sources, sourceUrl, sourceWorkspace, sourceYoutube, sourceDevice},
   data () {
     return {
-      source: undefined,
-      sourcesShow: false,
+      source: 'url',
+      sourcesShow: true,
       sources: {
-        url: {type: 'url', name: 'Добавить по ссылке', nameMini: 'Url', icon: 'link'},
-        workspace: {type: 'workspace', name: 'Мастерская', nameMini: false, icon: 'cloud'},
-        device: {type: 'device', name: 'Загрузить с устройства', nameMini: false, icon: 'folder'},
-        youtube: {type: 'youtube', name: 'Найти в Youtube', nameMini: 'YT', icon: 'fab fa-youtube'},
-        google: {type: 'google', name: 'Google', nameMini: 'G', icon: 'fab fa-google'},
-        pinterest: {type: 'pinterest', name: 'Pinterest', nameMini: 'G', icon: 'fab fa-pinterest'},
-        vk: {type: 'vk', name: 'Вконтакте', nameMini: 'VK', icon: 'fab fa-vk'},
-        vimeo: {type: 'vimeo', name: 'Vimeo', nameMini: 'VM', icon: 'fab fa-vimeo'},
-        'yandexdisk-9120390123': {type: 'yandexdisk', name: 'Яндекс Диск 1', nameMini: 'ЯД', icon: false},
-        'yandexdisk-2392940324': {type: 'yandexdisk', name: 'Яндекс Диск 2', nameMini: 'ЯД', icon: false},
-        'googledrive-123912309': {type: 'googledrive', name: 'Google drive 1', nameMini: 'GD', icon: 'fab fa-yandex'},
-        'googledrive-129310239': {type: 'googledrive', name: 'Google drive 2', nameMini: 'GD', icon: false},
-        'dropbox-393403948': {type: 'dropbox', name: 'Dropbox 1', nameMini: 'DP', icon: false},
-        'dropbox-239023939': {type: 'dropbox', name: 'Dropbox 2', nameMini: 'DP', icon: false}
+        url: {type: 'url', name: 'по ссылке', nameMini: 'Url', icon: 'link'},
+        workspace: {type: 'workspace', name: 'из мастерской', nameMini: false, icon: 'cloud'},
+        device: {type: 'device', name: 'с устройства', nameMini: false, icon: 'folder'},
+        youtube: {type: 'youtube', name: 'из Youtube', nameMini: 'YT', icon: 'fab fa-youtube'},
+        google: {type: 'google', name: 'из Google', nameMini: 'G', icon: 'fab fa-google'},
+        pinterest: {type: 'pinterest', name: 'из Pinterest', nameMini: 'G', icon: 'fab fa-pinterest'},
+        vk: {type: 'vk', name: 'из Вконтакте', nameMini: 'VK', icon: 'fab fa-vk'},
+        vimeo: {type: 'vimeo', name: 'из Vimeo', nameMini: 'VM', icon: 'fab fa-vimeo'},
+        'yandexdisk-9120390123': {type: 'yandexdisk', name: 'из Яндекс Диск 1', nameMini: 'ЯД', icon: false},
+        'yandexdisk-2392940324': {type: 'yandexdisk', name: 'из Яндекс Диск 2', nameMini: 'ЯД', icon: false},
+        'googledrive-123912309': {type: 'googledrive', name: 'из Google drive 1', nameMini: 'GD', icon: 'fab fa-yandex'},
+        'googledrive-129310239': {type: 'googledrive', name: 'из Google drive 2', nameMini: 'GD', icon: false},
+        'dropbox-393403948': {type: 'dropbox', name: 'из Dropbox 1', nameMini: 'DP', icon: false},
+        'dropbox-239023939': {type: 'dropbox', name: 'из Dropbox 2', nameMini: 'DP', icon: false}
       },
       type: undefined,
       types: {

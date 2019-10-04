@@ -10,7 +10,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px', overflow: 'hi
         span(style=`whiteSpace: nowrap`).text-bold {{ bookmarkLocal.name || 'Новая закладка' | cut(36) }}
     //- delete
     div(:style=`{width: '70px'}`).row.full-height.items-center.content-center.justify-center
-      k-menu-popup(v-if="bookmark" :name="'Точно удалить закладку?'" :actions="actions" @action="bookmarkDelete")
+      k-menu-popup(v-if="value" :name="'Точно удалить закладку?'" :actions="actions" @action="bookmarkDelete")
         q-btn(round flat icon="delete_outline" color="grey-6")
   //- body
   div(ignore-body-scroll-lock).col.scroll.full-width
@@ -36,9 +36,9 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px', overflow: 'hi
   //- create / update btn
   div(:style=`{height: '80px'}`).row.full-width.items-center.content-center.q-px-sm
     q-btn(
-      color="primary" no-caps :loading="bookmarkCreating" @click="bookmark && bookmark.uid ? bookmarkDraft () : bookmarkCreate()"
+      color="primary" no-caps :loading="bookmarkCreating" @click="value && value.uid ? bookmarkDraft () : bookmarkCreate()"
       style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-      span.text-bold.text-white {{bookmark && bookmark.uid ? 'Создать ядро' : 'Создать закладку'}}
+      span.text-bold.text-white {{value && value.uid ? 'Создать ядро' : 'Создать закладку'}}
 </template>
 
 <script>
@@ -47,7 +47,7 @@ import wsTagsInput from './ws_tags_input'
 export default {
   name: 'wsBookmarkEditor',
   components: {wsTagsInput},
-  props: ['type', 'bookmark'],
+  props: ['value'],
   data () {
     return {
       loading: true,
@@ -148,9 +148,9 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted', this.bookmark)
-    if (this.bookmark) {
-      this.$set(this, 'bookmarkLocal', {...this.bookmarkLocal, ...JSON.parse(JSON.stringify(this.bookmark))})
+    this.$log('mounted', this.value)
+    if (this.value) {
+      this.$set(this, 'bookmarkLocal', {...this.bookmarkLocal, ...JSON.parse(JSON.stringify(this.value))})
       this.$refs.nameInput.focus()
     } else {
       this.$refs.urlInput.focus()

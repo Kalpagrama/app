@@ -1,24 +1,21 @@
 <template lang="pug">
 .column.fit
-  div(:style=`{minHeight: '70px'}`).row.full-width.q-px-sm
-    div(:style=`{height: '70px'}`).row.full-width.items-center.justify-between
-      q-btn(round :icon="source.icon" color="primary" @click="$emit('sourcesToggle')")
-      .col
-        .row.fit.items-center.content-center.q-px-sm
-          span.text-bold {{ source.name }}
-      //- q-btn(round flat icon="more_horiz" color="grey-8")
-    div(:style=`{minHeight: height+'px'}`).row.full-width.items-end
+  //- header
+  div(:style=`{minHeight: '70px'}`).row.full-width
+    //- q-btn(round flat icon="more_horiz" color="grey-8")
+    div(:style=`{minHeight: height+'px'}`).row.full-width.items-end.q-px-sm
       div(:style=`{height: '56px', borderRadius: '10px', overflow: 'hidden', zIndex: 300}`).row.full-width
         .row.full-width
           q-input(ref="inputUrl" v-model="input" filled placeholder="Вставьте ссылку" @keydown.enter="inputEnterHandle" @input="inputHandle" @focus="inputFocusHandle" @blur="inputBlurHandle").full-width
             template(v-slot:append)
               q-btn(v-if="input.length > 0" round flat icon="clear" @click="inputClear()")
-  div(body-scroll-lock-ignore).col.scroll
+  //- body
+  div(body-scroll-lock-ignore).col.scroll.full-width
     .row.full-width.items-start.content-start
       div(v-show="!inputFocused && input.length === 0").row.full-width.q-pa-sm
         //- icon="save_alt"
-        q-btn(color="primary" outline style=`height: 56px; borderRadius: 10px` no-caps @click="inputBuffer()").full-width
-          span.text-bold Вставить из буфера обмена
+        q-btn(color="grey-7" outline style=`height: 50px; borderRadius: 10px` no-caps @click="inputBuffer()").full-width
+          span Вставить из буфера обмена
       div(v-show="inputValid").row.full-width.q-px-sm
         div(:style=`{position: 'relative', paddingTop: '100%', borderRadius: '10px', overflow: 'hidden', zIndex: 1000}`
           ).row.full-width.q-my-sm.bg-grey-3
@@ -28,6 +25,7 @@
             :src="inputUrl")
           div(v-if="!iframeReady" :style=`{position: 'absolute', zIndex: 1000, top: 0, left: 0}`).row.fit.items-center.justify-center
             q-spinner(:thickness="4" size="50px" color="primary")
+  //- footer
   div(v-if="inputUrl" :style=`{height: '70px'}`).row.full-width.q-px-sm
     q-btn(color="primary" style=`height: 60px; borderRadius: 10px` no-caps @click="upload()"
       :disable="!iframeReady"

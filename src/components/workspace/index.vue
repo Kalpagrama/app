@@ -9,7 +9,9 @@ div(:style=`{position: 'relative'}`).row.fit
   div(:style=`{position: 'absolute', left: '0px', zIndex: 200, width: menusWidth+'px', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`
     ).column.full-height.bg-grey-2
     //- menu header
-    div(:style=`{height: '70px'}`).row.full-width.items-center.justify-center
+    div(
+      v-if="!inFinder"
+      :style=`{height: '70px'}`).row.full-width.items-center.justify-center
       div(:style=`{height: '70px', width: '60px'}`).row.items-center.justify-center
         q-btn(icon="keyboard_arrow_left" round flat color="primary" @click="menuToggle()").q-mx-sm
       .col
@@ -25,16 +27,18 @@ div(:style=`{position: 'relative'}`).row.fit
           .col
             .row.fit.items-center.q-px-sm
               span(:class=`{'text-primary': menu === mkey}`).text-bold {{ m.name }}
-  ws-bookmarks(v-if="menu === 'bookmarks'" @menu="menuToggle()")
-  ws-contents(v-else-if="menu === 'contents'" @menu="menuToggle()")
-  ws-fragments(v-else-if="menu === 'fragments'" @menu="menuToggle()")
-  ws-drafts(v-else-if="menu === 'drafts'" @menu="menuToggle()")
-  ws-settings(v-else-if="menu === 'settings'" @menu="menuToggle()")
-  ws-tags(v-else-if="menu === 'tags'" @menu="menuToggle()")
-  ws-dashboard(v-else @menu="menuToggle()")
+  ws-items(type="bookmark" @item="$emit('item', $event)")
+  //- ws-bookmarks(v-if="menu === 'bookmarks'" @menu="menuToggle()")
+  //- ws-contents(v-else-if="menu === 'contents'" @menu="menuToggle()")
+  //- ws-fragments(v-else-if="menu === 'fragments'" @menu="menuToggle()")
+  //- ws-drafts(v-else-if="menu === 'drafts'" @menu="menuToggle()")
+  //- ws-settings(v-else-if="menu === 'settings'" @menu="menuToggle()")
+  //- ws-tags(v-else-if="menu === 'tags'" @menu="menuToggle()")
+  //- ws-dashboard(v-else @menu="menuToggle()")
 </template>
 
 <script>
+import wsItems from './ws_items'
 import wsBookmarks from './ws_bookmarks'
 import wsFragments from './ws_fragments'
 import wsContents from './ws_contents'
@@ -45,8 +49,8 @@ import wsTags from './ws_tags'
 
 export default {
   name: 'workspace',
-  components: {wsBookmarks, wsFragments, wsContents, wsSettings, wsDrafts, wsDashboard, wsTags},
-  props: ['source'],
+  components: {wsItems, wsBookmarks, wsFragments, wsContents, wsSettings, wsDrafts, wsDashboard, wsTags},
+  props: ['source', 'inFinder'],
   data () {
     return {
       reactive: 1,

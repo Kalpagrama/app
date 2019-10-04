@@ -87,37 +87,29 @@ export default {
     },
     async fragmentNodes (fragment) {
       this.$log('fragmentNodes start', fragment)
-      let { data: { fragmentTopNodes } } = await this.$apollo.query({
+      let { data: { sphereNodes } } = await this.$apollo.query({
         query: gql`
-          query fragmentTopNodes($fragment: FragmentInput!) {
-            fragmentTopNodes(fragment: $fragment) {
-              objectShort {
+          query fragmentTopNodes($oid: OID!) {
+            sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}, sortStrategy: HOT) {
+              items {
                 oid
                 type
                 name
-                createdAt
-                thumbUrl(preferWidth: 600)
-              }
-              fragments {
-                fragmentIndx
-                relativeScale
-                relativePoints {
-                  x
-                }
               }
             }
           }
         `,
         variables: {
-          fragment: fragment
+          oid: fragment.oid
         }
       })
-      this.$log('fragmentNodes done', fragmentTopNodes)
+      this.$log('fragmentNodes done', sphereNodes)
       // return fragmentTopNodes
       // return fragmentTopNodes.map(n => n.objectShort)
-      return fragmentTopNodes.map(n => {
-        return {fragmentsPoints: n.fragments, ...n.objectShort}
-      })
+      // return sphereNodes.items.map(n => {
+      //   return {fragmentsPoints: n.fragments, ...n.objectShort}
+      // })
+      return sphereNodes.items
     },
     async nodesLoad () {
       this.$log('nodesLoad start')

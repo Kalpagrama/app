@@ -115,15 +115,6 @@ export default {
           })
           break
         }
-        // case 'node_answer': {
-        //   this.$log('fragmentAction', a.id)
-        //   let node = JSON.parse(JSON.stringify(this.nodeFull))
-        //   this.$store.commit('workspace/state', ['answer', node])
-        //   this.$nextTick(() => {
-        //     this.$store.commit('workspace/state', ['answerDialogOpened', true])
-        //   })
-        //   break
-        // }
       }
     }
   },

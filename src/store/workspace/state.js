@@ -32,5 +32,12 @@ export default {
   draftNode: null,
   draftEditorDialogOpened: false,
   answer: null,
-  answerDialogOpened: false
+  answerDialogOpened: false,
+  types: {
+    WSBookmark: {name: 'Закладка'},
+    WSContent: {name: 'Контент'},
+    WSFragment: {name: 'Фрагмент'},
+    WSDraft: {name: 'Черновик'},
+    WSTag: {name: 'Тэг'}
+  }
 }

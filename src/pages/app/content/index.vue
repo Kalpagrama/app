@@ -37,7 +37,7 @@ export default {
   methods: {
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
-      let {data: {contentLoad: [content]}} = await this.$apollo.query({
+      let {data: {objectList: [content]}} = await this.$apollo.query({
         query: gql`
           query contentLoad ($oid: OID!) {
             objectList(oids: [$oid]) {

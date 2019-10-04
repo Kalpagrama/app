@@ -3,6 +3,28 @@ debug.enabled = true
 
 import {apollo} from 'boot/apollo'
 
+export const categories = async (store) => {
+  debug('categories start')
+  let {data: {categories}} = await apollo.query({
+    query: gql`
+      query categories {
+        categories {
+          type
+          name
+          icon
+          sphere {
+            oid
+            type
+            name
+          }
+        }
+      }
+    `
+  })
+  debug('categories done', categories)
+  return categories
+}
+
 export const nodeUnrate = async (store, oid) => {
   debug('nodeUnrate start')
   if (!oid) return
@@ -52,6 +74,7 @@ export const nodeDelete = async (store, oid) => {
 
 export const nodeCreate = async (store, payload) => {
   debug('nodeCreate start', payload)
+  if (!payload.fragments || payload.fragments.length === 0) throw new Error('Wrong fragments!')
   let node = {
     name: payload.name || '',
     spheres: [],
