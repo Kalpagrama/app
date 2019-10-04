@@ -44,13 +44,10 @@
       div(v-for="(f, fi) in 2" :key="fi" v-show="fragmentActive === fi").row.fit
         node-fragment-video(v-if="nodeFull.fragments[fi].content.type === 'VIDEO'" :zIndex="zIndex" :url="nodeFull.fragments[fi].url" :visible="fi === fragmentActive && active")
         node-fragment-image(v-if="nodeFull.fragments[fi].content.type === 'IMAGE'" :zIndex="zIndex" :url="nodeFull.fragments[fi].url" :visible="fi === fragmentActive && active")
-  node-name(:node="node")
-  node-actions(:node="node" :nodeFull="nodeFull")
-    template(v-slot:actions)
-      k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
-        q-btn(icon="brush" color="grey-5" round flat)
-  node-spheres(:node="node" :nodeFull="nodeFull")
-  node-timestamp(:node="node" :nodeFull="nodeFull")
+  node-name(v-if="!noName" :node="node")
+  node-actions(v-if="!noActions" :node="node" :nodeFull="nodeFull")
+  node-spheres(v-if="!noSpheres" :node="node" :nodeFull="nodeFull")
+  node-timestamp(v-if="!noTimestamp" :node="node" :nodeFull="nodeFull")
 </template>
 
 <script>
@@ -66,15 +63,14 @@ import kMenuPopup from 'components/k_menu_popup'
 export default {
   name: 'nodeTemplate__pip',
   components: {nodeName, nodeHeader, nodeActions, nodeSpheres, nodeTimestamp, nodeFragmentVideo, nodeFragmentImage, kMenuPopup},
-  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates', 'inCreator'],
+  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates', 'inCreator', 'noActions', 'noTimestamp', 'noName', 'noSpheres'],
   data () {
     return {
       fragmentActive: 0,
       fragmentActions: [
         {id: 'content_explore', name: 'Исследовать контент'},
-        {id: 'content_workspace', name: 'Добавить контент в мастерскую'},
-        {id: 'fragment_workspace', name: 'Добавить фрагмент в мастерскую'},
-        {id: 'fragment_draft', name: 'Создать ядро'}
+        {id: 'fragment_workspace', name: 'Сохранить в мастерскую'},
+        // {id: 'node_answer', name: 'Ответить', color: '#7d389e', class: ['text-bold', 'text-primary']}
       ]
     }
   },
@@ -109,15 +105,6 @@ export default {
           this.$router.push(`/app/content/${this.nodeFull.fragments[fi].content.oid}`)
           break
         }
-        case 'content_workspace': {
-          this.$log('fragmentAction', a.id)
-          let content = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi].content))
-          this.$store.commit('workspace/state', ['content', content])
-          this.$nextTick(() => {
-            this.$store.commit('workspace/state', ['contentEditorDialogOpened', true])
-          })
-          break
-        }
         case 'fragment_workspace': {
           this.$log('fragmentAction', a.id)
           let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
@@ -128,13 +115,15 @@ export default {
           })
           break
         }
-        case 'fragment_draft': {
-          this.$log('fragmentAction', a.id)
-          // add to workspace
-          // create draft
-          // go to node creator
-          break
-        }
+        // case 'node_answer': {
+        //   this.$log('fragmentAction', a.id)
+        //   let node = JSON.parse(JSON.stringify(this.nodeFull))
+        //   this.$store.commit('workspace/state', ['answer', node])
+        //   this.$nextTick(() => {
+        //     this.$store.commit('workspace/state', ['answerDialogOpened', true])
+        //   })
+        //   break
+        // }
       }
     }
   },

@@ -14,6 +14,7 @@ import { createUploadLink } from 'apollo-upload-client'
 // import { persistCache } from 'apollo-cache-persist'
 import VueApollo from 'vue-apollo'
 import axios from 'axios'
+var apollo
 
 export default async ({ Vue, store, app }) => {
   debug('start')
@@ -142,7 +143,7 @@ export default async ({ Vue, store, app }) => {
     cache
   })
   // provider
-  app.apolloProvider = new VueApollo({
+  const provider = new VueApollo({
     defaultClient: defaultClient,
     clients: {
       defaultClient,
@@ -150,5 +151,9 @@ export default async ({ Vue, store, app }) => {
       ws
     }
   })
+  app.apolloProvider = provider
+  apollo = defaultClient
   debug('done')
 }
+
+export { apollo }

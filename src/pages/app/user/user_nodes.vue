@@ -42,28 +42,7 @@ export default {
     },
     async nodesLoad (oid) {
       this.$log('nodesLoad start')
-      let {data: {sphereNodes: {items}}} = await this.$apollo.query({
-        query: gql`
-          query sphereNodes($oid: OID!) {
-            sphereNodes (sphereOid: $oid, pagination: {pageSize: 50}) {
-              totalCount
-              items {
-                oid
-                type
-                thumbUrl (preferWidth: 600)
-                createdAt
-                name
-              }
-              nextPageToken
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
-      this.$log('nodesLoad done', items)
-      return items
+      return []
     }
   },
   async mounted () {

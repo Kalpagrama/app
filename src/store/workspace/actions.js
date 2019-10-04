@@ -211,7 +211,7 @@ export const updateWSContent = async (store, content) => {
     mutation: gql`
       ${WSContent}
       mutation updateWSContent ($uid: String!, $content: WSContentInput!) {
-        updateWSContnt (uid: $uid, content: $content) {
+        updateWSContent (uid: $uid, content: $content) {
           ...WSContent
         }
       }

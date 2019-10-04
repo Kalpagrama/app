@@ -1,13 +1,6 @@
 <template lang="pug">
 div(
   :style=`{position: 'relative'}`).row.full-width.items-start.content-start
-  //- debug
-  div(
-    v-if="debug"
-    :style=`{position: 'absolute', top: '0px', fontSize: '11px', color: 'white'}`).row.full-width.bg-purple.q-px-sm
-    small.full-width muted: {{muted}}
-    small.full-width playing: {{playing}}
-    small.full-width now: {{$time(now)}}
   //- actions
   div(v-if="true" :style=`{position: 'absolute', zIndex: zIndex+10, top: '8px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
     //- q-btn(round flat color="white" icon="fullscreen" @click="videoToggleFullscreen").shadow-1
@@ -22,7 +15,7 @@ div(
   div(v-if="now > 0" :style=`{position: 'absolute', zIndex: zIndex+100, bottom: '0px', left: '0px', height: '10px'}` @click="videoTimelineClick"
     ).row.full-width.items-end.cursor-pointer
     div(:style=`{width: videoNow+'%', height: '10px', borderRight: '3px solid #5f277a', pointerEvents: 'none'}`).row.bg-primary
-  //- video autoPictureInPicture
+  //- video
   video(
     ref="kvideo"
     :src="url"
@@ -40,11 +33,9 @@ export default {
   props: ['zIndex', 'url', 'active', 'visible'],
   data () {
     return {
-      debug: localStorage.getItem('kvideo_debug') ? true : false,
-      playing: false,
-      muted: localStorage.getItem('ksound') ? false : true,
       now: 0,
       duration: 0,
+      playing: false,
       playsinline: true
     }
   },
@@ -132,9 +123,6 @@ export default {
     }
   },
   async mounted () {
-    // this.$log('mounted')
-    // localStorage.setItem('kvideo_debug', 'all')
-    localStorage.removeItem('kvideo_debug')
   }
 }
 </script>

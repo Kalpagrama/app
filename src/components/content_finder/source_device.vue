@@ -35,19 +35,19 @@ export default {
   methods: {
     async uploadFile (file, length) {
       this.$log('uploadFile')
-      let {data: {uploadContentFile: {oid}}} = await this.$apollo.mutate({
-        client: 'upload',
-        mutation: gql`
-          mutation uploadContentFile ($file: Upload!, $length: Float!) {
-            uploadContentFile (file: $file, length: $length) { oid }
-          }
-        `,
-        variables: {
-          file: file,
-          length: length
-        }
-      })
-      return oid
+      // let {data: {uploadContentFile: {oid}}} = await this.$apollo.mutate({
+      //   client: 'upload',
+      //   mutation: gql`
+      //     mutation uploadContentFile ($file: Upload!, $length: Float!) {
+      //       uploadContentFile (file: $file, length: $length) { oid }
+      //     }
+      //   `,
+      //   variables: {
+      //     file: file,
+      //     length: length
+      //   }
+      // })
+      // return oid
     }
   },
   mounted () {

@@ -60,13 +60,13 @@ export default {
     },
     async logout () {
       this.$log('logout')
-      await this.$apollo.query({
-        query: gql`
-          query logout {
-            logout
-          }
-        `
-      })
+      // await this.$apollo.query({
+      //   query: gql`
+      //     query logout {
+      //       logout
+      //     }
+      //   `
+      // })
     }
   },
   mounted () {

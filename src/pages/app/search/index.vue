@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width
+.row.full-width.bg-red
   span search
 </template>
 
@@ -12,22 +12,7 @@ export default {
       tag: '',
       tags: ['Ядра', 'Люди', 'Цепочки', 'Контент'],
       tagsSelected: ['Ядра'],
-      search: 'hello',
-      query: gql`
-        query nodes($search: String!) {
-          feed(type: SEARCH_COMMON, pagination: {pageSize: 5, pageToken: null} filter: {types:[NODE], text: $search} ){
-            count
-            totalCount
-            nextPageToken
-            items {
-              oid
-              type
-              name
-              thumbUrl(preferWidth: 600)
-            }
-          }
-        }
-      `
+      search: 'hello'
     }
   },
   computed: {
