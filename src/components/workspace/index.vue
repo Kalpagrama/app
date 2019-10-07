@@ -1,56 +1,63 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit
-  //- menu backdrop
-  transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(
-      v-if="menusShow"
-      :style=`{position: 'absolute', left: 0, top: 0, zIndex: 100, background: 'rgba(0, 0, 0, 0.5)'}` @click.self="menuToggle()").row.fit
-  //- menu
-  div(:style=`{position: 'absolute', left: '0px', zIndex: 200, width: menusWidth+'px', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`
-    ).column.full-height.bg-grey-2
-    //- menu header
-    div(
-      v-if="!inFinder"
-      :style=`{height: '70px'}`).row.full-width.items-center.justify-center
-      div(:style=`{height: '70px', width: '60px'}`).row.items-center.justify-center
-        q-btn(icon="keyboard_arrow_left" round flat color="primary" @click="menuToggle()").q-mx-sm
+q-layout(view='hHh Lpr fFf' :container="inFinder")
+  q-drawer(ref="wsMenu" side="left" :width="230")
+    div(:style=`{position: 'relative', borderRadius: '0px 10px 10px 0', overflow: 'hidden'}`).column.fit.bg-white
+      //- menu header
+      div(
+        v-if="!inFinder"
+        :style=`{height: '70px'}`).row.full-width.items-center.justify-center
+        .col
+          .row.fit.items-center.q-px-md
+            span.text-bold Мастерская
+      //- menu body
+      .col.scroll
+        .row.full-width.items-start.content-start
+          div(
+            v-for="(m, mkey) in menus" :key="mkey" @click="menusClick(m, mkey)"
+            :style=`{height: '70px'}`
+            ).row.full-width.items-center.hr.cursor-pointer
+            div(:style=`{width: '40px', height: '70px'}`).row.items-center.justify-end
+              q-icon(:name="m.icon" :color="menu === mkey ? 'primary' : 'grey-9'" :size="menu === mkey ? '25px' : '20px'")
+            .col
+              .row.fit.items-center.q-px-sm
+                span(:class=`{'text-primary': menu === mkey}`).text-bold {{ m.name }}
+  //- header
+  q-header(reveal)
+    div(:style=`{minHeight: '70px'}`).row.full-width.bg-white
+      div(
+        v-if="true"
+        :style=`{height: '70px', width: '70px'}`).row.items-center.justify-center
+        q-btn(round flat icon="menu" color="primary" @click="$refs.wsMenu.toggle()")
       .col
-    //- menu body
-    div(ignore-body-scroll-lock).col.scroll
-      .row.full-width.items-start.content-start
-        div(
-          v-for="(m, mkey) in menus" :key="mkey" @click="menusClick(m, mkey)"
-          :style=`{height: '70px'}`
-          ).row.full-width.items-center.hr.cursor-pointer
-          div(:style=`{width: '40px', height: '70px'}`).row.items-center.justify-end
-            q-icon(:name="m.icon" :color="menu === mkey ? 'primary' : 'grey-9'" :size="menu === mkey ? '25px' : '20px'")
-          .col
-            .row.fit.items-center.q-px-sm
-              span(:class=`{'text-primary': menu === mkey}`).text-bold {{ m.name }}
-  ws-items(type="bookmark" @item="$emit('item', $event)")
-  //- ws-bookmarks(v-if="menu === 'bookmarks'" @menu="menuToggle()")
-  //- ws-contents(v-else-if="menu === 'contents'" @menu="menuToggle()")
-  //- ws-fragments(v-else-if="menu === 'fragments'" @menu="menuToggle()")
-  //- ws-drafts(v-else-if="menu === 'drafts'" @menu="menuToggle()")
-  //- ws-settings(v-else-if="menu === 'settings'" @menu="menuToggle()")
-  //- ws-tags(v-else-if="menu === 'tags'" @menu="menuToggle()")
-  //- ws-dashboard(v-else @menu="menuToggle()")
+        div(:class=`{'q-pl-sm': inFinder}`).row.fit.items-center.content-center.q-pr-sm
+          div(:style=`{borderRadius: '10px', overflow: 'hidden', zIndex: 100, position: 'relative'}`).row.full-width
+            q-input(v-model="search" filled placeholder="Поиск").full-width
+              template(v-slot:append)
+                q-btn(round flat dense color="grey-7" icon="filter_list")
+  //- page
+  q-page-container
+    ws-dashboard(v-if="menu === 'dashboard'" @menu="menusClick(null, $event)")
+    ws-items(v-else @item="$emit('item', $event)")
+  //- footer
+  q-footer(v-if="!inFinder" reveal).bg-grey-4
+    k-menu-horiz(page="workspace" :colors="['primary', 'grey-9']")
 </template>
 
 <script>
 import wsItems from './ws_items'
-import wsBookmarks from './ws_bookmarks'
-import wsFragments from './ws_fragments'
-import wsContents from './ws_contents'
-import wsSettings from './ws_settings'
-import wsDrafts from './ws_drafts'
 import wsDashboard from './ws_dashboard'
-import wsTags from './ws_tags'
 
 export default {
   name: 'workspace',
-  components: {wsItems, wsBookmarks, wsFragments, wsContents, wsSettings, wsDrafts, wsDashboard, wsTags},
-  props: ['source', 'inFinder'],
+  components: {wsItems, wsDashboard},
+  props: {
+    inFinder: {
+      type: Boolean,
+      default () {
+        return false
+      }
+    }
+  },
   data () {
     return {
       reactive: 1,
@@ -88,33 +95,14 @@ export default {
   methods: {
     async menusClick (m, mkey) {
       this.$log('menusClick', m, mkey)
-      await this.menuToggle()
-      // this.$set(this, 'menu', mkey)
-      if (mkey === 'dashboard') this.$router.push('/app/workspace')
-      else this.$router.push({params: {menu: mkey}})
-    },
-    menuToggle () {
-      return new Promise((resolve, reject) => {
-        this.$log('menuToggle')
-        if (this.menusShow) {
-          this.$tween.to(this, 0.3, {
-            menusWidth: 0,
-            onComplete: () => {
-              this.menusShow = false
-              resolve()
-            }
-          })
-        } else {
-          this.menusShow = true
-          this.$tween.to(this, 0.3, {
-            menusWidth: 240,
-            onComplete: () => {
-              this.menusShow = true
-              resolve()
-            }
-          })
-        }
-      })
+      if (this.inFinder) {
+        this.$log('IN FINDER')
+        this.menu = mkey
+      } else {
+        this.$log('IN WORKSPACE')
+        if (mkey === 'dashboard') this.$router.push('/app/workspace')
+        else this.$router.push({params: {menu: mkey}})
+      }
     }
   },
   mounted () {

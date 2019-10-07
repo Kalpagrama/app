@@ -1,7 +1,5 @@
 <template lang="pug">
-div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width.bg-grey-4
-  .col
-    workspace
+workspace
 </template>
 
 <script>

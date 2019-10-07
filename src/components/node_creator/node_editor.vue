@@ -14,14 +14,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
   //- body
   div(:style=`{padding: '0 0 80px 0'}`).col.scroll.full-width
     //- category header
-    div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-md
-      span.text-bold Категория
-    .row.full-width.q-px-sm
-      div(:style=`{height: '56px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.q-px-sm.bg-grey-3
-        span Выберите категорию
-        .col
-        q-icon(name="keyboard_arrow_down" size="30px" color="grey-7").q-mr-sm
+    node-category(:input="node.categories" @input="$emit('categories', $event)")
     //- layout header
     div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-md
       span.text-bold Шаблон
@@ -29,7 +22,8 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
     .row.full-width.q-px-sm
       div(:style=`{height: '56px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.q-px-sm.bg-grey-3
-        span Выберите шаблон
+        //- span Выберите шаблон
+        span Картинка в картинке
         .col
         q-icon(name="keyboard_arrow_down" size="30px" color="grey-7").q-mr-sm
     //- spheres header
@@ -63,8 +57,11 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
 </template>
 
 <script>
+import nodeCategory from './node_category'
+
 export default {
   name: 'nodeCreator__nodeEditor',
+  components: {nodeCategory},
   props: ['node'],
   data () {
     return {

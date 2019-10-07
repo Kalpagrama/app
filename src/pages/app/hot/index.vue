@@ -1,5 +1,6 @@
 <template lang="pug">
-q-layout.window-height
+q-layout
+  //- drawer
   q-drawer(ref="kDrawer" side="left" :width="240")
     div(@click.self="$refs.kDrawer.toggle()").row.fit.items-start.content-start
       div(:style=`{height: 'calc(var(--vh, 1vh) * 100)', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`).column.full-width.bg-grey-4
@@ -18,10 +19,12 @@ q-layout.window-height
               :style=`{height: '60px'}`
               ).row.full-width.items-center.q-px-md.cursor-pointer.hr
               span {{ `#${c.name.charAt(0).toUpperCase() + c.name.slice(1)}` }}
-  q-page-container.window-height
-    .column.fit
-      div(body-scroll-lock-ignore).col.scroll
-        node-loader(v-if="sphereOid" mode="feed" :query="query" queryKey="sphereNodes" :variables="variables")
+  q-page-container
+    node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variables")
+      template(v-slot:items=`{items, fetchingMore}`)
+        node-feed(:nodes="items" :fetchingMore="fetchingMore")
+  q-footer(reveal).bg-grey-4.lt-md
+    k-menu-horiz(page="hot" :colors="['primary', 'grey-7']")
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf').bg-primary
+q-layout(view='hHh Lpr fFf')
   //- bookmark
   k-dialog(
     v-if="$store.state.workspace.bookmarkEditorDialogOpened" :value="$store.state.workspace.bookmarkEditorDialogOpened"
@@ -24,12 +24,15 @@ q-layout(view='hHh Lpr fFf').bg-primary
   q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
     k-menu-vert.bg-primary
   q-page-container
-    q-page(:style=`{borderRadius: $q.screen.gt.sm ? '10px 0 0 10px' : '0 0 10px 10px', overflow: 'hidden'}`)
-      router-view(v-if="!loading" :width="width" :height="height")
-      div(v-else).row.full-width.window-height.items-center.justify-center
-        q-spinner(size="50px" :thickness="2" color="white")
-  q-footer(reveal :style=`{background: 'none '}`).lt-md
-    k-menu-horiz
+    router-view(v-if="!loading")
+    div(v-else).row.full-width.window-height.items-center.justify-center
+      q-spinner(size="50px" :thickness="2" color="white")
+    //- q-page(:style=`{borderRadius: $q.screen.gt.sm ? '10px 0 0 10px' : '0 0 10px 10px', overflow: 'hidden'}`)
+    //-   router-view(v-if="!loading" :width="width" :height="height")
+    //-   div(v-else).row.full-width.window-height.items-center.justify-center
+    //-     q-spinner(size="50px" :thickness="2" color="white")
+  //- q-footer(reveal :style=`{background: 'none '}`).lt-md
+  //-   k-menu-horiz
 </template>
 
 <script>
@@ -68,8 +71,9 @@ export default {
       handler (to, from) {
         this.$log('gt.sm CHANGED', to)
         let vh = window.innerHeight
-        if (to) vh = vh * 0.01
-        else vh = (vh - 60) * 0.01
+        // if (to) vh = vh * 0.01
+        // else vh = (vh - 60) * 0.01
+        vh = vh * 0.01
         document.documentElement.style.setProperty('--vh', `${vh}px`)
       }
     }
@@ -149,13 +153,6 @@ export default {
       // this.$q.notify('Getting user workspace!')
       let userWorkspace = await this.$store.dispatch('workspace/userWorkspace')
       this.$log('userWorkspace', userWorkspace)
-      // return to path
-      // let path = localStorage.getItem('path')
-      // this.$log('path', path)
-      // if (path) this.$router.push(path)
-      // await this.$wait(1000)
-      // this.$log('created done')
-      // console.timeEnd('created')
       this.loading = false
     } catch (error) {
       this.$log('error', error)

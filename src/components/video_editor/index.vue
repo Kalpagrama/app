@@ -27,12 +27,18 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
   //- close with no changes!
   //- TODO: save initial state of fragments!
   q-btn(
-    :style=`{position: 'absolute', top: '16px', left: '16px', opacity: 0.5}`
-    round icon="clear" color="white" @click="ready()").bg-grey-9
+    v-if="inEditor"
+    round icon="clear" color="white" @click="ready()"
+    :style=`{position: 'absolute', top: '16px', left: '16px', opacity: 0.5}`).bg-grey-9
   //- save changes
   q-btn(
-    :style=`{position: 'absolute', top: '16px', right: '16px', opacity: 0.8}`
-    round icon="check" color="primary" @click="ready()")
+    v-if="inEditor"
+    round icon="check" color="primary" @click="ready()"
+    :style=`{position: 'absolute', top: '16px', right: '16px', opacity: 0.8}`)
+  q-btn(
+    v-if="false"
+    round dense color="green" icon="add" @click="$emit('create', {})"
+    :style=`{position: 'absolute', zIndex: 1000, right: '10px', bottom: '24px'}`)
   //- menu-time-menu
   div(v-show="duration > 0" :style=`{position: 'absolute', zIndex: 200, bottom: timelineBottom+160+'px', height: '50px', opacity: 0.6}`
     ).row.full-width.items-center.justify-between.q-px-md
@@ -99,7 +105,7 @@ import menuRight from './menu_right'
 export default {
   name: 'videoEditor',
   components: {menuLeft, menuRight},
-  props: ['content', 'fragments', 'left'],
+  props: ['content', 'fragments', 'inEditor'],
   data () {
     return {
       loading: false,

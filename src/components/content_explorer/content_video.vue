@@ -1,39 +1,5 @@
 <template lang="pug">
-.row.fit
-  //- div(:style=`{maxWidth: isDesktop ? '100%' : '100%'}`).col.full-height
-  //-   q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
-  //-     //- content video
-  //-     q-tab-panel(name="content" :style=`{padding: '0px', background: 'none'}`).column.fit
-  //-       q-resize-observer(ref="kresize" @resize="onResize")
-  //-       div(style=`height: 60px`).row.full-width.items-center.q-px-md.bg-black
-  //-         //- h6.q-ma-xs {{content.name}}/{{width}}/{{height}}
-  //-         //- q-btn(round flat color="grey-9" icon="keyboard_arrow_left")
-  //-         q-icon(name="movie_creation" color='red' size="40px").q-mr-sm
-  //-         .col.full-height
-  //-           .row.fit.items-center.no-wrap.scroll
-  //-             span(style=`whiteSpace: nowrap`).text-bold.text-white {{content.name}}
-  //-         //- q-btn(round flat color="grey-4" icon="more_vert" @click="contentMenuClick")
-  //-       .col.full-width
-  //-         .row.fit
-  //-           div(:style=`{position: 'relative', maxHeight: 'calc(100vh - 120px)'}`).row.fit
-  //-             video(ref="kvideo" playsinline autoplay type="video/mp4" :src="content.url" preload="none"
-  //-               :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
-  //-       //- bar
-  //-       div(v-if="false" :style=`{height: '60px', paddingLeft: '10px', paddingRight: '10px'}`).row.full-width.items-center.bg-black
-  //-         div(style=`height: 40px; borderRadius: 4px; overflow: hidden`).row.full-width.bg-grey-9
-  //-           div(:style=`{width: barNow+'px'}`).row.items-center.bg-white {{nowSec}}/{{content.duration}}
-  //-       div(:style=`{height: '60px'}`).row.full-width.justify-end.items-center.q-px-sm.bg-black
-  //-         q-btn(v-if="!isDesktop" no-caps color="primary" icon-right="keyboard_arrow_right" @click="$refs.kpanels.goTo('nodes')") {{nodes.length}} nodes
-  //-       //- debug
-  //-       div(v-if="false").row.full-width.bg-purple
-  //-         small width: {{width}}
-  //-     //- nodes mobile
-  //-     q-tab-panel(name="nodes" :style=`{padding: '0px'}` v-if="!isDesktop")
-  //-       content-video-nodes(:nodes="nodes" @nodeClick="nodeClick" @back="$refs.kpanels.goTo('content')")
-  //- nodes desktop
-  //- div(v-if="isDesktop").col.full-height.bg-black
-  //-   content-video-nodes(:nodes="nodes" @nodeClick="nodeClick")
-  video-editor(:fragment="fragment" :left="20" :content="content")
+video-editor(:inEditor="inEditor" :fragment="fragment" :left="20" :content="content")
 </template>
 
 <script>
@@ -46,7 +12,8 @@ export default {
   name: 'contentExplorer__contentVideo',
   components: {contentVideoNodes, videoEditor},
   props: {
-    content: {type: Object}
+    content: {type: Object},
+    inEditor: {type: Boolean, default () { return false }}
   },
   data () {
     return {

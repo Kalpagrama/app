@@ -4,18 +4,18 @@
     template(v-slot:actions)
       k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
         q-btn(icon="brush" color="grey-5" round flat)
-  //- wrapper maxHeight: getHeight+'px'
+  //- wrapper
   div(
     :style=`{position: 'relative', zIndex: zIndex+100, maxHeight: '100vh', overflow: 'hidden', borderRadius: '10px'}`
     ).row.full-width.items-start.content-start.bg-grey-3
     //- actions
-    //- .row.full-width.justify-end
     k-menu-popup(v-if="active && nodeFull"
       :style=`{position: 'absolute', zIndex: zIndex+1000, top: '8px', right: '8px'}`
       :name="nodeFull.fragments[fragmentActive].content.name" :actions="fragmentActions"
       @action="$event => fragmentAction($event, fragmentActive)")
-      q-btn(icon="more_horiz" color="white" round flat dense
-        :style=`{opacity: 0.5}`).shadow-1.bg-grey-9
+      div(:style=`{width: '30px', height: '30px', borderRadius: '15px', oveflow: 'hidden', background: 'rgba(0, 0, 0, 0.4)'}`
+        ).row.items-center.justify-center
+        q-icon(color='white' name="more_horiz" size="20px")
     //- forward
     div(@click="forwardClick()"
       :style=`{position: 'absolute', zIndex: zIndex+200, width: '100px', bottom: '10px', right: '10px', borderRadius: '10px', overflow: 'hidden', opacity: 0.7}`

@@ -99,6 +99,7 @@ export default async ({ Vue, store, router }) => {
   // }
   Vue.component('kPage', () => import(`components/k_page`))
   Vue.component('kMenuPopup', () => import(`components/k_menu_popup`))
+  Vue.component('kMenuHoriz', () => import(`components/k_menu_horiz`))
   Vue.component('kDialog', () => import(`components/k_dialog`))
   Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
   Vue.component('wsBookmarkEditor', () => import('components/workspace/ws_bookmark_editor'))
@@ -106,6 +107,7 @@ export default async ({ Vue, store, router }) => {
   Vue.component('node', () => import('components/node'))
   Vue.component('nodeRate', () => import('components/node/node_rate'))
   Vue.component('nodeLoader', () => import('components/node_loader'))
+  Vue.component('nodeFeed', () => import(`components/node_feed`))
 }
 
 export { time }

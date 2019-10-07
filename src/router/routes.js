@@ -13,7 +13,8 @@ const routes = [
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       { name: 'node', path: 'node/:oid', component: () => import('pages/app/node') },
       { name: 'workspace', path: 'workspace/:menu?', component: () => import('pages/app/workspace') },
-      { name: 'create', path: 'create', component: () => import('pages/app/create') }
+      { name: 'create', path: 'create', component: () => import('pages/app/create') },
+      { name: 'menu', path: 'menu', component: () => import('pages/app/menu') }
     ]
   },
   {

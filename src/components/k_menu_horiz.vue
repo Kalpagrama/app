@@ -1,46 +1,35 @@
 <template lang="pug">
 .row.full-width.q-px-sm
-  div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '20px 20px 0 0'}`).row.full-width.items-center.justify-between.q-px-md.q-mx-md
-    //- home
-    //- q-btn(round flat color="grey-6" :style=`{overflow: 'hidden', borderRadius: '50%', width: '40px', height: '40px', border: $route.path === '/app/home' ? '1px solid #027BE3' : 'none'}`
-    //-   @click="menuClick('/app/home')")
-    //-   template(v-slot:default)
-    //-     img(:src="`statics/logo.png`" width="40px" height="40px")
-    q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'white' : 'grey-3'" @click="menuClick(pages.home)")
-    //- hot
-    q-btn(round flat icon="whatshot" :color="$route.path === '/app/hot' ? 'white' : 'grey-3'" @click="menuClick(pages.hot)")
-    //- add
-    q-btn(round flat icon="add" :color="$route.path === '/app/create' ? 'white' : 'grey-3'" @click="menuClick(pages.create)")
-    //- workspace
-    q-btn(round flat icon="cloud_queue" :color="$route.path === '/app/workspace' ? 'white' : 'grey-3'" @click="menuClick(pages.workspace)")
-    //- user
-    q-btn(round flat icon="menu" :color="$route.path === '/app/menu' ? 'white' : 'grey-3'" @click="menuClick(pages.user)")
-    //- q-btn(round flat color="grey-6" :style=`{overflow: 'hidden', borderRadius: '50%', width: '40px', height: '40px', border: $route.name === 'user' ? '1px solid #027BE3' : 'none'}` @click="menuClick('/app/user')")
-    //-   template(v-slot:default)
-    //-     img(v-if="$store.state.auth.user" :src="$store.state.auth.user.thumbUrl[0]" style=`width: 42px; height: 42px`)
+  div(:style=`{height: '50px', overflow: 'hidden', borderRadius: '20px 20px 0 0'}`
+    ).row.full-width.items-end.content-end.justify-between.q-px-md.q-mx-md
+    q-btn(
+      v-for="(p, pkey) in pages" :key="pkey" @click="pageClick(p, pkey)"
+      round flat :color="page === pkey ? colors[0] : colors[1]")
+      q-icon(:name="p.icon" :size="page === pkey ? '30px' : '20px'")
 </template>
 
 <script>
 export default {
   name: 'kMenuHoriz',
+  props: ['page', 'colors'],
   data () {
     return {
       pages: {
-        'home': {id: 'home', name: 'Home', path: '/app/home'},
-        'hot': {id: 'hot', name: 'Hot', path: '/app/hot'},
-        'create': {id: 'create', name: 'Create', path: '/app/create'},
-        'workspace': {id: 'workspace', name: 'Workspace', path: '/app/workspace'},
-        'user': {id: 'user', name: 'User', path: '/app/user'}
+        'home': {name: 'Home', icon: 'blur_on', path: '/app/home'},
+        'hot': {name: 'Hot', icon: 'whatshot', path: '/app/hot'},
+        'create': {name: 'Create', icon: 'add', path: '/app/create'},
+        'workspace': {name: 'Workspace', icon: 'cloud_queue', path: '/app/workspace'},
+        'menu': {name: 'Menu', icon: 'menu', path: '/app/menu'}
       }
     }
   },
   methods: {
-    menuClick (page) {
-      this.$log('menuClick')
-      if (this.$route.name !== page.id) {
-        this.$router.push(page.path)
+    pageClick (p, pkey) {
+      this.$log('pageClick', p, pkey)
+      if (this.page === pkey) {
+        this.$root.$emit('page', p)
       } else {
-        this.$root.$emit('page')
+        this.$router.push(p.path)
       }
     }
   }

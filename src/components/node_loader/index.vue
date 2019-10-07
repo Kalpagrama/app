@@ -1,18 +1,12 @@
 <template lang="pug">
 .row.full-width
-  feed(v-if="kQuery && kQuery.items && mode === 'feed'" :nodes="kQuery.items" @more="fetchMore" :fetchingMore="fetchingMore")
-  node-list(v-if="kQuery && kQuery.items && mode === 'list'" :nodes="kQuery.items" @more="fetchMore" :fetchingMore="fetchingMore")
+  slot(v-if="kQuery" name="items" :items="kQuery.items" :fetchingMore="fetchingMore")
 </template>
 
 <script>
-import feed from './feed'
-import nodeList from 'components/node_list'
-
 export default {
   name: 'nodeLoader',
-  components: {feed, nodeList},
   props: {
-    mode: {type: String, default () { return 'feed' }, required: true},
     query: {type: Object, required: true},
     queryKey: {type: String, required: true},
     variables: {type: Object}

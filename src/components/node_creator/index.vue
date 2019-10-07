@@ -3,10 +3,10 @@
   //- editors
   k-dialog(ref="nodeEditorDialog" :value="false")
     node-editor(:node="node" @hide="$refs.nodeEditorDialog.hide()"
-      @name="name = $event" @spheres="spheres = $event" @meta="meta = $event")
+      @name="name = $event" @spheres="spheres = $event" @categories="categories = $event" @meta="meta = $event")
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(
-      v-if="content" :content="content" :fragments="fragmentsEditing"
+      v-if="content" :content="content" :fragments="fragmentsEditing" :inEditor="true"
       @create="$event => fragmentCreate(content, $event)" @update="fragmentUpdate" @delete="fragmentDelete"
       @hide="$refs.videoEditorDialog.hide(), content = null")
   //- content finder dialog position="bottom"
@@ -19,7 +19,7 @@
       .row.fit.scroll
         div.row.full-height.no-wrap
           //- content finder wrapper
-          div(v-if="false" :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).full-height.q-pa-sm.gt-sm
+          div(v-if="true" :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).full-height.q-pa-sm.gt-sm
             content-finder(:style=`{
               borderRadius: '10px', overflow: 'hidden', zIndex: 100, maxHeight: '100%'}` @content="contentSelected")
           //- fragments selected wrapper
@@ -61,7 +61,8 @@ export default {
       layout: 'PIP',
       layoutPolicy: 'DEFAULT',
       nodePublishing: false,
-      nodeSaving: false
+      nodeSaving: false,
+      categories: []
     }
   },
   computed: {
@@ -89,6 +90,7 @@ export default {
           }
         }),
         spheres: this.spheres,
+        categories: this.categories,
         createdAt: Date.now(),
         meta: {
           layout: this.layout,
@@ -230,7 +232,7 @@ export default {
           }
         }),
         meta: node.meta,
-        categories: ['POLITICS', 'SPIRIT', 'EDUCATION', 'FUN', 'SCIENCE', 'HEALTH', 'SPORT']
+        categories: node.categories
       }
     },
     async nodePublish () {
@@ -264,7 +266,8 @@ export default {
         this.$log('nodePublish done', nodeCreate)
         this.nodePublishing = false
         // go to node page?
-        this.$router.push(`/app/node/${nodeCreate.oid}`)
+        // TODO: wait for node created event
+        this.$router.push(`/app/home`)
       } catch (e) {
         this.$log('nodePublish error', e)
         this.nodePublishing = false

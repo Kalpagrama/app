@@ -1,7 +1,7 @@
 <template lang="pug">
 q-dialog(ref="kdialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="$emit('hide')")
   div(@click.self="$refs.kdialog.hide()").row.fit.justify-center.items-end
-    div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden', maxHeight: 'calc(var(--vh, 1vh) * 100 - 0px)', maxWidth: '600px'}`).row.fit
+    div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden', maxHeight: 'calc(var(--vh, 1vh) * 100 - 60px)', maxWidth: '600px'}`).row.fit
       slot(name="default" @shit="shit")
 </template>
 
