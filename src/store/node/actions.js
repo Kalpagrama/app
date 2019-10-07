@@ -82,8 +82,7 @@ export const nodeCreate = async (store, payload) => {
     meta: {
       layout: 'PIP',
       layoutPolicy: 'DEFAULT',
-      fragments: [],
-      cells: []
+      fragments: []
     }
   }
   if (payload.parentNode) node.parentNode = payload.parentNode
