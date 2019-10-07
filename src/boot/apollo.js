@@ -107,26 +107,23 @@ export default async ({ Vue, store, app }) => {
     cache,
     connectToDevTools: true
   })
-  // ws client
-  const ws = new ApolloClient({
-    link: new WebSocketLink({
-      uri: linkWs,
-      options: {
-        lazy: false,
-        reconnect: true,
-        connectionParams: async () => {
-          debug('FETCH WS')
-          let options = {}
-          const token = localStorage.getItem('ktoken')
-          const d = localStorage.getItem('kdebug')
-          if (token) options.headers['Authorization'] = token
-          if (d) options.headers['X-Kalpagramma-debug'] = d
-          return options
-        }
-      }
-    }),
-    cache
-  })
+    // ws client
+    const ws = new ApolloClient({
+        link: new WebSocketLink({
+            uri: linkWs,
+            options: {
+                reconnect: true,
+                connectionParams: () => {
+                    debug('FETCH WS')
+                    return {
+                        Authorization: localStorage.getItem('ktoken'),
+                        'X-Kalpagramma-debug': localStorage.getItem('kdebug')
+                    }
+                }
+            }
+        }),
+        cache
+    })
   // upload client
   const upload = new ApolloClient({
     link: createUploadLink({
