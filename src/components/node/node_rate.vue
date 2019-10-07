@@ -6,10 +6,10 @@ div(v-if="node").row.fit
     //- header
     //- rate name
     div(:style=`{height: '80px'}`).row.full-width.justify-center.items-center
-      h3.q-ma-xs Далеко
+      h3.q-ma-xs {{ rateName }}
     //- drag shit
-    div.row.full-width.justify-center.bg
-      div(:style=`{position: 'relative', width: '300px', height: '300px'}`).row.br
+    div.row.full-width.justify-center
+      div(:style=`{position: 'relative', width: '300px', height: '300px'}`).row
         q-icon(name="blur_on" :style=`{fontSize: '300px'}` color="grey-9")
         div(
           v-touch-pan.mouse.prevent="fingerDrag"
@@ -20,13 +20,13 @@ div(v-if="node").row.fit
           ).row.items-center.justify-center.bg-primary
           q-icon(name="fingerprint" color="white" size="36px")
     //- debug
-    .row.full-width.justify-center
+    div(v-if="false").row.full-width.justify-center
       //- small {{ fingerLeft }} / {{ fingerTop }}
       small {{ fingerRadius }}
     //- rating numbers
     div(:style=`{height: '80px'}`).row.full-width.justify-center.items-end
-      h4.q-ma-xs.q-mr-sm {{ fingerRate * 100 }} /
-      h3.q-ma-xs.text-bold {{ nodeFull.rate * 100 }}
+      h3.q-ma-xs.q-mr-sm {{ fingerRate }}
+      //- h3.q-ma-xs.text-bold {{ nodeFull.rate * 100 }}
     //- footer
     div(:style=`{position: 'absolute', zIndex: 1000, bottom: '0px', height: '76px', background: 'rgba(255, 255, 255, 0.8)'}`
       ).row.full-width.items-center.q-px-sm
@@ -51,34 +51,50 @@ export default {
     return {
       node: null,
       nodeFull: null,
-      nodeRated: false,
+      // nodeRated: false,
       nodeRating: false,
       actions: [
         {id: 'answer', name: 'Ответить ядром'}
       ],
-      fingerLeft: 0,
-      fingerTop: 0
+      fingerLeft: 150,
+      fingerTop: 150
     }
   },
   computed: {
-    // nodeRated () {
-    //   return this.nodeFull.rateUser
-    // }
+    nodeRated () {
+      if (this.nodeFull) {
+        return this.nodeFull.rateUser
+      } else {
+        return false
+      }
+    },
+    rateName () {
+      let r = this.fingerRate
+      if (r === 0) return 'Нет'
+      else if (r > 0 && r <= 25) return 'Скорее нет'
+      else if (r > 25 && r <= 50) return 'Может быть'
+      else if (r > 50 && r <= 75) return 'Скорее да'
+      else if (r > 75) return 'Да'
+      else return 'Да'
+    },
     fingerRate () {
-      return 0
+      let r = this.fingerRadius
+      if (r > 120) return 0
+      else return Math.round(100 - ((r * 50) / 60))
     },
     fingerRadius () {
       let fl = this.fingerLeft
       let ft = this.fingerTop
       let flr = Math.abs(150 - fl)
       let ftr = Math.abs(150 - ft)
-      // return Math.sqrt(flr + )
-      return 0
+      return Math.sqrt(Math.pow(flr, 2) + Math.pow(ftr, 2))
+      // return 0
     }
   },
   methods: {
     fingerDrag (e) {
       // this.$log('fingerDrag', e)
+      // if (this.fingerRadius >= 116) return
       let fl = this.fingerLeft + e.delta.x
       let ft = this.fingerTop + e.delta.y
       if (fl >= 0 && fl <= 300) this.fingerLeft = fl
@@ -99,7 +115,7 @@ export default {
         this.$log('nodeRateJob start')
         this.nodeRating = true
         await this.$wait(600)
-        let res = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: 0.2389492834})
+        let res = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: this.fingerRate / 100})
         this.$log('nodeRateJob done', res)
         this.nodeRating = false
         await this.$wait(300)

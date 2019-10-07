@@ -21,7 +21,7 @@ q-layout.window-height
   q-page-container.window-height
     .column.fit
       div(body-scroll-lock-ignore).col.scroll
-        node-loader(mode="feed" :query="query" queryKey="sphereNodes" :variables="variables")
+        node-loader(v-if="sphereOid" mode="feed" :query="query" queryKey="sphereNodes" :variables="variables")
 </template>
 
 <script>
@@ -47,6 +47,10 @@ export default {
     }
   },
   computed: {
+    sphereOid () {
+      if (this.categories[this.category]) return this.categories[this.category].sphere.oid
+      else return false
+    },
     query () {
       return gql`
         query sphereNodes ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
@@ -65,7 +69,7 @@ export default {
     },
     variables () {
       return {
-        sphereOid: this.categories[this.category].sphere.oid,
+        sphereOid: this.sphereOid,
         pagination: {
           pageSize: 100
         },

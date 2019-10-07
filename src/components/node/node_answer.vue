@@ -10,7 +10,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
         :style=`{borderRadius: '10px', oveflow: 'hidden'}`).bg-white
     .row.full-width.q-my-sm.q-px-sm
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-        q-input(v-model="name" type="textarea" filled placeholder="В чем ты видишь суть?").full-width
+        q-input(v-model="name" type="textarea" filled placeholder="А в чем ты видишь суть?").full-width
   //- footer
   div(
     :style=`{position: 'absolute', bottom: '0px', height: '76px'}`

@@ -22,46 +22,11 @@ export default {
   props: ['index', 'zIndex', 'node', 'nodeFull', 'active'],
   data () {
     return {
-      value: 0,
-      nodeRating: false,
-      nodeRated: false,
-      nodeRates: [
-        {id: 1, name: 'Нет', rate: 0.0, icon: 'gps_off', opacity: 1},
-        {id: 2, name: 'Скорее нет', rate: 0.25, icon: 'gps_not_fixed', opacity: 0.7},
-        {id: 3, name: 'Может быть', rate: 0.5, icon: 'gps_not_fixed', opacity: 1},
-        {id: 4, name: 'Скорее да', rate: 0.75, icon: 'gps_fixed', opacity: 0.7},
-        {id: 5, name: 'Да', rate: 1.0, icon: 'gps_fixed', opacity: 1}
-      ],
       actions: [
         {id: 'to_bookmark', name: 'Сохранить в закладки'},
         {id: 'to_telegram', name: 'Отправить в Telegram'},
         {id: 'to_copy', name: 'Скопировать ссылку'}
       ]
-    }
-  },
-  watch: {
-    nodeFull: {
-      handler (to, from) {
-        if (to && to.rateUser) this.value = to.rateUser * 100
-      }
-    }
-  },
-  computed: {
-    rateCurrent () {
-      let v = this.value
-      if (v < 25) return this.nodeRates[0]
-      else if (v < 50) return this.nodeRates[1]
-      else if (v < 75) return this.nodeRates[2]
-      else if (v < 100) return this.nodeRates[3]
-      else return this.nodeRates[4]
-    },
-    showNodeRate () {
-      if (this.nodeFull && this.nodeFull.rateUser) {
-        return true
-      } else {
-        if (this.nodeRated) return true
-        else return false
-      }
     }
   },
   methods: {
