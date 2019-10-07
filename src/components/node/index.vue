@@ -123,7 +123,10 @@ export default {
                   oid
                   name
                 }
+                categories
                 fragments {
+                  uid
+                  name
                   url
                   content {
                     oid

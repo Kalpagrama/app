@@ -42,7 +42,10 @@ export default {
         this.answering = true
         // let res = await this.$store.dispatch('node/nodeUnrate', this.node.oid)
         // await this.$wait(2000)
-        let res = await this.$store.dispatch('node/nodeCreate', {parentNode: this.node.oid, name: this.name})
+        let node = JSON.parse(JSON.stringify(this.nodeFull))
+        node.parentNode = this.node.oid
+        node.name = this.name
+        let res = await this.$store.dispatch('node/nodeCreate', node)
         this.$log('handleAnswer done', res)
         this.answering = false
         await this.$wait(300)

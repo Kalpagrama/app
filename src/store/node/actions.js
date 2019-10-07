@@ -77,15 +77,25 @@ export const nodeCreate = async (store, payload) => {
   if (!payload.fragments || payload.fragments.length === 0) throw new Error('Wrong fragments!')
   let node = {
     name: payload.name || '',
-    spheres: [],
-    fragments: [],
+    spheres: payload.spheres.map(s => ({name: s.name, oid: s.oid})),
+    categories: payload.categories,
+    fragments: payload.fragments.map(f => {
+      return {
+        uid: f.uid,
+        name: f.name,
+        oid: f.content.oid,
+        relativePoints: f.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
+        relativeScale: f.relativeScale
+      }
+    }),
     meta: {
       layout: 'PIP',
       layoutPolicy: 'DEFAULT',
-      fragments: []
+      fragments: payload.fragments.map(f => ({uid: f.uid, color: 'black'}))
     }
   }
   if (payload.parentNode) node.parentNode = payload.parentNode
+  debug('nodeCreate node', node)
   let {data: {nodeCreate}} = await apollo.mutate({
     mutation: gql`
       mutation nodePublish ($node: NodeInput!) {

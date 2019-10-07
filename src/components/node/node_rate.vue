@@ -70,8 +70,8 @@ export default {
     },
     rateName () {
       let r = this.fingerRate
-      if (r === 0) return 'Нет'
-      else if (r > 0 && r <= 25) return 'Скорее нет'
+      if (r === 1) return 'Нет'
+      else if (r > 1 && r <= 25) return 'Скорее нет'
       else if (r > 25 && r <= 50) return 'Может быть'
       else if (r > 50 && r <= 75) return 'Скорее да'
       else if (r > 75) return 'Да'
@@ -79,7 +79,7 @@ export default {
     },
     fingerRate () {
       let r = this.fingerRadius
-      if (r > 120) return 0
+      if (r > 120) return 1
       else return Math.round(100 - ((r * 50) / 60))
     },
     fingerRadius () {
