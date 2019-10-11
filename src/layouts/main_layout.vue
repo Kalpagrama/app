@@ -2,7 +2,7 @@
 q-layout(view='hHh Lpr fFf')
   k-dialog(:value="$store.state.ui.dialogOpened" ref="kDialog" @hide="$store.commit('ui/state', ['dialogOpened', false])")
     ws-fragment-editor(
-      v-if="$store.state.workspace.fragment"
+      v-if="$store.state.workspace.fragment && !$store.state.node.node"
       @hide="$refs.kDialog.hide()")
     node-rate(
       v-if="$store.state.node.node && !$store.state.node.answer"

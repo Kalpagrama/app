@@ -147,6 +147,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$store.commit('workspace/state', ['fragment', null])
   }
 }
 </script>
