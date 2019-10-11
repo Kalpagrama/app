@@ -7,62 +7,74 @@
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(
       v-if="content" :content="content" :fragments="fragmentsEditing" :inEditor="true"
-      @create="$event => fragmentCreate(content, $event)" @update="fragmentUpdate" @delete="fragmentDelete"
+      @create="$event => fragmentCreate(content, $event)" @delete="fragmentDelete"
       @hide="$refs.videoEditorDialog.hide(), content = null")
   //- content finder dialog position="bottom"
   k-dialog(ref="contentFinderDialog" :value="false")
     content-finder(@content="contentSelected" @close="$refs.contentFinderDialog.hide()")
   //- panels wrapper
-  q-tab-panels(ref="kpanels" v-model="tab" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).row.fit
+  q-tab-panels(ref="ncPanels" v-model="tab" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).row.fit
     //- main desktop panel
     q-tab-panel(name="main" style=`margin: 0; padding: 0`).row.fit
       .row.fit.scroll
         div.row.full-height.no-wrap
           //- content finder wrapper
-          div(v-if="true" :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).full-height.q-pa-sm.gt-sm
+          div(:style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).full-height.q-pa-sm.gt-sm
             content-finder(:style=`{
               borderRadius: '10px', overflow: 'hidden', zIndex: 100, maxHeight: '100%'}` @content="contentSelected")
           //- fragments selected wrapper
-          div(v-if="true" :style=`{position: 'relative', maxWidth: colWidth+'px'}`).full-height
-            node-fragments(:fragments="fragments" :colWidth="colWidth" @add="contentFind" @edit="$event => fragmentEdit($event.content)" @delete="fragmentDelete" @copy="fragmentCopy")
-          //- node preview wrapper
-          div(v-if="true" :style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).gt-sm
-            node-preview(
-              :node="node" @edit="nodeEdit" @reset="nodeReset" @publish="nodePublish"
-              :nodePublishPossible="nodePublishPossible" :nodePublishing="nodePublishing" :nodeSaving="nodeSaving")
+          div(:style=`{position: 'relative', maxWidth: colWidth+'px'}`).full-height
+            //- next btn
+            transition(
+              appear
+              enter-active-class="animated slideInUp"
+              leave-active-class="animated slideOutDown")
+              div(
+                v-if="readyForPreview"
+                :style=`{position: 'absolute', zIndex: 1000, height: '76px', bottom: '0px'}`
+                ).row.full-width.items-center.content-center.q-px-sm
+                q-btn(
+                  color="primary" no-caps @click="$refs.ncPanels.goTo('preview')"
+                  style=`height: 60px; borderRadius: 10px`).full-width
+                  span.text-bold Далее
+            //- fragments
+            node-fragments(
+              ref="nodeFragments"
+              :fragments="fragments" :colWidth="colWidth" @create="$refs.contentFinderDialog.show()")
+          //- node editor wrapper
+          div(:style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).gt-sm
+            node-editor(
+              :node="node" :nodePublishing="nodePublishing"
+              @update="nodeUpdate" @publish="nodePublish")
     //- mobile panel
     q-tab-panel(name="preview" style=`margin: 0; padding: 0`)
       .row.fit
-        node-preview(
-          :node="node" @edit="nodeEdit" @reset="nodeReset" @publish="nodePublish"
-          :nodePublishPossible="nodePublishPossible" :nodePublishing="nodePublishing" :nodeSaving="nodeSaving")
+        node-editor(
+          :node="node" :nodePublishing="nodePublishing"
+          @update="nodeUpdate" @publish="nodePublish")
 </template>
 
 <script>
 import contentFinder from 'components/content_finder'
-import videoEditor from 'components/video_editor'
 import nodeFragments from './node_fragments'
-import nodePreview from './node_preview'
 import nodeEditor from './node_editor'
 
 export default {
   name: 'nodeCreator',
-  components: {contentFinder, videoEditor, nodeFragments, nodePreview, nodeEditor},
-  props: [],
+  components: {contentFinder, nodeFragments, nodeEditor},
   data () {
     return {
       tab: 'main',
       content: null,
       draft: null,
-      fragments: {},
       uid: undefined,
       name: '',
-      spheres: [],
+      fragments: {},
       layout: 'PIP',
       layoutPolicy: 'DEFAULT',
-      nodePublishing: false,
-      nodeSaving: false,
-      categories: []
+      spheres: [],
+      categories: [],
+      nodePublishing: false
     }
   },
   computed: {
@@ -101,8 +113,12 @@ export default {
         }
       }
     },
-    nodePublishPossible () {
-      return true
+    readyForPreview () {
+      if (Object.keys(this.fragments).length > 1) return true
+      else return false
+    },
+    readyForPublish () {
+      return false
     },
     fragmentsEditing () {
       let fragments = {}
@@ -122,16 +138,12 @@ export default {
   watch: {
     node: {
       handler (to, from) {
-        // this.$log('node CHANGED', to)
+        this.$log('node CHANGED', to)
         localStorage.setItem('draft', JSON.stringify(to))
       }
     }
   },
   methods: {
-    contentFind () {
-      this.$log('contentFind')
-      this.$refs.contentFinderDialog.show()
-    },
     async contentSelected (content) {
       this.$log('contentSelected', content)
       // close content finder dialog
@@ -139,121 +151,20 @@ export default {
       await this.$wait(300)
       let WSContent = await this.$store.dispatch('workspace/addWSContent', {name: content.name, content: {oid: content.oid}})
       // open editor
-      this.fragmentEdit(WSContent.content)
+      this.$refs.nodeFragments.fragmentCreate(WSContent.content)
+      // this.fragmentEdit(WSContent.content)
     },
-    fragmentCreate (content, f) {
-      this.$log('fragmentCreate', content)
-      let uid = f && f.uid ? f.uid : `${content.oid}-${Date.now()}`
-      let fragment = null
-      this.$set(this, 'content', content)
-      switch (content.type) {
-        case 'VIDEO': {
-          fragment = {
-            uid: uid,
-            url: '',
-            name: f && f.name ? f.name : '',
-            relativePoints: f && f.relativePoints ? f.relativePoints : [],
-            relativeScale: content.duration,
-            content: content,
-            thumbUrl: content.thumbUrl[0]
-          }
-          this.$set(this.fragments, uid, fragment)
-          this.$refs.videoEditorDialog.show()
-          break
-        }
-        case 'IMAGE': {
-          fragment = {
-            uid: uid,
-            url: '',
-            name: '',
-            relativePoints: [],
-            relativeScale: 0.00,
-            content: content,
-            thumbUrl: content.thumbUrl[0]
-          }
-          this.$set(this.fragments, uid, fragment)
-          this.$refs.imageEditorDialog.show()
-          break
-        }
-      }
-    },
-    fragmentCopy (f, fkey) {
-      this.$log('fragmentCopy')
-      let uid = `${f.content.oid}-${Date.now()}`
-      let fragment = JSON.parse(JSON.stringify(f))
-      fragment.uid = uid
-      this.$set(this.fragments, uid, fragment)
-    },
-    fragmentUpdate () {
-      this.$log('fragmentUpdate')
-    },
-    fragmentEdit (content) {
-      this.$log('fragmentEdit', content)
-      this.$set(this, 'content', content)
-      switch (content.type) {
-        case 'VIDEO': {
-          this.$log('fragmentEdit', content.type)
-          this.$refs.videoEditorDialog.show()
-          break
-        }
-        case 'IMAGE': {
-          this.$log('fragmentEdit', content.type)
-          this.$refs.imageEditorDialog.show()
-          break
-        }
-      }
-    },
-    fragmentDelete (f, fkey) {
-      this.$log('fragmentDelete', f, fkey)
-      this.$delete(this.fragments, f.uid)
-    },
-    nodeEdit () {
-      this.$log('nodeEdit')
-      this.$refs.nodeEditorDialog.show()
-    },
-    nodeReset () {
-      this.$log('nodeReset')
-      // save this node as draft
-      // delete this node?
-    },
-    nodeInput (input) {
-      let node = this.$strip(JSON.parse(JSON.stringify(input)))
-      return {
-        name: node.name,
-        spheres: node.spheres,
-        fragments: node.fragments.map(f => {
-          return {
-            uid: f.uid,
-            oid: f.content.oid,
-            name: f.name,
-            thumbUrl: f.thumbUrl,
-            relativePoints: f.relativePoints,
-            relativeScale: f.relativeScale
-          }
-        }),
-        meta: node.meta,
-        categories: node.categories
-      }
+    async nodeUpdate (key, val) {
+      this.$log('nodeUpdate', key, val)
+      this[key] = val
     },
     async nodePublish () {
       try {
-        this.$log('nodePublish start', this.node)
-        if (this.fragments.lenth < 2) return
+        this.$log('nodePublish start')
         this.nodePublishing = true
-        let {data: {nodeCreate}} = await this.$apollo.mutate({
-          mutation: gql`
-            mutation nodeCreate ($node: NodeInput!) {
-              nodeCreate (node: $node) {
-                oid
-                type
-                name
-              }
-            }
-          `,
-          variables: {
-            node: this.nodeInput(this.node)
-          }
-        })
+        await this.$wait(3000)
+        // create mutation
+        let node = await this.$store.dispatch('node/nodeCreate', this.node)
         // delete ws draft
         if (this.draft) {
           let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
@@ -263,22 +174,22 @@ export default {
         localStorage.removeItem('draft')
         // remove draftStorage
         this.$store.commit('workspace/state', ['draft', null])
-        this.$log('nodePublish done', nodeCreate)
+        // done
+        this.$log('nodePublish done', node)
         this.nodePublishing = false
-        // go to node page?
-        // TODO: wait for node created event
+        // go to home
         this.$router.push(`/app/home`)
-      } catch (e) {
-        this.$log('nodePublish error', e)
+      } catch (error) {
+        this.$log('nodePublis error', error)
         this.nodePublishing = false
-        this.nodePublishingError = e
+        this.$q.notify({message: 'Node publish error!', color: 'red', textColor: 'white'})
       }
     },
     useDraft (draft) {
       this.$set(this, 'uid', draft.uid)
       this.$set(this, 'name', draft.name)
       this.$set(this, 'spheres', draft.spheres)
-      // this.$set(this, '')
+      this.$set(this, 'categories', draft.categories)
       draft.fragments.map((f, fi) => {
         this.$set(this.fragments, f.uid, f)
       })
@@ -290,8 +201,8 @@ export default {
     // draft
     let draftLocal = this.$store.state.workspace.draft
     let draftStorage = this.$q.localStorage.getItem('draft')
-    this.$log('draftLocal', draftLocal)
-    this.$log('draftStorage', draftStorage)
+    // this.$log('draftLocal', draftLocal)
+    // this.$log('draftStorage', draftStorage)
     if (draftLocal) {
       if (draftStorage !== null && draftStorage !== 'null' && draftStorage !== 'undefined' && draftStorage !== undefined) {
         this.$log('DRAFTS: local, storage')
@@ -326,6 +237,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus">
-</style>

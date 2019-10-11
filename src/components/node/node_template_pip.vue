@@ -69,7 +69,7 @@ export default {
       fragmentActive: 0,
       fragmentActions: [
         {id: 'content_explore', name: 'Исследовать контент'},
-        {id: 'fragment_workspace', name: 'Сохранить в мастерскую'},
+        {id: 'fragment_workspace', name: 'Добавить в мастерскую'},
         // {id: 'node_answer', name: 'Ответить', color: '#7d389e', class: ['text-bold', 'text-primary']}
       ]
     }
@@ -110,9 +110,10 @@ export default {
           let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
           fragment.thumbUrl = this.node.thumbUrl[fi]
           this.$store.commit('workspace/state', ['fragment', fragment])
-          this.$nextTick(() => {
-            this.$store.commit('workspace/state', ['fragmentEditorDialogOpened', true])
-          })
+          this.$store.commit('ui/state', ['dialogOpened', true])
+          // this.$nextTick(() => {
+          //   this.$store.commit('ui/state', ['dialogOpened', true])
+          // })
           break
         }
       }

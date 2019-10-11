@@ -73,9 +73,14 @@ export default {
   methods: {
     videoClick () {
       this.$log('videoClick')
+      // TODO: save mute state where? or do in in props? or in nodes? vuex
       if (this.playing) {
-        this.$refs.kvideo.pause()
-        this.playing = false
+        if (this.muted) {
+          this.videoToggleMute()
+        } else {
+          this.$refs.kvideo.pause()
+          this.playing = false
+        }
       } else {
         this.$refs.kvideo.play()
         // this.videoToggleMute()

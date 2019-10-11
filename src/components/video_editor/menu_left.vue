@@ -5,11 +5,10 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
     :style=`{position: 'absolute', bottom: '10px', right: '10px', zIndex: 1000}`
     icon="add" round color="primary" @click="fragmentCreate()" size="lg")
   //- fragment editor dialog
-  q-dialog(ref="fragmentDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="fragmentDialogClosed")
-    div(@click.self="$refs.fragmentDialog.hide()").row.fit.items-end.content-end.justify-center
-      fragment-editor(v-if="fragment" :fragment="fragment" @fragment="fragmentEdited"
-        @delete="fragmentDelete(fragment)"
-        :style=`{maxWidth: '600px', maxHeight: '600px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`)
+  //- k-dialog(ref="fragmentDialog")
+  //-   fragment-editor(v-if="fragment" :fragment="fragment" @fragment="fragmentEdited"
+  //-     @delete="fragmentDelete(fragment)"
+  //-     :style=`{maxWidth: '600px', maxHeight: '600px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`)
   //- header
   div(:style=`{position: 'absolute', borderRadius: '10px', overflow: 'hidden', zIndex: 200, top: '0px', height: '70px', background: 'rgba(255, 255, 255, 0.95)'}`).row.full-width.items-center.justify-between.q-px-md
     span.text-bold Фрагменты

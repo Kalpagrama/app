@@ -90,7 +90,6 @@ export const nodeCreate = async (store, payload) => {
     }),
     meta: {
       layout: 'PIP',
-      layoutPolicy: 'DEFAULT',
       fragments: payload.fragments.map(f => ({uid: f.uid, color: 'black'}))
     }
   }
@@ -99,11 +98,7 @@ export const nodeCreate = async (store, payload) => {
   let {data: {nodeCreate}} = await apollo.mutate({
     mutation: gql`
       mutation nodePublish ($node: NodeInput!) {
-        nodeCreate (node: $node) {
-          oid
-          type
-          name
-        }
+        nodeCreate (node: $node)
       }
     `,
     variables: {

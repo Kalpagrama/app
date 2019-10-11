@@ -1,23 +1,31 @@
 <template lang="pug">
 div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.bg-white
   //- header
+  div(
+    v-if="false"
+    :style=`{height: '70px'}`).row.full-width.items-center.justify-center.q-px-md.bg-grey-3
+    span.text-bold Ответить ядром
   //- body
   .col.scroll.full-width.bg-grey-3
-    div().row.full-width.q-pa-sm
+    .row.full-width.q-pa-sm
       node(
+        v-if="node"
         :node="node" :nodeFullReady="nodeFull" :active="active" :visible="visible"
         :noActions="true" :noTimestamp="true" :noSpheres="true"
-        :style=`{borderRadius: '10px', oveflow: 'hidden'}`).bg-white
+        :style=`{borderRadius: '10px', oveflow: 'hidden'}`).bg-white.q-mt-md
     .row.full-width.q-my-sm.q-px-sm
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-        q-input(v-model="name" type="textarea" filled placeholder="А в чем ты видишь суть?").full-width
-  //- footer
-  div(
-    :style=`{position: 'absolute', bottom: '0px', height: '76px'}`
-    ).row.full-width.items-center.q-px-sm
+        q-input(ref="inputAnswer" v-model="name" type="textarea" filled placeholder="А в чем ты видишь суть?").full-width
+  //- actions
+  //- rate
+  transition(
+    appear
+    enter-active-class="animated slideInUp"
+    leave-active-class="animated slideOutDown")
     q-btn(
+      v-if="!loading && name.length > 0"
       no-caps color="primary" :loading="answering" @click="handleAnswer()"
-      style=`height: 60px; borderRadius: 10px`).full-width
+      :style=`{position: 'absolute', zIndex: 1000, bottom: '10px', left: '10px', width: 'calc(100% - 20px)', height: '60px', borderRadius: '10px'}`)
       span.text-bold.text-white Ответить ядром
 </template>
 
@@ -25,14 +33,15 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
 
 export default {
   name: 'nodeAnswer',
-  components: {},
-  props: ['node', 'nodeFull'],
   data () {
     return {
+      loading: true,
       active: false,
       visible: false,
       name: '',
-      answering: false
+      answering: false,
+      node: null,
+      nodeFull: null
     }
   },
   methods: {
@@ -40,8 +49,6 @@ export default {
       try {
         this.$log('handleAnswer start')
         this.answering = true
-        // let res = await this.$store.dispatch('node/nodeUnrate', this.node.oid)
-        // await this.$wait(2000)
         let node = JSON.parse(JSON.stringify(this.nodeFull))
         node.parentNode = this.node.oid
         node.name = this.name
@@ -58,13 +65,20 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(2000)
+    await this.$wait(300)
+    // load node
+    this.node = this.$store.state.node.node
+    this.nodeFull = this.$store.state.node.nodeFull
     this.active = true
     this.visible = true
-    // this.$refs.nameInput.focus()
+    this.loading = false
+    this.$refs.inputAnswer.focus()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$store.commit('node/state', ['node', null])
+    this.$store.commit('node/state', ['nodeFull', null])
+    this.$store.commit('node/state', ['answer', false])
   }
 }
 </script>

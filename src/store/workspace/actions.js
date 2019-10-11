@@ -392,6 +392,7 @@ export const addWSDraft = async (store, draft) => {
       draft: {
         name: draft.name || Date.now().toString(),
         fragments: draft.fragments || [],
+        categories: draft.categories || [],
         spheres: draft.spheres || [],
         tagUids: draft.tagUids || []
       }

@@ -1,40 +1,38 @@
 <template lang="pug">
 div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.bg-white
+  //- header
   div(:style=`{height: '70px'}`).row.full-width
     .col.full-height
       .row.fit.items-center.justify-start.q-px-md
-        span.text-bold {{ fragmentLocal.name || 'Новый фрагмент' | cut(50) }}
+        //- span.text-bold {{ fragment.name | cut(50) }}
+        span.text-bold Добавить фрагмент в мастерскую
     div(:style=`{width: '70px'}`).row.full-height.items-center.content-center.justify-center
-      k-menu-popup(v-if="fragmentLocal.uid" :name="'Удалить фрагмент?'" :actions="actions" @action="fragmentDelete")
+      k-menu-popup(v-if="fragment.uid" :name="'Удалить фрагмент?'" :actions="actions" @action="fragmentDelete")
         q-btn(round flat icon="delete_outline" color="grey-6")
+    //- img(v-if="fragment.thumbUrl"
+    //-   :src="fragment.thumbUrl" :style=`{width: '100%'}`)
+  //- body
   .col.scroll.full-width
+    //- small {{ fragment }}
     .row.full-width.q-pa-sm
       div(style=`borderRadius: 10px; overflow: hidden`).row.full-width
-        q-input(v-model="fragmentLocal.name" filled placeholder="Name").full-width
-    ws-tags-input(:tags="fragmentLocal.tagUids" @tags="fragmentLocal.tagUids = $event")
+        q-input(v-model="fragment.name" filled placeholder="Имя фрагмента").full-width
+    ws-tags-input(:tags="fragment.tagUids" @tags="fragment.tagUids = $event").q-mt-sm
     //- TODO: fragment preview...
-    .row.full-width.q-pa-sm
+    div(v-if="false").row.full-width.q-pa-sm
       div(:style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.justify-center.bg-grey-2
-        span fragment preview
-    //- debug
-    //- .row.full-width
-    //-   small fragmentLocal
-    //- .row.full-width
-    //-   small {{ fragmentLocal }}
-    //- .row.full-width
-    //-   small fragment
-    //- .row.full-width
-    //-   small {{ fragment }}
-  div(:style=`{height: '80px'}`).row.full-width.q-pa-sm
+        small {{ fragment }}
+  //- actions
+  transition(
+    appear
+    enter-active-class="animated slideInUp"
+    leave-active-class="animated slideOutDown")
     q-btn(
-      v-if="!fragmentLocal.uid" @click="fragmentCreate()"
-      :loading="fragmentCreating" no-caps color="primary" style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-      span.text-bold.text-white Создать фрагмент
-    q-btn(
-      v-else @click="fragmentDraft()"
-      no-caps color="primary" style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-      span.text-bold.text-white Создать ядро
+      v-if="!loading"
+      color="primary" no-caps :loading="fragmentCreating" @click="fragmentCreate()"
+      :style=`{position: 'absolute', width: 'calc(100% - 20px)', left: '10px', bottom: '10px', height: '60px', borderRadius: '10px'}`)
+      span.text-bold.text-white Добавить фрагмент
 </template>
 
 <script>
@@ -43,18 +41,17 @@ import wsTagsInput from './ws_tags_input'
 export default {
   name: 'wsFragmentEditor',
   components: {wsTagsInput},
-  props: ['type', 'fragment'],
   data () {
     return {
       loading: true,
+      fragment: {
+        name: '',
+        tagUids: []
+      },
       fragmentCreating: false,
       fragmentDeleting: false,
       fragmentUpdating: false,
       fragmentDrafting: false,
-      fragmentLocal: {
-        name: '',
-        tagUids: []
-      },
       actions: [
         {id: 'delete', name: 'Удалить', color: 'red'}
       ]
@@ -63,13 +60,13 @@ export default {
   methods: {
     async fragmentCreate () {
       try {
-        this.$log('fragmentCreate start', this.fragmentLocal)
+        this.$log('fragmentCreate start', this.fragment)
         this.fragmentCreating = true
         await this.$wait(600)
-        let res = await this.$store.dispatch('workspace/addWSFragment', this.fragmentLocal)
-        this.$log('fragmentCreate done')
+        let res = await this.$store.dispatch('workspace/addWSFragment', this.fragment)
+        this.$log('fragmentCreate done', res)
         this.fragmentCreating = false
-        // this.$set(this, 'fragmentLocal', res)
+        // this.$set(this, 'fragment', res)
         this.$emit('hide')
       } catch (e) {
         this.$log('fragmentCrete error', e)
@@ -82,7 +79,7 @@ export default {
         this.$log('fragmentUdpate start')
         this.fragmentUpdating = true
         await this.$wait(600)
-        // let res = await this.$store.dispatch('workspace/updateWSFragment', this.fragmentLocal)
+        // let res = await this.$store.dispatch('workspace/updateWSFragment', this.fragment)
         this.$log('fragmentUpdate done')
         this.fragmentUpdating = false
         this.$emit('hide')
@@ -96,7 +93,7 @@ export default {
         this.$log('fragmentDelete start')
         this.fragmentDeleting = true
         await this.$wait(600)
-        // let res = await this.$store.dispatch('workspace/deleteWSFragemnt', this.fragmentLocal.uid)
+        // let res = await this.$store.dispatch('workspace/deleteWSFragemnt', this.fragment.uid)
         this.$log('fragmentDelete done')
         this.fragmentDeleting = false
         this.$emit('hide')
@@ -109,23 +106,24 @@ export default {
       try {
         this.$log('fragmentDraft start')
         this.fragmentDrafting = true
-        // create fragments
-        let fragments = [
-          {
-            name: this.fragmentLocal.name,
-            tagUids: this.fragmentLocal.tagUids,
-            thumbUrl: this.fragmentLocal.thumbUrl,
-            relativePoints: this.fragmentLocal.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
-            relativeScale: this.fragmentLocal.relativeScale,
-            contentOid: this.fragmentLocal.content.oid
-          }
-        ]
-        this.$log('fragments', fragments)
-        let res = await this.$store.dispatch('workspace/addWSDraft', {fragments})
-        this.$log('res', res)
-        // go to node_creator
-        this.$store.commit('workspace/state', ['draft', res])
-        this.$router.push('/app/create')
+        await this.$wait(1000)
+        // // create fragments
+        // let fragments = [
+        //   {
+        //     name: this.fragment.name,
+        //     tagUids: this.fragment.tagUids,
+        //     thumbUrl: this.fragment.thumbUrl,
+        //     relativePoints: this.fragment.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
+        //     relativeScale: this.fragment.relativeScale,
+        //     contentOid: this.fragment.content.oid
+        //   }
+        // ]
+        // this.$log('fragments', fragments)
+        // let res = await this.$store.dispatch('workspace/addWSDraft', {fragments})
+        // this.$log('res', res)
+        // // go to node_creator
+        // this.$store.commit('workspace/state', ['draft', res])
+        // this.$router.push('/app/create')
         this.$log('fragmentDraft done')
         this.fragmentDrafting = false
         this.$emit('hide')
@@ -135,13 +133,17 @@ export default {
       }
     }
   },
-  mounted () {
-    this.$log('mounted', this.fragment)
-    let fragment = JSON.parse(JSON.stringify(this.fragment))
-    this.$set(this, 'fragmentLocal', fragment)
-    this.$nextTick(() => {
-      this.loading = false
-    })
+  async mounted () {
+    this.$log('mounted')
+    let fragment = JSON.parse(JSON.stringify(this.$store.state.workspace.fragment))
+    let fragments = this.$store.getters['workspace/fragments']
+    this.$log('fragments', fragments)
+    let fragmentInWs = this.$store.getters['workspace/fragments'][fragment.uid]
+    this.$log('fragmentInWs', fragmentInWs)
+    // if we got this fragment in ws already...
+    this.$set(this, 'fragment', fragment)
+    await this.$wait(200)
+    this.loading = false
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -2,7 +2,7 @@
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-sm.q-pt-sm
   k-menu-popup(ref="kPopup" :name="item ? item.name : ''" :actions="actions" @action="itemAction")
   div(
-    v-for="(i, ii) in WSItems" :key="ii" @click="itemClick(i, ii)"
+    v-for="(i, ii) in items" :key="ii" @click="itemClick(i, ii)"
     :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.full-width.items-center.bg-grey-2.q-mb-sm
     img(
@@ -16,9 +16,10 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-
 <script>
 export default {
   name: 'wsItems',
+  props: ['search'],
   data () {
     return {
-      search: '',
+      // search: '',
       actions: [
         {id: 'use', name: 'Использовать', class: ['text-bold', 'text-primary']},
         {id: 'edit', name: 'Изменить'},
@@ -31,6 +32,15 @@ export default {
     WSItems () {
       // return this.$store.getters['workspace/WSItems']
       return this.$store.state.workspace.workspace.fragments
+    },
+    items () {
+      if (this.search.length === 0) return this.tags
+      else {
+        return this.WSItems.filter(t => {
+          let pattern = new RegExp(this.search, 'g')
+          return t.name.match(pattern)
+        })
+      }
     },
     types () {
       return this.$store.state.workspace.types

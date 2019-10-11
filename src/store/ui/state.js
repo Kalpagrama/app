@@ -26,5 +26,6 @@ export default {
     {id: 'node-template-vert', name: 'Vertical'},
     // {id: 'node-template-slider', name: 'Slider'},
     {id: 'node-template-cards', name: 'Cards'}
-  ]
+  ],
+  dialogOpened: false
 }

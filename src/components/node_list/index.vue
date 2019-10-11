@@ -13,7 +13,7 @@ div(:style=`{marginBottom: '60px'}`).row.full-width.items-start.content-start.ju
     div(
       :style=`{position: 'absolute', borderRadius: '0px 0px 10px 10px', left: '0px', top: nodeHeight-10+'px', zIndex: 1, maxHeight: '36px', overflow: 'hidden'}`
       ).row.full-width.q-px-sm.q-pt-sm.bg-white
-      small.text-black {{n.name | cut(60)}}
+      small.text-black.q-my-sm {{n.name | cut(60)}}
 </template>
 
 <script>
@@ -46,9 +46,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // setInterval(() => {
-    //   this.$emit('more')
-    // }, 2000)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

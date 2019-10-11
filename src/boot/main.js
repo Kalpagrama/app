@@ -35,7 +35,7 @@ export default async ({ Vue, store, router }) => {
   Vue.use(VueVirtualScroller)
   Vue.use(VueObserveVisibility)
   Vue.use(Carousel3d)
-  Vue.prototype.$wait = (msg) => new Promise(resolve => setTimeout(resolve, msg))
+  Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
   let banned = {'App': 1, 'mainLayout': 1}
   Vue.prototype.$log = function (...msg) {
     // if (banned[this.$options.name]) return
@@ -106,8 +106,10 @@ export default async ({ Vue, store, router }) => {
   Vue.component('wsFragmentEditor', () => import('components/workspace/ws_fragment_editor'))
   Vue.component('node', () => import('components/node'))
   Vue.component('nodeRate', () => import('components/node/node_rate'))
+  Vue.component('nodeAnswer', () => import(`components/node/node_answer`))
   Vue.component('nodeLoader', () => import('components/node_loader'))
   Vue.component('nodeFeed', () => import(`components/node_feed`))
+  Vue.component('videoEditor', () => import(`components/video_editor`))
 }
 
 export { time }

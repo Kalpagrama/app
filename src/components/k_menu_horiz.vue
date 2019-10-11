@@ -1,11 +1,11 @@
 <template lang="pug">
 .row.full-width.q-px-sm
-  div(:style=`{height: '50px', overflow: 'hidden', borderRadius: '20px 20px 0 0'}`
-    ).row.full-width.items-end.content-end.justify-between.q-px-md.q-mx-md
+  div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '20px 20px 0 0'}`
+    ).row.full-width.items-center.content-center.justify-between.q-px-md.q-mx-md
     q-btn(
       v-for="(p, pkey) in pages" :key="pkey" @click="pageClick(p, pkey)"
       round flat :color="page === pkey ? colors[0] : colors[1]")
-      q-icon(:name="p.icon" :size="page === pkey ? '30px' : '20px'")
+      q-icon(:name="p.icon" :size="page === pkey ? '30px' : '24px'")
 </template>
 
 <script>

@@ -1,38 +1,21 @@
 <template lang="pug">
 q-layout(view='hHh Lpr fFf')
-  //- bookmark
-  k-dialog(
-    v-if="$store.state.workspace.bookmarkEditorDialogOpened" :value="$store.state.workspace.bookmarkEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false]), $store.commit('workspace/state', ['bookmark', null])")
-    ws-bookmark-editor(type="create" :bookmark="$store.state.workspace.bookmark" @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
-  //- fragment
-  k-dialog(
-    v-if="$store.state.workspace.fragmentEditorDialogOpened" :value="$store.state.workspace.fragmentEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false]), $store.commit('workspace/state', ['fragment', null])")
-    ws-fragment-editor(type="create" :fragment="$store.state.workspace.fragment" @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false])")
-  //- boomark dialog
-  k-dialog(
-    v-if="$store.state.workspace.bookmarkEditorDialogOpened" :value="$store.state.workspace.bookmarkEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
-    ws-bookmark-editor(@hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
-  //- rate dialog
-  k-dialog(
-    v-if="$store.state.node.rateDialogOpened" :value="$store.state.node.rateDialogOpened"
-    @hide="$store.commit('node/state', ['rateDialogOpened', false])")
-    node-rate(@hide="$store.commit('node/state', ['rateDialogOpened', false])")
-  //- drawer
+  k-dialog(:value="$store.state.ui.dialogOpened" ref="kDialog" @hide="$store.commit('ui/state', ['dialogOpened', false])")
+    ws-fragment-editor(
+      v-if="$store.state.workspace.fragment"
+      @hide="$refs.kDialog.hide()")
+    node-rate(
+      v-if="$store.state.node.node && !$store.state.node.answer"
+      @hide="$refs.kDialog.hide()")
+    node-answer(
+      v-if="$store.state.node.node && $store.state.node.answer"
+      @hide="$refs.kDialog.hide()")
   q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
     k-menu-vert.bg-primary
   q-page-container
     router-view(v-if="!loading")
     div(v-else).row.full-width.window-height.items-center.justify-center
       q-spinner(size="50px" :thickness="2" color="white")
-    //- q-page(:style=`{borderRadius: $q.screen.gt.sm ? '10px 0 0 10px' : '0 0 10px 10px', overflow: 'hidden'}`)
-    //-   router-view(v-if="!loading" :width="width" :height="height")
-    //-   div(v-else).row.full-width.window-height.items-center.justify-center
-    //-     q-spinner(size="50px" :thickness="2" color="white")
-  //- q-footer(reveal :style=`{background: 'none '}`).lt-md
-  //-   k-menu-horiz
 </template>
 
 <script>
@@ -116,7 +99,10 @@ export default {
       // if (localStorage.getItem('kdebug')) this.d = true
       // check token
       let token = this.$route.query.token
-      if (token) localStorage.setItem('ktoken', token)
+      if (token) {
+        localStorage.setItem('ktoken', token)
+        this.$router.push('/app/home')
+      }
       // this.$q.notify('token', token)
       // user check
       // this.$log('Checking user...')

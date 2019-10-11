@@ -1,18 +1,9 @@
 <template lang="pug">
 div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.bg-black
-  q-dialog(ref="menuLeftDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    div(@click.self="$refs.menuLeftDialog.hide()").row.fit.items-end.content-end.justify-center
-      menu-left(
-        :fragments="fragments" :fragmentsVisible="fragmentsVisible" :duration="duration"
-        @toggle="fragmentToggle"
-        @create="$event => $emit('create', $event)"
-        @delete="$event => $emit('delete', $event)"
-        @preview="fragmentPreview"
-        @hide="$refs.menuLeftDialog.hide()"
-        :style=`{maxWidth: '600px', maxHeight: 'calc(var(--vh, 1vh) * 100)', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`)
-  q-dialog(ref="menuRightDialog" :maximized="true")
-    //- menu-right
   q-resize-observer(@resize="onResize")
+  //- fragments local
+  k-dialog(ref="menuLeftDialog")
+    menu-left(:fragments="fragments" :duration="duration" :fragmentsVisible="fragmentsVisible")
   div(v-if="false" style=`position: absolute; pointerEvents: none; zIndex: 300; right: 16px; width: 350px; opacity: 0.4; borderRadius: 10px; maxHeight: 500px; top: 76px; color: white`
     ).row.bg-purple.q-pa-sm.scroll
     small(v-for="(d, di) in debug").full-width {{d}}:{{get(d)}}
@@ -22,7 +13,7 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
   video(
     ref="kvideo" :src="content.url" playsinline type="video/mp4" crossorigin="Anonymous" :muted="muted"
     :style=`{height: '100%', width: '100%', objectFit: 'contain'}` @load="videoLoaded"
-    @click="videoClick" @playing="videoPlaying" @timeupdate="videoTimeupdate").bg
+    @click="videoClick" @playing="videoPlaying" @timeupdate="videoTimeupdate")
   //- actions
   //- close with no changes!
   //- TODO: save initial state of fragments!
@@ -55,14 +46,15 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
     //- actions right
     div(:style=`{minWidth: '80px'}`).row.full-height.items-center
       q-btn(round flat :icon="timelineBottom === 0 ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" color="white" @click="timelineToggle()").bg-grey-9.q-mr-sm
-      q-btn(round flat icon="menu" color="white" @click="menuRightToggle()").bg-grey-9
+      //- q-btn(round flat icon="menu" color="white" @click="menuRightToggle()").bg-grey-9
   //- relative points
   div(:style=`{position: 'absolute', bottom: timelineBottom+82+'px', height: '80px', paddingLeft: width/2+'px'}`).row.full-width
     div(v-for="(f, fkey, fi) in fragments" :key="fkey" v-show="fragmentsVisible[fkey]")
       div(v-for="(p, pi) in f.relativePoints"
         :style=`{position: 'absolute', top: '0px', zIndex: 400, height: '160px', width: '1px',
           left: -framesScrollLeft+width/2+(p.x*k)+'px', background: $randomColor(fkey)}`).row
-          //- div(:style=`{position: 'absolute', bottom: '0px', height: '50px'}`).row.bg-red
+          //- div(:style=`{position: 'absolute', left: '0px', bottom: '14px', height: '50px'}`).row.bg-red
+          //-   span heello
           div(
             v-if="pi === 0 && f.label"
             :style=`{position: 'absolute', top: '-280px', left: '-20px', height: '300px', width: '40px', background: $randomColor(fkey), borderRadius: '20px 20px 0 0'}`
@@ -399,6 +391,7 @@ export default {
     this.$log('mounted', this.content)
     this.$set(this, 'frames', [])
     this.$set(this, 'frames', await this.framesLoad(this.content.oid))
+    this.$tween.to(this.$refs.kframes, 0.5, {scrollLeft: (this.width / 2) - 10})
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

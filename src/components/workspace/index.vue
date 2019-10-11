@@ -24,20 +24,20 @@ q-layout(view='hHh Lpr fFf' :container="inFinder")
   //- header
   q-header(reveal)
     div(:style=`{minHeight: '70px'}`).row.full-width.bg-white
-      div(
-        v-if="true"
-        :style=`{height: '70px', width: '70px'}`).row.items-center.justify-center
-        q-btn(round flat icon="menu" color="primary" @click="$refs.wsMenu.toggle()")
+      //- div(
+      //-   v-if="!inFinder"
+      //-   :style=`{height: '70px', width: '70px'}`).row.items-center.justify-center
+      //-   q-btn(round flat icon="menu" color="primary" @click="$refs.wsMenu.toggle()")
       .col
-        div(:class=`{'q-pl-sm': inFinder}`).row.fit.items-center.content-center.q-pr-sm
+        div(:class=`{'q-pl-sm': inFinder}`).row.fit.items-center.content-center.q-px-sm
           div(:style=`{borderRadius: '10px', overflow: 'hidden', zIndex: 100, position: 'relative'}`).row.full-width
-            q-input(v-model="search" filled placeholder="Поиск").full-width
+            q-input(v-model="search" filled placeholder="Поиск" @focus="search = ' '").full-width
               template(v-slot:append)
                 q-btn(round flat dense color="grey-7" icon="filter_list")
   //- page
   q-page-container
-    ws-dashboard(v-if="menu === 'dashboard'" @menu="menusClick(null, $event)")
-    ws-items(v-else @item="$emit('item', $event)")
+    ws-dashboard(v-if="search.length === 0" @menu="menusClick(null, $event)")
+    ws-items(v-else @item="$emit('item', $event)" :search="search" :type="type")
   //- footer
   q-footer(v-if="!inFinder" reveal).bg-grey-4
     k-menu-horiz(page="workspace" :colors="['primary', 'grey-9']")
@@ -63,6 +63,7 @@ export default {
       reactive: 1,
       selected: {},
       search: '',
+      type: '',
       filtersShow: false,
       filtersHeight: 0,
       menusShow: false,
@@ -97,16 +98,19 @@ export default {
       this.$log('menusClick', m, mkey)
       if (this.inFinder) {
         this.$log('IN FINDER')
-        this.menu = mkey
+        // this.menu = mkey
       } else {
         this.$log('IN WORKSPACE')
-        if (mkey === 'dashboard') this.$router.push('/app/workspace')
-        else this.$router.push({params: {menu: mkey}})
+        // if (mkey === 'dashboard') this.$router.push('/app/workspace')
+        // else this.$router.push({params: {menu: mkey}})
       }
     }
   },
   mounted () {
     this.$log('mounted')
+    // this.$root.$on('page', () => {
+    //   this.$refs.wsMenu.toggle()
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

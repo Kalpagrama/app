@@ -1,7 +1,5 @@
 <template lang="pug">
-div(
-  :style=`{position: 'relative'}`
-  ).column.fit.bg-white
+div(:style=`{position: 'relative'}`).column.fit.bg-white
   //- cover
   div(v-if="false" :style=`{position: 'absolute', top: '0px', zIndex: 10}`).row.full-width.full-height
     img(:src="fragment.thumbUrl" :style=`{width: '100%', height: '100%', objectFit: 'cover', opacity: 0.2}`)

@@ -1,11 +1,10 @@
 
 export default {
-  templates: {
-    'pip': {name: 'Picture in picture'},
-    'vert': {name: 'Vertical'},
-    'horizontal': {name: 'Horizontal'},
-    'slider': {name: 'Slider'},
-    'custom': {name: 'Custom'}
+  layouts: {
+    'PIP': {type: 'PIP', name: 'Картинка в картинке'},
+    'HORIZONTAL': {type: 'HORIZONTAL', name: 'Горизонтальный'},
+    'VERTICAL': {type: 'VERTICAL', name: 'Вертикальный'},
+    'SLIDER': {type: 'SLIDER', name: 'Слайдер'}
   },
   node: null,
   nodeFull: null,
