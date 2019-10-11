@@ -4,11 +4,6 @@
   k-dialog(ref="nodeEditorDialog" :value="false")
     node-editor(:node="node" @hide="$refs.nodeEditorDialog.hide()"
       @name="name = $event" @spheres="spheres = $event" @categories="categories = $event" @meta="meta = $event")
-  q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    video-editor(
-      v-if="content" :content="content" :fragments="fragmentsEditing" :inEditor="true"
-      @create="$event => fragmentCreate(content, $event)" @delete="fragmentDelete"
-      @hide="$refs.videoEditorDialog.hide(), content = null")
   //- content finder dialog position="bottom"
   k-dialog(ref="contentFinderDialog" :value="false")
     content-finder(@content="contentSelected" @close="$refs.contentFinderDialog.hide()")
@@ -20,15 +15,11 @@
         div.row.full-height.no-wrap
           //- content finder wrapper
           div(:style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).full-height.q-pa-sm.gt-sm
-            content-finder(:style=`{
-              borderRadius: '10px', overflow: 'hidden', zIndex: 100, maxHeight: '100%'}` @content="contentSelected")
+            content-finder(:style=`{borderRadius: '10px', overflow: 'hidden', zIndex: 100, maxHeight: '100%'}` @content="contentSelected")
           //- fragments selected wrapper
           div(:style=`{position: 'relative', maxWidth: colWidth+'px'}`).full-height
             //- next btn
-            transition(
-              appear
-              enter-active-class="animated slideInUp"
-              leave-active-class="animated slideOutDown")
+            transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
               div(
                 v-if="readyForPreview"
                 :style=`{position: 'absolute', zIndex: 1000, height: '76px', bottom: '0px'}`
@@ -39,19 +30,16 @@
                   span.text-bold Далее
             //- fragments
             node-fragments(
-              ref="nodeFragments"
-              :fragments="fragments" :colWidth="colWidth" @create="$refs.contentFinderDialog.show()")
+              ref="nodeFragments" :fragments="fragments" :colWidth="colWidth" @create="$refs.contentFinderDialog.show()")
           //- node editor wrapper
           div(:style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).gt-sm
             node-editor(
-              :node="node" :nodePublishing="nodePublishing"
-              @update="nodeUpdate" @publish="nodePublish")
+              :node="node" :nodePublishing="nodePublishing" @update="nodeUpdate" @publish="nodePublish")
     //- mobile panel
     q-tab-panel(name="preview" style=`margin: 0; padding: 0`)
       .row.fit
         node-editor(
-          :node="node" :nodePublishing="nodePublishing"
-          @update="nodeUpdate" @publish="nodePublish")
+          :node="node" :nodePublishing="nodePublishing" @update="nodeUpdate" @publish="nodePublish")
 </template>
 
 <script>
@@ -95,7 +83,7 @@ export default {
             uid: f.uid,
             oid: f.content.oid,
             content: f.content,
-            label: f.label,
+            name: f.name,
             thumbUrl: f.thumbUrl,
             relativePoints: f.relativePoints,
             relativeScale: f.relativeScale
@@ -106,7 +94,7 @@ export default {
         createdAt: Date.now(),
         meta: {
           layout: this.layout,
-          layoutPolicy: this.layoutPolicy,
+          // layoutPolicy: this.layoutPolicy,
           fragments: fragments.map(f => {
             return {uid: f.uid}
           })
@@ -120,15 +108,6 @@ export default {
     readyForPublish () {
       return false
     },
-    fragmentsEditing () {
-      let fragments = {}
-      for (const f in this.fragments) {
-        if (this.fragments[f].content.oid === this.content.oid) {
-          fragments[f] = this.fragments[f]
-        }
-      }
-      return fragments
-    },
     colWidth () {
       let w = this.$q.screen.width
       if (w > 500) return 500
@@ -137,6 +116,7 @@ export default {
   },
   watch: {
     node: {
+      deep: true,
       handler (to, from) {
         this.$log('node CHANGED', to)
         localStorage.setItem('draft', JSON.stringify(to))

@@ -16,7 +16,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-
 <script>
 export default {
   name: 'wsItems',
-  props: ['search'],
+  props: ['search', 'type'],
   data () {
     return {
       // search: '',
@@ -34,13 +34,17 @@ export default {
       return this.$store.state.workspace.workspace.fragments
     },
     items () {
-      if (this.search.length === 0) return this.tags
-      else {
-        return this.WSItems.filter(t => {
-          let pattern = new RegExp(this.search, 'g')
-          return t.name.match(pattern)
-        })
-      }
+      // if (this.search.length === 0) return this.tags
+      // else {
+      //   return this.WSItems.filter(t => {
+      //     let pattern = new RegExp(this.search, 'g')
+      //     return t.name.match(pattern)
+      //   })
+      // }
+      return this.WSItems.filter(t => {
+        let pattern = new RegExp(this.search, 'g')
+        return t.name.match(pattern)
+      })
     },
     types () {
       return this.$store.state.workspace.types

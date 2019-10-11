@@ -31,13 +31,13 @@ q-layout(view='hHh Lpr fFf' :container="inFinder")
       .col
         div(:class=`{'q-pl-sm': inFinder}`).row.fit.items-center.content-center.q-px-sm
           div(:style=`{borderRadius: '10px', overflow: 'hidden', zIndex: 100, position: 'relative'}`).row.full-width
-            q-input(v-model="search" filled placeholder="Поиск" @focus="search = ' '").full-width
+            q-input(v-model="search" filled placeholder="Поиск").full-width
               template(v-slot:append)
                 q-btn(round flat dense color="grey-7" icon="filter_list")
   //- page
   q-page-container
-    ws-dashboard(v-if="search.length === 0" @menu="menusClick(null, $event)")
-    ws-items(v-else @item="$emit('item', $event)" :search="search" :type="type")
+    //- ws-dashboard(v-if="search.length === 0" @menu="menusClick(null, $event)")
+    ws-items(@item="$emit('item', $event)" :search="search" :type="type")
   //- footer
   q-footer(v-if="!inFinder" reveal).bg-grey-4
     k-menu-horiz(page="workspace" :colors="['primary', 'grey-9']")

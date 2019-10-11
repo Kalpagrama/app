@@ -18,17 +18,21 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
   //- close with no changes!
   //- TODO: save initial state of fragments!
   q-btn(
-    v-if="inEditor"
-    round icon="clear" color="white" @click="ready()"
-    :style=`{position: 'absolute', top: '16px', left: '16px', opacity: 0.5}`).bg-grey-9
+    no-caps color="primary" icon="check" @click="ready()"
+    :style=`{position: 'absolute', zIndex: 1000, height: '60px', top: '10px', right: '10px', width: '60px', borderRadius: '10px'}`)
+    //- span.text-bold.text-white Готово
+  //- q-btn(
+  //-   v-if="inEditor"
+  //-   round icon="clear" color="white" @click="ready()"
+  //-   :style=`{position: 'absolute', top: '16px', left: '16px', opacity: 0.5}`).bg-grey-9
   //- save changes
+  //- q-btn(
+  //-   v-if="inEditor"
+  //-   round icon="check" color="primary" @click="ready()"
+  //-   :style=`{position: 'absolute', top: '16px', right: '16px', opacity: 0.8}`)
   q-btn(
-    v-if="inEditor"
-    round icon="check" color="primary" @click="ready()"
-    :style=`{position: 'absolute', top: '16px', right: '16px', opacity: 0.8}`)
-  q-btn(
-    v-if="false"
-    round dense color="green" icon="add" @click="$emit('create', {})"
+    v-if="true"
+    round dense color="primary" icon="add" @click="$emit('create', {})"
     :style=`{position: 'absolute', zIndex: 1000, right: '10px', bottom: '24px'}`)
   //- menu-time-menu
   div(v-show="duration > 0" :style=`{position: 'absolute', zIndex: 200, bottom: timelineBottom+160+'px', height: '50px', opacity: 0.6}`
@@ -46,10 +50,11 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.
     //- actions right
     div(:style=`{minWidth: '80px'}`).row.full-height.items-center
       q-btn(round flat :icon="timelineBottom === 0 ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" color="white" @click="timelineToggle()").bg-grey-9.q-mr-sm
-      //- q-btn(round flat icon="menu" color="white" @click="menuRightToggle()").bg-grey-9
+      q-btn(round flat icon="menu" color="white").bg-grey-9
   //- relative points
   div(:style=`{position: 'absolute', bottom: timelineBottom+82+'px', height: '80px', paddingLeft: width/2+'px'}`).row.full-width
-    div(v-for="(f, fkey, fi) in fragments" :key="fkey" v-show="fragmentsVisible[fkey]")
+    //- v-show="fragmentsVisible[fkey]"
+    div(v-for="(f, fkey, fi) in fragments" :key="fkey")
       div(v-for="(p, pi) in f.relativePoints"
         :style=`{position: 'absolute', top: '0px', zIndex: 400, height: '160px', width: '1px',
           left: -framesScrollLeft+width/2+(p.x*k)+'px', background: $randomColor(fkey)}`).row

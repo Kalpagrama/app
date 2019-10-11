@@ -22,7 +22,7 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
         div(:style=`{width: '56px', borderRadius: '10px', background: $randomColor(f.uid)}` @click="fragmentPreview(f, fkey)").row.full-height
         div(@click="fragmentClick(f, fkey)").col.full-height
           .row.fit.items-center.content-center.q-px-sm
-            span {{ f.label }}
+            span {{ f.name }}
             .row.full-width
               small(v-for="p in f.relativePoints").text-grey-9 {{ p }}
         div(:style=`{width: '56px'}`).row.full-height.items-center.justify-center

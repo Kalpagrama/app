@@ -2,7 +2,15 @@
 div(:style=`{position: 'relative', minWidth: colWidth+'px', width: width+'px', maxHeight: '100%'}`).column.fit
   //- dialog
   k-dialog(ref="fragmentDialog")
-    node-fragment(v-if="fragment" :fragment="fragment")
+    node-fragment(
+      v-if="fragment" :fragment="fragment" @delete="fragmentDelete(fragment.uid)"
+      @editor="fragmentEditor(fragment)" @hide="$refs.fragmentDialog.hide()")
+  //- editor
+  q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    video-editor(
+      v-if="fragment" :content="fragment.content" :fragments="fragmentsEditing" :inEditor="true"
+      @create="$event => fragmentCreate(fragment.content, $event)" @delete="fragmentDelete"
+      @hide="$refs.videoEditorDialog.hide()")
   //- actions
   k-menu-popup(ref="fragmentMenu" :name="'fragment.name'" :actions="fragmentActions" @action="fragmentAction")
   //- body
@@ -52,6 +60,16 @@ export default {
   computed: {
     fragmentsEmpty () {
       return Object.keys(this.fragments).length === 0
+    },
+    fragmentsEditing () {
+      if (!this.fragment) return {}
+      let fragments = {}
+      for (const f in this.fragments) {
+        if (this.fragments[f].content.oid === this.fragment.content.oid) {
+          fragments[f] = this.fragments[f]
+        }
+      }
+      return fragments
     }
   },
   watch: {
@@ -94,7 +112,6 @@ export default {
       this.$log('fragmentCreate')
       let uid = f && f.uid ? f.uid : `${content.oid}-${Date.now()}`
       let fragment = null
-      this.$set(this, 'content', content)
       switch (content.type) {
         case 'VIDEO': {
           fragment = {
@@ -126,17 +143,14 @@ export default {
         }
       }
     },
-    fragmentEdit (content, f) {
-      this.$log('fragmentEdit')
-      this.$set(this, 'content', content)
-      switch (content.type) {
+    fragmentEditor (f) {
+      this.$log('fragmentEditor', f.content.type)
+      switch (f.content.type) {
         case 'VIDEO': {
-          this.$log('fragmentEdit', content.type)
           this.$refs.videoEditorDialog.show()
           break
         }
         case 'IMAGE': {
-          this.$log('fragmentEdit', content.type)
           this.$refs.imageEditorDialog.show()
           break
         }
