@@ -100,7 +100,7 @@ export default {
   mounted () {
     this.$log('mounted')
     this.$root.$on('page', () => {
-      this.$refs.kDrawer.toggle()
+      if (this.$refs.kDrawer) this.$refs.kDrawer.toggle()
     })
   },
   beforeDestroy () {
