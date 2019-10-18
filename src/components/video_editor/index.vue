@@ -195,7 +195,7 @@ export default {
     pointCreate () {
       this.$log('pointCreate')
       this.fragment.relativePoints.push({x: this.now})
-      let to = this.now + 10
+      let to = this.now + 3
       if (to <= this.duration) this.fragment.relativePoints.push({x: to})
       else this.fragment.relativePoints.push({x: this.duration})
     },
