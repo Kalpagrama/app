@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.fit
+div(:style=`{position: 'relative'}`).row.fit
   content-video(v-if="content && content.type === 'VIDEO'" :content="content" :inEditor="inEditor")
   //- content-image
   //- content-book

@@ -13,7 +13,7 @@ q-layout
     q-btn(
       v-if="!footerShow" color="green" no-caps @click="footerToggle()"
       :style=`{position: 'fixed', zIndex: 1100, bottom: '10px', height: '60px', borderRadius: '10px', left: '10px', width: 'calc(100% - 20px)'}`)
-      span Explore 13 more nodes
+      span Explore nodes
     div(
       v-show="footerShow"
       v-touch-swipe.down="footerHide"
@@ -26,7 +26,7 @@ q-layout
         v-touch-swipe.mouse="footerSwipe"
         v-touch-pan.mouse.prevent="footerPan"
         :style=`{height: '60px'}`).row.full-width.items-center.q-pl-md.q-pr-sm
-        span Explore 35 more nodes
+        span Explore nodes
         .col
         q-btn(round flat color="grey-6" icon="drag_indicator")
       //- body

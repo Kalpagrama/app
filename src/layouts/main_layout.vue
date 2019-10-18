@@ -87,10 +87,6 @@ export default {
     this.$root.$on('toggle_menu', () => {
       if (this.$q.screen.lt.md) this.menuToggle()
     })
-    // setInterval(() => {
-    //   this.$log('push interval')
-    //   // this.$router.replace({query: {scroll: Date.now()}})
-    // }, 1000)
   },
   async created () {
     try {

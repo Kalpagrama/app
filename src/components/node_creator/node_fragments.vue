@@ -25,8 +25,10 @@ q-layout(view='hHh Lpr fFf' :container="true")
   //- k-menu-popup(ref="fragmentMenu" :name="'fragment.name'" :actions="fragmentActions" @action="fragmentAction")
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md.bg-primary
-      span.text-bold.text-white Фрагменты
-      .col
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.go(-1)")
+      .col.full-height
+        .row.fit.items-center.justify-center
+          span.text-bold.text-white Фрагменты
       q-btn(round flat color="white" icon="keyboard_arrow_right" @click="$emit('next')")
   q-page-container
     //- body

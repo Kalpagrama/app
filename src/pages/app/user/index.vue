@@ -67,7 +67,7 @@ export default {
           this.page = 'nodes'
         } else {
           this.$log('NO USER OID!')
-          this.$router.replace({params: {oid: this.$store.state.auth.user.oid}})
+          this.$router.push({params: {oid: this.$store.state.auth.user.oid}})
         }
       }
     }

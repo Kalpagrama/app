@@ -27,7 +27,7 @@ export default {
     '$route': {
       handler (to, from) {
         this.$log('$route CHANGED', to)
-        // this.$router.replace(to.path)
+        // this.$router.push(to.path)
       }
     }
   }

@@ -1,7 +1,7 @@
 <template lang="pug">
 .column.fit
   .col.scroll
-    node-loader(ref="nodeLoader" :query="query" queryKey="feed" :variables="variables")
+    node-loader(ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
       template(v-slot:items=`{items, fetchingMore}`)
         node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
 </template>
@@ -19,8 +19,8 @@ export default {
   data () {
     return {
       query: gql`
-        query feed2 ($pageToken: RawJSON) {
-          feed(pagination: {pageSize: 100, pageToken: $pageToken}) {
+        query feed2 ($oid: OID!, $pageToken: RawJSON) {
+          nodeNodes(nodeOid: $oid, pagination: {pageSize: 100, pageToken: $pageToken}, sortStrategy: HOT) {
             count
             totalCount
             nextPageToken

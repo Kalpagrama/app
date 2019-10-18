@@ -10,7 +10,7 @@ div(:style=`{background: '#312c4b !important'}`).column.fit
       span(style=`fontWeight: 700`).text-white Кальпаграмма
   .col
     div(:to="`/app/user`" :style=`{height: '70px'}` @click="pageClick('/app/user')").row.full-width.items-center.q-px-sm
-      img(@click="$router.replace(`/app/user/${$store.state.auth.user.oid}`)"
+      img(@click="$router.push(`/app/user/${$store.state.auth.user.oid}`)"
         :src="$store.state.auth.user ? $store.state.auth.user.thumbUrl[0] : ''" style=`width: 40px; height: 40px; borderRadius: 50%; overflow: hidden`)
       .col.q-px-sm
         span(style=`fontWeight: 400`).text-white {{ $store.state.auth.user ? $store.state.auth.user.name : ''}}
@@ -56,7 +56,7 @@ export default {
       this.$log('pageClick', path)
       this.$root.$emit('toggle_menu')
       await this.$wait(200)
-      this.$router.replace(path)
+      this.$router.push(path)
     },
     async logout () {
       this.$log('logout')

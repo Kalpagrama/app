@@ -55,6 +55,7 @@ export default {
       this.$log('fetchMore start')
       this.pageTokenNext = this.pageToken
       this.fetchingMore = true
+      if (this.itemsCount >= this.totalCount) return
       this.$apollo.queries.kQuery.fetchMore({
         variables: {
           pageToken: this.pageTokenNext

@@ -30,7 +30,7 @@ export default {
         this.$root.$emit('page', p)
       } else {
         // this.$router.push(p.path)
-        this.$router.replace(p.path)
+        this.$router.push(p.path)
       }
     }
   }

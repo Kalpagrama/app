@@ -44,25 +44,28 @@ div(v-if="!loading" :style=`{position: 'relative', overflow: 'hidden'}`).row.fit
     //- fragment point
     div(
       v-for="(p, pi) in fragment.relativePoints"
-      :style=`{position: 'absolute', top: pi === 0 ? '0px' : '40px', zIndex: 400, height: pi === 0 ? '146px' : '106px', width: '1px',
-        left: -framesScrollLeft+width/2+(p.x*k)+'px', background: $randomColor(pi % 2 === 0 ? pi : pi - 1)}`).row
-        //- rectangle left: -framesScrollLeft+width/2+(k*Math.min(f.relativePoints[0]['x'], f.relativePoints[1]['x'])),
+      :style=`{position: 'absolute', top: pointFirst(pi) ? '0px' : '40px', zIndex: 400, height: pointFirst(pi) ? '146px' : '106px', width: '1px',
+        left: -framesScrollLeft+width/2+(p.x*k)+'px', background: $randomColor(pointFirst(pi) ? pi : pi+1)}`).row
+        //- rectangle left
         //- div(
-        //-   v-if="pi === 0"
+        //-   v-if="pointFirst(pi)"
+        //- )
+        //- div(
+        //-   v-if="pointFirst(pi)"
         //-   :style=`{
-        //-     position: 'absolute', bottom: '0px', height: '50px', background: $randomColor(fkey), opacity: 0.5, pointerEvents: 'none',
-        //-     left: f.relativePoints[1]['x'] > f.relativePoints[0]['x'] ? '0px' : -Math.abs(k*(f.relativePoints[1]['x'] - f.relativePoints[0]['x']))+'px',
-        //-     width: Math.abs(k*(f.relativePoints[1]['x'] - f.relativePoints[0]['x']))+'px'
+        //-     position: 'absolute', bottom: '0px', height: '50px', background: $randomColor(pi), opacity: 0.5, pointerEvents: 'none',
+        //-     left: fragment.relativePoints[pointFirst(pi) ? pi + 1 : pi]['x'] > fragment.relativePoints[pointFirst(pi) ? pi : pi - 1]['x'] ? '0px' : -Math.abs(k*(fragment.relativePoints[pointFirst(pi) ? p - 1 : pi]['x'] - fragment.relativePoints[pointFirst(pi) ? pi : pi + 1]['x']))+'px',
+        //-     width: Math.abs(k*(fragment.relativePoints[pointFirst(pi) ? pi + 1 : pi]['x'] - fragment.relativePoints[pointFirst(pi) ? pi : pi - 1]['x']))+'px'
         //-     }`).row
         //- circle
         div(
           v-touch-pan.mouse.stop="$event => pointDrag(p, pi, $event)"
           :style=`{
             position: 'absolute', top: '-1px', left: '-20px',
-            width: '40px', height: '40px', borderRadius: '50%', background: $randomColor(pi % 2 === 0 ? pi : pi -1, 0.5)
+            width: '40px', height: '40px', borderRadius: '50%', background: $randomColor(pointFirst(pi) ? pi : pi+1, 0.5)
           }`
           ).row.items-center.justify-center.cursor-pointer
-          span(style=`user-select: none`).text-white.text-bold {{ pi % 2 === 0 ? pi : pi-1 }}
+          span(style=`user-select: none`).text-white.text-bold {{ pointFirst(pi) ? pi : pi+1 }}
   //- --------
   //- timeline
   div(:style=`{position: 'absolute', bottom: timelineBottom+'px', height: '82px'}`).row.full-width.justify-center.items-center.content-center
@@ -185,6 +188,10 @@ export default {
     get (key) {
       return this[key]
     },
+    pointFirst (i) {
+      let index = i + 1
+      return index % 2 === 0
+    },
     pointCreate () {
       this.$log('pointCreate')
       this.fragment.relativePoints.push({x: this.now})
@@ -213,9 +220,7 @@ export default {
             pointSet()
           }, 20)
         }
-      }
-      // left
-      if (pos < 80 && e.direction === 'left') {
+      } else if (pos < 80 && e.direction === 'left') {
         this.$log('LEFT')
         if (!this.pointInterval) {
           this.pointInterval = setInterval(() => {
@@ -223,6 +228,8 @@ export default {
             pointSet()
           }, 20)
         }
+      } else {
+        this.pointStop()
       }
       // first
       if (e.isFirst) {
