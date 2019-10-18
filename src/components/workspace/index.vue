@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf' :container="inFinder")
+q-layout(view='hHh Lpr fFf' :container="inFinder").bg-grey-2
   q-drawer(ref="wsMenu" side="left" :width="230")
     div(:style=`{position: 'relative', borderRadius: '0px 10px 10px 0', overflow: 'hidden'}`).column.fit.bg-white
       //- menu header
@@ -40,7 +40,7 @@ q-layout(view='hHh Lpr fFf' :container="inFinder")
     ws-items(@item="$emit('item', $event)" :search="search" :type="type")
   //- footer
   q-footer(v-if="!inFinder" reveal).bg-grey-4
-    k-menu-horiz(page="workspace" :colors="['primary', 'grey-9']")
+    k-menu-horiz(page="workspace" :colors="['white', 'grey-9']")
 </template>
 
 <script>

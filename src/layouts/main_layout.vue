@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf')
+q-layout(view='hHh Lpr fFf').bg-primary
   k-dialog(:value="$store.state.ui.dialogOpened" ref="kDialog" @hide="$store.commit('ui/state', ['dialogOpened', false])")
     ws-fragment-editor(
       v-if="$store.state.workspace.fragment && !$store.state.node.node"
@@ -87,6 +87,10 @@ export default {
     this.$root.$on('toggle_menu', () => {
       if (this.$q.screen.lt.md) this.menuToggle()
     })
+    // setInterval(() => {
+    //   this.$log('push interval')
+    //   // this.$router.replace({query: {scroll: Date.now()}})
+    // }, 1000)
   },
   async created () {
     try {

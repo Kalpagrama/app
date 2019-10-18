@@ -1,5 +1,5 @@
 <template lang="pug">
-video-editor(:inEditor="inEditor" :fragment="fragment" :left="20" :content="content")
+video-editor(:inCreator="false" :fragmentInput="fragment")
 </template>
 
 <script>

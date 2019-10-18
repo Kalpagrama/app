@@ -3,7 +3,7 @@ q-layout
   //- drawer
   q-drawer(ref="kDrawer" side="left" :width="240")
     div(@click.self="$refs.kDrawer.toggle()").row.fit.items-start.content-start
-      div(:style=`{height: 'calc(var(--vh, 1vh) * 100)', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`).column.full-width.bg-grey-4
+      div(:style=`{height: 'calc(var(--vh, 1vh) * 100)', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`).column.full-width.bg-white
         //- header
         div(:style=`{height: '70px'}`).row.full-width.bg-white
           div(v-if="false" :style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
@@ -24,7 +24,7 @@ q-layout
       template(v-slot:items=`{items, fetchingMore}`)
         node-feed(:nodes="items" :fetchingMore="fetchingMore")
   q-footer(reveal).bg-grey-4.lt-md
-    k-menu-horiz(page="hot" :colors="['primary', 'grey-7']")
+    k-menu-horiz(page="hot" :colors="['white', 'grey-7']")
 </template>
 
 <script>

@@ -7,7 +7,9 @@ div(id="q-app" ref="kapp")
 import {disableBodyScroll} from 'body-scroll-lock'
 
 export default {
+  name: 'App',
   mounted () {
+    // this.$log('name', this.$store.state.core.name)
     // disableBodyScroll(this.$refs.kapp, {
     //   allowTouchMove: el => {
     //     while (el && el !== document.body) {
@@ -20,13 +22,21 @@ export default {
     //     }
     //   }
     // })
+  },
+  watch: {
+    '$route': {
+      handler (to, from) {
+        this.$log('$route CHANGED', to)
+        // this.$router.replace(to.path)
+      }
+    }
   }
 }
 </script>
 
 <style lang="stylus">
 .q-menu
-  background: none
+  // background: none
   box-shadow: none
 .q-drawer
   background: none

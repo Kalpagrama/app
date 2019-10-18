@@ -1,11 +1,14 @@
 <template lang="pug">
 q-layout
+  q-header(reveal).bg-grey-2
+    div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
+      span header
   q-page-container
     node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
       template(v-slot:items=`{items, fetchingMore}`)
         node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
-  q-footer(reveal).bg-grey-4.lt-md
-    k-menu-horiz(page="home" :colors="['primary', 'grey-5']")
+  q-footer(reveal).lt-md
+    k-menu-horiz(page="home" :colors="['white', 'grey-7']")
 </template>
 
 <script>
@@ -52,6 +55,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-// .q-footer
-//   background: none !important
+.q-footer
+  background: none !important
 </style>

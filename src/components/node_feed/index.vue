@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm.bg-grey-2
   div(:style=`{maxWidth: '550px'}`).row.full-width
     div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width.q-px-sm
       node(
@@ -10,13 +10,14 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
           'bg-grey-3': activeNode ? activeNode[0] !== ni : false,
           'bg-white': activeNode ? activeNode[0] === ni : false}`
         :style=`{zIndex: activeNode ? activeNode[0] === ni ? 200 : 10 : 10, borderRadius: '10px'}`
+        :noActions="true" :noSpheres="true" :noTimestamp="true"
         v-observe-visibility=`{
           callback: nodeVisible,
           throttle: 300,
           intersection: {
-            threshold: 0.8
+            threshold: 0.98
           }
-        }`).q-mb-md
+        }`).q-mb-lg
     div(:style=`{height: '80px'}`).row.full-width.items-center.justify-center
       q-spinner(v-show="fetchingMore" :thickness="2" color="primary" size="50px")
 </template>

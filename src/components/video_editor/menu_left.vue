@@ -65,7 +65,7 @@ export default {
     fragmentClick (f, fkey) {
       this.$log('fragmentClick', f, fkey)
       this.$set(this, 'fragment', f)
-      this.$refs.fragmentDialog.show()
+      // this.$refs.fragmentDialog.show()
     },
     fragmentToggle (f, fkey) {
       this.$log('fragmentToggle', f, fkey)

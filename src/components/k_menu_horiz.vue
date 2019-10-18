@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.q-px-sm
+div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width.q-px-sm.bg-primary
   div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '20px 20px 0 0'}`
     ).row.full-width.items-center.content-center.justify-between.q-px-md.q-mx-md
     q-btn(
@@ -29,7 +29,8 @@ export default {
       if (this.page === pkey) {
         this.$root.$emit('page', p)
       } else {
-        this.$router.push(p.path)
+        // this.$router.push(p.path)
+        this.$router.replace(p.path)
       }
     }
   }

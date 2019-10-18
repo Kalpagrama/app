@@ -1,6 +1,6 @@
 <template lang="pug">
-.column.fit
-  k-menu
+//- .column.fit
+//-   k-menu
 </template>
 
 <script>

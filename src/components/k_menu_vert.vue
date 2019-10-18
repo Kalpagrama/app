@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.fit
+div(:style=`{background: '#312c4b !important'}`).column.fit
   div(:to="`/app/home`" :style=`{height: '80px'}` @click="pageClick('/app/home')").row.full-width.items-center.q-px-sm
     //- q-btn(round flat color="grey-6" :style=`{overflow: 'hidden'}`)
     //-   template(v-slot:default)
@@ -10,7 +10,7 @@
       span(style=`fontWeight: 700`).text-white Кальпаграмма
   .col
     div(:to="`/app/user`" :style=`{height: '70px'}` @click="pageClick('/app/user')").row.full-width.items-center.q-px-sm
-      img(@click="$router.push(`/app/user/${$store.state.auth.user.oid}`)"
+      img(@click="$router.replace(`/app/user/${$store.state.auth.user.oid}`)"
         :src="$store.state.auth.user ? $store.state.auth.user.thumbUrl[0] : ''" style=`width: 40px; height: 40px; borderRadius: 50%; overflow: hidden`)
       .col.q-px-sm
         span(style=`fontWeight: 400`).text-white {{ $store.state.auth.user ? $store.state.auth.user.name : ''}}
@@ -30,7 +30,7 @@
       q-btn(round flat icon="keyboard_arrow_left" color="white")
     .col.full-height
       .row.fit.items-center.justify-start.q-px-sm
-        small.text-grey-3 0.3.0
+        small.text-grey-3 0.4.0
 </template>
 
 <script>
@@ -56,7 +56,7 @@ export default {
       this.$log('pageClick', path)
       this.$root.$emit('toggle_menu')
       await this.$wait(200)
-      this.$router.push(path)
+      this.$router.replace(path)
     },
     async logout () {
       this.$log('logout')

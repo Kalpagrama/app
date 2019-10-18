@@ -2,7 +2,7 @@
 q-layout
   //- header
   q-header(reveal)
-    div(:style=`{height: '70px'}`).row.full-width.items-center
+    div(:style=`{height: '140px'}`).row.full-width.items-center
       .col.full-height
         .row.fit.items-center.q-pl-md
           span(v-if="$store.state.auth.user") {{ $store.state.auth.user.name }}
@@ -17,7 +17,7 @@ q-layout
       span Menu {{ m }}
   //- footer
   q-footer(reveal).bg-grey-4.lg-md
-    k-menu-horiz(page="menu" :colors="['primary', 'grey-7']")
+    k-menu-horiz(page="menu" :colors="['white', 'grey-7']")
 </template>
 
 <script>
