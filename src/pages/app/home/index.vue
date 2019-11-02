@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout
+q-layout()
   q-header(reveal).bg-grey-2
     div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
       span header
@@ -33,7 +33,7 @@ export default {
               meta {
                 ...on MetaNode {
                   layout
-                  fragments { uid width height color }
+                  fragments { uid width height color thumbUrl(preferWidth: 600) }
                 }
               }
             }
@@ -54,7 +54,7 @@ export default {
 }
 </script>
 
-<style lang="stylus" scoped>
+<style lang="stylus">
 .q-footer
   background: none !important
 </style>

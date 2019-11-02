@@ -1,13 +1,13 @@
 <template lang="pug">
 q-layout
-  q-header(reveal)
-    div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.go(-1)")
-      span Node explorer
-      .col
-      q-btn(round flat color="white" icon="more_vert")
+  //- q-header(reveal)
+  //-   div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
+  //-     q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.go(-1)")
+  //-     span Node explorer
+  //-     .col
+  //-     q-btn(round flat color="white" icon="more_vert")
   q-page-container
-    .row.full-width.items-center.content-start.q-px-sm
+    .row.full-width.items-center.content-start.q-pa-sm
       node(v-if="node" :node="node" :needFull="true" :index="0" @nodeFull="nodeFullLoaded" :active="true"
         :style=`{borderRadius: '10px', maxWidth: '500px'}`).bg-white.q-mt-m
     q-btn(

@@ -60,11 +60,19 @@ export default {
           sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
             count
             totalCount
+            nextPageToken
             items {
               oid
               type
+              thumbUrl (preferWidth: 600)
+              createdAt
               name
-              thumbUrl(preferWidth: 600)
+              meta {
+                ...on MetaNode {
+                  layout
+                  fragments { uid width height color thumbUrl(preferWidth: 600) }
+                }
+              }
             }
           }
         }

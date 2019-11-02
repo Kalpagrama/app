@@ -5,9 +5,13 @@ div(id="q-app" ref="kapp")
 
 <script>
 import {disableBodyScroll} from 'body-scroll-lock'
+import { AddressbarColor } from 'quasar'
 
 export default {
   name: 'App',
+  created () {
+    AddressbarColor.set('#342d58')
+  },
   mounted () {
     // this.$log('name', this.$store.state.core.name)
     // disableBodyScroll(this.$refs.kapp, {

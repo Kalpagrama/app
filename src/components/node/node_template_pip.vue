@@ -23,15 +23,15 @@
       img(
         v-for="(p, pi) in 2" :key="pi"
         v-show="fragmentActive !== pi"
-        :src="node.thumbUrl[pi]"
+        :src="node.meta.fragments[pi].thumbUrl"
         :style=`{width: '100%', height: '100%', objectFit: 'contain'}` draggable="false"
         @load="$event => imgLoaded($event, `mini:${pi}`)"
         @error="$event => imgError($event, `mini:${pi}`)")
     //- previews v-if="node.thumbUrl[pi]"
     img(
       v-for="(p, pi) in 2" :key="pi"
-      v-show="node.thumbUrl[pi] && fragmentActive === pi"
-      :src="node.thumbUrl[pi]"
+      v-show="node.meta.fragments[pi].thumbUrl && fragmentActive === pi"
+      :src="node.meta.fragments[pi].thumbUrl"
       :style=`{width: '100%', minHeight: '150px', objectFit: 'contain', zIndex: zIndex+50}`
       draggable="false"
       @load="$event => imgLoaded($event, `preview:${pi}`)"

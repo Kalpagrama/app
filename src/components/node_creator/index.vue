@@ -1,9 +1,9 @@
 <template lang="pug">
 .row.window-height
   //- editors
-  k-dialog(ref="nodeEditorDialog" :value="false")
-    node-editor(:node="node" @hide="$refs.nodeEditorDialog.hide()"
-      @name="name = $event" @spheres="spheres = $event" @categories="categories = $event" @meta="meta = $event")
+  //- k-dialog(ref="nodeEditorDialog" :value="false")
+  //-   node-editor(:node="node" @hide="$refs.nodeEditorDialog.hide()"
+  //-     @name="name = $event" @spheres="spheres = $event" @categories="categories = $event" @meta="meta = $event")
   //- panels wrapper
   q-tab-panels(ref="ncPanels" v-model="tab" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).row.fit
     //- main desktop panel
@@ -16,13 +16,13 @@
               ref="nodeFragments" :fragments="fragments" :colWidth="colWidth" @create="$refs.contentFinderDialog.show()")
           //- node editor wrapper
           div(:style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).col.gt-sm
-            node-editor(
-              :node="node" :nodePublishing="nodePublishing" @update="nodeUpdate" @publish="nodePublish")
+            //- node-editor(
+            //-   :node="node" :nodePublishing="nodePublishing" @update="nodeUpdate" @publish="nodePublish")
     //- mobile panel
     q-tab-panel(name="preview" style=`margin: 0; padding: 0`)
       .row.fit
-        node-editor(@back="$refs.ncPanels.goTo('main')"
-          :node="node" :nodePublishing="nodePublishing" @update="nodeUpdate" @publish="nodePublish")
+        //- node-editor(@back="$refs.ncPanels.goTo('main')"
+        //-   :node="node" :nodePublishing="nodePublishing" @update="nodeUpdate" @publish="nodePublish")
 </template>
 
 <script>
@@ -67,7 +67,11 @@ export default {
             content: f.content,
             name: f.name,
             thumbUrl: f.thumbUrl,
-            relativePoints: f.relativePoints,
+            relativePoints: f.relativeCuts.reduce((acc, val) => {
+              acc.push({x: val.start})
+              acc.push({x: val.end})
+              return acc
+            }, []),
             relativeScale: f.relativeScale
           }
         }),

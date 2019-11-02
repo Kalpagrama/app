@@ -1,7 +1,7 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm.bg-grey-2
   div(:style=`{maxWidth: '550px'}`).row.full-width
-    div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width.q-px-sm
+    div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width
       node(
         :index="ni" :node="n" :lang="ni"
         :needFull="ni >= fullNodes[0] && ni <= fullNodes[1]"
@@ -17,7 +17,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
           intersection: {
             threshold: 0.98
           }
-        }`).q-mb-lg
+        }`).q-mb-xl
     div(:style=`{height: '80px'}`).row.full-width.items-center.justify-center
       q-spinner(v-show="fetchingMore" :thickness="2" color="primary" size="50px")
 </template>

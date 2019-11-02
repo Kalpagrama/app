@@ -1,10 +1,10 @@
 <template lang="pug">
 q-layout(view='hHh Lpr fFf' :container="true")
   q-header(reveal)
-    div(:style=`{height: '60px'}`).row.full-width.items-center
+    div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('back')")
       .col.full-height
-        .row.fit.items-center.q-px-md
+        .row.fit.items-center.justify-center.q-px-md
           span.text-bold.text-white Предосмотр
       //- .col
       q-btn(round flat color="white" icon="more_vert")

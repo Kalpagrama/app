@@ -76,6 +76,9 @@ export default async ({ Vue, store, router }) => {
     round(obj)
     return obj
   }
+  Vue.prototype.$isInteger = (num) => {
+    return (num ^ 0) === num
+  }
   Vue.prototype.$nodesDistinct = function (nodes) {
     const result = []
     const map = new Map()
@@ -111,6 +114,7 @@ export default async ({ Vue, store, router }) => {
   Vue.component('nodeLoader', () => import('components/node_loader'))
   Vue.component('nodeFeed', () => import(`components/node_feed`))
   Vue.component('videoEditor', () => import(`components/video_editor`))
+  Vue.component('kVideo', () => import(`components/k_video`))
 }
 
 export { time }

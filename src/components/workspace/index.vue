@@ -36,6 +36,7 @@ q-layout(view='hHh Lpr fFf' :container="inFinder").bg-grey-2
                 q-btn(round flat dense color="grey-7" icon="filter_list")
   //- page
   q-page-container
+    //- ws-bookmarks
     //- ws-dashboard(v-if="search.length === 0" @menu="menusClick(null, $event)")
     ws-items(@item="$emit('item', $event)" :search="search" :type="type")
   //- footer
@@ -46,10 +47,11 @@ q-layout(view='hHh Lpr fFf' :container="inFinder").bg-grey-2
 <script>
 import wsItems from './ws_items'
 import wsDashboard from './ws_dashboard'
+import wsBookmarks from './ws_bookmarks'
 
 export default {
   name: 'workspace',
-  components: {wsItems, wsDashboard},
+  components: {wsItems, wsDashboard, wsBookmarks},
   props: {
     inFinder: {
       type: Boolean,
@@ -101,16 +103,16 @@ export default {
         // this.menu = mkey
       } else {
         this.$log('IN WORKSPACE')
-        // if (mkey === 'dashboard') this.$router.push('/app/workspace')
-        // else this.$router.push({params: {menu: mkey}})
+        if (mkey === 'dashboard') this.$router.push('/app/workspace')
+        else this.$router.push({params: {menu: mkey}})
       }
     }
   },
   mounted () {
     this.$log('mounted')
-    // this.$root.$on('page', () => {
-    //   this.$refs.wsMenu.toggle()
-    // })
+    this.$root.$on('page', () => {
+      this.$refs.wsMenu.toggle()
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

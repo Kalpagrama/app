@@ -4,7 +4,7 @@ div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width
     ).row.full-width.items-center.content-center.justify-between.q-px-md.q-mx-md
     q-btn(
       v-for="(p, pkey) in pages" :key="pkey" @click="pageClick(p, pkey)"
-      round flat :color="page === pkey ? colors[0] : colors[1]")
+      round flat :color="page === pkey ? colors[0] : 'grey-6'")
       q-icon(:name="p.icon" :size="page === pkey ? '30px' : '24px'")
 </template>
 

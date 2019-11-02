@@ -1,11 +1,11 @@
 <template lang="pug">
-.row.fit
-  span menu right
+.row.full-width.bg-red
+  span fragment finder from ws link or other shit
 </template>
 
 <script>
 export default {
-  name: 'videoEditor__menuRight',
+  name: 'fragmentFinder',
   data () {
     return {
     }

@@ -4,13 +4,13 @@ q-layout(view='hHh Lpr fFf' :container="true")
   q-btn(
     round color="green" icon="add" size="lg" @click="$refs.contentFinderDialog.show()"
     :style=`{position: 'fixed', zIndex: 1000, bottom: '14px', right: '14px'}`)
-  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      v-if="fragmentsEmpty"
-      :style=`{position: 'fixed', bottom: '20px', right: '80px', height: '50px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.items-center.bg-white.q-px-md
-      span Добавьте фрагментов!
-      q-icon(name="keyboard_arrow_right" color="black" size="28px")
+  //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  //-   div(
+  //-     v-if="fragmentsEmpty"
+  //-     :style=`{position: 'fixed', bottom: '20px', right: '80px', height: '50px', borderRadius: '10px', overflow: 'hidden'}`
+  //-     ).row.items-center.bg-white.q-px-md
+  //-     span Добавьте фрагментов!
+  //-     q-icon(name="keyboard_arrow_right" color="black" size="28px")
   //- content finder dialog
   k-dialog(ref="contentFinderDialog" :value="false")
     content-finder(@content="contentSelected" @close="$refs.contentFinderDialog.hide()")
@@ -59,17 +59,17 @@ q-layout(view='hHh Lpr fFf' :container="true")
           //- body
           div(
             :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-pl-xs
-            div(
-              v-if="(pi+1) % 2 !== 0" v-for="(p, pi) in f.relativePoints" :key="p.x"
-              @click="fragment = f, point = pi, $refs.pointEditMenu.show()"
-              :style=`{position: 'relative'}`
-              ).col-4.q-pr-xs.cursor-pointer
-              div(:style=`{position: 'absolute', bottom: '4px', left: '4px'}`).row.q-pa-xs.bg-red
-                small.text-white i: {{ pi+1 }}
-              //- point preivew...
-              img(
-                :src="f.thumbUrl[pi]"
-                :style=`{width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}` draggable="false")
+            //- div(
+            //-   v-if="(pi+1) % 2 !== 0" v-for="(p, pi) in f.relativePoints" :key="p.x"
+            //-   @click="fragment = f, point = pi, $refs.pointEditMenu.show()"
+            //-   :style=`{position: 'relative'}`
+            //-   ).col-4.q-pr-xs.cursor-pointer
+            //-   div(:style=`{position: 'absolute', bottom: '4px', left: '4px'}`).row.q-pa-xs.bg-red
+            //-     small.text-white i: {{ pi+1 }}
+            //-   //- point preivew...
+            //-   img(
+            //-     :src="f.thumbUrl[pi]"
+            //-     :style=`{width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}` draggable="false")
             div(v-if="f.relativePoints.length === 0").row.full-width.q-pa-sm.q-mb-xs
               q-btn(
                 dense no-caps color="green" @click="fragment = f, pointAdd(0, true)"
@@ -82,10 +82,11 @@ q-layout(view='hHh Lpr fFf' :container="true")
 <script>
 import nodeFragment from './node_fragment'
 import contentFinder from 'components/content_finder'
+import fragmentFinder from 'components/fragment_finder'
 
 export default {
   name: 'nodeCreator__nodeFragments',
-  components: {contentFinder, nodeFragment},
+  components: {contentFinder, nodeFragment, fragmentFinder},
   props: ['colWidth', 'fragments'],
   data () {
     return {
@@ -125,6 +126,7 @@ export default {
       this.$refs.contentFinderDialog.hide()
       await this.$wait(300)
       let WSContent = await this.$store.dispatch('workspace/addWSContent', {name: content.name, content: {oid: content.oid}})
+      this.$log('WSContent', WSContent)
       // open editor
       this.fragmentCreate(WSContent.content)
       // this.fragmentEdit(WSContent.content)
@@ -197,7 +199,7 @@ export default {
       }
     },
     fragmentCreate (content, f) {
-      this.$log('fragmentCreate', content)
+      this.$log('fragmentCreate', content, f)
       let uid = `${content.oid}-${Date.now()}`
       let fragment = null
       switch (content.type) {

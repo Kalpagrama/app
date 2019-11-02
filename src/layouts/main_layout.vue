@@ -47,6 +47,10 @@ export default {
         // document.location.hash = to.path
         // window.history.replaceState(null, null, to.path)
         // this.$q.notify('route changed')
+        // this.$log('history', window.history)
+        // window.history.length = 0
+        // window.onerror = window.close()
+        // window.browser.history.deleteAll()
       }
     },
     '$q.screen.gt.sm': {

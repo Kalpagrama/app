@@ -1,33 +1,42 @@
 <template lang="pug">
-div(v-if="!loading" :style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.bg-black
+div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.justify-center.bg-black
   q-resize-observer(@resize="onResize")
-  //- loading
+  //- fragments local
+  k-dialog(ref="menuLeftDialog")
+    menu-left(:fragments="fragments" :duration="duration" :fragmentsVisible="fragmentsVisible")
+  div(v-if="false" style=`position: absolute; pointerEvents: none; zIndex: 300; right: 16px; width: 350px; opacity: 0.4; borderRadius: 10px; maxHeight: 500px; top: 76px; color: white`
+    ).row.bg-purple.q-pa-sm.scroll
+    small(v-for="(d, di) in debug").full-width {{d}}:{{get(d)}}
+  //- k-menu(ref="kmenu" :fragments="fragments" :colors="colors" :duration="duration")
   div(v-if="!framesLoadedAll" :style=`{position: 'absolute', zIndex: 10000, top: 0, left: 0, pointerEvents: 'none'}`).row.fit.items-center.justify-center
-    q-spinner(:thickness="5" color="primary" size="100px")
-  //- //- fragment menu ?
-  //- k-dialog(ref="menuLeftDialog")
-  //-   menu-left(:fragment="fragment" :duration="duration" :fragmentsVisible="fragmentsVisible")
-  //- video
+    q-spinner(:thickness="10" color="primary" size="200px")
   video(
-    ref="kvideo" :src="fragmentInput.content.url" playsinline :showControls="true" type="video/mp4" crossorigin="Anonymous" :muted="muted"
+    ref="kvideo" :src="content.url" playsinline type="video/mp4" crossorigin="Anonymous" :muted="muted"
     :style=`{height: '100%', width: '100%', objectFit: 'contain'}` @load="videoLoaded"
-    @seeked="videoSeeked"
     @click="videoClick" @playing="videoPlaying" @timeupdate="videoTimeupdate")
   //- actions
-  q-btn(v-if="inCreator" no-caps color="primary" icon="clear" @click="cancel()"
-    :style=`{position: 'absolute', zIndex: 1000, height: '60px', top: '10px', left: '10px', width: '60px', borderRadius: '10px', opacity: 0.8}`)
-  q-btn(v-if="inCreator" no-caps color="primary" icon="check" @click="ready()"
+  //- close with no changes!
+  //- TODO: save initial state of fragments!
+  //- debug
+  div(
+    v-if="false"
+    :style=`{position: 'absolute', top: '0px'}`).row.full-width.bg-primary
+    small.full-width.text-white {{ pointInterval }}
+  q-btn(
+    v-if="true"
+    no-caps color="primary" icon="check" @click="ready()"
     :style=`{position: 'absolute', zIndex: 1000, height: '60px', top: '10px', right: '10px', width: '60px', borderRadius: '10px'}`)
-  q-btn(v-if="inCreator" round color="green" icon="add" @click="pointCreate()"
-    :style=`{position: 'absolute', zIndex: 1000, right: '14px', bottom: '14px'}`)
-  //- --------------
+  q-btn(
+    v-if="true"
+    round dense color="primary" icon="add" @click="$emit('create', now)"
+    :style=`{position: 'absolute', zIndex: 1000, right: '10px', bottom: '24px'}`)
   //- menu-time-menu
   div(v-show="duration > 0" :style=`{position: 'absolute', zIndex: 200, bottom: timelineBottom+160+'px', height: '50px', opacity: 0.6}`
     ).row.full-width.items-center.justify-between.q-px-md
     //- actions left
     div(:style=`{minWidth: '80px'}`).row.full-height.items-center
-      //- q-btn(round flat icon="menu" color="white" @click="menuLeftToggle()").bg-grey-9
-      q-btn(round flat :icon="timelineBottom === 0 ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" color="white" @click="timelineToggle()").bg-grey-9.q-mr-sm
+      q-btn(round flat icon="menu" color="white" @click="menuLeftToggle()").bg-grey-9
+      q-btn(round flat :icon="muted ? 'volume_off' : 'volume_up'" color="white" @click="mutedToggle()").bg-grey-9.q-ml-sm
     //- time
     .col
       .row.full-width.justify-center
@@ -35,42 +44,41 @@ div(v-if="!loading" :style=`{position: 'relative', overflow: 'hidden'}`).row.fit
           ).row.items-center.bg-grey-9.q-px-sm.cursor-pointer
           span(style=`user-select: none`).text-white {{ $time(now) }}/{{ $time(duration) }}
     //- actions right
-    div(:style=`{minWidth: '80px'}`).row.full-height.items-center.justify-end
-      q-btn(round flat :icon="muted ? 'volume_off' : 'volume_up'" color="white" @click="mutedToggle()").bg-grey-9.q-ml-sm
-      //- q-btn(round flat icon="menu" color="white").bg-grey-9
-  //- ----
-  div(:style=`{position: 'absolute', bottom: '200px', zIndex: 1000, height: '40px', paddingLeft: '30px', paddingRight: '30px'}`).row.full-width.items-center
-    div(:style=`{height: '14px', borderRadius: '7px', overflow: 'hidden'}`).row.full-width.bg-red
-      div(:style=`{width: now/duration*100+'%'}`).row.bg-green
-  //- -----------------------
-  //- fragment points wrapper
-  div(v-if="fragment && timelineBottom === 0" :style=`{position: 'absolute', bottom: timelineBottom+82+'px', height: '80px', paddingLeft: width/2+'px'}`).row.full-width
-    //- fragment point
-    div(
-      v-for="(p, pi) in fragment.relativePoints"
-      :style=`{position: 'absolute', top: pointFirst(pi) ? '0px' : '40px', zIndex: 400, height: pointFirst(pi) ? '146px' : '106px', width: '1px',
-        left: -framesScrollLeft+width/2+(p.x*k)+'px', background: $randomColor(pointFirst(pi) ? pi : pi+1)}`).row
-        //- rectangle left
-        //- div(
-        //-   v-if="pointFirst(pi)"
-        //- )
-        //- div(
-        //-   v-if="pointFirst(pi)"
-        //-   :style=`{
-        //-     position: 'absolute', bottom: '0px', height: '50px', background: $randomColor(pi), opacity: 0.5, pointerEvents: 'none',
-        //-     left: fragment.relativePoints[pointFirst(pi) ? pi + 1 : pi]['x'] > fragment.relativePoints[pointFirst(pi) ? pi : pi - 1]['x'] ? '0px' : -Math.abs(k*(fragment.relativePoints[pointFirst(pi) ? p - 1 : pi]['x'] - fragment.relativePoints[pointFirst(pi) ? pi : pi + 1]['x']))+'px',
-        //-     width: Math.abs(k*(fragment.relativePoints[pointFirst(pi) ? pi + 1 : pi]['x'] - fragment.relativePoints[pointFirst(pi) ? pi : pi - 1]['x']))+'px'
-        //-     }`).row
-        //- circle
-        div(
-          v-touch-pan.mouse.stop="$event => pointDrag(p, pi, $event)"
-          :style=`{
-            position: 'absolute', top: '-1px', left: '-20px',
-            width: '40px', height: '40px', borderRadius: '50%', background: $randomColor(pointFirst(pi) ? pi : pi+1, 0.5)
-          }`
-          ).row.items-center.justify-center.cursor-pointer
-          span(style=`user-select: none`).text-white.text-bold {{ pointFirst(pi) ? pi : pi+1 }}
-  //- --------
+    div(:style=`{minWidth: '80px'}`).row.full-height.items-center
+      q-btn(round flat :icon="timelineBottom === 0 ? 'keyboard_arrow_down' : 'keyboard_arrow_up'" color="white" @click="timelineToggle()").bg-grey-9.q-mr-sm
+      q-btn(round flat icon="menu" color="white").bg-grey-9
+  //- relative points
+  div(:style=`{position: 'absolute', bottom: timelineBottom+82+'px', height: '80px', paddingLeft: width/2+'px'}`).row.full-width
+    //- v-show="fragmentsVisible[fkey]"
+    //- fragments
+    div(v-for="(f, fkey, fi) in fragments" :key="fkey")
+      //- point
+      div(v-for="(p, pi) in f.relativePoints"
+        :style=`{position: 'absolute', top: pi === 0 ? '0px' : '40px', zIndex: 400, height: pi === 0 ? '146px' : '106px', width: '1px',
+          left: -framesScrollLeft+width/2+(p.x*k)+'px', background: $randomColor(fkey)}`).row
+          //- rectangle left: -framesScrollLeft+width/2+(k*Math.min(f.relativePoints[0]['x'], f.relativePoints[1]['x'])),
+          div(
+            v-if="pi === 0"
+            :style=`{
+              position: 'absolute', bottom: '0px', height: '50px', background: $randomColor(fkey), opacity: 0.5, pointerEvents: 'none',
+              left: f.relativePoints[1]['x'] > f.relativePoints[0]['x'] ? '0px' : -Math.abs(k*(f.relativePoints[1]['x'] - f.relativePoints[0]['x']))+'px',
+              width: Math.abs(k*(f.relativePoints[1]['x'] - f.relativePoints[0]['x']))+'px'
+              }`).row
+          //- stick
+          div(
+            v-if="pi === 0 && f.label"
+            :style=`{position: 'absolute', top: '-280px', left: '-20px', height: '300px', width: '40px', background: $randomColor(fkey), borderRadius: '20px 20px 0 0'}`
+            ).row.items-center.justify-center.br
+            span(:style=`{lineHeight: '100px'}`).text-white {{ f.label }}
+          //- circle
+          div(
+            v-touch-pan.mouse.stop="$event => pointDrag(f, fkey, p, pi, $event)"
+            :style=`{
+              position: 'absolute', top: '-1px', left: '-20px',
+              width: '40px', height: '40px', borderRadius: '50%', background: $randomColor(f.uid, 0.5)
+            }`
+            ).row.items-center.justify-center.cursor-pointer
+            span(style=`user-select: none`).text-white.text-bold {{ fi+1 }}
   //- timeline
   div(:style=`{position: 'absolute', bottom: timelineBottom+'px', height: '82px'}`).row.full-width.justify-center.items-center.content-center
     //- frames
@@ -82,6 +90,7 @@ div(v-if="!loading" :style=`{position: 'relative', overflow: 'hidden'}`).row.fit
         div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap.shadow-9
           //- frame
           div(
+            v-touch-hold.mouse="$event => frameHold(f, fi, $event)"
             v-for="(f, fi) in frames" :key="f" @click="$event => frameClick(f, fi, $event)"
             :style=`{height: '50px'}`
             ).row.items-center.justify-center.bg-black
@@ -99,17 +108,7 @@ import menuRight from './menu_right'
 export default {
   name: 'videoEditor',
   components: {menuLeft, menuRight},
-  props: {
-    fragmentInput: {
-      type: Object
-    },
-    inCreator: {
-      type: Boolean,
-      default () {
-        return false
-      }
-    }
-  },
+  props: ['content', 'fragments', 'inEditor'],
   data () {
     return {
       loading: false,
@@ -129,11 +128,17 @@ export default {
       framesSynced: false,
       framesDragging: false,
       frameClicks: 0,
-      fragment: null,
       clicks: 0,
       clickDelay: 300,
       clickTimer: null,
-      pointsVisible: [],
+      fragment: null,
+      fragmentsVisible: {},
+      pointActive: undefined,
+      pointDragging: undefined,
+      pointInterval: false,
+      pointDraggingHeight: 40,
+      // debug: ['width', 'height', 'k', 'now', 'duration', 'framesCount', 'frameDuration', 'fragments', 'framesMiddle', 'framesScrollLeft', 'framesScrollWidth'],
+      debug: ['fragment'],
       timelineBottom: 0
     }
   },
@@ -158,13 +163,13 @@ export default {
         if (this.$refs.kframes && this.framesSynced) {
           this.$tween.to(this.$refs.kframes, 0.4, {scrollLeft: (to * this.k)})
         }
-        // if (this.fragment) {
-        //   // this.$log('now GOT FRAGMENT')
-        //   if (to > this.fragment.relativePoints[1]['x']) {
-        //     // this.$log('now START AGAIN')
-        //     this.$refs.kvideo.currentTime = this.fragment.relativePoints[0]['x']
-        //   }
-        // }
+        if (this.fragment) {
+          // this.$log('now GOT FRAGMENT')
+          if (to > this.fragment.relativePoints[1]['x']) {
+            // this.$log('now START AGAIN')
+            this.$refs.kvideo.currentTime = this.fragment.relativePoints[0]['x']
+          }
+        }
       }
     }
   },
@@ -192,17 +197,6 @@ export default {
     get (key) {
       return this[key]
     },
-    pointFirst (i) {
-      let index = i + 1
-      return index % 2 === 0
-    },
-    pointCreate () {
-      this.$log('pointCreate')
-      this.fragment.relativePoints.push({x: this.now})
-      let to = this.now + 3
-      if (to <= this.duration) this.fragment.relativePoints.push({x: to})
-      else this.fragment.relativePoints.push({x: this.duration})
-    },
     pointClick (fi, pi, e) {
       this.$log('pointClick', fi, pi, e)
       this.pointActive = `${fi + pi}`
@@ -212,8 +206,9 @@ export default {
       clearInterval(this.pointInterval)
       this.pointInterval = false
     },
-    pointDrag (p, pi, e) {
+    pointDrag (f, fkey, p, pi, e) {
       // this.$log('pointDrag', e)
+      this.pointDragging = `${fkey}-${pi}`
       let pos = e.position.left
       // right
       if (this.width - pos < 80 && e.direction === 'right') {
@@ -224,7 +219,9 @@ export default {
             pointSet()
           }, 20)
         }
-      } else if (pos < 80 && e.direction === 'left') {
+      }
+      // left
+      if (pos < 80 && e.direction === 'left') {
         this.$log('LEFT')
         if (!this.pointInterval) {
           this.pointInterval = setInterval(() => {
@@ -232,24 +229,24 @@ export default {
             pointSet()
           }, 20)
         }
-      } else {
-        this.pointStop()
       }
       // first
       if (e.isFirst) {
+        this.$set(this, 'fragment', f)
       }
       // final
       if (e.isFinal) {
         this.$log('FINAL FINAL FINAL')
-        // if (this.fragment.relativePoints[0]['x'] > f.relativePoints[1]['x']) f.relativePoints.reverse()
+        if (f.relativePoints[0]['x'] > f.relativePoints[1]['x']) f.relativePoints.reverse()
         this.pointStop()
+        this.pointInverval = null
       }
       // point set
       const pointSet = () => {
-        let from = this.fragment.relativePoints[pi]['x']
+        let from = f.relativePoints[pi]['x']
         let to = from + (e.delta.x / this.k)
         if (to >= 0 && to <= this.duration) {
-          this.$set(this.fragment.relativePoints[pi], 'x', to)
+          this.$set(this.fragments[fkey].relativePoints[pi], 'x', to)
           this.$refs.kvideo.currentTime = to
         }
       }
@@ -292,8 +289,15 @@ export default {
       this.$log('time', time)
       this.$tween.to(this.$refs.kframes, 0.5, {scrollLeft: (time * this.k)})
     },
-    videoSeeked (e) {
-      this.$log('videoSeeked', e)
+    frameHold (f, fi, e) {
+      this.$log('frameHold', e)
+      // let start = e.evt.target.offsetLeft / this.k
+      // let end = start + 5 < this.duration ? start + 5 : this.duration
+      // let uid = `${this.content.oid}-${Date.now()}`
+      // this.$log('start/end', start, end)
+      // let fragment = {uid: uid, relativePoints: [{x: start}, {x: end}]}
+      // this.$emit('create', fragment)
+      // this.fragmentToggle(fragment)
     },
     videoClick (e) {
       // this.$log('videoClick')
@@ -352,7 +356,7 @@ export default {
       this.$log('framesLoad start')
       let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
         query: gql`
-          query getVideo3 ($oid: OID!) {
+          query getVideo2 ($oid: OID!) {
             objectList(oids: [$oid]) {
               ... on Video {
                 frameUrls
@@ -369,9 +373,8 @@ export default {
     },
     timelineToggle () {
       this.$log('timelineToggle')
-      // -162
       if (this.timelineBottom === 0) {
-        this.$tween.to(this, 0.5, {timelineBottom: -150})
+        this.$tween.to(this, 0.5, {timelineBottom: -162})
       } else {
         this.$tween.to(this, 0.5, {timelineBottom: 0})
       }
@@ -388,55 +391,38 @@ export default {
       this.$log('mutedToggle')
       this.muted = !this.muted
     },
-    videoForwardTo (sec) {
-      return new Promise(async (resolve, reject) => {
-        this.$log('videoForwardTo', sec)
-        this.$refs.kvideo.currentTime = sec
-        await this.$wait(1000)
-        resolve()
-      })
-    },
     async ready () {
-      this.$log('ready start')
-      // this.loading = true
+      this.$log('ready')
+      this.loading = true
       let video = this.$refs.kvideo
       video.pause()
       // create canvas
       let canvas = document.createElement('canvas')
-      canvas.width = this.fragment.content.width
-      canvas.height = this.fragment.content.height
+      canvas.width = this.content.width
+      canvas.height = this.content.height
       let ctx = canvas.getContext('2d')
       // loop fragments
-      for (let i = 0; i < this.fragment.relativePoints.length; i++) {
-        let index = i + 1
-        if (index % 2 !== 0) {
-          let point = this.fragment.relativePoints[i]
-          await this.videoForwardTo(point.x)
-          ctx.drawImage(this.$refs.kvideo, 0, 0, canvas.width, canvas.height)
-          await this.$wait(1000)
-          this.fragment.thumbUrl[i] = canvas.toDataURL('image/jpeg', 0.5)
-        }
+      for (const f in this.fragments) {
+        let fragment = this.fragments[f]
+        video.currentTime = fragment.relativePoints[0]['x']
+        await this.$wait(500)
+        ctx.drawImage(this.$refs.kvideo, 0, 0, canvas.width, canvas.height)
+        await this.$wait(500)
+        fragment.thumbUrl = canvas.toDataURL('image/jpeg', 0.5)
       }
-      // this.loading = false
-      this.$log('ready done')
-      this.$emit('fragment', this.fragment)
-    },
-    async cancel () {
-      this.$log('cancel start')
-      this.fragment = null
-      this.$log('cancel done')
-      this.$emit('fragment', this.fragmentInput)
+      this.loading = false
+      this.$emit('hide')
     }
   },
   async mounted () {
-    this.$log('mounted')
-    this.loading = true
-    this.$set(this, 'frames', await this.framesLoad(this.fragmentInput.content.oid))
-    this.$set(this, 'fragment', JSON.parse(JSON.stringify(this.fragmentInput)))
-    this.loading = false
+    this.$log('mounted', this.content)
+    this.$set(this, 'frames', [])
+    this.$set(this, 'frames', await this.framesLoad(this.content.oid))
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$set(this, 'frames', [])
+    clearInterval(this.pointInverval)
   }
 }
 </script>
