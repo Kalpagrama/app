@@ -134,6 +134,10 @@ export default {
     }
   },
   async mounted () {
+    this.$root.$on('create', () => {
+      this.muted = true
+      if (this.$refs.kvideo) this.$refs.kvideo.pause()
+    })
   }
 }
 </script>

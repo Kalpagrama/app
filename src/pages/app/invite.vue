@@ -1,14 +1,16 @@
 <template lang="pug">
-  .row.fit.items-center.justify-center
+  .row.fit.items-center.justify-center.bg-grey-2
     div(style=`maxWidth: 500px; maxHeight: 500px`).column.fit
+      .row.full-width.justify-center
+        span.text-h5 Пришлашение
       .col
         .row.fit.content-center.q-px-md
           .row.full-width.q-mb-sm
-            q-input(v-model="email" type="email" outlined label="Введите email того, кого хотите пригласить" @keyup.enter="emailSend" style=`height: 50px`).row.full-width
+            q-input(v-model="email" type="email" outlined label="Email друга" @keyup.enter="emailSend" style=`height: 50px`).row.full-width
           .row.full-width.q-mb-sm
-            q-btn(label="Пригласить" no-caps color="grey" style=`height: 50px` @click="emailSend" :loading="emailSending").row.full-width
+            q-btn(label="Пригласить" no-caps color="primary" style=`height: 50px` @click="emailSend" :loading="emailSending").row.full-width
           .row.full-width.q-mb-sm
-            q-btn(label="Отмена" no-caps color="grey" style=`height: 50px` @click="$router.go(-2)").row.full-width
+            q-btn(label="Отмена" no-caps color="primary" style=`height: 50px` @click="$emit('hide')").row.full-width
 </template>
 
 <script>

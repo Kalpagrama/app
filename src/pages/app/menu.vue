@@ -1,50 +1,47 @@
 <template lang="pug">
-  q-layout
-    //- header
-    q-header(reveal)
-      div(:style=`{height: '140px'}`).row.full-width.items-center
-        .col.full-height
-          .row.fit.items-center.q-pl-md
-            span(v-if="$store.state.auth.user") {{ $store.state.auth.user.name }}
-        div(:style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
-          q-btn(round flat icon="person_add" color="white" @click="$router.push({name: 'invite'})")
-        div(:style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
-          q-btn(round flat icon="power_off" color="white" @click="logout()")
-    //- page
-    q-page-container
-      div(
-        v-for="(m, mkey) in 100" :key="mkey"
-        :style=`{height: '60px'}`
+q-layout.lt-sm
+  //- header
+  q-header(reveal).row.items-center
+    q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '60px'}` @click="pageClick('/app/home')").row.q-px-sm
+      q-item-section(avatar)
+        q-btn(round flat color="primary")
+          q-icon(name="blur_on" color="white" style=`fontSize: 42px`)
+      q-item-section
+          span.text-bold.text-white Кальпаграмма
+    .col
+    div(:style=`{width: '50px', height: '50px'}`).row.items-center.justify-center
+      q-btn(round flat icon="settings" color="white" @click="")
+    //- div(:style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
+    //-   q-btn(round flat icon="person_add" color="white" @click="$router.push({name: 'invite'})")
+  //- page
+  q-page-container(style=`height: 100vh`).bg-grey-2
+    menumobile
+    //- div(
+      v-for="(m, mkey) in 100" :key="mkey"
+      :style=`{height: '60px'}`
       ).row.full-width.items-center.q-px-md
-        span Menu {{ m }}
-    //- footer
-    q-footer(reveal).bg-grey-4.lg-md
-      k-menu-horiz(page="menu" :colors="['white', 'grey-7']")
+      span Menu {{ m }}
+  //- footer
+  q-footer(reveal).bg-grey-2.lt-md
+    k-menu-horiz(page="menu" :colors="['white', 'grey-7']")
 </template>
 
 <script>
- export default {
+import menumobile from 'components/menumobile'
+export default {
   name: 'menu',
+  components: { menumobile },
   data () {
-   return {
-    menus: {}
-   }
+    return {
+    }
   },
   methods: {
-   async logout () {
-    this.$log('logout')
-    await this.$apollo.mutate({
-     mutation: gql`
-          mutation logout {
-            logout
-          }
-        `
-    })
-    localStorage.removeItem('ktoken')
-    localStorage.removeItem('ktokenExpires')
-    localStorage.removeItem('ktokenInviteCode')
-    this.$router.push('/login')
-   }
+   async pageClick (path) {
+    this.$log('pageClick', path)
+    this.$root.$emit('toggle_menu')
+    await this.$wait(200)
+    this.$router.push(path)
+  }
   },
   mounted () {
    this.$log('mounted')

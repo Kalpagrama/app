@@ -1,93 +1,71 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf' :container="true")
-  //- action add
-  q-btn(
-    round color="green" icon="add" size="lg" @click="$refs.contentFinderDialog.show()"
-    :style=`{position: 'fixed', zIndex: 1000, bottom: '14px', right: '14px'}`)
-  //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-  //-   div(
-  //-     v-if="fragmentsEmpty"
-  //-     :style=`{position: 'fixed', bottom: '20px', right: '80px', height: '50px', borderRadius: '10px', overflow: 'hidden'}`
-  //-     ).row.items-center.bg-white.q-px-md
-  //-     span Добавьте фрагментов!
-  //-     q-icon(name="keyboard_arrow_right" color="black" size="28px")
-  //- content finder dialog
-  k-dialog(ref="contentFinderDialog" :value="false")
-    content-finder(@content="contentSelected" @close="$refs.contentFinderDialog.hide()")
-  //- video editor
+div(:style=`{paddingBottom: '60px'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm.q-px-sm
+  //- fragment finder dialog
+  q-dialog(ref="fragmentFinderDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    fragment-finder(@fragment="fragmentFound" @hide="$refs.fragmentFinderDialog.hide()")
+  //- video editor dialog
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(
       v-if="fragment" :fragmentInput="fragment" :inCreator="true"
       @fragment="fragments[fragment.uid] = $event, $refs.videoEditorDialog.hide(), fragment = null")
   //- actions
-  k-menu-popup(ref="fragmentDeleteMenu" name="Удалить фрагмент?" :actions="[{id: 'delete', name: 'Удалить'}]" @action="fragmentDelete(fragment.uid), fragment = null")
-  k-menu-popup(ref="pointEditMenu" :name="fragment ? fragment.name : ''" :actions="[{id: 'edit', name: 'Изменить'}, {id: 'delete', name: 'Удалить'}]" @action="$event => pointEdit(fragment, point, $event)")
+  //- k-menu-popup(ref="fragmentDeleteMenu" name="Удалить фрагмент?" :actions="[{id: 'delete', name: 'Удалить'}]" @action="fragmentDelete(fragment.uid), fragment = null")
+  //- k-menu-popup(ref="pointEditMenu" :name="fragment ? fragment.name : ''" :actions="[{id: 'edit', name: 'Изменить'}, {id: 'delete', name: 'Удалить'}]" @action="$event => pointEdit(fragment, point, $event)")
   //- k-menu-popup(ref="fragmentMenu" :name="'fragment.name'" :actions="fragmentActions" @action="fragmentAction")
-  q-header(reveal)
-    div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md.bg-primary
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.go(-1)")
+  //- add fragment btn
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    q-btn(
+      v-if="tab === 'fragments'"
+      round color="green" icon="add" size="lg" @click="$refs.fragmentFinderDialog.show()"
+      :style=`{position: 'fixed', zIndex: 1000, bottom: '8px', right: '8px'}`)
+  //- fragment
+  div(
+    v-for="(f, fkey) in fragments" :key="fkey"
+    :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-lg
+    //- header
+    div(
+      :style=`{height: '50px'}`
+      ).row.full-width.items-center.bg-white
       .col.full-height
-        .row.fit.items-center.justify-center
-          span.text-bold.text-white Фрагменты
-      q-btn(round flat color="white" icon="keyboard_arrow_right" @click="$emit('next')")
-  q-page-container
+        //- name preview
+        div(v-if="nameEdit !== fkey" @click="fragmentNameClick(f)").row.fit.items-center.q-pl-sm
+          span().text-bold {{ f.name || 'Enter fragment name' }}
+        //- name input
+        div(v-if="nameEdit === fkey").row.fit.items-center.q-pl-sm
+          input(
+            ref="nameInput" :value="name" @input="f.name = $event.target.value"
+            @blur="nameEdit = undefined" @keyup.enter="nameEdit = undefined"
+            :style=`{border: 'none', height: '30px', borderRadius: '4px', paddingLeft: '4px'}`
+            ).full-width.bg-grey-3.kinput
+      //- delete btn
+      q-btn(round flat dense color="grey-4" icon="delete_outline" @click="fragment = f, $refs.fragmentDeleteMenu.show()").q-mr-xs
     //- body
-    div(body-scroll-lock-ignore).col.scroll.q-px-sm
-      //- wrapper
-      div(:style=`{paddingBottom: '60px'}`).row.full-width.items-start.content-start.justify-center
-        //- fragment
-        div(
-          v-for="(f, fkey) in fragments" :key="fkey"
-          :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-lg
-          //- header
-          div(
-            :style=`{height: '50px'}`
-            ).row.full-width.items-center.bg-white
-            .col.full-height
-              //- name preview
-              div(v-if="nameEdit !== fkey" @click="fragmentNameClick(f)").row.fit.items-center.q-pl-sm
-                span().text-bold {{ f.name || 'Enter fragment name' }}
-              //- name input
-              div(v-if="nameEdit === fkey").row.fit.items-center.q-pl-sm
-                input(
-                  ref="nameInput" :value="name" @input="f.name = $event.target.value"
-                  @blur="nameEdit = undefined" @keyup.enter="nameEdit = undefined"
-                  :style=`{border: 'none', height: '30px', borderRadius: '4px', paddingLeft: '4px'}`
-                  ).full-width.bg-grey-3.kinput
-            //- delete btn
-            q-btn(round flat dense color="grey-4" icon="delete_outline" @click="fragment = f, $refs.fragmentDeleteMenu.show()").q-mr-xs
-          //- body
-          div(
-            :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-pl-xs
-            //- div(
-            //-   v-if="(pi+1) % 2 !== 0" v-for="(p, pi) in f.relativePoints" :key="p.x"
-            //-   @click="fragment = f, point = pi, $refs.pointEditMenu.show()"
-            //-   :style=`{position: 'relative'}`
-            //-   ).col-4.q-pr-xs.cursor-pointer
-            //-   div(:style=`{position: 'absolute', bottom: '4px', left: '4px'}`).row.q-pa-xs.bg-red
-            //-     small.text-white i: {{ pi+1 }}
-            //-   //- point preivew...
-            //-   img(
-            //-     :src="f.thumbUrl[pi]"
-            //-     :style=`{width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}` draggable="false")
-            div(v-if="f.relativePoints.length === 0").row.full-width.q-pa-sm.q-mb-xs
-              q-btn(
-                dense no-caps color="green" @click="fragment = f, pointAdd(0, true)"
-                style=`height: 50px; borderRadius: 10px`).full-width Выделить фрагмент
-          //- debug
-          div(v-if="false").row.full-width.q-pa-sm
-            small {{ f.relativePoints }}
+    div(
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-pl-xs
+      //- div(
+      //-   v-if="(pi+1) % 2 !== 0" v-for="(p, pi) in f.relativePoints" :key="p.x"
+      //-   @click="fragment = f, point = pi, $refs.pointEditMenu.show()"
+      //-   :style=`{position: 'relative'}`
+      //-   ).col-4.q-pr-xs.cursor-pointer
+      //-   div(:style=`{position: 'absolute', bottom: '4px', left: '4px'}`).row.q-pa-xs.bg-red
+      //-     small.text-white i: {{ pi+1 }}
+      //-   //- point preivew...
+      //-   img(
+      //-     :src="f.thumbUrl[pi]"
+      //-     :style=`{width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}` draggable="false")
+      div(v-if="f.relativePoints.length === 0").row.full-width.q-pa-sm.q-mb-xs
+        q-btn(
+          dense no-caps color="green" @click="fragment = f, pointAdd(0, true)"
+          style=`height: 50px; borderRadius: 10px`).full-width Выделить фрагмент
 </template>
 
 <script>
-import nodeFragment from './node_fragment'
-import contentFinder from 'components/content_finder'
 import fragmentFinder from 'components/fragment_finder'
 
 export default {
   name: 'nodeCreator__nodeFragments',
-  components: {contentFinder, nodeFragment, fragmentFinder},
-  props: ['colWidth', 'fragments'],
+  components: {fragmentFinder},
+  props: ['tab', 'fragments'],
   data () {
     return {
       width: 500,
@@ -112,14 +90,11 @@ export default {
     }
   },
   watch: {
-    fragments: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('fragments CHANGED', to)
-      }
-    }
   },
   methods: {
+    async fragmentFound (f) {
+      this.$log('fragmentFound', f)
+    },
     async contentSelected (content) {
       this.$log('contentSelected', content)
       // close content finder dialog
