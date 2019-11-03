@@ -129,7 +129,7 @@ export default {
   mounted () {
     this.$log('mounted')
     const observer = this.$apollo.subscribe({
-      client: 'ws',
+      client: 'wsApollo',
       query: gql`
         subscription uploadProgress {
           progress {

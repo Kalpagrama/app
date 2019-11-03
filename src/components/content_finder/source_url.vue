@@ -131,7 +131,7 @@ export default {
         this.uploading = true
         this.$emit('uploading', true)
         let {data: {uploadContentUrl: {oid}}} = await this.$apollo.mutate({
-          client: 'upload',
+          client: 'uploadApollo',
           mutation: gql`
             mutation uploadContentUrl ($url: String!) {
               uploadContentUrl(url: $url) {

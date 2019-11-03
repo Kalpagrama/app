@@ -1,11 +1,11 @@
 const debug = require('debug')('[node]:action')
 debug.enabled = true
 
-import {apollo} from 'boot/apollo'
+import {apolloProvider} from 'boot/apollo'
 
 export const categories = async (store) => {
   debug('categories start')
-  let {data: {categories}} = await apollo.query({
+  let {data: {categories}} = await apolloProvider.clients.apiApollo.query({
     query: gql`
       query categories {
         categories {
@@ -28,7 +28,7 @@ export const categories = async (store) => {
 export const nodeUnrate = async (store, oid) => {
   debug('nodeUnrate start')
   if (!oid) return
-  let {data: {nodeUnrate}} = await apollo.mutate({
+  let {data: {nodeUnrate}} = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodeUnrate ($oid: OID!) {
         nodeUnrate (oid: $oid)
@@ -47,7 +47,7 @@ export const nodeRate = async (store, {oid, rate}) => {
   debug('nodeRate start', oid, rate)
   if (!oid) throw new Error(`No oid!`)
   if (!rate) throw new Error(`No rate!`)
-  let {data: {nodeRate}} = await apollo.mutate({
+  let {data: {nodeRate}} = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodeRate ($oid: OID!, $rate: Float!) {
         nodeRate (oid: $oid, rate: $rate)
@@ -95,7 +95,7 @@ export const nodeCreate = async (store, payload) => {
   }
   if (payload.parentNode) node.parentNode = payload.parentNode
   debug('nodeCreate node', node)
-  let {data: {nodeCreate}} = await apollo.mutate({
+  let {data: {nodeCreate}} = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodePublish ($node: NodeInput!) {
         nodeCreate (node: $node)

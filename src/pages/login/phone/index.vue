@@ -32,8 +32,8 @@
      this.$log('smsSend start', this.phone)
      this.smsSending = true
      if (this.phone.length === 0) throw { message: 'Wrong phone!' }
-     // await this.$wait(500)
      let { data: { loginPhone: { token, expires, role } } } = await this.$apollo.mutate({
+      client: 'authApollo',
       mutation: gql`
             mutation loginPhone ($phone: String!, $inviteCode: OID){
               loginPhone(phone: $phone, inviteCode: $inviteCode){
@@ -66,9 +66,8 @@
      this.codeSending = true
      this.codeConfirmed = false
      if (this.code.length !== 4) throw { message: 'Wrong code!' }
-     // await this.$wait(500)
-     // if (this.code !== this.codeFake) throw {message: 'Wrong code!'}
      let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
+      client: 'authApollo',
       mutation: gql`
             mutation codeConfirmPhone ($code: String!) {
               confirm(code: $code){
