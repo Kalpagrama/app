@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf' :container="true")
+q-layout(view='hHh Lpr fFf' style=`` :container="true")
   //- action add
   q-btn(
     round color="green" icon="add" size="lg" @click="$refs.contentFinderDialog.show()"

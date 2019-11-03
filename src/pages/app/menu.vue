@@ -1,37 +1,47 @@
 <template lang="pug">
-q-layout
+q-layout.lt-sm
   //- header
-  q-header(reveal)
-    div(:style=`{height: '140px'}`).row.full-width.items-center
-      .col.full-height
-        .row.fit.items-center.q-pl-md
-          span(v-if="$store.state.auth.user") {{ $store.state.auth.user.name }}
-      div(:style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
-        q-btn(round flat icon="power_off" color="white" @click="logout()")
+  q-header(reveal).row.items-center
+    q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '50px'}` @click="pageClick('/app/home')").row.q-px-sm
+      q-item-section(avatar)
+        q-btn(round flat color="primary")
+          q-icon(name="blur_on" color="white" style=`fontSize: 42px`)
+    .col.row.items-center.justify-center
+      span.text-bold Кальпаграмма
+    div(:style=`{width: '50px', height: '50px'}`).row.items-center.justify-center
+      q-btn(round flat icon="exit_to_app" color="white" @click="logout()")
   //- page
-  q-page-container
-    div(
+  q-page-container(style=`height: 100vh`).bg-grey-2
+    menumobile
+    //- div(
       v-for="(m, mkey) in 100" :key="mkey"
       :style=`{height: '60px'}`
       ).row.full-width.items-center.q-px-md
       span Menu {{ m }}
   //- footer
-  q-footer(reveal).bg-grey-4.lg-md
+  q-footer(reveal).bg-grey-2.lt-md
     k-menu-horiz(page="menu" :colors="['white', 'grey-7']")
 </template>
 
 <script>
+import menumobile from 'components/menumobile'
 export default {
   name: 'menu',
+  components: { menumobile },
   data () {
     return {
-      menus: {}
     }
   },
   methods: {
     logout () {
       this.$log('logout')
-    }
+    },
+    async pageClick (path) {
+      this.$log('pageClick', path)
+      this.$root.$emit('toggle_menu')
+      await this.$wait(200)
+      this.$router.push(path)
+    },
   },
   mounted () {
     this.$log('mounted')

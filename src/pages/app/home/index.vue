@@ -1,10 +1,10 @@
 <template lang="pug">
-q-layout()
-  q-header(reveal).bg-grey-2
+q-layout(container style=`height: 100vh`)
+  //- q-header(reveal).bg-secondary
     div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
       span header
-  q-page-container
-    node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
+  q-page-container.bg-grey-2
+    node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables").q-pt-xl
       template(v-slot:items=`{items, fetchingMore}`)
         node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
   q-footer(reveal).lt-md
@@ -17,6 +17,8 @@ export default {
   components: {},
   data () {
     return {
+      drawer: false,
+      miniState: false,
       nodes: [],
       query: gql`
         query feed($pageToken: RawJSON) {
@@ -47,6 +49,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$root.$on('page', () => {
+      if (this.$refs.kDrawer) this.$refs.kDrawer.toggle()
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
