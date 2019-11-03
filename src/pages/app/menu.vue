@@ -6,12 +6,13 @@ q-layout.lt-sm
       q-item-section(avatar)
         q-btn(round flat color="primary")
           q-icon(name="blur_on" color="white" style=`fontSize: 42px`)
-    .col.row.items-center.justify-center
-      span.text-bold Кальпаграмма
+      q-item-section
+          span.text-bold.text-white Кальпаграмма
+    .col
     div(:style=`{width: '50px', height: '50px'}`).row.items-center.justify-center
-      q-btn(round flat icon="exit_to_app" color="white" @click="logout()")
-    div(:style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
-      q-btn(round flat icon="person_add" color="white" @click="$router.push({name: 'invite'})")
+      q-btn(round flat icon="settings" color="white" @click="")
+    //- div(:style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
+    //-   q-btn(round flat icon="person_add" color="white" @click="$router.push({name: 'invite'})")
   //- page
   q-page-container(style=`height: 100vh`).bg-grey-2
     menumobile
@@ -40,21 +41,7 @@ export default {
     this.$root.$emit('toggle_menu')
     await this.$wait(200)
     this.$router.push(path)
-  },
-  async logout () {
-    this.$log('logout')
-    await this.$apollo.mutate({
-     mutation: gql`
-          mutation logout {
-            logout
-          }
-        `
-    })
-    localStorage.removeItem('ktoken')
-    localStorage.removeItem('ktokenExpires')
-    localStorage.removeItem('ktokenInviteCode')
-    this.$router.push('/login')
-   }
+  }
   },
   mounted () {
    this.$log('mounted')

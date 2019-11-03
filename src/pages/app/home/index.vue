@@ -1,8 +1,8 @@
 <template lang="pug">
-q-layout(container style=`height: 100vh`)
+q-layout()
   //- q-header(reveal).bg-secondary
-    div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
-      span header
+  //-   div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
+  //-     span header
   q-page-container.bg-grey-2
     node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables").q-pt-xl
       template(v-slot:items=`{items, fetchingMore}`)

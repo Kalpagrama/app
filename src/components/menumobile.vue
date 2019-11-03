@@ -1,5 +1,7 @@
 <template lang="pug">
 div(:style=`{}`).column.fit.bg-grey-2
+  q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    pageInvite(@hide="$refs.inviteDialog.hide()")
   .col
     q-item(clickble v-ripple :to="`/app/user`" :style=`{height: '70px'}` @click="pageClick('/app/user')").row.full-width.items-center.q-px-sm
       q-item-section(avatar)
@@ -35,30 +37,34 @@ div(:style=`{}`).column.fit.bg-grey-2
           q-icon(name="notifications" color="primary" style=`fontSize: 30px`)
       q-item-section.col.q-px-sm
         span(style=`fontWeight: 400`) Уведомления
-    q-item(clickble :to="`/`" @click="pageClick('/')"
+    q-item(clickable @click="$refs.inviteDialog.show()"
       :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
       q-item-section(avatar)
         q-btn(round flat color="primary")
-          q-icon(name="insert_invitation" color="primary" style=`fontSize: 30px`)
+          q-icon(name="person_add" color="primary" style=`fontSize: 30px`)
       q-item-section.col.q-px-sm
         span(style=`fontWeight: 400`) Пригласить друга
-    q-item(clickble :to="`/`" @click="pageClick('/')"
+    q-item(clickble :to="`/`" @click="logout()"
       :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
       q-item-section(avatar)
         q-btn(round flat color="primary")
-          q-icon(name="settings" color="primary" style=`fontSize: 30px`)
+          q-icon(name="exit_to_app" color="primary" style=`fontSize: 30px`)
       q-item-section.col.q-px-sm
-        span(style=`fontWeight: 400`) Настройки
+        span(style=`fontWeight: 400`) Выйти
 </template>
 <script>
+import pageInvite from 'pages/app/invite'
 export default {
   name: 'menumobile',
-  components: {},
+  components: { pageInvite },
   data () {
     return {
     }
   },
   methods: {
+    show () {
+      this.$refs.inviteDialog.show()
+    },
     async pageClick (path) {
       this.$log('pageClick', path)
       this.$root.$emit('toggle_menu')
@@ -66,7 +72,18 @@ export default {
       this.$router.push(path)
     },
     async logout () {
-      this.$log('logout')
+    this.$log('logout')
+    await this.$apollo.mutate({
+     mutation: gql`
+          mutation logout {
+            logout
+          }
+        `
+    })
+    localStorage.removeItem('ktoken')
+    localStorage.removeItem('ktokenExpires')
+    localStorage.removeItem('ktokenInviteCode')
+    this.$router.push('/login')
     }
   }
 }
