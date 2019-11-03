@@ -1,8 +1,15 @@
 <template lang="pug">
-.column.fit
+.column.fit.bg-white
   //- header
   div(:style=`{minHeight: '70px'}`).row.full-width
-    //- q-btn(round flat icon="more_horiz" color="grey-8")
+    //- header
+    div(:style=`{height: '70px'}`).row.full-width
+      .col.full-height
+        .row.fit.items-center.justify-start.q-px-md
+          span.text-bold Upload by URL
+      div(:style=`{height: '70px', width: '70px'}`).row.items-center.justify-center.q-px-md
+        q-btn(round flat icon="clear" @click="$emit('hide')")
+    //- header input
     div(:style=`{minHeight: height+'px'}`).row.full-width.items-end.q-px-sm
       div(:style=`{height: '56px', borderRadius: '10px', overflow: 'hidden', zIndex: 300}`).row.full-width
         .row.full-width
@@ -10,10 +17,9 @@
             template(v-slot:append)
               q-btn(v-if="input.length > 0" round flat icon="clear" @click="inputClear()")
   //- body
-  div(body-scroll-lock-ignore).col.scroll.full-width
+  .col.scroll.full-width
     .row.full-width.items-start.content-start
       div(v-show="!inputFocused && input.length === 0").row.full-width.q-pa-sm
-        //- icon="save_alt"
         q-btn(color="grey-7" outline style=`height: 50px; borderRadius: 10px` no-caps @click="inputBuffer()").full-width
           span Вставить из буфера обмена
       div(v-show="inputValid").row.full-width.q-px-sm
@@ -133,7 +139,7 @@ export default {
         let {data: {uploadContentUrl: {oid}}} = await this.$apollo.mutate({
           client: 'upload',
           mutation: gql`
-            mutation uploadContentUrlOldOld ($url: String!) {
+            mutation uploadContentUrl ($url: String!) {
               uploadContentUrl(url: $url) {
                 oid
                 type

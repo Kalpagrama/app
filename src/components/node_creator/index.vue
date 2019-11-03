@@ -1,41 +1,39 @@
 <template lang="pug">
-.row.window-height
-  //- editors
-  //- k-dialog(ref="nodeEditorDialog" :value="false")
-  //-   node-editor(:node="node" @hide="$refs.nodeEditorDialog.hide()"
-  //-     @name="name = $event" @spheres="spheres = $event" @categories="categories = $event" @meta="meta = $event")
-  //- panels wrapper
-  q-tab-panels(ref="ncPanels" v-model="tab" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).row.fit
-    //- main desktop panel
-    q-tab-panel(name="main" style=`margin: 0; padding: 0`).row.fit
-      .row.fit.scroll
-        div.row.full-height.no-wrap
-          //- fragments
-          div(:style=`{position: 'relative', maxWidth: colWidth+'px', minWidth: colWidth+'px', height: $q.screen.height+'px'}`).col
-            node-fragments(@next="$refs.ncPanels.goTo('preview')"
-              ref="nodeFragments" :fragments="fragments" :colWidth="colWidth" @create="$refs.contentFinderDialog.show()")
-          //- node editor wrapper
-          div(:style=`{minWidth: colWidth+'px', maxWidth: colWidth+'px'}`).col.gt-sm
-            //- node-editor(
-            //-   :node="node" :nodePublishing="nodePublishing" @update="nodeUpdate" @publish="nodePublish")
-    //- mobile panel
-    q-tab-panel(name="preview" style=`margin: 0; padding: 0`)
-      .row.fit
-        //- node-editor(@back="$refs.ncPanels.goTo('main')"
-        //-   :node="node" :nodePublishing="nodePublishing" @update="nodeUpdate" @publish="nodePublish")
+q-layout(view="hHh lpR lff" :style=`{height: '100vh'}`).column.bg-primary
+  q-dialog(ref="nodeCreatorHelperDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    helper(@hide="$refs.nodeCreatorHelperDialog.hide()")
+  q-header
+    div(:style=`{height: '60px'}`).row.full-width
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(round flat icon="menu" color="grey-3" @click="$refs.nodeCreatorHelperDialog.toggle()")
+      .col.full-height
+        .row.fit.items-center.justify-center.q-px-md
+          span.text-bold Ядрогенератор
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(round flat icon="clear" @click="$emit('hide')")
+    q-tabs(v-model="tab" @input="tabChanged")
+      q-tab(no-caps name="fragments" label="Фрагменты")
+      q-tab(no-caps name="preview" label="Предосмотр")
+  q-page-container.col
+    q-tab-panels(v-model="tab" @input="tabChanged" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).fit
+      q-tab-panel(name="fragments" style=`margin: 0; padding: 0`)
+        node-fragments(:tab="tabLocal" :fragments="fragments")
+      q-tab-panel(name="preview" style=`margin: 0; padding: 0`)
+        node-preview(:tab="tabLocal" :node="node")
 </template>
 
 <script>
 import nodeFragments from './node_fragments'
-import nodeEditor from './node_editor'
+import nodePreview from './node_preview'
+import helper from './helper'
 
 export default {
   name: 'nodeCreator',
-  components: {nodeFragments, nodeEditor},
+  components: {nodeFragments, nodePreview, helper},
   data () {
     return {
-      tab: 'main',
-      content: null,
+      tab: 'fragments',
+      tabLocal: 'fragments',
       draft: null,
       uid: undefined,
       name: '',
@@ -43,8 +41,7 @@ export default {
       layout: 'PIP',
       layoutPolicy: 'DEFAULT',
       spheres: [],
-      categories: [],
-      nodePublishing: false
+      categories: []
     }
   },
   computed: {
@@ -86,18 +83,6 @@ export default {
           })
         }
       }
-    },
-    readyForPreview () {
-      if (Object.keys(this.fragments).length > 1) return true
-      else return false
-    },
-    readyForPublish () {
-      return false
-    },
-    colWidth () {
-      let w = this.$q.screen.width
-      if (w > 500) return 500
-      else return w
     }
   },
   watch: {
@@ -110,36 +95,11 @@ export default {
     }
   },
   methods: {
-    async nodeUpdate (key, val) {
-      this.$log('nodeUpdate', key, val)
-      this[key] = val
-    },
-    async nodePublish () {
-      try {
-        this.$log('nodePublish start')
-        this.nodePublishing = true
-        await this.$wait(3000)
-        // create mutation
-        let node = await this.$store.dispatch('node/nodeCreate', this.node)
-        // delete ws draft
-        if (this.draft) {
-          let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
-          this.$log('deleteWSDraft', deleteWSDraft)
-        }
-        // remove draftLocal
-        localStorage.removeItem('draft')
-        // remove draftStorage
-        this.$store.commit('workspace/state', ['draft', null])
-        // done
-        this.$log('nodePublish done', node)
-        this.nodePublishing = false
-        // go to home
-        this.$router.push(`/app/home`)
-      } catch (error) {
-        this.$log('nodePublis error', error)
-        this.nodePublishing = false
-        this.$q.notify({message: 'Node publish error!', color: 'red', textColor: 'white'})
-      }
+    async tabChanged (tab) {
+      // this.$log('tabChanged', tab)
+      this.tabLocal = undefined
+      await this.$wait(300)
+      this.tabLocal = tab
     },
     useDraft (draft) {
       this.$set(this, 'uid', draft.uid)

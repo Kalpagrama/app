@@ -1,37 +1,26 @@
 <template lang="pug">
 div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width.q-px-sm.bg-primary
   div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '20px 20px 0 0'}`
-    ).row.full-width.items-center.content-center.justify-between.q-px-md.q-mx-md
-    q-btn(
-      v-for="(p, pkey) in pages" :key="pkey" @click="pageClick(p, pkey)"
-      round flat :color="page === pkey ? colors[0] : 'grey-6'")
-      q-icon(:name="p.icon" :size="page === pkey ? '30px' : '24px'")
+    ).row.full-width.items-center.content-center.justify-between.q-px-xs
+    q-btn(round flat icon="blur_on" color="grey" @click="pageClick('/app/home')")
+    q-btn(round flat icon="whatshot" color="grey" @click="pageClick('/app/hot')")
+    q-btn(round icon="add" color="green" size="md" @click="$root.$emit('create')")
+    q-btn(round flat icon="cloud_queue" color="grey" @click="pageClick('/app/workspace')")
+    q-btn(round flat icon="menu" color="grey" @click="pageClick('/app/menu')")
 </template>
 
 <script>
 export default {
   name: 'kMenuHoriz',
-  props: ['page', 'colors'],
   data () {
     return {
-      pages: {
-        'home': {name: 'Home', icon: 'blur_on', path: '/app/home'},
-        'hot': {name: 'Hot', icon: 'whatshot', path: '/app/hot'},
-        'create': {name: 'Create', icon: 'add', path: '/app/create'},
-        'workspace': {name: 'Workspace', icon: 'cloud_queue', path: '/app/workspace'},
-        'menu': {name: 'Menu', icon: 'menu', path: '/app/menu'}
-      }
     }
   },
   methods: {
-    pageClick (p, pkey) {
-      this.$log('pageClick', p, pkey)
-      if (this.page === pkey) {
-        this.$root.$emit('page', p)
-      } else {
-        // this.$router.push(p.path)
-        this.$router.push(p.path)
-      }
+    pageClick (path) {
+      this.$log('pageClick', path)
+      this.$root.$emit('page', path)
+      this.$router.push(path)
     }
   }
 }

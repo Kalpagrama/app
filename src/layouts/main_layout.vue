@@ -1,19 +1,21 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf').bg-primary
-  k-dialog(:value="$store.state.ui.dialogOpened" ref="kDialog" @hide="$store.commit('ui/state', ['dialogOpened', false])")
-    ws-fragment-editor(
-      v-if="$store.state.workspace.fragment && !$store.state.node.node"
-      @hide="$refs.kDialog.hide()")
-    node-rate(
-      v-if="$store.state.node.node && !$store.state.node.answer"
-      @hide="$refs.kDialog.hide()")
-    node-answer(
-      v-if="$store.state.node.node && $store.state.node.answer"
-      @hide="$refs.kDialog.hide()")
+q-layout(view='hHh Lpr fFf' @resize="onResize").bg-primary
+  q-dialog(ref="nodeCreatorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    node-creator(@hide="$refs.nodeCreatorDialog.hide()")
+  //- k-dialog(:value="$store.state.ui.dialogOpened" ref="kDialog" @hide="$store.commit('ui/state', ['dialogOpened', false])")
+  //-   ws-fragment-editor(
+  //-     v-if="$store.state.workspace.fragment && !$store.state.node.node"
+  //-     @hide="$refs.kDialog.hide()")
+  //-   node-rate(
+  //-     v-if="$store.state.node.node && !$store.state.node.answer"
+  //-     @hide="$refs.kDialog.hide()")
+  //-   node-answer(
+  //-     v-if="$store.state.node.node && $store.state.node.answer"
+  //-     @hide="$refs.kDialog.hide()")
   q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
     k-menu-vert.bg-primary
   q-page-container
-    router-view(v-if="!loading")
+    router-view(v-if="!loading" :height="height" :width="width")
     div(v-else).row.full-width.window-height.items-center.justify-center
       q-spinner(size="50px" :thickness="2" color="white")
 </template>
@@ -21,10 +23,11 @@ q-layout(view='hHh Lpr fFf').bg-primary
 <script>
 import kMenuVert from 'components/k_menu_vert'
 import kMenuHoriz from 'components/k_menu_horiz'
+import nodeCreator from 'components/node_creator'
 
 export default {
   name: 'mainLayout',
-  components: {kMenuHoriz, kMenuVert},
+  components: {kMenuHoriz, kMenuVert, nodeCreator},
   data () {
     return {
       loading: true,
@@ -36,23 +39,6 @@ export default {
     }
   },
   watch: {
-    '$route': {
-      handler (to, from) {
-        this.$log('$route CHANGED', to)
-        // window.history.length = 0
-        // window.history.replaceState([], null, null)
-        // window.browser.history.deleteAll()
-        // delete window.history
-        // window.history.replaceState(null, null, '#' + url)
-        // document.location.hash = to.path
-        // window.history.replaceState(null, null, to.path)
-        // this.$q.notify('route changed')
-        // this.$log('history', window.history)
-        // window.history.length = 0
-        // window.onerror = window.close()
-        // window.browser.history.deleteAll()
-      }
-    },
     '$q.screen.gt.sm': {
       immediate: true,
       handler (to, from) {
@@ -83,6 +69,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
+    await this.$wait(500)
     // TODO: handle page height...
     // this.$refs.zresize.trigger()
     // let vh = (window.innerHeight - 60) * 0.01
@@ -90,6 +77,9 @@ export default {
     // document.documentElement.style.setProperty('--vh', `${vh}px`)
     this.$root.$on('toggle_menu', () => {
       if (this.$q.screen.lt.md) this.menuToggle()
+    })
+    this.$root.$on('create', () => {
+      if (this.$refs.nodeCreatorDialog) this.$refs.nodeCreatorDialog.show()
     })
   },
   async created () {
