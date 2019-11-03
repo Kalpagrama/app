@@ -35,11 +35,6 @@ export default {
     }
   },
   methods: {
-    logout () {
-      this.$log('logout')
-    }
-  },
-  methods: {
    async pageClick (path) {
     this.$log('pageClick', path)
     this.$root.$emit('toggle_menu')
