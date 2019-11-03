@@ -12,8 +12,21 @@ q-layout(view='hHh Lpr fFf' @resize="onResize").bg-primary
   //-   node-answer(
   //-     v-if="$store.state.node.node && $store.state.node.answer"
   //-     @hide="$refs.kDialog.hide()")
-  q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
+  q-drawer(
+    side="left" v-model="drawer" show-if-above
+    :mini="!drawer || miniState" :breakpoint="500" bordered content-class="bg-grey-3" :width="210" no-swipe-open).gt-sm
     k-menu-vert.bg-primary
+    div(class="" style="margin-top: -80px; margin-right: 4px;").row.justify-end
+      q-btn(
+        dense
+        round
+        unelevated
+        size="20px"
+        :icon="miniState ? 'chevron_right' : 'chevron_left'"
+        style=`color: #fff`
+        @click="toggleMini")
+    .row.full-width.justify-start.q-pl-sm
+      span.text-grey-3 0.4.0
   q-page-container
     router-view(v-if="!loading" :height="height" :width="width")
     div(v-else).row.full-width.window-height.items-center.justify-center
@@ -35,7 +48,10 @@ export default {
       radius: 30,
       width: 0,
       height: 0,
-      noPointerEvents: true
+      noPointerEvents: true,
+      miniState: false,
+      drawer: true,
+      toggleIcon: ''
     }
   },
   watch: {
@@ -52,6 +68,20 @@ export default {
     }
   },
   methods: {
+    toggleMini (miniState) {
+      this.miniState = !this.miniState
+    },
+    // drawerClick (e) {
+    //   // if in "mini" state and user
+    //   // click on drawer, we switch it to "normal" mode
+    //   if (this.miniState) {
+    //     this.miniState = false
+    //     // notice we have registered an event with capture flag;
+    //     // we need to stop further propagation as this click is
+    //     // intended for switching drawer to "normal" mode only
+    //     e.stopPropagation()
+    //   }
+    // },
     onResize (e) {
       // this.$log('onResize', e)
       this.width = e.width
@@ -93,8 +123,10 @@ export default {
       // if (localStorage.getItem('kdebug')) this.d = true
       // check token
       let token = this.$route.query.token
+      let expires = this.$route.query.expires
       if (token) {
         localStorage.setItem('ktoken', token)
+        localStorage.setItem('ktokenExpires', expires)
         this.$router.push('/app/home')
       }
       // this.$q.notify('token', token)
@@ -105,7 +137,8 @@ export default {
         query userCheck {
           userIsAuthorized
           userIsConfirmed
-          }`
+          }`,
+       fetchPolicy: 'network-only'
         })
       // this.$log('userIsAuthorized', userIsAuthorized)
       // this.$log('userIsConfirmed', userIsConfirmed)

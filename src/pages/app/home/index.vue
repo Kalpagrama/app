@@ -14,6 +14,8 @@ export default {
   components: {},
   data () {
     return {
+      drawer: false,
+      miniState: false,
       nodes: [],
       query: gql`
         query feed($pageToken: RawJSON) {
@@ -44,6 +46,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$root.$on('page', () => {
+      if (this.$refs.kDrawer) this.$refs.kDrawer.toggle()
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

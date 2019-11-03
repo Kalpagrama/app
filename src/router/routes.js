@@ -14,7 +14,8 @@ const routes = [
       { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
       { name: 'workspace', path: 'workspace/:menu?', component: () => import('pages/app/workspace') },
       { name: 'create', path: 'create', component: () => import('components/node_creator') },
-      { name: 'menu', path: 'menu', component: () => import('pages/app/menu') }
+      { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
+      { name: 'invite', path: 'invite', component: () => import('pages/app/invite') }
     ]
   },
   {
