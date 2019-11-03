@@ -20,14 +20,14 @@ export default {
     },
     async logout () {
       this.$log('logout')
-      await this.$apollo.query({
-        query: gql`
-          query logout {
-            logout
-          }
-        `
-      })
-      this.$router.push('/login')
+      // await this.$apollo.mutate({
+      //  mutation: gql`
+      //     mutation logout {
+      //       logout
+      //     }
+      //   `
+      // })
+      // this.$router.push('/login')
     }
   },
   mounted () {
