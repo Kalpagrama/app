@@ -2,7 +2,7 @@
 q-layout.lt-sm
   //- header
   q-header(reveal).row.items-center
-    q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '50px'}` @click="pageClick('/app/home')").row.q-px-sm
+    q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '60px'}` @click="pageClick('/app/home')").row.q-px-sm
       q-item-section(avatar)
         q-btn(round flat color="primary")
           q-icon(name="blur_on" color="white" style=`fontSize: 42px`)
