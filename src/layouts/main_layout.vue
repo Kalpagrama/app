@@ -61,6 +61,7 @@ q-layout(view='lHh Lpr fFf').bg-primary
 <script>
 import kMenuVert from 'components/k_menu_vert'
 import kMenuHoriz from 'components/k_menu_horiz'
+import gql from 'graphql-tag'
 
 export default {
   name: 'mainLayout',
@@ -160,8 +161,10 @@ export default {
       // if (localStorage.getItem('kdebug')) this.d = true
       // check token
       let token = this.$route.query.token
+      let expires = this.$route.query.expires
       if (token) {
         localStorage.setItem('ktoken', token)
+        localStorage.setItem('ktokenExpires', expires)
         this.$router.push('/app/home')
       }
       // this.$q.notify('token', token)
@@ -172,7 +175,8 @@ export default {
         query userCheck {
           userIsAuthorized
           userIsConfirmed
-          }`
+          }`,
+       fetchPolicy: 'network-only'
         })
       // this.$log('userIsAuthorized', userIsAuthorized)
       // this.$log('userIsConfirmed', userIsConfirmed)

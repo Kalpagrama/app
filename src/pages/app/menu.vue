@@ -10,6 +10,8 @@ q-layout.lt-sm
       span.text-bold Кальпаграмма
     div(:style=`{width: '50px', height: '50px'}`).row.items-center.justify-center
       q-btn(round flat icon="exit_to_app" color="white" @click="logout()")
+    div(:style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
+      q-btn(round flat icon="person_add" color="white" @click="$router.push({name: 'invite'})")
   //- page
   q-page-container(style=`height: 100vh`).bg-grey-2
     menumobile
@@ -35,19 +37,35 @@ export default {
   methods: {
     logout () {
       this.$log('logout')
-    },
-    async pageClick (path) {
-      this.$log('pageClick', path)
-      this.$root.$emit('toggle_menu')
-      await this.$wait(200)
-      this.$router.push(path)
-    },
+    }
+  },
+  methods: {
+   async pageClick (path) {
+    this.$log('pageClick', path)
+    this.$root.$emit('toggle_menu')
+    await this.$wait(200)
+    this.$router.push(path)
+  },
+  async logout () {
+    this.$log('logout')
+    await this.$apollo.mutate({
+     mutation: gql`
+          mutation logout {
+            logout
+          }
+        `
+    })
+    localStorage.removeItem('ktoken')
+    localStorage.removeItem('ktokenExpires')
+    localStorage.removeItem('ktokenInviteCode')
+    this.$router.push('/login')
+   }
   },
   mounted () {
-    this.$log('mounted')
+   this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+   this.$log('beforeDestroy')
   }
-}
+ }
 </script>
