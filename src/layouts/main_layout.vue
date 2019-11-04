@@ -1,44 +1,46 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf').bg-primary
-  //- bookmark
-  k-dialog(
-    v-if="$store.state.workspace.bookmarkEditorDialogOpened" :value="$store.state.workspace.bookmarkEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false]), $store.commit('workspace/state', ['bookmark', null])")
-    ws-bookmark-editor(type="create" :bookmark="$store.state.workspace.bookmark" @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
-  //- fragment
-  k-dialog(
-    v-if="$store.state.workspace.fragmentEditorDialogOpened" :value="$store.state.workspace.fragmentEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false]), $store.commit('workspace/state', ['fragment', null])")
-    ws-fragment-editor(type="create" :fragment="$store.state.workspace.fragment" @hide="$store.commit('workspace/state', ['fragmentEditorDialogOpened', false])")
-  //- boomark dialog
-  k-dialog(
-    v-if="$store.state.workspace.bookmarkEditorDialogOpened" :value="$store.state.workspace.bookmarkEditorDialogOpened"
-    @hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
-    ws-bookmark-editor(@hide="$store.commit('workspace/state', ['bookmarkEditorDialogOpened', false])")
-  //- rate dialog
-  k-dialog(
-    v-if="$store.state.node.rateDialogOpened" :value="$store.state.node.rateDialogOpened"
-    @hide="$store.commit('node/state', ['rateDialogOpened', false])")
-    node-rate(@hide="$store.commit('node/state', ['rateDialogOpened', false])")
-  //- drawer
-  q-drawer(side="left" v-model="showLeftDrawer" :width="210" no-swipe-open)
+q-layout(view='hHh Lpr fFf' @resize="onResize").bg-primary
+  q-dialog(ref="nodeCreatorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    node-creator(@hide="$refs.nodeCreatorDialog.hide()")
+  //- k-dialog(:value="$store.state.ui.dialogOpened" ref="kDialog" @hide="$store.commit('ui/state', ['dialogOpened', false])")
+  //-   ws-fragment-editor(
+  //-     v-if="$store.state.workspace.fragment && !$store.state.node.node"
+  //-     @hide="$refs.kDialog.hide()")
+  //-   node-rate(
+  //-     v-if="$store.state.node.node && !$store.state.node.answer"
+  //-     @hide="$refs.kDialog.hide()")
+  //-   node-answer(
+  //-     v-if="$store.state.node.node && $store.state.node.answer"
+  //-     @hide="$refs.kDialog.hide()")
+  q-drawer(
+    side="left" v-model="drawer" show-if-above
+    :mini="!drawer || miniState" :breakpoint="500" bordered content-class="bg-grey-3" :width="210" no-swipe-open).gt-sm
     k-menu-vert.bg-primary
+    div(class="" style="margin-top: -80px; margin-right: 4px;").row.justify-end
+      q-btn(
+        dense
+        round
+        unelevated
+        size="20px"
+        :icon="miniState ? 'chevron_right' : 'chevron_left'"
+        style=`color: #fff`
+        @click="toggleMini")
+    .row.full-width.justify-start.q-pl-sm
+      span.text-grey-3 0.4.0
   q-page-container
-    q-page(:style=`{borderRadius: $q.screen.gt.sm ? '10px 0 0 10px' : '0 0 10px 10px', overflow: 'hidden'}`)
-      router-view(v-if="!loading" :width="width" :height="height")
-      div(v-else).row.full-width.window-height.items-center.justify-center
-        q-spinner(size="50px" :thickness="2" color="white")
-  q-footer(reveal :style=`{background: 'none '}`).lt-md
-    k-menu-horiz
+    router-view(v-if="!loading" :height="height" :width="width")
+    div(v-else).row.full-width.window-height.items-center.justify-center
+      q-spinner(size="50px" :thickness="2" color="white")
 </template>
 
 <script>
 import kMenuVert from 'components/k_menu_vert'
 import kMenuHoriz from 'components/k_menu_horiz'
+import nodeCreator from 'components/node_creator'
 
 export default {
   name: 'mainLayout',
-  components: {kMenuHoriz, kMenuVert},
+  components: {kMenuHoriz, kMenuVert, nodeCreator},
   data () {
     return {
       loading: true,
@@ -46,35 +48,40 @@ export default {
       radius: 30,
       width: 0,
       height: 0,
-      noPointerEvents: true
+      noPointerEvents: true,
+      miniState: false,
+      drawer: true,
+      toggleIcon: ''
     }
   },
   watch: {
-    '$route': {
-      handler (to, from) {
-        this.$log('$route CHANGED', to)
-        // window.history.length = 0
-        // window.history.replaceState([], null, null)
-        // window.browser.history.deleteAll()
-        // delete window.history
-        // window.history.replaceState(null, null, '#' + url)
-        // document.location.hash = to.path
-        // window.history.replaceState(null, null, to.path)
-        // this.$q.notify('route changed')
-      }
-    },
     '$q.screen.gt.sm': {
       immediate: true,
       handler (to, from) {
         this.$log('gt.sm CHANGED', to)
         let vh = window.innerHeight
-        if (to) vh = vh * 0.01
-        else vh = (vh - 60) * 0.01
+        // if (to) vh = vh * 0.01
+        // else vh = (vh - 60) * 0.01
+        vh = vh * 0.01
         document.documentElement.style.setProperty('--vh', `${vh}px`)
       }
     }
   },
   methods: {
+    toggleMini (miniState) {
+      this.miniState = !this.miniState
+    },
+    // drawerClick (e) {
+    //   // if in "mini" state and user
+    //   // click on drawer, we switch it to "normal" mode
+    //   if (this.miniState) {
+    //     this.miniState = false
+    //     // notice we have registered an event with capture flag;
+    //     // we need to stop further propagation as this click is
+    //     // intended for switching drawer to "normal" mode only
+    //     e.stopPropagation()
+    //   }
+    // },
     onResize (e) {
       // this.$log('onResize', e)
       this.width = e.width
@@ -92,6 +99,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
+    await this.$wait(500)
     // TODO: handle page height...
     // this.$refs.zresize.trigger()
     // let vh = (window.innerHeight - 60) * 0.01
@@ -99,6 +107,9 @@ export default {
     // document.documentElement.style.setProperty('--vh', `${vh}px`)
     this.$root.$on('toggle_menu', () => {
       if (this.$q.screen.lt.md) this.menuToggle()
+    })
+    this.$root.$on('create', () => {
+      if (this.$refs.nodeCreatorDialog) this.$refs.nodeCreatorDialog.show()
     })
   },
   async created () {
@@ -112,7 +123,12 @@ export default {
       // if (localStorage.getItem('kdebug')) this.d = true
       // check token
       let token = this.$route.query.token
-      if (token) localStorage.setItem('ktoken', token)
+      let expires = this.$route.query.expires
+      if (token) {
+        localStorage.setItem('ktoken', token)
+        localStorage.setItem('ktokenExpires', expires)
+        this.$router.push('/app/home')
+      }
       // this.$q.notify('token', token)
       // user check
       // this.$log('Checking user...')
@@ -121,7 +137,8 @@ export default {
         query userCheck {
           userIsAuthorized
           userIsConfirmed
-          }`
+          }`,
+       fetchPolicy: 'network-only'
         })
       // this.$log('userIsAuthorized', userIsAuthorized)
       // this.$log('userIsConfirmed', userIsConfirmed)
@@ -149,13 +166,6 @@ export default {
       // this.$q.notify('Getting user workspace!')
       let userWorkspace = await this.$store.dispatch('workspace/userWorkspace')
       this.$log('userWorkspace', userWorkspace)
-      // return to path
-      // let path = localStorage.getItem('path')
-      // this.$log('path', path)
-      // if (path) this.$router.push(path)
-      // await this.$wait(1000)
-      // this.$log('created done')
-      // console.timeEnd('created')
       this.loading = false
     } catch (error) {
       this.$log('error', error)

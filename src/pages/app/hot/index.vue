@@ -1,33 +1,28 @@
 <template lang="pug">
-q-layout.window-height
-  q-drawer(ref="kDrawer" side="left" :width="240")
+q-layout
+  //- drawer
+  q-drawer(ref="kDrawer" side="left" :width="240").lt-sm
     div(@click.self="$refs.kDrawer.toggle()").row.fit.items-start.content-start
-      div(:style=`{height: 'calc(var(--vh, 1vh) * 100)', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`).column.full-width.bg-grey-4
-        //- header
-        div(:style=`{height: '70px'}`).row.full-width.bg-white
-          div(v-if="false" :style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
-            q-btn(round flat color="primary" icon="menu")
-          .col.full-height
-            .row.fit.items-center.q-px-md
-              span.text-bold Категории
-        //- body
-        div(body-scroll-lock-ignore).col.scroll.full-width
-          .row.full-width.items-start.bg-white
-            div(
-              v-for="(c,ci) in categories" :key="ci" @click="categoryClick(c, ci)"
-              :style=`{height: '60px'}`
-              ).row.full-width.items-center.q-px-md.cursor-pointer.hr
-              span {{ `#${c.name.charAt(0).toUpperCase() + c.name.slice(1)}` }}
-  q-page-container.window-height
-    .column.fit
-      div(body-scroll-lock-ignore).col.scroll
-        node-loader(mode="feed" :query="query" queryKey="sphereNodes" :variables="variables")
+      div(:style=`{height: 'calc(var(--vh, 1vh) * 100)', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`).column.full-width.bg-white
+        categories
+  q-page-container.bg-grey-2
+    .row.full-width.justify-center
+      div(style=`width: 200px`).row.gt-sm
+        categories(style=`position: fixed; overflow: hidden; maxWidth: 200px; border-radius: 10px`).q-mt-sm
+      div(style=`maxWidth: 600px`).row.full-width.justify-center
+        node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variables")
+          template(v-slot:items=`{items, fetchingMore}`)
+            node-feed(:nodes="items" :fetchingMore="fetchingMore")
+      div(style=`width: 200px`).gt-sm
+  q-footer(reveal).bg-grey-4.lt-md
+    k-menu-horiz(page="hot" :colors="['white', 'grey-7']")
 </template>
 
 <script>
+import categories from 'pages/app/hot/categories'
 export default {
   name: 'pageApp__hot',
-  components: {},
+  components: { categories },
   data () {
     return {
       category: undefined
@@ -47,17 +42,29 @@ export default {
     }
   },
   computed: {
+    sphereOid () {
+      if (this.categories[this.category]) return this.categories[this.category].sphere.oid
+      else return false
+    },
     query () {
       return gql`
         query sphereNodes ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
           sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
             count
             totalCount
+            nextPageToken
             items {
               oid
               type
+              thumbUrl (preferWidth: 600)
+              createdAt
               name
-              thumbUrl(preferWidth: 600)
+              meta {
+                ...on MetaNode {
+                  layout
+                  fragments { uid width height color thumbUrl(preferWidth: 600) }
+                }
+              }
             }
           }
         }
@@ -65,7 +72,7 @@ export default {
     },
     variables () {
       return {
-        sphereOid: this.categories[this.category].sphere.oid,
+        sphereOid: this.sphereOid,
         pagination: {
           pageSize: 100
         },
@@ -93,7 +100,7 @@ export default {
   mounted () {
     this.$log('mounted')
     this.$root.$on('page', () => {
-      this.$refs.kDrawer.toggle()
+      if (this.$refs.kDrawer) this.$refs.kDrawer.toggle()
     })
   },
   beforeDestroy () {

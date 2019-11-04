@@ -1,67 +1,38 @@
 <template lang="pug">
 div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
+  //- actions
   //- share
-  k-menu-popup(name="Поделиться" :actions="actions" @action="nodeShare")
+  k-menu-popup(ref="nodeShareMenu" name="Поделиться" :actions="actions" @action="nodeShare")
     q-btn(color="grey-9" round flat)
       q-icon(name="share" size="26px" color="grey-8")
+  //- rate/answer
+  k-menu-popup(ref="nodeRateAnswerMenu" :noName="true" :actions="nodeActions" @action="nodeAction")
   .col
   //- rate
   div(v-if="nodeFull && nodeFull.rateUser").q-mr-sm
     small {{Math.ceil(nodeFull.rateUser*100)}}/
     span(:style=`{fontSize: '15px'}`).text-bold {{Math.ceil(nodeFull.rate*100)}}
-  q-btn(color="grey-9" round flat @click="nodeRate()")
+  //- blur
+  q-btn(color="grey-9" round flat @click="nodeBlur()")
     q-icon(name="blur_on" size="34px")
 </template>
 
 <script>
-import nodeRate from './node_rate'
-
 export default {
   name: 'nodeActions',
-  components: {nodeRate},
+  components: {},
   props: ['index', 'zIndex', 'node', 'nodeFull', 'active'],
   data () {
     return {
-      value: 0,
-      nodeRating: false,
-      nodeRated: false,
-      nodeRates: [
-        {id: 1, name: 'Нет', rate: 0.0, icon: 'gps_off', opacity: 1},
-        {id: 2, name: 'Скорее нет', rate: 0.25, icon: 'gps_not_fixed', opacity: 0.7},
-        {id: 3, name: 'Может быть', rate: 0.5, icon: 'gps_not_fixed', opacity: 1},
-        {id: 4, name: 'Скорее да', rate: 0.75, icon: 'gps_fixed', opacity: 0.7},
-        {id: 5, name: 'Да', rate: 1.0, icon: 'gps_fixed', opacity: 1}
-      ],
       actions: [
         {id: 'to_bookmark', name: 'Сохранить в закладки'},
         {id: 'to_telegram', name: 'Отправить в Telegram'},
         {id: 'to_copy', name: 'Скопировать ссылку'}
+      ],
+      nodeActions: [
+        {id: 'rate', name: 'Переголосовать'},
+        {id: 'answer', name: 'Ответить ядром'}
       ]
-    }
-  },
-  watch: {
-    nodeFull: {
-      handler (to, from) {
-        if (to && to.rateUser) this.value = to.rateUser * 100
-      }
-    }
-  },
-  computed: {
-    rateCurrent () {
-      let v = this.value
-      if (v < 25) return this.nodeRates[0]
-      else if (v < 50) return this.nodeRates[1]
-      else if (v < 75) return this.nodeRates[2]
-      else if (v < 100) return this.nodeRates[3]
-      else return this.nodeRates[4]
-    },
-    showNodeRate () {
-      if (this.nodeFull && this.nodeFull.rateUser) {
-        return true
-      } else {
-        if (this.nodeRated) return true
-        else return false
-      }
     }
   },
   methods: {
@@ -83,19 +54,45 @@ export default {
         }
       }
     },
+    nodeAction ({id}) {
+      this.$log('nodeAction', id)
+      switch (id) {
+        case 'rate': {
+          this.nodeRate()
+          break
+        }
+        case 'answer': {
+          this.nodeAnswer()
+          break
+        }
+      }
+    },
+    nodeBlur () {
+      this.$log('nodeBlur')
+      if (this.nodeFull.rateUser) {
+        this.$refs.nodeRateAnswerMenu.show()
+      } else {
+        this.nodeRate()
+      }
+    },
+    async nodeAnswer () {
+      this.$log('nodeAnswer')
+      this.$store.commit('node/state', ['answer', true])
+      this.nodeRate()
+    },
     async nodeRate () {
       this.$log('nodeRate')
       this.$store.commit('node/state', ['node', this.node])
       this.$store.commit('node/state', ['nodeFull', this.nodeFull])
-      await this.$wait(300)
+      // await this.$wait(300)
       this.$nextTick(() => {
-        this.$store.commit('node/state', ['rateDialogOpened', true])
+        this.$store.commit('ui/state', ['dialogOpened', true])
       })
     },
     async nodeBookmark () {
       this.$log('nodeBookmark')
       this.$store.commit('workspace/state', ['bookmark', {url: this.node.oid}])
-      await this.$wait(300)
+      // await this.$wait(300)
       this.$nextTick(() => {
         this.$store.commit('workspace/state', ['bookmarkEditorDialogOpened', true])
       })

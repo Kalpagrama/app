@@ -1,7 +1,11 @@
 <template lang="pug">
-div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width.bg-grey-4
-  div(body-scroll-lock-ignore).col.scroll
-    node-loader(mode="feed" :query="query" queryKey="feed" :variables="variables")
+q-layout
+  q-page-container
+    node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
+      template(v-slot:items=`{items, fetchingMore}`)
+        node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
+  q-footer(reveal).lt-md
+    k-menu-horiz(page="home" :colors="['white', 'grey-7']")
 </template>
 
 <script>
@@ -10,6 +14,8 @@ export default {
   components: {},
   data () {
     return {
+      drawer: false,
+      miniState: false,
       nodes: [],
       query: gql`
         query feed($pageToken: RawJSON) {
@@ -26,7 +32,7 @@ export default {
               meta {
                 ...on MetaNode {
                   layout
-                  fragments { uid width height color }
+                  fragments { uid width height color thumbUrl(preferWidth: 600) }
                 }
               }
             }
@@ -40,9 +46,17 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$root.$on('page', () => {
+      if (this.$refs.kDrawer) this.$refs.kDrawer.toggle()
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
   }
 }
 </script>
+
+<style lang="stylus">
+.q-footer
+  background: none !important
+</style>

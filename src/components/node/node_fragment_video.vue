@@ -2,15 +2,20 @@
 div(
   :style=`{position: 'relative'}`).row.full-width.items-start.content-start
   //- actions
-  div(v-if="true" :style=`{position: 'absolute', zIndex: zIndex+10, top: '8px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
+  //- div(v-if="true" :style=`{position: 'absolute', zIndex: zIndex+10, top: '8px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
     //- q-btn(round flat color="white" icon="fullscreen" @click="videoToggleFullscreen").shadow-1
     //- TODO: align items in node...
     //- q-btn(v-if="!playing && visible" round color="primary" icon="flash_on" style=`width: 30px; height: 30px` @click="videoToggleMute").shadow-1
-  div(:style=`{position: 'absolute', zIndex: zIndex+10, bottom: '20px', height: '40px', opacity: 0.7}`).row.full-width.justify-center.items-center
-    //- q-btn(round flat color="white" dense @click="videoToggleMute").shadow-1.bg-grey-9
-    //-   q-icon(:name="muted ? 'volume_off' : 'volume_up'" color="white" size="19px")
-    div(:style=`{color: 'white', borderRadius: '4px', opacity: 0.7}`).bg-grey-10.q-px-xs.q-ml-sm
-      small {{$time(now)}} / {{$time(duration)}}
+  //- volume
+  q-btn(
+    round flat color="white" dense @click="videoToggleMute()"
+    :style=`{position: 'absolute', zIndex: 1000, top: '10px', left: '10px', opacity: 0.7}`
+    ).shadow-1.bg-grey-9
+    q-icon(:name="muted ? 'volume_off' : 'volume_up'" color="white" size="19px")
+  //- time
+  div(:style=`{position: 'absolute', height: '20px', bottom: '10px', left: '10px', color: 'white', borderRadius: '4px', opacity: 0.5}`
+    ).row.items-center.bg-grey-10.q-px-xs
+    small {{$time(now)}} / {{$time(duration)}}
   //- timeline
   div(v-if="now > 0" :style=`{position: 'absolute', zIndex: zIndex+100, bottom: '0px', left: '0px', height: '10px'}` @click="videoTimelineClick"
     ).row.full-width.items-end.cursor-pointer
@@ -20,7 +25,7 @@ div(
     ref="kvideo"
     :src="url"
     :style=`{width: '100%', objectFit: 'contain'}`
-    loop playsinline muted
+    loop playsinline :muted="muted"
     @click="videoClick"
     @playing="videoPlaying"
     @timeupdate="videoTimeupdate"
@@ -34,6 +39,7 @@ export default {
   data () {
     return {
       now: 0,
+      muted: true,
       duration: 0,
       playing: false,
       playsinline: true
@@ -67,9 +73,14 @@ export default {
   methods: {
     videoClick () {
       this.$log('videoClick')
+      // TODO: save mute state where? or do in in props? or in nodes? vuex
       if (this.playing) {
-        this.$refs.kvideo.pause()
-        this.playing = false
+        if (this.muted) {
+          this.videoToggleMute()
+        } else {
+          this.$refs.kvideo.pause()
+          this.playing = false
+        }
       } else {
         this.$refs.kvideo.play()
         // this.videoToggleMute()
@@ -123,6 +134,10 @@ export default {
     }
   },
   async mounted () {
+    this.$root.$on('create', () => {
+      this.muted = true
+      if (this.$refs.kvideo) this.$refs.kvideo.pause()
+    })
   }
 }
 </script>

@@ -4,18 +4,18 @@
     template(v-slot:actions)
       k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
         q-btn(icon="brush" color="grey-5" round flat)
-  //- wrapper maxHeight: getHeight+'px'
+  //- wrapper
   div(
     :style=`{position: 'relative', zIndex: zIndex+100, maxHeight: '100vh', overflow: 'hidden', borderRadius: '10px'}`
     ).row.full-width.items-start.content-start.bg-grey-3
     //- actions
-    //- .row.full-width.justify-end
     k-menu-popup(v-if="active && nodeFull"
       :style=`{position: 'absolute', zIndex: zIndex+1000, top: '8px', right: '8px'}`
       :name="nodeFull.fragments[fragmentActive].content.name" :actions="fragmentActions"
       @action="$event => fragmentAction($event, fragmentActive)")
-      q-btn(icon="more_horiz" color="white" round flat dense
-        :style=`{opacity: 0.5}`).shadow-1.bg-grey-9
+      div(:style=`{width: '30px', height: '30px', borderRadius: '15px', oveflow: 'hidden', background: 'rgba(0, 0, 0, 0.4)'}`
+        ).row.items-center.justify-center
+        q-icon(color='white' name="more_horiz" size="20px")
     //- forward
     div(@click="forwardClick()"
       :style=`{position: 'absolute', zIndex: zIndex+200, width: '100px', bottom: '10px', right: '10px', borderRadius: '10px', overflow: 'hidden', opacity: 0.7}`
@@ -23,15 +23,15 @@
       img(
         v-for="(p, pi) in 2" :key="pi"
         v-show="fragmentActive !== pi"
-        :src="node.thumbUrl[pi]"
+        :src="node.meta.fragments[pi].thumbUrl"
         :style=`{width: '100%', height: '100%', objectFit: 'contain'}` draggable="false"
         @load="$event => imgLoaded($event, `mini:${pi}`)"
         @error="$event => imgError($event, `mini:${pi}`)")
     //- previews v-if="node.thumbUrl[pi]"
     img(
       v-for="(p, pi) in 2" :key="pi"
-      v-show="node.thumbUrl[pi] && fragmentActive === pi"
-      :src="node.thumbUrl[pi]"
+      v-show="node.meta.fragments[pi].thumbUrl && fragmentActive === pi"
+      :src="node.meta.fragments[pi].thumbUrl"
       :style=`{width: '100%', minHeight: '150px', objectFit: 'contain', zIndex: zIndex+50}`
       draggable="false"
       @load="$event => imgLoaded($event, `preview:${pi}`)"
@@ -69,7 +69,7 @@ export default {
       fragmentActive: 0,
       fragmentActions: [
         {id: 'content_explore', name: 'Исследовать контент'},
-        {id: 'fragment_workspace', name: 'Сохранить в мастерскую'},
+        {id: 'fragment_workspace', name: 'Добавить в мастерскую'},
         // {id: 'node_answer', name: 'Ответить', color: '#7d389e', class: ['text-bold', 'text-primary']}
       ]
     }
@@ -110,9 +110,10 @@ export default {
           let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
           fragment.thumbUrl = this.node.thumbUrl[fi]
           this.$store.commit('workspace/state', ['fragment', fragment])
-          this.$nextTick(() => {
-            this.$store.commit('workspace/state', ['fragmentEditorDialogOpened', true])
-          })
+          this.$store.commit('ui/state', ['dialogOpened', true])
+          // this.$nextTick(() => {
+          //   this.$store.commit('ui/state', ['dialogOpened', true])
+          // })
           break
         }
       }

@@ -6,10 +6,10 @@
       q-tab-panels(ref="kpanels" v-model="tab" :swipeable="!isDesktop" animated keep-alive :style=`{background: 'none'}`).fit
         //- spheres
         q-tab-panel(name="sphere" :style=`{padding: '0px', background: 'none'}`)
-          .row.fit.q-py-sm
+          .row.fit
             .column.fit
               //- header
-              div(v-if="noHeader" :style=`{minHeight: '60px', borderRadius: '10px'}`).row.full-width.items-center.scroll.q-px-sm.bg-grey-1
+              div(v-if="true" :style=`{minHeight: '70px'}`).row.full-width.items-center.scroll.q-px-sm
                 h4(:style=`{}`).q-pa-xs.q-ma-xs {{`#${sphere.name}`}}
               //- tools
               div(v-if="false" :style=`{height: '40px'}`).row.full-width.items-center.justify-end.q-px-sm.bg-grey-1

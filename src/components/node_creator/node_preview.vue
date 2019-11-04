@@ -1,41 +1,63 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit.q-px-sm
-  //- body
-  div(:style=`{position: 'relative'}` body-scroll-lock-ignore).col.scroll
-    //- node for preview
-    node(:node="node" :nodeFullReady="node" inCreator :style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`).bg-white.q-my-sm
-    //- node edit btn
-    q-btn(v-if="false" :style=`{position: 'absolute', zIndex: 1000, right: '15px', top: '20px', opacity: 0.9}`
-      round flat dense icon="edit" color="white").bg-grey-9
-    div(:style=`{zIndex: 10, marginTop: '-20px', borderRadius: '0 0 10px 10px', opacity: 0.8}`).row.full-width.items-end.bg-grey-2.q-pa-sm.q-pt-md
-      .row.full-width.q-py-sm
-        q-btn(outline color="primary" style=`width: 50px; height: 50px; borderRadius: 10px`
-          :loading="nodeSaving"
-          icon="refresh" @click="$emit('reset')").q-mr-sm
-          q-tooltip Сохранить и создать новое
-        .col
-          q-btn(outline color="primary" no-caps style=`height: 50px; borderRadius: 10px` @click="$emit('edit')").full-width
-            span.text-bold Редактировать
-      q-btn(
-        no-caps color="primary" style=`height: 60px; borderRadius: 10px`
-        :disable="!nodePublishPossible" :loading="nodePublishing" @click="$emit('publish')").full-width.q-mb-sm
-        span.text-bold.text-white Опубликовать
-    div(:style=`{height: '60px'}`).row.full-width
+div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-px-sm
+  div(
+    :style=`{height: '300px', borderRadius: '10px'}`
+    ).row.full-width.bg-white.q-mb-md
+  div(
+    :style=`{height: '300px', borderRadius: '10px'}`
+    ).row.full-width.bg-white.q-mb-md
+  div(
+    :style=`{height: '300px', borderRadius: '10px'}`
+    ).row.full-width.bg-white.q-mb-md
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    q-btn(
+      v-if="tab === 'preview'"
+      color="green" no-caps @click="publish()"
+      :style=`{position: 'absolute', left: '8px', bottom: '8px', height: '60px',
+        width: 'calc(100% - 16px)', borderRadius: '10px'}`)
+      span.text-bold Опубликовать
 </template>
 
 <script>
-import node from 'components/node'
-
 export default {
   name: 'nodeCreator__nodePreview',
-  components: {node},
-  props: ['node', 'nodePublishPossible', 'nodeSaving', 'nodePublishing'],
+  props: ['tab', 'node'],
   data () {
     return {
+      publishing: false
     }
   },
-  mounted () {
-    this.$log('monted')
+  methods: {
+    async publish () {
+      try {
+        this.$log('nodePublish start')
+        this.publishing = true
+        await this.$wait(3000)
+        // create mutation
+        let node = await this.$store.dispatch('node/nodeCreate', this.node)
+        // delete ws draft
+        // if (this.draft) {
+        //   let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
+        //   this.$log('deleteWSDraft', deleteWSDraft)
+        // }
+        // remove draftLocal
+        localStorage.removeItem('draft')
+        // remove draftStorage
+        this.$store.commit('workspace/state', ['draft', null])
+        // done
+        this.$log('nodePublish done', node)
+        this.publishing = false
+        // go to home
+        this.$router.push(`/app/home`)
+      } catch (error) {
+        this.$log('nodePublis error', error)
+        this.publishing = false
+        this.$q.notify({message: 'Node publish error!', color: 'red', textColor: 'white'})
+      }
+    }
+  },
+  async mounted () {
+    this.$log('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

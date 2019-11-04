@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.fit
-  workspace(@contentClick="contentClick" inFinder @item="$emit('uploaded', $event.content.oid)")
+  workspace(@contentClick="contentClick" :inFinder="true" @item="$emit('uploaded', $event.content.oid)")
 </template>
 
 <script>

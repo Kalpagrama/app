@@ -1,40 +1,25 @@
 <template lang="pug">
-div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.bg-white
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-sm.q-pt-sm
   k-menu-popup(ref="kPopup" :name="item ? item.name : ''" :actions="actions" @action="itemAction")
-  //- header
-  div(:style=`{height: '70px'}`).row.full-width
-    div(
-      v-if="false"
-      :style=`{height: '70px', width: '70px'}`).row.items-center.justify-center
-      q-btn(round flat icon="menu" color="primary")
+  div(
+    v-for="(i, ii) in items" :key="ii" @click="itemClick(i, ii)"
+    :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+    ).row.full-width.items-center.bg-grey-2.q-mb-sm
+    img(
+      :src="i.thumbUrl"
+      :style=`{height: '60px', borderRadius: '10px', oveflow: 'hidden', width: '100px', objectFit: 'contain'}`).bg-black
     .col.full-height
-      .row.fit.items-center.content-center.q-px-sm
-        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-          q-input(v-model="search" filled placeholder="Поиск").full-width
-            template(v-slot:append)
-              q-btn(round flat dense color="grey-7" icon="filter_list")
-  //- body
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
-      div(
-        v-for="(i, ii) in WSItems" :key="ii" @click="itemClick(i, ii)"
-        :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.bg-grey-2.q-mb-sm
-        img(
-          :src="i.thumbUrl"
-          :style=`{height: '60px', borderRadius: '10px', oveflow: 'hidden', width: '100px', objectFit: 'contain'}`).bg-black
-        .col.full-height
-          .row.fit.items-center.q-px-sm
-            span {{ i.name || i.uid | cut(40) }}
-  //- footer
+      .row.fit.items-center.q-px-sm
+        span {{ i.name || i.uid | cut(40) }}
 </template>
 
 <script>
 export default {
   name: 'wsItems',
+  props: ['search', 'type'],
   data () {
     return {
-      search: '',
+      // search: '',
       actions: [
         {id: 'use', name: 'Использовать', class: ['text-bold', 'text-primary']},
         {id: 'edit', name: 'Изменить'},
@@ -47,6 +32,19 @@ export default {
     WSItems () {
       // return this.$store.getters['workspace/WSItems']
       return this.$store.state.workspace.workspace.fragments
+    },
+    items () {
+      // if (this.search.length === 0) return this.tags
+      // else {
+      //   return this.WSItems.filter(t => {
+      //     let pattern = new RegExp(this.search, 'g')
+      //     return t.name.match(pattern)
+      //   })
+      // }
+      return this.WSItems.filter(t => {
+        let pattern = new RegExp(this.search, 'g')
+        return t.name.match(pattern)
+      })
     },
     types () {
       return this.$store.state.workspace.types

@@ -133,7 +133,7 @@ export default {
         let {data: {uploadContentUrl: {oid}}} = await this.$apollo.mutate({
           client: 'upload',
           mutation: gql`
-            mutation uploadContentUrl ($url: String!) {
+            mutation uploadContentUrlOldOld ($url: String!) {
               uploadContentUrl(url: $url) {
                 oid
                 type

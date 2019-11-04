@@ -35,7 +35,7 @@ export default async ({ Vue, store, router }) => {
   Vue.use(VueVirtualScroller)
   Vue.use(VueObserveVisibility)
   Vue.use(Carousel3d)
-  Vue.prototype.$wait = (msg) => new Promise(resolve => setTimeout(resolve, msg))
+  Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
   let banned = {'App': 1, 'mainLayout': 1}
   Vue.prototype.$log = function (...msg) {
     // if (banned[this.$options.name]) return
@@ -76,6 +76,9 @@ export default async ({ Vue, store, router }) => {
     round(obj)
     return obj
   }
+  Vue.prototype.$isInteger = (num) => {
+    return (num ^ 0) === num
+  }
   Vue.prototype.$nodesDistinct = function (nodes) {
     const result = []
     const map = new Map()
@@ -99,13 +102,19 @@ export default async ({ Vue, store, router }) => {
   // }
   Vue.component('kPage', () => import(`components/k_page`))
   Vue.component('kMenuPopup', () => import(`components/k_menu_popup`))
+  Vue.component('kMenuHoriz', () => import(`components/k_menu_horiz`))
   Vue.component('kDialog', () => import(`components/k_dialog`))
+  Vue.component('kTongue', () => import(`components/k_tongue`))
   Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
   Vue.component('wsBookmarkEditor', () => import('components/workspace/ws_bookmark_editor'))
   Vue.component('wsFragmentEditor', () => import('components/workspace/ws_fragment_editor'))
   Vue.component('node', () => import('components/node'))
   Vue.component('nodeRate', () => import('components/node/node_rate'))
+  Vue.component('nodeAnswer', () => import(`components/node/node_answer`))
   Vue.component('nodeLoader', () => import('components/node_loader'))
+  Vue.component('nodeFeed', () => import(`components/node_feed`))
+  Vue.component('videoEditor', () => import(`components/video_editor`))
+  Vue.component('kVideo', () => import(`components/k_video`))
 }
 
 export { time }

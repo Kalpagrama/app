@@ -41,8 +41,9 @@ const WSFragment = gql`
   fragment WSFragment on WSFragment {
     uid
     name
+    # relativePoints {x y z}
     thumbUrl(preferWidth: 600)
-    relativePoints {x y z}
+    relativeCuts {type name start end thumbUrl(preferWidth: 600)}
     relativeScale
     tagUids
     createdAt
@@ -250,6 +251,29 @@ export const addWSFragment = async (store, fragment) => {
     debug('addWSFragment done', i)
     return i
   } else {
+    // TODO: make it perfect
+    let fragmentInput = {
+      name: fragment.name,
+      tagUids: fragment.tagUids,
+      // thumbUrl: fragment.thumbUrl,
+      // relativePoints: fragment.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
+      relativeCuts: fragment.relativePoints.reduce((acc, val, i, arr) => {
+        // name type start end
+        if ((i + 1) % 2 !== 0) {
+          acc.push({
+            name: '',
+            start: val.x,
+            end: arr[i + 1].x,
+            type: 'video',
+            thumb: ''
+          })
+        }
+        return acc
+      }, []),
+      relativeScale: fragment.relativeScale,
+      contentOid: fragment.content.oid
+    }
+    debug('fragmentInput', fragmentInput)
     let {data: {addWSFragment}} = await apollo.mutate({
       mutation: gql`
         ${WSFragment}
@@ -260,19 +284,13 @@ export const addWSFragment = async (store, fragment) => {
         }
       `,
       variables: {
-        fragment: {
-          name: fragment.name,
-          tagUids: fragment.tagUids,
-          thumbUrl: fragment.thumbUrl,
-          relativePoints: fragment.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
-          relativeScale: fragment.relativeScale,
-          contentOid: fragment.content.oid
-        }
+        fragment: fragmentInput
       }
     })
     debug('addWSFragment done', addWSFragment)
     store.commit('addWSFragment', addWSFragment)
     return addWSFragment
+    // return null
   }
 }
 export const updateWSFragment = async (store, fragment) => {
@@ -392,6 +410,7 @@ export const addWSDraft = async (store, draft) => {
       draft: {
         name: draft.name || Date.now().toString(),
         fragments: draft.fragments || [],
+        categories: draft.categories || [],
         spheres: draft.spheres || [],
         tagUids: draft.tagUids || []
       }

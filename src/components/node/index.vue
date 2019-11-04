@@ -1,7 +1,8 @@
 <template lang="pug">
 component(
-  :is="nodeTemplate" :index="index" :zIndex="zIndex" :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
-  :nodeTemplates="$store.state.ui.nodeTemplates" :nodeTemplate="nodeTemplate" @nodeTemplate="nodeTemplateChanged" :inCreator="inCreator"
+  :is="$store.state.node.layouts[node.meta.layout].component"
+  :index="index" :zIndex="zIndex"
+  :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
   :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
 </template>
 
@@ -48,27 +49,6 @@ export default {
     }
   },
   computed: {
-    nodeTemplate: {
-      get () {
-        if (this.nodeTemplateSet) return this.nodeTemplateSet
-        if (this.template) return this.template
-        let n = this.node.name
-        let t = parseInt(n.split('-')[0])
-        if (this.$store.state.ui.nodeTemplates[t]) return this.templates[t].id
-        else return this.$store.state.ui.nodeTemplates[0].id
-      },
-      set (val) {
-        this.nodeTemplateSet = val
-      }
-    },
-    nodeWorkspaced () {
-      return this.index % 2 === 0
-    },
-    getHeight () {
-      let w = this.$q.screen.width
-      if (w > 500) return 500
-      else return w
-    }
   },
   watch: {
     nodeFullReady: {
@@ -93,11 +73,6 @@ export default {
     }
   },
   methods: {
-    async nodeTemplateChanged (t) {
-      this.$log('nodeTemplateChanged', t)
-      this.$set(this, 'nodeTemplate', t)
-      // this.nodeTemplate = t
-    },
     async nodeLoad (oid) {
       // this.$log('nodeLoad start', this.index, this.node.name)
       let { data: { objectList: [nodeFull] } } = await this.$apollo.query({
@@ -123,7 +98,10 @@ export default {
                   oid
                   name
                 }
+                categories
                 fragments {
+                  uid
+                  name
                   url
                   content {
                     oid

@@ -11,9 +11,11 @@ const routes = [
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
-      { name: 'node', path: 'node/:oid', component: () => import('pages/app/node') },
+      { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
       { name: 'workspace', path: 'workspace/:menu?', component: () => import('pages/app/workspace') },
-      { name: 'create', path: 'create', component: () => import('pages/app/create') }
+      { name: 'create', path: 'create', component: () => import('components/node_creator') },
+      { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
+      { name: 'invite', path: 'invite', component: () => import('pages/app/invite') }
     ]
   },
   {

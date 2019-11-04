@@ -1,12 +1,8 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center
-  //- div(:style=`{position: 'absolute', zIndex: 100, opacity: 0.3}`).row.fit.bg-black
-  div(:style=`{maxWidth: '550px'}`).row.full-width.q-pt-md
-    //- .q-px-sm
-    div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width.q-px-sm
-      //- :title="n.name"
-      //- 'shadow-1': activeNode ? activeNode[0] === ni : false}
-      node-inst(
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm.bg-grey-2
+  div(:style=`{maxWidth: '550px'}`).row.full-width
+    div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width
+      node(
         :index="ni" :node="n" :lang="ni"
         :needFull="ni >= fullNodes[0] && ni <= fullNodes[1]"
         :active="activeNode ? activeNode[0] === ni : false"
@@ -14,24 +10,24 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
           'bg-grey-3': activeNode ? activeNode[0] !== ni : false,
           'bg-white': activeNode ? activeNode[0] === ni : false}`
         :style=`{zIndex: activeNode ? activeNode[0] === ni ? 200 : 10 : 10, borderRadius: '10px'}`
-        v-touch-swipe.mouse.left="nodeSwipeLeft"
+        :noActions="true" :noSpheres="true" :noTimestamp="true"
         v-observe-visibility=`{
           callback: nodeVisible,
           throttle: 300,
           intersection: {
-            threshold: 0.8
+            threshold: 0.98
           }
-        }`).q-mb-md
+        }`).q-mb-xl
     div(:style=`{height: '80px'}`).row.full-width.items-center.justify-center
       q-spinner(v-show="fetchingMore" :thickness="2" color="primary" size="50px")
 </template>
 
 <script>
-import nodeInst from 'components/node'
+import node from 'components/node'
 
 export default {
-  name: 'nodeLoader__feed',
-  components: {nodeInst},
+  name: 'nodeFeed',
+  components: {node},
   props: ['nodes', 'fetchingMore'],
   data () {
     return {
@@ -69,9 +65,6 @@ export default {
     }
   },
   methods: {
-    nodeSwipeLeft () {
-      this.$log('nodeSwipeLeft')
-    },
     async nodeVisible (isVisible, entry) {
       let top = entry.target.offsetTop
       let name = entry.target.title
@@ -87,9 +80,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    // setInterval(() => {
-    //   this.$emit('more')
-    // }, 2000)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

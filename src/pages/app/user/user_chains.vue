@@ -11,7 +11,7 @@
       v-for="(c, ci) in chains" :key="c.oid" @click="chainClick(c, ci)"
       style=`height: 50px; borderTop: 1px solid #eee`
       ).row.full-width.items-center.justify-between.hr.cursor-pointer.q-px-md
-      span {{c.name | cut(50)}}
+      span {{c.name}}
       span {{c.nodesCount}}
 </template>
 

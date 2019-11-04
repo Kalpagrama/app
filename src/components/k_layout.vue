@@ -1,24 +1,13 @@
 <template lang="pug">
-.column.fit
-  k-menu
+q-layout
 </template>
 
 <script>
-import kMenu from 'components/kMenu'
-
 export default {
-  name: 'pageApp__Menu',
-  components: { kMenu },
-  props: {
-    mini: {type: Boolean}
-  },
+  name: 'kLayout',
   data () {
     return {
     }
-  },
-  methods: {
-  },
-  watch: {
   },
   mounted () {
     this.$log('mounted')

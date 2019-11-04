@@ -1,81 +1,238 @@
 <template lang="pug">
-div(:style=`{position: 'relative', minWidth: colWidth+'px', width: width+'px', maxHeight: '100%'}`).column.fit
-  //- body
-  div(body-scroll-lock-ignore).col.scroll.q-px-sm
-    div(
-      v-for="(f, fkey) in fragments" :key="fkey"
-      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-white.q-mt-sm.shadow-1
-      //- fragment actions top right
-      div(:style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', height: '40px', opacity: 0.3}`).row
-        q-btn(round flat dense color="white" icon="edit" @click="$emit('edit', f, fkey)").bg-grey-9
-      //- fragment actions top left
-      div(:style=`{position: 'absolute', zIndex: 100, top: '8px', left: '8px', height: '40px', opacity: 0.3}`).row
-        q-btn(round flat dense color="white" icon="clear" @click="$emit('delete', f, fkey)").bg-grey-9
-      //- fragment actions bottom right
-      div(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', right: '8px', height: '40px', opacity: 0.3}`).row
-        q-btn(round flat dense color="white" icon="keyboard_arrow_down" @click="$emit('copy', f, fkey)").bg-grey-9
-      //- fragment preview only?
-      img(
-        :src="f.thumbUrl || f.content.thumbUrl[0]"
-        :style=`{width: '100%', objectFit: 'contain'}` draggable="false")
-      //- name with tags
-      div(
-        v-if="f.label"
-        :style=`{position: 'absolute', bottom: '10px', left: '10px', borderRadius: '10px', overflow: 'hidden', opacity: 0.95}`).row.bg-grey-9.q-px-sm.q-py-xs
-        span.text-bold.text-white {{ f.label }}
-        div(v-if="false").row.full-width
-          small.text-white {{ f.relativePoints }}
-    //- content add
-    div(
-      v-if="true"
-      :style=`{position: 'relative', height: '100px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.justify-center.bg-white.q-my-sm
-      div(v-show="!mini" :style=`{width: '100px'}`).row.full-height.justify-center.items-center
-        //- q-btn(round flat icon="more_vert" color="grey-5")
-      div(v-show="!mini").col.full-height
-        .row.fit.items-center.justify-center
-          q-btn(icon="add" color="primary" round outline size="lg" @click="$emit('add')")
-      div(:style=`{width: '100px'}`).row.full-height.justify-center.items-center
-        //- q-btn(round flat color="grey-5" @click="toggle()"
-          :icon="mini ? 'keyboard_arrow_right' : 'keyboard_arrow_left'")
-    //- toggle fragments from workspace
+div(:style=`{paddingBottom: '60px'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm.q-px-sm
+  //- fragment finder dialog
+  q-dialog(ref="fragmentFinderDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    fragment-finder(@fragment="fragmentFound" @hide="$refs.fragmentFinderDialog.hide()")
+  //- video editor dialog
+  q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    video-editor(
+      v-if="fragment" :fragmentInput="fragment" :inCreator="true"
+      @fragment="fragments[fragment.uid] = $event, $refs.videoEditorDialog.hide(), fragment = null" @hide="$refs.videoEditorDialog.hide()")
+  //- actions
+  //- k-menu-popup(ref="fragmentDeleteMenu" name="Удалить фрагмент?" :actions="[{id: 'delete', name: 'Удалить'}]" @action="fragmentDelete(fragment.uid), fragment = null")
+  //- k-menu-popup(ref="pointEditMenu" :name="fragment ? fragment.name : ''" :actions="[{id: 'edit', name: 'Изменить'}, {id: 'delete', name: 'Удалить'}]" @action="$event => pointEdit(fragment, point, $event)")
+  //- k-menu-popup(ref="fragmentMenu" :name="'fragment.name'" :actions="fragmentActions" @action="fragmentAction")
+  //- add fragment btn
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
-      v-if="false" :icon="fragmentsWorkspaceShow ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" outline color="grey-6"
-      style=`height: 50px; borderRadius: 8px` no-caps
-      @click="fragmentsWorkspaceShow = !fragmentsWorkspaceShow").full-width.q-mt-md
-      span {{fragmentsWorkspaceShow ? 'Скрыть фрагменты из мастерской' : 'Показать фрагменты из мастерской'}}
-    //- margin bottom
-    div(:style=`{height: '100px'}`).row.full-width
+      v-if="tab === 'fragments'"
+      round color="green" icon="add" size="lg" @click="$refs.fragmentFinderDialog.show()"
+      :style=`{position: 'fixed', zIndex: 1000, bottom: '8px', right: '8px'}`)
+  //- fragment
+  div(
+    v-for="(f, fkey) in fragments" :key="fkey"
+    :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-lg
+    //- header
+    div(
+      :style=`{height: '50px'}`
+      ).row.full-width.items-center.bg-white
+      .col.full-height
+        //- name preview
+        div(v-if="nameEdit !== fkey" @click="fragmentNameClick(f)").row.fit.items-center.q-pl-sm
+          span().text-bold {{ f.name || 'Enter fragment name' }}
+        //- name input
+        div(v-if="nameEdit === fkey").row.fit.items-center.q-pl-sm
+          input(
+            ref="nameInput" :value="name" @input="f.name = $event.target.value"
+            @blur="nameEdit = undefined" @keyup.enter="nameEdit = undefined"
+            :style=`{border: 'none', height: '30px', borderRadius: '4px', paddingLeft: '4px'}`
+            ).full-width.bg-grey-3.kinput
+      //- delete btn
+      q-btn(round flat dense color="grey-4" icon="delete_outline" @click="fragment = f, $refs.fragmentDeleteMenu.show()").q-mr-xs
+    //- body
+    div(
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-pl-xs
+      //- div(
+      //-   v-if="(pi+1) % 2 !== 0" v-for="(p, pi) in f.relativeCuts" :key="p.x"
+      //-   @click="fragment = f, point = pi, $refs.pointEditMenu.show()"
+      //-   :style=`{position: 'relative'}`
+      //-   ).col-4.q-pr-xs.cursor-pointer
+      //-   div(:style=`{position: 'absolute', bottom: '4px', left: '4px'}`).row.q-pa-xs.bg-red
+      //-     small.text-white i: {{ pi+1 }}
+      //-   //- point preivew...
+      //-   img(
+      //-     :src="f.thumbUrl[pi]"
+      //-     :style=`{width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}` draggable="false")
+      div(v-if="f.relativeCuts.length === 0").row.full-width.q-pa-sm.q-mb-xs
+        q-btn(
+          dense no-caps color="green" @click="fragment = f, pointAdd(0, true)"
+          style=`height: 50px; borderRadius: 10px`).full-width Выделить фрагмент
 </template>
 
 <script>
+import fragmentFinder from 'components/fragment_finder'
+
 export default {
   name: 'nodeCreator__nodeFragments',
-  props: ['colWidth', 'fragments'],
-  components: {},
+  components: {fragmentFinder},
+  props: ['tab', 'fragments'],
   data () {
     return {
-      mini: false,
-      width: 500
+      width: 500,
+      point: undefined,
+      fragment: null,
+      fragmentAddHeight: 300,
+      fragmentActions: [
+        {id: 'edit', name: 'Edit'},
+        {id: 'duplicate', name: 'Duplicate'},
+        {id: 'delete', name: 'Delete', color: 'red'}
+      ],
+      name: '',
+      nameEdit: undefined
+    }
+  },
+  computed: {
+    fragmentsLength () {
+      return Object.keys(this.fragments).length
+    },
+    fragmentsEmpty () {
+      return this.fragmentsLength === 0
     }
   },
   watch: {
-    mini: {
-      // immediate: true,
-      handler (to, from) {
-        this.$log('mini CHANGED', to)
-        if (to === true) {
-          this.$tween.to(this, 0.5, {width: 120})
-        } else {
-          this.$tween.to(this, 0.5, {width: 500})
-        }
-      }
-    }
   },
   methods: {
-    toggle () {
-      this.$log('toggle')
-      this.mini = !this.mini
+    async fragmentFound (f) {
+      this.$log('fragmentFound', f)
+      this.$set(this.fragments, f.uid, f)
+      // this.fragments
+      // create fragment
+    },
+    async contentSelected (content) {
+      this.$log('contentSelected', content)
+      // close content finder dialog
+      this.$refs.contentFinderDialog.hide()
+      await this.$wait(300)
+      let WSContent = await this.$store.dispatch('workspace/addWSContent', {name: content.name, content: {oid: content.oid}})
+      this.$log('WSContent', WSContent)
+      // open editor
+      this.fragmentCreate(WSContent.content)
+      // this.fragmentEdit(WSContent.content)
+    },
+    pointAdd (now, andOpenEditor) {
+      this.$log('pointAdd')
+      this.fragments[this.fragment.uid].relativeCuts.push({x: now})
+      this.fragments[this.fragment.uid].relativeCuts.push({x: now + 10})
+      if (andOpenEditor) this.$refs.videoEditorDialog.show()
+    },
+    pointEdit (f, pi, {id}) {
+      this.$log('pointEdit', f, pi, id)
+      switch (id) {
+        case 'edit': {
+          this.$refs.videoEditorDialog.show()
+          break
+        }
+        case 'delete': {
+          // TODO: not even indexes of fragment?
+          this.$delete(this.fragments[f.uid].relativePoints, pi)
+          this.$delete(this.fragments[f.uid].relativePoints, pi - 1)
+          if (this.fragments[f.uid].relativePoints.length === 0) this.fragmentDelete(f.uid)
+          break
+        }
+      }
+    },
+    async fragmentNameClick (f) {
+      this.$log('fragmentNameClick', f)
+      this.$set(this, 'name', f.name)
+      this.nameEdit = f.uid
+      await this.$wait(300)
+      this.$nextTick(() => {
+        this.$refs.nameInput[0].focus()
+      })
+    },
+    fragmentHeaderClick () {
+      this.$log('fragmentHeaderClick')
+    },
+    fragmentPointClick (f, pi) {
+      this.$log('fragmentPointClick', f, pi)
+      this.$set(this, 'fragment', f)
+      this.$nextTick(() => {
+        // TODO: what editor to open?
+        this.$refs.videoEditorDialog.show()
+      })
+    },
+    fragmentClick (f) {
+      this.$log('fragmentClick', f)
+      this.$set(this, 'fragment', f)
+      this.$nextTick(() => {
+        // this.$refs.fragmentMenu.show()
+        this.$refs.fragmentDialog.show()
+      })
+    },
+    fragmentAction ({id}) {
+      this.$log('fragmentAction', id)
+      switch (id) {
+        case 'edit': {
+          this.fragmentEdit()
+          break
+        }
+        case 'duplicate': {
+          this.fragmentDuplicate(this.fragment)
+          break
+        }
+        case 'delete': {
+          this.fragmentDelete(this.fragment.uid)
+          break
+        }
+      }
+    },
+    // fragmentCreate (content, f) {
+    //   this.$log('fragmentCreate', content, f)
+    //   let uid = `${content.oid}-${Date.now()}`
+    //   let fragment = null
+    //   switch (content.type) {
+    //     case 'VIDEO': {
+    //       fragment = {
+    //         uid: uid,
+    //         url: '',
+    //         name: fragment.name,
+    //         relativeCuts: [],
+    //         relativeScale: content.duration,
+    //         content: content,
+    //         thumbUrl: []
+    //       }
+    //       this.$set(this.fragments, uid, fragment)
+    //       break
+    //     }
+    //     case 'IMAGE': {
+    //       fragment = {
+    //         uid: uid,
+    //         url: '',
+    //         name: '',
+    //         relativePoints: [],
+    //         relativeScale: 0.00,
+    //         content: content,
+    //         thumbUrl: []
+    //       }
+    //       this.$set(this.fragments, uid, fragment)
+    //       break
+    //     }
+    //   }
+    // },
+    fragmentEditor (f) {
+      this.$log('fragmentEditor', f.content.type)
+      switch (f.content.type) {
+        case 'VIDEO': {
+          this.$refs.videoEditorDialog.show()
+          break
+        }
+        case 'IMAGE': {
+          this.$refs.imageEditorDialog.show()
+          break
+        }
+      }
+    },
+    fragmentDuplicate (f) {
+      this.$log('fragmentDuplicate')
+      let uid = `${f.content.oid}-${Date.now()}`
+      let fragment = JSON.parse(JSON.stringify(f))
+      fragment.uid = uid
+      this.$set(this.fragments, uid, fragment)
+    },
+    fragmentDelete (uid) {
+      this.$log('fragmentDelete')
+      if (!uid) return
+      this.$delete(this.fragments, uid)
     }
   },
   mounted () {
@@ -86,3 +243,9 @@ export default {
   }
 }
 </script>
+
+<style lang="stylus">
+.kinput:focus {
+  outline: none
+}
+</style>

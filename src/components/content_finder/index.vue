@@ -94,7 +94,7 @@ export default {
       this.$log('contentGet start', oid)
       let {data: {objectList: [content]}} = await this.$apollo.query({
         query: gql`
-          query contentGet ($oid: OID!) {
+          query contentGetOld ($oid: OID!) {
             objectList(oids: [$oid]) {
               oid
               type

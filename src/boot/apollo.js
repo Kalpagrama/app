@@ -45,7 +45,7 @@ export default async ({ Vue, store, app }) => {
   // apollo
   Vue.use(VueApollo)
   // let SERVICES_URL = process.env.SERVICES_URL || 'https://dev.kalpagramma.com/graphql'
-  let SERVICES_URL = 'https://test.kalpagramma.com/graphql'
+  let SERVICES_URL = 'https://dev.kalpagramma.com/graphql'
   debug('SERVICES_URL', SERVICES_URL)
   store.commit('auth/state', ['SERVICES_URL', SERVICES_URL])
   let { data: {data: {services}}, error } = await axios.post(SERVICES_URL, {query: `query { services }`})
@@ -109,20 +109,20 @@ export default async ({ Vue, store, app }) => {
   })
     // ws client
     const ws = new ApolloClient({
-        link: new WebSocketLink({
-            uri: linkWs,
-            options: {
-                reconnect: true,
-                connectionParams: () => {
-                    debug('FETCH WS')
-                    return {
-                        Authorization: localStorage.getItem('ktoken'),
-                        'X-Kalpagramma-debug': localStorage.getItem('kdebug')
-                    }
-                }
+      link: new WebSocketLink({
+        uri: linkWs,
+        options: {
+          reconnect: true,
+          connectionParams: () => {
+            debug('FETCH WS')
+            return {
+              Authorization: localStorage.getItem('ktoken'),
+              'X-Kalpagramma-debug': localStorage.getItem('kdebug')
             }
-        }),
-        cache
+          }
+        }
+      }),
+      cache
     })
   // upload client
   const upload = new ApolloClient({

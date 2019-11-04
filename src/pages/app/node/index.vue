@@ -1,6 +1,13 @@
 <template lang="pug">
-.row.fit
-  node-explorer
+q-layout(view="hHh lpR fFf")
+  q-header
+    div(:style=`{height: '60px'}`).row.full-width.items-center
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(round flat color="white" icon="keyboard_arrow_left")
+      span Жидкий металл
+  q-page-container
+    q-page
+      node-explorer
 </template>
 
 <script>
