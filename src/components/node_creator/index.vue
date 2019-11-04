@@ -58,6 +58,7 @@ export default {
           return f.thumbUrl
         }),
         fragments: fragments.map(f => {
+          this.$log('f', f)
           return {
             uid: f.uid,
             oid: f.content.oid,

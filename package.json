@@ -20,7 +20,8 @@
     "build_cordova": "quasar build -m cordova",
     "gql": "apollo schema:download -k ./src/schema/graphql.schema.json",
     "lint": "eslint --ext .js,.vue src",
-    "test": "echo \"No test specified\" && exit 0"
+    "test": "echo \"No test specified\" && exit 0",
+    "now-build": "quasar build -m pwa"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",

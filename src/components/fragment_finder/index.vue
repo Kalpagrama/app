@@ -1,11 +1,11 @@
 <template lang="pug">
 .column.fit.bg-white
   q-dialog(ref="sourceUrlDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    source-url(@hide="$refs.sourceUrlDialog.hide()")
+    source-url(@hide="$refs.sourceUrlDialog.hide()" @oid="contentFound")
   q-dialog(ref="sourceDeviceDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    source-url(@hide="$refs.sourceDeviceDialog.hide()")
+    source-device(@hide="$refs.sourceDeviceDialog.hide()")
   q-dialog(ref="sourceWsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    source-url(@hide="$refs.sourceWsDialog.hide()" @input="")
+    source-ws(@hide="$refs.sourceWsDialog.hide()" @input="")
   div(:style=`{height: '60px'}`).row.full-width.items-center
     .col.full-height
       .row.fit.items-center.q-px-md
@@ -55,6 +55,78 @@ export default {
     }
   },
   methods: {
+    async contentFound (oid) {
+      this.$log('contentFound', oid)
+      let content = await this.contentGet(oid)
+      let fragment = await this.fragmentCreate(content)
+      this.$log('fragment', fragment)
+      this.$emit('fragment', fragment)
+      this.$emit('hide')
+    },
+    fragmentUse () {},
+    async fragmentCreate (content, f) {
+      this.$log('fragmentCreate', content, f)
+      let uid = `${content.oid}-${Date.now()}`
+      let fragment = null
+      switch (content.type) {
+        case 'VIDEO': {
+          fragment = {
+            uid: uid,
+            name: content.name,
+            relativeCuts: [],
+            relativeScale: content.duration,
+            content: content,
+            thumbUrl: ''
+          }
+          break
+        }
+        case 'IMAGE': {
+          fragment = {
+            uid: uid,
+            name: '',
+            relativeCuts: [],
+            relativeScale: 0.00,
+            content: content,
+            thumbUrl: []
+          }
+          this.$set(this.fragments, uid, fragment)
+          break
+        }
+      }
+      return fragment
+    },
+    async contentGet (oid) {
+      this.$log('contentGet start', oid)
+      let {data: {objectList: [content]}} = await this.$apollo.query({
+        query: gql`
+          query contentGetOld ($oid: OID!) {
+            objectList(oids: [$oid]) {
+              oid
+              type
+              name
+              thumbUrl(preferWidth: 600)
+              name
+              ... on Video {
+                url
+                urlOriginal
+                duration
+                width
+                height
+              }
+              ... on Image {
+                url
+                urlOriginal
+              }
+            }
+          }
+        `,
+        variables: {
+          oid: oid
+        }
+      })
+      this.$log('contentGet done', content)
+      return content
+    }
   },
   mounted () {
     this.$log('mounted')
