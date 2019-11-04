@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout.lt-sm
+q-layout.lt-md
   //- header
   q-header(reveal).row.items-center
     q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '60px'}` @click="pageClick('/app/home')").row.q-px-sm
@@ -10,7 +10,7 @@ q-layout.lt-sm
           span.text-bold.text-white Кальпаграмма
     .col
     div(:style=`{width: '50px', height: '50px'}`).row.items-center.justify-center
-      q-btn(round flat icon="settings" color="white" @click="")
+      q-btn(round flat icon="settings" @click="pageClick('/app/settings')" color="white")
     //- div(:style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
     //-   q-btn(round flat icon="person_add" color="white" @click="$router.push({name: 'invite'})")
   //- page

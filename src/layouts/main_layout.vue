@@ -14,7 +14,7 @@ q-layout(view='hHh Lpr fFf' @resize="onResize").bg-primary
   //-     @hide="$refs.kDialog.hide()")
   q-drawer(
     side="left" v-model="drawer" show-if-above
-    :mini="!drawer || miniState" :breakpoint="500" bordered content-class="bg-grey-3" :width="210" no-swipe-open).gt-sm
+    :mini="!drawer || miniState" bordered content-class="bg-grey-3" :width="250" no-swipe-open).gt-sm
     k-menu-vert.bg-primary
     div(class="" style="margin-top: -80px; margin-right: 4px;").row.justify-end
       q-btn(
