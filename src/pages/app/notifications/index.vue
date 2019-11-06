@@ -10,7 +10,7 @@
     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
       q-btn(icon="more_vert" flat round color="primary")
   .col.scroll.bg-grey-2
-    div(style=`height: 60px;`).row.full-width.justify-center.items-center
+    div(style=`height: 60px;` v-show="!notifications").row.full-width.justify-center.items-center
       span У вас пока нет никаких уведомлений
 </template>
 
@@ -19,6 +19,18 @@ export default {
   name: 'pageApp__Notifications',
   data () {
     return {
+      notifications: [
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''},
+        // {oid: '', name: '', thumbURL: ''}
+      ]
     }
   },
   mounted () {

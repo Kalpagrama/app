@@ -15,7 +15,9 @@ const routes = [
       { name: 'workspace', path: 'workspace/:menu?', component: () => import('pages/app/workspace') },
       { name: 'create', path: 'create', component: () => import('components/node_creator') },
       { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
-      { name: 'invite', path: 'invite', component: () => import('pages/app/invite') }
+      { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
+      { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
+      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
     ]
   },
   {
