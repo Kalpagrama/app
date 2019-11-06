@@ -45,7 +45,7 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
     :style=`{paddingTop: mode === 'maxi' ? '70px' : '10px', paddingBottom: '400px', overflowY: cutsOverflowY, overflowX: cutsOverflowX}`).col.full-width.scroll
     //- cut wrapper
     div(
-      v-for="(c, ci) in cuts" :key="ci"
+      v-for="(c, ci) in fragment.relativeCuts" :key="ci"
       :style=`{height: cutHeight+'px', width: width+framesWidth+'px', borderBottom: mode === 'maxi' ? '1px solid #eee' : 'none',
         marginBottom: cut == ci ? '120px' : '0px'}`).row
       //- left padding
@@ -140,7 +140,7 @@ export default {
       return this.frames.length
     },
     fragmentTotalLength () {
-      return this.cuts.reduce((acc, val) => {
+      return this.fragment.relativeCuts.reduce((acc, val) => {
         return acc + (Math.abs(val.end - val.start))
       }, 0)
     }
@@ -181,6 +181,8 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('cut CHANGED', to)
+        // emit cut to be highlighten
+        this.$emit('cut', this.cuts[to])
         // toggle cuts overflowY and may be X, and if it long?
         this.$log('null>=0', undefined >= 0)
         if (to >= 0) {
@@ -190,6 +192,12 @@ export default {
           this.cutsOverflowX = 'auto'
           this.cutsOverflowY = 'auto'
         }
+      }
+    },
+    cuts: {
+      deep: true,
+      handler (to, from) {
+        this.$log('cuts CHANGED', to)
       }
     }
   },
@@ -219,41 +227,46 @@ export default {
     },
     cutDragStart (e) {
       // this.$log('cutDragStart', e.position.left)
-      let cut = this.cuts[this.cut]
+      let cut = this.fragment.relativeCuts[this.cut]
       let to = cut.start + (e.delta.x / this.k)
       if (to > 0 && to < cut.end) {
-        cut.start = to
+        // cut.start = to
+        this.$set(cut, 'start', to)
         this.video.goSync(to)
-        if (e.position.left < 50 || e.position.left > this.width - 50) {
-          this.$log('MOVING SCROLL')
-          this.$refs.kframes.scrollLeft += e.delta.x * 2
-        }
+        // scroll left helper
+        // if (e.position.left < 50 || e.position.left > this.width - 50) {
+        //   this.$log('MOVING SCROLL')
+        //   this.$refs.kframes.scrollLeft += e.delta.x * 2
+        // }
       }
     },
     cutDragEnd (e) {
       // this.$log('cutDragEnd')
-      let cut = this.cuts[this.cut]
+      let cut = this.fragment.relativeCuts[this.cut]
       let to = cut.end + (e.delta.x / this.k)
       if (to < this.duration && to > cut.start) {
-        cut.end = to
+        // cut.end = to
+        this.$set(cut, 'end', to)
         this.video.goSync(to)
-        if (e.position.left < 50 || e.position.left > this.width - 50) {
-          this.$log('MOVING SCROLL')
-          this.$refs.kframes.scrollLeft += e.delta.x * 2
-        }
+        // scroll left helper
+        // if (e.position.left < 50 || e.position.left > this.width - 50) {
+        //   this.$log('MOVING SCROLL')
+        //   this.$refs.kframes.scrollLeft += e.delta.x * 2
+        // }
       }
     },
     async cutClick (c, ci) {
       this.$log('cutClick', c, ci)
       // if got active cut
       if (this.cut === ci) {
+        await this.video.go(c.start)
         // set mode back to mini
-        this.mode = 'mini'
-        await this.$wait(300)
+        // this.mode = 'mini'
+        // await this.$wait(300)
         // scroll to
-        this.cutToScrollTo(ci)
-        await this.$wait(300)
-        this.cut = undefined
+        // this.cutToScrollTo(ci)
+        // await this.$wait(300)
+        // this.cut = undefined
       } else {
         // if no cut is active
         // pause and go
@@ -274,21 +287,21 @@ export default {
       // let end = e || this.$random(start + 1, this.duration)
       let end = start + 3 > this.duration ? this.duration : start + 3
       // add
-      this.$set(this.cuts, this.cuts.length, {type: 'video', name: '', start: start, end: end})
+      this.$set(this.fragment.relativeCuts, this.fragment.relativeCuts.length, {type: 'video', name: '', start: start, end: end})
       // make this cut active to edit it right now
-      this.cutClick(this.cuts[this.cuts.length - 1], this.cuts.length - 1)
+      this.cutClick(this.fragment.relativeCuts[this.fragment.relativeCuts.length - 1], this.fragment.relativeCuts.length - 1)
     },
     cutDelete (ci) {
       this.$log('cutDelete', ci)
       if (this.cut === ci) this.cut = undefined
       // TODO: confirm cut deletion
-      this.$delete(this.cuts, ci)
+      this.$delete(this.fragment.relativeCuts, ci)
     },
     async cutToScrollTo (ci) {
       return new Promise(async (resolve, reject) => {
         this.$log('cutToScrollTo', ci)
         let scrollTop = this.cutHeight * ci
-        let scrollLeft = (this.cuts[this.cut].start * this.k) + (this.width / 2) - 30
+        let scrollLeft = (this.fragment.relativeCuts[this.cut].start * this.k) + (this.width / 2) - 30
         this.$log('cutToScrollTo scrollTop/scrollLeft', scrollTop, scrollLeft)
         this.$tween.to(this.$refs.kcuts, 0.3, {scrollTop, scrollLeft})
         await this.$wait(300)
@@ -297,7 +310,7 @@ export default {
     },
     // cuts
     cutsScrolled (e) {
-      // this.$log('cutsScrolled', e.target.scrollLeft)
+      this.$log('cutsScrolled', e.target.scrollLeft)
       // set cuts scrollLeft
       this.cutsScrollLeft = e.target.scrollLeft
       // connect with frames scroll position
@@ -310,20 +323,22 @@ export default {
     frameRendered () {
       // this.$log('frameRendered', this.framesRendered)
       this.framesRendered++
+      // if (this.$refs.kframes) this.$refs.kframes.scrollLeft = (this.width / 2) - 10
       if (this.framesRendered === this.framesCount) {
         this.framesRenderedAll = true
+        this.$log('frames rendered!')
         // set framesScrollWidth
         // this.framesScrollWidth = this.$refs.kframes.scrollWidth - this.width
         // frames to the left once frames rendered all, if there less than width
-        let scrollLeftInitial = (this.width / 2) - 10
-        if (this.framesWidth > this.width) scrollLeftInitial = (this.width) - 10
-        this.$tween.to(this.$refs.kframes, 0.5, {scrollLeft: scrollLeftInitial})
+        // let scrollLeftInitial = (this.width / 2) - 10
+        // if (this.framesWidth > this.width) scrollLeftInitial = (this.width) - 10
+        // this.$tween.to(this.$refs.kframes, 0.5, {scrollLeft: scrollLeftInitial})
         // play video
         if (this.video) this.video.play()
       }
     },
     framesScrolled (e) {
-      // this.$log('framesScrolled', e.target.scrollLeft)
+      this.$log('framesScrolled', e.target.scrollLeft)
       // save frames scroll position
       this.framesScrollLeft = e.target.scrollLeft
       // connect with rows scroll position
@@ -333,7 +348,7 @@ export default {
       this.$log('framesLoad start')
       let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
         query: gql`
-          query getVideoFrames ($oid: OID!) {
+          query getVideoFramesOld ($oid: OID!) {
             objectList(oids: [$oid]) {
               ... on Video {
                 frameUrls
@@ -353,6 +368,9 @@ export default {
     this.$log('mounted', this.fragment)
     // get frames, and then wait for there all are rendered
     this.$set(this, 'frames', await this.framesLoad(this.fragment.content.oid))
+    // await this.$wait(1000)
+    // this.$tween.to(this.$refs.kframes, 0.5, {scrollLeft: (this.width / 2) + 10})
+    // this.$refs.kframes.scrollLeft = 100
     // this.mode = 'mini'
   },
   beforeDestroy () {

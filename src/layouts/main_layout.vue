@@ -1,36 +1,31 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf' @resize="onResize").bg-primary
+q-layout(view='hHh Lpr fFf')
   q-dialog(ref="nodeCreatorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     node-creator(@hide="$refs.nodeCreatorDialog.hide()")
-  //- k-dialog(:value="$store.state.ui.dialogOpened" ref="kDialog" @hide="$store.commit('ui/state', ['dialogOpened', false])")
-  //-   ws-fragment-editor(
-  //-     v-if="$store.state.workspace.fragment && !$store.state.node.node"
-  //-     @hide="$refs.kDialog.hide()")
-  //-   node-rate(
-  //-     v-if="$store.state.node.node && !$store.state.node.answer"
-  //-     @hide="$refs.kDialog.hide()")
-  //-   node-answer(
-  //-     v-if="$store.state.node.node && $store.state.node.answer"
-  //-     @hide="$refs.kDialog.hide()")
+  q-dialog(ref="bookmarkDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    ws-bookmark-editor
+  q-dialog(
+    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened" @hide="$store.commit('ui/state', ['fragmentDialogOpened', false])"
+    :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    ws-fragment-editor
+  q-dialog(ref="nodeRateDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    node-rate
   q-drawer(
     side="left" v-model="drawer" show-if-above
     :mini="!drawer || miniState" :breakpoint="500" bordered content-class="bg-grey-3" :width="210" no-swipe-open).gt-sm
     k-menu-vert.bg-primary
     div(class="" style="margin-top: -80px; margin-right: 4px;").row.justify-end
       q-btn(
-        dense
-        round
-        unelevated
-        size="20px"
-        :icon="miniState ? 'chevron_right' : 'chevron_left'"
-        style=`color: #fff`
-        @click="toggleMini")
+        dense round unelevated size="20px" :icon="miniState ? 'chevron_right' : 'chevron_left'" @click="toggleMini"
+        style=`color: #fff`)
     .row.full-width.justify-start.q-pl-sm
       span.text-grey-3 0.4.0
   q-page-container
-    router-view(v-if="!loading" :height="height" :width="width")
-    div(v-else).row.full-width.window-height.items-center.justify-center
-      q-spinner(size="50px" :thickness="2" color="white")
+    q-page
+      q-resize-observer(@resize="onResize")
+      router-view(v-if="!loading" :height="height" :width="width")
+      div(v-else).row.full-width.window-height.items-center.justify-center
+        q-spinner(size="50px" :thickness="2" color="white")
 </template>
 
 <script>

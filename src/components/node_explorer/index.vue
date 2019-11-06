@@ -119,6 +119,12 @@ export default {
               name
               createdAt
               thumbUrl(preferWidth: 600)
+              meta {
+                ...on MetaNode {
+                  layout
+                  fragments { uid width height color thumbUrl(preferWidth: 600) }
+                }
+              }
             }
           }
         `,

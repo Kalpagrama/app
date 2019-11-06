@@ -115,6 +115,7 @@ export default async ({ Vue, store, router }) => {
   Vue.component('nodeFeed', () => import(`components/node_feed`))
   Vue.component('videoEditor', () => import(`components/video_editor`))
   Vue.component('kVideo', () => import(`components/k_video`))
+  Vue.component('kDialogBottom', () => import(`components/k_dialog_bottom`))
 }
 
 export { time }

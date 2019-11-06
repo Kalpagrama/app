@@ -6,57 +6,30 @@ div(:style=`{paddingBottom: '60px'}`).row.full-width.items-start.content-start.j
   //- video editor dialog
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(
-      v-if="fragment" :fragmentInput="fragment" :inCreator="true"
+      v-if="fragment" :value="fragment" :inCreator="true"
       @fragment="fragments[fragment.uid] = $event, $refs.videoEditorDialog.hide(), fragment = null" @hide="$refs.videoEditorDialog.hide()")
-  //- actions
-  //- k-menu-popup(ref="fragmentDeleteMenu" name="Удалить фрагмент?" :actions="[{id: 'delete', name: 'Удалить'}]" @action="fragmentDelete(fragment.uid), fragment = null")
-  //- k-menu-popup(ref="pointEditMenu" :name="fragment ? fragment.name : ''" :actions="[{id: 'edit', name: 'Изменить'}, {id: 'delete', name: 'Удалить'}]" @action="$event => pointEdit(fragment, point, $event)")
-  //- k-menu-popup(ref="fragmentMenu" :name="'fragment.name'" :actions="fragmentActions" @action="fragmentAction")
+  //- fragment actions
+  k-dialog-bottom(ref="fragmentActionDialog" mode="actions" :options="fragmentActionOptions" @action="fragmentAction")
   //- add fragment btn
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
       v-if="tab === 'fragments'"
-      round color="green" icon="add" size="lg" @click="$refs.fragmentFinderDialog.show()"
+      push round color="green" icon="add" size="lg" @click="$refs.fragmentFinderDialog.show()"
       :style=`{position: 'fixed', zIndex: 1000, bottom: '8px', right: '8px'}`)
   //- fragment
   div(
-    v-for="(f, fkey) in fragments" :key="fkey"
-    :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-lg
+    v-for="(f, fkey, fi) in fragments" :key="fkey" @click="fragment = f, $refs.fragmentActionDialog.show()"
+    :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
     //- header
-    div(
-      :style=`{height: '50px'}`
-      ).row.full-width.items-center.bg-white
-      .col.full-height
-        //- name preview
-        div(v-if="nameEdit !== fkey" @click="fragmentNameClick(f)").row.fit.items-center.q-pl-sm
-          span().text-bold {{ f.name || 'Enter fragment name' }}
-        //- name input
-        div(v-if="nameEdit === fkey").row.fit.items-center.q-pl-sm
-          input(
-            ref="nameInput" :value="name" @input="f.name = $event.target.value"
-            @blur="nameEdit = undefined" @keyup.enter="nameEdit = undefined"
-            :style=`{border: 'none', height: '30px', borderRadius: '4px', paddingLeft: '4px'}`
-            ).full-width.bg-grey-3.kinput
-      //- delete btn
-      q-btn(round flat dense color="grey-4" icon="delete_outline" @click="fragment = f, $refs.fragmentDeleteMenu.show()").q-mr-xs
-    //- body
-    div(
-      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-pl-xs
-      //- div(
-      //-   v-if="(pi+1) % 2 !== 0" v-for="(p, pi) in f.relativeCuts" :key="p.x"
-      //-   @click="fragment = f, point = pi, $refs.pointEditMenu.show()"
-      //-   :style=`{position: 'relative'}`
-      //-   ).col-4.q-pr-xs.cursor-pointer
-      //-   div(:style=`{position: 'absolute', bottom: '4px', left: '4px'}`).row.q-pa-xs.bg-red
-      //-     small.text-white i: {{ pi+1 }}
-      //-   //- point preivew...
-      //-   img(
-      //-     :src="f.thumbUrl[pi]"
-      //-     :style=`{width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}` draggable="false")
-      div(v-if="f.relativeCuts.length === 0").row.full-width.q-pa-sm.q-mb-xs
-        q-btn(
-          dense no-caps color="green" @click="fragment = f, pointAdd(0, true)"
-          style=`height: 50px; borderRadius: 10px`).full-width Выделить фрагмент
+    div(:style=`{height: '50px'}`).row.full-width.items-center.q-pa-sm.bg-white
+      span.text-bold.q-mr-sm {{ fi+ 1 }}.
+      span().text-bold {{ f.name || 'Enter fragment name' }}
+    //- body maybe
+    .row.full-width.q-pa-sm
+      img(
+        v-for="(c, ci) in f.relativeCuts" :key="ci"
+        :src="c.thumbUrl"
+        :style=`{borderRadius: '10px', height: '40px'}`).q-mr-xs
 </template>
 
 <script>
@@ -87,49 +60,59 @@ export default {
     },
     fragmentsEmpty () {
       return this.fragmentsLength === 0
+    },
+    fragmentActionOptions () {
+      return {
+        header: false,
+        confirm: true,
+        confirmName: 'Редактировать',
+        actions: {
+          rename: {name: 'Переименовать'},
+          duplicate: {name: 'Дублировать'},
+          delete: {name: 'Удалить', color: 'red'}
+        }
+      }
     }
   },
   watch: {
   },
   methods: {
-    async fragmentFound (f) {
-      this.$log('fragmentFound', f)
-      this.$set(this.fragments, f.uid, f)
-      // this.fragments
-      // create fragment
-    },
-    async contentSelected (content) {
-      this.$log('contentSelected', content)
-      // close content finder dialog
-      this.$refs.contentFinderDialog.hide()
-      await this.$wait(300)
-      let WSContent = await this.$store.dispatch('workspace/addWSContent', {name: content.name, content: {oid: content.oid}})
-      this.$log('WSContent', WSContent)
-      // open editor
-      this.fragmentCreate(WSContent.content)
-      // this.fragmentEdit(WSContent.content)
-    },
-    pointAdd (now, andOpenEditor) {
-      this.$log('pointAdd')
-      this.fragments[this.fragment.uid].relativeCuts.push({x: now})
-      this.fragments[this.fragment.uid].relativeCuts.push({x: now + 10})
-      if (andOpenEditor) this.$refs.videoEditorDialog.show()
-    },
-    pointEdit (f, pi, {id}) {
-      this.$log('pointEdit', f, pi, id)
-      switch (id) {
-        case 'edit': {
-          this.$refs.videoEditorDialog.show()
+    fragmentAction (e) {
+      this.$log('fragmentAction', e)
+      switch (e) {
+        case 'rename': {
+          this.$log('RENAME')
+          // TODO: rename from content name
+          break
+        }
+        case 'duplicate': {
+          this.$log('DUPLICATE')
+          // TODO: duplicate implementation
           break
         }
         case 'delete': {
-          // TODO: not even indexes of fragment?
-          this.$delete(this.fragments[f.uid].relativePoints, pi)
-          this.$delete(this.fragments[f.uid].relativePoints, pi - 1)
-          if (this.fragments[f.uid].relativePoints.length === 0) this.fragmentDelete(f.uid)
+          this.$log('DELETE')
+          this.$delete(this.fragments, this.fragment.uid)
+          break
+        }
+        case 'confirm': {
+          this.$log('CONFIRM')
+          switch (this.fragment.content.type) {
+            case 'VIDEO': {
+              this.$refs.videoEditorDialog.show()
+              break
+            }
+          }
           break
         }
       }
+    },
+    async fragmentFound (f) {
+      this.$log('fragmentFound', f)
+      // create WSContent?
+      // let WSContent = await this.$store.dispatch('workspace/addWSContent', {name: content.name, content: {oid: content.oid}})
+      // create WSFragment?
+      this.$set(this.fragments, f.uid, f)
     },
     async fragmentNameClick (f) {
       this.$log('fragmentNameClick', f)
@@ -140,94 +123,13 @@ export default {
         this.$refs.nameInput[0].focus()
       })
     },
-    fragmentHeaderClick () {
-      this.$log('fragmentHeaderClick')
-    },
-    fragmentPointClick (f, pi) {
-      this.$log('fragmentPointClick', f, pi)
-      this.$set(this, 'fragment', f)
-      this.$nextTick(() => {
-        // TODO: what editor to open?
-        this.$refs.videoEditorDialog.show()
-      })
-    },
-    fragmentClick (f) {
-      this.$log('fragmentClick', f)
-      this.$set(this, 'fragment', f)
-      this.$nextTick(() => {
-        // this.$refs.fragmentMenu.show()
-        this.$refs.fragmentDialog.show()
-      })
-    },
-    fragmentAction ({id}) {
-      this.$log('fragmentAction', id)
-      switch (id) {
-        case 'edit': {
-          this.fragmentEdit()
-          break
-        }
-        case 'duplicate': {
-          this.fragmentDuplicate(this.fragment)
-          break
-        }
-        case 'delete': {
-          this.fragmentDelete(this.fragment.uid)
-          break
-        }
-      }
-    },
-    // fragmentCreate (content, f) {
-    //   this.$log('fragmentCreate', content, f)
-    //   let uid = `${content.oid}-${Date.now()}`
-    //   let fragment = null
-    //   switch (content.type) {
-    //     case 'VIDEO': {
-    //       fragment = {
-    //         uid: uid,
-    //         url: '',
-    //         name: fragment.name,
-    //         relativeCuts: [],
-    //         relativeScale: content.duration,
-    //         content: content,
-    //         thumbUrl: []
-    //       }
-    //       this.$set(this.fragments, uid, fragment)
-    //       break
-    //     }
-    //     case 'IMAGE': {
-    //       fragment = {
-    //         uid: uid,
-    //         url: '',
-    //         name: '',
-    //         relativePoints: [],
-    //         relativeScale: 0.00,
-    //         content: content,
-    //         thumbUrl: []
-    //       }
-    //       this.$set(this.fragments, uid, fragment)
-    //       break
-    //     }
-    //   }
-    // },
-    fragmentEditor (f) {
-      this.$log('fragmentEditor', f.content.type)
-      switch (f.content.type) {
+    fragmentEdit () {
+      this.$log('fragmentEdit', this.fragment)
+      switch (this.fragment.content.type) {
         case 'VIDEO': {
           this.$refs.videoEditorDialog.show()
-          break
-        }
-        case 'IMAGE': {
-          this.$refs.imageEditorDialog.show()
-          break
         }
       }
-    },
-    fragmentDuplicate (f) {
-      this.$log('fragmentDuplicate')
-      let uid = `${f.content.oid}-${Date.now()}`
-      let fragment = JSON.parse(JSON.stringify(f))
-      fragment.uid = uid
-      this.$set(this.fragments, uid, fragment)
     },
     fragmentDelete (uid) {
       this.$log('fragmentDelete')

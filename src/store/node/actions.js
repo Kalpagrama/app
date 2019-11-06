@@ -84,7 +84,12 @@ export const nodeCreate = async (store, payload) => {
         uid: f.uid,
         name: f.name,
         oid: f.content.oid,
-        relativePoints: f.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
+        // relativePoints: f.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
+        relativePoints: f.relativeCuts.reduce((acc, val) => {
+          acc.push({x: val.start})
+          acc.push({x: val.end})
+          return acc
+        }, []),
         relativeScale: f.relativeScale
       }
     }),

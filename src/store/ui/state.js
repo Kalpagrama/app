@@ -27,5 +27,8 @@ export default {
     // {id: 'node-template-slider', name: 'Slider'},
     {id: 'node-template-cards', name: 'Cards'}
   ],
-  dialogOpened: false
+  dialogOpened: false,
+  fragmentDialogOpened: false,
+  bookmarkDialogOpened: false,
+  nodeRateDialogOpened: false
 }

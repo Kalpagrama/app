@@ -1,9 +1,11 @@
 <template lang="pug">
-component(
-  :is="$store.state.node.layouts[node.meta.layout].component"
-  :index="index" :zIndex="zIndex"
-  :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
-  :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
+.row.full-width
+  component(
+    :is="$store.state.node.layouts[node.meta.layout].component"
+    :index="index" :zIndex="zIndex" @action="nodeAction($event)"
+    :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
+    :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
+  k-dialog-bottom(ref="nodeActionDialog" mode="actions" :options="nodeActionOptions" @action="action")
 </template>
 
 <script>
@@ -32,23 +34,22 @@ export default {
   },
   data () {
     return {
-      nodeFull: null,
-      nodeRating: false,
-      nodeRates: [
-        {id: 1, name: 'Нет', rate: 0.0, icon: 'gps_off', opacity: 1},
-        {id: 2, name: 'Скорее нет', rate: 0.25, icon: 'gps_not_fixed', opacity: 0.7},
-        {id: 3, name: 'Может быть', rate: 0.5, icon: 'gps_not_fixed', opacity: 1},
-        {id: 4, name: 'Скорее да', rate: 0.75, icon: 'gps_fixed', opacity: 0.7},
-        {id: 5, name: 'Да', rate: 1.0, icon: 'gps_fixed', opacity: 1}
-      ],
-      nodeSharing: false,
-      nodeChaining: false,
-      nodeWorkspacing: false,
-      fragmentActive: 0,
-      nodeTemplateSet: undefined
+      nodeFull: null
     }
   },
   computed: {
+    nodeActionOptions () {
+      return {
+        header: false,
+        confirm: true,
+        confirmName: 'Создать ядро',
+        actions: {
+          subscribe: {name: 'Follow'},
+          contentExplore: {name: 'Explore content'},
+          saveToWorkspace: {name: 'Save to workspace'}
+        }
+      }
+    }
   },
   watch: {
     nodeFullReady: {
@@ -73,6 +74,33 @@ export default {
     }
   },
   methods: {
+    nodeAction ([action, payload]) {
+      this.$log('nodeAction', action, payload)
+      this.$refs.nodeActionDialog.show()
+    },
+    action (e) {
+      this.$log('action', e)
+      switch (e) {
+        case 'subscribe': {
+          this.$log('SUBSCRIBE')
+          break
+        }
+        case 'confirm': {
+          this.$log('CONFIRM')
+          this.$root.$emit('create')
+          break
+        }
+      }
+    },
+    nodeBookmark () {
+      this.$log('nodeBookmark')
+    },
+    nodeContent () {
+      this.$log('nodeContent')
+    },
+    nodeFragment () {
+      this.$log('nodeFragment')
+    },
     async nodeLoad (oid) {
       // this.$log('nodeLoad start', this.index, this.node.name)
       let { data: { objectList: [nodeFull] } } = await this.$apollo.query({

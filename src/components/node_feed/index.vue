@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm.bg-grey-2
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm.bg-grey-3
   div(:style=`{maxWidth: '550px'}`).row.full-width
     div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width
       node(
@@ -7,7 +7,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
         :needFull="ni >= fullNodes[0] && ni <= fullNodes[1]"
         :active="activeNode ? activeNode[0] === ni : false"
         :class=`{
-          'bg-grey-3': activeNode ? activeNode[0] !== ni : false,
+          'bg-grey-2': activeNode ? activeNode[0] !== ni : false,
           'bg-white': activeNode ? activeNode[0] === ni : false}`
         :style=`{zIndex: activeNode ? activeNode[0] === ni ? 200 : 10 : 10, borderRadius: '10px'}`
         :noActions="true" :noSpheres="true" :noTimestamp="true"

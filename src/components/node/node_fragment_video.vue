@@ -8,9 +8,8 @@ div(
     //- q-btn(v-if="!playing && visible" round color="primary" icon="flash_on" style=`width: 30px; height: 30px` @click="videoToggleMute").shadow-1
   //- volume
   q-btn(
-    round flat color="white" dense @click="videoToggleMute()"
-    :style=`{position: 'absolute', zIndex: 1000, top: '10px', left: '10px', opacity: 0.7}`
-    ).shadow-1.bg-grey-9
+    round dense flat color="white" @click="videoToggleMute()"
+    :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.5)'}`)
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" color="white" size="19px")
   //- time
   div(:style=`{position: 'absolute', height: '20px', bottom: '10px', left: '10px', color: 'white', borderRadius: '4px', opacity: 0.5}`

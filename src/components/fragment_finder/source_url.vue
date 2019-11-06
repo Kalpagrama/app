@@ -33,7 +33,9 @@
             q-spinner(:thickness="4" size="50px" color="primary")
   //- footer
   div(v-if="inputUrl" :style=`{height: '70px'}`).row.full-width.q-px-sm
-    q-btn(color="primary" style=`height: 60px; borderRadius: 10px` no-caps @click="upload()"
+    q-btn(
+      color="green" push no-caps @click="upload()"
+      style=`height: 60px; borderRadius: 10px`
       :disable="!iframeReady"
       :loading="uploading" :percentage="progress ? progress.progress : 0").full-width
       span.text-white.text-bold {{ `Загрузить` }}

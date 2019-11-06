@@ -6,17 +6,20 @@ div(:style=`{position: 'relative'}`).row
     :style=`{height: '100%', width: '100%', objectFit: 'contain'}`
     :muted="true"
     @click="click"
-    @seeked="seeked"
+    @seeked="seekEnded"
     @play="handlePlay"
     @timeupdate="now = $refs.kVideo.currentTime, $emit('now', now)"
     @playing="duration = $refs.kVideo.duration, $emit('duration', duration)"
     @pause="handlePause"
-    @seeking="seeking")
+    @seeking="seekStarted")
+  //- seeking spinner
+  div(v-if="seeking" :style=`{position: 'absolute'}`).row.fit.items-center.justify-center
+    q-spinner(size="50px" :thickness="4" color="white")
   //- forwards
   //- div(:style=`{position: 'absolute', zIndex: 10, width: '50%', height: '100%', left: '0px'}` @click="$refs.kVideo.currentTime -= 10")
   //- div(:style=`{position: 'absolute', zIndex: 10, width: '50%', height: '100%', right: '0px'}` @click="$refs.kVideo.currentTime += 10")
   //- tools
-  div(v-show="tools" :style=`{position: 'absolute', bottom: '0px', zIndex: 1000, height: '66px'}`).row.full-width
+  div(v-show="tools" :style=`{position: 'absolute', bottom: '10px', zIndex: 1000, height: '66px'}`).row.full-width
     //- actions
     div(v-if="actions" :style=`{height: '48px', paddingLeft: '10px', paddingRight: '20px'}`).row.full-width
       //- play/pause button
@@ -24,7 +27,7 @@ div(:style=`{position: 'relative'}`).row
         q-btn(round flat color="white" :icon="playStarted ? 'pause' : 'play_arrow'" @click="click()")
       .col.full-height
         .row.fit.items-center.q-px-sm
-          span(style=`user-select: none; background: rgba(0,0,0,0.4); borderRadius: 4px; overflow: hidden`).text-white.q-pa-xs {{ $time(now) }}/{{ $time(duration) }}
+          small(style=`user-select: none; background: rgba(0,0,0,0.4); borderRadius: 4px; overflow: hidden`).text-white.q-pa-xs {{ $time(now) }}/{{ $time(duration) }}
       //- volume up/down button
       div(:style=`{height: '48px', minWidth: '48px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="white" icon="fullscreen")
@@ -36,14 +39,15 @@ div(:style=`{position: 'relative'}`).row
         v-touch-pan.mouse.stop="timelinePan"
         :style=`{position: 'relative', height: '18px', borderRadius: '2px', overflow: 'hidden'}`).row.full-width.items-end.bg-grey-6
         div(:style=`{pointerEvents: 'none', height: '18px', width: now/duration*100+'%'}`).row.bg-white
-        //- timeline points
-        //- div(
-        //-   v-for="(p, pi) in fragment.relativePoints" :key="pi" v-if="(pi+1) % 2 !== 0"
-        //-   :style=`{
-        //-     position: 'absolute', left: (p.x/duration)*100+'%', pointerEvents: 'none',
-        //-     borderRadius: '1px',
-        //-     width: Math.abs(p.x - fragment.relativePoints[pi + 1].x)/duration*100+'%',
-        //-     height: '9px', background: $randomColor(pi)}`).row
+        //- cut
+        div(
+          v-if="cut"
+          :style=`{
+            position: 'absolute', zIndex: 1000, pointerEvents: 'none',
+            left: cut.start/duration*100+'%',
+            width: ((cut.end-cut.start)/duration)*100+'%', minWidth: '2px',
+            height: '18px',
+            background: $randomColor(cut.uid)}`)
 </template>
 
 <script>
@@ -71,6 +75,12 @@ export default {
         return true
       }
     },
+    cut: {
+      type: [Object, Boolean],
+      default () {
+        return false
+      }
+    }
   },
   data () {
     return {
@@ -78,6 +88,7 @@ export default {
       duration: 0,
       playStarted: false,
       seek: false,
+      seeking: false,
       seekCount: 0,
       seekInterval: null
     }
@@ -91,6 +102,7 @@ export default {
     handlePlay (e) {
       this.$log('handlePlay', e)
       this.playStarted = true
+      this.seeking = false
     },
     play () {
       this.$refs.kVideo.play()
@@ -104,7 +116,8 @@ export default {
     },
     go (time) {
       return new Promise((resolve, reject) => {
-        this.$refs.kVideo.currentTime = time
+        if (this.$refs.kVideo) this.$refs.kVideo.currentTime = time
+        this.seeking = true
         this.seekInterval = setInterval(() => {
           // this.$log('seekInterval', this.seekCount)
           this.seekCount++
@@ -112,6 +125,7 @@ export default {
             clearInterval(this.seekInterval)
             resolve(time)
             this.seekCount = 0
+            this.seeking = false
           } else {
             // clearInterval(this.seekInterval)
           }
@@ -119,15 +133,17 @@ export default {
       })
     },
     goSync (time) {
-      this.$refs.kVideo.currentTime = time
+      if (this.$refs.kVideo) this.$refs.kVideo.currentTime = time
     },
-    seeked (e) {
-      // this.$log('seeked', e)
-      this.seek = true
-    },
-    seeking (e) {
+    seekStarted (e) {
       // this.$log('seeking', e)
+      this.seeking = true
       this.seek = false
+    },
+    seekEnded (e) {
+      // this.$log('seeked', e)
+      this.seeking = false
+      this.seek = true
     },
     async timelineClick (e) {
       this.$log('timelineClick start')
@@ -166,6 +182,21 @@ export default {
     videoLoaded (e) {
       this.$log('videoLoaded')
       this.$emit('duration', this.$refs.kVideo.duration)
+    },
+    async getScreenshot (sec) {
+      this.$log('getScreenshot start', sec)
+      this.pause()
+      await this.go(sec)
+      let canvas = document.createElement('canvas')
+      canvas.width = this.fragment.content.width
+      canvas.height = this.fragment.content.height
+      this.$log('canvas', canvas)
+      let ctx = canvas.getContext('2d')
+      ctx.drawImage(this.$refs.kVideo, 0, 0, canvas.width, canvas.height)
+      let screenshot = canvas.toDataURL('image/jpeg', 0.5)
+      await this.$wait(500)
+      this.$log('getScreenshot done')
+      return screenshot
     }
   },
   mounted () {

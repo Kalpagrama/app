@@ -1,21 +1,11 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
-  node-header(v-if="false" :node="node" :nodeFull="nodeFull" :inCreator="inCreator")
-    template(v-slot:actions)
-      k-menu-popup(name="Choose template" :actions="nodeTemplates" @action="$event => $emit('nodeTemplate', $event.id)")
-        q-btn(icon="brush" color="grey-5" round flat)
-  //- wrapper
   div(
     :style=`{position: 'relative', zIndex: zIndex+100, maxHeight: '100vh', overflow: 'hidden', borderRadius: '10px'}`
     ).row.full-width.items-start.content-start.bg-grey-3
-    //- actions
-    k-menu-popup(v-if="active && nodeFull"
-      :style=`{position: 'absolute', zIndex: zIndex+1000, top: '8px', right: '8px'}`
-      :name="nodeFull.fragments[fragmentActive].content.name" :actions="fragmentActions"
-      @action="$event => fragmentAction($event, fragmentActive)")
-      div(:style=`{width: '30px', height: '30px', borderRadius: '15px', oveflow: 'hidden', background: 'rgba(0, 0, 0, 0.4)'}`
-        ).row.items-center.justify-center
-        q-icon(color='white' name="more_horiz" size="20px")
+    //- action
+    q-btn(v-if="active" round dense flat color="white" icon="more_horiz" @click="$emit('action', ['menu', nodeFull.fragments[fragmentActive]])"
+      :style=`{position: 'absolute', zIndex: 1000, right: '8px', top: '8px', background: 'rgba(0,0,0,0.5)'}`)
     //- forward
     div(@click="forwardClick()"
       :style=`{position: 'absolute', zIndex: zIndex+200, width: '100px', bottom: '10px', right: '10px', borderRadius: '10px', overflow: 'hidden', opacity: 0.7}`
@@ -36,9 +26,6 @@
       draggable="false"
       @load="$event => imgLoaded($event, `preview:${pi}`)"
       @error="$event => imgError($event, `preview:${pi}`)")
-    //- div(
-    //-   v-for="(p, pi) in 2" :key="pi"
-    //-   :style=`{height: '240px'}`).row.full-width.bg-grey-3.br
     //- active
     div(v-if="needFull && nodeFull && nodeFull.fragments" :style=`{position: 'absolute', zIndex: zIndex+90}`).row.fit
       div(v-for="(f, fi) in 2" :key="fi" v-show="fragmentActive === fi").row.fit
@@ -63,15 +50,10 @@ import kMenuPopup from 'components/k_menu_popup'
 export default {
   name: 'nodeTemplate__pip',
   components: {nodeName, nodeHeader, nodeActions, nodeSpheres, nodeTimestamp, nodeFragmentVideo, nodeFragmentImage, kMenuPopup},
-  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'nodeTemplates', 'inCreator', 'noActions', 'noTimestamp', 'noName', 'noSpheres'],
+  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'inCreator', 'noActions', 'noTimestamp', 'noName', 'noSpheres'],
   data () {
     return {
-      fragmentActive: 0,
-      fragmentActions: [
-        {id: 'content_explore', name: 'Исследовать контент'},
-        {id: 'fragment_workspace', name: 'Добавить в мастерскую'},
-        // {id: 'node_answer', name: 'Ответить', color: '#7d389e', class: ['text-bold', 'text-primary']}
-      ]
+      fragmentActive: 0
     }
   },
   computed: {
@@ -96,6 +78,18 @@ export default {
     imgLoaded (e, msg) {
       // this.$log('imgLoaded', msg)
     },
+    contentExplore () {
+      this.$log('contentExplore')
+      this.$router.push(`/app/content/${this.nodeFull.fragments[this.fragmentActive].content.oid}`)
+    },
+    fragmentWorkspace () {
+      this.$log('fragmentWorkspace')
+      let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[this.fragmentActive]))
+      // TODO: take thumbUrl from node.meta.fragments
+      // fragment.thumbUrl = this.node.thumbUrl[fi]
+      this.$store.commit('workspace/state', ['fragment', fragment])
+      this.$store.commit('ui/state', ['fragmentDialogOpened', true])
+    },
     async fragmentAction (a, fi) {
       this.$log('fragmentAction', a)
       await this.$wait(200)
@@ -108,7 +102,6 @@ export default {
         case 'fragment_workspace': {
           this.$log('fragmentAction', a.id)
           let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
-          fragment.thumbUrl = this.node.thumbUrl[fi]
           this.$store.commit('workspace/state', ['fragment', fragment])
           this.$store.commit('ui/state', ['dialogOpened', true])
           // this.$nextTick(() => {

@@ -1,19 +1,18 @@
 <template lang="pug">
 q-layout(view="hHh lpR lff" :style=`{height: '100vh'}`).column.bg-primary
-  q-dialog(ref="nodeCreatorHelperDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    helper(@hide="$refs.nodeCreatorHelperDialog.hide()")
+  k-dialog-bottom(ref="nodeCreatorDialog" mode="actions" :options="nodeCreatorDialogOptions" @action="nodeCreatorAction")
   q-header
     div(:style=`{height: '60px'}`).row.full-width
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-        q-btn(round flat icon="menu" color="grey-3" @click="$refs.nodeCreatorHelperDialog.toggle()")
+        q-btn(round flat icon="menu" color="grey-3" @click="$refs.nodeCreatorDialog.toggle()")
       .col.full-height
         .row.fit.items-center.justify-center.q-px-md
-          span.text-bold Ядрогенератор
+          span.text-bold Node creator
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="clear" @click="$emit('hide')")
     q-tabs(v-model="tab" @input="tabChanged")
-      q-tab(no-caps name="fragments" label="Фрагменты")
-      q-tab(no-caps name="preview" label="Предосмотр")
+      q-tab(no-caps name="fragments" label="Fragments")
+      q-tab(no-caps name="preview" label="Preview")
   q-page-container.col
     q-tab-panels(v-model="tab" @input="tabChanged" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).fit
       q-tab-panel(name="fragments" style=`margin: 0; padding: 0`)
@@ -54,9 +53,6 @@ export default {
         uid: this.uid,
         name: this.name,
         author: this.$store.state.auth.user,
-        thumbUrl: fragments.map(f => {
-          return f.thumbUrl
-        }),
         fragments: fragments.map(f => {
           this.$log('f', f)
           return {
@@ -65,11 +61,7 @@ export default {
             content: f.content,
             name: f.name,
             thumbUrl: f.thumbUrl,
-            relativePoints: f.relativeCuts.reduce((acc, val) => {
-              acc.push({x: val.start})
-              acc.push({x: val.end})
-              return acc
-            }, []),
+            relativeCuts: f.relativeCuts,
             relativeScale: f.relativeScale
           }
         }),
@@ -78,10 +70,22 @@ export default {
         createdAt: Date.now(),
         meta: {
           layout: this.layout,
-          // layoutPolicy: this.layoutPolicy,
           fragments: fragments.map(f => {
-            return {uid: f.uid}
+            return {uid: f.uid, thumbUrl: f.thumbUrl}
           })
+        }
+      }
+    },
+    nodeCreatorDialogOptions () {
+      return {
+        confirm: false,
+        confirmName: '',
+        actions: {
+          mydrafts: {name: 'My drafts'},
+          new: {name: 'Start a new one'},
+          share: {name: 'Share with friend'},
+          settings: {name: 'Settings'},
+          help: {name: 'How does it works?!'}
         }
       }
     }
@@ -96,6 +100,9 @@ export default {
     }
   },
   methods: {
+    nodeCreatorAction (e) {
+      this.$log('nodeCreatorAction', e)
+    },
     async tabChanged (tab) {
       // this.$log('tabChanged', tab)
       this.tabLocal = undefined

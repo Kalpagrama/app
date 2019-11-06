@@ -30,10 +30,10 @@
      this.emailSending = true
      let { data: { inviteEmail } } = await this.$apollo.mutate({
       mutation: gql`
-            mutation inviteEmail ($email: String!){
-              inviteEmail(email: $email)
-            }
-          `,
+        mutation inviteEmail ($email: String!){
+          inviteEmail(email: $email)
+        }
+      `,
       variables: {
        email: this.email
       }

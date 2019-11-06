@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     points () {
-      return this.fragment.relativePoints.filter((p, pi) => {
+      return this.fragment.relativeCuts.filter((p, pi) => {
         return (pi + 1) % 2 !== 0
       })
     }
@@ -64,8 +64,8 @@ export default {
       this.$log('pointAdd')
       let start = this.now
       let end = this.now + 10 > this.duration ? this.duration : this.now + 10
-      this.fragment.relativePoints.push({x: start})
-      this.fragment.relativePoints.push({x: end})
+      // this.fragment.relativePoints.push({x: start})
+      // this.fragment.relativePoints.push({x: end})
     }
   },
   mounted () {

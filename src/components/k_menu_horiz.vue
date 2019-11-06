@@ -4,7 +4,7 @@ div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width
     ).row.full-width.items-center.content-center.justify-between.q-px-xs
     q-btn(round flat icon="blur_on" color="grey" @click="pageClick('/app/home')")
     q-btn(round flat icon="whatshot" color="grey" @click="pageClick('/app/hot')")
-    q-btn(round icon="add" color="green" size="md" @click="$root.$emit('create')")
+    q-btn(round push icon="add" color="green" size="md" @click="$root.$emit('create')")
     q-btn(round flat icon="cloud_queue" color="grey" @click="pageClick('/app/workspace')")
     q-btn(round flat icon="menu" color="grey" @click="pageClick('/app/menu')")
 </template>
