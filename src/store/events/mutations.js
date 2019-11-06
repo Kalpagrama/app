@@ -1,6 +1,6 @@
 
-export function init(state, categories) {
-  state.categories = categories
+export function init(state, userEvents) {
+  state.userEvents = userEvents
   state.initialized = true
 }
 

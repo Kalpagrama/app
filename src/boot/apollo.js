@@ -14,6 +14,7 @@ import axios from 'axios'
 
 var apolloProvider
 
+// todo remove axios
 export default async ({ Vue, store, app }) => {
   debug('start')
   // axios
