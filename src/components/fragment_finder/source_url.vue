@@ -152,9 +152,9 @@ export default {
         })
         this.$log('upload done', oid)
         this.uploading = false
-        this.$emit('uploading', false)
-        this.$emit('uploaded', oid)
         this.inputClear()
+        this.$emit('oid', oid)
+        this.$emit('hide')
       } catch (e) {
         this.$log('upload error', e)
         this.uploading = false
@@ -164,9 +164,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    // TODO: uploading progress...
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    // close uploading connection ws
   }
 }
 </script>

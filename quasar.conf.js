@@ -64,12 +64,13 @@ module.exports = function (ctx) {
     supportIE: false,
     build: {
       env: {
-        SERVICES_URL: JSON.stringify(process.env.SERVICES_URL)
+        AUTH_URL: JSON.stringify(process.env.AUTH_URL)
       },
       scopeHoisting: true,
       vueRouterMode: 'history',
       vueCompiler: true,
-      distDir: path.resolve(__dirname, 'public'),
+      // distDir: path.resolve(__dirname, 'public'),
+      distDir: 'dist',
       // gzip: true,
       // analyze: true,
       // extractCSS: false,

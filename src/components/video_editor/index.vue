@@ -7,7 +7,7 @@ q-layout.bg-black
       :style=`{background: 'rgba(0,0,0,0.4)'}`)
   div(:style=`{position: 'absolute', top: '0px', right: '0px', zIndex: 10000, height: '70px', width: '70px'}`).row.items-center.justify-center
     q-btn(
-      round flat color="white" icon="blur_on" @click="$refs.menuKalpaDialog.toggle()"
+      round flat color="white" icon="clear" @click="$emit('hide')"
       :style=`{background: 'rgba(0,0,0,0.4)'}`)
   q-dialog(ref="menuLocalDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     menu-local(

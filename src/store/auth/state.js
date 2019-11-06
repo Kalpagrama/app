@@ -1,4 +1,4 @@
 export default {
-  SERVICES_URL: '',
+  AUTH_URL: '',
   user: null
 }

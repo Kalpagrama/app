@@ -94,7 +94,7 @@ export default {
       this.$log('contentGet start', oid)
       let {data: {objectList: [content]}} = await this.$apollo.query({
         query: gql`
-          query contentGet ($oid: OID!) {
+          query contentGetOld ($oid: OID!) {
             objectList(oids: [$oid]) {
               oid
               type
@@ -129,7 +129,7 @@ export default {
   mounted () {
     this.$log('mounted')
     const observer = this.$apollo.subscribe({
-      client: 'ws',
+      client: 'wsApollo',
       query: gql`
         subscription uploadProgress {
           progress {

@@ -7,7 +7,7 @@ div(:style=`{paddingBottom: '60px'}`).row.full-width.items-start.content-start.j
   q-dialog(ref="videoEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     video-editor(
       v-if="fragment" :fragmentInput="fragment" :inCreator="true"
-      @fragment="fragments[fragment.uid] = $event, $refs.videoEditorDialog.hide(), fragment = null")
+      @fragment="fragments[fragment.uid] = $event, $refs.videoEditorDialog.hide(), fragment = null" @hide="$refs.videoEditorDialog.hide()")
   //- actions
   //- k-menu-popup(ref="fragmentDeleteMenu" name="Удалить фрагмент?" :actions="[{id: 'delete', name: 'Удалить'}]" @action="fragmentDelete(fragment.uid), fragment = null")
   //- k-menu-popup(ref="pointEditMenu" :name="fragment ? fragment.name : ''" :actions="[{id: 'edit', name: 'Изменить'}, {id: 'delete', name: 'Удалить'}]" @action="$event => pointEdit(fragment, point, $event)")
@@ -43,7 +43,7 @@ div(:style=`{paddingBottom: '60px'}`).row.full-width.items-start.content-start.j
     div(
       :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-pl-xs
       //- div(
-      //-   v-if="(pi+1) % 2 !== 0" v-for="(p, pi) in f.relativePoints" :key="p.x"
+      //-   v-if="(pi+1) % 2 !== 0" v-for="(p, pi) in f.relativeCuts" :key="p.x"
       //-   @click="fragment = f, point = pi, $refs.pointEditMenu.show()"
       //-   :style=`{position: 'relative'}`
       //-   ).col-4.q-pr-xs.cursor-pointer
@@ -53,7 +53,7 @@ div(:style=`{paddingBottom: '60px'}`).row.full-width.items-start.content-start.j
       //-   img(
       //-     :src="f.thumbUrl[pi]"
       //-     :style=`{width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}` draggable="false")
-      div(v-if="f.relativePoints.length === 0").row.full-width.q-pa-sm.q-mb-xs
+      div(v-if="f.relativeCuts.length === 0").row.full-width.q-pa-sm.q-mb-xs
         q-btn(
           dense no-caps color="green" @click="fragment = f, pointAdd(0, true)"
           style=`height: 50px; borderRadius: 10px`).full-width Выделить фрагмент
@@ -94,6 +94,9 @@ export default {
   methods: {
     async fragmentFound (f) {
       this.$log('fragmentFound', f)
+      this.$set(this.fragments, f.uid, f)
+      // this.fragments
+      // create fragment
     },
     async contentSelected (content) {
       this.$log('contentSelected', content)
@@ -108,8 +111,8 @@ export default {
     },
     pointAdd (now, andOpenEditor) {
       this.$log('pointAdd')
-      this.fragments[this.fragment.uid].relativePoints.push({x: now})
-      this.fragments[this.fragment.uid].relativePoints.push({x: now + 10})
+      this.fragments[this.fragment.uid].relativeCuts.push({x: now})
+      this.fragments[this.fragment.uid].relativeCuts.push({x: now + 10})
       if (andOpenEditor) this.$refs.videoEditorDialog.show()
     },
     pointEdit (f, pi, {id}) {
@@ -173,39 +176,39 @@ export default {
         }
       }
     },
-    fragmentCreate (content, f) {
-      this.$log('fragmentCreate', content, f)
-      let uid = `${content.oid}-${Date.now()}`
-      let fragment = null
-      switch (content.type) {
-        case 'VIDEO': {
-          fragment = {
-            uid: uid,
-            url: '',
-            name: content.name,
-            relativePoints: [],
-            relativeScale: content.duration,
-            content: content,
-            thumbUrl: []
-          }
-          this.$set(this.fragments, uid, fragment)
-          break
-        }
-        case 'IMAGE': {
-          fragment = {
-            uid: uid,
-            url: '',
-            name: '',
-            relativePoints: [],
-            relativeScale: 0.00,
-            content: content,
-            thumbUrl: []
-          }
-          this.$set(this.fragments, uid, fragment)
-          break
-        }
-      }
-    },
+    // fragmentCreate (content, f) {
+    //   this.$log('fragmentCreate', content, f)
+    //   let uid = `${content.oid}-${Date.now()}`
+    //   let fragment = null
+    //   switch (content.type) {
+    //     case 'VIDEO': {
+    //       fragment = {
+    //         uid: uid,
+    //         url: '',
+    //         name: fragment.name,
+    //         relativeCuts: [],
+    //         relativeScale: content.duration,
+    //         content: content,
+    //         thumbUrl: []
+    //       }
+    //       this.$set(this.fragments, uid, fragment)
+    //       break
+    //     }
+    //     case 'IMAGE': {
+    //       fragment = {
+    //         uid: uid,
+    //         url: '',
+    //         name: '',
+    //         relativePoints: [],
+    //         relativeScale: 0.00,
+    //         content: content,
+    //         thumbUrl: []
+    //       }
+    //       this.$set(this.fragments, uid, fragment)
+    //       break
+    //     }
+    //   }
+    // },
     fragmentEditor (f) {
       this.$log('fragmentEditor', f.content.type)
       switch (f.content.type) {
