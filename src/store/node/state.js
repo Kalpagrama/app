@@ -1,5 +1,6 @@
 
 export default {
+  initialized: false,
   layouts: {
     'PIP': {type: 'PIP', name: 'Картинка в картинке', component: 'nodeTemplatePip'},
     'HORIZONTAL': {type: 'HORIZONTAL', name: 'Горизонтальный', component: 'nodeTemplatePip'},

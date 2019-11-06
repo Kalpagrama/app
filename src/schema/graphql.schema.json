@@ -373,7 +373,7 @@
             "deprecationReason": null
           },
           {
-            "name": "userSubscribes",
+            "name": "userSubscriptions",
             "description": "подписки текущего пользователя",
             "args": [],
             "type": {
@@ -429,24 +429,9 @@
             "deprecationReason": null
           },
           {
-            "name": "notifications",
+            "name": "userEvents",
             "description": "уведомления",
-            "args": [
-              {
-                "name": "limit",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
+            "args": [],
             "type": {
               "kind": "LIST",
               "name": null,
@@ -455,7 +440,7 @@
                 "name": null,
                 "ofType": {
                   "kind": "OBJECT",
-                  "name": "Notification",
+                  "name": "Event",
                   "ofType": null
                 }
               }
@@ -1265,7 +1250,7 @@
             "deprecationReason": null
           },
           {
-            "name": "subscribes",
+            "name": "subscriptions",
             "description": "подписки на ядра. подписки на... {oid:ugfrwuqyrt=, .....}",
             "args": [],
             "type": {
@@ -2560,9 +2545,13 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -2768,15 +2757,19 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -2821,9 +2814,13 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -2952,15 +2949,19 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -2984,6 +2985,22 @@
         "name": "WSRelativeCut",
         "description": "склеиваемый отрезок фрагмента",
         "fields": [
+          {
+            "name": "uid",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "start",
             "description": null,
@@ -3284,15 +3301,19 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -3630,19 +3651,19 @@
       },
       {
         "kind": "OBJECT",
-        "name": "Notification",
+        "name": "Event",
         "description": null,
         "fields": [
           {
-            "name": "date",
-            "description": null,
+            "name": "type",
+            "description": "что сделал(тип действия)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "DateTime",
+                "kind": "ENUM",
+                "name": "EventEnum",
                 "ofType": null
               }
             },
@@ -3651,7 +3672,7 @@
           },
           {
             "name": "subject",
-            "description": "субъект(тот, чьи действия привели к пояалению новой записи)",
+            "description": "кто сделал(user)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -3667,7 +3688,7 @@
           },
           {
             "name": "object",
-            "description": "объект, измененный субъектом",
+            "description": "что сделал (данные)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -3680,34 +3701,6 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
-          },
-          {
-            "name": "action",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "NotificationActionEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "actionValue",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "RawJSON",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -3717,27 +3710,81 @@
       },
       {
         "kind": "ENUM",
-        "name": "NotificationActionEnum",
+        "name": "EventEnum",
         "description": null,
         "fields": null,
         "inputFields": null,
         "interfaces": null,
         "enumValues": [
           {
-            "name": "RATE",
-            "description": "оценил ядро/звено",
+            "name": "ERROR",
+            "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "CREATE",
-            "description": "создал ядро/цепочку",
+            "name": "USER_LOGIN",
+            "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "SUBSCRIBE",
-            "description": "подписался",
+            "name": "USER_LOGOUT",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USER_CONFIRMED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USER_PASSWORD_RESET",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NODE_CREATED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NODE_RATED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NODE_DELETED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "WS_ITEM_CREATED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "WS_ITEM_UPDATED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "WS_ITEM_DELETED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PROGRESS",
+            "description": null,
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -6231,6 +6278,20 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "uid",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          },
+          {
             "name": "start",
             "description": null,
             "type": {
@@ -6422,24 +6483,6 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "EMERG",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ALERT",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "CRIT",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "ERROR",
             "description": null,
             "isDeprecated": false,
@@ -6447,12 +6490,6 @@
           },
           {
             "name": "WARNING",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "NOTICE",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -6510,7 +6547,7 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeCreated",
+            "name": "event",
             "description": null,
             "args": [],
             "type": {
@@ -6526,7 +6563,7 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeRated",
+            "name": "wsEvent",
             "description": null,
             "args": [],
             "type": {
@@ -6534,87 +6571,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Event",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "nodeDeleted",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Event",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "userSubscribed",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Event",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "wsItemCreated",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "WSItem",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "wsItemUpdated",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "WSItem",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "wsItemDeleted",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "WSItem",
+                "name": "WSEvent",
                 "ofType": null
               }
             },
@@ -6727,19 +6684,19 @@
       },
       {
         "kind": "OBJECT",
-        "name": "Event",
+        "name": "WSEvent",
         "description": null,
         "fields": [
           {
-            "name": "subject",
-            "description": "кто (user)",
+            "name": "type",
+            "description": "что сделал(тип действия)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "kind": "ENUM",
+                "name": "EventEnum",
                 "ofType": null
               }
             },
@@ -6748,14 +6705,14 @@
           },
           {
             "name": "object",
-            "description": "что сделал (any type)",
+            "description": "что сделал (данные)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
                 "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "name": "WSItem",
                 "ofType": null
               }
             },
@@ -9246,6 +9203,122 @@
           {
             "name": "CREATED",
             "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "Notification",
+        "description": null,
+        "fields": [
+          {
+            "name": "date",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subject",
+            "description": "субъект(тот, чьи действия привели к пояалению новой записи)",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "ObjectShort",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "object",
+            "description": "объект, измененный субъектом",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "ObjectShort",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "action",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "NotificationActionEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "actionValue",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "RawJSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "NotificationActionEnum",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "RATE",
+            "description": "оценил ядро/звено",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CREATE",
+            "description": "создал ядро/цепочку",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SUBSCRIBE",
+            "description": "подписался",
             "isDeprecated": false,
             "deprecationReason": null
           }

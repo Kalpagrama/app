@@ -1,4 +1,5 @@
 export default {
+  initialized: false,
   width: window.innerWidth,
   height: window.innerHeight,
   show_right_drawer: false,

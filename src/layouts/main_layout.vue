@@ -151,20 +151,8 @@
      // throw new Error(`No auth!`)
      // // TODO: error code? switch...
     }
-    // user
-    this.$log('Getting user...')
-    let { data: { user } } = await this.$apollo.query({ query: gql`query getCurrentUser { user { oid name thumbUrl(preferWidth: 50) } }` })
-    // this.$log('user', user)
-    this.$store.commit('auth/state', ['user', user])
-    // catagories
-    let categories = await this.$store.dispatch('node/categories')
-    // this.$log('catagories', categories)
-    this.$store.commit('node/state', ['categories', categories])
-    // workspace
-    this.$log('Getting user workspace')
-    // this.$q.notify('Getting user workspace!')
-    let userWorkspace = await this.$store.dispatch('workspace/userWorkspace')
-    this.$log('userWorkspace', userWorkspace)
+    await this.$store.dispatch('init')
+
     this.loading = false
    } catch (error) {
     this.$log('error', error)
