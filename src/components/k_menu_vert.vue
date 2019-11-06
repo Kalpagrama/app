@@ -1,7 +1,7 @@
 <template lang="pug">
-div(:style=`{}`).column.fit.bg-secondary
+.column.fit.bg-secondary
   q-dialog(ref="inviteDialog" transition-show="slide-up" transition-hide="slide-down")
-    pageInvite(@hide="$refs.inviteDialog.hide()")
+    k-invite(@hide="$refs.inviteDialog.hide()")
   q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '80px'}` @click="pageClick('/app/home')").row.full-width.items-center.q-px-sm
     //- q-btn(round flat color="grey-6" :style=`{overflow: 'hidden'}`)
     //-   template(v-slot:default)
@@ -25,14 +25,14 @@ div(:style=`{}`).column.fit.bg-secondary
           q-icon(:name="p.icon" color="white" style=`fontSize: 25px`)
       q-item-section.col.q-px-sm
         span(style=`fontWeight: 400`).text-white {{p.name}}
-    q-item(clickable @click="$refs.inviteDialog.show()"
+    q-item(clickable v-ripple @click="$refs.inviteDialog.show()"
       :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
       q-item-section(avatar)
         q-btn(round flat color="primary")
           q-icon(name="person_add" color="white" style=`fontSize: 25px`)
       q-item-section.col.q-px-sm
         span(style=`fontWeight: 400`).text-white Пригласить друга
-    q-item(clickable :to="`/`" @click="logout()"
+    q-item(clickable v-ripple :to="`/`" @click="$refs.logoutDialog.show()"
       :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
       q-item-section(avatar)
         q-btn(round flat color="primary")
@@ -42,10 +42,8 @@ div(:style=`{}`).column.fit.bg-secondary
 </template>
 
 <script>
-import pageInvite from 'pages/app/invite'
 export default {
   name: 'kMenuVert',
-  components: { pageInvite },
   props: ['mini', 'loading'],
   data () {
     return {
@@ -55,27 +53,14 @@ export default {
         {name: 'Создать ядро', icon: 'add', path: '/app/create'},
         {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},
         {name: 'Уведомления', icon: 'notifications', path: '/app/notifications'},
-        {name: 'Найстройки', icon: 'settings', path: '/app/settings'}
+        {name: 'Настройки', icon: 'settings', path: '/app/settings'}
       ]
     }
   },
   methods: {
     show () {
       this.$refs.inviteDialog.show()
-    },
-    async logout () {
-    this.$log('logout')
-    await this.$apollo.mutate({
-     mutation: gql`
-          mutation logout {
-            logout
-          }
-        `
-    })
-    localStorage.removeItem('ktoken')
-    localStorage.removeItem('ktokenExpires')
-    localStorage.removeItem('ktokenInviteCode')
-    this.$router.push('/login')
+      this.$refs.logoutDialog.show()
     },
     drawerClick (e) {
       // if in "mini" state and user
