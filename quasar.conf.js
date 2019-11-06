@@ -95,6 +95,10 @@ module.exports = function (ctx) {
             gql: 'graphql-tag'
           })
         )
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias,
+          schema: path.resolve(__dirname, './src/schema')
+        }
       }
     },
     devServer: {
