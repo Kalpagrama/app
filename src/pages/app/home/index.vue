@@ -1,16 +1,19 @@
 <template lang="pug">
-q-layout
+q-layout(containter :style=`{width: width+'px'}`)
+  //- q-header(reveal)
+  //-   div(:style=`{height: '60px'}`).row.full-width.bg-red
   q-page-container
     node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
       template(v-slot:items=`{items, fetchingMore}`)
         node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
-  q-footer(reveal).lt-md
+  q-footer(reveal).lt-sm
     k-menu-horiz(page="home" :colors="['white', 'grey-7']")
 </template>
 
 <script>
 export default {
   name: 'pageApp__home',
+  props: ['width', 'height'],
   components: {},
   data () {
     return {

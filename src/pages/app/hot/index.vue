@@ -7,22 +7,26 @@ q-layout
         categories
   q-page-container.bg-grey-2
     .row.full-width.justify-center
-      div(style=`width: 200px`).row.gt-sm
+      div(style=`width: 200px`).row.gt-xs
         categories(style=`position: fixed; overflow: hidden; maxWidth: 200px; border-radius: 10px`).q-mt-sm
       div(style=`maxWidth: 600px`).row.full-width.justify-center
         node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variables")
           template(v-slot:items=`{items, fetchingMore}`)
             node-feed(:nodes="items" :fetchingMore="fetchingMore")
-      div(style=`width: 200px`).gt-sm
-  q-footer(reveal).bg-grey-4.lt-md
+      div(style=`width: 250px;`).gt-xs
+        pageSubscriptions(
+          :width="250" :height="height - 100"
+          style=`position: fixed; overflow: hidden; maxWidth: 250px; border-radius: 10px`).q-mt-sm
+  q-footer(reveal).bg-grey-4.lt-sm
     k-menu-horiz(page="hot" :colors="['white', 'grey-7']")
 </template>
-
 <script>
 import categories from 'pages/app/hot/categories'
+import pageSubscriptions from 'pages/app/subscriptions'
 export default {
   name: 'pageApp__hot',
-  components: { categories },
+  components: { categories, pageSubscriptions },
+  props: ['width', 'height'],
   data () {
     return {
       category: undefined
