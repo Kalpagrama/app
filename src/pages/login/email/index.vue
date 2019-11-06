@@ -32,8 +32,8 @@
      this.$log('emailSend start', this.email)
      this.emailSending = true
      if (this.email.length === 0) throw { message: 'Wrong email!' }
-     // await this.$wait(500)
      let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
+      client: 'authApollo',
       mutation: gql`
             mutation loginEmail ($email: String!, $inviteCode: OID){
               loginEmail(email: $email, inviteCode: $inviteCode){
@@ -69,6 +69,7 @@
      // await this.$wait(500)
      // if (this.code !== this.codeFake) throw {message: 'Wrong code!'}
      let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
+      client: 'authApollo',
       mutation: gql`
             mutation codeConfirmEmail ($code: String!) {
               confirm(code: $code){

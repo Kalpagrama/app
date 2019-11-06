@@ -1,34 +1,19 @@
 const debug = require('debug')('[node]:action')
 debug.enabled = true
 
-import {apollo} from 'boot/apollo'
+import { apolloProvider } from 'boot/apollo'
 
-export const categories = async (store) => {
-  debug('categories start')
-  let {data: {categories}} = await apollo.query({
-    query: gql`
-      query categories {
-        categories {
-          type
-          name
-          icon
-          sphere {
-            oid
-            type
-            name
-          }
-        }
-      }
-    `
-  })
-  debug('categories done', categories)
+export const init = async (store, categories) => {
+  if (store.getters.initialized) throw new Error('events state initialized already')
+  store.dispatch('log/debug', ['node', 'node store init. categories', categories], { root: true })
+  store.commit('init', categories)
   return categories
 }
 
 export const nodeUnrate = async (store, oid) => {
   debug('nodeUnrate start')
   if (!oid) return
-  let {data: {nodeUnrate}} = await apollo.mutate({
+  let { data: { nodeUnrate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodeUnrate ($oid: OID!) {
         nodeUnrate (oid: $oid)
@@ -43,11 +28,11 @@ export const nodeUnrate = async (store, oid) => {
   return nodeUnrate
 }
 
-export const nodeRate = async (store, {oid, rate}) => {
+export const nodeRate = async (store, { oid, rate }) => {
   debug('nodeRate start', oid, rate)
   if (!oid) throw new Error(`No oid!`)
   if (!rate) throw new Error(`No rate!`)
-  let {data: {nodeRate}} = await apollo.mutate({
+  let { data: { nodeRate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodeRate ($oid: OID!, $rate: Float!) {
         nodeRate (oid: $oid, rate: $rate)
@@ -77,14 +62,13 @@ export const nodeCreate = async (store, payload) => {
   if (!payload.fragments || payload.fragments.length === 0) throw new Error('Wrong fragments!')
   let node = {
     name: payload.name || '',
-    spheres: payload.spheres.map(s => ({name: s.name, oid: s.oid})),
+    spheres: payload.spheres.map(s => ({ name: s.name, oid: s.oid })),
     categories: payload.categories,
     fragments: payload.fragments.map(f => {
       return {
         uid: f.uid,
         name: f.name,
         oid: f.content.oid,
-        // relativePoints: f.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
         relativePoints: f.relativeCuts.reduce((acc, val) => {
           acc.push({x: val.start})
           acc.push({x: val.end})
@@ -95,12 +79,12 @@ export const nodeCreate = async (store, payload) => {
     }),
     meta: {
       layout: 'PIP',
-      fragments: payload.fragments.map(f => ({uid: f.uid, color: 'black'}))
+      fragments: payload.fragments.map(f => ({ uid: f.uid, color: 'black' }))
     }
   }
   if (payload.parentNode) node.parentNode = payload.parentNode
   debug('nodeCreate node', node)
-  let {data: {nodeCreate}} = await apollo.mutate({
+  let { data: { nodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodePublish ($node: NodeInput!) {
         nodeCreate (node: $node)
@@ -113,3 +97,16 @@ export const nodeCreate = async (store, payload) => {
   debug('nodeCreate done', nodeCreate)
   return nodeCreate
 }
+
+// // Вернет ядро из кэша, либо запросит его в приоритетном режиме
+// export const nodeGet = async (store, oid) => {
+//   store.dispatch('log/debug', ['node', 'nodeGet start...'], { root: true })
+//   let node = {}
+//   // await node
+//   store.dispatch('log/debug', ['node', 'nodeGet done', node], { root: true })
+//   return node
+// }
+// // подсказка загрузчику в том, что скоро могут понадобиться эти ядра.
+// // По возможности эти ядра будут загружены. Последние запрошенные - в приоритете
+// export const nodeQueue = (store, oid) => {
+// }

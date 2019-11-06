@@ -64,7 +64,7 @@ module.exports = function (ctx) {
     supportIE: false,
     build: {
       env: {
-        SERVICES_URL: JSON.stringify(process.env.SERVICES_URL)
+        AUTH_URL: JSON.stringify(process.env.AUTH_URL)
       },
       scopeHoisting: true,
       vueRouterMode: 'history',
@@ -95,6 +95,10 @@ module.exports = function (ctx) {
             gql: 'graphql-tag'
           })
         )
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias,
+          schema: path.resolve(__dirname, './src/schema')
+        }
       }
     },
     devServer: {

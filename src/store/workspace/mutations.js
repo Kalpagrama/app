@@ -1,12 +1,12 @@
 const debug = require('debug')('$workspace:mutation')
 debug.enabled = true
 
+export function init(state, workspace) {
+  state.workspace = workspace
+  state.initialized = true
+}
+
 export function state(state, [key, val]) {
-  // if (val) {
-  //   state[key] = val
-  // } else {
-  //   return state[key]
-  // }
   state[key] = val
 }
 

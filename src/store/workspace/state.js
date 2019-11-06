@@ -1,4 +1,5 @@
 export default {
+  initialized: false,
   workspace: {
     bookmarks: [],
     contents: [],
