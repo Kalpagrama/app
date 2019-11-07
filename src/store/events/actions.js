@@ -1,6 +1,12 @@
-
 import { apolloProvider } from 'boot/apollo'
-import {eventFragment, WSContentFragment, WSFragmentFragment, WSDraftFragment, WSBookmarkFragment, WSTagFragment} from 'schema/index'
+import {
+  eventFragment,
+  WSContentFragment,
+  WSFragmentFragment,
+  WSDraftFragment,
+  WSBookmarkFragment,
+  WSTagFragment
+} from 'schema/index'
 
 export const init = async (state, userEvents) => {
   if (state.getters.initialized) throw new Error('events state initialized already')
@@ -53,39 +59,40 @@ export const init = async (state, userEvents) => {
             ... on WSDraft{...WSDraftFragment}
             ... on WSTag{...WSTagFragment}
             ... on WSFragment{...WSFragmentFragment}
-          }          
+          }
         }
       }
     `
   })
 
   observerError.subscribe({
-    next: ({data: {error}}) => {
-      state.dispatch('log/error', `EVENT error ${error}`, { root: true })
+    next: ({ data: { error } }) => {
+      state.dispatch('log/debug', ['events', `EVENT error`, error], { root: true })
     },
     error: (error) => {
       state.dispatch('log/error', `EVENT error error ${error}`, { root: true })
     }
   })
   observerProgress.subscribe({
-    next: ({data: {progress}}) => {
-      state.dispatch('log/debug', ['events', 'progress', progress], { root: true })
+    next: ({ data: { progress } }) => {
+      state.dispatch('log/debug', ['events', `EVENT progress`, progress], { root: true })
+      state.commit('state', ['progress', progress])
     },
     error: (error) => {
       state.dispatch('log/error', `EVENT progress error ${error}`, { root: true })
     }
   })
   observerEvent.subscribe({
-    next: ({data: {event}}) => {
-      state.dispatch('log/debug', `EVENT event ${event}`, { root: true })
+    next: ({ data: { event } }) => {
+      state.dispatch('log/debug', ['events', `EVENT event`, event], { root: true })
     },
     error: (error) => {
       state.dispatch('log/error', `EVENT event error ${error}`, { root: true })
     }
   })
   observerWsEvent.subscribe({
-    next: ({data: {wsEvent}}) => {
-      state.dispatch('log/debug', `EVENT wsEvent ${wsEvent}`, { root: true })
+    next: ({ data: { wsEvent } }) => {
+      state.dispatch('log/debug', ['events', `EVENT wsEvent`, wsEvent], { root: true })
     },
     error: (error) => {
       state.dispatch('log/error', `EVENT wsEvent error ${error}`, { root: true })
