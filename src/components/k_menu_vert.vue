@@ -8,7 +8,8 @@
     //-     img(:src="`statics/logo.png`" style=`width: 40px; height: 40px`)
     q-item-section(avatar)
       q-btn(round flat color="primary")
-        q-icon(name="blur_on" color="white" style=`fontSize: 42px`)
+        div(style=`width: 60px; height: 60px`)
+          k-logo
     q-item-section.col.q-px-sm
       span(style=`fontWeight: 700`).text-white Кальпаграмма
   .col
@@ -49,7 +50,7 @@ export default {
     return {
       pages: [
         {name: 'В тренде', icon: 'whatshot', path: '/app/hot'},
-        {name: 'Мастерская', icon: 'cloud_queue', path: '/app/workspace'},
+        {name: 'Мастерская', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
         {name: 'Создать ядро', icon: 'add', path: '/app/create'},
         {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},
         {name: 'Уведомления', icon: 'notifications', path: '/app/notifications'},
@@ -96,7 +97,6 @@ export default {
   transition: background-color .28s
   &:hover
     background-color: rgba(0, 0, 0, .04)
-
 .mini-icon
   font-size: 1.718em
 

@@ -30,9 +30,9 @@ export default {
         {name: 'В тренде', icon: 'whatshot', path: '/app/hot'},
         {name: 'Создать ядро', icon: 'add', path: '/app/create'},
         {name: 'Уведомления', icon: 'notifications', path: '/app/notifications'},
-        {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
-        {name: 'Invite friend', icon: 'person_add', path: false},
-        {name: 'Logout', icon: 'power_off', path: false}
+        {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},
+        {name: 'Пригласить друга', icon: 'person_add', path: false},
+        {name: 'Выход', icon: 'power_off', path: false}
       ]
     }
   },
