@@ -87,8 +87,8 @@ export default {
       let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[this.fragmentActive]))
       // TODO: take thumbUrl from node.meta.fragments
       // fragment.thumbUrl = this.node.thumbUrl[fi]
-      this.$store.commit('workspace/state', ['fragment', fragment])
-      this.$store.commit('ui/state', ['fragmentDialogOpened', true])
+      this.$store.commit('workspace/stateSet', ['fragment', fragment])
+      this.$store.commit('ui/stateSet', ['fragmentDialogOpened', true])
     },
     async fragmentAction (a, fi) {
       this.$log('fragmentAction', a)
@@ -102,10 +102,10 @@ export default {
         case 'fragment_workspace': {
           this.$log('fragmentAction', a.id)
           let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
-          this.$store.commit('workspace/state', ['fragment', fragment])
-          this.$store.commit('ui/state', ['dialogOpened', true])
+          this.$store.commit('workspace/stateSet', ['fragment', fragment])
+          this.$store.commit('ui/stateSet', ['dialogOpened', true])
           // this.$nextTick(() => {
-          //   this.$store.commit('ui/state', ['dialogOpened', true])
+          //   this.$store.commit('ui/stateSet', ['dialogOpened', true])
           // })
           break
         }

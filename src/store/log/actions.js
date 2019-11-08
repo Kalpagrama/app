@@ -2,13 +2,13 @@ import assert from 'assert'
 
 import { apolloProvider } from 'boot/apollo'
 
-export const init = async (state) => {
-  if (state.getters.initialized) throw new Error('events state initialized already')
-  state.commit('init')
+export const init = async (context) => {
+  if (context.getters.initialized) throw new Error('events state initialized already')
+  context.commit('init')
   return true
 }
 
-function sendApi (state, level, info) {
+function sendApi (context, level, info) {
   apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation logError($level: ErrorLevelEnum!, $error: String!) {
@@ -21,28 +21,28 @@ function sendApi (state, level, info) {
   }).then(res => {
 
   }).catch(err => {
-    state.commit('error', ['logger', err.message, err])
+    context.commit('error', ['logger', err.message, err])
   })
 }
 
 // все ф-ии должны быть синхронными! (фронт не должен ждать пока логирование отправится на сервер)
-export const error = (state, info) => {
-  assert.ok(state.getters.initialized)
-  state.commit('error', info)
-  sendApi(state, 'ERROR', info)
+export const error = (context, info) => {
+  assert.ok(context.getters.initialized)
+  context.commit('error', info)
+  sendApi(context, 'ERROR', info)
 }
-export const warn = (state, info) => {
-  assert.ok(state.getters.initialized)
-  state.commit('warn', info)
+export const warn = (context, info) => {
+  assert.ok(context.getters.initialized)
+  context.commit('warn', info)
   // sendApi(state, 'WARNING', info)
 }
-export const info = (state, info) => {
-  assert.ok(state.getters.initialized)
-  state.commit('info', info)
+export const info = (context, info) => {
+  assert.ok(context.getters.initialized)
+  context.commit('info', info)
   // sendApi(state, 'INFO', info)
 }
-export const debug = (state, info) => {
-  assert.ok(state.getters.initialized)
-  state.commit('debug', info)
+export const debug = (context, info) => {
+  assert.ok(context.getters.initialized)
+  context.commit('debug', info)
   // sendApi(state, 'DEBUG', info)
 }

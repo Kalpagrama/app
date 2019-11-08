@@ -1,5 +1,8 @@
 export default {
   initialized: false,
   userEvents: [],
-  progress: {}
+  progress: null,
+  nodeCreated: null,
+  nodeDeleted: null,
+  nodeRated: null
 }

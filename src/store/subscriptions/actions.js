@@ -1,22 +1,14 @@
 import { apolloProvider } from 'boot/apollo'
-import {
-  eventFragment,
-  WSContentFragment,
-  WSFragmentFragment,
-  WSDraftFragment,
-  WSBookmarkFragment,
-  WSTagFragment
-} from 'schema/index'
 
-export const init = async (state, userSubscriptions) => {
-  if (state.getters.initialized) throw new Error('subscriptions state initialized already')
-  state.dispatch('log/debug', ['subscriptions', 'init', userSubscriptions], { root: true })
-  state.commit('init', userSubscriptions)
+export const init = async (context, userSubscriptions) => {
+  if (context.getters.initialized) throw new Error('subscriptions state initialized already')
+  context.dispatch('log/debug', ['subscriptions', 'init', userSubscriptions], { root: true })
+  context.commit('init', userSubscriptions)
   return userSubscriptions
 }
 
-export const subscribe = async (state, oid) => {
-  state.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
+export const subscribe = async (context, oid) => {
+  context.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
   let { data: { subscribe } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation subscribe ($oid: OID!) {
@@ -27,11 +19,11 @@ export const subscribe = async (state, oid) => {
       oid
     }
   })
-  state.commit('subscribe', oid)
+  context.commit('subscribe', oid)
 }
 
-export const unSubscribe = async (state, oid) => {
-  state.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
+export const unSubscribe = async (context, oid) => {
+  context.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
   let { data: { subscribe } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation unSubscribe ($oid: OID!) {
@@ -42,5 +34,5 @@ export const unSubscribe = async (state, oid) => {
       oid
     }
   })
-  state.commit('unSubscribe', oid)
+  context.commit('unSubscribe', oid)
 }

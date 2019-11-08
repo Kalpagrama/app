@@ -5,7 +5,7 @@ q-layout(view='hHh Lpr fFf')
   q-dialog(ref="bookmarkDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     ws-bookmark-editor
   q-dialog(
-    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened" @hide="$store.commit('ui/state', ['fragmentDialogOpened', false])"
+    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened" @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])"
     :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     ws-fragment-editor
   q-dialog(ref="nodeRateDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
