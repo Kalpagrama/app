@@ -13,26 +13,27 @@
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="clear" @click="$emit('hide')")
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-md.q-pt-lg
-      .row.full-width.q-pa-sm
-        span.text-bold Upload
-      .row.full-width.q-mb-lg
-        div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceUrlDialog.show()").col.bg-grey-2
-          .row.fit.items-center.justify-center
-            span by URL
-        div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceDeviceDialog.show()").col.bg-grey-2.q-ml-sm
-          .row.fit.items-center.justify-center
-            span from device
-      .row.full-width.q-pa-sm
-        span.text-bold Pick from Workspace
-      .row.full-width
-        div(
-          v-for="(w, wi) in wsStats" :key="wi" @click="$refs.sourceWsDialog.show()"
-          :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
-          ).row.full-width.items-center.q-px-md.bg-grey-2.q-mb-md.cursor-pointer
-          span {{ w.name }}
-          .col
-          span {{ w.count }}
+    .row.fit.items-start.justify-center
+      div(:style=`{maxWidth: $q.screen.width > 500 ? '500px' : '100%'}`).row.full-width.items-start.content-start.q-px-md.q-pt-lg
+        .row.full-width.q-pa-sm
+          span.text-bold Upload
+        .row.full-width.q-mb-lg
+          div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceUrlDialog.show()").col.bg-grey-2
+            .row.fit.items-center.justify-center
+              span by URL
+          div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceDeviceDialog.show()").col.bg-grey-2.q-ml-sm
+            .row.fit.items-center.justify-center
+              span from device
+        .row.full-width.q-pa-sm
+          span.text-bold Pick from Workspace
+        .row.full-width
+          div(
+            v-for="(w, wi) in wsStats" :key="wi" @click="$refs.sourceWsDialog.show()"
+            :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
+            ).row.full-width.items-center.q-px-md.bg-grey-2.q-mb-md.cursor-pointer
+            span {{ w.name }}
+            .col
+            span {{ w.count }}
 </template>
 
 <script>

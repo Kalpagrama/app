@@ -115,9 +115,11 @@ export default async ({ Vue, store, router }) => {
   Vue.component('nodeAnswer', () => import(`components/node/node_answer`))
   Vue.component('nodeLoader', () => import('components/node_loader'))
   Vue.component('nodeFeed', () => import(`components/node_feed`))
+  Vue.component('nodeList', () => import(`components/node_list`))
   Vue.component('videoEditor', () => import(`components/video_editor`))
   Vue.component('kVideo', () => import(`components/k_video`))
   Vue.component('kDialogBottom', () => import(`components/k_dialog_bottom`))
+  Vue.component('kSplit', () => import(`components/k_split`))
 }
 
 export { time }

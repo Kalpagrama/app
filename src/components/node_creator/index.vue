@@ -1,20 +1,22 @@
 <template lang="pug">
-q-layout(view="hHh lpR lff" :style=`{height: '100vh'}`).column.bg-primary
+q-layout(view="hHh lpR lff" :container="true" :style=`{width: width+'px', height: height+'px'}`).column.bg-primary
   k-dialog-bottom(ref="nodeCreatorDialog" mode="actions" :options="nodeCreatorDialogOptions" @action="nodeCreatorAction")
-  q-header
+  q-header.full-width
     div(:style=`{height: '60px'}`).row.full-width
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="menu" color="grey-3" @click="$refs.nodeCreatorDialog.toggle()")
       .col.full-height
-        .row.fit.items-center.justify-center.q-px-md
+        .row.fit.items-center.justify-start.q-px-md
           span.text-bold Node creator
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="clear" @click="$emit('hide')")
-    q-tabs(v-model="tab" @input="tabChanged")
+    q-tabs(v-model="tab" @input="tabChanged" align="justify")
       q-tab(no-caps name="fragments" label="Fragments")
       q-tab(no-caps name="preview" label="Preview")
-  q-page-container.col
-    q-tab-panels(v-model="tab" @input="tabChanged" :swipeable="$q.screen.lt.md" animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).fit
+  q-page-container
+    //- q-page
+    //- :swipeable="$q.screen.lt.md"
+    q-tab-panels(v-model="tab" @input="tabChanged" swipeable animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).fit
       q-tab-panel(name="fragments" style=`margin: 0; padding: 0`)
         node-fragments(:tab="tabLocal" :fragments="fragments")
       q-tab-panel(name="preview" style=`margin: 0; padding: 0`)
@@ -29,6 +31,7 @@ import helper from './helper'
 export default {
   name: 'nodeCreator',
   components: {nodeFragments, nodePreview, helper},
+  props: ['width', 'height'],
   data () {
     return {
       tab: 'fragments',

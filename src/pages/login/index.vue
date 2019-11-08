@@ -20,7 +20,7 @@
   },
   mounted () {
    this.$log('mounted')
-   localStorage.removeItem('ktoken')
+  //  localStorage.removeItem('ktoken')
    localStorage.removeItem('ktokenExpires')
    localStorage.removeItem('ktokenInviteCode')
    let inviteCode = this.$route.query.invite

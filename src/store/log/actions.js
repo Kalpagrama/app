@@ -18,9 +18,10 @@ function sendApi (state, level, info) {
       level,
       error: JSON.stringify(info)
     }
-  }).then(res => {
-
-  }).catch(err => {
+  })
+  .then(res => {
+  })
+  .catch(err => {
     state.commit('error', ['logger', err.message, err])
   })
 }

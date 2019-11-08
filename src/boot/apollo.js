@@ -1,5 +1,5 @@
 const debug = require('debug')('[boot]:apollo')
-debug.enabled = true
+// debug.enabled = true
 import assert from 'assert'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'

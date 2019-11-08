@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(container :style=`{width: width+'px', height: height+'px'}`).bg-grey-2
+q-layout(:container="true" :style=`{width: width+'px', height: height+'px'}`).bg-grey-2
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width
       q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '60px'}` @click="pageClick('/app/home')").row.q-px-sm
@@ -28,7 +28,6 @@ export default {
   methods: {
    async pageClick (path) {
     this.$log('pageClick', path)
-    this.$root.$emit('toggle_menu')
     await this.$wait(200)
     this.$router.push(path)
   }

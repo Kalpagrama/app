@@ -1,23 +1,6 @@
 <template lang="pug">
 div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
-  //- actions
-  //- share
-  //- k-menu-popup(ref="nodeShareMenu" name="Поделиться" :actions="actions" @action="nodeShare")
-  //-   q-btn(color="grey-9" round flat)
-  //-     q-icon(name="share" size="26px" color="grey-8")
-  //- rate/answer
-  //- k-menu-popup(ref="nodeRateAnswerMenu" :noName="true" :actions="nodeActions" @action="nodeAction")
-  q-dialog(ref="nodeActionsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    div(@click.self="$refs.fragmentActionDialog.hide()").column.fit.justify-end
-      div(:style=`{paddingBottom: '80px'}`).row.full-width.justify-center
-        q-btn(
-          color="grey-1"
-          :style=`{height: '60px', width: 'calc(100% - 16px)', borderRadius: '10px'}` no-caps)
-          span.text-black Удалить
-      .row.full-width.justify-center
-      q-btn(
-        color="green"
-        :style=`{position: 'absolute', bottom: '8px', left: '8px', width: 'calc(100% - 16px)', height: '60px', borderRadius: '10px'}` no-caps) Редактировать
+  q-btn(round flat color="grey-9" icon="share")
   .col
   //- rate
   div(v-if="nodeFull && nodeFull.rateUser").q-mr-sm

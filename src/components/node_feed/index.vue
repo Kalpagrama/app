@@ -1,6 +1,16 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.q-pt-sm.bg-grey-3
-  div(:style=`{maxWidth: '550px'}`).row.full-width
+  //- header
+  div(:style=`{position: 'sticky', zIndex: 1000, top: headerTop+'px', height: '60px'}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '500px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.justify-between.bg-white.q-px-sm
+      .col.full-height
+        .row.fit.items-center.q-px-sm
+          span.text-bold {{ name }}
+      q-btn(round dense flat :color="muted ? 'grey-6' : 'green'" :icon="muted ? 'volume_off' : 'volume_up'" @click="volumeToggle()")
+      q-btn(round dense flat color="grey-6" icon="more_vert" @click="feedOptions()")
+  //- body
+  div(:style=`{maxWidth: '500px'}`).row.full-width
+    q-resize-observer(@resize="onResize")
     div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width
       node(
         :index="ni" :node="n" :lang="ni"
@@ -11,6 +21,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
           'bg-white': activeNode ? activeNode[0] === ni : false}`
         :style=`{zIndex: activeNode ? activeNode[0] === ni ? 200 : 10 : 10, borderRadius: '10px'}`
         :noActions="true" :noSpheres="true" :noTimestamp="true"
+        :width="width" :muted="muted"
         v-observe-visibility=`{
           callback: nodeVisible,
           throttle: 300,
@@ -28,10 +39,13 @@ import node from 'components/node'
 export default {
   name: 'nodeFeed',
   components: {node},
-  props: ['nodes', 'fetchingMore'],
+  props: ['name', 'nodes', 'fetchingMore'],
   data () {
     return {
-      visibleNodes: []
+      visibleNodes: [],
+      width: 0,
+      headerTop: 0,
+      muted: true
     }
   },
   computed: {
@@ -65,6 +79,22 @@ export default {
     }
   },
   methods: {
+    scrollDirectionChanged (b) {
+      this.$log('scrollDirectionChanged')
+      this.$tween.to(this, 0.3, {headerTop: b ? -60 : 0})
+    },
+    feedOptions () {
+      this.$log('feedOptions')
+    },
+    volumeToggle () {
+      this.$log('volumeToggle')
+      this.$set(this, 'muted', !this.muted)
+      // this.muted = !this.muted
+    },
+    onResize (e) {
+      // this.$log('onResize', e)
+      this.width = e.width
+    },
     async nodeVisible (isVisible, entry) {
       let top = entry.target.offsetTop
       let name = entry.target.title

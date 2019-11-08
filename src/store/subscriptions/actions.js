@@ -28,11 +28,12 @@ export const subscribe = async (state, oid) => {
     }
   })
   state.commit('subscribe', oid)
+  return subscribe
 }
 
 export const unSubscribe = async (state, oid) => {
   state.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
-  let { data: { subscribe } } = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { unSubscribe } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation unSubscribe ($oid: OID!) {
         unSubscribe (oid: $oid)
@@ -43,4 +44,5 @@ export const unSubscribe = async (state, oid) => {
     }
   })
   state.commit('unSubscribe', oid)
+  return unSubscribe
 }

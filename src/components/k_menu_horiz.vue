@@ -19,8 +19,11 @@ export default {
   methods: {
     pageClick (path) {
       this.$log('pageClick', path)
-      this.$root.$emit('page', path)
+      // this.$log('1')
+      // this.$root.$emit('page', path)
+      // this.$log('2')
       this.$router.push(path)
+      // this.$log('3')
     }
   }
 }

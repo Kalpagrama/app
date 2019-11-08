@@ -1,6 +1,6 @@
 <template lang="pug">
 div(
-  :style=`{position: 'relative'}`).row.full-width.items-start.content-start
+  :style=`{position: 'relative'}`).row.full-width.full-height.items-start.content-start
   //- actions
   //- div(v-if="true" :style=`{position: 'absolute', zIndex: zIndex+10, top: '8px', left: '8px', height: '40px', opacity: 0.7}`).row.items-center
     //- q-btn(round flat color="white" icon="fullscreen" @click="videoToggleFullscreen").shadow-1
@@ -8,23 +8,26 @@ div(
     //- q-btn(v-if="!playing && visible" round color="primary" icon="flash_on" style=`width: 30px; height: 30px` @click="videoToggleMute").shadow-1
   //- volume
   q-btn(
+    v-if="active"
     round dense flat color="white" @click="videoToggleMute()"
     :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.5)'}`)
-    q-icon(:name="muted ? 'volume_off' : 'volume_up'" color="white" size="19px")
+    q-icon(:name="videoMuted ? 'volume_off' : 'volume_up'" color="white" size="19px")
   //- time
-  div(:style=`{position: 'absolute', height: '20px', bottom: '10px', left: '10px', color: 'white', borderRadius: '4px', opacity: 0.5}`
+  div(
+    v-if="active"
+    :style=`{position: 'absolute', height: '20px', bottom: '10px', left: '10px', color: 'white', borderRadius: '4px', opacity: 0.5}`
     ).row.items-center.bg-grey-10.q-px-xs
     small {{$time(now)}} / {{$time(duration)}}
   //- timeline
-  div(v-if="now > 0" :style=`{position: 'absolute', zIndex: zIndex+100, bottom: '0px', left: '0px', height: '10px'}` @click="videoTimelineClick"
+  div(v-if="active && now > 0" :style=`{position: 'absolute', zIndex: zIndex+100, bottom: '0px', left: '0px', height: '6px'}` @click="videoTimelineClick"
     ).row.full-width.items-end.cursor-pointer
-    div(:style=`{width: videoNow+'%', height: '10px', borderRight: '3px solid #5f277a', pointerEvents: 'none'}`).row.bg-primary
+    div(:style=`{width: videoNow+'%', height: '10px', borderRadius: '0 4px 4px 0', pointerEvents: 'none'}`).row.bg-green
   //- video
   video(
     ref="kvideo"
     :src="url"
-    :style=`{width: '100%', objectFit: 'contain'}`
-    loop playsinline :muted="muted"
+    :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
+    loop playsinline :muted="videoMuted"
     @click="videoClick"
     @playing="videoPlaying"
     @timeupdate="videoTimeupdate"
@@ -34,17 +37,21 @@ div(
 <script>
 export default {
   name: 'nodeFragmentVideo',
-  props: ['zIndex', 'url', 'active', 'visible'],
+  props: ['zIndex', 'url', 'active', 'visible', 'muted'],
   data () {
     return {
       now: 0,
-      muted: true,
+      mutedLocal: true,
       duration: 0,
       playing: false,
       playsinline: true
     }
   },
   computed: {
+    videoMuted () {
+      if (!this.mutedLocal) return false
+      else return this.muted
+    },
     videoNow () {
       let k = (this.now / this.duration) * 100
       return k
@@ -123,20 +130,14 @@ export default {
     },
     videoToggleMute () {
       this.$log('videoToggleMute')
-      if (this.muted) {
-        this.muted = false
-        localStorage.setItem('ksound', 'max')
-      } else {
-        this.muted = true
-        localStorage.removeItem('ksound')
-      }
+      this.mutedLocal = !this.mutedLocal
     }
   },
   async mounted () {
-    this.$root.$on('create', () => {
-      this.muted = true
-      if (this.$refs.kvideo) this.$refs.kvideo.pause()
-    })
+    // this.$root.$on('create', () => {
+    //   this.muted = true
+    //   if (this.$refs.kvideo) this.$refs.kvideo.pause()
+    // })
   }
 }
 </script>

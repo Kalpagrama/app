@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout
+q-layout(containter :style=`{width: width+'px'}` @scroll="onScroll")
   //- drawer
   q-drawer(ref="kDrawer" side="left" :width="240").lt-sm
     div(@click.self="$refs.kDrawer.toggle()").row.fit.items-start.content-start
@@ -12,7 +12,7 @@ q-layout
       div(style=`maxWidth: 600px`).row.full-width.justify-center
         node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variables")
           template(v-slot:items=`{items, fetchingMore}`)
-            node-feed(:nodes="items" :fetchingMore="fetchingMore")
+            node-feed(ref="nodeFeed" name="Whats hot" :nodes="items" :fetchingMore="fetchingMore")
       div(style=`width: 250px;`).gt-xs
         pageSubscriptions(
           :width="250" :height="height - 100"
@@ -94,6 +94,15 @@ export default {
     }
   },
   methods: {
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      if (e.directionChanged) {
+        let b = true
+        if (e.direction === 'down') b = true
+        else b = false
+        if (this.$refs.nodeFeed) this.$refs.nodeFeed.scrollDirectionChanged(b)
+      }
+    },
     async categoryClick (c, ci) {
       this.$log('categoryClick', c, ci)
       this.$refs.kDrawer.hide()
@@ -103,9 +112,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$root.$on('page', () => {
-      if (this.$refs.kDrawer) this.$refs.kDrawer.toggle()
-    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
