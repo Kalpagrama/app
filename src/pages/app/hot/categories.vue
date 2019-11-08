@@ -1,13 +1,13 @@
 <template lang="pug">
-.column
-  div(:style=`{height: '70px'}`).row.full-width.bg-white
-    div(v-if="false" :style=`{width: '70px', height: '70px'}`).row.items-center.justify-center
+.column.fit.bg-white
+  div(:style=`{height: '60px'}`).row.full-width
+    div(v-if="false" :style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
       q-btn(round flat color="primary" icon="menu")
     .col.full-height
       .row.fit.items-center.q-px-md
         span.text-bold Категории
   //- body
-  div(body-scroll-lock-ignore).col.scroll.full-width.bg-white
+  .col.scroll.full-width
     .row.full-width.items-start
       div(
         v-for="(c,ci) in categories" :key="ci" @click="categoryClick(c, ci)"

@@ -30,12 +30,12 @@ q-layout(view='hHh Lpr fFf')
 
 <script>
 import kMenuVert from 'components/k_menu_vert'
-import kMenuHoriz from 'components/k_menu_horiz'
+// import kMenuHoriz from 'components/k_menu_horiz'
 import nodeCreator from 'components/node_creator'
 
 export default {
   name: 'mainLayout',
-  components: { kMenuHoriz, kMenuVert, nodeCreator },
+  components: { kMenuVert, nodeCreator },
   data () {
     return {
       loading: true,
@@ -49,19 +49,19 @@ export default {
       toggleIcon: ''
     }
   },
-  watch: {
-    '$q.screen.gt.sm': {
-      immediate: true,
-      handler (to, from) {
-        this.$log('gt.sm CHANGED', to)
-        let vh = window.innerHeight
-        // if (to) vh = vh * 0.01
-        // else vh = (vh - 60) * 0.01
-        vh = vh * 0.01
-        document.documentElement.style.setProperty('--vh', `${vh}px`)
-      }
-    }
-  },
+  // watch: {
+  //   '$q.screen.gt.sm': {
+  //     immediate: true,
+  //     handler (to, from) {
+  //       this.$log('gt.sm CHANGED', to)
+  //       let vh = window.innerHeight
+  //       // if (to) vh = vh * 0.01
+  //       // else vh = (vh - 60) * 0.01
+  //       vh = vh * 0.01
+  //       document.documentElement.style.setProperty('--vh', `${vh}px`)
+  //     }
+  //   }
+  // },
   methods: {
     toggleMini (miniState) {
       this.miniState = !this.miniState
@@ -71,31 +71,7 @@ export default {
       this.width = e.width
       this.height = this.$q.screen.height
       // this.height = e.height
-    },
-    menuToggle () {
-      this.$log('menuToggle')
-      if (this.showLeftDrawer) {
-      this.$tween.to(this, 0.5, { radius: 0 })
-      } else {
-      this.$tween.to(this, 0.5, { radius: 30 })
-      }
-      this.$set(this, 'showLeftDrawer', !this.showLeftDrawer)
     }
-  },
-  async mounted () {
-    this.$log('mounted')
-    await this.$wait(500)
-    // TODO: handle page height...
-    // this.$refs.zresize.trigger()
-    // let vh = (window.innerHeight - 60) * 0.01
-    // Then we set the value in the --vh custom property to the root of the document
-    // document.documentElement.style.setProperty('--vh', `${vh}px`)
-    // this.$root.$on('toggle_menu', () => {
-    //   if (this.$q.screen.lt.md) this.menuToggle()
-    // })
-    // this.$root.$on('create', () => {
-    //   if (this.$refs.nodeCreatorDialog) this.$refs.nodeCreatorDialog.show()
-    // })
   },
   async created () {
     try {
@@ -144,9 +120,6 @@ export default {
       this.$log('error', error)
       // this.loading = false
     }
-  },
-  beforeDestroy () {
-   this.$log('beforeDestroy')
   }
  }
 </script>

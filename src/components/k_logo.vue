@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.justify-center.items-center
+div(:style=`{width: width+'px', height: height+'px'}`).row.justify-center.items-center
   <svg class="loading" width="100%" height="100%" viewBox="0 0 410 410" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M204.635 389C305.624 389 387.492 307.132 387.492 206.143C387.492 105.154 305.624 23.2861 204.635 23.2861C103.646 23.2861 21.7778 105.154 21.7778 206.143C21.7778 307.132 103.646 389 204.635 389Z" fill="url(#paint0_radial)"/>
   <path d="M297.159 47.7874L113.205 365.227M111.742 47.7874L295.331 364.13M20.8623 207.826H388.71M256.985 388.628L257.046 388.733M256.985 388.628H257.107L257.046 388.733M256.985 388.628L73.3422 71.9889H335.528L152.025 388.628M257.046 388.733L388.405 162.6H20.8623L152.025 388.628M152.025 388.628L151.965 388.733L151.904 388.628H152.025ZM204.268 26.9199L362.622 298.28H47.3766L204.268 26.9199ZM254.736 29.8674L388.71 253.053H21.0452L151.605 26.9199L335.522 343.349H73.2443L254.736 29.8674ZM361.951 117.268L47.0715 117.268L204.322 388.628L361.951 117.268Z" stroke="white" stroke-opacity="0.3" stroke-width="0.5"/>
@@ -50,6 +50,13 @@
   </defs>
   </svg>
 </template>
+
+<script>
+export default {
+  props: ['width', 'height']
+}
+</script>
+
 <style lang="stylus" scoped>
 .diamondOrCh {
   animation-name: diamondOriginChanged;
