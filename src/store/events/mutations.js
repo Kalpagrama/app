@@ -4,6 +4,10 @@ export function init(state, userEvents) {
   state.initialized = true
 }
 
-export function state(state, [key, val]) {
+export function addEvent(state, userEvent) {
+  state.userEvents.push(userEvent)
+}
+
+export function stateSet(state, [key, val]) {
   state[key] = val
 }

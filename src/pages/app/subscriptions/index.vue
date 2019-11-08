@@ -1,20 +1,16 @@
 <template lang="pug">
-q-layout(:container="true" :style=`{height: height+'px', width: width+'px'}`).bg-grey-2
-  q-header(reveal)
-    div(:style=`{height: '60px'}`).row.full-width.justify-center.bg-white
-      div(:style=`{maxWidth: '600px'}`).row.full-width.bg-white
-        div(:style=`{height: '60px'}`).row.full-width
-          .col.full-height
-            .row.fit.items-center.q-px-md
-              span.text-bold.text-black Подписки
-          div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-            q-btn(flat no-caps dense round icon="edit" color="primary" @click="$refs.myComponent.activeDelete()")
-          //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-          //-   q-btn(round dense flat color="primary" icon="clear" @click="$emit('hide')")
+q-layout(:style=`{width: width+'px', height: height+'px'}`).bg-grey-3
   q-page-container
-    .row.full-width.justify-center
-      div(:style=`{maxWidth: '600px'}`).row.full-width.items-start
-        subscriptions(ref="myComponent")
+    div(:style=`{height: '60px'}`).row.full-width.justify-center.bg-grey-3
+      div(:style=`{maxWidth: '600px'}`).row.full-width.bg-white
+        div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end.q-px-md
+          .row.items-center.full-width
+            span.text-bold.text-black Подписки
+            .col
+            q-btn(flat no-caps dense round icon="edit" color="primary" @click="$refs.subs.activeDelete()")
+    div(style=`height: calc(100vh-60px)`).row.full-width.justify-center.scroll
+      div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.bg-white
+        subscriptions(ref="subs")
   q-footer(reveal).lt-sm
     k-menu-horiz
 </template>
@@ -28,15 +24,21 @@ export default {
     return {
     }
   },
-  mathods: {
+  methods: {
     activeDelete () {
-      this.$refs.myComponent.activeDelete()
+      this.$refs.subs.activeDelete()
     }
   }
 }
 </script>
-
 <style lang="stylus">
-.q-footer
-  background: none !important
+@media (max-width: 400px ) {
+  ::-webkit-scrollbar {
+  width: 2px !important
+  height: 10px !important
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #000
+  }
+}
 </style>

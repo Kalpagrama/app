@@ -45,14 +45,14 @@ export default {
     async draftCreate () {
       this.$log('draftCreate')
       let draft = await this.$store.dispatch('workspace/addWSDraft', {})
-      this.$store.commit('workspace/state', ['draft', draft])
+      this.$store.commit('workspace/stateSet', ['draft', draft])
       this.$nextTick(() => {
         this.$router.push('/app/create')
       })
     },
     draftClick (d, di) {
       this.$log('draftClick', d, di)
-      this.$store.commit('workspace/state', ['draft', d])
+      this.$store.commit('workspace/stateSet', ['draft', d])
       this.$nextTick(() => {
         this.$router.push('/app/create')
       })

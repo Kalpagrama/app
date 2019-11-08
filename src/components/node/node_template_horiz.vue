@@ -101,7 +101,7 @@ export default {
           n.thumbUrl[fi] = this.node.thumbUrl[fi]
           this.$log('forkFragment', n)
           // save node to store
-          this.$store.commit('workspace/state', ['node', n])
+          this.$store.commit('workspace/stateSet', ['node', n])
           this.$router.push('/app/create/node')
           break
         }

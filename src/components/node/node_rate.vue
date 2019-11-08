@@ -150,8 +150,8 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('node/state', ['node', null])
-    this.$store.commit('node/state', ['nodeFull', null])
+    this.$store.commit('node/stateSet', ['node', null])
+    this.$store.commit('node/stateSet', ['nodeFull', null])
   }
 }
 </script>

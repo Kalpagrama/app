@@ -46,7 +46,7 @@ export default async ({ Vue, store, app }) => {
   // let AUTH_URL = process.env.AUTH_URL || 'https://dev.kalpagramma.com/graphql'
   let AUTH_URL = 'https://dev.kalpagramma.com/graphql'
   debug('AUTH_URL', AUTH_URL)
-  store.commit('auth/state', ['AUTH_URL', AUTH_URL])
+  store.commit('auth/stateSet', ['AUTH_URL', AUTH_URL])
 
   // Cache
   const fragmentMatcher = new IntrospectionFragmentMatcher({
@@ -80,7 +80,7 @@ export default async ({ Vue, store, app }) => {
   let linkHttp = services.API
   let linkWs = services.SUBSCRIPTIONS
   let linkUpload = services.UPLOAD
-  store.commit('auth/state', ['AUTH_VK', services.AUTH_VK])
+  store.commit('auth/stateSet', ['AUTH_VK', services.AUTH_VK])
   const apiApollo = new ApolloClient({
     link: createHttpLink({
       uri: linkHttp,
@@ -100,6 +100,7 @@ export default async ({ Vue, store, app }) => {
     link: new WebSocketLink({
       uri: linkWs,
       options: {
+        minTimeout: 6000,
         reconnect: true,
         lazy: true,
         connectionParams: () => {
@@ -238,7 +239,7 @@ export default async ({ Vue, store, app }) => {
   // let linkHttp = services.API
   // let linkWs = services.SUBSCRIPTIONS
   // let linkUpload = services.UPLOAD
-  // store.commit('auth/state', ['AUTH_VK', services.AUTH_VK])
+  // store.commit('auth/stateSet', ['AUTH_VK', services.AUTH_VK])
   // // Cache
   // const fragmentMatcher = new IntrospectionFragmentMatcher({
   //   introspectionQueryResultData

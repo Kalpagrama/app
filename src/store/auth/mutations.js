@@ -5,9 +5,9 @@ export function init(state, user) {
   state.initialized = true
 }
 
-export function state(state, [key, val]) {
-  // console.log('auth/state', key, val)
-  // console.log('auth/state state', state)
+export function stateSet(state, [key, val]) {
+  // console.log('auth/stateSet', key, val)
+  // console.log('auth/state stateSet', state)
   if (val) {
     Vue.set(state, key, val)
     // state[key] = val

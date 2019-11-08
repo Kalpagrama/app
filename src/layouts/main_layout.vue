@@ -5,14 +5,14 @@ q-layout(view='hHh Lpr fFf')
   q-dialog(ref="bookmarkDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     ws-bookmark-editor
   q-dialog(
-    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened" @hide="$store.commit('ui/state', ['fragmentDialogOpened', false])"
+    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened" @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])"
     :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     ws-fragment-editor
   q-dialog(ref="nodeRateDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     node-rate
   q-drawer(
     side="left" v-model="drawer" show-if-above
-    :mini="!drawer || miniState" bordered content-class="bg-grey-3" :width="210" no-swipe-open).gt-sm
+    :mini="!drawer || miniState" bordered content-class="bg-grey-3" :width="250" no-swipe-open).gt-sm
     k-menu-vert.bg-primary
     div(style="margin-top: -80px; margin-right: 4px;").row.justify-start
       q-btn(
@@ -25,7 +25,7 @@ q-layout(view='hHh Lpr fFf')
       q-resize-observer(@resize="onResize")
       router-view(v-if="!loading" :height="height" :width="width")
       div(v-else).row.full-width.window-height.items-center.justify-center
-        q-spinner(size="50px" :thickness="2" color="white")
+        k-spinner(:width="200" :height="200")
 </template>
 
 <script>

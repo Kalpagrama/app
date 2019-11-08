@@ -5,7 +5,8 @@ q-layout(:container="true" :style=`{width: width+'px', height: height+'px'}`).bg
       q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '60px'}` @click="pageClick('/app/home')").row.q-px-sm
         q-item-section(avatar)
           q-btn(round flat color="primary")
-            q-icon(name="blur_on" color="white" style=`fontSize: 42px`)
+            //- q-icon(name="img:statics/logo.svg" color="white" style=`fontSize: 42px`)
+            k-logo
         q-item-section
             span.text-bold.text-white Кальпаграмма
       .col
@@ -14,7 +15,7 @@ q-layout(:container="true" :style=`{width: width+'px', height: height+'px'}`).bg
   q-page-container
     k-menu-mobile
   q-footer(reveal).lt-sm
-    k-menu-horiz
+    k-menu-horiz(page="menu" :colors="['white', 'grey-7']")
 </template>
 
 <script>
@@ -27,10 +28,10 @@ export default {
   },
   methods: {
    async pageClick (path) {
-    this.$log('pageClick', path)
-    await this.$wait(200)
-    this.$router.push(path)
-  }
+      this.$log('pageClick', path)
+      await this.$wait(200)
+      this.$router.push(path)
+    }
   },
   mounted () {
    this.$log('mounted')
@@ -42,6 +43,7 @@ export default {
 </script>
 
 <style lang="stylus">
-.q-footer
+.q-footer {
   background: none !important
+}
 </style>

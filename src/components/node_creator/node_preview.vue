@@ -65,7 +65,7 @@ export default {
         // remove draftLocal
         localStorage.removeItem('draft')
         // remove draftStorage
-        this.$store.commit('workspace/state', ['draft', null])
+        this.$store.commit('workspace/stateSet', ['draft', null])
         // done
         this.$log('nodePublish done', node)
         this.publishing = false

@@ -101,6 +101,8 @@ export default async ({ Vue, store, router }) => {
   //   Notify.create({message: msg.toString(), color: 'red', colorText: 'red'})
   // }
   Vue.component('kPage', () => import(`components/k_page`))
+  Vue.component('kSpinner', () => import(`components/k_spinner`))
+  Vue.component('kLogo', () => import(`components/k_logo`))
   Vue.component('kMenuPopup', () => import(`components/k_menu_popup`))
   Vue.component('kMenuHoriz', () => import(`components/k_menu_horiz`))
   Vue.component('kMenuMobile', () => import(`components/k_menu_mobile`))

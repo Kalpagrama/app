@@ -67,7 +67,7 @@ export default {
           // add to workspace
           let n = this.nodeWorkspace()
           // add to store
-          this.$store.commit('workspace/state', ['draft', n])
+          this.$store.commit('workspace/stateSet', ['draft', n])
           await this.$wait(200)
           // go to create
           this.$router.push('/app/create')

@@ -109,10 +109,10 @@ export default {
     async bookmarkContent () {
       this.$log('bookmarkContent', this.bookmarkLocal)
       this.$emit('hide')
-      this.$store.commit('workspace/state', ['bookmarkContent', this.bookmarkLocal])
+      this.$store.commit('workspace/stateSet', ['bookmarkContent', this.bookmarkLocal])
       this.$nextTick(() => {
         this.$emit('hide')
-        this.$store.commit('workspace/state', ['contentEditorDialogOpened', true])
+        this.$store.commit('workspace/stateSet', ['contentEditorDialogOpened', true])
       })
     },
     async bookmarkDraft () {
@@ -136,7 +136,7 @@ export default {
         // let res = await this.$store.dispatch('workspace/addWSDraft', {fragments})
         // this.$log('res', res)
         // go to node_creator
-        // this.$store.commit('workspace/state', ['draft', res])
+        // this.$store.commit('workspace/stateSet', ['draft', res])
         // this.$router.push('/app/create')
         this.$log('bookmarkDraft done')
         this.bookmarkDrafting = false
