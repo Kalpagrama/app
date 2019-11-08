@@ -6,7 +6,7 @@ export function init(state, workspace) {
   state.initialized = true
 }
 
-export function state(state, [key, val]) {
+export function stateSet(state, [key, val]) {
   state[key] = val
 }
 

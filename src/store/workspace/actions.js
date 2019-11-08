@@ -1,20 +1,21 @@
 const debug = require('debug')('$workspace:action')
 debug.enabled = true
-import {apolloProvider} from 'boot/apollo'
-import {contentFragment, WSContentFragment, WSFragmentFragment, WSDraftFragment, WSBookmarkFragment, WSTagFragment} from 'schema/index'
-export const init = async (state, userWorkspace) => {
-  if (state.getters.initialized) throw new Error('events state initialized already')
+import { apolloProvider } from 'boot/apollo'
+import { fragments } from 'schema/index'
+
+export const init = async (context, userWorkspace) => {
+  if (context.getters.initialized) throw new Error('events state initialized already')
   debug('userWorkspace init. userWorkspace=', userWorkspace)
-  state.commit('init', userWorkspace)
+  context.commit('init', userWorkspace)
   return userWorkspace
 }
 
 // bookmark
-export const addWSBookmark = async (store, bookmark) => {
+export const addWSBookmark = async (context, bookmark) => {
   debug('addWSBookmark start')
-  let {data: {addWSBookmark}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { addWSBookmark } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      ${WSBookmarkFragment}
+      ${fragments.WSBookmarkFragment}
       mutation addWSBookmark ($bookmark: WSBookmarkInput!) {
         addWSBookmark (bookmark: $bookmark) {
           ...WSBookmarkFragment
@@ -26,12 +27,12 @@ export const addWSBookmark = async (store, bookmark) => {
     }
   })
   debug('addWSBookmark done', addWSBookmark)
-  store.commit('addWSBookmark', addWSBookmark)
+  context.commit('addWSBookmark', addWSBookmark)
   return addWSBookmark
 }
 export const deleteWSBookmark = async (store, uid) => {
   debug('deleteWSBookmark start')
-  let {data: {deleteWSBookmark}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { deleteWSBookmark } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation deleteWSBookmark ($uid: String!) {
         deleteWSBookmark(uid: $uid)
@@ -47,9 +48,9 @@ export const deleteWSBookmark = async (store, uid) => {
 }
 export const updateWSBookmark = async (store, bookmark) => {
   debug('updateWSBookmark start')
-  let {data: {updateWSBookmark}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { updateWSBookmark } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      ${WSBookmarkFragment}
+      ${fragments.WSBookmarkFragment}
       mutation updateWSBookmark ($uid: String!, $bookmark: WSBookmarkInput!) {
         updateWSBookmark(uid: $uid, bookmark: $bookmark) {
           ...WSBookmarkFragment
@@ -71,18 +72,18 @@ export const updateWSBookmark = async (store, bookmark) => {
 }
 
 // content
-export const addWSContent = async (store, content) => {
+export const addWSContent = async (context, content) => {
   debug('addWSContent start')
   // check existance
-  let i = store.state.workspace.contents.find(c => c.content.oid === content.content.oid)
+  let i = context.state.workspace.contents.find(c => c.content.oid === content.content.oid)
   // debug('i', i)
   if (i) {
     debug('addWSContent done', i)
     return i
   } else {
-    let {data: {addWSContent}} = await apolloProvider.clients.apiApollo.mutate({
+    let { data: { addWSContent } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
-        ${WSContentFragment}
+        ${fragments.WSContentFragment}
         mutation addWSContent ($content: WSContentInput!) {
           addWSContent (content: $content) {
             ...WSContentFragment
@@ -98,15 +99,15 @@ export const addWSContent = async (store, content) => {
       }
     })
     debug('addWSContent done', addWSContent)
-    store.commit('addWSContent', addWSContent)
+    context.commit('addWSContent', addWSContent)
     return addWSContent
   }
 }
-export const updateWSContent = async (store, content) => {
+export const updateWSContent = async (context, content) => {
   debug('updateWSContent start')
-  let {data: {updateWSContent}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { updateWSContent } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      ${WSContentFragment}
+      ${fragments.WSContentFragment}
       mutation updateWSContent ($uid: String!, $content: WSContentInput!) {
         updateWSContent (uid: $uid, content: $content) {
           ...WSContentFragment
@@ -119,12 +120,12 @@ export const updateWSContent = async (store, content) => {
     }
   })
   debug('updateWSContent done', updateWSContent)
-  store.commit('updateWSContent', updateWSContent)
+  context.commit('updateWSContent', updateWSContent)
   return updateWSContent
 }
-export const deleteWSContent = async (store, uid) => {
+export const deleteWSContent = async (context, uid) => {
   debug('deleteWSContent start')
-  let {data: {deleteWSContent}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { deleteWSContent } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation deleteWSContent ($uid: String!) {
         deleteWSContent (uid: $uid)
@@ -135,15 +136,15 @@ export const deleteWSContent = async (store, uid) => {
     }
   })
   debug('deleteWSContent done', deleteWSContent)
-  store.commit('deleteWSContent', uid)
+  context.commit('deleteWSContent', uid)
   return deleteWSContent
 }
 
 // fragment
-export const addWSFragment = async (store, fragment) => {
+export const addWSFragment = async (context, fragment) => {
   debug('addWSFragment start', fragment)
   // if (fragment.uid) return
-  let i = store.state.workspace.fragments.find(c => c.uid === fragment.uid)
+  let i = context.state.workspace.fragments.find(c => c.uid === fragment.uid)
   if (i) {
     debug('addWSFragment done', i)
     return i
@@ -171,9 +172,9 @@ export const addWSFragment = async (store, fragment) => {
       contentOid: fragment.content.oid
     }
     debug('fragmentInput', fragmentInput)
-    let {data: {addWSFragment}} = await apolloProvider.clients.apiApollo.mutate({
+    let { data: { addWSFragment } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
-        ${WSFragmentFragment}
+        ${fragments.WSFragmentFragment}
         mutation addWSFragment ($fragment: WSFragmentInput!) {
           addWSFragment (fragment: $fragment) {
             ...WSFragmentFragment
@@ -185,17 +186,17 @@ export const addWSFragment = async (store, fragment) => {
       }
     })
     debug('addWSFragment done', addWSFragment)
-    store.commit('addWSFragment', addWSFragment)
+    context.commit('addWSFragment', addWSFragment)
     return addWSFragment
     // return null
   }
 }
-export const updateWSFragment = async (store, fragment) => {
+export const updateWSFragment = async (context, fragment) => {
   debug('updateWSFragment start')
   if (!fragment.uid) return
-  let {data: {updateWSFragment}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { updateWSFragment } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      ${WSFragmentFragment}
+      ${fragments.WSFragmentFragment}
       mutation updateWSFragment ($uid: String!, $fragment: WSFragmentInput!) {
         updateWSFragment (uid: $uid, fragment: $fragment) {
           ...WSFragmentFragment
@@ -208,13 +209,13 @@ export const updateWSFragment = async (store, fragment) => {
     }
   })
   debug('updateWSFragment done', updateWSFragment)
-  store.commit('updateWSFragment', updateWSFragment)
+  context.commit('updateWSFragment', updateWSFragment)
   return updateWSFragment
 }
-export const deleteWSFragment = async (store, fragment) => {
+export const deleteWSFragment = async (context, fragment) => {
   debug('deleteWSFragment start')
   if (!fragment.uid) return
-  let {data: {deleteWSFragment}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { deleteWSFragment } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation deleteWSFragment ($uid: String!) {
         deleteWSFragment (uid: $uid)
@@ -225,15 +226,15 @@ export const deleteWSFragment = async (store, fragment) => {
     }
   })
   debug('deleteWSFragment done', deleteWSFragment)
-  store.commit('deleteWSFragment', fragment)
+  context.commit('deleteWSFragment', fragment)
 }
 
 // tag
-export const addWSTag = async (store, tag) => {
+export const addWSTag = async (context, tag) => {
   debug('addWSTag start')
-  let {data: {addWSTag}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { addWSTag } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      ${WSTagFragment}
+      ${fragments.WSTagFragment}
       mutation addWSTag ($tag: WSTagInput!) {
         addWSTag (tag: $tag) {
           ...WSTagFragment
@@ -244,15 +245,15 @@ export const addWSTag = async (store, tag) => {
       tag: tag
     }
   })
-  store.commit('addWSTag', addWSTag)
+  context.commit('addWSTag', addWSTag)
   debug('addWSTag done', addWSTag)
   return addWSTag
 }
-export const updateWSTag = async (store, tag) => {
+export const updateWSTag = async (context, tag) => {
   debug('updateWSTag start')
-  let {data: {updateWSTag}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { updateWSTag } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      ${WSTagFragment}
+      ${fragments.WSTagFragment}
       mutation updateWSTag ($uid: String!, $tag: WSTagInput!) {
         updateWSTag (uid: $uid, tag: $tag) {
           ...WSTagFragment
@@ -268,13 +269,13 @@ export const updateWSTag = async (store, tag) => {
       }
     }
   })
-  store.commit('updateWSTag', updateWSTag)
+  context.commit('updateWSTag', updateWSTag)
   debug('updateWSTag done', updateWSTag)
   return updateWSTag
 }
-export const deleteWSTag = async (store, uid) => {
+export const deleteWSTag = async (context, uid) => {
   debug('deleteWSTag start', uid)
-  let {data: {deleteWSTag}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { deleteWSTag } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation deleteWSTag ($uid: String!) {
         deleteWSTag (uid: $uid)
@@ -284,19 +285,19 @@ export const deleteWSTag = async (store, uid) => {
       uid: uid
     }
   })
-  store.commit('deleteWSTag', uid)
+  context.commit('deleteWSTag', uid)
   // TODO: delete this tag from all tagUids
   debug('deleteWSTag done')
   return deleteWSTag
 }
 
 // draft
-export const addWSDraft = async (store, draft) => {
+export const addWSDraft = async (context, draft) => {
   debug('addWSDraft start')
   if (!draft) return
-  let {data: {addWSDraft}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { addWSDraft } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      ${WSDraftFragment}
+      ${fragments.WSDraftFragment}
       mutation addWSDraft ($draft: WSDraftInput!) {
         addWSDraft (draft: $draft) {
           ...WSDraftFragment
@@ -314,16 +315,16 @@ export const addWSDraft = async (store, draft) => {
     }
   })
   debug('addWSDraft done')
-  store.commit('addWSDraft', addWSDraft)
+  context.commit('addWSDraft', addWSDraft)
   debug('addWSDraft', addWSDraft)
   return addWSDraft
 }
-export const updateWSDraft = async (store, draft) => {
+export const updateWSDraft = async (context, draft) => {
   debug('updateWSDraft start')
   if (!draft) return
-  let {data: {updateWSDraft}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { updateWSDraft } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      ${WSDraftFragment}
+      ${fragments.WSDraftFragment}
       mutation updateWSDraft ($uid: String!, $draft: WSDraftInput!) {
         updateWSDraft (uid: $uid, draft: $draft) {
           ...WSDraftFragment
@@ -341,13 +342,13 @@ export const updateWSDraft = async (store, draft) => {
     }
   })
   debug('updateWSDraft done', updateWSDraft)
-  store.commit('updateWSDraft', updateWSDraft)
+  context.commit('updateWSDraft', updateWSDraft)
   return updateWSDraft
 }
-export const deleteWSDraft = async (store, draft) => {
+export const deleteWSDraft = async (context, draft) => {
   debug('deleteWSDraft start')
   if (!draft.uid) return
-  let {data: {deleteWSDraft}} = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { deleteWSDraft } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation deleteWSDraft ($uid: String!) {
         deleteWSDraft (uid: $uid)
@@ -358,6 +359,6 @@ export const deleteWSDraft = async (store, draft) => {
     }
   })
   debug('deleteWSDraft done', deleteWSDraft)
-  store.commit('deleteWSDraft', draft)
+  context.commit('deleteWSDraft', draft)
   return deleteWSDraft
 }

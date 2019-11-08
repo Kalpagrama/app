@@ -128,26 +128,27 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    const observer = this.$apollo.subscribe({
-      client: 'wsApollo',
-      query: gql`
-        subscription uploadProgress {
-          progress {
-            action
-            progress
-          }
-        }
-      `
-    })
-    observer.subscribe({
-      next: ({data: {progress}}) => {
-        this.$log('progress', progress)
-        this.$set(this, 'progress', progress)
-      },
-      error: (error) => {
-        this.$log('progress error', error)
-      }
-    })
+    // todo use Vuex
+    // const observer = this.$apollo.subscribe({
+    //   client: 'wsApollo',
+    //   query: gql`
+    //     subscription uploadProgress {
+    //       progress {
+    //         action
+    //         progress
+    //       }
+    //     }
+    //   `
+    // })
+    // observer.subscribe({
+    //   next: ({data: {progress}}) => {
+    //     this.$log('progress', progress)
+    //     this.$set(this, 'progress', progress)
+    //   },
+    //   error: (error) => {
+    //     this.$log('progress error', error)
+    //   }
+    // })
     let bookmarkContent = this.$store.state.workspace.bookmarkContent
     this.$log('bookmarkContent', bookmarkContent)
     if (bookmarkContent) {

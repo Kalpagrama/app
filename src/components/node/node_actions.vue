@@ -88,24 +88,24 @@ export default {
     },
     async nodeAnswer () {
       this.$log('nodeAnswer')
-      this.$store.commit('node/state', ['answer', true])
+      this.$store.commit('node/stateSet', ['answer', true])
       this.nodeRate()
     },
     async nodeRate () {
       this.$log('nodeRate')
-      this.$store.commit('node/state', ['node', this.node])
-      this.$store.commit('node/state', ['nodeFull', this.nodeFull])
+      this.$store.commit('node/stateSet', ['node', this.node])
+      this.$store.commit('node/stateSet', ['nodeFull', this.nodeFull])
       // await this.$wait(300)
       this.$nextTick(() => {
-        this.$store.commit('ui/state', ['dialogOpened', true])
+        this.$store.commit('ui/stateSet', ['dialogOpened', true])
       })
     },
     async nodeBookmark () {
       this.$log('nodeBookmark')
-      this.$store.commit('workspace/state', ['bookmark', {url: this.node.oid}])
+      this.$store.commit('workspace/stateSet', ['bookmark', {url: this.node.oid}])
       // await this.$wait(300)
       this.$nextTick(() => {
-        this.$store.commit('workspace/state', ['bookmarkEditorDialogOpened', true])
+        this.$store.commit('workspace/stateSet', ['bookmarkEditorDialogOpened', true])
       })
     }
   }

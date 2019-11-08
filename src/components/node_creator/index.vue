@@ -137,13 +137,13 @@ export default {
         // use draft
         this.useDraft(draftLocal)
         // remove draft local
-        this.$store.commit('workspace/state', ['draft', null])
+        this.$store.commit('workspace/stateSet', ['draft', null])
       } else {
         this.$log('DRAFTS: local')
         // use draft
         this.useDraft(draftLocal)
         // remove draft local
-        this.$store.commit('workspace/state', ['draft', null])
+        this.$store.commit('workspace/stateSet', ['draft', null])
       }
     } else {
       if (draftStorage !== null && draftStorage !== 'null' && draftStorage !== 'undefined' && draftStorage !== undefined) {
