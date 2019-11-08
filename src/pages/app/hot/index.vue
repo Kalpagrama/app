@@ -1,11 +1,11 @@
 <template lang="pug">
-q-layout
+q-layout.bg-grey-3
   //- drawer
   q-drawer(ref="kDrawer" side="left" :width="240").lt-sm
     div(@click.self="$refs.kDrawer.toggle()").row.fit.items-start.content-start
       div(:style=`{height: 'calc(var(--vh, 1vh) * 100)', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`).column.full-width.bg-white
         categories
-  q-page-container.bg-grey-2
+  q-page-container.bg-grey-3
     .row.full-width.justify-center
       div(style=`width: 200px`).row.gt-xs
         categories(style=`position: fixed; overflow: hidden; maxWidth: 200px; border-radius: 10px`).q-mt-sm
@@ -13,9 +13,8 @@ q-layout
         node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variables")
           template(v-slot:items=`{items, fetchingMore}`)
             node-feed(:nodes="items" :fetchingMore="fetchingMore")
-      div(style=`width: 250px;`).gt-xs
+      div(style=`width: 250px;`).row.gt-xs
         pageSubscriptions(
-          :width="250" :height="height - 100"
           style=`position: fixed; overflow: hidden; maxWidth: 250px; border-radius: 10px`).q-mt-sm
   q-footer(reveal).bg-grey-4.lt-sm
     k-menu-horiz(page="hot" :colors="['white', 'grey-7']")

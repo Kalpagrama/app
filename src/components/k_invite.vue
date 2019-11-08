@@ -3,7 +3,7 @@
   div(:style=`{height: '60px'}`).row.full-width
     .col.full-height
       .row.fit.items-center.q-px-md
-        span.text-bold Invite friend
+        span.text-bold Пригласить друга
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="clear" @click="$emit('hide')")
   .col.full-width
@@ -12,24 +12,24 @@
         //- by email
         .row.full-width.justify-center.q-px-md.q-mb-md
           div(:style=`{borderRadius: '10px', overflow: 'hidden', zIndex: 100}`).row.full-width.q-mb-sm
-            q-input(v-model="email" type="email" filled label="Your friend email" @keyup.enter="emailSend()").full-width
+            q-input(v-model="email" type="email" filled label="Почта" @keyup.enter="emailSend()").full-width
               template(v-slot:append)
                 q-icon(name="mail")
           q-btn(
             no-caps color="green" :disable="emailSent" :loading="emailSending" @click="emailSend()"
             style=`height: 56px; width: 120px; border-radius: 10px`).full-width
-            span.text-bold {{emailSent ? 'Email sent!' : 'Send invite by email'}}
+            span.text-bold {{emailSent ? 'Приглашение отправлено!' : 'Отправить приглашение'}}
         //- get link
         .row.full-width.justify-center.q-px-md.q-mb-md
           div(
             v-if="link.length > 0"
             :style=`{borderRadius: '10px', overflow: 'hidden', zIndex: 100}`).row.full-width.q-mb-sm
-            q-input(v-model="link" filled label="Invite link" @keyup.enter="emailSend").full-width
+            q-input(v-model="link" filled label="Ссылка приглашения" @keyup.enter="emailSend").full-width
               template(v-slot:append)
                 q-icon(name="link")
           q-btn(
             v-if="link.length === 0"
-            label="or get invite link" outline no-caps color="green" :loading="linkGetting" @click="getLink()"
+            label="или скопировать ссылку" outline no-caps color="green" :loading="linkGetting" @click="getLink()"
             style=`height: 56px; width: 120px; border-radius: 10px`).full-width
 </template>
 
@@ -49,7 +49,7 @@ export default {
     async emailSend () {
       try {
         this.$log('invite emailSend start', this.email)
-        if (this.email.length === 0) throw { message: 'Wrong email!' }
+        if (this.email.length === 0) throw { message: 'Не верная почта' }
         this.emailSending = true
         let { data: { inviteEmail } } = await this.$apollo.mutate({
           mutation: gql`
@@ -65,7 +65,7 @@ export default {
         this.emailSending = false
         this.emailSent = true
         this.email = ''
-        this.$q.notify({color: 'green', textColor: 'white', message: 'Invite sent!'})
+        this.$q.notify({color: 'green', textColor: 'white', message: 'Приглашение отправлено!'})
         // this.$emit('hide')
       } catch (error) {
         this.$log('emailSend error', error)
@@ -93,9 +93,9 @@ export default {
         let buffered = await this.inputBuffer(inviteUrl)
         this.$log('buffered', buffered)
         if (buffered) {
-          this.$q.notify({color: 'green', textColor: 'white', message: 'Link copied to clipboard!'})
+          this.$q.notify({color: 'green', textColor: 'white', message: 'Ссылка успешно скопирована!'})
         } else {
-          this.$q.notify({color: 'yellow', textColor: 'white', message: 'Copy link manualy!'})
+          this.$q.notify({color: 'yellow', textColor: 'white', message: 'Скопируйте в ручную'})
         }
       } catch (error) {
         this.$log('linkGet error', error)

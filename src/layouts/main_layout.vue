@@ -12,7 +12,7 @@ q-layout(view='hHh Lpr fFf')
     node-rate
   q-drawer(
     side="left" v-model="drawer" show-if-above
-    :mini="!drawer || miniState" :breakpoint="500" bordered content-class="bg-grey-3" :width="210" no-swipe-open).gt-sm
+    :mini="!drawer || miniState" bordered content-class="bg-grey-3" :width="250" no-swipe-open).gt-sm
     k-menu-vert.bg-primary
     div(style="margin-top: -80px; margin-right: 4px;").row.justify-end
       q-btn(
@@ -25,7 +25,8 @@ q-layout(view='hHh Lpr fFf')
       q-resize-observer(@resize="onResize")
       router-view(v-if="!loading" :height="height" :width="width")
       div(v-else).row.full-width.window-height.items-center.justify-center
-        q-spinner(size="50px" :thickness="2" color="white")
+        div(style="width: 100px; height: 100px")
+          k-spinner
 </template>
 
 <script>
