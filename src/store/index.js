@@ -50,13 +50,50 @@ async function init (context) {
   await context.dispatch('workspace/init', userWorkspace)
   await context.dispatch('events/init', userEvents)
   await context.dispatch('subscriptions/init', userSubscriptions)
-  // await context.dispatch('objects/init')
-  // await context.dispatch('objects/get', { oid: 'AiWZwc5BIBg=', fragmentName: 'nodeFragment', priority: 0 })
-  // await context.dispatch('objects/get', { oid: 'AiWZwc5BIBg=', fragmentName: 'nodeFragment', priority: 0 })
-  // await context.dispatch('objects/get', { oid: 'AiWZwc5BIBg=', fragmentName: 'nodeFragment', priority: 0 })
-  // await context.dispatch('objects/get', { oid: 'AiWZwc5BIBg=', fragmentName: 'nodeFragment', priority: 0 })
-  // await context.dispatch('objects/get', { oid: 'AiWZwc5BIBg=', fragmentName: 'nodeFragment', priority: 0 })
-  // await context.dispatch('objects/get', { oid: 'AiSh0muAoA0=', fragmentName: 'contentFragment', priority: 0 })
+  await context.dispatch('objects/init')
+
+  context.dispatch('objects/get', { oid: 'AiSh0muAoA0=', fragmentName: 'contentFragment', priority: 0 })
+    .then(object => {
+      console.log(object)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  context.dispatch('objects/get', { oid: 'Aiw8GpoBICQ=', fragmentName: 'nodeFragment', priority: 0 })
+    .then(object => {
+      console.log(object)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  context.dispatch('objects/get', { oid: 'AiWT7JlAoA8=', fragmentName: 'contentFragment', priority: 0 })
+    .then(object => {
+      console.log(object)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  context.dispatch('objects/get', { oid: 'Ai6yN5WBICc=', fragmentName: 'nodeFragment', priority: 1 })
+    .then(object => {
+      console.log(object)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  context.dispatch('objects/get', { oid: 'AiSeK9iBIBQ=', fragmentName: 'nodeFragment', priority: 1 })
+    .then(object => {
+      console.log(object)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+  context.dispatch('objects/get', { oid: 'AiWZwc5BIBg=', fragmentName: 'nodeFragment', priority: 1 })
+    .then(object => {
+      console.log(object)
+    })
+    .catch(err => {
+      console.log(err)
+    })
 }
 
 export default function (/* { ssrContext } */) {

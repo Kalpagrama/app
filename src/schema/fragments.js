@@ -1,3 +1,4 @@
+
 const contentFragment = gql`
   fragment contentFragment on Object {
     oid

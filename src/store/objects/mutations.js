@@ -5,6 +5,8 @@ export function init (state) {
 }
 
 export function stateSet (state, [key, val]) {
+  // console.debug('asdasd')
+  assert.ok(state.hasOwnProperty(key))
   state[key] = val
 }
 

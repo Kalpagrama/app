@@ -43,6 +43,7 @@ export function init (state) {
 }
 
 export function stateSet (state, [key, val]) {
+  assert.ok(state.hasOwnProperty(key))
   state[key] = val
 }
 

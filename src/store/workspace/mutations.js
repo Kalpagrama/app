@@ -1,3 +1,5 @@
+import assert from 'assert'
+
 const debug = require('debug')('$workspace:mutation')
 debug.enabled = true
 
@@ -7,6 +9,7 @@ export function init(state, workspace) {
 }
 
 export function stateSet(state, [key, val]) {
+  assert.ok(state.hasOwnProperty(key))
   state[key] = val
 }
 

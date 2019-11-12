@@ -22,7 +22,7 @@ class Queue {
       else if (priority === 1) queue = this.queueSecondary
       assert.ok(queue)
       queue.push({ context, oid, fragmentName, resolve, reject })
-      this.next()
+      this.next(context)
     })
   }
 
@@ -33,26 +33,28 @@ class Queue {
     else reject('query was destroyed due out of date ')
   }
 
-  // берет из очереди последний добавленный
-  next () {
+  // берет из очереди последний добавленный и отправляет на выполненеие
+  next (context) {
+    // если предыдущий запрос еще выполняется, то подождем...
+    if (context.getters.queryInProgress) return
+
+    // извлечь из очереди сдедующие count объектов для запроса на сервер. Проверяем на наличие
     let getFromQueue = (queue, count) => {
       let result = []
-      while (result.length < count && this.queue.length) {
+      while (result.length < count && queue.length) {
         let lastItem = queue.pop()
         if (lastItem.context.getters.objectGet(lastItem)) {
           this.destroyItem(lastItem)
-          continue
-        }
+        } else result.push(lastItem)
       }
       return result
     }
-
     // берем последний элемент из queueMaster
     let itemsForQuery = [...getFromQueue(this.queueMaster, 1)]
     // добиваем до пяти из queueSecondary
     itemsForQuery.push(...getFromQueue(this.queueSecondary, 5 - itemsForQuery.length))
 
-    // очищаем то что осталось
+    // очищаем то что осталось в очереди
     this.queueMaster.forEach(item => {
       this.destroyItem(item)
     })
@@ -62,15 +64,22 @@ class Queue {
     this.queueMaster = []
     this.queueSecondary = []
 
-    let fragmentName = 'nodeFragment'
-    let fragment = fragments[fragmentName]
-    assert.ok(fragment || !fragmentName)
+    if (itemsForQuery.length === 0) return
+
+    let fragmentNames = Array.from(new Set(itemsForQuery.map(item => item.fragmentName)))
+    context.commit('stateSet', ['queryInProgress', true])
     apolloProvider.clients.apiApollo.query({
       query: gql`
-        ${fragment}
+        ${fragmentNames.reduce((acc, item) => {
+            let fr = fragments[item]
+            return acc + fr.loc.source.body
+            }, '')
+          }
         query objectFull ($oids: [OID!]!) {
           objectList(oids: $oids) {
-            ...${fragmentName}
+            ${fragmentNames.reduce((acc, item) =>
+            acc + '\n...' + item, ''
+            )}
           }
         }
       `,
@@ -87,23 +96,26 @@ class Queue {
         assert.ok(object)
         item.resolve(object)
       }
+      context.commit('stateSet', ['queryInProgress', false])
+      this.next(context)
     })
     .catch(err => {
       for (let item of itemsForQuery) {
         item.reject(err)
       }
+      context.commit('stateSet', ['queryInProgress', false])
     })
   }
 }
 
 const queue = new Queue()
 
-// Вернет объект из кэша, либо запросит его
+// Вернет объект из кэша, либо запросит его. Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
 // priority 0 - будут выполнен только последний запрос.
 // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
 // fragmentName - определяет множество выводимых полей
 export const get = async (context, { oid, fragmentName, priority }) => {
-  context.dispatch('log/debug', ['objects', 'objecGet start...'], { root: true })
+  context.dispatch('log/debug', ['objects', 'objectGet start...'], { root: true })
 
   // Если объект в кэше - взять из кэша
   let object = context.getters.objectGet({ oid, fragmentName })
