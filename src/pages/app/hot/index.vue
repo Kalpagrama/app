@@ -15,7 +15,7 @@ q-layout.bg-grey-3
             node-feed(:nodes="items" :fetchingMore="fetchingMore")
       div(style=`width: 250px;`).row.gt-xs
         pageSubscriptions(
-          style=`position: fixed; overflow: hidden; maxWidth: 250px; border-radius: 10px`).q-mt-sm
+          style=`position: fixed; overflow: hidden; maxWidth: 250px; border-radius: 10px`)
   q-footer(reveal).bg-grey-4.lt-sm
     k-menu-horiz(page="hot" :colors="['white', 'grey-7']")
 </template>

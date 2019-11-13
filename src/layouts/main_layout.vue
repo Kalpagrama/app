@@ -25,8 +25,7 @@ q-layout(view='hHh Lpr fFf')
       q-resize-observer(@resize="onResize")
       router-view(v-if="!loading" :height="height" :width="width")
       div(v-else).row.full-width.window-height.items-center.justify-center
-        div(style="width: 100px; height: 100px")
-          k-spinner
+        k-spinner
 </template>
 
 <script>
