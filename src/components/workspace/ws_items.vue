@@ -1,6 +1,6 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-sm.q-pt-sm
-  k-menu-popup(ref="kPopup" :name="item ? item.name : ''" :actions="actions" @action="itemAction")
+  k-dialog-bottom(ref="itemDialog" mode="actions" :options="itemDialogOptions" @action="itemAction")
   div(
     v-for="(i, ii) in items" :key="ii" @click="itemClick(i, ii)"
     :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
@@ -29,6 +29,15 @@ export default {
     }
   },
   computed: {
+    itemDialogOptions () {
+      return {
+        confirm: true,
+        confirmName: 'Edit',
+        actions: {
+          delete: {name: 'Delete', color: 'red'}
+        }
+      }
+    },
     WSItems () {
       // return this.$store.getters['workspace/WSItems']
       return this.$store.state.workspace.workspace.fragments
@@ -51,55 +60,23 @@ export default {
     }
   },
   methods: {
-    itemAction ({id}) {
-      this.$log('itemAction', id)
-      switch (id) {
-        case 'use': {
-          this.$emit('item', this.item)
-          break
-        }
-        case 'edit': {
-          break
-        }
+    itemAction (e) {
+      this.$log('itemAction', e)
+      switch (e) {
         case 'delete': {
+          this.$log('delete')
+          break
+        }
+        case 'confirm': {
+          this.$log('confirm')
           break
         }
       }
-      this.$set(this, 'item', null)
     },
     itemClick (i, ii) {
       this.$log('itemClick', i)
-      this.$set(this, 'item', i)
-      switch (i.__typename) {
-        case 'WSBookmark': {
-          this.$log('WSBookmark')
-          break
-        }
-        case 'WSContent': {
-          this.$log('WSContent')
-          break
-        }
-        case 'WSFragment': {
-          this.$log('WSFragment')
-          break
-        }
-        case 'WSDraft': {
-          this.$log('WSDraft')
-          break
-        }
-        case 'WSTag': {
-          this.$log('WSTag')
-          break
-        }
-      }
-      this.$refs.kPopup.toggle()
+      this.$refs.itemDialog.show()
     }
-  },
-  mounted () {
-    this.$log('mounted')
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
   }
 }
 </script>

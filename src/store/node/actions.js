@@ -3,14 +3,14 @@ debug.enabled = true
 
 import { apolloProvider } from 'boot/apollo'
 
-export const init = async (store, categories) => {
-  if (store.getters.initialized) throw new Error('events state initialized already')
-  store.dispatch('log/debug', ['node', 'node store init. categories', categories], { root: true })
-  store.commit('init', categories)
+export const init = async (context, categories) => {
+  if (context.getters.initialized) throw new Error('events state initialized already')
+  context.dispatch('log/debug', ['node', 'node store init. categories', categories], { root: true })
+  context.commit('init', categories)
   return categories
 }
 
-export const nodeUnrate = async (store, oid) => {
+export const nodeUnrate = async (context, oid) => {
   debug('nodeUnrate start')
   if (!oid) return
   let { data: { nodeUnrate } } = await apolloProvider.clients.apiApollo.mutate({
@@ -28,7 +28,7 @@ export const nodeUnrate = async (store, oid) => {
   return nodeUnrate
 }
 
-export const nodeRate = async (store, { oid, rate }) => {
+export const nodeRate = async (context, { oid, rate }) => {
   debug('nodeRate start', oid, rate)
   if (!oid) throw new Error(`No oid!`)
   if (!rate) throw new Error(`No rate!`)
@@ -47,17 +47,17 @@ export const nodeRate = async (store, { oid, rate }) => {
   return nodeRate
 }
 
-export const nodeFull = async (store, oid) => {
+export const nodeFull = async (context, oid) => {
   debug('nodeFull start')
   debug('nodeFull done')
 }
 
-export const nodeDelete = async (store, oid) => {
+export const nodeDelete = async (context, oid) => {
   debug('nodeDelete start')
   debug('nodeDelete dones')
 }
 
-export const nodeCreate = async (store, payload) => {
+export const nodeCreate = async (context, payload) => {
   debug('nodeCreate start', payload)
   if (!payload.fragments || payload.fragments.length === 0) throw new Error('Wrong fragments!')
   let node = {
@@ -97,16 +97,3 @@ export const nodeCreate = async (store, payload) => {
   debug('nodeCreate done', nodeCreate)
   return nodeCreate
 }
-
-// // Вернет ядро из кэша, либо запросит его в приоритетном режиме
-// export const nodeGet = async (store, oid) => {
-//   store.dispatch('log/debug', ['node', 'nodeGet start...'], { root: true })
-//   let node = {}
-//   // await node
-//   store.dispatch('log/debug', ['node', 'nodeGet done', node], { root: true })
-//   return node
-// }
-// // подсказка загрузчику в том, что скоро могут понадобиться эти ядра.
-// // По возможности эти ядра будут загружены. Последние запрошенные - в приоритете
-// export const nodeQueue = (store, oid) => {
-// }

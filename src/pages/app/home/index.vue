@@ -1,11 +1,11 @@
 <template lang="pug">
-q-layout(containter :style=`{width: width+'px'}`)
+q-layout(containter :style=`{width: width+'px'}` @scroll="onScroll")
   //- q-header(reveal)
   //-   div(:style=`{height: '60px'}`).row.full-width.bg-red
   q-page-container
     node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
       template(v-slot:items=`{items, fetchingMore}`)
-        node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
+        node-feed(ref="nodeFeed" name="Home" :nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
   q-footer(reveal).lt-sm
     k-menu-horiz(page="home" :colors="['white', 'grey-7']")
 </template>
@@ -47,11 +47,19 @@ export default {
       }
     }
   },
+  methods: {
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      if (e.directionChanged) {
+        let b = true
+        if (e.direction === 'down') b = true
+        else b = false
+        if (this.$refs.nodeFeed) this.$refs.nodeFeed.scrollDirectionChanged(b)
+      }
+    }
+  },
   mounted () {
     this.$log('mounted')
-    this.$root.$on('page', () => {
-      if (this.$refs.kDrawer) this.$refs.kDrawer.toggle()
-    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

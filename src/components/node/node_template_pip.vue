@@ -1,10 +1,10 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   div(
-    :style=`{position: 'relative', zIndex: zIndex+100, maxHeight: '100vh', overflow: 'hidden', borderRadius: '10px'}`
-    ).row.full-width.items-start.content-start.bg-grey-3
+    :style=`{position: 'relative', zIndex: zIndex+100, overflow: 'hidden', borderRadius: '10px', ...getStyles}`
+    ).row.full-width.items-start.content-start.bg-black
     //- action
-    q-btn(v-if="active" round dense flat color="white" icon="more_horiz" @click="$emit('action', ['menu', nodeFull.fragments[fragmentActive]])"
+    q-btn(v-if="active" round dense flat color="white" icon="more_vert" @click="$emit('action', ['menu', nodeFull.fragments[fragmentActive]])"
       :style=`{position: 'absolute', zIndex: 1000, right: '8px', top: '8px', background: 'rgba(0,0,0,0.5)'}`)
     //- forward
     div(@click="forwardClick()"
@@ -15,26 +15,31 @@
         v-show="fragmentActive !== pi"
         :src="node.meta.fragments[pi].thumbUrl"
         :style=`{width: '100%', height: '100%', objectFit: 'contain'}` draggable="false"
-        @load="$event => imgLoaded($event, `mini:${pi}`)"
-        @error="$event => imgError($event, `mini:${pi}`)")
+        @load="$event => imgForwardLoaded($event, pi)"
+        @error="$event => imgForwardError($event, pi)")
     //- previews v-if="node.thumbUrl[pi]"
     img(
       v-for="(p, pi) in 2" :key="pi"
       v-show="node.meta.fragments[pi].thumbUrl && fragmentActive === pi"
       :src="node.meta.fragments[pi].thumbUrl"
-      :style=`{width: '100%', minHeight: '150px', objectFit: 'contain', zIndex: zIndex+50}`
+      :style=`{width: '100%', objectFit: 'contain', zIndex: zIndex+50, ...getStylesPreview}`
       draggable="false"
-      @load="$event => imgLoaded($event, `preview:${pi}`)"
-      @error="$event => imgError($event, `preview:${pi}`)")
+      @load="$event => imgPreviewLoaded($event, pi)"
+      @error="$event => imgPreviewError($event, pi)")
     //- active
     div(v-if="needFull && nodeFull && nodeFull.fragments" :style=`{position: 'absolute', zIndex: zIndex+90}`).row.fit
       div(v-for="(f, fi) in 2" :key="fi" v-show="fragmentActive === fi").row.fit
-        node-fragment-video(v-if="nodeFull.fragments[fi].content.type === 'VIDEO'" :zIndex="zIndex" :url="nodeFull.fragments[fi].url" :visible="fi === fragmentActive && active")
+        node-fragment-video(v-if="nodeFull.fragments[fi].content.type === 'VIDEO'" :zIndex="zIndex" :url="nodeFull.fragments[fi].url" :visible="fi === fragmentActive && active" :active="active" :muted="muted")
         node-fragment-image(v-if="nodeFull.fragments[fi].content.type === 'IMAGE'" :zIndex="zIndex" :url="nodeFull.fragments[fi].url" :visible="fi === fragmentActive && active")
   node-name(v-if="!noName" :node="node")
   node-actions(v-if="!noActions" :node="node" :nodeFull="nodeFull")
   node-spheres(v-if="!noSpheres" :node="node" :nodeFull="nodeFull")
   node-timestamp(v-if="!noTimestamp" :node="node" :nodeFull="nodeFull")
+  div(v-if="false").row.full-width
+    small.full-width getStyles {{ getStyles }}
+    small.full-width k: {{ k }}
+    small.full-width width/height: {{ width }}/{{ height }}
+    small.full-width widthWrapper: {{ widthWrapper }}
 </template>
 
 <script>
@@ -45,22 +50,48 @@ import nodeSpheres from './node_spheres'
 import nodeTimestamp from './node_timestamp'
 import nodeFragmentVideo from './node_fragment_video'
 import nodeFragmentImage from './node_fragment_image'
-import kMenuPopup from 'components/k_menu_popup'
 
 export default {
   name: 'nodeTemplate__pip',
-  components: {nodeName, nodeHeader, nodeActions, nodeSpheres, nodeTimestamp, nodeFragmentVideo, nodeFragmentImage, kMenuPopup},
-  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'inCreator', 'noActions', 'noTimestamp', 'noName', 'noSpheres'],
+  components: {nodeName, nodeHeader, nodeActions, nodeSpheres, nodeTimestamp, nodeFragmentVideo, nodeFragmentImage},
+  props: ['index', 'zIndex', 'node', 'nodeFull', 'active', 'needFull', 'inCreator', 'noActions', 'noTimestamp', 'noName', 'noSpheres', 'widthWrapper', 'muted'],
   data () {
     return {
-      fragmentActive: 0
+      fragmentActive: 0,
+      previewsLoaded: 0,
+      width: 0,
+      height: 0
     }
   },
   computed: {
+    k () {
+      return this.height / this.width
+    },
     getHeight () {
-      let w = this.$q.screen.width
-      if (w > 500) return 500
-      else return w
+      return this.widthWrapper * this.k
+    },
+    getStyles () {
+      if (this.height === 0) {
+        return {
+          minHeight: '200px',
+          maxHeight: '530px'
+        }
+      } else {
+        return {
+          minHeight: this.getHeight + 'px',
+          maxHeight: this.getHeight + 'px',
+          height: this.getHeight + 'px'
+        }
+      }
+    },
+    getStylesPreview () {
+      if (this.height === 0) {
+        return {}
+      } else {
+        return {
+          height: '100%'
+        }
+      }
     }
   },
   methods: {
@@ -72,51 +103,19 @@ export default {
         if (this.$refs.kvideo) this.$refs.kvideo[this.fragmentActive].play()
       })
     },
-    imgError (e, msg) {
-      // this.$log('imgError', msg)
-    },
-    imgLoaded (e, msg) {
-      // this.$log('imgLoaded', msg)
-    },
-    contentExplore () {
-      this.$log('contentExplore')
-      this.$router.push(`/app/content/${this.nodeFull.fragments[this.fragmentActive].content.oid}`)
-    },
-    fragmentWorkspace () {
-      this.$log('fragmentWorkspace')
-      let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[this.fragmentActive]))
-      // TODO: take thumbUrl from node.meta.fragments
-      // fragment.thumbUrl = this.node.thumbUrl[fi]
-      this.$store.commit('workspace/state', ['fragment', fragment])
-      this.$store.commit('ui/state', ['fragmentDialogOpened', true])
-    },
-    async fragmentAction (a, fi) {
-      this.$log('fragmentAction', a)
-      await this.$wait(200)
-      switch (a.id) {
-        case 'content_explore': {
-          this.$log('fragmentAction', a.id)
-          this.$router.push(`/app/content/${this.nodeFull.fragments[fi].content.oid}`)
-          break
-        }
-        case 'fragment_workspace': {
-          this.$log('fragmentAction', a.id)
-          let fragment = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
-          this.$store.commit('workspace/state', ['fragment', fragment])
-          this.$store.commit('ui/state', ['dialogOpened', true])
-          // this.$nextTick(() => {
-          //   this.$store.commit('ui/state', ['dialogOpened', true])
-          // })
-          break
-        }
+    imgPreviewLoaded (e, i) {
+      if (i === 0) {
+        this.$log('LOADED FIRST PREVIEW')
+        this.width = e.path[0].width
+        this.height = e.path[0].height
       }
+    },
+    imgPreviewError (e, i) {
+    },
+    imgForwardLoaded (e, i) {
+    },
+    imgForwardError (e, i) {
     }
-  },
-  mounted () {
-    // this.$log('mounted')
-  },
-  beforeDestroy () {
-    // this.$log('beforeDestroy')
   }
 }
 </script>

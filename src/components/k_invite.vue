@@ -111,14 +111,14 @@ export default {
           navigator
             .clipboard
             .writeText(link)
-            .then(() => {
-              this.$log('PASTE GOOD')
-              resolve(true)
-            },
-            () => {
-              this.$log('PASTE BAD')
-              reject(false)
-            })
+            // .then(() => {
+            //   this.$log('PASTE GOOD')
+            //   resolve(true)
+            // },
+            // () => {
+            //   this.$log('PASTE BAD')
+            //   reject(false)
+            // })
         } else {
           this.$log('CANT PASTE LINK')
           resolve(true)

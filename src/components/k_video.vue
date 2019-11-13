@@ -18,6 +18,8 @@ div(:style=`{position: 'relative'}`).row
   //- forwards
   //- div(:style=`{position: 'absolute', zIndex: 10, width: '50%', height: '100%', left: '0px'}` @click="$refs.kVideo.currentTime -= 10")
   //- div(:style=`{position: 'absolute', zIndex: 10, width: '50%', height: '100%', right: '0px'}` @click="$refs.kVideo.currentTime += 10")
+  div(:style=`{position: 'absolute', top: '0px', height: '48px'}`).row.full-width.items-center.q-px-sm.justify-end
+    slot(name="default")
   //- tools
   div(v-show="tools" :style=`{position: 'absolute', bottom: '10px', zIndex: 1000, height: '66px'}`).row.full-width
     //- actions

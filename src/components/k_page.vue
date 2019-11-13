@@ -104,9 +104,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$root.$on('path', (val) => {
-      if (val === this.$route.path) this.menuToggle()
-    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

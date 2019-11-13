@@ -1,16 +1,10 @@
 const debug = require('debug')('[boot]:main')
 debug.enabled = true
-import VueVirtualScroller from 'vue-virtual-scroller'
+
 import { LoadingBar, date, Notify } from 'quasar'
 import TweenMax from 'gsap/TweenMax'
 import VueObserveVisibility from 'vue-observe-visibility'
-// import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
-import { sync } from 'vuex-router-sync'
-import 'mediaelement/build/mediaelementplayer.min.css'
-import 'mediaelement/full'
-import Carousel3d from 'vue-carousel-3d'
-import VueMasonry from 'vue-masonry-css'
-import PortalVue from 'portal-vue'
+// import { sync } from 'vuex-router-sync'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -30,15 +24,9 @@ const time = (sec) => {
 }
 
 export default async ({ Vue, store, router }) => {
-  Vue.use(PortalVue)
-  Vue.use(VueMasonry)
-  Vue.use(VueVirtualScroller)
   Vue.use(VueObserveVisibility)
-  Vue.use(Carousel3d)
   Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-  let banned = {'App': 1, 'mainLayout': 1}
   Vue.prototype.$log = function (...msg) {
-    // if (banned[this.$options.name]) return
     const debug = require('debug')(`[${this.$options.name}] `)
     debug.enabled = true
     debug(...msg)
@@ -55,7 +43,7 @@ export default async ({ Vue, store, router }) => {
       monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
     })
   }
-  sync(store, router, { moduleName: 'route' })
+  // sync(store, router, { moduleName: 'route' })
   Vue.prototype.$time = time
   Vue.prototype.$random = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
@@ -94,32 +82,23 @@ export default async ({ Vue, store, router }) => {
   Vue.config.errorHandler = function(err, vm, info) {
     debug(`### VUE ERROR ### ${err.toString()}\nInfo: ${info}`)
     debug(err.stack)
-    Notify.create({message: err.toString(), color: 'red', colorText: 'red'})
+    // Notify.create({message: err.toString(), color: 'red', colorText: 'red'})
   }
   // window.onerror = function(msg, src, linenum, colnum, error) {
   //   debug('### ERROR ###', msg.toString())
   //   Notify.create({message: msg.toString(), color: 'red', colorText: 'red'})
   // }
-  Vue.component('kPage', () => import(`components/k_page`))
   Vue.component('kSpinner', () => import(`components/k_spinner`))
   Vue.component('kLogo', () => import(`components/k_logo`))
-  Vue.component('kMenuPopup', () => import(`components/k_menu_popup`))
   Vue.component('kMenuHoriz', () => import(`components/k_menu_horiz`))
   Vue.component('kMenuMobile', () => import(`components/k_menu_mobile`))
-  Vue.component('kInvite', () => import(`components/k_invite`))
-  Vue.component('kDialog', () => import(`components/k_dialog`))
-  Vue.component('kTongue', () => import(`components/k_tongue`))
-  Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
-  Vue.component('wsBookmarkEditor', () => import('components/workspace/ws_bookmark_editor'))
-  Vue.component('wsFragmentEditor', () => import('components/workspace/ws_fragment_editor'))
   Vue.component('node', () => import('components/node'))
-  Vue.component('nodeRate', () => import('components/node/node_rate'))
-  Vue.component('nodeAnswer', () => import(`components/node/node_answer`))
   Vue.component('nodeLoader', () => import('components/node_loader'))
   Vue.component('nodeFeed', () => import(`components/node_feed`))
-  Vue.component('videoEditor', () => import(`components/video_editor`))
-  Vue.component('kVideo', () => import(`components/k_video`))
+  Vue.component('nodeList', () => import(`components/node_list`))
   Vue.component('kDialogBottom', () => import(`components/k_dialog_bottom`))
+  Vue.component('kSplit', () => import(`components/k_split`))
+  Vue.component('kVideo', () => import('components/k_video'))
 }
 
 export { time }

@@ -1,23 +1,6 @@
 <template lang="pug">
 div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
-  //- actions
-  //- share
-  //- k-menu-popup(ref="nodeShareMenu" name="Поделиться" :actions="actions" @action="nodeShare")
-  //-   q-btn(color="grey-9" round flat)
-  //-     q-icon(name="share" size="26px" color="grey-8")
-  //- rate/answer
-  //- k-menu-popup(ref="nodeRateAnswerMenu" :noName="true" :actions="nodeActions" @action="nodeAction")
-  q-dialog(ref="nodeActionsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    div(@click.self="$refs.fragmentActionDialog.hide()").column.fit.justify-end
-      div(:style=`{paddingBottom: '80px'}`).row.full-width.justify-center
-        q-btn(
-          color="grey-1"
-          :style=`{height: '60px', width: 'calc(100% - 16px)', borderRadius: '10px'}` no-caps)
-          span.text-black Удалить
-      .row.full-width.justify-center
-      q-btn(
-        color="green"
-        :style=`{position: 'absolute', bottom: '8px', left: '8px', width: 'calc(100% - 16px)', height: '60px', borderRadius: '10px'}` no-caps) Редактировать
+  q-btn(round flat color="grey-9" icon="share")
   .col
   //- rate
   div(v-if="nodeFull && nodeFull.rateUser").q-mr-sm
@@ -88,24 +71,24 @@ export default {
     },
     async nodeAnswer () {
       this.$log('nodeAnswer')
-      this.$store.commit('node/state', ['answer', true])
+      this.$store.commit('node/stateSet', ['answer', true])
       this.nodeRate()
     },
     async nodeRate () {
       this.$log('nodeRate')
-      this.$store.commit('node/state', ['node', this.node])
-      this.$store.commit('node/state', ['nodeFull', this.nodeFull])
+      this.$store.commit('node/stateSet', ['node', this.node])
+      this.$store.commit('node/stateSet', ['nodeFull', this.nodeFull])
       // await this.$wait(300)
       this.$nextTick(() => {
-        this.$store.commit('ui/state', ['dialogOpened', true])
+        this.$store.commit('ui/stateSet', ['dialogOpened', true])
       })
     },
     async nodeBookmark () {
       this.$log('nodeBookmark')
-      this.$store.commit('workspace/state', ['bookmark', {url: this.node.oid}])
+      this.$store.commit('workspace/stateSet', ['bookmark', {url: this.node.oid}])
       // await this.$wait(300)
       this.$nextTick(() => {
-        this.$store.commit('workspace/state', ['bookmarkEditorDialogOpened', true])
+        this.$store.commit('workspace/stateSet', ['bookmarkEditorDialogOpened', true])
       })
     }
   }

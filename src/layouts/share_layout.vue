@@ -1,6 +1,6 @@
 <template lang="pug">
 .column.fit.items-center.justify-center
-  span {{ share }}
+  //- span {{ share }}
 </template>
 
 <script>
@@ -16,7 +16,7 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('$route CHANGED', to)
-        this.$set(this, 'share', to.params)
+        // this.$set(this, 'share', to.params)
       }
     }
   },

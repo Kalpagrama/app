@@ -116,7 +116,7 @@ export default {
         let res = await this.$store.dispatch('workspace/addWSDraft', {fragments})
         this.$log('res', res)
         // go to node_creator
-        this.$store.commit('workspace/state', ['draft', res])
+        this.$store.commit('workspace/stateSet', ['draft', res])
         this.$router.push('/app/create')
         this.$log('contentDraft done')
         this.contentDrafting = false

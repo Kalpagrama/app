@@ -79,7 +79,7 @@ export default {
     },
     async pageClick (path) {
       this.$log('pageClick', path)
-      this.$root.$emit('toggle_menu')
+      // this.$root.$emit('toggle_menu')
       await this.$wait(200)
       this.$router.push(path)
     }

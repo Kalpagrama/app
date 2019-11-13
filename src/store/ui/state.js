@@ -21,13 +21,6 @@ export default {
     {id: '/app/account', name: 'account', icon: 'account_circle', hidden: false, desktop: true, mobile: true},
     {id: '/app/menu', icon: 'menu', name: 'menu', hidden: false, desktop: true, mobile: true}
   ],
-  nodeTemplates: [
-    {id: 'node-template-pip', name: 'Picture in picture'},
-    {id: 'node-template-horiz', name: 'Horizontal'},
-    {id: 'node-template-vert', name: 'Vertical'},
-    // {id: 'node-template-slider', name: 'Slider'},
-    {id: 'node-template-cards', name: 'Cards'}
-  ],
   dialogOpened: false,
   fragmentDialogOpened: false,
   bookmarkDialogOpened: false,

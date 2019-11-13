@@ -1,6 +1,7 @@
 <template lang="pug">
 .row.full-width.justify-center.items-center
-  <svg class="" width="100%" height="100%" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  div(:style=`{width: width+'px', height: height+'px'}`).row.justify-center.items-center
+    <svg class="" width="100%" height="100%" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M199.86 378.257C298.386 378.257 378.257 298.386 378.257 199.86C378.257 101.334 298.386 21.4629 199.86 21.4629C101.334 21.4629 21.4629 101.334 21.4629 199.86C21.4629 298.386 101.334 378.257 199.86 378.257Z" fill="url(#paint0_radial)"/>
     <path d="M291.021 44.7491L111.553 354.446M110.126 44.7491L289.237 353.376M21.4629 200.885H380.338M372.195 156.761H26.3409M375.042 165.366L256.314 369.756M374.697 235.61L249.633 27.2662L75.6336 327.805M372.195 245.008H26.3409M320.487 68.3604H79.5117M325.101 74.1467L152.089 372.683M145.919 29.7565L25.3775 238.537M151.568 28.7809L325.086 327.317M75.4529 73.1711L248.597 371.708M24.7579 162.439L145.063 369.756M80.4873 333.102H319.512M200.395 24.3906L354.887 289.132H47.3305L200.395 24.3906ZM354.233 112.535L47.0329 112.535L200.448 377.276L354.233 112.535Z" stroke="white" stroke-opacity="0.3"/>
     <path d="M199.582 235.261C219.287 235.261 235.261 219.287 235.261 199.582C235.261 179.877 219.287 163.902 199.582 163.902C179.877 163.902 163.902 179.877 163.902 199.582C163.902 219.287 179.877 235.261 199.582 235.261Z" fill="url(#paint1_radial)"/>
@@ -35,6 +36,25 @@
     </defs>
     </svg>
 </template>
+<script>
+export default {
+  name: 'kSpinner',
+  props: {
+    width: {
+      type: Number,
+      default () {
+        return 60
+      }
+    },
+    height: {
+      type: Number,
+      default () {
+        return 60
+      }
+    }
+  }
+}
+</script>
 <style lang="stylus">
 .logo:hover .diamondOrCh {
   animation-name: diamondOriginChanged;

@@ -1,10 +1,8 @@
 <template lang="pug">
-q-layout.bg-grey-3
+q-layout(containter :style=`{width: width+'px'}` @scroll="onScroll")
   //- drawer
   q-drawer(ref="kDrawer" side="left" :width="240").lt-sm
-    div(@click.self="$refs.kDrawer.toggle()").row.fit.items-start.content-start
-      div(:style=`{height: 'calc(var(--vh, 1vh) * 100)', borderRadius: '0 10px 10px 0', overflow: 'hidden'}`).column.full-width.bg-white
-        categories
+    categories(:style=`{borderRadius: '0 10px 10px 0', overflow: 'hidden'}`)
   q-page-container.bg-grey-3
     .row.full-width.justify-center
       div(style=`width: 200px`).row.gt-xs
@@ -12,7 +10,8 @@ q-layout.bg-grey-3
       div(style=`maxWidth: 600px`).row.full-width.justify-center
         node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variables")
           template(v-slot:items=`{items, fetchingMore}`)
-            node-feed(:nodes="items" :fetchingMore="fetchingMore")
+            node-feed(ref="nodeFeed" name="Чего горячего есть?" :nodes="items" :fetchingMore="fetchingMore")
+              q-btn(round flat icon="menu" color="black" @click="$refs.kDrawer.toggle()")
       div(style=`width: 250px;`).row.gt-xs
         pageSubscriptions(
           style=`position: fixed; overflow: hidden; maxWidth: 250px; border-radius: 10px`)
@@ -39,6 +38,9 @@ export default {
         if (to.params.category) {
           this.category = to.params.category
         } else {
+          this.$nextTick(() => {
+            this.$refs.kDrawer.toggle()
+          })
           this.$router.push({params: {category: this.categories[Object.keys(this.categories)[0]].type}})
         }
       }
@@ -93,6 +95,15 @@ export default {
     }
   },
   methods: {
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      if (e.directionChanged) {
+        let b = true
+        if (e.direction === 'down') b = true
+        else b = false
+        if (this.$refs.nodeFeed) this.$refs.nodeFeed.scrollDirectionChanged(b)
+      }
+    },
     async categoryClick (c, ci) {
       this.$log('categoryClick', c, ci)
       this.$refs.kDrawer.hide()
@@ -102,12 +113,15 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$root.$on('page', () => {
-      if (this.$refs.kDrawer) this.$refs.kDrawer.toggle()
-    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
   }
 }
 </script>
+
+<style lang="stylus">
+.q-drawer {
+  background: none !important
+}
+</style>

@@ -2,7 +2,7 @@
 .row.full-width
   component(
     :is="$store.state.node.layouts[node.meta.layout].component"
-    :index="index" :zIndex="zIndex" @action="nodeAction($event)"
+    :index="index" :zIndex="zIndex" @action="nodeAction($event)" :widthWrapper="width" :muted="muted"
     :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
     :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
   k-dialog-bottom(ref="nodeActionDialog" mode="actions" :options="nodeActionOptions" @action="action")
@@ -30,11 +30,14 @@ export default {
     noActions: {type: Boolean},
     noTimestamp: {type: Boolean},
     noName: {type: Boolean},
-    noSpheres: {type: Boolean}
+    noSpheres: {type: Boolean},
+    width: {type: Number},
+    muted: {type: Boolean}
   },
   data () {
     return {
-      nodeFull: null
+      nodeFull: null,
+      actionFragment: null
     }
   },
   computed: {
@@ -76,6 +79,7 @@ export default {
   methods: {
     nodeAction ([action, payload]) {
       this.$log('nodeAction', action, payload)
+      this.actionFragment = payload
       this.$refs.nodeActionDialog.show()
     },
     action (e) {
@@ -83,6 +87,11 @@ export default {
       switch (e) {
         case 'subscribe': {
           this.$log('SUBSCRIBE')
+          break
+        }
+        case 'contentExplore': {
+          this.$log('CONTENT EXPLORE')
+          this.$router.push(`/app/content/${this.actionFragment.content.oid}`)
           break
         }
         case 'confirm': {

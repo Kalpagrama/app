@@ -3,23 +3,20 @@
   .col.scroll
     node-loader(ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
       template(v-slot:items=`{items, fetchingMore}`)
-        node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
+        node-list(:nodes="items")
 </template>
 
 <script>
 export default {
   name: 'nodeExplorer__nodes',
   props: {
-    node: {
-      type: Object,
-      required: true
-    }
+    node: {type: Object, required: true}
   },
   components: {},
   data () {
     return {
       query: gql`
-        query feed2 ($oid: OID!, $pageToken: RawJSON) {
+        query nodeNodesFeed ($oid: OID!, $pageToken: RawJSON) {
           nodeNodes(nodeOid: $oid, pagination: {pageSize: 100, pageToken: $pageToken}, sortStrategy: HOT) {
             count
             totalCount
@@ -33,7 +30,7 @@ export default {
               meta {
                 ...on MetaNode {
                   layout
-                  fragments { uid width height color }
+                  fragments { uid width height color thumbUrl(preferWidth: 600) }
                 }
               }
             }

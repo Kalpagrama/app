@@ -8,13 +8,13 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
       div(v-else-if="mode === 'actions'").row.full-width.q-pa-sm
         div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-md
           div(
-            v-for="(a, akey, ai) in options.actions" :key="akey" @click="$emit('action', akey), $refs.kDialogBottom.hide()"
+            v-for="(a, akey, ai) in options.actions" :key="akey" @click="actionClick(a, akey, ai)"
             :style=`{height: '50px', borderTop: ai > 0 ? '1px solid #eee' : 'none'}`
             ).row.full-width.items-center.justify-center.cursor-pointer
             span(:style=`{color: a.color ? a.color : 'black'}`) {{ a.name }}
         q-btn(
           v-if="options.confirm"
-          push no-caps color="green" @click="$emit('action', 'confirm'), $refs.kDialogBottom.hide()"
+          push no-caps color="green" @click="confirmClick()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width
           span.text-bold {{ options.confirmName }}
 </template>
@@ -56,6 +56,15 @@ export default {
     }
   },
   methods: {
+    actionClick (a, akey, ai) {
+      this.$log('actionClick')
+      this.$emit('action', akey)
+      this.$refs.kDialogBottom.hide()
+    },
+    confirmClick () {
+      this.$emit('action', 'confirm')
+      this.$refs.kDialogBottom.hide()
+    },
     swiped (e) {
       this.$log('swiped', e)
       if (e.direction === 'down') {

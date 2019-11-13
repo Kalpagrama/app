@@ -136,8 +136,19 @@ const objectShortFragment = gql`
     thumbUrl(preferWidth: 600)
   }
 `
+const nodeFragment = gql`
+  fragment nodeFragment on Node {
+    type
+    oid
+    name
+    thumbUrl(preferWidth: 600)
+    author{
+      name
+    }
+  }
+`
 
-export {
+const fragments = {
   eventFragment,
   contentFragment,
   WSContentFragment,
@@ -146,5 +157,10 @@ export {
   WSBookmarkFragment,
   WSTagFragment,
   userFragment,
-  objectShortFragment
+  objectShortFragment,
+  nodeFragment
+}
+
+export {
+  fragments
 }
