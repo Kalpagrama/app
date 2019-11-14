@@ -10,6 +10,7 @@ const contentFragment = gql`
       duration
       width
       height
+      frameUrls
     }
     ... on Image {
       url
@@ -49,9 +50,9 @@ const WSFragmentFragment = gql`
   }
   ${contentFragment}
 `
-const WSDraftFragment = gql`
+const WSNodeFragment = gql`
   ${WSFragmentFragment}
-  fragment WSDraftFragment on WSDraft {
+  fragment WSNodeFragment on WSNode {
     uid
     name
     tagUids
@@ -75,8 +76,8 @@ const WSBookmarkFragment = gql`
     updatedAt
   }
 `
-const WSTagFragment = gql`
-  fragment WSTagFragment on WSTag {
+const WSSphereFragment = gql`
+  fragment WSSphereFragment on WSSphere {
     uid
     name
     color
@@ -142,23 +143,71 @@ const nodeFragment = gql`
     oid
     name
     thumbUrl(preferWidth: 600)
-    author{
+    rate
+    rateUser
+    viewCnt
+    author {
+      oid
+      type
       name
+      thumbUrl(preferWidth: 50)
+    }
+    spheres {
+      oid
+      name
+    }
+    categories
+    fragments {
+      uid
+      name
+      url
+      content {
+        oid
+        type
+        name
+        thumbUrl(preferWidth: 600)
+        ...on Video {
+          url
+          urlType
+          width
+          height
+          duration
+        }
+        ...on Image {
+          url
+        }
+      }
+      relativePoints { x y z }
+      relativeScale
+    }
+    meta {
+      ...on MetaNode {
+        layout
+        fragments { uid width height color thumbUrl(preferWidth: 600) }
+      }
     }
   }
 `
-
+const sphereFragment = gql`
+  fragment sphereFragment on Object {
+    oid
+    type
+    name
+    thumbUrl(preferWidth: 600)
+  }
+`
 const fragments = {
   eventFragment,
   contentFragment,
   WSContentFragment,
   WSFragmentFragment,
-  WSDraftFragment,
+  WSNodeFragment,
   WSBookmarkFragment,
-  WSTagFragment,
+  WSSphereFragment,
   userFragment,
   objectShortFragment,
-  nodeFragment
+  nodeFragment,
+  sphereFragment
 }
 
 export {

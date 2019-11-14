@@ -4,8 +4,8 @@ export default {
     bookmarks: [],
     contents: [],
     fragments: [],
-    drafts: [],
-    tags: []
+    nodes: [],
+    spheres: []
   },
   version: 0,
   synced: false,
@@ -38,7 +38,7 @@ export default {
     WSBookmark: {name: 'Закладка'},
     WSContent: {name: 'Контент'},
     WSFragment: {name: 'Фрагмент'},
-    WSDraft: {name: 'Черновик'},
-    WSTag: {name: 'Тэг'}
+    WSNode: {name: 'Черновик'},
+    WSSphere: {name: 'Сфера'}
   }
 }

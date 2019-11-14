@@ -346,22 +346,23 @@ export default {
     },
     async framesLoad (oid) {
       this.$log('framesLoad start')
-      let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
-        query: gql`
-          query getVideoFramesOld ($oid: OID!) {
-            objectList(oids: [$oid]) {
-              ... on Video {
-                frameUrls
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
+      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
+      // let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
+      //   query: gql`
+      //     query getVideoFramesOld ($oid: OID!) {
+      //       objectList(oids: [$oid]) {
+      //         ... on Video {
+      //           frameUrls
+      //         }
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   }
+      // })
       this.$log('framesLoad done')
-      return frameUrls
+      return content.frameUrls
     }
   },
   async mounted () {

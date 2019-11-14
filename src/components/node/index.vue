@@ -51,6 +51,7 @@ export default {
         }
       }
     },
+    // нужны данные по полному ядру
     needFull: {
       immediate: true,
       async handler (to, from) {
@@ -60,7 +61,7 @@ export default {
           this.$emit('nodeFull', this.nodeFull)
         }
       }
-    }
+    },
   },
   methods: {
     nodeAction ([action, payload]) {
@@ -97,65 +98,75 @@ export default {
       this.$log('nodeFragment')
     },
     async nodeLoad (oid) {
-      // this.$log('nodeLoad start', this.index, this.node.name)
-      let { data: { objectList: [nodeFull] } } = await this.$apollo.query({
-        query: gql`
-          query getExtendedNodesProps($oid: OID!) {
-            objectList(oids: [$oid]) {
-              oid
-              type
-              name
-              createdAt
-              ...on Node {
-                rate
-                rateUser
-                viewCnt
-                author {
-                  oid
-                  type
-                  name
-                  thumbUrl(preferWidth: 50)
-                  __typename
-                }
-                spheres {
-                  oid
-                  name
-                }
-                categories
-                fragments {
-                  uid
-                  name
-                  url
-                  content {
-                    oid
-                    type
-                    name
-                    thumbUrl(preferWidth: 600)
-                    ...on Video {
-                      url
-                      urlType
-                      width
-                      height
-                      duration
-                    }
-                    ...on Image {
-                      url
-                    }
-                  }
-                  relativePoints { x y z }
-                  relativeScale
-                }
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        },
-        fetchPolicy: 'cache-first'
-      })
-      // this.$log('nodeLoad done', this.index, this.node.name)
-      return nodeFull
+      this.$log('nodeLoad start', this.index, this.node.oid)
+      let node = null
+      try {
+        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
+      } catch (err){
+        // this.$log('nodeLoad error', err, this.index, this.node.oid)
+        this.$store.dispatch('log/error', ['node', 'nodeLoad error', err])
+        node = null
+      }
+      this.$log('nodeLoad end', this.index, this.node.oid)
+      return node
+      // let { data: { objectList: [nodeFull] } } = await this.$apollo.query({
+      //   query: gql`
+      //     query getExtendedNodesProps($oid: OID!) {
+      //       objectList(oids: [$oid]) {
+      //         oid
+      //         type
+      //         name
+      //         createdAt
+      //         ...on Node {
+      //           rate
+      //           rateUser
+      //           viewCnt
+      //           author {
+      //             oid
+      //             type
+      //             name
+      //             thumbUrl(preferWidth: 50)
+      //             __typename
+      //           }
+      //           spheres {
+      //             oid
+      //             name
+      //           }
+      //           categories
+      //           fragments {
+      //             uid
+      //             name
+      //             url
+      //             content {
+      //               oid
+      //               type
+      //               name
+      //               thumbUrl(preferWidth: 600)
+      //               ...on Video {
+      //                 url
+      //                 urlType
+      //                 width
+      //                 height
+      //                 duration
+      //               }
+      //               ...on Image {
+      //                 url
+      //               }
+      //             }
+      //             relativePoints { x y z }
+      //             relativeScale
+      //           }
+      //         }
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   },
+      //   fetchPolicy: 'cache-first'
+      // })
+      // // this.$log('nodeLoad done', this.index, this.node.name)
+      // return nodeFull
     }
   }
 }
