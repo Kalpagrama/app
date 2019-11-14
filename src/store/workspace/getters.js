@@ -1,8 +1,4 @@
 
-export const initialized = (state, getters) => {
-  return state.initialized
-}
-
 export const WSItems = (state, getters) => {
   return [
     ...state.workspace.bookmarks,
