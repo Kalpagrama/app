@@ -1,8 +1,8 @@
 {
-  "name": "kalpa",
+  "name": "kalpagramma",
   "version": "0.0.92",
-  "description": "kalpa",
-  "productName": "kalpa",
+  "description": "Kalpagramma",
+  "productName": "Kalpagramma",
   "cordovaId": "com.kalpagramma.app",
   "author": "Ivan Motovilov <ivanmoto@pm.me>",
   "private": true,

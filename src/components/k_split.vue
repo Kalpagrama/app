@@ -1,12 +1,12 @@
 <template lang="pug">
-div(:style=`{height: $q.screen.height+'px'}`).column
+div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column
   //- header
   div(
     :class="headerClass"
-    :style=`{overflow: 'hidden'}`).row.full-width
+    :style=`{position: 'relative', overflow: 'hidden'}`).row.full-width
     slot(name="header")
   //- body
-  div(:class="bodyClass").col.full-width.scroll
+  div(ref="kSplitBody" :class="bodyClass" :style=`{position: 'relative'}` @scroll="onScroll").col.full-width.scroll
     slot(name="body")
 </template>
 
@@ -16,6 +16,16 @@ export default {
   props: ['width', 'height', 'headerMaxHeight', 'bodyClass', 'headerClass'],
   data () {
     return {
+    }
+  },
+  methods: {
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      this.$emit('scrollTop', e.target.scrollTop)
+    },
+    scrollTo (px) {
+      // this.$refs.kSplitBody.scrollTop = px
+      this.$tween.to(this.$refs.kSplitBody, 0.3, {scrollTop: px})
     }
   }
 }

@@ -3,7 +3,8 @@ import assert from 'assert'
 import { apolloProvider } from 'boot/apollo'
 
 export const init = async (context) => {
-  if (context.getters.initialized) throw new Error('events state initialized already')
+  // if (context.getters.initialized) throw new Error('events state initialized already')
+  if (context.getters.initialized) return
   context.commit('init')
   return true
 }

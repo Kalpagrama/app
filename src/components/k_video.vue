@@ -4,8 +4,8 @@ div(:style=`{position: 'relative'}`).row
     ref="kVideo"
     v-bind="$attrs" crossorigin="Anonymous"
     :style=`{height: '100%', width: '100%', objectFit: 'contain'}`
-    :muted="true"
-    @click="click"
+    :autoplay="true" :muted="true"
+    @click="videoClick()"
     @seeked="seekEnded"
     @play="handlePlay"
     @timeupdate="now = $refs.kVideo.currentTime, $emit('now', now)"
@@ -18,15 +18,15 @@ div(:style=`{position: 'relative'}`).row
   //- forwards
   //- div(:style=`{position: 'absolute', zIndex: 10, width: '50%', height: '100%', left: '0px'}` @click="$refs.kVideo.currentTime -= 10")
   //- div(:style=`{position: 'absolute', zIndex: 10, width: '50%', height: '100%', right: '0px'}` @click="$refs.kVideo.currentTime += 10")
-  div(:style=`{position: 'absolute', top: '0px', height: '48px'}`).row.full-width.items-center.q-px-sm.justify-end
+  div(v-if="toolsShow" :style=`{position: 'absolute', top: '0px', height: '48px'}`).row.full-width.items-center.q-px-sm.justify-end
     slot(name="default")
   //- tools
-  div(v-show="tools" :style=`{position: 'absolute', bottom: '10px', zIndex: 1000, height: '66px'}`).row.full-width
+  div(v-show="toolsShow" :style=`{position: 'absolute', bottom: '10px', zIndex: 1000, height: '66px'}`).row.full-width
     //- actions
     div(v-if="actions" :style=`{height: '48px', paddingLeft: '10px', paddingRight: '20px'}`).row.full-width
       //- play/pause button
       div(:style=`{height: '48px', width: '48px'}`).row.items-center.justify-center
-        q-btn(round flat color="white" :icon="playStarted ? 'pause' : 'play_arrow'" @click="click()")
+        q-btn(round flat color="white" :icon="playStarted ? 'pause' : 'play_arrow'" @click="videoPlayPause()")
       .col.full-height
         .row.fit.items-center.q-px-sm
           small(style=`user-select: none; background: rgba(0,0,0,0.4); borderRadius: 4px; overflow: hidden`).text-white.q-pa-xs {{ $time(now) }}/{{ $time(duration) }}
@@ -92,12 +92,33 @@ export default {
       seek: false,
       seeking: false,
       seekCount: 0,
-      seekInterval: null
+      seekInterval: null,
+      toolsShowLocal: false
+    }
+  },
+  computed: {
+    toolsShow () {
+      if (this.tools) {
+        return this.toolsShowLocal
+      } else {
+        return false
+      }
     }
   },
   methods: {
-    click () {
-      this.$log('click')
+    videoClick () {
+      this.$log('videoClick')
+      if (this.toolsShowLocal) {
+        this.toolsShowLocal = false
+      } else {
+        this.toolsShowLocal = true
+        setTimeout(() => {
+          if (!this.playStarted) this.toolsShowLocal = false
+        }, 3000)
+      }
+    },
+    videoPlayPause () {
+      this.$log('videoPlayPause')
       if (this.playStarted) this.pause()
       else this.play()
     },

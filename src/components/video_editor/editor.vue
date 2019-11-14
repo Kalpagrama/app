@@ -271,14 +271,19 @@ export default {
       })
       this.$log('framesLoad done')
       return frameUrls
+    },
+    handleResize (e) {
+      this.$log('handleResize', e)
     }
   },
   async mounted () {
     this.$log('mounted')
     this.$set(this, 'frames', await this.framesLoad(this.fragment.content.oid))
+    window.addEventListener('resize', this.handleResize)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    window.removeEventListener('resize', this.handleResize)
   }
 }
 </script>

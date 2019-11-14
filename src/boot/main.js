@@ -96,9 +96,14 @@ export default async ({ Vue, store, router }) => {
   Vue.component('nodeLoader', () => import('components/node_loader'))
   Vue.component('nodeFeed', () => import(`components/node_feed`))
   Vue.component('nodeList', () => import(`components/node_list`))
+  Vue.component('nodeCreator', () => import(`components/node_creator`))
+  Vue.component('nodeRate', () => import(`components/node_rate`))
   Vue.component('kDialogBottom', () => import(`components/k_dialog_bottom`))
   Vue.component('kSplit', () => import(`components/k_split`))
   Vue.component('kVideo', () => import('components/k_video'))
+  Vue.component('kInvite', () => import(`components/k_invite`))
+  Vue.component('videoEditor', () => import(`components/video_editor`))
+  Vue.component('wsBookmark', () => import(`components/workspace/ws_bookmark`))
 }
 
 export { time }

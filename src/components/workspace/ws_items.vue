@@ -1,22 +1,47 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-sm.q-pt-sm
-  k-dialog-bottom(ref="itemDialog" mode="actions" :options="itemDialogOptions" @action="itemAction")
+  k-dialog-bottom(ref="itemDialog" mode="actions" :options="itemDialogOptions" @action="itemAction" @hide="item = null")
   div(
     v-for="(i, ii) in items" :key="ii" @click="itemClick(i, ii)"
-    :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
-    ).row.full-width.items-center.bg-grey-2.q-mb-sm
-    img(
-      :src="i.thumbUrl"
-      :style=`{height: '60px', borderRadius: '10px', oveflow: 'hidden', width: '100px', objectFit: 'contain'}`).bg-black
-    .col.full-height
-      .row.fit.items-center.q-px-sm
-        span {{ i.name || i.uid | cut(40) }}
+    :style=`{borderRadius: '10px', overflow: 'hidden'}`
+    ).row.full-width.q-mb-sm
+    //- bookmarks
+    div(
+      v-if="page === 'bookmarks'"
+      :style=`{height: '60px'}`).row.full-width.items-center.bg-white
+      img(
+        :src="i.thumbUrl"
+        :style=`{height: '60px', borderRadius: '10px', oveflow: 'hidden', width: '100px', objectFit: 'contain'}`).bg-black
+      .col.full-height
+        .row.fit.q-px-sm
+          span {{ i.name }}
+    //- contents
+    div(
+      v-else-if="page === 'contents'").row.fit
+      span {{ i.name }}
+    //- fragments
+    div(
+      v-else-if="page === 'fragments'").row.fit
+      img(
+        :src="i.thumbUrl"
+        :style=`{height: '60px', borderRadius: '10px', oveflow: 'hidden', width: '100px', objectFit: 'contain'}`).bg-black
+      .col.full-height
+        .row.fit.items-center.q-px-sm
+          span {{ i.name || i.uid | cut(40) }}
+    //- nodes
+    div(
+      v-else-if="page === 'drafts'").row.fit.items-center.bg-white
+    //- spheres
+    div(
+      v-else-if="page === 'tags'"
+      :style=`{height: '40px'}`).row.full-width.items-center.q-px-md.bg-white
+      span {{ `#${i.name}` }}
 </template>
 
 <script>
 export default {
   name: 'wsItems',
-  props: ['search', 'type'],
+  props: ['page'],
   data () {
     return {
       // search: '',
@@ -31,6 +56,8 @@ export default {
   computed: {
     itemDialogOptions () {
       return {
+        header: this.item,
+        headerName: this.item ? this.item.name : '',
         confirm: true,
         confirmName: 'Edit',
         actions: {
@@ -40,7 +67,7 @@ export default {
     },
     WSItems () {
       // return this.$store.getters['workspace/WSItems']
-      return this.$store.state.workspace.workspace.fragments
+      return this.$store.state.workspace.workspace[this.page]
     },
     items () {
       // if (this.search.length === 0) return this.tags
@@ -50,10 +77,11 @@ export default {
       //     return t.name.match(pattern)
       //   })
       // }
-      return this.WSItems.filter(t => {
-        let pattern = new RegExp(this.search, 'g')
-        return t.name.match(pattern)
-      })
+      // return this.WSItems.filter(t => {
+      //   let pattern = new RegExp(this.search, 'g')
+      //   return t.name.match(pattern)
+      // })
+      return this.WSItems
     },
     types () {
       return this.$store.state.workspace.types
@@ -75,6 +103,7 @@ export default {
     },
     itemClick (i, ii) {
       this.$log('itemClick', i)
+      this.item = i
       this.$refs.itemDialog.show()
     }
   }

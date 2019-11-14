@@ -25,7 +25,8 @@ export default {
   methods: {
     nodeClick (n, ni) {
       this.$log('nodeClick', n, ni)
-      this.$router.push(`/app/node/${n.oid}`)
+      this.$emit('nodeClick', n)
+      // this.$router.push(`/app/node/${n.oid}`)
     }
   },
   mounted () {

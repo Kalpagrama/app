@@ -1,15 +1,24 @@
 <template lang="pug">
 q-layout(view='hHh Lpr fFf')
-  q-dialog(ref="nodeCreatorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+  //- node action dialog
+  k-dialog-bottom(:value="$store.state.ui.fragmentDialogOpened" mode="actions" :options="fragmentDialogOptions"
+    @action="fragmentDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])")
+  //- node rate dialog
+  q-dialog(ref="nodeRateDialog" :value="$store.state.ui.nodeRateDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
+    @hide="$store.commit('ui/stateSet', ['nodeRateDialogOpened', false])")
+    node-rate(@hide="$refs.nodeRateDialog.hide()")
+  //- node creator dialog
+  q-dialog(ref="nodeCreatorDialog" :value="$store.state.ui.nodeCreatorDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
+    @hide="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', false])")
     node-creator(@hide="$refs.nodeCreatorDialog.hide()")
-  q-dialog(ref="bookmarkDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    ws-bookmark-editor
+  //- bookmark dialog
   q-dialog(
-    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened" @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])"
+    ref="bookmarkDialog" :value="$store.state.ui.bookmarkDialogOpened"
+    @hide="$store.commit('ui/stateSet', ['bookmarkDialogOpened', false])"
     :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    ws-fragment-editor
-  q-dialog(ref="nodeRateDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    node-rate
+    ws-bookmark(@hide="$refs.bookmarkDialog.hide()")
+  //- fragment dialog
+  //- content, node
   q-drawer(
     side="left" v-model="drawer" show-if-above
     :mini="!drawer || miniState" bordered content-class="bg-grey-3" :width="250" no-swipe-open).gt-sm
@@ -30,7 +39,6 @@ q-layout(view='hHh Lpr fFf')
 
 <script>
 import kMenuVert from 'components/k_menu_vert'
-// import kMenuHoriz from 'components/k_menu_horiz'
 import nodeCreator from 'components/node_creator'
 
 export default {
@@ -62,7 +70,53 @@ export default {
   //     }
   //   }
   // },
+  computed: {
+    fragmentDialogHeaderName () {
+      let fragmentPayload = this.$store.state.ui.fragmentDialogPayload
+      if (fragmentPayload) {
+        return fragmentPayload.content.name
+      } else {
+        return ''
+      }
+    },
+    fragmentDialogOptions () {
+      return {
+        header: true,
+        headerName: this.fragmentDialogHeaderName,
+        confirm: true,
+        confirmName: 'Создать ядро',
+        actions: {
+          subscribe: {name: 'Follow'},
+          contentExplore: {name: 'Explore content'},
+          saveToWorkspace: {name: 'Save to workspace'}
+        }
+      }
+    }
+  },
   methods: {
+    fragmentDialogAction (action) {
+      this.$log('fragmentDialogAction', action)
+      this.$log('fragmentDialogPayload', this.$store.state.ui.fragmentDialogPayload)
+      switch (action) {
+        case 'header': {
+          this.$router.push(`/app/content/${this.$store.state.ui.fragmentDialogPayload.content.oid}`)
+          break
+        }
+        case 'subscribe': {
+          break
+        }
+        case 'contentExplore': {
+          this.$router.push(`/app/content/${this.$store.state.ui.fragmentDialogPayload.content.oid}`)
+          break
+        }
+        case 'saveToWorkspace': {
+          break
+        }
+        case 'confrim': {
+          break
+        }
+      }
+    },
     toggleMini (miniState) {
       this.miniState = !this.miniState
     },

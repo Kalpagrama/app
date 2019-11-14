@@ -3,7 +3,8 @@ import { fragments } from 'schema/index'
 import assert from 'assert'
 
 export const init = async (context) => {
-  if (context.getters.initialized) throw new Error('subscriptions state initialized already')
+  // if (context.getters.initialized) throw new Error('subscriptions state initialized already')
+  if (context.getters.initialized) return
   context.dispatch('log/debug', ['objects', 'init'], { root: true })
   context.commit('init')
 }

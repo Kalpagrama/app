@@ -1,17 +1,22 @@
 <template lang="pug">
-q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="$emit('hide')")
   div(
     @click.self="$refs.kDialogBottom.hide()" v-touch-swipe.mouse="swiped"
     :class="getClass")
     div(:style=`{maxWidth: $q.screen.gt.xs ? '330px' : '100%', maxHeight: $q.screen.gt.xs ? 500+'px' : '100%'}`).row.full-width
       slot(v-if="mode === 'custom'" name="default")
       div(v-else-if="mode === 'actions'").row.full-width.q-pa-sm
+        //- header
+        div(v-if="options.header" :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="headerClick()").row.full-width.justify-center.items-center.q-mb-md.bg-white
+          span.text-bold.text-center {{ options.headerName | cut(50) }}
+        //- actions
         div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-md
           div(
             v-for="(a, akey, ai) in options.actions" :key="akey" @click="actionClick(a, akey, ai)"
             :style=`{height: '50px', borderTop: ai > 0 ? '1px solid #eee' : 'none'}`
             ).row.full-width.items-center.justify-center.cursor-pointer
             span(:style=`{color: a.color ? a.color : 'black'}`) {{ a.name }}
+        //- confirm
         q-btn(
           v-if="options.confirm"
           push no-caps color="green" @click="confirmClick()"
@@ -23,6 +28,7 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
 export default {
   name: 'kDialogBottom',
   props: {
+    value: {type: Boolean},
     mode: {
       type: String,
       default () {
@@ -55,7 +61,24 @@ export default {
       }
     }
   },
+  watch: {
+    value: {
+      handler (to, from) {
+        this.$log('value CHNAGED', to)
+        if (to) {
+          this.show()
+        } else {
+          this.hide()
+        }
+      }
+    }
+  },
   methods: {
+    headerClick () {
+      this.$log('headerClick')
+      this.$emit('action', 'header')
+      this.$refs.kDialogBottom.hide()
+    },
     actionClick (a, akey, ai) {
       this.$log('actionClick')
       this.$emit('action', akey)

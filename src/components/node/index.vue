@@ -1,11 +1,9 @@
 <template lang="pug">
-.row.full-width
-  component(
-    :is="$store.state.node.layouts[node.meta.layout].component"
-    :index="index" :zIndex="zIndex" @action="nodeAction($event)" :widthWrapper="width" :muted="muted"
-    :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
-    :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
-  k-dialog-bottom(ref="nodeActionDialog" mode="actions" :options="nodeActionOptions" @action="action")
+component(
+  :is="$store.state.node.layouts[node.meta.layout].component"
+  :index="index" :zIndex="zIndex" @action="nodeAction($event)" :widthWrapper="width" :muted="muted"
+  :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
+  :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
 </template>
 
 <script>
@@ -41,18 +39,6 @@ export default {
     }
   },
   computed: {
-    nodeActionOptions () {
-      return {
-        header: false,
-        confirm: true,
-        confirmName: 'Создать ядро',
-        actions: {
-          subscribe: {name: 'Follow'},
-          contentExplore: {name: 'Explore content'},
-          saveToWorkspace: {name: 'Save to workspace'}
-        }
-      }
-    }
   },
   watch: {
     nodeFullReady: {
