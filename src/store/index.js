@@ -10,6 +10,7 @@ import events from './events'
 import log from './log'
 import subscriptions from './subscriptions'
 import objects from './objects'
+import user from './user'
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 
@@ -18,7 +19,7 @@ Vue.use(Vuex)
 async function init (context) {
   await context.dispatch('log/init')
 
-  let { data: { user, categories, userWorkspace, userEvents, userSubscriptions } } = await apolloProvider.clients.apiApollo.query({
+  let { data: { user, categories, userWorkspace, userEvents, userSubscriptions, userSettings } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       ${fragments.objectShortFragment} ${fragments.eventFragment} ${fragments.userFragment} ${fragments.WSContentFragment} ${fragments.WSFragmentFragment} ${fragments.WSBookmarkFragment} ${fragments.WSSphereFragment} ${fragments.WSNodeFragment}
       query initializationQuery {
@@ -42,15 +43,20 @@ async function init (context) {
         }
         userEvents{...eventFragment}
         userSubscriptions{...objectShortFragment}
+        userSettings{
+          elements
+        }
       }`
   })
   // context.dispatch('log/debug', `initializationQuery complete. result= ${{ user, categories, userWorkspace, userEvents }}`, { root: true })
+  // todo убрать юзера из auth
   await context.dispatch('auth/init', user)
   await context.dispatch('node/init', categories)
   await context.dispatch('workspace/init', userWorkspace)
   await context.dispatch('events/init', userEvents)
   await context.dispatch('subscriptions/init', userSubscriptions)
   await context.dispatch('objects/init')
+  await context.dispatch('user/init', userSettings, user)
 }
 
 export default function (/* { ssrContext } */) {
@@ -64,7 +70,8 @@ export default function (/* { ssrContext } */) {
       events,
       log,
       subscriptions,
-      objects
+      objects,
+      user
     },
     strict: process.env.DEV,
     actions: {

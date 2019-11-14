@@ -4,8 +4,8 @@ import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 
 export const init = async (context, userWorkspace) => {
-  // if (context.getters.initialized) throw new Error('events state initialized already')
-  if (context.getters.initialized) return
+  // if (context.state.initialized) throw new Error('events state initialized already')
+  if (context.state.initialized) return
   debug('userWorkspace init. userWorkspace=', userWorkspace)
   context.commit('init', userWorkspace)
   return userWorkspace

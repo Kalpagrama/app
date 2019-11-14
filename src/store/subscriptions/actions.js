@@ -1,8 +1,8 @@
 import { apolloProvider } from 'boot/apollo'
 
 export const init = async (context, userSubscriptions) => {
-  // if (context.getters.initialized) throw new Error('subscriptions state initialized already')
-  if (context.getters.initialized) return
+  // if (context.state.initialized) throw new Error('subscriptions state initialized already')
+  if (context.state.initialized) return
   context.dispatch('log/debug', ['subscriptions', 'init', userSubscriptions], { root: true })
   context.commit('init', userSubscriptions)
   return userSubscriptions

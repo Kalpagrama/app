@@ -1,6 +1,4 @@
-export const initialized = (state, getters) => {
-  return state.initialized
-}
+
 export const queryInProgress = (state, getters) => {
   return state.queryInProgress
 }
