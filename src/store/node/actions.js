@@ -4,8 +4,8 @@ debug.enabled = true
 import { apolloProvider } from 'boot/apollo'
 
 export const init = async (context, categories) => {
-  // if (context.getters.initialized) throw new Error('events state initialized already')
-  if (context.getters.initialized) return
+  // if (context.state.initialized) throw new Error('events state initialized already')
+  if (context.state.initialized) return
   context.dispatch('log/debug', ['node', 'node store init. categories', categories], { root: true })
   context.commit('init', categories)
   return categories

@@ -1,8 +1,3 @@
-
-export const initialized = (state, getters) => {
-  return state.initialized
-}
-
 export const userSubscriptions = (state, getters) => {
   return state.userSubscriptions
 }
