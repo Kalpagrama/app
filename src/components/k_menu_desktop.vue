@@ -1,95 +1,93 @@
 <template lang="pug">
-.column.fit.bg-secondary
-  div(:style=`{height: '100px'}`).row.full-width
+div(:style=`{width: width+'px'}`).column.full-height.bg-secondary
+  //- kalpagramma
+  div(:style=`{height: '60px'}`).row.full-width
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      k-logo(:width="40" :height="40")
+    div(v-if="!mini").col.full-height
+      .row.fit.items-center.q-px-sm
+        span.text-bold.text-white Kalpagramma
+  //- user
+  div(:style=`{height: '60px'}`).row.full-width
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
+    div(v-if="!mini").col.full-height
+      .row.fit.items-center.q-px-sm
+        span.text-bold.text-white {{ $store.state.auth.user.name }}
+  div(:style=`{height: '60px'}`).row.full-width.items-center
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      q-btn(round icon="add" color="green")
+    div(v-if="!mini").col.full-height
+      .row.fit.items-center.q-px-sm
+        span.text-white Create node
+  //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start
-  //- q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '80px'}` @click="pageClick('/app/home')").row.full-width.items-center.q-px-sm.logo
-  //-   //- q-btn(round flat color="grey-6" :style=`{overflow: 'hidden'}`)
-  //-   //-   template(v-slot:default)
-  //-   //-     img(:src="`statics/logo.png`" style=`width: 40px; height: 40px`)
-  //-   q-item-section(avatar)
-  //-     q-btn(round flat color="primary")
-  //-       div(style=`width: 60px; height: 60px`)
-  //-         k-logo(:width="50" :height="50")
-  //-   q-item-section.col.q-px-sm
-  //-     span(style=`fontWeight: 700`).text-white Кальпаграмма
-  //- .col
-  //-   q-item(clickable v-ripple :to="`/app/user`" :style=`{height: '70px'}` @click="pageClick('/app/user')").row.full-width.items-center.q-px-sm
-  //-     q-item-section(avatar)
-  //-       img(@click="$router.push(`/app/user/${$store.state.auth.user.oid}`)"
-  //-         :src="$store.state.auth.user ? $store.state.auth.user.thumbUrl : ''" style=`width: 40px; height: 40px; borderRadius: 50%; overflow: hidden`)
-  //-     q-item-section.col.q-px-sm
-  //-       span(style=`fontWeight: 400;`).text-white {{ $store.state.auth.user ? $store.state.auth.user.name : ''}}
-  //-   q-item(clickable v-ripple v-for="(p, pp) in pages" :key="p.id" :to="p.path" @click="pageClick(p.path)"
-  //-     :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-  //-     q-item-section(avatar)
-  //-       q-btn(round flat color="primary")
-  //-         q-icon(:name="p.icon" color="white" style=`fontSize: 25px`)
-  //-     q-item-section.col.q-px-sm
-  //-       span(style=`fontWeight: 400`).text-white {{p.name}}
-  //-   q-item(clickable v-ripple @click="$refs.inviteDialog.show()"
-  //-     :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-  //-     q-item-section(avatar)
-  //-       q-btn(round flat color="primary")
-  //-         q-icon(name="person_add" color="white" style=`fontSize: 25px`)
-  //-     q-item-section.col.q-px-sm
-  //-       span(style=`fontWeight: 400`).text-white Пригласить друга
-  //-   q-item(clickable v-ripple :to="`/`" @click="$refs.logoutDialog.show()"
-  //-     :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-  //-     q-item-section(avatar)
-  //-       q-btn(round flat color="primary")
-  //-         q-icon(name="exit_to_app" color="white" style=`fontSize: 25px`)
-  //-     q-item-section.col.q-px-sm
-  //-       span(style=`fontWeight: 400`).text-white Выйти
+      div(v-for="(p, pi) in pages" :key="pi" @click="pageClick(p, pi)"
+        :style=`{height: '60px'}`
+        ).row.full-width
+        div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+          q-btn(round flat :icon="p.icon" color="white")
+        div(v-if="!mini").col.full-height
+          .row.fit.items-center.q-px-sm
+            span.text-white {{ p.name }}
+    .row.full-width.q-px-sm.q-my-sm
+      q-btn(color="green" no-caps :style=`{height: '50px', borderRadius: '10px'}`).full-width
+        span Invite friend
+  //- footer mini
+  div(:style=`{height: '60px'}`).row.full-width.items-center
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      q-btn(round flat :icon="mini ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" color="white" @click="mini = !mini")
 </template>
 
 <script>
 export default {
-  name: 'kMenuVert',
-  props: ['mini', 'loading'],
+  name: 'kMenuDesktop',
   data () {
     return {
+      width: 230,
+      mini: false,
       pages: [
-        {name: 'В тренде', icon: 'whatshot', path: '/app/hot'},
-        {name: 'Мастерская', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
-        {name: 'Создать ядро', icon: 'add', path: '/app/create'},
-        {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},
-        {name: 'Уведомления', icon: 'notifications', path: '/app/notifications'},
-        {name: 'Настройки', icon: 'settings', path: '/app/settings'}
+        {name: 'Explore', icon: 'explore', path: '/app/hot'},
+        {name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
+        // {name: 'Create node', icon: 'add', path: '/app/create'},
+        // {name: 'Invite friend', icon: 'menu', path: '/app/invite'},
+        {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
+        {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
+        {name: 'Settings', icon: 'settings', path: '/app/settings'},
+        {name: 'Logout', icon: 'exit_to_app', path: '/app/logout'}
       ]
     }
   },
-  methods: {
-    show () {
-      this.$refs.inviteDialog.show()
-      this.$refs.logoutDialog.show()
-    },
-    drawerClick (e) {
-      // if in "mini" state and user
-      // click on drawer, we switch it to "normal" mode
-      if (this.miniState) {
-        this.miniState = false
-        // notice we have registered an event with capture flag;
-        // we need to stop further propagation as this click is
-        // intended for switching drawer to "normal" mode only
-        e.stopPropagation()
+  watch: {
+    mini: {
+      handler (to, from) {
+        let w = 0
+        if (to) w = 60
+        else w = 230
+        this.$tween.to(this, 0.3, {width: w})
+        // this.$emit('width', w)
       }
     },
-    menuToggle () {
-      this.$log('menuToggle')
-    },
-    async pageClick (path) {
-      this.$log('pageClick', path)
-      // this.$root.$emit('toggle_menu')
-      await this.$wait(200)
-      this.$router.push(path)
+    width: {
+      handler (to, from) {
+        this.$emit('width', to)
+      }
     }
   },
-  mounted () {
-    // this.$log('mounted')
-  },
-  beforeDestroy () {
-    // this.$log('beforeDestroy')
+  methods: {
+    async pageClick (p, pi) {
+      this.$log('pageClick', p, pi)
+      switch (p.path) {
+        case '/app/logout': {
+          this.$log('LOGOUT')
+          break
+        }
+        default: {
+          this.$router.push(p.path)
+        }
+      }
+    }
   }
 }
 </script>

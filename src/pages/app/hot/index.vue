@@ -1,8 +1,8 @@
 <template lang="pug">
 q-layout(containter :style=`{width: width+'px'}` @scroll="onScroll")
   //- drawer
-  //- q-drawer(ref="kDrawer" side="left" :width="240").lt-sm
-  //-   categories(:style=`{borderRadius: '0 10px 10px 0', overflow: 'hidden'}`)
+  q-drawer(ref="kDrawer" side="left" :width="240").lt-sm
+    categories(:style=`{borderRadius: '0 10px 10px 0', overflow: 'hidden'}`)
   q-page-container.bg-grey-3
     .row.full-width.justify-center
       div(style=`width: 200px`).row.gt-xs
@@ -12,20 +12,14 @@ q-layout(containter :style=`{width: width+'px'}` @scroll="onScroll")
           template(v-slot:items=`{items, fetchingMore}`)
             node-feed(ref="nodeFeed" name="Чего горячего есть?" :nodes="items" :fetchingMore="fetchingMore")
               q-btn(round flat icon="menu" color="black" @click="$refs.kDrawer.toggle()")
-      div(style=`width: 250px;`).row.gt-xs
-        pageSubscriptions(
-          style=`position: fixed; overflow: hidden; maxWidth: 250px; border-radius: 10px`)
-  //- q-footer(reveal).bg-grey-4.lt-sm
-  //-   k-menu-mobile(page="hot" :colors="['white', 'grey-7']")
 </template>
 
 <script>
 import categories from 'pages/app/hot/categories'
-import pageSubscriptions from 'pages/app/subscriptions'
 
 export default {
   name: 'pageApp__hot',
-  components: { categories, pageSubscriptions },
+  components: { categories },
   props: ['width', 'height'],
   data () {
     return {

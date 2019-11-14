@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf')
+q-layout(view='hHh Lpr fFf').bg-grey-3
   //- node action dialog
   k-dialog-bottom(:value="$store.state.ui.fragmentDialogOpened" mode="actions" :options="fragmentDialogOptions"
     @action="fragmentDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])")
@@ -19,23 +19,15 @@ q-layout(view='hHh Lpr fFf')
     ws-bookmark(@hide="$refs.bookmarkDialog.hide()")
   //- fragment dialog
   //- content, node
-  q-drawer(
-    side="left" v-model="drawer" show-if-above
-    :mini="!drawer || miniState" bordered content-class="bg-grey-3" :width="250" no-swipe-open).gt-sm
-    k-menu-desktop
-    div(style="margin-top: -80px; margin-right: 4px;").row.justify-start
-      q-btn(
-        dense round unelevated size="20px" :icon="miniState ? 'chevron_right' : 'chevron_left'" @click="toggleMini"
-        style=`color: #fff`)
-    .row.full-width.justify-start.q-pl-sm
-      span.text-grey-3 0.4.0
+  q-drawer(v-model="leftDrawerShow" side="left" show-if-above :width="leftDrawerWidth").gt-xs
+    k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
   q-page-container
     q-page
       q-resize-observer(@resize="onResize")
       router-view(v-if="!loading" :height="height" :width="width")
       div(v-else).row.full-width.window-height.items-center.justify-center
         k-spinner(:width="200" :height="200")
-  q-page-footer
+  q-footer(reveal).lt-sm
     k-menu-mobile
 </template>
 
@@ -46,7 +38,8 @@ export default {
   data () {
     return {
       loading: true,
-      showLeftDrawer: true,
+      leftDrawerShow: true,
+      leftDrawerWidth: 250,
       radius: 30,
       width: 0,
       height: 0,
@@ -120,10 +113,9 @@ export default {
       this.miniState = !this.miniState
     },
     onResize (e) {
-      // this.$log('onResize', e)
+      this.$log('onResize', e)
       this.width = e.width
       this.height = this.$q.screen.height
-      // this.height = e.height
     }
   },
   async created () {
@@ -176,3 +168,9 @@ export default {
   }
  }
 </script>
+
+<style lang="stylus">
+.q-footer {
+  background: none !important
+}
+</style>

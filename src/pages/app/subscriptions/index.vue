@@ -28,8 +28,8 @@ q-layout(container :style=`{width: $q.screen.width+'px', height: $q.screen.heigh
               span {{ s.name | cut(50) }}
           div(v-if="editing" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
             q-btn(round flat icon="clear" @click="subDelete(s, si)")
-  q-footer(reveal).lt-sm
-    k-menu-horiz
+  //- q-footer(reveal).lt-sm
+  //-   k-menu-horiz
 </template>
 
 <script>
