@@ -7,6 +7,7 @@ export const init = async (context, userSubscriptions) => {
   return userSubscriptions
 }
 
+// Подписаться на сущность. Мутация будет вызвана по приходу эвента
 export const subscribe = async (context, oid) => {
   context.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
   let { data: { subscribe } } = await apolloProvider.clients.apiApollo.mutate({
@@ -19,10 +20,9 @@ export const subscribe = async (context, oid) => {
       oid
     }
   })
-  context.commit('subscribe', oid)
   return subscribe
 }
-
+// Отписаться от сущности. Мутация будет вызвана по приходу эвента
 export const unSubscribe = async (state, oid) => {
   state.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
   let { data: { unSubscribe } } = await apolloProvider.clients.apiApollo.mutate({
@@ -35,6 +35,5 @@ export const unSubscribe = async (state, oid) => {
       oid
     }
   })
-  state.commit('unSubscribe', oid)
   return unSubscribe
 }

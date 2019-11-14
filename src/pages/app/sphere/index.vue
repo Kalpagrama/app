@@ -45,16 +45,17 @@ export default {
   methods: {
     async sphereLoad (oid) {
       this.$log('sphereLoad start', oid)
-      let { data: { objectList: [sphere] } } = await this.$apollo.query({
-        query: gql`
-          query sphereLoad ($oid: OID!) {
-            objectList (oids: [$oid]) { oid type name }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
+      let sphere = await this.$store.dispatch('objects/get', { oid, fragmentName: 'sphereFragment', priority: 0 })
+      // let { data: { objectList: [sphere] } } = await this.$apollo.query({
+      //   query: gql`
+      //     query sphereLoad ($oid: OID!) {
+      //       objectList (oids: [$oid]) { oid type name }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   }
+      // })
       this.$log('sphereLoad done', sphere)
       return sphere
     }

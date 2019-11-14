@@ -73,42 +73,42 @@ export const updateWSFragment = (state, fragment) => {
 }
 
 // draft
-export const addWSDraft = (state, draft) => {
-  debug('addWSDraft start')
-  state.workspace.drafts.push(draft)
-  debug('addWSDraft done')
+export const addWSNode = (state, draft) => {
+  debug('addWSNode start')
+  state.workspace.nodes.push(draft)
+  debug('addWSNode done')
 }
-export const deleteWSDraft = (state, draft) => {
-  debug('deleteWSDraft start')
+export const deleteWSNode = (state, draft) => {
+  debug('deleteWSNode start')
   if (!draft.uid) return
-  let i = state.workspace.drafts.findIndex(d => d.uid === draft.uid)
-  state.workspace.drafts.splice(i, 1)
-  debug('deleteWSDraft done')
+  let i = state.workspace.nodes.findIndex(d => d.uid === draft.uid)
+  state.workspace.nodes.splice(i, 1)
+  debug('deleteWSNode done')
 }
-export const updateWSDraft = (state, draft) => {
-  debug('updateWSDraft start')
+export const updateWSNode = (state, draft) => {
+  debug('updateWSNode start')
   if (!draft.uid) return
-  let i = state.workspace.drafts.findIndex(d => d.uid === draft.uid)
-  state.workspace.drafts[i] = draft
-  debug('updateWSDraft done')
+  let i = state.workspace.nodes.findIndex(d => d.uid === draft.uid)
+  state.workspace.nodes[i] = draft
+  debug('updateWSNode done')
 }
 
 // tag
-export const addWSTag = (state, tag) => {
-  debug('addWSTag start')
-  state.workspace.tags.push(tag)
-  debug('addWSTag done')
+export const addWSSphere = (state, tag) => {
+  debug('addWSSphere start')
+  state.workspace.spheres.push(tag)
+  debug('addWSSphere done')
 }
-export const deleteWSTag = (state, uid) => {
-  debug('deleteWSTag start', uid)
-  let i = state.workspace.tags.findIndex(t => t.uid === uid)
-  state.workspace.tags.splice(i, 1)
+export const deleteWSSphere = (state, uid) => {
+  debug('deleteWSSphere start', uid)
+  let i = state.workspace.spheres.findIndex(t => t.uid === uid)
+  state.workspace.spheres.splice(i, 1)
   // TODO: delete this tag from all contents drafts and nodes
-  debug('deleteWSTag done')
+  debug('deleteWSSphere done')
 }
-export const updateWSTag = (state, tag) => {
-  debug('updateWSTag start')
-  let i = state.workspace.tags.findIndex(t => t.uid === tag.uid)
-  state.workspace.tags[i] = tag
-  debug('updateWSTag done')
+export const updateWSSphere = (state, tag) => {
+  debug('updateWSSphere start')
+  let i = state.workspace.spheres.findIndex(t => t.uid === tag.uid)
+  state.workspace.spheres[i] = tag
+  debug('updateWSSphere done')
 }

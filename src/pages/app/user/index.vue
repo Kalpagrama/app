@@ -75,22 +75,24 @@ export default {
   methods: {
     async userLoad (oid) {
       this.$log('userLoad start')
-      let {data: {userLoad: [user]}} = await this.$apollo.query({
-        query: gql`
-          query userLoad ($oid: OID!) {
-            objectList(oids: [$oid]) {
-              oid
-              type
-              name
-              thumbUrl(preferWidth: 50)
-              createdAt
-            }
-          }
-        `,
-        variables: {
-          oid
-        }
-      })
+      let user = await this.$store.dispatch('objects/get', { oid, fragmentName: 'userFragment', priority: 0 })
+      // return user
+      // let {data: {userLoad: [user]}} = await this.$apollo.query({
+      //   query: gql`
+      //     query userLoad ($oid: OID!) {
+      //       objectList(oids: [$oid]) {
+      //         oid
+      //         type
+      //         name
+      //         thumbUrl(preferWidth: 50)
+      //         createdAt
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid
+      //   }
+      // })
       this.$log('userLoad done', user)
       return user
     },

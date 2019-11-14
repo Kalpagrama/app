@@ -40,7 +40,7 @@ export const init = async (context, userEvents) => {
   const observerWsEvent = apolloProvider.clients.wsApollo.subscribe({
     client: 'wsApollo',
     query: gql`
-      ${fragments.WSContentFragment} ${fragments.WSFragmentFragment} ${fragments.WSBookmarkFragment} ${fragments.WSTagFragment} ${fragments.WSDraftFragment}
+      ${fragments.WSContentFragment} ${fragments.WSFragmentFragment} ${fragments.WSBookmarkFragment} ${fragments.WSSphereFragment} ${fragments.WSNodeFragment}
       subscription wsEvent {
         wsEvent {
           type
@@ -49,8 +49,8 @@ export const init = async (context, userEvents) => {
             uid
             ... on WSBookmark{...WSBookmarkFragment}
             ... on WSContent{...WSContentFragment}
-            ... on WSDraft{...WSDraftFragment}
-            ... on WSTag{...WSTagFragment}
+            ... on WSNode{...WSNodeFragment}
+            ... on WSSphere{...WSSphereFragment}
             ... on WSFragment{...WSFragmentFragment}
           }
         }
@@ -82,6 +82,14 @@ export const init = async (context, userEvents) => {
       if (event.type === 'NODE_CREATED') context.commit('stateSet', ['nodeCreated', event])
       else if (event.type === 'NODE_DELETED') context.commit('stateSet', ['nodeDeleted', event])
       else if (event.type === 'NODE_RATED') context.commit('stateSet', ['nodeRated', event])
+      else if (event.type === 'USER_SUBSCRIBED') {
+        context.commit('stateSet', ['userSubscribed', event])
+        processSubscribeEvent(context, event)
+      } else if (event.type === 'USER_UNSUBSCRIBED') {
+        context.commit('stateSet', ['userUnSubscribed', event])
+        processUnSubscribeEvent(context, event)
+      }
+      context.commit('addEvent', event)
     },
     error: (error) => {
       context.dispatch('log/error', `EVENT event error ${error}`, { root: true })
@@ -90,6 +98,7 @@ export const init = async (context, userEvents) => {
   observerWsEvent.subscribe({
     next: ({ data: { wsEvent } }) => {
       context.dispatch('log/debug', ['events', `EVENT wsEvent`, wsEvent], { root: true })
+      processWsEvent(context, wsEvent)
     },
     error: (error) => {
       context.dispatch('log/error', `EVENT wsEvent error ${error}`, { root: true })
@@ -98,4 +107,34 @@ export const init = async (context, userEvents) => {
 
   context.commit('init', userEvents)
   return userEvents
+}
+
+function processSubscribeEvent (context, event) {
+  context.commit('subscriptions/subscribe', event.object, { root: true })
+}
+
+function processUnSubscribeEvent (context, event) {
+  context.commit('subscriptions/unSubscribe', event.object, { root: true })
+}
+
+function processWsEvent (context, wsEvent) {
+  let type = wsEvent.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
+  let object = wsEvent.object
+  let objectType = object.__typename
+  let operationName
+  switch (type) {
+    case 'WS_ITEM_CREATED':
+      operationName = 'add'
+      break
+    case 'WS_ITEM_UPDATED':
+      operationName = 'update'
+      break
+    case 'WS_ITEM_DELETED':
+      operationName = 'delete'
+      break
+    default:
+      throw new Error(`bad type ${type}`)
+  }
+  console.log(operationName, objectType)
+  context.commit(`workspace/${operationName}${objectType}`, object, { root: true })
 }

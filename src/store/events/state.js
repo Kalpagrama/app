@@ -4,5 +4,7 @@ export default {
   progress: null,
   nodeCreated: null,
   nodeDeleted: null,
-  nodeRated: null
+  nodeRated: null,
+  userSubscribed: null,
+  userUnSubscribed: null
 }

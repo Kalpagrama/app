@@ -7,6 +7,7 @@ export function init(state, userEvents) {
 
 export function addEvent(state, userEvent) {
   state.userEvents.push(userEvent)
+  state.userEvents.splice(888, state.userEvents.length)
 }
 
 export function stateSet(state, [key, val]) {

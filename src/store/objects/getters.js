@@ -11,10 +11,3 @@ export const objectGet = (state) => ({ oid, fragmentName }) => {
     return storedValue.objectData
   } else return null
 }
-
-// export const objectGet = (state, getters, rootState, rootGetters, params) => {
-//   console.debug(params)
-//   console.debug(params)
-//   // let xxx = state.objects[oid]
-//   // if (xxx) return xxx.objectData
-// }
