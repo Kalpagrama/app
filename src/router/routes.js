@@ -16,7 +16,9 @@ const routes = [
       { name: 'create', path: 'create', component: () => import('components/node_creator') },
       { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
+      // { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
+      // { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications/notifications') },
       { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
     ]
   },

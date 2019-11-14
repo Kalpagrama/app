@@ -1,37 +1,23 @@
 <template lang="pug">
-.column.fit
-  div(style=`height: 60px; borderBottom: 1px solid #eee`
-    ).row.full-width.bg-white
-    div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      q-btn(icon="notifications_none" flat round color="primary")
-    .col
-      .row.fit.items-center.justify-center
-        span Мои уведомления
-    div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      q-btn(icon="more_vert" flat round color="primary")
-  .col.scroll.bg-grey-2
-    div(style=`height: 60px;` v-show="!notifications").row.full-width.justify-center.items-center
-      span У вас пока нет никаких уведомлений
+q-layout(:style=`{width: width+'px', height: height+'px'}`).bg-grey-3.q-pt-sm
+  .row.full-width.justify-center
+    div(:style=`{width: '600px', overflow: 'hidden', borderRadius: '10px'}`)
+      notifications
+  q-footer(reveal).lt-sm
+    k-menu-horiz
 </template>
 
 <script>
+import notifications from 'pages/app/notifications/notifications'
 export default {
   name: 'pageApp__Notifications',
+  components: { notifications },
+  props: [ 'width', 'height' ],
   data () {
     return {
-      notifications: [
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''},
-        // {oid: '', name: '', thumbURL: ''}
-      ]
     }
+  },
+  methods: {
   },
   mounted () {
     this.$log('mounted')
