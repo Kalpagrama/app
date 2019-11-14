@@ -16,7 +16,7 @@ q-layout(containter :style=`{width: width+'px'}` @scroll="onScroll")
         pageSubscriptions(
           style=`position: fixed; overflow: hidden; maxWidth: 250px; border-radius: 10px`)
   q-footer(reveal).bg-grey-4.lt-sm
-    k-menu-horiz(page="hot" :colors="['white', 'grey-7']")
+    k-menu-mobile(page="hot" :colors="['white', 'grey-7']")
 </template>
 
 <script>

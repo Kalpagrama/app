@@ -7,7 +7,7 @@ q-layout(containter :style=`{width: width+'px', minHeight: $q.screen.height+'px'
       template(v-slot:items=`{items, fetchingMore}`)
         node-feed(ref="nodeFeed" name="Home" :nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
   q-footer(reveal).lt-sm
-    k-menu-horiz(page="home" :colors="['white', 'grey-7']")
+    k-menu-mobile(page="home" :colors="['white', 'grey-7']")
 </template>
 
 <script>

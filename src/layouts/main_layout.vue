@@ -22,7 +22,7 @@ q-layout(view='hHh Lpr fFf')
   q-drawer(
     side="left" v-model="drawer" show-if-above
     :mini="!drawer || miniState" bordered content-class="bg-grey-3" :width="250" no-swipe-open).gt-sm
-    k-menu-vert.bg-primary
+    k-menu-desktop
     div(style="margin-top: -80px; margin-right: 4px;").row.justify-start
       q-btn(
         dense round unelevated size="20px" :icon="miniState ? 'chevron_right' : 'chevron_left'" @click="toggleMini"
@@ -38,12 +38,9 @@ q-layout(view='hHh Lpr fFf')
 </template>
 
 <script>
-import kMenuVert from 'components/k_menu_vert'
-import nodeCreator from 'components/node_creator'
 
 export default {
   name: 'mainLayout',
-  components: { kMenuVert, nodeCreator },
   data () {
     return {
       loading: true,
