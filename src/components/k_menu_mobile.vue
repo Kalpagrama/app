@@ -1,57 +1,50 @@
 <template lang="pug">
-.row.full-width
-  q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    k-invite(@hide="$refs.inviteDialog.hide()")
-  //- user
-  q-item(clickable v-ripple :to="`/app/user`" :style=`{height: '70px'}` @click="pageClick('/app/user')").row.full-width.items-center.q-px-sm
-    q-item-section(avatar)
-      img(@click="$router.push(`/app/user/${$store.state.auth.user.oid}`)"
-        :src="$store.state.auth.user ? $store.state.auth.user.thumbUrl : ''" style=`width: 40px; height: 40px; borderRadius: 50%; overflow: hidden`)
-    q-item-section.col.q-px-sm
-      span(style=`fontWeight: 400;`) {{ $store.state.auth.user ? $store.state.auth.user.name : ''}}
-  //- items
-  q-item(
-    v-for="(p, pp) in pages" :key="p.id" clickable @click="pageClick(p)"
-    v-ripple
-    :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-    q-item-section(avatar)
-      q-btn(round flat color="primary")
-        q-icon(:name="p.icon" color="primary" style=`fontSize: 25px`)
-    q-item-section.col.q-px-sm
-      span(style=`fontWeight: 400`) {{p.name}}
+div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '10px 10px 0 0'}`
+  ).row.full-width.items-center.content-center.justify-between.q-px-sm.bg-primary
+  q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'green' : 'white'" @click.stop="pageClick('/app/home')")
+  q-btn(round flat icon="whatshot" :color="$route.path.split('/')[2] === 'hot' ? 'green' : 'white'" @click.stop="pageClick('/app/hot')")
+  q-btn(round push icon="add" color="green" size="md" @click.stop="pageClick('/app/create')")
+  q-btn(round flat icon="img:statics/icons/anvil.svg" :color="$route.path === '/app/workspace' ? 'green' : 'white'" @click.stop="pageClick('/app/workspace')")
+  q-btn(round flat icon="menu" :color="inMenu" @click.stop="pageClick('/app/menu')")
 </template>
+
 <script>
 export default {
   name: 'kMenuMobile',
-  components: {},
   data () {
     return {
-      pages: [
-        {name: 'В тренде', icon: 'whatshot', path: '/app/hot'},
-        {name: 'Создать ядро', icon: 'add', path: '/app/create'},
-        {name: 'Уведомления', icon: 'notifications', path: '/app/notifications'},
-        {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},
-        {name: 'Пригласить друга', icon: 'person_add', path: false},
-        {name: 'Выход', icon: 'power_off', path: false}
-      ]
+    }
+  },
+  computed: {
+    inMenu () {
+      let arr = ['/app/home', '/app/hot', '/app/create', '/app/workspace']
+      let p = this.$route.path
+      if (arr.includes(p)) return 'white'
+      else return 'green'
     }
   },
   methods: {
-    async pageClick (page) {
-      this.$log('pageClick', page)
-      if (page.path) {
-        this.$router.push(page.path)
-      } else {
-        switch (page.icon) {
-          case 'person_add': {
-            this.$refs.inviteDialog.show()
+    pageCreate () {
+      this.$log('pageCreate')
+    },
+    pageClick (path) {
+      try {
+        this.$log('pageClick start', path)
+        // this.$store.commit('ui/stateSet', ['page', path])
+        // this.$router.push(path)
+        switch (path) {
+          case '/app/create': {
+            this.$log('/app/create GOGOGOG')
+            this.$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])
             break
           }
-          case 'power_off': {
-            this.$refs.logoutDialog.show()
-            break
+          default: {
+            this.$router.push(path)
           }
         }
+        this.$log('pageClick done')
+      } catch (e) {
+        this.$log('pageClick error', e)
       }
     }
   }

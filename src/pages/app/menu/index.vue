@@ -1,15 +1,12 @@
 <template lang="pug">
 q-layout(:container="true" :style=`{width: width+'px', height: height+'px'}`).bg-grey-2
   q-header(reveal)
-    div(:style=`{height: '60px'}`).row.full-width
-      q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '60px'}` @click="pageClick('/app/home')").row.q-px-sm
-        q-item-section(avatar)
-          q-btn(round flat color="primary")
-            //- q-icon(name="img:statics/logo.svg" color="white" style=`fontSize: 42px`)
-            k-logo
-        q-item-section
-            span.text-bold.text-white Кальпаграмма
-      .col
+    div(:style=`{height: '60px'}`).row.full-width.items-center
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        k-logo(:width="40" :height="40")
+      .col.full-height
+        .row.fit.items-center.q-px-sm
+          span.text-bold.text-white Kalpagramma
       div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="settings" @click="pageClick('/app/settings')" color="white")
   q-page-container
