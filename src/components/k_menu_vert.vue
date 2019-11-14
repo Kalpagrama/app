@@ -2,7 +2,7 @@
 .column.fit.bg-secondary
   q-dialog(ref="inviteDialog" transition-show="slide-up" transition-hide="slide-down")
     k-invite(@hide="$refs.inviteDialog.hide()")
-  q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '80px'}` @click="pageClick('/app/home')").row.full-width.items-center.q-px-sm
+  q-item(clickble v-ripple :to="`/app/home`" :style=`{height: '80px'}` @click="pageClick('/app/home')").row.full-width.items-center.q-px-sm.logo
     //- q-btn(round flat color="grey-6" :style=`{overflow: 'hidden'}`)
     //-   template(v-slot:default)
     //-     img(:src="`statics/logo.png`" style=`width: 40px; height: 40px`)

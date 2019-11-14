@@ -1,19 +1,26 @@
 <template lang="pug">
 .row.full-width.justify-center
     //- body
-    div(
-      v-for="(s, ss) in userSubscriptions" :key="s.id"
-      :style=`{height: '50px'}`
-      ).row.full-width.justify-center.items-center.bg-white.q-px-md.cursor-pointer.hr
-      div(@click="pageSubscriber(s)").row.items-center
-        div(:style=`{width: '30px', height: '30px', backgroundImage: 'url('+ s.thumbUrl +')'}`).subscriptionImage
-        .row.items-center.justify-center.q-ml-md
-          span {{s.name | cut(10)}}
-      .col
-      div(v-show="active").row.items-center.q-ml-md
-        q-btn(icon="clear" round dense flat color="primary" @click="unSubscribe(s, ss)")
-    div(v-if="userSubscriptions.length === 0" :style=`{ height: '100px', borderRadius: '0 0 10px 10px'}`).row.full-width.justify-center.q-px-md.items-center.bg-white
-      span.text-center.text-bold У вас пока нету активных подписок.
+    div(style=`maxWidth: 600px`).row.full-width.justify-center.items-start
+      div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end.q-px-md.bg-white
+        .row.items-center.full-width
+          span.text-bold.text-black Мои подписки
+          .col
+          q-btn(flat no-caps dense round icon="edit" color="primary" @click="activeDelete()")
+    div(:style=`{height: 'calc(100vh - 80px)'}`).row.full-width.justify-center.items-start.scroll
+      div(
+        v-for="(s, ss) in userSubscriptions" :key="s.id"
+        :style=`{height: '50px'}`
+        ).row.full-width.justify-center.items-center.bg-white.q-px-md.cursor-pointer.hr
+        div(@click="pageSubscriber(s)").row.items-center
+          div(:style=`{width: '30px', height: '30px', backgroundImage: 'url('+ s.thumbUrl +')'}`).image
+          .row.items-center.justify-center.q-ml-md
+            span {{s.name | cut(10)}}
+        .col
+        div(v-show="active").row.items-center.q-ml-md
+          q-btn(icon="clear" round dense flat color="primary" @click="unSubscribe(s, ss)")
+      div(v-if="userSubscriptions.length === 0" :style=`{ height: '100px', borderRadius: '0 0 10px 10px'}`).row.full-width.justify-center.q-px-md.items-center.bg-white
+        span.text-center.text-bold У вас пока нету активных подписок.
 </template>
 <script>
 export default {
@@ -70,10 +77,5 @@ export default {
   }
 }
 </script>
-<style lang="stylus" scoped>
-.subscriptionImage
-  background-repeat: no-repeat
-  background-size: cover;
-  background-position: center
-  border-radius: 20px;
+<style lang="stylus">
 </style>
