@@ -21,8 +21,9 @@ export default {
     {id: '/app/account', name: 'account', icon: 'account_circle', hidden: false, desktop: true, mobile: true},
     {id: '/app/menu', icon: 'menu', name: 'menu', hidden: false, desktop: true, mobile: true}
   ],
-  dialogOpened: false,
   fragmentDialogOpened: false,
+  fragmentDialogPayload: null,
   bookmarkDialogOpened: false,
-  nodeRateDialogOpened: false
+  nodeRateDialogOpened: false,
+  nodeCreatorDialogOpened: false
 }

@@ -88,17 +88,28 @@ export default async ({ Vue, store, router }) => {
   //   debug('### ERROR ###', msg.toString())
   //   Notify.create({message: msg.toString(), color: 'red', colorText: 'red'})
   // }
+  // menus
+  Vue.component('kMenuDesktop', () => import(`components/k_menu_desktop`))
+  Vue.component('kMenuMobile', () => import(`components/k_menu_mobile`))
+  // helpers
   Vue.component('kSpinner', () => import(`components/k_spinner`))
   Vue.component('kLogo', () => import(`components/k_logo`))
-  Vue.component('kMenuHoriz', () => import(`components/k_menu_horiz`))
-  Vue.component('kMenuMobile', () => import(`components/k_menu_mobile`))
+  // node
   Vue.component('node', () => import('components/node'))
   Vue.component('nodeLoader', () => import('components/node_loader'))
   Vue.component('nodeFeed', () => import(`components/node_feed`))
   Vue.component('nodeList', () => import(`components/node_list`))
+  Vue.component('nodeCreator', () => import(`components/node_creator`))
+  Vue.component('nodeRate', () => import(`components/node_rate`))
+  // dialogs
   Vue.component('kDialogBottom', () => import(`components/k_dialog_bottom`))
   Vue.component('kSplit', () => import(`components/k_split`))
+  // other
   Vue.component('kVideo', () => import('components/k_video'))
+  Vue.component('kInvite', () => import(`components/k_invite`))
+  Vue.component('videoEditor', () => import(`components/video_editor`))
+  // ws
+  Vue.component('wsBookmark', () => import(`components/workspace/ws_bookmark`))
 }
 
 export { time }

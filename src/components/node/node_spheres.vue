@@ -1,5 +1,5 @@
 <template lang="pug">
-div(v-show="getSpheres.length > 0" :style=`{paddingLeft: '20px', paddingRight: '20px'}`).row.full-width
+div(v-show="getSpheres.length > 0" :style=`{paddingLeft: '14px', paddingRight: '14px'}`).row.full-width
   //- spheres wrapper
   div(
     :style=`{

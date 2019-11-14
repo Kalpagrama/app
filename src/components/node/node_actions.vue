@@ -1,6 +1,7 @@
 <template lang="pug">
-div(:style=`{height: '55px'}`).row.full-width.items-center.justify-end.q-px-sm
-  q-btn(round flat color="grey-9" icon="share")
+div(:style=`{height: '40px'}`).row.full-width.items-center.justify-end.q-px-xs
+  //- share
+  q-btn(round flat color="grey-9" icon="share" @click="nodeShare()")
   .col
   //- rate
   div(v-if="nodeFull && nodeFull.rateUser").q-mr-sm
@@ -16,80 +17,14 @@ export default {
   name: 'nodeActions',
   components: {},
   props: ['index', 'zIndex', 'node', 'nodeFull', 'active'],
-  data () {
-    return {
-      actions: [
-        {id: 'to_bookmark', name: 'Сохранить в закладки'},
-        {id: 'to_telegram', name: 'Отправить в Telegram'},
-        {id: 'to_copy', name: 'Скопировать ссылку'}
-      ],
-      nodeActions: [
-        {id: 'rate', name: 'Переголосовать'},
-        {id: 'answer', name: 'Ответить ядром'}
-      ]
-    }
-  },
   methods: {
-    nodeShare ({id}) {
-      // this.$log('nodeShare', id)
-      switch (id) {
-        case 'to_bookmark': {
-          this.$log('nodeShare', id)
-          this.nodeBookmark()
-          break
-        }
-        case 'to_telegram': {
-          this.$log('nodeShare', id)
-          break
-        }
-        case 'to_copy': {
-          this.$log('nodeShare', id)
-          break
-        }
-      }
-    },
-    nodeAction ({id}) {
-      this.$log('nodeAction', id)
-      switch (id) {
-        case 'rate': {
-          this.nodeRate()
-          break
-        }
-        case 'answer': {
-          this.nodeAnswer()
-          break
-        }
-      }
-    },
     nodeBlur () {
       this.$log('nodeBlur')
-      if (this.nodeFull.rateUser) {
-        this.$refs.nodeRateAnswerMenu.show()
-      } else {
-        this.nodeRate()
-      }
+      this.$store.commit('ui/stateSet', ['nodeRateDialogOpened', true])
     },
-    async nodeAnswer () {
-      this.$log('nodeAnswer')
-      this.$store.commit('node/stateSet', ['answer', true])
-      this.nodeRate()
-    },
-    async nodeRate () {
-      this.$log('nodeRate')
-      this.$store.commit('node/stateSet', ['node', this.node])
-      this.$store.commit('node/stateSet', ['nodeFull', this.nodeFull])
-      // await this.$wait(300)
-      this.$nextTick(() => {
-        this.$store.commit('ui/stateSet', ['dialogOpened', true])
-      })
-    },
-    async nodeBookmark () {
-      this.$log('nodeBookmark')
-      this.$store.commit('workspace/stateSet', ['bookmark', {url: this.node.oid}])
-      // await this.$wait(300)
-      this.$nextTick(() => {
-        this.$store.commit('workspace/stateSet', ['bookmarkEditorDialogOpened', true])
-      })
+    nodeShare () {
+      this.$log('nodeShare')
+      this.$store.commit('ui/stateSet', ['nodeShareDialogOpened', true])
     }
   }
 }

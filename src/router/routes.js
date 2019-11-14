@@ -12,11 +12,11 @@ const routes = [
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
-      { name: 'workspace', path: 'workspace/:menu?', component: () => import('components/workspace') },
+      { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
       { name: 'create', path: 'create', component: () => import('components/node_creator') },
       { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
-      { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
+      { name: 'events', path: 'events', component: () => import('pages/app/events') },
       { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
     ]
   },

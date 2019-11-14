@@ -1,44 +1,82 @@
 <template lang="pug">
-q-layout(:style=`{width: width+'px', height: height+'px'}`).bg-grey-3
-  q-page-container
-    div(:style=`{height: '60px'}`).row.full-width.justify-center.bg-grey-3
-      div(:style=`{maxWidth: '600px'}`).row.full-width.bg-white
-        div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end.q-px-md
-          .row.items-center.full-width
-            span.text-bold.text-black Подписки
-            .col
-            q-btn(flat no-caps dense round icon="edit" color="primary" @click="$refs.subs.activeDelete()")
-    div(style=`height: calc(100vh-60px)`).row.full-width.justify-center.scroll
-      div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.bg-white
-        subscriptions(ref="subs")
+q-layout(container :style=`{width: $q.screen.width+'px', height: $q.screen.height+'px'}`).column.bg-grey-3
+  q-dialog(ref="subDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
+    @hide="sub = null")
+    div(@click.self="$refs.subDialog.hide()").row.fit.q-py-xl.q-px-sm
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).column.fit.bg-white
+        .col.full-width.scroll
+          .row.full-width.items-start.content-start.q-pa-md
+            span {{ sub }}
+  q-header(reveal)
+    div(:style=`{height: '60px'}`).row.full-width.bg-white
+      .col.full-height
+        .row.fit.items-center.q-px-md
+          span.text-bold.text-black Subscriptions
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(round flat icon="edit" color="green" @click="editToggle()")
+  q-page-container.fit
+    q-page.fit
+      .row.full-width.items-start.content-start.q-pa-md
+        div(
+          v-for="(s, si) in subscriptions" :key="si"
+          :style=`{height: '60px'}`
+          ).row.full-width.items-center.q-mb-sm
+          div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+            img(@click="subClick(s, si)" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
+          div(@click="subClick(s, si)").col.full-height
+            .row.fit.items-center
+              span {{ s.name | cut(50) }}
+          div(v-if="editing" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+            q-btn(round flat icon="clear" @click="subDelete(s, si)")
   q-footer(reveal).lt-sm
     k-menu-horiz
 </template>
+
 <script>
-import subscriptions from 'pages/app/subscriptions/subscriptions'
 export default {
-  name: 'pageSubscriptions',
-  components: { subscriptions },
+  name: 'pageApp__subscriptions',
   props: [ 'width', 'height' ],
   data () {
     return {
+      sub: null,
+      editing: false
+    }
+  },
+  computed: {
+    subscriptions () {
+      return this.$store.state.subscriptions.userSubscriptions
+    },
+    subscriptionsCount () {
+      return this.subscriptions.length
     }
   },
   methods: {
-    activeDelete () {
-      this.$refs.subs.activeDelete()
+    editToggle () {
+      this.$log('editToggle')
+      this.editing = !this.editing
+    },
+    async subClick (s, si) {
+      this.$log('subClick')
+      this.sub = s
+      this.$refs.subDialog.show()
+    },
+    async subDelete (s, si) {
+      try {
+        this.$log('subDelete start')
+        let res = await this.$store.dispatch('subscriptions/unSubscribe', s.oid)
+        this.$log('res', res)
+        // this.$delete(this.userSubscriptions, ss)
+        this.$log('subDelete done')
+      } catch (error) {
+        this.$log('subDelete error', error)
+      }
     }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>
-<style lang="stylus">
-@media (max-width: 400px ) {
-  ::-webkit-scrollbar {
-  width: 2px !important
-  height: 10px !important
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #000
-  }
-}
-</style>

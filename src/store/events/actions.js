@@ -2,7 +2,8 @@ import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 
 export const init = async (context, userEvents) => {
-  if (context.getters.initialized) throw new Error('events state initialized already')
+  // if (context.getters.initialized) throw new Error('events state initialized already')
+  if (context.getters.initialized) return
   context.dispatch('log/debug', ['events', 'init', userEvents], { root: true })
 
   const observerError = apolloProvider.clients.wsApollo.subscribe({

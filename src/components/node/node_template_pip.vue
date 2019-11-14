@@ -4,7 +4,7 @@
     :style=`{position: 'relative', zIndex: zIndex+100, overflow: 'hidden', borderRadius: '10px', ...getStyles}`
     ).row.full-width.items-start.content-start.bg-black
     //- action
-    q-btn(v-if="active" round dense flat color="white" icon="more_vert" @click="$emit('action', ['menu', nodeFull.fragments[fragmentActive]])"
+    q-btn(v-if="active" round dense flat color="white" icon="more_vert" @click="fragmentAction"
       :style=`{position: 'absolute', zIndex: 1000, right: '8px', top: '8px', background: 'rgba(0,0,0,0.5)'}`)
     //- forward
     div(@click="forwardClick()"
@@ -95,6 +95,12 @@ export default {
     }
   },
   methods: {
+    fragmentAction () {
+      this.$store.commit('ui/stateSet', ['fragmentDialogOpened', true])
+      this.$store.commit('ui/stateSet', ['fragmentDialogPayload', {
+        content: this.nodeFull.fragments[this.fragmentActive].content,
+        fragment: this.nodeFull.fragments[this.fragmentActive]}])
+    },
     forwardClick () {
       this.$log('forwardClick')
       let a = this.fragmentActive === 0 ? 1 : 0
