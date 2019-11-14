@@ -44,24 +44,24 @@ export const fragmentsCount = (state, getters) => {
   return state.workspace.fragments.length
 }
 
-export const tags = (state, getters) => {
-  return state.workspace.tags.reduce((acc, val) => {
+export const spheres = (state, getters) => {
+  return state.workspace.spheres.reduce((acc, val) => {
     acc[val.uid] = val
     return acc
   }, {})
 }
 
-export const tagsCount = (state, getters) => {
-  return state.workspace.tags.length
+export const spheresCount = (state, getters) => {
+  return state.workspace.spheres.length
 }
 
-export const drafts = (state, getters) => {
-  return state.workspace.drafts.reduce((acc, val) => {
+export const nodes = (state, getters) => {
+  return state.workspace.nodes.reduce((acc, val) => {
     acc[val.uid] = val
     return acc
   }, {})
 }
 
-export const draftsCount = (state, getters) => {
-  return state.workspace.drafts.length
+export const nodesCount = (state, getters) => {
+  return state.workspace.nodes.length
 }

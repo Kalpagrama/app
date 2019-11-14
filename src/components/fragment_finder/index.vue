@@ -98,33 +98,34 @@ export default {
     },
     async contentGet (oid) {
       this.$log('contentGet start', oid)
-      let {data: {objectList: [content]}} = await this.$apollo.query({
-        query: gql`
-          query contentGet ($oid: OID!) {
-            objectList(oids: [$oid]) {
-              oid
-              type
-              name
-              thumbUrl(preferWidth: 600)
-              name
-              ... on Video {
-                url
-                urlOriginal
-                duration
-                width
-                height
-              }
-              ... on Image {
-                url
-                urlOriginal
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
+      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
+      // let {data: {objectList: [content]}} = await this.$apollo.query({
+      //   query: gql`
+      //     query contentGet ($oid: OID!) {
+      //       objectList(oids: [$oid]) {
+      //         oid
+      //         type
+      //         name
+      //         thumbUrl(preferWidth: 600)
+      //         name
+      //         ... on Video {
+      //           url
+      //           urlOriginal
+      //           duration
+      //           width
+      //           height
+      //         }
+      //         ... on Image {
+      //           url
+      //           urlOriginal
+      //         }
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   }
+      // })
       this.$log('contentGet done', content)
       return content
     }

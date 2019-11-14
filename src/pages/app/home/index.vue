@@ -5,7 +5,7 @@ q-layout(containter :style=`{width: width+'px', minHeight: $q.screen.height+'px'
   q-page-container
     node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
       template(v-slot:items=`{items, fetchingMore}`)
-        node-feed(ref="nodeFeed" name="Home" :nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
+        node-feed(ref="nodeFeed" name="Home" :nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()" @prefetch="$event => $refs.nodeLoader.prefetch($event)")
   q-footer(reveal).lt-sm
     k-menu-horiz(page="home" :colors="['white', 'grey-7']")
 </template>

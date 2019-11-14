@@ -87,6 +87,16 @@ export default {
       this.totalCount = data[this.queryKey].totalCount
       this.itemsCount = data[this.queryKey].items.length
       this.$log('nodeLoad done')
+    },
+    // возможно это ядро скоро понадобятся
+    prefetch(oid){
+      this.$log('prefetch', oid)
+      this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 1 })
+        .catch(err => {
+          this.$log('prefetch error', err)
+          // this.$store.dispatch('log/error', ['node_loader', 'error', err])
+        })
+      this.$log('prefetch ok!', oid)
     }
   },
   mounted () {

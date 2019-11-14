@@ -4,11 +4,11 @@ const LogLevelEnum = Object.freeze({ ERROR: 'ERROR', WARNING: 'WARNING', INFO: '
 Object.freeze(LogLevelEnum)
 
 function isObject (value) {
-  return value && typeof value === 'object' && value.constructor === Object;
+  return value && typeof value === 'object' && value.constructor === Object
 }
 
 function isString (value) {
-  return typeof value === 'string' || value instanceof String;
+  return typeof value === 'string' || value instanceof String
 }
 
 function processInfo (state, logLevelEnum, info) {
@@ -28,10 +28,10 @@ function processInfo (state, logLevelEnum, info) {
   }
   const dbgLog = require('debug')(namespace)
   dbgLog.enabled = true
-
-  dbgLog(message, data)
+  if (data) dbgLog(message, data)
+  else dbgLog(message)
   let messages = state.messages[logLevelEnum]
-  messages.push({message, data})
+  messages.push({ message, data })
   if (messages.length > 100) messages.splice(0, 1)
 }
 
@@ -43,6 +43,7 @@ export function init (state) {
 }
 
 export function stateSet (state, [key, val]) {
+  assert.ok(state.hasOwnProperty(key))
   state[key] = val
 }
 

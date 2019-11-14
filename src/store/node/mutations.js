@@ -1,3 +1,4 @@
+import assert from 'assert'
 
 export function init(state, categories) {
   state.categories = categories
@@ -5,5 +6,6 @@ export function init(state, categories) {
 }
 
 export function stateSet(state, [key, val]) {
+  assert.ok(state.hasOwnProperty(key))
   state[key] = val
 }

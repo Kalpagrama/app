@@ -37,27 +37,28 @@ export default {
   methods: {
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
-      let {data: {objectList: [content]}} = await this.$apollo.query({
-        query: gql`
-          query contentLoad ($oid: OID!) {
-            objectList(oids: [$oid]) {
-              oid
-              type
-              name
-              ...on Video {
-                duration
-                thumbUrl(preferWidth: 600)
-                url
-                height
-                width
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
+      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
+      // let {data: {objectList: [content]}} = await this.$apollo.query({
+      //   query: gql`
+      //     query contentLoad ($oid: OID!) {
+      //       objectList(oids: [$oid]) {
+      //         oid
+      //         type
+      //         name
+      //         ...on Video {
+      //           duration
+      //           thumbUrl(preferWidth: 600)
+      //           url
+      //           height
+      //           width
+      //         }
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   }
+      // })
       this.$log('contentLoad done', content)
       return content
     }
