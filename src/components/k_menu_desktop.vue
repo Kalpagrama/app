@@ -93,14 +93,3 @@ export default {
   }
 }
 </script>
-<style lang="stylus">
-.mini-slot
-  transition: background-color .28s
-  &:hover
-    background-color: rgba(0, 0, 0, .04)
-.mini-icon
-  font-size: 1.718em
-
-  & + &
-    margin-top: 18px
-</style>

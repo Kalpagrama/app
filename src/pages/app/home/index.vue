@@ -6,8 +6,8 @@ q-layout(containter :style=`{width: width+'px', minHeight: $q.screen.height+'px'
     node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
       template(v-slot:items=`{items, fetchingMore}`)
         node-feed(ref="nodeFeed" name="Home" :nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()" @prefetch="$event => $refs.nodeLoader.prefetch($event)")
-  q-footer(reveal).lt-sm
-    k-menu-mobile(page="home" :colors="['white', 'grey-7']")
+  //- q-footer(reveal).lt-sm
+  //-   k-menu-mobile(page="home" :colors="['white', 'grey-7']")
 </template>
 
 <script>
@@ -68,6 +68,7 @@ export default {
 </script>
 
 <style lang="stylus">
-.q-footer
+.q-footer {
   background: none !important
+}
 </style>

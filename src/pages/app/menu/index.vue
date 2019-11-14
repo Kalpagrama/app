@@ -10,9 +10,9 @@ q-layout(:container="true" :style=`{width: width+'px', height: height+'px'}`).bg
       div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="settings" @click="pageClick('/app/settings')" color="white")
   q-page-container
-    k-menu-mobile
+    //- k-menu-mobile
   q-footer(reveal).lt-sm
-    k-menu-horiz(page="menu" :colors="['white', 'grey-7']")
+    k-menu-mobile(page="menu" :colors="['white', 'grey-7']")
 </template>
 
 <script>

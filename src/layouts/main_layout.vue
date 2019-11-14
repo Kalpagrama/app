@@ -35,6 +35,8 @@ q-layout(view='hHh Lpr fFf')
       router-view(v-if="!loading" :height="height" :width="width")
       div(v-else).row.full-width.window-height.items-center.justify-center
         k-spinner(:width="200" :height="200")
+  q-page-footer
+    k-menu-mobile
 </template>
 
 <script>
