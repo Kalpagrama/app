@@ -153,18 +153,19 @@ export const addWSFragment = async (context, fragment) => {
     // TODO: make it perfect
     let fragmentInput = {
       name: fragment.name,
-      tagUids: fragment.tagUids,
-      // thumbUrl: fragment.thumbUrl,
+      tagUids: fragment.tagUids || [],
+      thumbUrl: fragment.thumbUrl || fragment.content.thumbUrl,
       // relativePoints: fragment.relativePoints.map(p => ({x: p.x, y: p.y, z: p.z})),
       relativeCuts: fragment.relativePoints.reduce((acc, val, i, arr) => {
         // name type start end
         if ((i + 1) % 2 !== 0) {
           acc.push({
+            uid: Date.now().toString(),
             name: '',
             start: val.x,
             end: arr[i + 1].x,
             type: 'video',
-            thumb: ''
+            thumbUrl: ''
           })
         }
         return acc

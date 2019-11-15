@@ -21,7 +21,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-
       span {{ i.name }}
     //- fragments
     div(
-      v-else-if="page === 'fragments'").row.fit
+      v-else-if="page === 'fragments'").row.full-width.bg-white
       img(
         :src="i.thumbUrl"
         :style=`{height: '60px', borderRadius: '10px', oveflow: 'hidden', width: '100px', objectFit: 'contain'}`).bg-black
