@@ -20,6 +20,8 @@ export default {
   methods: {
     nodeBlur () {
       this.$log('nodeBlur')
+      this.$store.commit('node/stateSet', ['node', this.node])
+      this.$store.commit('node/stateSet', ['nodeFull', this.nodeFull])
       this.$store.commit('ui/stateSet', ['nodeRateDialogOpened', true])
     },
     nodeShare () {
