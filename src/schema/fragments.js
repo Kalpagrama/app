@@ -110,25 +110,6 @@ const eventFragment = gql`
     }
   }
 `
-
-const userFragment = gql`
-  fragment userFragment on User {
-    oid
-    name
-    thumbUrl(preferWidth: 600)
-    weightVal
-    profile{
-      city
-      country
-      dateBirth
-      gender
-      lang
-      nameFirst
-      nameFull
-      nameSecond
-    }
-  }
-`
 const objectShortFragment = gql`
   fragment objectShortFragment on ObjectShort {
     type
@@ -194,6 +175,35 @@ const sphereFragment = gql`
     type
     name
     thumbUrl(preferWidth: 600)
+  }
+`
+const userFragment = gql`
+  ${objectShortFragment} ${eventFragment} ${WSNodeFragment} ${WSFragmentFragment} ${WSContentFragment} ${WSBookmarkFragment} ${WSSphereFragment}
+  fragment userFragment on User {
+    oid
+    name
+    thumbUrl(preferWidth: 600)
+    weightVal
+    settings
+    subscriptions{...objectShortFragment}
+    workspace{
+      nodes { ...WSNodeFragment }
+      fragments { ...WSFragmentFragment }
+      contents { ...WSContentFragment }
+      bookmarks { ...WSBookmarkFragment }
+      spheres { ...WSSphereFragment }
+    }
+    events{...eventFragment}
+    profile{
+      city
+      country
+      dateBirth
+      gender
+      lang
+      nameFirst
+      nameFull
+      nameSecond
+    }
   }
 `
 const fragments = {
