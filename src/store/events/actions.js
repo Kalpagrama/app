@@ -38,6 +38,19 @@ export const init = async (context, userEvents) => {
       }
     `
   })
+  const observerEventChange = apolloProvider.clients.wsApollo.subscribe({
+    client: 'wsApollo',
+    query: gql`
+      ${fragments.eventChangeFragment}
+      subscription eventChange {
+        eventChange {
+          ...eventChangeFragment
+          path
+          value
+        }
+      }
+    `
+  })
   const observerWsEvent = apolloProvider.clients.wsApollo.subscribe({
     client: 'wsApollo',
     query: gql`
@@ -91,6 +104,18 @@ export const init = async (context, userEvents) => {
         processUnSubscribeEvent(context, event)
       }
       context.commit('addEvent', event)
+    },
+    error: (error) => {
+      context.dispatch('log/error', `EVENT event error ${error}`, { root: true })
+    }
+  })
+  observerEventChange.subscribe({
+    next: ({ data: { eventChange } }) => {
+      context.dispatch('log/debug', ['events', `EVENT eventChange`, eventChange], { root: true })
+      if (eventChange.type === 'USER_CHANGED') {
+        context.commit('user/setUserValue', { path: eventChange.path, value: eventChange.value })
+      } else throw new Error(`not implemented! ${eventChange.type}`)
+      context.commit('addEvent', eventChange)
     },
     error: (error) => {
       context.dispatch('log/error', `EVENT event error ${error}`, { root: true })

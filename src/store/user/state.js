@@ -1,6 +1,7 @@
 export default {
   initialized: false,
   user: {
+    oid: '',
     name: '',
     thumbUrl: '',
     weightVal: 0.001,
