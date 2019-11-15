@@ -1,9 +1,10 @@
 <template lang="pug">
 .column.fit
   .col.scroll
-    node-loader(ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
-      template(v-slot:items=`{items, fetchingMore}`)
-        node-list(:nodes="items")
+    .row.full-width.q-px-md.q-pt-md
+      node-loader(ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
+        template(v-slot:items=`{items, fetchingMore}`)
+          node-list(:nodes="items")
 </template>
 
 <script>

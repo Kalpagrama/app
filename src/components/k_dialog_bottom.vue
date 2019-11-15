@@ -8,7 +8,7 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
       div(v-else-if="mode === 'actions'").row.full-width.q-pa-sm
         //- header
         div(v-if="options.header" :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="headerClick()").row.full-width.justify-center.items-center.q-mb-md.bg-white
-          span.text-bold.text-center {{ options.headerName | cut(50) }}
+          span.text-bold.text-center {{ options.headerName }}
         //- actions
         div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-md
           div(
@@ -95,20 +95,23 @@ export default {
       }
     },
     show () {
-      this.$log('show')
+      this.$log('show', this.$refs.kDialogBottom)
       this.$refs.kDialogBottom.show()
     },
     hide () {
-      this.$log('hide')
+      this.$log('hide', this.$refs.kDialogBottom)
       this.$refs.kDialogBottom.hide()
     },
     toggle () {
-      this.$log('toggle')
+      this.$log('toggle', this.$refs.kDialogBottom)
       this.$refs.kDialogBottom.toggle()
     }
   },
   mounted () {
     this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

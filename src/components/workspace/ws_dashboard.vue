@@ -15,11 +15,11 @@
   div(:style=`{height: '60px', borderRadius: '10px'}` @click="$emit('page', 'drafts')").row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-px-md
     span Ядра
     .col
-    span {{ $store.state.workspace.workspace.drafts.length }}
+    span {{ $store.state.workspace.workspace.nodes.length }}
   div(:style=`{height: '60px', borderRadius: '10px'}` @click="$emit('page', 'tags')").row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-px-md
     span Сферы
     .col
-    span {{ $store.state.workspace.workspace.tags.length }}
+    span {{ $store.state.workspace.workspace.spheres.length }}
 </template>
 
 <script>

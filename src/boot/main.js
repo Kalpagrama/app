@@ -23,7 +23,10 @@ const time = (sec) => {
   return result
 }
 
-export default async ({ Vue, store, router }) => {
+var router
+
+export default async ({ Vue, store, router: VueRouter }) => {
+  router = VueRouter
   Vue.use(VueObserveVisibility)
   Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
   Vue.prototype.$log = function (...msg) {
@@ -110,6 +113,7 @@ export default async ({ Vue, store, router }) => {
   Vue.component('videoEditor', () => import(`components/video_editor`))
   // ws
   Vue.component('wsBookmark', () => import(`components/workspace/ws_bookmark`))
+  Vue.component('wsFragment', () => import(`components/workspace/ws_fragment`))
 }
 
-export { time }
+export { time, router }

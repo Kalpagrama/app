@@ -5,30 +5,30 @@
   q-dialog(ref="sourceDeviceDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     source-device(@hide="$refs.sourceDeviceDialog.hide()")
   q-dialog(ref="sourceWsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    source-ws(@hide="$refs.sourceWsDialog.hide()" @input="")
+    source-ws(@hide="$refs.sourceWsDialog.hide()" :type="wsType" @input="")
   div(:style=`{height: '60px'}`).row.full-width.items-center
     .col.full-height
       .row.fit.items-center.q-px-md
-        span.text-bold Fragment finder {{ source }}
+        span.text-bold Найти фрагмент
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="clear" @click="$emit('hide')")
   .col.full-width.scroll
     .row.fit.items-start.justify-center
       div(:style=`{maxWidth: $q.screen.width > 500 ? '500px' : '100%'}`).row.full-width.items-start.content-start.q-px-md.q-pt-lg
         .row.full-width.q-pa-sm
-          span.text-bold Upload
+          span.text-bold Загрузить
         .row.full-width.q-mb-lg
-          div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceUrlDialog.show()").col.bg-grey-2
+          div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceUrlDialog.show()").col.bg-grey-2.cursor-pointer
             .row.fit.items-center.justify-center
-              span by URL
-          div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceDeviceDialog.show()").col.bg-grey-2.q-ml-sm
+              span по URL
+          div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceDeviceDialog.show()").col.bg-grey-2.q-ml-sm.cursor-pointer
             .row.fit.items-center.justify-center
-              span from device
+              span с устройства
         .row.full-width.q-pa-sm
-          span.text-bold Pick from Workspace
+          span.text-bold Выбрать из мастерской
         .row.full-width
           div(
-            v-for="(w, wi) in wsStats" :key="wi" @click="$refs.sourceWsDialog.show()"
+            v-for="(w, wi) in wsStats" :key="wi" @click="wsType = w.id, $refs.sourceWsDialog.show()"
             :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.q-px-md.bg-grey-2.q-mb-md.cursor-pointer
             span {{ w.name }}
@@ -47,11 +47,16 @@ export default {
   data () {
     return {
       source: undefined,
-      wsStats: [
-        {id: 'bookmarks', name: 'Bookmarks', count: 10},
-        {id: 'contents', name: 'Contents', count: 1},
-        {id: 'fragments', name: 'Fragments', count: 2},
-        {id: 'drafts', name: 'Drafts', count: 13}
+      wsType: undefined
+    }
+  },
+  computed: {
+    wsStats () {
+      return [
+        {id: 'bookmarks', name: 'Заметки', count: this.$store.state.workspace.workspace.bookmarks.length},
+        {id: 'contents', name: 'Контент', count: this.$store.state.workspace.workspace.contents.length},
+        {id: 'fragments', name: 'Фрагменты', count: this.$store.state.workspace.workspace.fragments.length},
+        {id: 'nodes', name: 'Ядра', count: this.$store.state.workspace.workspace.nodes.length}
       ]
     }
   },
@@ -99,33 +104,6 @@ export default {
     async contentGet (oid) {
       this.$log('contentGet start', oid)
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
-      // let {data: {objectList: [content]}} = await this.$apollo.query({
-      //   query: gql`
-      //     query contentGet ($oid: OID!) {
-      //       objectList(oids: [$oid]) {
-      //         oid
-      //         type
-      //         name
-      //         thumbUrl(preferWidth: 600)
-      //         name
-      //         ... on Video {
-      //           url
-      //           urlOriginal
-      //           duration
-      //           width
-      //           height
-      //         }
-      //         ... on Image {
-      //           url
-      //           urlOriginal
-      //         }
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     oid: oid
-      //   }
-      // })
       this.$log('contentGet done', content)
       return content
     }

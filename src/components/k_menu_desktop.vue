@@ -1,41 +1,48 @@
 <template lang="pug">
 div(:style=`{width: width+'px'}`).column.full-height.bg-secondary
+  //- dialogs
+  q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    k-invite(@hide="$refs.inviteDialog.hide()")
+  k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
-  div(:style=`{height: '60px'}`).row.full-width
+  div(:style=`{height: '60px'}` @click="$router.push('/app/home')").row.full-width.cursor-pointer
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       k-logo(:width="40" :height="40")
     div(v-if="!mini").col.full-height
-      .row.fit.items-center.q-px-sm
-        span.text-bold.text-white Kalpagramma
+      .row.fit.items-center
+        span.text-bold.text-white Кальпаграмма
   //- user
   div(:style=`{height: '60px'}`).row.full-width
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
     div(v-if="!mini").col.full-height
-      .row.fit.items-center.q-px-sm
+      .row.fit.items-center
         span.text-bold.text-white {{ $store.state.auth.user.name }}
-  div(:style=`{height: '60px'}`).row.full-width.items-center
+  //- create node
+  div(v-if="!page" :style=`{height: '60px'}` @click="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])").row.full-width.items-center.cursor-pointer
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      q-btn(round icon="add" color="green")
+      q-btn(round push icon="add" color="green")
     div(v-if="!mini").col.full-height
-      .row.fit.items-center.q-px-sm
-        span.text-white Create node
+      .row.fit.items-center
+        span.text-white Создать ядро
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start
       div(v-for="(p, pi) in pages" :key="pi" @click="pageClick(p, pi)"
         :style=`{height: '60px'}`
-        ).row.full-width
+        ).row.full-width.cursor-pointer
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
           q-btn(round flat :icon="p.icon" color="white")
         div(v-if="!mini").col.full-height
-          .row.fit.items-center.q-px-sm
+          .row.fit.items-center
             span.text-white {{ p.name }}
-    .row.full-width.q-px-sm.q-my-sm
-      q-btn(color="green" no-caps :style=`{height: '50px', borderRadius: '10px'}`).full-width
-        span Invite friend
+    div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
+      q-btn(
+        :round="mini" push color="green" no-caps icon="person_add" @click="$refs.inviteDialog.show()"
+        :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
+        span(v-if="width === 230").text-bold Пригласить друга
   //- footer mini
-  div(:style=`{height: '60px'}`).row.full-width.items-center
+  div(v-if="!page" :style=`{height: '60px'}`).row.full-width.items-center
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat :icon="mini ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" color="white" @click="mini = !mini")
 </template>
@@ -43,20 +50,34 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-secondary
 <script>
 export default {
   name: 'kMenuDesktop',
+  props: ['page'],
   data () {
     return {
       width: 230,
       mini: false,
       pages: [
-        {name: 'Explore', icon: 'explore', path: '/app/hot'},
-        {name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
+        {name: 'Чарты', icon: 'explore', path: '/app/hot'},
+        {name: 'Мастерская', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
         // {name: 'Create node', icon: 'add', path: '/app/create'},
         // {name: 'Invite friend', icon: 'menu', path: '/app/invite'},
-        {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
-        {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
-        {name: 'Settings', icon: 'settings', path: '/app/settings'},
-        {name: 'Logout', icon: 'exit_to_app', path: '/app/logout'}
+        {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},
+        {name: 'Уведомления', icon: 'notifications', path: '/app/notifications'},
+        {name: 'Настройки', icon: 'settings', path: '/app/settings'},
+        {name: 'Выйти', icon: 'exit_to_app', path: '/app/logout'}
       ]
+    }
+  },
+  computed: {
+    logoutDialogOptions () {
+      return {
+        header: false,
+        headerName: '',
+        actions: {
+          stay: {name: 'Если хочешь остаться, останься просто так'}
+        },
+        confirm: true,
+        confirmName: 'Выйти'
+      }
     }
   },
   watch: {
@@ -76,11 +97,20 @@ export default {
     }
   },
   methods: {
+    async logoutDialogAction (action) {
+      this.$log('logoutDialogAction', action)
+      switch (action) {
+        case 'confirm': {
+          await this.$store.dispatch('auth/logout')
+        }
+      }
+    },
     async pageClick (p, pi) {
       this.$log('pageClick', p, pi)
       switch (p.path) {
         case '/app/logout': {
           this.$log('LOGOUT')
+          this.$refs.logoutDialog.show()
           break
         }
         default: {

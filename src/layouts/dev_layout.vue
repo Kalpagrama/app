@@ -1,22 +1,11 @@
 <template lang='pug'>
-q-layout(view='hHh Lpr fFf').bg-primary
-  q-page-container
-    q-page
-      .row.window-height
-        //- video-editor(:content="content")
-        h1(
-          :style=`{
-            color: 'red',
-            'hover':  '{color: green !important}'
-          }`) hello
+.row.full-width devLayout
 </template>
 
 <script>
-import videoEditor from 'components/video_editor'
-
 export default {
   name: 'devLayout',
-  components: {videoEditor},
+  components: {},
   data () {
     return {
       content: {

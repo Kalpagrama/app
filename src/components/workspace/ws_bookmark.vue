@@ -2,14 +2,14 @@
 div(:style=`{position: 'relative'}`).column.fit.bg-white
   //- create/update
   q-btn(
-    color="green" no-caps push @click="bookmarkCreate()"
+    color="green" no-caps push :loadig="creating" @click="bookmarkCreate()"
     :style=`{position: 'absolute', bottom: '8px', left: '8px', width: 'calc(100% - 16px)', height: '60px', borderRadius: '10px'}`)
-    span.text-bold Create bookmark
+    span.text-bold Создать
   //- header
   div(:style=`{height: '60px'}`).row.full-width
     .col.full-height
       .row.fit.items-center.q-px-md
-        span.text-bold New bookmark
+        span.text-bold Новая заметка
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="clear" @click="$emit('hide')")
   //- body
@@ -28,21 +28,40 @@ export default {
   name: 'wsBookmark',
   data () {
     return {
+      creating: false,
+      loadig: false,
       url: '',
       name: '',
       body: ''
     }
   },
   methods: {
-    bookmarkCreate () {
-      this.$log('bookmarkCreate')
+    async bookmarkCreate () {
+      try {
+        this.$log('bookmarkCreate start')
+        this.creating = true
+        let bookmark = {
+          name: this.name,
+          url: this.url,
+          tagUids: []
+        }
+        let res = await this.$store.dispatch('workspace/addWSBookmark', bookmark)
+        this.$log('bookmarkCreate done', res)
+        this.creating = false
+        this.$emit('hide')
+      } catch (e) {
+        this.$log('bookmarkCreate error', e)
+        this.creating = false
+      }
     }
   },
   mounted () {
     this.$log('mounted')
+    // TODO: get bookmark from vuex
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$store.commit('ui/stateSet', ['bookmark', null])
   }
 }
 </script>

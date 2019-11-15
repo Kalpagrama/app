@@ -1,10 +1,10 @@
 <template lang="pug">
-  k-split(:headerMaxHeight="$q.screen.height/2" :headerClass="['q-pa-sm']" :bodyClass="['bg-grey-1', 'q-pt-md']").bg-white
+  k-split(:headerMaxHeight="$q.screen.height/2" :headerClass="['q-pa-sm']" :bodyClass="['bg-grey-1']").bg-white
     template(v-slot:header)
       node(v-if="node" :node="node" :needFull="true" :active="true" :width="width"
         :noName="false" :noSpheres="false" noHeader noTimestamp :noActions="false")
     template(v-slot:body)
-      nodes(v-if="node" :node="node").q-px-md
+      nodes(v-if="node" :node="node")
       div(v-else).row.fit.items-center.justify-center
         q-spinner(:thickness="2" color="green" size="50px")
 </template>

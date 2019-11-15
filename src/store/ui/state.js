@@ -21,9 +21,12 @@ export default {
     {id: '/app/account', name: 'account', icon: 'account_circle', hidden: false, desktop: true, mobile: true},
     {id: '/app/menu', icon: 'menu', name: 'menu', hidden: false, desktop: true, mobile: true}
   ],
+  fragment: null,
+  fragmentActionDialogOpened: false,
   fragmentDialogOpened: false,
-  fragmentDialogPayload: null,
+  bookmark: null,
   bookmarkDialogOpened: false,
+  node: null,
   nodeRateDialogOpened: false,
   nodeCreatorDialogOpened: false
 }

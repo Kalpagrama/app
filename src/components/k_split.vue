@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column
+div(:style=`{position: 'relative', height: $q.screen.height-60+'px'}`).column
   //- header
   div(
     :class="headerClass"

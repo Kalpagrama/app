@@ -4,7 +4,7 @@ div(:style=`{position: 'relative'}`).row
     ref="kVideo"
     v-bind="$attrs" crossorigin="Anonymous"
     :style=`{height: '100%', width: '100%', objectFit: 'contain'}`
-    :autoplay="true" :muted="true"
+    :autoplay="true" :muted="true" loop playsinline
     @click="videoClick()"
     @seeked="seekEnded"
     @play="handlePlay"
@@ -93,7 +93,7 @@ export default {
       seeking: false,
       seekCount: 0,
       seekInterval: null,
-      toolsShowLocal: false
+      toolsShowLocal: true
     }
   },
   computed: {
@@ -109,12 +109,12 @@ export default {
     videoClick () {
       this.$log('videoClick')
       if (this.toolsShowLocal) {
-        this.toolsShowLocal = false
+        // this.toolsShowLocal = false
       } else {
-        this.toolsShowLocal = true
-        setTimeout(() => {
-          if (!this.playStarted) this.toolsShowLocal = false
-        }, 3000)
+        // this.toolsShowLocal = true
+        // setTimeout(() => {
+        //   if (!this.playStarted) this.toolsShowLocal = false
+        // }, 3000)
       }
     },
     videoPlayPause () {

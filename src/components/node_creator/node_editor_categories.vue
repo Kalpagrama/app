@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   //- dialog
-  k-dialog(ref="nodeCategoryDialog")
+  q-dialog(ref="nodeCategoryDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     div(:style=`{position: 'relative'}`).column.fit.bg-white
       //- actions
       q-btn(
@@ -27,13 +27,13 @@
   .row.full-width
     div(
       :style=`{minHeight: '56px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.q-pa-sm.bg-grey-4
+      ).row.full-width.items-center.q-pa-sm.bg-grey-3
       .col.full-height
         div(@click.self="$refs.nodeCategoryDialog.show()").row.fit.items-center.content-center
           div(
             v-for="(c, ckey) in categoriesMap" :key="ckey" v-if="categories.includes(c.type)"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`
-            ).row.bg-primary.q-mr-sm.q-mt-xs
+            ).row.bg-green.q-mr-sm.q-mt-xs
             .col
               .row.fit.items-center.q-px-sm
                 span.text-white.q-mb-xs {{ c.nameC  }}

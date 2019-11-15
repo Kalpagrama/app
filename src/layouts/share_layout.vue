@@ -5,7 +5,7 @@
 
 <script>
 export default {
-  name: 'share_layout',
+  name: 'shareLayout',
   data () {
     return {
     }

@@ -1,9 +1,9 @@
 <template lang="pug">
-q-layout(container :style=`{width: $q.screen.width+'px', height: $q.screen.height+'px'}`).column.bg-grey-3
+q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-grey-3
   q-dialog(ref="subDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
     @hide="sub = null")
-    div(@click.self="$refs.subDialog.hide()").row.fit.q-py-xl.q-px-sm
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).column.fit.bg-white
+    div(@click.self="$refs.subDialog.hide()").row.fit.justify-center.items-start.q-py-xl.q-px-sm
+      div(:style=`{maxWidth: '500px', borderRadius: '10px', overflow: 'hidden'}`).column.fit.bg-white
         .col.full-width.scroll
           .row.full-width.items-start.content-start.q-pa-md
             span {{ sub }}
@@ -11,25 +11,24 @@ q-layout(container :style=`{width: $q.screen.width+'px', height: $q.screen.heigh
     div(:style=`{height: '60px'}`).row.full-width.bg-white
       .col.full-height
         .row.fit.items-center.q-px-md
-          span.text-bold.text-black Subscriptions
+          span.text-bold.text-black Подписки
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="edit" color="green" @click="editToggle()")
   q-page-container.fit
     q-page.fit
-      .row.full-width.items-start.content-start.q-pa-md
-        div(
-          v-for="(s, si) in subscriptions" :key="si"
-          :style=`{height: '60px'}`
-          ).row.full-width.items-center.q-mb-sm
-          div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-            img(@click="subClick(s, si)" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
-          div(@click="subClick(s, si)").col.full-height
-            .row.fit.items-center
-              span {{ s.name | cut(50) }}
-          div(v-if="editing" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-            q-btn(round flat icon="clear" @click="subDelete(s, si)")
-  //- q-footer(reveal).lt-sm
-  //-   k-menu-horiz
+      .row.full-width.items-start.content-start.justify-center.q-pa-md
+        div(:style=`{maxWidth: '500px'}`).row.full-width
+          div(
+            v-for="(s, si) in subscriptions" :key="si"
+            :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+            ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer
+            div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+              img(@click="subClick(s, si)" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
+            div(@click="subClick(s, si)").col.full-height
+              .row.fit.items-center
+                span {{ s.name | cut(50) }}
+            div(v-if="editing" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+              q-btn(round flat icon="delete_outline" color="grey-7" @click="subDelete(s, si)")
 </template>
 
 <script>

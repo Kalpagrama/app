@@ -1,9 +1,7 @@
 <template lang="pug">
 div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-px-sm
-  //- div(
-  //-   :style=`{height: '300px', borderRadius: '10px'}`
-  //-   ).row.full-width.bg-white.q-mb-md
-  node(:node="node" :nodeFull="node"
+  node(
+    :node="node" :nodeFull="node"
     :style=`{borderRadius: '10px'}`).bg-white.q-mb-md
   div(
     :style=`{height: 'auto', borderRadius: '10px'}`
@@ -17,14 +15,14 @@ div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-
     ).row.full-width.bg-white.q-mb-md
     .row.full-width.items-start.content-start.q-pa-md
       .row.full-width.q-pa-sm
-        span.text-bold Layout
+        span.text-bold Шаблон
       div(:style=`{height: '56px', borderRadius: '10px'}`).row.full-width.items-center.justify-between.q-px-sm.bg-grey-2
-        span Picture in picture
+        span Картинка в картинке
         q-icon(size="26px" name="keyboard_arrow_down")
       .row.full-width.q-pa-sm
-        span.text-bold Category
+        span.text-bold Категория
       div(:style=`{height: '56px', borderRadius: '10px'}`).row.full-width.items-center.justify-between.q-px-sm.bg-grey-2
-        span(:style=`{borderRadius: '10px'}`).bg-green.q-px-md.q-py-sm.text-white #Fun
+        span(:style=`{borderRadius: '10px'}`).bg-green.q-px-md.q-py-sm.text-white #Развлечения
         q-icon(size="26px" name="keyboard_arrow_down")
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
@@ -33,17 +31,54 @@ div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-
       :loading="publishing"
       :style=`{position: 'absolute', left: '8px', bottom: '8px', height: '60px',
         width: 'calc(100% - 16px)', borderRadius: '10px'}`)
-      span.text-bold Publish
+      span.text-bold Опубликовать
 </template>
 
 <script>
 export default {
   name: 'nodeCreator__nodePreview',
-  props: ['tab', 'node'],
+  props: ['tab', 'fragments'],
   data () {
     return {
       publishing: false,
+      layout: 'PIP',
+      categories: ['FUN'],
+      spheres: [],
       name: ''
+    }
+  },
+  computed: {
+    node () {
+      let fragments = []
+      for (const f in this.fragments) {
+        fragments.push(this.fragments[f])
+      }
+      return {
+        uid: this.uid,
+        name: this.name,
+        author: this.$store.state.auth.user,
+        fragments: fragments.map(f => {
+          // this.$log('f', f)
+          return {
+            uid: f.uid,
+            oid: f.content.oid,
+            content: f.content,
+            name: f.name,
+            thumbUrl: f.thumbUrl,
+            relativeCuts: f.relativeCuts,
+            relativeScale: f.relativeScale
+          }
+        }),
+        spheres: this.spheres,
+        categories: this.categories,
+        createdAt: Date.now(),
+        meta: {
+          layout: this.layout,
+          fragments: fragments.map(f => {
+            return {uid: f.uid, thumbUrl: f.thumbUrl}
+          })
+        }
+      }
     }
   },
   methods: {

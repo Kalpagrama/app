@@ -1,6 +1,5 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf' container
-  :style=`{position: 'relative', width: width+'px', height: height-0+'px !important'}`).bg-grey-2
+q-layout(view='hHh Lpr fFf' container :style=`{position: 'relative', width: width+'px', height: height-0+'px !important'}`).bg-grey-3
   //- dialogs
   k-dialog-bottom(ref="wsAddDialog" mode="actions" :options="wsAddDialogOptions" @action="wsAddDialogAction")
   //- menu
@@ -43,9 +42,6 @@ q-layout(view='hHh Lpr fFf' container
     ws-dashboard(v-if="page === 'dashboard'" @page="$router.push({params: {page: $event}})")
     ws-settings(v-else-if="page === 'settings'")
     ws-items(v-else-if="page" @item="$emit('item', $event)" :page="page")
-  //- footer
-  q-footer(reveal).lt-md.bg-grey-4
-    k-menu-horiz
 </template>
 
 <script>
@@ -79,10 +75,10 @@ export default {
     wsAddDialogOptions () {
       return {
         confirm: true,
-        confirmName: 'Create node',
+        confirmName: 'Создать ядро',
         actions: {
-          addBookmark: {name: 'Add Bookmark'},
-          addContent: {name: 'Add Content'}
+          addBookmark: {name: 'Добавить заметку'},
+          addContent: {name: 'Добавить конент'}
         }
       }
     }
@@ -107,7 +103,7 @@ export default {
           break
         }
         case 'addContent': {
-          this.$store.commit('ui/stateSet', ['contentDialogOpened', true])
+          // this.$store.commit('ui/stateSet', ['contentDialogOpened', true])
           break
         }
         case 'confirm': {

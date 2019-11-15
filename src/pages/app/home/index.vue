@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(containter :style=`{width: width+'px', minHeight: $q.screen.height+'px'}` @scroll="onScroll").bg-grey-3
+q-layout(containter :style=`{width: width+'px', minHeight: height+'px'}` @scroll="onScroll").bg-grey-3
   //- q-header(reveal)
   //-   div(:style=`{height: '60px'}`).row.full-width.bg-red
   q-page-container

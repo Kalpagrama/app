@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{paddingBottom: '60px'}`).row.full-width.full-height.items-start.content-start.justify-center.q-pt-sm.q-px-sm.bg
+div(:style=`{paddingBottom: '60px'}`).row.full-width.full-height.items-start.content-start.justify-center.q-pt-sm.q-px-sm
   //- fragment finder dialog
   q-dialog(ref="fragmentFinderDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     fragment-finder(@fragment="fragmentFound" @hide="$refs.fragmentFinderDialog.hide()")

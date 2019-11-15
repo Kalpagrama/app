@@ -1,8 +1,8 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf').bg-grey-3
+q-layout(view='hHh Lpr fFf' :class="{'bg-grey-3': $route.path !== '/app/menu'}").bg-primary
   //- node action dialog
-  k-dialog-bottom(:value="$store.state.ui.fragmentDialogOpened" mode="actions" :options="fragmentDialogOptions"
-    @action="fragmentDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])")
+  k-dialog-bottom(ref="fragmentActionDialog" :value="$store.state.ui.fragmentActionDialogOpened" mode="actions" :options="fragmentActionDialogOptions"
+    @action="fragmentActionDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentActionDialogOpened', false])")
   //- node rate dialog
   q-dialog(ref="nodeRateDialog" :value="$store.state.ui.nodeRateDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
     @hide="$store.commit('ui/stateSet', ['nodeRateDialogOpened', false])")
@@ -18,13 +18,19 @@ q-layout(view='hHh Lpr fFf').bg-grey-3
     :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     ws-bookmark(@hide="$refs.bookmarkDialog.hide()")
   //- fragment dialog
-  //- content, node
-  q-drawer(v-model="leftDrawerShow" side="left" show-if-above :width="leftDrawerWidth").gt-xs
+  q-dialog(
+    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened"
+    @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])"
+    :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    ws-fragment(@hide="$refs.fragmentDialog.hide()")
+  //- content dialog
+  q-drawer(v-model="leftDrawerShow" side="left" show-if-above :breakpoint="500" :width="leftDrawerWidth").gt-xs
     k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
+  //- page
   q-page-container
     q-page
       q-resize-observer(@resize="onResize")
-      router-view(v-if="!loading" :height="height" :width="width")
+      router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height-60" :width="width")
       div(v-else).row.full-width.window-height.items-center.justify-center
         k-spinner(:width="200" :height="200")
   q-footer(reveal).lt-sm
@@ -39,7 +45,7 @@ export default {
     return {
       loading: true,
       leftDrawerShow: true,
-      leftDrawerWidth: 250,
+      leftDrawerWidth: 230,
       radius: 30,
       width: 0,
       height: 0,
@@ -63,48 +69,52 @@ export default {
   //   }
   // },
   computed: {
-    fragmentDialogHeaderName () {
-      let fragmentPayload = this.$store.state.ui.fragmentDialogPayload
+    fragmentActionDialogHeaderName () {
+      let fragmentPayload = this.$store.state.ui.fragment
       if (fragmentPayload) {
         return fragmentPayload.content.name
       } else {
         return ''
       }
     },
-    fragmentDialogOptions () {
+    fragmentActionDialogOptions () {
       return {
-        header: true,
+        header: false,
         headerName: this.fragmentDialogHeaderName,
         confirm: true,
         confirmName: 'Создать ядро',
         actions: {
-          subscribe: {name: 'Follow'},
-          contentExplore: {name: 'Explore content'},
-          saveToWorkspace: {name: 'Save to workspace'}
+          contentSubscribe: {name: 'Подпсаться на контент'},
+          contentExplore: {name: 'Исследовать контент'},
+          fragmentWorkspace: {name: 'Фрагмент в мастерскую'}
         }
       }
     }
   },
   methods: {
-    fragmentDialogAction (action) {
+    fragmentActionDialogAction (action) {
       this.$log('fragmentDialogAction', action)
-      this.$log('fragmentDialogPayload', this.$store.state.ui.fragmentDialogPayload)
+      this.$log('fragmentDialogPayload', this.$store.state.ui.fragment)
       switch (action) {
         case 'header': {
-          this.$router.push(`/app/content/${this.$store.state.ui.fragmentDialogPayload.content.oid}`)
+          this.$router.push(`/app/content/${this.$store.state.ui.fragment.content.oid}`)
           break
         }
-        case 'subscribe': {
+        case 'contentSubscribe': {
+          this.$store.dispatch('subscriptions/subscribe', this.$store.state.ui.fragment.content.oid)
           break
         }
         case 'contentExplore': {
-          this.$router.push(`/app/content/${this.$store.state.ui.fragmentDialogPayload.content.oid}`)
+          this.$router.push(`/app/content/${this.$store.state.ui.fragment.content.oid}`)
           break
         }
-        case 'saveToWorkspace': {
+        case 'fragmentWorkspace': {
+          this.$store.commit('ui/stateSet', ['fragmentDialogOpened', true])
           break
         }
         case 'confrim': {
+          // this.$store.commit('ui/s')
+          this.$store.commit('ui/nodeCreatorDialogOpened', true)
           break
         }
       }
@@ -113,7 +123,7 @@ export default {
       this.miniState = !this.miniState
     },
     onResize (e) {
-      this.$log('onResize', e)
+      // this.$log('onResize', e)
       this.width = e.width
       this.height = this.$q.screen.height
     }

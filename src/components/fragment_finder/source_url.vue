@@ -8,14 +8,14 @@
         .row.fit.items-center.justify-start.q-px-md
           span.text-bold Upload by URL
       div(:style=`{height: '70px', width: '70px'}`).row.items-center.justify-center.q-px-md
-        q-btn(round flat icon="clear" @click="$emit('hide')")
+        q-btn(v-if="!uploading" round flat icon="clear" @click="cancel()")
     //- header input
     div(:style=`{minHeight: height+'px'}`).row.full-width.items-end.q-px-sm
       div(:style=`{height: '56px', borderRadius: '10px', overflow: 'hidden', zIndex: 300}`).row.full-width
         .row.full-width
           q-input(ref="inputUrl" v-model="input" filled placeholder="Вставьте ссылку" @keydown.enter="inputEnterHandle" @input="inputHandle" @focus="inputFocusHandle" @blur="inputBlurHandle").full-width
             template(v-slot:append)
-              q-btn(v-if="input.length > 0" round flat icon="clear" @click="inputClear()")
+              q-btn(v-if="input.length > 0 && !uploading" round flat icon="clear" @click="inputClear()")
   //- body
   .col.scroll.full-width
     .row.full-width.items-start.content-start
@@ -32,6 +32,8 @@
           div(v-if="!iframeReady" :style=`{position: 'absolute', zIndex: 1000, top: 0, left: 0}`).row.fit.items-center.justify-center
             q-spinner(:thickness="4" size="50px" color="primary")
   //- footer
+  .row.full-width
+    small {{ $store.state.events.progress }}
   div(v-if="inputUrl" :style=`{height: '70px'}`).row.full-width.q-px-sm
     q-btn(
       color="green" push no-caps @click="upload()"
@@ -162,15 +164,19 @@ export default {
         this.uploading = false
         this.$emit('uploading', false)
       }
+    },
+    cancel () {
+      this.$log('cancel')
+      if (!this.uploading) {
+        this.$emit('hide')
+      }
     }
   },
   mounted () {
     this.$log('mounted')
-    // TODO: uploading progress...
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // close uploading connection ws
   }
 }
 </script>

@@ -7,7 +7,7 @@ export function init(state, userEvents) {
 
 export function addEvent(state, userEvent) {
   userEvent.uid = Date.now().toString()
-  state.userEvents.push(userEvent)
+  state.userEvents.unshift(userEvent)
   state.userEvents.splice(888, state.userEvents.length)
 }
 
