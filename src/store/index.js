@@ -21,7 +21,7 @@ async function init (context) {
 
   let { data: { user, categories, userWorkspace, userEvents, userSubscriptions, userSettings } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
-      ${fragments.objectShortFragment} ${fragments.eventFragment} ${fragments.userFragment} ${fragments.WSContentFragment} ${fragments.WSFragmentFragment} ${fragments.WSBookmarkFragment} ${fragments.WSSphereFragment} ${fragments.WSNodeFragment}
+      ${fragments.userFragment}
       query initializationQuery {
         user { ...userFragment}
         categories {
@@ -34,29 +34,17 @@ async function init (context) {
             name
           }
         }
-        userWorkspace {
-          nodes { ...WSNodeFragment }
-          fragments { ...WSFragmentFragment }
-          contents { ...WSContentFragment }
-          bookmarks { ...WSBookmarkFragment }
-          spheres { ...WSSphereFragment }
-        }
-        userEvents{...eventFragment}
-        userSubscriptions{...objectShortFragment}
-        userSettings{
-          elements
-        }
       }`
   })
   // context.dispatch('log/debug', `initializationQuery complete. result= ${{ user, categories, userWorkspace, userEvents }}`, { root: true })
   // todo убрать юзера из auth
   await context.dispatch('auth/init', user)
   await context.dispatch('node/init', categories)
-  await context.dispatch('workspace/init', userWorkspace)
-  await context.dispatch('events/init', userEvents)
-  await context.dispatch('subscriptions/init', userSubscriptions)
+  await context.dispatch('workspace/init', user.workspace)
+  await context.dispatch('events/init', user.events)
+  await context.dispatch('subscriptions/init', user.subscriptions)
   await context.dispatch('objects/init')
-  await context.dispatch('user/init', userSettings, user)
+  await context.dispatch('user/init', user)
 }
 
 export default function (/* { ssrContext } */) {
