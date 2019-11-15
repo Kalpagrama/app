@@ -5,7 +5,7 @@
   q-dialog(ref="sourceDeviceDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     source-device(@hide="$refs.sourceDeviceDialog.hide()")
   q-dialog(ref="sourceWsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    source-ws(@hide="$refs.sourceWsDialog.hide()" :type="wsType" @input="")
+    source-ws(@hide="$refs.sourceWsDialog.hide()" :type="wsType" @item="fragmentFound")
   div(:style=`{height: '60px'}`).row.full-width.items-center
     .col.full-height
       .row.fit.items-center.q-px-md
@@ -70,6 +70,11 @@ export default {
       this.$emit('hide')
     },
     fragmentUse () {},
+    fragmentFound (i) {
+      this.$log('fragmentFound', i)
+      this.$emit('fragment', i)
+      this.$emit('hide')
+    },
     async fragmentCreate (content, f) {
       this.$log('fragmentCreate', content, f)
       let uid = `${content.oid}-${Date.now()}`
@@ -95,7 +100,7 @@ export default {
             content: content,
             thumbUrl: []
           }
-          this.$set(this.fragments, uid, fragment)
+          // this.$set(this.fragments, uid, fragment)
           break
         }
       }

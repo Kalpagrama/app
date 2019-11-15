@@ -187,8 +187,8 @@ export default {
         let node = await this.$store.dispatch('node/nodeCreate', this.node)
         // delete ws draft
         if (this.draft) {
-          let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
-          this.$log('deleteWSDraft', deleteWSDraft)
+          // let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
+          // this.$log('deleteWSDraft', deleteWSDraft)
         }
         // remove draftLocal
         localStorage.removeItem('draft')

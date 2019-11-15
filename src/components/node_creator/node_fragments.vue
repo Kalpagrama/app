@@ -18,7 +18,7 @@ div(:style=`{paddingBottom: '60px'}`).row.full-width.full-height.items-start.con
       :style=`{position: 'fixed', zIndex: 1000, bottom: '8px', right: '8px'}`)
   //- fragment
   div(
-    v-for="(f, fkey, fi) in fragments" :key="fkey" @click="fragment = f, $refs.fragmentActionDialog.show()"
+    v-for="(f, fkey, fi) in fragments" :key="fkey" @click="fragmentClick(f, fkey, fi)"
     :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
     //- header
     div(:style=`{height: '50px'}`).row.full-width.items-center.q-pa-sm.bg-white
@@ -77,6 +77,11 @@ export default {
   watch: {
   },
   methods: {
+    fragmentClick (f) {
+      this.$log('fragmentClick')
+      this.fragment = f
+      this.$refs.fragmentActionDialog.show()
+    },
     fragmentAction (e) {
       this.$log('fragmentAction', e)
       switch (e) {
@@ -109,32 +114,9 @@ export default {
     },
     async fragmentFound (f) {
       this.$log('fragmentFound', f)
-      // create WSContent?
-      // let WSContent = await this.$store.dispatch('workspace/addWSContent', {name: content.name, content: {oid: content.oid}})
-      // create WSFragment?
       this.$set(this.fragments, f.uid, f)
-    },
-    async fragmentNameClick (f) {
-      this.$log('fragmentNameClick', f)
-      this.$set(this, 'name', f.name)
-      this.nameEdit = f.uid
-      await this.$wait(300)
-      this.$nextTick(() => {
-        this.$refs.nameInput[0].focus()
-      })
-    },
-    fragmentEdit () {
-      this.$log('fragmentEdit', this.fragment)
-      switch (this.fragment.content.type) {
-        case 'VIDEO': {
-          this.$refs.videoEditorDialog.show()
-        }
-      }
-    },
-    fragmentDelete (uid) {
-      this.$log('fragmentDelete')
-      if (!uid) return
-      this.$delete(this.fragments, uid)
+      this.fragment = f
+      this.fragmentAction('confirm')
     }
   },
   mounted () {

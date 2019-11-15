@@ -9,6 +9,10 @@ q-layout.bg-black
     q-btn(
       round flat color="white" icon="menu" @click="$refs.videoEditorDialog.toggle()"
       :style=`{background: 'rgba(0,0,0,0.4)'}`)
+  q-btn(
+    color="green" push no-caps @click="confirm()"
+    :style=`{position: 'absolute', zIndex: 10000, top: '16px', left: '70px', width: 'calc(100% - 140px)'}`)
+    span.text-white Ready
   //- cancel
   div(:style=`{position: 'absolute', top: '0px', right: '0px', zIndex: 10000, height: '70px', width: '70px'}`).row.items-center.justify-center
     q-btn(
