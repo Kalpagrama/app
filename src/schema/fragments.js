@@ -110,6 +110,32 @@ const eventFragment = gql`
     }
   }
 `
+const eventChangeFragment = gql`
+  fragment eventChangeFragment on EventChange {
+    type
+    subject{
+      oid
+      name
+      thumbUrl(preferWidth: 600)
+    }
+    object{
+      oid
+      name
+      thumbUrl(preferWidth: 600)
+      meta{
+        type
+        ...on MetaNode{
+          layout
+          fragments{
+            uid
+          }
+        }
+      }
+    }
+    path
+    value
+  }
+`
 const objectShortFragment = gql`
   fragment objectShortFragment on ObjectShort {
     type
@@ -208,6 +234,7 @@ const userFragment = gql`
 `
 const fragments = {
   eventFragment,
+  eventChangeFragment,
   contentFragment,
   WSContentFragment,
   WSFragmentFragment,
