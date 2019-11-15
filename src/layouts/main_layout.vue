@@ -24,15 +24,15 @@ q-layout(view='hHh Lpr fFf' :class="{'bg-grey-3': $route.path !== '/app/menu'}")
     :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     ws-fragment(@hide="$refs.fragmentDialog.hide()")
   //- content dialog
-  q-drawer(v-model="leftDrawerShow" side="left" show-if-above :breakpoint="500" :width="leftDrawerWidth").gt-xs
+  q-drawer(v-model="leftDrawerShow" side="left" :width="leftDrawerWidth").gt-xs
     k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
   //- page
   q-page-container
-    q-page
-      q-resize-observer(@resize="onResize")
-      router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height-60" :width="width")
-      div(v-else).row.full-width.window-height.items-center.justify-center
-        k-spinner(:width="200" :height="200")
+    //- q-page
+    q-resize-observer(@resize="onResize")
+    router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height-60" :width="width")
+    div(v-else).row.full-width.window-height.items-center.justify-center
+      k-spinner(:width="200" :height="200")
   q-footer(reveal).lt-sm
     k-menu-mobile
 </template>
@@ -44,7 +44,7 @@ export default {
   data () {
     return {
       loading: true,
-      leftDrawerShow: true,
+      leftDrawerShow: false,
       leftDrawerWidth: 230,
       radius: 30,
       width: 0,

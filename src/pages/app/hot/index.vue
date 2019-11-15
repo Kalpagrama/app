@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(containter :style=`{width: width+'px', minHeight: height+'px'}` @scroll="onScroll")
+q-layout(:style=`{width: width+'px'}` @scroll="onScroll")
   //- drawer
   q-drawer(ref="kDrawer" side="left" :width="240").lt-sm
     categories(:style=`{borderRadius: '0 10px 10px 0', overflow: 'hidden'}`)
