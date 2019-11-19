@@ -9,8 +9,8 @@ Vue.use(VueRouter)
 export default function (/* { store, ssrContext } */) {
   const Router = new VueRouter({
     scrollBehavior (to, from, savedPosition) {
-      debug('sb', to, from)
-      debug('scrollBehavior', to, from)
+      // debug('sb', to, from)
+      // debug('scrollBehavior', to, from)
       // if (savedPosition) {
       //   debug('savedPosition', savedPosition)
       //   return savedPosition

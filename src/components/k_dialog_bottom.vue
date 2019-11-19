@@ -10,7 +10,7 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
         div(v-if="options.header" :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="headerClick()").row.full-width.justify-center.items-center.q-mb-md.bg-white
           span.text-bold.text-center {{ options.headerName }}
         //- actions
-        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-md
+        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
           div(
             v-for="(a, akey, ai) in options.actions" :key="akey" @click="actionClick(a, akey, ai)"
             :style=`{height: '50px', borderTop: ai > 0 ? '1px solid #eee' : 'none'}`

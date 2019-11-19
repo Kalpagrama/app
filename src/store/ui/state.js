@@ -28,5 +28,6 @@ export default {
   bookmarkDialogOpened: false,
   node: null,
   nodeRateDialogOpened: false,
-  nodeCreatorDialogOpened: false
+  nodeCreatorDialogOpened: false,
+  gtxs: true
 }

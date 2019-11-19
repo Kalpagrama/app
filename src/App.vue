@@ -1,5 +1,5 @@
 <template lang="pug">
-div(id="q-app")
+div(id="q-app").row.window-height.full-width.items-center.justify-center.bg-black
   router-view
 </template>
 

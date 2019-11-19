@@ -114,6 +114,8 @@ export default async ({ Vue, store, router: VueRouter }) => {
   // ws
   Vue.component('wsBookmark', () => import(`components/workspace/ws_bookmark`))
   Vue.component('wsFragment', () => import(`components/workspace/ws_fragment`))
+  // new
+  Vue.component('nodeTape', () => import(`components/node_tape`))
 }
 
 export { time, router }

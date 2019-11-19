@@ -1,24 +1,30 @@
 <template lang="pug">
-.column.fit.bg-white
+div(:style=`{position: 'relative'}`).column.fit.bg-white
   div(:style=`{height: '60px'}`).row.full-width
     div(v-if="false" :style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
       q-btn(round flat color="primary" icon="menu")
     .col.full-height
-      .row.fit.items-center.q-px-md
-        span.text-bold Категории
+      .row.fit.items-center.q-px-lg
+        span.text-bold {{ $t('Trends') }}
+  div(v-if="false").row.full-width.bg-red
+    small {{ category }}
   //- body
   .col.scroll.full-width
-    .row.full-width.items-start
+    div(:style=`{paddingBottom: '100px'}`).row.full-width.items-start
+      //- span {{ categories }}
       div(
-        v-for="(c,ci) in categories" :key="ci" @click="categoryClick(c, ci)"
+        v-for="(c, ckey) in categories" :key="ckey" @click="categoryClick(c, ckey)"
         :style=`{height: '60px'}`
-        ).row.full-width.items-center.q-px-md.cursor-pointer.hr
-        span {{ `#${c.name.charAt(0).toUpperCase() + c.name.slice(1)}` }}
+        ).row.full-width.items-center.q-px-md.cursor-pointer
+        span(
+          :class=`{'bg-green': ckey === category}`
+          :style=`{color: ckey === category ? 'white' : 'black', borderRadius: '4px'}`).q-pa-sm {{ `#${c.name.charAt(0).toUpperCase() + c.name.slice(1)}` }}
 </template>
+
 <script>
 export default {
   name: 'categories',
-  components: {},
+  // props: ['category'],
   data () {
     return {
       category: undefined
@@ -28,7 +34,7 @@ export default {
     '$route': {
       immediate: true,
       handler (to, from) {
-        this.$log('$route CHANGED', to)
+        // this.$log('$route CHANGED', to)
         if (to.params.category) {
           this.category = to.params.category
         } else {
@@ -52,9 +58,17 @@ export default {
   methods: {
     async categoryClick (c, ci) {
       this.$log('categoryClick', c, ci)
-      await this.$wait(200)
+      // this.$emit('category', c.type)
+      // await this.$wait(200)
       this.$router.push({params: {category: c.type}})
+      this.$emit('category', c.type)
     }
   },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+  }
 }
 </script>

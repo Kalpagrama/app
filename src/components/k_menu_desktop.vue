@@ -58,6 +58,7 @@ export default {
       pages: [
         {name: 'Чарты', icon: 'explore', path: '/app/hot'},
         {name: 'Мастерская', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
+        {name: 'Research', icon: 'wb_iridescent', path: '/app/research-creator'},
         // {name: 'Create node', icon: 'add', path: '/app/create'},
         // {name: 'Invite friend', icon: 'menu', path: '/app/invite'},
         {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},

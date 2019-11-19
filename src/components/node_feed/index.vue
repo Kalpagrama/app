@@ -1,5 +1,5 @@
 <template lang="pug">
-  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.bg-grey-3
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.bg-grey-5
     //- header
     div(:style=`{position: 'sticky', zIndex: 1000, top: headerTop+'px', height: '60px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: '500px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.justify-between.bg-white.q-px-sm
@@ -29,7 +29,7 @@
           intersection: {
             threshold: 0.98
           }
-        }`).q-mb-xl
+        }`).q-mb-md.shadow-10
       div(v-if="false" :style=`{height: '80px'}`).row.full-width.items-center.justify-center
         q-spinner(v-show="fetchingMore" :thickness="2" color="primary" size="50px")
 </template>
