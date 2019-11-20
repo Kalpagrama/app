@@ -51,17 +51,21 @@ function processEvent (context, event) {
       context.commit('addEvent', event)
       break
     case 'NODE_CREATED':
-      notifyUserActionComplete(event.type, event.object)
+      if (event.subject.oid === context.rootState.user.user.oid) {
+        notifyUserActionComplete(event.type, event.object)
+      }
       context.commit('stateSet', ['nodeCreated', event])
       context.commit('addEvent', event)
       break
     case 'NODE_RATED':
-      notifyUserActionComplete(event.type, event.object)
+      if (event.subject.oid === context.rootState.user.user.oid) {
+        notifyUserActionComplete(event.type, event.object)
+      }
       context.commit('stateSet', ['nodeRated', event])
       context.commit('objects/setObjectValue', {
         oid: event.object.oid,
         path: ['rate'],
-        value: event.object.rate
+        value: event.rate
       }, { root: true })
       context.commit('addEvent', event)
       break

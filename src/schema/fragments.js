@@ -269,6 +269,11 @@ const eventFragment = gql`
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
     }
+    ... on EventRate{
+      subject{... objectShortFragment}
+      object{... objectShortWithMetaFragment}
+      rate
+    }
   }
 `
 
