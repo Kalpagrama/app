@@ -4,7 +4,7 @@ q-layout(container :style=`{height: height+'px', width: width+'px'}`).column.bg-
     div(:style=`{height: '60px'}`).row.full-width.bg-white
       .col.full-height
         .row.fit.items-center.q-px-md
-          span.text-bold.text-black Уведомления
+          span.text-bold.text-black {{ $t('Notifications') }}
   q-page-container.fit
     q-page.col.bg-grey-2
       .row.full-width.items-start.content-start.justify-center.q-pa-md
@@ -12,16 +12,22 @@ q-layout(container :style=`{height: height+'px', width: width+'px'}`).column.bg-
           div(
             v-for="(e, ei) in events" :key="ei"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.bg-white.q-pa-sm.q-mb-sm
-            div(:style=`{height: '60px', width: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.items-center.justify-center.bg-black
-              img(:src="e.object.thumbUrl"
-                :style=`{height: '50px'}`)
-            .col.full-height
-              .row.fit.items-center.q-px-sm
-                span {{ e.type }}
-            div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-              img(:src="e.subject.thumbUrl"
-                :style=`{height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
+            ).row.full-width.bg-white.q-mb-sm.q-pa-sm
+            div().row.fit
+              div(:style=`{width: '40px', height: '40px'}`).row.items-center.justify-center
+                img(:src="e.subject.thumbUrl"
+                  :style=`{height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
+              .col.full-height
+                //- SUBJECT
+                div(@click="subjectClick(e.subject)").row.items-center.q-px-md
+                  span {{ $t(e.subject.name) }}
+                //- INFO
+                .row.full-width.q-px-md
+                  span(style=`font-size: 10px`).q-mr-xs {{ $t(textAction(e)) }}
+                  span(style=`font-size: 10px`).text-lowercase {{ $t(e.object.type) }}
+                //- OBJECT
+                div(@click="objectClick(e.object)").row.items-center.q-px-md.text-blue.cursor-pointer
+                  span {{ $t(e.object.name) | cut(20) }}
 </template>
 
 <script>
@@ -41,8 +47,68 @@ export default {
     }
   },
   methods: {
+    textAction (e) {
+      if (e.type === 'NODE_RATED') return 'rated'
+      if (e.type === 'NODE_CREATED') return 'created'
+      if (e.type === 'NODE_DELETED') return 'deleted'
+      if (e.type === 'USER_SUBSCRIBED') return 'subscribed to'
+      if (e.type === 'USER_UNSUBSCRIBED') return 'unsubscribed from'
+      if (e.type === 'USER_CHANGED') return 'changed'
+      if (e.type === 'USER_CONFIRMED') return 'confirmed'
+      if (e.type === 'WS_ITEM_CREATED') return 'in workspace created'
+      if (e.type === 'WS_ITEM_UPDATED') return 'in workspace updated'
+      if (e.type === 'WS_ITEM_DELETED') return 'in workspace deleted'
+    },
     editToggle () {
       this.$log('editToggle')
+    },
+    subjectClick (s) {
+      this.$log('subjectClick')
+      switch (s.type) {
+        case 'VIDEO':
+        case 'AUDIO':
+        case 'BOOK':
+        case 'IMAGE': {
+          this.$router.push(`/app/content/${s.oid}`)
+          break
+        }
+        case 'USER': {
+          this.$router.push(`/app/user/${s.oid}`)
+          break
+        }
+        case 'SPHERE': {
+          this.$router.push(`/app/sphere/${s.oid}`)
+          break
+        }
+        case 'NODE': {
+          this.$router.push(`/app/node/${s.oid}`)
+          break
+        }
+      }
+    },
+    objectClick (o) {
+      this.$log('objectClick')
+      switch (o.type) {
+        case 'VIDEO':
+        case 'AUDIO':
+        case 'BOOK':
+        case 'IMAGE': {
+          this.$router.push(`/app/content/${o.oid}`)
+          break
+        }
+        case 'USER': {
+          this.$router.push(`/app/user/${o.oid}`)
+          break
+        }
+        case 'SPHERE': {
+          this.$router.push(`/app/sphere/${o.oid}`)
+          break
+        }
+        case 'NODE': {
+          this.$router.push(`/app/node/${o.oid}`)
+          break
+        }
+      }
     }
   },
   mounted () {
