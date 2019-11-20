@@ -24,7 +24,7 @@
     "now-build": "quasar build -m pwa"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.3.3",
     "apollo-cache-inmemory": "^1.6.3",
     "apollo-cache-persist": "^0.1.1",
     "apollo-client": "^2.6.4",
@@ -48,7 +48,7 @@
     "portal-vue": "^2.1.6",
     "pug": "^2.0.3",
     "pug-loader": "^2.4.0",
-    "quasar": "^1.0.0-beta.0",
+    "quasar": "^1.4.3",
     "serve-static": "^1.14.1",
     "subscriptions-transport-ws": "github:4321ip/subscriptions-transport-ws#fix/min-connect-timeout",
     "vue-apollo": "^3.0.0",
@@ -60,7 +60,7 @@
     "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
-    "@quasar/app": "^1.0.0-beta.0",
+    "@quasar/app": "^1.2.4",
     "@vue/eslint-config-airbnb": "^4.0.0",
     "apollo": "^2.7.0",
     "babel-eslint": "^10.0.1",

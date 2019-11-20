@@ -27,6 +27,7 @@ async function init (context) {
         categories {
           type
           name
+          alias
           icon
           sphere {
             oid

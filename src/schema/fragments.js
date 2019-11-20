@@ -1,3 +1,5 @@
+import gql from 'graphql-tag'
+
 const contentFragment = gql`
   fragment contentFragment on Object {
     oid
@@ -20,8 +22,7 @@ const contentFragment = gql`
     }
   }
 `
-const WSContentFragment = gql`
-  ${contentFragment}
+const WSContentFragment = gql`${contentFragment}
   fragment WSContentFragment on WSContent {
     uid
     name
@@ -50,8 +51,7 @@ const WSFragmentFragment = gql`
   }
   ${contentFragment}
 `
-const WSNodeFragment = gql`
-  ${WSFragmentFragment}
+const WSNodeFragment = gql`${WSFragmentFragment}
   fragment WSNodeFragment on WSNode {
     uid
     name
@@ -86,40 +86,45 @@ const WSSphereFragment = gql`
     updatedAt
   }
 `
-const eventFragment = gql`
-  fragment eventFragment on Event {
-    type
-    subject{
-      oid
-      name
-      thumbUrl(preferWidth: 600)
-    }
-    object{
-      oid
-      name
-      thumbUrl(preferWidth: 600)
-      meta{
-        type
-        ...on MetaNode{
-          layout
-          fragments{
-            uid
-          }
-        }
-      }
-    }
-  }
-`
+// const eventFragment = gql`
+//   fragment eventFragment on Event {
+//     type
+//     subject{
+//       oid
+//       type
+//       name
+//       thumbUrl(preferWidth: 600)
+//     }
+//     object{
+//       oid
+//       type
+//       name
+//       thumbUrl(preferWidth: 600)
+//       meta{
+//         type
+//         ...on MetaNode{
+//           layout
+//           fragments{
+//             uid
+//           }
+//         }
+//       }
+//     }
+//   }
+// `
+
 const eventChangeFragment = gql`
   fragment eventChangeFragment on EventChange {
     type
     subject{
       oid
+      type
       name
       thumbUrl(preferWidth: 600)
     }
     object{
       oid
+      type
       name
       thumbUrl(preferWidth: 600)
       meta{
@@ -142,6 +147,23 @@ const objectShortFragment = gql`
     oid
     name
     thumbUrl(preferWidth: 600)
+  }
+`
+const objectShortWithMetaFragment = gql`
+  fragment objectShortWithMetaFragment on ObjectShort {
+    type
+    oid
+    name
+    thumbUrl(preferWidth: 600)
+    meta{
+      type
+      ...on MetaNode{
+        layout
+        fragments{
+          uid
+        }
+      }
+    }
   }
 `
 const nodeFragment = gql`
@@ -203,8 +225,53 @@ const sphereFragment = gql`
     thumbUrl(preferWidth: 600)
   }
 `
+const WSItemFragment = gql`${WSNodeFragment} ${WSFragmentFragment} ${WSContentFragment} ${WSBookmarkFragment} ${WSSphereFragment}
+  fragment WSItemFragment on WSItem {
+    ... on WSNode{...WSNodeFragment}
+    ... on WSFragment{...WSFragmentFragment}
+    ... on WSContent{...WSContentFragment}
+    ... on WSBookmark{...WSBookmarkFragment}
+    ... on WSSphere{...WSSphereFragment}
+  }
+`
+const eventFragment = gql`
+  ${WSItemFragment} ${objectShortFragment} ${objectShortWithMetaFragment}
+  fragment eventFragment on Event {
+    type
+    ... on EventError{
+      operation
+      code
+      message
+    }
+    ... on EventProgress{
+      oid
+      action
+      progress
+    }
+    ... on EventNotice{
+      typeNotice
+      message
+    }
+    ... on EventWS{
+      wsObject{
+        ... on WSFragment {... WSItemFragment}
+      }
+    }
+    ... on EventChange{
+      subject{... objectShortFragment}
+      object{... objectShortWithMetaFragment}
+      path
+      value
+    }
+    ... on EventGeneral{
+      subject{... objectShortFragment}
+      object{... objectShortWithMetaFragment}
+    }
+  }
+`
+
 const userFragment = gql`
-  ${objectShortFragment} ${eventFragment} ${WSNodeFragment} ${WSFragmentFragment} ${WSContentFragment} ${WSBookmarkFragment} ${WSSphereFragment}
+  ${objectShortFragment} ${WSItemFragment} ${eventFragment}
   fragment userFragment on User {
     oid
     name
@@ -213,11 +280,11 @@ const userFragment = gql`
     settings
     subscriptions{...objectShortFragment}
     workspace{
-      nodes { ...WSNodeFragment }
-      fragments { ...WSFragmentFragment }
-      contents { ...WSContentFragment }
-      bookmarks { ...WSBookmarkFragment }
-      spheres { ...WSSphereFragment }
+      nodes { ...WSItemFragment }
+      fragments { ...WSItemFragment }
+      contents { ...WSItemFragment }
+      bookmarks { ...WSItemFragment }
+      spheres { ...WSItemFragment }
     }
     events{...eventFragment}
     profile{
@@ -232,6 +299,7 @@ const userFragment = gql`
     }
   }
 `
+
 const fragments = {
   eventFragment,
   eventChangeFragment,
