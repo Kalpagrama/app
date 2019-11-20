@@ -1,5 +1,7 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+  //- tint for nodeClick event
+  div(v-if="!active" :style=`{position: 'absolute', zIndex: 1001}` @click="$emit('nodeClick')").row.fit
   div(
     :style=`{position: 'relative', zIndex: zIndex+100, overflow: 'hidden', borderRadius: '10px', ...getStyles}`
     ).row.full-width.items-start.content-start.bg-black
@@ -61,6 +63,14 @@ export default {
       previewsLoaded: 0,
       width: 0,
       height: 0
+    }
+  },
+  watch: {
+    active: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('active CHANGED', to)
+      }
     }
   },
   computed: {

@@ -2,35 +2,28 @@
 q-layout(:container="true" :style=`{width: width+'px', height: height+'px'}` @scroll="onScroll")
   q-page-container.fit.bg-grey-3
     k-dialog-bottom(ref="nodeActionDialog" mode="actions" :options="nodeActionDialogOptions")
-    q-tab-panels(
-      v-model="tab" @input="tabChanged" :swipeable="mode !== 'fresh'" animated keep-alive
-      :style=`{height: height+'px', background: 'none', margin: 0, padding: 0}`).fit
-      q-tab-panel(name="categories" :style=`{padding: 0, margin: 0, height: height+'px'}`)
+    k-colls(ref="kCollsTabs" @value="tab = $event" :value="tab" :colls="tabs" :disable="mode !== 'hot'" :style=`{height: height+'px'}`)
+      template(v-slot:categories)
         categories(:category="category" @category="category = $event")
-      q-tab-panel(name="feed" :style=`{padding: 0, margin: 0, height: height+'px'}`)
+      template(v-slot:feed)
         .column.fit
-          //- div(:style=`{height: '50px'}`).row.full-width.items-center.bg-white
-          //-   q-btn(flat round icon="list" :color="tab === 'categories' ? 'green' : 'grey'" @click="tab = 'categories'")
-          //-   q-btn(flat no-caps).q-px-xs
-          //-     span {{ $t(category) }}
-          //-   .col
-          //-   q-btn(flat no-caps :color="mode === 'hot' ? 'green' : 'grey'")
-          //-     span(:class=`{'text-bold': mode === 'hot'}` @click="mode = 'hot'") {{ $t('Hot') }}
-          //-   q-btn(flat no-caps :color="mode === 'fresh' ? 'green' : 'grey'")
-          //-     span(:class=`{'text-bold': mode === 'fresh'}` @click="mode = 'fresh'") {{ $t('Fresh') }}
-          //- debug
-          div(v-if="false").row.full-width.bg-red
-            small.full-width scrollTop/scrollHeight {{scrollTop}}/{{scrollHeight}}
-            small.full-width clientHeight: {{ clientHeight }}
-            small.full-width {{clientHeight + scrollTop}}
-          .col.full-width
-            q-tab-panels(
-              v-model="mode" @input="modeChanged" swipeable animated keep-alive
-              :style=`{height: height+'px', margin: 0, padding: 0, background: 'none'}`).fit
-              q-tab-panel(
-                v-for="(m, mi) in modes" :key="m"
-                :name="m" :style=`{position: 'relative', height: height+'px', padding: 0, margin: 0}`)
-                node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variables")
+          div(:style=`{height: '50px'}`).row.full-width.items-center.bg-white.q-px-xs
+            q-btn(flat round icon="list" :color="tab === 'categories' ? 'green' : 'grey'" @click="tab = 'categories'")
+            q-btn(flat no-caps).q-px-xs
+              span {{ $t(`#${categories[category].name.charAt(0).toUpperCase() + categories[category].name.slice(1)}`)}}
+            .col
+            q-btn(flat no-caps :color="mode === 'hot' ? 'green' : 'grey'")
+              span(:class=`{'text-bold': mode === 'hot'}` @click="mode = 'hot'") {{ $t('Hot') }}
+            q-btn(flat no-caps :color="mode === 'fresh' ? 'green' : 'grey'")
+              span(:class=`{'text-bold': mode === 'fresh'}` @click="mode = 'fresh'") {{ $t('Fresh') }}
+          .col
+            k-colls(ref="kCollsModes" :value="mode" @value="mode = $event" :colls="modes" :style=`{height: height+'px'}`)
+              template(v-slot:hot)
+                node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variablesHot")
+                  template(v-slot:default=`{items, fetchingMore}`)
+                    node-tape(:nodes="items")
+              template(v-slot:fresh)
+                node-loader(v-if="sphereOid" :query="query" queryKey="sphereNodes" :variables="variablesFresh")
                   template(v-slot:default=`{items, fetchingMore}`)
                     node-tape(:nodes="items")
 </template>
@@ -44,6 +37,7 @@ export default {
   props: ['width', 'height'],
   data () {
     return {
+      coll: 1,
       tab: 'categories',
       tabs: ['categories', 'feed'],
       mode: 'hot',
@@ -58,7 +52,7 @@ export default {
   watch: {
     'category': {
       handler (to, from) {
-        // this.$log('category CHANGED', to)
+        this.$log('category CHANGED', to)
         this.tab = 'feed'
       }
     },
@@ -123,13 +117,25 @@ export default {
         }
       `
     },
-    variables () {
+    variablesHot () {
       return {
         sphereOid: this.sphereOid,
         pagination: {
           pageSize: 100
         },
         sortStrategy: 'HOT',
+        filter: {
+          types: 'NODE'
+        }
+      }
+    },
+    variablesFresh () {
+      return {
+        sphereOid: this.sphereOid,
+        pagination: {
+          pageSize: 100
+        },
+        sortStrategy: 'AGE',
         filter: {
           types: 'NODE'
         }

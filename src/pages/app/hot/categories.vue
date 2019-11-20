@@ -1,7 +1,8 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit.bg-white
-  div(:style=`{height: '60px'}`).row.full-width
-    div(v-if="false" :style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+  //- background: 'rgba(0,0,0,0.35)'
+  div(:style=`{height: '50px'}`).row.full-width.bg-white
+    div(v-if="false" :style=`{width: '50px', height: '50px'}`).row.items-center.justify-center
       q-btn(round flat color="primary" icon="menu")
     .col.full-height
       .row.fit.items-center.q-px-lg

@@ -24,12 +24,12 @@
           :noActions="true" :noSpheres="true" :noTimestamp="true"
           :width="width" :muted="muted"
           v-observe-visibility=`{
-          callback: nodeVisible,
-          throttle: 300,
-          intersection: {
-            threshold: 0.98
-          }
-        }`).q-mb-md.shadow-10
+            callback: nodeVisible,
+            throttle: 300,
+            intersection: {
+              threshold: 0.98
+            }
+          }`).q-mb-md.shadow-10
       div(v-if="false" :style=`{height: '80px'}`).row.full-width.items-center.justify-center
         q-spinner(v-show="fetchingMore" :thickness="2" color="primary" size="50px")
 </template>

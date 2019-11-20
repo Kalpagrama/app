@@ -8,6 +8,7 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
     small.full-width clientWidth/clientHeight: {{clientWidth}}/{{clientHeight}}
     small.full-width scrollTop/scrollHeight: {{scrollTop}}/{{scrollHeight}}
     small.full-width nodeActive: {{nodeActive}}
+    small.full-width nodesVisible: {{nodesVisible}}
   //- debug swipes
   q-btn(
     round color="green" icon="keyboard_arrow_up" @click="swipeDown()"
@@ -15,19 +16,6 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
   q-btn(
     round color="green" icon="keyboard_arrow_down" @click="swipeUp()"
     :style=`{position: 'absolute', zIndex: 1000, bottom: '70px', right: '10px'}`)
-  //- node active ghost
-  nodeTapeNode(
-    v-if="node" ref="nodeActive"
-    :node="node" :nodeIndex="0"
-    :active="true"
-    :opened="true"
-    :width="width"
-    :style=`{
-      position: 'absolute',
-      zIndex: 10000,
-      borderRadius: '10px', overflow: 'hidden',
-      top: nodeOffsetHeight+'px'
-    }`).bg-white
   //- tint
   div(:style=`{position: 'absolute', zIndex: tintIndex, top: 0, left: 0, pointerEvents: 'none', background: 'rgba(0,0,0,'+tintOpacity+')'}`).row.fit
   //- body scroll
@@ -38,26 +26,38 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
     div.row.full-width.justify-center
       div(
         :style=`{maxWidth: '500px', paddingBottom: $q.screen.height+'px'}`
-        ).row.full-width.items-start.content-start
+        ).row.full-width.items-start.content-start.q-px-xs
         q-resize-observer(ref="onResizeObserver" @resize="onResize")
-        nodeTapeNode(
+        node(
           v-for="(n, ni) in nodes" :key="n.oid"
           :ref="`node${n.oid}`"
           @nodeClick="nodeClick(n, ni)"
           @nodeName="nodeName(n, ni)"
           :width="width"
-          :node="n" :nodeIndex="ni"
+          :needFull="nodeActive === ni"
+          :noActions="true"
+          :noSpheres="true"
+          :noTimestamp="true"
+          :node="n" :nodeIndex="ni" :lang="ni"
           :active="nodeActive === ni"
           :class=`{
             'cursor-pointer': nodeActive !== ni
           }`
           :style=`{
             zIndex: nodeActive === ni ? 300 : 100,
-            borderRadius: '10px', oveflow: 'hidden'}`).bg-white.q-mt-xl
+            borderRadius: '10px', oveflow: 'hidden'}`
+          v-observe-visibility=`{
+            callback: nodeVisible,
+            throttle: 230,
+            intersection: {
+              threshold: 0.98
+            }
+          }`).bg-white.q-mt-xl
 </template>
 
 <script>
 import nodeTapeNode from './node'
+// callback: e => e ? nodeVisible(e, ni) : false,
 
 export default {
   name: 'nodeTape',
@@ -69,6 +69,8 @@ export default {
       header: false,
       scrollTop: 0,
       scrollHeight: 0,
+      scrollTimeout: null,
+      scrolling: false,
       clientWidth: 0,
       clientHeight: 0,
       width: 0,
@@ -80,7 +82,9 @@ export default {
       nodeOffsetHeight: 0,
       nodeClientHeight: 0,
       tintIndex: 200,
-      tintOpacity: 0.35
+      tintOpacity: 0.35,
+      nodesVisible: [],
+      // nodeVisible: null
     }
   },
   computed: {
@@ -89,6 +93,15 @@ export default {
     }
   },
   methods: {
+    nodeVisible (isVisible, entry) {
+      if (isVisible) {
+        this.$log('nodeVisible', isVisible, entry.target.lang)
+        this.nodesVisible.unshift(Number(entry.target.lang))
+        if (this.nodesVisible.length > 20) this.nodesVisible.length = 10
+      } else {
+        // this.$log('nodeVisible', entry.target.lang)
+      }
+    },
     nodeName (n, ni, e) {
       this.$log('nodeName')
       let node = this.$refs[`node${n.oid}`][0]
@@ -128,7 +141,7 @@ export default {
         this.$refs.scrollWrapper,
         0.2,
         {
-          scrollTop: scrollTo,
+          scrollTop: scrollTo > 0 ? scrollTo : 0,
           onComplete: () => {
             this.$log('SCROLLED TO', scrollTo)
           }
@@ -149,14 +162,29 @@ export default {
     },
     onScroll (e) {
       // this.$log('onScroll', e)
+      // this.scrolling = true
       this.scrollTop = e.target.scrollTop
       this.scrollHeight = e.target.scrollHeight
       this.clientHeight = e.target.clientHeight
       this.clientWidth = e.target.clientWidth
+      if (this.scrollTimeout) {
+        clearInterval(this.scrollTimeout)
+        this.scrollTimeout = null
+      }
+      this.scrollTimeout = setTimeout(() => {
+        // this.scrolling = false
+        this.onScrolled()
+      }, 230)
+    },
+    onScrolled () {
+      this.$log('onScrolled')
+      this.nodeClick(this.nodes[this.nodesVisible[0]], this.nodesVisible[0])
     },
     onResize (e) {
-      this.$log('onResize', e)
+      // this.$log('onResize', e)
       // if (this.scrollTop !== 0) this.$refs.scrollWrapper.scrollTop = this.scrollTop
+      // TODO: memorize last scroll position
+      // wait for all the nodes to load their first previews...
       this.width = e.width
       this.height = e.height
     }
@@ -164,6 +192,8 @@ export default {
   async mounted () {
     this.$log('mounted')
     if (this.$refs.onResizeObserver) this.$refs.onResizeObserver.trigger()
+    // let h = this.nodeVisibleHandler()
+    // this.nodeVisible = new Proxy({}, h)
     // await this.$wait(500)
     // this.$refs.scrollWrapper.scrollTop = 100
   },

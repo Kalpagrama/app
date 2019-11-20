@@ -3,7 +3,7 @@ div(:style=`{position: 'relative'}`).row.full-width
   //- tint for nodeClick event
   div(v-if="!active" :style=`{position: 'absolute', zIndex: 101}` @click="$emit('nodeClick')").row.fit
   //- first preview wrapper
-  div(:style=`{position: 'relative', maxHeight: width+'px', borderRadius: '10px', overflow: 'hidden'}`
+  div(:style=`{position: 'relative', minHeight: '200px', maxHeight: width+'px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.full-width.bg-black
     img(
       @load="imgFirstLoaded"
@@ -27,6 +27,10 @@ div(:style=`{position: 'relative'}`).row.full-width
     img(
       :src="node.meta.fragments[1].thumbUrl" draggable="false"
       :style=`{width: '100%', height: '100%', objectFit: 'contain', userSelect: 'none'}`)
+  //- debug
+  div(v-if="debug").row.full-width.bg-red
+    small.full-width nodeIndex: {{ nodeIndex }}
+    small.full-width oid: {{ node.oid }}
 </template>
 
 <script>
@@ -35,11 +39,18 @@ export default {
   props: ['width', 'active', 'opened', 'node', 'nodeIndex'],
   data () {
     return {
+      debug: false,
       height: 0,
       nodeFull: null
     }
   },
   watch: {
+    active: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('active CHANGE', to, this.node.name)
+      }
+    },
     opened: {
       handler (to, from) {
         this.$log('opened CHANGED', to)
@@ -51,7 +62,7 @@ export default {
   methods: {
     nameClick () {
       this.$log('nameClick')
-      this.$emit('nodeName')
+      // this.$emit('nodeName')
     },
     imgFirstLoaded (e) {
       // this.$log('imgFirstLoaded', e.target.height)

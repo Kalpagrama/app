@@ -37,7 +37,7 @@ q-layout(
     div(v-else).row.full-width.window-height.items-center.justify-center
       k-spinner(:width="200" :height="200")
   //- q-footer(reveal).lt-sm
-  //- k-menu-mobile(:style=`{position: 'fixed', bottom: '0px', zIndex: 1000}`)
+  k-menu-mobile(:style=`{position: 'fixed', bottom: '0px', zIndex: 1000}`)
 </template>
 
 <script>

@@ -1,6 +1,7 @@
 <template lang="pug">
 component(
   :is="$store.state.node.layouts[node.meta.layout].component"
+  @nodeClick="$emit('nodeClick')"
   :index="index" :zIndex="zIndex" @action="nodeAction($event)" :widthWrapper="width" :muted="muted"
   :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
   :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
@@ -41,6 +42,11 @@ export default {
   computed: {
   },
   watch: {
+    active: {
+      handler (to, from) {
+        this.$log('active CHANGED', to)
+      }
+    },
     nodeFullReady: {
       immediate: true,
       handler (to, from) {
@@ -56,7 +62,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         if (to === true && !this.nodeFullReady) {
-          // this.$log('nodeFull CHANGED', this.node.name)
+          this.$log('needFull CHANGED', this.node.name)
           this.nodeFull = await this.nodeLoad(this.node.oid)
           this.$emit('nodeFull', this.nodeFull)
         }
@@ -107,66 +113,8 @@ export default {
         this.$store.dispatch('log/error', ['node', 'nodeLoad error', err])
         node = null
       }
-      this.$log('nodeLoad end', this.index, this.node.oid)
+      this.$log('nodeLoad done', this.index, this.node.oid)
       return node
-      // let { data: { objectList: [nodeFull] } } = await this.$apollo.query({
-      //   query: gql`
-      //     query getExtendedNodesProps($oid: OID!) {
-      //       objectList(oids: [$oid]) {
-      //         oid
-      //         type
-      //         name
-      //         createdAt
-      //         ...on Node {
-      //           rate
-      //           rateUser
-      //           viewCnt
-      //           author {
-      //             oid
-      //             type
-      //             name
-      //             thumbUrl(preferWidth: 50)
-      //             __typename
-      //           }
-      //           spheres {
-      //             oid
-      //             name
-      //           }
-      //           categories
-      //           fragments {
-      //             uid
-      //             name
-      //             url
-      //             content {
-      //               oid
-      //               type
-      //               name
-      //               thumbUrl(preferWidth: 600)
-      //               ...on Video {
-      //                 url
-      //                 urlType
-      //                 width
-      //                 height
-      //                 duration
-      //               }
-      //               ...on Image {
-      //                 url
-      //               }
-      //             }
-      //             relativePoints { x y z }
-      //             relativeScale
-      //           }
-      //         }
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     oid: oid
-      //   },
-      //   fetchPolicy: 'cache-first'
-      // })
-      // // this.$log('nodeLoad done', this.index, this.node.name)
-      // return nodeFull
     }
   }
 }
