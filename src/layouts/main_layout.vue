@@ -32,8 +32,8 @@ q-layout(
   //- page
   q-page-container
     q-page
-    q-resize-observer(ref="pageResizeObserver" @resize="onResize")
-    router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height" :width="width")
+      q-resize-observer(ref="pageResizeObserver" @resize="onResize")
+      router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height" :width="width")
       div(v-else).row.full-width.window-height.items-center.justify-center
         k-spinner(:width="200" :height="200")
   //- q-footer(reveal).lt-sm
