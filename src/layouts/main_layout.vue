@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf' :class="{'bg-grey-3': $route.path !== '/app/menu'}").bg-primary
+q-layout(view='hHh Lpr fFf' :class="{'bg-grey-3': $route.path !== '/app/menu'}").bg-grey-3
   //- node action dialog
   k-dialog-bottom(ref="fragmentActionDialog" :value="$store.state.ui.fragmentActionDialogOpened" mode="actions" :options="fragmentActionDialogOptions"
     @action="fragmentActionDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentActionDialogOpened', false])")

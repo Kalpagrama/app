@@ -1,10 +1,10 @@
 <template lang="pug">
-div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '10px 10px 0 0'}`
+div(:style=`{height: '60px', overflow: 'hidden'}`
   ).row.full-width.items-center.content-center.justify-between.q-px-sm.bg-primary
-  q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'green' : 'white'" @click.stop="pageClick('/app/home')")
-  q-btn(round flat icon="whatshot" :color="$route.path.split('/')[2] === 'hot' ? 'green' : 'white'" @click.stop="pageClick('/app/hot')")
-  q-btn(round push icon="add" color="green" size="md" @click.stop="pageClick('/app/create')")
-  q-btn(round flat icon="img:statics/icons/anvil.svg" :color="$route.path === '/app/workspace' ? 'green' : 'white'" @click.stop="pageClick('/app/workspace')")
+  q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'accent' : 'white'" @click.stop="pageClick('/app/home')")
+  q-btn(round flat icon="whatshot" :color="$route.path.split('/')[2] === 'hot' ? 'accent' : 'white'" @click.stop="pageClick('/app/hot')")
+  q-btn(round push icon="add" color="accent" size="md" @click.stop="pageClick('/app/create')")
+  q-btn(round flat icon="img:statics/icons/anvil.svg" :color="$route.path === '/app/workspace' ? 'accent' : 'white'" @click.stop="pageClick('/app/workspace')")
   q-btn(round flat icon="menu" :color="inMenu" @click.stop="pageClick('/app/menu')")
 </template>
 
