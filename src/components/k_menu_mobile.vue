@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '10px 10px 0 0'}`
+div(:style=`{height: '60px', overflow: 'hidden'}`
   ).row.full-width.items-center.content-center.justify-between.q-px-sm.bg-primary
   //- div(:style=`{width: '40px', height: '40px'}`).row.br
   //-   k-logo(:width="40" :height="40")
