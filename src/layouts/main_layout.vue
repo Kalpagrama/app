@@ -31,11 +31,11 @@ q-layout(
   //-   k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
   //- page
   q-page-container
-    //- q-page
-    q-resize-observer(ref="pageResizeObserver" @resize="onResize")
-    router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height" :width="width")
-    div(v-else).row.full-width.window-height.items-center.justify-center
-      k-spinner(:width="200" :height="200")
+    q-page
+      q-resize-observer(ref="pageResizeObserver" @resize="onResize")
+      router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height" :width="width")
+      div(v-else).row.full-width.window-height.items-center.justify-center
+        k-spinner(:width="200" :height="200")
   //- q-footer(reveal).lt-sm
   k-menu-mobile(:style=`{position: 'fixed', bottom: '0px', zIndex: 1000}`)
 </template>
@@ -47,7 +47,7 @@ export default {
   data () {
     return {
       loading: true,
-      leftDrawerShow: false,
+      leftDrawerShow: true,
       leftDrawerWidth: 230,
       radius: 30,
       width: 0,

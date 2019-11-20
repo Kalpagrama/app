@@ -44,8 +44,8 @@ export default async ({ Vue, store, app }) => {
   // if (mode === 'offline') return
   // apollo
   Vue.use(VueApollo)
-  // let AUTH_URL = process.env.AUTH_URL || 'https://dev.kalpagramma.com/graphql'
-  let AUTH_URL = 'https://dev.kalpagramma.com/graphql'
+  let AUTH_URL = process.env.AUTH_URL || 'https://dev.kalpagramma.com/graphql'
+  // let AUTH_URL = 'https://dev.kalpagramma.com/graphql'
   debug('AUTH_URL', AUTH_URL)
   store.commit('auth/stateSet', ['AUTH_URL', AUTH_URL])
 
@@ -130,7 +130,7 @@ export default async ({ Vue, store, app }) => {
     cache
   })
   apolloProvider = new VueApollo({
-    defaultClient: authApollo,
+    defaultClient: apiApollo,
     clients: {
       authApollo,
       apiApollo,
