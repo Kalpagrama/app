@@ -66,6 +66,13 @@ export default {
     }
   },
   watch: {
+    active: {
+      handler (to, from) {
+        this.$log('active CHANGED', to)
+        if (to) this.$refs.kvideo.play()
+        else this.$refs.kvideo.pause()
+      }
+    },
     visible: {
       // immediate: true,
       handler (to, from) {

@@ -6,7 +6,7 @@ const routes = [
     component: () => import('layouts/main_layout'),
     children: [
       { name: 'home', path: 'home', component: () => import('pages/app/home') },
-      { name: 'hot', path: 'hot/:category?', component: () => import('pages/app/hot') },
+      { name: 'hot', path: 'hot/:category?/:mode?', component: () => import('pages/app/hot') },
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
@@ -14,6 +14,7 @@ const routes = [
       { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
       { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
       { name: 'create', path: 'create', component: () => import('components/node_creator') },
+      { name: 'researchCreator', path: 'research-creator', component: () => import('components/research_creator') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
       { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },

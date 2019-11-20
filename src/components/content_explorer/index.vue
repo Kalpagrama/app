@@ -2,8 +2,8 @@
 k-split(ref="kSplit" :headerMaxHeight="200" :headerClass="['bg-black']" :bodyClass="['bg-grey-1']" @scrollTop="scrollTop = $event")
   template(v-slot:header)
     q-dialog(ref="nodePreviewDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="node = null")
-      div(@click.self="$refs.nodePreviewDialog.hide()").row.fit.q-px-sm.q-pt-xl.q-pb-sm
-        div(:style=`{borderRadius: '10px'}`).column.fit.bg-white
+      div(@click.self="$refs.nodePreviewDialog.hide()").row.fit.items-end.content-end.q-px-sm.q-pt-xl.q-pb-sm
+        div(:style=`{borderRadius: '10px'}`).column.full-width.bg-white
           //- h1 Hello node
           node(v-if="node" :node="node" :width="300" :active="true" :needFull="true")
     k-dialog-bottom(ref="contentVideoDialog" mode="actions" :options="contentVideoDialogOptions" @action="contentVideoAction")

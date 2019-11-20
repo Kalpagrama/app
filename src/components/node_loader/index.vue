@@ -1,8 +1,3 @@
-<template lang="pug">
-.row.full-width
-  slot(v-if="kQuery" name="items" :items="kQuery.items" :fetchingMore="fetchingMore")
-</template>
-
 <script>
 export default {
   name: 'nodeLoader',
@@ -19,6 +14,17 @@ export default {
       pageTokenNext: null,
       totalCount: 0,
       itemsCount: 0
+    }
+  },
+  render() {
+    // slot(v-if="kQuery" name="items" :items="kQuery.items" :fetchingMore="fetchingMore")
+    if (this.$scopedSlots.default) {
+      return this.$scopedSlots.default({
+        items: this.kQuery ? this.kQuery.items : [],
+        fetchingMore: this.fetchingMore
+      })
+    } else {
+      return null
     }
   },
   apollo: {

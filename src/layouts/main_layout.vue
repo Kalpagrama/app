@@ -1,5 +1,8 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf' :class="{'bg-grey-3': $route.path !== '/app/menu'}").bg-primary
+q-layout(
+  view='hHh Lpr fFf'
+  :style=`{width: $q.screen.width+'px', height: '100vh'}`
+  :class="{'bg-grey-3': $route.path !== '/app/menu'}").bg-primary
   //- node action dialog
   k-dialog-bottom(ref="fragmentActionDialog" :value="$store.state.ui.fragmentActionDialogOpened" mode="actions" :options="fragmentActionDialogOptions"
     @action="fragmentActionDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentActionDialogOpened', false])")
@@ -24,17 +27,17 @@ q-layout(view='hHh Lpr fFf' :class="{'bg-grey-3': $route.path !== '/app/menu'}")
     :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     ws-fragment(@hide="$refs.fragmentDialog.hide()")
   //- content dialog
-  q-drawer(v-model="leftDrawerShow" side="left" show-if-above :breakpoint="500" :width="leftDrawerWidth").gt-xs
-    k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
+  //- q-drawer(v-model="leftDrawerShow" side="left" :width="leftDrawerWidth").gt-xs
+  //-   k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
   //- page
   q-page-container
     q-page
-      q-resize-observer(@resize="onResize")
-      router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height-60" :width="width")
+    q-resize-observer(ref="pageResizeObserver" @resize="onResize")
+    router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height" :width="width")
       div(v-else).row.full-width.window-height.items-center.justify-center
         k-spinner(:width="200" :height="200")
-  q-footer(reveal).lt-sm
-    k-menu-mobile
+  //- q-footer(reveal).lt-sm
+  k-menu-mobile(:style=`{position: 'fixed', bottom: '0px', zIndex: 1000}`)
 </template>
 
 <script>
@@ -55,19 +58,24 @@ export default {
       toggleIcon: ''
     }
   },
-  // watch: {
-  //   '$q.screen.gt.sm': {
-  //     immediate: true,
-  //     handler (to, from) {
-  //       this.$log('gt.sm CHANGED', to)
-  //       let vh = window.innerHeight
-  //       // if (to) vh = vh * 0.01
-  //       // else vh = (vh - 60) * 0.01
-  //       vh = vh * 0.01
-  //       document.documentElement.style.setProperty('--vh', `${vh}px`)
-  //     }
-  //   }
-  // },
+  watch: {
+    '$q.screen.gt.xs': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('gt.sm CHANGED', to)
+        if (to) {
+          this.$store.commit('ui/stateSet', ['gtxs', true])
+        } else {
+          this.$store.commit('ui/stateSet', ['gtxs', false])
+        }
+        let vh = window.innerHeight
+        // if (to) vh = vh * 0.01
+        // else vh = (vh - 60) * 0.01
+        vh = vh * 0.01
+        document.documentElement.style.setProperty('--vh', `${vh}px`)
+      }
+    }
+  },
   computed: {
     fragmentActionDialogHeaderName () {
       let fragmentPayload = this.$store.state.ui.fragment
@@ -128,12 +136,17 @@ export default {
       this.height = this.$q.screen.height
     }
   },
+  mounted () {
+    this.$log('mounted')
+    this.$refs.pageResizeObserver.trigger()
+  },
   async created () {
     try {
       // this.$log('created')
       // console.time('created')
       // this.$q.notify('Created start')
       this.loading = true
+      // await this.$wait(4000)
       // Oauth case. take token from redirect url
       let token = this.$route.query.token
       let expires = this.$route.query.expires

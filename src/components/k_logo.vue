@@ -56,6 +56,13 @@ export default {
 }
 </script>
 <style lang="stylus">
+svg {
+  cursor:crosshair
+  -moz-box-shadow: 0px 0px 5px #888
+  -webkit-box-shadow: 0px 0px 5px #888;
+  box-shadow: 0px 0px 5px #888;
+  border-radius: 50%;
+}
 .logo:hover .diamondOrCh {
   animation-name: diamondOriginChanged;
   animation-duration: 4s;

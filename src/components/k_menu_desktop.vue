@@ -1,18 +1,18 @@
 <template lang="pug">
-div(:style=`{width: width+'px'}`).column.full-height.bg-secondary
+div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
   //- dialogs
   q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     k-invite(@hide="$refs.inviteDialog.hide()")
   k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
-  div(:style=`{height: '60px'}` @click="$router.push('/app/home')").row.full-width.cursor-pointer
+  div(:style=`{height: '60px'}` @click="$router.push('/app/home')").row.full-width.cursor-pointer.bg-secondary.q-mb-sm.shadow-3
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       k-logo(:width="40" :height="40")
     div(v-if="!mini").col.full-height
       .row.fit.items-center
         span.text-bold.text-white Кальпаграмма
   //- user
-  div(:style=`{height: '60px'}`).row.full-width
+  div(:style=`{height: '60px'}` @click="$router.push(`/app/user/` + $store.state.auth.user.oid)").row.full-width.bg-secondary.q-mb-sm.shadow-3
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
     div(v-if="!mini").col.full-height
@@ -26,7 +26,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-secondary
       .row.fit.items-center
         span.text-white Создать ядро
   //- body
-  .col.full-width.scroll
+  .col.full-width.scroll.bg-secondary.q-mb-sm.shadow-3
     .row.full-width.items-start.content-start
       div(v-for="(p, pi) in pages" :key="pi" @click="pageClick(p, pi)"
         :style=`{height: '60px'}`
@@ -38,7 +38,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-secondary
             span.text-white {{ p.name }}
     div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       q-btn(
-        :round="mini" push color="green" no-caps icon="person_add" @click="$refs.inviteDialog.show()"
+        :round="mini" push color="accent" no-caps icon="person_add" @click="$refs.inviteDialog.show()"
         :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
         span(v-if="width === 230").text-bold Пригласить друга
   //- footer mini
@@ -58,6 +58,7 @@ export default {
       pages: [
         {name: 'Чарты', icon: 'explore', path: '/app/hot'},
         {name: 'Мастерская', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
+        {name: 'Research', icon: 'wb_iridescent', path: '/app/research-creator'},
         // {name: 'Create node', icon: 'add', path: '/app/create'},
         // {name: 'Invite friend', icon: 'menu', path: '/app/invite'},
         {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},

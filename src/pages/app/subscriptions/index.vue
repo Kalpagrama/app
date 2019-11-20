@@ -11,24 +11,33 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
     div(:style=`{height: '60px'}`).row.full-width.bg-white
       .col.full-height
         .row.fit.items-center.q-px-md
-          span.text-bold.text-black Подписки
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-        q-btn(round flat icon="edit" color="green" @click="editToggle()")
+          span.text-bold.text-black Subscriptions
+      //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      //-   q-btn(round flat icon="edit" color="green" @click="editToggle()")
   q-page-container.fit
     q-page.fit
+      k-dialog-bottom(ref="subDialog" mode="actions" :options="subDialogOptions" @action="subDialogAction")
       .row.full-width.items-start.content-start.justify-center.q-pa-md
         div(:style=`{maxWidth: '500px'}`).row.full-width
           div(
             v-for="(s, si) in subscriptions" :key="si"
             :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer
-            div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-              img(@click="subClick(s, si)" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
-            div(@click="subClick(s, si)").col.full-height
+            ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
+            div(:style=`{height: '40px', width: '40px'}`).row.items-center.justify-center
+              //- subClick(s, si)
+              img(@click="" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
+            div(@click="").col.full-height.q-ml-sm
               .row.fit.items-center
-                span {{ s.name | cut(50) }}
-            div(v-if="editing" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-              q-btn(round flat icon="delete_outline" color="grey-7" @click="subDelete(s, si)")
+                span.text-caption {{ s.name | cut(50) }}
+                //- small {{ s }}
+            div(:style=`{}`).row.items-center.justify-center
+              //- @click="subDelete(s, si)"
+              q-btn(rounded outline dense no-caps
+                :label="subsToDelete.includes(s.oid) ? 'Follow' : 'Unfollow'"
+                :color="subsToDelete.includes(s.oid) ? 'green' : 'red'"
+                size="10px"  @click="subsToDelete.includes(s.oid) ? followClick(s, si) : unfollowClick(s, si)"
+                :style=`{padding: '2px 5px'}`)
+              //- q-btn( rounded outline dense label="follow" size="10px" color="green-7" @click="followClick(s, si)")
 </template>
 
 <script>
@@ -38,24 +47,68 @@ export default {
   data () {
     return {
       sub: null,
-      editing: false
+      follow: false,
+      label: 'unfollow',
+      color: 'red-7',
+      subIndex: undefined,
+      subsToDelete: []
     }
   },
   computed: {
     subscriptions () {
       return this.$store.state.subscriptions.userSubscriptions
     },
-    subscriptionsCount () {
-      return this.subscriptions.length
+    subDialogOptions () {
+      return {
+        header: false,
+        headerName: 'slkdmflksd',
+        actions: {
+          unfollow: {name: 'Unfollow', color: 'red'}
+        },
+        confirm: true,
+        confirmName: 'Cancel'
+      }
     }
   },
   methods: {
-    editToggle () {
-      this.$log('editToggle')
-      this.editing = !this.editing
+    subDialogAction (action) {
+      this.$log('subDialogAction', action)
+      switch (action) {
+        case 'header': {
+          break
+        }
+        case 'unfollow': {
+          // TODO: some shit
+          this.subsToDelete.push(this.subscriptions[this.subIndex].oid)
+          // this.subscriptionsDelete()
+          break
+        }
+        case 'confirm': {
+          break
+        }
+      }
+    },
+    // subscriptionsDelete (s, si) {
+    //   this.$log('deleteActionStart', s)
+    //   if (this.subsToDelete) {
+    //     setTimeout(() => this.$store.dispatch('subscriptions/unSubscribe', s.oid), 500);
+    //   }
+    // },
+    followClick (s, si) {
+      this.$log('followClick', s)
+      this.follow = !this.follow
+      this.subIndex = si
+      // this.subsToDelete.splice(this.subsToDelete.length - this.subIndex.oid, 1);
+      this.subsToDelete = this.subsToDelete.filter((sub) => sub !== s.oid)
+    },
+    unfollowClick (s, si) {
+      this.$log('unfollowClick', s)
+      this.subIndex = si
+      this.$refs.subDialog.show()
     },
     async subClick (s, si) {
       this.$log('subClick')
+      this.subIndex = si
       this.sub = s
       this.$refs.subDialog.show()
     },
@@ -76,6 +129,9 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.subsToDelete.map((sub) => {
+      this.subDelete({oid: sub})
+    })
   }
 }
 </script>

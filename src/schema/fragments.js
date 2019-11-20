@@ -121,12 +121,14 @@ const eventChangeFragment = gql`
       type
       name
       thumbUrl(preferWidth: 600)
+      type
     }
     object{
       oid
       type
       name
       thumbUrl(preferWidth: 600)
+      type
       meta{
         type
         ...on MetaNode{

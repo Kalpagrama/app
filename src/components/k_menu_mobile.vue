@@ -1,6 +1,8 @@
 <template lang="pug">
-div(:style=`{height: '60px', overflow: 'hidden', borderRadius: '10px 10px 0 0'}`
+div(:style=`{height: '60px', overflow: 'hidden'}`
   ).row.full-width.items-center.content-center.justify-between.q-px-sm.bg-primary
+  //- div(:style=`{width: '40px', height: '40px'}`).row.br
+  //-   k-logo(:width="40" :height="40")
   q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'green' : 'white'" @click.stop="pageClick('/app/home')")
   q-btn(round flat icon="whatshot" :color="$route.path.split('/')[2] === 'hot' ? 'green' : 'white'" @click.stop="pageClick('/app/hot')")
   q-btn(round push icon="add" color="green" size="md" @click.stop="pageClick('/app/create')")
