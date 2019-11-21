@@ -14,7 +14,7 @@ div(:style=`{paddingBottom: '60px'}`).row.full-width.full-height.items-start.con
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
       v-if="tab === 'fragments'"
-      push round color="accent" icon="add" size="lg" @click="$refs.fragmentFinderDialog.show()"
+      push round color="green" icon="add" size="lg" @click="$refs.fragmentFinderDialog.show()"
       :style=`{position: 'fixed', zIndex: 1000, bottom: '8px', right: '8px'}`)
   //- fragment
   div(

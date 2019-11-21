@@ -2,7 +2,7 @@
 div(:style=`{position: 'relative'}`).row.fit
   //- toggle nodes
   q-btn(
-    color="accent" no-caps @click="$refs.kTongue.show()"
+    color="green" no-caps @click="$refs.kTongue.show()"
     :style=`{position: 'fixed', zIndex: 1000, top: '10px', left: '10px', height: '60px', width: 'calc(100% - 20px)', borderRadius: '10px'}`)
     span 23 Nodes to explore
   video-editor(:inCreator="false" :fragmentInput="{content: content, relativePoints: []}")

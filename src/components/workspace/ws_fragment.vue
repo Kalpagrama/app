@@ -4,7 +4,7 @@
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
       v-if="fragment"
-      color="accent" no-caps push :loading="creating" @click="fragmentCreate()"
+      color="green" no-caps push :loading="creating" @click="fragmentCreate()"
       :style=`{position: 'absolute', bottom: '8px', left: '8px', width: 'calc(100% - 16px)', height: '60px', borderRadius: '10px'}`)
       span.text-bold Создать
   //- header
@@ -24,7 +24,7 @@
         span Add spheres
       small {{ fragment }}
     div(v-else).row.fit.items-center.justify-center
-      q-spinner(color="accent" size="50px" :thickness="3")
+      q-spinner(color="green" size="50px" :thickness="3")
 </template>
 
 <script>

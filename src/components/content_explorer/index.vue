@@ -2,8 +2,8 @@
 k-split(ref="kSplit" :headerMaxHeight="200" :headerClass="['bg-black']" :bodyClass="['bg-grey-1']" @scrollTop="scrollTop = $event")
   template(v-slot:header)
     q-dialog(ref="nodePreviewDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="node = null")
-      div(@click.self="$refs.nodePreviewDialog.hide()").row.fit.q-px-sm.q-pt-xl.q-pb-sm
-        div(:style=`{borderRadius: '10px'}`).column.fit.bg-white
+      div(@click.self="$refs.nodePreviewDialog.hide()").row.fit.items-end.content-end.q-px-sm.q-pt-xl.q-pb-sm
+        div(:style=`{borderRadius: '10px'}`).column.full-width.bg-white
           //- h1 Hello node
           node(v-if="node" :node="node" :width="300" :active="true" :needFull="true")
     k-dialog-bottom(ref="contentVideoDialog" mode="actions" :options="contentVideoDialogOptions" @action="contentVideoAction")
@@ -20,8 +20,8 @@ k-split(ref="kSplit" :headerMaxHeight="200" :headerClass="['bg-black']" :bodyCla
       @click="$refs.kSplit.scrollTo(0)"
       :style=`{position: 'sticky', top: '0px', height: '50px'}`
       ).row.full-width.items-center.justify-center
-      q-btn(round flat color="accent" size="md" )
-        q-icon(name="keyboard_arrow_up" size="30px" color="accent")
+      q-btn(round flat color="green" size="md" )
+        q-icon(name="keyboard_arrow_up" size="30px" color="green")
       //- span {{ scrollTop }}
     //- content header
     div(:style=`{height: headerHeight+'px', borderBottom: '1px solid #eee'}`).row.full-width.items-start.content-start.justify-start.q-px-sm.q-mb-md

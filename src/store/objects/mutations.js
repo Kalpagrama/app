@@ -33,3 +33,15 @@ export function objectAdd (state, { object, fragmentName }) {
 
   state.objects[object.oid] = storedValue
 }
+
+export function setObjectValue (state, { oid, path, value }) {
+  let object = state.objects[oid]
+  if (!object) return
+  let propValue = object
+  for (let i = 0; i < path.length; i++) {
+    let propName = path[i]
+    propValue = propValue[propName]
+    assert.ok(propValue)
+    if (i === path.length - 1) propValue[propName] = value
+  }
+}

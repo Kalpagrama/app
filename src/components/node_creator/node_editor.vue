@@ -36,7 +36,7 @@ q-layout(view='hHh Lpr fFf' :container="true")
       div(v-if="showPublish" :style=`{position: 'fixed', zIndex: 10000, bottom: '0px', height: '76px'}`).row.full-width.items-center.content-center.q-px-sm
         k-menu-popup(ref="prePublishDialog" :noName="true" :actions="publishActions" @action="publishAction").full-width
         q-btn(
-          no-caps color="accent" @click="$refs.prePublishDialog.toggle()"
+          no-caps color="green" @click="$refs.prePublishDialog.toggle()"
           :loading="nodePublishing"
           style=`height: 60px; borderRadius: 10px`).full-width
           span.text-bold.text-white Опубликовать

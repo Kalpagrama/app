@@ -13,7 +13,7 @@ div(:style="{width: width+'px'}").column.full-height
             :disable="disable"
             round
             :flat="skey !== source"
-            :icon="s.icon ? s.icon : ''" :color="skey === source ? 'accent' : 'grey-8'")
+            :icon="s.icon ? s.icon : ''" :color="skey === source ? 'green' : 'grey-8'")
             span(v-if="!s.icon").text-bold {{ s.nameMini || s.name }}
         //- full name
         div(v-if="false").col.full-height

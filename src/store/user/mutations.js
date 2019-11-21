@@ -5,7 +5,7 @@ export function init (state, user) {
   state.initialized = true
 }
 
-export const setUserValue = async (state, {path, value}) => {
+export function setUserValue(state, {path, value}) {
   let propValue = state.user
   for (let i = 0; i < path.length; i++) {
     let propName = path[i]

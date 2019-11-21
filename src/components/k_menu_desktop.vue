@@ -21,7 +21,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
   //- create node
   div(v-if="!page" :style=`{height: '60px'}` @click="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])").row.full-width.items-center.cursor-pointer
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      q-btn(round push icon="add" color="accent")
+      q-btn(round push icon="add" color="green")
     div(v-if="!mini").col.full-height
       .row.fit.items-center
         span.text-white Создать ядро
@@ -58,6 +58,7 @@ export default {
       pages: [
         {name: 'Чарты', icon: 'explore', path: '/app/hot'},
         {name: 'Мастерская', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
+        {name: 'Research', icon: 'wb_iridescent', path: '/app/research-creator'},
         // {name: 'Create node', icon: 'add', path: '/app/create'},
         // {name: 'Invite friend', icon: 'menu', path: '/app/invite'},
         {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},

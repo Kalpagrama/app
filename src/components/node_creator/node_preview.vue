@@ -27,7 +27,7 @@ div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
       v-if="tab === 'preview'"
-      color="accent" push no-caps @click="publish()"
+      color="green" push no-caps @click="publish()"
       :loading="publishing"
       :style=`{position: 'absolute', left: '8px', bottom: '8px', height: '60px',
         width: 'calc(100% - 16px)', borderRadius: '10px'}`)

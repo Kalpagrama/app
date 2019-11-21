@@ -1,34 +1,15 @@
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
+import { Notify } from 'quasar'
+import { router } from 'boot/main'
+import assert from 'assert'
+import { t } from 'boot/i18n'
 
 export const init = async (context, userEvents) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
   context.dispatch('log/debug', ['events', 'init', userEvents], { root: true })
 
-  const observerError = apolloProvider.clients.wsApollo.subscribe({
-    client: 'wsApollo',
-    query: gql`
-      subscription error {
-        error {
-          operation
-          code
-          message
-        }
-      }
-    `
-  })
-  const observerProgress = apolloProvider.clients.wsApollo.subscribe({
-    client: 'wsApollo',
-    query: gql`
-      subscription progress {
-        progress {
-          action
-          progress
-        }
-      }
-    `
-  })
   const observerEvent = apolloProvider.clients.wsApollo.subscribe({
     client: 'wsApollo',
     query: gql`
@@ -38,96 +19,14 @@ export const init = async (context, userEvents) => {
       }
     `
   })
-  const observerEventChange = apolloProvider.clients.wsApollo.subscribe({
-    client: 'wsApollo',
-    query: gql`
-      ${fragments.eventChangeFragment}
-      subscription eventChange {
-        eventChange {
-          ...eventChangeFragment
-          path
-          value
-        }
-      }
-    `
-  })
-  const observerWsEvent = apolloProvider.clients.wsApollo.subscribe({
-    client: 'wsApollo',
-    query: gql`
-      ${fragments.WSContentFragment} ${fragments.WSFragmentFragment} ${fragments.WSBookmarkFragment} ${fragments.WSSphereFragment} ${fragments.WSNodeFragment}
-      subscription wsEvent {
-        wsEvent {
-          type
-          object{
-            name
-            uid
-            ... on WSBookmark{...WSBookmarkFragment}
-            ... on WSContent{...WSContentFragment}
-            ... on WSNode{...WSNodeFragment}
-            ... on WSSphere{...WSSphereFragment}
-            ... on WSFragment{...WSFragmentFragment}
-          }
-        }
-      }
-    `
-  })
 
-  observerError.subscribe({
-    next: ({ data: { error } }) => {
-      context.dispatch('log/debug', ['events', `EVENT error`, error], { root: true })
-      context.commit('stateSet', ['error', error])
-    },
-    error: (error) => {
-      context.dispatch('log/error', `EVENT error error ${error}`, { root: true })
-    }
-  })
-  observerProgress.subscribe({
-    next: ({ data: { progress } }) => {
-      context.dispatch('log/debug', ['events', `EVENT progress`, progress], { root: true })
-      context.commit('stateSet', ['progress', progress])
-    },
-    error: (error) => {
-      context.dispatch('log/error', `EVENT progress error ${error}`, { root: true })
-    }
-  })
   observerEvent.subscribe({
     next: ({ data: { event } }) => {
-      context.dispatch('log/debug', ['events', `EVENT event`, event], { root: true })
-      if (event.type === 'NODE_CREATED') context.commit('stateSet', ['nodeCreated', event])
-      else if (event.type === 'NODE_DELETED') context.commit('stateSet', ['nodeDeleted', event])
-      else if (event.type === 'NODE_RATED') context.commit('stateSet', ['nodeRated', event])
-      else if (event.type === 'USER_SUBSCRIBED') {
-        context.commit('stateSet', ['userSubscribed', event])
-        processSubscribeEvent(context, event)
-      } else if (event.type === 'USER_UNSUBSCRIBED') {
-        context.commit('stateSet', ['userUnSubscribed', event])
-        processUnSubscribeEvent(context, event)
-      }
-      context.commit('addEvent', event)
+      context.dispatch('log/debug', ['events', `EVENT received ${event.type}`, event], { root: true })
+      processEvent(context, event)
     },
     error: (error) => {
-      context.dispatch('log/error', `EVENT event error ${error}`, { root: true })
-    }
-  })
-  observerEventChange.subscribe({
-    next: ({ data: { eventChange } }) => {
-      context.dispatch('log/debug', ['events', `EVENT eventChange`, eventChange], { root: true })
-      if (eventChange.type === 'USER_CHANGED') {
-        context.commit('user/setUserValue', { path: eventChange.path, value: eventChange.value })
-      } else throw new Error(`not implemented! ${eventChange.type}`)
-      context.commit('addEvent', eventChange)
-    },
-    error: (error) => {
-      context.dispatch('log/error', `EVENT event error ${error}`, { root: true })
-    }
-  })
-  observerWsEvent.subscribe({
-    next: ({ data: { wsEvent } }) => {
-      context.dispatch('log/debug', ['events', `EVENT wsEvent`, wsEvent], { root: true })
-      processWsEvent(context, wsEvent)
-    },
-    error: (error) => {
-      context.dispatch('log/error', `EVENT wsEvent error ${error}`, { root: true })
+      context.dispatch('log/error', `EVENT error ${error}`, { root: true })
     }
   })
 
@@ -135,17 +34,72 @@ export const init = async (context, userEvents) => {
   return userEvents
 }
 
-function processSubscribeEvent (context, event) {
-  context.commit('subscriptions/subscribe', event.object, { root: true })
+function processEvent (context, event) {
+  switch (event.type) {
+    case 'ERROR':
+      context.commit('stateSet', ['error', event])
+      notifyError(event)
+      break
+    case 'PROGRESS':
+      context.commit('stateSet', ['progress', event])
+      break
+    case 'NOTICE':
+      processEventNotice(context, event)
+      break
+    case 'USER_CHANGED':
+      context.commit('user/setUserValue', { path: event.path, value: event.value })
+      context.commit('addEvent', event)
+      break
+    case 'NODE_CREATED':
+      if (event.subject.oid === context.rootState.user.user.oid) {
+        notifyUserActionComplete(event.type, event.object)
+      }
+      context.commit('stateSet', ['nodeCreated', event])
+      context.commit('addEvent', event)
+      break
+    case 'NODE_RATED':
+      if (event.subject.oid === context.rootState.user.user.oid) {
+        notifyUserActionComplete(event.type, event.object)
+      }
+      context.commit('stateSet', ['nodeRated', event])
+      context.commit('objects/setObjectValue', {
+        oid: event.object.oid,
+        path: ['rate'],
+        value: event.rate
+      }, { root: true })
+      context.commit('addEvent', event)
+      break
+    case 'NODE_DELETED':
+      notifyUserActionComplete(event.type, event.object)
+      context.commit('stateSet', ['nodeDeleted', event])
+      context.commit('addEvent', event)
+      break
+    case 'USER_SUBSCRIBED':
+      notifyUserActionComplete(event.type, event.object)
+      context.commit('stateSet', ['userSubscribed', event])
+      context.commit('subscriptions/subscribe', event.object, { root: true })
+      context.commit('addEvent', event)
+      break
+    case 'USER_UNSUBSCRIBED':
+      notifyUserActionComplete(event.type, event.object)
+      context.commit('stateSet', ['userUnSubscribed', event])
+      context.commit('subscriptions/unSubscribe', event.object, { root: true })
+      context.commit('addEvent', event)
+      break
+    case 'WS_ITEM_CREATED':
+    case 'WS_ITEM_UPDATED':
+    case 'WS_ITEM_DELETED':
+      notifyUserActionComplete(event.type, event.object)
+      processEventWs(context, event)
+      break
+    default:
+      throw new Error(`unsupported Event ${event.type}`)
+  }
 }
 
-function processUnSubscribeEvent (context, event) {
-  context.commit('subscriptions/unSubscribe', event.object, { root: true })
-}
-
-function processWsEvent (context, wsEvent) {
-  let type = wsEvent.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
-  let object = wsEvent.object
+function processEventWs (context, event) {
+  let type = event.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
+  let object = event.wsObject
   let objectType = object.__typename
   let operationName
   switch (type) {
@@ -163,4 +117,85 @@ function processWsEvent (context, wsEvent) {
   }
   console.log(operationName, objectType)
   context.commit(`workspace/${operationName}${objectType}`, object, { root: true })
+}
+
+function processEventNotice (context, { typeNotice, message }) {
+  // TODO!
+  if (typeNotice === 'GREETING') {
+    // показать форму приветствия и туториал
+    throw new Error(' todo !')
+  } else throw new Error('not implemented!')
+}
+
+// вывести уведомление о действии пользователя
+function notifyUserActionComplete (eventType, object) {
+  assert.ok(eventType && object)
+  let eventMessage = ''
+  switch (eventType) {
+    case 'NODE_CREATED':
+      eventMessage = t('node created')
+      break
+    case 'NODE_DELETED':
+      eventMessage = t('node deleted')
+      break
+    case 'NODE_RATED':
+      eventMessage = t('node rated')
+      break
+    case 'USER_SUBSCRIBED':
+      eventMessage = t('user subscribed')
+      break
+    case 'USER_UNSUBSCRIBED':
+      eventMessage = t('user unsubscribed')
+      break
+    case 'WS_ITEM_CREATED':
+      eventMessage = t('ws element created')
+      break
+    case 'WS_ITEM_DELETED':
+      eventMessage = t('ws element deleted')
+      break
+    case 'WS_ITEM_UPDATED':
+      eventMessage = t('ws element updated')
+      break
+  }
+  // console.debug(eventMessage)
+  Notify.create(
+    {
+      position: 'top',
+      message: eventMessage,
+      avatar: object.thumbUrl,
+      actions: [{
+        label: t('Goto...'),
+        noDismiss: true,
+        handler: () => {
+          // app/workspace/fragments
+          let route = `/app/home`
+          if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
+            route = `/app/content/${object.oid}`
+          } else if (['NODE'].includes(object.type)) {
+            route = `/app/node/${object.oid}`
+          } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
+            route = `/app/sphere/${object.oid}`
+          } else if (['WSBookmark', 'WSSphere', 'WSContent', 'WSNode', 'WSFragment'].includes(object.__typename)) {
+            if (object.__typename === 'WSBookmark') route = `/app/workspace/bookmarks`
+            else if (object.__typename === 'WSSphere') route = `/app/workspace/spheres`
+            else if (object.__typename === 'WSContent') route = `/app/workspace/contents`
+            else if (object.__typename === 'WSNode') route = `/app/workspace/nodes`
+            else if (object.__typename === 'WSFragment') route = `/app/workspace/fragments`
+          } else throw new Error(`bad object ${JSON.stringify(object)}`)
+          router.push(route)
+        }
+      }]
+    }
+  )
+}
+
+function notifyError (event) {
+  assert.ok(event)
+
+  Notify.create(
+    {
+      position: 'top',
+      message: `${event.operation} ${event.code} ${event.message}`
+    }
+  )
 }
