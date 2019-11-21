@@ -10,7 +10,7 @@ q-layout.bg-black
       round flat color="white" icon="menu" @click="$refs.videoEditorDialog.toggle()"
       :style=`{background: 'rgba(0,0,0,0.4)'}`)
   q-btn(
-    color="green" push no-caps @click="confirm()"
+    color="accent" push no-caps @click="confirm()"
     :style=`{position: 'absolute', zIndex: 10000, top: '16px', left: '70px', width: 'calc(100% - 140px)'}`)
     span.text-white Ready
   //- cancel

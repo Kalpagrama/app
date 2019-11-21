@@ -20,8 +20,8 @@ k-split(ref="kSplit" :headerMaxHeight="200" :headerClass="['bg-black']" :bodyCla
       @click="$refs.kSplit.scrollTo(0)"
       :style=`{position: 'sticky', top: '0px', height: '50px'}`
       ).row.full-width.items-center.justify-center
-      q-btn(round flat color="green" size="md" )
-        q-icon(name="keyboard_arrow_up" size="30px" color="green")
+      q-btn(round flat color="accent" size="md" )
+        q-icon(name="keyboard_arrow_up" size="30px" color="accent")
       //- span {{ scrollTop }}
     //- content header
     div(:style=`{height: headerHeight+'px', borderBottom: '1px solid #eee'}`).row.full-width.items-start.content-start.justify-start.q-px-sm.q-mb-md

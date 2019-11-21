@@ -20,7 +20,7 @@ export default {
       let arr = ['/app/home', '/app/hot', '/app/create', '/app/workspace']
       let p = this.$route.path
       if (arr.includes(p)) return 'white'
-      else return 'green'
+      else return 'accent'
     }
   },
   methods: {

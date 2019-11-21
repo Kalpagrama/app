@@ -21,7 +21,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
   //- create node
   div(v-if="!page" :style=`{height: '60px'}` @click="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])").row.full-width.items-center.cursor-pointer
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      q-btn(round push icon="add" color="green")
+      q-btn(round push icon="add" color="accent")
     div(v-if="!mini").col.full-height
       .row.fit.items-center
         span.text-white Создать ядро

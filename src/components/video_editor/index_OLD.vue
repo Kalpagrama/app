@@ -18,7 +18,7 @@ div(v-if="!loading" :style=`{position: 'relative', overflow: 'hidden'}`).row.fit
     :style=`{position: 'absolute', zIndex: 1000, height: '60px', top: '10px', left: '10px', width: '60px', borderRadius: '10px', opacity: 0.8}`)
   q-btn(v-if="inCreator" no-caps color="primary" icon="check" @click="ready()"
     :style=`{position: 'absolute', zIndex: 1000, height: '60px', top: '10px', right: '10px', width: '60px', borderRadius: '10px'}`)
-  q-btn(v-if="inCreator" round color="green" icon="add" @click="pointCreate()"
+  q-btn(v-if="inCreator" round color="accent" icon="add" @click="pointCreate()"
     :style=`{position: 'absolute', zIndex: 1000, right: '14px', bottom: '14px'}`)
   //- --------------
   //- menu-time-menu

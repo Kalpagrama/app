@@ -7,7 +7,7 @@
         .col.full-height
           .row.fit.items-center.q-px-sm
             span.text-bold {{ name }}
-        q-btn(round dense flat :color="muted ? 'grey-6' : 'green'" :icon="muted ? 'volume_off' : 'volume_up'" @click="volumeToggle()")
+        q-btn(round dense flat :color="muted ? 'grey-6' : 'accent'" :icon="muted ? 'volume_off' : 'volume_up'" @click="volumeToggle()")
         q-btn(round dense flat color="grey-6" icon="more_vert" @click="feedOptions()")
     //- body
     div(:style=`{maxWidth: '500px'}`).row.full-width.q-pt-sm

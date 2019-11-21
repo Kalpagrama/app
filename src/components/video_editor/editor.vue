@@ -79,17 +79,17 @@ div(
           q-btn(round flat dense icon="more_vert" color="grey-6")
         //- actions
         div(:style=`{position: 'relative', height: '50px'}`).row.full-width.items-center.justify-between.q-px-sm
-          q-btn(round dense icon="play_arrow" color="green" @click="cutPlay()")
+          q-btn(round dense icon="play_arrow" color="accent" @click="cutPlay()")
           q-btn(round flat dense icon="delete_outline" color="grey-6" @click="cutDelete()")
     //- confirm cut changes
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       q-btn(
-        v-if="cut >= 0" round color="green" icon="check" @click="confirm()"
+        v-if="cut >= 0" round color="accent" icon="check" @click="confirm()"
         :style=`{position: 'absolute', zIndex: 2000, right: '12px', bottom: '12px'}`)
     //- add
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       q-btn(
-        v-if="cut >= 0 ? false : true" round push size="md" color="green" icon="add" @click="add()"
+        v-if="cut >= 0 ? false : true" round push size="md" color="accent" icon="add" @click="add()"
         :style=`{position: 'absolute', zIndex: 2000, right: cuts.length > 0 ? '12px' : $q.screen.width/2-24+'px', bottom: '12px'}`)
     //- debug
     div(v-if="false" :style=`{position: 'absolute', bottom: '0px', fontSize: '9px'}`).row.full-width.q-pa-xs

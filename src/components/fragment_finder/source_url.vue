@@ -36,7 +36,7 @@
     small {{ $store.state.events.progress }}
   div(v-if="inputUrl" :style=`{height: '70px'}`).row.full-width.q-px-sm
     q-btn(
-      color="green" push no-caps @click="upload()"
+      color="accent" push no-caps @click="upload()"
       style=`height: 60px; borderRadius: 10px`
       :disable="!iframeReady"
       :loading="uploading" :percentage="progress ? progress.progress : 0").full-width
