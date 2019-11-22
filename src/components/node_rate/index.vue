@@ -17,7 +17,7 @@ div(
           position: 'absolute', width: '60px', height: '60px',
           left: fingerLeft-30+'px', top: fingerTop-30+'px', zIndex: 1000,
           borderRadius: '30px', overflow: 'hidden'}`
-        ).row.items-center.justify-center.bg-green
+        ).row.items-center.justify-center.bg-accent
         q-icon(name="fingerprint" color="white" size="36px")
   //- debug
   div(v-if="false").row.full-width.justify-center
@@ -34,7 +34,7 @@ div(
     leave-active-class="animated slideOutDown")
     q-btn(
       v-if="!loading"
-      push color="green" no-caps :loading="nodeRating" @click="nodeRating ? '' : nodeRate()"
+      push color="accent" no-caps :loading="nodeRating" @click="nodeRating ? '' : nodeRate()"
       :style=`{position: 'absolute', zIndex: 1000, left: '10px', bottom: '10px', width: 'calc(100% - 20px)', height: '60px', borderRadius: '10px'}`
       )
       span.text-bold.text-white Проголосовать

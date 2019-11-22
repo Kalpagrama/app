@@ -21,7 +21,7 @@ div(
   //- timeline
   div(v-if="active && now > 0" :style=`{position: 'absolute', zIndex: zIndex+100, bottom: '0px', left: '0px', height: '6px'}` @click="videoTimelineClick"
     ).row.full-width.items-end.cursor-pointer
-    div(:style=`{width: videoNow+'%', height: '10px', borderRadius: '0 4px 4px 0', pointerEvents: 'none'}`).row.bg-green
+    div(:style=`{width: videoNow+'%', height: '10px', borderRadius: '0 4px 4px 0', pointerEvents: 'none'}`).row.bg-accent
   //- video
   video(
     ref="kvideo"

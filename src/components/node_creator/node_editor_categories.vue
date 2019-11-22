@@ -33,7 +33,7 @@
           div(
             v-for="(c, ckey) in categoriesMap" :key="ckey" v-if="categories.includes(c.type)"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`
-            ).row.bg-green.q-mr-sm.q-mt-xs
+            ).row.bg-accent.q-mr-sm.q-mt-xs
             .col
               .row.fit.items-center.q-px-sm
                 span.text-white.q-mb-xs {{ c.nameC  }}

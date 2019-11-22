@@ -18,11 +18,11 @@ div(
     ).row.full-width.items-center.q-px-xs
     q-btn(
       v-if="collCurrent !== 0"
-      round color="green" icon="keyboard_arrow_left" @click="backward()")
+      round color="accent" icon="keyboard_arrow_left" @click="backward()")
     .col
     q-btn(
       v-if="collCurrent < count - 1"
-      round color="green" icon="keyboard_arrow_right" @click="forward()")
+      round color="accent" icon="keyboard_arrow_right" @click="forward()")
   //- scroll
   div(
     ref="kCollsScrollWrapper"

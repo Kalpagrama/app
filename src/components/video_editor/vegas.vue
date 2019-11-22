@@ -11,13 +11,13 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
     //- small.full-width cutsOverflowY: {{cutsOverflowY}}
   //- actions
   q-btn(
-    v-show="cut === undefined" round color="green" size="md" icon="add"  @click="cutAdd(now)"
+    v-show="cut === undefined" round color="accent" size="md" icon="add"  @click="cutAdd(now)"
     :style=`{position: 'absolute', right: '10px', bottom: '10px', zIndex: 10000}`)
   q-btn(
-    v-show="cut === undefined" round color="green" size="md" :icon="mode === 'mini' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'"  @click="modeToggle()"
+    v-show="cut === undefined" round color="accent" size="md" :icon="mode === 'mini' ? 'keyboard_arrow_down' : 'keyboard_arrow_up'"  @click="modeToggle()"
     :style=`{position: 'absolute', left: '10px', bottom: '10px', zIndex: 10000}`)
   q-btn(
-    v-show="cut >= 0" no-caps color="green" @click="cutConfirm()"
+    v-show="cut >= 0" no-caps color="accent" @click="cutConfirm()"
     :style=`{position: 'absolute', left: '10px', bottom: '10px', height: '60px', width: 'calc(100% - 20px)', borderRadius: '10px'}`)
     span Готово
   //- frames
@@ -37,7 +37,7 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
             //- frame img
             img(:src="f" draggable="false" :style=`{height: '50px', objectFit: 'cover', userSelect: 'none'}` @load="frameRendered")
           //- now line
-          div(:style=`{position: 'absolute', left: now*k+'px', width: '5px', height: '50px'}`).row.bg-green
+          div(:style=`{position: 'absolute', left: now*k+'px', width: '5px', height: '50px'}`).row.bg-accent
         //- right box for padding
         div(:style=`{height: '50px', width: width/2+'px'}`).row.bg-white
   //- cuts

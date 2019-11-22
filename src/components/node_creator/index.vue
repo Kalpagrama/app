@@ -62,7 +62,7 @@
             transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
               q-btn(
                 v-if="tab === 'preview'"
-                color="green" push no-caps @click="publish()"
+                color="accent" push no-caps @click="publish()"
                 :loading="publishing"
                 :style=`{position: 'absolute', left: '8px', bottom: '8px', height: '60px',
                   width: 'calc(100% - 16px)', borderRadius: '10px'}`)

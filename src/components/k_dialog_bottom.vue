@@ -19,7 +19,7 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
         //- confirm
         q-btn(
           v-if="options.confirm"
-          push no-caps color="green" @click="confirmClick()"
+          push no-caps color="accent" @click="confirmClick()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width
           span.text-bold {{ options.confirmName }}
 </template>

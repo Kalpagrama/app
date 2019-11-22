@@ -8,13 +8,13 @@ q-layout(:container="true" :style=`{width: width+'px', height: height+'px'}` @sc
       template(v-slot:feed)
         .column.fit
           div(:style=`{height: '50px'}`).row.full-width.items-center.bg-white.q-px-xs
-            q-btn(flat round icon="list" :color="tab === 'categories' ? 'green' : 'grey'" @click="tab = 'categories'")
+            q-btn(flat round icon="list" :color="tab === 'categories' ? 'accent' : 'grey'" @click="tab = 'categories'")
             q-btn(flat no-caps).q-px-xs
               span {{ $t(`#${categories[category].name.charAt(0).toUpperCase() + categories[category].name.slice(1)}`)}}
             .col
-            q-btn(flat no-caps :color="mode === 'hot' ? 'green' : 'grey'")
+            q-btn(flat no-caps :color="mode === 'hot' ? 'accent' : 'grey'")
               span(:class=`{'text-bold': mode === 'hot'}` @click="mode = 'hot'") {{ $t('Hot') }}
-            q-btn(flat no-caps :color="mode === 'fresh' ? 'green' : 'grey'")
+            q-btn(flat no-caps :color="mode === 'fresh' ? 'accent' : 'grey'")
               span(:class=`{'text-bold': mode === 'fresh'}` @click="mode = 'fresh'") {{ $t('Fresh') }}
           .col
             k-colls(ref="kCollsModes" :value="mode" @value="mode = $event" :colls="modes" :style=`{height: height+'px'}`)
