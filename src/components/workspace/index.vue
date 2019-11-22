@@ -20,10 +20,10 @@ q-layout(view='hHh Lpr fFf' container :style=`{position: 'relative', width: widt
             :style=`{height: '70px'}`
             ).row.full-width.items-center.hr.cursor-pointer
             div(:style=`{width: '40px', height: '70px'}`).row.items-center.justify-end
-              q-icon(:name="m.icon" :color="page === mkey ? 'green' : 'grey-9'" :size="page === mkey ? '25px' : '20px'")
+              q-icon(:name="m.icon" :color="page === mkey ? 'accent' : 'grey-9'" :size="page === mkey ? '25px' : '20px'")
             .col
               .row.fit.items-center.q-px-sm
-                span(:class=`{'text-green': page === mkey}`).text-bold {{ m.name }}
+                span(:class=`{'text-accent': page === mkey}`).text-bold {{ m.name }}
   //- header
   q-header(reveal)
     div(:style=`{minHeight: '60px'}`).row.full-width.bg-white
@@ -36,7 +36,7 @@ q-layout(view='hHh Lpr fFf' container :style=`{position: 'relative', width: widt
             .row.full-width
               small(v-if="page").text-grey-9 {{ pages[page].name }}
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-          q-btn(round flat color="green" icon="add" @click="$refs.wsAddDialog.show()")
+          q-btn(round flat color="accent" icon="add" @click="$refs.wsAddDialog.show()")
   //- page
   q-page-container
     ws-dashboard(v-if="page === 'dashboard'" @page="$router.push({params: {page: $event}})")

@@ -22,12 +22,12 @@ div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-
       .row.full-width.q-pa-sm
         span.text-bold Категория
       div(:style=`{height: '56px', borderRadius: '10px'}`).row.full-width.items-center.justify-between.q-px-sm.bg-grey-2
-        span(:style=`{borderRadius: '10px'}`).bg-green.q-px-md.q-py-sm.text-white #Развлечения
+        span(:style=`{borderRadius: '10px'}`).bg-accent.q-px-md.q-py-sm.text-white #Развлечения
         q-icon(size="26px" name="keyboard_arrow_down")
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
       v-if="tab === 'preview'"
-      color="green" push no-caps @click="publish()"
+      color="accent" push no-caps @click="publish()"
       :loading="publishing"
       :style=`{position: 'absolute', left: '8px', bottom: '8px', height: '60px',
         width: 'calc(100% - 16px)', borderRadius: '10px'}`)

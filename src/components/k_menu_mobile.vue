@@ -3,11 +3,12 @@ div(:style=`{height: '60px', overflow: 'hidden'}`
   ).row.full-width.items-center.content-center.justify-between.q-px-sm.bg-primary
   //- div(:style=`{width: '40px', height: '40px'}`).row.br
   //-   k-logo(:width="40" :height="40")
-  q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'green' : 'white'" @click.stop="pageClick('/app/home')")
-  q-btn(round flat icon="whatshot" :color="$route.path.split('/')[2] === 'hot' ? 'green' : 'white'" @click.stop="pageClick('/app/hot')")
-  q-btn(round push icon="add" color="green" size="md" @click.stop="pageClick('/app/create')")
-  q-btn(round flat icon="img:statics/icons/anvil.svg" :color="$route.path === '/app/workspace' ? 'green' : 'white'" @click.stop="pageClick('/app/workspace')")
-  q-btn(round flat icon="menu" :color="inMenu" @click.stop="pageClick('/app/menu')")
+  q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'accent' : 'white'" @click.stop="pageClick('/app/home')")
+  q-btn(round flat icon="whatshot" :color="$route.path.split('/')[2] === 'hot' ? 'accent' : 'white'" @click.stop="pageClick('/app/hot')")
+  q-btn(round push icon="add" color="accent" size="md" @click.stop="pageClick('/app/create')")
+  q-btn(round flat :color="$route.path === '/app/workspace' ? '#789dff' : '#fff'" @click.stop="pageClick('/app/workspace')")
+    anvil(:width="30" :height="30" :color="anvilColor")
+  q-btn(round flat icon="menu" :color="$route.path === '/app/menu' ? 'accent' : 'white'" @click.stop="pageClick('/app/menu')")
 </template>
 
 <script>
@@ -22,7 +23,11 @@ export default {
       let arr = ['/app/home', '/app/hot', '/app/create', '/app/workspace']
       let p = this.$route.path
       if (arr.includes(p)) return 'white'
-      else return 'green'
+      else return 'accent'
+    },
+    anvilColor () {
+      if (this.$route.path === '/app/workspace') return '#789dff'
+      else return 'white'
     }
   },
   methods: {

@@ -18,7 +18,7 @@ div(v-if="!loading" :style=`{position: 'relative', overflow: 'hidden'}`).row.fit
     :style=`{position: 'absolute', zIndex: 1000, height: '60px', top: '10px', left: '10px', width: '60px', borderRadius: '10px', opacity: 0.8}`)
   q-btn(v-if="inCreator" no-caps color="primary" icon="check" @click="ready()"
     :style=`{position: 'absolute', zIndex: 1000, height: '60px', top: '10px', right: '10px', width: '60px', borderRadius: '10px'}`)
-  q-btn(v-if="inCreator" round color="green" icon="add" @click="pointCreate()"
+  q-btn(v-if="inCreator" round color="accent" icon="add" @click="pointCreate()"
     :style=`{position: 'absolute', zIndex: 1000, right: '14px', bottom: '14px'}`)
   //- --------------
   //- menu-time-menu
@@ -41,7 +41,7 @@ div(v-if="!loading" :style=`{position: 'relative', overflow: 'hidden'}`).row.fit
   //- ----
   div(:style=`{position: 'absolute', bottom: '200px', zIndex: 1000, height: '40px', paddingLeft: '30px', paddingRight: '30px'}`).row.full-width.items-center
     div(:style=`{height: '14px', borderRadius: '7px', overflow: 'hidden'}`).row.full-width.bg-red
-      div(:style=`{width: now/duration*100+'%'}`).row.bg-green
+      div(:style=`{width: now/duration*100+'%'}`).row.bg-accent
   //- -----------------------
   //- fragment points wrapper
   div(v-if="fragment && timelineBottom === 0" :style=`{position: 'absolute', bottom: timelineBottom+82+'px', height: '80px', paddingLeft: width/2+'px'}`).row.full-width
