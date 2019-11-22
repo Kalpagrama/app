@@ -36,23 +36,24 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
         div(
           v-if="nodeBluring"
           :style=`{
-            position: 'absolute', zIndex: 1000, left: '0px', top: '-90px',
-            width: ratesWidth+'px', height: '90px', overflow: 'hidden'}`).row.items-end.bg-white
+            position: 'absolute', zIndex: 1000, left: '0px', top: '-145px',
+            width: ratesWidth+'px', height: '90px', overflow: 'hidden'}`).row.items-end
           div(
             v-for="(r, ri) in rates" :key="ri"
             @click="rateClick(r, ri)"
             :style=`{position: 'relative', height: '50px'}`
-            ).col.bg-white
+            ).col
+            //- background: 'rgba(0,0,0,0.5)'
             transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
               div(
                 v-if="ri === rate"
                 :style=`{position: 'absolute', zIndex: 2000, height: '50px', bottom: '0px'}`
                 ).row.full-width.items-start.justify-center
                 div(:style=`{width: '40px', height: '40px', borderRadius: '50%', background: r.color}`).row.items-center.justify-center
-                  span.text-bold {{ r.name }}
+                  span.text-bold.text-white {{ r.name }}
             .row.fit.items-center.justify-center
               //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-              span(v-if="rates !== ri").text-bold {{ r.name }}
+              span(v-if="rates !== ri").text-bold.text-red {{ r.name }}
       //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       //- q-icon(name="keyboard_arrow_left" color="grey" size="20px")
       span(v-if="nodeBluring").text-bold {{ $t('Tap or slide to select') }}
@@ -88,11 +89,11 @@ export default {
       tab: 0,
       rate: 0,
       rates: [
-        {id: 0, name: '5', color: 'blue'},
-        {id: 1, name: '25', color: 'green'},
-        {id: 2, name: '50', color: 'red'},
-        {id: 3, name: '75', color: 'yellow'},
-        {id: 4, name: '95', color: 'gold'}
+        {id: 0, name: '5', color: 'red', size: 40},
+        {id: 1, name: '25', color: 'yellow', size: 50},
+        {id: 2, name: '50', color: 'green', size: 60},
+        {id: 3, name: '75', color: 'blue', size: 70},
+        {id: 4, name: '95', color: 'purple', size: 95}
       ],
       panPositionLeft: 0
     }

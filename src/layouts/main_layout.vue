@@ -156,7 +156,7 @@ export default {
       // console.time('created')
       // this.$q.notify('Created start')
       this.loading = true
-      await this.$wait(1000)
+      // await this.$wait(10000)
       // Oauth case. take token from redirect url
       let token = this.$route.query.token
       let expires = this.$route.query.expires
