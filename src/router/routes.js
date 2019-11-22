@@ -5,20 +5,21 @@ const routes = [
     redirect: '/app/home',
     component: () => import('layouts/main_layout'),
     children: [
-      { name: 'home', path: 'home', component: () => import('pages/app/home') },
-      { name: 'hot', path: 'hot/:category?/:mode?', component: () => import('pages/app/hot') },
+      // mobile
+      { name: 'home', path: 'home/:sphere?/:sort?', component: () => import('pages/app/home') },
+      { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('pages/app/trends') },
+      { name: 'create', path: 'create', component: () => import('components/node_creator') },
+      { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
+      { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
+      // rest
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
-      { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
-      { name: 'create', path: 'create', component: () => import('components/node_creator') },
-      { name: 'researchCreator', path: 'research-creator', component: () => import('components/research_creator') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
-      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
-      { name: 'menu', path: 'menu', component: () => import('pages/app/menu') }
+      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') }
     ]
   },
   {

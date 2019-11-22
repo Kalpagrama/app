@@ -8,20 +8,20 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
       div(v-else-if="mode === 'actions'").row.full-width.q-pa-sm
         //- header
         div(v-if="options.header" :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="headerClick()").row.full-width.justify-center.items-center.q-mb-md.bg-white
-          span.text-bold.text-center {{ options.headerName }}
+          span.text-bold.text-center {{ $t(options.headerName) }}
         //- actions
         div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
           div(
             v-for="(a, akey, ai) in options.actions" :key="akey" @click="actionClick(a, akey, ai)"
             :style=`{height: '50px', borderTop: ai > 0 ? '1px solid #eee' : 'none'}`
             ).row.full-width.items-center.justify-center.cursor-pointer
-            span(:style=`{color: a.color ? a.color : 'black'}`) {{ a.name }}
+            span(:style=`{color: a.color ? a.color : 'black'}`) {{ $t(a.name) }}
         //- confirm
         q-btn(
           v-if="options.confirm"
           push no-caps color="green" @click="confirmClick()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width
-          span.text-bold {{ options.confirmName }}
+          span.text-bold {{ $t(options.confirmName) }}
 </template>
 
 <script>

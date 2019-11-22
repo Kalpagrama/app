@@ -90,11 +90,12 @@ export default {
         header: false,
         headerName: this.fragmentDialogHeaderName,
         confirm: true,
-        confirmName: 'Создать ядро',
+        confirmName: 'Create node',
         actions: {
-          contentSubscribe: {name: 'Подпсаться на контент'},
-          contentExplore: {name: 'Исследовать контент'},
-          fragmentWorkspace: {name: 'Фрагмент в мастерскую'}
+          // contentSubscribe: {name: 'Подпсаться на контент'},
+          nodeBookmark: {name: 'Node bookmark'},
+          contentExplore: {name: 'Explore content'},
+          fragmentWorkspace: {name: 'Fragment to workspace'}
         }
       }
     }
@@ -106,6 +107,15 @@ export default {
       switch (action) {
         case 'header': {
           this.$router.push(`/app/content/${this.$store.state.ui.fragment.content.oid}`)
+          break
+        }
+        case 'nodeBookmark': {
+          this.$store.commit('ui/stateSet', ['bookmarkDialogOpened', true])
+          this.$store.commit('ui/stateSet', ['bookmark', {
+            type: 'node',
+            name: '',
+            url: 'qwe'
+          }])
           break
         }
         case 'contentSubscribe': {

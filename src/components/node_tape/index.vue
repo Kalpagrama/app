@@ -32,7 +32,6 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
           v-for="(n, ni) in nodes" :key="n.oid"
           :ref="`node${n.oid}`"
           @nodeClick="nodeClick(n, ni)"
-          @nodeName="nodeName(n, ni)"
           :width="width"
           :needFull="nodeActive === ni"
           :noActions="true"
@@ -57,7 +56,6 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
 
 <script>
 import nodeTapeNode from './node'
-// callback: e => e ? nodeVisible(e, ni) : false,
 
 export default {
   name: 'nodeTape',
@@ -84,7 +82,7 @@ export default {
       tintIndex: 200,
       tintOpacity: 0.35,
       nodesVisible: [],
-      // nodeVisible: null
+      muted: true
     }
   },
   computed: {
@@ -102,31 +100,6 @@ export default {
         // this.$log('nodeVisible', entry.target.lang)
       }
     },
-    nodeName (n, ni, e) {
-      this.$log('nodeName')
-      let node = this.$refs[`node${n.oid}`][0]
-      this.$log('node', node)
-      this.nodeClientHeight = node.$el.clientHeight
-      this.nodeOffsetTop = node.$el.offsetTop
-      this.$log('nodeOffsetTop', this.nodeOffsetTop)
-      this.nodeOffsetHeight = node.$el.offsetHeight
-      this.$log('nodeOffsetHeight', this.nodeOffsetHeight)
-      // set node
-      this.node = n
-      this.$tween.to(
-        this,
-        0.2,
-        {
-          nodeOffsetHeight: 50,
-          tintOpacity: 0.9,
-          tintIndex: 1000,
-          onComplete: () => {
-            this.$log('nodeName DONE')
-            this.$router.push(`/app/node/${n.oid}`)
-          }
-        }
-      )
-    },
     nodeClick (n, ni, e) {
       this.$log('nodeClick', n, ni, e)
       this.node = null
@@ -136,7 +109,10 @@ export default {
       let node = this.$refs[`node${n.oid}`][0]
       let offsetTop = node.$el.offsetTop
       let clientHeight = node.$el.clientHeight
-      let scrollTo = offsetTop - (this.$q.screen.height - clientHeight) / 2
+      let offsetBottom = clientHeight - offsetTop
+      // let scrollTo = offsetTop - (this.$q.screen.height - clientHeight) / 2
+      let scrollTo = offsetTop - clientHeight
+      this.$log('offsetTop/offsetBottom/clientHeight/scrollTo', offsetTop, offsetBottom, clientHeight, scrollTo)
       this.$tween.to(
         this.$refs.scrollWrapper,
         0.2,
@@ -152,33 +128,29 @@ export default {
       if (this.nodesCount === this.nodeActive + 1) return
       this.$log('swipeUp', e)
       this.nodeClick(this.nodes[this.nodeActive + 1], this.nodeActive + 1, null)
-      // this.nodeActive++
     },
     swipeDown (e) {
       if (this.nodeActive === 0) return
       this.$log('swipeDown', e)
       this.nodeClick(this.nodes[this.nodeActive - 1], this.nodeActive - 1, null)
-      // this.nodeActive--
     },
     onScroll (e) {
       // this.$log('onScroll', e)
-      // this.scrolling = true
       this.scrollTop = e.target.scrollTop
       this.scrollHeight = e.target.scrollHeight
       this.clientHeight = e.target.clientHeight
       this.clientWidth = e.target.clientWidth
-      if (this.scrollTimeout) {
-        clearInterval(this.scrollTimeout)
-        this.scrollTimeout = null
-      }
-      this.scrollTimeout = setTimeout(() => {
-        // this.scrolling = false
-        this.onScrolled()
-      }, 230)
+      // if (this.scrollTimeout) {
+      //   clearInterval(this.scrollTimeout)
+      //   this.scrollTimeout = null
+      // }
+      // this.scrollTimeout = setTimeout(() => {
+      //   this.onScrolled()
+      // }, 230)
     },
     onScrolled () {
       this.$log('onScrolled')
-      this.nodeClick(this.nodes[this.nodesVisible[0]], this.nodesVisible[0])
+      // this.nodeClick(this.nodes[this.nodesVisible[0]], this.nodesVisible[0])
     },
     onResize (e) {
       // this.$log('onResize', e)
@@ -192,10 +164,6 @@ export default {
   async mounted () {
     this.$log('mounted')
     if (this.$refs.onResizeObserver) this.$refs.onResizeObserver.trigger()
-    // let h = this.nodeVisibleHandler()
-    // this.nodeVisible = new Proxy({}, h)
-    // await this.$wait(500)
-    // this.$refs.scrollWrapper.scrollTop = 100
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
