@@ -6,7 +6,7 @@
     template(v-slot:body)
       nodes(v-if="node" :node="node")
       div(v-else).row.fit.items-center.justify-center
-        q-spinner(:thickness="2" color="green" size="50px")
+        q-spinner(:thickness="2" color="accent" size="50px")
 </template>
 
 <script>

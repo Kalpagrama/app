@@ -11,10 +11,10 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
     small.full-width nodesVisible: {{nodesVisible}}
   //- debug swipes
   q-btn(
-    round color="green" icon="keyboard_arrow_up" @click="swipeDown()"
+    round color="accent" icon="keyboard_arrow_up" @click="swipeDown()"
     :style=`{position: 'absolute', zIndex: 1000, bottom: '70px', left: '10px'}`)
   q-btn(
-    round color="green" icon="keyboard_arrow_down" @click="swipeUp()"
+    round color="accent" icon="keyboard_arrow_down" @click="swipeUp()"
     :style=`{position: 'absolute', zIndex: 1000, bottom: '70px', right: '10px'}`)
   //- tint
   div(:style=`{position: 'absolute', zIndex: tintIndex, top: 0, left: 0, pointerEvents: 'none', background: 'rgba(0,0,0,'+tintOpacity+')'}`).row.fit

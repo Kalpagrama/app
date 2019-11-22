@@ -18,7 +18,7 @@ div(:style=`{position: 'relative'}`).column.fit.bg-white
         :style=`{height: '60px'}`
         ).row.full-width.items-center.q-px-md.cursor-pointer
         span(
-          :class=`{'bg-green': ckey === category}`
+          :class=`{'bg-accent': ckey === category}`
           :style=`{color: ckey === category ? 'white' : 'black', borderRadius: '4px'}`).q-pa-sm {{ `#${c.name.charAt(0).toUpperCase() + c.name.slice(1)}` }}
 </template>
 

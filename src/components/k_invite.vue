@@ -16,7 +16,7 @@
               template(v-slot:append)
                 q-icon(name="mail")
           q-btn(
-            no-caps color="green" :disable="emailSent" :loading="emailSending" @click="emailSend()"
+            no-caps color="accent" :disable="emailSent" :loading="emailSending" @click="emailSend()"
             style=`height: 56px; width: 120px; border-radius: 10px`).full-width
             span.text-bold {{emailSent ? 'Приглашение отправлено!' : 'Отправить приглашение'}}
         //- get link
@@ -29,7 +29,7 @@
                 q-icon(name="link")
           q-btn(
             v-if="link.length === 0"
-            label="или скопировать ссылку" outline no-caps color="green" :loading="linkGetting" @click="getLink()"
+            label="или скопировать ссылку" outline no-caps color="accent" :loading="linkGetting" @click="getLink()"
             style=`height: 56px; width: 120px; border-radius: 10px`).full-width
 </template>
 

@@ -7,7 +7,7 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
     .col
       .row.fit.items-center.justify-end.q-px-sm
         q-btn(
-          color="green" no-caps @click="$emit('fragment')"
+          color="accent" no-caps @click="$emit('fragment')"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`) Save and exit
   q-tabs(v-model="tab")
     q-tab(v-for="t in tabs" :key="t.id" :name="t.id" :label="t.name" no-caps)
@@ -17,7 +17,7 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
       q-tab-panel(name="fragments" style=`position: relative; margin: 0; padding: 0`).column.fit.bg-white
         //- add
         q-btn(
-          round color="green" size="lg" icon="add" @click="pointAdd()"
+          round color="accent" size="lg" icon="add" @click="pointAdd()"
           :style=`{position: 'absolute', right: '10px', bottom: '10px'}`)
         //- ready
         .col.scroll

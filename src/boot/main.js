@@ -117,6 +117,8 @@ export default async ({ Vue, store, router: VueRouter }) => {
   // new
   Vue.component('nodeTape', () => import(`components/node_tape`))
   Vue.component('kColls', () => import(`components/k_colls`))
+  // icons
+  Vue.component('anvil', () => import(`components/k_icons/anvil`))
 }
 
 export { time, router }

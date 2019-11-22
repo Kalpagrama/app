@@ -55,34 +55,12 @@ export default {
   }
 }
 </script>
-<style lang="stylus">
+<style lang="stylus" scoped>
 svg {
   cursor:crosshair
   -moz-box-shadow: 0px 0px 5px #888
   -webkit-box-shadow: 0px 0px 5px #888;
   box-shadow: 0px 0px 5px #888;
   border-radius: 50%;
-}
-.logo:hover .diamondOrCh {
-  animation-name: diamondOriginChanged;
-  animation-duration: 4s;
-  animation-iteration-count: infinite;
-  transform-origin: 50% 50%;
-}
-.logo:hover .diamondOrCh2 {
-  animation-name: diamondOriginChanged2;
-  animation-duration: 4s;
-  animation-iteration-count: infinite;
-  transform-origin: 50% 50%;
-}
-.loading {
-}
-@keyframes diamondOriginChanged {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
-}
-@keyframes diamondOriginChanged2 {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(-360deg); }
 }
 </style>

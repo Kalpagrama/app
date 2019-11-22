@@ -2,7 +2,7 @@
 div(:style=`{position: 'relative'}`).column.fit.bg-white
   //- create/update
   q-btn(
-    color="green" no-caps push :loadig="creating" @click="bookmarkCreate()"
+    color="accent" no-caps push :loadig="creating" @click="bookmarkCreate()"
     :style=`{position: 'absolute', bottom: '8px', left: '8px', width: 'calc(100% - 16px)', height: '60px', borderRadius: '10px'}`)
     span.text-bold Создать
   //- header

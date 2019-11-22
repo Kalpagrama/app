@@ -34,7 +34,7 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
               //- @click="subDelete(s, si)"
               q-btn(rounded outline dense no-caps
                 :label="subsToDelete.includes(s.oid) ? 'Follow' : 'Unfollow'"
-                :color="subsToDelete.includes(s.oid) ? 'green' : 'red'"
+                :color="subsToDelete.includes(s.oid) ? 'accent' : 'red'"
                 size="10px"  @click="subsToDelete.includes(s.oid) ? followClick(s, si) : unfollowClick(s, si)"
                 :style=`{padding: '2px 5px'}`)
               //- q-btn( rounded outline dense label="follow" size="10px" color="green-7" @click="followClick(s, si)")
