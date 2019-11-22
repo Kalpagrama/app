@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.fit.bg-primary
+div(:style=`{height: $q.screen.height-60+'px'}`).column.full-width.bg-primary
   //- k-dialog-bottom(ref="nodeCreatorDialog" mode="actions" :options="nodeCreatorDialogOptions" @action="nodeCreatorAction")
   q-dialog(ref="nodeCreatorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     .column.fit.bg-white

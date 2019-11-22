@@ -1,14 +1,17 @@
 <template lang="pug">
-div(:style=`{height: '60px', overflow: 'hidden'}`
-  ).row.full-width.items-center.content-center.justify-between.q-px-sm.bg-primary
-  //- div(:style=`{width: '40px', height: '40px'}`).row.br
-  //-   k-logo(:width="40" :height="40")
-  q-btn(round flat icon="blur_on" :color="$route.path === '/app/home' ? 'accent' : 'white'" @click.stop="pageClick('/app/home')")
-  q-btn(round flat icon="whatshot" :color="$route.path.split('/')[2] === 'hot' ? 'accent' : 'white'" @click.stop="pageClick('/app/hot')")
-  q-btn(round push icon="add" color="accent" size="md" @click.stop="pageClick('/app/create')")
-  q-btn(round flat :color="$route.path === '/app/workspace' ? '#789dff' : '#fff'" @click.stop="pageClick('/app/workspace')")
-    anvil(:width="30" :height="30" :color="anvilColor")
-  q-btn(round flat icon="menu" :color="$route.path === '/app/menu' ? 'accent' : 'white'" @click.stop="pageClick('/app/menu')")
+div(:style=`{minHeight: '60px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
+  ).row.full-width.items-center.content-center.justify-between.bg-primary.q-px-md
+  div(:style=`{width: '40px', height: '40px'}` @click="$router.push({name: 'home'})").row
+    k-spinner(v-if="$route.name === 'home'" :width="40" :height="40")
+    k-logo(v-else :width="40" :height="40")
+  q-btn(round flat icon="whatshot" :color="$route.name === 'trends' ? 'accent' : 'white'" @click.stop="$router.push({name: 'trends'})")
+  q-btn(round push icon="add" color="accent" size="md" @click.stop="$router.push({name: 'create'})")
+  q-btn(round flat :color="$route.name === 'workspace' ? '#789dff' : '#fff'" @click.stop="$router.push({name: 'workspace'})")
+    anvil(:width="26" :height="26" :color="$route.name === 'workspace' ? '#789dff' : '#fff'")
+  q-btn(round flat icon="menu" :color="inMenu ? 'accent' : 'white'" @click.stop="$router.push({name: 'menu'})")
+  //- debug
+  div(v-if="debug").row.full-width.bg-red
+    small $route.name: {{$route.name}}
 </template>
 
 <script>
@@ -16,43 +19,13 @@ export default {
   name: 'kMenuMobile',
   data () {
     return {
+      debug: false
     }
   },
   computed: {
     inMenu () {
-      let arr = ['/app/home', '/app/hot', '/app/create', '/app/workspace']
-      let p = this.$route.path
-      if (arr.includes(p)) return 'white'
-      else return 'accent'
-    },
-    anvilColor () {
-      if (this.$route.path === '/app/workspace') return '#789dff'
-      else return 'white'
-    }
-  },
-  methods: {
-    pageCreate () {
-      this.$log('pageCreate')
-    },
-    pageClick (path) {
-      try {
-        this.$log('pageClick start', path)
-        // this.$store.commit('ui/stateSet', ['page', path])
-        // this.$router.push(path)
-        switch (path) {
-          case '/app/create': {
-            this.$log('/app/create GOGOGOG')
-            this.$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])
-            break
-          }
-          default: {
-            this.$router.push(path)
-          }
-        }
-        this.$log('pageClick done')
-      } catch (e) {
-        this.$log('pageClick error', e)
-      }
+      if (['home', 'trends', 'create', 'workspace'].includes(this.$route.name)) return false
+      else return true
     }
   }
 }

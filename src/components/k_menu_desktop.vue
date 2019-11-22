@@ -5,7 +5,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
     k-invite(@hide="$refs.inviteDialog.hide()")
   k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
-  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-secondary.q-mb-sm.shadow-3
+  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-secondary
     div(@click="$router.push('/app/home')").col.row.items-center
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         k-logo(:width="40" :height="40")
@@ -15,7 +15,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
     div(@click="$router.push('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
-  div(:style=`{height: '60px'}` @click="$router.push(`/app/user/` + $store.state.auth.user.oid)").row.full-width.bg-secondary.q-mb-sm.shadow-3
+  div(:style=`{height: '60px'}` @click="$router.push(`/app/user/` + $store.state.auth.user.oid)").row.full-width.bg-secondary
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
     div(v-if="!mini").col.full-height
@@ -29,7 +29,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
       .row.fit.items-center
         span.text-white Создать ядро
   //- body
-  .col.full-width.scroll.bg-secondary.q-mb-sm.shadow-3
+  .col.full-width.scroll.bg-secondary
     .row.full-width.items-start.content-start
       div(v-for="(p, pi) in pages" :key="pi" @click="pageClick(p, pi)"
         :style=`{height: '60px'}`
@@ -38,14 +38,14 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
           q-btn(round flat :icon="p.icon" color="white")
         div(v-if="!mini").col.full-height
           .row.fit.items-center
-            span.text-white {{ p.name }}
+            span.text-white {{ $t(p.name) }}
     div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       q-btn(
         :round="mini" push color="accent" no-caps icon="person_add" @click="$refs.inviteDialog.show()"
         :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
-        span(v-if="width === 230").text-bold Пригласить друга
+        span(v-if="width === 230").text-bold.q-ml-md {{ $t('Invite friend') }}
   //- footer mini
-  div(v-if="!page" :style=`{height: '60px'}`).row.full-width.items-center
+  div(v-if="!page" :style=`{height: '60px'}`).row.full-width.items-center.br
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat :icon="mini ? 'keyboard_arrow_right' : 'keyboard_arrow_left'" color="white" @click="mini = !mini")
 </template>
@@ -59,14 +59,10 @@ export default {
       width: 230,
       mini: false,
       pages: [
-        {name: 'Чарты', icon: 'explore', path: '/app/hot'},
-        {name: 'Мастерская', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
-        {name: 'Research', icon: 'wb_iridescent', path: '/app/research-creator'},
-        // {name: 'Create node', icon: 'add', path: '/app/create'},
-        // {name: 'Invite friend', icon: 'menu', path: '/app/invite'},
-        {name: 'Подписки', icon: 'subscriptions', path: '/app/subscriptions'},
-        {name: 'Уведомления', icon: 'notifications', path: '/app/notifications'},
-        // {name: 'Настройки', icon: 'settings', path: ''},
+        {name: 'Trends', icon: 'whatshot', path: '/app/trends'},
+        {name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
+        {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
+        {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
         {name: 'Выйти', icon: 'exit_to_app', path: '/app/logout'}
       ]
     }

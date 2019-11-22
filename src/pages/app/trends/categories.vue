@@ -3,9 +3,15 @@ div(:style=`{position: 'relative'}`).column.fit.bg-white
   //- debug
   div(v-if="debug").row.full-width.bg-red
     small.full-width category: {{ category }}
+  div(:style=`{height: '60px'}`).row.full-width.items-center
+    .col.full-height
+      .row.fit.items-center.q-px-md
+        span.text-bold {{ $t('Trends') }}
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      q-btn(round flat icon="search" @click="searchStart()")
   //- body
   .col.full-width.scroll
-    div(:style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
+    div(:style=`{paddingBottom: '0px'}`).row.full-width.items-start.content-start
       div(
         v-for="(c, ckey, ci) in categories" :key="ckey" @click="categoryClick(c, ckey, ci)"
         :style=`{height: '60px'}`
@@ -21,13 +27,18 @@ export default {
   props: ['categories', 'category'],
   data () {
     return {
-      debug: true
+      debug: false
     }
   },
   methods: {
+    searchStart () {
+      this.$log('searchStart')
+    },
     async categoryClick (c, ckey, ci) {
       this.$log('categoryClick', c, ckey, ci)
       this.$router.push({params: {category: ckey}})
+      await this.$wait(250)
+      this.$emit('hide')
     }
   }
 }

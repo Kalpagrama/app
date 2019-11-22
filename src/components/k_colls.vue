@@ -2,113 +2,118 @@
 div(
   :style=`{position: 'relative'}`
   v-touch-pan.left.right.prevent.mouse="handlePan"
-  v-touch-swipe.left.right.prevent.mouse="handleSwipe"
-  ).row.full-width
+  ).column.full-width
   //- debug
   div(
     v-if="debug"
-    :style=`{position: 'absolute', top: '0px', zIndex: 1000, background: 'rgba(0,0,0,0.3)'}`).row.full-width.items-center
-    small.full-width collsOverflow: {{ collsOverflow }}
+    :style=`{position: 'absolute', top: '0px', zIndex: 1000, background: 'rgba(0,0,0,0.3)'}`).row.full-width.items-center.bg-red
+    small.full-width overflow: {{ overflow }}
     small.full-width value: {{ value }}
     small.full-width colls: {{ colls }}
-  //- scroll
+  //- header
   div(
-    ref="kCollsScrollWrapper"
-    :style=`{position: 'relative', overflow: overflow}`).row.fit.no-wrap.scroll
+    v-if="header"
+    :style=`{minHeight: '60px'}`).row.full-width
+    slot(name="header")
+  //- body
+  .col.full-width
     div(
-      v-for="(c, ckey, ci) in colls" :key="ckey"
-      :style=`{...collStyles(c, ckey, ci)}`
-      ).row.full-height.items-start.content-start
-      slot(:name="ckey")
+      ref="kCollsScrollWrapper"
+      :style=`{position: 'relative', overflow: overflow}`).row.fit.no-wrap.scroll
+      div(
+        v-for="(c, ci) in colls" :key="c.id"
+        :style=`{width: '100%', minWidth: '100%', maxWidth: '100%'}`
+        ).row.full-height.items-start.content-start
+        slot(:name="c.id")
 </template>
 
 <script>
 export default {
   name: 'kColls',
-  props: ['value', 'colls', 'disable'],
+  props: ['coll', 'colls', 'disable', 'header'],
   data () {
     return {
       debug: false,
       controls: false,
       overflow: 'hidden',
       panning: false,
-      isFirstMove: false
+      firstMove: true,
+      collIndex: 0
     }
   },
   watch: {
-    value: {
+    coll: {
       immediate: true,
       async handler (to, from) {
-        this.$log('value CHANGED', to)
+        this.$log('coll CHANGED', to)
         if (to) {
-          await this.$wait(300)
           this.$nextTick(() => {
-            this.move(to, !this.isFirstMove)
-            this.firstMoved = true
+            let i = this.colls.findIndex(c => c.id === to)
+            this.move(i, this.firstMove)
+            if (this.firstMove) this.firstMove = false
+            this.collIndex = i
           })
         }
       }
     }
   },
   methods: {
-    collStyles (c, ckey, ci) {
-      let width = c.width ? c.width * 100 + '%' : '100%'
-      return {
-        width: width,
-        minWidth: width,
-        maxWidth: width
-      }
-    },
-    handleSwipe (e) {
+    async handleSwipe (e) {
+      let i = e.direction === 'left' ? this.collIndex + 1 : this.collIndex - 1
+      if (this.disable || i < 0 || i > this.colls.length - 1 || !this.colls[i]) return
       this.$log('handleSwipe', e)
-      switch (e.direction) {
-        case 'left': {
-          // find next value...
-          break
-        }
-        case 'right': {
-          // find prev value...
-          break
-        }
-      }
+      this.$emit('coll', this.colls[i].id)
     },
     handlePan (e) {
-      // this.$log('handlePan', e)
-      if (!this.debug) return
       if (this.disable) return
+      // this.$log('handlePan', e)
       this.$refs.kCollsScrollWrapper.scrollLeft -= e.delta.x
       if (e.isFirst) {
         this.panning = true
         this.overflow = 'auto'
       }
       if (e.isFinal) {
-        this.panning = false
-        this.oveflow = 'hidden'
-        let i = this.$refs.kCollsScrollWrapper.scrollLeft / this.$refs.kCollsScrollWrapper.clientWidth
-        if (i < 0 || i > this.colls.length - 1) return
-        this.move(Math.round(i))
+        // this.$log('e.duration', e.duration)
+        if (e.duration < 300) {
+          this.panning = false
+          this.handleSwipe(e)
+        } else {
+          setTimeout(() => {
+            this.panning = false
+          }, 500)
+          this.oveflow = 'hidden'
+          let i = Math.round(this.$refs.kCollsScrollWrapper.scrollLeft / this.$refs.kCollsScrollWrapper.clientWidth)
+          // this.$log('i', i)
+          let coll = this.colls[i]
+          if (coll.id === this.coll) {
+            this.$log('SAME SAME SAME')
+            this.move(i, false, 0.1)
+          } else {
+            this.$log('coll.id', coll.id)
+            this.$emit('coll', coll.id)
+          }
+        }
       }
     },
-    move (index, immediate) {
+    move (index, immediate, ms) {
       return new Promise((resolve, reject) => {
-        this.$log('move start', index)
+        // this.$log('move start', index)
         let clientWidth = this.$refs.kCollsScrollWrapper.clientWidth
-        let d = 1
-        let scrollLeft = (clientWidth * d) * index
-        this.$log('scrollLeft', scrollLeft)
+        let scrollLeft = clientWidth * index
+        // this.$log('scrollLeft', scrollLeft)
         this.overflow = 'auto'
         if (immediate) {
           this.$refs.kCollsScrollWrapper.scrollLeft = scrollLeft
           this.overflow = 'hidden'
-          this.$log('move DONE')
+          // this.$log('move DONE')
         } else {
           this.$tween.to(
             this.$refs.kCollsScrollWrapper,
-            0.2,
+            ms || 0.15,
             {
               scrollLeft: scrollLeft,
               onComplete: () => {
-                this.$log('move DONE')
+                // this.$log('move DONE')
                 this.overflow = 'hidden'
               }
             }
@@ -116,12 +121,6 @@ export default {
         }
       })
     }
-  },
-  mounted () {
-    // this.$log('mounted')
-  },
-  beforeDestroy () {
-    // this.$log('beforeDestroy')
   }
 }
 </script>

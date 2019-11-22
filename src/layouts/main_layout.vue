@@ -156,7 +156,7 @@ export default {
       // console.time('created')
       // this.$q.notify('Created start')
       this.loading = true
-      // await this.$wait(4000)
+      await this.$wait(1000)
       // Oauth case. take token from redirect url
       let token = this.$route.query.token
       let expires = this.$route.query.expires
@@ -178,8 +178,8 @@ export default {
         `,
         fetchPolicy: 'network-only'
       })
-      this.$log('userIsAuthorized', userIsAuthorized)
-      this.$log('userIsConfirmed', userIsConfirmed)
+      // this.$log('userIsAuthorized', userIsAuthorized)
+      // this.$log('userIsConfirmed', userIsConfirmed)
       // this.$q.notify('userIsAuthorized', userIsAuthorized)
       // this.$q.notify('userIsConfirmed', userIsConfirmed)
       // TODO: create with try/catch this...

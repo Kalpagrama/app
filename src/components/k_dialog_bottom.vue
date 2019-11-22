@@ -22,6 +22,7 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
           push no-caps color="green" @click="confirmClick()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width
           span.text-bold {{ $t(options.confirmName) }}
+        div(:style=`{height: '80px'}`).row.full-width
 </template>
 
 <script>

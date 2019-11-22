@@ -1,16 +1,22 @@
 <template lang="pug">
 q-layout(containter :style=`{width: width+'px', minHeight: height+'px'}` @scroll="onScroll").bg-grey-3
-  //- q-header(reveal)
-  //-   div(:style=`{height: '60px'}`).row.full-width.bg-red
+  q-dialog(ref="subscriptionsDialog" no-route-dismiss :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    div(@click.self="$refs.subscriptionsDialog.hide()").row.fit.items-center.justify-center
+      subscriptions(
+        @hide="$refs.subscriptionsDialog.hide()"
+        :subscription="$route.params.category"
+        :style=`{
+          borderRadius: '10px', overflow: 'hidden',
+          maxWidth: $q.screen.width-100+'px', maxHeight: $q.screen.height-100+'px'}`)
   q-page-container
     node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
       template(v-slot:default=`{items, fetchingMore}`)
-        node-feed(ref="nodeFeed" name="Home" :nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()" @prefetch="$event => $refs.nodeLoader.prefetch($event)")
-  //- q-footer(reveal).lt-sm
-  //-   k-menu-mobile(page="home" :colors="['white', 'grey-7']")
+        node-tape(ref="nodeFeed" name="Home" :nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()" @prefetch="$event => $refs.nodeLoader.prefetch($event)")
 </template>
 
 <script>
+import subscriptions from './subscriptions'
+
 export default {
   name: 'pageApp__home',
   props: ['width', 'height'],

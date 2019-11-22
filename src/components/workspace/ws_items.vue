@@ -7,7 +7,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-
     ).row.full-width.q-mb-sm
     //- bookmarks
     div(
-      v-if="page === 'bookmarks'"
+      v-if="type === 'bookmarks'"
       :style=`{height: '60px'}`).row.full-width.items-center.bg-white
       img(
         :src="i.thumbUrl"
@@ -15,25 +15,21 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-
       .col.full-height
         .row.fit.q-px-sm
           span {{ i.name }}
-    //- contents
-    div(
-      v-else-if="page === 'contents'").row.fit
-      span {{ i.name }}
     //- fragments
     div(
-      v-else-if="page === 'fragments'").row.full-width.bg-white
+      v-else-if="type === 'fragments'").row.full-width.bg-white
       img(
         :src="i.thumbUrl"
         :style=`{height: '60px', borderRadius: '10px', oveflow: 'hidden', width: '100px', objectFit: 'contain'}`).bg-black
       .col.full-height
         .row.fit.items-center.q-px-sm
           span {{ i.name || i.uid | cut(40) }}
-    //- nodes
+    //- drafts
     div(
-      v-else-if="page === 'drafts'").row.fit.items-center.bg-white
+      v-else-if="type === 'drafts'").row.fit.items-center.bg-white
     //- spheres
     div(
-      v-else-if="page === 'tags'"
+      v-else-if="type === 'spheres'"
       :style=`{height: '40px'}`).row.full-width.items-center.q-px-md.bg-white
       span {{ `#${i.name}` }}
 </template>
@@ -41,7 +37,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-
 <script>
 export default {
   name: 'wsItems',
-  props: ['page'],
+  props: ['page', 'type'],
   data () {
     return {
       // search: '',
@@ -67,7 +63,7 @@ export default {
     },
     WSItems () {
       // return this.$store.getters['workspace/WSItems']
-      return this.$store.state.workspace.workspace[this.page]
+      return this.$store.state.workspace.workspace[this.type]
     },
     items () {
       // if (this.search.length === 0) return this.tags
@@ -106,6 +102,12 @@ export default {
       this.item = i
       this.$refs.itemDialog.show()
     }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

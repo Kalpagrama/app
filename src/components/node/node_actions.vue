@@ -36,8 +36,8 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
         div(
           v-if="nodeBluring"
           :style=`{
-            position: 'absolute', zIndex: 1000, left: '0px', top: '-100px',
-            width: ratesWidth+'px', height: '100px', overflow: 'hidden'}`).row.items-end
+            position: 'absolute', zIndex: 1000, left: '0px', top: '-90px',
+            width: ratesWidth+'px', height: '90px', overflow: 'hidden'}`).row.items-end.bg-white
           div(
             v-for="(r, ri) in rates" :key="ri"
             @click="rateClick(r, ri)"
@@ -56,6 +56,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
       //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       //- q-icon(name="keyboard_arrow_left" color="grey" size="20px")
       span(v-if="nodeBluring").text-bold {{ $t('Tap or slide to select') }}
+      //- small.full-width panPositionLeft: {{panPositionLeft}}
       //- q-icon(name="keyboard_arrow_right" color="grey" size='20px')
     div(v-else).row.fit.items-center
       //- blur
@@ -92,7 +93,8 @@ export default {
         {id: 2, name: '50', color: 'red'},
         {id: 3, name: '75', color: 'yellow'},
         {id: 4, name: '95', color: 'gold'}
-      ]
+      ],
+      panPositionLeft: 0
     }
   },
   computed: {
@@ -111,9 +113,9 @@ export default {
       this.nodeBluring = false
     },
     async nodeBlurPan (e) {
-      this.$log('nodeBlurPan', e)
-      let left = e.position.left
-      let i = e.offset.x / (this.ratesWidth / 5)
+      // this.$log('nodeBlurPan', e)
+      this.panPositionLeft = e.position.left
+      let i = this.panPositionLeft / (this.ratesWidth / 5)
       this.$set(this, 'rate', Math.round(i))
       if (e.isFinal) {
         await this.$wait(700)

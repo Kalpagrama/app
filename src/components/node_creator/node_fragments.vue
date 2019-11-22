@@ -15,9 +15,9 @@ div(:style=`{paddingBottom: '60px'}`).row.full-width.full-height.items-start.con
     q-btn(
       v-if="tab === 'fragments'"
       push round color="accent" icon="add" size="lg" @click="$refs.fragmentFinderDialog.show()"
-      :style=`{position: 'fixed', zIndex: 1000, bottom: '8px', right: '8px'}`)
+      :style=`{position: 'absolute', zIndex: 1000, bottom: '8px', right: '8px'}`)
   //- fragment
-  div(
+  div(soz
     v-for="(f, fkey, fi) in fragments" :key="fkey" @click="fragmentClick(f, fkey, fi)"
     :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
     //- header

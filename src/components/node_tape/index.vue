@@ -1,7 +1,7 @@
 <template lang="pug">
 div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
   //- header
-  div(v-if="header" :style=`{height: '50px'}`).row.full-width.bg-white
+  //- div(v-if="header" :style=`{height: '60px'}`).row.full-width.bg-white
   //- debug
   div(v-if="debug").row.full-width.bg-red
     small.full-width width/height: {{width}}/{{height}}
@@ -9,24 +9,15 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
     small.full-width scrollTop/scrollHeight: {{scrollTop}}/{{scrollHeight}}
     small.full-width nodeActive: {{nodeActive}}
     small.full-width nodesVisible: {{nodesVisible}}
-  //- debug swipes
-  q-btn(
-    round color="accent" icon="keyboard_arrow_up" @click="swipeDown()"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '70px', left: '10px'}`)
-  q-btn(
-    round color="accent" icon="keyboard_arrow_down" @click="swipeUp()"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '70px', right: '10px'}`)
   //- tint
-  div(:style=`{position: 'absolute', zIndex: tintIndex, top: 0, left: 0, pointerEvents: 'none', background: 'rgba(0,0,0,'+tintOpacity+')'}`).row.fit
+  //- div(:style=`{position: 'absolute', zIndex: 1, top: 0, left: 0, pointerEvents: 'none', background: 'rgba(0,0,0,'+tintOpacity+')'}`).row.fit
   //- body scroll
   div(ref="scrollWrapper" @scroll="onScroll"
-    v-touch-swipe.mouse.down="swipeDown"
-    v-touch-swipe.mouse.up="swipeUp"
     ).col.full-width.scroll
     div.row.full-width.justify-center
       div(
-        :style=`{maxWidth: '500px', paddingBottom: $q.screen.height+'px'}`
-        ).row.full-width.items-start.content-start.q-px-xs
+        :style=`{maxWidth: '500px', paddingBottom: '100px'}`
+        ).row.full-width.items-start.content-start.q-pa-sm
         q-resize-observer(ref="onResizeObserver" @resize="onResize")
         node(
           v-for="(n, ni) in nodes" :key="n.oid"
@@ -40,7 +31,10 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
           :node="n" :nodeIndex="ni" :lang="ni"
           :active="nodeActive === ni"
           :class=`{
-            'cursor-pointer': nodeActive !== ni
+            'cursor-pointer': nodeActive !== ni,
+            'shadow-5': nodeActive === ni,
+            'bg-white': nodeActive === ni,
+            'bg-grey-1': nodeActive !== ni
           }`
           :style=`{
             zIndex: nodeActive === ni ? 300 : 100,
@@ -51,7 +45,7 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
             intersection: {
               threshold: 0.98
             }
-          }`).bg-white.q-mt-xl
+          }`).q-mb-xl
 </template>
 
 <script>

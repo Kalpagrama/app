@@ -1,23 +1,19 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-px-sm.q-pt-sm
   div(:style=`{height: '60px', borderRadius: '10px'}` @click="$emit('page', 'bookmarks')").row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-px-md
-    span Заметки
+    span {{$t('Bookmarks')}}
     .col
     span {{ $store.state.workspace.workspace.bookmarks.length }}
-  div(:style=`{height: '60px', borderRadius: '10px'}` @click="$emit('page', 'contents')").row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-px-md
-    span Контент
-    .col
-    span {{ $store.state.workspace.workspace.contents.length }}
   div(:style=`{height: '60px', borderRadius: '10px'}` @click="$emit('page', 'fragments')").row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-px-md
-    span Фрагменты
+    span {{$t('Fragments')}}
     .col
     span {{ $store.state.workspace.workspace.fragments.length }}
   div(:style=`{height: '60px', borderRadius: '10px'}` @click="$emit('page', 'drafts')").row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-px-md
-    span Ядра
+    span {{$t('Drafts')}}
     .col
     span {{ $store.state.workspace.workspace.nodes.length }}
   div(:style=`{height: '60px', borderRadius: '10px'}` @click="$emit('page', 'tags')").row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-px-md
-    span Сферы
+    span {{$t('Spheres')}}
     .col
     span {{ $store.state.workspace.workspace.spheres.length }}
 </template>
