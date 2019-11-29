@@ -5,8 +5,10 @@ q-layout(container :style=`{height: height+'px', width: width+'px'}`).column.bg-
       .col.full-height
         .row.fit.items-center.q-px-md
           span.text-bold.text-black {{ $t('Notifications') }}
-  q-page-container.fit
-    q-page.col.bg-grey-2
+  q-page-container
+    q-page.bg-grey-2
+      div(v-if="events.length === 0").row.fit.justify-center.bg-white.q-py-xl
+        span.text-grey.text-h6 You dont have notifications.
       .row.full-width.items-start.content-start.justify-center.q-pa-md
         div(:style=`{maxWidth: '500px'}`).row.full-width
           div(

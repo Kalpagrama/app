@@ -4,6 +4,7 @@ export default {
     oid: '',
     name: '',
     thumbUrl: '',
+    subscribers: [],
     weightVal: 0.001,
     profile: {
       city: '',

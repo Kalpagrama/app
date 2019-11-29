@@ -5,7 +5,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
     k-invite(@hide="$refs.inviteDialog.hide()")
   k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
-  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-secondary
+  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-primary
     div(@click="$router.push('/app/home')").col.row.items-center
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         k-logo(:width="40" :height="40")
@@ -63,7 +63,7 @@ export default {
         {name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
         {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
         {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
-        {name: 'Выйти', icon: 'exit_to_app', path: '/app/logout'}
+        {name: 'Exit', icon: 'exit_to_app', path: '/app/logout'}
       ]
     }
   },
@@ -73,7 +73,7 @@ export default {
         header: false,
         headerName: '',
         actions: {
-          stay: {name: 'Если хочешь остаться, останься просто так'}
+          stay: {name: 'Отмена'}
         },
         confirm: true,
         confirmName: 'Выйти'
