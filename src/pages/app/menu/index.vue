@@ -1,6 +1,8 @@
 <template lang="pug">
-div(:style=`{height: $q.screen.height-60+'px'}`).row.full-width
+.row.fit
   k-menu-desktop(:page="true").full-width
+  div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width
+    k-menu-mobile
 </template>
 
 <script>

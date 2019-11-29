@@ -1,49 +1,69 @@
 <template lang="pug">
-q-layout(
-  view='hHh Lpr fFf'
-  :style=`{width: $q.screen.width+'px', height: '100vh'}`
-  :class="{'bg-grey-3': $route.path !== '/app/menu'}").bg-primary
-  //- node action dialog
-  k-dialog-bottom(ref="fragmentActionDialog" :value="$store.state.ui.fragmentActionDialogOpened" mode="actions" :options="fragmentActionDialogOptions"
-    @action="fragmentActionDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentActionDialogOpened', false])")
-  //- node rate dialog
-  q-dialog(ref="nodeRateDialog" :value="$store.state.ui.nodeRateDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
-    @hide="$store.commit('ui/stateSet', ['nodeRateDialogOpened', false])")
-    node-rate(@hide="$refs.nodeRateDialog.hide()")
-  //- node creator dialog
-  q-dialog(ref="nodeCreatorDialog" :value="$store.state.ui.nodeCreatorDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
-    @hide="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', false])")
-    node-creator(@hide="$refs.nodeCreatorDialog.hide()")
-  //- bookmark dialog
-  q-dialog(
-    ref="bookmarkDialog" :value="$store.state.ui.bookmarkDialogOpened"
-    @hide="$store.commit('ui/stateSet', ['bookmarkDialogOpened', false])"
-    :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    ws-bookmark(@hide="$refs.bookmarkDialog.hide()")
-  //- fragment dialog
-  q-dialog(
-    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened"
-    @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])"
-    :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    ws-fragment(@hide="$refs.fragmentDialog.hide()")
-  //- content dialog
-  //- q-drawer(v-model="leftDrawerShow" side="left" :width="leftDrawerWidth").gt-xs
-  //-   k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
-  //- page
-  q-page-container
-    q-page
-      q-resize-observer(ref="pageResizeObserver" @resize="onResize")
-      router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height" :width="width")
-      div(v-else).row.full-width.window-height.items-center.justify-center
-        k-spinner(:width="200" :height="200")
-  //- q-footer(reveal).lt-sm
-  k-menu-mobile(:style=`{position: 'fixed', bottom: '0px', zIndex: 1000}`)
+//- q-layout(
+//-   view='hHh Lpr fFf'
+//-   :style=`{width: $q.screen.width+'px', height: '100vh'}`
+//-   :class="{'bg-grey-3': $route.path !== '/app/menu'}")
+//-   //- node action dialog
+//-   k-dialog-bottom(ref="fragmentActionDialog" :value="$store.state.ui.fragmentActionDialogOpened" mode="actions" :options="fragmentActionDialogOptions"
+//-     @action="fragmentActionDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentActionDialogOpened', false])")
+//-   //- node rate dialog
+//-   q-dialog(ref="nodeRateDialog" :value="$store.state.ui.nodeRateDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
+//-     @hide="$store.commit('ui/stateSet', ['nodeRateDialogOpened', false])")
+//-     node-rate(@hide="$refs.nodeRateDialog.hide()")
+//-   //- node creator dialog
+//-   q-dialog(ref="nodeCreatorDialog" :value="$store.state.ui.nodeCreatorDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
+//-     @hide="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', false])")
+//-     node-creator(@hide="$refs.nodeCreatorDialog.hide()")
+//-   //- bookmark dialog
+//-   q-dialog(
+//-     ref="bookmarkDialog" :value="$store.state.ui.bookmarkDialogOpened"
+//-     @hide="$store.commit('ui/stateSet', ['bookmarkDialogOpened', false])"
+//-     :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+//-     ws-bookmark(@hide="$refs.bookmarkDialog.hide()")
+//-   //- fragment dialog
+//-   q-dialog(
+//-     ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened"
+//-     @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])"
+//-     :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+//-     ws-fragment(@hide="$refs.fragmentDialog.hide()")
+//-   //- content dialog
+//-   //- q-drawer(v-model="leftDrawerShow" side="left" :width="leftDrawerWidth").gt-xs
+//-   //-   k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
+//-   //- page
+//-   q-page-container
+//-     q-page
+//-       q-resize-observer(ref="pageResizeObserver" @resize="onResize")
+//-       router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height" :width="width")
+//-       div(v-else).row.full-width.window-height.items-center.justify-center
+//-         k-spinner(:width="200" :height="200")
+//-   //- q-footer(reveal).lt-sm
+//-   k-menu-mobile(
+//-     v-if="$route.name !== 'create'"
+//-     :style=`{position: 'fixed', bottom: '0px', zIndex: 100000}`)
+//- div(:style=`{position: 'relative'}`).row.fit.items-center.justify-center
+//-   q-dialog(
+//-     v-if="$store.state.ui.rect"
+//-     ref="nodeRectDialog" :value="$store.state.ui.rect ? true : false"
+//-     :maximized="true" transition-hide="fadeIn" transition-show="fadeOut"
+//-     @hide="$store.commit('ui/stateSet', ['rect', null])")
+//-     node-rect(:rect="$store.state.ui.rect" @hide="$refs.nodeRectDialog.hide()")
+//-   div(:style=`{position: 'absolute', zIndex: 1000, bottom: '0px', height: '60px'}`).row.full-width
+//-     k-menu-mobile
+//-   transition(appear
+//-     :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
+//-     router-view(v-if="!loading" :height="$q.screen.height" :width="$q.screen.width")
+//-   //- k-spinner(v-if="loading" :width="100" :height="100")
+//- router-view
+.row.fit.items-center.justify-center
+  k-spinner(v-if="loading")
+  transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
+    router-view(v-if="!loading" :opened="true" :height="$q.screen.height" :width="$q.screen.width")
 </template>
 
 <script>
-
 export default {
   name: 'mainLayout',
+  components: {},
   data () {
     return {
       loading: true,
@@ -148,7 +168,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$refs.pageResizeObserver.trigger()
+    if (this.$refs.pageResizeObserver) this.$refs.pageResizeObserver.trigger()
   },
   async created () {
     try {
@@ -203,7 +223,13 @@ export default {
 </script>
 
 <style lang="stylus">
-.q-footer {
-  background: none !important
-}
+// .q-footer {
+//   background: none !important
+// }
+// .q-dialog {
+//   background: none !important
+// }
+// .q-dialog__backdrop {
+//   background: none !important
+// }
 </style>

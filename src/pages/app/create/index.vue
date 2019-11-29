@@ -1,5 +1,5 @@
 <template lang="pug">
-node-creator
+node-creator(:height="height" :width="width")
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import nodeCreator from 'components/node_creator'
 
 export default {
   name: 'pageApp_сreate',
-  props: [],
+  props: ['height', 'width'],
   components: {nodeCreator},
   data () {
     return {
