@@ -9,9 +9,10 @@ module.exports = {
     '!src/i18n/**',
     '!**/node_modules/**'
   ],
-  output: 'src/',
+  output: './',
   options: {
     debug: true,
+    sort: true,
     func: {
       list: ['i18next.t', 'i18n.t', 't'],
       extensions: ['.js', '.jsx', '.vue']
@@ -38,8 +39,8 @@ module.exports = {
     defaultNs: 'translation',
     defaultValue: '__STRING_NOT_TRANSLATED__',
     resource: {
-      loadPath: 'i18n/{{lng}}/{{ns}}.json',
-      savePath: 'i18n/{{lng}}/{{ns}}.json',
+      loadPath: 'src/i18n/{{ns}}_{{lng}}.json',
+      savePath: 'src/i18n/{{ns}}_{{lng}}.json',
       jsonIndent: 2,
       lineEnding: '\n'
     },
