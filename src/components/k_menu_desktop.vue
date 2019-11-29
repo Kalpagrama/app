@@ -11,7 +11,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
         k-logo(:width="40" :height="40")
       div(v-if="!mini").col.full-height
         .row.fit.items-center
-          span.text-bold.text-white Кальпаграмма
+          span.text-bold.text-white {{'Кальпаграмма ver:' + $store.state.core.version}}
     div(@click="$router.push('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
@@ -44,6 +44,18 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
         :round="mini" push color="accent" no-caps icon="person_add" @click="$refs.inviteDialog.show()"
         :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
         span(v-if="width === 230").text-bold.q-ml-md {{ $t('Invite friend') }}
+    div(v-if="!this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
+      q-btn(
+        :round="mini" push color="accent" no-caps
+        :icon="this.$store.state.core.newVersionAvailable ? 'system_update' : 'cloud_download'"
+        @click="update"
+        :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
+        span(v-if="width === 230").text-bold.q-ml-md {{ $t(this.$store.state.core.newVersionAvailable ? 'install new version' : 'check for updates') }}
+    div(v-if="this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
+      q-btn(
+        :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
+        :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
+        span(v-if="width === 230").text-bold.q-ml-md {{ $t('install_app') }}
   //- footer mini
   div(v-if="!page" :style=`{height: '60px'}`).row.full-width.items-center.br
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
@@ -51,6 +63,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
 </template>
 
 <script>
+  import {checkUpdate} from 'src/system/service_worker'
 export default {
   name: 'kMenuDesktop',
   props: ['page'],
@@ -63,6 +76,7 @@ export default {
         {name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
         {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
         {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
+        {name: 'test web-push', icon: 'message', path: '/app/test_message'},
         {name: 'Выйти', icon: 'exit_to_app', path: '/app/logout'}
       ]
     }
@@ -108,15 +122,32 @@ export default {
     async pageClick (p, pi) {
       this.$log('pageClick', p, pi)
       switch (p.path) {
-        case '/app/logout': {
+        case '/app/logout':
           this.$log('LOGOUT')
           this.$refs.logoutDialog.show()
           break
-        }
-        default: {
+        case '/app/test_message':
+          this.$log('test_message..')
+          await this.$store.dispatch('events/testWebPush')
+          break
+        default:
           this.$router.push(p.path)
-        }
       }
+    },
+    async update(){
+      if (this.$store.state.core.newVersionAvailable){
+        this.$store.commit('core/stateSet', ['newVersionAvailable', false])
+        this.$log('updating ...')
+        location.reload()
+      } else {
+        this.$log('checkUpdate..')
+        await checkUpdate()
+      }
+    },
+    async install(){
+      let installPrompt = this.$store.state.core.installPrompt
+      console.log('installPrompt=', installPrompt)
+      if (installPrompt) installPrompt.prompt()
     }
   }
 }

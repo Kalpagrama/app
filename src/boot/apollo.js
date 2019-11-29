@@ -1,3 +1,5 @@
+import { initSw, initWebPush } from 'src/system/service_worker'
+
 const debug = require('debug')('[boot]:apollo')
 // debug.enabled = true
 

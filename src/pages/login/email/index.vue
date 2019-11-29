@@ -35,7 +35,7 @@
      let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
       client: 'authApollo',
       mutation: gql`
-            mutation loginEmail ($email: String!, $inviteCode: OID){
+            mutation loginEmail ($email: String!, $inviteCode: String){
               loginEmail(email: $email, inviteCode: $inviteCode){
                 token
                 expires

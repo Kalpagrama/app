@@ -6,9 +6,10 @@ module.exports = function (ctx) {
   return {
     preFetch: true,
     boot: [
+      'sw',
+      'apollo',
       'i18n',
       'main',
-      'apollo',
       'filters'
     ],
     css: [
@@ -120,12 +121,15 @@ module.exports = function (ctx) {
       pwa: false
     },
     pwa: {
-      // workboxPluginMode: 'InjectManifest',
-      // workboxOptions: {},
+      workboxPluginMode: 'InjectManifest',
+      workboxOptions: {
+        // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
+        swSrc: 'src/system/service_worker/service-worker.js'
+      },
       manifest: {
         name: 'Kalpagramma',
         short_name: 'Kalpagramma',
-        description: 'Find your gala-effect',
+        description: 'Find your halo-effect',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#000',

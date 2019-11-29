@@ -1,7 +1,4 @@
-import enUS from './en-us';
-import ruRU from './ru-ru';
+import en from './en/translation'
+import ru from './ru/translation'
 
-export default {
-  'en-us': enUS,
-  'ru-ru': ruRU,
-};
+export default { en, ru }

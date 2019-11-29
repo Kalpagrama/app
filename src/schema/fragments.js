@@ -286,6 +286,7 @@ const userFragment = gql`
     weightVal
     settings
     subscriptions{...objectShortFragment}
+    subscribers{...objectShortFragment}
     workspace{
       nodes { ...WSItemFragment }
       fragments { ...WSItemFragment }

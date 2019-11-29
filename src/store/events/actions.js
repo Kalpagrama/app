@@ -34,6 +34,19 @@ export const init = async (context, userEvents) => {
   return userEvents
 }
 
+export const testWebPush = async (context) => {
+  console.log('testWebPush...')
+  let { data: { testWebPush } } = await apolloProvider.clients.apiApollo.query({
+    query: gql`
+      query testWebPush {
+        testWebPush
+      }`,
+    fetchPolicy: 'network-only'
+  })
+  console.log('testWebPush result = ', testWebPush)
+  return testWebPush
+}
+
 function processEvent (context, event) {
   switch (event.type) {
     case 'ERROR':
@@ -124,7 +137,9 @@ function processEventNotice (context, { typeNotice, message }) {
   if (typeNotice === 'GREETING') {
     // показать форму приветствия и туториал
     throw new Error(' todo !')
-  } else throw new Error('not implemented!')
+  } else {
+    throw new Error('not implemented!')
+  }
 }
 
 // вывести уведомление о действии пользователя
@@ -176,12 +191,18 @@ function notifyUserActionComplete (eventType, object) {
           } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
             route = `/app/sphere/${object.oid}`
           } else if (['WSBookmark', 'WSSphere', 'WSContent', 'WSNode', 'WSFragment'].includes(object.__typename)) {
-            if (object.__typename === 'WSBookmark') route = `/app/workspace/bookmarks`
-            else if (object.__typename === 'WSSphere') route = `/app/workspace/spheres`
-            else if (object.__typename === 'WSContent') route = `/app/workspace/contents`
-            else if (object.__typename === 'WSNode') route = `/app/workspace/nodes`
-            else if (object.__typename === 'WSFragment') route = `/app/workspace/fragments`
-          } else throw new Error(`bad object ${JSON.stringify(object)}`)
+            if (object.__typename === 'WSBookmark') {
+              route = `/app/workspace/bookmarks`
+            } else if (object.__typename === 'WSSphere') {
+              route = `/app/workspace/spheres`
+            } else if (object.__typename === 'WSContent') {
+              route = `/app/workspace/contents`
+            } else if (object.__typename === 'WSNode') {
+              route = `/app/workspace/nodes`
+            } else if (object.__typename === 'WSFragment') route = `/app/workspace/fragments`
+          } else {
+            throw new Error(`bad object ${JSON.stringify(object)}`)
+          }
           router.push(route)
         }
       }]

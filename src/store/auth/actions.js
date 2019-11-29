@@ -1,3 +1,4 @@
+import { apolloProvider } from 'boot/apollo'
 const debug = require('debug')('[auth]:actions')
 debug.enabled = true
 

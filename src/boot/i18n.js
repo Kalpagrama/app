@@ -1,19 +1,68 @@
-// import VueI18n from 'vue-i18n'
-// import messages from 'src/i18n'
+import i18next from 'i18next'
+import LanguageDetector from 'i18next-browser-languagedetector'
+import VueI18Next from '@panter/vue-i18next'
+import translations from '../i18n/index'
 
-function t (str) {
+let t = function (str) {
   return str
 }
 
-export default async ({ app, Vue }) => {
-  // Vue.use(VueI18n);
-  // Set i18n instance on app
-  // app.i18n = new VueI18n({
-  //   locale: 'ru-ru',
-  //   fallbackLocale: 'ru-ru',
-  //   messages,
-  // })
-  Vue.prototype.$t = t
+export default async ({ Vue, store, app }) => {
+  console.log(translations.en, translations.ru)
+  console.log(translations.en, translations.ru)
+  console.log(translations.en, translations.ru)
+  console.log(translations.en, translations.ru)
+  Vue.use(VueI18Next)
+  const languageDetector = new LanguageDetector()
+  await i18next
+    .use(LanguageDetector)
+    .init({
+      saveMissing: true,
+      fallbackLng: {
+        'ru-RU': ['ru', 'en'],
+        'RUS': ['ru', 'en'],
+        'en-US': ['en', 'ru'],
+        'ENG': ['en', 'ru'],
+        'default': ['en']
+      },
+      resources: {
+        en: { translation: translations.en },
+        ru: { translation: translations.ru }
+      },
+      detection: {
+        // order and from where user language should be detected
+        order: ['localStorage', 'querystring', 'cookie', 'navigator', 'htmlTag', 'path', 'subdomain'],
+
+        // keys or params to lookup language from
+        lookupQuerystring: 'lng',
+        lookupCookie: 'i18next',
+        lookupLocalStorage: 'i18nextLng',
+        lookupFromPathIndex: 0,
+        lookupFromSubdomainIndex: 0,
+
+        // cache user language on
+        caches: ['localStorage', 'cookie'],
+        excludeCacheFor: ['cimode'], // languages to not persist (cookie, localStorage)
+
+        // optional expire and domain for set cookie
+        cookieMinutes: 10,
+        cookieDomain: 'myDomain',
+
+        // optional htmlTag with lang attribute, the default is:
+        htmlTag: document.documentElement,
+
+        // only detect languages that are in the whitelist
+        checkWhitelist: true
+      }
+    })
+  // console.debug('asdasdasd')
+  app.i18n = new VueI18Next(i18next)
+
+  // t = i18next.t
+  // Vue.prototype.$t = t
+  i18next.on('missingKey', function (lngs, namespace, key, res) {
+    console.error('translate is missing', lngs, namespace, key, res)
+  })
 }
 
 export { t }
