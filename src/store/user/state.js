@@ -15,8 +15,6 @@ export default {
       nameFirst: '',
       nameFull: '',
       nameSecond: '',
-      about: '',
-      status: ''
     },
     settings: {
       general: {
