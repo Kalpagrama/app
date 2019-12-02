@@ -115,9 +115,6 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kVideo', () => import('components/k_video'))
     Vue.component('kInvite', () => import('components/k_invite'))
     Vue.component('videoEditor', () => import('components/video_editor'))
-    // ws
-    Vue.component('wsBookmark', () => import('components/workspace/ws_bookmark'))
-    Vue.component('wsFragment', () => import('components/workspace/ws_fragment'))
     // new
     Vue.component('nodeTape', () => import('components/node_tape'))
     Vue.component('kColls', () => import('components/k_colls'))
@@ -126,6 +123,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kDialogMini', () => import('components/k_dialog_mini'))
     Vue.component('nodeRect', () => import('pages/app/trends/node_rect'))
     Vue.component('nodePin', () => import('components/node_pin'))
+    Vue.component('kDialogTutorial', () => import('components/k_dialog_tutorial'))
     // icons
     Vue.component('anvil', () => import('components/k_icons/anvil'))
   } catch (err) {
