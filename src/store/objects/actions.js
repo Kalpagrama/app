@@ -1,12 +1,13 @@
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 import assert from 'assert'
+import { logD } from 'src/boot/log'
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 export const init = async (context) => {
   // if (context.state.initialized) throw new Error('subscriptions state initialized already')
   if (context.state.initialized) return
-  context.dispatch('log/debug', ['objects', 'init'], { root: true })
+  logD('objects', 'init')
   context.commit('init')
 }
 
@@ -18,7 +19,7 @@ class Queue {
 
   // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
   push (context, oid, fragmentName, priority) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let queue
       let queueMaxSz = 0
       if (priority === 0) {
@@ -34,16 +35,19 @@ class Queue {
         let firstItem = queue.shift()
         this.destroyItem(firstItem)
       }
-      await wait(100) // ждем, параллельных вызовов(чтобы выполнить пачкой)
-      this.next(context)
+      // ждем, параллельных вызовов(чтобы выполнить пачкой). Иначе, первый запрос пойдет отдельно, а остальные - пачкой
+      wait(100).then(() => this.next(context)).catch(reject)
     })
   }
 
   // вызывать при удалении из очереди
   destroyItem ({ context, oid, fragmentName, resolve, reject }) {
     let object = context.getters.objectGet({ oid, fragmentName })
-    if (object) resolve(object)
-    else reject('queued object was destroyed due out of date ')
+    if (object) {
+      resolve(object)
+    } else {
+      reject('queued object was destroyed due out of date ')
+    }
   }
 
   // берет из очереди последний добавленный и отправляет на выполненеие
@@ -54,12 +58,15 @@ class Queue {
     let itemsForQuery = []
     while (itemsForQuery.length < 5 && (this.queueMaster.length || this.queueSecondary.length)) {
       let queue
-      if (this.queueMaster.length) queue = this.queueMaster
-      else if (this.queueSecondary.length) queue = this.queueSecondary
+      if (this.queueMaster.length) {
+        queue = this.queueMaster
+      } else if (this.queueSecondary.length) queue = this.queueSecondary
       let lastItem = queue.pop()
       if (lastItem.context.getters.objectGet(lastItem)) { // уже есть. Запрашивать не надо
         this.destroyItem(lastItem)
-      } else itemsForQuery.push(lastItem)
+      } else {
+        itemsForQuery.push(lastItem)
+      }
     }
     // let getFromQueue = (queue, count) => {
     //   let result = []
@@ -118,8 +125,11 @@ class Queue {
         if (!object) object = { oid: item.oid, notFound: true }
 
         context.commit('objectAdd', { object, fragmentName: item.fragmentName })
-        if (object.notFound) item.reject(`object not found on backend ${object.oid}`)
-        else item.resolve(object)
+        if (object.notFound) {
+          item.reject(`object not found on backend ${object.oid}`)
+        } else {
+          item.resolve(object)
+        }
         context.commit('stateSet', ['queryInProgress', false])
       }
       this.next(context)
@@ -140,12 +150,15 @@ const queue = new Queue()
 // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
 // fragmentName - определяет множество выводимых полей
 export const get = async (context, { oid, fragmentName, priority }) => {
-  context.dispatch('log/debug', ['objects', 'objectGet start...'], { root: true })
+  logD('objects', 'objectGet start...')
   // Если объект в кэше - взять из кэша
   let object = context.getters.objectGet({ oid, fragmentName })
   if (object) {
-    if (object.notFound) throw new Error(`object not found on backend ${object.oid}`)
-    else return object
+    if (object.notFound) {
+      throw new Error(`object not found on backend ${object.oid}`)
+    } else {
+      return object
+    }
   }
   let promise = queue.push(context, oid, fragmentName, priority)
   return promise

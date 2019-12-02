@@ -38,29 +38,29 @@ export default {
   },
   methods: {
     async timelineClick (e) {
-      this.$log('timelineClick start')
+      this.$logD('timelineClick start')
       let left = e.layerX
       let w = e.target.clientWidth
       let now = this.duration * left / w
-      // this.$log('now', now)
+      // this.$logD('now', now)
       await this.video.go(now)
       // this.$emit('now', now)
-      this.$log('timelineClick done')
+      this.$logD('timelineClick done')
     },
     timelinePan (e) {
-      // this.$log('timelinePan', e)
+      // this.$logD('timelinePan', e)
       let left = e.position.left - 30
       let w = this.$q.screen.width - 60
       let now = this.duration * left / w
-      // this.$log('now', now)
+      // this.$logD('now', now)
       this.video.go(now)
     }
   },
   mounted () {
-    this.$log('mounted', this.video)
+    this.$logD('mounted', this.video)
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

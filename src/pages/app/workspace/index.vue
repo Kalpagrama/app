@@ -19,11 +19,11 @@ export default {
   watch: {
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     // upload workspace?
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

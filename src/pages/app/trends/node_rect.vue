@@ -33,11 +33,11 @@ export default {
   },
   methods: {
     swipeDown (e) {
-      this.$log('swipeDonw', e)
+      this.$logD('swipeDonw', e)
       this.hide()
     },
     hide () {
-      this.$log('hide')
+      this.$logD('hide')
       // this.clone.setAttribute('opened', false)
       this.$tween.to(this.r, 0.5, {top: this.rect.top})
       this.$tween.to(
@@ -53,7 +53,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     this.r = JSON.parse(JSON.stringify(this.rect))
     await this.$wait(300)
     this.$nextTick(() => {
@@ -64,12 +64,12 @@ export default {
     let clone = this.$store.state.ui.rectClone
     this.clone = this.$refs.nodeRectWrapper.appendChild(clone)
     this.clone.setAttribute('ref', 'shit')
-    this.$log('this.clone', this.clone)
-    this.$log('$refs.shit', this.$refs.nodeRectWrapper)
+    this.$logD('this.clone', this.clone)
+    this.$logD('$refs.shit', this.$refs.nodeRectWrapper)
     // this.clone.nodeHello()
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -88,7 +88,7 @@ export default {
       } else this.$router.back(1)
     },
     pageClick (p, pkey) {
-      this.$log('pageClick', p, pkey)
+      this.$logD('pageClick', p, pkey)
       this.page = pkey
       this.right = !this.right
     }

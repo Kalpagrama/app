@@ -63,7 +63,7 @@ export default {
   watch: {
     value: {
       handler (to, from) {
-        this.$log('value CHNAGED', to)
+        this.$logD('value CHNAGED', to)
         if (to) {
           this.show()
         } else {
@@ -74,12 +74,12 @@ export default {
   },
   methods: {
     headerClick () {
-      this.$log('headerClick')
+      this.$logD('headerClick')
       this.$emit('action', 'header')
       this.$refs.kDialogBottom.hide()
     },
     actionClick (a, akey, ai) {
-      this.$log('actionClick')
+      this.$logD('actionClick')
       this.$emit('action', akey)
       this.$refs.kDialogBottom.hide()
     },
@@ -88,29 +88,29 @@ export default {
       this.$refs.kDialogBottom.hide()
     },
     swiped (e) {
-      this.$log('swiped', e)
+      this.$logD('swiped', e)
       if (e.direction === 'down') {
         this.$refs.kDialogBottom.hide()
       }
     },
     show () {
-      this.$log('show', this.$refs.kDialogBottom)
+      this.$logD('show', this.$refs.kDialogBottom)
       this.$refs.kDialogBottom.show()
     },
     hide () {
-      this.$log('hide', this.$refs.kDialogBottom)
+      this.$logD('hide', this.$refs.kDialogBottom)
       this.$refs.kDialogBottom.hide()
     },
     toggle () {
-      this.$log('toggle', this.$refs.kDialogBottom)
+      this.$logD('toggle', this.$refs.kDialogBottom)
       this.$refs.kDialogBottom.toggle()
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

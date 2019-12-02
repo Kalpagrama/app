@@ -30,23 +30,23 @@ export default {
   },
   methods: {
     nodeClick (n, ni) {
-      this.$log('nodeClick')
+      this.$logD('nodeClick')
       this.$emit('nodeClick', n, ni)
     },
     nodeTimes (n) {
-      let res = ``
+      let res = ''
       n.fragmentsPoints.map((f, fi, arr) => {
-        res += `${this.$time(f.relativePoints[0]['x'])}-${this.$time(f.relativePoints[1]['x'])}`
+        res += `${this.$time(f.relativePoints[0].x)}-${this.$time(f.relativePoints[1].x)}`
         if (fi !== arr.length - 1) res += ',  '
       })
       return res
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     this.$q.notify('nodes destroyed')
   }
 }

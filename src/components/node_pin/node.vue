@@ -38,17 +38,17 @@ export default {
   watch: {
     active: {
       handler (to, from) {
-        this.$log('active CHANGED', to, this.node.name)
+        this.$logD('active CHANGED', to, this.node.name)
       }
     },
     pinned: {
       handler (to, from) {
-        this.$log('pinned CHAGNED', to)
+        this.$logD('pinned CHAGNED', to)
       }
     },
     opened: {
       handler (to, from) {
-        this.$log('opened CHANGED', to)
+        this.$logD('opened CHANGED', to)
         if (to) {
           this.$tween.to(this, 0.7, {
             f1Bottom: -150,
@@ -65,10 +65,10 @@ export default {
   },
   methods: {
     nameClick () {
-      this.$log('nameClick', this.pinned)
+      this.$logD('nameClick', this.pinned)
       if (this.pinned) {
       } else {
-        let {'0': r} = this.$el.getClientRects()
+        let {0: r} = this.$el.getClientRects()
         let rect = {bottom: r.bottom, width: r.width, height: r.height, left: r.left, right: r.right, top: r.top, x: r.x, y: r.y}
         this.$emit('nameClick', [this.node, rect])
       }

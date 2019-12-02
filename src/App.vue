@@ -2,11 +2,11 @@
 div(
   id="q-app" ref="kapp"
   :style=`{height: $q.screen.height+'px', position: 'fixed'}`).full-width.bg-primary
-  router-view
+    router-view
 </template>
 
 <script>
-import { AddressbarColor } from 'quasar'
+  import { AddressbarColor } from 'quasar'
 import { disableBodyScroll } from 'body-scroll-lock'
 
 export default {
@@ -16,7 +16,7 @@ export default {
         allowTouchMove: el => {
           while (el && el !== document.body) {
             let classList = el.classList
-            // this.$log('classList', classList)
+            // this.$logD('classList', classList)
             // if (classList.contains('scroll')) return true
             el = el.parentNode
           }
@@ -24,10 +24,10 @@ export default {
       })
     }
   },
-  created () {
+    created () {
     // this.$q.notify('App created')
-    AddressbarColor.set('#342d58')
+      AddressbarColor.set('#342d58')
     this.disableBodyScroll()
-  }
+    }
 }
 </script>

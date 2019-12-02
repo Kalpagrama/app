@@ -1,8 +1,10 @@
+import { logE } from 'src/boot/log'
+
 const debug = require('debug')('[boot]:main')
 debug.enabled = true
 
 import { LoadingBar, date, Notify } from 'quasar'
-import TweenMax from 'gsap/TweenMax'
+import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 // import { sync } from 'vuex-router-sync'
 
@@ -26,61 +28,60 @@ const time = (sec) => {
 var router
 
 export default async ({ Vue, store, router: VueRouter }) => {
-  router = VueRouter
-  Vue.use(VueObserveVisibility)
-  Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-  Vue.prototype.$log = function (...msg) {
-    const debug = require('debug')(`[${this.$options.name}] `)
-    debug.enabled = true
-    debug(...msg)
-  }
-  LoadingBar.setDefaults({
-    color: 'primary',
-    size: '1px',
-    position: 'top'
-  })
-  Vue.prototype.$tween = TweenMax
-  Vue.prototype.$date = (ts, format) => {
-    return date.formatDate(ts, format || 'YYYY.MM.DD', {
-      dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
-      monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+  try {
+    router = VueRouter
+    Vue.use(VueObserveVisibility)
+    Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+    LoadingBar.setDefaults({
+      color: 'primary',
+      size: '1px',
+      position: 'top'
     })
-  }
-  // sync(store, router, { moduleName: 'route' })
-  Vue.prototype.$time = time
-  Vue.prototype.$random = function (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min
-  }
-  var colors = {}
-  Vue.prototype.$randomColor = function (id, opacity) {
-    const r = () => Math.floor(256 * Math.random())
-    if (opacity) return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()}, ${opacity})`)
-    else return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
-  }
-  Vue.prototype.$strip = function (obj) {
-    let round = (obj) => {
-      if (obj['__typename']) delete obj['__typename']
-      for (const k in obj) {
-        if (obj[k] === Object(obj[k])) round(obj[k])
+    Vue.prototype.$tween = TweenMax
+    Vue.prototype.$date = (ts, format) => {
+      return date.formatDate(ts, format || 'YYYY.MM.DD', {
+        dayNames: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+        monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+      })
+    }
+    // sync(store, router, { moduleName: 'route' })
+    Vue.prototype.$time = time
+    Vue.prototype.$random = function (min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min
+    }
+    var colors = {}
+    Vue.prototype.$randomColor = function (id, opacity) {
+      const r = () => Math.floor(256 * Math.random())
+      if (opacity) {
+        return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()}, ${opacity})`)
+      } else {
+        return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
-    round(obj)
-    return obj
-  }
-  Vue.prototype.$isInteger = (num) => {
-    return (num ^ 0) === num
-  }
-  Vue.prototype.$nodesDistinct = function (nodes) {
-    const result = []
-    const map = new Map()
-    for (const node of nodes) {
-      if (!map.has(node.oid)){
-        map.set(node.oid, true)
-        result.push(node)
+    Vue.prototype.$strip = function (obj) {
+      let round = (obj) => {
+        if (obj.__typename) delete obj.__typename
+        for (const k in obj) {
+          if (obj[k] === Object(obj[k])) round(obj[k])
+        }
       }
+      round(obj)
+      return obj
     }
-    return result
-  }
+    Vue.prototype.$isInteger = (num) => {
+      return (num ^ 0) === num
+    }
+    Vue.prototype.$nodesDistinct = function (nodes) {
+      const result = []
+      const map = new Map()
+      for (const node of nodes) {
+        if (!map.has(node.oid)) {
+          map.set(node.oid, true)
+          result.push(node)
+        }
+      }
+      return result
+    }
   // navigation
   Vue.prototype.$go = (options) => {
     // debug('go', options)
@@ -94,49 +95,42 @@ export default async ({ Vue, store, router: VueRouter }) => {
   Vue.prototype.$back = () => {
     // store.commit()
   }
-  // errors
-  Vue.config.errorHandler = function(err, vm, info) {
-    debug(`### VUE ERROR ### ${err.toString()}\nInfo: ${info}`)
-    debug(err.stack)
-    // Notify.create({message: err.toString(), color: 'red', colorText: 'red'})
+    // menus
+    Vue.component('kMenuDesktop', () => import('components/k_menu_desktop'))
+    Vue.component('kMenuMobile', () => import('components/k_menu_mobile'))
+    // helpers
+    Vue.component('kSpinner', () => import('components/k_spinner'))
+    Vue.component('kLogo', () => import('components/k_logo'))
+    // node
+    Vue.component('node', () => import('components/node'))
+    Vue.component('nodeLoader', () => import('components/node_loader'))
+    Vue.component('nodeFeed', () => import('components/node_feed'))
+    Vue.component('nodeList', () => import('components/node_list'))
+    Vue.component('nodeCreator', () => import('components/node_creator'))
+    Vue.component('nodeRate', () => import('components/node_rate'))
+    // dialogs
+    Vue.component('kDialogBottom', () => import('components/k_dialog_bottom'))
+    Vue.component('kSplit', () => import('components/k_split'))
+    // other
+    Vue.component('kVideo', () => import('components/k_video'))
+    Vue.component('kInvite', () => import('components/k_invite'))
+    Vue.component('videoEditor', () => import('components/video_editor'))
+    // ws
+    Vue.component('wsBookmark', () => import('components/workspace/ws_bookmark'))
+    Vue.component('wsFragment', () => import('components/workspace/ws_fragment'))
+    // new
+    Vue.component('nodeTape', () => import('components/node_tape'))
+    Vue.component('kColls', () => import('components/k_colls'))
+    Vue.component('nodeRubick', () => import('components/node_rubick'))
+    Vue.component('kPage', () => import('components/k_page'))
+    Vue.component('kDialogMini', () => import('components/k_dialog_mini'))
+    Vue.component('nodeRect', () => import('pages/app/trends/node_rect'))
+    Vue.component('nodePin', () => import('components/node_pin'))
+    // icons
+    Vue.component('anvil', () => import('components/k_icons/anvil'))
+  } catch (err) {
+    logE(err)
   }
-  // window.onerror = function(msg, src, linenum, colnum, error) {
-  //   debug('### ERROR ###', msg.toString())
-  //   Notify.create({message: msg.toString(), color: 'red', colorText: 'red'})
-  // }
-  // menus
-  Vue.component('kMenuDesktop', () => import(`components/k_menu_desktop`))
-  Vue.component('kMenuMobile', () => import(`components/k_menu_mobile`))
-  // helpers
-  Vue.component('kSpinner', () => import(`components/k_spinner`))
-  Vue.component('kLogo', () => import(`components/k_logo`))
-  // node
-  Vue.component('node', () => import('components/node'))
-  Vue.component('nodeLoader', () => import('components/node_loader'))
-  Vue.component('nodeFeed', () => import(`components/node_feed`))
-  Vue.component('nodeList', () => import(`components/node_list`))
-  Vue.component('nodeCreator', () => import(`components/node_creator`))
-  Vue.component('nodeRate', () => import(`components/node_rate`))
-  // dialogs
-  Vue.component('kDialogBottom', () => import(`components/k_dialog_bottom`))
-  Vue.component('kSplit', () => import(`components/k_split`))
-  // other
-  Vue.component('kVideo', () => import('components/k_video'))
-  Vue.component('kInvite', () => import(`components/k_invite`))
-  Vue.component('videoEditor', () => import(`components/video_editor`))
-  // ws
-  Vue.component('wsBookmark', () => import(`components/workspace/ws_bookmark`))
-  Vue.component('wsFragment', () => import(`components/workspace/ws_fragment`))
-  // new
-  Vue.component('nodeTape', () => import(`components/node_tape`))
-  Vue.component('kColls', () => import(`components/k_colls`))
-  Vue.component('nodeRubick', () => import(`components/node_rubick`))
-  Vue.component('kPage', () => import(`components/k_page`))
-  Vue.component('kDialogMini', () => import(`components/k_dialog_mini`))
-  Vue.component('nodeRect', () => import(`pages/app/trends/node_rect`))
-  Vue.component('nodePin', () => import(`components/node_pin`))
-  // icons
-  Vue.component('anvil', () => import(`components/k_icons/anvil`))
 }
 
 export { time, router }

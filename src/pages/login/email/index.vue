@@ -43,7 +43,7 @@
   methods: {
    async emailSend () {
     try {
-     this.$log('emailSend start', this.email)
+     this.$logD('emailSend start', this.email)
      this.emailSending = true
      if (this.email.length === 0) throw { message: 'Wrong email!' }
      let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
@@ -63,21 +63,21 @@
         // inviteCode: '171145051370487837'
       }
      })
-     this.$log('token', token)
+     this.$logD('token', token)
      localStorage.setItem('ktoken', token)
      localStorage.setItem('ktokenExpires', expires)
-     this.$log('emailSend done')
+     this.$logD('emailSend done')
      this.emailSending = false
      this.codeWaiting = true
     } catch (error) {
-     this.$log('emailSend error', error)
+     this.$logD('emailSend error', error)
      this.$q.notify(error.message || JSON.stringify(error))
      this.emailSending = false
     }
    },
    async codeSend () {
     try {
-     this.$log('codeSend start')
+     this.$logD('codeSend start')
      this.codeSending = true
      this.codeConfirmed = false
      if (this.code.length !== 4) throw { message: 'Wrong code!' }
@@ -102,26 +102,26 @@
      this.codeSending = false
      this.codeWaiting = false
      if (result) {
-      this.$log('codeSend done', result)
+      this.$logD('codeSend done', result)
       this.codeConfirmed = true
       await this.$wait(1000)
       this.$go('/app/home')
      } else {
-      this.$log('codeSend fails', failReason)
+      this.$logD('codeSend fails', failReason)
       this.$q.notify(this.$t('code send error') + failReason)
      }
     } catch (error) {
-     this.$log('codeSend error', error)
+     this.$logD('codeSend error', error)
      this.$q.notify(error.message || JSON.stringify(error))
      this.codeSending = false
     }
    }
   },
   mounted () {
-   this.$log('mounted')
+   this.$logD('mounted')
   },
   beforeDestroy () {
-   this.$log('beforeDestroy')
+   this.$logD('beforeDestroy')
   }
  }
 </script>

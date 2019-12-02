@@ -38,21 +38,21 @@ export default {
   methods: {
     async userDelete (b, bi) {
       try {
-        this.$log('userDelete start')
+        this.$logD('userDelete start')
         let res = await this.$store.dispatch('', b.oid)
-        this.$log('res', res)
+        this.$logD('res', res)
         this.$delete(this.blacklist, bi)
-        this.$log('userDelete done')
+        this.$logD('userDelete done')
       } catch (error) {
-        this.$log('userDelete error', error)
+        this.$logD('userDelete error', error)
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

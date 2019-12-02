@@ -80,12 +80,12 @@ export default {
   },
   methods: {
     nameEditStart () {
-      this.$log('nameEditStart')
+      this.$logD('nameEditStart')
       this.$refs.nameFinderDialog.show()
       this.nameEditing = true
     },
     fragmentFindStart (i) {
-      this.$log('fragmentFindStart', i)
+      this.$logD('fragmentFindStart', i)
       this.fragmentFinding = i
       this.$refs.fragmentFinderDialog.show()
     },
@@ -98,31 +98,31 @@ export default {
       }
     },
     startNew () {
-      this.$log('startNew')
+      this.$logD('startNew')
       // save current to drafts
       // remove from localStorage
       // go to the editor
       // this.$router.push({params: {page: 'editor'}})
     },
     nodeComposerAction (action) {
-      this.$log('nodeComposerAction', action)
+      this.$logD('nodeComposerAction', action)
       switch (action) {
         case 'new': {
           this.startNew()
           break
         }
         case 'help': {
-          this.$log('HELP HELP HELP')
+          this.$logD('HELP HELP HELP')
           break
         }
       }
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

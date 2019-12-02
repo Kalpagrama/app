@@ -57,17 +57,17 @@ export default {
     content: {
       immediate: true,
       async handler (to, from) {
-        this.$log('content CHANGED', to)
+        this.$logD('content CHANGED', to)
       }
     }
   },
   methods: {
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -94,7 +94,7 @@ export default {
   },
   methods: {
     headerToggle () {
-      this.$log('headerToggle')
+      this.$logD('headerToggle')
       if (this.headerHeight === 60) {
         this.$tween.to(this, 0.3, {headerHeight: 300})
       } else {
@@ -102,16 +102,16 @@ export default {
       }
     },
     nodeClick (n) {
-      this.$log('nodeClick', n)
+      this.$logD('nodeClick', n)
       this.$refs.nodePreviewDialog.show()
       this.node = n
     },
     async contentVideoAction (a) {
-      this.$log('contentVideoAction', a)
+      this.$logD('contentVideoAction', a)
       switch (a) {
         case 'follow': {
           let res = await this.$store.dispatch('subscriptions/subscribe', this.content.oid)
-          this.$log('res', res)
+          this.$logD('res', res)
           break
         }
         case 'bookmark': {
@@ -121,17 +121,17 @@ export default {
           break
         }
         case 'confirm': {
-          this.$log('CREATE!')
+          this.$logD('CREATE!')
           break
         }
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

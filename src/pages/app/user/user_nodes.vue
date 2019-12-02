@@ -27,29 +27,29 @@ export default {
     }
   },
   watch: {
-    'user': {
+    user: {
       immediate: true,
       async handler (to, from) {
-        this.$log('user CHANGED', to)
+        this.$logD('user CHANGED', to)
         this.nodes = await this.nodesLoad(to.oid)
       }
     }
   },
   methods: {
     nodeClick (n, ni) {
-      this.$log('nodeClick', n)
+      this.$logD('nodeClick', n)
       this.$router.push(`/app/node/${n.oid}`)
     },
     async nodesLoad (oid) {
-      this.$log('nodesLoad start')
+      this.$logD('nodesLoad start')
       return []
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

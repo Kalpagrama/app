@@ -42,7 +42,7 @@
   methods: {
    async smsSend () {
     try {
-     this.$log('smsSend start', this.phone)
+     this.$logD('smsSend start', this.phone)
      this.smsSending = true
      if (this.phone.length === 0) throw { message: 'Wrong phone!' }
      let { data: { loginPhone: { token, expires, role } } } = await this.$apollo.mutate({
@@ -61,21 +61,21 @@
         inviteCode: localStorage.getItem('ktokenInviteCode')
       }
      })
-     this.$log('token', token)
+     this.$logD('token', token)
      localStorage.setItem('ktoken', token)
      localStorage.setItem('ktokenExpires', expires)
-     this.$log('smsSend done')
+     this.$logD('smsSend done')
      this.smsSending = false
      this.codeWaiting = true
     } catch (error) {
-     this.$log('smsSend error', error)
+     this.$logD('smsSend error', error)
      this.$q.notify(error.message || JSON.stringify(error))
      this.smsSending = false
     }
    },
    async codeSend () {
     try {
-     this.$log('codeSend start')
+     this.$logD('codeSend start')
      this.codeSending = true
      this.codeConfirmed = false
      if (this.code.length !== 4) throw { message: 'Wrong code!' }
@@ -98,26 +98,26 @@
      this.codeSending = false
      this.codeWaiting = false
      if (result) {
-      this.$log('codeSend done', result)
+      this.$logD('codeSend done', result)
       this.codeConfirmed = true
       await this.$wait(1000)
       this.$go('/app/home')
      } else {
-      this.$log('codeSend fails', failReason)
+      this.$logD('codeSend fails', failReason)
       this.$q.notify(this.$t('code send error') + failReason)
      }
     } catch (error) {
-     this.$log('codeSend error', error)
+     this.$logD('codeSend error', error)
      this.$q.notify(error.message || JSON.stringify(error))
      this.codeSending = false
     }
    }
   },
   mounted () {
-   this.$log('mounted')
+   this.$logD('mounted')
   },
   beforeDestroy () {
-   this.$log('beforeDestroy')
+   this.$logD('beforeDestroy')
   }
  }
 </script>

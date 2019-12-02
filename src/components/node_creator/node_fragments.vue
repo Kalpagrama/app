@@ -78,30 +78,30 @@ export default {
   },
   methods: {
     fragmentClick (f) {
-      this.$log('fragmentClick')
+      this.$logD('fragmentClick')
       this.fragment = f
       this.$refs.fragmentActionDialog.show()
     },
     fragmentAction (e) {
-      this.$log('fragmentAction', e)
+      this.$logD('fragmentAction', e)
       switch (e) {
         case 'rename': {
-          this.$log('RENAME')
+          this.$logD('RENAME')
           // TODO: rename from content name
           break
         }
         case 'duplicate': {
-          this.$log('DUPLICATE')
+          this.$logD('DUPLICATE')
           // TODO: duplicate implementation
           break
         }
         case 'delete': {
-          this.$log('DELETE')
+          this.$logD('DELETE')
           this.$delete(this.fragments, this.fragment.uid)
           break
         }
         case 'confirm': {
-          this.$log('CONFIRM')
+          this.$logD('CONFIRM')
           switch (this.fragment.content.type) {
             case 'VIDEO': {
               this.$refs.videoEditorDialog.show()
@@ -113,17 +113,17 @@ export default {
       }
     },
     async fragmentFound (f) {
-      this.$log('fragmentFound', f)
+      this.$logD('fragmentFound', f)
       this.$set(this.fragments, f.uid, f)
       this.fragment = f
       this.fragmentAction('confirm')
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

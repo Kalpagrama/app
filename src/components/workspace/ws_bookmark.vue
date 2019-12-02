@@ -38,7 +38,7 @@ export default {
   methods: {
     async bookmarkCreate () {
       try {
-        this.$log('bookmarkCreate start')
+        this.$logD('bookmarkCreate start')
         this.creating = true
         let bookmark = {
           name: this.name,
@@ -46,24 +46,24 @@ export default {
           tagUids: []
         }
         let res = await this.$store.dispatch('workspace/addWSBookmark', bookmark)
-        this.$log('bookmarkCreate done', res)
+        this.$logD('bookmarkCreate done', res)
         this.creating = false
         this.$emit('hide')
       } catch (e) {
-        this.$log('bookmarkCreate error', e)
+        this.$logD('bookmarkCreate error', e)
         this.creating = false
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     let bookmark = this.$store.state.ui.bookmark
-    this.$log('bookmark', bookmark)
+    this.$logD('bookmark', bookmark)
     let node = this.$store.state.ui.node
-    this.$log('node', node)
+    this.$logD('node', node)
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     this.$store.commit('ui/stateSet', ['bookmark', null])
     this.$store.commit('ui/stateSet', ['node', null])
   }

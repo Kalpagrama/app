@@ -62,21 +62,21 @@ export default {
   },
   methods: {
     async contentFound (oid) {
-      this.$log('contentFound', oid)
+      this.$logD('contentFound', oid)
       let content = await this.contentGet(oid)
       let fragment = await this.fragmentCreate(content)
-      this.$log('fragment', fragment)
+      this.$logD('fragment', fragment)
       this.$emit('fragment', fragment)
       this.$emit('hide')
     },
     fragmentUse () {},
     fragmentFound (i) {
-      this.$log('fragmentFound', i)
+      this.$logD('fragmentFound', i)
       this.$emit('fragment', i)
       this.$emit('hide')
     },
     async fragmentCreate (content, f) {
-      this.$log('fragmentCreate', content, f)
+      this.$logD('fragmentCreate', content, f)
       let uid = `${content.oid}-${Date.now()}`
       let fragment = null
       switch (content.type) {
@@ -107,14 +107,14 @@ export default {
       return fragment
     },
     async contentGet (oid) {
-      this.$log('contentGet start', oid)
+      this.$logD('contentGet start', oid)
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
-      this.$log('contentGet done', content)
+      this.$logD('contentGet done', content)
       return content
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     // url, create content, and then empty fragment
     // device, create content and then empty fragment
     // from bookmark, create content and then empty fragment
@@ -126,7 +126,7 @@ export default {
     // ws we got it?
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

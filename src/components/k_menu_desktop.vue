@@ -11,7 +11,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-primary
         k-logo(:width="40" :height="40")
       div(v-if="!mini").col.full-height
         .row.fit.items-center
-          span.text-bold.text-white Кальпаграмма
+          span.text-bold.text-white {{'Кальпаграмма ver:' + $store.state.core.version}}
     div(@click="$go('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
@@ -44,6 +44,18 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-primary
         :round="mini" push color="accent" no-caps icon="person_add" @click="$go('/app/invite')"
         :style=`mini ? {} : {height: '60px', borderRadius: '10px'}`).full-width
         span(v-if="width === 230").text-bold.q-ml-md {{ $t('Invite friend') }}
+    div(v-if="!this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
+      q-btn(
+        :round="mini" push color="accent" no-caps
+        :icon="this.$store.state.core.newVersionAvailable ? 'system_update' : 'cloud_download'"
+        @click="update"
+        :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
+        span(v-if="width === 230").text-bold.q-ml-md {{ $t(this.$store.state.core.newVersionAvailable ? 'install new version' : 'check for updates') }}
+    div(v-if="this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
+      q-btn(
+        :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
+        :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
+        span(v-if="width === 230").text-bold.q-ml-md {{ $t('install_app') }}
   //- footer mini
   div(v-if="!page" :style=`{height: '60px'}`).row.full-width.items-center.br
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
@@ -51,6 +63,7 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-primary
 </template>
 
 <script>
+  import {checkUpdate} from 'src/system/service_worker'
 export default {
   name: 'kMenuDesktop',
   props: ['page'],
@@ -63,7 +76,9 @@ export default {
         {name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
         {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
         {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
-        {name: 'Exit', icon: 'exit_to_app', path: '/app/logout'}
+        {name: 'test web-push', icon: 'message', path: '/app/test_message'},
+        {name: 'sentry log send', icon: 'message', path: '/app/sentry_log'},
+                {name: 'Exit', icon: 'exit_to_app', path: '/app/logout'}
       ]
     }
   },
@@ -98,7 +113,7 @@ export default {
   },
   methods: {
     async logoutDialogAction (action) {
-      this.$log('logoutDialogAction', action)
+      this.$logD('logoutDialogAction', action)
       switch (action) {
         case 'confirm': {
           await this.$store.dispatch('auth/logout')
@@ -106,17 +121,38 @@ export default {
       }
     },
     async pageClick (p, pi) {
-      this.$log('pageClick', p, pi)
+      this.$logD('pageClick', p, pi)
       switch (p.path) {
-        case '/app/logout': {
-          this.$log('LOGOUT')
+        case '/app/logout':
+          this.$logD('LOGOUT')
           this.$refs.logoutDialog.show()
           break
-        }
-        default: {
+        case '/app/test_message':
+          this.$logD('test_message..')
+          await this.$store.dispatch('events/testWebPush')
+          break
+        case '/app/sentry_log':
+          this.$logD('sentry_log..')
+          await this.$store.commit('core/stateSet', ['sentryLogLevel', 'debug'])
+          break
+        default:
           this.$go(p.path)
-        }
       }
+    },
+    async update(){
+      if (this.$store.state.core.newVersionAvailable){
+        this.$store.commit('core/stateSet', ['newVersionAvailable', false])
+        this.$logD('updating ...')
+        location.reload()
+      } else {
+        this.$logD('checkUpdate..')
+        await checkUpdate()
+      }
+    },
+    async install(){
+      let installPrompt = this.$store.state.core.installPrompt
+      this.$logD('installPrompt=', installPrompt)
+      if (installPrompt) installPrompt.prompt()
     }
   }
 }
