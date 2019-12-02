@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     async logout () {
-    this.$log('logout')
+    this.$logD('logout')
     await this.$apollo.mutate({
      mutation: gql`
           mutation logout {

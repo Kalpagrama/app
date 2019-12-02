@@ -54,7 +54,7 @@ export default {
   watch: {
     url: {
       handler (to, from) {
-        this.$log('url CHANGED', to)
+        this.$logD('url CHANGED', to)
         if (to) {
           this.inputValid = true
           switch (to.host) {
@@ -62,7 +62,7 @@ export default {
             case 'youtu.be':
             case 'www.youtube.com':
             case 'youtube.com': {
-              this.$log('youtube.com')
+              this.$logD('youtube.com')
               let regExp = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/
               let match = to.href.match(regExp)
               if (match && match[1] && match[1].length === 11) {
@@ -80,11 +80,11 @@ export default {
   },
   methods: {
     iframeLoaded () {
-      this.$log('iframeLoaded')
+      this.$logD('iframeLoaded')
       this.iframeReady = true
     },
     inputEnterHandle () {
-      this.$log('inputEnterHandle')
+      this.$logD('inputEnterHandle')
     },
     inputHandle (e) {
       try {
@@ -94,13 +94,13 @@ export default {
       }
     },
     inputFocusHandle (e) {
-      this.$log('inputFocused')
+      this.$logD('inputFocused')
       this.inputFocused = true
       this.inputBlured = false
       this.$tween.to(this, 0.5, {height: 70})
     },
     inputBlurHandle (e) {
-      this.$log('inputBlured')
+      this.$logD('inputBlured')
       this.inputFocused = false
       this.inputBlured = true
       if (this.input.length === 0) {
@@ -108,18 +108,18 @@ export default {
       }
     },
     inputBuffer () {
-      this.$log('inputBuffer')
+      this.$logD('inputBuffer')
       this.$refs.inputUrl.focus()
       if (navigator && navigator.clipboard) {
         navigator.clipboard.readText().then(text => {
-          this.$log('text', text)
+          this.$logD('text', text)
           this.input = text
           this.inputHandle(text)
         })
       }
     },
     inputClear () {
-      this.$log('inputClear')
+      this.$logD('inputClear')
       this.input = ''
       this.inputValid = false
       this.inputUrl = undefined
@@ -127,7 +127,7 @@ export default {
     },
     async upload () {
       try {
-        this.$log('upload start')
+        this.$logD('upload start')
         this.uploading = true
         this.$emit('uploading', true)
         let {data: {uploadContentUrl: {oid}}} = await this.$apollo.mutate({
@@ -144,23 +144,23 @@ export default {
             url: this.inputUrl
           }
         })
-        this.$log('upload done', oid)
+        this.$logD('upload done', oid)
         this.uploading = false
         this.$emit('uploading', false)
         this.$emit('uploaded', oid)
         this.inputClear()
       } catch (e) {
-        this.$log('upload error', e)
+        this.$logD('upload error', e)
         this.uploading = false
         this.$emit('uploading', false)
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

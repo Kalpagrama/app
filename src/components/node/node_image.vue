@@ -17,7 +17,7 @@ export default {
   },
   methods: {
     toggleFullscreen () {
-      this.$log('toggleFullscreen')
+      this.$logD('toggleFullscreen')
     }
   }
 }

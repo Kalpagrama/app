@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     pointAdd () {
-      this.$log('pointAdd')
+      this.$logD('pointAdd')
       let start = this.now
       let end = this.now + 10 > this.duration ? this.duration : this.now + 10
       // this.fragment.relativePoints.push({x: start})
@@ -69,10 +69,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

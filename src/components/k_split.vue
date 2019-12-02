@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     onScroll (e) {
-      // this.$log('onScroll', e)
+      // this.$logD('onScroll', e)
       this.$emit('scrollTop', e.target.scrollTop)
     },
     scrollTo (px) {

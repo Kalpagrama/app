@@ -72,18 +72,18 @@ export default {
   },
   methods: {
     nameInput (e) {
-      // this.$log('nameInput', e)
+      // this.$logD('nameInput', e)
       this.$emit('name', e)
     },
     spheresInput (e) {
-      this.$log('handleInput', e)
+      this.$logD('handleInput', e)
     },
     sphereDelete (s, si) {
-      this.$log('sphereDelete', s, si)
+      this.$logD('sphereDelete', s, si)
       this.$delete(this.spheres, si)
     },
     sphereCreate () {
-      this.$log('sphereCreate', this.sphereRaw)
+      this.$logD('sphereCreate', this.sphereRaw)
       if (this.node.spheres.length >= 10) {
         this.$q.notify({message: '10 spheres max!', color: 'red', textColor: 'white'})
         return
@@ -105,11 +105,11 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     this.spheres = this.node.spheres
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

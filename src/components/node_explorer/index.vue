@@ -32,11 +32,11 @@
       }
     },
     watch: {
-      '$route': {
+      $route: {
         immediate: true,
         async handler (to, from) {
           if (to.params.oid) {
-            this.$log('$route CHANGED', to.params.oid)
+            this.$logD('$route CHANGED', to.params.oid)
             this.tab = 'node'
             this.node = null
             await this.$wait(300)
@@ -52,12 +52,12 @@
     },
     methods: {
       async nodeFullLoaded (n) {
-        this.$log('nodeFullLoaded', n)
+        this.$logD('nodeFullLoaded', n)
         this.nodeFull = n
         this.active = true
       },
       async nodeLoad (oid) {
-        this.$log('nodeLoad start')
+        this.$logD('nodeLoad start')
         let node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
         return node
         // let { data: { objectList: [node] } } = await this.$apollo.query({
@@ -83,15 +83,15 @@
         //   },
         //   fetchPolicy: 'cache-first'
         // })
-        // this.$log('nodeLoad done', node.name)
+        // this.$logD('nodeLoad done', node.name)
         // return node
       }
     },
     mounted () {
-      this.$log('mounted')
+      this.$logD('mounted')
     },
     beforeDestroy () {
-      this.$log('beforeDestroy')
+      this.$logD('beforeDestroy')
     }
   }
 </script>

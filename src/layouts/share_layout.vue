@@ -11,20 +11,20 @@ export default {
     }
   },
   watch: {
-    '$route': {
+    $route: {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('$route CHANGED', to)
+        this.$logD('$route CHANGED', to)
         // this.$set(this, 'share', to.params)
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

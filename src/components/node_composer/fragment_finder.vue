@@ -83,31 +83,31 @@ export default {
   },
   methods: {
     async bookmarkClick (b, bi) {
-      this.$log('bookmarkClick', b, bi)
+      this.$logD('bookmarkClick', b, bi)
       await this.$wait(200)
       this.$emit('hide')
     },
     async fragmentClick (f, fi) {
-      this.$log('fragmentClick', f, fi)
+      this.$logD('fragmentClick', f, fi)
       await this.$wait(200)
       this.$emit('fragment', f)
       // this.$emit('hide')
     },
     urlChanged (e) {
-      this.$log('urlChanged', e)
+      this.$logD('urlChanged', e)
     },
     fileChanged (e) {
-      this.$log('fileChanged', e)
+      this.$logD('fileChanged', e)
       let files = e.target.files
-      this.$log('typof files', typeof files)
+      this.$logD('typof files', typeof files)
       // TODO: how to handle many files or one, or types
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

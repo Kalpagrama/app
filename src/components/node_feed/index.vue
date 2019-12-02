@@ -90,16 +90,16 @@
       // изменилось активное ядро
       activeNode: {
         async handler (to, from) {
-          this.$log('activeNode CHANGED', to)
+          this.$logD('activeNode CHANGED', to)
           if (to && to !== from) {
             { // prefetch nodes. возможно эти ядра скоро понадобятся
               let activeNodeIndx = to[0]
-              // this.$log('activeNodeIndx', activeNodeIndx)
+              // this.$logD('activeNodeIndx', activeNodeIndx)
               assert.ok(activeNodeIndx >= 0 && this.nodes.length)
               let leftBorder = Math.max(0, activeNodeIndx - 4)
               let rightBorder = Math.min(this.nodes.length - 1, activeNodeIndx + 4)
-              // this.$log('leftBorder', leftBorder)
-              // this.$log('rightBorder', rightBorder)
+              // this.$logD('leftBorder', leftBorder)
+              // this.$logD('rightBorder', rightBorder)
               assert.ok(leftBorder <= rightBorder && leftBorder <= activeNodeIndx && rightBorder >= activeNodeIndx)
               // последние запрошенные - в приоритете. запрашиваем от краев к центру
               let next = 0
@@ -108,14 +108,14 @@
                 else if (activeNodeIndx - leftBorder < rightBorder - activeNodeIndx) next = rightBorder--
                 else next = -1
                 if (next >= 0) {
-                  // this.$log('next', next)
+                  // this.$logD('next', next)
                   assert.ok(next >= 0 && next < this.nodes.length && next !== activeNodeIndx)
                   this.$emit('prefetch', this.nodes[next].oid)
                 }
               }
             }
             if (this.nodes.length - to[0] < 4 && !this.fetchingMore) {
-              this.$log('MORE')
+              this.$logD('MORE')
               this.$emit('more')
             }
           }
@@ -124,19 +124,19 @@
     },
     methods: {
       scrollDirectionChanged (b) {
-        this.$log('scrollDirectionChanged')
+        this.$logD('scrollDirectionChanged')
         this.$tween.to(this, 0.3, { headerTop: b ? -60 : 0 })
       },
       feedOptions () {
-        this.$log('feedOptions')
+        this.$logD('feedOptions')
       },
       volumeToggle () {
-        this.$log('volumeToggle')
+        this.$logD('volumeToggle')
         this.$set(this, 'muted', !this.muted)
         // this.muted = !this.muted
       },
       onResize (e) {
-        // this.$log('onResize', e)
+        // this.$logD('onResize', e)
         this.width = e.width
       },
       async nodeVisible (isVisible, entry) {
@@ -144,19 +144,19 @@
         let name = entry.target.title
         let index = parseInt(entry.target.lang)
         if (isVisible) {
-          this.$log('nodeVisible SHOW', index)
+          this.$logD('nodeVisible SHOW', index)
           this.visibleNodes.unshift([index, top])
         } else if (this.visibleNodes.find(([i, t]) => (i === index)) && this.visibleNodes.length > 1) {
-          this.$log('nodeVisible HIDE', index)
+          this.$logD('nodeVisible HIDE', index)
           this.visibleNodes = this.visibleNodes.filter(([i, t]) => (i !== index))
         }
       }
     },
     async mounted () {
-      this.$log('mounted')
+      this.$logD('mounted')
     },
     beforeDestroy () {
-      this.$log('beforeDestroy')
+      this.$logD('beforeDestroy')
     }
   }
 </script>

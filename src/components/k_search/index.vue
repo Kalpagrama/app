@@ -16,14 +16,14 @@ export default {
   },
   methods: {
     onInput (e) {
-      this.$log('onInput', e.target.value)
+      this.$logD('onInput', e.target.value)
     }
   },
   mounted () {
-    // this.$log('mounted')
+    // this.$logD('mounted')
   },
   beforeDestroy () {
-    // this.$log('beforeDestroy')
+    // this.$logD('beforeDestroy')
   }
 }
 </script>

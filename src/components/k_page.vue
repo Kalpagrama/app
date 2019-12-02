@@ -34,10 +34,10 @@ export default {
   },
   methods: {
     onScroll (e) {
-      // this.$log('onScroll', e)
+      // this.$logD('onScroll', e)
     },
     onPan (e) {
-      // this.$log('handlePan', e)
+      // this.$logD('handlePan', e)
       if (this.scrollTop === 0) return
       let to = this.headerHeight + e.delta.y
       if (to < 400) this.headerHeight = to

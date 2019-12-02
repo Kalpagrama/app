@@ -87,49 +87,49 @@ export default {
   methods: {
     nodeVisible (isVisible, entry) {
       if (isVisible) {
-        this.$log('nodeVisible', isVisible, entry.target.lang)
+        this.$logD('nodeVisible', isVisible, entry.target.lang)
         this.nodesVisible.unshift(Number(entry.target.lang))
         if (this.nodesVisible.length > 20) this.nodesVisible.length = 10
       } else {
-        // this.$log('nodeVisible', entry.target.lang)
+        // this.$logD('nodeVisible', entry.target.lang)
       }
     },
     nodeClick (n, ni, e) {
-      this.$log('nodeClick', n, ni, e)
+      this.$logD('nodeClick', n, ni, e)
       this.node = null
       if (this.nodeActive === ni) return
       this.nodeActive = ni
-      this.$log('node', this.$refs[`node${n.oid}`][0].$el.offsetTop)
+      this.$logD('node', this.$refs[`node${n.oid}`][0].$el.offsetTop)
       let node = this.$refs[`node${n.oid}`][0]
       let offsetTop = node.$el.offsetTop
       let clientHeight = node.$el.clientHeight
       let offsetBottom = clientHeight - offsetTop
       // let scrollTo = offsetTop - (this.$q.screen.height - clientHeight) / 2
       let scrollTo = offsetTop - clientHeight
-      this.$log('offsetTop/offsetBottom/clientHeight/scrollTo', offsetTop, offsetBottom, clientHeight, scrollTo)
+      this.$logD('offsetTop/offsetBottom/clientHeight/scrollTo', offsetTop, offsetBottom, clientHeight, scrollTo)
       this.$tween.to(
         this.$refs.scrollWrapper,
         0.2,
         {
           scrollTop: scrollTo > 0 ? scrollTo : 0,
           onComplete: () => {
-            this.$log('SCROLLED TO', scrollTo)
+            this.$logD('SCROLLED TO', scrollTo)
           }
         }
       )
     },
     swipeUp (e) {
       if (this.nodesCount === this.nodeActive + 1) return
-      this.$log('swipeUp', e)
+      this.$logD('swipeUp', e)
       this.nodeClick(this.nodes[this.nodeActive + 1], this.nodeActive + 1, null)
     },
     swipeDown (e) {
       if (this.nodeActive === 0) return
-      this.$log('swipeDown', e)
+      this.$logD('swipeDown', e)
       this.nodeClick(this.nodes[this.nodeActive - 1], this.nodeActive - 1, null)
     },
     onScroll (e) {
-      // this.$log('onScroll', e)
+      // this.$logD('onScroll', e)
       this.scrollTop = e.target.scrollTop
       this.scrollHeight = e.target.scrollHeight
       this.clientHeight = e.target.clientHeight
@@ -143,11 +143,11 @@ export default {
       // }, 230)
     },
     onScrolled () {
-      this.$log('onScrolled')
+      this.$logD('onScrolled')
       // this.nodeClick(this.nodes[this.nodesVisible[0]], this.nodesVisible[0])
     },
     onResize (e) {
-      // this.$log('onResize', e)
+      // this.$logD('onResize', e)
       // if (this.scrollTop !== 0) this.$refs.scrollWrapper.scrollTop = this.scrollTop
       // TODO: memorize last scroll position
       // wait for all the nodes to load their first previews...
@@ -156,11 +156,11 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     if (this.$refs.onResizeObserver) this.$refs.onResizeObserver.trigger()
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

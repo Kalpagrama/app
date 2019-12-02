@@ -69,7 +69,7 @@ export default {
     active: {
       immediate: true,
       handler (to, from) {
-        this.$log('active CHANGED', to)
+        this.$logD('active CHANGED', to)
       }
     }
   },
@@ -106,15 +106,15 @@ export default {
   },
   methods: {
     fragmentAction () {
-      this.$log('fragmentAction')
+      this.$logD('fragmentAction')
       this.$store.commit('ui/stateSet', ['fragmentActionDialogOpened', true])
       let fragment = this.nodeFull.fragments[this.fragmentActive]
-      this.$log('fragment', fragment)
+      this.$logD('fragment', fragment)
       this.$store.commit('ui/stateSet', ['fragment', fragment])
       this.$store.commit('ui/stateSet', ['node', this.nodeFull])
     },
     forwardClick () {
-      this.$log('forwardClick')
+      this.$logD('forwardClick')
       let a = this.fragmentActive === 0 ? 1 : 0
       this.fragmentActive = a
       this.$nextTick(() => {
@@ -123,7 +123,7 @@ export default {
     },
     imgPreviewLoaded (e, i) {
       if (i === 0) {
-        this.$log('LOADED FIRST PREVIEW')
+        this.$logD('LOADED FIRST PREVIEW')
         this.width = e.path[0].width
         this.height = e.path[0].height
       }

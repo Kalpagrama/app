@@ -287,6 +287,7 @@ const userFragment = gql`
     settings
     subscribers{...objectShortFragment}
     subscriptions{...objectShortFragment}
+    subscribers{...objectShortFragment}
     workspace{
       nodes { ...WSItemFragment }
       fragments { ...WSItemFragment }

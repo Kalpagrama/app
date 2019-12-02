@@ -32,15 +32,15 @@ export default {
   },
   methods: {
     chainClick (c, ci) {
-      this.$log('chainClick', c)
+      this.$logD('chainClick', c)
       this.$router.push(`/app/chain/${c.oid}`)
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

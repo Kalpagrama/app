@@ -159,14 +159,14 @@ export default {
   watch: {
     now: {
       handler (to, from) {
-        // this.$log('now CHANGED', to)
+        // this.$logD('now CHANGED', to)
         if (this.$refs.kframes && this.framesSynced) {
           this.$tween.to(this.$refs.kframes, 0.4, {scrollLeft: (to * this.k)})
         }
         if (this.fragment) {
-          // this.$log('now GOT FRAGMENT')
+          // this.$logD('now GOT FRAGMENT')
           if (to > this.fragment.relativePoints[1]['x']) {
-            // this.$log('now START AGAIN')
+            // this.$logD('now START AGAIN')
             this.$refs.kvideo.currentTime = this.fragment.relativePoints[0]['x']
           }
         }
@@ -175,14 +175,14 @@ export default {
   },
   methods: {
     fragmentPreview (f) {
-      this.$log('fragmentPreview', f)
+      this.$logD('fragmentPreview', f)
       this.$set(this, 'fragment', f)
       this.framesSynced = true
       this.$refs.kvideo.currentTime = f.relativePoints[0]['x']
       this.$refs.kvideo.play()
     },
     fragmentToggle (f, fkey) {
-      this.$log('fragmentToggle', f)
+      this.$logD('fragmentToggle', f)
       if (this.fragmentsVisible[f.uid]) {
         this.$delete(this.fragmentsVisible, f.uid)
       } else {
@@ -190,7 +190,7 @@ export default {
       }
     },
     onResize (e) {
-      this.$log('onResize', e)
+      this.$logD('onResize', e)
       this.$set(this, 'width', e.width)
       this.$set(this, 'height', e.height)
     },
@@ -198,21 +198,21 @@ export default {
       return this[key]
     },
     pointClick (fi, pi, e) {
-      this.$log('pointClick', fi, pi, e)
+      this.$logD('pointClick', fi, pi, e)
       this.pointActive = `${fi + pi}`
     },
     pointStop () {
-      this.$log('pointStop')
+      this.$logD('pointStop')
       clearInterval(this.pointInterval)
       this.pointInterval = false
     },
     pointDrag (f, fkey, p, pi, e) {
-      // this.$log('pointDrag', e)
+      // this.$logD('pointDrag', e)
       this.pointDragging = `${fkey}-${pi}`
       let pos = e.position.left
       // right
       if (this.width - pos < 80 && e.direction === 'right') {
-        this.$log('RIGHT')
+        this.$logD('RIGHT')
         if (!this.pointInterval) {
           this.pointInterval = setInterval(() => {
             this.$refs.kframes.scrollLeft += e.delta.x
@@ -222,7 +222,7 @@ export default {
       }
       // left
       if (pos < 80 && e.direction === 'left') {
-        this.$log('LEFT')
+        this.$logD('LEFT')
         if (!this.pointInterval) {
           this.pointInterval = setInterval(() => {
             this.$refs.kframes.scrollLeft += e.delta.x
@@ -236,7 +236,7 @@ export default {
       }
       // final
       if (e.isFinal) {
-        this.$log('FINAL FINAL FINAL')
+        this.$logD('FINAL FINAL FINAL')
         if (f.relativePoints[0]['x'] > f.relativePoints[1]['x']) f.relativePoints.reverse()
         this.pointStop()
         this.pointInverval = null
@@ -253,7 +253,7 @@ export default {
       pointSet()
     },
     async framesDrag (e) {
-      // this.$log('framesDrag', e)
+      // this.$logD('framesDrag', e)
       if (e.isFirst) {
         this.framesDragging = true
       }
@@ -266,14 +266,14 @@ export default {
       }
     },
     framesScroll (e) {
-      // this.$log('framesScroll', e.target.scrollLeft)
+      // this.$logD('framesScroll', e.target.scrollLeft)
       this.framesScrollLeft = e.target.scrollLeft
     },
     frameLoaded (e) {
-      // this.$log('frameLoaded')
+      // this.$logD('frameLoaded')
       this.framesLoaded++
       if (this.framesLoaded === this.framesCount) {
-        this.$log('frames LOADED!')
+        this.$logD('frames LOADED!')
         if (this.$refs.kframes) this.$tween.to(this, 0.5, {framesScrollWidth: this.$refs.kframes.scrollWidth - this.width})
         // scroll frames to the left
         this.$tween.to(this.$refs.kframes, 0.5, {scrollLeft: (this.width / 2) - 10})
@@ -282,29 +282,29 @@ export default {
       }
     },
     frameClick (f, fi, e) {
-      this.$log('frameClick', fi, e)
+      this.$logD('frameClick', fi, e)
       if (this.framesDragging) return
       let time = this.frameDuration * (fi) + this.frameDuration / 2
       this.$refs.kvideo.currentTime = time
-      this.$log('time', time)
+      this.$logD('time', time)
       this.$tween.to(this.$refs.kframes, 0.5, {scrollLeft: (time * this.k)})
     },
     frameHold (f, fi, e) {
-      this.$log('frameHold', e)
+      this.$logD('frameHold', e)
       // let start = e.evt.target.offsetLeft / this.k
       // let end = start + 5 < this.duration ? start + 5 : this.duration
       // let uid = `${this.content.oid}-${Date.now()}`
-      // this.$log('start/end', start, end)
+      // this.$logD('start/end', start, end)
       // let fragment = {uid: uid, relativePoints: [{x: start}, {x: end}]}
       // this.$emit('create', fragment)
       // this.fragmentToggle(fragment)
     },
     videoClick (e) {
-      // this.$log('videoClick')
+      // this.$logD('videoClick')
       // TODO: dbclick for forward/backward
       this.clicks++
       if (this.clicks === 1) {
-        this.$log('CLICK')
+        this.$logD('CLICK')
         this.clickTimer = setTimeout(() => {
           this.clicks = 0
         }, this.clickDelay)
@@ -317,7 +317,7 @@ export default {
           this.playing = true
         }
       } else {
-        this.$log('CLICK DB')
+        this.$logD('CLICK DB')
         clearTimeout(this.clickTimer)
         this.clicks = 0
         // job
@@ -325,19 +325,19 @@ export default {
       }
     },
     videoPlaying () {
-      // this.$log('videoPlaying')
+      // this.$logD('videoPlaying')
       this.playing = true
       if (this.$refs.kvideo) this.duration = this.$refs.kvideo.duration
     },
     videoTimeupdate () {
-      // this.$log('videoTimeupdate')
+      // this.$logD('videoTimeupdate')
       if (this.$refs.kvideo) this.now = this.$refs.kvideo.currentTime
     },
     videoLoaded (e) {
-      this.$log('videoLoaded', e)
+      this.$logD('videoLoaded', e)
     },
     videoPlayback () {
-      this.$log('videoPlayback')
+      this.$logD('videoPlayback')
       this.$refs.kvideo.playBackwards = function () {
         this.pause()
         var video = this
@@ -353,7 +353,7 @@ export default {
       }
     },
     async framesLoad (oid) {
-      this.$log('framesLoad start')
+      this.$logD('framesLoad start')
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
       // let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
       //   query: gql`
@@ -369,11 +369,11 @@ export default {
       //     oid: oid
       //   }
       // })
-      this.$log('framesLoad done')
+      this.$logD('framesLoad done')
       return content.frameUrls
     },
     timelineToggle () {
-      this.$log('timelineToggle')
+      this.$logD('timelineToggle')
       if (this.timelineBottom === 0) {
         this.$tween.to(this, 0.5, {timelineBottom: -162})
       } else {
@@ -381,19 +381,19 @@ export default {
       }
     },
     menuLeftToggle () {
-      this.$log('menuLeftToggle')
+      this.$logD('menuLeftToggle')
       this.$refs.menuLeftDialog.toggle()
     },
     menuRightToggle () {
-      this.$log('menuRightToggle')
+      this.$logD('menuRightToggle')
       this.$refs.menuRightDialog.toggle()
     },
     mutedToggle () {
-      this.$log('mutedToggle')
+      this.$logD('mutedToggle')
       this.muted = !this.muted
     },
     async ready () {
-      this.$log('ready')
+      this.$logD('ready')
       this.loading = true
       let video = this.$refs.kvideo
       video.pause()
@@ -416,12 +416,12 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted', this.content)
+    this.$logD('mounted', this.content)
     this.$set(this, 'frames', [])
     this.$set(this, 'frames', await this.framesLoad(this.content.oid))
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     this.$set(this, 'frames', [])
     clearInterval(this.pointInverval)
   }

@@ -28,14 +28,14 @@ export default {
     '$q.screen.gt.xs': {
       immediate: true,
       handler (to, from) {
-        this.$log('gt.sm CHANGED', to)
+        this.$logD('gt.sm CHANGED', to)
         this.$store.commit('ui/stateSet', ['gtxs', to])
       }
     }
   },
   methods: {
     onResize (e) {
-      this.$log('onResize', e)
+      this.$logD('onResize', e)
       this.width = e.width
       let vh = window.innerHeight * 0.01
       document.documentElement.style.setProperty('--vh', `${vh}px`)
@@ -44,7 +44,7 @@ export default {
   },
   async created () {
     try {
-      this.$log('created')
+      this.$logD('created')
       this.loading = true
       // take token from redirect url
       let token = this.$route.query.token
@@ -66,7 +66,7 @@ export default {
         fetchPolicy: 'network-only'
       })
       if (!userIsAuthorized || !userIsConfirmed) {
-        this.$log('GO LOGIN')
+        this.$logD('GO LOGIN')
         this.$router.push('/login')
         this.$q.notify('Go login')
         return
@@ -74,7 +74,7 @@ export default {
       await this.$store.dispatch('init')
       this.loading = false
     } catch (error) {
-      this.$log('error', error)
+      this.$logD('error', error)
       // this.loading = false
     }
   }

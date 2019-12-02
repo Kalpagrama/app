@@ -75,16 +75,16 @@ export default {
   },
   methods: {
     async fragmentAction (a, fi) {
-      this.$log('fragmentAction', a)
+      this.$logD('fragmentAction', a)
       await this.$wait(200)
       switch (a.id) {
         case 'explore_content': {
-          this.$log('fragmentAction', a.id)
+          this.$logD('fragmentAction', a.id)
           this.$router.push(`/app/content/${this.nodeFull.fragments[fi].content.oid}`)
           break
         }
         case 'fork_fragment': {
-          this.$log('fragmentAction', a.id)
+          this.$logD('fragmentAction', a.id)
           // prepare node
           let f = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
           let n = { name: '', thumbUrl: [], fragments: [], spheres: [], author: this.$store.state.auth.user }
@@ -99,34 +99,34 @@ export default {
             content: f.content
           }
           n.thumbUrl[fi] = this.node.thumbUrl[fi]
-          this.$log('forkFragment', n)
+          this.$logD('forkFragment', n)
           // save node to store
           this.$store.commit('workspace/stateSet', ['node', n])
           this.$router.push('/app/create/node')
           break
         }
         case 'add_content_to_workspace': {
-          this.$log('fragmentAction', a.id)
+          this.$logD('fragmentAction', a.id)
           break
         }
         case 'add_node_to_workspace': {
-          this.$log('fragmentAction', a.id)
+          this.$logD('fragmentAction', a.id)
           break
         }
       }
     },
     imgError (e, msg) {
-      // this.$log('imgError', msg)
+      // this.$logD('imgError', msg)
     },
     imgLoaded (e, msg) {
-      // this.$log('imgLoaded', msg)
+      // this.$logD('imgLoaded', msg)
     }
   },
   mounted () {
-    // this.$log('mounted')
+    // this.$logD('mounted')
   },
   beforeDestroy () {
-    // this.$log('beforeDestroy')
+    // this.$logD('beforeDestroy')
   }
 }
 </script>

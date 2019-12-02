@@ -6,7 +6,7 @@ export function init (state, userSubscriptions) {
 }
 
 export function stateSet (state, [key, val]) {
-  assert.ok(state.hasOwnProperty(key))
+  assert.ok(Object.prototype.hasOwnProperty.call(state, key))
   state[key] = val
 }
 

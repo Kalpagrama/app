@@ -103,17 +103,17 @@ export default {
   },
   methods: {
     fingerDrag (e) {
-      // this.$log('fingerDrag', e)
+      // this.$logD('fingerDrag', e)
       let fl = this.fingerLeft + e.delta.x
       let ft = this.fingerTop + e.delta.y
       if (fl >= 0 && fl <= 300) this.fingerLeft = fl
       if (ft >= 0 && ft <= 300) this.fingerTop = ft
     },
     action ({id}) {
-      this.$log('action', id)
+      this.$logD('action', id)
       switch (id) {
         case 'answer': {
-          this.$log('action', id)
+          this.$logD('action', id)
           // this.nodeRated = true
           this.$emit('hide')
           break
@@ -122,23 +122,23 @@ export default {
     },
     async nodeRate () {
       try {
-        this.$log('nodeRateJob start')
+        this.$logD('nodeRateJob start')
         this.nodeRating = true
         await this.$wait(600)
         let res = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: this.fingerRate / 100})
-        this.$log('nodeRateJob done', res)
+        this.$logD('nodeRateJob done', res)
         this.nodeRating = false
         await this.$wait(300)
         this.$emit('hide')
         // this.$refs.rateToAnswer.toggle()
       } catch (e) {
-        this.$log('nodeRateJob error', e)
+        this.$logD('nodeRateJob error', e)
         this.nodeRating = false
       }
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     // get nodes...
     this.node = this.$store.state.node.node
     this.nodeFull = this.$store.state.node.nodeFull
@@ -149,7 +149,7 @@ export default {
     this.loading = false
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     this.$store.commit('node/stateSet', ['node', null])
     this.$store.commit('node/stateSet', ['nodeFull', null])
   }

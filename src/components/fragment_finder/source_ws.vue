@@ -60,20 +60,19 @@ export default {
   },
   methods: {
     itemClick (i, ii) {
-      this.$log('itemClick', i, ii)
+      this.$logD('itemClick', i, ii)
       this.item = i
       // this.$refs.sourceWsDialog.show()
       this.$refs.wsItemDialog.show()
     },
     wsItemDialogAction (action) {
-      this.$log('wsItemDialogAction', action)
+      this.$logD('wsItemDialogAction', action)
       switch (action) {
         case 'preview': {
-          this.$log('PREVIEW')
+          this.$logD('PREVIEW')
           break
         }
         case 'delete': {
-          // this.$log
           this.$emit('hide')
           break
         }
@@ -86,10 +85,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

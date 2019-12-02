@@ -66,10 +66,10 @@ export default {
   },
   methods: {
     publishAction ({id}) {
-      this.$log('publishAction', id)
+      this.$logD('publishAction', id)
       switch (id) {
         case 'sure': {
-          this.$log('publish')
+          this.$logD('publish')
           this.$emit('publish')
           break
         }
@@ -77,10 +77,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('monted')
+    this.$logD('monted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -47,24 +47,24 @@ export default {
   methods: {
     async handleAnswer () {
       try {
-        this.$log('handleAnswer start')
+        this.$logD('handleAnswer start')
         this.answering = true
         let node = JSON.parse(JSON.stringify(this.nodeFull))
         node.parentNode = this.node.oid
         node.name = this.name
         let res = await this.$store.dispatch('node/nodeCreate', node)
-        this.$log('handleAnswer done', res)
+        this.$logD('handleAnswer done', res)
         this.answering = false
         await this.$wait(300)
         this.$emit('hide')
       } catch (error) {
-        this.$log('handleAnswer error', error)
+        this.$logD('handleAnswer error', error)
         this.answering = false
       }
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     await this.$wait(300)
     // load node
     this.node = this.$store.state.node.node
@@ -75,7 +75,7 @@ export default {
     this.$refs.inputAnswer.focus()
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     this.$store.commit('node/stateSet', ['node', null])
     this.$store.commit('node/stateSet', ['nodeFull', null])
     this.$store.commit('node/stateSet', ['answer', false])

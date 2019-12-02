@@ -76,40 +76,40 @@ export default {
     value: {
       immediate: true,
       handler (to, from) {
-        this.$log('value CHANGED', to)
+        this.$logD('value CHANGED', to)
         this.spheres = to
       }
     }
   },
   methods: {
     sphereClick (t, ti) {
-      this.$log('sphereClick', t, ti)
+      this.$logD('sphereClick', t, ti)
       let sFind = this.spheres.find(s => (s.name === t.name))
       if (sFind) {
-        this.$log('DUPLICATE')
+        this.$logD('DUPLICATE')
       } else {
-        this.$log('ADD')
+        this.$logD('ADD')
         this.$set(this.spheres, this.spheres.length, {name: t.name})
       }
       this.$refs.spheresDialog.hide()
       this.$emit('input', this.spheres)
     },
     sphereCreate () {
-      this.$log('sphereCreate')
+      this.$logD('sphereCreate')
       this.sphereClick({name: this.search})
       this.search = ''
     },
     sphereDelete (s, si) {
-      this.$log('sphereDelete', s, si)
+      this.$logD('sphereDelete', s, si)
       this.$delete(this.spheres, si)
       this.$emit('input', this.spheres)
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

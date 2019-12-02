@@ -1,4 +1,10 @@
+import assert from 'assert'
 
-export const set = (state, [key, val]) => {
+export function init (state) {
+  state.initialized = true
+}
+
+export function stateSet (state, [key, val]) {
+  assert.ok(Object.prototype.hasOwnProperty.call(state, key))
   state[key] = val
 }

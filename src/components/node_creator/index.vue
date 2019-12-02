@@ -140,7 +140,7 @@ export default {
   computed: {
   },
   watch: {
-    '$route': {
+    $route: {
       immediate: true,
       handler (to, from) {
         if (!to.params.page) {
@@ -151,12 +151,12 @@ export default {
   },
   methods: {
     nameEditStart () {
-      this.$log('nameEditStart')
+      this.$logD('nameEditStart')
       this.$refs.nameFinderDialog.show()
       this.nameEditing = true
     },
     fragmentFindStart (i) {
-      this.$log('fragmentFindStart', i)
+      this.$logD('fragmentFindStart', i)
       this.fragmentFinding = i
       this.$refs.fragmentFinderDialog.show()
     },
@@ -170,10 +170,10 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

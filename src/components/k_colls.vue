@@ -122,14 +122,14 @@ export default {
   watch: {
     tabsLeft: {
       handler (to, from) {
-        // this.$log('tabsLeft', to)
+        // this.$logD('tabsLeft', to)
         this.$refs.kCollsTabsWrapper.scrollLeft = to - (this.clientWidth / 3)
       }
     },
     coll: {
       immediate: true,
       async handler (to, from) {
-        this.$log('coll CHANGED', to)
+        this.$logD('coll CHANGED', to)
         if (to) {
           this.$nextTick(() => {
             let i = this.colls.findIndex(c => c.id === to)
@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     handleScroll (e) {
-      // this.$log('handleScroll', e)
+      // this.$logD('handleScroll', e)
       this.clientWidth = e.target.clientWidth
       this.scrollLeft = e.target.scrollLeft
       this.scrollWidth = e.target.scrollWidth
@@ -156,14 +156,13 @@ export default {
     async handleSwipe (e) {
       let i = e.direction === 'left' ? this.collIndex + 1 : this.collIndex - 1
       if (this.disable || i < 0 || i > this.colls.length - 1 || !this.colls[i]) return
-      this.$log('handleSwipe', e)
+      this.$logD('handleSwipe', e)
       this.$emit('coll', this.colls[i].id)
     },
     handlePan (e) {
       if (this.disable) return
       if (e.distance.x > this.clientWidth * 1.3) return
       // if (e.direction === 'right' && this.collNowIndex === 0) return
-      // this.$log('handlePan', e)
       // this.$q.notify(e.direction)
       // let d = this.$refs.kCollsTabsWrapper.scrollWidth / this.$refs.kCollsScrollWrapper.scrollWidth
       // this.$refs.kCollsTabsWrapper.scrollLeft -= e.delta.x * d
@@ -174,7 +173,7 @@ export default {
         if (e.position.left < 60) return
       }
       if (e.isFinal) {
-        // this.$log('e.duration', e.duration)
+        // this.$logD('e.duration', e.duration)
         if (e.duration < 300) {
           this.panning = false
           this.handleSwipe(e)
@@ -184,13 +183,13 @@ export default {
           }, 500)
           this.oveflow = 'hidden'
           let i = Math.round(this.$refs.kCollsScrollWrapper.scrollLeft / this.$refs.kCollsScrollWrapper.clientWidth)
-          // this.$log('i', i)
+          // this.$logD('i', i)
           let coll = this.colls[i]
           if (coll.id === this.coll) {
-            this.$log('SAME SAME SAME')
+            this.$logD('SAME SAME SAME')
             this.move(i, false, 0.1)
           } else {
-            this.$log('coll.id', coll.id)
+            this.$logD('coll.id', coll.id)
             this.$emit('coll', coll.id)
           }
         }
@@ -198,15 +197,15 @@ export default {
     },
     move (index, immediate, ms) {
       return new Promise((resolve, reject) => {
-        // this.$log('move start', index)
+        // this.$logD('move start', index)
         let clientWidth = this.$refs.kCollsScrollWrapper.clientWidth
         let scrollLeft = clientWidth * index
-        // this.$log('scrollLeft', scrollLeft)
+        // this.$logD('scrollLeft', scrollLeft)
         this.overflow = 'auto'
         if (immediate) {
           this.$refs.kCollsScrollWrapper.scrollLeft = scrollLeft
           this.overflow = 'hidden'
-          // this.$log('move DONE')
+          // this.$logD('move DONE')
         } else {
           this.$tween.to(
             this.$refs.kCollsScrollWrapper,
@@ -214,7 +213,7 @@ export default {
             {
               scrollLeft: scrollLeft,
               onComplete: () => {
-                // this.$log('move DONE')
+                // this.$logD('move DONE')
                 this.overflow = 'hidden'
               }
             }

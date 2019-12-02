@@ -58,7 +58,7 @@ export default {
         name: this.name,
         author: this.$store.state.auth.user,
         fragments: fragments.map(f => {
-          // this.$log('f', f)
+          // this.$logD('f', f)
           return {
             uid: f.uid,
             oid: f.content.oid,
@@ -84,7 +84,7 @@ export default {
   methods: {
     async publish () {
       try {
-        this.$log('nodePublish start', this.node)
+        this.$logD('nodePublish start', this.node)
         this.publishing = true
         // await this.$wait(3000)
         // create mutation
@@ -95,29 +95,29 @@ export default {
         // delete ws draft
         if (this.draft) {
           let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
-          this.$log('deleteWSDraft', deleteWSDraft)
+          this.$logD('deleteWSDraft', deleteWSDraft)
         }
         // remove draftLocal
         localStorage.removeItem('draft')
         // remove draftStorage
         this.$store.commit('workspace/stateSet', ['draft', null])
         // done
-        this.$log('nodePublish done', node)
+        this.$logD('nodePublish done', node)
         this.publishing = false
         // go to home
-        this.$router.push(`/app/home`)
+        this.$router.push('/app/home')
       } catch (error) {
-        this.$log('nodePublis error', error)
+        this.$logD('nodePublis error', error)
         this.publishing = false
         this.$q.notify({message: 'Node publish error!', color: 'red', textColor: 'white'})
       }
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

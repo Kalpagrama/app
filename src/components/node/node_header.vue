@@ -49,21 +49,21 @@ export default {
       return r
     },
     async handleAction (a) {
-      this.$log('handleAction', a)
+      this.$logD('handleAction', a)
       switch (a.id) {
         case 'to_node': {
-          this.$log('handleAction', a.id)
+          this.$logD('handleAction', a.id)
           await this.$wait(200)
           this.$router.push(`/app/node/${this.node.oid}`)
           break
         }
         case 'to_workspace': {
-          this.$log('handleAction', a.id, this.node, this.nodeFull)
+          this.$logD('handleAction', a.id, this.node, this.nodeFull)
           this.nodeWorkspace()
           break
         }
         case 'to_create': {
-          this.$log('handleAction', a.id, this.node, this.nodeFull)
+          this.$logD('handleAction', a.id, this.node, this.nodeFull)
           // add to workspace
           let n = this.nodeWorkspace()
           // add to store
@@ -74,10 +74,10 @@ export default {
           break
         }
         case 'report': {
-          this.$log('handleAction', a.id)
+          this.$logD('handleAction', a.id)
           var r = confirm('Report ?')
           if (!r) return
-          this.$log('reporting...')
+          this.$logD('reporting...')
           await this.$apollo.mutate({
             mutation: gql`
               mutation deleteNode($oid: OID!) {
@@ -88,7 +88,7 @@ export default {
               oid: this.node.oid
             }
           })
-          this.$log('reported!')
+          this.$logD('reported!')
         }
       }
     }

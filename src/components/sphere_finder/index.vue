@@ -41,7 +41,7 @@ export default {
     sphere: {
       immediate: false,
       async handler (to, from) {
-        this.$log('sphere CHANGED', to)
+        this.$logD('sphere CHANGED', to)
         if (to.length < 2) return
         this.sphereOptions = []
         this.sphereOptions = await this.spheresLoad(to)
@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     onEnter () {
-      this.$log('onEnter')
+      this.$logD('onEnter')
       if (this.sphere.length < 3) return
       // this.spheres.push({name: this.sphere})
       this.$set(this.spheres, this.spheres.length, {name: this.sphere})
@@ -68,20 +68,20 @@ export default {
       // this.sphere = ``
     },
     onBackspace () {
-      this.$log('onBackspace')
+      this.$logD('onBackspace')
       if (this.sphere.length === 0) {
         this.spheres.pop()
       }
     },
     async spheresLoad (sphere) {
-      this.$log('spheresLoad start')
+      this.$logD('spheresLoad start')
       this.spheresLoading = true
       this.spheresLoading = false
-      this.$log('spheresLoad done')
+      this.$logD('spheresLoad done')
       return []
     },
     sphereClick (s) {
-      this.$log('sphereClick', s)
+      this.$logD('sphereClick', s)
       // TODO: check for duplicate in spheres!
       this.sphere = ``
       this.sphereOptions = []
@@ -89,10 +89,10 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

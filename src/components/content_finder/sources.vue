@@ -36,20 +36,20 @@ export default {
   },
   methods: {
     sourceClick (s, skey) {
-      this.$log('sourceClick', s, skey)
+      this.$logD('sourceClick', s, skey)
       this.$emit('source', skey)
     },
     sourceAdd () {
-      this.$log('sourceAdd')
+      this.$logD('sourceAdd')
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     // await this.$wait(200)
     this.sourceClick(null, 'url')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>
