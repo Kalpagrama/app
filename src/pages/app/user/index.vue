@@ -17,7 +17,7 @@ div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
       .row.full-width
         img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`)
         .col.row.justify-end.q-mt-sm
-          q-btn(rounded dense no-caps color="accent").q-px-md Follow
+          q-btn(rounded dense no-caps :color="subscriptions.includes(this.oid) ? 'accent' : 'red'").q-px-md Follow
       .row.full-width.items-center.justify-start
         .row
           span.text-bold.text-black.text-h6 {{ user.name }}
@@ -53,6 +53,8 @@ div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
       //- div(v-else).row.fit.q-pt-md
       //-   div(:style=`{borderRadius: '20px', overflow: 'hidden'}`).row.fit.items-start.content-start.bg-white.q-pa-sm
       //-     h4 {{ pages[page].name }}
+    div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width
+      k-menu-mobile
 </template>
 
 <script>
@@ -71,6 +73,9 @@ export default {
     }
   },
   computed: {
+    subscriptions () {
+      return this.$store.state.subscriptions.userSubscriptions
+    },
     userSettingsDialogOptions () {
       return {
         confirm: false,

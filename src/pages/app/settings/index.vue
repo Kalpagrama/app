@@ -40,6 +40,9 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: width+'px', height
                   q-icon(size="30px" color="accent" :name="p.icon")
                 .col.q-ml-sm.items-center
                   span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
+  q-footer()
+    div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width
+      k-menu-mobile
 </template>
 
 <script>
