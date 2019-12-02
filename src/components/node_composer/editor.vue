@@ -76,7 +76,7 @@ export default {
   },
   methods: {
     nameClick () {
-      this.$log('nameClick')
+      this.$logD('nameClick')
       if (this.nameEditing) {
         this.nameEditing = false
         // save name
@@ -88,24 +88,24 @@ export default {
       }
     },
     fragmentClick (index) {
-      this.$log('fragmentClick', index)
+      this.$logD('fragmentClick', index)
       this.fragmentIndex = index
       if (this.fragments[index]) {
-        this.$log('EDIT or DELETE')
+        this.$logD('EDIT or DELETE')
         this.$refs.fragmentMenu.show()
       } else {
         this.$refs.fragmentFinderDialog.show()
       }
     },
     fragmentFound (f) {
-      this.$log('fragmentFound', f)
+      this.$logD('fragmentFound', f)
       // this.fragments[this.fragmentIndex] = f
       this.$set(this.fragments, this.fragmentIndex, f)
       this.$refs.fragmentFinderDialog.hide()
       this.fragmentIndex = -1
     },
     fragmentAction (action) {
-      this.$log('fragmentAction', action)
+      this.$logD('fragmentAction', action)
       switch (action) {
         case 'edit': {
           this.fragmentEdit()
@@ -118,27 +118,27 @@ export default {
       }
     },
     fragmentEdit () {
-      this.$log('fragmentEdit')
+      this.$logD('fragmentEdit')
     },
     fragmentDelete () {
-      this.$log('fragmentDelete')
+      this.$logD('fragmentDelete')
     },
     preview () {
-      this.$log('preview')
+      this.$logD('preview')
       this.$emit('preview')
     },
     clear () {
-      this.$log('clear')
+      this.$logD('clear')
       // start new one? save progress? or not?
       this.$set(this, 'fragments', [null, null])
       // this.fragments = [null, null]
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

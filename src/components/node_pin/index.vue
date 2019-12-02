@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     nameClick ([node, rect]) {
-      this.$log('nameClick', node, rect)
+      this.$logD('nameClick', node, rect)
       this.nodeRect = rect
       this.nodeStyles.height = rect.height + 'px'
       this.nodeStyles.width = rect.width + 'px'
@@ -160,7 +160,7 @@ export default {
       this.$tween.to(this, this.nodeGoTimeout, {tintOpacity: 1})
     },
     nodeAction (action) {
-      this.$log('nodeAction', action)
+      this.$logD('nodeAction', action)
       switch (action) {
         case 'fragment': {
           break
@@ -168,7 +168,7 @@ export default {
       }
     },
     nodeBack () {
-      this.$log('nodeBack')
+      this.$logD('nodeBack')
       this.nodePinned = false
       this.$tween.to(this.nodeStyles, this.nodeGoTimeout, {
         top: this.nodeRect.top + 'px',
@@ -181,15 +181,15 @@ export default {
     },
     nodeVisible (isVisible, entry) {
       if (isVisible) {
-        this.$log('nodeVisible', isVisible, entry.target.lang)
+        this.$logD('nodeVisible', isVisible, entry.target.lang)
         this.nodesVisible.unshift(entry.target.lang)
       } else {
-        this.$log('nodeVisible', isVisible, entry.target.lang)
+        this.$logD('nodeVisible', isVisible, entry.target.lang)
         this.nodesVisible = this.nodesVisible.filter(n => (n.oid !== entry.target.lang))
       }
     },
     onScroll (e) {
-      // this.$log('onScroll', e)
+      // this.$logD('onScroll', e)
       let scrollTop = this.$refs.nodePinScroll.scrollTop
       if (this.scrollTop > scrollTop) this.headerShow = true
       else this.headerShow = false
@@ -200,10 +200,10 @@ export default {
     this.sphereOid = this.colls[0].id
   },
   mounted () {
-    this.$log('mounted', this.zIndex)
+    this.$logD('mounted', this.zIndex)
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

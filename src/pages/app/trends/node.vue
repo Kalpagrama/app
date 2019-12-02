@@ -47,7 +47,7 @@ export default {
   watch: {
     opened: {
       handler (to, from) {
-        this.$log('opened CHANGED', to)
+        this.$logD('opened CHANGED', to)
         if (to) {
           this.$tween.to(this, 0.7, {f1maxHeight: this.$q.screen.width})
         } else {
@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     nodeNameClick () {
-      this.$log('nodeNameClick')
+      this.$logD('nodeNameClick')
       if (this.opened) {
       } else {
         let {'0': r} = this.$el.getClientRects()
@@ -67,14 +67,14 @@ export default {
       }
     },
     nodeHello () {
-      this.$log('nodeHello')
+      this.$logD('nodeHello')
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

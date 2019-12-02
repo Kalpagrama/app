@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     subjectClick (s) {
-      this.$log('subjectClick')
+      this.$logD('subjectClick')
       switch (s.type) {
         case 'VIDEO':
         case 'AUDIO':

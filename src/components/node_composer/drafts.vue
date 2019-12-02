@@ -35,13 +35,13 @@ export default {
   },
   methods: {
     async draftNew () {
-      this.$log('draftNew')
+      this.$logD('draftNew')
       // save prev draft, and go to editor
       await this.$wait(200)
       this.$emit('new')
     },
     async draftClick (d, di) {
-      this.$log('draftClick', d, di)
+      this.$logD('draftClick', d, di)
       this.draftIndex = di
       await this.$wait(200)
       this.$emit('draft', d)
@@ -56,7 +56,7 @@ export default {
       }
     },
     handlePan (e) {
-      // this.$log('handlePan', e)
+      // this.$logD('handlePan', e)
       let to = this.headerHeight + e.delta.y
       if (to < 200) this.headerHeight = to
       if (e.isFinal) {
@@ -64,15 +64,15 @@ export default {
       }
     },
     onScroll (e) {
-      // this.$log('onScroll', e)
+      // this.$logD('onScroll', e)
       this.scrollTop = e.target.scrollTop
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

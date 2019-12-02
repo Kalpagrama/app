@@ -1,5 +1,5 @@
 <template lang="pug">
-div(id="q-app").row.window-height.full-width.items-center.justify-center.bg-black
+div(
   id="q-app" ref="kapp"
   :style=`{height: $q.screen.height+'px', position: 'fixed'}`).full-width.bg-primary
     router-view
@@ -16,7 +16,7 @@ export default {
         allowTouchMove: el => {
           while (el && el !== document.body) {
             let classList = el.classList
-            // this.$log('classList', classList)
+            // this.$logD('classList', classList)
             // if (classList.contains('scroll')) return true
             el = el.parentNode
           }

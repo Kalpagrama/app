@@ -84,25 +84,27 @@ export default {
   },
   methods: {
     vote () {
-      return new Promise(async (resolve, reject) => {
-        this.$log('vote START')
+      return new Promise((resolve, reject) => {
+        this.$logD('vote  START')
         this.voteSending = true
-        await this.$wait(300)
-        this.$log('vote DONE')
-        this.voteSending = false
-        this.toggle()
+        this.$wait(300).then(() => {
+          this.$logD('vote DONE')
+          this.voteSending = false
+          this.toggle()
+          resolve()
+        }).catch(reject)
       })
     },
     votePan (e) {
-      // this.$log('votePan', e)
+      // this.$logD('votePan', e)
       let to = this.voteLeft + e.delta.x
       if (to > 50 && to < this.width - 110) this.voteLeft = to
       if (e.isFirst) {
-        this.$log('votePan FIRST')
+        this.$logD('votePan FIRST')
         this.votePanning = true
       }
       if (e.isFinal) {
-        this.$log('votePan FINAL')
+        this.$logD('votePan FINAL')
         this.votePanning = false
         this.vote()
       }
@@ -115,7 +117,7 @@ export default {
       }
     },
     open () {
-      this.$log('open', this.opened)
+      this.$logD('open', this.opened)
       this.opened = true
       this.$tween.to(this.f1, 0.35, {
         top: 276,
@@ -125,7 +127,7 @@ export default {
       this.$tween.to(this, 0.35, {actionsTop: 192})
     },
     close () {
-      this.$log('close', this.opened)
+      this.$logD('close', this.opened)
       this.opened = false
       this.$tween.to(this.f1, 0.35, {
         top: 105,
@@ -136,10 +138,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

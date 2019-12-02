@@ -122,7 +122,7 @@ export default {
   watch: {
     tabsLeft: {
       handler (to, from) {
-        // this.$log('tabsLeft', to)
+        // this.$logD('tabsLeft', to)
         this.$refs.kCollsTabsWrapper.scrollLeft = to - (this.clientWidth / 3)
       }
     },
@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     handleScroll (e) {
-      // this.$log('handleScroll', e)
+      // this.$logD('handleScroll', e)
       this.clientWidth = e.target.clientWidth
       this.scrollLeft = e.target.scrollLeft
       this.scrollWidth = e.target.scrollWidth

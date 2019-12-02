@@ -109,7 +109,7 @@ export default {
   },
   methods: {
     userSettingsAction (a) {
-      this.$log('userSettingsAction', a)
+      this.$logD('userSettingsAction', a)
       switch (a) {
         case 'report': {
           break
@@ -130,11 +130,11 @@ export default {
     },
     // async subscribers () {
     //   let res = await this.$store.dispatch('objects/get', { oid, fragmentName: 'userFragment', priority: 0 })
-    //   this.$log('res', res)
+    //   this.$logD('res', res)
     // },
     async followUser () {
       let res = await this.$store.dispatch('subscriptions/subscribe', this.user.oid)
-      this.$log('res', res)
+      this.$logD('res', res)
     },
     async userLoad (oid) {
       this.$logD('userLoad start')
