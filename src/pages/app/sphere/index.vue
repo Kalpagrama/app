@@ -22,7 +22,7 @@ export default {
   computed: {
     pages () {
       return {
-        sphere: {name: this.sphere ? `#${this.sphere.name}` : '#'},
+        sphere: {name: this.sphere ? `#${this.sphere.name}` : ''},
         settings: {name: 'Настройки'}
       }
     }

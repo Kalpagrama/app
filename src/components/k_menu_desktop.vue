@@ -63,7 +63,7 @@ export default {
         {name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace'},
         {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
         {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
-        {name: 'Выйти', icon: 'exit_to_app', path: '/app/logout'}
+        {name: 'Exit', icon: 'exit_to_app', path: '/app/logout'}
       ]
     }
   },
@@ -73,7 +73,7 @@ export default {
         header: false,
         headerName: '',
         actions: {
-          stay: {name: 'Если хочешь остаться, останься просто так'}
+          stay: {name: 'Отмена'}
         },
         confirm: true,
         confirmName: 'Выйти'
