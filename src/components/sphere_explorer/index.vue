@@ -65,11 +65,11 @@ export default {
   },
   methods: {
     sphereClick (s, si) {
-      this.$log('sphereClick', s, si)
+      this.$logD('sphereClick', s, si)
       this.$router.push(`/app/sphere/${s.oid}`)
     },
     async spheresLoad (oid) {
-      this.$log('spheresLoad start', oid)
+      this.$logD('spheresLoad start', oid)
       let { data: { sphereSpheres: { items: spheres } } } = await this.$apollo.query({
         query: gql`
           query sphereSpheresOld ($oid: OID!){
@@ -85,15 +85,15 @@ export default {
           oid: oid
         }
       })
-      this.$log('spheresLoad done', spheres)
+      this.$logD('spheresLoad done', spheres)
       return spheres
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

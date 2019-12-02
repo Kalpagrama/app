@@ -1,3 +1,5 @@
+import { initSw, initWebPush } from 'src/system/service_worker'
+
 const debug = require('debug')('[boot]:apollo')
 // debug.enabled = true
 
@@ -12,13 +14,18 @@ import { createUploadLink } from 'apollo-upload-client'
 // import { persistCache } from 'apollo-cache-persist'
 import VueApollo from 'vue-apollo'
 import axios from 'axios'
+import { logE } from 'src/boot/log'
 
-var apolloProvider
+let apolloProvider
 
 // todo remove axios
 export default async ({ Vue, store, app }) => {
-  debug('start')
-  // axios
+  try {
+
+  } catch (err) {
+    logE(err)
+  }
+
   axios.interceptors.request.use((request) => {
     // Do something with response data
     debug('axios request', request)
@@ -66,7 +73,7 @@ export default async ({ Vue, store, app }) => {
         debug('FETCH HTTP')
         const token = localStorage.getItem('ktoken')
         const d = localStorage.getItem('kdebug')
-        if (token) options.headers['Authorization'] = token
+        if (token) options.headers.Authorization = token
         if (d) options.headers['X-Kalpagramma-debug'] = d
         return fetch(uri, options)
       }
@@ -89,7 +96,7 @@ export default async ({ Vue, store, app }) => {
         debug('FETCH HTTP')
         const token = localStorage.getItem('ktoken')
         const d = localStorage.getItem('kdebug')
-        if (token) options.headers['Authorization'] = token
+        if (token) options.headers.Authorization = token
         if (d) options.headers['X-Kalpagramma-debug'] = d
         return fetch(uri, options)
       }
@@ -122,7 +129,7 @@ export default async ({ Vue, store, app }) => {
         debug('FETCH UPLOAD', uri, options)
         const token = localStorage.getItem('ktoken')
         const d = localStorage.getItem('kdebug')
-        if (token) options.headers['Authorization'] = token
+        if (token) options.headers.Authorization = token
         if (d) options.headers['X-Kalpagramma-debug'] = d
         return fetch(uri, options)
       }

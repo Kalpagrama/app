@@ -23,11 +23,11 @@ export default {
   },
   methods: {
     fileInputChanged (e) {
-      this.$log('fileInputChanged', e)
+      this.$logD('fileInputChanged', e)
     },
     upload () {
       try {
-        this.$log('upload start')
+        this.$logD('upload start')
         this.uploading = true
         // let {data: {uploadContentFile: {oid}}} = await this.$apollo.mutate({
         //   client: 'uploadApollo',
@@ -42,26 +42,26 @@ export default {
         //   }
         // })
         // return oid
-        this.$log('upload done')
+        this.$logD('upload done')
         this.uploading = false
       } catch (error) {
-        this.$log('upload error', error)
+        this.$logD('upload error', error)
         this.uploading = false
       }
     },
     cancel () {
-      this.$log('cancel')
+      this.$logD('cancel')
       if (!this.uploading) {
         this.$emit('hide')
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     this.$refs.fileinput.click()
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

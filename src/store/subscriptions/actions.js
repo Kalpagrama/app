@@ -1,16 +1,17 @@
 import { apolloProvider } from 'boot/apollo'
+import { logD } from 'src/boot/log'
 
 export const init = async (context, userSubscriptions) => {
   // if (context.state.initialized) throw new Error('subscriptions state initialized already')
   if (context.state.initialized) return
-  context.dispatch('log/debug', ['subscriptions', 'init', userSubscriptions], { root: true })
+  logD('subscriptions', 'init', userSubscriptions)
   context.commit('init', userSubscriptions)
   return userSubscriptions
 }
 
 // Подписаться на сущность. Мутация будет вызвана по приходу эвента
 export const subscribe = async (context, oid) => {
-  context.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
+  logD('subscriptions', 'subscribe', oid)
   let { data: { subscribe } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation subscribe ($oid: OID!) {
@@ -25,7 +26,7 @@ export const subscribe = async (context, oid) => {
 }
 // Отписаться от сущности. Мутация будет вызвана по приходу эвента
 export const unSubscribe = async (state, oid) => {
-  state.dispatch('log/debug', ['subscriptions', 'subscribe', oid], { root: true })
+  logD('subscriptions', 'subscribe', oid)
   let { data: { unSubscribe } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation unSubscribe ($oid: OID!) {

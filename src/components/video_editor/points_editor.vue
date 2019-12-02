@@ -84,16 +84,16 @@ export default {
     current: {
       immediate: true,
       handler (to, from) {
-        this.$log('current CHANGED', to)
+        this.$logD('current CHANGED', to)
         let now = this.fragment.relativePoints[to]
-        this.$log('now', now)
+        this.$logD('now', now)
       }
     }
   },
   methods: {
     handleScroll (e) {
       if (this.swiping) return
-      // this.$log('handleScroll', e.target.scrollLeft, this.$q.screen.width)
+      // this.$logD('handleScroll', e.target.scrollLeft, this.$q.screen.width)
       this.scrolling = true
       this.scrollLeft = e.target.scrollLeft
       if (this.scrollTimer !== null) {
@@ -102,33 +102,33 @@ export default {
       this.scrollTimer = setTimeout(() => {
         this.scrolling = false
         let k = this.scrollLeft / this.$q.screen.width
-        // this.$log('k', k)
+        // this.$logD('k', k)
         if (this.$isInteger(k)) {
-          // this.$log('IN position', k)
+          // this.$logD('IN position', k)
         } else {
-          // this.$log('NOT in position', k)
+          // this.$logD('NOT in position', k)
           this.$tween.to(this.$refs.pointsList, 0.3, {scrollLeft: this.$q.screen.width * Math.round(k)})
         }
       }, 150)
     },
     pointClick (p, pi) {
-      this.$log('pointClick', p, pi)
+      this.$logD('pointClick', p, pi)
       this.swipeUp()
       // show frames line
     },
     pointHold (p) {
-      // this.$log('pointHold', p)
+      // this.$logD('pointHold', p)
     },
     swipeDown (e) {
-      this.$log('swipeDown', e)
+      this.$logD('swipeDown', e)
       this.$tween.to(this, 0.4, {top: 0})
     },
     swipeUp (e) {
-      this.$log('swipUp', e)
+      this.$logD('swipUp', e)
       this.$tween.to(this, 0.4, {top: 200})
     },
     swipeLeft (e) {
-      this.$log('swipeLeft', e)
+      this.$logD('swipeLeft', e)
       if (this.scrolling || e.duration < 100 || this.current === this.points.length - 1) return
       if (e.duration < 100) return
       this.swiping = true
@@ -140,7 +140,7 @@ export default {
       }, 150)
     },
     swipeRight (e) {
-      this.$log('swipeRight', e)
+      this.$logD('swipeRight', e)
       if (this.scrolling || e.duration < 100 || this.current === 0) return
       this.swiping = true
       this.scrollLeft = this.$q.screen.width * (this.current - 1)
@@ -152,14 +152,14 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     await this.$wait(2000)
     // setInterval(() => {
     //   this.$refs.pointsList.scrollLeft += this.$q.screen.width
     // }, 1000)
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

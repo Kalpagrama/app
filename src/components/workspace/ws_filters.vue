@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     show () {
-      this.$log('show')
+      this.$logD('show')
       this.$tween.to(this, 0.2, {
         height: 80,
         onComplete: () => {
@@ -38,7 +38,7 @@ export default {
       })
     },
     hide () {
-      this.$log('hide')
+      this.$logD('hide')
       this.$tween.to(this, 0.2, {
         height: 0,
         onComplete: () => {
@@ -47,16 +47,16 @@ export default {
       })
     },
     toggle () {
-      this.$log('toggle')
+      this.$logD('toggle')
       if (this.opened) this.hide()
       else this.show()
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

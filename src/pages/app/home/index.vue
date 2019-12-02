@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     onScroll (e) {
-      // this.$log('onScroll', e)
+      // this.$logD('onScroll', e)
       if (e.directionChanged) {
         let b = true
         if (e.direction === 'down') b = true
@@ -82,10 +82,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -13,6 +13,8 @@ import objects from './objects'
 import user from './user'
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
+import { initSw, initWebPush } from 'src/system/service_worker'
+import i18next from 'i18next'
 
 Vue.use(Vuex)
 
@@ -37,8 +39,8 @@ async function init (context) {
         }
       }`
   })
-  // context.dispatch('log/debug', `initializationQuery complete. result= ${{ user, categories, userWorkspace, userEvents }}`, { root: true })
   // todo убрать юзера из auth
+  await context.dispatch('core/init')
   await context.dispatch('auth/init', user)
   await context.dispatch('node/init', categories)
   await context.dispatch('workspace/init', user.workspace)
@@ -46,6 +48,7 @@ async function init (context) {
   await context.dispatch('subscriptions/init', user.subscriptions)
   await context.dispatch('objects/init')
   await context.dispatch('user/init', user)
+  await i18next.changeLanguage(user.profile.lang);
 }
 
 export default function (/* { ssrContext } */) {

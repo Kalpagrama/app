@@ -24,16 +24,16 @@ export default {
   },
   methods: {
     nodeClick (n, ni) {
-      this.$log('nodeClick', n, ni)
+      this.$logD('nodeClick', n, ni)
       this.$emit('nodeClick', n)
       // this.$router.push(`/app/node/${n.oid}`)
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -48,7 +48,7 @@ export default {
   methods: {
     async emailSend () {
       try {
-        this.$log('invite emailSend start', this.email)
+        this.$logD('invite emailSend start', this.email)
         if (this.email.length === 0) throw { message: 'Не верная почта' }
         this.emailSending = true
         let { data: { inviteEmail } } = await this.$apollo.mutate({
@@ -61,21 +61,21 @@ export default {
             email: this.email
           }
         })
-        this.$log('emailSend done', inviteEmail)
+        this.$logD('emailSend done', inviteEmail)
         this.emailSending = false
         this.emailSent = true
         this.email = ''
         this.$q.notify({color: 'green', textColor: 'white', message: 'Приглашение отправлено!'})
         // this.$emit('hide')
       } catch (error) {
-        this.$log('emailSend error', error)
+        this.$logD('emailSend error', error)
         this.$q.notify(error.message || JSON.stringify(error))
         this.emailSending = false
       }
     },
     async getLink () {
       try {
-        this.$log('invite linkGet start', this.link)
+        this.$logD('invite linkGet start', this.link)
         this.linkGetting = true
         let { data: { inviteUrl } } = await this.$apollo.mutate({
         mutation: gql`
@@ -87,50 +87,50 @@ export default {
           link: this.link
         }
         })
-        this.$log('linkGet done', inviteUrl)
+        this.$logD('linkGet done', inviteUrl)
         this.linkGetting = false
         this.link = inviteUrl
         let buffered = await this.inputBuffer(inviteUrl)
-        this.$log('buffered', buffered)
+        this.$logD('buffered', buffered)
         if (buffered) {
           this.$q.notify({color: 'green', textColor: 'white', message: 'Ссылка успешно скопирована!'})
         } else {
           this.$q.notify({color: 'yellow', textColor: 'white', message: 'Скопируйте в ручную'})
         }
       } catch (error) {
-        this.$log('linkGet error', error)
+        this.$logD('linkGet error', error)
         this.$q.notify(error.message || JSON.stringify(error))
         this.linkGetting = false
       }
     },
     inputBuffer (link) {
       return new Promise((resolve, reject) => {
-        this.$log('inputBuffer')
+        this.$logD('inputBuffer')
         if (navigator && navigator.clipboard) {
-          this.$log('PASTE LINK')
+          this.$logD('PASTE LINK')
           navigator
             .clipboard
             .writeText(link)
             // .then(() => {
-            //   this.$log('PASTE GOOD')
+            //   this.$logD('PASTE GOOD')
             //   resolve(true)
             // },
             // () => {
-            //   this.$log('PASTE BAD')
+            //   this.$logD('PASTE BAD')
             //   reject(false)
             // })
         } else {
-          this.$log('CANT PASTE LINK')
+          this.$logD('CANT PASTE LINK')
           resolve(true)
         }
       })
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     handlePan (e) {
-      this.$log('handlePan', e)
+      this.$logD('handlePan', e)
       this.delta += e.delta.y
     }
   }

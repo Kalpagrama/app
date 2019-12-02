@@ -46,7 +46,7 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
 <script>
 export default {
   name: 'pageApp__subscriptions',
-  props: [ 'width', 'height' ],
+  props: ['width', 'height'],
   data () {
     return {
       sub: null,
@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     subjectClick (s) {
-      this.$log('subjectClick')
+      this.$logD('subjectClick')
       switch (s.type) {
         case 'VIDEO':
         case 'AUDIO':
@@ -99,7 +99,7 @@ export default {
       }
     },
     subDialogAction (action) {
-      this.$log('subDialogAction', action)
+      this.$logD('subDialogAction', action)
       switch (action) {
         case 'header': {
           break
@@ -116,20 +116,20 @@ export default {
       }
     },
     // subscriptionsDelete (s, si) {
-    //   this.$log('deleteActionStart', s)
+    //   this.$logD('deleteActionStart', s)
     //   if (this.subsToDelete) {
     //     setTimeout(() => this.$store.dispatch('subscriptions/unSubscribe', s.oid), 500);
     //   }
     // },
     followClick (s, si) {
-      this.$log('followClick', s)
+      this.$logD('followClick', s)
       this.follow = !this.follow
       this.subIndex = si
       // this.subsToDelete.splice(this.subsToDelete.length - this.subIndex.oid, 1);
       this.subsToDelete = this.subsToDelete.filter((sub) => sub !== s.oid)
     },
     unfollowClick (s, si) {
-      this.$log('unfollowClick', s)
+      this.$logD('unfollowClick', s)
       this.subIndex = si
       this.$refs.subDialog.show()
     },
@@ -141,21 +141,21 @@ export default {
     },
     async subDelete (s, si) {
       try {
-        this.$log('subDelete start')
+        this.$logD('subDelete start')
         let res = await this.$store.dispatch('subscriptions/unSubscribe', s.oid)
-        this.$log('res', res)
+        this.$logD('res', res)
         // this.$delete(this.userSubscriptions, ss)
-        this.$log('subDelete done')
+        this.$logD('subDelete done')
       } catch (error) {
-        this.$log('subDelete error', error)
+        this.$logD('subDelete error', error)
       }
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     this.subsToDelete.map((sub) => {
       this.subDelete({oid: sub})
     })

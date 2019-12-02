@@ -111,7 +111,7 @@ export default {
   },
   methods: {
     nodeNameClick (n, rect) {
-      this.$log('nodeNameClick', n, rect)
+      this.$logD('nodeNameClick', n, rect)
       this.nodeRect = rect
       this.nodeStyles.height = rect.height + 'px'
       this.nodeStyles.width = rect.width + 'px'
@@ -121,24 +121,24 @@ export default {
       this.$tween.to(this.nodeStyles, 0.6, {
         top: '0px',
         onComplete: () => {
-          this.$log('nodeShow DONE')
+          this.$logD('nodeShow DONE')
         }
       })
       this.$tween.to(this, 0.6, {tintOpacity: 1})
     },
     nodeHide () {
-      this.$log('nodeHide start')
+      this.$logD('nodeHide start')
       this.$tween.to(this.nodeStyles, 0.6, {
         top: (this.nodeRect.top - 50) + 'px',
         onComplete: () => {
-          this.$log('nodeHide DONE')
+          this.$logD('nodeHide DONE')
           this.nodeOid = undefined
         }
       })
       this.$tween.to(this, 0.6, {tintOpacity: 0})
     },
     swipeDown (e) {
-      this.$log('swipeDown', e)
+      this.$logD('swipeDown', e)
       this.nodeHide()
     },
     variables (sort) {
@@ -151,7 +151,7 @@ export default {
     }
   },
   created () {
-    this.$log('created')
+    this.$logD('created')
     this.coll = this.colls[0].id
   }
 }

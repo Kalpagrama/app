@@ -24,19 +24,19 @@ export default {
   },
   methods: {
     handleSearch (e) {
-      this.$log('handleSearch')
+      this.$logD('handleSearch')
       this.$router.push({query: {q: e}})
     },
     getNode (n) {
-      this.$log('getNode', n)
+      this.$logD('getNode', n)
       return {visible: true, ...n}
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

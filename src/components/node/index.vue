@@ -13,6 +13,7 @@ import nodeTemplateVert from './node_template_vert'
 import nodeTemplatePip from './node_template_pip'
 import nodeTemplateCards from './node_template_cards'
 import kMenuPopup from 'components/k_menu_popup'
+import { logD, logE } from 'src/boot/log'
 
 export default {
   components: {nodeTemplateHoriz, nodeTemplateVert, nodeTemplatePip, nodeTemplateCards, kMenuPopup},
@@ -44,14 +45,14 @@ export default {
   watch: {
     active: {
       handler (to, from) {
-        this.$log('active CHANGED', to)
+        this.$logD('active CHANGED', to)
       }
     },
     nodeFullReady: {
       immediate: true,
       handler (to, from) {
         if (to) {
-          // this.$log('nodeFullReady CHANGED')
+          // this.$logD('nodeFullReady CHANGED')
           this.nodeFull = to
           this.$emit('nodeFull', this.nodeFull)
         }
@@ -62,7 +63,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         if (to === true && !this.nodeFullReady) {
-          this.$log('needFull CHANGED', this.node.name)
+          this.$logD('needFull CHANGED', this.node.name)
           this.nodeFull = await this.nodeLoad(this.node.oid)
           this.$emit('nodeFull', this.nodeFull)
         }
@@ -71,49 +72,49 @@ export default {
   },
   methods: {
     nodeAction ([action, payload]) {
-      this.$log('nodeAction', action, payload)
+      this.$logD('nodeAction', action, payload)
       this.actionFragment = payload
       this.$refs.nodeActionDialog.show()
     },
     action (e) {
-      this.$log('action', e)
+      this.$logD('action', e)
       switch (e) {
         case 'subscribe': {
-          this.$log('SUBSCRIBE')
+          this.$logD('SUBSCRIBE')
           break
         }
         case 'contentExplore': {
-          this.$log('CONTENT EXPLORE')
+          this.$logD('CONTENT EXPLORE')
           this.$router.push(`/app/content/${this.actionFragment.content.oid}`)
           break
         }
         case 'confirm': {
-          this.$log('CONFIRM')
+          this.$logD('CONFIRM')
           this.$root.$emit('create')
           break
         }
       }
     },
     nodeBookmark () {
-      this.$log('nodeBookmark')
+      this.$logD('nodeBookmark')
     },
     nodeContent () {
-      this.$log('nodeContent')
+      this.$logD('nodeContent')
     },
     nodeFragment () {
-      this.$log('nodeFragment')
+      this.$logD('nodeFragment')
     },
     async nodeLoad (oid) {
-      this.$log('nodeLoad start', this.index, this.node.oid)
+      this.$logD('nodeLoad start', this.index, this.node.oid)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
       } catch (err){
-        // this.$log('nodeLoad error', err, this.index, this.node.oid)
-        this.$store.dispatch('log/error', ['node', 'nodeLoad error', err])
+        // this.$logD('nodeLoad error', err, this.index, this.node.oid)
+        logE('node', 'nodeLoad error', err)
         node = null
       }
-      this.$log('nodeLoad done', this.index, this.node.oid)
+      this.$logD('nodeLoad done', this.index, this.node.oid)
       return node
     }
   }

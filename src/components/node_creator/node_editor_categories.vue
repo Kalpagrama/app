@@ -56,7 +56,7 @@ export default {
     value: {
       immediate: true,
       handler (to, from) {
-        this.$log('value CHANGED', to)
+        this.$logD('value CHANGED', to)
         this.categories = to
       }
     }
@@ -72,15 +72,15 @@ export default {
   },
   methods: {
     categoryClick (ckey) {
-      this.$log('categoryClick', ckey)
+      this.$logD('categoryClick', ckey)
       // find
       let cFind = this.categories.find(cat => (cat === ckey))
-      this.$log('cFind', cFind)
+      this.$logD('cFind', cFind)
       if (cFind) {
-        this.$log('DELETE CATEGORY')
+        this.$logD('DELETE CATEGORY')
         this.categories = this.categories.filter(cat => (cat !== ckey))
       } else {
-        this.$log('ADD CATEGORY')
+        this.$logD('ADD CATEGORY')
         if (this.categories.length > 2) return
         this.$set(this.categories, this.categories.length, ckey)
       }
@@ -88,16 +88,16 @@ export default {
       this.$emit('input', this.categories)
     },
     categoryDelete (c, ckey) {
-      this.$log('categoryDelete', c, ckey)
+      this.$logD('categoryDelete', c, ckey)
       this.categories = this.categories.filter(c => (c !== ckey))
       this.$emit('input', this.categories)
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

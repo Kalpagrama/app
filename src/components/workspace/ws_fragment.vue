@@ -44,26 +44,26 @@ export default {
   methods: {
     async fragmentCreate () {
       try {
-        this.$log('fragmentCreate start')
+        this.$logD('fragmentCreate start')
         this.creating = true
         let res = await this.$store.dispatch('workspace/addWSFragment', this.fragment)
-        this.$log('fragmentCreate done', res)
+        this.$logD('fragmentCreate done', res)
         this.creating = false
         this.$emit('hide')
       } catch (e) {
-        this.$log('fragmentCreate error', e)
+        this.$logD('fragmentCreate error', e)
         this.creating = false
       }
     }
   },
   async mounted () {
-    this.$log('mounted', this.$store.state.ui.fragment)
-    this.$log('node', this.$store.state.ui.node)
+    this.$logD('mounted', this.$store.state.ui.fragment)
+    this.$logD('node', this.$store.state.ui.node)
     await this.$wait(500)
     this.fragment = JSON.parse(JSON.stringify(this.$store.state.ui.fragment))
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     this.fragment = null
     this.$store.commit('ui/stateSet', ['fragment', null])
     this.$store.commit('ui/stateSet', ['node', null])

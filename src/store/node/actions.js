@@ -1,3 +1,5 @@
+import { logD } from 'src/boot/log'
+
 const debug = require('debug')('[node]:action')
 debug.enabled = true
 
@@ -6,7 +8,7 @@ import { apolloProvider } from 'boot/apollo'
 export const init = async (context, categories) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
-  context.dispatch('log/debug', ['node', 'node store init. categories', categories], { root: true })
+  logD('node', 'node store init. categories', categories)
   context.commit('init', categories)
   return categories
 }
@@ -31,8 +33,8 @@ export const nodeUnrate = async (context, oid) => {
 
 export const nodeRate = async (context, { oid, rate }) => {
   debug('nodeRate start', oid, rate)
-  if (!oid) throw new Error(`No oid!`)
-  if (!rate) throw new Error(`No rate!`)
+  if (!oid) throw new Error('No oid!')
+  if (!rate) throw new Error('No rate!')
   let { data: { nodeRate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodeRate ($oid: OID!, $rate: Float!) {

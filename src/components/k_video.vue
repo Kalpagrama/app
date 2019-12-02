@@ -107,7 +107,7 @@ export default {
   },
   methods: {
     videoClick () {
-      this.$log('videoClick')
+      this.$logD('videoClick')
       if (this.toolsShowLocal) {
         // this.toolsShowLocal = false
       } else {
@@ -118,12 +118,12 @@ export default {
       }
     },
     videoPlayPause () {
-      this.$log('videoPlayPause')
+      this.$logD('videoPlayPause')
       if (this.playStarted) this.pause()
       else this.play()
     },
     handlePlay (e) {
-      this.$log('handlePlay', e)
+      this.$logD('handlePlay', e)
       this.playStarted = true
       this.seeking = false
     },
@@ -131,7 +131,7 @@ export default {
       this.$refs.kVideo.play()
     },
     handlePause (e) {
-      this.$log('handlePause', e)
+      this.$logD('handlePause', e)
       this.playStarted = false
     },
     pause () {
@@ -142,7 +142,7 @@ export default {
         if (this.$refs.kVideo) this.$refs.kVideo.currentTime = time
         this.seeking = true
         this.seekInterval = setInterval(() => {
-          // this.$log('seekInterval', this.seekCount)
+          // this.$logD('seekInterval', this.seekCount)
           this.seekCount++
           if (this.seek || this.seekCount > 300) {
             clearInterval(this.seekInterval)
@@ -159,35 +159,35 @@ export default {
       if (this.$refs.kVideo) this.$refs.kVideo.currentTime = time
     },
     seekStarted (e) {
-      // this.$log('seeking', e)
+      // this.$logD('seeking', e)
       this.seeking = true
       this.seek = false
     },
     seekEnded (e) {
-      // this.$log('seeked', e)
+      // this.$logD('seeked', e)
       this.seeking = false
       this.seek = true
     },
     async timelineClick (e) {
-      this.$log('timelineClick start')
+      this.$logD('timelineClick start')
       let left = e.layerX
       let w = e.target.clientWidth
       let now = this.duration * left / w
-      // this.$log('now', now)
+      // this.$logD('now', now)
       await this.go(now)
       // this.$emit('now', now)
-      this.$log('timelineClick done')
+      this.$logD('timelineClick done')
     },
     timelinePan (e) {
-      // this.$log('timelinePan', e)
+      // this.$logD('timelinePan', e)
       let left = e.position.left - 30
       let w = this.$q.screen.width - 60
       let now = this.duration * left / w
-      // this.$log('now', now)
+      // this.$logD('now', now)
       this.goSync(now)
     },
     playBack () {
-      this.$log('playBack')
+      this.$logD('playBack')
       // this.$refs.kvideo.playBackwards = function () {
       //   this.pause()
       //   var video = this
@@ -203,30 +203,30 @@ export default {
       // }
     },
     videoLoaded (e) {
-      this.$log('videoLoaded')
+      this.$logD('videoLoaded')
       this.$emit('duration', this.$refs.kVideo.duration)
     },
     async getScreenshot (sec) {
-      this.$log('getScreenshot start', sec)
+      this.$logD('getScreenshot start', sec)
       this.pause()
       await this.go(sec)
       let canvas = document.createElement('canvas')
       canvas.width = this.fragment.content.width
       canvas.height = this.fragment.content.height
-      this.$log('canvas', canvas)
+      this.$logD('canvas', canvas)
       let ctx = canvas.getContext('2d')
       ctx.drawImage(this.$refs.kVideo, 0, 0, canvas.width, canvas.height)
       let screenshot = canvas.toDataURL('image/jpeg', 0.5)
       await this.$wait(500)
-      this.$log('getScreenshot done')
+      this.$logD('getScreenshot done')
       return screenshot
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     clearInterval(this.seekInterval)
   }
 }
