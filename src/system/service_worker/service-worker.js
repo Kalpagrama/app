@@ -4,11 +4,23 @@
  * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
  */
 
+importScripts('https://browser.sentry-cdn.com/5.9.1/bundle.min.js')
+Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
+function logFunc(...msg){
+  console.log('sw_message:', ...msg)
+  Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+}
+function errFunc(...msg){
+  console.error(...msg)
+  Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+}
+
+const swVer = 28
+logFunc('SW_VER=', swVer)
+
 /* global workbox */
 workbox.core.setCacheNameDetails({ prefix: 'app' })
-
 workbox.core.skipWaiting()
-
 workbox.core.clientsClaim()
 
 /**
@@ -20,14 +32,14 @@ self.__precacheManifest = [].concat(self.__precacheManifest || [])
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
 
 self.addEventListener('message', function handler (event) {
-  console.log('V1 message!', event)
+  logFunc('V1 message!', event)
   var promise = self.clients.matchAll()
     .then(function (clientList) {
-      console.log('V1 message! clientList', clientList)
+      logFunc('V1 message! clientList', clientList)
       var senderID = event.source.id
 
       clientList.forEach(function (client) {
-        console.log('V1 message! postMessage', client)
+        logFunc('V1 message! postMessage', client)
         client.postMessage({
           client: senderID,
           message: event.data,
@@ -39,30 +51,26 @@ self.addEventListener('message', function handler (event) {
     event.waitUntil(promise)
   }
 })
-
 self.addEventListener('install', event => {
-  console.log('V1 now ready to install!')
+  logFunc('V1 now ready to install!', swVer)
 })
-
 self.addEventListener('activate', event => {
-  console.log('V1 now ready to handle activate!')
+  logFunc('V1 now ready to handle activate!', swVer)
 })
-
 self.addEventListener('fetch', event => {
-  console.log('V1 now ready to handle fetches!')
+  logFunc('V1 now ready to handle fetches!', swVer)
 })
-
 self.addEventListener('updatefound', event => {
-  console.log('updatefound!')
+  logFunc('V1 now ready to update!', swVer)
 })
-
+self.addEventListener('error', function(e) {
+  errFunc(e.filename, e.lineno, e.colno, e.message)
+});
 // ----------------------- settings for Web-push------------------------------
 
 /* global importScripts */
 importScripts('https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js')
 importScripts('https://www.gstatic.com/firebasejs/7.5.0/firebase-messaging.js')
-
-console.log('SW VER', 22)
 
 /* global firebase */
 firebase.initializeApp({
@@ -80,7 +88,8 @@ let i = 0
 if (firebase.messaging.isSupported()) {
   const messaging = firebase.messaging()
   messaging.setBackgroundMessageHandler(function (payload) {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload)
+    logFunc('[firebase-messaging-sw.js] Received background message ', payload)
+
     // Customize notification here
     const notificationTitle = `#${++i} ${payload.data.type} event received!`
     const notificationOptions = {
@@ -111,7 +120,7 @@ if (firebase.messaging.isSupported()) {
 self.addEventListener('notificationclick', function (event) {
   event.notification.close()
   if (event.action === 'test') {
-    console.log('test action was clicked')
+    logFunc('test action was clicked')
     self.clients.openWindow('/app/trends/SCIENCE?sort=HOT')
   } else {
     // Main body of notification was clicked

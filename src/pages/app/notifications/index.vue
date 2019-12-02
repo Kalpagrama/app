@@ -60,10 +60,10 @@ export default {
       if (e.type === 'WS_ITEM_DELETED') return 'in workspace deleted'
     },
     editToggle () {
-      this.$log('editToggle')
+      this.$logD('editToggle')
     },
     subjectClick (s) {
-      this.$log('subjectClick')
+      this.$logD('subjectClick')
       switch (s.type) {
         case 'VIDEO':
         case 'AUDIO':
@@ -87,7 +87,7 @@ export default {
       }
     },
     objectClick (o) {
-      this.$log('objectClick')
+      this.$logD('objectClick')
       switch (o.type) {
         case 'VIDEO':
         case 'AUDIO':
@@ -112,10 +112,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

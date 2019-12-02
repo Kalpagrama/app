@@ -44,24 +44,24 @@ export default {
     value: {
       immediate: true,
       handler (to, from) {
-        this.$log('value CHANGED', to)
+        this.$logD('value CHANGED', to)
         this.meta = to
       }
     }
   },
   methods: {
     layoutClick (l, li) {
-      this.$log('layoutClick', l, li)
+      this.$logD('layoutClick', l, li)
       // this.meta.layout = l.type
       this.$emit('input', this.meta)
       this.$refs.metaDialog.hide()
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

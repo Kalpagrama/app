@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     pageClick (p, pkey) {
-      this.$log('pageClick', p, pkey)
+      this.$logD('pageClick', p, pkey)
       this.page = pkey
     }
   }

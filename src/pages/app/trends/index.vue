@@ -52,10 +52,10 @@ export default {
     }
   },
   watch: {
-    '$route': {
+    $route: {
       immediate: true,
       handler (to, from) {
-        this.$log('$route CHANGED', to.params.category, to.query.sort)
+        this.$logD('$route CHANGED', to.params.category, to.query.sort)
         if (to.params.category) {
           if (to.query.sort) {
             this.coll = to.query.sort
@@ -115,7 +115,7 @@ export default {
   },
   methods: {
     collChanged (coll) {
-      this.$log('collChanged', coll)
+      this.$logD('collChanged', coll)
       this.$router.push({query: {sort: coll}})
     },
     variables (sort) {

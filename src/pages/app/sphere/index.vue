@@ -28,13 +28,13 @@ export default {
     }
   },
   watch: {
-    '$route': {
+    $route: {
       deep: true,
       immediate: true,
       async handler (to, from) {
         this.page = 'sphere'
         if (to.params.oid) {
-          this.$log('$route CHANGED', to)
+          this.$logD('$route CHANGED', to)
           this.sphere = await this.sphereLoad(to.params.oid)
         } else {
           this.$router.push(`/app/sphere/${this.$store.state.auth.user.oid}`)
@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     async sphereLoad (oid) {
-      this.$log('sphereLoad start', oid)
+      this.$logD('sphereLoad start', oid)
       let sphere = await this.$store.dispatch('objects/get', { oid, fragmentName: 'sphereFragment', priority: 0 })
       // let { data: { objectList: [sphere] } } = await this.$apollo.query({
       //   query: gql`
@@ -56,15 +56,15 @@ export default {
       //     oid: oid
       //   }
       // })
-      this.$log('sphereLoad done', sphere)
+      this.$logD('sphereLoad done', sphere)
       return sphere
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

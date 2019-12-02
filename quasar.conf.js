@@ -6,6 +6,7 @@ module.exports = function (ctx) {
   return {
     preFetch: true,
     boot: [
+      'log',
       'sw',
       'apollo',
       'i18n',

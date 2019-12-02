@@ -85,29 +85,29 @@ export default {
   },
   methods: {
     itemAction (e) {
-      this.$log('itemAction', e)
+      this.$logD('itemAction', e)
       switch (e) {
         case 'delete': {
-          this.$log('delete')
+          this.$logD('delete')
           break
         }
         case 'confirm': {
-          this.$log('confirm')
+          this.$logD('confirm')
           break
         }
       }
     },
     itemClick (i, ii) {
-      this.$log('itemClick', i)
+      this.$logD('itemClick', i)
       this.item = i
       this.$refs.itemDialog.show()
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

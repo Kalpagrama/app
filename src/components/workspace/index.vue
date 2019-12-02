@@ -122,7 +122,7 @@ export default {
     }
   },
   watch: {
-    '$route': {
+    $route: {
       immediate: true,
       handler (to, from) {
         if (to.params.page) this.$set(this, 'page', to.params.page)
@@ -137,7 +137,7 @@ export default {
       this.$router.push({params: {page: coll}})
     },
     wsAddDialogAction (action) {
-      this.$log('wsAddDialogAction', action)
+      this.$logD('wsAddDialogAction', action)
       switch (action) {
         case 'addBookmark': {
           this.$store.commit('ui/stateSet', ['bookmarkDialogOpened', true])
@@ -156,7 +156,7 @@ export default {
       }
     },
     async pageClick (m, mkey) {
-      this.$log('pageClick', m, mkey)
+      this.$logD('pageClick', m, mkey)
       this.$router.push({params: {page: mkey}})
     }
   }

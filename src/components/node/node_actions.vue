@@ -105,16 +105,16 @@ export default {
   },
   methods: {
     rateStatsClick () {
-      this.$log('rateStatsClick')
+      this.$logD('rateStatsClick')
       this.$refs.rateStatsDialog.show()
     },
     rateClick (r, ri) {
-      this.$log('rateClick', r, ri)
+      this.$logD('rateClick', r, ri)
       this.$set(this, 'rate', ri)
       this.nodeBluring = false
     },
     async nodeBlurPan (e) {
-      // this.$log('nodeBlurPan', e)
+      // this.$logD('nodeBlurPan', e)
       this.panPositionLeft = e.position.left
       let i = this.panPositionLeft / (this.ratesWidth / 5)
       this.$set(this, 'rate', Math.round(i))
@@ -124,13 +124,13 @@ export default {
       }
     },
     async nodeBlurHold (e) {
-      this.$log('nodeBlurHold', e)
+      this.$logD('nodeBlurHold', e)
       this.nodeBluring = true
       // await this.$wait(3000)
       // this.nodeBluring = false
     },
     async nodeBlurClick () {
-      this.$log('nodeBlurClick')
+      this.$logD('nodeBlurClick')
       this.nodeBluring = true
       // await this.$wait(3000)
       // this.nodeBluring = false
@@ -139,7 +139,7 @@ export default {
       // this.$store.commit('ui/stateSet', ['nodeRateDialogOpened', true])
     },
     nodeShare () {
-      this.$log('nodeShare')
+      this.$logD('nodeShare')
       // this.$store.commit('ui/stateSet', ['nodeShareDialogOpened', true])
     }
   }

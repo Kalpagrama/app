@@ -1,25 +1,34 @@
 // Внимание! firebase подключается через CDN  в src/system/service_worker/service-worker.js
 import * as firebase from 'firebase/app'
 import '@firebase/messaging'
+import { logD, logW } from 'src/boot/log'
 
 let registration = null // ServiceWorkerRegistration
 let messaging = null
 
 async function initSw (store) {
-  console.log('initSw')
+  logD('initSw')
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
-    console.log('beforeinstallprompt')
-    e.preventDefault()
+    logD('beforeinstallprompt')
+    // e.preventDefault()
     store.commit('core/stateSet', ['installPrompt', e])
+  })
+  window.addEventListener('appinstalled', (e) => {
+    // Prevent the mini-info bar from appearing.
+    logD('appinstalled')
+    // e.preventDefault()
+    store.commit('core/stateSet', ['installPrompt', null])
   })
   if ('serviceWorker' in navigator && !registration) {
     registration = await navigator.serviceWorker.register('/service-worker.js')
-    registration.onupdatefound = async () => {
-      console.warn('New version is available!!!')
+    registration.addEventListener('updatefound', function() {
+      // If updatefound is fired, it means that there's
+      // a new service worker being installed.
+      // let installingWorker = registration.installing;
+      // logW('V1 initSw onupdatefound2:', installingWorker)
       store.commit('core/stateSet', ['newVersionAvailable', true])
-      // location.reload()
-    }
+    })
     await initWebPush(store)
   }
 }
@@ -31,7 +40,7 @@ async function initWebPush (store) {
   } else { // FCM
     const hasPerm = await askForNPerm()
     if (!hasPerm) {
-      console.log('Notification permission denied!')
+      logD('Notification permission denied!')
       return
     }
     if (firebase.messaging.isSupported() && registration && !messaging) {
@@ -49,14 +58,14 @@ async function initWebPush (store) {
       messaging.useServiceWorker(registration)
       // - a message is received while the app has focus
       messaging.onMessage((payload) => {
-        console.log('Message received . ', payload)
+        logD('Message received . ', payload)
         // ...
       })
 
       let token = await messaging.getToken()
       store.commit('core/stateSet', ['webPushTokenDraft', token])
 
-      console.log(token)
+      logD(token)
       showNotification('initWebPush ok', 'body')
       // todo send to server
       messaging.onTokenRefresh(async () => {
@@ -69,9 +78,9 @@ async function initWebPush (store) {
 }
 
 async function checkUpdate () {
-  console.log('checkUpdate1')
+  logD('checkUpdate1')
   if (registration) {
-    console.log('checkUpdate2')
+    logD('checkUpdate2')
     await registration.update()
   }
 }
@@ -79,15 +88,15 @@ async function checkUpdate () {
 async function askForNPerm () {
   return new Promise((resolve, reject) => {
     if (!('Notification' in window)) {
-      console.log('This browser does not support desktop notification')
+      logD('This browser does not support desktop notification')
       return resolve(false)
     }
     if (Notification.permission === 'granted') return resolve(true)
 
     Notification.requestPermission(function (result) {
-      console.log('User choice', result)
+      logD('User choice', result)
       if (result !== 'granted') {
-        console.log('No notification permission granted!')
+        logD('No notification permission granted!')
         return resolve(false)
       } else {
         return resolve(true)
@@ -125,7 +134,7 @@ async function showNotification (title, body) {
     tag: 'tag: sample'
   }
   let notification = new Notification('direct:' + title, options)
-  console.log('notification=', notification)
+  logD('notification=', notification)
 
   if (registration) {
     // todo

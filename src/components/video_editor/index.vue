@@ -68,65 +68,65 @@ export default {
   watch: {
     fragment: {
       handler (to, from) {
-        this.$log('fragment CHANGED', to)
+        this.$logD('fragment CHANGED', to)
       }
     }
   },
   methods: {
     videoEditorAction (e) {
-      this.$log('videoEditorAction', e)
+      this.$logD('videoEditorAction', e)
       switch (e) {
         case 'similar': {
-          this.$log('SIMILAR')
+          this.$logD('SIMILAR')
           break
         }
         case 'deleteAllCuts': {
-          this.$log('DELETEALLCUTS')
+          this.$logD('DELETEALLCUTS')
           break
         }
         case 'confirm': {
-          this.$log('CONFIRM')
+          this.$logD('CONFIRM')
           this.confirm()
           break
         }
       }
     },
     async confirm () {
-      this.$log('confirm start', this.$refs.kvideo)
+      this.$logD('confirm start', this.$refs.kvideo)
       this.$refs.kvideo.pause()
       // validate fragment total length
       let total = this.fragment.relativeCuts.reduce((acc, val) => {
         acc += val.end - val.start
         return acc
       }, 0)
-      this.$log('total', total)
+      this.$logD('total', total)
       for (let i = 0; i < this.fragment.relativeCuts.length; i++) {
         let cut = this.fragment.relativeCuts[i]
         let thumb = await this.$refs.kvideo.getScreenshot(cut.start)
         if (i === 0) this.fragment.thumbUrl = thumb
         cut.thumbUrl = thumb
       }
-      this.$log('confirm done')
+      this.$logD('confirm done')
       this.$emit('fragment', this.fragment)
     },
     async cancel () {
-      this.$log('cancel start')
+      this.$logD('cancel start')
       this.$emit('fragment', this.value)
       this.fragment = null
-      this.$log('cancel done')
+      this.$logD('cancel done')
     },
     onResize (e) {
-      this.$log('onResize', e)
+      this.$logD('onResize', e)
       this.$set(this, 'width', e.width)
       this.$set(this, 'height', e.height)
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     this.$set(this, 'fragment', JSON.parse(JSON.stringify(this.value)))
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

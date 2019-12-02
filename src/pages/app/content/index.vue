@@ -24,11 +24,11 @@ export default {
     }
   },
   watch: {
-    '$route': {
+    $route: {
       immediate: true,
       async handler (to, from) {
         if (to.params.oid) {
-          this.$log('$route CHANGED', to.params.oid)
+          this.$logD('$route CHANGED', to.params.oid)
           this.content = await this.contentLoad(to.params.oid)
         }
       }
@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     async contentLoad (oid) {
-      this.$log('contentLoad start', oid)
+      this.$logD('contentLoad start', oid)
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
       // let {data: {objectList: [content]}} = await this.$apollo.query({
       //   query: gql`
@@ -59,15 +59,15 @@ export default {
       //     oid: oid
       //   }
       // })
-      this.$log('contentLoad done', content)
+      this.$logD('contentLoad done', content)
       return content
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -75,23 +75,23 @@ export default {
   },
   methods: {
     close () {
-      this.$log('close')
+      this.$logD('close')
       // are u really wanna quit u will lost some info...
       this.$emit('close')
     },
     uploading (val) {
-      this.$log('uploading')
+      this.$logD('uploading')
       this.disableSourcesSwitch = val
     },
     async uploaded (oid) {
-      this.$log('uploaded start', oid)
+      this.$logD('uploaded start', oid)
       let content = await this.contentGet(oid)
-      // this.$log('content', content)
+      // this.$logD('content', content)
       this.$emit('content', content)
-      this.$log('uploaded done')
+      this.$logD('uploaded done')
     },
     async contentGet (oid) {
-      this.$log('contentGet start', oid)
+      this.$logD('contentGet start', oid)
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
       // let {data: {objectList: [content]}} = await this.$apollo.query({
       //   query: gql`
@@ -120,7 +120,7 @@ export default {
       //     oid: oid
       //   }
       // })
-      this.$log('contentGet done', content)
+      this.$logD('contentGet done', content)
       return content
     },
     showError (msg) {
@@ -128,7 +128,7 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     // todo use Vuex
     // const observer = this.$apollo.subscribe({
     //   client: 'wsApollo',
@@ -143,21 +143,21 @@ export default {
     // })
     // observer.subscribe({
     //   next: ({data: {progress}}) => {
-    //     this.$log('progress', progress)
+    //     this.$logD('progress', progress)
     //     this.$set(this, 'progress', progress)
     //   },
     //   error: (error) => {
-    //     this.$log('progress error', error)
+    //     this.$logD('progress error', error)
     //   }
     // })
     let bookmarkContent = this.$store.state.workspace.bookmarkContent
-    this.$log('bookmarkContent', bookmarkContent)
+    this.$logD('bookmarkContent', bookmarkContent)
     if (bookmarkContent) {
       // this.source = 'url'
     }
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     this.observer = null
   }
 }

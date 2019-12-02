@@ -18,7 +18,7 @@
  export default {
   name: 'pageLogin__index',
   mounted () {
-   this.$log('mounted')
+   this.$logD('mounted')
   //  localStorage.removeItem('ktoken')
    localStorage.removeItem('ktokenExpires')
    localStorage.removeItem('ktokenInviteCode')
@@ -26,7 +26,7 @@
    if (inviteCode) localStorage.setItem('ktokenInviteCode', inviteCode)
   },
   beforeDestroy () {
-   this.$log('beforeDestroy')
+   this.$logD('beforeDestroy')
   }
  }
 </script>

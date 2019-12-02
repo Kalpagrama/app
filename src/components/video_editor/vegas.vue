@@ -124,7 +124,7 @@ export default {
       }
     },
     frameWidth () {
-      this.$log('framesWidth')
+      this.$logD('framesWidth')
       // video.height - 50
       // video.width - x
       if (this.mode === 'maxi') {
@@ -149,7 +149,7 @@ export default {
     mode: {
       immediate: true,
       async handler (to, from) {
-        this.$log('mode CHANGED', to)
+        this.$logD('mode CHANGED', to)
         switch (to) {
           case 'maxi': {
             this.$tween.to(this, 0.3, {cutHeight: this.cutHeightMax})
@@ -167,7 +167,7 @@ export default {
             this.$tween.to(this.$refs.kframes, 0.3, {
               scrollLeft: (this.width / 2) - 10,
               onComplete: () => {
-                this.$log('completed!!!')
+                this.$logD('completed!!!')
                 // this.cutsOverflowX = 'hidden'
               }
             })
@@ -180,11 +180,11 @@ export default {
     cut: {
       immediate: true,
       handler (to, from) {
-        this.$log('cut CHANGED', to)
+        this.$logD('cut CHANGED', to)
         // emit cut to be highlighten
         this.$emit('cut', this.cuts[to])
         // toggle cuts overflowY and may be X, and if it long?
-        this.$log('null>=0', undefined >= 0)
+        this.$logD('null>=0', undefined >= 0)
         if (to >= 0) {
           this.cutsOverflowX = 'hidden'
           this.cutsOverflowY = 'hidden'
@@ -197,7 +197,7 @@ export default {
     cuts: {
       deep: true,
       handler (to, from) {
-        this.$log('cuts CHANGED', to)
+        this.$logD('cuts CHANGED', to)
       }
     }
   },
@@ -205,13 +205,13 @@ export default {
     // mode
     modeToggle () {
       // TODO: return promise 300ms?
-      this.$log('modeToggle')
+      this.$logD('modeToggle')
       if (this.mode === 'mini') this.mode = 'maxi'
       else this.mode = 'mini'
     },
     // cut
     cutConfirm () {
-      this.$log('cutConfirm')
+      this.$logD('cutConfirm')
       // TODO: save or change?
       this.cut = undefined
       // scroll to the top? and if there are a lot of points there?
@@ -219,14 +219,14 @@ export default {
       this.mode = 'mini'
     },
     cutDragBody (e) {
-      this.$log('cutDragBody', e)
+      this.$logD('cutDragBody', e)
       if (this.cut >= 0) {
         this.cutDragEnd(e)
         this.cutDragStart(e)
       }
     },
     cutDragStart (e) {
-      // this.$log('cutDragStart', e.position.left)
+      // this.$logD('cutDragStart', e.position.left)
       let cut = this.fragment.relativeCuts[this.cut]
       let to = cut.start + (e.delta.x / this.k)
       if (to > 0 && to < cut.end) {
@@ -235,13 +235,13 @@ export default {
         this.video.goSync(to)
         // scroll left helper
         // if (e.position.left < 50 || e.position.left > this.width - 50) {
-        //   this.$log('MOVING SCROLL')
+        //   this.$logD('MOVING SCROLL')
         //   this.$refs.kframes.scrollLeft += e.delta.x * 2
         // }
       }
     },
     cutDragEnd (e) {
-      // this.$log('cutDragEnd')
+      // this.$logD('cutDragEnd')
       let cut = this.fragment.relativeCuts[this.cut]
       let to = cut.end + (e.delta.x / this.k)
       if (to < this.duration && to > cut.start) {
@@ -250,13 +250,13 @@ export default {
         this.video.goSync(to)
         // scroll left helper
         // if (e.position.left < 50 || e.position.left > this.width - 50) {
-        //   this.$log('MOVING SCROLL')
+        //   this.$logD('MOVING SCROLL')
         //   this.$refs.kframes.scrollLeft += e.delta.x * 2
         // }
       }
     },
     async cutClick (c, ci) {
-      this.$log('cutClick', c, ci)
+      this.$logD('cutClick', c, ci)
       // if got active cut
       if (this.cut === ci) {
         await this.video.go(c.start)
@@ -281,7 +281,7 @@ export default {
       }
     },
     cutAdd (s, e) {
-      this.$log('cutAdd', s, e)
+      this.$logD('cutAdd', s, e)
       // start/end
       let start = s || this.$random(0, this.duration - 2)
       // let end = e || this.$random(start + 1, this.duration)
@@ -292,17 +292,17 @@ export default {
       this.cutClick(this.fragment.relativeCuts[this.fragment.relativeCuts.length - 1], this.fragment.relativeCuts.length - 1)
     },
     cutDelete (ci) {
-      this.$log('cutDelete', ci)
+      this.$logD('cutDelete', ci)
       if (this.cut === ci) this.cut = undefined
       // TODO: confirm cut deletion
       this.$delete(this.fragment.relativeCuts, ci)
     },
     async cutToScrollTo (ci) {
       return new Promise(async (resolve, reject) => {
-        this.$log('cutToScrollTo', ci)
+        this.$logD('cutToScrollTo', ci)
         let scrollTop = this.cutHeight * ci
         let scrollLeft = (this.fragment.relativeCuts[this.cut].start * this.k) + (this.width / 2) - 30
-        this.$log('cutToScrollTo scrollTop/scrollLeft', scrollTop, scrollLeft)
+        this.$logD('cutToScrollTo scrollTop/scrollLeft', scrollTop, scrollLeft)
         this.$tween.to(this.$refs.kcuts, 0.3, {scrollTop, scrollLeft})
         await this.$wait(300)
         resolve()
@@ -310,7 +310,7 @@ export default {
     },
     // cuts
     cutsScrolled (e) {
-      this.$log('cutsScrolled', e.target.scrollLeft)
+      this.$logD('cutsScrolled', e.target.scrollLeft)
       // set cuts scrollLeft
       this.cutsScrollLeft = e.target.scrollLeft
       // connect with frames scroll position
@@ -318,15 +318,15 @@ export default {
     },
     // frames
     frameClick (e) {
-      this.$log('frameClick')
+      this.$logD('frameClick')
     },
     frameRendered () {
-      // this.$log('frameRendered', this.framesRendered)
+      // this.$logD('frameRendered', this.framesRendered)
       this.framesRendered++
       // if (this.$refs.kframes) this.$refs.kframes.scrollLeft = (this.width / 2) - 10
       if (this.framesRendered === this.framesCount) {
         this.framesRenderedAll = true
-        this.$log('frames rendered!')
+        this.$logD('frames rendered!')
         // set framesScrollWidth
         // this.framesScrollWidth = this.$refs.kframes.scrollWidth - this.width
         // frames to the left once frames rendered all, if there less than width
@@ -338,14 +338,14 @@ export default {
       }
     },
     framesScrolled (e) {
-      this.$log('framesScrolled', e.target.scrollLeft)
+      this.$logD('framesScrolled', e.target.scrollLeft)
       // save frames scroll position
       this.framesScrollLeft = e.target.scrollLeft
       // connect with rows scroll position
       this.$refs.kcuts.scrollLeft = e.target.scrollLeft
     },
     async framesLoad (oid) {
-      this.$log('framesLoad start')
+      this.$logD('framesLoad start')
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
       // let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
       //   query: gql`
@@ -361,12 +361,12 @@ export default {
       //     oid: oid
       //   }
       // })
-      this.$log('framesLoad done')
+      this.$logD('framesLoad done')
       return content.frameUrls
     }
   },
   async mounted () {
-    this.$log('mounted', this.fragment)
+    this.$logD('mounted', this.fragment)
     // get frames, and then wait for there all are rendered
     this.$set(this, 'frames', await this.framesLoad(this.fragment.content.oid))
     // await this.$wait(1000)
@@ -375,7 +375,7 @@ export default {
     // this.mode = 'mini'
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     // TODO: disable some watchers?
   }
 }

@@ -32,10 +32,10 @@ export default {
   },
   methods: {
     searchStart () {
-      this.$log('searchStart')
+      this.$logD('searchStart')
     },
     async categoryClick (c, ckey, ci) {
-      this.$log('categoryClick', c, ckey, ci)
+      this.$logD('categoryClick', c, ckey, ci)
       this.$router.push({params: {category: ckey}})
       await this.$wait(250)
       this.$emit('hide')

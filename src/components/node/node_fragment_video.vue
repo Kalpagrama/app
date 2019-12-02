@@ -68,7 +68,7 @@ export default {
   watch: {
     active: {
       handler (to, from) {
-        this.$log('active CHANGED', to)
+        this.$logD('active CHANGED', to)
         if (to) this.$refs.kvideo.play()
         else this.$refs.kvideo.pause()
       }
@@ -85,7 +85,7 @@ export default {
   },
   methods: {
     videoClick () {
-      this.$log('videoClick')
+      this.$logD('videoClick')
       // TODO: save mute state where? or do in in props? or in nodes? vuex
       if (this.playing) {
         if (this.muted) {
@@ -101,42 +101,42 @@ export default {
       }
     },
     videoTimelineClick (e) {
-      // this.$log('e', e)
+      // this.$logD('e', e)
       // let x = e.offsetX
       // let w = e.path[0].clientWidth
       // this.$q.notify(`${x.toString()}/${w.toString()} !!!`)
       // TODO: click on mobile devices
       if (e && e.path && e.path[0] && e.path[0].clientWidth && e.offsetX) {
-        this.$log('videoTimelineClick', e.offsetX, e.path[0].clientWidth)
+        this.$logD('videoTimelineClick', e.offsetX, e.path[0].clientWidth)
         let k = e.offsetX / e.path[0].clientWidth
         this.$refs.kvideo.currentTime = this.duration * k
       }
     },
     videoPlaying () {
-      this.$log('videoPlaying')
+      this.$logD('videoPlaying')
       this.playing = true
       // if (this.$refs.kvideo) this.duration = this.$refs.kvideo.duration
     },
     videoTimeupdate () {
-      // this.$log('videoTimeupdate')
+      // this.$logD('videoTimeupdate')
       if (this.$refs.kvideo) this.now = this.$refs.kvideo.currentTime
       // TODO: loop again bitch...
     },
     videoLoaded (e) {
-      // this.$log('videoLoaded', e)
+      // this.$logD('videoLoaded', e)
       let duration = e.target.duration
-      // this.$log('duration', duration)
+      // this.$logD('duration', duration)
       this.$set(this, 'duration', duration)
       this.$emit('duration', duration)
     },
     videoToggleFullscreen () {
-      this.$log('videoToggleFullscreen')
+      this.$logD('videoToggleFullscreen')
       // TODO: toggle fullscreen request
       // this.playsinline = !this.playsinline
       // this.$refs.kvideo.requestFullScreen()
     },
     videoToggleMute () {
-      this.$log('videoToggleMute')
+      this.$logD('videoToggleMute')
       this.mutedLocal = !this.mutedLocal
     }
   },

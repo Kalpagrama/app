@@ -104,7 +104,7 @@ export default {
         name: this.name,
         author: this.$store.state.auth.user,
         fragments: fragments.map(f => {
-          // this.$log('f', f)
+          // this.$logD('f', f)
           return {
             uid: f.uid,
             oid: f.content.oid,
@@ -144,23 +144,23 @@ export default {
     node: {
       deep: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
+        this.$logD('node CHANGED', to)
         localStorage.setItem('draft', JSON.stringify(to))
       }
     }
   },
   methods: {
     nodeCreatorAction (action) {
-      this.$log('nodeCreatorAction', action)
+      this.$logD('nodeCreatorAction', action)
       switch (action) {
         case 'mydrafts': {
-          this.$log('DRAFTS')
+          this.$logD('DRAFTS')
           break
         }
       }
     },
     async tabChanged (tab) {
-      // this.$log('tabChanged', tab)
+      // this.$logD('tabChanged', tab)
       this.tabLocal = undefined
       await this.$wait(300)
       this.tabLocal = tab
@@ -177,7 +177,7 @@ export default {
     },
     async publish () {
       try {
-        this.$log('nodePublish start', this.node)
+        this.$logD('nodePublish start', this.node)
         this.publishing = true
         // await this.$wait(3000)
         // create mutation
@@ -188,34 +188,34 @@ export default {
         // delete ws draft
         if (this.draft) {
           // let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
-          // this.$log('deleteWSDraft', deleteWSDraft)
+          // this.$logD('deleteWSDraft', deleteWSDraft)
         }
         // remove draftLocal
         localStorage.removeItem('draft')
         // remove draftStorage
         this.$store.commit('workspace/stateSet', ['draft', null])
         // done
-        this.$log('nodePublish done', node)
+        this.$logD('nodePublish done', node)
         this.publishing = false
         // go to home
-        this.$router.push(`/app/home`)
+        this.$router.push('/app/home')
       } catch (error) {
-        this.$log('nodePublis error', error)
+        this.$logD('nodePublis error', error)
         this.publishing = false
         this.$q.notify({message: 'Node publish error!', color: 'red', textColor: 'white'})
       }
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     // draft
     let draftLocal = this.$store.state.workspace.draft
     let draftStorage = this.$q.localStorage.getItem('draft')
-    // this.$log('draftLocal', draftLocal)
-    // this.$log('draftStorage', draftStorage)
+    // this.$logD('draftLocal', draftLocal)
+    // this.$logD('draftStorage', draftStorage)
     if (draftLocal) {
       if (draftStorage !== null && draftStorage !== 'null' && draftStorage !== 'undefined' && draftStorage !== undefined) {
-        this.$log('DRAFTS: local, storage')
+        this.$logD('DRAFTS: local, storage')
         // save old draft
         let d = JSON.parse(draftStorage)
         if (d.uid) await this.$store.dispatch('workspace/updateWSDraft', d)
@@ -225,7 +225,7 @@ export default {
         // remove draft local
         this.$store.commit('workspace/stateSet', ['draft', null])
       } else {
-        this.$log('DRAFTS: local')
+        this.$logD('DRAFTS: local')
         // use draft
         this.useDraft(draftLocal)
         // remove draft local
@@ -233,17 +233,17 @@ export default {
       }
     } else {
       if (draftStorage !== null && draftStorage !== 'null' && draftStorage !== 'undefined' && draftStorage !== undefined) {
-        this.$log('DRAFTS: storage')
+        this.$logD('DRAFTS: storage')
         // use draft
         this.useDraft(JSON.parse(draftStorage))
       } else {
-        this.$log('DRAFTS: none')
+        this.$logD('DRAFTS: none')
         // do nothing
       }
     }
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

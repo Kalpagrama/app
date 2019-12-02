@@ -62,7 +62,7 @@ export default {
     '$q.screen.gt.xs': {
       immediate: true,
       handler (to, from) {
-        this.$log('gt.sm CHANGED', to)
+        this.$logD('gt.sm CHANGED', to)
         if (to) {
           this.$store.commit('ui/stateSet', ['gtxs', true])
         } else {
@@ -102,8 +102,8 @@ export default {
   },
   methods: {
     fragmentActionDialogAction (action) {
-      this.$log('fragmentDialogAction', action)
-      this.$log('fragmentDialogPayload', this.$store.state.ui.fragment)
+      this.$logD('fragmentDialogAction', action)
+      this.$logD('fragmentDialogPayload', this.$store.state.ui.fragment)
       switch (action) {
         case 'header': {
           this.$router.push(`/app/content/${this.$store.state.ui.fragment.content.oid}`)
@@ -141,18 +141,18 @@ export default {
       this.miniState = !this.miniState
     },
     onResize (e) {
-      // this.$log('onResize', e)
+      // this.$logD('onResize', e)
       this.width = e.width
       this.height = this.$q.screen.height
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     this.$refs.pageResizeObserver.trigger()
   },
   async created () {
     try {
-      // this.$log('created')
+      // this.$logD('created')
       // console.time('created')
       // this.$q.notify('Created start')
       this.loading = true
@@ -167,7 +167,7 @@ export default {
       }
       // this.$q.notify('token', token)
       // user check
-      // this.$log('Checking user...')
+      // this.$logD('Checking user...')
       let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
         client: 'authApollo',
         query: gql`
@@ -178,13 +178,13 @@ export default {
         `,
         fetchPolicy: 'network-only'
       })
-      // this.$log('userIsAuthorized', userIsAuthorized)
-      // this.$log('userIsConfirmed', userIsConfirmed)
+      // this.$logD('userIsAuthorized', userIsAuthorized)
+      // this.$logD('userIsConfirmed', userIsConfirmed)
       // this.$q.notify('userIsAuthorized', userIsAuthorized)
       // this.$q.notify('userIsConfirmed', userIsConfirmed)
       // TODO: create with try/catch this...
       if (!userIsAuthorized || !userIsConfirmed) {
-        this.$log('GO LOGIN')
+        this.$logD('GO LOGIN')
         this.$router.push('/login')
         this.$q.notify('Go login')
         return
@@ -195,7 +195,7 @@ export default {
 
       this.loading = false
     } catch (error) {
-      this.$log('error', error)
+      this.$logD('error', error)
       // this.loading = false
     }
   }

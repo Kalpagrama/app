@@ -67,26 +67,26 @@ export default {
   },
   methods: {
     onResize (e) {
-      // this.$log('onResize', e)
+      // this.$logD('onResize', e)
       this.ready = true
       this.$set(this, 'width', e.width)
     },
     onScroll (e) {
-      // this.$log('onScroll', e)
+      // this.$logD('onScroll', e)
       this.$set(this, 'scroll', e.position)
       // this.$emit(e.position)
     },
     imgError(e, ni) {
-      // this.$log('imgError', ni)
+      // this.$logD('imgError', ni)
       e.target.src = 'https://storage.yandexcloud.net/kalpa-thumbs/7n/r9/132596514735333573_600_1.jpg'
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     this.$refs.kresize.trigger()
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

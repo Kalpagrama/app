@@ -26,14 +26,14 @@ export default {
   },
   methods: {
     searchStart () {
-      this.$log('searchStart')
+      this.$logD('searchStart')
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -57,16 +57,16 @@ export default {
     }
   },
   watch: {
-    '$route': {
+    $route: {
       immediate: true,
       async handler (to, from) {
-        this.$log('$route CHANGED', to)
+        this.$logD('$route CHANGED', to)
         if (to.params.oid) {
-          this.$log('GOT USER OID', to.params.oid)
+          this.$logD('GOT USER OID', to.params.oid)
           this.user = await this.userLoad(to.params.oid)
           this.page = 'nodes'
         } else {
-          this.$log('NO USER OID!')
+          this.$logD('NO USER OID!')
           this.$router.push({params: {oid: this.$store.state.auth.user.oid}})
         }
       }
@@ -74,7 +74,7 @@ export default {
   },
   methods: {
     async userLoad (oid) {
-      this.$log('userLoad start')
+      this.$logD('userLoad start')
       let user = await this.$store.dispatch('objects/get', { oid, fragmentName: 'userFragment', priority: 0 })
       // return user
       // let {data: {userLoad: [user]}} = await this.$apollo.query({
@@ -93,11 +93,11 @@ export default {
       //     oid
       //   }
       // })
-      this.$log('userLoad done', user)
+      this.$logD('userLoad done', user)
       return user
     },
     pageClick (p) {
-      this.$log('pageClick', p)
+      this.$logD('pageClick', p)
       this.$router.push({params: {page: p.id}})
     },
     pageBtnClass (p) {
@@ -109,7 +109,7 @@ export default {
       }
     },
     menuAddClick (a, ai) {
-      this.$log('menuAddClick')
+      this.$logD('menuAddClick')
       switch (a.id) {
         case 'node': {
           this.$router.push('/app/create/node')
@@ -122,15 +122,15 @@ export default {
       }
     },
     avatarError (e) {
-      // this.$log('avatarError', e)
+      // this.$logD('avatarError', e)
       e.target.src = 'statics/logo.png'
     }
   },
   mounted () {
-    // this.$log('mounted')
+    // this.$logD('mounted')
   },
   beforeDestroy () {
-    // this.$log('beforeDestroy')
+    // this.$logD('beforeDestroy')
   }
 }
 </script>

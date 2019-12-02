@@ -39,7 +39,6 @@ async function init (context) {
         }
       }`
   })
-  // context.dispatch('log/debug', `initializationQuery complete. result= ${{ user, categories, userWorkspace, userEvents }}`, { root: true })
   // todo убрать юзера из auth
   await context.dispatch('core/init')
   await context.dispatch('auth/init', user)

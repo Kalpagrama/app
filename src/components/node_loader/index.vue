@@ -37,7 +37,7 @@ export default {
         },
         result ({ data, loading, networkStatus }) {
           if (data) {
-            this.$log('feed result', data)
+            this.$logD('feed result', data)
             this.pageToken = data[this.queryKey].nextPageToken
             this.totalCount = data[this.queryKey].totalCount
             this.itemsCount = data[this.queryKey].items.length
@@ -51,14 +51,14 @@ export default {
   },
   methods: {
     async needFetchMore () {
-      this.$log('needFetchMore start')
+      this.$logD('needFetchMore start')
       this.fetchingMore = true
       await this.$wait(3000)
       this.fetchingMore = false
-      this.$log('needFetchMore done')
+      this.$logD('needFetchMore done')
     },
     fetchMore () {
-      this.$log('fetchMore start')
+      this.$logD('fetchMore start')
       this.pageTokenNext = this.pageToken
       this.fetchingMore = true
       if (this.itemsCount >= this.totalCount) return
@@ -67,23 +67,23 @@ export default {
           pageToken: this.pageTokenNext
         },
         updateQuery: (from, {fetchMoreResult: to}) => {
-          // this.$log('updateQuery from', from)
-          // this.$log('updateQuery to', to)
+          // this.$logD('updateQuery from', from)
+          // this.$logD('updateQuery to', to)
           let res = {
             [this.queryKey]: {
               ...to[this.queryKey],
               items: [...from[this.queryKey].items, ...to[this.queryKey].items]
             }
           }
-          // this.$log('updateQuery res', res)
-          this.$log('fetchMore done')
+          // this.$logD('updateQuery res', res)
+          this.$logD('fetchMore done')
           this.fetchingMore = false
           return res
         }
       })
     },
     async nodesLoad (query, queryKey, variables) {
-      this.$log('nodesLoad start')
+      this.$logD('nodesLoad start')
       let {data} = await this.$apollo.query({
         query: query,
         variables: variables
@@ -92,24 +92,23 @@ export default {
       this.pageToken = data[this.queryKey].nextPageToken
       this.totalCount = data[this.queryKey].totalCount
       this.itemsCount = data[this.queryKey].items.length
-      this.$log('nodeLoad done')
+      this.$logD('nodeLoad done')
     },
     // возможно это ядро скоро понадобятся
     prefetch(oid){
-      this.$log('prefetch', oid)
+      this.$logD('prefetch', oid)
       this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 1 })
         .catch(err => {
-          this.$log('prefetch error', err)
-          // this.$store.dispatch('log/error', ['node_loader', 'error', err])
+          this.$logD('prefetch error', err)
         })
-      this.$log('prefetch ok!', oid)
+      this.$logD('prefetch ok!', oid)
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

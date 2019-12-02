@@ -48,12 +48,12 @@ export default {
     active: {
       immediate: true,
       handler (to, from) {
-        this.$log('active CHANGE', to, this.node.name)
+        this.$logD('active CHANGE', to, this.node.name)
       }
     },
     opened: {
       handler (to, from) {
-        this.$log('opened CHANGED', to)
+        this.$logD('opened CHANGED', to)
         if (to) {
         }
       }
@@ -61,19 +61,19 @@ export default {
   },
   methods: {
     nameClick () {
-      this.$log('nameClick')
+      this.$logD('nameClick')
       // this.$emit('nodeName')
     },
     imgFirstLoaded (e) {
-      // this.$log('imgFirstLoaded', e.target.height)
+      // this.$logD('imgFirstLoaded', e.target.height)
       this.height = e.target.height
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

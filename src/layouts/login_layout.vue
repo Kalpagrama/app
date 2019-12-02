@@ -27,10 +27,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted', this.$route)
+    this.$logD('mounted', this.$route)
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
 }
 </script>

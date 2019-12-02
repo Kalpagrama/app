@@ -3,13 +3,14 @@ import { fragments } from 'schema/index'
 import { Notify } from 'quasar'
 import { router } from 'boot/main'
 import assert from 'assert'
-import { t } from 'boot/i18n'
+import { i18n } from 'boot/i18n'
+import { logI } from 'boot/log'
+import { logD, logE } from 'src/boot/log'
 
 export const init = async (context, userEvents) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
-  context.dispatch('log/debug', ['events', 'init', userEvents], { root: true })
-
+  logD('init', userEvents)
   const observerEvent = apolloProvider.clients.wsApollo.subscribe({
     client: 'wsApollo',
     query: gql`
@@ -22,11 +23,11 @@ export const init = async (context, userEvents) => {
 
   observerEvent.subscribe({
     next: ({ data: { event } }) => {
-      context.dispatch('log/debug', ['events', `EVENT received ${event.type}`, event], { root: true })
+      logD(`EVENT received ${event.type}`, event)
       processEvent(context, event)
     },
     error: (error) => {
-      context.dispatch('log/error', `EVENT error ${error}`, { root: true })
+      logE('EVENT error', error)
     }
   })
 
@@ -35,7 +36,7 @@ export const init = async (context, userEvents) => {
 }
 
 export const testWebPush = async (context) => {
-  console.log('testWebPush...')
+  logD('testWebPush...')
   let { data: { testWebPush } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       query testWebPush {
@@ -43,7 +44,7 @@ export const testWebPush = async (context) => {
       }`,
     fetchPolicy: 'network-only'
   })
-  console.log('testWebPush result = ', testWebPush)
+  logD('testWebPush result = ', testWebPush)
   return testWebPush
 }
 
@@ -128,7 +129,7 @@ function processEventWs (context, event) {
     default:
       throw new Error(`bad type ${type}`)
   }
-  console.log(operationName, objectType)
+  logD(operationName, objectType)
   context.commit(`workspace/${operationName}${objectType}`, object, { root: true })
 }
 
@@ -148,28 +149,28 @@ function notifyUserActionComplete (eventType, object) {
   let eventMessage = ''
   switch (eventType) {
     case 'NODE_CREATED':
-      eventMessage = t('node created')
+      eventMessage = i18n.t('node created')
       break
     case 'NODE_DELETED':
-      eventMessage = t('node deleted')
+      eventMessage = i18n.t('node deleted')
       break
     case 'NODE_RATED':
-      eventMessage = t('node rated')
+      eventMessage = i18n.t('node rated')
       break
     case 'USER_SUBSCRIBED':
-      eventMessage = t('user subscribed')
+      eventMessage = i18n.t('user subscribed')
       break
     case 'USER_UNSUBSCRIBED':
-      eventMessage = t('user unsubscribed')
+      eventMessage = i18n.t('user unsubscribed')
       break
     case 'WS_ITEM_CREATED':
-      eventMessage = t('ws element created')
+      eventMessage = i18n.t('ws element created')
       break
     case 'WS_ITEM_DELETED':
-      eventMessage = t('ws element deleted')
+      eventMessage = i18n.t('ws element deleted')
       break
     case 'WS_ITEM_UPDATED':
-      eventMessage = t('ws element updated')
+      eventMessage = i18n.t('ws element updated')
       break
   }
   // console.debug(eventMessage)
@@ -179,11 +180,11 @@ function notifyUserActionComplete (eventType, object) {
       message: eventMessage,
       avatar: object.thumbUrl,
       actions: [{
-        label: t('Goto...'),
+        label: i18n.t('Goto...'),
         noDismiss: true,
         handler: () => {
           // app/workspace/fragments
-          let route = `/app/home`
+          let route = '/app/home'
           if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
             route = `/app/content/${object.oid}`
           } else if (['NODE'].includes(object.type)) {
@@ -192,14 +193,14 @@ function notifyUserActionComplete (eventType, object) {
             route = `/app/sphere/${object.oid}`
           } else if (['WSBookmark', 'WSSphere', 'WSContent', 'WSNode', 'WSFragment'].includes(object.__typename)) {
             if (object.__typename === 'WSBookmark') {
-              route = `/app/workspace/bookmarks`
+              route = '/app/workspace/bookmarks'
             } else if (object.__typename === 'WSSphere') {
-              route = `/app/workspace/spheres`
+              route = '/app/workspace/spheres'
             } else if (object.__typename === 'WSContent') {
-              route = `/app/workspace/contents`
+              route = '/app/workspace/contents'
             } else if (object.__typename === 'WSNode') {
-              route = `/app/workspace/nodes`
-            } else if (object.__typename === 'WSFragment') route = `/app/workspace/fragments`
+              route = '/app/workspace/nodes'
+            } else if (object.__typename === 'WSFragment') route = '/app/workspace/fragments'
           } else {
             throw new Error(`bad object ${JSON.stringify(object)}`)
           }

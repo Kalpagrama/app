@@ -23,7 +23,7 @@
    }
   },
   async mounted () {
-   this.$log('mounted')
+   this.$logD('mounted')
    await this.$wait(500)
    location.href = this.getUrl
   }

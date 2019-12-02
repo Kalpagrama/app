@@ -139,10 +139,10 @@ export default {
       deep: true,
       immediate: false,
       async handler (to, from) {
-        this.$log('cut CHANGED')
+        this.$logD('cut CHANGED')
         this.cutChanging = true
         if (to >= 0) {
-          this.$log('cut', to)
+          this.$logD('cut', to)
           this.$emit('cut', this.cuts[to])
           this.$tween.to(this, 0.3, {framesTop: 0, framesHeight: 180, cutMarginBottom: this.$q.screen.height / 2})
           this.$tween.to(
@@ -151,7 +151,7 @@ export default {
             {
               scrollLeft: (this.cuts[to].start * this.framesWidth) / this.duration,
               onComplete: () => {
-                this.$log('tween COMPLETED')
+                this.$logD('tween COMPLETED')
                 this.cutsOverflowY = 'hidden'
               }
             })
@@ -166,7 +166,7 @@ export default {
             {
               scrollLeft: 0,
               onComplete: () => {
-                this.$log('tween COMPLETED')
+                this.$logD('tween COMPLETED')
                 this.cutsOverflowY = 'auto'
               }
             })
@@ -178,7 +178,7 @@ export default {
   },
   methods: {
     cutClick (c, ci) {
-      this.$log('cutClick', c, ci)
+      this.$logD('cutClick', c, ci)
       if (this.cut >= 0) {
         // this.$set(this, 'cut', undefined)
       } else {
@@ -186,18 +186,18 @@ export default {
       }
     },
     cutPlay () {
-      this.$log('cutPlay')
+      this.$logD('cutPlay')
     },
     cutDelete (c) {
-      this.$log('cutDelete')
+      this.$logD('cutDelete')
       this.$delete(this.cuts, this.cut)
       this.$set(this, 'cut', undefined)
     },
     cutHold (c, ci) {
-      this.$log('cutHold', c, ci)
+      this.$logD('cutHold', c, ci)
     },
     cutPanStart (e) {
-      // this.$log('cutPanStart', e)
+      // this.$logD('cutPanStart', e)
       let cut = this.cuts[this.cut]
       let delta = e.delta.x * this.duration / this.framesWidth
       let to = cut.start + delta
@@ -216,7 +216,7 @@ export default {
       }
     },
     cutPanEnd (e) {
-      // this.$log('cutPanEnd', e)
+      // this.$logD('cutPanEnd', e)
       let cut = this.cuts[this.cut]
       let delta = e.delta.x * this.duration / this.framesWidth
       let to = cut.end + delta
@@ -235,11 +235,11 @@ export default {
       }
     },
     confirm () {
-      this.$log('confirm')
+      this.$logD('confirm')
       this.$set(this, 'cut', undefined)
     },
     add () {
-      this.$log('add')
+      this.$logD('add')
       let cut = {
         uid: Date.now().toString(),
         start: this.now,
@@ -254,7 +254,7 @@ export default {
       else return '0px'
     },
     async framesLoad (oid) {
-      this.$log('framesLoad start')
+      this.$logD('framesLoad start')
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
       // let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
       //   query: gql`
@@ -270,20 +270,20 @@ export default {
       //     oid: oid
       //   }
       // })
-      this.$log('framesLoad done')
+      this.$logD('framesLoad done')
       return content.frameUrls
     },
     handleResize (e) {
-      this.$log('handleResize', e)
+      this.$logD('handleResize', e)
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
     this.$set(this, 'frames', await this.framesLoad(this.fragment.content.oid))
     window.addEventListener('resize', this.handleResize)
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.$logD('beforeDestroy')
     window.removeEventListener('resize', this.handleResize)
   }
 }

@@ -77,6 +77,7 @@ export default {
         {name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions'},
         {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
         {name: 'test web-push', icon: 'message', path: '/app/test_message'},
+        {name: 'sentry log send', icon: 'message', path: '/app/sentry_log'},
         {name: 'Выйти', icon: 'exit_to_app', path: '/app/logout'}
       ]
     }
@@ -112,7 +113,7 @@ export default {
   },
   methods: {
     async logoutDialogAction (action) {
-      this.$log('logoutDialogAction', action)
+      this.$logD('logoutDialogAction', action)
       switch (action) {
         case 'confirm': {
           await this.$store.dispatch('auth/logout')
@@ -120,15 +121,19 @@ export default {
       }
     },
     async pageClick (p, pi) {
-      this.$log('pageClick', p, pi)
+      this.$logD('pageClick', p, pi)
       switch (p.path) {
         case '/app/logout':
-          this.$log('LOGOUT')
+          this.$logD('LOGOUT')
           this.$refs.logoutDialog.show()
           break
         case '/app/test_message':
-          this.$log('test_message..')
+          this.$logD('test_message..')
           await this.$store.dispatch('events/testWebPush')
+          break
+        case '/app/sentry_log':
+          this.$logD('sentry_log..')
+          await this.$store.commit('core/stateSet', ['sentryLogLevel', 'debug'])
           break
         default:
           this.$router.push(p.path)
@@ -137,16 +142,16 @@ export default {
     async update(){
       if (this.$store.state.core.newVersionAvailable){
         this.$store.commit('core/stateSet', ['newVersionAvailable', false])
-        this.$log('updating ...')
+        this.$logD('updating ...')
         location.reload()
       } else {
-        this.$log('checkUpdate..')
+        this.$logD('checkUpdate..')
         await checkUpdate()
       }
     },
     async install(){
       let installPrompt = this.$store.state.core.installPrompt
-      console.log('installPrompt=', installPrompt)
+      this.$logD('installPrompt=', installPrompt)
       if (installPrompt) installPrompt.prompt()
     }
   }
