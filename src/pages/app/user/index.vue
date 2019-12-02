@@ -17,7 +17,9 @@ div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
       .row.full-width
         img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`)
         .col.row.justify-end.q-mt-sm
-          q-btn(rounded dense no-caps :color="subscriptions.includes(this.oid) ? 'accent' : 'red'").q-px-md Follow
+          q-btn(rounded dense no-caps
+          :label="subscriptions.includes() ? 'Unfollow' : 'Follow'"
+          :color="subscriptions.includes() ? 'accent' : 'red'").q-px-md
       .row.full-width.items-center.justify-start
         .row
           span.text-bold.text-black.text-h6 {{ user.name }}
