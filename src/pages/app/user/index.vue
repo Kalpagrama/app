@@ -7,17 +7,24 @@ div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
       .row.items-start
         q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
       .col
+        span {{ mySubscriptions }}
       .row
-        .row.full-width.justify-end
+        .row.full-width.justify-end.items-start
           q-btn(round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
         //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
           q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
     //- body
     .row.full-width.bg-grey-1.q-px-sm
       .row.full-width
-        img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`)
+        img(:src="user.thumbUrl" :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`)
         .col.row.justify-end.q-mt-sm
-          q-btn(rounded dense no-caps color="accent").q-px-md Follow
+          q-btn(label="dev" @click="followUser()")
+          q-btn(
+            rounded dense no-caps
+            v-if="myoid !== user.oid"
+            @click="subscriptions.includes(user.oid) ? followUser(user.oid) : unfollowUser(user.oid)"
+            :labal="subscriptions.includes(user.oid) ? 'Follow' : 'Unfollow'"
+            :color="subscriptions.includes(user.oid) ? 'accent' : 'red'").q-px-md
       .row.full-width.items-center.justify-start
         .row
           span.text-bold.text-black.text-h6 {{ user.name }}
@@ -36,13 +43,13 @@ div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
         //- Количество подписчиков
         div(style=`width: 60px; height: 50px`).row.justify-center.items-center
           .row.full-width.justify-center
-            span.text-h6.text-bold 2
+            span.text-h6.text-bold {{ user.subscribers.length }}
           .row.full-width.justify-center
             small.text-grey.text-bold Followers
         //- Количество подписок
         div(style=`width: 60px; height: 50px`).row.justify-center.items-center
           .row.full-width.justify-center
-            span.text-h6.text-bold 2
+            span.text-h6.text-bold {{ user.subscriptions.length }}
           .row.full-width.justify-center
             small.text-grey.text-bold  Following
     .row.full-width.justify-center
@@ -71,6 +78,12 @@ export default {
     }
   },
   computed: {
+    myoid () {
+      return this.$store.state.user.user.oid
+    },
+    mySubscriptions () {
+      return this.$store.state.subscriptions.userSubscriptions
+    },
     userSettingsDialogOptions () {
       return {
         confirm: false,
@@ -136,6 +149,17 @@ export default {
       let res = await this.$store.dispatch('subscriptions/subscribe', this.user.oid)
       this.$logD('res', res)
     },
+    async unfollowUser () {
+      try {
+        this.$logD('subDelete start')
+        let res = await this.$store.dispatch('subscriptions/unSubscribe', this.user.oid)
+        this.$logD('res', res)
+        // this.$delete(this.userSubscriptions, ss)
+        this.$logD('subDelete done')
+      } catch (error) {
+        this.$logD('subDelete error', error)
+      }
+    },
     async userLoad (oid) {
       this.$logD('userLoad start')
       let user = await this.$store.dispatch('objects/get', { oid, fragmentName: 'userFragment', priority: 0 })
@@ -159,31 +183,31 @@ export default {
       this.$logD('userLoad done', user)
       return user
     },
-    pageClick (p) {
-      this.$logD('pageClick', p)
-      this.$router.push({params: {page: p.id}})
-    },
-    pageBtnClass (p) {
-      if (this.page) {
-        return {
-          'bg-grey-5': this.page.id === p.id,
-          'text-white': this.page.id === p.id
-        }
-      }
-    },
-    menuAddClick (a, ai) {
-      this.$logD('menuAddClick')
-      switch (a.id) {
-        case 'node': {
-          this.$router.push('/app/create/node')
-          break
-        }
-        case 'chain': {
-          this.$router.push('/app/create/chain')
-          break
-        }
-      }
-    },
+    // pageClick (p) {
+    //   this.$logD('pageClick', p)
+    //   this.$router.push({params: {page: p.id}})
+    // },
+    // pageBtnClass (p) {
+    //   if (this.page) {
+    //     return {
+    //       'bg-grey-5': this.page.id === p.id,
+    //       'text-white': this.page.id === p.id
+    //     }
+    //   }
+    // },
+    // menuAddClick (a, ai) {
+    //   this.$logD('menuAddClick')
+    //   switch (a.id) {
+    //     case 'node': {
+    //       this.$router.push('/app/create/node')
+    //       break
+    //     }
+    //     case 'chain': {
+    //       this.$router.push('/app/create/chain')
+    //       break
+    //     }
+    //   }
+    // },
     avatarError (e) {
       // this.$logD('avatarError', e)
       e.target.src = 'statics/logo.png'
