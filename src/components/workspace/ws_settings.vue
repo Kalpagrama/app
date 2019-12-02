@@ -6,7 +6,7 @@
   .row.full-width.q-py-sm
     q-btn(outline color="red" no-caps @click="wsClear()"
       style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-      span Очистить мастерскую
+      span.text-red {{$t('Clear my workspace')}}
   div(:style=`{height: '400px'}`).row.full-width
 </template>
 

@@ -19,7 +19,7 @@ div(
   transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
     div(
       v-if="tabs" ref="kCollsTabsWrapper"
-      :style=`{position: 'absolute', zIndex: 300, height: '50px'}`).row.full-width.no-wrap.scroll.q-px-sm.bg-grey-3
+      :style=`{position: 'absolute', bottom: '60px', zIndex: 300, height: '50px'}`).row.full-width.no-wrap.scroll.q-px-sm.bg-grey-3
       div(
         v-ripple="{color: 'white'}"
         :style=`{
