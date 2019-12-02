@@ -1,15 +1,15 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit.bg-white
+div(:style=`{position: 'relative'}`).column.fit.bg-grey-3
   //- create/update
   q-btn(
-    color="green" no-caps push :loadig="creating" @click="bookmarkCreate()"
+    color="accent" no-caps push :loadig="creating" @click="bookmarkCreate()"
     :style=`{position: 'absolute', bottom: '8px', left: '8px', width: 'calc(100% - 16px)', height: '60px', borderRadius: '10px'}`)
     span.text-bold {{ $t('Create') }}
   //- header
   div(:style=`{height: '60px'}`).row.full-width
     .col.full-height
       .row.fit.items-center.q-px-md
-        span.text-bold {{ $t('Новая заметка') }}
+        span.text-bold {{ $t('New note') }}
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="clear" @click="$emit('hide')")
   //- body

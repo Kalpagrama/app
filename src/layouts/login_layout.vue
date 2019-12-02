@@ -1,14 +1,11 @@
 <template lang="pug">
-q-layout(view='lHh Lpr lFf' :style=`{height: height+'px'}` @resize="handleResize").bg-white
-  q-header.bg-white
-    div(:style=`{height: width+'px', maxHeight: '500px'}` @click="$router.push({name: 'index'})").row.full-width.items-center.content-center.justify-center
-      div(style=`height: 200px; width: 200px; borderRadius: 50%`).row.items-center.justify-center.bg-primary
-        k-logo(:width="200" :height="200").logo
-      .row.full-width.justify-center
-        h5.q-ma-md.text-black.text-bold Кальпаграмма
-  q-page-container
-    q-page
-      router-view
+div(
+  :style=`{position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 10000, height: '100%'}`
+  ).column.full-width.bg-primary
+  div(:style=`{height: 300+'px'}`).row.full-width.items-center
+    k-spinner(:width="100" :height="100" @click.native="$go('/login')")
+  .col.full-width.scroll
+    router-view
 </template>
 
 <script>

@@ -1,49 +1,18 @@
 <template lang="pug">
-q-layout(
-  view='hHh Lpr fFf'
-  :style=`{width: $q.screen.width+'px', height: '100vh'}`
-  :class="{'bg-grey-3': $route.path !== '/app/menu'}").bg-primary
-  //- node action dialog
-  k-dialog-bottom(ref="fragmentActionDialog" :value="$store.state.ui.fragmentActionDialogOpened" mode="actions" :options="fragmentActionDialogOptions"
-    @action="fragmentActionDialogAction" @hide="$store.commit('ui/stateSet', ['fragmentActionDialogOpened', false])")
-  //- node rate dialog
-  q-dialog(ref="nodeRateDialog" :value="$store.state.ui.nodeRateDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
-    @hide="$store.commit('ui/stateSet', ['nodeRateDialogOpened', false])")
-    node-rate(@hide="$refs.nodeRateDialog.hide()")
-  //- node creator dialog
-  q-dialog(ref="nodeCreatorDialog" :value="$store.state.ui.nodeCreatorDialogOpened" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
-    @hide="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', false])")
-    node-creator(@hide="$refs.nodeCreatorDialog.hide()")
-  //- bookmark dialog
-  q-dialog(
-    ref="bookmarkDialog" :value="$store.state.ui.bookmarkDialogOpened"
-    @hide="$store.commit('ui/stateSet', ['bookmarkDialogOpened', false])"
-    :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    ws-bookmark(@hide="$refs.bookmarkDialog.hide()")
-  //- fragment dialog
-  q-dialog(
-    ref="fragmentDialog" :value="$store.state.ui.fragmentDialogOpened"
-    @hide="$store.commit('ui/stateSet', ['fragmentDialogOpened', false])"
-    :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    ws-fragment(@hide="$refs.fragmentDialog.hide()")
-  //- content dialog
-  //- q-drawer(v-model="leftDrawerShow" side="left" :width="leftDrawerWidth").gt-xs
-  //-   k-menu-desktop(v-if="!loading" @width="leftDrawerWidth = $event")
-  //- page
-  q-page-container
-    q-page
-      q-resize-observer(ref="pageResizeObserver" @resize="onResize")
-      router-view(v-if="!loading" :height="$q.screen.gt.xs ? height : height" :width="width")
-      div(v-else).row.full-width.window-height.items-center.justify-center
-        k-spinner(:width="200" :height="200")
-  //- q-footer(reveal).lt-sm
-  k-menu-mobile(:style=`{position: 'fixed', bottom: '0px', zIndex: 1000}`)
+.row.fit.items-center.justify-center
+  q-dialog(ref="tutorialDialog" :maximized="true")
+    k-dialog-tutorial
+  k-spinner(v-if="loading")
+  transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
+    router-view(v-if="!loading" :opened="true" :height="$q.screen.height" :width="$q.screen.width")
 </template>
 
 <script>
+import kDialogTutorial from 'components/k_dialog_tutorial'
 
 export default {
   name: 'mainLayout',
+  components: {kDialogTutorial},
   data () {
     return {
       loading: true,
@@ -149,6 +118,8 @@ export default {
   mounted () {
     this.$logD('mounted')
     this.$refs.pageResizeObserver.trigger()
+    this.$refs.tutorialDialog.show()
+    if (this.$refs.pageResizeObserver) this.$refs.pageResizeObserver.trigger()
   },
   async created () {
     try {
@@ -203,7 +174,4 @@ export default {
 </script>
 
 <style lang="stylus">
-.q-footer {
-  background: none !important
-}
 </style>

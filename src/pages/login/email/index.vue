@@ -1,15 +1,29 @@
 <template lang="pug">
-  .column.fit
-    .col
-      div(v-if="!codeConfirmed").row.fit.content-center.items-center.q-px-md
-        div(v-if="!codeWaiting").row.full-width.q-mb-sm
-          q-input(v-model="email" type="email" outlined label="Почта" @keyup.enter="emailSend").full-width.q-mb-sm
-          q-btn(style=`height: 50px` color="primary" label="Далее" @click="emailSend" :loading="emailSending").full-width
-        div(v-else).row.full-width
-          q-input(v-model="code" outlined label="Код подтверждения" @keyup.enter="codeSend").full-width.q-mb-sm
-          q-btn(style=`height: 50px` color="primary" label="Войти" @click="codeSend" :loading="codeSending").full-width
-      div(v-else).row.fit.justify-center.content-center.items-center
-        q-icon(name="email" size="100px" color="primary")
+.row.full-width.justify-center
+  div(:style=`{maxWidth: 330+'px'}`).row.full-width
+    .row.fit.content-center.items-center
+      div(v-if="!codeWaiting").row.full-width.q-mb-sm
+        div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mb-sm.bg-white
+          q-input(
+            v-model="email" type="email" filled :label="$t('Email')" @keyup.enter="emailSend()"
+            ).full-width.bg-white
+        q-btn(
+          push no-caps color="accent" @click="emailSend()" :loading="emailSending"
+          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm
+          span.text-bold {{$t('Next')}}
+        q-btn(
+          outline no-caps color="white" @click="$go('/login')"
+          :style=`{height: '60px', borderRadius: '10px'}`).full-width
+          span {{$t('Back')}}
+      div(v-else).row.full-width
+        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
+          q-input(
+            v-model="code" filled :label="$t('Code')" @keyup.enter="codeSend()"
+            ).full-width.bg-white
+        q-btn(
+          push no-caps color="accent" @click="codeSend" :loading="codeSending"
+          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width
+          span.text-bold {{$t('Login')}}
 </template>
 
 <script>
@@ -35,17 +49,18 @@
      let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
       client: 'authApollo',
       mutation: gql`
-            mutation loginEmail ($email: String!, $inviteCode: String){
-              loginEmail(email: $email, inviteCode: $inviteCode){
-                token
-                expires
-                role
-              }
-            }
-          `,
+        mutation loginEmail ($email: String!, $inviteCode: String){
+          loginEmail(email: $email, inviteCode: $inviteCode){
+            token
+            expires
+            role
+          }
+        }
+      `,
       variables: {
-       email: this.email,
-       inviteCode: localStorage.getItem('ktokenInviteCode')
+        email: this.email,
+        inviteCode: localStorage.getItem('ktokenInviteCode')
+        // inviteCode: '171145051370487837'
       }
      })
      this.$logD('token', token)
@@ -90,7 +105,7 @@
       this.$logD('codeSend done', result)
       this.codeConfirmed = true
       await this.$wait(1000)
-      this.$router.push('/app/home')
+      this.$go('/app/home')
      } else {
       this.$logD('codeSend fails', failReason)
       this.$q.notify(this.$t('code send error') + failReason)

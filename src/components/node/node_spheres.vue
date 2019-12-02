@@ -1,5 +1,5 @@
 <template lang="pug">
-div(v-show="getSpheres.length > 0" :style=`{paddingLeft: '14px', paddingRight: '14px'}`).row.full-width
+div(v-show="getSpheres.length > 0" :style=`{}`).row.full-width.q-px-lg
   //- spheres wrapper
   div(
     :style=`{
@@ -9,7 +9,7 @@ div(v-show="getSpheres.length > 0" :style=`{paddingLeft: '14px', paddingRight: '
     router-link(
       v-for="(s, si) in getSpheres"
       :key="si" :to="s.oid ? `/app/sphere/${s.oid}` : '/app/sphere'").q-mr-sm
-      span(style=`fontSize: 12px`).text-grey-7.ksphere {{ `#${s.name}` }}
+      span(style=`fontSize: 12px`).text-grey-7.ksphere {{ `${s.name}` }}
   //- more row
   div(v-if="!showAllSpheres && getSpheres.length > 3" :style=`{height: '20px'}` @click="showAllSpheres = true").row.full-width.justify-start.cursor-pointer
     small.text-grey-6.ksphere показать все сферы

@@ -3,13 +3,13 @@ k-split(:headerMaxHeight="$q.screen.height/3" :bodyClass="['bg-grey-1', 'q-pt-sm
   template(v-slot:header)
     //- header
     div(v-if="true" :style=`{minHeight: '70px'}`).row.full-width.items-center.scroll.q-px-sm
-      h6(:style=`{}`).q-pa-xs.q-ma-xs {{`#${sphere.name}`}}
+      h6(:style=`{}`).q-pa-xs.q-ma-xs {{`${sphere.name}`}}
     //- spheres
     div.row.full-width.q-px-md
       div(v-for="(s, si) in spheres" v-if="si < 5" :key="s.oid" @click="sphereClick(s, si)"
         :style=`{borderRadius: '10px'}`
         ).bg-grey-3.q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
-        span(:style=`{whiteSpace: 'nowrap'}`) {{`#${s.name}` | cut(50)}}
+        span(:style=`{whiteSpace: 'nowrap'}`) {{`${s.name}` | cut(50)}}
   template(v-slot:body)
     node-loader(ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
       template(v-slot:items=`{items, fetchingMore}`)

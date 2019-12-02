@@ -1,21 +1,21 @@
 <template lang="pug">
-div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
+div(:style=`{width: width+'px'}`).column.full-height.bg-primary
   //- dialogs
-  q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+  q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
     k-invite(@hide="$refs.inviteDialog.hide()")
   k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
   div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-secondary
-    div(@click="$router.push('/app/home')").col.row.items-center
+    div(@click="$go('/app/home')").col.row.items-center
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         k-logo(:width="40" :height="40")
       div(v-if="!mini").col.full-height
         .row.fit.items-center
           span.text-bold.text-white {{'Кальпаграмма ver:' + $store.state.core.version}}
-    div(@click="$router.push('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+    div(@click="$go('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
-  div(:style=`{height: '60px'}` @click="$router.push(`/app/user/` + $store.state.auth.user.oid)").row.full-width.bg-secondary
+  div(:style=`{height: '60px'}` @click="$go(`/app/user/` + $store.state.auth.user.oid)").row.full-width.bg-secondary
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
     div(v-if="!mini").col.full-height
@@ -41,8 +41,8 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-grey-3
             span.text-white {{ $t(p.name) }}
     div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       q-btn(
-        :round="mini" push color="accent" no-caps icon="person_add" @click="$refs.inviteDialog.show()"
-        :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
+        :round="mini" push color="accent" no-caps icon="person_add" @click="$go('/app/invite')"
+        :style=`mini ? {} : {height: '60px', borderRadius: '10px'}`).full-width
         span(v-if="width === 230").text-bold.q-ml-md {{ $t('Invite friend') }}
     div(v-if="!this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       q-btn(
@@ -78,7 +78,7 @@ export default {
         {name: 'Notifications', icon: 'notifications', path: '/app/notifications'},
         {name: 'test web-push', icon: 'message', path: '/app/test_message'},
         {name: 'sentry log send', icon: 'message', path: '/app/sentry_log'},
-        {name: 'Выйти', icon: 'exit_to_app', path: '/app/logout'}
+                {name: 'Exit', icon: 'exit_to_app', path: '/app/logout'}
       ]
     }
   },
@@ -88,7 +88,7 @@ export default {
         header: false,
         headerName: '',
         actions: {
-          stay: {name: 'Если хочешь остаться, останься просто так'}
+          stay: {name: 'Отмена'}
         },
         confirm: true,
         confirmName: 'Выйти'
@@ -136,7 +136,7 @@ export default {
           await this.$store.commit('core/stateSet', ['sentryLogLevel', 'debug'])
           break
         default:
-          this.$router.push(p.path)
+          this.$go(p.path)
       }
     },
     async update(){

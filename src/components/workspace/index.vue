@@ -1,75 +1,30 @@
 <template lang="pug">
-q-layout(view='hHh Lpr fFf' container :style=`{position: 'relative', width: width+'px', height: height-0+'px !important'}`).bg-grey-3
-  //- q-btn(
-  //-   round push color="accent" icon="add"
-  //-   :style=`{position: 'absolute', zIndex: 1000, bottom: '10px', right: '10px'}`)
-  //- dialogs
-  k-dialog-bottom(ref="wsAddDialog" mode="actions" :options="wsAddDialogOptions" @action="wsAddDialogAction")
-  //- menu
-  q-drawer(ref="wsMenu" side="left" :width="250")
-    div(:style=`{position: 'relative', borderRadius: '0px 10px 10px 0', overflow: 'hidden'}`).column.fit.bg-white
-      //- menu header
-      div(
-        v-if="!inFinder"
-        :style=`{height: '70px'}`).row.full-width.items-center.justify-center
-        .col
-          .row.fit.items-center.q-px-md
-            span.text-bold Мастерская
-      //- menu body
-      .col.scroll
-        .row.full-width.items-start.content-start
-          div(
-            v-for="(m, mkey) in pages" :key="mkey" @click="pageClick(m, mkey)"
-            :style=`{height: '70px'}`
-            ).row.full-width.items-center.hr.cursor-pointer
-            div(:style=`{width: '40px', height: '70px'}`).row.items-center.justify-end
-              q-icon(:name="m.icon" :color="page === mkey ? 'accent' : 'grey-9'" :size="page === mkey ? '25px' : '20px'")
-            .col
-              .row.fit.items-center.q-px-sm
-                span(:class=`{'text-accent': page === mkey}`).text-bold {{ m.name }}
-  //- header
-  //- q-header(reveal)
-  //-   div(:style=`{minHeight: '60px'}`).row.full-width.bg-white
-  //-     div(:style=`{height: '60px'}`).row.full-width
-  //-       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-  //-         q-btn(round flat icon="menu" color="black" @click="$refs.wsMenu.toggle()")
-  //-       .col.full-height
-  //-         .row.fit.items-center.content-center
-  //-           span.text-bold.text-black Мастерская
-  //-           .row.full-width
-  //-             small(v-if="page").text-grey-9 {{ pages[page].name }}
-  //-       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-  //-         q-btn(round flat color="accent" icon="add" @click="$refs.wsAddDialog.show()")
-  //- page
-  q-page-container
-    k-colls(@coll="collChanged" :coll="$route.params.page" :colls="colls" :header="true" :style=`{height: height+'px'}`)
-      template(v-slot:header)
-        .row.fit.items-center
-          div(:style=`{height: '60px'}`).row.full-width.items-center
-            //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-              //- anvil(:width="30" :height="30")
-              q-btn(round flat icon="menu")
-            .col.full-height
-              .row.fit.items-center.q-px-md
-                span.text-bold {{ $t('Workspace') }}
-            div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-              q-btn(round flat icon="add" @click="$refs.wsAddDialog.show()")
-          div(:style=`{height: '40px'}`).row.full-width
-            //- div(:style=`{height: '40px', width: '40px', borderTop: $route.params.page === 'dashboard' ? '3px solid #101d49' : '3px solid white'}`).row.items-center.justify-center
-            //-   anvil(:width="24" :height="24")
-            div(
-              v-for="c in colls" :key="c.id"
-              @click="c.id !== $route.params.page ? $router.push({params: {page: c.id}}) : false"
-              :style=`{borderTop: $route.params.page === c.id ? '3px solid #101d49' : '3px solid white'}`
-              ).col.cursor-pointer
-              .row.fit.items-center.justify-center
-                span {{ c.name }}
+.column.fit.bg-grey-3
+  //- template(v-slot:header)
+  div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+    span.text-bold Workspace
+  div(:style=`{order: 1000, height: '80px'}`).row.full-width.items-center
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      //- anvil(:width="30" :height="30")
+      q-btn(round flat icon="keyboard_arrow_left")
+    .col.full-height
+      .row.fit.items-center.q-px-md
+        //- span.text-bold {{ $t('Workspace') }}
+    div(:style=`{height: '80px', width: '80px'}`).row.items-center.justify-center
+      q-btn(round color="accent" size="lg" icon="add" @click="$refs.wsAddDialog.show()")
+  .col.full-width
+    k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :actions="false" :style=`{height: height+'px'}`)
+      template(v-slot:actions)
+        q-btn(round push color="primary" size="lg" icon="add")
+      //- template(v-slot:header)
       template(v-slot:dashboard)
         ws-dashboard
       template(
         v-for="(c, ci) in colls"
         v-slot:[c.id])
         ws-items(:type="c.id" :key="c.id")
+      template(v-slot:settings)
+        ws-settings
 </template>
 
 <script>
@@ -87,24 +42,13 @@ export default {
   },
   data () {
     return {
-      types: ['bookmarks', 'bragments', 'brafts', 'bpheres'],
-      page: undefined,
-      pages: {
-        dashboard: {name: 'Дэшборд', icon: 'dashboard'},
-        bookmarks: {name: 'Заметки', icon: 'bookmark_outline'},
-        // contents: {name: 'Контент', icon: 'photo_size_select_actual'},
-        fragments: {name: 'Фрагменты', icon: 'aspect_ratio'},
-        drafts: {name: 'Ядра', icon: 'post_add'},
-        spheres: {name: 'Сферы', icon: 'style'},
-        settings: {name: 'Настройки', icon: 'settings'}
-      },
-      coll: 'dashboard',
+      coll: 'bookmarks',
       colls: [
-        // {id: 'dashboard', name: 'Dashboard'},
         {id: 'bookmarks', name: 'Bookmarks'},
-        {id: 'fragments', name: 'Fragments'},
-        {id: 'drafts', name: 'Drafts'},
-        {id: 'spheres', name: 'Spheres'}
+        // {id: 'fragments', name: 'Fragments'},
+        {id: 'drafts', name: 'Nodes'},
+        {id: 'spheres', name: 'Spheres'},
+        {id: 'settings', name: 'Settings'}
       ]
     }
   },
@@ -122,20 +66,17 @@ export default {
     }
   },
   watch: {
-    $route: {
-      immediate: true,
-      handler (to, from) {
-        if (to.params.page) this.$set(this, 'page', to.params.page)
-        else {
-          this.$router.push({params: {page: 'bookmarks'}})
-        }
-      }
-    }
+    // '$route': {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     if (to.params.page) this.$set(this, 'page', to.params.page)
+    //     else {
+    //       this.$router.push({params: {page: 'bookmarks'}})
+    //     }
+    //   }
+    // }
   },
   methods: {
-    collChanged (coll) {
-      this.$router.push({params: {page: coll}})
-    },
     wsAddDialogAction (action) {
       this.$logD('wsAddDialogAction', action)
       switch (action) {

@@ -1,15 +1,28 @@
 <template lang="pug">
-  .column.fit
-    .col
-      div(v-if="!codeConfirmed").row.fit.content-center.items-center.q-px-md
-        div(v-if="!codeWaiting").row.full-width.q-mb-sm
-          q-input(v-model="phone" type="tel" outlined label="Телефон" @keyup.enter="smsSend").full-width.q-mb-sm
-          q-btn(style=`height: 50px` color="primary" label="Далее" @click="smsSend" :loading="smsSending").full-width
-        div(v-else).row.full-width
-          q-input(v-model="code" outlined label="Код подтверждения" @keyup.enter="codeSend").full-width.q-mb-sm
-          q-btn(style=`height: 50px` color="primary" label="Войти" @click="codeSend" :loading="codeSending").full-width
-      div(v-else).row.fit.justify-center.content-center.items-center
-        q-icon(name="phone" size="100px" color="primary")
+.row.full-width.justify-center
+  div(:style=`{maxWidth: 330+'px'}`).row.full-width
+    //- sending code
+    div(v-if="!codeWaiting").row.full-width.q-mb-sm
+      div(:style=`{position: 'relative', height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-end.q-mb-sm.bg-white
+        q-input(v-model="phone" type="tel" filled :label="$t('Phone')" @keyup.enter="smsSend()").full-width.bg-white
+      q-btn(
+        push no-caps color="accent" :loading="smsSending" @click="smsSend()"
+        :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm
+        span.text-bold {{$t('Next')}}
+      q-btn(
+        outline no-caps color="white" @click="$go('/login')"
+        :style=`{height: '60px', borderRadius: '10px'}`).full-width
+        span.text-bold {{$t('Back')}}
+    //- confirming code
+    div(v-else).row.full-width
+      div(:style=`{position: 'relative', zIndex: 100, height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mb-sm.bg-white
+        q-input(v-model="code" filled :label="$t('Code')" @keyup.enter="codeSend()").full-width.q-mb-sm
+      q-btn(push color="accent" label="Войти" :loading="codeSending" @click="codeSend()"
+        :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm
+      q-btn(
+        outline no-caps color="white" @click="codeWaiting = false"
+        :style=`{height: '60px', borderRadius: '10px'}`).full-width
+        span.text-bold {{$t('Back')}}
 </template>
 
 <script>
@@ -35,17 +48,17 @@
      let { data: { loginPhone: { token, expires, role } } } = await this.$apollo.mutate({
       client: 'authApollo',
       mutation: gql`
-            mutation loginPhone ($phone: String!, $inviteCode: String){
-              loginPhone(phone: $phone, inviteCode: $inviteCode){
-                token
-                expires
-                role
-              }
-            }
-          `,
+        mutation loginPhone ($phone: String!, $inviteCode: String){
+          loginPhone(phone: $phone, inviteCode: $inviteCode){
+            token
+            expires
+            role
+          }
+        }
+      `,
       variables: {
-       phone: this.phone,
-       inviteCode: localStorage.getItem('ktokenInviteCode')
+        phone: this.phone,
+        inviteCode: localStorage.getItem('ktokenInviteCode')
       }
      })
      this.$logD('token', token)
@@ -88,7 +101,7 @@
       this.$logD('codeSend done', result)
       this.codeConfirmed = true
       await this.$wait(1000)
-      this.$router.push('/app/home')
+      this.$go('/app/home')
      } else {
       this.$logD('codeSend fails', failReason)
       this.$q.notify(this.$t('code send error') + failReason)

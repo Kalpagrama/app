@@ -6,12 +6,13 @@ const routes = [
     component: () => import('layouts/main_layout'),
     children: [
       // mobile
-      { name: 'home', path: 'home/:sphere?/:sort?', component: () => import('pages/app/home') },
-      { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('pages/app/trends') },
-      { name: 'create', path: 'create', component: () => import('components/node_creator') },
+      { name: 'home', path: 'home/:sphere?/:sort?', component: () => import('components/node_pin') },
+      { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('components/node_pin') },
+      { name: 'create', path: 'create/:page?', component: () => import('components/node_composer') },
       { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
       { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
       // rest
+      { name: 'invite', path: 'invite', component: () => import('components/k_invite') },
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },

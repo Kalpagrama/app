@@ -20,7 +20,7 @@ export default {
     // slot(v-if="kQuery" name="items" :items="kQuery.items" :fetchingMore="fetchingMore")
     if (this.$scopedSlots.default) {
       return this.$scopedSlots.default({
-        items: this.kQuery ? this.kQuery.items : [],
+        nodes: this.kQuery ? this.kQuery.items : [],
         fetchingMore: this.fetchingMore
       })
     } else {

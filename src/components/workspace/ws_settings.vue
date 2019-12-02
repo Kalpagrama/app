@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.q-px-sm.bg-white
+.row.full-width.items-start.content-start.q-pa-sm
   div(:style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.full-width.items-center.content-center.justify-center.bg-grey-2
     span Some settings

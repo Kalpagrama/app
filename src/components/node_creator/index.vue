@@ -1,249 +1,182 @@
 <template lang="pug">
-div(:style=`{height: $q.screen.height-60+'px'}`).column.full-width.bg-primary
-  //- k-dialog-bottom(ref="nodeCreatorDialog" mode="actions" :options="nodeCreatorDialogOptions" @action="nodeCreatorAction")
-  q-dialog(ref="nodeCreatorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+div(:style=`{height: $q.screen.height+'px'}`).column.full-width
+  q-dialog(ref="nodeCreatorDialog" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
     .column.fit.bg-white
-      div(:style=`{height: '60px'}`).row.full-width
-        .col.full-height
-          .row.fit.items-center.q-px-md
-            span.text-bold Ядрогенератор
-        div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-          q-btn(round flat icon="clear" @click="$refs.nodeCreatorDialog.hide()")
-      .col.full-width.scroll
-        .row.full-width.items-start.content-start
-          div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
-            span start new node
-          div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
-            span Мои ядра
-  .row.full-width
-    div(:style=`{height: '60px'}`).row.full-width
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-        q-btn(round flat icon="menu" color="grey-3" @click="$refs.nodeCreatorDialog.toggle()")
-      .col.full-height
-        .row.fit.items-center.justify-start
-          span.text-bold.text-white Ядрогенератор
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-        q-btn(round flat icon="clear" color="white" @click="$emit('hide')")
-    q-tabs(v-model="tab" @input="tabChanged" align="left" color="white").full-width
-      q-tab(no-caps name="fragments" label="Фрагменты" color="white" :style=`{color: 'white'}`)
-      q-tab(no-caps name="preview" label="Предосмотр" :style=`{color: 'white'}`)
-  .col
-    q-tab-panels(v-model="tab" @input="tabChanged" swipeable animated keep-alive :style=`{background: 'none', margin: 0, padding: 0}`).fit
-      q-tab-panel(name="fragments" :style=`{height: '100%', margin: 0, padding: 0}`)
-        node-fragments(:tab="tabLocal" :fragments="fragments")
-      q-tab-panel(name="preview" :style=`{height: '200px', margin: 0, padding: 0}`)
-        .row.full-width.justify-center
-          div(:style=`{position: 'relative', maxWidth: '500px', paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-px-sm
-            node(
-              :node="node" :nodeFull="node"
-              :style=`{borderRadius: '10px'}`).bg-white.q-mb-md
+      div(:style=`{height: '60px'}`).row.full-width.items-center
+        div(:style=`{height: '60px', width: '45px'}`).row.items-center.justify-end
+          q-btn(round flat icon="keyboard_arrow_left" @click="$refs.nodeCreatorDialog.hide()")
+      span nodeCreatorDialog
+  q-dialog(ref="fragmentFinderDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
+    @hide="fragmentFinderDialogToggled(false)" @show="fragmentFinderDialogToggled(true)")
+    div(
+      @click.self="$refs.fragmentFinderDialog.hide()"
+      :style=`{background: 'rgba(0,0,0,'+fragmentFinderDialogBackgroundOpacity+')'}`).row.fit.items-end
+      div(
+        :style=`{height: height-260+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
+        ).column.full-width.bg-white
+        //- div(:style=`{height: '60px'}`).row.full-width
+        //-   .col.full-height
+        //-   div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        //-     q-btn(round flat icon="check" @click="fragmentFinding = -1")
+        .col.full-width
+          k-colls(@coll="fragmentFindingColl = $event" :tabs="true" :coll="fragmentFindingColl" :colls="fragmentFindingColls" :style="{height: '100%'}")
+            template(v-slot:bookmarks)
+              span Bookmarks
+            template(v-slot:fragments)
+              span Fragments
+  q-dialog(ref="nameFinderDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    div(@click.self="$refs.nameFinderDialog.hide()").row.fit.items-end
+      div(:style=`{height: height-200+'px', borderRadius: '10px 10px 0 0'}`).column.full-width.q-pa-sm.bg-grey-3
+        .row.full-width
+          div(:style=`{height: '60px', borderRadius: '10px'}`).row.full-width.bg-white
+        .col.full-width.scroll
+          .row.full-width.items-start.content-start.q-px-sm
             div(
-              :style=`{height: 'auto', borderRadius: '10px'}`
-              ).row.full-width.items-end.bg-white.q-pa-md.q-mb-md
-              .row.full-width.q-pa-sm
-                span.text-bold В чем суть?
-              div(:style=`{position: 'relative', zIndex: 100, overflow: 'hidden', borderRadius: '10px'}`).row.full-width
-                q-input(v-model="name" filled type="textarea" :rows="3").full-width
+              v-for="(s, si) in 20" :key="si"
+              :style=`{minHeight: '40px'}`
+              ).row.full-width.items-center.justify-center.q-px-sm
+              span Suggestion {{ s }}
+  div(
+    v-if="true"
+    :style=`{height: '60px'}`).row.full-width
+    div(
+      v-if="false"
+      :style=`{height: '60px', width: '45px'}`).row.items-center.justify-start
+      q-btn(round flat icon="keyboard_arrow_left")
+    .col.full-height
+      .row.fit.items-center.justify-start.q-px-md
+        span.text-bold {{ $t('Node composer') }}
+    div(
+      v-if="true"
+      :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      q-btn(round flat icon="more_vert" @click="$refs.nodeCreatorDialog.show()")
+  .col.full-width.scroll
+    k-colls(@coll="$router.push({params: {page: $event}})" :coll="$route.params.page" :colls="colls" :tabs="true" :style=`{height: height-60+'px'}`)
+      template(v-slot:drafts)
+        .column.fit
+          div(:style=`{height: '60px'}`).row.full-width
+            .col.full-height
+              .row.fit.items-center.q-px-sm
+                span 4 {{ $t('drafts') }}
+            div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+              q-btn(round flat icon="search")
+          .col.scroll
+            .row.full-width.items-start.content-start.q-pa-sm
+              div(
+                v-for="(d, di) in 4" :key="di"
+                :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+                ).row.full-width.items-center.bg-white.q-px-sm.q-mb-sm
+                span Draft {{ di }}
+      template(v-slot:editor)
+        .column.fit
+          .col.scroll
+            div(:style=`{paddingBottom: '200px'}`).row.full-width.items-start.justify-center
+              div(:style=`{maxWidth: '400px'}`).row.full-width.items-start.content-start.q-px-sm
+                //- first fragment
+                //- transition(appear enter-active-class="animated slideOutDown" leave-active-class="animated slideInUp")
+                div(
+                  v-if="fragmentFinding !== 1"
+                  v-ripple=`{color: 'accent'}` @click="fragmentFindStart(0)"
+                  :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', oveflow: 'hidden'}`
+                  ).row.full-width.items-center.justify-center.bg-white.cursor-pointer.q-mb-sm
+                  q-btn(round flat icon="add" color="accent" size="lg" :style=`{pointerEvents: 'none'}`)
+                //- name
+                //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+                div(
+                  v-if="fragmentFinding < 0" @click="nameEditStart()"
+                  :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+                  ).row.full-width.items-center.justify-center.bg-white.q-mb-sm
+                  span {{ $t('Whats the point?') }}
+                //- second fragment
+                //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+                div(
+                  v-if="fragmentFinding !== 0"
+                  v-ripple=`{color: 'accent'}` @click="fragmentFindStart(1)"
+                  :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+                  ).row.full-width.items-center.justify-center.bg-white.cursor-pointer.q-mb-sm
+                  q-btn(round flat icon="add" color="accent" size="lg" :style=`{pointerEvents: 'none'}`)
+                //- save or publish
+                .row.full-width.q-mt-sm
+                  q-btn(
+                    v-if="fragmentFinding < 0"
+                    push no-caps color="accent" @click="$router.push({params: {page: 'preview'}})"
+                    :style=`{height: '60px', borderRadius: '10px'}`).full-width
+                    span.text-bold {{ $t('Next') }}
+      template(v-slot:preview)
+        .row.fit.items-start.content-start
+          .row.full-width.q-px-sm
             div(
-              :style=`{borderRadius: '10px'}`
-              ).row.full-width.bg-white.q-mb-md
-              .row.full-width.items-start.content-start.q-pa-md
-                .row.full-width.q-pa-sm
-                  span.text-bold Шаблон
-                div(:style=`{height: '56px', borderRadius: '10px'}`).row.full-width.items-center.justify-between.q-px-sm.bg-grey-3
-                  span Картинка в картинке
-                  q-icon(size="26px" name="keyboard_arrow_down")
-                //- .row.full-width.q-pa-sm
-                //-   span.text-bold Категория
-                //- div(:style=`{height: '56px', borderRadius: '10px'}`).row.full-width.items-center.justify-between.q-px-sm.bg-grey-2
-                //-   span(:style=`{borderRadius: '10px'}`).bg-green.q-px-md.q-py-sm.text-white #Развлечения
-                //-   q-icon(size="26px" name="keyboard_arrow_down")
-                node-editor-categories(:value="categories" @input="categories = $event")
-            transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-              q-btn(
-                v-if="tab === 'preview'"
-                color="accent" push no-caps @click="publish()"
-                :loading="publishing"
-                :style=`{position: 'absolute', left: '8px', bottom: '8px', height: '60px',
-                  width: 'calc(100% - 16px)', borderRadius: '10px'}`)
-                span.text-bold Опубликовать
+              :style=`{height: '200px', borderRadius: '10px'}`).row.full-width.bg-white
+          .row.full-width.q-mt-sm.q-px-sm
+            q-btn(
+              push no-caps color="accent" @click="nodePublish()"
+              :style=`{height: '60px', borderRadius: '10px'}`).full-width
+              span.text-bold {{$t('Publish')}}
+          //- span Preview
 </template>
 
 <script>
-import nodeFragments from './node_fragments'
-import nodePreview from './node_preview'
-import helper from './helper'
-import nodeEditorCategories from './node_editor_categories'
-
 export default {
   name: 'nodeCreator',
-  components: {nodeFragments, nodePreview, helper, nodeEditorCategories},
   props: ['width', 'height'],
   data () {
     return {
-      tab: 'fragments',
-      tabLocal: 'fragments',
-      draft: null,
-      fragments: {},
-      uid: '',
-      name: '',
-      layout: 'PIP',
-      categories: [],
-      spheres: [],
-      publishing: false
+      coll: 'editor',
+      colls: [
+        {id: 'drafts', name: 'My drafts'},
+        {id: 'editor', name: 'Editor'},
+        {id: 'preview', name: 'Preview'}
+      ],
+      fragmentFinding: -1,
+      fragmentFindingColl: 'bookmarks',
+      fragmentFindingColls: [
+        {id: 'bookmarks', name: 'Bookmarks'},
+        {id: 'fragments', name: 'Fragments'}
+      ],
+      fragmentFinderDialogBackgroundOpacity: 0,
+      nameEditing: false
     }
   },
   computed: {
-    node () {
-      let fragments = []
-      for (const f in this.fragments) {
-        fragments.push(this.fragments[f])
-      }
-      return {
-        uid: this.uid,
-        name: this.name,
-        author: this.$store.state.auth.user,
-        fragments: fragments.map(f => {
-          // this.$logD('f', f)
-          return {
-            uid: f.uid,
-            oid: f.content.oid,
-            content: f.content,
-            name: f.name,
-            thumbUrl: f.thumbUrl,
-            relativeCuts: f.relativeCuts,
-            relativeScale: f.relativeScale
-          }
-        }),
-        spheres: this.spheres,
-        categories: this.categories,
-        createdAt: Date.now(),
-        meta: {
-          layout: this.layout,
-          fragments: fragments.map(f => {
-            return {uid: f.uid, thumbUrl: f.thumbUrl}
-          })
-        }
-      }
-    },
-    nodeCreatorDialogOptions () {
-      return {
-        confirm: false,
-        confirmName: '',
-        actions: {
-          mydrafts: {name: 'My drafts'},
-          new: {name: 'Start a new one'},
-          share: {name: 'Share with friend'},
-          settings: {name: 'Settings'},
-          help: {name: 'How does it works?!'}
-        }
-      }
-    }
   },
   watch: {
-    node: {
-      deep: true,
+    '$route': {
+      immediate: true,
       handler (to, from) {
-        this.$logD('node CHANGED', to)
-        localStorage.setItem('draft', JSON.stringify(to))
+        if (!to.params.page) {
+          this.$router.replace({params: {page: 'creator'}})
+        }
       }
     }
   },
   methods: {
-    nodeCreatorAction (action) {
-      this.$logD('nodeCreatorAction', action)
-      switch (action) {
-        case 'mydrafts': {
-          this.$logD('DRAFTS')
-          break
-        }
-      }
+    nameEditStart () {
+      this.$log('nameEditStart')
+      this.$refs.nameFinderDialog.show()
+      this.nameEditing = true
     },
-    async tabChanged (tab) {
-      // this.$logD('tabChanged', tab)
-      this.tabLocal = undefined
-      await this.$wait(300)
-      this.tabLocal = tab
+    fragmentFindStart (i) {
+      this.$log('fragmentFindStart', i)
+      this.fragmentFinding = i
+      this.$refs.fragmentFinderDialog.show()
     },
-    useDraft (draft) {
-      this.$set(this, 'uid', draft.uid)
-      this.$set(this, 'name', draft.name)
-      this.$set(this, 'spheres', draft.spheres)
-      this.$set(this, 'categories', draft.categories)
-      draft.fragments.map((f, fi) => {
-        this.$set(this.fragments, f.uid, f)
-      })
-      this.$set(this, 'draft', draft)
-    },
-    async publish () {
-      try {
-        this.$logD('nodePublish start', this.node)
-        this.publishing = true
-        // await this.$wait(3000)
-        // create mutation
-        // TODO: take name and categories from node computed, from here?
-        // this.node.name = this.name
-        // this.node.categories = ['FUN']
-        let node = await this.$store.dispatch('node/nodeCreate', this.node)
-        // delete ws draft
-        if (this.draft) {
-          // let deleteWSDraft = await this.$store.dispatch('workspace/deleteWSDraft', this.draft)
-          // this.$logD('deleteWSDraft', deleteWSDraft)
-        }
-        // remove draftLocal
-        localStorage.removeItem('draft')
-        // remove draftStorage
-        this.$store.commit('workspace/stateSet', ['draft', null])
-        // done
-        this.$logD('nodePublish done', node)
-        this.publishing = false
-        // go to home
-        this.$router.push('/app/home')
-      } catch (error) {
-        this.$logD('nodePublis error', error)
-        this.publishing = false
-        this.$q.notify({message: 'Node publish error!', color: 'red', textColor: 'white'})
+    fragmentFinderDialogToggled (show) {
+      if (show) {
+        this.$tween.to(this, 0.3, {fragmentFinderDialogBackgroundOpacity: 0.25})
+      } else {
+        this.$tween.to(this, 0.3, {fragmentFinderDialogBackgroundOpacity: 0})
+        this.fragmentFinding = -1
       }
     }
   },
   async mounted () {
     this.$logD('mounted')
-    // draft
-    let draftLocal = this.$store.state.workspace.draft
-    let draftStorage = this.$q.localStorage.getItem('draft')
-    // this.$logD('draftLocal', draftLocal)
-    // this.$logD('draftStorage', draftStorage)
-    if (draftLocal) {
-      if (draftStorage !== null && draftStorage !== 'null' && draftStorage !== 'undefined' && draftStorage !== undefined) {
-        this.$logD('DRAFTS: local, storage')
-        // save old draft
-        let d = JSON.parse(draftStorage)
-        if (d.uid) await this.$store.dispatch('workspace/updateWSDraft', d)
-        else await this.$store.dispatch('workspace/addWSDraft', d)
-        // use draft
-        this.useDraft(draftLocal)
-        // remove draft local
-        this.$store.commit('workspace/stateSet', ['draft', null])
-      } else {
-        this.$logD('DRAFTS: local')
-        // use draft
-        this.useDraft(draftLocal)
-        // remove draft local
-        this.$store.commit('workspace/stateSet', ['draft', null])
-      }
-    } else {
-      if (draftStorage !== null && draftStorage !== 'null' && draftStorage !== 'undefined' && draftStorage !== undefined) {
-        this.$logD('DRAFTS: storage')
-        // use draft
-        this.useDraft(JSON.parse(draftStorage))
-      } else {
-        this.$logD('DRAFTS: none')
-        // do nothing
-      }
-    }
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')
   }
 }
 </script>
+
+<style lang="stylus">
+</style>

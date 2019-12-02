@@ -4,6 +4,9 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
   //- node votes stats
   q-dialog(ref="rateStatsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     div(@click.self="$refs.rateStatsDialog.hide()").row.fit.items-end.content-end
+      .row.full-width.justify-between.q-px-lg
+        h1.q-ma-xs.text-white 25
+        h1.q-ma-xs.text-white 75
       div(:style=`{height: '16px'}`).row.full-width.justify-center.items-center
         div(:style=`{height: '5px', width: '50px', borderRadius: '2.5px'}`).row.bg-grey-2
       div(:style=`{height: $q.screen.height/2+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).column.full-width.bg-white
@@ -37,7 +40,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
           v-if="nodeBluring"
           :style=`{
             position: 'absolute', zIndex: 1000, left: '0px', top: '-145px',
-            width: ratesWidth+'px', height: '90px', overflow: 'hidden'}`).row.items-end
+            width: ratesWidth+'px', height: '90px', overflow: 'hidden'}`).row.items-end.q-px-xl
           div(
             v-for="(r, ri) in rates" :key="ri"
             @click="rateClick(r, ri)"
@@ -49,7 +52,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
                 v-if="ri === rate"
                 :style=`{position: 'absolute', zIndex: 2000, height: '50px', bottom: '0px'}`
                 ).row.full-width.items-start.justify-center
-                div(:style=`{width: '40px', height: '40px', borderRadius: '50%', background: r.color}`).row.items-center.justify-center
+                div(:style=`{width: '50px', height: '50px', borderRadius: '50%', background: r.color}`).row.items-center.justify-center
                   span.text-bold.text-white {{ r.name }}
             .row.fit.items-center.justify-center
               //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
@@ -59,7 +62,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
       span(v-if="nodeBluring").text-bold {{ $t('Tap or slide to select') }}
       //- small.full-width panPositionLeft: {{panPositionLeft}}
       //- q-icon(name="keyboard_arrow_right" color="grey" size='20px')
-    div(v-else).row.fit.items-center
+    div(v-else).row.fit.items-center.q-px-lg
       //- blur
       q-btn(
         color="grey-9" round flat

@@ -82,6 +82,19 @@ export default async ({ Vue, store, router: VueRouter }) => {
       }
       return result
     }
+  // navigation
+  Vue.prototype.$go = (options) => {
+    // debug('go', options)
+    store.commit('ui/stateSet', ['going', true])
+    // VueRouter.replace(options)
+    VueRouter.push(options)
+    setTimeout(() => {
+      store.commit('ui/stateSet', ['going', false])
+    }, 500)
+  }
+  Vue.prototype.$back = () => {
+    // store.commit()
+  }
     // menus
     Vue.component('kMenuDesktop', () => import('components/k_menu_desktop'))
     Vue.component('kMenuMobile', () => import('components/k_menu_mobile'))
@@ -108,6 +121,11 @@ export default async ({ Vue, store, router: VueRouter }) => {
     // new
     Vue.component('nodeTape', () => import('components/node_tape'))
     Vue.component('kColls', () => import('components/k_colls'))
+  Vue.component('nodeRubick', () => import(`components/node_rubick`))
+  Vue.component('kPage', () => import(`components/k_page`))
+  Vue.component('kDialogMini', () => import(`components/k_dialog_mini`))
+  Vue.component('nodeRect', () => import(`pages/app/trends/node_rect`))
+  Vue.component('nodePin', () => import(`components/node_pin`))
     // icons
     Vue.component('anvil', () => import('components/k_icons/anvil'))
   } catch (err) {

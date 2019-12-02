@@ -1,22 +1,22 @@
 <template lang="pug">
 .column.fit.bg-white
   div(:style=`{height: '60px'}`).row.full-width
-    .col.full-height
-      .row.fit.items-center.q-px-md
-        span.text-bold Пригласить друга
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      q-btn(round flat icon="clear" @click="$emit('hide')")
+      q-btn(round flat icon="keyboard_arrow_left" @click="$router.back()")
+    .col.full-height
+      .row.fit.items-center
+        span.text-bold Пригласить друга
   .col.full-width
     .row.fit.items-center.content-center.justify-center
       div(:style=`{maxWidth: $q.screen.gt.xs ? '330px' : '100%'}`).row.full-width
         //- by email
         .row.full-width.justify-center.q-px-md.q-mb-md
           div(:style=`{borderRadius: '10px', overflow: 'hidden', zIndex: 100}`).row.full-width.q-mb-sm
-            q-input(v-model="email" type="email" filled label="Почта" @keyup.enter="emailSend()").full-width
+            q-input(v-model="email" type="email" filled :label="$t('Email')" @keyup.enter="emailSend()").full-width
               template(v-slot:append)
                 q-icon(name="mail")
           q-btn(
-            no-caps color="accent" :disable="emailSent" :loading="emailSending" @click="emailSend()"
+            push no-caps color="accent" :disable="emailSent" :loading="emailSending" @click="emailSend()"
             style=`height: 56px; width: 120px; border-radius: 10px`).full-width
             span.text-bold {{emailSent ? 'Приглашение отправлено!' : 'Отправить приглашение'}}
         //- get link
@@ -24,7 +24,7 @@
           div(
             v-if="link.length > 0"
             :style=`{borderRadius: '10px', overflow: 'hidden', zIndex: 100}`).row.full-width.q-mb-sm
-            q-input(v-model="link" filled label="Ссылка приглашения" @keyup.enter="emailSend").full-width
+            q-input(v-model="link" filled :label="$t('Send invite')" @keyup.enter="emailSend").full-width
               template(v-slot:append)
                 q-icon(name="link")
           q-btn(

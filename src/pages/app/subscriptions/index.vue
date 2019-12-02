@@ -9,6 +9,8 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
             span {{ sub }}
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width.bg-white
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(round flat icon="keyboard_arrow_left" color="accent" @click="$router.back()")
       .col.full-height
         .row.fit.items-center.q-px-md
           span.text-bold.text-black Subscriptions
@@ -17,16 +19,17 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
   q-page-container.fit
     q-page.fit
       k-dialog-bottom(ref="subDialog" mode="actions" :options="subDialogOptions" @action="subDialogAction")
+      div(v-if="subscriptions.length === 0").row.fit.justify-center.bg-white.q-py-xl
+        span.text-grey.text-h6 You dont have subscriptions.
       .row.full-width.items-start.content-start.justify-center.q-pa-md
         div(:style=`{maxWidth: '500px'}`).row.full-width
           div(
             v-for="(s, si) in subscriptions" :key="si"
             :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
-            div(:style=`{height: '40px', width: '40px'}`).row.items-center.justify-center
-              //- subClick(s, si)
+            div(@click="subjectClick(s)" :style=`{height: '40px', width: '40px'}`).row.items-center.justify-center
               img(@click="" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
-            div(@click="").col.full-height.q-ml-sm
+            div(@click="subjectClick(s)").col.full-height.q-ml-sm
               .row.fit.items-center
                 span.text-caption {{ s.name | cut(50) }}
                 //- small {{ s }}
@@ -71,6 +74,30 @@ export default {
     }
   },
   methods: {
+    subjectClick (s) {
+      this.$log('subjectClick')
+      switch (s.type) {
+        case 'VIDEO':
+        case 'AUDIO':
+        case 'BOOK':
+        case 'IMAGE': {
+          this.$router.push(`/app/content/${s.oid}`)
+          break
+        }
+        case 'USER': {
+          this.$router.push(`/app/user/${s.oid}`)
+          break
+        }
+        case 'SPHERE': {
+          this.$router.push(`/app/sphere/${s.oid}`)
+          break
+        }
+        case 'NODE': {
+          this.$router.push(`/app/node/${s.oid}`)
+          break
+        }
+      }
+    },
     subDialogAction (action) {
       this.$logD('subDialogAction', action)
       switch (action) {

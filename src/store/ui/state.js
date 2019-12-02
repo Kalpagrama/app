@@ -29,5 +29,9 @@ export default {
   node: null,
   nodeRateDialogOpened: false,
   nodeCreatorDialogOpened: false,
-  gtxs: true
+  gtxs: true,
+  going: false,
+  rect: null,
+  rectNode: null,
+  rectClone: null
 }

@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  name: 'pageApp__Settings__General',
+  name: 'pageApp__Settings__Security',
   data () {
     return {
     }
