@@ -1,7 +1,7 @@
 <template lang="pug">
 div().column.full-width.q-px-sm.q-pt-sm
   div(:style=`{position: 'relative', borderRadius: '10px',
-    border: active ? '3px solid black' : '3px solid #eee'}`).row.full-width.bg-white
+    border: active ? '0px solid black' : '0px solid #eee'}`).row.full-width.bg-white
     //- action
     q-btn(round flat dense icon="more_vert" color="white" @click="$emit('action')"
       :style=`{position: 'absolute', zIndex: zIndex+2, top: '8px', right: '8px'}`).shadow-1
@@ -20,7 +20,7 @@ div().column.full-width.q-px-sm.q-pt-sm
     div(
       @click="nameClick"
       :style=`{minHeight: '50px'}`).row.full-width.justify-center.items-center
-      span.text-bold.text-center.cursor-pointer {{ node.oid }}
+      span.text-bold.text-center.cursor-pointer {{ node.name }}
   //- div(v-if="pinned").col.full-width.bg-green
   //-   node-pin(:zIndex="zIndex+100" :opened="pinned")
 </template>

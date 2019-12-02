@@ -67,8 +67,8 @@ export default {
       coll: 'fragments',
       colls: [
         {id: 'upload', name: 'Upload'},
-        {id: 'bookmarks', name: 'Bookmarks'},
-        {id: 'fragments', name: 'Fragments'}
+        {id: 'fragments', name: 'Nodes'},
+        {id: 'bookmarks', name: 'Bookmarks'}
       ],
       url: ''
     }

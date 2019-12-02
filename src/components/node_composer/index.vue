@@ -21,7 +21,7 @@ div(:style=`{zIndex: 1000}`).column.fit.bg-grey-3
   k-dialog-bottom(ref="nodeCreatorDialog" @action="nodeComposerAction" :options="nodeComposerDialogOptions")
   q-dialog(ref="nodePreviewDialog" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
     k-page(@hide="$refs.nodePreviewDialog.hide()").bg-grey-3
-      template(v-slot:header)
+      template(v-slot:footer)
         .row.fit.items-center.justify-between.q-px-sm
           q-btn(round flat icon="keyboard_arrow_left" @click="$refs.nodePreviewDialog.hide()")
           .col
@@ -46,7 +46,7 @@ div(:style=`{zIndex: 1000}`).column.fit.bg-grey-3
       q-btn(round flat icon="more_vert" @click="$refs.nodeCreatorDialog.show()")
   .col.full-width.scroll
     k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`)
-      template(v-slot:drafts)
+      template(v-slot:nodes)
         drafts(:height="height" @new="startNew()" @draft="$router.push({params: {page: 'editor'}})")
       template(v-slot:editor)
         editor(:height="height" @preview="$refs.nodePreviewDialog.show()")
@@ -64,7 +64,7 @@ export default {
     return {
       coll: 'editor',
       colls: [
-        {id: 'drafts', name: 'Drafts'},
+        {id: 'nodes', name: 'Nodes'},
         {id: 'editor', name: 'Node editor'}
       ],
       nodeComposerDialogOptions: {

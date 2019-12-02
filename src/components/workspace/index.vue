@@ -1,15 +1,17 @@
 <template lang="pug">
 .column.fit.bg-grey-3
   //- template(v-slot:header)
-  div(:style=`{height: '60px'}`).row.full-width.items-center
-    //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+  div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+    span.text-bold Workspace
+  div(:style=`{order: 1000, height: '80px'}`).row.full-width.items-center
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       //- anvil(:width="30" :height="30")
-      q-btn(round flat icon="menu")
+      q-btn(round flat icon="keyboard_arrow_left")
     .col.full-height
       .row.fit.items-center.q-px-md
-        span.text-bold {{ $t('Workspace') }}
-    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      q-btn(round flat icon="add" @click="$refs.wsAddDialog.show()")
+        //- span.text-bold {{ $t('Workspace') }}
+    div(:style=`{height: '80px', width: '80px'}`).row.items-center.justify-center
+      q-btn(round color="accent" size="lg" icon="add" @click="$refs.wsAddDialog.show()")
   .col.full-width
     k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :actions="false" :style=`{height: height+'px'}`)
       template(v-slot:actions)
@@ -42,9 +44,9 @@ export default {
     return {
       coll: 'bookmarks',
       colls: [
-        {id: 'bookmarks', name: 'Notes'},
-        {id: 'fragments', name: 'Fragments'},
-        {id: 'drafts', name: 'Drafts'},
+        {id: 'bookmarks', name: 'Bookmarks'},
+        // {id: 'fragments', name: 'Fragments'},
+        {id: 'drafts', name: 'Nodes'},
         {id: 'spheres', name: 'Spheres'},
         {id: 'settings', name: 'Settings'}
       ]

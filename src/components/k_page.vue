@@ -1,13 +1,5 @@
 <template lang="pug">
 .column.fit
-  //- header
-  div(
-    v-if="!noHeader"
-    :style=`{height: headerHeight+'px', overflow: 'hidden'}`).row.full-width
-    div(:style=`{height: '60px'}`).row.full-width
-      slot(name="header")
-    div(v-if="true").row.full-width.items-center.justify-center
-      q-spinner(color="accent" :size="40")
   div(v-if="!noActions"
     :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', height: '78px'}`).row.full-width.items-center
     slot(name="actions")
@@ -17,6 +9,14 @@
     @scroll="onScroll"
     ).col.full-width.scroll
     slot
+  //- header
+  div(
+    v-if="!noHeader"
+    :style=`{height: headerHeight+'px', overflow: 'hidden'}`).row.full-width
+    div(:style=`{height: '60px'}`).row.full-width
+      slot(name="footer")
+    div(v-if="true").row.full-width.items-center.justify-center
+      q-spinner(color="accent" :size="40")
 </template>
 
 <script>
