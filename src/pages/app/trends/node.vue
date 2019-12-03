@@ -41,7 +41,7 @@ export default {
   data () {
     return {
       f1maxHeight: 0,
-      url: 'https://test.kalpagramma.com/local_object_storage/fragments/54/e7/154692406606864399/568.38:0-10_640.mp4'
+      url: 'https://dev.kalpagramma.com/local_object_storage/fragments/54/e7/154692406606864399/568.38:0-10_640.mp4'
     }
   },
   watch: {

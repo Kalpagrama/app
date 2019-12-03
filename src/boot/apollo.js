@@ -47,8 +47,8 @@ export default async ({ Vue, store, app }) => {
   // if (mode === 'offline') return
   // apollo
   Vue.use(VueApollo)
-  let AUTH_URL = process.env.AUTH_URL || 'https://test.kalpagramma.com/graphql'
-  // let AUTH_URL = 'https://test.kalpagramma.com/graphql'
+  let AUTH_URL = process.env.AUTH_URL || 'https://dev.kalpagramma.com/graphql'
+  // let AUTH_URL = 'https://dev.kalpagramma.com/graphql'
   logD('AUTH_URL', AUTH_URL)
   store.commit('auth/stateSet', ['AUTH_URL', AUTH_URL])
 
