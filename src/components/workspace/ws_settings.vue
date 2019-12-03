@@ -65,7 +65,7 @@ export default {
       this.$logD('wsClear start')
       let {data: {wsClear}} = await this.$apollo.mutate({
         mutation: gql`
-          mutation wsClear {
+          mutation wsClear2 {
             wsClear
           }
         `

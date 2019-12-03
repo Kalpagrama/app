@@ -84,7 +84,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     }
   // navigation
   Vue.prototype.$go = (options) => {
-    // debug('go', options)
+    // logD('go', options)
     store.commit('ui/stateSet', ['going', true])
     // VueRouter.replace(options)
     VueRouter.push(options)

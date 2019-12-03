@@ -13,8 +13,8 @@ import objects from './objects'
 import user from './user'
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
-import { initSw, initWebPush } from 'src/system/service_worker'
 import i18next from 'i18next'
+import { logD } from 'src/boot/log'
 
 Vue.use(Vuex)
 
@@ -48,7 +48,26 @@ async function init (context) {
   await context.dispatch('subscriptions/init', user.subscriptions)
   await context.dispatch('objects/init')
   await context.dispatch('user/init', user)
-  await i18next.changeLanguage(user.profile.lang);
+  await i18next.changeLanguage(user.profile.lang)
+
+  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+  wait(1000).then(async () => {
+    logD('test ws')
+    // await context.dispatch('workspace/wsSphereCreate', {
+    //   name: 'test sphere2',
+    // })
+
+    // await context.dispatch('workspace/wsNodeCreate', {
+    //   name: 'test node',
+    //   categories: ['POLITICS'],
+    //   spheres: [{ name: 'test sphere' }],
+    //   fragments: [],
+    //   meta: {
+    //     layout: 'PIP',
+    //     fragments: []
+    //   }
+    // })
+  })
 }
 
 export default function (/* { ssrContext } */) {
