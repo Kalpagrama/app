@@ -1,9 +1,6 @@
 import { apolloProvider } from 'boot/apollo'
-const debug = require('debug')('[auth]:actions')
-debug.enabled = true
-
+import {logD} from 'src/boot/log'
 import {router} from 'boot/main'
-import { logD } from 'src/boot/log'
 
 export const init = async (context, user) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
@@ -14,9 +11,16 @@ export const init = async (context, user) => {
 }
 
 export const logout = async (ctx) => {
-  debug('@logout start')
+  logD('@logout start')
+  let { data: { logout } } = await apolloProvider.clients.apiApollo.mutate({
+    mutation: gql`
+      mutation logout {
+        logout
+      }
+    `
+  })
   localStorage.removeItem('ktoken')
   localStorage.removeItem('ktokenExpires')
   router.push('/login')
-  debug('@logout done')
+  logD('@logout done')
 }

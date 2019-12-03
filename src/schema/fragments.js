@@ -1,148 +1,4 @@
 import gql from 'graphql-tag'
-
-const contentFragment = gql`
-  fragment contentFragment on Object {
-    oid
-    type
-    name
-    thumbUrl(preferWidth: 600)
-    ... on Video {
-      url
-      urlOriginal
-      duration
-      width
-      height
-      frameUrls
-    }
-    ... on Image {
-      url
-      urlOriginal
-      width
-      height
-    }
-  }
-`
-const WSContentFragment = gql`${contentFragment}
-  fragment WSContentFragment on WSContent {
-    uid
-    name
-    tagUids
-    createdAt
-    updatedAt
-    content {
-      ...contentFragment
-    }
-  }
-`
-const WSFragmentFragment = gql`
-  fragment WSFragmentFragment on WSFragment {
-    uid
-    name
-    # relativePoints {x y z}
-    thumbUrl(preferWidth: 600)
-    relativeCuts {type name start end thumbUrl(preferWidth: 600)}
-    relativeScale
-    tagUids
-    createdAt
-    updatedAt
-    content {
-      ...contentFragment
-    }
-  }
-  ${contentFragment}
-`
-const WSNodeFragment = gql`${WSFragmentFragment}
-  fragment WSNodeFragment on WSNode {
-    uid
-    name
-    tagUids
-    createdAt
-    updatedAt
-    spheres { oid type name }
-    fragments {
-      ...WSFragmentFragment
-    }
-  }
-`
-const WSBookmarkFragment = gql`
-  fragment WSBookmarkFragment on WSBookmark {
-    uid
-    type
-    name
-    url
-    thumbUrl(preferWidth: 600)
-    tagUids
-    createdAt
-    updatedAt
-  }
-`
-const WSSphereFragment = gql`
-  fragment WSSphereFragment on WSSphere {
-    uid
-    name
-    color
-    icon
-    createdAt
-    updatedAt
-  }
-`
-// const eventFragment = gql`
-//   fragment eventFragment on Event {
-//     type
-//     subject{
-//       oid
-//       type
-//       name
-//       thumbUrl(preferWidth: 600)
-//     }
-//     object{
-//       oid
-//       type
-//       name
-//       thumbUrl(preferWidth: 600)
-//       meta{
-//         type
-//         ...on MetaNode{
-//           layout
-//           fragments{
-//             uid
-//           }
-//         }
-//       }
-//     }
-//   }
-// `
-
-const eventChangeFragment = gql`
-  fragment eventChangeFragment on EventChange {
-    type
-    subject{
-      oid
-      type
-      name
-      thumbUrl(preferWidth: 600)
-      type
-    }
-    object{
-      oid
-      type
-      name
-      thumbUrl(preferWidth: 600)
-      type
-      meta{
-        type
-        ...on MetaNode{
-          layout
-          fragments{
-            uid
-          }
-        }
-      }
-    }
-    path
-    value
-  }
-`
 const objectShortFragment = gql`
   fragment objectShortFragment on ObjectShort {
     type
@@ -168,7 +24,35 @@ const objectShortWithMetaFragment = gql`
     }
   }
 `
+
+const videoFragment = gql`
+  fragment videoFragment on Video {
+    oid
+    type
+    name
+    thumbUrl(preferWidth: 600)
+    url
+    urlOriginal
+    duration
+    width
+    height
+    frameUrls
+  }
+`
+const imageFragment = gql`
+  fragment imageFragment on Image {
+    oid
+    type
+    name
+    thumbUrl(preferWidth: 600)
+    url
+    urlOriginal
+    width
+    height
+  }
+`
 const nodeFragment = gql`
+  ${videoFragment} ${imageFragment}
   fragment nodeFragment on Node {
     type
     oid
@@ -193,20 +77,8 @@ const nodeFragment = gql`
       name
       url
       content {
-        oid
-        type
-        name
-        thumbUrl(preferWidth: 600)
-        ...on Video {
-          url
-          urlType
-          width
-          height
-          duration
-        }
-        ...on Image {
-          url
-        }
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
       }
       relativePoints { x y z }
       relativeScale
@@ -219,25 +91,33 @@ const nodeFragment = gql`
     }
   }
 `
+
 const sphereFragment = gql`
   fragment sphereFragment on Object {
     oid
     type
     name
     thumbUrl(preferWidth: 600)
+    subscriberCnt
   }
 `
-const WSItemFragment = gql`${WSNodeFragment} ${WSFragmentFragment} ${WSContentFragment} ${WSBookmarkFragment} ${WSSphereFragment}
-  fragment WSItemFragment on WSItem {
-    ... on WSNode{...WSNodeFragment}
-    ... on WSFragment{...WSFragmentFragment}
-    ... on WSContent{...WSContentFragment}
-    ... on WSBookmark{...WSBookmarkFragment}
-    ... on WSSphere{...WSSphereFragment}
+
+const objectFragment = gql`
+  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment}
+  fragment objectFragment on Object {
+    oid
+    type
+    name
+    thumbUrl(preferWidth: 600)
+    ...on Video {...videoFragment}
+    ...on Image {...imageFragment}
+    ...on Node {... nodeFragment}
+    ...on Sphere {... sphereFragment}
   }
 `
+
 const eventFragment = gql`
-  ${WSItemFragment} ${objectShortFragment} ${objectShortWithMetaFragment}
+  ${objectFragment} ${objectShortFragment} ${objectShortWithMetaFragment} ${objectFragment}
   fragment eventFragment on Event {
     type
     ... on EventError{
@@ -255,9 +135,7 @@ const eventFragment = gql`
       message
     }
     ... on EventWS{
-      wsObject{
-        ... on WSFragment {... WSItemFragment}
-      }
+      objectFull{... objectFragment}
     }
     ... on EventChange{
       subject{... objectShortFragment}
@@ -278,7 +156,7 @@ const eventFragment = gql`
 `
 
 const userFragment = gql`
-  ${objectShortFragment} ${WSItemFragment} ${eventFragment}
+  ${objectShortFragment} ${nodeFragment} ${eventFragment}
   fragment userFragment on User {
     oid
     name
@@ -289,11 +167,8 @@ const userFragment = gql`
     subscriptions{...objectShortFragment}
     subscribers{...objectShortFragment}
     workspace{
-      nodes { ...WSItemFragment }
-      fragments { ...WSItemFragment }
-      contents { ...WSItemFragment }
-      bookmarks { ...WSItemFragment }
-      spheres { ...WSItemFragment }
+      nodes { ...nodeFragment }
+      spheres { ...objectShortFragment }
     }
     events{...eventFragment}
     profile{
@@ -311,13 +186,7 @@ const userFragment = gql`
 
 const fragments = {
   eventFragment,
-  eventChangeFragment,
-  contentFragment,
-  WSContentFragment,
-  WSFragmentFragment,
-  WSNodeFragment,
-  WSBookmarkFragment,
-  WSSphereFragment,
+  objectFragment,
   userFragment,
   objectShortFragment,
   nodeFragment,

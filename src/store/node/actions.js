@@ -1,8 +1,5 @@
 import { logD } from 'src/boot/log'
 
-const debug = require('debug')('[node]:action')
-debug.enabled = true
-
 import { apolloProvider } from 'boot/apollo'
 
 export const init = async (context, categories) => {
@@ -14,7 +11,7 @@ export const init = async (context, categories) => {
 }
 
 export const nodeUnrate = async (context, oid) => {
-  debug('nodeUnrate start')
+  logD('nodeUnrate start')
   if (!oid) return
   let { data: { nodeUnrate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
@@ -26,13 +23,13 @@ export const nodeUnrate = async (context, oid) => {
       oid: oid
     }
   })
-  debug('nodeUnrate done', nodeUnrate)
+  logD('nodeUnrate done', nodeUnrate)
   // update node in apollo cache
   return nodeUnrate
 }
 
 export const nodeRate = async (context, { oid, rate }) => {
-  debug('nodeRate start', oid, rate)
+  logD('nodeRate start', oid, rate)
   if (!oid) throw new Error('No oid!')
   if (!rate) throw new Error('No rate!')
   let { data: { nodeRate } } = await apolloProvider.clients.apiApollo.mutate({
@@ -46,22 +43,22 @@ export const nodeRate = async (context, { oid, rate }) => {
       rate: rate
     }
   })
-  debug('nodeRate done', nodeRate)
+  logD('nodeRate done', nodeRate)
   return nodeRate
 }
 
 export const nodeFull = async (context, oid) => {
-  debug('nodeFull start')
-  debug('nodeFull done')
+  logD('nodeFull start')
+  logD('nodeFull done')
 }
 
 export const nodeDelete = async (context, oid) => {
-  debug('nodeDelete start')
-  debug('nodeDelete dones')
+  logD('nodeDelete start')
+  logD('nodeDelete dones')
 }
 
 export const nodeCreate = async (context, payload) => {
-  debug('nodeCreate start', payload)
+  logD('nodeCreate start', payload)
   if (!payload.fragments || payload.fragments.length === 0) throw new Error('Wrong fragments!')
   let node = {
     name: payload.name || '',
@@ -86,7 +83,7 @@ export const nodeCreate = async (context, payload) => {
     }
   }
   if (payload.parentNode) node.parentNode = payload.parentNode
-  debug('nodeCreate node', node)
+  logD('nodeCreate node', node)
   let { data: { nodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodePublish ($node: NodeInput!) {
@@ -97,6 +94,6 @@ export const nodeCreate = async (context, payload) => {
       node: node
     }
   })
-  debug('nodeCreate done', nodeCreate)
+  logD('nodeCreate done', nodeCreate)
   return nodeCreate
 }

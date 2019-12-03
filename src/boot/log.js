@@ -63,9 +63,13 @@ class Logger {
   }
 
   error (module, ...msg) {
-    this.getLoggerFunc(module)(...msg)
-    this.store.dispatch('log/error', ['module', msg], { root: true })
-    Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+    try {
+      this.getLoggerFunc(module)(...msg)
+      this.store.dispatch('log/error', ['module', msg], { root: true })
+      Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+    } catch (err) {
+      console.error('error on logging error!!!', err)
+    }
   }
 }
 
@@ -76,6 +80,7 @@ export default async ({ Vue, store, app }) => {
       let module = this && this.constructor && this.constructor.name === 'VueComponent' ? this.$options.name : 'unknown module'
       logger.debug(module, ...msg)
     }
+    Vue.prototype.$log = logD
     Vue.prototype.$logI = logI = function (...msg) {
       let module = this && this.constructor && this.constructor.name === 'VueComponent' ? this.$options.name : 'unknown module'
       logger.info(module, ...msg)

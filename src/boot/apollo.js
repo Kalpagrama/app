@@ -1,9 +1,3 @@
-import { initSw, initWebPush } from 'src/system/service_worker'
-
-const debug = require('debug')('[boot]:apollo')
-// debug.enabled = true
-
-import assert from 'assert'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
 import { WebSocketLink } from 'apollo-link-ws'
@@ -14,7 +8,9 @@ import { createUploadLink } from 'apollo-upload-client'
 // import { persistCache } from 'apollo-cache-persist'
 import VueApollo from 'vue-apollo'
 import axios from 'axios'
-import { logE } from 'src/boot/log'
+import { logE, logD } from 'src/boot/log'
+// const debug = require('debug')('[boot]:apollo')
+// debug.enabled = true
 
 let apolloProvider
 
@@ -28,7 +24,7 @@ export default async ({ Vue, store, app }) => {
 
   axios.interceptors.request.use((request) => {
     // Do something with response data
-    debug('axios request', request)
+    logD('axios request', request)
     let d = localStorage.getItem('kdebug')
     if (d) request.headers['X-Kalpagramma-debug'] = d
     return request
@@ -38,7 +34,7 @@ export default async ({ Vue, store, app }) => {
     return Promise.reject(error)
   })
   axios.interceptors.response.use(response => {
-    debug('axios response', response)
+    logD('axios response', response)
     if (response.request) {
     } else {
     }
@@ -53,7 +49,7 @@ export default async ({ Vue, store, app }) => {
   Vue.use(VueApollo)
   let AUTH_URL = process.env.AUTH_URL || 'https://dev.kalpagramma.com/graphql'
   // let AUTH_URL = 'https://dev.kalpagramma.com/graphql'
-  debug('AUTH_URL', AUTH_URL)
+  logD('AUTH_URL', AUTH_URL)
   store.commit('auth/stateSet', ['AUTH_URL', AUTH_URL])
 
   // Cache
@@ -70,7 +66,7 @@ export default async ({ Vue, store, app }) => {
     link: createHttpLink({
       uri: AUTH_URL,
       fetch (uri, options) {
-        debug('FETCH HTTP')
+        logD('FETCH HTTP')
         const token = localStorage.getItem('ktoken')
         const d = localStorage.getItem('kdebug')
         if (token) options.headers.Authorization = token
@@ -84,7 +80,7 @@ export default async ({ Vue, store, app }) => {
   let { data: { services } } = await authApollo.query({
     query: gql`query services {services}`
   })
-  debug('services', services)
+  logD('services', services)
   let linkHttp = services.API
   let linkWs = services.SUBSCRIPTIONS
   let linkUpload = services.UPLOAD
@@ -93,7 +89,7 @@ export default async ({ Vue, store, app }) => {
     link: createHttpLink({
       uri: linkHttp,
       fetch (uri, options) {
-        debug('FETCH HTTP')
+        logD('FETCH HTTP')
         const token = localStorage.getItem('ktoken')
         const d = localStorage.getItem('kdebug')
         if (token) options.headers.Authorization = token
@@ -112,7 +108,7 @@ export default async ({ Vue, store, app }) => {
         reconnect: true,
         lazy: true,
         connectionParams: () => {
-          debug('FETCH WS')
+          logD('FETCH WS')
           return {
             Authorization: localStorage.getItem('ktoken'),
             'X-Kalpagramma-debug': localStorage.getItem('kdebug')
@@ -126,7 +122,7 @@ export default async ({ Vue, store, app }) => {
     link: createUploadLink({
       uri: linkUpload,
       fetch (uri, options) {
-        debug('FETCH UPLOAD', uri, options)
+        logD('FETCH UPLOAD', uri, options)
         const token = localStorage.getItem('ktoken')
         const d = localStorage.getItem('kdebug')
         if (token) options.headers.Authorization = token
@@ -146,7 +142,7 @@ export default async ({ Vue, store, app }) => {
     }
   })
   app.apolloProvider = apolloProvider
-  debug('apollo init done')
+  logD('apollo init done')
 }
 
 export { apolloProvider }

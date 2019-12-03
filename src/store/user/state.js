@@ -14,7 +14,7 @@ export default {
       lang: '',
       nameFirst: '',
       nameFull: '',
-      nameSecond: '',
+      nameSecond: ''
     },
     settings: {
       general: {
