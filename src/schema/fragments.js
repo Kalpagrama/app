@@ -17,9 +17,6 @@ const objectShortWithMetaFragment = gql`
       type
       ...on MetaNode{
         layout
-        fragments{
-          uid
-        }
       }
     }
   }
@@ -37,6 +34,7 @@ const videoFragment = gql`
     width
     height
     frameUrls
+    contentSource
   }
 `
 const imageFragment = gql`
@@ -73,7 +71,6 @@ const nodeFragment = gql`
     }
     categories
     fragments {
-      uid
       name
       url
       content {
@@ -86,7 +83,7 @@ const nodeFragment = gql`
     meta {
       ...on MetaNode {
         layout
-        fragments { uid width height color thumbUrl(preferWidth: 600) }
+        fragments { width height color thumbUrl(preferWidth: 600) }
       }
     }
   }

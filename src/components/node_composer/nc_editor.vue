@@ -99,7 +99,6 @@ export default {
     },
     fragmentFound (f) {
       this.$logD('fragmentFound', f)
-      // this.fragments[this.fragmentIndex] = f
       this.$set(this.fragments, this.fragmentIndex, f)
       this.$refs.fragmentFinderDialog.hide()
       this.fragmentIndex = -1

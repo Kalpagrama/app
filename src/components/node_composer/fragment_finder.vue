@@ -43,8 +43,8 @@ div(:style=`{position: 'relative'}`).column.fit.bg-grey-3
                   :style=`{height: '60px', borderRadius: '10px'}`).full-width
                   span {{ $t('or Pick from device') }}
             //- youtube, and others
-            div(v-if="urlType").row.fit
-              nc-youtube(v-if="urlType === 'YOUTUBE'" :url="url")
+            div(v-if="content").row.fit
+              nc-youtube(v-if="content.contentSource === 'YOUTUBE'" :url="url" @relativePoints="relativePointsFound")
 </template>
 
 <script>
@@ -61,10 +61,10 @@ export default {
         {id: 'upload', name: 'Upload'},
         {id: 'nodes', name: 'Nodes'}
       ],
+      headerHeight: 200,
       url: '',
-      urlType: undefined,
-      urlTypes: ['YOUTUBE', 'TWITTER', 'KALPAGRAMMA'],
-      headerHeight: 200
+      file: null,
+      content: null
     }
   },
   computed: {
@@ -75,26 +75,28 @@ export default {
   watch: {
     url: {
       immediate: true,
-      handler (to, from) {
+      async handler (to, from) {
         this.$logD('url CHANGED', to)
-        // let url = new URL(to)
         let url = this.urlParse(to)
         if (url) {
-          switch (url.host) {
-            case 'www.youtu.be':
-            case 'youtu.be':
-            case 'www.youtube.com':
-            case 'youtube.com': {
-              this.$logD('HOST: YOUTUBE')
-              this.urlType = 'YOUTUBE'
-              break
-            }
-            case 'twitter.com':
-            case 'www.twitter.com': {
-              this.urlType = 'TWITTER'
-              break
-            }
-          }
+          // let {data: {uploadContentUrl}} = await this.$apollo.mutate({
+          //   mutation: gql`
+          //     mutation nc_uploadContentUrl ($url: String!) {
+          //       uploadContentUrl (url: $url, onlyMeta: true) {
+          //         oid
+          //         type
+          //         name
+          //       }
+          //     }
+          //   `,
+          //   variables: {
+          //     url: url
+          //   }
+          // })
+          // this.$log('uploadContentUrl', uploadContentUrl)
+          // this.content = await this.$store.dispatch('objects/get', { oid: uploadContentUrl.oid, fragmentName: 'objectFragment', priority: 0 })
+          // this.content.contentSource = 'YOUTUBE'
+          // this.$log('content', this.content)
           this.$tween.to(this, 0.3, {headerHeight: 70})
         } else {
           this.$tween.to(this, 0.3, {headerHeight: 200})
@@ -104,6 +106,18 @@ export default {
     }
   },
   methods: {
+    relativePointsFound (points) {
+      this.$log('relativePointsFound', points)
+      let fragment = {
+        uid: 'skdmflksmdf',
+        oid: this.content.oid,
+        thumbUrl: this.content.thumbUrl,
+        relativePoints: points,
+        relativeScale: this.content.duration
+      }
+      this.$log('fragment', fragment)
+      this.$emit('fragment', fragment)
+    },
     urlParse (url) {
       let res
       try {
@@ -117,7 +131,6 @@ export default {
     async urlPasted (e) {
       this.$logD('urlPasted', e)
       await this.$wait(200)
-      // this.$q.notify({message: 'Pasted!', color: 'green', textColor: 'white'})
       this.$refs.inputUrl.blur()
     },
     urlInput (e) {
