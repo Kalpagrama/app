@@ -14,7 +14,7 @@ export default {
   name: 'kDialogMini',
   data () {
     return {
-      delta: 200
+      delta: 60
     }
   },
   methods: {

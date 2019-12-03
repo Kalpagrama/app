@@ -1,106 +1,144 @@
+<style lang="stylus">
+.kinput
+  border: none
+  height: 56px
+  padding: 10px
+  &:focus
+    outline: none
+</style>
+
 <template lang="pug">
-div(
-  :style=`{position: 'relative'}`
-  ).column.fit.bg-grey-3
+div(:style=`{position: 'relative'}`).column.fit.bg-grey-3
   div.col.full-width
     k-colls(@coll="coll = $event" :tabs="true" :header="false" :coll="coll" :colls="colls" :style="{height: '100%'}")
+      template(v-slot:nodes)
+        ws-nodes(@nodeClick="nodeClick" :nodeClickOverride="true")
       template(v-slot:upload)
-        div(:style=`{paddingTop: '100px'}`).row.full-width.q-px-sm
-          //- by url
-          .row.full-width
-          div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
-            //- q-input(
-            //-   v-model="url"
-            //-   :style=`{}`).full-width
-            input(
-              ref="inputUrl" type="url" :placeholder="$t('Paste URL')" @change="urlChanged"
-              :style=`{height: '60px', width: '100%'}`).kinput
-          //- from device
-          div(
-            @click="$refs.inputFile.click()"
-            :style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.items-center.justify-center.bg-white.cursor-pointer
-            input(ref="inputFile" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-            span {{$t('or Pick file from device')}}
-      template(v-slot:bookmarks)
-          .column.fit
-            .col.full-width.scroll
-              .row.full-width.items-start.q-px-sm
-                div(v-for="(b,bi) in bookmarks" :key="bi" :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
-                  ).row.full-width.items-center.bg-white.q-px-sm.q-mb-sm
-                  img(:style=`{height: '60px', objectFit: 'contain'}`).bg-black
-                  .col.full-height
-                    span {{ b.name | cut(50) }}
-                div(v-if="bookmarks.length === 0").row.full-width.justify-center.q-py-xl
-                  span You dont have any bookmarks
-      template(v-slot:fragments)
-        k-page(:noBackBtn="true")
-          template(v-slot:header)
-            q-btn(round flat icon="search")
-            .col
-            q-btn(round flat icon="more_vert")
-          .column.fit
-            .col.full-width.scroll
-              .row.full-width.items-start.q-px-sm
-                div(
-                  v-for="(f,fi) in fragments" :key="fi" @click="fragmentClick(f,fi)"
-                  :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
-                  ).row.full-width.items-center.bg-white.q-mb-sm
-                  div(:style=`{height: '60px', width: '100px', borderRadius: '10px', overflow: 'hidden'}`).bg-black
-                    img(:src="f.thumbUrl" :style=`{objectFit: 'contain'}`).fit
-                  .col.full-height
-                    .row.fit.items-center.q-px-xs
-                      span {{ f.name | cut(50) }}
-                div(v-if="fragments.length === 0").row.full-width.justify-center.q-py-xl
-                  span You dont have any fragments
+        .column.fit
+          div(:style=`{height: headerHeight+'px'}`).row.full-width.items-end.q-px-sm
+            div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
+              input(
+                ref="inputUrl" type="url" :placeholder="$t('Write URL')" v-model="url"
+                @paste="urlPasted"
+                @input="urlInput" @change="urlChanged"
+                :style=`{height: '60px', width: '100%'}`).kinput
+              q-btn(
+                v-if="url.length === 0"
+                push no-caps color="accent" @click="paste()"
+                :style=`{position: 'absolute', right: '8px', top: '12px', borderRadius: '10px'}`)
+                span {{$t('Paste')}}
+              q-btn(
+                v-else
+                round flat icon="clear" @click="url = ''"
+                :style=`{position: 'absolute', right: '8px', top: '10px'}`)
+          .col.full-width.scroll.kscroll
+            //- device
+            div(v-if="url.length === 0" key="device").row.fit.q-pa-sm
+              div(
+                :style=`{borderRadius: '10px', overflow: 'hidden'}`
+                ).row.full-width.full-height.items-start.justify-center.bg-white.cursor-pointer.q-pa-sm
+                input(ref="inputFile" type="file" @change="fileChanged" :style=`{display: 'none'}`)
+                q-btn(
+                  no-caps outline color="accent" @click="$refs.inputFile.click()"
+                  :style=`{height: '60px', borderRadius: '10px'}`).full-width
+                  span {{ $t('or Pick from device') }}
+            //- youtube, and others
+            div(v-if="urlType").row.fit
+              nc-youtube(v-if="urlType === 'YOUTUBE'" :url="url")
 </template>
 
 <script>
-// TODO: how to do q-gutter in upload and in everything else, paddingLeft: -5px?
-import workspace from 'components/workspace'
+import wsNodes from 'components/workspace/ws_nodes'
+import ncYoutube from './nc_youtube'
 
 export default {
   name: 'fragmentFinder',
-  components: {workspace},
+  components: {wsNodes, ncYoutube},
   data () {
     return {
-      coll: 'fragments',
+      coll: 'upload',
       colls: [
         {id: 'upload', name: 'Upload'},
-        {id: 'fragments', name: 'Nodes'},
-        {id: 'bookmarks', name: 'Bookmarks'}
+        {id: 'nodes', name: 'Nodes'}
       ],
-      url: ''
+      url: '',
+      urlType: undefined,
+      urlTypes: ['YOUTUBE', 'TWITTER', 'KALPAGRAMMA'],
+      headerHeight: 200
     }
   },
   computed: {
-    bookmarks () {
-      return this.$store.state.workspace.workspace.bookmarks
-    },
-    fragments () {
-      return this.$store.state.workspace.workspace.fragments
+    urlEmpty () {
+      return this.url.length === 0
+    }
+  },
+  watch: {
+    url: {
+      immediate: true,
+      handler (to, from) {
+        this.$logD('url CHANGED', to)
+        // let url = new URL(to)
+        let url = this.urlParse(to)
+        if (url) {
+          switch (url.host) {
+            case 'www.youtu.be':
+            case 'youtu.be':
+            case 'www.youtube.com':
+            case 'youtube.com': {
+              this.$logD('HOST: YOUTUBE')
+              this.urlType = 'YOUTUBE'
+              break
+            }
+            case 'twitter.com':
+            case 'www.twitter.com': {
+              this.urlType = 'TWITTER'
+              break
+            }
+          }
+          this.$tween.to(this, 0.3, {headerHeight: 70})
+        } else {
+          this.$tween.to(this, 0.3, {headerHeight: 200})
+          this.$logD('WRONG URL')
+        }
+      }
     }
   },
   methods: {
-    async bookmarkClick (b, bi) {
-      this.$logD('bookmarkClick', b, bi)
-      await this.$wait(200)
-      this.$emit('hide')
+    urlParse (url) {
+      let res
+      try {
+        res = new URL(url)
+        return res
+      } catch (e) {
+        this.$logD('urlParse WRONG URL')
+        return false
+      }
     },
-    async fragmentClick (f, fi) {
-      this.$logD('fragmentClick', f, fi)
+    async urlPasted (e) {
+      this.$logD('urlPasted', e)
       await this.$wait(200)
-      this.$emit('fragment', f)
-      // this.$emit('hide')
+      // this.$q.notify({message: 'Pasted!', color: 'green', textColor: 'white'})
+      this.$refs.inputUrl.blur()
+    },
+    urlInput (e) {
+      this.$logD('urlInput', e)
     },
     urlChanged (e) {
       this.$logD('urlChanged', e)
+    },
+    paste () {
+      this.$logD('paste')
+      let data = ClipboardEvent.clipboardData
+      this.$logD('data', data)
     },
     fileChanged (e) {
       this.$logD('fileChanged', e)
       let files = e.target.files
       this.$logD('typof files', typeof files)
       // TODO: how to handle many files or one, or types
+    },
+    nodeClick ([n, ni]) {
+      this.$logD('nodeClick', n, ni)
     }
   },
   mounted () {
@@ -111,11 +149,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus">
-.kinput
-  border none
-  padding 10px
-  &:focus
-    outline: none
-</style>

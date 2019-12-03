@@ -32,7 +32,7 @@ k-page(:noHeader="true")
               v-model="name" :style=`{width: '100%'}`).kinput.text-center.text-bold.br
             span(
               v-else
-              ).text-bold {{ name ? name : $t('В чем суть?') }}
+              ).text-bold {{ name ? name : $t('Whats the point?', 'Whats the point?') }}
           //- f2
           div(
             v-ripple=`{color: 'accent'}` @click="fragmentClick(1)"
@@ -47,7 +47,7 @@ k-page(:noHeader="true")
 import fragmentFinder from './fragment_finder'
 
 export default {
-  name: 'nodeComposer__editor',
+  name: 'ncEditor',
   components: {fragmentFinder},
   props: ['height'],
   data () {
@@ -135,7 +135,7 @@ export default {
     }
   },
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')

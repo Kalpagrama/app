@@ -1,22 +1,25 @@
 <template lang="pug">
 .column.fit
-  div(v-if="!noActions"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', height: '78px'}`).row.full-width.items-center
-    slot(name="actions")
-  //- body with default slot
+  //- header
+  transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+    div(
+      v-if="headerShow"
+      :style=`{height: headerHeight+'px', overflow: 'hidden'}`).row.full-width
+      slot(name="header")
+  //- body
+  //- v-touch-pan.down.prevent.mouse="onPan"
   div(
-    v-touch-pan.down.prevent.mouse="scrollTop === 0 ? onPan : () => false"
+    ref="kPageScroll"
+    :style=`{position: 'relative'}`
     @scroll="onScroll"
     ).col.full-width.scroll
     slot
-  //- header
-  div(
-    v-if="!noHeader"
-    :style=`{height: headerHeight+'px', overflow: 'hidden'}`).row.full-width
-    div(:style=`{height: '60px'}`).row.full-width
+  //- footer
+  transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+    div(
+      v-if="!noFooter"
+      :style=`{height: footerHeight+'px', overflow: 'hidden'}`).row.full-width
       slot(name="footer")
-    div(v-if="true").row.full-width.items-center.justify-center
-      q-spinner(color="accent" :size="40")
 </template>
 
 <script>
@@ -24,21 +27,35 @@
 
 export default {
   name: 'kPage',
-  props: ['noHeader', 'noBackBtn', 'noActions'],
+  props: ['noHeader', 'noFooter', 'noBackBtn', 'noActions', 'noPan'],
   data () {
     return {
       scrollTop: 0,
       scrollHeight: 0,
-      headerHeight: 60
+      headerShowLocal: true,
+      headerHeight: 0,
+      footerHeight: 60
+    }
+  },
+  computed: {
+    headerShow () {
+      if (this.noHeader) return false
+      else return this.headerShowLocal
     }
   },
   methods: {
     onScroll (e) {
       // this.$logD('onScroll', e)
+      let scrollTop = this.$refs.kPageScroll.scrollTop
+      if (this.scrollTop > scrollTop) this.headerShowLocal = false
+      this.scrollTop = scrollTop
     },
     onPan (e) {
-      // this.$logD('handlePan', e)
-      if (this.scrollTop === 0) return
+      if (this.noPan) return
+      if (this.scrollTop > 0) return
+      this.$logD('handlePan', e)
+      // if (this.scrollTop === 0) return
+      // manipulate header or footer
       let to = this.headerHeight + e.delta.y
       if (to < 400) this.headerHeight = to
       if (e.isFinal) {

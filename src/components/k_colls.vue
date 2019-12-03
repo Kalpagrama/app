@@ -19,7 +19,7 @@ div(
   transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
     div(
       v-if="tabs" ref="kCollsTabsWrapper"
-      :style=`{position: 'absolute', bottom: '60px', zIndex: 300, height: '50px'}`).row.full-width.no-wrap.scroll.q-px-sm.bg-grey-3
+      :style=`{position: 'absolute', top: '0px', zIndex: 300, height: '50px'}`).row.full-width.no-wrap.scroll.q-px-sm.bg-grey-3
       div(
         v-ripple="{color: 'white'}"
         :style=`{
@@ -33,7 +33,7 @@ div(
         div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.items-center.justify-center
           span(:style=`{whiteSpace: 'nowrap'}`).text-bold.cursor-pointer {{c.name}}
   //- body
-  div(v-touch-pan.left.right.prevent.mouse="handlePan" :style=`{marginTop: '0px'}`).col.full-width
+  div(v-touch-pan.left.right.prevent.mouse="handlePan" :style=`{paddingTop: '50px'}`).col.full-width
     div(
       ref="kCollsScrollWrapper" @scroll="handleScroll"
       :style=`{position: 'relative', overflowX: overflow}`).row.fit.no-wrap.scroll.kscroll

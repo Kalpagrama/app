@@ -66,7 +66,7 @@ async function initWebPush (store) {
       store.commit('core/stateSet', ['webPushTokenDraft', token])
 
       logD(token)
-      showNotification('initWebPush ok', 'body')
+      // showNotification('initWebPush ok', 'body')
       // todo send to server
       messaging.onTokenRefresh(async () => {
         let token = await messaging.getToken()

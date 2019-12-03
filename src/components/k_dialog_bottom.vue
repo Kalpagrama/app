@@ -94,7 +94,7 @@ export default {
       }
     },
     show () {
-      this.$logD('show', this.$refs.kDialogBottom)
+      this.$logD('show')
       this.$refs.kDialogBottom.show()
     },
     hide () {
