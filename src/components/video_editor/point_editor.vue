@@ -184,7 +184,7 @@ export default {
     },
     async framesLoad (oid) {
       this.$logD('framesLoad start')
-      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
+      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFragment', priority: 0 })
       // let { data: { objectList: [{frameUrls}] } } = await this.$apollo.query({
       //   query: gql`
       //     query getVideo ($oid: OID!) {

@@ -19,7 +19,7 @@ export default {
   },
   methods: {
     async wsClear () {
-      this.$logD('wsClear start')
+      this.$log('wsClear start')
       let {data: {wsClear}} = await this.$apollo.mutate({
         mutation: gql`
           mutation wsClear {
@@ -27,15 +27,15 @@ export default {
           }
         `
       })
-      this.$logD('wsClear done', wsClear)
+      this.$log('wsClear done', wsClear)
       window.location.reload(true)
     }
   },
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

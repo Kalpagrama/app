@@ -1,9 +1,6 @@
 export default {
   initialized: false,
   workspace: {
-    bookmarks: [],
-    contents: [],
-    fragments: [],
     nodes: [],
     spheres: []
   },
