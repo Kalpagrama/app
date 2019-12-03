@@ -92,7 +92,7 @@ export default {
     },
     async contentGet (oid) {
       this.$logD('contentGet start', oid)
-      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'contentFragment', priority: 0 })
+      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFragment', priority: 0 })
       // let {data: {objectList: [content]}} = await this.$apollo.query({
       //   query: gql`
       //     query contentGetOld ($oid: OID!) {

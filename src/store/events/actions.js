@@ -49,6 +49,7 @@ export const testWebPush = async (context) => {
 }
 
 function processEvent (context, event) {
+  logD('event received', event)
   switch (event.type) {
     case 'ERROR':
       context.commit('stateSet', ['error', event])
@@ -103,7 +104,10 @@ function processEvent (context, event) {
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_UPDATED':
     case 'WS_ITEM_DELETED':
+      logD('try notifyUserActionComplete', event)
+      event.object = event.objectFull
       notifyUserActionComplete(event.type, event.object)
+      logD('try processEventWs')
       processEventWs(context, event)
       break
     default:
@@ -113,24 +117,24 @@ function processEvent (context, event) {
 
 function processEventWs (context, event) {
   let type = event.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
-  let object = event.wsObject
+  let object = event.object
   let objectType = object.__typename
   let operationName
   switch (type) {
     case 'WS_ITEM_CREATED':
-      operationName = 'add'
+      operationName = 'Create'
       break
     case 'WS_ITEM_UPDATED':
-      operationName = 'update'
+      operationName = 'Update'
       break
     case 'WS_ITEM_DELETED':
-      operationName = 'delete'
+      operationName = 'Delete'
       break
     default:
       throw new Error(`bad type ${type}`)
   }
   logD(operationName, objectType)
-  context.commit(`workspace/${operationName}${objectType}`, object, { root: true })
+  context.commit(`workspace/ws${objectType}${operationName}`, object, { root: true })
 }
 
 function processEventNotice (context, { typeNotice, message }) {
@@ -191,19 +195,21 @@ function notifyUserActionComplete (eventType, object) {
             route = `/app/node/${object.oid}`
           } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
             route = `/app/sphere/${object.oid}`
-          } else if (['WSBookmark', 'WSSphere', 'WSContent', 'WSNode', 'WSFragment'].includes(object.__typename)) {
-            if (object.__typename === 'WSBookmark') {
-              route = '/app/workspace/bookmarks'
-            } else if (object.__typename === 'WSSphere') {
-              route = '/app/workspace/spheres'
-            } else if (object.__typename === 'WSContent') {
-              route = '/app/workspace/contents'
-            } else if (object.__typename === 'WSNode') {
-              route = '/app/workspace/nodes'
-            } else if (object.__typename === 'WSFragment') route = '/app/workspace/fragments'
           } else {
             throw new Error(`bad object ${JSON.stringify(object)}`)
           }
+          // else if (['WSBookmark', 'WSSphere', 'WSContent', 'WSNode', 'WSFragment'].includes(object.__typename)) {
+          //   if (object.__typename === 'WSBookmark') {
+          //     route = '/app/workspace/bookmarks'
+          //   } else if (object.__typename === 'WSSphere') {
+          //     route = '/app/workspace/spheres'
+          //   } else if (object.__typename === 'WSContent') {
+          //     route = '/app/workspace/contents'
+          //   } else if (object.__typename === 'WSNode') {
+          //     route = '/app/workspace/nodes'
+          //   } else if (object.__typename === 'WSFragment') route = '/app/workspace/fragments'
+          // }
+
           router.push(route)
         }
       }]
