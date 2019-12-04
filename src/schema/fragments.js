@@ -19,7 +19,6 @@ const objectShortWithMetaFragment = gql`
         layout
         fragments{
           name
-          uid
         }
       }
     }

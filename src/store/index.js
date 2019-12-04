@@ -69,7 +69,7 @@ async function init (context) {
   wait(1000).then(async () => {
     logD('test node cre')
     // await context.dispatch('workspace/wsNodeCreate', null)
-    await context.dispatch('node/nodeCreate', null)
+    // await context.dispatch('node/nodeCreate', null)
     // await context.dispatch('workspace/wsSphereCreate', {
     //   name: 'test sphere2',
     // })
