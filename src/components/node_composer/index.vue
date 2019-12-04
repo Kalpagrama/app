@@ -66,6 +66,7 @@ div(:style=`{zIndex: 1000}`).column.fit.bg-grey-3
                 v-else
                 ).text-bold {{ node.name ? node.name : $t('Whats the point?', 'Whats the point?') }}
             nc-fragment(:width="editorWidth")
+            div(:style=`{height: '100px'}`).row.full-width
 </template>
 
 <script>

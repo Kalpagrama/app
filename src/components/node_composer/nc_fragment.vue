@@ -1,10 +1,9 @@
 <style lang="stylus">
 </style>
-
 <template lang="pug">
 div(
   :style=`{
-    position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'
+    position: 'relative', zIndex: 100, minHeight: '150px', borderRadius: '10px', overflow: 'hidden'
   }`
   ).row.full-width
   div(v-if="stage === 0").row.fit.items-center.justify-center.bg-grey-1
