@@ -31,7 +31,7 @@ export default {
               meta {
                 ...on MetaNode {
                   layout
-                  fragments { uid width height color thumbUrl(preferWidth: 600) }
+                  fragments { width height color thumbUrl(preferWidth: 600) }
                 }
               }
             }
