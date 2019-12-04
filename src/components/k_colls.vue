@@ -1,25 +1,11 @@
 <template lang="pug">
 div(
   ).column.full-width
-  //- debug
-  div(
-    v-if="debug"
-    :style=`{position: 'absolute', bottom: '300px', zIndex: 1000, background: 'rgba(0,0,0,0.3)'}`).row.full-width.items-center.bg-red
-  //- actions
-  div(
-    v-if="actions"
-    :style=`{position: 'absolute', bottom: '70px', right: '10px', height: '60px', width: '60px'}`).row
-    slot(name="actions")
-  //- header
-  //- div(
-  //-   v-if="header"
-  //-   :style=`{minHeight: '60px'}`).row.full-width
-  //-   slot(name="header")
   //- tabs
   transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
     div(
       v-if="tabs" ref="kCollsTabsWrapper"
-      :style=`{position: 'absolute', top: '0px', zIndex: 300, height: '50px'}`).row.full-width.no-wrap.scroll.q-px-sm.bg-grey-3
+      :style=`{position: 'relative', height: '50px'}`).row.full-width.no-wrap.scroll.q-px-sm.bg-grey-3
       div(
         v-ripple="{color: 'white'}"
         :style=`{
@@ -33,7 +19,7 @@ div(
         div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.items-center.justify-center
           span(:style=`{whiteSpace: 'nowrap'}`).text-bold.cursor-pointer {{c.name}}
   //- body
-  div(v-touch-pan.left.right.prevent.mouse="handlePan" :style=`{paddingTop: '50px'}`).col.full-width
+  div(v-touch-pan.left.right.prevent.mouse="handlePan").col.full-width
     div(
       ref="kCollsScrollWrapper" @scroll="handleScroll"
       :style=`{position: 'relative', overflowX: overflow}`).row.fit.no-wrap.scroll.kscroll
