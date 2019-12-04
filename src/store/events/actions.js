@@ -4,7 +4,6 @@ import { Notify } from 'quasar'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
-import { logI } from 'boot/log'
 import { logD, logE } from 'src/boot/log'
 
 export const init = async (context, userEvents) => {
@@ -92,8 +91,17 @@ function processEvent (context, event) {
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userSubscribed', event])
-      if (event.subject.oid === context.rootState.user.user.oid){
+      if (event.subject.oid === context.rootState.user.user.oid) { // если это мы подписались
         context.commit('subscriptions/subscribe', event.object, { root: true })
+        let cachedObj = context.rootGetters['objects/objectGet']({ oid: event.object.oid })
+        if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
+          cachedObj.subscribers.push({
+            oid: context.rootState.user.user.oid,
+            name: context.rootState.user.user.name,
+            type: context.rootState.user.user.type,
+            thumbUrl: context.rootState.user.user.thumbUrl
+          })
+        }
       }
       context.commit('addEvent', event)
       break
@@ -102,6 +110,15 @@ function processEvent (context, event) {
       context.commit('stateSet', ['userUnSubscribed', event])
       if (event.subject.oid === context.rootState.user.user.oid) {
         context.commit('subscriptions/unSubscribe', event.object, { root: true })
+        let cachedObj = context.rootGetters['objects/objectGet']({ oid: event.object.oid })
+        if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
+          let indx = cachedObj.subscribers.findIndex(obj => obj.oid === context.rootState.user.user.oid)
+          if (indx >= 0) {
+            cachedObj.subscribers.splice(indx, 1)
+          } else {
+            logE('subscriber not found', event, cachedObj)
+          }
+        }
       }
       context.commit('addEvent', event)
       break
