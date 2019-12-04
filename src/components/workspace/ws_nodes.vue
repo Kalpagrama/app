@@ -2,12 +2,19 @@
 </style>
 
 <template lang="pug">
-.column.fit
+div(:style=`{position: 'relative'}`).column.fit
+  q-btn(
+    push round icon="add" color="accent" size="xl"
+    :style=`{position: 'absolute', zIndex: 1000, right: '10px', bottom: '10px'}`)
   div(:style=`{height: '50px'}`).row.full-width.items-center.q-px-sm
-    q-btn(round flat icon="search")
-    .col
+    .col.q-px-sm
+      span.q-mr-sm Spheres
+      span.q-mr-sm Nodes
+      span.q-mr-sm Fragments
+      span.q-mr-sm Contents
     //- q-btn(round flat icon="list")
-    q-btn(round flat icon="more_vert")
+    //- q-btn(round flat icon="more_vert")
+    q-btn(round flat icon="search")
   .col.full-width.scroll.kscroll
     div().row.full-width.items-start.content-start.q-pt-sm.q-px-sm
       div(

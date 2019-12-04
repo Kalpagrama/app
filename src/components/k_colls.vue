@@ -1,39 +1,24 @@
 <template lang="pug">
-div(
-  ).column.full-width
-  //- debug
-  div(
-    v-if="debug"
-    :style=`{position: 'absolute', bottom: '300px', zIndex: 1000, background: 'rgba(0,0,0,0.3)'}`).row.full-width.items-center.bg-red
-  //- actions
-  div(
-    v-if="actions"
-    :style=`{position: 'absolute', bottom: '70px', right: '10px', height: '60px', width: '60px'}`).row
-    slot(name="actions")
-  //- header
-  //- div(
-  //-   v-if="header"
-  //-   :style=`{minHeight: '60px'}`).row.full-width
-  //-   slot(name="header")
+.column.full-width
   //- tabs
-  transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+  //- transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+  div(
+    ref="kCollsTabsWrapper"
+    :style=`{position: 'relative', height: tabsHeight+'px'}`).row.full-width.no-wrap.scroll.q-px-sm.bg-grey-3
     div(
-      v-if="tabs" ref="kCollsTabsWrapper"
-      :style=`{position: 'absolute', top: '0px', zIndex: 300, height: '50px'}`).row.full-width.no-wrap.scroll.q-px-sm.bg-grey-3
-      div(
-        v-ripple="{color: 'white'}"
-        :style=`{
-          position: 'absolute', bottom: '10px', zIndex: 200, height: '30px',
-          borderRadius: '10px', overflow: 'hidden', backdropFilter: 'invert(100%)',
-          width: collScroll.width+'px', left: 8+collScroll.left+'px'}`).row.cursor-pointer
-      div(
-        v-for="(c, ci) in getColls" :key="c.id" @click="$emit('coll', c.id)"
-        :style=`{position: 'relative', height: '50px', minWidth: c.width+'px', maxWidth: c.width+'px', width: c.width+'px'}`
-        )
-        div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.items-center.justify-center
-          span(:style=`{whiteSpace: 'nowrap'}`).text-bold.cursor-pointer {{c.name}}
+      v-ripple="{color: 'white'}"
+      :style=`{
+        position: 'absolute', bottom: '10px', zIndex: 200, height: '30px',
+        borderRadius: '10px', overflow: 'hidden', backdropFilter: 'invert(100%)',
+        width: collScroll.width+'px', left: 8+collScroll.left+'px'}`).row.cursor-pointer
+    div(
+      v-for="(c, ci) in getColls" :key="c.id" @click="$emit('coll', c.id)"
+      :style=`{position: 'relative', height: '50px', minWidth: c.width+'px', maxWidth: c.width+'px', width: c.width+'px'}`
+      )
+      div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.items-center.justify-center
+        span(:style=`{whiteSpace: 'nowrap'}`).text-bold.cursor-pointer {{c.name}}
   //- body
-  div(v-touch-pan.left.right.prevent.mouse="handlePan" :style=`{paddingTop: '50px'}`).col.full-width
+  div(v-touch-pan.left.right.prevent.mouse="handlePan").col.full-width
     div(
       ref="kCollsScrollWrapper" @scroll="handleScroll"
       :style=`{position: 'relative', overflowX: overflow}`).row.fit.no-wrap.scroll.kscroll
@@ -65,7 +50,8 @@ export default {
       clientWidth: this.$q.screen.width,
       scrollLeft: 0,
       scrollWidth: 0,
-      visited: []
+      visited: [],
+      tabsHeight: 50
     }
   },
   computed: {
@@ -77,10 +63,6 @@ export default {
     },
     collNowIndex () {
       return this.getColls.findIndex(c => c.id === this.coll)
-    },
-    collNowVisible () {
-      // if (this.collScroll.left > )
-      return false
     },
     collNow () {
       return this.getColls[this.collNowIndex]
@@ -120,16 +102,23 @@ export default {
     }
   },
   watch: {
+    tabs: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('tabs CHANGED', to)
+        this.$tween.to(this, 0.3, {tabsHeight: to ? 50 : 0})
+      }
+    },
     tabsLeft: {
       handler (to, from) {
-        // this.$logD('tabsLeft', to)
+        // this.$log('tabsLeft', to)
         this.$refs.kCollsTabsWrapper.scrollLeft = to - (this.clientWidth / 3)
       }
     },
     coll: {
       immediate: true,
       async handler (to, from) {
-        this.$logD('coll CHANGED', to)
+        this.$log('coll CHANGED', to)
         if (to) {
           this.$nextTick(() => {
             let i = this.colls.findIndex(c => c.id === to)
@@ -149,18 +138,23 @@ export default {
     handleScroll (e) {
       // this.$logD('handleScroll', e)
       this.clientWidth = e.target.clientWidth
+      this.scrollTop = e.target.scrollTop
       this.scrollLeft = e.target.scrollLeft
       this.scrollWidth = e.target.scrollWidth
       this.$emit('scroll', e)
     },
+    scrollTo (to) {
+      this.$refs.kCollsScrollWrapper.scrollTop = to
+    },
     async handleSwipe (e) {
       let i = e.direction === 'left' ? this.collIndex + 1 : this.collIndex - 1
       if (this.disable || i < 0 || i > this.colls.length - 1 || !this.colls[i]) return
-      this.$logD('handleSwipe', e)
+      this.$log('handleSwipe', e)
       this.$emit('coll', this.colls[i].id)
     },
     handlePan (e) {
       if (this.disable) return
+      if (!this.tabs) return
       if (e.distance.x > this.clientWidth * 1.3) return
       // if (e.direction === 'right' && this.collNowIndex === 0) return
       // this.$q.notify(e.direction)
