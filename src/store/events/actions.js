@@ -92,13 +92,17 @@ function processEvent (context, event) {
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userSubscribed', event])
-      context.commit('subscriptions/subscribe', event.object, { root: true })
+      if (event.subject.oid === context.rootState.user.user.oid){
+        context.commit('subscriptions/subscribe', event.object, { root: true })
+      }
       context.commit('addEvent', event)
       break
     case 'USER_UNSUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userUnSubscribed', event])
-      context.commit('subscriptions/unSubscribe', event.object, { root: true })
+      if (event.subject.oid === context.rootState.user.user.oid) {
+        context.commit('subscriptions/unSubscribe', event.object, { root: true })
+      }
       context.commit('addEvent', event)
       break
     case 'WS_ITEM_CREATED':

@@ -10,7 +10,7 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width.bg-white
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-        q-btn(round flat icon="keyboard_arrow_left" color="accent" @click="$router.back()")
+        q-btn(round @click="$router.back(1)" flat color="accent" icon="arrow_back")
       .col.full-height
         .row.fit.items-center.q-px-md
           span.text-bold.text-black Subscriptions

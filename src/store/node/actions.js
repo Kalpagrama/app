@@ -1,6 +1,7 @@
 import { logD } from 'src/boot/log'
 
 import { apolloProvider } from 'boot/apollo'
+import assert from 'assert'
 
 export const init = async (context, categories) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
@@ -57,41 +58,89 @@ export const nodeDelete = async (context, oid) => {
   logD('nodeDelete dones')
 }
 
-export const nodeCreate = async (context, payload) => {
-  logD('nodeCreate start', payload)
-  if (!payload.fragments || payload.fragments.length === 0) throw new Error('Wrong fragments!')
-  let node = {
-    name: payload.name || '',
-    spheres: payload.spheres.map(s => ({ name: s.name, oid: s.oid })),
-    categories: payload.categories,
-    fragments: payload.fragments.map(f => {
-      return {
-        uid: f.uid,
-        name: f.name,
-        oid: f.content.oid,
-        relativePoints: f.relativeCuts.reduce((acc, val) => {
-          acc.push({x: val.start})
-          acc.push({x: val.end})
-          return acc
-        }, []),
-        relativeScale: f.relativeScale
+export const nodeCreate = async (context, node) => {
+  logD('nodeCreate start', node)
+
+  node = {
+    name: 'test name', // от 1 до 180
+    categories: ['POLITICS'], // от 1 до 3
+    spheres: [], // от нуля до 10
+    layout: 'PIP', // PIP, HORIZONTAL, VERTICAL, SLIDER
+    // превью ядра
+    thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+    fragments: [{ // от 1 до 2
+      name: 'fragment1 name',
+      contentOid: 'AmiFT0MCoGI=',
+      thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+      width: 600,
+      height: 450,
+      color: 'black',
+      relativeScale: 1000,
+      relativeCuts: [{ // минимум 1 cut
+        start: 100, // 0 - relativeScale
+        end: 200, // (start+1) - relativeScale
+        name: 'relativeCut1 name',
+        type: 'reserved...',
+        thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      }]
+    }
+    ]
+  }
+
+  // checks
+  {
+    assert.ok(node.categories.length >= 1 && node.categories.length <= 3)
+    assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10)
+    assert.ok(node.name.length > 0 && node.name.length < 180)
+    assert.ok(node.fragments.length >= 1 && node.fragments.length <= 2)
+    assert.ok(node.layout)
+    for (let fr of node.fragments) {
+      assert.ok(fr.relativeCuts.length > 0)
+      for (let rc of fr.relativeCuts) {
+        assert.ok(fr.relativeScale > 0 && rc.start >= 0 && rc.end > 0)
+        assert.ok(rc.end > rc.start && rc.end <= fr.relativeScale)
       }
-    }),
-    meta: {
-      layout: 'PIP',
-      fragments: payload.fragments.map(f => ({ uid: f.uid, color: 'black' }))
     }
   }
-  if (payload.parentNode) node.parentNode = payload.parentNode
-  logD('nodeCreate node', node)
+
+  let nodeInput = {}
+  nodeInput.name = node.name
+  nodeInput.categories = node.categories
+  nodeInput.spheres = node.spheres
+  nodeInput.fragments = node.fragments.map(fr => {
+    return {
+      name: fr.name,
+      oid: fr.contentOid,
+      thumbUrl: fr.thumbUrl,
+      relativeScale: fr.relativeScale,
+      relativePoints: fr.relativeCuts.reduce((acc, val) => {
+        acc.push({ x: val.start })
+        acc.push({ x: val.end })
+        return acc
+      }, [])
+    }
+  })
+  nodeInput.meta = {
+    layout: node.layout,
+    thumbUrl: node.thumbUrl,
+    fragments: node.fragments.map(fr => ({
+      width: fr.width,
+      height: fr.height,
+      color: fr.color,
+      thumbUrl: fr.thumbUrl,
+      relativeCuts: fr.relativeCuts
+    }))
+  }
+
+  logD('nodeCreate node', nodeInput)
   let { data: { nodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation nodePublish ($node: NodeInput!) {
+      mutation nodeCreate ($node: NodeInput!) {
         nodeCreate (node: $node)
       }
     `,
     variables: {
-      node: node
+      node: nodeInput
     }
   })
   logD('nodeCreate done', nodeCreate)

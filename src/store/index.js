@@ -47,12 +47,29 @@ async function init (context) {
   await context.dispatch('events/init', user.events)
   await context.dispatch('subscriptions/init', user.subscriptions)
   await context.dispatch('objects/init')
+  user.profile = {profile: {
+    city: 'EKB',
+    country: 'Russia',
+    dateBirth: '20.05.1998',
+    gender: 'MALE',
+    lang: 'russian',
+    nameFirst: 'Roman',
+    nameFull: 'Roman Motovilov',
+    status: '',
+    about: '',
+    nameSecond: 'Motovilov',
+    email: 'roma-motovilov@mail.ru',
+    number: '8999-999-99-99'
+  }
+  }
   await context.dispatch('user/init', user)
   await i18next.changeLanguage(user.profile.lang)
 
   const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
   wait(1000).then(async () => {
-    logD('test ws')
+    logD('test node cre')
+    // await context.dispatch('workspace/wsNodeCreate', null)
+    // await context.dispatch('node/nodeCreate', null)
     // await context.dispatch('workspace/wsSphereCreate', {
     //   name: 'test sphere2',
     // })
