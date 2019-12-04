@@ -26,7 +26,7 @@ export default {
     this.$logD('logout')
     await this.$apollo.mutate({
      mutation: gql`
-          mutation logout {
+          mutation logoutFromKalpa {
             logout
           }
         `

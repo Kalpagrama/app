@@ -19,6 +19,7 @@ const objectShortWithMetaFragment = gql`
         layout
         fragments{
           name
+          uid
         }
       }
     }
@@ -37,6 +38,7 @@ const videoFragment = gql`
     width
     height
     frameUrls
+    contentSource
   }
 `
 const imageFragment = gql`

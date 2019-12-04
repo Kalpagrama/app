@@ -3,8 +3,17 @@
 
 <template lang="pug">
 .column.fit.bg-grey-3
-  div(:style=`{height: '60px'}`).row.full-width.items-center
-    span ws_spheres
+  //- div(:style=`{height: '60px'}`).row.full-width.items-center
+  //-   span wsSpheres
+  .col.full-width.scroll.kscroll
+    .row.full-width.items-start.content-start.q-px-sm
+      div(
+        v-for="(s,si) in 100" :key="si"
+        :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
+        div(:style=`{height: '40px', width: '40px', overflow: 'hidden', background: $randomColor(si)}`).row
+        .col.full-height
+          .row.fit.items-center.q-px-sm
+            span Sphere {{ si }}
 </template>
 
 <script>
@@ -15,7 +24,10 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$logD('mounted')
+  },
+  beforeDestroy () {
+    this.$logD('beforeDestroy')
   }
 }
 </script>

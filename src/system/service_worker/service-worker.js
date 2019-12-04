@@ -102,7 +102,7 @@ if (firebase.messaging.isSupported()) {
         {
           action: 'test',
           title: 'action-test',
-          icon: '/statics/quasar-logo.png'
+          icon: '/statics/kalpagramma-logo.png'
         }
       ]
     }

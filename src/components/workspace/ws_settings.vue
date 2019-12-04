@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <template lang="pug">
 .row.full-width.items-start.content-start.q-pa-sm
   div(:style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
@@ -40,46 +39,3 @@ export default {
   }
 }
 </script>
-=======
-<template lang="pug">
-.row.full-width.items-start.content-start.q-pa-sm
-  div(:style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
-    ).row.full-width.items-center.content-center.justify-center.bg-grey-2
-    span Some settings
-  .row.full-width.q-py-sm
-    q-btn(outline color="red" no-caps @click="wsClear()"
-      style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-      span Очистить мастерскую
-  div(:style=`{height: '400px'}`).row.full-width
-</template>
-
-<script>
-export default {
-  name: 'wsSettings',
-  data () {
-    return {
-    }
-  },
-  methods: {
-    async wsClear () {
-      this.$logD('wsClear start')
-      let {data: {wsClear}} = await this.$apollo.mutate({
-        mutation: gql`
-          mutation wsClear2 {
-            wsClear
-          }
-        `
-      })
-      this.$logD('wsClear done', wsClear)
-      window.location.reload(true)
-    }
-  },
-  mounted () {
-    this.$logD('mounted')
-  },
-  beforeDestroy () {
-    this.$logD('beforeDestroy')
-  }
-}
-</script>
->>>>>>> 89bf613b3a17b556258d93f8d603c1cdd832734d

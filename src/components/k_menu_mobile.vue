@@ -1,7 +1,7 @@
 <template lang="pug">
-div(:style=`{height: '50px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
+div(:style=`{height: '60px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
   ).row.full-width.items-center.content-center.justify-between.bg-primary.q-px-md
-  div(:style=`{width: '40px', height: '40px'}` @click="$go({name: 'home'})").row
+  div(:style=`{width: '50px', height: '60px'}` @click="$go({name: 'home'})").row
     k-spinner(v-if="$route.name === 'home'" :width="40" :height="40")
     k-logo(v-else :width="40" :height="40")
   q-btn(round flat icon="whatshot" :color="$route.name === 'trends' ? 'accent' : 'white'" @click.stop="$go({name: 'trends'})")

@@ -76,10 +76,11 @@ class Logger {
 export default async ({ Vue, store, app }) => {
   try {
     let logger = new Logger(store)
-    Vue.prototype.$logD = logD = function (...msg) {
+    let logD = function (...msg) {
       let module = this && this.constructor && this.constructor.name === 'VueComponent' ? this.$options.name : 'unknown module'
       logger.debug(module, ...msg)
     }
+    Vue.prototype.$logD = logD
     Vue.prototype.$log = logD
     Vue.prototype.$logI = logI = function (...msg) {
       let module = this && this.constructor && this.constructor.name === 'VueComponent' ? this.$options.name : 'unknown module'
@@ -103,7 +104,7 @@ export default async ({ Vue, store, app }) => {
     }
     // в продакшене не работает
     Vue.config.warnHandler = function (msg, vm, trace) {
-      logW(`Vue.config.warnHandler: ${msg}\nTrace: ${trace}`)
+      // logW(`Vue.config.warnHandler: ${msg}\nTrace: ${trace}`)
     }
     // глобальный обработчик ошибок для всего. Сработает только если ОПРЕДЕЛЕНА Vue.config.errorHandler. Это странно...
     window.onerror = function (message, source, line, column, error) {

@@ -12,6 +12,9 @@
 </template>
 
 <script>
+import 'mediaelement/build/mediaelementplayer.min.css'
+import 'mediaelement/full'
+
 export default {
   name: 'mainLayout',
   components: {},
@@ -19,8 +22,12 @@ export default {
     return {
       loading: true,
       width: 0,
-      height: 0
+      height: 0,
+      me: null,
+      player: null
     }
+  },
+  mounted () {
   },
   computed: {
   },
