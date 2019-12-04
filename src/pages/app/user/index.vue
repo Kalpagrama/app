@@ -82,7 +82,6 @@ div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
         div(@click="showInfo()").row.full-width
           span.text-accent {{text}} detailed information
           //- span {{ user.subscriptions }}
-          span(v-if="mySubscriptions.includes(user.oid)") {{mySubscriptions}}
         div(v-if="showI").row.full-width.text-grey
           .row.full-width
             span Номер телефона
@@ -118,9 +117,13 @@ div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).row.full-width.bg-grey-4
           .row.full-width.justify-center
             small.text-grey.text-bold  Following
     .col.fit.items-start.justify-center.br
-      k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
-        template(v-slot:nodes)
+      k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: height+'px'}`).bg-grey-2
+        template(v-slot:created)
           k-page
+            span Created
+        template(v-slot:rated)
+          k-page
+            span Rated
             //- user-nodes(v-if="page === 'nodes' && user" :user="user")
 </template>
 
@@ -133,15 +136,17 @@ import userWorkspace from './user_workspace'
 export default {
   name: 'pageApp__User',
   components: {userNodes, userChains, userSettings, userWorkspace},
+  props: ['width', 'height'],
   data () {
     return {
       user: null,
       page: 'nodes',
       showI: false,
-      coll: undefined,
+      coll: 'created',
       colls: [
-        {name: 'nodes'}
-      ]
+        {id: 'created', name: 'Created'},
+        {id: 'rated', name: 'Rated'}
+      ],
     }
   },
   computed: {
