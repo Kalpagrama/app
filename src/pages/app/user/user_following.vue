@@ -10,7 +10,7 @@
     div(@click="").col.full-height.q-ml-sm
       .row.fit.items-center
         span.text-caption {{ s.name | cut(50) }}
-  div(v-if="countSubs === 0").row.full-width
+  div(v-if="countSubsсriptions === 0").row.full-width
     div(style=`border-radius: 10px`).row.full-width.justify-center.items-center.bg-grey-1.q-pa-xl
       span.text-bold Нету активных подписок
 </template>
@@ -23,7 +23,7 @@ export default {
     }
   },
   computed: {
-    countSubs () {
+    countSubsсriptions () {
       if (this.subscriptions === null) return 0
       return this.subscriptions.length
     }

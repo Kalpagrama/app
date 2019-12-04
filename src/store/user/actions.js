@@ -22,4 +22,5 @@ export const setUserValue = async (context, {path, value}) => {
       value
     }
   })
+  return objectChange
 }

@@ -16,14 +16,13 @@ div(:style=`{position: 'relative'}`).column.fit
     div(v-if="true").row.full-width.bg-grey-1.q-px-sm
       .row.full-width
         img(:src="user.thumbUrl" :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`)
-        .col.row.justify-end.q-mt-sm
+        div().col.row.justify-end.q-mt-sm
           q-btn(
-            push no-caps
-            v-if="myoid !== user.oid"
-            @click="mySubscriptions.includes(user.oid) ? followUser(user.oid) : unfollowUser(user.oid)"
-            :label="mySubscriptions.includes(user.oid) ? 'Follow' : 'Unfollow'"
-            :color="mySubscriptions.includes(user.oid) ? 'accent' : 'red'"
-            :style=`{borderRadius: '10px'}`).q-px-md
+            rounded no-caps
+            @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
+            :label="include ? 'Follow' : 'Unfollow'"
+            :color="include ? 'accent' : 'red'"
+            ).q-px-md
       .row.full-width.items-center.justify-start
         .row.full-width
           span.text-bold.text-black.text-h6 {{ user.name }}
@@ -33,24 +32,8 @@ div(:style=`{position: 'relative'}`).column.fit
           //- .row.full-width.q-mt-xs
           //-   small About
         div(v-if="false" @click="showInfo()").row.full-width
-          span.text-accent {{text}} detailed information
+          span.text-accent Show detailed information
           //- span {{ user.subscriptions }}
-        div(v-if="false && showI").row.full-width.text-grey
-          .row.full-width
-            span Номер телефона
-          .row.full-width
-            span Почта
-          .row.full-width
-            span Язык
-          .row.full-width
-            span Страна
-          .row.full-width
-            span Город
-          .row.full-width
-            span Дата рождения
-          .row.full-width
-            span Пол
-  span {{mySubscriptions}}
   div(
     v-if="user"
     :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width.bg-grey-3
@@ -84,12 +67,17 @@ export default {
     }
   },
   computed: {
+    include () {
+      let find = this.mySubscriptions.find(s => s.oid === this.user.oid)
+      if (find) return true
+      else return false
+    },
     colls () {
       return [
         {id: 'created', name: 'Created'},
         {id: 'rated', name: 'Rated'},
-        {id: 'following', name: 'Following ' + this.countSubscriptions},
-        {id: 'followers', name: 'Followers ' + this.countSubscribers}
+        {id: 'following', name: this.countSubscriptions + ' Following'},
+        {id: 'followers', name: this.countSubscribers + ' Followers'}
       ]
     },
     myoid () {
@@ -156,6 +144,7 @@ export default {
        try {
         this.$logD('subcribe start')
         let res = await this.$store.dispatch('subscriptions/subscribe', this.user.oid)
+        this.user = await this.userLoad(this.$route.params.oid)
         this.$logD('res', res)
         this.$logD('subcribe done')
       } catch (error) {
@@ -168,6 +157,7 @@ export default {
         let res = await this.$store.dispatch('subscriptions/unSubscribe', this.user.oid)
         this.$logD('res', res)
         // this.$delete(this.userSubscriptions, ss)
+        this.user = await this.userLoad(this.$route.params.oid)
         this.$logD('subDelete done')
       } catch (error) {
         this.$logD('subDelete error', error)

@@ -13,7 +13,7 @@
       div(style=`border-radius: 10px;`).row.content-start.justify-center
         q-input(v-model="newPhone" stack-label label="Phone number" prefix="+7" filled).full-width.q-mb-md
         q-btn(
-          push no-caps dense color="accent" @click=""
+          push no-caps dense color="accent" @click="changePhone()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get code') }}
         .row.full-width.justify-start
           small.text-grey {{ $t('Example for Russia:') }} +7 921 0000007
@@ -29,7 +29,7 @@
         q-input(v-model="settings.general.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
         q-input(v-model="newEmail" stack-label label="New email" filled).full-width.q-mb-md
         q-btn(
-          push no-caps dense color="accent" @click=""
+          push no-caps dense color="accent" @click="changeEmail()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Save email') }}
   //- Pasword
   q-dialog(ref="changePasword" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
@@ -44,7 +44,7 @@
         q-input(v-model="newPas" stack-label label="New pasword" filled).full-width.q-mb-md
         q-input(v-model="repPas" stack-label label="Repeate pasword" filled).full-width.q-mb-md
         q-btn(
-          push no-caps dense color="accent" @click=""
+          push no-caps dense color="accent" @click="changePasword()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Change pasword') }}
   //- Nickname
   q-dialog(ref="changeNickname" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
@@ -92,7 +92,7 @@
       small.text-grey  {{ settings.general.nickname }}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeLanguage.show()").row.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
     .row.full-width
-      span Language
+      span {{$t('Language')}}
     .row.full-width
       small.text-grey  {{ settings.general.language }}
 </template>
@@ -116,6 +116,78 @@ export default {
           email: 'ro***@mail.ru',
           nickname: 'terminator3000'
         }
+      }
+    }
+  },
+  methods: {
+    async changePhone () {
+      try {
+        this.$log('changePhone start')
+        let res = await this.$store.dispatch('user/setUserValue', {
+          path: ['settings', 'general', 'phone'],
+          value: this.newPhone
+        })
+        this.$log('changePhone done', res)
+        this.$q.notify({message: 'Changed PHONE', color: 'green', textColor: 'white'})
+      } catch (e) {
+        this.$log('changePhone ERROR', e)
+        this.$q.notify({message: 'Cant change PHONE', color: 'red', textColor: 'white'})
+      }
+    },
+    async changeEmail () {
+      try {
+        this.$log('changeEmail start')
+        let res = await this.$store.dispatch('user/setUserValue', {
+          path: ['settings', 'general', 'email'],
+          value: this.newEmail
+        })
+        this.$log('changeEmail done', res)
+        this.$q.notify({message: 'Changed EMAIL', color: 'green', textColor: 'white'})
+      } catch (e) {
+        this.$log('changeEmail ERROR', e)
+        this.$q.notify({message: 'Cant change EMAIL', color: 'red', textColor: 'white'})
+      }
+    },
+    async changePasword () {
+      try {
+        this.$log('changePasword start')
+        let res = await this.$store.dispatch('user/setUserValue', {
+          path: ['settings', 'general', 'pasword'],
+          value: this.newPasword
+        })
+        this.$log('changePasword done', res)
+        this.$q.notify({message: 'Cant change PASWORD', color: 'green', textColor: 'white'})
+      } catch (e) {
+        this.$log('changePasword ERROR', e)
+        this.$q.notify({message: 'Cant change PASWORD', color: 'red', textColor: 'white'})
+      }
+    },
+    async changeNickname () {
+      try {
+        this.$log('changeNickname start')
+        let res = await this.$store.dispatch('user/setUserValue', {
+          path: ['settings', 'general', 'nickname'],
+          value: this.newPhone
+        })
+        this.$log('changeNickname done', res)
+        this.$q.notify({message: 'Cant change NICKNAME', color: 'green', textColor: 'white'})
+      } catch (e) {
+        this.$log('changeNickname ERROR', e)
+        this.$q.notify({message: 'Cant change NICKNAME', color: 'red', textColor: 'white'})
+      }
+    },
+    async changeLanguage () {
+      try {
+        this.$log('changeLanguage start')
+        let res = await this.$store.dispatch('user/setUserValue', {
+          path: ['settings', 'general', 'language'],
+          value: this.newLanguage
+        })
+        this.$log('changeLanguage done', res)
+        this.$q.notify({message: 'Cant change LANGUAGE', color: 'green', textColor: 'white'})
+      } catch (e) {
+        this.$log('changeLanguage ERROR', e)
+        this.$q.notify({message: 'Cant change LANGUAGE', color: 'red', textColor: 'white'})
       }
     }
   }
