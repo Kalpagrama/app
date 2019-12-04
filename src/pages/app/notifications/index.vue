@@ -2,6 +2,8 @@
 q-layout(container :style=`{height: height+'px', width: width+'px'}`).column.bg-grey-2
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width.bg-white
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+        q-btn(round @click="$router.back(1)" flat color="accent" icon="arrow_back")
       .col.full-height
         .row.fit.items-center.q-px-md
           span.text-bold.text-black {{ $t('Notifications') }}
