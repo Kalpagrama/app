@@ -71,6 +71,7 @@ module.exports = {
         'object-curly-spacing': 0,
         'no-throw-literal': 0,
         'no-unneeded-ternary': 0,
-        'prefer-const': 0
+        'prefer-const': 0,
+        'no-lone-blocks': 0
     }
 }
