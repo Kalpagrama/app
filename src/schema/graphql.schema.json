@@ -478,27 +478,19 @@
             "deprecationReason": null
           },
           {
-            "name": "youtubeInfo",
+            "name": "contentInfo",
             "description": "выдача информации о ролике",
             "args": [
               {
-                "name": "videoIds",
+                "name": "url",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "NON_NULL",
-                      "name": null,
-                      "ofType": {
-                        "kind": "SCALAR",
-                        "name": "String",
-                        "ofType": null
-                      }
-                    }
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   }
                 },
                 "defaultValue": null
@@ -508,17 +500,9 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "RawJSON",
-                    "ofType": null
-                  }
-                }
+                "kind": "SCALAR",
+                "name": "RawJSON",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -3716,6 +3700,20 @@
                   }
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "onlyMeta",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -4500,28 +4498,6 @@
             "defaultValue": null
           },
           {
-            "name": "fragments",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "FragmentInput",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
             "name": "name",
             "description": "словесное наименование выявленной сути.",
             "type": {
@@ -4536,8 +4512,30 @@
             "defaultValue": null
           },
           {
-            "name": "spheres",
+            "name": "categories",
             "description": "хэштеги",
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "CategoryEnum",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "spheres",
+            "description": null,
             "type": {
               "kind": "LIST",
               "name": null,
@@ -4554,7 +4552,7 @@
             "defaultValue": null
           },
           {
-            "name": "categories",
+            "name": "fragments",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -4566,8 +4564,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "ENUM",
-                    "name": "CategoryEnum",
+                    "kind": "INPUT_OBJECT",
+                    "name": "FragmentInput",
                     "ofType": null
                   }
                 }
@@ -4670,6 +4668,16 @@
               }
             },
             "defaultValue": null
+          },
+          {
+            "name": "thumbUrl",
+            "description": "data url для превью ядра",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
           }
         ],
         "interfaces": null,
@@ -4754,6 +4762,16 @@
           {
             "name": "color",
             "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "thumbUrl",
+            "description": "data url для превью фрагмента",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -7373,6 +7391,33 @@
                 "name": "FragmentLayoutEnum",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "thumbUrl",
+            "description": "data url для превью ядра",
+            "args": [
+              {
+                "name": "preferWidth",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null

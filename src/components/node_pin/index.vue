@@ -18,7 +18,7 @@ div(v-if="sphereOid").column.fit.bg-grey-3
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="headerShow"
-      :style=`{position: 'absolute', zIndex: zIndex+10, bottom: '0px', height: '50px'}`).row.full-width
+      :style=`{position: 'absolute', zIndex: zIndex+10, bottom: '0px', height: '60px'}`).row.full-width
       k-menu-mobile
   //- tint btn
   q-btn(
@@ -36,7 +36,7 @@ div(v-if="sphereOid").column.fit.bg-grey-3
     k-colls(@coll="sphereOid = $event" :coll="sphereOid" :colls="colls" :tabs="true" :style=`{height: '100%'}`)
       template(v-slot:[sphereOid])
         .column.fit
-          div(ref="nodePinScroll" @scroll="onScroll" :style=`{paddingTop: '60px', paddinBottom: '60px'}`).col.full-width.scroll.kscroll
+          div(ref="nodePinScroll" @scroll="onScroll" :style=`{paddingTop: '0px', paddinBottom: '60px'}`).col.full-width.scroll.kscroll
             node-loader(ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
               template(v-slot:default=`{nodes}`)
                 .row.full-width.items-start.content-start.q-pt-sm
@@ -117,7 +117,7 @@ export default {
               meta {
                 ...on MetaNode {
                   layout
-                  fragments { uid width height color thumbUrl(preferWidth: 600) }
+                  fragments { width height color thumbUrl(preferWidth: 600) }
                 }
               }
             }
