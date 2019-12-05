@@ -15,12 +15,12 @@ div(:style=`{width: width+'px'}`).column.full-height.bg-primary
     div(@click="$go('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
-  div(:style=`{height: '60px'}` @click="$go(`/app/user/` + $store.state.auth.user.oid)").row.full-width.bg-secondary
+  div(:style=`{height: '60px'}` @click="$go(`/app/user/` + $store.state.objects.currentUser.oid)").row.full-width.bg-secondary
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      img(:src="$store.state.auth.user.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
+      img(:src="$store.state.objects.currentUser.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
     div(v-if="!mini").col.full-height
       .row.fit.items-center
-        span.text-bold.text-white {{ $store.state.auth.user.name }}
+        span.text-bold.text-white {{ $store.state.objects.currentUser.name }}
   //- create node
   div(v-if="!page" :style=`{height: '60px'}` @click="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])").row.full-width.items-center.cursor-pointer
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center

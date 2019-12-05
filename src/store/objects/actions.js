@@ -4,11 +4,11 @@ import assert from 'assert'
 import { logD } from 'src/boot/log'
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-export const init = async (context) => {
+export const init = async (context, { user, fragmentName }) => {
   // if (context.state.initialized) throw new Error('subscriptions state initialized already')
   if (context.state.initialized) return
   logD('objects', 'init')
-  context.commit('init')
+  context.commit('init', { user, fragmentName })
 }
 
 class Queue {
@@ -162,4 +162,17 @@ export const get = async (context, { oid, fragmentName, priority }) => {
   }
   let promise = queue.push(context, oid, fragmentName, priority)
   return promise
+}
+
+// path ex: ['settings', 'general', 'language'] OR ['profile', 'gender']
+export const setObjectValue = async (context, { oid, path, value }) => {
+  let { data: { objectChange } } = await apolloProvider.clients.apiApollo.mutate({
+    mutation: gql`
+      mutation objectChange ($oid: OID!, $path: String!, $value: RawJSON!) {
+        objectChange (oid: $oid, path: $path, value: $value)
+      }
+    `,
+    variables: { oid, path, value }
+  })
+  return objectChange
 }

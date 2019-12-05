@@ -1,7 +1,12 @@
 import assert from 'assert'
 
-export function init (state) {
+export function init (state, {user, fragmentName}) {
   state.initialized = true
+  // current user  хранится в кэше со всеми объектами, но живет вечно
+  assert.ok(user.oid)
+  assert.ok(!state.objects[user.oid])
+  state.objects[user.oid] = { objectData: user, fragments: [fragmentName] }
+  state.currentUser = state.objects[user.oid].objectData
 }
 
 export function stateSet (state, [key, val]) {
@@ -10,13 +15,16 @@ export function stateSet (state, [key, val]) {
   state[key] = val
 }
 
+// удаляем из кэша при превышении размера и по ttl
 function cleanUp (state) {
-  while (state.objectOids.length > 8888) {
-    let first = state.objectOids.shift()
-    delete state.objects[first]
+  // удаляем по ttl, либо по превышению размера
+  while (state.ttls.length > 8888 || (state.ttls.length && state.ttls[0].ttl < Date.now())) {
+    let first = state.ttls.shift()
+    delete state.objects[first.oid]
   }
 }
 
+// кэш объектов
 export function objectAdd (state, { object, fragmentName }) {
   assert.ok(object.oid)
   cleanUp(state)
@@ -27,21 +35,27 @@ export function objectAdd (state, { object, fragmentName }) {
       storedValue.objectData[prop] = object[prop]
     }
   } else {
-    storedValue = state.objects[object.oid] = { objectData: object, fragments: [fragmentName] }
-    state.objectOids.push(object.oid)
+    storedValue = { objectData: object, fragments: [fragmentName] }
+    // todo state.ttls должно быть отсортировано по t tl. (актуально, если мы захотим назначать разные ttl)
+    // сейчас сортировка естественным образом соблюдается(данные добавляются хронологически)
+    state.ttls.push({ oid: object.oid, ttl: Date.now() + 1000 * 60 * 60 }) // + 1 час
   }
-
   state.objects[object.oid] = storedValue
+}
+
+function setValue (obj, path, value) {
+  let o = obj
+  for (let i = 0; i < path.length - 1; i++) {
+    let n = path[i]
+    if (!(n in o)) o[n] = {}
+    o = o[n]
+  }
+  o[path[path.length - 1]] = value
 }
 
 export function setObjectValue (state, { oid, path, value }) {
   let object = state.objects[oid]
   if (!object) return
-  let propValue = object
-  for (let i = 0; i < path.length; i++) {
-    let propName = path[i]
-    propValue = propValue[propName]
-    assert.ok(propValue)
-    if (i === path.length - 1) propValue[propName] = value
-  }
+  let p = path.split('.')
+  setValue(object, p, value)
 }

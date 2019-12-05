@@ -60,25 +60,29 @@ function processEvent (context, event) {
     case 'NOTICE':
       processEventNotice(context, event)
       break
-    case 'USER_CHANGED':
-      context.commit('user/setUserValue', { path: event.path, value: event.value })
+    case 'OBJECT_CHANGED':
+      context.commit('objects/setObjectValue', {
+        oid: event.object.oid,
+        path: event.path,
+        value: event.value
+      }, {root: true})
       context.commit('addEvent', event)
       break
     case 'NODE_CREATED':
-      if (event.subject.oid === context.rootState.user.user.oid) {
+      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeCreated', event])
       context.commit('addEvent', event)
       break
     case 'NODE_RATED':
-      if (event.subject.oid === context.rootState.user.user.oid) {
+      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeRated', event])
       context.commit('objects/setObjectValue', {
         oid: event.object.oid,
-        path: ['rate'],
+        path: 'rate',
         value: event.rate
       }, { root: true })
       context.commit('addEvent', event)
@@ -91,15 +95,15 @@ function processEvent (context, event) {
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userSubscribed', event])
-      if (event.subject.oid === context.rootState.user.user.oid) { // если это мы подписались
+      if (event.subject.oid === context.rootState.objects.currentUser.oid) { // если это мы подписались
         context.commit('subscriptions/subscribe', event.object, { root: true })
         let cachedObj = context.rootGetters['objects/objectGet']({ oid: event.object.oid })
         if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
           cachedObj.subscribers.push({
-            oid: context.rootState.user.user.oid,
-            name: context.rootState.user.user.name,
-            type: context.rootState.user.user.type,
-            thumbUrl: context.rootState.user.user.thumbUrl
+            oid: context.rootState.objects.currentUser.oid,
+            name: context.rootState.objects.currentUser.name,
+            type: context.rootState.objects.currentUser.type,
+            thumbUrl: context.rootState.objects.currentUser.thumbUrl
           })
         }
       }
@@ -108,11 +112,11 @@ function processEvent (context, event) {
     case 'USER_UNSUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userUnSubscribed', event])
-      if (event.subject.oid === context.rootState.user.user.oid) {
+      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
         context.commit('subscriptions/unSubscribe', event.object, { root: true })
         let cachedObj = context.rootGetters['objects/objectGet']({ oid: event.object.oid })
         if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
-          let indx = cachedObj.subscribers.findIndex(obj => obj.oid === context.rootState.user.user.oid)
+          let indx = cachedObj.subscribers.findIndex(obj => obj.oid === context.rootState.objects.currentUser.oid)
           if (indx >= 0) {
             cachedObj.subscribers.splice(indx, 1)
           } else {

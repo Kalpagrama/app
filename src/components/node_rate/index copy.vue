@@ -69,7 +69,7 @@ export default {
     },
     nodeYours () {
       if (this.nodeFull) {
-        if (this.nodeFull.author.oid === this.$store.state.auth.user.oid) {
+        if (this.nodeFull.author.oid === this.$store.state.objects.currentUser.oid) {
           return true
         } else {
           return false

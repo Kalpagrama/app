@@ -102,7 +102,7 @@ export default {
       return {
         uid: this.uid,
         name: this.name,
-        author: this.$store.state.auth.user,
+        author: this.$store.state.objects.currentUser,
         fragments: fragments.map(f => {
           // this.$logD('f', f)
           return {
