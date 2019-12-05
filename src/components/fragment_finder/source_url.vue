@@ -144,7 +144,7 @@ export default {
           client: 'uploadApollo',
           mutation: gql`
             mutation uploadContentUrl ($url: String!) {
-              uploadContentUrl(url: $url) {
+              uploadContentUrl(url: $url, onlyMeta: true) {
                 oid
                 type
               }

@@ -28,12 +28,6 @@ export default {
   name: 'kDialogBottom',
   props: {
     value: {type: Boolean},
-    mode: {
-      type: String,
-      default () {
-        return 'custom'
-      }
-    },
     options: {
       type: Object,
       default () {
