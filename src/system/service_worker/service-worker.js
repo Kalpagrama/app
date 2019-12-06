@@ -8,7 +8,7 @@ importScripts('https://browser.sentry-cdn.com/5.9.1/bundle.min.js')
 Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
 
 function logFunc (...msg) {
-  console.log('sw_message:', ...msg)
+  // console.log('sw_message:', ...msg)
   // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
 }
 
