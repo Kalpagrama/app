@@ -1,4 +1,5 @@
 import assert from 'assert'
+import { logD } from 'src/boot/log'
 
 export function init (state, {user, fragmentName}) {
   // current user  хранится в кэше со всеми объектами, но живет вечно
@@ -54,7 +55,7 @@ function setValue (obj, path, value) {
 }
 
 export function setObjectValue (state, { oid, path, value }) {
-  let object = state.objects[oid]
+  let object = state.objects[oid].objectData
   if (!object) return
   let p = path.split('.')
   setValue(object, p, value)
