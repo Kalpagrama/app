@@ -20,7 +20,6 @@ Vue.use(Vuex)
 
 async function init (context) {
   await context.dispatch('log/init')
-
   let { data: { user, categories, userWorkspace, userEvents, userSubscriptions, userSettings } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       ${fragments.userFragment}
@@ -39,30 +38,33 @@ async function init (context) {
         }
       }`
   })
+
+  user.profile = {
+    profile: {
+      city: 'EKB',
+      country: 'Russia',
+      dateBirth: '20.05.1998',
+      gender: 'MALE',
+      lang: 'russian',
+      nameFirst: 'Roman',
+      nameFull: 'Roman Motovilov',
+      status: '',
+      about: '',
+      nameSecond: 'Motovilov',
+      email: 'roma-motovilov@mail.ru',
+      number: '8999-999-99-99'
+    }
+  }
+
   // todo убрать юзера из auth
   await context.dispatch('core/init')
-  await context.dispatch('auth/init', user)
+  await context.dispatch('auth/init')
   await context.dispatch('node/init', categories)
-  await context.dispatch('workspace/init', user.workspace)
-  await context.dispatch('events/init', user.events)
-  await context.dispatch('subscriptions/init', user.subscriptions)
-  await context.dispatch('objects/init')
-  user.profile = {profile: {
-    city: 'EKB',
-    country: 'Russia',
-    dateBirth: '20.05.1998',
-    gender: 'MALE',
-    lang: 'russian',
-    nameFirst: 'Roman',
-    nameFull: 'Roman Motovilov',
-    status: '',
-    about: '',
-    nameSecond: 'Motovilov',
-    email: 'roma-motovilov@mail.ru',
-    number: '8999-999-99-99'
-  }
-  }
-  await context.dispatch('user/init', user)
+  await context.dispatch('objects/init', {user, fragmentName: 'userFragment'})
+  await context.dispatch('workspace/init')
+  await context.dispatch('events/init')
+  await context.dispatch('subscriptions/init')
+  await context.dispatch('user/init')
   await i18next.changeLanguage(user.profile.lang)
 
   const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))

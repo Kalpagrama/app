@@ -1,6 +1,7 @@
 import assert from 'assert'
 
 export function init(state, userEvents) {
+  assert.ok(userEvents)
   state.userEvents = userEvents
   state.initialized = true
 }

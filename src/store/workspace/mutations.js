@@ -2,6 +2,7 @@ import assert from 'assert'
 import { logE } from 'src/boot/log'
 
 export function init (state, workspace) {
+  assert.ok(workspace)
   state.workspace = workspace
   state.initialized = true
 }

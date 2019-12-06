@@ -6,11 +6,13 @@
 
 importScripts('https://browser.sentry-cdn.com/5.9.1/bundle.min.js')
 Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
-function logFunc(...msg){
+
+function logFunc (...msg) {
   console.log('sw_message:', ...msg)
-  Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+  // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
 }
-function errFunc(...msg){
+
+function errFunc (...msg) {
   console.error(...msg)
   Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
 }
@@ -32,14 +34,14 @@ self.__precacheManifest = [].concat(self.__precacheManifest || [])
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
 
 self.addEventListener('message', function handler (event) {
-  logFunc('V1 message!', event)
+  logFunc('SW message!', event)
   var promise = self.clients.matchAll()
     .then(function (clientList) {
-      logFunc('V1 message! clientList', clientList)
+      logFunc('SW message! clientList', clientList)
       var senderID = event.source.id
 
       clientList.forEach(function (client) {
-        logFunc('V1 message! postMessage', client)
+        logFunc('SW message! postMessage', client)
         client.postMessage({
           client: senderID,
           message: event.data,
@@ -52,20 +54,34 @@ self.addEventListener('message', function handler (event) {
   }
 })
 self.addEventListener('install', event => {
-  logFunc('V1 now ready to install!', swVer)
+  logFunc('SW now ready to install!', swVer)
 })
 self.addEventListener('activate', event => {
-  logFunc('V1 now ready to handle activate!', swVer)
+  logFunc('SW now ready to handle activate!', swVer)
 })
 self.addEventListener('fetch', event => {
-  logFunc('V1 now ready to handle fetches!', swVer)
+  logFunc('SW now ready to handle fetches!', swVer)
+  if (event.request.method !== 'POST') {
+    // event.respondWith(fetch(event.request))
+    return
+  }
+
+  logFunc('SW fetch post message!', swVer, event)
+  // event.respondWith((async () => {
+  //   const formData = await event.request.formData()
+  //   logFunc('SW formData = ', formData)
+  //   logFunc('SW formData = ', formData.get('title'))
+  //   logFunc('SW formData = ', formData.get('text'))
+  //   logFunc('SW formData = ', formData.get('url'))
+  //   logFunc('SW formData = ', formData.get('files'))
+  // })())
 })
 self.addEventListener('updatefound', event => {
-  logFunc('V1 now ready to update!', swVer)
+  logFunc('SW now ready to update!', swVer)
 })
-self.addEventListener('error', function(e) {
+self.addEventListener('error', function (e) {
   errFunc(e.filename, e.lineno, e.colno, e.message)
-});
+})
 // ----------------------- settings for Web-push------------------------------
 
 /* global importScripts */
@@ -108,12 +124,12 @@ if (firebase.messaging.isSupported()) {
     }
     return self.registration.showNotification(notificationTitle, notificationOptions)
 
-  //   const notificationOptions = {
-  //     body: 'Background Message body.',
-  //     icon: '/firebase-logo.png'
-  //   }
-  //   return self.registration.showNotification(notificationTitle,
-  //     notificationOptions);
+    //   const notificationOptions = {
+    //     body: 'Background Message body.',
+    //     icon: '/firebase-logo.png'
+    //   }
+    //   return self.registration.showNotification(notificationTitle,
+    //     notificationOptions);
   })
 }
 

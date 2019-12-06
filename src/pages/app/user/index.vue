@@ -83,7 +83,7 @@ export default {
       ]
     },
     myoid () {
-      return this.$store.state.user.user.oid
+      return this.$store.state.objects.currentUser.oid
     },
     countSubscribers () {
       if (this.user && this.user.subscribers === null) return 0
@@ -119,7 +119,7 @@ export default {
           this.page = 'nodes'
         } else {
           this.$logD('NO USER OID!')
-          this.$router.push({params: {oid: this.$store.state.auth.user.oid}})
+          this.$router.push({params: {oid: this.$store.state.objects.currentUser.oid}})
         }
       }
     }

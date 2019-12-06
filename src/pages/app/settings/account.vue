@@ -123,8 +123,9 @@ export default {
     async changePhone () {
       try {
         this.$log('changePhone start')
-        let res = await this.$store.dispatch('user/setUserValue', {
-          path: ['settings', 'general', 'phone'],
+        let res = await this.$store.dispatch('objects/setObjectValue', {
+          oid: this.$store.state.objects.currentUser.oid,
+          path: 'settings.general.phone',
           value: this.newPhone
         })
         this.$log('changePhone done', res)
@@ -137,8 +138,9 @@ export default {
     async changeEmail () {
       try {
         this.$log('changeEmail start')
-        let res = await this.$store.dispatch('user/setUserValue', {
-          path: ['settings', 'general', 'email'],
+        let res = await this.$store.dispatch('objects/setObjectValue', {
+          oid: this.$store.state.objects.currentUser.oid,
+          path: 'settings.general.email',
           value: this.newEmail
         })
         this.$log('changeEmail done', res)
@@ -150,25 +152,27 @@ export default {
     },
     async changePasword () {
       try {
-        this.$log('changePasword start')
-        let res = await this.$store.dispatch('user/setUserValue', {
-          path: ['settings', 'general', 'pasword'],
+        this.$log('changePassword start')
+        let res = await this.$store.dispatch('objects/setObjectValue', {
+          oid: this.$store.state.objects.currentUser.oid,
+          path: 'settings.general.password',
           value: this.newPasword
         })
-        this.$log('changePasword done', res)
-        this.$q.notify({message: 'Cant change PASWORD', color: 'green', textColor: 'white'})
+        this.$log('changePassword done', res)
+        this.$q.notify({message: 'Cant change PASSWORD', color: 'green', textColor: 'white'})
       } catch (e) {
-        this.$log('changePasword ERROR', e)
-        this.$q.notify({message: 'Cant change PASWORD', color: 'red', textColor: 'white'})
+        this.$log('changePassword ERROR', e)
+        this.$q.notify({message: 'Cant change PASSWORD', color: 'red', textColor: 'white'})
       }
     },
     async changeNickname () {
       try {
         this.$log('changeNickname start')
-        let res = await this.$store.dispatch('user/setUserValue', {
-          path: ['settings', 'general', 'nickname'],
+        let res = await this.$store.dispatch('objects/setObjectValue', {
+          oid: this.$store.state.objects.currentUser.oid,
+          path: 'settings.general.nickname',
           value: this.newPhone
-        })
+          })
         this.$log('changeNickname done', res)
         this.$q.notify({message: 'Cant change NICKNAME', color: 'green', textColor: 'white'})
       } catch (e) {
@@ -179,8 +183,9 @@ export default {
     async changeLanguage () {
       try {
         this.$log('changeLanguage start')
-        let res = await this.$store.dispatch('user/setUserValue', {
-          path: ['settings', 'general', 'language'],
+        let res = await this.$store.dispatch('objects/setObjectValue', {
+          oid: this.$store.state.objects.currentUser.oid,
+          path: 'settings.general.language',
           value: this.newLanguage
         })
         this.$log('changeLanguage done', res)

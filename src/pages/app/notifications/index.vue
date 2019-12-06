@@ -57,7 +57,7 @@ export default {
       if (e.type === 'NODE_DELETED') return 'deleted'
       if (e.type === 'USER_SUBSCRIBED') return 'subscribed to'
       if (e.type === 'USER_UNSUBSCRIBED') return 'unsubscribed from'
-      if (e.type === 'USER_CHANGED') return 'changed'
+      if (e.type === 'OBJECT_CHANGED') return 'changed'
       if (e.type === 'USER_CONFIRMED') return 'confirmed'
       if (e.type === 'WS_ITEM_CREATED') return 'in workspace created'
       if (e.type === 'WS_ITEM_UPDATED') return 'in workspace updated'

@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import assert from 'assert'
 
-export function init(state, user) {
-  state.user = user
+export function init(state) {
   state.initialized = true
 }
 
