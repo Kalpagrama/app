@@ -51,6 +51,7 @@ div(
 import ncFragmentContent from './nc_fragment_content'
 import ncFragmentVideo from './nc_fragment_video'
 import ncFragmentVideoEditor from './nc_fragment_video_editor'
+
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
@@ -104,6 +105,7 @@ export default {
     contentFound (content) {
       this.$log('contentFound', content)
       this.content = content
+      this.$emit('ready', this.index)
       this.stage = 2
     },
     cancel () {
@@ -114,7 +116,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // if (this.stageInitial) this.stage = this.stageInitial
+    if (this.stageInitial) this.stage = this.stageInitial
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -6,6 +6,11 @@ div(
     borderRadius: '10px', oveflow: 'hidden',
     border: urlInputFocused ? '2px solid #789dff' : '3px solid #eee'}`
     ).row.full-width.items-center.justify-center.bg-grey-2
+  q-dialog(:maximized="true" ref="ncComposerWsDialog")
+    .row.fit.items-end.content-end
+      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px', overflow: 'hidden'}`).column.fit.bg-grey-3
+        .col.full-width
+          ws-nodes
   div(
     v-if="progressShow && $store.state.events.progress"
     :style=`{
@@ -31,9 +36,12 @@ div(
 </template>
 
 <script>
+import wsNodes from 'components/workspace/ws_nodes'
 import {fragments} from 'schema/fragments'
+
 export default {
   name: 'ncFragmentContent',
+  components: {wsNodes},
   props: ['width'],
   data () {
     return {
@@ -70,7 +78,7 @@ export default {
         if (content.type === 'VIDEO') {
           if (content.contentSource !== 'KALPA') {
             if (content.duration < 300) {
-              content = await this.contentGet(to, false)
+              // content = await this.contentGet(to, false)
               this.$emit('content', content)
             } else {
               this.$emit('content', content)

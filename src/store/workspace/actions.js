@@ -51,7 +51,7 @@ export const wsSphereDelete = async (context, oid) => {
 export const wsNodeCreate = async (context, node) => {
   logD('wsNodeCreate start')
 
-  node = {
+  let nodeex = {
     name: 'test name', // любое
     categories: ['POLITICS'], // любое
     spheres: [], // любое
@@ -80,7 +80,7 @@ export const wsNodeCreate = async (context, node) => {
   // checks
   {
     assert.ok(node.categories.length >= 0)
-    assert.ok(node.spheres.length >= 0)
+    // assert.ok(node.spheres.length >= 0)
     assert.ok(node.fragments.length >= 0)
     assert.ok(node.layout)
     for (let fr of node.fragments) {
