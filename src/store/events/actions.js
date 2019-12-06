@@ -107,14 +107,14 @@ function processEvent (context, event) {
             thumbUrl: event.subject.thumbUrl
           })
         }
-        let me = context.rootState.objects.currentUser
-        assert.ok(me && me.subscriptions)
-        me.subscriptions.push({
-          oid: event.object.oid,
-          name: event.object.name,
-          type: event.object.type,
-          thumbUrl: event.object.thumbUrl
-        })
+        // let me = context.rootState.objects.currentUser
+        // assert.ok(me && me.subscriptions)
+        // me.subscriptions.push({
+        //   oid: event.object.oid,
+        //   name: event.object.name,
+        //   type: event.object.type,
+        //   thumbUrl: event.object.thumbUrl
+        // })
       }
       context.commit('addEvent', event)
       break
@@ -132,14 +132,14 @@ function processEvent (context, event) {
             logE('subscriber not found', event, cachedObj)
           }
         }
-        let me = context.rootState.objects.currentUser
-        assert.ok(me && me.subscriptions)
-        let indx = me.subscriptions.findIndex(obj => obj.oid === event.object.oid)
-        if (indx >= 0) {
-          me.subscriptions.splice(indx, 1)
-        } else {
-          logE('subscriber not found', event, me)
-        }
+        // let me = context.rootState.objects.currentUser
+        // assert.ok(me && me.subscriptions)
+        // let indx = me.subscriptions.findIndex(obj => obj.oid === event.object.oid)
+        // if (indx >= 0) {
+        //   me.subscriptions.splice(indx, 1)
+        // } else {
+        //   logE('subscriber not found', event, me)
+        // }
       }
       context.commit('addEvent', event)
       break
