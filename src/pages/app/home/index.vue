@@ -66,7 +66,7 @@ export default {
         }
       `,
       variables: {
-        oid: this.$store.state.auth.user.oid
+        oid: this.$store.state.objects.currentUser.oid
       }
     }
   },

@@ -3,12 +3,12 @@ import { fragments } from 'schema/index'
 import { logD } from 'src/boot/log'
 import assert from 'assert'
 
-export const init = async (context, userWorkspace) => {
+export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
-  logD('userWorkspace init. userWorkspace=', userWorkspace)
-  context.commit('init', userWorkspace)
-  return userWorkspace
+  logD('userWorkspace init. userWorkspace=', context.rootState.objects.currentUser.workspace)
+  context.commit('init', context.rootState.objects.currentUser.workspace)
+  return true
 }
 
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events

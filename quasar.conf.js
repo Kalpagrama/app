@@ -137,19 +137,37 @@ module.exports = function (ctx) {
         theme_color: '#000',
         icons: [
           {
-            'src': 'statics/icons/icon-256x256.png',
-            'sizes': '256x256',
-            'type': 'image/png'
+            src: 'statics/icons/icon-256x256.png',
+            sizes: '256x256',
+            type: 'image/png'
           }
         ],
         share_target: {
-          action: '/share-target/',
-          method: 'GET',
-          enctype: 'application/x-www-form-urlencoded',
+          // action: '/share-target/',
+          // method: 'GET',
+          // enctype: 'application/x-www-form-urlencoded',
+          // params: {
+          //   title: 'title',
+          //   text: 'body',
+          //   url: 'url'
+          // }
+          action: '/bookmark',
+          method: 'POST',
+          enctype: 'multipart/form-data',
           params: {
-            title: 'SHaRe kalpagramma',
-            text: 'what u want to sshrare JSON.stringify',
-            url: '/share'
+            title: 'title',
+            text: 'text',
+            url: 'url',
+            files: [
+              {
+                name: 'video',
+                accept: ['video/mp4', '.mp4']
+              },
+              {
+                name: 'image',
+                accept: 'image/jpeg'
+              }
+            ]
           }
         }
       }

@@ -5,7 +5,7 @@ export const queryInProgress = (state, getters) => {
 
 export const objectGet = (state) => ({ oid, fragmentName }) => {
   let storedValue = state.objects[oid]
-  if (storedValue && storedValue.fragments.includes(fragmentName)) {
+  if (storedValue && (!fragmentName || storedValue.fragments.includes(fragmentName))) {
     return storedValue.objectData
   } else return null
 }

@@ -2,12 +2,11 @@ import { apolloProvider } from 'boot/apollo'
 import {logD} from 'src/boot/log'
 import {router} from 'boot/main'
 
-export const init = async (context, user) => {
+export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
-  logD('user init', user)
-  context.commit('init', user)
-  return user
+  logD('user init')
+  context.commit('init')
 }
 
 export const logout = async (ctx) => {
