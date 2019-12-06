@@ -20,8 +20,8 @@ div(:style=`{position: 'relative'}`).column.fit
           q-btn(
             rounded no-caps
             @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
-            :label="include ? 'Follow' : 'Unfollow'"
-            :color="include ? 'accent' : 'red'"
+            :label="include ? 'Unfollow' : 'Follow'"
+            :color="include ? 'red' : 'accent'"
             ).q-px-md
       .row.full-width.items-center.justify-start
         .row.full-width
@@ -36,27 +36,29 @@ div(:style=`{position: 'relative'}`).column.fit
           //- span {{ user.subscriptions }}
   div(
     v-if="user"
-    :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width.bg-grey-3
-    k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100%'}`).bg-grey-3
+    :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
+    k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
       template(v-slot:created)
-        k-page
-          span Created
+        user-created-nodes()
       template(v-slot:rated)
-        k-page
-          span Rated
+        user-rated-nodes()
       template(v-slot:following)
         user-following(:subscriptions="user.subscriptions" :oid="user.oid")
       template(v-slot:followers)
         user-followers(:subscribers="user.subscribers" :oid="user.oid")
+  div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width
+    k-menu-mobile
 </template>
 
 <script>
 import userFollowers from './user_followers'
 import userFollowing from './user_following'
+import userCreatedNodes from './user_created_nodes'
+import userRatedNodes from './user_rated_nodes'
 
 export default {
   name: 'pageApp__User',
-  components: {userFollowing, userFollowers},
+  components: {userRatedNodes, userCreatedNodes, userFollowing, userFollowers},
   props: ['width', 'height'],
   data () {
     return {
