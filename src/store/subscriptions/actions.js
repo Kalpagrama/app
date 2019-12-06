@@ -1,12 +1,12 @@
 import { apolloProvider } from 'boot/apollo'
 import { logD } from 'src/boot/log'
 
-export const init = async (context, userSubscriptions) => {
+export const init = async (context) => {
   // if (context.state.initialized) throw new Error('subscriptions state initialized already')
   if (context.state.initialized) return
-  logD('subscriptions', 'init', userSubscriptions)
-  context.commit('init', userSubscriptions)
-  return userSubscriptions
+  logD('subscriptions', 'init', context.rootState.objects.currentUser.subscriptions)
+  context.commit('init', context.rootState.objects.currentUser.subscriptions)
+  return true
 }
 
 // Подписаться на сущность. Мутация будет вызвана по приходу эвента

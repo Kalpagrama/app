@@ -4,13 +4,12 @@ import { Notify } from 'quasar'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
-import { logI } from 'boot/log'
 import { logD, logE } from 'src/boot/log'
 
-export const init = async (context, userEvents) => {
+export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
-  logD('init', userEvents)
+  logD('init', context.rootState.objects.currentUser.events)
   const observerEvent = apolloProvider.clients.wsApollo.subscribe({
     client: 'wsApollo',
     query: gql`
@@ -31,8 +30,8 @@ export const init = async (context, userEvents) => {
     }
   })
 
-  context.commit('init', userEvents)
-  return userEvents
+  context.commit('init', context.rootState.objects.currentUser.events)
+  return true
 }
 
 export const testWebPush = async (context) => {
@@ -61,25 +60,29 @@ function processEvent (context, event) {
     case 'NOTICE':
       processEventNotice(context, event)
       break
-    case 'USER_CHANGED':
-      context.commit('user/setUserValue', { path: event.path, value: event.value })
+    case 'OBJECT_CHANGED':
+      context.commit('objects/setObjectValue', {
+        oid: event.object.oid,
+        path: event.path,
+        value: event.value
+      }, {root: true})
       context.commit('addEvent', event)
       break
     case 'NODE_CREATED':
-      if (event.subject.oid === context.rootState.user.user.oid) {
+      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeCreated', event])
       context.commit('addEvent', event)
       break
     case 'NODE_RATED':
-      if (event.subject.oid === context.rootState.user.user.oid) {
+      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeRated', event])
       context.commit('objects/setObjectValue', {
         oid: event.object.oid,
-        path: ['rate'],
+        path: 'rate',
         value: event.rate
       }, { root: true })
       context.commit('addEvent', event)
@@ -92,16 +95,35 @@ function processEvent (context, event) {
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userSubscribed', event])
-      if (event.subject.oid === context.rootState.user.user.oid){
+      if (event.subject.oid === context.rootState.objects.currentUser.oid) { // если это мы подписались
         context.commit('subscriptions/subscribe', event.object, { root: true })
+        // на кого я подписан...
+        let cachedObj = context.rootGetters['objects/objectGet']({ oid: event.object.oid })
+        if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
+          cachedObj.subscribers.push({
+            oid: event.subject.oid,
+            name: event.subject.name,
+            type: event.subject.type,
+            thumbUrl: event.subject.thumbUrl
+          })
+        }
       }
       context.commit('addEvent', event)
       break
     case 'USER_UNSUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userUnSubscribed', event])
-      if (event.subject.oid === context.rootState.user.user.oid) {
+      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
         context.commit('subscriptions/unSubscribe', event.object, { root: true })
+        let cachedObj = context.rootGetters['objects/objectGet']({ oid: event.object.oid })
+        if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
+          let indx = cachedObj.subscribers.findIndex(obj => obj.oid === event.subject.oid)
+          if (indx >= 0) {
+            cachedObj.subscribers.splice(indx, 1)
+          } else {
+            logE('subscriber not found', event, cachedObj)
+          }
+        }
       }
       context.commit('addEvent', event)
       break

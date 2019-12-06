@@ -114,22 +114,8 @@ const sphereFragment = gql`
   }
 `
 
-const objectFragment = gql`
-  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment}
-  fragment objectFragment on Object {
-    oid
-    type
-    name
-    thumbUrl(preferWidth: 600)
-    ...on Video {...videoFragment}
-    ...on Image {...imageFragment}
-    ...on Node {... nodeFragment}
-    ...on Sphere {... sphereFragment}
-  }
-`
-
 const eventFragment = gql`
-  ${objectFragment} ${objectShortFragment} ${objectShortWithMetaFragment} ${objectFragment}
+  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${objectShortFragment} ${objectShortWithMetaFragment}
   fragment eventFragment on Event {
     type
     ... on EventError{
@@ -147,7 +133,16 @@ const eventFragment = gql`
       message
     }
     ... on EventWS{
-      objectFull{... objectFragment}
+      objectFull{
+        oid
+        type
+        name
+        thumbUrl(preferWidth: 600)
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Node {...nodeFragment}
+        ...on Sphere {...sphereFragment}
+      }
     }
     ... on EventChange{
       subject{... objectShortFragment}
@@ -193,6 +188,20 @@ const userFragment = gql`
       nameFull
       nameSecond
     }
+  }
+`
+const objectFragment = gql`
+  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment}
+  fragment objectFragment on Object {
+    oid
+    type
+    name
+    thumbUrl(preferWidth: 600)
+    ...on Video {...videoFragment}
+    ...on Image {...imageFragment}
+    ...on Node {... nodeFragment}
+    ...on Sphere {... sphereFragment}
+    ...on User {... userFragment}
   }
 `
 

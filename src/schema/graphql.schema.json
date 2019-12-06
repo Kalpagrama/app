@@ -2443,7 +2443,7 @@
             "deprecationReason": null
           },
           {
-            "name": "USER_CHANGED",
+            "name": "OBJECT_CHANGED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
