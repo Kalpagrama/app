@@ -1,12 +1,12 @@
 import assert from 'assert'
 
 export function init (state, {user, fragmentName}) {
-  state.initialized = true
   // current user  хранится в кэше со всеми объектами, но живет вечно
-  assert.ok(user.oid)
+  assert.ok(user && user.oid && fragmentName)
   assert.ok(!state.objects[user.oid])
   state.objects[user.oid] = { objectData: user, fragments: [fragmentName] }
   state.currentUser = state.objects[user.oid].objectData
+  state.initialized = true
 }
 
 export function stateSet (state, [key, val]) {

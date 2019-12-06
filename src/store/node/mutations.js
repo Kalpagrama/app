@@ -1,6 +1,7 @@
 import assert from 'assert'
 
 export function init(state, categories) {
+  assert.ok(categories)
   state.categories = categories
   state.initialized = true
 }

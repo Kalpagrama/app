@@ -60,10 +60,10 @@ async function init (context) {
   await context.dispatch('core/init')
   await context.dispatch('auth/init')
   await context.dispatch('node/init', categories)
-  await context.dispatch('workspace/init', user.workspace)
-  await context.dispatch('events/init', user.events)
-  await context.dispatch('subscriptions/init', user.subscriptions)
   await context.dispatch('objects/init', {user, fragmentName: 'userFragment'})
+  await context.dispatch('workspace/init')
+  await context.dispatch('events/init')
+  await context.dispatch('subscriptions/init')
   await context.dispatch('user/init')
   await i18next.changeLanguage(user.profile.lang)
 

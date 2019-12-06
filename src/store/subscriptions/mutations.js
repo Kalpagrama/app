@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { logD } from 'boot/log'
 export function init (state, userSubscriptions) {
+  assert.ok(userSubscriptions)
   state.userSubscriptions = userSubscriptions
   state.initialized = true
 }

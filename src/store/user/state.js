@@ -1,3 +1,4 @@
 export default {
-  initialized: false
+  initialized: false,
+  user: null
 }
