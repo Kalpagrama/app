@@ -41,7 +41,6 @@ class Logger {
   debug (module, ...msg) {
     if (['debug'].includes(this.store.state.core.logLevel)) {
       this.getLoggerFunc(module)(...msg)
-      this.store.dispatch('log/debug', ['module', msg], { root: true })
     }
     if (['debug'].includes(this.store.state.core.sentryLogLevel)) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
   }
@@ -49,7 +48,6 @@ class Logger {
   info (module, ...msg) {
     if (['debug', 'info'].includes(this.store.state.core.logLevel)) {
       this.getLoggerFunc(module)(...msg)
-      this.store.dispatch('log/info', ['module', msg], { root: true })
     }
     if (['debug', 'info'].includes(this.store.state.core.sentryLogLevel)) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Info)
   }
@@ -57,7 +55,6 @@ class Logger {
   warn (module, ...msg) {
     if (['debug', 'info', 'warning', 'warn'].includes(this.store.state.core.logLevel)) {
       this.getLoggerFunc(module)(...msg)
-      this.store.dispatch('log/warn', ['module', msg], { root: true })
     }
     if (['debug', 'info', 'warning', 'warn'].includes(this.store.state.core.sentryLogLevel)) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Warning)
   }
@@ -65,7 +62,6 @@ class Logger {
   error (module, ...msg) {
     try {
       this.getLoggerFunc(module)(...msg)
-      this.store.dispatch('log/error', ['module', msg], { root: true })
       Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
     } catch (err) {
       console.error('error on logging error!!!', err)

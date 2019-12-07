@@ -22,6 +22,7 @@ async function initSw (store) {
   })
   if ('serviceWorker' in navigator && !registration) {
     registration = await navigator.serviceWorker.register('/service-worker.js')
+    logD('Registration sw succeeded. Scope is ' + registration.scope)
     registration.addEventListener('updatefound', function() {
       // If updatefound is fired, it means that there's
       // a new service worker being installed.

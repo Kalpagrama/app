@@ -16,7 +16,7 @@
           push no-caps dense color="accent" @click="changePhone()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get code') }}
         .row.full-width.justify-start
-          small.text-grey {{ $t('Example for Russia:') }} +7 (921)-000-00-07
+          small.text-grey {{ $t('Example for Russia') }} +7 (921)-000-00-07
   //- Email
   q-dialog(ref="changeEmail" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     div(style=`height: 60px`).row.items-center.bg-primary

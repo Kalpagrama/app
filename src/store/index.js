@@ -19,7 +19,6 @@ import { logD } from 'src/boot/log'
 Vue.use(Vuex)
 
 async function init (context) {
-  await context.dispatch('log/init')
   let { data: { user, categories, userWorkspace, userEvents, userSubscriptions, userSettings } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       ${fragments.userFragment}
