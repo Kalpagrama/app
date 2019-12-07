@@ -1,7 +1,10 @@
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 import assert from 'assert'
-import { logD } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 export const init = async (context, { user, fragmentName }) => {

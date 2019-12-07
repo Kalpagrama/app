@@ -2,7 +2,10 @@
 // import messages from 'src/i18n'
 
 import { initSw } from 'src/system/service_worker'
-import { logE } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.SW)
 
 function t (str) {
   return str

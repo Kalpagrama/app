@@ -11,12 +11,12 @@
       .row.full-width.justify-left.q-my-md
         span You can attach your personal <b>phone number</b> to the page. This will protect your page.
       div(style=`border-radius: 10px;`).row.content-start.justify-center
-        q-input(v-model="newPhone" stack-label label="Phone number" prefix="+7" filled).full-width.q-mb-md
+        q-input(v-model="newPhone" mask="(###)-###-##-##" stack-label label="Phone number" prefix="+7" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changePhone()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get code') }}
         .row.full-width.justify-start
-          small.text-grey {{ $t('Example for Russia:') }} +7 921 0000007
+          small.text-grey {{ $t('Example for Russia') }} +7 (921)-000-00-07
   //- Email
   q-dialog(ref="changeEmail" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     div(style=`height: 60px`).row.items-center.bg-primary
@@ -26,7 +26,7 @@
         span.text-bold.text-white {{$t('Changing email')}}
     .column.bg-white.q-px-md
       .row.content-start.justify-center
-        q-input(v-model="settings.general.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
+        q-input(v-model="$store.state.objects.currentUser.settings.general.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
         q-input(v-model="newEmail" stack-label label="New email" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changeEmail()"
@@ -40,8 +40,8 @@
         span.text-bold.text-white {{$t('Changing password')}}
     .column.bg-white.q-px-md
       .row.content-start.justify-center
-        q-input(v-model="currentPas" stack-label label="Current pasword" filled).full-width.q-my-md
-        q-input(v-model="newPas" stack-label label="New pasword" filled).full-width.q-mb-md
+        //- q-input(v-model="currentPas" stack-label label="Current pasword" filled).full-width.q-my-md
+        q-input(v-model="newPas" stack-label label="New pasword" filled).full-width.q-my-md
         q-input(v-model="repPas" stack-label label="Repeate pasword" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changePasword()"
@@ -76,12 +76,12 @@
     .row.full-width
       span {{$t("Phone number")}}
     .row.full-width
-      small.text-grey  {{ settings.general.phone }}
+      small.text-grey  {{ $store.state.objects.currentUser.settings.general.phone }}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeEmail.show()").row.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
     .row.full-width
       span {{$t('Email')}}
     .row.full-width
-      small.text-grey {{ settings.general.email }}
+      small.text-grey {{ $store.state.objects.currentUser.settings.general.email }}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePasword.show()").row.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
     .row.full-width
       span {{$t('Change pasword')}}
@@ -94,7 +94,7 @@
     .row.full-width
       span {{$t('Language')}}
     .row.full-width
-      small.text-grey  {{ settings.general.language }}
+      small.text-grey  {{ $store.state.objects.currentUser.profile.lang }}
 </template>
 
 <script>
@@ -119,6 +119,8 @@ export default {
       }
     }
   },
+  computed: {
+  },
   methods: {
     async changePhone () {
       try {
@@ -126,7 +128,7 @@ export default {
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
           path: 'settings.general.phone',
-          value: this.newPhone
+          value: '+7 ' + this.newPhone
         })
         this.$log('changePhone done', res)
         this.$q.notify({message: 'Changed PHONE', color: 'green', textColor: 'white'})
