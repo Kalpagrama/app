@@ -9,22 +9,22 @@
       q-btn(
         push no-caps color="blue" @click="$go({name: 'phone'})"
         :style=`{height: '60px', borderRadius: '10px'}`).full-width
-        span Войти по номеру телефона
+        span {{$t('Войти по номеру телефона')}}
     .row.full-width.q-mb-sm
       q-btn(
         push no-caps color="grey" @click="$go({name: 'email'})"
         :style=`{height: '60px', borderRadius: '10px'}`).full-width
-        span Войти через почту
+        span {{$t('Войти через почту')}}
     .row.full-width.q-mb-sm
       q-btn(
         push no-caps color="black" @click="$go({name: 'signIn'})"
         :style=`{height: '60px', borderRadius: '10px'}`).full-width
-        span Sign in
+        span {{$t('Sign in')}}
     //- .row.full-width.q-mb-sm
       q-btn(
         push no-caps color="accent" @click="$go({name: 'signUp'})"
         :style=`{height: '60px', borderRadius: '10px'}`).full-width
-        span Sign up
+        span {{$t(Sign up)}}
 </template>
 
 <script>

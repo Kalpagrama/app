@@ -20,7 +20,7 @@ div().column.full-width.q-px-sm.q-pt-sm
     div(
       @click="nameClick"
       :style=`{minHeight: '50px'}`).row.full-width.justify-center.items-center
-      span.text-bold.text-center.cursor-pointer {{ node.name }}
+      span.text-bold.text-center.cursor-pointer {{ $t(node.name) }}
   //- div(v-if="pinned").col.full-width.bg-green
   //-   node-pin(:zIndex="zIndex+100" :opened="pinned")
 </template>

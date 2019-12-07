@@ -9,7 +9,7 @@
         span.text-bold.text-white {{$t('Changing phone number')}}
     .column.bg-white.q-px-md
       .row.full-width.justify-left.q-my-md
-        span You can attach your personal <b>phone number</b> to the page. This will protect your page.
+        span {{$t('You can attach your personal phone number to the page. This will protect your page.')}}
       div(style=`border-radius: 10px;`).row.content-start.justify-center
         q-input(v-if="currentPhone" v-model="currentPhone" readonly disable stack-label label="Current number" filled).full-width.q-mb-md
         q-input(v-model="newPhone" unmasked-value mask="(###)-###-##-##" stack-label label="New number" prefix="+7" filled).full-width.q-mb-md
@@ -87,7 +87,7 @@
     .row.full-width
       small.text-grey  {{ currentPhone }}
       div(v-if="!currentPhone").row.full-width.items-center
-        small.text-grey Add your phone number
+        small.text-grey {{$t('Add your phone number')}}
         q-icon(name="warning" color="accent" size="20px").q-ml-xs
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeEmail.show()").row.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
     .row.full-width
@@ -95,13 +95,13 @@
     .row.full-width
       small.text-grey {{ currentEmail }}
       div(v-if="!currentEmail").row.full-width.items-center
-        small.text-grey Add your email
+        small.text-grey {{$t('Add your email')}}
         q-icon(name="warning" color="accent" size="20px").q-ml-xs
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePassword.show()").row.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
     .row.full-width
       span {{$t('Change password')}}
       div(v-if="!currentPassword").row.full-width.items-center
-        small.text-grey Add password
+        small.text-grey {{$t('Add password')}}
         q-icon(name="warning" color="accent" size="20px").q-ml-xs
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeNickname.show()").row.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
     .row.full-width

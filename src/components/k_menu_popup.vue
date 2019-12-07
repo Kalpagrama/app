@@ -7,14 +7,14 @@ div
       div(:style=`{borderRadius: '10px'}`).row.full-width.bg-white
         //- header with name
         div(v-if="!noName" :style=`{minHeight: '60px', borderBottom: '1px solid #eee'}`).row.full-width.items-center.justify-center.q-px-sm
-          span(:style=`{fontSize: '16px'}`).text-bold.text-center {{ name || '' | cut(50) }}
+          span(:style=`{fontSize: '16px'}`).text-bold.text-center {{ $t(name || '' | cut(50)) }}
         //- actions
         div(v-for="(a, ai) in actions" :key="a.id" @click="$emit('action', a). $refs.kPopup.hide()"
           :style=`{height: '60px', overflow: 'hidden', borderRadius: '10px'}`
           ).row.full-width.items-center.justify-center.q-px-md.hr.cursor-pointer.scroll
           span(
             :style=`{color: a.color || 'black', whiteSpace: 'nowrap'}`
-            :class="a.class || []") {{ a.name }}
+            :class="a.class || []") {{ $t(a.name) }}
       //- hide
       div(v-if="$q.screen.width < 451" @click="$emit('hide'), $refs.kPopup.hide()"
         :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`

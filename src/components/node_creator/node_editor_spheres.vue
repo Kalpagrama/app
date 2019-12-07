@@ -16,7 +16,7 @@
             v-for="(t, ti) in tagsFiltered" :key="ti" @click="sphereClick(t, ti)"
             :style=`{height: '60px'}`
             ).row.full-width.items-center.q-px-md
-            span {{ t.name }}
+            span {{ $t(t.name) }}
         transition(
           appear
           enter-active-class="animated slideInDown"
@@ -25,10 +25,10 @@
             v-if="tagsFiltered.length === 0 && search.length > 0"
             no-caps color="primary" :loading="sphereCreating" @click="sphereCreate()"
             :style=`{position: 'absolute', top: '0px', left: '10px', width: 'calc(100% - 20px)', minHeight: '60px', borderRadius: '10px'}`)
-            span Добавить сферу "{{ search }}"
+            span {{$t('Добавить сферу')}} "{{ $t(search) }}"
   //- label
   div(:style=`{height: '40px'}`).row.full-width.items-end.q-px-sm
-    span.text-bold Сферы
+    span.text-bold {{$t('Сферы')}}
   //- spheres
   div(
     :style=`{position: 'relative', minHeight: '56px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.q-pa-sm.bg-grey-4
@@ -40,7 +40,7 @@
           ).row.bg-primary.q-mr-sm.q-mt-sm
           .col
             .row.fit.items-center.q-px-sm
-              span.text-white.q-mb-xs {{ s.name }}
+              span.text-white.q-mb-xs {{ $t(s.name) }}
           q-btn(round flat color="white" icon="clear" @click="sphereDelete(s, si)")
     q-icon(name="keyboard_arrow_down" size="30px" color="grey-7" @click="$refs.spheresDialog.show()").q-mr-sm
 </template>

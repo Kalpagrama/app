@@ -12,7 +12,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
   //- author name
   .col.q-pl-sm
     router-link(v-if="nodeFull" :to="`/app/user/${nodeFull.author.oid}`")
-      span(v-if="nodeFull").q-mr-xs {{nodeFull.author.name}}
+      span(v-if="nodeFull").q-mr-xs {{$t(nodeFull.author.name)}}
   //- actions
   div
     slot(name="actions")

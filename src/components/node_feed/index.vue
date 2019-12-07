@@ -6,7 +6,7 @@
         slot(name="default")
         .col.full-height
           .row.fit.items-center.q-px-sm
-            span.text-bold {{ name }}
+            span.text-bold {{ $t(name) }}
         q-btn(round dense flat :color="muted ? 'grey-6' : 'accent'" :icon="muted ? 'volume_off' : 'volume_up'" @click="volumeToggle()")
         q-btn(round dense flat color="grey-6" icon="more_vert" @click="feedOptions()")
     //- body

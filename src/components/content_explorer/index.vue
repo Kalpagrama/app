@@ -28,7 +28,7 @@ k-split(ref="kSplit" :headerMaxHeight="200" :headerClass="['bg-black']" :bodyCla
       div(:style=`{height: '60px'}`).row.full-width
         .col.full-height
           .row.fit.items-center
-            span.text-bold {{ content.name | cut(50) }}
+            span.text-bold {{ $t(content.name | cut(50)) }}
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
           q-btn(round flat icon="keyboard_arrow_down" @click="headerToggle()")
     node-loader(ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")

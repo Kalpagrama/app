@@ -30,7 +30,7 @@ div(:style=`{position: 'relative'}`).column.fit.bg
             :style=`{position: 'absolute', zIndex: 200, top: 220+'px', left: '0px', height: '60px', }`
             ).row.full-width.q-px-sm
             div(:style=`{borderRadius: '10px'}`).row.fit.items-center.justify-center.bg-white
-              span.text-bold How to be happy?
+              span.text-bold {{$t('How to be happy?')}}
           //- actions
           div(:style=`{position: 'absolute', top: 290+actionsTop+'px', left: '0px', height: '60px'}`
             ).row.full-width.q-px-sm

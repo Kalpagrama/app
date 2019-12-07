@@ -6,13 +6,13 @@ div(:style=`{position: 'relative'}`).column.fit.bg-white
     div(@click.self="$refs.sourceWsDialog.hide()").row.fit.items-start.justify-center.q-pt-xl.q-px-sm
       div(:style=`{maxWidth: '500px'}`).column.fit.bg-white
         div(v-if="item").col.scroll
-          span {{ item.name }}
+          span {{ $t(item.name) }}
   //- header
   div(:style=`{height: '60px'}`).row.full-width
     .col.full-height
       .row.fit.items-center.q-px-md
         //- span.text-bold Take from workspace
-        span.text-bold {{ type }}
+        span.text-bold {{ $t(type) }}
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="clear" @click="$emit('hide')")
   //- body
@@ -28,7 +28,7 @@ div(:style=`{position: 'relative'}`).column.fit.bg-white
         //- body
         .col.full-height
           .row.fit.items-start.q-pa-sm
-            span {{ i.name }}
+            span {{ $t(i.name) }}
 </template>
 
 <script>

@@ -7,10 +7,10 @@
       q-btn(
         color="primary" no-caps @click="$refs.nodeCategoryDialog.hide()"
         :style=`{position: 'absolute', bottom: '10px', left: '10px', width: 'calc(100% - 20px)', minHeight: '60px', borderRadius: '10px'}`)
-        span.text-bold Готово
+        span.text-bold {{$t('Готово')}}
       //- header
       div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-md
-        span Выберите категории (3 максимум)
+        span {{$t('Выберите категории (3 максимум)')}}
       //- body
       div(:style=`{paddingBottom: '80px'}`).col.scroll.full-width
         .row.full-width.items-start.content-start
@@ -19,10 +19,10 @@
             :style=`{height: '60px'}`
             :class=`{'bg-grey-4': categories.includes(c.type)}`
             ).row.full-width.items-center.q-px-md
-            span(:class=`{'text-black': categories.includes(c.type)}`) {{ c.nameC }}
+            span(:class=`{'text-black': categories.includes(c.type)}`) {{ $t(c.nameC) }}
   //- header
   div(:style=`{height: '40px'}`).row.full-width.items-end.q-px-sm
-    span.text-bold Категории
+    span.text-bold {{$t('Категории')}}
   //- body
   .row.full-width
     div(
@@ -36,9 +36,9 @@
             ).row.bg-accent.q-mr-sm.q-mt-xs
             .col
               .row.fit.items-center.q-px-sm
-                span.text-white.q-mb-xs {{ c.nameC  }}
+                span.text-white.q-mb-xs {{ $t(c.nameC)  }}
             q-btn(round flat color="white" icon="clear" @click="categoryDelete(c, ckey)")
-          span(v-if="categories.length === 0") Выберите категории
+          span(v-if="categories.length === 0") {{$t('Выберите категории')}}
       q-icon(name="keyboard_arrow_down" size="30px" color="grey-7" @click="$refs.nodeCategoryDialog.show()").q-mr-sm
 </template>
 

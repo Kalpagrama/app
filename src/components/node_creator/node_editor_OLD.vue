@@ -6,7 +6,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
     :style=`{minHeight: '70px'}`).row.full-width.q-pa-sm
     //- name
     div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-sm
-      span.text-bold В чем суть?
+      span.text-bold {{$t('В чем суть?')}}
     //- name in out
     .row.full-width
         div(:style=`{borderRadius: '10px', overflow: 'hidden !important', zIndex: 900}`).row.full-width
@@ -17,18 +17,18 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
     node-category(:input="node.categories" @input="$emit('categories', $event)")
     //- layout header
     div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-md
-      span.text-bold Шаблон
+      span.text-bold {{$t('Шаблон')}}
     //- layout input
     .row.full-width.q-px-sm
       div(:style=`{height: '56px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.q-px-sm.bg-grey-3
         //- span Выберите шаблон
-        span Картинка в картинке
+        span {{$t('Картинка в картинке')}}
         .col
         q-icon(name="keyboard_arrow_down" size="30px" color="grey-7").q-mr-sm
     //- spheres header
     div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-md
-      span.text-bold Сферы
+      span.text-bold {{$t('Сферы')}}
     //- spheres list
     div(v-if="true" :class=`{'q-mb-lg': node.spheres.length > 0}`).row.full-width.q-px-sm
       div(v-show="node.spheres.length > 0" :style=`{background: '#f2f2f2', zIndex: 10, marginBottom: '-30px', borderRadius: '10px 10px 0 0'}`).row.full-width.q-pa-sm
@@ -53,7 +53,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
     q-btn(
       color="primary" no-caps @click="$emit('hide')"
       style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
-      span.text-white.text-bold Сохранить
+      span.text-white.text-bold {{$t('Сохранить')}}
 </template>
 
 <script>

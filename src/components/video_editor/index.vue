@@ -12,7 +12,7 @@ q-layout.bg-black
   q-btn(
     color="accent" push no-caps @click="confirm()"
     :style=`{position: 'absolute', zIndex: 10000, top: '16px', left: '70px', width: 'calc(100% - 140px)'}`)
-    span.text-white Ready
+    span.text-white {{$t('Ready')}}
   //- cancel
   div(:style=`{position: 'absolute', top: '0px', right: '0px', zIndex: 10000, height: '70px', width: '70px'}`).row.items-center.justify-center
     q-btn(

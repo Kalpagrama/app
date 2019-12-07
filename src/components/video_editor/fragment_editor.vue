@@ -19,10 +19,10 @@ div(:style=`{position: 'relative'}`).column.fit.bg-white
       small(@click="$refs.fragmentDialog.hide()") {{ fragment }}
   div(v-if="false").row.full-width.q-pa-sm
     q-btn(color="primary" no-caps style=`borderRadius: 10px; height: 60px` @click="$emit('preview')").full-width
-      span.text-bold.text-white Проиграть
+      span.text-bold.text-white {{$t('Проиграть')}}
   .row.full-width.q-pa-sm
     q-btn(outline color="red" no-caps style=`borderRadius: 10px; height: 50px` @click="$emit('delete')").full-width
-      span Удалить фрагмент
+      span {{$t('Удалить фрагмент')}}
 </template>
 
 <script>

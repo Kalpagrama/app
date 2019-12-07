@@ -15,7 +15,7 @@
       .row.full-width.justify-center
         span.text-h6 KALPAGRAMMA
         .row.full-width.justify-center
-          span essence is near...
+          span {{$t('essence is near')}}...
       div(style=`width: 200px; height: 200px; border-radius: 10px`).row.full-width.justify-items-center.bg-grey-1.q-mt-md.shadow-5
       //- .row.full-width.justify-center.q-mt-md
       //-   <iframe width="280" height="157,5" src="https://www.youtube-nocookie.com/embed/MwYbCLJCV8s" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -26,33 +26,33 @@
         div(style=`border-radius: 50%; border: 3px solid #fff; height: 100px; width: 100px`).row.justify-center.items-center
           q-icon(name="person_add" size="56px")
         .row.full-width.justify-center.q-mt-sm
-          span.text-center.text-h5 Find and Follow Facebook Friends
+          span.text-center.text-h5 {{$t('Find and Follow Facebook Friends')}}
         .row.full-width.justify-center.q-mt-sm
-          span.text-center.text-grey-4 You decide who to subscribe to. We will never post to Facebook without your permission.
+          span.text-center.text-grey-4 {{$t('You decide who to subscribe to. We will never post to Facebook without your permission.')}}
         .row.full-width.justify-center.q-mt-lg
-          q-btn(unelevated color="accent") Connect Facebook
+          q-btn(unelevated color="accent") {{$t('Connect Facebook')}}
       .row.full-width.justify-end.self-end
-        q-btn(flat color="accent" @click="nextSlide()") Skip
+        q-btn(flat color="accent" @click="nextSlide()") {{$t('Skip')}}
     q-carousel-slide(name="3").row.justify-center.items-center
       .row.justify-center.content-center
         div(style=`border-radius: 50%; border: 3px solid #fff; height: 100px; width: 100px`).row.justify-center.items-center
           q-icon(name="add_a_photo" size="56px")
         .row.full-width.justify-center.q-mt-sm
-          span.text-center.text-h5 Add a profile photo
+          span.text-center.text-h5 {{$t('Add a profile photo')}}
         .row.full-width.justify-center.q-mt-sm
-          span.text-center.text-grey-4 Add a profile photo that friends could recognize you.
+          span.text-center.text-grey-4 {{$t('Add a profile photo that friends could recognize you.')}}
         .row.full-width.justify-center.q-mt-lg
-          q-btn(unelevated color="accent") Add a photo
+          q-btn(unelevated color="accent") {{$t('Add a photo')}}
       .row.full-width.justify-end.self-end
-        q-btn(flat color="accent" @click="nextSlide()") Skip
+        q-btn(flat color="accent" @click="nextSlide()") {{$t('Skip')}}
     q-carousel-slide(name="4").row.justify-center.content-start
       div(style=`height: 30%`).row
         .row.full-width.justify-start
-          span(style='width: 160px').text-h6 Welcome to the Kalpagramma
+          span(style='width: 160px').text-h6 {{$t('Welcome to the')}} Kalpagramma
           .col
           q-btn(v-model="slide" style=`height: 40px` @click="nextSlide()" color="accent" label="Next")
         .row.full-width.justify-start
-          span Choose at least 5 to get started.
+          span {{$t('Choose at least 5 to get started.')}}
       div(style=`height: 70%`).row.full-width.justify-center.scroll
         div(v-for="(c, ci) in contentList" :key="ci" @click="chosenContent()").row.justify-center.q-ma-xs
           div(:style=`{width: '6em', height: '6em', overflow: 'hidden', borderRadius: '10px', backgroundSize: 'cover', backgroundImage: 'url(' + c.thumbUrl + ')'}`).row.justify-start

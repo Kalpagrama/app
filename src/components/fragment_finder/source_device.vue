@@ -3,7 +3,7 @@
   div(:style=`{height: '60px'}`).row.full-width
     .col.full-height
       .row.fit.items-center.q-px-md
-        span.text-bold Загрузка с устройства
+        span.text-bold {{$t('Загрузка с устройства')}}
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-content-center
       q-btn(v-if="!uploading" round flat icon="clear" @click="cancel()")
   .col.full-width.scroll

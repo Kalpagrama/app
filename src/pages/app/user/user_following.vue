@@ -12,7 +12,7 @@
         span.text-caption {{ s.name | cut(50) }}
   div(v-if="countSubsсriptions === 0").row.full-width
     div(style=`border-radius: 10px`).row.full-width.justify-center.items-center.bg-grey-1.q-pa-lg
-      span.text-bold Нету активных подписок
+      span.text-bold {{$t('Нету активных подписок')}}
 </template>
 <script>
 export default {

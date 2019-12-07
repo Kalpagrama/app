@@ -6,22 +6,22 @@ div(:style=`{height: $q.screen.height-60+'px'}`).column.full-width.bg-primary
       div(:style=`{height: '60px'}`).row.full-width
         .col.full-height
           .row.fit.items-center.q-px-md
-            span.text-bold Ядрогенератор
+            span.text-bold {{$t('Ядрогенератор')}}
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
           q-btn(round flat icon="clear" @click="$refs.nodeCreatorDialog.hide()")
       .col.full-width.scroll
         .row.full-width.items-start.content-start
           div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
-            span start new node
+            span {{$t('start new node')}}
           div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
-            span Мои ядра
+            span {{$t('Мои ядра')}}
   .row.full-width
     div(:style=`{height: '60px'}`).row.full-width
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="menu" color="grey-3" @click="$refs.nodeCreatorDialog.toggle()")
       .col.full-height
         .row.fit.items-center.justify-start
-          span.text-bold.text-white Ядрогенератор
+          span.text-bold.text-white {{$t('Ядрогенератор')}}
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="clear" color="white" @click="$emit('hide')")
     q-tabs(v-model="tab" @input="tabChanged" align="left" color="white").full-width
@@ -41,7 +41,7 @@ div(:style=`{height: $q.screen.height-60+'px'}`).column.full-width.bg-primary
               :style=`{height: 'auto', borderRadius: '10px'}`
               ).row.full-width.items-end.bg-white.q-pa-md.q-mb-md
               .row.full-width.q-pa-sm
-                span.text-bold В чем суть?
+                span.text-bold {{$t('В чем суть?')}}
               div(:style=`{position: 'relative', zIndex: 100, overflow: 'hidden', borderRadius: '10px'}`).row.full-width
                 q-input(v-model="name" filled type="textarea" :rows="3").full-width
             div(
@@ -49,9 +49,9 @@ div(:style=`{height: $q.screen.height-60+'px'}`).column.full-width.bg-primary
               ).row.full-width.bg-white.q-mb-md
               .row.full-width.items-start.content-start.q-pa-md
                 .row.full-width.q-pa-sm
-                  span.text-bold Шаблон
+                  span.text-bold {{$t('Шаблон')}}
                 div(:style=`{height: '56px', borderRadius: '10px'}`).row.full-width.items-center.justify-between.q-px-sm.bg-grey-3
-                  span Картинка в картинке
+                  span {{$t('Картинка в картинке')}}
                   q-icon(size="26px" name="keyboard_arrow_down")
                 //- .row.full-width.q-pa-sm
                 //-   span.text-bold Категория
@@ -66,7 +66,7 @@ div(:style=`{height: $q.screen.height-60+'px'}`).column.full-width.bg-primary
                 :loading="publishing"
                 :style=`{position: 'absolute', left: '8px', bottom: '8px', height: '60px',
                   width: 'calc(100% - 16px)', borderRadius: '10px'}`)
-                span.text-bold Опубликовать
+                span.text-bold {{$t('Опубликовать')}}
 </template>
 
 <script>

@@ -2,7 +2,7 @@
 .row.full-width.items-start.content-start.q-pa-sm
   div(:style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.full-width.items-center.content-center.justify-center.bg-grey-2
-    span Some settings
+    span {{$t('Some settings')}}
   .row.full-width.q-py-sm
     q-btn(outline color="red" no-caps @click="wsClear()"
       style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width

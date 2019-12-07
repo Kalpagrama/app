@@ -6,7 +6,7 @@
     div(:style=`{height: '70px'}`).row.full-width
       .col.full-height
         .row.fit.items-center.justify-start.q-px-md
-          span.text-bold Upload by URL
+          span.text-bold {{$t('Upload by URL')}}
       div(:style=`{height: '70px', width: '70px'}`).row.items-center.justify-center.q-px-md
         q-btn(v-if="!uploading" round flat icon="clear" @click="cancel()")
     //- header input
@@ -21,7 +21,7 @@
     .row.full-width.items-start.content-start
       div(v-show="!inputFocused && input.length === 0").row.full-width.q-pa-sm
         q-btn(color="grey-7" outline style=`height: 50px; borderRadius: 10px` no-caps @click="inputBuffer()").full-width
-          span Вставить из буфера обмена
+          span {{$t('Вставить из буфера обмена')}}
       div(v-show="inputValid").row.full-width.q-px-sm
         div(:style=`{position: 'relative', paddingTop: '100%', borderRadius: '10px', overflow: 'hidden', zIndex: 1000}`
           ).row.full-width.q-my-sm.bg-grey-3
@@ -40,7 +40,7 @@
       style=`height: 60px; borderRadius: 10px`
       :disable="!iframeReady"
       :loading="uploading" :percentage="progress ? progress.progress : 0").full-width
-      span.text-white.text-bold {{ `Загрузить` }}
+      span.text-white.text-bold {{ $t('Загрузить') }}
 </template>
 
 <script>

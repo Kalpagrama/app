@@ -5,7 +5,7 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
       div(:style=`{height: '60px'}`).row.full-width.items-center
         div(:style=`{height: '60px', width: '45px'}`).row.items-center.justify-end
           q-btn(round flat icon="keyboard_arrow_left" @click="$refs.nodeCreatorDialog.hide()")
-      span nodeCreatorDialog
+      span {{$t('nodeCreatorDialog')}}
   q-dialog(ref="fragmentFinderDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
     @hide="fragmentFinderDialogToggled(false)" @show="fragmentFinderDialogToggled(true)")
     div(
@@ -21,9 +21,9 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
         .col.full-width
           k-colls(@coll="fragmentFindingColl = $event" :tabs="true" :coll="fragmentFindingColl" :colls="fragmentFindingColls" :style="{height: '100%'}")
             template(v-slot:bookmarks)
-              span Bookmarks
+              span {{$t('Bookmarks')}}
             template(v-slot:fragments)
-              span Fragments
+              span {{$t('Fragments')}}
   q-dialog(ref="nameFinderDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     div(@click.self="$refs.nameFinderDialog.hide()").row.fit.items-end
       div(:style=`{height: height-200+'px', borderRadius: '10px 10px 0 0'}`).column.full-width.q-pa-sm.bg-grey-3
@@ -35,7 +35,7 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
               v-for="(s, si) in 20" :key="si"
               :style=`{minHeight: '40px'}`
               ).row.full-width.items-center.justify-center.q-px-sm
-              span Suggestion {{ s }}
+              span {{$t('Suggestion')}} {{ s }}
   div(
     v-if="true"
     :style=`{height: '60px'}`).row.full-width
@@ -66,7 +66,7 @@ div(:style=`{height: $q.screen.height+'px'}`).column.full-width
                 v-for="(d, di) in 4" :key="di"
                 :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
                 ).row.full-width.items-center.bg-white.q-px-sm.q-mb-sm
-                span Draft {{ di }}
+                span {{$t('Draft')}} {{ $t(di) }}
       template(v-slot:editor)
         .column.fit
           .col.scroll

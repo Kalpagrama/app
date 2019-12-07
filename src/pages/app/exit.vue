@@ -3,12 +3,12 @@
   .row.full-width
     div(:style=`{height: '50px'}`).row.full-width.items-center.justify-end.q-pl-md
       .row
-        span.text-bold Выход
+        span.text-bold {{$t('Выход')}}
       .col.row.justify-end
         q-btn(round flat icon="clear" @click="$emit('hide')")
   .row.full-width.justify-center.content-start
     .row.full-width.justify-center.q-mb-md
-      span.text-bold Вы точно хотите выйти?
+      span.text-bold {{$t('Вы точно хотите выйти?')}}
     .row.full-width.justify-center.q-px-md.q-mb-sm
       q-btn(@click="logout()" no-caps dense color="primary" style=`width: 120px; border-radius: 10px` label="Выйти").row.full-width
     .row.full-width.justify-center.q-px-md

@@ -10,7 +10,7 @@ q-layout(container :style=`{height: height+'px', width: width+'px'}`).column.bg-
   q-page-container
     q-page.bg-grey-2
       div(v-if="events.length === 0").row.fit.justify-center.bg-white.q-py-xl
-        span.text-grey.text-h6 You dont have notifications.
+        span.text-grey.text-h6 {{$t('You dont have notifications.')}}
       .row.full-width.items-start.content-start.justify-center.q-pa-md
         div(:style=`{maxWidth: '500px'}`).row.full-width
           div(

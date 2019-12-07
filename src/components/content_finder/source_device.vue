@@ -6,7 +6,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
       q-btn(
         icon="attachment" color="primary" no-caps @click="$refs.fileinput.click()"
         style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width.q-my-xl
-        span.text-white.text-bold.q-ml-sm Выбрать файл
+        span.text-white.text-bold.q-ml-sm {{$t('Выбрать файл')}}
     //- div(body-scroll-lock-ignore).col.scroll
     //-   .row.full-width.items-start.content-start
     //-     div(

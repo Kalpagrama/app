@@ -22,7 +22,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
                   v-for="(u, ui) in 50" :key="ui"
                   :style=`{height: '50px'}`
                   ).row.full-width.items-center.q-px-md.br
-                  span User {{ tab }} {{ ui }}
+                  span {{$t('User')}} {{ $t(tab) }} {{ $t(ui) }}
   div(
     v-if="nodeBluring"
     @click="nodeBluring = false"
@@ -56,7 +56,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
                   span.text-bold.text-white {{ r.name }}
             .row.fit.items-center.justify-center
               //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-              span(v-if="rates !== ri").text-bold.text-red {{ r.name }}
+              span(v-if="rates !== ri").text-bold.text-red {{ $t(r.name) }}
       //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       //- q-icon(name="keyboard_arrow_left" color="grey" size="20px")
       span(v-if="nodeBluring").text-bold {{ $t('Tap or slide to select') }}
@@ -72,7 +72,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.justify-end
         q-icon(name="blur_on" size="40px"
           :style=`{color: rates[rate].color}`)
       //- rate
-      span(@click="rateStatsClick()").text-bold.q-ml-sm {{ rates[rate].name }} / 95
+      span(@click="rateStatsClick()").text-bold.q-ml-sm {{ $t(rates[rate].name) }} / 95
       //- div(v-if="nodeFull && nodeFull.rateUser").q-mr-sm
       //-   small {{Math.ceil(nodeFull.rateUser*100)}}/
       //-   span(:style=`{fontSize: '15px'}`).text-bold {{Math.ceil(nodeFull.rate*100)}}

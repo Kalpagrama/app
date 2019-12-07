@@ -5,7 +5,7 @@
       q-btn(color="primary" round flat icon="menu" @click="sourcesShow = !sourcesShow")
     .col.full-height
       .row.fit.items-center.content-center.q-px-md
-        span.text-bold Добавить фрагмент
+        span.text-bold {{$t('Добавить фрагмент')}}
         .row.full-width
           span {{ sources[source].name }}
   .col
