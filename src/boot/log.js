@@ -26,12 +26,18 @@ let logC = (...msg) => console.error(...msg)
 
 function getLogFunc (level, module) {
   switch (level) {
-    case 'debug': return (...args) => logD.call({ logModuleName: module }, ...args)
-    case 'info': return (...args) => logI.call({ logModuleName: module }, ...args)
-    case 'warning': return (...args) => logW.call({ logModuleName: module }, ...args)
-    case 'error': return (...args) => logE.call({ logModuleName: module }, ...args)
-    case 'critical': return (...args) => logC.call({ logModuleName: module }, ...args)
-    default: return (...args) => logD.call({ logModuleName: module }, ...args)
+    case 'debug':
+      return (...args) => logD.call({ logModuleName: module }, ...args)
+    case 'info':
+      return (...args) => logI.call({ logModuleName: module }, ...args)
+    case 'warning':
+      return (...args) => logW.call({ logModuleName: module }, ...args)
+    case 'error':
+      return (...args) => logE.call({ logModuleName: module }, ...args)
+    case 'critical':
+      return (...args) => logC.call({ logModuleName: module }, ...args)
+    default:
+      return (...args) => logD.call({ logModuleName: module }, ...args)
   }
 }
 
@@ -40,13 +46,13 @@ const LogLevelEnum = Object.freeze({
   INFO: 1,
   WARNING: 2,
   ERROR: 3,
-  CRITICAL: 4,
+  CRITICAL: 4
 })
 Object.freeze(LogLevelEnum)
 const LogModulesEnum = Object.freeze({
   SW: 'sw',
   VUEX: 'vuex',
-  BOOT: 'boot',
+  BOOT: 'boot'
 })
 Object.freeze(LogModulesEnum)
 
@@ -67,30 +73,30 @@ class Logger {
 
   debug (module, ...msg) {
     if (this.store.state.core.logModulesBlackList.includes(module)) return
-    if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel){
+    if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel) {
       this.getLoggerFunc(module)(...msg)
     }
-    if (LogLevelEnum.DEBUG >= this.store.state.core.logLevelSentry){
+    if (LogLevelEnum.DEBUG >= this.store.state.core.logLevelSentry) {
       Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
     }
   }
 
   info (module, ...msg) {
     if (this.store.state.core.logModulesBlackList.includes(module)) return
-    if (LogLevelEnum.INFO >= this.store.state.core.logLevel){
+    if (LogLevelEnum.INFO >= this.store.state.core.logLevel) {
       this.getLoggerFunc(module)(...msg)
     }
-    if (LogLevelEnum.INFO >= this.store.state.core.logLevelSentry){
+    if (LogLevelEnum.INFO >= this.store.state.core.logLevelSentry) {
       Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Info)
     }
   }
 
   warn (module, ...msg) {
     if (this.store.state.core.logModulesBlackList.includes(module)) return
-    if (LogLevelEnum.WARNING >= this.store.state.core.logLevel){
+    if (LogLevelEnum.WARNING >= this.store.state.core.logLevel) {
       this.getLoggerFunc(module)(...msg)
     }
-    if (LogLevelEnum.WARNING >= this.store.state.core.logLevelSentry){
+    if (LogLevelEnum.WARNING >= this.store.state.core.logLevelSentry) {
       Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Warning)
     }
   }
@@ -98,10 +104,10 @@ class Logger {
   error (module, ...msg) {
     try {
       // if (this.store.state.core.logModulesBlackList.includes(module)) return
-      if (LogLevelEnum.ERROR >= this.store.state.core.logLevel){
+      if (LogLevelEnum.ERROR >= this.store.state.core.logLevel) {
         this.getLoggerFunc(module)(...msg)
       }
-      if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry){
+      if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry) {
         Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
       }
     } catch (err) {
@@ -112,10 +118,10 @@ class Logger {
   critical (module, ...msg) {
     try {
       // if (this.store.state.core.logModulesBlackList.includes(module)) return
-      if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel){
+      if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
         this.getLoggerFunc(module)(...msg)
       }
-      if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry){
+      if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry) {
         Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Critical)
       }
     } catch (err) {
