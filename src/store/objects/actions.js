@@ -179,3 +179,9 @@ export const setObjectValue = async (context, { oid, path, value }) => {
   })
   return objectChange
 }
+
+export const setPhoto = async (context, { oid, path, value }) => {
+  let { data: { objectChange } } = await apolloProvider.clients.apiApollo.mutate({
+  })
+  return objectChange
+}
