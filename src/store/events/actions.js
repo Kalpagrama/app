@@ -4,7 +4,10 @@ import { Notify } from 'quasar'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
-import { logD, logE } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')

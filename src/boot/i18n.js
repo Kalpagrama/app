@@ -2,8 +2,10 @@ import i18next from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import VueI18Next from '@panter/vue-i18next'
 import translations from '../i18n/index'
-import { logE } from 'src/boot/log'
-
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.BOOT)
 let i18n
 
 export default async ({ Vue, store, app }) => {

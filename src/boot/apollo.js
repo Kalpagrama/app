@@ -8,9 +8,9 @@ import { createUploadLink } from 'apollo-upload-client'
 // import { persistCache } from 'apollo-cache-persist'
 import VueApollo from 'vue-apollo'
 import axios from 'axios'
-import { logE, logD } from 'src/boot/log'
-// const debug = require('debug')('[boot]:apollo')
-// debug.enabled = true
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
 
 let apolloProvider
 

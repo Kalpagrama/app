@@ -22,6 +22,33 @@ let logD = (...msg) => console.log(...msg)
 let logI = (...msg) => console.log(...msg)
 let logW = (...msg) => console.warn(...msg)
 let logE = (...msg) => console.error(...msg)
+let logC = (...msg) => console.error(...msg)
+
+function getLogFunc (level, module) {
+  switch (level) {
+    case 'debug': return (...args) => logD.call({ logModuleName: module }, ...args)
+    case 'info': return (...args) => logI.call({ logModuleName: module }, ...args)
+    case 'warning': return (...args) => logW.call({ logModuleName: module }, ...args)
+    case 'error': return (...args) => logE.call({ logModuleName: module }, ...args)
+    case 'critical': return (...args) => logC.call({ logModuleName: module }, ...args)
+    default: return (...args) => logD.call({ logModuleName: module }, ...args)
+  }
+}
+
+const LogLevelEnum = Object.freeze({
+  DEBUG: 0,
+  INFO: 1,
+  WARNING: 2,
+  ERROR: 3,
+  CRITICAL: 4,
+})
+Object.freeze(LogLevelEnum)
+const LogModulesEnum = Object.freeze({
+  SW: 'sw',
+  VUEX: 'vuex',
+  BOOT: 'boot',
+})
+Object.freeze(LogModulesEnum)
 
 class Logger {
   constructor (store) {
@@ -39,30 +66,58 @@ class Logger {
   }
 
   debug (module, ...msg) {
-    if (['debug'].includes(this.store.state.core.logLevel)) {
+    if (this.store.state.core.logModulesBlackList.includes(module)) return
+    if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel){
       this.getLoggerFunc(module)(...msg)
     }
-    if (['debug'].includes(this.store.state.core.sentryLogLevel)) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+    if (LogLevelEnum.DEBUG >= this.store.state.core.logLevelSentry){
+      Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+    }
   }
 
   info (module, ...msg) {
-    if (['debug', 'info'].includes(this.store.state.core.logLevel)) {
+    if (this.store.state.core.logModulesBlackList.includes(module)) return
+    if (LogLevelEnum.INFO >= this.store.state.core.logLevel){
       this.getLoggerFunc(module)(...msg)
     }
-    if (['debug', 'info'].includes(this.store.state.core.sentryLogLevel)) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Info)
+    if (LogLevelEnum.INFO >= this.store.state.core.logLevelSentry){
+      Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Info)
+    }
   }
 
   warn (module, ...msg) {
-    if (['debug', 'info', 'warning', 'warn'].includes(this.store.state.core.logLevel)) {
+    if (this.store.state.core.logModulesBlackList.includes(module)) return
+    if (LogLevelEnum.WARNING >= this.store.state.core.logLevel){
       this.getLoggerFunc(module)(...msg)
     }
-    if (['debug', 'info', 'warning', 'warn'].includes(this.store.state.core.sentryLogLevel)) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Warning)
+    if (LogLevelEnum.WARNING >= this.store.state.core.logLevelSentry){
+      Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Warning)
+    }
   }
 
   error (module, ...msg) {
     try {
-      this.getLoggerFunc(module)(...msg)
-      // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+      // if (this.store.state.core.logModulesBlackList.includes(module)) return
+      if (LogLevelEnum.ERROR >= this.store.state.core.logLevel){
+        this.getLoggerFunc(module)(...msg)
+      }
+      if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry){
+        Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+      }
+    } catch (err) {
+      console.error('error on logging error!!!', err)
+    }
+  }
+
+  critical (module, ...msg) {
+    try {
+      // if (this.store.state.core.logModulesBlackList.includes(module)) return
+      if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel){
+        this.getLoggerFunc(module)(...msg)
+      }
+      if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry){
+        Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Critical)
+      }
     } catch (err) {
       console.error('error on logging error!!!', err)
     }
@@ -71,24 +126,30 @@ class Logger {
 
 export default async ({ Vue, store, app }) => {
   try {
-    let logger = new Logger(store)
-    let logD = function (...msg) {
-      let module = this && this.constructor && this.constructor.name === 'VueComponent' ? this.$options.name : 'unknown module'
-      logger.debug(module, ...msg)
+    const detectModuleName = (thiz) => {
+      if (thiz && thiz.logModuleName) {
+        return thiz.logModuleName
+      } else if (thiz && thiz.constructor && thiz.constructor.name === 'VueComponent') {
+        return thiz.$options.name
+      } else {
+        return 'unknown module'
+      }
     }
-    Vue.prototype.$logD = logD
-    Vue.prototype.$log = logD
+    let logger = new Logger(store)
+    Vue.prototype.$log = Vue.prototype.$logD = logD = function (...msg) {
+      logger.debug(detectModuleName(this), ...msg)
+    }
     Vue.prototype.$logI = logI = function (...msg) {
-      let module = this && this.constructor && this.constructor.name === 'VueComponent' ? this.$options.name : 'unknown module'
-      logger.info(module, ...msg)
+      logger.info(detectModuleName(this), ...msg)
     }
     Vue.prototype.$logW = logW = function (...msg) {
-      let module = this && this.constructor && this.constructor.name === 'VueComponent' ? this.$options.name : 'unknown module'
-      logger.warn(module, ...msg)
+      logger.warn(detectModuleName(this), ...msg)
     }
     Vue.prototype.$logE = logE = function (...msg) {
-      let module = this && this.constructor && this.constructor.name === 'VueComponent' ? this.$options.name : 'unknown module'
-      logger.error(module, ...msg)
+      logger.error(detectModuleName(this), ...msg)
+    }
+    Vue.prototype.$logC = logC = function (...msg) {
+      logger.critical(detectModuleName(this), ...msg)
     }
 
     Vue.config.errorHandler = function (err, vm, info) {
@@ -121,4 +182,4 @@ export default async ({ Vue, store, app }) => {
   }
 }
 
-export { logD, logI, logW, logE }
+export { getLogFunc, LogLevelEnum, LogModulesEnum }

@@ -64,7 +64,7 @@
 
 <script>
   import { checkUpdate } from 'src/system/service_worker'
-  import { logE } from 'src/boot/log'
+  import { LogLevelEnum } from 'src/boot/log'
 
   export default {
     name: 'kMenuDesktop',
@@ -139,7 +139,7 @@
             break
           case '/app/sentry_log':
             this.$logD('sentry_log..')
-            await this.$store.commit('core/stateSet', ['sentryLogLevel', 'debug'])
+            await this.$store.commit('core/stateSet', ['logLevelSentry', LogLevelEnum.DEBUG])
             break
           case '/app/share': {
             this.$logD('share..')
@@ -152,7 +152,7 @@
                 url: 'https://whatwebcando.today/'
               })
                 .then(() => console.log('Successful share'))
-                .catch(error => logE('Error sharing:', error));
+                .catch(error => this.$logE('Error sharing:', error));
             }
             // http://localhost:8282/share-target/?title=test_title&text=test_text+https%3A%2F%2Fwhatwebcando.today%2F
             // let intent = new Intent('http://webintents.org/share',

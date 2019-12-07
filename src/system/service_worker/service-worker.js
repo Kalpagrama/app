@@ -5,15 +5,21 @@ const swVer = 49
  * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
  */
 
+let logModulesBlackList = []
+let logLevel = 0
+let logLevelSentry = 3
 importScripts('https://browser.sentry-cdn.com/5.9.1/bundle.min.js')
 Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
+
 function logFunc (...msg) {
-  console.log('SW: ', ...msg)
-  // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+  if (logModulesBlackList.includes('sw')) return
+  if (logLevel <= 2) console.log('SW: ', ...msg)
+  if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
 }
-function errFunc (...msg) {
-  console.error(...msg)
-  Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+
+function errCritFunc (...msg) {
+  if (logLevel <= 4) console.error(...msg)
+  if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
 }
 
 logFunc('SW_VER=', swVer)
@@ -44,24 +50,33 @@ workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
 // );
 
 self.addEventListener('message', function handler (event) {
-  logFunc('message!', event)
-  var promise = self.clients.matchAll()
-    .then(function (clientList) {
-      logFunc('message! clientList', clientList)
-      var senderID = event.source.id
-
-      clientList.forEach(function (client) {
-        logFunc('message! postMessage', client)
-        client.postMessage({
-          client: senderID,
-          message: event.data,
-          self
-        })
-      })
-    })
-  if (event.waitUntil) {
-    event.waitUntil(promise)
+  // logFunc('message!', event.data)
+  if (event.data && event.data.logModulesBlackList) {
+    logModulesBlackList = event.data.logModulesBlackList
+    logLevel = event.data.logLevel
+    logLevelSentry = event.data.logLevelSentry
   }
+  // var promise = self.clients.matchAll()
+  //   .then(function (clientList) {
+  //     logFunc('message! ', event.data)
+  //     logFunc('message! clientList', clientList)
+  //     logFunc('message! clientList', clientList)
+  //     var senderID = event.source.id
+  //
+  //     clientList.forEach(function (client) {
+  //       logFunc('message! postMessage', client)
+  //       logFunc('message! postMessage', client)
+  //       logFunc('message! postMessage', client)
+  //       client.postMessage({
+  //         client: senderID,
+  //         message: event.data,
+  //         self
+  //       })
+  //     })
+  //   })
+  // if (event.waitUntil) {
+  //   event.waitUntil(promise)
+  // }
 })
 
 self.addEventListener('install', event => {
@@ -71,7 +86,7 @@ self.addEventListener('activate', event => {
   logFunc('activated!', swVer)
 })
 self.addEventListener('fetch', async event => {
-  logFunc('ready to handle fetches!', swVer, event.request.url)
+  // logFunc('ready to handle fetches!', swVer, event.request.url)
   // if (event.request.method === 'POST') {
   //   const formData = await event.request.formData()
   //   // event.respondWith(fetch(event.request))
@@ -101,8 +116,9 @@ self.addEventListener('updatefound', event => {
   logFunc('ready to update!', swVer)
 })
 self.addEventListener('error', function (e) {
-  errFunc(e.filename, e.lineno, e.colno, e.message)
+  errCritFunc(e.filename, e.lineno, e.colno, e.message)
 })
+
 // ----------------------- settings for Web-push------------------------------
 
 /* global importScripts */
