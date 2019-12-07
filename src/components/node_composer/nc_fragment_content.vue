@@ -48,6 +48,7 @@ export default {
       url: '',
       urlInputLoading: false,
       urlInputFocused: false,
+      file: null,
       progressShow: false
     }
   },
@@ -73,22 +74,9 @@ export default {
         this.$log('url GOOD', url)
         this.urlInputLoading = true
         let content = await this.contentGet(to, true)
-        await this.$wait(500)
-        this.$log('content', content)
-        if (content.type === 'VIDEO') {
-          if (content.contentSource !== 'KALPA') {
-            if (content.duration < 300) {
-              // content = await this.contentGet(to, false)
-              this.$emit('content', content)
-            } else {
-              this.$emit('content', content)
-            }
-          } else {
-            this.$emit('content', content)
-          }
-        } else {
-          this.$emit('content', content)
-        }
+        // await this.$wait(500)
+        // this.$log('content', content)
+        this.$emit('content', content)
         this.urlInputLoading = false
       } catch (e) {
         this.$log('url WRONG', to)
@@ -118,8 +106,8 @@ export default {
       this.$log('contenGet done', uploadContentUrl)
       return uploadContentUrl
     },
-    fileChanged (e) {
-      this.$log('fileChanged', e)
+    async fileChanged (e) {
+      this.$log('fileChanged', e.target.files['0'])
     }
   },
   mounted () {

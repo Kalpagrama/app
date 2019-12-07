@@ -2,49 +2,51 @@
 </style>
 <template lang="pug">
 div(
-  :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
-  ).row.full-width.bg-grey-1
+  :style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`
+  ).row.full-width.items-start.content-start.bg-grey-1.kscroll
   //- stage 0
   div(v-if="stage === 0" :style=`{height: '200px'}`).row.full-width.items-center.justify-center.bg-grey-3
     q-btn(round outline size="lg" color="accent" icon="add" @click="stage = 1")
   //- stage 1
   nc-fragment-content(v-if="stage === 1" @content="contentFound" :width="width")
   //- stage 2
-  div(v-if="stage === 2 && fragment && fragment.content"
-    :style=`{position: 'relative'}`).row.full-width
+  div(v-if="stage === 2" :style=`{position: 'relative'}`).row.full-width.items-start.content-start
     //- cancel
-    k-dialog-bottom(ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete', color: 'red'}}}" @action="cancel()")
+    k-dialog-bottom(ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete fragment', color: 'red'}}}" @action="cancel()")
     q-btn(
       round flat color="white" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
       :style=`{position: 'absolute', zIndex: 11000, right: '18px', top: '18px'}`).shadow-1
-    //- start
-    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-      q-btn(
-        v-if="!started"
-        push no-caps color="accent" @click="start()"
-        :style=`{position: 'absolute', zIndex: 11000, left: '20px', bottom: '34px'}`)
-        span.text-bold {{$t('Start')}}
     //- play
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       q-btn(
-        v-if="started"
-        round push no-caps @click="play()"
-        :color="playing ? 'green' : 'green'"
-        :icon="playing ? 'edit' : 'check'"
+        round push no-caps @click="edit()"
+        :color="editing ? 'green' : 'green'"
+        :icon="editing ? 'check' : 'edit'"
         :style=`{position: 'absolute', zIndex: 11000, right: '20px', bottom: '34px'}`)
     //- preview img
-    .row.full-width
-      img(:src="fragment.content.thumbUrl" :style=`{width: '100%', maxHeight: width+'px', objectFit: 'contain'}` @load="imgLoad")
+    img(
+      ref="ncFragmentPreview"
+      @load="imgLoad"
+      :src="node.meta.fragments[index].thumbUrl || node.fragments[index].content.thumbUrl"
+      :style=`{width: '100%', maxHeight: width+'px', objectFit: 'contain', userSelect: 'none'}`
+      crossOrigin="anonymous" draggable="false")
     //- video
-    div(v-if="imgWidth > 0" :style=`{position: 'absolute', zIndex: 100, width: imgWidth+'px', height: imgHeight+'px', top: 0}`).row
+    div(
+      v-if="$refs.ncFragmentPreview && imgHeight > 0"
+      :style=`{position: 'absolute', zIndex: 100,
+        width: $refs.ncFragmentPreview.clientWidth+'px',
+        height: $refs.ncFragmentPreview.clientHeight+'px', top: 0}`).row
       nc-fragment-video(
-        v-if="fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
-        :content="fragment.content" :width="imgWidth" :height="imgHeight")
+        v-if="node.fragments[index].content.type === 'VIDEO'" ref="ncFragmentVideo"
+        :content="node.fragments[index].content" :width="$refs.ncFragmentPreview.clientWidth" :height="$refs.ncFragmentPreview.clientHeight")
     //- editors
     nc-fragment-video-editor(
-      v-if="$refs.ncFragmentVideo && fragment.content.type === 'VIDEO'" ref="ncFragmentVideoEditor"
-      :content="fragment.content" :player="$refs.ncFragmentVideo.player"
+      v-if="$refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
+      :index="index" :node="node"
+      :content="node.fragments[index].content" :player="$refs.ncFragmentVideo.player"
       :width="width" :style=`{height: toolsHeight+'px'}`)
+    div(v-if="false").row.full-width.bg-red
+      small.full-width editign: {{editing}}
 </template>
 
 <script>
@@ -55,7 +57,7 @@ import ncFragmentVideoEditor from './nc_fragment_video_editor'
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
-  props: ['width', 'index', 'fragment', 'stageInitial'],
+  props: ['width', 'index', 'node', 'stageInitial'],
   data () {
     return {
       stage: 0,
@@ -63,36 +65,44 @@ export default {
       imgHeight: 0,
       actionsHeight: 0,
       toolsHeight: 0,
-      started: false,
-      playing: false,
-      points: []
+      editing: false
+    }
+  },
+  watch: {
+    node: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('node CHANGED', to)
+        if (to.fragments[this.index] && to.fragments[this.index].content) {
+          this.stage = 2
+        } else {
+          if (this.index === 0) this.stage = 0
+          else this.stage = 1
+        }
+      }
     }
   },
   methods: {
-    start () {
-      this.$log('start start')
-      // this.points.push({name: '', type: 'default', thumbUrl: '', start: this.$refs.ncFragmentVideo.now, end: this.$refs.ncFragmentVideo.now + 3})
-      if (!this.started) this.started = true
-      this.$emit('edit', this.index)
-      this.$tween.to(this, 0.3, {
-        actionsHeight: 52,
-        toolsHeight: this.$q.screen.height - 8 - 8 - 8 - 60 - this.imgHeight,
-        onComplete: () => {
-          this.$log('start done')
-        }
-      })
-    },
-    play () {
-      this.$log('play start')
-      if (this.playing) {
-        this.playing = false
-        this.start()
-      } else {
-        this.playing = true
+    edit () {
+      this.$log('edit')
+      if (this.editing) {
+        this.editing = false
         this.$emit('edit', -1)
         this.$tween.to(this, 0.3, {
           actionsHeight: 0,
           toolsHeight: 0
+        })
+      } else {
+        this.editing = true
+        this.$emit('edit', this.index)
+        // TODO: for video only
+        // this.$refs.ncFragmentVideoEditor.cutCreate()
+        this.$tween.to(this, 0.3, {
+          actionsHeight: 52,
+          toolsHeight: this.$q.screen.height - 8 - 8 - 8 - 60 - this.$refs.ncFragmentPreview.clientHeight,
+          onComplete: () => {
+            this.$log('start done')
+          }
         })
       }
     },
@@ -101,31 +111,38 @@ export default {
       this.imgWidth = e.path[0].width
       this.imgHeight = e.path[0].height
     },
+    imgError (e) {
+      this.$log('imgError', e)
+      this.$q.notify('imgError!')
+    },
     contentFound (content) {
-      this.$log('contentFound', content, this.fragment)
-      this.$emit('content', content)
-      this.fragment.content = content
-      this.fragment.contentOid = content.oid
+      this.$log('contentFound', content)
+      this.$set(this.node.fragments, this.index, {
+        relativePoints: [],
+        relativeScale: content.type === 'VIDEO' ? content.duration : 0,
+        content: content,
+        oid: content.oid
+      })
+      this.$set(this.node.meta.fragments, this.index, {
+        relativeCuts: [],
+        thumbUrl: ''
+      })
+      this.$set(this, 'stage', 2)
       this.$emit('ready', this.index)
-      this.stage = 2
+      this.$nextTick(() => {
+        this.play()
+      })
     },
     cancel () {
       this.$log('cancel')
-      this.stage = 1
-      this.fragment.thumbUrl = ''
-      this.fragment.relativePoints = []
-      this.fragment.relativeCuts = []
-      this.fragment.contentOid = false
-      this.fragment.content = null
+      this.$delete(this.node.fragments, this.index)
+      this.$delete(this.node.meta.fragments, this.index)
+      this.$set(this, 'stage', 1)
     }
   },
-  mounted () {
-    this.$log('mounted', this.fragment)
-    // if (this.stageInitial) this.stage = this.stageInitial
-    // this.fragment.count += 10
-    if (this.fragment && this.fragment.content) {
-      this.contentFound(this.fragment.content)
-    }
+  async mounted () {
+    this.$log('mounted')
+    if (this.stageInitial) this.stage = this.stageInitial
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

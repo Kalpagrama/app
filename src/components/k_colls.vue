@@ -8,7 +8,7 @@
     div(
       v-ripple="{color: 'white'}"
       :style=`{
-        position: 'absolute', bottom: '10px', zIndex: 200, height: '30px',
+        position: 'absolute', bottom: '10px', zIndex: 10, height: '30px',
         borderRadius: '10px', overflow: 'hidden', backdropFilter: 'invert(100%)',
         width: collScroll.width+'px', left: 8+collScroll.left+'px'}`).row.cursor-pointer
     div(

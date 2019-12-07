@@ -32,7 +32,8 @@ export default {
   data () {
     return {
       f1Bottom: 10,
-      f1maxWidth: '30%'
+      f1maxWidth: '30%',
+      nodeFull: null
     }
   },
   watch: {
@@ -76,9 +77,23 @@ export default {
     play () {
     },
     pause () {
+    },
+    async nodeLoad (oid) {
+      this.$logD('nodeLoad start', this.index, this.node.oid)
+      let node = null
+      try {
+        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
+      } catch (err){
+        // this.$logD('nodeLoad error', err, this.index, this.node.oid)
+        this.logE('node', 'nodeLoad error', err)
+        node = null
+      }
+      this.$logD('nodeLoad done', this.index, this.node.oid)
+      return node
     }
   },
-  mounted () {
+  async mounted () {
+    this.nodeFull = await this.nodeLoad(this.node.oid)
   },
   beforeDestroy () {
   }
