@@ -31,6 +31,7 @@ const routes = [
       { name: 'vk', path: 'vk', component: () => import('pages/login/vk') },
       { name: 'email', path: 'email', component: () => import('pages/login/email') },
       { name: 'phone', path: 'phone', component: () => import('pages/login/phone') },
+      { name: 'signIn', path: 'sign_in', component: () => import('pages/login/sign_in') },
       // { name: '404', path: '*', component: () => import('pages/Error404.vue') }
     ]
   },

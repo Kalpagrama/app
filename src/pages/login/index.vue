@@ -15,6 +15,16 @@
         push no-caps color="grey" @click="$go({name: 'email'})"
         :style=`{height: '60px', borderRadius: '10px'}`).full-width
         span Войти через почту
+    .row.full-width.q-mb-sm
+      q-btn(
+        push no-caps color="black" @click="$go({name: 'signIn'})"
+        :style=`{height: '60px', borderRadius: '10px'}`).full-width
+        span Sign in
+    //- .row.full-width.q-mb-sm
+      q-btn(
+        push no-caps color="accent" @click="$go({name: 'signUp'})"
+        :style=`{height: '60px', borderRadius: '10px'}`).full-width
+        span Sign up
 </template>
 
 <script>
