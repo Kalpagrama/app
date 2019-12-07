@@ -1,3 +1,4 @@
+import {LogLevelEnum, LogModulesEnum} from 'src/boot/log'
 export default {
   initialized: false,
   name: 'Kalpagramma',
@@ -6,8 +7,9 @@ export default {
   webPushTokenDraft: null,
   newVersionAvailable: false,
   installPrompt: null, // ф-я вызова диалога "установить приложение"
-  logLevel: 'debug',
-  sentryLogLevel: 'error',
+  logLevel: LogLevelEnum.DEBUG,
+  logLevelSentry: LogLevelEnum.CRITICAL,
+  logModulesBlackList: [LogModulesEnum.ML, LogModulesEnum.VUEX, LogModulesEnum.BOOT],
   colors: {
     hello: 'goodbye'
   }

@@ -1,4 +1,7 @@
-import { logD } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 import { apolloProvider } from 'boot/apollo'
 import assert from 'assert'
@@ -61,7 +64,7 @@ export const nodeDelete = async (context, oid) => {
 export const nodeCreate = async (context, node) => {
   logD('nodeCreate start', node)
 
-  node = {
+  let nodeex = {
     name: 'test name', // от 1 до 180
     categories: ['POLITICS'], // от 1 до 3
     spheres: [], // от нуля до 10

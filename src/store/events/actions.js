@@ -4,7 +4,10 @@ import { Notify } from 'quasar'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
-import { logD, logE } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
@@ -107,14 +110,6 @@ function processEvent (context, event) {
             thumbUrl: event.subject.thumbUrl
           })
         }
-        // let me = context.rootState.objects.currentUser
-        // assert.ok(me && me.subscriptions)
-        // me.subscriptions.push({
-        //   oid: event.object.oid,
-        //   name: event.object.name,
-        //   type: event.object.type,
-        //   thumbUrl: event.object.thumbUrl
-        // })
       }
       context.commit('addEvent', event)
       break
@@ -132,14 +127,6 @@ function processEvent (context, event) {
             logE('subscriber not found', event, cachedObj)
           }
         }
-        // let me = context.rootState.objects.currentUser
-        // assert.ok(me && me.subscriptions)
-        // let indx = me.subscriptions.findIndex(obj => obj.oid === event.object.oid)
-        // if (indx >= 0) {
-        //   me.subscriptions.splice(indx, 1)
-        // } else {
-        //   logE('subscriber not found', event, me)
-        // }
       }
       context.commit('addEvent', event)
       break

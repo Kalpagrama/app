@@ -1,13 +1,48 @@
 // Внимание! firebase подключается через CDN  в src/system/service_worker/service-worker.js
 import * as firebase from 'firebase/app'
 import '@firebase/messaging'
-import { logD, logW } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.SW)
 
 let registration = null // ServiceWorkerRegistration
 let messaging = null
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+function sendMessageToSW (message) {
+  // This wraps the message posting/response in a promise, which will
+  // resolve if the response doesn't contain an error, and reject with
+  // the error if it does. If you'd prefer, it's possible to call
+  // controller.postMessage() and set up the onmessage handler
+  // independently of a promise, but this is a convenient wrapper.
+  return new Promise(function (resolve, reject) {
+    var messageChannel = new MessageChannel()
+    messageChannel.port1.onmessage = function (event) {
+      if (event.data.error) {
+        reject(event.data.error)
+      } else {
+        resolve(event.data)
+      }
+    }
+    // This sends the message data as well as transferring
+    // messageChannel.port2 to the service worker.
+    // The service worker can then use the transferred port to reply
+    // via postMessage(), which will in turn trigger the onmessage
+    // handler on messageChannel.port1.
+    // See
+    // https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
+    if (navigator && navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage(message, [messageChannel.port2])
+    } else {
+      reject('no controller!!!')
+    }
+  })
+}
 
 async function initSw (store) {
-  logD('initSw')
+  // logD('initSw')
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
     logD('beforeinstallprompt')
@@ -22,11 +57,20 @@ async function initSw (store) {
   })
   if ('serviceWorker' in navigator && !registration) {
     registration = await navigator.serviceWorker.register('/service-worker.js')
-    registration.addEventListener('updatefound', function() {
+    logD('Registration sw succeeded. Scope is ' + registration.scope)
+    wait(100).then(() => {
+      logD('sendMessageToSW... ...')
+      sendMessageToSW({
+        logModulesBlackList: store.state.core.logModulesBlackList,
+        logLevel: store.state.core.logLevel,
+        logLevelSentry: store.state.core.logLevelSentry
+      }).catch(err => logE('cant post msg to sw', err))
+    })
+
+    registration.addEventListener('updatefound', function () {
       // If updatefound is fired, it means that there's
       // a new service worker being installed.
       // let installingWorker = registration.installing;
-      // logW('V1 initSw onupdatefound2:', installingWorker)
       store.commit('core/stateSet', ['newVersionAvailable', true])
     })
     await initWebPush(store)

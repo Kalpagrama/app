@@ -13,7 +13,6 @@ import nodeTemplateVert from './node_template_vert'
 import nodeTemplatePip from './node_template_pip'
 import nodeTemplateCards from './node_template_cards'
 import kMenuPopup from 'components/k_menu_popup'
-import { logD, logE } from 'src/boot/log'
 
 export default {
   components: {nodeTemplateHoriz, nodeTemplateVert, nodeTemplatePip, nodeTemplateCards, kMenuPopup},
@@ -111,7 +110,7 @@ export default {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
       } catch (err){
         // this.$logD('nodeLoad error', err, this.index, this.node.oid)
-        logE('node', 'nodeLoad error', err)
+        this.$logE('node', 'nodeLoad error', err)
         node = null
       }
       this.$logD('nodeLoad done', this.index, this.node.oid)

@@ -1,23 +1,27 @@
+const swVer = 49
 /*
  * This file (which will be your service worker)
  * is picked up by the build system ONLY if
  * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
  */
 
+let logModulesBlackList = []
+let logLevel = 0
+let logLevelSentry = 3
 importScripts('https://browser.sentry-cdn.com/5.9.1/bundle.min.js')
 Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
 
 function logFunc (...msg) {
-  console.log('sw_message:', ...msg)
-  // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+  if (logModulesBlackList.includes('sw')) return
+  if (logLevel <= 2) console.log('SW: ', ...msg)
+  if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
 }
 
-function errFunc (...msg) {
-  console.error(...msg)
-  Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+function errCritFunc (...msg) {
+  if (logLevel <= 4) console.error(...msg)
+  if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
 }
 
-const swVer = 28
 logFunc('SW_VER=', swVer)
 
 /* global workbox */
@@ -33,40 +37,72 @@ workbox.core.clientsClaim()
 self.__precacheManifest = [].concat(self.__precacheManifest || [])
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
 
-self.addEventListener('message', function handler (event) {
-  logFunc('SW message!', event)
-  var promise = self.clients.matchAll()
-    .then(function (clientList) {
-      logFunc('SW message! clientList', clientList)
-      var senderID = event.source.id
+// const matchFunction = ({url, event}) => {
+//   // Return true if the route should match
+//   return true;
+// };
+//
+// workbox.routing.registerRoute(
+//   matchFunction,
+//   new workbox.strategies.CacheFirst({
+//     cacheName: 'images'
+//   })
+// );
 
-      clientList.forEach(function (client) {
-        logFunc('SW message! postMessage', client)
-        client.postMessage({
-          client: senderID,
-          message: event.data,
-          self
-        })
-      })
-    })
-  if (event.waitUntil) {
-    event.waitUntil(promise)
+self.addEventListener('message', function handler (event) {
+  // logFunc('message!', event.data)
+  if (event.data && event.data.logModulesBlackList) {
+    logModulesBlackList = event.data.logModulesBlackList
+    logLevel = event.data.logLevel
+    logLevelSentry = event.data.logLevelSentry
   }
+  // var promise = self.clients.matchAll()
+  //   .then(function (clientList) {
+  //     logFunc('message! ', event.data)
+  //     logFunc('message! clientList', clientList)
+  //     logFunc('message! clientList', clientList)
+  //     var senderID = event.source.id
+  //
+  //     clientList.forEach(function (client) {
+  //       logFunc('message! postMessage', client)
+  //       logFunc('message! postMessage', client)
+  //       logFunc('message! postMessage', client)
+  //       client.postMessage({
+  //         client: senderID,
+  //         message: event.data,
+  //         self
+  //       })
+  //     })
+  //   })
+  // if (event.waitUntil) {
+  //   event.waitUntil(promise)
+  // }
 })
+
 self.addEventListener('install', event => {
-  logFunc('SW now ready to install!', swVer)
+  logFunc('installed!', swVer)
 })
 self.addEventListener('activate', event => {
-  logFunc('SW now ready to handle activate!', swVer)
+  logFunc('activated!', swVer)
 })
-self.addEventListener('fetch', event => {
-  logFunc('SW now ready to handle fetches!', swVer)
-  if (event.request.method !== 'POST') {
-    // event.respondWith(fetch(event.request))
-    return
-  }
+self.addEventListener('fetch', async event => {
+  // logFunc('ready to handle fetches!', swVer, event.request.url)
+  // if (event.request.method === 'POST') {
+  //   const formData = await event.request.formData()
+  //   // event.respondWith(fetch(event.request))
+  //   logFunc('fetch post message!', swVer, event)
+  //   logFunc('SW formData = ', formData)
+  //   for (var value of formData.values()) {
+  //     logFunc('SW formData value = ', value);
+  //   }
+  //   logFunc('SW formData title = ', formData.get('title'))
+  //   logFunc('SW formData text = ', formData.get('text'))
+  //   logFunc('SW formData url = ', formData.get('url'))
+  //   logFunc('SW formData file = ', formData.get('file'))
+  //   logFunc('SW formData files = ', formData.get('files'))
+  //   await self.clients.openWindow('/app/create/')
+  // }
 
-  logFunc('SW fetch post message!', swVer, event)
   // event.respondWith((async () => {
   //   const formData = await event.request.formData()
   //   logFunc('SW formData = ', formData)
@@ -77,11 +113,12 @@ self.addEventListener('fetch', event => {
   // })())
 })
 self.addEventListener('updatefound', event => {
-  logFunc('SW now ready to update!', swVer)
+  logFunc('ready to update!', swVer)
 })
 self.addEventListener('error', function (e) {
-  errFunc(e.filename, e.lineno, e.colno, e.message)
+  errCritFunc(e.filename, e.lineno, e.colno, e.message)
 })
+
 // ----------------------- settings for Web-push------------------------------
 
 /* global importScripts */

@@ -1,4 +1,6 @@
-import { logE } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
 
 const debug = require('debug')('[boot]:main')
 debug.enabled = true

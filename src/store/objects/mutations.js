@@ -1,5 +1,8 @@
 import assert from 'assert'
-import logD from 'boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export function init (state, {user, fragmentName}) {
   // current user  хранится в кэше со всеми объектами, но живет вечно
@@ -55,7 +58,7 @@ function setValue (obj, path, value) {
 }
 
 export function setObjectValue (state, { oid, path, value }) {
-  let object = state.objects[oid]
+  let object = state.objects[oid].objectData
   if (!object) return
   let p = path.split('.')
   setValue(object, p, value)

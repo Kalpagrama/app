@@ -8,9 +8,9 @@ import { createUploadLink } from 'apollo-upload-client'
 // import { persistCache } from 'apollo-cache-persist'
 import VueApollo from 'vue-apollo'
 import axios from 'axios'
-import { logE, logD } from 'src/boot/log'
-// const debug = require('debug')('[boot]:apollo')
-// debug.enabled = true
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
 
 let apolloProvider
 
@@ -49,7 +49,7 @@ export default async ({ Vue, store, app }) => {
   Vue.use(VueApollo)
   let AUTH_URL = process.env.AUTH_URL || 'https://dev.kalpagramma.com/graphql'
   // let AUTH_URL = 'https://dev.kalpagramma.com/graphql'
-  logD('AUTH_URL', AUTH_URL)
+  // logD('AUTH_URL', AUTH_URL)
   store.commit('auth/stateSet', ['AUTH_URL', AUTH_URL])
 
   // Cache
@@ -80,7 +80,7 @@ export default async ({ Vue, store, app }) => {
   let { data: { services } } = await authApollo.query({
     query: gql`query services {services}`
   })
-  logD('services', services)
+  // logD('services', services)
   let linkHttp = services.API
   let linkWs = services.SUBSCRIPTIONS
   let linkUpload = services.UPLOAD
@@ -142,7 +142,7 @@ export default async ({ Vue, store, app }) => {
     }
   })
   app.apolloProvider = apolloProvider
-  logD('apollo init done')
+  // logD('apollo init done')
 }
 
 export { apolloProvider }

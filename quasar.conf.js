@@ -112,6 +112,14 @@ module.exports = function (ctx) {
         //   credentials: true
         // }))
       },
+      setup(app) {
+        app.post('*', (req, res) => {
+          res.redirect(req.originalUrl);
+        });
+      },
+      // headers: {
+      //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
+      // },
       // https: true,
       port: 8282,
       open: true // opens browser window automatically
@@ -151,7 +159,7 @@ module.exports = function (ctx) {
           //   text: 'body',
           //   url: 'url'
           // }
-          action: '/bookmark',
+          action: '/share-target',
           method: 'POST',
           enctype: 'multipart/form-data',
           params: {

@@ -5,7 +5,12 @@ div(
   :style=`{position: 'relative', height: 200+'px',
     borderRadius: '10px', oveflow: 'hidden',
     border: urlInputFocused ? '2px solid #789dff' : '3px solid #eee'}`
-    ).row.full-width.items-center.justify-center.bg-grey-2
+    ).row.full-width.items-center.justify-center.bg-grey-1
+  q-dialog(ref="ncFragmentContentWsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    div(@click.self="$refs.ncFragmentContentWsDialog.hide()").row.fit.items-end.content-end
+      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).column.fit.bg-grey-3
+        .col.full-width
+          ws-items
   div(
     v-if="progressShow && $store.state.events.progress"
     :style=`{
@@ -21,19 +26,22 @@ div(
       @paste="urlPasted" @focus="urlInputFocused = true" @blur="urlInputFocused = false"
       :loading="urlInputLoading"
       :placeholder="$t('Paste URL or upload a file')"
-      :style=`{paddingRight: '10px', paddingLeft: '10px'}`
+      :style=`{}`
       :input-style=`{paddingLeft: '0px', paddingRight: '0px'}`).full-width
       template(v-slot:prepend)
-        q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="add")
+        q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="add" @click="$refs.ncFragmentContentWsDialog.show()")
       template(v-slot:append)
         q-btn(v-if="!urlInputLoading && url.length > 0" round flat icon="clear" @click="url = ''")
         q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="attachment" @click="$refs.fileInput.click()").rotate-90
 </template>
 
 <script>
+import wsItems from 'components/workspace/ws_items'
 import {fragments} from 'schema/fragments'
+
 export default {
   name: 'ncFragmentContent',
+  components: {wsItems},
   props: ['width'],
   data () {
     return {
@@ -66,11 +74,11 @@ export default {
         this.urlInputLoading = true
         let content = await this.contentGet(to, true)
         await this.$wait(500)
-        // this.$log('content', content)
+        this.$log('content', content)
         if (content.type === 'VIDEO') {
           if (content.contentSource !== 'KALPA') {
             if (content.duration < 300) {
-              content = await this.contentGet(to, false)
+              // content = await this.contentGet(to, false)
               this.$emit('content', content)
             } else {
               this.$emit('content', content)
@@ -89,7 +97,7 @@ export default {
     async contentGet (url, onlyMeta = true) {
       this.$log('contentGet start')
       if (!onlyMeta) this.progressShow = true
-      let {data: {uploadContentUrl: content}} = await this.$apollo.mutate({
+      let {data: {uploadContentUrl}} = await this.$apollo.mutate({
         mutation: gql`
           ${fragments.objectFragment}
           mutation nc_uploadContentUrl ($url: String!, $onlyMeta: Boolean!) {
@@ -107,8 +115,8 @@ export default {
         this.progressShow = false
       }
       this.$store.commit('events/stateSet', ['progress', null])
-      this.$log('contenGet done')
-      return content
+      this.$log('contenGet done', uploadContentUrl)
+      return uploadContentUrl
     },
     fileChanged (e) {
       this.$log('fileChanged', e)

@@ -1,5 +1,8 @@
 import assert from 'assert'
-import { logD } from 'boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 export function init (state, userSubscriptions) {
   assert.ok(userSubscriptions)
   state.userSubscriptions = userSubscriptions
