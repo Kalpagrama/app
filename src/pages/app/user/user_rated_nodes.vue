@@ -27,7 +27,7 @@
 <script>
 import node from './node'
 export default {
-  name: 'user__created_nodes',
+  name: 'user__rated_nodes',
   props: {
     zIndex: {type: Number, default () { return 100 }},
     node: {type: Object},

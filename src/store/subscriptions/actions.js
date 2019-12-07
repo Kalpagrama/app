@@ -1,10 +1,12 @@
 import { apolloProvider } from 'boot/apollo'
-import { logD } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
-  // if (context.state.initialized) throw new Error('subscriptions state initialized already')
   if (context.state.initialized) return
-  logD('subscriptions', 'init', context.rootState.objects.currentUser.subscriptions)
+  logD('subscriptions', 'init', context.rootState.objects.currentUser.subscriptions, this)
   context.commit('init', context.rootState.objects.currentUser.subscriptions)
   return true
 }

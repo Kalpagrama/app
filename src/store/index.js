@@ -7,19 +7,20 @@ import node from './node'
 import auth from './auth'
 import ui from './ui'
 import events from './events'
-import log from './log'
 import subscriptions from './subscriptions'
 import objects from './objects'
 import user from './user'
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 import i18next from 'i18next'
-import { logD } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 
 Vue.use(Vuex)
 
 async function init (context) {
-  await context.dispatch('log/init')
   let { data: { user, categories, userWorkspace, userEvents, userSubscriptions, userSettings } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       ${fragments.userFragment}
@@ -39,6 +40,7 @@ async function init (context) {
       }`
   })
 
+  logD('asdasdasd')
   user.profile = {
     profile: {
       city: 'EKB',
@@ -60,7 +62,7 @@ async function init (context) {
   await context.dispatch('core/init')
   await context.dispatch('auth/init')
   await context.dispatch('node/init', categories)
-  await context.dispatch('objects/init', {user, fragmentName: 'userFragment'})
+  await context.dispatch('objects/init', { user, fragmentName: 'userFragment' })
   await context.dispatch('workspace/init')
   await context.dispatch('events/init')
   await context.dispatch('subscriptions/init')
@@ -98,7 +100,6 @@ export default function (/* { ssrContext } */) {
       auth,
       ui,
       events,
-      log,
       subscriptions,
       objects,
       user
