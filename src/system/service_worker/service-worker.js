@@ -1,4 +1,4 @@
-const swVer = 49
+const swVer = 9
 /*
  * This file (which will be your service worker)
  * is picked up by the build system ONLY if
@@ -16,7 +16,6 @@ function logFunc (...msg) {
   if (logLevel <= 2) console.log('SW: ', ...msg)
   if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
 }
-
 function errCritFunc (...msg) {
   if (logLevel <= 4) console.error(...msg)
   if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
@@ -36,17 +35,16 @@ workbox.core.clientsClaim()
  */
 self.__precacheManifest = [].concat(self.__precacheManifest || [])
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
-
-// const matchFunction = ({url, event}) => {
-//   // Return true if the route should match
-//   return true;
-// };
-//
+logFunc('self.__precacheManifest=', self.__precacheManifest)
 // workbox.routing.registerRoute(
-//   matchFunction,
+//   new RegExp('^https://dev.kalpagramma.com/.*'),
 //   new workbox.strategies.CacheFirst({
-//     cacheName: 'images'
-//   })
+//     plugins: [
+//       new workbox.cacheableResponse.Plugin({
+//         statuses: [0, 200]
+//       })
+//     ]
+//   }),
 // );
 
 self.addEventListener('message', function handler (event) {
@@ -55,6 +53,7 @@ self.addEventListener('message', function handler (event) {
     logModulesBlackList = event.data.logModulesBlackList
     logLevel = event.data.logLevel
     logLevelSentry = event.data.logLevelSentry
+    // if (logModulesBlackList.includes('sw')) workbox.setConfig({debug: false})
   }
   // var promise = self.clients.matchAll()
   //   .then(function (clientList) {
@@ -81,12 +80,16 @@ self.addEventListener('message', function handler (event) {
 
 self.addEventListener('install', event => {
   logFunc('installed!', swVer)
+  event.registerForeignFetch({
+    scopes: ['/'],
+    origins: ['*'] // or ['https://example.com']
+  })
 })
 self.addEventListener('activate', event => {
   logFunc('activated!', swVer)
 })
 self.addEventListener('fetch', async event => {
-  // logFunc('ready to handle fetches!', swVer, event.request.url)
+  logFunc('ready to handle fetches!', swVer, event.request.url)
   // if (event.request.method === 'POST') {
   //   const formData = await event.request.formData()
   //   // event.respondWith(fetch(event.request))

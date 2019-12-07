@@ -43,7 +43,7 @@ register(process.env.SERVICE_WORKER_FILE, {
 
   offline () {
     if (process.env.DEV) {
-      // console.log('No internet connection found. App is running in offline mode.')
+      console.log('No internet connection found. App is running in offline mode.')
     }
   },
 
