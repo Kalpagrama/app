@@ -10,7 +10,7 @@ div(
   //- stage 1
   nc-fragment-content(v-if="stage === 1" @content="contentFound" :width="width")
   //- stage 2
-  div(v-if="stage === 2 && content"
+  div(v-if="stage === 2 && fragment && fragment.content"
     :style=`{position: 'relative'}`).row.full-width
     //- cancel
     k-dialog-bottom(ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete', color: 'red'}}}" @action="cancel()")
@@ -34,16 +34,16 @@ div(
         :style=`{position: 'absolute', zIndex: 11000, right: '20px', bottom: '34px'}`)
     //- preview img
     .row.full-width
-      img(:src="content.thumbUrl" :style=`{width: '100%', maxHeight: width+'px', objectFit: 'contain'}` @load="imgLoad")
+      img(:src="fragment.content.thumbUrl" :style=`{width: '100%', maxHeight: width+'px', objectFit: 'contain'}` @load="imgLoad")
     //- video
     div(v-if="imgWidth > 0" :style=`{position: 'absolute', zIndex: 100, width: imgWidth+'px', height: imgHeight+'px', top: 0}`).row
       nc-fragment-video(
-        v-if="content.type === 'VIDEO'" ref="ncFragmentVideo"
-        :content="content" :width="imgWidth" :height="imgHeight")
+        v-if="fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
+        :content="fragment.content" :width="imgWidth" :height="imgHeight")
     //- editors
     nc-fragment-video-editor(
-      v-if="$refs.ncFragmentVideo && content.type === 'VIDEO'" ref="ncFragmentVideoEditor"
-      :content="content" :player="$refs.ncFragmentVideo.player"
+      v-if="$refs.ncFragmentVideo && fragment.content.type === 'VIDEO'" ref="ncFragmentVideoEditor"
+      :content="fragment.content" :player="$refs.ncFragmentVideo.player"
       :width="width" :style=`{height: toolsHeight+'px'}`)
 </template>
 
@@ -51,6 +51,7 @@ div(
 import ncFragmentContent from './nc_fragment_content'
 import ncFragmentVideo from './nc_fragment_video'
 import ncFragmentVideoEditor from './nc_fragment_video_editor'
+
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
@@ -58,7 +59,6 @@ export default {
   data () {
     return {
       stage: 0,
-      content: null,
       imgWidth: 0,
       imgHeight: 0,
       actionsHeight: 0,
@@ -102,19 +102,30 @@ export default {
       this.imgHeight = e.path[0].height
     },
     contentFound (content) {
-      this.$log('contentFound', content)
-      this.content = content
+      this.$log('contentFound', content, this.fragment)
+      this.$emit('content', content)
+      this.fragment.content = content
+      this.fragment.contentOid = content.oid
+      this.$emit('ready', this.index)
       this.stage = 2
     },
     cancel () {
       this.$log('cancel')
       this.stage = 1
-      this.content = null
+      this.fragment.thumbUrl = ''
+      this.fragment.relativePoints = []
+      this.fragment.relativeCuts = []
+      this.fragment.contentOid = false
+      this.fragment.content = null
     }
   },
   mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.fragment)
     // if (this.stageInitial) this.stage = this.stageInitial
+    // this.fragment.count += 10
+    if (this.fragment && this.fragment.content) {
+      this.contentFound(this.fragment.content)
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

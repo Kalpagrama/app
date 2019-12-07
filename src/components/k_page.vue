@@ -3,7 +3,7 @@
   //- header
   transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
     div(
-      v-if="headerShow"
+      v-if="true"
       :style=`{height: headerHeight+'px', overflow: 'hidden'}`).row.full-width
       slot(name="header")
   //- body
@@ -33,7 +33,7 @@ export default {
       scrollTop: 0,
       scrollHeight: 0,
       headerShowLocal: true,
-      headerHeight: 0,
+      headerHeight: 60,
       footerHeight: 60
     }
   },

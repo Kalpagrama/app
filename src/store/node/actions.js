@@ -61,7 +61,7 @@ export const nodeDelete = async (context, oid) => {
 export const nodeCreate = async (context, node) => {
   logD('nodeCreate start', node)
 
-  node = {
+  let nodeex = {
     name: 'test name', // от 1 до 180
     categories: ['POLITICS'], // от 1 до 3
     spheres: [], // от нуля до 10
