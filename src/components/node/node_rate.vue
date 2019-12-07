@@ -20,10 +20,10 @@ div(
   //- debug
   div(v-if="false").row.full-width.justify-center
     //- small {{ fingerLeft }} / {{ fingerTop }}
-    small {{ fingerRadius }}
+    small {{ $t(fingerRadius) }}
   //- rating numbers
   div(:style=`{height: '80px'}`).row.full-width.justify-center.items-end
-    h3.q-ma-xs.q-mr-sm {{ fingerRate }}
+    h3.q-ma-xs.q-mr-sm {{ $t(fingerRate) }}
     //- h3.q-ma-xs.text-bold {{ nodeFull.rate * 100 }}
   //- actions
   k-menu-popup(ref="rateToAnswer" :noName="true" :actions="actions" @action="action" @hide="$emit('hide')")
@@ -36,7 +36,7 @@ div(
       color="primary" no-caps :loading="nodeRating" @click="nodeRating ? '' : nodeRate()"
       :style=`{position: 'absolute', zIndex: 1000, left: '10px', bottom: '10px', width: 'calc(100% - 20px)', height: '60px', borderRadius: '10px'}`
       )
-      span.text-bold.text-white Проголосовать
+      span.text-bold.text-white {{$t(Проголосовать)}}
 </template>
 
 <script>

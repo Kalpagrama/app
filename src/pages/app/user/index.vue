@@ -31,11 +31,11 @@ div(:style=`{position: 'relative'}`).column.fit
           span.text-bold.text-black.text-h6 {{ user.name }}
         .row.full-width
           .row.full-width.q-py-sm
-            small.text-grey Status
+            small.text-grey {{$t('Status')}}
           //- .row.full-width.q-mt-xs
           //-   small About
         div(v-if="false" @click="showInfo()").row.full-width
-          span.text-accent Show detailed information
+          span.text-accent {{$t('Show detailed information')}}
           //- span {{ user.subscriptions }}
   div(
     v-if="user"

@@ -4,7 +4,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
   div(
     v-if="false"
     :style=`{height: '70px'}`).row.full-width.items-center.justify-center.q-px-md.bg-grey-3
-    span.text-bold Ответить ядром
+    span.text-bold {{$t('Ответить ядром')}}
   //- body
   .col.scroll.full-width.bg-grey-3
     .row.full-width.q-pa-sm
@@ -26,7 +26,7 @@ div(:style=`{position: 'relative', maxWidth: $q.screen.width+'px'}`).column.fit.
       v-if="!loading && name.length > 0"
       no-caps color="primary" :loading="answering" @click="handleAnswer()"
       :style=`{position: 'absolute', zIndex: 1000, bottom: '10px', left: '10px', width: 'calc(100% - 20px)', height: '60px', borderRadius: '10px'}`)
-      span.text-bold.text-white Ответить ядром
+      span.text-bold.text-white {{$t('Ответить ядром')}}
 </template>
 
 <script>

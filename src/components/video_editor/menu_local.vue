@@ -29,7 +29,7 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
               div(:style=`{width: '40px', height: '40px', borderRadius: '4px', overflow: 'hidden', background: $randomColor(pi)}`)
               .col.full-height
                 .row.fit.items-center.q-px-sm
-                  span point {{pi}}: {{ p }}
+                  span {{$t('point')}} {{pi}}: {{ p }}
       q-tab-panel(name="settings" style=`margin: 0; padding: 0`).column.fit.bg-grey-2
         .col.scroll
           .row.full-width.items-start

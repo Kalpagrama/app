@@ -3,22 +3,22 @@
   k-dialog(ref="metaDialog")
     .column.fit.bg-white
       div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-md
-        span.text-bold Выбрать шаблон
+        span.text-bold {{$t('Выбрать шаблон')}}
       .col.scroll.full-width
         div(
           v-for="(l, li) in layouts" :key="li" @click="layoutClick(l, li)"
           :style=`{height: '100px'}`
           ).row.full-width.items-center.q-px-md
-          span {{ l.name }}
+          span {{ $t(l.name) }}
   //- label
   div(:style=`{height: '40px'}`).row.full-width.items-end.q-px-sm
-    span.text-bold Шаблон
+    span.text-bold {{$t('Шаблон')}}
   //- input
   div(
     :style=`{height: '56px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.q-pa-sm.bg-grey-4
     .col.full-height
       div(@click="$refs.metaDialog.show()").row.fit.items-center.content-center
-        span Картинка в картинке
+        span {{$t('Картинка в картинке')}}
     q-icon(name="keyboard_arrow_down" size="30px" color="grey-7" @click="$refs.metaDialog.show()").q-mr-sm
   //- span node meta input
 </template>

@@ -14,11 +14,11 @@ div(:style="{width: width+'px'}").column.full-height
             round
             :flat="skey !== source"
             :icon="s.icon ? s.icon : ''" :color="skey === source ? 'accent' : 'grey-8'")
-            span(v-if="!s.icon").text-bold {{ s.nameMini || s.name }}
+            span(v-if="!s.icon").text-bold {{ $t(s.nameMini || s.name) }}
         //- full name
         div(v-if="false").col.full-height
-          span {{ s.name }}
-        q-tooltip {{ s.name }}
+          span {{ $t(s.name) }}
+        q-tooltip {{ $t(s.name) }}
       //- source add
       div(:style=`{height: '70px'}`).row.full-width.items-center
         div(:style=`{height: '70px', width: '70px'}`).row.items-center.justify-center

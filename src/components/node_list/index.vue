@@ -10,7 +10,7 @@
         :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
     .col.full-height
       .row.fit.items-center.q-px-md
-        span {{ n.name | cut(50) }}
+        span {{ $t(n.name | cut(50)) }}
 </template>
 
 <script>

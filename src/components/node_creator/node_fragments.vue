@@ -22,8 +22,8 @@ div(:style=`{paddingBottom: '60px'}`).row.full-width.full-height.items-start.con
     :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
     //- header
     div(:style=`{height: '50px'}`).row.full-width.items-center.q-pa-sm.bg-white
-      span.text-bold.q-mr-sm {{ fi+ 1 }}.
-      span().text-bold {{ f.name || 'Enter fragment name' }}
+      span.text-bold.q-mr-sm {{ $t(fi+ 1) }}.
+      span().text-bold {{ $t(f.name || 'Enter fragment name') }}
     //- body maybe
     .row.full-width.q-pa-sm
       img(

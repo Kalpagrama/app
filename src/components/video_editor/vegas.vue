@@ -19,7 +19,7 @@ div(:style=`{position: 'relative', borderRadius: '10px 10px 0 0', overflow: 'hid
   q-btn(
     v-show="cut >= 0" no-caps color="accent" @click="cutConfirm()"
     :style=`{position: 'absolute', left: '10px', bottom: '10px', height: '60px', width: 'calc(100% - 20px)', borderRadius: '10px'}`)
-    span Готово
+    span {{$t('Готово')}}
   //- frames
   div(:style=`{position: 'absolute', zIndex: 1000, top: mode === 'maxi' ? '0px' : '-70px', height: '70px'}`).row.full-width.justify-center.items-center.content-center.bg-white
     //- frames v-touch-pan.mouse.stop.left.right="framesDrag"

@@ -9,31 +9,31 @@
   div(:style=`{height: '60px'}`).row.full-width.items-center
     .col.full-height
       .row.fit.items-center.q-px-md
-        span.text-bold Найти фрагмент
+        span.text-bold {{$t('Найти фрагмент')}}
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="clear" @click="$emit('hide')")
   .col.full-width.scroll
     .row.fit.items-start.justify-center
       div(:style=`{maxWidth: $q.screen.width > 500 ? '500px' : '100%'}`).row.full-width.items-start.content-start.q-px-md.q-pt-lg
         .row.full-width.q-pa-sm
-          span.text-bold Загрузить
+          span.text-bold {{$t('Загрузить')}}
         .row.full-width.q-mb-lg
           div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceUrlDialog.show()").col.bg-grey-2.cursor-pointer
             .row.fit.items-center.justify-center
-              span по URL
+              span {{$t('по URL')}}
           div(:style=`{height: '50px', borderRadius: '10px'}` @click="$refs.sourceDeviceDialog.show()").col.bg-grey-2.q-ml-sm.cursor-pointer
             .row.fit.items-center.justify-center
-              span с устройства
+              span {{$t('с устройства')}}
         .row.full-width.q-pa-sm
-          span.text-bold Выбрать из мастерской
+          span.text-bold {{$t('Выбрать из мастерской')}}
         .row.full-width
           div(
             v-for="(w, wi) in wsStats" :key="wi" @click="wsType = w.id, $refs.sourceWsDialog.show()"
             :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.q-px-md.bg-grey-2.q-mb-md.cursor-pointer
-            span {{ w.name }}
+            span {{ $t(w.name) }}
             .col
-            span {{ w.count }}
+            span {{ $t(w.count) }}
 </template>
 
 <script>

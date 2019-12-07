@@ -7,7 +7,7 @@ div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-
     :style=`{height: 'auto', borderRadius: '10px'}`
     ).row.full-width.items-end.bg-white.q-pa-md.q-mb-md
     .row.full-width.q-pa-sm
-      span.text-bold В чем суть?
+      span.text-bold {{$t('В чем суть?')}}
     div(:style=`{position: 'relative', zIndex: 100, overflow: 'hidden', borderRadius: '10px'}`).row.full-width
       q-input(v-model="name" filled type="textarea" :rows="3").full-width
   div(
@@ -15,14 +15,14 @@ div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-
     ).row.full-width.bg-white.q-mb-md
     .row.full-width.items-start.content-start.q-pa-md
       .row.full-width.q-pa-sm
-        span.text-bold Шаблон
+        span.text-bold {{$t('Шаблон')}}
       div(:style=`{height: '56px', borderRadius: '10px'}`).row.full-width.items-center.justify-between.q-px-sm.bg-grey-2
-        span Картинка в картинке
+        span {{$t('Картинка в картинке')}}
         q-icon(size="26px" name="keyboard_arrow_down")
       .row.full-width.q-pa-sm
-        span.text-bold Категория
+        span.text-bold {{$t('Категория')}}
       div(:style=`{height: '56px', borderRadius: '10px'}`).row.full-width.items-center.justify-between.q-px-sm.bg-grey-2
-        span(:style=`{borderRadius: '10px'}`).bg-accent.q-px-md.q-py-sm.text-white #Развлечения
+        span(:style=`{borderRadius: '10px'}`).bg-accent.q-px-md.q-py-sm.text-white {{$t('Развлечения')}}
         q-icon(size="26px" name="keyboard_arrow_down")
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
@@ -31,7 +31,7 @@ div(:style=`{paddingBottom: '70px'}`).row.justify-start.content-start.q-pt-sm.q-
       :loading="publishing"
       :style=`{position: 'absolute', left: '8px', bottom: '8px', height: '60px',
         width: 'calc(100% - 16px)', borderRadius: '10px'}`)
-      span.text-bold Опубликовать
+      span.text-bold {{$t('Опубликовать')}}
 </template>
 
 <script>

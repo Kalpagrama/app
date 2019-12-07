@@ -9,12 +9,12 @@
       img(@click="" :src="b.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
     div(@click="").col.full-height.q-ml-sm
       .row.fit.items-center
-        span.text-caption {{ b.name | cut(50) }}
+        span.text-caption {{ $t(b.name | cut(50)) }}
         //- small {{ s }}
     div(:style=`{}`).row.items-center.justify-center
       q-btn(icon="clear" round flat @click="userDelete()")
   div(style=`height: 100px`).row.full-width.justify-center.items-center
-    span No one in your blacklist
+    span {{$t('No one in your blacklist')}}
 </template>
 
 <script>

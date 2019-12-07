@@ -21,7 +21,7 @@ div(:style=`{position: 'relative'}`).row.full-width
     span(
       @click="nameClick()"
       :style=`{userSelect: 'none'}`
-      ).text-center.cursor-pointer {{ node.name }}
+      ).text-center.cursor-pointer {{ $t(node.name) }}
   div(v-if="opened" :style=`{position: 'relative', maxHeight: width+'px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.full-width.bg-black
     img(

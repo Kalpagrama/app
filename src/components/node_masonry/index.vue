@@ -15,7 +15,7 @@
         div(:style=`{overflow: 'hidden', ...getRadius}`).row.full-width
           img(:src="n.thumbUrl[0]" :style=`{width: '100%', objectFit: 'cover'}`)
         div(:style=`{minHeight: '40px'}`).row.full-width.items-center.q-px-sm
-          span {{n.name}}
+          span {{$t(n.name)}}
         div(v-if="false").row.full-width.justify-end.q-pa-xs
           q-btn(round flat dense icon="more_horiz" color="grey-5")
         //- node-css(

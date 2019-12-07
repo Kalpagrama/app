@@ -37,7 +37,7 @@ div(
       push color="green" no-caps :loading="nodeRating" @click="nodeRating ? '' : nodeRate()"
       :style=`{position: 'absolute', zIndex: 1000, left: '10px', bottom: '10px', width: 'calc(100% - 20px)', height: '60px', borderRadius: '10px'}`
       )
-      span.text-bold.text-white Проголосовать
+      span.text-bold.text-white {{$t('Проголосовать')}}
 </template>
 
 <script>

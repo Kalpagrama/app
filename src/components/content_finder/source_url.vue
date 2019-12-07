@@ -15,7 +15,7 @@
       div(v-show="!inputFocused && input.length === 0").row.full-width.q-pa-sm
         //- icon="save_alt"
         q-btn(color="grey-7" outline style=`height: 50px; borderRadius: 10px` no-caps @click="inputBuffer()").full-width
-          span Вставить из буфера обмена
+          span {{$t('Вставить из буфера обмена')}}
       div(v-show="inputValid").row.full-width.q-px-sm
         div(:style=`{position: 'relative', paddingTop: '100%', borderRadius: '10px', overflow: 'hidden', zIndex: 1000}`
           ).row.full-width.q-my-sm.bg-grey-3
@@ -30,7 +30,7 @@
     q-btn(color="primary" style=`height: 60px; borderRadius: 10px` no-caps @click="upload()"
       :disable="!iframeReady"
       :loading="uploading" :percentage="progress ? progress.progress : 0").full-width
-      span.text-white.text-bold {{ `Загрузить` }}
+      span.text-white.text-bold {{ $t('Загрузить') }}
 </template>
 
 <script>
