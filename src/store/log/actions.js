@@ -31,21 +31,21 @@ function sendApi (context, level, info) {
 // все ф-ии должны быть синхронными! (фронт не должен ждать пока логирование отправится на сервер)
 export const error = (context, info) => {
   if (!context.state.initialized) return
-  context.commit('error', info)
+  // context.commit('error', info)
   sendApi(context, 'ERROR', info)
 }
 export const warn = (context, info) => {
-  if (!context.state.initialized) return
-  context.commit('warn', info)
+  // if (!context.state.initialized) return
+  // context.commit('warn', info)
   // sendApi(state, 'WARNING', info)
 }
 export const info = (context, info) => {
-  if (!context.state.initialized) return
-  context.commit('info', info)
+  // if (!context.state.initialized) return
+  // context.commit('info', info)
   // sendApi(state, 'INFO', info)
 }
 export const debug = (context, info) => {
-  if (!context.state.initialized) return
-  context.commit('debug', info)
+  // if (!context.state.initialized) return
+  // context.commit('debug', info)
   // sendApi(state, 'DEBUG', info)
 }

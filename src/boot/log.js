@@ -66,7 +66,7 @@ class Logger {
     try {
       this.getLoggerFunc(module)(...msg)
       this.store.dispatch('log/error', ['module', msg], { root: true })
-      Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+      // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
     } catch (err) {
       console.error('error on logging error!!!', err)
     }

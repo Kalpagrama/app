@@ -48,8 +48,8 @@ export const wsSphereDelete = async (context, oid) => {
   logD('wsSphereDelete done')
   return wsSphereDelete
 }
-export const wsNodeCreate = async (context, node) => {
-  logD('wsNodeCreate start')
+export const wsNodeSave = async (context, node) => {
+  logD('wsNodeSave start')
 
   let nodeex = {
     name: 'test name', // любое
@@ -120,44 +120,41 @@ export const wsNodeCreate = async (context, node) => {
       relativeCuts: fr.relativeCuts
     }))
   }
-
-  logD('wsNodeCreate node', nodeInput)
-  let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
-    mutation: gql`
-      ${fragments.nodeFragment}
-      mutation wsNodeCreate ($node: NodeInput!) {
-        wsNodeCreate (node: $node) {
-          ...nodeFragment
+  let res
+  if (node.oid) {
+    let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
+      mutation: gql`
+        ${fragments.nodeFragment}
+        mutation wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
+          wsNodeUpdate (oid: $oid, node: $node) {
+            ...nodeFragment
+          }
         }
+      `,
+      variables: {
+        oid: node.oid,
+        node: nodeInput
       }
-    `,
-    variables: {
-      node: nodeInput
-    }
-  })
-  logD('wsNodeCreate', wsNodeCreate)
-  return wsNodeCreate
-}
-export const wsNodeUpdate = async (context, node) => {
-  logD('wsNodeUpdate start')
-  assert.ok(node)
-  let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
-    mutation: gql`
-      ${fragments.nodeFragment}
-      mutation wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
-        wsNodeUpdate (oid: $oid, node: $node) {
-          ...nodeFragment
+    })
+    res = wsNodeUpdate
+  } else {
+    let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
+      mutation: gql`
+        ${fragments.nodeFragment}
+        mutation wsNodeCreate ($node: NodeInput!) {
+          wsNodeCreate (node: $node) {
+            ...nodeFragment
+          }
         }
+      `,
+      variables: {
+        node: nodeInput
       }
-    `,
-    variables: {
-      oid: node.oid,
-      node
-    }
-  })
-  logD('wsNodeUpdate done', wsNodeUpdate)
-  // context.commit('wsNodeUpdate', wsNodeUpdate)
-  return wsNodeUpdate
+    })
+    res = wsNodeCreate
+  }
+  logD('wsNodeSave done', res)
+  return res
 }
 export const wsNodeDelete = async (context, oid) => {
   logD('wsNodeDelete start')

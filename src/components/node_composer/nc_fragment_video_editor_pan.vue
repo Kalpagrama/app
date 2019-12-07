@@ -1,3 +1,8 @@
+<style lang="stylus">
+.mejs__overlay-button: {
+  display: none !important;
+}
+</style>
 <template lang="pug">
 div(:style=`{height: '100px'}`).row.full-width.items-center.content-center
   div(:style=`{height: '50px'}`).row.full-width.q-px-md
@@ -5,7 +10,9 @@ div(:style=`{height: '100px'}`).row.full-width.items-center.content-center
       div(:style=`{height: '50px'}`).row.items-center.justify-center
         q-btn(round flat color="grey-6" icon="keyboard_arrow_left" @click="tickLeft")
       .col.full-height
-        .row.fit.items-center.justify-center
+        div(
+          v-touch-pan.left.right.prevent.mouse="handlePan"
+        ).row.fit.items-center.justify-center
           span.text-grey-5 {{ $t('Pan to select point') }}
       div(:style=`{height: '50px'}`).row.items-center.justify-center
         q-btn(round flat color="grey-6" icon="keyboard_arrow_right" @click="tickRight")
@@ -31,16 +38,22 @@ export default {
     }
   },
   methods: {
+    handlePan (e) {
+      this.$log('handlePan', e)
+      let now = this.player.currentTime
+      let to = now + (e.delta.x * 2)
+      this.player.currentTime = to
+    },
     tickLeft () {
       this.$log('tickLeft')
       let now = this.player.currentTime
-      let to = now - 1
+      let to = now - 0.5
       this.player.currentTime = to
     },
     tickRight () {
       this.$log('tickRight')
       let now = this.player.currentTime
-      let to = now + 1
+      let to = now + 0.5
       this.player.currentTime = to
     }
   },

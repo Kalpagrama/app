@@ -7,7 +7,7 @@ let registration = null // ServiceWorkerRegistration
 let messaging = null
 
 async function initSw (store) {
-  logD('initSw')
+  // logD('initSw')
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
     logD('beforeinstallprompt')
