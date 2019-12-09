@@ -2,7 +2,7 @@
 </style>
 
 <template lang="pug">
-k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="colls" :tabs="true" :style=`{height: '100%'}`)
+k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFiltered" :tabs="true" :style=`{height: '100%'}`)
   template(v-slot:notes)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -26,9 +26,17 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="colls" :ta
         .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(f, fi) in fragments" :key="fi" @click="$emit('itemClick', ['fragment', f])"
-            :style=`{height: '150px', borderRadius: '10px'}`
-            ).row.full-width.items-center.bg-white.q-px-md.q-mb-sm
-            span {{$t('fragment')}} {{ fi }}
+            :style=`{position: 'relative', minHeight: '60px', borderRadius: '10px'}`
+            ).row.full-width.items-center.bg-white.q-mb-md
+            img(
+              :src="f.content.thumbUrl" draggable="false"
+              :style=`{
+                width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
+                borderRadius: '10px'}`)
+            span(:style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '16px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+              ).q-pa-sm.text-white fragment {{fi}}
+            small(:style=`{position: 'absolute', zIndex: 100, bottom: '16px', left: '16px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+              ).q-pa-sm.text-white {{ f.content.name | cut(50) }}
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -39,8 +47,15 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="colls" :ta
         .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(c, ci) in contents" :key="ci" @click="$emit('itemClick', ['content', c])"
-            :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-            span {{ $t(c.name) }}
+            :style=`{position: 'relative', minHeight: '60px'}`
+            ).row.full-width.items-center.q-px-sm.q-mb-md
+            img(
+              :src="c.thumbUrl" draggable="false"
+              :style=`{
+                width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
+                borderRadius: '10px'}`)
+            span(:style=`{position: 'absolute', zIndex: 100, bottom: '16px', left: '16px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+              ).q-pa-sm.text-white {{ c.name | cut(40) }}
   template(v-slot:nodes)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -59,7 +74,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="colls" :ta
 <script>
 export default {
   name: 'wsItems',
-  props: ['nodeClickOverride'],
+  props: ['types', 'nodeClickOverride'],
   data () {
     return {
       coll: 'fragments',
@@ -72,6 +87,15 @@ export default {
     }
   },
   computed: {
+    collsFiltered () {
+      if (this.types) {
+        return this.colls.filter((c, ci) => {
+          return this.types.includes(c.id)
+        })
+      } else {
+        return this.colls
+      }
+    },
     notes () {
       return this.$store.state.workspace.workspace.nodes.filter((n, i) => {
         return n.fragments.length === 0

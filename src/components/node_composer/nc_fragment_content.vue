@@ -10,7 +10,7 @@ div(
     div(@click.self="$refs.ncFragmentContentWsDialog.hide()").row.fit.items-end.content-end
       div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).column.fit.bg-grey-3
         .col.full-width
-          ws-items
+          ws-items(:types="['fragments', 'contents']" @itemClick="wsItemClick")
   div(
     v-if="progressShow && $store.state.events.progress"
     :style=`{
@@ -61,6 +61,20 @@ export default {
     }
   },
   methods: {
+    wsItemClick ([type, item]) {
+      this.$log('wsItemClick', type, item)
+      switch (type) {
+        case 'content': {
+          this.$emit('content', JSON.parse(JSON.stringify(item)))
+          break
+        }
+        case 'fragment': {
+          // TODO: take f.thumbUrl from somewhere?
+          this.$emit('fragment', JSON.parse(JSON.stringify(item)))
+          break
+        }
+      }
+    },
     async urlPasted (url) {
       this.$log('urlPasted', url)
       await this.$wait(200)
@@ -74,8 +88,8 @@ export default {
         this.$log('url GOOD', url)
         this.urlInputLoading = true
         let content = await this.contentGet(to, true)
-        // await this.$wait(500)
-        // this.$log('content', content)
+        await this.$wait(500)
+        this.$log('content', content)
         this.$emit('content', content)
         this.urlInputLoading = false
       } catch (e) {

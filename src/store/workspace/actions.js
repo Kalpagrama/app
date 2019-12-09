@@ -2,9 +2,9 @@ import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 
 export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
@@ -54,34 +54,53 @@ export const wsSphereDelete = async (context, oid) => {
 export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave start', node)
   // checks
-  {
-    assert.ok(node.categories.length >= 0)
-    assert.ok(node.spheres.length >= 0)
-    assert.ok(node.fragments.length >= 0)
-    assert.ok(node.meta.layout)
-    for (let fr of node.fragments) {
-      // assert.ok(fr.relativeCuts.length >= 0)
-      // for (let rc of fr.relativeCuts) {
-      //   assert.ok(fr.relativeScale > 0 && rc.start >= 0 && rc.end > 0)
-      //   assert.ok(rc.end > rc.start && rc.end <= fr.relativeScale)
-      // }
+  // {
+  //   assert.ok(node.categories.length >= 0)
+  //   assert.ok(node.spheres.length >= 0)
+  //   assert.ok(node.fragments.length >= 0)
+  //   assert.ok(node.meta.layout)
+  //   for (let fr of node.fragments) {
+  //     // assert.ok(fr.relativeCuts.length >= 0)
+  //     // for (let rc of fr.relativeCuts) {
+  //     //   assert.ok(fr.relativeScale > 0 && rc.start >= 0 && rc.end > 0)
+  //     //   assert.ok(rc.end > rc.start && rc.end <= fr.relativeScale)
+  //     // }
+  //   }
+  //   for (let fr of node.meta.fragments) {
+  //     assert.ok(fr.relativeCuts.length >= 0)
+  //   }
+  // }
+  let nodeInput = {}
+  nodeInput.name = node.name
+  nodeInput.categories = node.categories
+  nodeInput.spheres = node.spheres
+  nodeInput.fragments = node.fragments.map((f, fi) => {
+    return {
+      oid: f.content.oid,
+      name: f.name,
+      thumbUrl: f.thumbUrl,
+      relativePoints: node.meta.fragments[fi].relativeCuts.reduce((acc, val) => {
+        acc.push({x: val.start})
+        acc.push({x: val.end})
+        return acc
+      }, []),
+      relativeScale: f.relativeScale
     }
-    for (let fr of node.meta.fragments) {
-      assert.ok(fr.relativeCuts.length >= 0)
-    }
-  }
-  node.fragments.map((f, fi) => {
-    delete f.content
-    f.relativePoints = node.meta.fragments[fi].relativeCuts.reduce((acc, val) => {
-      acc.push({x: val.start})
-      acc.push({x: val.end})
-      return acc
-    }, [])
   })
+  nodeInput.meta = {
+    layout: node.meta.layout,
+    fragments: node.meta.fragments.map((f, fi) => {
+      return {
+        thumbUrl: f.thumbUrl,
+        relativeCuts: f.relativeCuts.map((c, ci) => {
+          return {start: c.start, end: c.end, name: c.name, type: c.type, thumbUrl: c.thumbUrl}
+        })
+      }
+    })
+  }
+  logD('wsNodeSave nodeInput', nodeInput)
   let res
-  logD('wsNodeSave before', node)
   if (node.oid) {
-    delete node.oid
     let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
@@ -93,12 +112,11 @@ export const wsNodeSave = async (context, node) => {
       `,
       variables: {
         oid: node.oid,
-        node: node
+        node: nodeInput
       }
     })
     res = wsNodeUpdate
   } else {
-    delete node.oid
     let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
@@ -109,7 +127,7 @@ export const wsNodeSave = async (context, node) => {
         }
       `,
       variables: {
-        node: node
+        node: nodeInput
       }
     })
     res = wsNodeCreate
