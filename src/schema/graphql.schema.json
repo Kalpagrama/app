@@ -3250,7 +3250,7 @@
                 "defaultValue": null
               },
               {
-                "name": "pasword",
+                "name": "password",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",

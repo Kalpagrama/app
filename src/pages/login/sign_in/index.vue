@@ -6,13 +6,8 @@
         div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
           q-input(v-model="login" stack-label label="Login" filled).full-width.bg-white
         div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
-          q-input(v-model="password" pattern="(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}" stack-label label="Password" filled :type="isPwd ? 'password' : 'text'").full-width.bg-white
+          q-input(v-model="password" stack-label label="Password" filled :type="isPwd ? 'password' : 'text'").full-width.bg-white
             template(v-slot:append)
-              //- q-icon(
-              //-   v-if="validPassowrd"
-              //-   name="info"
-              //-   size="25px"
-              //-   color="red")
               q-icon(
                 :name="isPwd ? 'visibility_off' : 'visibility'"
                 size="25px"
@@ -54,14 +49,14 @@
       }
       e.preventDefault();
     },
-    validPassowrd (password) {
+    validPassword (password) {
       const regExp = /(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}/g
       return regExp.test(password)
     },
     async logining () {
       try {
         this.$log('login start')
-        let res = await this.$store.dispatch('auth/setObjectValue', {
+        let res = await this.$store.dispatch('auth/login', {
           login: this.login,
           password: this.password
         })

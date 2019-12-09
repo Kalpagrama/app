@@ -42,9 +42,11 @@ div(:style=`{position: 'relative'}`).column.fit
     :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
     k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
       template(v-slot:created)
-        user-created-nodes()
+        //- user-created-nodes()
+        h2.text-center.text-bold ВАНЯ НЕ СДЕЛАЛ
       template(v-slot:rated)
-        user-rated-nodes()
+        //- user-rated-nodes()
+        h2.text-center.text-bold ВАНЯ НЕ СДЕЛАЛ
       template(v-slot:following)
         user-following(:subscriptions="user.subscriptions" :oid="user.oid")
       template(v-slot:followers)

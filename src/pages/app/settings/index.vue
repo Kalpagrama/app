@@ -43,7 +43,7 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: width+'px', height
 </template>
 
 <script>
-import account from './account'
+import account from './account/index'
 import payments from './payments'
 import privacy from './privacy'
 import security from './security'
