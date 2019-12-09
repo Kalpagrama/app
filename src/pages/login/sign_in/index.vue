@@ -61,7 +61,7 @@
     async logining () {
       try {
         this.$log('login start')
-        let res = await this.$store.dispatch('auth/setObjectValue', {
+        let res = await this.$store.dispatch('auth/loginPassword', {
           login: this.login,
           password: this.password
         })
