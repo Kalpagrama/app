@@ -50,11 +50,13 @@
       .row.content-start.justify-center
         //- q-input(v-model="currentPas" stack-label label="Current password" filled).full-width.q-my-md
         q-input(v-model="newPas" stack-label label="New password" filled :type="isPwd ? 'password' : 'text'").full-width.q-my-md
-        q-input(v-model="repPas" stack-label label="New password" lazy-rules filled :type="isPwd ? 'password' : 'text'" :rules="[val => !!val || '* Required', val => val === newPas || 'Please enter correct password',]").full-width
+        q-input(v-model="repPas" stack-label label="Repeat password" lazy-rules filled :type="isPwd ? 'password' : 'text'" :rules="[val => !!val || '* Required', val => val === newPas || 'Please enter correct password',]").full-width
+        span {{validPassword}}
+        span {{newPas}}
         q-btn(
           v-if="newPas === repPas && newPas"
           push no-caps dense color="accent" @click="changePassword()"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Change password') }}
+          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mt-md {{ $t('Change password') }}
   //- Nickname
   q-dialog(ref="changeNickname" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     div(style=`height: 60px`).row.items-center.bg-primary
@@ -150,6 +152,20 @@ export default {
     }
   },
   methods: {
+    validPassword (newPas) {
+      var re = /(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{6,}/g
+      return re.test(newPas)
+    },
+    checkInput (e) {
+      this.errors = [];
+      if (!this.validPassword(this.newPas)) {
+        this.errors.push('Неверный пароль');
+      }
+      if (!this.errors.length) {
+        return true;
+      }
+      e.preventDefault();
+    },
     async changePhone () {
       try {
         this.$log('changePhone start')

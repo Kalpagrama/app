@@ -11,7 +11,6 @@ export const init = async (context) => {
   logD('user init')
   context.commit('init')
 }
-
 export const logout = async (ctx) => {
   logD('@logout start')
   let { data: { logout } } = await apolloProvider.clients.apiApollo.mutate({
@@ -25,4 +24,7 @@ export const logout = async (ctx) => {
   localStorage.removeItem('ktokenExpires')
   router.push('/login')
   logD('@logout done')
+}
+
+export const logining = async (ctx) => {
 }

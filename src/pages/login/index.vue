@@ -17,9 +17,9 @@
         span {{$t('Войти через почту')}}
     .row.full-width.q-mb-sm
       q-btn(
-        push no-caps color="black" @click="$go({name: 'signIn'})"
-        :style=`{height: '60px', borderRadius: '10px'}`).full-width
-        span {{$t('Sign in')}}
+        push no-caps @click="$go({name: 'signIn'})"
+        :style=`{height: '60px', backgroundColor: '#474747', borderRadius: '10px'}`).full-width
+        span.text-white {{$t('Sign in')}}
     //- .row.full-width.q-mb-sm
       q-btn(
         push no-caps color="accent" @click="$go({name: 'signUp'})"
