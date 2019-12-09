@@ -1,71 +1,83 @@
 <template lang="pug">
 div(:style=`{position: 'relative', maxWidth: '100%'}`).row.full-width
-  video(
-    ref="ncYoutube" :playsinline="true" crossorigin="Anonymous" :autoplay="true"
-    @canplay="videoCanplay" @play="videoPlay" @playing="videoPlaying"
-    :src="content.url" :type="content.contentSource === 'KALPA' ? 'video/mp4' : 'video/youtube'"
-    :width="width" :height="height")
-    //- source()
+  slot(name="actions" :now="now" :player="player")
+  div(:style=`{position: 'relative'}`).row.full-width
+    video(
+      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="true"
+      :width="width" :height="height")
+      source(:src="content.url" :type="content.contentSource === 'KALPA' ? 'video/mp4' : 'video/youtube'")
+    div(
+      :style=`{position: 'absolute', bottom: '16px', zIndex: 105, height: '12px'}`).row.full-width.q-px-md
+      //- progress width
+      div(:style=`{borderRadius: '4px', overflow: 'hidden', background: 'rgba(255,255,255,0.4)'}` @click="progressClick").row.fit
+        //- progress bar
+        div(:style=`{width: (now/content.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
+          ).row.full-height.bg-white.q-px-xs
+      //- progress now/duration
+      small(:style=`{position: 'absolute', zIndex: 105, top: '-24px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
+        ).q-px-sm.text-white {{ $time(now) }} / {{ $time(content.duration) }}
+  slot(name="editor" :now="now" :player="player")
 </template>
 
 <script>
 export default {
   name: 'ncFragmentVideo',
-  props: ['width', 'height', 'fragment', 'content'],
+  props: ['width', 'height', 'content'],
   data () {
     return {
       now: 0,
       start: undefined,
       end: undefined,
       player: null,
-      playing: false,
-      playingHeight: 0,
-      instance: null,
-      imgWidth: 0,
-      imgHeight: 0
+      playing: false
     }
   },
   methods: {
+    progressClick (e) {
+      this.$log('progressClick', this.content.duration)
+      let w = e.target.clientWidth
+      let x = e.offsetX
+      let now = (this.content.duration * x) / w
+      this.$log('w,x,now', w, x, now)
+      this.player.setCurrentTime(now)
+    },
     videoTimeupdate (e) {
       this.now = this.player.currentTime
-      // this.$emit('now', this.now)
+    },
+    videoSeeked (e) {
+      this.$log('videoSeeked', e)
     },
     playerStart (width, height) {
-      let me = new window.MediaElementPlayer(this.$refs.ncYoutube, {
+      let me = new window.MediaElementPlayer(this.$refs.ncFragmentVideo, {
         loop: true,
         autoplay: true,
-        controls: true,
-        useFakeFullscreen: true,
-        alwaysShowControls: true,
-        features: ['playpause', 'progress', 'duration'],
+        controls: false,
+        // useFakeFullscreen: true,
+        features: [],
         setDimensions: true,
+        // enableKeyboard: false,
         // enableAutosize: true,
-        autosizeProgress: false,
         // stretching: 'auto',
-        iPhoneUseNativeControls: false,
         videoWidth: width,
-        defaultVideoWidth: width,
         videoHeight: height,
-        defaultVideoHeight: height,
         clickToPlayPause: true,
         success: async (mediaElement, originalNode, instance) => {
-          // this.$log('instance', instance)
-          this.instance = instance
           this.player = mediaElement
-          this.player.addEventListener('timeupdate', this.videoTimeupdate, false)
-          this.player.setCurrentTime(0)
+          this.player.addEventListener('timeupdate', this.videoTimeupdate)
+          this.player.addEventListener('seeked', this.videoSeeked)
           this.player.play()
         }
       })
     }
   },
-  mounted () {
-    this.$log('mounted', this.content)
+  async mounted () {
+    this.$log('mounted')
     this.playerStart(this.width, this.height)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     this.player.removeEventListener('timeupdate', this.videoTimeupdate)
+    this.player.removeEventListener('seeked', this.videoSeeked)
   }
 }
 </script>

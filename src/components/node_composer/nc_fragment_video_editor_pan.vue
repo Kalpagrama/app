@@ -1,32 +1,23 @@
-<style lang="stylus">
-// .mejs__overlay-button: {
-//   display: none !important;
-// }
-</style>
 <template lang="pug">
-div(:style=`{position: 'relative', minHeight: '100px'}`).row.full-width.items-center.content-center
-  div(v-if="cut" :style=`{position: 'absolute', top: 0, zIndex: 500, height: '10px',
-    paddingLeft: '52px', paddingRight: '60px'}`).row.full-width
-    div(:style=`{position: 'relative', borderRadius: '2px'}`).row.full-width.bg-grey-6
-      div(:style=`{
-        position: 'absolute',
-        zIndex: 600,
-        background: $randomColor(cut.name),
-        left: (cut.start/content.duration)*100+'%',
-        height: '10px',
-        borderRadius: '2px',
-        width: ((cut.end-cut.start)/content.duration)*100+'%'}`).row
-  div(v-if="content.contentSource === 'KALPA'").row.full-width
+div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-center.content-center
+  .row.full-width
     div(
       ref="framesScrollWrapper"
       :style=`{height: '70px'}`).row.full-width.items-center.scroll
       .row.no-wrap
         div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
         div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap
-          img(
-            v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
-            :src="f" draggable="false"
-            :style=`{height: '50px', userSelect: 'none'}`)
+          div(v-if="content.contentSource === 'KALPA'").row.no-wrap
+            img(
+              v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
+              :src="f" draggable="false"
+              :style=`{height: '50px', userSelect: 'none'}`)
+          div(v-else).row.no-wrap
+            div(
+              v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
+              :style=`{height: '50px', width: '50px', borderLeft: fi === 0 ? 'none' : '1px solid grey'}`
+              ).row.items-center.justify-center.bg-grey-8
+              small {{ $time((parseInt(((fi+1)*frameDuration)*100))/100) }}
           //- left tint
           div(
             v-if="cut"
@@ -39,7 +30,7 @@ div(:style=`{position: 'relative', minHeight: '100px'}`).row.full-width.items-ce
             :style=`{position: 'absolute', zIndex: 100, height: '50px', top: '0px',
               left: (cut.start/content.duration)*100+'%',
               width: ((cut.end-cut.start)/content.duration)*100+'%',
-              borderRadius: '4px', border: '4px solid '+ $randomColor(cut.name), pointerEvents: 'none'}`).row
+              borderRadius: '4px', border: '4px solid '+ $randomColor(cut.type), pointerEvents: 'none'}`).row
           //- cut start
           div(
             v-if="cut"
@@ -63,19 +54,6 @@ div(:style=`{position: 'relative', minHeight: '100px'}`).row.full-width.items-ce
               width: ((content.duration-cut.end)/content.duration)*100+'%',
               opacity: 0.6, pointerEvents: 'none'}`).row.bg-black
         div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
-  div(
-    v-else
-    :style=`{height: '50px'}`).row.full-width.q-px-md
-    div(:style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.justify-center.bg-grey-10
-      div(:style=`{height: '50px'}`).row.items-center.justify-center
-        q-btn(round flat color="grey-6" icon="keyboard_arrow_left" @click="tickLeft")
-      .col.full-height
-        div(
-          v-touch-pan.left.right.prevent.mouse="handlePan"
-        ).row.fit.items-center.justify-center
-          span.text-grey-5 {{ $t('Pan to select point') }}
-      div(:style=`{height: '50px'}`).row.items-center.justify-center
-        q-btn(round flat color="grey-6" icon="keyboard_arrow_right" @click="tickRight")
 </template>
 
 <script>
@@ -95,13 +73,21 @@ export default {
       }
     },
     frames () {
-      return this.content.frameUrls.filter((f, fi) => {
-        // return fi % 2 === 0
-        return true
-      })
+      if (this.content.contentSource === 'KALPA') {
+        return this.content.frameUrls.filter((f, fi) => {
+          // return fi % 2 === 0
+          return true
+        })
+      } else {
+        return Math.ceil(this.content.duration / 10)
+      }
     },
     framesCount () {
-      return this.content.frameUrls.length
+      if (this.content.contentSource === 'KALPA') {
+        return this.frames.length
+      } else {
+        return this.frames
+      }
     },
     frameDuration () {
       return this.content.duration / this.framesCount
@@ -113,12 +99,14 @@ export default {
       handler (to, from) {
         this.$log('cut CHANGED', to)
         if (this.framesWidth === 0 && this.$refs.framesScrollWrapper) this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.width
-        if (from) {
-          if (to.name !== from.name) {
-            this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.start / this.k) + this.width / 2})
+        if (to) {
+          if (from) {
+            if (from.type !== to.type) {
+              this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.start / this.k) + this.width / 2 - 50})
+              this.player.setCurrentTime(to.start)
+            }
+          } else {
           }
-        } else {
-          this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.start / this.k) + this.width / 2})
         }
       }
     }

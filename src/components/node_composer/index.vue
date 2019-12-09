@@ -132,6 +132,8 @@ export default {
       this.nodeSaving = true
       let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
       this.$log('res', res)
+      // this.node = this.nodeNew
+      // await this.$wait(500)
       this.node = res
       this.nodeSaving = false
       this.$log('nodeSave done')

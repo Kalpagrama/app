@@ -52,6 +52,7 @@ Object.freeze(LogLevelEnum)
 const LogModulesEnum = Object.freeze({
   SW: 'sw',
   VUEX: 'vuex',
+  VUEX_WS: 'vuex_ws',
   BOOT: 'boot'
 })
 Object.freeze(LogModulesEnum)
