@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     currentPhone () {
-      return this.$store.state.objects.currentUser.settings.general.phone
+      return this.$store.state.objects.currentUser.profile.phone
     }
   },
   methods: {
@@ -46,7 +46,7 @@ export default {
         this.$log('changePhone start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.phone',
+          path: 'profile.phone',
           value: '+7 ' + this.newPhone
         })
         this.$log('changePhone done', res)

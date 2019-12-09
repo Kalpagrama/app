@@ -9,7 +9,7 @@
         span.text-bold.text-white {{$t('Changing email')}}
     .column.bg-white.q-px-md
       .row.content-start.justify-center
-        q-input(v-model="$store.state.objects.currentUser.settings.general.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
+        q-input(v-model="$store.state.objects.currentUser.profile.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
         q-input(v-model="newEmail" stack-label label="New email" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changeEmail()"
@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     currentEmail () {
-      return this.$store.state.objects.currentUser.settings.general.email
+      return this.$store.state.objects.currentUser.profile.email
     }
   },
   methods: {
@@ -42,7 +42,7 @@ export default {
         this.$log('changeEmail start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.email',
+          path: 'profile.email',
           value: this.newEmail
         })
         this.$log('changeEmail done', res)

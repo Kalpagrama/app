@@ -45,7 +45,7 @@ export default {
   },
   computed: {
     currentPassword () {
-      return this.$store.state.objects.currentUser.settings.general.password
+      return this.$store.state.objects.currentUser.profile.password
     }
   },
   methods: {
@@ -68,7 +68,7 @@ export default {
         this.$log('changePassword start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.password',
+          path: 'profile.password',
           value: this.newPas
         })
         this.$log('changePassword done', res)

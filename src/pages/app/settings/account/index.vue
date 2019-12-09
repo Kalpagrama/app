@@ -6,6 +6,8 @@
   emailDialog
   passwordDialog
   languageDialog
+  genderDialog
+  cityDialog
 </template>
 
 <script>
@@ -15,9 +17,11 @@ import emailDialog from './emailDialog'
 import passwordDialog from './passwordDialog'
 import languageDialog from './languageDialog'
 import phoneDialog from './phoneDialog'
+import cityDialog from './cityDialog'
+import genderDialog from './genderDialog'
 export default {
   name: 'pageApp__settings__account',
-  components: {passwordDialog, phoneDialog, languageDialog, emailDialog, nameSecondDialog, nameFirstDialog},
+  components: {passwordDialog, genderDialog, cityDialog, phoneDialog, languageDialog, emailDialog, nameSecondDialog, nameFirstDialog},
   data () {
     return {
     }

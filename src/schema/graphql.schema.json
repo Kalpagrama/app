@@ -3602,7 +3602,7 @@
           },
           {
             "name": "objectChange",
-            "description": "изменить свойство объекта. Например User. path ex: 'settings.general.language'",
+            "description": "изменить свойство объекта. Например User. path ex: 'profile.language'",
             "args": [
               {
                 "name": "oid",

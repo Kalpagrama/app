@@ -29,7 +29,7 @@ export default {
   },
   computed: {
     currentLanguage () {
-      return this.$store.state.objects.currentUser.settings.general.language
+      return this.$store.state.objects.currentUser.profile.lang
     }
   },
   methods: {
@@ -38,7 +38,7 @@ export default {
         this.$log('changeLanguage start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.language',
+          path: 'profile.lang',
           value: this.newLanguage
         })
         this.$log('changeLanguage done', res)
