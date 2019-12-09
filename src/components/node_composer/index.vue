@@ -1,46 +1,49 @@
 <style lang="stylus">
-.kinput
-  border none
-  height 100%
-  padding 10px
-  &:focus
-    outline none
+.kinput {
+  border: none;
+  height: 100%;
+  padding: 10px;
+  &:focus {
+    outline: none;
+  }
+}
 </style>
 <template lang="pug">
 .column.fit.bg-grey-3
-  k-dialog-bottom(ref="exitDialog" @action="exitAction" :options="{confirm: true, confirmName: 'Save', actions: {discard: {name: 'Discard changes', color: 'red'}}}")
+  k-dialog-bottom(ref="exitDialog" @action="$event => refreshAction($event, true)" :options="{confirm: true, confirmName: 'Save & exit', actions: {discard: {name: 'Discard changes', color: 'red'}}}")
+  k-dialog-bottom(ref="refreshDialog" @action="$event => refreshAction($event, false)" :options="{confirm: true, confirmName: 'Save & start new', actions: {discard: {name: 'Discard changes', color: 'red'}}}")
   //- footer actions
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="fragmentEditing < 0"
       :style=`{position: 'absolute', zIndex: 5000, bottom: '0px', height: '60px'}`).row.full-width.items-center.q-px-sm
-      q-btn(flat round no-caps color="grey" @click="exit()").q-mr-sm
+      q-btn(flat round no-caps color="grey" @click="$refs.exitDialog.show()").q-mr-sm
         span {{$t('Exit')}}
-      q-btn(flat round no-caps color="grey" @click="exit()")
+      q-btn(flat round no-caps color="grey" @click="$refs.refreshDialog.show()")
         span {{$t('Start new')}}
       .col
       transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
         q-btn(
-          v-if="node.name.length > 0"
+          v-if="node && node.name.length > 0"
           :loading="nodeSaving"
           push no-caps color="accent" @click="nodeSave()"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
           span.text-bold {{ $t('Save') }}
-      transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-        q-btn(
-          v-if="node.oid"
-          :loading="nodePublishing"
-          push no-caps color="green" @click="nodePublish()"
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`)
-          span.text-bold {{ $t('Publish') }}
+      //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+      //-   q-btn(
+      //-     v-if="node && node.oid"
+      //-     :loading="nodePublishing"
+      //-     push no-caps color="green" @click="nodePublish()"
+      //-     :style=`{borderRadius: '10px', overflow: 'hidden'}`)
+      //-     span.text-bold {{ $t('Publish') }}
   //- body
-  div(ref="ncScroll").col.full-width.scroll
+  div(ref="ncScroll").col.full-width.scroll.kscroll
     div(v-if="loading").row.fit.items-center.justify-center
-      q-spinner(size="50px" color="accent")
+      q-spinner(size="60px" color="accent")
     div(v-else).row.full-width.items-start.content-start.q-pa-sm
-      .row.full-width
+      div(v-if="node").row.full-width
         q-resize-observer(@resize="onResize")
-        nc-fragment(:index="0" :stageInitial="1" :width="editorWidth" :fragment="nodeFragments[0]" @ready="fragmentReady" @edit="fragmentEdit")
+        nc-fragment(:index="0" :stageInitial="1" :width="editorWidth" :node="node" @edit="fragmentEdit")
         //- name
         div(ref="nameEditor").row.full-width.q-py-sm
           div(
@@ -51,16 +54,13 @@
             ).row.full-width.items-center.justify-center.bg-white
             input(
               v-if="nameEditing" ref="nameInput" @blur="nameEditing = false" type="textarea" :rows="2"
-              v-model="nodeName" :style=`{width: '100%'}`).kinput.text-center.text-bold
+              v-model="node.name" :style=`{width: '100%'}`).kinput.text-center.text-bold
             span(
               v-else
-              ).text-bold {{ nodeName ? nodeName : $t('Whats the essence?', 'Whats the essence?') }}
-        div(v-if="true").row.full-width
-          small.full-width oid: {{node.oid}}
-          small.full-width name: {{node.name}}
-          small.full-width counts: {{nodeFragments[0].count}}/{{nodeFragments[1].count}}
-        nc-fragment(:index="1" :width="editorWidth" :fragment="nodeFragments[1]"
-          @ready="fragmentReady" @edit="fragmentEdit")
+              ).text-bold {{ node.name ? node.name : $t('Whats the essence?!') }}
+        nc-fragment(
+          v-if="node.fragments[0]"
+          :index="1" :width="editorWidth" :node="node" @edit="fragmentEdit")
 </template>
 
 <script>
@@ -76,46 +76,40 @@ export default {
       editorWidth: 0,
       nameEditing: false,
       fragmentEditing: -1,
-      // node
-      nodeOid: false,
-      nodeName: '',
-      nodeFragments: [{relativePoints: [], content: null, count: 100}, {relativePoints: [], content: null, count: 100}],
-      nodeSpheres: [],
-      nodeCategories: [],
-      nodeLayout: 'PIP',
-      // states
+      node: null,
+      nodeNew: {
+        oid: false,
+        name: '',
+        fragments: [
+          // {relativePoints: [], relativeScale: 0, content: null, contentOid: false},
+          // {relativePoints: [], relativeScale: 0, content: null, contentOid: false}
+        ],
+        categories: ['FUN'],
+        spheres: [],
+        meta: {
+          layout: 'PIP',
+          fragments: [
+            // {thumbUrl: '', relativeCuts: []},
+            // {thumbUrl: '', relativeCuts: []}
+          ]
+        }
+      },
       nodePublishing: false,
-      nodePublished: false,
-      nodeSaved: false,
       nodeSaving: false
     }
   },
   computed: {
-    node () {
-      return {
-        oid: this.nodeOid,
-        name: this.nodeName,
-        fragments: this.nodeFragments,
-        spheres: this.nodeSpheres,
-        categories: ['FUN'],
-        layout: 'PIP'
-      }
-    }
   },
   watch: {
     node: {
+      deep: true,
       handler (to, from) {
-        // this.$log('node CHANGED', to)
+        this.$log('node CHANGED', to)
         localStorage.setItem('knode', JSON.stringify(to))
       }
     }
   },
   methods: {
-    contentFound (index, content) {
-      this.$log('contentFound nc', index, content)
-      this.nodeFragments[index].content = content
-      this.nodeFragments[index].contentOid = content.oid
-    },
     fragmentReady (index) {
       this.$log('fragmentReady', index)
       this.nameEditStart()
@@ -123,14 +117,8 @@ export default {
     async fragmentEdit (index) {
       this.$log('fragmentEdit', index)
       this.fragmentEditing = index
+      if (index < 0) return
       this.$tween.to(this.$refs.ncScroll, 0.3, {scrollTop: index === 0 ? 0 : this.$refs.ncScroll.scrollHeight})
-    },
-    onResize (e) {
-      // this.$log('onResize', e)
-      this.editorWidth = e.width
-    },
-    nodeClick ([n, ni]) {
-      this.$logD('nodeClick', n, ni)
     },
     nameEditStart () {
       this.$logD('nameEditStart')
@@ -139,23 +127,13 @@ export default {
         this.$refs.nameInput.focus()
       })
     },
-    nodeUse (val) {
-      this.$log('nodeUse', val)
-      this.nodeOid = val.oid
-      this.nodeName = val.name
-      this.nodeFragments = val.fragments
-      this.nodeSpheres = val.spheres
-      this.nodeCategories = val.categories
-      this.nodeLayout = val.layout
-    },
     async nodeSave () {
       this.$log('nodeSave start', this.node)
       this.nodeSaving = true
       let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
       this.$log('res', res)
-      this.nodeUse(res)
+      this.node = res
       this.nodeSaving = false
-      this.nodeSaved = true
       this.$log('nodeSave done')
     },
     async nodePublish () {
@@ -163,57 +141,38 @@ export default {
       this.nodePublishing = true
       let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
       this.$log('res', res)
-      this.nodeUse(res)
+      this.node = res
       this.nodePublishing = false
-      this.nodePublished = true
       this.$log('nodePublish done')
     },
-    exit () {
-      this.$log('exit')
-      this.$refs.exitDialog.show()
-    },
-    async exitAction (action) {
-      this.$log('exitAction')
-      switch (action) {
-        case 'discard': {
-          this.refresh()
-          this.$go('/app/workspace')
-          break
-        }
-        case 'confirm': {
-          await this.nodeSave()
-          this.refresh()
-          this.$go('/app/workspace')
-          break
-        }
-      }
+    async refreshAction (action, exit) {
+      this.$log('refreshAction', action)
+      if (action === 'confirm') await this.nodeSave()
+      this.refresh()
+      if (exit) this.$go('/app/workspace')
     },
     refresh () {
       this.$log('refresh')
-      this.nodeUse({oid: false, name: '', fragments: [{content: null}, {content: null}], spheres: [], categories: ['FUN'], layout: 'PIP'})
+      this.$set(this, 'node', this.nodeNew)
       localStorage.removeItem('knode')
+    },
+    onResize (e) {
+      // this.$log('onResize', e)
+      this.editorWidth = e.width
     }
   },
   async mounted () {
     this.$log('mounted')
     this.loading = true
-    // let nodeLocalStorage = localStorage.getItem('knode')
+    let nodeLocalStorage = localStorage.getItem('knode')
     // this.$log('nodeLocalStorage', nodeLocalStorage)
-    // if (nodeLocalStorage) {
-    //   this.nodeUse(JSON.parse(nodeLocalStorage))
-    // } else {
-    // }
-    // await this.$wait(500)
+    if (nodeLocalStorage) {
+      this.node = JSON.parse(nodeLocalStorage)
+    } else {
+      this.refresh()
+    }
+    await this.$wait(1000)
     this.loading = false
-    // setInterval(() => {
-    //   this.$log('count !')
-    //   // this.nodeFragments[0].count += 1
-    //   // this.nodeFragments[0].content = {now: Date.now()}
-    // }, 1000)
-    // let nodeShare = null
-    // this.$log('nodeShare', nodeShare)
-    // let nodePayload = null
-    // this.$log('nodePayload', nodePayload)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

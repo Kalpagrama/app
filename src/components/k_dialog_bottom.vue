@@ -78,6 +78,7 @@ export default {
       this.$refs.kDialogBottom.hide()
     },
     confirmClick () {
+      this.$log('confirmClick')
       this.$emit('action', 'confirm')
       this.$refs.kDialogBottom.hide()
     },

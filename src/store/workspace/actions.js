@@ -52,79 +52,36 @@ export const wsSphereDelete = async (context, oid) => {
   return wsSphereDelete
 }
 export const wsNodeSave = async (context, node) => {
-  logD('wsNodeSave start')
-
-  let nodeex = {
-    name: 'test name', // любое
-    categories: ['POLITICS'], // любое
-    spheres: [], // любое
-    layout: 'PIP', // PIP, HORIZONTAL, VERTICAL, SLIDER
-    // превью ядра
-    thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-    fragments: [{ // от 1 до 2
-      name: 'fragment1 name',
-      contentOid: 'AmiFT0MCoGI=',
-      thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-      width: 600,
-      height: 450,
-      color: 'black',
-      relativeScale: 1000,
-      relativeCuts: [{ // любое число cuts
-        start: 100, // 0 - relativeScale
-        end: 200, // (start+1) - relativeScale
-        name: 'relativeCut1 name',
-        type: 'reserved...',
-        thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-      }]
-    }
-    ]
-  }
-
+  logD('wsNodeSave start', node)
   // checks
   {
     assert.ok(node.categories.length >= 0)
-    // assert.ok(node.spheres.length >= 0)
+    assert.ok(node.spheres.length >= 0)
     assert.ok(node.fragments.length >= 0)
-    assert.ok(node.layout)
+    assert.ok(node.meta.layout)
     for (let fr of node.fragments) {
+      // assert.ok(fr.relativeCuts.length >= 0)
+      // for (let rc of fr.relativeCuts) {
+      //   assert.ok(fr.relativeScale > 0 && rc.start >= 0 && rc.end > 0)
+      //   assert.ok(rc.end > rc.start && rc.end <= fr.relativeScale)
+      // }
+    }
+    for (let fr of node.meta.fragments) {
       assert.ok(fr.relativeCuts.length >= 0)
-      for (let rc of fr.relativeCuts) {
-        assert.ok(fr.relativeScale > 0 && rc.start >= 0 && rc.end > 0)
-        assert.ok(rc.end > rc.start && rc.end <= fr.relativeScale)
-      }
     }
   }
-
-  let nodeInput = {}
-  nodeInput.name = node.name
-  nodeInput.categories = node.categories
-  nodeInput.spheres = node.spheres
-  nodeInput.fragments = node.fragments.map(fr => {
-    return {
-      name: fr.name,
-      oid: fr.contentOid,
-      thumbUrl: fr.thumbUrl,
-      relativeScale: fr.relativeScale,
-      relativePoints: fr.relativeCuts.reduce((acc, val) => {
-        acc.push({ x: val.start })
-        acc.push({ x: val.end })
-        return acc
-      }, [])
-    }
+  node.fragments.map((f, fi) => {
+    delete f.content
+    f.relativePoints = node.meta.fragments[fi].relativeCuts.reduce((acc, val) => {
+      acc.push({x: val.start})
+      acc.push({x: val.end})
+      return acc
+    }, [])
   })
-  nodeInput.meta = {
-    layout: node.layout,
-    thumbUrl: node.thumbUrl,
-    fragments: node.fragments.map(fr => ({
-      width: fr.width,
-      height: fr.height,
-      color: fr.color,
-      thumbUrl: fr.thumbUrl,
-      relativeCuts: fr.relativeCuts
-    }))
-  }
   let res
+  logD('wsNodeSave before', node)
   if (node.oid) {
+    delete node.oid
     let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
@@ -136,11 +93,12 @@ export const wsNodeSave = async (context, node) => {
       `,
       variables: {
         oid: node.oid,
-        node: nodeInput
+        node: node
       }
     })
     res = wsNodeUpdate
   } else {
+    delete node.oid
     let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
@@ -151,7 +109,7 @@ export const wsNodeSave = async (context, node) => {
         }
       `,
       variables: {
-        node: nodeInput
+        node: node
       }
     })
     res = wsNodeCreate
