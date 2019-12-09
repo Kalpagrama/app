@@ -187,6 +187,9 @@ const userFragment = gql`
       nameFirst
       nameFull
       nameSecond
+      role
+      email
+      phone
     }
   }
 `

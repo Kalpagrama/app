@@ -27,7 +27,7 @@
         span.text-bold.text-white {{$t('Changing email')}}
     .column.bg-white.q-px-md
       .row.content-start.justify-center
-        q-input(v-model="$store.state.objects.currentUser.settings.general.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
+        q-input(v-model="$store.state.objects.currentUser.profile.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
         q-input(v-model="newEmail" stack-label label="New email" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changeEmail()"
@@ -107,12 +107,12 @@
     .row.full-width
       span {{$t('Nickname')}}
     .row.full-width
-      small.text-grey  {{ settings.general.nickname }}
+      small.text-grey  {{ profile.nickname }}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeLanguage.show()").row.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
     .row.full-width
       span {{$t('Language')}}
     .row.full-width
-      small.text-grey  {{ $store.state.objects.currentUser.settings.general.language }}
+      small.text-grey  {{ $store.state.objects.currentUser.profile.lang }}
 </template>
 
 <script>
@@ -130,7 +130,7 @@ export default {
       newNickname: '',
       settings: {
         general: {
-          language: 'Russian',
+          language: 'RUS',
           phone: '+7 *** *** ** 99',
           email: 'ro***@mail.ru',
           nickname: 'terminator3000'
@@ -140,13 +140,13 @@ export default {
   },
   computed: {
     currentPhone () {
-      return this.$store.state.objects.currentUser.settings.general.phone
+      return this.$store.state.objects.currentUser.profile.phone
     },
     currentEmail () {
-      return this.$store.state.objects.currentUser.settings.general.email
+      return this.$store.state.objects.currentUser.profile.email
     },
     currentPassword () {
-      return this.$store.state.objects.currentUser.settings.general.password
+      return this.$store.state.objects.currentUser.profile.password
     }
   },
   methods: {
@@ -155,7 +155,7 @@ export default {
         this.$log('changePhone start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.phone',
+          path: 'profile.phone',
           value: '+7 ' + this.newPhone
         })
         this.$log('changePhone done', res)
@@ -170,7 +170,7 @@ export default {
         this.$log('changeEmail start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.email',
+          path: 'profile.email',
           value: this.newEmail
         })
         this.$log('changeEmail done', res)
@@ -185,7 +185,7 @@ export default {
         this.$log('changePassword start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.password',
+          path: 'profile.password',
           value: this.newPas
         })
         this.$log('changePassword done', res)
@@ -200,7 +200,7 @@ export default {
         this.$log('changeNickname start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.nickname',
+          path: 'profile.nickname',
           value: this.newPhone
           })
         this.$log('changeNickname done', res)
@@ -215,7 +215,7 @@ export default {
         this.$log('changeLanguage start')
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'settings.general.language',
+          path: 'profile.lang',
           value: this.newLanguage
         })
         this.$log('changeLanguage done', res)

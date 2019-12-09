@@ -45,26 +45,27 @@
      this.$logD('smsSend start', this.phone)
      this.smsSending = true
      if (this.phone.length === 0) throw { message: 'Wrong phone!' }
-     let { data: { loginPhone: { token, expires, role } } } = await this.$apollo.mutate({
-      client: 'authApollo',
-      mutation: gql`
-        mutation loginPhone ($phone: String!, $inviteCode: String){
-          loginPhone(phone: $phone, inviteCode: $inviteCode){
-            token
-            expires
-            role
-          }
-        }
-      `,
-      variables: {
-        phone: this.phone,
-        inviteCode: localStorage.getItem('ktokenInviteCode')
-      }
-     })
-     this.$logD('token', token)
-     localStorage.setItem('ktoken', token)
-     localStorage.setItem('ktokenExpires', expires)
-     this.$logD('smsSend done')
+      await this.$store.dispatch('auth/loginPhone', this.phone)
+     // let { data: { loginPhone: { token, expires, role } } } = await this.$apollo.mutate({
+     //  client: 'authApollo',
+     //  mutation: gql`
+     //    mutation loginPhone ($phone: String!, $inviteCode: String){
+     //      loginPhone(phone: $phone, inviteCode: $inviteCode){
+     //        token
+     //        expires
+     //        role
+     //      }
+     //    }
+     //  `,
+     //  variables: {
+     //    phone: this.phone,
+     //    inviteCode: localStorage.getItem('ktokenInviteCode')
+     //  }
+     // })
+     // this.$logD('token', token)
+     // localStorage.setItem('ktoken', token)
+     // localStorage.setItem('ktokenExpires', expires)
+     // this.$logD('smsSend done')
      this.smsSending = false
      this.codeWaiting = true
     } catch (error) {

@@ -1,4 +1,4 @@
-const swVer = 3z
+const swVer = 6
 /*
  * This file (which will be your service worker)
  * is picked up by the build system ONLY if
@@ -16,6 +16,7 @@ function logFunc (...msg) {
   if (logLevel <= 2) console.log('SW: ', swVer, ...msg)
   if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
 }
+
 function errCritFunc (...msg) {
   if (logLevel <= 4) console.error(...msg)
   if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
@@ -27,76 +28,39 @@ logFunc('SW_VER=', swVer)
 workbox.core.setCacheNameDetails({ prefix: 'app' })
 workbox.core.skipWaiting()
 workbox.core.clientsClaim()
-
-// порядок вызовов precacheAndRoute и registerRoute имеет значение
-// precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
-self.__precacheManifest = [].concat(self.__precacheManifest || [])
-workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
-logFunc('self.__precacheManifest=', self.__precacheManifest)
-
-workbox.routing.registerRoute(
-  /\/.*/,
-  new workbox.strategies.CacheFirst({
-    cacheName: 'sameOrigin'
-  }),
-);
-workbox.routing.registerRoute(
-  /^https:\/\/.*\.kalpagramma\.com\/graphql\/.*/,
-  new workbox.strategies.CacheFirst({
-    cacheName: 'api'
-  }),
-);
-
-workbox.routing.registerRoute(
-  /.*(?:googleapis|gstatic)\.com/,
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: 'google'
-  }),
-);
-
-workbox.routing.registerRoute(
-  /^https:\/\/storage\.yandexcloud\.net\/.*/,
-  new workbox.strategies.CacheFirst({
-    cacheName: 'content'
-  }),
-)
-
+//
+// // порядок вызовов precacheAndRoute и registerRoute имеет значение
+// // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
+// self.__precacheManifest = [].concat(self.__precacheManifest || [])
+// workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
+// logFunc('self.__precacheManifest=', self.__precacheManifest)
+//
 // workbox.routing.registerRoute(
-//   new RegExp('^https://dev.kalpagramma.com/graphql'),
-//   // async ({event, url}) => {
-//   //   // See https://developers.google.com/web/tools/workbox/guides/route-requests#handling_a_route_with_a_custom_callback
-//   //   // Do something here. What it is up to you.
-//   //   // Eventually, return a Response object, or else your request will fail.
-//   //   return response;
-//   // },
-//   async ({event, url}) => staleWhileRevalidate(event),
-//   'POST'
-// );
-
-// workbox.routing.registerRoute(
-//   /\.(?:js|css|json|png|gif|jpg|jpeg|webp|svg|woff2)$/,
+//   /\/.*/,
 //   new workbox.strategies.CacheFirst({
-//     cacheName: 'sameOrigin',
-//     plugins: [
-//       new workbox.expiration.Plugin({
-//         maxEntries: 60,
-//         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
-//       }),
-//     ],
-//   })
+//     cacheName: 'sameOrigin'
+//   }),
+// );
+// workbox.routing.registerRoute(
+//   /^https:\/\/.*\.kalpagramma\.com\/graphql\/.*/,
+//   new workbox.strategies.CacheFirst({
+//     cacheName: 'api'
+//   }),
 // );
 //
 // workbox.routing.registerRoute(
-//   new RegExp('^https://.*.kalpagramma.com/.*|^https://fonts.gstatic.com/.*'),
-//   new workbox.strategies.CacheFirst({
-//     cacheName: 'crossOrigin',
-//     plugins: [
-//       new workbox.cacheableResponse.Plugin({
-//         statuses: [0, 200]
-//       })
-//     ]
+//   /.*(?:googleapis|gstatic)\.com/,
+//   new workbox.strategies.StaleWhileRevalidate({
+//     cacheName: 'google'
 //   }),
 // );
+//
+// workbox.routing.registerRoute(
+//   /^https:\/\/storage\.yandexcloud\.net\/.*/,
+//   new workbox.strategies.CacheFirst({
+//     cacheName: 'content'
+//   }),
+// )
 
 self.addEventListener('message', function handler (event) {
   logFunc('message!', event.data)
@@ -104,7 +68,11 @@ self.addEventListener('message', function handler (event) {
     logModulesBlackList = event.data.logModulesBlackList
     logLevel = event.data.logLevel
     logLevelSentry = event.data.logLevelSentry
-    if (logModulesBlackList.includes('sw')) workbox.setConfig({debug: false})
+    try {
+      if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
+    } catch (err) {
+      logFunc('error on setConfig', err)
+    }
   }
   // var promise = self.clients.matchAll()
   //   .then(function (clientList) {

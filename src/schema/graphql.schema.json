@@ -1458,6 +1458,46 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "role",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "UserRoleEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "email",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "phone",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -1522,6 +1562,41 @@
           },
           {
             "name": "KAZ",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "UserRoleEnum",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ADMIN",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MODERATOR",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MEMBER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GUEST",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -1922,22 +1997,6 @@
         "description": "тип для указания фрагмента контента",
         "fields": [
           {
-            "name": "uid",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "content",
             "description": null,
             "args": [],
@@ -2065,22 +2124,6 @@
         "name": "IFragment",
         "description": null,
         "fields": [
-          {
-            "name": "uid",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "content",
             "description": null,
@@ -2956,20 +2999,6 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "uid",
-            "description": "генерится на клиенте",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
             "name": "oid",
             "description": "content OID",
             "type": {
@@ -3233,7 +3262,7 @@
           },
           {
             "name": "login",
-            "description": "Универсальный вход по постоянному паролю(пока не работает)",
+            "description": "Универсальный вход по постоянному паролю. Можно входить когда пользователдь уже есть!",
             "args": [
               {
                 "name": "login",
@@ -3250,7 +3279,7 @@
                 "defaultValue": null
               },
               {
-                "name": "pasword",
+                "name": "password",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -3573,7 +3602,7 @@
           },
           {
             "name": "objectChange",
-            "description": "изменить свойство объекта. Например User. path ex: ['settings', 'general', 'language']",
+            "description": "изменить свойство объекта. Например User. path ex: 'settings.general.language'",
             "args": [
               {
                 "name": "oid",
@@ -3596,17 +3625,9 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "NON_NULL",
-                      "name": null,
-                      "ofType": {
-                        "kind": "SCALAR",
-                        "name": "String",
-                        "ofType": null
-                      }
-                    }
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   }
                 },
                 "defaultValue": null
@@ -3676,7 +3697,7 @@
               "name": null,
               "ofType": {
                 "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "name": "Object",
                 "ofType": null
               }
             },
@@ -3721,7 +3742,7 @@
               "name": null,
               "ofType": {
                 "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "name": "Object",
                 "ofType": null
               }
             },
@@ -4374,41 +4395,6 @@
         "possibleTypes": null
       },
       {
-        "kind": "ENUM",
-        "name": "UserRoleEnum",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "ADMIN",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MODERATOR",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "GUEST",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
         "kind": "OBJECT",
         "name": "ConfirmResult",
         "description": null,
@@ -4648,6 +4634,16 @@
             "defaultValue": null
           },
           {
+            "name": "thumbUrl",
+            "description": "data url для превью ядра",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "fragments",
             "description": null,
             "type": {
@@ -4666,16 +4662,6 @@
                   }
                 }
               }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "thumbUrl",
-            "description": "data url для превью ядра",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
             },
             "defaultValue": null
           }
@@ -4725,20 +4711,6 @@
         "description": null,
         "fields": null,
         "inputFields": [
-          {
-            "name": "uid",
-            "description": "uid of fragment. See type Fragment",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
           {
             "name": "width",
             "description": null,
@@ -5827,7 +5799,7 @@
       },
       {
         "kind": "ENUM",
-        "name": "ContentSourceEnum",
+        "name": "ContentProviderEnum",
         "description": null,
         "fields": null,
         "inputFields": null,
@@ -6100,17 +6072,9 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -7057,22 +7021,6 @@
         "name": "MetaFragment",
         "description": null,
         "fields": [
-          {
-            "name": "uid",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "content",
             "description": null,
@@ -8465,7 +8413,7 @@
               "name": null,
               "ofType": {
                 "kind": "ENUM",
-                "name": "ContentSourceEnum",
+                "name": "ContentProviderEnum",
                 "ofType": null
               }
             },
