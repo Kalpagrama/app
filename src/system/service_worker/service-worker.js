@@ -1,4 +1,4 @@
-const swVer = 9
+const swVer = 3z
 /*
  * This file (which will be your service worker)
  * is picked up by the build system ONLY if
@@ -13,7 +13,7 @@ Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' 
 
 function logFunc (...msg) {
   if (logModulesBlackList.includes('sw')) return
-  if (logLevel <= 2) console.log('SW: ', ...msg)
+  if (logLevel <= 2) console.log('SW: ', swVer, ...msg)
   if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
 }
 function errCritFunc (...msg) {
@@ -28,17 +28,68 @@ workbox.core.setCacheNameDetails({ prefix: 'app' })
 workbox.core.skipWaiting()
 workbox.core.clientsClaim()
 
-/**
- * The workboxSW.precacheAndRoute() method efficiently caches and responds to
- * requests for URLs in the manifest.
- * See https://goo.gl/S9QRab
- */
+// порядок вызовов precacheAndRoute и registerRoute имеет значение
+// precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
 self.__precacheManifest = [].concat(self.__precacheManifest || [])
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
 logFunc('self.__precacheManifest=', self.__precacheManifest)
+
+workbox.routing.registerRoute(
+  /\/.*/,
+  new workbox.strategies.CacheFirst({
+    cacheName: 'sameOrigin'
+  }),
+);
+workbox.routing.registerRoute(
+  /^https:\/\/.*\.kalpagramma\.com\/graphql\/.*/,
+  new workbox.strategies.CacheFirst({
+    cacheName: 'api'
+  }),
+);
+
+workbox.routing.registerRoute(
+  /.*(?:googleapis|gstatic)\.com/,
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: 'google'
+  }),
+);
+
+workbox.routing.registerRoute(
+  /^https:\/\/storage\.yandexcloud\.net\/.*/,
+  new workbox.strategies.CacheFirst({
+    cacheName: 'content'
+  }),
+)
+
 // workbox.routing.registerRoute(
-//   new RegExp('^https://dev.kalpagramma.com/.*'),
+//   new RegExp('^https://dev.kalpagramma.com/graphql'),
+//   // async ({event, url}) => {
+//   //   // See https://developers.google.com/web/tools/workbox/guides/route-requests#handling_a_route_with_a_custom_callback
+//   //   // Do something here. What it is up to you.
+//   //   // Eventually, return a Response object, or else your request will fail.
+//   //   return response;
+//   // },
+//   async ({event, url}) => staleWhileRevalidate(event),
+//   'POST'
+// );
+
+// workbox.routing.registerRoute(
+//   /\.(?:js|css|json|png|gif|jpg|jpeg|webp|svg|woff2)$/,
 //   new workbox.strategies.CacheFirst({
+//     cacheName: 'sameOrigin',
+//     plugins: [
+//       new workbox.expiration.Plugin({
+//         maxEntries: 60,
+//         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+//       }),
+//     ],
+//   })
+// );
+//
+// workbox.routing.registerRoute(
+//   new RegExp('^https://.*.kalpagramma.com/.*|^https://fonts.gstatic.com/.*'),
+//   new workbox.strategies.CacheFirst({
+//     cacheName: 'crossOrigin',
 //     plugins: [
 //       new workbox.cacheableResponse.Plugin({
 //         statuses: [0, 200]
@@ -48,12 +99,12 @@ logFunc('self.__precacheManifest=', self.__precacheManifest)
 // );
 
 self.addEventListener('message', function handler (event) {
-  // logFunc('message!', event.data)
+  logFunc('message!', event.data)
   if (event.data && event.data.logModulesBlackList) {
     logModulesBlackList = event.data.logModulesBlackList
     logLevel = event.data.logLevel
     logLevelSentry = event.data.logLevelSentry
-    // if (logModulesBlackList.includes('sw')) workbox.setConfig({debug: false})
+    if (logModulesBlackList.includes('sw')) workbox.setConfig({debug: false})
   }
   // var promise = self.clients.matchAll()
   //   .then(function (clientList) {
@@ -80,10 +131,10 @@ self.addEventListener('message', function handler (event) {
 
 self.addEventListener('install', event => {
   logFunc('installed!', swVer)
-  event.registerForeignFetch({
-    scopes: ['/'],
-    origins: ['*'] // or ['https://example.com']
-  })
+  // event.registerForeignFetch({
+  //   scopes: ['/'],
+  //   origins: ['*'] // or ['https://example.com']
+  // })
 })
 self.addEventListener('activate', event => {
   logFunc('activated!', swVer)
@@ -119,7 +170,7 @@ self.addEventListener('updatefound', event => {
   logFunc('ready to update!', swVer)
 })
 self.addEventListener('error', function (e) {
-  errCritFunc(e.filename, e.lineno, e.colno, e.message)
+  errCritFunc(e)
 })
 
 // ----------------------- settings for Web-push------------------------------

@@ -2,7 +2,7 @@ import {LogLevelEnum, LogModulesEnum} from 'src/boot/log'
 export default {
   initialized: false,
   name: 'Kalpagramma',
-  version: '0.0.17',
+  version: '0.0.18',
   webPushToken: null,
   webPushTokenDraft: null,
   newVersionAvailable: false,
