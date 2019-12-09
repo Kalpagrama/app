@@ -11,7 +11,6 @@ export const init = async (context) => {
   logD('user init')
   context.commit('init')
 }
-
 export const logout = async (context) => {
   logD('@logout start')
   let { data: { logout } } = await apolloProvider.clients.authApollo.mutate({
