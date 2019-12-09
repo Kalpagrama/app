@@ -133,7 +133,8 @@ module.exports = function (ctx) {
       workboxPluginMode: 'InjectManifest',
       workboxOptions: {
         // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
-        swSrc: 'src/system/service_worker/service-worker.js'
+        swSrc: 'src/system/service_worker/service-worker.js',
+        // precacheManifestFilename: 'precache-manifest.[manifestHash].js'
       },
       manifest: {
         name: 'Kalpagramma',

@@ -56,10 +56,12 @@
     async logining () {
       try {
         this.$log('login start')
-        let res = await this.$store.dispatch('auth/login', {
+        let res = await this.$store.dispatch('auth/loginPassword', {
           login: this.login,
           password: this.password
         })
+        await this.$wait(1000)
+        this.$go('/app/home')
         this.$log('login done', res)
       } catch (e) {
         this.$log('login ERROR', e)

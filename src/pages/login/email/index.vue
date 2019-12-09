@@ -46,27 +46,28 @@
      this.$logD('emailSend start', this.email)
      this.emailSending = true
      if (this.email.length === 0) throw { message: 'Wrong email!' }
-     let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
-      client: 'authApollo',
-      mutation: gql`
-        mutation loginEmail ($email: String!, $inviteCode: String){
-          loginEmail(email: $email, inviteCode: $inviteCode){
-            token
-            expires
-            role
-          }
-        }
-      `,
-      variables: {
-        email: this.email,
-        inviteCode: localStorage.getItem('ktokenInviteCode')
-        // inviteCode: '171145051370487837'
-      }
-     })
-     this.$logD('token', token)
-     localStorage.setItem('ktoken', token)
-     localStorage.setItem('ktokenExpires', expires)
-     this.$logD('emailSend done')
+     await this.$store.dispatch('auth/loginEmail', this.email)
+     // let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
+     //  client: 'authApollo',
+     //  mutation: gql`
+     //    mutation loginEmail ($email: String!, $inviteCode: String){
+     //      loginEmail(email: $email, inviteCode: $inviteCode){
+     //        token
+     //        expires
+     //        role
+     //      }
+     //    }
+     //  `,
+     //  variables: {
+     //    email: this.email,
+     //    inviteCode: localStorage.getItem('ktokenInviteCode')
+     //    // inviteCode: '171145051370487837'
+     //  }
+     // })
+     // this.$logD('token', token)
+     // localStorage.setItem('ktoken', token)
+     // localStorage.setItem('ktokenExpires', expires)
+     // this.$logD('emailSend done')
      this.emailSending = false
      this.codeWaiting = true
     } catch (error) {
@@ -83,22 +84,23 @@
      if (this.code.length !== 4) throw { message: 'Wrong code!' }
      // await this.$wait(500)
      // if (this.code !== this.codeFake) throw {message: 'Wrong code!'}
-     let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
-      client: 'authApollo',
-      mutation: gql`
-            mutation codeConfirmEmail ($code: String!) {
-              confirm(code: $code){
-                result
-                nextAttemptDate
-                attempts
-                failReason
-              }
-            }
-          `,
-      variables: {
-       code: this.code
-      }
-     })
+     let { result, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/confirm', this.code)
+     //  let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
+     //  client: 'authApollo',
+     //  mutation: gql`
+     //        mutation codeConfirmEmail ($code: String!) {
+     //          confirm(code: $code){
+     //            result
+     //            nextAttemptDate
+     //            attempts
+     //            failReason
+     //          }
+     //        }
+     //      `,
+     //  variables: {
+     //   code: this.code
+     //  }
+     // })
      this.codeSending = false
      this.codeWaiting = false
      if (result) {

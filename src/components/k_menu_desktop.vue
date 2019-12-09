@@ -44,13 +44,13 @@
           :round="mini" push color="accent" no-caps icon="person_add" @click="$go('/app/invite')"
           :style=`mini ? {} : {height: '60px', borderRadius: '10px'}`).full-width
           span(v-if="width === 230").text-bold.q-ml-md {{ $t('Invite friend') }}
-      div(v-if="!this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
+      div(v-if="!this.$store.state.core.installPrompt || true" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
         q-btn(
           :round="mini" push color="accent" no-caps
         :icon="this.$store.state.core.newVersionAvailable ? 'system_update' : 'cloud_download'"
           @click="update"
           :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
-          span(v-if="width === 230").text-bold.q-ml-md {{ $t(this.$store.state.core.newVersionAvailable ? 'install new version' : 'check for updates') }}
+          span(v-if="width === 230").text-bold.q-ml-md {{ $t(this.$store.state.core.newVersionAvailable ? 'update app' : 'check for updates') }}
       div(v-if="this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
         q-btn(
           :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
