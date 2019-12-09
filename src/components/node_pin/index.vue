@@ -32,7 +32,7 @@ div(v-if="sphereOid").column.fit.bg-grey-3
     @click.self="nodeBack()"
     :style=`{position: 'absolute', zIndex: zIndex+10, opacity: tintOpacity}`).row.fit.bg-grey-3
   //- body
-  div(v-if="opened").col
+  div(v-if="opened").col.full-width
     k-colls(@coll="sphereOid = $event" :coll="sphereOid" :colls="colls" :tabs="true" :style=`{height: '100%'}`)
       template(v-slot:[sphereOid])
         .column.fit
@@ -149,7 +149,7 @@ export default {
       this.nodeRect = rect
       this.nodeStyles.height = rect.height + 'px'
       this.nodeStyles.width = rect.width + 'px'
-      this.nodeStyles.top = rect.top - 50 + 'px'
+      this.nodeStyles.top = rect.top + 'px'
       this.nodeOid = node.oid
       this.$tween.to(this.nodeStyles, this.nodeGoTimeout, {
         top: 0 + 'px',
@@ -171,7 +171,7 @@ export default {
       this.$logD('nodeBack')
       this.nodePinned = false
       this.$tween.to(this.nodeStyles, this.nodeGoTimeout, {
-        top: this.nodeRect.top + 'px',
+        top: this.nodeRect.top - 50 + 'px',
         onComplete: () => {
           this.nodeOid = undefined
           this.nodeRect = null

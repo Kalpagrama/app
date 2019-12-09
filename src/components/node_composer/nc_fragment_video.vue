@@ -37,14 +37,17 @@ export default {
         controls: true,
         useFakeFullscreen: true,
         alwaysShowControls: true,
-        features: ['progress'],
+        features: ['playpause', 'progress', 'duration'],
         setDimensions: true,
         // enableAutosize: true,
+        autosizeProgress: false,
         // stretching: 'auto',
+        iPhoneUseNativeControls: false,
         videoWidth: width,
-        // defaultVideoWidth: width,
+        defaultVideoWidth: width,
         videoHeight: height,
-        // defaultVideoHeight: height,
+        defaultVideoHeight: height,
+        clickToPlayPause: true,
         success: async (mediaElement, originalNode, instance) => {
           // this.$log('instance', instance)
           this.instance = instance
