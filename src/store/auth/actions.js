@@ -93,3 +93,24 @@ export const loginPassword = async (context, { login, password }) => {
   localStorage.setItem('ktokenExpires', expires)
   logD('@loginPassword done')
 }
+export const confirm = async (context, code) => {
+  logD('@confirm start')
+  let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await apolloProvider.clients.authApollo.mutate({
+    client: 'authApollo',
+    mutation: gql`
+      mutation codeConfirmEmail ($code: String!) {
+        confirm(code: $code){
+          result
+          nextAttemptDate
+          attempts
+          failReason
+        }
+      }
+    `,
+    variables: {
+      code
+    }
+  })
+  logD('@confirm done')
+  return { result, nextAttemptDate, attempts, failReason }
+}

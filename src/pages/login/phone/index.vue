@@ -80,22 +80,23 @@
      this.codeSending = true
      this.codeConfirmed = false
      if (this.code.length !== 4) throw { message: 'Wrong code!' }
-     let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
-      client: 'authApollo',
-      mutation: gql`
-            mutation codeConfirmPhone ($code: String!) {
-              confirm(code: $code){
-                result
-                nextAttemptDate
-                attempts
-                failReason
-              }
-            }
-          `,
-      variables: {
-       code: this.code
-      }
-     })
+     let { result, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/confirm', this.code)
+     // let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
+     //  client: 'authApollo',
+     //  mutation: gql`
+     //        mutation codeConfirmPhone ($code: String!) {
+     //          confirm(code: $code){
+     //            result
+     //            nextAttemptDate
+     //            attempts
+     //            failReason
+     //          }
+     //        }
+     //      `,
+     //  variables: {
+     //   code: this.code
+     //  }
+     // })
      this.codeSending = false
      this.codeWaiting = false
      if (result) {
