@@ -128,22 +128,34 @@ export default {
       })
     },
     async nodeSave () {
-      this.$log('nodeSave start', this.node)
-      this.nodeSaving = true
-      let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
-      this.$log('res', res)
-      this.node = res
-      this.nodeSaving = false
-      this.$log('nodeSave done')
+      try {
+        this.$log('nodeSave start', this.node)
+        this.nodeSaving = true
+        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
+        this.$log('res', res)
+        this.node = res
+        this.nodeSaving = false
+        this.$log('nodeSave done')
+        // this.refreshAction('discard', true)
+      } catch (e) {
+        this.$log('nodeSave error', e)
+        this.nodeSaving = false
+      }
     },
     async nodePublish () {
-      this.$log('nodePublish start')
-      this.nodePublishing = true
-      let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
-      this.$log('res', res)
-      // this.node = res
-      this.nodePublishing = false
-      this.$log('nodePublish done')
+      try {
+        this.$log('nodePublish start')
+        this.nodePublishing = true
+        let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
+        this.$log('res', res)
+        // this.node = res
+        this.nodePublishing = false
+        this.$log('nodePublish done')
+        this.refreshAction('discard', true)
+      } catch (e) {
+        this.$log('nodePublish error', e)
+        this.nodePublishing = false
+      }
     },
     async refreshAction (action, exit) {
       this.$log('refreshAction', action)

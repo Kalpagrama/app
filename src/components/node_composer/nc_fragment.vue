@@ -70,7 +70,7 @@ export default {
       stage: 0,
       imgWidth: 0,
       imgHeight: 0,
-      imgReady: false,
+      imgComplete: false,
       imgInterval: null,
       actionsHeight: 0,
       toolsHeight: 0,
@@ -100,8 +100,8 @@ export default {
           // this.edit()
         } else {
           this.$log('f:', this.index, 'NO FRAGMENT')
-          if (this.index === 0) this.stage = 0
-          else this.stage = 1
+          if (this.index === 0) this.stage = 1
+          else this.stage = 0
         }
       }
     }
@@ -144,13 +144,12 @@ export default {
     imgCheck () {
       // this.$log('ncFragmentPreview', this.$refs.ncFragmentPreview)
       if (this.$refs.ncFragmentPreview) {
-        let height = this.$refs.ncFragmentPreview.clientHeight
-        let width = this.$refs.ncFragmentPreview.clientWidth
-        this.$log('height', height)
-        if (height > 0) {
-          this.imgHeight = height
-          this.imgWidth = width
-          this.imgReady = true
+        let complete = this.$refs.ncFragmentPreview.complete
+        this.$log('complete', complete)
+        if (complete) {
+          this.imgHeight = this.$refs.ncFragmentPreview.clientHeight
+          this.imgWidth = this.$refs.ncFragmentPreview.clientWidth
+          this.imgComplete = true
           clearInterval(this.imgInterval)
         }
       }
