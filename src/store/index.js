@@ -35,6 +35,7 @@ async function init (context) {
             oid
             type
             name
+            thumbUrl(preferWidth: 600)
           }
         }
       }`

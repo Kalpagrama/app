@@ -890,6 +890,30 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "sessions",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Session",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -1322,7 +1346,7 @@
       {
         "kind": "INTERFACE",
         "name": "Meta",
-        "description": "Meta - неизменяемые после создания данные. (бэкенд имеет право кэшировать эти данные локально)",
+        "description": "Meta - неизменяемые после создания данные. Можно запрашивать у ObjectShort.\n(бэкенд имеет право кэшировать эти данные локально)",
         "fields": [
           {
             "name": "type",
@@ -1341,6 +1365,11 @@
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "MetaContent",
+            "ofType": null
+          },
           {
             "kind": "OBJECT",
             "name": "MetaNode",
@@ -1489,6 +1518,18 @@
           },
           {
             "name": "phone",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "password",
             "description": null,
             "args": [],
             "type": {
@@ -2723,6 +2764,65 @@
       },
       {
         "kind": "OBJECT",
+        "name": "Session",
+        "description": "сессия пользователя",
+        "fields": [
+          {
+            "name": "token",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userAgent",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ip",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "Category",
         "description": null,
         "fields": [
@@ -3476,6 +3576,45 @@
             "deprecationReason": null
           },
           {
+            "name": "setFavouriteCategories",
+            "description": "указать категории для новых пользователей. используется для первоначального заполнения выдачи",
+            "args": [
+              {
+                "name": "categories",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "CategoryEnum",
+                        "ofType": null
+                      }
+                    }
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "resetPassword",
             "description": "Восстановление пароля по почте. Если к учетке привязана почта, то на нее придет новый пароль",
             "args": [
@@ -3508,8 +3647,19 @@
           },
           {
             "name": "logout",
-            "description": null,
-            "args": [],
+            "description": "если token не указан - выйти из всех сессий",
+            "args": [
+              {
+                "name": "token",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -3602,7 +3752,7 @@
           },
           {
             "name": "objectChange",
-            "description": "изменить свойство объекта. Например User. path ex: 'profile.language'",
+            "description": "изменить свойство объекта. Например User. path ex: 'settings.general.language'",
             "args": [
               {
                 "name": "oid",
@@ -7018,6 +7168,78 @@
       },
       {
         "kind": "OBJECT",
+        "name": "MetaContent",
+        "description": null,
+        "fields": [
+          {
+            "name": "type",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "thumbUrl",
+            "description": "data url для превью ядра",
+            "args": [
+              {
+                "name": "preferWidth",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uploadedFileInfo",
+            "description": "информация о загруженном контенте",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "RawJSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Meta",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "MetaFragment",
         "description": null,
         "fields": [
@@ -7184,6 +7406,18 @@
                   "ofType": null
                 }
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uploadedFileInfo",
+            "description": "информация о загруженном файле",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "RawJSON",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null

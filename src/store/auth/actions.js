@@ -12,18 +12,23 @@ export const init = async (context) => {
   logD('user init')
   context.commit('init')
 }
-export const logout = async (context) => {
+export const logout = async (context, token) => {
   logD('@logout start')
   let { data: { logout } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
-      mutation logout {
-        logout
+      mutation logout($token: String) {
+        logout(token: $token)
       }
-    `
+    `,
+    variables: {
+      token
+    }
   })
-  localStorage.removeItem('ktoken')
-  localStorage.removeItem('ktokenExpires')
-  router.push('/login')
+  if (!token || token === localStorage.getItem('ktoken')) {
+    localStorage.removeItem('ktoken')
+    localStorage.removeItem('ktokenExpires')
+    router.push('/login')
+  }
   logD('@logout done')
 }
 export const loginEmail = async (context, email) => {

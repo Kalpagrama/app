@@ -61,7 +61,7 @@ function processEvent (context, event) {
       context.commit('stateSet', ['progress', event])
       break
     case 'NOTICE':
-      processEventNotice(context, event)
+      context.commit('stateSet', ['notice', event])
       break
     case 'OBJECT_CHANGED':
       context.commit('objects/setObjectValue', {
@@ -164,16 +164,6 @@ function processEventWs (context, event) {
   }
   logD(operationName, objectType)
   context.commit(`workspace/ws${objectType}${operationName}`, object, { root: true })
-}
-
-function processEventNotice (context, { typeNotice, message }) {
-  // TODO!
-  if (typeNotice === 'GREETING') {
-    // показать форму приветствия и туториал
-    throw new Error(' todo !')
-  } else {
-    throw new Error('not implemented!')
-  }
 }
 
 // вывести уведомление о действии пользователя
