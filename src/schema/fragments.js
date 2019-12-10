@@ -190,6 +190,7 @@ const userFragment = gql`
       role
       email
       phone
+      password
     }
   }
 `

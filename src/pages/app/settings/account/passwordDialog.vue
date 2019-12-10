@@ -83,10 +83,10 @@ export default {
           value: this.newPas
         })
         this.$log('changePassword done', res)
-        this.$q.notify({message: 'Cant change PASSWORD', color: 'green', textColor: 'white'})
+        this.$q.notify({message: 'Changed password', color: 'green', textColor: 'white'})
       } catch (e) {
         this.$log('changePassword ERROR', e)
-        this.$q.notify({message: 'Cant change PASSWORD', color: 'red', textColor: 'white'})
+        this.$q.notify({message: 'Incorrect password', color: 'red', textColor: 'white'})
       }
     },
   }

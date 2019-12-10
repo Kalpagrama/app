@@ -5,11 +5,11 @@
   q-select(filled v-model="country" :options="countries" :label="$t('Country')")
   q-select(filled v-model="gender" :options="genders" :label="$t('Gender')")
   q-select(filled v-model="lang" :options="langs" :label="$t('Lang')")
-  q-btn(@click="save()" color="accent").q-mb-md Save
   phoneDialog
   emailDialog
   passwordDialog
-  span {{$store.state.objects.currentUser.profile.password}}
+  div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-px-md
+    q-btn(@click="save()" round icon="done" size="lg" color="accent").q-mb-md
 </template>
 
 <script>
