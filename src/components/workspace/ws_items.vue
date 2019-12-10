@@ -47,10 +47,6 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
         .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(c, ci) in contents" :key="ci" @click="$emit('itemClick', ['content', c])"
-<<<<<<< HEAD
-            :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-            span {{ $t(c.name) }}
-=======
             :style=`{position: 'relative', minHeight: '60px'}`
             ).row.full-width.items-center.q-px-sm.q-mb-md
             img(
@@ -60,7 +56,6 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
                 borderRadius: '10px'}`)
             span(:style=`{position: 'absolute', zIndex: 100, bottom: '16px', left: '16px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
               ).q-pa-sm.text-white {{ c.name | cut(40) }}
->>>>>>> 29b74d257fe1aeb953bd8c12a58ca35ba2a8c77a
   template(v-slot:nodes)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
