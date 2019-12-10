@@ -70,6 +70,7 @@ export default {
       stage: 0,
       imgWidth: 0,
       imgHeight: 0,
+      imgReady: false,
       imgInterval: null,
       actionsHeight: 0,
       toolsHeight: 0,
@@ -149,6 +150,7 @@ export default {
         if (height > 0) {
           this.imgHeight = height
           this.imgWidth = width
+          this.imgReady = true
           clearInterval(this.imgInterval)
         }
       }
@@ -162,7 +164,9 @@ export default {
       })
       this.$set(this, 'stage', 2)
       this.$emit('ready', this.index)
-      this.edit()
+      // this.$nextTick(() => {
+      //   this.edit()
+      // })
     },
     contentFound (content) {
       this.$log('f:', this.index, 'contentFound', content)
