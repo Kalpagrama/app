@@ -40,24 +40,6 @@ async function init (context) {
       }`
   })
 
-  logD('asdasdasd')
-  user.profile = {
-    profile: {
-      city: 'EKB',
-      country: 'Russia',
-      dateBirth: '20.05.1998',
-      gender: 'MALE',
-      lang: 'russian',
-      nameFirst: 'Roman',
-      nameFull: 'Roman Motovilov',
-      status: '',
-      about: '',
-      nameSecond: 'Motovilov',
-      email: 'roma-motovilov@mail.ru',
-      number: '8999-999-99-99'
-    }
-  }
-
   // todo убрать юзера из auth
   await context.dispatch('core/init')
   await context.dispatch('auth/init')
