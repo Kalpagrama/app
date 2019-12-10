@@ -9,10 +9,10 @@ div().column.full-width.q-px-sm.q-pt-sm
     div(:style=`{maxHeight: $q.screen.width-60+'px', borderRadius: '10px'}`
       ).row.full-width.items-start.content-start.bg-black
       img(
-        :src="node.meta.fragments[0].thumbUrl"
+        :src="node.meta.fragments[0].thumbUrl" draggable="false"
         :style=`{objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}`).fit
       img(
-        :src="node.meta.fragments[1].thumbUrl"
+        :src="node.meta.fragments[1].thumbUrl" draggable="false"
         :style=`{
           position: 'absolute', right: '10px', bottom: 60+'px', zIndex: zIndex+1,
           objectFit: 'contain', borderRadius: '10px', width: '100px', opacity: 0.8}`)

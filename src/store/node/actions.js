@@ -1,7 +1,7 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 
 import { apolloProvider } from 'boot/apollo'
 import assert from 'assert'
@@ -64,78 +64,37 @@ export const nodeDelete = async (context, oid) => {
 export const nodeCreate = async (context, node) => {
   logD('nodeCreate start', node)
 
-  let nodeex = {
-    name: 'test name', // от 1 до 180
-    categories: ['POLITICS'], // от 1 до 3
-    spheres: [], // от нуля до 10
-    layout: 'PIP', // PIP, HORIZONTAL, VERTICAL, SLIDER
-    // превью ядра
-    thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-    fragments: [{ // от 1 до 2
-      name: 'fragment1 name',
-      contentOid: 'AmiFT0MCoGI=',
-      thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-      width: 600,
-      height: 450,
-      color: 'black',
-      relativeScale: 1000,
-      relativeCuts: [{ // минимум 1 cut
-        start: 100, // 0 - relativeScale
-        end: 200, // (start+1) - relativeScale
-        name: 'relativeCut1 name',
-        type: 'reserved...',
-        thumbUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-      }]
-    }
-    ]
-  }
-
-  // checks
-  {
-    assert.ok(node.categories.length >= 1 && node.categories.length <= 3)
-    assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10)
-    assert.ok(node.name.length > 0 && node.name.length < 180)
-    assert.ok(node.fragments.length >= 1 && node.fragments.length <= 2)
-    assert.ok(node.layout)
-    for (let fr of node.fragments) {
-      assert.ok(fr.relativeCuts.length > 0)
-      for (let rc of fr.relativeCuts) {
-        assert.ok(fr.relativeScale > 0 && rc.start >= 0 && rc.end > 0)
-        assert.ok(rc.end > rc.start && rc.end <= fr.relativeScale)
-      }
-    }
-  }
-
   let nodeInput = {}
   nodeInput.name = node.name
   nodeInput.categories = node.categories
   nodeInput.spheres = node.spheres
-  nodeInput.fragments = node.fragments.map(fr => {
+  nodeInput.fragments = node.fragments.map((f, fi) => {
     return {
-      name: fr.name,
-      oid: fr.contentOid,
-      thumbUrl: fr.thumbUrl,
-      relativeScale: fr.relativeScale,
-      relativePoints: fr.relativeCuts.reduce((acc, val) => {
-        acc.push({ x: val.start })
-        acc.push({ x: val.end })
+      oid: f.content.oid,
+      name: f.name,
+      thumbUrl: f.thumbUrl,
+      relativePoints: node.meta.fragments[fi].relativeCuts.reduce((acc, val) => {
+        acc.push({x: val.start})
+        acc.push({x: val.end})
         return acc
-      }, [])
+      }, []),
+      relativeScale: f.relativeScale
     }
   })
   nodeInput.meta = {
-    layout: node.layout,
-    thumbUrl: node.thumbUrl,
-    fragments: node.fragments.map(fr => ({
-      width: fr.width,
-      height: fr.height,
-      color: fr.color,
-      thumbUrl: fr.thumbUrl,
-      relativeCuts: fr.relativeCuts
-    }))
+    layout: node.meta.layout,
+    fragments: node.meta.fragments.map((f, fi) => {
+      return {
+        // oid: node.fragments[fi].content.oid,
+        thumbUrl: f.thumbUrl,
+        relativeCuts: f.relativeCuts.map((c, ci) => {
+          return {start: c.start, end: c.end, name: c.name, type: c.type, thumbUrl: c.thumbUrl}
+        })
+      }
+    })
   }
 
-  logD('nodeCreate node', nodeInput)
+  logD('nodeCreate nodeInput', nodeInput)
   let { data: { nodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodeCreate ($node: NodeInput!) {

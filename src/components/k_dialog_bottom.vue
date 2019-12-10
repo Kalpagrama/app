@@ -3,7 +3,7 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
   div(
     @click.self="$refs.kDialogBottom.hide()" v-touch-swipe.mouse="swiped"
     :class="getClass")
-    div(:style=`{maxWidth: $q.screen.gt.xs ? '330px' : '100%', maxHeight: $q.screen.gt.xs ? 500+'px' : '100%'}`).row.full-width.q-pa-sm
+    div(:style=`{maxWidth: $q.screen.gt.xs ? '330px' : '100%', maxHeight: $q.screen.gt.xs ? 500+'px' : '100%'}`).row.full-width.q-px-sm
       //- header
       div(v-if="options.header" :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="headerClick()"
         ).row.full-width.justify-center.items-center.q-mb-md.bg-white
