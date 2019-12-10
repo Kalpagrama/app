@@ -85,6 +85,7 @@ export const nodeCreate = async (context, node) => {
     layout: node.meta.layout,
     fragments: node.meta.fragments.map((f, fi) => {
       return {
+        // oid: node.fragments[fi].content.oid,
         thumbUrl: f.thumbUrl,
         relativeCuts: f.relativeCuts.map((c, ci) => {
           return {start: c.start, end: c.end, name: c.name, type: c.type, thumbUrl: c.thumbUrl}
