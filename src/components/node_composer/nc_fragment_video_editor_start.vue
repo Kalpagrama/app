@@ -1,8 +1,8 @@
 <template lang="pug">
 .column.full-width.q-px-md
   .col.full-width
-    .row.fit.items-start.justify-center
-      .row.full-width.q-my-md
+    .row.fit.items-start.content-start.justify-center
+      div(v-for="n in 2" :key="2").row.full-width.q-my-md
         .col
           input(
             ref="hourInput"

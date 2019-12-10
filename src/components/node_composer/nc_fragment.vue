@@ -1,4 +1,7 @@
 <style lang="stylus">
+.mejs__overlay-button {
+  display: none !important;
+}
 </style>
 <template lang="pug">
 div(
@@ -45,8 +48,11 @@ div(
             :index="index" :node="node"
             :content="node.fragments[index].content" :player="$refs.ncFragmentVideo.player"
             :width="width" :style=`{height: toolsHeight+'px'}`)
-    div(v-if="false").row.full-width.bg-red
+    div(v-if="false" :style=`{height: '60px',zIndex: 10000}`).row.full-width.bg-red
       small.full-width editing: {{editing}}
+      small.full-width imgHeight: {{imgHeight}}
+      small.full-width imgWidth: {{imgWidth}}
+      small.full-width height: {{node.fragments[index].content.height}}
 </template>
 
 <script>
@@ -64,6 +70,7 @@ export default {
       stage: 0,
       imgWidth: 0,
       imgHeight: 0,
+      imgInterval: null,
       actionsHeight: 0,
       toolsHeight: 0,
       editing: false,
@@ -71,6 +78,15 @@ export default {
     }
   },
   watch: {
+    stage: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('f:', this.index, 'stage CHANGED', to)
+        if (to === 2) {
+          this.imgInterval = setInterval(this.imgCheck, 100)
+        }
+      }
+    },
     node: {
       immediate: true,
       handler (to, from) {
@@ -91,7 +107,7 @@ export default {
   },
   methods: {
     edit () {
-      this.$log('edit', this.editing)
+      this.$log('f:', this.index, 'edit', this.editing)
       if (this.editing) {
         this.editing = false
         this.$emit('edit', -1)
@@ -115,14 +131,27 @@ export default {
     },
     imgLoad (e) {
       this.$log('f:', this.index, 'imgLoad', e.path[0].width, e.path[0].height)
-      this.$set(this, 'imgWidth', e.path[0].width)
-      this.$set(this, 'imgHeight', e.path[0].height)
+      // this.$set(this, 'imgWidth', e.path[0].width)
+      // this.$set(this, 'imgHeight', e.path[0].height)
       // this.imgWidth = e.path[0].width
       // this.imgHeight = e.path[0].height
     },
     imgError (e) {
       this.$log('imgError', e)
       this.$q.notify('imgError!')
+    },
+    imgCheck () {
+      // this.$log('ncFragmentPreview', this.$refs.ncFragmentPreview)
+      if (this.$refs.ncFragmentPreview) {
+        let height = this.$refs.ncFragmentPreview.clientHeight
+        let width = this.$refs.ncFragmentPreview.clientWidth
+        this.$log('height', height)
+        if (height > 0) {
+          this.imgHeight = height
+          this.imgWidth = width
+          clearInterval(this.imgInterval)
+        }
+      }
     },
     fragmentFound (fragment) {
       this.$log('fragmentFound', fragment)
@@ -162,10 +191,10 @@ export default {
   },
   async mounted () {
     this.$log('f:', this.index, 'mounted')
-    // if (this.stageInitial) this.stage = this.stageInitial
   },
   beforeDestroy () {
     this.$log('f:', this.index, 'beforeDestroy')
+    clearInterval(this.imgInterval)
   }
 }
 </script>
