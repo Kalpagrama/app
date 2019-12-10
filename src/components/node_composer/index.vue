@@ -28,14 +28,14 @@
           :loading="nodeSaving"
           push no-caps color="accent" @click="nodeSave()"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
-          span.text-bold {{ $t('Save') }}
-      //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-      //-   q-btn(
-      //-     v-if="node && node.oid"
-      //-     :loading="nodePublishing"
-      //-     push no-caps color="green" @click="nodePublish()"
-      //-     :style=`{borderRadius: '10px', overflow: 'hidden'}`)
-      //-     span.text-bold {{ $t('Publish') }}
+          span.text-bold {{ $t('Save to ws') }}
+      transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+        q-btn(
+          v-if="node && node.oid"
+          :loading="nodePublishing"
+          push no-caps color="green" @click="nodePublish()"
+          :style=`{borderRadius: '10px', overflow: 'hidden'}`)
+          span.text-bold {{ $t('Publish') }}
   //- body
   div(ref="ncScroll").col.full-width.scroll.kscroll
     div(v-if="loading").row.fit.items-center.justify-center
@@ -132,8 +132,6 @@ export default {
       this.nodeSaving = true
       let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
       this.$log('res', res)
-      // this.node = this.nodeNew
-      // await this.$wait(500)
       this.node = res
       this.nodeSaving = false
       this.$log('nodeSave done')
@@ -143,7 +141,7 @@ export default {
       this.nodePublishing = true
       let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
       this.$log('res', res)
-      this.node = res
+      // this.node = res
       this.nodePublishing = false
       this.$log('nodePublish done')
     },
@@ -173,6 +171,7 @@ export default {
     } else {
       this.refresh()
     }
+    // nodeWs, nodeShare
     await this.$wait(1000)
     this.loading = false
   },
