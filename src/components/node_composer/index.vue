@@ -28,7 +28,7 @@
           :loading="nodeSaving"
           push no-caps color="accent" @click="nodeSave()"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
-          span.text-bold {{ $t('Save to ws') }}
+          span.text-bold {{ $t('Save to WS') }}
       transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
         q-btn(
           v-if="node && node.oid"
@@ -179,7 +179,8 @@ export default {
     let nodeLocalStorage = localStorage.getItem('knode')
     // this.$log('nodeLocalStorage', nodeLocalStorage)
     if (nodeLocalStorage) {
-      this.node = JSON.parse(nodeLocalStorage)
+      this.$set(this, 'node', JSON.parse(nodeLocalStorage))
+      // this.node = JSON.parse(nodeLocalStorage)
     } else {
       this.refresh()
     }

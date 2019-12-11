@@ -1,3 +1,8 @@
+<style lang="stylus">
+.mejs__playpause-button {
+  display: none !important
+}
+</style>
 <template lang="pug">
 div(:style=`{position: 'relative', maxWidth: '100%'}`).row.full-width
   slot(name="actions" :now="now" :player="player")
@@ -53,7 +58,7 @@ export default {
         autoplay: true,
         controls: false,
         // useFakeFullscreen: true,
-        features: [],
+        features: ['playpause'],
         setDimensions: true,
         // enableKeyboard: false,
         // enableAutosize: true,

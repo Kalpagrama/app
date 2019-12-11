@@ -126,9 +126,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$nextTick(() => {
-      this.$refs.urlInput.focus()
-    })
+    // this.$nextTick(() => {
+    //   this.$refs.urlInput.focus()
+    // })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

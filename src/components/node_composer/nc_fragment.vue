@@ -18,41 +18,43 @@ div(
     //- cancel
     q-btn(
       round flat color="white" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
-      :style=`{position: 'absolute', zIndex: 11000, right: '18px', top: '18px'}`).shadow-1
+      :style=`{position: 'absolute', zIndex: 11000, left: '18px', top: '18px'}`).shadow-1
+    //- boom
+    q-btn(
+      v-if="!boomed"
+      push round no-caps @click="boom()"
+      color="green"
+      :style=`{position: 'absolute', zIndex: 200, bottom: '40px', left: 'calc(50% - 20px)'}`).shadow-5.q-mr-sm
+      q-icon(name="wb_incandescent").rotate-180
     //- edit
-    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-      q-btn(
-        round push no-caps @click="edit()"
-        :color="editing ? 'green' : 'green'"
-        :icon="editing ? 'check' : 'edit'"
-        :style=`{position: 'absolute', zIndex: 500, right: '20px', bottom: '40px'}`)
+    q-btn(
+      v-if="true"
+      push round no-caps @click="editing = !editing"
+      :color="editing ? 'green' : 'green'"
+      :icon="editing ? 'check' : 'edit'"
+      :style=`{position: 'absolute', zIndex: 200, bottom: '40px', right: '20px'}`).shadow-5
     //- preview img, node.meta.fragments[index].thumbUrl
     //- node.fragments[index].content.contentSource === 'KALPA' ? node.meta.fragments[index].thumbUrl :
     img(
       ref="ncFragmentPreview"
-      @load="imgLoad"
+      @load="previewLoad"
       :src="node.fragments[index].content.thumbUrl"
-      :style=`{position: 'absolute', top: 0, width: '100%', maxHeight: width+'px', objectFit: 'contain', userSelect: 'none'}`
+      :style=`{position: previewLoaded ? 'absolute' : 'relative', top: 0, width: '100%', maxHeight: width+'px', objectFit: 'contain', userSelect: 'none'}`
       crossOrigin="anonymous" draggable="false")
     //- video
     div(
-      v-if="imgHeight > 0"
-      :style=`{position: 'relative', zIndex: 100, top: 0}`).row.full-width
+      v-if="previewLoaded"
+      :style=`{position: 'relative', zIndex: 100, top: 0}`).row.fit
       nc-fragment-video(
         v-if="node.fragments[index].content.type === 'VIDEO'" ref="ncFragmentVideo"
-        :content="node.fragments[index].content" :width="imgWidth" :height="imgHeight")
+        :content="node.fragments[index].content" :width="previewWidth" :height="previewHeight")
         template(v-slot:editor=`{now, player}`)
           nc-fragment-video-editor(
             v-if="$refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
-            @cutTimer="edit(), $refs.ncFragmentVideoEditor.cutTimer()"
+            @close="editing = false"
             :index="index" :node="node"
-            :content="node.fragments[index].content" :player="$refs.ncFragmentVideo.player"
+            :content="node.fragments[index].content" :now="now" :player="player"
             :width="width" :style=`{height: toolsHeight+'px'}`)
-    div(v-if="false" :style=`{height: '60px',zIndex: 10000}`).row.full-width.bg-red
-      small.full-width editing: {{editing}}
-      small.full-width imgHeight: {{imgHeight}}
-      small.full-width imgWidth: {{imgWidth}}
-      small.full-width height: {{node.fragments[index].content.height}}
 </template>
 
 <script>
@@ -68,23 +70,34 @@ export default {
   data () {
     return {
       stage: 0,
-      imgWidth: 0,
-      imgHeight: 0,
-      imgComplete: false,
-      imgInterval: null,
+      previewWidth: 0,
+      previewHeight: 0,
+      previewLoaded: false,
+      previewInterval: null,
       actionsHeight: 0,
       toolsHeight: 0,
       editing: false,
-      now: 0
+      boomed: false
+    }
+  },
+  computed: {
+    ncFragmentPreview () {
+      if (this.$refs.ncFragmentPreview) return this.$refs.ncFragmentPreview
+      else return null
     }
   },
   watch: {
+    '$refs.ncFragmentPreview': {
+      handler (to, from) {
+        this.$log('$refs.ncFragmentPreview CHANGED', to)
+      }
+    },
     stage: {
-      immediate: true,
+      immediate: false,
       handler (to, from) {
         this.$log('f:', this.index, 'stage CHANGED', to)
         if (to === 2) {
-          this.imgInterval = setInterval(this.imgCheck, 100)
+          this.previewInterval = setInterval(this.previewCheck, 100)
         }
       }
     },
@@ -94,68 +107,75 @@ export default {
         this.$log('f:', this.index, ' node CHANGED', to)
         if (to.fragments[this.index] && to.fragments[this.index].content) {
           this.$log('f:', this.index, 'GOT FRAGMENT', 'stage', this.stage)
-          this.$set(this, 'stage', 2)
-          // this.stage = 2
+          this.stage = 2
           this.$log('f:', this.index, 'stage', this.stage)
-          // this.edit()
         } else {
           this.$log('f:', this.index, 'NO FRAGMENT')
-          if (this.index === 0) this.stage = 1
-          else this.stage = 0
+          // if (this.index === 0) this.stage = 1
+          // else this.stage = 0
+        }
+      }
+    },
+    editing: {
+      handler (to, from) {
+        this.$log('editing CHANGED', to)
+        if (to) {
+          this.$emit('edit', this.index)
+          this.$tween.to(this, 0.3, {
+            actionsHeight: 52,
+            toolsHeight: this.$q.screen.height - 8 - 8 - 8 - 60 - this.$refs.ncFragmentPreview.clientHeight,
+            onComplete: () => {
+              this.$log('edit START')
+            }
+          })
+        } else {
+          this.$emit('edit', -1)
+          this.$tween.to(this, 0.3, {
+            actionsHeight: 0,
+            toolsHeight: 0,
+            onComplete: () => {
+              this.$log('edit END')
+            }
+          })
         }
       }
     }
   },
   methods: {
-    edit () {
-      this.$log('f:', this.index, 'edit', this.editing)
-      if (this.editing) {
-        this.editing = false
-        this.$emit('edit', -1)
-        this.$tween.to(this, 0.3, {
-          actionsHeight: 0,
-          toolsHeight: 0
-        })
-      } else {
-        this.editing = true
-        this.$emit('edit', this.index)
-        // TODO: for video only
-        // this.$refs.ncFragmentVideoEditor.cutCreate()
-        this.$tween.to(this, 0.3, {
-          actionsHeight: 52,
-          toolsHeight: this.$q.screen.height - 8 - 8 - 8 - 60 - this.$refs.ncFragmentPreview.clientHeight,
-          onComplete: () => {
-            this.$log('start done')
-          }
-        })
+    boom () {
+      this.$log('boom')
+      this.boomed = true
+      this.editing = true
+      switch (this.node.fragments[this.index].content.type) {
+        case 'VIDEO': {
+          this.$refs.ncFragmentVideoEditor.boom()
+          break
+        }
       }
     },
-    imgLoad (e) {
-      this.$log('f:', this.index, 'imgLoad', e.path[0].width, e.path[0].height)
-      // this.$set(this, 'imgWidth', e.path[0].width)
-      // this.$set(this, 'imgHeight', e.path[0].height)
-      // this.imgWidth = e.path[0].width
-      // this.imgHeight = e.path[0].height
+    previewLoad (e) {
+      this.$log('f:', this.index, 'previewLoad', e.path[0].width, e.path[0].height)
     },
-    imgError (e) {
-      this.$log('imgError', e)
-      this.$q.notify('imgError!')
+    previewError (e) {
+      this.$log('previewError', e)
+      this.$q.notify('previewError!')
     },
-    imgCheck () {
+    previewCheck () {
       // this.$log('ncFragmentPreview', this.$refs.ncFragmentPreview)
       if (this.$refs.ncFragmentPreview) {
         let complete = this.$refs.ncFragmentPreview.complete
         this.$log('complete', complete)
         if (complete) {
-          this.imgHeight = this.$refs.ncFragmentPreview.clientHeight
-          this.imgWidth = this.$refs.ncFragmentPreview.clientWidth
-          this.imgComplete = true
-          clearInterval(this.imgInterval)
+          this.previewHeight = this.$refs.ncFragmentPreview.clientHeight
+          this.previewWidth = this.$refs.ncFragmentPreview.clientWidth
+          this.previewLoaded = true
+          clearInterval(this.previewInterval)
         }
       }
     },
     fragmentFound (fragment) {
       this.$log('fragmentFound', fragment)
+      // TODO: take relativeCuts from the node...
       this.$set(this.node.fragments, this.index, fragment)
       this.$set(this.node.meta.fragments, this.index, {
         relativeCuts: [],
@@ -163,9 +183,6 @@ export default {
       })
       this.$set(this, 'stage', 2)
       this.$emit('ready', this.index)
-      // this.$nextTick(() => {
-      //   this.edit()
-      // })
     },
     contentFound (content) {
       this.$log('f:', this.index, 'contentFound', content)
@@ -181,9 +198,6 @@ export default {
       })
       this.$set(this, 'stage', 2)
       this.$emit('ready', this.index)
-      // this.$nextTick(() => {
-      //   this.edit()
-      // })
     },
     cancel () {
       this.$log('cancel')
@@ -197,7 +211,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('f:', this.index, 'beforeDestroy')
-    clearInterval(this.imgInterval)
+    clearInterval(this.previewInterval)
   }
 }
 </script>

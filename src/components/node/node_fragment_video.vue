@@ -27,7 +27,7 @@ div(
     ref="kvideo"
     :src="url"
     :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
-    loop playsinline :muted="videoMuted"
+    loop playsinline :muted="videoMuted" autoplay
     @click="videoClick"
     @playing="videoPlaying"
     @timeupdate="videoTimeupdate"

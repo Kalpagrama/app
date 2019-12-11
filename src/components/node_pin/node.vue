@@ -6,13 +6,18 @@ div().column.full-width.q-px-sm.q-pt-sm
     q-btn(round flat dense icon="more_vert" color="white" @click="$emit('action')"
       :style=`{position: 'absolute', zIndex: zIndex+2, top: '8px', right: '8px'}`).shadow-1
     //- f0 preview
-    div(:style=`{maxHeight: $q.screen.width-60+'px', borderRadius: '10px'}`
+    div(:style=`{position: 'relative', maxHeight: $q.screen.width-60+'px', borderRadius: '10px'}`
       ).row.full-width.items-start.content-start.bg-black
       img(
-        :src="node.meta.fragments[0].thumbUrl" draggable="false"
-        :style=`{objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}`).fit
-      img(
         :src="node.meta.fragments[1].thumbUrl" draggable="false"
+        :style=`{objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}`).fit
+      video(
+        v-if="nodeFull && pinned" autoplay
+        :src="nodeFull.fragments[1].url" type="video/mp4"
+        :style=`{position: 'absolute', zIndex: 10, top: 0, objectFit: 'contain'}`
+        ).fit
+      img(
+        :src="node.meta.fragments[0].thumbUrl" draggable="false"
         :style=`{
           position: 'absolute', right: '10px', bottom: 60+'px', zIndex: zIndex+1,
           objectFit: 'contain', borderRadius: '10px', width: '100px', opacity: 0.8}`)
