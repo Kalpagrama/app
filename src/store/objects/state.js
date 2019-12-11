@@ -37,6 +37,13 @@ export default {
         enableSoundNotifications: true,
         eventFilter: [],
         emailNotificationFilter: true,
+        pauseAllNotifications: true,
+        assessmentsNotifications: true,
+        subscriptionsNotifications: true,
+        mentionsNotifications: true,
+        sharedNotifications: true,
+        nodeCreatedNotifications: true,
+        nodeAddedNotifications: true
       },
       blackList: {}
     }

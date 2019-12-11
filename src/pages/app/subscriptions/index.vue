@@ -31,7 +31,7 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
               img(@click="" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
             div(@click="subjectClick(s)").col.full-height.q-ml-sm
               .row.fit.items-center
-                span.text-caption {{ $t(s.name | cut(50)) }}
+                span.text-caption {{ $t(s.name)}}
                 //- small {{ s }}
             div(:style=`{}`).row.items-center.justify-center
               //- @click="subDelete(s, si)"
