@@ -123,9 +123,9 @@ export default {
     nameEditStart () {
       this.$logD('nameEditStart')
       this.nameEditing = true
-      // this.$nextTick(() => {
-      //   this.$refs.nameInput.focus()
-      // })
+      this.$nextTick(() => {
+        this.$refs.nameInput.focus()
+      })
     },
     async nodeSave () {
       try {
