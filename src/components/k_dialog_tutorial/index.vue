@@ -122,12 +122,12 @@ export default {
       this.$log('item', item)
       this.categoriesToAdd.push(item)
     },
-    async catAdd(c, ci) {
+    async catAdd() {
       try {
         this.$logD('catAdd start')
-        let res = await this.$store.dispatch('user/setFavouriteCategories', c.type)
+        let res = await this.$store.dispatch('user/setFavouriteCategories', this.categoriesToAdd)
         this.$logD('res', res)
-        this.$logD('catAdd done')
+        this.$logD('catAdd done', this.categoriesToAdd)
       } catch (error) {
         this.$logD('catAdd error', error)
       }
