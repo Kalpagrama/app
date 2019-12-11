@@ -61,7 +61,6 @@ export default {
     },
     async cancel () {
       this.$log('cancel')
-      await this.$wait(1000)
       // check
       // show switch save, emit || emit
       this.$emit('cancel')
