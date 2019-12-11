@@ -4527,6 +4527,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "isNewUser",
+            "description": "первый вход после регистрации",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -7692,7 +7708,7 @@
           },
           {
             "name": "subject",
-            "description": "субъект(тот, чьи действия привели к пояалению новой записи)",
+            "description": "субъект(тот, чьи действия привели к появлению новой записи)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
