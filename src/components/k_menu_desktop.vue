@@ -122,7 +122,7 @@
         this.$logD('logoutDialogAction', action)
         switch (action) {
           case 'confirm': {
-            await this.$store.dispatch('auth/logout')
+            await this.$store.dispatch('auth/logout', localStorage.getItem('ktoken'))
           }
         }
       },

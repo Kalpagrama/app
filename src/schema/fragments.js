@@ -191,6 +191,11 @@ const userFragment = gql`
       phone
       password
     }
+    sessions{
+      token
+      ip
+      userAgent
+    }
   }
 `
 const objectFragment = gql`

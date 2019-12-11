@@ -73,7 +73,7 @@ export default async ({ Vue, store, app }) => {
         if (d) options.headers['X-Kalpagramma-debug'] = d
         return fetch(uri, options)
       },
-      useGETForQueries: true
+      // useGETForQueries: true
     }),
     cache
   })
@@ -97,7 +97,7 @@ export default async ({ Vue, store, app }) => {
         if (d) options.headers['X-Kalpagramma-debug'] = d
         return fetch(uri, options)
       },
-      useGETForQueries: true
+      // useGETForQueries: true
     }),
     cache,
     connectToDevTools: true
