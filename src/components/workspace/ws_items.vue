@@ -26,7 +26,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
         .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(f, fi) in fragments" :key="fi" @click="$emit('itemClick', ['fragment', f])"
-            :style=`{position: 'relative', minHeight: '60px', borderRadius: '10px'}`
+            :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px'}`
             ).row.full-width.items-center.bg-white.q-mb-md
             img(
               :src="f.content.thumbUrl" draggable="false"
@@ -46,16 +46,18 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(c, ci) in contents" :key="ci" @click="$emit('itemClick', ['content', c])"
-            :style=`{position: 'relative', minHeight: '60px'}`
-            ).row.full-width.items-center.q-px-sm.q-mb-md
+            v-for="(c, ckey) in contents" :key="ckey" @click="$emit('itemClick', ['content', c.item])"
+            :style=`{position: 'relative', minHeight: '100px', borderRadius: '10px', oveflow: 'hidden'}`
+            ).row.full-width.items-center.bg-black.q-mb-md
             img(
-              :src="c.thumbUrl" draggable="false"
+              :src="c.item.thumbUrl" draggable="false"
               :style=`{
                 width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
                 borderRadius: '10px'}`)
-            span(:style=`{position: 'absolute', zIndex: 100, bottom: '16px', left: '16px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
-              ).q-pa-sm.text-white {{ c.name | cut(40) }}
+            small(:style=`{position: 'absolute', zIndex: 100, top: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+              ).q-pa-sm.text-white.text-bold Nodes: {{c.nodes }}
+            small(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+              ).q-pa-sm.text-white {{ c.item.name | cut(40) }}
   template(v-slot:nodes)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -109,9 +111,20 @@ export default {
     },
     contents () {
       return this.$store.state.workspace.workspace.nodes.reduce((acc, val) => {
-        val.fragments.map(f => (acc.push(f.content)))
+        val.fragments.map(f => {
+          if (!acc[f.content.oid]) {
+            acc[f.content.oid] = {
+              type: 'content',
+              item: f.content,
+              node: val,
+              nodes: 1
+            }
+          } else {
+            acc[f.content.oid].nodes += 1
+          }
+        })
         return acc
-      }, [])
+      }, {})
     },
     nodes () {
       return this.$store.state.workspace.workspace.nodes.filter((n, i) => {

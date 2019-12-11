@@ -58,7 +58,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
 
 <script>
 export default {
-  name: 'ncFragmentVideoEditorPan',
+  name: 'ncFVE_pan',
   props: ['width', 'player', 'node', 'content', 'cut'],
   data () {
     return {
@@ -106,6 +106,8 @@ export default {
               this.player.setCurrentTime(to.start)
             }
           } else {
+            this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.start / this.k) + this.width / 2 - 50})
+            this.player.setCurrentTime(to.start)
           }
         }
       }

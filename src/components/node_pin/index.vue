@@ -37,37 +37,43 @@ div(v-if="sphereOid").column.fit.bg-grey-3
       template(v-slot:[sphereOid])
         .column.fit
           div(ref="nodePinScroll" @scroll="onScroll" :style=`{paddingTop: '0px', paddinBottom: '60px'}`).col.full-width.scroll.kscroll
-            node-loader(ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
-              template(v-slot:default=`{nodes}`)
-                .row.full-width.items-start.content-start.q-pt-sm
-                  div(
-                    v-for="(n, ni) in nodes" :key="n.oid"
-                    ).row.full-width.q-mb-xl
-                    node(
-                      @nameClick="nameClick" @action="$refs.nodeActionDialog.show()"
-                      :style=`n.oid === nodeOid ? {...nodeStyles, ...{zIndex: nodeZIndex}} : {zIndex: zIndex}`
-                      :zIndex="zIndex" :index="ni" :node="n" :opened="n.oid === nodeOid" :pinned="n.oid === nodeOid && nodePinned"
-                      :active="nodesVisible[0] ? nodesVisible[0] === n.oid : false"
-                      :ref="'node-'+n.oid" :lang="n.oid"
-                      v-observe-visibility=`{
-                        callback: nodeVisible,
-                        throttle: 230,
-                        intersection: {
-                          threshold: 0.98
-                        }
-                      }`)
-                    div(
-                      v-if="n.oid === nodeOid"
-                      :style=`{height: nodeRect.height+'px', borderRadius: '10px', overflow: 'hidden'}`
-                      ).row.full-width.bg-grey-3
+            .row.full-width.justify-center
+              div(:style=`{maxWidth: '500px'}`).row.full-width
+                q-resize-observer(ref="onResizeObserver" @resize="onResize")
+                node-loader(ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
+                  template(v-slot:default=`{nodes}`)
+                    .row.full-width.items-start.content-start.q-pt-sm.q-px-xs
+                      div(
+                        v-for="(n, ni) in nodes" :key="n.oid"
+                        ).row.full-width.q-mb-xl
+                        node(
+                          @nameClick="nameClick" @action="$refs.nodeActionDialog.show()"
+                          :style=`n.oid === nodeOid ? {...nodeStyles, ...{zIndex: nodeZIndex}} : {zIndex: zIndex}`
+                          :width="width"
+                          :noActions="true" :noTimestamp="true" :noSpheres="true"
+                          :needFull="nodesVisible[0] ? nodesVisible[0] === n.oid : false"
+                          :zIndex="zIndex" :index="ni" :node="n" :opened="n.oid === nodeOid" :pinned="n.oid === nodeOid && nodePinned"
+                          :active="nodesVisible[0] ? nodesVisible[0] === n.oid : false"
+                          :ref="'node-'+n.oid" :lang="n.oid"
+                          v-observe-visibility=`{
+                            callback: nodeVisible,
+                            throttle: 230,
+                            intersection: {
+                              threshold: 0.98
+                            }
+                          }`)
+                        div(
+                          v-if="n.oid === nodeOid"
+                          :style=`{height: nodeRect.height+'px', borderRadius: '10px', overflow: 'hidden'}`
+                          ).row.full-width.bg-grey-3
 </template>
 
 <script>
-import node from './node'
+// import node from './node'
 
 export default {
   name: 'nodePin',
-  components: {node},
+  components: {},
   props: {
     zIndex: {type: Number, default () { return 100 }},
     node: {type: Object},
@@ -80,6 +86,8 @@ export default {
   },
   data () {
     return {
+      width: 0,
+      height: 0,
       headerShow: true,
       sphereOid: undefined,
       nodePinned: true,
@@ -194,6 +202,10 @@ export default {
       if (this.scrollTop > scrollTop) this.headerShow = true
       else this.headerShow = false
       this.scrollTop = scrollTop
+    },
+    onResize (e) {
+      this.width = e.width
+      this.height = e.height
     }
   },
   created () {
