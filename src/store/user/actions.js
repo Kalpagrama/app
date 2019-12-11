@@ -8,3 +8,7 @@ export const init = async (context) => {
   context.commit('init', context.rootState.objects.currentUser)
   return true
 }
+
+export const setFavouriteCategories = async (context, categoryTypes) => {
+
+}

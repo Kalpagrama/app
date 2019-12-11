@@ -4,7 +4,7 @@
 <template lang="pug">
 .row.fit.items-center.justify-center
   q-dialog(ref="tutorialDialog" :maximized="true")
-    k-dialog-tutorial
+    //- k-dialog-tutorial(ref="tutorial")
   k-spinner(v-if="loading")
   q-resize-observer(@resize="onResize")
   transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
@@ -28,6 +28,7 @@ export default {
     }
   },
   mounted () {
+    // this.$refs.tutorialDialog.show()
   },
   computed: {
   },

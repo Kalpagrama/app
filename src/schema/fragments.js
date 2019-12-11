@@ -170,7 +170,6 @@ const userFragment = gql`
     thumbUrl(preferWidth: 600)
     weightVal
     settings
-    subscribers{...objectShortFragment}
     subscriptions{...objectShortFragment}
     subscribers{...objectShortFragment}
     workspace{

@@ -1,6 +1,6 @@
 <template lang="pug">
 .column.bg-white.fit
-  q-input(v-model="nameFirst" stack-label label="First name" filled).full-width
+  q-input(v-model="nameFirst" stack-label label="First name" filled).full-width.q-mt-sm
   q-input(v-model="nameSecond" stack-label label="Second name" filled).full-width
   q-select(filled v-model="country" :options="countries" :label="$t('Country')")
   q-select(filled v-model="gender" :options="genders" :label="$t('Gender')")
@@ -26,7 +26,7 @@ export default {
       lang: null,
       gender: null,
       country: null,
-      nameFIrst: null,
+      nameFirst: null,
       nameSecond: null,
       langs: ['ENG', 'RUS'],
       genders: ['MALE', 'FEMALE'],
@@ -52,11 +52,19 @@ export default {
   },
   methods: {
     save () {
+      this.$log('save')
       this.changeLanguage()
       this.changeCountry()
       this.changeGender()
       this.changeNameFirst()
       this.changeNameSecond()
+    },
+    async cancel () {
+      this.$log('cancel')
+      await this.$wait(1000)
+      // check
+      // show switch save, emit || emit
+      this.$emit('cancel')
     },
     async changeLanguage () {
       if (this.lang !== this.currentLang) {

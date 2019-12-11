@@ -39,8 +39,22 @@ async function init (context) {
         }
       }`
   })
-
-  // todo убрать юзера из auth
+  // TODO make confortable
+  if (!user.settings.notifications) {
+    user.settings.notifications = {
+      showInstantNotifications: true,
+      enableSoundNotifications: true,
+      eventFilter: [],
+      emailNotificationFilter: true,
+      pauseAllNotifications: true,
+      assessmentsNotifications: true,
+      subscriptionsNotifications: true,
+      mentionsNotifications: true,
+      sharedNotifications: true,
+      nodeCreatedNotifications: true,
+      nodeAddedNotifications: true
+    }
+  }
   await context.dispatch('core/init')
   await context.dispatch('auth/init')
   await context.dispatch('node/init', categories)
