@@ -24,8 +24,6 @@
           transition(appear enter-active-class="animated fadeIn")
             div(v-if="si === sessionIndex").row.full-width.justify-center
               span {{s.userAgent}}
-          span {{s.token}}
-        //- span {{mytoken}}
         .row.full-width.items-center.justify-center.q-my-sm
           q-btn(
             push color="accent" no-caps @click="deleteSession(null)"
@@ -52,7 +50,9 @@ export default {
       return this.$store.state.objects.currentUser.sessions
     },
     mytoken () {
-      return localStorage.getItem('ktoken')
+      let str = localStorage.getItem('ktoken')
+      let newstr = str.split('::')[0]
+      return newstr
     }
   },
   methods: {

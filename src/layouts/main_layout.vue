@@ -81,7 +81,7 @@ export default {
       }
       await this.$store.dispatch('init')
       this.loading = false
-      this.$refs.kTutorialDialog.show()
+      // this.$refs.kTutorialDialog.show()
     } catch (error) {
       this.$logD('error', error)
       // this.loading = false
