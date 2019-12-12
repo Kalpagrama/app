@@ -81,7 +81,7 @@ export default {
       fragmentEditing: -1,
       node: null,
       nodeNew: {
-        oid: false,
+        // oid: false,
         layout: 'PIP',
         name: '',
         fragments: [
@@ -133,7 +133,7 @@ export default {
       this.$log('fragmentEdit', index)
       this.fragmentEditing = index
       if (index < 0) return
-      this.$tween.to(document, 0.3, {scrollTop: index === 0 ? 0 : window.scrollHeight})
+      this.$tween.to(window, 0.3, {scrollTop: index === 0 ? 0 : window.scrollHeight})
     },
     nodeNameEdit () {
       this.$log('nodeNameEdit')

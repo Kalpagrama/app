@@ -30,7 +30,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
       :fragment="fragment" @close="fragmentNameDialogOpened = false"
       :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
   //- pan
-  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" @cut="cutChanged")
+  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :now="now" @cut="cutChanged")
   //- body
   div(:style=`{}`).col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-md
@@ -243,6 +243,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    if (this.cuts.length > 0 && true) this.cutIndex = 0
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

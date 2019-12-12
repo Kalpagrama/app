@@ -25,7 +25,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll.kscroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(f, fi) in fragments" :key="fi" @click="itemClick('itemClick', 'fragment', f)"
+            v-for="(f, fi) in fragments" :key="fi" @click="itemClick('fragment', f)"
             :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px'}`
             ).row.full-width.items-center.bg-white.q-mb-md
             img(
@@ -153,6 +153,7 @@ export default {
   },
   methods: {
     itemClick (type, item) {
+      this.$log('itemClick', type, item)
       this.$emit('itemClick', [type, JSON.parse(JSON.stringify(item))])
     }
   },

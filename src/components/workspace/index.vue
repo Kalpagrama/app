@@ -5,19 +5,22 @@
 </style>
 
 <template lang="pug">
-.column.fit.bg-grey-3
-  div(:style=`{height: '60px'}`).row.full-width.items-center
-    //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-    //-   q-btn(round flat icon="keyboard_arrow_left" @click="cancel()")
-    .col.full-height
-      .row.fit.items-center.q-px-md
-        span.text-bold {{$t('Workspace')}}
-    div(:style=`{height: '60px'}`).row.items-center.justify-center.q-px-sm
-      q-btn(round flat icon="style" color="grey-9")
-      q-btn(round flat icon="settings" color="grey-9" @click="coll = 'settings'")
-  .col.full-width.scroll
+q-layout.bg-grey-3
+  q-header
+    div(:style=`{height: '60px', color: 'black'}`).row.full-width.items-center.bg-grey-3
+      //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      //-   q-btn(round flat icon="keyboard_arrow_left" @click="cancel()")
+      .col.full-height
+        .row.fit.items-center.q-px-md
+          span.text-bold {{$t('Workspace')}}
+      div(:style=`{height: '60px'}`).row.items-center.justify-center.q-px-sm
+        q-btn(round flat icon="style" color="grey-9")
+        q-btn(round flat icon="settings" color="grey-9" @click="coll = 'settings'")
+  //- .col.full-width.scroll
+  q-page-container
     ws-items(@itemClick="itemClick")
-  div.row.full-width
+  q-footer
+    //- div.row.full-width
     k-menu-mobile
 </template>
 

@@ -38,7 +38,7 @@ div(
     img(
       ref="ncFragmentPreview"
       @load="previewLoad"
-      :src="thumbUrl || fragment.content.thumbUrl"
+      :src="fragment.content.thumbUrl"
       :style=`{position: previewLoaded ? 'absolute' : 'relative', top: 0, width: '100%', maxHeight: width+'px', objectFit: 'contain', userSelect: 'none'}`
       crossOrigin="anonymous" draggable="false")
     //- video
@@ -114,6 +114,7 @@ export default {
         this.$log('editing CHANGED', to)
         if (to) {
           this.$emit('edit', this.index)
+          this.boomed = true
           this.$tween.to(this, 0.3, {
             actionsHeight: 52,
             toolsHeight: this.$q.screen.height - 8 - 8 - 8 - 60 - this.$refs.ncFragmentPreview.clientHeight,

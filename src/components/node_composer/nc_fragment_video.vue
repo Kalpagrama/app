@@ -10,7 +10,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.full-width
     video(
       ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="true"
       :width="width" :height="height")
-      source(:src="fragment.url || fragment.content.url" :type="fragment.content.contentSource === 'KALPA' ? 'video/mp4' : 'video/youtube'")
+      source(:src="fragment.content.url" :type="fragment.content.contentSource === 'KALPA' ? 'video/mp4' : 'video/youtube'")
     div(
       :style=`{position: 'absolute', bottom: '16px', zIndex: 105, height: '12px'}`).row.full-width.q-px-md
       //- progress width
