@@ -65,12 +65,11 @@ export default {
       this.$log('wsItemClick', type, item)
       switch (type) {
         case 'content': {
-          this.$emit('content', JSON.parse(JSON.stringify(item)))
+          this.$emit('content', item)
           break
         }
         case 'fragment': {
-          // TODO: take f.thumbUrl from somewhere?
-          this.$emit('fragment', JSON.parse(JSON.stringify(item)))
+          this.$emit('fragment', type)
           break
         }
       }

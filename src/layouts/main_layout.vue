@@ -2,13 +2,13 @@
 </style>
 
 <template lang="pug">
-.row.fit.items-center.justify-center
-  q-dialog(ref="tutorialDialog" :maximized="true")
-    k-dialog-tutorial
-  k-spinner(v-if="loading")
-  q-resize-observer(@resize="onResize")
-  transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
-    router-view(v-if="!loading" :opened="true" :height="$q.screen.height" :width="$q.screen.width")
+//- .row.fit.items-center.justify-center
+  //- q-dialog(ref="tutorialDialog" :maximized="true")
+    //- k-dialog-tutorial
+  //- k-spinner(v-if="loading")
+  //- q-resize-observer(@resize="onResize")
+  //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
+router-view(v-if="!loading")
 </template>
 
 <script>

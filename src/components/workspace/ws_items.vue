@@ -12,7 +12,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(n, ni) in notes" :key="ni" @click="$emit('itemClick', ['note', n])"
+            v-for="(n, ni) in notes" :key="ni" @click="itemClick('note', n)"
             :style=`{height: '60px', borderRadius: '10px'}`
             ).row.full-width.items-center.q-px-sm.bg-white.q-mb-sm
             span {{ n.name }}
@@ -25,18 +25,28 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll.kscroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(f, fi) in fragments" :key="fi" @click="$emit('itemClick', ['fragment', f])"
+            v-for="(f, fi) in fragments" :key="fi" @click="itemClick('itemClick', 'fragment', f)"
             :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px'}`
             ).row.full-width.items-center.bg-white.q-mb-md
             img(
-              :src="f.content.thumbUrl" draggable="false"
+              :src="f.item.content.thumbUrl" draggable="false"
               :style=`{
                 width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
                 borderRadius: '10px'}`)
-            span(:style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '16px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
-              ).q-pa-sm.text-white fragment {{fi}}
-            small(:style=`{position: 'absolute', zIndex: 100, bottom: '16px', left: '16px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
-              ).q-pa-sm.text-white {{ f.content.name | cut(50) }}
+            div(
+              v-if="f.relativeCuts"
+              :style=`{position: 'absolute', top: '8px', left: '8px'}`
+              ).row.full-width
+              div(v-for="(c, ci) in f.relativeCuts" :key="ci"
+                ).q-mr-xs
+                div(:style=`{background: $randomColor(c.type, 0.5), borderRadius: '4px'}`).q-px-sm
+                  small.text-white {{ $time(c.start)}}-{{$time(c.end) }}
+            span(
+              v-if="f.name"
+              :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+              ).q-pa-sm.text-white {{ f.item.name }}
+            small(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+              ).q-pa-sm.text-white {{ f.item.content.name | cut(50) }}
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -46,7 +56,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(c, ckey) in contents" :key="ckey" @click="$emit('itemClick', ['content', c.item])"
+            v-for="(c, ckey) in contents" :key="ckey" @click="itemClick('content', c)"
             :style=`{position: 'relative', minHeight: '100px', borderRadius: '10px', oveflow: 'hidden'}`
             ).row.full-width.items-center.bg-black.q-mb-md
             img(
@@ -67,7 +77,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(n, ni) in nodes" :key="n.oid" @click="$emit('itemClick', ['node', n])"
+            v-for="(n, ni) in nodes" :key="n.oid" @click="itemClick('node', n)"
             :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.justify-center.bg-white.q-mb-sm
             span {{ n.name }}
@@ -76,7 +86,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
 <script>
 export default {
   name: 'wsItems',
-  props: ['types', 'nodeClickOverride'],
+  props: ['types'],
   data () {
     return {
       coll: 'fragments',
@@ -105,7 +115,14 @@ export default {
     },
     fragments () {
       return this.$store.state.workspace.workspace.nodes.reduce((acc, val) => {
-        val.fragments.map(f => (acc.push(f)))
+        val.fragments.map(f => {
+          acc.push(f)
+          // f.cuts.map((c, ci) => {
+          //   if (c.name) {
+          //     acc.push({name: c.name, scale: f.content.duration, content: f.content, cuts: [{name: '', thumbUrl: '', color: '', points: c.points}]})
+          //   }
+          // })
+        })
         return acc
       }, [])
     },
@@ -133,17 +150,15 @@ export default {
     }
   },
   methods: {
-    nodeClick (n, ni) {
-      this.$logD('nodeClick', n, ni)
-      if (this.nodeClickOverride) {
-        this.$emit('nodeClick', [n, ni])
-      } else {
-        // open node click for editor?
-      }
+    itemClick (type, item) {
+      this.$emit('itemClick', [type, JSON.parse(JSON.stringify(item))])
     }
   },
   mounted () {
     this.$logD('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

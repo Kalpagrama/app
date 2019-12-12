@@ -10,24 +10,24 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.full-width
     video(
       ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="true"
       :width="width" :height="height")
-      source(:src="content.url" :type="content.contentSource === 'KALPA' ? 'video/mp4' : 'video/youtube'")
+      source(:src="fragment.url || fragment.content.url" :type="fragment.content.contentSource === 'KALPA' ? 'video/mp4' : 'video/youtube'")
     div(
       :style=`{position: 'absolute', bottom: '16px', zIndex: 105, height: '12px'}`).row.full-width.q-px-md
       //- progress width
       div(:style=`{borderRadius: '4px', overflow: 'hidden', background: 'rgba(255,255,255,0.4)'}` @click="progressClick").row.fit
         //- progress bar
-        div(:style=`{width: (now/content.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
+        div(:style=`{width: (now/fragment.content.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
           ).row.full-height.bg-white.q-px-xs
       //- progress now/duration
       small(:style=`{position: 'absolute', zIndex: 105, top: '-24px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
-        ).q-px-sm.text-white {{ $time(now) }} / {{ $time(content.duration) }}
+        ).q-px-sm.text-white {{ $time(now) }} / {{ $time(fragment.content.duration) }}
   slot(name="editor" :now="now" :player="player")
 </template>
 
 <script>
 export default {
   name: 'ncFragmentVideo',
-  props: ['width', 'height', 'content'],
+  props: ['width', 'height', 'fragment', 'inEditor'],
   data () {
     return {
       now: 0,
@@ -39,10 +39,10 @@ export default {
   },
   methods: {
     progressClick (e) {
-      this.$log('progressClick', this.content.duration)
+      this.$log('progressClick', this.fragment.content.duration)
       let w = e.target.clientWidth
       let x = e.offsetX
-      let now = (this.content.duration * x) / w
+      let now = (this.fragment.content.duration * x) / w
       this.$log('w,x,now', w, x, now)
       this.player.setCurrentTime(now)
     },

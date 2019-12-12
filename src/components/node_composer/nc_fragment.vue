@@ -38,7 +38,7 @@ div(
     img(
       ref="ncFragmentPreview"
       @load="previewLoad"
-      :src="node.fragments[index].content.thumbUrl"
+      :src="thumbUrl || fragment.content.thumbUrl"
       :style=`{position: previewLoaded ? 'absolute' : 'relative', top: 0, width: '100%', maxHeight: width+'px', objectFit: 'contain', userSelect: 'none'}`
       crossOrigin="anonymous" draggable="false")
     //- video
@@ -46,15 +46,16 @@ div(
       v-if="previewLoaded"
       :style=`{position: 'relative', zIndex: 100, top: 0}`).row.fit
       nc-fragment-video(
-        v-if="node.fragments[index].content.type === 'VIDEO'" ref="ncFragmentVideo"
-        :content="node.fragments[index].content" :width="previewWidth" :height="previewHeight")
-        template(v-slot:editor=`{now, player}`)
+        v-if="fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
+        :fragment="fragment" :inEditor="inEditor"
+        :width="previewWidth" :height="previewHeight")
+        template(v-if="inEditor" v-slot:editor=`{now, player}`)
           nc-fragment-video-editor(
             v-if="$refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
             @close="editing = false"
-            :index="index" :node="node"
-            :content="node.fragments[index].content" :now="now" :player="player"
-            :width="width" :style=`{height: toolsHeight+'px'}`)
+            :fragment="fragment" :now="now" :player="player"
+            :width="previewWidth" :height="previewHeight"
+            :style=`{height: toolsHeight+'px'}`)
 </template>
 
 <script>
@@ -66,7 +67,7 @@ import ncFragmentVideoEditor from './nc_fragment_video_editor'
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
-  props: ['width', 'index', 'node', 'stageInitial'],
+  props: ['width', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst'],
   data () {
     return {
       stage: 0,
@@ -80,18 +81,7 @@ export default {
       boomed: false
     }
   },
-  computed: {
-    ncFragmentPreview () {
-      if (this.$refs.ncFragmentPreview) return this.$refs.ncFragmentPreview
-      else return null
-    }
-  },
   watch: {
-    '$refs.ncFragmentPreview': {
-      handler (to, from) {
-        this.$log('$refs.ncFragmentPreview CHANGED', to)
-      }
-    },
     stage: {
       immediate: false,
       handler (to, from) {
@@ -101,18 +91,21 @@ export default {
         }
       }
     },
-    node: {
+    fragment: {
       immediate: true,
       handler (to, from) {
-        this.$log('f:', this.index, ' node CHANGED', to)
-        if (to.fragments[this.index] && to.fragments[this.index].content) {
-          this.$log('f:', this.index, 'GOT FRAGMENT', 'stage', this.stage)
-          this.stage = 2
-          this.$log('f:', this.index, 'stage', this.stage)
+        this.$log('fragment CHANGED', to)
+        if (to) {
+          if (to.content) {
+            this.$log('GOT CONTENT')
+            this.stage = 2
+          } else {
+            this.$log('NO CONTENT')
+            this.stage = this.stageFirst || 1
+          }
         } else {
-          this.$log('f:', this.index, 'NO FRAGMENT')
-          // if (this.index === 0) this.stage = 1
-          // else this.stage = 0
+          this.$log('NO FRAGMENT')
+          this.stage = 0
         }
       }
     },
@@ -146,7 +139,7 @@ export default {
       this.$log('boom')
       this.boomed = true
       this.editing = true
-      switch (this.node.fragments[this.index].content.type) {
+      switch (this.fragment.content.type) {
         case 'VIDEO': {
           this.$refs.ncFragmentVideoEditor.boom()
           break
@@ -154,7 +147,7 @@ export default {
       }
     },
     previewLoad (e) {
-      this.$log('f:', this.index, 'previewLoad', e.path[0].width, e.path[0].height)
+      this.$log('previewLoad', e.path[0].width, e.path[0].height)
     },
     previewError (e) {
       this.$log('previewError', e)
@@ -175,42 +168,22 @@ export default {
     },
     fragmentFound (fragment) {
       this.$log('fragmentFound', fragment)
-      // TODO: take relativeCuts from the node...
-      this.$set(this.node.fragments, this.index, fragment)
-      this.$set(this.node.meta.fragments, this.index, {
-        relativeCuts: [],
-        thumbUrl: ''
-      })
-      this.$set(this, 'stage', 2)
-      this.$emit('ready', this.index)
+      this.$emit('fragment', fragment)
     },
     contentFound (content) {
-      this.$log('f:', this.index, 'contentFound', content)
-      this.$set(this.node.fragments, this.index, {
-        relativePoints: [],
-        relativeScale: content.type === 'VIDEO' ? content.duration : 0,
-        content: content,
-        oid: content.oid
-      })
-      this.$set(this.node.meta.fragments, this.index, {
-        relativeCuts: [],
-        thumbUrl: ''
-      })
-      this.$set(this, 'stage', 2)
-      this.$emit('ready', this.index)
+      this.$log('contentFound', content)
+      this.$emit('content', content)
     },
     cancel () {
       this.$log('cancel')
-      this.$delete(this.node.fragments, this.index)
-      this.$delete(this.node.meta.fragments, this.index)
-      this.$set(this, 'stage', 1)
+      this.$emit('delete')
     }
   },
   async mounted () {
-    this.$log('f:', this.index, 'mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('f:', this.index, 'beforeDestroy')
+    this.$log('beforeDestroy')
     clearInterval(this.previewInterval)
   }
 }
