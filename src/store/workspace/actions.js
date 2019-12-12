@@ -83,8 +83,8 @@ export const wsNodeSave = async (context, node) => {
     assert.ok(node.spheres.length >= 0)
     assert.ok(node.fragments.length >= 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
-    assert.ok(node.content)
     for (let fr of node.fragments) {
+      assert.ok(fr.content)
       assert.ok(fr.cuts.length >= 0)
       assert.ok(fr.scale > 0)
       for (let c of fr.cuts) {
@@ -130,6 +130,7 @@ export const wsNodeSave = async (context, node) => {
     fr.oid = fr.content.oid
     delete fr.content
   }
+  delete node.meta
   logD('wsNodeSave nodeInput', node)
   let res
   if (node.oid) {
@@ -143,11 +144,12 @@ export const wsNodeSave = async (context, node) => {
         }
       `,
       variables: {
-        oid: node.oid, node
+        node
       }
     })
     res = wsNodeUpdate
   } else {
+    // delete node.oid
     let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
