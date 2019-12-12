@@ -55,15 +55,10 @@ export default {
   methods: {
     async deleteSession (token) {
       // this.tokenString = token
-      try {
-          this.$log('delete start')
-          let res = await this.$store.dispatch('auth/logout', token)
-          this.$log('deleted done', res)
-          this.$q.notify({message: 'Session deleted', color: 'green', textColor: 'white'})
-        } catch (e) {
-          this.$log('delete session ERROR', token)
-          this.$q.notify({message: 'Cant delete session', color: 'red', textColor: 'white'})
-        }
+      this.$log('delete start')
+      let res = await this.$store.dispatch('auth/logout', token)
+      this.$log('deleted done', res)
+      this.$q.notify({message: 'Session deleted', color: 'green', textColor: 'white'})
     }
   },
   mounted () {
