@@ -5,7 +5,6 @@
   q-select(filled v-model="country" :options="countries" :label="$t('Country')")
   q-select(filled v-model="gender" :options="genders" :label="$t('Gender')")
   q-select(filled v-model="lang" :options="langs" :label="$t('Lang')")
-  
   phoneDialog
   emailDialog
   passwordDialog

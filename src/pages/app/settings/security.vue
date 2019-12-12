@@ -10,20 +10,22 @@
       .row.content-start.justify-center.q-pt-md
         div(
           v-for="(s, si) in sessions" :key="si"
-          v-if="s.token === "
+          v-if="s.token !== mytoken"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`
           ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
           .col
             span {{s.ip}}
+            //- span {{s.token}}
           div(style=`height: 60px; width: 40px`).row.justify-center.items-center
             q-icon(name="more_vert" size="25px" @click="sessionIndex < 0 ? sessionIndex = si : sessionIndex = -1" color="black")
           div(style=`height: 60px; width: 40px`).row.justify-center.items-center
             q-icon(name="clear" size="25px" @click="deleteSession(s.token)" color="black")
           //-  leave-active-class="animated fadeOut"
-          //- span {{s.token}}
           transition(appear enter-active-class="animated fadeIn")
             div(v-if="si === sessionIndex").row.full-width.justify-center
               span {{s.userAgent}}
+          span {{s.token}}
+        //- span {{mytoken}}
         .row.full-width.items-center.justify-center.q-my-sm
           q-btn(
             push color="accent" no-caps @click="deleteSession(null)"
@@ -48,6 +50,9 @@ export default {
     // },
     sessions () {
       return this.$store.state.objects.currentUser.sessions
+    },
+    mytoken () {
+      return localStorage.getItem('ktoken')
     }
   },
   methods: {
