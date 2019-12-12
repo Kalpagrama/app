@@ -5,9 +5,15 @@
   q-select(filled v-model="country" :options="countries" :label="$t('Country')")
   q-select(filled v-model="gender" :options="genders" :label="$t('Gender')")
   q-select(filled v-model="lang" :options="langs" :label="$t('Lang')")
+  
   phoneDialog
   emailDialog
   passwordDialog
+  div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeEmail.show()").row.full-width.justify-left.items-center.q-py-sm.q-px-md
+    .row.full-width
+      span {{$t('Role')}}
+    .row.full-width
+      small.text-red {{ currentRole }}
   div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-px-md
     q-btn(@click="save()" round icon="done" size="lg" color="accent").q-mb-md
 </template>
@@ -48,6 +54,9 @@ export default {
     },
     currentNameSecond () {
       return this.$store.state.objects.currentUser.profile.nameSecond
+    },
+    currentRole () {
+      return this.$store.state.objects.currentUser.profile.role
     }
   },
   methods: {

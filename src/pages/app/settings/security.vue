@@ -10,6 +10,7 @@
       .row.content-start.justify-center.q-pt-md
         div(
           v-for="(s, si) in sessions" :key="si"
+          v-if="s.token === "
           :style=`{borderRadius: '10px', overflow: 'hidden'}`
           ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
           .col
