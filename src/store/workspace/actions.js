@@ -91,8 +91,8 @@ export const wsNodeSave = async (context, node) => {
         assert.ok(c.color)
         assert.ok(c.thumbUrl)
         assert.ok(c.points && c.points.length === 2)
-        let start = c.points[0]
-        let end = c.points[1]
+        let start = c.points[0].x
+        let end = c.points[1].x
         assert.ok(start >= 0 && end > 0)
         assert.ok(end > start && end <= fr.scale)
       }

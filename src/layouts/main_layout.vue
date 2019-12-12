@@ -27,10 +27,6 @@ export default {
       player: null
     }
   },
-  mounted () {
-    // this.log('mounted')
-    this.$refs.kTutorialDialog.show()
-  },
   computed: {
   },
   watch: {
@@ -50,6 +46,9 @@ export default {
       document.documentElement.style.setProperty('--vh', `${vh}px`)
       this.height = vh
     }
+  },
+  mounted () {
+    this.$log('mounted')
   },
   async created () {
     try {

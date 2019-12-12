@@ -11,7 +11,7 @@
 <template lang="pug">
 q-layout
   q-dialog(ref="ncSaveDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    nc-save(:node="node" @saved="node = $event" @published="refreshAction('discard', true)")
+    nc-save(:node="node" @saved="node = $event" @published="refreshAction('discard', true)" @close="$refs.ncSaveDialog.hide()")
   //- footer actions
   q-footer
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
@@ -43,7 +43,8 @@ q-layout
             q-resize-observer(@resize="onResize")
             nc-fragment(:width="editorWidth" :thumbUrl="false" :fragment="node.fragments[0]" :inEditor="true" :stageFirst="1"
               @content="$event => fragmentCreate(0, $event)"
-              @fragment="$event => fragmentSet(0, $event)")
+              @fragment="$event => fragmentSet(0, $event)"
+              @delete="fragmentDelete(0)")
             //- name
             div(ref="nameEditor").row.full-width.q-py-sm
               div(
@@ -60,7 +61,8 @@ q-layout
                   ).text-bold {{ node.name ? node.name : $t('Whats the essence?!') }}
             nc-fragment(:width="editorWidth" :thumbUrl="false" :fragment="node.fragments[1]" :inEditor="true"
               @content="$event => fragmentCreate(1, $event)"
-              @fragment="$event => fragmentSet(1, $event)")
+              @fragment="$event => fragmentSet(1, $event)"
+              @delete="fragmentDelete(1)")
 </template>
 
 <script>
@@ -118,6 +120,10 @@ export default {
         content: content,
         cuts: []
       })
+    },
+    fragmentDelete (index) {
+      this.$log('fragmentDelete', index)
+      this.$delete(this.node.fragments, index)
     },
     fragmentSet (index, fragment) {
       this.$log('fragmentSet', index, fragment)

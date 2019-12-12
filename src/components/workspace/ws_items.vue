@@ -29,24 +29,25 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
             :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px'}`
             ).row.full-width.items-center.bg-white.q-mb-md
             img(
-              :src="f.item.content.thumbUrl" draggable="false"
+              :src="f.content.thumbUrl" draggable="false"
               :style=`{
                 width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
                 borderRadius: '10px'}`)
             div(
-              v-if="f.relativeCuts"
+              v-if="f.cuts"
               :style=`{position: 'absolute', top: '8px', left: '8px'}`
               ).row.full-width
-              div(v-for="(c, ci) in f.relativeCuts" :key="ci"
+              div(v-for="(c, ci) in f.cuts" :key="ci"
                 ).q-mr-xs
                 div(:style=`{background: $randomColor(c.type, 0.5), borderRadius: '4px'}`).q-px-sm
-                  small.text-white {{ $time(c.start)}}-{{$time(c.end) }}
+                  small.text-white {{ c }}
+                  //- small.text-white {{ $time(c.start)}}-{{$time(c.end) }}
             span(
               v-if="f.name"
               :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
-              ).q-pa-sm.text-white {{ f.item.name }}
+              ).q-pa-sm.text-white {{ f.name }}
             small(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
-              ).q-pa-sm.text-white {{ f.item.content.name | cut(50) }}
+              ).q-pa-sm.text-white {{ f.content.name | cut(50) }}
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -59,6 +60,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
             v-for="(c, ckey) in contents" :key="ckey" @click="itemClick('content', c)"
             :style=`{position: 'relative', minHeight: '100px', borderRadius: '10px', oveflow: 'hidden'}`
             ).row.full-width.items-center.bg-black.q-mb-md
+            small {{ckey}}
             img(
               :src="c.item.thumbUrl" draggable="false"
               :style=`{

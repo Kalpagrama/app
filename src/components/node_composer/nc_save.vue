@@ -1,11 +1,19 @@
 <template lang="pug">
-.row.full-width
-  node(:nodeFullReady="node")
-  .row.full-width
-    .row.full-width spheres
-    .row.full-width categories
-    .row.full-width options
-    .row.full-width actions...
+.column.fit.bg-white
+  node(:node="node" :nodeFullReady="node")
+  .col.full-width
+    .row.full-width
+      .row.full-width spheres
+      .row.full-width categories
+      .row.full-width options
+      .row.full-width actions...
+  .row.full-width.justify-between.q-pa-md
+    q-btn(no-caps flat color="green" @click="$emit('close')")
+      span {{$t('Cancel')}}
+    q-btn(push no-caps :loading="nodeSaving" color="green" @click="nodeSave")
+      span.text-white {{$t('Save')}}
+    q-btn(push no-caps :loading="nodePublishing" color="green" @click="nodePublish")
+      span.text-white {{$t('Publish')}}
 </template>
 
 <script>
