@@ -107,7 +107,7 @@ export const nodeCreate = async (context, node) => {
         assert.ok(end > start && end <= fr.scale)
         fragmentLen += (end - start)
       }
-      let sixtySec = (60 * fr.scale) / node.content.duration
+      let sixtySec = (60 * fr.scale) / fr.content.duration
       assert.ok(fragmentLen <= sixtySec)
     }
   }
