@@ -92,17 +92,17 @@ export const nodeCreate = async (context, node) => {
     assert.ok(node.spheres.length >= 0 && node.spheres.length < 10)
     assert.ok(node.fragments.length === 2)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
-    assert.ok(node.content)
     for (let fr of node.fragments) {
-      assert.ok(fr.cuts.length >= 1)
+      assert.ok(fr.content)
+      assert.ok(fr.cuts.length > 0)
       assert.ok(fr.scale > 0)
       let fragmentLen = 0
       for (let c of fr.cuts) {
         assert.ok(c.color)
-        assert.ok(c.thumbUrl)
+        // assert.ok(c.thumbUrl)
         assert.ok(c.points && c.points.length === 2)
-        let start = c.points[0]
-        let end = c.points[1]
+        let start = c.points[0].x
+        let end = c.points[1].x
         assert.ok(start >= 0 && end > 0)
         assert.ok(end > start && end <= fr.scale)
         fragmentLen += (end - start)
@@ -113,44 +113,42 @@ export const nodeCreate = async (context, node) => {
   }
 
   let nodeInput = {}
+  nodeInput.layout = node.layout
   nodeInput.name = node.name
   nodeInput.categories = node.categories
   nodeInput.spheres = node.spheres
-  nodeInput.fragments = node.fragments.map((f, fi) => {
+  nodeInput.fragments = node.fragments.map(f => {
     return {
       oid: f.content.oid,
       name: f.name,
       thumbUrl: f.thumbUrl,
-      relativeScale: f.scale,
-      relativePoints: f.cuts.reduce((acc, c) => {
-        acc.push(...c.points)
-        return acc
-      }, [])
+      scale: f.scale,
+      cuts: f.cuts.map(c => {
+        return {
+          name: c.name,
+          color: c.color,
+          thumbUrl: c.thumbUrl,
+          points: c.points.map(p => {
+            return {
+              x: p.x,
+              y: p.y,
+              z: p.z
+            }
+          }),
+          style: c.style
+        }
+      })
     }
   })
-  nodeInput.meta = {
-    layout: node.meta.layout,
-    fragments: node.meta.fragments.map((f, fi) => {
-      return {
-        thumbUrl: f.thumbUrl,
-        relativeCuts: f.cuts
-      }
-    })
-  }
 
-  for (let fr of node.fragments){
-    fr.oid = fr.content.oid
-    delete fr.content
-  }
-
-  logD('nodeCreate nodeInput', node)
+  logD('nodeCreate nodeInput', nodeInput)
   let { data: { nodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation nodeCreate ($node: NodeInput!) {
         nodeCreate (node: $node)
       }
     `,
-    variables: { node }
+    variables: { node: nodeInput}
   })
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
