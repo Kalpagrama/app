@@ -1,5 +1,6 @@
 import { apolloProvider } from 'boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { router } from 'boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
@@ -23,10 +24,11 @@ export const logout = async (context, token) => {
       token
     }
   })
-  if (!token || token === localStorage.getItem('ktoken')) {
+  let currentToken = localStorage.getItem('ktoken').split('::')[0]
+  if (!token || token === currentToken) {
     localStorage.removeItem('ktoken')
     localStorage.removeItem('ktokenExpires')
-    // router.push('/login')
+    router.push('/login')
   }
   context.commit('objects/deleteUserSession', token, { root: true })
   logD('@logout done')
