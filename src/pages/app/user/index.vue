@@ -1,6 +1,8 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
   k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
+  k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
+  input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
   div(v-if="user").row.full-width.content-start
     //- header
     div(:style=`{height: '100px'}`).row.full-width.bg-primary
@@ -14,9 +16,10 @@ div(:style=`{position: 'relative'}`).column.fit
           q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
     //- body
     div(v-if="true").row.full-width.bg-grey-1.q-px-sm
+      //- <input type="file" @change="previewFiles" multiple>
       .row.full-width
-        img(:src="user.thumbUrl" :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`)
-        div().col.row.justify-end.q-mt-sm
+        img(:src="user.thumbUrl" @click="$refs.userPhotoDialog.show()" :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`)
+        div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
           q-btn(
             rounded no-caps
             @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
@@ -28,20 +31,22 @@ div(:style=`{position: 'relative'}`).column.fit
           span.text-bold.text-black.text-h6 {{ user.name }}
         .row.full-width
           .row.full-width.q-py-sm
-            small.text-grey Status
+            small.text-grey {{$t('Status')}}
           //- .row.full-width.q-mt-xs
           //-   small About
         div(v-if="false" @click="showInfo()").row.full-width
-          span.text-accent Show detailed information
+          span.text-accent {{$t('Show detailed information')}}
           //- span {{ user.subscriptions }}
   div(
     v-if="user"
     :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
     k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
       template(v-slot:created)
-        user-created-nodes()
+        //- user-created-nodes()
+        h2.text-center.text-bold ВАНЯ НЕ СДЕЛАЛ
       template(v-slot:rated)
-        user-rated-nodes()
+        //- user-rated-nodes()
+        h2.text-center.text-bold ВАНЯ НЕ СДЕЛАЛ
       template(v-slot:following)
         user-following(:subscriptions="user.subscriptions" :oid="user.oid")
       template(v-slot:followers)
@@ -65,7 +70,9 @@ export default {
       user: null,
       page: 'nodes',
       showI: false,
-      coll: 'created'
+      coll: 'created',
+      theStream: '',
+      file: null
     }
   },
   computed: {
@@ -106,6 +113,15 @@ export default {
           report: {name: 'Report', color: 'red'}
         }
       }
+    },
+    userPhotoDialogOptions () {
+      return {
+        confirm: false,
+        actions: {
+          // makePhoto: {name: 'Make a photo'},
+          download: {name: 'Download from device'}
+        }
+      }
     }
   },
   watch: {
@@ -125,6 +141,35 @@ export default {
     }
   },
   methods: {
+    fileChanged (e) {
+      this.$log(e.target.files)
+      this.file = e.target.files
+      this.downloadPhoto()
+    },
+    userPhotoAction (a) {
+      this.$logD('userPhotoAction', a)
+      switch (a) {
+        // case 'makePhoto': {
+        //   break
+        // }
+        case 'download': {
+          this.$refs.fileInput.click()
+          break
+        }
+      }
+    },
+    async downloadPhoto (e) {
+      try {
+        this.$log('changePhoto start')
+        let res = await this.$store.dispatch('objects/setPhoto', {
+          oid: this.$store.state.objects.currentUser.oid,
+          path: 'thumbUrl',
+          value: this.file
+        })
+      } catch (e) {
+        this.$log('changePhoto ERROR', e)
+      }
+    },
     userSettingsAction (a) {
       this.$logD('userSettingsAction', a)
       switch (a) {

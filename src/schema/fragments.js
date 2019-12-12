@@ -73,6 +73,7 @@ const nodeFragment = gql`
       name
     }
     categories
+    layout
     fragments {
       name
       url
@@ -80,24 +81,21 @@ const nodeFragment = gql`
         ...on Video {...videoFragment}
         ...on Image {...imageFragment}
       }
-      relativePoints { x y z }
-      relativeScale
+      scale
+      cuts {
+        name
+        color
+        thumbUrl(preferWidth: 600)
+        points { x y z }
+        style
+      }
+      
     }
     meta {
       ...on MetaNode {
-        layout
         fragments { 
           width
           height
-          color 
-          thumbUrl(preferWidth: 600) 
-          relativeCuts {
-            start
-            end
-            name
-            thumbUrl(preferWidth: 600)
-            type
-          }
         }
       }
     }
@@ -170,7 +168,6 @@ const userFragment = gql`
     thumbUrl(preferWidth: 600)
     weightVal
     settings
-    subscribers{...objectShortFragment}
     subscriptions{...objectShortFragment}
     subscribers{...objectShortFragment}
     workspace{
@@ -187,6 +184,15 @@ const userFragment = gql`
       nameFirst
       nameFull
       nameSecond
+      role
+      email
+      phone
+      password
+    }
+    sessions{
+      token
+      ip
+      userAgent
     }
   }
 `

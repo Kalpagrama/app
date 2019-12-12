@@ -1,4 +1,4 @@
-const swVer = 49
+const swVer = 6
 /*
  * This file (which will be your service worker)
  * is picked up by the build system ONLY if
@@ -13,7 +13,7 @@ Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' 
 
 function logFunc (...msg) {
   if (logModulesBlackList.includes('sw')) return
-  if (logLevel <= 2) console.log('SW: ', ...msg)
+  if (logLevel <= 2) console.log('SW: ', swVer, ...msg)
   if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
 }
 
@@ -28,33 +28,51 @@ logFunc('SW_VER=', swVer)
 workbox.core.setCacheNameDetails({ prefix: 'app' })
 workbox.core.skipWaiting()
 workbox.core.clientsClaim()
-
-/**
- * The workboxSW.precacheAndRoute() method efficiently caches and responds to
- * requests for URLs in the manifest.
- * See https://goo.gl/S9QRab
- */
-self.__precacheManifest = [].concat(self.__precacheManifest || [])
-workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
-
-// const matchFunction = ({url, event}) => {
-//   // Return true if the route should match
-//   return true;
-// };
+//
+// // порядок вызовов precacheAndRoute и registerRoute имеет значение
+// // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
+// self.__precacheManifest = [].concat(self.__precacheManifest || [])
+// workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
+// logFunc('self.__precacheManifest=', self.__precacheManifest)
 //
 // workbox.routing.registerRoute(
-//   matchFunction,
+//   /\/.*/,
 //   new workbox.strategies.CacheFirst({
-//     cacheName: 'images'
-//   })
+//     cacheName: 'sameOrigin'
+//   }),
 // );
+// workbox.routing.registerRoute(
+//   /^https:\/\/.*\.kalpagramma\.com\/graphql\/.*/,
+//   new workbox.strategies.CacheFirst({
+//     cacheName: 'api'
+//   }),
+// );
+//
+// workbox.routing.registerRoute(
+//   /.*(?:googleapis|gstatic)\.com/,
+//   new workbox.strategies.StaleWhileRevalidate({
+//     cacheName: 'google'
+//   }),
+// );
+//
+// workbox.routing.registerRoute(
+//   /^https:\/\/storage\.yandexcloud\.net\/.*/,
+//   new workbox.strategies.CacheFirst({
+//     cacheName: 'content'
+//   }),
+// )
 
 self.addEventListener('message', function handler (event) {
-  // logFunc('message!', event.data)
+  logFunc('message!', event.data)
   if (event.data && event.data.logModulesBlackList) {
     logModulesBlackList = event.data.logModulesBlackList
     logLevel = event.data.logLevel
     logLevelSentry = event.data.logLevelSentry
+    try {
+      if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
+    } catch (err) {
+      logFunc('error on setConfig', err)
+    }
   }
   // var promise = self.clients.matchAll()
   //   .then(function (clientList) {
@@ -81,12 +99,16 @@ self.addEventListener('message', function handler (event) {
 
 self.addEventListener('install', event => {
   logFunc('installed!', swVer)
+  // event.registerForeignFetch({
+  //   scopes: ['/'],
+  //   origins: ['*'] // or ['https://example.com']
+  // })
 })
 self.addEventListener('activate', event => {
   logFunc('activated!', swVer)
 })
 self.addEventListener('fetch', async event => {
-  // logFunc('ready to handle fetches!', swVer, event.request.url)
+  logFunc('ready to handle fetches!', swVer, event.request.url)
   // if (event.request.method === 'POST') {
   //   const formData = await event.request.formData()
   //   // event.respondWith(fetch(event.request))
@@ -116,7 +138,7 @@ self.addEventListener('updatefound', event => {
   logFunc('ready to update!', swVer)
 })
 self.addEventListener('error', function (e) {
-  errCritFunc(e.filename, e.lineno, e.colno, e.message)
+  errCritFunc(e)
 })
 
 // ----------------------- settings for Web-push------------------------------

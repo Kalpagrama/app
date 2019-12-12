@@ -9,12 +9,12 @@
       img(@click="" :src="b.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
     div(@click="").col.full-height.q-ml-sm
       .row.fit.items-center
-        span.text-caption {{ b.name | cut(50) }}
+        span.text-caption {{ $t(b.name) }}
         //- small {{ s }}
     div(:style=`{}`).row.items-center.justify-center
       q-btn(icon="clear" round flat @click="userDelete()")
-  div(style=`height: 100px`).row.full-width.justify-center.items-center
-    span No one in your blacklist
+  div(v-if="!blacklist" style=`height: 100px`).row.full-width.justify-center.items-center
+    span {{$t('No one in your blacklist')}}
 </template>
 
 <script>
@@ -22,16 +22,16 @@ export default {
   name: 'pageApp__Settings__Blacklist',
   data () {
     return {
-      blacklist: [
-        {}
-      ]
     }
   },
   computed: {
     // blacklist () {
     //   return this.$store.state.
     // }
-     blacklistCount () {
+    blacklist () {
+      return this.$store.state.objects.currentUser.blacklist
+    },
+    blacklistCount () {
       return this.blacklist.length
     }
   },

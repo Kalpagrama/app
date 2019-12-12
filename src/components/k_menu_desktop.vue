@@ -11,7 +11,7 @@
           k-logo(:width="40" :height="40")
         div(v-if="!mini").col.full-height
           .row.fit.items-center
-            span.text-bold.text-white {{'Кальпаграмма ver:' + $store.state.core.version}}
+            span.text-bold.text-white {{$t('Кальпаграмма ver:') + $store.state.core.version}}
       div(@click="$go('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="settings" color="white")
     //- user
@@ -20,14 +20,14 @@
         img(:src="$store.state.objects.currentUser.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
       div(v-if="!mini").col.full-height
         .row.fit.items-center
-          span.text-bold.text-white {{ $store.state.objects.currentUser.name }}
+          span.text-bold.text-white {{ $t($store.state.objects.currentUser.name) }}
     //- create node
     div(v-if="!page" :style=`{height: '60px'}` @click="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])").row.full-width.items-center.cursor-pointer
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round push icon="add" color="accent")
       div(v-if="!mini").col.full-height
         .row.fit.items-center
-          span.text-white Создать ядро
+          span.text-white {{$t('Создать ядро')}}
     //- body
     .col.full-width.scroll.bg-secondary
       .row.full-width.items-start.content-start
@@ -44,13 +44,13 @@
           :round="mini" push color="accent" no-caps icon="person_add" @click="$go('/app/invite')"
           :style=`mini ? {} : {height: '60px', borderRadius: '10px'}`).full-width
           span(v-if="width === 230").text-bold.q-ml-md {{ $t('Invite friend') }}
-      div(v-if="!this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
+      div(v-if="!this.$store.state.core.installPrompt || true" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
         q-btn(
           :round="mini" push color="accent" no-caps
         :icon="this.$store.state.core.newVersionAvailable ? 'system_update' : 'cloud_download'"
           @click="update"
           :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
-          span(v-if="width === 230").text-bold.q-ml-md {{ $t(this.$store.state.core.newVersionAvailable ? 'install new version' : 'check for updates') }}
+          span(v-if="width === 230").text-bold.q-ml-md {{ $t(this.$store.state.core.newVersionAvailable ? 'update app' : 'check for updates') }}
       div(v-if="this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
         q-btn(
           :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
@@ -122,7 +122,7 @@
         this.$logD('logoutDialogAction', action)
         switch (action) {
           case 'confirm': {
-            await this.$store.dispatch('auth/logout')
+            await this.$store.dispatch('auth/logout', localStorage.getItem('ktoken'))
           }
         }
       },

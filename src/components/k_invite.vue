@@ -5,7 +5,7 @@
       q-btn(round flat icon="keyboard_arrow_left" @click="$router.back()")
     .col.full-height
       .row.fit.items-center
-        span.text-bold Пригласить друга
+        span.text-bold {{$t('Пригласить друга')}}
   .col.full-width
     .row.fit.items-center.content-center.justify-center
       div(:style=`{maxWidth: $q.screen.gt.xs ? '330px' : '100%'}`).row.full-width
@@ -18,7 +18,7 @@
           q-btn(
             push no-caps color="accent" :disable="emailSent" :loading="emailSending" @click="emailSend()"
             style=`height: 56px; width: 120px; border-radius: 10px`).full-width
-            span.text-bold {{emailSent ? 'Приглашение отправлено!' : 'Отправить приглашение'}}
+            span.text-bold {{$t(emailSent ? 'Приглашение отправлено!' : 'Отправить приглашение')}}
         //- get link
         .row.full-width.justify-center.q-px-md.q-mb-md
           div(

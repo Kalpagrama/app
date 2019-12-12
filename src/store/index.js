@@ -35,30 +35,27 @@ async function init (context) {
             oid
             type
             name
+            thumbUrl(preferWidth: 600)
           }
         }
       }`
   })
-
-  logD('asdasdasd')
-  user.profile = {
-    profile: {
-      city: 'EKB',
-      country: 'Russia',
-      dateBirth: '20.05.1998',
-      gender: 'MALE',
-      lang: 'russian',
-      nameFirst: 'Roman',
-      nameFull: 'Roman Motovilov',
-      status: '',
-      about: '',
-      nameSecond: 'Motovilov',
-      email: 'roma-motovilov@mail.ru',
-      number: '8999-999-99-99'
+  // TODO make confortable
+  if (!user.settings.notifications) {
+    user.settings.notifications = {
+      showInstantNotifications: true,
+      enableSoundNotifications: true,
+      eventFilter: [],
+      emailNotificationFilter: true,
+      pauseAllNotifications: true,
+      assessmentsNotifications: true,
+      subscriptionsNotifications: true,
+      mentionsNotifications: true,
+      sharedNotifications: true,
+      nodeCreatedNotifications: true,
+      nodeAddedNotifications: true
     }
   }
-
-  // todo убрать юзера из auth
   await context.dispatch('core/init')
   await context.dispatch('auth/init')
   await context.dispatch('node/init', categories)

@@ -6,7 +6,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
   template(v-slot:notes)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-        span Total: {{ notes.length }}
+        span {{$t('Total')}}: {{ notes.length }}
         .col
         q-btn(round flat icon="search")
       .col.full-width.scroll
@@ -15,11 +15,11 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
             v-for="(n, ni) in notes" :key="ni" @click="itemClick('note', n)"
             :style=`{height: '60px', borderRadius: '10px'}`
             ).row.full-width.items-center.q-px-sm.bg-white.q-mb-sm
-            span {{ n.name }}
+            span {{ $t(n.name) }}
   template(v-slot:fragments)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-        span Total: {{ fragments.length }}
+        span {{$t('Total')}}: {{ fragments.length }}
         .col
         q-btn(round flat icon="search")
       .col.full-width.scroll.kscroll
@@ -50,7 +50,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-        span Total: {{ contents.length }}
+        span {{$t('Total')}}: {{ contents.length }}
         .col
         q-btn(round flat icon="search")
       .col.full-width.scroll
@@ -71,7 +71,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
   template(v-slot:nodes)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-        span Total: {{ nodes.length }}
+        span {{$t('Total')}}: {{ nodes.length }}
         .col
         q-btn(round flat icon="search")
       .col.full-width.scroll
@@ -80,7 +80,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
             v-for="(n, ni) in nodes" :key="n.oid" @click="itemClick('node', n)"
             :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.justify-center.bg-white.q-mb-sm
-            span {{ n.name }}
+            span {{ $t(n.name) }}
 </template>
 
 <script>

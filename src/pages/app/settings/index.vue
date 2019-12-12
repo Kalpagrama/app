@@ -1,12 +1,13 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" :container="true" :style=`{width: width+'px', height: height+'px'}`).bg-grey-3
+  //- k-dialog-bottom(ref="accountSettings" mode="actions" :options="accountSettingsOptions" @action="accountSettingsAction")
   q-header()
-    div(:style=`{height: '60px'}`).row.full-width.items-center.bg-primary
+    div(:style=`{height: '60px'}`).row.full-width.items-center.bg-white
       div(:style=`{height: '60px', width: '60px'}` @click="mainPage()").row.items-center.justify-center
-        q-btn(round flat color="white" icon="arrow_back")
+        q-btn(round flat color="primary" icon="arrow_back")
       .col.full-height
         .row.fit.items-center.q-pb-xs
-          span.text-bold.text-white {{ $t(settings) }}
+          span.text-bold.text-black {{ $t(settings) }}
       //- div(:style=`{height: '60px', width: '60px'}` @click="right = !right").row.items-center.justify-center
         q-btn(round flat color="black" icon="menu")
   //- q-drawer(v-model="right" side="right" :width="200")
@@ -23,7 +24,7 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: width+'px', height
       div(:style=`{height: height-60+'px'}`).row
         .col.full-height
           notifications(v-if="page === 'notifications'")
-          account(v-if="page === 'account'")
+          account(v-if="page === 'account'" ref="accountSettings" @cancel="page = 'settings'")
           security(v-if="page === 'security'")
           //- payments(v-if="page === 'payments'")
           privacy(v-if="page === 'privacy'")
@@ -37,13 +38,13 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: width+'px', height
               :style=`{height: '50px'}`
               ).row.full-width.items-center.cursor-pointer.q-px-md
                 .row.justify-center.items-center
-                  q-icon(size="30px" color="accent" :name="p.icon")
+                  q-icon(size="30px" color="primary" :name="p.icon")
                 .col.q-ml-sm.items-center
                   span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
 </template>
 
 <script>
-import account from './account'
+import account from './account/index'
 import payments from './payments'
 import privacy from './privacy'
 import security from './security'
@@ -79,13 +80,41 @@ export default {
       if (this.page === 'blacklist') return 'Black list'
       if (this.page === 'information') return 'Information'
       else return 'Settings'
-    }
+    },
+    accountSettingsOptions () {
+      return {
+        confirm: false,
+        actions: {
+          save: {name: 'Save & exit'},
+          cancel: {name: 'Exit'}
+        }
+      }
+    },
   },
   methods: {
+    accountSettingsAction (a) {
+      this.$logD('accountSettingsAction', a)
+      switch (a) {
+        case 'save': {
+          this.$refs.accountSettings.emit('save')
+          break
+        }
+        case 'cancel': {
+          this.page = 'settings'
+          break
+        }
+      }
+    },
     mainPage () {
-      if (this.page !== 'settings') {
-        this.page = 'settings'
-      } else this.$router.back(1)
+      if (this.page === 'settings') {
+        this.$router.back(1)
+      } else {
+        if (this.page === 'account') {
+          this.$refs.accountSettings.cancel()
+        } else {
+          this.page = 'settings'
+        }
+      }
     },
     pageClick (p, pkey) {
       this.$logD('pageClick', p, pkey)

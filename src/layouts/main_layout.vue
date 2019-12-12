@@ -3,8 +3,8 @@
 
 <template lang="pug">
 //- .row.fit.items-center.justify-center
-  //- q-dialog(ref="tutorialDialog" :maximized="true")
-    //- k-dialog-tutorial
+  //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    //- k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
   //- k-spinner(v-if="loading")
   //- q-resize-observer(@resize="onResize")
   //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
@@ -28,6 +28,8 @@ export default {
     }
   },
   mounted () {
+    // this.log('mounted')
+    this.$refs.kTutorialDialog.show()
   },
   computed: {
   },

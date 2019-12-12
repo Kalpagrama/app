@@ -12,8 +12,8 @@
         .row.fit.items-center
           span.text-caption {{ s.name | cut(50) }}
     div(v-if="countSubs === 0").row.full-width
-      div(style=`border-radius: 10px`).row.full-width.justify-center.items-center.bg-grey-1.q-pa-xl
-        span.text-bold.text-h6 Нету подписчиков
+      div(style=`border-radius: 10px`).row.full-width.justify-center.items-center.bg-grey-1.q-pa-lg
+        span.text-bold.text-h6 {{$t('Нету подписчиков')}}
 </template>
 <script>
 export default {

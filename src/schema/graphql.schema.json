@@ -890,6 +890,30 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "sessions",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Session",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -1322,7 +1346,7 @@
       {
         "kind": "INTERFACE",
         "name": "Meta",
-        "description": "Meta - неизменяемые после создания данные. (бэкенд имеет право кэшировать эти данные локально)",
+        "description": "Meta - неизменяемые после создания данные. Можно запрашивать у ObjectShort.\n(бэкенд имеет право кэшировать эти данные локально)",
         "fields": [
           {
             "name": "type",
@@ -1341,6 +1365,11 @@
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "MetaContent",
+            "ofType": null
+          },
           {
             "kind": "OBJECT",
             "name": "MetaNode",
@@ -1458,6 +1487,58 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "role",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "UserRoleEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "email",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "phone",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "password",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -1522,6 +1603,41 @@
           },
           {
             "name": "KAZ",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "UserRoleEnum",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ADMIN",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MODERATOR",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MEMBER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GUEST",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -1922,22 +2038,6 @@
         "description": "тип для указания фрагмента контента",
         "fields": [
           {
-            "name": "uid",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "content",
             "description": null,
             "args": [],
@@ -2065,22 +2165,6 @@
         "name": "IFragment",
         "description": null,
         "fields": [
-          {
-            "name": "uid",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "content",
             "description": null,
@@ -2680,6 +2764,65 @@
       },
       {
         "kind": "OBJECT",
+        "name": "Session",
+        "description": "сессия пользователя",
+        "fields": [
+          {
+            "name": "token",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "userAgent",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ip",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
         "name": "Category",
         "description": null,
         "fields": [
@@ -2956,20 +3099,6 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "uid",
-            "description": "генерится на клиенте",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
             "name": "oid",
             "description": "content OID",
             "type": {
@@ -3233,7 +3362,7 @@
           },
           {
             "name": "login",
-            "description": "Универсальный вход по постоянному паролю(пока не работает)",
+            "description": "Универсальный вход по постоянному паролю. Можно входить когда пользователдь уже есть!",
             "args": [
               {
                 "name": "login",
@@ -3250,7 +3379,7 @@
                 "defaultValue": null
               },
               {
-                "name": "pasword",
+                "name": "password",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -3447,6 +3576,45 @@
             "deprecationReason": null
           },
           {
+            "name": "setFavouriteCategories",
+            "description": "указать категории для новых пользователей. используется для первоначального заполнения выдачи",
+            "args": [
+              {
+                "name": "categories",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "LIST",
+                    "name": null,
+                    "ofType": {
+                      "kind": "NON_NULL",
+                      "name": null,
+                      "ofType": {
+                        "kind": "ENUM",
+                        "name": "CategoryEnum",
+                        "ofType": null
+                      }
+                    }
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "resetPassword",
             "description": "Восстановление пароля по почте. Если к учетке привязана почта, то на нее придет новый пароль",
             "args": [
@@ -3479,8 +3647,19 @@
           },
           {
             "name": "logout",
-            "description": null,
-            "args": [],
+            "description": "если token не указан - выйти из всех сессий",
+            "args": [
+              {
+                "name": "token",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -3573,7 +3752,7 @@
           },
           {
             "name": "objectChange",
-            "description": "изменить свойство объекта. Например User. path ex: ['settings', 'general', 'language']",
+            "description": "изменить свойство объекта. Например User. path ex: 'settings.general.language'",
             "args": [
               {
                 "name": "oid",
@@ -3596,17 +3775,9 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "LIST",
-                    "name": null,
-                    "ofType": {
-                      "kind": "NON_NULL",
-                      "name": null,
-                      "ofType": {
-                        "kind": "SCALAR",
-                        "name": "String",
-                        "ofType": null
-                      }
-                    }
+                    "kind": "SCALAR",
+                    "name": "String",
+                    "ofType": null
                   }
                 },
                 "defaultValue": null
@@ -3676,7 +3847,7 @@
               "name": null,
               "ofType": {
                 "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "name": "Object",
                 "ofType": null
               }
             },
@@ -3721,7 +3892,7 @@
               "name": null,
               "ofType": {
                 "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "name": "Object",
                 "ofType": null
               }
             },
@@ -4356,6 +4527,22 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "isNewUser",
+            "description": "первый вход после регистрации",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -4371,41 +4558,6 @@
         "inputFields": null,
         "interfaces": null,
         "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "UserRoleEnum",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "ADMIN",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MODERATOR",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "MEMBER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "GUEST",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
         "possibleTypes": null
       },
       {
@@ -4648,6 +4800,16 @@
             "defaultValue": null
           },
           {
+            "name": "thumbUrl",
+            "description": "data url для превью ядра",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
             "name": "fragments",
             "description": null,
             "type": {
@@ -4666,16 +4828,6 @@
                   }
                 }
               }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "thumbUrl",
-            "description": "data url для превью ядра",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
             },
             "defaultValue": null
           }
@@ -4725,20 +4877,6 @@
         "description": null,
         "fields": null,
         "inputFields": [
-          {
-            "name": "uid",
-            "description": "uid of fragment. See type Fragment",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
           {
             "name": "width",
             "description": null,
@@ -5827,7 +5965,7 @@
       },
       {
         "kind": "ENUM",
-        "name": "ContentSourceEnum",
+        "name": "ContentProviderEnum",
         "description": null,
         "fields": null,
         "inputFields": null,
@@ -6100,17 +6238,9 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -7054,11 +7184,11 @@
       },
       {
         "kind": "OBJECT",
-        "name": "MetaFragment",
+        "name": "MetaContent",
         "description": null,
         "fields": [
           {
-            "name": "uid",
+            "name": "type",
             "description": null,
             "args": [],
             "type": {
@@ -7073,6 +7203,62 @@
             "isDeprecated": false,
             "deprecationReason": null
           },
+          {
+            "name": "thumbUrl",
+            "description": "data url для превью ядра",
+            "args": [
+              {
+                "name": "preferWidth",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uploadedFileInfo",
+            "description": "информация о загруженном контенте",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "RawJSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Meta",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "MetaFragment",
+        "description": null,
+        "fields": [
           {
             "name": "content",
             "description": null,
@@ -7236,6 +7422,18 @@
                   "ofType": null
                 }
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uploadedFileInfo",
+            "description": "информация о загруженном файле",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "RawJSON",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -7510,7 +7708,7 @@
           },
           {
             "name": "subject",
-            "description": "субъект(тот, чьи действия привели к пояалению новой записи)",
+            "description": "субъект(тот, чьи действия привели к появлению новой записи)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -8465,7 +8663,7 @@
               "name": null,
               "ofType": {
                 "kind": "ENUM",
-                "name": "ContentSourceEnum",
+                "name": "ContentProviderEnum",
                 "ofType": null
               }
             },

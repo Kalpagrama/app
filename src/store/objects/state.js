@@ -10,22 +10,21 @@ export default {
     subscribers: [],
     weightVal: 0.001,
     profile: {
+      lang: 'RUS',
+      role: 'MEMBER',
+      email: '123@321.ru',
+      phone: '79263334455',
+      gender: 'MALE',
+
       city: '',
       country: '',
       dateBirth: '',
-      gender: '',
-      lang: '',
+
       nameFirst: '',
       nameFull: '',
       nameSecond: ''
     },
     settings: {
-      general: {
-        language: 'Russian',
-        phone: '',
-        email: '',
-        password: ''
-      },
       contentSettings: {
         autoplay: true
       },
@@ -38,6 +37,13 @@ export default {
         enableSoundNotifications: true,
         eventFilter: [],
         emailNotificationFilter: true,
+        pauseAllNotifications: true,
+        assessmentsNotifications: true,
+        subscriptionsNotifications: true,
+        mentionsNotifications: true,
+        sharedNotifications: true,
+        nodeCreatedNotifications: true,
+        nodeAddedNotifications: true
       },
       blackList: {}
     }

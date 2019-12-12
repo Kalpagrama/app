@@ -2,7 +2,7 @@
 .column.fit
   div(style=`height: 60px; borderBottom: 1px solid #eee`
     ).row.full-width.items-center.q-px-md
-    span Платежи и подписки
+    span {{$t('Платежи и подписки')}}
 </template>
 
 <script>

@@ -1,28 +1,32 @@
 <template lang="pug">
 .row.full-width
-  node-loader(ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
-    template(v-slot:default=`{nodes}`)
-      .row.full-width.items-start.content-start.q-pt-sm
-        div(
-          v-for="(n, ni) in nodes" :key="n.oid"
-          ).row.full-width.q-mb-xl
-          node(
-            @nameClick="nameClick" @action="$refs.nodeActionDialog.show()"
-            :style=`n.oid === nodeOid ? {...nodeStyles, ...{zIndex: nodeZIndex}} : {zIndex: zIndex}`
-            :zIndex="zIndex" :index="ni" :node="n" :opened="n.oid === nodeOid" :pinned="n.oid === nodeOid && nodePinned"
-            :active="nodesVisible[0] ? nodesVisible[0] === n.oid : false"
-            :ref="'node-'+n.oid" :lang="n.oid"
-            v-observe-visibility=`{
-              callback: nodeVisible,
-              throttle: 230,
-              intersection: {
-                threshold: 0.98
-              }
-            }`)
-          div(
-            v-if="n.oid === nodeOid"
-            :style=`{height: nodeRect.height+'px', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.bg-grey-3
+  k-colls(@coll="sphereOid = $event" :coll="sphereOid" :colls="colls" :tabs="true" :style=`{height: '100%'}`)
+    template(v-slot:[sphereOid])
+      .column.fit
+        div(ref="nodePinScroll" @scroll="onScroll" :style=`{paddingTop: '0px', paddinBottom: '60px'}`).col.full-width.scroll.kscroll
+          node-loader(ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
+            template(v-slot:default=`{nodes}`)
+              .row.full-width.items-start.content-start.q-pt-sm
+                div(
+                  v-for="(n, ni) in nodes" :key="n.oid"
+                  ).row.full-width.q-mb-xl
+                  node(
+                    @nameClick="nameClick" @action="$refs.nodeActionDialog.show()"
+                    :style=`n.oid === nodeOid ? {...nodeStyles, ...{zIndex: nodeZIndex}} : {zIndex: zIndex}`
+                    :zIndex="zIndex" :index="ni" :node="n" :opened="n.oid === nodeOid" :pinned="n.oid === nodeOid && nodePinned"
+                    :active="nodesVisible[0] ? nodesVisible[0] === n.oid : false"
+                    :ref="'node-'+n.oid" :lang="n.oid"
+                    v-observe-visibility=`{
+                      callback: nodeVisible,
+                      throttle: 230,
+                      intersection: {
+                        threshold: 0.98
+                      }
+                    }`)
+                  div(
+                    v-if="n.oid === nodeOid"
+                    :style=`{height: nodeRect.height+'px', borderRadius: '10px', overflow: 'hidden'}`
+                    ).row.full-width.bg-grey-3
 </template>
 <script>
 import node from './node'

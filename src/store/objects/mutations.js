@@ -62,4 +62,6 @@ export function setObjectValue (state, { oid, path, value }) {
   if (!object) return
   let p = path.split('.')
   setValue(object, p, value)
+  logD('!!!', object)
+  logD('currentUser', state.objects.currentUser)
 }

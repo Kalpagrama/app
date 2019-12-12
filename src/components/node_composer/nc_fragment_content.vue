@@ -17,7 +17,7 @@ div(
       position: 'absolute', zIndex: 100000, left: 0,
       width: ($store.state.events.progress.progress)+'%',
       height: '100%', opacity: 0.8}`).row.items-center.justify-center.bg-accent
-      span(:style=`{fontSize: '30px'}`).text-white {{ $store.state.events.progress.progress }}
+      span(:style=`{fontSize: '30px'}`).text-white {{ $t($store.state.events.progress.progress) }}
   div.row.full-width.q-px-lg
     input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
     q-input(

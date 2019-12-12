@@ -6,21 +6,21 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
       div(:style=`{maxWidth: '500px', borderRadius: '10px', overflow: 'hidden'}`).column.fit.bg-white
         .col.full-width.scroll
           .row.full-width.items-start.content-start.q-pa-md
-            span {{ sub }}
+            span {{ $t(sub) }}
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width.bg-white
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round @click="$router.back(1)" flat color="accent" icon="arrow_back")
       .col.full-height
         .row.fit.items-center.q-px-md
-          span.text-bold.text-black Subscriptions
+          span.text-bold.text-black {{$t('Subscriptions')}}
       //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       //-   q-btn(round flat icon="edit" color="green" @click="editToggle()")
   q-page-container.fit
     q-page.fit
       k-dialog-bottom(ref="subDialog" mode="actions" :options="subDialogOptions" @action="subDialogAction")
       div(v-if="subscriptions.length === 0").row.fit.justify-center.bg-white.q-py-xl
-        span.text-grey.text-h6 You dont have subscriptions.
+        span.text-grey.text-h6 {{$t('You dont have subscriptions.')}}
       .row.full-width.items-start.content-start.justify-center.q-pa-md
         div(:style=`{maxWidth: '500px'}`).row.full-width
           div(
@@ -31,7 +31,7 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
               img(@click="" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
             div(@click="subjectClick(s)").col.full-height.q-ml-sm
               .row.fit.items-center
-                span.text-caption {{ s.name | cut(50) }}
+                span.text-caption {{ $t(s.name)}}
                 //- small {{ s }}
             div(:style=`{}`).row.items-center.justify-center
               //- @click="subDelete(s, si)"

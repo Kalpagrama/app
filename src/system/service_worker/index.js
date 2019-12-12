@@ -59,7 +59,7 @@ async function initSw (store) {
     registration = await navigator.serviceWorker.register('/service-worker.js')
     logD('Registration sw succeeded. Scope is ' + registration.scope)
     wait(100).then(() => {
-      logD('sendMessageToSW... ...')
+      logD('sendMessageToSW...')
       sendMessageToSW({
         logModulesBlackList: store.state.core.logModulesBlackList,
         logLevel: store.state.core.logLevel,

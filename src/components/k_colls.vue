@@ -16,7 +16,7 @@
       :style=`{position: 'relative', height: '50px', minWidth: c.width+'px', maxWidth: c.width+'px', width: c.width+'px'}`
       )
       div(:style=`{position: 'relative', overflow: 'hidden'}`).row.fit.items-center.justify-center
-        span(:style=`{whiteSpace: 'nowrap'}`).text-bold.cursor-pointer {{c.name}}
+        span(:style=`{whiteSpace: 'nowrap'}`).text-bold.cursor-pointer {{$t(c.name)}}
   //- body
   div(v-touch-pan.left.right.prevent.mouse="handlePan").col.full-width
     div(
