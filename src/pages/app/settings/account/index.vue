@@ -1,6 +1,6 @@
 <template lang="pug">
 .column.bg-white.fit
-  q-input(v-model="nameFirst" stack-label label="First name" filled).full-width.q-mt-sm
+  q-input(v-model="nameFirst" stack-label label="First name" filled).full-width
   q-input(v-model="nameSecond" stack-label label="Second name" filled).full-width
   q-select(filled v-model="country" :options="countries" :label="$t('Country')")
   q-select(filled v-model="gender" :options="genders" :label="$t('Gender')")
