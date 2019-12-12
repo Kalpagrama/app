@@ -106,7 +106,7 @@ export const wsNodeSave = async (context, node) => {
     }
   })
 
-  logD('wsNodeSave nodeInput', nodeInput)
+  logD('wsNodeSave nodeInput ', nodeInput)
   let res
   if (node.oid) {
     let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
