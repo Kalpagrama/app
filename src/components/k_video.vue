@@ -46,8 +46,8 @@ div(:style=`{position: 'relative'}`).row
           v-if="cut"
           :style=`{
             position: 'absolute', zIndex: 1000, pointerEvents: 'none',
-            left: cut.start/duration*100+'%',
-            width: ((cut.end-cut.start)/duration)*100+'%', minWidth: '2px',
+            left: cut.points[0].x/duration*100+'%',
+            width: ((cut.points[1].x-cut.points[0].x)/duration)*100+'%', minWidth: '2px',
             height: '18px',
             background: $randomColor(cut.uid)}`)
 </template>

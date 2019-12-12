@@ -7,9 +7,9 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
     div(:style=`{position: 'relative'}`).row.fit
       div(:style=`{
         position: 'absolute', zIndex: 106, top: 0, height: '100%',
-        left: (cut.start/content.duration)*100+'%',
-        width: ((cut.end-cut.start)/content.duration)*100+'%',
-        borderRadius: '4px', background: $randomColor(cut.type)}`)
+        left: (cut.points[0].x/fragment.content.duration)*100+'%',
+        width: ((cut.points[1].x-cut.points[0].x)/fragment.content.duration)*100+'%',
+        borderRadius: '4px', background:cut.color}`)
   //- dialogs
   k-dialog-bottom(ref="cutDialog" :options="cutDialogOptions" @action="cutDialogAction")
   k-dialog-bottom(ref='cutDeleteDialog' :options="{actions: {delete: {name: 'Delete', color: 'red'}}}" @action="cutDelete(cutIndex)")
@@ -27,10 +27,10 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     nc-fve-fragment-name(
       v-if="fragmentNameDialogOpened"
-      :fragment="node.fragments[index]" @close="fragmentNameDialogOpened = false"
+      :fragment="fragment" @close="fragmentNameDialogOpened = false"
       :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
   //- pan
-  nc-fve-cut-pan(:player="player" :content="content" :width="width" :cut="cut" @cut="cutChanged")
+  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" @cut="cutChanged")
   //- body
   div(:style=`{}`).col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-md
@@ -47,7 +47,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
           .col
             .row.fit.items-center.content-center
               div(:style=`{height: '44px', width: '44px'}`).row.items-center.justify-center
-                div(:style=`{height: '36px', width: '36px', borderRadius: '10px', background: $randomColor(c.type)}`
+                div(:style=`{height: '36px', width: '36px', borderRadius: '10px', background: c.color}`
                   ).row.items-center.justify-center
                   small.text-white {{ci}}
               .col.full-height
@@ -55,7 +55,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
                   .row.full-width
                     span(v-if="c.name" ).text-white {{ c.name }}
                   .row.full-width.items-start
-                    small.text-white {{ $time((parseInt(c.start*100))/100) }} - {{ $time((parseInt(c.end*100))/100) }}
+                    small.text-white {{ $time((parseInt(c.points[0].x*100))/100) }} - {{ $time((parseInt(c.points[1].x*100))/100) }}
           //- more
           q-btn(round flat icon="more_vert" color="grey-8" @click="cutMoreClick(c, ci)").q-mr-xs
         //- cut ACTIVE
@@ -83,10 +83,10 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
     small cut: {{cut}}
   //- footer
   div(:style=`{position: 'relative', height: '60px'}`).row.full-width.items-center.content-center.bg-grey-10
-    span(@click="fragmentNameDialogOpened = true").text-white.q-mb-xs.q-ml-md {{ node.fragments[index].name || $t('Set fragment name')}}
-    //- progress
-    div(:style=`{position: 'absolute', bottom: '0px', height: '6px'}`).row.full-width
-      div(:style=`{width: 56+'%', borderRadius: '0 3px 3px 0'}`).row.full-height.bg-green
+    span(@click="fragmentNameDialogOpened = true").text-white.q-mb-xs.q-ml-md {{ fragment.name || $t('Set fragment name')}}
+  //- progress
+  div(:style=`{position: 'absolute', top: '0px', height: '4px'}`).row.full-width
+    div(:style=`{width: 56+'%', borderRadius: '0 2px 2px 0'}`).row.full-height.bg-green
 </template>
 
 <script>
@@ -98,7 +98,7 @@ import ncFveFragmentName from './nc_fve_fragment_name'
 export default {
   name: 'ncFragmentVideoEditor',
   components: {ncFveCutPan, ncFveCutTimer, ncFveCutName, ncFveFragmentName},
-  props: ['width', 'index', 'node', 'content', 'player', 'now'],
+  props: ['width', 'height', 'fragment', 'player', 'now'],
   data () {
     return {
       cutIndex: -1,
@@ -116,7 +116,7 @@ export default {
       else return null
     },
     cuts () {
-      return this.node.meta.fragments[this.index].relativeCuts
+      return this.fragment.cuts
     },
     cutDialogOptions () {
       return {
@@ -138,11 +138,11 @@ export default {
       handler (to, from) {
         // this.$log('now CHANGED', to)
         if (this.cut && this.cutPlaying >= 0) {
-          if (to > this.cut.end) {
-            this.player.setCurrentTime(this.cut.start)
+          if (to > this.cut.points[1].x) {
+            this.player.setCurrentTime(this.cut.points[0].x)
           }
-          if (to < this.cut.start) {
-            this.player.setCurrentTime(this.cut.start)
+          if (to < this.cut.points[0].x) {
+            this.player.setCurrentTime(this.cut.points[0].x)
           }
         }
       }
@@ -185,13 +185,9 @@ export default {
       }
       this.cutIndex = -1
     },
-    cutTimer (isFirst) {
-      this.$log('cutTimer', 'isFirst:', isFirst)
-      this.cutTimerDialogOpened = true
-    },
-    cutChanged (e) {
-      this.$log('cutChanged', e)
-      this.$set(this.node.meta.fragments[this.index].relativeCuts, this.cutIndex, e)
+    cutChanged (cut) {
+      this.$log('cutChanged', cut)
+      this.fragment.cuts[this.cutIndex] = cut
     },
     cutClick (c, ci) {
       this.$log('cutClick', c, ci)
@@ -209,7 +205,7 @@ export default {
         this.cutPlaying = -1
       } else {
         this.cutPlaying = ci
-        this.player.setCurrentTime(this.cut.start)
+        this.player.setCurrentTime(this.cut.points[0].x)
         this.player.play()
       }
     },
@@ -225,22 +221,24 @@ export default {
       this.$refs.cutDialog.show()
     },
     cutCreate ([start, end]) {
-      // TODO: type is UID for now
       this.$log('cutCreate', this.player.currentTime)
       let cut = {
-        type: Date.now().toString(),
         name: '',
+        color: this.$randomColor(Date.now().toString()),
         thumbUrl: '',
-        start: start || this.player.currentTime,
-        end: end ? end : start ? start + 10 : this.player.currentTime + 10
+        style: null,
+        points: [
+          {x: start || this.player.currentTime},
+          {x: end ? end : start ? start + 10 : this.player.currentTime + 10}
+        ]
       }
-      this.node.meta.fragments[this.index].relativeCuts.push(cut)
-      this.cutClick(cut, this.node.meta.fragments[this.index].relativeCuts.length - 1)
+      this.fragment.cuts.push(cut)
+      this.cutClick(cut, this.fragment.cuts.length - 1)
     },
     cutDelete (index) {
       this.$log('cutDelete', index)
       this.cutIndex = -1
-      this.$delete(this.node.meta.fragments[this.index].relativeCuts, index)
+      this.$delete(this.fragment.cuts, index)
     }
   },
   mounted () {

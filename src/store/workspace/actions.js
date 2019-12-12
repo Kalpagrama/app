@@ -2,6 +2,7 @@ import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
@@ -53,24 +54,53 @@ export const wsSphereDelete = async (context, oid) => {
 }
 export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave start', node)
-  // checks
-  // {
-  //   assert.ok(node.categories.length >= 0)
-  //   assert.ok(node.spheres.length >= 0)
-  //   assert.ok(node.fragments.length >= 0)
-  //   assert.ok(node.meta.layout)
-  //   for (let fr of node.fragments) {
-  //     // assert.ok(fr.relativeCuts.length >= 0)
-  //     // for (let rc of fr.relativeCuts) {
-  //     //   assert.ok(fr.relativeScale > 0 && rc.start >= 0 && rc.end > 0)
-  //     //   assert.ok(rc.end > rc.start && rc.end <= fr.relativeScale)
-  //     // }
-  //   }
-  //   for (let fr of node.meta.fragments) {
-  //     assert.ok(fr.relativeCuts.length >= 0)
-  //   }
+
+  // let nodeFull = {
+  //   layout: 'PIP', // "PIP", "SLIDER", "VERTICAL", "HORIZONTAL"
+  //   name: '',
+  //   fragments: [
+  //     {
+  //       name: '',
+  //       thumbUrl: '',
+  //       scale: 1000,
+  //       cuts: [
+  //         {
+  //           name: '',
+  //           color: '', // cutCreate () => {color: $randomColor(Date.now().toString())}
+  //           thumbUrl: '',
+  //           points: [{ x: 0 }, { x: 20, y: null }],
+  //           style: null
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   content: {}
   // }
+
+  // checks
+  {
+    assert.ok(node.categories.length >= 0)
+    assert.ok(node.spheres.length >= 0)
+    assert.ok(node.fragments.length >= 0)
+    assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
+    assert.ok(node.content)
+    for (let fr of node.fragments) {
+      assert.ok(fr.cuts.length >= 0)
+      assert.ok(fr.scale > 0)
+      for (let c of fr.cuts) {
+        assert.ok(c.color)
+        assert.ok(c.thumbUrl)
+        assert.ok(c.points && c.points.length === 2)
+        let start = c.points[0].x
+        let end = c.points[1].x
+        assert.ok(start >= 0 && end > 0)
+        assert.ok(end > start && end <= fr.scale)
+      }
+    }
+  }
+
   let nodeInput = {}
+  nodeInput.layout = node.layout
   nodeInput.name = node.name
   nodeInput.categories = node.categories
   nodeInput.spheres = node.spheres
@@ -79,27 +109,28 @@ export const wsNodeSave = async (context, node) => {
       oid: f.content.oid,
       name: f.name,
       thumbUrl: f.thumbUrl,
-      relativePoints: node.meta.fragments[fi].relativeCuts.reduce((acc, val) => {
-        acc.push({x: val.start})
-        acc.push({x: val.end})
+      relativeScale: f.scale,
+      relativePoints: f.cuts.reduce((acc, c) => {
+        acc.push(...c.points)
         return acc
-      }, []),
-      relativeScale: f.relativeScale
+      }, [])
     }
   })
   nodeInput.meta = {
-    layout: node.meta.layout,
-    fragments: node.meta.fragments.map((f, fi) => {
+    layout: node.layout,
+    fragments: node.fragments.map((f, fi) => {
       return {
-        // oid: node.fragments[fi].content.oid,
         thumbUrl: f.thumbUrl,
-        relativeCuts: f.relativeCuts.map((c, ci) => {
-          return {start: c.start, end: c.end, name: c.name, type: c.type, thumbUrl: c.thumbUrl}
-        })
+        relativeCuts: f.cuts
       }
     })
   }
-  logD('wsNodeSave nodeInput', nodeInput)
+
+  for (let fr of node.fragments){
+    fr.oid = fr.content.oid
+    delete fr.content
+  }
+  logD('wsNodeSave nodeInput', node)
   let res
   if (node.oid) {
     let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
@@ -112,8 +143,7 @@ export const wsNodeSave = async (context, node) => {
         }
       `,
       variables: {
-        oid: node.oid,
-        node: nodeInput
+        oid: node.oid, node
       }
     })
     res = wsNodeUpdate
@@ -128,7 +158,7 @@ export const wsNodeSave = async (context, node) => {
         }
       `,
       variables: {
-        node: nodeInput
+        oid: node.oid, node
       }
     })
     res = wsNodeCreate

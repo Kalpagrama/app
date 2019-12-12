@@ -2,13 +2,13 @@
 </style>
 
 <template lang="pug">
-.row.fit.items-center.justify-center
-  q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
-  k-spinner(v-if="loading")
-  q-resize-observer(@resize="onResize")
-  transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
-    router-view(v-if="!loading" :opened="true" :height="$q.screen.height" :width="$q.screen.width")
+//- .row.fit.items-center.justify-center
+  //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    //- k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
+  //- k-spinner(v-if="loading")
+  //- q-resize-observer(@resize="onResize")
+  //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
+router-view(v-if="!loading")
 </template>
 
 <script>
@@ -26,9 +26,6 @@ export default {
       me: null,
       player: null
     }
-  },
-  mounted () {
-    // this.log('mounted')
   },
   computed: {
   },
@@ -49,6 +46,9 @@ export default {
       document.documentElement.style.setProperty('--vh', `${vh}px`)
       this.height = vh
     }
+  },
+  mounted () {
+    this.$log('mounted')
   },
   async created () {
     try {

@@ -1,13 +1,13 @@
 <template lang="pug">
 div(
-  id="q-app" ref="kapp"
-  :style=`{height: $q.screen.height+'px', position: 'fixed'}`).full-width.bg-primary
+  id="q-app" ref="kapp")
     router-view
 </template>
 
 <script>
-  import { AddressbarColor } from 'quasar'
+import { AddressbarColor } from 'quasar'
 import { disableBodyScroll } from 'body-scroll-lock'
+// :style=`{height: $q.screen.height+'px', position: 'fixed'}`).full-width.bg-primary
 
 export default {
   methods: {
@@ -24,10 +24,10 @@ export default {
       })
     }
   },
-    created () {
+  created () {
     // this.$q.notify('App created')
-      AddressbarColor.set('#342d58')
-    this.disableBodyScroll()
-    }
+    AddressbarColor.set('#342d58')
+    // this.disableBodyScroll()
+  }
 }
 </script>

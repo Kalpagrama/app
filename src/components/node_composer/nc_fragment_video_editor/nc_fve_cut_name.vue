@@ -50,9 +50,9 @@ export default {
     this.$log('mounted', this.cut)
     if (this.cut) {
       this.name = this.cut.name
-      // this.$nextTick(() => {
-      //   this.$refs.nameInput.focus()
-      // })
+      this.$nextTick(() => {
+        this.$refs.nameInput.focus()
+      })
     }
   },
   beforeDestroy () {

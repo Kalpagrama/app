@@ -181,7 +181,7 @@ export default {
           let coll = this.colls[i]
           if (coll.id === this.coll) {
             this.$logD('SAME SAME SAME')
-            this.move(i, false, 0.1)
+            this.move(i, false, 0.3)
           } else {
             this.$logD('coll.id', coll.id)
             this.$emit('coll', coll.id)
@@ -203,7 +203,7 @@ export default {
         } else {
           this.$tween.to(
             this.$refs.kCollsScrollWrapper,
-            ms || 0.15,
+            ms || 0.3,
             {
               scrollLeft: scrollLeft,
               onComplete: () => {

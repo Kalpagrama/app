@@ -9,66 +9,69 @@
 }
 </style>
 <template lang="pug">
-.column.fit.bg-grey-3
-  k-dialog-bottom(ref="exitDialog" @action="$event => refreshAction($event, true)" :options="{confirm: true, confirmName: 'Save & exit', actions: {discard: {name: 'Discard changes', color: 'red'}}}")
-  k-dialog-bottom(ref="refreshDialog" @action="$event => refreshAction($event, false)" :options="{confirm: true, confirmName: 'Save & start new', actions: {discard: {name: 'Discard changes', color: 'red'}}}")
+q-layout
+  q-dialog(ref="ncSaveDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    nc-save(:node="node" @saved="node = $event" @published="refreshAction('discard', true)" @close="$refs.ncSaveDialog.hide()")
   //- footer actions
-  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      v-if="fragmentEditing < 0"
-      :style=`{position: 'absolute', zIndex: 5000, bottom: '0px', height: '60px'}`).row.full-width.items-center.q-px-sm
-      q-btn(flat round no-caps color="grey" @click="$refs.exitDialog.show()").q-mr-sm
-        span {{$t('Exit')}}
-      q-btn(flat round no-caps color="grey" @click="$refs.refreshDialog.show()")
-        span {{$t('Start new')}}
-      .col
-      transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-        q-btn(
-          v-if="node && node.name.length > 0"
-          :loading="nodeSaving"
-          push no-caps color="accent" @click="nodeSave()"
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
-          span.text-bold {{ $t('Save to WS') }}
-      transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-        q-btn(
-          v-if="node && node.oid"
-          :loading="nodePublishing"
-          push no-caps color="green" @click="nodePublish()"
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`)
-          span.text-bold {{ $t('Publish') }}
-  //- body
-  div(ref="ncScroll").col.full-width.scroll.kscroll
-    div(v-if="loading").row.fit.items-center.justify-center
-      q-spinner(size="60px" color="accent")
-    div(v-else).row.full-width.items-start.content-start.q-pa-sm
-      div(v-if="node").row.full-width
-        q-resize-observer(@resize="onResize")
-        nc-fragment(:index="0" :stageInitial="1" :width="editorWidth" :node="node" @edit="fragmentEdit")
-        //- name
-        div(ref="nameEditor").row.full-width.q-py-sm
-          div(
-            @click="nameEditStart()"
-            :style=`{
-              height: '60px', borderRadius: '10px', overflow: 'hidden',
-              border: nameEditing ? '2px solid #789dff' : '3px solid white'}`
-            ).row.full-width.items-center.justify-center.bg-white
-            input(
-              v-if="nameEditing" ref="nameInput" @blur="nameEditing = false" type="textarea" :rows="2"
-              v-model="node.name" :style=`{width: '100%'}`).kinput.text-center.text-bold
-            span(
-              v-else
-              ).text-bold {{ node.name ? node.name : $t('Whats the essence?!') }}
-        nc-fragment(
-          v-if="node.fragments[0]"
-          :index="1" :width="editorWidth" :node="node" @edit="fragmentEdit")
+  q-footer
+    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+      div(
+        v-if="fragmentEditing < 0"
+        :style=`{position: 'absolute', zIndex: 5000, bottom: '0px', height: '60px'}`).row.full-width.items-center.q-px-sm
+        q-btn(flat round no-caps color="grey" @click="$refs.exitDialog.show()").q-mr-sm
+          span {{$t('Exit')}}
+        q-btn(flat round no-caps color="grey" @click="$refs.refreshDialog.show()")
+          span {{$t('Start new')}}
+        .col
+        transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+          q-btn(
+            v-if="node"
+            :loading="nodeSaving"
+            push no-caps color="accent" @click="$refs.ncSaveDialog.show()"
+            :style=`{borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
+            span.text-bold {{ $t('Preview') }}
+  q-page-conainter
+      //- q-page
+      k-dialog-bottom(ref="exitDialog" @action="$event => refreshAction($event, true)" :options="{confirm: true, confirmName: 'Save & exit', actions: {discard: {name: 'Discard changes', color: 'red'}}}")
+      k-dialog-bottom(ref="refreshDialog" @action="$event => refreshAction($event, false)" :options="{confirm: true, confirmName: 'Save & start new', actions: {discard: {name: 'Discard changes', color: 'red'}}}")
+      //- body
+      .row.full-width
+        div(v-if="loading" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-center.justify-center
+          q-spinner(size="60px" color="primary")
+        div(v-else).row.full-width.items-start.content-start.q-pa-sm
+          div(v-if="node").row.full-width
+            q-resize-observer(@resize="onResize")
+            nc-fragment(:width="editorWidth" :thumbUrl="false" :fragment="node.fragments[0]" :inEditor="true" :stageFirst="1"
+              @content="$event => fragmentCreate(0, $event)"
+              @fragment="$event => fragmentSet(0, $event)"
+              @delete="fragmentDelete(0)")
+            //- name
+            div(ref="nameEditor").row.full-width.q-py-sm
+              div(
+                @click="nodeNameEdit()"
+                :style=`{
+                  height: '60px', borderRadius: '10px', overflow: 'hidden',
+                  border: nameEditing ? '2px solid #789dff' : '3px solid white'}`
+                ).row.full-width.items-center.justify-center.bg-white
+                input(
+                  v-if="nameEditing" ref="nameInput" @blur="nameEditing = false" type="textarea" :rows="2"
+                  v-model="node.name" :style=`{width: '100%'}`).kinput.text-center.text-bold
+                span(
+                  v-else
+                  ).text-bold {{ node.name ? node.name : $t('Whats the essence?!') }}
+            nc-fragment(:width="editorWidth" :thumbUrl="false" :fragment="node.fragments[1]" :inEditor="true"
+              @content="$event => fragmentCreate(1, $event)"
+              @fragment="$event => fragmentSet(1, $event)"
+              @delete="fragmentDelete(1)")
 </template>
 
 <script>
 import ncFragment from './nc_fragment'
+import ncSave from './nc_save'
 
 export default {
   name: 'nodeComposer',
-  components: {ncFragment},
+  components: {ncFragment, ncSave},
   props: ['width', 'height'],
   data () {
     return {
@@ -79,18 +82,16 @@ export default {
       node: null,
       nodeNew: {
         oid: false,
+        layout: 'PIP',
         name: '',
         fragments: [
-          // {relativePoints: [], relativeScale: 0, content: null, contentOid: false},
-          // {relativePoints: [], relativeScale: 0, content: null, contentOid: false}
+          // {name: '', thumbUrl: '', scale: 0, content: {oid: "", type: "VIDEO", contentType: "KALPA"}, cuts: [points: [{x: 0}]]},
         ],
         categories: ['FUN'],
         spheres: [],
         meta: {
-          layout: 'PIP',
           fragments: [
-            // {thumbUrl: '', relativeCuts: []},
-            // {thumbUrl: '', relativeCuts: []}
+            // {thumbUrl: '', color: '', width: '', height: ''}
           ]
         }
       },
@@ -110,52 +111,36 @@ export default {
     }
   },
   methods: {
-    fragmentReady (index) {
-      this.$log('fragmentReady', index)
-      this.nameEditStart()
+    fragmentCreate (index, content) {
+      this.$log('fragmentCreate', index, content)
+      this.$set(this.node.fragments, index, {
+        name: '',
+        thumbUrl: '',
+        scale: content.type === 'VIDEO' ? content.duration : 100,
+        content: content,
+        cuts: []
+      })
+    },
+    fragmentDelete (index) {
+      this.$log('fragmentDelete', index)
+      this.$delete(this.node.fragments, index)
+    },
+    fragmentSet (index, fragment) {
+      this.$log('fragmentSet', index, fragment)
+      this.$set(this.node.fragments, index, fragment)
     },
     async fragmentEdit (index) {
       this.$log('fragmentEdit', index)
       this.fragmentEditing = index
       if (index < 0) return
-      this.$tween.to(this.$refs.ncScroll, 0.3, {scrollTop: index === 0 ? 0 : this.$refs.ncScroll.scrollHeight})
+      this.$tween.to(document, 0.3, {scrollTop: index === 0 ? 0 : window.scrollHeight})
     },
-    nameEditStart () {
-      this.$logD('nameEditStart')
+    nodeNameEdit () {
+      this.$log('nodeNameEdit')
       this.nameEditing = true
       this.$nextTick(() => {
         this.$refs.nameInput.focus()
       })
-    },
-    async nodeSave () {
-      try {
-        this.$log('nodeSave start', this.node)
-        this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
-        this.$log('res', res)
-        this.node = res
-        this.nodeSaving = false
-        this.$log('nodeSave done')
-        // this.refreshAction('discard', true)
-      } catch (e) {
-        this.$log('nodeSave error', e)
-        this.nodeSaving = false
-      }
-    },
-    async nodePublish () {
-      try {
-        this.$log('nodePublish start')
-        this.nodePublishing = true
-        let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
-        this.$log('res', res)
-        // this.node = res
-        this.nodePublishing = false
-        this.$log('nodePublish done')
-        this.refreshAction('discard', true)
-      } catch (e) {
-        this.$log('nodePublish error', e)
-        this.nodePublishing = false
-      }
     },
     async refreshAction (action, exit) {
       this.$log('refreshAction', action)

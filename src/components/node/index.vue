@@ -1,121 +1,70 @@
 <template lang="pug">
-component(
-  :is="$store.state.node.layouts[node.meta.layout].component"
-  @nodeClick="$emit('nodeClick')"
-  :index="index" :zIndex="zIndex" @action="nodeAction($event)" :widthWrapper="width" :muted="muted"
-  :node="node" :nodeFull="nodeFull" :active="active" :needFull="needFull"
-  :noActions="noActions" :noTimestamp="noTimestamp" :noName="noName" :noSpheres="noSpheres")
+.row.full-width.bg-red.q-mb-md
+  small.full-width width: {{ width }}
+  small.full-width {{ node }}
+  //- small.full-width {{ nodeFull }}
 </template>
 
 <script>
-import nodeTemplateHoriz from './node_template_horiz'
-import nodeTemplateVert from './node_template_vert'
-import nodeTemplatePip from './node_template_pip'
-import nodeTemplateCards from './node_template_cards'
-import kMenuPopup from 'components/k_menu_popup'
-
 export default {
-  components: {nodeTemplateHoriz, nodeTemplateVert, nodeTemplatePip, nodeTemplateCards, kMenuPopup},
-  name: 'node',
-  props: {
-    zIndex: {type: Number, default () { return 200 }},
-    index: {type: Number, default () { return 0 }},
-    node: {type: Object},
-    needFull: {type: Boolean},
-    nodeFullReady: {type: Object},
-    active: {type: Boolean},
-    template: {type: String},
-    inCreator: {type: Boolean},
-    noActions: {type: Boolean},
-    noTimestamp: {type: Boolean},
-    noName: {type: Boolean},
-    noSpheres: {type: Boolean},
-    width: {type: Number},
-    muted: {type: Boolean}
-  },
+  name: 'nodeNew',
+  props: ['index', 'width', 'node', 'nodeFullReady'],
   data () {
     return {
-      nodeFull: null,
-      actionFragment: null
+      nodeFullError: null,
+      nodeFull: null
     }
   },
-  computed: {
-  },
   watch: {
-    active: {
-      handler (to, from) {
-        this.$logD('active CHANGED', to)
+    needFull: {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('needFull CHANGED', to)
+        if (to && !this.nodeFull) {
+          this.nodeFull = await this.nodeLoad(this.node.oid)
+        }
       }
     },
     nodeFullReady: {
       immediate: true,
       handler (to, from) {
+        this.$log('nodeFullReady CHANGED', to)
         if (to) {
-          // this.$logD('nodeFullReady CHANGED')
-          this.nodeFull = to
-          this.$emit('nodeFull', this.nodeFull)
+          this.nodeFull = this.nodeFullReady
         }
       }
-    },
-    // нужны данные по полному ядру
-    needFull: {
-      immediate: true,
-      async handler (to, from) {
-        if (to === true && !this.nodeFullReady) {
-          this.$logD('needFull CHANGED', this.node.name)
-          this.nodeFull = await this.nodeLoad(this.node.oid)
-          this.$emit('nodeFull', this.nodeFull)
-        }
-      }
-    },
+    }
   },
   methods: {
-    nodeAction ([action, payload]) {
-      this.$logD('nodeAction', action, payload)
-      this.actionFragment = payload
-      this.$refs.nodeActionDialog.show()
+    play () {
+      this.$log('play')
     },
-    action (e) {
-      this.$logD('action', e)
-      switch (e) {
-        case 'subscribe': {
-          this.$logD('SUBSCRIBE')
-          break
-        }
-        case 'contentExplore': {
-          this.$logD('CONTENT EXPLORE')
-          this.$router.push(`/app/content/${this.actionFragment.content.oid}`)
-          break
-        }
-        case 'confirm': {
-          this.$logD('CONFIRM')
-          this.$root.$emit('create')
-          break
-        }
-      }
+    pause () {
+      this.$log('pause')
     },
-    nodeBookmark () {
-      this.$logD('nodeBookmark')
-    },
-    nodeContent () {
-      this.$logD('nodeContent')
-    },
-    nodeFragment () {
-      this.$logD('nodeFragment')
+    open () {
+      this.$log('open')
     },
     async nodeLoad (oid) {
-      this.$logD('nodeLoad start', this.index, this.node.oid)
+      this.$log('nodeLoad start', this.index, this.node.oid)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
-      } catch (err){
-        // this.$logD('nodeLoad error', err, this.index, this.node.oid)
+        this.nodeFullError = null
+      } catch (err) {
         this.$logE('node', 'nodeLoad error', err)
         node = null
+        this.nodeFullError = err
       }
-      this.$logD('nodeLoad done', this.index, this.node.oid)
+      this.$log('nodeLoad done', this.index, this.node.oid)
       return node
     }
+  },
+  mounted () {
+    this.$log('mounted', this.node)
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>
