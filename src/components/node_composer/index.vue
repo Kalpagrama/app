@@ -81,7 +81,7 @@ export default {
       fragmentEditing: -1,
       node: null,
       nodeNew: {
-        oid: false,
+        // oid: false,
         layout: 'PIP',
         name: '',
         fragments: [
