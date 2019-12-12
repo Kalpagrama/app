@@ -74,7 +74,7 @@
             q-icon(name="done" size="25px" :color="categoriesToAdd.includes(c.type) ? 'black' : 'white'")
       //- span {{categoriesToAdd}}
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
-        q-btn(v-model="slide" style=`height: 40px` @click="nextSlide()" color="accent" label="Next")
+        q-btn(v-model="slide" v-if="categoriesToAdd.length >= 1" style=`height: 40px` @click="nextSlide()" color="accent" label="Next")
 </template>
 
 <script>
@@ -111,7 +111,6 @@ export default {
   methods: {
     catDeleteClick (c, ci) {
       this.$logD('catDeleteClick', c)
-      this.follow = !this.follow
       this.catIndex = ci
       this.categoriesToAdd = this.categoriesToAdd.filter((cat) => cat !== c.type)
     },

@@ -4,7 +4,7 @@
   q-dialog(ref="changeEmail" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     div(style=`height: 60px`).row.items-center.bg-primary
       div(style=`height: 60px; width: 60px`).row.justify-center.items-center
-        q-btn(round flat icon="arrow_back" color="white" @click="$refs.changeEmail.toggle()")
+        q-btn(round flat icon="arrow_back" color="white" @click="closing()")
       .col.row.justify-start.items-center.q-px-sm
         span.text-bold.text-white {{$t('Changing email')}}
     .column.bg-white.q-px-md
@@ -37,6 +37,11 @@ export default {
     }
   },
   methods: {
+    closing () {
+      this.$log('reset start')
+      this.newPhone = null
+      this.$refs.changeEmail.toggle()
+    },
     async changeEmail () {
       try {
         this.$log('changeEmail start')
