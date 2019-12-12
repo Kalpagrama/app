@@ -26,13 +26,18 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
             :style=`{position: 'absolute', left: 0, top: 0, height: '50px',
               width: (cut.points[0].x/duration)*100+'%',
               opacity: 0.6, pointerEvents: 'none'}`).row.bg-black
-          //- middle fragmens
+          //- middle fragments
           div(
             v-if="cut"
             :style=`{position: 'absolute', zIndex: 100, height: '50px', top: '0px',
               left: (cut.points[0].x/duration)*100+'%',
               width: ((cut.points[1].x-cut.points[0].x)/duration)*100+'%',
               borderRadius: '4px', border: '4px solid '+ $randomColor(cut.type), pointerEvents: 'none'}`).row
+          div(
+            v-if="true"
+            :style=`{position: 'absolute', zIndex: 99, height: '50px', top: '0px',
+              left: (now/duration)*100+'%',
+              width: '5px', pointerEvents: 'none'}`).row.bg-yellow
           //- cut start
           div(
             v-if="cut"
@@ -61,7 +66,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
 <script>
 export default {
   name: 'ncFveCutPan',
-  props: ['width', 'player', 'node', 'fragment', 'cut'],
+  props: ['width', 'player', 'node', 'fragment', 'cut', 'now'],
   data () {
     return {
       framesWidth: 0

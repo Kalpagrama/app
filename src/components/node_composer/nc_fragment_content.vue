@@ -69,7 +69,7 @@ export default {
           break
         }
         case 'fragment': {
-          this.$emit('fragment', type)
+          this.$emit('fragment', item)
           break
         }
       }

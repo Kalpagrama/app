@@ -78,26 +78,26 @@ export const wsNodeSave = async (context, node) => {
   // }
 
   // checks
-  // {
-  //   assert.ok(node.categories.length >= 0)
-  //   assert.ok(node.spheres.length >= 0)
-  //   assert.ok(node.fragments.length >= 0)
-  //   assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
-  //   // assert.ok(node.content)
-  //   for (let fr of node.fragments) {
-  //     assert.ok(fr.cuts.length >= 0)
-  //     assert.ok(fr.scale > 0)
-  //     for (let c of fr.cuts) {
-  //       assert.ok(c.color)
-  //       assert.ok(c.thumbUrl)
-  //       assert.ok(c.points && c.points.length === 2)
-  //       let start = c.points[0].x
-  //       let end = c.points[1].x
-  //       assert.ok(start >= 0 && end > 0)
-  //       assert.ok(end > start && end <= fr.scale)
-  //     }
-  //   }
-  // }
+  {
+    assert.ok(node.categories.length >= 0)
+    assert.ok(node.spheres.length >= 0)
+    assert.ok(node.fragments.length >= 0)
+    assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
+    for (let fr of node.fragments) {
+      assert.ok(fr.content)
+      assert.ok(fr.cuts.length >= 0)
+      assert.ok(fr.scale > 0)
+      for (let c of fr.cuts) {
+        assert.ok(c.color)
+        assert.ok(c.thumbUrl)
+        assert.ok(c.points && c.points.length === 2)
+        let start = c.points[0].x
+        let end = c.points[1].x
+        assert.ok(start >= 0 && end > 0)
+        assert.ok(end > start && end <= fr.scale)
+      }
+    }
+  }
 
   let nodeInput = {}
   nodeInput.layout = node.layout
@@ -130,6 +130,7 @@ export const wsNodeSave = async (context, node) => {
     fr.oid = fr.content.oid
     delete fr.content
   }
+  delete node.meta
   logD('wsNodeSave nodeInput', node)
   let res
   if (node.oid) {
@@ -143,12 +144,12 @@ export const wsNodeSave = async (context, node) => {
         }
       `,
       variables: {
-        oid: node.oid,
-        node: node
+        node
       }
     })
     res = wsNodeUpdate
   } else {
+    // delete node.oid
     let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
