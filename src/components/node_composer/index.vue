@@ -9,25 +9,27 @@
 }
 </style>
 <template lang="pug">
-q-layout
+q-layout(view="hHh lpR fFf").bg-grey-3
   q-dialog(ref="ncSaveDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    nc-save(:node="node" @saved="node = $event" @published="refreshAction('discard', true)" @close="$refs.ncSaveDialog.hide()")
+    nc-save(
+      :node="node"
+      @saved="node = $event, $refs.ncSaveDialog.hide()"
+      @published="refreshAction('discard', true)" @close="$refs.ncSaveDialog.hide()")
   //- footer actions
-  q-footer
-    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    q-footer(v-if="fragmentEditing < 0" reveal).bg-grey-3
       div(
-        v-if="fragmentEditing < 0"
-        :style=`{position: 'absolute', zIndex: 5000, bottom: '0px', height: '60px'}`).row.full-width.items-center.q-px-sm
-        q-btn(flat round no-caps color="grey" @click="$refs.exitDialog.show()").q-mr-sm
+        :style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+        q-btn(flat no-caps color="grey" @click="$refs.exitDialog.show()").q-mr-sm
           span {{$t('Exit')}}
-        q-btn(flat round no-caps color="grey" @click="$refs.refreshDialog.show()")
+        q-btn(flat no-caps color="grey" @click="$refs.refreshDialog.show()")
           span {{$t('Start new')}}
         .col
         transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           q-btn(
             v-if="node"
             :loading="nodeSaving"
-            push no-caps color="accent" @click="$refs.ncSaveDialog.show()"
+            push no-caps color="green" @click="$refs.ncSaveDialog.show()"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
             span.text-bold {{ $t('Preview') }}
   q-page-conainter
@@ -41,7 +43,9 @@ q-layout
         div(v-else).row.full-width.items-start.content-start.q-pa-sm
           div(v-if="node").row.full-width
             q-resize-observer(@resize="onResize")
-            nc-fragment(:width="editorWidth" :thumbUrl="false" :fragment="node.fragments[0]" :inEditor="true" :stageFirst="1"
+            nc-fragment(
+              :index="0" :width="editorWidth" :thumbUrl="false" :fragment="node.fragments[0]" :inEditor="true" :stageFirst="1"
+              @edit="fragmentEdit"
               @content="$event => fragmentCreate(0, $event)"
               @fragment="$event => fragmentSet(0, $event)"
               @delete="fragmentDelete(0)")
@@ -59,7 +63,9 @@ q-layout
                 span(
                   v-else
                   ).text-bold {{ node.name ? node.name : $t('Whats the essence?!') }}
-            nc-fragment(:width="editorWidth" :thumbUrl="false" :fragment="node.fragments[1]" :inEditor="true"
+            nc-fragment(
+              :index="1" :width="editorWidth" :thumbUrl="false" :fragment="node.fragments[1]" :inEditor="true"
+              @edit="fragmentEdit"
               @content="$event => fragmentCreate(1, $event)"
               @fragment="$event => fragmentSet(1, $event)"
               @delete="fragmentDelete(1)")
@@ -81,7 +87,6 @@ export default {
       fragmentEditing: -1,
       node: null,
       nodeNew: {
-        // oid: false,
         layout: 'PIP',
         name: '',
         fragments: [
@@ -130,10 +135,10 @@ export default {
       this.$set(this.node.fragments, index, fragment)
     },
     async fragmentEdit (index) {
-      this.$log('fragmentEdit', index)
+      this.$log('fragmentEdit', index, document.body.scrollTop)
       this.fragmentEditing = index
       if (index < 0) return
-      this.$tween.to(window, 0.3, {scrollTop: index === 0 ? 0 : window.scrollHeight})
+      this.$tween.to(document.body, 0.3, {scrollTop: index === 0 ? 0 : document.body.scrollHeight})
     },
     nodeNameEdit () {
       this.$log('nodeNameEdit')

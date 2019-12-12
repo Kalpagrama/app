@@ -1,18 +1,21 @@
 <template lang="pug">
-.column.fit.bg-white
-  node(:node="node" :nodeFullReady="node")
-  .col.full-width
-    .row.full-width
-      .row.full-width spheres
-      .row.full-width categories
-      .row.full-width options
-      .row.full-width actions...
-  .row.full-width.justify-between.q-pa-md
+.column.fit.bg-grey-3
+  q-resize-observer(@resize="onResize")
+  .col.full-width.scroll.br
+    .row.full-width.q-pa-sm
+      node(:width="width" :node="node" :nodeFullReady="node").bg-white
+    .row.full-width.q-px-sm
+      div(:style=`{borderRadius: '10px'}`).row.full-width.bg-white
+        div(:style=`{height: '60px'}`).row.full-width actions
+        div(:style=`{height: '60px'}`).row.full-width spheres
+        div(:style=`{height: '60px'}`).row.full-width categories
+  .row.full-width.justify-between.q-py-md.q-pr-sm
     q-btn(no-caps flat color="green" @click="$emit('close')")
       span {{$t('Cancel')}}
-    q-btn(push no-caps :loading="nodeSaving" color="green" @click="nodeSave")
-      span.text-white {{$t('Save')}}
-    q-btn(push no-caps :loading="nodePublishing" color="green" @click="nodePublish")
+    //- q-btn(push no-caps :loading="nodeSaving" color="green" @click="nodeSave")
+    //-   span.text-white {{$t('Save')}}
+    q-btn(push no-caps :loading="nodePublishing" color="green" @click="nodePublish()"
+      :style=`{borderRadius: '10px'}`)
       span.text-white {{$t('Publish')}}
 </template>
 
@@ -22,6 +25,7 @@ export default {
   props: ['node'],
   data () {
     return {
+      width: 0,
       nodePublishing: false,
       nodePublishingError: null,
       nodeSaving: false,
@@ -61,6 +65,9 @@ export default {
         this.nodePublishingError = e
       }
     },
+    onResize (e) {
+      this.width = e.width
+    }
   },
   mounted () {
     this.$log('mounted', this.node)

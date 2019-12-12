@@ -1,6 +1,11 @@
+<style lang="stylus">
+html, body {
+  background: #eee;
+}
+</style>
 <template lang="pug">
 div(
-  id="q-app" ref="kapp")
+  id="q-app" ref="kapp").bg-grey-3
     router-view
 </template>
 

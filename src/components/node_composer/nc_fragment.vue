@@ -15,41 +15,46 @@ div(
   nc-fragment-content(v-if="stage === 1" :width="width" @content="contentFound" @fragment="fragmentFound")
   //- stage 2
   div(v-if="stage === 2" :style=`{position: 'relative'}`).row.full-width.items-start.content-start
+    div(
+      v-if="mini" @click="$emit('mini')"
+      :style=`{position: 'absolute', zIndex: 200, opacity: 0.5}`).row.fit.bg-red
     //- cancel
     q-btn(
+      v-if="inEditor"
       round flat color="white" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
       :style=`{position: 'absolute', zIndex: 11000, left: '18px', top: '18px'}`).shadow-1
     //- boom
     q-btn(
-      v-if="!boomed"
+      v-if="inEditor && !boomed"
       push round no-caps @click="boom()"
       color="green"
       :style=`{position: 'absolute', zIndex: 200, bottom: '40px', left: 'calc(50% - 20px)'}`).shadow-5.q-mr-sm
       q-icon(name="wb_incandescent").rotate-180
     //- edit
     q-btn(
-      v-if="true"
+      v-if="inEditor"
       push round no-caps @click="editing = !editing"
       :color="editing ? 'green' : 'green'"
       :icon="editing ? 'check' : 'edit'"
       :style=`{position: 'absolute', zIndex: 200, bottom: '40px', right: '20px'}`).shadow-5
     //- preview img, node.meta.fragments[index].thumbUrl
     //- node.fragments[index].content.contentSource === 'KALPA' ? node.meta.fragments[index].thumbUrl :
+    //- previewLoaded ? 'absolute' :
     img(
       ref="ncFragmentPreview"
       @load="previewLoad"
       :src="fragment.content.thumbUrl"
-      :style=`{position: previewLoaded ? 'absolute' : 'relative', top: 0, width: '100%', maxHeight: width+'px', objectFit: 'contain', userSelect: 'none'}`
+      :style=`{position: previewLoaded ? 'relative' : 'relative', top: 0, width: width+'px', maxHeight: width+'px', objectFit: 'contain', userSelect: 'none'}`
       crossOrigin="anonymous" draggable="false")
     //- video
     div(
       v-if="previewLoaded"
-      :style=`{position: 'relative', zIndex: 100, top: 0}`).row.fit
+      :style=`{position: 'absolute', zIndex: 100, minHeight: '100%', minWidth: '100%', maxHeight: previewHeight+'px', top: 0}`).row.fit
       nc-fragment-video(
         v-if="fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
-        :fragment="fragment" :inEditor="inEditor"
+        :fragment="fragment" :inEditor="inEditor" :mini="mini"
         :width="previewWidth" :height="previewHeight")
-        template(v-if="inEditor" v-slot:editor=`{now, player}`)
+        template(v-if="inEditor && editing" v-slot:editor=`{now, player}`)
           nc-fragment-video-editor(
             v-if="$refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
             @close="editing = false"
@@ -67,7 +72,7 @@ import ncFragmentVideoEditor from './nc_fragment_video_editor'
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
-  props: ['width', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst'],
+  props: ['index', 'width', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'mini'],
   data () {
     return {
       stage: 0,
@@ -146,6 +151,9 @@ export default {
           break
         }
       }
+    },
+    setSize (...args) {
+      this.$refs.ncFragmentVideo.setSize(...args)
     },
     previewLoad (e) {
       this.$log('previewLoad', e.path[0].width, e.path[0].height)

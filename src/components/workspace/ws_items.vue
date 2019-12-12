@@ -39,9 +39,9 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
               ).row.full-width
               div(v-for="(c, ci) in f.cuts" :key="ci"
                 ).q-mr-xs
-                div(:style=`{background: $randomColor(c.type, 0.5), borderRadius: '4px'}`).q-px-sm
-                  small.text-white {{ c }}
-                  //- small.text-white {{ $time(c.start)}}-{{$time(c.end) }}
+                div(:style=`{background: c.color, borderRadius: '4px'}`).q-px-sm
+                  //- small.text-white {{ c }}
+                  small.text-white {{ $time(c.points[0].x)}}-{{$time(c.points[1].x) }}
             span(
               v-if="f.name"
               :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`

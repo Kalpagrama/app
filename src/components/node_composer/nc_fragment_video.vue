@@ -2,16 +2,23 @@
 .mejs__playpause-button {
   display: none !important
 }
+iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
 </style>
 <template lang="pug">
 div(:style=`{position: 'relative', maxWidth: '100%'}`).row.full-width
-  slot(name="actions" :now="now" :player="player")
   div(:style=`{position: 'relative'}`).row.full-width
+    //- :width="width" :height="height"
     video(
       ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="true"
-      :width="width" :height="height")
+      width="100%" height="100%" :muted="true"
+      :style=`{width: '100%', height: '100%'}`
+      ).fit
       source(:src="fragment.content.url" :type="fragment.content.contentSource === 'KALPA' ? 'video/mp4' : 'video/youtube'")
     div(
+      v-if="true" v-show="true"
       :style=`{position: 'absolute', bottom: '16px', zIndex: 105, height: '12px'}`).row.full-width.q-px-md
       //- progress width
       div(:style=`{borderRadius: '4px', overflow: 'hidden', background: 'rgba(255,255,255,0.4)'}` @click="progressClick").row.fit
@@ -20,14 +27,14 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.full-width
           ).row.full-height.bg-white.q-px-xs
       //- progress now/duration
       small(:style=`{position: 'absolute', zIndex: 105, top: '-24px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
-        ).q-px-sm.text-white {{ $time(now) }} / {{ $time(fragment.content.duration) }}
+        ).q-px-sm.text-white {{ $time(now) }} / {{ $time(fragment.content.duration) }} {{mini}}
   slot(name="editor" :now="now" :player="player")
 </template>
 
 <script>
 export default {
   name: 'ncFragmentVideo',
-  props: ['width', 'height', 'fragment', 'inEditor'],
+  props: ['width', 'height', 'fragment', 'inEditor', 'mini'],
   data () {
     return {
       now: 0,
@@ -52,6 +59,9 @@ export default {
     videoSeeked (e) {
       this.$log('videoSeeked', e)
     },
+    setSize (...args) {
+      this.player.setSize(...args)
+    },
     playerStart (width, height) {
       let me = new window.MediaElementPlayer(this.$refs.ncFragmentVideo, {
         loop: true,
@@ -59,12 +69,14 @@ export default {
         controls: false,
         // useFakeFullscreen: true,
         features: ['playpause'],
-        setDimensions: true,
+        // setDimensions: true,
         // enableKeyboard: false,
-        // enableAutosize: true,
-        // stretching: 'auto',
-        videoWidth: width,
-        videoHeight: height,
+        enableAutosize: true,
+        stretching: 'fill',
+        // videoWidth: width,
+        // videoHeight: height,
+        pauseOtherPlayers: false,
+        ignorePauseOtherPlayersOption: false,
         clickToPlayPause: true,
         success: async (mediaElement, originalNode, instance) => {
           this.player = mediaElement
