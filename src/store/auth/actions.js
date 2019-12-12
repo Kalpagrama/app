@@ -1,5 +1,6 @@
 import { apolloProvider } from 'boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { router } from 'boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
