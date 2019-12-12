@@ -19,6 +19,7 @@
           div(style=`height: 60px; width: 40px`).row.justify-center.items-center
             q-icon(name="clear" size="25px" @click="deleteSession(s.token)" color="black")
           //-  leave-active-class="animated fadeOut"
+          span {{s.token}}
           transition(appear enter-active-class="animated fadeIn")
             div(v-if="si === sessionIndex").row.full-width.justify-center
               span {{s.userAgent}}
@@ -30,7 +31,6 @@
             span.text-bold.q-ml-md {{ $t('Delete all sessions exept your') }}
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}` @click="$refs.sessions.show()").row.full-width.justify-start.items-center.q-px-md
     span {{$t('Sessions')}}
-  span {{sessions}}
 </template>
 
 <script>
@@ -39,29 +39,29 @@ export default {
   data () {
     return {
       inf: false,
-      token: '',
+      // tokenString: '',
       sessionIndex: -1
     }
   },
   computed: {
-    session () {
-      if (this.sessionIndex) return this.sessions[this.sessionIndex]
-      else return null
-    },
+    // session () {
+    //   if (this.sessionIndex) return this.sessions[this.sessionIndex]
+    //   else return null
+    // },
     sessions () {
       return this.$store.state.user.user.sessions
     }
   },
   methods: {
-    async deleteSession (s) {
-      this.token = s
+    async deleteSession (token) {
+      // this.tokenString = token
       try {
           this.$log('delete start')
-          let res = await this.$store.dispatch('auth/logout', {token: this.token})
+          let res = await this.$store.dispatch('auth/logout', token)
           this.$log('deleted done', res)
           this.$q.notify({message: 'Session deleted', color: 'green', textColor: 'white'})
         } catch (e) {
-          this.$log('delete session ERROR', this.token)
+          this.$log('delete session ERROR', token)
           this.$q.notify({message: 'Cant delete session', color: 'red', textColor: 'white'})
         }
     }
