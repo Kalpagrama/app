@@ -1,30 +1,27 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
   //- toggle nodes
-  q-btn(
-    color="accent" no-caps @click="$refs.kTongue.show()"
-    :style=`{position: 'fixed', zIndex: 1000, top: '10px', left: '10px', height: '60px', width: 'calc(100% - 20px)', borderRadius: '10px'}`)
-    span {{$t('23 Nodes to explore')}}
-  video-editor(:inCreator="false" :fragmentInput="{content: content, relativePoints: []}")
+  //- q-btn(
+  //-   color="accent" no-caps @click="$refs.kTongue.show()"
+  //-   :style=`{position: 'fixed', zIndex: 1000, top: '10px', left: '10px', height: '60px', width: 'calc(100% - 20px)', borderRadius: '10px'}`)
+  //-   span 23 Nodes to explore
+  //- video-editor(:inCreator="false" :fragmentInput="{content: content, relativePoints: []}")
   //- video nodes
-  k-tongue(ref="kTongue")
-    template(v-slot:header)
-      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md.bg-white
-        span {{$t('Explore nodes')}}
-    template(v-slot:body)
-      .row.full-width.full-height.items-start.content-start.bg-white
-        node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="sphereNodes" :variables="variables")
-          template(v-slot:items=`{items, fetchingMore}`)
-            node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
+  //- k-tongue(ref="kTongue")
+  //-   template(v-slot:header)
+  //-     div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md.bg-white
+  //-       span Explore nodes
+  //-   template(v-slot:body)
+  //-     .row.full-width.full-height.items-start.content-start.bg-white
+  //-       node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="sphereNodes" :variables="variables")
+  //-         template(v-slot:items=`{items, fetchingMore}`)
+  //-           node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
 </template>
 
 <script>
-import contentVideoNodes from './content_video_nodes'
-import videoEditor from 'components/video_editor'
-
 export default {
   name: 'contentExplorer__contentVideo',
-  components: {contentVideoNodes, videoEditor},
+  components: {},
   props: {
     content: {type: Object},
     inEditor: {type: Boolean, default () { return false }}

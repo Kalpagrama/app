@@ -154,8 +154,8 @@ export default {
       if (this.boom) {
         this.$emit('boom', [this.startResult, this.endResult])
       } else {
-        this.cut.start = this.startResult
-        this.cut.end = this.endResult
+        this.cut.points[0].x = this.startResult
+        this.cut.points[1].x = this.endResult
       }
       this.cancel()
     },
@@ -167,8 +167,8 @@ export default {
   mounted () {
     this.$log('mounted')
     if (this.cut) {
-      let arrStart = this.parseSec(this.cut.start)
-      let arrEnd = this.parseSec(this.cut.end)
+      let arrStart = this.parseSec(this.cut.points[0].x)
+      let arrEnd = this.parseSec(this.cut.points[1].x)
       this.$log('arrStart', arrStart)
       this.$log('arrEnd', arrEnd)
       this.$set(this, 'hourStart', arrStart[0])
