@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(container :style=`{height: height+'px', width: width+'px'}`).column.bg-grey-2
+q-layout(container :style=`{height: '100vh', width: '100vw'}`).column.bg-grey-2
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width.bg-white
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center

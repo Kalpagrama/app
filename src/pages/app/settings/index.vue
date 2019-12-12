@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" :container="true" :style=`{width: width+'px', height: height+'px'}`).bg-grey-3
+q-layout(view="hHh lpR fFf" :container="true" :style=`{width: '100vw', height: '100vh'}`)
   //- k-dialog-bottom(ref="accountSettings" mode="actions" :options="accountSettingsOptions" @action="accountSettingsAction")
   q-header()
     div(:style=`{height: '60px'}`).row.full-width.items-center.bg-white
@@ -121,6 +121,9 @@ export default {
       this.page = pkey
       this.right = !this.right
     }
+  },
+  mounted () {
+    this.$log('settings')
   }
 }
 </script>

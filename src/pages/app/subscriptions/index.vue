@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-grey-3
+q-layout(container :style=`{width: '100vw', height: '100vh'}`).column.bg-grey-3
   q-dialog(ref="subDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
     @hide="sub = null")
     div(@click.self="$refs.subDialog.hide()").row.fit.justify-center.items-start.q-py-xl.q-px-sm
