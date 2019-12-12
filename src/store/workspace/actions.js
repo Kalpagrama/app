@@ -55,28 +55,6 @@ export const wsSphereDelete = async (context, oid) => {
 export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave start', node)
 
-  // let nodeFull = {
-  //   layout: 'PIP', // "PIP", "SLIDER", "VERTICAL", "HORIZONTAL"
-  //   name: '',
-  //   fragments: [
-  //     {
-  //       name: '',
-  //       thumbUrl: '',
-  //       scale: 1000,
-  //       cuts: [
-  //         {
-  //           name: '',
-  //           color: '', // cutCreate () => {color: $randomColor(Date.now().toString())}
-  //           thumbUrl: '',
-  //           points: [{ x: 0 }, { x: 20, y: null }],
-  //           style: null
-  //         }
-  //       ]
-  //     }
-  //   ],
-  //   content: {}
-  // }
-
   // checks
   {
     assert.ok(node.categories.length >= 0)
@@ -89,7 +67,7 @@ export const wsNodeSave = async (context, node) => {
       assert.ok(fr.scale > 0)
       for (let c of fr.cuts) {
         assert.ok(c.color)
-        assert.ok(c.thumbUrl)
+        // assert.ok(c.thumbUrl)
         assert.ok(c.points && c.points.length === 2)
         let start = c.points[0].x
         let end = c.points[1].x
@@ -104,34 +82,31 @@ export const wsNodeSave = async (context, node) => {
   nodeInput.name = node.name
   nodeInput.categories = node.categories
   nodeInput.spheres = node.spheres
-  nodeInput.fragments = node.fragments.map((f, fi) => {
+  nodeInput.fragments = node.fragments.map(f => {
     return {
       oid: f.content.oid,
       name: f.name,
       thumbUrl: f.thumbUrl,
-      relativeScale: f.scale,
-      relativePoints: f.cuts.reduce((acc, c) => {
-        acc.push(...c.points)
-        return acc
-      }, [])
+      scale: f.scale,
+      cuts: f.cuts.map(c => {
+        return {
+          name: c.name,
+          color: c.color,
+          thumbUrl: c.thumbUrl,
+          points: c.points.map(p => {
+            return {
+              x: p.x,
+              y: p.y,
+              z: p.z
+            }
+          }),
+          style: c.style
+        }
+      })
     }
   })
-  nodeInput.meta = {
-    layout: node.layout,
-    fragments: node.fragments.map((f, fi) => {
-      return {
-        thumbUrl: f.thumbUrl,
-        relativeCuts: f.cuts
-      }
-    })
-  }
 
-  for (let fr of node.fragments){
-    fr.oid = fr.content.oid
-    delete fr.content
-  }
-  delete node.meta
-  logD('wsNodeSave nodeInput', node)
+  logD('wsNodeSave nodeInput', nodeInput)
   let res
   if (node.oid) {
     let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
@@ -144,12 +119,11 @@ export const wsNodeSave = async (context, node) => {
         }
       `,
       variables: {
-        node
+        oid: node.oid, node: nodeInput
       }
     })
     res = wsNodeUpdate
   } else {
-    // delete node.oid
     let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
@@ -160,7 +134,7 @@ export const wsNodeSave = async (context, node) => {
         }
       `,
       variables: {
-        node: node
+        node: nodeInput
       }
     })
     res = wsNodeCreate
