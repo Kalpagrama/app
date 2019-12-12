@@ -24,7 +24,8 @@ export const logout = async (context, token) => {
       token
     }
   })
-  if (!token || token === localStorage.getItem('ktoken')) {
+  let currentToken = localStorage.getItem('ktoken').split('::')[0]
+  if (!token || token === currentToken) {
     localStorage.removeItem('ktoken')
     localStorage.removeItem('ktokenExpires')
     router.push('/login')

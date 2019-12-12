@@ -69,7 +69,8 @@ export function setObjectValue (state, { oid, path, value }) {
 
 export function deleteUserSession (state, token) {
   if (!token) { // удалить все кроме текущей
-    let indx = state.currentUser.sessions.findIndex(sess => sess.token === localStorage.getItem('ktoken'))
+    let currentToken = localStorage.getItem('ktoken').split('::')[0]
+    let indx = state.currentUser.sessions.findIndex(sess => sess.token === currentToken)
     if (indx >= 0) state.currentUser.sessions = [state.currentUser.sessions[indx]]
   } else {
     let indx = state.currentUser.sessions.findIndex(sess => sess.token === token)
