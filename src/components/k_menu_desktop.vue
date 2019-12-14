@@ -6,16 +6,16 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
   k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
   div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-secondary
-    div(@click="$go('/app/home')").col.row.items-center
+    div(@click="$go('/')").col.row.items-center
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         k-logo(:width="40" :height="40")
       div(v-if="!mini").col.full-height
         .row.fit.items-center
           span.text-bold.text-white {{$t('Кальпаграмма ver:') + $store.state.core.version}}
-    div(@click="$go('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+    div(@click="$go('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
-  div(:style=`{height: '60px'}` @click="$go(`/app/user/` + $store.state.objects.currentUser.oid)").row.full-width.bg-secondary
+  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.state.objects.currentUser.oid)").row.full-width.bg-secondary
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(
         v-show="!userAvatarErrored"
@@ -28,7 +28,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         ).row.bg-grey-3
     div(v-if="!mini").col.full-height
       .row.fit.items-center
-        span.text-bold.text-white {{ $t($store.state.objects.currentUser.name) }}
+        span.text-bold.text-white.cursor-pointer {{ $t($store.state.objects.currentUser.name) }}
   //- create node
   div(v-if="!page" :style=`{height: '60px'}` @click="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])").row.full-width.items-center.cursor-pointer
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
@@ -49,7 +49,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
             span.text-white {{ $t(p.name) }}
     div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       q-btn(
-        :round="mini" push color="accent" no-caps icon="person_add" @click="$go('/app/invite')"
+        :round="mini" push color="accent" no-caps icon="person_add" @click="$go('/invite')"
         :style=`mini ? {} : {height: '60px', borderRadius: '10px'}`).full-width
         span(v-if="width === 230").text-bold.q-ml-md {{ $t('Invite friend') }}
     div(v-if="!this.$store.state.core.installPrompt || true" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm

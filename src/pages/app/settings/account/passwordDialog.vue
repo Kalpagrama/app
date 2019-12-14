@@ -1,20 +1,20 @@
 <template lang="pug">
 .row.full-width
   //- Password
-  q-dialog(ref="changePassword" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
-    div(style=`height: 60px`).row.items-center.bg-primary
-      div(style=`height: 60px; width: 60px`).row.justify-center.items-center
-        q-btn(round flat icon="arrow_back" color="white" @click="closing()")
-      .col.row.justify-start.items-center.q-px-sm
-        span.text-bold.text-white {{$t('Changing password')}}
-        .col
-      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        q-icon(
-          :name="isPwd ? 'visibility_off' : 'visibility'"
-          size="25px"
-          color="white"
-          @click="isPwd = !isPwd")
+  q-dialog(ref="changePassword" :maximized="$q.screen.xs" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     .column.bg-white.q-px-md
+      div(style=`height: 60px`).row.items-center
+        div(style=`height: 60px; width: 60px`).row.justify-center.items-center
+          q-btn(round flat icon="arrow_back" color="primary" @click="closing()")
+        .col.row.justify-start.items-center.q-px-sm
+          span.text-bold {{$t('Changing password')}}
+          .col
+        div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+          q-icon(
+            :name="isPwd ? 'visibility_off' : 'visibility'"
+            size="25px"
+            color="primary"
+            @click="isPwd = !isPwd")
       .row.content-start.justify-center
         //- q-input(v-model="currentPas" stack-label label="Current password" filled).full-width.q-my-md
         q-input(v-model="newPas" ref="password" stack-label label="New password" filled :type="isPwd ? 'password' : 'text'").full-width.q-my-md
@@ -23,8 +23,9 @@
           v-if="newPas === repPas && newPas"
           push no-caps dense color="accent" @click="changePassword()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width {{ $t('Change password') }}
-        small.text-accent.q-px-xs.q-mt-sm Пароль должен состоять не менее чем из 6 символов, включающих буквы разных регистров, цифр и спецсимволов!
-  div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePassword.show()").row.full-width.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
+        .row.full-width.q-py-sm
+          small.text-grey-8.q-px-xs.q-mt-sm Пароль должен состоять не менее чем из 6 символов, включающих буквы разных регистров, цифр и спецсимволов!
+  div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePassword.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
       span {{$t('Change password')}}
       div(v-if="!currentPassword").row.full-width.items-center

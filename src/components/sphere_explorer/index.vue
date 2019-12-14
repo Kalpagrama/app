@@ -66,7 +66,7 @@ export default {
   methods: {
     sphereClick (s, si) {
       this.$logD('sphereClick', s, si)
-      this.$router.push(`/app/sphere/${s.oid}`)
+      this.$router.push(`/sphere/${s.oid}`)
     },
     async spheresLoad (oid) {
       this.$logD('spheresLoad start', oid)

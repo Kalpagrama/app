@@ -102,10 +102,10 @@ export default {
     }
   },
   mounted () {
-    this.$logD('mounted')
+    // this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    // this.$logD('beforeDestroy')
   }
 }
 </script>

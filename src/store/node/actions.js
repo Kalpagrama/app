@@ -89,7 +89,9 @@ export const nodeCreate = async (context, node) => {
   nodeInput.layout = node.layout
   nodeInput.name = node.name
   nodeInput.categories = node.categories
-  nodeInput.spheres = node.spheres
+  nodeInput.spheres = node.spheres.map(s => {
+    return {name: s.name}
+  })
   nodeInput.fragments = node.fragments.map(f => {
     return {
       oid: f.content.oid,

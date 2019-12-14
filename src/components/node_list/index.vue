@@ -61,6 +61,8 @@ export default {
       if (isVisible) {
         this.$log('nodeVisible', isVisible, entry.target.accessKey)
         this.nodeOidVisible = parseInt(entry.target.accessKey)
+      } else {
+        if (this.nodeOidVisible === entry.target.accessKey) this.nodeOidVisible = undefined
       }
     },
     nodeClick (n, ni) {

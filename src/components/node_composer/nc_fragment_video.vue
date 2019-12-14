@@ -8,22 +8,23 @@ iframe {
 }
 </style>
 <template lang="pug">
-div(:style=`{position: 'relative', maxWidth: '100%'}`).row.full-width
+div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   //- play/pause for inList
   div(
     v-if="ctx !== 'inEditor'" @click="videoToggle()"
     :style=`{position: 'absolute', zIndex: 103, opacity: 0.5}`).row.fit.items-center.justify-center
     q-btn(v-if="!playing" round flat icon="play_arrow" color="white" size="60px")
-  video(
-    ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="true"
-    @play="playing = true" @pause="playing = false"
-    width="100%" height="100%" :muted="false"
-    :style=`{width: '100%', height: '100%'}`
-    ).fit
-    //- fragment.content.contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'
-    source(
-      :src="ctx === 'inEditor' ? fragment.content.url : fragment.url"
-      :type="ctx === 'inEditor' ? 'video/youtube' : 'video/mp4'")
+  div(:style=`{position: 'relative'}`).row.fit
+    video(
+      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="true"
+      @play="playing = true" @pause="playing = false"
+      width="100%" height="100%" :muted="false"
+      :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
+      ).fit
+      //- fragment.content.contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'
+      source(
+        :src="ctx === 'inEditor' ? fragment.content.url : fragment.url"
+        :type="ctx === 'inEditor' ? 'video/youtube' : 'video/mp4'")
   //- progress
   div(
     v-if="player && ctx === 'inEditor'"

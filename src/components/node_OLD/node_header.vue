@@ -3,7 +3,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
   //- author avatar
   router-link(
     v-if="nodeFull"
-    :to="`/app/user/${nodeFull.author.oid}`"
+    :to="`/user/${nodeFull.author.oid}`"
     :style=`{width: '38px', height: '38px', borderRadius: '50%', overflow: 'hidden'}`).row.cursor-pointer
     img(:src="nodeFull.author.thumbUrl[0]" width="100%" height="100%")
   div(
@@ -11,7 +11,7 @@ div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
     :style=`{width: '38px', height: '38px', borderRadius: '50%', overflow: 'hidden'}`).row.bg-grey-5
   //- author name
   .col.q-pl-sm
-    router-link(v-if="nodeFull" :to="`/app/user/${nodeFull.author.oid}`")
+    router-link(v-if="nodeFull" :to="`/user/${nodeFull.author.oid}`")
       span(v-if="nodeFull").q-mr-xs {{$t(nodeFull.author.name)}}
   //- actions
   div
@@ -54,7 +54,7 @@ export default {
         case 'to_node': {
           this.$logD('handleAction', a.id)
           await this.$wait(200)
-          this.$router.push(`/app/node/${this.node.oid}`)
+          this.$router.push(`/node/${this.node.oid}`)
           break
         }
         case 'to_workspace': {

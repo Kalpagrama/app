@@ -8,12 +8,12 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
       :thumbUrl="node.meta.fragments[0].thumbUrl"
       @previewLoaded="previewHeight = $event, $emit('previewLoaded', $event)"
       :width="width" :fragment="nodeFull ? nodeFull.fragments[0] : null" :mini="false")
-    //- nc-fragment(
-    //-   ref="fBottom"
-    //-   :ctx="ctx"
-    //-   :thumbUrl="node.meta.fragments[1].thumbUrl"
-    //-   :width="fWidth" :fragment="nodeFull ? nodeFull.fragments[1] : null" :mini="fMini" @mini="fragmentMini"
-    //-   :style=`{position: 'absolute', zIndex: 200, maxWidth: fWidth+'px', right: fRight+'px', bottom: fBottom+'px'}`)
+    nc-fragment(
+      ref="fBottom"
+      :ctx="ctx"
+      :thumbUrl="node.meta.fragments[1].thumbUrl"
+      :width="fWidth" :fragment="nodeFull ? nodeFull.fragments[1] : null" :mini="fMini" @mini="fragmentMini"
+      :style=`{position: 'absolute', zIndex: 200, maxWidth: fWidth+'px', right: fRight+'px', bottom: fBottom+'px'}`)
   //- name
   div(
     ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
@@ -30,7 +30,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
         position: 'absolute', left: voteLeft+'px', zIndex: 200,
         height: '60px', width: '90px'}`
         ).row.items-center.justify-center
-      div(:style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.items-center.justify-center.bg-primary
+      div(:style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.items-center.justify-center.bg-primary.cursor-pointer
         q-icon(name="blur_on" color="white" size="30px")
     div(
       v-if="votePanning"
@@ -113,10 +113,10 @@ export default {
       } else {
         this.$log('fragmentMini START')
         this.$tween.to(this, 0.6, {
-          fBottom: -(this.previewHeight + 60),
-          fWidth: this.width - 16,
+          fBottom: -(this.$el.clientHeight - 60),
+          fWidth: this.$el.clientWidth,
           fRight: 0,
-          fMarginTop: this.previewHeight,
+          fMarginTop: this.$el.clientHeight - 120,
           onComplete: async () => {
             this.$log('fragmentMini DONE')
             // this.fPosition = 'relative'

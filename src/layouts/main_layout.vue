@@ -61,7 +61,7 @@ export default {
       if (token) {
         localStorage.setItem('ktoken', token)
         localStorage.setItem('ktokenExpires', expires)
-        this.$router.push('/app/home')
+        this.$router.push('/')
       }
       // check user
       let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({

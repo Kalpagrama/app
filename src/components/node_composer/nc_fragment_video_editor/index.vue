@@ -245,8 +245,12 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
-    if (this.cuts.length > 0 && true) this.cutIndex = 0
+    this.$log('mounted', this.cuts.length)
+    if (this.cuts.length > 0) {
+      this.cutIndex = 0
+      this.player.setCurrentTime(this.cut.points[0].x)
+      // this.cutPlay(this.cut, 0)
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -46,14 +46,14 @@ div(
       @load="previewLoad"
       :src="ctx === 'inEditor' ? fragment.content.thumbUrl : thumbUrl"
       crossOrigin="anonymous" draggable="false"
-      :style=`{position: 'relative', top: 0, maxHeight: 500+'px', minHeight: mini ? '0px' : '200px', objectFit: 'contain', userSelect: 'none'}`
+      :style=`{position: 'relative', top: 0, maxHeight: 500+'px', minHeight: '100%', objectFit: 'contain', userSelect: 'none'}`
       ).full-width
-    //- video
+    //- video maxHeight: previewHeight+'px', minHeight: mini ? '0px' : '200px',
     div(
       v-if="fragment && fragment.content"
-      :style=`{position: 'absolute', zIndex: 100, top: 0, minHeight: '100%', minWidth: '100%', maxHeight: previewHeight+'px', top: 0}`).row.fit
+      :style=`{position: 'absolute', zIndex: 100, top: 0, minHeight: '100%', minWidth: '100%'}`).fit
       nc-fragment-video(
-        v-if="fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
+        v-if="previewLoaded && fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
         :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini"
         :width="previewWidth" :height="previewHeight")
   nc-fragment-video-editor(
@@ -179,7 +179,9 @@ export default {
       this.editing = true
       switch (this.fragment.content.type) {
         case 'VIDEO': {
-          this.$refs.ncFragmentVideoEditor.boom()
+          this.$nextTick(() => {
+            this.$refs.ncFragmentVideoEditor.boom()
+          })
           break
         }
       }
@@ -190,6 +192,7 @@ export default {
     previewLoad (e) {
       this.$log('previewLoad', e.path[0].width, e.path[0].height)
       this.$emit('previewLoaded', e.path[0].height)
+      this.previewLoaded = true
     },
     previewError (e) {
       this.$log('previewError', e)
@@ -223,10 +226,10 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
     clearInterval(this.previewInterval)
   }
 }

@@ -196,9 +196,9 @@ self.addEventListener('notificationclick', function (event) {
   event.notification.close()
   if (event.action === 'test') {
     logFunc('test action was clicked')
-    self.clients.openWindow('/app/trends/SCIENCE?sort=HOT')
+    self.clients.openWindow('/trends/SCIENCE?sort=HOT')
   } else {
     // Main body of notification was clicked
-    self.clients.openWindow('/app')
+    self.clients.openWindow('/')
   }
 }, false)

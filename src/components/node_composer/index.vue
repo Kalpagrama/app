@@ -135,7 +135,7 @@ export default {
     node: {
       deep: true,
       handler (to, from) {
-        // this.$log('node CHANGED', to)
+        this.$log('node CHANGED', to)
         localStorage.setItem('knode', JSON.stringify(to))
       }
     }
@@ -182,7 +182,7 @@ export default {
       this.$log('refreshAction', action)
       if (action === 'confirm') await this.nodeSave()
       this.refresh()
-      if (exit) this.$go('/app/workspace')
+      if (exit) this.$router.push('/workspace')
     },
     refresh () {
       this.$log('refresh')

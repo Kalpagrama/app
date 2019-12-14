@@ -2,6 +2,13 @@
 .q-header {
   background: none !important;
 }
+.mejs__playpause-button {
+  display: none !important
+}
+iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
 </style>
 <template lang="pug">
 q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
@@ -18,15 +25,16 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
     k-menu-mobile(:style=`{maxWidth: '500px'}`)
   q-page-conainter
     .row.full-width.justify-center.items-start.content-start
-      div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
-        .row.full-width.items-start.content-start
-          node(
-            v-if="node"
-            :ctx="'inEditor'"
-            :width="width" :node="node" :nodeFullReady="node"
-            @nodeClick="nodeClick"
-            @previewLoaded="previewHeight = $event").bg-white.q-mb-md
-        div(:style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+          .row.full-width.items-start.content-start
+            node(
+              v-if="node" ref="neNode"
+              :ctx="'inEditor'"
+              :width="width" :node="node" :nodeFullReady="node"
+              @previewLoaded="previewHeight = $event").bg-white.q-mb-md
+      div(:style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
+        div(:style=`{maxWidth: '500px'}`).row.full-width.q-pa-sm
           node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
             template(v-slot:default=`{nodes}`)
               node-list(:nodes="nodes" @nodeClick="nodeClick")
@@ -86,6 +94,10 @@ export default {
           let node = this.$store.state.node.node
           if (node) this.node = node
           else this.node = await this.nodeLoad(to.params.oid)
+          await this.$wait(500)
+          this.$nextTick(() => {
+            this.$refs.neNode.fragmentMini()
+          })
         }
       }
     }

@@ -1,15 +1,17 @@
 <template lang="pug">
 .column.bg-white.fit
-  q-input(v-model="nameFirst" stack-label label="First name" filled).full-width.q-mt-sm
-  q-input(v-model="nameSecond" stack-label label="Second name" filled).full-width
-  q-select(filled v-model="country" :options="countries" :label="$t('Country')")
-  q-select(filled v-model="gender" :options="genders" :label="$t('Gender')")
-  q-select(filled v-model="lang" :options="langs" :label="$t('Lang')")
-  phoneDialog
-  emailDialog
-  passwordDialog
-  div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-px-md
-    q-btn(@click="save()" round icon="done" size="lg" color="accent").q-mb-md
+  .row.full-width.q-px-sm
+    q-input(v-model="nameFirst" stack-label label="First name").full-width.q-mt-sm
+    q-input(v-model="nameSecond" stack-label label="Second name").full-width
+    q-select( v-model="country" :options="countries" :label="$t('Country')").full-width
+    q-select( v-model="gender" :options="genders" :label="$t('Gender')").full-width
+    q-select( v-model="lang" :options="langs" :label="$t('Lang')").full-width
+    phoneDialog
+    emailDialog
+    passwordDialog
+  div(:style=`{height: '60px'}`).row.full-width.justify-end.items-center.content-center.q-px-md
+    q-btn(@click="save()" push no-caps  color="green")
+      span.text-bold {{ $t('Save') }}
 </template>
 
 <script>

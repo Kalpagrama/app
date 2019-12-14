@@ -1,58 +1,67 @@
+<style lang="stylus">
+.q-footer {
+  background: none !important
+}
+</style>
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
+q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  div(v-if="user").row.full-width.content-start
-    //- header
-    div(:style=`{height: '100px'}`).row.full-width.bg-primary
-      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-      .col
-      .row
-        div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-          q-btn(round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-        //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
-          q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
-    //- body
-    div(v-if="true").row.full-width.bg-grey-1.q-px-sm
-      //- <input type="file" @change="previewFiles" multiple>
-      .row.full-width
-        img(:src="user.thumbUrl" @click="$refs.userPhotoDialog.show()" :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`)
-        div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
-          q-btn(
-            rounded no-caps
-            @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
-            :label="include ? 'Unfollow' : 'Follow'"
-            :color="include ? 'red' : 'accent'"
-            ).q-px-md
-      .row.full-width.items-center.justify-start
-        .row.full-width
-          span.text-bold.text-black.text-h6 {{ user.name }}
-        .row.full-width
-          .row.full-width.q-py-sm
-            small.text-grey {{$t('Status')}}
-          //- .row.full-width.q-mt-xs
-          //-   small About
-        div(v-if="false" @click="showInfo()").row.full-width
-          span.text-accent {{$t('Show detailed information')}}
-          //- span {{ user.subscriptions }}
-  div(
-    v-if="user"
-    :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
-    k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
-      template(v-slot:created)
-        //- user-created-nodes()
-        h2.text-center.text-bold ВАНЯ НЕ СДЕЛАЛ
-      template(v-slot:rated)
-        //- user-rated-nodes()
-        h2.text-center.text-bold ВАНЯ НЕ СДЕЛАЛ
-      template(v-slot:following)
-        user-following(:subscriptions="user.subscriptions" :oid="user.oid")
-      template(v-slot:followers)
-        user-followers(:subscribers="user.subscribers" :oid="user.oid")
-  div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width
-    k-menu-mobile
+  q-header.row.full-width.justify-center
+    div(:style=`{maxWidth: '500px'}`).row.full-width
+      div(v-if="user").row.full-width.content-start
+        //- header
+        div(:style=`{height: '100px'}`).row.full-width.bg-primary
+          div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+            q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+          .col
+          .row
+            div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+              q-btn(round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+            //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
+              q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
+        //- body
+        div(v-if="true").row.full-width.q-px-sm
+          //- <input type="file" @change="previewFiles" multiple>
+          .row.full-width
+            img(:src="user.thumbUrl" @click="$refs.userPhotoDialog.show()"
+              :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
+            div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
+              q-btn(
+                rounded no-caps
+                @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
+                :label="include ? 'Unfollow' : 'Follow'"
+                :color="include ? 'red' : 'accent'"
+                ).q-px-md
+          .row.full-width.items-center.justify-start
+            .row.full-width
+              span.text-bold.text-h6.text-white {{ user.name }}
+            .row.full-width
+              .row.full-width.q-py-sm
+                small.text-grey Status
+              //- .row.full-width.q-mt-xs
+              //-   small About
+            div(v-if="false" @click="showInfo()").row.full-width
+              span.text-accent Show detailed information
+              //- span {{ user.subscriptions }}
+  q-page-container
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '500px'}`).row.full-width
+        div(
+          v-if="user"
+          :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
+          k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
+            template(v-slot:created)
+              user-created-nodes()
+            template(v-slot:rated)
+              user-created-nodes()
+            template(v-slot:following)
+              user-following(:subscriptions="user.subscriptions" :oid="user.oid")
+            template(v-slot:followers)
+              user-followers(:subscribers="user.subscribers" :oid="user.oid")
+  q-footer.row.full-width.justify-center
+    k-menu-mobile(:style=`{maxWidth: '500px'}`)
 </template>
 
 <script>
