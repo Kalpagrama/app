@@ -207,13 +207,13 @@ function notifyUserActionComplete (eventType, object) {
         noDismiss: true,
         handler: () => {
           // app/workspace/fragments
-          let route = '/app/home'
+          let route = '/'
           if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
-            route = `/app/content/${object.oid}`
+            route = `/content/${object.oid}`
           } else if (['NODE'].includes(object.type)) {
-            route = `/app/node/${object.oid}`
+            route = `/node/${object.oid}`
           } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
-            route = `/app/sphere/${object.oid}`
+            route = `/sphere/${object.oid}`
           } else {
             throw new Error(`bad object ${JSON.stringify(object)}`)
           }

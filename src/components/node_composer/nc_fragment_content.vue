@@ -4,11 +4,11 @@
 div(
   :style=`{position: 'relative', height: 200+'px',
     borderRadius: '10px', oveflow: 'hidden',
-    border: urlInputFocused ? '2px solid #789dff' : '3px solid #eee'}`
-    ).row.full-width.items-center.justify-center.bg-grey-1
+    border: urlInputFocused ? '2px solid #52b156' : '2px solid #eee'}`
+    ).row.full-width.items-center.justify-center.bg-white
   q-dialog(ref="ncFragmentContentWsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    div(@click.self="$refs.ncFragmentContentWsDialog.hide()").row.fit.items-end.content-end
-      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).column.fit.bg-grey-3
+    div(@click.self="$refs.ncFragmentContentWsDialog.hide()").row.fit.items-end.content-end.justify-center
+      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: '500px'}`).column.fit.bg-grey-3
         .col.full-width
           ws-items(:types="['fragments', 'contents']" @itemClick="wsItemClick")
   div(
@@ -22,10 +22,10 @@ div(
     input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
     q-input(
       ref="urlInput"
-      v-model="url" color="accent" invert
+      v-model="url" color="green" invert
       @paste="urlPasted" @focus="urlInputFocused = true" @blur="urlInputFocused = false"
       :loading="urlInputLoading"
-      :placeholder="$t('Paste URL or upload a file')"
+      :placeholder="$t('Paste URL')"
       :style=`{}`
       :input-style=`{paddingLeft: '0px', paddingRight: '0px'}`).full-width
       template(v-slot:prepend)
@@ -125,9 +125,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // this.$nextTick(() => {
-    //   this.$refs.urlInput.focus()
-    // })
+    this.$nextTick(() => {
+      this.$refs.urlInput.focus()
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

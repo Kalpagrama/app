@@ -9,7 +9,7 @@
       //- div(
       //-   v-for="n in 100" :key="n"
       //-   :style=`{width: '50px', height: '50px'}`).row.bg-red hello
-      div(v-for="(n, ni) in nodes" :key="n.oid" @click="$router.push(`/app/node/${n.oid}`)"
+      div(v-for="(n, ni) in nodes" :key="n.oid" @click="$router.push(`/node/${n.oid}`)"
         :style=`{borderRadius: '8px', overflow: 'hidden'}`
           ).row.items-start.content-start.bg-white.q-mb-xl
         div(:style=`{overflow: 'hidden', ...getRadius}`).row.full-width

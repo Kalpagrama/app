@@ -1,13 +1,11 @@
 const routes = [
-  { path: '/', redirect: '/app' },
   {
-    path: '/app',
-    redirect: '/app/home',
+    path: '/',
     component: () => import('layouts/main_layout'),
     children: [
       // mobile
-      { name: 'home', path: 'home/:sphere?/:sort?', component: () => import('components/node_pin') },
-      { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('components/node_pin') },
+      { name: 'home', path: '', component: () => import('pages/app/home') },
+      { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('pages/app/home') },
       { name: 'create', path: 'create/:page?', component: () => import('components/node_composer') },
       { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
       { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },

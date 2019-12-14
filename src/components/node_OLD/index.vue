@@ -84,7 +84,7 @@ export default {
         }
         case 'contentExplore': {
           this.$logD('CONTENT EXPLORE')
-          this.$router.push(`/app/content/${this.actionFragment.content.oid}`)
+          this.$router.push(`/content/${this.actionFragment.content.oid}`)
           break
         }
         case 'confirm': {

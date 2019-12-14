@@ -1,8 +1,8 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" :container="true" :style=`{width: '100vw', height: '100vh'}`)
+q-layout(view="hHh lpR fFf" :container="true" :style=`{width: $q.screen.width+'px', height: '100vh'}`).bg-grey-3
   //- k-dialog-bottom(ref="accountSettings" mode="actions" :options="accountSettingsOptions" @action="accountSettingsAction")
-  q-header()
-    div(:style=`{height: '60px'}`).row.full-width.items-center.bg-white
+  q-header().row.full-width.justify-center.bg-white
+    div(:style=`{height: '60px', maxWidth: '500px'}`).row.full-width.items-center.bg-white
       div(:style=`{height: '60px', width: '60px'}` @click="mainPage()").row.items-center.justify-center
         q-btn(round flat color="primary" icon="arrow_back")
       .col.full-height
@@ -20,27 +20,29 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: '100vw', height: '
         ).row.full-width.items-center.cursor-pointer.q-px-md
           span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
   q-page-container
-    q-page
-      div(:style=`{height: height-60+'px'}`).row
-        .col.full-height
-          notifications(v-if="page === 'notifications'")
-          account(v-if="page === 'account'" ref="accountSettings" @cancel="page = 'settings'")
-          security(v-if="page === 'security'")
-          //- payments(v-if="page === 'payments'")
-          privacy(v-if="page === 'privacy'")
-          blacklist(v-if="page === 'blacklist'")
-          information(v-if="page === 'information'")
-          //- div(v-else).row.fit.items-center.justify-center
-            span.text-bold 404
-          div(v-if="page === 'settings'" :style=`{}`).row.full-height.items-start.content-start.bg-grey-1.q-pt-sm
-            div(
-              v-for="(p, pkey) in pages" :key="pkey" @click="pageClick(p, pkey)"
-              :style=`{height: '50px'}`
-              ).row.full-width.items-center.cursor-pointer.q-px-md
-                .row.justify-center.items-center
-                  q-icon(size="30px" color="primary" :name="p.icon")
-                .col.q-ml-sm.items-center
-                  span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
+    //- q-page
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '500px'}`).row.full-width
+        //- div(:style=`{height: height-60+'px'}`).row
+        //- .col.full-height
+        notifications(v-if="page === 'notifications'")
+        account(v-if="page === 'account'" ref="accountSettings" @cancel="page = 'settings'")
+        security(v-if="page === 'security'")
+        //- payments(v-if="page === 'payments'")
+        privacy(v-if="page === 'privacy'")
+        blacklist(v-if="page === 'blacklist'")
+        information(v-if="page === 'information'")
+        //- div(v-else).row.fit.items-center.justify-center
+          span.text-bold 404
+        div(v-if="page === 'settings'" :style=`{}`).row.full-height.items-start.content-start.bg-grey-1.q-pt-sm
+          div(
+            v-for="(p, pkey) in pages" :key="pkey" @click="pageClick(p, pkey)"
+            :style=`{height: '50px'}`
+            ).row.full-width.items-center.cursor-pointer.q-px-md
+              .row.justify-center.items-center
+                q-icon(size="30px" color="primary" :name="p.icon")
+              .col.q-ml-sm.items-center
+                span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
 </template>
 
 <script>

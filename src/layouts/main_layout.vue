@@ -8,6 +8,7 @@
   //- k-spinner(v-if="loading")
   //- q-resize-observer(@resize="onResize")
   //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
+transition(appear enter-active-class="animated fadeIn")
   router-view(v-if="!loading")
 </template>
 
@@ -59,7 +60,7 @@ export default {
     if (token) {
       localStorage.setItem('ktoken', token)
       localStorage.setItem('ktokenExpires', expires)
-      await this.$router.push('/app/home')
+      await this.$router.push('/')
     }
     if (!await this.$store.dispatch('init')) {
       this.$logD('GO LOGIN')

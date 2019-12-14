@@ -1,7 +1,7 @@
 <template lang="pug">
 .column.fit.bg-primary
   .row.full-width.items-center
-    .row.full-width.bg-primary.items-center.q-py-sm
+    div(:style=`{height: '500px'}`).row.full-width.bg-primary.items-center.content-center.q-py-sm
       k-logo(:width="100" :height="100")
       .row.full-width.justify-center.q-mt-xs
         small.text-grey {{$t('Version')}} 0.05

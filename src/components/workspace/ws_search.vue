@@ -1,20 +1,22 @@
+<style lang="stylus">
+</style>
 <template lang="pug">
-.column.fit
-  span nc_publish
+.row.full-width
+  span ws_search
 </template>
 
 <script>
 export default {
-  name: 'ncPublish',
+  name: 'wsSearch',
   data () {
     return {
     }
   },
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

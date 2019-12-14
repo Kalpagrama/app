@@ -18,7 +18,7 @@
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get code') }}
         .row.full-width.justify-start
           small.text-grey {{ $t('Example for Russia')}} +7 (921)-000-00-07
-  div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePhone.show()").row.full-width.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
+  div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePhone.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
       span {{$t("Phone number")}}
     .row.full-width
