@@ -1,5 +1,11 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.q-pa-sm
+.row.full-width.items-start.content-start
+  div(:style=`{height: '60px'}`).row.full-width.items-center
+    .col.full-height
+      .row.fit.items-center.justify-start
+        span.text-bold {{ $t('Workspace settings') }}
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+      q-btn(round flat icon="clear" color="grey" @click="$emit('close')")
   div(:style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.full-width.items-center.content-center.justify-center.bg-grey-2
     span {{$t('Some settings')}}
@@ -7,7 +13,7 @@
     q-btn(outline color="red" no-caps @click="wsClear()"
       style=`height: 60px; borderRadius: 10px; overflow: hidden`).full-width
       span.text-red {{$t('Clear my workspace')}}
-  div(:style=`{height: '400px'}`).row.full-width
+  //- div(:style=`{height: '400px'}`).row.full-width
 </template>
 
 <script>

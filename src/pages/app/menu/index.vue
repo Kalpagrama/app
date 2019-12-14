@@ -1,17 +1,23 @@
+<style lang="stylus">
+</style>
 <template lang="pug">
-.row.fit
-  k-menu-desktop(:page="true").full-width
-  div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width
-    k-menu-mobile
+q-layout(view="hHh lpR fFf").bg-secondary
+  q-page-conainter
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '500px'}`).row.full-width
+        k-menu-desktop(:page="true").full-width
+  q-footer(reveal).row.full-width.justify-center
+    div(:style=`{maxWidth: '500px'}`).row.full-width
+      k-menu-mobile
 </template>
 
 <script>
 export default {
-  name: 'pageApp__menu',
-  props: ['width', 'height'],
+  name: 'pageAppMenu',
+  props: [],
   data () {
     return {
     }
   }
- }
+}
 </script>

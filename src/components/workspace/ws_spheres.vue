@@ -1,10 +1,13 @@
 <style lang="stylus">
 </style>
-
 <template lang="pug">
 .column.fit.bg-grey-3
-  //- div(:style=`{height: '60px'}`).row.full-width.items-center
-  //-   span wsSpheres
+  div(:style=`{height: '60px'}`).row.full-width.items-center
+    .col.full-height
+      .row.fit.items-center
+        span.text-bold {{ $t('Spheres') }}
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+    q-btn(round flat icon="clear" color="grey" @click="$emit('close')")
   .col.full-width.scroll.kscroll
     .row.full-width.items-start.content-start.q-px-sm
       div(

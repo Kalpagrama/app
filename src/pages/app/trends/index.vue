@@ -1,169 +1,110 @@
 <template lang="pug">
-div(
-  ).row.fit
-  k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
-    template(v-slot:[coll])
-      k-page
-        node-loader(:query="query" queryKey="sphereNodes" :variables="variables()")
-          template(v-slot:default=`{items}`)
-            .row.full-width
-              div(:style=`{paddingBottom: '60px'}`).row.full-width.items-start.content-start.q-px-sm
-                template(
-                  v-for="(n, ni) in items").row.full-width
-                  node(
-                    @nodeNameClick="nodeNameClick" :key="n.oid"
-                    :style="n.oid === nodeOid ? nodeStyles : {}"
-                    :index="ni" :node="n" :opened="n.oid === nodeOid").q-mb-xl.ontop
-                  div(
-                    v-if="n.oid === nodeOid" :key="n.oid+'e'"
-                    :style=`{height: nodeStyles.height, borderRadius: '10px', overflow: 'hidden'}`
-                    ).row.full-width.bg-grey-3.q-mb-xl
-              div(
-                v-if="nodeOid"
-                v-touch-swipe:down="swipeDown"
-                @click.self="nodeHide()"
-                :style=`{position: 'absolute', zIndex: 10000}`).row.fit.bg-grey-3
-  //- div(
-  //-   v-if="nodeOid"
-  //-   v-touch-swipe:down="swipeDown"
-  //-   @click.self="nodeHide()"
-  //-   :style=`{position: 'absolute', zIndex: 2000, opacity: tintOpacity, '-webkit-transform': 'translate3d(0,0,0)'}`).row.fit.bg-red
+q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
+  q-header(
+    v-if="true"
+    reveal
+    ).row.full-width.justify-center.q-px-sm.bg-grey-3
+    k-colls-tabs(:style=`{maxWidth: '500px', borderRadius: '0 0 10px 10px'}`).bg-white
+  q-footer(reveal).row.full-width.justify-center.bg-grey-3
+    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+  q-page-conainter
+    div(:style=`{paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
+      div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+        //- k-colls-new
+        //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
+        node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
+          template(v-slot:default=`{nodes}`)
+            node-list(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>
-// TODO: long click on category(sphere) opens menu to manage subs
-// TODO: keep-alive k-colls friend nodes to make next coll visible
-// TODO: what happens with scroll
-// TODO: save scroll position of the page TRENDS, HOME, and maybe in node_tape
-
-import categories from './categories'
-import node from './node'
-
 export default {
-  name: 'pageApp__hot',
-  components: { categories, node },
-  props: ['width', 'height'],
+  name: 'pageAppTrends',
+  props: [],
   data () {
     return {
-      coll: undefined,
-      nodeOid: undefined,
-      nodeRect: null,
-      nodeStyles: {
-        position: 'absolute',
-        zIndex: 100000,
-        top: 0,
-        width: 0,
-        height: 0
-      },
-      tintOpacity: 0
+      width: 0,
+      coll: 'foryou',
+      colls: [
+        {id: 'foryou', name: 'For you'},
+        {id: 'following', name: 'Following'},
+        {id: 's1', name: 'How to kill'},
+        {id: 's2', name: 'How to pill'},
+        {id: 's3', name: 'How to feel'}
+      ]
     }
   },
   computed: {
-    // query () {
-    //   return gql`
-    //     query sphereNodes ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-    //       sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-    //         count
-    //         totalCount
-    //         nextPageToken
-    //         items {
-    //           oid
-    //           type
-    //           thumbUrl (preferWidth: 600)
-    //           createdAt
-    //           name
-    //           meta {
-    //             ...on MetaNode {
-    //               layout
-    //               fragments { uid width height color thumbUrl(preferWidth: 600) }
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    //   `
-    // },
     categories () {
       return this.$store.state.node.categories.reduce((acc, val) => {
         acc[val.type] = val
         return acc
       }, {})
     },
-    categoryName () {
-      let category = this.$route.params.category
-      if (category) {
-        let name = this.categories[category].name
-        return `#${name.charAt(0).toUpperCase() + name.slice(1)}`
-      } else {
-        return this.$t('Catagories')
-      }
-    },
     sphereOid () {
-      if (this.$route.params.category) return this.categories[this.$route.params.category].sphere.oid
+      if (this.$route.params.sphere) return this.categories[this.$route.params.sphere].sphere.oid
       else return false
+      // return this.categories.FUN.sphere.oid
+      // else return false
     },
-    colls () {
-      return this.$store.state.node.categories.map((c, ci) => {
-        c.id = c.sphere.oid
-        return c
-      })
-    }
-  },
-  methods: {
-    nodeNameClick (n, rect) {
-      this.$logD('nodeNameClick', n, rect)
-      this.nodeRect = rect
-      this.nodeStyles.height = rect.height + 'px'
-      this.nodeStyles.width = rect.width + 'px'
-      this.nodeStyles.maxWidth = rect.width + 'px'
-      this.nodeStyles.top = rect.top - 50 + 'px'
-      this.nodeOid = n.oid
-      this.$tween.to(this.nodeStyles, 0.6, {
-        top: '0px',
-        onComplete: () => {
-          this.$logD('nodeShow DONE')
+    query () {
+      return gql`
+        query sphereNodesTrends ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
+          sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+            count
+            totalCount
+            nextPageToken
+            items {
+              oid
+              type
+              thumbUrl (preferWidth: 600)
+              createdAt
+              name
+              meta {
+                ...on MetaNode {
+                  layout
+                  fragments { width height thumbUrl(preferWidth: 600) }
+                }
+              }
+            }
+          }
         }
-      })
-      this.$tween.to(this, 0.6, {tintOpacity: 1})
+      `
     },
-    nodeHide () {
-      this.$logD('nodeHide start')
-      this.$tween.to(this.nodeStyles, 0.6, {
-        top: (this.nodeRect.top - 50) + 'px',
-        onComplete: () => {
-          this.$logD('nodeHide DONE')
-          this.nodeOid = undefined
-        }
-      })
-      this.$tween.to(this, 0.6, {tintOpacity: 0})
-    },
-    swipeDown (e) {
-      this.$logD('swipeDown', e)
-      this.nodeHide()
-    },
-    variables (sort) {
+    variables () {
       return {
-        sphereOid: this.coll,
+        sphereOid: this.sphereOid,
         pagination: { pageSize: 100 },
-        sortStrategy: sort || 'HOT',
+        sortStrategy: 'HOT',
         filter: { types: 'NODE' }
       }
+    },
+  },
+  watch: {
+  },
+  methods: {
+    nodeClick (val) {
+      this.$log('nodeClick', val)
+      // this.$store.commit('node/stateSet', ['node', val])
+      this.$router.push('/node/' + val[0].oid)
+    },
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      // if (this.previewHeight > 0 && e.position >= this.previewHeight) {
+      //   this.showNameSticky = true
+      // } else {
+      //   this.showNameSticky = false
+      // }
+    },
+    onResize (e) {
+      this.width = e.width
     }
   },
-  created () {
-    this.$logD('created')
-    this.coll = this.colls[0].id
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>
-
-<style lang="stylus">
-.onback {
-  -webkit-transform: translate3d(0,0,1px);
-  transform: translate3d(0,0,1px);
-}
-.ontop {
-  -webkit-transform: translate3d(0,0,100px) !important;
-  transform: translate3d(0,0,100px) !important;
-}
-</style>

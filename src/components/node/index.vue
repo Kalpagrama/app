@@ -1,21 +1,29 @@
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '10px'}`).row.full-width
+div(:style=`{borderRadius: '10px'}`).row.full-width
   //- fragments
   div(:style=`{position: 'relative'}`).row.full-width
     nc-fragment(
-      :width="width" :fragment="nodeFull.fragments[0]" :mini="false")
-    nc-fragment(
-      ref="fBottom"
-      :width="fWidth" :fragment="nodeFull.fragments[1]" :mini="fMini" @mini="fragmentMini"
-      :style=`{position: 'absolute', zIndex: 200, maxWidth: fWidth+'px', right: fRight+'px', bottom: fBottom+'px'}`)
+      ref="fTop"
+      :ctx="ctx"
+      :thumbUrl="node.meta.fragments[0].thumbUrl"
+      @previewLoaded="previewHeight = $event, $emit('previewLoaded', $event)"
+      :width="width" :fragment="nodeFull ? nodeFull.fragments[0] : null" :mini="false")
+    //- nc-fragment(
+    //-   ref="fBottom"
+    //-   :ctx="ctx"
+    //-   :thumbUrl="node.meta.fragments[1].thumbUrl"
+    //-   :width="fWidth" :fragment="nodeFull ? nodeFull.fragments[1] : null" :mini="fMini" @mini="fragmentMini"
+    //-   :style=`{position: 'absolute', zIndex: 200, maxWidth: fWidth+'px', right: fRight+'px', bottom: fBottom+'px'}`)
   //- name
   div(
+    ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
     :style=`{minHeight: '60px'}`
     ).row.full-width.items-center.justify-center
-    span.text-bold.text-center {{ node.name }}
-  //- div(:style=`{}`)
+    span.text-bold.text-center.cursor-pointer {{ node.name }}
   //- actions
-  div(:style=`{position: 'relative', height: '60px', borderRadius: '10px', overflow: 'hidden', marginTop: fMarginTop+'px'}`).row.full-width.items-center
+  div(
+    v-if="ctx === 'inEditor'"
+    :style=`{position: 'relative', height: '60px', borderRadius: '10px', overflow: 'hidden', marginTop: fMarginTop+'px'}`).row.full-width.items-center
     div(
       v-touch-pan.left.right.prevent.mouse="votePan"
       :style=`{
@@ -32,6 +40,7 @@ div(:style=`{position: 'relative', borderRadius: '10px'}`).row.full-width
       span.text-bold 100
       small.text-bold / 10
     .col
+    q-btn(round flat color="grey-9" icon="keyboard_arrow_up" @click="fragmentMini()")
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat color="grey-9" icon="more_vert" @click="nodeActions")
   //- author
@@ -44,8 +53,6 @@ div(:style=`{position: 'relative', borderRadius: '10px'}`).row.full-width
   //-     .col.full-height
   //-       .row.fit.items-center
   //-         span Author
-  div(v-if="false").row.full-width.bg-red
-    small.full-width {{ nodeFull.fragments[0].cuts }}
 </template>
 
 <script>
@@ -53,7 +60,7 @@ import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'nodeNew',
-  props: ['index', 'width', 'node', 'nodeFullReady'],
+  props: ['ctx', 'index', 'width', 'node', 'needFull', 'nodeFullReady', 'visible'],
   components: {ncFragment},
   data () {
     return {
@@ -67,10 +74,19 @@ export default {
       fMini: true,
       fWidth: 100,
       fBottom: 30,
-      fRight: 10
+      fRight: 10,
+      previewHeight: 0
     }
   },
   watch: {
+    visible: {
+      immediate: false,
+      async handler (to, from) {
+        this.$log('visible CHANGED', to)
+        if (to) this.play()
+        else this.pause()
+      }
+    },
     needFull: {
       immediate: true,
       async handler (to, from) {
@@ -92,25 +108,29 @@ export default {
   },
   methods: {
     async fragmentMini () {
-      this.$log('fragmentMini START')
-      this.$tween.to(this, 0.5, {
-        fBottom: -270,
-        fWidth: this.width - 16,
-        fRight: 0,
-        fMarginTop: 210,
-        onComplete: async () => {
-          this.$log('fragmentMini DONE')
-          // this.fPosition = 'relative'
-          this.fMini = !this.fMini
-          // this.$refs.fBottom.setSize(this.width, 210)
-          // await this.$wait(600)
-        }
-      })
+      if (this.ctx === 'inList') {
+        this.$log('inList')
+      } else {
+        this.$log('fragmentMini START')
+        this.$tween.to(this, 0.6, {
+          fBottom: -(this.previewHeight + 60),
+          fWidth: this.width - 16,
+          fRight: 0,
+          fMarginTop: this.previewHeight,
+          onComplete: async () => {
+            this.$log('fragmentMini DONE')
+            // this.fPosition = 'relative'
+            this.fMini = !this.fMini
+            // this.$refs.fBottom.setSize(this.width, 210)
+            // await this.$wait(600)
+          }
+        })
+      }
     },
     votePan (e) {
       // this.$log('votePan', e)
       let to = this.voteLeft + e.delta.x
-      if (to > 0 && to <= this.width - 90 - 16) {
+      if (to > 0 && to <= 500 - 90 - 16) {
         this.voteLeft += e.delta.x
       }
       if (e.isFirst) {
@@ -124,9 +144,11 @@ export default {
     },
     play () {
       this.$log('play')
+      this.$refs.fTop.play()
     },
     pause () {
       this.$log('pause')
+      this.$refs.fTop.pause()
     },
     open () {
       this.$log('open')
@@ -149,13 +171,11 @@ export default {
       return node
     }
   },
-  async mounted () {
-    this.$log('mounted', this.node)
-    // await this.$wait(600)
-    // this.fragmentMini()
+  mounted () {
+    // this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
   }
 }
 </script>

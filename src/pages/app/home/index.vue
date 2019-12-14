@@ -1,37 +1,29 @@
 <template lang="pug">
-//- q-layout(containter :style=`{width: width+'px', minHeight: height+'px'}` @scroll="onScroll").bg-grey-3
-//-   q-dialog(ref="subscriptionsDialog" no-route-dismiss :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-//-     div(@click.self="$refs.subscriptionsDialog.hide()").row.fit.items-center.justify-center
-//-       subscriptions(
-//-         @hide="$refs.subscriptionsDialog.hide()"
-//-         :subscription="$route.params.category"
-//-         :style=`{
-//-           borderRadius: '10px', overflow: 'hidden',
-//-           maxWidth: $q.screen.width-100+'px', maxHeight: $q.screen.height-100+'px'}`)
-//-   q-page-container
-//-     node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="feed" :variables="variables")
-//-       template(v-slot:default=`{items, fetchingMore}`)
-//-         node-tape(ref="nodeFeed" name="Home" :nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()" @prefetch="$event => $refs.nodeLoader.prefetch($event)")
-k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
-  template(v-slot:foryou)
-    node-loader(ref="nodeLoader" :query="query" queryKey="feed" :variables="variables")
-      template(v-slot:default=`{items}`)
-        div(
-          v-for="(n, ni) in items" :key="ni"
-          :style=`{height: '500px'}`
-          ).row.full-width
-          span {{ n }}
+q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
+  q-header(
+    v-if="true"
+    reveal
+    ).row.full-width.justify-center.q-px-sm.bg-grey-3
+    k-colls-tabs(:style=`{maxWidth: '500px', borderRadius: '0 0 10px 10px'}`).bg-white
+  q-footer(reveal).row.full-width.justify-center.bg-grey-3
+    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+  q-page-conainter
+    div(:style=`{paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
+      div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+        //- k-colls-new
+        //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
+        node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
+          template(v-slot:default=`{nodes}`)
+            node-list(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>
-import subscriptions from './subscriptions'
-
 export default {
-  name: 'pageApp__home',
-  props: ['width', 'height'],
-  components: {},
+  name: 'pageAppHome',
+  props: [],
   data () {
     return {
+      width: 0,
       coll: 'foryou',
       colls: [
         {id: 'foryou', name: 'For you'},
@@ -40,12 +32,50 @@ export default {
         {id: 's2', name: 'How to pill'},
         {id: 's3', name: 'How to feel'}
       ],
-      drawer: false,
-      miniState: false,
-      nodes: [],
-      query: gql`
-        query feed($pageToken: RawJSON) {
-          feed(pagination: {pageSize: 100, pageToken: $pageToken}) {
+      // query: gql`
+      //   query feed($pageToken: RawJSON) {
+      //     feed(pagination: {pageSize: 100, pageToken: $pageToken}) {
+      //       count
+      //       totalCount
+      //       nextPageToken
+      //       items {
+      //         oid
+      //         type
+      //         thumbUrl (preferWidth: 600)
+      //         createdAt
+      //         name
+      //         meta {
+      //           ...on MetaNode {
+      //             layout
+      //             fragments { width height thumbUrl(preferWidth: 600) }
+      //           }
+      //         }
+      //       }
+      //     }
+      //   }
+      // `
+    }
+  },
+  computed: {
+    // variables () {
+    //   return {
+    //     oid: this.$store.state.objects.currentUser.oid
+    //   }
+    // },
+    categories () {
+      return this.$store.state.node.categories.reduce((acc, val) => {
+        acc[val.type] = val
+        return acc
+      }, {})
+    },
+    sphereOid () {
+      return this.categories.FUN.sphere.oid
+      // else return false
+    },
+    query () {
+      return gql`
+        query sphereNodesHome ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
+          sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
             count
             totalCount
             nextPageToken
@@ -58,40 +88,48 @@ export default {
               meta {
                 ...on MetaNode {
                   layout
-                  fragments { width height color thumbUrl(preferWidth: 600) }
+                  fragments { width height thumbUrl(preferWidth: 600) }
                 }
               }
             }
           }
         }
-      `,
-      variables: {
-        oid: this.$store.state.objects.currentUser.oid
+      `
+    },
+    variables () {
+      return {
+        sphereOid: this.sphereOid,
+        pagination: { pageSize: 100 },
+        sortStrategy: 'HOT',
+        filter: { types: 'NODE' }
       }
-    }
+    },
+  },
+  watch: {
   },
   methods: {
+    nodeClick (val) {
+      this.$log('nodeClick', val)
+      // this.$store.commit('node/stateSet', ['node', val])
+      this.$router.push('/node/' + val[0].oid)
+    },
     onScroll (e) {
-      // this.$logD('onScroll', e)
-      if (e.directionChanged) {
-        let b = true
-        if (e.direction === 'down') b = true
-        else b = false
-        if (this.$refs.nodeFeed) this.$refs.nodeFeed.scrollDirectionChanged(b)
-      }
+      // this.$log('onScroll', e)
+      // if (this.previewHeight > 0 && e.position >= this.previewHeight) {
+      //   this.showNameSticky = true
+      // } else {
+      //   this.showNameSticky = false
+      // }
+    },
+    onResize (e) {
+      this.width = e.width
     }
   },
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>
-
-<style lang="stylus">
-.q-footer {
-  background: none !important
-}
-</style>

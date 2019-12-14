@@ -3,13 +3,13 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
   //- cut on video progress bar
   div(
     v-if="cut"
-    :style=`{position: 'absolute', zIndex: 103, top: '-34px', height: '24px'}`).row.full-width.q-px-md
+    :style=`{position: 'absolute', zIndex: 103, top: '-40px', height: '28px', pointerEvents: 'none'}`).row.full-width.q-px-md
     div(:style=`{position: 'relative'}`).row.fit
       div(:style=`{
-        position: 'absolute', zIndex: 106, top: 0, height: '100%',
+        position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 0.9,
         left: (cut.points[0].x/fragment.content.duration)*100+'%',
         width: ((cut.points[1].x-cut.points[0].x)/fragment.content.duration)*100+'%',
-        borderRadius: '4px', background:cut.color}`)
+        borderRadius: '4px', background: cut.color}`)
   //- dialogs
   k-dialog-bottom(ref="cutDialog" :options="cutDialogOptions" @action="cutDialogAction")
   k-dialog-bottom(ref='cutDeleteDialog' :options="{actions: {delete: {name: 'Delete', color: 'red'}}}" @action="cutDelete(cutIndex)")
@@ -34,6 +34,11 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
   //- body
   div(:style=`{}`).col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-md
+      //- cut CREATE
+      q-btn(
+        outline no-caps color="green" size="md" icon="add" @click="cutCreate([])"
+        :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm
+        span {{ $t('Add cut') }}
       //- cut
       div(
         v-for="(c, ci) in cuts" :key="c.type"
@@ -76,8 +81,6 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
         div(
           v-if="cutIndex !== ci" @click="cutClick(c, ci)"
           :style=`{position: 'absolute'}`).row.fit
-      q-btn(outline color="green" size="md" icon="add" @click="cutCreate([])"
-        :style=`{height: '40px', borderRadius: '10px'}`).full-width
   //- debug
   div(v-if="false").row.full-width.bg-red
     small cut: {{cut}}
