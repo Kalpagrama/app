@@ -2,6 +2,8 @@
 import * as firebase from 'firebase/app'
 import '@firebase/messaging'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { Notify } from 'quasar'
+import { i18n } from 'boot/i18n'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
@@ -74,6 +76,34 @@ async function initSw (store) {
       store.commit('core/stateSet', ['newVersionAvailable', true])
     })
     await initWebPush(store)
+  }
+
+  // не работает вроде...
+  function handleNetworkChange (event) {
+    logD('handleNetworkChange', navigator.onLine)
+    store.commit('core/stateSet', ['online', navigator.onLine])
+    Notify.create(
+      {
+        position: 'top',
+        message: store.state.core.online
+          ? i18n.t('network_available', 'network available') : i18n.t('network_unavailable', 'network unavailable')
+      }
+    )
+  }
+
+  window.addEventListener('online', handleNetworkChange)
+  window.addEventListener('offline', handleNetworkChange)
+}
+
+// очистить кэш сервис-воркера
+async function clearCache () {
+  logD('clearCache')
+  if (registration) {
+    caches.keys().then(cacheNames => {
+      cacheNames.forEach(cacheName => {
+        caches.delete(cacheName)
+      })
+    })
   }
 }
 
@@ -198,4 +228,4 @@ async function showNotification (title, body) {
   }
 }
 
-export { initSw, initWebPush, checkUpdate }
+export { initSw, initWebPush, checkUpdate, clearCache }

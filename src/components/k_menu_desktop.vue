@@ -63,7 +63,7 @@
 </template>
 
 <script>
-  import { checkUpdate } from 'src/system/service_worker'
+  import { checkUpdate, clearCache } from 'src/system/service_worker'
   import { LogLevelEnum } from 'src/boot/log'
 
   export default {
@@ -80,7 +80,8 @@
           { name: 'Notifications', icon: 'notifications', path: '/app/notifications' },
           // { name: 'test web-push', icon: 'message', path: '/app/test_message' },
           // { name: 'sentry log send', icon: 'message', path: '/app/sentry_log' },
-          { name: 'test share', icon: 'share', path: '/app/share' },
+          // { name: 'test share', icon: 'share', path: '/app/share' },
+          { name: 'clear_cache', icon: 'autorenew', path: '/app/clear_cache' },
           { name: 'Exit', icon: 'exit_to_app', path: '/app/logout' }
         ]
       }
@@ -165,6 +166,11 @@
             // });
             break
           }
+          case '/app/clear_cache': {
+            // alert('Web Share API not supported.');
+            await clearCache()
+            break
+          }
           default:
             this.$go(p.path)
         }
@@ -183,7 +189,7 @@
         let installPrompt = this.$store.state.core.installPrompt
         this.$logD('installPrompt=', installPrompt)
         if (installPrompt) installPrompt.prompt()
-      }
+      },
     }
   }
 </script>

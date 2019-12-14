@@ -7,9 +7,9 @@ module.exports = function (ctx) {
     preFetch: true,
     boot: [
       'log',
+      'i18n',
       'sw',
       'apollo',
-      'i18n',
       'main',
       'filters'
     ],

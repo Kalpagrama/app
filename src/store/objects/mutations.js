@@ -59,7 +59,7 @@ function setValue (obj, path, value) {
 }
 
 export function setObjectValue (state, { oid, path, value }) {
-  let object = state.objects[oid].objectData
+  let object = state.objects[oid] ? state.objects[oid].objectData : null
   if (!object) return
   let p = path.split('.')
   setValue(object, p, value)

@@ -165,7 +165,13 @@ export default async ({ Vue, store, app }) => {
         if (err.processed) return
         err.processed = true
       }
-      logE(err, info)
+      try {
+        logE(err, info)
+        let clearCache = require('src/system/service_worker').clearCache
+        clearCache()
+      } catch (e) {
+        console.error(e, info)
+      }
     }
     // в продакшене не работает
     Vue.config.warnHandler = function (msg, vm, trace) {
@@ -177,9 +183,14 @@ export default async ({ Vue, store, app }) => {
         if (error.processed) return
         error.processed = true
       }
-      logE('window.onerror', message, source, line, column, error)
+      try {
+        logE('window.onerror', message, source, line, column, error)
+        let clearCache = require('src/system/service_worker').clearCache
+        clearCache()
+      } catch (e) {
+        console.error(e)
+      }
     }
-
     // Sentry.init({
     //   dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536',
     //   integrations: [new Integrations.Vue({ Vue, attachProps: true, logErrors: true })]

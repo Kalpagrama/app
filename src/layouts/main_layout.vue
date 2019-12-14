@@ -51,41 +51,23 @@ export default {
     this.$log('mounted')
   },
   async created () {
-    try {
-      this.$logD('created')
-      this.loading = true
-      // take token from redirect url
-      let token = this.$route.query.token
-      let expires = this.$route.query.expires
-      if (token) {
-        localStorage.setItem('ktoken', token)
-        localStorage.setItem('ktokenExpires', expires)
-        this.$router.push('/app/home')
-      }
-      // check user
-      let { data: { userIsAuthorized, userIsConfirmed } } = await this.$apollo.query({
-        client: 'authApollo',
-        query: gql`
-          query userCheck {
-            userIsAuthorized
-            userIsConfirmed
-          }
-        `,
-        fetchPolicy: 'network-only'
-      })
-      if (!userIsAuthorized || !userIsConfirmed) {
-        this.$logD('GO LOGIN')
-        this.$router.push('/login')
-        this.$q.notify('Go login')
-        return
-      }
-      await this.$store.dispatch('init')
-      this.loading = false
-      this.$refs.kTutorialDialog.show()
-    } catch (error) {
-      this.$logD('error', error)
-      // this.loading = false
+    this.$logD('created')
+    this.loading = true
+    // take token from redirect url
+    let token = this.$route.query.token
+    let expires = this.$route.query.expires
+    if (token) {
+      localStorage.setItem('ktoken', token)
+      localStorage.setItem('ktokenExpires', expires)
+      await this.$router.push('/app/home')
     }
+    if (!await this.$store.dispatch('init')) {
+      this.$logD('GO LOGIN')
+      await this.$router.push('/login')
+      return
+    }
+    this.loading = false
+    if (this.$store.state.events.notice) this.$refs.kTutorialDialog.show()
   }
  }
 </script>

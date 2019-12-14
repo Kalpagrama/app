@@ -1,52 +1,69 @@
-const swVer = 6
-/*
- * This file (which will be your service worker)
- * is picked up by the build system ONLY if
- * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
- */
+const swVer = 7
+let logFunc, errCritFunc
+{ // log
+  let logModulesBlackList = []
+  let logLevel = 0
+  let logLevelSentry = 3
+  importScripts('https://browser.sentry-cdn.com/5.9.1/bundle.min.js')
+  Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
 
-let logModulesBlackList = []
-let logLevel = 0
-let logLevelSentry = 3
-importScripts('https://browser.sentry-cdn.com/5.9.1/bundle.min.js')
-Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
+  logFunc = (...msg) => {
+    if (logModulesBlackList.includes('sw')) return
+    if (logLevel <= 2) console.log('SW: ', swVer, ...msg)
+    if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+  }
 
-function logFunc (...msg) {
-  if (logModulesBlackList.includes('sw')) return
-  if (logLevel <= 2) console.log('SW: ', swVer, ...msg)
-  if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
-}
-
-function errCritFunc (...msg) {
-  if (logLevel <= 4) console.error(...msg)
-  if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+  errCritFunc = (...msg) => {
+    if (logLevel <= 4) console.error(...msg)
+    if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+  }
 }
 
 logFunc('SW_VER=', swVer)
 
 /* global workbox */
-workbox.core.setCacheNameDetails({ prefix: 'app' })
-workbox.core.skipWaiting()
-workbox.core.clientsClaim()
-//
-// // порядок вызовов precacheAndRoute и registerRoute имеет значение
-// // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
-// self.__precacheManifest = [].concat(self.__precacheManifest || [])
-// workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
-// logFunc('self.__precacheManifest=', self.__precacheManifest)
-//
+{
+  workbox.core.setCacheNameDetails({
+    prefix: 'kalpa',
+    suffix: `v${swVer}`,
+    precache: 'installTime',
+    runtime: 'runTime',
+    googleAnalytics: 'googleAnalytics',
+  })
+  workbox.core.skipWaiting()
+  workbox.core.clientsClaim()
+
+// порядок вызовов precacheAndRoute и registerRoute имеет значение
+// precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
+  self.__precacheManifest = [].concat(self.__precacheManifest || [])
+  workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
+
+  // This will trigger the importScripts() for workbox.strategies and its dependencies:
+  const {strategies} = workbox;
+}
+
 // workbox.routing.registerRoute(
 //   /\/.*/,
 //   new workbox.strategies.CacheFirst({
 //     cacheName: 'sameOrigin'
 //   }),
 // );
-// workbox.routing.registerRoute(
-//   /^https:\/\/.*\.kalpagramma\.com\/graphql\/.*/,
-//   new workbox.strategies.CacheFirst({
-//     cacheName: 'api'
-//   }),
-// );
+workbox.routing.registerRoute(
+  /^https:\/\/.*\.kalpagramma\.com\/graphql\/.*/,
+  ({url, event, params}) => {
+    logFunc(' catch gql query')
+    // Using the previously-initialized strategies.
+    const cacheFirst = new strategies.CacheFirst()
+    event.respondWith(cacheFirst.makeRequest({request: event.request}));
+    // return fetch(event.request)
+    //   .then((response) => {
+    //     return response.text();
+    //   })
+    //   .then((responseBody) => {
+    //     return new Response(`${responseBody} <!-- Look Ma. Added Content. -->`);
+    //   });
+  }
+);
 //
 // workbox.routing.registerRoute(
 //   /.*(?:googleapis|gstatic)\.com/,
@@ -108,7 +125,9 @@ self.addEventListener('activate', event => {
   logFunc('activated!', swVer)
 })
 self.addEventListener('fetch', async event => {
-  logFunc('ready to handle fetches!', swVer, event.request.url)
+  logFunc('ready to handle fetches!1', swVer, event.request.url)
+  logFunc('ready to handle fetches!2', swVer, event.request.url)
+  logFunc('ready to handle fetches!3', swVer, event.request.url)
   // if (event.request.method === 'POST') {
   //   const formData = await event.request.formData()
   //   // event.respondWith(fetch(event.request))
