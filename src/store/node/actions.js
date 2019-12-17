@@ -63,40 +63,16 @@ export const nodeDelete = async (context, oid) => {
 
 export const nodeCreate = async (context, node) => {
   logD('nodeCreate start', node)
-
-  // let nodeFull = {
-  //   layout: 'PIP', // "PIP", "SLIDER", "VERTICAL", "HORIZONTAL"
-  //   name: 'AAA',
-  //   fragments: [
-  //     {
-  //       name: '',
-  //       thumbUrl: '',
-  //       scale: 1000,
-  //       cuts: [
-  //         {
-  //           name: '',
-  //           color: '', // cutCreate () => {color: $randomColor(Date.now().toString())}
-  //           thumbUrl: '',
-  //           points: [{ x: 0 }, { x: 20, y: null }],
-  //           style: null
-  //         }
-  //       ]
-  //     }
-  //   ],
-  //   content: {}
-  // }
-
   // checks
   {
-    assert.ok(node.categories.length >= 1 && node.categories.length < 4)
-    assert.ok(node.spheres.length >= 0 && node.spheres.length < 10)
-    assert.ok(node.fragments.length === 2)
+    assert.ok(node.categories.length >= 0)
+    assert.ok(node.spheres.length >= 0)
+    assert.ok(node.fragments.length >= 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
     for (let fr of node.fragments) {
       assert.ok(fr.content)
-      assert.ok(fr.cuts.length > 0)
+      assert.ok(fr.cuts.length >= 0)
       assert.ok(fr.scale > 0)
-      let fragmentLen = 0
       for (let c of fr.cuts) {
         assert.ok(c.color)
         // assert.ok(c.thumbUrl)
@@ -105,10 +81,7 @@ export const nodeCreate = async (context, node) => {
         let end = c.points[1].x
         assert.ok(start >= 0 && end > 0)
         assert.ok(end > start && end <= fr.scale)
-        fragmentLen += (end - start)
       }
-      let sixtySec = (60 * fr.scale) / fr.content.duration
-      assert.ok(fragmentLen <= sixtySec)
     }
   }
 
@@ -116,7 +89,9 @@ export const nodeCreate = async (context, node) => {
   nodeInput.layout = node.layout
   nodeInput.name = node.name
   nodeInput.categories = node.categories
-  nodeInput.spheres = node.spheres
+  nodeInput.spheres = node.spheres.map(s => {
+    return {name: s.name}
+  })
   nodeInput.fragments = node.fragments.map(f => {
     return {
       oid: f.content.oid,
@@ -148,7 +123,9 @@ export const nodeCreate = async (context, node) => {
         nodeCreate (node: $node)
       }
     `,
-    variables: { node: nodeInput}
+    variables: {
+      node: nodeInput
+    }
   })
   logD('nodeCreate done', nodeCreate)
   return nodeCreate

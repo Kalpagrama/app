@@ -14,7 +14,7 @@
         q-btn(
           push no-caps dense color="accent" @click="changeEmail()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Save email') }}
-  div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeEmail.show()").row.full-width.justify-left.items-center.q-py-sm.q-px-md.cursor-pointer.hr
+  div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeEmail.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
       span {{$t('Email')}}
     .row.full-width

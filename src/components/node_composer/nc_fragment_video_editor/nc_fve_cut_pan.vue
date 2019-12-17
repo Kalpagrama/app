@@ -19,7 +19,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
               v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
               :style=`{height: '50px', width: '50px', borderLeft: fi === 0 ? 'none' : '1px solid grey'}`
               ).row.items-center.justify-center.bg-grey-8
-              small {{ $time((parseInt(((fi+1)*frameDuration)*100))/100) }}
+              small(:style=`{userSelect: 'none', pointerEvents: 'none'}`).cursor-pointer {{ $time((parseInt(((fi+1)*frameDuration)*100))/100) }}
           //- left tint
           div(
             v-if="cut"
@@ -32,7 +32,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
             :style=`{position: 'absolute', zIndex: 100, height: '50px', top: '0px',
               left: (cut.points[0].x/duration)*100+'%',
               width: ((cut.points[1].x-cut.points[0].x)/duration)*100+'%',
-              borderRadius: '4px', border: '4px solid '+ $randomColor(cut.type), pointerEvents: 'none'}`).row
+              borderRadius: '4px', border: '4px solid '+ cut.color, pointerEvents: 'none'}`).row
           div(
             v-if="true"
             :style=`{position: 'absolute', zIndex: 99, height: '50px', top: '0px',
@@ -108,17 +108,10 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('cut CHANGED', to)
-        if (this.framesWidth === 0 && this.$refs.framesScrollWrapper) this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.width
+        if (this.framesWidth === 0 && this.$refs.framesScrollWrapper) this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
         if (to) {
-          if (from) {
-            if (from.type !== to.type) {
-              this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.points[0].x / this.k) + this.width / 2 - 50})
-              this.player.setCurrentTime(to.points[0].x)
-            }
-          } else {
-            this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.points[0].x / this.k) + this.width / 2 - 50})
-            this.player.setCurrentTime(to.points[0].x)
-          }
+          this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.points[0].x / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
+          this.player.setCurrentTime(to.points[0].x)
         }
       }
     }

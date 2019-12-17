@@ -1,100 +1,134 @@
+<style lang="stylus">
+.q-header {
+  background: none !important;
+}
+.mejs__playpause-button {
+  display: none !important
+}
+iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
+</style>
 <template lang="pug">
-  k-split(:headerMaxHeight="$q.screen.height/2" :headerClass="['q-pa-sm']" :bodyClass="['bg-grey-1']").bg-white
-    template(v-slot:header)
-      node(v-if="node" :node="node" :needFull="true" :active="true" :width="width"
-        :noName="false" :noSpheres="false" noHeader noTimestamp :noActions="false")
-    template(v-slot:body)
-      nodes(v-if="node" :node="node")
-      div(v-else).row.fit.items-center.justify-center
-        q-spinner(:thickness="2" color="accent" size="50px")
+q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
+  q-header(
+    v-if="showNameSticky"
+    ).row.full-width.justify-center
+    .col.bg-grey-3
+    div(:style=`{maxWidth: '500px'}`).row.full-width.q-px-sm
+      div(:style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.bg-grey-3.q-pt-sm
+        div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', }`).row.full-width.items-center.justify-center.bg-white
+          span(v-if="node").text-bold.text-black {{ node.name }}
+    .col.bg-grey-3
+  q-footer(reveal).row.full-width.justify-center.bg-grey-3
+    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+  q-page-conainter
+    .row.full-width.justify-center.items-start.content-start
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+          .row.full-width.items-start.content-start
+            node(
+              v-if="node" ref="neNode"
+              :ctx="'inEditor'"
+              :width="width" :node="node" :nodeFullReady="node"
+              @previewLoaded="previewHeight = $event").bg-white.q-mb-md
+      div(:style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
+        div(:style=`{maxWidth: '500px'}`).row.full-width.q-pa-sm
+          node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
+            template(v-slot:default=`{nodes}`)
+              node-list(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>
-  import nodes from './nodes'
-
-  export default {
-    name: 'nodeExplorer',
-    components: { nodes },
-    props: ['width', 'height'],
-    data () {
-      return {
-        node: null,
-        needFull: false,
-        nodeFull: null,
-        active: false,
-        footerHeight: 60,
-        footerShow: false
-      }
-    },
-    computed: {
-      isDesktop () {
-        return this.$q.screen.width > 850
-      }
-    },
-    watch: {
-      $route: {
-        immediate: true,
-        async handler (to, from) {
-          if (to.params.oid) {
-            this.$logD('$route CHANGED', to.params.oid)
-            this.tab = 'node'
-            this.node = null
-            await this.$wait(300)
-            this.active = false
-            this.node = await this.nodeLoad(to.params.oid)
-            // ??
-            this.needFull = false
-            await this.$wait(100)
-            this.needFull = true
+export default {
+  name: 'nodeExplorer',
+  props: [],
+  data () {
+    return {
+      width: 0,
+      node: null,
+      showNameSticky: false,
+      previewHeight: 0,
+      query: gql`
+        query nodeExplorerNodeNodes ($oid: OID!, $pageToken: RawJSON) {
+          nodeNodes(nodeOid: $oid, pagination: {pageSize: 100, pageToken: $pageToken}, sortStrategy: HOT) {
+            count
+            totalCount
+            nextPageToken
+            items {
+              oid
+              type
+              thumbUrl (preferWidth: 600)
+              createdAt
+              name
+              meta {
+                ...on MetaNode {
+                  layout
+                  fragments { width height thumbUrl(preferWidth: 600) }
+                }
+              }
+            }
           }
         }
-      }
-    },
-    methods: {
-      async nodeFullLoaded (n) {
-        this.$logD('nodeFullLoaded', n)
-        this.nodeFull = n
-        this.active = true
-      },
-      async nodeLoad (oid) {
-        this.$logD('nodeLoad start')
-        let node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
-        return node
-        // let { data: { objectList: [node] } } = await this.$apollo.query({
-        //   query: gql`
-        //     query getExtendedNodesPropsExplorer($oid: OID!) {
-        //       objectList(oids: [$oid]) {
-        //         oid
-        //         type
-        //         name
-        //         createdAt
-        //         thumbUrl(preferWidth: 600)
-        //         meta {
-        //           ...on MetaNode {
-        //             layout
-        //             fragments { uid width height color thumbUrl(preferWidth: 600) }
-        //           }
-        //         }
-        //       }
-        //     }
-        //   `,
-        //   variables: {
-        //     oid: oid
-        //   },
-        //   fetchPolicy: 'cache-first'
-        // })
-        // this.$logD('nodeLoad done', node.name)
-        // return node
-      }
-    },
-    mounted () {
-      this.$logD('mounted')
-    },
-    beforeDestroy () {
-      this.$logD('beforeDestroy')
+      `
     }
+  },
+  computed: {
+    nodeOid () {
+      if (this.node) return this.node.oid
+      else return false
+    },
+    variables () {
+      return {
+        oid: this.nodeOid
+      }
+    }
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      async handler (to, from) {
+        if (to.params.oid) {
+          this.$log('$route CHANGED', to.params.oid)
+          let node = this.$store.state.node.node
+          if (node) this.node = node
+          else this.node = await this.nodeLoad(to.params.oid)
+          await this.$wait(500)
+          this.$nextTick(() => {
+            this.$refs.neNode.fragmentMini()
+          })
+        }
+      }
+    }
+  },
+  methods: {
+    nodeClick (val) {
+      this.$log('nodeClick', val)
+      this.$router.push('/node/' + val[0].oid)
+    },
+    async nodeLoad (oid) {
+      this.$log('nodeLoad start')
+      let node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
+      return node
+    },
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      if (this.previewHeight > 0 && e.position >= this.previewHeight) {
+        this.showNameSticky = true
+      } else {
+        this.showNameSticky = false
+      }
+    },
+    onResize (e) {
+      this.width = e.width
+    }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
+}
 </script>
-
-<style lang="stylus">
-</style>

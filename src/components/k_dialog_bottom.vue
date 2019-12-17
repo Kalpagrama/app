@@ -4,12 +4,12 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
     @click.self="$refs.kDialogBottom.hide()" v-touch-swipe.mouse="swiped"
     :class="getClass")
     div(:style=`{maxWidth: $q.screen.gt.xs ? '330px' : '100%', maxHeight: $q.screen.gt.xs ? 500+'px' : '100%'}`).row.full-width.q-px-sm
-      //- header
-      div(v-if="options.header" :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="headerClick()"
-        ).row.full-width.justify-center.items-center.q-mb-md.bg-white
-        span.text-bold.text-center {{ $t(options.headerName) }}
       //- actions
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
+        //- header
+        div(v-if="options.header" :style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="headerClick()"
+          ).row.full-width.justify-center.items-center.bg-white
+          span.text-bold.text-center {{ $t(options.headerName) }}
         div(
           v-for="(a, akey, ai) in options.actions" :key="akey" @click="actionClick(a, akey, ai)"
           :style=`{height: '60px', borderTop: ai > 0 ? '1px solid #eee' : 'none'}`
@@ -19,7 +19,7 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
       q-btn(
         v-if="options.confirm"
         push no-caps color="accent" @click="confirmClick()"
-        :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mt-sm
+        :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-my-sm
         span.text-bold {{ $t(options.confirmName) }}
 </template>
 
@@ -102,10 +102,10 @@ export default {
     }
   },
   mounted () {
-    this.$logD('mounted')
+    // this.$logD('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    // this.$logD('beforeDestroy')
   }
 }
 </script>

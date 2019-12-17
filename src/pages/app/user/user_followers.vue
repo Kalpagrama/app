@@ -13,7 +13,7 @@
           span.text-caption {{ s.name | cut(50) }}
     div(v-if="countSubs === 0").row.full-width
       div(style=`border-radius: 10px`).row.full-width.justify-center.items-center.bg-grey-1.q-pa-lg
-        span.text-bold.text-h6 {{$t('Нету подписчиков')}}
+        span.text-bold No followers
 </template>
 <script>
 export default {
@@ -37,20 +37,20 @@ export default {
         case 'AUDIO':
         case 'BOOK':
         case 'IMAGE': {
-          this.$router.push(`/app/content/${s.oid}`)
+          this.$router.push(`/content/${s.oid}`)
           break
         }
         case 'USER': {
           if (this.oid === s.oid) break
-          else this.$router.push(`/app/user/${s.oid}`)
+          else this.$router.push(`/user/${s.oid}`)
           break
         }
         case 'SPHERE': {
-          this.$router.push(`/app/sphere/${s.oid}`)
+          this.$router.push(`/sphere/${s.oid}`)
           break
         }
         case 'NODE': {
-          this.$router.push(`/app/node/${s.oid}`)
+          this.$router.push(`/node/${s.oid}`)
           break
         }
       }

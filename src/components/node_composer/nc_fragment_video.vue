@@ -2,69 +2,103 @@
 .mejs__playpause-button {
   display: none !important
 }
+iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
 </style>
 <template lang="pug">
-div(:style=`{position: 'relative', maxWidth: '100%'}`).row.full-width
-  slot(name="actions" :now="now" :player="player")
-  div(:style=`{position: 'relative'}`).row.full-width
+div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
+  //- play/pause for inList
+  div(
+    v-if="ctx !== 'inEditor'" @click="videoToggle()"
+    :style=`{position: 'absolute', zIndex: 103, opacity: 0.5}`).row.fit.items-center.justify-center
+    q-btn(v-if="!playing" round flat icon="play_arrow" color="white" size="60px")
+  div(:style=`{position: 'relative'}`).row.fit
     video(
-      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="true"
-      :width="width" :height="height")
-      source(:src="fragment.content.url" :type="fragment.content.contentSource === 'KALPA' ? 'video/mp4' : 'video/youtube'")
-    div(
-      :style=`{position: 'absolute', bottom: '16px', zIndex: 105, height: '12px'}`).row.full-width.q-px-md
-      //- progress width
-      div(:style=`{borderRadius: '4px', overflow: 'hidden', background: 'rgba(255,255,255,0.4)'}` @click="progressClick").row.fit
-        //- progress bar
-        div(:style=`{width: (now/fragment.content.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
-          ).row.full-height.bg-white.q-px-xs
-      //- progress now/duration
-      small(:style=`{position: 'absolute', zIndex: 105, top: '-24px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
-        ).q-px-sm.text-white {{ $time(now) }} / {{ $time(fragment.content.duration) }}
-  slot(name="editor" :now="now" :player="player")
+      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="true"
+      @play="playing = true" @pause="playing = false"
+      width="100%" height="100%" :muted="false"
+      :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
+      ).fit
+      //- fragment.content.contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'
+      source(
+        :src="ctx === 'inEditor' ? fragment.content.url : fragment.url"
+        :type="ctx === 'inEditor' ? 'video/youtube' : 'video/mp4'")
+  //- progress
+  div(
+    v-if="player && ctx === 'inEditor'"
+    :style=`{position: 'absolute', bottom: '0px', zIndex: 105, height: '32px'}`).row.full-width.q-px-md
+    //- progress width
+    div(:style=`{position: 'relative', height: '32px'}` @click="progressClick").row.full-width.cursor-pointer
+      div(:style=`{position: 'absolute', top: 0, height: '12px', pointerEvents: 'none', background: 'rgba(255,255,255,0.4)',
+        borderRadius: '4px', overflow: 'hidden'}`).row.full-width
+      //- progress bar
+      div(:style=`{height: '12px', width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
+        ).row.bg-white.q-px-xs
+    //- progress now/duration
+    small(:style=`{position: 'absolute', zIndex: 105, top: '-24px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
+      ).q-px-sm.text-white {{ $time(now) }} / {{ $time(player.duration) }}
 </template>
 
 <script>
 export default {
   name: 'ncFragmentVideo',
-  props: ['width', 'height', 'fragment', 'inEditor'],
+  props: ['ctx', 'fragment'],
   data () {
     return {
       now: 0,
-      start: undefined,
-      end: undefined,
       player: null,
       playing: false
     }
   },
+  computed: {
+  },
   methods: {
+    play () {
+      this.$log('play')
+      if (this.player) this.player.play()
+    },
+    pause () {
+      this.$log('pause')
+      if (this.player) this.player.pause()
+    },
     progressClick (e) {
-      this.$log('progressClick', this.fragment.content.duration)
+      this.$log('progressClick', this.player.duration)
       let w = e.target.clientWidth
       let x = e.offsetX
-      let now = (this.fragment.content.duration * x) / w
+      let now = (this.player.duration * x) / w
       this.$log('w,x,now', w, x, now)
       this.player.setCurrentTime(now)
     },
+    videoToggle () {
+      if (this.playing) this.pause()
+      else this.play()
+      this.playing = !this.playing
+    },
     videoTimeupdate (e) {
-      this.now = this.player.currentTime
+      if (this.ctx === 'inEditor') {
+        this.now = this.player.currentTime
+      } else {
+        this.now = this.$refs.ncFragmentVideo.currentTime
+        this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
+        this.player.duration = this.$refs.ncFragmentVideo.duration
+      }
     },
     videoSeeked (e) {
       this.$log('videoSeeked', e)
     },
-    playerStart (width, height) {
+    playerStart () {
+      this.$log('playerStart')
       let me = new window.MediaElementPlayer(this.$refs.ncFragmentVideo, {
         loop: true,
         autoplay: true,
         controls: false,
-        // useFakeFullscreen: true,
         features: ['playpause'],
-        setDimensions: true,
-        // enableKeyboard: false,
-        // enableAutosize: true,
-        // stretching: 'auto',
-        videoWidth: width,
-        videoHeight: height,
+        enableAutosize: true,
+        stretching: 'fill',
+        pauseOtherPlayers: false,
+        ignorePauseOtherPlayersOption: false,
         clickToPlayPause: true,
         success: async (mediaElement, originalNode, instance) => {
           this.player = mediaElement
@@ -73,16 +107,46 @@ export default {
           this.player.play()
         }
       })
+    },
+    playerStartNative () {
+      this.$log('playerStartNative')
+      this.player = {}
+      this.player.play = () => {
+        this.$log('playerNative: play')
+        this.$refs.ncFragmentVideo.play()
+      }
+      this.player.pause = () => {
+        this.$log('playerNative: pause')
+        this.$refs.ncFragmentVideo.pause()
+      }
+      this.player.setCurrentTime = (ms) => {
+        this.$log('playerNative: setCurrentTime', ms)
+        this.$refs.ncFragmentVideo.currentTime = ms
+      }
+      this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
+      this.player.duration = this.$refs.ncFragmentVideo.duration
+      this.player.now = this.$refs.ncFragmentVideo.currentTime
+      this.$refs.ncFragmentVideo.addEventListener('timeupdate', this.videoTimeupdate)
+      this.$refs.ncFragmentVideo.addEventListener('seeked', this.videoSeeked)
     }
   },
   async mounted () {
     this.$log('mounted')
-    this.playerStart(this.width, this.height)
+    if (this.ctx === 'inEditor') {
+      this.playerStart()
+    } else {
+      this.playerStartNative()
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.player.removeEventListener('timeupdate', this.videoTimeupdate)
-    this.player.removeEventListener('seeked', this.videoSeeked)
+    if (this.ctx === 'inEditor') {
+      this.player.removeEventListener('timeupdate', this.videoTimeupdate)
+      this.player.removeEventListener('seeked', this.videoSeeked)
+    } else {
+      this.$refs.ncFragmentVideo.addEventListener('timeupdate', this.videoTimeupdate)
+      this.$refs.ncFragmentVideo.addEventListener('seeked', this.videoSeeked)
+    }
   }
 }
 </script>

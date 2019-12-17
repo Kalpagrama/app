@@ -35,8 +35,8 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     LoadingBar.setDefaults({
-      color: 'primary',
-      size: '1px',
+      color: '#52b156',
+      size: '2px',
       position: 'top'
     })
     Vue.prototype.$tween = TweenMax
@@ -103,11 +103,12 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kMenuMobile', () => import('components/k_menu_mobile'))
     Vue.component('kSplit', () => import('components/k_split'))
     Vue.component('kColls', () => import('components/k_colls'))
+    Vue.component('kCollsTabs', () => import('components/k_colls_tabs'))
+    Vue.component('kCollsNew', () => import('components/k_colls_new'))
     // node
     Vue.component('node', () => import('components/node'))
     Vue.component('nodeLoader', () => import('components/node_loader'))
     Vue.component('nodeList', () => import('components/node_list'))
-    Vue.component('nodeRubick', () => import('components/node_rubick'))
     // dialogs
     Vue.component('kDialogMini', () => import('components/k_dialog_mini'))
     Vue.component('kDialogBottom', () => import('components/k_dialog_bottom'))

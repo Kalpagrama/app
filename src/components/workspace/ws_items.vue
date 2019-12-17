@@ -2,7 +2,7 @@
 </style>
 
 <template lang="pug">
-k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFiltered" :tabs="true" :style=`{height: '100%'}`)
+k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFiltered" :tabs="true" :style=`{height: height || '100%'}`)
   template(v-slot:notes)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -39,9 +39,9 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
               ).row.full-width
               div(v-for="(c, ci) in f.cuts" :key="ci"
                 ).q-mr-xs
-                div(:style=`{background: $randomColor(c.type, 0.5), borderRadius: '4px'}`).q-px-sm
-                  small.text-white {{ c }}
-                  //- small.text-white {{ $time(c.start)}}-{{$time(c.end) }}
+                div(:style=`{background: c.color, borderRadius: '4px'}`).q-px-sm
+                  //- small.text-white {{ c }}
+                  small.text-white {{ $time(c.points[0].x)}}-{{$time(c.points[1].x) }}
             span(
               v-if="f.name"
               :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
@@ -80,15 +80,27 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
         .row.full-width.items-start.content-start.q-px-sm
           div(
             v-for="(n, ni) in nodes" :key="n.oid" @click="itemClick('node', n)"
-            :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.items-center.justify-center.bg-white.q-mb-sm
-            span {{ $t(n.name) }}
+            :style=`{minHeight: '60px', borderRadius: '10px', overflow: 'hidden'}`
+            ).row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-pa-sm
+            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-black
+              div(v-for="(f, fi) in n.fragments" :key="fi").col
+                div(:style=`{borderRadius: '10px'}`).row.full-width
+                  img(
+                    :src="f.thumbUrl || f.content.thumbUrl" draggable="false"
+                    :style=`{width: '100%', height: '100%', maxHeight: '200px', objectFit: 'contain'}`)
+                .row.full-width
+                  small.full-width {{f.name}}
+                  small.full-width {{f.content.name}}
+                  small(v-for="(c,ci) in f.cuts" :key="ci")
+                    small(v-for="(p,pi) in c.points" :key="pi") {{$time(p.x)}}/
+            div(:style=`{minHeight: '60px'}`).row.full-width.items-center.justify-center
+              span.text-bold {{ n.name }}
 </template>
 
 <script>
 export default {
   name: 'wsItems',
-  props: ['types'],
+  props: ['types', 'height'],
   data () {
     return {
       coll: 'fragments',
