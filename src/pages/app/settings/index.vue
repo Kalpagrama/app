@@ -30,6 +30,7 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: '100vw', height: '
           privacy(v-if="page === 'privacy'")
           blacklist(v-if="page === 'blacklist'")
           information(v-if="page === 'information'")
+          //- k-spinner(v-if="true" :width="300" :height="300").q-my-xl
           //- div(v-else).row.fit.items-center.justify-center
             span.text-bold 404
           div(v-if="page === 'settings'" :style=`{}`).row.full-height.items-start.content-start.bg-grey-1.q-pt-sm

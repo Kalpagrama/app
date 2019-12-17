@@ -11,7 +11,7 @@
           k-logo(:width="40" :height="40")
         div(v-if="!mini").col.full-height
           .row.fit.items-center
-            span.text-bold.text-white {{$t('Кальпаграмма ver:') + $store.state.core.version}}
+            span.text-bold.text-white {{$t('Кальпаграмма ver ') + $store.state.core.version}}
       div(@click="$go('/app/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="settings" color="white")
     //- user
@@ -42,19 +42,20 @@
       div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
         q-btn(
           :round="mini" push color="accent" no-caps icon="person_add" @click="$go('/app/invite')"
-          :style=`mini ? {} : {height: '60px', borderRadius: '10px'}`).full-width
+          :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`).full-width
           span(v-if="width === 230").text-bold.q-ml-md {{ $t('Invite friend') }}
       div(v-if="!this.$store.state.core.installPrompt || true" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
         q-btn(
           :round="mini" push color="accent" no-caps
-        :icon="this.$store.state.core.newVersionAvailable ? 'system_update' : 'cloud_download'"
+          :icon="this.$store.state.core.newVersionAvailable ? 'system_update' : 'cloud_download'"
           @click="update"
-          :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
+          :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`).full-width
           span(v-if="width === 230").text-bold.q-ml-md {{ $t(this.$store.state.core.newVersionAvailable ? 'update app' : 'check for updates') }}
-      div(v-if="this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
+      //- v-if="this.$store.state.core.installPrompt"
+      div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
         q-btn(
           :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
-          :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
+          :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`).full-width
           span(v-if="width === 230").text-bold.q-ml-md {{ $t('install_app') }}
     //- footer mini
     div(v-if="!page" :style=`{height: '60px'}`).row.full-width.items-center.br
