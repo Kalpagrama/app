@@ -1,19 +1,27 @@
 <template lang="pug">
 div(:style=`{borderRadius: '10px'}`).row.full-width
   //- fragments
-  div(:style=`{position: 'relative'}`).row.full-width
+  div(:style=`{position: 'relative', height: previewHeight+'px'}`).row.full-width
     nc-fragment(
-      ref="fTop"
-      :ctx="ctx"
+      ref="fragmentFirst"
+      :ctx="ctx" :index="0"
       :thumbUrl="node.meta.fragments[0].thumbUrl"
-      @previewLoaded="previewHeight = $event, $emit('previewLoaded', $event)"
-      :width="width" :fragment="nodeFull ? nodeFull.fragments[0] : null" :mini="false")
+      @height="$event => fragmentHeight(0, $event)"
+      @ended="fragmentEnded(0)"
+      :visible="visible"
+      :width="width" :fragment="nodeFull ? nodeFull.fragments[0] : null"
+      :mini="fragmentMini === 0" @mini="fragmentChange(1)"
+      :style=`fragmentMini === 0 ? fragmentMiniStyles : {}`)
     nc-fragment(
-      ref="fBottom"
-      :ctx="ctx"
+      ref="fragmentSecond"
+      :ctx="ctx" :index="1"
       :thumbUrl="node.meta.fragments[1].thumbUrl"
-      :width="fWidth" :fragment="nodeFull ? nodeFull.fragments[1] : null" :mini="fMini" @mini="fragmentMini"
-      :style=`{position: 'absolute', zIndex: 200, maxWidth: fWidth+'px', right: fRight+'px', bottom: fBottom+'px'}`)
+      @height="$event => fragmentHeight(1, $event)"
+      @ended="fragmentEnded(1)"
+      :visible="visible"
+      :width="fWidth" :fragment="nodeFull ? nodeFull.fragments[1] : null"
+      :mini="fragmentMini === 1" @mini="fragmentChange(0)"
+      :style=`fragmentMini === 1 ? fragmentMiniStyles : {height: '100%', width: '100%', objectFit: 'contain'}`)
   //- name
   div(
     ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
@@ -75,7 +83,16 @@ export default {
       fWidth: 100,
       fBottom: 30,
       fRight: 10,
-      previewHeight: 0
+      previewHeight: 0,
+      fragmentMini: 1,
+      fragmentMiniStyles: {
+        position: 'absolute',
+        zIndex: 200,
+        maxWidth: 100 + 'px',
+        right: 16 + 'px',
+        bottom: 40 + 'px',
+        opacity: 0.8
+      }
     }
   },
   watch: {
@@ -107,18 +124,41 @@ export default {
     }
   },
   methods: {
-    async fragmentMini () {
+    fragmentHeight (index, height) {
+      this.$log('fragmentHeight', index, height)
+      if (index === 0) {
+        this.previewHeight = height
+      }
+      let heights = []
+      heights[index] = height
+      this.$emit('heights', heights)
+    },
+    fragmentEnded (index) {
+      this.$log('fragmentEnded', index)
+      if (index === 0) this.fragmentChange(0)
+      else this.fragmentChange(1)
+    },
+    async fragmentChange (index) {
+      this.$log('fragmentChange', index)
+      this.$refs.fragmentFirst.pause()
+      this.$refs.fragmentSecond.pause()
+      await this.$wait(300)
+      if (index === 0) this.$refs.fragmentSecond.play()
+      else this.$refs.fragmentFirst.play()
+      this.fragmentMini = index
+    },
+    async fragmentMove () {
       if (this.ctx === 'inList') {
         this.$log('inList')
       } else {
-        this.$log('fragmentMini START')
+        this.$log('fragmentMove START')
         this.$tween.to(this, 0.6, {
           fBottom: -(this.$el.clientHeight - 60),
           fWidth: this.$el.clientWidth,
           fRight: 0,
           fMarginTop: this.$el.clientHeight - 120,
           onComplete: async () => {
-            this.$log('fragmentMini DONE')
+            this.$log('fragmentMove DONE')
             // this.fPosition = 'relative'
             this.fMini = !this.fMini
             // this.$refs.fBottom.setSize(this.width, 210)
@@ -144,11 +184,13 @@ export default {
     },
     play () {
       this.$log('play')
-      this.$refs.fTop.play()
+      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
+      else this.$refs.fragmentFirst.play()
     },
     pause () {
       this.$log('pause')
-      this.$refs.fTop.pause()
+      if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
+      else this.$refs.fragmentFirst.pause()
     },
     open () {
       this.$log('open')

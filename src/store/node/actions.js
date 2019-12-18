@@ -61,6 +61,11 @@ export const nodeDelete = async (context, oid) => {
   logD('nodeDelete dones')
 }
 
+export const nodeAction = async (context, {node}) => {
+  logD('nodeAction start')
+  logD('nodeAction done')
+}
+
 export const nodeCreate = async (context, node) => {
   logD('nodeCreate start', node)
   // checks

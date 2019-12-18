@@ -14,11 +14,18 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
     v-if="ctx !== 'inEditor'" @click="videoToggle()"
     :style=`{position: 'absolute', zIndex: 103, opacity: 0.5}`).row.fit.items-center.justify-center
     q-btn(v-if="!playing" round flat icon="play_arrow" color="white" size="60px")
+  //- muted
+  q-btn(
+    v-if="!mini && visible"
+    round flat dense color="white" :icon="muted ? 'volume_off' : 'volume_up'" @click="mutedToggle()"
+    :style=`{position: 'absolute', zIndex: 103, left: '8px', top: '8px'}`).shadow-1
+  //- video wrapper
   div(:style=`{position: 'relative'}`).row.fit
     video(
-      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="true"
+      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="false"
       @play="playing = true" @pause="playing = false"
-      width="100%" height="100%" :muted="false"
+      @ended="videoEnded" @timeupdate="videoTimeupdate" @seeked="videoSeeked"
+      width="100%" height="100%" :muted="muted"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
       ).fit
       //- fragment.content.contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'
@@ -27,7 +34,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
         :type="ctx === 'inEditor' ? 'video/youtube' : 'video/mp4'")
   //- progress
   div(
-    v-if="player && ctx === 'inEditor'"
+    v-if="now && !mini"
     :style=`{position: 'absolute', bottom: '0px', zIndex: 105, height: '32px'}`).row.full-width.q-px-md
     //- progress width
     div(:style=`{position: 'relative', height: '32px'}` @click="progressClick").row.full-width.cursor-pointer
@@ -44,17 +51,23 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
 <script>
 export default {
   name: 'ncFragmentVideo',
-  props: ['ctx', 'fragment'],
+  props: ['ctx', 'fragment', 'mini', 'visible'],
   data () {
     return {
-      now: 0,
+      now: undefined,
       player: null,
-      playing: false
+      playing: false,
+      muted: true
     }
   },
   computed: {
   },
   methods: {
+    mutedToggle () {
+      this.$log('mutedToggle')
+      this.muted = !this.muted
+      this.$emit('muted', this.muted)
+    },
     play () {
       this.$log('play')
       if (this.player) this.player.play()
@@ -77,6 +90,7 @@ export default {
       this.playing = !this.playing
     },
     videoTimeupdate (e) {
+      this.$log('videoTimeupdate', e)
       if (this.ctx === 'inEditor') {
         this.now = this.player.currentTime
       } else {
@@ -84,6 +98,10 @@ export default {
         this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
         this.player.duration = this.$refs.ncFragmentVideo.duration
       }
+    },
+    videoEnded (e) {
+      this.$log('videoEnded', e)
+      this.$emit('ended')
     },
     videoSeeked (e) {
       this.$log('videoSeeked', e)
@@ -126,8 +144,8 @@ export default {
       this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
       this.player.duration = this.$refs.ncFragmentVideo.duration
       this.player.now = this.$refs.ncFragmentVideo.currentTime
-      this.$refs.ncFragmentVideo.addEventListener('timeupdate', this.videoTimeupdate)
-      this.$refs.ncFragmentVideo.addEventListener('seeked', this.videoSeeked)
+      // this.$refs.ncFragmentVideo.addEventListener('timeupdate', this.videoTimeupdate)
+      // this.$refs.ncFragmentVideo.addEventListener('seeked', this.videoSeeked)
     }
   },
   async mounted () {
@@ -144,8 +162,8 @@ export default {
       this.player.removeEventListener('timeupdate', this.videoTimeupdate)
       this.player.removeEventListener('seeked', this.videoSeeked)
     } else {
-      this.$refs.ncFragmentVideo.addEventListener('timeupdate', this.videoTimeupdate)
-      this.$refs.ncFragmentVideo.addEventListener('seeked', this.videoSeeked)
+      // this.$refs.ncFragmentVideo.addEventListener('timeupdate', this.videoTimeupdate)
+      // this.$refs.ncFragmentVideo.addEventListener('seeked', this.videoSeeked)
     }
   }
 }

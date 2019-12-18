@@ -32,7 +32,7 @@ div(
         q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="add" @click="$refs.ncFragmentContentWsDialog.show()")
       template(v-slot:append)
         q-btn(v-if="!urlInputLoading && url.length > 0" round flat icon="clear" @click="url = ''")
-        q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="attachment" @click="$refs.fileInput.click()").rotate-90
+        q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="attach_file" @click="$refs.fileInput.click()")
 </template>
 
 <script>
@@ -65,7 +65,7 @@ export default {
       this.$log('wsItemClick', type, item)
       switch (type) {
         case 'content': {
-          this.$emit('content', item)
+          this.$emit('content', item.item)
           break
         }
         case 'fragment': {

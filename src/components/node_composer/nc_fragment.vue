@@ -16,12 +16,17 @@ div(
   //- stage 1
   nc-fragment-content(v-if="ctx === 'inEditor' && stage === 1" :width="width" @content="contentFound" @fragment="fragmentFound")
   //- stage 2
-  div(v-if="stage === 2" :style=`{position: 'relative'}`).row.full-width.items-start.content-start
+  div(v-if="stage === 2" :style=`{position: 'relative'}`).row.fit.items-start.content-start.bg-black
     k-dialog-bottom(ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete fragment', color: 'red'}}}" @action="cancel()")
     //- mini mode
     div(
-      v-if="ctx === 'inEditor' && mini" @click="$emit('mini')"
-      :style=`{position: 'absolute', zIndex: 200, opacity: 0.5}`).row.fit.bg-red
+      v-if="mini" @click="$emit('mini')"
+      :style=`{position: 'absolute', zIndex: 200, opacity: 0.5}`).row.fit.cursor-pointer
+    //- actions
+    q-btn(
+      v-if="!mini && visible"
+      round flat dense color="white" icon="more_vert" @click="fragmentAction()"
+      :style=`{position: 'absolute', zIndex: 200, right: '8px', top: '8px'}`).shadow-1
     //- cancel
     q-btn(
       v-if="ctx === 'inEditor'"
@@ -46,16 +51,18 @@ div(
       @load="previewLoad"
       :src="ctx === 'inEditor' ? fragment.content.thumbUrl : thumbUrl"
       crossOrigin="anonymous" draggable="false"
-      :style=`{position: 'relative', top: 0, maxHeight: 500+'px', minHeight: '100%', objectFit: 'contain', userSelect: 'none'}`
-      ).full-width
+      :style=`{position: 'relative', top: 0, width: '100%', minWidth: '100%', height: '100%', minHeight: '100%', objectFit: 'contain', userSelect: 'none'}`
+      )
     //- video maxHeight: previewHeight+'px', minHeight: mini ? '0px' : '200px',
     div(
-      v-if="fragment && fragment.content"
+      v-if="fragment && fragment.content && previewLoaded"
       :style=`{position: 'absolute', zIndex: 100, top: 0, minHeight: '100%', minWidth: '100%'}`).fit
       nc-fragment-video(
         v-if="previewLoaded && fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
-        :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini"
-        :width="previewWidth" :height="previewHeight")
+        :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini" :visible="visible"
+        :width="previewWidth" :height="previewHeight"
+        @muted="$event => $emit('muted', $event)"
+        @ended="$emit('ended', index)")
   nc-fragment-video-editor(
     v-if="ctx === 'inEditor' && $refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
     @close="editing = false"
@@ -72,7 +79,7 @@ import ncFragmentVideoEditor from './nc_fragment_video_editor'
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
-  props: ['ctx', 'index', 'width', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'mini'],
+  props: ['ctx', 'index', 'width', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'mini', 'visible'],
   data () {
     return {
       stage: 0,
@@ -152,6 +159,9 @@ export default {
     }
   },
   methods: {
+    fragmentAction () {
+      this.$log('fragmentAction')
+    },
     play () {
       this.$log('play')
       if (this.fragment && this.fragment.content) {
@@ -191,7 +201,7 @@ export default {
     },
     previewLoad (e) {
       this.$log('previewLoad', e.path[0].width, e.path[0].height)
-      this.$emit('previewLoaded', e.path[0].height)
+      this.$emit('height', e.path[0].height)
       this.previewLoaded = true
     },
     previewError (e) {
