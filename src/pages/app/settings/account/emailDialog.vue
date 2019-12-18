@@ -9,8 +9,8 @@
         span.text-bold.text-white {{$t('Changing email')}}
     .column.bg-white.q-px-md
       .row.content-start.justify-center
-        q-input(v-model="$store.state.objects.currentUser.profile.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
-        q-input(v-model="newEmail" stack-label label="New email" filled).full-width.q-mb-md
+        q-input(v-model="$store.state.objects.currentUser.profile.email" standout disable readonly stack-label :label="$t('Current email')").full-width.q-my-md.text-black
+        q-input(v-model="newEmail" stack-label :label="$t('New email')" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changeEmail()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Save email') }}

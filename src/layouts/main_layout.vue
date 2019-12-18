@@ -8,8 +8,8 @@
   //- k-spinner(v-if="loading")
   //- q-resize-observer(@resize="onResize")
   //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
-transition(appear enter-active-class="animated fadeIn")
-  router-view(v-if="!loading")
+  transition(appear enter-active-class="animated fadeIn")
+    router-view(v-if="!loading")
 </template>
 
 <script>

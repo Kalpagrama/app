@@ -38,7 +38,7 @@
                   div(
                     v-for="(s,si) in 100" :key="si"
                     :style=`{borderRadius: '4px'}`).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm
-                    small Sphere {{si}}
+                    small {{$t('Sphere')}} {{si}}
               div(:style=`{minHeight: '60px'}`).row.full-width.q-pa-md
                 div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
                   span.text-bold {{ $t('Categories') }}
@@ -48,7 +48,7 @@
                   div(
                     v-for="(s,si) in 6" :key="si"
                     :style=`{borderRadius: '4px'}`).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm
-                    small Category {{si}}
+                    small {{$t('Category') {{si}}
             div(:style=`{height: '70px'}`).row.full-with.br
 </template>
 
