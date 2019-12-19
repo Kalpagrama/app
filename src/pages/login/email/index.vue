@@ -8,7 +8,7 @@
             v-model="email" type="email" filled :label="$t('Email')" @keyup.enter="emailSend()"
             ).full-width.bg-white
         q-btn(
-          push no-caps color="accent" @click="emailSend()" :loading="emailSending"
+          push no-caps color="green" @click="emailSend()" :loading="emailSending"
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm
           span.text-bold {{$t('Next')}}
         q-btn(
@@ -21,7 +21,7 @@
             v-model="code" filled :label="$t('Code')" @keyup.enter="codeSend()"
             ).full-width.bg-white
         q-btn(
-          push no-caps color="accent" @click="codeSend" :loading="codeSending"
+          push no-caps color="green" @click="codeSend" :loading="codeSending"
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width
           span.text-bold {{$t('Login')}}
 </template>

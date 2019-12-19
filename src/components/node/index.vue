@@ -6,22 +6,24 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
       :thumbUrl="node.meta.fragments[0].thumbUrl"
-      @height="$event => fragmentHeight(0, $event)"
+      @previewWidth="$event => fragmentWidth(0, $event)"
+      @previewHeight="$event => fragmentHeight(0, $event)"
       @ended="fragmentEnded(0)"
       @action="nodeAction"
       :visible="visible"
-      :width="width" :fragment="nodeFull ? nodeFull.fragments[0] : null"
+      :fragment="nodeFull ? nodeFull.fragments[0] : null"
       :mini="fragmentMini === 0" @mini="fragmentChange(1)"
       :style=`fragmentMini === 0 ? fragmentMiniStyles : {}`)
     nc-fragment(
       ref="fragmentSecond"
       :ctx="ctx" :index="1"
       :thumbUrl="node.meta.fragments[1].thumbUrl"
-      @height="$event => fragmentHeight(1, $event)"
+      @previewWidth="$event => fragmentWidth(1, $event)"
+      @previewHeight="$event => fragmentHeight(1, $event)"
       @ended="fragmentEnded(1)"
       @action="nodeAction"
       :visible="visible"
-      :width="fWidth" :fragment="nodeFull ? nodeFull.fragments[1] : null"
+      :fragment="nodeFull ? nodeFull.fragments[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(0)"
       :style=`fragmentMini === 1 ? fragmentMiniStyles : {height: '100%', width: '100%', objectFit: 'contain'}`)
   //- name
@@ -32,37 +34,31 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
     span.text-bold.text-center.cursor-pointer {{ node.name }}
   //- actions
   div(
-    v-if="ctx === 'inEditor'"
-    :style=`{position: 'relative', height: '60px', borderRadius: '10px', overflow: 'hidden', marginTop: fMarginTop+'px'}`).row.full-width.items-center
+    v-if="nodeFull && opened"
+    :style=`{position: 'relative', height: '60px', borderRadius: '0 0 10px 10px', overflow: 'hidden', marginTop: fMarginTop+'px', borderTop: '1px solid #eee'}`).row.full-width.items-center
     div(
       v-touch-pan.left.right.prevent.mouse="votePan"
       :style=`{
         position: 'absolute', left: voteLeft+'px', zIndex: 200,
         height: '60px', width: '90px'}`
         ).row.items-center.justify-center
-      div(:style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.items-center.justify-center.bg-primary.cursor-pointer
+      q-btn(round push :style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.items-center.justify-center.bg-green.cursor-pointer
         q-icon(name="blur_on" color="white" size="30px")
     div(
       v-if="votePanning"
       :style=`{position: 'absolute', zIndex: 198, borderTop: '1px solid #eee'}`).row.fit.items-center.justify-center.bg-white
       span Pan to vote
-    div(:style=`{marginLeft: '90px'}`).row.full-height.items-center
-      span.text-bold 100
-      small.text-bold / 10
-    .col
-    q-btn(round flat color="grey-9" icon="keyboard_arrow_up" @click="fragmentMini()")
+    div(:style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
+      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center 100
+      span.text-bold.full-width.text-center 10
+    .col.full-height
+      .row.fit.items-center.justify-end
+        span {{ nodeFull.author.name }}
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      q-btn(round flat color="grey-9" icon="more_vert" @click="nodeActions")
-  //- author
-  //- transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
-  //-   div(
-  //-     v-if="opened"
-  //-     :style=`{height: '50px'}`).row.full-width.items-center.justify-center
-  //-     div(:style=`{height: '50px', width: '50px'}`).row.items-center.justify-center
-  //-       div(:style=`{height: '35px', width: '35px', borderRadius: '50%'}`).bg-grey-3
-  //-     .col.full-height
-  //-       .row.fit.items-center
-  //-         span Author
+      div(:style=`{height: '35px', width: '35px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-3
+        img(
+          :src="nodeFull.author.thumbUrl"
+          :style=`{width: '100%', height: '100%', objectFit: 'cover'}`)
 </template>
 
 <script>
@@ -70,7 +66,7 @@ import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'nodeNew',
-  props: ['ctx', 'index', 'width', 'node', 'needFull', 'nodeFullReady', 'visible'],
+  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'nodeFullReady', 'visible'],
   components: {ncFragment},
   data () {
     return {
@@ -78,7 +74,6 @@ export default {
       nodeFull: null,
       voteLeft: 0,
       votePanning: false,
-      opened: false,
       fPosition: 'absolute',
       fMarginTop: 0,
       fMini: true,
@@ -86,6 +81,7 @@ export default {
       fBottom: 30,
       fRight: 10,
       previewHeight: 0,
+      previewWidth: 0,
       fragmentMini: 1,
       fragmentMiniStyles: {
         position: 'absolute',
@@ -127,15 +123,19 @@ export default {
     }
   },
   methods: {
+    fragmentWidth (index, width) {
+      this.$log('fragmentWidth', index, width)
+      if (index === 0) {
+        this.previewWidth = width
+        this.$emit('previewWidth', width)
+      }
+    },
     fragmentHeight (index, height) {
       this.$log('fragmentHeight', index, height)
-      this.$q.notify('height:: ' + height)
       if (index === 0) {
         this.previewHeight = height
+        this.$emit('previewHeight', height)
       }
-      let heights = []
-      heights[index] = height
-      this.$emit('heights', heights)
     },
     fragmentEnded (index) {
       this.$log('fragmentEnded', index)
@@ -174,7 +174,7 @@ export default {
     votePan (e) {
       // this.$log('votePan', e)
       let to = this.voteLeft + e.delta.x
-      if (to > 0 && to <= 500 - 90 - 16) {
+      if (to > 0 && to <= this.previewWidth - 80) {
         this.voteLeft += e.delta.x
       }
       if (e.isFirst) {
@@ -182,7 +182,7 @@ export default {
       }
       if (e.isFinal) {
         this.votePanning = false
-        this.opened = !this.opened
+        // this.opened = !this.opened
         this.$tween.to(this, 0.4, {voteLeft: 0})
       }
     },

@@ -18,8 +18,8 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
     .col.bg-grey-3
     div(:style=`{maxWidth: '500px'}`).row.full-width.q-px-sm
       div(:style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.bg-grey-3.q-pt-sm
-        div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', }`).row.full-width.items-center.justify-center.bg-white
-          span(v-if="node").text-bold.text-black {{ node.name }}
+        div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', }` @click="headerClick()").row.full-width.items-center.justify-center.bg-green
+          span(v-if="node").text-bold.text-white.text-center {{ node.name }}
     .col.bg-grey-3
   q-footer(reveal).row.full-width.justify-center.bg-grey-3
     k-menu-mobile(:style=`{maxWidth: '500px'}`)
@@ -29,12 +29,15 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
         div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
           .row.full-width.items-start.content-start
             node(
-              v-if="node" ref="neNode"
+              v-if="node"
+              ref="neNode"
               :ctx="'inList'"
-              :width="width" :node="node" :nodeFullReady="node"
-              @previewLoaded="previewHeight = $event").bg-white.q-mb-md
+              :node="node" :nodeFullReady="node"
+              :visible="true" :opened="true"
+              @previewWidth="previewWidth = $event"
+              @previewHeight="previewHeight = $event").bg-white.q-mb-md
       div(
-        v-if="false"
+        v-if="true"
         :style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '500px'}`).row.full-width.q-pa-sm
           node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
@@ -113,6 +116,12 @@ export default {
       this.$log('nodeLoad start')
       let node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
       return node
+    },
+    headerClick () {
+      this.$log('headerClick')
+      // window.scrollTo(0, 0)
+      this.$tween.to(document.documentElement, 0.3, {scrollTop: 0})
+      // document.documentElement.scrollTop = 0
     },
     onScroll (e) {
       // this.$log('onScroll', e)

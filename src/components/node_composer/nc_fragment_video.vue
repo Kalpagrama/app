@@ -13,12 +13,13 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   div(
     v-if="ctx !== 'inEditor'" @click="videoToggle()"
     :style=`{position: 'absolute', zIndex: 103, opacity: 0.5}`).row.fit.items-center.justify-center
-    q-btn(v-if="!playing" round flat icon="play_arrow" color="white" size="60px")
+    q-btn(v-if="!playing && !mini" round flat icon="play_arrow" color="white" size="60px")
   //- muted
   q-btn(
     v-if="!mini && visible"
-    round flat dense color="white" :icon="muted ? 'volume_off' : 'volume_up'" @click="mutedToggle()"
-    :style=`{position: 'absolute', zIndex: 103, left: '8px', top: '8px'}`).shadow-1
+    round flat color="white" @click="mutedToggle()"
+    :style=`{position: 'absolute', zIndex: 103, left: '8px', top: '8px', background: 'rgba(255,255,255,0.15)'}`).shadow-1
+    q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   //- video wrapper
   div(:style=`{position: 'relative'}`).row.fit
     video(
@@ -68,9 +69,13 @@ export default {
       this.muted = !this.muted
       this.$emit('muted', this.muted)
     },
-    play () {
+    async play () {
       this.$log('play')
-      if (this.player) this.player.play()
+      if (this.player) {
+        this.player.play()
+        await this.$wait(100)
+        this.muted = false
+      }
     },
     pause () {
       this.$log('pause')
@@ -90,7 +95,7 @@ export default {
       this.playing = !this.playing
     },
     videoTimeupdate (e) {
-      this.$log('videoTimeupdate', e)
+      // this.$log('videoTimeupdate', e)
       if (this.ctx === 'inEditor') {
         this.now = this.player.currentTime
       } else {
@@ -129,11 +134,16 @@ export default {
     playerStartNative () {
       this.$log('playerStartNative')
       this.player = {}
-      this.player.play = () => {
+      this.player.play = async () => {
         this.$log('playerNative: play')
         this.$refs.ncFragmentVideo.play()
+        await this.$wait(100)
+        this.muted = false
+        // this.$nextTick(() => {
+        //   this.muted = false
+        // })
       }
-      this.player.pause = () => {
+      this.player.pause = async () => {
         this.$log('playerNative: pause')
         this.$refs.ncFragmentVideo.pause()
       }
@@ -154,6 +164,7 @@ export default {
       this.playerStart()
     } else {
       this.playerStartNative()
+      // this.player.play()
     }
   },
   beforeDestroy () {
