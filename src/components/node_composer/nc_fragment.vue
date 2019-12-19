@@ -161,6 +161,9 @@ export default {
   methods: {
     fragmentAction () {
       this.$log('fragmentAction')
+      this.$emit('action')
+      // this.$store.commit('node/stateSet', ['nodeOptionsPayload', JSON.parse(JSON.stringify(this.fragment))])
+      // this.$store.commit('node/stateSet', ['nodeOptionsDialogOpened', true])
     },
     play () {
       this.$log('play')

@@ -1,4 +1,5 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { router } from 'boot/main'
 import { apolloProvider } from 'boot/apollo'
 import assert from 'assert'
 
@@ -61,8 +62,23 @@ export const nodeDelete = async (context, oid) => {
   logD('nodeDelete dones')
 }
 
-export const nodeAction = async (context, {node}) => {
-  logD('nodeAction start')
+export const nodeAction = async (context, action) => {
+  logD('nodeAction start', action)
+  switch (action) {
+    case 'confirm': {
+      logD('MIX MIX MIX')
+      context.commit('workspace/stateSet', ['wsItem', {type: 'node', item: context.state.nodeOptionsPayload}], { root: true })
+      router.push('/create')
+      break
+    }
+    case 'savenode': {
+      logD('SAVE SAVE')
+      let nodeInput = context.state.nodeOptionsPayload
+      delete nodeInput.oid
+      context.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(nodeInput)), { root: true })
+      break
+    }
+  }
   logD('nodeAction done')
 }
 

@@ -10,5 +10,15 @@ export default {
   node: null,
   nodeFull: null,
   rateDialogOpened: false,
-  categories: []
+  categories: [],
+  nodeOptionsPayload: null,
+  nodeOptionsDialogOpened: false,
+  nodeOptions: {
+    header: false,
+    confirm: true,
+    confirmName: 'Mix node',
+    actions: {
+      savenode: {name: 'Save to workspace'}
+    }
+  }
 }
