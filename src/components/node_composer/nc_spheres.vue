@@ -77,6 +77,10 @@ div(
         v-for="(c, ci) in node.categories" :key="ci" @click="sphereDelete(c, ci)"
         :style=`{borderRadius: '4px'}`).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm
         small(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`) {{ c.name }}
+      div(
+        v-for="(c, ci) in categoriesMap" :key="ci" @click="sphereDelete(c.type)"
+        :style=`{borderRadius: '4px'}`).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm
+        small(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`) {{ c.name }}
 </template>
 
 <script>

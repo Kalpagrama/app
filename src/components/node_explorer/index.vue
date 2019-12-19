@@ -34,7 +34,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
               :width="width" :node="node" :nodeFullReady="node"
               @previewLoaded="previewHeight = $event").bg-white.q-mb-md
       div(
-        v-if="true"
+        v-if="false"
         :style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '500px'}`).row.full-width.q-pa-sm
           node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")

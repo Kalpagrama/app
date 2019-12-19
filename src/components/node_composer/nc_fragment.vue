@@ -16,7 +16,7 @@ div(
   //- stage 1
   nc-fragment-content(v-if="ctx === 'inEditor' && stage === 1" :width="width" @content="contentFound" @fragment="fragmentFound")
   //- stage 2
-  div(v-if="stage === 2" :style=`{position: 'relative'}` :class=`{'full-height': ctx === 'inList'}`).row.full-width.items-start.content-start.bg-black
+  div(v-if="stage === 2" :style=`{position: 'relative'}`).row.full-width.full-height.items-start.content-start.bg-black
     k-dialog-bottom(ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete fragment', color: 'red'}}}" @action="cancel()")
     //- mini mode
     div(
@@ -48,8 +48,8 @@ div(
       :style=`{position: 'absolute', zIndex: 200, bottom: '24px', right: '16px'}`).shadow-5
     img(
       ref="ncFragmentPreview"
-      @load="previewLoad"
       :src="ctx === 'inEditor' ? fragment.content.thumbUrl : thumbUrl"
+      @load="$emit('height', $refs.ncFragmentPreview.clientHeight), previewLoaded = true"
       crossOrigin="anonymous" draggable="false"
       :style=`{position: 'relative', top: 0, width: '100%', minWidth: '100%', height: '100%', minHeight: '100%', objectFit: 'contain', userSelect: 'none'}`
       )
@@ -63,12 +63,12 @@ div(
         :width="previewWidth" :height="previewHeight"
         @muted="$event => $emit('muted', $event)"
         @ended="$emit('ended', index)")
-  nc-fragment-video-editor(
-    v-if="ctx === 'inEditor' && $refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
-    @close="editing = false"
-    :fragment="fragment" :now="$refs.ncFragmentVideo.now" :player="$refs.ncFragmentVideo.player"
-    :width="width" :height="previewHeight"
-    :style=`{height: toolsHeight+'px'}`)
+    nc-fragment-video-editor(
+      v-if="ctx === 'inEditor' && $refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
+      @close="editing = false"
+      :fragment="fragment" :now="$refs.ncFragmentVideo.now" :player="$refs.ncFragmentVideo.player"
+      :width="width" :height="previewHeight"
+      :style=`{height: toolsHeight+'px'}`)
 </template>
 
 <script>
@@ -202,9 +202,10 @@ export default {
     setSize (...args) {
       this.$refs.ncFragmentVideo.setSize(...args)
     },
-    previewLoad (e) {
-      this.$log('previewLoad', e.path[0].width, e.path[0].height)
-      this.$emit('height', e.path[0].height)
+    previewHeightLoaded (height) {
+      this.$log('previewHeightLoaded', height)
+      this.$emit('height', height)
+      this.previewHeight = height
       this.previewLoaded = true
     },
     previewError (e) {

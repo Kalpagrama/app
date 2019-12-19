@@ -1,7 +1,7 @@
 <template lang="pug">
 div(:style=`{borderRadius: '10px'}`).row.full-width
   //- fragments
-  div(:style=`{position: 'relative', height: previewHeight+'px'}`).row.full-width
+  div(:style=`{position: 'relative', height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`).row.full-width
     nc-fragment(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
@@ -92,8 +92,9 @@ export default {
         zIndex: 200,
         maxWidth: 100 + 'px',
         right: 16 + 'px',
-        bottom: 40 + 'px',
-        opacity: 0.8
+        bottom: 20 + 'px',
+        opacity: 0.8,
+        objectFit: 'contain'
       }
     }
   },
@@ -128,6 +129,7 @@ export default {
   methods: {
     fragmentHeight (index, height) {
       this.$log('fragmentHeight', index, height)
+      this.$q.notify('height:: ' + height)
       if (index === 0) {
         this.previewHeight = height
       }
