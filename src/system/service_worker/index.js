@@ -152,6 +152,7 @@ async function initSw (store) {
 }
 
 // очистить кэш сервис-воркера
+// todo clear indexed DB!!!
 async function clearCache () {
   logD('clearCache')
   if (registration && registration.waiting) { // если есть новый ожидающий SW - активируем его

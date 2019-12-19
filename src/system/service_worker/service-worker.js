@@ -1,5 +1,5 @@
-const swVer = 5
-const useCache = true
+const swVer = 9
+const useCache = false
 
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry
 // log
@@ -25,9 +25,9 @@ let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry
 }
 logDebug('swVer=', swVer)
 
-// custom staleWhileRevalidate for POST requests
-let staleWhileRevalidate = async (event) => {
-  logDebug('staleWhileRevalidate dummy...')
+// custom cacheGraphQl for POST requests
+let cacheGraphQl = async (event) => {
+  logDebug('cacheGraphQl dummy...')
 }
 {
   /* global idbKeyval, MD5 */
@@ -40,9 +40,9 @@ let staleWhileRevalidate = async (event) => {
   const gqlStore = new idbKeyval.Store('sw-cache-gql', 'graphql-responses')
   idbKeyval.set('swVer', swVer, swStore)
 
-  staleWhileRevalidate = async function (event) {
+  cacheGraphQl = async function (event) {
     // let tmpReq = event.request.clone()
-    // logDebug('staleWhileRevalidate...', 'body = ', await tmpReq.json(), tmpReq)
+    // logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
     // let promise = null
     // if(event.request.method === 'POST')
     let cachedResponse = await getCache(event.request.clone())
@@ -154,7 +154,7 @@ if (useCache) {
     )
     workbox.routing.registerRoute(
       /^https:\/\/.*\.kalpagramma\.com:?[0-9]*\/graphql.*/,
-      async ({ url, event, params }) => staleWhileRevalidate(event),
+      async ({ url, event, params }) => cacheGraphQl(event),
       'POST'
     )
   }
@@ -199,8 +199,8 @@ if (useCache) {
       // if (event.request.url.match(/^https:\/\/.*\.kalpagramma\.com:?[0-9]*\/graphql.*/)) {
       //   logDebug('gql query')
       //   let tmpReq = event.request.clone()
-      //   logDebug('staleWhileRevalidate...', 'body = ', await tmpReq.json(), tmpReq)
-      //   event.respondWith(staleWhileRevalidate(event))
+      //   logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
+      //   event.respondWith(cacheGraphQl(event))
       // }
 
       // if (event.request.method === 'POST') {
