@@ -42,7 +42,7 @@ export const loginEmail = async (context, email) => {
           token
           expires
           role
-          isNewUser
+          # isNewUser
         }
       }
     `,

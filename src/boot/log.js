@@ -138,7 +138,10 @@ export default async ({ Vue, store, app }) => {
       if (thiz && thiz.logModuleName) {
         return thiz.logModuleName
       } else if (thiz && thiz.constructor && thiz.constructor.name === 'VueComponent') {
-        return thiz.$options.name
+        let res = thiz.$options.name
+        // if (thiz.$attrs.index !== undefined) res += `--${thiz.$attrs.index}`
+        // res += `--${thiz.$props.index}`
+        return res
       } else {
         return 'unknown module'
       }

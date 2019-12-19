@@ -12,7 +12,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
       div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
         //- k-colls-new
         //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
-        node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
+        node-loader(v-if="true" ref="nodeLoader" :query="query" queryKey="feed")
           template(v-slot:default=`{nodes}`)
             node-list(:nodes="nodes" @nodeClick="nodeClick")
 </template>
@@ -32,50 +32,9 @@ export default {
         {id: 's2', name: 'How to pill'},
         {id: 's3', name: 'How to feel'}
       ],
-      // query: gql`
-      //   query feed($pageToken: RawJSON) {
-      //     feed(pagination: {pageSize: 100, pageToken: $pageToken}) {
-      //       count
-      //       totalCount
-      //       nextPageToken
-      //       items {
-      //         oid
-      //         type
-      //         thumbUrl (preferWidth: 600)
-      //         createdAt
-      //         name
-      //         meta {
-      //           ...on MetaNode {
-      //             layout
-      //             fragments { width height thumbUrl(preferWidth: 600) }
-      //           }
-      //         }
-      //       }
-      //     }
-      //   }
-      // `
-    }
-  },
-  computed: {
-    // variables () {
-    //   return {
-    //     oid: this.$store.state.objects.currentUser.oid
-    //   }
-    // },
-    categories () {
-      return this.$store.state.node.categories.reduce((acc, val) => {
-        acc[val.type] = val
-        return acc
-      }, {})
-    },
-    sphereOid () {
-      return this.categories.FUN.sphere.oid
-      // else return false
-    },
-    query () {
-      return gql`
-        query sphereNodesHome ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-          sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+      query: gql`
+        query feed($pageToken: RawJSON) {
+          feed(pagination: {pageSize: 100, pageToken: $pageToken}) {
             count
             totalCount
             nextPageToken
@@ -95,7 +54,48 @@ export default {
           }
         }
       `
+    }
+  },
+  computed: {
+    // variables () {
+    //   return {
+    //     oid: this.$store.state.objects.currentUser.oid
+    //   }
+    // },
+    categories () {
+      return this.$store.state.node.categories.reduce((acc, val) => {
+        acc[val.type] = val
+        return acc
+      }, {})
     },
+    sphereOid () {
+      return this.categories.FUN.sphere.oid
+      // else return false
+    },
+    // query () {
+    //   return gql`
+    //     query sphereNodesHome ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
+    //       sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+    //         count
+    //         totalCount
+    //         nextPageToken
+    //         items {
+    //           oid
+    //           type
+    //           thumbUrl (preferWidth: 600)
+    //           createdAt
+    //           name
+    //           meta {
+    //             ...on MetaNode {
+    //               layout
+    //               fragments { width height thumbUrl(preferWidth: 600) }
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   `
+    // },
     variables () {
       return {
         sphereOid: this.sphereOid,
