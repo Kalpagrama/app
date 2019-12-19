@@ -1,3 +1,5 @@
+import { checkUpdate, clearCache } from 'src/system/service_worker'
+
 const routes = [
   {
     path: '/',
@@ -18,7 +20,19 @@ const routes = [
       { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
-      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') }
+      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
+      {
+        name: 'refresh',
+        path: 'refresh',
+        component: null,
+        beforeEnter: async (to, from, next) => {
+          console.log('refresh app!!!')
+          await checkUpdate()
+          await clearCache()
+          localStorage.clear()
+          await next('/')
+        }
+      }
     ]
   },
   {

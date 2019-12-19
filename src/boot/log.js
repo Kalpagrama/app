@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/browser'
+// import * as Sentry from '@sentry/browser'
 
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {
@@ -62,7 +62,7 @@ class Logger {
   constructor (store) {
     this.store = store
     this.loggerFuncs = {}
-    Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
+    // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
   }
 
   getLoggerFunc (module) {
@@ -79,7 +79,7 @@ class Logger {
       this.getLoggerFunc(module)(...msg)
     }
     if (LogLevelEnum.DEBUG >= this.store.state.core.logLevelSentry) {
-      Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
+      // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
     }
   }
 
@@ -89,7 +89,7 @@ class Logger {
       this.getLoggerFunc(module)(...msg)
     }
     if (LogLevelEnum.INFO >= this.store.state.core.logLevelSentry) {
-      Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Info)
+      // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Info)
     }
   }
 
@@ -99,7 +99,7 @@ class Logger {
       this.getLoggerFunc(module)(...msg)
     }
     if (LogLevelEnum.WARNING >= this.store.state.core.logLevelSentry) {
-      Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Warning)
+      // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Warning)
     }
   }
 
@@ -110,7 +110,7 @@ class Logger {
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry) {
-        Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
+        // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
       }
     } catch (err) {
       console.error('error on logging error!!!', err)
@@ -124,7 +124,7 @@ class Logger {
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry) {
-        Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Critical)
+        // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Critical)
       }
     } catch (err) {
       console.error('error on logging error!!!', err)
@@ -191,11 +191,6 @@ export default async ({ Vue, store, app }) => {
         console.error(e)
       }
     }
-    // Sentry.init({
-    //   dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536',
-    //   integrations: [new Integrations.Vue({ Vue, attachProps: true, logErrors: true })]
-    // })
-    // Sentry.captureMessage('Some messagezzzzz', Sentry.Severity.Debug);
   } catch (err) {
     if (logE) logE(err)
   }

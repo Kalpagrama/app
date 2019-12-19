@@ -13,7 +13,7 @@ export const init = async (context) => {
   let { data: { userIsAuthorized, userIsConfirmed } } = await apolloProvider.clients.authApollo.query({
     client: 'apiApollo',
     query: gql`
-      query userCheck {
+      query sw_cache_userCheck {
         userIsAuthorized
         userIsConfirmed
       }

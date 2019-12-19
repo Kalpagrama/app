@@ -71,7 +71,6 @@ module.exports = function (ctx) {
       scopeHoisting: true,
       vueRouterMode: 'history',
       vueCompiler: true,
-      // distDir: path.resolve(__dirname, 'public'),
       distDir: 'dist',
       // gzip: true,
       // analyze: true,
@@ -104,6 +103,7 @@ module.exports = function (ctx) {
       }
     },
     devServer: {
+      // writeToDisk: true,
       before (app) {
         // const cors = require('cors')
         // app.use(cors())
@@ -134,7 +134,7 @@ module.exports = function (ctx) {
       workboxOptions: {
         // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
         swSrc: 'src/system/service_worker/service-worker.js',
-        // precacheManifestFilename: 'precache-manifest.[manifestHash].js'
+        // importWorkboxFrom: 'local'
       },
       manifest: {
         name: 'Kalpagramma',

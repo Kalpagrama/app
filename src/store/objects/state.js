@@ -10,6 +10,9 @@ export default {
     subscribers: [],
     weightVal: 0.001,
     profile: {
+      // data url, в котором хранится аватарка. Нужно для того, чтобы при смене аватарки - быстро показались данные (objectShort.thumbUrl может быть закэширован на CDN или иным сервером статики и меняется долго)
+      // на сфере пользователя сначала показывать эту картинку, и если пусто, то стандарный objectShort.thumbUrl
+      thumbUrl: null,
       lang: 'RUS',
       role: 'MEMBER',
       email: '123@321.ru',

@@ -67,7 +67,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
 </template>
 
 <script>
-  import { checkUpdate, clearCache } from 'src/system/service_worker'
+  import { checkUpdate, update } from 'src/system/service_worker'
   import { LogLevelEnum } from 'src/boot/log'
 
   export default {
@@ -85,7 +85,6 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
           // { name: 'test web-push', icon: 'message', path: '/app/test_message' },
           // { name: 'sentry log send', icon: 'message', path: '/app/sentry_log' },
           // { name: 'test share', icon: 'share', path: '/app/share' },
-          { name: 'clear_cache', icon: 'autorenew', path: '/app/clear_cache' },
           { name: 'Exit', icon: 'exit_to_app', path: '/app/logout' }
         ],
         userAvatarErrored: false
@@ -175,11 +174,6 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
             // });
             break
           }
-          case '/app/clear_cache': {
-            // alert('Web Share API not supported.');
-            await clearCache()
-            break
-          }
           default:
             this.$go(p.path)
         }
@@ -188,9 +182,9 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         if (this.$store.state.core.newVersionAvailable) {
           this.$store.commit('core/stateSet', ['newVersionAvailable', false])
           this.$logD('updating ...')
-          location.reload()
+          await update()
         } else {
-          this.$logD('checkUpdate..')
+          this.$logD('checkUpdate...')
           await checkUpdate()
         }
       },

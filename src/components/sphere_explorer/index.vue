@@ -69,23 +69,24 @@ export default {
       this.$router.push(`/sphere/${s.oid}`)
     },
     async spheresLoad (oid) {
-      this.$logD('spheresLoad start', oid)
-      let { data: { sphereSpheres: { items: spheres } } } = await this.$apollo.query({
-        query: gql`
-          query sphereSpheresOld ($oid: OID!){
-            sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
-              items {
-                oid
-                name
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
-      this.$logD('spheresLoad done', spheres)
+      // this.$logD('spheresLoad start', oid)
+      let spheres = await this.$store.dispatch('objects/sphereSpheres', oid)
+      // let { data: { sphereSpheres: { items: spheres } } } = await this.$apollo.query({
+      //   query: gql`
+      //     query sphereSpheresOld ($oid: OID!){
+      //       sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
+      //         items {
+      //           oid
+      //           name
+      //         }
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   }
+      // })
+      // this.$logD('spheresLoad done', spheres)
       return spheres
     }
   },

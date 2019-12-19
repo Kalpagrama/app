@@ -134,3 +134,25 @@ export const nodeCreate = async (context, node) => {
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
 }
+
+export const sphereSpheres = async (context, oid) => {
+  logD('sphereSpheres start')
+  assert.ok(oid)
+  let { data: { sphereSpheres: { items: spheres } } } = await apolloProvider.clients.apiApollo.query({
+    query: gql`
+      query sphereSpheres ($oid: OID!){
+        sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
+          items {
+            oid
+            name
+          }
+        }
+      }
+    `,
+    variables: {
+      oid: oid
+    }
+  })
+  logD('sphereSpheres complete')
+  return spheres
+}

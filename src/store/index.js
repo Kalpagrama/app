@@ -29,7 +29,7 @@ async function init (context) {
   let { data: { user, categories, userWorkspace, userEvents, userSubscriptions, userSettings } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       ${fragments.userFragment}
-      query initializationQuery {
+      query sw_cache_initializationQuery {
         user { ...userFragment}
         categories {
           type
