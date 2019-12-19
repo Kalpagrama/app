@@ -1,8 +1,7 @@
 <template lang="pug">
 div(
   :style=`{borderRadius: '10px', oveflow: 'hidden'}`).row.full-width.bg-white
-  //- dialogs
-  //- spheres
+  //- spheres dialog
   q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     .column.fit.bg-white
       div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-sm
@@ -23,16 +22,12 @@ div(
             v-for="(s, si) in spheres" :key="si" @click="sphereCreate({name: s.name, oid: s.oid})"
             :style=`{minHeight: '40px'}`).row.full-width.items-center.q-px-md
             span {{ s.name }}
-  //- categories
+  //- categories dialog
   q-dialog(ref="categoriesDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     .column.fit.bg-white
       div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-sm
         .col
           div(:style=`{position: 'relative', zIndex: 10, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-            q-input(
-              v-model="category" filled color="green"
-              :placeholder="$t('Find category')"
-              @blur="categoryCreate()" @keyup.enter="categoryCreate()").full-width
         q-btn(round flat icon="clear" color="grey" @click="$refs.categoriesDialog.hide()").q-ml-sm
       .col.full-width.scroll
         .row.full-width.items-start.content-start
@@ -44,6 +39,7 @@ div(
             v-for="(c, ci) in categories" :key="ci" @click="categoryCreate({name: c.name, type: c.type})"
             :style=`{minHeight: '40px'}`).row.full-width.items-center.q-px-md
             span {{ c.name }}
+          span {{category}}
   //- spheres
   div(:style=`{minHeight: '60px', padding: '10px'}`).row.full-width
     div(:style=`{height: '60px'}`).row.full-width.items-center
@@ -71,11 +67,10 @@ div(
               :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).full-width
               q-input(v-model="category" ref="categoryInput" autofocus filled @blur="categoryCreate()" @keyup.enter="categoryCreate()").full-width
           q-btn(v-else="!categoryCreating" round flat icon="add" color="green" @click="categoryCreateStart()")
-          //- span {{this.$store.state.node.categories}}
     .row.full-width.items-start.content-start
       div(
-        v-for="(c, ci) in node.categories" :key="ci" @click="sphereDelete(c, ci)"
-        :style=`{borderRadius: '4px'}`).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm
+        v-for="(c, ci) in categoriesMap" :key="ci" @click="categoryDelete(c.type)"
+        :style=`{borderRadius: '4px'}`).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm.br
         small(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`) {{ c.name }}
       div(
         v-for="(c, ci) in categoriesMap" :key="ci" @click="sphereDelete(c.type)"
@@ -105,6 +100,11 @@ export default {
     categories () {
       return this.$store.state.node.categories
     },
+    categoriesMap () {
+      return this.node.categories.map(m => {
+        return this.$store.state.node.categories.find(c => (c.type === m))
+      })
+    },
     spheresWS () {
       return this.$store.state.workspace.workspace.nodes.reduce((acc, val) => {
         val.spheres.map(s => {
@@ -115,6 +115,21 @@ export default {
     }
   },
   methods: {
+    categoryCreateStart () {
+      this.$log('categoryCreateStart')
+      this.$refs.categoriesDialog.show()
+    },
+    categoryCreate (category) {
+      if (this.node.categories.includes(category.type)) return
+      if (this.node.categories.length > 3) return
+      this.node.categories.push(category.type)
+      this.$refs.categoriesDialog.hide()
+      this.$log('categoryCreate', category)
+    },
+    categoryDelete (type) {
+      this.node.categories = this.node.categories.filter(c => (c !== type))
+      this.$log('categoryDelete', type)
+    },
     sphereCreateStart () {
       this.$log('sphereCreateStart')
       this.$refs.spheresDialog.show()
@@ -125,21 +140,6 @@ export default {
         this.$log('spheres', spheres)
         this.spheresSpheres = [...spheres, ...this.spheresSpheres]
       })
-    },
-    categoryCreateStart () {
-      this.$log('categoryCreateStart')
-      this.$refs.categoriesDialog.show()
-    },
-    categoryCreate (category) {
-      this.$log('categoryCreate', category, this.category)
-      this.node.categories.push(category)
-      this.categoryCreating = false
-      this.category = ''
-      this.$refs.categoriesDialog.hide()
-    },
-    categoryDelete (c, ci) {
-      this.$log('categoryDelete', c, ci)
-      this.$delete(this.category, ci)
     },
     sphereCreate (sphere) {
       this.$log('sphereCreate', sphere, this.sphere)
