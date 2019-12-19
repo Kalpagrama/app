@@ -3,7 +3,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
   //- cut on video progress bar
   div(
     v-if="cut"
-    :style=`{position: 'absolute', zIndex: 103, top: '-40px', height: '28px', pointerEvents: 'none'}`).row.full-width.q-px-md
+    :style=`{position: 'absolute', zIndex: 103, top: '-14px', height: '14px', pointerEvents: 'none'}`).row.full-width.q-px-md
     div(:style=`{position: 'relative'}`).row.fit
       div(:style=`{
         position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 0.9,

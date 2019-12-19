@@ -67,7 +67,9 @@ export const nodeAction = async (context, action) => {
   switch (action) {
     case 'confirm': {
       logD('MIX MIX MIX')
-      context.commit('workspace/stateSet', ['wsItem', {type: 'node', item: context.state.nodeOptionsPayload}], { root: true })
+      let nodeInput = context.state.nodeOptionsPayload
+      delete nodeInput.oid
+      context.commit('workspace/stateSet', ['wsItem', {type: 'node', item: nodeInput}], { root: true })
       router.push('/create')
       break
     }

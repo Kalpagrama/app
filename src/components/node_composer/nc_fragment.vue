@@ -16,7 +16,7 @@ div(
   //- stage 1
   nc-fragment-content(v-if="ctx === 'inEditor' && stage === 1" :width="width" @content="contentFound" @fragment="fragmentFound")
   //- stage 2
-  div(v-if="stage === 2" :style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
+  div(v-if="stage === 2" :style=`{position: 'relative'}` :class=`{'full-height': ctx === 'inList'}`).row.full-width.items-start.content-start.bg-black
     k-dialog-bottom(ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete fragment', color: 'red'}}}" @action="cancel()")
     //- mini mode
     div(
