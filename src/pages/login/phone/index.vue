@@ -103,7 +103,7 @@
       this.$logD('codeSend done', result)
       this.codeConfirmed = true
       await this.$wait(1000)
-      this.$go('/app/home')
+      this.$go('/')
      } else {
       this.$logD('codeSend fails', failReason)
       this.$q.notify(this.$t('code send error') + failReason)

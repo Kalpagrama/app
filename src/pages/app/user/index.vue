@@ -152,8 +152,10 @@ export default {
   methods: {
     fileChanged (e) {
       this.$log(e.target.files)
-      this.file = e.target.files
-      this.downloadPhoto()
+      if (e.target.files.length === 1){
+        this.file = e.target.files[0]
+        this.downloadPhoto(this.file)
+      } else throw new Error(`bad selected files len ${e.target.files.length}`)
     },
     userPhotoAction (a) {
       this.$logD('userPhotoAction', a)
@@ -167,13 +169,13 @@ export default {
         }
       }
     },
-    async downloadPhoto (e) {
+    async downloadPhoto (file) {
       try {
         this.$log('changePhoto start')
-        let res = await this.$store.dispatch('objects/setPhoto', {
+        let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
-          path: 'thumbUrl',
-          value: this.file
+          path: 'profile.thumbUrl',
+          value: file
         })
       } catch (e) {
         this.$log('changePhoto ERROR', e)

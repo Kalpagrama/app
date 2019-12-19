@@ -67,7 +67,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
 </template>
 
 <script>
-  import { checkUpdate } from 'src/system/service_worker'
+  import { checkUpdate, update } from 'src/system/service_worker'
   import { LogLevelEnum } from 'src/boot/log'
 
   export default {
@@ -84,7 +84,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
           { name: 'Notifications', icon: 'notifications', path: '/notifications' },
           // { name: 'test web-push', icon: 'message', path: '/test_message' },
           // { name: 'sentry log send', icon: 'message', path: '/sentry_log' },
-          { name: 'test share', icon: 'share', path: '/share' },
+          // { name: 'test share', icon: 'share', path: '/app/share' },
           { name: 'Exit', icon: 'exit_to_app', path: '/logout' }
         ],
         userAvatarErrored: false
@@ -182,9 +182,9 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         if (this.$store.state.core.newVersionAvailable) {
           this.$store.commit('core/stateSet', ['newVersionAvailable', false])
           this.$logD('updating ...')
-          location.reload()
+          await update()
         } else {
-          this.$logD('checkUpdate..')
+          this.$logD('checkUpdate...')
           await checkUpdate()
         }
       },
@@ -192,7 +192,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         let installPrompt = this.$store.state.core.installPrompt
         this.$logD('installPrompt=', installPrompt)
         if (installPrompt) installPrompt.prompt()
-      }
+      },
     }
   }
 </script>

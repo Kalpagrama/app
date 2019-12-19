@@ -2,6 +2,7 @@ import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
@@ -169,6 +170,17 @@ export const get = async (context, { oid, fragmentName, priority }) => {
 
 // path ex: ['settings', 'general', 'language'] OR ['profile', 'gender']
 export const setObjectValue = async (context, { oid, path, value }) => {
+  if (path === 'profile.thumbUrl') {
+    let file = value
+    const toBase64 = file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+    value = await toBase64(file)
+  }
+
   let { data: { objectChange } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation objectChange ($oid: OID!, $path: String!, $value: RawJSON!) {
@@ -181,7 +193,6 @@ export const setObjectValue = async (context, { oid, path, value }) => {
 }
 
 export const setPhoto = async (context, { oid, path, value }) => {
-  let { data: { objectChange } } = await apolloProvider.clients.apiApollo.mutate({
-  })
+  let { data: { objectChange } } = await apolloProvider.clients.apiApollo.mutate({})
   return objectChange
 }

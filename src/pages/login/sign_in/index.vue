@@ -61,8 +61,8 @@
           password: this.password
         })
         await this.$wait(1000)
-        this.$go('/app/home')
-        this.$log('login done', res)
+        this.$go('/')
+        this.$log('login done!', res)
       } catch (e) {
         this.$log('login ERROR', e)
       }

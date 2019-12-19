@@ -2,6 +2,8 @@
 import * as firebase from 'firebase/app'
 import '@firebase/messaging'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { Notify } from 'quasar'
+import { i18n } from 'boot/i18n'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
@@ -41,8 +43,30 @@ function sendMessageToSW (message) {
   })
 }
 
+function showNotifyNewVer () {
+  Notify.create(
+    {
+      position: 'top',
+      message: i18n.t('new_ver_avail', 'new version available'),
+      actions: [{
+        label: i18n.t('update_app', 'Update application'),
+        noDismiss: true,
+        handler: async () => {
+          await update()
+        }
+      }]
+    }
+  )
+}
+
+import { Store, get } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
+
 async function initSw (store) {
-  // logD('initSw')
+  logD('initSw')
+  const swStore = new Store('sw-cache-common', 'common-data')
+  let swVer = await get('swVer', swStore)
+  store.commit('core/stateSet', ['version', `${store.state.core.version}-${swVer}`])
+
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
     logD('beforeinstallprompt')
@@ -56,24 +80,90 @@ async function initSw (store) {
     store.commit('core/stateSet', ['installPrompt', null])
   })
   if ('serviceWorker' in navigator && !registration) {
-    registration = await navigator.serviceWorker.register('/service-worker.js')
-    logD('Registration sw succeeded. Scope is ' + registration.scope)
-    wait(100).then(() => {
-      logD('sendMessageToSW...')
-      sendMessageToSW({
-        logModulesBlackList: store.state.core.logModulesBlackList,
-        logLevel: store.state.core.logLevel,
-        logLevelSentry: store.state.core.logLevelSentry
-      }).catch(err => logE('cant post msg to sw', err))
-    })
+    // init sw
+    {
+      registration = await navigator.serviceWorker.register('/service-worker.js')
+      logD('Registration sw succeeded. Scope is ' + registration.scope)
+      wait(100).then(() => {
+        logD('sendMessageToSW...')
+        sendMessageToSW({
+          type: 'logInit',
+          logModulesBlackList: store.state.core.logModulesBlackList,
+          logLevel: store.state.core.logLevel,
+          logLevelSentry: store.state.core.logLevelSentry
+        }).catch(err => logE('cant post msg to sw', err))
+      })
 
-    registration.addEventListener('updatefound', function () {
-      // If updatefound is fired, it means that there's
-      // a new service worker being installed.
-      // let installingWorker = registration.installing;
-      store.commit('core/stateSet', ['newVersionAvailable', true])
-    })
+      if (registration.waiting && registration.active) {
+        // The page has been loaded when there's already a waiting and active SW.
+        // This would happen if skipWaiting isn't being called, and there are
+        // still old tabs open.
+        logW('Please close all tabs to get updates.')
+        // todo show prompt for SW to activate sw immediately and reload page
+        registration.waiting.postMessage({ type: 'skipWaiting' })
+        store.commit('core/stateSet', ['newVersionAvailable', true])
+        await update()
+      } else {
+        // updatefound is also fired for the very first install. ¯\_(ツ)_/¯
+        registration.addEventListener('updatefound', () => {
+          // If updatefound is fired, it means that there's
+          // a new service worker being installed.
+          let newSW = registration.installing
+          newSW.addEventListener('statechange', (event) => {
+            if (event.target.state === 'installed') {
+              if (registration.active) {
+                // If there's already an active SW, and skipWaiting() is not
+                // called in the SW, then the user needs to close all their
+                // tabs before they'll get updates.
+                logW('Please close all tabs to get updates.')
+                // todo show prompt for SW to activate sw immediately and reload page
+                newSW.postMessage({ type: 'skipWaiting' })
+                store.commit('core/stateSet', ['newVersionAvailable', true])
+                showNotifyNewVer()
+              } else {
+                // Otherwise, this newly installed SW will soon become the
+                // active SW. Rather than explicitly wait for that to happen,
+                // just show the initial "content is cached" message.
+                logW('Content is cached for the first time! please wait...')
+              }
+            }
+          })
+        })
+      }
+    }
     await initWebPush(store)
+  }
+
+  // не работает вроде...
+  function handleNetworkChange (event) {
+    logD('handleNetworkChange', navigator.onLine)
+    store.commit('core/stateSet', ['online', navigator.onLine])
+    Notify.create(
+      {
+        position: 'top',
+        message: store.state.core.online
+          ? i18n.t('network_available', 'network available') : i18n.t('network_unavailable', 'network unavailable')
+      }
+    )
+  }
+
+  window.addEventListener('online', handleNetworkChange)
+  window.addEventListener('offline', handleNetworkChange)
+}
+
+// очистить кэш сервис-воркера
+// todo clear indexed DB!!!
+async function clearCache () {
+  logD('clearCache')
+  if (registration && registration.waiting) { // если есть новый ожидающий SW - активируем его
+    registration.waiting.postMessage({ type: 'skipWaiting' })
+  }
+  if (registration) {
+    caches.keys().then(cacheNames => {
+      cacheNames.forEach(cacheName => {
+        caches.delete(cacheName)
+      })
+    })
   }
 }
 
@@ -108,9 +198,7 @@ async function initWebPush (store) {
 
       let token = await messaging.getToken()
       store.commit('core/stateSet', ['webPushTokenDraft', token])
-
-      logD(token)
-      // showNotification('initWebPush ok', 'body')
+      await showNotification('application loaded', `version=${store.state.core.version}`)
       // todo send to server
       messaging.onTokenRefresh(async () => {
         let token = await messaging.getToken()
@@ -127,6 +215,11 @@ async function checkUpdate () {
     logD('checkUpdate2')
     await registration.update()
   }
+}
+
+async function update () {
+  await clearCache()
+  await window.location.reload()
 }
 
 async function askForNPerm () {
@@ -198,4 +291,4 @@ async function showNotification (title, body) {
   }
 }
 
-export { initSw, initWebPush, checkUpdate }
+export { initSw, initWebPush, checkUpdate, update, clearCache }
