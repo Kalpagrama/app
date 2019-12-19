@@ -3,7 +3,7 @@
   div(:style=`{maxWidth: 330+'px'}`).row.full-width
     .row.full-width.q-mb-sm
       q-btn(
-        push label="Войти через" icon-right="fab fa-vk" no-caps @click="$go({name: 'vk'})"
+        push :label="$t('Sign in by', 'Войти через')" icon-right="fab fa-vk" no-caps @click="$go({name: 'vk'})"
         :style=`{background: '#45668e', color: 'white', height: '60px', borderRadius: '10px'}`).full-width
     .row.full-width.q-mb-sm
       q-btn(

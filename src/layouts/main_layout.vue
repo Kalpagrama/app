@@ -2,14 +2,14 @@
 </style>
 
 <template lang="pug">
-//- .row.fit.items-center.justify-center
-  //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    //- k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
+.row.fit.items-center.justify-center.bg-primary
+  q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
   //- k-spinner(v-if="loading")
   //- q-resize-observer(@resize="onResize")
   //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
-transition(appear enter-active-class="animated fadeIn")
-  router-view(v-if="!loading")
+  transition(appear enter-active-class="animated fadeIn")
+    router-view(v-if="!loading")
 </template>
 
 <script>
@@ -82,6 +82,7 @@ export default {
       }
       await this.$store.dispatch('init')
       this.loading = false
+      // this.$refs.kTutorialDialog.show()
     } catch (error) {
       this.$logD('error', error)
       // this.loading = false

@@ -29,7 +29,7 @@
                 q-icon(name="link")
           q-btn(
             v-if="link.length === 0"
-            label="или скопировать ссылку" outline no-caps color="accent" :loading="linkGetting" @click="getLink()"
+            :label="$t('или скопировать ссылку')" outline no-caps color="accent" :loading="linkGetting" @click="getLink()"
             style=`height: 56px; width: 120px; border-radius: 10px`).full-width
 </template>
 

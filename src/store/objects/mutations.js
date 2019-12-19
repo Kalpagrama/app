@@ -1,10 +1,11 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
-export function init (state, {user, fragmentName}) {
+export function init (state, { user, fragmentName }) {
   // current user  хранится в кэше со всеми объектами, но живет вечно
   assert.ok(user && user.oid && fragmentName)
   assert.ok(!state.objects[user.oid])
@@ -64,4 +65,15 @@ export function setObjectValue (state, { oid, path, value }) {
   setValue(object, p, value)
   logD('!!!', object)
   logD('currentUser', state.objects.currentUser)
+}
+
+export function deleteUserSession (state, token) {
+  if (!token) { // удалить все кроме текущей
+    let currentToken = localStorage.getItem('ktoken').split('::')[0]
+    let indx = state.currentUser.sessions.findIndex(sess => sess.token === currentToken)
+    if (indx >= 0) state.currentUser.sessions = [state.currentUser.sessions[indx]]
+  } else {
+    let indx = state.currentUser.sessions.findIndex(sess => sess.token === token)
+    if (indx >= 0) state.currentUser.sessions.splice(indx, 1)
+  }
 }

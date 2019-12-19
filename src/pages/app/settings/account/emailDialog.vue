@@ -4,13 +4,13 @@
   q-dialog(ref="changeEmail" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     div(style=`height: 60px`).row.items-center.bg-primary
       div(style=`height: 60px; width: 60px`).row.justify-center.items-center
-        q-btn(round flat icon="arrow_back" color="white" @click="$refs.changeEmail.toggle()")
+        q-btn(round flat icon="arrow_back" color="white" @click="closing()")
       .col.row.justify-start.items-center.q-px-sm
         span.text-bold.text-white {{$t('Changing email')}}
     .column.bg-white.q-px-md
       .row.content-start.justify-center
-        q-input(v-model="$store.state.objects.currentUser.profile.email" standout disable readonly stack-label label="Current email").full-width.q-my-md.text-black
-        q-input(v-model="newEmail" stack-label label="New email" filled).full-width.q-mb-md
+        q-input(v-model="$store.state.objects.currentUser.profile.email" standout disable readonly stack-label :label="$t('Current email')").full-width.q-my-md.text-black
+        q-input(v-model="newEmail" stack-label :label="$t('New email')" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changeEmail()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Save email') }}
@@ -37,6 +37,11 @@ export default {
     }
   },
   methods: {
+    closing () {
+      this.$log('reset start')
+      this.newPhone = null
+      this.$refs.changeEmail.toggle()
+    },
     async changeEmail () {
       try {
         this.$log('changeEmail start')

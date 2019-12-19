@@ -17,7 +17,7 @@
     div(v-else).row.full-width
       div(:style=`{position: 'relative', zIndex: 100, height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mb-sm.bg-white
         q-input(v-model="code" filled :label="$t('Code')" @keyup.enter="codeSend()").full-width.q-mb-sm
-      q-btn(push color="accent" label="Войти" :loading="codeSending" @click="codeSend()"
+      q-btn(push color="accent" :label="$t('Sign in', 'Войти')" :loading="codeSending" @click="codeSend()"
         :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm
       q-btn(
         outline no-caps color="white" @click="codeWaiting = false"

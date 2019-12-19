@@ -10,9 +10,9 @@
     .row.full-width.justify-center.q-mb-md
       span.text-bold {{$t('Вы точно хотите выйти?')}}
     .row.full-width.justify-center.q-px-md.q-mb-sm
-      q-btn(@click="logout()" no-caps dense color="primary" style=`width: 120px; border-radius: 10px` label="Выйти").row.full-width
+      q-btn(@click="logout()" no-caps dense color="primary" style=`width: 120px; border-radius: 10px` :label="$t('Выйти')").row.full-width
     .row.full-width.justify-center.q-px-md
-      q-btn(@click="$emit('hide')" no-caps dense color="primary" style=`width: 120px; border-radius: 10px` label="Отмена").row.full-width
+      q-btn(@click="$emit('hide')" no-caps dense color="primary" style=`width: 120px; border-radius: 10px` :label="$t('Отмена')").row.full-width
 </template>
 <script>
 export default {

@@ -1,6 +1,6 @@
 import { apolloProvider } from 'boot/apollo'
-import { router } from 'boot/main'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { router } from 'boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
@@ -14,7 +14,7 @@ export const init = async (context) => {
 }
 export const logout = async (context, token) => {
   logD('@logout start')
-  let { data: { logout } } = await apolloProvider.clients.authApollo.mutate({
+  let { data: { logout } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       mutation logout($token: String) {
         logout(token: $token)
@@ -24,11 +24,13 @@ export const logout = async (context, token) => {
       token
     }
   })
-  if (!token || token === localStorage.getItem('ktoken')) {
+  let currentToken = localStorage.getItem('ktoken').split('::')[0]
+  if (!token || token === currentToken) {
     localStorage.removeItem('ktoken')
     localStorage.removeItem('ktokenExpires')
     router.push('/login')
   }
+  context.commit('objects/deleteUserSession', token, { root: true })
   logD('@logout done')
 }
 export const loginEmail = async (context, email) => {

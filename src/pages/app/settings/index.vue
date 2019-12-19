@@ -62,9 +62,9 @@ export default {
       page: 'settings',
       right: true,
       pages: {
-        notifications: {name: 'Notifications', icon: 'notifications'},
         account: {name: 'Account', icon: 'perm_identity'},
-        // security: {name: 'Security', icon: 'security'},
+        security: {name: 'Security', icon: 'security'},
+        notifications: {name: 'Notifications', icon: 'notifications'},
         privacy: {name: 'Privacy', icon: 'pan_tool'},
         // payments: {name: 'Payments and Subscriptions'},
         blacklist: {name: 'Black list', icon: 'view_list'},
@@ -123,6 +123,9 @@ export default {
       this.page = pkey
       this.right = !this.right
     }
+  },
+  mounted () {
+    this.$log('settings')
   }
 }
 </script>

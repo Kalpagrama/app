@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-grey-3
+q-layout(container :style=`{width: '100vw', height: '100vh'}`).column.bg-grey-3
   q-dialog(ref="subDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
     @hide="sub = null")
     div(@click.self="$refs.subDialog.hide()").row.fit.justify-center.items-start.q-py-xl.q-px-sm
@@ -36,11 +36,10 @@ q-layout(container :style=`{width: width+'px', height: height+'px'}`).column.bg-
             div(:style=`{}`).row.items-center.justify-center
               //- @click="subDelete(s, si)"
               q-btn(rounded outline dense no-caps
-                :label="subsToDelete.includes(s.oid) ? 'Follow' : 'Unfollow'"
+                :label="subsToDelete.includes(s.oid) ? $t('Follow') : $t('Unfollow')"
                 :color="subsToDelete.includes(s.oid) ? 'accent' : 'red'"
                 size="10px"  @click="subsToDelete.includes(s.oid) ? followClick(s, si) : unfollowClick(s, si)"
                 :style=`{padding: '2px 5px'}`)
-              //- q-btn( rounded outline dense label="follow" size="10px" color="green-7" @click="followClick(s, si)")
 </template>
 
 <script>
@@ -51,8 +50,6 @@ export default {
     return {
       sub: null,
       follow: false,
-      label: 'unfollow',
-      color: 'red-7',
       subIndex: undefined,
       subsToDelete: []
     }

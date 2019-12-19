@@ -4,15 +4,15 @@
   q-dialog(ref="changePhone" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     div(style=`height: 60px`).row.items-center.bg-primary
       div(style=`height: 60px; width: 60px`).row.justify-center.items-center
-        q-btn(round flat icon="arrow_back" color="white" @click="$refs.changePhone.toggle()")
+        q-btn(round flat icon="arrow_back" color="white" @click="closing()")
       .col.row.justify-start.items-center.q-px-sm
         span.text-bold.text-white {{$t('Changing phone number')}}
     .column.bg-white.q-px-md
       .row.full-width.justify-left.q-my-md
         span {{$t('You can attach your personal phone number to the page. This will protect your page.')}}
       div(style=`border-radius: 10px;`).row.content-start.justify-center
-        q-input(v-if="currentPhone" v-model="currentPhone" readonly disable stack-label label="Current number" filled).full-width.q-mb-md
-        q-input(v-model="newPhone" unmasked-value mask="(###)-###-##-##" stack-label label="New number" prefix="+7" filled).full-width.q-mb-md
+        q-input(v-if="currentPhone" v-model="currentPhone" readonly disable stack-label :label="$t('Current number')" filled).full-width.q-mb-md
+        q-input(v-model="newPhone" unmasked-value mask="(###)-###-##-##" stack-label :label="$t('New number')" prefix="+7" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changePhone()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get code') }}
@@ -41,6 +41,11 @@ export default {
     }
   },
   methods: {
+    closing () {
+      this.$log('reset start')
+      this.newPhone = null
+      this.$refs.changePhone.toggle()
+    },
     async changePhone () {
       try {
         this.$log('changePhone start')
