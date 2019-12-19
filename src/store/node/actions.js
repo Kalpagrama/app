@@ -94,6 +94,7 @@ export const nodeCreate = async (context, node) => {
       assert.ok(fr.content)
       assert.ok(fr.cuts.length >= 0)
       assert.ok(fr.scale > 0)
+      let fragmentLen = 0
       for (let c of fr.cuts) {
         assert.ok(c.color)
         // assert.ok(c.thumbUrl)
@@ -102,6 +103,7 @@ export const nodeCreate = async (context, node) => {
         let end = c.points[1].x
         assert.ok(start >= 0 && end > 0)
         assert.ok(end > start && end <= fr.scale)
+        fragmentLen += (end - start)
       }
     }
   }
@@ -150,4 +152,26 @@ export const nodeCreate = async (context, node) => {
   })
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
+}
+
+export const sphereSpheres = async (context, oid) => {
+  logD('sphereSpheres start')
+  assert.ok(oid)
+  let { data: { sphereSpheres: { items: spheres } } } = await apolloProvider.clients.apiApollo.query({
+    query: gql`
+      query sphereSpheres ($oid: OID!){
+        sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
+          items {
+            oid
+            name
+          }
+        }
+      }
+    `,
+    variables: {
+      oid: oid
+    }
+  })
+  logD('sphereSpheres complete')
+  return spheres
 }

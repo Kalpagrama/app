@@ -33,7 +33,7 @@ export const init = async (context) => {
     }
   })
 
-  context.commit('init', context.rootState.objects.currentUser.events)
+  context.commit('init')
   return true
 }
 

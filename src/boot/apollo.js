@@ -79,7 +79,7 @@ export default async ({ Vue, store, app }) => {
   })
 
   let { data: { services } } = await authApollo.query({
-    query: gql`query services {services}`
+    query: gql`query sw_cache_services {services}`
   })
   // logD('services', services)
   let linkHttp = services.API

@@ -9,12 +9,22 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
-  logD('user init')
-  context.commit('init')
+  logD('auth init')
+  let { data: { userIsAuthorized, userIsConfirmed } } = await apolloProvider.clients.authApollo.query({
+    client: 'apiApollo',
+    query: gql`
+      query sw_cache_userCheck {
+        userIsAuthorized
+        userIsConfirmed
+      }
+    `,
+    fetchPolicy: 'network-only'
+  })
+  context.commit('init', { userIsAuthorized, userIsConfirmed })
 }
 export const logout = async (context, token) => {
   logD('@logout start')
-  let { data: { logout } } = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { logout } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
       mutation logout($token: String) {
         logout(token: $token)
@@ -42,7 +52,6 @@ export const loginEmail = async (context, email) => {
           token
           expires
           role
-          # isNewUser
         }
       }
     `,
@@ -79,6 +88,7 @@ export const loginPhone = async (context, phone) => {
   logD('@loginPhone done')
 }
 export const loginPassword = async (context, { login, password }) => {
+  logD('@loginPassword start')
   logD('@loginPassword start')
   let { data: { login: { token, expires, role } } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
