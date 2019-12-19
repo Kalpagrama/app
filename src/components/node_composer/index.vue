@@ -77,7 +77,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
             //- save / add fragment
             div(
               v-if="node.fragments[0]"
-              :style=`{height: '60px', marginBottom: '200px'}`).row.full-width.q-mt-sm.br
+              :style=`{height: '60px', marginBottom: '200px'}`).row.full-width.q-mt-sm
               q-btn(
                 outline no-caps color="green" @click="nodeSave()"
                 :style=`{height: '60px', borderRadius: '10px'}`

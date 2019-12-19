@@ -35,16 +35,16 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   //- progress
   div(
     v-if="now && !mini"
-    :style=`{position: 'absolute', bottom: '0px', zIndex: 105, height: '32px'}`).row.full-width.q-px-md
+    :style=`{position: 'absolute', bottom: '0px', zIndex: 105, height: '28px'}`).row.full-width.q-px-md
     //- progress width
-    div(:style=`{position: 'relative', height: '32px'}` @click="progressClick").row.full-width.cursor-pointer
-      div(:style=`{position: 'absolute', top: 0, height: '12px', pointerEvents: 'none', background: 'rgba(255,255,255,0.4)',
+    div(:style=`{position: 'relative', height: '28px'}` @click="progressClick").row.full-width.cursor-pointer
+      div(:style=`{position: 'absolute', top: '10px', height: '4px', pointerEvents: 'none', background: 'rgba(255,255,255,0.8)',
         borderRadius: '4px', overflow: 'hidden'}`).row.full-width
       //- progress bar
-      div(:style=`{height: '12px', width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
-        ).row.bg-white.q-px-xs
+      div(:style=`{position: 'absolute', top: '10px', height: '4px', width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
+        ).row.bg-green.q-px-xs
     //- progress now/duration
-    small(:style=`{position: 'absolute', zIndex: 105, top: '-24px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
+    small(:style=`{position: 'absolute', zIndex: 105, top: '-10px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
       ).q-px-sm.text-white {{ $time(now) }} / {{ $time(player.duration) }}
 </template>
 
@@ -110,7 +110,7 @@ export default {
       this.$log('playerStart')
       let me = new window.MediaElementPlayer(this.$refs.ncFragmentVideo, {
         loop: true,
-        autoplay: true,
+        autoplay: false,
         controls: false,
         features: ['playpause'],
         enableAutosize: true,
@@ -122,7 +122,7 @@ export default {
           this.player = mediaElement
           this.player.addEventListener('timeupdate', this.videoTimeupdate)
           this.player.addEventListener('seeked', this.videoSeeked)
-          this.player.play()
+          // this.player.play()
         }
       })
     },

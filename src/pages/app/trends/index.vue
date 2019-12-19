@@ -4,14 +4,18 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
     v-if="true"
     reveal
     ).row.full-width.justify-center.q-px-sm.bg-grey-3
-    k-colls-tabs(:style=`{maxWidth: '500px', borderRadius: '0 0 10px 10px'}`).bg-white
+    k-colls-tabs(
+      :coll="coll" :colls="colls"
+      @coll="coll = $event"
+      :style=`{maxWidth: '500px', borderRadius: '0 0 10px 10px'}`).bg-white
   q-footer(reveal).row.full-width.justify-center.bg-grey-3
     k-menu-mobile(:style=`{maxWidth: '500px'}`)
   q-page-conainter
     div(:style=`{paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
       div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
-        //- k-colls-new
-        //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
+        //- k-colls-new(:coll="coll" :colls="colls" @coll="coll = $event")
+          //- template(v-slot:[$route.params.category])
+            //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
         node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
           template(v-slot:default=`{nodes}`)
             node-list(:nodes="nodes" @nodeClick="nodeClick")
@@ -24,17 +28,26 @@ export default {
   data () {
     return {
       width: 0,
-      coll: 'foryou',
-      colls: [
-        {id: 'foryou', name: 'For you'},
-        {id: 'following', name: 'Following'},
-        {id: 's1', name: 'How to kill'},
-        {id: 's2', name: 'How to pill'},
-        {id: 's3', name: 'How to feel'}
-      ]
+      coll: 'FUN',
+      // colls: [
+      //   {id: 'foryou', name: 'For you'},
+      //   {id: 'following', name: 'Following'},
+      //   {id: 's1', name: 'How to kill'},
+      //   {id: 's2', name: 'How to pill'},
+      //   {id: 's3', name: 'How to feel'}
+      // ]
     }
   },
   computed: {
+    colls () {
+      return this.$store.state.node.categories.reduce((acc, val) => {
+        acc.push({
+          id: val.type,
+          name: val.name
+        })
+        return acc
+      }, [])
+    },
     categories () {
       return this.$store.state.node.categories.reduce((acc, val) => {
         acc[val.type] = val
@@ -42,7 +55,7 @@ export default {
       }, {})
     },
     sphereOid () {
-      if (this.$route.params.sphere) return this.categories[this.$route.params.sphere].sphere.oid
+      if (this.$route.params.category) return this.categories[this.$route.params.category].sphere.oid
       else return false
       // return this.categories.FUN.sphere.oid
       // else return false
@@ -81,6 +94,28 @@ export default {
     },
   },
   watch: {
+    coll: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('coll CHANGED', to)
+        if (to) {
+          // if ios safari?
+          this.$router.push({params: {category: to}})
+        }
+      }
+    },
+    // $route: {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.$log('$route CHANGED', to)
+    //     if (to.params.category) {
+    //       this.coll = to.params.category
+    //     } else {
+    //       this.coll = 'FUN'
+    //       // this.$router.replace({params: {category: 'FUN'}})
+    //     }
+    //   }
+    // }
   },
   methods: {
     nodeClick (val) {

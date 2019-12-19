@@ -16,7 +16,7 @@ div(
   //- stage 1
   nc-fragment-content(v-if="ctx === 'inEditor' && stage === 1" :width="width" @content="contentFound" @fragment="fragmentFound")
   //- stage 2
-  div(v-if="stage === 2" :style=`{position: 'relative'}`).row.fit.items-start.content-start.bg-black
+  div(v-if="stage === 2" :style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
     k-dialog-bottom(ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete fragment', color: 'red'}}}" @action="cancel()")
     //- mini mode
     div(
@@ -26,18 +26,18 @@ div(
     q-btn(
       v-if="!mini && visible"
       round flat dense color="white" icon="more_vert" @click="fragmentAction()"
-      :style=`{position: 'absolute', zIndex: 200, right: '8px', top: '8px'}`).shadow-1
+      :style=`{position: 'absolute', zIndex: 200, right: '8px', top: '8px', background: 'rgba(255,255,255,0.1)'}`).shadow-1
     //- cancel
     q-btn(
       v-if="ctx === 'inEditor'"
-      round flat color="white" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
-      :style=`{position: 'absolute', zIndex: 11000, left: '18px', top: '18px'}`).shadow-1
+      round flat color="red" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
+      :style=`{position: 'absolute', zIndex: 11000, left: '10px', top: 'calc(50% - 20px)', background: 'rgba(255,255,255,0.1)'}`).shadow-1
     //- boom
     q-btn(
-      v-if="ctx === 'inEditor' && !boomed"
+      v-if="ctx === 'inEditor' && !boomed && fragment.cuts.length === 0"
       push round no-caps @click="boom()"
       color="green"
-      :style=`{position: 'absolute', zIndex: 200, bottom: '40px', left: 'calc(50% - 20px)'}`).shadow-5.q-mr-sm
+      :style=`{position: 'absolute', zIndex: 200, bottom: '24px', left: 'calc(50% - 20px)'}`).shadow-5.q-mr-sm
       q-icon(name="wb_incandescent").rotate-180
     //- edit
     q-btn(
@@ -45,7 +45,7 @@ div(
       push round no-caps @click="editing = !editing"
       :color="editing ? 'green' : 'green'"
       :icon="editing ? 'check' : 'edit'"
-      :style=`{position: 'absolute', zIndex: 200, bottom: '40px', right: '20px'}`).shadow-5
+      :style=`{position: 'absolute', zIndex: 200, bottom: '24px', right: '16px'}`).shadow-5
     img(
       ref="ncFragmentPreview"
       @load="previewLoad"
