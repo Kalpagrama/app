@@ -8,7 +8,6 @@ debug.enabled = true
 import { LoadingBar, date, Notify } from 'quasar'
 import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
-// import { sync } from 'vuex-router-sync'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
