@@ -17,14 +17,14 @@
             @click="isPwd = !isPwd")
       .row.content-start.justify-center
         //- q-input(v-model="currentPas" stack-label label="Current password" filled).full-width.q-my-md
-        q-input(v-model="newPas" ref="password" stack-label label="New password" filled :type="isPwd ? 'password' : 'text'").full-width.q-my-md
-        q-input(v-model="repPas" ref="password" stack-label label="Repeat password" lazy-rules filled :type="isPwd ? 'password' : 'text'" :rules="[val => !!val || '* Required', val => val === newPas || 'Please enter correct password',]").full-width
+        q-input(v-model="newPas" ref="password" stack-label :label="$t('New password')" filled :type="isPwd ? 'password' : 'text'").full-width.q-my-md
+        q-input(v-model="repPas" ref="password" stack-label :label="$t('Repeat password')" lazy-rules filled :type="isPwd ? 'password' : 'text'" :rules="[val => !!val || '* Required', val => val === newPas || 'Please enter correct password',]").full-width
         q-btn(
           v-if="newPas === repPas && newPas"
           push no-caps dense color="accent" @click="changePassword()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width {{ $t('Change password') }}
         .row.full-width.q-py-sm
-          small.text-grey-8.q-px-xs.q-mt-sm Пароль должен состоять не менее чем из 6 символов, включающих буквы разных регистров, цифр и спецсимволов!
+          small.text-grey-8.q-px-xs.q-mt-sm {{$t('Пароль должен состоять не менее чем из 6 символов, включающих буквы разных регистров, цифр и спецсимволов!')}}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePassword.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
       span {{$t('Change password')}}

@@ -4,9 +4,9 @@
     .row.fit.content-center.items-center
       div().row.full-width
         div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
-          q-input(v-model="login" stack-label label="Login" filled).full-width.bg-white
+          q-input(v-model="login" stack-label :label="$t('Логин', 'Login')" filled).full-width.bg-white
         div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
-          q-input(v-model="password" stack-label label="Password" filled :type="isPwd ? 'password' : 'text'").full-width.bg-white
+          q-input(v-model="password" stack-label :label="$t('Пароль', 'Password')" filled :type="isPwd ? 'password' : 'text'").full-width.bg-white
             template(v-slot:append)
               q-icon(
                 :name="isPwd ? 'visibility_off' : 'visibility'"

@@ -31,7 +31,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
               q-btn(
                 rounded no-caps
                 @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
-                :label="include ? 'Unfollow' : 'Follow'"
+                :label="include ? $t('Unfollow') : $t('Follow')"
                 :color="include ? 'red' : 'accent'"
                 ).q-px-md
           .row.full-width.items-center.justify-start

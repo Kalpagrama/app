@@ -24,7 +24,7 @@
           q-btn(color="white" @click="chosenLanguage('RUS')").q-mr-sm.text-black RUS
           q-btn(color="white" @click="chosenLanguage('ENG')").q-ml-sm.text-black ENG
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
-        q-btn(v-model="slide" style=`height: 40px` @click="nextSlide()" color="accent" label="Next")
+        q-btn(v-model="slide" style=`height: 40px` @click="nextSlide()" color="accent" :label="$t('Next')")
     //- q-carousel-slide(name="2").row.fit.justify-center.items-center
     //-   .row.justify-center.content-center
     //-     div(style=`border-radius: 50%; border: 3px solid #fff; height: 100px; width: 100px`).row.justify-center.items-center
@@ -74,7 +74,7 @@
             q-icon(name="done" size="25px" :color="categoriesToAdd.includes(c.type) ? 'black' : 'white'")
       //- span {{categoriesToAdd}}
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
-        q-btn(v-model="slide" v-if="categoriesToAdd.length >= 1" style=`height: 40px` @click="nextSlide()" color="accent" label="Next")
+        q-btn(v-model="slide" v-if="categoriesToAdd.length >= 1" style=`height: 40px` @click="nextSlide()" color="accent" :label="$t('Next')")
 </template>
 
 <script>

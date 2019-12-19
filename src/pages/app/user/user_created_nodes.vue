@@ -2,7 +2,7 @@
 .row.full-width.items-start.content-start.q-px-sm
   node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
     template(v-slot:default=`{nodes}`)
-      node-list(:nodes="nodes")
+      node-list(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>
@@ -50,6 +50,10 @@ export default {
     }
   },
   methods: {
+    nodeClick (val) {
+      this.$log('nodeClick', val)
+      this.$router.push('/node/' + val[0].oid)
+    }
   },
   mounted () {
     this.$logD('mounted')

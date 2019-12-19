@@ -30,10 +30,12 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
           .row.full-width.items-start.content-start
             node(
               v-if="node" ref="neNode"
-              :ctx="'inEditor'"
+              :ctx="'inList'"
               :width="width" :node="node" :nodeFullReady="node"
               @previewLoaded="previewHeight = $event").bg-white.q-mb-md
-      div(:style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
+      div(
+        v-if="true"
+        :style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '500px'}`).row.full-width.q-pa-sm
           node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
             template(v-slot:default=`{nodes}`)
@@ -96,7 +98,7 @@ export default {
           else this.node = await this.nodeLoad(to.params.oid)
           await this.$wait(500)
           this.$nextTick(() => {
-            this.$refs.neNode.fragmentMini()
+            // this.$refs.neNode.fragmentMini()
           })
         }
       }

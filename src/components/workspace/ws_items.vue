@@ -130,7 +130,10 @@ export default {
     fragments () {
       return this.$store.state.workspace.workspace.nodes.reduce((acc, val) => {
         val.fragments.map(f => {
-          acc.push(f)
+          if (f.cuts.length > 0) {
+            acc.push(f)
+          }
+          // acc.push(f)
           // f.cuts.map((c, ci) => {
           //   if (c.name) {
           //     acc.push({name: c.name, scale: f.content.duration, content: f.content, cuts: [{name: '', thumbUrl: '', color: '', points: c.points}]})

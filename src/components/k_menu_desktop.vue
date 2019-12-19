@@ -78,14 +78,14 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         width: 230,
         mini: false,
         pages: [
-          { name: 'Trends', icon: 'whatshot', path: '/app/trends' },
-          { name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/app/workspace' },
-          { name: 'Subscriptions', icon: 'subscriptions', path: '/app/subscriptions' },
-          { name: 'Notifications', icon: 'notifications', path: '/app/notifications' },
-          // { name: 'test web-push', icon: 'message', path: '/app/test_message' },
-          // { name: 'sentry log send', icon: 'message', path: '/app/sentry_log' },
+          { name: 'Trends', icon: 'whatshot', path: '/trends' },
+          { name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/workspace' },
+          { name: 'Subscriptions', icon: 'subscriptions', path: '/subscriptions' },
+          { name: 'Notifications', icon: 'notifications', path: '/notifications' },
+          // { name: 'test web-push', icon: 'message', path: '/test_message' },
+          // { name: 'sentry log send', icon: 'message', path: '/sentry_log' },
           // { name: 'test share', icon: 'share', path: '/app/share' },
-          { name: 'Exit', icon: 'exit_to_app', path: '/app/logout' }
+          { name: 'Exit', icon: 'exit_to_app', path: '/logout' }
         ],
         userAvatarErrored: false
       }
@@ -138,19 +138,19 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
       async pageClick (p, pi) {
         this.$logD('pageClick', p, pi)
         switch (p.path) {
-          case '/app/logout':
+          case '/logout':
             this.$logD('LOGOUT')
             this.$refs.logoutDialog.show()
             break
-          case '/app/test_message':
+          case '/test_message':
             this.$logD('test_message..')
             await this.$store.dispatch('events/testWebPush')
             break
-          case '/app/sentry_log':
+          case '/sentry_log':
             this.$logD('sentry_log..')
             await this.$store.commit('core/stateSet', ['logLevelSentry', LogLevelEnum.DEBUG])
             break
-          case '/app/share': {
+          case '/share': {
             this.$logD('share..')
             if (!('share' in navigator)) {
               alert('Web Share API not supported.');

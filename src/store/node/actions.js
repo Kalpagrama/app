@@ -61,6 +61,11 @@ export const nodeDelete = async (context, oid) => {
   logD('nodeDelete dones')
 }
 
+export const nodeAction = async (context, {node}) => {
+  logD('nodeAction start')
+  logD('nodeAction done')
+}
+
 export const nodeCreate = async (context, node) => {
   logD('nodeCreate start', node)
   // checks
@@ -84,8 +89,6 @@ export const nodeCreate = async (context, node) => {
         assert.ok(end > start && end <= fr.scale)
         fragmentLen += (end - start)
       }
-      let sixtySec = (60 * fr.scale) / fr.content.duration
-      assert.ok(fragmentLen <= sixtySec)
     }
   }
 

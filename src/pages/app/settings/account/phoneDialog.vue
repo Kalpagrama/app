@@ -11,8 +11,8 @@
       .row.full-width.justify-left.q-my-md
         span {{$t('You can attach your personal phone number to the page. This will protect your page.')}}
       div(style=`border-radius: 10px;`).row.content-start.justify-center
-        q-input(v-if="currentPhone" v-model="currentPhone" readonly disable stack-label label="Current number" filled).full-width.q-mb-md
-        q-input(v-model="newPhone" unmasked-value mask="(###)-###-##-##" stack-label label="New number" prefix="+7" filled).full-width.q-mb-md
+        q-input(v-if="currentPhone" v-model="currentPhone" readonly disable stack-label :label="$t('Current number')" filled).full-width.q-mb-md
+        q-input(v-model="newPhone" unmasked-value mask="(###)-###-##-##" stack-label :label="$t('New number')" prefix="+7" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changePhone()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get code') }}

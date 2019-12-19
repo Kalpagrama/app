@@ -96,6 +96,7 @@ const nodeFragment = gql`
         fragments { 
           width
           height
+          thumbUrl(preferWidth: 600)
         }
       }
     }

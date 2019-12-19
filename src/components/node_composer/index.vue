@@ -40,7 +40,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
         div(v-if="loading" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-center.justify-center
           q-spinner(size="60px" color="primary")
         div(v-else).row.full-width.items-start.content-start.justify-center.q-pa-sm
-          div(v-if="node" :style=`{maxWidth: '500px'}`).row.full-width
+          div(v-if="node" :style=`{maxWidth: '500px', paddingBottom: '200px'}`).row.full-width
             q-resize-observer(@resize="onResize")
             nc-fragment(
               :ctx="'inEditor'"

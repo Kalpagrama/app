@@ -10,25 +10,25 @@
       .row.content-start.justify-center.q-pt-md
         div(
           v-for="(s, si) in sessions" :key="si"
+          v-if="s.token !== mytoken"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`
           ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
           .col
             span {{s.ip}}
+            //- span {{s.token}}
           div(style=`height: 60px; width: 40px`).row.justify-center.items-center
             q-icon(name="more_vert" size="25px" @click="sessionIndex < 0 ? sessionIndex = si : sessionIndex = -1" color="black")
           div(style=`height: 60px; width: 40px`).row.justify-center.items-center
             q-icon(name="clear" size="25px" @click="deleteSession(s.token)" color="black")
           //-  leave-active-class="animated fadeOut"
-          span {{s.token}}
           transition(appear enter-active-class="animated fadeIn")
             div(v-if="si === sessionIndex").row.full-width.justify-center
               span {{s.userAgent}}
-              span {{showBool}}
         .row.full-width.items-center.justify-center.q-my-sm
           q-btn(
             push color="accent" no-caps @click="deleteSession(null)"
             :style=`{height: '50px', borderRadius: '10px'}`)
-            span.text-bold.q-ml-md {{ $t('Delete all sessions exept your') }}
+            span.text-bold.q-ml-md {{ $t('Delete all sessions exept yours') }}
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}` @click="$refs.sessions.show()").row.full-width.justify-start.items-center.q-px-md
     span {{$t('Sessions')}}
 </template>
@@ -38,8 +38,6 @@ export default {
   name: 'pageApp__Settings__Security',
   data () {
     return {
-      inf: false,
-      // tokenString: '',
       sessionIndex: -1
     }
   },
@@ -49,7 +47,12 @@ export default {
     //   else return null
     // },
     sessions () {
-      return this.$store.state.user.user.sessions
+      return this.$store.state.objects.currentUser.sessions
+    },
+    mytoken () {
+      let str = localStorage.getItem('ktoken')
+      let newstr = str.split('::')[0]
+      return newstr
     }
   },
   methods: {

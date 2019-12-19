@@ -3,9 +3,9 @@
   q-dialog(ref="whocould")
     div(style=`border-radius: 10px; overflow: hidden`).row.full-width.justify-center.bg-white
       div(:style=`{borderBottom: '1px solid #eee'}`).row.justify-left.items-center.q-px-md
-        q-radio(v-model="show" color="accent" val="all" label="All").row.full-width
-        q-radio(v-model="show" color="accent" val="important" label="Important").row.full-width
-        q-radio(v-model="show" color="accent" val="neither" label="Neither").row.full-width
+        q-radio(v-model="show" color="accent" val="all" :label="$t('all')").row.full-width
+        q-radio(v-model="show" color="accent" val="important" :label="$t('important')").row.full-width
+        q-radio(v-model="show" color="accent" val="neither" :label="$t('neither')").row.full-width
   .row.full-width.items-center
     div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
       span {{$t('Allow people to find me')}}
