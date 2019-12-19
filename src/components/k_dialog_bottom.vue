@@ -91,10 +91,12 @@ export default {
     show () {
       this.$logD('show')
       this.$refs.kDialogBottom.show()
+      this.$emit('show')
     },
     hide () {
       this.$logD('hide', this.$refs.kDialogBottom)
       this.$refs.kDialogBottom.hide()
+      this.$emit('hide')
     },
     toggle () {
       this.$logD('toggle', this.$refs.kDialogBottom)

@@ -8,6 +8,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
       :thumbUrl="node.meta.fragments[0].thumbUrl"
       @height="$event => fragmentHeight(0, $event)"
       @ended="fragmentEnded(0)"
+      @action="nodeAction"
       :visible="visible"
       :width="width" :fragment="nodeFull ? nodeFull.fragments[0] : null"
       :mini="fragmentMini === 0" @mini="fragmentChange(1)"
@@ -18,6 +19,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
       :thumbUrl="node.meta.fragments[1].thumbUrl"
       @height="$event => fragmentHeight(1, $event)"
       @ended="fragmentEnded(1)"
+      @action="nodeAction"
       :visible="visible"
       :width="fWidth" :fragment="nodeFull ? nodeFull.fragments[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(0)"
@@ -197,6 +199,11 @@ export default {
     },
     nodeActions () {
       this.$log('nodeActions')
+    },
+    nodeAction () {
+      this.$log('nodeAction')
+      this.$store.commit('node/stateSet', ['nodeOptionsPayload', JSON.parse(JSON.stringify(this.nodeFull))])
+      this.$store.commit('node/stateSet', ['nodeOptionsDialogOpened', true])
     },
     async nodeLoad (oid) {
       this.$log('nodeLoad start', this.index, this.node.oid)

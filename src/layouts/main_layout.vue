@@ -2,14 +2,21 @@
 </style>
 
 <template lang="pug">
-.row.fit.items-center.justify-center.bg-primary
-  q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-   k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
+//- .row.fit.items-center.justify-center
+  //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    //- k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
   //- k-spinner(v-if="loading")
   //- q-resize-observer(@resize="onResize")
   //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
-  transition(appear enter-active-class="animated fadeIn")
-    router-view(v-if="!loading")
+.row.full-width.items-start.content-start
+  //- transition(appear enter-active-class="animated fadeIn")
+  k-dialog-bottom(
+    :value="$store.state.node.nodeOptionsDialogOpened"
+    :options="$store.state.node.nodeOptions"
+    @action="$event => $store.dispatch('node/nodeAction', $event)"
+    @hide="$store.commit('node/stateSet', ['nodeOptionsDialogOpened', false])")
+    //- k-node-dialog
+  router-view(v-if="!loading")
 </template>
 
 <script>
@@ -68,7 +75,7 @@ export default {
       return
     }
     this.loading = false
-    if (this.$store.state.events.notice) this.$refs.kTutorialDialog.show()
+    // if (this.$store.state.events.notice) this.$refs.kTutorialDialog.show()
   }
  }
 </script>
