@@ -9,6 +9,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', }` @click="headerClick()").row.full-width.items-center.justify-center.bg-green
           span(v-if="node").text-bold.text-white.text-center {{ sphere.name }}
     .col.bg-grey-3
+      span похожие сферы в ряд
   q-footer(reveal).row.full-width.justify-center.bg-grey-3
     k-menu-mobile(:style=`{maxWidth: '500px'}`)
   q-page-conainter
@@ -28,7 +29,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
         v-if="true"
         :style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '500px'}`).row.full-width.q-pa-sm
-          node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
+          node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
             template(v-slot:default=`{nodes}`)
               node-list(:nodes="nodes" @nodeClick="nodeClick")
 </template>
