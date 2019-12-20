@@ -23,6 +23,8 @@
             v-if="n.oid === nodeOid"
             :style=`{height: nodeRect.height+'px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-3
+    div(v-if="!nodes" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
+      span {{$t('Пользователь не голосовал', 'User didnt rate')}}
 </template>
 <script>
 import node from './node'

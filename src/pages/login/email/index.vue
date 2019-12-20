@@ -1,29 +1,45 @@
+<style lang="stylus">
+.kinput {
+  border: none;
+  height: 100%;
+  padding: 10px;
+  &:focus {
+    outline: none;
+  }
+}
+</style>
 <template lang="pug">
 .row.full-width.justify-center
   div(:style=`{maxWidth: 330+'px'}`).row.full-width
     .row.fit.content-center.items-center
-      div(v-if="!codeWaiting").row.full-width.q-mb-sm
+      div(v-if="!codeConfirmed && !codeWaiting").row.full-width.q-mb-sm
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mb-sm.bg-white
-          q-input(
-            v-model="email" type="email" filled :label="$t('Email')" @keyup.enter="emailSend()"
-            ).full-width.bg-white
+          input(
+            :placeholder="$t('Почта')"
+            v-model="email" type="email" filled @keyup.enter="emailSend()"
+            ).full-width.bg-white.kinput
         q-btn(
           push no-caps color="accent" @click="emailSend()" :loading="emailSending"
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm
           span.text-bold {{$t('Next')}}
-        q-btn(
-          outline no-caps color="white" @click="$go('/login')"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width
-          span {{$t('Back')}}
+        //- q-btn(
+        //-   outline no-caps color="white" @click="$go('/login')"
+        //-   :style=`{height: '60px', borderRadius: '10px'}`).full-width
+        //-   span {{$t('Back')}}
       div(v-else).row.full-width
-        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
-          q-input(
-            v-model="code" filled :label="$t('Code')" @keyup.enter="codeSend()"
-            ).full-width.bg-white
+        div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
+          input(
+            :placeholder="$t('Код')"
+            v-model="code" filled @keyup.enter="codeSend()"
+            ).full-width.bg-white.kinput
         q-btn(
           push no-caps color="accent" @click="codeSend" :loading="codeSending"
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width
           span.text-bold {{$t('Login')}}
+        q-btn(
+          outline no-caps color="white" @click="back()"
+          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mt-sm
+            span {{$t('Back')}}
 </template>
 
 <script>
@@ -41,6 +57,12 @@
    }
   },
   methods: {
+    back () {
+      this.codeConfirmed = false
+      this.codeWaiting = false
+      this.emailSending = false
+      this.code = ''
+    },
    async emailSend () {
     try {
      this.$logD('emailSend start', this.email)

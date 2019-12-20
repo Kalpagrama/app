@@ -20,7 +20,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
       img(
         v-show="!userAvatarErrored"
         @error="userAvatarError"
-        :src="$store.state.objects.currentUser.thumbUrl"
+        :src="$store.state.objects.currentUser.profile.thumbUrl"
         :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
       div(
         v-if="userAvatarErrored"
@@ -91,6 +91,11 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
       }
     },
     computed: {
+      mytoken () {
+        let str = localStorage.getItem('ktoken')
+        let newstr = str.split('::')[0]
+        return newstr
+      },
       logoutDialogOptions () {
         return {
           header: false,
@@ -123,6 +128,12 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
       }
     },
     methods: {
+      async logout (mytoken) {
+        // this.tokenString = token
+        this.$log('logout start')
+        let res = await this.$store.dispatch('auth/logout', mytoken)
+        this.$log('logout done', res)
+      },
       userAvatarError (e) {
         this.$log('userAvatarError', e)
         this.userAvatarErrored = true
@@ -131,7 +142,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         this.$logD('logoutDialogAction', action)
         switch (action) {
           case 'confirm': {
-            await this.$store.dispatch('auth/logout', localStorage.getItem('ktoken'))
+            this.logout()
           }
         }
       },

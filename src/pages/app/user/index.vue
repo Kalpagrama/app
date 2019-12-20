@@ -25,7 +25,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
         div(v-if="true").row.full-width.q-px-sm
           //- <input type="file" @change="previewFiles" multiple>
           .row.full-width
-            img(:src="user.thumbUrl" @click="$refs.userPhotoDialog.show()"
+            img(:src="user.profile.thumbUrl" @click="changePhoto()"
               :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
             div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
               q-btn(
@@ -55,7 +55,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
             template(v-slot:created)
               user-created-nodes()
             template(v-slot:rated)
-              user-created-nodes()
+              user-rated-nodes()
             template(v-slot:following)
               user-following(:subscriptions="user.subscriptions" :oid="user.oid")
             template(v-slot:followers)
@@ -150,6 +150,11 @@ export default {
     }
   },
   methods: {
+    changePhoto () {
+      if (this.myoid === this.user.oid) {
+        this.$refs.userPhotoDialog.show()
+      }
+    },
     fileChanged (e) {
       this.$log(e.target.files)
       if (e.target.files.length === 1){

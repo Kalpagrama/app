@@ -3,6 +3,8 @@
   node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
     template(v-slot:default=`{nodes}`)
       node-list(:nodes="nodes" @nodeClick="nodeClick")
+  div(v-if="!nodes" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
+    span {{$t('Пользователь не создавал ядра', 'User didnt create nodes')}}
 </template>
 
 <script>
