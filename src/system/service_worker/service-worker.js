@@ -1,7 +1,10 @@
-const swVer = 9
+const swVer = 19
 const useCache = false
 
-let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry
+let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, swStore, gqlStore, cacheGraphQl
+/* global idbKeyval, MD5 */
+importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
+importScripts('/statics/scripts/md5.js')
 // log
 {
   logModulesBlackList = []
@@ -23,23 +26,41 @@ let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry
     // if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
   }
 }
-logDebug('swVer=', swVer)
 
-// custom cacheGraphQl for POST requests
-let cacheGraphQl = async (event) => {
-  logDebug('cacheGraphQl dummy...')
-}
+// common init sw
 {
-  /* global idbKeyval, MD5 */
-  // idb-keyval-iife.min.js
-  importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
-  importScripts('/statics/scripts/md5.js')
-  logDebug('create common-data...')
-  const swStore = new idbKeyval.Store('sw-cache-common', 'common-data')
-  logDebug('create graphql-responses...')
-  const gqlStore = new idbKeyval.Store('sw-cache-gql', 'graphql-responses')
+  logDebug('swVer=', swVer)
+  swStore = new idbKeyval.Store('sw-cache-common', 'common-data')
+  gqlStore = new idbKeyval.Store('sw-cache-gql', 'graphql-responses')
   idbKeyval.set('swVer', swVer, swStore)
+  self.addEventListener('message', function handler (event) {
+    logDebug('message!', event.data)
+    if (event.data) {
+      switch (event.data.type) {
+        case 'logInit':
+          logModulesBlackList = event.data.logModulesBlackList
+          logLevel = event.data.logLevel
+          logLevelSentry = event.data.logLevelSentry
+          try {
+            if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
+          } catch (err) {
+            logDebug('error on setConfig', err)
+          }
+          break
+        case 'skipWaiting':
+          self.skipWaiting()
+          break
+        default:
+          logCritical('bad event.data.type', event.data.type)
+      }
+    } else {
+      logCritical('event.data is null')
+    }
+  })
+}
 
+// custom resolver for graphql POST requests
+{
   cacheGraphQl = async function (event) {
     // let tmpReq = event.request.clone()
     // logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
@@ -74,6 +95,7 @@ let cacheGraphQl = async (event) => {
   async function setCache (request, response) {
     let body = await request.json()
     // logDebug('body === ', body)
+    if (body.operationName.startsWith('sw_nocache_')) return
     // if (!body.operationName.startsWith('sw_cache_')) return
     let id = MD5(JSON.stringify(body)).toString()
     // logDebug('MD5 === ', id)
@@ -115,7 +137,9 @@ if (useCache) {
 // workbox init
   {
     /* global workbox */
-    workbox.core.setCacheNameDetails({ prefix: 'kalpa' })
+    workbox.core.setCacheNameDetails({
+      prefix: 'kalpa'
+    })
     // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/service_worker/index.js
     workbox.core.clientsClaim()
 
@@ -126,30 +150,72 @@ if (useCache) {
   }
 // routing
   {
-    // This will trigger the importScripts() for workbox.strategies and its dependencies:
+    // // This will trigger the importScripts() for workbox.strategies and its dependencies:
     const { strategies } = workbox
     workbox.routing.registerRoute(
       /.*(?:googleapis|gstatic)\.com\/.*/,
-      new workbox.strategies.CacheFirst({
-        cacheName: 'google'
+      new workbox.strategies.StaleWhileRevalidate({
+        cacheName: 'google',
+        plugins: [
+          new workbox.expiration.Plugin({
+            maxEntries: 100
+          })
+        ]
       })
     )
     workbox.routing.registerRoute(
       /^https:\/\/.*\.kalpagramma\.com\/?(?:menu|trends|create|workspace)?\/?$s/,
-      new workbox.strategies.CacheFirst({
-        cacheName: 'origin'
+      new workbox.strategies.StaleWhileRevalidate({
+        cacheName: 'origin',
+        plugins: [
+          new workbox.expiration.Plugin({
+            maxEntries: 500
+          })
+        ]
       })
     )
     workbox.routing.registerRoute(
-      /^https:\/\/storage\.yandexcloud\.net\/.*/,
+      /^https:\/\/storage\.yandexcloud\.net\/.*.jpg$/,
       new workbox.strategies.CacheFirst({
-        cacheName: 'content'
+        cacheName: 'content_img',
+        plugins: [
+          new workbox.expiration.Plugin({
+            maxEntries: 2000
+          })
+        ]
       })
     )
     workbox.routing.registerRoute(
-      /^https:\/\/.*\.kalpagramma\.com\/local_object_storage\/.*/,
+      /^https:\/\/.*\.kalpagramma\.com\/local_object_storage\/.*.jpg$/,
       new workbox.strategies.CacheFirst({
-        cacheName: 'content'
+        cacheName: 'content_img',
+        plugins: [
+          new workbox.expiration.Plugin({
+            maxEntries: 2000
+          })
+        ]
+      })
+    )
+    workbox.routing.registerRoute(
+      /^https:\/\/storage\.yandexcloud\.net\/.*.mp4$/,
+      new workbox.strategies.CacheFirst({
+        cacheName: 'content_video',
+        plugins: [
+          new workbox.expiration.Plugin({
+            maxEntries: 200,
+          }),
+        ]
+      })
+    )
+    workbox.routing.registerRoute(
+      /^https:\/\/.*\.kalpagramma\.com\/local_object_storage\/.*.mp4$/,
+      new workbox.strategies.CacheFirst({
+        cacheName: 'content_video',
+        plugins: [
+          new workbox.expiration.Plugin({
+            maxEntries: 200,
+          }),
+        ]
       })
     )
     workbox.routing.registerRoute(
@@ -157,33 +223,39 @@ if (useCache) {
       async ({ url, event, params }) => cacheGraphQl(event),
       'POST'
     )
+
+    // // This "catch" handler is triggered when any of the other routes fail to
+    // // generate a response.
+    // workbox.routing.setCatchHandler(async ({ event }) => {
+    //   // The FALLBACK_URL entries must be added to the cache ahead of time, either via runtime
+    //   // or precaching.
+    //   // If they are precached, then call workbox.precaching.getCacheKeyForURL(FALLBACK_URL)
+    //   // to get the correct cache key to pass in to caches.match().
+    //   //
+    //   // Use event, request, and url to figure out how to respond.
+    //   // One approach would be to use request.destination, see
+    //   // https://medium.com/dev-channel/service-worker-caching-strategies-based-on-request-types-57411dd7652c
+    //
+    //   switch (event.request.destination) {
+    //     case 'document':
+    //       logDebug('fallback document', event.request)
+    //       return caches.match('FALLBACK_HTML_URL')
+    //     case 'image': {
+    //       logDebug('fallback image', event.request.url, 'to', workbox.precaching.getCacheKeyForURL('/statics/logo.png'))
+    //       return caches.match(workbox.precaching.getCacheKeyForURL('/statics/logo.png'))
+    //     }
+    //     case 'font':
+    //       logDebug('fallback font', event.request)
+    //       return caches.match('FALLBACK_FONT_URL')
+    //     default:
+    //       logDebug('fallback default', event.request)
+    //       // If we don't have a fallback, just return an error response.
+    //       return Response.error()
+    //   }
+    // })
   }
 // listeners
   {
-    self.addEventListener('message', function handler (event) {
-      logDebug('message!', event.data)
-      if (event.data) {
-        switch (event.data.type) {
-          case 'logInit':
-            logModulesBlackList = event.data.logModulesBlackList
-            logLevel = event.data.logLevel
-            logLevelSentry = event.data.logLevelSentry
-            try {
-              if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
-            } catch (err) {
-              logDebug('error on setConfig', err)
-            }
-            break
-          case 'skipWaiting':
-            self.skipWaiting()
-            break
-          default:
-            logCritical('bad event.data.type', event.data.type)
-        }
-      } else {
-        logCritical('event.data is null')
-      }
-    })
     self.addEventListener('install', event => {
       logDebug('installed!', swVer)
       // event.registerForeignFetch({
