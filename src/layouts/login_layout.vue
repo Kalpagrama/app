@@ -5,7 +5,7 @@ div(
   div(:style=`{height: 300+'px'}`).row.full-width.content-center
     k-spinner(:width="100" :height="100" @click.native="$go('/login')")
     .row.full-width.justify-center.q-mt-sm
-      span.text-h6.text-white.text-bold Kalpagramma
+      span.text-h6.text-white.text-bold KALPAGRAMMA
   .col.full-width.scroll
     router-view
 </template>

@@ -10,6 +10,8 @@
   //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
 .row.full-width.items-start.content-start
   //- transition(appear enter-active-class="animated fadeIn")
+  q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
   k-dialog-bottom(
     :value="$store.state.node.nodeOptionsDialogOpened"
     :options="$store.state.node.nodeOptions"
@@ -75,7 +77,8 @@ export default {
       return
     }
     this.loading = false
-    // if (this.$store.state.events.notice) this.$refs.kTutorialDialog.show()
+    if (this.$store.state.events.notice) this.$refs.kTutorialDialog.show()
+    // this.$refs.kTutorialDialog.show()
   }
  }
 </script>

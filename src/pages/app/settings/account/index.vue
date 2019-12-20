@@ -1,3 +1,5 @@
+<style lang="stylus">
+</style>
 <template lang="pug">
 .column.bg-white.fit
   .row.full-width.q-px-sm

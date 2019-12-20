@@ -1,19 +1,36 @@
 <template lang="pug">
-k-split(:headerMaxHeight="$q.screen.height/3" :bodyClass="['bg-grey-1', 'q-pt-sm']").bg-white
-  template(v-slot:header)
-    //- header
-    div(v-if="true" :style=`{minHeight: '70px'}`).row.full-width.items-center.scroll.q-px-sm
-      h6(:style=`{}`).q-pa-xs.q-ma-xs {{`${sphere.name}`}}
-    //- spheres
-    div.row.full-width.q-px-md
-      div(v-for="(s, si) in spheres" v-if="si < 5" :key="s.oid" @click="sphereClick(s, si)"
-        :style=`{borderRadius: '10px'}`
-        ).bg-grey-3.q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
-        span(:style=`{whiteSpace: 'nowrap'}`) {{`${s.name}` | cut(50)}}
-  template(v-slot:body)
-    node-loader(ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
-      template(v-slot:items=`{items, fetchingMore}`)
-        node-list(:nodes="items").q-px-md
+q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
+  q-header(
+    v-if="showNameSticky"
+    ).row.full-width.justify-center
+    .col.bg-grey-3
+    div(:style=`{maxWidth: '500px'}`).row.full-width.q-px-sm
+      div(:style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.bg-grey-3.q-pt-sm
+        div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', }` @click="headerClick()").row.full-width.items-center.justify-center.bg-green
+          span(v-if="node").text-bold.text-white.text-center {{ sphere.name }}
+    .col.bg-grey-3
+  q-footer(reveal).row.full-width.justify-center.bg-grey-3
+    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+  q-page-conainter
+    .row.full-width.justify-center.items-start.content-start
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+          .row.full-width.items-start.content-start
+            node(
+              v-if="node"
+              ref="neNode"
+              :ctx="'inList'"
+              :node="node" :nodeFullReady="node"
+              :visible="true" :opened="true"
+              @previewWidth="previewWidth = $event"
+              @previewHeight="previewHeight = $event").bg-white.q-mb-md
+      div(
+        v-if="true"
+        :style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
+        div(:style=`{maxWidth: '500px'}`).row.full-width.q-pa-sm
+          node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
+            template(v-slot:default=`{nodes}`)
+              node-list(:nodes="nodes" @nodeClick="nodeClick")
 </template>
 
 <script>
