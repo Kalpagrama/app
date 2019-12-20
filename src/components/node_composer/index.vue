@@ -43,7 +43,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
           div(v-if="node" :style=`{maxWidth: '500px', paddingBottom: '200px'}`).row.full-width
             nc-fragment(
               :ctx="'inEditor'"
-              :index="0" :thumbUrl="false" :fragment="node.fragments[0]" :inEditor="true" :stageFirst="1"
+              :index="0" :thumbUrl="false" :fragment="node.fragments[0]" :visible="true"
               @edit="fragmentEdit"
               @content="$event => fragmentCreate(0, $event)"
               @fragment="$event => fragmentSet(0, $event)"
@@ -64,7 +64,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
                   ).text-bold {{ node.name ? node.name : 'В чем суть?' }}
             nc-fragment(
               ctx="inEditor"
-              :index="1" :thumbUrl="false" :fragment="node.fragments[1]"
+              :index="1" :thumbUrl="false" :fragment="node.fragments[1]" :visible="true"
               @edit="fragmentEdit"
               @content="$event => fragmentCreate(1, $event)"
               @fragment="$event => fragmentSet(1, $event)"

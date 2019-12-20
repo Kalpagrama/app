@@ -3,43 +3,51 @@ div(
   :style=`{borderRadius: '10px', oveflow: 'hidden'}`).row.full-width.bg-white
   //- spheres dialog
   q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    .column.fit.bg-white
-      div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-sm
-        .col
-          div(:style=`{position: 'relative', zIndex: 10, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-            q-input(
-              v-model="sphere" filled color="green"
-              :placeholder="$t('Find sphere')"
-              @blur="sphereCreate()" @keyup.enter="sphereCreate()").full-width
-        q-btn(round flat icon="clear" color="grey" @click="$refs.spheresDialog.hide()").q-ml-sm
-      .col.full-width.scroll
-        .row.full-width.items-start.content-start
-          div(v-if="sphere.length > 0").row.full-width.q-px-sm
-            q-btn(
-              outline no-caps color="green" @click="sphereCreate()"
-              :style=`{height: '60px', borderRadius: '10px'}`).full-width Create "{{ sphere }}"
-          div(
-            v-for="(s, si) in spheres" :key="si" @click="sphereCreate({name: s.name, oid: s.oid})"
-            :style=`{minHeight: '40px'}`).row.full-width.items-center.q-px-md
-            span {{ s.name }}
+    div(@click.self="$refs.spheresDialog.hide()").row.fit.items-end.content-end.justify-center
+      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: '500px'}`).column.fit.bg-grey-3
+        div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-sm
+          .col
+            div(:style=`{position: 'relative', zIndex: 10, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+              q-input(
+                v-model="sphere" filled color="green"
+                :placeholder="$t('Find sphere')"
+                @blur="sphereCreate()" @keyup.enter="sphereCreate()").full-width
+          q-btn(round flat icon="clear" color="grey" @click="$refs.spheresDialog.hide()").q-ml-sm
+        //- .col.full-width
+        .col.full-width.scroll
+          .row.full-width.items-start.content-start
+            div(v-if="sphere.length > 0").row.full-width.q-px-sm
+              q-btn(
+                outline no-caps color="green" @click="sphereCreate()"
+                :style=`{height: '60px', borderRadius: '10px'}`).full-width Create "{{ sphere }}"
+            div(
+              v-for="(s, si) in spheres" :key="si" @click="sphereCreate({name: s.name, oid: s.oid})"
+              :style=`{minHeight: '40px'}`).row.full-width.items-center.q-px-md.cursor-pointer
+              span(
+                :style=`{borderRadius: '4px'}`
+                :class=`{
+                  'bg-green': node.spheres.find(i => (i.name === s.name)),
+                  'text-white': node.spheres.find(i => (i.name === s.name))}`
+                ).q-pa-sm.cursor-pointer {{ s.name }}
   //- categories dialog
   q-dialog(ref="categoriesDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    .column.fit.bg-white
-      div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-sm
-        .col
-          div(:style=`{position: 'relative', zIndex: 10, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-        q-btn(round flat icon="clear" color="grey" @click="$refs.categoriesDialog.hide()").q-ml-sm
-      .col.full-width.scroll
-        .row.full-width.items-start.content-start
-          div(v-if="category.length > 0").row.full-width.q-px-sm
-            q-btn(
-              outline no-caps color="green" @click="categoryCreate()"
-              :style=`{height: '60px', borderRadius: '10px'}`).full-width Create "{{ category }}"
-          div(
-            v-for="(c, ci) in categories" :key="ci" @click="categoryCreate({name: c.name, type: c.type})"
-            :style=`{minHeight: '40px'}`).row.full-width.items-center.q-px-md
-            span {{ c.name }}
-          span {{category}}
+    div(@click.self="$refs.categoriesDialog.hide()").row.fit.items-end.content-end.justify-center
+      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: '500px'}`).column.fit.bg-grey-3
+        div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-md
+          .col
+            .row.fit.items-center
+              span {{ $t('Choose category') }}
+          q-btn(round flat icon="clear" color="grey" @click="$refs.categoriesDialog.hide()").q-ml-sm
+        .col.full-width.scroll
+          .row.full-width.items-start.content-start
+            div(
+              v-for="(c, ci) in categories" :key="ci" @click="categoryCreate({name: c.name, type: c.type})"
+              :style=`{minHeight: '50px'}`
+              ).row.full-width.items-center.q-px-md
+              span(
+                :style=`{borderRadius: '4px'}`
+                :class=`{'bg-green': node.categories.includes(c.type), 'text-white': node.categories.includes(c.type)}`
+                ).q-pa-sm.cursor-pointer {{ c.name }}
   //- spheres
   div(:style=`{minHeight: '60px', padding: '10px'}`).row.full-width
     div(:style=`{height: '60px'}`).row.full-width.items-center
@@ -70,11 +78,8 @@ div(
     .row.full-width.items-start.content-start
       div(
         v-for="(c, ci) in categoriesMap" :key="ci" @click="categoryDelete(c.type)"
-        :style=`{borderRadius: '4px'}`).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm.br
-        small(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`) {{ c.name }}
-      div(
-        v-for="(c, ci) in categoriesMap" :key="ci" @click="sphereDelete(c.type)"
-        :style=`{borderRadius: '4px'}`).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm
+        :style=`{borderRadius: '4px'}`
+        ).bg-grey-2.q-px-sm.q-mr-sm.q-mb-sm.cursor-pointer
         small(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`) {{ c.name }}
 </template>
 
@@ -120,15 +125,18 @@ export default {
       this.$refs.categoriesDialog.show()
     },
     categoryCreate (category) {
-      if (this.node.categories.includes(category.type)) return
-      if (this.node.categories.length > 3) return
-      this.node.categories.push(category.type)
-      this.$refs.categoriesDialog.hide()
       this.$log('categoryCreate', category)
+      if (this.node.categories.includes(category.type)) {
+        this.categoryDelete(category.type)
+      } else {
+        if (this.node.categories.length > 3) return
+        this.node.categories.push(category.type)
+      }
+      this.$refs.categoriesDialog.hide()
     },
     categoryDelete (type) {
-      this.node.categories = this.node.categories.filter(c => (c !== type))
       this.$log('categoryDelete', type)
+      this.node.categories = this.node.categories.filter(c => (c !== type))
     },
     sphereCreateStart () {
       this.$log('sphereCreateStart')
@@ -143,15 +151,21 @@ export default {
     },
     sphereCreate (sphere) {
       this.$log('sphereCreate', sphere, this.sphere)
+      let s = sphere || {name: this.sphere}
       if (!sphere && this.sphere.length === 0) return
-      this.node.spheres.push(sphere ? sphere : {name: this.sphere})
+      if (this.node.spheres.find(i => (i.name === s.name))) {
+        this.sphereDelete(s)
+      } else {
+        this.node.spheres.push(s)
+      }
       this.sphereCreating = false
       this.sphere = ''
       this.$refs.spheresDialog.hide()
     },
     sphereDelete (s, si) {
       this.$log('sphereDelete', s, si)
-      this.$delete(this.node.spheres, si)
+      // this.$delete(this.node.spheres, si)
+      this.node.spheres = this.node.spheres.filter(i => (i.name !== s.name))
     },
     async spheresLoad (oid) {
       this.$log('spheresLoad start', oid)

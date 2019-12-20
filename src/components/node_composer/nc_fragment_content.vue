@@ -28,10 +28,10 @@ div(
       :placeholder="$t('Paste URL')"
       :style=`{}`
       :input-style=`{paddingLeft: '0px', paddingRight: '0px'}`).full-width
-      template(v-slot:prepend)
-        q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="add" @click="$refs.ncFragmentContentWsDialog.show()")
       template(v-slot:append)
+        q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="add" @click="$refs.ncFragmentContentWsDialog.show()")
         q-btn(v-if="!urlInputLoading && url.length > 0" round flat icon="clear" @click="url = ''")
+      template(v-slot:prepend)
         q-btn(v-if="!urlInputLoading && url.length === 0" round flat icon="attach_file" @click="$refs.fileInput.click()")
 </template>
 

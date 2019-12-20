@@ -31,15 +31,21 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
       :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
   //- pan
   nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :now="now" @cut="cutChanged")
+  //- actions
+  //- cut CREATE
+  div(:style=`{height: '50px'}`).row.full-width.q-my-sm.q-px-md
+    .col.q-pr-sm
+      q-btn(
+        outline no-caps color="green" size="md" @click="cutCreate([])"
+        :style=`{height: '50px', borderRadius: '10px'}`).full-width.q-mb-sm
+        span {{ $t('Add cut here') }}
+    q-btn(
+      outline icon="add" color="green"
+      :style=`{width: '50px', height: '50px', borderRadius: '10px'}`)
   //- body
   div(:style=`{}`).col.full-width.scroll
-    .row.full-width.items-start.content-start.q-pa-md
-      //- cut CREATE
-      //- q-btn(
-      //-   outline no-caps color="green" size="md" icon="add" @click="cutCreate([])"
-      //-   :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm
-      //-   span {{ $t('Add cut') }}
-      //- cut border: cutIndex === ci ? '3px solid '+c.color : '3px solid black'
+    .row.full-width.items-start.content-start.q-px-md
+      //- cut
       div(
         v-for="(c, ci) in cuts" :key="c.type"
         :style=`{position: 'relative', minHeight: '50px', overflow: 'hidden', borderRadius: '10px'}`

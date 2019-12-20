@@ -66,15 +66,21 @@ export default {
   methods: {
     mutedToggle () {
       this.$log('mutedToggle')
-      this.muted = !this.muted
-      this.$emit('muted', this.muted)
+      if (this.ctx === 'inEditor') {
+        this.player.setMuted(!this.muted)
+        this.muted = !this.muted
+      } else {
+        this.player.setMuted(!this.muted)
+      }
+      // this.muted = !this.muted
+      this.$emit('muted', !this.muted)
     },
     async play () {
       this.$log('play')
       if (this.player) {
         this.player.play()
         await this.$wait(100)
-        this.muted = false
+        this.player.setMuted(false)
       }
     },
     pause () {
@@ -128,6 +134,13 @@ export default {
           this.player.addEventListener('timeupdate', this.videoTimeupdate)
           this.player.addEventListener('seeked', this.videoSeeked)
           // this.player.play()
+        },
+        error: async (mediaElement, originalNode, instance) => {
+          this.$log('playerStart error')
+          this.$log('playerStart mediaElement', mediaElement)
+          this.$log('playerStart originalNode', originalNode)
+          this.$log('playerStart instance', instance)
+          this.$q.notify('playerStart error!!!')
         }
       })
     },
@@ -137,8 +150,8 @@ export default {
       this.player.play = async () => {
         this.$log('playerNative: play')
         this.$refs.ncFragmentVideo.play()
-        await this.$wait(100)
-        this.muted = false
+        // await this.$wait(100)
+        // this.muted = false
         // this.$nextTick(() => {
         //   this.muted = false
         // })
@@ -150,6 +163,10 @@ export default {
       this.player.setCurrentTime = (ms) => {
         this.$log('playerNative: setCurrentTime', ms)
         this.$refs.ncFragmentVideo.currentTime = ms
+      }
+      this.player.setMuted = (muted) => {
+        this.$log('playerNative: setMuted', muted)
+        this.muted = muted
       }
       this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
       this.player.duration = this.$refs.ncFragmentVideo.duration

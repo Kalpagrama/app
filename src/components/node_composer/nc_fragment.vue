@@ -26,7 +26,7 @@ div(
       :style=`{position: 'absolute', zIndex: 200, opacity: 0.5}`).row.fit.cursor-pointer
     //- actions
     q-btn(
-      v-if="!mini && visible"
+      v-if="!mini && visible && ctx !== 'inEditor'"
       round flat color="white" icon="more_vert" @click="$emit('action')"
       :style=`{position: 'absolute', zIndex: 200, right: '8px', top: '8px', background: 'rgba(255,255,255,0.15)'}`).shadow-5
     //- cancel
