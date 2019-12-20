@@ -18,7 +18,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
       v-if="cutTimerDialogOpened"
       :boom="cutTimerDialogBoom"
       :player="player" :cut="cut" @boom="cutBoom" @close="cutTimerDialogOpened = false"
-      :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
+      :style=`{position: 'absolute', zIndex: 10000, bottom: 0, height: 'calc(100% - 190px)'}`)
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     nc-fve-cut-name(
       v-if="cutNameDialogOpened"
@@ -30,7 +30,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
       :fragment="fragment" @close="fragmentNameDialogOpened = false"
       :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
   //- pan
-  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :now="now" @cut="cutChanged")
+  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now" @cut="cutChanged")
   //- actions
   //- cut CREATE
   div(:style=`{height: '50px'}`).row.full-width.q-my-sm.q-px-md
@@ -55,50 +55,22 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
         div(
           :style=`{position: 'relative', height: '50px'}`
           ).row.full-width
-          //- name
-          //- .col
-            .row.fit.items-center.content-center
-              //- div(:style=`{height: '44px', width: '44px'}`).row.items-center.justify-center
-              //-   div(:style=`{height: '36px', width: '36px', borderRadius: '10px', background: c.color}`
-              //-     ).row.items-center.justify-center
-              //-     small.text-white {{ci}}
           div(:style=`{height: '50px', width: '50px'}`).row.items-center.content-center.justify-center
             q-btn(round flat icon="play_arrow" color="green" @click="cutMoreClick(c, ci)")
-          .col.full-height
+          div(@click="cutTimerDialogOpened = true").col.full-height.cursor-pointer
             .row.fit.items-center.justify-end.q-pr-sm
-              span(:style=`{fontSize: '16px'}`).text-white {{ $time((parseInt(c.points[0].x*100))/100) }}
+              span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white {{ $time((parseInt(c.points[0].x*100))/100) }}
           div().row.full-height.items-center.justify-center
             span(:style=`{fontSize: '16px'}`).text-white.text-bold.q-mx-xs -
-          .col.full-height
+          div(@click="cutTimerDialogOpened = true").col.full-height.cursor-pointer
             .row.fit.items-center.justify-start.q-pl-sm
-              span(:style=`{fontSize: '16px'}`).text-white {{ $time((parseInt(c.points[1].x*100))/100) }}
+              span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white {{ $time((parseInt(c.points[1].x*100))/100) }}
           div(:style=`{height: '50px', width: '50px'}`).row.items-center.content-center.justify-center
             q-btn(round flat icon="more_vert" color="grey-8" @click="cutMoreClick(c, ci)")
-                //- div(@click="cutNameClick(c, ci)").row.fit.items-center.content-center
-                //-   .row.full-width
-                //-     span(v-if="c.name" ).text-white {{ c.name }}
-                //-   .row.full-width.items-start
-                //-     small.text-white {{ $time((parseInt(c.points[0].x*100))/100) }} - {{ $time((parseInt(c.points[1].x*100))/100) }}
-          //- more
-          //- q-btn(round flat icon="more_vert" color="grey-8" @click="cutMoreClick(c, ci)").q-mr-xs
-        //- cut ACTIVE
-        //- transition(appear enter-active-class="animated fadeIn")
-        //-   div(
-        //-     v-if="cutIndex === ci"
-        //-     :style=`{height: '56px'}`
-        //-     ).row.full-width.items-center.justify-between.q-px-xs
-        //-     q-btn(no-caps round flat icon="delete_outline" color="red" @click="cutIndex = ci, $refs.cutDeleteDialog.show()")
-        //-     //- .col
-        //-     q-btn(round flat icon="timer" color="green" @click="cutTimerDialogOpened = true")
-        //-     q-btn(
-        //-       round no-caps @click="cutPlay(c, ci)"
-        //-       :flat="cutPlaying !== ci" :push="cutPlaying === ci"
-        //-       :icon="cutPlaying === ci ? 'pause' : 'play_arrow'"
-        //-       :color="cutPlaying === ci ? 'red' : 'green'")
-        //- cut INACTIVE
+        //- cut INACTIVE tint
         div(
           v-if="cutIndex !== ci" @click="cutClick(c, ci)"
-          :style=`{position: 'absolute'}`).row.fit
+          :style=`{position: 'absolute', background: 'rgba(0,0,0,0.2)'}`).row.fit.cursor-pointer
   //- debug
   div(v-if="false").row.full-width.bg-red
     small cut: {{cut}}

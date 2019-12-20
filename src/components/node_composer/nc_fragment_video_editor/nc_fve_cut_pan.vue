@@ -20,6 +20,15 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
               :style=`{height: '50px', width: '50px', borderLeft: fi === 0 ? 'none' : '1px solid grey'}`
               ).row.items-center.justify-center.bg-grey-5
               small(:style=`{userSelect: 'none', pointerEvents: 'none'}`).cursor-pointer {{ $time((parseInt(((fi+1)*frameDuration)*100))/100) }}
+          //- cuts tints
+          div(
+            v-for="(c,ci) in fragment.cuts" :key="ci"
+            v-if="ci !== cutIndex"
+            :style=`{
+              position: 'absolute', height: '50px', background: c.color,
+              pointerEvents: 'none', opacity: 0.5,
+              left: (c.points[0].x/duration)*100+'%',
+              width: ((c.points[1].x-c.points[0].x)/duration)*100+'%'}`).row
           //- left tint
           div(
             v-if="cut"
@@ -68,7 +77,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
 <script>
 export default {
   name: 'ncFveCutPan',
-  props: ['width', 'player', 'node', 'fragment', 'cut', 'now'],
+  props: ['width', 'player', 'node', 'fragment', 'cut', 'cutIndex', 'now'],
   data () {
     return {
       framesWidth: 0
@@ -112,7 +121,7 @@ export default {
         this.$log('cut CHANGED', to)
         if (this.framesWidth === 0 && this.$refs.framesScrollWrapper) this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
         if (to) {
-          this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.points[0].x / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
+          this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.points[0].x / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
           this.player.setCurrentTime(to.points[0].x)
         }
       }

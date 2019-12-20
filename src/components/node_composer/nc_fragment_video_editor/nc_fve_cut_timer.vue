@@ -28,33 +28,6 @@
               :style=`{fontSize: '40px', background: 'none'}`).full-width.text-white.text-center.kinput
             .row.full-width.justify-center
               small.text-white {{ $t('second') }}
-      transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-        div(v-if="canSave").row.full-width.q-my-md
-          .row.full-width.justify-center.q-mt-md
-            span.text-white {{$t('End')}}
-          .row.full-width
-            .col
-              input(
-                ref="hourInputEnd"
-                v-model="hourEnd" placeholder="00" type="number" :maxlength="2" :min="0" :max="59" @input="$event => inputChanged('hourEnd', $event)"
-                :style=`{fontSize: '40px', background: 'none'}`).full-width.text-white.text-center.kinput
-              .row.full-width.justify-center
-                small.text-white {{ $t('hour') }}
-            .col
-              input(
-                ref="minuteInputEnd"
-                v-model="minuteEnd" placeholder="00" type="number" :maxlength="2" :min="0" :max="59" @input="$event => inputChanged('minuteEnd', $event)"
-                autofocus
-                :style=`{fontSize: '40px', background: 'none'}`).full-width.text-white.text-center.kinput
-              .row.full-width.justify-center
-                small.text-white {{ $t('minute') }}
-            .col
-              input(
-                ref="secondInputEnd"
-                v-model="secondEnd" placeholder="00" type="number" :maxlength="2" :min="0" :max="59" @input="$event => inputChanged('secondEnd', $event)"
-                :style=`{fontSize: '40px', background: 'none'}`).full-width.text-white.text-center.kinput
-              .row.full-width.justify-center
-                small.text-white {{ $t('second') }}
       div(:style=`{position: 'relative', overflow: 'hidden', height: '90px'}`).row.full-width.items-center.q-py-md
         transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           q-btn(
@@ -79,11 +52,11 @@ export default {
       hourStart: '',
       minuteStart: '',
       secondStart: '',
-      hourEnd: '',
-      minuteEnd: '',
-      secondEnd: '',
+      // hourEnd: '',
+      // minuteEnd: '',
+      // secondEnd: '',
       startResult: undefined,
-      endResult: undefined
+      // endResult: undefined
     }
   },
   computed: {
@@ -99,14 +72,14 @@ export default {
       if (this.secondStart.length > 0) sec += parseInt(this.secondStart)
       return sec
     },
-    endSecond () {
-      let sec = 0
-      let duration = this.player.duration
-      if (duration > 60 * 60 && this.hourEnd.length > 0) sec += parseInt(this.hourEnd) * 60 * 60
-      if (duration > 60 && this.minuteEnd.length > 0) sec += parseInt(this.minuteEnd) * 60
-      if (this.secondEnd.length > 0) sec += parseInt(this.secondEnd)
-      return sec
-    }
+    // endSecond () {
+    //   let sec = 0
+    //   let duration = this.player.duration
+    //   if (duration > 60 * 60 && this.hourEnd.length > 0) sec += parseInt(this.hourEnd) * 60 * 60
+    //   if (duration > 60 && this.minuteEnd.length > 0) sec += parseInt(this.minuteEnd) * 60
+    //   if (this.secondEnd.length > 0) sec += parseInt(this.secondEnd)
+    //   return sec
+    // }
   },
   watch: {
     startSecond: {
@@ -121,15 +94,15 @@ export default {
         }
       }
     },
-    endSecond: {
-      handler (to, from) {
-        this.$log('endSecond CHANGED', to, typeof to)
-        if (to > 0 && to > this.startSecond && this.player.duration > to) {
-          this.player.setCurrentTime(to)
-          this.endResult = to
-        }
-      }
-    }
+    // endSecond: {
+    //   handler (to, from) {
+    //     this.$log('endSecond CHANGED', to, typeof to)
+    //     if (to > 0 && to > this.startSecond && this.player.duration > to) {
+    //       this.player.setCurrentTime(to)
+    //       this.endResult = to
+    //     }
+    //   }
+    // }
   },
   methods: {
     inputChanged (key, e) {
@@ -152,10 +125,10 @@ export default {
     confirm () {
       this.$log('confirm', 'isFirst', this.isFirst)
       if (this.boom) {
-        this.$emit('boom', [this.startResult, this.endResult])
+        this.$emit('boom', [this.startResult])
       } else {
         this.cut.points[0].x = this.startResult
-        this.cut.points[1].x = this.endResult
+        // this.cut.points[1].x = this.endResult
       }
       this.cancel()
     },
@@ -168,15 +141,15 @@ export default {
     this.$log('mounted')
     if (this.cut) {
       let arrStart = this.parseSec(this.cut.points[0].x)
-      let arrEnd = this.parseSec(this.cut.points[1].x)
+      // let arrEnd = this.parseSec(this.cut.points[1].x)
       this.$log('arrStart', arrStart)
-      this.$log('arrEnd', arrEnd)
+      // this.$log('arrEnd', arrEnd)
       this.$set(this, 'hourStart', arrStart[0])
       this.$set(this, 'minuteStart', arrStart[1])
       this.$set(this, 'secondStart', arrStart[2])
-      this.$set(this, 'hourEnd', arrEnd[0])
-      this.$set(this, 'minuteEnd', arrEnd[1])
-      this.$set(this, 'secondEnd', arrEnd[2])
+      // this.$set(this, 'hourEnd', arrEnd[0])
+      // this.$set(this, 'minuteEnd', arrEnd[1])
+      // this.$set(this, 'secondEnd', arrEnd[2])
     }
     this.player.pause()
     this.$refs.minuteInputStart.focus()
