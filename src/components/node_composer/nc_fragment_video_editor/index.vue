@@ -15,9 +15,9 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
   k-dialog-bottom(ref='cutDeleteDialog' :options="{actions: {delete: {name: 'Delete', color: 'red'}}}" @action="cutDelete(cutIndex)")
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     nc-fve-cut-timer(
-      v-if="cutTimerDialogOpened"
-      :boom="cutTimerDialogBoom"
-      :player="player" :cut="cut" @boom="cutBoom" @close="cutTimerDialogOpened = false"
+      v-if="cutSetTimeDialogOpened"
+      :player="player" :cut="cut" :pointIndex="cutSetTimePointIndex"
+      @point="cutSetTime(cutSetTimePointIndex, $event)" @close="cutSetTimeDialogOpened = false"
       :style=`{position: 'absolute', zIndex: 10000, bottom: 0, height: 'calc(100% - 190px)'}`)
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     nc-fve-cut-name(
@@ -30,7 +30,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
       :fragment="fragment" @close="fragmentNameDialogOpened = false"
       :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
   //- pan
-  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now" @cut="cutChanged")
+  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now")
   //- actions
   //- cut CREATE
   div(:style=`{height: '50px'}`).row.full-width.q-my-sm.q-px-md
@@ -57,12 +57,12 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
           ).row.full-width
           div(:style=`{height: '50px', width: '50px'}`).row.items-center.content-center.justify-center
             q-btn(round flat icon="play_arrow" color="green" @click="cutMoreClick(c, ci)")
-          div(@click="cutTimerDialogOpened = true").col.full-height.cursor-pointer
+          div(@click="cutSetTime(0)").col.full-height.cursor-pointer
             .row.fit.items-center.justify-end.q-pr-sm
               span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white {{ $time((parseInt(c.points[0].x*100))/100) }}
           div().row.full-height.items-center.justify-center
             span(:style=`{fontSize: '16px'}`).text-white.text-bold.q-mx-xs -
-          div(@click="cutTimerDialogOpened = true").col.full-height.cursor-pointer
+          div(@click="cutSetTime(1)").col.full-height.cursor-pointer
             .row.fit.items-center.justify-start.q-pl-sm
               span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white {{ $time((parseInt(c.points[1].x*100))/100) }}
           div(:style=`{height: '50px', width: '50px'}`).row.items-center.content-center.justify-center
@@ -100,8 +100,8 @@ export default {
     return {
       cutIndex: -1,
       cutPlaying: -1,
-      cutTimerDialogOpened: false,
-      cutTimerDialogBoom: false,
+      cutSetTimeDialogOpened: false,
+      cutSetTimePointIndex: 0,
       cutNameDialogOpened: false,
       fragmentNameDialogOpened: false,
       fragmentPlaying: false
@@ -146,19 +146,8 @@ export default {
     }
   },
   methods: {
-    boom () {
-      this.$log('boom')
-      this.cutTimerDialogBoom = true
-      this.cutTimerDialogOpened = true
-    },
     fragmentPlay () {
       this.$log('fragmentPlay')
-    },
-    cutBoom (arr) {
-      this.$log('cutBoom', arr)
-      this.cutTimerDialogBoom = false
-      this.cutCreate(arr)
-      this.$emit('close')
     },
     cutDialogAction (action) {
       this.$log('cutDialogAction', action)
@@ -185,15 +174,6 @@ export default {
       }
       this.cutIndex = -1
     },
-    cutChanged (cut) {
-      this.$log('cutChanged', cut)
-      this.fragment.cuts[this.cutIndex] = cut
-    },
-    cutClick (c, ci) {
-      this.$log('cutClick', c, ci)
-      if (ci === this.cutIndex) return
-      this.$set(this, 'cutIndex', ci)
-    },
     cutNameClick (c, ci) {
       this.$log('cutNameClick', c, ci)
       this.cutIndex = ci
@@ -209,6 +189,15 @@ export default {
         this.player.play()
       }
     },
+    cutSetTime (pointIndex, value) {
+      this.$log('cutSetTime', pointIndex, value)
+      if (value) {
+        this.cut.points[pointIndex].x = value
+      } else {
+        this.cutSetTimePointIndex = pointIndex
+        this.cutSetTimeDialogOpened = true
+      }
+    },
     cutUp () {
       this.$log('pointUp')
     },
@@ -220,17 +209,22 @@ export default {
       this.cutIndex = ci
       this.$refs.cutDialog.show()
     },
-    cutCreate ([start, end]) {
+    cutClick (c, ci) {
+      this.$log('cutClick', c, ci)
+      if (ci === this.cutIndex) return
+      this.$set(this, 'cutIndex', ci)
+    },
+    cutCreate (s, e) {
       this.$log('cutCreate', this.player.currentTime)
+      let start = s || this.player.currentTime
+      let end = e || start + 30
+      if (end > this.fragment.content.duration) end = this.fragment.content.duration
       let cut = {
         name: '',
         color: this.$randomColor(Date.now().toString()),
         thumbUrl: '',
         style: null,
-        points: [
-          {x: start || this.player.currentTime},
-          {x: end ? end : start ? start + 10 : this.player.currentTime + 10}
-        ]
+        points: [{x: start}, {x: end}]
       }
       this.fragment.cuts.push(cut)
       this.cutClick(cut, this.fragment.cuts.length - 1)
@@ -243,10 +237,14 @@ export default {
   },
   mounted () {
     this.$log('mounted', this.cuts.length)
-    if (this.cuts.length > 0) {
+    if (this.cuts.length === 0) {
+      this.$log('FIRST EDIT CREATE CUT AT CURRENT SECOND')
+      this.cutCreate()
+      this.cutSetTime(0)
+    } else {
+      this.$log('SET FIRST CUT')
       this.cutIndex = 0
       this.player.setCurrentTime(this.cut.points[0].x)
-      // this.cutPlay(this.cut, 0)
     }
   },
   beforeDestroy () {

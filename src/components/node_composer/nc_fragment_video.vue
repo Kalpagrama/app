@@ -11,7 +11,7 @@ iframe {
 div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   //- play/pause for inList
   div(
-    v-if="ctx !== 'inEditor'" @click="videoToggle()"
+    v-if="!mini" @click="videoToggle()"
     :style=`{position: 'absolute', zIndex: 103, opacity: 0.5}`).row.fit.items-center.justify-center
     q-btn(v-if="!playing && !mini" round flat icon="play_arrow" color="white" size="60px")
   //- muted
@@ -29,10 +29,9 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
       width="100%" height="100%" :muted="muted"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
       ).fit
-      //- fragment.content.contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'
       source(
         :src="ctx === 'inEditor' ? fragment.content.url : fragment.url"
-        :type="ctx === 'inEditor' ? 'video/youtube' : 'video/mp4'")
+        :type="ctx !== 'inEditor' ? 'video/mp4' : fragment.content.contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'")
   //- progress
   div(
     v-if="now && !mini"
@@ -72,7 +71,6 @@ export default {
       } else {
         this.player.setMuted(!this.muted)
       }
-      // this.muted = !this.muted
       this.$emit('muted', !this.muted)
     },
     async play () {
@@ -150,11 +148,6 @@ export default {
       this.player.play = async () => {
         this.$log('playerNative: play')
         this.$refs.ncFragmentVideo.play()
-        // await this.$wait(100)
-        // this.muted = false
-        // this.$nextTick(() => {
-        //   this.muted = false
-        // })
       }
       this.player.pause = async () => {
         this.$log('playerNative: pause')
@@ -171,27 +164,18 @@ export default {
       this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
       this.player.duration = this.$refs.ncFragmentVideo.duration
       this.player.now = this.$refs.ncFragmentVideo.currentTime
-      // this.$refs.ncFragmentVideo.addEventListener('timeupdate', this.videoTimeupdate)
-      // this.$refs.ncFragmentVideo.addEventListener('seeked', this.videoSeeked)
     }
   },
   async mounted () {
     this.$log('mounted')
-    if (this.ctx === 'inEditor') {
-      this.playerStart()
-    } else {
-      this.playerStartNative()
-      // this.player.play()
-    }
+    if (this.ctx === 'inEditor') this.playerStart()
+    else this.playerStartNative()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     if (this.ctx === 'inEditor') {
       this.player.removeEventListener('timeupdate', this.videoTimeupdate)
       this.player.removeEventListener('seeked', this.videoSeeked)
-    } else {
-      // this.$refs.ncFragmentVideo.addEventListener('timeupdate', this.videoTimeupdate)
-      // this.$refs.ncFragmentVideo.addEventListener('seeked', this.videoSeeked)
     }
   }
 }

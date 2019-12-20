@@ -2,6 +2,7 @@
 .row.full-width.items-start.content-start.justify-start
   node(
     v-for="(n, ni) in nodes" :key="n.oid" :accessKey="ni"
+    v-if="nodesBan ? !nodesBan.includes(n.oid) : true"
     :ctx="'inList'"
     :node="n"
     :needFull="ni >= friends[0] && ni <= friends[1]"
@@ -37,7 +38,7 @@
 <script>
 export default {
   name: 'nodeList',
-  props: ['nodes', 'selected'],
+  props: ['nodes', 'nodesBan', 'selected'],
   data () {
     return {
       nodeHeight: 50,

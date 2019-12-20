@@ -16,10 +16,13 @@ div(
   //- stage 1
   nc-fragment-content(v-if="ctx === 'inEditor' && stage === 1" @content="$emit('content', $event)" @fragment="$emit('fragment', $event)")
   //- stage 2
-  div(v-if="stage === 2"
+  div(
+    v-if="stage === 2"
     :style=`{position: 'relative', maxHeight: ctx === 'inEditor' ? previewHeight+'px' : '100%'}`
     :class=`{'full-height': !mini}`).row.full-width.items-start.content-start.bg-black
-    k-dialog-bottom(ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete fragment', color: 'red'}}}" @action="$emit('delete')")
+    k-dialog-bottom(
+      v-if="ctx === 'inEditor'"
+      ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete fragment', color: 'red'}}}" @action="$emit('delete')")
     //- mini mode toggle tint
     div(
       v-if="mini" @click="$emit('mini')"
@@ -34,13 +37,6 @@ div(
       v-if="ctx === 'inEditor'"
       round flat color="red" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
       :style=`{position: 'absolute', zIndex: 11000, left: '10px', top: 'calc(50% - 20px)', background: 'rgba(255,255,255,0.15)'}`).shadow-5
-    //- boom
-    q-btn(
-      v-if="ctx === 'inEditor' && !boomed && fragment.cuts.length === 0"
-      push round no-caps @click="boom()"
-      color="green"
-      :style=`{position: 'absolute', zIndex: 200, bottom: '24px', left: 'calc(50% - 20px)'}`).shadow-5.q-mr-sm
-      q-icon(name="wb_incandescent").rotate-180
     //- edit
     q-btn(
       v-if="ctx === 'inEditor'"
@@ -57,18 +53,17 @@ div(
       :class=`{'full-height': ctx !== 'inEditor'}`)
     //- video
     div(
-      v-if="true && fragment && fragment.content && previewLoaded"
       :style=`{position: 'absolute', zIndex: 100, top: 0, minHeight: '100%', minWidth: '100%'}`).row.fit
       nc-fragment-video(
-        v-if="previewLoaded && fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
+        v-if="previewLoaded && fragment && fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
         :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini" :visible="visible"
         :width="previewWidth" :height="previewHeight"
         @muted="$event => $emit('muted', $event)"
         @ended="$emit('ended', index)")
     //- editors
-  .row.full-width
+  div(v-if="stage === 2 && ctx === 'inEditor'").row.full-width
     nc-fragment-video-editor(
-      v-if="ctx === 'inEditor' && $refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
+      v-if="$refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
       @close="editing = false"
       :fragment="fragment" :now="$refs.ncFragmentVideo.now" :player="$refs.ncFragmentVideo.player"
       :width="previewWidth" :height="toolsHeight"
