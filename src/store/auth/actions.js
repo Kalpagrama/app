@@ -1,6 +1,7 @@
 import { apolloProvider } from 'boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { router } from 'boot/main'
+import { clearCache } from 'src/system/service_worker'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
@@ -24,21 +25,27 @@ export const init = async (context) => {
 }
 export const logout = async (context, token) => {
   logD('@logout start')
-  let { data: { logout } } = await apolloProvider.clients.authApollo.mutate({
-    mutation: gql`
-      mutation logout($token: String) {
-        logout(token: $token)
+  try {
+    let { data: { logout } } = await apolloProvider.clients.authApollo.mutate({
+      mutation: gql`
+        mutation sw_nocache_logout($token: String) {
+          logout(token: $token)
+        }
+      `,
+      variables: {
+        token
       }
-    `,
-    variables: {
-      token
+    })
+  } catch (err) {
+    logE('error on logout! err=', err)
+  } finally {
+    let currentToken = localStorage.getItem('ktoken').split('::')[0]
+    if (!token || token === localStorage.getItem('ktoken') || token === currentToken) {
+      localStorage.removeItem('ktoken')
+      localStorage.removeItem('ktokenExpires')
+      await clearCache()
+      router.push('/login')
     }
-  })
-  let currentToken = localStorage.getItem('ktoken').split('::')[0]
-  if (!token || token === currentToken) {
-    localStorage.removeItem('ktoken')
-    localStorage.removeItem('ktokenExpires')
-    router.push('/login')
   }
   context.commit('objects/deleteUserSession', token, { root: true })
   logD('@logout done')
