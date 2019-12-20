@@ -7,6 +7,7 @@
     :node="n"
     :needFull="ni >= friends[0] && ni <= friends[1]"
     :visible="ni === nodeOidVisible"
+    @error="nodesBan.push(n.oid)"
     @nodeClick="$event => $emit('nodeClick', $event)"
     :style=`{}`
     v-observe-visibility=`{
@@ -38,7 +39,12 @@
 <script>
 export default {
   name: 'nodeList',
-  props: ['nodes', 'nodesBan', 'selected'],
+  // props: ['nodes', 'nodesBan', 'selected'],
+  props: {
+    nodes: {type: Array},
+    nodesBan: {type: Array, default () { return [] }},
+    selected: {type: Array}
+  },
   data () {
     return {
       nodeHeight: 50,

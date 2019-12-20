@@ -26,7 +26,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
       :fragment="nodeFull ? nodeFull.fragments[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(0)"
       :style=`fragmentMini === 1 ? fragmentMiniStyles : {height: '100%', width: '100%', objectFit: 'contain'}`)
-  //- name
+  //- name, essence
   div(
     ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
     :style=`{minHeight: '60px'}`
@@ -35,7 +35,10 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
   //- actions
   div(
     v-if="nodeFull && opened"
-    :style=`{position: 'relative', height: '60px', borderRadius: '0 0 10px 10px', overflow: 'hidden', marginTop: fMarginTop+'px', borderTop: '1px solid #eee'}`).row.full-width.items-center
+    :style=`{
+      position: 'relative', height: '60px',
+      borderTop: '1px solid #eee', borderBottom: '1px solid #eee'}`).row.full-width.items-center
+    //- pan btn
     div(
       v-touch-pan.left.right.prevent.mouse="votePan"
       :style=`{
@@ -44,29 +47,38 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
         ).row.items-center.justify-center
       q-btn(round push :style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.items-center.justify-center.bg-green.cursor-pointer
         q-icon(name="blur_on" color="white" size="30px")
+    //- vote tint and helper text
     div(
       v-if="votePanning"
-      :style=`{position: 'absolute', zIndex: 198, borderTop: '1px solid #eee'}`).row.fit.items-center.justify-center.bg-white
+      :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
       span Pan to vote
     div(:style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
       span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center 100
       span.text-bold.full-width.text-center 10
-    .col.full-height
-      .row.fit.items-center.justify-end
-        span {{ nodeFull.author.name }}
-    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+    //- user name
+    div(
+      @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
+      .row.fit.items-center.justify-end.cursor-pointer
+        span(:style=`{userSelect: 'none'}`) {{ nodeFull.author.name | cut(40) }}
+    //- user avatar
+    div(
+      @click="$router.push('/user/' + nodeFull.author.oid)"
+      :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center.cursor-pointer
       div(:style=`{height: '35px', width: '35px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-3
         img(
           :src="nodeFull.author.thumbUrl"
           :style=`{width: '100%', height: '100%', objectFit: 'cover'}`)
+  //- spheres and timestamp
   div(v-if="nodeFull && opened").row.full-width
+    //- spheres
     div(:style=`{height: '50px'}`).row.full-width.scroll
       .row.justify-start.items-start.content-start.no-wrap.q-pa-md
         div(
-          v-for="(s, si) in 20" :key="si" @click="$router.push('/sphere/' + si)"
+          v-for="(s, si) in nodeFull.spheres" :key="si" @click="$router.push('/sphere/' + s.oid)"
           :style=`{}`).q-mr-sm.cursor-pointer
-          span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs sphere {{si}}
-    .row.full-width.justify-end.q-pa-sm
+          span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
+    //- timestamp
+    .row.full-width.justify-start.q-pa-md
       small.text-grey-7 20.12.2019
 </template>
 
@@ -224,6 +236,7 @@ export default {
         this.nodeFullError = null
       } catch (err) {
         this.$logE('node', 'nodeLoad error', err)
+        this.$emit('error')
         node = null
         this.nodeFullError = err
       }

@@ -27,27 +27,28 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
           div(
             v-for="(f, fi) in fragments" :key="fi" @click="itemClick('fragment', f)"
             :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px'}`
-            ).row.full-width.items-center.bg-white.q-mb-md
-            img(
-              :src="f.content.thumbUrl" draggable="false"
-              :style=`{
-                width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
-                borderRadius: '10px'}`)
-            div(
-              v-if="f.cuts"
-              :style=`{position: 'absolute', top: '8px', left: '8px'}`
-              ).row.full-width
-              div(v-for="(c, ci) in f.cuts" :key="ci"
-                ).q-mr-xs
-                div(:style=`{background: c.color, borderRadius: '4px'}`).q-px-sm
-                  //- small.text-white {{ c }}
-                  small.text-white {{ $time(c.points[0].x)}}-{{$time(c.points[1].x) }}
-            span(
-              v-if="f.name"
-              :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
-              ).q-pa-sm.text-white {{ f.name }}
-            small(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
-              ).q-pa-sm.text-white {{ f.content.name | cut(50) }}
+            ).col-6
+              .row.full-width.items-center.bg-white.q-mb-md
+              img(
+                :src="f.content.thumbUrl" draggable="false"
+                :style=`{
+                  width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
+                  borderRadius: '10px'}`)
+              div(
+                v-if="f.cuts"
+                :style=`{position: 'absolute', top: '8px', left: '8px'}`
+                ).row.full-width
+                div(v-for="(c, ci) in f.cuts" :key="ci"
+                  ).q-mr-xs
+                  div(:style=`{background: c.color, borderRadius: '4px'}`).q-px-sm
+                    //- small.text-white {{ c }}
+                    small.text-white {{ $time(c.points[0].x)}}-{{$time(c.points[1].x) }}
+              span(
+                v-if="f.name"
+                :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+                ).q-pa-sm.text-white {{ f.name }}
+              small(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+                ).q-pa-sm.text-white {{ f.content.name | cut(50) }}
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm

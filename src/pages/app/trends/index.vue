@@ -12,7 +12,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
     k-menu-mobile(:style=`{maxWidth: '500px'}`)
   q-page-conainter
     div(:style=`{paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
-      div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+      div(:style=`{maxWidth: '900px'}`).row.full-width.items-start.content-start.q-pa-sm
         //- k-colls-new(:coll="coll" :colls="colls" @coll="coll = $event")
           //- template(v-slot:[$route.params.category])
             //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3

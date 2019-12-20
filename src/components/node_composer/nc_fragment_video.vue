@@ -20,6 +20,14 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
     round flat color="white" @click="mutedToggle()"
     :style=`{position: 'absolute', zIndex: 103, left: '8px', top: '8px', background: 'rgba(255,255,255,0.15)'}`).shadow-1
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
+  //- content
+  div(
+    v-if="!mini && visible" @click="$router.push('/content/' + fragment.content.oid)"
+    :style=`{
+      position: 'absolute', zIndex: 103, left: '58px', top: '8px', height: '42px',
+      borderRadius: '20px', overflow: 'hidden',
+      background: 'rgba(255,255,255,0.15)'}`).row.items-center.q-pa-sm.cursor-pointer
+    span(:style=`{userSelect: 'none', whiteSpace: 'nowrap'}`).text-white {{ fragment.content.name | cut(50) }}
   //- video wrapper
   div(:style=`{position: 'relative'}`).row.fit
     video(
