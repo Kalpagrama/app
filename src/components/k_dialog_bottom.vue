@@ -18,7 +18,7 @@ q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transi
       //- confirm
       q-btn(
         v-if="options.confirm"
-        push no-caps color="accent" @click="confirmClick()"
+        push no-caps color="green" @click="confirmClick()"
         :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-my-sm
         span.text-bold {{ $t(options.confirmName) }}
 </template>
@@ -104,10 +104,10 @@ export default {
     }
   },
   mounted () {
-    // this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    // this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

@@ -3,10 +3,10 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
   .row.full-width
     div(
       ref="framesScrollWrapper"
-      :style=`{height: '70px'}`).row.full-width.items-center.scroll
+      :style=`{height: '66px'}`).row.full-width.items-center.scroll
       .row.no-wrap
         div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
-        div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap
+        div(:style=`{position: 'relative', borderRadius: '10px'}`).row.no-wrap
           //- frames images
           div(v-if="fragment.content.contentSource === 'KALPA'").row.no-wrap
             img(
@@ -18,26 +18,37 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
             div(
               v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
               :style=`{height: '50px', width: '50px', borderLeft: fi === 0 ? 'none' : '1px solid grey'}`
-              ).row.items-center.justify-center.bg-grey-8
+              ).row.items-center.justify-center.bg-grey-5
               small(:style=`{userSelect: 'none', pointerEvents: 'none'}`).cursor-pointer {{ $time((parseInt(((fi+1)*frameDuration)*100))/100) }}
+          //- cuts tints
+          div(
+            v-for="(c,ci) in fragment.cuts" :key="ci"
+            v-if="ci !== cutIndex"
+            :style=`{
+              position: 'absolute', height: '50px', background: c.color,
+              pointerEvents: 'none', opacity: 0.5,
+              left: (c.points[0].x/duration)*100+'%',
+              width: ((c.points[1].x-c.points[0].x)/duration)*100+'%'}`).row
           //- left tint
           div(
             v-if="cut"
             :style=`{position: 'absolute', left: 0, top: 0, height: '50px',
-              width: (cut.points[0].x/duration)*100+'%',
+              width: 'calc( '+(cut.points[0].x/duration)*100+'% + 6px )',
               opacity: 0.6, pointerEvents: 'none'}`).row.bg-black
           //- middle fragments
           div(
             v-if="cut"
-            :style=`{position: 'absolute', zIndex: 100, height: '50px', top: '0px',
+            :style=`{
+              position: 'absolute', zIndex: 100, height: '66px', top: '-8px',
               left: (cut.points[0].x/duration)*100+'%',
               width: ((cut.points[1].x-cut.points[0].x)/duration)*100+'%',
-              borderRadius: '4px', border: '4px solid '+ cut.color, pointerEvents: 'none'}`).row
+              borderRadius: '16px', border: '8px solid '+ cut.color, pointerEvents: 'none'}`).row
+          //- now second
           div(
             v-if="true"
             :style=`{position: 'absolute', zIndex: 99, height: '50px', top: '0px',
-              left: (now/duration)*100+'%',
-              width: '5px', pointerEvents: 'none'}`).row.bg-yellow
+              left: (now/duration)*100+'%', borderRadius: '2px',
+              width: '4px', pointerEvents: 'none'}`).row.bg-green
           //- cut start
           div(
             v-if="cut"
@@ -58,7 +69,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
           div(
             v-if="cut"
             :style=`{position: 'absolute', right: 0, top: 0, height: '50px',
-              width: ((duration-cut.points[1].x)/duration)*100+'%',
+              width: 'calc( '+((duration-cut.points[1].x)/duration)*100+'% + 8px )',
               opacity: 0.6, pointerEvents: 'none'}`).row.bg-black
         div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
 </template>
@@ -66,7 +77,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
 <script>
 export default {
   name: 'ncFveCutPan',
-  props: ['width', 'player', 'node', 'fragment', 'cut', 'now'],
+  props: ['width', 'player', 'node', 'fragment', 'cut', 'cutIndex', 'now'],
   data () {
     return {
       framesWidth: 0
@@ -110,7 +121,7 @@ export default {
         this.$log('cut CHANGED', to)
         if (this.framesWidth === 0 && this.$refs.framesScrollWrapper) this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
         if (to) {
-          this.$tween.to(this.$refs.framesScrollWrapper, 0.3, {scrollLeft: (to.points[0].x / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
+          this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.points[0].x / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
           this.player.setCurrentTime(to.points[0].x)
         }
       }

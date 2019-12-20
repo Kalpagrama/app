@@ -18,7 +18,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
         q-btn(round flat no-caps color="grey" icon="clear" @click="$router.back()").q-mr-sm
         transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           q-btn(
-            v-if="showRefresh"
+            v-if="true"
             round flat no-caps color="grey" icon="refresh" @click="$refs.refreshDialog.show()")
         .col
         transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
@@ -41,10 +41,9 @@ q-layout(view="hHh lpR fFf").bg-grey-3
           q-spinner(size="60px" color="primary")
         div(v-else).row.full-width.items-start.content-start.justify-center.q-pa-sm
           div(v-if="node" :style=`{maxWidth: '500px', paddingBottom: '200px'}`).row.full-width
-            q-resize-observer(@resize="onResize")
             nc-fragment(
               :ctx="'inEditor'"
-              :index="0" :width="editorWidth" :thumbUrl="false" :fragment="node.fragments[0]" :inEditor="true" :stageFirst="1"
+              :index="0" :thumbUrl="false" :fragment="node.fragments[0]" :visible="true"
               @edit="fragmentEdit"
               @content="$event => fragmentCreate(0, $event)"
               @fragment="$event => fragmentSet(0, $event)"
@@ -64,8 +63,8 @@ q-layout(view="hHh lpR fFf").bg-grey-3
                   v-else
                   ).text-bold {{ node.name ? node.name : 'В чем суть?' }}
             nc-fragment(
-              :ctx="'inEditor'"
-              :index="1" :width="editorWidth" :thumbUrl="false" :fragment="node.fragments[1]" :inEditor="true" :stageFirst="0"
+              ctx="inEditor"
+              :index="1" :thumbUrl="false" :fragment="node.fragments[1]" :visible="true"
               @edit="fragmentEdit"
               @content="$event => fragmentCreate(1, $event)"
               @fragment="$event => fragmentSet(1, $event)"
@@ -141,10 +140,6 @@ export default {
     }
   },
   methods: {
-    fragmentSecond () {
-      this.$log('fragmentSecond')
-      this.fragmentSecondShow = true
-    },
     fragmentCreate (index, content) {
       this.$log('fragmentCreate', index, content)
       this.$set(this.node.fragments, index, {
@@ -220,10 +215,6 @@ export default {
         this.nodePublishing = false
         this.nodePublishingError = e
       }
-    },
-    onResize (e) {
-      // this.$log('onResize', e)
-      this.editorWidth = e.width
     }
   },
   async mounted () {

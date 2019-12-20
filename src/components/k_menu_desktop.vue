@@ -64,6 +64,11 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
         :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
         span(v-if="width === 230").text-bold.q-ml-md {{ $t('install_app') }}
+    //- refresh
+    div().row.full-width.q-px-md
+      q-btn(
+        outline color="accent" no-caps @click="appRefresh()"
+        :style=`{borderRadius: '10px'}` ).full-width Refresh
 </template>
 
 <script>
@@ -204,6 +209,10 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         this.$logD('installPrompt=', installPrompt)
         if (installPrompt) installPrompt.prompt()
       },
+      appRefresh () {
+        this.$log('appRefresh')
+        window.location.reload(true)
+      }
     }
   }
 </script>

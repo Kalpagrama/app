@@ -118,6 +118,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kSpinner', () => import('components/k_spinner'))
     Vue.component('kLogo', () => import('components/k_logo'))
     Vue.component('anvil', () => import('components/k_icons/anvil'))
+    Vue.component('kImg', () => import('components/k_img'))
   } catch (err) {
     logE(err)
   }
