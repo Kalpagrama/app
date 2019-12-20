@@ -59,6 +59,15 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
         img(
           :src="nodeFull.author.thumbUrl"
           :style=`{width: '100%', height: '100%', objectFit: 'cover'}`)
+  div(v-if="nodeFull && opened").row.full-width
+    div(:style=`{height: '50px'}`).row.full-width.scroll
+      .row.justify-start.items-start.content-start.no-wrap.q-pa-md
+        div(
+          v-for="(s, si) in 20" :key="si" @click="$router.push('/sphere/' + si)"
+          :style=`{}`).q-mr-sm.cursor-pointer
+          span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs sphere {{si}}
+    .row.full-width.justify-end.q-pa-sm
+      small.text-grey-7 20.12.2019
 </template>
 
 <script>

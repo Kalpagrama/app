@@ -9,14 +9,18 @@
           .col
             input(
               ref="hourInputStart"
-              v-model="hourStart" placeholder="00" type="number" :maxlength="2" :min="0" :max="59" @input="$event => inputChanged('hourStart', $event)"
+              v-model="hourStart" placeholder="00" type="number" :maxlength="2" :min="0" :max="59"
+              @input="$event => inputChanged('hourStart', $event)"
+              @keyup.enter="confirm()"
               :style=`{fontSize: '40px', background: 'none'}`).full-width.text-white.text-center.kinput
             .row.full-width.justify-center
               small.text-white {{ $t('hour') }}
           .col
             input(
               ref="minuteInputStart"
-              v-model="minuteStart" placeholder="00" type="number" :maxlength="2" :min="0" :max="59" @input="$event => inputChanged('minuteStart', $event)"
+              v-model="minuteStart" placeholder="00" type="number" :maxlength="2" :min="0" :max="59"
+              @input="$event => inputChanged('minuteStart', $event)"
+              @keyup.enter="confirm()"
               autofocus
               :style=`{fontSize: '40px', background: 'none'}`).full-width.text-white.text-center.kinput
             .row.full-width.justify-center
@@ -24,7 +28,9 @@
           .col
             input(
               ref="secondInputStart"
-              v-model="secondStart" placeholder="00" type="number" :maxlength="2" :min="0" :max="59" @input="$event => inputChanged('secondStart', $event)"
+              v-model="secondStart" placeholder="00" type="number" :maxlength="2" :min="0" :max="59"
+              @input="$event => inputChanged('secondStart', $event)"
+              @keyup.enter="confirm()"
               :style=`{fontSize: '40px', background: 'none'}`).full-width.text-white.text-center.kinput
             .row.full-width.justify-center
               small.text-white {{ $t('second') }}
@@ -46,17 +52,13 @@
 <script>
 export default {
   name: 'ncFveCutTimer',
-  props: ['cut', 'player', 'boom'],
+  props: ['cut', 'player', 'duration', 'pointIndex'],
   data () {
     return {
       hourStart: '',
       minuteStart: '',
       secondStart: '',
-      // hourEnd: '',
-      // minuteEnd: '',
-      // secondEnd: '',
-      startResult: undefined,
-      // endResult: undefined
+      startResult: undefined
     }
   },
   computed: {
@@ -71,15 +73,7 @@ export default {
       if (duration > 60 && this.minuteStart.length > 0) sec += parseInt(this.minuteStart) * 60
       if (this.secondStart.length > 0) sec += parseInt(this.secondStart)
       return sec
-    },
-    // endSecond () {
-    //   let sec = 0
-    //   let duration = this.player.duration
-    //   if (duration > 60 * 60 && this.hourEnd.length > 0) sec += parseInt(this.hourEnd) * 60 * 60
-    //   if (duration > 60 && this.minuteEnd.length > 0) sec += parseInt(this.minuteEnd) * 60
-    //   if (this.secondEnd.length > 0) sec += parseInt(this.secondEnd)
-    //   return sec
-    // }
+    }
   },
   watch: {
     startSecond: {
@@ -89,20 +83,11 @@ export default {
           this.player.setCurrentTime(to)
           this.startResult = to
           if (this.endSecond === 0) {
-            // TODO: set endSecond plus 30 sec
+            // TODO: set endSecond plus 30 sec, but less duration
           }
         }
       }
-    },
-    // endSecond: {
-    //   handler (to, from) {
-    //     this.$log('endSecond CHANGED', to, typeof to)
-    //     if (to > 0 && to > this.startSecond && this.player.duration > to) {
-    //       this.player.setCurrentTime(to)
-    //       this.endResult = to
-    //     }
-    //   }
-    // }
+    }
   },
   methods: {
     inputChanged (key, e) {
@@ -124,12 +109,7 @@ export default {
     },
     confirm () {
       this.$log('confirm', 'isFirst', this.isFirst)
-      if (this.boom) {
-        this.$emit('boom', [this.startResult])
-      } else {
-        this.cut.points[0].x = this.startResult
-        // this.cut.points[1].x = this.endResult
-      }
+      this.$emit('point', this.startResult)
       this.cancel()
     },
     cancel () {
@@ -140,16 +120,11 @@ export default {
   mounted () {
     this.$log('mounted')
     if (this.cut) {
-      let arrStart = this.parseSec(this.cut.points[0].x)
-      // let arrEnd = this.parseSec(this.cut.points[1].x)
+      let arrStart = this.parseSec(this.cut.points[this.pointIndex].x)
       this.$log('arrStart', arrStart)
-      // this.$log('arrEnd', arrEnd)
       this.$set(this, 'hourStart', arrStart[0])
       this.$set(this, 'minuteStart', arrStart[1])
       this.$set(this, 'secondStart', arrStart[2])
-      // this.$set(this, 'hourEnd', arrEnd[0])
-      // this.$set(this, 'minuteEnd', arrEnd[1])
-      // this.$set(this, 'secondEnd', arrEnd[2])
     }
     this.player.pause()
     this.$refs.minuteInputStart.focus()

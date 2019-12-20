@@ -5,10 +5,14 @@
 .q-footer {
   background: none !important
 }
+.q-header {
+  background: none !important
+}
 </style>
 
 <template lang="pug">
-q-layout(view="hHh lpR fFf" :container="true" :style=`{height: '100vh', width: $q.screen.width+'px', maxWidth: '500px'}`).bg-grey-3
+q-layout(view="hHh lpR fFf").bg-grey-3
+  //- actions and dialogs
   q-dialog(ref="settingsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     .row.full-width.justify-center.bg-grey-3
       div(:style=`{maxWidth: '500px'}`).row.full-width
@@ -20,18 +24,22 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{height: '100vh', width: $
   q-btn(
     round push icon="add" size="lg" color="green" @click="itemAdd()"
     :style=`{position: 'absolute', zIndex: 1000, bottom: '80px', right: '8px'}`)
-  q-header
-    div(:style=`{height: '60px', color: 'black'}`).row.full-width.items-center.bg-grey-3
+  //- header
+  q-header.row.full-width.justify-center
+    div(:style=`{height: '60px', maxWidth: '500px', color: 'black'}`).row.full-width.items-center.bg-grey-3
       .col.full-height
         .row.fit.items-center.q-px-md
           span.text-bold {{$t('Workspace')}}
       div(:style=`{height: '60px'}`).row.items-center.justify-center.q-px-sm
         q-btn(round flat icon="style" color="grey-9" @click="$refs.spheresDialog.show()")
         q-btn(round flat icon="settings" color="grey-9" @click="$refs.settingsDialog.show()")
-  q-page-container
-    ws-items(@itemClick="itemClick" :height="$q.screen.height-60-60+'px'")
-  q-footer
-    k-menu-mobile
+  //- body
+  q-page-container.row.full-width.justify-center
+    div(:style=`{maxWidth: '500px'}`).row.full-width
+      ws-items(@itemClick="itemClick" :height="$q.screen.height-60-60+'px'")
+  //- footer
+  q-footer.row.full-width.justify-center
+    k-menu-mobile(:style=`{maxWidth: '500px'}`)
 </template>
 
 <script>

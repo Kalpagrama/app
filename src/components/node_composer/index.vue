@@ -43,7 +43,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
           div(v-if="node" :style=`{maxWidth: '500px', paddingBottom: '200px'}`).row.full-width
             nc-fragment(
               :ctx="'inEditor'"
-              :index="0" :thumbUrl="false" :fragment="node.fragments[0]" :visible="true"
+              :index="0" :thumbUrl="false" :fragment="node.fragments[0]" :mini="false" :visible="true" :stageFirst="1"
               @edit="fragmentEdit"
               @content="$event => fragmentCreate(0, $event)"
               @fragment="$event => fragmentSet(0, $event)"
@@ -64,7 +64,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
                   ).text-bold {{ node.name ? node.name : 'В чем суть?' }}
             nc-fragment(
               ctx="inEditor"
-              :index="1" :thumbUrl="false" :fragment="node.fragments[1]" :visible="true"
+              :index="1" :thumbUrl="false" :fragment="node.fragments[1]" :mini="false" :visible="true"
               @edit="fragmentEdit"
               @content="$event => fragmentCreate(1, $event)"
               @fragment="$event => fragmentSet(1, $event)"
@@ -152,8 +152,8 @@ export default {
     },
     fragmentDelete (index) {
       this.$log('fragmentDelete', index)
-      this.$delete(this.node.fragments, index)
-      // this.$set(this.node.fragments, index, null)
+      // this.$delete(this.node.fragments, index)
+      this.$set(this.node.fragments, index, null)
       this.fragmentSecondShow = false
     },
     fragmentSet (index, fragment) {
@@ -193,7 +193,6 @@ export default {
         this.nodeSaving = false
         this.nodeSavingError = null
         this.$log('nodeSave done')
-        this.$emit('saved', res)
       } catch (e) {
         this.$log('nodeSave error', e)
         this.nodeSaving = false
@@ -209,7 +208,7 @@ export default {
         this.nodePublishing = false
         this.nodePublishingError = null
         this.$log('nodePublish done')
-        this.$emit('published')
+        this.refreshAction('confirm', true)
       } catch (e) {
         this.$log('nodePublish error', e)
         this.nodePublishing = false

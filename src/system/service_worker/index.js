@@ -1,6 +1,7 @@
 // Внимание! firebase подключается через CDN  в src/system/service_worker/service-worker.js
 import * as firebase from 'firebase/app'
 import '@firebase/messaging'
+import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Notify } from 'quasar'
 import { i18n } from 'boot/i18n'
@@ -59,8 +60,6 @@ function showNotifyNewVer () {
   )
 }
 
-import { Store, get } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
-
 async function initSw (store) {
   logD('initSw')
   const swStore = new Store('sw-cache-common', 'common-data')
@@ -93,7 +92,6 @@ async function initSw (store) {
           logLevelSentry: store.state.core.logLevelSentry
         }).catch(err => logE('cant post msg to sw', err))
       })
-
       if (registration.waiting && registration.active) {
         // The page has been loaded when there's already a waiting and active SW.
         // This would happen if skipWaiting isn't being called, and there are
@@ -102,7 +100,7 @@ async function initSw (store) {
         // todo show prompt for SW to activate sw immediately and reload page
         registration.waiting.postMessage({ type: 'skipWaiting' })
         store.commit('core/stateSet', ['newVersionAvailable', true])
-        await update()
+        await clearCache()
       } else {
         // updatefound is also fired for the very first install. ¯\_(ツ)_/¯
         registration.addEventListener('updatefound', () => {
@@ -134,7 +132,6 @@ async function initSw (store) {
     await initWebPush(store)
   }
 
-  // не работает вроде...
   function handleNetworkChange (event) {
     logD('handleNetworkChange', navigator.onLine)
     store.commit('core/stateSet', ['online', navigator.onLine])
@@ -149,25 +146,36 @@ async function initSw (store) {
 
   window.addEventListener('online', handleNetworkChange)
   window.addEventListener('offline', handleNetworkChange)
+  logD('initSw OK!')
 }
 
-// очистить кэш сервис-воркера
-// todo clear indexed DB!!!
-async function clearCache () {
-  logD('clearCache')
+// очистить кэш сервис-воркера + indexedDB
+async function clearCache (force = false) {
+  logD('clearCache start')
   if (registration && registration.waiting) { // если есть новый ожидающий SW - активируем его
     registration.waiting.postMessage({ type: 'skipWaiting' })
   }
   if (registration) {
     caches.keys().then(cacheNames => {
-      cacheNames.forEach(cacheName => {
-        caches.delete(cacheName)
+      cacheNames.forEach(cacheName => { // прекэш сам обновляется( + у файлов уникальный префикс). Если удалить, то в след раз он заполнится только при инсталляции воркера!
+        if (force || !cacheName.startsWith('kalpa-precache')) {
+          logD('clear cacheDb. cacheName=', cacheName)
+          caches.delete(cacheName)
+        }
       })
     })
   }
+  logD('clear Idb...')
+  const swStore = new Store('sw-cache-common', 'common-data')
+  const gqlStore = new Store('sw-cache-gql', 'graphql-responses')
+  await clear(swStore)
+  await clear(gqlStore)
+
+  logD('clearCache end!')
 }
 
 async function initWebPush (store) {
+  logD('initWebPush start')
   if ('safari' in window && 'pushNotification' in window.safari) { // APNS
     // let permissionData = window.safari.pushNotification.permission('mac.kalpagramma.com')
     // checkSafariRemotePermission(permissionData, store)
@@ -195,7 +203,6 @@ async function initWebPush (store) {
         logD('Message received . ', payload)
         // ...
       })
-
       let token = await messaging.getToken()
       store.commit('core/stateSet', ['webPushTokenDraft', token])
       await showNotification('application loaded', `version=${store.state.core.version}`)
@@ -207,6 +214,7 @@ async function initWebPush (store) {
       return token
     }
   }
+  logD('initWebPush end')
 }
 
 async function checkUpdate () {
