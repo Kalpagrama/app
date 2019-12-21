@@ -2,7 +2,7 @@ import {LogLevelEnum, LogModulesEnum} from 'src/boot/log'
 export default {
   initialized: false,
   name: 'Kalpagramma',
-  version: '0.0.33',
+  version: '0.0.34',
   online: true, // если сеть недоступна - присваивается false
   webPushToken: null,
   webPushTokenDraft: null,

@@ -1,4 +1,4 @@
-const swVer = 1
+const swVer = 2
 const useCache = false
 
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, cacheGraphQl
