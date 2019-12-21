@@ -203,7 +203,7 @@ export default {
       this.$log('nodePublishCheck')
       let duration = this.node.fragments.reduce((acc, f) => {
         f.cuts.map(c => {
-          acc += c.points[1] - c.points[0].x
+          acc += c.points[1].x - c.points[0].x
         })
         return acc
       }, 0)
@@ -218,13 +218,12 @@ export default {
         this.$log('nodePublish start')
         this.nodePublishing = true
         this.nodePublishCheck()
-        // let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
-        // this.$log('res', res)
-        await this.$wait(1000)
+        let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
+        this.$log('res', res)
         this.$log('nodePublish done')
         this.nodePublishing = false
         this.nodePublishingError = null
-        // this.refreshAction('confirm', true)
+        this.refreshAction('confirm', true)
       } catch (e) {
         this.$log('nodePublish error', e)
         this.nodePublishing = false
