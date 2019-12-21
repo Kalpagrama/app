@@ -295,7 +295,7 @@ export default {
     if (this.cuts.length === 0) {
       this.$log('FIRST EDIT CREATE CUT AT CURRENT SECOND')
       this.cutCreate()
-      this.cutSetTime(0)
+      // this.cutSetTime(0)
     } else {
       this.$log('SET FIRST CUT')
       this.cutIndex = 0

@@ -67,7 +67,7 @@ div(
     //- editors
   div(v-if="stage === 2 && ctx === 'inEditor'").row.full-width
     nc-fragment-video-editor(
-      v-if="$refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
+      v-if="fragment && $refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
       @close="editing = false"
       :fragment="fragment" :now="$refs.ncFragmentVideo.now" :player="$refs.ncFragmentVideo.player"
       :width="previewWidth" :height="toolsHeight"

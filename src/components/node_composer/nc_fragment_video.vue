@@ -18,13 +18,13 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   q-btn(
     v-if="!mini && visible"
     round flat color="white" @click="mutedToggle()"
-    :style=`{position: 'absolute', zIndex: 103, right: '16px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.15)'}`).shadow-1
+    :style=`{position: 'absolute', zIndex: 103, left: '8px', top: '50px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   //- content
   div(
     v-if="!mini && visible && ctx !== 'inEditor'" @click="$router.push('/content/' + fragment.content.oid)"
     :style=`{
-      position: 'absolute', zIndex: 103, left: '58px', top: '8px', height: '42px',
+      position: 'absolute', zIndex: 103, left: '8px', top: '8px', height: '42px',
       borderRadius: '20px', overflow: 'hidden',
       background: 'rgba(255,255,255,0.15)'}`
       ).row.items-center.q-pa-sm.cursor-pointer
@@ -185,6 +185,7 @@ export default {
     if (this.ctx === 'inEditor') {
       this.player.removeEventListener('timeupdate', this.videoTimeupdate)
       this.player.removeEventListener('seeked', this.videoSeeked)
+      this.player.remove()
     }
   }
 }
