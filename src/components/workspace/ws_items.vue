@@ -43,6 +43,10 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
                   ).q-mr-xs
                   div(:style=`{background: c.color, borderRadius: '4px'}`).q-px-sm
                     small.text-white {{ $time(c.points[0].x)}}-{{$time(c.points[1].x) }}
+              //- small(:style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px'}`).text-white {{ f.type }}
+              q-btn(
+                round dense flat color="white" icon="more_vert" @click="itemDelete(f)"
+                :style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
               small(
                 v-if="f.item.name"
                 :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
