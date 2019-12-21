@@ -1,7 +1,13 @@
 {
   "version": 2,
   "name": "kalpagramma",
-  "builds": [{ "src": "package.json", "use": "@now/static-build" }],
+  "builds": [{
+    "src": "package.json",
+    "use": "@now/static-build",
+    "env": {
+      "AUTH_URL": "https://test.kalpagramma.com/graphql"
+    }
+  }],
   "routes": [
     { "src": "^/js/(.*)", "dest": "/js/$1" },
     { "src": "^/css/(.*)", "dest": "/css/$1" },
