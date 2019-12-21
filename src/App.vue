@@ -31,6 +31,7 @@ export default {
   },
   created () {
     this.$log('created')
+    window.alert('Created')
     this.$q.addressbarColor.set('#eee')
     // this.disableBodyScroll()
   }
