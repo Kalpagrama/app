@@ -12,6 +12,6 @@
     { "src": "^/(.*)", "dest": "/$1" },
     { "src": ".*", "dest": "/index.html" },
     { "src": ".*", "dest": "/" },
-    { "src": "/menu", "dest": "/menu" }
+    { "src": "/menu", "dest": "/index.html" }
   ]
 }
