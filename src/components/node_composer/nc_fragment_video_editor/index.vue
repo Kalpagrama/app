@@ -55,29 +55,47 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
         div(
           :style=`{position: 'relative', height: '50px'}`
           ).row.full-width
+          //- play
           div(:style=`{height: '50px', width: '50px'}`).row.items-center.content-center.justify-center
-            q-btn(round flat icon="play_arrow" color="green" @click="cutMoreClick(c, ci)")
+            q-btn(
+              round flat
+              :icon="cutPlaying === ci ? 'pause' : 'play_arrow'"
+              :color="cutPlaying === ci ? 'red' : 'green'"
+              @click="cutPlay(c, ci)")
+          //- start
           div(@click="cutSetTime(0)").col.full-height.cursor-pointer
             .row.fit.items-center.justify-end.q-pr-sm
               span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white {{ $time((parseInt(c.points[0].x*100))/100) }}
           div().row.full-height.items-center.justify-center
             span(:style=`{fontSize: '16px'}`).text-white.text-bold.q-mx-xs -
+          //- end
           div(@click="cutSetTime(1)").col.full-height.cursor-pointer
             .row.fit.items-center.justify-start.q-pl-sm
               span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white {{ $time((parseInt(c.points[1].x*100))/100) }}
+          //- actions
           div(:style=`{height: '50px', width: '50px'}`).row.items-center.content-center.justify-center
             q-btn(round flat icon="more_vert" color="grey-8" @click="cutMoreClick(c, ci)")
         //- cut INACTIVE tint
         div(
           v-if="cutIndex !== ci" @click="cutClick(c, ci)"
-          :style=`{position: 'absolute', background: 'rgba(0,0,0,0.2)'}`).row.fit.cursor-pointer
+          :style=`{position: 'absolute', zIndex: 100, background: 'rgba(0,0,0,0.2)'}`).row.fit.cursor-pointer
+        //- cut PLAYING tint
+        div(
+          v-if="cut && cutPlaying === ci"
+          :style=`{
+            position: 'absolute', zIndex: 100, right: 0, background: 'rgba(0,0,0,0.5)', pointerEvents: 'none',
+            width: ((cut.points[1].x-now)/(cut.points[1].x-cut.points[0].x))*100+'%'}`
+          ).row.full-height
   //- debug
   div(v-if="false").row.full-width.bg-red
     small cut: {{cut}}
   //- footer
   div(:style=`{position: 'relative', height: '60px'}`).row.full-width.items-center.content-center.bg-grey-10
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      q-btn(round flat icon="play_arrow" color="green" @click="fragmentPlay()")
+      q-btn(
+        round flat @click="fragmentPlay()"
+        :icon="fragmentPlaying ? 'pause' : 'play_arrow'"
+        :color="fragmentPlaying ? 'red' : 'green'")
     span(@click="fragmentNameDialogOpened = true").text-white {{ fragment.name || $t('Set fragment name')}}
   //- progress
   div(
@@ -134,13 +152,27 @@ export default {
     now: {
       handler (to, from) {
         // this.$log('now CHANGED', to)
+        // if (to && from && to.color === from.color) return
         if (this.cut && this.cutPlaying >= 0) {
-          if (to > this.cut.points[1].x) {
-            this.player.setCurrentTime(this.cut.points[0].x)
+          if (to > this.cut.points[1].x || to < this.cut.points[0].x) {
+            if (this.fragmentPlaying) {
+              this.$log('FRAGMENT PLAYING')
+              if (this.cuts[this.cutIndex + 1]) {
+                this.$log('NEXT CUT')
+                this.cutIndex += 1
+                this.cutPlaying += 1
+              } else {
+                this.$log('FIRST CUT AGAIN')
+                this.cutIndex = 0
+                this.cutPlaying = 0
+              }
+            } else {
+              this.$log('CUT AGAIN')
+              this.player.setCurrentTime(this.cut.points[0].x)
+            }
           }
-          if (to < this.cut.points[0].x) {
-            this.player.setCurrentTime(this.cut.points[0].x)
-          }
+        } else {
+          // this.$log('NO CUT PLAYING')
         }
       }
     }
@@ -148,6 +180,18 @@ export default {
   methods: {
     fragmentPlay () {
       this.$log('fragmentPlay')
+      if (this.fragment.cuts.length === 0) return
+      if (this.fragmentPlaying) {
+        this.fragmentPlaying = false
+        this.cutIndex = -1
+        this.cutPlaying = -1
+      } else {
+        this.fragmentPlaying = true
+        this.cutIndex = 0
+        this.cutPlaying = 0
+        this.player.play()
+        this.player.setCurrentTime(this.cut.points[0].x)
+      }
     },
     cutDialogAction (action) {
       this.$log('cutDialogAction', action)
