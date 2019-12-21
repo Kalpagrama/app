@@ -1,9 +1,9 @@
 <template lang="pug">
-div(:style=`{position: 'relative', height: '500px', marginTop: '100px'}`).row.full-width.items-end.content-end.bg-white
+div(:style=`{position: 'relative', height: $store.state.ui.pageMaxWidth+'px', marginTop: '100px'}`).row.full-width.items-end.content-end.bg-white
   div(:style=`{position: 'absolute', zIndex: zIndex+100, top: '-70px', left: '5%', width: '80%', borderRadius: '8px', overflow: 'hidden'}`
     ).row.shadow-20.bg-grey-3
     img(:src="node.thumbUrl[0]" :style=`{width: '100%', objectFit: 'contain'}`)
-  div(:style=`{position: 'absolute', zIndex: zIndex+90, top: '-40px', right: '5%', width: '80%', maxHeight: 'calc(500px - 20%)', borderRadius: '8px', overflow: 'hidden'}`
+  div(:style=`{position: 'absolute', zIndex: zIndex+90, top: '-40px', right: '5%', width: '80%', maxHeight: 'calc($store.state.ui.pageMaxWidth+'px' - 20%)', borderRadius: '8px', overflow: 'hidden'}`
     ).row.shadow-5.bg-grey-3
     img(:src="node.thumbUrl[1]" :style=`{width: '100%', objectFit: 'contain'}`)
   //- div(:style=`{height: '600px', paddingTop: '230px'}`).row.full-width

@@ -2,7 +2,7 @@
 div(:style=`{position: 'relative'}`).column.fit.bg
   .col.full-width.scroll
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '500px'}`).row.full-width.q-pt-sm
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
         //- debug
         div(v-if="false").row.full-width.bg-red.q-mb-md.q-px-sm
           small.full-width opened: {{ opened }}
@@ -20,7 +20,7 @@ div(:style=`{position: 'relative'}`).column.fit.bg
                   .row.fit.items-center
                     span Ivan Ivanov
         //- node
-        div(:style=`{position: 'relative', height: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+        div(:style=`{position: 'relative', height: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
           //- f1
           div(:style=`{height: '200px', borderRadius: '10px'}`
             ).row.full-width.items-center.justify-center.bg-black

@@ -14,7 +14,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-footer(v-if="fragmentEditing < 0" reveal).row.full-width.justify-center.bg-grey-3
       div(
-        :style=`{height: '60px', maxWidth: '500px'}`).row.full-width.items-center.q-px-sm
+        :style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.q-px-sm
         q-btn(round flat no-caps color="grey" icon="clear" @click="$router.back()").q-mr-sm
         transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
           q-btn(
@@ -30,7 +30,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
             span.text-bold {{ $t('Publish') }}
   q-page-conainter
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '500px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         k-dialog-bottom(
           ref="refreshDialog" @action="$event => refreshAction($event, false)"
           :options=`{
@@ -40,7 +40,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
         div(v-if="loading" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-center.justify-center
           q-spinner(size="60px" color="primary")
         div(v-else).row.full-width.items-start.content-start.justify-center.q-pa-sm
-          div(v-if="node" :style=`{maxWidth: '500px', paddingBottom: '200px'}`).row.full-width
+          div(v-if="node" :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', paddingBottom: '200px'}`).row.full-width
             nc-fragment(
               :ctx="'inEditor'"
               :index="0" :thumbUrl="false" :fragment="node.fragments[0]" :mini="false" :visible="true" :stageFirst="1"
@@ -152,7 +152,6 @@ export default {
     },
     fragmentDelete (index) {
       this.$log('fragmentDelete', index)
-      // this.$delete(this.node.fragments, index)
       this.$set(this.node.fragments, index, null)
       this.fragmentSecondShow = false
     },
@@ -192,6 +191,7 @@ export default {
         this.$log('res', res)
         this.nodeSaving = false
         this.nodeSavingError = null
+        this.node = res
         this.$log('nodeSave done')
       } catch (e) {
         this.$log('nodeSave error', e)
@@ -232,8 +232,7 @@ export default {
         // set
         switch (wsItem.type) {
           case 'note': {
-            this.$set(this, 'node', this.nodeNew)
-            this.$set(this.node, 'name', wsItem.item.name)
+            this.$set(this, 'node', JSON.parse(JSON.stringify(wsItem.item)))
             break
           }
           case 'content': {
@@ -242,6 +241,11 @@ export default {
             break
           }
           case 'fragment': {
+            this.$set(this, 'node', this.nodeNew)
+            this.fragmentSet(0, JSON.parse(JSON.stringify(wsItem.item)))
+            break
+          }
+          case 'cut': {
             this.$set(this, 'node', this.nodeNew)
             this.fragmentSet(0, JSON.parse(JSON.stringify(wsItem.item)))
             break

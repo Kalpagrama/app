@@ -11,7 +11,7 @@ iframe {
 div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   //- play/pause for inList
   div(
-    v-if="!mini" @click="videoToggle()"
+    v-if="!mini && ctx !== 'inEditor'" @click="videoToggle()"
     :style=`{position: 'absolute', zIndex: 103, opacity: 0.5}`).row.fit.items-center.justify-center
     q-btn(v-if="!playing && !mini" round flat icon="play_arrow" color="white" size="60px")
   //- muted
@@ -22,11 +22,12 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   //- content
   div(
-    v-if="!mini && visible" @click="$router.push('/content/' + fragment.content.oid)"
+    v-if="!mini && visible && ctx !== 'inEditor'" @click="$router.push('/content/' + fragment.content.oid)"
     :style=`{
       position: 'absolute', zIndex: 103, left: '58px', top: '8px', height: '42px',
       borderRadius: '20px', overflow: 'hidden',
-      background: 'rgba(255,255,255,0.15)'}`).row.items-center.q-pa-sm.cursor-pointer
+      background: 'rgba(255,255,255,0.15)'}`
+      ).row.items-center.q-pa-sm.cursor-pointer
     span(:style=`{userSelect: 'none', whiteSpace: 'nowrap'}`).text-white {{ fragment.content.name | cut(50) }}
   //- video wrapper
   div(:style=`{position: 'relative'}`).row.fit

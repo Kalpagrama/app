@@ -36,7 +36,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
   div(:style=`{height: '50px'}`).row.full-width.q-my-sm.q-px-md
     .col.q-pr-sm
       q-btn(
-        outline no-caps color="green" size="md" @click="cutCreate([])"
+        outline no-caps color="green" size="md" @click="cutCreate()"
         :style=`{height: '50px', borderRadius: '10px'}`).full-width.q-mb-sm
         span {{ $t('Add cut here') }}
     q-btn(
@@ -245,6 +245,7 @@ export default {
       this.$log('SET FIRST CUT')
       this.cutIndex = 0
       this.player.setCurrentTime(this.cut.points[0].x)
+      this.player.play()
     }
   },
   beforeDestroy () {

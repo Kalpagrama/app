@@ -4,12 +4,12 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
     v-if="true"
     reveal
     ).row.full-width.justify-center.q-px-sm.bg-grey-3
-    k-colls-tabs(:style=`{maxWidth: '500px', borderRadius: '0 0 10px 10px'}`).bg-white
+    k-colls-tabs(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '0 0 10px 10px'}`).bg-white
   q-footer(reveal).row.full-width.justify-center.bg-grey-3
-    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
   q-page-conainter
     div(:style=`{paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
-      div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
         //- k-colls-new
         //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
         node-loader(v-if="true" ref="nodeLoader" :query="query" queryKey="feed")

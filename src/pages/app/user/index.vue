@@ -9,7 +9,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
   q-header.row.full-width.justify-center
-    div(:style=`{maxWidth: '500px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       div(v-if="user").row.full-width.content-start
         //- header
         div(:style=`{height: '100px'}`).row.full-width.bg-primary
@@ -47,7 +47,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
               //- span {{ user.subscriptions }}
   q-page-container
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '500px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(
           v-if="user"
           :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
@@ -61,7 +61,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
             template(v-slot:followers)
               user-followers(:subscribers="user.subscribers" :oid="user.oid")
   q-footer.row.full-width.justify-center
-    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
 </template>
 
 <script>

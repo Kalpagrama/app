@@ -16,17 +16,17 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
     v-if="showNameSticky"
     ).row.full-width.justify-center
     .col.bg-grey-3
-    div(:style=`{maxWidth: '500px'}`).row.full-width.q-px-sm
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm
       div(:style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.bg-grey-3.q-pt-sm
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', }` @click="headerClick()").row.full-width.items-center.justify-center.bg-white
           span(v-if="node").text-bold.text-black.text-center {{ node.name }}
     .col.bg-grey-3
   q-footer(reveal).row.full-width.justify-center.bg-grey-3
-    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
   q-page-conainter
     .row.full-width.justify-center.items-start.content-start
       .row.full-width.justify-center
-        div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
           .row.full-width.items-start.content-start
             node(
               v-if="node"
@@ -39,7 +39,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
       div(
         v-if="true"
         :style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
-        div(:style=`{maxWidth: '500px'}`).row.full-width.q-pa-sm
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pa-sm
           //- similar nodes header
           div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.justify-center.bg-white.q-mt-xl.q-mb-sm

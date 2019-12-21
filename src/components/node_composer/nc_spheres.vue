@@ -4,7 +4,7 @@ div(
   //- spheres dialog
   q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     div(@click.self="$refs.spheresDialog.hide()").row.fit.items-end.content-end.justify-center
-      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: '500px'}`).column.fit.bg-grey-3
+      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
         div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-sm
           .col
             div(:style=`{position: 'relative', zIndex: 10, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
@@ -32,7 +32,7 @@ div(
   //- categories dialog
   q-dialog(ref="categoriesDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     div(@click.self="$refs.categoriesDialog.hide()").row.fit.items-end.content-end.justify-center
-      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: '500px'}`).column.fit.bg-grey-3
+      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
         div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-md
           .col
             .row.fit.items-center

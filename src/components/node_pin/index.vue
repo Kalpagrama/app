@@ -38,7 +38,7 @@ div(v-if="sphereOid").column.fit.bg-grey-3
         .column.fit
           div(ref="nodePinScroll" @scroll="onScroll" :style=`{paddingTop: '0px', paddinBottom: '60px'}`).col.full-width.scroll.kscroll
             .row.full-width.justify-center
-              div(:style=`{maxWidth: '500px'}`).row.full-width
+              div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
                 q-resize-observer(ref="onResizeObserver" @resize="onResize")
                 node-loader(ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
                   template(v-slot:default=`{nodes}`)
