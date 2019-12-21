@@ -12,7 +12,7 @@ q-layout(container :style=`{height: '100vh', width: '100vw'}`).column.bg-grey-2
       div(v-if="events.length === 0").row.fit.justify-center.bg-white.q-py-xl
         span.text-grey.text-h6 {{$t('You dont have notifications.')}}
       .row.full-width.items-start.content-start.justify-center.q-pa-md
-        div(:style=`{maxWidth: '500px'}`).row.full-width
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
           div(
             v-for="(e, ei) in events" :key="ei"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`

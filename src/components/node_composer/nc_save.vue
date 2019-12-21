@@ -8,7 +8,7 @@
   q-layout(view="hHh lpR fFf" :container="true" :style=`{height: '100vh', width: $q.screen.width+'px'}` @resize="onResize" @scroll="onScroll").bg-grey-3
     q-footer(reveal).bg-grey-3
       .row.full-width.justify-center
-        div(:style=`{height: '60px', maxWidth: '500px'}`).row.full-width.items-center.justify-between.q-px-sm
+        div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.justify-between.q-px-sm
           q-btn(no-caps round flat color="grey" icon="clear" @click="$emit('close')")
           q-btn(push no-caps :loading="nodePublishing" color="green" @click="nodePublish()"
             :style=`{borderRadius: '10px'}`)
@@ -16,12 +16,12 @@
     q-header(
       v-if="showNameSticky"
       ).row.full-width.justify-center.q-px-sm.bg-grey-3
-      div(:style=`{maxWidth: '500px'}`).row.full-width.q-px-sm.q-pt-sm
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm.q-pt-sm
         div(:style=`{height: '60px', borderRadius: '10px 10px 0 0', overflow: 'hidden', }`).row.full-width.items-center.justify-center.bg-white
           span.text-bold.text-black {{ node.name }}
     q-page-conainter
       .row.full-width.justify-center.items-start.content-start
-        div(:style=`{maxWidth: '500px'}`).row.full-width.items-start.content-start.q-pa-sm
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
           .row.full-width.items-start.content-start
             node(
               :width="width" :node="node" :nodeFullReady="node"

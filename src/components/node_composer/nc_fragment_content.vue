@@ -8,7 +8,7 @@ div(
     ).row.full-width.items-center.justify-center.bg-white
   q-dialog(ref="ncFragmentContentWsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     div(@click.self="$refs.ncFragmentContentWsDialog.hide()").row.fit.items-end.content-end.justify-center
-      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: '500px'}`).column.fit.bg-grey-3
+      div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
         .col.full-width
           ws-items(:types="['fragments', 'contents']" @itemClick="wsItemClick")
   div(
@@ -61,15 +61,19 @@ export default {
     }
   },
   methods: {
-    wsItemClick ([type, item]) {
-      this.$log('wsItemClick', type, item)
-      switch (type) {
+    wsItemClick (val) {
+      this.$log('wsItemClick', val)
+      switch (val.type) {
         case 'content': {
-          this.$emit('content', item.item)
+          this.$emit('content', val.item)
+          break
+        }
+        case 'cut': {
+          this.$emit('fragment', val.item)
           break
         }
         case 'fragment': {
-          this.$emit('fragment', item)
+          this.$emit('fragment', val.item)
           break
         }
       }

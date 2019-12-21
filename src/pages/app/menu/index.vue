@@ -4,10 +4,10 @@
 q-layout(view="hHh lpR fFf").bg-secondary
   q-page-conainter
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '500px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         k-menu-desktop(:page="true").full-width
   q-footer(reveal).row.full-width.justify-center
-    div(:style=`{maxWidth: '500px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       k-menu-mobile
 </template>
 

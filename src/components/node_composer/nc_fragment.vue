@@ -23,6 +23,8 @@ div(
     k-dialog-bottom(
       v-if="ctx === 'inEditor'"
       ref="ncFragmentCancelDialog" :options="{actions: {delete: {name: 'Delete fragment', color: 'red'}}}" @action="$emit('delete')")
+    //- previewLoaded
+    //- span(:style=`{position: 'absolute', zIndex: 10000, left: '50%', top: '50%'}`).bg-red.text-white.q-pa-sm previewLoaded: {{previewLoaded}}
     //- mini mode toggle tint
     div(
       v-if="mini" @click="$emit('mini')"
@@ -44,16 +46,18 @@ div(
       :color="editing ? 'green' : 'green'"
       :icon="editing ? 'check' : 'edit'"
       :style=`{position: 'absolute', zIndex: 200, bottom: '24px', right: '16px'}`).shadow-5
+    //- preview
     img(
       ref="ncFragmentPreview"
       :src="ctx === 'inEditor' ? fragment.content.thumbUrl : thumbUrl"
       @load="previewLoad" @error="previewError"
       crossOrigin="anonymous" draggable="false"
-      :style=`{width: '100%', minWidth: '100%', maxHeight: 400+'px', objectFit: 'contain', userSelect: 'none'}`
+      :style=`{width: '100%', minWidth: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain', userSelect: 'none'}`
       :class=`{'full-height': ctx !== 'inEditor'}`)
     //- video
     div(
-      :style=`{position: 'absolute', zIndex: 100, top: 0, minHeight: '100%', minWidth: '100%'}`).row.fit
+      v-if="previewLoaded"
+      :style=`{position: 'absolute', zIndex: 100, top: 0, bottom: 0, left: 0, right: 0, minHeight: '100%', minWidth: '100%'}`).row.fit
       nc-fragment-video(
         v-if="previewLoaded && fragment && fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
         :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini" :visible="visible"
@@ -88,7 +92,8 @@ export default {
       actionsHeight: 0,
       toolsHeight: 0,
       editing: false,
-      boomed: false
+      contentReady: false,
+      editorReady: false
     }
   },
   computed: {
@@ -110,6 +115,12 @@ export default {
           } else {
             this.$log('NO FRAGMENT')
             this.stage = this.stageFirst || 0
+            this.previewLoaded = false
+            this.previewWidth = 0
+            this.previewHeight = 0
+            this.contentReady = false
+            this.editorReady = false
+            this.editing = false
           }
         } else {
           this.stage = 2
@@ -121,7 +132,6 @@ export default {
         this.$log('editing CHANGED', to)
         if (to) {
           this.$emit('edit', this.index)
-          this.boomed = true
           this.$tween.to(this, 0.3, {
             actionsHeight: 52,
             toolsHeight: this.$q.screen.height - 8 - 8 - 8 - 60 - this.$refs.ncFragmentPreview.clientHeight,
@@ -164,20 +174,7 @@ export default {
         }
       }
     },
-    boom () {
-      this.$log('boom')
-      this.boomed = true
-      this.editing = true
-      switch (this.fragment.content.type) {
-        case 'VIDEO': {
-          this.$nextTick(() => {
-            this.$refs.ncFragmentVideoEditor.boom()
-          })
-          break
-        }
-      }
-    },
-    previewLoad () {
+    async previewLoad () {
       this.$log('previewLoad', this.$refs.ncFragmentPreview.clientHeight)
       if (this.ctx === 'inEditor') this.$q.notify('previewLoad' + this.$refs.ncFragmentPreview.clientHeight)
       let h = this.$refs.ncFragmentPreview.clientHeight

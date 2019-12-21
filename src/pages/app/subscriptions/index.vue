@@ -3,7 +3,7 @@ q-layout(container :style=`{width: '100vw', height: '100vh'}`).column.bg-grey-3
   q-dialog(ref="subDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down"
     @hide="sub = null")
     div(@click.self="$refs.subDialog.hide()").row.fit.justify-center.items-start.q-py-xl.q-px-sm
-      div(:style=`{maxWidth: '500px', borderRadius: '10px', overflow: 'hidden'}`).column.fit.bg-white
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '10px', overflow: 'hidden'}`).column.fit.bg-white
         .col.full-width.scroll
           .row.full-width.items-start.content-start.q-pa-md
             span {{ $t(sub) }}
@@ -22,7 +22,7 @@ q-layout(container :style=`{width: '100vw', height: '100vh'}`).column.bg-grey-3
       div(v-if="subscriptions.length === 0").row.fit.justify-center.bg-white.q-py-xl
         span.text-grey.text-h6 {{$t('You dont have subscriptions.')}}
       .row.full-width.items-start.content-start.justify-center.q-pa-md
-        div(:style=`{maxWidth: '500px'}`).row.full-width
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
           div(
             v-for="(s, si) in subscriptions" :key="si"
             :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
