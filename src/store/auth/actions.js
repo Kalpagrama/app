@@ -54,7 +54,7 @@ export const loginEmail = async (context, email) => {
   logD('@loginEmail start')
   let { data: { loginEmail: { token, expires, role } } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
-      mutation loginEmail ($email: String!, $inviteCode: String){
+      mutation sw_nocache_loginEmail ($email: String!, $inviteCode: String){
         loginEmail(email: $email, inviteCode: $inviteCode){
           token
           expires
@@ -76,7 +76,7 @@ export const loginPhone = async (context, phone) => {
   logD('@loginPhone start')
   let { data: { loginPhone: { token, expires, role } } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
-      mutation loginPhone ($phone: String!, $inviteCode: String){
+      mutation sw_nocache_loginPhone ($phone: String!, $inviteCode: String){
         loginPhone(phone: $phone, inviteCode: $inviteCode){
           token
           expires
@@ -96,10 +96,9 @@ export const loginPhone = async (context, phone) => {
 }
 export const loginPassword = async (context, { login, password }) => {
   logD('@loginPassword start')
-  logD('@loginPassword start')
   let { data: { login: { token, expires, role } } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
-      mutation login ($login: String!, $password: String!, $inviteCode: String){
+      mutation sw_nocache_login ($login: String!, $password: String!, $inviteCode: String){
         login(login: $login, password: $password  inviteCode: $inviteCode){
           token
           expires
@@ -123,7 +122,7 @@ export const confirm = async (context, code) => {
   let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await apolloProvider.clients.authApollo.mutate({
     client: 'authApollo',
     mutation: gql`
-      mutation codeConfirmEmail ($code: String!) {
+      mutation sw_nocache_codeConfirmEmail ($code: String!) {
         confirm(code: $code){
           result
           nextAttemptDate
