@@ -9,6 +9,6 @@
     { "src": "^/fonts/(.*)", "dest": "/fonts/$1" },
     { "src": "^/statics/(.*)", "dest": "/statics/$1" },
     { "src": "^/statics/icons/(.*)", "dest": "/statics/icons/$1" },
-    { "src": ".*", "dest": "/index.html" }
+    { "src": "^/(.*)", "dest": "/$1" }
   ]
 }
