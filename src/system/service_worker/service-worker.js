@@ -1,7 +1,7 @@
-const swVer = 19
+const swVer = 16
 const useCache = false
 
-let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, swStore, gqlStore, cacheGraphQl
+let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, cacheGraphQl
 /* global idbKeyval, MD5 */
 importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
 importScripts('/statics/scripts/md5.js')
@@ -30,9 +30,8 @@ importScripts('/statics/scripts/md5.js')
 // common init sw
 {
   logDebug('swVer=', swVer)
-  swStore = new idbKeyval.Store('sw-cache-common', 'common-data')
+  // swStore = new idbKeyval.Store('sw-cache-common', 'common-data')
   gqlStore = new idbKeyval.Store('sw-cache-gql', 'graphql-responses')
-  idbKeyval.set('swVer', swVer, swStore)
   self.addEventListener('message', function handler (event) {
     logDebug('message!', event.data)
     if (event.data) {
@@ -50,6 +49,9 @@ importScripts('/statics/scripts/md5.js')
         case 'skipWaiting':
           self.skipWaiting()
           break
+        case 'sendVersion':
+          self.clients.matchAll().then(all => all.map(client => client.postMessage(swVer)));
+          break
         default:
           logCritical('bad event.data.type', event.data.type)
       }
@@ -62,6 +64,7 @@ importScripts('/statics/scripts/md5.js')
 // custom resolver for graphql POST requests
 {
   cacheGraphQl = async function (event) {
+    // todo use different strategies
     // let tmpReq = event.request.clone()
     // logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
     // let promise = null
@@ -204,6 +207,10 @@ if (useCache) {
           new workbox.expiration.Plugin({
             maxEntries: 200,
           }),
+          // If we have the *entire* video in the cache,
+          // then this plugin will properly honor the Range: header on incoming requests,
+          // and slice up the response body, giving back only what's asked for.
+          new workbox.rangeRequests.Plugin()
         ]
       })
     )
@@ -215,6 +222,10 @@ if (useCache) {
           new workbox.expiration.Plugin({
             maxEntries: 200,
           }),
+          // If we have the *entire* video in the cache,
+          // then this plugin will properly honor the Range: header on incoming requests,
+          // and slice up the response body, giving back only what's asked for.
+          new workbox.rangeRequests.Plugin()
         ]
       })
     )
@@ -224,35 +235,33 @@ if (useCache) {
       'POST'
     )
 
-    // // This "catch" handler is triggered when any of the other routes fail to
-    // // generate a response.
-    // workbox.routing.setCatchHandler(async ({ event }) => {
-    //   // The FALLBACK_URL entries must be added to the cache ahead of time, either via runtime
-    //   // or precaching.
-    //   // If they are precached, then call workbox.precaching.getCacheKeyForURL(FALLBACK_URL)
-    //   // to get the correct cache key to pass in to caches.match().
-    //   //
-    //   // Use event, request, and url to figure out how to respond.
-    //   // One approach would be to use request.destination, see
-    //   // https://medium.com/dev-channel/service-worker-caching-strategies-based-on-request-types-57411dd7652c
-    //
-    //   switch (event.request.destination) {
-    //     case 'document':
-    //       logDebug('fallback document', event.request)
-    //       return caches.match('FALLBACK_HTML_URL')
-    //     case 'image': {
-    //       logDebug('fallback image', event.request.url, 'to', workbox.precaching.getCacheKeyForURL('/statics/logo.png'))
-    //       return caches.match(workbox.precaching.getCacheKeyForURL('/statics/logo.png'))
-    //     }
-    //     case 'font':
-    //       logDebug('fallback font', event.request)
-    //       return caches.match('FALLBACK_FONT_URL')
-    //     default:
-    //       logDebug('fallback default', event.request)
-    //       // If we don't have a fallback, just return an error response.
-    //       return Response.error()
-    //   }
-    // })
+    // This "catch" handler is triggered when any of the other routes fail to
+    // generate a response.
+    workbox.routing.setCatchHandler(async ({ event }) => {
+      // The FALLBACK_URL entries must be added to the cache ahead of time, either via runtime
+      // or precaching.
+      // If they are precached, then call workbox.precaching.getCacheKeyForURL(FALLBACK_URL)
+      // to get the correct cache key to pass in to caches.match().
+      //
+      // Use event, request, and url to figure out how to respond.
+      // One approach would be to use request.destination, see
+      // https://medium.com/dev-channel/service-worker-caching-strategies-based-on-request-types-57411dd7652c
+
+      switch (event.request.destination) {
+        case 'image': {
+          logDebug('fallback image', event.request.url, 'to', workbox.precaching.getCacheKeyForURL('/statics/fallback_image.png'))
+          return caches.match(workbox.precaching.getCacheKeyForURL('/statics/fallback_image.png'))
+        }
+        case 'video': {
+          logDebug('fallback video', event.request.url, 'to', workbox.precaching.getCacheKeyForURL('/statics/fallback_video.mp4'))
+          return caches.match(workbox.precaching.getCacheKeyForURL('/statics/fallback_video.mp4'))
+        }
+        default:
+          logDebug('fallback default', event.request)
+          // If we don't have a fallback, just return an error response.
+          return Response.error()
+      }
+    })
   }
 // listeners
   {
