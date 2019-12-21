@@ -77,7 +77,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
 <script>
 export default {
   name: 'ncFveCutPan',
-  props: ['width', 'player', 'node', 'fragment', 'cut', 'cutIndex', 'now'],
+  props: ['width', 'player', 'node', 'fragment', 'cut', 'cutIndex', 'now', 'fragmentDuration'],
   data () {
     return {
       framesWidth: 0

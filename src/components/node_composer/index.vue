@@ -199,16 +199,32 @@ export default {
         this.nodeSavingError = e
       }
     },
+    async nodePublishCheck () {
+      this.$log('nodePublishCheck')
+      let duration = this.node.fragments.reduce((acc, f) => {
+        f.cuts.map(c => {
+          acc += c.points[1] - c.points[0].x
+        })
+        return acc
+      }, 0)
+      this.$log('duration', duration)
+      if (duration > 120) {
+        this.$q.notify({message: 'Too big fragments!', color: 'red', textColor: 'white'})
+        throw new Error('Too big fragments')
+      }
+    },
     async nodePublish () {
       try {
         this.$log('nodePublish start')
         this.nodePublishing = true
-        let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
-        this.$log('res', res)
+        this.nodePublishCheck()
+        // let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
+        // this.$log('res', res)
+        await this.$wait(1000)
+        this.$log('nodePublish done')
         this.nodePublishing = false
         this.nodePublishingError = null
-        this.$log('nodePublish done')
-        this.refreshAction('confirm', true)
+        // this.refreshAction('confirm', true)
       } catch (e) {
         this.$log('nodePublish error', e)
         this.nodePublishing = false

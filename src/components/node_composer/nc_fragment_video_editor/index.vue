@@ -30,7 +30,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
       :fragment="fragment" @close="fragmentNameDialogOpened = false"
       :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
   //- pan
-  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now")
+  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now" :fragmentDuration="fragmentDuration")
   //- actions
   //- cut CREATE
   div(:style=`{height: '50px'}`).row.full-width.q-my-sm.q-px-md
@@ -96,7 +96,12 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
         round flat @click="fragmentPlay()"
         :icon="fragmentPlaying ? 'pause' : 'play_arrow'"
         :color="fragmentPlaying ? 'red' : 'green'")
-    span(@click="fragmentNameDialogOpened = true").text-white {{ fragment.name || $t('Set fragment name')}}
+    .col.full-height
+      .row.fit.items-center.content-center.q-pr-sm
+        .row.full-width
+          span(@click="fragmentNameDialogOpened = true").text-white {{ fragment.name || $t('Set fragment name') | cut(40) }}
+        .row.full-width
+          span(:style=`{color: fragmentDuration > 60 ? 'red' : 'green'}`).text-bold {{ $time(fragmentDuration) }}
   //- progress
   div(
     v-if="false"
@@ -146,6 +151,12 @@ export default {
           delete: {name: 'Delete', color: 'red'}
         }
       }
+    },
+    fragmentDuration () {
+      return this.cuts.reduce((acc, val) => {
+        acc += val.points[1].x - val.points[0].x
+        return acc
+      }, 0)
     }
   },
   watch: {
