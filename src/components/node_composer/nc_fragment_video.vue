@@ -35,7 +35,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
       ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="false"
       @play="playing = true" @pause="playing = false"
       @ended="videoEnded" @timeupdate="videoTimeupdate" @seeked="videoSeeked"
-      width="100%" height="100%" :muted="muted"
+      width="100%" height="100%" :muted="true"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
       ).fit
       source(
@@ -84,15 +84,17 @@ export default {
     },
     async play () {
       this.$log('play')
+      this.$q.notify('PLAY')
       if (this.player) {
+        this.player.setMuted(true)
         this.player.play()
-        await this.$wait(100)
-        this.player.setMuted(false)
+        // await this.$wait(100)
       }
     },
     pause () {
       this.$log('pause')
-      if (this.player) this.player.pause()
+      this.$q.notify('PAUSE')
+      // if (this.player) this.player.pause()
     },
     progressClick (e) {
       this.$log('progressClick', this.player.duration)

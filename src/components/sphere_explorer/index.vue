@@ -37,7 +37,7 @@ q-layout(view="HHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
           :style=`{borderRadius: '10px'}`
           ).bg-grey-4.q-px-sm.q-py-xs.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
           span(:style=`{whiteSpace: 'nowrap'}`) {{`${s.name}` | cut(50)}}
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm
       node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
         template(v-slot:default=`{nodes, fetchingMore}`)
           node-list(:nodes="nodes" :nodesBan="[]" @nodeClick="nodeClick")
