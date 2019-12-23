@@ -126,7 +126,7 @@ import ncFveFragmentName from './nc_fve_fragment_name'
 export default {
   name: 'ncFragmentVideoEditor',
   components: {ncFveCutPan, ncFveCutTimer, ncFveCutName, ncFveFragmentName},
-  props: ['width', 'height', 'fragment', 'player', 'now'],
+  props: ['width', 'height', 'fragment', 'player', 'now', 'editing'],
   data () {
     return {
       cutIndex: -1,
@@ -168,6 +168,18 @@ export default {
     }
   },
   watch: {
+    editing: {
+      handler (to, from) {
+        this.$log('editing CHANGED', to)
+        if (to) {
+          if (this.cuts.length === 0) {
+            this.$log('FIRST EDIT CLICK, CREATE!')
+            this.cutCreate()
+            // this.cutSetTime(0)
+          }
+        }
+      }
+    },
     now: {
       handler (to, from) {
         // this.$log('now CHANGED', to)
@@ -300,12 +312,7 @@ export default {
   },
   mounted () {
     this.$log('mounted', this.cuts.length)
-    if (this.cuts.length === 0) {
-      this.$log('FIRST EDIT CREATE CUT AT CURRENT SECOND')
-      this.cutCreate()
-      // this.cutSetTime(0)
-    } else {
-      this.$log('SET FIRST CUT')
+    if (this.cuts.length > 0) {
       this.cutIndex = 0
       this.player.setCurrentTime(this.cut.points[0].x)
       this.player.play()

@@ -63,12 +63,13 @@ div(
         :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini" :visible="visible"
         :width="previewWidth" :height="previewHeight"
         @muted="$event => $emit('muted', $event)"
-        @ended="$emit('ended', index)")
-    //- editors
+        @ended="$emit('ended', index)"
+        @ready="fragmentReady = true")
+  //- editors
   div(v-if="stage === 2 && ctx === 'inEditor'").row.full-width
     nc-fragment-video-editor(
-      v-if="fragment && $refs.ncFragmentVideo" ref="ncFragmentVideoEditor"
-      @close="editing = false"
+      v-if="fragmentReady" ref="ncFragmentVideoEditor"
+      @close="editing = false" :editing="editing"
       :fragment="fragment" :now="$refs.ncFragmentVideo.now" :player="$refs.ncFragmentVideo.player"
       :width="previewWidth" :height="toolsHeight"
       :style=`{height: toolsHeight+'px'}`)
@@ -93,7 +94,8 @@ export default {
       toolsHeight: 0,
       editing: false,
       contentReady: false,
-      editorReady: false
+      editorReady: false,
+      fragmentReady: false
     }
   },
   computed: {
@@ -121,6 +123,7 @@ export default {
             this.contentReady = false
             this.editorReady = false
             this.editing = false
+            this.fragmentReady = false
             this.$emit('edit', -1)
           }
         } else {

@@ -148,6 +148,16 @@ export default {
     }
   },
   methods: {
+    play () {
+      this.$log('play')
+      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
+      else this.$refs.fragmentFirst.play()
+    },
+    pause () {
+      this.$log('pause')
+      if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
+      else this.$refs.fragmentFirst.pause()
+    },
     async nodeVote () {
       try {
         this.$log('nodeVote start')
@@ -224,21 +234,8 @@ export default {
         this.$tween.to(this, 0.4, {voteLeft: 0})
       }
     },
-    play () {
-      this.$log('play')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
-      else this.$refs.fragmentFirst.play()
-    },
-    pause () {
-      this.$log('pause')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
-      else this.$refs.fragmentFirst.pause()
-    },
     open () {
       this.$log('open')
-    },
-    nodeActions () {
-      this.$log('nodeActions')
     },
     nodeAction () {
       this.$log('nodeAction')

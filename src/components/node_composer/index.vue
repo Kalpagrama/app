@@ -154,6 +154,7 @@ export default {
       this.$log('fragmentDelete', index)
       this.$set(this.node.fragments, index, null)
       this.fragmentSecondShow = false
+      window.location.reload(true)
     },
     fragmentSet (index, fragment) {
       this.$log('fragmentSet', index, fragment)

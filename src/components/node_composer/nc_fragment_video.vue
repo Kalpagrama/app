@@ -124,8 +124,8 @@ export default {
     videoSeeked (e) {
       this.$log('videoSeeked', e)
     },
-    playerStart () {
-      this.$log('playerStart')
+    playerInit () {
+      this.$log('playerInit')
       let me = new window.MediaElementPlayer(this.$refs.ncFragmentVideo, {
         loop: true,
         autoplay: false,
@@ -137,10 +137,13 @@ export default {
         ignorePauseOtherPlayersOption: false,
         clickToPlayPause: true,
         success: async (mediaElement, originalNode, instance) => {
+          this.$log('playerInit done')
           this.player = mediaElement
           this.player.addEventListener('timeupdate', this.videoTimeupdate)
           this.player.addEventListener('seeked', this.videoSeeked)
           // this.player.play()
+          this.muted = false
+          this.$emit('ready')
         },
         error: async (mediaElement, originalNode, instance) => {
           this.$log('playerStart error')
@@ -151,8 +154,8 @@ export default {
         }
       })
     },
-    playerStartNative () {
-      this.$log('playerStartNative')
+    async playerInitNative () {
+      this.$log('playerInitNative start')
       this.player = {}
       this.player.play = async () => {
         this.$log('playerNative: play')
@@ -173,12 +176,15 @@ export default {
       this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
       this.player.duration = this.$refs.ncFragmentVideo.duration
       this.player.now = this.$refs.ncFragmentVideo.currentTime
+      await this.$wait(200)
+      this.$emit('ready')
+      this.$log('playerInit done')
     }
   },
   async mounted () {
     this.$log('mounted')
-    if (this.ctx === 'inEditor') this.playerStart()
-    else this.playerStartNative()
+    if (this.ctx === 'inEditor') this.playerInit()
+    else this.playerInitNative()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
