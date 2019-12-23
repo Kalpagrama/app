@@ -4,7 +4,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
     div(
       ref="framesScrollWrapper"
       :style=`{height: '66px'}`).row.full-width.items-center.scroll
-      .row.no-wrap
+      div(v-touch-pan.left.right.prevent.mouse="panFrames").row.no-wrap
         div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
         div(:style=`{position: 'relative', borderRadius: '10px'}`).row.no-wrap
           //- frames images
@@ -80,7 +80,8 @@ export default {
   props: ['width', 'player', 'node', 'fragment', 'cut', 'cutIndex', 'now', 'fragmentDuration'],
   data () {
     return {
-      framesWidth: 0
+      framesWidth: 0,
+      panning: false
     }
   },
   computed: {
@@ -128,6 +129,11 @@ export default {
     }
   },
   methods: {
+    panFrames (e) {
+      if (this.panning) return
+      this.$log('panFrames', e)
+      this.$refs.framesScrollWrapper.scrollLeft -= e.delta.x
+    },
     panStart (e) {
       this.$log('panStart', e)
       let to = this.cut.points[0].x + (e.delta.x * this.k)
@@ -135,6 +141,8 @@ export default {
         this.player.currentTime = to
         this.cut.points[0].x = to
       }
+      if (e.isFirst) this.panning = true
+      if (e.isFinal) this.panning = false
     },
     panEnd (e) {
       this.$log('panEnd', e)
@@ -143,6 +151,8 @@ export default {
         this.player.currentTime = to
         this.cut.points[1].x = to
       }
+      if (e.isFirst) this.panning = true
+      if (e.isFinal) this.panning = false
     },
     frameClick (f, fi, e) {
       this.$log('frameClick', fi)

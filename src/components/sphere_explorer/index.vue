@@ -1,24 +1,46 @@
+<style lang="stylus">
+.q-header {
+  background: none !important;
+}
+.q-footer {
+  background: none !important;
+}
+.mejs__playpause-button {
+  display: none !important
+}
+iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
+</style>
 <template lang="pug">
-.row.full-width
+q-layout(view="HHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
   //- header
-  div(
-    v-if="sphere"
-    :style=`{minHeight: '70px'}`).row.full-width.items-center.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      h6(:style=`{}`).q-pa-xs.q-ma-xs {{`${sphere.name}`}}
-  //- spheres
-  div.row.full-width.justify-center.q-px-md
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      div(v-for="(s, si) in spheres" v-if="si < 5" :key="s.oid" @click="sphereClick(s, si)"
-        :style=`{borderRadius: '10px'}`
-        ).bg-grey-3.q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
-        span(:style=`{whiteSpace: 'nowrap'}`) {{`${s.name}` | cut(50)}}
+  q-header(reveal).row.full-width.items-center.justify-center
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.bg-grey-3
+      h6(v-if="sphere" :style=`{}`).text-black.q-pa-xs.q-ma-xs {{`${sphere.name}`}}
+      .col
+      q-btn(round flat icon="more_vert")
+  q-footer(reveal).row.full-width.justify-center
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
   //- body nodes
-  .row.full-width.items-start.content-start.justify-center
+  q-page-conainter.row.full-width.items-start.content-start.justify-center
+    //- spheres
+    div(:style=`{marginTop: '60px'}`).row.full-width.justify-center.q-px-md
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start
+        div(v-if="false").row.full-width.q-pa-sm
+          span {{$t('Similar spheres')}}
+        div(
+          v-for="(s, si) in spheres" :key="s.oid"
+          v-if="si < 20"
+          @click="sphereClick(s, si)"
+          :style=`{borderRadius: '10px'}`
+          ).bg-grey-4.q-px-sm.q-py-xs.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
+          span(:style=`{whiteSpace: 'nowrap'}`) {{`${s.name}` | cut(50)}}
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
         template(v-slot:default=`{nodes, fetchingMore}`)
-          node-list(:nodes="nodes")
+          node-list(:nodes="nodes" :nodesBan="[]" @nodeClick="nodeClick")
 </template>
 
 <script>
@@ -77,6 +99,10 @@ export default {
     }
   },
   methods: {
+    nodeClick (val) {
+      this.$log('nodeClick', val)
+      this.$router.push('/node/' + val[0].oid)
+    },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
       this.$router.push(`/sphere/${s.oid}`)
@@ -119,7 +145,7 @@ export default {
 
 <style lang="stylus" scoped>
 .ksphere:hover {
-  background: #7d389e !important;
+  background: #4caf50 !important;
   color: white !important;
 }
 </style>

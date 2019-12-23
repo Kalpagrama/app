@@ -5,6 +5,14 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
     v-if="cut"
     :style=`{position: 'absolute', zIndex: 103, top: '-13px', height: '8px', pointerEvents: 'none'}`).row.full-width.q-px-md
     div(:style=`{position: 'relative'}`).row.fit
+      div(
+        v-for="(c, ci) in cuts" :key="ci"
+        v-if="ci !== cutIndex"
+        :style=`{
+          position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 0.6,
+          left: (c.points[0].x/fragment.content.duration)*100+'%',
+          width: ((c.points[1].x-c.points[0].x)/fragment.content.duration)*100+'%',
+          borderRadius: '4px', background: c.color}`)
       div(:style=`{
         position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 1,
         left: (cut.points[0].x/fragment.content.duration)*100+'%',

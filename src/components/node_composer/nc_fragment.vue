@@ -121,6 +121,7 @@ export default {
             this.contentReady = false
             this.editorReady = false
             this.editing = false
+            this.$emit('edit', -1)
           }
         } else {
           this.stage = 2
