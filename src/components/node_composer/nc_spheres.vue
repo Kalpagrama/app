@@ -186,7 +186,7 @@ export default {
       })
       this.$log('spheresLoad done', spheres)
       return spheres
-    },
+    }
   },
   mounted () {
     this.$log('mounted')

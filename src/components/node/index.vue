@@ -1,7 +1,7 @@
 <template lang="pug">
-div(:style=`{borderRadius: '10px'}`).row.full-width
+div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
   //- fragments
-  div(:style=`{position: 'relative', height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`).row.full-width
+  div(:style=`{position: 'relative', height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`).row.full-width.items-start
     nc-fragment(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
