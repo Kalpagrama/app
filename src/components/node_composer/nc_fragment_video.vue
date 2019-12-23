@@ -18,13 +18,13 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   q-btn(
     v-if="!mini && visible"
     round flat color="white" @click="mutedToggle()"
-    :style=`{position: 'absolute', zIndex: 103, right: '16px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.15)'}`).shadow-1
+    :style=`{position: 'absolute', zIndex: 103, left: '8px', top: '50px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   //- content
   div(
     v-if="!mini && visible && ctx !== 'inEditor'" @click="$router.push('/content/' + fragment.content.oid)"
     :style=`{
-      position: 'absolute', zIndex: 103, left: '58px', top: '8px', height: '42px',
+      position: 'absolute', zIndex: 103, left: '8px', top: '8px', height: '42px',
       borderRadius: '20px', overflow: 'hidden',
       background: 'rgba(255,255,255,0.15)'}`
       ).row.items-center.q-pa-sm.cursor-pointer
@@ -35,7 +35,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
       ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="false"
       @play="playing = true" @pause="playing = false"
       @ended="videoEnded" @timeupdate="videoTimeupdate" @seeked="videoSeeked"
-      width="100%" height="100%" :muted="muted"
+      width="100%" height="100%" :muted="true"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
       ).fit
       source(
@@ -84,15 +84,17 @@ export default {
     },
     async play () {
       this.$log('play')
+      this.$q.notify('PLAY')
       if (this.player) {
+        this.player.setMuted(true)
         this.player.play()
-        await this.$wait(100)
-        this.player.setMuted(false)
+        // await this.$wait(100)
       }
     },
     pause () {
       this.$log('pause')
-      if (this.player) this.player.pause()
+      this.$q.notify('PAUSE')
+      // if (this.player) this.player.pause()
     },
     progressClick (e) {
       this.$log('progressClick', this.player.duration)
@@ -124,8 +126,8 @@ export default {
     videoSeeked (e) {
       this.$log('videoSeeked', e)
     },
-    playerStart () {
-      this.$log('playerStart')
+    playerInit () {
+      this.$log('playerInit')
       let me = new window.MediaElementPlayer(this.$refs.ncFragmentVideo, {
         loop: true,
         autoplay: false,
@@ -137,10 +139,13 @@ export default {
         ignorePauseOtherPlayersOption: false,
         clickToPlayPause: true,
         success: async (mediaElement, originalNode, instance) => {
+          this.$log('playerInit done')
           this.player = mediaElement
           this.player.addEventListener('timeupdate', this.videoTimeupdate)
           this.player.addEventListener('seeked', this.videoSeeked)
           // this.player.play()
+          this.muted = false
+          this.$emit('ready')
         },
         error: async (mediaElement, originalNode, instance) => {
           this.$log('playerStart error')
@@ -151,8 +156,8 @@ export default {
         }
       })
     },
-    playerStartNative () {
-      this.$log('playerStartNative')
+    async playerInitNative () {
+      this.$log('playerInitNative start')
       this.player = {}
       this.player.play = async () => {
         this.$log('playerNative: play')
@@ -173,18 +178,22 @@ export default {
       this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
       this.player.duration = this.$refs.ncFragmentVideo.duration
       this.player.now = this.$refs.ncFragmentVideo.currentTime
+      await this.$wait(200)
+      this.$emit('ready')
+      this.$log('playerInit done')
     }
   },
   async mounted () {
     this.$log('mounted')
-    if (this.ctx === 'inEditor') this.playerStart()
-    else this.playerStartNative()
+    if (this.ctx === 'inEditor') this.playerInit()
+    else this.playerInitNative()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     if (this.ctx === 'inEditor') {
       this.player.removeEventListener('timeupdate', this.videoTimeupdate)
       this.player.removeEventListener('seeked', this.videoSeeked)
+      this.player.remove()
     }
   }
 }

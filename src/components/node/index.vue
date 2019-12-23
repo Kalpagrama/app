@@ -1,7 +1,7 @@
 <template lang="pug">
-div(:style=`{borderRadius: '10px'}`).row.full-width
+div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
   //- fragments
-  div(:style=`{position: 'relative', height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`).row.full-width
+  div(:style=`{position: 'relative', height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`).row.full-width.items-start
     nc-fragment(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
@@ -45,16 +45,19 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
         position: 'absolute', left: voteLeft+'px', zIndex: 200,
         height: '60px', width: '90px'}`
         ).row.items-center.justify-center
-      q-btn(round push :style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.items-center.justify-center.bg-green.cursor-pointer
+      q-btn(
+        :loading="nodeVoting" @click="nodeVote()"
+        round push :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
+        ).row.items-center.justify-center.bg-green.cursor-pointer
         q-icon(name="blur_on" color="white" size="30px")
     //- vote tint and helper text
     div(
       v-if="votePanning"
       :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
       span Pan to vote
-    div(:style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
-      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center 100
-      span.text-bold.full-width.text-center 10
+    div( :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
+      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{node.rate}}
+      span.text-bold.full-width.text-center {{node.rateUser}}
     //- user name
     div(
       @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
@@ -112,7 +115,8 @@ export default {
         bottom: 20 + 'px',
         opacity: 0.8,
         objectFit: 'contain'
-      }
+      },
+      nodeVoting: false
     }
   },
   watch: {
@@ -144,6 +148,29 @@ export default {
     }
   },
   methods: {
+    play () {
+      this.$log('play')
+      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
+      else this.$refs.fragmentFirst.play()
+    },
+    pause () {
+      this.$log('pause')
+      if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
+      else this.$refs.fragmentFirst.pause()
+    },
+    async nodeVote () {
+      try {
+        this.$log('nodeVote start')
+        this.nodeVoting = true
+        await this.$wait(500)
+        let vote = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: 0.5})
+        this.$log('nodeVote done', vote)
+        this.nodeVoting = false
+      } catch (e) {
+        this.$log('nodeVote error', e)
+        this.nodeVoting = false
+      }
+    },
     fragmentWidth (index, width) {
       this.$log('fragmentWidth', index, width)
       if (index === 0) {
@@ -207,21 +234,8 @@ export default {
         this.$tween.to(this, 0.4, {voteLeft: 0})
       }
     },
-    play () {
-      this.$log('play')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
-      else this.$refs.fragmentFirst.play()
-    },
-    pause () {
-      this.$log('pause')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
-      else this.$refs.fragmentFirst.pause()
-    },
     open () {
       this.$log('open')
-    },
-    nodeActions () {
-      this.$log('nodeActions')
     },
     nodeAction () {
       this.$log('nodeAction')

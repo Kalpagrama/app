@@ -16,11 +16,15 @@ export default {
       itemsCount: 0
     }
   },
-  render() {
+  render () {
     // slot(v-if="kQuery" name="items" :items="kQuery.items" :fetchingMore="fetchingMore")
+    // await this.$wait(3000)
+    this.nodesLoad(this.query, this.queryKey, this.variables)
+    this.$log('render variables', this.variables)
     if (this.$scopedSlots.default) {
       return this.$scopedSlots.default({
-        nodes: this.kQuery ? this.kQuery.items : [],
+        // nodes: this.kQuery ? this.kQuery.items : [],
+        nodes: this.nodes,
         fetchingMore: this.fetchingMore
       })
     } else {
@@ -28,26 +32,26 @@ export default {
     }
   },
   apollo: {
-      kQuery: {
-        query () {
-          return this.query
-        },
-        variables () {
-          return this.variables
-        },
-        result ({ data, loading, networkStatus }) {
-          if (data) {
-            this.$logD('feed result', data)
-            this.pageToken = data[this.queryKey].nextPageToken
-            this.totalCount = data[this.queryKey].totalCount
-            this.itemsCount = data[this.queryKey].items.length
-          }
-        },
-        update (data) {
-          return data[this.queryKey]
-        },
-        fetchPolicy: 'cache-and-network'
-      }
+      // kQuery: {
+      //   query () {
+      //     return this.query
+      //   },
+      //   variables () {
+      //     return this.variables
+      //   },
+      //   result ({ data, loading, networkStatus }) {
+      //     if (data) {
+      //       this.$logD('feed result', data)
+      //       this.pageToken = data[this.queryKey].nextPageToken
+      //       this.totalCount = data[this.queryKey].totalCount
+      //       this.itemsCount = data[this.queryKey].items.length
+      //     }
+      //   },
+      //   update (data) {
+      //     return data[this.queryKey]
+      //   },
+      //   fetchPolicy: 'cache-and-network'
+      // }
   },
   methods: {
     async needFetchMore () {
@@ -92,7 +96,7 @@ export default {
       this.pageToken = data[this.queryKey].nextPageToken
       this.totalCount = data[this.queryKey].totalCount
       this.itemsCount = data[this.queryKey].items.length
-      this.$logD('nodeLoad done')
+      this.$logD('nodesLoad done')
     },
     // возможно это ядро скоро понадобятся
     prefetch(oid){
@@ -104,8 +108,8 @@ export default {
       this.$logD('prefetch ok!', oid)
     }
   },
-  mounted () {
-    this.$logD('mounted')
+  async mounted () {
+    this.$logD('mounted', this.variables)
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')

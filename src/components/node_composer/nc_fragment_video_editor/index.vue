@@ -5,6 +5,14 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
     v-if="cut"
     :style=`{position: 'absolute', zIndex: 103, top: '-13px', height: '8px', pointerEvents: 'none'}`).row.full-width.q-px-md
     div(:style=`{position: 'relative'}`).row.fit
+      div(
+        v-for="(c, ci) in cuts" :key="ci"
+        v-if="ci !== cutIndex"
+        :style=`{
+          position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 0.6,
+          left: (c.points[0].x/fragment.content.duration)*100+'%',
+          width: ((c.points[1].x-c.points[0].x)/fragment.content.duration)*100+'%',
+          borderRadius: '4px', background: c.color}`)
       div(:style=`{
         position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 1,
         left: (cut.points[0].x/fragment.content.duration)*100+'%',
@@ -30,7 +38,7 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
       :fragment="fragment" @close="fragmentNameDialogOpened = false"
       :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
   //- pan
-  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now")
+  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now" :fragmentDuration="fragmentDuration")
   //- actions
   //- cut CREATE
   div(:style=`{height: '50px'}`).row.full-width.q-my-sm.q-px-md
@@ -96,7 +104,12 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
         round flat @click="fragmentPlay()"
         :icon="fragmentPlaying ? 'pause' : 'play_arrow'"
         :color="fragmentPlaying ? 'red' : 'green'")
-    span(@click="fragmentNameDialogOpened = true").text-white {{ fragment.name || $t('Set fragment name')}}
+    .col.full-height
+      .row.fit.items-center.content-center.q-pr-sm
+        .row.full-width
+          span(@click="fragmentNameDialogOpened = true").text-white {{ fragment.name || $t('Set fragment name') | cut(40) }}
+        .row.full-width
+          span(:style=`{color: fragmentDuration > 60 ? 'red' : 'green'}`).text-bold {{ $time(fragmentDuration) }}
   //- progress
   div(
     v-if="false"
@@ -113,7 +126,7 @@ import ncFveFragmentName from './nc_fve_fragment_name'
 export default {
   name: 'ncFragmentVideoEditor',
   components: {ncFveCutPan, ncFveCutTimer, ncFveCutName, ncFveFragmentName},
-  props: ['width', 'height', 'fragment', 'player', 'now'],
+  props: ['width', 'height', 'fragment', 'player', 'now', 'editing'],
   data () {
     return {
       cutIndex: -1,
@@ -146,9 +159,27 @@ export default {
           delete: {name: 'Delete', color: 'red'}
         }
       }
+    },
+    fragmentDuration () {
+      return this.cuts.reduce((acc, val) => {
+        acc += val.points[1].x - val.points[0].x
+        return acc
+      }, 0)
     }
   },
   watch: {
+    editing: {
+      handler (to, from) {
+        this.$log('editing CHANGED', to)
+        if (to) {
+          if (this.cuts.length === 0) {
+            this.$log('FIRST EDIT CLICK, CREATE!')
+            this.cutCreate()
+            // this.cutSetTime(0)
+          }
+        }
+      }
+    },
     now: {
       handler (to, from) {
         // this.$log('now CHANGED', to)
@@ -281,12 +312,7 @@ export default {
   },
   mounted () {
     this.$log('mounted', this.cuts.length)
-    if (this.cuts.length === 0) {
-      this.$log('FIRST EDIT CREATE CUT AT CURRENT SECOND')
-      this.cutCreate()
-      this.cutSetTime(0)
-    } else {
-      this.$log('SET FIRST CUT')
+    if (this.cuts.length > 0) {
       this.cutIndex = 0
       this.player.setCurrentTime(this.cut.points[0].x)
       this.player.play()
