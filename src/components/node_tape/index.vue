@@ -16,7 +16,7 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
     ).col.full-width.scroll
     div.row.full-width.justify-center
       div(
-        :style=`{maxWidth: '500px', paddingBottom: '100px'}`
+        :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', paddingBottom: '100px'}`
         ).row.full-width.items-start.content-start.q-pa-sm
         q-resize-observer(ref="onResizeObserver" @resize="onResize")
         node(

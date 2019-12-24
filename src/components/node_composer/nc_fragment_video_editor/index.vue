@@ -5,6 +5,14 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
     v-if="cut"
     :style=`{position: 'absolute', zIndex: 103, top: '-13px', height: '8px', pointerEvents: 'none'}`).row.full-width.q-px-md
     div(:style=`{position: 'relative'}`).row.fit
+      div(
+        v-for="(c, ci) in cuts" :key="ci"
+        v-if="ci !== cutIndex"
+        :style=`{
+          position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 0.6,
+          left: (c.points[0].x/fragment.content.duration)*100+'%',
+          width: ((c.points[1].x-c.points[0].x)/fragment.content.duration)*100+'%',
+          borderRadius: '4px', background: c.color}`)
       div(:style=`{
         position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 1,
         left: (cut.points[0].x/fragment.content.duration)*100+'%',
@@ -30,13 +38,13 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
       :fragment="fragment" @close="fragmentNameDialogOpened = false"
       :style=`{position: 'absolute', zIndex: 10000, top: 0}`)
   //- pan
-  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now")
+  nc-fve-cut-pan(:player="player" :fragment="fragment" :width="width" :cut="cut" :cutIndex="cutIndex" :now="now" :fragmentDuration="fragmentDuration")
   //- actions
   //- cut CREATE
   div(:style=`{height: '50px'}`).row.full-width.q-my-sm.q-px-md
     .col.q-pr-sm
       q-btn(
-        outline no-caps color="green" size="md" @click="cutCreate([])"
+        outline no-caps color="green" size="md" @click="cutCreate()"
         :style=`{height: '50px', borderRadius: '10px'}`).full-width.q-mb-sm
         span {{ $t('Add cut here') }}
     q-btn(
@@ -55,30 +63,53 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
         div(
           :style=`{position: 'relative', height: '50px'}`
           ).row.full-width
+          //- play
           div(:style=`{height: '50px', width: '50px'}`).row.items-center.content-center.justify-center
-            q-btn(round flat icon="play_arrow" color="green" @click="cutMoreClick(c, ci)")
+            q-btn(
+              round flat
+              :icon="cutPlaying === ci ? 'pause' : 'play_arrow'"
+              :color="cutPlaying === ci ? 'red' : 'green'"
+              @click="cutPlay(c, ci)")
+          //- start
           div(@click="cutSetTime(0)").col.full-height.cursor-pointer
             .row.fit.items-center.justify-end.q-pr-sm
               span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white {{ $time((parseInt(c.points[0].x*100))/100) }}
           div().row.full-height.items-center.justify-center
             span(:style=`{fontSize: '16px'}`).text-white.text-bold.q-mx-xs -
+          //- end
           div(@click="cutSetTime(1)").col.full-height.cursor-pointer
             .row.fit.items-center.justify-start.q-pl-sm
               span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white {{ $time((parseInt(c.points[1].x*100))/100) }}
+          //- actions
           div(:style=`{height: '50px', width: '50px'}`).row.items-center.content-center.justify-center
             q-btn(round flat icon="more_vert" color="grey-8" @click="cutMoreClick(c, ci)")
         //- cut INACTIVE tint
         div(
           v-if="cutIndex !== ci" @click="cutClick(c, ci)"
-          :style=`{position: 'absolute', background: 'rgba(0,0,0,0.2)'}`).row.fit.cursor-pointer
+          :style=`{position: 'absolute', zIndex: 100, background: 'rgba(0,0,0,0.2)'}`).row.fit.cursor-pointer
+        //- cut PLAYING tint
+        div(
+          v-if="cut && cutPlaying === ci"
+          :style=`{
+            position: 'absolute', zIndex: 100, right: 0, background: 'rgba(0,0,0,0.5)', pointerEvents: 'none',
+            width: ((cut.points[1].x-now)/(cut.points[1].x-cut.points[0].x))*100+'%'}`
+          ).row.full-height
   //- debug
   div(v-if="false").row.full-width.bg-red
     small cut: {{cut}}
   //- footer
   div(:style=`{position: 'relative', height: '60px'}`).row.full-width.items-center.content-center.bg-grey-10
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-      q-btn(round flat icon="play_arrow" color="green" @click="fragmentPlay()")
-    span(@click="fragmentNameDialogOpened = true").text-white {{ fragment.name || $t('Set fragment name')}}
+      q-btn(
+        round flat @click="fragmentPlay()"
+        :icon="fragmentPlaying ? 'pause' : 'play_arrow'"
+        :color="fragmentPlaying ? 'red' : 'green'")
+    .col.full-height
+      .row.fit.items-center.content-center.q-pr-sm
+        .row.full-width
+          span(@click="fragmentNameDialogOpened = true").text-white {{ fragment.name || $t('Set fragment name') | cut(40) }}
+        .row.full-width
+          span(:style=`{color: fragmentDuration > 60 ? 'red' : 'green'}`).text-bold {{ $time(fragmentDuration) }}
   //- progress
   div(
     v-if="false"
@@ -95,7 +126,7 @@ import ncFveFragmentName from './nc_fve_fragment_name'
 export default {
   name: 'ncFragmentVideoEditor',
   components: {ncFveCutPan, ncFveCutTimer, ncFveCutName, ncFveFragmentName},
-  props: ['width', 'height', 'fragment', 'player', 'now'],
+  props: ['width', 'height', 'fragment', 'player', 'now', 'editing'],
   data () {
     return {
       cutIndex: -1,
@@ -128,19 +159,51 @@ export default {
           delete: {name: 'Delete', color: 'red'}
         }
       }
+    },
+    fragmentDuration () {
+      return this.cuts.reduce((acc, val) => {
+        acc += val.points[1].x - val.points[0].x
+        return acc
+      }, 0)
     }
   },
   watch: {
+    editing: {
+      handler (to, from) {
+        this.$log('editing CHANGED', to)
+        if (to) {
+          if (this.cuts.length === 0) {
+            this.$log('FIRST EDIT CLICK, CREATE!')
+            this.cutCreate()
+            // this.cutSetTime(0)
+          }
+        }
+      }
+    },
     now: {
       handler (to, from) {
         // this.$log('now CHANGED', to)
+        // if (to && from && to.color === from.color) return
         if (this.cut && this.cutPlaying >= 0) {
-          if (to > this.cut.points[1].x) {
-            this.player.setCurrentTime(this.cut.points[0].x)
+          if (to > this.cut.points[1].x || to < this.cut.points[0].x) {
+            if (this.fragmentPlaying) {
+              this.$log('FRAGMENT PLAYING')
+              if (this.cuts[this.cutIndex + 1]) {
+                this.$log('NEXT CUT')
+                this.cutIndex += 1
+                this.cutPlaying += 1
+              } else {
+                this.$log('FIRST CUT AGAIN')
+                this.cutIndex = 0
+                this.cutPlaying = 0
+              }
+            } else {
+              this.$log('CUT AGAIN')
+              this.player.setCurrentTime(this.cut.points[0].x)
+            }
           }
-          if (to < this.cut.points[0].x) {
-            this.player.setCurrentTime(this.cut.points[0].x)
-          }
+        } else {
+          // this.$log('NO CUT PLAYING')
         }
       }
     }
@@ -148,6 +211,18 @@ export default {
   methods: {
     fragmentPlay () {
       this.$log('fragmentPlay')
+      if (this.fragment.cuts.length === 0) return
+      if (this.fragmentPlaying) {
+        this.fragmentPlaying = false
+        this.cutIndex = -1
+        this.cutPlaying = -1
+      } else {
+        this.fragmentPlaying = true
+        this.cutIndex = 0
+        this.cutPlaying = 0
+        this.player.play()
+        this.player.setCurrentTime(this.cut.points[0].x)
+      }
     },
     cutDialogAction (action) {
       this.$log('cutDialogAction', action)
@@ -237,14 +312,10 @@ export default {
   },
   mounted () {
     this.$log('mounted', this.cuts.length)
-    if (this.cuts.length === 0) {
-      this.$log('FIRST EDIT CREATE CUT AT CURRENT SECOND')
-      this.cutCreate()
-      this.cutSetTime(0)
-    } else {
-      this.$log('SET FIRST CUT')
+    if (this.cuts.length > 0) {
       this.cutIndex = 0
       this.player.setCurrentTime(this.cut.points[0].x)
+      this.player.play()
     }
   },
   beforeDestroy () {

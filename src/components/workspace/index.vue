@@ -15,18 +15,18 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   //- actions and dialogs
   q-dialog(ref="settingsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     .row.full-width.justify-center.bg-grey-3
-      div(:style=`{maxWidth: '500px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         ws-settings(@close="$refs.settingsDialog.hide()")
   q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
     .row.full-width.justify-center.bg-grey-3
-      div(:style=`{maxWidth: '500px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         ws-spheres(@close="$refs.spheresDialog.hide()")
   q-btn(
     round push icon="add" size="lg" color="green" @click="itemAdd()"
     :style=`{position: 'absolute', zIndex: 1000, bottom: '80px', right: '8px'}`)
   //- header
   q-header.row.full-width.justify-center
-    div(:style=`{height: '60px', maxWidth: '500px', color: 'black'}`).row.full-width.items-center.bg-grey-3
+    div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px', color: 'black'}`).row.full-width.items-center.bg-grey-3
       .col.full-height
         .row.fit.items-center.q-px-md
           span.text-bold {{$t('Workspace')}}
@@ -35,11 +35,11 @@ q-layout(view="hHh lpR fFf").bg-grey-3
         q-btn(round flat icon="settings" color="grey-9" @click="$refs.settingsDialog.show()")
   //- body
   q-page-container.row.full-width.justify-center
-    div(:style=`{maxWidth: '500px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       ws-items(@itemClick="itemClick" :height="$q.screen.height-60-60+'px'")
   //- footer
   q-footer.row.full-width.justify-center
-    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
 </template>
 
 <script>
@@ -58,9 +58,9 @@ export default {
   computed: {
   },
   methods: {
-    itemClick ([type, item]) {
-      this.$log('itemClick', type, item)
-      this.$store.commit('workspace/stateSet', ['wsItem', {type, item}])
+    itemClick (val) {
+      this.$log('itemClick', val)
+      this.$store.commit('workspace/stateSet', ['wsItem', val])
       this.$router.push('/create')
     },
     itemAdd () {

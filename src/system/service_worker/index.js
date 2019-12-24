@@ -62,10 +62,6 @@ function showNotifyNewVer () {
 
 async function initSw (store) {
   logD('initSw')
-  const swStore = new Store('sw-cache-common', 'common-data')
-  let swVer = await get('swVer', swStore)
-  store.commit('core/stateSet', ['version', `${store.state.core.version}-${swVer}`])
-
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
     logD('beforeinstallprompt')
@@ -83,6 +79,7 @@ async function initSw (store) {
     {
       registration = await navigator.serviceWorker.register('/service-worker.js')
       logD('Registration sw succeeded. Scope is ' + registration.scope)
+
       wait(100).then(() => {
         logD('sendMessageToSW...')
         sendMessageToSW({
@@ -127,6 +124,14 @@ async function initSw (store) {
             }
           })
         })
+      }
+      { // получаем версию текущего sw (просим сервисворкнра записать ее в iDb)
+        navigator.serviceWorker.addEventListener('message', function handler (event) {
+          let swVer = event.data
+          logD('sw version =', swVer);
+          store.commit('core/stateSet', ['version', `${store.state.core.version}-${swVer}`])
+        });
+        if (registration.active) registration.active.postMessage({ type: 'sendVersion' })
       }
     }
     await initWebPush(store)

@@ -9,7 +9,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
   q-header.row.full-width.justify-center
-    div(:style=`{maxWidth: '500px'}`).row.full-width
+    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       div(v-if="user").row.full-width.content-start
         //- header
         div(:style=`{height: '100px'}`).row.full-width.bg-primary
@@ -47,21 +47,22 @@ q-layout(view="hHh lpR fFf").bg-grey-3
               //- span {{ user.subscriptions }}
   q-page-container
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '500px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(
           v-if="user"
           :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
           k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
             template(v-slot:created)
-              user-created-nodes()
+              user-created-nodes(:filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
             template(v-slot:rated)
-              user-rated-nodes()
+              // h1 vetur
+              user-created-nodes(:filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
             template(v-slot:following)
               user-following(:subscriptions="user.subscriptions" :oid="user.oid")
             template(v-slot:followers)
               user-followers(:subscribers="user.subscribers" :oid="user.oid")
   q-footer.row.full-width.justify-center
-    k-menu-mobile(:style=`{maxWidth: '500px'}`)
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
 </template>
 
 <script>

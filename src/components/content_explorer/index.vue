@@ -1,137 +1,113 @@
+<style lang="stylus">
+.q-header {
+  background: none !important;
+}
+.mejs__playpause-button {
+  display: none !important
+}
+iframe {
+  width: 100% !important;
+  height: 100% !important;
+}
+</style>
 <template lang="pug">
-k-split(ref="kSplit" :headerMaxHeight="200" :headerClass="['bg-black']" :bodyClass="['bg-grey-1']" @scrollTop="scrollTop = $event")
-  template(v-slot:header)
-    q-dialog(ref="nodePreviewDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="node = null")
-      div(@click.self="$refs.nodePreviewDialog.hide()").row.fit.items-end.content-end.q-px-sm.q-pt-xl.q-pb-sm
-        div(:style=`{borderRadius: '10px'}`).column.full-width.bg-white
-          //- h1 Hello node
-          node(v-if="node" :node="node" :width="300" :active="true" :needFull="true")
-    k-dialog-bottom(ref="contentVideoDialog" mode="actions" :options="contentVideoDialogOptions" @action="contentVideoAction")
-    k-video(:fragment="{content: content}" :src="content.url").full-width
-      q-btn(
-        round dense flat color="white" icon="more_vert" @click="$refs.contentVideoDialog.show()"
-        :style=`{background: 'rgba(0,0,0,0.5)'}`)
-    div(v-if="false" :style=`{marginTop: '-20px', height: '40px', paddingLeft: '30px', paddingRight: '30px'}`).row.full-width.items-center
-      div(:style=`{height: '20px', borderRadius: '4px'}`).row.full-width.bg-red
-  template(v-slot:body)
-    //- scroll to top
-    div(
-      v-show="scrollTop > 100"
-      @click="$refs.kSplit.scrollTo(0)"
-      :style=`{position: 'sticky', top: '0px', height: '50px'}`
-      ).row.full-width.items-center.justify-center
-      q-btn(round flat color="accent" size="md" )
-        q-icon(name="keyboard_arrow_up" size="30px" color="accent")
-      //- span {{ scrollTop }}
-    //- content header
-    div(:style=`{height: headerHeight+'px', borderBottom: '1px solid #eee'}`).row.full-width.items-start.content-start.justify-start.q-px-sm.q-mb-md
-      div(:style=`{height: '60px'}`).row.full-width
-        .col.full-height
-          .row.fit.items-center
-            span.text-bold {{ $t(content.name | cut(50)) }}
-        div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-          q-btn(round flat icon="keyboard_arrow_down" @click="headerToggle()")
-    node-loader(ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
-      template(v-slot:items=`{items, fetchingMore}`)
-        node-list(:nodes="items" @nodeClick="nodeClick").q-px-md
-    div(:style=`{height: '200px'}`).row.full-width
+q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
+  //- q-header(
+  //-   v-if="showNameSticky"
+  //-   ).row.full-width.justify-center
+  //-   .col.bg-grey-3
+  //-   div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm
+  //-     div(:style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.bg-grey-3.q-pt-sm
+  //-       div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', }` @click="headerClick()").row.full-width.items-center.justify-center.bg-white
+  //-         span(v-if="node").text-bold.text-black.text-center {{ node.name }}
+  //-   .col.bg-grey-3
+  q-footer(reveal).row.full-width.justify-center.bg-grey-3
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
+  q-page-conainter
+    .row.full-width.justify-center.items-start.content-start
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
+          nc-fragment(
+            v-if="content" ctx="inEditor" :index="0" :stageFirst="2"
+            :fragment="{content: content, cuts: [], name: '', thumbUrl: '', scale: content.type === 'VIDEO' ? content.duration : 100}")
+      div(
+        v-if="true"
+        :style=`{marginBottom: '1000px'}`).row.full-width.items-start.content-start.justify-center
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pa-sm
+          //- content nodes header
+          div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+            ).row.full-width.items-center.justify-center.bg-white.q-mt-xl.q-mb-sm
+            span.text-center {{ $t('Similar nodes') }}
+          //- similar nodes list
+          node-loader(ref="nodeLoader" :variables="variables" type="sphereNodes")
+            template(v-slot:default=`{nodes}`)
+              node-list(:nodes="nodes" :nodesBan="[]" @nodeClick="nodeClick")
 </template>
 
 <script>
-import contentVideo from './content_video'
+import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'contentExplorer',
-  components: {contentVideo},
-  props: {
-    content: {type: Object},
-    inEditor: {type: Boolean, default () { return false }}
-  },
+  components: {ncFragment},
+  props: [],
   data () {
     return {
-      query: gql`
-        query contentNodesNew ($oid: OID!) {
-          sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}, sortStrategy: HOT) {
-            items {
-              oid
-              type
-              name
-              createdAt
-              thumbUrl(preferWidth: 600)
-              meta {
-                ...on MetaNode {
-                  layout
-                  fragments { width height color thumbUrl(preferWidth: 600) }
-                }
-              }
-            }
-            count
-            totalCount
-            nextPageToken
-          }
-        }
-      `,
-      variables: {
-        oid: this.content.oid
-      },
-      scrollTop: 0,
-      node: null,
-      headerHeight: 60
+      width: 0,
+      content: null,
+      showNameSticky: false,
+      previewHeight: 0
     }
   },
   computed: {
-    contentVideoDialogOptions () {
+    variables () {
       return {
-        confirm: true,
-        confirmName: 'Создать ядро',
-        actions: {
-          follow: {name: 'Follow'},
-          bookmark: {name: 'Save to notes'},
-          report: {name: 'Report', color: 'red'}
+        oid: this.$route.params.oid
+      }
+    }
+  },
+  watch: {
+    $route: {
+      immediate: true,
+      async handler (to, from) {
+        if (to.params.oid) {
+          this.$log('$route CHANGED', to.params.oid)
+          this.content = await this.contentLoad(to.params.oid)
         }
       }
     }
   },
   methods: {
-    headerToggle () {
-      this.$logD('headerToggle')
-      if (this.headerHeight === 60) {
-        this.$tween.to(this, 0.3, {headerHeight: 300})
+    nodeClick (val) {
+      this.$log('nodeClick', val)
+      this.$router.push('/node/' + val[0].oid)
+    },
+    async contentLoad (oid) {
+      this.$log('contentLoad start')
+      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFragment', priority: 0 })
+      return content
+    },
+    headerClick () {
+      this.$log('headerClick')
+      this.$tween.to(document.documentElement, 0.3, {scrollTop: 0})
+    },
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      if (this.previewHeight > 0 && e.position >= this.previewHeight) {
+        this.showNameSticky = true
       } else {
-        this.$tween.to(this, 0.3, {headerHeight: 60})
+        this.showNameSticky = false
       }
     },
-    nodeClick (n) {
-      this.$logD('nodeClick', n)
-      this.$refs.nodePreviewDialog.show()
-      this.node = n
-    },
-    async contentVideoAction (a) {
-      this.$logD('contentVideoAction', a)
-      switch (a) {
-        case 'follow': {
-          let res = await this.$store.dispatch('subscriptions/subscribe', this.content.oid)
-          this.$logD('res', res)
-          break
-        }
-        case 'bookmark': {
-          break
-        }
-        case 'report': {
-          break
-        }
-        case 'confirm': {
-          this.$logD('CREATE!')
-          break
-        }
-      }
+    onResize (e) {
+      this.width = e.width
     }
   },
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

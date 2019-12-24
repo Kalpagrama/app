@@ -38,9 +38,9 @@ div(v-if="sphereOid").column.fit.bg-grey-3
         .column.fit
           div(ref="nodePinScroll" @scroll="onScroll" :style=`{paddingTop: '0px', paddinBottom: '60px'}`).col.full-width.scroll.kscroll
             .row.full-width.justify-center
-              div(:style=`{maxWidth: '500px'}`).row.full-width
+              div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
                 q-resize-observer(ref="onResizeObserver" @resize="onResize")
-                node-loader(ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
+                node-loader(ref="nodeLoader" :variables="variables" type="sphereNodes")
                   template(v-slot:default=`{nodes}`)
                     .row.full-width.items-start.content-start.q-pt-sm.q-px-xs
                       div(
@@ -109,33 +109,9 @@ export default {
     nodeZIndex () {
       return this.zIndex + 200
     },
-    query () {
-      return gql`
-        query sphereNodesNodePin ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-          sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            count
-            totalCount
-            nextPageToken
-            items {
-              oid
-              type
-              thumbUrl (preferWidth: 600)
-              createdAt
-              name
-              meta {
-                ...on MetaNode {
-                  layout
-                  fragments { width height thumbUrl(preferWidth: 600) }
-                }
-              }
-            }
-          }
-        }
-      `
-    },
     variables () {
       return {
-        sphereOid: this.sphereOid,
+        oid: this.sphereOid,
         pagination: { pageSize: 100 },
         sortStrategy: 'HOT',
         filter: { types: 'NODE' }

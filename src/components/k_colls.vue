@@ -118,7 +118,7 @@ export default {
     coll: {
       immediate: true,
       async handler (to, from) {
-        this.$log('coll CHANGED', to)
+        this.$log('coll CHANGED2', to)
         if (to) {
           this.$nextTick(() => {
             let i = this.colls.findIndex(c => c.id === to)

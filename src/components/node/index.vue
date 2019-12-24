@@ -1,7 +1,7 @@
 <template lang="pug">
-div(:style=`{borderRadius: '10px'}`).row.full-width
+div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
   //- fragments
-  div(:style=`{position: 'relative', height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`).row.full-width
+  div(:style=`{position: 'relative', height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`).row.full-width.items-start
     nc-fragment(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
@@ -26,47 +26,63 @@ div(:style=`{borderRadius: '10px'}`).row.full-width
       :fragment="nodeFull ? nodeFull.fragments[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(0)"
       :style=`fragmentMini === 1 ? fragmentMiniStyles : {height: '100%', width: '100%', objectFit: 'contain'}`)
-  //- name
+  //- name, essence
   div(
     ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
     :style=`{minHeight: '60px'}`
+    :class=`{'bg-red': !nodeFull}`
     ).row.full-width.items-center.justify-center
     span.text-bold.text-center.cursor-pointer {{ node.name }}
   //- actions
   div(
     v-if="nodeFull && opened"
-    :style=`{position: 'relative', height: '60px', borderRadius: '0 0 10px 10px', overflow: 'hidden', marginTop: fMarginTop+'px', borderTop: '1px solid #eee'}`).row.full-width.items-center
+    :style=`{
+      position: 'relative', height: '60px',
+      borderTop: '1px solid #eee', borderBottom: '1px solid #eee'}`).row.full-width.items-center
+    //- pan btn
     div(
       v-touch-pan.left.right.prevent.mouse="votePan"
       :style=`{
         position: 'absolute', left: voteLeft+'px', zIndex: 200,
         height: '60px', width: '90px'}`
         ).row.items-center.justify-center
-      q-btn(round push :style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.items-center.justify-center.bg-green.cursor-pointer
+      q-btn(
+        :loading="nodeVoting" @click="nodeVote()"
+        round push :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
+        ).row.items-center.justify-center.bg-green.cursor-pointer
         q-icon(name="blur_on" color="white" size="30px")
+    //- vote tint and helper text
     div(
       v-if="votePanning"
-      :style=`{position: 'absolute', zIndex: 198, borderTop: '1px solid #eee'}`).row.fit.items-center.justify-center.bg-white
+      :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
       span Pan to vote
-    div(:style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
-      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center 100
-      span.text-bold.full-width.text-center 10
-    .col.full-height
-      .row.fit.items-center.justify-end
-        span {{ nodeFull.author.name }}
-    div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
+    div( :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
+      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{node.rate}}
+      span.text-bold.full-width.text-center {{node.rateUser}}
+    //- user name
+    div(
+      @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
+      .row.fit.items-center.justify-end.cursor-pointer
+        span(:style=`{userSelect: 'none'}`) {{ nodeFull.author.name | cut(40) }}
+    //- user avatar
+    div(
+      @click="$router.push('/user/' + nodeFull.author.oid)"
+      :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center.cursor-pointer
       div(:style=`{height: '35px', width: '35px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-3
         img(
           :src="nodeFull.author.thumbUrl"
           :style=`{width: '100%', height: '100%', objectFit: 'cover'}`)
+  //- spheres and timestamp
   div(v-if="nodeFull && opened").row.full-width
+    //- spheres
     div(:style=`{height: '50px'}`).row.full-width.scroll
       .row.justify-start.items-start.content-start.no-wrap.q-pa-md
         div(
-          v-for="(s, si) in 20" :key="si" @click="$router.push('/sphere/' + si)"
+          v-for="(s, si) in nodeFull.spheres" :key="si" @click="$router.push('/sphere/' + s.oid)"
           :style=`{}`).q-mr-sm.cursor-pointer
-          span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs sphere {{si}}
-    .row.full-width.justify-end.q-pa-sm
+          span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
+    //- timestamp
+    .row.full-width.justify-start.q-pa-md
       small.text-grey-7 20.12.2019
 </template>
 
@@ -100,7 +116,8 @@ export default {
         bottom: 20 + 'px',
         opacity: 0.8,
         objectFit: 'contain'
-      }
+      },
+      nodeVoting: false
     }
   },
   watch: {
@@ -108,8 +125,12 @@ export default {
       immediate: false,
       async handler (to, from) {
         this.$log('visible CHANGED', to)
-        if (to) this.play()
-        else this.pause()
+        if (to) {
+          this.play()
+          // this.$q.notify('visible')
+        } else {
+          this.pause()
+        }
       }
     },
     needFull: {
@@ -132,6 +153,29 @@ export default {
     }
   },
   methods: {
+    play () {
+      this.$log('play')
+      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
+      else this.$refs.fragmentFirst.play()
+    },
+    pause () {
+      this.$log('pause')
+      if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
+      else this.$refs.fragmentFirst.pause()
+    },
+    async nodeVote () {
+      try {
+        this.$log('nodeVote start')
+        this.nodeVoting = true
+        await this.$wait(500)
+        let vote = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: 0.5})
+        this.$log('nodeVote done', vote)
+        this.nodeVoting = false
+      } catch (e) {
+        this.$log('nodeVote error', e)
+        this.nodeVoting = false
+      }
+    },
     fragmentWidth (index, width) {
       this.$log('fragmentWidth', index, width)
       if (index === 0) {
@@ -195,21 +239,8 @@ export default {
         this.$tween.to(this, 0.4, {voteLeft: 0})
       }
     },
-    play () {
-      this.$log('play')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
-      else this.$refs.fragmentFirst.play()
-    },
-    pause () {
-      this.$log('pause')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
-      else this.$refs.fragmentFirst.pause()
-    },
     open () {
       this.$log('open')
-    },
-    nodeActions () {
-      this.$log('nodeActions')
     },
     nodeAction () {
       this.$log('nodeAction')
@@ -224,7 +255,8 @@ export default {
         this.nodeFullError = null
       } catch (err) {
         this.$logE('node', 'nodeLoad error', err)
-        node = null
+        // this.$emit('error')
+        // node = null
         this.nodeFullError = err
       }
       this.$log('nodeLoad done', this.index, this.node.oid)

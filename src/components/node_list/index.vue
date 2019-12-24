@@ -7,13 +7,14 @@
     :node="n"
     :needFull="ni >= friends[0] && ni <= friends[1]"
     :visible="ni === nodeOidVisible"
+    @error="nodesBan.push(n.oid)"
     @nodeClick="$event => $emit('nodeClick', $event)"
     :style=`{}`
     v-observe-visibility=`{
       callback: nodeVisible,
-      throttle: 300,
+      throttle: 150,
       intersection: {
-        threshold: 0.98
+        threshold: 0.5
       }
     }`
     ).bg-white.q-mb-lg
@@ -38,7 +39,12 @@
 <script>
 export default {
   name: 'nodeList',
-  props: ['nodes', 'nodesBan', 'selected'],
+  // props: ['nodes', 'nodesBan', 'selected'],
+  props: {
+    nodes: {type: Array},
+    nodesBan: {type: Array, default () { return [] }},
+    selected: {type: Array}
+  },
   data () {
     return {
       nodeHeight: 50,
@@ -67,7 +73,7 @@ export default {
       }
     },
     nodeClick (n, ni) {
-      this.$logd('nodeClick', n, ni)
+      this.$logD('nodeClick', n, ni)
       this.$emit('nodeClick', n)
     }
   },

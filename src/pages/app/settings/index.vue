@@ -2,7 +2,7 @@
 q-layout(view="hHh lpR fFf" :container="true" :style=`{width: $q.screen.width+'px', height: '100vh'}`).bg-grey-3
   //- k-dialog-bottom(ref="accountSettings" mode="actions" :options="accountSettingsOptions" @action="accountSettingsAction")
   q-header().row.full-width.justify-center.bg-white
-    div(:style=`{height: '60px', maxWidth: '500px'}`).row.full-width.items-center.bg-white
+    div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.bg-white
       div(:style=`{height: '60px', width: '60px'}` @click="mainPage()").row.items-center.justify-center
         q-btn(round flat color="primary" icon="arrow_back")
       .col.full-height
@@ -22,7 +22,7 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: $q.screen.width+'p
   q-page-container
     //- q-page
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '500px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         //- div(:style=`{height: height-60+'px'}`).row
         //- .col.full-height
         notifications(v-if="page === 'notifications'")

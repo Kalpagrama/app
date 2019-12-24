@@ -14,8 +14,8 @@ const routes = [
       // rest
       { name: 'invite', path: 'invite', component: () => import('components/k_invite') },
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
-      { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
-      { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
+      { name: 'sphere', path: 'sphere/:oid?', component: () => import('components/sphere_explorer') },
+      { name: 'content', path: 'content/:oid?', component: () => import('components/content_explorer') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },

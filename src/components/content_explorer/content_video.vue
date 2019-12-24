@@ -13,7 +13,7 @@ div(:style=`{position: 'relative'}`).row.fit
   //-       span Explore nodes
   //-   template(v-slot:body)
   //-     .row.full-width.full-height.items-start.content-start.bg-white
-  //-       node-loader(ref="nodeLoader" mode="feed" :query="query" queryKey="sphereNodes" :variables="variables")
+  //-       node-loader(ref="nodeLoader" mode="feed" :variables="variables")
   //-         template(v-slot:items=`{items, fetchingMore}`)
   //-           node-feed(:nodes="items" :fetchingMore="fetchingMore" @more="$refs.nodeLoader.fetchMore()")
 </template>
@@ -28,21 +28,6 @@ export default {
   },
   data () {
     return {
-      query: gql`
-        query contentNodes($oid: OID!) {
-          sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}, sortStrategy: HOT) {
-            items {
-              oid
-              type
-              name
-              thumbUrl(preferWidth: 600)
-            }
-            count
-            totalCount
-            nextPageToken
-          }
-        }
-      `,
       variables: {
         oid: this.content.oid
       }
