@@ -9,6 +9,10 @@ iframe {
 </style>
 <template lang="pug">
 div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
+  //- div(
+  //-   v-if="!mini"
+  //-   :style=`{position: 'absolute', top: '50%', zIndex: 2000, opacity: 0.5}`).row.items-center.justify-center.bg-green
+  //-   span(@click="$emit('mini')").text-white.text-bold {{ now }}
   //- play/pause for inList
   div(
     v-if="!mini && ctx !== 'inEditor'" ref="playPause" @click="videoToggle()"
@@ -16,23 +20,23 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
     q-btn(v-if="!playing && !mini" round flat icon="play_arrow" color="white" size="60px")
   //- muted
   q-btn(
-    ref="mutedToggleBtn"
+    v-if="!mini"
     round flat color="white" @click="mutedToggle()"
-    :style=`{position: 'absolute', zIndex: 103, left: '8px', top: '50px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
+    :style=`{position: 'absolute', zIndex: 103, left: '16px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.15)'}`).shadow-1
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   //- content
   div(
-    v-if="!mini && visible && ctx !== 'inEditor'" @click="$router.push('/content/' + fragment.content.oid)"
+    v-if="!mini && visible && ctx === 'inExplorer'" @click="$router.push('/content/' + fragment.content.oid)"
     :style=`{
       position: 'absolute', zIndex: 103, left: '8px', top: '8px', height: '42px',
-      borderRadius: '20px', overflow: 'hidden',
+      borderRadius: '10px', overflow: 'hidden',
       background: 'rgba(255,255,255,0.15)'}`
-      ).row.items-center.q-pa-sm.cursor-pointer
-    span(:style=`{userSelect: 'none', whiteSpace: 'nowrap'}`).text-white {{ fragment.content.name | cut(50) }}
+      ).row.items-center.q-pa-sm.cursor-pointer.bg
+    span(:style=`{userSelect: 'none', whiteSpace: 'nowrap'}`).text-white {{ fragment.content.name | cut(40) }}
   //- video wrapper
   div(:style=`{position: 'relative'}`).row.fit
     video(
-      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="false" preload="auto"
+      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="true" preload="auto"
       @play="playing = true" @pause="playing = false"
       @ended="videoEnded" @timeupdate="videoTimeupdate" @seeked="videoSeeked"
       width="100%" height="100%" muted="true"
@@ -43,17 +47,21 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
         :type="ctx !== 'inEditor' ? 'video/mp4' : fragment.content.contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'")
   //- progress
   div(
-    v-if="now && !mini"
+    v-if="now"
     :style=`{position: 'absolute', bottom: '0px', zIndex: 105, height: '28px'}`).row.full-width.q-px-md
     //- progress width
-    div(:style=`{position: 'relative', height: '28px'}` @click="progressClick").row.full-width.cursor-pointer
+    div(
+      v-show="!mini"
+      :style=`{position: 'relative', height: '28px'}` @click="progressClick").row.full-width.cursor-pointer
       div(:style=`{position: 'absolute', top: '10px', height: '4px', pointerEvents: 'none', background: 'rgba(255,255,255,0.8)',
         borderRadius: '4px', overflow: 'hidden'}`).row.full-width
       //- progress bar
       div(:style=`{position: 'absolute', top: '10px', height: '4px', width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
         ).row.bg-green.q-px-xs
     //- progress now/duration
-    small(:style=`{position: 'absolute', zIndex: 105, top: '-10px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
+    small(
+      v-show="!mini"
+      :style=`{position: 'absolute', zIndex: 105, top: '-10px', borderRadius: '4px', background: 'rgba(0,0,0,0.4)'}`
       ).q-px-sm.text-white {{ $time(now) }} / {{ $time(player.duration) }}
 </template>
 
@@ -64,6 +72,7 @@ export default {
   data () {
     return {
       now: undefined,
+      nowMini: undefined,
       player: null,
       playing: false,
       muted: true
@@ -72,13 +81,25 @@ export default {
   computed: {
   },
   watch: {
+    // mini: {
+    //   handler (to, from) {
+    //     this.$log('mini CHANGED', to)
+    //     if (to) {
+    //       // this.player.setCurrentTime(now)
+    //       this.nowMini = this.now
+    //       this.player.setCurrentTime(this.nowMini)
+    //     } else {
+    //       this.player.setCurrentTime(this.nowMini)
+    //     }
+    //   }
+    // },
     visible: {
       immediate: true,
       handler (to, from) {
         this.$log('visible CHANGED', to)
         if (to && !this.mini) {
           // this.$q.notify('visible VIDEO')
-          this.play()
+          // this.play()
         }
       }
     }
@@ -97,21 +118,10 @@ export default {
     },
     async play () {
       this.$log('play')
-      // await this.$wait(300)
-      // this.$q.notify('PLAY')
-      if (this.player) {
-        // this.player.setMuted(true)
-        this.player.play()
-        // this.$refs.mutedToggleBtn.click()
-        // this.$refs.playPause.click()
-        // await this.$wait(1000)
-        // this.$refs.ncFragmentVideo.muted = false
-        // await this.$wait(100)
-      }
+      if (this.player) this.player.play()
     },
     pause () {
       this.$log('pause')
-      // this.$q.notify('PAUSE')
       if (this.player) this.player.pause()
     },
     progressClick (e) {
@@ -162,7 +172,7 @@ export default {
         ignorePauseOtherPlayersOption: false,
         clickToPlayPause: true,
         success: async (mediaElement, originalNode, instance) => {
-          this.$log('playerInit done')
+          // this.$log('playerInit done')
           this.player = mediaElement
           this.player.addEventListener('timeupdate', this.videoTimeupdate)
           this.player.addEventListener('seeked', this.videoSeeked)
@@ -209,12 +219,17 @@ export default {
       this.player.now = this.$refs.ncFragmentVideo.currentTime
       // await this.$wait(200)
       this.$emit('ready')
-      this.$log('playerInit done')
+      // this.$log('playerInit done')
     }
   },
   async mounted () {
     this.$log('mounted')
     // if (this.visible) this.$q.notify('MOUNTED' + this.index)
+    if (this.$q.screen.width > 600) {
+      // this.$q.notify('IS DESKTOP')
+      this.$refs.ncFragmentVideo.muted = false
+      this.muted = false
+    }
     if (this.ctx === 'inEditor') this.playerInit()
     else this.playerInitNative()
     // this.player.setCurrentTime(0)
@@ -224,7 +239,7 @@ export default {
     // this.player.play()
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
     if (this.ctx === 'inEditor') {
       this.player.removeEventListener('timeupdate', this.videoTimeupdate)
       this.player.removeEventListener('seeked', this.videoSeeked)

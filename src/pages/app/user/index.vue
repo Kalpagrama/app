@@ -22,7 +22,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
             //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
               q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
         //- body
-        div(v-if="true").row.full-width.q-px-sm
+        div(v-if="user").row.full-width.q-px-sm
           //- <input type="file" @change="previewFiles" multiple>
           .row.full-width
             img(:src="user.thumbUrl" @click="$refs.userPhotoDialog.show()"

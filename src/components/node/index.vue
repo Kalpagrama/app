@@ -1,7 +1,12 @@
 <template lang="pug">
 div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
-  //- fragments
-  div(:style=`{position: 'relative', height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`).row.full-width.items-start
+  //- fragments wrapper
+  div(
+    :style=`{
+      position: 'relative',
+      minHeight: previewHeight+'px', borderRadius: '10px', overflow: 'hidden',
+      height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`
+    ).row.full-width.items-start.bg-black
     nc-fragment(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
@@ -12,8 +17,13 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       @action="nodeAction"
       :visible="visible"
       :fragment="nodeFull ? nodeFull.fragments[0] : null"
-      :mini="fragmentMini === 0" @mini="fragmentChange(1)"
-      :style=`fragmentMini === 0 ? fragmentMiniStyles : {}`)
+      :mini="fragmentMini === 0" @mini="fragmentChange(0)"
+      :style=`{
+        position: previewHeight > 0 ? 'absolute' : 'relative', zIndex: fragmentMini === 0 ? 200 : 150,
+        opacity: styles[0].opacity,
+        maxWidth: styles[0].maxWidth+'%',
+        bottom: styles[0].bottom+'px',
+        right: styles[0].right+'px'}`)
     nc-fragment(
       ref="fragmentSecond"
       :ctx="ctx" :index="1"
@@ -24,15 +34,28 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       @action="nodeAction"
       :visible="visible"
       :fragment="nodeFull ? nodeFull.fragments[1] : null"
-      :mini="fragmentMini === 1" @mini="fragmentChange(0)"
-      :style=`fragmentMini === 1 ? fragmentMiniStyles : {height: '100%', width: '100%', objectFit: 'contain'}`)
+      :mini="fragmentMini === 1" @mini="fragmentChange(1)"
+      :style=`{
+        position: 'absolute', zIndex: fragmentMini === 1 ? 200 : 150,
+        height: fragmentMini === 1 ? 'auto' : previewHeight+'px',
+        opacity: styles[1].opacity,
+        maxWidth: styles[1].maxWidth+'%',
+        bottom: styles[1].bottom+'px',
+        right: styles[1].right+'px'}`)
+    //- height: fragmentMini === 1 ? 'auto' : '100%',
+    //- div(:style=`{position: 'absolute', zIndex: 100, right: 0+'px', bottom: 0+'px', height: '50px', maxWidth: 20+'%', width: '50px', opacity: 0.5}`).row.fit.bg-yellow
   //- name, essence
   div(
     ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
     :style=`{minHeight: '60px'}`
     :class=`{'bg-red': !nodeFull}`
     ).row.full-width.items-center.justify-center
+    //- span.text-green.text-bold.q-mr-sm {{index}}
     span.text-bold.text-center.cursor-pointer {{ node.name }}
+  //- .row.full-width.bg-red
+  //-   span.text-white.full-width stylesMaxi: {{stylesMaxi}}
+  //-   span.text-white.full-width stylesMini: {{stylesMini}}
+  //-   span.text-white.full-width styles[0]: {{styles[0].toString()}}
   //- actions
   div(
     v-if="nodeFull && opened"
@@ -108,23 +131,19 @@ export default {
       previewHeight: 0,
       previewWidth: 0,
       fragmentMini: 1,
-      fragmentMiniStyles: {
-        position: 'absolute',
-        zIndex: 200,
-        maxWidth: 100 + 'px',
-        right: 16 + 'px',
-        bottom: 20 + 'px',
-        opacity: 0.8,
-        objectFit: 'contain'
-      },
-      nodeVoting: false
+      fragmentMiniStart: 1,
+      nodeVoting: false,
+      stylesMini: {right: 20, bottom: 20, maxWidth: 20, maxHeight: 20},
+      stylesMaxi: {right: 0, bottom: 0, maxWidth: 100, maxHeight: 100},
+      styles: [{right: 0, bottom: 0, maxWidth: 100, opacity: 1}, {right: 20, bottom: 20, maxWidth: 20, opacity: 1}],
+      fragmentSecondPlaying: false
     }
   },
   watch: {
     visible: {
       immediate: false,
       async handler (to, from) {
-        this.$log('visible CHANGED', to)
+        // this.$log('visible CHANGED', to)
         if (to) {
           this.play()
           // this.$q.notify('visible')
@@ -136,7 +155,7 @@ export default {
     needFull: {
       immediate: true,
       async handler (to, from) {
-        this.$log('needFull CHANGED', to)
+        // this.$log('needFull CHANGED', to)
         if (to && !this.nodeFull) {
           this.nodeFull = await this.nodeLoad(this.node.oid)
         }
@@ -145,7 +164,7 @@ export default {
     nodeFullReady: {
       immediate: true,
       handler (to, from) {
-        this.$log('nodeFullReady CHANGED', to)
+        // this.$log('nodeFullReady CHANGED', to)
         if (to) {
           this.nodeFull = this.nodeFullReady
         }
@@ -177,14 +196,14 @@ export default {
       }
     },
     fragmentWidth (index, width) {
-      this.$log('fragmentWidth', index, width)
+      // this.$log('fragmentWidth', index, width)
       if (index === 0) {
         this.previewWidth = width
         this.$emit('previewWidth', width)
       }
     },
     fragmentHeight (index, height) {
-      this.$log('fragmentHeight', index, height)
+      // this.$log('fragmentHeight', index, height)
       if (index === 0) {
         this.previewHeight = height
         this.$emit('previewHeight', height)
@@ -192,36 +211,65 @@ export default {
     },
     fragmentEnded (index) {
       this.$log('fragmentEnded', index)
-      if (index === 0) this.fragmentChange(0)
-      else this.fragmentChange(1)
+      // if (index === 0) this.fragmentChange(0)
+      // else this.fragmentChange(1)
     },
     async fragmentChange (index) {
       this.$log('fragmentChange', index)
-      this.$refs.fragmentFirst.pause()
-      this.$refs.fragmentSecond.pause()
-      await this.$wait(300)
-      if (index === 0) this.$refs.fragmentSecond.play()
-      else this.$refs.fragmentFirst.play()
-      this.fragmentMini = index
-    },
-    async fragmentMove () {
-      if (this.ctx === 'inList') {
-        this.$log('inList')
-      } else {
-        this.$log('fragmentMove START')
-        this.$tween.to(this, 0.6, {
-          fBottom: -(this.$el.clientHeight - 60),
-          fWidth: this.$el.clientWidth,
-          fRight: 0,
-          fMarginTop: this.$el.clientHeight - 120,
-          onComplete: async () => {
-            this.$log('fragmentMove DONE')
-            // this.fPosition = 'relative'
-            this.fMini = !this.fMini
-            // this.$refs.fBottom.setSize(this.width, 210)
-            // await this.$wait(600)
+      // this.fragmentMini = index === 0 ? 1 : 0
+      // this.$refs.fragmentSecond.play()
+      // if (this.fragmentSecondPlaying) {
+      //   this.fragmentSecondPlaying = false
+      //   this.$refs.fragmentSecond.pause()
+      //   this.$tween.to(this.styles[1], 0.9, {maxWidth: 20, right: 20, bottom: 20})
+      //   this.fragmentMini = 1
+      // } else {
+      //   this.fragmentSecondPlaying = true
+      //   this.$refs.fragmentSecond.play()
+      //   this.$tween.to(this.styles[1], 0.9, {maxWidth: 80, right: 0, bottom: 0})
+      //   this.fragmentMini = -1
+      // }
+      // ***
+      // this.fragmentMini = index === 0 ? 1 : 0
+      this.fragmentMiniStart = index === 0 ? 1 : 0
+      this.$tween.to(
+        this.styles[index],
+        0.65,
+        {
+          maxWidth: 100,
+          right: 0,
+          bottom: 0,
+          onComplete: () => {
+            // if (index === 0) {
+            //   this.$refs.fragmentFirst.play()
+            //   this.$refs.fragmentSecond.pause()
+            // } else {
+            //   this.$refs.fragmentFirst.pause()
+            //   this.$refs.fragmentSecond.play()
+            // }
+            this.fragmentMini = index === 0 ? 1 : 0
+            this.fragmentMiniStart = index === 0 ? 1 : 0
+            this.styles[index === 0 ? 1 : 0].opacity = 0
+            this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.65, {
+              maxWidth: 25,
+              right: 16,
+              bottom: 32,
+              onComplete: () => {
+                this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.2, {opacity: 1})
+              }
+            })
           }
-        })
+        }
+      )
+      // this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.65, {maxWidth: 25, right: 16, bottom: 32, opacity: 1})
+      // await this.$wait(600)
+      // this.fragmentMiniStart = index === 0 ? 1 : 0
+      if (index === 0) {
+        this.$refs.fragmentFirst.play()
+        this.$refs.fragmentSecond.pause()
+      } else {
+        this.$refs.fragmentFirst.pause()
+        this.$refs.fragmentSecond.play()
       }
     },
     votePan (e) {
@@ -248,7 +296,7 @@ export default {
       this.$store.commit('node/stateSet', ['nodeOptionsDialogOpened', true])
     },
     async nodeLoad (oid) {
-      this.$log('nodeLoad start', this.index, this.node.oid)
+      // this.$log('nodeLoad start', this.index, this.node.oid)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })

@@ -1,11 +1,11 @@
 <template lang="pug">
-div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
+div(:style=`{minHeight: '100vh'}`).column.full-width.bg-black
   //- dialogs
   q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
     k-invite(@hide="$refs.inviteDialog.hide()")
   k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
-  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-secondary
+  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-black
     div(@click="$go('/')").col.row.items-center
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         k-logo(:width="40" :height="40")
@@ -15,7 +15,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
     div(@click="$go('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
-  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.state.objects.currentUser.oid)").row.full-width.bg-secondary
+  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.state.objects.currentUser.oid)").row.full-width.bg-black
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(
         v-show="!userAvatarErrored"
@@ -37,7 +37,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
       .row.fit.items-center
         span.text-white {{$t('Создать ядро')}}
   //- body
-  .col.full-width.scroll.bg-secondary
+  .col.full-width.scroll.bg-black
     .row.full-width.items-start.content-start
       div(v-for="(p, pi) in pages" :key="pi" @click="pageClick(p, pi)"
         :style=`{height: '60px'}`
