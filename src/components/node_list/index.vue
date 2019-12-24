@@ -73,7 +73,7 @@ export default {
       }
     },
     nodeClick (n, ni) {
-      this.$logd('nodeClick', n, ni)
+      this.$logD('nodeClick', n, ni)
       this.$emit('nodeClick', n)
     }
   },

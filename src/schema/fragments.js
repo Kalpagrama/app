@@ -17,9 +17,7 @@ const objectShortWithMetaFragment = gql`
       type
       ...on MetaNode{
         layout
-        fragments{
-          name
-        }
+        fragments { width height thumbUrl(preferWidth: 600) }
       }
     }
   }
@@ -218,6 +216,7 @@ const fragments = {
   objectFragment,
   userFragment,
   objectShortFragment,
+  objectShortWithMetaFragment,
   nodeFragment,
   sphereFragment
 }

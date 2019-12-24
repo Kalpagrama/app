@@ -45,7 +45,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
             ).row.full-width.items-center.justify-center.bg-white.q-mt-xl.q-mb-sm
             span.text-center {{ $t('Similar nodes') }}
           //- similar nodes list
-          node-loader(v-if="nodeOid" ref="nodeLoader" :query="query" queryKey="nodeNodes" :variables="variables")
+          node-loader(v-if="nodeOid" ref="nodeLoader" :variables="variables" type="nodeNodes")
             template(v-slot:default=`{nodes}`)
               node-list(:nodes="nodes" :nodesBan="[node.oid]" @nodeClick="nodeClick")
 </template>
@@ -59,29 +59,7 @@ export default {
       width: 0,
       node: null,
       showNameSticky: false,
-      previewHeight: 0,
-      query: gql`
-        query nodeExplorerNodeNodes ($oid: OID!, $pageToken: RawJSON) {
-          nodeNodes(nodeOid: $oid, pagination: {pageSize: 100, pageToken: $pageToken}, sortStrategy: HOT) {
-            count
-            totalCount
-            nextPageToken
-            items {
-              oid
-              type
-              thumbUrl (preferWidth: 600)
-              createdAt
-              name
-              meta {
-                ...on MetaNode {
-                  layout
-                  fragments { width height thumbUrl(preferWidth: 600) }
-                }
-              }
-            }
-          }
-        }
-      `
+      previewHeight: 0
     }
   },
   computed: {

@@ -38,7 +38,7 @@ q-layout(view="HHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
           ).bg-grey-4.q-px-sm.q-py-xs.q-mr-sm.q-mb-sm.cursor-pointer.ksphere
           span(:style=`{whiteSpace: 'nowrap'}`) {{`${s.name}` | cut(50)}}
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm
-      node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
+      node-loader(v-if="sphereOid" ref="nodeLoader" :variables="variables" type="sphereNodes")
         template(v-slot:default=`{nodes, fetchingMore}`)
           node-list(:nodes="nodes" :nodesBan="[]" @nodeClick="nodeClick")
 </template>
@@ -51,29 +51,7 @@ export default {
   data () {
     return {
       sphere: null,
-      spheres: [],
-      query: gql`
-        query nodesLoad($oid: OID!) {
-          sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}, sortStrategy: HOT) {
-            items {
-              oid
-              type
-              name
-              createdAt
-              thumbUrl(preferWidth: 600)
-              meta {
-                ...on MetaNode {
-                  layout
-                  fragments { width height thumbUrl(preferWidth: 600) }
-                }
-              }
-            }
-            count
-            totalCount
-            nextPageToken
-          }
-        }
-      `
+      spheres: []
     }
   },
   computed: {

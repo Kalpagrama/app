@@ -39,7 +39,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
             ).row.full-width.items-center.justify-center.bg-white.q-mt-xl.q-mb-sm
             span.text-center {{ $t('Similar nodes') }}
           //- similar nodes list
-          node-loader(ref="nodeLoader" :query="query" queryKey="sphereNodes" :variables="variables")
+          node-loader(ref="nodeLoader" :variables="variables" type="sphereNodes")
             template(v-slot:default=`{nodes}`)
               node-list(:nodes="nodes" :nodesBan="[]" @nodeClick="nodeClick")
 </template>
@@ -56,29 +56,7 @@ export default {
       width: 0,
       content: null,
       showNameSticky: false,
-      previewHeight: 0,
-      query: gql`
-        query contentExplorerSphereNodes ($oid: OID!) {
-          sphereNodes (sphereOid: $oid, pagination: {pageSize: 100}, sortStrategy: HOT) {
-            count
-            totalCount
-            nextPageToken
-            items {
-              oid
-              type
-              name
-              createdAt
-              thumbUrl(preferWidth: 600)
-              meta {
-                ...on MetaNode {
-                  layout
-                  fragments { width height thumbUrl(preferWidth: 600) }
-                }
-              }
-            }
-          }
-        }
-      `
+      previewHeight: 0
     }
   },
   computed: {

@@ -250,8 +250,8 @@ export default {
         this.nodeFullError = null
       } catch (err) {
         this.$logE('node', 'nodeLoad error', err)
-        this.$emit('error')
-        node = null
+        // this.$emit('error')
+        // node = null
         this.nodeFullError = err
       }
       this.$log('nodeLoad done', this.index, this.node.oid)

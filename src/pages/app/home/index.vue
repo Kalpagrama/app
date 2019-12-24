@@ -12,7 +12,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
         //- k-colls-new
         //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
-        node-loader(v-if="true" ref="nodeLoader" :query="query" queryKey="feed")
+        node-loader(v-if="true" ref="nodeLoader" :variables="variables" type="feed")
           template(v-slot:default=`{nodes}`)
             node-list(:nodes="nodes" @nodeClick="nodeClick")
 </template>
@@ -31,37 +31,15 @@ export default {
         {id: 's1', name: 'How to kill'},
         {id: 's2', name: 'How to pill'},
         {id: 's3', name: 'How to feel'}
-      ],
-      query: gql`
-        query feed($pageToken: RawJSON) {
-          feed(pagination: {pageSize: 100, pageToken: $pageToken}) {
-            count
-            totalCount
-            nextPageToken
-            items {
-              oid
-              type
-              thumbUrl (preferWidth: 600)
-              createdAt
-              name
-              meta {
-                ...on MetaNode {
-                  layout
-                  fragments { width height thumbUrl(preferWidth: 600) }
-                }
-              }
-            }
-          }
-        }
-      `
+      ]
     }
   },
   computed: {
-    // variables () {
-    //   return {
-    //     oid: this.$store.state.objects.currentUser.oid
-    //   }
-    // },
+    variables () {
+      return {
+        pagination: {pageSize: 100, pageToken: null}
+      }
+    },
     categories () {
       return this.$store.state.node.categories.reduce((acc, val) => {
         acc[val.type] = val
@@ -96,14 +74,14 @@ export default {
     //     }
     //   `
     // },
-    variables () {
-      return {
-        sphereOid: this.sphereOid,
-        pagination: { pageSize: 100 },
-        sortStrategy: 'HOT',
-        filter: { types: 'NODE' }
-      }
-    },
+    // variables () {
+    //   return {
+    //     sphereOid: this.sphereOid,
+    //     pagination: { pageSize: 100 },
+    //     sortStrategy: 'HOT',
+    //     filter: { types: 'NODE' }
+    //   }
+    // },
   },
   watch: {
   },
