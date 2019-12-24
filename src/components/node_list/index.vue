@@ -12,9 +12,9 @@
     :style=`{}`
     v-observe-visibility=`{
       callback: nodeVisible,
-      throttle: 300,
+      throttle: 150,
       intersection: {
-        threshold: 0.98
+        threshold: 0.5
       }
     }`
     ).bg-white.q-mb-lg

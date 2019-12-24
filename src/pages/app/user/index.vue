@@ -53,9 +53,9 @@ q-layout(view="hHh lpR fFf").bg-grey-3
           :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
           k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
             template(v-slot:created)
-              user-created-nodes()
+              user-created-nodes(:sphereOid="$route.params.oid" :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
             template(v-slot:rated)
-              user-created-nodes()
+              user-created-nodes(:sphereOid="$route.params.oid" :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
             template(v-slot:following)
               user-following(:subscriptions="user.subscriptions" :oid="user.oid")
             template(v-slot:followers)

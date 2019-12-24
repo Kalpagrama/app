@@ -11,12 +11,12 @@ iframe {
 div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   //- play/pause for inList
   div(
-    v-if="!mini && ctx !== 'inEditor'" @click="videoToggle()"
+    v-if="!mini && ctx !== 'inEditor'" ref="playPause" @click="videoToggle()"
     :style=`{position: 'absolute', zIndex: 103, opacity: 0.5}`).row.fit.items-center.justify-center
     q-btn(v-if="!playing && !mini" round flat icon="play_arrow" color="white" size="60px")
   //- muted
   q-btn(
-    v-if="!mini && visible"
+    ref="mutedToggleBtn"
     round flat color="white" @click="mutedToggle()"
     :style=`{position: 'absolute', zIndex: 103, left: '8px', top: '50px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
@@ -32,10 +32,10 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   //- video wrapper
   div(:style=`{position: 'relative'}`).row.fit
     video(
-      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="false"
+      ref="ncFragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="false" preload="auto"
       @play="playing = true" @pause="playing = false"
       @ended="videoEnded" @timeupdate="videoTimeupdate" @seeked="videoSeeked"
-      width="100%" height="100%" :muted="true"
+      width="100%" height="100%" muted="true"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`
       ).fit
       source(
@@ -60,7 +60,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
 <script>
 export default {
   name: 'ncFragmentVideo',
-  props: ['ctx', 'fragment', 'mini', 'visible'],
+  props: ['ctx', 'fragment', 'mini', 'visible', 'index'],
   data () {
     return {
       now: undefined,
@@ -71,6 +71,18 @@ export default {
   },
   computed: {
   },
+  watch: {
+    visible: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('visible CHANGED', to)
+        if (to && !this.mini) {
+          // this.$q.notify('visible VIDEO')
+          this.play()
+        }
+      }
+    }
+  },
   methods: {
     mutedToggle () {
       this.$log('mutedToggle')
@@ -78,23 +90,29 @@ export default {
         this.player.setMuted(!this.muted)
         this.muted = !this.muted
       } else {
+        this.$refs.ncFragmentVideo.muted = false
         this.player.setMuted(!this.muted)
       }
       this.$emit('muted', !this.muted)
     },
     async play () {
       this.$log('play')
-      this.$q.notify('PLAY')
+      // await this.$wait(300)
+      // this.$q.notify('PLAY')
       if (this.player) {
-        this.player.setMuted(true)
+        // this.player.setMuted(true)
         this.player.play()
+        // this.$refs.mutedToggleBtn.click()
+        // this.$refs.playPause.click()
+        // await this.$wait(1000)
+        // this.$refs.ncFragmentVideo.muted = false
         // await this.$wait(100)
       }
     },
     pause () {
       this.$log('pause')
-      this.$q.notify('PAUSE')
-      // if (this.player) this.player.pause()
+      // this.$q.notify('PAUSE')
+      if (this.player) this.player.pause()
     },
     progressClick (e) {
       this.$log('progressClick', this.player.duration)
@@ -105,9 +123,14 @@ export default {
       this.player.setCurrentTime(now)
     },
     videoToggle () {
-      if (this.playing) this.pause()
-      else this.play()
-      this.playing = !this.playing
+      if (this.muted) {
+        this.player.setMuted(false)
+        this.muted = false
+      } else {
+        if (this.playing) this.pause()
+        else this.play()
+        this.playing = !this.playing
+      }
     },
     videoTimeupdate (e) {
       // this.$log('videoTimeupdate', e)
@@ -146,6 +169,7 @@ export default {
           // this.player.play()
           this.muted = false
           this.$emit('ready')
+          // this.$q.notify('ready')
         },
         error: async (mediaElement, originalNode, instance) => {
           this.$log('playerStart error')
@@ -160,8 +184,12 @@ export default {
       this.$log('playerInitNative start')
       this.player = {}
       this.player.play = async () => {
-        this.$log('playerNative: play')
-        this.$refs.ncFragmentVideo.play()
+        return new Promise((resolve, reject) => {
+          // this.$log('playerNative: play')
+          // this.$refs.ncFragmentVideo.play()
+          this.$refs.ncFragmentVideo.play().then(() => resolve())
+          // resolve()
+        })
       }
       this.player.pause = async () => {
         this.$log('playerNative: pause')
@@ -174,19 +202,26 @@ export default {
       this.player.setMuted = (muted) => {
         this.$log('playerNative: setMuted', muted)
         this.muted = muted
+        this.$refs.ncFragmentVideo.muted = muted
       }
       this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
       this.player.duration = this.$refs.ncFragmentVideo.duration
       this.player.now = this.$refs.ncFragmentVideo.currentTime
-      await this.$wait(200)
+      // await this.$wait(200)
       this.$emit('ready')
       this.$log('playerInit done')
     }
   },
   async mounted () {
     this.$log('mounted')
+    // if (this.visible) this.$q.notify('MOUNTED' + this.index)
     if (this.ctx === 'inEditor') this.playerInit()
     else this.playerInitNative()
+    // this.player.setCurrentTime(0)
+    // await this.player.play()
+    // this.player.pause()
+    this.$refs.ncFragmentVideo.load()
+    // this.player.play()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

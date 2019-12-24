@@ -60,7 +60,7 @@ div(
       :style=`{position: 'absolute', zIndex: 100, top: 0, bottom: 0, left: 0, right: 0, minHeight: '100%', minWidth: '100%'}`).row.fit
       nc-fragment-video(
         v-if="previewLoaded && fragment && fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
-        :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini" :visible="visible"
+        :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini" :visible="visible" :index="index"
         :width="previewWidth" :height="previewHeight"
         @muted="$event => $emit('muted', $event)"
         @ended="$emit('ended', index)"

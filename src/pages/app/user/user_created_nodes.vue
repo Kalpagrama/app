@@ -8,14 +8,16 @@
 <script>
 export default {
   name: 'userCreatedNodes',
+  props: ['sphereOid', 'filter'],
   data () {
     return {
     }
   },
   computed: {
-    sphereOid () {
-      return this.$store.state.objects.currentUser.oid
-    },
+    // sphereOid () {
+    //   // return this.$store.state.objects.currentUser.oid
+    //   return this.$route.params.oid
+    // },
     query () {
       return gql`
         query sphereNodesUser ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
@@ -45,7 +47,8 @@ export default {
         sphereOid: this.sphereOid,
         pagination: { pageSize: 100 },
         sortStrategy: 'HOT',
-        filter: { types: 'NODE' }
+        // filter: { types: 'NODE' }
+        filter: this.filter
       }
     }
   },

@@ -9,6 +9,7 @@ export default {
   data () {
     return {
       nodes: [],
+      fetched: false,
       fetchingMore: false,
       pageToken: null,
       pageTokenNext: null,
@@ -16,11 +17,23 @@ export default {
       itemsCount: 0
     }
   },
+  watch: {
+    variables: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('VARIABLES CHANGED', to)
+        if (to) this.nodesLoad(this.query, this.queryKey, to)
+      }
+    }
+  },
   render () {
+    this.$log('render')
+    // this.$q.notify('RENDER')
     // slot(v-if="kQuery" name="items" :items="kQuery.items" :fetchingMore="fetchingMore")
     // await this.$wait(3000)
-    this.nodesLoad(this.query, this.queryKey, this.variables)
-    this.$log('render variables', this.variables)
+    // if (!this.fetched) this.nodesLoad(this.query, this.queryKey, this.variables)
+    // this.fetched = true
+    // this.$log('render variables', this.variables)
     if (this.$scopedSlots.default) {
       return this.$scopedSlots.default({
         // nodes: this.kQuery ? this.kQuery.items : [],
@@ -31,28 +44,28 @@ export default {
       return null
     }
   },
-  apollo: {
-      // kQuery: {
-      //   query () {
-      //     return this.query
-      //   },
-      //   variables () {
-      //     return this.variables
-      //   },
-      //   result ({ data, loading, networkStatus }) {
-      //     if (data) {
-      //       this.$logD('feed result', data)
-      //       this.pageToken = data[this.queryKey].nextPageToken
-      //       this.totalCount = data[this.queryKey].totalCount
-      //       this.itemsCount = data[this.queryKey].items.length
-      //     }
-      //   },
-      //   update (data) {
-      //     return data[this.queryKey]
-      //   },
-      //   fetchPolicy: 'cache-and-network'
-      // }
-  },
+  // apollo: {
+  //     kQuery: {
+  //       query () {
+  //         return this.query
+  //       },
+  //       variables () {
+  //         return this.variables
+  //       },
+  //       result ({ data, loading, networkStatus }) {
+  //         if (data) {
+  //           this.$logD('feed result', data)
+  //           this.pageToken = data[this.queryKey].nextPageToken
+  //           this.totalCount = data[this.queryKey].totalCount
+  //           this.itemsCount = data[this.queryKey].items.length
+  //         }
+  //       },
+  //       update (data) {
+  //         return data[this.queryKey]
+  //       },
+  //       fetchPolicy: 'cache-and-network'
+  //     }
+  // },
   methods: {
     async needFetchMore () {
       this.$logD('needFetchMore start')
