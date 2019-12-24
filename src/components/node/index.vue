@@ -30,6 +30,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
   div(
     ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
     :style=`{minHeight: '60px'}`
+    :class=`{'bg-red': !nodeFull}`
     ).row.full-width.items-center.justify-center
     span.text-bold.text-center.cursor-pointer {{ node.name }}
   //- actions
@@ -124,8 +125,12 @@ export default {
       immediate: false,
       async handler (to, from) {
         this.$log('visible CHANGED', to)
-        if (to) this.play()
-        else this.pause()
+        if (to) {
+          this.play()
+          // this.$q.notify('visible')
+        } else {
+          this.pause()
+        }
       }
     },
     needFull: {
