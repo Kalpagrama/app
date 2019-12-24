@@ -35,7 +35,7 @@
         q-btn(
           push no-caps color="green" @click="codeSend" :loading="codeSending"
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width
-          span.text-bold {{$t('Login')}}
+          span.text-bold {{$t('Sign in', 'Войти')}}
         q-btn(
           outline no-caps color="white" @click="back()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mt-sm
