@@ -30,7 +30,6 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
   div(
     ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
     :style=`{minHeight: '60px'}`
-    :class=`{'bg-red': !nodeFull}`
     ).row.full-width.items-center.justify-center
     span.text-bold.text-center.cursor-pointer {{ node.name }}
   //- actions
@@ -125,12 +124,8 @@ export default {
       immediate: false,
       async handler (to, from) {
         this.$log('visible CHANGED', to)
-        if (to) {
-          this.play()
-          // this.$q.notify('visible')
-        } else {
-          this.pause()
-        }
+        if (to) this.play()
+        else this.pause()
       }
     },
     needFull: {
@@ -255,8 +250,8 @@ export default {
         this.nodeFullError = null
       } catch (err) {
         this.$logE('node', 'nodeLoad error', err)
-        // this.$emit('error')
-        // node = null
+        this.$emit('error')
+        node = null
         this.nodeFullError = err
       }
       this.$log('nodeLoad done', this.index, this.node.oid)
