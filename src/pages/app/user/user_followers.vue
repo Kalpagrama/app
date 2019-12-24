@@ -43,6 +43,7 @@ export default {
         case 'USER': {
           if (this.oid === s.oid) break
           else this.$router.push(`/user/${s.oid}`)
+          this.$log('!!!', this.path)
           break
         }
         case 'SPHERE': {

@@ -35,10 +35,12 @@
 </template>
 
 <script>
-import { TimelineLite, Linear } from 'gsap'
+import { TimelineLite, Linear, gsap } from 'gsap'
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 // import { TimelineMax } from 'gsap'
 export default {
   name: 'kSpinner',
+  components: {TimelineLite, MotionPathPlugin, Linear, gsap},
   props: {
     width: {
       type: Number,
@@ -62,6 +64,7 @@ export default {
   methods: {
   },
   mounted () {
+    gsap.registerPlugin(MotionPathPlugin);
     // TH
     const st = this.$refs.st
     const stTimeline = new TimelineLite({repeat: -1, repeatDelay: 9, ease: Linear.easeNone})
@@ -76,7 +79,6 @@ export default {
     // ND
     const nd = this.$refs.nd
     const ndTimeline = new TimelineLite({repeat: -1, repeatDelay: 6, ease: Linear.easeNone})
-    // ndTimeline.set(nd, {scale: 0.5, })
     ndTimeline.fromTo(nd, 3,
     {
       rotation: 0,
@@ -207,6 +209,7 @@ export default {
       ease: Linear.easeNone
     })
   th2Timeline.repeat(-1)
+  // TH3
   const th3 = this.$refs.th3
   const th3Timeline = new TimelineLite({ease: Linear.easeNone})
   th3Timeline.set(th3, {scale: 0, transformOrigin: '50% 50%'})
