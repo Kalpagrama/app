@@ -77,7 +77,7 @@ export default {
       return
     }
     this.loading = false
-    if (this.$store.state.events.notice) this.$refs.kTutorialDialog.show()
+    if (this.$store.state.objects.currentUser.profile.tutorial) this.$refs.kTutorialDialog.show()
     // this.$refs.kTutorialDialog.show()
   }
  }

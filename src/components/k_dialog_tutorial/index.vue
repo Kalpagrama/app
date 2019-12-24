@@ -236,12 +236,19 @@ export default {
       if (this.slide === '1') this.prev = '1'
       this.slide = this.prev
     },
-    nextSlide () {
+    async nextSlide () {
       if (this.slide === '1') this.next = '2'
       if (this.slide === '2') this.next = '3'
       if (this.slide === '3') this.next = '4'
       this.slide = this.next
-      if (this.next === '4') this.$emit('hide')
+      if (this.next === '4') {
+        let res = await this.$store.dispatch('objects/setObjectValue', {
+          oid: this.$store.state.objects.currentUser.oid,
+          path: 'profile.tutorial',
+          value: false
+        })
+        this.$emit('hide')
+      }
     },
     secondSlide () {
       this.slide = '2'

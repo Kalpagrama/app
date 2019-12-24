@@ -704,7 +704,7 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeCnt",
+            "name": "childNodeCnt",
             "description": null,
             "args": [],
             "type": {
@@ -896,19 +896,15 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
+              "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "LIST",
+                "kind": "NON_NULL",
                 "name": null,
                 "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Session",
-                    "ofType": null
-                  }
+                  "kind": "OBJECT",
+                  "name": "Session",
+                  "ofType": null
                 }
               }
             },
@@ -1378,6 +1374,16 @@
             "kind": "OBJECT",
             "name": "MetaNode",
             "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "MetaSphere",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "MetaUser",
+            "ofType": null
           }
         ]
       },
@@ -1396,6 +1402,53 @@
         "name": "UserProfile",
         "description": null,
         "fields": [
+          {
+            "name": "tutorial",
+            "description": "показать туториал",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Boolean",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "thumbUrl",
+            "description": "превью. Либо dataUrl, либо ссылка на User.thumbUrl",
+            "args": [
+              {
+                "name": "preferWidth",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "nameFirst",
             "description": null,
@@ -1497,13 +1550,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "UserRoleEnum",
-                "ofType": null
-              }
+              "kind": "ENUM",
+              "name": "UserRoleEnum",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -2202,6 +2251,42 @@
             },
             "isDeprecated": false,
             "deprecationReason": null
+          },
+          {
+            "name": "width",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "height",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "uploadedFileInfo",
+            "description": "информация о загруженном файле",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "RawJSON",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
         "inputFields": null,
@@ -2339,11 +2424,6 @@
           {
             "kind": "OBJECT",
             "name": "Fragment",
-            "ofType": null
-          },
-          {
-            "kind": "OBJECT",
-            "name": "MetaFragment",
             "ofType": null
           }
         ]
@@ -2818,7 +2898,7 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeCnt",
+            "name": "childNodeCnt",
             "description": "число созданных ядер",
             "args": [],
             "type": {
@@ -3207,6 +3287,24 @@
         "fields": null,
         "inputFields": [
           {
+            "name": "fastFilters",
+            "description": null,
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "ENUM",
+                  "name": "FastFilterEnum",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
             "name": "types",
             "description": null,
             "type": {
@@ -3250,9 +3348,32 @@
         "possibleTypes": null
       },
       {
+        "kind": "ENUM",
+        "name": "FastFilterEnum",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "CREATED_BY_USER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "VOTED_BY_USER",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
         "kind": "INPUT_OBJECT",
         "name": "FragmentInput",
-        "description": "тип для указания фрагмента контента",
+        "description": null,
         "fields": null,
         "inputFields": [
           {
@@ -4196,37 +4317,6 @@
             "deprecationReason": null
           },
           {
-            "name": "objectDelete",
-            "description": "удаление любой объект(контент, документ, цепочка, участник)",
-            "args": [
-              {
-                "name": "oid",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "OID",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "nodeRate",
             "description": "проголосовать за ядро",
             "args": [
@@ -4756,22 +4846,6 @@
               "ofType": {
                 "kind": "ENUM",
                 "name": "UserRoleEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "isNewUser",
-            "description": "первый вход после регистрации",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
                 "ofType": null
               }
             },
@@ -6008,7 +6082,7 @@
             "deprecationReason": null
           },
           {
-            "name": "relativePoints",
+            "name": "cuts",
             "description": "выбранная область (пустой массив - выбрано все.)",
             "args": [],
             "type": {
@@ -6022,7 +6096,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "RelativePoint",
+                    "name": "RelativeCut",
                     "ofType": null
                   }
                 }
@@ -6032,7 +6106,7 @@
             "deprecationReason": null
           },
           {
-            "name": "relativeScale",
+            "name": "scale",
             "description": "масштаб относительной шкалы делений",
             "args": [],
             "type": {
@@ -7186,33 +7260,6 @@
             "deprecationReason": null
           },
           {
-            "name": "thumbUrl",
-            "description": "data url для превью ядра",
-            "args": [
-              {
-                "name": "preferWidth",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "uploadedFileInfo",
             "description": "информация о загруженном контенте",
             "args": [],
@@ -7233,209 +7280,6 @@
             "ofType": null
           }
         ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "MetaFragment",
-        "description": null,
-        "fields": [
-          {
-            "name": "content",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "Object",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "name",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "thumbUrl",
-            "description": null,
-            "args": [
-              {
-                "name": "preferWidth",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "Int",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "url",
-            "description": "url to fragment data file (piece of content file)",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "scale",
-            "description": "масштаб относительной шкалы делений",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "cuts",
-            "description": "выбранная область (пустой массив - выбрано все.)",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "RelativeCut",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "width",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "height",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "uploadedFileInfo",
-            "description": "информация о загруженном файле",
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "RawJSON",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [
-          {
-            "kind": "INTERFACE",
-            "name": "IFragment",
-            "ofType": null
-          }
-        ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "MetaFragmentInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "thumbUrl",
-            "description": "data url для превью фрагмента",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "relativeCuts",
-            "description": null,
-            "type": {
-              "kind": "LIST",
-              "name": null,
-              "ofType": {
-                "kind": "NON_NULL",
-                "name": null,
-                "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "RelativeCutInput",
-                  "ofType": null
-                }
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -7518,7 +7362,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "MetaFragment",
+                    "name": "Fragment",
                     "ofType": null
                   }
                 }
@@ -7540,59 +7384,68 @@
         "possibleTypes": null
       },
       {
-        "kind": "INPUT_OBJECT",
-        "name": "MetaNodeInput",
+        "kind": "OBJECT",
+        "name": "MetaSphere",
         "description": null,
-        "fields": null,
-        "inputFields": [
+        "fields": [
           {
-            "name": "layout",
+            "name": "type",
             "description": null,
+            "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "ENUM",
-                "name": "FragmentLayoutEnum",
+                "kind": "SCALAR",
+                "name": "String",
                 "ofType": null
               }
             },
-            "defaultValue": null
-          },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
           {
-            "name": "thumbUrl",
-            "description": "data url для превью ядра",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
+            "kind": "INTERFACE",
+            "name": "Meta",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "MetaUser",
+        "description": null,
+        "fields": [
           {
-            "name": "fragments",
+            "name": "type",
             "description": null,
+            "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "MetaFragmentInput",
-                    "ofType": null
-                  }
-                }
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               }
             },
-            "defaultValue": null
+            "isDeprecated": false,
+            "deprecationReason": null
           }
         ],
-        "interfaces": null,
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Meta",
+            "ofType": null
+          }
+        ],
         "enumValues": null,
         "possibleTypes": null
       },
@@ -8352,7 +8205,7 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeCnt",
+            "name": "childNodeCnt",
             "description": "общее число ядер на этой сфере",
             "args": [],
             "type": {

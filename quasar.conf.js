@@ -66,7 +66,7 @@ module.exports = function (ctx) {
     supportIE: false,
     build: {
       env: {
-        AUTH_URL: JSON.stringify(process.env.AUTH_URL)
+        SERVICES_URL: JSON.stringify(process.env.SERVICES_URL)
       },
       scopeHoisting: true,
       vueRouterMode: 'history',
