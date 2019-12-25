@@ -1,8 +1,5 @@
 <template lang="pug">
-div(
-  :style=`{position: 'relative'}`
-  :class=`{'q-pl-xs': index % 2 !== 0, 'q-pr-xs': index % 2 === 0}`
-  ).col-6.q-mb-sm
+div(:style=`{position: 'relative'}`)
   div(:style=`{position: 'relative', borderRadius: '10px', oveflow: 'hidden'}`).row.full-width.items-center.bg-black
     img(
       ref="itemPreview"

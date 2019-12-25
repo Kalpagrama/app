@@ -28,7 +28,9 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
           //- v-if="fragmentToDelete !== ii"
           ws-item-fragment(
             v-for="(i, ii) in fragments" :key="i.node.oid"
-            :index="ii" :item="i" @action="item = i, itemIndex = ii, $refs.itemActionDialog.show()")
+            :index="ii" :item="i" @action="item = i, itemIndex = ii, $refs.itemActionDialog.show()"
+            :class=`{'q-pl-xs': ii % 2 !== 0, 'q-pr-xs': ii % 2 === 0}`
+            ).col-6.q-mb-sm
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
