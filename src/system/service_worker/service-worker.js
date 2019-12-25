@@ -1,5 +1,5 @@
-const swVer = 9
-const useCache = false
+const swVer = 11
+const useCache = true
 
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, swShareStore, cacheGraphQl
 /* global idbKeyval, MD5 */
@@ -47,30 +47,7 @@ importScripts('/statics/scripts/md5.js')
       logDebug('activated!', swVer)
     })
     self.addEventListener('fetch', async event => {
-      logDebug('ready to handle fetches! request=', event.request)
-      // if (event.request.method === 'POST') {
-      //   const formData = await event.request.formData()
-      //   // event.respondWith(fetch(event.request))
-      //   logDebug('fetch post message!', swVer, event)
-      //   logDebug('SW formData = ', formData)
-      //   for (var value of formData.values()) {
-      //     logDebug('SW formData value = ', value);
-      //   }
-      //   logDebug('SW formData title = ', formData.get('title'))
-      //   logDebug('SW formData text = ', formData.get('text'))
-      //   logDebug('SW formData url = ', formData.get('url'))
-      //   logDebug('SW formData file = ', formData.get('file'))
-      //   logDebug('SW formData files = ', formData.get('files'))
-      //   // await self.clients.openWindow('/app/create/')
-      // }
-      // event.respondWith((async () => {
-      //   const formData = await event.request.formData()
-      //   logDebug('SW formData = ', formData)
-      //   logDebug('SW formData = ', formData.get('title'))
-      //   logDebug('SW formData = ', formData.get('text'))
-      //   logDebug('SW formData = ', formData.get('url'))
-      //   logDebug('SW formData = ', formData.get('files'))
-      // })())
+      // logDebug('ready to handle fetches! request=', event.request)
     })
     self.addEventListener('updatefound', event => {
       logDebug('ready to update!', swVer)
@@ -212,36 +189,49 @@ if (useCache) {
         ]
       })
     )
-    workbox.routing.registerRoute( // vue router ( /menu /create etc looks at index.html)
-      /^http.*\/\w+\/?$/,
+    workbox.routing.registerRoute( // share_target
+      /\/share_target\/?$/,
       async ({ url, event, params }) => {
-        logDebug('workbox.routing.registerRoute 1', url)
-        logDebug('workbox.routing.registerRoute 2', url)
-        logDebug('workbox.routing.registerRoute 3 getCacheKeyForURL=', workbox.precaching.getCacheKeyForURL('/index.html'))
+        logDebug('share_target 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
         // if (event.request.method === 'POST') {
         //   logDebug('redirect to share_target = ')
         //   return Response.redirect('share_target', 303)
         // }
-        idbKeyval.set(url.pathname, url, swShareStore)
-        if (/*event.request.method === 'POST' && */url.pathname.includes('share_target')) {
-          //if (contentType.includes('form'))
-          logDebug('workbox.routing.registerRoute 4 share_target')
+        if (url.pathname.includes('share_target')) {
+          logDebug('share_target 6 ')
           try {
             let formData = await event.request.formData()
-            formData = formData || {}
-            logDebug('save formData to idb', formData)
-            idbKeyval.set('formData', formData, swShareStore)
-          } catch (err){
+            // for (let [name, value] of formData) {
+            //   shareData[name] = value
+            // }
+            let title = formData.get('title')
+            let text = formData.get('text')
+            let url = formData.get('url')
+            let images = formData.getAll('image')
+            let videos = formData.getAll('video')
+            logDebug(' formData fields  = ', {title, text, url, images, videos})
+            await idbKeyval.set('shareData', {title, text, url, images, videos}, swShareStore)
+          } catch (err) {
             logCritical('share_target err', err)
           }
         }
-        throw new Error('asdasdasdasd')
-
         if (workbox.precaching.getCacheKeyForURL('/index.html')) {
           logDebug('workbox.routing.registerRoute returm from cache', url)
           return caches.match(workbox.precaching.getCacheKeyForURL('/index.html'))
         } else {
           logDebug('workbox.routing.registerRoute returm from net', url)
+          return fetch('/index.html')
+        }
+      },
+      'POST'
+    )
+    workbox.routing.registerRoute( // vue router ( /menu /create etc looks at index.html)
+      /\/\w+\/?$/,
+      async ({ url, event, params }) => {
+        logDebug('vue router 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
+        if (workbox.precaching.getCacheKeyForURL('/index.html')) {
+          return caches.match(workbox.precaching.getCacheKeyForURL('/index.html'))
+        } else {
           return fetch('/index.html')
         }
       }
