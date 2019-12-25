@@ -37,12 +37,12 @@ div(
       :style=`{position: 'absolute', zIndex: 200, right: '8px', top: '8px', background: 'rgba(255,255,255,0.15)'}`).shadow-5
     //- cancel
     q-btn(
-      v-if="ctx === 'inEditor'"
+      v-if="ctx === 'inEditor' && !inExplorer"
       round flat color="red" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
-      :style=`{position: 'absolute', zIndex: 11000, left: '10px', top: 'calc(50% - 20px)', background: 'rgba(255,255,255,0.15)'}`).shadow-5
+      :style=`{position: 'absolute', zIndex: 11000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(255,255,255,0.15)'}`).shadow-5
     //- edit
     q-btn(
-      v-if="ctx === 'inEditor'"
+      v-if="ctx === 'inEditor' && !inExplorer"
       push round no-caps @click="editing = !editing"
       :color="editing ? 'green' : 'green'"
       :icon="editing ? 'check' : 'edit'"
@@ -84,7 +84,7 @@ import ncFragmentVideoEditor from './nc_fragment_video_editor'
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
-  props: ['ctx', 'index', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'mini', 'visible', 'height'],
+  props: ['ctx', 'index', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'mini', 'visible', 'height', 'inExplorer'],
   data () {
     return {
       stage: 0,

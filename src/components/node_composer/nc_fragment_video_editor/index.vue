@@ -129,6 +129,7 @@ export default {
   props: ['width', 'height', 'fragment', 'player', 'now', 'editing'],
   data () {
     return {
+      now_: 0,
       cutIndex: -1,
       cutPlaying: -1,
       cutSetTimeDialogOpened: false,
@@ -185,7 +186,8 @@ export default {
         // this.$log('now CHANGED', to)
         // if (to && from && to.color === from.color) return
         if (this.cut && this.cutPlaying >= 0) {
-          if (to > this.cut.points[1].x || to < this.cut.points[0].x) {
+          // this.player.pause()
+          if (to >= this.cut.points[1].x) {
             if (this.fragmentPlaying) {
               this.$log('FRAGMENT PLAYING')
               if (this.cuts[this.cutIndex + 1]) {
@@ -196,6 +198,7 @@ export default {
                 this.$log('FIRST CUT AGAIN')
                 this.cutIndex = 0
                 this.cutPlaying = 0
+                this.player.setCurrentTime(this.cut.points[0].x)
               }
             } else {
               this.$log('CUT AGAIN')
@@ -216,6 +219,7 @@ export default {
         this.fragmentPlaying = false
         this.cutIndex = -1
         this.cutPlaying = -1
+        this.player.pause()
       } else {
         this.fragmentPlaying = true
         this.cutIndex = 0
@@ -256,11 +260,13 @@ export default {
     },
     cutPlay (c, ci) {
       this.$log('cutPlay', c, ci)
+      this.fragmentPlaying = false
       if (this.cutPlaying === ci) {
+        this.player.pause()
         this.cutPlaying = -1
       } else {
         this.cutPlaying = ci
-        this.player.setCurrentTime(this.cut.points[0].x)
+        // this.player.setCurrentTime(this.cut.points[0].x)
         this.player.play()
       }
     },
@@ -314,7 +320,10 @@ export default {
     this.$log('mounted', this.cuts.length)
     if (this.cuts.length > 0) {
       this.cutIndex = 0
-      this.player.setCurrentTime(this.cut.points[0].x)
+      // this.player.setCurrentTime(this.cut.points[0].x)
+      // this.player.play()
+      this.fragmentPlay()
+    } else {
       this.player.play()
     }
   },

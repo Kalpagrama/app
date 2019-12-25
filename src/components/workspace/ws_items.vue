@@ -12,7 +12,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(n, ni) in notes" :key="ni" @click="itemClick(n)"
+            v-for="(n, ni) in notes" :key="ni"
             :style=`{height: '60px', borderRadius: '10px'}`
             ).row.full-width.items-center.q-px-sm.bg-white.q-mb-sm
             span {{ $t(n.item.name) }}
@@ -28,7 +28,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
           //- v-if="fragmentToDelete !== ii"
           ws-item-fragment(
             v-for="(i, ii) in fragments" :key="i.node.oid"
-            :index="ii" :item="i" @action="item = i, itemIndex = ii, $refs.itemActionDialog.show()"
+            :index="ii" :item="i" @action="item = JSON.parse(JSON.stringify(i)), itemIndex = ii, $refs.itemActionDialog.show()"
             :class=`{'q-pl-xs': ii % 2 !== 0, 'q-pr-xs': ii % 2 === 0}`
             ).col-6.q-mb-sm
   template(v-slot:contents)
@@ -40,7 +40,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(c, ckey, ci) in contents" :key="ckey" @click="itemClick(c)"
+            v-for="(c, ckey, ci) in contents" :key="ckey"
             :style=`{position: 'relative', minHeight: '100px'}`
             :class=`{'q-pl-xs': ci % 2 !== 0, 'q-pr-xs': ci % 2 === 0}`
             ).col-6.q-mb-sm
@@ -63,7 +63,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(n, ni) in nodes" :key="n.oid" @click="itemClick(n)"
+            v-for="(n, ni) in nodes" :key="n.oid"
             :style=`{minHeight: '60px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-pa-sm
             div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-black
