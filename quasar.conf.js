@@ -160,7 +160,7 @@ module.exports = function (ctx) {
           //   text: 'body',
           //   url: 'url'
           // }
-          action: '/share-target',
+          action: '/share_target',
           method: 'POST',
           enctype: 'multipart/form-data',
           params: {

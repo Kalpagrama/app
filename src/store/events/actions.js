@@ -201,7 +201,7 @@ function notifyUserActionComplete (eventType, object) {
     {
       position: 'top',
       message: eventMessage,
-      avatar: object.thumbUrl,
+      avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
       actions: [{
         label: i18n.t('Goto...'),
         noDismiss: true,

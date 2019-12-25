@@ -1,5 +1,5 @@
-const swVer = 2
-const useCache = false
+const swVer = 4
+const useCache = true
 
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, cacheGraphQl
 /* global idbKeyval, MD5 */
@@ -32,107 +32,78 @@ importScripts('/statics/scripts/md5.js')
   logDebug('swVer=', swVer)
   // swStore = new idbKeyval.Store('sw-cache-common', 'common-data')
   gqlStore = new idbKeyval.Store('sw-cache-gql', 'graphql-responses')
-  self.addEventListener('message', function handler (event) {
-    logDebug('message!', event.data)
-    if (event.data) {
-      switch (event.data.type) {
-        case 'logInit':
-          logModulesBlackList = event.data.logModulesBlackList
-          logLevel = event.data.logLevel
-          logLevelSentry = event.data.logLevelSentry
-          try {
-            if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
-          } catch (err) {
-            logDebug('error on setConfig', err)
-          }
-          break
-        case 'skipWaiting':
-          self.skipWaiting()
-          break
-        case 'sendVersion':
-          self.clients.matchAll().then(all => all.map(client => client.postMessage(swVer)));
-          break
-        default:
-          logCritical('bad event.data.type', event.data.type)
-      }
-    } else {
-      logCritical('event.data is null')
-    }
-  })
-}
-
-// custom resolver for graphql POST requests
-{
-  cacheGraphQl = async function (event) {
-    // todo use different strategies
-    // let tmpReq = event.request.clone()
-    // logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
-    // let promise = null
-    // if(event.request.method === 'POST')
-    let cachedResponse = await getCache(event.request.clone())
-    let fetchPromise = fetch(event.request.clone())
-      .then((response) => {
-        setCache(event.request.clone(), response.clone())
-        return response
-      })
-      .catch((err) => {
-        logCritical(err)
-      })
-    return cachedResponse ? Promise.resolve(cachedResponse) : fetchPromise
-  }
-
-  async function serializeResponse (response) {
-    let serializedHeaders = {}
-    for (let entry of response.headers.entries()) {
-      serializedHeaders[entry[0]] = entry[1]
-    }
-    let serialized = {
-      headers: serializedHeaders,
-      status: response.status,
-      statusText: response.statusText
-    }
-    serialized.body = await response.json()
-    return serialized
-  }
-
-  async function setCache (request, response) {
-    let body = await request.json()
-    // logDebug('body === ', body)
-    if (body.operationName.startsWith('sw_nocache_')) return
-    // if (!body.operationName.startsWith('sw_cache_')) return
-    let id = MD5(JSON.stringify(body)).toString()
-    // logDebug('MD5 === ', id)
-    // logDebug('request = ', request)
-    let entry = {
-      query: body.query,
-      response: await serializeResponse(response),
-      timestamp: Date.now()
-    }
-    idbKeyval.set(id, entry, gqlStore)
-  }
-
-  async function getCache (request) {
-    let data
-    try {
-      let body = await request.json()
-      let id = MD5(JSON.stringify(body)).toString() // CryptoJS.MD5(body.query).toString()
-      data = await idbKeyval.get(id, gqlStore)
-      if (!data) {
-        logDebug('Load response not found in cache.')
-        return null
-      }
-      // // Check cache max age.
-      // let cacheControl = request.headers.get('Cache-Control')
-      // let maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 3600
-      // if (Date.now() - data.timestamp > maxAge * 1000) {
-      //   logDebug('Cache expired. Load from API endpoint.')
-      //   return null
+  // listeners
+  {
+    self.addEventListener('install', event => {
+      logDebug('installed!', swVer)
+      // event.registerForeignFetch({
+      //   scopes: ['/'],
+      //   origins: ['*'] // or ['https://example.com']
+      // })
+    })
+    self.addEventListener('activate', event => {
+      logDebug('activated!', swVer)
+    })
+    self.addEventListener('fetch', async event => {
+      // logDebug('ready to handle fetches! request=', event.request.url)
+      // if (event.request.method === 'POST') {
+      //   const formData = await event.request.formData()
+      //   // event.respondWith(fetch(event.request))
+      //   logDebug('fetch post message!', swVer, event)
+      //   logDebug('SW formData = ', formData)
+      //   for (var value of formData.values()) {
+      //     logDebug('SW formData value = ', value);
+      //   }
+      //   logDebug('SW formData title = ', formData.get('title'))
+      //   logDebug('SW formData text = ', formData.get('text'))
+      //   logDebug('SW formData url = ', formData.get('url'))
+      //   logDebug('SW formData file = ', formData.get('file'))
+      //   logDebug('SW formData files = ', formData.get('files'))
+      //   // await self.clients.openWindow('/app/create/')
       // }
-      logDebug('Load response from cache.')
-      return new Response(JSON.stringify(data.response.body), data.response)
-    } catch (err) {
-      return null
-    }
+      // event.respondWith((async () => {
+      //   const formData = await event.request.formData()
+      //   logDebug('SW formData = ', formData)
+      //   logDebug('SW formData = ', formData.get('title'))
+      //   logDebug('SW formData = ', formData.get('text'))
+      //   logDebug('SW formData = ', formData.get('url'))
+      //   logDebug('SW formData = ', formData.get('files'))
+      // })())
+    })
+    self.addEventListener('updatefound', event => {
+      logDebug('ready to update!', swVer)
+      self.registration.showNotification('new version available')
+    })
+    self.addEventListener('error', function (e) {
+      logCritical(e)
+    })
+    self.addEventListener('message', function handler (event) {
+      logDebug('message!', event.data)
+      if (event.data) {
+        switch (event.data.type) {
+          case 'logInit':
+            logModulesBlackList = event.data.logModulesBlackList
+            logLevel = event.data.logLevel
+            logLevelSentry = event.data.logLevelSentry
+            try {
+              if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
+            } catch (err) {
+              logDebug('error on setConfig', err)
+            }
+            break
+          case 'skipWaiting':
+            self.skipWaiting()
+            break
+          case 'sendVersion':
+            self.clients.matchAll().then(all => all.map(client => client.postMessage(swVer)))
+            break
+          default:
+            logCritical('bad event.data.type', event.data.type)
+        }
+      } else {
+        logCritical('event.data is null')
+      }
+    })
   }
 }
 
@@ -145,18 +116,91 @@ if (useCache) {
     })
     // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/service_worker/index.js
     workbox.core.clientsClaim()
-
-    // порядок вызовов precacheAndRoute и registerRoute имеет значение
-    // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
     self.__precacheManifest = [].concat(self.__precacheManifest || [])
-    workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
+    // custom resolver for graphql POST requests
+    {
+      cacheGraphQl = async function (event) {
+        // todo use different strategies
+        // let tmpReq = event.request.clone()
+        // logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
+        // let promise = null
+        // if(event.request.method === 'POST')
+        let cachedResponse = await getCache(event.request.clone())
+        let fetchPromise = fetch(event.request.clone())
+          .then((response) => {
+            setCache(event.request.clone(), response.clone())
+            return response
+          })
+          .catch((err) => {
+            logCritical(err)
+          })
+        return cachedResponse ? Promise.resolve(cachedResponse) : fetchPromise
+      }
+
+      const serializeResponse = async (response) => {
+        let serializedHeaders = {}
+        for (let entry of response.headers.entries()) {
+          serializedHeaders[entry[0]] = entry[1]
+        }
+        let serialized = {
+          headers: serializedHeaders,
+          status: response.status,
+          statusText: response.statusText
+        }
+        serialized.body = await response.json()
+        return serialized
+      }
+
+      const setCache = async (request, response) => {
+        let body = await request.json()
+        // logDebug('body === ', body)
+        if (body.operationName.startsWith('sw_nocache_')) return
+        // if (!body.operationName.startsWith('sw_cache_')) return
+        let id = MD5(JSON.stringify(body)).toString()
+        // logDebug('MD5 === ', id)
+        // logDebug('request = ', request)
+        let entry = {
+          query: body.query,
+          response: await serializeResponse(response),
+          timestamp: Date.now()
+        }
+        idbKeyval.set(id, entry, gqlStore)
+      }
+
+      const getCache = async (request) => {
+        let data
+        try {
+          let body = await request.json()
+          let id = MD5(JSON.stringify(body)).toString() // CryptoJS.MD5(body.query).toString()
+          data = await idbKeyval.get(id, gqlStore)
+          if (!data) {
+            logDebug('Load response not found in cache.')
+            return null
+          }
+          // // Check cache max age.
+          // let cacheControl = request.headers.get('Cache-Control')
+          // let maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 3600
+          // if (Date.now() - data.timestamp > maxAge * 1000) {
+          //   logDebug('Cache expired. Load from API endpoint.')
+          //   return null
+          // }
+          logDebug('Load response from cache.')
+          return new Response(JSON.stringify(data.response.body), data.response)
+        } catch (err) {
+          return null
+        }
+      }
+    }
   }
 // routing
   {
-    // // This will trigger the importScripts() for workbox.strategies and its dependencies:
+    // порядок вызовов precacheAndRoute и registerRoute имеет значение
+    // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
+    workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
+    // This will trigger the importScripts() for workbox.strategies and its dependencies:
     const { strategies } = workbox
     workbox.routing.registerRoute(
-      /.*(?:googleapis|gstatic)\.com\/.*/,
+      /^http.*(?:googleapis|gstatic)\.com\/.*/,
       new workbox.strategies.StaleWhileRevalidate({
         cacheName: 'google',
         plugins: [
@@ -166,19 +210,24 @@ if (useCache) {
         ]
       })
     )
-    workbox.routing.registerRoute(
-      /^https:\/\/.*\.kalpagramma\.com\/?(?:menu|trends|create|workspace)?\/?$s/,
-      new workbox.strategies.StaleWhileRevalidate({
-        cacheName: 'origin',
-        plugins: [
-          new workbox.expiration.Plugin({
-            maxEntries: 500
-          })
-        ]
-      })
+    workbox.routing.registerRoute( // vue router ( /menu /create etc looks at index.html)
+      /\/\w+\/?$/,
+      async ({ url, event, params }) => {
+        logDebug('workbox.routing.registerRoute', url)
+        logDebug('workbox.routing.registerRoute getCacheKeyForURL=', workbox.precaching.getCacheKeyForURL('/index.html'))
+        if (event.request.method === 'POST') {
+          logDebug('redirect to share_target = ')
+          return Response.redirect('share_target', 303)
+        }
+        if (workbox.precaching.getCacheKeyForURL('/index.html')) {
+          return caches.match(workbox.precaching.getCacheKeyForURL('/index.html'))
+        } else {
+          return fetch('/index.html')
+        }
+      }
     )
-    workbox.routing.registerRoute(
-      /^https:\/\/storage\.yandexcloud\.net\/.*.jpg$/,
+    workbox.routing.registerRoute( // content images
+      /^http.*(yandexcloud|local_object_storage).+\.jpg$/,
       new workbox.strategies.CacheFirst({
         cacheName: 'content_img',
         plugins: [
@@ -188,24 +237,13 @@ if (useCache) {
         ]
       })
     )
-    workbox.routing.registerRoute(
-      /^https:\/\/.*\.kalpagramma\.com\/local_object_storage\/.*.jpg$/,
-      new workbox.strategies.CacheFirst({
-        cacheName: 'content_img',
-        plugins: [
-          new workbox.expiration.Plugin({
-            maxEntries: 2000
-          })
-        ]
-      })
-    )
-    workbox.routing.registerRoute(
-      /^https:\/\/storage\.yandexcloud\.net\/.*.mp4$/,
+    workbox.routing.registerRoute( // content video
+      /^http.*(yandexcloud|local_object_storage).+\.mp4$/,
       new workbox.strategies.CacheFirst({
         cacheName: 'content_video',
         plugins: [
           new workbox.expiration.Plugin({
-            maxEntries: 200,
+            maxEntries: 200
           }),
           // If we have the *entire* video in the cache,
           // then this plugin will properly honor the Range: header on incoming requests,
@@ -214,24 +252,35 @@ if (useCache) {
         ]
       })
     )
-    workbox.routing.registerRoute(
-      /^https:\/\/.*\.kalpagramma\.com\/local_object_storage\/.*.mp4$/,
-      new workbox.strategies.CacheFirst({
-        cacheName: 'content_video',
-        plugins: [
-          new workbox.expiration.Plugin({
-            maxEntries: 200,
-          }),
-          // If we have the *entire* video in the cache,
-          // then this plugin will properly honor the Range: header on incoming requests,
-          // and slice up the response body, giving back only what's asked for.
-          new workbox.rangeRequests.Plugin()
-        ]
-      })
-    )
-    workbox.routing.registerRoute(
-      /^https:\/\/.*\.kalpagramma\.com:?[0-9]*\/graphql.*/,
+    workbox.routing.registerRoute(// graphql
+      /^http.*\/graphql\/?$/,
       async ({ url, event, params }) => cacheGraphQl(event),
+      'POST'
+    )
+    workbox.routing.registerRoute( // share
+      /\/share_target\/?$/,
+      async ({ url, event, params }) => {
+        logDebug('share_target POST!!! request=', event.request)
+        const formData = await event.request.formData()
+        // event.respondWith(fetch(event.request))
+        logDebug('fetch post message!', swVer, event)
+        logDebug('SW formData = ', formData)
+        for (let value of formData.values()) {
+          logDebug('SW formData value = ', value)
+        }
+        logDebug('SW formData title = ', formData.get('title'))
+        logDebug('SW formData text = ', formData.get('text'))
+        logDebug('SW formData url = ', formData.get('url'))
+        logDebug('SW formData file = ', formData.get('file'))
+        logDebug('SW formData files = ', formData.get('files'))
+
+        logDebug('send response = ', formData)
+        // await self.clients.openWindow('/create/')
+        // return Promise.resolve(new Response(formData, {
+        //   headers: { 'Content-Type': 'application/json', status: 200 }
+        // }))
+        return Response.redirect('share_target', 303)
+      },
       'POST'
     )
 
@@ -261,59 +310,6 @@ if (useCache) {
           // If we don't have a fallback, just return an error response.
           return Response.error()
       }
-    })
-  }
-// listeners
-  {
-    self.addEventListener('install', event => {
-      logDebug('installed!', swVer)
-      // event.registerForeignFetch({
-      //   scopes: ['/'],
-      //   origins: ['*'] // or ['https://example.com']
-      // })
-    })
-    self.addEventListener('activate', event => {
-      logDebug('activated!', swVer)
-    })
-    self.addEventListener('fetch', async event => {
-      logDebug('ready to handle fetches!', event.request.url)
-      // if (event.request.url.match(/^https:\/\/.*\.kalpagramma\.com:?[0-9]*\/graphql.*/)) {
-      //   logDebug('gql query')
-      //   let tmpReq = event.request.clone()
-      //   logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
-      //   event.respondWith(cacheGraphQl(event))
-      // }
-
-      // if (event.request.method === 'POST') {
-      //   const formData = await event.request.formData()
-      //   // event.respondWith(fetch(event.request))
-      //   logDebug('fetch post message!', swVer, event)
-      //   logDebug('SW formData = ', formData)
-      //   for (var value of formData.values()) {
-      //     logDebug('SW formData value = ', value);
-      //   }
-      //   logDebug('SW formData title = ', formData.get('title'))
-      //   logDebug('SW formData text = ', formData.get('text'))
-      //   logDebug('SW formData url = ', formData.get('url'))
-      //   logDebug('SW formData file = ', formData.get('file'))
-      //   logDebug('SW formData files = ', formData.get('files'))
-      //   await self.clients.openWindow('/app/create/')
-      // }
-      // event.respondWith((async () => {
-      //   const formData = await event.request.formData()
-      //   logDebug('SW formData = ', formData)
-      //   logDebug('SW formData = ', formData.get('title'))
-      //   logDebug('SW formData = ', formData.get('text'))
-      //   logDebug('SW formData = ', formData.get('url'))
-      //   logDebug('SW formData = ', formData.get('files'))
-      // })())
-    })
-    self.addEventListener('updatefound', event => {
-      logDebug('ready to update!', swVer)
-      self.registration.showNotification('new version available')
-    })
-    self.addEventListener('error', function (e) {
-      logCritical(e)
     })
   }
 }

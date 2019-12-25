@@ -39,6 +39,7 @@ export const logout = async (context, token) => {
   } catch (err) {
     logE('error on logout! err=', err)
   } finally {
+    context.commit('objects/deleteUserSession', token, { root: true })
     let currentToken = localStorage.getItem('ktoken').split('::')[0]
     if (!token || token === localStorage.getItem('ktoken') || token === currentToken) {
       localStorage.removeItem('ktoken')
@@ -48,7 +49,6 @@ export const logout = async (context, token) => {
       await update()
     }
   }
-  context.commit('objects/deleteUserSession', token, { root: true })
   logD('@logout done')
 }
 export const loginEmail = async (context, email) => {

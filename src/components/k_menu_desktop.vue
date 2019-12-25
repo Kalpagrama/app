@@ -96,11 +96,6 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
       }
     },
     computed: {
-      mytoken () {
-        let str = localStorage.getItem('ktoken')
-        let newstr = str.split('::')[0]
-        return newstr
-      },
       logoutDialogOptions () {
         return {
           header: false,
@@ -147,7 +142,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         this.$logD('logoutDialogAction', action)
         switch (action) {
           case 'confirm': {
-            this.logout()
+            await this.logout(localStorage.getItem('ktoken'))
           }
         }
       },

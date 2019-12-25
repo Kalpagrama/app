@@ -283,8 +283,8 @@ async function showNotification (title, body) {
     vibrate: [150, 200, 150, 200, 150, 100, 150, 100],
     tag: 'tag: sample'
   }
-  let notification = new Notification('direct:' + title, options)
-  logD('notification=', notification)
+  // let notification = new Notification('direct:' + title, options)
+  // logD('notification=', notifications)
 
   if (registration) {
     // todo
