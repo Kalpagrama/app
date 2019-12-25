@@ -98,8 +98,8 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
       span Pan to vote
     div( :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
-      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{node.rate}}
-      span.text-bold.full-width.text-center {{node.rateUser}}
+      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(node.rate)}}
+      span.text-bold.full-width.text-center {{voteHuman(node.rateUser)}}
     //- user name
     div(
       @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
@@ -221,6 +221,11 @@ export default {
       this.$log('pause')
       if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
       else this.$refs.fragmentFirst.pause()
+    },
+    voteHuman (vote) {
+      let v = ((vote * 100) / 20).toFixed(1)
+      let arr = v.split('.')
+      return arr[0] + ',' + arr[1]
     },
     async votePan (e) {
       // this.$log('votePan', e)
