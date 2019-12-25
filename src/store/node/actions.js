@@ -181,7 +181,6 @@ export const sphereSpheres = async (context, oid) => {
 
 export const sphereNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('sphereNodes start')
-  assert.ok(oid && pagination && filter && sortStrategy)
   let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       ${fragments.objectShortWithMetaFragment}
@@ -202,7 +201,6 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
 
 export const nodeNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('nodeNodes start')
-  assert.ok(oid && pagination && filter && sortStrategy)
   let { data: { nodeNodes: { items, count, totalCount, nextPageToken } } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       ${fragments.objectShortWithMetaFragment}

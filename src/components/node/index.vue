@@ -7,6 +7,24 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       minHeight: previewHeight+'px', borderRadius: '10px', overflow: 'hidden',
       height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`
     ).row.full-width.items-start.bg-black
+    //- vote
+    div(
+      v-if="votePanning"
+      :style=`{
+        position: 'absolute', zIndex: 1000, paddingBottom: '30px',
+        borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}`
+        ).row.fit.items-end.content-end.justify-center
+      //- span(
+      //-   :style=`{padding: 0, margin: 0, fontSize: 20*(voteValue/10) < 50 ? 50+'px' : 20*(voteValue/10)+'px',
+      //-     display: 'table-cell',
+      //-     verticalAlign: 'bottom'}`
+      //-   ).text-center.text-bold.text-white.bg {{ voteValue }}
+      div(
+        :style=`{fontSize: 10*(voteValue/10) < 50 ? 50+'px' : 10*(voteValue/10)+'px'}`
+      ).row.full-width.justify-center.items-end.text-bold.text-white {{ voteText }}
+      .row.full-width.justify-center
+        span(:style=`{fontSize: '50px'}`
+          ).text-bold.text-white.text-center {{ voteLabel }}
     nc-fragment(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
@@ -122,6 +140,8 @@ export default {
       nodeFull: null,
       voteLeft: 0,
       votePanning: false,
+      voteValue: 0,
+      voteLabels: {},
       fPosition: 'absolute',
       fMarginTop: 0,
       fMini: true,
@@ -137,6 +157,26 @@ export default {
       stylesMaxi: {right: 0, bottom: 0, maxWidth: 100, maxHeight: 100},
       styles: [{right: 0, bottom: 0, maxWidth: 100, opacity: 1}, {right: 20, bottom: 20, maxWidth: 20, opacity: 1}],
       fragmentSecondPlaying: false
+    }
+  },
+  computed: {
+    voteText () {
+      // let v = this.voteValue
+      // if (v > 0 && < 20)
+      // return Math.round(this.voteValue / 20)
+      // return (this.voteValue / 20).toFixed(1)
+      let v = (this.voteValue / 20).toFixed(1)
+      let arr = v.split('.')
+      return arr[0] + ',' + arr[1]
+    },
+    voteLabel () {
+      let v = this.voteValue
+      if (v >= 0 && v < 20) return 'That sucks'
+      else if (v >= 20 && v < 40) return 'Nah'
+      else if (v >= 40 && v < 60) return 'So so'
+      else if (v >= 60 && v < 80) return 'High'
+      else if (v >= 80 && v < 100) return 'Soo high'
+      else return 'No way'
     }
   },
   watch: {
@@ -207,6 +247,7 @@ export default {
       if (index === 0) {
         this.previewHeight = height
         this.$emit('previewHeight', height)
+        // this.$emit('scrollTop', this.$el.scrollHeight)
       }
     },
     fragmentEnded (index) {
@@ -280,11 +321,14 @@ export default {
       let to = this.voteLeft + e.delta.x
       if (to > 0 && to <= this.previewWidth - 80) {
         this.voteLeft += e.delta.x
+        this.voteValue = Math.round((this.voteLeft / this.previewWidth) * 100)
       }
       if (e.isFirst) {
+        this.$log('votePan FIRST')
         this.votePanning = true
       }
       if (e.isFinal) {
+        this.$log('votePan FINAL')
         this.votePanning = false
         // this.opened = !this.opened
         this.$tween.to(this, 0.4, {voteLeft: 0})
