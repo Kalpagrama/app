@@ -241,16 +241,16 @@ export default {
 
     // TODO
     // данные из меню поделиться в приложение
-    {
-      let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
-      let shareUrl = shareData.text || shareData.url || shareData.title
-      // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
-      if (shareUrl) {
-        // todo использовать как фрагмент
-      } else if (shareData.images.length || shareData.videos.length){
-        // todo использовать как фрагменты
-      }
-    }
+    // {
+    //   let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
+    //   let shareUrl = shareData.text || shareData.url || shareData.title
+    //   // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
+    //   if (shareUrl) {
+    //     // todo использовать как фрагмент
+    //   } else if (shareData.images.length || shareData.videos.length){
+    //     // todo использовать как фрагменты
+    //   }
+    // }
 
     this.$log('wsItem', wsItem)
     if (nodeLocalStorage) {
