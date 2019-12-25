@@ -62,7 +62,7 @@ export const wsNodeSave = async (context, node) => {
     assert.ok(node.fragments.length >= 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
     for (let fr of node.fragments) {
-      if (fr === null) return
+      if (fr === null) continue
       assert.ok(fr.content)
       assert.ok(fr.cuts.length >= 0)
       assert.ok(fr.scale > 0)
@@ -85,9 +85,10 @@ export const wsNodeSave = async (context, node) => {
   nodeInput.spheres = node.spheres.map(s => {
     return {name: s.name}
   })
-  nodeInput.fragments = node.fragments.map(f => {
+  nodeInput.fragments = []
+  node.fragments.map(f => {
     if (f !== null) {
-      return {
+      nodeInput.fragments.push({
         oid: f.content.oid,
         name: f.name,
         thumbUrl: f.thumbUrl,
@@ -107,7 +108,7 @@ export const wsNodeSave = async (context, node) => {
             style: c.style
           }
         })
-      }
+      })
     }
   })
 
