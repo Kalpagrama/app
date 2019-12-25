@@ -4,7 +4,8 @@
 </template>
 
 <script>
-export default {
+  import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
+  export default {
   name: 'shareLayout',
   data () {
     return {
@@ -20,8 +21,11 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     this.$logD('mounted')
+    const swShareStore = new Store('sw-share', 'request-formData')
+      let formData = await get('formData', swShareStore)
+    this.$logD('formData=', formData)
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')

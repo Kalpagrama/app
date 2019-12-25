@@ -9,7 +9,7 @@ const routes = [
       { name: 'home', path: '', component: () => import('pages/app/home') },
       { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('pages/app/trends') },
       { name: 'create', path: 'create/:page?', component: () => import('components/node_composer') },
-      { name: 'share', path: 'share_target/:page?', component: () => import('components/node_composer') },
+      { name: 'share', path: 'share_target/:page?', component: () => import('layouts/share_layout.vue') },
       { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
       { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
       // rest

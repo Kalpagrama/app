@@ -1,7 +1,7 @@
-const swVer = 4
-const useCache = true
+const swVer = 9
+const useCache = false
 
-let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, cacheGraphQl
+let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, swShareStore, cacheGraphQl
 /* global idbKeyval, MD5 */
 importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
 importScripts('/statics/scripts/md5.js')
@@ -30,8 +30,10 @@ importScripts('/statics/scripts/md5.js')
 // common init sw
 {
   logDebug('swVer=', swVer)
-  // swStore = new idbKeyval.Store('sw-cache-common', 'common-data')
+  logDebug('init idb')
+  swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
   gqlStore = new idbKeyval.Store('sw-cache-gql', 'graphql-responses')
+  logDebug('init idb ok')
   // listeners
   {
     self.addEventListener('install', event => {
@@ -45,7 +47,7 @@ importScripts('/statics/scripts/md5.js')
       logDebug('activated!', swVer)
     })
     self.addEventListener('fetch', async event => {
-      // logDebug('ready to handle fetches! request=', event.request.url)
+      logDebug('ready to handle fetches! request=', event.request)
       // if (event.request.method === 'POST') {
       //   const formData = await event.request.formData()
       //   // event.respondWith(fetch(event.request))
@@ -211,17 +213,35 @@ if (useCache) {
       })
     )
     workbox.routing.registerRoute( // vue router ( /menu /create etc looks at index.html)
-      /\/\w+\/?$/,
+      /^http.*\/\w+\/?$/,
       async ({ url, event, params }) => {
-        logDebug('workbox.routing.registerRoute', url)
-        logDebug('workbox.routing.registerRoute getCacheKeyForURL=', workbox.precaching.getCacheKeyForURL('/index.html'))
-        if (event.request.method === 'POST') {
-          logDebug('redirect to share_target = ')
-          return Response.redirect('share_target', 303)
+        logDebug('workbox.routing.registerRoute 1', url)
+        logDebug('workbox.routing.registerRoute 2', url)
+        logDebug('workbox.routing.registerRoute 3 getCacheKeyForURL=', workbox.precaching.getCacheKeyForURL('/index.html'))
+        // if (event.request.method === 'POST') {
+        //   logDebug('redirect to share_target = ')
+        //   return Response.redirect('share_target', 303)
+        // }
+        idbKeyval.set(url.pathname, url, swShareStore)
+        if (/*event.request.method === 'POST' && */url.pathname.includes('share_target')) {
+          //if (contentType.includes('form'))
+          logDebug('workbox.routing.registerRoute 4 share_target')
+          try {
+            let formData = await event.request.formData()
+            formData = formData || {}
+            logDebug('save formData to idb', formData)
+            idbKeyval.set('formData', formData, swShareStore)
+          } catch (err){
+            logCritical('share_target err', err)
+          }
         }
+        throw new Error('asdasdasdasd')
+
         if (workbox.precaching.getCacheKeyForURL('/index.html')) {
+          logDebug('workbox.routing.registerRoute returm from cache', url)
           return caches.match(workbox.precaching.getCacheKeyForURL('/index.html'))
         } else {
+          logDebug('workbox.routing.registerRoute returm from net', url)
           return fetch('/index.html')
         }
       }
@@ -257,32 +277,32 @@ if (useCache) {
       async ({ url, event, params }) => cacheGraphQl(event),
       'POST'
     )
-    workbox.routing.registerRoute( // share
-      /\/share_target\/?$/,
-      async ({ url, event, params }) => {
-        logDebug('share_target POST!!! request=', event.request)
-        const formData = await event.request.formData()
-        // event.respondWith(fetch(event.request))
-        logDebug('fetch post message!', swVer, event)
-        logDebug('SW formData = ', formData)
-        for (let value of formData.values()) {
-          logDebug('SW formData value = ', value)
-        }
-        logDebug('SW formData title = ', formData.get('title'))
-        logDebug('SW formData text = ', formData.get('text'))
-        logDebug('SW formData url = ', formData.get('url'))
-        logDebug('SW formData file = ', formData.get('file'))
-        logDebug('SW formData files = ', formData.get('files'))
-
-        logDebug('send response = ', formData)
-        // await self.clients.openWindow('/create/')
-        // return Promise.resolve(new Response(formData, {
-        //   headers: { 'Content-Type': 'application/json', status: 200 }
-        // }))
-        return Response.redirect('share_target', 303)
-      },
-      'POST'
-    )
+    // workbox.routing.registerRoute( // share
+    //   /\/share_target\/?$/,
+    //   async ({ url, event, params }) => {
+    //     logDebug('share_target POST!!! request=', event.request)
+    //     const formData = await event.request.formData()
+    //     // event.respondWith(fetch(event.request))
+    //     logDebug('fetch post message!', swVer, event)
+    //     logDebug('SW formData = ', formData)
+    //     for (let value of formData.values()) {
+    //       logDebug('SW formData value = ', value)
+    //     }
+    //     logDebug('SW formData title = ', formData.get('title'))
+    //     logDebug('SW formData text = ', formData.get('text'))
+    //     logDebug('SW formData url = ', formData.get('url'))
+    //     logDebug('SW formData file = ', formData.get('file'))
+    //     logDebug('SW formData files = ', formData.get('files'))
+    //
+    //     logDebug('send response = ', formData)
+    //     // await self.clients.openWindow('/create/')
+    //     // return Promise.resolve(new Response(formData, {
+    //     //   headers: { 'Content-Type': 'application/json', status: 200 }
+    //     // }))
+    //     return Response.redirect('share_target', 303)
+    //   },
+    //   'POST'
+    // )
 
     // This "catch" handler is triggered when any of the other routes fail to
     // generate a response.

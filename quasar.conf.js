@@ -112,10 +112,10 @@ module.exports = function (ctx) {
         //   credentials: true
         // }))
       },
-      setup(app) {
+      setup (app) {
         app.post('*', (req, res) => {
-          res.redirect(req.originalUrl);
-        });
+          res.redirect(req.originalUrl)
+        })
       },
       // headers: {
       //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
@@ -133,7 +133,7 @@ module.exports = function (ctx) {
       workboxPluginMode: 'InjectManifest',
       workboxOptions: {
         // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
-        swSrc: 'src/system/service_worker/service-worker.js',
+        swSrc: 'src/system/service_worker/service-worker.js'
         // importWorkboxFrom: 'local'
       },
       manifest: {
