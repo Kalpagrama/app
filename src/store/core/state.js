@@ -4,6 +4,7 @@ export default {
   name: 'Kalpagramma',
   version: '0.0.36',
   online: true, // если сеть недоступна - присваивается false
+  shareData: null, // данные от меню "поделиться в приложение"
   webPushToken: null,
   webPushTokenDraft: null,
   newVersionAvailable: false,
