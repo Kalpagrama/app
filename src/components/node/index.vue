@@ -7,6 +7,24 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       minHeight: previewHeight+'px', borderRadius: '10px', overflow: 'hidden',
       height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`
     ).row.full-width.items-start.bg-black
+    //- vote
+    div(
+      v-if="votePanning"
+      :style=`{
+        position: 'absolute', zIndex: 1000, paddingBottom: '30px',
+        borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}`
+        ).row.fit.items-end.content-end.justify-center
+      //- span(
+      //-   :style=`{padding: 0, margin: 0, fontSize: 20*(voteValue/10) < 50 ? 50+'px' : 20*(voteValue/10)+'px',
+      //-     display: 'table-cell',
+      //-     verticalAlign: 'bottom'}`
+      //-   ).text-center.text-bold.text-white.bg {{ voteValue }}
+      div(
+        :style=`{fontSize: 10*(voteValue/10) < 50 ? 50+'px' : 10*(voteValue/10)+'px'}`
+      ).row.full-width.justify-center.items-end.text-bold.text-white {{ voteText }}
+      .row.full-width.justify-center
+        span(:style=`{fontSize: '50px'}`
+          ).text-bold.text-white.text-center {{ voteLabel }}
     nc-fragment(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
@@ -69,8 +87,8 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
         height: '60px', width: '90px'}`
         ).row.items-center.justify-center
       q-btn(
-        :loading="nodeVoting" @click="nodeVote()"
-        round push :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
+        round push color="white" :loading="nodeVoting" @click="nodeVote()"
+        :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
         ).row.items-center.justify-center.bg-green.cursor-pointer
         q-icon(name="blur_on" color="white" size="30px")
     //- vote tint and helper text
@@ -79,8 +97,8 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
       span Pan to vote
     div( :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
-      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{node.rate}}
-      span.text-bold.full-width.text-center {{node.rateUser}}
+      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(node.rate)}}
+      span.text-bold.full-width.text-center {{voteHuman(node.rateUser)}}
     //- user name
     div(
       @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
@@ -121,6 +139,8 @@ export default {
       nodeFull: null,
       voteLeft: 0,
       votePanning: false,
+      voteValue: 0,
+      voteLabels: {},
       fPosition: 'absolute',
       fMarginTop: 0,
       fMini: true,
@@ -136,6 +156,26 @@ export default {
       stylesMaxi: {right: 0, bottom: 0, maxWidth: 100, maxHeight: 100},
       styles: [{right: 0, bottom: 0, maxWidth: 100, opacity: 1}, {right: 20, bottom: 20, maxWidth: 20, opacity: 1}],
       fragmentSecondPlaying: false
+    }
+  },
+  computed: {
+    voteText () {
+      // let v = this.voteValue
+      // if (v > 0 && < 20)
+      // return Math.round(this.voteValue / 20)
+      // return (this.voteValue / 20).toFixed(1)
+      let v = (this.voteValue / 20).toFixed(1)
+      let arr = v.split('.')
+      return arr[0] + ',' + arr[1]
+    },
+    voteLabel () {
+      let v = this.voteValue
+      if (v >= 0 && v < 20) return 'That sucks'
+      else if (v >= 20 && v < 40) return 'Nah'
+      else if (v >= 40 && v < 60) return 'So so'
+      else if (v >= 60 && v < 80) return 'High'
+      else if (v >= 80 && v < 100) return 'Soo high'
+      else return 'No way'
     }
   },
   watch: {
@@ -177,17 +217,27 @@ export default {
       if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
       else this.$refs.fragmentFirst.pause()
     },
-    async nodeVote () {
-      try {
-        this.$log('nodeVote start')
-        this.nodeVoting = true
-        await this.$wait(500)
-        let vote = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: 0.5})
-        this.$log('nodeVote done', vote)
-        this.nodeVoting = false
-      } catch (e) {
-        this.$log('nodeVote error', e)
-        this.nodeVoting = false
+    voteHuman (vote) {
+      let v = ((vote * 100) / 20).toFixed(1)
+      let arr = v.split('.')
+      return arr[0] + ',' + arr[1]
+    },
+    async votePan (e) {
+      // this.$log('votePan', e)
+      let to = this.voteLeft + e.delta.x
+      if (to > 0 && to <= this.previewWidth - 80) {
+        this.voteLeft += e.delta.x
+        this.voteValue = Math.round((this.voteLeft / this.previewWidth) * 100)
+      }
+      if (e.isFirst) {
+        this.$log('votePan FIRST')
+        this.votePanning = true
+      }
+      if (e.isFinal) {
+        this.$log('votePan FINAL', this.voteValue / 100)
+        await this.nodeVote(this.voteValue / 100)
+        this.$tween.to(this, 0.4, {voteLeft: 0})
+        this.votePanning = false
       }
     },
     fragmentWidth (index, width) {
@@ -202,6 +252,8 @@ export default {
       if (index === 0) {
         this.previewHeight = height
         this.$emit('previewHeight', height)
+        // TODO: emit scrollTop event of node in scroll wrapper
+        // this.$emit('scrollTop', this.$el.scrollHeight)
       }
     },
     fragmentEnded (index) {
@@ -211,21 +263,6 @@ export default {
     },
     async fragmentChange (index) {
       this.$log('fragmentChange', index)
-      // this.fragmentMini = index === 0 ? 1 : 0
-      // this.$refs.fragmentSecond.play()
-      // if (this.fragmentSecondPlaying) {
-      //   this.fragmentSecondPlaying = false
-      //   this.$refs.fragmentSecond.pause()
-      //   this.$tween.to(this.styles[1], 0.9, {maxWidth: 20, right: 20, bottom: 20})
-      //   this.fragmentMini = 1
-      // } else {
-      //   this.fragmentSecondPlaying = true
-      //   this.$refs.fragmentSecond.play()
-      //   this.$tween.to(this.styles[1], 0.9, {maxWidth: 80, right: 0, bottom: 0})
-      //   this.fragmentMini = -1
-      // }
-      // ***
-      // this.fragmentMini = index === 0 ? 1 : 0
       this.fragmentMiniStart = index === 0 ? 1 : 0
       this.$tween.to(
         this.styles[index],
@@ -235,13 +272,6 @@ export default {
           right: 0,
           bottom: 0,
           onComplete: () => {
-            // if (index === 0) {
-            //   this.$refs.fragmentFirst.play()
-            //   this.$refs.fragmentSecond.pause()
-            // } else {
-            //   this.$refs.fragmentFirst.pause()
-            //   this.$refs.fragmentSecond.play()
-            // }
             this.fragmentMini = index === 0 ? 1 : 0
             this.fragmentMiniStart = index === 0 ? 1 : 0
             this.styles[index === 0 ? 1 : 0].opacity = 0
@@ -259,9 +289,6 @@ export default {
           }
         }
       )
-      // this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.65, {maxWidth: 25, right: 16, bottom: 32, opacity: 1})
-      // await this.$wait(600)
-      // this.fragmentMiniStart = index === 0 ? 1 : 0
       if (index === 0) {
         this.$refs.fragmentFirst.play()
         this.$refs.fragmentSecond.pause()
@@ -270,28 +297,23 @@ export default {
         this.$refs.fragmentSecond.play()
       }
     },
-    votePan (e) {
-      // this.$log('votePan', e)
-      let to = this.voteLeft + e.delta.x
-      if (to > 0 && to <= this.previewWidth - 80) {
-        this.voteLeft += e.delta.x
-      }
-      if (e.isFirst) {
-        this.votePanning = true
-      }
-      if (e.isFinal) {
-        this.votePanning = false
-        // this.opened = !this.opened
-        this.$tween.to(this, 0.4, {voteLeft: 0})
-      }
-    },
-    open () {
-      this.$log('open')
-    },
     nodeAction () {
       this.$log('nodeAction')
       this.$store.commit('node/stateSet', ['nodeOptionsPayload', JSON.parse(JSON.stringify(this.nodeFull))])
       this.$store.commit('node/stateSet', ['nodeOptionsDialogOpened', true])
+    },
+    async nodeVote (rate = 0.5) {
+      try {
+        this.$log('nodeVote start')
+        this.nodeVoting = true
+        await this.$wait(1000)
+        let vote = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: rate})
+        this.$log('nodeVote done', vote)
+        this.nodeVoting = false
+      } catch (e) {
+        this.$log('nodeVote error', e)
+        this.nodeVoting = false
+      }
     },
     async nodeLoad (oid) {
       // this.$log('nodeLoad start', this.index, this.node.oid)

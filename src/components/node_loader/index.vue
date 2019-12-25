@@ -49,6 +49,8 @@ export default {
     async nodesLoad (variables, append = false) {
       this.$logD('nodesLoad2 start', variables)
       let { oid, pagination, filter, sortStrategy } = variables
+      pagination = pagination || {pageSize: 100, pageToken: null}
+      sortStrategy = sortStrategy || 'HOT'
       let res
       switch (this.type){
         case 'sphereNodes' :
