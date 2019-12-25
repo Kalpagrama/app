@@ -77,7 +77,7 @@ export const wsNodeSave = async (context, node) => {
       }
     }
   }
-
+  logD('wsNodeSave check OK')
   let nodeInput = {}
   nodeInput.layout = node.layout
   nodeInput.name = node.name

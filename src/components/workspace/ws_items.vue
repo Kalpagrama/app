@@ -18,41 +18,14 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
             span {{ $t(n.item.name) }}
   template(v-slot:fragments)
     .column.fit
+      k-dialog-bottom(ref="itemActionDialog" :options="itemActionOptions" @action="itemAction")
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
         span {{$t('Total')}}: {{ fragments.length }}
         .col
         q-btn(round flat icon="search")
       .col.full-width.scroll.kscroll
         .row.full-width.items-start.content-start.q-px-sm
-          div(
-            v-for="(f, fi) in fragments" :key="fi" @click="itemClick(f)"
-            :style=`{position: 'relative'}`
-            :class=`{'q-pl-xs': ci % 2 !== 0, 'q-pr-xs': ci % 2 === 0}`
-            ).col-6.q-mb-sm
-            div(:style=`{borderRadius: '10px', oveflow: 'hidden'}`).row.full-width.items-center.bg-black
-              img(
-                :src="f.item.content.thumbUrl" draggable="false"
-                :style=`{
-                  width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
-                  borderRadius: '10px'}`)
-              div(
-                v-if="f.item.cuts"
-                :style=`{position: 'absolute', top: '8px', left: '8px'}`
-                ).row.full-width
-                div(v-for="(c, ci) in f.item.cuts" :key="ci"
-                  ).q-mr-xs
-                  div(:style=`{background: c.color, borderRadius: '4px'}`).q-px-sm
-                    small.text-white {{ $time(c.points[0].x)}}-{{$time(c.points[1].x) }}
-              //- small(:style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px'}`).text-white {{ f.type }}
-              q-btn(
-                round dense flat color="white" icon="more_vert" @click="itemDelete(f)"
-                :style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
-              small(
-                v-if="f.item.name"
-                :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
-                ).q-pa-sm.text-white {{ f.item.name | cut(20) }}
-              small(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
-                ).q-pa-sm.text-white {{ f.item.content.name | cut(20) }}
+          ws-item-fragment(v-for="(i, ii) in fragments" :key="ii" :index="ii" :item="i" @action="item = i, $refs.itemActionDialog.show()")
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -104,8 +77,11 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
 </template>
 
 <script>
+import wsItemFragment from './ws_item_fragment'
+
 export default {
   name: 'wsItems',
+  components: {wsItemFragment},
   props: ['types', 'height'],
   data () {
     return {
@@ -115,10 +91,23 @@ export default {
         {id: 'fragments', name: 'Fragments'},
         {id: 'contents', name: 'Contents'},
         {id: 'nodes', name: 'Nodes'}
-      ]
+      ],
+      item: null
     }
   },
   computed: {
+    itemActionOptions () {
+      return {
+        header: this.item ? true : false,
+        headerName: this.item ? this.item.item.name : '',
+        confirm: true,
+        confirmName: 'Edit',
+        actions: {
+          preview: {name: 'Preiview'},
+          delete: {name: 'Delete', color: 'red'}
+        }
+      }
+    },
     collsFiltered () {
       if (this.types) {
         return this.colls.filter((c, ci) => {
@@ -201,31 +190,34 @@ export default {
     }
   },
   methods: {
-    itemClick (val) {
-      this.$log('itemClick', val)
-      // this.$emit('itemClick', JSON.parse(JSON.stringify(val)))
-      this.$emit('itemClick', val)
-    },
-    itemDelete (val) {
-      this.$log('itemDelete', val)
-      switch (val.type) {
-        case 'note': {
-          // possible...
-          break
-        }
+    itemAction (action) {
+      this.$log('itemAction', this.item.type, action)
+      switch (this.item.type) {
         case 'fragment': {
-          // possible but delete cuts...
-          break
-        }
-        case 'content': {
-          // how?? impossible...
-          break
-        }
-        case 'node': {
-          // call delete action
+          switch (action) {
+            case 'confirm': {
+              this.$emit('itemClick', this.item)
+              break
+            }
+            case 'preview': {
+              this.$q.notify('PREVIEW')
+              break
+            }
+            case 'delete': {
+              this.fragmentDelete(this.item)
+              break
+            }
+          }
           break
         }
       }
+    },
+    async fragmentDelete (item) {
+      this.$log('fragmentDelete', item)
+      let node = item.node
+      node.fragments[item.fragmentIndex] = null
+      let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
+      this.$log('res', res)
     }
   },
   mounted () {
