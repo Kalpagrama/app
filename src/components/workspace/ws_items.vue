@@ -22,9 +22,9 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       q-dialog(ref="fragmentEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
         div(@click.self="$refs.fragmentEditorDialog.hide()").row.full-width.justify-center.items-end
           ws-fragment-editor(
-            :item="item"
+            :item="item" @item="item = {item: $event}"
             :style=`{
-              maxWidth: $store.state.ui.pageMaxWidth+'px',
+              maxWidth: $store.state.ui.pageMaxWidth-100+'px',
               maxHeight: $q.screen.height-60+'px',
               borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
