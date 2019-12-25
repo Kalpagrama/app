@@ -39,7 +39,7 @@ div(
     q-btn(
       v-if="ctx === 'inEditor' && !inExplorer"
       round flat color="red" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
-      :style=`{position: 'absolute', zIndex: 11000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(255,255,255,0.15)'}`).shadow-5
+      :style=`{position: 'absolute', zIndex: 11000, right: '16px', top: 'calc(50% - 20px)', background: 'rgba(255,255,255,0.15)'}`).shadow-5
     //- edit
     q-btn(
       v-if="ctx === 'inEditor' && !inExplorer"

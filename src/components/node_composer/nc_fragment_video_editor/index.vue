@@ -60,6 +60,13 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
         :class=`{'bg-grey-10': ci !== cutIndex, 'bg-grey-5': ci === cutIndex}`
         ).row.full-width.q-mb-sm
         //- cut wrapper
+        //- cut name ROW
+        div(
+          v-if="c.name && c.name.length > 0"
+          :style=`{position: 'relative', height: '40px'}`
+          ).row.full-width.items-center.q-px-md
+          span.text-white.text-bold {{ c.name }}
+        //- cut body
         div(
           :style=`{position: 'relative', height: '50px'}`
           ).row.full-width
@@ -149,12 +156,12 @@ export default {
     },
     cutDialogOptions () {
       let options = {
-        header: false,
+        header: this.cut ? this.cut.name.length > 0 : false,
         headerName: this.cut ? this.cut.name : '',
         confirm: true,
         confirmName: 'Play',
         actions: {
-          setName: {name: 'Set name'},
+          setName: {name: 'Set cut name'},
           down: {name: 'Down'},
           up: {name: 'Up'},
           delete: {name: 'Delete', color: 'red'},
@@ -245,6 +252,7 @@ export default {
         }
         case 'setName': {
           // TODO: open cut namedialog
+          this.cutNameDialogOpened = true
           break
         }
         case 'up': {
@@ -260,7 +268,7 @@ export default {
           break
         }
       }
-      this.cutIndex = -1
+      // this.cutIndex = -1
     },
     cutNameClick (c, ci) {
       this.$log('cutNameClick', c, ci)

@@ -25,13 +25,13 @@ div(:style=`{position: 'relative'}`)
     //- fragment name
     small(
       v-if="previewLoaded && item.item.name"
-      :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
-      ).q-pa-sm.text-white {{ item.item.name | cut(20) }}
+      :style=`{position: 'absolute', zIndex: 100, bottom: '36px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
+      ).q-px-sm.q-py-xs.text-white {{ item.item.name | cut(20) }}
     //- framgent content name
     small(
       v-if="previewLoaded"
       :style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
-      ).q-pa-sm.text-white {{ item.item.content.name | cut(20) }}
+      ).q-px-sm.q-py-xs.text-white {{ item.item.content.name | cut(20) }}
 </template>
 
 <script>

@@ -26,7 +26,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   //- content
   div(
-    v-if="!mini && visible" @click="$router.push('/content/' + fragment.content.oid)"
+    v-if="!mini && visible && ctx !== 'inEditor'" @click="$router.push('/content/' + fragment.content.oid)"
     :style=`{
       position: 'absolute', zIndex: 103, left: '8px', top: '8px', height: '42px',
       borderRadius: '10px', overflow: 'hidden',
