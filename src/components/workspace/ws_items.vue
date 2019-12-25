@@ -25,7 +25,10 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
         q-btn(round flat icon="search")
       .col.full-width.scroll.kscroll
         .row.full-width.items-start.content-start.q-px-sm
-          ws-item-fragment(v-for="(i, ii) in fragments" :key="ii" :index="ii" :item="i" @action="item = i, $refs.itemActionDialog.show()")
+          //- v-if="fragmentToDelete !== ii"
+          ws-item-fragment(
+            v-for="(i, ii) in fragments" :key="i.node.oid"
+            :index="ii" :item="i" @action="item = i, itemIndex = ii, $refs.itemActionDialog.show()")
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -92,7 +95,9 @@ export default {
         {id: 'contents', name: 'Contents'},
         {id: 'nodes', name: 'Nodes'}
       ],
-      item: null
+      item: null,
+      itemIndex: -1,
+      fragmentToDelete: -1
     }
   },
   computed: {
@@ -216,7 +221,9 @@ export default {
       this.$log('fragmentDelete', item)
       let node = item.node
       node.fragments[item.fragmentIndex] = null
+      // this.fragmentToDelete = this.itemIndex
       let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
+      // this.fragmentToDelete = -1
       this.$log('res', res)
     }
   },
