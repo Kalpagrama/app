@@ -148,18 +148,21 @@ export default {
       return this.fragment.cuts
     },
     cutDialogOptions () {
-      return {
+      let options = {
         header: false,
-        headerName: '',
+        headerName: this.cut ? this.cut.name : '',
+        confirm: true,
+        confirmName: 'Play',
         actions: {
           setName: {name: 'Set name'},
-          setStart: {name: 'Set start'},
-          setEnd: {name: 'Set name'},
-          up: {name: 'Up'},
           down: {name: 'Down'},
-          delete: {name: 'Delete', color: 'red'}
+          up: {name: 'Up'},
+          delete: {name: 'Delete', color: 'red'},
         }
       }
+      if (this.cutIndex === 0) delete options.actions.up
+      if (this.cutIndex === this.cuts.length - 1) delete options.actions.down
+      return options
     },
     fragmentDuration () {
       return this.cuts.reduce((acc, val) => {
@@ -194,11 +197,16 @@ export default {
                 this.$log('NEXT CUT')
                 this.cutIndex += 1
                 this.cutPlaying += 1
+                this.$nextTick(() => {
+                  this.player.setCurrentTime(this.cut.points[0].x)
+                })
               } else {
                 this.$log('FIRST CUT AGAIN')
                 this.cutIndex = 0
                 this.cutPlaying = 0
-                this.player.setCurrentTime(this.cut.points[0].x)
+                this.$nextTick(() => {
+                  this.player.setCurrentTime(this.cut.points[0].x)
+                })
               }
             } else {
               this.$log('CUT AGAIN')
@@ -231,11 +239,12 @@ export default {
     cutDialogAction (action) {
       this.$log('cutDialogAction', action)
       switch (action) {
-        case 'setName': {
+        case 'confirm': {
+          this.cutPlay(this.cut, this.cutIndex)
           break
         }
-        case 'setStart': {
-          this.cutTimerDialogOpened = true
+        case 'setName': {
+          // TODO: open cut namedialog
           break
         }
         case 'up': {
@@ -279,11 +288,25 @@ export default {
         this.cutSetTimeDialogOpened = true
       }
     },
-    cutUp () {
-      this.$log('pointUp')
+    cutUp (index) {
+      this.$log('cutUp')
+      let current = this.cuts[index]
+      let to = this.cuts[index - 1]
+      this.cuts[index] = to
+      this.cuts[index - 1] = current
+      this.$nextTick(() => {
+        this.cutIndex = index - 1
+      })
     },
-    cutDown () {
-      this.$log('pointDown')
+    cutDown (index) {
+      this.$log('cutDown')
+      let current = this.cuts[index]
+      let to = this.cuts[index + 1]
+      this.cuts[index] = to
+      this.cuts[index + 1] = current
+      this.$nextTick(() => {
+        this.cutIndex = index + 1
+      })
     },
     cutMoreClick (c, ci) {
       this.$log('cutMoreClick', c, ci)
