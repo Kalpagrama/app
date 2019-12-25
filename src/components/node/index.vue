@@ -250,12 +250,15 @@ export default {
             this.fragmentMini = index === 0 ? 1 : 0
             this.fragmentMiniStart = index === 0 ? 1 : 0
             this.styles[index === 0 ? 1 : 0].opacity = 0
-            this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.65, {
-              maxWidth: 25,
+            this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.1, {
+              maxWidth: 5,
               right: 16,
               bottom: 32,
               onComplete: () => {
-                this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.2, {opacity: 1})
+                this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.1, {
+                  maxWidth: 25,
+                  opacity: 1
+                })
               }
             })
           }
