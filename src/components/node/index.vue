@@ -88,8 +88,8 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
         height: '60px', width: '90px'}`
         ).row.items-center.justify-center
       q-btn(
-        :loading="nodeVoting" @click="nodeVote()"
-        round push :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
+        round push color="white" :loading="nodeVoting" @click="nodeVote()"
+        :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
         ).row.items-center.justify-center.bg-green.cursor-pointer
         q-icon(name="blur_on" color="white" size="30px")
     //- vote tint and helper text
@@ -222,17 +222,22 @@ export default {
       if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
       else this.$refs.fragmentFirst.pause()
     },
-    async nodeVote () {
-      try {
-        this.$log('nodeVote start')
-        this.nodeVoting = true
-        await this.$wait(500)
-        let vote = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: 0.5})
-        this.$log('nodeVote done', vote)
-        this.nodeVoting = false
-      } catch (e) {
-        this.$log('nodeVote error', e)
-        this.nodeVoting = false
+    async votePan (e) {
+      // this.$log('votePan', e)
+      let to = this.voteLeft + e.delta.x
+      if (to > 0 && to <= this.previewWidth - 80) {
+        this.voteLeft += e.delta.x
+        this.voteValue = Math.round((this.voteLeft / this.previewWidth) * 100)
+      }
+      if (e.isFirst) {
+        this.$log('votePan FIRST')
+        this.votePanning = true
+      }
+      if (e.isFinal) {
+        this.$log('votePan FINAL', this.voteValue / 100)
+        await this.nodeVote(this.voteValue / 100)
+        this.$tween.to(this, 0.4, {voteLeft: 0})
+        this.votePanning = false
       }
     },
     fragmentWidth (index, width) {
@@ -247,6 +252,7 @@ export default {
       if (index === 0) {
         this.previewHeight = height
         this.$emit('previewHeight', height)
+        // TODO: emit scrollTop event of node in scroll wrapper
         // this.$emit('scrollTop', this.$el.scrollHeight)
       }
     },
@@ -257,21 +263,6 @@ export default {
     },
     async fragmentChange (index) {
       this.$log('fragmentChange', index)
-      // this.fragmentMini = index === 0 ? 1 : 0
-      // this.$refs.fragmentSecond.play()
-      // if (this.fragmentSecondPlaying) {
-      //   this.fragmentSecondPlaying = false
-      //   this.$refs.fragmentSecond.pause()
-      //   this.$tween.to(this.styles[1], 0.9, {maxWidth: 20, right: 20, bottom: 20})
-      //   this.fragmentMini = 1
-      // } else {
-      //   this.fragmentSecondPlaying = true
-      //   this.$refs.fragmentSecond.play()
-      //   this.$tween.to(this.styles[1], 0.9, {maxWidth: 80, right: 0, bottom: 0})
-      //   this.fragmentMini = -1
-      // }
-      // ***
-      // this.fragmentMini = index === 0 ? 1 : 0
       this.fragmentMiniStart = index === 0 ? 1 : 0
       this.$tween.to(
         this.styles[index],
@@ -281,13 +272,6 @@ export default {
           right: 0,
           bottom: 0,
           onComplete: () => {
-            // if (index === 0) {
-            //   this.$refs.fragmentFirst.play()
-            //   this.$refs.fragmentSecond.pause()
-            // } else {
-            //   this.$refs.fragmentFirst.pause()
-            //   this.$refs.fragmentSecond.play()
-            // }
             this.fragmentMini = index === 0 ? 1 : 0
             this.fragmentMiniStart = index === 0 ? 1 : 0
             this.styles[index === 0 ? 1 : 0].opacity = 0
@@ -305,9 +289,6 @@ export default {
           }
         }
       )
-      // this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.65, {maxWidth: 25, right: 16, bottom: 32, opacity: 1})
-      // await this.$wait(600)
-      // this.fragmentMiniStart = index === 0 ? 1 : 0
       if (index === 0) {
         this.$refs.fragmentFirst.play()
         this.$refs.fragmentSecond.pause()
@@ -316,31 +297,23 @@ export default {
         this.$refs.fragmentSecond.play()
       }
     },
-    votePan (e) {
-      // this.$log('votePan', e)
-      let to = this.voteLeft + e.delta.x
-      if (to > 0 && to <= this.previewWidth - 80) {
-        this.voteLeft += e.delta.x
-        this.voteValue = Math.round((this.voteLeft / this.previewWidth) * 100)
-      }
-      if (e.isFirst) {
-        this.$log('votePan FIRST')
-        this.votePanning = true
-      }
-      if (e.isFinal) {
-        this.$log('votePan FINAL')
-        this.votePanning = false
-        // this.opened = !this.opened
-        this.$tween.to(this, 0.4, {voteLeft: 0})
-      }
-    },
-    open () {
-      this.$log('open')
-    },
     nodeAction () {
       this.$log('nodeAction')
       this.$store.commit('node/stateSet', ['nodeOptionsPayload', JSON.parse(JSON.stringify(this.nodeFull))])
       this.$store.commit('node/stateSet', ['nodeOptionsDialogOpened', true])
+    },
+    async nodeVote (rate = 0.5) {
+      try {
+        this.$log('nodeVote start')
+        this.nodeVoting = true
+        await this.$wait(1000)
+        let vote = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: rate})
+        this.$log('nodeVote done', vote)
+        this.nodeVoting = false
+      } catch (e) {
+        this.$log('nodeVote error', e)
+        this.nodeVoting = false
+      }
     },
     async nodeLoad (oid) {
       // this.$log('nodeLoad start', this.index, this.node.oid)
