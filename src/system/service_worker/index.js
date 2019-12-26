@@ -174,8 +174,10 @@ async function clearCache (force = false) {
   logD('clear Idb...')
   const swShareStore = new Store('sw-share', 'request-formData')
   const gqlStore = new Store('sw-cache-gql', 'graphql-responses')
+  const gqlVideo = new Store('sw-cache-video', 'video-responses')
   await clear(swShareStore)
   await clear(gqlStore)
+  await clear(gqlVideo)
 
   logD('clearCache end!')
 }
