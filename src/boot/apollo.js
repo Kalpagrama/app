@@ -43,9 +43,10 @@ export default async ({ Vue, store, app }) => {
     return Promise.reject(error)
   })
   Vue.prototype.$axios = axios
-  // let mode = 'offline'
+  // let mode =   'offline'
   // if (mode === 'offline') return
   // apollo
+  logD('process.env.SERVICES_URL=', process.env.SERVICES_URL)
   Vue.use(VueApollo)
   let SERVICES_URL = process.env.SERVICES_URL || 'https://test.kalpagramma.com/graphql'
   store.commit('auth/stateSet', ['SERVICES_URL', SERVICES_URL])
