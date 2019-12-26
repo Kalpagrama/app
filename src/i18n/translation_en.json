@@ -145,5 +145,19 @@
   "Пригласить друга": "Invite a friend",
   "Создать ядро": "Create a node",
   "или скопировать ссылку": "or copy link",
-  "показать все сферы": "Show all areas"
+  "показать все сферы": "Show all areas",
+  "Account": "Account",
+  "Security": "Security",
+  "Privacy": "Privacy",
+  "Black list": "Black list",
+  "Information": "Information",
+  "Exit": "Exit",
+  "Notes": "Notes",
+  "Fragments": "Fragments",
+  "Nodes": "Nodes",
+  "Contents": "Contents",
+  "Created": "Created",
+  "Rated": "Rated",
+  "Followers": "Followers",
+  "Following": "Followings"
 }
