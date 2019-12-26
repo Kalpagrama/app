@@ -11,7 +11,7 @@ export default {
   installPrompt: null, // ф-я вызова диалога "установить приложение"
   logLevel: LogLevelEnum.DEBUG,
   logLevelSentry: LogLevelEnum.CRITICAL,
-  logModulesBlackList: [],
+  logModulesBlackList: [LogModulesEnum.ML],
   colors: {
     hello: 'goodbye'
   }
