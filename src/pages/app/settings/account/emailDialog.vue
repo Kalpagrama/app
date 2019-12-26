@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   //- Email
-  q-dialog(ref="changeEmail" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
+  q-dialog(ref="changeEmail" :maximized="$q.screen.xs" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     div(style=`height: 60px`).row.items-center.bg-primary
       div(style=`height: 60px; width: 60px`).row.justify-center.items-center
         q-btn(round flat icon="arrow_back" color="white" @click="closing()")
@@ -10,10 +10,16 @@
     .column.bg-white.q-px-md
       .row.content-start.justify-center
         q-input(v-model="$store.state.objects.currentUser.profile.email" standout disable readonly stack-label :label="$t('Current email')").full-width.q-my-md.text-black
-        q-input(v-model="newEmail" stack-label :label="$t('New email')" filled).full-width.q-mb-md
-        q-btn(
-          push no-caps dense color="accent" @click="changeEmail()"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Save email') }}
+        div(v-if="!waitingCode").row.full-width
+          q-input(v-model="newEmail" @keyup.enter="emailSend()" stack-label :label="$t('New email')" filled).full-width.q-mb-md
+          q-btn(
+            push no-caps dense color="accent" @click=""
+            :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get the code', 'Получить код') }}
+        div(v-else).row.full-width
+          q-input(v-model="newEmail" stack-label :label="$t('Code')" filled).full-width.q-mb-md
+          q-btn(
+            push no-caps dense color="accent" @click="changeEmail()"
+            :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Change', 'Сменить') }}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeEmail.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
       span {{$t('Email')}}
@@ -28,7 +34,8 @@ export default {
   name: 'emailDialog',
   data () {
     return {
-      newEmail: ''
+      newEmail: '',
+      waitingCode: false
     }
   },
   computed: {

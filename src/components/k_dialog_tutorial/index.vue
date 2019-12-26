@@ -9,57 +9,68 @@
 }
 </style>
 <template lang="pug">
-.column.fit.bg-primary
+div(:style=`{backgroundColor: 'rgba(0, 0, 0, 0.2)', }`).row.fit.content-center.justify-center
   q-carousel(
     v-model="slide"
     transition-prev="scale"
     transition-next="scale"
     animated
+    :style=`{minHeight: $q.screen.gt.xs ? '70%' : '100%', maxWidth: '500px', borderRadius: '10px'}`
     control-color="white"
     padding
-    height="100%"
     class="bg-primary text-white")
-    //- PROFILE
-    q-carousel-slide(name="1").row.fit.justify-center.items-start
-      div(style='height: 40%').row.content-center
-        .row.full-width.justify-center.q-mt-sm
-          k-logo(:width="100" :height="100")
-        .row.full-width.justify-center.q-mt-md
-          span.text-h6 KALPAGRAMMA
-          .row.full-width.justify-center
-            span {{$t('essence is near')}}...
-      div(style=`height: 60%`).row.content-start
-        .row.full-width.justify-start.q-mt-md
-          span {{$t('Enter your First name'), ('Введите своt имя')}}
-        div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mt-sm.bg-white
-          input(v-model="nameFirst").full-width.kinput
-        .row.full-width.justify-start.q-mt-sm
-          span {{$t('Enter your Second name'), ('Введите свою фамилию')}}
-        div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mt-sm.bg-white
-          input(v-model="nameSecond").full-width.kinput
-        .row.full-width.justify-center.q-mt-md
-          span Select language
-        .row.full-width.justify-center.q-mt-md
-          q-btn(:color="rusColor" @click="lang = 'RUS'").q-mr-sm.text-black RUS
-          q-btn(:color="engColor" @click="lang = 'ENG'").q-ml-sm.text-black ENG
-      div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
-        q-btn(v-model="slide" v-if="allselected === true" style=`height: 40px` @click="secondSlide()" color="accent" :label="$t('Next')")
+    //- Lang
+    q-carousel-slide(name="1").row.justify-center.items-start
+      div(style=`maxWidth: 500px`).row.fit.justify-center.items-center
+        div(style='height: 60%').row.content-center
+          .row.full-width.justify-center.q-mt-sm
+            k-logo(:width="100" :height="100")
+          .row.full-width.justify-center.q-mt-md
+            span.text-h6 KALPAGRAMMA
+            .row.full-width.justify-center
+              span {{$t('essence is near')}}...
+        div(v-if="side === 'lang'" style=`height: 40%`).row.full-width.content-start
+          .row.full-width.justify-center.q-mt-md
+            span {{$t('Select language', 'Выберите язык')}}
+          .row.full-width.justify-center.q-mt-md
+            q-btn(:color="rusColor" @click="chosenLanguage('RUS')").q-mr-sm.text-black РУССКИЙ
+            q-btn(:color="engColor" @click="chosenLanguage('ENG')").q-ml-sm.text-black ENGLISH
+          div(v-if="lang" :style=`{position: 'absolute', bottom: '0px'}`).row.full-width.justify-end.q-pa-md.q-px-xl
+            q-btn(v-model="slide" style=`height: 40px` @click="stForm()" color="accent" :label="$t('Next')")
+        div(v-if="side === 'nameFirst'" style=`height: 40%`).row.full-width.content-start.justify-center
+          div(style=`maxWidth: 300px`).row.full-width
+            .row.full-width.justify-start.q-mt-md
+              span {{$t('Enter your First name'), ('Введите свое имя')}}
+            div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mt-sm.bg-white
+              input(v-model="nameFirst").full-width.kinput.br
+          div(v-if="nameFirst" :style=`{position: 'absolute', bottom: '0px'}`).row.full-width.justify-end.q-pa-md
+            q-btn(v-model="slide" style=`height: 40px` @click="ndForm()" color="accent" :label="$t('Next')")
+        div(v-if="side === 'nameSecond'" style=`height: 40%`).row.full.width.content-start.justify-center
+          div(style=`maxWidth: 300px`).row.full-width
+            .row.full-width.justify-start.q-mt-md
+              span {{$t('Enter your Second name'), ('Введите свою фамилию')}}
+            div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mt-sm.bg-white
+              input(v-model="nameSecond").full-width.kinput
+          div(v-if="nameSecond && side === 'nameSecond'" :style=`{position: 'absolute', bottom: '0px'}`).row.full-width.justify-end.q-pa-md
+            q-btn(v-model="slide" style=`height: 40px` @click="rdForm()" color="accent" :label="$t('Next')")
     //- PHOTO
     q-carousel-slide(name="2").row.justify-center.items-center
       k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
       input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-      div(style=`height: 40%`).row.row.full-width.justify-center.content-center
+      div(style=`height: 50%`).row.row.full-width.justify-center.content-center
         div(style=`border-radius: 50%; border: 3px solid #fff; height: 100px; width: 100px`).row.justify-center.items-center
           q-icon(name="add_a_photo" size="56px")
         .row.full-width.justify-center.q-mt-sm
-          span.text-center.text-h5 {{$t('Add a profile photo')}}
+          span.text-center.text-h5 {{$t('Add a profile photo', 'Добавьте фото профиля')}}
         .row.full-width.justify-center.q-mt-sm
-          span.text-center.text-grey-4 {{$t('Add a profile photo that friends could recognize you.')}}
+          span.text-center.text-grey-4 {{$t('Add a profile photo that friends could recognize you.', 'Добавьте фото профиля чтобы друзья могли вас узнать.')}}
         .row.full-width.justify-center.q-mt-md
           q-btn(unelevated @click="changePhoto()" color="accent") {{$t('Add a photo')}}
-      div(style=`height: 70%`).row.row.full-width.justify-center
-        div(v-if="$store.state.user.user.profile.thumbUrl").row.full-width.justify-center.q-mt-md
+      div(style=`height: 50%`).row.row.full-width.justify-center
+        div(v-if="$store.state.user.user.profile.thumbUrl").row.full-width.justify-center.q-mt-md.content-start
           img(:src="$store.state.user.user.profile.thumbUrl" :style=`{width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
+          .row.full-width.justify-center.q-mt-md
+            span.text-h5.text-bold {{$store.state.user.user.name}}
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
         q-btn(v-model="slide" style=`height: 40px` @click="nextSlide()" color="accent" :label="$t('Next')")
     //- CATEGORIES
@@ -82,6 +93,20 @@
             q-icon(name="done" size="25px" :color="categoriesToAdd.includes(c.type) ? 'black' : 'white'")
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
         q-btn(v-model="slide" v-if="categoriesToAdd.length >= 1" style=`height: 40px` @click="nextSlide()" color="accent" :label="$t('Next')")
+    //- find your own essense
+    q-carousel-slide(name="4").row.justify-center.items-center
+      input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
+      div(style=`height: 50%`).row.row.full-width.justify-center.content-center
+        .row.full-width.justify-center.q-mt-sm
+          k-logo(:width="100" :height="100")
+        .row.full-width.justify-center.q-mt-md
+          span.text-h6 KALPAGRAMMA
+          .row.full-width.justify-center
+            span {{$t('Create your own connections and make the world more truely', 'Создавай свои собственные ядра, и делай мир более правдивее')}}
+            span {{$t('Find your own essense!', 'Найди свою суть!')}}...
+      div(style=`height: 50%`).row.row.full-width.justify-center
+      div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
+        q-btn(v-model="slide" style=`height: 40px` @click="nextSlide()" color="accent" :label="$t('Start')")
 </template>
 
 <script>
@@ -96,7 +121,8 @@ export default {
       lang: '',
       categoriesToAdd: [],
       nameFirst: '',
-      nameSecond: ''
+      nameSecond: '',
+      side: 'lang'
     }
   },
   computed: {
@@ -110,10 +136,6 @@ export default {
     },
     categories () {
       return this.$store.state.node.categories
-    },
-    allselected () {
-      if (this.nameFirst && this.nameSecond && this.lang) return true
-      else return false
     },
     userPhotoDialogOptions () {
       return {
@@ -229,25 +251,24 @@ export default {
     chosenContent () {
       this.chosen = !this.chosen
     },
-    prevSlide () {
-      if (this.slide === '4') this.prev = '3'
-      if (this.slide === '3') this.prev = '2'
-      if (this.slide === '2') this.prev = '1'
-      if (this.slide === '1') this.prev = '1'
-      this.slide = this.prev
-    },
     nextSlide () {
       if (this.slide === '1') this.next = '2'
       if (this.slide === '2') this.next = '3'
       if (this.slide === '3') this.next = '4'
+      if (this.slide === '4') this.next = '5'
       this.slide = this.next
-      if (this.next === '4') this.$emit('hide')
+      if (this.next === '5') this.$emit('hide')
     },
-    secondSlide () {
-      this.slide = '2'
-      this.chosenLanguage(this.lang)
-      this.enterNameSecond(this.nameSecond)
+    stForm () {
+      this.side = 'nameFirst'
+    },
+    ndForm () {
+      this.side = 'nameSecond'
       this.enterNameFirst(this.nameFirst)
+    },
+    rdForm () {
+      this.slide = '2'
+      this.enterNameSecond(this.nameSecond)
     }
   },
   mounted () {

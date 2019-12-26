@@ -3,14 +3,21 @@
 <template lang="pug">
 .column.bg-white.fit
   .row.full-width.q-px-sm
+    span(v-if="role === 'MEMBER'").text-grey {{currentRole}}
     q-input(v-model="nameFirst" stack-label :label="$t('First name')").full-width.q-mt-sm
     q-input(v-model="nameSecond" stack-label :label="$t('Second name')").full-width
     q-select( v-model="country" :options="countries" :label="$t('Country')").full-width
+    q-input(v-model="city" stack-label :label="$t('City', 'Город')").full-width
     q-select( v-model="gender" :options="genders" :label="$t('Gender')").full-width
     q-select( v-model="lang" :options="langs" :label="$t('Lang')").full-width
-    phoneDialog
+    q-input( v-model="date" mask="date" :label="$t('Date of birth', 'Дата рождения')" :rules="['date']").full-width
+      template(v-slot:append)
+        q-icon(name="event" class="cursor-pointer")
+          q-popup-proxy(ref="qDateProxy" transition-show="scale" transition-hide="scale")
+            q-date(v-model="date" @input="() => $refs.qDateProxy.hide()")
+    //- phoneDialog
     emailDialog
-    passwordDialog
+    //- passwordDialog
   div(:style=`{height: '60px'}`).row.full-width.justify-end.items-center.content-center.q-px-md
     q-btn(@click="save()" push no-caps  :color="buttonColor")
       span.text-bold {{ $t('Save') }}
@@ -27,9 +34,11 @@ export default {
     return {
       newLang: '',
       model: null,
+      date: null,
       lang: null,
       gender: null,
       country: null,
+      city: null,
       nameFirst: null,
       nameSecond: null,
       langs: ['ENG', 'RUS'],
@@ -46,6 +55,12 @@ export default {
     },
     currentCountry () {
       return this.$store.state.objects.currentUser.profile.country
+    },
+    currentCity () {
+      return this.$store.state.objects.currentUser.profile.city
+    },
+    currentDate () {
+      return this.$store.state.objects.currentUser.profile.dateBirth
     },
     currentNameFirst () {
       return this.$store.state.objects.currentUser.profile.nameFirst
@@ -68,7 +83,9 @@ export default {
         this.country !== this.currentCountry ||
         this.gender !== this.currentGender ||
         this.nameFirst !== this.currentNameFirst ||
-        this.nameSecond !== this.currentNameSecond
+        this.nameSecond !== this.currentNameSecond ||
+        this.city !== this.currentCity ||
+        this.date !== this.currentDate
       ) {
         return true
       } else {
@@ -88,7 +105,8 @@ export default {
       this.changeGender()
       this.changeNameFirst()
       this.changeNameSecond()
-      // this.changeNameFull()
+      this.changeCity()
+      this.changeDate()
     },
     async cancel () {
       this.$log('cancel')
@@ -96,21 +114,36 @@ export default {
       // show switch save, emit || emit
       this.$emit('cancel')
     },
-    // async changeNameFull () {
-    //   if (this.nameFull !== this.currentNameFull) {
-    //     try {
-    //       this.$log('changeFullName start')
-    //       let res = await this.$store.dispatch('objects/setObjectValue', {
-    //         oid: this.$store.state.objects.currentUser.oid,
-    //         path: 'profile.nameFull',
-    //         value: this.nameFull
-    //       })
-    //       this.$log('changeNameFull done', res)
-    //     } catch (e) {
-    //       this.$log('changeNameFull ERROR', this.nameFull)
-    //     }
-    //   }
-    // },
+    async changeDate () {
+      if (this.date !== this.currentDate) {
+        try {
+          this.$log('changeDate start')
+          let res = await this.$store.dispatch('objects/setObjectValue', {
+            oid: this.$store.state.objects.currentUser.oid,
+            path: 'profile.dateBirth',
+            value: this.date
+          })
+          this.$log('changeDate done', res)
+        } catch (e) {
+          this.$log('changeDate ERROR', this.city)
+        }
+      }
+    },
+    async changeCity () {
+      if (this.city !== this.currentCity) {
+        try {
+          this.$log('changeCity start')
+          let res = await this.$store.dispatch('objects/setObjectValue', {
+            oid: this.$store.state.objects.currentUser.oid,
+            path: 'profile.city',
+            value: this.city
+          })
+          this.$log('changeCity done', res)
+        } catch (e) {
+          this.$log('changeCity ERROR', this.city)
+        }
+      }
+    },
     async changeLanguage () {
       if (this.lang !== this.currentLang) {
         try {
@@ -203,6 +236,8 @@ export default {
     this.nameFirst = this.$store.state.objects.currentUser.profile.nameFirst
     this.nameSecond = this.$store.state.objects.currentUser.profile.nameSecond
     this.lang = this.$store.state.objects.currentUser.profile.lang
+    this.city = this.$store.state.objects.currentUser.profile.city
+    this.date = this.$store.state.objects.currentUser.profile.dateBirth
   },
   created () {
     this.$logD('created')

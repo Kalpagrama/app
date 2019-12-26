@@ -2,6 +2,22 @@
 .q-footer {
   background: none !important
 }
+input {
+  background-color: transparent;
+  border: 0px solid;
+  height: 20px;
+  width: 160px;
+}
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+::placeholder {
+  opacity: 1
+  color: grey
+}
 </style>
 <template lang="pug">
 q-layout(view="hHh lpR fFf").bg-grey-3
@@ -18,7 +34,8 @@ q-layout(view="hHh lpR fFf").bg-grey-3
           .col
           .row
             div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-              q-btn(round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+              q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+              q-btn(v-else round flat @click="save()" color="white" icon="done")
             //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
               q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
         //- body
@@ -37,9 +54,14 @@ q-layout(view="hHh lpR fFf").bg-grey-3
           .row.full-width.items-center.justify-start
             .row.full-width
               span.text-bold.text-h6.text-white {{ user.name }}
-            .row.full-width
-              .row.full-width.q-py-sm
-                small.text-grey Status
+            div(v-if="!editions").row.full-width
+              .row.full-width
+                span.text-grey-4 {{status}}
+              .row.full-width.q-mb-sm
+                span.text-grey {{about}}
+            div(v-if="editions").row.full-width
+              input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
+              input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
               //- .row.full-width.q-mt-xs
               //-   small About
             div(v-if="false" @click="showInfo()").row.full-width
@@ -82,7 +104,10 @@ export default {
       showI: false,
       coll: 'created',
       theStream: '',
-      file: null
+      file: null,
+      editions: false,
+      status: null,
+      about: null
     }
   },
   computed: {
@@ -114,15 +139,27 @@ export default {
       return this.$store.state.subscriptions.userSubscriptions
     },
     userSettingsDialogOptions () {
-      return {
+      let options = {
         confirm: false,
         actions: {
           share: {name: 'Share'},
-          copy: {name: 'Copy Url'},
+          copy: {name: 'Copy Url'}
+        }
+      }
+      if (this.$route.params.oid === this.myoid) {
+        options.actions = {
+          ...options.actions,
+          edit: {name: 'Edit'},
+          changePhoto: {name: 'Change photo'},
+        }
+      } else {
+        options.actions = {
+          ...options.actions,
           block: {name: 'Block'},
           report: {name: 'Report', color: 'red'}
         }
       }
+      return options
     },
     userPhotoDialogOptions () {
       return {
@@ -143,6 +180,8 @@ export default {
           this.$logD('GOT USER OID', to.params.oid)
           this.user = await this.userLoad(to.params.oid)
           this.page = 'nodes'
+          this.status = this.user.profile.status
+          this.about = this.user.profile.about
         } else {
           this.$logD('NO USER OID!')
           this.$router.push({params: {oid: this.$store.state.objects.currentUser.oid}})
@@ -151,6 +190,41 @@ export default {
     }
   },
   methods: {
+    save () {
+      this.changeStatus()
+      this.changeAbout()
+      this.editions = !this.editions
+    },
+    async changeAbout () {
+      if (this.about !== this.currentAbout) {
+        try {
+          this.$log('changeAbout start')
+          let res = await this.$store.dispatch('objects/setObjectValue', {
+            oid: this.$store.state.objects.currentUser.oid,
+            path: 'profile.about',
+            value: this.about
+          })
+          this.$log('changeAbout done', res)
+        } catch (e) {
+          this.$log('changeAbout ERROR', this.about)
+        }
+      }
+    },
+    async changeStatus () {
+      if (this.status !== this.currentStatus) {
+        try {
+          this.$log('changeStatus start')
+          let res = await this.$store.dispatch('objects/setObjectValue', {
+            oid: this.$store.state.objects.currentUser.oid,
+            path: 'profile.status',
+            value: this.status
+          })
+          this.$log('changeStatus done', res)
+        } catch (e) {
+          this.$log('changeStatus ERROR', this.status)
+        }
+      }
+    },
     changePhoto () {
       if (this.myoid === this.user.oid) {
         this.$refs.userPhotoDialog.show()
@@ -202,6 +276,14 @@ export default {
         case 'share': {
           break
         }
+        case 'edit': {
+          this.editions = !this.editions
+          break
+        }
+        case 'changePhoto': {
+          this.changePhoto()
+          break
+        }
       }
     },
     async followUser () {
@@ -239,7 +321,7 @@ export default {
     }
   },
   mounted () {
-    // this.$logD('mounted')
+    this.$logD('mounted22')
   },
   beforeDestroy () {
     // this.$logD('beforeDestroy')

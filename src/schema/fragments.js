@@ -175,6 +175,8 @@ const userFragment = gql`
     }
     events{...eventFragment}
     profile{
+      status
+      about
       thumbUrl(preferWidth: 600)
       city
       country
