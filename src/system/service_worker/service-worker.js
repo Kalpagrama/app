@@ -1,4 +1,4 @@
-const swVer = 5
+const swVer = 7
 const useCache = true
 
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, swShareStore, cacheGraphQl
@@ -187,20 +187,20 @@ if (useCache) {
     }
     // Если по истечении timeout ответ не получен - ответить из кэша
     const networkFirst = async (event, timeout) => {
-      let promise = new Promise((resolve, reject) => {
-        let timeoutId = setTimeout(reject, timeout)
-        networkOnly(event).then(async (response) => {
-          clearTimeout(timeoutId)
-          if (response && response.ok) await setCache(event.request, response)
-          resolve(response)
+      let cachedResponse = await cacheOnly(event)
+      return await new Promise((resolve, reject) => {
+        let timeoutId
+        if (cachedResponse) {
+          timeoutId = setTimeout(() => {
+            resolve(cachedResponse)
+          }, timeout)
+        }
+        networkOnly(event).then(async (networkResponse) => {
+          if (timeoutId) clearTimeout(timeoutId)
+          if (networkResponse && networkResponse.ok) await setCache(event.request, networkResponse)
+          resolve(networkResponse)
         }, reject)
       })
-      try {
-        return await promise
-      } catch (err) {
-        logDebug('cant access network. get respond from cache')
-        return await cacheOnly(event)
-      }
     }
     const cacheFirst = async (event) => {
       let cachedResponse = await cacheOnly(event)
