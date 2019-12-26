@@ -242,7 +242,7 @@ export default {
     // TODO
     // данные из меню поделиться в приложение
     // {
-    //   let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
+      let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
       if (shareData){
         alert(`shareData: ${JSON.stringify(shareData)}`)
         let shareUrl = shareData.text || shareData.url || shareData.title
