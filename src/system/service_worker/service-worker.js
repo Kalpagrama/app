@@ -1,5 +1,5 @@
-const swVer = 2
-const useCache = false
+const swVer = 5
+const useCache = true
 
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, swShareStore, cacheGraphQl
 /* global idbKeyval, MD5 */
@@ -38,6 +38,8 @@ importScripts('/statics/scripts/md5.js')
   // workbox init
   {
     /* global workbox */
+    // This will trigger the importScripts() for workbox.strategies and its dependencies:
+    const { strategies } = workbox
     workbox.core.setCacheNameDetails({
       prefix: 'kalpa'
     })
@@ -140,129 +142,125 @@ importScripts('/statics/scripts/md5.js')
 if (useCache) {
   // custom resolver for graphql POST requests
   {
-    {
-      cacheGraphQl = async function (event) {
-        // todo use different strategies
-        // let tmpReq = event.request.clone()
-        // logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
-        // let promise = null
-        // if(event.request.method === 'POST')
-        let requestCopy = event.request.clone()
-        let body = await requestCopy.json()
+    cacheGraphQl = async function (event) {
+      // todo use different strategies
+      // let tmpReq = event.request.clone()
+      // logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
+      // let promise = null
+      // if(event.request.method === 'POST')
+      let requestCopy = event.request.clone()
+      let body = await requestCopy.json()
 
-        if (body.operationName.startsWith('sw_network_only_')) {
-          return await networkOnly(event)
-        } else if (body.operationName.startsWith('sw_cache_only_')) {
-          return await cacheOnly(event)
-        } else if (body.operationName.startsWith('sw_network_first_')) {
-          return await networkFirst(event, 400)
-        } else if (body.operationName.startsWith('sw_cache_first_')) {
-          return await cacheFirst(event)
-        } else if (body.operationName.startsWith('sw_stale_')) {
-          return await StaleWhileRevalidate(event)
-        } else {
-          return await networkFirst(event, 2000)
-        }
-        // todo для мутаций - сделать по умолчанию networkFirst, а для остальных - StaleWhileRevalidate
-        // todo выводить предупреждение, если для запроса не указана политика
+      if (body.operationName.startsWith('sw_network_only_')) {
+        return await networkOnly(event)
+      } else if (body.operationName.startsWith('sw_cache_only_')) {
+        return await cacheOnly(event)
+      } else if (body.operationName.startsWith('sw_network_first_')) {
+        return await networkFirst(event, 400)
+      } else if (body.operationName.startsWith('sw_cache_first_')) {
+        return await cacheFirst(event)
+      } else if (body.operationName.startsWith('sw_stale_')) {
+        return await StaleWhileRevalidate(event)
+      } else {
+        return await networkFirst(event, 2000)
       }
-      const cacheOnly = async (event) => {
-        return await getCache(event.request)
-      }
-      const networkOnly = async (event) => {
-        return await fetch(event.request.clone())
-      }
-      const StaleWhileRevalidate = async (event) => {
-        let cachedResponse = await cacheOnly(event)
-        let fetchPromise = fetch(event.request.clone())
-          .then((response) => {
-            if (response && response.ok) setCache(event.request, response)
-            return response
-          })
-          .catch((err) => {
-            logCritical('cant fetch gql query with StaleWhileRevalidate', err)
-          })
-        return cachedResponse ? cachedResponse : await fetchPromise
-      }
-      // Если по истечении timeout ответ не получен - ответить из кэша
-      const networkFirst = async (event, timeout) => {
-        let promise = new Promise((resolve, reject) => {
-          let timeoutId = setTimeout(reject, timeout)
-          networkOnly(event).then(async (response) => {
-            clearTimeout(timeoutId)
-            if (response && response.ok) await setCache(event.request, response)
-            resolve(response)
-          }, reject)
+      // todo для мутаций - сделать по умолчанию networkFirst, а для остальных - StaleWhileRevalidate
+      // todo выводить предупреждение, если для запроса не указана политика
+    }
+    const cacheOnly = async (event) => {
+      return await getCache(event.request)
+    }
+    const networkOnly = async (event) => {
+      return await fetch(event.request.clone())
+    }
+    const StaleWhileRevalidate = async (event) => {
+      let cachedResponse = await cacheOnly(event)
+      let fetchPromise = fetch(event.request.clone())
+        .then((response) => {
+          if (response && response.ok) setCache(event.request, response)
+          return response
         })
-        try {
-          return await promise
-        } catch (err) {
-          logDebug('cant access network. get respond from cache')
-          return await cacheOnly(event)
-        }
+        .catch((err) => {
+          logCritical('cant fetch gql query with StaleWhileRevalidate', err)
+        })
+      return cachedResponse ? cachedResponse : await fetchPromise
+    }
+    // Если по истечении timeout ответ не получен - ответить из кэша
+    const networkFirst = async (event, timeout) => {
+      let promise = new Promise((resolve, reject) => {
+        let timeoutId = setTimeout(reject, timeout)
+        networkOnly(event).then(async (response) => {
+          clearTimeout(timeoutId)
+          if (response && response.ok) await setCache(event.request, response)
+          resolve(response)
+        }, reject)
+      })
+      try {
+        return await promise
+      } catch (err) {
+        logDebug('cant access network. get respond from cache')
+        return await cacheOnly(event)
       }
-      const cacheFirst = async (event) => {
-        let cachedResponse = await cacheOnly(event)
-        if (cachedResponse) return cachedResponse
-        return await networkFirst(event)
-      }
+    }
+    const cacheFirst = async (event) => {
+      let cachedResponse = await cacheOnly(event)
+      if (cachedResponse) return cachedResponse
+      return await networkFirst(event)
+    }
 
-      const serializeResponse = async (response) => {
-        let serializedHeaders = {}
-        for (let entry of response.headers.entries()) {
-          serializedHeaders[entry[0]] = entry[1]
-        }
-        let serialized = {
-          headers: serializedHeaders,
-          status: response.status,
-          statusText: response.statusText
-        }
-        serialized.body = await response.json()
-        return serialized
+    const serializeResponse = async (response) => {
+      let serializedHeaders = {}
+      for (let entry of response.headers.entries()) {
+        serializedHeaders[entry[0]] = entry[1]
       }
-      const setCache = async (request, response) => {
-        let requestCopy = request.clone()
-        let responseCopy = response.clone()
+      let serialized = {
+        headers: serializedHeaders,
+        status: response.status,
+        statusText: response.statusText
+      }
+      serialized.body = await response.json()
+      return serialized
+    }
+    const setCache = async (request, response) => {
+      let requestCopy = request.clone()
+      let responseCopy = response.clone()
+      let body = await requestCopy.json()
+      let id = MD5(JSON.stringify(body)).toString()
+      let entry = {
+        query: body.query,
+        response: await serializeResponse(responseCopy),
+        timestamp: Date.now()
+      }
+      idbKeyval.set(id, entry, gqlStore)
+    }
+    const getCache = async (request) => {
+      let requestCopy = request.clone()
+      let data
+      try {
         let body = await requestCopy.json()
-        let id = MD5(JSON.stringify(body)).toString()
-        let entry = {
-          query: body.query,
-          response: await serializeResponse(responseCopy),
-          timestamp: Date.now()
-        }
-        idbKeyval.set(id, entry, gqlStore)
-      }
-      const getCache = async (request) => {
-        let requestCopy = request.clone()
-        let data
-        try {
-          let body = await requestCopy.json()
-          let id = MD5(JSON.stringify(body)).toString() // CryptoJS.MD5(body.query).toString()
-          data = await idbKeyval.get(id, gqlStore)
-          if (!data) {
-            logDebug('Load response not found in cache.')
-            return null
-          }
-          // // Check cache max age.
-          // let cacheControl = requestCopy.headers.get('Cache-Control')
-          // let maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 3600
-          // if (Date.now() - data.timestamp > maxAge * 1000) {
-          //   logDebug('Cache expired. Load from API endpoint.')
-          //   return null
-          // }
-          logDebug('Load response from cache.')
-          return new Response(JSON.stringify(data.response.body), data.response)
-        } catch (err) {
-          logCritical('cant getCache', err)
+        let id = MD5(JSON.stringify(body)).toString() // CryptoJS.MD5(body.query).toString()
+        data = await idbKeyval.get(id, gqlStore)
+        if (!data) {
+          logDebug('Load response not found in cache.')
           return null
         }
+        // // Check cache max age.
+        // let cacheControl = requestCopy.headers.get('Cache-Control')
+        // let maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 3600
+        // if (Date.now() - data.timestamp > maxAge * 1000) {
+        //   logDebug('Cache expired. Load from API endpoint.')
+        //   return null
+        // }
+        logDebug('Load response from cache.')
+        return new Response(JSON.stringify(data.response.body), data.response)
+      } catch (err) {
+        logCritical('cant getCache', err)
+        return null
       }
     }
   }
 // routing
   {
-    // This will trigger the importScripts() for workbox.strategies and its dependencies:
-    const { strategies } = workbox
     workbox.routing.registerRoute(
       /^http.*(?:googleapis|gstatic)\.com\/.*/,
       new workbox.strategies.StaleWhileRevalidate({
