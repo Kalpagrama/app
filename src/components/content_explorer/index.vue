@@ -28,7 +28,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
       .row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
           nc-fragment(
-            v-if="content" ctx="inEditor" :index="0" :stageFirst="2"
+            v-if="content" ctx="inEditor" :index="0" :stageFirst="2" :inExplorer="true"
             :fragment="{content: content, cuts: [], name: '', thumbUrl: '', scale: content.type === 'VIDEO' ? content.duration : 100}")
       div(
         v-if="true"

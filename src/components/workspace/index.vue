@@ -21,9 +21,9 @@ q-layout(view="hHh lpR fFf").bg-grey-3
     .row.full-width.justify-center.bg-grey-3
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         ws-spheres(@close="$refs.spheresDialog.hide()")
-  q-btn(
-    round push icon="add" size="lg" color="green" @click="itemAdd()"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '80px', right: '8px'}`)
+  //- q-btn(
+  //-   round push icon="add" size="lg" color="green" @click="itemAdd()"
+  //-   :style=`{position: 'absolute', zIndex: 1000, bottom: '80px', right: '8px'}`)
   //- header
   q-header.row.full-width.justify-center
     div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px', color: 'black'}`).row.full-width.items-center.bg-grey-3

@@ -12,23 +12,34 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(n, ni) in notes" :key="ni" @click="itemClick(n)"
+            v-for="(n, ni) in notes" :key="ni"
             :style=`{height: '60px', borderRadius: '10px'}`
             ).row.full-width.items-center.q-px-sm.bg-white.q-mb-sm
             span {{ $t(n.item.name) }}
   template(v-slot:fragments)
     .column.fit
       k-dialog-bottom(ref="itemActionDialog" :options="itemActionOptions" @action="itemAction")
-      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-        span {{$t('Total')}}: {{ fragments.length }}
-        .col
+      q-dialog(ref="fragmentEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+        div(@click.self="$refs.fragmentEditorDialog.hide()").row.full-width.justify-center.items-end
+          ws-fragment-editor(
+            :item="item" @item="item = {item: $event}"
+            :style=`{
+              maxWidth: $store.state.ui.pageMaxWidth-100+'px',
+              maxHeight: $q.screen.height-60+'px',
+              borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
+      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
+        span.text-bold {{ fragments.length }}
         q-btn(round flat icon="search")
+        .col
+        q-btn(round push icon="add" color="green" @click="item = null, $refs.fragmentEditorDialog.show()")
       .col.full-width.scroll.kscroll
         .row.full-width.items-start.content-start.q-px-sm
           //- v-if="fragmentToDelete !== ii"
           ws-item-fragment(
             v-for="(i, ii) in fragments" :key="i.node.oid"
-            :index="ii" :item="i" @action="item = i, itemIndex = ii, $refs.itemActionDialog.show()")
+            :index="ii" :item="i" @action="item = JSON.parse(JSON.stringify(i)), itemIndex = ii, $refs.itemActionDialog.show()"
+            :class=`{'q-pl-xs': ii % 2 !== 0, 'q-pr-xs': ii % 2 === 0}`
+            ).col-6.q-mb-sm
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -38,7 +49,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(c, ckey, ci) in contents" :key="ckey" @click="itemClick(c)"
+            v-for="(c, ckey, ci) in contents" :key="ckey"
             :style=`{position: 'relative', minHeight: '100px'}`
             :class=`{'q-pl-xs': ci % 2 !== 0, 'q-pr-xs': ci % 2 === 0}`
             ).col-6.q-mb-sm
@@ -61,7 +72,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(n, ni) in nodes" :key="n.oid" @click="itemClick(n)"
+            v-for="(n, ni) in nodes" :key="n.oid"
             :style=`{minHeight: '60px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-pa-sm
             div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-black
@@ -80,12 +91,13 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
 </template>
 
 <script>
+import wsFragmentEditor from './ws_fragment_editor'
 import wsItemFragment from './ws_item_fragment'
 
 export default {
   name: 'wsItems',
-  components: {wsItemFragment},
-  props: ['types', 'height'],
+  components: {wsFragmentEditor, wsItemFragment},
+  props: ['ctx', 'types', 'height'],
   data () {
     return {
       coll: 'fragments',
@@ -103,10 +115,10 @@ export default {
   computed: {
     itemActionOptions () {
       return {
-        header: this.item ? true : false,
+        header: this.item ? this.item.item.name.length > 0 : false,
         headerName: this.item ? this.item.item.name : '',
         confirm: true,
-        confirmName: 'Edit',
+        confirmName: this.ctx === 'inEditor' ? 'Choose' : 'Edit',
         actions: {
           preview: {name: 'Preiview'},
           delete: {name: 'Delete', color: 'red'}
@@ -154,7 +166,7 @@ export default {
                     name: c.name,
                     scale: f.content.duration,
                     content: f.content,
-                    cuts: [{name: '', thumbUrl: '', color: '', points: c.points}]
+                    cuts: [{name: '', thumbUrl: '', color: this.$randomColor(Date.now().toString()), points: c.points}]
                   },
                   node: val
                 })
@@ -201,7 +213,8 @@ export default {
         case 'fragment': {
           switch (action) {
             case 'confirm': {
-              this.$emit('itemClick', this.item)
+              if (this.ctx === 'inEditor') this.$emit('itemClick', this.item)
+              else this.$refs.fragmentEditorDialog.show()
               break
             }
             case 'preview': {
@@ -210,6 +223,24 @@ export default {
             }
             case 'delete': {
               this.fragmentDelete(this.item)
+              break
+            }
+          }
+          break
+        }
+        case 'cut': {
+          switch (action) {
+            case 'confirm': {
+              if (this.ctx === 'inEditor') this.$emit('itemClick', this.item)
+              else this.$refs.fragmentEditorDialog.show()
+              break
+            }
+            case 'preview': {
+              this.$q.notify('PREVIEW')
+              break
+            }
+            case 'delete': {
+              this.cutDelete(this.item)
               break
             }
           }
@@ -224,6 +255,13 @@ export default {
       // this.fragmentToDelete = this.itemIndex
       let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
       // this.fragmentToDelete = -1
+      this.$log('res', res)
+    },
+    async cutDelete (item) {
+      this.$log('cutDelete', item)
+      let node = item.node
+      node.fragments[item.fragmentIndex].cuts.splice([item.cutIndex], 1)
+      let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
       this.$log('res', res)
     }
   },

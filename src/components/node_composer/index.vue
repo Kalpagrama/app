@@ -241,8 +241,8 @@ export default {
 
     // TODO
     // данные из меню поделиться в приложение
-    {
-      let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
+    // {
+    //   let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
       if (shareData){
         alert(`shareData: ${JSON.stringify(shareData)}`)
         let shareUrl = shareData.text || shareData.url || shareData.title
@@ -254,7 +254,6 @@ export default {
         }
       }
       this.$store.commit('core/stateSet', ['shareData', null]) // после использования - очистить
-    }
 
     this.$log('wsItem', wsItem)
     if (nodeLocalStorage) {

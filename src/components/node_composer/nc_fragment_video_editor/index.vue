@@ -60,6 +60,13 @@ div(:style=`{position: 'relative'}`).column.full-width.bg-black
         :class=`{'bg-grey-10': ci !== cutIndex, 'bg-grey-5': ci === cutIndex}`
         ).row.full-width.q-mb-sm
         //- cut wrapper
+        //- cut name ROW
+        div(
+          v-if="c.name && c.name.length > 0"
+          :style=`{position: 'relative', height: '40px'}`
+          ).row.full-width.items-center.q-px-md
+          span.text-white.text-bold {{ c.name }}
+        //- cut body
         div(
           :style=`{position: 'relative', height: '50px'}`
           ).row.full-width
@@ -129,6 +136,7 @@ export default {
   props: ['width', 'height', 'fragment', 'player', 'now', 'editing'],
   data () {
     return {
+      now_: 0,
       cutIndex: -1,
       cutPlaying: -1,
       cutSetTimeDialogOpened: false,
@@ -147,18 +155,21 @@ export default {
       return this.fragment.cuts
     },
     cutDialogOptions () {
-      return {
-        header: false,
-        headerName: '',
+      let options = {
+        header: this.cut ? this.cut.name.length > 0 : false,
+        headerName: this.cut ? this.cut.name : '',
+        confirm: true,
+        confirmName: 'Play',
         actions: {
-          setName: {name: 'Set name'},
-          setStart: {name: 'Set start'},
-          setEnd: {name: 'Set name'},
-          up: {name: 'Up'},
+          setName: {name: 'Set cut name'},
           down: {name: 'Down'},
-          delete: {name: 'Delete', color: 'red'}
+          up: {name: 'Up'},
+          delete: {name: 'Delete', color: 'red'},
         }
       }
+      if (this.cutIndex === 0) delete options.actions.up
+      if (this.cutIndex === this.cuts.length - 1) delete options.actions.down
+      return options
     },
     fragmentDuration () {
       return this.cuts.reduce((acc, val) => {
@@ -185,17 +196,24 @@ export default {
         // this.$log('now CHANGED', to)
         // if (to && from && to.color === from.color) return
         if (this.cut && this.cutPlaying >= 0) {
-          if (to > this.cut.points[1].x || to < this.cut.points[0].x) {
+          // this.player.pause()
+          if (to >= this.cut.points[1].x) {
             if (this.fragmentPlaying) {
               this.$log('FRAGMENT PLAYING')
               if (this.cuts[this.cutIndex + 1]) {
                 this.$log('NEXT CUT')
                 this.cutIndex += 1
                 this.cutPlaying += 1
+                this.$nextTick(() => {
+                  this.player.setCurrentTime(this.cut.points[0].x)
+                })
               } else {
                 this.$log('FIRST CUT AGAIN')
                 this.cutIndex = 0
                 this.cutPlaying = 0
+                this.$nextTick(() => {
+                  this.player.setCurrentTime(this.cut.points[0].x)
+                })
               }
             } else {
               this.$log('CUT AGAIN')
@@ -216,6 +234,7 @@ export default {
         this.fragmentPlaying = false
         this.cutIndex = -1
         this.cutPlaying = -1
+        this.player.pause()
       } else {
         this.fragmentPlaying = true
         this.cutIndex = 0
@@ -227,11 +246,13 @@ export default {
     cutDialogAction (action) {
       this.$log('cutDialogAction', action)
       switch (action) {
-        case 'setName': {
+        case 'confirm': {
+          this.cutPlay(this.cut, this.cutIndex)
           break
         }
-        case 'setStart': {
-          this.cutTimerDialogOpened = true
+        case 'setName': {
+          // TODO: open cut namedialog
+          this.cutNameDialogOpened = true
           break
         }
         case 'up': {
@@ -247,7 +268,7 @@ export default {
           break
         }
       }
-      this.cutIndex = -1
+      // this.cutIndex = -1
     },
     cutNameClick (c, ci) {
       this.$log('cutNameClick', c, ci)
@@ -256,11 +277,13 @@ export default {
     },
     cutPlay (c, ci) {
       this.$log('cutPlay', c, ci)
+      this.fragmentPlaying = false
       if (this.cutPlaying === ci) {
+        this.player.pause()
         this.cutPlaying = -1
       } else {
         this.cutPlaying = ci
-        this.player.setCurrentTime(this.cut.points[0].x)
+        // this.player.setCurrentTime(this.cut.points[0].x)
         this.player.play()
       }
     },
@@ -273,11 +296,25 @@ export default {
         this.cutSetTimeDialogOpened = true
       }
     },
-    cutUp () {
-      this.$log('pointUp')
+    cutUp (index) {
+      this.$log('cutUp')
+      let current = this.cuts[index]
+      let to = this.cuts[index - 1]
+      this.cuts[index] = to
+      this.cuts[index - 1] = current
+      this.$nextTick(() => {
+        this.cutIndex = index - 1
+      })
     },
-    cutDown () {
-      this.$log('pointDown')
+    cutDown (index) {
+      this.$log('cutDown')
+      let current = this.cuts[index]
+      let to = this.cuts[index + 1]
+      this.cuts[index] = to
+      this.cuts[index + 1] = current
+      this.$nextTick(() => {
+        this.cutIndex = index + 1
+      })
     },
     cutMoreClick (c, ci) {
       this.$log('cutMoreClick', c, ci)
@@ -314,7 +351,10 @@ export default {
     this.$log('mounted', this.cuts.length)
     if (this.cuts.length > 0) {
       this.cutIndex = 0
-      this.player.setCurrentTime(this.cut.points[0].x)
+      // this.player.setCurrentTime(this.cut.points[0].x)
+      // this.player.play()
+      this.fragmentPlay()
+    } else {
       this.player.play()
     }
   },

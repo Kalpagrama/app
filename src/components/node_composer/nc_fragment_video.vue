@@ -26,12 +26,12 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   //- content
   div(
-    v-if="!mini && visible && ctx === 'inExplorer'" @click="$router.push('/content/' + fragment.content.oid)"
+    v-if="!mini && visible && ctx !== 'inEditor'" @click="$router.push('/content/' + fragment.content.oid)"
     :style=`{
       position: 'absolute', zIndex: 103, left: '8px', top: '8px', height: '42px',
       borderRadius: '10px', overflow: 'hidden',
       background: 'rgba(255,255,255,0.15)'}`
-      ).row.items-center.q-pa-sm.cursor-pointer.bg
+      ).row.items-center.q-pa-sm.cursor-pointer
     span(:style=`{userSelect: 'none', whiteSpace: 'nowrap'}`).text-white {{ fragment.content.name | cut(40) }}
   //- video wrapper
   div(:style=`{position: 'relative'}`).row.fit
@@ -81,24 +81,11 @@ export default {
   computed: {
   },
   watch: {
-    // mini: {
-    //   handler (to, from) {
-    //     this.$log('mini CHANGED', to)
-    //     if (to) {
-    //       // this.player.setCurrentTime(now)
-    //       this.nowMini = this.now
-    //       this.player.setCurrentTime(this.nowMini)
-    //     } else {
-    //       this.player.setCurrentTime(this.nowMini)
-    //     }
-    //   }
-    // },
     visible: {
       immediate: true,
       handler (to, from) {
         this.$log('visible CHANGED', to)
         if (to && !this.mini) {
-          // this.$q.notify('visible VIDEO')
           // this.play()
         }
       }
@@ -177,6 +164,7 @@ export default {
           this.player.addEventListener('timeupdate', this.videoTimeupdate)
           this.player.addEventListener('seeked', this.videoSeeked)
           // this.player.play()
+          this.player.setMuted(false)
           this.muted = false
           this.$emit('ready')
           // this.$q.notify('ready')
