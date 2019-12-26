@@ -23,18 +23,7 @@ export default {
   },
   methods: {
     async logout () {
-    this.$logD('logout')
-    await this.$apollo.mutate({
-     mutation: gql`
-          mutation logoutFromKalpa {
-            logout
-          }
-        `
-    })
-    localStorage.removeItem('ktoken')
-    localStorage.removeItem('ktokenExpires')
-    localStorage.removeItem('ktokenInviteCode')
-    this.$router.push('/login')
+      await this.$store.dispatch('auth/logout', localStorage.getItem('ktoken'))
     }
   }
 }

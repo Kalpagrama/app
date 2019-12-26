@@ -183,7 +183,7 @@ export const setObjectValue = async (context, { oid, path, value }) => {
 
   let { data: { objectChange } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation objectChange ($oid: OID!, $path: String!, $value: RawJSON!) {
+      mutation sw_network_only_objectChange ($oid: OID!, $path: String!, $value: RawJSON!) {
         objectChange (oid: $oid, path: $path, value: $value)
       }
     `,

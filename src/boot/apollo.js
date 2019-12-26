@@ -73,7 +73,7 @@ export default async ({ Vue, store, app }) => {
   })
 
   let { data: { services } } = await servicesApollo.query({
-    query: gql`query sw_cache_services {services}`
+    query: gql`query sw_network_first_services {services}`
   })
   logD('services', services)
   let linkAuth = services.AUTH

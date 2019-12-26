@@ -21,7 +21,7 @@ export const nodeUnrate = async (context, oid) => {
   if (!oid) return
   let { data: { nodeUnrate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation nodeUnrate ($oid: OID!) {
+      mutation sw_network_only_nodeUnrate ($oid: OID!) {
         nodeUnrate (oid: $oid)
       }
     `,
@@ -40,7 +40,7 @@ export const nodeRate = async (context, { oid, rate }) => {
   if (!rate) throw new Error('No rate!')
   let { data: { nodeRate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation nodeRate ($oid: OID!, $rate: Float!) {
+      mutation sw_network_only_nodeRate ($oid: OID!, $rate: Float!) {
         nodeRate (oid: $oid, rate: $rate)
       }
     `,
@@ -145,7 +145,7 @@ export const nodeCreate = async (context, node) => {
   logD('nodeCreate nodeInput', nodeInput)
   let { data: { nodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation nodeCreate ($node: NodeInput!) {
+      mutation sw_network_only_nodeCreate ($node: NodeInput!) {
         nodeCreate (node: $node)
       }
     `,

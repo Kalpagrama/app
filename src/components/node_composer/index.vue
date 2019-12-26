@@ -243,14 +243,16 @@ export default {
     // данные из меню поделиться в приложение
     {
       let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
-      let shareUrl = shareData.text || shareData.url || shareData.title
-      // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
-      if (shareUrl) {
-        // todo использовать как фрагмент
-      } else if (shareData.images.length || shareData.videos.length){
-        // todo использовать как фрагменты
+      if (shareData){
+        alert(`shareData: ${JSON.stringify(shareData)}`)
+        let shareUrl = shareData.text || shareData.url || shareData.title
+        // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
+        if (shareUrl) {
+          // todo использовать как фрагмент
+        } else if (shareData.images.length || shareData.videos.length){
+          // todo использовать как фрагменты
+        }
       }
-
       this.$store.commit('core/stateSet', ['shareData', null]) // после использования - очистить
     }
 
