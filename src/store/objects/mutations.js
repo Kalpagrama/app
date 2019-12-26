@@ -63,16 +63,15 @@ function setValue (obj, path, value) {
 export function setObjectValue (state, { oid, path, value }) {
   let object = state.objects[oid] ? state.objects[oid].objectData : null
   if (!object) return
+  let p = path.split('.')
+  setValue(object, p, value)
+  logD('currentUser', state.currentUser)
   if (i18next.language !== state.currentUser.profile.lang) { // изменился язык пользователя. изменить язык интерфейса
-    logD('change lang from: ', i18next.language, 'to: ', state.currentUser.profile.lang)
+    logD('change lang from:2 ', i18next.language, 'to: ', state.currentUser.profile.lang)
     i18next.changeLanguage(state.currentUser.profile.lang).catch(err => logE(err))
     // window.location.reload()
     Vue.forceUpdate();
   }
-
-  let p = path.split('.')
-  setValue(object, p, value)
-  logD('currentUser', state.currentUser)
 }
 
 export function deleteUserSession (state, token) {

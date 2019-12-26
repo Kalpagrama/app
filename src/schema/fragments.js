@@ -176,6 +176,8 @@ const userFragment = gql`
     events{...eventFragment}
     profile{
       tutorial
+      about
+      status
       thumbUrl(preferWidth: 600)
       city
       country

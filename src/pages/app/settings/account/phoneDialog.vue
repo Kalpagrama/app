@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   //- Phone
-  q-dialog(ref="changePhone" :maximized="true" transition-show="slide-left" transition-hide="slide-right").bg-secondary
+  q-dialog(ref="changePhone" :maximized="$q.screen.xs" transition-show="slide-left" transition-hide="slide-right").bg-secondary
     div(style=`height: 60px`).row.items-center.bg-primary
       div(style=`height: 60px; width: 60px`).row.justify-center.items-center
         q-btn(round flat icon="arrow_back" color="white" @click="closing()")

@@ -1,6 +1,6 @@
 <template lang="pug">
 .column.fit.bg-grey-1
-  q-dialog(ref="sessions" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
+  q-dialog(ref="sessions" :maximized="$q.screen.xs" transition-show="slide-left" transition-hide="slide-right")
     div(style=`height: 60px`).row.items-center.bg-primary
       div(style=`height: 60px; width: 60px`).row.justify-center.items-center
         q-btn(round flat icon="arrow_back" color="white" @click="$refs.sessions.toggle()")
