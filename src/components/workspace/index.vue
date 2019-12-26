@@ -14,16 +14,19 @@
 q-layout(view="hHh lpR fFf").bg-grey-3
   //- actions and dialogs
   q-dialog(ref="settingsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    .row.full-width.justify-center.bg-grey-3
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        ws-settings(@close="$refs.settingsDialog.hide()")
+    div(@click.self="$refs.settingsDialog.hide()").row.fit.justify-center.items-end.content.end
+      ws-settings(
+        @close="$refs.settingsDialog.hide()"
+        :style=`{
+          maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
+          borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
   q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    .row.full-width.justify-center.bg-grey-3
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        ws-spheres(@close="$refs.spheresDialog.hide()")
-  //- q-btn(
-  //-   round push icon="add" size="lg" color="green" @click="itemAdd()"
-  //-   :style=`{position: 'absolute', zIndex: 1000, bottom: '80px', right: '8px'}`)
+    div(@click.self="$refs.spheresDialog.hide()").row.fit.justify-center.items-end.content-end
+      ws-spheres(
+        @close="$refs.spheresDialog.hide()"
+        :style=`{
+          maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
+          borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
   //- header
   q-header.row.full-width.justify-center
     div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px', color: 'black'}`).row.full-width.items-center.bg-grey-3

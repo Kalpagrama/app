@@ -1,5 +1,10 @@
 <template lang="pug">
 div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-center.content-center
+  //- add cut btn
+  q-btn(
+    v-if="!panning && !panningFrames"
+    round push color="green" icon="add" @click="$emit('cutCreate')"
+    :style=`{position: 'absolute', zIndex: 1000, right: '16px'}`)
   .row.full-width
     div(
       ref="framesScrollWrapper"
@@ -42,7 +47,7 @@ div(:style=`{position: 'relative', minHeight: '70px'}`).row.full-width.items-cen
               position: 'absolute', zIndex: 100, height: '66px', top: '-8px',
               left: (cut.points[0].x/duration)*100+'%',
               width: ((cut.points[1].x-cut.points[0].x)/duration)*100+'%',
-              borderRadius: '16px', border: '8px solid '+ cut.color, pointerEvents: 'none'}`).row
+              borderRadius: '16px', border: '8px solid '+ cut.color, pointerEvents: 'none'}`).row.br
           //- now second
           div(
             v-if="true"
@@ -81,7 +86,8 @@ export default {
   data () {
     return {
       framesWidth: 0,
-      panning: false
+      panning: false,
+      panningFrames: false
     }
   },
   computed: {
@@ -116,6 +122,14 @@ export default {
     }
   },
   watch: {
+    panning: {
+      handler (to, from) {
+        this.$log('panning CHANGED', to)
+        if (to) {
+          this.$emit('panningStarted', true)
+        }
+      }
+    },
     cut: {
       immediate: true,
       handler (to, from) {
@@ -131,11 +145,13 @@ export default {
   methods: {
     panFrames (e) {
       if (this.panning) return
-      this.$log('panFrames', e)
+      // this.$log('panFrames', e)
       this.$refs.framesScrollWrapper.scrollLeft -= e.delta.x
+      if (e.isFirst) this.panningFrames = true
+      if (e.isFinal) this.panningFrames = false
     },
     panStart (e) {
-      this.$log('panStart', e)
+      // this.$log('panStart', e)
       let to = this.cut.points[0].x + (e.delta.x * this.k)
       if (to >= 0 && to < this.cut.points[1].x && to <= this.duration) {
         this.player.currentTime = to
@@ -145,7 +161,7 @@ export default {
       if (e.isFinal) this.panning = false
     },
     panEnd (e) {
-      this.$log('panEnd', e)
+      // this.$log('panEnd', e)
       let to = this.cut.points[1].x + (e.delta.x * this.k)
       if (to >= 0 && to > this.cut.points[0].x && to <= this.duration) {
         this.player.currentTime = to
