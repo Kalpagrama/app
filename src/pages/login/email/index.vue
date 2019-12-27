@@ -12,7 +12,7 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: 330+'px'}`).row.full-width
     .row.fit.content-center.items-center
-      //- div(v-if="!codeConfirmed && !codeWaiting")
+      div(v-if="!codeConfirmed && !codeWaiting")
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mb-sm.bg-white
           input(
             :placeholder="$t('Почта')"
