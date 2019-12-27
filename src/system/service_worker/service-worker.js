@@ -164,7 +164,7 @@ if (useCache) {
         if (type === 'mutation') {
           return await networkFirst(event, gqlStore)
         } else {
-          return await StaleWhileRevalidate(event, gqlStore)
+          return await networkFirst(event, gqlStore)
         }
       }
     }

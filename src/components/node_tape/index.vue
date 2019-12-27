@@ -1,3 +1,4 @@
+// deprecated
 <template lang="pug">
 div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
   //- header

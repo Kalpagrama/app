@@ -251,10 +251,8 @@ export default {
       } else if (shareData.images.length || shareData.videos.length) {
         // todo использовать как фрагменты
       }
-    }
-      }
       this.$store.commit('core/stateSet', ['shareData', null]) // после использования - очистить
-
+    }
     this.$log('wsItem', wsItem)
     if (nodeLocalStorage) {
       if (wsItem) {

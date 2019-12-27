@@ -131,7 +131,7 @@ import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'nodeNew',
-  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'nodeFullReady', 'visible'],
+  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'nodeFullReady', 'visible', 'priority'],
   components: {ncFragment},
   data () {
     return {
@@ -316,10 +316,11 @@ export default {
       }
     },
     async nodeLoad (oid) {
-      // this.$log('nodeLoad start', this.index, this.node.oid)
+      this.$log(`nodeLoad start indx=${this.index} priority=${this.priority} oid=${this.node.oid}`)
       let node = null
       try {
-        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
+        let priority = this.priority || 0
+        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority })
         this.nodeFullError = null
       } catch (err) {
         this.$logE('node', 'nodeLoad error', err)

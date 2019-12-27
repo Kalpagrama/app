@@ -5,7 +5,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
     v-if="nodesBan ? !nodesBan.includes(n.oid) : true"
     :ctx="'inList'"
     :node="n" :index="ni"
-    :needFull="ni > nodeMiddle-2 && ni < nodeMiddle+2"
+    :priority="ni >= nodeMiddle-1 && ni <= nodeMiddle+1 ? 0 : 1"
+    :needFull="ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
     :visible="nodeMiddle === ni"
     @error="nodesBan.push(n.oid)"
     @nodeClick="$event => $emit('nodeClick', $event)"
@@ -14,7 +15,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
       callback: nodeMiddleHandler,
       throttle: 300,
       intersection: {
-        rootMargin: -($q.screen.height/2-10)+'px 0px'
+        rootMargin: -($q.screen.height/2-1)+'px 0px'
       }
     }`
     ).bg-white.q-mb-lg
