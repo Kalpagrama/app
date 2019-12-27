@@ -189,20 +189,21 @@ export default {
     },
     needFull: {
       immediate: true,
-      async handler (to, from) {
-        if (!this.nodeFull && to) {
-        if (to) {
-          if (!this.nodeFull) this.nodeFull = await this.nodeLoad(this.node.oid)
-        } else {
-          this.nodeFull = null
+        async handler (to, from) {
+          if (to) {
+            if (!this.nodeFull) this.nodeFull = await this.nodeLoad(this.node.oid)
+          } else {
+            this.nodeFull = null
+          }
         }
-      }
     },
     needFullPreload: {
       immediate: true,
       async handler (to, from) {
-        if (!this.nodeFull && to) {
-          this.nodeFull = await this.nodePreLoad(this.node.oid)
+        if (to) {
+          if (!this.nodeFull) this.nodeFull = await this.nodePreLoad(this.node.oid)
+        } else {
+          this.nodeFull = null
         }
       }
     },
