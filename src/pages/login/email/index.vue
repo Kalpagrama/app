@@ -19,7 +19,7 @@
             v-model="email" type="email" filled @keyup.enter="emailSend()"
             ).full-width.bg-white.kinput
         q-btn(
-          push no-caps color="accent" @click="notify()" :loading="emailSending"
+          push no-caps color="accent" @click="emailSend()" :loading="emailSending"
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm
           span.text-bold {{$t('Next')}}
         //- q-btn(
@@ -30,6 +30,7 @@
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
           input(
             :placeholder="$t('Код')"
+            pattern="[0-9]*"
             type="number"
             v-model="code" filled @keyup.enter="codeSend()"
             ).full-width.bg-white.kinput
@@ -57,7 +58,6 @@ export default {
       codeWaiting: false,
       codeSending: false,
       codeConfirmed: false,
-      message: 'No invite! Need invite!'
     }
   },
   methods: {
@@ -71,7 +71,7 @@ export default {
     try {
       this.$logD('emailSend start', this.email)
       this.emailSending = true
-      if (this.email.length === 0) throw { message: 'Wrong email!' }
+      if (this.email.length === 0) this.$q.notify({message: 'Wrong email! Enter correct Email!', color: 'white', position: 'bottom', textColor: 'red', icon: 'error'})
       await this.$store.dispatch('auth/loginEmail', this.email)
       // let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
       //  client: 'authApollo',
@@ -101,15 +101,16 @@ export default {
       this.$logD('emailSend error', error)
       this.$logD('notify sent')
       this.emailSending = false
-      this.$q.notify({
-        message: 'No invite! Need invite!',
-        icon: 'error'
-      })
+      if (this.email.length > 0) {
+        this.$q.notify({
+          message: 'No invite! Need invite!',
+          color: 'white',
+          position: 'bottom',
+          textColor: 'red',
+          icon: 'error'
+        })
+      }
     }
-  },
-  notify () {
-    this.$log('NOTIFY')
-    this.$q.notify('No invite! Need invite!')
   },
   async codeSend () {
     try {
@@ -156,7 +157,6 @@ export default {
   },
   mounted () {
     this.$logD('mounted')
-    this.$q.notify('jhbjhbjh')
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')
