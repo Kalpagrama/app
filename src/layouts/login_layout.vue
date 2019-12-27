@@ -6,8 +6,8 @@ q-layout().bg-primary
         k-spinner(:width="100" :height="100" @click.native="$go('/login')")
         .row.full-width.justify-center.q-mt-sm
           span.text-h6.text-white.text-bold KALPAGRAMMA
-      .col.full-width.scroll
-        router-view
+  q-footer(style=`height: 50%`)
+    router-view
 </template>
 
 <script>
