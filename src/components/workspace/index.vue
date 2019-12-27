@@ -20,13 +20,13 @@ q-layout(view="hHh lpR fFf").bg-grey-3
         :style=`{
           maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
           borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
-  q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    div(@click.self="$refs.spheresDialog.hide()").row.fit.justify-center.items-end.content-end
-      ws-spheres(
-        @close="$refs.spheresDialog.hide()"
-        :style=`{
-          maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
-          borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
+  //- q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+  //-   div(@click.self="$refs.spheresDialog.hide()").row.fit.justify-center.items-end.content-end
+  //-     ws-spheres(
+  //-       @close="$refs.spheresDialog.hide()"
+  //-       :style=`{
+  //-         maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
+  //-         borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
   //- header
   q-header.row.full-width.justify-center
     div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px', color: 'black'}`).row.full-width.items-center.bg-grey-3
@@ -34,7 +34,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
         .row.fit.items-center.q-px-md
           span.text-bold {{$t('Workspace')}}
       div(:style=`{height: '60px'}`).row.items-center.justify-center.q-px-sm
-        q-btn(round flat icon="style" color="grey-9" @click="$refs.spheresDialog.show()")
+        //- q-btn(round flat icon="style" color="grey-9" @click="$refs.spheresDialog.show()")
         q-btn(round flat icon="settings" color="grey-9" @click="$refs.settingsDialog.show()")
   //- body
   q-page-container.row.full-width.justify-center

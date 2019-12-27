@@ -4,7 +4,7 @@
 }
 </style>
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-black
+q-layout(view="hHh lpR fFf").bg-secondary
   q-page-conainter
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width

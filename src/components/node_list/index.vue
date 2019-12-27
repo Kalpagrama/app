@@ -30,8 +30,7 @@ export default {
   },
   data () {
     return {
-      nodeHeight: 50,
-      nodeMiddle: 0
+      nodeMiddle: -1
     }
   },
   computed: {
@@ -42,10 +41,6 @@ export default {
         this.$log('nodeMiddleHandler', entry.target.accessKey)
         this.nodeMiddle = parseInt(entry.target.accessKey)
       }
-    },
-    nodeClick (n, ni) {
-      this.$logD('nodeClick', n, ni)
-      this.$emit('nodeClick', n)
     }
   },
   mounted () {

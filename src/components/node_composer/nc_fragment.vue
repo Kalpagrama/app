@@ -53,7 +53,7 @@ div(
       :src="ctx === 'inEditor' ? fragment.content.thumbUrl : thumbUrl"
       @load="previewLoad" @error="previewError"
       crossOrigin="anonymous" draggable="false"
-      :style=`{width: '100%', minWidth: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain', userSelect: 'none', opacity: previewLoaded ? 0 : 1}`
+      :style=`{width: '100%', minWidth: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain', userSelect: 'none', opacity: previewLoaded ? 1 : 1}`
       :class=`{'full-height': ctx !== 'inEditor'}`)
     //- video
     div(
