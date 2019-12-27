@@ -74,9 +74,10 @@ export default {
       // this.videoUrl = url
       // this.videoShow = true
       let { data } = await this.$apollo.mutate({
+        client: 'uploadApollo',
         mutation: gql`
           ${fragments.objectFullFragment}
-          mutation uploadContentFileFragmentFinder($file: Upload!, $length: Float!) {
+          mutation sw_network_only_uploadContentFileFragmentFinder($file: Upload!, $length: Float!) {
             uploadContentFile(file: $file, length: $length) {
               ...objectFullFragment
             }
@@ -85,10 +86,9 @@ export default {
         variables: {
           file: file,
           length: file.size
-        },
-        client: 'uploadApollo'
+        }
       })
-      this.$log('data', data)
+      this.$log('file upload data', data)
       // let content = {
       //   oid: false,
       //   type: 'VIDEO',

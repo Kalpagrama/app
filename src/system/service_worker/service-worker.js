@@ -1,4 +1,4 @@
-const swVer = 7
+const swVer = 2
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
   cacheGraphQl,
@@ -378,7 +378,8 @@ if (useCache) {
         default:
           logDebug('fallback default', event.request)
           // If we don't have a fallback, just return an error response.
-          return Response.error()
+          // return Response.error()
+          return await fetch(event.request.clone())
       }
     })
   }
