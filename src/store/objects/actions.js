@@ -129,11 +129,9 @@ class Queue {
         if (!object) object = { oid: item.oid, notFound: true }
 
         context.commit('objectAdd', { object, fragmentName: item.fragmentName })
-        if (object.notFound) {
-          item.reject(`object not found on backend ${object.oid}`)
-        } else {
-          item.resolve(object)
-        }
+        if (object.notFound) item.reject(`object not found on backend ${object.oid}`)
+        else if (object.deletedAt) item.reject(`object was deleted ${object.oid}`)
+        else item.resolve(object)
         context.commit('stateSet', ['queryInProgress', false])
       }
       this.next(context)
@@ -149,23 +147,22 @@ class Queue {
 
 const queue = new Queue()
 
-// Вернет объект из кэша, либо запросит его. Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
+// Вернет объект из кэша, либо запросит его. и вернет промис, который возможно когда-то выполнится(когда дойдет очередь);
+// Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
 // priority 0 - будут выполнены 20 последних запросов.
 // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
 // fragmentName - определяет множество выводимых полей
-export const get = async (context, { oid, fragmentName, priority }) => {
+export const get = async(context, { oid, fragmentName, priority }) => {
   logD('objects', 'objectGet start...')
   // Если объект в кэше - взять из кэша
   let object = context.getters.objectGet({ oid, fragmentName })
   if (object) {
-    if (object.notFound) {
-      throw new Error(`object not found on backend ${object.oid}`)
-    } else {
-      return object
-    }
+    if (object.notFound) throw new Error(`object not found on backend ${object.oid}`)
+    else if (object.deletedAt) throw new Error(`object was deleted ${object.oid}`)
+    else return object
   }
   let promise = queue.push(context, oid, fragmentName, priority)
-  return promise
+  return await promise
 }
 
 // path ex: ['settings', 'general', 'language'] OR ['profile', 'gender']

@@ -324,7 +324,7 @@ export default {
         this.nodeFullError = null
       } catch (err) {
         this.$logE('node', 'nodeLoad error', err)
-        this.$emit('error')
+        this.$emit('hide') // не показывать это ядро
         node = null
         this.nodeFullError = err
       }

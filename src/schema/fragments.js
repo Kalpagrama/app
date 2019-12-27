@@ -1,4 +1,21 @@
 import gql from 'graphql-tag'
+
+const metaFragment = gql`
+  fragment metaFragment on Meta {
+    type
+    ...on MetaNode {
+      fragments {
+        width
+        height
+        thumbUrl(preferWidth: 600)
+      }
+    }
+    ...on MetaContent{
+      type
+      uploadedFileInfo
+    }
+  }
+`
 const objectShortFragment = gql`
   fragment objectShortFragment on ObjectShort {
     type
@@ -8,27 +25,34 @@ const objectShortFragment = gql`
   }
 `
 const objectShortWithMetaFragment = gql`
+  ${metaFragment}
   fragment objectShortWithMetaFragment on ObjectShort {
     type
     oid
     name
     thumbUrl(preferWidth: 600)
-    meta{
-      type
-      ...on MetaNode{
-        layout
-        fragments { width height thumbUrl(preferWidth: 600) }
-      }
-    }
+    meta{...metaFragment}
   }
 `
 
-const videoFragment = gql`
-  fragment videoFragment on Video {
-    oid
+const objectFragment = gql`
+  ${metaFragment} ${objectShortFragment}
+  fragment objectFragment on Object {
     type
+    oid
     name
     thumbUrl(preferWidth: 600)
+    createdAt
+    deletedAt
+    subscriberCnt
+    subscribers {...objectShortFragment}
+    meta{ ...metaFragment}
+  }
+`
+const videoFragment = gql`
+  ${objectFragment}
+  fragment videoFragment on Video {
+    ...objectFragment
     url
     urlOriginal
     duration
@@ -39,11 +63,9 @@ const videoFragment = gql`
   }
 `
 const imageFragment = gql`
+  ${objectFragment}
   fragment imageFragment on Image {
-    oid
-    type
-    name
-    thumbUrl(preferWidth: 600)
+    ...objectFragment
     url
     urlOriginal
     width
@@ -51,12 +73,9 @@ const imageFragment = gql`
   }
 `
 const nodeFragment = gql`
-  ${videoFragment} ${imageFragment}
+  ${videoFragment} ${imageFragment} ${objectFragment}
   fragment nodeFragment on Node {
-    type
-    oid
-    name
-    thumbUrl(preferWidth: 600)
+    ...objectFragment
     rate
     rateUser
     viewCnt
@@ -89,28 +108,14 @@ const nodeFragment = gql`
       }
       
     }
-    meta {
-      ...on MetaNode {
-        fragments { 
-          width
-          height
-          thumbUrl(preferWidth: 600)
-        }
-      }
-    }
   }
 `
-
 const sphereFragment = gql`
+  ${objectFragment}
   fragment sphereFragment on Object {
-    oid
-    type
-    name
-    thumbUrl(preferWidth: 600)
-    subscriberCnt
+    ...objectFragment
   }
 `
-
 const eventFragment = gql`
   ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${objectShortFragment} ${objectShortWithMetaFragment}
   fragment eventFragment on Event {
@@ -158,17 +163,13 @@ const eventFragment = gql`
     }
   }
 `
-
 const userFragment = gql`
-  ${objectShortFragment} ${nodeFragment} ${eventFragment}
+  ${objectShortFragment} ${nodeFragment} ${eventFragment} ${objectFragment}
   fragment userFragment on User {
-    oid
-    name
-    thumbUrl(preferWidth: 600)
+    ...objectFragment
     weightVal
     settings
     subscriptions{...objectShortFragment}
-    subscribers{...objectShortFragment}
     workspace{
       nodes { ...nodeFragment }
       spheres { ...objectShortFragment }
@@ -199,9 +200,9 @@ const userFragment = gql`
     }
   }
 `
-const objectFragment = gql`
+const objectFullFragment = gql`
   ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment}
-  fragment objectFragment on Object {
+  fragment objectFullFragment on Object {
     oid
     type
     name
@@ -216,7 +217,7 @@ const objectFragment = gql`
 
 const fragments = {
   eventFragment,
-  objectFragment,
+  objectFullFragment,
   userFragment,
   objectShortFragment,
   objectShortWithMetaFragment,

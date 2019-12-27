@@ -8,7 +8,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
     :priority="ni >= nodeMiddle-1 && ni <= nodeMiddle+1 ? 0 : 1"
     :needFull="ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
     :visible="nodeMiddle === ni"
-    @error="nodesBan.push(n.oid)"
+    @hide="nodesBan.push(n.oid)"
     @nodeClick="$event => $emit('nodeClick', $event)"
     :style=`{}`
     v-observe-visibility=`{
