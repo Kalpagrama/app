@@ -376,7 +376,7 @@ if (useCache) {
           return caches.match(workbox.precaching.getCacheKeyForURL('/statics/fallback_video.mp4'))
         }
         default:
-          logDebug('fallback default', event.request)
+          logDebug('fallback default (get from network)', event.request)
           // If we don't have a fallback, just return an error response.
           // return Response.error()
           return await fetch(event.request.clone())
