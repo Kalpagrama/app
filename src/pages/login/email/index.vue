@@ -19,7 +19,7 @@
             v-model="email" type="email" filled @keyup.enter="emailSend()"
             ).full-width.bg-white.kinput
         q-btn(
-          push no-caps color="accent" @click="emailSend()" :loading="emailSending"
+          push no-caps color="accent" @click="notify()" :loading="emailSending"
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm
           span.text-bold {{$t('Next')}}
         //- q-btn(
@@ -30,6 +30,7 @@
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
           input(
             :placeholder="$t('Код')"
+            type="number"
             v-model="code" filled @keyup.enter="codeSend()"
             ).full-width.bg-white.kinput
         q-btn(
@@ -39,22 +40,25 @@
         q-btn(
           outline no-caps color="white" @click="back()"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mt-sm
-            span {{$t('Back')}}
+          span {{$t('Back')}}
 </template>
 
 <script>
- export default {
+import { Notify } from 'quasar'
+export default {
   name: 'pageLoginEmail',
+  components: { Notify },
   data () {
-   return {
-    email: '',
-    emailSending: false,
-    code: '',
-    codeFake: 'xxxx',
-    codeWaiting: false,
-    codeSending: false,
-    codeConfirmed: false
-   }
+    return {
+      email: '',
+      emailSending: false,
+      code: '',
+      codeFake: 'xxxx',
+      codeWaiting: false,
+      codeSending: false,
+      codeConfirmed: false,
+      message: 'No invite! Need invite!'
+    }
   },
   methods: {
     back () {
@@ -65,87 +69,97 @@
     },
    async emailSend () {
     try {
-     this.$logD('emailSend start', this.email)
-     this.emailSending = true
-     if (this.email.length === 0) throw { message: 'Wrong email!' }
-     await this.$store.dispatch('auth/loginEmail', this.email)
-     // let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
-     //  client: 'authApollo',
-     //  mutation: gql`
-     //    mutation loginEmail ($email: String!, $inviteCode: String){
-     //      loginEmail(email: $email, inviteCode: $inviteCode){
-     //        token
-     //        expires
-     //        role
-     //      }
-     //    }
-     //  `,
-     //  variables: {
-     //    email: this.email,
-     //    inviteCode: localStorage.getItem('ktokenInviteCode')
-     //    // inviteCode: '171145051370487837'
-     //  }
-     // })
-     // this.$logD('token', token)
-     // localStorage.setItem('ktoken', token)
-     // localStorage.setItem('ktokenExpires', expires)
-     // this.$logD('emailSend done')
-     this.emailSending = false
-     this.codeWaiting = true
+      this.$logD('emailSend start', this.email)
+      this.emailSending = true
+      if (this.email.length === 0) throw { message: 'Wrong email!' }
+      await this.$store.dispatch('auth/loginEmail', this.email)
+      // let { data: { loginEmail: { token, expires, role } } } = await this.$apollo.mutate({
+      //  client: 'authApollo',
+      //  mutation: gql`
+      //    mutation loginEmail ($email: String!, $inviteCode: String){
+      //      loginEmail(email: $email, inviteCode: $inviteCode){
+      //        token
+      //        expires
+      //        role
+      //      }
+      //    }
+      //  `,
+      //  variables: {
+      //    email: this.email,
+      //    inviteCode: localStorage.getItem('ktokenInviteCode')
+      //    // inviteCode: '171145051370487837'
+      //  }
+      // })
+      // this.$logD('token', token)
+      // localStorage.setItem('ktoken', token)
+      // localStorage.setItem('ktokenExpires', expires)
+      // this.$logD('emailSend done')
+      this.emailSending = false
+      this.codeWaiting = true
+      this.$log('code', this.codeWaiting)
     } catch (error) {
-     this.$logD('emailSend error', error)
-     this.$q.notify(error.message || JSON.stringify(error))
-     this.emailSending = false
+      this.$logD('emailSend error', error)
+      this.$logD('notify sent')
+      this.emailSending = false
+      this.$q.notify({
+        message: 'No invite! Need invite!',
+        icon: 'error'
+      })
     }
-   },
-   async codeSend () {
+  },
+  notify () {
+    this.$log('NOTIFY')
+    this.$q.notify('No invite! Need invite!')
+  },
+  async codeSend () {
     try {
-     this.$logD('codeSend start')
-     this.codeSending = true
-     this.codeConfirmed = false
-     if (this.code.length !== 4) throw { message: 'Wrong code!' }
-     // await this.$wait(500)
-     // if (this.code !== this.codeFake) throw {message: 'Wrong code!'}
-     let { result, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/confirm', this.code)
-     //  let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
-     //  client: 'authApollo',
-     //  mutation: gql`
-     //        mutation codeConfirmEmail ($code: String!) {
-     //          confirm(code: $code){
-     //            result
-     //            nextAttemptDate
-     //            attempts
-     //            failReason
-     //          }
-     //        }
-     //      `,
-     //  variables: {
-     //   code: this.code
-     //  }
-     // })
-     this.codeSending = false
-     this.codeWaiting = false
-     if (result) {
-      this.$logD('codeSend done', result)
-      this.codeConfirmed = true
-      await this.$wait(1000)
-      this.$go('/')
-     } else {
-      this.$logD('codeSend fails', failReason)
-      this.$q.notify(this.$t('code send error') + failReason)
-     }
-    } catch (error) {
-     this.$logD('codeSend error', error)
-     this.$q.notify(error.message || JSON.stringify(error))
-     this.codeSending = false
+      this.$logD('codeSend start')
+      this.codeSending = true
+      this.codeConfirmed = false
+      if (this.code.length !== 4) throw { message: 'Wrong code!' }
+      // await this.$wait(500)
+      // if (this.code !== this.codeFake) throw {message: 'Wrong code!'}
+      let { result, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/confirm', this.code)
+      //  let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
+      //  client: 'authApollo',
+      //  mutation: gql`
+      //        mutation codeConfirmEmail ($code: String!) {
+      //          confirm(code: $code){
+      //            result
+      //            nextAttemptDate
+      //            attempts
+      //            failReason
+      //          }
+      //        }
+      //      `,
+      //  variables: {
+      //   code: this.code
+      //  }
+      // })
+      this.codeSending = false
+      this.codeWaiting = false
+      if (result) {
+        this.$logD('codeSend done', result)
+        this.codeConfirmed = true
+        await this.$wait(1000)
+        this.$go('/')
+      } else {
+        this.$logD('codeSend fails', failReason)
+        this.$q.notify(this.$t('code send error') + failReason)
+      }
+      } catch (error) {
+      this.$logD('codeSend error', error)
+      // this.$q.notify(error.message)
+      this.codeSending = false
+      }
     }
-   }
   },
   mounted () {
-   this.$logD('mounted')
+    this.$logD('mounted')
+    this.$q.notify('jhbjhbjh')
   },
   beforeDestroy () {
-   this.$logD('beforeDestroy')
+    this.$logD('beforeDestroy')
   }
  }
 </script>
