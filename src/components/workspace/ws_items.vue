@@ -12,47 +12,42 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(n, ni) in notes" :key="ni" @click="itemClick(n)"
+            v-for="(n, ni) in notes" :key="ni"
             :style=`{height: '60px', borderRadius: '10px'}`
             ).row.full-width.items-center.q-px-sm.bg-white.q-mb-sm
             span {{ $t(n.item.name) }}
   template(v-slot:fragments)
     .column.fit
+      k-dialog-bottom(ref="itemActionDialog" :options="itemActionOptions" @action="itemAction" @hide="itemIndex = -1")
+      q-dialog(ref="fragmentEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+        div(@click.self="$refs.fragmentEditorDialog.hide()"
+          :style=`{}`).row.full-width.justify-center.items-end
+          //- background: 'rgba(0,0,0,0.5)'
+          ws-fragment-editor(
+            :item="item" @item="item = {item: $event}"
+            @hide="$refs.fragmentEditorDialog.hide()"
+            :style=`{
+              maxWidth: $store.state.ui.pageMaxWidth-100+'px',
+              maxHeight: $q.screen.height+'px',
+              borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-        span {{$t('Total')}}: {{ fragments.length }}
+        //- span.text-bold {{ fragments.length }}
+        q-btn(round flat icon="search" color="grey")
         .col
-        q-btn(round flat icon="search")
+        q-btn(round flat icon="view_list" color="grey")
+        q-btn(round flat icon="view_module" color="green")
+        q-btn(round flat icon="view_stream" color='grey')
+        .col
+        q-btn(round push icon="add" color="green" @click="item = null, $refs.fragmentEditorDialog.show()")
       .col.full-width.scroll.kscroll
         .row.full-width.items-start.content-start.q-px-sm
-          div(
-            v-for="(f, fi) in fragments" :key="fi" @click="itemClick(f)"
-            :style=`{position: 'relative'}`
-            :class=`{'q-pl-xs': ci % 2 !== 0, 'q-pr-xs': ci % 2 === 0}`
+          //- v-if="fragmentToDelete !== ii"
+          ws-item-fragment(
+            v-for="(i, ii) in fragments" :key="i.node.oid"
+            :index="ii" :item="i" :itemIndex="itemIndex"
+            @action="item = JSON.parse(JSON.stringify(i)), itemIndex = ii, $refs.itemActionDialog.show()"
+            :class=`{'q-pl-xs': ii % 2 !== 0, 'q-pr-xs': ii % 2 === 0}`
             ).col-6.q-mb-sm
-            div(:style=`{borderRadius: '10px', oveflow: 'hidden'}`).row.full-width.items-center.bg-black
-              img(
-                :src="f.item.content.thumbUrl" draggable="false"
-                :style=`{
-                  width: '100%', height: '100%', maxHeight: '300px', objectFit: 'contain',
-                  borderRadius: '10px'}`)
-              div(
-                v-if="f.item.cuts"
-                :style=`{position: 'absolute', top: '8px', left: '8px'}`
-                ).row.full-width
-                div(v-for="(c, ci) in f.item.cuts" :key="ci"
-                  ).q-mr-xs
-                  div(:style=`{background: c.color, borderRadius: '4px'}`).q-px-sm
-                    small.text-white {{ $time(c.points[0].x)}}-{{$time(c.points[1].x) }}
-              //- small(:style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px'}`).text-white {{ f.type }}
-              q-btn(
-                round dense flat color="white" icon="more_vert" @click="itemDelete(f)"
-                :style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
-              small(
-                v-if="f.item.name"
-                :style=`{position: 'absolute', zIndex: 100, bottom: '50px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
-                ).q-pa-sm.text-white {{ f.item.name | cut(20) }}
-              small(:style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
-                ).q-pa-sm.text-white {{ f.item.content.name | cut(20) }}
   template(v-slot:contents)
     .column.fit
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -62,7 +57,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(c, ckey, ci) in contents" :key="ckey" @click="itemClick(c)"
+            v-for="(c, ckey, ci) in contents" :key="ckey"
             :style=`{position: 'relative', minHeight: '100px'}`
             :class=`{'q-pl-xs': ci % 2 !== 0, 'q-pr-xs': ci % 2 === 0}`
             ).col-6.q-mb-sm
@@ -85,7 +80,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
       .col.full-width.scroll
         .row.full-width.items-start.content-start.q-px-sm
           div(
-            v-for="(n, ni) in nodes" :key="n.oid" @click="itemClick(n)"
+            v-for="(n, ni) in nodes" :key="n.oid"
             :style=`{minHeight: '60px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.justify-center.bg-white.q-mb-sm.q-pa-sm
             div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-black
@@ -104,9 +99,13 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
 </template>
 
 <script>
+import wsFragmentEditor from './ws_fragment_editor'
+import wsItemFragment from './ws_item_fragment'
+
 export default {
   name: 'wsItems',
-  props: ['types', 'height'],
+  components: {wsFragmentEditor, wsItemFragment},
+  props: ['ctx', 'types', 'height'],
   data () {
     return {
       coll: 'fragments',
@@ -115,10 +114,25 @@ export default {
         {id: 'fragments', name: 'Fragments'},
         {id: 'contents', name: 'Contents'},
         {id: 'nodes', name: 'Nodes'}
-      ]
+      ],
+      item: null,
+      itemIndex: -1,
+      fragmentToDelete: -1
     }
   },
   computed: {
+    itemActionOptions () {
+      return {
+        header: this.item ? this.item.item.name.length > 0 : false,
+        headerName: this.item ? this.item.item.name : '',
+        confirm: true,
+        confirmName: this.ctx === 'inEditor' ? 'Choose' : 'Edit',
+        actions: {
+          preview: {name: 'Preiview'},
+          delete: {name: 'Delete', color: 'red'}
+        }
+      }
+    },
     collsFiltered () {
       if (this.types) {
         return this.colls.filter((c, ci) => {
@@ -142,32 +156,42 @@ export default {
     },
     fragments () {
       return this.$store.state.workspace.workspace.nodes.reduce((acc, val) => {
-        val.fragments.map((f, fi) => {
-          if (f.cuts.length > 0) {
+        if (val.fragments.length === 1) {
+          val.fragments.map((f, fi) => {
             acc.push({
               type: 'fragment',
               fragmentIndex: fi,
               item: f,
               node: val
             })
-            f.cuts.map((c, ci) => {
-              if (c.name) {
-                acc.push({
-                  type: 'cut',
-                  fragmentIndex: fi,
-                  cutIndex: ci,
-                  item: {
-                    name: c.name,
-                    scale: f.content.duration,
-                    content: f.content,
-                    cuts: [{name: '', thumbUrl: '', color: '', points: c.points}]
-                  },
-                  node: val
-                })
-              }
-            })
-          }
-        })
+          })
+        }
+        // val.fragments.map((f, fi) => {
+        //   if (f.cuts.length > 0) {
+        //     acc.push({
+        //       type: 'fragment',
+        //       fragmentIndex: fi,
+        //       item: f,
+        //       node: val
+        //     })
+        //     f.cuts.map((c, ci) => {
+        //       if (c.name) {
+        //         acc.push({
+        //           type: 'cut',
+        //           fragmentIndex: fi,
+        //           cutIndex: ci,
+        //           item: {
+        //             name: c.name,
+        //             scale: f.content.duration,
+        //             content: f.content,
+        //             cuts: [{name: '', thumbUrl: '', color: this.$randomColor(Date.now().toString()), points: c.points}]
+        //           },
+        //           node: val
+        //         })
+        //       }
+        //     })
+        //   }
+        // })
         return acc
       }, [])
     },
@@ -201,31 +225,62 @@ export default {
     }
   },
   methods: {
-    itemClick (val) {
-      this.$log('itemClick', val)
-      // this.$emit('itemClick', JSON.parse(JSON.stringify(val)))
-      this.$emit('itemClick', val)
-    },
-    itemDelete (val) {
-      this.$log('itemDelete', val)
-      switch (val.type) {
-        case 'note': {
-          // possible...
-          break
-        }
+    itemAction (action) {
+      this.$log('itemAction', this.item.type, action)
+      switch (this.item.type) {
         case 'fragment': {
-          // possible but delete cuts...
+          switch (action) {
+            case 'confirm': {
+              if (this.ctx === 'inEditor') this.$emit('itemClick', this.item)
+              else this.$refs.fragmentEditorDialog.show()
+              break
+            }
+            case 'preview': {
+              this.$q.notify('PREVIEW')
+              break
+            }
+            case 'delete': {
+              this.fragmentDelete(this.item)
+              break
+            }
+          }
           break
         }
-        case 'content': {
-          // how?? impossible...
-          break
-        }
-        case 'node': {
-          // call delete action
+        case 'cut': {
+          switch (action) {
+            case 'confirm': {
+              if (this.ctx === 'inEditor') this.$emit('itemClick', this.item)
+              else this.$refs.fragmentEditorDialog.show()
+              break
+            }
+            case 'preview': {
+              this.$q.notify('PREVIEW')
+              break
+            }
+            case 'delete': {
+              this.cutDelete(this.item)
+              break
+            }
+          }
           break
         }
       }
+    },
+    async fragmentDelete (item) {
+      this.$log('fragmentDelete', item)
+      let node = item.node
+      node.fragments[item.fragmentIndex] = null
+      // this.fragmentToDelete = this.itemIndex
+      let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
+      // this.fragmentToDelete = -1
+      this.$log('res', res)
+    },
+    async cutDelete (item) {
+      this.$log('cutDelete', item)
+      let node = item.node
+      node.fragments[item.fragmentIndex].cuts.splice([item.cutIndex], 1)
+      let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
+      this.$log('res', res)
     }
   },
   mounted () {

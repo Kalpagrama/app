@@ -62,10 +62,6 @@ function showNotifyNewVer () {
 
 async function initSw (store) {
   logD('initSw')
-  const swStore = new Store('sw-cache-common', 'common-data')
-  let swVer = await get('swVer', swStore)
-  store.commit('core/stateSet', ['version', `${store.state.core.version}-${swVer}`])
-
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
     logD('beforeinstallprompt')
@@ -83,6 +79,7 @@ async function initSw (store) {
     {
       registration = await navigator.serviceWorker.register('/service-worker.js')
       logD('Registration sw succeeded. Scope is ' + registration.scope)
+
       wait(100).then(() => {
         logD('sendMessageToSW...')
         sendMessageToSW({
@@ -128,6 +125,14 @@ async function initSw (store) {
           })
         })
       }
+      { // получаем версию текущего sw (просим сервисворкнра записать ее в iDb)
+        navigator.serviceWorker.addEventListener('message', function handler (event) {
+          let swVer = event.data
+          logD('sw version =', swVer);
+          store.commit('core/stateSet', ['version', `${store.state.core.version}-${swVer}`])
+        });
+        if (registration.active) registration.active.postMessage({ type: 'sendVersion' })
+      }
     }
     await initWebPush(store)
   }
@@ -161,15 +166,18 @@ async function clearCache (force = false) {
         if (force || !cacheName.startsWith('kalpa-precache')) {
           logD('clear cacheDb. cacheName=', cacheName)
           caches.delete(cacheName)
+          logD('clear cacheDb. Ok!', cacheName)
         }
       })
     })
   }
   logD('clear Idb...')
-  const swStore = new Store('sw-cache-common', 'common-data')
+  const swShareStore = new Store('sw-share', 'request-formData')
   const gqlStore = new Store('sw-cache-gql', 'graphql-responses')
-  await clear(swStore)
+  const gqlVideo = new Store('sw-cache-video', 'video-responses')
+  await clear(swShareStore)
   await clear(gqlStore)
+  await clear(gqlVideo)
 
   logD('clearCache end!')
 }
@@ -278,8 +286,8 @@ async function showNotification (title, body) {
     vibrate: [150, 200, 150, 200, 150, 100, 150, 100],
     tag: 'tag: sample'
   }
-  let notification = new Notification('direct:' + title, options)
-  logD('notification=', notification)
+  // let notification = new Notification('direct:' + title, options)
+  // logD('notification=', notifications)
 
   if (registration) {
     // todo

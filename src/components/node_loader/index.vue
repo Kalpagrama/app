@@ -1,13 +1,28 @@
+<template lang="pug">
+  .row.full-width
+    slot(name="default" :nodes="nodes")
+</template>
 <script>
 export default {
   name: 'nodeLoader',
   props: {
-    query: {type: Object, required: true},
-    queryKey: {type: String, required: true},
+    type: {type: String, required: true}, // feed or sphereNodes or nodeNodes
     variables: {type: Object}
+  },
+  watch: {
+    variables: {
+      immediate: true,
+      async handler (to, from) {
+        this.$logD('watch variables', 'from=', from, 'to=', to)
+        if (to){
+          await this.nodesLoad(to)
+        }
+      }
+    }
   },
   data () {
     return {
+      loaded: false,
       nodes: [],
       fetchingMore: false,
       pageToken: null,
@@ -15,39 +30,6 @@ export default {
       totalCount: 0,
       itemsCount: 0
     }
-  },
-  render() {
-    // slot(v-if="kQuery" name="items" :items="kQuery.items" :fetchingMore="fetchingMore")
-    if (this.$scopedSlots.default) {
-      return this.$scopedSlots.default({
-        nodes: this.kQuery ? this.kQuery.items : [],
-        fetchingMore: this.fetchingMore
-      })
-    } else {
-      return null
-    }
-  },
-  apollo: {
-      kQuery: {
-        query () {
-          return this.query
-        },
-        variables () {
-          return this.variables
-        },
-        result ({ data, loading, networkStatus }) {
-          if (data) {
-            this.$logD('feed result', data)
-            this.pageToken = data[this.queryKey].nextPageToken
-            this.totalCount = data[this.queryKey].totalCount
-            this.itemsCount = data[this.queryKey].items.length
-          }
-        },
-        update (data) {
-          return data[this.queryKey]
-        },
-        fetchPolicy: 'cache-and-network'
-      }
   },
   methods: {
     async needFetchMore () {
@@ -59,40 +41,38 @@ export default {
     },
     fetchMore () {
       this.$logD('fetchMore start')
-      this.pageTokenNext = this.pageToken
-      this.fetchingMore = true
       if (this.itemsCount >= this.totalCount) return
-      this.$apollo.queries.kQuery.fetchMore({
-        variables: {
-          pageToken: this.pageTokenNext
-        },
-        updateQuery: (from, {fetchMoreResult: to}) => {
-          // this.$logD('updateQuery from', from)
-          // this.$logD('updateQuery to', to)
-          let res = {
-            [this.queryKey]: {
-              ...to[this.queryKey],
-              items: [...from[this.queryKey].items, ...to[this.queryKey].items]
-            }
-          }
-          // this.$logD('updateQuery res', res)
-          this.$logD('fetchMore done')
-          this.fetchingMore = false
-          return res
-        }
-      })
+      this.variables.pagination.pageToken = this.nextPageToken // сработает вотчер и запросит новые данные
+      this.fetchingMore = true
+      this.$logD('fetchMore done')
     },
-    async nodesLoad (query, queryKey, variables) {
-      this.$logD('nodesLoad start')
-      let {data} = await this.$apollo.query({
-        query: query,
-        variables: variables
-      })
-      this.nodes = data[this.queryKey].items
-      this.pageToken = data[this.queryKey].nextPageToken
-      this.totalCount = data[this.queryKey].totalCount
-      this.itemsCount = data[this.queryKey].items.length
-      this.$logD('nodeLoad done')
+    async nodesLoad (variables, append = false) {
+      this.$logD('nodesLoad2 start', variables)
+      let { oid, pagination, filter, sortStrategy } = variables
+      pagination = pagination || {pageSize: 100, pageToken: null}
+      sortStrategy = sortStrategy || 'HOT'
+      let res
+      switch (this.type){
+        case 'sphereNodes' :
+          res = await this.$store.dispatch('node/sphereNodes', { oid, pagination, filter, sortStrategy })
+          break
+        case 'feed' :
+          res = await this.$store.dispatch('node/feed', { oid, pagination, filter, sortStrategy })
+          break
+        case 'nodeNodes' :
+          res = await this.$store.dispatch('node/nodeNodes', { oid, pagination, filter, sortStrategy })
+          break
+        default: throw new Error(`unknown type ${this.type}`)
+      }
+      let { items, count, totalCount, nextPageToken } = res
+      if (this.oid === oid && this.nextPageToken !== nextPageToken){
+        for (let item of items) this.nodes.push(item)
+      } else this.nodes = items
+      this.nodes = items
+      this.nextPageToken = nextPageToken
+      this.totalCount = totalCount
+      this.itemsCount = items.length
+      this.$logD('nodesLoad2 done', this.nodes)
     },
     // возможно это ядро скоро понадобятся
     prefetch(oid){
@@ -104,8 +84,9 @@ export default {
       this.$logD('prefetch ok!', oid)
     }
   },
-  mounted () {
-    this.$logD('mounted')
+  async mounted () {
+    this.$logD('mounted', this.variables)
+    // await this.nodesLoad(this.variables)
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')

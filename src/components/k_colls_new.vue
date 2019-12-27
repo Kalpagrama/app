@@ -36,7 +36,7 @@ export default {
     coll: {
       immediate: true,
       handler (to, from) {
-        this.$log('coll CHANGED', to)
+        this.$log('coll CHANGED3', to)
         if (to && from) {
           let toIndex = this.colls.findIndex(c => c.id === to)
           let fromIndex = this.colls.findIndex(c => c.id === from)

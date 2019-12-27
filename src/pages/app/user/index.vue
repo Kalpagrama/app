@@ -2,60 +2,94 @@
 .q-footer {
   background: none !important
 }
+input {
+  background-color: transparent;
+  border: 0px solid;
+  height: 20px;
+  width: 160px;
+}
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+::placeholder {
+  opacity: 1
+  color: grey
+}
 </style>
 <template lang="pug">
 q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  q-header.row.full-width.justify-center
+  q-header(v-if="scroll").row.full-width.justify-center
+    div(:style=`{height: '60px'}`).row.full-width
+      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+        q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+      .col
+        .row.full-width.justify-start.items-center.fit
+          span.text-bold.text-h6.text-white {{ user.name }}
+      .row
+        div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+          q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+          q-btn(v-else round flat @click="save()" color="white" icon="done")
+  q-page-container(style=`height: 100vh`)
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      div(v-if="user").row.full-width.content-start
+      div(v-if="user").row.full-width.content-start.bg-primary
         //- header
-        div(:style=`{height: '100px'}`).row.full-width.bg-primary
+        div(:style=`{height: '60px'}`).row.full-width
           div(style=`height: 60px; width: 60px`).row.items-center.justify-center
             q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
           .col
           .row
             div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-              q-btn(round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+              q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+              q-btn(v-else round flat @click="save()" color="white" icon="done")
             //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
               q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
         //- body
-        div(v-if="true").row.full-width.q-px-sm
+        div(v-if="true").row.full-width.q-px-sm.bg-primary
           //- <input type="file" @change="previewFiles" multiple>
           .row.full-width
-            img(:src="user.thumbUrl" @click="$refs.userPhotoDialog.show()"
-              :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
+            img(:src="user.profile.thumbUrl" @click="changePhoto()"
+              :style=`{width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden'}`)
             div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
               q-btn(
                 rounded no-caps
                 @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
                 :label="include ? $t('Unfollow') : $t('Follow')"
                 :color="include ? 'red' : 'accent'"
+                style=`height: 40px`
                 ).q-px-md
           .row.full-width.items-center.justify-start
             .row.full-width
               span.text-bold.text-h6.text-white {{ user.name }}
-            .row.full-width
-              .row.full-width.q-py-sm
-                small.text-grey Status
+            div(v-if="!editions").row.full-width
+              .row.full-width
+                span.text-grey-4 {{status}}
+              .row.full-width.q-mb-sm
+                span.text-grey {{about}}
+            div(v-if="editions").row.full-width
+              input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
+              input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
               //- .row.full-width.q-mt-xs
               //-   small About
             div(v-if="false" @click="showInfo()").row.full-width
               span.text-accent Show detailed information
               //- span {{ user.subscriptions }}
-  q-page-container
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(
           v-if="user"
-          :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
-          k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
-            template(v-slot:created)
-              user-created-nodes()
+          :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width.bg-grey-3
+          k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" style=`heigth: 100vh`).bg-grey-3
+            template(v-slot:created).scroll
+              user-created-nodes(:filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
             template(v-slot:rated)
-              user-created-nodes()
+              // h1 vetur
+              user-created-nodes(:filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
             template(v-slot:following)
               user-following(:subscriptions="user.subscriptions" :oid="user.oid")
             template(v-slot:followers)
@@ -81,10 +115,17 @@ export default {
       showI: false,
       coll: 'created',
       theStream: '',
-      file: null
+      file: null,
+      editions: false,
+      status: null,
+      about: null
     }
   },
   computed: {
+    scroll () {
+      if (window.scrollY > 100) return true
+      else return false
+    },
     include () {
       let find = this.mySubscriptions.find(s => s.oid === this.user.oid)
       if (find) return true
@@ -113,15 +154,27 @@ export default {
       return this.$store.state.subscriptions.userSubscriptions
     },
     userSettingsDialogOptions () {
-      return {
+      let options = {
         confirm: false,
         actions: {
           share: {name: 'Share'},
-          copy: {name: 'Copy Url'},
+          copy: {name: 'Copy Url'}
+        }
+      }
+      if (this.$route.params.oid === this.myoid) {
+        options.actions = {
+          ...options.actions,
+          edit: {name: 'Edit'},
+          changePhoto: {name: 'Change photo'},
+        }
+      } else {
+        options.actions = {
+          ...options.actions,
           block: {name: 'Block'},
           report: {name: 'Report', color: 'red'}
         }
       }
+      return options
     },
     userPhotoDialogOptions () {
       return {
@@ -142,6 +195,8 @@ export default {
           this.$logD('GOT USER OID', to.params.oid)
           this.user = await this.userLoad(to.params.oid)
           this.page = 'nodes'
+          this.status = this.user.profile.status
+          this.about = this.user.profile.about
         } else {
           this.$logD('NO USER OID!')
           this.$router.push({params: {oid: this.$store.state.objects.currentUser.oid}})
@@ -150,6 +205,46 @@ export default {
     }
   },
   methods: {
+    save () {
+      this.changeStatus()
+      this.changeAbout()
+      this.editions = !this.editions
+    },
+    async changeAbout () {
+      if (this.about !== this.currentAbout) {
+        try {
+          this.$log('changeAbout start')
+          let res = await this.$store.dispatch('objects/setObjectValue', {
+            oid: this.$store.state.objects.currentUser.oid,
+            path: 'profile.about',
+            value: this.about
+          })
+          this.$log('changeAbout done', res)
+        } catch (e) {
+          this.$log('changeAbout ERROR', this.about)
+        }
+      }
+    },
+    async changeStatus () {
+      if (this.status !== this.currentStatus) {
+        try {
+          this.$log('changeStatus start')
+          let res = await this.$store.dispatch('objects/setObjectValue', {
+            oid: this.$store.state.objects.currentUser.oid,
+            path: 'profile.status',
+            value: this.status
+          })
+          this.$log('changeStatus done', res)
+        } catch (e) {
+          this.$log('changeStatus ERROR', this.status)
+        }
+      }
+    },
+    changePhoto () {
+      if (this.myoid === this.user.oid) {
+        this.$refs.userPhotoDialog.show()
+      }
+    },
     fileChanged (e) {
       this.$log(e.target.files)
       if (e.target.files.length === 1){
@@ -196,6 +291,14 @@ export default {
         case 'share': {
           break
         }
+        case 'edit': {
+          this.editions = !this.editions
+          break
+        }
+        case 'changePhoto': {
+          this.changePhoto()
+          break
+        }
       }
     },
     async followUser () {
@@ -233,7 +336,7 @@ export default {
     }
   },
   mounted () {
-    // this.$logD('mounted')
+    this.$logD('mounted22')
   },
   beforeDestroy () {
     // this.$logD('beforeDestroy')

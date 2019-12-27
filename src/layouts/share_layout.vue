@@ -1,30 +1,34 @@
+/**
+* компонент для перехвата данных при вызове меню "поделиться в наше приложение"
+* сохраняет данные во vuex и вызывает форму создания
+*/
 <template lang="pug">
-.column.fit.items-center.justify-center
-  //- span {{ share }}
+  .column.fit.items-center.justify-center
+    //- span {{ share }}
 </template>
 
 <script>
-export default {
-  name: 'shareLayout',
-  data () {
-    return {
+  import { get, Store } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
+
+  export default {
+    name: 'shareLayout',
+    async mounted () {
+      // const toBase64 = file => new Promise((resolve, reject) => {
+      //   const reader = new FileReader()
+      //   reader.readAsDataURL(file)
+      //   reader.onload = () => resolve(reader.result)
+      //   reader.onerror = error => reject(error)
+      // })
+      this.$logD('mounted')
+      const swShareStore = new Store('sw-share', 'request-formData')
+      let shareData = await get('shareData', swShareStore)
+      this.$logD('formData=', shareData)
+      this.$store.commit('core/stateSet', ['shareData', shareData])
+      // if (shareData.image) this.$logD('file image =', await toBase64(shareData.image))
+      await this.$router.push('/create')
+    },
+    beforeDestroy () {
+      this.$logD('beforeDestroy')
     }
-  },
-  watch: {
-    $route: {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$logD('$route CHANGED', to)
-        // this.$set(this, 'share', to.params)
-      }
-    }
-  },
-  mounted () {
-    this.$logD('mounted')
-  },
-  beforeDestroy () {
-    this.$logD('beforeDestroy')
   }
-}
 </script>

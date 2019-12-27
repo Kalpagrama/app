@@ -154,6 +154,7 @@ export default {
       this.$log('fragmentDelete', index)
       this.$set(this.node.fragments, index, null)
       this.fragmentSecondShow = false
+      window.location.reload(true)
     },
     fragmentSet (index, fragment) {
       this.$log('fragmentSet', index, fragment)
@@ -199,15 +200,30 @@ export default {
         this.nodeSavingError = e
       }
     },
+    async nodePublishCheck () {
+      this.$log('nodePublishCheck')
+      let duration = this.node.fragments.reduce((acc, f) => {
+        f.cuts.map(c => {
+          acc += c.points[1].x - c.points[0].x
+        })
+        return acc
+      }, 0)
+      this.$log('duration', duration)
+      if (duration > 120) {
+        this.$q.notify({message: 'Too big fragments!', color: 'red', textColor: 'white'})
+        throw new Error('Too big fragments')
+      }
+    },
     async nodePublish () {
       try {
         this.$log('nodePublish start')
         this.nodePublishing = true
+        this.nodePublishCheck()
         let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
         this.$log('res', res)
+        this.$log('nodePublish done')
         this.nodePublishing = false
         this.nodePublishingError = null
-        this.$log('nodePublish done')
         this.refreshAction('confirm', true)
       } catch (e) {
         this.$log('nodePublish error', e)
@@ -222,6 +238,21 @@ export default {
     let nodeLocalStorage = localStorage.getItem('knode')
     // this.$log('nodeLocalStorage', nodeLocalStorage)
     let wsItem = this.$store.state.workspace.wsItem
+
+    // TODO:
+    // данные из меню поделиться в приложение
+    let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
+    if (shareData) {
+      let shareUrl = shareData.text || shareData.url || shareData.title
+      // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
+      if (shareUrl) {
+        this.$log('shareUrl', shareUrl)
+        // todo использовать как фрагмент
+      } else if (shareData.images.length || shareData.videos.length) {
+        // todo использовать как фрагменты
+      }
+      this.$store.commit('core/stateSet', ['shareData', null]) // после использования - очистить
+    }
     this.$log('wsItem', wsItem)
     if (nodeLocalStorage) {
       if (wsItem) {

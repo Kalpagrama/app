@@ -80,7 +80,7 @@ export default {
           this.$logD('reporting...')
           await this.$apollo.mutate({
             mutation: gql`
-              mutation deleteNode($oid: OID!) {
+              mutation sw_network_only_deleteNode($oid: OID!) {
                 deleteObject (oid: $oid)
               }
             `,

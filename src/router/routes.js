@@ -1,4 +1,4 @@
-import { checkUpdate, clearCache } from 'src/system/service_worker'
+// import { checkUpdate, clearCache } from 'src/system/service_worker'
 
 const routes = [
   {
@@ -9,6 +9,7 @@ const routes = [
       { name: 'home', path: '', component: () => import('pages/app/home') },
       { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('pages/app/trends') },
       { name: 'create', path: 'create/:page?', component: () => import('components/node_composer') },
+      { name: 'share', path: 'share_target/:page?', component: () => import('layouts/share_layout.vue') },
       { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
       { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
       // rest
@@ -20,19 +21,19 @@ const routes = [
       { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
-      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
-      {
-        name: 'refresh',
-        path: 'refresh',
-        component: null,
-        beforeEnter: async (to, from, next) => {
-          console.log('refresh app!!!')
-          await checkUpdate()
-          await clearCache()
-          localStorage.clear()
-          await next('/')
-        }
-      }
+      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') }
+      // {
+      //   name: 'refresh',
+      //   path: 'refresh',
+      //   component: null,
+      //   beforeEnter: async (to, from, next) => {
+      //     console.log('refresh app!!!')
+      //     await checkUpdate()
+      //     await clearCache()
+      //     localStorage.clear()
+      //     await next('/')
+      //   }
+      // }
     ]
   },
   {
@@ -50,6 +51,10 @@ const routes = [
   {
     path: '/dev',
     component: () => import('layouts/dev_layout.vue')
+  },
+  {
+    path: '/refresh',
+    component: () => import('layouts/refresh_layout.vue')
   }
 ]
 

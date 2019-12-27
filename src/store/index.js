@@ -29,7 +29,7 @@ async function init (context) {
   let { data: { user, categories, userWorkspace, userEvents, userSubscriptions, userSettings } } = await apolloProvider.clients.apiApollo.query({
     query: gql`
       ${fragments.userFragment}
-      query sw_cache_initializationQuery {
+      query sw_network_first_initializationQuery {
         user { ...userFragment}
         categories {
           type
@@ -47,6 +47,8 @@ async function init (context) {
   })
 
   // TODO remove
+  // user.profile.tutorial = true
+
   if (!user.settings.notifications) {
     user.settings.notifications = {
       showInstantNotifications: true,

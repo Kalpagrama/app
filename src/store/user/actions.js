@@ -16,7 +16,7 @@ export const setFavouriteCategories = async (context, categoryTypes) => {
   // logD('', categoryTypes)
   let { data: { setFavouriteCategories } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation setFavouriteCategories ($categories: [CategoryEnum!]!){
+      mutation sw_network_only_setFavouriteCategories ($categories: [CategoryEnum!]!){
         setFavouriteCategories(categories: $categories)
       }
     `,

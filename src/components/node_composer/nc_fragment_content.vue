@@ -10,7 +10,7 @@ div(
     div(@click.self="$refs.ncFragmentContentWsDialog.hide()").row.fit.items-end.content-end.justify-center
       div(:style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
         .col.full-width
-          ws-items(:types="['fragments', 'contents']" @itemClick="wsItemClick")
+          ws-items(ctx="inEditor" :types="['fragments', 'contents']" @itemClick="wsItemClick")
   div(
     v-if="progressShow && $store.state.events.progress"
     :style=`{
@@ -105,7 +105,7 @@ export default {
       let {data: {uploadContentUrl}} = await this.$apollo.mutate({
         mutation: gql`
           ${fragments.objectFragment}
-          mutation nc_uploadContentUrl ($url: String!, $onlyMeta: Boolean!) {
+          mutation sw_network_only_nc_uploadContentUrl ($url: String!, $onlyMeta: Boolean!) {
             uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
               ...objectFragment
             }

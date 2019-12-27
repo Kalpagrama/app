@@ -1,79 +1,50 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-start
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-start
   node(
     v-for="(n, ni) in nodes" :key="n.oid" :accessKey="ni"
     v-if="nodesBan ? !nodesBan.includes(n.oid) : true"
     :ctx="'inList'"
-    :node="n"
-    :needFull="ni >= friends[0] && ni <= friends[1]"
-    :visible="ni === nodeOidVisible"
+    :node="n" :index="ni"
+    :priority="ni >= nodeMiddle-1 && ni <= nodeMiddle+1 ? 0 : 1"
+    :needFull="ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
+    :visible="nodeMiddle === ni"
     @error="nodesBan.push(n.oid)"
     @nodeClick="$event => $emit('nodeClick', $event)"
     :style=`{}`
     v-observe-visibility=`{
-      callback: nodeVisible,
+      callback: nodeMiddleHandler,
       throttle: 300,
       intersection: {
-        threshold: 0.98
+        rootMargin: -($q.screen.height/2-1)+'px 0px'
       }
     }`
     ).bg-white.q-mb-lg
-  //- div(
-  //-   v-for="(n, ni) in 100" :key="ni" :accessKey="ni"
-  //-   :style=`{position: 'relative', height: '300px', borderRadius: '10px'}`
-  //-   v-observe-visibility=`{
-  //-     callback: nodeVisible,
-  //-     throttle: 300,
-  //-     intersection: {
-  //-       threshold: 0.98
-  //-     }
-  //-   }`
-  //-   ).row.full-width.items-center.justify-center.q-mb-lg.bg-white
-  //-   div(:style=`{position: 'absolute', right: '10px', bottom: '10px', width: '100px', height: '60px', borderRadius: '10px'}`).row.bg-grey-2
-  //-   small.full-width node: {{ ni }}
-  //-   small.full-width nodesLength: {{nodesLength}}
-  //-   small.full-width friends: {{friends}}
-  //-   h3(v-if="ni === nodeOidVisible") dick
 </template>
 
 <script>
 export default {
   name: 'nodeList',
-  // props: ['nodes', 'nodesBan', 'selected'],
   props: {
     nodes: {type: Array},
-    nodesBan: {type: Array, default () { return [] }},
-    selected: {type: Array}
+    nodesBan: {type: Array, default () { return [] }}
   },
   data () {
     return {
       nodeHeight: 50,
-      nodeOidVisible: undefined
+      nodeMiddle: 0
     }
   },
   computed: {
-    nodesLength () {
-      return this.nodes.length
-    },
-    friends () {
-      let from = this.nodeOidVisible - 2
-      let to = this.nodeOidVisible + 2
-      if (from < 0) from = 0
-      if (to > this.nodesLength) to = this.nodesLength
-      return [from, to]
-    }
   },
   methods: {
-    nodeVisible (isVisible, entry) {
+    nodeMiddleHandler (isVisible, entry) {
       if (isVisible) {
-        this.$log('nodeVisible', isVisible, entry.target.accessKey)
-        this.nodeOidVisible = parseInt(entry.target.accessKey)
-      } else {
-        if (this.nodeOidVisible === entry.target.accessKey) this.nodeOidVisible = undefined
+        this.$log('nodeMiddleHandler', entry.target.accessKey)
+        this.nodeMiddle = parseInt(entry.target.accessKey)
       }
     },
     nodeClick (n, ni) {
-      this.$logd('nodeClick', n, ni)
+      this.$logD('nodeClick', n, ni)
       this.$emit('nodeClick', n)
     }
   },

@@ -12,11 +12,12 @@
     .row.full-width.items-start.content-start.q-px-sm
       div(
         v-for="(s, skey, si) in spheres" :key="skey" @click="sphereClick(s)"
-        :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white.q-mb-sm
-        div(:style=`{height: '40px', width: '40px', borderRadius: '10px', overflow: 'hidden', background: $randomColor(skey)}`).row
+        :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.q-mr-sm.q-mb-sm.bg-grey-4.cursor-pointer
+        //- div(:style=`{height: '40px', width: '40px', borderRadius: '10px', overflow: 'hidden', background: $randomColor(skey)}`).row
         .col.full-height
           .row.fit.items-center.q-px-sm
-            span {{ s.name }}
+            span.text-black {{ s.name }}
 </template>
 
 <script>

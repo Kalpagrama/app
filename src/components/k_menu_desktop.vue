@@ -1,11 +1,11 @@
 <template lang="pug">
-div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
+div(:style=`{minHeight: '100vh'}`).column.full-width.bg-black
   //- dialogs
   q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
     k-invite(@hide="$refs.inviteDialog.hide()")
   k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
-  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-secondary
+  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-black
     div(@click="$go('/')").col.row.items-center
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         k-logo(:width="40" :height="40")
@@ -15,12 +15,12 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
     div(@click="$go('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
-  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.state.objects.currentUser.oid)").row.full-width.bg-secondary
+  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.state.objects.currentUser.oid)").row.full-width.bg-black
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(
         v-show="!userAvatarErrored"
         @error="userAvatarError"
-        :src="$store.state.objects.currentUser.thumbUrl"
+        :src="$store.state.objects.currentUser.profile.thumbUrl"
         :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
       div(
         v-if="userAvatarErrored"
@@ -37,7 +37,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
       .row.fit.items-center
         span.text-white {{$t('Создать ядро')}}
   //- body
-  .col.full-width.scroll.bg-secondary
+  .col.full-width.scroll.bg-black
     .row.full-width.items-start.content-start
       div(v-for="(p, pi) in pages" :key="pi" @click="pageClick(p, pi)"
         :style=`{height: '60px'}`
@@ -58,7 +58,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         :icon="this.$store.state.core.newVersionAvailable ? 'system_update' : 'cloud_download'"
         @click="update"
         :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`).full-width
-        span(v-if="width === 230").text-bold.q-ml-md {{ $t($store.state.core.newVersionAvailable ? 'Update app!' : 'Check for updates') }}
+        span(v-if="width === 230").text-bold.q-ml-md {{$store.state.core.newVersionAvailable ? $t('Update app!') : $t('Check for updates') }}
     div(v-if="this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       q-btn(
         :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
@@ -68,7 +68,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
     div().row.full-width.q-px-md
       q-btn(
         outline color="accent" no-caps @click="appRefresh()"
-        :style=`{borderRadius: '10px'}` ).full-width Refresh
+        :style=`{borderRadius: '10px'}` ).full-width {{$t('Refresh')}}
 </template>
 
 <script>
@@ -89,7 +89,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
           { name: 'Notifications', icon: 'notifications', path: '/notifications' },
           // { name: 'test web-push', icon: 'message', path: '/test_message' },
           // { name: 'sentry log send', icon: 'message', path: '/sentry_log' },
-          // { name: 'test share', icon: 'share', path: '/app/share' },
+          { name: 'test share', icon: 'share', path: '/share_target' },
           { name: 'Exit', icon: 'exit_to_app', path: '/logout' }
         ],
         userAvatarErrored: false
@@ -128,6 +128,12 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
       }
     },
     methods: {
+      async logout (mytoken) {
+        // this.tokenString = token
+        this.$log('logout start')
+        let res = await this.$store.dispatch('auth/logout', mytoken)
+        this.$log('logout done', res)
+      },
       userAvatarError (e) {
         this.$log('userAvatarError', e)
         this.userAvatarErrored = true
@@ -136,7 +142,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         this.$logD('logoutDialogAction', action)
         switch (action) {
           case 'confirm': {
-            await this.$store.dispatch('auth/logout', localStorage.getItem('ktoken'))
+            await this.logout(localStorage.getItem('ktoken'))
           }
         }
       },
@@ -155,32 +161,32 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
             this.$logD('sentry_log..')
             await this.$store.commit('core/stateSet', ['logLevelSentry', LogLevelEnum.DEBUG])
             break
-          case '/share': {
-            this.$logD('share..')
-            if (!('share' in navigator)) {
-              alert('Web Share API not supported.');
-            } else {
-              navigator.share({
-                title: 'test_title',
-                text: 'test_text',
-                url: 'https://whatwebcando.today/'
-              })
-                .then(() => console.log('Successful share'))
-                .catch(error => this.$logE('Error sharing:', error));
-            }
-            // http://localhost:8282/share-target/?title=test_title&text=test_text+https%3A%2F%2Fwhatwebcando.today%2F
-            // let intent = new Intent('http://webintents.org/share',
-            //   'text/uri-list',
-            //   'https://whatwebcando.today');
-            // navigator.startActivity(intent, function () {
-            //   console.log('Successful share')
-            // }, function (error) {
-            //   console.log('Error sharing:', error);
-            // });
-            break
-          }
+          // case '/share': {
+          //   this.$logD('share..')
+          //   if (!('share' in navigator)) {
+          //     alert('Web Share API not supported.');
+          //   } else {
+          //     navigator.share({
+          //       title: 'test_title',
+          //       text: 'test_text',
+          //       url: 'https://whatwebcando.today/'
+          //     })
+          //       .then(() => console.log('Successful share'))
+          //       .catch(error => this.$logE('Error sharing:', error));
+          //   }
+          //   // http://localhost:8282/share-target/?title=test_title&text=test_text+https%3A%2F%2Fwhatwebcando.today%2F
+          //   // let intent = new Intent('http://webintents.org/share',
+          //   //   'text/uri-list',
+          //   //   'https://whatwebcando.today');
+          //   // navigator.startActivity(intent, function () {
+          //   //   console.log('Successful share')
+          //   // }, function (error) {
+          //   //   console.log('Error sharing:', error);
+          //   // });
+          //   break
+          // }
           default:
-            this.$go(p.path)
+            await this.$router.push(p.path)
         }
       },
       async update () {

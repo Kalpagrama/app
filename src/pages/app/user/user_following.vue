@@ -36,20 +36,20 @@ export default {
         case 'AUDIO':
         case 'BOOK':
         case 'IMAGE': {
-          this.$router.push(`/app/content/${s.oid}`)
+          this.$router.push(`/content/${s.oid}`)
           break
         }
         case 'USER': {
           if (this.oid === s.oid) break
-          else this.$router.push(`/app/user/${s.oid}`)
+          else this.$router.push(`/user/${s.oid}`)
           break
         }
         case 'SPHERE': {
-          this.$router.push(`/app/sphere/${s.oid}`)
+          this.$router.push(`/sphere/${s.oid}`)
           break
         }
         case 'NODE': {
-          this.$router.push(`/app/node/${s.oid}`)
+          this.$router.push(`/node/${s.oid}`)
           break
         }
       }

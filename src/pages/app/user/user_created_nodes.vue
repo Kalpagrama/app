@@ -1,51 +1,42 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-px-sm
-  node-loader(v-if="sphereOid" ref="nodeLoader" :query="query" :variables="variables" queryKey="sphereNodes")
+  node-loader(v-if="variables" ref="nodeLoader" :variables="variables" type="sphereNodes")
     template(v-slot:default=`{nodes}`)
+      // small(v-for="n in nodes" :key="n.oid").full-width.br {{ n.name }}
       node-list(:nodes="nodes" @nodeClick="nodeClick")
+  div(v-if="nodes" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
+    span {{$t('Пользователь не создавал ядра', 'User didnt create nodes')}}
 </template>
 
 <script>
 export default {
   name: 'userCreatedNodes',
+  props: {
+    filter: {
+      type: Object,
+      // default () {
+      //   return {types: ['NODE'], fastFilters: ['VOTED_BY_USER']}
+      // }
+    }
+  },
   data () {
     return {
     }
   },
   computed: {
     sphereOid () {
-      return this.$store.state.objects.currentUser.oid
-    },
-    query () {
-      return gql`
-        query sphereNodesUser ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-          sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            count
-            totalCount
-            nextPageToken
-            items {
-              oid
-              type
-              thumbUrl (preferWidth: 600)
-              createdAt
-              name
-              meta {
-                ...on MetaNode {
-                  layout
-                  fragments { width height thumbUrl(preferWidth: 600) }
-                }
-              }
-            }
-          }
-        }
-      `
+      // return this.$store.state.objects.currentUser.oid
+      return this.$route.params.oid
     },
     variables () {
+      // this.$logD(`this.filter= ${JSON.stringify(this.filter)}`)
+      // this.$log('varssss', this.filter)
       return {
-        sphereOid: this.sphereOid,
+        oid: this.sphereOid,
         pagination: { pageSize: 100 },
         sortStrategy: 'HOT',
-        filter: { types: 'NODE' }
+        filter: this.filter
+        // filter: { types: ['NODE'], fastFilters: ['CREATED_BY_USER']} // JSON.parse(JSON.stringify(this.filter))
       }
     }
   },
