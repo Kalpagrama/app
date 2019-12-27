@@ -30,7 +30,7 @@
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
           input(
             :placeholder="$t('Код')"
-            type="number"
+            type="email"
             v-model="code" filled @keyup.enter="codeSend()"
             ).full-width.bg-white.kinput
         q-btn(
