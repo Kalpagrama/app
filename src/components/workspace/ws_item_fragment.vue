@@ -1,6 +1,12 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`)
+div(:style=`{position: 'relative'}` @click="$emit('action')")
   div(:style=`{position: 'relative', borderRadius: '10px', oveflow: 'hidden'}`).row.full-width.items-center.bg-black
+    //- itemIndex === index
+    div(
+      v-if="itemIndex === index"
+      :style=`{position: 'absolute', zIndex: 100, borderRadius: '10px', border: itemIndex === index ? '3px solid #4caf50' : 'none'}`
+      ).row.fit
+    //- preview
     img(
       ref="itemPreview"
       :src="item.item.content.thumbUrl" draggable="false"
@@ -13,31 +19,43 @@ div(:style=`{position: 'relative'}`)
       v-if="previewLoaded && item.item.cuts"
       :style=`{position: 'absolute', top: '8px', left: '8px'}`
       ).row.full-width
-      div(v-for="(c, ci) in item.item.cuts" :key="ci"
-        ).q-mr-xs
+      div(
+        v-for="(c, ci) in item.item.cuts" :key="ci"
+        v-if="ci < 2"
+        ).q-mr-xs.q-mb-sm
         div(:style=`{background: c.color, borderRadius: '10px'}`).q-px-sm
           small.text-white {{ $time(c.points[0].x)}}-{{$time(c.points[1].x) }}
+      div(
+        v-if="item.item.cuts.length >= 2"
+        :style=`{borderRadius: '10px'}`
+        ).q-px-sm.bg-grey-10
+        small.text-white {{item.item.cuts.length - 2}} more...
     //- small(:style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px'}`).text-white {{ item.type }}
-    q-btn(
-      v-if="previewLoaded"
-      round dense flat color="white" icon="more_vert" @click="$emit('action')"
-      :style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
+    //- q-btn(
+    //-   v-if="previewLoaded"
+    //-   round dense flat color="white" icon="more_vert" @click="$emit('action')"
+    //-   :style=`{position: 'absolute', zIndex: 100, top: '8px', right: '8px', background: 'rgba(0,0,0,0.15)'}`).shadow-1
     //- fragment name
-    small(
-      v-if="previewLoaded && item.item.name"
-      :style=`{position: 'absolute', zIndex: 100, bottom: '36px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
-      ).q-px-sm.q-py-xs.text-white {{ item.item.name | cut(20) }}
-    //- framgent content name
-    small(
+    div(
       v-if="previewLoaded"
-      :style=`{position: 'absolute', zIndex: 100, bottom: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
-      ).q-px-sm.q-py-xs.text-white {{ item.item.content.name | cut(20) }}
+      :style=`{
+        position: 'absolute', zIndex: 100, bottom: '8px', overflow: 'hidden', maxWidth: '100%'
+      }`).q-px-sm
+      //- fragment.name
+      small(
+        v-if="item.item.name"
+        :style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
+        ).full-width.q-px-sm.q-py-xs.text-white {{ item.item.name | cut(25) }}
+      //- framgent.content.name ALWAYS
+      small(
+        :style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
+        ).full-width.q-px-sm.q-py-xs.text-white {{ item.item.content.name | cut(25) }}
 </template>
 
 <script>
 export default {
   name: 'wsItemFragment',
-  props: ['index', 'item'],
+  props: ['index', 'item', 'itemIndex'],
   data () {
     return {
       previewLoaded: false,

@@ -130,7 +130,8 @@ export default {
       }
     },
     videoTimeupdate (e) {
-      // this.$log('videoTimeupdate', e)
+      if (this.now === this.player.currentTime) return
+      this.$log('videoTimeupdate', e)
       if (this.ctx === 'inEditor') {
         this.now = this.player.currentTime
       } else {

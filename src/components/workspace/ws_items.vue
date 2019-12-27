@@ -18,18 +18,25 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
             span {{ $t(n.item.name) }}
   template(v-slot:fragments)
     .column.fit
-      k-dialog-bottom(ref="itemActionDialog" :options="itemActionOptions" @action="itemAction")
+      k-dialog-bottom(ref="itemActionDialog" :options="itemActionOptions" @action="itemAction" @hide="itemIndex = -1")
       q-dialog(ref="fragmentEditorDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-        div(@click.self="$refs.fragmentEditorDialog.hide()").row.full-width.justify-center.items-end
+        div(@click.self="$refs.fragmentEditorDialog.hide()"
+          :style=`{}`).row.full-width.justify-center.items-end
+          //- background: 'rgba(0,0,0,0.5)'
           ws-fragment-editor(
             :item="item" @item="item = {item: $event}"
+            @hide="$refs.fragmentEditorDialog.hide()"
             :style=`{
               maxWidth: $store.state.ui.pageMaxWidth-100+'px',
-              maxHeight: $q.screen.height-60+'px',
+              maxHeight: $q.screen.height+'px',
               borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
-      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
-        span.text-bold {{ fragments.length }}
-        q-btn(round flat icon="search")
+      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+        //- span.text-bold {{ fragments.length }}
+        q-btn(round flat icon="search" color="grey")
+        .col
+        q-btn(round flat icon="view_list" color="grey")
+        q-btn(round flat icon="view_module" color="green")
+        q-btn(round flat icon="view_stream" color='grey')
         .col
         q-btn(round push icon="add" color="green" @click="item = null, $refs.fragmentEditorDialog.show()")
       .col.full-width.scroll.kscroll
@@ -37,7 +44,8 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
           //- v-if="fragmentToDelete !== ii"
           ws-item-fragment(
             v-for="(i, ii) in fragments" :key="i.node.oid"
-            :index="ii" :item="i" @action="item = JSON.parse(JSON.stringify(i)), itemIndex = ii, $refs.itemActionDialog.show()"
+            :index="ii" :item="i" :itemIndex="itemIndex"
+            @action="item = JSON.parse(JSON.stringify(i)), itemIndex = ii, $refs.itemActionDialog.show()"
             :class=`{'q-pl-xs': ii % 2 !== 0, 'q-pr-xs': ii % 2 === 0}`
             ).col-6.q-mb-sm
   template(v-slot:contents)
@@ -148,32 +156,42 @@ export default {
     },
     fragments () {
       return this.$store.state.workspace.workspace.nodes.reduce((acc, val) => {
-        val.fragments.map((f, fi) => {
-          if (f.cuts.length > 0) {
+        if (val.fragments.length === 1) {
+          val.fragments.map((f, fi) => {
             acc.push({
               type: 'fragment',
               fragmentIndex: fi,
               item: f,
               node: val
             })
-            f.cuts.map((c, ci) => {
-              if (c.name) {
-                acc.push({
-                  type: 'cut',
-                  fragmentIndex: fi,
-                  cutIndex: ci,
-                  item: {
-                    name: c.name,
-                    scale: f.content.duration,
-                    content: f.content,
-                    cuts: [{name: '', thumbUrl: '', color: this.$randomColor(Date.now().toString()), points: c.points}]
-                  },
-                  node: val
-                })
-              }
-            })
-          }
-        })
+          })
+        }
+        // val.fragments.map((f, fi) => {
+        //   if (f.cuts.length > 0) {
+        //     acc.push({
+        //       type: 'fragment',
+        //       fragmentIndex: fi,
+        //       item: f,
+        //       node: val
+        //     })
+        //     f.cuts.map((c, ci) => {
+        //       if (c.name) {
+        //         acc.push({
+        //           type: 'cut',
+        //           fragmentIndex: fi,
+        //           cutIndex: ci,
+        //           item: {
+        //             name: c.name,
+        //             scale: f.content.duration,
+        //             content: f.content,
+        //             cuts: [{name: '', thumbUrl: '', color: this.$randomColor(Date.now().toString()), points: c.points}]
+        //           },
+        //           node: val
+        //         })
+        //       }
+        //     })
+        //   }
+        // })
         return acc
       }, [])
     },

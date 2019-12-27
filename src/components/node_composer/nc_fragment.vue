@@ -72,7 +72,7 @@ div(
       v-if="fragmentReady" ref="ncFragmentVideoEditor"
       @close="editing = false" :editing="editing"
       :fragment="fragment" :now="$refs.ncFragmentVideo.now" :player="$refs.ncFragmentVideo.player"
-      :width="previewWidth" :height="toolsHeight"
+      :width="previewWidth" :height="toolsHeight" :previewHeight="previewHeight"
       :style=`{height: toolsHeight+'px'}`)
 </template>
 
@@ -84,7 +84,7 @@ import ncFragmentVideoEditor from './nc_fragment_video_editor'
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
-  props: ['ctx', 'index', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'mini', 'visible', 'height', 'inExplorer'],
+  props: ['ctx', 'index', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'editorFirst', 'mini', 'visible', 'height', 'inExplorer'],
   data () {
     return {
       stage: 0,
@@ -181,7 +181,7 @@ export default {
     },
     async previewLoad () {
       // this.$log('previewLoad', this.$refs.ncFragmentPreview.clientHeight)
-      if (this.ctx === 'inEditor') this.$q.notify('previewLoad' + this.$refs.ncFragmentPreview.clientHeight)
+      // if (this.ctx === 'inEditor') this.$q.notify('previewLoad' + this.$refs.ncFragmentPreview.clientHeight)
       let h = this.$refs.ncFragmentPreview.clientHeight
       let w = this.$refs.ncFragmentPreview.clientWidth
       this.$emit('previewHeight', h)
@@ -189,10 +189,21 @@ export default {
       this.previewHeight = h
       this.previewWidth = w
       this.previewLoaded = true
+      if (this.editorFirst) this.editing = true
     },
     previewError (e) {
       // this.$log('previewError', e)
       // this.$q.notify('previewError!')
+    }
+  },
+  mounted () {
+    if (this.ctx === 'inEditor') {
+      this.$log('mounted')
+    }
+  },
+  beforeDestroy () {
+    if (this.ctx === 'inEditor') {
+      this.$log('beforeDestroy')
     }
   }
 }
