@@ -28,7 +28,7 @@ export default {
       this.$log('wsClear start')
       let {data: {wsClear}} = await this.$apollo.mutate({
         mutation: gql`
-          mutation wsClear {
+          mutation sw_network_only_wsClear {
             wsClear
           }
         `

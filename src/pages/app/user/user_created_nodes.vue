@@ -4,7 +4,7 @@
     template(v-slot:default=`{nodes}`)
       // small(v-for="n in nodes" :key="n.oid").full-width.br {{ n.name }}
       node-list(:nodes="nodes" @nodeClick="nodeClick")
-  div(v-if="!nodes" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
+  div(v-if="nodes" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
     span {{$t('Пользователь не создавал ядра', 'User didnt create nodes')}}
 </template>
 

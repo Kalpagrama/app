@@ -21,7 +21,7 @@ export const wsSphereCreate = async (context, sphere) => {
   let { data: { wsSphereCreate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       ${fragments.objectShortFragment}
-      mutation wsSphereCreate ($sphere: ObjectShortInput!) {
+      mutation sw_network_only_wsSphereCreate ($sphere: ObjectShortInput!) {
         wsSphereCreate (sphere: $sphere) {
           ...objectShortFragment
         }
@@ -39,7 +39,7 @@ export const wsSphereDelete = async (context, oid) => {
   logD('wsSphereDelete start', oid)
   let { data: { wsSphereDelete } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation wsSphereDelete ($oid: OID!) {
+      mutation sw_network_only_wsSphereDelete ($oid: OID!) {
         wsSphereDelete (oid: $oid)
       }
     `,
@@ -118,7 +118,7 @@ export const wsNodeSave = async (context, node) => {
     let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
-        mutation wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
+        mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
           wsNodeUpdate (oid: $oid, node: $node) {
             ...nodeFragment
           }
@@ -133,7 +133,7 @@ export const wsNodeSave = async (context, node) => {
     let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
-        mutation wsNodeCreate ($node: NodeInput!) {
+        mutation sw_network_only_wsNodeCreate ($node: NodeInput!) {
           wsNodeCreate (node: $node) {
             ...nodeFragment
           }
@@ -153,7 +153,7 @@ export const wsNodeDelete = async (context, oid) => {
   assert.ok(oid)
   let { data: { wsNodeDelete } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation wsNodeDelete ($oid: OID!) {
+      mutation sw_network_only_wsNodeDelete ($oid: OID!) {
         wsNodeDelete (oid: $oid)
       }
     `,

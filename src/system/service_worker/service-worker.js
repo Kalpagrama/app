@@ -1,10 +1,9 @@
-const swVer = 11
-const useCache = false
+const swVer = 7
+const useCache = true
+let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
+  cacheGraphQl,
+  cacheVideo
 
-let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, swShareStore, cacheGraphQl
-/* global idbKeyval, MD5 */
-importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
-importScripts('/statics/scripts/md5.js')
 // log
 {
   logModulesBlackList = []
@@ -26,14 +25,70 @@ importScripts('/statics/scripts/md5.js')
     // if (logLevelSentry <= 4) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
   }
 }
-
 // common init sw
 {
+  /* global idbKeyval, MD5 */
+  importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
+  importScripts('/statics/scripts/md5.js')
   logDebug('swVer=', swVer)
   logDebug('init idb')
   swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
   gqlStore = new idbKeyval.Store('sw-cache-gql', 'graphql-responses')
+  videoStore = new idbKeyval.Store('sw-cache-video', 'video-responses')
   logDebug('init idb ok')
+
+  // workbox init
+  {
+    /* global workbox */
+    // This will trigger the importScripts() for workbox.strategies and its dependencies:
+    const { strategies } = workbox
+    workbox.core.setCacheNameDetails({
+      prefix: 'kalpa'
+    })
+    // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/service_worker/index.js
+    workbox.core.clientsClaim()
+    self.__precacheManifest = [].concat(self.__precacheManifest || [])
+    // порядок вызовов precacheAndRoute и registerRoute имеет значение
+    // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
+    workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
+    workbox.routing.registerRoute( // share_target
+      /\/share_target\/?$/,
+      async ({ url, event, params }) => {
+        logDebug('share_target 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
+        // if (event.request.method === 'POST') {
+        //   logDebug('redirect to share_target = ')
+        //   return Response.redirect('share_target', 303)
+        // }
+        if (url.pathname.includes('share_target')) {
+          logDebug('share_target 6 ')
+          try {
+            let formData = await event.request.formData()
+            // for (let [name, value] of formData) {
+            //   shareData[name] = value
+            // }
+            let title = formData.get('title')
+            let text = formData.get('text')
+            let url = formData.get('url')
+            let images = formData.getAll('image')
+            let videos = formData.getAll('video')
+            logDebug(' formData fields  = ', { title, text, url, images, videos })
+            await idbKeyval.set('shareData', { title, text, url, images, videos }, swShareStore)
+          } catch (err) {
+            logCritical('share_target err', err)
+          }
+        }
+        if (workbox.precaching.getCacheKeyForURL('/index.html')) {
+          logDebug('share_target returm from cache', url)
+          return caches.match(workbox.precaching.getCacheKeyForURL('/index.html'))
+        } else {
+          logDebug('share_target returm from net', url)
+          return fetch('/index.html')
+        }
+      },
+      'POST'
+    )
+  }
+
   // listeners
   {
     self.addEventListener('install', event => {
@@ -87,97 +142,176 @@ importScripts('/statics/scripts/md5.js')
 }
 
 if (useCache) {
-// workbox init
+  // custom resolver for graphql & video requests
   {
-    /* global workbox */
-    workbox.core.setCacheNameDetails({
-      prefix: 'kalpa'
-    })
-    // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/service_worker/index.js
-    workbox.core.clientsClaim()
-    self.__precacheManifest = [].concat(self.__precacheManifest || [])
-    // custom resolver for graphql POST requests
-    {
-      cacheGraphQl = async function (event) {
-        // todo use different strategies
-        // let tmpReq = event.request.clone()
-        // logDebug('cacheGraphQl...', 'body = ', await tmpReq.json(), tmpReq)
-        // let promise = null
-        // if(event.request.method === 'POST')
-        let cachedResponse = await getCache(event.request.clone())
-        let fetchPromise = fetch(event.request.clone())
-          .then((response) => {
-            setCache(event.request.clone(), response.clone())
-            return response
-          })
-          .catch((err) => {
-            logCritical(err)
-          })
-        return cachedResponse ? Promise.resolve(cachedResponse) : fetchPromise
-      }
-
-      const serializeResponse = async (response) => {
-        let serializedHeaders = {}
-        for (let entry of response.headers.entries()) {
-          serializedHeaders[entry[0]] = entry[1]
+    cacheGraphQl = async function (event) {
+      let requestCopy = event.request.clone()
+      let body = await requestCopy.json()
+      logDebug('gql cacheGraphQl', body.operationName)
+      let type = body && body.query && body.query.startsWith('mutation') ? 'mutation' : 'query'
+      if (body.operationName.startsWith('sw_network_only_')) {
+        return await networkOnly(event, gqlStore)
+      } else if (body.operationName.startsWith('sw_cache_only_')) {
+        return await cacheOnly(event, gqlStore)
+      } else if (body.operationName.startsWith('sw_network_first_')) {
+        return await networkFirst(event, gqlStore, 400)
+      } else if (body.operationName.startsWith('sw_cache_first_')) {
+        return await cacheFirst(event, gqlStore)
+      } else if (body.operationName.startsWith('sw_stale_')) {
+        return await StaleWhileRevalidate(event, gqlStore)
+      } else {
+        logDebug(`gql warn. query ${body.operationName} not contains sw strategy. use defaults`)
+        if (type === 'mutation') {
+          return await networkFirst(event, gqlStore)
+        } else {
+          return await networkFirst(event, gqlStore)
         }
-        let serialized = {
-          headers: serializedHeaders,
-          status: response.status,
-          statusText: response.statusText
-        }
-        serialized.body = await response.json()
-        return serialized
       }
-
-      const setCache = async (request, response) => {
-        let body = await request.json()
-        // logDebug('body === ', body)
-        if (body.operationName.startsWith('sw_nocache_')) return
-        // if (!body.operationName.startsWith('sw_cache_')) return
-        let id = MD5(JSON.stringify(body)).toString()
-        // logDebug('MD5 === ', id)
-        // logDebug('request = ', request)
-        let entry = {
-          query: body.query,
-          response: await serializeResponse(response),
-          timestamp: Date.now()
+    }
+    cacheVideo = async function (event) {
+      // let requestCopy = event.request.clone()
+      // logDebug('video cacheVideo', requestCopy.url, requestCopy)
+      return await cacheFirst(event, videoStore)
+    }
+    const cacheOnly = async (event, store) => {
+      return await getCache(event.request, store)
+    }
+    const networkOnly = async (event, store) => {
+      return await fetch(event.request.clone())
+    }
+    const StaleWhileRevalidate = async (event, store) => {
+      logDebug('gql StaleWhileRevalidate')
+      let cachedResponse = await cacheOnly(event, store)
+      let fetchPromise = fetch(event.request.clone())
+        .then(async (response) => {
+          if (response && response.ok) await setCache(event.request, response, store)
+          return response
+        })
+        .catch((err) => {
+          logCritical('cant fetch gql query with StaleWhileRevalidate', err)
+        })
+      return cachedResponse ? cachedResponse : await fetchPromise
+    }
+    // Если по истечении timeout ответ не получен - ответить из кэша
+    const networkFirst = async (event, store, timeout) => {
+      logDebug('gql networkFirst')
+      let cachedResponse = await cacheOnly(event, store)
+      return await new Promise((resolve, reject) => {
+        let timeoutId
+        if (cachedResponse && timeout) {
+          timeoutId = setTimeout(() => {
+            logDebug('gql networkFirst. time expired. resolve from cache ok!')
+            resolve(cachedResponse)
+          }, timeout)
         }
-        idbKeyval.set(id, entry, gqlStore)
-      }
-
-      const getCache = async (request) => {
-        let data
-        try {
-          let body = await request.json()
-          let id = MD5(JSON.stringify(body)).toString() // CryptoJS.MD5(body.query).toString()
-          data = await idbKeyval.get(id, gqlStore)
-          if (!data) {
-            logDebug('Load response not found in cache.')
-            return null
+        networkOnly(event, store).then(async (networkResponse) => {
+          logDebug('gql networkFirst. resolve from network ok!', networkResponse)
+          if (timeoutId) clearTimeout(timeoutId)
+          if (networkResponse && networkResponse.ok) {
+            logDebug('gql networkFirst. save to cache...')
+            await setCache(event.request, networkResponse, store)
           }
-          // // Check cache max age.
-          // let cacheControl = request.headers.get('Cache-Control')
-          // let maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 3600
-          // if (Date.now() - data.timestamp > maxAge * 1000) {
-          //   logDebug('Cache expired. Load from API endpoint.')
-          //   return null
-          // }
-          logDebug('Load response from cache.')
-          return new Response(JSON.stringify(data.response.body), data.response)
-        } catch (err) {
+
+          resolve(networkResponse)
+        }).catch(err => {
+          if (cachedResponse) {
+            logDebug('gql networkFirst. fails. resolve from cache ok!', err)
+            resolve(cachedResponse)
+          }
+          logDebug('gql networkFirst. fails.', err)
+          reject(err)
+        })
+      })
+    }
+    const cacheFirst = async (event, store) => {
+      logDebug('gql cacheFirst')
+      let cachedResponse = await cacheOnly(event, store)
+      if (cachedResponse) return cachedResponse
+      return await networkFirst(event, store)
+    }
+
+    // сделает из response данные для хранения в кэше
+    const prepareResponse = async (response, request) => {
+      let requestCopy = request.clone()
+      let responseCopy = response.clone()
+      let serializedHeaders = {}
+      for (let entry of responseCopy.headers.entries()) {
+        serializedHeaders[entry[0]] = entry[1]
+      }
+      let res = {
+        request: await prepareRequest(requestCopy),
+        headers: serializedHeaders,
+        status: responseCopy.status,
+        statusText: responseCopy.statusText,
+        body: await responseCopy.arrayBuffer()// await response.json()
+      }
+      return res
+    }
+    // сделает из request данные для ключа в кэше
+    const prepareRequest = async (request) => {
+      let requestCopy = request.clone()
+      let serializedHeaders = {}
+      for (let entry of requestCopy.headers.entries()) {
+        if (!['range'].includes(entry[0].toLowerCase())) continue // остальные заголовки считаем несущественными для ключа
+        serializedHeaders[entry[0]] = entry[1]
+      }
+      let res = {
+        url: requestCopy.url,
+        headers: serializedHeaders,
+      }
+      if (requestCopy.method === 'POST') {
+        res.body = await requestCopy.json()
+      }
+      return res
+    }
+    const setCache = async (request, response, store) => {
+      logDebug('save to cache...')
+      if (!store) {
+        logCritical('bad store!!!')
+        throw new Error('bad store!!!')
+      }
+      let reqPrepared = await prepareRequest(request)
+      let entry = {
+        request: reqPrepared,
+        response: await prepareResponse(response, request),
+        timestamp: Date.now()
+      }
+      let id = MD5(JSON.stringify(reqPrepared)).toString()
+
+      await idbKeyval.set(id, entry, store)
+      logDebug('save to cache ok!')
+    }
+    const getCache = async (request, store) => {
+      if (!store) {
+        logCritical('bad store!!!')
+        throw new Error('bad store!!!')
+      }
+      let reqPrepared = await prepareRequest(request)
+      try {
+        let entry
+        let id = MD5(JSON.stringify(reqPrepared)).toString()
+        entry = await idbKeyval.get(id, store)
+        if (!entry) {
+          logDebug('Load response not found in cache.')
           return null
         }
+        // // Check cache max age.
+        // let cacheControl = requestCopy.headers.get('Cache-Control')
+        // let maxAge = cacheControl ? parseInt(cacheControl.split('=')[1]) : 3600
+        // if (Date.now() - data.timestamp > maxAge * 1000) {
+        //   logDebug('Cache expired. Load from API endpoint.')
+        //   return null
+        // }
+        logDebug('Load response from cache.', entry)
+        return new Response(entry.response.body, entry.response)
+      } catch (err) {
+        logCritical('cant getCache', err)
+        return null
       }
     }
   }
 // routing
   {
-    // порядок вызовов precacheAndRoute и registerRoute имеет значение
-    // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
-    workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
-    // This will trigger the importScripts() for workbox.strategies and its dependencies:
-    const { strategies } = workbox
     workbox.routing.registerRoute(
       /^http.*(?:googleapis|gstatic)\.com\/.*/,
       new workbox.strategies.StaleWhileRevalidate({
@@ -188,42 +322,6 @@ if (useCache) {
           })
         ]
       })
-    )
-    workbox.routing.registerRoute( // share_target
-      /\/share_target\/?$/,
-      async ({ url, event, params }) => {
-        logDebug('share_target 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
-        // if (event.request.method === 'POST') {
-        //   logDebug('redirect to share_target = ')
-        //   return Response.redirect('share_target', 303)
-        // }
-        if (url.pathname.includes('share_target')) {
-          logDebug('share_target 6 ')
-          try {
-            let formData = await event.request.formData()
-            // for (let [name, value] of formData) {
-            //   shareData[name] = value
-            // }
-            let title = formData.get('title')
-            let text = formData.get('text')
-            let url = formData.get('url')
-            let images = formData.getAll('image')
-            let videos = formData.getAll('video')
-            logDebug(' formData fields  = ', {title, text, url, images, videos})
-            await idbKeyval.set('shareData', {title, text, url, images, videos}, swShareStore)
-          } catch (err) {
-            logCritical('share_target err', err)
-          }
-        }
-        if (workbox.precaching.getCacheKeyForURL('/index.html')) {
-          logDebug('workbox.routing.registerRoute returm from cache', url)
-          return caches.match(workbox.precaching.getCacheKeyForURL('/index.html'))
-        } else {
-          logDebug('workbox.routing.registerRoute returm from net', url)
-          return fetch('/index.html')
-        }
-      },
-      'POST'
     )
     workbox.routing.registerRoute( // vue router ( /menu /create etc looks at index.html)
       /\/\w+\/?$/,
@@ -249,51 +347,13 @@ if (useCache) {
     )
     workbox.routing.registerRoute( // content video
       /^http.*(yandexcloud|local_object_storage).+\.mp4$/,
-      new workbox.strategies.CacheFirst({
-        cacheName: 'content_video',
-        plugins: [
-          new workbox.expiration.Plugin({
-            maxEntries: 200
-          }),
-          // If we have the *entire* video in the cache,
-          // then this plugin will properly honor the Range: header on incoming requests,
-          // and slice up the response body, giving back only what's asked for.
-          new workbox.rangeRequests.Plugin()
-        ]
-      })
+      ({ url, event, params }) => cacheVideo(event)
     )
     workbox.routing.registerRoute(// graphql
       /^http.*\/graphql\/?$/,
-      async ({ url, event, params }) => cacheGraphQl(event),
+      ({ url, event, params }) => cacheGraphQl(event),
       'POST'
     )
-    // workbox.routing.registerRoute( // share
-    //   /\/share_target\/?$/,
-    //   async ({ url, event, params }) => {
-    //     logDebug('share_target POST!!! request=', event.request)
-    //     const formData = await event.request.formData()
-    //     // event.respondWith(fetch(event.request))
-    //     logDebug('fetch post message!', swVer, event)
-    //     logDebug('SW formData = ', formData)
-    //     for (let value of formData.values()) {
-    //       logDebug('SW formData value = ', value)
-    //     }
-    //     logDebug('SW formData title = ', formData.get('title'))
-    //     logDebug('SW formData text = ', formData.get('text'))
-    //     logDebug('SW formData url = ', formData.get('url'))
-    //     logDebug('SW formData file = ', formData.get('file'))
-    //     logDebug('SW formData files = ', formData.get('files'))
-    //
-    //     logDebug('send response = ', formData)
-    //     // await self.clients.openWindow('/create/')
-    //     // return Promise.resolve(new Response(formData, {
-    //     //   headers: { 'Content-Type': 'application/json', status: 200 }
-    //     // }))
-    //     return Response.redirect('share_target', 303)
-    //   },
-    //   'POST'
-    // )
-
     // This "catch" handler is triggered when any of the other routes fail to
     // generate a response.
     workbox.routing.setCatchHandler(async ({ event }) => {

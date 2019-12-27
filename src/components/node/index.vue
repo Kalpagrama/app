@@ -131,7 +131,7 @@ import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'nodeNew',
-  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'nodeFullReady', 'visible'],
+  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
   components: {ncFragment},
   data () {
     return {
@@ -189,10 +189,19 @@ export default {
     },
     needFull: {
       immediate: true,
+        async handler (to, from) {
+          if (to) {
+            if (!this.nodeFull) this.nodeFull = await this.nodeLoad(this.node.oid)
+          } else {
+            this.nodeFull = null
+          }
+        }
+    },
+    needFullPreload: {
+      immediate: true,
       async handler (to, from) {
-        // this.$log('needFull CHANGED', to)
         if (to) {
-          if (!this.nodeFull) this.nodeFull = await this.nodeLoad(this.node.oid)
+          if (!this.nodeFull) this.nodeFull = await this.nodePreLoad(this.node.oid)
         } else {
           this.nodeFull = null
         }
@@ -318,15 +327,26 @@ export default {
         this.nodeVoting = false
       }
     },
+    // упреждающая загрузка ядра (с низким приоритетом. Запрос на сервер будет сделан по-возможности)
+    async nodePreLoad (oid) {
+      this.$log(`nodePreLoad start indx=${this.index} oid=${this.node.oid}`)
+      let node = null
+      try {
+        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 1 })
+      } catch (err) { }
+      this.$log('nodePreLoad done', this.index, this.node.oid)
+      return node
+    },
+    // гарантированная загрузка ядра
     async nodeLoad (oid) {
-      // this.$log('nodeLoad start', this.index, this.node.oid)
+      this.$log(`nodeLoad start indx=${this.index}oid=${this.node.oid}`)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
         this.nodeFullError = null
       } catch (err) {
         this.$logE('node', 'nodeLoad error', err)
-        this.$emit('error')
+        this.$emit('hide') // не показывать это ядро
         node = null
         this.nodeFullError = err
       }

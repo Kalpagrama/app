@@ -43,6 +43,6 @@ export default {
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')
-  }
- }
+  },
+}
 </script>

@@ -16,7 +16,7 @@ export const subscribe = async (context, oid) => {
   logD('subscriptions', 'subscribe', oid)
   let { data: { subscribe } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation subscribe ($oid: OID!) {
+      mutation sw_network_only_subscribe ($oid: OID!) {
         subscribe (oid: $oid)
       }
     `,
@@ -31,7 +31,7 @@ export const unSubscribe = async (state, oid) => {
   logD('subscriptions', 'subscribe', oid)
   let { data: { unSubscribe } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation unSubscribe ($oid: OID!) {
+      mutation sw_network_only_unSubscribe ($oid: OID!) {
         unSubscribe (oid: $oid)
       }
     `,

@@ -5,16 +5,17 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
     v-if="nodesBan ? !nodesBan.includes(n.oid) : true"
     :ctx="'inList'"
     :node="n" :index="ni"
-    :needFull="ni > nodeMiddle-3 && ni < nodeMiddle+3"
+    :needFull="ni >= nodeMiddle-1 && ni <= nodeMiddle+1"
+    :needFullPreload="!(ni >= nodeMiddle-1 && ni <= nodeMiddle+1) && ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
     :visible="nodeMiddle === ni"
-    @error="nodesBan.push(n.oid)"
+    @hide="nodesBan.push(n.oid)"
     @nodeClick="$event => $emit('nodeClick', $event)"
     :style=`{}`
     v-observe-visibility=`{
       callback: nodeMiddleHandler,
       throttle: 300,
       intersection: {
-        rootMargin: -($q.screen.height/2-10)+'px 0px'
+        rootMargin: -($q.screen.height/2-1)+'px 0px'
       }
     }`
     ).bg-white.q-mb-lg

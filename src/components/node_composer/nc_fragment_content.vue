@@ -104,10 +104,10 @@ export default {
       if (!onlyMeta) this.progressShow = true
       let {data: {uploadContentUrl}} = await this.$apollo.mutate({
         mutation: gql`
-          ${fragments.objectFragment}
-          mutation nc_uploadContentUrl ($url: String!, $onlyMeta: Boolean!) {
+          ${fragments.objectFullFragment}
+          mutation sw_network_only_nc_uploadContentUrl ($url: String!, $onlyMeta: Boolean!) {
             uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
-              ...objectFragment
+              ...objectFullFragment
             }
           }
         `,

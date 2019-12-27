@@ -75,10 +75,10 @@ export default {
       // this.videoShow = true
       let { data } = await this.$apollo.mutate({
         mutation: gql`
-          ${fragments.objectFragment}
-          mutation uploadContentFileFragmentFinder ($file: Upload!, $length: Float!) {
+          ${fragments.objectFullFragment}
+          mutation uploadContentFileFragmentFinder($file: Upload!, $length: Float!) {
             uploadContentFile(file: $file, length: $length) {
-              ...objectFragment
+              ...objectFullFragment
             }
           }
         `,
