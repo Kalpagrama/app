@@ -39,7 +39,7 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
         q-btn(round flat icon="view_stream" color='grey')
         .col
         div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
-          q-btn(v-if="ctx !== 'inEditor'" round push icon="add" color="green" @click="item = null, $refs.fragmentEditorDialog.show()")
+          q-btn(v-if="ctx !== 'inEditor'" round push icon="add" color="green" @click="$router.push({name: 'fragment'})")
       .col.full-width.scroll.kscroll
         .row.full-width.items-start.content-start.q-px-sm
           //- v-if="fragmentToDelete !== ii"

@@ -16,9 +16,9 @@ div(:style=`{}`).row.fit
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   video(
     ref="fragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="true" preload="auto"
-    @play="playing = true" @pause="playing = false"
+    @play="playing = true" @pause="playing = false" :muted="muted"
     @ended="ended" @timeupdate="timeupdate" @seeked="seeked"
-    width="100%" height="100%" muted="true"
+    width="100%" height="100%"
     :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
     source(
       :src="ctx === 'inEditor' ? fragment.content.url : fragment.url"
@@ -58,7 +58,7 @@ export default {
     },
     timeupdate () {
       if (this.now !== 0 && this.now === this.player.currentTime) return
-      this.$log('timeupdate')
+      // this.$log('timeupdate')
       if (this.ctx === 'inEditor') {
         this.now = this.player.currentTime
       } else {
@@ -70,6 +70,7 @@ export default {
     },
     mutedToggle () {
       this.$log('mutedToggle')
+      this.muted = !this.muted
     },
     playerInit () {
       this.$log('playerInit')
@@ -90,6 +91,7 @@ export default {
             this.player.addEventListener('seeked', this.seeked)
             this.muted = false
             this.player.play()
+            this.$emit('player', this.player)
           },
           error: async (mediaElement, originalNode, instance) => {
             this.$log('playerStart error')

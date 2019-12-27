@@ -1,0 +1,210 @@
+<template lang="pug">
+div(
+  :style=`{position: 'relative'}`
+  ).column.full-width.bg-black
+  //- cuts on progress bar
+  //- cut&cuts on video progress bar
+  div(
+    v-if="cut"
+    :style=`{position: 'absolute', zIndex: 400, top: '0px', height: '8px', pointerEvents: 'none'}`).row.full-width.q-px-md.bg-black
+    div(:style=`{position: 'relative'}`).row.fit
+      //- cuts in progress bar
+      div(
+        v-for="(c, ci) in cuts" :key="ci"
+        v-if="ci !== cutIndex"
+        :style=`{
+          position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 0.6,
+          left: (c.points[0].x/fragment.content.duration)*100+'%',
+          width: ((c.points[1].x-c.points[0].x)/fragment.content.duration)*100+'%',
+          borderRadius: '4px', background: c.color}`)
+      //- cut on progress bar
+      div(:style=`{
+        position: 'absolute', zIndex: 106, top: 0, height: '100%', opacity: 1,
+        left: (cut.points[0].x/fragment.content.duration)*100+'%',
+        width: ((cut.points[1].x-cut.points[0].x)/fragment.content.duration)*100+'%',
+        borderRadius: '4px', background: cut.color}`)
+  //- cuts pan
+  cuts-on-frames(
+    v-show="editing"
+    :editing="editing" :width="width" :fragment="fragment" :cut="cut" :cuts="cuts" :player="player"
+    @panningStarted="fragmentPlaying = false" @cutCreate="cutCreate")
+  //- cuts-pan
+  //- body
+  div.col.full-width.scroll
+    .row.full-width.items-start.content-start.q-pa-md
+      k-dialog-bottom(ref="cutDialog" :options="cutDialogOptions" @action="cutAction")
+      fev-cut(
+        v-for="(c, ci) in cuts" :key="c.color"
+        :index="ci" :cut="c" :cutIndex="cutIndex" :cutPlaying="cutPlaying" :player="player"
+        @cutIndex="cutIndex = $event" @play="cutPlay"
+        @action="$refs.cutDialog.show()").q-mb-sm
+</template>
+
+<script>
+import fevCut from './cut'
+import cutsOnFrames from './cuts_on_frames'
+
+export default {
+  name: 'nFEV',
+  components: {fevCut, cutsOnFrames},
+  props: ['ctx', 'fragment', 'width', 'height', 'mini', 'player', 'editing'],
+  data () {
+    return {
+      cutIndex: -1,
+      cutPlaying: -1,
+      fragmentPlaying: false
+    }
+  },
+  computed: {
+    cut () {
+      if (this.cutIndex >= 0) return this.cuts[this.cutIndex]
+      else return null
+    },
+    cuts () {
+      return this.fragment.cuts
+    },
+    fragmentDuration () {
+      return this.cuts.reduce((acc, val) => {
+        acc += val.points[1].x - val.points[0].x
+        return acc
+      }, 0)
+    },
+    cutDialogOptions () {
+      let options = {
+        header: this.cut ? this.cut.name.length > 0 : false,
+        headerName: this.cut ? this.cut.name : '',
+        confirm: true,
+        confirmName: 'Export to forge',
+        actions: {
+          down: {name: 'Down'},
+          up: {name: 'Up'},
+          delete: {name: 'Delete', color: 'red'},
+        }
+      }
+      if (this.cutIndex === 0) delete options.actions.up
+      if (this.cutIndex === this.cuts.length - 1) delete options.actions.down
+      return options
+    }
+  },
+  watch: {
+    editing: {
+      handler (to, from) {
+        this.$log('editing CHANGED', to)
+        if (to) {
+          if (this.cuts.length === 0) {
+            this.$log('FIRST EDIT CLICK, CREATE!')
+            this.cutCreate()
+          }
+        }
+      }
+    }
+  },
+  methods: {
+    fragmentPlay () {
+      this.$log('fragmentPlay')
+      // if (this.fragment.cuts.length === 0) return
+      // if (this.fragmentPlaying) {
+      //   this.fragmentPlaying = false
+      //   this.cutIndex = -1
+      //   this.cutPlaying = -1
+      //   this.player.pause()
+      // } else {
+      //   this.fragmentPlaying = true
+      //   this.cutIndex = 0
+      //   this.cutPlaying = 0
+      //   this.player.play()
+      //   this.player.setCurrentTime(this.cut.points[0].x)
+      // }
+    },
+    cutPlay (ci) {
+      this.$log('cutPlay', ci)
+      this.fragmentPlaying = false
+      if (this.cutPlaying === ci) {
+        this.player.pause()
+        this.cutPlaying = -1
+      } else {
+        this.cutPlaying = ci
+        this.player.play()
+      }
+    },
+    cutCreate (s, e) {
+      this.$log('cutCreate', this.player.currentTime)
+      let start = s || this.player.currentTime
+      let end = e || start + 30
+      if (end > this.fragment.content.duration) end = this.fragment.content.duration
+      let cut = {
+        name: '',
+        color: this.$randomColor(Date.now().toString()),
+        thumbUrl: '',
+        style: null,
+        points: [{x: start}, {x: end}]
+      }
+      this.fragment.cuts.push(cut)
+      this.cutIndex = this.fragment.cuts.length - 1
+    },
+    cutDelete (index) {
+      this.$log('cutDelete', index)
+      this.cutIndex = -1
+      this.$delete(this.fragment.cuts, index)
+    },
+    cutExport () {
+      this.$log('cutExport', this.cut)
+      // create node with one fragment...
+    },
+    cutUp (index) {
+      this.$log('cutUp')
+      let current = this.cuts[index]
+      let to = this.cuts[index - 1]
+      this.cuts[index] = to
+      this.cuts[index - 1] = current
+      this.$nextTick(() => {
+        this.cutIndex = index - 1
+      })
+    },
+    cutDown (index) {
+      this.$log('cutDown')
+      let current = this.cuts[index]
+      let to = this.cuts[index + 1]
+      this.cuts[index] = to
+      this.cuts[index + 1] = current
+      this.$nextTick(() => {
+        this.cutIndex = index + 1
+      })
+    },
+    cutAction (action) {
+      this.$log('cutAction', action)
+      switch (action) {
+        case 'confirm': {
+          this.$log('EXPORT')
+          break
+        }
+        case 'up': {
+          this.cutUp(this.cutIndex)
+          break
+        }
+        case 'down': {
+          this.cutDown(this.cutIndex)
+          break
+        }
+        case 'delete': {
+          if (confirm(this.$t('Delete cut?'))) this.cutDelete(this.cutIndex)
+          break
+        }
+      }
+    }
+  },
+  mounted () {
+    this.$log('mounted')
+    if (this.cuts.length > 0) {
+      this.cutIndex = 0
+      // this.fragmentPlay()
+    } else {
+      // this.player.play()
+    }
+    this.player.play()
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+  }
+}
+</script>

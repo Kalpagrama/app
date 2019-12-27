@@ -1,15 +1,5 @@
 <template lang="pug">
-div.row.full-width
-  //- //- add fragment slot
-  //- div(v-if="stage === 0 && ctx === 'inEditor'" @click="stage = 1").row.full-width.items-center.justify-center.bg-grey-1
-  //-   q-btn(
-  //-     outline no-caps color="green" icon="add" @click="stage = 1"
-  //-     :style=`{height: '60px', borderRadius: '10px'}`).full-width
-  //-     span.text-bold {{$t('Add fragment')}}
-  //- //- content find slot
-  //- div(v-if="stage === 1 && ctx === 'inEditor'").row.full-width
-  //- //- fragment
-  //- div(v-if="stage === 2").row.full-width.bg-black
+div(:style=`{position: 'relative'}`).row.full-width
   img(
     ref="previewRef"
     :src="ctx === 'inEditor' ? fragment.content.thumbUrl : fragment.thumbUrl"
@@ -22,7 +12,8 @@ div.row.full-width
       v-if="fragment.content.type === 'VIDEO'"
       ref="fragmentVideo"
       :index="index" :ctx="ctx" :fragment="fragment" :active="active" :visible="visible" :mini="mini"
-      :width="previewWidth" :height="previewHeight")
+      :width="previewWidth" :height="previewHeight"
+      @player="$emit('player', $event)")
     //- fragment-image(v-if="fragment && fragment.content.type === 'IMAGE")
     //- fragment-book(v-if="fragment && fragment.content.type === 'BOOK")
 //- editors slot
