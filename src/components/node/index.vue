@@ -193,6 +193,7 @@ export default {
           if (to) {
             if (!this.nodeFull) this.nodeFull = await this.nodeLoad(this.node.oid)
           } else {
+            // TODO сделать удаление
             // this.nodeFull = null
           }
         }
@@ -203,6 +204,7 @@ export default {
         if (to) {
           if (!this.nodeFull) this.nodeFull = await this.nodePreLoad(this.node.oid)
         } else {
+          // TODO сделать удаление
           // this.nodeFull = null
         }
       }
