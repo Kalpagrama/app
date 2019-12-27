@@ -76,7 +76,7 @@ export default {
       let { data } = await this.$apollo.mutate({
         mutation: gql`
           ${fragments.objectFragment}
-          mutation uploadContentFileFragmentFinder($file: Upload!, $length: Float!) {
+          mutation uploadContentFileFragmentFinder ($file: Upload!, $length: Float!) {
             uploadContentFile(file: $file, length: $length) {
               ...objectFragment
             }
