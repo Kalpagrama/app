@@ -58,7 +58,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
         :icon="this.$store.state.core.newVersionAvailable ? 'system_update' : 'cloud_download'"
         @click="update"
         :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`).full-width
-        span(v-if="width === 230").text-bold.q-ml-md {{ $t($store.state.core.newVersionAvailable ? 'Update app!' : 'Check for updates') }}
+        span(v-if="width === 230").text-bold.q-ml-md {{$store.state.core.newVersionAvailable ? $t('Update app!') : $t('Check for updates') }}
     div(v-if="this.$store.state.core.installPrompt" :class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       q-btn(
         :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
@@ -68,7 +68,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-primary
     div().row.full-width.q-px-md
       q-btn(
         outline color="accent" no-caps @click="appRefresh()"
-        :style=`{borderRadius: '10px'}` ).full-width Refresh
+        :style=`{borderRadius: '10px'}` ).full-width {{$t('Refresh')}}
 </template>
 
 <script>

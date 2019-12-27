@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" :container="true" :style=`{width: $q.screen.width+'px', height: '100vh'}`).bg-grey-3
   //- k-dialog-bottom(ref="accountSettings" mode="actions" :options="accountSettingsOptions" @action="accountSettingsAction")
-  q-header().row.full-width.justify-center.bg-white
+  q-header().row.full-width.justify-center.bg-grey-3
     div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.bg-white
       div(:style=`{height: '60px', width: '60px'}` @click="mainPage()").row.items-center.justify-center
         q-btn(round flat color="primary" icon="arrow_back")

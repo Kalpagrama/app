@@ -24,11 +24,22 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  q-header.row.full-width.justify-center
+  q-header(v-if="scroll").row.full-width.justify-center
+    div(:style=`{height: '60px'}`).row.full-width
+      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+        q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+      .col
+        .row.full-width.justify-start.items-center.fit
+          span.text-bold.text-h6.text-white {{ user.name }}
+      .row
+        div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+          q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+          q-btn(v-else round flat @click="save()" color="white" icon="done")
+  q-page-container(style=`height: 100vh`)
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      div(v-if="user").row.full-width.content-start
+      div(v-if="user").row.full-width.content-start.bg-primary
         //- header
-        div(:style=`{height: '100px'}`).row.full-width.bg-primary
+        div(:style=`{height: '60px'}`).row.full-width
           div(style=`height: 60px; width: 60px`).row.items-center.justify-center
             q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
           .col
@@ -39,17 +50,18 @@ q-layout(view="hHh lpR fFf").bg-grey-3
             //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
               q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
         //- body
-        div(v-if="true").row.full-width.q-px-sm
+        div(v-if="true").row.full-width.q-px-sm.bg-primary
           //- <input type="file" @change="previewFiles" multiple>
           .row.full-width
             img(:src="user.profile.thumbUrl" @click="changePhoto()"
-              :style=`{width: '80px', height: '80px', marginTop: '-40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
+              :style=`{width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden'}`)
             div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
               q-btn(
                 rounded no-caps
                 @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
                 :label="include ? $t('Unfollow') : $t('Follow')"
                 :color="include ? 'red' : 'accent'"
+                style=`height: 40px`
                 ).q-px-md
           .row.full-width.items-center.justify-start
             .row.full-width
@@ -67,14 +79,13 @@ q-layout(view="hHh lpR fFf").bg-grey-3
             div(v-if="false" @click="showInfo()").row.full-width
               span.text-accent Show detailed information
               //- span {{ user.subscriptions }}
-  q-page-container
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(
           v-if="user"
-          :style=`{position: 'relative', height: '100vh', overflow: 'hidden'}`).col.full-width.bg-grey-3
-          k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" :style=`{height: '100vh'}`).bg-grey-3
-            template(v-slot:created)
+          :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width.bg-grey-3
+          k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" style=`heigth: 100vh`).bg-grey-3
+            template(v-slot:created).scroll
               user-created-nodes(:filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
             template(v-slot:rated)
               // h1 vetur
@@ -111,6 +122,10 @@ export default {
     }
   },
   computed: {
+    scroll () {
+      if (window.scrollY > 100) return true
+      else return false
+    },
     include () {
       let find = this.mySubscriptions.find(s => s.oid === this.user.oid)
       if (find) return true
