@@ -9,7 +9,7 @@
     //- trends
     q-btn(round flat icon="whatshot" :color="$route.name === 'trends' ? 'green' : 'white'" @click.stop="$router.push({name: 'trends'})")
     //- add fragment
-    q-btn(round push color="green" size="md" @click.stop="$router.push({name: 'fragment'})")
+    q-btn(round push color="green" size="md" @click.stop="$router.push({name: 'create'})")
       q-spinner(v-if="$route.name === 'fragment'" size="20px" color="white")
       q-icon(v-else name="add" color="white")
     //- workspace

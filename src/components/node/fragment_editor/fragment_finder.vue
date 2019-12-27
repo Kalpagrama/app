@@ -8,15 +8,19 @@ div(:style=`{minHeight: '74px', borderBottom: '1px solid #eee'}`).row.full-width
           :style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0',
             overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
           .col.full-width
-            ws-items(ctx="inEditor" :types="['fragments', 'contents']" @itemClick="wsItemClick")
+            ws-items(ctx="inEditor" :types="['fragments', 'contents']" @itemClick="itemFound")
     //- url input
     input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}` accept="video/*")
     div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-      q-input(ref="urlInput" v-model="url" color="green" filled placeholder="Paste URL").full-width
+      q-input(
+        ref="urlInput" v-model="url" color="green"
+        filled placeholder="Paste URL" :loading="urlInputLoading"
+        ).full-width
         template(v-slot:prepend)
-          q-btn(round flat color="green" icon="attach_file" @click="$refs.fileInput.click()")
+          q-btn(v-if="url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()")
         template(v-slot:append)
-          q-btn(round flat color="green" icon="add" @click="$refs.findWsDialog.show()")
+          q-btn(v-if="url.length === 0" round flat color="green" icon="add" @click="$refs.findWsDialog.show()")
+          q-btn(v-if="!urlInputLoading && url.length > 0" round flat color="green" icon="clear" @click="url = ''")
   video(
     v-if="videoShow"
     ref="videoRef" crossorigin="anonymous" autoplay="true" loop="true" playsinline="true" preload="auto"
@@ -35,26 +39,73 @@ export default {
   data () {
     return {
       url: '',
+      urlInputLoading: false,
       videoUrl: '',
       videoShow: false,
       videoLoaded: false
     }
   },
+  watch: {
+    url: {
+      handler (to, from) {
+        try {
+          this.$log('url CHANGED WATCHER', to)
+          if (new URL(to)) this.urlChanged(to)
+          else this.$log('WRONG URL')
+        } catch (e) {
+          this.$log('URL WRONG', e)
+        }
+      }
+    }
+  },
   methods: {
-    wsItemClick (item) {
-      this.$log('wsItemClick', item.type)
+    itemFound (item) {
+      this.$log('itemFound', item.type)
       switch (item.type) {
         case 'fragment': {
           this.$emit('fragment', item.item)
           break
         }
         case 'content': {
+          let fragment = {
+            url: '',
+            name: '',
+            thumbUrl: '',
+            content: item.item,
+            scale: item.item.duration,
+            cuts: []
+          }
+          this.$emit('fragment', fragment)
           break
         }
       }
     },
-    urlChanged (e) {
-      this.$log('urlChanged', e)
+    async urlChanged (to) {
+      this.$log('url CHANGED', to)
+      this.urlInputLoading = true
+      // TODO: show progress
+      let content = await this.contentGetByUrl(to, true)
+      this.itemFound({type: 'content', item: content})
+      this.urlInputLoading = false
+    },
+    async contentGetByUrl (url, onlyMeta = true) {
+      this.$log('contentGetByUrl start')
+      let {data: {uploadContentUrl}} = await this.$apollo.mutate({
+        mutation: gql`
+          ${fragments.objectFullFragment}
+          mutation sw_network_only_nc_contentGetByUrl ($url: String!, $onlyMeta: Boolean!) {
+            uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
+              ...objectFullFragment
+            }
+          }
+        `,
+        variables: {
+          url: url,
+          onlyMeta: onlyMeta
+        }
+      })
+      this.$log('contentGetByUrl done')
+      return uploadContentUrl
     },
     videoLoad (e) {
       this.$log('videoLoad', e)
@@ -71,12 +122,18 @@ export default {
       let file = e.target.files['0']
       this.$log('file', file)
       let url = URL.createObjectURL(file)
-      // this.videoUrl = url
-      // this.videoShow = true
-      let { data } = await this.$apollo.mutate({
+      this.videoUrl = url
+      this.videoShow = true
+      let content = await this.contentGetByFile(file, false)
+      this.$log('content', content)
+      this.itemFound({type: 'content', item: content})
+    },
+    async contentGetByFile (file, onlyMeta = true) {
+      this.$log('contentGetByFile start')
+      let { data: {uploadContentFile} } = await this.$apollo.mutate({
         mutation: gql`
           ${fragments.objectFullFragment}
-          mutation uploadContentFileFragmentFinder($file: Upload!, $length: Float!) {
+          mutation sw_network_only_nc_contentGetByFile ($file: Upload!, $length: Float!) {
             uploadContentFile(file: $file, length: $length) {
               ...objectFullFragment
             }
@@ -88,28 +145,8 @@ export default {
         },
         client: 'uploadApollo'
       })
-      this.$log('data', data)
-      // let content = {
-      //   oid: false,
-      //   type: 'VIDEO',
-      //   contentSource: 'DEVICE',
-      //   url: url,
-      //   urlOriginal: url,
-      //   name: file.name,
-      //   duration: 0,
-      //   thumbUrl: '',
-      //   width: 0,
-      //   height: 0,
-      //   frameUrls: []
-      // }
-      // let fragment = {
-      //   name: '',
-      //   content: content,
-      //   url: '',
-      //   scale: 0,
-      //   cuts: []
-      // }
-      // this.$emit('fragment', fragment)
+      this.$log('contentGetByFile done')
+      return uploadContentFile
     }
   },
   mounted () {
