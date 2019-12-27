@@ -11,14 +11,15 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
   q-footer(reveal).row.full-width.justify-center.bg-grey-3
     k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
   q-page-conainter
-    div(:style=`{paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
+    div(:style=`{position: 'relative', paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
+        //- div(ref="nodeListMedian" :style=`{position: 'fixed', top: $q.screen.height/2+'px', zIndex: 10000, height: '100px'}`).row.full-width.bg-blue
         //- k-colls-new(:coll="coll" :colls="colls" @coll="coll = $event")
           //- template(v-slot:[$route.params.category])
             //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
         node-loader(v-if="sphereOid" ref="nodeLoader" :variables="variables" type="sphereNodes")
           template(v-slot:default=`{nodes}`)
-            node-list(:nodes="nodes" @nodeClick="nodeClick")
+            node-list(:nodes="nodes" :median="$refs.nodeListMedian" @nodeClick="nodeClick")
 </template>
 
 <script>
