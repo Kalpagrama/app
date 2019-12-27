@@ -12,7 +12,7 @@
 .row.full-width.justify-center
   div(:style=`{maxWidth: 330+'px'}`).row.full-width
     .row.fit.content-center.items-center
-      div(v-if="!codeConfirmed && !codeWaiting")
+      div(v-if="!codeConfirmed && !codeWaiting").row.full-width.q-mb-sm
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mb-sm.bg-white
           input(
             :placeholder="$t('Почта')"
@@ -26,7 +26,7 @@
         //-   outline no-caps color="white" @click="$go('/login')"
         //-   :style=`{height: '60px', borderRadius: '10px'}`).full-width
         //-   span {{$t('Back')}}
-      div().row.full-width.q-mb-sm
+      div(v-else).row.full-width.q-mb-sm
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
           input(
             :placeholder="$t('Код')"
