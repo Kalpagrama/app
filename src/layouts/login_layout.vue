@@ -7,12 +7,14 @@ q-layout().bg-primary
         .row.full-width.justify-center.q-mt-sm
           span.text-h6.text-white.text-bold KALPAGRAMMA
   q-footer(style=`height: 50%`)
-    router-view
+    email
 </template>
 
 <script>
+import email from 'pages/login/email'
 export default {
   name: 'loginLayout',
+  components: {email},
   data () {
     return {
       height: window.innerHeight,
