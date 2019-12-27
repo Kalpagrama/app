@@ -7,7 +7,7 @@ html, body {
 div(
   id="q-app" ref="kapp").row.full-width.justify-center.bg-grey-3
   router-view
-  div(v-if="!$store.state.core.online" :style=`{position: 'absolute', zIndex: 100, top: '0px', height: '10px'}`).row.full-width.justify-end.items-center.q-px-md.bg-red-4
+  div(v-if="!$state.store.core.online" :style=`{position: 'relative', zIndex: 100000, top: '0px', height: '15px'}`).row.full-width.justify-end.items-center.q-px-md.bg-red-4
     small(style=`font-size: 8px`).text-bold.text-primary {{'offline'}}
 </template>
 
