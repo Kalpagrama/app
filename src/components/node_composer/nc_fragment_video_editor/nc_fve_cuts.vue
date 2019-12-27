@@ -30,12 +30,12 @@
       div(@click="cutName = c.name, cutNameEditing = ci").col.full-height
         .row.fit.items-center.content-center.q-px-sm
           span(
-            v-if="cutNameEditing !== ci && c.name && c.name.length > 0"
-            ) {{ c.name }}
+            v-if="cutNameEditing !== ci"
+            ) {{ c.name.length > 0 ? c.name : 'Set name' }}
           input(
             v-if="cutNameEditing === ci"
             v-model="c.name"
-            @keyup.enter="cutNameEditing = -1"
+            @keyup.enter="cutNameEditing = -1" @blur="cutNameEditing = -1"
             :style=`{background: 'none', margin: 0, padding: 0}`).full-width.kinput
       //- start
       div(

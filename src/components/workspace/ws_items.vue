@@ -31,14 +31,15 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
               maxHeight: $q.screen.height+'px',
               borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
       div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-        //- span.text-bold {{ fragments.length }}
-        q-btn(round flat icon="search" color="grey")
+        div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+          q-btn(round flat icon="search" color="grey")
         .col
         q-btn(round flat icon="view_list" color="grey")
         q-btn(round flat icon="view_module" color="green")
         q-btn(round flat icon="view_stream" color='grey')
         .col
-        q-btn(round push icon="add" color="green" @click="item = null, $refs.fragmentEditorDialog.show()")
+        div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+          q-btn(v-if="ctx !== 'inEditor'" round push icon="add" color="green" @click="item = null, $refs.fragmentEditorDialog.show()")
       .col.full-width.scroll.kscroll
         .row.full-width.items-start.content-start.q-px-sm
           //- v-if="fragmentToDelete !== ii"
@@ -110,9 +111,11 @@ export default {
     return {
       coll: 'fragments',
       colls: [
-        {id: 'notes', name: 'Notes'},
-        {id: 'fragments', name: 'Fragments'},
+        // {id: 'notes', name: 'Notes'},
+        // {id: 'workspace', name: 'Workspace'},
+        {id: 'spheres', name: 'Spheres'},
         {id: 'contents', name: 'Contents'},
+        {id: 'fragments', name: 'Fragments'},
         {id: 'nodes', name: 'Nodes'}
       ],
       item: null,

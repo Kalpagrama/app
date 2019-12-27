@@ -191,8 +191,10 @@ export default {
       immediate: true,
       async handler (to, from) {
         // this.$log('needFull CHANGED', to)
-        if (to && !this.nodeFull) {
-          this.nodeFull = await this.nodeLoad(this.node.oid)
+        if (to) {
+          if (!this.nodeFull) this.nodeFull = await this.nodeLoad(this.node.oid)
+        } else {
+          this.nodeFull = null
         }
       }
     },
@@ -252,6 +254,7 @@ export default {
       if (index === 0) {
         this.previewHeight = height
         this.$emit('previewHeight', height)
+        if (this.visible) this.play()
         // TODO: emit scrollTop event of node in scroll wrapper
         // this.$emit('scrollTop', this.$el.scrollHeight)
       }

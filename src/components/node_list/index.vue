@@ -5,7 +5,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
     v-if="nodesBan ? !nodesBan.includes(n.oid) : true"
     :ctx="'inList'"
     :node="n" :index="ni"
-    :needFull="ni > nodeMiddle-2 && ni < nodeMiddle+2"
+    :needFull="ni > nodeMiddle-3 && ni < nodeMiddle+3"
     :visible="nodeMiddle === ni"
     @error="nodesBan.push(n.oid)"
     @nodeClick="$event => $emit('nodeClick', $event)"
@@ -29,8 +29,7 @@ export default {
   },
   data () {
     return {
-      nodeHeight: 50,
-      nodeMiddle: 0
+      nodeMiddle: -1
     }
   },
   computed: {
@@ -41,10 +40,6 @@ export default {
         this.$log('nodeMiddleHandler', entry.target.accessKey)
         this.nodeMiddle = parseInt(entry.target.accessKey)
       }
-    },
-    nodeClick (n, ni) {
-      this.$logD('nodeClick', n, ni)
-      this.$emit('nodeClick', n)
     }
   },
   mounted () {
