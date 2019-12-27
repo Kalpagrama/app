@@ -131,7 +131,7 @@ import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'nodeNew',
-  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'nodeFullReady', 'visible', 'priority'],
+  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
   components: {ncFragment},
   data () {
     return {
@@ -190,9 +190,16 @@ export default {
     needFull: {
       immediate: true,
       async handler (to, from) {
-        // this.$log('needFull CHANGED', to)
-        if (to && !this.nodeFull) {
+        if (!this.nodeFull && to) {
           this.nodeFull = await this.nodeLoad(this.node.oid)
+        }
+      }
+    },
+    needFullPreload: {
+      immediate: true,
+      async handler (to, from) {
+        if (!this.nodeFull && to) {
+          this.nodeFull = await this.nodePreLoad(this.node.oid)
         }
       }
     },
@@ -315,12 +322,22 @@ export default {
         this.nodeVoting = false
       }
     },
-    async nodeLoad (oid) {
-      this.$log(`nodeLoad start indx=${this.index} priority=${this.priority} oid=${this.node.oid}`)
+    // упреждающая загрузка ядра (с низким приоритетом. Запрос на сервер будет сделан по-возможности)
+    async nodePreLoad (oid) {
+      this.$log(`nodePreLoad start indx=${this.index} oid=${this.node.oid}`)
       let node = null
       try {
-        let priority = this.priority || 0
-        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority })
+        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 1 })
+      } catch (err) { }
+      this.$log('nodePreLoad done', this.index, this.node.oid)
+      return node
+    },
+    // гарантированная загрузка ядра
+    async nodeLoad (oid) {
+      this.$log(`nodeLoad start indx=${this.index}oid=${this.node.oid}`)
+      let node = null
+      try {
+        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
         this.nodeFullError = null
       } catch (err) {
         this.$logE('node', 'nodeLoad error', err)

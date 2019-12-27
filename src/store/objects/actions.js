@@ -50,7 +50,7 @@ class Queue {
     if (object) {
       resolve(object)
     } else {
-      reject('queued object was destroyed due out of date ')
+      reject('queued object was destroyed due out of date')
     }
   }
 
