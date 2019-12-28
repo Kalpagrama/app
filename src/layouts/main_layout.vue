@@ -78,7 +78,7 @@ export default {
     }
     this.loading = false
     if (this.$store.state.events.notice) this.$refs.kTutorialDialog.show()
-    this.$refs.kTutorialDialog.show()
+    // this.$refs.kTutorialDialog.show()
   }
  }
 </script>
