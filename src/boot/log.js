@@ -171,7 +171,7 @@ export default async ({ Vue, store, app }) => {
       try {
         logE(err, info)
         let clearCache = require('src/system/service_worker').clearCache
-        clearCache()
+        // clearCache()
       } catch (e) {
         console.error(e, info)
       }
@@ -189,7 +189,7 @@ export default async ({ Vue, store, app }) => {
       try {
         logE('window.onerror', message, source, line, column, error)
         let clearCache = require('src/system/service_worker').clearCache
-        clearCache()
+        // clearCache()
       } catch (e) {
         console.error(e)
       }

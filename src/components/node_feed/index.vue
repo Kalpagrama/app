@@ -1,3 +1,4 @@
+// deprecated
 <template lang="pug">
   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-center.bg-grey-5
     //- header

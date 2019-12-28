@@ -238,6 +238,21 @@ export default {
     let nodeLocalStorage = localStorage.getItem('knode')
     // this.$log('nodeLocalStorage', nodeLocalStorage)
     let wsItem = this.$store.state.workspace.wsItem
+
+    // TODO:
+    // данные из меню поделиться в приложение
+    let shareData = this.$store.state.core.shareData // {title, text, url, images, videos}
+    if (shareData) {
+      let shareUrl = shareData.text || shareData.url || shareData.title
+      // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
+      if (shareUrl) {
+        this.$log('shareUrl', shareUrl)
+        // todo использовать как фрагмент
+      } else if (shareData.images.length || shareData.videos.length) {
+        // todo использовать как фрагменты
+      }
+      this.$store.commit('core/stateSet', ['shareData', null]) // после использования - очистить
+    }
     this.$log('wsItem', wsItem)
     if (nodeLocalStorage) {
       if (wsItem) {

@@ -31,7 +31,7 @@ q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
             node(
               v-if="node"
               ref="neNode"
-              :ctx="'inList'"
+              :ctx="'inExplorer'"
               :node="node" :nodeFullReady="node"
               :visible="true" :opened="true"
               @previewWidth="previewWidth = $event"

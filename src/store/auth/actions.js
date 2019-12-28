@@ -1,7 +1,7 @@
 import { apolloProvider } from 'boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { router } from 'boot/main'
-import { clearCache } from 'src/system/service_worker'
+import { checkUpdate, clearCache, update } from 'src/system/service_worker'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
@@ -14,7 +14,7 @@ export const init = async (context) => {
   let { data: { userIsAuthorized, userIsConfirmed } } = await apolloProvider.clients.authApollo.query({
     client: 'apiApollo',
     query: gql`
-      query sw_cache_userCheck {
+      query sw_network_first_userCheck {
         userIsAuthorized
         userIsConfirmed
       }
@@ -28,7 +28,7 @@ export const logout = async (context, token) => {
   try {
     let { data: { logout } } = await apolloProvider.clients.authApollo.mutate({
       mutation: gql`
-        mutation sw_nocache_logout($token: String) {
+        mutation sw_network_only_logout($token: String) {
           logout(token: $token)
         }
       `,
@@ -39,22 +39,23 @@ export const logout = async (context, token) => {
   } catch (err) {
     logE('error on logout! err=', err)
   } finally {
+    context.commit('objects/deleteUserSession', token, { root: true })
     let currentToken = localStorage.getItem('ktoken').split('::')[0]
     if (!token || token === localStorage.getItem('ktoken') || token === currentToken) {
       localStorage.removeItem('ktoken')
       localStorage.removeItem('ktokenExpires')
-      await clearCache()
-      router.push('/login')
+      await checkUpdate()
+      await router.push('/login')
+      await update()
     }
   }
-  context.commit('objects/deleteUserSession', token, { root: true })
   logD('@logout done')
 }
 export const loginEmail = async (context, email) => {
   logD('@loginEmail start')
   let { data: { loginEmail: { token, expires, role } } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
-      mutation sw_nocache_loginEmail ($email: String!, $inviteCode: String){
+      mutation sw_network_only_loginEmail ($email: String!, $inviteCode: String){
         loginEmail(email: $email, inviteCode: $inviteCode){
           token
           expires
@@ -76,7 +77,7 @@ export const loginPhone = async (context, phone) => {
   logD('@loginPhone start')
   let { data: { loginPhone: { token, expires, role } } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
-      mutation sw_nocache_loginPhone ($phone: String!, $inviteCode: String){
+      mutation sw_network_only_loginPhone ($phone: String!, $inviteCode: String){
         loginPhone(phone: $phone, inviteCode: $inviteCode){
           token
           expires
@@ -98,7 +99,7 @@ export const loginPassword = async (context, { login, password }) => {
   logD('@loginPassword start')
   let { data: { login: { token, expires, role } } } = await apolloProvider.clients.authApollo.mutate({
     mutation: gql`
-      mutation sw_nocache_login ($login: String!, $password: String!, $inviteCode: String){
+      mutation sw_network_only_login ($login: String!, $password: String!, $inviteCode: String){
         login(login: $login, password: $password  inviteCode: $inviteCode){
           token
           expires
@@ -122,7 +123,7 @@ export const confirm = async (context, code) => {
   let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await apolloProvider.clients.authApollo.mutate({
     client: 'authApollo',
     mutation: gql`
-      mutation sw_nocache_codeConfirmEmail ($code: String!) {
+      mutation sw_network_only_codeConfirmEmail ($code: String!) {
         confirm(code: $code){
           result
           nextAttemptDate

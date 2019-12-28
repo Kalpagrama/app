@@ -21,7 +21,7 @@ export const wsSphereCreate = async (context, sphere) => {
   let { data: { wsSphereCreate } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
       ${fragments.objectShortFragment}
-      mutation wsSphereCreate ($sphere: ObjectShortInput!) {
+      mutation sw_network_only_wsSphereCreate ($sphere: ObjectShortInput!) {
         wsSphereCreate (sphere: $sphere) {
           ...objectShortFragment
         }
@@ -39,7 +39,7 @@ export const wsSphereDelete = async (context, oid) => {
   logD('wsSphereDelete start', oid)
   let { data: { wsSphereDelete } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation wsSphereDelete ($oid: OID!) {
+      mutation sw_network_only_wsSphereDelete ($oid: OID!) {
         wsSphereDelete (oid: $oid)
       }
     `,
@@ -62,7 +62,7 @@ export const wsNodeSave = async (context, node) => {
     assert.ok(node.fragments.length >= 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
     for (let fr of node.fragments) {
-      if (fr === null) return
+      if (fr === null) continue
       assert.ok(fr.content)
       assert.ok(fr.cuts.length >= 0)
       assert.ok(fr.scale > 0)
@@ -77,7 +77,7 @@ export const wsNodeSave = async (context, node) => {
       }
     }
   }
-
+  logD('wsNodeSave check OK')
   let nodeInput = {}
   nodeInput.layout = node.layout
   nodeInput.name = node.name
@@ -85,9 +85,10 @@ export const wsNodeSave = async (context, node) => {
   nodeInput.spheres = node.spheres.map(s => {
     return {name: s.name}
   })
-  nodeInput.fragments = node.fragments.map(f => {
+  nodeInput.fragments = []
+  node.fragments.map(f => {
     if (f !== null) {
-      return {
+      nodeInput.fragments.push({
         oid: f.content.oid,
         name: f.name,
         thumbUrl: f.thumbUrl,
@@ -107,7 +108,7 @@ export const wsNodeSave = async (context, node) => {
             style: c.style
           }
         })
-      }
+      })
     }
   })
 
@@ -117,7 +118,7 @@ export const wsNodeSave = async (context, node) => {
     let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
-        mutation wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
+        mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
           wsNodeUpdate (oid: $oid, node: $node) {
             ...nodeFragment
           }
@@ -132,7 +133,7 @@ export const wsNodeSave = async (context, node) => {
     let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
-        mutation wsNodeCreate ($node: NodeInput!) {
+        mutation sw_network_only_wsNodeCreate ($node: NodeInput!) {
           wsNodeCreate (node: $node) {
             ...nodeFragment
           }
@@ -152,7 +153,7 @@ export const wsNodeDelete = async (context, oid) => {
   assert.ok(oid)
   let { data: { wsNodeDelete } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`
-      mutation wsNodeDelete ($oid: OID!) {
+      mutation sw_network_only_wsNodeDelete ($oid: OID!) {
         wsNodeDelete (oid: $oid)
       }
     `,

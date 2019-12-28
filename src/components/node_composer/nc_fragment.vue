@@ -5,8 +5,9 @@
 </style>
 <template lang="pug">
 div(
-  :style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`
-  ).row.full-width.items-start.content-start.bg-grey-1
+  :style=`{position: 'relative', zIndex: 100, borderRadius: '10px', overflow: 'hidden', height: mini ? 'auto' : height ? height+'px' : 'auto'}`
+  ).row.full-width.items-start.content-start.bg-black
+  //- :class=`{'full-height': !mini}`
   //- stage 0
   div(v-if="ctx === 'inEditor' && stage === 0" @click="stage = 1").row.full-width.items-center.justify-center.bg-grey-1
     q-btn(
@@ -28,20 +29,20 @@ div(
     //- mini mode toggle tint
     div(
       v-if="mini" @click="$emit('mini')"
-      :style=`{position: 'absolute', zIndex: 200, opacity: 0.5}`).row.fit.cursor-pointer
+      :style=`{position: 'absolute', zIndex: 200, opacity: 0.3}`).row.fit.cursor-pointer
     //- actions
     q-btn(
-      v-if="!mini && visible && ctx !== 'inEditor'"
+      v-if="!mini && visible && ctx === 'inExplorer'"
       round flat color="white" icon="more_vert" @click="$emit('action')"
       :style=`{position: 'absolute', zIndex: 200, right: '8px', top: '8px', background: 'rgba(255,255,255,0.15)'}`).shadow-5
     //- cancel
     q-btn(
-      v-if="ctx === 'inEditor'"
+      v-if="ctx === 'inEditor' && !inExplorer"
       round flat color="red" icon="clear" @click="$refs.ncFragmentCancelDialog.show()"
-      :style=`{position: 'absolute', zIndex: 11000, left: '10px', top: 'calc(50% - 20px)', background: 'rgba(255,255,255,0.15)'}`).shadow-5
+      :style=`{position: 'absolute', zIndex: 11000, right: '16px', top: 'calc(50% - 20px)', background: 'rgba(255,255,255,0.15)'}`).shadow-5
     //- edit
     q-btn(
-      v-if="ctx === 'inEditor'"
+      v-if="ctx === 'inEditor' && !inExplorer"
       push round no-caps @click="editing = !editing"
       :color="editing ? 'green' : 'green'"
       :icon="editing ? 'check' : 'edit'"
@@ -52,17 +53,17 @@ div(
       :src="ctx === 'inEditor' ? fragment.content.thumbUrl : thumbUrl"
       @load="previewLoad" @error="previewError"
       crossOrigin="anonymous" draggable="false"
-      :style=`{width: '100%', minWidth: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain', userSelect: 'none'}`
+      :style=`{width: '100%', minWidth: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain', userSelect: 'none', opacity: previewLoaded ? 1 : 1}`
       :class=`{'full-height': ctx !== 'inEditor'}`)
     //- video
     div(
       v-if="previewLoaded"
       :style=`{position: 'absolute', zIndex: 100, top: 0, bottom: 0, left: 0, right: 0, minHeight: '100%', minWidth: '100%'}`).row.fit
       nc-fragment-video(
-        v-if="previewLoaded && fragment && fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
+        v-if="true && previewLoaded && fragment && fragment.content.type === 'VIDEO'" ref="ncFragmentVideo"
         :ctx="ctx" :fragment="fragment" :inEditor="inEditor" :mini="mini" :visible="visible" :index="index"
         :width="previewWidth" :height="previewHeight"
-        @muted="$event => $emit('muted', $event)"
+        @muted="$event => $emit('muted', $event)" @mini="$emit('mini')"
         @ended="$emit('ended', index)"
         @ready="fragmentReady = true")
   //- editors
@@ -71,7 +72,7 @@ div(
       v-if="fragmentReady" ref="ncFragmentVideoEditor"
       @close="editing = false" :editing="editing"
       :fragment="fragment" :now="$refs.ncFragmentVideo.now" :player="$refs.ncFragmentVideo.player"
-      :width="previewWidth" :height="toolsHeight"
+      :width="previewWidth" :height="toolsHeight" :previewHeight="previewHeight"
       :style=`{height: toolsHeight+'px'}`)
 </template>
 
@@ -83,7 +84,7 @@ import ncFragmentVideoEditor from './nc_fragment_video_editor'
 export default {
   name: 'ncFragment',
   components: {ncFragmentContent, ncFragmentVideo, ncFragmentVideoEditor},
-  props: ['ctx', 'index', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'mini', 'visible'],
+  props: ['ctx', 'index', 'thumbUrl', 'fragment', 'inEditor', 'stageFirst', 'editorFirst', 'mini', 'visible', 'height', 'inExplorer'],
   data () {
     return {
       stage: 0,
@@ -104,18 +105,18 @@ export default {
     fragment: {
       immediate: true,
       handler (to, from) {
-        this.$log('fragment CHANGED', to)
+        // this.$log('fragment CHANGED', to)
         if (this.ctx === 'inEditor') {
           if (to) {
             if (to.content) {
-              this.$log('GOT CONTENT')
+              // this.$log('GOT CONTENT')
               this.stage = 2
             } else {
-              this.$log('NO CONTENT')
+              // this.$log('NO CONTENT')
               this.stage = this.stageFirst || 1
             }
           } else {
-            this.$log('NO FRAGMENT')
+            // this.$log('NO FRAGMENT')
             this.stage = this.stageFirst || 0
             this.previewLoaded = false
             this.previewWidth = 0
@@ -179,8 +180,8 @@ export default {
       }
     },
     async previewLoad () {
-      this.$log('previewLoad', this.$refs.ncFragmentPreview.clientHeight)
-      if (this.ctx === 'inEditor') this.$q.notify('previewLoad' + this.$refs.ncFragmentPreview.clientHeight)
+      // this.$log('previewLoad', this.$refs.ncFragmentPreview.clientHeight)
+      // if (this.ctx === 'inEditor') this.$q.notify('previewLoad' + this.$refs.ncFragmentPreview.clientHeight)
       let h = this.$refs.ncFragmentPreview.clientHeight
       let w = this.$refs.ncFragmentPreview.clientWidth
       this.$emit('previewHeight', h)
@@ -188,10 +189,21 @@ export default {
       this.previewHeight = h
       this.previewWidth = w
       this.previewLoaded = true
+      if (this.editorFirst) this.editing = true
     },
     previewError (e) {
-      this.$log('previewError', e)
-      this.$q.notify('previewError!')
+      // this.$log('previewError', e)
+      // this.$q.notify('previewError!')
+    }
+  },
+  mounted () {
+    if (this.ctx === 'inEditor') {
+      this.$log('mounted')
+    }
+  },
+  beforeDestroy () {
+    if (this.ctx === 'inEditor') {
+      this.$log('beforeDestroy')
     }
   }
 }

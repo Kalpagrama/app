@@ -166,15 +166,18 @@ async function clearCache (force = false) {
         if (force || !cacheName.startsWith('kalpa-precache')) {
           logD('clear cacheDb. cacheName=', cacheName)
           caches.delete(cacheName)
+          logD('clear cacheDb. Ok!', cacheName)
         }
       })
     })
   }
   logD('clear Idb...')
-  const swStore = new Store('sw-cache-common', 'common-data')
+  const swShareStore = new Store('sw-share', 'request-formData')
   const gqlStore = new Store('sw-cache-gql', 'graphql-responses')
-  await clear(swStore)
+  const gqlVideo = new Store('sw-cache-video', 'video-responses')
+  await clear(swShareStore)
   await clear(gqlStore)
+  await clear(gqlVideo)
 
   logD('clearCache end!')
 }
@@ -283,8 +286,8 @@ async function showNotification (title, body) {
     vibrate: [150, 200, 150, 200, 150, 100, 150, 100],
     tag: 'tag: sample'
   }
-  let notification = new Notification('direct:' + title, options)
-  logD('notification=', notification)
+  // let notification = new Notification('direct:' + title, options)
+  // logD('notification=', notifications)
 
   if (registration) {
     // todo

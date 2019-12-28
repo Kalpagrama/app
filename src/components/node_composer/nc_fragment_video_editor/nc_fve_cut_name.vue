@@ -38,10 +38,12 @@ export default {
   },
   methods: {
     async confirm () {
-      this.$log('confirm')
+      this.$log('confirm', this.cut)
       this.loading = true
       await this.$wait(300)
-      this.cut.name = this.name
+      if (this.cut) {
+        this.cut.name = this.name
+      }
       this.loading = false
       this.$emit('close')
     }

@@ -1,4 +1,7 @@
 <style lang="stylus">
+.q-footer {
+  background: none !important;
+}
 </style>
 <template lang="pug">
 q-layout(view="hHh lpR fFf").bg-secondary
@@ -7,8 +10,7 @@ q-layout(view="hHh lpR fFf").bg-secondary
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         k-menu-desktop(:page="true").full-width
   q-footer(reveal).row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      k-menu-mobile
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
 </template>
 
 <script>

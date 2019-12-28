@@ -53,7 +53,7 @@ export default {
         this.emailSending = true
         let { data: { inviteEmail } } = await this.$apollo.mutate({
           mutation: gql`
-            mutation inviteEmail ($email: String!){
+            mutation sw_network_only_inviteEmail ($email: String!){
               inviteEmail(email: $email)
             }
           `,
@@ -79,7 +79,7 @@ export default {
         this.linkGetting = true
         let { data: { inviteUrl } } = await this.$apollo.mutate({
         mutation: gql`
-          mutation inviteUrl {
+          mutation sw_network_only_inviteUrl {
             inviteUrl
           }
         `,

@@ -66,7 +66,8 @@ module.exports = function (ctx) {
     supportIE: false,
     build: {
       env: {
-        AUTH_URL: JSON.stringify(process.env.AUTH_URL)
+        SERVICES_URL: JSON.stringify(process.env.AUTH_URL) || JSON.stringify(process.env.SERVICES_URL),
+        SERVICES_URL_DEBUG: JSON.stringify(process.env.SERVICES_URL_DEBUG)
       },
       scopeHoisting: true,
       vueRouterMode: 'history',
@@ -112,10 +113,10 @@ module.exports = function (ctx) {
         //   credentials: true
         // }))
       },
-      setup(app) {
+      setup (app) {
         app.post('*', (req, res) => {
-          res.redirect(req.originalUrl);
-        });
+          res.redirect(req.originalUrl)
+        })
       },
       // headers: {
       //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
@@ -133,7 +134,7 @@ module.exports = function (ctx) {
       workboxPluginMode: 'InjectManifest',
       workboxOptions: {
         // swDest: 'firebase-messaging-sw.js', // не работает. Приходится делать messaging.useServiceWorker('firebase-messaging-sw.js')
-        swSrc: 'src/system/service_worker/service-worker.js',
+        swSrc: 'src/system/service_worker/service-worker.js'
         // importWorkboxFrom: 'local'
       },
       manifest: {
@@ -160,7 +161,7 @@ module.exports = function (ctx) {
           //   text: 'body',
           //   url: 'url'
           // }
-          action: '/share-target',
+          action: '/share_target',
           method: 'POST',
           enctype: 'multipart/form-data',
           params: {
