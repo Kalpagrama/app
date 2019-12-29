@@ -48,7 +48,9 @@ q-layout(view="hHh lpR fFf").bg-white
           minHeight: $q.screen.height-170+'px',
           maxWidth: $store.state.ui.pageMaxWidth+'px'}`
         ).row.full-width.items-start.content-start.bg-white
-        div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-sm
+        div(
+          v-if="false"
+          :style=`{height: '40px'}`).row.full-width.items-center.q-px-sm
           small(@click="refresh()").bg-red.text-white.cursor-pointer.q-mx-sm refresh
           .col
           small.bg-red-2 OID: {{ node.oid }}, version: {{nodeVersion}}

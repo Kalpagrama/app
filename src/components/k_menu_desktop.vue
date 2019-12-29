@@ -65,7 +65,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-secondary
         :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
         span(v-if="width === 230").text-bold.q-ml-md {{ $t('install_app') }}
     //- refresh
-    div().row.full-width.q-px-md
+    div(:style=`{marginBottom: '70px'}`).row.full-width.q-px-md
       q-btn(
         outline color="accent" no-caps @click="appRefresh()"
         :style=`{borderRadius: '10px'}` ).full-width {{$t('Refresh')}}

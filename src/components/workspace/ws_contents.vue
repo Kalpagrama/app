@@ -18,7 +18,7 @@ div(:style=`{position: 'relative'}`).column.fit
             position: 'absolute', zIndex: 100, top: '16px', left: '16px',
             borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.8)',
             maxWidth: '80%'}`
-          ).text-white.q-px-sm.q-py-xs {{ i.item.name | cut(60) }}
+          ).text-white.q-px-sm.q-py-xs {{ i.item.name | cut(20) }}
 </template>
 
 <script>
