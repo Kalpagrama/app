@@ -10,6 +10,7 @@ div(:style=`{position: 'relative'}`
   //- body
   k-dialog-bottom(ref="fragmentActionDialog" :options="fragmentActionDialogOptions" @action="fragmentAction")
   .col.full-width.scroll
+    //- list
     div(v-if="mode === 'list'").row.full-width.items-start.content-start.q-pt-md.q-px-sm
       div(
         v-for="(f, fi) in fragments" :key="fi" @click="fragmentClick(f, fi)"
@@ -26,15 +27,28 @@ div(:style=`{position: 'relative'}`
           .col.full-height
             .row.fit.items-center.q-px-md
               span(:style=`{userSelect: 'none', maxWidth: '100%', overflow: 'hidden'}`) {{ f.item.name || f.item.content.name }}
+    //- gallery
     div(v-if="mode === 'gallery'").row.full-width.items-start.content-start
       div(
-        v-for="(i,ii) in fragments" :key="ii"
+        v-for="(i, ii) in fragments" :key="ii"
         :style=`{position: 'relative'}`
         ).col-6.q-pa-sm
         div(v-if="fragmentPlaying !== ii" @click="fragmentClick(i ,ii)").row.fit
           img(
             :src="i.item.content.thumbUrl" draggable="false"
             :style=`{width: '100%', objectFit: 'contain', userSelect: 'none', borderRadius: '10px', overflow: 'hidden'}`)
+          span(
+            :style=`{
+              position: 'absolute', top: '16px', left: '16px',
+              maxWidth: '80%', overflow: 'hidden', pointerEvents: 'none',
+              borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
+            ).text-white.q-px-sm.q-py-xs {{ i.item.name.length === 0 ? i.node.name : i.item.name | cut(50) }}
+          span(
+            :style=`{
+              position: 'absolute', bottom: '16px', left: '16px',
+              maxWidth: '80%', overflow: 'hidden', pointerEvents: 'none',
+              borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`
+            ).text-white.q-px-sm.q-py-xs {{ i.item.content.name | cut(50) }}
         //- node-fragment(
         //-   v-if="ii === fragmentPlaying"
         //-   ctx="inEditor"

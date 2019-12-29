@@ -122,9 +122,10 @@ export default {
   watch: {
     node: {
       deep: true,
-      immediate: true,
+      immediate: false,
       handler (to, from) {
-        // this.$log('node CHANGED', to)
+        this.$log('node CHANGED', to)
+        localStorage.setItem('knode', JSON.stringify(to))
         this.nodeVersion += 1
       }
     }
@@ -194,6 +195,7 @@ export default {
         this.$log('nodePublish start')
         this.nodePublishing = true
         this.nodePublishCheck()
+        await this.nodeSave()
         let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
         this.$log('res', res)
         this.$log('nodePublish done')
@@ -212,6 +214,7 @@ export default {
       await this.$wait(600)
       let confirmed = confirm('Delete node?')
       if (confirmed) this.nodeStart()
+      localStorage.removeItem('knode')
       this.nodePurging = false
     },
     nodeStart () {
@@ -229,6 +232,7 @@ export default {
     },
     refresh () {
       this.$log('refresh')
+      localStorage.removeItem('knode')
       window.location.reload(true)
     }
   },
@@ -238,9 +242,13 @@ export default {
     this.$q.addressbarColor.set('white')
     document.body.style.background = 'white'
     this.nodeStart()
+    // lsItem
+    let lsItem = JSON.parse(localStorage.getItem('knode'))
+    this.$log('lsItem', lsItem)
     // wsItem
     let wsItem = JSON.parse(JSON.stringify(this.$store.state.workspace.wsItem))
     this.$log('wsItem', wsItem)
+    // checks
     if (wsItem) {
       switch (wsItem.type) {
         case 'content': {
@@ -265,8 +273,12 @@ export default {
           break
         }
       }
+      this.$store.commit('workspace/stateSet', ['wsItem', null])
+    } else {
+      if (lsItem) {
+        this.$set(this, 'node', lsItem)
+      }
     }
-    this.$store.commit('workspace/stateSet', ['wsItem', null])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
@@ -275,7 +287,11 @@ export default {
     this.$log('beforeRouteLeave')
     if (this.nodeSavePossible && this.nodeVersion > 1) {
       let confirmed = confirm('Save node to WS?!')
-      if (confirmed) await this.nodeSave()
+      if (confirmed) {
+        await this.nodeSave()
+      } else {
+        localStorage.removeItem('knode')
+      }
       next()
     } else {
       next()

@@ -82,8 +82,8 @@ export default {
           // autoplay: false,
           controls: false,
           features: [], // 'playpause'
-          // enableAutosize: true,
-          // stretching: 'fill',
+          enableAutosize: true,
+          stretching: 'fill',
           pauseOtherPlayers: false,
           // plugins: ['youtube'],
           // ignorePauseOtherPlayersOption: false,
