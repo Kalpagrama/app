@@ -7,11 +7,20 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     :style=`{width: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain', userSelect: 'none', pointerEvents: 'none'}`)
   div(
     v-if="previewLoaded && fragment"
-    :style=`{position: 'absolute', zIndex: 100, top: '-200px', minHeight: 'calc(100% + 400px)', minWidth: '100%'}`).row.fit
+    :style=`{
+      position: 'absolute', zIndex: 100,
+      top: fullscreen ? '-200px' : '0px',
+      minHeight: fullscreen ? 'calc(100% + 400px)' : '100%'}`).row.fit
+    q-btn(
+      flat round color="white" :icon="fullscreen ? 'fullscreen_exit' : 'fullscreen'" @click="fullscreen = !fullscreen"
+      :style=`{
+        position: 'absolute', zIndex: 200,
+        right: '16px', top: fullscreen ? '216px' : '16px',
+        background: 'rgba(0,0,0,0.3)'}`)
     fragment-video(
       v-if="fragment.content.type === 'VIDEO'"
       ref="fragmentVideo"
-      :index="index" :ctx="ctx" :fragment="fragment" :active="active" :visible="visible" :mini="mini"
+      :index="index" :ctx="ctx" :fragment="fragment" :active="active" :visible="visible" :mini="mini" :fullscreen="fullscreen"
       :width="previewWidth" :height="previewHeight"
       @player="$emit('player', $event)")
       //- fragment-image(v-if="fragment && fragment.content.type === 'IMAGE")
@@ -30,7 +39,8 @@ export default {
       stage: 0,
       previewLoaded: false,
       previewHeight: 0,
-      previewWidth: 0
+      previewWidth: 0,
+      fullscreen: true
     }
   },
   computed: {

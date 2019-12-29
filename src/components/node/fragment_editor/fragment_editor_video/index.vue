@@ -49,8 +49,9 @@ div(
         v-if="fragment.cuts.length > 0"
         :style=`{height: '66px', width: '66px'}`).row.items-center.content-center.justify-center
         q-btn(
-          push round color="green" @click="fragmentPlay()"
-          :icon="fragmentPlaying === index ? 'pause' : 'play_arrow'")
+          push round @click="fragmentPlay()"
+          :color="fragmentPlaying ? 'red' : 'green'"
+          :icon="fragmentPlaying ? 'pause' : 'play_arrow'")
     .col.full-height.q-px-md
       div(
         @click="fragmentNameSettingStart()"
@@ -120,25 +121,26 @@ export default {
   },
   watch: {
     now: {
-      handler (to, from) {
+      async handler (to, from) {
         // this.$log('now CHANGED', to)
-        if (this.fragmentPlaying) {
+        if (this.cutPlaying >= 0) {
           let cutStart = this.cut.points[0].x
           let cutEnd = this.cut.points[1].x
-          if (to < cutStart) {
-            this.$log('TOO SMALL')
-            // this.cutPlaying = 0
-            // this.player.setCurrentTime(cutStart)
-          }
-          if (to > cutEnd) {
-            this.$log('TOO MUCH')
-            this.player.pause()
+          if (to < cutStart || to > cutEnd) {
+            this.$log('MUCH MUCH MUCH')
             this.player.setCurrentTime(cutStart)
-            this.player.play()
+            await this.$wait(200)
+            if (this.fragmentPlaying) {
+              if (this.cuts[this.cutPlaying + 1]) {
+                this.cutIndex += 1
+                this.cutPlaying += 1
+              } else {
+                this.cutIndex = 0
+                this.cutPlaying = 0
+              }
+            }
           }
-        } else {
         }
-        // TODO: fragmentPlay, cutPlay logic
       }
     },
     editing: {
@@ -261,11 +263,8 @@ export default {
     this.$log('mounted')
     if (this.cuts.length > 0) {
       this.cutIndex = 0
-      // this.fragmentPlay()
-    } else {
-      // this.player.play()
+      this.fragmentPlay()
     }
-    this.player.play()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -16,6 +16,14 @@ div(:style=`{position: 'relative'}`).row.fit
     round flat color="white" @click="mutedToggle()"
     :style=`{position: 'absolute', zIndex: 103, left: '16px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.15)'}`).shadow-1
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
+  //- content
+  small(
+    @click="contentClick()"
+    :style=`{
+      position: 'absolute', zIndex: 103, top: fullscreen ? '208px' : '8px', left: '8px',
+      background: 'rgba(0,0,0,0.5)', maxWidth: '70%', borderRadius: '10px', overflow: 'hidden'
+    }`
+    ).text-white.q-pa-sm.cursor-pointer {{ fragment.content.name }}
   video(
     ref="fragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="true" preload="auto"
     :muted="muted" allowfullscreen="false"
@@ -27,7 +35,7 @@ div(:style=`{position: 'relative'}`).row.fit
   video-progress(
     v-if="player"
     :mini="mini" :now="now" :player="player"
-    :style=`{position: 'absolute', bottom: '200px', zIndex: 105}`)
+    :style=`{position: 'absolute', bottom: fullscreen ? '200px' : '0px', zIndex: 105}`)
 </template>
 
 <script>
@@ -36,7 +44,7 @@ import videoProgress from './video_progress'
 export default {
   name: 'nodeFragmentVideo',
   components: {videoProgress},
-  props: ['ctx', 'fragment', 'mini'],
+  props: ['ctx', 'fragment', 'mini', 'fullscreen'],
   data () {
     return {
       now: 0,
@@ -75,6 +83,9 @@ export default {
     mutedToggle () {
       this.$log('mutedToggle')
       this.muted = !this.muted
+    },
+    contentClick () {
+      this.$router.push('/content/' + this.fragment.content.oid)
     },
     playerInit () {
       this.$log('playerInit')
