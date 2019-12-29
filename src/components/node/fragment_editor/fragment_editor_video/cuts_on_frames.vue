@@ -54,7 +54,7 @@ div(:style=`{position: 'relative', minHeight: '100px'}`).row.full-width.items-ce
           div(
             v-if="true"
             :style=`{position: 'absolute', zIndex: 99, height: '50px', top: '0px',
-              left: (player.currentTime/duration)*100+'%', borderRadius: '2px',
+              left: (now/duration)*100+'%', borderRadius: '2px',
               width: '4px', pointerEvents: 'none'}`).row.bg-green
           //- cut start
           div(
@@ -84,7 +84,7 @@ div(:style=`{position: 'relative', minHeight: '100px'}`).row.full-width.items-ce
 <script>
 export default {
   name: 'nFEV__cutsOnFrames',
-  props: ['width', 'cut', 'cuts', 'fragment', 'player', 'editing'],
+  props: ['width', 'cut', 'cuts', 'fragment', 'player', 'now', 'editing'],
   data () {
     return {
       panning: false,

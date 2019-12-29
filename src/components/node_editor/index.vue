@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf").bg-white
   //- header
-  q-header(reveal).row.full-width.justify-center.bg-white
+  q-header(reveal v-if="nodeSavePossible").row.full-width.justify-center.bg-white
     div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px', borderBottom: '1px solid #eee'}`
       ).row.full-width.items-center.justify-between.q-px-sm.bg-white
       transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -21,21 +21,6 @@ q-layout(view="hHh lpR fFf").bg-white
           span.text-bold Publish
   //- footer
   q-footer(reveal).row.full-width.justify-center.bg-white
-    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      .row.full-width.justify-center
-        div(
-          v-if="nodeSavePossible"
-          :style=`{
-            position: 'relative', borderTop: '1px solid #eee',
-            minHeight: '50px', height: nodeSpheresHeight+'px',
-            maxWidth: $store.state.ui.pageMaxWidth+'px'}`
-          ).row.full-width.items-start.content-start.q-px-md.bg-white
-          div(:style=`{height: '50px'}`).row.full-width.items-center.content-center
-            span.text-black Spheres + Category
-            .col
-            q-btn(
-              round flat dense color="grey" @click="spheresToggle()"
-              :icon="nodeSpheresHeight === 50 ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
     .row.full-width.justify-center
       k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', background: 'white'}`)
   //- body
@@ -66,6 +51,10 @@ q-layout(view="hHh lpR fFf").bg-white
         div(v-if="node.fragments[0]").row.full-width.bg-white.q-pa-sm
           fragment-editor(v-if="node.fragments[1]" ref="fragmentEditorSecond" :index="1" :fragment="node.fragments[1]" @delete="fragmentDelete")
           fragment-finder(v-else @fragment="$event => fragmentFound(1, $event)")
+        transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+          node-editor-spheres(
+            v-if="node && nodeSavePossible" :node="node"
+            :style=`{marginBottom: '70px'}`)
     //- no node
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
@@ -77,10 +66,11 @@ q-layout(view="hHh lpR fFf").bg-white
 <script>
 import fragmentFinder from 'components/node/fragment_finder'
 import fragmentEditor from 'components/node/fragment_editor'
+import nodeEditorSpheres from './spheres'
 
 export default {
   name: 'nodeEditor',
-  components: {fragmentFinder, fragmentEditor},
+  components: {fragmentFinder, fragmentEditor, nodeEditorSpheres},
   data () {
     return {
       menuShow: false,
@@ -126,17 +116,13 @@ export default {
       deep: true,
       immediate: false,
       handler (to, from) {
-        this.$log('node CHANGED', to)
+        // this.$log('node CHANGED', to)
         localStorage.setItem('knode', JSON.stringify(to))
         this.nodeVersion += 1
       }
     }
   },
   methods: {
-    spheresToggle () {
-      this.$log('spheresToggle')
-      this.$tween.to(this, 0.35, {nodeSpheresHeight: this.nodeSpheresHeight === 50 ? 400 : 50})
-    },
     nameChanged (e) {
       // this.$log('nameChanged', e)
       e.target.style.height = e.target.scrollHeight + 'px'

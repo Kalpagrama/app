@@ -33,6 +33,15 @@ export default {
       previewWidth: 0
     }
   },
+  computed: {
+    now () {
+      if (this.$refs.fragmentVideo) {
+        return this.$refs.fragmentVideo.now || 0
+      } else {
+        return 0
+      }
+    }
+  },
   watch: {
     fragment: {
       immediate: true,
