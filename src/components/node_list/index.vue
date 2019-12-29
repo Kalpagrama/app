@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.justify-start
+div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`).row.full-width.items-start.content-start.justify-start
   node(
     v-for="(n, ni) in nodes" :key="n.oid" :accessKey="ni"
     v-if="nodesBan ? !nodesBan.includes(n.oid) : true"
@@ -9,7 +9,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
     :needFullPreload="!(ni >= nodeMiddle-0 && ni <= nodeMiddle+0) && ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
     :visible="nodeMiddle === ni"
     @hide="nodesBan.push(n.oid)"
-    @nodeClick="$event => $emit('nodeClick', $event)"
+    @nodeClick="$event => { $emit('nodeClick', $event)}"
     :style=`{}`
     v-observe-visibility=`{
       callback: nodeMiddleHandler,
