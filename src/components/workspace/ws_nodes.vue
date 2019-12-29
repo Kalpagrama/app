@@ -3,13 +3,14 @@
   //- div(:style=`{height: '60px'}`).row.full-width
   k-dialog-bottom(ref="nodeActionDialog" :options="nodeDialogOptions" @action="nodeAction")
   .col.full-width.scroll
-    div(
-      v-for="(i, ii) in nodes" :key="i.item.oid" @click="nodeClick(i, ii)"
-      :style=`{
-        height: '60px', borderRadius: '10px', overflow: 'hidden',
-        border: ii === nodeIndex ? '3px solid #4caf50' : '3px solid #eee'}`
-      ).row.full-width.items-center.justify-center.bg-white.q-mb-md.cursor-pointer
-      span {{ i.item.name }}
+    .row.full-width.items-start.content-start.q-px-sm
+      div(
+        v-for="(i, ii) in nodes" :key="i.item.oid" @click="nodeClick(i, ii)"
+        :style=`{
+          height: '60px', borderRadius: '10px', overflow: 'hidden',
+          border: ii === nodeIndex ? '3px solid #4caf50' : '3px solid #eee'}`
+        ).row.full-width.items-center.justify-center.bg-white.q-mb-md.cursor-pointer
+        span {{ i.item.name }}
 </template>
 
 <script>

@@ -6,7 +6,7 @@ q-layout(view="hHh lpR fFf").bg-white
       ).row.full-width.items-center.justify-between.q-px-sm.bg-white
       transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         q-btn(
-          v-if="nodeSavePossible"
+          v-if="true"
           flat round no-caps color="red" icon="refresh" :loading="nodePurging" @click="nodePurge()")
       .col
       transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
