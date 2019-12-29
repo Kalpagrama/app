@@ -5,10 +5,10 @@ div(
   div(
     v-show="!mini"
     :style=`{position: 'relative', height: '28px'}` @click="progressClick").row.full-width.cursor-pointer
-    div(:style=`{position: 'absolute', top: '10px', height: '4px', pointerEvents: 'none', background: 'rgba(255,255,255,0.8)',
+    div(:style=`{position: 'absolute', top: '10px', height: '7px', pointerEvents: 'none', background: 'rgba(255,255,255,0.8)',
       borderRadius: '4px', overflow: 'hidden'}`).row.full-width
     //- progress bar
-    div(:style=`{position: 'absolute', top: '10px', height: '4px', width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
+    div(:style=`{position: 'absolute', top: '10px', height: '7px', width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRadius: '4px', overflow: 'hidden'}`
       ).row.bg-green.q-px-xs
   //- progress now/duration
   small(

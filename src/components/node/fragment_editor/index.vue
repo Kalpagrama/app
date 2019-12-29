@@ -62,7 +62,7 @@ export default {
         this.$log('fragmentEditing CHANGED', to)
         if (to) {
           this.$emit('bg', 'black')
-          this.$tween.to(this, 0.5, {fragmentEditorVideoHeight: this.fragmentHeight})
+          this.$tween.to(this, 0.5, {fragmentEditorVideoHeight: 500})
         } else {
           this.$emit('bg', 'white')
           this.$tween.to(this, 0.5, {fragmentEditorVideoHeight: 10})

@@ -40,15 +40,18 @@ div(
         span.text-bold.text-white Total duration: {{ $time(fragmentDuration) }}
       fev-cut(
         v-for="(c, ci) in cuts" :key="c.color"
-        :index="ci" :cut="c" :cutIndex="cutIndex" :cutPlaying="cutPlaying" :player="player"
+        :index="ci" :cut="c" :cutIndex="cutIndex" :cutPlaying="cutPlaying" :player="player" :now="now"
         @cutIndex="cutIndex = $event" @play="cutPlay"
         @action="$refs.cutDialog.show()").q-mb-sm
   div(:style=`{height: '66px'}`).row.full-width.bg-black
-    div(:style=`{height: '66px', width: '66px'}`).row.items-center.content-center.justify-center
-      q-btn(
-        push round color="green" @click="fragmentPlay()"
-        :icon="fragmentPlaying === index ? 'pause' : 'play_arrow'")
-    .col.full-height
+    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="fragment.cuts.length > 0"
+        :style=`{height: '66px', width: '66px'}`).row.items-center.content-center.justify-center
+        q-btn(
+          push round color="green" @click="fragmentPlay()"
+          :icon="fragmentPlaying === index ? 'pause' : 'play_arrow'")
+    .col.full-height.q-px-md
       div(
         @click="fragmentNameSettingStart()"
         :style=`{position: 'relative'}` v-ripple=`{color: 'white'}`
@@ -119,6 +122,22 @@ export default {
     now: {
       handler (to, from) {
         // this.$log('now CHANGED', to)
+        if (this.fragmentPlaying) {
+          let cutStart = this.cut.points[0].x
+          let cutEnd = this.cut.points[1].x
+          if (to < cutStart) {
+            this.$log('TOO SMALL')
+            // this.cutPlaying = 0
+            // this.player.setCurrentTime(cutStart)
+          }
+          if (to > cutEnd) {
+            this.$log('TOO MUCH')
+            this.player.pause()
+            this.player.setCurrentTime(cutStart)
+            this.player.play()
+          }
+        } else {
+        }
         // TODO: fragmentPlay, cutPlay logic
       }
     },
@@ -137,19 +156,19 @@ export default {
   methods: {
     fragmentPlay () {
       this.$log('fragmentPlay')
-      // if (this.fragment.cuts.length === 0) return
-      // if (this.fragmentPlaying) {
-      //   this.fragmentPlaying = false
-      //   this.cutIndex = -1
-      //   this.cutPlaying = -1
-      //   this.player.pause()
-      // } else {
-      //   this.fragmentPlaying = true
-      //   this.cutIndex = 0
-      //   this.cutPlaying = 0
-      //   this.player.play()
-      //   this.player.setCurrentTime(this.cut.points[0].x)
-      // }
+      if (this.fragment.cuts.length === 0) return
+      if (this.fragmentPlaying) {
+        this.fragmentPlaying = false
+        this.cutIndex = -1
+        this.cutPlaying = -1
+        this.player.pause()
+      } else {
+        this.fragmentPlaying = true
+        this.cutIndex = 0
+        this.cutPlaying = 0
+        this.player.play()
+        this.player.setCurrentTime(this.cut.points[0].x)
+      }
     },
     fragmentNameSettingStart () {
       this.$log('fragmentNameSettingStart')
