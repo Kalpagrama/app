@@ -24,33 +24,38 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  q-header(v-if="scroll").row.full-width.justify-center
-    div(:style=`{height: '60px'}`).row.full-width
-      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+  q-header(reveal).row.full-width.justify-center
+    div(:style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      //- div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+      //-   q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
       .col
-        .row.full-width.justify-start.items-center.fit
-          span.text-bold.text-h6.text-white {{ user.name }}
+        .row.full-width.justify-start.items-center.fit.q-px-sm
+          span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
       .row
         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
           q-btn(v-else round flat @click="save()" color="white" icon="done")
-  q-page-container(style=`height: 100vh`)
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      div(v-if="user").row.full-width.content-start.bg-primary
+      .row.full-width.q-pa-sm.bg-primary
+        span(
+          v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
+          :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'white'}`
+          :class="{'bg-green': p === pageId}"
+          ).text-bold.q-pa-sm.q-mr-md.cursor-pointer.hr {{ p }}
+  q-page-container.row.full-width.justify-center
+    div(v-if="user").row.full-width.items-start.content-start.justify-center.bg-primary
         //- header
-        div(:style=`{height: '60px'}`).row.full-width
-          div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-            q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-          .col
-          .row
-            div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-              q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-              q-btn(v-else round flat @click="save()" color="white" icon="done")
+        //- div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+        //-   div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+        //-     q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+        //-   .col
+        //-   .row
+        //-     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+        //-       q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+        //-       q-btn(v-else round flat @click="save()" color="white" icon="done")
             //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
               q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
         //- body
-        div(v-if="true").row.full-width.q-px-sm.bg-primary
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm.q-py-lg.bg-primary
           //- <input type="file" @change="previewFiles" multiple>
           .row.full-width
             img(:src="user.profile.thumbUrl" @click="changePhoto()"
@@ -63,37 +68,36 @@ q-layout(view="hHh lpR fFf").bg-grey-3
                 :color="include ? 'red' : 'accent'"
                 style=`height: 40px`
                 ).q-px-md
-          .row.full-width.items-center.justify-start
-            .row.full-width
-              span.text-bold.text-h6.text-white {{ user.name }}
-            div(v-if="!editions").row.full-width
-              .row.full-width
-                span.text-grey-4 {{status}}
-              .row.full-width.q-mb-sm
-                span.text-grey {{about}}
-            div(v-if="editions").row.full-width
-              input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
-              input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
-              //- .row.full-width.q-mt-xs
-              //-   small About
-            div(v-if="false" @click="showInfo()").row.full-width
-              span.text-accent Show detailed information
-              //- span {{ user.subscriptions }}
+          //- .row.full-width.items-center.justify-start
+          //-   .row.full-width
+          //-     span.text-bold.text-h6.text-white {{ user.name }}
+          //-   div(v-if="!editions").row.full-width
+          //-     .row.full-width
+          //-       span.text-grey-4 {{status}}
+          //-     .row.full-width.q-mb-sm
+          //-       span.text-grey {{about}}
+          //-   div(v-if="editions").row.full-width
+          //-     input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
+          //-     input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
+          //-     //- .row.full-width.q-mt-xs
+          //-     //-   small About
+          //-   div(v-if="false" @click="showInfo()").row.full-width
+          //-     span.text-accent Show detailed information
+          //-     //- span {{ user.subscriptions }}
     .row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        div(
-          v-if="user"
-          :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width.bg-grey-3
-          k-colls(v-if="coll" @coll="coll = $event" :coll="coll" :colls="colls" :header="false" :tabs="true" style=`heigth: 100vh`).bg-grey-3
-            template(v-slot:created).scroll
-              user-created-nodes(:filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
-            template(v-slot:rated)
-              // h1 vetur
-              user-created-nodes(:filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
-            template(v-slot:following)
-              user-following(:subscriptions="user.subscriptions" :oid="user.oid")
-            template(v-slot:followers)
-              user-followers(:subscribers="user.subscribers" :oid="user.oid")
+      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-md
+        user-created-nodes(
+          v-if="pageId === 'Created nodes'"
+          :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
+        user-created-nodes(
+          v-if="pageId === 'Voted nodes'"
+          :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
+        user-following(
+          v-if="pageId === 'Following'"
+          :subscriptions="user.subscriptions" :oid="user.oid")
+        user-followers(
+          v-if="pageId === 'Followers'"
+          :subscribers="user.subscribers" :oid="user.oid")
   q-footer.row.full-width.justify-center
     k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
 </template>
@@ -118,7 +122,9 @@ export default {
       file: null,
       editions: false,
       status: null,
-      about: null
+      about: null,
+      pageId: 'Created nodes',
+      pages: ['Created nodes', 'Voted notes', 'Following', 'Followers']
     }
   },
   computed: {
@@ -197,6 +203,7 @@ export default {
           this.page = 'nodes'
           this.status = this.user.profile.status
           this.about = this.user.profile.about
+          this.pageId = 'Created nodes'
         } else {
           this.$logD('NO USER OID!')
           this.$router.push({params: {oid: this.$store.state.objects.currentUser.oid}})
