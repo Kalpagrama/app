@@ -362,7 +362,7 @@ export default {
         this.nodeFullError = err
       }
       if (node) {
-        this.$log(` nodeLoad OK ! indx=${this.index}  oid=${oid}`)
+        this.$log(`np-test: nodeLoad OK ! indx=${this.index}  oid=${oid}`)
         this.nodeFull = node
         this.$nextTick(async () => {
           if (this.visible) await this.play()

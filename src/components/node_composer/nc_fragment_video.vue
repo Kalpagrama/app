@@ -116,7 +116,7 @@ export default {
       this.$emit('muted', !this.muted)
     },
     async play () {
-      this.$log(' video.play')
+      this.$log('np-test: video.play')
       // this.playerState = 'play'
       if (this.player) this.player.play()
     },

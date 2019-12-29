@@ -11,7 +11,7 @@
 .row.full-width.items-start.content-start
   //- transition(appear enter-active-class="animated fadeIn")
   q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
+    k-dialog-tutorial(@hide="closeTutorial()")
   k-dialog-bottom(
     :value="$store.state.node.nodeOptionsDialogOpened"
     :options="$store.state.node.nodeOptions"
@@ -55,6 +55,10 @@ export default {
       let vh = window.innerHeight * 0.01
       document.documentElement.style.setProperty('--vh', `${vh}px`)
       this.height = vh
+    },
+    async closeTutorial(){
+      await this.$refs.kTutorialDialog.hide()
+      this.loading = false
     }
   },
   mounted () {
@@ -76,9 +80,8 @@ export default {
       await this.$router.push('/login')
       return
     }
-    this.loading = false
     if (this.$store.state.objects.currentUser.profile.tutorial) this.$refs.kTutorialDialog.show()
-    // this.$refs.kTutorialDialog.show()
+    else this.loading = false
   }
  }
 </script>

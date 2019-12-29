@@ -159,7 +159,7 @@ export default {
   },
   methods: {
     play () {
-      this.$log('nc_fragment::play')
+      this.$log('np-test: nc_fragment::play')
       if (this.fragment && this.fragment.content) {
         switch (this.fragment.content.type) {
           case 'VIDEO': {

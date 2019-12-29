@@ -18,7 +18,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
       //   leading: 'both',
       // },
       intersection: {
-        rootMargin: -($q.screen.height/2-60)+'px 0px'
+        rootMargin: -($q.screen.height/2-10)+'px 0px'
       }
     }`
     ).bg-white.q-mb-lg
@@ -43,7 +43,7 @@ export default {
     nodeMiddleHandler (isVisible, entry) {
       if (isVisible) {
         this.nodeMiddle = parseInt(entry.target.accessKey)
-        this.$log(` nodeMiddle=${this.nodeMiddle}, name=${this.nodes[this.nodeMiddle].name}`)
+        this.$log(`np-test: nodeMiddle=${this.nodeMiddle}, throttle=${this.throttle} name=${this.nodes[this.nodeMiddle].name}`)
       }
     }
   },
