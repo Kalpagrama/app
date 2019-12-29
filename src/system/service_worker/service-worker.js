@@ -1,5 +1,5 @@
 const swVer = 4
-const useCache = false
+const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
   cacheGraphQl,
   cacheVideo
