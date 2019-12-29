@@ -1,4 +1,8 @@
 <style lang="stylus">
+iframe {
+  width: 100%;
+  height: 500px;
+}
 </style>
 
 <template lang="pug">
@@ -10,15 +14,19 @@
   //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
 .row.full-width.items-start.content-start
   //- transition(appear enter-active-class="animated fadeIn")
-  q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    k-dialog-tutorial(@hide="closeTutorial()")
-  k-dialog-bottom(
-    :value="$store.state.node.nodeOptionsDialogOpened"
-    :options="$store.state.node.nodeOptions"
-    @action="$event => $store.dispatch('node/nodeAction', $event)"
-    @hide="$store.commit('node/stateSet', ['nodeOptionsDialogOpened', false])")
-    //- k-node-dialog
+  //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+  //-   k-dialog-tutorial(@hide="closeTutorial()")
+  //- k-dialog-bottom(
+  //-   :value="$store.state.node.nodeOptionsDialogOpened"
+  //-   :options="$store.state.node.nodeOptions"
+  //-   @action="$event => $store.dispatch('node/nodeAction', $event)"
+  //-   @hide="$store.commit('node/stateSet', ['nodeOptionsDialogOpened', false])")
+  //- iframe(v-if="showIframe" frameborder="0" src="https://www.youtube.com/embed/QywBr6-K2zM" height="500").bg
   router-view(v-if="!loading")
+  //- .row.full-width.items-start.content-start
+  //-   div(:style=`{height: '500px'}`).row.full-width
+  //-   iframe(v-if="true" frameborder="0" src="https://www.youtube.com/embed/QywBr6-K2zM" height="500").bg
+  //-   div(:style="{height: '2000px', background: 'red'}").row.full-width
 </template>
 
 <script>
@@ -34,7 +42,8 @@ export default {
       width: 0,
       height: 0,
       me: null,
-      player: null
+      player: null,
+      showIframe: false
     }
   },
   computed: {
@@ -61,8 +70,10 @@ export default {
       this.loading = false
     }
   },
-  mounted () {
-    this.$log('mounted.')
+  async mounted () {
+    this.$log('mounted')
+    await this.$wait(3000)
+    this.showIframe = true
   },
   async created () {
     this.$logD('created')

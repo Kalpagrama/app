@@ -1,9 +1,9 @@
 <template lang="pug">
-div(:style=`{minHeight: '74px', borderBottom: '1px solid #eee'}`).row.full-width.items-center.content-center.bg-white
-  div(v-if="!videoShow").row.full-width.q-px-sm
+div(:style=`{minHeight: '74px'}`).row.full-width.items-center.content-center.bg-white
+  div(v-if="!videoShow").row.full-width
     //- find in ws
-    q-dialog(ref="findWsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-      div(@click.self="$refs.findWsDialog.hide()").row.fit.items-end.content-end.justify-center
+    q-dialog(v-model="wsDialogShow" ref="wsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+      div(@click.self="wsDialogShow = false").row.fit.items-end.content-end.justify-center
         div(
           :style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0',
             overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
@@ -19,7 +19,7 @@ div(:style=`{minHeight: '74px', borderBottom: '1px solid #eee'}`).row.full-width
         template(v-slot:prepend)
           q-btn(v-if="url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()")
         template(v-slot:append)
-          q-btn(v-if="url.length === 0" round flat color="green" icon="add" @click="$refs.findWsDialog.show()")
+          q-btn(v-if="url.length === 0" round flat color="green" icon="add" @click="wsDialogShow = true")
           q-btn(v-if="!urlInputLoading && url.length > 0" round flat color="green" icon="clear" @click="url = ''")
   video(
     v-if="videoShow"
@@ -42,7 +42,8 @@ export default {
       urlInputLoading: false,
       videoUrl: '',
       videoShow: false,
-      videoLoaded: false
+      videoLoaded: false,
+      wsDialogShow: false
     }
   },
   watch: {
@@ -59,8 +60,10 @@ export default {
     }
   },
   methods: {
-    itemFound (item) {
+    async itemFound (item) {
       this.$log('itemFound', item.type)
+      if (this.$refs.wsDialog) this.$refs.wsDialog.hide()
+      await this.$wait(600)
       switch (item.type) {
         case 'fragment': {
           this.$emit('fragment', item.item)

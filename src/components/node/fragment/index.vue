@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
   img(
     ref="previewRef"
     :src="ctx === 'inEditor' ? fragment.content.thumbUrl : fragment.thumbUrl"
@@ -14,9 +14,8 @@ div(:style=`{position: 'relative'}`).row.full-width
       :index="index" :ctx="ctx" :fragment="fragment" :active="active" :visible="visible" :mini="mini"
       :width="previewWidth" :height="previewHeight"
       @player="$emit('player', $event)")
-    //- fragment-image(v-if="fragment && fragment.content.type === 'IMAGE")
-    //- fragment-book(v-if="fragment && fragment.content.type === 'BOOK")
-//- editors slot
+      //- fragment-image(v-if="fragment && fragment.content.type === 'IMAGE")
+      //- fragment-book(v-if="fragment && fragment.content.type === 'BOOK")
 </template>
 
 <script>
@@ -39,10 +38,6 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('fragment CHANGED', to)
-        if (to) {
-        } else {
-        }
-        if (this.stageFirst) this.stage = this.stageFist
       }
     }
   },

@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
+q-layout(view="hHh lpR fFf").bg-grey-3
   q-header(
     v-if="true"
     reveal
@@ -113,6 +113,8 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.$q.addressbarColor.set('#eee')
+    document.body.style.background = '#eee'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
