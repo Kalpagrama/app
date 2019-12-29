@@ -8,7 +8,7 @@ iframe {
 }
 </style>
 <template lang="pug">
-div(:style=`{}`).row.fit
+div(:style=`{position: 'relative'}`).row.fit
   q-btn(
     v-if="!mini"
     round flat color="white" @click="mutedToggle()"
@@ -16,8 +16,7 @@ div(:style=`{}`).row.fit
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   video(
     ref="fragmentVideo" :playsinline="true" crossorigin="Anonymous" :autoplay="false" :loop="true" preload="auto"
-    @play="playing = true" @pause="playing = false" :muted="muted"
-    @ended="ended" @timeupdate="timeupdate" @seeked="seeked"
+    :muted="muted" allowfullscreen="false"
     width="100%" height="100%"
     :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
     source(
@@ -68,6 +67,9 @@ export default {
     seeked () {
       this.$log('seeked')
     },
+    touchstart (e) {
+      this.$log('touchstart', e)
+    },
     mutedToggle () {
       this.$log('mutedToggle')
       this.muted = !this.muted
@@ -77,18 +79,19 @@ export default {
       if (this.ctx === 'inEditor') {
         let me = new window.MediaElementPlayer(this.$refs.fragmentVideo, {
           loop: true,
-          autoplay: false,
+          // autoplay: false,
           controls: false,
-          features: ['playpause'],
-          enableAutosize: true,
-          stretching: 'fill',
+          features: [], // 'playpause'
+          // enableAutosize: true,
+          // stretching: 'fill',
           pauseOtherPlayers: false,
-          ignorePauseOtherPlayersOption: false,
+          // plugins: ['youtube'],
+          // ignorePauseOtherPlayersOption: false,
           clickToPlayPause: true,
           success: async (mediaElement, originalNode, instance) => {
             this.player = mediaElement
-            this.player.addEventListener('timeupdate', this.timeupdate)
-            this.player.addEventListener('seeked', this.seeked)
+            this.player.addEventListener('timeupdate', this.timeupdate, {passive: true})
+            this.player.addEventListener('seeked', this.seeked, {passive: true})
             this.muted = false
             this.player.play()
             this.$emit('player', this.player)

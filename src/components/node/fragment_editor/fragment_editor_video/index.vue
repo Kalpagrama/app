@@ -6,7 +6,7 @@ div(
   //- cut&cuts on video progress bar
   div(
     v-if="cut"
-    :style=`{position: 'absolute', zIndex: 400, top: '0px', height: '8px', pointerEvents: 'none'}`).row.full-width.q-px-md.bg-black
+    :style=`{position: 'absolute', zIndex: 400, top: '0px', height: '8px', pointerEvents: 'none'}`).row.full-width.q-px-md
     div(:style=`{position: 'relative'}`).row.fit
       //- cuts in progress bar
       div(
@@ -23,9 +23,8 @@ div(
         left: (cut.points[0].x/fragment.content.duration)*100+'%',
         width: ((cut.points[1].x-cut.points[0].x)/fragment.content.duration)*100+'%',
         borderRadius: '4px', background: cut.color}`)
-  //- cuts pan
+  //- cuts on frames pan
   cuts-on-frames(
-    v-show="editing"
     :editing="editing" :width="width" :fragment="fragment" :cut="cut" :cuts="cuts" :player="player"
     @panningStarted="fragmentPlaying = false" @cutCreate="cutCreate")
   //- cuts-pan
