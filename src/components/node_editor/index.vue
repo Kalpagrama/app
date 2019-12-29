@@ -22,20 +22,22 @@ q-layout(view="hHh lpR fFf").bg-white
   //- footer
   q-footer(reveal).row.full-width.justify-center.bg-white
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="nodeSavePossible"
-        :style=`{
-          position: 'relative', borderTop: '1px solid #eee',
-          minHeight: '50px', height: nodeSpheresHeight+'px',
-          maxWidth: $store.state.ui.pageMaxWidth+'px'}`
-        ).row.full-width.items-start.content-start.q-px-md.bg-white
-        div(:style=`{height: '50px'}`).row.full-width.items-center.content-center
-          span.text-black Spheres + Category
-          .col
-          q-btn(
-            round flat dense color="grey" @click="spheresToggle()"
-            :icon="nodeSpheresHeight === 50 ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
-    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', background: 'white'}`)
+      .row.full-width.justify-center
+        div(
+          v-if="nodeSavePossible"
+          :style=`{
+            position: 'relative', borderTop: '1px solid #eee',
+            minHeight: '50px', height: nodeSpheresHeight+'px',
+            maxWidth: $store.state.ui.pageMaxWidth+'px'}`
+          ).row.full-width.items-start.content-start.q-px-md.bg-white
+          div(:style=`{height: '50px'}`).row.full-width.items-center.content-center
+            span.text-black Spheres + Category
+            .col
+            q-btn(
+              round flat dense color="grey" @click="spheresToggle()"
+              :icon="nodeSpheresHeight === 50 ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
+    .row.full-width.justify-center
+      k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', background: 'white'}`)
   //- body
   q-page-container.row.full-width.justify-center.items-start.content-start
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -122,7 +124,7 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
+        // this.$log('node CHANGED', to)
         this.nodeVersion += 1
       }
     }

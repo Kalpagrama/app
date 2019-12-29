@@ -12,7 +12,7 @@ div(:style=`{position: 'relative'}`
   .col.full-width.scroll
     div(v-if="mode === 'list'").row.full-width.items-start.content-start.q-pt-md.q-px-sm
       div(
-        v-for="(f, fi) in fragments" :key="fi" @click="fragmentIndex = fi, $refs.fragmentActionDialog.show()"
+        v-for="(f, fi) in fragments" :key="fi" @click="fragmentClick(f, fi)"
         :style=`{
           height: '100px', borderRadius: '10px', overflow: 'hidden',
           border: fragmentIndex === fi ? '3px solid #4caf50' : '3px solid #eee'}`
@@ -31,7 +31,7 @@ div(:style=`{position: 'relative'}`
         v-for="(i,ii) in fragments" :key="ii"
         :style=`{position: 'relative'}`
         ).col-6.q-pa-sm
-        div(v-if="fragmentPlaying !== ii" @click="fragmentIndex = ii, $refs.fragmentActionDialog.show()").row.fit
+        div(v-if="fragmentPlaying !== ii" @click="fragmentClick(i ,ii)").row.fit
           img(
             :src="i.item.content.thumbUrl" draggable="false"
             :style=`{width: '100%', objectFit: 'contain', userSelect: 'none', borderRadius: '10px', overflow: 'hidden'}`)
@@ -46,6 +46,7 @@ import nodeFragment from 'components/node/fragment'
 
 export default {
   name: 'wsFragments',
+  props: ['ctx'],
   components: {nodeFragment},
   data () {
     return {
@@ -87,7 +88,7 @@ export default {
       await this.$wait(600)
       switch (action) {
         case 'confirm': {
-          this.fragmentClick(this.fragments[this.fragmentIndex], this.fragmentIndex)
+          this.fragmentUse(this.fragments[this.fragmentIndex], this.fragmentIndex)
           break
         }
         case 'delete': {
@@ -99,6 +100,16 @@ export default {
     },
     async fragmentClick (i, ii) {
       this.$log('fragmentClick', i, ii)
+      this.fragmentIndex = ii
+      if (this.ctx === 'inEditor') {
+        this.$emit('item', i)
+      } else {
+        this.fragmentIndex = ii
+        this.$refs.fragmentActionDialog.show()
+      }
+    },
+    async fragmentUse (i, ii) {
+      this.$log('fragmentUse', i, ii)
       this.$store.commit('workspace/stateSet', ['wsItem', {type: 'fragment', item: i.item}])
       await this.$wait(300)
       this.$router.push('/create')

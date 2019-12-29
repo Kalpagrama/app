@@ -1,6 +1,7 @@
 <template lang="pug">
 .column.fit
   //- div(:style=`{height: '60px'}`).row.full-width
+  k-dialog-bottom(ref="nodeActionDialog" :options="nodeDialogOptions" @action="nodeAction")
   .col.full-width.scroll
     div(
       v-for="(i, ii) in nodes" :key="i.item.oid" @click="nodeClick(i, ii)"
@@ -16,7 +17,15 @@ export default {
   name: 'wsNodes',
   data () {
     return {
-      nodeIndex: -1
+      nodeIndex: -1,
+      nodeDialogOptions: {
+        header: false,
+        confirm: true,
+        confirmName: 'Edit',
+        actions: {
+          delete: {name: 'Delete', color: 'red'}
+        }
+      }
     }
   },
   computed: {
@@ -40,11 +49,11 @@ export default {
       await this.$wait(600)
       switch (action) {
         case 'confirm': {
-          this.nodeClick(this.nodes[this.nodeIndex], this.nodeIndex)
+          this.nodeUse(this.nodes[this.nodeIndex], this.nodeIndex)
           break
         }
         case 'delete': {
-          this.nodeDelete(this.nodes[this.nodesIndex])
+          this.nodeDelete(this.nodes[this.nodeIndex])
           break
         }
       }
@@ -52,7 +61,9 @@ export default {
     },
     async nodeDelete (item) {
       this.$log('nodeDelete', item)
-      let res = await this.$store.dispatch('workspace/wsNodeDelete', item.item.oid)
+      let oid = item.item.oid
+      this.$log('nodeDelete OID', oid)
+      let res = await this.$store.dispatch('workspace/wsNodeDelete', oid)
       this.$log('res', res)
     },
     async fragmentDelete (item) {
@@ -63,6 +74,11 @@ export default {
       this.$log('res', res)
     },
     async nodeClick (i, ii) {
+      this.$log('nodeClick', i, ii)
+      this.nodeIndex = ii
+      this.$refs.nodeActionDialog.show()
+    },
+    async nodeUse (i, ii) {
       this.$log('nodeClick', i, ii)
       this.$store.commit('workspace/stateSet', ['wsItem', {type: 'node', item: JSON.parse(JSON.stringify(i.item))}])
       await this.$wait(300)

@@ -31,14 +31,17 @@ export const wsNodeUpdate = (state, node) => {
     logE('node not found', node)
   }
 }
-export const wsNodeDelete = (state, oid) => {
-  assert(oid)
-  let i = state.workspace.nodes.findIndex(d => d.oid === oid)
+export const wsNodeDelete = (state, node) => {
+  logD('wsNodeDelete', node)
+  assert(node)
+  let i = state.workspace.nodes.findIndex(d => d.oid === node.oid)
   if (i >= 0) {
     // state.workspace.nodes.splice(i, 1)
     Vue.delete(state.workspace.nodes, i)
+    logD('wsNodeDelete', node)
   } else {
-    logE('wsNode not found', oid)
+    logE('wsNodeDelete OID not found', node)
+    logD('wsNodeDelete', node)
   }
 }
 

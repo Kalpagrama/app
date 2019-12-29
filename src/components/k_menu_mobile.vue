@@ -10,8 +10,8 @@
     q-btn(round flat icon="whatshot" :color="$route.name === 'trends' ? 'green' : 'white'" @click.stop="$router.push({name: 'trends'})")
     //- add fragment
     q-btn(round push color="green" size="md" @click.stop="$router.push({name: 'create'})")
-      q-spinner(v-if="$route.name === 'create'" size="20px" color="white")
-      q-icon(v-else name="add" color="white")
+      //- q-spinner(v-if="$route.name === 'create'" size="20px" color="white")
+      q-icon(name="add" color="white")
     //- workspace
     q-btn(round flat :color="$route.name === 'workspace' ? '#4caf50' : '#fff'" @click.stop="$router.push({name: 'workspace'})")
       anvil(:width="26" :height="26" :color="$route.name === 'workspace' ? '#4caf50' : '#fff'")

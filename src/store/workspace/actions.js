@@ -149,7 +149,7 @@ export const wsNodeSave = async (context, node) => {
   return res
 }
 export const wsNodeDelete = async (context, oid) => {
-  logD('wsNodeDelete start')
+  logD('wsNodeDelete start', oid)
   assert.ok(oid)
   let { data: { wsNodeDelete } } = await apolloProvider.clients.apiApollo.mutate({
     mutation: gql`

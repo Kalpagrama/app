@@ -24,6 +24,7 @@ div(:style=`{position: 'relative'}`).column.fit
 <script>
 export default {
   name: 'wsContents',
+  props: ['ctx'],
   data () {
     return {
       contentIndex: -1
@@ -50,11 +51,18 @@ export default {
     }
   },
   methods: {
-    async contentClick (i, ii) {
+    async contentUse (i, ii) {
       this.$log('contentClick', i, ii)
       this.$store.commit('workspace/stateSet', ['wsItem', {type: 'content', item: JSON.parse(JSON.stringify(i.item))}])
       await this.$wait(300)
       this.$router.push('/create')
+    },
+    async contentClick (i, ii) {
+      if (this.ctx === 'inEditor') {
+        this.$emit('item', i)
+      } else {
+        this.contentUse(i, ii)
+      }
     }
   },
   mounted () {

@@ -8,7 +8,7 @@ div(:style=`{minHeight: '74px'}`).row.full-width.items-center.content-center.bg-
           :style=`{maxHeight: $q.screen.height-60+'px', borderRadius: '10px 10px 0 0',
             overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
           .col.full-width
-            ws-items(ctx="inEditor" :types="['fragments', 'contents']" @itemClick="itemFound")
+            ws-items(ctx="inEditor" :types="['fragments', 'contents']" @item="itemFound")
     //- url input
     input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}` accept="video/*")
     div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
