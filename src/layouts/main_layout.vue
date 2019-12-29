@@ -16,12 +16,14 @@ iframe {
   //- transition(appear enter-active-class="animated fadeIn")
   //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
   //-   k-dialog-tutorial(@hide="closeTutorial()")
-  //- k-dialog-bottom(
-  //-   :value="$store.state.node.nodeOptionsDialogOpened"
-  //-   :options="$store.state.node.nodeOptions"
-  //-   @action="$event => $store.dispatch('node/nodeAction', $event)"
-  //-   @hide="$store.commit('node/stateSet', ['nodeOptionsDialogOpened', false])")
-  //- iframe(v-if="showIframe" frameborder="0" src="https://www.youtube.com/embed/QywBr6-K2zM" height="500").bg
+  q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
+    k-dialog-tutorial(@hide="closeTutorial()")
+  k-dialog-bottom(
+    :value="$store.state.node.nodeOptionsDialogOpened"
+    :options="$store.state.node.nodeOptions"
+    @action="$event => $store.dispatch('node/nodeAction', $event)"
+    @hide="$store.commit('node/stateSet', ['nodeOptionsDialogOpened', false])")
+  // - iframe(v-if="showIframe" frameborder="0" src="https://www.youtube.com/embed/QywBr6-K2zM" height="500").bg
   router-view(v-if="!loading")
   //- .row.full-width.items-start.content-start
   //-   div(:style=`{height: '500px'}`).row.full-width

@@ -47,7 +47,7 @@ async function init (context) {
   })
 
   // TODO remove
-  user.profile.tutorial = true
+  // user.profile.tutorial = true
 
   if (!user.settings.notifications) {
     user.settings.notifications = {
