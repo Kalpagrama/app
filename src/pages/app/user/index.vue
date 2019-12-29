@@ -25,7 +25,9 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
   q-header(reveal).row.full-width.justify-center
-    div(:style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+    div(
+      v-if="user"
+      :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
       //- div(style=`height: 60px; width: 60px`).row.items-center.justify-center
       //-   q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
       .col
@@ -343,7 +345,9 @@ export default {
     }
   },
   mounted () {
-    this.$logD('mounted22')
+    this.$logD('mounted')
+    this.$q.addressbarColor.set('#101d49')
+    document.body.style.background = '#101d49'
   },
   beforeDestroy () {
     // this.$logD('beforeDestroy')

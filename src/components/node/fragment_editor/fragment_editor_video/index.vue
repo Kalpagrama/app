@@ -85,7 +85,8 @@ export default {
       cutIndex: -1,
       cutPlaying: -1,
       fragmentPlaying: false,
-      fragmentNameSetting: false
+      fragmentNameSetting: false,
+      nowStop: false
     }
   },
   computed: {
@@ -129,8 +130,8 @@ export default {
           if (to < cutStart || to > cutEnd) {
             this.$log('MUCH MUCH MUCH')
             this.player.setCurrentTime(cutStart)
-            await this.$wait(200)
-            if (this.fragmentPlaying) {
+            if (this.fragmentPlaying && !this.nowStop) {
+              this.nowStopSet()
               if (this.cuts[this.cutPlaying + 1]) {
                 this.cutIndex += 1
                 this.cutPlaying += 1
@@ -156,6 +157,12 @@ export default {
     }
   },
   methods: {
+    async nowStopSet () {
+      this.$log('nowStopSet')
+      this.nowStop = true
+      await this.$wait(200)
+      this.nowStop = false
+    },
     fragmentPlay () {
       this.$log('fragmentPlay')
       if (this.fragment.cuts.length === 0) return
