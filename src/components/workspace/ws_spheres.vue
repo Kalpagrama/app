@@ -1,7 +1,7 @@
 <style lang="stylus">
 </style>
 <template lang="pug">
-.column.fit.bg-grey-3
+.column.fit
   //- div(:style=`{height: '60px'}`).row.full-width.items-center
   //-   .col.full-height
   //-     .row.fit.items-center.q-px-md

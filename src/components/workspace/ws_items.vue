@@ -6,9 +6,9 @@ k-colls(ref="wsItemsColls" :coll="coll" @coll="coll = $event" :colls="collsFilte
   template(v-slot:spheres)
     ws-spheres
   template(v-slot:fragments)
-    ws-fragments
+    ws-fragments(:ctx="ctx" @item="$event => $emit('item', $event)")
   template(v-slot:contents)
-    ws-contents
+    ws-contents(:ctx="ctx" @item="$event => $emit('item', $event)")
   template(v-slot:nodes)
     ws-nodes
 </template>

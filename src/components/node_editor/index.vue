@@ -6,7 +6,7 @@ q-layout(view="hHh lpR fFf").bg-white
       ).row.full-width.items-center.justify-between.q-px-sm.bg-white
       transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
         q-btn(
-          v-if="nodeSavePossible"
+          v-if="true"
           flat round no-caps color="red" icon="refresh" :loading="nodePurging" @click="nodePurge()")
       .col
       transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -22,20 +22,22 @@ q-layout(view="hHh lpR fFf").bg-white
   //- footer
   q-footer(reveal).row.full-width.justify-center.bg-white
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      div(
-        v-if="nodeSavePossible"
-        :style=`{
-          position: 'relative', borderTop: '1px solid #eee',
-          minHeight: '50px', height: nodeSpheresHeight+'px',
-          maxWidth: $store.state.ui.pageMaxWidth+'px'}`
-        ).row.full-width.items-start.content-start.q-px-md.bg-white
-        div(:style=`{height: '50px'}`).row.full-width.items-center.content-center
-          span.text-black Spheres + Category
-          .col
-          q-btn(
-            round flat dense color="grey" @click="spheresToggle()"
-            :icon="nodeSpheresHeight === 50 ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
-    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', background: 'white'}`)
+      .row.full-width.justify-center
+        div(
+          v-if="nodeSavePossible"
+          :style=`{
+            position: 'relative', borderTop: '1px solid #eee',
+            minHeight: '50px', height: nodeSpheresHeight+'px',
+            maxWidth: $store.state.ui.pageMaxWidth+'px'}`
+          ).row.full-width.items-start.content-start.q-px-md.bg-white
+          div(:style=`{height: '50px'}`).row.full-width.items-center.content-center
+            span.text-black Spheres + Category
+            .col
+            q-btn(
+              round flat dense color="grey" @click="spheresToggle()"
+              :icon="nodeSpheresHeight === 50 ? 'keyboard_arrow_up' : 'keyboard_arrow_down'")
+    .row.full-width.justify-center
+      k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', background: 'white'}`)
   //- body
   q-page-container.row.full-width.justify-center.items-start.content-start
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -46,7 +48,9 @@ q-layout(view="hHh lpR fFf").bg-white
           minHeight: $q.screen.height-170+'px',
           maxWidth: $store.state.ui.pageMaxWidth+'px'}`
         ).row.full-width.items-start.content-start.bg-white
-        div(:style=`{height: '40px'}`).row.full-width.items-center.q-px-sm
+        div(
+          v-if="false"
+          :style=`{height: '40px'}`).row.full-width.items-center.q-px-sm
           small(@click="refresh()").bg-red.text-white.cursor-pointer.q-mx-sm refresh
           .col
           small.bg-red-2 OID: {{ node.oid }}, version: {{nodeVersion}}
@@ -120,9 +124,10 @@ export default {
   watch: {
     node: {
       deep: true,
-      immediate: true,
+      immediate: false,
       handler (to, from) {
         this.$log('node CHANGED', to)
+        localStorage.setItem('knode', JSON.stringify(to))
         this.nodeVersion += 1
       }
     }
@@ -192,6 +197,7 @@ export default {
         this.$log('nodePublish start')
         this.nodePublishing = true
         this.nodePublishCheck()
+        await this.nodeSave()
         let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
         this.$log('res', res)
         this.$log('nodePublish done')
@@ -210,6 +216,7 @@ export default {
       await this.$wait(600)
       let confirmed = confirm('Delete node?')
       if (confirmed) this.nodeStart()
+      localStorage.removeItem('knode')
       this.nodePurging = false
     },
     nodeStart () {
@@ -227,6 +234,7 @@ export default {
     },
     refresh () {
       this.$log('refresh')
+      localStorage.removeItem('knode')
       window.location.reload(true)
     }
   },
@@ -236,9 +244,13 @@ export default {
     this.$q.addressbarColor.set('white')
     document.body.style.background = 'white'
     this.nodeStart()
+    // lsItem
+    let lsItem = JSON.parse(localStorage.getItem('knode'))
+    this.$log('lsItem', lsItem)
     // wsItem
     let wsItem = JSON.parse(JSON.stringify(this.$store.state.workspace.wsItem))
     this.$log('wsItem', wsItem)
+    // checks
     if (wsItem) {
       switch (wsItem.type) {
         case 'content': {
@@ -263,8 +275,12 @@ export default {
           break
         }
       }
+      this.$store.commit('workspace/stateSet', ['wsItem', null])
+    } else {
+      if (lsItem) {
+        this.$set(this, 'node', lsItem)
+      }
     }
-    this.$store.commit('workspace/stateSet', ['wsItem', null])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
@@ -273,7 +289,11 @@ export default {
     this.$log('beforeRouteLeave')
     if (this.nodeSavePossible && this.nodeVersion > 1) {
       let confirmed = confirm('Save node to WS?!')
-      if (confirmed) await this.nodeSave()
+      if (confirmed) {
+        await this.nodeSave()
+      } else {
+        localStorage.removeItem('knode')
+      }
       next()
     } else {
       next()
