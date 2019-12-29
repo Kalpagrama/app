@@ -7,7 +7,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     :style=`{width: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain', userSelect: 'none', pointerEvents: 'none'}`)
   div(
     v-if="previewLoaded && fragment"
-    :style=`{position: 'absolute', zIndex: 100, minHeight: '100%', minWidth: '100%'}`).row.fit
+    :style=`{position: 'absolute', zIndex: 100, top: '-200px', minHeight: 'calc(100% + 400px)', minWidth: '100%'}`).row.fit
     fragment-video(
       v-if="fragment.content.type === 'VIDEO'"
       ref="fragmentVideo"
@@ -31,6 +31,15 @@ export default {
       previewLoaded: false,
       previewHeight: 0,
       previewWidth: 0
+    }
+  },
+  computed: {
+    now () {
+      if (this.$refs.fragmentVideo) {
+        return this.$refs.fragmentVideo.now || 0
+      } else {
+        return 0
+      }
     }
   },
   watch: {

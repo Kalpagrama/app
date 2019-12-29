@@ -1,6 +1,8 @@
 <style lang="stylus">
 .mejs__playpause-button {
-  display: none !important
+  display: none !important;
+  margin-top: 100px;
+  margin-bottom: 100px
 }
 iframe {
   width: 100% !important;
@@ -25,7 +27,7 @@ div(:style=`{position: 'relative'}`).row.fit
   video-progress(
     v-if="player"
     :mini="mini" :now="now" :player="player"
-    :style=`{position: 'absolute', bottom: '0px', zIndex: 105}`)
+    :style=`{position: 'absolute', bottom: '200px', zIndex: 105}`)
 </template>
 
 <script>
@@ -79,7 +81,7 @@ export default {
       if (this.ctx === 'inEditor') {
         let me = new window.MediaElementPlayer(this.$refs.fragmentVideo, {
           loop: true,
-          // autoplay: false,
+          autoplay: false,
           controls: false,
           features: [], // 'playpause'
           enableAutosize: true,

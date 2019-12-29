@@ -24,14 +24,14 @@ div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 
       :icon="fragmentEditing ? 'check' : 'edit'"
       :style=`{position: 'absolute', zIndex: 1000, right: '16px', bottom: '30px'}`)
     fragment(
-      ctx="inEditor" :fragment="fragment"
+      ctx="inEditor" :fragment="fragment" ref="nodeFragment"
       @previewHeight="fragmentHeight = $event" @previewWidth="fragmentWidth = $event"
       @player="playerReady")
   //- editors
   fragment-editor-video(
     v-if="fragment && fragmentPlayer"
     :fragment="fragment" :player="fragmentPlayer" :width="fragmentWidth" :height="fragmentEditorVideoHeight"
-    :editing="fragmentEditing"
+    :editing="fragmentEditing" :now="$refs.nodeFragment.now"
     :style=`{
       overflow: 'hidden', marginTop: '-10px',
       maxWidth: $store.state.ui.pageMaxWidth+'px',
@@ -62,7 +62,7 @@ export default {
         this.$log('fragmentEditing CHANGED', to)
         if (to) {
           this.$emit('bg', 'black')
-          this.$tween.to(this, 0.5, {fragmentEditorVideoHeight: this.fragmentHeight * 2})
+          this.$tween.to(this, 0.5, {fragmentEditorVideoHeight: 500})
         } else {
           this.$emit('bg', 'white')
           this.$tween.to(this, 0.5, {fragmentEditorVideoHeight: 10})
