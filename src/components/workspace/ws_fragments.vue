@@ -33,7 +33,7 @@ div(:style=`{position: 'relative'}`
         v-for="(i, ii) in fragments" :key="ii"
         :style=`{position: 'relative'}`
         ).col-6.q-pa-sm
-        div(v-if="fragmentPlaying !== ii" @click="fragmentClick(i ,ii)").row.fit.items-start.content-start
+        div(v-if="fragmentPlaying !== ii" @click="fragmentClick(i ,ii)").row.fit.items-start.content-start.cursor-pointer
           img(
             :src="i.item.content.thumbUrl" draggable="false"
             :style=`{width: '100%', objectFit: 'contain', userSelect: 'none', borderRadius: '10px', overflow: 'hidden'}`)

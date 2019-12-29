@@ -56,7 +56,7 @@ export default {
     fragment: {
       immediate: true,
       handler (to, from) {
-        this.$log('fragment CHANGED', to)
+        // this.$log('fragment CHANGED', to)
       }
     }
   },

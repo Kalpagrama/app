@@ -92,8 +92,8 @@
       .row.full-width.items-start.content-start.justify-start.q-px-md
         div(
           v-for="(s,si) in node.spheres" :key="si" @click="sphereDelete(s, si)"
-          :style=`{borderRadius: '4px'}`).q-px-sm.q-mr-sm.q-mb-sm.cursor-pointer.bg-green
-          small(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`).text-white {{ s.name }}
+          :style=`{borderRadius: '10px'}`).q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer.bg-green
+          span(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`).text-white {{ s.name }}
     //- category
     //- div(:style=`{minHeight: '60px', padding: '10px'}`).row.full-width
     //-   div(:style=`{height: '60px'}`).row.full-width.items-center

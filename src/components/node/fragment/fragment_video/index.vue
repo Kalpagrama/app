@@ -9,6 +9,7 @@ iframe {
   height: 100% !important;
 }
 </style>
+
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
   q-btn(
