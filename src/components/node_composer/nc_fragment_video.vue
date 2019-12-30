@@ -21,7 +21,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
   //- muted
   q-btn(
     v-if="!mini"
-    round flat color="white" @click="mutedToggle()"
+    round flat color="white" @click="player.setMuted(!muted)"
     :style=`{position: 'absolute', zIndex: 103, left: '16px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.15)'}`).shadow-1
     q-icon(:name="muted ? 'volume_off' : 'volume_up'" size="18px" color="white")
   //- content
@@ -92,20 +92,11 @@ export default {
     }
   },
   methods: {
-    mutedToggle () {
-      this.$log('mutedToggle')
-      if (this.ctx === 'inEditor') {
-        this.player.setMuted(!this.muted)
-        this.muted = !this.muted
-      } else {
-        this.$refs.ncFragmentVideo.muted = false
-        this.player.setMuted(!this.muted)
-      }
-      this.$emit('muted', !this.muted)
-    },
     async play () {
       this.$log('play')
+      this.$q.notify('PLAY' + localStorage.getItem('kmute'))
       if (this.player) this.player.play()
+      if (localStorage.getItem('kmute') === 'yes') this.player.setMuted(true)
     },
     pause () {
       this.$log('pause')
@@ -120,14 +111,9 @@ export default {
       this.player.setCurrentTime(now)
     },
     videoToggle () {
-      if (this.muted) {
-        this.player.setMuted(false)
-        this.muted = false
-      } else {
-        if (this.playing) this.pause()
-        else this.play()
-        this.playing = !this.playing
-      }
+      if (this.playing) this.pause()
+      else this.play()
+      this.playing = !this.playing
     },
     videoTimeupdate (e) {
       if (this.now !== 0 && this.now === this.player.currentTime) return
@@ -165,9 +151,9 @@ export default {
           this.player.addEventListener('timeupdate', this.videoTimeupdate)
           this.player.addEventListener('seeked', this.videoSeeked)
           // this.player.play()
-          this.player.setMuted(false)
-          this.muted = false
-          this.$emit('ready')
+          // this.player.setMuted(false)
+          // this.muted = false
+          // this.$emit('ready')
           // this.$q.notify('ready')
         },
         error: async (mediaElement, originalNode, instance) => {
@@ -200,6 +186,8 @@ export default {
       }
       this.player.setMuted = (muted) => {
         this.$log('playerNative: setMuted', muted)
+        if (muted) localStorage.setItem('kmute', 'yes')
+        else localStorage.removeItem('kmute')
         this.muted = muted
         this.$refs.ncFragmentVideo.muted = muted
       }

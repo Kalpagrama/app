@@ -68,7 +68,7 @@ q-layout(view="hHh lpR fFf").bg-white
         //-   div(:style=`{maxHeight: $q.screen.height/2+'px'}`).col.full-width.scroll
         //- .row.full-width.q-px-md.q-pa-sm
         //-   span(:style=`{fontSize: '17px'}`).text-bold {{$t('Образы')}}
-        .row.full-width.items-start.content-start
+        .row.full-width.items-start.content-start.q-px-sm
               draggable(
                 v-model="node.fragments"
                 v-bind="dragOptions"
@@ -80,8 +80,9 @@ q-layout(view="hHh lpR fFf").bg-white
                   div(
                     v-for="(f, fi) in fragmentsFilter" :key="f.order"
                     :style=`{
+                      position: 'relative',
                       minHeight: '50px'}`
-                    ).row.full-width.items-start.content-start.bg-white.q-px-sm.q-mb-sm
+                    ).row.full-width.items-start.content-start.bg-white.q-mb-sm
                     fragment-editor(
                       v-if="fragmentEditing === f.order"
                       ctx="inEditor" :index="fi" :fragment="f"
@@ -92,11 +93,11 @@ q-layout(view="hHh lpR fFf").bg-white
                       :class=`{'bg-grey-4': fi !== node.fragments.length-1, 'bg-grey-4': fi === node.fragments.length-1}`
                       ).row.full-width.items-start.content-start.bg-grey-3
                       img(
-                        @click="fragmentActionStart(f, fi)"
+                        @click="fragmentEditing = f.order"
                         :src="f.content.thumbUrl" draggable="false"
                         :style=`{height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}`).cursor-pointer
                       div(
-                        @click="fragmentActionStart(f, fi)"
+                        @click="fragmentEditing = f.order"
                         :style=`{position: 'relative'}` v-ripple=`{color: 'white'}`
                         ).col.full-height.cursor-pointer
                         .row.fit.items-center.content-center.q-px-sm
