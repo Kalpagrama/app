@@ -78,13 +78,13 @@ q-layout(view="hHh lpR fFf").bg-white
                 ).full-width
                 transition-group(type="transition" name="flip-list")
                   div(
-                    v-for="(f, fi) in node.fragments" :key="`${fi}-${f.content.oid}`"
+                    v-for="(f, fi) in fragmentsFilter" :key="f.order"
                     :style=`{
                       minHeight: '50px'}`
                     ).row.full-width.items-start.content-start.bg-white.q-px-sm.q-mb-sm
                     fragment-editor(
-                      v-if="fragmentEditing === fi"
-                      ctx="inEditor" :index="fi" :fragment="node.fragments[fi]"
+                      v-if="fragmentEditing === f.order"
+                      ctx="inEditor" :index="fi" :fragment="f"
                       @edited="fragmentEditing = -1" @delete="fragmentDelete")
                     div(
                       v-else
@@ -100,10 +100,11 @@ q-layout(view="hHh lpR fFf").bg-white
                         :style=`{position: 'relative'}` v-ripple=`{color: 'white'}`
                         ).col.full-height.cursor-pointer
                         .row.fit.items-center.content-center.q-px-sm
+                          small.text-black {{ f.order }}
                           span(
                             :class=`{'text-bold': fi === node.fragments.length-1}`
                             :style=`{maxWidth: '80%', overflow: 'hidden'}`
-                            ) {{ f.name || f.content.name | cut(40)}}
+                            ) {{ f.name || f.content.name | cut(35)}}
                       div(:style=`{height: '50px', width: '66px'}`).row.items-center.justify-center.handle
                         q-btn(round flat color="grey" icon="drag_indicator")
         //- .row.full-width.bg-white.q-pa-sm
@@ -162,6 +163,14 @@ export default {
     }
   },
   computed: {
+    fragmentsFilter () {
+      return this.node.fragments.reduce((acc, val, index) => {
+        let f = val
+        if (!f.order) f.order = index + 1
+        acc.push(f)
+        return acc
+      }, [])
+    },
     dragOptions() {
       return {
         animation: 0,
@@ -205,23 +214,23 @@ export default {
       // this.$log('nameChanged', e)
       e.target.style.height = e.target.scrollHeight + 'px'
     },
-    async fragmentClick (f, fi) {
-      this.$log('fragmentClick', f, fi)
-      if (this.fragmentEditing === fi) {
+    async fragmentClick (f) {
+      this.$log('fragmentClick', f)
+      if (this.fragmentEditing === f.order) {
         this.fragmentEditing = -1
       } else {
-        this.fragmentEditing = fi
+        this.fragmentEditing = f.order
       }
     },
     fragmentFound (index, fragment) {
       this.$log('fragmentFound', index, fragment)
       this.$set(this.node.fragments, index, JSON.parse(JSON.stringify(fragment)))
     },
-    fragmentActionStart (f, fi) {
-      this.$log('fragmentActionStart', f, fi)
+    fragmentActionStart (f) {
+      this.$log('fragmentActionStart', f)
       this.$store.dispatch('ui/action', [
         {
-          payload: fi,
+          payload: f.order,
           timeout: 5000,
           name: f.name || f.content.name,
           actions: {
@@ -234,24 +243,25 @@ export default {
         this.fragmentAction
       ])
     },
-    fragmentAction (action, fi) {
-      this.$log('fragmentAction', action, fi)
+    fragmentAction (action, order) {
+      this.$log('fragmentAction', action, order)
       switch (action) {
         case 'delete': {
-          this.fragmentDelete(fi)
+          this.fragmentDelete(order)
           break
         }
         case 'confirm': {
-          this.fragmentEditing = fi
+          this.fragmentEditing = order
           break
         }
       }
     },
-    fragmentDelete (index) {
-      this.$log('fragmentDelete', index)
-      if (!index) return
+    fragmentDelete (order) {
+      this.$log('fragmentDelete', order)
+      if (!order) return
       // this.$set(this.node.fragments, index, null)
-      this.$delete(this.node.fragments, index)
+      let i = this.fragmentsFilter.findIndex(f => f.order === order)
+      this.$delete(this.node.fragments, i)
     },
     menuToggle () {
       this.$log('menuToggle')
