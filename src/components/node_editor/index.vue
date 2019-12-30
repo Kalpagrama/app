@@ -1,10 +1,32 @@
+<style lang="stylus">
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+.list-group {
+  min-height: 20px;
+}
+.list-group-item {
+  cursor: move;
+}
+.list-group-item i {
+  cursor: pointer;
+}
+</style>
+
 <template lang="pug">
 q-layout(view="hHh lpR fFf").bg-white
   //- header
-  q-header(reveal v-if="nodeSavePossible").row.full-width.justify-center.bg-white
-    div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px', borderBottom: '1px solid #eee'}`
+  q-header(reveal).row.full-width.justify-center.bg-white
+    div(:style=`{height: '50px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`
       ).row.full-width.items-center.justify-between.q-px-sm.bg-white
-      transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
         q-btn(
           v-if="true"
           flat round no-caps color="red" icon="refresh" :loading="nodePurging" @click="nodePurge()")
@@ -21,11 +43,10 @@ q-layout(view="hHh lpR fFf").bg-white
           span.text-bold Publish
   //- footer
   q-footer(reveal).row.full-width.justify-center.bg-white
-    .row.full-width.justify-center
-      k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', background: 'white'}`)
+    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', background: 'white'}`)
   //- body
   q-page-container.row.full-width.justify-center.items-start.content-start
-    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      //- transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="node"
         :style=`{
@@ -39,24 +60,70 @@ q-layout(view="hHh lpR fFf").bg-white
           small(@click="refresh()").bg-red.text-white.cursor-pointer.q-mx-sm refresh
           .col
           small.bg-red-2 OID: {{ node.oid }}, version: {{nodeVersion}}
-        .row.full-width.bg-white.q-pa-sm
-          fragment-editor(v-if="node.fragments[0]" ref="fragmentEditorFirst" :index="0" :fragment="node.fragments[0]" @delete="fragmentDelete")
-          fragment-finder(v-else @fragment="$event => fragmentFound(0, $event)")
-        .row.full-width.justify-center
+        //- .row.full-width.q-px-md.q-pa-sm
+        //-   span(:style=`{fontSize: '17px'}`).text-bold {{$t('Добавить образ')}}
+        .row.full-width.bg-white.q-px-sm
+          fragment-finder(@fragment="$event => fragmentFound(node.fragments.length, $event)")
+        //- div(:style=`{position: 'relative'}`).column.full-width
+        //-   div(:style=`{maxHeight: $q.screen.height/2+'px'}`).col.full-width.scroll
+        //- .row.full-width.q-px-md.q-pa-sm
+        //-   span(:style=`{fontSize: '17px'}`).text-bold {{$t('Образы')}}
+        .row.full-width.items-start.content-start
+              draggable(
+                v-model="node.fragments"
+                v-bind="dragOptions"
+                @start="fragmentDragging = true"
+                @end="fragmentDragging = false"
+                handle=".handle"
+                ).full-width
+                transition-group(type="transition" name="flip-list")
+                  div(
+                    v-for="(f, fi) in node.fragments" :key="`${fi}-${f.content.oid}`"
+                    :style=`{
+                      minHeight: '50px'}`
+                    ).row.full-width.items-start.content-start.bg-white.q-px-sm.q-mb-sm
+                    fragment-editor(
+                      v-if="fragmentEditing === fi"
+                      ctx="inEditor" :index="fi" :fragment="node.fragments[fi]"
+                      @edited="fragmentEditing = -1" @delete="fragmentDelete")
+                    div(
+                      v-else
+                      :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
+                      :class=`{'bg-grey-4': fi !== node.fragments.length-1, 'bg-grey-4': fi === node.fragments.length-1}`
+                      ).row.full-width.items-start.content-start.bg-grey-3
+                      img(
+                        @click="fragmentActionStart(f, fi)"
+                        :src="f.content.thumbUrl" draggable="false"
+                        :style=`{height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'}`).cursor-pointer
+                      div(
+                        @click="fragmentActionStart(f, fi)"
+                        :style=`{position: 'relative'}` v-ripple=`{color: 'white'}`
+                        ).col.full-height.cursor-pointer
+                        .row.fit.items-center.content-center.q-px-sm
+                          span(
+                            :class=`{'text-bold': fi === node.fragments.length-1}`
+                            :style=`{maxWidth: '80%', overflow: 'hidden'}`
+                            ) {{ f.name || f.content.name | cut(40)}}
+                      div(:style=`{height: '50px', width: '66px'}`).row.items-center.justify-center.handle
+                        q-btn(round flat color="grey" icon="drag_indicator")
+        //- .row.full-width.bg-white.q-pa-sm
+        //-   fragment-editor(v-if="node.fragments[0]" ref="fragmentEditorFirst" :index="0" :fragment="node.fragments[0]" @delete="fragmentDelete")
+        //-   fragment-finder(v-else @fragment="$event => fragmentFound(0, $event)")
+        div(v-if="true").row.full-width.justify-center
           textarea(
             v-model="node.name" ref="nodeNameInput" autofocus
             placeholder="В чем суть?" rows="1" @input="nameChanged"
-            :style=`{fontSize: '30px', paddingLeft: '20px', paddingRight: '10px', paddingTop: '5px', paddingBottom: '5px', maxHeight: '150px'}`
+            :style=`{fontSize: '30px', paddingLeft: '16px', paddingRight: '16px', paddingTop: '5px', paddingBottom: '5px', maxHeight: '150px'}`
             ).full-width.kinput.text-bold.text-black
-        div(v-if="node.fragments[0]").row.full-width.bg-white.q-pa-sm
-          fragment-editor(v-if="node.fragments[1]" ref="fragmentEditorSecond" :index="1" :fragment="node.fragments[1]" @delete="fragmentDelete")
-          fragment-finder(v-else @fragment="$event => fragmentFound(1, $event)")
+        //- div(v-if="node.fragments[0]").row.full-width.bg-white.q-pa-sm
+        //-   fragment-editor(v-if="node.fragments[1]" ref="fragmentEditorSecond" :index="1" :fragment="node.fragments[1]" @delete="fragmentDelete")
+        //-   fragment-finder(v-else @fragment="$event => fragmentFound(1, $event)")
         transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
           node-editor-spheres(
             v-if="node && nodeSavePossible" :node="node"
-            :style=`{marginBottom: '70px'}`)
-    //- no node
-    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+            :style=`{marginTop: '300px', marginBottom: '70px'}`)
+      //- no node
+      //- transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="!node"
         :style=`{minHeight: $q.screen.height-170+'px'}`).row.full-width.items-center.content-center.justify-center
@@ -67,10 +134,11 @@ q-layout(view="hHh lpR fFf").bg-white
 import fragmentFinder from 'components/node/fragment_finder'
 import fragmentEditor from 'components/node/fragment_editor'
 import nodeEditorSpheres from './spheres'
+import draggable from 'vuedraggable'
 
 export default {
   name: 'nodeEditor',
-  components: {fragmentFinder, fragmentEditor, nodeEditorSpheres},
+  components: {fragmentFinder, fragmentEditor, nodeEditorSpheres, draggable},
   data () {
     return {
       menuShow: false,
@@ -88,10 +156,20 @@ export default {
       nodeSavingError: null,
       nodePurging: false,
       nodePublishing: false,
-      nodePublishingError: null
+      nodePublishingError: null,
+      fragmentEditing: -1,
+      fragmentDragging: false
     }
   },
   computed: {
+    dragOptions() {
+      return {
+        animation: 0,
+        group: 'description',
+        disabled: false,
+        ghostClass: 'ghost'
+      }
+    },
     nodeSavePossible () {
       if (this.node &&
         this.node.name.length > 3) {
@@ -127,19 +205,53 @@ export default {
       // this.$log('nameChanged', e)
       e.target.style.height = e.target.scrollHeight + 'px'
     },
-    async fragmentClick (i) {
-      this.$log('fragmentClick', i)
-      this.$refs.fragmentEditor.fragmentUse(i.item)
-      await this.$wait(200)
-      this.menuShow = false
+    async fragmentClick (f, fi) {
+      this.$log('fragmentClick', f, fi)
+      if (this.fragmentEditing === fi) {
+        this.fragmentEditing = -1
+      } else {
+        this.fragmentEditing = fi
+      }
     },
     fragmentFound (index, fragment) {
       this.$log('fragmentFound', index, fragment)
       this.$set(this.node.fragments, index, JSON.parse(JSON.stringify(fragment)))
     },
+    fragmentActionStart (f, fi) {
+      this.$log('fragmentActionStart', f, fi)
+      this.$store.dispatch('ui/action', [
+        {
+          payload: fi,
+          timeout: 5000,
+          name: f.name || f.content.name,
+          actions: {
+            copy: {name: 'Copy'},
+            share: {name: 'Share'},
+            delete: {name: 'Delete'},
+            confirm: {name: 'Edit'}
+          }
+        },
+        this.fragmentAction
+      ])
+    },
+    fragmentAction (action, fi) {
+      this.$log('fragmentAction', action, fi)
+      switch (action) {
+        case 'delete': {
+          this.fragmentDelete(fi)
+          break
+        }
+        case 'confirm': {
+          this.fragmentEditing = fi
+          break
+        }
+      }
+    },
     fragmentDelete (index) {
       this.$log('fragmentDelete', index)
-      this.$set(this.node.fragments, index, null)
+      if (!index) return
+      // this.$set(this.node.fragments, index, null)
+      this.$delete(this.node.fragments, index)
     },
     menuToggle () {
       this.$log('menuToggle')
@@ -225,7 +337,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$log('mount START')
     // this.$q.notify('MOUNTED')
     this.$q.addressbarColor.set('white')
     document.body.style.background = 'white'
@@ -267,6 +379,7 @@ export default {
         this.$set(this, 'node', lsItem)
       }
     }
+    this.$log('mount DONE')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

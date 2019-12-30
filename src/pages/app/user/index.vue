@@ -27,7 +27,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   q-header(reveal).row.full-width.justify-center
     div(
       v-if="user"
-      :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.bg-primary
       //- div(style=`height: 60px; width: 60px`).row.items-center.justify-center
       //-   q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
       .col

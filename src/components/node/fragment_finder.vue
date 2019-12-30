@@ -82,6 +82,7 @@ export default {
           break
         }
       }
+      this.url = ''
     },
     async urlChanged (to) {
       this.$log('url CHANGED', to)
