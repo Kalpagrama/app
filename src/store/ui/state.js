@@ -23,5 +23,8 @@ export default {
   going: false,
   rect: null,
   rectNode: null,
-  rectClone: null
+  rectClone: null,
+  actionOpened: false,
+  actionKey: undefined,
+  actionOptions: null
 }

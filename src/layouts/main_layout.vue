@@ -24,6 +24,7 @@ iframe {
     @action="$event => $store.dispatch('node/nodeAction', $event)"
     @hide="$store.commit('node/stateSet', ['nodeOptionsDialogOpened', false])")
   // - iframe(v-if="showIframe" frameborder="0" src="https://www.youtube.com/embed/QywBr6-K2zM" height="500").bg
+  k-action
   router-view(v-if="!loading")
   //- .row.full-width.items-start.content-start
   //-   div(:style=`{height: '500px'}`).row.full-width
@@ -32,12 +33,13 @@ iframe {
 </template>
 
 <script>
+import kAction from 'components/k_action'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 
 export default {
   name: 'mainLayout',
-  components: {},
+  components: {kAction},
   data () {
     return {
       loading: true,
