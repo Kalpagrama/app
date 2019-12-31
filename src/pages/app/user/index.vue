@@ -126,7 +126,7 @@ export default {
       status: null,
       about: null,
       pageId: 'Created nodes',
-      pages: ['Created nodes', 'Voted notes', 'Following', 'Followers']
+      pages: ['Created nodes', 'Voted nodes', 'Following', 'Followers']
     }
   },
   computed: {

@@ -32,7 +32,7 @@ div(
       :style=`{position: 'absolute', zIndex: 200, opacity: 0.3}`).row.fit.cursor-pointer
     //- actions
     q-btn(
-      v-if="!mini && visible && ctx === 'inExplorer'"
+      v-if="!mini && visible"
       round flat color="white" icon="more_vert" @click="$emit('action')"
       :style=`{position: 'absolute', zIndex: 200, right: '8px', top: '8px', background: 'rgba(255,255,255,0.15)'}`).shadow-5
     //- cancel
@@ -53,7 +53,7 @@ div(
       :src="ctx === 'inEditor' ? fragment.content.thumbUrl : thumbUrl"
       @load="previewLoad" @error="previewError"
       crossOrigin="anonymous" draggable="false"
-      :style=`{width: '100%', minWidth: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain', userSelect: 'none', opacity: previewLoaded ? 1 : 1}`
+      :style=`{width: '100%', minWidth: '100%', maxHeight: 500+'px', objectFit: 'contain', userSelect: 'none', opacity: previewLoaded ? 1 : 1}`
       :class=`{'full-height': ctx !== 'inEditor'}`)
     //- video
     div(

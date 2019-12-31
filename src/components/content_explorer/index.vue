@@ -72,6 +72,8 @@ export default {
       async handler (to, from) {
         if (to.params.oid) {
           this.$log('$route CHANGED', to.params.oid)
+          this.content = null
+          await this.$wait(300)
           this.content = await this.contentLoad(to.params.oid)
         }
       }

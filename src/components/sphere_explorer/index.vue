@@ -18,9 +18,9 @@ q-layout(view="HHh lpR fFf").bg-grey-3
   //- header
   q-header(reveal).row.full-width.items-center.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.bg-grey-3
-      h6(v-if="sphere" :style=`{}`).text-black.q-pa-xs.q-ma-xs {{`${sphere.name}`}}
-      .col
-      q-btn(round flat icon="more_vert")
+      h6(v-if="sphere" :style=`{}`).text-black.q-pa-xs.q-ma-xs {{ sphere.name }}
+      //- .col
+      //- q-btn(round flat icon="more_vert")
   q-footer(reveal).row.full-width.justify-center
     k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
   //- body nodes

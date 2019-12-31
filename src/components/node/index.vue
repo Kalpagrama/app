@@ -25,14 +25,14 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       .row.full-width.justify-center
         span(:style=`{fontSize: '50px'}`
           ).text-bold.text-white.text-center {{ voteLabel }}
-    nc-fragment(
+    component(:is="fc ? fc : 'nc-fragment'"
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
       :thumbUrl="node.meta.fragments[0].thumbUrl"
       @previewWidth="$event => fragmentWidth(0, $event)"
       @previewHeight="$event => fragmentHeight(0, $event)"
       @ended="fragmentEnded(0)"
-      @action="nodeAction"
+      @action="nodeActionStart"
       :visible="visible"
       :fragment="nodeFull ? nodeFull.fragments[0] : null"
       :mini="fragmentMini === 0" @mini="fragmentChange(0)"
@@ -42,14 +42,14 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
         maxWidth: styles[0].maxWidth+'%',
         bottom: styles[0].bottom+'px',
         right: styles[0].right+'px'}`)
-    nc-fragment(
+    component(:is="fc ? fc : 'nc-fragment'"
       ref="fragmentSecond"
       :ctx="ctx" :index="1"
       :thumbUrl="node.meta.fragments[1].thumbUrl"
       @previewWidth="$event => fragmentWidth(1, $event)"
       @previewHeight="$event => fragmentHeight(1, $event)"
       @ended="fragmentEnded(1)"
-      @action="nodeAction"
+      @action="nodeActionStart"
       :visible="visible"
       :fragment="nodeFull ? nodeFull.fragments[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(1)"
@@ -123,17 +123,18 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
           span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
     //- timestamp
     .row.full-width.justify-start.q-pa-md
-      small.text-grey-7 20.12.2019
+      small.text-grey-7 31.12.2019
 </template>
 
 <script>
+import nodeFragment from 'components/node/fragment'
 import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'nodeNew',
   // TODO заменить имя св-ва visible на active
-  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
-  components: {ncFragment},
+  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'fc'],
+  components: {nodeFragment, ncFragment},
   data () {
     return {
       nodeFullError: null,
@@ -310,10 +311,43 @@ export default {
         this.$refs.fragmentSecond.play()
       }
     },
-    nodeAction () {
-      this.$log('nodeAction')
+    nodeActionStart () {
+      this.$log('nodeActionStart')
+      this.$store.dispatch('ui/action', [
+        {
+          timeout: 4000,
+          payload: this.nodeFull,
+          name: this.node.name,
+          actions: {
+            save: {name: 'Save to WS'},
+            confirm: {name: 'Mix node'}
+          }
+        },
+        this.nodeAction
+      ])
       this.$store.commit('node/stateSet', ['nodeOptionsPayload', JSON.parse(JSON.stringify(this.nodeFull))])
       this.$store.commit('node/stateSet', ['nodeOptionsDialogOpened', true])
+    },
+    nodeAction (action) {
+      this.$log('nodeAction', action)
+      switch (action) {
+        case 'confirm': {
+          this.$log('MIX MIX MIX')
+          let nodeInput = this.nodeFull
+          delete nodeInput.oid
+          this.$store.commit('workspace/stateSet', ['wsItem', {type: 'node', item: nodeInput}], { root: true })
+          this.$router.push('/create')
+          break
+        }
+        case 'save': {
+          this.$log('SAVE SAVE')
+          let nodeInput = this.nodeFull
+          delete nodeInput.oid
+          this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(nodeInput)), { root: true })
+          break
+        }
+      }
+      this.$log('nodeAction done')
     },
     async nodeVote (rate = 0.5) {
       try {

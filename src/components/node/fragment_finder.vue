@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{minHeight: '74px'}`).row.full-width.items-center.content-center.bg-white
+div(:style=`{position: 'relative', minHeight: '74px'}`).row.full-width.items-center.content-center.bg-white
   div(v-if="!videoShow").row.full-width
     //- find in ws
     q-dialog(v-model="wsDialogShow" ref="wsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
@@ -21,12 +21,17 @@ div(:style=`{minHeight: '74px'}`).row.full-width.items-center.content-center.bg-
         template(v-slot:append)
           q-btn(v-if="url.length === 0" round flat color="green" icon="add" @click="wsDialogShow = true")
           q-btn(v-if="!urlInputLoading && url.length > 0" round flat color="green" icon="clear" @click="url = ''")
-  video(
-    v-if="videoShow"
-    ref="videoRef" crossorigin="anonymous" autoplay="true" loop="true" playsinline="true" preload="auto"
-    :src="videoUrl"
-    @loadeddata="videoLoad" @error="videoError"
-    :style=`{width: '100%'}`)
+  //- video(
+  //-   v-if="videoShow"
+  //-   ref="videoRef" crossorigin="anonymous" autoplay="true" loop="true" playsinline="true" preload="auto"
+  //-   :src="videoUrl"
+  //-   @loadeddata="videoLoad" @error="videoError"
+  //-   :style=`{width: '100%'}`)
+  //- div(:style=`{
+  //-   position: 'absolute', zIndex: 1000, top: '8px', opacity: 0.5,
+  //-   height: $q.screen.height-130+'px',
+  //-   borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-red
+  //-   h1.text-white hello
 </template>
 
 <script>
@@ -84,6 +89,11 @@ export default {
       }
       this.url = ''
     },
+    urlUse (url) {
+      this.$log('urlUse', url)
+      this.$q.notify({message: 'Pasted URL', color: 'green', textColor: 'white'})
+      this.url = url
+    },
     async urlChanged (to) {
       this.$log('url CHANGED', to)
       this.urlInputLoading = true
@@ -126,8 +136,8 @@ export default {
       let file = e.target.files['0']
       this.$log('file', file)
       let url = URL.createObjectURL(file)
-      this.videoUrl = url
-      this.videoShow = true
+      // this.videoUrl = url
+      // this.videoShow = true
       let content = await this.contentGetByFile(file, false)
       this.$log('content', content)
       this.itemFound({type: 'content', item: content})

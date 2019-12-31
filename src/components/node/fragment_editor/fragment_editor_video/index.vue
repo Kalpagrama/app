@@ -1,3 +1,24 @@
+<style lang="stylus">
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+.list-group {
+  min-height: 20px;
+}
+.list-group-item {
+  cursor: move;
+}
+.list-group-item i {
+  cursor: pointer;
+}
+</style>
 <template lang="pug">
 div(
   :style=`{position: 'relative'}`
@@ -33,16 +54,23 @@ div(
   //- body
   div.col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-md
-      k-dialog-bottom(ref="cutDialog" :options="cutDialogOptions" @action="cutAction")
       div(
         :class=`{'bg-red': fragmentDuration > 60, 'bg-green': fragmentDuration < 60}`
         :style=`{borderRadius: '10px'}`).row.full-width.q-pa-sm.q-my-sm
         span.text-bold.text-white Total duration: {{ $time(fragmentDuration) }}
-      fev-cut(
-        v-for="(c, ci) in cuts" :key="c.color"
-        :index="ci" :cut="c" :cutIndex="cutIndex" :cutPlaying="cutPlaying" :player="player" :now="now"
-        @cutIndex="cutIndex = $event" @play="cutPlay"
-        @action="$refs.cutDialog.show()").q-mb-sm
+      draggable(
+        v-model="fragment.cuts"
+        v-bind="dragOptions"
+        @start="cutDragging = true"
+        @end="cutDragging = false"
+        handle=".handle"
+        ).full-width
+        transition-group(type="transition" name="flip-list")
+          fev-cut(
+            v-for="(c, ci) in fragment.cuts" :key="c.color"
+            :index="ci" :cut="c" :cutIndex="cutIndex" :cutPlaying="cutPlaying" :player="player" :now="now"
+            @cutIndex="cutIndex = $event" @play="cutPlay"
+            @action="cutActionStart(c, ci)").q-mb-sm
   div(:style=`{height: '66px'}`).row.full-width.bg-black
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
@@ -75,10 +103,11 @@ div(
 <script>
 import fevCut from './cut'
 import cutsOnFrames from './cuts_on_frames'
+import draggable from 'vuedraggable'
 
 export default {
   name: 'nFEV',
-  components: {fevCut, cutsOnFrames},
+  components: {fevCut, cutsOnFrames, draggable},
   props: ['ctx', 'fragment', 'width', 'height', 'mini', 'player', 'now', 'editing'],
   data () {
     return {
@@ -118,6 +147,14 @@ export default {
       if (this.cutIndex === 0) delete options.actions.up
       if (this.cutIndex === this.cuts.length - 1) delete options.actions.down
       return options
+    },
+    dragOptions() {
+      return {
+        animation: 0,
+        group: 'cuts',
+        disabled: false,
+        ghostClass: 'ghost'
+      }
     }
   },
   watch: {
@@ -127,9 +164,9 @@ export default {
         if (this.cutPlaying >= 0) {
           let cutStart = this.cut.points[0].x
           let cutEnd = this.cut.points[1].x
-          if (to < cutStart || to > cutEnd) {
+          if (to < cutStart - 0.5 || to > cutEnd + 0.5) {
             this.$log('MUCH MUCH MUCH')
-            this.player.setCurrentTime(cutStart)
+            this.player.setCurrentTime(cutStart - 0.1)
             if (this.fragmentPlaying && !this.nowStop) {
               this.nowStopSet()
               if (this.cuts[this.cutPlaying + 1]) {
@@ -186,8 +223,11 @@ export default {
         if (this.$refs.fragmentNameInput) this.$refs.fragmentNameInput.focus()
       })
     },
-    fragmentDialog () {
-      this.$log('fragmentDialog')
+    fragmentActionStart (fragment) {
+      this.$log('fragmentDialog', fragment)
+    },
+    fragmentAction (action, payload) {
+      this.$log('fragmentAction', action, payload)
     },
     cutPlay (ci) {
       this.$log('cutPlay', ci)
@@ -215,52 +255,45 @@ export default {
       this.fragment.cuts.push(cut)
       this.cutIndex = this.fragment.cuts.length - 1
     },
-    cutDelete (index) {
+    async cutDelete (index) {
       this.$log('cutDelete', index)
+      // TODO: delete by color...
       this.cutIndex = -1
       this.$delete(this.fragment.cuts, index)
+      await this.$wait(200)
+      if (this.cuts.length > 0) {
+        if (this.cuts[index - 1]) this.cutIndex = index
+        else this.cutIndex = 0
+      }
     },
     cutExport () {
       this.$log('cutExport', this.cut)
       // create node with one fragment...
     },
-    cutUp (index) {
-      this.$log('cutUp')
-      let current = this.cuts[index]
-      let to = this.cuts[index - 1]
-      this.cuts[index] = to
-      this.cuts[index - 1] = current
-      this.$nextTick(() => {
-        this.cutIndex = index - 1
-      })
+    cutActionStart (c, ci) {
+      this.$log('cutActionStart', c, ci)
+      this.$store.dispatch('ui/action', [
+        {
+          payload: ci,
+          timeout: 3000,
+          name: c.name.length > 0 ? c.name : false,
+          actions: {
+            delete: {name: 'Delete'},
+            confirm: {name: 'Export to fragment'}
+          }
+        },
+        this.cutAction
+      ])
     },
-    cutDown (index) {
-      this.$log('cutDown')
-      let current = this.cuts[index]
-      let to = this.cuts[index + 1]
-      this.cuts[index] = to
-      this.cuts[index + 1] = current
-      this.$nextTick(() => {
-        this.cutIndex = index + 1
-      })
-    },
-    cutAction (action) {
+    cutAction (action, ci) {
       this.$log('cutAction', action)
       switch (action) {
         case 'confirm': {
           this.$log('EXPORT')
           break
         }
-        case 'up': {
-          this.cutUp(this.cutIndex)
-          break
-        }
-        case 'down': {
-          this.cutDown(this.cutIndex)
-          break
-        }
         case 'delete': {
-          if (confirm(this.$t('Delete cut?'))) this.cutDelete(this.cutIndex)
+          if (confirm(this.$t('Delete cut?'))) this.cutDelete(ci)
           break
         }
       }

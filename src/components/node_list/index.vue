@@ -14,9 +14,6 @@ div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`
     v-observe-visibility=`{
       callback: nodeMiddleHandler,
       throttle: throttle,
-      // throttleOptions: {
-      //   leading: 'both',
-      // },
       intersection: {
         rootMargin: -($q.screen.height/2-10)+'px 0px'
       }
