@@ -86,7 +86,7 @@ q-layout(view="hHh lpR fFf").bg-white
                     fragment-editor(
                       v-if="fragmentEditing === f.order"
                       ctx="inEditor" :index="fi" :fragment="f"
-                      @edited="fragmentEditing = -1" @delete="fragmentDelete")
+                      @edited="fragmentEditing = -1" @delete="fragmentDelete(f.order)")
                     div(
                       v-else
                       :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
@@ -257,11 +257,13 @@ export default {
         }
       }
     },
-    fragmentDelete (order) {
+    async fragmentDelete (order) {
       this.$log('fragmentDelete', order)
       if (!order) return
       // this.$set(this.node.fragments, index, null)
       let i = this.fragmentsFilter.findIndex(f => f.order === order)
+      this.$log('fragmentDelete index', i)
+      await this.$wait(1000)
       this.$delete(this.node.fragments, i)
     },
     menuToggle () {
