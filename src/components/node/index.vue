@@ -131,6 +131,7 @@ import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'nodeNew',
+  // TODO заменить имя св-ва visible на active
   props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
   components: {ncFragment},
   data () {
@@ -182,46 +183,46 @@ export default {
     visible: {
       immediate: false,
       async handler (to, from) {
-        // this.$log('visible CHANGED', to)
-        if (to) this.play()
-        else this.pause()
+        if (to) {
+          this.$log(` indx=${this.index} active(visible) CHANGED to ${to}`)
+          this.play()
+        } else {
+          this.$log(`. indx=${this.index} active(visible) CHANGED to ${to} index = ${this.index}`)
+          this.pause()
+        }
       }
     },
     needFull: {
       immediate: true,
         async handler (to, from) {
-          if (to) {
-            if (!this.nodeFull) this.nodeFull = await this.nodeLoad(this.node.oid)
-          } else {
-            // this.nodeFull = null
-          }
+          if (to) await this.nodeLoad()
+          else await this.nodeDestroy()
         }
     },
     needFullPreload: {
       immediate: true,
       async handler (to, from) {
-        if (to) {
-          if (!this.nodeFull) this.nodeFull = await this.nodePreLoad(this.node.oid)
-        } else {
-          // this.nodeFull = null
-        }
+        if (to) await this.nodePreLoad()
+        else await this.nodeDestroy()
       }
     },
     nodeFullReady: {
       immediate: true,
       handler (to, from) {
-        // this.$log('nodeFullReady CHANGED', to)
         if (to) {
+          this.$log('nodeFullReady CHANGED', to)
           this.nodeFull = this.nodeFullReady
         }
       }
     }
   },
   methods: {
-    play () {
-      this.$log('play')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
-      else this.$refs.fragmentFirst.play()
+    async play () {
+      if (this.nodeFull){
+        this.$log(` play indx=${this.index} fr=${this.fragmentMini}`, this.$refs.fragmentFirst, this.$refs.fragmentSecond)
+        if (this.fragmentMini === 0) await this.$refs.fragmentSecond.play()
+        else await this.$refs.fragmentFirst.play()
+      }
     },
     pause () {
       this.$log('pause')
@@ -328,30 +329,51 @@ export default {
       }
     },
     // упреждающая загрузка ядра (с низким приоритетом. Запрос на сервер будет сделан по-возможности)
-    async nodePreLoad (oid) {
-      this.$log(`nodePreLoad start indx=${this.index} oid=${this.node.oid}`)
+    async nodePreLoad () {
+      if (this.nodeFull) return
+      let oid = this.node.oid
+      this.$log(`nodePreLoad start indx=${this.index} oid=${oid}`)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 1 })
-      } catch (err) { }
-      this.$log('nodePreLoad done', this.index, this.node.oid)
-      return node
+      } catch (err) {
+        // приоритет 1 - не гарантирует что ядро будет загружено. Запрос может быть отвергнут.
+        if (err !== 'queued object was evicted legally'){
+          // this.$logE('nodePreLoad error', err)
+          this.$emit('hide') // не показывать это ядро
+          node = null
+        }
+      }
+      if (node) this.$log('nodePreLoad OK! indx=', this.index, oid)
     },
     // гарантированная загрузка ядра
-    async nodeLoad (oid) {
-      this.$log(`nodeLoad start indx=${this.index}oid=${this.node.oid}`)
+    async nodeLoad () {
+      if (this.nodeFull) return
+      let oid = this.node.oid
+      this.$log(` nodeLoad start indx=${this.index}  oid=${oid}`)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
         this.nodeFullError = null
       } catch (err) {
-        this.$logE('node', 'nodeLoad error', err)
+        // this.$logE('nodeLoad error', err)
         this.$emit('hide') // не показывать это ядро
         node = null
         this.nodeFullError = err
       }
-      this.$log('nodeLoad done', this.index, this.node.oid)
-      return node
+      if (node) {
+        this.$log(`np-test: nodeLoad OK ! indx=${this.index}  oid=${oid}`)
+        this.nodeFull = node
+        this.$nextTick(async () => {
+          if (this.visible) await this.play()
+        })
+      }
+    },
+    async nodeDestroy(){
+      if (this.nodeFull && !this.needFull && !this.needFullPreload){
+        this.$log(` node CLEAR indx=${this.index} oid=${this.node.oid}`)
+        this.nodeFull = null
+      }
     }
   },
   mounted () {

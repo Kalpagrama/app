@@ -68,7 +68,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
 <script>
 export default {
   name: 'ncFragmentVideo',
-  props: ['ctx', 'fragment', 'mini', 'visible', 'index'],
+  props: ['ctx', 'fragment', 'mini', 'visible', 'index', 'playerState'],
   data () {
     return {
       now: undefined,
@@ -90,6 +90,18 @@ export default {
         }
       }
     }
+    // player: {
+    //   immediate: true,
+    //   handler (to, from){
+    //     if (!from && to){
+    //       this.$log(' player watch', this.playerState)
+    //       if (this.playerState === 'play') {
+    //         this.$log(' autoplay after create', this.player)
+    //         this.player.play()
+    //       }
+    //     }
+    //   }
+    // }
   },
   methods: {
     async play () {
@@ -100,6 +112,7 @@ export default {
     },
     pause () {
       this.$log('pause')
+      // this.playerState = 'pause'
       if (this.player) this.player.pause()
     },
     progressClick (e) {

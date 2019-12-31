@@ -1,4 +1,4 @@
-const swVer = 7
+const swVer = 5
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
   cacheGraphQl,
@@ -376,9 +376,10 @@ if (useCache) {
           return caches.match(workbox.precaching.getCacheKeyForURL('/statics/fallback_video.mp4'))
         }
         default:
-          logDebug('fallback default', event.request)
+          logDebug('fallback default (get from network)', event.request)
           // If we don't have a fallback, just return an error response.
-          return Response.error()
+          // return Response.error()
+          return await fetch(event.request.clone())
       }
     })
   }

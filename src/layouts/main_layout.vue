@@ -66,6 +66,10 @@ export default {
       let vh = window.innerHeight * 0.01
       document.documentElement.style.setProperty('--vh', `${vh}px`)
       this.height = vh
+    },
+    async closeTutorial(){
+      await this.$refs.kTutorialDialog.hide()
+      this.loading = false
     }
   },
   async mounted () {
@@ -89,9 +93,8 @@ export default {
       await this.$router.push('/login')
       return
     }
-    this.loading = false
     if (this.$store.state.objects.currentUser.profile.tutorial) this.$refs.kTutorialDialog.show()
-    // this.$refs.kTutorialDialog.show()
+    else this.loading = false
   }
  }
 </script>

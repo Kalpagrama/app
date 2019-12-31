@@ -26,12 +26,11 @@
         //-   outline no-caps color="white" @click="$go('/login')"
         //-   :style=`{height: '60px', borderRadius: '10px'}`).full-width
         //-   span {{$t('Back')}}
-      div(v-else).row.full-width
+      div(v-else).row.full-width.q-mb-sm
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-mb-sm
           input(
             :placeholder="$t('Код')"
-            pattern="[0-9]*"
-            type="number"
+            type="email"
             v-model="code" filled @keyup.enter="codeSend()"
             ).full-width.bg-white.kinput
         q-btn(

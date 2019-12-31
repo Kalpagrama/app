@@ -263,6 +263,7 @@ export default {
           path: 'profile.tutorial',
           value: false
         })
+        await this.catAdd()
         this.$emit('hide')
       }
     },
@@ -281,11 +282,8 @@ export default {
   mounted () {
     this.$logD('mounted')
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$logD('beforeDestroy')
-    this.categoriesToAdd.map((cat) => {
-      this.catAdd({oid: cat})
-    })
   }
 }
 </script>
