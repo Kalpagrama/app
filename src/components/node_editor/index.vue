@@ -114,7 +114,7 @@ q-layout(view="hHh lpR fFf").bg-white
         div(v-if="true").row.full-width.justify-center
           textarea(
             v-model="node.name" ref="nodeNameInput" autofocus
-            placeholder="В чем суть?" rows="1" @input="nameChanged"
+            placeholder="В чем суть?" rows="3" @input="nameChanged"
             :style=`{fontSize: '30px', paddingLeft: '16px', paddingRight: '16px', paddingTop: '5px', paddingBottom: '5px', maxHeight: '150px'}`
             ).full-width.kinput.text-bold.text-black
         //- div(v-if="node.fragments[0]").row.full-width.bg-white.q-pa-sm

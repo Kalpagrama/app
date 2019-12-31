@@ -32,7 +32,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       @previewWidth="$event => fragmentWidth(0, $event)"
       @previewHeight="$event => fragmentHeight(0, $event)"
       @ended="fragmentEnded(0)"
-      @action="nodeAction"
+      @action="nodeActionStart"
       :visible="visible"
       :fragment="nodeFull ? nodeFull.fragments[0] : null"
       :mini="fragmentMini === 0" @mini="fragmentChange(0)"
@@ -49,7 +49,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       @previewWidth="$event => fragmentWidth(1, $event)"
       @previewHeight="$event => fragmentHeight(1, $event)"
       @ended="fragmentEnded(1)"
-      @action="nodeAction"
+      @action="nodeActionStart"
       :visible="visible"
       :fragment="nodeFull ? nodeFull.fragments[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(1)"
@@ -310,10 +310,43 @@ export default {
         this.$refs.fragmentSecond.play()
       }
     },
-    nodeAction () {
-      this.$log('nodeAction')
+    nodeActionStart () {
+      this.$log('nodeActionStart')
+      this.$store.dispatch('ui/action', [
+        {
+          timeout: 4000,
+          payload: this.nodeFull,
+          name: this.node.name,
+          actions: {
+            save: {name: 'Save to WS'},
+            confirm: {name: 'Mix node'}
+          }
+        },
+        this.nodeAction
+      ])
       this.$store.commit('node/stateSet', ['nodeOptionsPayload', JSON.parse(JSON.stringify(this.nodeFull))])
       this.$store.commit('node/stateSet', ['nodeOptionsDialogOpened', true])
+    },
+    nodeAction (action) {
+      this.$log('nodeAction', action)
+      switch (action) {
+        case 'confirm': {
+          this.$log('MIX MIX MIX')
+          let nodeInput = this.nodeFull
+          delete nodeInput.oid
+          this.$store.commit('workspace/stateSet', ['wsItem', {type: 'node', item: nodeInput}], { root: true })
+          this.$router.push('/create')
+          break
+        }
+        case 'save': {
+          this.$log('SAVE SAVE')
+          let nodeInput = this.nodeFull
+          delete nodeInput.oid
+          this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(nodeInput)), { root: true })
+          break
+        }
+      }
+      this.$log('nodeAction done')
     },
     async nodeVote (rate = 0.5) {
       try {

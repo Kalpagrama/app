@@ -50,6 +50,7 @@ div(:style=`{position: 'relative', maxWidth: '100%'}`).row.fit
     v-if="now"
     :style=`{position: 'absolute', bottom: '0px', zIndex: 105, height: '28px'}`).row.full-width.q-px-md
     //- progress width
+    //- span.text-white.text-bold now: {{now}}
     div(
       v-show="!mini"
       :style=`{position: 'relative', height: '28px'}` @click="progressClick").row.full-width.cursor-pointer
@@ -134,6 +135,7 @@ export default {
       if (this.ctx === 'inEditor') {
         this.now = this.player.currentTime
       } else {
+        // this.now = this.player.currentTime
         this.now = this.$refs.ncFragmentVideo.currentTime
         this.player.currentTime = this.$refs.ncFragmentVideo.currentTime
         this.player.duration = this.$refs.ncFragmentVideo.duration

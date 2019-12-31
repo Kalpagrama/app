@@ -11,7 +11,8 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-secondary
         k-logo(:width="40" :height="40")
       div(v-if="!mini").col.full-height
         .row.fit.items-center
-          span.text-bold.text-white {{$t('Кальпаграмма ver:') + $store.state.core.version}}
+          //- span.text-bold.text-white {{$t('Кальпаграмма ver:') + $store.state.core.version}}
+          span.text-white.text-bold Кальпаграмма 1.0.1
     div(@click="$go('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user

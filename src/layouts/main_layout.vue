@@ -6,28 +6,9 @@ iframe {
 </style>
 
 <template lang="pug">
-//- .row.fit.items-center.justify-center
-  //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    //- k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
-  //- k-spinner(v-if="loading")
-  //- q-resize-observer(@resize="onResize")
-  //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
 .row.full-width.items-start.content-start
-  //- transition(appear enter-active-class="animated fadeIn")
-  //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-  //-   k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
-  //- k-dialog-bottom(
-  //-   :value="$store.state.node.nodeOptionsDialogOpened"
-  //-   :options="$store.state.node.nodeOptions"
-  //-   @action="$event => $store.dispatch('node/nodeAction', $event)"
-  //-   @hide="$store.commit('node/stateSet', ['nodeOptionsDialogOpened', false])")
-  //- iframe(v-if="showIframe" frameborder="0" src="https://www.youtube.com/embed/QywBr6-K2zM" height="500").bg
   k-action
   router-view(v-if="!loading")
-  //- .row.full-width.items-start.content-start
-  //-   div(:style=`{height: '500px'}`).row.full-width
-  //-   iframe(v-if="true" frameborder="0" src="https://www.youtube.com/embed/QywBr6-K2zM" height="500").bg
-  //-   div(:style="{height: '2000px', background: 'red'}").row.full-width
 </template>
 
 <script>
