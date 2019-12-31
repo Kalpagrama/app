@@ -50,7 +50,7 @@ export default {
     return {
       now: 0,
       player: null,
-      playing: false,
+      // playing: false,
       muted: true
     }
   },
@@ -78,8 +78,15 @@ export default {
     seeked () {
       this.$log('seeked')
     },
-    touchstart (e) {
-      this.$log('touchstart', e)
+    playing (e) {
+      this.$log('playing', e)
+      this.playing = true
+      this.player.playing = true
+    },
+    paused () {
+      this.$log('paused')
+      this.playing = false
+      this.player.playing = false
     },
     mutedToggle () {
       this.$log('mutedToggle')
@@ -104,6 +111,8 @@ export default {
           clickToPlayPause: true,
           success: async (mediaElement, originalNode, instance) => {
             this.player = mediaElement
+            this.player.addEventListener('playing', this.playing, {passive: true})
+            this.player.addEventListener('pause', this.paused, {passive: true})
             this.player.addEventListener('timeupdate', this.timeupdate, {passive: true})
             this.player.addEventListener('seeked', this.seeked, {passive: true})
             this.muted = false
@@ -126,6 +135,8 @@ export default {
   beforeDestroy () {
     this.$log('beforeDestroy')
     if (this.ctx === 'inEditor') {
+      this.player.removeEventListener('playing', this.playing)
+      this.player.removeEventListener('pause', this.paused)
       this.player.removeEventListener('timeupdate', this.timeupdate)
       this.player.removeEventListener('seeked', this.seeked)
       this.player.remove()

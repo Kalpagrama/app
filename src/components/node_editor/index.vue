@@ -101,7 +101,7 @@ q-layout(view="hHh lpR fFf").bg-white
                         :style=`{position: 'relative'}` v-ripple=`{color: 'white'}`
                         ).col.full-height.cursor-pointer
                         .row.fit.items-center.content-center.q-px-sm
-                          small.text-black {{ f.order }}
+                          //- small.text-black {{ f.order }}
                           span(
                             :class=`{'text-bold': fi === node.fragments.length-1}`
                             :style=`{maxWidth: '80%', overflow: 'hidden'}`
@@ -175,7 +175,7 @@ export default {
     dragOptions() {
       return {
         animation: 0,
-        group: 'description',
+        group: 'fragments',
         disabled: false,
         ghostClass: 'ghost'
       }

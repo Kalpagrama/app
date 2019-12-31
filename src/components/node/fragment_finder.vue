@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{minHeight: '74px'}`).row.full-width.items-center.content-center.bg-white
+div(:style=`{position: 'relative', minHeight: '74px'}`).row.full-width.items-center.content-center.bg-white
   div(v-if="!videoShow").row.full-width
     //- find in ws
     q-dialog(v-model="wsDialogShow" ref="wsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
@@ -27,6 +27,11 @@ div(:style=`{minHeight: '74px'}`).row.full-width.items-center.content-center.bg-
     :src="videoUrl"
     @loadeddata="videoLoad" @error="videoError"
     :style=`{width: '100%'}`)
+  //- div(:style=`{
+  //-   position: 'absolute', zIndex: 1000, top: '8px', opacity: 0.5,
+  //-   height: $q.screen.height-130+'px',
+  //-   borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-red
+  //-   h1.text-white hello
 </template>
 
 <script>

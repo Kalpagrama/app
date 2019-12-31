@@ -94,7 +94,7 @@ export default {
   methods: {
     async play () {
       this.$log('play')
-      this.$q.notify('PLAY' + localStorage.getItem('kmute'))
+      // this.$q.notify('PLAY' + localStorage.getItem('kmute'))
       if (this.player) this.player.play()
       if (localStorage.getItem('kmute') === 'yes') this.player.setMuted(true)
     },

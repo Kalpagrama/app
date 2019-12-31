@@ -15,7 +15,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       flat round color="white" :icon="fullscreen ? 'fullscreen_exit' : 'fullscreen'" @click="fullscreen = !fullscreen"
       :style=`{
         position: 'absolute', zIndex: 200,
-        right: '16px', top: fullscreen ? '216px' : '16px',
+        left: '16px', top: fullscreen ? '300px' : '100px',
         background: 'rgba(0,0,0,0.3)'}`)
     fragment-video(
       v-if="fragment.content.type === 'VIDEO'"

@@ -26,7 +26,7 @@ div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 
     q-btn(
       round push color="green" @click="$emit('edited')"
       icon="keyboard_arrow_up"
-      :style=`{position: 'absolute', zIndex: 1000, right: '16px', top: '50px'}`)
+      :style=`{position: 'absolute', zIndex: 1000, right: '16px', top: '16px'}`)
     fragment(
       ctx="inEditor" :fragment="fragment" ref="nodeFragment"
       @previewHeight="fragmentHeight = $event" @previewWidth="fragmentWidth = $event"
