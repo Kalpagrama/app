@@ -63,7 +63,7 @@ q-layout(view="hHh lpR fFf").bg-white
         //- .row.full-width.q-px-md.q-pa-sm
         //-   span(:style=`{fontSize: '17px'}`).text-bold {{$t('Добавить образ')}}
         .row.full-width.bg-white.q-px-sm
-          fragment-finder(@fragment="$event => fragmentFound(node.fragments.length, $event)")
+          fragment-finder(ref="fragmentFinder" @fragment="$event => fragmentFound(node.fragments.length, $event)")
         //- div(:style=`{position: 'relative'}`).column.full-width
         //-   div(:style=`{maxHeight: $q.screen.height/2+'px'}`).col.full-width.scroll
         //- .row.full-width.q-px-md.q-pa-sm
@@ -359,32 +359,47 @@ export default {
     // wsItem
     let wsItem = JSON.parse(JSON.stringify(this.$store.state.workspace.wsItem))
     this.$log('wsItem', wsItem)
+    // shareItem
+    let shareItem = JSON.parse(JSON.stringify(this.$store.state.core.shareData))
+    this.$log('shareItem', shareItem)
     // checks
     if (wsItem) {
-      switch (wsItem.type) {
-        case 'content': {
-          this.fragmentFound(0, {
-            name: '',
-            cuts: [],
-            content: wsItem.item,
-            scale: wsItem.item.duration
-          })
-          break
+      if (shareItem) {
+        let shareUrl = shareItem.text || shareItem.url || shareItem.title
+        // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
+        if (shareUrl) {
+          this.$log('shareUrl', shareUrl)
+          this.$refs.fragmentFinder.urlUse(shareUrl)
+        } else if (shareItem.images.length || shareItem.videos.length) {
+          // todo использовать как фрагменты
         }
-        case 'fragment': {
-          this.fragmentFound(0, wsItem.item)
-          break
+        this.$store.commit('core/stateSet', ['shareData', null])
+      } else {
+        switch (wsItem.type) {
+          case 'content': {
+            this.fragmentFound(0, {
+              name: '',
+              cuts: [],
+              content: wsItem.item,
+              scale: wsItem.item.duration
+            })
+            break
+          }
+          case 'fragment': {
+            this.fragmentFound(0, wsItem.item)
+            break
+          }
+          case 'cut': {
+            this.fragmentFound(0, wsItem.item)
+            break
+          }
+          case 'node': {
+            this.$set(this, 'node', wsItem.item)
+            break
+          }
         }
-        case 'cut': {
-          this.fragmentFound(0, wsItem.item)
-          break
-        }
-        case 'node': {
-          this.$set(this, 'node', wsItem.item)
-          break
-        }
+        this.$store.commit('workspace/stateSet', ['wsItem', null])
       }
-      this.$store.commit('workspace/stateSet', ['wsItem', null])
     } else {
       if (lsItem) {
         this.$set(this, 'node', lsItem)
