@@ -25,7 +25,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       .row.full-width.justify-center
         span(:style=`{fontSize: '50px'}`
           ).text-bold.text-white.text-center {{ voteLabel }}
-    nc-fragment(
+    component(:is="fc ? fc : 'nc-fragment'"
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
       :thumbUrl="node.meta.fragments[0].thumbUrl"
@@ -42,7 +42,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
         maxWidth: styles[0].maxWidth+'%',
         bottom: styles[0].bottom+'px',
         right: styles[0].right+'px'}`)
-    nc-fragment(
+    component(:is="fc ? fc : 'nc-fragment'"
       ref="fragmentSecond"
       :ctx="ctx" :index="1"
       :thumbUrl="node.meta.fragments[1].thumbUrl"
@@ -123,17 +123,18 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
           span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
     //- timestamp
     .row.full-width.justify-start.q-pa-md
-      small.text-grey-7 20.12.2019
+      small.text-grey-7 31.12.2019
 </template>
 
 <script>
+import nodeFragment from 'components/node/fragment'
 import ncFragment from 'components/node_composer/nc_fragment'
 
 export default {
   name: 'nodeNew',
   // TODO заменить имя св-ва visible на active
-  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
-  components: {ncFragment},
+  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'fc'],
+  components: {nodeFragment, ncFragment},
   data () {
     return {
       nodeFullError: null,
