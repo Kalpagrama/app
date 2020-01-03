@@ -2,7 +2,7 @@ import {LogLevelEnum, LogModulesEnum} from 'src/boot/log'
 export default {
   initialized: false,
   name: 'Kalpagramma',
-  version: '1.0.0',
+  version: '1.0.1',
   online: true, // если сеть недоступна - присваивается false
   shareData: null, // данные от меню "поделиться в приложение"
   webPushToken: null,
