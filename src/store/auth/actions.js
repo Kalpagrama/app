@@ -23,6 +23,33 @@ export const init = async (context) => {
   })
   context.commit('init', { userIsAuthorized, userIsConfirmed })
 }
+export const inviteEmail = async (context, email) => {
+  logD('@invite start')
+  let { data: { inviteEmail } } = await apolloProvider.clients.authApollo.mutate({
+    mutation: gql`
+      mutation sw_network_only_inviteEmail ($email: String!){
+        inviteEmail(email: $email)
+      }
+    `,
+    variables: {
+      email: email
+    }
+  })
+  logD('@invite done')
+  return inviteEmail
+}
+export const inviteUrl = async (context) => {
+  logD('@invite start')
+  let { data: { inviteUrl } } = await apolloProvider.clients.authApollo.mutate({
+    mutation: gql`
+      mutation sw_network_only_inviteUrl{
+        inviteUrl
+      }
+    `
+  })
+  logD('@invite done')
+  return inviteUrl
+}
 export const logout = async (context, token) => {
   logD('@logout start')
   try {

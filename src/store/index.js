@@ -10,6 +10,8 @@ import events from './events'
 import subscriptions from './subscriptions'
 import objects from './objects'
 import user from './user'
+import lists from './lists'
+import content from './content'
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 import i18next from 'i18next'
@@ -70,6 +72,8 @@ async function init (context) {
   await context.dispatch('workspace/init')
   await context.dispatch('subscriptions/init')
   await context.dispatch('user/init')
+  await context.dispatch('lists/init')
+  await context.dispatch('content/init')
   context.commit('events/stateSet', ['userEvents', user.events], { root: true })
   await i18next.changeLanguage(user.profile.lang)
 
@@ -108,7 +112,9 @@ export default function (/* { ssrContext } */) {
       events,
       subscriptions,
       objects,
-      user
+      user,
+      lists,
+      content
     },
     strict: process.env.DEV,
     actions: {

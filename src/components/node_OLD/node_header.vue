@@ -75,20 +75,21 @@ export default {
         }
         case 'report': {
           this.$logD('handleAction', a.id)
-          var r = confirm('Report ?')
+          var r = confirm(this.$t('delete_node_ask', 'delete node ?'))
           if (!r) return
-          this.$logD('reporting...')
-          await this.$apollo.mutate({
-            mutation: gql`
-              mutation sw_network_only_deleteNode($oid: OID!) {
-                deleteObject (oid: $oid)
-              }
-            `,
-            variables: {
-              oid: this.node.oid
-            }
-          })
-          this.$logD('reported!')
+          this.$logD('deleting...')
+          let res = await this.$store.dispatch('node/nodeDelete', this.node.oid)
+          // await this.$apollo.mutate({
+          //   mutation: gql`
+          //     mutation sw_network_only_deleteNode($oid: OID!) {
+          //       deleteObject (oid: $oid)
+          //     }
+          //   `,
+          //   variables: {
+          //     oid: this.node.oid
+          //   }
+          // })
+          this.$logD('deleted!')
         }
       }
     }

@@ -60,7 +60,19 @@ export const nodeRate = async (context, { oid, rate }) => {
 
 export const nodeDelete = async (context, oid) => {
   logD('nodeDelete start')
+  assert.ok(oid)
+  let { data: { deleteObject } } = await apolloProvider.clients.apiApollo.mutate({
+    mutation: gql`
+      mutation sw_network_only_deleteNode($oid: OID!) {
+        deleteObject (oid: $oid)
+      }
+    `,
+    variables: {
+      oid: oid
+    }
+  })
   logD('nodeDelete dones')
+  return deleteObject
 }
 
 export const nodeCreate = async (context, node) => {
@@ -133,87 +145,4 @@ export const nodeCreate = async (context, node) => {
   })
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
-}
-
-export const sphereSpheres = async (context, oid) => {
-  logD('sphereSpheres start')
-  assert.ok(oid)
-  let { data: { sphereSpheres: { items: spheres } } } = await apolloProvider.clients.apiApollo.query({
-    query: gql`
-      query sphereSpheres ($oid: OID!){
-        sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
-          items {
-            oid
-            name
-          }
-        }
-      }
-    `,
-    variables: {
-      oid: oid
-    }
-  })
-  logD('sphereSpheres complete')
-  return spheres
-}
-
-export const sphereNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
-  logD('sphereNodes start')
-  let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apolloProvider.clients.apiApollo.query({
-    query: gql`
-      ${fragments.objectShortWithMetaFragment}
-      query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-        sphereNodes (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-          count
-          totalCount
-          nextPageToken
-          items {... objectShortWithMetaFragment}
-        }
-      }
-    `,
-    variables: { oid, pagination, filter, sortStrategy }
-  })
-  logD('sphereNodes complete')
-  return { items, count, totalCount, nextPageToken }
-}
-
-export const nodeNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
-  logD('nodeNodes start')
-  let { data: { nodeNodes: { items, count, totalCount, nextPageToken } } } = await apolloProvider.clients.apiApollo.query({
-    query: gql`
-      ${fragments.objectShortWithMetaFragment}
-      query nodeNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-        nodeNodes (nodeOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-          count
-          totalCount
-          nextPageToken
-          items {... objectShortWithMetaFragment}
-        }
-      }
-    `,
-    variables: { oid, pagination, filter, sortStrategy }
-  })
-  logD('nodeNodes complete')
-  return { items, count, totalCount, nextPageToken }
-}
-
-export const feed = async (context, {pagination}) => {
-  logD('feed start')
-  assert.ok(pagination)
-  let { data: { feed: { items, count, totalCount, nextPageToken } } } = await apolloProvider.clients.apiApollo.query({
-    query: gql`
-      ${fragments.objectShortWithMetaFragment}
-      query feed ($pagination: PaginationInput!) {
-        feed (pagination: $pagination) {
-          count
-          totalCount
-          nextPageToken
-          items {... objectShortWithMetaFragment}
-        }
-      }
-    `,
-    variables: { pagination }
-  })
-  logD('feed complete')
-  return { items, count, totalCount, nextPageToken }
 }

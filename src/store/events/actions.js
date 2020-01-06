@@ -10,7 +10,6 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
-  // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
   logD('init', context.rootState.objects.currentUser.events)
   const observerEvent = apolloProvider.clients.wsApollo.subscribe({

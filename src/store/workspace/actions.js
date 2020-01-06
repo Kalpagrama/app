@@ -14,7 +14,18 @@ export const init = async (context) => {
   context.commit('init', context.rootState.objects.currentUser.workspace)
   return true
 }
-
+export const wsClear = async (context) => {
+  logD('wsClear start')
+  let { data: { wsClear } } = await apolloProvider.clients.apiApollo.mutate({
+    mutation: gql`
+      mutation sw_network_only_wsClear {
+        wsClear
+      }
+    `
+  })
+  logD('wsClear done', wsClear)
+  return wsClear
+}
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
 export const wsSphereCreate = async (context, sphere) => {
   logD('wsSphereCreate start', sphere)

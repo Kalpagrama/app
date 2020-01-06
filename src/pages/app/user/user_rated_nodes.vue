@@ -69,7 +69,7 @@ export default {
       return {
         oid: this.sphereOid,
         pagination: { pageSize: 100 },
-        sortStrategy: 'HOT',
+        sortStrategy: 'AGE',
         // filter: { types: ['NODE'], fastFilters: ['VOTED_BY_USER']}
         filter: this.filter
       }

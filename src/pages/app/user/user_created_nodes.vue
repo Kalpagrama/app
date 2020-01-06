@@ -34,7 +34,7 @@ export default {
       return {
         oid: this.sphereOid,
         pagination: { pageSize: 100 },
-        sortStrategy: 'HOT',
+        sortStrategy: 'AGE',
         filter: this.filter
         // filter: { types: ['NODE'], fastFilters: ['CREATED_BY_USER']} // JSON.parse(JSON.stringify(this.filter))
       }

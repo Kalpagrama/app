@@ -54,13 +54,13 @@ export default {
       let res
       switch (this.type){
         case 'sphereNodes' :
-          res = await this.$store.dispatch('node/sphereNodes', { oid, pagination, filter, sortStrategy })
+          res = await this.$store.dispatch('lists/sphereNodes', { oid, pagination, filter, sortStrategy })
           break
         case 'feed' :
-          res = await this.$store.dispatch('node/feed', { oid, pagination, filter, sortStrategy })
+          res = await this.$store.dispatch('lists/feed', { oid, pagination, filter, sortStrategy })
           break
         case 'nodeNodes' :
-          res = await this.$store.dispatch('node/nodeNodes', { oid, pagination, filter, sortStrategy })
+          res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
         default: throw new Error(`unknown type ${this.type}`)
       }

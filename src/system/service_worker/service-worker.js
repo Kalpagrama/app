@@ -1,4 +1,4 @@
-const swVer = 1
+const swVer = 7
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
   cacheGraphQl,
@@ -145,8 +145,13 @@ if (useCache) {
   // custom resolver for graphql & video requests
   {
     cacheGraphQl = async function (event) {
+      logDebug('cacheGraphQl start')
       let requestCopy = event.request.clone()
-      let body = await requestCopy.json()
+      let body
+      try {
+        body = await requestCopy.json()
+      } catch (err) { }
+      if (!body) return await networkOnly(event, gqlStore) // например, upload (multipart/form-data)
       logDebug('gql cacheGraphQl', body.operationName)
       let type = body && body.query && body.query.startsWith('mutation') ? 'mutation' : 'query'
       if (body.operationName.startsWith('sw_network_only_')) {
@@ -154,7 +159,7 @@ if (useCache) {
       } else if (body.operationName.startsWith('sw_cache_only_')) {
         return await cacheOnly(event, gqlStore)
       } else if (body.operationName.startsWith('sw_network_first_')) {
-        return await networkFirst(event, gqlStore, 400)
+        return await networkFirst(event, gqlStore, 1200)
       } else if (body.operationName.startsWith('sw_cache_first_')) {
         return await cacheFirst(event, gqlStore)
       } else if (body.operationName.startsWith('sw_stale_')) {
@@ -257,7 +262,7 @@ if (useCache) {
       }
       let res = {
         url: requestCopy.url,
-        headers: serializedHeaders,
+        headers: serializedHeaders
       }
       if (requestCopy.method === 'POST') {
         res.body = await requestCopy.json()
@@ -324,7 +329,7 @@ if (useCache) {
       })
     )
     workbox.routing.registerRoute( // vue router ( /menu /create etc looks at index.html)
-      /\/\w+\/?$/,
+      /\/(?!graphql)\w+\/?$/,
       async ({ url, event, params }) => {
         logDebug('vue router 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
         if (workbox.precaching.getCacheKeyForURL('/index.html')) {
@@ -378,8 +383,9 @@ if (useCache) {
         default:
           logDebug('fallback default (get from network)', event.request)
           // If we don't have a fallback, just return an error response.
-          // return Response.error()
-          return await fetch(event.request.clone())
+          return Response.error()
+        // return await fetch(event.request)
+        // return await fetch(event)
       }
     })
   }

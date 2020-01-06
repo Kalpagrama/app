@@ -49,18 +49,19 @@ export default {
     async emailSend () {
       try {
         this.$logD('invite emailSend start', this.email)
-        if (this.email.length === 0) throw { message: 'Не верная почта' }
+        if (this.email.length === 0) throw { message: 'Неверная почта' }
         this.emailSending = true
-        let { data: { inviteEmail } } = await this.$apollo.mutate({
-          mutation: gql`
-            mutation sw_network_only_inviteEmail ($email: String!){
-              inviteEmail(email: $email)
-            }
-          `,
-          variables: {
-            email: this.email
-          }
-        })
+        let inviteEmail = await this.$store.dispatch('auth/inviteEmail', this.email)
+        // let { data: { inviteEmail } } = await this.$apollo.mutate({
+        //   mutation: gql`
+        //     mutation sw_network_only_inviteEmail ($email: String!){
+        //       inviteEmail(email: $email)
+        //     }
+        //   `,
+        //   variables: {
+        //     email: this.email
+        //   }
+        // })
         this.$logD('emailSend done', inviteEmail)
         this.emailSending = false
         this.emailSent = true
@@ -77,16 +78,17 @@ export default {
       try {
         this.$logD('invite linkGet start', this.link)
         this.linkGetting = true
-        let { data: { inviteUrl } } = await this.$apollo.mutate({
-        mutation: gql`
-          mutation sw_network_only_inviteUrl {
-            inviteUrl
-          }
-        `,
-        variables: {
-          link: this.link
-        }
-        })
+        let inviteUrl = await this.$store.dispatch('auth/inviteUrl')
+        // let { data: { inviteUrl } } = await this.$apollo.mutate({
+        // mutation: gql`
+        //   mutation sw_network_only_inviteUrl {
+        //     inviteUrl
+        //   }
+        // `,
+        // variables: {
+        //   link: this.link
+        // }
+        // })
         this.$logD('linkGet done', inviteUrl)
         this.linkGetting = false
         this.link = inviteUrl

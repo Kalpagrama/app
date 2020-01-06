@@ -98,26 +98,27 @@ export default {
       this.$log('url CHANGED', to)
       this.urlInputLoading = true
       // TODO: show progress
-      let content = await this.contentGetByUrl(to, true)
+      let content = await this.contentGetByUrl(to)
       this.itemFound({type: 'content', item: content})
       this.urlInputLoading = false
     },
-    async contentGetByUrl (url, onlyMeta = true) {
+    async contentGetByUrl (url) {
       this.$log('contentGetByUrl start')
-      let {data: {uploadContentUrl}} = await this.$apollo.mutate({
-        mutation: gql`
-          ${fragments.objectFullFragment}
-          mutation sw_network_only_nc_contentGetByUrl ($url: String!, $onlyMeta: Boolean!) {
-            uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
-              ...objectFullFragment
-            }
-          }
-        `,
-        variables: {
-          url: url,
-          onlyMeta: onlyMeta
-        }
-      })
+      let uploadContentUrl = await this.$store.dispatch('content/uploadContentUrl', url)
+      // let {data: {uploadContentUrl}} = await this.$apollo.mutate({
+      //   mutation: gql`
+      //     ${fragments.objectFullFragment}
+      //     mutation sw_network_only_nc_contentGetByUrl ($url: String!, $onlyMeta: Boolean!) {
+      //       uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
+      //         ...objectFullFragment
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     url: url,
+      //     onlyMeta: onlyMeta
+      //   }
+      // })
       this.$log('contentGetByUrl done')
       return uploadContentUrl
     },
@@ -138,27 +139,28 @@ export default {
       let url = URL.createObjectURL(file)
       // this.videoUrl = url
       // this.videoShow = true
-      let content = await this.contentGetByFile(file, false)
+      let content = await this.contentGetByFile(file)
       this.$log('content', content)
       this.itemFound({type: 'content', item: content})
     },
-    async contentGetByFile (file, onlyMeta = true) {
+    async contentGetByFile (file) {
       this.$log('contentGetByFile start')
-      let { data: {uploadContentFile} } = await this.$apollo.mutate({
-        mutation: gql`
-          ${fragments.objectFullFragment}
-          mutation sw_network_only_nc_contentGetByFile ($file: Upload!, $length: Float!) {
-            uploadContentFile(file: $file, length: $length) {
-              ...objectFullFragment
-            }
-          }
-        `,
-        variables: {
-          file: file,
-          length: file.size
-        },
-        client: 'uploadApollo'
-      })
+      let uploadContentFile = await this.$store.dispatch('content/uploadContentFile', file)
+      // let { data: {uploadContentFile} } = await this.$apollo.mutate({
+      //   mutation: gql`
+      //     ${fragments.objectFullFragment}
+      //     mutation sw_network_only_nc_contentGetByFile ($file: Upload!, $length: Float!) {
+      //       uploadContentFile(file: $file, length: $length) {
+      //         ...objectFullFragment
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     file: file,
+      //     length: file.size
+      //   },
+      //   client: 'uploadApollo'
+      // })
       this.$log('contentGetByFile done')
       return uploadContentFile
     }

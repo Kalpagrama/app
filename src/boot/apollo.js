@@ -7,14 +7,12 @@ import introspectionQueryResultData from '../schema/graphql.schema.json'
 import { createUploadLink } from 'apollo-upload-client'
 // import { persistCache } from 'apollo-cache-persist'
 import VueApollo from 'vue-apollo'
-import axios from 'axios'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
 
 let apolloProvider
 
-// todo remove axios
 export default async ({ Vue, store, app }) => {
   try {
 
@@ -22,27 +20,27 @@ export default async ({ Vue, store, app }) => {
     logE(err)
   }
 
-  axios.interceptors.request.use((request) => {
-    // Do something with response data
-    logD('axios request', request)
-    let d = localStorage.getItem('kdebug')
-    if (d) request.headers['X-Kalpagramma-debug'] = d
-    return request
-  }, (error) => {
-    // Do something with response error
-    // localStorage.removeItem('kdebug')
-    return Promise.reject(error)
-  })
-  axios.interceptors.response.use(response => {
-    logD('axios response', response)
-    if (response.request) {
-    } else {
-    }
-    return response
-  }, (error) => {
-    return Promise.reject(error)
-  })
-  Vue.prototype.$axios = axios
+  // axios.interceptors.request.use((request) => {
+  //   // Do something with response data
+  //   logD('axios request', request)
+  //   let d = localStorage.getItem('kdebug')
+  //   if (d) request.headers['X-Kalpagramma-debug'] = d
+  //   return request
+  // }, (error) => {
+  //   // Do something with response error
+  //   // localStorage.removeItem('kdebug')
+  //   return Promise.reject(error)
+  // })
+  // axios.interceptors.response.use(response => {
+  //   logD('axios response', response)
+  //   if (response.request) {
+  //   } else {
+  //   }
+  //   return response
+  // }, (error) => {
+  //   return Promise.reject(error)
+  // })
+  // Vue.prototype.$axios = axios
   // let mode =   'offline'
   // if (mode === 'offline') return
   // apollo
