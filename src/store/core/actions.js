@@ -3,6 +3,12 @@ import { apolloProvider } from 'boot/apollo'
 export const init = async (context) => {
   if (context.state.initialized) return
   let token = context.state.webPushTokenDraft
+  await setWebPushToken(context, token)
+  context.commit('init')
+  return true
+}
+export const setWebPushToken = async (context, token) => {
+  if (context.state.initialized) return
   if (token) {
     if (context.state.webPushToken === token) return // это значение было отправлено ранее и сервер уже знает его
     let { data: { objectChange } } = await apolloProvider.clients.authApollo.mutate({
@@ -17,6 +23,5 @@ export const init = async (context) => {
     })
     context.commit('stateSet', ['webPushToken', token])
   }
-  context.commit('init')
   return true
 }

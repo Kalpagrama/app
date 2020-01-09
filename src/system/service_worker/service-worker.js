@@ -1,4 +1,4 @@
-const swVer = 7
+const swVer = 8
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
   cacheGraphQl,
@@ -145,32 +145,39 @@ if (useCache) {
   // custom resolver for graphql & video requests
   {
     cacheGraphQl = async function (event) {
-      logDebug('cacheGraphQl start')
-      let requestCopy = event.request.clone()
-      let body
       try {
-        body = await requestCopy.json()
-      } catch (err) { }
-      if (!body) return await networkOnly(event, gqlStore) // например, upload (multipart/form-data)
-      logDebug('gql cacheGraphQl', body.operationName)
-      let type = body && body.query && body.query.startsWith('mutation') ? 'mutation' : 'query'
-      if (body.operationName.startsWith('sw_network_only_')) {
-        return await networkOnly(event, gqlStore)
-      } else if (body.operationName.startsWith('sw_cache_only_')) {
-        return await cacheOnly(event, gqlStore)
-      } else if (body.operationName.startsWith('sw_network_first_')) {
-        return await networkFirst(event, gqlStore, 1200)
-      } else if (body.operationName.startsWith('sw_cache_first_')) {
-        return await cacheFirst(event, gqlStore)
-      } else if (body.operationName.startsWith('sw_stale_')) {
-        return await StaleWhileRevalidate(event, gqlStore)
-      } else {
-        logDebug(`gql warn. query ${body.operationName} not contains sw strategy. use defaults`)
-        if (type === 'mutation') {
-          return await networkFirst(event, gqlStore)
-        } else {
-          return await networkFirst(event, gqlStore)
+        logDebug('cacheGraphQl start')
+        let requestCopy = event.request.clone()
+        let body
+        try {
+          body = await requestCopy.json()
+        } catch (err) {
         }
+        if (!body || !body.operationName) return await networkOnly(event, gqlStore) // например, upload (multipart/form-data)
+        logDebug('gql cacheGraphQl', body.operationName)
+        let type = body && body.query && body.query.startsWith('mutation') ? 'mutation' : 'query'
+        if (body.operationName.startsWith('sw_network_only_')) {
+          return await networkOnly(event, gqlStore)
+        } else if (body.operationName.startsWith('sw_cache_only_')) {
+          return await cacheOnly(event, gqlStore)
+        } else if (body.operationName.startsWith('sw_network_first_')) {
+          return await networkFirst(event, gqlStore, 1200)
+        } else if (body.operationName.startsWith('sw_cache_first_')) {
+          return await cacheFirst(event, gqlStore)
+        } else if (body.operationName.startsWith('sw_stale_')) {
+          return await StaleWhileRevalidate(event, gqlStore)
+        } else {
+          logDebug(`gql warn. query ${body.operationName} not contains sw strategy. use defaults`)
+          if (type === 'mutation') {
+            return await networkFirst(event, gqlStore)
+          } else {
+            return await networkFirst(event, gqlStore)
+          }
+        }
+      } catch (e) {
+        logCritical('error on cacheGraphQl', e)
+        throw e
+        // return await networkOnly(event, gqlStore)
       }
     }
     cacheVideo = async function (event) {

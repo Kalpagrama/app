@@ -67,8 +67,8 @@ export const logout = async (context, token) => {
     logE('error on logout! err=', err)
   } finally {
     context.commit('objects/deleteUserSession', token, { root: true })
-    let currentToken = localStorage.getItem('ktoken').split('::')[0]
-    if (!token || token === localStorage.getItem('ktoken') || token === currentToken) {
+    // let currentToken = localStorage.getItem('ktoken').split('::')[0]
+    if (!token || token === localStorage.getItem('ktoken')) {
       localStorage.removeItem('ktoken')
       localStorage.removeItem('ktokenExpires')
       await checkUpdate()

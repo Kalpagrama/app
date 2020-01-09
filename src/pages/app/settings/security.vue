@@ -51,8 +51,8 @@ export default {
     },
     mytoken () {
       let str = localStorage.getItem('ktoken')
-      let newstr = str.split('::')[0]
-      return newstr
+      // let newstr = str.split('::')[0]
+      return str
     }
   },
   methods: {

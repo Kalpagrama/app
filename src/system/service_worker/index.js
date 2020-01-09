@@ -151,6 +151,7 @@ async function initSw (store) {
 
   window.addEventListener('online', handleNetworkChange)
   window.addEventListener('offline', handleNetworkChange)
+  store.commit('core/stateSet', ['online', navigator.onLine])
   logD('initSw OK!')
 }
 
