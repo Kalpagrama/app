@@ -37,48 +37,48 @@ q-layout(view="hHh lpR fFf").bg-grey-3
           q-btn(v-else round flat @click="save()" color="white" icon="done")
   q-page-container()
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      //- div(v-if="user").row.full-width.content-start.bg-primary
-      //-   //- header
-      //-   div(:style=`{height: '60px'}`).row.full-width
-      //-     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      //-       q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-      //-     .col
-      //-     .row
-      //-       div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      //-         q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-      //-         q-btn(v-else round flat @click="save()" color="white" icon="done")
-      //-       //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
-      //-         q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
-      //-   //- body
-      //-   div(v-if="true").row.full-width.q-px-sm.bg-primary
-      //-     //- <input type="file" @change="previewFiles" multiple>
-      //-     .row.full-width
-      //-       img(:src="user.profile.thumbUrl" @click="changePhoto()"
-      //-         :style=`{width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden'}`)
-      //-       div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
-      //-         q-btn(
-      //-           rounded no-caps
-      //-           @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
-      //-           :label="include ? $t('Unfollow') : $t('Follow')"
-      //-           :color="include ? 'red' : 'accent'"
-      //-           style=`height: 40px`
-      //-           ).q-px-md
-      //-     .row.full-width.items-center.justify-start
-      //-       .row.full-width
-      //-         span.text-bold.text-h6.text-white {{ user.name }}
-      //-       div(v-if="!editions").row.full-width
-      //-         .row.full-width
-      //-           span.text-grey-4 {{status}}
-      //-         .row.full-width.q-mb-sm
-      //-           span.text-grey {{about}}
-      //-       div(v-if="editions").row.full-width
-      //-         input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
-      //-         input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
-      //-         //- .row.full-width.q-mt-xs
-      //-         //-   small About
-      //-       div(v-if="false" @click="showInfo()").row.full-width
-      //-         span.text-accent Show detailed information
-      //-         //- span {{ user.subscriptions }}
+      div(v-if="user").row.full-width.content-start.bg-primary
+        //- header
+        div(:style=`{height: '60px'}`).row.full-width
+          div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+            q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+          .col
+          .row
+            div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+              q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+              q-btn(v-else round flat @click="save()" color="white" icon="done")
+            //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
+              q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
+        //- body
+        div(v-if="true").row.full-width.q-px-sm.bg-primary
+          //- <input type="file" @change="previewFiles" multiple>
+          .row.full-width
+            img(:src="user.profile.thumbUrl" @click="changePhoto()"
+              :style=`{width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden'}`)
+            div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
+              q-btn(
+                rounded no-caps
+                @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
+                :label="include ? $t('Unfollow') : $t('Follow')"
+                :color="include ? 'red' : 'accent'"
+                style=`height: 40px`
+                ).q-px-md
+          .row.full-width.items-center.justify-start
+            .row.full-width
+              span.text-bold.text-h6.text-white {{ user.name }}
+            div(v-if="!editions").row.full-width
+              .row.full-width
+                span.text-grey-4 {{status}}
+              .row.full-width.q-mb-sm
+                span.text-grey {{about}}
+            div(v-if="editions").row.full-width
+              input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
+              input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
+              //- .row.full-width.q-mt-xs
+              //-   small About
+            div(v-if="false" @click="showInfo()").row.full-width
+              span.text-accent Show detailed information
+              //- span {{ user.subscriptions }}
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(

@@ -66,13 +66,15 @@ div(:style=`{backgroundColor: 'rgba(0, 0, 0, 0.2)', }`).row.fit.content-center.j
           span.text-center.text-grey-4 {{$t('Add a profile photo that friends could recognize you.', 'Добавьте фото профиля чтобы друзья могли вас узнать.')}}
         .row.full-width.justify-center.q-mt-md
           q-btn(unelevated @click="changePhoto()" color="accent") {{$t('Add a photo')}}
-      div(style=`height: 50%`).row.row.full-width.justify-center
-        div(v-if="$store.state.user.user.profile.thumbUrl").row.full-width.justify-center.q-mt-md.content-start
+      div(style=`height: 50%`).row.row.full-width.justify-center.q-mt-md.content-start
+        div(v-if="$store.state.user.user.profile.thumbUrl").row.full-width.justify-center
           img(:src="$store.state.user.user.profile.thumbUrl" :style=`{width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
-          .row.full-width.justify-center.q-mt-md
-            span.text-h5.text-bold {{$store.state.user.user.name}}
+        div(v-else).row.full-width.justify-center
+          img(src="statics/default_photo.png" :style=`{width: '150px', height: '150px', position: 'center', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
+        .row.full-width.justify-center.q-mt-md
+          span.text-h5.text-bold {{$store.state.user.user.name}}
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
-        q-btn(v-model="slide" style=`height: 40px` @click="nextSlide()" color="accent" :label="$t('Next')")
+        q-btn(v-model="slide" style=`height: 40px` @click="afterPhoto()" color="accent" :label="$t('Next')")
     //- CATEGORIES
     q-carousel-slide(name="3").row.justify-center.content-start
       div(style=`height: 20%`).row
@@ -162,7 +164,7 @@ export default {
   methods: {
     async downloadPhoto (file) {
       try {
-        this.$log('changePhoto start')
+        this.$log('changePhoto start', file)
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
           path: 'profile.thumbUrl',
@@ -181,6 +183,15 @@ export default {
         this.file = e.target.files[0]
         this.downloadPhoto(this.file)
       } else throw new Error(`bad selected files len ${e.target.files.length}`)
+    },
+    afterPhoto () {
+      this.$log('afterPhoto')
+      this.slide = '3'
+      this.file = 'statics/default_photo.png'
+      this.$log('file changed', this.file)
+      if (!this.file && !this.$store.state.user.user.profile.thumbUrl) {
+        this.$log('default photo')
+      }
     },
     catDeleteClick (c, ci) {
       this.$logD('catDeleteClick', c)
@@ -257,7 +268,7 @@ export default {
       if (this.slide === '3') this.next = '4'
       if (this.slide === '4') this.next = '5'
       this.slide = this.next
-      if (this.next === '4') {
+      if (this.next === '5') {
         let res = await this.$store.dispatch('objects/setObjectValue', {
           oid: this.$store.state.objects.currentUser.oid,
           path: 'profile.tutorial',

@@ -1,6 +1,7 @@
 import { apolloProvider } from 'boot/apollo'
 import { fragments } from 'schema/index'
 import { Notify } from 'quasar'
+import { knotify } from 'src/boot/knotify'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
@@ -201,10 +202,15 @@ function notifyUserActionComplete (eventType, object) {
     {
       position: 'top',
       message: eventMessage,
+      color: 'white',
+      textColor: 'black',
       avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
+      multiLine: false,
+      timeout: 1000,
       actions: [{
-        label: i18n.t('Goto...'),
+        label: i18n.t('GO'),
         noDismiss: true,
+        color: 'green',
         handler: () => {
           // app/workspace/fragments
           let route = '/'
