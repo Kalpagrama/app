@@ -148,7 +148,7 @@ export default {
       ]
     },
     myoid () {
-      return this.$store.getters.currUser.oid
+      return this.$store.getters.currentUser.oid
     },
     countSubscribers () {
       if (this.user && this.user.subscribers === null) return 0
@@ -159,7 +159,7 @@ export default {
       else return this.user.subscriptions.length
     },
     mySubscriptions () {
-      return this.$store.getters.currUser.subscriptions
+      return this.$store.getters.currentUser.subscriptions
     },
     userSettingsDialogOptions () {
       let options = {
@@ -208,7 +208,7 @@ export default {
           this.pageId = 'Created nodes'
         } else {
           this.$logD('NO USER OID!')
-          this.$router.push({params: {oid: this.$store.getters.currUser.oid}})
+          this.$router.push({params: {oid: this.$store.getters.currentUser.oid}})
         }
       }
     }
@@ -224,7 +224,7 @@ export default {
         try {
           this.$log('changeAbout start')
           let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currUser.oid,
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.about',
             value: this.about
           })
@@ -239,7 +239,7 @@ export default {
         try {
           this.$log('changeStatus start')
           let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currUser.oid,
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.status',
             value: this.status
           })
@@ -277,7 +277,7 @@ export default {
       try {
         this.$log('changePhoto start')
         let res = await this.$store.dispatch('objects/update', {
-          oid: this.$store.getters.currUser.oid,
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.thumbUrl',
           value: file
         })

@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     contents () {
-      return this.$store.getters.currUser.workspace.nodes
+      return this.$store.getters.currentUser.workspace.nodes
         .reduce((acc, val) => {
           val.fragments.map(f => {
             if (!acc[f.content.oid]) {

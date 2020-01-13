@@ -132,7 +132,7 @@ export default {
     },
     spheresWS () {
       let m = {}
-      return this.$store.getters.currUser.workspace.nodes
+      return this.$store.getters.currentUser.workspace.nodes
         .reduce((acc, val) => {
           val.spheres.map(s => {
             if (!m[s.name]) acc.push(s)

@@ -8,6 +8,7 @@ import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
+import assert from 'assert'
 
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
@@ -62,7 +63,12 @@ export default async ({ Vue, store, app }) => {
   const cache = new InMemoryCache({
     addTypename: true,
     // fragmentMatcher,
-    dataIdFromObject: object => object.oid || null,
+    dataIdFromObject: object => {
+      // logD('dataIdFromObject', object)
+      if (!object.__typename || !object.oid) return null
+      if (possibleTypes.Object.includes(object.__typename)) return object.oid
+      else return object.__typename + ':' + object.oid // если так не сделать - то например objectShort может перезаписать в кэше полный объект
+    },
     possibleTypes,
     cacheRedirects: {
       Query: {
@@ -70,7 +76,7 @@ export default async ({ Vue, store, app }) => {
       }
     }
   })
-  // // ОЧЕНЬ неоптимальная реализация. при каждом изменении сериализуется весь кэш и записывается в 1 item
+  // // ОЧЕНЬ!!! неоптимальная реализация. при каждом изменении сериализуется весь кэш и записывается в 1 item
   // await persistCache({
   //   cache,
   //   storage: window.localStorage, // StorageProvider,

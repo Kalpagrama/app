@@ -70,7 +70,7 @@ export default {
     },
     nodeYours () {
       if (this.nodeFull) {
-        if (this.nodeFull.author.oid === this.$store.getters.currUser.oid) {
+        if (this.nodeFull.author.oid === this.$store.getters.currentUser.oid) {
           return true
         } else {
           return false

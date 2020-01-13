@@ -56,7 +56,7 @@ export default {
   },
   computed: {
     subscriptions () {
-      return this.$store.getters.currUser.subscriptions
+      return this.$store.getters.currentUser.subscriptions
     },
     subDialogOptions () {
       return {

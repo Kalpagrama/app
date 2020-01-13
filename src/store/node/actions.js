@@ -1,18 +1,34 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { router } from 'boot/main'
 import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
-import { fragments } from 'src/schema/fragments'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 
-export const init = async (context, categories) => {
-  // if (context.state.initialized) throw new Error('events state initialized already')
+export const init = async (context) => {
+  logD('node/init')
   if (context.state.initialized) return
-  logD('node', 'node store init. categories', categories)
+  let { data: { categories } } = await apollo.clients.api.query({
+    query: gql`
+      query sw_cache_first_categories {
+        categories {
+          type
+          name
+          alias
+          icon
+          sphere {
+            oid
+            type
+            name
+            thumbUrl(preferWidth: 600)
+          }
+        }
+      }`,
+    fetchPolicy: 'cache-first'
+  })
   context.commit('init', categories)
+  logD('node/init done')
   return categories
 }
 
@@ -69,11 +85,6 @@ export const nodeRate = async (context, { node, rateUser }) => {
   return nodeRate.rate
 }
 
-// export const nodeFull = async (context, oid) => {
-//   logD('nodeFull start')
-//   logD('nodeFull done')
-// }
-
 export const nodeDelete = async (context, oid) => {
   logD('nodeDelete start')
   assert.ok(oid)
@@ -122,7 +133,7 @@ export const nodeCreate = async (context, node) => {
   nodeInput.name = node.name
   nodeInput.categories = node.categories
   nodeInput.spheres = node.spheres.map(s => {
-    return {name: s.name}
+    return { name: s.name }
   })
   nodeInput.fragments = node.fragments.map(f => {
     return {

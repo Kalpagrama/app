@@ -72,7 +72,7 @@ export default {
       this.nextPageToken = nextPageToken
       this.totalCount = totalCount
       this.itemsCount = items.length
-      this.$logD('nodesLoad2 done', this.nodes)
+      this.$logD('nodesLoad2 done')
     },
     // возможно это ядро скоро понадобятся
     prefetch(oid){

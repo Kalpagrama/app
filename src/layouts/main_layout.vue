@@ -74,7 +74,7 @@ export default {
       await this.$router.push('/login')
       return
     }
-    if (this.$store.getters.currUser.profile.tutorial) this.$refs.kTutorialDialog.show()
+    if (this.$store.getters.currentUser.profile.tutorial) this.$refs.kTutorialDialog.show()
     else this.loading = false
   }
  }

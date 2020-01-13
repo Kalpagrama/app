@@ -1,6 +1,5 @@
 export default {
   initialized: false,
-  userEvents: [],
   notice: null,
   error: null,
   progress: null,

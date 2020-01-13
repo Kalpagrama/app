@@ -1,4 +1,8 @@
 import { apollo } from 'src/boot/apollo'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 
 export const init = async (context) => {
   if (context.state.initialized) return
@@ -8,6 +12,7 @@ export const init = async (context) => {
   return true
 }
 export const setWebPushToken = async (context, token) => {
+  logD('core/setWebPushToken action start')
   if (context.state.initialized) return
   if (token) {
     if (context.state.webPushToken === token) return // это значение было отправлено ранее и сервер уже знает его
@@ -23,5 +28,6 @@ export const setWebPushToken = async (context, token) => {
     })
     context.commit('stateSet', ['webPushToken', token])
   }
+  logD('core/setWebPushToken action complete')
   return true
 }

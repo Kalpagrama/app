@@ -37,7 +37,7 @@ export default {
           this.$logD('$route CHANGED', to)
           this.sphere = await this.sphereLoad(to.params.oid)
         } else {
-          this.$router.push(`/app/sphere/${this.$store.getters.currUser.oid}`)
+          this.$router.push(`/app/sphere/${this.$store.getters.currentUser.oid}`)
         }
       }
     }

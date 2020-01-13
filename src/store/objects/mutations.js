@@ -7,12 +7,9 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
-export function init (state) {
-  // current user  хранится в кэше со всеми объектами, но живет вечно
-  // assert.ok(user && user.oid)
-  // assert.ok(!state.objects[user.oid])
-  // state.objects[user.oid] = { objectData: user, fragments: [fragmentName] }
-  // state.currentUser = user
+export function init (state, currentUser) {
+  // current user  хранится в кэше со всеми объектами
+  state.currentUser = currentUser
   state.initialized = true
 }
 
@@ -21,6 +18,16 @@ export function stateSet (state, [key, val]) {
   assert.ok(Object.prototype.hasOwnProperty.call(state, key))
   state[key] = val
 }
+
+// export function addObject (state, object) {
+//   assert(object && object.oid)
+//   state.objects[object.oid] = object
+// }
+//
+// export function deleteObject (state, oid) {
+//   assert(oid)
+//   delete state.objects[oid]
+// }
 
 // // удаляем из кэша при превышении размера и по ttl
 // function cleanUp (state) {
@@ -74,6 +81,7 @@ function setValue (obj, path, value) {
   o[path[path.length - 1]] = value
 }
 
+// обновит данные в кэше аполло. см src/store/objects/actions.js:214 (watchQuery.subscribe)
 export function update (state, { oid, path, newValue, setter }) {
   logD('object/update mutation', oid, path)
   // let object = state.objects[oid] ? state.objects[oid].objectData : null
@@ -101,14 +109,14 @@ export function update (state, { oid, path, newValue, setter }) {
       assert(oldValue)
       oldValue = oldValue[prop]
     }
-    logD('oldValue = ', oldValue)
-    newValue = setter(oldValue)
-    logD('newValue = ', newValue)
+    // logD('oldValue = ', oldValue)
+    newValue = setter(JSON.parse(JSON.stringify(oldValue))) // stringify - иначе ошибка из-за того что oldValue - readOnly
+    // logD('newValue = ', newValue)
   }
 
   let object = {}
   setValue(object, p, newValue)
-  logD('objects/update. object=', object)
+  logD('objects/update. objectDiff =', object)
   // writeFragment быстрее. Но ему надо чтобы в object были все поля фрагмента. Иначе - ругается ворнингами
   apollo.clients.api.writeData({ id: oid, data: object })
   // apollo.clients.api.writeFragment({
@@ -117,4 +125,5 @@ export function update (state, { oid, path, newValue, setter }) {
   //   fragment: fragments.objectFullFragment,
   //   data: object
   // })
+  logD('object/update mutation complete', oid, path)
 }

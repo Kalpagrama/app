@@ -2,6 +2,7 @@ import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { router } from 'boot/main'
 import { checkUpdate, clearCache, update } from 'src/system/service_worker'
+import { fragments } from 'src/schema/fragments'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
@@ -11,17 +12,19 @@ export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
   logD('auth init')
-  let { data: { userIsAuthorized, userIsConfirmed } } = await apollo.clients.auth.query({
+  let { data: { userIsAuthorized, userIsConfirmed, user } } = await apollo.clients.auth.query({
     client: 'apiApollo',
     query: gql`
+      ${fragments.objectFullFragment}
       query sw_network_first_userCheck {
         userIsAuthorized
         userIsConfirmed
+        user { ...objectFullFragment}
       }
     `,
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'cache-first'
   })
-  context.commit('init', { userIsAuthorized, userIsConfirmed })
+  context.commit('init', { userIsAuthorized, userIsConfirmed, user })
 }
 export const inviteEmail = async (context, email) => {
   logD('@invite start')
@@ -66,7 +69,7 @@ export const logout = async (context, token) => {
   } catch (err) {
     logE('error on logout! err=', err)
   } finally {
-    // context.commit('user/deleteUserSession', {token, userOid: context.rootState.user.oid}, { root: true })
+    // context.commit('user/deleteUserSession', {token, userOid: context.rootState.auth.userOid}, { root: true })
     // let currentToken = localStorage.getItem('ktoken').split('::')[0]
     if (!token || token === localStorage.getItem('ktoken')) {
       localStorage.removeItem('ktoken')

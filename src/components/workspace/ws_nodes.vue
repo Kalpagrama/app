@@ -31,7 +31,7 @@ export default {
   },
   computed: {
     nodes () {
-      return this.$store.getters.currUser.workspace.nodes
+      return this.$store.getters.currentUser.workspace.nodes
         .reduce((acc, val) => {
           if (val.fragments.length === 2) {
             acc.push({

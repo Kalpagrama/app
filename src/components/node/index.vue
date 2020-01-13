@@ -218,17 +218,17 @@ export default {
         }
       }
     },
-    node: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('node CHANGED:', to)
-      }
-    }
+    // node: {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.$log('node CHANGED:', to)
+    //   }
+    // }
   },
   methods: {
     async play () {
       if (this.nodeFull){
-        this.$log(` play indx=${this.index} fr=${this.fragmentMini}`, this.$refs.fragmentFirst, this.$refs.fragmentSecond)
+        // this.$log(` play indx=${this.index} fr=${this.fragmentMini}`, this.$refs.fragmentFirst, this.$refs.fragmentSecond)
         if (this.fragmentMini === 0) await this.$refs.fragmentSecond.play()
         else await this.$refs.fragmentFirst.play()
       }
@@ -405,7 +405,7 @@ export default {
         this.nodeFullError = err
       }
       if (node) {
-        this.$log(`np-test: nodeLoad OK ! indx=${this.index}  oid=${oid}`, node)
+        // this.$log(`np-test: nodeLoad OK ! indx=${this.index}  oid=${oid}`, node)
         this.nodeFull = node
         this.$nextTick(async () => {
           if (this.visible) await this.play()

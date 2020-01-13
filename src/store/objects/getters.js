@@ -18,13 +18,13 @@ export const queryInProgress = (state, getters) => {
 //   }
 // }
 
-export const get = (state) => (oid) => {
-  logD('object getter ', oid)
-  let cacheData = apollo.clients.api.readFragment({
-    id: oid,
-    fragmentName: 'objectFullFragment',
-    fragment: fragments.objectFullFragment
-  })
-  logD('object getter ', oid, cacheData)
-  return cacheData
-}
+// export const get = (state) => (oid) => {
+//   logD('object getter ', oid)
+//   let cacheData = apollo.clients.api.readFragment({
+//     id: oid,
+//     fragmentName: 'objectFullFragment',
+//     fragment: fragments.objectFullFragment
+//   })
+//   logD('object getter ', oid, cacheData)
+//   return cacheData
+// }

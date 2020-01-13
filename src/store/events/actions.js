@@ -51,7 +51,7 @@ export const testWebPush = async (context) => {
 }
 
 function processEvent (context, event) {
-  logD('event received', event)
+  logD('processEvent start', event)
   switch (event.type) {
     case 'ERROR':
       context.commit('stateSet', ['error', event])
@@ -69,17 +69,17 @@ function processEvent (context, event) {
         path: event.path,
         newValue: event.value
       }, { root: true })
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'NODE_CREATED':
-      if (event.subject.oid === context.rootState.user.oid) {
+      if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeCreated', event])
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'NODE_RATED':
-      if (event.subject.oid === context.rootState.user.oid) {
+      if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeRated', event])
@@ -88,53 +88,72 @@ function processEvent (context, event) {
         path: 'rate',
         newValue: event.rate
       }, { root: true })
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'NODE_DELETED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['nodeDeleted', event])
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userSubscribed', event])
-      if (event.subject.oid === context.rootState.user.oid) { // если это мы подписались
-        logD('before subscribe1', context.rootGetters['objects/get'](context.rootState.user.oid))
-        logD('before subscribe2', context.rootGetters['objects/get'](event.object.oid))
-        logD('before subscribe3', context.rootGetters.currUser)
-        context.commit('user/subscribe', { objectShort: event.object, context }, { root: true })
+      if (event.subject.oid === context.rootState.auth.userOid) { // если это мы подписались
+        context.commit('objects/update', {
+          oid: event.subject.oid,
+          path: 'subscriptions',
+          setter: (oldValue) => {
+            let subscriptions = oldValue // JSON.parse(JSON.stringify(currentUser.subscriptions))
+            let index = subscriptions.findIndex(s => s.oid === event.object.oid)
+            assert.ok(index === -1)
+            subscriptions.push(event.object)
+            return subscriptions
+          }
+        }, { root: true })
         // на кого я подписан...
-        let cachedObj = context.rootGetters['objects/get'](event.object.oid)
-        if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
-          cachedObj.subscribers.push({
-            oid: event.subject.oid,
-            name: event.subject.name,
-            type: event.subject.type,
-            thumbUrl: event.subject.thumbUrl
-          })
-        }
+        context.commit('objects/update', {
+          oid: event.object.oid,
+          path: 'subscribers',
+          setter: (oldValue) => {
+            let subscribers = oldValue // JSON.parse(JSON.stringify(currentUser.subscriptions))
+            let index = subscribers.findIndex(s => s.oid === event.subject.oid)
+            assert.ok(index === -1)
+            subscribers.push(event.subject)
+            return subscribers
+          }
+        }, { root: true })
       }
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'USER_UNSUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userUnSubscribed', event])
-      if (event.subject.oid === context.rootState.user.oid) {
-        logD('before unsubscribe1', context.rootGetters['objects/get'](context.rootState.user.oid))
-        logD('before unsubscribe2', context.rootGetters['objects/get'](event.object.oid))
-        logD('before unsubscribe3', context.rootGetters.currUser)
-        context.commit('user/unSubscribe', { objectShort: event.object, context }, { root: true })
-        let cachedObj = context.rootGetters['objects/get'](event.object.oid)
-        if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
-          let indx = cachedObj.subscribers.findIndex(obj => obj.oid === event.subject.oid)
-          if (indx >= 0) {
-            cachedObj.subscribers.splice(indx, 1)
-          } else {
-            logE('subscriber not found', event, cachedObj)
+      if (event.subject.oid === context.rootState.auth.userOid) {
+        context.commit('objects/update', {
+          oid: event.subject.oid,
+          path: 'subscriptions',
+          setter: (oldValue) => {
+            let subscriptions = oldValue
+            let index = subscriptions.findIndex(s => s.oid === event.object.oid)
+            assert.ok(index >= 0)
+            subscriptions.splice(index, 1)
+            return subscriptions
           }
-        }
+        }, { root: true })
+        // на кого я подписан...
+        context.commit('objects/update', {
+          oid: event.object.oid,
+          path: 'subscribers',
+          setter: (oldValue) => {
+            let subscribers = oldValue
+            let index = subscribers.findIndex(s => s.oid === event.subject.oid)
+            assert.ok(index >= 0)
+            subscribers.splice(index, 1)
+            return subscribers
+          }
+        }, { root: true })
       }
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_UPDATED':
@@ -148,6 +167,7 @@ function processEvent (context, event) {
     default:
       throw new Error(`unsupported Event ${event.type}`)
   }
+  logD('processEvent done')
 }
 
 function processEventWs (context, event) {

@@ -10,7 +10,7 @@
           span.text-bold.text-white {{$t('Changing email')}}
       .column.bg-white.q-px-md
         .row.content-start.justify-center
-          q-input(v-model="$store.getters.currUser.profile.email" standout disable readonly stack-label :label="$t('Current email')").full-width.q-my-md.text-black
+          q-input(v-model="$store.getters.currentUser.profile.email" standout disable readonly stack-label :label="$t('Current email')").full-width.q-my-md.text-black
           div(v-if="!waitingCode").row.full-width
             q-input(v-model="newEmail" @keyup.enter="emailSend()" stack-label :label="$t('New email')" filled).full-width.q-mb-md
             q-btn(
@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     currentEmail () {
-      return this.$store.getters.currUser.profile.email
+      return this.$store.getters.currentUser.profile.email
     }
   },
   methods: {
@@ -54,7 +54,7 @@ export default {
       try {
         this.$log('changeEmail start')
         let res = await this.$store.dispatch('objects/update', {
-          oid: this.$store.getters.currUser.oid,
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.email',
           value: this.newEmail
         })

@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import assert from 'assert'
 
-export function init(state, { userIsAuthorized, userIsConfirmed }) {
+export function init(state, { userIsAuthorized, userIsConfirmed, user }) {
   state.initialized = userIsConfirmed ? true : false
   state.userIsAuthorized = userIsAuthorized
   state.userIsConfirmed = userIsConfirmed
+  state.userOid = user.oid
 }
 
 export function stateSet(state, [key, val]) {

@@ -29,7 +29,7 @@ export default {
   },
   computed: {
     spheres () {
-      return this.$store.getters.currUser.workspace.nodes.reduce((acc, val) => {
+      return this.$store.getters.currentUser.workspace.nodes.reduce((acc, val) => {
         val.spheres.map(s => {
           if (!acc[s.name]) acc[s.name] = s
         })

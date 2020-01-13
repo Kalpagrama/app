@@ -1,8 +1,9 @@
 export default {
   initialized: false,
   // // кэш загруженных объектов {oid: {fragment1: {}, fragment2:{}}}
-  // objects: {},
+  objects: {},
   // ttls: [], // отсортированные данные по времени жизни объектов в кэше{ttl, oid}. сортирвка по ttl
+  currentUser: null, // ссылается на objects[userOid]
   // currentUser: {
   //   oid: '',
   //   name: '',

@@ -9,10 +9,11 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 export const init = async (context) => {
-  // if (context.state.initialized) throw new Error('subscriptions state initialized already')
+  logD('objects/init')
   if (context.state.initialized) return
-  logD('objects', 'init')
-  context.commit('init')
+  let currentUser = await context.dispatch('objects/get', { oid: context.rootState.auth.userOid }, { root: true })
+  context.commit('init', currentUser)
+  logD('objects/init done')
 }
 
 //
@@ -160,7 +161,7 @@ class CacheControl {
     this.addRefCnt = 0
   }
 
-  incRef (oid) {
+  incRef (context, oid) {
     this.addRefCnt++
     apollo.cache.retain(oid) // apollo.cache.gc() не тронет этот item
     if (this.elements.has(oid)) {
@@ -179,7 +180,11 @@ class CacheControl {
         while (apollo.cache.release(releasedOid)) {
         } // apollo.cache.gc() теперь сможет удалить releasedOid
       }
-      apollo.cache.gc()
+      let deletedKeys = apollo.cache.gc()
+      logD('try evict cache entries', deletedKeys)
+      for (let oid of deletedKeys){
+        delete context.state.objects[oid]
+      }
     }
   }
 }
@@ -208,9 +213,12 @@ const cacheControl = new CacheControl()
 //   return await promise
 // }
 
-export const get = async (context, { oid, fragmentName, priority, objectFull }) => {
-  logD('objects', 'objectGet start...')
-  objectFull = objectFull || {}
+// запросит объект из кэша аполло. и сохранит его во вьюикс. (иначе имеем утечку. при каждом обращении создается соллбэк и новый объект(который не удаляется никогда поскольку на него есть ссылка в коллбэке).)
+// todo priority!!! ставить в очередь запрашивать пачкой! (после persist cache save)
+export const get = async (context, { oid, fragmentName, priority }) => {
+  logD('objects/get action start', oid)
+  if (context.state.objects[oid]) return context.state.objects[oid]
+  // objectFull = objectFull || {}
   let promise = new Promise((resolve, reject) => {
     apollo.clients.api.watchQuery({
       query: gql`
@@ -225,23 +233,34 @@ export const get = async (context, { oid, fragmentName, priority, objectFull }) 
       fetchPolicy: 'cache-first'
     }).subscribe({
       next: ({ data }) => {
-        logD('objectGet next data =', data)
-        for (let prop in data.objectFull) {
-          objectFull[prop] = data.objectFull[prop]
+        assert(data && data.objectFull, data)
+        if (context.state.objects[oid]) logD('object changed in apollo cache! =', data)
+        // logD('objectGet next data =', data)
+        if (data.objectFull) {
+          context.state.objects[oid] = data.objectFull
+          if (context.state.currentUser && context.state.currentUser.oid === data.objectFull.oid) {
+            context.commit('stateSet', ['currentUser', context.state.objects[oid]])
+          }
         }
+        // for (let prop in data.objectFull) {
+        //   objectFull[prop] = data.objectFull[prop]
+        // }
         resolve()
       },
       error: reject
     })
   })
   await promise
-
-  if (objectFull) cacheControl.incRef(objectFull.oid)
+  let objectFull = context.state.objects[oid]
+  assert(objectFull && objectFull.oid)
+  if (objectFull) cacheControl.incRef(context, objectFull.oid)
+  logD('objects/get action complete', oid)
   return objectFull
 }
 
 // path ex: ['settings', 'general', 'language'] OR ['profile', 'gender']
 export const update = async (context, { oid, path, value }) => {
+  logD('objects/update action start', oid)
   if (path === 'profile.thumbUrl') {
     let file = value
     const toBase64 = file => new Promise((resolve, reject) => {
@@ -269,10 +288,6 @@ export const update = async (context, { oid, path, value }) => {
     `,
     variables: { oid, path, value }
   })
-  return objectChange
-}
-
-export const setPhoto = async (context, { oid, path, value }) => {
-  let { data: { objectChange } } = await apollo.clients.api.mutate({})
+  logD('objects/update action complete', oid)
   return objectChange
 }

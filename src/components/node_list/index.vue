@@ -40,7 +40,7 @@ export default {
     nodeMiddleHandler (isVisible, entry) {
       if (isVisible) {
         this.nodeMiddle = parseInt(entry.target.accessKey)
-        this.$log(`np-test: nodeMiddle=${this.nodeMiddle}, throttle=${this.throttle} name=${this.nodes[this.nodeMiddle].name}`)
+        // this.$log(`np-test: nodeMiddle=${this.nodeMiddle}, throttle=${this.throttle} name=${this.nodes[this.nodeMiddle].name}`)
       }
     }
   },
