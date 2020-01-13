@@ -56,7 +56,7 @@ export default {
   },
   computed: {
     subscriptions () {
-      return this.$store.state.subscriptions.userSubscriptions
+      return this.$store.getters.currUser.subscriptions
     },
     subDialogOptions () {
       return {
@@ -115,7 +115,7 @@ export default {
     // subscriptionsDelete (s, si) {
     //   this.$logD('deleteActionStart', s)
     //   if (this.subsToDelete) {
-    //     setTimeout(() => this.$store.dispatch('subscriptions/unSubscribe', s.oid), 500);
+    //     setTimeout(() => this.$store.dispatch('user/unSubscribe', s.oid), 500);
     //   }
     // },
     followClick (s, si) {
@@ -139,7 +139,7 @@ export default {
     async subDelete (s, si) {
       try {
         this.$logD('subDelete start')
-        let res = await this.$store.dispatch('subscriptions/unSubscribe', s.oid)
+        let res = await this.$store.dispatch('user/unSubscribe', s.oid)
         this.$logD('res', res)
         // this.$delete(this.userSubscriptions, ss)
         this.$logD('subDelete done')

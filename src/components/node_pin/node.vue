@@ -84,7 +84,7 @@ export default {
     pause () {
     },
     async nodeLoad (oid) {
-      this.$logD('nodeLoad start', this.index, this.node.oid)
+      this.$logD('nodeLoad start2', this.index, oid)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })

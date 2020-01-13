@@ -1,5 +1,5 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { apolloProvider } from 'boot/apollo'
+import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
 import { fragments } from 'src/schema/fragments'
 
@@ -15,7 +15,7 @@ export const init = async (context) => {
 export const sphereSpheres = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('sphereSpheres start')
   assert.ok(oid)
-  let { data: { sphereSpheres: { items: spheres } } } = await apolloProvider.clients.apiApollo.query({
+  let { data: { sphereSpheres: { items: spheres } } } = await apollo.clients.api.query({
     query: gql`
       query sphereSpheres ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum){
         sphereSpheres (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
@@ -34,7 +34,7 @@ export const sphereSpheres = async (context, { oid, pagination, filter, sortStra
 
 export const sphereNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('sphereNodes start')
-  let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apolloProvider.clients.apiApollo.query({
+  let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
     query: gql`
       ${fragments.objectShortWithMetaFragment}
       query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
@@ -54,7 +54,7 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
 
 export const nodeNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('nodeNodes start')
-  let { data: { nodeNodes: { items, count, totalCount, nextPageToken } } } = await apolloProvider.clients.apiApollo.query({
+  let { data: { nodeNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
     query: gql`
       ${fragments.objectShortWithMetaFragment}
       query nodeNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
@@ -75,7 +75,7 @@ export const nodeNodes = async (context, { oid, pagination, filter, sortStrategy
 export const feed = async (context, {pagination}) => {
   logD('feed start')
   assert.ok(pagination)
-  let { data: { feed: { items, count, totalCount, nextPageToken } } } = await apolloProvider.clients.apiApollo.query({
+  let { data: { feed: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
     query: gql`
       ${fragments.objectShortWithMetaFragment}
       query feed ($pagination: PaginationInput!) {

@@ -35,7 +35,7 @@
     div(@click="save()")
       q-toggle(v-model="nodeAddedNotifications" @input="save(nodeAddedNotifications)" color="accent")
   //- span {{pauseAllNotifications}}
-  //- span {{$store.state.objects.currentUser.settings.notifications.pauseAllNotifications}}
+  //- span {{$store.getters.currUser.settings.notifications.pauseAllNotifications}}
 </template>
 
 <script>
@@ -61,8 +61,8 @@ export default {
     async save (n) {
       try {
         this.$log('changing start', n)
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currUser.oid,
           path: 'settings.notifications',
           value: this.n
         })
@@ -76,13 +76,13 @@ export default {
   },
   mounted () {
     this.$logD('mounted')
-    this.pauseAllNotifications = this.$store.state.objects.currentUser.settings.notifications.pauseAllNotifications
-    this.assessmentsNotifications = this.$store.state.objects.currentUser.settings.notifications.assessmentsNotifications
-    this.subscriptionsNotifications = this.$store.state.objects.currentUser.settings.notifications.subscriptionsNotifications
-    this.mentionsNotifications = this.$store.state.objects.currentUser.settings.notifications.mentionsNotifications
-    this.sharedNotifications = this.$store.state.objects.currentUser.settings.notifications.sharedNotifications
-    this.nodeCreatedNotifications = this.$store.state.objects.currentUser.settings.notifications.nodeCreatedNotifications
-    this.nodeAddedNotifications = this.$store.state.objects.currentUser.settings.notifications.nodeAddedNotifications
+    this.pauseAllNotifications = this.$store.getters.currUser.settings.notifications.pauseAllNotifications
+    this.assessmentsNotifications = this.$store.getters.currUser.settings.notifications.assessmentsNotifications
+    this.subscriptionsNotifications = this.$store.getters.currUser.settings.notifications.subscriptionsNotifications
+    this.mentionsNotifications = this.$store.getters.currUser.settings.notifications.mentionsNotifications
+    this.sharedNotifications = this.$store.getters.currUser.settings.notifications.sharedNotifications
+    this.nodeCreatedNotifications = this.$store.getters.currUser.settings.notifications.nodeCreatedNotifications
+    this.nodeAddedNotifications = this.$store.getters.currUser.settings.notifications.nodeAddedNotifications
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')

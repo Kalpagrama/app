@@ -5,9 +5,9 @@ export function init(state) {
 }
 
 export function addEvent(state, userEvent) {
-  userEvent.uid = Date.now().toString()
-  state.userEvents.unshift(userEvent)
-  state.userEvents.splice(888, state.userEvents.length)
+  // userEvent.uid = Date.now().toString()
+  // state.userEvents.unshift(userEvent)
+  // state.userEvents.splice(888, state.userEvents.length)
 }
 
 export function stateSet(state, [key, val]) {

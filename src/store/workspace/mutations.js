@@ -5,9 +5,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 import Vue from 'vue'
 
-export function init (state, workspace) {
-  assert.ok(workspace)
-  state.workspace = workspace
+export function init (state) {
   state.initialized = true
 }
 
@@ -16,12 +14,14 @@ export function stateSet (state, [key, val]) {
   state[key] = val
 }
 
-export const wsNodeCreate = (state, node) => {
+export const wsNodeCreate = (state, {object, context: { rootGetters, commit }}) => {
+  let node = object
   assert(node.oid)
   // state.workspace.nodes.push(node)
   Vue.set(state.workspace.nodes, state.workspace.nodes.length, node)
 }
-export const wsNodeUpdate = (state, node) => {
+export const wsNodeUpdate = (state, {object, context: { rootGetters, commit }}) => {
+  let node = object
   assert(node.oid)
   let i = state.workspace.nodes.findIndex(d => d.oid === node.oid)
   if (i >= 0) {
@@ -31,7 +31,8 @@ export const wsNodeUpdate = (state, node) => {
     logE('node not found', node)
   }
 }
-export const wsNodeDelete = (state, node) => {
+export const wsNodeDelete = (state, {object, context: { rootGetters, commit }}) => {
+  let node = object
   logD('wsNodeDelete', node)
   assert(node)
   let i = state.workspace.nodes.findIndex(d => d.oid === node.oid)
@@ -45,12 +46,14 @@ export const wsNodeDelete = (state, node) => {
   }
 }
 
-export const wsSphereCreate = (state, sphere) => {
+export const wsSphereCreate = (state, {object, context: { rootGetters, commit }}) => {
+  let sphere = object
   assert(sphere.oid)
   // state.workspace.spheres.push(sphere)
   Vue.set(state.workspace.spheres, state.workspace.spheres.length, sphere)
 }
-export const wsSphereDelete = (state, oid) => {
+export const wsSphereDelete = (state, {object, context: { rootGetters, commit }}) => {
+  let oid = object.oid
   assert(oid)
   let i = state.workspace.spheres.findIndex(t => t.oid === oid)
   if (i >= 0) {

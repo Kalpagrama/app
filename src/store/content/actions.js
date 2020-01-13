@@ -1,5 +1,5 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { apolloProvider } from 'boot/apollo'
+import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
 import { fragments } from 'src/schema/fragments'
 
@@ -15,7 +15,7 @@ export const init = async (context) => {
 export const uploadContentUrl = async (context, url) => {
   logD('uploadContentUrl start')
   assert.ok(url)
-  let {data: {uploadContentUrl}} = await apolloProvider.clients.uploadApollo.mutate({
+  let {data: {uploadContentUrl}} = await apollo.clients.upload.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
       mutation sw_network_only_nc_contentGetByUrl ($url: String!, $onlyMeta: Boolean!) {
@@ -35,7 +35,7 @@ export const uploadContentUrl = async (context, url) => {
 export const uploadContentFile = async (context, file) => {
   logD('uploadContentFile start')
   assert.ok(file)
-  let {data: {uploadContentFile}} = await apolloProvider.clients.uploadApollo.mutate({
+  let {data: {uploadContentFile}} = await apollo.clients.upload.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
       mutation sw_network_only_nc_contentGetByFile ($file: Upload!, $length: Float!) {

@@ -96,8 +96,9 @@ export default {
       this.$router.push('/node/' + val[0].oid)
     },
     async nodeLoad (oid) {
-      this.$log('nodeLoad start')
+      this.$log('nodeLoad start1', oid)
       let node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
+      // this.$log('nodeLoad start1 complete', node)
       return node
     },
     headerClick () {

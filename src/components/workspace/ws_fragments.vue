@@ -80,7 +80,7 @@ export default {
   },
   computed: {
     fragments () {
-      return this.$store.state.workspace.workspace.nodes.reduce((acc, val) => {
+      return this.$store.getters.currUser.workspace.nodes.reduce((acc, val) => {
         if (val.fragments.length === 1) {
           val.fragments.map((f, fi) => {
             acc.push({

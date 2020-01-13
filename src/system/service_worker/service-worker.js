@@ -147,17 +147,19 @@ if (useCache) {
     cacheGraphQl = async function (event) {
       try {
         logDebug('cacheGraphQl start')
+        // return await networkOnly(event)// для кэширования gql используется apollo-cache-persist src/boot/apollo.js:10
+        // // eslint-disable-next-line no-unreachable
         let requestCopy = event.request.clone()
         let body
         try {
           body = await requestCopy.json()
         } catch (err) {
         }
-        if (!body || !body.operationName) return await networkOnly(event, gqlStore) // например, upload (multipart/form-data)
+        if (!body || !body.operationName) return await networkOnly(event) // например, upload (multipart/form-data)
         logDebug('gql cacheGraphQl', body.operationName)
         let type = body && body.query && body.query.startsWith('mutation') ? 'mutation' : 'query'
         if (body.operationName.startsWith('sw_network_only_')) {
-          return await networkOnly(event, gqlStore)
+          return await networkOnly(event)
         } else if (body.operationName.startsWith('sw_cache_only_')) {
           return await cacheOnly(event, gqlStore)
         } else if (body.operationName.startsWith('sw_network_first_')) {
@@ -177,7 +179,7 @@ if (useCache) {
       } catch (e) {
         logCritical('error on cacheGraphQl', e)
         throw e
-        // return await networkOnly(event, gqlStore)
+        // return await networkOnly(event)
       }
     }
     cacheVideo = async function (event) {
@@ -188,7 +190,7 @@ if (useCache) {
     const cacheOnly = async (event, store) => {
       return await getCache(event.request, store)
     }
-    const networkOnly = async (event, store) => {
+    const networkOnly = async (event) => {
       return await fetch(event.request.clone())
     }
     const StaleWhileRevalidate = async (event, store) => {
@@ -216,7 +218,7 @@ if (useCache) {
             resolve(cachedResponse)
           }, timeout)
         }
-        networkOnly(event, store).then(async (networkResponse) => {
+        networkOnly(event).then(async (networkResponse) => {
           logDebug('gql networkFirst. resolve from network ok!', networkResponse)
           if (timeoutId) clearTimeout(timeoutId)
           if (networkResponse && networkResponse.ok) {

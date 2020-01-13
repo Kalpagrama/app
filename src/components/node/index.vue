@@ -129,6 +129,8 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
 <script>
 import nodeFragment from 'components/node/fragment'
 import ncFragment from 'components/node_composer/nc_fragment'
+import { fragments } from 'src/schema/fragments'
+import { apollo } from 'src/boot/apollo'
 
 export default {
   name: 'nodeNew',
@@ -214,6 +216,12 @@ export default {
           this.$log('nodeFullReady CHANGED', to)
           this.nodeFull = this.nodeFullReady
         }
+      }
+    },
+    node: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('node CHANGED:', to)
       }
     }
   },
@@ -351,11 +359,12 @@ export default {
     },
     async nodeVote (rate = 0.5) {
       try {
-        this.$log('nodeVote start')
+        this.$log('nodeVote start', this.node.oid)
         this.nodeVoting = true
-        await this.$wait(1000)
-        let vote = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: rate})
-        this.$log('nodeVote done', vote)
+        // await this.$wait(1000)
+        this.$store.dispatch('node/nodeRate', {node: this.node, rateUser: rate})
+          .catch(err => this.$logE('nodeVote err', err))
+        this.$log('nodeVote done')
         this.nodeVoting = false
       } catch (e) {
         this.$log('nodeVote error', e)
@@ -396,7 +405,7 @@ export default {
         this.nodeFullError = err
       }
       if (node) {
-        this.$log(`np-test: nodeLoad OK ! indx=${this.index}  oid=${oid}`)
+        this.$log(`np-test: nodeLoad OK ! indx=${this.index}  oid=${oid}`, node)
         this.nodeFull = node
         this.$nextTick(async () => {
           if (this.visible) await this.play()

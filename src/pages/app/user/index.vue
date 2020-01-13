@@ -148,7 +148,7 @@ export default {
       ]
     },
     myoid () {
-      return this.$store.state.objects.currentUser.oid
+      return this.$store.getters.currUser.oid
     },
     countSubscribers () {
       if (this.user && this.user.subscribers === null) return 0
@@ -159,7 +159,7 @@ export default {
       else return this.user.subscriptions.length
     },
     mySubscriptions () {
-      return this.$store.state.subscriptions.userSubscriptions
+      return this.$store.getters.currUser.subscriptions
     },
     userSettingsDialogOptions () {
       let options = {
@@ -208,7 +208,7 @@ export default {
           this.pageId = 'Created nodes'
         } else {
           this.$logD('NO USER OID!')
-          this.$router.push({params: {oid: this.$store.state.objects.currentUser.oid}})
+          this.$router.push({params: {oid: this.$store.getters.currUser.oid}})
         }
       }
     }
@@ -223,8 +223,8 @@ export default {
       if (this.about !== this.currentAbout) {
         try {
           this.$log('changeAbout start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currUser.oid,
             path: 'profile.about',
             value: this.about
           })
@@ -238,8 +238,8 @@ export default {
       if (this.status !== this.currentStatus) {
         try {
           this.$log('changeStatus start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currUser.oid,
             path: 'profile.status',
             value: this.status
           })
@@ -276,8 +276,8 @@ export default {
     async downloadPhoto (file) {
       try {
         this.$log('changePhoto start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currUser.oid,
           path: 'profile.thumbUrl',
           value: file
         })
@@ -313,7 +313,7 @@ export default {
     async followUser () {
        try {
         this.$logD('subcribe start')
-        let res = await this.$store.dispatch('subscriptions/subscribe', this.user.oid)
+        let res = await this.$store.dispatch('user/subscribe', this.user.oid)
         this.user = await this.userLoad(this.$route.params.oid)
         this.$logD('res', res)
         this.$logD('subcribe done')
@@ -324,7 +324,7 @@ export default {
     async unfollowUser () {
       try {
         this.$logD('subDelete start')
-        let res = await this.$store.dispatch('subscriptions/unSubscribe', this.user.oid)
+        let res = await this.$store.dispatch('user/unSubscribe', this.user.oid)
         this.$logD('res', res)
         // this.$delete(this.userSubscriptions, ss)
         this.user = await this.userLoad(this.$route.params.oid)

@@ -1,4 +1,5 @@
 export default {
   initialized: false,
-  user: null
+  oid: null,
+  // user: null
 }

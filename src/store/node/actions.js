@@ -1,6 +1,6 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { router } from 'boot/main'
-import { apolloProvider } from 'boot/apollo'
+import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
 import { fragments } from 'src/schema/fragments'
 
@@ -19,10 +19,14 @@ export const init = async (context, categories) => {
 export const nodeUnrate = async (context, oid) => {
   logD('nodeUnrate start')
   if (!oid) return
-  let { data: { nodeUnrate } } = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { nodeUnrate } } = await apollo.clients.api.mutate({
     mutation: gql`
       mutation sw_network_only_nodeUnrate ($oid: OID!) {
-        nodeUnrate (oid: $oid)
+        nodeUnrate (oid: $oid){
+          oid
+          rate
+          rateUser
+        }
       }
     `,
     variables: {
@@ -34,23 +38,35 @@ export const nodeUnrate = async (context, oid) => {
   return nodeUnrate
 }
 
-export const nodeRate = async (context, { oid, rate }) => {
-  logD('nodeRate start', oid, rate)
-  if (!oid) throw new Error('No oid!')
-  if (!rate) throw new Error('No rate!')
-  let { data: { nodeRate } } = await apolloProvider.clients.apiApollo.mutate({
+export const nodeRate = async (context, { node, rateUser }) => {
+  logD('nodeRate start', node.oid, rateUser)
+  assert(node.oid && rateUser)
+  let { data: { nodeRate } } = await apollo.clients.api.mutate({
     mutation: gql`
       mutation sw_network_only_nodeRate ($oid: OID!, $rate: Float!) {
-        nodeRate (oid: $oid, rate: $rate)
+        nodeRate (oid: $oid, rate: $rate){
+          oid
+          rate
+          rateUser
+        }
       }
     `,
     variables: {
-      oid: oid,
-      rate: rate
+      oid: node.oid,
+      rate: rateUser
+    },
+    optimisticResponse: {
+      __typename: 'Mutation',
+      nodeRate: {
+        __typename: 'Node',
+        oid: node.oid,
+        rate: node.rate,
+        rateUser: rateUser
+      }
     }
   })
   logD('nodeRate done', nodeRate)
-  return nodeRate
+  return nodeRate.rate
 }
 
 // export const nodeFull = async (context, oid) => {
@@ -61,7 +77,7 @@ export const nodeRate = async (context, { oid, rate }) => {
 export const nodeDelete = async (context, oid) => {
   logD('nodeDelete start')
   assert.ok(oid)
-  let { data: { deleteObject } } = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { deleteObject } } = await apollo.clients.api.mutate({
     mutation: gql`
       mutation sw_network_only_deleteNode($oid: OID!) {
         deleteObject (oid: $oid)
@@ -133,7 +149,7 @@ export const nodeCreate = async (context, node) => {
   })
 
   logD('nodeCreate nodeInput', nodeInput)
-  let { data: { nodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { nodeCreate } } = await apollo.clients.api.mutate({
     mutation: gql`
       mutation sw_network_only_nodeCreate ($node: NodeInput!) {
         nodeCreate (node: $node)

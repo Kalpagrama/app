@@ -20,8 +20,8 @@ export default {
     }
   },
   computed: {
-    subsriptions () {
-      return this.$store.state.subsriptions.userSubscriptions
+    subscriptions () {
+      return this.$store.getters.currUser.subscriptions
     }
   },
   methods: {

@@ -70,7 +70,7 @@ export default {
     },
     nodeYours () {
       if (this.nodeFull) {
-        if (this.nodeFull.author.oid === this.$store.state.objects.currentUser.oid) {
+        if (this.nodeFull.author.oid === this.$store.getters.currUser.oid) {
           return true
         } else {
           return false
@@ -124,9 +124,10 @@ export default {
       try {
         this.$logD('nodeRateJob start')
         this.nodeRating = true
-        await this.$wait(600)
-        let res = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: this.fingerRate / 100})
-        this.$logD('nodeRateJob done', res)
+        // await this.$wait(600)
+        this.$store.dispatch('node/nodeRate', {node: this.node, rateUser: this.fingerRate / 100})
+          .catch(err => this.$logE('nodeRateJob err', err))
+        this.$logD('nodeRateJob done')
         this.nodeRating = false
         await this.$wait(300)
         this.$emit('hide')

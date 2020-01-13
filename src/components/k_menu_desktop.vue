@@ -16,12 +16,12 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-secondary
     div(@click="$go('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
-  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.state.objects.currentUser.oid)").row.full-width
+  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currUser.oid)").row.full-width
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(
         v-show="!userAvatarErrored"
         @error="userAvatarError"
-        :src="$store.state.objects.currentUser.profile.thumbUrl"
+        :src="$store.getters.currUser.profile.thumbUrl"
         :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
       div(
         v-if="userAvatarErrored"
@@ -29,7 +29,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-secondary
         ).row.bg-grey-3
     div(v-if="!mini").col.full-height
       .row.fit.items-center
-        span.text-bold.text-white.cursor-pointer {{ $t($store.state.objects.currentUser.name) }}
+        span.text-bold.text-white.cursor-pointer {{ $t($store.getters.currUser.name) }}
   //- create node
   div(v-if="!page" :style=`{height: '60px'}` @click="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])").row.full-width.items-center.cursor-pointer
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
