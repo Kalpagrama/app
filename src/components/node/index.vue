@@ -25,14 +25,14 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       .row.full-width.justify-center
         span(:style=`{fontSize: '50px'}`
           ).text-bold.text-white.text-center {{ voteLabel }}
-    nc-fragment(
+    component(:is="fc ? fc : 'nc-fragment'"
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
       :thumbUrl="node.meta.fragments[0].thumbUrl"
       @previewWidth="$event => fragmentWidth(0, $event)"
       @previewHeight="$event => fragmentHeight(0, $event)"
       @ended="fragmentEnded(0)"
-      @action="nodeAction"
+      @action="nodeActionStart"
       :visible="visible"
       :fragment="nodeFull ? nodeFull.fragments[0] : null"
       :mini="fragmentMini === 0" @mini="fragmentChange(0)"
@@ -42,14 +42,14 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
         maxWidth: styles[0].maxWidth+'%',
         bottom: styles[0].bottom+'px',
         right: styles[0].right+'px'}`)
-    nc-fragment(
+    component(:is="fc ? fc : 'nc-fragment'"
       ref="fragmentSecond"
       :ctx="ctx" :index="1"
       :thumbUrl="node.meta.fragments[1].thumbUrl"
       @previewWidth="$event => fragmentWidth(1, $event)"
       @previewHeight="$event => fragmentHeight(1, $event)"
       @ended="fragmentEnded(1)"
-      @action="nodeAction"
+      @action="nodeActionStart"
       :visible="visible"
       :fragment="nodeFull ? nodeFull.fragments[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(1)"
@@ -123,16 +123,20 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
           span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
     //- timestamp
     .row.full-width.justify-start.q-pa-md
-      small.text-grey-7 20.12.2019
+      small.text-grey-7 31.12.2019
 </template>
 
 <script>
+import nodeFragment from 'components/node/fragment'
 import ncFragment from 'components/node_composer/nc_fragment'
+import { fragments } from 'src/schema/fragments'
+import { apollo } from 'src/boot/apollo'
 
 export default {
   name: 'nodeNew',
-  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
-  components: {ncFragment},
+  // TODO заменить имя св-ва visible на active
+  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'fc'],
+  components: {nodeFragment, ncFragment},
   data () {
     return {
       nodeFullError: null,
@@ -182,48 +186,52 @@ export default {
     visible: {
       immediate: false,
       async handler (to, from) {
-        // this.$log('visible CHANGED', to)
-        if (to) this.play()
-        else this.pause()
+        if (to) {
+          this.$log(` indx=${this.index} active(visible) CHANGED to ${to}`)
+          this.play()
+        } else {
+          this.$log(`. indx=${this.index} active(visible) CHANGED to ${to} index = ${this.index}`)
+          this.pause()
+        }
       }
     },
     needFull: {
       immediate: true,
         async handler (to, from) {
-          if (to) {
-            if (!this.nodeFull) this.nodeFull = await this.nodeLoad(this.node.oid)
-          } else {
-            // TODO сделать удаление
-            // this.nodeFull = null
-          }
+          if (to) await this.nodeLoad()
+          else await this.nodeDestroy()
         }
     },
     needFullPreload: {
       immediate: true,
       async handler (to, from) {
-        if (to) {
-          if (!this.nodeFull) this.nodeFull = await this.nodePreLoad(this.node.oid)
-        } else {
-          // TODO сделать удаление
-          // this.nodeFull = null
-        }
+        if (to) await this.nodePreLoad()
+        else await this.nodeDestroy()
       }
     },
     nodeFullReady: {
       immediate: true,
       handler (to, from) {
-        // this.$log('nodeFullReady CHANGED', to)
         if (to) {
+          this.$log('nodeFullReady CHANGED', to)
           this.nodeFull = this.nodeFullReady
         }
       }
-    }
+    },
+    // node: {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.$log('node CHANGED:', to)
+    //   }
+    // }
   },
   methods: {
-    play () {
-      this.$log('play')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.play()
-      else this.$refs.fragmentFirst.play()
+    async play () {
+      if (this.nodeFull){
+        // this.$log(` play indx=${this.index} fr=${this.fragmentMini}`, this.$refs.fragmentFirst, this.$refs.fragmentSecond)
+        if (this.fragmentMini === 0) await this.$refs.fragmentSecond.play()
+        else await this.$refs.fragmentFirst.play()
+      }
     },
     pause () {
       this.$log('pause')
@@ -311,18 +319,52 @@ export default {
         this.$refs.fragmentSecond.play()
       }
     },
-    nodeAction () {
-      this.$log('nodeAction')
+    nodeActionStart () {
+      this.$log('nodeActionStart')
+      this.$store.dispatch('ui/action', [
+        {
+          timeout: 4000,
+          payload: this.nodeFull,
+          name: this.node.name,
+          actions: {
+            save: {name: 'Save to WS'},
+            confirm: {name: 'Mix node'}
+          }
+        },
+        this.nodeAction
+      ])
       this.$store.commit('node/stateSet', ['nodeOptionsPayload', JSON.parse(JSON.stringify(this.nodeFull))])
       this.$store.commit('node/stateSet', ['nodeOptionsDialogOpened', true])
     },
+    nodeAction (action) {
+      this.$log('nodeAction', action)
+      switch (action) {
+        case 'confirm': {
+          this.$log('MIX MIX MIX')
+          let nodeInput = this.nodeFull
+          delete nodeInput.oid
+          this.$store.commit('workspace/stateSet', ['wsItem', {type: 'node', item: nodeInput}], { root: true })
+          this.$router.push('/create')
+          break
+        }
+        case 'save': {
+          this.$log('SAVE SAVE')
+          let nodeInput = this.nodeFull
+          delete nodeInput.oid
+          this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(nodeInput)), { root: true })
+          break
+        }
+      }
+      this.$log('nodeAction done')
+    },
     async nodeVote (rate = 0.5) {
       try {
-        this.$log('nodeVote start')
+        this.$log('nodeVote start', this.node.oid)
         this.nodeVoting = true
-        await this.$wait(1000)
-        let vote = await this.$store.dispatch('node/nodeRate', {oid: this.node.oid, rate: rate})
-        this.$log('nodeVote done', vote)
+        // await this.$wait(1000)
+        this.$store.dispatch('node/nodeRate', {node: this.node, rateUser: rate})
+          .catch(err => this.$logE('nodeVote err', err))
+        this.$log('nodeVote done')
         this.nodeVoting = false
       } catch (e) {
         this.$log('nodeVote error', e)
@@ -330,30 +372,51 @@ export default {
       }
     },
     // упреждающая загрузка ядра (с низким приоритетом. Запрос на сервер будет сделан по-возможности)
-    async nodePreLoad (oid) {
-      this.$log(`nodePreLoad start indx=${this.index} oid=${this.node.oid}`)
+    async nodePreLoad () {
+      if (this.nodeFull) return
+      let oid = this.node.oid
+      this.$log(`nodePreLoad start indx=${this.index} oid=${oid}`)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 1 })
-      } catch (err) { }
-      this.$log('nodePreLoad done', this.index, this.node.oid)
-      return node
+      } catch (err) {
+        // приоритет 1 - не гарантирует что ядро будет загружено. Запрос может быть отвергнут.
+        if (err !== 'queued object was evicted legally'){
+          // this.$logE('nodePreLoad error', err)
+          this.$emit('hide') // не показывать это ядро
+          node = null
+        }
+      }
+      if (node) this.$log('nodePreLoad OK! indx=', this.index, oid)
     },
     // гарантированная загрузка ядра
-    async nodeLoad (oid) {
-      this.$log(`nodeLoad start indx=${this.index}oid=${this.node.oid}`)
+    async nodeLoad () {
+      if (this.nodeFull) return
+      let oid = this.node.oid
+      this.$log(` nodeLoad start indx=${this.index}  oid=${oid}`)
       let node = null
       try {
         node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
         this.nodeFullError = null
       } catch (err) {
-        this.$logE('node', 'nodeLoad error', err)
+        // this.$logE('nodeLoad error', err)
         this.$emit('hide') // не показывать это ядро
         node = null
         this.nodeFullError = err
       }
-      this.$log('nodeLoad done', this.index, this.node.oid)
-      return node
+      if (node) {
+        // this.$log(`np-test: nodeLoad OK ! indx=${this.index}  oid=${oid}`, node)
+        this.nodeFull = node
+        this.$nextTick(async () => {
+          if (this.visible) await this.play()
+        })
+      }
+    },
+    async nodeDestroy(){
+      if (this.nodeFull && !this.needFull && !this.needFullPreload){
+        this.$log(` node CLEAR indx=${this.index} oid=${this.node.oid}`)
+        this.nodeFull = null
+      }
     }
   },
   mounted () {

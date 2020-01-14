@@ -1,12 +1,35 @@
+<style lang="stylus">
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+.list-group {
+  min-height: 20px;
+}
+.list-group-item {
+  cursor: move;
+}
+.list-group-item i {
+  cursor: pointer;
+}
+</style>
 <template lang="pug">
 div(
   :style=`{position: 'relative'}`
   ).column.full-width.bg-black
+  //- div(:style=`{position: 'absolute', zIndex: 1000, top: '95px'}`).row.full-width.bg-red
+  //-   small.full-width now: {{ now }}
   //- cuts on progress bar
   //- cut&cuts on video progress bar
   div(
     v-if="cut"
-    :style=`{position: 'absolute', zIndex: 400, top: '0px', height: '8px', pointerEvents: 'none'}`).row.full-width.q-px-md.bg-black
+    :style=`{position: 'absolute', zIndex: 400, top: '0px', height: '8px', pointerEvents: 'none'}`).row.full-width.q-px-md
     div(:style=`{position: 'relative'}`).row.fit
       //- cuts in progress bar
       div(
@@ -23,36 +46,76 @@ div(
         left: (cut.points[0].x/fragment.content.duration)*100+'%',
         width: ((cut.points[1].x-cut.points[0].x)/fragment.content.duration)*100+'%',
         borderRadius: '4px', background: cut.color}`)
-  //- cuts pan
+  //- cuts on frames pan
   cuts-on-frames(
-    v-show="editing"
-    :editing="editing" :width="width" :fragment="fragment" :cut="cut" :cuts="cuts" :player="player"
+    :editing="editing" :width="width" :fragment="fragment" :cut="cut" :cuts="cuts" :player="player" :now="now"
     @panningStarted="fragmentPlaying = false" @cutCreate="cutCreate")
   //- cuts-pan
   //- body
   div.col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-md
-      k-dialog-bottom(ref="cutDialog" :options="cutDialogOptions" @action="cutAction")
-      fev-cut(
-        v-for="(c, ci) in cuts" :key="c.color"
-        :index="ci" :cut="c" :cutIndex="cutIndex" :cutPlaying="cutPlaying" :player="player"
-        @cutIndex="cutIndex = $event" @play="cutPlay"
-        @action="$refs.cutDialog.show()").q-mb-sm
+      div(
+        :class=`{'bg-red': fragmentDuration > 60, 'bg-green': fragmentDuration < 60}`
+        :style=`{borderRadius: '10px'}`).row.full-width.q-pa-sm.q-my-sm
+        span.text-bold.text-white Total duration: {{ $time(fragmentDuration) }}
+      draggable(
+        v-model="fragment.cuts"
+        v-bind="dragOptions"
+        @start="cutDragging = true"
+        @end="cutDragging = false"
+        handle=".handle"
+        ).full-width
+        transition-group(type="transition" name="flip-list")
+          fev-cut(
+            v-for="(c, ci) in fragment.cuts" :key="c.color"
+            :index="ci" :cut="c" :cutIndex="cutIndex" :cutPlaying="cutPlaying" :player="player" :now="now"
+            @cutIndex="cutIndex = $event" @play="cutPlay"
+            @action="cutActionStart(c, ci)").q-mb-sm
+  div(:style=`{height: '66px'}`).row.full-width.bg-black
+    transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      div(
+        v-if="fragment.cuts.length > 0"
+        :style=`{height: '66px', width: '66px'}`).row.items-center.content-center.justify-center
+        q-btn(
+          push round @click="fragmentPlay()"
+          :color="fragmentPlaying ? 'red' : 'green'"
+          :icon="fragmentPlaying ? 'pause' : 'play_arrow'")
+    .col.full-height.q-px-md
+      div(
+        @click="fragmentNameSettingStart()"
+        :style=`{position: 'relative'}` v-ripple=`{color: 'white'}`
+        ).row.fit.items-center.content-center.cursor-pointer
+        span(
+          v-if="!fragmentNameSetting"
+          :style=`{fontSize: '16px'}`
+          ).text-white {{ fragment.name.length > 0 ? fragment.name : 'Set fragment name' }}
+        input(
+          v-if="fragmentNameSetting"
+          ref="fragmentNameInput"
+          v-model="fragment.name"
+          @keyup.enter="fragmentNameSetting = false" @blur="fragmentNameSetting = false"
+          :style=`{fontSize: '16px', margin: 0, padding: 0, borderRadius: '10px', overflow: 'hidden'}`
+          ).full-width.kinput.text-white.bg-green
+    div(:style=`{height: '66px', width: '66px'}`).row.items-center.justify-center
+      q-btn(round flat color="white" icon="more_vert" @click="fragmentDialog()")
 </template>
 
 <script>
 import fevCut from './cut'
 import cutsOnFrames from './cuts_on_frames'
+import draggable from 'vuedraggable'
 
 export default {
   name: 'nFEV',
-  components: {fevCut, cutsOnFrames},
-  props: ['ctx', 'fragment', 'width', 'height', 'mini', 'player', 'editing'],
+  components: {fevCut, cutsOnFrames, draggable},
+  props: ['ctx', 'fragment', 'width', 'height', 'mini', 'player', 'now', 'editing'],
   data () {
     return {
       cutIndex: -1,
       cutPlaying: -1,
-      fragmentPlaying: false
+      fragmentPlaying: false,
+      fragmentNameSetting: false,
+      nowStop: false
     }
   },
   computed: {
@@ -84,9 +147,40 @@ export default {
       if (this.cutIndex === 0) delete options.actions.up
       if (this.cutIndex === this.cuts.length - 1) delete options.actions.down
       return options
+    },
+    dragOptions() {
+      return {
+        animation: 0,
+        group: 'cuts',
+        disabled: false,
+        ghostClass: 'ghost'
+      }
     }
   },
   watch: {
+    now: {
+      async handler (to, from) {
+        // this.$log('now CHANGED', to)
+        if (this.cutPlaying >= 0) {
+          let cutStart = this.cut.points[0].x
+          let cutEnd = this.cut.points[1].x
+          if (to < cutStart - 0.5 || to > cutEnd + 0.5) {
+            this.$log('MUCH MUCH MUCH')
+            this.player.setCurrentTime(cutStart - 0.1)
+            if (this.fragmentPlaying && !this.nowStop) {
+              this.nowStopSet()
+              if (this.cuts[this.cutPlaying + 1]) {
+                this.cutIndex += 1
+                this.cutPlaying += 1
+              } else {
+                this.cutIndex = 0
+                this.cutPlaying = 0
+              }
+            }
+          }
+        }
+      }
+    },
     editing: {
       handler (to, from) {
         this.$log('editing CHANGED', to)
@@ -100,21 +194,40 @@ export default {
     }
   },
   methods: {
+    async nowStopSet () {
+      this.$log('nowStopSet')
+      this.nowStop = true
+      await this.$wait(200)
+      this.nowStop = false
+    },
     fragmentPlay () {
       this.$log('fragmentPlay')
-      // if (this.fragment.cuts.length === 0) return
-      // if (this.fragmentPlaying) {
-      //   this.fragmentPlaying = false
-      //   this.cutIndex = -1
-      //   this.cutPlaying = -1
-      //   this.player.pause()
-      // } else {
-      //   this.fragmentPlaying = true
-      //   this.cutIndex = 0
-      //   this.cutPlaying = 0
-      //   this.player.play()
-      //   this.player.setCurrentTime(this.cut.points[0].x)
-      // }
+      if (this.fragment.cuts.length === 0) return
+      if (this.fragmentPlaying) {
+        this.fragmentPlaying = false
+        this.cutIndex = -1
+        this.cutPlaying = -1
+        this.player.pause()
+      } else {
+        this.fragmentPlaying = true
+        this.cutIndex = 0
+        this.cutPlaying = 0
+        this.player.play()
+        this.player.setCurrentTime(this.cut.points[0].x)
+      }
+    },
+    fragmentNameSettingStart () {
+      this.$log('fragmentNameSettingStart')
+      this.fragmentNameSetting = !this.fragmentNameSetting
+      this.$nextTick(() => {
+        if (this.$refs.fragmentNameInput) this.$refs.fragmentNameInput.focus()
+      })
+    },
+    fragmentActionStart (fragment) {
+      this.$log('fragmentDialog', fragment)
+    },
+    fragmentAction (action, payload) {
+      this.$log('fragmentAction', action, payload)
     },
     cutPlay (ci) {
       this.$log('cutPlay', ci)
@@ -142,52 +255,45 @@ export default {
       this.fragment.cuts.push(cut)
       this.cutIndex = this.fragment.cuts.length - 1
     },
-    cutDelete (index) {
+    async cutDelete (index) {
       this.$log('cutDelete', index)
+      // TODO: delete by color...
       this.cutIndex = -1
       this.$delete(this.fragment.cuts, index)
+      await this.$wait(200)
+      if (this.cuts.length > 0) {
+        if (this.cuts[index - 1]) this.cutIndex = index
+        else this.cutIndex = 0
+      }
     },
     cutExport () {
       this.$log('cutExport', this.cut)
       // create node with one fragment...
     },
-    cutUp (index) {
-      this.$log('cutUp')
-      let current = this.cuts[index]
-      let to = this.cuts[index - 1]
-      this.cuts[index] = to
-      this.cuts[index - 1] = current
-      this.$nextTick(() => {
-        this.cutIndex = index - 1
-      })
+    cutActionStart (c, ci) {
+      this.$log('cutActionStart', c, ci)
+      this.$store.dispatch('ui/action', [
+        {
+          payload: ci,
+          timeout: 3000,
+          name: c.name.length > 0 ? c.name : false,
+          actions: {
+            delete: {name: 'Delete'},
+            confirm: {name: 'Export to fragment'}
+          }
+        },
+        this.cutAction
+      ])
     },
-    cutDown (index) {
-      this.$log('cutDown')
-      let current = this.cuts[index]
-      let to = this.cuts[index + 1]
-      this.cuts[index] = to
-      this.cuts[index + 1] = current
-      this.$nextTick(() => {
-        this.cutIndex = index + 1
-      })
-    },
-    cutAction (action) {
+    cutAction (action, ci) {
       this.$log('cutAction', action)
       switch (action) {
         case 'confirm': {
           this.$log('EXPORT')
           break
         }
-        case 'up': {
-          this.cutUp(this.cutIndex)
-          break
-        }
-        case 'down': {
-          this.cutDown(this.cutIndex)
-          break
-        }
         case 'delete': {
-          if (confirm(this.$t('Delete cut?'))) this.cutDelete(this.cutIndex)
+          if (confirm(this.$t('Delete cut?'))) this.cutDelete(ci)
           break
         }
       }
@@ -197,11 +303,8 @@ export default {
     this.$log('mounted')
     if (this.cuts.length > 0) {
       this.cutIndex = 0
-      // this.fragmentPlay()
-    } else {
-      // this.player.play()
+      this.fragmentPlay()
     }
-    this.player.play()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

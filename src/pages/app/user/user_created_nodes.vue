@@ -25,7 +25,7 @@ export default {
   },
   computed: {
     sphereOid () {
-      // return this.$store.state.objects.currentUser.oid
+      // return this.$store.getters.currentUser.oid
       return this.$route.params.oid
     },
     variables () {
@@ -34,7 +34,7 @@ export default {
       return {
         oid: this.sphereOid,
         pagination: { pageSize: 100 },
-        sortStrategy: 'HOT',
+        sortStrategy: 'AGE',
         filter: this.filter
         // filter: { types: ['NODE'], fastFilters: ['CREATED_BY_USER']} // JSON.parse(JSON.stringify(this.filter))
       }

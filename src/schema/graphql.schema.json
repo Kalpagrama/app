@@ -1,10 +1,10 @@
 {
   "__schema": {
     "queryType": {
-      "name": "queries"
+      "name": "Query"
     },
     "mutationType": {
-      "name": "mutations"
+      "name": "Mutation"
     },
     "subscriptionType": {
       "name": "subscriptions"
@@ -12,7 +12,7 @@
     "types": [
       {
         "kind": "OBJECT",
-        "name": "queries",
+        "name": "Query",
         "description": null,
         "fields": [
           {
@@ -472,6 +472,37 @@
                     "ofType": null
                   }
                 }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "objectFull",
+            "description": null,
+            "args": [
+              {
+                "name": "oid",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "OID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Object",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -3619,7 +3650,7 @@
             "deprecationReason": null
           },
           {
-            "name": "rates",
+            "name": "history",
             "description": null,
             "args": [],
             "type": {
@@ -3709,7 +3740,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "mutations",
+        "name": "Mutation",
         "description": null,
         "fields": [
           {
@@ -4180,8 +4211,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
+                "kind": "INTERFACE",
+                "name": "Object",
                 "ofType": null
               }
             },
@@ -4377,8 +4408,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
+                "kind": "OBJECT",
+                "name": "Node",
                 "ofType": null
               }
             },
@@ -4408,8 +4439,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
+                "kind": "OBJECT",
+                "name": "Node",
                 "ofType": null
               }
             },
@@ -4439,8 +4470,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
+                "kind": "INTERFACE",
+                "name": "ObjectShort",
                 "ofType": null
               }
             },
@@ -4470,8 +4501,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
+                "kind": "INTERFACE",
+                "name": "ObjectShort",
                 "ofType": null
               }
             },
@@ -6616,13 +6647,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "OID",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "OID",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null

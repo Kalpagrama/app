@@ -1,7 +1,10 @@
 import assert from 'assert'
+import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
-export function init (state, currentUser) {
-  assert.ok(currentUser)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
+
+export function init (state) {
   state.initialized = true
-  state.user = currentUser
 }

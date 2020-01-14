@@ -201,12 +201,13 @@ const userFragment = gql`
   }
 `
 const objectFullFragment = gql`
-  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment}
+  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${objectFragment}
   fragment objectFullFragment on Object {
-    oid
-    type
-    name
-    thumbUrl(preferWidth: 600)
+#    oid
+#    type
+#    name
+#    thumbUrl(preferWidth: 600)
+    ...objectFragment
     ...on Video {...videoFragment}
     ...on Image {...imageFragment}
     ...on Node {... nodeFragment}

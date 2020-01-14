@@ -164,9 +164,9 @@ export default {
   methods: {
     async downloadPhoto (file) {
       try {
-        this.$log('changePhoto start', file)
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        this.$log('changePhoto start')
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.thumbUrl',
           value: file
         })
@@ -218,8 +218,8 @@ export default {
     async enterNameFirst () {
       try {
         this.$log('changeNameFirst start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.nameFirst',
           value: this.nameFirst
         })
@@ -232,8 +232,8 @@ export default {
     async enterNameSecond () {
       try {
         this.$log('changeNameSecond start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.nameSecond',
           value: this.nameSecond
         })
@@ -247,8 +247,12 @@ export default {
       this.lang = n
       try {
         this.$log('changeLanguage start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        // изменить язык интерфейса
+        this.$logD('change lang from: ', this.$i18n.i18next.language, 'to: ', this.lang)
+        this.$i18n.i18next.changeLanguage(this.lang).catch(err => this.$logE(err))
+        this.$forceUpdate();
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.lang',
           value: this.lang
         })
@@ -268,12 +272,13 @@ export default {
       if (this.slide === '3') this.next = '4'
       if (this.slide === '4') this.next = '5'
       this.slide = this.next
-      if (this.next === '5') {
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+      if (this.next === '4') {
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.tutorial',
           value: false
         })
+        await this.catAdd()
         this.$emit('hide')
       }
     },
@@ -292,11 +297,8 @@ export default {
   mounted () {
     this.$logD('mounted')
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$logD('beforeDestroy')
-    this.categoriesToAdd.map((cat) => {
-      this.catAdd({oid: cat})
-    })
   }
 }
 </script>

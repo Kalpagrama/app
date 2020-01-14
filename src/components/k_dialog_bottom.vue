@@ -1,5 +1,5 @@
 <template lang="pug">
-q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="$emit('hide')")
+q-dialog(ref="kDialogBottom" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="actionClick(null, 'hide')")
   div(
     @click.self="$refs.kDialogBottom.hide()" v-touch-swipe.mouse="swiped"
     :class="getClass")
@@ -94,7 +94,7 @@ export default {
       this.$emit('show')
     },
     hide () {
-      this.$logD('hide', this.$refs.kDialogBottom)
+      this.$logD('hide')
       this.$refs.kDialogBottom.hide()
       this.$emit('hide')
     },

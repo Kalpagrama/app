@@ -47,20 +47,20 @@ export default {
       this.$logD('fetchMore done')
     },
     async nodesLoad (variables, append = false) {
-      this.$logD('nodesLoad2 start', variables)
+      this.$logD('nodesLoad start', variables)
       let { oid, pagination, filter, sortStrategy } = variables
       pagination = pagination || {pageSize: 100, pageToken: null}
       sortStrategy = sortStrategy || 'HOT'
       let res
       switch (this.type){
         case 'sphereNodes' :
-          res = await this.$store.dispatch('node/sphereNodes', { oid, pagination, filter, sortStrategy })
+          res = await this.$store.dispatch('lists/sphereNodes', { oid, pagination, filter, sortStrategy })
           break
         case 'feed' :
-          res = await this.$store.dispatch('node/feed', { oid, pagination, filter, sortStrategy })
+          res = await this.$store.dispatch('lists/feed', { oid, pagination, filter, sortStrategy })
           break
         case 'nodeNodes' :
-          res = await this.$store.dispatch('node/nodeNodes', { oid, pagination, filter, sortStrategy })
+          res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
         default: throw new Error(`unknown type ${this.type}`)
       }
@@ -72,7 +72,7 @@ export default {
       this.nextPageToken = nextPageToken
       this.totalCount = totalCount
       this.itemsCount = items.length
-      this.$logD('nodesLoad2 done', this.nodes)
+      this.$logD('nodesLoad2 done')
     },
     // возможно это ядро скоро понадобятся
     prefetch(oid){

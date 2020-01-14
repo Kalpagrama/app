@@ -11,7 +11,7 @@ iframe {
 }
 </style>
 <template lang="pug">
-q-layout(view="hHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
+q-layout(view="hHh lpR fFf").bg-grey-3
   //- q-header(
   //-   v-if="showNameSticky"
   //-   ).row.full-width.justify-center
@@ -72,6 +72,8 @@ export default {
       async handler (to, from) {
         if (to.params.oid) {
           this.$log('$route CHANGED', to.params.oid)
+          this.content = null
+          await this.$wait(300)
           this.content = await this.contentLoad(to.params.oid)
         }
       }

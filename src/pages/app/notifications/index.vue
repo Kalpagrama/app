@@ -44,7 +44,7 @@ export default {
   },
   computed: {
     events () {
-      return this.$store.state.events.userEvents
+      return this.$store.getters.currentUser.events
     },
     eventsCount () {
       return this.events.length

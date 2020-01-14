@@ -20,6 +20,11 @@ export default {
   data () {
     return {
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.$q.addressbarColor.set('#1b2e65')
+    document.body.style.background = '#1b2e65'
   }
 }
 </script>

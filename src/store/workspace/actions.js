@@ -1,5 +1,5 @@
-import { apolloProvider } from 'boot/apollo'
-import { fragments } from 'schema/index'
+import { apollo } from 'src/boot/apollo'
+import { fragments } from 'src/schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
@@ -10,15 +10,26 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
-  logD('userWorkspace init. userWorkspace=', context.rootState.objects.currentUser.workspace)
-  context.commit('init', context.rootState.objects.currentUser.workspace)
+  logD('userWorkspace init')
+  context.commit('init')
   return true
 }
-
+export const wsClear = async (context) => {
+  logD('wsClear start')
+  let { data: { wsClear } } = await apollo.clients.api.mutate({
+    mutation: gql`
+      mutation sw_network_only_wsClear {
+        wsClear
+      }
+    `
+  })
+  logD('wsClear done', wsClear)
+  return wsClear
+}
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
 export const wsSphereCreate = async (context, sphere) => {
   logD('wsSphereCreate start', sphere)
-  let { data: { wsSphereCreate } } = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { wsSphereCreate } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectShortFragment}
       mutation sw_network_only_wsSphereCreate ($sphere: ObjectShortInput!) {
@@ -37,7 +48,7 @@ export const wsSphereCreate = async (context, sphere) => {
 }
 export const wsSphereDelete = async (context, oid) => {
   logD('wsSphereDelete start', oid)
-  let { data: { wsSphereDelete } } = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { wsSphereDelete } } = await apollo.clients.api.mutate({
     mutation: gql`
       mutation sw_network_only_wsSphereDelete ($oid: OID!) {
         wsSphereDelete (oid: $oid)
@@ -115,7 +126,7 @@ export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave nodeInput ', nodeInput)
   let res
   if (node.oid) {
-    let { data: { wsNodeUpdate } } = await apolloProvider.clients.apiApollo.mutate({
+    let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
         mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
@@ -130,7 +141,7 @@ export const wsNodeSave = async (context, node) => {
     })
     res = wsNodeUpdate
   } else {
-    let { data: { wsNodeCreate } } = await apolloProvider.clients.apiApollo.mutate({
+    let { data: { wsNodeCreate } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.nodeFragment}
         mutation sw_network_only_wsNodeCreate ($node: NodeInput!) {
@@ -149,9 +160,9 @@ export const wsNodeSave = async (context, node) => {
   return res
 }
 export const wsNodeDelete = async (context, oid) => {
-  logD('wsNodeDelete start')
+  logD('wsNodeDelete start', oid)
   assert.ok(oid)
-  let { data: { wsNodeDelete } } = await apolloProvider.clients.apiApollo.mutate({
+  let { data: { wsNodeDelete } } = await apollo.clients.api.mutate({
     mutation: gql`
       mutation sw_network_only_wsNodeDelete ($oid: OID!) {
         wsNodeDelete (oid: $oid)

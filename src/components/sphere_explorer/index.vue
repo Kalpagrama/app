@@ -14,13 +14,13 @@ iframe {
 }
 </style>
 <template lang="pug">
-q-layout(view="HHh lpR fFf" @resize="onResize" @scroll="onScroll").bg-grey-3
+q-layout(view="HHh lpR fFf").bg-grey-3
   //- header
   q-header(reveal).row.full-width.items-center.justify-center
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.bg-grey-3
-      h6(v-if="sphere" :style=`{}`).text-black.q-pa-xs.q-ma-xs {{`${sphere.name}`}}
-      .col
-      q-btn(round flat icon="more_vert")
+      h6(v-if="sphere" :style=`{}`).text-black.q-pa-xs.q-ma-xs {{ sphere.name }}
+      //- .col
+      //- q-btn(round flat icon="more_vert")
   q-footer(reveal).row.full-width.justify-center
     k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
   //- body nodes
@@ -93,21 +93,25 @@ export default {
     },
     async spheresLoad (oid) {
       this.$log('spheresLoad start', oid)
-      let { data: { sphereSpheres: { items: spheres } } } = await this.$apollo.query({
-        query: gql`
-          query sphereSpheresSphereExplorer ($oid: OID!){
-            sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
-              items {
-                oid
-                name
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
+      let pagination = {pageSize: 100}
+      let filter = null
+      let sortStrategy = 'HOT'
+      let spheres = await this.$store.dispatch('lists/sphereSpheres', { oid, pagination, filter, sortStrategy })
+      // let { data: { sphereSpheres: { items: spheres } } } = await this.$apollo.query({
+      //   query: gql`
+      //     query sphereSpheresSphereExplorer ($oid: OID!){
+      //       sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
+      //         items {
+      //           oid
+      //           name
+      //         }
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   }
+      // })
       this.$log('spheresLoad done', spheres)
       return spheres
     }
