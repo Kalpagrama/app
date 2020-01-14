@@ -67,10 +67,10 @@ div(:style=`{backgroundColor: 'rgba(0, 0, 0, 0.2)', }`).row.fit.content-center.j
         .row.full-width.justify-center.q-mt-md
           q-btn(unelevated @click="changePhoto()" color="accent") {{$t('Add a photo')}}
       div(style=`height: 50%`).row.row.full-width.justify-center
-        div(v-if="$store.state.user.user.profile.thumbUrl").row.full-width.justify-center.q-mt-md.content-start
-          img(:src="$store.state.user.user.profile.thumbUrl" :style=`{width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
+        div(v-if="$store.getters.currentUser.profile.thumbUrl").row.full-width.justify-center.q-mt-md.content-start
+          img(:src="$store.getters.currentUser.profile.thumbUrl" :style=`{width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
           .row.full-width.justify-center.q-mt-md
-            span.text-h5.text-bold {{$store.state.user.user.name}}
+            span.text-h5.text-bold {{$store.getters.currentUser.name}}
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px'}`).row.full-width.justify-end.q-pa-md
         q-btn(v-model="slide" style=`height: 40px` @click="nextSlide()" color="accent" :label="$t('Next')")
     //- CATEGORIES
@@ -163,8 +163,8 @@ export default {
     async downloadPhoto (file) {
       try {
         this.$log('changePhoto start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.thumbUrl',
           value: file
         })
@@ -207,8 +207,8 @@ export default {
     async enterNameFirst () {
       try {
         this.$log('changeNameFirst start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.nameFirst',
           value: this.nameFirst
         })
@@ -221,8 +221,8 @@ export default {
     async enterNameSecond () {
       try {
         this.$log('changeNameSecond start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.nameSecond',
           value: this.nameSecond
         })
@@ -236,8 +236,12 @@ export default {
       this.lang = n
       try {
         this.$log('changeLanguage start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        // изменить язык интерфейса
+        this.$logD('change lang from: ', this.$i18n.i18next.language, 'to: ', this.lang)
+        this.$i18n.i18next.changeLanguage(this.lang).catch(err => this.$logE(err))
+        this.$forceUpdate();
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.lang',
           value: this.lang
         })
@@ -258,11 +262,12 @@ export default {
       if (this.slide === '4') this.next = '5'
       this.slide = this.next
       if (this.next === '4') {
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.tutorial',
           value: false
         })
+        await this.catAdd()
         this.$emit('hide')
       }
     },
@@ -281,11 +286,8 @@ export default {
   mounted () {
     this.$logD('mounted')
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$logD('beforeDestroy')
-    this.categoriesToAdd.map((cat) => {
-      this.catAdd({oid: cat})
-    })
   }
 }
 </script>

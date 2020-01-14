@@ -90,7 +90,7 @@ export default {
         let url = new URL(to)
         this.$log('url GOOD', url)
         this.urlInputLoading = true
-        let content = await this.contentGet(to, true)
+        let content = await this.contentGet(to)
         await this.$wait(500)
         this.$log('content', content)
         this.$emit('content', content)
@@ -99,27 +99,28 @@ export default {
         this.$log('url WRONG', to)
       }
     },
-    async contentGet (url, onlyMeta = true) {
+    async contentGet (url) {
       this.$log('contentGet start')
-      if (!onlyMeta) this.progressShow = true
-      let {data: {uploadContentUrl}} = await this.$apollo.mutate({
-        mutation: gql`
-          ${fragments.objectFragment}
-          mutation sw_network_only_nc_uploadContentUrl ($url: String!, $onlyMeta: Boolean!) {
-            uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
-              ...objectFragment
-            }
-          }
-        `,
-        variables: {
-          url: url,
-          onlyMeta: onlyMeta
-        }
-      })
-      if (!onlyMeta) {
-        this.progressShow = false
-      }
-      this.$store.commit('events/stateSet', ['progress', null])
+      // if (!onlyMeta) this.progressShow = true
+      let uploadContentUrl = await this.$store.dispatch('content/uploadContentUrl', url)
+      // let {data: {uploadContentUrl}} = await this.$apollo.mutate({
+      //   mutation: gql`
+      //     ${fragments.objectFullFragment}
+      //     mutation sw_network_only_nc_uploadContentUrl ($url: String!, $onlyMeta: Boolean!) {
+      //       uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
+      //         ...objectFullFragment
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     url: url,
+      //     onlyMeta: onlyMeta
+      //   }
+      // })
+      // if (!onlyMeta) {
+      //   this.progressShow = false
+      // }
+      // this.$store.commit('events/stateSet', ['progress', null])
       this.$log('contenGet done', uploadContentUrl)
       return uploadContentUrl
     },

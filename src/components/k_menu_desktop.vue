@@ -1,26 +1,27 @@
 <template lang="pug">
-div(:style=`{minHeight: '100vh'}`).column.full-width.bg-black
+div(:style=`{minHeight: '100vh'}`).column.full-width.bg-secondary
   //- dialogs
   q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
     k-invite(@hide="$refs.inviteDialog.hide()")
   k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
   //- kalpagramma
-  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer.bg-black
+  div(:style=`{height: '60px'}`).row.full-width.cursor-pointer
     div(@click="$go('/')").col.row.items-center
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         k-logo(:width="40" :height="40")
       div(v-if="!mini").col.full-height
         .row.fit.items-center
-          span.text-bold.text-white {{$t('Кальпаграмма ver:') + $store.state.core.version}}
+          span.text-bold.text-white {{$t('Kalpagramma v') + $store.state.core.version}}
+          //- span.text-white.text-bold Кальпаграмма 1.0.1 // зачем сломали номер версии? поставил обратно...
     div(@click="$go('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       q-btn(round flat icon="settings" color="white")
   //- user
-  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.state.objects.currentUser.oid)").row.full-width.bg-black
+  div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid)").row.full-width
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       img(
         v-show="!userAvatarErrored"
         @error="userAvatarError"
-        :src="$store.state.objects.currentUser.profile.thumbUrl"
+        :src="$store.getters.currentUser.profile.thumbUrl"
         :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
       div(
         v-if="userAvatarErrored"
@@ -28,7 +29,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-black
         ).row.bg-grey-3
     div(v-if="!mini").col.full-height
       .row.fit.items-center
-        span.text-bold.text-white.cursor-pointer {{ $t($store.state.objects.currentUser.name) }}
+        span.text-bold.text-white.cursor-pointer {{ $t($store.getters.currentUser.name) }}
   //- create node
   div(v-if="!page" :style=`{height: '60px'}` @click="$store.commit('ui/stateSet', ['nodeCreatorDialogOpened', true])").row.full-width.items-center.cursor-pointer
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
@@ -37,7 +38,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-black
       .row.fit.items-center
         span.text-white {{$t('Создать ядро')}}
   //- body
-  .col.full-width.scroll.bg-black
+  .col.full-width.scroll
     .row.full-width.items-start.content-start
       div(v-for="(p, pi) in pages" :key="pi" @click="pageClick(p, pi)"
         :style=`{height: '60px'}`
@@ -65,7 +66,7 @@ div(:style=`{minHeight: '100vh'}`).column.full-width.bg-black
         :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
         span(v-if="width === 230").text-bold.q-ml-md {{ $t('install_app') }}
     //- refresh
-    div().row.full-width.q-px-md
+    div(:style=`{marginBottom: '70px'}`).row.full-width.q-px-md
       q-btn(
         outline color="accent" no-caps @click="appRefresh()"
         :style=`{borderRadius: '10px'}` ).full-width {{$t('Refresh')}}

@@ -1,19 +1,19 @@
-import { apolloProvider } from 'boot/apollo'
-import { fragments } from 'schema/index'
+import { apollo } from 'src/boot/apollo'
+import { fragments } from 'src/schema/index'
 import { Notify } from 'quasar'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
-  // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
-  logD('init', context.rootState.objects.currentUser.events)
-  const observerEvent = apolloProvider.clients.wsApollo.subscribe({
+  logD('init events')
+  const observerEvent = apollo.clients.ws.subscribe({
     client: 'wsApollo',
     query: gql`
       ${fragments.eventFragment}
@@ -39,7 +39,7 @@ export const init = async (context) => {
 
 export const testWebPush = async (context) => {
   logD('testWebPush...')
-  let { data: { testWebPush } } = await apolloProvider.clients.apiApollo.query({
+  let { data: { testWebPush } } = await apollo.clients.api.query({
     query: gql`
       query testWebPush {
         testWebPush
@@ -51,7 +51,7 @@ export const testWebPush = async (context) => {
 }
 
 function processEvent (context, event) {
-  logD('event received', event)
+  logD('processEvent start', event)
   switch (event.type) {
     case 'ERROR':
       context.commit('stateSet', ['error', event])
@@ -64,71 +64,96 @@ function processEvent (context, event) {
       context.commit('stateSet', ['notice', event])
       break
     case 'OBJECT_CHANGED':
-      context.commit('objects/setObjectValue', {
+      context.commit('objects/update', {
         oid: event.object.oid,
         path: event.path,
-        value: event.value
-      }, {root: true})
-      context.commit('addEvent', event)
+        newValue: event.value
+      }, { root: true })
+      context.commit('addEvent', {event, context})
       break
     case 'NODE_CREATED':
-      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
+      if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeCreated', event])
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'NODE_RATED':
-      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
+      if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeRated', event])
-      context.commit('objects/setObjectValue', {
+      context.commit('objects/update', {
         oid: event.object.oid,
         path: 'rate',
-        value: event.rate
+        newValue: event.rate
       }, { root: true })
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'NODE_DELETED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['nodeDeleted', event])
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userSubscribed', event])
-      if (event.subject.oid === context.rootState.objects.currentUser.oid) { // если это мы подписались
-        context.commit('subscriptions/subscribe', event.object, { root: true })
+      if (event.subject.oid === context.rootState.auth.userOid) { // если это мы подписались
+        context.commit('objects/update', {
+          oid: event.subject.oid,
+          path: 'subscriptions',
+          setter: (oldValue) => {
+            let subscriptions = oldValue // JSON.parse(JSON.stringify(currentUser.subscriptions))
+            let index = subscriptions.findIndex(s => s.oid === event.object.oid)
+            assert.ok(index === -1)
+            subscriptions.push(event.object)
+            return subscriptions
+          }
+        }, { root: true })
         // на кого я подписан...
-        let cachedObj = context.rootGetters['objects/objectGet']({ oid: event.object.oid })
-        if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
-          cachedObj.subscribers.push({
-            oid: event.subject.oid,
-            name: event.subject.name,
-            type: event.subject.type,
-            thumbUrl: event.subject.thumbUrl
-          })
-        }
+        context.commit('objects/update', {
+          oid: event.object.oid,
+          path: 'subscribers',
+          setter: (oldValue) => {
+            let subscribers = oldValue // JSON.parse(JSON.stringify(currentUser.subscriptions))
+            let index = subscribers.findIndex(s => s.oid === event.subject.oid)
+            assert.ok(index === -1)
+            subscribers.push(event.subject)
+            return subscribers
+          }
+        }, { root: true })
       }
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'USER_UNSUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userUnSubscribed', event])
-      if (event.subject.oid === context.rootState.objects.currentUser.oid) {
-        context.commit('subscriptions/unSubscribe', event.object, { root: true })
-        let cachedObj = context.rootGetters['objects/objectGet']({ oid: event.object.oid })
-        if (cachedObj && cachedObj.subscribers) { // обновим закэшированные данные
-          let indx = cachedObj.subscribers.findIndex(obj => obj.oid === event.subject.oid)
-          if (indx >= 0) {
-            cachedObj.subscribers.splice(indx, 1)
-          } else {
-            logE('subscriber not found', event, cachedObj)
+      if (event.subject.oid === context.rootState.auth.userOid) {
+        context.commit('objects/update', {
+          oid: event.subject.oid,
+          path: 'subscriptions',
+          setter: (oldValue) => {
+            let subscriptions = oldValue
+            let index = subscriptions.findIndex(s => s.oid === event.object.oid)
+            assert.ok(index >= 0)
+            subscriptions.splice(index, 1)
+            return subscriptions
           }
-        }
+        }, { root: true })
+        // на кого я подписан...
+        context.commit('objects/update', {
+          oid: event.object.oid,
+          path: 'subscribers',
+          setter: (oldValue) => {
+            let subscribers = oldValue
+            let index = subscribers.findIndex(s => s.oid === event.subject.oid)
+            assert.ok(index >= 0)
+            subscribers.splice(index, 1)
+            return subscribers
+          }
+        }, { root: true })
       }
-      context.commit('addEvent', event)
+      context.commit('addEvent', {event, context})
       break
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_UPDATED':
@@ -142,6 +167,7 @@ function processEvent (context, event) {
     default:
       throw new Error(`unsupported Event ${event.type}`)
   }
+  logD('processEvent done')
 }
 
 function processEventWs (context, event) {
@@ -163,7 +189,7 @@ function processEventWs (context, event) {
       throw new Error(`bad type ${type}`)
   }
   logD(operationName, objectType)
-  context.commit(`workspace/ws${objectType}${operationName}`, object, { root: true })
+  context.commit(`workspace/ws${objectType}${operationName}`, {object, context}, { root: true })
 }
 
 // вывести уведомление о действии пользователя

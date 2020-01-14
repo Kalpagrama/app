@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.full-width.bg-black
+div(:style=`{}`).column.full-width.bg-black
   //- cut&cuts on video progress bar
   div(
     v-if="cut"

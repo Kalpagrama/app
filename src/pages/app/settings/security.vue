@@ -47,12 +47,12 @@ export default {
     //   else return null
     // },
     sessions () {
-      return this.$store.state.objects.currentUser.sessions
+      return this.$store.getters.currentUser.sessions
     },
     mytoken () {
       let str = localStorage.getItem('ktoken')
-      let newstr = str.split('::')[0]
-      return newstr
+      // let newstr = str.split('::')[0]
+      return str
     }
   },
   methods: {

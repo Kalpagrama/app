@@ -1,40 +1,32 @@
 <style lang="stylus">
+iframe {
+  width: 100%;
+  height: 500px;
+}
 </style>
 
 <template lang="pug">
-//- .row.fit.items-center.justify-center
-  //- q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    //- k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
-  //- k-spinner(v-if="loading")
-  //- q-resize-observer(@resize="onResize")
-  //- transition(appear :enter-active-class="$store.state.ui.going ? 'animated slideInRight' : ''")
 .row.full-width.items-start.content-start
-  //- transition(appear enter-active-class="animated fadeIn")
-  q-dialog(ref="kTutorialDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    k-dialog-tutorial(@hide="$refs.kTutorialDialog.hide()")
-  k-dialog-bottom(
-    :value="$store.state.node.nodeOptionsDialogOpened"
-    :options="$store.state.node.nodeOptions"
-    @action="$event => $store.dispatch('node/nodeAction', $event)"
-    @hide="$store.commit('node/stateSet', ['nodeOptionsDialogOpened', false])")
-    //- k-node-dialog
+  k-action
   router-view(v-if="!loading")
 </template>
 
 <script>
+import kAction from 'components/k_action'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 
 export default {
   name: 'mainLayout',
-  components: {},
+  components: {kAction},
   data () {
     return {
       loading: true,
       width: 0,
       height: 0,
       me: null,
-      player: null
+      player: null,
+      showIframe: false
     }
   },
   computed: {
@@ -55,10 +47,16 @@ export default {
       let vh = window.innerHeight * 0.01
       document.documentElement.style.setProperty('--vh', `${vh}px`)
       this.height = vh
+    },
+    async closeTutorial(){
+      await this.$refs.kTutorialDialog.hide()
+      this.loading = false
     }
   },
-  mounted () {
-    this.$log('mounted.')
+  async mounted () {
+    this.$log('mounted')
+    await this.$wait(3000)
+    this.showIframe = true
   },
   async created () {
     this.$logD('created')
@@ -76,9 +74,8 @@ export default {
       await this.$router.push('/login')
       return
     }
-    this.loading = false
-    if (this.$store.state.objects.currentUser.profile.tutorial) this.$refs.kTutorialDialog.show()
-    // this.$refs.kTutorialDialog.show()
+    if (this.$store.getters.currentUser.profile.tutorial) this.$refs.kTutorialDialog.show()
+    else this.loading = false
   }
  }
 </script>

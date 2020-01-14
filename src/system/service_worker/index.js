@@ -151,6 +151,7 @@ async function initSw (store) {
 
   window.addEventListener('online', handleNetworkChange)
   window.addEventListener('offline', handleNetworkChange)
+  store.commit('core/stateSet', ['online', navigator.onLine])
   logD('initSw OK!')
 }
 
@@ -174,10 +175,13 @@ async function clearCache (force = false) {
   logD('clear Idb...')
   const swShareStore = new Store('sw-share', 'request-formData')
   const gqlStore = new Store('sw-cache-gql', 'graphql-responses')
-  const gqlVideo = new Store('sw-cache-video', 'video-responses')
+  const videoStore = new Store('sw-cache-video', 'video-responses')
+  const gqlPersistStore = new Store('gqlPersistStore', 'cache')
   await clear(swShareStore)
   await clear(gqlStore)
-  await clear(gqlVideo)
+  await clear(videoStore)
+  // todo clear InMemoryCache instead (src/boot/apollo.js:68)
+  await clear(gqlPersistStore)
 
   logD('clearCache end!')
 }

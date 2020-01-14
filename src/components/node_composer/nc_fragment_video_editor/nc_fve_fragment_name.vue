@@ -4,7 +4,7 @@
     .row.fit.items-start.content-start.q-pa-md
       .row.full-width
         input(
-          ref="nameInput" v-model="name" :placeholder="$t('Set name')" @keyup.enter="confirm()"
+          ref="nameInput" v-model="name" :placeholder="$t('Set name')" @keyup.enter="confirm()" @blur="confirm()"
           :style=`{fontSize: nameHeight+'px', background: 'none'}`).full-width.text-white.text-center.kinput
   div(:style=`{}`).row.full-width.items-center.q-pa-md
     q-btn(

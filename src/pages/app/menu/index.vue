@@ -4,7 +4,7 @@
 }
 </style>
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-black
+q-layout(view="hHh lpR fFf").bg-secondary
   q-page-conainter
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
@@ -20,6 +20,11 @@ export default {
   data () {
     return {
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.$q.addressbarColor.set('#1b2e65')
+    document.body.style.background = '#1b2e65'
   }
 }
 </script>

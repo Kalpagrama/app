@@ -19,7 +19,7 @@ div(:style=`{position: 'relative', oveflow: 'hidden'}`).column.fit
       div(
         :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', paddingBottom: '100px'}`
         ).row.full-width.items-start.content-start.q-pa-sm
-        q-resize-observer(ref="onResizeObserver" @resize="onResize")
+        //- q-resize-observer(ref="onResizeObserver" @resize="onResize")
         node(
           v-for="(n, ni) in nodes" :key="n.oid"
           :ref="`node${n.oid}`"

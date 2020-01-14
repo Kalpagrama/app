@@ -132,7 +132,7 @@ export default {
     },
     spheresWS () {
       let m = {}
-      return this.$store.state.workspace.workspace.nodes
+      return this.$store.getters.currentUser.workspace.nodes
         .reduce((acc, val) => {
           val.spheres.map(s => {
             if (!m[s.name]) acc.push(s)
@@ -200,21 +200,25 @@ export default {
     },
     async spheresLoad (oid) {
       this.$log('spheresLoad start', oid)
-      let { data: { sphereSpheres: { items: spheres } } } = await this.$apollo.query({
-        query: gql`
-          query sphereSpheresNcSpheres ($oid: OID!){
-            sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
-              items {
-                oid
-                name
-              }
-            }
-          }
-        `,
-        variables: {
-          oid: oid
-        }
-      })
+      let pagination = {pageSize: 100}
+      let filter = null
+      let sortStrategy = 'HOT'
+      let spheres = await this.$store.dispatch('lists/sphereSpheres', { oid, pagination, filter, sortStrategy })
+      // let { data: { sphereSpheres: { items: spheres } } } = await this.$apollo.query({
+      //   query: gql`
+      //     query sphereSpheresNcSpheres ($oid: OID!){
+      //       sphereSpheres (sphereOid: $oid, pagination: {pageSize: 500}, sortStrategy: HOT) {
+      //         items {
+      //           oid
+      //           name
+      //         }
+      //       }
+      //     }
+      //   `,
+      //   variables: {
+      //     oid: oid
+      //   }
+      // })
       this.$log('spheresLoad done', spheres)
       return spheres
     }

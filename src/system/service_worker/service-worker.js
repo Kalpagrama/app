@@ -1,4 +1,4 @@
-const swVer = 7
+const swVer = 8
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
   cacheGraphQl,
@@ -145,27 +145,41 @@ if (useCache) {
   // custom resolver for graphql & video requests
   {
     cacheGraphQl = async function (event) {
-      let requestCopy = event.request.clone()
-      let body = await requestCopy.json()
-      logDebug('gql cacheGraphQl', body.operationName)
-      let type = body && body.query && body.query.startsWith('mutation') ? 'mutation' : 'query'
-      if (body.operationName.startsWith('sw_network_only_')) {
-        return await networkOnly(event, gqlStore)
-      } else if (body.operationName.startsWith('sw_cache_only_')) {
-        return await cacheOnly(event, gqlStore)
-      } else if (body.operationName.startsWith('sw_network_first_')) {
-        return await networkFirst(event, gqlStore, 400)
-      } else if (body.operationName.startsWith('sw_cache_first_')) {
-        return await cacheFirst(event, gqlStore)
-      } else if (body.operationName.startsWith('sw_stale_')) {
-        return await StaleWhileRevalidate(event, gqlStore)
-      } else {
-        logDebug(`gql warn. query ${body.operationName} not contains sw strategy. use defaults`)
-        if (type === 'mutation') {
-          return await networkFirst(event, gqlStore)
-        } else {
-          return await networkFirst(event, gqlStore)
+      try {
+        logDebug('cacheGraphQl start')
+        // return await networkOnly(event)// для кэширования gql используется apollo-cache-persist src/boot/apollo.js:10
+        // // eslint-disable-next-line no-unreachable
+        let requestCopy = event.request.clone()
+        let body
+        try {
+          body = await requestCopy.json()
+        } catch (err) {
         }
+        if (!body || !body.operationName) return await networkOnly(event) // например, upload (multipart/form-data)
+        logDebug('gql cacheGraphQl', body.operationName)
+        let type = body && body.query && body.query.startsWith('mutation') ? 'mutation' : 'query'
+        if (body.operationName.startsWith('sw_network_only_')) {
+          return await networkOnly(event)
+        } else if (body.operationName.startsWith('sw_cache_only_')) {
+          return await cacheOnly(event, gqlStore)
+        } else if (body.operationName.startsWith('sw_network_first_')) {
+          return await networkFirst(event, gqlStore, 1200)
+        } else if (body.operationName.startsWith('sw_cache_first_')) {
+          return await cacheFirst(event, gqlStore)
+        } else if (body.operationName.startsWith('sw_stale_')) {
+          return await StaleWhileRevalidate(event, gqlStore)
+        } else {
+          logDebug(`gql warn. query ${body.operationName} not contains sw strategy. use defaults`)
+          if (type === 'mutation') {
+            return await networkFirst(event, gqlStore)
+          } else {
+            return await networkFirst(event, gqlStore)
+          }
+        }
+      } catch (e) {
+        logCritical('error on cacheGraphQl', e)
+        throw e
+        // return await networkOnly(event)
       }
     }
     cacheVideo = async function (event) {
@@ -176,7 +190,7 @@ if (useCache) {
     const cacheOnly = async (event, store) => {
       return await getCache(event.request, store)
     }
-    const networkOnly = async (event, store) => {
+    const networkOnly = async (event) => {
       return await fetch(event.request.clone())
     }
     const StaleWhileRevalidate = async (event, store) => {
@@ -204,7 +218,7 @@ if (useCache) {
             resolve(cachedResponse)
           }, timeout)
         }
-        networkOnly(event, store).then(async (networkResponse) => {
+        networkOnly(event).then(async (networkResponse) => {
           logDebug('gql networkFirst. resolve from network ok!', networkResponse)
           if (timeoutId) clearTimeout(timeoutId)
           if (networkResponse && networkResponse.ok) {
@@ -257,7 +271,7 @@ if (useCache) {
       }
       let res = {
         url: requestCopy.url,
-        headers: serializedHeaders,
+        headers: serializedHeaders
       }
       if (requestCopy.method === 'POST') {
         res.body = await requestCopy.json()
@@ -324,7 +338,7 @@ if (useCache) {
       })
     )
     workbox.routing.registerRoute( // vue router ( /menu /create etc looks at index.html)
-      /\/\w+\/?$/,
+      /\/(?!graphql)\w+\/?$/,
       async ({ url, event, params }) => {
         logDebug('vue router 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
         if (workbox.precaching.getCacheKeyForURL('/index.html')) {
@@ -376,9 +390,11 @@ if (useCache) {
           return caches.match(workbox.precaching.getCacheKeyForURL('/statics/fallback_video.mp4'))
         }
         default:
-          logDebug('fallback default', event.request)
+          logDebug('fallback default (get from network)', event.request)
           // If we don't have a fallback, just return an error response.
           return Response.error()
+        // return await fetch(event.request)
+        // return await fetch(event)
       }
     })
   }

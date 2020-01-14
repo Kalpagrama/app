@@ -12,7 +12,7 @@
         q-btn(round dense flat color="grey-6" icon="more_vert" @click="feedOptions()")
     //- body
     div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-sm
-      q-resize-observer(@resize="onResize")
+      //- q-resize-observer(@resize="onResize")
       div(v-for="(n, ni) in nodes" :key="n.oid").row.full-width
         node(
           :index="ni" :node="n" :lang="ni"

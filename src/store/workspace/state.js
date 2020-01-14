@@ -1,8 +1,8 @@
 export default {
   initialized: false,
-  workspace: {
-    nodes: [],
-    spheres: []
-  },
+  // workspace: {
+  //   nodes: [],
+  //   spheres: []
+  // },
   wsItem: null
 }

@@ -29,7 +29,7 @@ export default {
     //   return this.$store.state.
     // }
     blacklist () {
-      return this.$store.state.objects.currentUser.blacklist
+      return this.$store.getters.currentUser.blacklist
     },
     blacklistCount () {
       return this.blacklist.length

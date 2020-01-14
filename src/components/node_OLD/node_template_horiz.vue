@@ -87,7 +87,7 @@ export default {
           this.$logD('fragmentAction', a.id)
           // prepare node
           let f = JSON.parse(JSON.stringify(this.nodeFull.fragments[fi]))
-          let n = { name: '', thumbUrl: [], fragments: [], spheres: [], author: this.$store.state.objects.currentUser }
+          let n = { name: '', thumbUrl: [], fragments: [], spheres: [], author: this.$store.getters.currentUser }
           n.fragments[fi] = {
             oid: f.content.oid,
             relativePoints: f.relativePoints.map(p => {

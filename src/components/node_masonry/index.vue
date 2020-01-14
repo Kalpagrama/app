@@ -2,7 +2,7 @@
 .row.full-width
   //- div(:style=`{color: 'white'}`).row.full-width.bg-purple
   //-   small colCount: {{colCount}}
-  q-resize-observer(ref="kresize" @resize="onResize")
+  q-resize-observer(ref="kresize")
   //- q-scroll-observer(@scroll="onScroll")
   div(v-if="ready" :style=`{position: 'relative'}`).row.full-width.justify-s.q-px-md
     masonry(:cols=`colCount` :gutter="{default: colGap}" :style=`{}`)

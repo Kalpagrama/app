@@ -48,31 +48,31 @@ export default {
   },
   computed: {
     currentLang () {
-      return this.$store.state.objects.currentUser.profile.lang
+      return this.$store.getters.currentUser.profile.lang
     },
     currentGender () {
-      return this.$store.state.objects.currentUser.profile.gender
+      return this.$store.getters.currentUser.profile.gender
     },
     currentCountry () {
-      return this.$store.state.objects.currentUser.profile.country
+      return this.$store.getters.currentUser.profile.country
     },
     currentCity () {
-      return this.$store.state.objects.currentUser.profile.city
+      return this.$store.getters.currentUser.profile.city
     },
     currentDate () {
-      return this.$store.state.objects.currentUser.profile.dateBirth
+      return this.$store.getters.currentUser.profile.dateBirth
     },
     currentNameFirst () {
-      return this.$store.state.objects.currentUser.profile.nameFirst
+      return this.$store.getters.currentUser.profile.nameFirst
     },
     currentNameSecond () {
-      return this.$store.state.objects.currentUser.profile.nameSecond
+      return this.$store.getters.currentUser.profile.nameSecond
     },
     currentNameFull () {
-      return this.$store.state.objects.currentUser.profile.nameFull
+      return this.$store.getters.currentUser.profile.nameFull
     },
     currentRole () {
-      return this.$store.state.objects.currentUser.profile.role
+      return this.$store.getters.currentUser.profile.role
     },
     nameFull () {
       return this.nameSecond + ' ' + this.nameFirst
@@ -118,8 +118,8 @@ export default {
       if (this.date !== this.currentDate) {
         try {
           this.$log('changeDate start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.dateBirth',
             value: this.date
           })
@@ -133,8 +133,8 @@ export default {
       if (this.city !== this.currentCity) {
         try {
           this.$log('changeCity start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.city',
             value: this.city
           })
@@ -148,8 +148,12 @@ export default {
       if (this.lang !== this.currentLang) {
         try {
           this.$log('changeLanguage start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          // изменить язык интерфейса
+          this.$logD('change lang from: ', this.$i18n.i18next.language, 'to: ', this.lang)
+          this.$i18n.i18next.changeLanguage(this.lang).catch(err => this.$logE(err))
+          this.$forceUpdate();
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.lang',
             value: this.lang
           })
@@ -165,8 +169,8 @@ export default {
       if (this.country !== this.currentCountry) {
         try {
           this.$log('changeCountry start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.country',
             value: this.country
           })
@@ -182,8 +186,8 @@ export default {
       if (this.gender !== this.currentGender) {
         try {
           this.$log('changeGender start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.gender',
             value: this.gender
           })
@@ -199,8 +203,8 @@ export default {
       if (this.nameFirst !== this.currentNameFirst) {
         try {
           this.$log('changeNameFirst start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.nameFirst',
             value: this.nameFirst
           })
@@ -216,8 +220,8 @@ export default {
       if (this.nameSecond !== this.currentNameSecond) {
         try {
           this.$log('changeNameSecond start')
-          let res = await this.$store.dispatch('objects/setObjectValue', {
-            oid: this.$store.state.objects.currentUser.oid,
+          let res = await this.$store.dispatch('objects/update', {
+            oid: this.$store.getters.currentUser.oid,
             path: 'profile.nameSecond',
             value: this.nameSecond
           })
@@ -231,13 +235,13 @@ export default {
     }
   },
   mounted () {
-    this.gender = this.$store.state.objects.currentUser.profile.gender
-    this.country = this.$store.state.objects.currentUser.profile.country
-    this.nameFirst = this.$store.state.objects.currentUser.profile.nameFirst
-    this.nameSecond = this.$store.state.objects.currentUser.profile.nameSecond
-    this.lang = this.$store.state.objects.currentUser.profile.lang
-    this.city = this.$store.state.objects.currentUser.profile.city
-    this.date = this.$store.state.objects.currentUser.profile.dateBirth
+    this.gender = this.$store.getters.currentUser.profile.gender
+    this.country = this.$store.getters.currentUser.profile.country
+    this.nameFirst = this.$store.getters.currentUser.profile.nameFirst
+    this.nameSecond = this.$store.getters.currentUser.profile.nameSecond
+    this.lang = this.$store.getters.currentUser.profile.lang
+    this.city = this.$store.getters.currentUser.profile.city
+    this.date = this.$store.getters.currentUser.profile.dateBirth
   },
   created () {
     this.$logD('created')

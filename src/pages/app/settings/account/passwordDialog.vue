@@ -46,7 +46,7 @@ export default {
   },
   computed: {
     currentPassword () {
-      return this.$store.state.objects.currentUser.profile.password
+      return this.$store.getters.currentUser.profile.password
     },
     errorLength () {
       if (this.errors) return this.errors.length
@@ -78,8 +78,8 @@ export default {
     async changePassword () {
       try {
         this.$log('changePassword start')
-        let res = await this.$store.dispatch('objects/setObjectValue', {
-          oid: this.$store.state.objects.currentUser.oid,
+        let res = await this.$store.dispatch('objects/update', {
+          oid: this.$store.getters.currentUser.oid,
           path: 'profile.password',
           value: this.newPas
         })

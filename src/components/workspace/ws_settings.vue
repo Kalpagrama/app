@@ -26,15 +26,16 @@ export default {
     async wsClear () {
       if (!confirm('Do really want to clear your workspace?')) return
       this.$log('wsClear start')
-      let {data: {wsClear}} = await this.$apollo.mutate({
-        mutation: gql`
-          mutation sw_network_only_wsClear {
-            wsClear
-          }
-        `
-      })
+      let wsClear = await this.$store.dispatch('workspace/wsClear')
+      // let {data: {wsClear}} = await this.$apollo.mutate({
+      //   mutation: gql`
+      //     mutation sw_network_only_wsClear {
+      //       wsClear
+      //     }
+      //   `
+      // })
       this.$log('wsClear done', wsClear)
-      window.location.reload(true)
+      window.location.reload()
     }
   },
   mounted () {
