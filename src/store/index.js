@@ -14,6 +14,7 @@ import content from './content'
 import i18next from 'i18next'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 
@@ -49,6 +50,19 @@ export default function (/* { ssrContext } */) {
         await context.dispatch('content/init')
         assert(context.state.objects.currentUser)
         await i18next.changeLanguage(context.state.objects.currentUser.profile.lang)
+        // let val = 0.001
+        // setTimeout(() => {
+        //   setInterval(() => {
+        //     val = val + 0.0001
+        //     if (val >= 1) return
+        //     context.commit('objects/update', {
+        //       oid: 'An6e9mWDIH0=',
+        //       path: 'rate',
+        //       newValue: val
+        //     }, { root: true })
+        //   }, 10)
+        // }, 2000)
+
         logD('vuex init done!')
         return true
       }
