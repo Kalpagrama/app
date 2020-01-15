@@ -147,7 +147,7 @@ if (useCache) {
     cacheGraphQl = async function (event) {
       try {
         logDebug('cacheGraphQl start')
-        // return await networkOnly(event)// для кэширования gql используется apollo-cache-persist src/boot/apollo.js:10
+        // return await networkOnly(event)// для кэширования gql ДОЛЖЕН используется apollo-cache-persist src/boot/apollo.js:10
         // // eslint-disable-next-line no-unreachable
         let requestCopy = event.request.clone()
         let body
