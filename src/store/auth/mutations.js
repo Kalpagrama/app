@@ -1,14 +1,14 @@
 import Vue from 'vue'
 import assert from 'assert'
 
-export function init(state, { userIsAuthorized, userIsConfirmed, user }) {
+export function init (state, { userIsAuthorized, userIsConfirmed, user }) {
   state.initialized = userIsConfirmed ? true : false
   state.userIsAuthorized = userIsAuthorized
   state.userIsConfirmed = userIsConfirmed
-  state.userOid = user.oid
+  state.userOid = user ? user.oid : null
 }
 
-export function stateSet(state, [key, val]) {
+export function stateSet (state, [key, val]) {
   // console.debug('asdasd')
   assert.ok(Object.prototype.hasOwnProperty.call(state, key))
   if (val) {
