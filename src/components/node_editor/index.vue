@@ -355,6 +355,7 @@ export default {
     this.$q.addressbarColor.set('white')
     document.body.style.background = 'white'
     this.nodeStart()
+    await this.$wait(500)
     // lsItem
     let lsItem = JSON.parse(localStorage.getItem('knode'))
     this.$log('lsItem', lsItem)
@@ -363,49 +364,48 @@ export default {
     this.$log('wsItem', wsItem)
     // shareItem
     let shareItem = JSON.parse(JSON.stringify(this.$store.state.core.shareData))
+    // let shareItem = {text: 'https://www.youtube.com/watch?v=cocXKSEHbbo'}
     this.$log('shareItem', shareItem)
     // checks
-    if (wsItem) {
-      if (shareItem) {
-        let shareUrl = shareItem.text || shareItem.url || shareItem.title
-        // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
-        if (shareUrl) {
-          this.$log('shareUrl', shareUrl)
-          this.$refs.fragmentFinder.urlUse(shareUrl)
-        } else if (shareItem.images.length || shareItem.videos.length) {
-          // todo использовать как фрагменты
-        }
-        this.$store.commit('core/stateSet', ['shareData', null])
-      } else {
-        switch (wsItem.type) {
-          case 'content': {
-            this.fragmentFound(0, {
-              name: '',
-              cuts: [],
-              content: wsItem.item,
-              scale: wsItem.item.duration
-            })
-            break
-          }
-          case 'fragment': {
-            this.fragmentFound(0, wsItem.item)
-            break
-          }
-          case 'cut': {
-            this.fragmentFound(0, wsItem.item)
-            break
-          }
-          case 'node': {
-            this.$set(this, 'node', wsItem.item)
-            break
-          }
-        }
-        this.$store.commit('workspace/stateSet', ['wsItem', null])
+    if (shareItem) {
+      if (lsItem) await this.nodeSave(lsItem)
+      let shareUrl = shareItem.text || shareItem.url || shareItem.title
+      // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
+      if (shareUrl) {
+        this.$log('shareUrl', shareUrl)
+        this.$refs.fragmentFinder.urlUse(shareUrl)
+      } else if (shareItem.images.length || shareItem.videos.length) {
+        // todo использовать как фрагменты
       }
+      this.$store.commit('core/stateSet', ['shareData', null])
+    } else if (wsItem) {
+      if (lsItem) await this.nodeSave(lsItem)
+      switch (wsItem.type) {
+        case 'content': {
+          this.fragmentFound(0, {
+            name: '',
+            cuts: [],
+            content: wsItem.item,
+            scale: wsItem.item.duration
+          })
+          break
+        }
+        case 'fragment': {
+          this.fragmentFound(0, wsItem.item)
+          break
+        }
+        case 'cut': {
+          this.fragmentFound(0, wsItem.item)
+          break
+        }
+        case 'node': {
+          this.$set(this, 'node', wsItem.item)
+          break
+        }
+      }
+      this.$store.commit('workspace/stateSet', ['wsItem', null])
     } else {
-      if (lsItem) {
-        this.$set(this, 'node', lsItem)
-      }
+      if (lsItem) this.$set(this, 'node', lsItem)
     }
     this.$log('mount DONE')
   },

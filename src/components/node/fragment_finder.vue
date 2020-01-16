@@ -1,5 +1,7 @@
 <template lang="pug">
 div(:style=`{position: 'relative', minHeight: '74px'}`).row.full-width.items-center.content-center.bg-white
+  //- div(v-if="progress").row.bg-red
+  //-   span {{ progress }}
   div(v-if="!videoShow").row.full-width
     //- find in ws
     q-dialog(v-model="wsDialogShow" ref="wsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
@@ -49,6 +51,11 @@ export default {
       videoShow: false,
       videoLoaded: false,
       wsDialogShow: false
+    }
+  },
+  computed: {
+    progress () {
+      return this.$store.state.events.progress
     }
   },
   watch: {
@@ -105,20 +112,6 @@ export default {
     async contentGetByUrl (url) {
       this.$log('contentGetByUrl start')
       let uploadContentUrl = await this.$store.dispatch('content/uploadContentUrl', url)
-      // let {data: {uploadContentUrl}} = await this.$apollo.mutate({
-      //   mutation: gql`
-      //     ${fragments.objectFullFragment}
-      //     mutation sw_network_only_nc_contentGetByUrl ($url: String!, $onlyMeta: Boolean!) {
-      //       uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
-      //         ...objectFullFragment
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     url: url,
-      //     onlyMeta: onlyMeta
-      //   }
-      // })
       this.$log('contentGetByUrl done')
       return uploadContentUrl
     },
@@ -146,21 +139,6 @@ export default {
     async contentGetByFile (file) {
       this.$log('contentGetByFile start')
       let uploadContentFile = await this.$store.dispatch('content/uploadContentFile', file)
-      // let { data: {uploadContentFile} } = await this.$apollo.mutate({
-      //   mutation: gql`
-      //     ${fragments.objectFullFragment}
-      //     mutation sw_network_only_nc_contentGetByFile ($file: Upload!, $length: Float!) {
-      //       uploadContentFile(file: $file, length: $length) {
-      //         ...objectFullFragment
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     file: file,
-      //     length: file.size
-      //   },
-      //   client: 'uploadApollo'
-      // })
       this.$log('contentGetByFile done')
       return uploadContentFile
     }

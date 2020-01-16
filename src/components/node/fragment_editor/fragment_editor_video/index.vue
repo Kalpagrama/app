@@ -54,10 +54,10 @@ div(
   //- body
   div.col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-md
-      div(
-        :class=`{'bg-red': fragmentDuration > 60, 'bg-green': fragmentDuration < 60}`
-        :style=`{borderRadius: '10px'}`).row.full-width.q-pa-sm.q-my-sm
-        span.text-bold.text-white Total duration: {{ $time(fragmentDuration) }}
+      //- div(
+      //-   :class=`{'bg-red': fragmentDuration > 60, 'bg-green': fragmentDuration < 60}`
+      //-   :style=`{borderRadius: '10px'}`).row.full-width.q-pa-sm.q-my-sm
+      //-   span.text-bold.text-white Total duration: {{ $time(fragmentDuration) }}
       draggable(
         v-model="fragment.cuts"
         v-bind="dragOptions"
@@ -71,7 +71,34 @@ div(
             :index="ci" :cut="c" :cutIndex="cutIndex" :cutPlaying="cutPlaying" :player="player" :now="now"
             @cutIndex="cutIndex = $event" @play="cutPlay"
             @action="cutActionStart(c, ci)").q-mb-sm
-  div(:style=`{height: '66px'}`).row.full-width.bg-black
+      //- import cuts
+      div(
+        :style=`{height: '60px'}`
+        ).row.full-width.items-center.q-px-sm
+        span.text-white Another cuts on this content
+        .col
+        q-btn(
+          round flat color="white" @click="cutsContentShow = !cutsContentShow"
+          :icon="cutsContentShow ? 'keyboard_arrow_down' : 'keyboard_arrow_up'")
+      div(
+        v-show="cutsContentShow"
+        ).row.full-width.items-start.content-start
+        div(
+          v-for="(c, ci) in cutsContentFiltered" :key="c.color"
+          :index="ci" :cut="c" :cutIndex="-100" :cutPlaying="-100" :player="player" :now="now"
+          @cutIndex="cutContentClick"
+          :style=`{height: '40px'}`
+          ).col-6.q-pa-xs
+          div(
+            @click="cutContentClick(c, ci)"
+            :style=`{borderRadius: '4px', overflow: 'hidden'}`
+            ).row.fit.items-center.justify-end.q-px-sm.bg-grey-8.cursor-pointer
+            small.text-white {{ $time(c.points[0].x) }}
+            small.text-white.q-mx-xs -
+            small.text-white {{ $time(c.points[1].x) }}
+  div(
+    :class=`{'bg-red': fragmentDuration > 60, 'bg-black': fragmentDuration < 60}`
+    :style=`{height: '66px'}`).row.full-width
     transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       div(
         v-if="fragment.cuts.length > 0"
@@ -97,7 +124,8 @@ div(
           :style=`{fontSize: '16px', margin: 0, padding: 0, borderRadius: '10px', overflow: 'hidden'}`
           ).full-width.kinput.text-white.bg-green
     div(:style=`{height: '66px', width: '66px'}`).row.items-center.justify-center
-      q-btn(round flat color="white" icon="more_vert" @click="fragmentDialog()")
+      //- q-btn(round flat color="white" icon="more_vert" @click="fragmentDialog()")
+      span.text-bold.text-white {{ $time(fragmentDuration) }}
 </template>
 
 <script>
@@ -115,7 +143,9 @@ export default {
       cutPlaying: -1,
       fragmentPlaying: false,
       fragmentNameSetting: false,
-      nowStop: false
+      nowStop: false,
+      cutsContent: [],
+      cutsContentShow: true
     }
   },
   computed: {
@@ -125,6 +155,14 @@ export default {
     },
     cuts () {
       return this.fragment.cuts
+    },
+    cutsContentFiltered () {
+      return this.cutsContent.filter((c, ci) => {
+        let i = this.fragment.cuts.findIndex(e => {
+          return e.points[0].x === c.points[0].x
+        })
+        if (i < 0) return true
+      })
     },
     fragmentDuration () {
       return this.cuts.reduce((acc, val) => {
@@ -272,6 +310,9 @@ export default {
     },
     cutActionStart (c, ci) {
       this.$log('cutActionStart', c, ci)
+      // get payload, on current cut
+      // export to node! no to fragment, to independent, and delete? or use it as link?
+      // import as link? or how?
       this.$store.dispatch('ui/action', [
         {
           payload: ci,
@@ -297,6 +338,24 @@ export default {
           break
         }
       }
+    },
+    cutContentClick (cut, index) {
+      this.$log('cutContentClick', index)
+      this.fragment.cuts.push(JSON.parse(JSON.stringify(cut)))
+    },
+    cutsContentLoad (contentOid) {
+      this.$log('cutsContentLoad start', contentOid)
+      return this.$store.getters.currentUser.workspace.nodes.reduce((acc, val) => {
+        val.fragments.map((f, fi) => {
+          // TODO: if val.oid !== THIS node.oid
+          if (f !== null && f.content.oid === contentOid) {
+            f.cuts.map((c, ci) => {
+              acc.push(c)
+            })
+          }
+        })
+        return acc
+      }, [])
     }
   },
   mounted () {
@@ -305,6 +364,7 @@ export default {
       this.cutIndex = 0
       this.fragmentPlay()
     }
+    this.cutsContent = this.cutsContentLoad(this.fragment.content.oid)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
