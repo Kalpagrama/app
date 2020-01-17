@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
 import { Notify } from 'quasar'
-import { knotify } from 'src/boot/knotify'
+import { notify } from 'boot/notify'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
@@ -224,57 +224,36 @@ function notifyUserActionComplete (eventType, object) {
       break
   }
   // console.debug(eventMessage)
-  Notify.create(
+  notify(
+    'info',
+    eventMessage,
     {
-      position: 'top',
-      message: eventMessage,
-      color: 'white',
-      textColor: 'black',
       avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
-      multiLine: false,
-      timeout: 1000,
-      actions: [{
-        label: i18n.t('GO'),
-        noDismiss: true,
-        color: 'green',
-        handler: () => {
-          // app/workspace/fragments
-          let route = '/'
-          if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
-            route = `/content/${object.oid}`
-          } else if (['NODE'].includes(object.type)) {
-            route = `/node/${object.oid}`
-          } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
-            route = `/sphere/${object.oid}`
-          } else {
-            throw new Error(`bad object ${JSON.stringify(object)}`)
+      actions: [
+        {
+          label: i18n.t('GO'),
+          noDismiss: true,
+          color: 'green',
+          handler: () => {
+            // app/workspace/fragments
+            let route = '/'
+            if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
+              route = `/content/${object.oid}`
+            } else if (['NODE'].includes(object.type)) {
+              route = `/node/${object.oid}`
+            } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
+              route = `/sphere/${object.oid}`
+            } else {
+              throw new Error(`bad object ${JSON.stringify(object)}`)
+            }
+            router.push(route)
           }
-          // else if (['WSBookmark', 'WSSphere', 'WSContent', 'WSNode', 'WSFragment'].includes(object.__typename)) {
-          //   if (object.__typename === 'WSBookmark') {
-          //     route = '/app/workspace/bookmarks'
-          //   } else if (object.__typename === 'WSSphere') {
-          //     route = '/app/workspace/spheres'
-          //   } else if (object.__typename === 'WSContent') {
-          //     route = '/app/workspace/contents'
-          //   } else if (object.__typename === 'WSNode') {
-          //     route = '/app/workspace/nodes'
-          //   } else if (object.__typename === 'WSFragment') route = '/app/workspace/fragments'
-          // }
-
-          router.push(route)
         }
-      }]
-    }
-  )
+      ]
+    })
 }
 
 function notifyError (event) {
   assert.ok(event)
-
-  Notify.create(
-    {
-      position: 'top',
-      message: `${event.operation} ${event.code} ${event.message}`
-    }
-  )
+  notify('error', `${event.operation} ${event.code} ${event.message}`)
 }

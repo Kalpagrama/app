@@ -24,12 +24,12 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  q-header(reveal).row.full-width.justify-center
+  q-header(reveal).row.full-width.justify-center.bg-primary
     div(
       v-if="user"
-      :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.bg-primary
-      //- div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      //-   q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+      :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+        q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
       .col
         .row.full-width.justify-start.items-center.fit.q-px-sm
           span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
@@ -37,12 +37,12 @@ q-layout(view="hHh lpR fFf").bg-grey-3
         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
           q-btn(v-else round flat @click="save()" color="white" icon="done")
-      .row.full-width.q-pa-sm.bg-primary
-        span(
-          v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
-          :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'white'}`
-          :class="{'bg-green': p === pageId}"
-          ).text-bold.q-pa-sm.q-mr-md.cursor-pointer.hr {{ p }}
+    .row.full-width.content-end.justify-start.text-white.q-mt-md.q-px-sm.q-mb-sm
+      span(
+        v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
+        :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'primary'}`
+        :class="{'bg-green' : pageId  === p}"
+        ).text-bold.q-pa-sm.q-mr-md.cursor-pointer {{ p }}
   q-page-container.row.full-width.justify-center
     div(v-if="user").row.full-width.items-start.content-start.justify-center.bg-primary
         //- header
@@ -70,22 +70,22 @@ q-layout(view="hHh lpR fFf").bg-grey-3
                 :color="include ? 'red' : 'accent'"
                 style=`height: 40px`
                 ).q-px-md
-          //- .row.full-width.items-center.justify-start
-          //-   .row.full-width
-          //-     span.text-bold.text-h6.text-white {{ user.name }}
-          //-   div(v-if="!editions").row.full-width
-          //-     .row.full-width
-          //-       span.text-grey-4 {{status}}
-          //-     .row.full-width.q-mb-sm
-          //-       span.text-grey {{about}}
-          //-   div(v-if="editions").row.full-width
-          //-     input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
-          //-     input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
-          //-     //- .row.full-width.q-mt-xs
-          //-     //-   small About
-          //-   div(v-if="false" @click="showInfo()").row.full-width
-          //-     span.text-accent Show detailed information
-          //-     //- span {{ user.subscriptions }}
+          .row.full-width.items-center.justify-start
+            .row.full-width
+              span.text-bold.text-h6.text-white {{ user.name }}
+            div(v-if="!editions").row.full-width
+              .row.full-width
+                span.text-grey-4 {{status}}
+              .row.full-width.q-mb-sm
+                span.text-grey {{about}}
+            div(v-if="editions").row.full-width
+              input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
+              input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
+              //- .row.full-width.q-mt-xs
+              //-   small About
+            div(v-if="false" @click="showInfo()").row.full-width
+              span.text-accent Show detailed information
+              //- span {{ user.subscriptions }}
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-md
         user-created-nodes(
@@ -130,6 +130,10 @@ export default {
     }
   },
   computed: {
+    colorButton () {
+      if (this.pageId === 'Created nodes') return 'bg-green'
+      else return 'bg-white'
+    },
     scroll () {
       if (window.scrollY > 100) return true
       else return false
@@ -165,7 +169,6 @@ export default {
       let options = {
         confirm: false,
         actions: {
-          share: {name: 'Share'},
           copy: {name: 'Copy Url'}
         }
       }
@@ -295,9 +298,6 @@ export default {
           break
         }
         case 'copy': {
-          break
-        }
-        case 'share': {
           break
         }
         case 'edit': {

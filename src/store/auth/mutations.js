@@ -5,7 +5,7 @@ export function init(state, { userIsAuthorized, userIsConfirmed, user }) {
   state.initialized = userIsConfirmed ? true : false
   state.userIsAuthorized = userIsAuthorized
   state.userIsConfirmed = userIsConfirmed
-  state.userOid = user.oid
+  state.userOid = user ? user.oid : null
 }
 
 export function stateSet(state, [key, val]) {
