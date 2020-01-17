@@ -62,7 +62,7 @@ export default {
   },
   computed: {
     progress () {
-      return this.$store.state.events.progress
+      return this.$store.state.events.progressUpload
     }
   },
   watch: {
@@ -80,7 +80,7 @@ export default {
     progress: {
       handler (to, from) {
         this.$log('progress CHANGED', to)
-        if (to && to.progress === 100) this.$store.commit('events/stateSet', ['progress', null])
+        if (to && to.progress === 100) this.$store.commit('events/stateSet', ['progressUpload', null])
       }
     }
   },

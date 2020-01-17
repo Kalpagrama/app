@@ -315,6 +315,7 @@ export default {
         this.nodePublishing = false
         this.nodePublishingError = null
         this.nodeStart()
+        this.$router.push('/user/' + this.$store.state.objects.currentUser.oid)
       } catch (e) {
         this.$log('nodePublish error', e)
         this.nodePublishing = false

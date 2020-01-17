@@ -1,8 +1,18 @@
 <template lang="pug">
 .row.full-width.items-start.content-start.q-px-sm
+  //- progress create node
+  div(
+    v-if="progress"
+    :style=`{height: '400px', borderRadius: '10px', overflow: 'hidden'}`
+    ).row.full-width.items-center.content-center.justify-center.bg-primary
+    .row.full-width.justify-center
+      q-spinner(color="white" size="50px" :thickness="3")
+    .row.full-width.justify-center
+      span.text-white {{ $t('Your node is creating...') }}
+  //- nodes
   node-loader(v-if="variables" ref="nodeLoader" :variables="variables" type="sphereNodes")
     template(v-slot:default=`{nodes}`)
-      // small(v-for="n in nodes" :key="n.oid").full-width.br {{ n.name }}
+      //- small(v-for="n in nodes" :key="n.oid").full-width.br {{ n.name }}
       node-list(:nodes="nodes" @nodeClick="nodeClick")
   div(v-if="nodes" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
     span {{$t('Пользователь не создавал ядра', 'User didnt create nodes')}}
@@ -24,6 +34,9 @@ export default {
     }
   },
   computed: {
+    progress () {
+      return this.$store.state.events.progressCreateNode
+    },
     sphereOid () {
       // return this.$store.getters.currentUser.oid
       return this.$route.params.oid
