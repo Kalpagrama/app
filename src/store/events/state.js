@@ -3,6 +3,8 @@ export default {
   notice: null,
   error: null,
   progress: null,
+  progressUpload: null,
+  progressCreateNode: null,
   nodeCreated: null,
   nodeDeleted: null,
   nodeRated: null,
