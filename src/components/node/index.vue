@@ -237,7 +237,7 @@ export default {
       return arr[0] + ',' + arr[1]
     },
     async votePan (e) {
-      this.$log('votePan', e.delta.x)
+      // this.$log('votePan', e.delta.x)
       let to = this.voteLeft + e.delta.x
       if (to > 0 && to <= this.previewWidth - 90) {
         this.voteLeft += e.delta.x
