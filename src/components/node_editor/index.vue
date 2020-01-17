@@ -204,7 +204,7 @@ export default {
       deep: true,
       immediate: false,
       handler (to, from) {
-        // this.$log('node CHANGED', to)
+        this.$log('node CHANGED', to)
         localStorage.setItem('knode', JSON.stringify(to))
         this.nodeVersion += 1
       }
@@ -354,7 +354,7 @@ export default {
     // this.$q.notify('MOUNTED')
     this.$q.addressbarColor.set('white')
     document.body.style.background = 'white'
-    this.nodeStart()
+    // this.nodeStart()
     await this.$wait(500)
     // lsItem
     let lsItem = JSON.parse(localStorage.getItem('knode'))
@@ -368,7 +368,9 @@ export default {
     this.$log('shareItem', shareItem)
     // checks
     if (shareItem) {
+      this.$q.notify('Using SHARE item!')
       if (lsItem) await this.nodeSave(lsItem)
+      this.nodeStart()
       let shareUrl = shareItem.text || shareItem.url || shareItem.title
       // images & videos - массивы объектов File() https://developer.mozilla.org/ru/docs/Web/API/File
       if (shareUrl) {
@@ -379,7 +381,9 @@ export default {
       }
       this.$store.commit('core/stateSet', ['shareData', null])
     } else if (wsItem) {
+      this.$q.notify('Using WS item!')
       if (lsItem) await this.nodeSave(lsItem)
+      this.nodeStart()
       switch (wsItem.type) {
         case 'content': {
           this.fragmentFound(0, {
@@ -405,6 +409,7 @@ export default {
       }
       this.$store.commit('workspace/stateSet', ['wsItem', null])
     } else {
+      this.$q.notify('Using LS item!')
       if (lsItem) this.$set(this, 'node', lsItem)
     }
     this.$log('mount DONE')

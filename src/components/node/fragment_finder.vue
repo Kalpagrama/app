@@ -1,7 +1,5 @@
 <template lang="pug">
 div(:style=`{position: 'relative', minHeight: '74px'}`).row.full-width.items-center.content-center.bg-white
-  //- div(v-if="progress").row.bg-red
-  //-   span {{ progress }}
   div(v-if="!videoShow").row.full-width
     //- find in ws
     q-dialog(v-model="wsDialogShow" ref="wsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
@@ -11,9 +9,18 @@ div(:style=`{position: 'relative', minHeight: '74px'}`).row.full-width.items-cen
             overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
           .col.full-width
             ws-items(ctx="inEditor" :types="['fragments', 'contents']" @item="itemFound")
-    //- url input
+    //- url input & progress
     input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}` accept="video/*")
     div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+      //- progress
+      div(
+        v-if="progress"
+        :style=`{position: 'absolute', left: '0px', zIndex: 100}`).row.fit
+        div(
+          :style=`{position: 'absolute', left: '0px', zIndex: 100, width: progress.progress+'%', opacity: 0.5}`
+          ).row.full-height.items-center.justify-center.bg-green
+          span.text-white.text-bold {{ progress.progress }}%
+      //- input url
       q-input(
         ref="urlInput" v-model="url" color="green"
         filled placeholder="Paste URL" :loading="urlInputLoading"
@@ -68,6 +75,12 @@ export default {
         } catch (e) {
           this.$log('URL WRONG', e)
         }
+      }
+    },
+    progress: {
+      handler (to, from) {
+        this.$log('progress CHANGED', to)
+        if (to && to.progress === 100) this.$store.commit('events/stateSet', ['progress', null])
       }
     }
   },
