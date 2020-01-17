@@ -86,7 +86,6 @@ div(
         div(
           v-for="(c, ci) in cutsContentFiltered" :key="c.color"
           :index="ci" :cut="c" :cutIndex="-100" :cutPlaying="-100" :player="player" :now="now"
-          @cutIndex="cutContentClick"
           :style=`{height: '40px'}`
           ).col-6.q-pa-xs
           div(
@@ -340,7 +339,7 @@ export default {
       }
     },
     cutContentClick (cut, index) {
-      this.$log('cutContentClick', index)
+      this.$log('cutContentClick', cut, index)
       this.fragment.cuts.push(JSON.parse(JSON.stringify(cut)))
     },
     cutsContentLoad (contentOid) {
