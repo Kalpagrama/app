@@ -62,8 +62,9 @@ export default function (/* { ssrContext } */) {
         //     }, { root: true })
         //   }, 10)
         // }, 2000)
-
-        logD('vuex init done!')
+        let xxx = await context.dispatch('lists/wsItems',
+          { pagination: { pageSize: 30 }, sortStrategy: null, filter: { types: ['NODE', 'COMPOSITION', 'VIDEO'] } })
+        logD('vuex init done!', xxx)
         return true
       }
     },
