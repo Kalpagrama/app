@@ -1,19 +1,26 @@
 import gql from 'graphql-tag'
 
 const metaFragment = gql`
+  fragment metaComposition on MetaComposition {
+    thumbUrl(preferWidth: 600)
+    height
+    width
+  }
   fragment metaFragment on Meta {
     type
     ...on MetaNode {
-      fragments {
-        width
-        height
-        thumbUrl(preferWidth: 600)
+      compositions{
+        oid
+        meta {
+          ... on MetaComposition{...metaComposition}
+        }
       }
     }
     ...on MetaContent{
       type
       uploadedFileInfo
     }
+    ... on MetaComposition {...metaComposition}
   }
 `
 const objectShortFragment = gql`
@@ -49,6 +56,30 @@ const objectFragment = gql`
     meta{ ...metaFragment}
   }
 `
+const compositionFragment = gql`
+  ${objectFragment} ${objectShortFragment}
+  fragment figureFragment on Figure {
+    t
+    points {
+      x
+      y
+    }
+  }
+  fragment compositionFragment on Composition {
+    ...objectFragment
+    spheres {...objectShortFragment}
+    layers {
+      contentOid
+      figuresAbsolute{...figureFragment}
+      speed
+      spheres {...objectShortFragment}
+      thumbUrl(preferWidth: 600)
+      url
+    }
+    url
+  }
+`
+
 const videoFragment = gql`
   ${objectFragment}
   fragment videoFragment on Video {
@@ -73,7 +104,7 @@ const imageFragment = gql`
   }
 `
 const nodeFragment = gql`
-  ${videoFragment} ${imageFragment} ${objectFragment}
+  ${videoFragment} ${imageFragment} ${objectFragment} ${compositionFragment}
   fragment nodeFragment on Node {
     ...objectFragment
     rate
@@ -89,25 +120,9 @@ const nodeFragment = gql`
       oid
       name
     }
-    categories
+    category
     layout
-    fragments {
-      name
-      url
-      content {
-        ...on Video {...videoFragment}
-        ...on Image {...imageFragment}
-      }
-      scale
-      cuts {
-        name
-        color
-        thumbUrl(preferWidth: 600)
-        points { x y z }
-        style
-      }
-      
-    }
+    compositions {...compositionFragment}
   }
 `
 const sphereFragment = gql`
@@ -203,10 +218,6 @@ const userFragment = gql`
 const objectFullFragment = gql`
   ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${objectFragment}
   fragment objectFullFragment on Object {
-#    oid
-#    type
-#    name
-#    thumbUrl(preferWidth: 600)
     ...objectFragment
     ...on Video {...videoFragment}
     ...on Image {...imageFragment}
