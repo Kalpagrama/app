@@ -185,10 +185,6 @@ const userFragment = gql`
     weightVal
     settings
     subscriptions{...objectShortFragment}
-    workspace{
-      nodes { ...nodeFragment }
-      spheres { ...objectShortFragment }
-    }
     events{...eventFragment}
     profile{
       tutorial
