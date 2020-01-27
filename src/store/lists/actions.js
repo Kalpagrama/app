@@ -31,6 +31,26 @@ export const sphereSpheres = async (context, { oid, pagination, filter, sortStra
   return spheres
 }
 
+export const wsItems = async (context, { oid, pagination, filter, sortStrategy }) => {
+  logD('wsItems start')
+  assert.ok(oid)
+  let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+    query: gql`
+      query wsItems ( $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum){
+        wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+          items {
+            oid
+            name
+          }
+        }
+      }
+    `,
+    variables: { oid, pagination, filter, sortStrategy }
+  })
+  logD('wsItems complete')
+  return { items, count, totalCount, nextPageToken }
+}
+
 export const sphereNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('sphereNodes start')
   let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({

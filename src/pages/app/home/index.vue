@@ -5,7 +5,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
     reveal
     ).row.full-width.justify-center.q-px-sm.bg-grey-3
     k-colls-tabs(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '0 0 10px 10px'}`).bg-white
-  q-footer(reveal).row.full-width.justify-center.bg-grey-3
+  q-footer(reveal).row.full-width.justify-center.bg-grey-3.lt-sm
     k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
   q-page-conainter
     div(:style=`{paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
