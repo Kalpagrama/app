@@ -9,6 +9,10 @@ iframe {
 .row.full-width.items-start.content-start
   k-action
   router-view(v-if="!loading")
+    template(v-slot:menuDesktop)
+      k-menu-desktop
+    template(v-slot:menuMobile)
+      k-menu-mobile
 </template>
 
 <script>
@@ -25,8 +29,7 @@ export default {
       width: 0,
       height: 0,
       me: null,
-      player: null,
-      showIframe: false
+      player: null
     }
   },
   computed: {
@@ -56,7 +59,6 @@ export default {
   async mounted () {
     this.$log('mounted')
     await this.$wait(3000)
-    this.showIframe = true
   },
   async created () {
     this.$logD('created')

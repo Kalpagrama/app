@@ -2,6 +2,7 @@
   .row.full-width
     slot(name="default" :nodes="nodes")
 </template>
+
 <script>
 export default {
   name: 'nodeLoader',

@@ -1,25 +1,29 @@
 <template lang="pug">
-div(:style=`{height: 'calc(var(--vh, 1vh) * 100)'}`).column.full-width
+div(:style=`{position: 'relative'}`).row.full-width
+  div.row.full-height.bg-black
+    slot(name="menuDesktop")
   .col
-    content-explorer(v-if="content" :content="content")
+    content-explorer(
+      v-if="$route.params.oid && content" :content="content"
+      @create="content = null, $router.push('/content')")
+    div(v-if="$route.params.oid && !content").row.fit.items-center.content-center.justify-center
+      q-spinner(size="50px" color="green")
+    content-finder(
+      v-if="!$route.params.oid"
+      :style=`{height: $q.screen.height+'px'}`
+      ).bg-black
 </template>
 
 <script>
-import contentExplorer from 'components/content_explorer'
+import contentFinder from 'components/content/finder'
+import contentExplorer from 'components/content/explorer'
 
 export default {
-  name: 'page_app_content',
-  components: {contentExplorer},
-  props: ['width', 'height'],
+  name: 'pageAppContent',
+  components: {contentExplorer, contentFinder},
+  props: [],
   data () {
     return {
-      item: 'content',
-      items: {
-        content: {name: 'Content'},
-        some: {name: 'какие-нибудь'},
-        points: {name: 'пункты'},
-        menu: {name: 'меню'}
-      },
       content: null
     }
   },
@@ -27,47 +31,27 @@ export default {
     $route: {
       immediate: true,
       async handler (to, from) {
-        if (to.params.oid) {
-          this.$logD('$route CHANGED', to.params.oid)
+        if (to && to.params.oid) {
+          this.$log('$route CHANGED to.params.oid', to.params.oid)
+          await this.$wait(3000)
           this.content = await this.contentLoad(to.params.oid)
         }
       }
-    },
+    }
   },
   methods: {
     async contentLoad (oid) {
-      this.$logD('contentLoad start', oid)
+      this.$log('contentLoad start', oid)
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFullFragment', priority: 0 })
-      // let {data: {objectList: [content]}} = await this.$apollo.query({
-      //   query: gql`
-      //     query contentLoad ($oid: OID!) {
-      //       objectList(oids: [$oid]) {
-      //         oid
-      //         type
-      //         name
-      //         ...on Video {
-      //           duration
-      //           thumbUrl(preferWidth: 600)
-      //           url
-      //           height
-      //           width
-      //         }
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     oid: oid
-      //   }
-      // })
-      this.$logD('contentLoad done', content)
+      this.$log('contentLoad done', content)
       return content
     }
   },
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

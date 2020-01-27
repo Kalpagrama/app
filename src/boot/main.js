@@ -8,6 +8,8 @@ debug.enabled = true
 import { LoadingBar, date, Notify } from 'quasar'
 import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
+import 'viewerjs/dist/viewer.css'
+import Viewer from 'v-viewer'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -31,6 +33,7 @@ var router
 export default async ({ Vue, store, router: VueRouter }) => {
   try {
     router = VueRouter
+    Vue.use(Viewer)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     LoadingBar.setDefaults({
@@ -38,6 +41,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
       size: '2px',
       position: 'top'
     })
+    // TODO: memory leak with tweenmax
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {
       return date.formatDate(ts, format || 'YYYY.MM.DD', {
@@ -59,7 +63,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
         return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
-    Vue.prototype.$strip = function (obj) {
+    Vue.prototype.$deleteTypename = function (obj) {
       let round = (obj) => {
         if (obj.__typename) delete obj.__typename
         for (const k in obj) {
@@ -72,30 +76,6 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.prototype.$isInteger = (num) => {
       return (num ^ 0) === num
     }
-    Vue.prototype.$nodesDistinct = function (nodes) {
-      const result = []
-      const map = new Map()
-      for (const node of nodes) {
-        if (!map.has(node.oid)) {
-          map.set(node.oid, true)
-          result.push(node)
-        }
-      }
-      return result
-    }
-  // navigation
-  Vue.prototype.$go = (options) => {
-    // logD('go', options)
-    store.commit('ui/stateSet', ['going', true])
-    // VueRouter.replace(options)
-    VueRouter.push(options)
-    setTimeout(() => {
-      store.commit('ui/stateSet', ['going', false])
-    }, 500)
-  }
-  Vue.prototype.$back = () => {
-    // store.commit()
-  }
     // layout
     Vue.component('kPage', () => import('components/k_page'))
     Vue.component('kMenuDesktop', () => import('components/k_menu_desktop'))
@@ -119,6 +99,16 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kLogo', () => import('components/k_logo'))
     Vue.component('anvil', () => import('components/k_icons/anvil'))
     Vue.component('kImg', () => import('components/k_img'))
+    // kalpa
+    Vue.component('kalpaAction', () => import('components/kalpa/action'))
+    // Vue.component('kalpaColls', () => import('components/kalpa/colls'))
+    // Vue.component('kalpaIcon', () => import('components/kalpa/icon'))
+    Vue.component('kalpaLoader', () => import('components/kalpa/loader'))
+    Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
+    Vue.component('kalpaMenuDesktop', () => import('components/kalpa/menudesktop'))
+    Vue.component('kalpaMenuMobile', () => import('components/kalpa/menumobile'))
+    Vue.component('kalpaSpinner', () => import('components/kalpa/spinner'))
+    // Vue.component('kalpaTutorial', () => import('components/kalpa/tutorial'))
   } catch (err) {
     logE(err)
   }
