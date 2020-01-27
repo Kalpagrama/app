@@ -64,7 +64,7 @@ export default {
       this.$log('nodeDelete', item)
       let oid = item.item.oid
       this.$log('nodeDelete OID', oid)
-      let res = await this.$store.dispatch('workspace/wsNodeDelete', oid)
+      let res = await this.$store.dispatch('workspace/wsItemDelete', oid)
       this.$log('res', res)
     },
     async fragmentDelete (item) {
