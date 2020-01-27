@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
 import { Notify } from 'quasar'
-import { notify } from 'boot/notify'
+import { notify } from 'src/boot/notify'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
