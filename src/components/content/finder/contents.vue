@@ -21,12 +21,14 @@ div(
     //- body list
     .col.full-width.scroll
       .row.full-width.items-start.content-start.q-px-sm
-        div(
-          v-for="(c, ckey, ci) in contents" :key="ckey"
-          ).row.full-width.q-mb-md
-          img(
-            :src="c.thumbUrl"
-            :style=`{width: '100%'}`)
+        kalpa-loader(type="wsContent")
+          template(v-slot:items=`{items}`)
+            div(
+              v-for="(c, ckey, ci) in items" :key="ckey"
+              ).row.full-width.q-mb-md
+              img(
+                :src="c.thumbUrl"
+                :style=`{width: '100%'}`)
 </template>
 
 <script>
