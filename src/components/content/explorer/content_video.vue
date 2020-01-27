@@ -22,8 +22,9 @@ div(
   //-     height: '40px'}`
   //-   ).row.full-width.bg-grey-10
   //-   span nodes graph
-  //- timeline
+  //- timeline 1
   div(
+    v-if="false"
     v-show="player.playing ? player.controls : true"
     :style=`{
       position: 'absolute', bottom: '16px', left: 0, zIndex: 1000,
@@ -57,6 +58,29 @@ div(
         q-btn(
           round flat color="green" @click="$q.fullscreen.toggle()"
           :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
+  //- timeline 3
+  div(
+    v-if="true"
+    v-show="player.playing ? player.controls : true"
+    :style=`{
+      position: 'absolute', bottom: '16px', left: 0, zIndex: 1000,
+      height: '10px'}`
+    ).row.full-width.q-px-md
+    div(
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.bg-grey-10
+      div(
+        @click="progressClick"
+        :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.fit.bg-grey-9.cursor-pointer
+        //- progress %
+        div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none'}`).row.full-height.bg-green
+      //- fullscreen
+  //- div(
+  //-   :style=`{width: '44px'}`
+  //-   ).row.full-height.items-center.content-center.justify-center
+  //-   q-btn(
+  //-     round flat color="green" @click="$q.fullscreen.toggle()"
+  //-     :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
 </template>
 
 <script>
@@ -85,7 +109,7 @@ export default {
       if (this.moveInterval) clearInterval(this.moveInterval)
       this.moveInterval = setTimeout(() => {
         this.$set(this.player, 'controls', false)
-      }, 1000)
+      }, 2500)
     },
     videoPlay () {
       this.$log('videoPlay')

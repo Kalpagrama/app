@@ -1,34 +1,31 @@
 <template lang="pug">
-div(
-  :style=`{position: 'relative'}`
-  ).row.fit.items-center.content-center.justify-center
-  .col.full-height
-    .row.fit.items-center.content-center.justify-center
-      div(:style=`{maxWidth: '500px'}`).row.full-width.items-center.content-center.justify-center
-        //- input file
-        input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}` accept="video/*, image/*")
-        //- input url
-        div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white
-          q-input(
-            v-model="url"
-            color="green" placeholder="Paste URL of any content!"
-            :loading="urlInputLoading"
-            :input-style=`{paddingLeft: '0px', paddingRight: '10px'}`
-            ).full-width
-            template(v-slot:prepend)
-              q-btn(v-if="url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm
-            template(v-slot:append)
-              //- q-btn(v-if="url.length === 0" round flat color="green" icon="add" @click="wsDialogShow = true")
-              q-btn(v-if="!urlInputLoading && url.length > 0" round flat color="green" icon="clear" @click="url = ''").q-mr-sm
-  contents(:content="content")
+.row.fit.items-center.content-center.justify-center
+  div(:style=`{maxWidth: '500px'}`).row.full-width.items-center.content-center.justify-center
+    //- input file
+    input(
+      v-if="sources.includes('device')"
+      ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}` accept="video/*, image/*")
+    //- input url
+    div(
+      v-if="sources.includes('url')"
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white
+      q-input(
+        v-model="url"
+        color="green" placeholder="Paste URL of any content!"
+        :loading="urlInputLoading"
+        ).full-width
+        template(v-slot:prepend)
+          q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm
+        template(v-slot:append)
+          q-btn(v-if="sources.includes('ws') && url.length === 0" round flat color="green" icon="add" @click="wsDialogShow = true").q-mr-sm
+          q-btn(v-if="!urlInputLoading && url.length > 0" round flat color="green" icon="clear" @click="url = ''").q-mr-sm
 </template>
 
 <script>
-import contents from './contents'
-
 export default {
   name: 'contentFinder',
-  components: {contents},
+  props: ['sources'],
+  components: {},
   data () {
     return {
       url: '',
