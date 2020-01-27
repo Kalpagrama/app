@@ -10,7 +10,7 @@
         :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm
         span.text-bold {{$t('Next')}}
       q-btn(
-        outline no-caps color="white" @click="$go('/login')"
+        outline no-caps color="white" @click="$router.push('/login')"
         :style=`{height: '60px', borderRadius: '10px'}`).full-width
         span.text-bold {{$t('Back')}}
     //- confirming code
@@ -100,12 +100,12 @@
      this.codeSending = false
      this.codeWaiting = false
      if (result) {
-      this.$logD('codeSend done', result)
+      this.$log('codeSend done', result)
       this.codeConfirmed = true
       await this.$wait(1000)
-      this.$go('/')
+      this.$router.push('/')
      } else {
-      this.$logD('codeSend fails', failReason)
+      this.$log('codeSend fails', failReason)
       this.$q.notify(this.$t('code send error') + failReason)
      }
     } catch (error) {

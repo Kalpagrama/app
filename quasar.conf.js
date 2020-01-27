@@ -59,7 +59,8 @@ module.exports = function (ctx) {
       ],
       plugins: [
         'Notify',
-        'BottomSheet'
+        'BottomSheet',
+        'AppFullscreen'
       ]
       // iconSet: 'ionicons-v4'
       // lang: 'de' // Quasar language
