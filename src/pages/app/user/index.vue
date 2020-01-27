@@ -24,25 +24,26 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
   k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  q-header(reveal).row.full-width.justify-center.bg-primary
-    div(
-      v-if="user"
-      :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-      .col
-        .row.full-width.justify-start.items-center.fit.q-px-sm
-          span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
-      .row
+  q-header(reveal).row.full-width.justify-center
+    .row.full-width.justify-center.bg-primary
+      div(
+        v-if="user"
+        :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-          q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-          q-btn(v-else round flat @click="save()" color="white" icon="done")
-    .row.full-width.content-end.justify-start.text-white.q-mt-md.q-px-sm.q-mb-sm
-      span(
-        v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
-        :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'primary'}`
-        :class="{'bg-green' : pageId  === p}"
-        ).text-bold.q-pa-sm.q-mr-md.cursor-pointer {{ p }}
+          q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+        .col
+          .row.full-width.justify-start.items-center.fit.q-px-sm
+            span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
+        .row
+          div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+            q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+            q-btn(v-else round flat @click="save()" color="white" icon="done")
+        .row.full-width.content-end.justify-start.text-white.q-mt-md.q-px-sm.q-mb-sm
+          span(
+            v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
+            :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'primary'}`
+            :class="{'bg-green' : pageId  === p}"
+            ).text-bold.q-pa-sm.q-mr-md.cursor-pointer {{ p }}
   q-page-container.row.full-width.justify-center
     div(v-if="user").row.full-width.items-start.content-start.justify-center.bg-primary
         //- header

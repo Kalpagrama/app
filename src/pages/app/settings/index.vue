@@ -21,6 +21,7 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: $q.screen.width+'p
           span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
   q-page-container
     //- q-page
+    k-spinner(:width="200" :height="200" stroke="white" type="spinner")
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
         //- div(:style=`{height: height-60+'px'}`).row
