@@ -3,7 +3,7 @@ q-layout().bg-primary
   q-page-container
     .column
       div(:style=`{height: 400+'px'}`).row.full-width.content-center
-        k-spinner(:width="100" :height="100" @click.native="$go('/login')")
+        k-spinner(:width="100" :height="100" @click.native="$router.push('/login')")
         .row.full-width.justify-center.q-mt-sm
           span.text-h6.text-white.text-bold KALPAGRAMMA
   q-footer(style=`height: 50%`)

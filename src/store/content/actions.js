@@ -25,7 +25,7 @@ export const uploadContentUrl = async (context, url) => {
     `,
     variables: {
       url: url,
-      onlyMeta: true
+      onlyMeta: false
     }
   })
   logD('uploadContentUrl complete')

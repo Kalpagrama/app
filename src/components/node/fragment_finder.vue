@@ -9,9 +9,18 @@ div(:style=`{position: 'relative', minHeight: '74px'}`).row.full-width.items-cen
             overflow: 'hidden', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).column.fit.bg-grey-3
           .col.full-width
             ws-items(ctx="inEditor" :types="['fragments', 'contents']" @item="itemFound")
-    //- url input
+    //- url input & progress
     input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}` accept="video/*")
     div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+      //- progress
+      div(
+        v-if="progress"
+        :style=`{position: 'absolute', left: '0px', zIndex: 100}`).row.fit
+        div(
+          :style=`{position: 'absolute', left: '0px', zIndex: 100, width: progress.progress+'%', opacity: 0.5}`
+          ).row.full-height.items-center.justify-center.bg-green
+          span.text-white.text-bold {{ progress.progress }}%
+      //- input url
       q-input(
         ref="urlInput" v-model="url" color="green"
         filled placeholder="Paste URL" :loading="urlInputLoading"
@@ -51,6 +60,11 @@ export default {
       wsDialogShow: false
     }
   },
+  computed: {
+    progress () {
+      return this.$store.state.events.progressUpload
+    }
+  },
   watch: {
     url: {
       handler (to, from) {
@@ -61,6 +75,12 @@ export default {
         } catch (e) {
           this.$log('URL WRONG', e)
         }
+      }
+    },
+    progress: {
+      handler (to, from) {
+        this.$log('progress CHANGED', to)
+        if (to && to.progress === 100) this.$store.commit('events/stateSet', ['progressUpload', null])
       }
     }
   },
@@ -105,20 +125,6 @@ export default {
     async contentGetByUrl (url) {
       this.$log('contentGetByUrl start')
       let uploadContentUrl = await this.$store.dispatch('content/uploadContentUrl', url)
-      // let {data: {uploadContentUrl}} = await this.$apollo.mutate({
-      //   mutation: gql`
-      //     ${fragments.objectFullFragment}
-      //     mutation sw_network_only_nc_contentGetByUrl ($url: String!, $onlyMeta: Boolean!) {
-      //       uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
-      //         ...objectFullFragment
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     url: url,
-      //     onlyMeta: onlyMeta
-      //   }
-      // })
       this.$log('contentGetByUrl done')
       return uploadContentUrl
     },
@@ -146,21 +152,6 @@ export default {
     async contentGetByFile (file) {
       this.$log('contentGetByFile start')
       let uploadContentFile = await this.$store.dispatch('content/uploadContentFile', file)
-      // let { data: {uploadContentFile} } = await this.$apollo.mutate({
-      //   mutation: gql`
-      //     ${fragments.objectFullFragment}
-      //     mutation sw_network_only_nc_contentGetByFile ($file: Upload!, $length: Float!) {
-      //       uploadContentFile(file: $file, length: $length) {
-      //         ...objectFullFragment
-      //       }
-      //     }
-      //   `,
-      //   variables: {
-      //     file: file,
-      //     length: file.size
-      //   },
-      //   client: 'uploadApollo'
-      // })
       this.$log('contentGetByFile done')
       return uploadContentFile
     }

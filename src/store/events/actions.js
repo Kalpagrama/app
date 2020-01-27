@@ -60,6 +60,8 @@ function processEvent (context, event) {
       break
     case 'PROGRESS':
       context.commit('stateSet', ['progress', event])
+      if (event.action === 'UPLOAD') context.commit('stateSet', ['progressUpload', event])
+      if (event.action === 'CREATE_NODE') context.commit('stateSet', ['progressCreateNode', event])
       break
     case 'NOTICE':
       context.commit('stateSet', ['notice', event])
@@ -70,14 +72,14 @@ function processEvent (context, event) {
         path: event.path,
         newValue: event.value
       }, { root: true })
-      context.commit('addEvent', {event, context})
+      context.commit('addEvent', { event, context })
       break
     case 'NODE_CREATED':
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeCreated', event])
-      context.commit('addEvent', {event, context})
+      context.commit('addEvent', { event, context })
       break
     case 'NODE_RATED':
       if (event.subject.oid === context.rootState.auth.userOid) {
@@ -89,12 +91,12 @@ function processEvent (context, event) {
         path: 'rate',
         newValue: event.rate
       }, { root: true })
-      context.commit('addEvent', {event, context})
+      context.commit('addEvent', { event, context })
       break
     case 'NODE_DELETED':
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['nodeDeleted', event])
-      context.commit('addEvent', {event, context})
+      context.commit('addEvent', { event, context })
       break
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
@@ -124,7 +126,7 @@ function processEvent (context, event) {
           }
         }, { root: true })
       }
-      context.commit('addEvent', {event, context})
+      context.commit('addEvent', { event, context })
       break
     case 'USER_UNSUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
@@ -154,7 +156,7 @@ function processEvent (context, event) {
           }
         }, { root: true })
       }
-      context.commit('addEvent', {event, context})
+      context.commit('addEvent', { event, context })
       break
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_UPDATED':
@@ -190,7 +192,7 @@ function processEventWs (context, event) {
       throw new Error(`bad type ${type}`)
   }
   logD(operationName, objectType)
-  context.commit(`workspace/ws${objectType}${operationName}`, {object, context}, { root: true })
+  context.commit(`workspace/ws${objectType}${operationName}`, { object, context }, { root: true })
 }
 
 // вывести уведомление о действии пользователя

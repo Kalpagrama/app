@@ -18,7 +18,7 @@
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm
           span.text-bold {{$t('Login')}}
         q-btn(
-          outline no-caps color="white" @click="$go('/login')"
+          outline no-caps color="white" @click="$router.push('/login')"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width
           span {{$t('Back')}}
 </template>
@@ -61,7 +61,7 @@
           password: this.password
         })
         await this.$wait(1000)
-        this.$go('/')
+        this.$router.push('/')
         this.$log('login done!', res)
       } catch (e) {
         this.$log('login ERROR', e)

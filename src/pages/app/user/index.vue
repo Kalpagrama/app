@@ -15,7 +15,7 @@ button:focus {
     outline: none;
 }
 ::placeholder {
-  opacity: 1
+  opacity: 1;
   color: grey
 }
 </style>
