@@ -185,7 +185,7 @@ const eventFragment = gql`
   }
 `
 const userFragment = gql`
-  ${objectShortFragment} ${nodeFragment} ${eventFragment} ${objectFragment}
+  ${objectShortFragment} ${nodeFragment} ${objectFragment}
   fragment userFragment on User {
     ...objectFragment
     weightVal

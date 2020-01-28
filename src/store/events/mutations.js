@@ -17,7 +17,6 @@ export function stateSet(state, [key, val]) {
 export function addEvent(state, {event, context: { rootState, commit }}) {
   logD('addEvent', event)
   logE('not implemented!')
-  return
   // commit('objects/update', {
   //   oid: rootState.objects.currentUser.oid,
   //   path: 'events',
