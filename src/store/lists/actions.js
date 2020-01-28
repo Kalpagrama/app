@@ -35,13 +35,19 @@ export const wsItems = async (context, {pagination, filter, sortStrategy }) => {
   logD('wsItems start')
   let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
     query: gql`
-      ${fragments.objectFullFragment}
+      ${fragments.objectFullFragment} ${fragments.objectShortFragment}
       query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
         wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
           totalCount
           count
           nextPageToken
-          items {...objectFullFragment}
+          items {
+            createdAt
+            updatedAt
+            spheres {... objectShortFragment}
+            wsVersion
+            object{ ... objectFullFragment}
+            }
         }
       }
     `,

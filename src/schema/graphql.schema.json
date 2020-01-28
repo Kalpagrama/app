@@ -2900,8 +2900,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "Object",
+                    "kind": "OBJECT",
+                    "name": "WSItem",
                     "ofType": null
                   }
                 }
@@ -2952,6 +2952,105 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "RawJSON",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "WSItem",
+        "description": null,
+        "fields": [
+          {
+            "name": "createdAt",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "updatedAt",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "DateTime",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "object",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Object",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "spheres",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "ObjectShort",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "wsVersion",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
                 "ofType": null
               }
             },
@@ -3915,8 +4014,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INTERFACE",
-                "name": "Object",
+                "kind": "OBJECT",
+                "name": "WSItem",
                 "ofType": null
               }
             },
@@ -3947,7 +4046,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Node",
+                "name": "WSItem",
                 "ofType": null
               }
             },
@@ -3977,8 +4076,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "kind": "OBJECT",
+                "name": "WSItem",
                 "ofType": null
               }
             },
@@ -4008,8 +4107,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "kind": "OBJECT",
+                "name": "WSItem",
                 "ofType": null
               }
             },
@@ -4039,8 +4138,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INTERFACE",
-                "name": "ObjectShort",
+                "kind": "OBJECT",
+                "name": "WSItem",
                 "ofType": null
               }
             },
@@ -4085,7 +4184,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Node",
+                "name": "WSItem",
                 "ofType": null
               }
             },
@@ -6915,15 +7014,15 @@
             "deprecationReason": null
           },
           {
-            "name": "objectFull",
+            "name": "item",
             "description": "что сделал (данные)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "INTERFACE",
-                "name": "Object",
+                "kind": "OBJECT",
+                "name": "WSItem",
                 "ofType": null
               }
             },
