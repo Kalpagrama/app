@@ -47,12 +47,31 @@ export const wsSphereCreate = async (context, sphere) => {
   return wsSphereCreate
 }
 
+export const wsItemAdd = async (context, oid) => {
+  logD('wsItemAdd start', oid)
+  let { data: { wsItemAdd: wsItem } } = await apollo.clients.api.mutate({
+    mutation: gql`
+      ${fragments.objectFullFragment}
+      mutation sw_network_only_wsItemAdd ($oid: OID!) {
+        wsItemAdd (oid: $oid) {
+          ...objectFullFragment
+        }
+      }
+    `,
+    variables: {
+      oid
+    }
+  })
+  // context.commit('wsSphereCreate', wsSphereCreate)
+  logD('wsItemAdd done', wsItem)
+  return wsItem
+}
 export const wsContentCreate = async (context, {type, url, spheres}) => {
   logD('wsContentCreate start', url)
   let { data: { wsContentCreate } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectShortFragment}
-      mutation sw_network_only_wsContentCreate ($type: ObjectTypeEnum!, $url: String, $spheres: [ObjectShortInput!]!) {
+      mutation sw_network_only_wsContentCreate ($type: ObjectTypeEnum, $url: String, $spheres: [ObjectShortInput!]!) {
         wsContentCreate (content: {type: $type, url: $url, spheres: $spheres}) {
           ...objectShortFragment
         }
@@ -62,9 +81,8 @@ export const wsContentCreate = async (context, {type, url, spheres}) => {
       type, url, spheres
     }
   })
-  // context.commit('wsSphereCreate', wsSphereCreate)
-  logD('wsContentCreate done', wsSphereCreate)
-  return wsSphereCreate
+  logD('wsContentCreate done', wsContentCreate)
+  return wsContentCreate
 }
 export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave start', node)

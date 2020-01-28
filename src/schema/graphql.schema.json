@@ -3877,6 +3877,37 @@
             "deprecationReason": null
           },
           {
+            "name": "wsItemAdd",
+            "description": null,
+            "args": [
+              {
+                "name": "oid",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "OID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Object",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "wsNodeCreate",
             "description": null,
             "args": [
@@ -5357,13 +5388,9 @@
             "name": "type",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "ObjectTypeEnum",
-                "ofType": null
-              }
+              "kind": "ENUM",
+              "name": "ObjectTypeEnum",
+              "ofType": null
             },
             "defaultValue": null
           },
