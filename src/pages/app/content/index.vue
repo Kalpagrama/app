@@ -10,7 +10,7 @@ div(:style=`{position: 'relative'}`).row.full-width
       q-spinner(size="50px" color="green")
     content-finder(
       v-if="!$route.params.oid"
-      @content="$event => $router.push('/content/' + $event.oid)"
+      @content="contentFound"
       :sources="['device', 'url', 'ws']"
       :style=`{height: $q.screen.height+'px'}`
       ).bg-black
@@ -43,6 +43,14 @@ export default {
     }
   },
   methods: {
+    async contentFound (content) {
+      this.$log('contentFound', content)
+      // add content to ws
+      let res = await this.$store.dispatch('workspace/wsItemAdd', content.oid)
+      this.$log('res', res)
+      // go to content/oid
+      this.$router.push('/content/' + content.oid)
+    },
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFullFragment', priority: 0 })

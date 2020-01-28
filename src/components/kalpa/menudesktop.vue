@@ -86,15 +86,10 @@ div(
         menuShow: true,
         width: 230,
         pages: [
+          { name: 'Home', icon: '', path: '/home' },
           { name: 'Trends', icon: 'whatshot', path: '/trends' },
-          { name: 'Content', icon: '', path: '/content' },
           { name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/workspace' },
-          { name: 'Subscriptions', icon: 'subscriptions', path: '/subscriptions' },
-          { name: 'Notifications', icon: 'notifications', path: '/notifications' },
-          // { name: 'test web-push', icon: 'message', path: '/test_message' },
-          // { name: 'sentry log send', icon: 'message', path: '/sentry_log' },
-          { name: 'test share', icon: 'share', path: '/share_target' },
-          { name: 'Exit', icon: 'exit_to_app', path: '/logout' }
+          { name: 'Settings', icon: 'settings', path: '/settings' }
         ],
         userAvatarErrored: false
       }
@@ -155,30 +150,6 @@ div(
             this.$logD('sentry_log..')
             await this.$store.commit('core/stateSet', ['logLevelSentry', LogLevelEnum.DEBUG])
             break
-          // case '/share': {
-          //   this.$logD('share..')
-          //   if (!('share' in navigator)) {
-          //     alert('Web Share API not supported.');
-          //   } else {
-          //     navigator.share({
-          //       title: 'test_title',
-          //       text: 'test_text',
-          //       url: 'https://whatwebcando.today/'
-          //     })
-          //       .then(() => console.log('Successful share'))
-          //       .catch(error => this.$logE('Error sharing:', error));
-          //   }
-          //   // http://localhost:8282/share-target/?title=test_title&text=test_text+https%3A%2F%2Fwhatwebcando.today%2F
-          //   // let intent = new Intent('http://webintents.org/share',
-          //   //   'text/uri-list',
-          //   //   'https://whatwebcando.today');
-          //   // navigator.startActivity(intent, function () {
-          //   //   console.log('Successful share')
-          //   // }, function (error) {
-          //   //   console.log('Error sharing:', error);
-          //   // });
-          //   break
-          // }
           default:
             await this.$router.push(p.path)
         }

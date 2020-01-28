@@ -42,19 +42,26 @@ div(
     .col.full-width.scroll
       .row.full-width.items-start.content-start.q-px-md
         div(
-          v-for="(n, ni) in 100" :key="ni"
-          :style=`{height: '30px', overflow: 'hidden', borderBottom: '1px solid #eee'}`
-          ).row.full-width.items-center.content-center.justify-center
-          span node {{ ni }}
+          v-for="(i, ii) in items" :key="ii" @click="itemClick(i,ii)"
+          :style=`{minHeight: '30px', overflow: 'hidden', borderBottom: '1px solid #eee'}`
+          ).row.full-width.items-center.content-center.justify-start
+          div(:style=`{
+            borderRadius: '6px', overflow: 'hidden',
+            color: 'white', background: typeLabel(i.type).background}`
+            ).row.items-center.justify-center.q-px-sm.q-mr-sm
+            span.text-white {{typeLabel(i.type).name}}
+          span.text-white {{ i.name | cut(50) }}
 </template>
 
 <script>
 export default {
   name: 'contentExplorerRelations',
+  props: ['content'],
   data () {
     return {
       show: false,
-      width: 0
+      width: 0,
+      items: []
     }
   },
   watch: {
@@ -66,8 +73,27 @@ export default {
       }
     }
   },
-  mounted () {
+  methods: {
+    typeLabel (type) {
+      switch (type) {
+        case 'VIDEO': {
+          return {name: 'Video', color: 'white', background: 'red'}
+        }
+        case 'IMAGE': {
+          return {name: 'Image', color: 'white', background: 'green'}
+        }
+      }
+    },
+    itemClick (i, ii) {
+      this.$log('itemClick', i, i)
+      this.$router.push('/content/' + i.oid)
+    }
+  },
+  async mounted () {
     this.$log('mounted')
+    let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {types: ['VIDEO', 'AUDIO', 'IMAGE']}})
+    this.$log('items', items)
+    this.items = items
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

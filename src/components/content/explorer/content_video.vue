@@ -120,7 +120,7 @@ export default {
       this.$set(this.player, 'playing', false)
     },
     videoTimeupdate () {
-      this.$log('videoTimeupdate')
+      // this.$log('videoTimeupdate')
       if (!this.player.started) this.$set(this.player, 'started', true)
       this.$set(this.player, 'duration', this.$refs.contentVideo.duration)
       this.$set(this.player, 'now', this.$refs.contentVideo.currentTime)

@@ -13,7 +13,7 @@ iframe {
     template(v-slot:menuDesktop)
       kalpa-menu-desktop
     template(v-slot:menuMobile)
-      k-menu-mobile
+      kalpa-menu-mobile
 </template>
 
 <script>

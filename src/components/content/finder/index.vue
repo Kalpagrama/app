@@ -1,3 +1,5 @@
+<style lang="stylus">
+</style>
 <template lang="pug">
 .row.fit.items-center.content-center.justify-center
   div(:style=`{maxWidth: '500px'}`).row.full-width.items-center.content-center.justify-center
@@ -75,8 +77,6 @@ export default {
       this.urlInputLoading = true
       // TODO: show progress
       let content = await this.contentGetByUrl(url)
-      // this.itemFound({type: 'content', item: content})
-      // this.$router.push('/content/' + content.oid)
       this.$emit('content', content)
       this.urlInputLoading = false
     },
@@ -88,9 +88,7 @@ export default {
       // this.videoUrl = url
       // this.videoShow = true
       let content = await this.contentGetByFile(file)
-      this.$log('content', content)
-      this.$router.push('/content/' + content.oid)
-      // this.itemFound({type: 'content', item: content})
+      this.$emit('content', content)
     },
     async contentPreview () {
       this.$log('contentPreview')
