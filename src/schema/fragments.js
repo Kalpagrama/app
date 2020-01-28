@@ -185,14 +185,13 @@ const eventFragment = gql`
   }
 `
 const userFragment = gql`
-  ${objectShortFragment} ${nodeFragment} ${eventFragment} ${objectFragment}
+  ${objectShortFragment} ${nodeFragment} ${objectFragment}
   fragment userFragment on User {
     ...objectFragment
     weightVal
     settings
     wsVersion
     subscriptions{...objectShortFragment}
-    events{...eventFragment}
     profile{
       tutorial
       about
@@ -229,6 +228,16 @@ const objectFullFragment = gql`
     ...on User {... userFragment}
   }
 `
+const wsItemFragment = gql`
+  ${objectFullFragment} ${objectShortFragment}
+  fragment wsItemFragment on WSItem{
+    createdAt
+    updatedAt
+    wsVersion
+    spheres{...objectShortFragment}
+    object{...objectFullFragment}
+  }
+`
 
 const fragments = {
   eventFragment,
@@ -237,7 +246,8 @@ const fragments = {
   objectShortFragment,
   objectShortWithMetaFragment,
   nodeFragment,
-  sphereFragment
+  sphereFragment,
+  wsItemFragment
 }
 
 export {
