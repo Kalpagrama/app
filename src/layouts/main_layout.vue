@@ -11,7 +11,7 @@ iframe {
   //- kalpa-tutorial
   router-view(v-if="!loading")
     template(v-slot:menuDesktop)
-      k-menu-desktop
+      kalpa-menu-desktop
     template(v-slot:menuMobile)
       k-menu-mobile
 </template>

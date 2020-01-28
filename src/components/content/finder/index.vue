@@ -9,6 +9,10 @@
     div(
       v-if="sources.includes('url')"
       :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white
+      div(
+        v-if="progress"
+        :style=`{position: 'absolute', zIndex: 100, left: 0, width: progress.progress+'%'}`
+        ).row.full-height.bg-green
       q-input(
         v-model="url"
         color="green" placeholder="Paste URL of any content!"
@@ -36,8 +40,22 @@ export default {
     }
   },
   computed: {
+    progress () {
+      return this.$store.state.events.progressUpload
+    }
   },
   watch: {
+    progress: {
+      async handler (to, from) {
+        this.$log('progress CHANGED', to)
+        if (to) {
+          if (to.progress === 100) {
+            await this.$wait(1000)
+            this.$store.commit('events/stateSet', ['progressUpload', null])
+          }
+        }
+      }
+    },
     url: {
       handler (to, from) {
         this.$log('url CHANGED', to)
@@ -58,7 +76,8 @@ export default {
       // TODO: show progress
       let content = await this.contentGetByUrl(url)
       // this.itemFound({type: 'content', item: content})
-      this.$router.push('/content/' + content.oid)
+      // this.$router.push('/content/' + content.oid)
+      this.$emit('content', content)
       this.urlInputLoading = false
     },
     async fileChanged (e) {

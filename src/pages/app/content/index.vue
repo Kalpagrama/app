@@ -10,6 +10,7 @@ div(:style=`{position: 'relative'}`).row.full-width
       q-spinner(size="50px" color="green")
     content-finder(
       v-if="!$route.params.oid"
+      @content="$event => $router.push('/content/' + $event.oid)"
       :sources="['device', 'url', 'ws']"
       :style=`{height: $q.screen.height+'px'}`
       ).bg-black
