@@ -13,21 +13,19 @@ export function stateSet(state, [key, val]) {
   state[key] = val
 }
 
+// todo куда добавлять эвенты (user.events не существует)
 export function addEvent(state, {event, context: { rootState, commit }}) {
   logD('addEvent', event)
-  // event.uid = Date.now().toString()
-  commit('objects/update', {
-    oid: rootState.objects.currentUser.oid,
-    path: 'events',
-    setter: (oldValue) => {
-      let events = oldValue
-      events.unshift(event)
-      events.splice(888, events.length)
-      return events
-    }
-  }, { root: true })
-
-  // userEvent.uid = Date.now().toString()
-  // state.userEvents.unshift(userEvent)
-  // state.userEvents.splice(888, state.userEvents.length)
+  logE('not implemented!')
+  return
+  // commit('objects/update', {
+  //   oid: rootState.objects.currentUser.oid,
+  //   path: 'events',
+  //   setter: (oldValue) => {
+  //     let events = oldValue
+  //     events.unshift(event)
+  //     events.splice(888, events.length)
+  //     return events
+  //   }
+  // }, { root: true })
 }

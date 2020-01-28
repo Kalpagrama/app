@@ -192,7 +192,6 @@ const userFragment = gql`
     settings
     wsVersion
     subscriptions{...objectShortFragment}
-    events{...eventFragment}
     profile{
       tutorial
       about

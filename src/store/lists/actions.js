@@ -31,6 +31,27 @@ export const sphereSpheres = async (context, { oid, pagination, filter, sortStra
   return spheres
 }
 
+export const events = async (context, {pagination}) => {
+  logD('events start')
+  assert(pagination.pageSize)
+  let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+    query: gql`
+      ${fragments.eventFragment}
+      query events ( $pagination: PaginationInput!){
+        events (pagination: $pagination) {
+          totalCount
+          count
+          nextPageToken
+          items {...eventFragment}
+        }
+      }
+    `,
+    variables: { pagination }
+  })
+  logD('events complete')
+  return { items, count, totalCount, nextPageToken }
+}
+
 export const wsItems = async (context, {pagination, filter, sortStrategy }) => {
   logD('wsItems start')
   let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
