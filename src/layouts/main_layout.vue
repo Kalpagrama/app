@@ -8,6 +8,7 @@ iframe {
 <template lang="pug">
 .row.full-width.items-start.content-start
   k-action
+  //- kalpa-tutorial
   router-view(v-if="!loading")
     template(v-slot:menuDesktop)
       k-menu-desktop
@@ -76,9 +77,10 @@ export default {
       await this.$router.push('/login')
       return
     }
-    if (this.$store.getters.currentUser.profile.tutorial) {
-      this.$refs.kTutorialDialog.show()
-    } else this.loading = false
+    this.loading = false
+    // if (this.$store.getters.currentUser.profile.tutorial) {
+    //   this.$refs.kTutorialDialog.show()
+    // } else this.loading = false
   }
  }
 </script>
