@@ -46,22 +46,25 @@ export const wsSphereCreate = async (context, sphere) => {
   logD('wsSphereCreate done', wsSphereCreate)
   return wsSphereCreate
 }
-export const wsSphereDelete = async (context, oid) => {
-  logD('wsSphereDelete start', oid)
-  let { data: { wsSphereDelete } } = await apollo.clients.api.mutate({
+
+export const wsContentCreate = async (context, {type, url, spheres}) => {
+  logD('wsContentCreate start', url)
+  let { data: { wsContentCreate } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_wsSphereDelete ($oid: OID!) {
-        wsSphereDelete (oid: $oid)
+      ${fragments.objectShortFragment}
+      mutation sw_network_only_wsContentCreate ($type: ObjectTypeEnum!, $url: String, $spheres: [ObjectShortInput!]!) {
+        wsContentCreate (content: {type: $type, url: $url, spheres: $spheres}) {
+          ...objectShortFragment
+        }
       }
     `,
     variables: {
-      oid
+      type, url, spheres
     }
   })
-  // context.commit('wsSphereDelete', uid)
-  // TODO: delete this tag from all tagUids
-  logD('wsSphereDelete done')
-  return wsSphereDelete
+  // context.commit('wsSphereCreate', wsSphereCreate)
+  logD('wsContentCreate done', wsSphereCreate)
+  return wsSphereCreate
 }
 export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave start', node)
@@ -159,19 +162,19 @@ export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave done', res)
   return res
 }
-export const wsNodeDelete = async (context, oid) => {
-  logD('wsNodeDelete start', oid)
+export const wsItemDelete = async (context, oid) => {
+  logD('wsItemDelete start', oid)
   assert.ok(oid)
-  let { data: { wsNodeDelete } } = await apollo.clients.api.mutate({
+  let { data: { wsItemDelete } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_wsNodeDelete ($oid: OID!) {
-        wsNodeDelete (oid: $oid)
+      mutation sw_network_only_wsItemDelete ($oid: OID!) {
+        wsItemDelete (oid: $oid)
       }
     `,
     variables: {
       oid
     }
   })
-  logD('wsNodeDelete done', wsNodeDelete)
-  return wsNodeDelete
+  logD('wsItemDelete done', wsItemDelete)
+  return wsItemDelete
 }

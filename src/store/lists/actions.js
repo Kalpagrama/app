@@ -31,21 +31,21 @@ export const sphereSpheres = async (context, { oid, pagination, filter, sortStra
   return spheres
 }
 
-export const wsItems = async (context, { oid, pagination, filter, sortStrategy }) => {
+export const wsItems = async (context, {pagination, filter, sortStrategy }) => {
   logD('wsItems start')
-  assert.ok(oid)
   let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
     query: gql`
-      query wsItems ( $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum){
+      ${fragments.objectFullFragment}
+      query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
         wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-          items {
-            oid
-            name
-          }
+          totalCount
+          count
+          nextPageToken
+          items {...objectFullFragment}
         }
       }
     `,
-    variables: { oid, pagination, filter, sortStrategy }
+    variables: { pagination, filter, sortStrategy }
   })
   logD('wsItems complete')
   return { items, count, totalCount, nextPageToken }
