@@ -150,15 +150,21 @@ const eventFragment = gql`
       message
     }
     ... on EventWS{
-      objectFull{
-        oid
-        type
-        name
-        thumbUrl(preferWidth: 600)
-        ...on Video {...videoFragment}
-        ...on Image {...imageFragment}
-        ...on Node {...nodeFragment}
-        ...on Sphere {...sphereFragment}
+      item{
+        wsVersion
+        createdAt
+        updatedAt
+        spheres{...objectShortFragment}
+        object {
+          oid
+          type
+          name
+          thumbUrl(preferWidth: 600)
+          ...on Video {...videoFragment}
+          ...on Image {...imageFragment}
+          ...on Node {...nodeFragment}
+          ...on Sphere {...sphereFragment}
+        }
       }
     }
     ... on EventChange{
@@ -184,6 +190,7 @@ const userFragment = gql`
     ...objectFragment
     weightVal
     settings
+    wsVersion
     subscriptions{...objectShortFragment}
     events{...eventFragment}
     profile{

@@ -175,7 +175,7 @@ function processEvent (context, event) {
 
 function processEventWs (context, event) {
   let type = event.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
-  let object = event.object
+  let { createdAt, updatedAt, object, spheres, wsVersion } = event.item
   let objectType = object.__typename
   let operationName
   switch (type) {
@@ -192,7 +192,8 @@ function processEventWs (context, event) {
       throw new Error(`bad type ${type}`)
   }
   logD(operationName, objectType)
-  context.commit(`workspace/ws${objectType}${operationName}`, { object, context }, { root: true })
+  // todo что делать с этими эвентами?
+  // context.commit(`workspace/ws${objectType}${operationName}`, { object, context }, { root: true })
 }
 
 // вывести уведомление о действии пользователя
