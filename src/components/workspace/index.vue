@@ -7,15 +7,14 @@ q-layout(view="hHh lpR fFf")
       ).row.full-height.bg-black.gt-xs
       slot(name="menuDesktop")
     div(
-      :style=`{maxWidth: '300px'}`
+      :style=`{maxWidth: '130px'}`
       ).row.fit.bg-black.gt-xs
       ws-menu
-    div(
-      :style=`{maxWidth: '500px'}`
-      ).row.fit.bg-black
-      ws-contents
     .col.full-height
-      ws-content
+      ws-contents(v-if="$route.params.section === 'contents'")
+      span(v-if="$route.params.section === 'compositions'").text-green Compositions
+      span(v-if="$route.params.section === 'nodes'").text-green Nodes
+      span(v-if="$route.params.section === 'settigs'").text-green Settings
   //- footer
   q-footer.row.full-width.bg-black.lt-sm
     slot(name="menuMobile")
