@@ -2,9 +2,12 @@
 div(
   :style=`{position: 'relative', minHeight: '100vh', width: width+'px'}`).row
   //- toggle menu
-  div(:style=`{
-    position: 'absolute', top: 0, right: '-72px', zIndex: 1000,
-    width: '72px', height: '72px'}`).row.items-center.justify-center
+  div(
+    v-if="false"
+    :style=`{
+      position: 'absolute', top: 0, right: '-72px', zIndex: 1000,
+      width: '72px', height: '72px'}`
+    ).row.items-center.justify-center
     q-btn(
       flat color="green" icon="menu" @click="menuShow = !menuShow"
       :style=`{width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255, 0.3)'}`)
@@ -20,7 +23,7 @@ div(
           k-logo(:width="40" :height="40")
         div(v-if="!mini").col.full-height
           .row.fit.items-center
-            span.text-bold.text-white {{$t('Kalpagramma v') + $store.state.core.version}}
+            span.text-bold.text-white {{ $t('Home') }}
             //- span.text-white.text-bold Кальпаграмма 1.0.1 // зачем сломали номер версии? поставил обратно...
       div(@click="$router.push('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         q-btn(round flat icon="settings" color="white")
@@ -72,6 +75,8 @@ div(
         q-btn(
           outline color="accent" no-caps @click="appRefresh()"
           :style=`{borderRadius: '10px', whiteSpace: 'nowrap'}` ).full-width {{$t('Refresh')}}
+      div(:style=`{}`).row.full-width
+        q-btn(round flat icon="keyboard_arrow_left" color="green" @click="menuShow = !menuShow")
 </template>
 
 <script>
@@ -86,7 +91,6 @@ div(
         menuShow: true,
         width: 230,
         pages: [
-          { name: 'Home', icon: '', path: '/home' },
           { name: 'Trends', icon: 'whatshot', path: '/trends' },
           { name: 'Workspace', icon: 'img:statics/icons/anvil.svg', path: '/workspace' },
           { name: 'Settings', icon: 'settings', path: '/settings' }

@@ -1,24 +1,23 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
-  //- div(:style=`{height: '60px'}`).row.full-width
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start
+.row.fit
+  div(:style=`{position: 'relative'}`).column.fit
+    div(
+      :style=`{height: '60px'}`
+      ).row.full-width.items-center.content-center.br
+      .col.full-height
+        .row.fit.items-center.justify-start.q-px-md
+          span.text-bold.text-green Contents
       div(
-        v-for="(i, ii) in contents" :key="ii"
-        :style=`{position: 'relative', zIndex: 10, borderRadius: '10px', overflow: 'hidden'}`
-        ).col-6.q-pa-sm
-        img(
-          :src="i.item.thumbUrl" draggable="false" @click="contentClick(i, ii)"
-          :style=`{
-            width: '100%', height: '100%', objectFit :'contain',
-            userSelect: 'none',
-            borderRadius: '10px', overflow: 'hidden'}`).cursor-pointer
-        small(
-          :style=`{
-            position: 'absolute', zIndex: 100, top: '16px', left: '16px',
-            borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.8)',
-            maxWidth: '80%'}`
-          ).text-white.q-px-sm.q-py-xs {{ i.item.name | cut(20) }}
+        :style=`{width: '60px', height: '60px'}`
+        ).row.items-center.justify-center
+        q-btn(round flat icon="add" color="green" @click="contentAdd")
+    .col.full-width.scroll
+      .row.full-width.items-start.content-start
+        div(
+          v-for="(c, ci) in contents" :key="ci"
+          :style=`{minHeight: '50px'}`
+          ).row.full-width.items-center.q-px-sm
+          span.text-white content {{ c }}
 </template>
 
 <script>
@@ -27,46 +26,23 @@ export default {
   props: ['ctx'],
   data () {
     return {
-      contentIndex: -1
-    }
-  },
-  computed: {
-    contents () {
-      return this.$store.getters.currentUser.workspace.nodes
-        .reduce((acc, val) => {
-          val.fragments.map(f => {
-            if (!acc[f.content.oid]) {
-              acc[f.content.oid] = {
-                type: 'content',
-                item: f.content,
-                node: val,
-                nodes: 1
-              }
-            } else {
-              acc[f.content.oid].nodes += 1
-            }
-          })
-          return acc
-        }, {})
+      contents: []
     }
   },
   methods: {
+    contentAdd () {
+      this.$log('contentAdd')
+    },
     async contentUse (i, ii) {
-      this.$log('contentClick', i, ii)
-      this.$store.commit('workspace/stateSet', ['wsItem', {type: 'content', item: JSON.parse(JSON.stringify(i.item))}])
-      await this.$wait(300)
-      this.$router.push('/create')
     },
     async contentClick (i, ii) {
-      if (this.ctx === 'inEditor') {
-        this.$emit('item', i)
-      } else {
-        this.contentUse(i, ii)
-      }
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {types: ['VIDEO', 'AUDIO', 'IMAGE']}})
+    this.$log('items', items)
+    this.contents = items
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
