@@ -6,19 +6,20 @@ q-layout(view="hHh lpR fFf")
       :style=`{maxWidth: '500px'}`
       ).row.full-height.bg-black.gt-xs
       ws-menu
-    .col
-      h1 workspace
+    .col.full-height
+      ws-content
   //- footer
   q-footer.row.full-width.bg-black.lt-sm
     slot(name="menuMobile")
 </template>
 
 <script>
+import wsContent from './ws_content'
 import wsMenu from './ws_menu'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsMenu},
+  components: {wsMenu, wsContent},
   props: [],
   data () {
     return {
