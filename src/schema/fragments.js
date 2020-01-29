@@ -65,6 +65,50 @@ const compositionFragment = gql`
       y
     }
   }
+  fragment operationFragment on LayerOperation{
+    type
+    items
+    operations{
+      type
+      items
+      operations{
+        type
+        items
+        operations{
+          type
+          items
+          operations{
+            type
+            items
+            operations{
+              type
+              items
+              operations{
+                type
+                items
+                operations{
+                  type
+                  items
+                  operations{
+                    type
+                    items
+                    operations{
+                      type
+                      items
+                      operations{
+                        type
+                        items
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   fragment compositionFragment on Composition {
     ...objectFragment
     spheres {...objectShortFragment}
@@ -76,6 +120,8 @@ const compositionFragment = gql`
       thumbUrl(preferWidth: 600)
       url
     }
+    operation{... operationFragment}
+    outputType
     url
   }
 `
