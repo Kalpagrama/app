@@ -4,8 +4,8 @@
     .row.fit.items-center.justify-center
       span.text-bold.text-green Some content
   div(
-    v-if="false"
-    :style=`{maxWidth: '500px', borderLeft: '1px solid #4caf50'}`
+    v-if="true"
+    :style=`{maxWidth: '300px', borderLeft: '1px solid #4caf50'}`
     ).column.fit
     div(
       :style=`{height: '60px'}`
@@ -23,7 +23,7 @@
 <script>
 export default {
   name: 'wsContent',
-  props: [],
+  props: ['content'],
   data () {
     return {
     }

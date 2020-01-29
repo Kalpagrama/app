@@ -14,7 +14,11 @@ div(
     ref="contentVideo" @click="videoClick" v-viewer="{inline: true}"
     @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate"
     :src="content.url" type="video/mp4" autoplay loop
-    :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
+    :style=`{
+      width: '100%',
+      height: 'calc(100% - '+extractorHeight+'px)',
+      objectFit: 'contain'
+    }`)
   //- nodes
   //- div(
   //-   :style=`{
@@ -63,7 +67,9 @@ div(
     v-if="true"
     v-show="player.playing ? player.controls : true"
     :style=`{
-      position: 'absolute', bottom: '16px', left: 0, zIndex: 1000,
+      position: 'absolute',
+      bottom: 16+extractorHeight+'px',
+      left: 0, zIndex: 1000,
       height: '10px'}`
     ).row.full-width.q-px-md
     div(
@@ -75,24 +81,44 @@ div(
         //- progress %
         div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none'}`).row.full-height.bg-green
       //- fullscreen
+  //- extractor toggle
+  q-btn(
+    round push color="green" @click="extractorOpened = !extractorOpened"
+    :icon="extractorOpened ? 'keyboard_arrow_down' : 'keyboard_arrow_up'"
+    :style=`{position: 'absolute', zIndex: 1000, bottom: 40+extractorHeight+'px', right: '16px'}`)
   //- div(
   //-   :style=`{width: '44px'}`
   //-   ).row.full-height.items-center.content-center.justify-center
   //-   q-btn(
   //-     round flat color="green" @click="$q.fullscreen.toggle()"
   //-     :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
+  content-video-extractor(
+    :content="content" :player="player"
+    :style=`{height: extractorHeight+'px'}`)
 </template>
 
 <script>
+import contentVideoExtractor from './content_video_extractor'
+
 export default {
   name: 'contentVideo',
-  components: {},
+  components: {contentVideoExtractor},
   props: ['ctx', 'content'],
   data () {
     return {
       now: 0,
       player: {},
-      moveInterval: null
+      moveInterval: null,
+      extractorOpened: false,
+      extractorHeight: 0
+    }
+  },
+  watch: {
+    extractorOpened: {
+      handler (to, from) {
+        this.$log('extractorOpened CHANGED', to)
+        this.$tween.to(this, 0.5, {extractorHeight: to ? 200 : 0})
+      }
     }
   },
   methods: {

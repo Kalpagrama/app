@@ -19,6 +19,7 @@
         v-model="url"
         color="green" placeholder="Paste URL of any content!"
         :loading="urlInputLoading"
+        :style=`{paddingRight: '10px'}`
         ).full-width
         template(v-slot:prepend)
           q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm

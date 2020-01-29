@@ -15,6 +15,10 @@ q-layout(view="hHh lpR fFf")
       span(v-if="$route.params.section === 'compositions'").text-green Compositions
       span(v-if="$route.params.section === 'nodes'").text-green Nodes
       span(v-if="$route.params.section === 'settigs'").text-green Settings
+    div(
+      :style=`{maxWidth: '600px', borderLeft: '1px solid #4caf50'}`
+      ).row.fit.items-start.content-start.bg-black
+      node-editor
   //- footer
   q-footer.row.full-width.bg-black.lt-sm
     slot(name="menuMobile")
@@ -24,10 +28,11 @@ q-layout(view="hHh lpR fFf")
 import wsContents from './ws_contents'
 import wsContent from './ws_content'
 import wsMenu from './ws_menu'
+import nodeEditor from 'components/node/node_editor'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsMenu, wsContent, wsContents},
+  components: {wsMenu, wsContent, wsContents, nodeEditor},
   props: [],
   data () {
     return {

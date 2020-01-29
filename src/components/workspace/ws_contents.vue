@@ -1,9 +1,18 @@
+<style lang="stylus">
+.ws-content {
+  color: white;
+  &:hover {
+    color: #4caf50 !important;
+  }
+}
+</style>
+
 <template lang="pug">
 .row.fit
   div(
     :style=`{
       position: 'relative', borderRight: '1px solid #4caf50',
-      maxWidth: '500px'
+      maxWidth: '360px'
     }`).column.fit.bg-black
     div(
       :style=`{height: '60px'}`
@@ -18,12 +27,17 @@
     .col.full-width.scroll
       .row.full-width.items-start.content-start
         div(
-          v-for="(c, ci) in contents" :key="ci"
-          :style=`{minHeight: '50px'}`
-          ).row.full-width.items-center.q-px-sm
-          span.text-white content {{ c }}
+          v-for="(c, ci) in contents" :key="ci" @click="contentClick(c, ci)"
+          :style=`{minHeight: '40px'}`
+          ).row.full-width.items-center.q-px-md.ws-content
+          span(
+            :class=`{
+              'text-bold': content ? c.object.oid === content.oid : false,
+              'text-green': content ? c.object.oid === content.oid : false
+              }`
+          ).cursor-pointer {{ c.object.name | cut(50) }}
   .col.full-height
-    ws-content(
+    content-explorer(
       v-if="content"
       :content="content")
     content-finder(
@@ -35,11 +49,11 @@
 
 <script>
 import contentFinder from 'components/content/finder'
-import wsContent from './ws_content'
+import contentExplorer from 'components/content/explorer'
 
 export default {
   name: 'wsContents',
-  components: {wsContent, contentFinder},
+  components: {contentFinder, contentExplorer},
   props: ['ctx'],
   data () {
     return {
@@ -50,18 +64,20 @@ export default {
   methods: {
     contentAdd () {
       this.$log('contentAdd')
+      this.content = null
+    },
+    contentClick (c, ci) {
+      this.$log('contentClick', c, ci)
+      this.content = c.object
     },
     async contentFound (content) {
-      this.$log('contentFound')
+      this.$log('contentFound', content)
       this.content = content
       // add content to ws
       let res = await this.$store.dispatch('workspace/wsItemAdd', content.oid)
       this.$log('res', res)
       // go to content/oid
       // this.$router.push('/content/' + content.oid)
-      // open for preview...
-    },
-    async contentClick (i, ii) {
       // open for preview...
     }
   },

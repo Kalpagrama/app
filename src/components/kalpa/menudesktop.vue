@@ -182,6 +182,12 @@ export default {
       this.$log('appRefresh')
       window.location.reload(true)
     }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

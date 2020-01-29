@@ -5,7 +5,7 @@ div(:style=`{position: 'relative'}`).row.full-width.window-height
     //- content.name
     div(
       :style=`{
-        position: 'absolute', top: 0, left: '72px', zIndex: 1000,
+        position: 'absolute', top: 0, left: '16px', zIndex: 1000,
         height: '72px'}`
       ).row.items-center.content-center.justify-start
       div(
@@ -21,7 +21,7 @@ div(:style=`{position: 'relative'}`).row.full-width.window-height
         v-if="false"
         :style=`{height: '100px'}`).row.full-width.bg-black
         span extractor
-  content-relations(:content="content")
+  //- content-relations(:content="content")
 </template>
 
 <script>
