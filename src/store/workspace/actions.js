@@ -89,58 +89,66 @@ export const wsNodeSave = async (context, node) => {
 
   // checks
   {
-    assert.ok(node.categories.length >= 0)
-    assert.ok(node.spheres.length >= 0)
-    assert.ok(node.fragments.length >= 0)
+    // assert.ok(node.category)
+    assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10)
+    // assert.ok(node.compositions.length > 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
-    for (let fr of node.fragments) {
-      if (fr === null) continue
-      assert.ok(fr.content)
-      assert.ok(fr.cuts.length >= 0)
-      assert.ok(fr.scale > 0)
-      for (let c of fr.cuts) {
-        assert.ok(c.color)
-        // assert.ok(c.thumbUrl)
-        assert.ok(c.points && c.points.length === 2)
-        let start = c.points[0].x
-        let end = c.points[1].x
+    for (let c of node.compositions) {
+      // assert.ok(c.layers.length > 0)
+      assert(c.spheres && c.spheres.length >= 0 && c.spheres.length <= 10)
+      // assert(c.operation)
+      let compositionLen = 0
+      for (let l of c.layers) {
+        assert.ok(l.content && l.content.oid)
+        assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10)
+        assert.ok(l.figuresAbsolute && l.figuresAbsolute.length === 2)
+        let start = l.figuresAbsolute[0].t
+        let end = l.figuresAbsolute[1].t
         assert.ok(start >= 0 && end > 0)
-        assert.ok(end > start && end <= fr.scale)
+        assert.ok(end > start)
+        compositionLen += (end - start)
       }
+      assert(compositionLen <= 60)
     }
   }
-  logD('wsNodeSave check OK')
+
   let nodeInput = {}
   nodeInput.layout = node.layout
   nodeInput.name = node.name
   nodeInput.categories = node.categories
   nodeInput.spheres = node.spheres.map(s => {
-    return {name: s.name}
+    return { name: s.name }
   })
-  nodeInput.fragments = []
-  node.fragments.map(f => {
-    if (f !== null) {
-      nodeInput.fragments.push({
-        oid: f.content.oid,
-        name: f.name,
-        thumbUrl: f.thumbUrl,
-        scale: f.scale,
-        cuts: f.cuts.map(c => {
-          return {
-            name: c.name,
-            color: c.color,
-            thumbUrl: c.thumbUrl,
-            points: c.points.map(p => {
-              return {
-                x: p.x,
-                y: p.y,
-                z: p.z
-              }
-            }),
-            style: c.style
-          }
-        })
-      })
+  nodeInput.compositions = node.compositions.map(c => {
+    return {
+      thumbUrl: c.thumbUrl,
+      spheres: c.spheres.map(s => {
+        return { name: s.name }
+      }),
+      layers: c.layers.map(l => {
+        return {
+          contentOid: l.contentOid,
+          speed: l.speed,
+          figuresAbsolute: l.figuresAbsolute.map(f => {
+            return {
+              t: f.t,
+              points: f.points.map(p => {
+                return { x: p.x, y: p.y }
+              })
+            }
+          }),
+          spheres: l.spheres.map(s => {
+            return { name: s.name }
+          }),
+          color: l.color,
+          thumbUrl: l.thumbUrl
+        }
+      }),
+      operation: {
+        items: c.operation.items,
+        operations: c.operation.operations,
+        type: c.operation.type
+      }
     }
   })
 

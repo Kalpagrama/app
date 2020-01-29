@@ -106,25 +106,26 @@ export const nodeCreate = async (context, node) => {
   logD('nodeCreate start', node)
   // checks
   {
-    assert.ok(node.categories.length >= 0)
-    assert.ok(node.spheres.length >= 0)
-    assert.ok(node.fragments.length >= 0)
+    assert.ok(node.category)
+    assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10)
+    assert.ok(node.compositions.length > 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
-    for (let fr of node.fragments) {
-      assert.ok(fr.content)
-      assert.ok(fr.cuts.length >= 0)
-      assert.ok(fr.scale > 0)
-      let fragmentLen = 0
-      for (let c of fr.cuts) {
-        assert.ok(c.color)
-        // assert.ok(c.thumbUrl)
-        assert.ok(c.points && c.points.length === 2)
-        let start = c.points[0].x
-        let end = c.points[1].x
+    for (let c of node.compositions) {
+      assert.ok(c.layers.length > 0)
+      assert(c.spheres && c.spheres.length >= 0 && c.spheres.length <= 10)
+      assert(c.operation)
+      let compositionLen = 0
+      for (let l of c.layers) {
+        assert.ok(l.content && l.content.oid)
+        assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10)
+        assert.ok(l.figuresAbsolute && l.figuresAbsolute.length === 2)
+        let start = l.figuresAbsolute[0].t
+        let end = l.figuresAbsolute[1].t
         assert.ok(start >= 0 && end > 0)
-        assert.ok(end > start && end <= fr.scale)
-        fragmentLen += (end - start)
+        assert.ok(end > start)
+        compositionLen += (end - start)
       }
+      assert(compositionLen <= 60)
     }
   }
 
@@ -135,27 +136,36 @@ export const nodeCreate = async (context, node) => {
   nodeInput.spheres = node.spheres.map(s => {
     return { name: s.name }
   })
-  nodeInput.fragments = node.fragments.map(f => {
+  nodeInput.compositions = node.compositions.map(c => {
     return {
-      oid: f.content.oid,
-      name: f.name,
-      thumbUrl: f.thumbUrl,
-      scale: f.scale,
-      cuts: f.cuts.map(c => {
+      thumbUrl: c.thumbUrl,
+      spheres: c.spheres.map(s => {
+        return { name: s.name }
+      }),
+      layers: c.layers.map(l => {
         return {
-          name: c.name,
-          color: c.color,
-          thumbUrl: c.thumbUrl,
-          points: c.points.map(p => {
+          contentOid: l.contentOid,
+          speed: l.speed,
+          figuresAbsolute: l.figuresAbsolute.map(f => {
             return {
-              x: p.x,
-              y: p.y,
-              z: p.z
+              t: f.t,
+              points: f.points.map(p => {
+                return { x: p.x, y: p.y }
+              })
             }
           }),
-          style: c.style
+          spheres: l.spheres.map(s => {
+            return { name: s.name }
+          }),
+          color: l.color,
+          thumbUrl: l.thumbUrl
         }
-      })
+      }),
+      operation: {
+        items: c.operation.items,
+        operations: c.operation.operations,
+        type: c.operation.type
+      }
     }
   })
 
