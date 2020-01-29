@@ -1,20 +1,15 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf").bg-grey-3
-  q-header(
-    v-if="true"
-    reveal
-    ).row.full-width.justify-center.q-px-sm.bg-grey-3
-    k-colls-tabs(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '0 0 10px 10px'}`).bg-white
   q-footer(reveal).row.full-width.justify-center.bg-grey-3.lt-sm
-    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
-  q-page-conainter
-    div(:style=`{paddingTop: '70px', paddingBottom: '70px'}`).row.full-width.justify-center.items-start.content-start
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-start.content-start.q-pa-sm
-        //- k-colls-new
-        //- k-colls(@coll="coll = $event" :coll="coll" :colls="colls" :tabs="true" :style=`{height: height+'px'}`).bg-grey-3
-        node-loader(v-if="true" ref="nodeLoader" :variables="variables" type="feed")
-          template(v-slot:default=`{nodes}`)
-            node-list(:nodes="nodes" @nodeClick="nodeClick")
+    slot(name="menuMobile")
+  q-page-conainter.row.full-width.justify-center.items-start.content-start
+    div(
+      :style=`{maxWidth: '300px'}`
+      ).row.full-height.bg-black.gt-xs
+      slot(name="menuDesktop")
+    .col
+      .row.full-width.items-start.content-start.q-pa-sm
+        h1 home
 </template>
 
 <script>
@@ -23,85 +18,14 @@ export default {
   props: [],
   data () {
     return {
-      width: 0,
-      coll: 'foryou',
-      colls: [
-        {id: 'foryou', name: 'For you'},
-        {id: 'following', name: 'Following'},
-        {id: 's1', name: 'How to kill'},
-        {id: 's2', name: 'How to pill'},
-        {id: 's3', name: 'How to feel'}
-      ]
+      width: 0
     }
   },
   computed: {
-    variables () {
-      return {
-        pagination: {pageSize: 100, pageToken: null}
-      }
-    },
-    categories () {
-      return this.$store.state.node.categories.reduce((acc, val) => {
-        acc[val.type] = val
-        return acc
-      }, {})
-    },
-    sphereOid () {
-      return this.categories.FUN.sphere.oid
-      // else return false
-    },
-    // query () {
-    //   return gql`
-    //     query sphereNodesHome ($sphereOid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-    //       sphereNodes (sphereOid: $sphereOid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-    //         count
-    //         totalCount
-    //         nextPageToken
-    //         items {
-    //           oid
-    //           type
-    //           thumbUrl (preferWidth: 600)
-    //           createdAt
-    //           name
-    //           meta {
-    //             ...on MetaNode {
-    //               layout
-    //               fragments { width height thumbUrl(preferWidth: 600) }
-    //             }
-    //           }
-    //         }
-    //       }
-    //     }
-    //   `
-    // },
-    // variables () {
-    //   return {
-    //     sphereOid: this.sphereOid,
-    //     pagination: { pageSize: 100 },
-    //     sortStrategy: 'HOT',
-    //     filter: { types: 'NODE' }
-    //   }
-    // },
   },
   watch: {
   },
   methods: {
-    nodeClick (val) {
-      this.$log('nodeClick', val)
-      // this.$store.commit('node/stateSet', ['node', val])
-      this.$router.push('/node/' + val[0].oid)
-    },
-    onScroll (e) {
-      // this.$log('onScroll', e)
-      // if (this.previewHeight > 0 && e.position >= this.previewHeight) {
-      //   this.showNameSticky = true
-      // } else {
-      //   this.showNameSticky = false
-      // }
-    },
-    onResize (e) {
-      this.width = e.width
-    }
   },
   mounted () {
     this.$log('mounted')
