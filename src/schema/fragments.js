@@ -153,6 +153,7 @@ const nodeFragment = gql`
   ${videoFragment} ${imageFragment} ${objectFragment} ${compositionFragment}
   fragment nodeFragment on Node {
     ...objectFragment
+    sphereFromName{...objectFragment}
     rate
     rateUser
     viewCnt
