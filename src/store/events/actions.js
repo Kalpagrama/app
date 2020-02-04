@@ -175,7 +175,7 @@ function processEvent (context, event) {
 
 function processEventWs (context, event) {
   let type = event.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
-  let { createdAt, updatedAt, object, spheres, wsVersion } = event.item
+  let { createdAt, updatedAt, object, spheres, wsVersion } = event.object
   let objectType = object.__typename
   let operationName
   switch (type) {

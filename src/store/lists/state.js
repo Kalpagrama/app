@@ -1,4 +1,6 @@
 
 export default {
-  initialized: false
+  initialized: false,
+  wsItems: {}, // {key, value}
+  sphereNodes: []
 }

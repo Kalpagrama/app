@@ -114,6 +114,11 @@ const compositionFragment = gql`
     spheres {...objectShortFragment}
     layers {
       contentOid
+      content{
+        ... on Video{
+          url
+        }
+      }
       figuresAbsolute{...figureFragment}
       speed
       spheres {...objectShortFragment}

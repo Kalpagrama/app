@@ -53,6 +53,39 @@ export const events = async (context, { pagination }) => {
   return { items, count, totalCount, nextPageToken }
 }
 
+// вернет список из кэша, либо null(тогда надо брать из сети)
+function getCachedList (context, { pagination, filter, sortStrategy }) {
+  let key = JSON.stringify(filter) + JSON.stringify(sortStrategy)
+  let { items, count, totalCount, nextPageToken } = context.state.wsItems[key]
+  assert(items.length === count && totalCount >= count)
+  if (items) {
+    assert(Array.isArray(items))
+    let firstIndx = 0
+    if (pagination && pagination.pageToken && pagination.pageToken.lastOid) {
+      assert(pagination.pageToken.direction === 'forward', 'non forward directions not implemented!')
+      firstIndx = Math.max(0, items.findIndex(item => {
+        let oid = item.oid || item.object.oid
+        return oid === pagination.pageToken.lastOid
+      }))
+    }
+    let resultItems = items.slice(firstIndx, pagination.pageSize)
+    if (resultItems.length < pagination.pageSize && totalCount > count){
+      return null // в кэше данных недостаточно. запросить с сервера
+    }
+    let resultNextPageToken = {...nextPageToken}
+    if (resultItems.length) {
+      let lastItem = resultItems[resultItems.length - 1]
+      resultNextPageToken.lastOid = lastItem.oid || lastItem.object.oid
+    }
+    // let nextPageToken = {lastOid: 0, direction: 'forward'}
+    return { items: resultItems, count: resultItems.length, totalCount, nextPageToken: resultNextPageToken }
+  }
+}
+
+function setCachedList (context, { pagination, filter, sortStrategy }) {
+
+}
+
 export const wsItems = async (context, { pagination, filter, sortStrategy }) => {
   logD('wsItems start')
   let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
@@ -76,6 +109,7 @@ export const wsItems = async (context, { pagination, filter, sortStrategy }) => 
     variables: { pagination, filter, sortStrategy }
   })
   logD('wsItems complete')
+
   return { items, count, totalCount, nextPageToken }
 }
 
