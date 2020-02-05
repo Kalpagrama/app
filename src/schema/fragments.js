@@ -114,8 +114,17 @@ const compositionFragment = gql`
     spheres {...objectShortFragment}
     layers {
       contentOid
-      content{
-        ... on Video{
+      content {
+        oid
+        type
+        name
+        ...on Video {
+          url
+          duration
+          frameUrls
+          contentSource
+        }
+        ... on Image {
           url
         }
       }

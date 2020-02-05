@@ -1,78 +1,70 @@
-<style lang="stylus">
-.q-drawer {
-  background: none !important
-}
-.q-footer {
-  background: none !important
-}
-.q-header {
-  background: none !important
-}
-</style>
-
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-grey-3
-  //- actions and dialogs
-  q-dialog(ref="settingsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    div(@click.self="$refs.settingsDialog.hide()").row.fit.justify-center.items-end.content.end
+q-layout(view="hHh lpR fFf")
+  //- TODO: global theme styles: body :style=`{color: 'green !important'}`
+  q-page-container(
+  ).row.full-width.window-height.bg-black
+    ws-items(@page="page = $event" @node="nodeClick" :oid="node ? node.object.oid : false")
+    .col.full-height
+      composition-editor(
+        v-if="page === 'contents' && node && nodeIsContent(node)"
+        :node="node.object" :compositionIndex="0")
+      node-editor(
+        v-if="page === 'nodes'"
+        :value="node ? node : null")
       ws-settings(
-        @close="$refs.settingsDialog.hide()"
-        :style=`{
-          maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
-          borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
-  //- q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-  //-   div(@click.self="$refs.spheresDialog.hide()").row.fit.justify-center.items-end.content-end
-  //-     ws-spheres(
-  //-       @close="$refs.spheresDialog.hide()"
-  //-       :style=`{
-  //-         maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
-  //-         borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
-  //- header
-  q-header.row.full-width.justify-center
-    div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px', color: 'black'}`).row.full-width.items-center.bg-grey-3
-      .col.full-height
-        .row.fit.items-center.q-px-md
-          span.text-bold {{$t('Workspace')}}
-      div(:style=`{height: '60px'}`).row.items-center.justify-center.q-px-sm
-        //- q-btn(round flat icon="style" color="grey-9" @click="$refs.spheresDialog.show()")
-        q-btn(round flat icon="settings" color="grey-9" @click="$refs.settingsDialog.show()")
-  //- body
-  q-page-container.row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      ws-items(@itemClick="itemClick" :height="$q.screen.height-60-60+'px'")
+        v-if="page === 'settings'")
+    //- div(
+    //-   v-if="false"
+    //-   :style=`{maxWidth: '500px', borderLeft: '1px solid #4caf50'}`
+    //-   ).row.fit.items-start.content-start
+    //-   node-editor
   //- footer
-  q-footer.row.full-width.justify-center
-    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
+  q-footer.row.full-width.lt-sm
+    slot(name="menuMobile")
 </template>
 
 <script>
 import wsItems from './ws_items'
-import wsSpheres from './ws_spheres'
+import compositionEditor from 'components/node/composition_editor'
+import nodeEditor from 'components/node/node_editor'
 import wsSettings from './ws_settings'
 
 export default {
-  name: 'workspace',
-  components: {wsItems, wsSpheres, wsSettings},
+  name: 'workspaceIndex',
+  components: {wsItems, compositionEditor, nodeEditor, wsSettings},
   props: [],
   data () {
     return {
+      page: undefined,
+      node: null
     }
   },
   computed: {
   },
+  watch: {
+  },
   methods: {
-    itemClick (val) {
-      this.$log('itemClick', val)
-      this.$store.commit('workspace/stateSet', ['wsItem', val])
-      this.$router.push('/create')
+    async nodeClick (node) {
+      this.$log('nodeClick', node)
+      this.node = null
+      await this.$wait(300)
+      this.node = node
     },
-    itemAdd () {
-      this.$log('itemAdd')
-      // TODO: need to know the kcoll
-    },
-    cancel () {
-      this.$log('cancel')
+    nodeIsContent (node) {
+      let arr = node.object.name.split('-')
+      if (arr[0] === 'CONTENT') {
+        let contentOid = arr[1]
+        return true
+      } else {
+        return false
+      }
     }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

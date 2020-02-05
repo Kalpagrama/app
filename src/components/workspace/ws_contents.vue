@@ -1,72 +1,116 @@
+<style lang="stylus">
+.ws-content {
+  color: white;
+  &:hover {
+    color: #4caf50 !important;
+  }
+}
+</style>
+
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
-  //- div(:style=`{height: '60px'}`).row.full-width
+.column.fit
+  //- add content
+  div(
+    :style=`{height: '90px'}`
+    ).row.full-width.q-pa-md
+    content-finder(
+      :sources="['url', 'device']"
+      @content="contentFound")
+  //- actions, list, gallery, feed, list-expanded
+  div(:style=`{height: '60px'}`).row.full-width
+    .col.full-height
+    div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+      q-btn(round flat color="green" icon="refresh" @click="contentsReload()")
   .col.full-width.scroll
-    .row.full-width.items-start.content-start
+    .row.full-with.items-start.content-start.q-px-md
       div(
-        v-for="(i, ii) in contents" :key="ii"
-        :style=`{position: 'relative', zIndex: 10, borderRadius: '10px', overflow: 'hidden'}`
-        ).col-6.q-pa-sm
-        img(
-          :src="i.item.thumbUrl" draggable="false" @click="contentClick(i, ii)"
-          :style=`{
-            width: '100%', height: '100%', objectFit :'contain',
-            userSelect: 'none',
-            borderRadius: '10px', overflow: 'hidden'}`).cursor-pointer
-        small(
-          :style=`{
-            position: 'absolute', zIndex: 100, top: '16px', left: '16px',
-            borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.8)',
-            maxWidth: '80%'}`
-          ).text-white.q-px-sm.q-py-xs {{ i.item.name | cut(20) }}
+        v-for="(c,ci) in contents" :key="ci" @click="contentClick(c,ci)"
+        :class=`{'bg-grey-10': c.object.oid !== oid, 'bg-white': c.object.oid === oid}`
+        :style=`{minHeight: '50px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.cursor-pointer.q-mb-sm
+        span(
+          :class=`{
+            'text-white': c.object.oid !== oid,
+            'text-green': c.object.oid === oid,
+            'text-bold': c.object.oid === oid}`
+        ).q-ma-sm.cursor-pointer {{ c.object.compositions[0].layers[0].content.name }}
 </template>
 
 <script>
+import contentFinder from 'components/content/finder'
+
 export default {
   name: 'wsContents',
-  props: ['ctx'],
+  components: {contentFinder},
+  props: ['oid'],
   data () {
     return {
-      contentIndex: -1
+      content: null,
+      contents: []
     }
   },
-  computed: {
-    contents () {
-      return this.$store.getters.currentUser.workspace.nodes
-        .reduce((acc, val) => {
-          val.fragments.map(f => {
-            if (!acc[f.content.oid]) {
-              acc[f.content.oid] = {
-                type: 'content',
-                item: f.content,
-                node: val,
-                nodes: 1
-              }
-            } else {
-              acc[f.content.oid].nodes += 1
-            }
-          })
-          return acc
-        }, {})
-    }
+  watch: {
   },
   methods: {
-    async contentUse (i, ii) {
-      this.$log('contentClick', i, ii)
-      this.$store.commit('workspace/stateSet', ['wsItem', {type: 'content', item: JSON.parse(JSON.stringify(i.item))}])
-      await this.$wait(300)
-      this.$router.push('/create')
+    contentClick (c, ci) {
+      this.$log('contentClick', c, ci)
+      this.content = c.object
+      this.$emit('item', c)
     },
-    async contentClick (i, ii) {
-      if (this.ctx === 'inEditor') {
-        this.$emit('item', i)
+    async contentLoad (oid) {
+      this.$log('contentLoad start', oid)
+      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFullFragment', priority: 0 })
+      this.$log('contentLoad done', content)
+      return content
+    },
+    async contentsLoad () {
+      this.$log('contentsLoad start')
+      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^CONTENT-.{11}=$', types: ['NODE']}})
+      this.$log('contentsLoad done', items)
+      return items
+    },
+    async contentsReload () {
+      this.$log('contentsReload')
+      this.contents = await this.contentsLoad()
+    },
+    async contentFound (content) {
+      this.$log('contentFound', content)
+      // try to find item in ws by name CONTENT- + content.oid
+      let {items} = await this.$store.dispatch('lists/wsItems', {
+        pagination: {pageSize: 30, pageToken: null},
+        sortStrategy: 'HOT',
+        filter: {types: ['NODE'], name: 'CONTENT-' + content.oid}
+      })
+      this.$log('nodeFind', items)
+      // if no item create node content container
+      if (items.length === 0) {
+        // create node
+        this.$log('CREATE WS NODE')
+        let node = {
+          name: 'CONTENT-' + content.oid,
+          layout: 'PIP',
+          category: 'FUN',
+          spheres: [],
+          compositions: [
+            {
+              operation: { type: 'CONCAT', items: [], operations: null },
+              layers: [{ content: content, figuresAbsolute: [] }]
+            }
+          ]
+        }
+        let res = await this.$store.dispatch('workspace/wsNodeSave', node)
+        this.$log('res', res)
+        await this.$wait(300)
+        this.contentsReload()
       } else {
-        this.contentUse(i, ii)
+        this.$log('USE WS NODE')
+        // using node...
       }
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    this.contents = await this.contentsLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -2,28 +2,27 @@
 div(
   @mousemove="videoMove"
   :style=`{position: 'relative'}`
-  ).row.fit.items-center.content-center.justify-center.bg-black
-  //- span VIDEO
-  div(:style=`{position: 'absolute', left: '16px', top: '76px', borderRadius: '10px', color: 'white'}`).row.bg-green.q-pa-sm
+  ).column.fit.items-center.content-center.justify-center.bg-black
+  //- video debug
+  div(:style=`{position: 'absolute', left: '16px', top: '76px', width: '100%', maxWidth: 'calc(100% - 32px)', borderRadius: '10px', color: 'white', fontSize: '10px'}`
+    ).row.bg-green.q-pa-sm
     small.full-width now: {{now}}
     small.full-width player: {{player}}
-  //- img(
-  //-   :src="content.thumbUrl"
-  //-   :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
-  video(
-    ref="contentVideo" @click="videoClick" v-viewer="{inline: true}"
-    @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate"
-    :src="content.url" type="video/mp4" autoplay loop
-    :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
+  //- video wrapper
+  .col.full-width
+    video(
+      ref="contentVideo" @click="videoClick"
+      @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate"
+      :src="content.url" type="video/mp4" autoplay loop
+      :style=`{
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain'
+      }`)
   //- nodes
-  //- div(
-  //-   :style=`{
-  //-     position: 'absolute', bottom: '50px', left: 0, zIndex: 1000,
-  //-     height: '40px'}`
-  //-   ).row.full-width.bg-grey-10
-  //-   span nodes graph
-  //- timeline
+  //- timeline 1
   div(
+    v-if="true"
     v-show="player.playing ? player.controls : true"
     :style=`{
       position: 'absolute', bottom: '16px', left: 0, zIndex: 1000,
@@ -49,7 +48,7 @@ div(
             :style=`{position: 'absolute', top: '12px', left: '10px', zIndex: 200, pointerEvents: 'none'}`
             ).text-white {{$time(now)+' / '+$time(player.duration)}}
           //- progress %
-          div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none'}`).row.full-height.bg-green
+          div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
       //- fullscreen
       div(
         :style=`{width: '44px'}`
@@ -57,19 +56,46 @@ div(
         q-btn(
           round flat color="green" @click="$q.fullscreen.toggle()"
           :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
+  //- timeline 2: mini
+  div(
+    v-if="false"
+    v-show="player.playing ? player.controls : true"
+    :style=`{
+      position: 'absolute',
+      bottom: 16+extractorHeight+'px',
+      left: 0, zIndex: 1000,
+      height: '10px'}`
+    ).row.full-width.q-px-md
+    div(
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.bg-grey-10
+      div(
+        @click="progressClick"
+        :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.fit.bg-grey-9.cursor-pointer
+        //- progress %
+        div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none'}`).row.full-height.bg-green
+      //- fullscreen
 </template>
 
 <script>
+import contentVideoExtractor from './content_video_extractor'
+
 export default {
   name: 'contentVideo',
-  components: {},
-  props: ['ctx', 'content'],
+  components: {contentVideoExtractor},
+  props: ['node', 'ctx', 'content'],
   data () {
     return {
       now: 0,
       player: {},
-      moveInterval: null
+      moveInterval: null,
+      extractorOpened: false,
+      extractorHeight: 0,
+      metaOpened: false,
+      metaWidth: 0
     }
+  },
+  watch: {
   },
   methods: {
     progressClick (e) {
@@ -85,7 +111,7 @@ export default {
       if (this.moveInterval) clearInterval(this.moveInterval)
       this.moveInterval = setTimeout(() => {
         this.$set(this.player, 'controls', false)
-      }, 1000)
+      }, 2500)
     },
     videoPlay () {
       this.$log('videoPlay')
@@ -96,7 +122,7 @@ export default {
       this.$set(this.player, 'playing', false)
     },
     videoTimeupdate () {
-      this.$log('videoTimeupdate')
+      // this.$log('videoTimeupdate')
       if (!this.player.started) this.$set(this.player, 'started', true)
       this.$set(this.player, 'duration', this.$refs.contentVideo.duration)
       this.$set(this.player, 'now', this.$refs.contentVideo.currentTime)
@@ -142,6 +168,7 @@ export default {
           }
         })
       }
+      this.$emit('player', this.player)
     }
   },
   mounted () {

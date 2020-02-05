@@ -1,93 +1,64 @@
 <template lang="pug">
-.column.fit
-  //- div(:style=`{height: '60px'}`).row.full-width
-  k-dialog-bottom(ref="nodeActionDialog" :options="nodeDialogOptions" @action="nodeAction")
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
-      div(
-        v-for="(i, ii) in nodes" :key="i.item.oid" @click="nodeClick(i, ii)"
-        :style=`{
-          height: '60px', borderRadius: '10px', overflow: 'hidden',
-          border: ii === nodeIndex ? '3px solid #4caf50' : '3px solid #eee'}`
-        ).row.full-width.items-center.justify-center.bg-white.q-mb-md.cursor-pointer
-        span {{ i.item.name }}
+.row.fit
+  div(:style=`{position: 'relative'}`).column.fit
+    //- actions
+    q-btn(
+      round push size="lg" color="green" icon="add" @click="nodeAdd()"
+      :style=`{position: 'absolute', right: '16px', bottom: '16px'}`)
+    //- header with filters...
+    .row.full-width
+      .col.full-height
+      //- list, gallery, feed
+      div(:style=`{width: '60px', height: '60px'}`
+        ).row.items-center.content-center.justify-center
+        q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
+    //- body
+    .col.full-width.scroll
+      .row.full-width.items-start.content-start.q-px-md
+        div(
+          v-for="(n,ni) in nodesFiltered" :key="ni" @click="nodeClick(n, ni)"
+          :style=`{height: '60px', borderRadius: '10px'}`
+          ).row.full-width.items-center.bg-grey-10.q-px-sm.q-mb-sm
+          span.text-white {{ n.object.name }}
 </template>
 
 <script>
 export default {
   name: 'wsNodes',
+  props: ['oid'],
   data () {
     return {
-      nodeIndex: -1,
-      nodeDialogOptions: {
-        header: false,
-        confirm: true,
-        confirmName: 'Edit',
-        actions: {
-          delete: {name: 'Delete', color: 'red'}
-        }
-      }
+      nodes: []
     }
   },
   computed: {
-    nodes () {
-      return this.$store.getters.currentUser.workspace.nodes
-        .reduce((acc, val) => {
-          if (val.fragments.length === 2) {
-            acc.push({
-              type: 'node',
-              item: val
-            })
-          }
-          return acc
-        }, [])
+    nodesFiltered () {
+      return this.nodes
     }
   },
   methods: {
-    async nodeAction (action) {
-      this.$log('nodeAction', action)
-      this.$refs.nodeActionDialog.hide()
-      await this.$wait(600)
-      switch (action) {
-        case 'confirm': {
-          this.nodeUse(this.nodes[this.nodeIndex], this.nodeIndex)
-          break
-        }
-        case 'delete': {
-          this.nodeDelete(this.nodes[this.nodeIndex])
-          break
-        }
-      }
-      this.nodeIndex = -1
+    nodeAdd () {
+      this.$log('nodeAdd')
     },
-    async nodeDelete (item) {
-      this.$log('nodeDelete', item)
-      let oid = item.item.oid
-      this.$log('nodeDelete OID', oid)
-      let res = await this.$store.dispatch('workspace/wsItemDelete', oid)
-      this.$log('res', res)
+    nodeClick (n, ni) {
+      this.$log('nodeClick', n, ni)
+      this.$emit('item', n)
     },
-    async fragmentDelete (item) {
-      this.$log('fragmentDelete', item)
-      let node = item.node
-      node.fragments[item.fragmentIndex] = null
-      let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
-      this.$log('res', res)
+    async nodesLoad () {
+      this.$log('nodesLoad start')
+      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^(?!^CONTENT-.{11}=$)', types: ['NODE']}})
+      this.$log('nodesLoad done', items)
+      return items
     },
-    async nodeClick (i, ii) {
-      this.$log('nodeClick', i, ii)
-      this.nodeIndex = ii
-      this.$refs.nodeActionDialog.show()
-    },
-    async nodeUse (i, ii) {
-      this.$log('nodeClick', i, ii)
-      this.$store.commit('workspace/stateSet', ['wsItem', {type: 'node', item: JSON.parse(JSON.stringify(i.item))}])
-      await this.$wait(300)
-      this.$router.push('/create')
+    async nodesReload () {
+      this.$log('nodesReload')
+      this.nodes = await this.nodesLoad()
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    // TODO: initial load of items goes to kalpa-loader, and kalpa-loader is watching for updates...
+    this.nodes = await this.nodesLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -1,11 +1,12 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.window-height
+div(:style=`{position: 'relative'}`).row.fit
   //- main
   div(:style=`{position: 'relative'}`).col.full-height
     //- content.name
     div(
+      v-if="content"
       :style=`{
-        position: 'absolute', top: 0, left: '72px', zIndex: 1000,
+        position: 'absolute', top: 0, left: '16px', zIndex: 1000,
         height: '72px'}`
       ).row.items-center.content-center.justify-start
       div(
@@ -13,15 +14,11 @@ div(:style=`{position: 'relative'}`).row.full-width.window-height
         ).row.items-center.content-center.q-px-sm
         span(:style=`{whiteSpace: 'nowrap'}`).text-white.cursor-pointer {{ content.name }}
     .column.fit
-      .col
+      .col.full-width.full-height
+        //- span.text-white node: {{wsNode}}
         //- content
-        content-video(v-if="content.type === 'VIDEO'" :content="content")
-        content-image(v-if="content.type === 'IMAGE'" :content="content")
-      div(
-        v-if="false"
-        :style=`{height: '100px'}`).row.full-width.bg-black
-        span extractor
-  content-relations(:content="content")
+        content-video(v-if="content && content.type === 'VIDEO'" :node="wsNode.object" :content="content")
+        //- content-image(v-if="content.type === 'IMAGE'" :content="content")
 </template>
 
 <script>
@@ -32,9 +29,10 @@ import contentRelations from './relations'
 export default {
   name: 'contentExplorer',
   components: {contentImage, contentVideo, contentRelations},
-  props: ['content'],
+  props: ['wsNode', 'value'],
   data () {
     return {
+      content: null,
       menuDesktopShow: false,
       menuDesktopMaxWidth: 0,
       nodesShow: false,
@@ -42,6 +40,15 @@ export default {
     }
   },
   watch: {
+    wsNode: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('wsNode CHANGED', to)
+        if (to) {
+          this.content = to.object.compositions[0].layers[0].content
+        }
+      }
+    },
     nodesShow: {
       immediate: true,
       handler (to, from) {

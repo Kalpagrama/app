@@ -6,10 +6,12 @@ div(:style=`{position: 'relative'}`).row.full-width
     content-explorer(
       v-if="$route.params.oid && content" :content="content"
       @create="content = null, $router.push('/content')")
-    div(v-if="$route.params.oid && !content").row.fit.items-center.content-center.justify-center
+    div(v-if="$route.params.oid && !content").row.fit.items-center.content-center.justify-center.bg-black
       q-spinner(size="50px" color="green")
     content-finder(
       v-if="!$route.params.oid"
+      @content="contentFound"
+      :sources="['device', 'url', 'ws']"
       :style=`{height: $q.screen.height+'px'}`
       ).bg-black
 </template>
@@ -33,13 +35,22 @@ export default {
       async handler (to, from) {
         if (to && to.params.oid) {
           this.$log('$route CHANGED to.params.oid', to.params.oid)
-          await this.$wait(3000)
+          this.content = null
+          await this.$wait(300)
           this.content = await this.contentLoad(to.params.oid)
         }
       }
     }
   },
   methods: {
+    async contentFound (content) {
+      this.$log('contentFound', content)
+      // add content to ws
+      let res = await this.$store.dispatch('workspace/wsItemAdd', content.oid)
+      this.$log('res', res)
+      // go to content/oid
+      this.$router.push('/content/' + content.oid)
+    },
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
       let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFullFragment', priority: 0 })

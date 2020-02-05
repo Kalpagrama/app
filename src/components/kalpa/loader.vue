@@ -1,6 +1,6 @@
 <template lang="pug">
   .row.full-width
-    slot(name="default" :items="items")
+    slot(name="items" :items="items")
 </template>
 
 <script>

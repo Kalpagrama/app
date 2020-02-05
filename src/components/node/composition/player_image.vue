@@ -1,13 +1,11 @@
-<style lang="stylus">
-</style>
 <template lang="pug">
 .row.full-width
-  span ws_search
+  span player IMAGE
 </template>
 
 <script>
 export default {
-  name: 'wsSearch',
+  name: 'playerImage',
   data () {
     return {
     }

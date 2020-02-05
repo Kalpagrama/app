@@ -1,20 +1,20 @@
 <template lang="pug">
-.row.fit
-  span chainExplorer
+.row.full-width
+  span player book
 </template>
 
 <script>
 export default {
-  name: 'chainExplorer',
+  name: 'playerBook',
   data () {
     return {
     }
   },
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

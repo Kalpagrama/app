@@ -1,13 +1,13 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" :container="true" :style=`{width: $q.screen.width+'px', height: '100vh'}`).bg-grey-3
   //- k-dialog-bottom(ref="accountSettings" mode="actions" :options="accountSettingsOptions" @action="accountSettingsAction")
-  q-header().row.full-width.justify-center.bg-grey-3
-    div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.bg-white
-      div(:style=`{height: '60px', width: '60px'}` @click="mainPage()").row.items-center.justify-center
-        q-btn(round flat color="primary" icon="arrow_back")
-      .col.full-height
-        .row.fit.items-center.q-pb-xs
-          span.text-bold.text-black {{ $t(settings) }}
+  //- q-header().row.full-width.justify-center.bg-grey-3
+  //-   div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.items-center.bg-white
+  //-     div(:style=`{height: '60px', width: '60px'}` @click="mainPage()").row.items-center.justify-center
+  //-       q-btn(round flat color="primary" icon="arrow_back")
+  //-     .col.full-height
+  //-       .row.fit.items-center.q-pb-xs
+  //-         span.text-bold.text-black {{ $t(settings) }}
       //- div(:style=`{height: '60px', width: '60px'}` @click="right = !right").row.items-center.justify-center
         q-btn(round flat color="black" icon="menu")
   //- q-drawer(v-model="right" side="right" :width="200")
@@ -19,31 +19,35 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: $q.screen.width+'p
         :style=`{height: '50px'}`
         ).row.full-width.items-center.cursor-pointer.q-px-md
           span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
-  q-page-container
-    //- q-page
-    k-spinner(:width="200" :height="200" stroke="white" type="spinner")
-    .row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        //- div(:style=`{height: height-60+'px'}`).row
-        //- .col.full-height
-        notifications(v-if="page === 'notifications'")
-        account(v-if="page === 'account'" ref="accountSettings" @cancel="page = 'settings'")
-        security(v-if="page === 'security'")
-        //- payments(v-if="page === 'payments'")
-        privacy(v-if="page === 'privacy'")
-        blacklist(v-if="page === 'blacklist'")
-        information(v-if="page === 'information'")
-        //- div(v-else).row.fit.items-center.justify-center
-          span.text-bold 404
-        div(v-if="page === 'settings'" :style=`{}`).row.full-height.items-start.content-start.bg-grey-1.q-pt-sm
-          div(
-            v-for="(p, pkey) in pages" :key="pkey" @click="pageClick(p, pkey)"
-            :style=`{height: '50px'}`
-            ).row.full-width.items-center.cursor-pointer.q-px-md
-              .row.justify-center.items-center
-                q-icon(size="30px" color="primary" :name="p.icon")
-              .col.q-ml-sm.items-center
-                span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
+  q-page-container.row.full-width
+    div(
+      :style=`{maxWidth: '300px'}`
+      ).row.full-height.bg-black.gt-xs
+      slot(name="menuDesktop")
+    .col
+      //- k-spinner(:width="200" :height="200" stroke="white" type="spinner")
+      .row.full-width.justify-center
+        .row.full-width
+          //- div(:style=`{height: height-60+'px'}`).row
+          //- .col.full-height
+          notifications(v-if="page === 'notifications'")
+          account(v-if="page === 'account'" ref="accountSettings" @cancel="page = 'settings'")
+          security(v-if="page === 'security'")
+          //- payments(v-if="page === 'payments'")
+          privacy(v-if="page === 'privacy'")
+          blacklist(v-if="page === 'blacklist'")
+          information(v-if="page === 'information'")
+          //- div(v-else).row.fit.items-center.justify-center
+            span.text-bold 404
+          div(v-if="page === 'settings'" :style=`{}`).row.full-height.items-start.content-start.bg-grey-1.q-pt-sm
+            div(
+              v-for="(p, pkey) in pages" :key="pkey" @click="pageClick(p, pkey)"
+              :style=`{height: '50px'}`
+              ).row.full-width.items-center.cursor-pointer.q-px-md
+                .row.justify-center.items-center
+                  q-icon(size="30px" color="primary" :name="p.icon")
+                .col.q-ml-sm.items-center
+                  span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
 </template>
 
 <script>

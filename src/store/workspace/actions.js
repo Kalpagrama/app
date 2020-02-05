@@ -84,71 +84,66 @@ export const wsContentCreate = async (context, {type, url, spheres}) => {
   logD('wsContentCreate done', wsContentCreate)
   return wsContentCreate
 }
+
+export const wsCompositionCreate = async (context, input) => {
+  logD('wsCompositionCreate start', input)
+  let { data: {wsCompositionCreate } } = await apollo.clients.api.mutate({
+    mutation: gql`
+      ${fragments.wsItemFragment}
+      mutation sw_network_only_wsCompositionCreate ($composition: CompositionInput!) {
+        wsCompositionCreate(composition: $composition) {
+          ...wsItemFragment
+        }
+      }
+    `
+  })
+  logD('wsCompositionCreate done', wsCompositionCreate)
+  return wsCompositionCreate
+}
+
 export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave start', node)
 
   // checks
   {
-    // assert.ok(node.category)
-    assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10)
-    // assert.ok(node.compositions.length > 0)
+    assert.ok(node.spheres.length >= 0)
+    assert.ok(node.compositions.length >= 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
-    for (let c of node.compositions) {
-      // assert.ok(c.layers.length > 0)
-      assert(c.spheres && c.spheres.length >= 0 && c.spheres.length <= 10)
-      // assert(c.operation)
-      let compositionLen = 0
-      for (let l of c.layers) {
-        assert.ok(l.content && l.content.oid)
-        assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10)
-        assert.ok(l.figuresAbsolute && l.figuresAbsolute.length === 2)
-        let start = l.figuresAbsolute[0].t
-        let end = l.figuresAbsolute[1].t
-        assert.ok(start >= 0 && end > 0)
-        assert.ok(end > start)
-        compositionLen += (end - start)
-      }
-      assert(compositionLen <= 60)
-    }
   }
 
+  logD('wsNodeSave check OK')
   let nodeInput = {}
   nodeInput.layout = node.layout
   nodeInput.name = node.name
-  nodeInput.categories = node.categories
+  nodeInput.category = node.category || 'FUN'
   nodeInput.spheres = node.spheres.map(s => {
-    return { name: s.name }
+    return {name: s.name}
   })
-  nodeInput.compositions = node.compositions.map(c => {
-    return {
-      thumbUrl: c.thumbUrl,
-      spheres: c.spheres.map(s => {
-        return { name: s.name }
-      }),
-      layers: c.layers.map(l => {
-        return {
-          contentOid: l.contentOid,
-          speed: l.speed,
-          figuresAbsolute: l.figuresAbsolute.map(f => {
-            return {
-              t: f.t,
-              points: f.points.map(p => {
-                return { x: p.x, y: p.y }
-              })
-            }
-          }),
-          spheres: l.spheres.map(s => {
-            return { name: s.name }
-          }),
-          color: l.color,
-          thumbUrl: l.thumbUrl
-        }
-      }),
-      operation: {
-        items: c.operation.items,
-        operations: c.operation.operations,
-        type: c.operation.type
-      }
+  nodeInput.compositions = []
+  node.compositions.map(c => {
+    if (c !== null) {
+      nodeInput.compositions.push({
+        spheres: [],
+        operation: c.operation,
+        layers: c.layers.map(l => {
+          return {
+            contentOid: l.content.oid,
+            spheres: [],
+            figuresAbsolute: l.figuresAbsolute.map(f => {
+              return {
+                t: f.t,
+                points: f.points.map(p => {
+                  return {
+                    x: p.x,
+                    y: p.y,
+                    z: p.z
+                  }
+                })
+              }
+            })
+          }
+        })
+      })
     }
   })
 
@@ -157,10 +152,10 @@ export const wsNodeSave = async (context, node) => {
   if (node.oid) {
     let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
       mutation: gql`
-        ${fragments.nodeFragment}
+        ${fragments.wsItemFragment}
         mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
           wsNodeUpdate (oid: $oid, node: $node) {
-            ...nodeFragment
+            ...wsItemFragment
           }
         }
       `,

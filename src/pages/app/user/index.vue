@@ -21,44 +21,37 @@ button:focus {
 </style>
 <template lang="pug">
 q-layout(view="hHh lpR fFf").bg-grey-3
-  k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
-  k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
-  input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  q-header(reveal).row.full-width.justify-center
-    .row.full-width.justify-center.bg-primary
-      div(
-        v-if="user"
-        :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-          q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-        .col
-          .row.full-width.justify-start.items-center.fit.q-px-sm
-            span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
-        .row
-          div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-            q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-            q-btn(v-else round flat @click="save()" color="white" icon="done")
-        .row.full-width.content-end.justify-start.text-white.q-mt-md.q-px-sm.q-mb-sm
-          span(
-            v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
-            :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'primary'}`
-            :class="{'bg-green' : pageId  === p}"
-            ).text-bold.q-pa-sm.q-mr-md.cursor-pointer {{ p }}
+  //- k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
+  //- k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
+  //- input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
+  //- q-header(reveal).row.full-width.justify-center
+  //-   .row.full-width.justify-center.bg-primary
+  //-     div(
+  //-       v-if="user"
+  //-       :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+  //-       div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+  //-         q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+  //-       .col
+  //-         .row.full-width.justify-start.items-center.fit.q-px-sm
+  //-           span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
+  //-       .row
+  //-         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+  //-           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+  //-           q-btn(v-else round flat @click="save()" color="white" icon="done")
+  //-       .row.full-width.content-end.justify-start.text-white.q-mt-md.q-px-sm.q-mb-sm
+  //-         span(
+  //-           v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
+  //-           :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'primary'}`
+  //-           :class="{'bg-green' : pageId  === p}"
+  //-           ).text-bold.q-pa-sm.q-mr-md.cursor-pointer {{ p }}
   q-page-container.row.full-width.justify-center
-    div(v-if="user").row.full-width.items-start.content-start.justify-center.bg-primary
-        //- header
-        //- div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        //-   div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        //-     q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-        //-   .col
-        //-   .row
-        //-     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        //-       q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-        //-       q-btn(v-else round flat @click="save()" color="white" icon="done")
-            //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
-              q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
-        //- body
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm.q-py-lg.bg-primary
+    div(
+      :style=`{maxWidth: '300px'}`
+      ).row.full-height.bg-black.gt-xs
+      slot(name="menuDesktop")
+    .col
+      div(v-if="user").row.full-width.items-start.content-start.justify-center.bg-primary
+        .row.full-width.q-px-sm.q-py-lg.bg-primary
           //- <input type="file" @change="previewFiles" multiple>
           .row.full-width
             img(:src="user.profile.thumbUrl" @click="changePhoto()"
@@ -87,22 +80,22 @@ q-layout(view="hHh lpR fFf").bg-grey-3
             div(v-if="false" @click="showInfo()").row.full-width
               span.text-accent Show detailed information
               //- span {{ user.subscriptions }}
-    .row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-md
-        user-created-nodes(
-          v-if="pageId === 'Created nodes'"
-          :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
-        user-created-nodes(
-          v-if="pageId === 'Voted nodes'"
-          :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
-        user-following(
-          v-if="pageId === 'Following'"
-          :subscriptions="user.subscriptions" :oid="user.oid")
-        user-followers(
-          v-if="pageId === 'Followers'"
-          :subscribers="user.subscribers" :oid="user.oid")
-  q-footer.row.full-width.justify-center
-    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-md
+          user-created-nodes(
+            v-if="pageId === 'Created nodes'"
+            :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
+          user-created-nodes(
+            v-if="pageId === 'Voted nodes'"
+            :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
+          user-following(
+            v-if="pageId === 'Following'"
+            :subscriptions="user.subscriptions" :oid="user.oid")
+          user-followers(
+            v-if="pageId === 'Followers'"
+            :subscribers="user.subscribers" :oid="user.oid")
+  q-footer.row.full-width.justify-center.lt-sm
+    slot(name="menuMobile")
 </template>
 
 <script>
