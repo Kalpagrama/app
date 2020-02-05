@@ -24,8 +24,7 @@ export const init = async (context) => {
             thumbUrl(preferWidth: 600)
           }
         }
-      }`,
-    fetchPolicy: 'cache-first'
+      }`
   })
   context.commit('init', categories)
   logD('node/init done')

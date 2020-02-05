@@ -1,10 +1,10 @@
-// import { ApolloClient } from 'apollo-client'
-// import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
+import { ApolloClient } from 'apollo-client'
+import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
 // import introspectionQueryResultData from '../schema/graphql.schema.json'
-// import { createHttpLink } from 'apollo-link-http'
+import { createHttpLink } from 'apollo-link-http'
 // import VueApollo from 'vue-apollo'
 // import { persistCache } from 'apollo-cache-persist'
-import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
+// import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client'
 import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
@@ -18,37 +18,6 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
 let apollo
 
 export default async ({ Vue, store, app }) => {
-  try {
-
-  } catch (err) {
-    logE(err)
-  }
-
-  // axios.interceptors.request.use((request) => {
-  //   // Do something with response data
-  //   logD('axios request', request)
-  //   let d = localStorage.getItem('kdebug')
-  //   if (d) request.headers['X-Kalpagramma-debug'] = d
-  //   return request
-  // }, (error) => {
-  //   // Do something with response error
-  //   // localStorage.removeItem('kdebug')
-  //   return Promise.reject(error)
-  // })
-  // axios.interceptors.response.use(response => {
-  //   logD('axios response', response)
-  //   if (response.request) {
-  //   } else {
-  //   }
-  //   return response
-  // }, (error) => {
-  //   return Promise.reject(error)
-  // })
-  // Vue.prototype.$axios = axios
-  // let mode =   'offline'
-  // if (mode === 'offline') return
-  // apollo
-
   // Vue.use(VueApollo)
   let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
   // SERVICES_URL = SERVICES_URL || 'https://test.kalpagramma.com/graphql'
@@ -84,6 +53,14 @@ export default async ({ Vue, store, app }) => {
   //   debug: true
   // });
 
+  const defaultOptions = {
+    watchQuery: {
+      fetchPolicy: 'no-cache',
+    },
+    query: {
+      fetchPolicy: 'no-cache',
+    },
+  }
   const servicesApollo = new ApolloClient({
     link: createHttpLink({
       uri: SERVICES_URL,
@@ -93,6 +70,7 @@ export default async ({ Vue, store, app }) => {
         return fetch(uri, options)
       }
     }),
+    defaultOptions,
     cache
   })
 
@@ -118,6 +96,7 @@ export default async ({ Vue, store, app }) => {
       }
       // useGETForQueries: true
     }),
+    defaultOptions,
     cache
   })
   const apiApollo = new ApolloClient({
@@ -132,6 +111,7 @@ export default async ({ Vue, store, app }) => {
       }
       // useGETForQueries: true
     }),
+    defaultOptions,
     cache,
     connectToDevTools: true
   })
@@ -150,6 +130,7 @@ export default async ({ Vue, store, app }) => {
         }
       }
     }),
+    defaultOptions,
     cache
   })
   const uploadApollo = new ApolloClient({
@@ -163,6 +144,7 @@ export default async ({ Vue, store, app }) => {
         return fetch(uri, options)
       }
     }),
+    defaultOptions,
     cache
   })
   // apollo = new VueApollo({

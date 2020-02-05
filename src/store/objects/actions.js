@@ -2,6 +2,7 @@ import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
@@ -10,8 +11,7 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 export const init = async (context) => {
   logD('objects/init')
   if (context.state.initialized) return
-  let currentUser = await context.dispatch('objects/get', { oid: context.rootState.auth.userOid }, { root: true })
-  context.commit('init', currentUser)
+  context.commit('init')
   logD('objects/init done')
 }
 
@@ -120,7 +120,6 @@ export const init = async (context) => {
 //       variables: {
 //         oids: itemsForQuery.map(item => item.oid)
 //       },
-//       fetchPolicy: 'network-only'
 //     })
 //     .then(result => {
 //       let objectList = result.data.objectList
@@ -152,66 +151,6 @@ export const init = async (context) => {
 //
 // const queue = new Queue()
 
-// класс заставляет apollo.cache периодически очищаться
-class CacheControl {
-  constructor () {
-    this.queue = [] // список запрашиваемых сущностей в последнее время. В начале - самые старые
-    this.keys = new Set() // дубль this.queue
-    this.addRefCnt = 0
-    this.querySubscriptions = {}
-    this.noop = () => {
-    }
-  }
-
-  set (context, objectFull, querySubscription) {
-    logD('CacheControl::set start')
-    assert(objectFull && querySubscription && objectFull.oid)
-    context.commit('set', objectFull)
-    this.querySubscriptions[objectFull.oid] = querySubscription
-    return context.state.objects[objectFull.oid]
-  }
-
-  get (context, oid) {
-    logD('CacheControl::get', oid)
-    this.incRef(context, oid)
-    return context.state.objects[oid]
-  }
-
-  incRef (context, oid) {
-    this.addRefCnt++
-    apollo.cache.retain(oid) // apollo.cache.gc() не тронет этот item
-    if (this.keys.has(oid)) {
-      let indx = this.queue.indexOf(oid)
-      assert(indx >= 0)
-      this.queue.splice(indx, 1)
-    }
-    this.keys.add(oid)
-    this.queue.push(oid)
-    // TODO заменить 11 на 1000 после тестирования
-    if (this.addRefCnt % 11 === 0) { // тяжелая операция Вызываем иногда
-      // TODO заменить 12 на 5000 после тестирования
-      while (this.keys.length > 12) {
-        let releasedOid = this.queue.shift()
-        this.keys.delete(releasedOid)
-        // обнуляем счетчик ссылок. apollo.cache.gc() теперь сможет удалить releasedOid
-        while (apollo.cache.release(releasedOid)) this.noop()
-      }
-      let deletedKeys = apollo.cache.gc()
-      logD('try evict cache entries', deletedKeys)
-      for (let oid of deletedKeys) {
-        if (this.querySubscriptions[oid]) {
-          this.querySubscriptions[oid].unsubscribe()
-        }
-        delete context.state.objects[oid]
-        delete this.querySubscriptions[oid]
-      }
-      logD('evict cache entries OK')
-    }
-  }
-}
-
-const cacheControl = new CacheControl()
-
 // // Вернет объект из кэша, либо запросит его. и вернет промис, который возможно когда-то выполнится(когда дойдет очередь);
 // // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
 // // priority 0 - будут выполнены 20 последних запросов.
@@ -234,16 +173,10 @@ const cacheControl = new CacheControl()
 //   return await promise
 // }
 
-// запросит объект из кэша аполло. и сохранит его во вьюикс. (иначе имеем утечку. при каждом обращении создается соллбэк и новый объект(который не удаляется никогда поскольку на него есть ссылка в коллбэке).)
-// реагирует на изменения объекта в кэше apollo и меняет клон из вьюикс (cacheControl.set)
-// todo priority!!! ставить в очередь запрашивать пачкой! (после persist cache save)
-export const get = async (context, { oid, fragmentName, priority }) => {
+export const get = async (context, { oid, fragmentName, priority, }) => {
   logD('objects/get action start', oid)
-  let cacheObject = cacheControl.get(context, oid)
-  if (cacheObject) return cacheObject
-
-  let promise = new Promise((resolve, reject) => {
-    let querySubscription = apollo.clients.api.watchQuery({
+  const fetchItemFunc = async () => {
+    let { data: { objectFull } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectFullFragment}
         query objectFull ($oid: OID!) {
@@ -252,22 +185,15 @@ export const get = async (context, { oid, fragmentName, priority }) => {
           }
         }
       `,
-      variables: { oid },
-      fetchPolicy: 'cache-first'
+      variables: { oid }
     })
-    let subs = querySubscription
-    querySubscription.subscribe({
-      next: ({ data }) => {
-        logD('querySubscription.subscribe::next')
-        assert(data && data.objectFull, data)
-        if (context.state.objects[oid]) logD('object changed in apollo cache. try to change in local cache...', data.objectFull)
-        let cacheObject = cacheControl.set(context, data.objectFull, querySubscription)
-        resolve(cacheObject)
-      },
-      error: reject
-    })
-  })
-  let objectFull = await promise
+    assert(context.rootState.userOid)
+    return {
+      item: objectFull,
+      actualAge: context.rootState.userOid === oid ? 'day' : 'hour'
+    }
+  }
+  let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
   logD('objects/get action complete', oid)
   return objectFull
 }

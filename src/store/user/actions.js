@@ -3,12 +3,15 @@ import assert from 'assert'
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { fragments } from 'src/schema'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
-// todo переместить текущего пользователя в objects
+
 export const init = async (context) => {
   if (context.state.initialized) return
+  // Запрашиваем юзера (после этого он будет в кэше лежать)
+  await context.dispatch('objects/get', { oid: context.rootState.auth.userOid }, { root: true })
   context.commit('init')
   return true
 }
@@ -28,7 +31,6 @@ export const setFavouriteCategories = async (context, categoryTypes) => {
   logD('setFavouriteCategories complete')
   return setFavouriteCategories
 }
-
 // Подписаться на сущность. Мутация будет вызвана по приходу эвента
 export const subscribe = async (context, oid) => {
   logD('subscriptions', 'subscribe', oid)

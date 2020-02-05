@@ -18,7 +18,7 @@ export function addEvent(state, {event, context: { rootState, commit }}) {
   logD('addEvent', event)
   logE('not implemented!')
   // commit('objects/update', {
-  //   oid: rootState.objects.currentUser.oid,
+  //   oid: rootState.auth.userOid,
   //   path: 'events',
   //   setter: (oldValue) => {
   //     let events = oldValue

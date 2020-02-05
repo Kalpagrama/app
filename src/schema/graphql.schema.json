@@ -2655,12 +2655,48 @@
             "defaultValue": null
           },
           {
-            "name": "text",
+            "name": "oids",
+            "description": "фильтр по списку oid",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "OID",
+                  "ofType": null
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "name",
             "description": "фильтр по имени",
             "type": {
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "compositionOids",
+            "description": "актуально для кубика-рубика (ядра с какими композициями мы хотим видеть)",
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "OID",
+                  "ofType": null
+                }
+              }
             },
             "defaultValue": null
           },
@@ -3705,8 +3741,8 @@
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "Boolean",
+                "kind": "OBJECT",
+                "name": "Node",
                 "ofType": null
               }
             },
@@ -4587,15 +4623,19 @@
             "name": "spheres",
             "description": "хэштеги (запоминаются на ядре и в мастерской). учитываются при голосовании зя ядро. ",
             "type": {
-              "kind": "LIST",
+              "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "NON_NULL",
+                "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "INPUT_OBJECT",
-                  "name": "ObjectShortInput",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ObjectShortInput",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -4627,13 +4667,9 @@
             "name": "operation",
             "description": null,
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INPUT_OBJECT",
-                "name": "LayerOperationInput",
-                "ofType": null
-              }
+              "kind": "INPUT_OBJECT",
+              "name": "LayerOperationInput",
+              "ofType": null
             },
             "defaultValue": null
           }
@@ -4903,6 +4939,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "sphereFromName",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "ObjectShort",
                 "ofType": null
               }
             },
@@ -5362,13 +5414,9 @@
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "LayerOperation",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "LayerOperation",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -5547,13 +5595,9 @@
             "description": "скорость проигрывания слоя",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Float",
-                "ofType": null
-              }
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -7313,7 +7357,7 @@
             "deprecationReason": null
           },
           {
-            "name": "item",
+            "name": "object",
             "description": "что сделал (данные)",
             "args": [],
             "type": {
@@ -7599,6 +7643,22 @@
               "ofType": {
                 "kind": "SCALAR",
                 "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "contentSource",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "ContentProviderEnum",
                 "ofType": null
               }
             },

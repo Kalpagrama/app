@@ -2,7 +2,7 @@ import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { router } from 'boot/main'
 import { checkUpdate, clearCache, update } from 'src/system/service_worker'
-import { fragments } from 'src/schema/fragments'
+import assert from 'assert'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
@@ -12,19 +12,24 @@ export const init = async (context) => {
   // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
   logD('auth init')
-  let { data: { userIsAuthorized, userIsConfirmed, user } } = await apollo.clients.auth.query({
-    client: 'apiApollo',
-    query: gql`
-      ${fragments.objectFullFragment}
-      query sw_network_first_userCheck {
-        userIsAuthorized
-        userIsConfirmed
-        user { ...objectFullFragment}
-      }
-    `,
-    fetchPolicy: 'cache-first'
-  })
-  context.commit('init', { userIsAuthorized, userIsConfirmed, user })
+  const fetchItemFunc = async () => {
+    let { data: { userIsAuthorized, userIsConfirmed, user } } = await apollo.clients.auth.query({
+      client: 'apiApollo',
+      query: gql`
+        query sw_network_first_userCheck {
+          userIsAuthorized
+          userIsConfirmed
+          user { oid }
+        }
+      `
+    })
+    return { item: { userIsAuthorized, userIsConfirmed, user }, actualAge: 'zero' }
+  }
+
+  let { userIsAuthorized, userIsConfirmed, user } = await context.dispatch('cache/get', { key: 'userCheck', fetchItemFunc }, { root: true })
+  assert(user.oid)
+  context.commit('init', { userIsAuthorized, userIsConfirmed, userOid: user.oid })
+  logD('auth init done!')
 }
 export const inviteEmail = async (context, email) => {
   logD('@invite start')

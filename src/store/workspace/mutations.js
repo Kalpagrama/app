@@ -19,7 +19,7 @@ export const wsNodeCreate = (state, { object, context: { rootState, commit } }) 
   logD('wsNodeCreate', node)
   assert(node.oid)
   commit('objects/update', {
-    oid: rootState.objects.currentUser.oid,
+    oid: rootState.auth.userOid,
     path: 'workspace.nodes',
     setter: (oldValue) => {
       let nodes = oldValue
@@ -36,7 +36,7 @@ export const wsNodeUpdate = (state, { object, context: { rootState, commit } }) 
   logD('wsNodeUpdate', node)
   assert(node.oid)
   commit('objects/update', {
-    oid: rootState.objects.currentUser.oid,
+    oid: rootState.auth.userOid,
     path: 'workspace.nodes',
     setter: (oldValue) => {
       let nodes = oldValue
@@ -58,7 +58,7 @@ export const wsNodeDelete = (state, { object, context: { rootState, commit } }) 
   logD('wsNodeDelete', node)
   assert(node)
   commit('objects/update', {
-    oid: rootState.objects.currentUser.oid,
+    oid: rootState.auth.userOid,
     path: 'workspace.nodes',
     setter: (oldValue) => {
       let nodes = oldValue
@@ -84,7 +84,7 @@ export const wsSphereCreate = (state, { object, context: { rootState, commit } }
   assert(sphere && sphere.oid)
   logD('wsSphereCreate', sphere)
   commit('objects/update', {
-    oid: rootState.objects.currentUser.oid,
+    oid: rootState.auth.userOid,
     path: 'workspace.spheres',
     setter: (oldValue) => {
       let spheres = oldValue
@@ -101,7 +101,7 @@ export const wsSphereDelete = (state, { object, context: { rootState, commit } }
   assert(oid)
   logD('wsSphereDelete', oid)
   commit('objects/update', {
-    oid: rootState.objects.currentUser.oid,
+    oid: rootState.auth.userOid,
     path: 'workspace.spheres',
     setter: (oldValue) => {
       let spheres = oldValue

@@ -202,7 +202,7 @@ const eventFragment = gql`
       message
     }
     ... on EventWS{
-      item{
+      object{
         wsVersion
         createdAt
         updatedAt

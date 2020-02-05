@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 import workspace from './workspace'
 import core from './core'
+import cache from './cache'
 import node from './node'
 import auth from './auth'
 import ui from './ui'
@@ -23,6 +24,7 @@ Vue.use(Vuex)
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
+      cache,
       workspace,
       core,
       node,
@@ -38,18 +40,20 @@ export default function (/* { ssrContext } */) {
     actions: {
       init: async (context) => {
         logD('vuex init')
+        await context.dispatch('cache/init')
         await context.dispatch('auth/init')
+        await context.dispatch('user/init')
         if (!context.state.auth.userIsConfirmed) return false
         await context.dispatch('events/init')
         await context.dispatch('core/init')
         await context.dispatch('node/init')
         await context.dispatch('objects/init')
-        await context.dispatch('user/init')
         await context.dispatch('workspace/init')
         await context.dispatch('lists/init')
         await context.dispatch('content/init')
-        assert(context.state.objects.currentUser)
-        await i18next.changeLanguage(context.state.objects.currentUser.profile.lang)
+        let user = context.state.cache.cachedItems[context.state.auth.userOid]
+        assert(user)
+        await i18next.changeLanguage(user.profile.lang)
         // let val = 0.001
         // setTimeout(() => {
         //   setInterval(() => {
@@ -62,16 +66,18 @@ export default function (/* { ssrContext } */) {
         //     }, { root: true })
         //   }, 10)
         // }, 2000)
-        let xxx = await context.dispatch('lists/wsItems',
-          { pagination: { pageSize: 30 }, sortStrategy: null, filter: { types: ['NODE', 'COMPOSITION', 'VIDEO'] } })
+        // let xxx = await context.dispatch('lists/wsItems',
+        //   { pagination: { pageSize: 30 }, sortStrategy: null, filter: { types: ['NODE', 'COMPOSITION', 'VIDEO'] } })
         logD('vuex init done!')
         return true
       }
     },
     getters: {
       currentUser: (state, getters, rootState, rootGetters) => {
-        assert(state.objects.currentUser)
-        return state.objects.currentUser
+        assert(state.auth.userOid, 'unknown user oid!')
+        let user = state.cache.cachedItems[state.auth.userOid]
+        assert(user, 'user not in cache!!!!')
+        return user
       }
     }
   })

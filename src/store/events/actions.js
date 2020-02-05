@@ -44,8 +44,7 @@ export const testWebPush = async (context) => {
     query: gql`
       query testWebPush {
         testWebPush
-      }`,
-    fetchPolicy: 'network-only'
+      }`
   })
   logD('testWebPush result = ', testWebPush)
   return testWebPush
@@ -106,7 +105,7 @@ function processEvent (context, event) {
           oid: event.subject.oid,
           path: 'subscriptions',
           setter: (oldValue) => {
-            let subscriptions = oldValue // JSON.parse(JSON.stringify(currentUser.subscriptions))
+            let subscriptions = oldValue
             let index = subscriptions.findIndex(s => s.oid === event.object.oid)
             assert.ok(index === -1)
             subscriptions.push(event.object)
@@ -118,7 +117,7 @@ function processEvent (context, event) {
           oid: event.object.oid,
           path: 'subscribers',
           setter: (oldValue) => {
-            let subscribers = oldValue // JSON.parse(JSON.stringify(currentUser.subscriptions))
+            let subscribers = oldValue
             let index = subscribers.findIndex(s => s.oid === event.subject.oid)
             assert.ok(index === -1)
             subscribers.push(event.subject)
