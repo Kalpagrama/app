@@ -1,20 +1,25 @@
 <template lang="pug">
 .row.fit
-  .column.fit
+  div(:style=`{position: 'relative'}`).column.fit
+    //- actions
+    q-btn(
+      round push size="lg" color="green" icon="add" @click="nodeAdd()"
+      :style=`{position: 'absolute', right: '16px', bottom: '16px'}`)
     //- header with filters...
     .row.full-width
       .col.full-height
+      //- list, gallery, feed
       div(:style=`{width: '60px', height: '60px'}`
         ).row.items-center.content-center.justify-center
         q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
     //- body
     .col.full-width.scroll
-      .row.full-width.items-start.content-start
+      .row.full-width.items-start.content-start.q-px-md
         div(
-          v-for="(n,ni) in nodesFiltered" :key="ni"
-          :style=`{height: '400px'}`
-          ).row.full-width.items-center
-          span node {{ ni }}
+          v-for="(n,ni) in nodesFiltered" :key="ni" @click="nodeClick(n, ni)"
+          :style=`{height: '60px', borderRadius: '10px'}`
+          ).row.full-width.items-center.bg-grey-10.q-px-sm.q-mb-sm
+          span.text-white {{ n.object.name }}
 </template>
 
 <script>
@@ -32,6 +37,13 @@ export default {
     }
   },
   methods: {
+    nodeAdd () {
+      this.$log('nodeAdd')
+    },
+    nodeClick (n, ni) {
+      this.$log('nodeClick', n, ni)
+      this.$emit('item', n)
+    },
     async nodesLoad () {
       this.$log('nodesLoad start')
       let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^(?!^CONTENT-.{11}=$)', types: ['NODE']}})

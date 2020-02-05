@@ -10,6 +10,7 @@ div(:style=`{position: 'relative'}`).row.fit
 </template>
 
 <script>
+import { throttle } from 'quasar'
 import editorVideo from './editor_video/index.vue'
 import editorImage from './editor_image/index.vue'
 
@@ -31,6 +32,8 @@ export default {
   },
   data () {
     return {
+      nodeSaving: false,
+      nodeSavingError: null
     }
   },
   computed: {
@@ -51,14 +54,33 @@ export default {
   },
   watch: {
     node: {
+      deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
-        // TODO: what to do on change? save to ws?
+        if (to) this.nodeSave()
       }
     }
   },
   methods: {
+    async nodeSave (node) {
+      try {
+        this.$log('nodeSave start', this.node)
+        this.nodeSaving = true
+        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
+        this.$log('res', res)
+        this.nodeSaving = false
+        this.nodeSavingError = null
+        // this.node = res
+        this.$log('nodeSave done')
+      } catch (e) {
+        this.$log('nodeSave error', e)
+        this.nodeSaving = false
+        this.nodeSavingError = e
+      }
+    }
+  },
+  created () {
+    this.nodeSave = throttle(this.nodeSave, 500)
   },
   mounted () {
     this.$log('mounted')

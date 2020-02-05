@@ -13,7 +13,7 @@ div(:style=`{position: 'relative', overflow: 'hidden'}`).row.full-width.items-ce
           //- frames images from kalpa
           div(v-if="content.contentSource === 'KALPA'").row.no-wrap
             img(
-              v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
+              v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)" @load="frameLoaded"
               :src="f" draggable="false"
               :style=`{height: '50px', userSelect: 'none'}`)
           //- frames boxes for youtube
@@ -79,7 +79,9 @@ export default {
       width: 0,
       panning: false,
       panningFrames: false,
-      framesWidth: 0
+      framesWidth: 0,
+      framesLoadedCount: 0,
+      framesLoaded: false
     }
   },
   computed: {
@@ -117,13 +119,18 @@ export default {
     }
   },
   watch: {
+    framesLoaded: {
+      handler (to, from) {
+        this.$log('framesLoaded', to)
+        if (to) this.framesWidthUpdate()
+      }
+    },
     layer: {
       immediate: false,
       handler (to, from) {
         this.$log('layer CHANGED', to)
-        // this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
         if (to) {
-          this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
+          this.framesWidthUpdate()
           this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
           this.player.setCurrentTime(to.figuresAbsolute[0].t)
         }
@@ -137,6 +144,17 @@ export default {
       let to = (fi * this.frameDuration) + (this.frameDuration / 2)
       this.player.setCurrentTime(to)
     },
+    frameLoaded () {
+      this.$log('frameLoaded')
+      this.framesLoadedCount += 1
+      if (this.framesLoadedCount === this.framesCount) {
+        this.framesLoaded = true
+      }
+    },
+    framesWidthUpdate () {
+      this.$log('framesWidthUpdate')
+      this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
+    },
     panFrames (e) {
       if (this.panning) return
       if (this.$q.screen.width < 800) return
@@ -149,8 +167,9 @@ export default {
       // this.$log('panStart', e)
       let to = this.layer.figuresAbsolute[0].t + (e.delta.x * this.k)
       if (to >= 0 && to < this.layer.figuresAbsolute[1].t && to <= this.duration) {
-        this.player.currentTime = to
-        this.layer.figuresAbsolute[0].t = to
+        this.player.setCurrentTime(to)
+        // this.layer.figuresAbsolute[0].t = to
+        this.$set(this.layer.figuresAbsolute[0], 't', to)
       }
       if (e.isFirst) this.panning = true
       if (e.isFinal) this.panning = false
@@ -159,18 +178,22 @@ export default {
       // this.$log('panEnd', e)
       let to = this.layer.figuresAbsolute[1].t + (e.delta.x * this.k)
       if (to >= 0 && to > this.layer.figuresAbsolute[0].t && to <= this.duration) {
-        this.player.currentTime = to
-        this.layer.figuresAbsolute[1].t = to
+        this.player.setCurrentTime(to)
+        // this.layer.figuresAbsolute[1].t = to
+        this.$set(this.layer.figuresAbsolute[1], 't', to)
       }
       if (e.isFirst) this.panning = true
-      if (e.isFinal) this.panning = false
+      if (e.isFinal) {
+        this.panning = false
+        this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+      }
     },
   },
   async mounted () {
     this.$log('mounted')
-    this.width = this.$el.clientWidth
-    await this.$wait(1000)
-    this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
+    // this.width = this.$el.clientWidth
+    // await this.$wait(1000)
+    // this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

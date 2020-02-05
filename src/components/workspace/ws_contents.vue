@@ -9,12 +9,18 @@
 
 <template lang="pug">
 .column.fit
+  //- add content
   div(
     :style=`{height: '90px'}`
     ).row.full-width.q-pa-md
     content-finder(
       :sources="['url', 'device']"
       @content="contentFound")
+  //- actions, list, gallery, feed, list-expanded
+  div(:style=`{height: '60px'}`).row.full-width
+    .col.full-height
+    div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+      q-btn(round flat color="green" icon="refresh" @click="contentsReload()")
   .col.full-width.scroll
     .row.full-with.items-start.content-start.q-px-md
       div(

@@ -4,7 +4,7 @@ div(:style=`{position: 'relative'}`).row.full-height
   q-btn(
     round push color="green" @click="opened = !opened"
     :icon="width === 0 ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
-    :style=`{position: 'absolute', zIndex: 1000, right: '-60px', top: '50%'}`)
+    :style=`{position: 'absolute', zIndex: 1000, right: width === 0 ? '-60px' : '-22px', top: '50%'}`)
   //- column
   div(
     :style=`{position: 'relative', width: width+'px', maxWidth: width+'px', borderRight: '1px solid #4caf50', overflow: 'hidden'}`
@@ -38,16 +38,19 @@ div(:style=`{position: 'relative'}`).row.full-height
     div(v-show="width > 300").col.full-width
       ws-contents(v-if="page === 'contents'" @item="itemClick" :oid="oid")
       ws-nodes(v-if="page === 'nodes'" @item="itemClick" :oid="oid")
+      ws-spheres(v-if="page === 'spheres'")
       ws-settings(v-if="page === 'settings'")
 </template>
 
 <script>
 import wsContents from './ws_contents'
 import wsNodes from './ws_nodes'
+import wsSpheres from './ws_spheres'
+import wsSettings from './ws_settings'
 
 export default {
   name: 'wsItems',
-  components: {wsContents, wsNodes},
+  components: {wsContents, wsNodes, wsSpheres, wsSettings},
   props: ['oid'],
   data () {
     return {
@@ -56,7 +59,8 @@ export default {
       page: 'contents',
       pages: [
         {id: 'contents', name: 'Contents'},
-        {id: 'nodes', name: 'Nodes'}
+        {id: 'nodes', name: 'Nodes'},
+        {id: 'spheres', name: 'Spheres'}
       ],
       nodes: []
     }

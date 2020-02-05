@@ -115,7 +115,7 @@ export const wsNodeSave = async (context, node) => {
   let nodeInput = {}
   nodeInput.layout = node.layout
   nodeInput.name = node.name
-  nodeInput.category = node.category
+  nodeInput.category = node.category || 'FUN'
   nodeInput.spheres = node.spheres.map(s => {
     return {name: s.name}
   })
@@ -152,10 +152,10 @@ export const wsNodeSave = async (context, node) => {
   if (node.oid) {
     let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
       mutation: gql`
-        ${fragments.nodeFragment}
+        ${fragments.wsItemFragment}
         mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
           wsNodeUpdate (oid: $oid, node: $node) {
-            ...nodeFragment
+            ...wsItemFragment
           }
         }
       `,

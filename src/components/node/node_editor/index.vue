@@ -27,15 +27,16 @@
     div(
       :style=`{minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
       ).row.full-width.bg-grey-10.q-pa-md
-      composition-editor
+      span.text-red composition-editor
     div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
       input(
-        v-model="name"
+        v-if="node"
+        v-model="node.name"
         placeholder="Whats the essence?").fit.bg-white.kinput
     div(
       :style=`{minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
       ).row.full-width.bg-grey-10.q-pa-md
-      composition-editor
+      span.text-red composition-editor
     .col.full-width
     //- category, spheres
     div(:style=`{minHeight: '60px'}`).row.full-width.items-start
@@ -58,47 +59,73 @@
 </template>
 
 <script>
+import { throttle } from 'quasar'
 import compositionEditor from 'components/node/composition_editor'
 
 export default {
   name: 'nodeEditor',
   components: {compositionEditor},
+  props: ['value'],
   data () {
     return {
       name: '',
       saving: false,
       publishing: false,
-      refreshing: false
+      refreshing: false,
+      node: null,
+      nodeNew: {
+        name: '',
+        layout: 'PIP',
+        category: 'FUN',
+        spheres: [],
+        compositions: [
+          // {
+          //   operation: { type: 'CONCAT', items: [], operations: null },
+          //   layers: [{ content: content, figuresAbsolute: [] }]
+          // }
+        ]
+      }
+    }
+  },
+  watch: {
+    value: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('value CHANGED', to)
+        if (to) {
+          this.node = to.object
+        } else {
+          this.node = this.nodeNew
+        }
+      }
+    },
+    node: {
+      deep: true,
+      handler (to, from) {
+        this.$log('node CHANGED', to)
+        if (to) {
+          this.nodeSave(to)
+        }
+      }
     }
   },
   methods: {
-    // node: {
-    //   compositions: [
-    //     {
-    //       layers: [
-    //         {
-    //           content: {},
-    //           figuresAbsolute: [
-    //             {t: 0, points: []},
-    //             {t: 10}
-    //           ]
-    //         }
-    //       ]
-    //     }
-    //   ]
-    // }
-    async save () {
+    async nodeSave (node) {
       try {
-        this.$log('save start')
-        this.saving = true
-        await this.$wait(2000)
-        this.$log('save done')
-        this.saving = false
+        this.$log('nodeSave start', node || this.node)
+        this.nodeSaving = true
+        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node || this.node)))
+        this.$log('res', res)
+        this.nodeSaving = false
+        this.nodeSavingError = null
+        this.node = res.object
+        this.$log('nodeSave done')
       } catch (e) {
-        this.$log('save error', e)
-        this.saving = false
+        this.$log('nodeSave error', e)
+        this.nodeSaving = false
+        this.nodeSavingError = e
       }
-      this.$log('save')
     },
     async publish () {
       try {
@@ -124,6 +151,9 @@ export default {
         this.refreshing = false
       }
     }
+  },
+  created () {
+    this.nodeSave = throttle(this.nodeSave, 2000)
   },
   mounted () {
     this.$log('mounted')

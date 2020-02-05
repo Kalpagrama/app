@@ -13,7 +13,7 @@ iframe {
     kalpa-menu-desktop(v-if="!loading")
   .col
     router-view(v-if="!loading")
-    div(v-else).row.fit.items-center.content-center.justify-center.bg-black
+    div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
       q-spinner(color="green" size="50px")
 </template>
 

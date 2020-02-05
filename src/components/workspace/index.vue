@@ -9,8 +9,8 @@ q-layout(view="hHh lpR fFf")
         v-if="page === 'contents' && node && nodeIsContent(node)"
         :node="node.object" :compositionIndex="0")
       node-editor(
-        v-if="page === 'nodes' && node"
-        :node="node.object")
+        v-if="page === 'nodes'"
+        :value="node ? node : null")
       ws-settings(
         v-if="page === 'settings'")
     //- div(

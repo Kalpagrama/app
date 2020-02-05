@@ -1,6 +1,6 @@
 <template lang="pug">
-.row.full-width.bg-black
-  div(:style=`{position: 'relative'}`).row.full-width
+.row.fit.bg-black
+  div(:style=`{position: 'relative'}`).row.fit
     video(
       ref="kalpaVideo"
       playsinline autoplay
@@ -27,6 +27,10 @@
               round flat color="green" @click="videoClick"
               :icon="player.playing === true ? 'pause' : 'play_arrow'")
           .col
+            .row.fit.items-center.content-center
+              span(
+                :style=`{pointerEvents: 'none'}`
+                ).text-white {{$time(now)+' / '+$time(player.duration)}}
           //- fullscreen
           div(
             :style=`{width: '44px'}`
@@ -43,10 +47,10 @@
               @click="progressClick"
               :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
               ).row.fit.bg-grey-9.cursor-pointer
-              //- progress time
-              span(
-                :style=`{position: 'absolute', zIndex: 2000, top: '9px', left: '10px', zIndex: 200, pointerEvents: 'none'}`
-                ).text-white {{$time(now)+' / '+$time(player.duration)}}
+              //- //- progress time
+              //- span(
+              //-   :style=`{position: 'absolute', zIndex: 2000, top: '9px', left: '10px', zIndex: 200, pointerEvents: 'none'}`
+              //-   ).text-white {{$time(now)+' / '+$time(player.duration)}}
               //- progress %
               div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
       slot(name="layerEditor" :now="now" :player="player")
