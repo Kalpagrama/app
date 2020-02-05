@@ -9,11 +9,12 @@ iframe {
 .row.full-width.items-start.content-start
   k-action
   //- kalpa-tutorial
-  router-view(v-if="!loading")
-    template(v-slot:menuDesktop)
-      kalpa-menu-desktop
-    template(v-slot:menuMobile)
-      kalpa-menu-mobile
+  .row.window-height.bg-black
+    kalpa-menu-desktop(v-if="!loading")
+  .col
+    router-view(v-if="!loading")
+    div(v-else).row.fit.items-center.content-center.justify-center.bg-black
+      q-spinner(color="green" size="50px")
 </template>
 
 <script>
@@ -59,10 +60,9 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(3000)
   },
   async created () {
-    this.$logD('created')
+    this.$log('created')
     this.loading = true
     // take token from redirect url
     let token = this.$route.query.token
@@ -73,7 +73,7 @@ export default {
       await this.$router.push('/')
     }
     if (!await this.$store.dispatch('init')) {
-      this.$logD('GO LOGIN')
+      this.$log('GO LOGIN')
       await this.$router.push('/login')
       return
     }

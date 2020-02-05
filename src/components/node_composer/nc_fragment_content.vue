@@ -36,12 +36,12 @@ div(
 </template>
 
 <script>
-import wsItems from 'components/workspace/ws_items'
+// import wsItems from 'components/workspace/ws_items'
 import {fragments} from 'schema/fragments'
 
 export default {
   name: 'ncFragmentContent',
-  components: {wsItems},
+  components: {},
   props: ['width'],
   data () {
     return {

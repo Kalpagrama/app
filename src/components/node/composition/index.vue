@@ -1,29 +1,81 @@
 <template lang="pug">
-.row.full-width
-  
-  slot(name="editor" :player="player")
+div(:style=`{position: 'relative'}`).row.fit
+  //- slots
+  div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
+    slot(name="left")
+  div(:style=`{position: 'absolute', zIndex: 1000, right: '16px', top: '50%'}`).row
+    slot(name="right")
+  //- content name & menu & action slots
+  div(
+    :style=`{position: 'absolute', zIndex: 1000, top: 0, height: '60px'}`
+    ).row.full-width.items-center.q-pa-md.cursor-pointer
+    .col.full-height
+      .row.fit.items-center.content-center
+        span(
+          @click="contentClick"
+          :style=`{
+            borderRadius: '10px', overflow: 'hidden',
+            userSelect: 'none', pointerEvents: 'none',
+            background: 'rgba(255,255,255,0.5)'}`
+          ).q-pa-sm {{content.name}}
+  //- players
+  video-player(
+    :url="contentUrl" :source="contentSource"
+    :start="layerStart" :end="layerEnd"
+    @player="$emit('player', $event)" @ended="layerEnded")
+    template(v-slot:layerEditor)
+      slot(name="layerEditor")
 </template>
 
 <script>
+import videoPlayer from './video_player'
+
 export default {
   name: 'compositionEditor',
+  components: {videoPlayer},
+  props: ['ctx', 'composition'],
   data () {
     return {
-      compositionNew: {
-        oid: '',
-        type: '',
-        name: '',
-        thumbUrl: '',
-        layers: [
-          {
-            contentOid: '123',
-            content: {},
-            figures: [{points: [], t: 0}, {points: [], t: 10}],
-            url: ''
-          }
-        ]
-      },
-      player: null
+      layerIndex: 0
+    }
+  },
+  computed: {
+    layer () {
+      return this.layers[this.layerIndex]
+    },
+    layerFiguresRelative () {
+      return this.layer.figuresRelative
+    },
+    layerStart () {
+      if (this.layerFiguresRelative) return this.layerFiguresRelative[0].t
+      else return false
+    },
+    layerEnd () {
+      if (this.layerFiguresRelative) return this.layerFiguresRelative[1].t
+      else return false
+    },
+    layers () {
+      return this.composition.layers
+    },
+    content () {
+      return this.composition.layers[this.layerIndex].content
+    },
+    contentUrl () {
+      return this.content.url
+    },
+    contentSource () {
+      return this.content.contentSource
+    }
+  },
+  methods: {
+    contentClick () {
+      this.$log('contentClick')
+    },
+    layerEnded () {
+      this.$log('layerEnded')
+      // move to the next layer, this composition player
+      if (this.layerIndex === this.layers.length - 1) this.layerIndex = 0
+      else this.layerIndex += 1
     }
   },
   mounted () {

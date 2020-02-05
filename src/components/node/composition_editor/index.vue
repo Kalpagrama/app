@@ -1,71 +1,64 @@
 <template lang="pug">
-.row.full-width
-  span.bg-green composition editor
-  //- get content
-  //- so we got the outputType
-  //- create first layer
+div(:style=`{position: 'relative'}`).row.fit
+  .col.full-height
+    editor-video(
+      v-if="composition && content.type === 'VIDEO'"
+      :composition="composition" :content="content")
+    editor-image(
+      v-if="composition && content.type === 'IMAGE'"
+      :composition="composition" :content="content")
 </template>
 
 <script>
+import editorVideo from './editor_video'
+import editorImage from './editor_image'
+
 export default {
   name: 'compositionEditor',
+  components: {editorVideo, editorImage},
+  props: {
+    node: {
+      type: Object,
+      required: true
+    },
+    compositionIndex: {
+      type: Number,
+      required: true,
+      default () {
+        return 0
+      }
+    }
+  },
   data () {
     return {
-      composition: {},
-      compositionVideo: {
-        layers: [
-          {
-            content: {},
-            figures: [{points: [], t: 0}, {points: [], t: 10}],
-            url: ''
-          },
-          {
-            content: {},
-            figures: [{points: [], t: 0}, {points: [], t: 10}],
-            url: ''
-          }
-        ],
-        outputType: 'VIDEO',
-        operation: {
-          items: [0],
-          operations: null,
-          type: 'CONCAT'
-        }
-      },
-      compositionImage: {
-        layers: [
-          {
-            content: {},
-            figures: []
-          },
-          {
-            content: {},
-            figures: []
-          }
-        ],
-        outputType: 'IMAGE',
-        operation: {
-          items: [0, 1],
-          operations: [],
-          type: 'OVERLAY'
-        }
+    }
+  },
+  computed: {
+    composition () {
+      if (this.node && this.compositionIndex !== undefined) {
+        return this.node.compositions[this.compositionIndex]
+      } else {
+        return null
+      }
+    },
+    content () {
+      if (this.composition) {
+        return this.composition.layers[0].content
+      } else {
+        return null
       }
     }
   },
   watch: {
-    composition: {
+    node: {
+      immediate: true,
       handler (to, from) {
-        this.$log('composition CHANGED', to)
+        this.$log('node CHANGED', to)
+        // TODO: what to do on change? save to ws?
       }
     }
   },
   methods: {
-    layerAdd () {
-      this.$log('layerAdd')
-    },
-    layerDelete () {
-      this.$log('layerDelete')
-    }
   },
   mounted () {
     this.$log('mounted')

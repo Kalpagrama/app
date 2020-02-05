@@ -2,33 +2,27 @@
 div(
   @mousemove="videoMove"
   :style=`{position: 'relative'}`
-  ).row.fit.items-center.content-center.justify-center.bg-black
-  //- span VIDEO
-  div(:style=`{position: 'absolute', left: '16px', top: '76px', borderRadius: '10px', color: 'white'}`).row.bg-green.q-pa-sm
+  ).column.fit.items-center.content-center.justify-center.bg-black
+  //- video debug
+  div(:style=`{position: 'absolute', left: '16px', top: '76px', width: '100%', maxWidth: 'calc(100% - 32px)', borderRadius: '10px', color: 'white', fontSize: '10px'}`
+    ).row.bg-green.q-pa-sm
     small.full-width now: {{now}}
     small.full-width player: {{player}}
-  //- img(
-  //-   :src="content.thumbUrl"
-  //-   :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
-  video(
-    ref="contentVideo" @click="videoClick" v-viewer="{inline: true}"
-    @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate"
-    :src="content.url" type="video/mp4" autoplay loop
-    :style=`{
-      width: '100%',
-      height: 'calc(100% - '+extractorHeight+'px)',
-      objectFit: 'contain'
-    }`)
+  //- video wrapper
+  .col.full-width
+    video(
+      ref="contentVideo" @click="videoClick"
+      @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate"
+      :src="content.url" type="video/mp4" autoplay loop
+      :style=`{
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain'
+      }`)
   //- nodes
-  //- div(
-  //-   :style=`{
-  //-     position: 'absolute', bottom: '50px', left: 0, zIndex: 1000,
-  //-     height: '40px'}`
-  //-   ).row.full-width.bg-grey-10
-  //-   span nodes graph
   //- timeline 1
   div(
-    v-if="false"
+    v-if="true"
     v-show="player.playing ? player.controls : true"
     :style=`{
       position: 'absolute', bottom: '16px', left: 0, zIndex: 1000,
@@ -54,7 +48,7 @@ div(
             :style=`{position: 'absolute', top: '12px', left: '10px', zIndex: 200, pointerEvents: 'none'}`
             ).text-white {{$time(now)+' / '+$time(player.duration)}}
           //- progress %
-          div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none'}`).row.full-height.bg-green
+          div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
       //- fullscreen
       div(
         :style=`{width: '44px'}`
@@ -62,9 +56,9 @@ div(
         q-btn(
           round flat color="green" @click="$q.fullscreen.toggle()"
           :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
-  //- timeline 3
+  //- timeline 2: mini
   div(
-    v-if="true"
+    v-if="false"
     v-show="player.playing ? player.controls : true"
     :style=`{
       position: 'absolute',
@@ -81,20 +75,6 @@ div(
         //- progress %
         div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none'}`).row.full-height.bg-green
       //- fullscreen
-  //- extractor toggle
-  q-btn(
-    round push color="green" @click="extractorOpened = !extractorOpened"
-    :icon="extractorOpened ? 'keyboard_arrow_down' : 'keyboard_arrow_up'"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: 40+extractorHeight+'px', right: '16px'}`)
-  //- div(
-  //-   :style=`{width: '44px'}`
-  //-   ).row.full-height.items-center.content-center.justify-center
-  //-   q-btn(
-  //-     round flat color="green" @click="$q.fullscreen.toggle()"
-  //-     :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
-  content-video-extractor(
-    :content="content" :player="player"
-    :style=`{height: extractorHeight+'px'}`)
 </template>
 
 <script>
@@ -103,23 +83,19 @@ import contentVideoExtractor from './content_video_extractor'
 export default {
   name: 'contentVideo',
   components: {contentVideoExtractor},
-  props: ['ctx', 'content'],
+  props: ['node', 'ctx', 'content'],
   data () {
     return {
       now: 0,
       player: {},
       moveInterval: null,
       extractorOpened: false,
-      extractorHeight: 0
+      extractorHeight: 0,
+      metaOpened: false,
+      metaWidth: 0
     }
   },
   watch: {
-    extractorOpened: {
-      handler (to, from) {
-        this.$log('extractorOpened CHANGED', to)
-        this.$tween.to(this, 0.5, {extractorHeight: to ? 200 : 0})
-      }
-    }
   },
   methods: {
     progressClick (e) {
@@ -192,6 +168,7 @@ export default {
           }
         })
       }
+      this.$emit('player', this.player)
     }
   },
   mounted () {

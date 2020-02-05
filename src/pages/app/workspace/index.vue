@@ -3,6 +3,7 @@ workspace
 </template>
 
 <script>
+// TODO: code splitting in vue.js app
 import workspace from 'components/workspace'
 
 export default {
@@ -19,11 +20,11 @@ export default {
   watch: {
   },
   async mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
     // upload workspace?
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

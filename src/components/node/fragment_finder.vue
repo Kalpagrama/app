@@ -45,11 +45,11 @@ div(:style=`{position: 'relative', minHeight: '74px'}`).row.full-width.items-cen
 
 <script>
 import { fragments } from 'src/schema/fragments'
-import wsItems from 'components/workspace/ws_items'
+// import wsItems from 'components/workspace/ws_items'
 
 export default {
   name: 'fragmentFinder',
-  components: {wsItems},
+  components: {},
   data () {
     return {
       url: '',

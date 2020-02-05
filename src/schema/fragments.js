@@ -70,6 +70,20 @@ const compositionFragment = gql`
     spheres {...objectShortFragment}
     layers {
       contentOid
+      content {
+        oid
+        type
+        name
+        ...on Video {
+          url
+          duration
+          frameUrls
+          contentSource
+        }
+        ... on Image {
+          url
+        }
+      }
       figuresAbsolute{...figureFragment}
       speed
       spheres {...objectShortFragment}
@@ -150,7 +164,7 @@ const eventFragment = gql`
       message
     }
     ... on EventWS{
-      item{
+      object {
         wsVersion
         createdAt
         updatedAt
