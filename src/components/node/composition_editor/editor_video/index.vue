@@ -1,30 +1,40 @@
 <template lang="pug">
 .row.fit
-  .col.full-height
+  div(:style=`{position: 'relative'}`).col.full-height
     composition(v-if="composition" :composition="composition" @player="player = $event")
       template(v-slot:right)
         q-btn(
-          round dense push color="green" @click="layersShow = !layersShow"
-          :icon="layersShow ? 'keyboard_arrow_right' : 'keyboard_arrow_left'").q-ml-sm
+          round push color="green" @click="layersShow = !layersShow"
+          :icon="layersShow ? 'keyboard_arrow_right' : 'layers'").q-ml-sm
       //- layer editor
-      template(v-slot:layerEditor)
-        div(:style=`{position: 'absolute', zIndex: 1000, top: '0px', height: '50px', opacity: 0.5}`).row.full-width.bg-red
-          span hello
-        div(:style=`{height: editorHeight+'px', overflow: 'hidden'}`).row.full-width.items-center.content-center
-          //- frames
-          div(
-            :style=`{position: 'relative', height: '70px'}`
-            ).row.full-width.items-center.content-center.br
-            q-btn(
-              round push color="green" icon="add" @click="layerAdd()"
-              :style=`{position: 'absolute', zIndex: 1000, right: '0px', top: '14px'}`)
+      template(v-slot:layerEditor=`{player, now}`)
+        //- layer add
+        q-btn(
+          round push size="lg" color="green" icon="add" @click="layerAdd()"
+          :style=`{position: 'absolute', right: '40px', top: '-80px'}`)
+        //- layers on progress bar
+        div(:style=`{position: 'absolute', zIndex: 200, top: '44px', height: '40px', pointerEvents: 'none'}`).row.full-width.q-px-md
+          div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.q-px-sm
+            div(
+              v-for="(l, li) in layers" :key="li"
+              v-if="l.figuresAbsolute && l.figuresAbsolute.length > 0"
+              :style=`{
+                position: 'absolute', zIndex: 200, opacity: li === layerIndex ? 0.9 : 0.5,
+                left: (l.figuresAbsolute[0].t/player.duration)*100+'%',
+                width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
+                background: $randomColor(li)}`
+              ).row.full-height
+        //- layer editor minWidth: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
+        layer-editor(v-if="layer" :player="player" :now="now" :layers="layers" :layer="layer" :layerIndex="layerIndex" :style=`{height: editorHeight+'px'}`)
   //- layers
   div(:style=`{width: layersWidth+'px', overflow: 'hidden', borderLeft: '1px solid #4caf50'}`).row.full-height
     .column.fit
       div(:style=`{height: '60px'}`
         ).row.full-width
+        div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+          q-btn(round flat color="green" icon="layers")
         .col.full-height
-          .row.fit.items-center.content-center.q-px-md
+          .row.fit.items-center.content-center
             span.text-bold.text-green Layers
       div(:style=`{position: 'relative'}`).col.full-width.scroll
         .row.full-width.items-start.content-start.q-pa-md
@@ -40,18 +50,19 @@
 
 <script>
 import composition from 'components/node/composition'
+import layerEditor from './layer_editor'
 
 export default {
   name: 'compositionEditorVideo',
-  components: {composition},
+  components: {composition, layerEditor},
   props: ['composition', 'content'],
   data () {
     return {
       editorHeight: 0,
-      player: null,
+      // player: null,
       layerIndex: -1,
-      layersShow: false,
-      layersWidth: 0
+      layersShow: true,
+      layersWidth: 400
     }
   },
   computed: {
@@ -97,7 +108,8 @@ export default {
       this.$log('layerAdd', start, end)
       // TODO: check layers and find one last, or one first one
       let from = start || this.player.now
-      let to = end || from + 10 < this.player.duration ? from + 10 : this.player.duration
+      let to = end || from + 30 < this.player.duration ? from + 30 : this.player.duration
+      // let to = this.player.duration
       // update first layer without figures, or create a new layer...
       if (this.layers.length === 1 && this.layers[0].figuresAbsolute.length === 0) {
         this.$set(this.composition.layers[0], 'figuresAbsolute', [

@@ -14,41 +14,47 @@
       v-show="true"
       :style=`{
         position: 'absolute', bottom: '16px', left: 0, zIndex: 1000}`
-      ).row.full-width.q-px-md
-      div(
-        :style=`{height: '44px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
-        //- play/pause
-        div(
-          :style=`{width: '44px'}`
-          ).row.full-height.items-center.content-center.justify-center
-          q-btn(
-            round flat color="green" @click="videoClick"
-            :icon="player.playing === true ? 'pause' : 'play_arrow'")
-        //- progress
-        .col.full-height
+      ).row.full-width.items-start.content-start
+      //- pregress wrapper
+      .row.full-width.items-start.content-start.q-px-md
+        //- progress actions
+        div(:style=`{height: '44px'}`).row.full-width
+          //- play/pause
           div(
-            @click="progressClick"
-            :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.fit.bg-grey-9.cursor-pointer
-            //- progress time
-            span(
-              :style=`{position: 'absolute', top: '12px', left: '10px', zIndex: 200, pointerEvents: 'none'}`
-              ).text-white {{$time(now)+' / '+$time(player.duration)}}
-            //- progress %
-            div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
-        //- fullscreen
+            :style=`{width: '44px'}`
+            ).row.full-height.items-center.content-center.justify-center
+            q-btn(
+              round flat color="green" @click="videoClick"
+              :icon="player.playing === true ? 'pause' : 'play_arrow'")
+          .col
+          //- fullscreen
+          div(
+            :style=`{width: '44px'}`
+            ).row.full-height.items-center.content-center.justify-center
+            q-btn(
+              round flat color="green" @click="$q.fullscreen.toggle()"
+              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
+        //- progress bar & time
         div(
-          :style=`{width: '44px'}`
-          ).row.full-height.items-center.content-center.justify-center
-          q-btn(
-            round flat color="green" @click="$q.fullscreen.toggle()"
-            :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
-      slot(name="layerEditor")
+          :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
+          //- progress
+          .col.full-height
+            div(
+              @click="progressClick"
+              :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
+              ).row.fit.bg-grey-9.cursor-pointer
+              //- progress time
+              span(
+                :style=`{position: 'absolute', zIndex: 2000, top: '9px', left: '10px', zIndex: 200, pointerEvents: 'none'}`
+                ).text-white {{$time(now)+' / '+$time(player.duration)}}
+              //- progress %
+              div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
+      slot(name="layerEditor" :now="now" :player="player")
 </template>
 
 <script>
 export default {
-  name: 'videoPlayer',
+  name: 'playerVideo',
   props: ['url', 'source', 'start', 'end'],
   data () {
     return {

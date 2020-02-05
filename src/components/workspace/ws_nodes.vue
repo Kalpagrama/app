@@ -20,6 +20,7 @@
 <script>
 export default {
   name: 'wsNodes',
+  props: ['oid'],
   data () {
     return {
       nodes: []
@@ -33,7 +34,7 @@ export default {
   methods: {
     async nodesLoad () {
       this.$log('nodesLoad start')
-      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {types: ['NODE']}})
+      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^(?!^CONTENT-.{11}=$)', types: ['NODE']}})
       this.$log('nodesLoad done', items)
       return items
     },

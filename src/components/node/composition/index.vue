@@ -19,20 +19,22 @@ div(:style=`{position: 'relative'}`).row.fit
             background: 'rgba(255,255,255,0.5)'}`
           ).q-pa-sm {{content.name}}
   //- players
-  video-player(
+  //- TODO: content.type => player...
+  player-video(
     :url="contentUrl" :source="contentSource"
     :start="layerStart" :end="layerEnd"
     @player="$emit('player', $event)" @ended="layerEnded")
-    template(v-slot:layerEditor)
-      slot(name="layerEditor")
+    template(v-slot:layerEditor=`{player, now}`)
+      slot(name="layerEditor" :player="player" :now="now")
 </template>
 
 <script>
-import videoPlayer from './video_player'
+import playerVideo from './player_video'
+import playerImage from './player_image'
 
 export default {
   name: 'compositionEditor',
-  components: {videoPlayer},
+  components: {playerVideo, playerImage},
   props: ['ctx', 'composition'],
   data () {
     return {

@@ -19,9 +19,15 @@
     .row.full-with.items-start.content-start.q-px-md
       div(
         v-for="(c,ci) in contents" :key="ci" @click="contentClick(c,ci)"
+        :class=`{'bg-grey-10': c.object.oid !== oid, 'bg-white': c.object.oid === oid}`
         :style=`{minHeight: '50px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.bg-grey-10.q-mb-sm
-        span.text-white.q-ma-sm {{ c.object.compositions[0].layers[0].content.name }}
+        ).row.full-width.items-center.cursor-pointer.q-mb-sm
+        span(
+          :class=`{
+            'text-white': c.object.oid !== oid,
+            'text-green': c.object.oid === oid,
+            'text-bold': c.object.oid === oid}`
+        ).q-ma-sm.cursor-pointer {{ c.object.compositions[0].layers[0].content.name }}
 </template>
 
 <script>
@@ -30,7 +36,7 @@ import contentFinder from 'components/content/finder'
 export default {
   name: 'wsContents',
   components: {contentFinder},
-  props: ['ctx'],
+  props: ['oid'],
   data () {
     return {
       content: null,
@@ -53,7 +59,7 @@ export default {
     },
     async contentsLoad () {
       this.$log('contentsLoad start')
-      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: 'CONTENT-...........=', types: ['NODE']}})
+      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^CONTENT-.{11}=$', types: ['NODE']}})
       this.$log('contentsLoad done', items)
       return items
     },
@@ -88,6 +94,7 @@ export default {
         }
         let res = await this.$store.dispatch('workspace/wsNodeSave', node)
         this.$log('res', res)
+        await this.$wait(300)
         this.contentsReload()
       } else {
         this.$log('USE WS NODE')

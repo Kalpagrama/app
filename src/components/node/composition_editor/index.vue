@@ -10,8 +10,8 @@ div(:style=`{position: 'relative'}`).row.fit
 </template>
 
 <script>
-import editorVideo from './editor_video'
-import editorImage from './editor_image'
+import editorVideo from './editor_video/index.vue'
+import editorImage from './editor_image/index.vue'
 
 export default {
   name: 'compositionEditor',

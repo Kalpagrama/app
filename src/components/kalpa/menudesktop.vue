@@ -95,7 +95,7 @@ div(
 
 <script>
 import { checkUpdate, update } from 'src/system/service_worker'
-
+// img:statics/icons/anvil.svg
 export default {
   name: 'kalpaMenuDesktop',
   props: [],
@@ -105,7 +105,7 @@ export default {
       width: 60,
       pages: [
         { id: 'trends', name: 'Trends', icon: 'whatshot' },
-        { id: 'workspace', name: 'Workspace', icon: 'img:statics/icons/anvil.svg' },
+        { id: 'workspace', name: 'Workspace', icon: 'school' },
         { id: 'settings', name: 'Settings', icon: 'settings' }
       ],
       userAvatarErrored: false

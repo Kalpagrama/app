@@ -3,16 +3,21 @@ q-layout(view="hHh lpR fFf")
   //- TODO: global theme styles: body :style=`{color: 'green !important'}`
   q-page-container(
   ).row.full-width.window-height.bg-black
-    ws-items(@node="nodeClick")
+    ws-items(@page="page = $event" @node="nodeClick" :oid="node ? node.object.oid : false")
     .col.full-height
       composition-editor(
-        v-if="node && nodeIsContent(node)"
+        v-if="page === 'contents' && node && nodeIsContent(node)"
         :node="node.object" :compositionIndex="0")
-    div(
-      v-if="false"
-      :style=`{maxWidth: '500px', borderLeft: '1px solid #4caf50'}`
-      ).row.fit.items-start.content-start
-      node-editor
+      node-editor(
+        v-if="page === 'nodes' && node"
+        :node="node.object")
+      ws-settings(
+        v-if="page === 'settings'")
+    //- div(
+    //-   v-if="false"
+    //-   :style=`{maxWidth: '500px', borderLeft: '1px solid #4caf50'}`
+    //-   ).row.fit.items-start.content-start
+    //-   node-editor
   //- footer
   q-footer.row.full-width.lt-sm
     slot(name="menuMobile")
@@ -22,27 +27,21 @@ q-layout(view="hHh lpR fFf")
 import wsItems from './ws_items'
 import compositionEditor from 'components/node/composition_editor'
 import nodeEditor from 'components/node/node_editor'
+import wsSettings from './ws_settings'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, compositionEditor, nodeEditor},
+  components: {wsItems, compositionEditor, nodeEditor, wsSettings},
   props: [],
   data () {
     return {
-      node: null,
-      wsItemsShow: true,
-      wsItemsWidth: 400
+      page: undefined,
+      node: null
     }
   },
   computed: {
   },
   watch: {
-    wsItemsShow: {
-      handler (to, from) {
-        this.$log('wsItemsShow CHANGED', to)
-        this.$tween.to(this, 0.5, {wsItemsWidth: to ? 400 : 0})
-      }
-    }
   },
   methods: {
     async nodeClick (node) {

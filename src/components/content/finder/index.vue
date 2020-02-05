@@ -10,7 +10,7 @@
     //- input url
     div(
       v-if="sources.includes('url')"
-      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-3
       div(
         v-if="progress"
         :style=`{position: 'absolute', zIndex: 100, left: 0, width: progress.progress+'%'}`
@@ -80,6 +80,7 @@ export default {
       let content = await this.contentGetByUrl(url)
       this.$emit('content', content)
       this.urlInputLoading = false
+      this.url = ''
     },
     async fileChanged (e) {
       this.$log('fileChanged', e)
@@ -90,6 +91,8 @@ export default {
       // this.videoShow = true
       let content = await this.contentGetByFile(file)
       this.$emit('content', content)
+      this.urlInputLoading = false
+      this.url = ''
     },
     async contentPreview () {
       this.$log('contentPreview')
