@@ -2,14 +2,16 @@
 .column.fit
   //- header optional
   div(
-    v-if="header"
-    :style=`{height: '60px'}`
+    v-if="true"
+    :style=`{height: '60px', order: 1000}`
     ).row.full-width
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
       q-btn(round flat color="green" icon="layers")
     .col.full-height
       .row.fit.items-center.content-center
         span.text-bold.text-green Layers
+    div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+      q-btn(round flat color="green" icon="keyboard_arrow_right")
   //- body
   div(:style=`{position: 'relative'}`).col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-md
@@ -36,13 +38,15 @@
           :style=`{height: height+'px'}`
           ).row.full-width.items-end.content-end.justify-end.q-pa-sm
           //- span EXPORT, delete, use, fuck me
-          q-btn(push dense no-caps color="green" @click="layerExport(l, li)") Export me
+          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.justify-end
+            q-btn(round flat color="red" icon="delete" @click="layerDelete(li)").q-mr-sm
+            q-btn(push dense no-caps color="green" @click="layerExport(l, li)") Export me
 </template>
 
 <script>
 export default {
   name: 'editorVideoLayers',
-  props: ['header', 'layerIndex', 'layer', 'layers', 'layerClick', 'layerExport'],
+  props: ['header', 'layerIndex', 'layer', 'layers', 'layerClick', 'layerDelete', 'layerExport'],
   data () {
     return {
       height: 0

@@ -122,6 +122,8 @@ export default {
     framesLoaded: {
       handler (to, from) {
         this.$log('framesLoaded', to)
+        // TODO: show loading until all the frames are loaded...
+        // moving strange(
         if (to) this.framesWidthUpdate()
       }
     },
@@ -131,6 +133,7 @@ export default {
         this.$log('layer CHANGED', to)
         if (to) {
           this.framesWidthUpdate()
+          // TODO: wrong tween px...
           this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
           this.player.setCurrentTime(to.figuresAbsolute[0].t)
         }

@@ -16,7 +16,7 @@
               round push size="lg" color="green" icon="add" @click="layerAdd()"
               :style=`{position: 'absolute', right: '40px', top: '-80px'}`)
             //- layers on progress bar
-            div(:style=`{position: 'absolute', zIndex: 200, top: progressHeight+'44px', height: progressHeight+'px', pointerEvents: 'none'}`).row.full-width.q-px-md
+            div(:style=`{position: 'absolute', zIndex: 200, top: '60px', height: progressHeight+'px', pointerEvents: 'none'}`).row.full-width.q-px-md
               div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.q-px-sm
                 div(
                   v-for="(l, li) in layers" :key="li"
@@ -27,21 +27,21 @@
                     width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
                     background: $randomColor(li)}`
                   ).row.full-height
-            //- layer editor minWidth: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
+            //- layer editor
             layer-editor(v-if="layer" :player="player" :now="now" :layers="layers" :layer="layer" :layerIndex="layerIndex" :style=`{height: editorHeight+'px'}`)
-      //- $q.screen.height/2+'px'
+      //- layers RIGHT
       layers(
         v-if="true"
         :style=`{maxHeight: '50%'}`
         :header="false"
-        :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport")
-  //- layers,  borderLeft: '1px solid #4caf50'
+        :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport" :layerDelete="layerDelete")
+  //- layers BOTTOM
   div(
     v-if="false"
     :style=`{width: layersWidth+'px', overflow: 'hidden'}`).row.full-height.bg-grey-10
     layers(
       :header="true"
-      :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport")
+      :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport" :layerDelete="layerDelete")
 </template>
 
 <script>

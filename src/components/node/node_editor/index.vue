@@ -24,48 +24,54 @@
     //- composition finder
     q-dialog(v-model="compositionFinderOpened").bg-black
       composition-finder(@layer="layerFound").bg-black
+    //- header
+    div(
+      :style=`{height: '60px'}`
+      ).row.full-width.items-center.content-center
+      .col.full-height
+        .row.fit.items-center.content-center.q-px-md
+          span.text-bold.text-green Node editor
+      div(
+        :style=`{height: '60px', width: '60px'}`
+        ).row.items-center.content-center.justify-center
+        q-btn(round flat icon="refresh" color="green" :loading="refreshing" @click="nodeRefresh()")
     .col.full-width.scroll
-      //- header
+      //- composition one
       div(
-        :style=`{height: '60px'}`
-        ).row.full-width.items-center.content-center
-        .col.full-height
-          .row.fit.items-center.content-center.q-px-md
-            span.text-bold.text-green Node editor
-        div(
-          :style=`{height: '60px', width: '60px'}`
-          ).row.items-center.content-center.justify-center
-          q-btn(round flat icon="refresh" color="green" :loading="refreshing" @click="nodeRefresh()")
-      //- center body
-      //- .col.full-width
-      //- composition bar... reuse
-      div(:style=`{height: '50px'}`).row.full-width.items-center.content.content-center.justify-end
-        q-btn(v-if="!node.compositions[0]" round flat color="green" icon="add" @click="compositionFind(0)").q-mr-sm
-        q-btn(v-if="node.compositions[0]" round flat color="green" icon="edit" @click="compositionEdit(0)").q-mr-sm
-        q-btn(v-if="node.compositions[0]" round flat color="red" icon='delete' @click="compositionDelete(0)")
-      //- composition
-      div(
-        :style=`{minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+        :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.bg-grey-9
-        composition(:composition="node.compositions[0]")
+        composition(v-if="node.compositions[0]" :composition="node.compositions[0]")
+        //- composition actions
+        div(
+          v-if="!node.compositions[0]"
+          :style=`{position: 'absolute', zIndex: 3000}`
+          ).row.fit.items-center.content-center.justify-center
+          q-btn(v-if="!node.compositions[0]" round flat color="green" icon="add" size="lg" @click="compositionFind(0)")
+        q-btn(v-if="node.compositions[0]" round flat color="white" icon="edit" @click="compositionEdit(0)"
+            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
+        q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
+            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
       //- essence editor
       div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
         input(
           v-if="node"
           v-model="node.name"
           placeholder="Whats the essence?").fit.bg-white.kinput
-      //- composition
+      //- composition two
       div(
-        :style=`{minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+        :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.bg-grey-9
-        composition(:composition="node.compositions[1]")
-      //- composition bar... reuse
-      div(:style=`{height: '50px'}`).row.full-width.items-center.content.content-center.justify-end
-        q-btn(v-if="!node.compositions[1]" round flat color="green" icon="add" @click="compositionFind(1)").q-mr-sm
-        q-btn(v-if="node.compositions[1]" round flat color="green" icon="edit" @click="compositionEdit(1)").q-mr-sm
-        q-btn(v-if="node.compositions[1]" round flat color="red" icon='delete' @click="compositionDelete(1)")
-      //- center body
-      //- .col.full-width
+        composition(v-if="node.compositions[1]" :composition="node.compositions[1]")
+        //- composition actions
+        div(
+          v-if="!node.compositions[1]"
+          :style=`{position: 'absolute', zIndex: 3000}`
+          ).row.fit.items-center.content-center.justify-center
+          q-btn(v-if="!node.compositions[1]" round flat color="green" icon="add" size="lg" @click="compositionFind(1)")
+        q-btn(v-if="node.compositions[1]" round flat color="white" icon="edit" @click="compositionEdit(1)"
+            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
+        q-btn(v-if="node.compositions[1]" round flat color="red" icon='clear' @click="compositionDelete(1)"
+            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
       //- category, spheres
       div(:style=`{minHeight: '60px'}`).row.full-width.items-start
         div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm

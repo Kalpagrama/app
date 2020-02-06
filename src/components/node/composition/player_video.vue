@@ -18,26 +18,28 @@
       //- pregress wrapper
       .row.full-width.items-start.content-start.q-px-md
         //- progress actions
-        div(:style=`{height: '44px'}`).row.full-width
+        div(:style=`{height: '60px'}`).row.full-width.items-center
           //- play/pause
           div(
             :style=`{width: '44px'}`
             ).row.full-height.items-center.content-center.justify-center
             q-btn(
               round flat color="green" @click="videoClick"
-              :icon="player.playing === true ? 'pause' : 'play_arrow'")
+              :icon="player.playing === true ? 'pause' : 'play_arrow'"
+              :style=`{background: 'rgba(0,0,0,0.3)'}`)
           .col
             .row.fit.items-center.content-center
               span(
-                :style=`{pointerEvents: 'none'}`
-                ).text-white {{$time(now)+' / '+$time(player.duration)}}
+                :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
+                ).text-white.q-pa-sm.q-ml-sm {{$time(now)+' / '+$time(player.duration)}}
           //- fullscreen
           div(
             :style=`{width: '44px'}`
             ).row.full-height.items-center.content-center.justify-center
             q-btn(
               round flat color="green" @click="$q.fullscreen.toggle()"
-              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
+              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
+              :style=`{background: 'rgba(0,0,0,0.3)'}`)
         //- progress bar & time
         div(
           :style=`{height: progressHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
@@ -47,10 +49,6 @@
               @click="progressClick"
               :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
               ).row.fit.bg-grey-9.cursor-pointer
-              //- //- progress time
-              //- span(
-              //-   :style=`{position: 'absolute', zIndex: 2000, top: '9px', left: '10px', zIndex: 200, pointerEvents: 'none'}`
-              //-   ).text-white {{$time(now)+' / '+$time(player.duration)}}
               //- progress %
               div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
       slot(name="layerEditor" :now="now" :player="player" :progressHeight="progressHeight")

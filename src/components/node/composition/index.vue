@@ -16,16 +16,17 @@ div(:style=`{position: 'relative'}`).row.fit
           :style=`{
             borderRadius: '10px', overflow: 'hidden',
             userSelect: 'none', pointerEvents: 'none',
-            background: 'rgba(255,255,255,0.5)'}`
-          ).q-pa-sm {{content.name}}
+            background: 'rgba(0,0,0,0.5)'}`
+          ).text-white.q-pa-sm {{content.name}}
   //- players
   //- TODO: content.type => player...
   player-video(
     :url="contentUrl" :source="contentSource"
     :start="layerStart" :end="layerEnd"
     @player="$emit('player', $event)" @ended="layerEnded")
-    template(v-slot:layerEditor=`{player, now}`)
-      slot(name="layerEditor" :player="player" :now="now")
+    //- TODO: props is options on one object...
+    template(v-slot:layerEditor=`{player, now, progressHeight}`)
+      slot(name="layerEditor" :player="player" :now="now" :progressHeight="progressHeight")
 </template>
 
 <script>

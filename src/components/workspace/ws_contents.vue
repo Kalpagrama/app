@@ -18,7 +18,15 @@
       @content="contentFound")
   //- actions, list, gallery, feed, list-expanded
   div(:style=`{height: '60px'}`).row.full-width
+    //- .col.full-height
+    div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+      q-btn(round flat color="green" icon="search" @click="contentsFindStart()")
     .col.full-height
+      //- TODO: reuse
+      div(v-if="false").row.fit.items-center.justify-center
+        q-btn(dense :flat="mode !== 'list'" color="green" no-caps @click="mode = 'list'").q-px-sm.q-mx-sm List
+        q-btn(dense :flat="mode !== 'gallery'" color="green" no-caps @click="mode = 'gallery'").q-px-sm Gallery
+        q-btn(dense :flat="mode !== 'feed'" color="green" no-caps @click="mode = 'feed'").q-px-sm.q-mx-sm Feed
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
       q-btn(round flat color="green" icon="refresh" :loading="contentsLoading" @click="contentsReload()")
   .col.full-width.scroll
@@ -45,6 +53,8 @@ export default {
   props: ['ctx', 'oid'],
   data () {
     return {
+      mode: 'list',
+      modes: ['list', 'gallery', 'feed'],
       content: null,
       contents: [],
       contentsLoading: false
@@ -70,10 +80,13 @@ export default {
       this.$log('contentLoad done', content)
       return content
     },
+    async contentsFindStart () {
+      this.$log('contentsFindStart')
+    },
     async contentsLoad () {
       this.$log('contentsLoad start')
       this.contentsLoading = true
-      await this.$wait(1000)
+      // await this.$wait(1000)
       let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^CONTENT-.{11}=$', types: ['NODE']}})
       this.$log('contentsLoad done', items)
       this.contentsLoading = false
