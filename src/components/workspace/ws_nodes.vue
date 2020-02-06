@@ -14,11 +14,11 @@
         q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
     //- body
     .col.full-width.scroll
-      .row.full-width.items-start.content-start.q-px-md
+      .row.full-width.items-start.content-start.q-px-sm
         div(
           v-for="(n,ni) in nodesFiltered" :key="ni" @click="nodeClick(n, ni)"
-          :class=`{'bg-grey-10': n.oid !== oid, 'bg-white': n.oid === oid}`
-          :style=`{height: '60px', borderRadius: '10px'}`
+          :class=`{'bg-grey-8': n.oid !== oid, 'bg-white': n.oid === oid}`
+          :style=`{height: '40px', borderRadius: '10px'}`
           ).row.full-width.items-center.cursor-pointer.q-px-sm.q-mb-sm
           span(
             :class=`{

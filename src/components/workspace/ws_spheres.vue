@@ -10,7 +10,7 @@
         div(
           v-for="(s,si) in node.spheres" :key="si" @click="sphereClick(s,si)"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`
-          ).row.bg-grey-10.q-mr-sm.q-mb-sm
+          ).row.bg-grey-8.q-mr-sm.q-mb-sm
           span(:style=`{whiteSpace: 'nowrap'}`).text-white.q-pa-sm {{ s.name }}
 </template>
 

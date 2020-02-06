@@ -3,7 +3,8 @@
   div(:style=`{position: 'relative'}`).row.fit
     video(
       ref="kalpaVideo"
-      playsinline autoplay
+      playsinline :autoplay="false"
+      @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="videoEnded"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
       source(
@@ -18,70 +19,79 @@
       //- pregress wrapper
       .row.full-width.items-start.content-start.q-px-md
         //- progress actions
-        div(:style=`{height: '44px'}`).row.full-width
+        div(:style=`{height: '60px'}`).row.full-width.items-center
           //- play/pause
           div(
             :style=`{width: '44px'}`
             ).row.full-height.items-center.content-center.justify-center
             q-btn(
               round flat color="green" @click="videoClick"
-              :icon="player.playing === true ? 'pause' : 'play_arrow'")
+              :icon="player.playing === true ? 'pause' : 'play_arrow'"
+              :style=`{background: 'rgba(0,0,0,0.3)'}`)
           .col
             .row.fit.items-center.content-center
               span(
-                :style=`{pointerEvents: 'none'}`
-                ).text-white {{$time(now)+' / '+$time(player.duration)}}
+                :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
+                ).text-white.q-pa-sm.q-ml-sm {{$time(now)+' / '+$time(player.duration)}}
           //- fullscreen
           div(
             :style=`{width: '44px'}`
             ).row.full-height.items-center.content-center.justify-center
             q-btn(
               round flat color="green" @click="$q.fullscreen.toggle()"
-              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
+              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
+              :style=`{background: 'rgba(0,0,0,0.3)'}`)
         //- progress bar & time
         div(
-          :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
+          :style=`{height: progressHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
           //- progress
           .col.full-height
             div(
               @click="progressClick"
               :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
               ).row.fit.bg-grey-9.cursor-pointer
-              //- //- progress time
-              //- span(
-              //-   :style=`{position: 'absolute', zIndex: 2000, top: '9px', left: '10px', zIndex: 200, pointerEvents: 'none'}`
-              //-   ).text-white {{$time(now)+' / '+$time(player.duration)}}
               //- progress %
               div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
-      slot(name="layerEditor" :now="now" :player="player")
+      slot(name="layerEditor" :now="now" :player="player" :progressHeight="progressHeight")
 </template>
 
 <script>
 export default {
   name: 'playerVideo',
-  props: ['url', 'source', 'start', 'end'],
+  props: ['url', 'source', 'start', 'end', 'visible'],
   data () {
     return {
       now: 0,
       player: {},
       moveInterval: null,
+      progressHeight: 10
       // start: 3,
       // end: 30
     }
   },
   watch: {
     now: {
+      immediate: false,
       handler (to, from) {
         // this.$log('now CHANGED', to)
-        // if (this.start) {
-        //   if (to < this.start) {
-        //     this.player.setCurrentTime(this.start)
-        //   }
-        //   if (to > this.end) {
-        //     this.player.setCurrentTime(this.start)
-        //     this.$emit('ended')
-        //   }
-        // }
+        if (this.start) {
+          if (to < this.start) {
+            this.player.setCurrentTime(this.start)
+            this.player.play()
+          }
+          if (to > this.end) {
+            this.player.setCurrentTime(this.start)
+            this.$emit('ended')
+          }
+        }
+      }
+    },
+    visible: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('visible CHANGED', to)
+        if (to) this.videoPlay()
+        else this.videoPause()
       }
     }
   },
@@ -100,6 +110,11 @@ export default {
       this.moveInterval = setTimeout(() => {
         this.$set(this.player, 'controls', false)
       }, 2500)
+    },
+    videoCanplay () {
+      this.$log('videoCanplay')
+      this.player.setCurrentTime(this.start || 0)
+      this.player.play()
     },
     videoPlay () {
       this.$log('videoPlay')
@@ -134,6 +149,12 @@ export default {
         this.player.started = false
         this.player.setCurrentTime = (ms) => {
           this.$refs.kalpaVideo.currentTime = ms
+        }
+        this.player.play = () => {
+          this.$refs.kalpaVideo.play()
+        }
+        this.player.pause = () => {
+          this.$refs.kalpaVideo.pause()
         }
       } else {
         let me = new window.MediaElementPlayer(this.$refs.kalpaVideo, {

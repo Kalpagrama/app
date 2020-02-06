@@ -12,20 +12,21 @@ div(:style=`{position: 'relative'}`).row.fit
     .col.full-height
       .row.fit.items-center.content-center
         span(
-          @click="contentClick"
+          @click="contentNameClick()"
           :style=`{
             borderRadius: '10px', overflow: 'hidden',
             userSelect: 'none', pointerEvents: 'none',
-            background: 'rgba(255,255,255,0.5)'}`
-          ).q-pa-sm {{content.name}}
+            background: 'rgba(0,0,0,0.5)'}`
+          ).text-white.q-pa-sm {{content.name}}
   //- players
   //- TODO: content.type => player...
   player-video(
     :url="contentUrl" :source="contentSource"
-    :start="layerStart" :end="layerEnd"
+    :start="layerStart" :end="layerEnd" :visible="visible"
     @player="$emit('player', $event)" @ended="layerEnded")
-    template(v-slot:layerEditor=`{player, now}`)
-      slot(name="layerEditor" :player="player" :now="now")
+    //- TODO: props is options on one object...
+    template(v-slot:layerEditor=`{player, now, progressHeight}`)
+      slot(name="layerEditor" :player="player" :now="now" :progressHeight="progressHeight")
 </template>
 
 <script>
@@ -33,9 +34,9 @@ import playerVideo from './player_video'
 import playerImage from './player_image'
 
 export default {
-  name: 'compositionEditor',
+  name: 'composition',
   components: {playerVideo, playerImage},
-  props: ['ctx', 'composition'],
+  props: ['ctx', 'composition', 'layerIndexPlay', 'visible'],
   data () {
     return {
       layerIndex: 0
@@ -49,12 +50,18 @@ export default {
       return this.layer.figuresRelative
     },
     layerStart () {
-      if (this.layerFiguresRelative) return this.layerFiguresRelative[0].t
-      else return false
+      if (this.layerFiguresRelative) {
+        return this.layerFiguresRelative[0].t
+      } else {
+        return this.layer.figuresAbsolute[0].t
+      }
     },
     layerEnd () {
-      if (this.layerFiguresRelative) return this.layerFiguresRelative[1].t
-      else return false
+      if (this.layerFiguresRelative) {
+        return this.layerFiguresRelative[1].t
+      } else {
+        return this.layer.figuresAbsolute[1].t
+      }
     },
     layers () {
       return this.composition.layers
@@ -70,14 +77,28 @@ export default {
     }
   },
   methods: {
-    contentClick () {
-      this.$log('contentClick')
+    contentNameClick () {
+      this.$log('contentNameClick')
+      // TODO: show content modal...
+    },
+    play () {
+      this.$log('play')
+    },
+    pause () {
+      this.$log('pause')
+    },
+    playPause () {
+      this.$log('playPause')
     },
     layerEnded () {
-      this.$log('layerEnded')
-      // move to the next layer, this composition player
-      if (this.layerIndex === this.layers.length - 1) this.layerIndex = 0
-      else this.layerIndex += 1
+      this.$log('*** layerEnded ')
+      if (this.layerIndexPlay) {
+        this.layerIndex = this.layerIndexPlay
+      } else {
+         // move to the next layer, this composition player
+        if (this.layerIndex === this.layers.length - 1) this.layerIndex = 0
+        else this.layerIndex += 1
+      }
     }
   },
   mounted () {

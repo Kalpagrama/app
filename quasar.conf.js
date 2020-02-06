@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 require('dotenv').config()
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = function (ctx) {
   return {
@@ -24,34 +24,37 @@ module.exports = function (ctx) {
       'material-icons',
       // 'ionicons-v4',
       // 'mdi-v3',
-      'fontawesome-v5'
+      // 'fontawesome-v5'
       // 'eva-icons'
     ],
     framework: {
-      all: true,
+      all: false,
       components: [
         'QLayout',
-        'QPullToRefresh',
+        // 'QPullToRefresh',
         'QHeader',
         'QFooter',
-        'QTabs',
-        'QTab',
+        // 'QTabs',
+        // 'QTab',
         'QDrawer',
         'QPageContainer',
-        'QExpansionItem',
-        'QPage',
-        'QToolbar',
-        'QToolbarTitle',
+        // 'QExpansionItem',
+        // 'QPage',
+        // 'QToolbar',
+        // 'QToolbarTitle',
         'QBtn',
         'QIcon',
-        'QList',
-        'QItem',
-        'QItemSection',
-        'QItemLabel',
-        'QCard',
-        'QItem',
-        'QAvatar',
-        'QVideo'
+        // 'QList',
+        // 'QItem',
+        // 'QItemSection',
+        // 'QItemLabel',
+        // 'QCard',
+        // 'QItem',
+        // 'QAvatar',
+        // 'QVideo',
+        'QResizeObserver',
+        'QInput',
+        'QDialog'
       ],
       directives: [
         'Ripple',
@@ -74,7 +77,7 @@ module.exports = function (ctx) {
       },
       scopeHoisting: true,
       vueRouterMode: 'history',
-      vueCompiler: true,
+      vueCompiler: false,
       distDir: 'dist',
       // gzip: true,
       // analyze: true,
@@ -100,9 +103,9 @@ module.exports = function (ctx) {
             gql: 'graphql-tag'
           })
         )
-        // cfg.plugins.push(
-        //   new BundleAnalyzerPlugin()
-        // )
+        cfg.plugins.push(
+          new BundleAnalyzerPlugin()
+        )
         { // todo отключить когда не потребуется debug(увеличивает размер js в 2 раза)
           cfg.devtool = 'source-map'
           cfg.plugins.push(
@@ -144,8 +147,8 @@ module.exports = function (ctx) {
       port: 8282,
       open: true // opens browser window automatically
     },
-    animations: 'all',
-    // animations: [],
+    // animations: 'all',
+    animations: [],
     ssr: {
       pwa: false
     },

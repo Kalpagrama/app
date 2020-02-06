@@ -3,11 +3,16 @@ q-layout(view="hHh lpR fFf")
   //- TODO: global theme styles: body :style=`{color: 'green !important'}`
   q-page-container(
   ).row.full-width.window-height.bg-black
-    ws-items(@page="page = $event" @node="nodeClick" :oid="node ? node.oid : false")
-    .col.full-height
+    ws-items(
+      ctx="workspace"
+      :oid="node ? node.oid : false"
+      @page="$router.push({params: {page: $event}})" @item="itemClick").bg-grey-9
+    .col.full-height.bg-grey-10
+      //- note-editor
       composition-editor(
         v-if="page === 'contents' && node && nodeIsContent(node)"
-        :node="node" :compositionIndex="0")
+        ctx="composition"
+        :node="node" :compositionIndex="0").bg-black
       node-editor(
         v-if="page === 'nodes'"
         :value="node ? node : null")
@@ -25,13 +30,13 @@ q-layout(view="hHh lpR fFf")
 
 <script>
 import wsItems from './ws_items'
-import compositionEditor from 'components/node/composition_editor'
+// import compositionEditor from 'components/node/composition_editor'
 import nodeEditor from 'components/node/node_editor'
 import wsSettings from './ws_settings'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, compositionEditor, nodeEditor, wsSettings},
+  components: {wsItems, nodeEditor, wsSettings},
   props: [],
   data () {
     return {
@@ -42,19 +47,21 @@ export default {
   computed: {
   },
   watch: {
-    page: {
+    immediate: true,
+    '$route.params.page': {
       handler (to, from) {
-        this.$log('page CHANGED', to)
+        this.$log('$route.params.page CHANGED', to)
+        if (to) this.page = to
         if (to !== from) this.node = null
       }
     }
   },
   methods: {
-    async nodeClick (node) {
-      this.$log('nodeClick', node)
+    async itemClick ({type, item}) {
+      this.$log('nodeClick', type, item)
       this.node = null
       this.$nextTick(() => {
-        this.node = node
+        this.node = item
       })
     },
     nodeIsContent (node) {

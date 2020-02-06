@@ -1,27 +1,30 @@
 <template lang="pug">
 .row.fit
-  .column.fit
+  div(:style=`{position: 'relative'}`).column.fit
+    //- actions
+    q-btn(
+      round push size="lg" color="green" icon="add" @click="add()"
+      :style=`{position: 'absolute', zIndex: 2000, right: '16px', bottom: '16px'}`)
+    //- header
     div(
       :style=`{height: '60px'}`
       ).row.full-width.items-center
       .col.full-height
-        .row.fit.items-center.q-px-md
-          span.text-bold.text-green Compositions
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
         q-btn(round flat color="green" icon="refresh" @click="refresh()")
-      div(
-        :style=`{height: '60px', width: '60px'}`
-        ).row.items-center.justify-center
-        q-btn(round flat color="green" icon="add" @click="add()")
+    //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start
         div(
           v-for="(c,ci) in compositions" :key="ci"
+          :class=`{
+            'bg-grey-9': true
+          }`
           :style=`{height: '60px'}`
           ).row.full-width.items-center.q-px-md
-          span composition {{ ci }}
+          span {{ c.name }}
 </template>
 
 <script>

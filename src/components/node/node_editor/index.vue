@@ -10,9 +10,21 @@
 </style>
 <template lang="pug">
 .row.fit.justify-center
+  //- column
   div(
-    :style=`{maxWidth: '400px'}`
+    :style=`{position: 'relative', maxWidth: '600px'}`
     ).column.fit
+    //- actions
+    //- composition editor
+    //- TODO: reuse q-dialog props from UI module of vuex...?
+    q-dialog(v-model="compositionEditorOpened").bg-black
+      composition-editor(
+        ctx="node"
+        :node="node" :compositionIndex="compositionIndex").bg-black
+    //- composition finder
+    q-dialog(v-model="compositionFinderOpened").bg-black
+      composition-finder(@layer="layerFound").bg-black
+    //- header
     div(
       :style=`{height: '60px'}`
       ).row.full-width.items-center.content-center
@@ -22,54 +34,75 @@
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.content-center.justify-center
-        q-btn(round flat icon="refresh" color="green" :loading="refreshing" @click="refresh()")
-    .col.full-width
-    div(
-      :style=`{minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.bg-grey-10.q-pa-md
-      span.text-red composition-editor
-    div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
-      input(
-        v-if="node"
-        v-model="node.name"
-        placeholder="Whats the essence?").fit.bg-white.kinput
-    div(
-      :style=`{minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.bg-grey-10.q-pa-md
-      span.text-red composition-editor
-    .col.full-width
-    //- category, spheres
-    div(:style=`{minHeight: '60px'}`).row.full-width.items-start
-      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-        span.text-bold.text-green Category & spheres
-      .row.full-width
-        span(
+        q-btn(round flat icon="refresh" color="green" :loading="refreshing" @click="nodeRefresh()")
+    .col.full-width.scroll
+      //- composition one
+      div(
+        :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.bg-grey-9
+        composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :visible="compositionVisible[0]")
+        //- composition actions
+        div(
+          v-if="!node.compositions[0]"
+          :style=`{position: 'absolute', zIndex: 3000}`
+          ).row.fit.items-center.content-center.justify-center
+          q-btn(v-if="!node.compositions[0]" round flat color="green" icon="add" size="lg" @click="compositionFind(0)")
+        q-btn(v-if="node.compositions[0]" round flat color="white" icon="edit" @click="compositionEdit(0)"
+            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
+        q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
+            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
+      //- essence editor
+      div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
+        input(
           v-if="node"
-          v-for="(s,si) in node.spheres" :key="si"
-          :class=`{}`
-          :style=`{borderRadius: '10px'}`
-        ).text-green.q-pa-sm.bg-grey-10.q-mb-sm.q-mr-sm {{ s.name }}
-    //- footer: save, publish
-    div(:style=`{height: '60px'}`
-      ).row.full-width.items-center.q-px-sm
-      q-btn(
-        outline color="green" no-caps :loading="saving" @click="save()"
-        :style=`{borderRadius: '10px'}`)
-        span().text-bold.text-green Save
-      .col.full-height
-      q-btn(
-        push color="green" no-caps :loading="publishing" @click="publish()"
-        :style=`{borderRadius: '10px'}`)
-        span().text-bold Publish
+          v-model="node.name"
+          placeholder="Whats the essence?").fit.bg-white.kinput
+      //- composition two
+      div(
+        :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.bg-grey-9
+        composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :visible="compositionVisible[1]")
+        //- composition actions
+        div(
+          v-if="!node.compositions[1]"
+          :style=`{position: 'absolute', zIndex: 3000}`
+          ).row.fit.items-center.content-center.justify-center
+          q-btn(v-if="!node.compositions[1]" round flat color="green" icon="add" size="lg" @click="compositionFind(1)")
+        q-btn(v-if="node.compositions[1]" round flat color="white" icon="edit" @click="compositionEdit(1)"
+            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
+        q-btn(v-if="node.compositions[1]" round flat color="red" icon='clear' @click="compositionDelete(1)"
+            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
+      //- category, spheres
+      div(:style=`{minHeight: '60px'}`).row.full-width.items-start
+        div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+          span.text-bold.text-green Category & spheres
+        .row.full-width
+          span(
+            v-if="node"
+            v-for="(s,si) in node.spheres" :key="si"
+            :class=`{}`
+            :style=`{borderRadius: '10px'}`
+          ).text-green.q-pa-sm.bg-grey-10.q-mb-sm.q-mr-sm {{ s.name }}
+      //- footer: save, publish
+      div(:style=`{height: '60px'}`
+        ).row.full-width.items-center.q-px-sm
+        q-btn(
+          outline color="green" no-caps :loading="saving" @click="nodeSave()"
+          :style=`{borderRadius: '10px'}`)
+          span().text-bold.text-green Save
+        .col.full-height
+        q-btn(
+          push color="green" no-caps :loading="publishing" @click="nodePublish()"
+          :style=`{borderRadius: '10px'}`)
+          span().text-bold Publish
 </template>
 
 <script>
 import { throttle } from 'quasar'
-import compositionEditor from 'components/node/composition_editor'
 
 export default {
   name: 'nodeEditor',
-  components: {compositionEditor},
+  components: {},
   props: ['value'],
   data () {
     return {
@@ -89,7 +122,11 @@ export default {
           //   layers: [{ content: content, figuresAbsolute: [] }]
           // }
         ]
-      }
+      },
+      compositionEditorOpened: false,
+      compositionFinderOpened: false,
+      compositionIndex: undefined,
+      compositionVisible: [true, true]
     }
   },
   watch: {
@@ -110,12 +147,46 @@ export default {
       handler (to, from) {
         this.$log('node CHANGED', to)
         if (to) {
-          this.nodeSave(to)
+          // this.nodeSave(to)
         }
       }
     }
   },
   methods: {
+    layerFound (l) {
+      this.$log('layerFound', l)
+      // add layer to existing composition
+      if (this.node.compositions[this.compositionIndex]) {
+        this.node.compositions[this.compositionIndex].layers.push(l)
+      }
+      // create new composition with given index and layer
+      else {
+        let c = {
+          url: '',
+          name: '',
+          layers: [l]
+        }
+        this.$set(this.node.compositions, this.compositionIndex, c)
+      }
+      this.compositionFinderOpened = false
+    },
+    compositionFind (index) {
+      this.$log('compositionFind', index)
+      this.compositionIndex = index
+      this.compositionVisible[index] = false
+      this.compositionFinderOpened = true
+    },
+    compositionEdit (index) {
+      this.$log('compositionEdit', index)
+      this.compositionIndex = index
+      this.compositionVisible[index] = false
+      this.compositionEditorOpened = true
+    },
+    compositionDelete (index) {
+      this.$log('compositionDelete', index)
+      this.compositionVisible[index] = false
+      this.$delete(this.node.compositions, index)
+    },
     async nodeSave (node) {
       try {
         this.$log('nodeSave start', node || this.node)
@@ -133,27 +204,27 @@ export default {
         this.nodeSavingError = e
       }
     },
-    async publish () {
+    async nodePublish () {
       try {
-        this.$log('publish start')
+        this.$log('nodePublish start')
         this.publishing = true
         await this.$wait(2000)
-        this.$log('publish done')
+        this.$log('nodePublish done')
         this.publishing = false
       } catch (e) {
-        this.$log('publish error', e)
+        this.$log('nodePublish error', e)
         this.publishing = false
       }
     },
-    async refresh () {
+    async nodeRefresh () {
       try {
-        this.$log('refresh start')
+        this.$log('nodeRefresh start')
         this.refreshing = true
         await this.$wait(2000)
-        this.$log('refresh done')
+        this.$log('nodeRefresh done')
         this.refreshing = false
       } catch (e) {
-        this.$log('refresh error', e)
+        this.$log('nodeRefresh error', e)
         this.refreshing = false
       }
     }

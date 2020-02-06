@@ -109,6 +109,11 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kalpaMenuMobile', () => import('components/kalpa/menumobile'))
     Vue.component('kalpaSpinner', () => import('components/kalpa/spinner'))
     Vue.component('kalpaTutorial', () => import('components/kalpa/tutorial'))
+    // new
+    Vue.component('wsItems', () => import('components/workspace/ws_items'))
+    Vue.component('compositionEditor', () => import('components/node/composition_editor'))
+    Vue.component('compositionFinder', () => import('components/node/composition_finder'))
+    Vue.component('composition', () => import('components/node/composition'))
   } catch (err) {
     logE(err)
   }

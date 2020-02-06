@@ -9,7 +9,7 @@ iframe {
 .row.full-width.items-start.content-start
   k-action
   //- kalpa-tutorial
-  .row.window-height.bg-black
+  .row.window-height.bg-grey-8
     kalpa-menu-desktop(v-if="!loading")
   .col
     router-view(v-if="!loading")
