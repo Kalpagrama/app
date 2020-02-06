@@ -2,7 +2,7 @@
 </style>
 <template lang="pug">
 .row.fit.items-center.content-center.justify-center
-  div(:style=`{maxWidth: '500px'}`).row.full-width.items-center.content-center.justify-center
+  div(:style=`{}`).row.full-width.items-center.content-center.justify-center
     //- input file
     input(
       v-if="sources.includes('device')"

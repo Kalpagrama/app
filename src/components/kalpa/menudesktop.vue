@@ -15,7 +15,8 @@ div(
   //- q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
   //-   k-invite(@hide="$refs.inviteDialog.hide()")
   //- k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
-  div(:style=`{position: 'relative', overflow: 'hidden', borderRight: '1px solid #4caf50'}`).column.fit
+  //- borderRight: '1px solid #4caf50'
+  div(:style=`{position: 'relative', overflow: 'hidden'}`).column.fit
     //- home, kalpagramma
     div(:style=`{height: '60px'}`).row.full-width.cursor-pointer
       div(@click="$router.push('/')").col.row.items-center

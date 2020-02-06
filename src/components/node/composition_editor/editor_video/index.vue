@@ -1,60 +1,57 @@
 <template lang="pug">
 .row.fit
   div(:style=`{position: 'relative'}`).col.full-height
-    composition(v-if="composition" :composition="composition" @player="player = $event")
-      template(v-slot:right)
-        q-btn(
-          round push color="green" @click="layersShow = !layersShow"
-          :icon="layersShow ? 'keyboard_arrow_right' : 'layers'").q-ml-sm
-      //- layer editor
-      template(v-slot:layerEditor=`{player, now}`)
-        //- layer add
-        q-btn(
-          round push size="lg" color="green" icon="add" @click="layerAdd()"
-          :style=`{position: 'absolute', right: '40px', top: '-80px'}`)
-        //- layers on progress bar
-        div(:style=`{position: 'absolute', zIndex: 200, top: '44px', height: '40px', pointerEvents: 'none'}`).row.full-width.q-px-md
-          div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.q-px-sm
-            div(
-              v-for="(l, li) in layers" :key="li"
-              v-if="l.figuresAbsolute && l.figuresAbsolute.length > 0"
-              :style=`{
-                position: 'absolute', zIndex: 200, opacity: li === layerIndex ? 0.9 : 0.5,
-                left: (l.figuresAbsolute[0].t/player.duration)*100+'%',
-                width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
-                background: $randomColor(li)}`
-              ).row.full-height
-        //- layer editor minWidth: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
-        layer-editor(v-if="layer" :player="player" :now="now" :layers="layers" :layer="layer" :layerIndex="layerIndex" :style=`{height: editorHeight+'px'}`)
-  //- layers
-  div(:style=`{width: layersWidth+'px', overflow: 'hidden', borderLeft: '1px solid #4caf50'}`).row.full-height
     .column.fit
-      div(:style=`{height: '60px'}`
-        ).row.full-width
-        div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
-          q-btn(round flat color="green" icon="layers")
-        .col.full-height
-          .row.fit.items-center.content-center
-            span.text-bold.text-green Layers
-      div(:style=`{position: 'relative'}`).col.full-width.scroll
-        .row.full-width.items-start.content-start.q-pa-md
-          div(
-            v-for="(l, li) in layers" :key="li" @click="layerClick(l, li)"
-            :class=`{'bg-grey-10': li !== layerIndex, 'bg-grey-8': li === layerIndex}`
-            :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.items-center.content-center.q-px-sm.q-mb-sm.cursor-pointer
-            div(v-if="l.figuresAbsolute.length > 0").row.fit.items-center.content-center
-              span.text-white {{ $time(l.figuresAbsolute[0].t) }}-
-              span.text-white {{ $time(l.figuresAbsolute[1].t) }}
+      .col.full-width
+        composition(v-if="composition" :composition="composition" @player="player = $event")
+          template(v-slot:right)
+            q-btn(
+              v-if="false"
+              round push color="green" @click="layersShow = !layersShow"
+              :icon="layersShow ? 'keyboard_arrow_right' : 'layers'").q-ml-sm
+          //- layer editor
+          template(v-slot:layerEditor=`{player, now, progressHeight}`)
+            //- layer add
+            q-btn(
+              round push size="lg" color="green" icon="add" @click="layerAdd()"
+              :style=`{position: 'absolute', right: '40px', top: '-80px'}`)
+            //- layers on progress bar
+            div(:style=`{position: 'absolute', zIndex: 200, top: progressHeight+'44px', height: progressHeight+'px', pointerEvents: 'none'}`).row.full-width.q-px-md
+              div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.q-px-sm
+                div(
+                  v-for="(l, li) in layers" :key="li"
+                  v-if="l.figuresAbsolute && l.figuresAbsolute.length > 0"
+                  :style=`{
+                    position: 'absolute', zIndex: 200, opacity: li === layerIndex ? 0.9 : 0.5,
+                    left: (l.figuresAbsolute[0].t/player.duration)*100+'%',
+                    width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
+                    background: $randomColor(li)}`
+                  ).row.full-height
+            //- layer editor minWidth: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
+            layer-editor(v-if="layer" :player="player" :now="now" :layers="layers" :layer="layer" :layerIndex="layerIndex" :style=`{height: editorHeight+'px'}`)
+      //- $q.screen.height/2+'px'
+      layers(
+        v-if="true"
+        :style=`{maxHeight: '50%'}`
+        :header="false"
+        :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport")
+  //- layers,  borderLeft: '1px solid #4caf50'
+  div(
+    v-if="false"
+    :style=`{width: layersWidth+'px', overflow: 'hidden'}`).row.full-height.bg-grey-10
+    layers(
+      :header="true"
+      :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport")
 </template>
 
 <script>
 import composition from 'components/node/composition'
 import layerEditor from './layer_editor'
+import layers from './layers'
 
 export default {
   name: 'compositionEditorVideo',
-  components: {composition, layerEditor},
+  components: {composition, layerEditor, layers},
   props: ['composition', 'content'],
   data () {
     return {
@@ -93,6 +90,10 @@ export default {
       this.$log('layerClick', l, li)
       this.layerIndex = li
       this.player.setCurrentTime(l.figuresAbsolute[0].t)
+    },
+    layerExport (l, li) {
+      this.$log('layerExport', l, li)
+      this.$emit('layerExport', l)
     },
     layerPlay () {
       this.$log('layerPlay')

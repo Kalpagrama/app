@@ -72,6 +72,7 @@ module.exports = {
         'no-throw-literal': 0,
         'no-unneeded-ternary': 0,
         'prefer-const': 0,
-        'no-lone-blocks': 0
+        'no-lone-blocks': 0,
+        'brace-style': 0
     }
 }

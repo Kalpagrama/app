@@ -1,12 +1,21 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  .col.full-height
+  //- if we got composition of the node ??
+  //- how to delete composition from the node
+  div(v-if="node.compositions[compositionIndex]").col.full-height
     editor-video(
       v-if="composition && content.type === 'VIDEO'"
-      :composition="composition" :content="content")
+      :composition="composition" :content="content"
+      @layerExport="$emit('layerExport', $event)")
     editor-image(
       v-if="composition && content.type === 'IMAGE'"
       :composition="composition" :content="content")
+  //- TODO: where to finder to be? inside composition editor
+  //- does it using somewhere else ??
+  div(v-else).row.fit.items-center.content-center.justify-center
+    q-dialog(v-model="compositionFinderOpened")
+      composition-finder(@layer="layerFound")
+    q-btn(round flat size="lg" color="green" icon="add" @click="compositionAdd()")
 </template>
 
 <script>
@@ -18,6 +27,9 @@ export default {
   name: 'compositionEditor',
   components: {editorVideo, editorImage},
   props: {
+    ctx: {
+      type: String
+    },
     node: {
       type: Object,
       required: true
@@ -33,7 +45,8 @@ export default {
   data () {
     return {
       nodeSaving: false,
-      nodeSavingError: null
+      nodeSavingError: null,
+      compositionFinderOpened: false
     }
   },
   computed: {
@@ -53,15 +66,61 @@ export default {
     }
   },
   watch: {
+    compositionIndex: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('compositionIndex CHANGED', to)
+        if (to !== undefined) {
+          if (!this.node.compositions[to]) {
+            // TODO: try to add composition to the node...
+          }
+        }
+      }
+    },
     node: {
       deep: true,
       immediate: true,
       handler (to, from) {
-        if (to) this.nodeSave()
+        if (to) {
+          if (this.ctx === 'composition') {
+            // this.nodeSave()
+          }
+        }
       }
     }
   },
   methods: {
+    layerFound (l) {
+      this.$log('layerFound', l)
+      // add layer to existing composition
+      if (this.node.compositions[this.compositionIndex]) {
+        // TODO: and if there is another content????
+        this.node.compositions[this.compositionIndex].layers.push(l)
+      }
+      // create new composition with given index and layer
+      else {
+        let c = {
+          url: '',
+          name: '',
+          layers: [l]
+        }
+        this.$set(this.node.compositions, this.compositionIndex, c)
+        // this.node.compositions[this.compositionIndex] = c
+      }
+      this.compositionFinderOpened = false
+    },
+    compositionAdd () {
+      this.$log('compositionAdd')
+      // open modal to export layers from node CONTENT?
+      // find only content and do it live?
+      this.compositionFinderOpened = true
+    },
+    compositionExport () {
+      this.$log('compositionExport')
+    },
+    compositionDelete () {
+      this.$log('compositionDelete')
+    },
     async nodeSave (node) {
       try {
         this.$log('nodeSave start', this.node)
@@ -80,7 +139,7 @@ export default {
     }
   },
   created () {
-    this.nodeSave = throttle(this.nodeSave, 500)
+    this.nodeSave = throttle(this.nodeSave, 2000)
   },
   mounted () {
     this.$log('mounted')

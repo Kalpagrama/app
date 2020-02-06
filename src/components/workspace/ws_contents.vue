@@ -12,7 +12,7 @@
   //- add content
   div(
     :style=`{height: '90px'}`
-    ).row.full-width.q-pa-md
+    ).row.full-width.q-pa-sm
     content-finder(
       :sources="['url', 'device']"
       @content="contentFound")
@@ -20,13 +20,13 @@
   div(:style=`{height: '60px'}`).row.full-width
     .col.full-height
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
-      q-btn(round flat color="green" icon="refresh" @click="contentsReload()")
+      q-btn(round flat color="green" icon="refresh" :loading="contentsLoading" @click="contentsReload()")
   .col.full-width.scroll
-    .row.full-with.items-start.content-start.q-px-md
+    .row.full-with.items-start.content-start.q-px-sm
       div(
         v-for="(c,ci) in contents" :key="ci" @click="contentClick(c,ci)"
-        :class=`{'bg-grey-10': c.oid !== oid, 'bg-white': c.oid === oid}`
-        :style=`{minHeight: '50px', borderRadius: '10px', overflow: 'hidden'}`
+        :class=`{'bg-grey-8': c.oid !== oid, 'bg-white': c.oid === oid}`
+        :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.cursor-pointer.q-mb-sm
         span(
           :class=`{
@@ -42,11 +42,12 @@ import contentFinder from 'components/content/finder'
 export default {
   name: 'wsContents',
   components: {contentFinder},
-  props: ['oid'],
+  props: ['ctx', 'oid'],
   data () {
     return {
       content: null,
-      contents: []
+      contents: [],
+      contentsLoading: false
     }
   },
   watch: {
@@ -54,8 +55,14 @@ export default {
   methods: {
     contentClick (c, ci) {
       this.$log('contentClick', c, ci)
-      this.content = c
-      this.$emit('item', c)
+      if (this.ctx === 'workspace') {
+        // open content for editing composition
+        this.content = c
+        this.$emit('item', c)
+      } else if (this.ctx === 'finder') {
+        // do something open contents for their layers, and look at them...
+        this.$emit('item', c)
+      }
     },
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
@@ -65,8 +72,11 @@ export default {
     },
     async contentsLoad () {
       this.$log('contentsLoad start')
+      this.contentsLoading = true
+      await this.$wait(1000)
       let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^CONTENT-.{11}=$', types: ['NODE']}})
       this.$log('contentsLoad done', items)
+      this.contentsLoading = false
       return items.map(i => i.object)
     },
     async contentsReload () {

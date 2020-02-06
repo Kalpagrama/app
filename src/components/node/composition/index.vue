@@ -33,7 +33,7 @@ import playerVideo from './player_video'
 import playerImage from './player_image'
 
 export default {
-  name: 'compositionEditor',
+  name: 'composition',
   components: {playerVideo, playerImage},
   props: ['ctx', 'composition'],
   data () {

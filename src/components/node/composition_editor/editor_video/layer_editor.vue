@@ -145,7 +145,7 @@ export default {
       this.player.setCurrentTime(to)
     },
     frameLoaded () {
-      this.$log('frameLoaded')
+      // this.$log('frameLoaded')
       this.framesLoadedCount += 1
       if (this.framesLoadedCount === this.framesCount) {
         this.framesLoaded = true

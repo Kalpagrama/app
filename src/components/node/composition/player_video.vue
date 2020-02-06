@@ -40,7 +40,7 @@
               :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
         //- progress bar & time
         div(
-          :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
+          :style=`{height: progressHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
           //- progress
           .col.full-height
             div(
@@ -53,7 +53,7 @@
               //-   ).text-white {{$time(now)+' / '+$time(player.duration)}}
               //- progress %
               div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
-      slot(name="layerEditor" :now="now" :player="player")
+      slot(name="layerEditor" :now="now" :player="player" :progressHeight="progressHeight")
 </template>
 
 <script>
@@ -65,6 +65,7 @@ export default {
       now: 0,
       player: {},
       moveInterval: null,
+      progressHeight: 10
       // start: 3,
       // end: 30
     }
