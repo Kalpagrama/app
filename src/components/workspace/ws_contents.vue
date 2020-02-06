@@ -25,15 +25,15 @@
     .row.full-with.items-start.content-start.q-px-md
       div(
         v-for="(c,ci) in contents" :key="ci" @click="contentClick(c,ci)"
-        :class=`{'bg-grey-10': c.object.oid !== oid, 'bg-white': c.object.oid === oid}`
+        :class=`{'bg-grey-10': c.oid !== oid, 'bg-white': c.oid === oid}`
         :style=`{minHeight: '50px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.cursor-pointer.q-mb-sm
         span(
           :class=`{
-            'text-white': c.object.oid !== oid,
-            'text-green': c.object.oid === oid,
-            'text-bold': c.object.oid === oid}`
-        ).q-ma-sm.cursor-pointer {{ c.object.compositions[0].layers[0].content.name }}
+            'text-white': c.oid !== oid,
+            'text-green': c.oid === oid,
+            'text-bold': c.oid === oid}`
+        ).q-ma-sm.cursor-pointer {{ c.compositions[0].layers[0].content.name }}
 </template>
 
 <script>
@@ -54,7 +54,7 @@ export default {
   methods: {
     contentClick (c, ci) {
       this.$log('contentClick', c, ci)
-      this.content = c.object
+      this.content = c
       this.$emit('item', c)
     },
     async contentLoad (oid) {
@@ -67,7 +67,7 @@ export default {
       this.$log('contentsLoad start')
       let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^CONTENT-.{11}=$', types: ['NODE']}})
       this.$log('contentsLoad done', items)
-      return items
+      return items.map(i => i.object)
     },
     async contentsReload () {
       this.$log('contentsReload')

@@ -3,11 +3,11 @@ q-layout(view="hHh lpR fFf")
   //- TODO: global theme styles: body :style=`{color: 'green !important'}`
   q-page-container(
   ).row.full-width.window-height.bg-black
-    ws-items(@page="page = $event" @node="nodeClick" :oid="node ? node.object.oid : false")
+    ws-items(@page="page = $event" @node="nodeClick" :oid="node ? node.oid : false")
     .col.full-height
       composition-editor(
         v-if="page === 'contents' && node && nodeIsContent(node)"
-        :node="node.object" :compositionIndex="0")
+        :node="node" :compositionIndex="0")
       node-editor(
         v-if="page === 'nodes'"
         :value="node ? node : null")
@@ -42,22 +42,24 @@ export default {
   computed: {
   },
   watch: {
+    page: {
+      handler (to, from) {
+        this.$log('page CHANGED', to)
+        if (to !== from) this.node = null
+      }
+    }
   },
   methods: {
     async nodeClick (node) {
       this.$log('nodeClick', node)
       this.node = null
-      await this.$wait(300)
-      this.node = node
+      this.$nextTick(() => {
+        this.node = node
+      })
     },
     nodeIsContent (node) {
-      let arr = node.object.name.split('-')
-      if (arr[0] === 'CONTENT') {
-        let contentOid = arr[1]
-        return true
-      } else {
-        return false
-      }
+      if (node.name.split('-')[0] === 'CONTENT') return true
+      else return false
     }
   },
   mounted () {
