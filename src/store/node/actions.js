@@ -103,58 +103,63 @@ export const nodeDelete = async (context, oid) => {
 }
 
 export const nodeCreate = async (context, node) => {
-  logD('nodeCreate start', node)
+  logD('nodeCreate start')
+  logD('nodeCreate input', node)
   // checks
   {
-    assert.ok(node.categories.length >= 0)
+    assert.ok(node.category)
     assert.ok(node.spheres.length >= 0)
-    assert.ok(node.fragments.length >= 0)
+    assert.ok(node.compositions.length >= 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
-    for (let fr of node.fragments) {
-      assert.ok(fr.content)
-      assert.ok(fr.cuts.length >= 0)
-      assert.ok(fr.scale > 0)
-      let fragmentLen = 0
-      for (let c of fr.cuts) {
-        assert.ok(c.color)
-        // assert.ok(c.thumbUrl)
-        assert.ok(c.points && c.points.length === 2)
-        let start = c.points[0].x
-        let end = c.points[1].x
-        assert.ok(start >= 0 && end > 0)
-        assert.ok(end > start && end <= fr.scale)
-        fragmentLen += (end - start)
-      }
-    }
+    // for (let fr of node.fragments) {
+    //   assert.ok(fr.content)
+    //   assert.ok(fr.cuts.length >= 0)
+    //   assert.ok(fr.scale > 0)
+    //   let fragmentLen = 0
+    //   for (let c of fr.cuts) {
+    //     assert.ok(c.color)
+    //     // assert.ok(c.thumbUrl)
+    //     assert.ok(c.points && c.points.length === 2)
+    //     let start = c.points[0].x
+    //     let end = c.points[1].x
+    //     assert.ok(start >= 0 && end > 0)
+    //     assert.ok(end > start && end <= fr.scale)
+    //     fragmentLen += (end - start)
+    //   }
+    // }
   }
 
   let nodeInput = {}
-  nodeInput.layout = node.layout
+  nodeInput.layout = node.layout || 'PIP'
   nodeInput.name = node.name
-  nodeInput.categories = node.categories
+  nodeInput.category = node.category || 'FUN'
   nodeInput.spheres = node.spheres.map(s => {
     return { name: s.name }
   })
-  nodeInput.fragments = node.fragments.map(f => {
-    return {
-      oid: f.content.oid,
-      name: f.name,
-      thumbUrl: f.thumbUrl,
-      scale: f.scale,
-      cuts: f.cuts.map(c => {
-        return {
-          name: c.name,
-          color: c.color,
-          thumbUrl: c.thumbUrl,
-          points: c.points.map(p => {
-            return {
-              x: p.x,
-              y: p.y,
-              z: p.z
-            }
-          }),
-          style: c.style
-        }
+  nodeInput.compositions = []
+  node.compositions.map(c => {
+    if (c !== null) {
+      nodeInput.compositions.push({
+        spheres: [],
+        operation: c.operation,
+        layers: c.layers.map(l => {
+          return {
+            contentOid: l.content.oid,
+            spheres: [],
+            figuresAbsolute: l.figuresAbsolute.map(f => {
+              return {
+                t: f.t,
+                points: f.points.map(p => {
+                  return {
+                    x: p.x,
+                    y: p.y,
+                    z: p.z
+                  }
+                })
+              }
+            })
+          }
+        })
       })
     }
   })
@@ -163,7 +168,9 @@ export const nodeCreate = async (context, node) => {
   let { data: { nodeCreate } } = await apollo.clients.api.mutate({
     mutation: gql`
       mutation sw_network_only_nodeCreate ($node: NodeInput!) {
-        nodeCreate (node: $node)
+        nodeCreate (node: $node) {
+          oid
+        }
       }
     `,
     variables: {
