@@ -9,6 +9,9 @@
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
       source(
         :src="url" type="video/mp4")
+    //- debug
+    div(:style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000}`).row.bg-green
+      span.full-width.text-white player: {{player}}
     //- progress
     div(
       v-if="true"
@@ -76,12 +79,15 @@ export default {
         // this.$log('now CHANGED', to)
         if (this.start) {
           if (to < this.start) {
+            this.$log('now < start')
             this.player.setCurrentTime(this.start)
             this.player.play()
           }
-          if (to > this.end) {
+          else if (to >= this.end) {
+            this.$log('now > end')
             this.player.setCurrentTime(this.start)
-            this.$emit('ended')
+            // this.$emit('ended')
+            this.videoEnded()
           }
         }
       }
@@ -131,15 +137,18 @@ export default {
       this.$set(this.player, 'now', this.$refs.kalpaVideo.currentTime)
       this.now = this.$refs.kalpaVideo.currentTime
     },
-    videoEnded (e) {
-      this.$log('videoEnded', e)
+    videoEnded () {
+      this.$log('videoEnded')
+      // this.player.pause()
       this.$emit('ended')
     },
     async videoClick (e) {
-      this.$log('videoClick', e)
+      this.$log('videoClick')
       // this.$q.notify('Video click!')
-      if (this.player.playing) this.$refs.kalpaVideo.pause()
-      else this.$refs.kalpaVideo.play()
+      if (this.player.playing) this.player.pause()
+      else this.player.play()
+      // if (this.player.playing) this.$refs.kalpaVideo.pause()
+      // else this.$refs.kalpaVideo.play()
     },
     playerInit () {
       if (this.source === 'KALPA') {
@@ -151,9 +160,11 @@ export default {
           this.$refs.kalpaVideo.currentTime = ms
         }
         this.player.play = () => {
+          this.$log('PLAYER play()')
           this.$refs.kalpaVideo.play()
         }
         this.player.pause = () => {
+          this.$log('PLAYER pause()')
           this.$refs.kalpaVideo.pause()
         }
       } else {
