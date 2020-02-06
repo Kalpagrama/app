@@ -211,21 +211,15 @@ const eventFragment = gql`
       message
     }
     ... on EventWS{
-      object{
-        wsVersion
-        createdAt
-        updatedAt
-        spheres{...objectShortFragment}
-        object {
-          oid
-          type
-          name
-          thumbUrl(preferWidth: 600)
-          ...on Video {...videoFragment}
-          ...on Image {...imageFragment}
-          ...on Node {...nodeFragment}
-          ...on Sphere {...sphereFragment}
-        }
+      object {
+        oid
+        type
+        name
+        thumbUrl(preferWidth: 600)
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
+        ...on Node {...nodeFragment}
+        ...on Sphere {...sphereFragment}
       }
     }
     ... on EventChange{

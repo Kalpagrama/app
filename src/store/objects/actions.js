@@ -173,6 +173,7 @@ export const init = async (context) => {
 //   return await promise
 // }
 
+// todo формировать очередь запросов (запрашивать пачкой)
 export const get = async (context, { oid, fragmentName, priority, }) => {
   logD('objects/get action start', oid)
   const fetchItemFunc = async () => {
@@ -187,10 +188,10 @@ export const get = async (context, { oid, fragmentName, priority, }) => {
       `,
       variables: { oid }
     })
-    assert(context.rootState.userOid)
+    assert(context.rootState.auth.userOid)
     return {
       item: objectFull,
-      actualAge: context.rootState.userOid === oid ? 'day' : 'hour'
+      actualAge: context.rootState.auth.userOid === oid ? 'day' : 'hour'
     }
   }
   let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })

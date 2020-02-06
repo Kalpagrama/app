@@ -58,12 +58,12 @@ class Cache {
         return JSON.stringify(n).length + key.length
       },
       maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
-      dispose: async (key, { actualUntil }) => {
-        if (key === this.context.rootState.auth.userOid){ // кладем обратно! юзера нельзя удалять
+      dispose: async (key, actualUntil) => {
+        if (key === this.context.rootState.auth.userOid) { // кладем обратно! юзера нельзя удалять
           setTimeout(() => {
             let item = this.context.state.cachedItems[key] // данные лежат во vuex
             assert(item)
-            this.cacheLru.set(key, { actualUntil })
+            this.cacheLru.set(key, actualUntil)
           }, 0)
         } else { // удалить объект из indexed db и vuex
           await this.cachePersist.remove(key)
@@ -78,25 +78,34 @@ class Cache {
     for (let key of await this.cachePersist.keys()) {
       let { item, actualUntil } = await this.cachePersist.getItem(key)
       assert(item && actualUntil)
-      this.cacheLru.set(key, { actualUntil })
+      this.cacheLru.set(key, actualUntil)
       this.context.commit('setItem', { key, item })
     }
   }
 
   // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
   async set (key, item, actualAge) {
-    if (actualAge === 'zero') actualAge = 0
-    else if (actualAge === 'minute') actualAge = 1000 * 60
-    else if (actualAge === 'hour') actualAge = 1000 * 60 * 60
-    else if (actualAge === 'day') actualAge = 1000 * 60 * 60 * 24
-    else if (actualAge === 'week') actualAge = 1000 * 60 * 60 * 24 * 7
-    else if (actualAge === 'month') actualAge = 1000 * 60 * 60 * 24 * 30
-    else if (actualAge === 'year') actualAge = 1000 * 60 * 60 * 24 * 360
-    else assert(!actualAge || Number.isInteger(actualAge))
+    if (actualAge === 'zero') {
+      actualAge = 0
+    } else if (actualAge === 'minute') {
+      actualAge = 1000 * 60
+    } else if (actualAge === 'hour') {
+      actualAge = 1000 * 60 * 60
+    } else if (actualAge === 'day') {
+      actualAge = 1000 * 60 * 60 * 24
+    } else if (actualAge === 'week') {
+      actualAge = 1000 * 60 * 60 * 24 * 7
+    } else if (actualAge === 'month') {
+      actualAge = 1000 * 60 * 60 * 24 * 30
+    } else if (actualAge === 'year') {
+      actualAge = 1000 * 60 * 60 * 24 * 360
+    } else {
+      assert(!actualAge || Number.isInteger(actualAge))
+    }
 
     actualAge = actualAge || this.defaultActualAge
     let actualUntil = Date.now() + actualAge
-    this.cacheLru.set(key, { actualUntil })
+    this.cacheLru.set(key, actualUntil)
     await this.cachePersist.setItem(key, { item, actualUntil })
     this.context.commit('setItem', { key, item })
   }
@@ -104,11 +113,12 @@ class Cache {
   // recieveItemFunc - ф-я которая запросит сущность с бэкенда
   async get (key, fetchItemFunc) {
     assert(key && fetchItemFunc)
-    let { actualUntil } = this.cacheLru.get(key)
+    let actualUntil = this.cacheLru.get(key)
     if (!actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
       logD('данные отсутствуют в кэше, либо устарели!')
       try {
         let { item, actualAge } = await fetchItemFunc()
+        // logD('данные извлечены!')
         assert(item && actualAge)
         await this.set(key, item, actualAge)
         logD('данные в кэше обновлены!')
@@ -137,5 +147,6 @@ export const init = async (context) => {
 
 export const get = async (context, { key, fetchItemFunc }) => {
   assert(context.state.initialized)
+  assert(typeof key === 'string')
   return await cache.get(key, fetchItemFunc)
 }

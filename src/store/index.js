@@ -52,6 +52,7 @@ export default function (/* { ssrContext } */) {
         await context.dispatch('lists/init')
         await context.dispatch('content/init')
         let user = context.state.cache.cachedItems[context.state.auth.userOid]
+        logD('user', user)
         assert(user)
         await i18next.changeLanguage(user.profile.lang)
         // let val = 0.001
