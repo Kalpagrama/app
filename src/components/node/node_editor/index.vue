@@ -147,7 +147,7 @@ export default {
       handler (to, from) {
         this.$log('node CHANGED', to)
         if (to) {
-          // this.nodeSave(to)
+          this.nodeSave(to)
         }
       }
     }

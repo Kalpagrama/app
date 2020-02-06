@@ -5,7 +5,7 @@ q-layout(view="hHh lpR fFf")
   ).row.full-width.window-height.bg-black
     ws-items(
       ctx="workspace"
-      :oid="node ? node.oid : false"
+      :oid="node ? node.oid : false" :page="page"
       @page="$router.push({params: {page: $event}})" @item="itemClick").bg-grey-9
     .col.full-height.bg-grey-10
       //- note-editor
@@ -47,8 +47,8 @@ export default {
   computed: {
   },
   watch: {
-    immediate: true,
     '$route.params.page': {
+      immediate: true,
       handler (to, from) {
         this.$log('$route.params.page CHANGED', to)
         if (to) this.page = to
