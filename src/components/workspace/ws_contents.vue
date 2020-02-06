@@ -59,7 +59,7 @@ export default {
     },
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
-      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFullFragment', priority: 0 })
+      let content = await this.$store.dispatch('objects/get', { oid, priority: 0 })
       this.$log('contentLoad done', content)
       return content
     },
@@ -67,7 +67,8 @@ export default {
       this.$log('contentsLoad start')
       let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^CONTENT-.{11}=$', types: ['NODE']}})
       this.$log('contentsLoad done', items)
-      return items.map(i => i.object)
+      // return items.map(i => i.object)
+      return items
     },
     async contentsReload () {
       this.$log('contentsReload')

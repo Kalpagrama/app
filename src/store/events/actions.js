@@ -25,9 +25,9 @@ export const init = async (context) => {
   })
 
   observerEvent.subscribe({
-    next: ({ data: { event } }) => {
+    next: async ({ data: { event } }) => {
       logD(`EVENT received ${event.type}`, event)
-      processEvent(context, event)
+      await processEvent(context, event)
     },
     error: (error) => {
       logE('EVENT error', error)
@@ -50,7 +50,7 @@ export const testWebPush = async (context) => {
   return testWebPush
 }
 
-function processEvent (context, event) {
+async function processEvent (context, event) {
   logD('processEvent start', event)
   switch (event.type) {
     case 'ERROR':
@@ -66,8 +66,8 @@ function processEvent (context, event) {
       context.commit('stateSet', ['notice', event])
       break
     case 'OBJECT_CHANGED':
-      context.commit('objects/update', {
-        oid: event.object.oid,
+      await context.dispatch('cache/update', {
+        key: event.object.oid,
         path: event.path,
         newValue: event.value
       }, { root: true })
@@ -85,8 +85,8 @@ function processEvent (context, event) {
         notifyUserActionComplete(event.type, event.object)
       }
       context.commit('stateSet', ['nodeRated', event])
-      context.commit('objects/update', {
-        oid: event.object.oid,
+      await context.dispatch('cache/update', {
+        key: event.object.oid,
         path: 'rate',
         newValue: event.rate
       }, { root: true })
@@ -101,8 +101,8 @@ function processEvent (context, event) {
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userSubscribed', event])
       if (event.subject.oid === context.rootState.auth.userOid) { // если это мы подписались
-        context.commit('objects/update', {
-          oid: event.subject.oid,
+        await context.dispatch('cache/update', {
+          key: event.subject.oid,
           path: 'subscriptions',
           setter: (oldValue) => {
             let subscriptions = oldValue
@@ -113,8 +113,8 @@ function processEvent (context, event) {
           }
         }, { root: true })
         // на кого я подписан...
-        context.commit('objects/update', {
-          oid: event.object.oid,
+        await context.dispatch('cache/update', {
+          key: event.object.oid,
           path: 'subscribers',
           setter: (oldValue) => {
             let subscribers = oldValue
@@ -131,8 +131,8 @@ function processEvent (context, event) {
       notifyUserActionComplete(event.type, event.object)
       context.commit('stateSet', ['userUnSubscribed', event])
       if (event.subject.oid === context.rootState.auth.userOid) {
-        context.commit('objects/update', {
-          oid: event.subject.oid,
+        await context.dispatch('cache/update', {
+          key: event.subject.oid,
           path: 'subscriptions',
           setter: (oldValue) => {
             let subscriptions = oldValue
@@ -143,8 +143,8 @@ function processEvent (context, event) {
           }
         }, { root: true })
         // на кого я подписан...
-        context.commit('objects/update', {
-          oid: event.object.oid,
+        await context.dispatch('cache/update', {
+          key: event.object.oid,
           path: 'subscribers',
           setter: (oldValue) => {
             let subscribers = oldValue
@@ -164,7 +164,7 @@ function processEvent (context, event) {
       event.object = event.objectFull
       notifyUserActionComplete(event.type, event.object)
       logD('try processEventWs')
-      processEventWs(context, event)
+      await processEventWs(context, event)
       break
     default:
       throw new Error(`unsupported Event ${event.type}`)
@@ -172,27 +172,54 @@ function processEvent (context, event) {
   logD('processEvent done')
 }
 
-function processEventWs (context, event) {
+async function processEventWs (context, event) {
   let type = event.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
   let object = event.object
   let objectType = object.__typename
-  let operationName
-  switch (type) {
-    case 'WS_ITEM_CREATED':
-      operationName = 'Create'
-      break
-    case 'WS_ITEM_UPDATED':
-      operationName = 'Update'
-      break
-    case 'WS_ITEM_DELETED':
-      operationName = 'Delete'
-      break
-    default:
-      throw new Error(`bad type ${type}`)
+  await context.dispatch('cache/update', {
+    key: event.object.oid,
+    fullItem: object
+  }, { root: true })
+  // todo найти все ленты с мастерской. В какие из них добавлять???? видимо в те, где pageToken === null
+  for (let key in context.rootState.cache.cachedItems) {
+    let keyPattern = 'wsItems: '
+    if (key.startsWith(keyPattern)) {
+      let { pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
+      assert(pagination)
+      if (type === 'WS_ITEM_CREATED') { // добавляем object в начальные запросы
+        if (!pagination.pageToken) { // pageToken === null при начальном запросе.
+          await context.dispatch('cache/update', {
+            key: key,
+            path: '',
+            actualAge: 'zero', // обновить при следующем запросе
+            setter: ({ items, count, totalCount, nextPageToken }) => {
+              assert(items && count >= 0 && totalCount >= 0)
+              items.unshift(object)
+              count++
+              totalCount++
+              return { items, count, totalCount, nextPageToken }
+            }
+          }, { root: true })
+        }
+      } else if (type === 'WS_ITEM_DELETED') { // удаляем из всех лент object
+        await context.dispatch('cache/update', {
+          key: key,
+          path: '',
+          actualAge: 'zero', // обновить при следующем запросе
+          setter: ({ items, count, totalCount, nextPageToken }) => {
+            assert(items && count >= 0 && totalCount >= 0)
+            let indx = items.findIndex(item => item.oid === object.oid)
+            if (indx >= 0) {
+              items.splice(indx, 1)
+              count--
+              totalCount--
+            }
+            return { items, count, totalCount, nextPageToken }
+          }
+        }, { root: true })
+      }
+    }
   }
-  logD(operationName, objectType)
-  // todo что делать с этими эвентами?
-  // context.commit(`workspace/ws${objectType}${operationName}`, { object, context }, { root: true })
 }
 
 // вывести уведомление о действии пользователя

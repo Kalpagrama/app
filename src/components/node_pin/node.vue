@@ -87,7 +87,7 @@ export default {
       this.$logD('nodeLoad start2', this.index, oid)
       let node = null
       try {
-        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
+        node = await this.$store.dispatch('objects/get', { oid, priority: 0 })
       } catch (err){
         // this.$logD('nodeLoad error', err, this.index, this.node.oid)
         this.logE('node', 'nodeLoad error', err)

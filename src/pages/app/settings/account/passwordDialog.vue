@@ -81,7 +81,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.password',
-          value: this.newPas
+          newValue: this.newPas
         })
         this.$log('changePassword done', res)
         this.$q.notify({message: 'Changed password', color: 'green', textColor: 'white'})

@@ -223,7 +223,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.about',
-            value: this.about
+            newValue: this.about
           })
           this.$log('changeAbout done', res)
         } catch (e) {
@@ -238,7 +238,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.status',
-            value: this.status
+            newValue: this.status
           })
           this.$log('changeStatus done', res)
         } catch (e) {
@@ -276,7 +276,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.thumbUrl',
-          value: file
+          newValue: file
         })
       } catch (e) {
         this.$log('changePhoto ERROR', e)
@@ -329,7 +329,7 @@ export default {
     },
     async userLoad (oid) {
       this.$logD('userLoad start')
-      let user = await this.$store.dispatch('objects/get', { oid, fragmentName: 'userFragment', priority: 0 })
+      let user = await this.$store.dispatch('objects/get', { oid, priority: 0 })
       this.$logD('userLoad done', user)
       return user
     },

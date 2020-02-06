@@ -283,16 +283,6 @@ const objectFullFragment = gql`
     ...on User {... userFragment}
   }
 `
-const wsItemFragment = gql`
-  ${objectFullFragment} ${objectShortFragment}
-  fragment wsItemFragment on WSItem{
-    createdAt
-    updatedAt
-    wsVersion
-    spheres{...objectShortFragment}
-    object{...objectFullFragment}
-  }
-`
 
 const fragments = {
   eventFragment,
@@ -301,8 +291,7 @@ const fragments = {
   objectShortFragment,
   objectShortWithMetaFragment,
   nodeFragment,
-  sphereFragment,
-  wsItemFragment
+  sphereFragment
 }
 
 export {

@@ -121,7 +121,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.dateBirth',
-            value: this.date
+            newValue: this.date
           })
           this.$log('changeDate done', res)
         } catch (e) {
@@ -136,7 +136,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.city',
-            value: this.city
+            newValue: this.city
           })
           this.$log('changeCity done', res)
         } catch (e) {
@@ -155,7 +155,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.lang',
-            value: this.lang
+            newValue: this.lang
           })
           this.$log('changeLanguage done', res)
           this.$q.notify({message: 'Changed Language', color: 'green', textColor: 'white'})
@@ -172,7 +172,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.country',
-            value: this.country
+            newValue: this.country
           })
           this.$log('changeCountry done', res)
           this.$q.notify({message: 'Changed Country', color: 'green', textColor: 'white'})
@@ -189,7 +189,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.gender',
-            value: this.gender
+            newValue: this.gender
           })
           this.$log('changeGender done', res)
           this.$q.notify({message: 'Changed Gender', color: 'green', textColor: 'white'})
@@ -206,7 +206,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.nameFirst',
-            value: this.nameFirst
+            newValue: this.nameFirst
           })
           this.$log('changeNameFirst done', res)
           this.$q.notify({message: 'Changed First name', color: 'green', textColor: 'white'})
@@ -223,7 +223,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.nameSecond',
-            value: this.nameSecond
+            newValue: this.nameSecond
           })
           this.$log('changeNameSecond done', res)
           this.$q.notify({message: 'Changed Second name', color: 'green', textColor: 'white'})

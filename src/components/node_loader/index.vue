@@ -78,7 +78,7 @@ export default {
     // возможно это ядро скоро понадобятся
     prefetch(oid){
       this.$logD('prefetch', oid)
-      this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 1 })
+      this.$store.dispatch('objects/get', { oid, priority: 1 })
         .catch(err => {
           this.$logD('prefetch error', err)
         })

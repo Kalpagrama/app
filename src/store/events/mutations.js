@@ -17,8 +17,8 @@ export function stateSet(state, [key, val]) {
 export function addEvent(state, {event, context: { rootState, commit }}) {
   logD('addEvent', event)
   logE('not implemented!')
-  // commit('objects/update', {
-  //   oid: rootState.auth.userOid,
+  // commit('cache/updateItem', {
+  //   key: rootState.auth.userOid,
   //   path: 'events',
   //   setter: (oldValue) => {
   //     let events = oldValue

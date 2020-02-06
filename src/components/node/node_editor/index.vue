@@ -124,7 +124,8 @@ export default {
         this.$log('res', res)
         this.nodeSaving = false
         this.nodeSavingError = null
-        this.node = res.object
+        // this.node = res.object
+        this.node = res
         this.$log('nodeSave done')
       } catch (e) {
         this.$log('nodeSave error', e)

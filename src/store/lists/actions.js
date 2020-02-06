@@ -53,45 +53,12 @@ export const events = async (context, { pagination }) => {
   return { items, count, totalCount, nextPageToken }
 }
 
-// вернет список из кэша, либо null(тогда надо брать из сети)
-function getCachedList (context, { pagination, filter, sortStrategy }) {
-  let key = JSON.stringify(filter) + JSON.stringify(sortStrategy)
-  let { items, count, totalCount, nextPageToken } = context.state.wsItems[key]
-  assert(items.length === count && totalCount >= count)
-  if (items) {
-    assert(Array.isArray(items))
-    let firstIndx = 0
-    if (pagination && pagination.pageToken && pagination.pageToken.lastOid) {
-      assert(pagination.pageToken.direction === 'forward', 'non forward directions not implemented!')
-      firstIndx = Math.max(0, items.findIndex(item => {
-        let oid = item.oid || item.object.oid
-        return oid === pagination.pageToken.lastOid
-      }))
-    }
-    let resultItems = items.slice(firstIndx, pagination.pageSize)
-    if (resultItems.length < pagination.pageSize && totalCount > count) {
-      return null // в кэше данных недостаточно. запросить с сервера
-    }
-    let resultNextPageToken = { ...nextPageToken }
-    if (resultItems.length) {
-      let lastItem = resultItems[resultItems.length - 1]
-      resultNextPageToken.lastOid = lastItem.oid || lastItem.object.oid
-    }
-    // let nextPageToken = {lastOid: 0, direction: 'forward'}
-    return { items: resultItems, count: resultItems.length, totalCount, nextPageToken: resultNextPageToken }
-  }
-}
-
-function setCachedList (context, { pagination, filter, sortStrategy }) {
-
-}
-
 export const wsItems = async (context, { pagination, filter, sortStrategy }) => {
   logD('wsItems start')
   const fetchItemFunc = async () => {
     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
-        ${fragments.objectFullFragment} ${fragments.objectShortFragment}
+        ${fragments.objectShortFragment}
         query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
           wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
             totalCount
@@ -108,10 +75,15 @@ export const wsItems = async (context, { pagination, filter, sortStrategy }) => 
       actualAge: 'hour'
     }
   }
-
-  logD('wsItems complete')
   let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
     { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc }, { root: true })
+  logD('wsItems recieved', { items, count, totalCount, nextPageToken })
+  for (let i = 0; i < items.length; i++){
+    assert(items[i].oid)
+    let itemFull = await context.dispatch('objects/get', {oid: items[i].oid, fromWs: true})
+    items[i] = itemFull
+  }
+  logD('wsItems complete')
   return { items, count, totalCount, nextPageToken }
 }
 

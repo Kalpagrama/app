@@ -3346,7 +3346,7 @@
                 "defaultValue": null
               },
               {
-                "name": "value",
+                "name": "newValue",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",

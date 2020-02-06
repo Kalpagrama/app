@@ -21,6 +21,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 
 Vue.use(Vuex)
 
+// todo action currentUser instead of mutation!!!!
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
@@ -55,20 +56,6 @@ export default function (/* { ssrContext } */) {
         logD('user', user)
         assert(user)
         await i18next.changeLanguage(user.profile.lang)
-        // let val = 0.001
-        // setTimeout(() => {
-        //   setInterval(() => {
-        //     val = val + 0.0001
-        //     if (val >= 1) return
-        //     context.commit('objects/update', {
-        //       oid: 'An6e9mWDIH0=',
-        //       path: 'rate',
-        //       newValue: val
-        //     }, { root: true })
-        //   }, 10)
-        // }, 2000)
-        // let xxx = await context.dispatch('lists/wsItems',
-        //   { pagination: { pageSize: 30 }, sortStrategy: null, filter: { types: ['NODE', 'COMPOSITION', 'VIDEO'] } })
         logD('vuex init done!')
         return true
       }

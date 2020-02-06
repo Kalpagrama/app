@@ -53,7 +53,7 @@ export default {
     },
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
-      let content = await this.$store.dispatch('objects/get', { oid, fragmentName: 'objectFullFragment', priority: 0 })
+      let content = await this.$store.dispatch('objects/get', { oid, priority: 0 })
       this.$log('contentLoad done', content)
       return content
     }

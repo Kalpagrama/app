@@ -70,7 +70,8 @@ export default {
         }
         let res = await this.$store.dispatch('workspace/wsNodeSave', node)
         this.$log('res', res)
-        this.node = res.object
+        // this.node = res.object
+        this.node = res
       } else {
         this.node = items[0].object
       }
@@ -83,7 +84,8 @@ export default {
         this.$log('res', res)
         this.nodeSaving = false
         this.nodeSavingError = null
-        this.node = res.object
+        // this.node = res.object
+        this.node = res
         this.$log('nodeSave done')
       } catch (e) {
         this.$log('nodeSave error', e)

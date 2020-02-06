@@ -97,7 +97,7 @@ export default {
     },
     async nodeLoad (oid) {
       this.$log('nodeLoad start1', oid)
-      let node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
+      let node = await this.$store.dispatch('objects/get', { oid, priority: 0 })
       // this.$log('nodeLoad start1 complete', node)
       return node
     },

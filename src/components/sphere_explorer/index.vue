@@ -87,7 +87,7 @@ export default {
     },
     async sphereLoad (oid) {
       this.$log('sphereLoad start', oid)
-      let sphere = await this.$store.dispatch('objects/get', { oid, fragmentName: 'sphereFragment', priority: 0 })
+      let sphere = await this.$store.dispatch('objects/get', { oid, priority: 0 })
       this.$log('sphereLoad done', sphere)
       return sphere
     },

@@ -374,7 +374,7 @@ export default {
       this.$log(`nodePreLoad start indx=${this.index} oid=${oid}`)
       let node = null
       try {
-        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 1 })
+        node = await this.$store.dispatch('objects/get', { oid, priority: 1 })
       } catch (err) {
         // приоритет 1 - не гарантирует что ядро будет загружено. Запрос может быть отвергнут.
         if (err !== 'queued object was evicted legally'){
@@ -392,7 +392,7 @@ export default {
       this.$log(` nodeLoad start indx=${this.index}  oid=${oid}`)
       let node = null
       try {
-        node = await this.$store.dispatch('objects/get', { oid, fragmentName: 'nodeFragment', priority: 0 })
+        node = await this.$store.dispatch('objects/get', { oid, priority: 0 })
         this.nodeFullError = null
       } catch (err) {
         // this.$logE('nodeLoad error', err)

@@ -168,7 +168,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.thumbUrl',
-          value: file
+          newValue: file
         })
       } catch (e) {
         this.$log('changePhoto ERROR', e)
@@ -221,7 +221,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.nameFirst',
-          value: this.nameFirst
+          newValue: this.nameFirst
         })
         this.$log('changeNameFirst done', res)
       } catch (e) {
@@ -235,7 +235,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.nameSecond',
-          value: this.nameSecond
+          newValue: this.nameSecond
         })
         this.$log('changeNameSecond done', res)
       } catch (e) {
@@ -254,7 +254,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.lang',
-          value: this.lang
+          newValue: this.lang
         })
         this.$log('changeLanguage done', res)
       } catch (e) {
@@ -276,7 +276,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.tutorial',
-          value: false
+          newValue: false
         })
         await this.catAdd()
         this.$emit('hide')

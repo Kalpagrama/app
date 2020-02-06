@@ -27,34 +27,14 @@ export const wsClear = async (context) => {
   return wsClear
 }
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
-export const wsSphereCreate = async (context, sphere) => {
-  logD('wsSphereCreate start', sphere)
-  let { data: { wsSphereCreate } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      ${fragments.wsItemFragment}
-      mutation sw_network_only_wsSphereCreate ($sphere: ObjectShortInput!) {
-        wsSphereCreate (sphere: $sphere) {
-          ...wsItemFragment
-        }
-      }
-    `,
-    variables: {
-      sphere
-    }
-  })
-  // context.commit('wsSphereCreate', wsSphereCreate)
-  logD('wsSphereCreate done', wsSphereCreate)
-  return wsSphereCreate
-}
-
 export const wsItemAdd = async (context, oid) => {
   logD('wsItemAdd start', oid)
   let { data: { wsItemAdd: wsItem } } = await apollo.clients.api.mutate({
     mutation: gql`
-      ${fragments.wsItemFragment}
+      ${fragments.objectFullFragment}
       mutation sw_network_only_wsItemAdd ($oid: OID!) {
         wsItemAdd (oid: $oid) {
-          ...wsItemFragment
+          ...objectFullFragment
         }
       }
     `,
@@ -66,41 +46,6 @@ export const wsItemAdd = async (context, oid) => {
   logD('wsItemAdd done', wsItem)
   return wsItem
 }
-export const wsContentCreate = async (context, {type, url, spheres}) => {
-  logD('wsContentCreate start', url)
-  let { data: { wsContentCreate } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      ${fragments.wsItemFragment}
-      mutation sw_network_only_wsContentCreate ($type: ObjectTypeEnum, $url: String, $spheres: [ObjectShortInput!]!) {
-        wsContentCreate (content: {type: $type, url: $url, spheres: $spheres}) {
-          ...wsItemFragment
-        }
-      }
-    `,
-    variables: {
-      type, url, spheres
-    }
-  })
-  logD('wsContentCreate done', wsContentCreate)
-  return wsContentCreate
-}
-
-export const wsCompositionCreate = async (context, input) => {
-  logD('wsCompositionCreate start', input)
-  let { data: {wsCompositionCreate } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      ${fragments.wsItemFragment}
-      mutation sw_network_only_wsCompositionCreate ($composition: CompositionInput!) {
-        wsCompositionCreate(composition: $composition) {
-          ...wsItemFragment
-        }
-      }
-    `
-  })
-  logD('wsCompositionCreate done', wsCompositionCreate)
-  return wsCompositionCreate
-}
-
 export const wsNodeSave = async (context, node) => {
   logD('wsNodeSave start', node)
 
@@ -152,10 +97,10 @@ export const wsNodeSave = async (context, node) => {
   if (node.oid) {
     let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
       mutation: gql`
-        ${fragments.wsItemFragment}
+        ${fragments.objectFullFragment}
         mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!) {
           wsNodeUpdate (oid: $oid, node: $node) {
-            ...wsItemFragment
+            ...objectFullFragment
           }
         }
       `,
@@ -167,10 +112,10 @@ export const wsNodeSave = async (context, node) => {
   } else {
     let { data: { wsNodeCreate } } = await apollo.clients.api.mutate({
       mutation: gql`
-        ${fragments.wsItemFragment}
+        ${fragments.objectFullFragment}
         mutation sw_network_only_wsNodeCreate ($node: NodeInput!) {
           wsNodeCreate (node: $node) {
-            ...wsItemFragment
+            ...objectFullFragment
           }
         }
       `,

@@ -54,7 +54,8 @@ export default {
       this.$log('nodesLoad start')
       let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^(?!^CONTENT-.{11}=$|^SPHERE$)', types: ['NODE']}})
       this.$log('nodesLoad done', items)
-      return items.map(i => i.object)
+      // return items.map(i => i.object)
+      return items
     },
     async nodesReload () {
       this.$log('nodesReload')
