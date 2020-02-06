@@ -40,13 +40,18 @@
     .col.full-width
     //- category, spheres
     div(:style=`{minHeight: '60px'}`).row.full-width.items-start
-      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
+      div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
         span.text-bold.text-green Category & spheres
-      .row.full-width.q-px-md
-        span.text-green spheres
+      .row.full-width
+        span(
+          v-if="node"
+          v-for="(s,si) in node.spheres" :key="si"
+          :class=`{}`
+          :style=`{borderRadius: '10px'}`
+        ).text-green.q-pa-sm.bg-grey-10.q-mb-sm.q-mr-sm {{ s.name }}
     //- footer: save, publish
     div(:style=`{height: '60px'}`
-      ).row.full-width.items-center.q-px-md
+      ).row.full-width.items-center.q-px-sm
       q-btn(
         outline color="green" no-caps :loading="saving" @click="save()"
         :style=`{borderRadius: '10px'}`)
@@ -94,7 +99,7 @@ export default {
       handler (to, from) {
         this.$log('value CHANGED', to)
         if (to) {
-          this.node = to.object
+          this.node = to
         } else {
           this.node = this.nodeNew
         }

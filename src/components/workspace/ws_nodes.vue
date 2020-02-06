@@ -17,9 +17,15 @@
       .row.full-width.items-start.content-start.q-px-md
         div(
           v-for="(n,ni) in nodesFiltered" :key="ni" @click="nodeClick(n, ni)"
+          :class=`{'bg-grey-10': n.oid !== oid, 'bg-white': n.oid === oid}`
           :style=`{height: '60px', borderRadius: '10px'}`
-          ).row.full-width.items-center.bg-grey-10.q-px-sm.q-mb-sm
-          span.text-white {{ n.object.name }}
+          ).row.full-width.items-center.cursor-pointer.q-px-sm.q-mb-sm
+          span(
+            :class=`{
+              'text-white': n.oid !== oid,
+              'text-green': n.oid === oid,
+              'text-bold': n.oid === oid}`
+          ) {{ n.name }}
 </template>
 
 <script>
@@ -46,9 +52,9 @@ export default {
     },
     async nodesLoad () {
       this.$log('nodesLoad start')
-      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^(?!^CONTENT-.{11}=$)', types: ['NODE']}})
+      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^(?!^CONTENT-.{11}=$|^SPHERE$)', types: ['NODE']}})
       this.$log('nodesLoad done', items)
-      return items
+      return items.map(i => i.object)
     },
     async nodesReload () {
       this.$log('nodesReload')
