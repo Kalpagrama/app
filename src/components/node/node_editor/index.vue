@@ -40,7 +40,7 @@
       div(
         :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.bg-grey-9
-        composition(v-if="node.compositions[0]" :composition="node.compositions[0]")
+        composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :visible="compositionVisible[0]")
         //- composition actions
         div(
           v-if="!node.compositions[0]"
@@ -61,7 +61,7 @@
       div(
         :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.bg-grey-9
-        composition(v-if="node.compositions[1]" :composition="node.compositions[1]")
+        composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :visible="compositionVisible[1]")
         //- composition actions
         div(
           v-if="!node.compositions[1]"
@@ -125,7 +125,8 @@ export default {
       },
       compositionEditorOpened: false,
       compositionFinderOpened: false,
-      compositionIndex: undefined
+      compositionIndex: undefined,
+      compositionVisible: [true, true]
     }
   },
   watch: {
@@ -172,15 +173,18 @@ export default {
     compositionFind (index) {
       this.$log('compositionFind', index)
       this.compositionIndex = index
+      this.compositionVisible[index] = false
       this.compositionFinderOpened = true
     },
     compositionEdit (index) {
       this.$log('compositionEdit', index)
       this.compositionIndex = index
+      this.compositionVisible[index] = false
       this.compositionEditorOpened = true
     },
     compositionDelete (index) {
       this.$log('compositionDelete', index)
+      this.compositionVisible[index] = false
       this.$delete(this.node.compositions, index)
     },
     async nodeSave (node) {

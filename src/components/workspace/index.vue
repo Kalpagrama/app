@@ -6,7 +6,7 @@ q-layout(view="hHh lpR fFf")
     ws-items(
       ctx="workspace"
       :oid="node ? node.oid : false"
-      @page="page = $event" @item="itemClick").bg-grey-9
+      @page="$router.push({params: {page: $event}})" @item="itemClick").bg-grey-9
     .col.full-height.bg-grey-10
       //- note-editor
       composition-editor(
@@ -47,9 +47,11 @@ export default {
   computed: {
   },
   watch: {
-    page: {
+    immediate: true,
+    '$route.params.page': {
       handler (to, from) {
-        this.$log('page CHANGED', to)
+        this.$log('$route.params.page CHANGED', to)
+        if (to) this.page = to
         if (to !== from) this.node = null
       }
     }

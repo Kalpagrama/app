@@ -52,6 +52,7 @@ module.exports = function (ctx) {
         // 'QItem',
         // 'QAvatar',
         // 'QVideo',
+        'QResizeObserver',
         'QInput',
         'QDialog'
       ],

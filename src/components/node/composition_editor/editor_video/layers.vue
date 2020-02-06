@@ -40,7 +40,7 @@
           //- span EXPORT, delete, use, fuck me
           div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.justify-end
             q-btn(round flat color="red" icon="delete" @click="layerDelete(li)").q-mr-sm
-            q-btn(push dense no-caps color="green" @click="layerExport(l, li)") Export me
+            q-btn(dense no-caps color="green" @click="layerExport(l, li)").q-px-sm Export
 </template>
 
 <script>

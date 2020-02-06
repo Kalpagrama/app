@@ -30,15 +30,15 @@ div(
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
-        q-btn(round :flat="page !== 'spheres'" color="green" icon="style" @click="page = 'spheres'")
+        q-btn(round :flat="page !== 'spheres'" color="green" icon="style" @click="$router.push({params: {page: 'spheres'}})")
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
-        q-btn(round :flat="page !== 'settings'" color="green" icon="settings" @click="page = 'settings'")
+        q-btn(round :flat="page !== 'settings'" color="green" icon="settings" @click="$router.push({params: {page: 'settings'}})")
     //- pages
     div(v-show="width > 390").row.full-width.q-pa-sm
       span(
-        v-for="(p,pi) in pagesFiltered" :key="p.id" @click="page = p.id"
+        v-for="(p,pi) in pagesFiltered" :key="p.id" @click="$router.push({params: {page: p.id}})"
         :style=`{
           borderRadius: '10px',
           color: page === p.id ? 'white !important' : '#4caf50',
@@ -103,11 +103,10 @@ export default {
     }
   },
   watch: {
-    page: {
+    '$route.params.page': {
       immediate: true,
       handler (to, from) {
-        this.$log('page CHANGED', to)
-        this.$emit('page', to)
+        if (to) this.page = to
       }
     },
     opened: {

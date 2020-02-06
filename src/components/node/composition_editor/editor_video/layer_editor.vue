@@ -1,7 +1,13 @@
 <template lang="pug">
-div(:style=`{position: 'relative', overflow: 'hidden'}`).row.full-width.items-center.content-center
-  q-resize-observer(@resize="width = $event.width")
+div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
+  q-resize-observer(@resize="onResize")
   div(:style=`{position: 'relative'}`).row.full-width
+    //- debug
+    div(
+      v-if="false"
+      :style=`{position: 'absolute', top: '-100', zIndex: 10000}`
+      ).row.full-width.bg-green
+      small.text-white.full-width width: {{width}}
     div(
       ref="framesScrollWrapper"
       :style=`{height: '66px'}`).row.full-width.items-center.scroll
@@ -191,12 +197,16 @@ export default {
         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
       }
     },
+    onResize (e) {
+      this.$log('onResize', e.width)
+      this.width = e.width
+    }
   },
   async mounted () {
     this.$log('mounted')
-    // this.width = this.$el.clientWidth
-    // await this.$wait(1000)
-    // this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
+    this.width = this.$el.clientWidth
+    await this.$wait(1000)
+    this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -10,7 +10,7 @@ const routes = [
       { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('pages/app/trends') },
       { name: 'create', path: 'create', component: () => import('components/node_editor') },
       { name: 'share', path: 'share_target/:page?', component: () => import('layouts/share_layout.vue') },
-      { name: 'workspace', path: 'workspace/:oid?', component: () => import('components/workspace') },
+      { name: 'workspace', path: 'workspace/:page?', component: () => import('components/workspace') },
       { name: 'menu', path: 'menu', component: () => import('pages/app/menu') },
       // rest
       { name: 'invite', path: 'invite', component: () => import('components/k_invite') },

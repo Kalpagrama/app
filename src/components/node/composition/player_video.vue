@@ -3,7 +3,8 @@
   div(:style=`{position: 'relative'}`).row.fit
     video(
       ref="kalpaVideo"
-      playsinline autoplay
+      playsinline :autoplay="false"
+      @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="videoEnded"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
       source(
@@ -57,7 +58,7 @@
 <script>
 export default {
   name: 'playerVideo',
-  props: ['url', 'source', 'start', 'end'],
+  props: ['url', 'source', 'start', 'end', 'visible'],
   data () {
     return {
       now: 0,
@@ -70,17 +71,27 @@ export default {
   },
   watch: {
     now: {
+      immediate: false,
       handler (to, from) {
         // this.$log('now CHANGED', to)
-        // if (this.start) {
-        //   if (to < this.start) {
-        //     this.player.setCurrentTime(this.start)
-        //   }
-        //   if (to > this.end) {
-        //     this.player.setCurrentTime(this.start)
-        //     this.$emit('ended')
-        //   }
-        // }
+        if (this.start) {
+          if (to < this.start) {
+            this.player.setCurrentTime(this.start)
+            this.player.play()
+          }
+          if (to > this.end) {
+            this.player.setCurrentTime(this.start)
+            this.$emit('ended')
+          }
+        }
+      }
+    },
+    visible: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('visible CHANGED', to)
+        if (to) this.videoPlay()
+        else this.videoPause()
       }
     }
   },
@@ -99,6 +110,11 @@ export default {
       this.moveInterval = setTimeout(() => {
         this.$set(this.player, 'controls', false)
       }, 2500)
+    },
+    videoCanplay () {
+      this.$log('videoCanplay')
+      this.player.setCurrentTime(this.start || 0)
+      this.player.play()
     },
     videoPlay () {
       this.$log('videoPlay')
@@ -133,6 +149,12 @@ export default {
         this.player.started = false
         this.player.setCurrentTime = (ms) => {
           this.$refs.kalpaVideo.currentTime = ms
+        }
+        this.player.play = () => {
+          this.$refs.kalpaVideo.play()
+        }
+        this.player.pause = () => {
+          this.$refs.kalpaVideo.pause()
         }
       } else {
         let me = new window.MediaElementPlayer(this.$refs.kalpaVideo, {
