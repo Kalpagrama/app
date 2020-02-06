@@ -7,6 +7,7 @@ div(:style=`{position: 'relative'}`).row.fit
     slot(name="right")
   //- debug
   div(
+    v-if="false"
     :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000}`).row.bg-green
     small.full-width.text-white layerIndex: {{layerIndex}}
     small.full-width.text-white layers:
@@ -60,14 +61,14 @@ export default {
       if (this.layerFiguresRelative) {
         return this.layerFiguresRelative[0].t
       } else {
-        return this.layer.figuresAbsolute[0].t
+        return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
       }
     },
     layerEnd () {
       if (this.layerFiguresRelative) {
         return this.layerFiguresRelative[1].t
       } else {
-        return this.layer.figuresAbsolute[1].t
+        return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
       }
     },
     layers () {
