@@ -112,6 +112,13 @@ const compositionFragment = gql`
   fragment compositionFragment on Composition {
     ...objectFragment
     spheres {...objectShortFragment}
+    operation {
+      type
+      operations {
+        type
+      }
+      items
+    }
     layers {
       contentOid
       content {

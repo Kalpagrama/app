@@ -30,15 +30,15 @@ div(
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
-        q-btn(round :flat="page !== 'spheres'" color="green" icon="style" @click="$router.push({params: {page: 'spheres'}})")
+        q-btn(round :flat="page !== 'spheres'" color="green" icon="style" @click="$emit('page', 'settings')")
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
-        q-btn(round :flat="page !== 'settings'" color="green" icon="settings" @click="$router.push({params: {page: 'settings'}})")
+        q-btn(round :flat="page !== 'settings'" color="green" icon="settings" @click="$emit('page', 'settings')")
     //- pages
     div(v-show="width > 390").row.full-width.q-pa-sm
       span(
-        v-for="(p,pi) in pagesFiltered" :key="p.id" @click="$router.push({params: {page: p.id}})"
+        v-for="(p,pi) in pagesFiltered" :key="p.id" @click="$emit('page', p.id)"
         :style=`{
           borderRadius: '10px',
           color: page === p.id ? 'white !important' : '#4caf50',
@@ -67,6 +67,9 @@ export default {
   name: 'wsItems',
   components: {wsNotes, wsContents, wsCompositions, wsNodes, wsSpheres, wsSettings},
   props: {
+    page: {
+      type: String
+    },
     oid: {
       type: String
     },
@@ -87,7 +90,7 @@ export default {
     return {
       opened: true,
       width: 400,
-      page: 'contents',
+      // page: 'contents',
       pagesRaw: [
         {id: 'notes', name: 'Notes'},
         {id: 'contents', name: 'Contents'},
@@ -103,12 +106,6 @@ export default {
     }
   },
   watch: {
-    '$route.params.page': {
-      immediate: true,
-      handler (to, from) {
-        if (to) this.page = to
-      }
-    },
     opened: {
       handler (to, from) {
         this.$log('opened CHANGED', to)

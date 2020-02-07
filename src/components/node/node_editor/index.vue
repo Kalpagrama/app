@@ -34,7 +34,7 @@
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.content-center.justify-center
-        q-btn(round flat icon="refresh" color="green" :loading="refreshing" @click="nodeRefresh()")
+        q-btn(round flat icon="refresh" color="green" :loading="nodeRefreshing" @click="nodeRefresh()")
     .col.full-width.scroll
       //- composition one
       div(
@@ -87,12 +87,12 @@
       div(:style=`{height: '60px'}`
         ).row.full-width.items-center.q-px-sm
         q-btn(
-          outline color="green" no-caps :loading="saving" @click="nodeSave()"
+          outline color="green" no-caps :loading="nodeSaving" @click="nodeSave()"
           :style=`{borderRadius: '10px'}`)
           span().text-bold.text-green Save
         .col.full-height
         q-btn(
-          push color="green" no-caps :loading="publishing" @click="nodePublish()"
+          push color="green" no-caps :loading="nodePublishing" @click="nodePublish()"
           :style=`{borderRadius: '10px'}`)
           span().text-bold Publish
 </template>
@@ -106,10 +106,12 @@ export default {
   props: ['value'],
   data () {
     return {
-      name: '',
-      saving: false,
-      publishing: false,
-      refreshing: false,
+      nodeSaving: false,
+      nodeSavingError: null,
+      nodePublishing: false,
+      nodePublishingError: null,
+      nodeRefreshing: false,
+      nodeRefreshingError: null,
       node: null,
       nodeNew: {
         name: '',
@@ -147,7 +149,7 @@ export default {
       handler (to, from) {
         this.$log('node CHANGED', to)
         if (to) {
-          // this.nodeSave(to)
+          this.nodeSave(to)
         }
       }
     }
@@ -200,32 +202,42 @@ export default {
         this.$log('nodeSave done')
       } catch (e) {
         this.$log('nodeSave error', e)
-        this.nodeSaving = false
         this.nodeSavingError = e
+        this.nodeSaving = false
       }
+    },
+    async nodePublishCheck (node) {
+      this.$log('nodePublishCheck', node)
     },
     async nodePublish () {
       try {
         this.$log('nodePublish start')
-        this.publishing = true
-        await this.$wait(2000)
+        this.nodePublishing = true
+        // this.nodePublishCheck(this.node)
+        let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
+        this.$log('res', res)
         this.$log('nodePublish done')
-        this.publishing = false
+        this.nodePublishing = false
+        this.nodePublishingError = null
+        this.$log('nodePublish done')
+        this.nodePublishing = false
       } catch (e) {
         this.$log('nodePublish error', e)
-        this.publishing = false
+        this.nodePublishingError = e
+        this.nodePublishing = false
       }
     },
     async nodeRefresh () {
       try {
         this.$log('nodeRefresh start')
-        this.refreshing = true
+        this.nodeRefreshing = true
         await this.$wait(2000)
         this.$log('nodeRefresh done')
-        this.refreshing = false
+        this.nodeRefreshing = false
       } catch (e) {
         this.$log('nodeRefresh error', e)
-        this.refreshing = false
+        this.nodeRefreshingError = e
+        this.nodeRefreshing = false
       }
     }
   },

@@ -4,7 +4,7 @@
     ctx="finder"
     :header="false" :toggle="false" :oid="oid"
     :pages="['contents', 'compositions']"
-    @item="itemClick" @page="pageClick"
+    @item="itemClick" @page="pageClick" :page="page"
     )
   q-dialog(v-model="dialogOpened")
     //- h1(v-if="node").text-red node.name {{node.name}}
@@ -24,7 +24,7 @@ export default {
   data () {
     return {
       oid: undefined,
-      page: undefined,
+      page: 'contents',
       node: null,
       dialogOpened: false
     }
@@ -38,9 +38,9 @@ export default {
       })
       this.dialogOpened = true
     },
-    pageClick (p, pi) {
-      this.$log('pageClick')
-      this.page = p.id
+    pageClick (p) {
+      this.$log('pageClick', p)
+      this.page = p
     },
     layerExport (l) {
       this.$log('layerExport')

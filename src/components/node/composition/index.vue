@@ -5,6 +5,13 @@ div(:style=`{position: 'relative'}`).row.fit
     slot(name="left")
   div(:style=`{position: 'absolute', zIndex: 1000, right: '16px', top: '50%'}`).row
     slot(name="right")
+  //- debug
+  div(
+    v-if="false"
+    :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000}`).row.bg-green
+    small.full-width.text-white layerIndex: {{layerIndex}}
+    small.full-width.text-white layers:
+    small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
   //- content name & menu & action slots
   div(
     :style=`{position: 'absolute', zIndex: 1000, top: 0, height: '60px'}`
@@ -30,6 +37,7 @@ div(:style=`{position: 'relative'}`).row.fit
 </template>
 
 <script>
+import { throttle } from 'quasar'
 import playerVideo from './player_video'
 import playerImage from './player_image'
 
@@ -53,14 +61,14 @@ export default {
       if (this.layerFiguresRelative) {
         return this.layerFiguresRelative[0].t
       } else {
-        return this.layer.figuresAbsolute[0].t
+        return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
       }
     },
     layerEnd () {
       if (this.layerFiguresRelative) {
         return this.layerFiguresRelative[1].t
       } else {
-        return this.layer.figuresAbsolute[1].t
+        return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
       }
     },
     layers () {
@@ -91,15 +99,31 @@ export default {
       this.$log('playPause')
     },
     layerEnded () {
-      this.$log('*** layerEnded ')
+      this.$log('*** layerEnded')
+      this.$log('NOW => ', this.layerIndex)
+      // TODO: throttle it ???))
       if (this.layerIndexPlay) {
+        this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
         this.layerIndex = this.layerIndexPlay
       } else {
-         // move to the next layer, this composition player
-        if (this.layerIndex === this.layers.length - 1) this.layerIndex = 0
-        else this.layerIndex += 1
+        // move to the next layer, this composition player
+        let layerTo = this.layerIndex + 1
+        if (this.layers[layerTo]) {
+          // this.$q.notify('NEXT layer next =>' + layerTo)
+          this.$log('NEXT => ', layerTo)
+          this.$set(this, 'layerIndex', layerTo)
+          // this.layerIndex = layerTo
+        }
+        else {
+          this.$log('LAST => 0')
+          this.$set(this, 'layerIndex', 0)
+          // this.layerIndex = 0
+        }
       }
     }
+  },
+  created () {
+    this.layerEnded = throttle(this.layerEnded, 300)
   },
   mounted () {
     this.$log('mounted')
