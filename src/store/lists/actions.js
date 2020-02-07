@@ -77,13 +77,22 @@ export const wsItems = async (context, { pagination, filter, sortStrategy }) => 
   }
   let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
     { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc }, { root: true })
-  logD('wsItems recieved', { items, count, totalCount, nextPageToken })
-  for (let i = 0; i < items.length; i++){
+  logD('wsItems recieved (short ver)', { items, count, totalCount, nextPageToken })
+  let promises = []
+  for (let i = 0; i < items.length; i++) {
     assert(items[i].oid)
-    let itemFull = await context.dispatch('objects/get', {oid: items[i].oid, fromWs: true})
-    items[i] = itemFull
+    // получаем полные сущности
+    const getFull = async () => {
+      items[i] = await context.dispatch('objects/get', {
+        oid: items[i].oid,
+        priority: 0,
+        fromWs: true
+      }, { root: true })
+    }
+    promises.push(getFull())
   }
-  logD('wsItems complete')
+  await Promise.all(promises)
+  logD('wsItems complete', items)
   return { items, count, totalCount, nextPageToken }
 }
 

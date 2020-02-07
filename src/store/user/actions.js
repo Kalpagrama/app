@@ -11,7 +11,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 export const init = async (context) => {
   if (context.state.initialized) return
   // Запрашиваем юзера (после этого он будет в кэше лежать)
-  await context.dispatch('objects/get', { oid: context.rootState.auth.userOid }, { root: true })
+  await context.dispatch('objects/get', { oid: context.rootState.auth.userOid, priority: 0 }, { root: true })
   context.commit('init')
   return true
 }

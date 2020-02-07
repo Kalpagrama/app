@@ -1,6 +1,6 @@
 import { ApolloClient } from 'apollo-client'
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
-// import introspectionQueryResultData from '../schema/graphql.schema.json'
+import introspectionQueryResultData from '../schema/graphql.schema.json'
 import { createHttpLink } from 'apollo-link-http'
 // import VueApollo from 'vue-apollo'
 // import { persistCache } from 'apollo-cache-persist'
@@ -26,12 +26,12 @@ export default async ({ Vue, store, app }) => {
   store.commit('auth/stateSet', ['SERVICES_URL', SERVICES_URL])
 
   // // todo После выхода apollo-client 3 - выкинуть fragmentMatcher и перейти на possibleTypes
-  // const fragmentMatcher = new IntrospectionFragmentMatcher({
-  //   introspectionQueryResultData
-  // })
+  const fragmentMatcher = new IntrospectionFragmentMatcher({
+    introspectionQueryResultData
+  })
   const cache = new InMemoryCache({
     addTypename: true,
-    // fragmentMatcher,
+    fragmentMatcher,
     dataIdFromObject: object => {
       // logD('dataIdFromObject', object)
       if (!object.__typename || !object.oid) return null

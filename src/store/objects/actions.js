@@ -24,6 +24,7 @@ class Queue {
 
   // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
   push (context, oid, priority, fromWs) {
+    assert(context && oid && priority >= 0, 'context && oid && priority')
     return new Promise((resolve, reject) => {
       let queue
       let queueMaxSz = 0
@@ -37,23 +38,19 @@ class Queue {
         queue = this.queueSecondary
         queueMaxSz = 4
       }
-      assert.ok(queue)
+      assert(queue)
       queue.push({ context, oid, fromWs, resolve, reject })
       while (queue.length > queueMaxSz) {
         let firstItem = queue.shift()
-        this.rejectItem(firstItem)
+        let { context, oid, fromWs, resolve, reject } = firstItem
+        reject('queued object was evicted legally')
       }
       // ждем, параллельных вызовов(чтобы выполнить пачкой). Иначе, первый запрос пойдет отдельно, а остальные - пачкой
       wait(100).then(() => this.next(context)).catch(reject)
     })
   }
 
-  // вызывать при удалении из очереди
-  rejectItem ({ context, oid, fromWs, resolve, reject }) {
-    reject('queued object was evicted legally')
-  }
-
-  // вызывать после получения объекта с сервера
+  // вызывать после получения объекта с сервера. разрезолвит объект во всех очередях
   resolveItem (object) {
     assert(object && object.oid)
     const resolveObject = (queue, object) => {
@@ -72,6 +69,22 @@ class Queue {
     this.queueWs = resolveObject(this.queueWs, object)
     this.queueMaster = resolveObject(this.queueMaster, object)
     this.queueSecondary = resolveObject(this.queueSecondary, object)
+  }
+
+  rejectItem (oid, err) {
+    assert(oid && err)
+    const rejectObject = (queue, objOid, err) => {
+      assert(queue && Array.isArray(queue))
+      for (let { context, oid, fromWs, resolve, reject } of queue) {
+        if (oid === objOid) {
+          reject(err)
+        }
+      }
+      return queue.filter(item => item.oid !== objOid)
+    }
+    this.queueWs = rejectObject(this.queueWs, oid, err)
+    this.queueMaster = rejectObject(this.queueMaster, oid, err)
+    this.queueSecondary = rejectObject(this.queueSecondary, oid, err)
   }
 
   // берет из очереди последний добавленный и отправляет на выполненеие
@@ -115,9 +128,14 @@ class Queue {
       let objectList = result.data.objectList
       for (let item of itemsForQuery) {
         let object = objectList.find(obj => obj.oid === item.oid)
-        if (!object) object = { oid: item.oid, notFound: true }
         // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
-        this.resolveItem(object)
+        if (object && !object.deletedAt) {
+          this.resolveItem(object)
+        } else if (object && !object.deletedAt) {
+          this.rejectItem(item.oid, 'deleted')
+        } else {
+          this.rejectItem(item.oid, 'notFound')
+        }
         context.commit('stateSet', ['queryInProgress', false])
       }
       this.next(context)
@@ -125,8 +143,7 @@ class Queue {
     .catch(err => {
       logE('error on fetch objectList', err)
       for (let item of itemsForQuery) {
-        let object = { oid: item.oid, fetchError: true }
-        this.resolveItem(object)
+        this.rejectItem(item.oid, 'fetchError')
       }
       context.commit('stateSet', ['queryInProgress', false])
     })
@@ -141,26 +158,11 @@ const queue = new Queue()
 // // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
 // todo формировать очередь запросов (запрашивать пачкой)
 export const get = async (context, { oid, priority, fromWs }) => {
-  logD('objects/get action start', oid)
+  logD('objects/get action start', { oid, priority, fromWs })
+  priority = priority || 0
   const fetchItemFunc = async () => {
-    // let promise = queue.push(context, oid, priority, fromWs)
-    // return await promise
-    let { data: { objectFull } } = await apollo.clients.api.query({
-      query: gql`
-        ${fragments.objectFullFragment}
-        query objectFull ($oid: OID!, $fromWs: Boolean) {
-          objectFull(oid: $oid, fromWs: $fromWs) {
-            ... objectFullFragment
-          }
-        }
-      `,
-      variables: { oid, fromWs }
-    })
-    assert(context.rootState.auth.userOid)
-    return {
-      item: objectFull,
-      actualAge: context.rootState.auth.userOid === oid ? 'day' : 'hour'
-    }
+    let promise = queue.push(context, oid, priority, fromWs)
+    return await promise
   }
   let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
   logD('objects/get action complete', oid)
@@ -180,8 +182,6 @@ export const update = async (context, { oid, path, newValue }) => {
     })
     newValue = await toBase64(file)
   }
-
-  context.commit('cache/updateItem', { key: oid, path, newValue }, { root: true }) // обновим в кэше
   let { data: { objectChange } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}

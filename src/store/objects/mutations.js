@@ -13,6 +13,11 @@ export function init (state) {
   state.initialized = true
 }
 
+export function stateSet(state, [key, val]) {
+  assert.ok(Object.prototype.hasOwnProperty.call(state, key))
+  state[key] = val
+}
+
 // function setValue (obj, path, value) {
 //   let o = obj
 //   for (let i = 0; i < path.length - 1; i++) {

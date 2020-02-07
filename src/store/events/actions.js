@@ -160,10 +160,8 @@ async function processEvent (context, event) {
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_UPDATED':
     case 'WS_ITEM_DELETED':
-      logD('try notifyUserActionComplete', event)
-      event.object = event.objectFull
       notifyUserActionComplete(event.type, event.object)
-      logD('try processEventWs')
+      // logD('try processEventWs')
       await processEventWs(context, event)
       break
     default:
@@ -193,6 +191,7 @@ async function processEventWs (context, event) {
             path: '',
             actualAge: 'zero', // обновить при следующем запросе
             setter: ({ items, count, totalCount, nextPageToken }) => {
+              logD('setter: ', { items, count, totalCount, nextPageToken })
               assert(items && count >= 0 && totalCount >= 0)
               items.unshift(object)
               count++
@@ -224,6 +223,7 @@ async function processEventWs (context, event) {
 
 // вывести уведомление о действии пользователя
 function notifyUserActionComplete (eventType, object) {
+  logD('notifyUserActionComplete', object)
   assert.ok(eventType && object)
   let eventMessage = ''
   switch (eventType) {
