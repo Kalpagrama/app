@@ -13,23 +13,25 @@ export const init = async (context) => {
   if (context.state.initialized) return
   logD('auth init')
   const fetchItemFunc = async () => {
-    let { data: { userIsAuthorized, userIsConfirmed, user } } = await apollo.clients.auth.query({
+    let { data: { authInfo } } = await apollo.clients.auth.query({
       client: 'apiApollo',
       query: gql`
-        query sw_network_first_userCheck {
-          userIsAuthorized
-          userIsConfirmed
-          user { oid }
+        query {
+          authInfo {
+            userIsAuthorized
+            userIsConfirmed
+            userOid
+          }
         }
       `
     })
-    return { item: { userIsAuthorized, userIsConfirmed, user }, actualAge: 'zero' }
+    return { item: authInfo, actualAge: 'zero' }
   }
 
-  let { userIsAuthorized, userIsConfirmed, user } = await context.dispatch('cache/get', { key: 'userCheck', fetchItemFunc }, { root: true })
-  assert(user.oid)
-  context.commit('init', { userIsAuthorized, userIsConfirmed, userOid: user.oid })
+  let authInfo = await context.dispatch('cache/get', { key: 'authInfo', fetchItemFunc }, { root: true })
+  context.commit('init', authInfo)
   logD('auth init done!')
+  return authInfo
 }
 export const inviteEmail = async (context, email) => {
   logD('@invite start')

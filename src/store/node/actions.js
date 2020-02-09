@@ -1,6 +1,7 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
+import { fragments } from 'src/schema/fragments'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
@@ -169,16 +170,20 @@ export const nodeCreate = async (context, node) => {
   })
 
   logD('nodeCreate nodeInput', nodeInput)
-  let { data: { nodeCreate } } = await apollo.clients.api.mutate({
+  let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
     mutation: gql`
+      ${fragments.objectFullFragment}
       mutation sw_network_only_nodeCreate ($node: NodeInput!) {
-        nodeCreate (node: $node)
+        nodeCreate (node: $node){
+          ...objectFullFragment
+        }
       }
     `,
     variables: {
       node: nodeInput
     }
   })
+  context.dispatch('cache/update', {key: createdNode.oid, newValue: createdNode, actualAge: 'zero'}, {root: true}) // кладем в кэш на всяк случай
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
 }

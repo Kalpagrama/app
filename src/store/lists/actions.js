@@ -53,49 +53,6 @@ export const events = async (context, { pagination }) => {
   return { items, count, totalCount, nextPageToken }
 }
 
-export const wsItems = async (context, { pagination, filter, sortStrategy }) => {
-  logD('wsItems start')
-  const fetchItemFunc = async () => {
-    let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-      query: gql`
-        ${fragments.objectShortFragment}
-        query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
-          wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            totalCount
-            count
-            nextPageToken
-            items {... objectShortFragment}
-          }
-        }
-      `,
-      variables: { pagination, filter, sortStrategy }
-    })
-    return {
-      item: { items, count, totalCount, nextPageToken },
-      actualAge: 'hour'
-    }
-  }
-  let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
-    { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc }, { root: true })
-  logD('wsItems recieved (short ver)', { items, count, totalCount, nextPageToken })
-  let promises = []
-  for (let i = 0; i < items.length; i++) {
-    assert(items[i].oid)
-    // получаем полные сущности
-    const getFull = async () => {
-      items[i] = await context.dispatch('objects/get', {
-        oid: items[i].oid,
-        priority: 0,
-        fromWs: true
-      }, { root: true })
-    }
-    promises.push(getFull())
-  }
-  await Promise.all(promises)
-  logD('wsItems complete', items)
-  return { items, count, totalCount, nextPageToken }
-}
-
 export const sphereNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('sphereNodes start')
   const fetchItemFunc = async () => {
@@ -199,4 +156,13 @@ export const feed = async (context, { pagination }) => {
     { key: 'feed: ' + JSON.stringify({ pagination }), fetchItemFunc }, { root: true })
   logD('feed complete')
   return { items, count, totalCount, nextPageToken }
+}
+
+// wsItemsType 'CONTENTS' 'SPHERES' 'NODES' 'COMPOSITIONS' 'NOTES' 'ALL'
+// Все сущности в мастерской лежат в ядрах. Ядро - как контейнер
+// При этом если мы хотим хранить контент. то мы создаем ядро с именем CONTENT-...........= (oid контента)и на этом ядре хранится контент и все лэеры этого контента
+// это же справедливо и для композиций (COMPOSITION-...........=) (oid композиции)
+// для сфер создается одно ядро со всеми сферами сразу с именем (SPHERES-...........=) (oid юзера)
+export const wsItems = async (context, { wsItemsType, pagination, filter }) => {
+  return context.dispatch('workspace/wsItems', { wsItemsType, pagination, filter }, { root: true })
 }

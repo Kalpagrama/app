@@ -5,8 +5,9 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 import Vue from 'vue'
 
-export function init (state) {
+export function init (state, wsRevision) {
   state.initialized = true
+  state.revision = wsRevision
 }
 
 export function stateSet (state, [key, val]) {

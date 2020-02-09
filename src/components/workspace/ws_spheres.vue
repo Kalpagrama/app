@@ -53,16 +53,13 @@ export default {
     async spheresLoad () {
       this.$log('spheresLoad')
       // try to load node with spheres
-      let {items} = await this.$store.dispatch('lists/wsItems', {
-        pagination: {pageSize: 30, pageToken: null},
-        sortStrategy: 'HOT',
-        filter: {types: ['NODE'], name: 'SPHERE'}
-      })
-      this.$log('nodeFind', items)
-      if (items.length === 0) {
+      let name = 'SPHERE-' + this.$store.state.auth.userOid
+      let item = await this.$store.dispatch('workspace/get', { name })
+      this.$log('nodeFind', item)
+      if (!item) {
         this.$log('create sphere node')
         let node = {
-          name: 'SPHERE',
+          name,
           layout: 'PIP',
           category: 'FUN',
           spheres: [],
@@ -70,10 +67,9 @@ export default {
         }
         let res = await this.$store.dispatch('workspace/wsNodeSave', node)
         this.$log('res', res)
-        // this.node = res.object
         this.node = res
       } else {
-        this.node = items[0].object
+        this.node = item
       }
     },
     async nodeSave (node) {

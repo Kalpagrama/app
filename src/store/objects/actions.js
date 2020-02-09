@@ -15,34 +15,33 @@ export const init = async (context) => {
   logD('objects/init done')
 }
 
-class Queue {
+// сцепляет запросы и отправляет пачкой
+class QueryAccumulator {
   constructor () {
     this.queueMaster = []
     this.queueSecondary = []
-    this.queueWs = []
   }
 
   // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
-  push (context, oid, priority, fromWs) {
+  push (context, oid, priority) {
     assert(context && oid && priority >= 0, 'context && oid && priority')
     return new Promise((resolve, reject) => {
       let queue
       let queueMaxSz = 0
-      if (fromWs) {
-        queue = this.queueWs
-        queueMaxSz = 888
-      } else if (priority === 0) {
+      if (priority === 0) {
         queue = this.queueMaster
         queueMaxSz = 20
       } else if (priority === 1) {
         queue = this.queueSecondary
         queueMaxSz = 4
       }
-      assert(queue)
-      queue.push({ context, oid, fromWs, resolve, reject })
+      assert(queue && queueMaxSz)
+      if (queue.findIndex(item => item.oid === oid) === -1) {
+        queue.push({ context, oid, resolve, reject })
+      }
       while (queue.length > queueMaxSz) {
         let firstItem = queue.shift()
-        let { context, oid, fromWs, resolve, reject } = firstItem
+        let { context, oid, resolve, reject } = firstItem
         reject('queued object was evicted legally')
       }
       // ждем, параллельных вызовов(чтобы выполнить пачкой). Иначе, первый запрос пойдет отдельно, а остальные - пачкой
@@ -55,7 +54,7 @@ class Queue {
     assert(object && object.oid)
     const resolveObject = (queue, object) => {
       assert(queue && Array.isArray(queue))
-      for (let { context, oid, fromWs, resolve, reject } of queue) {
+      for (let { context, oid, resolve, reject } of queue) {
         if (oid === object.oid) {
           let result = {
             item: object,
@@ -66,7 +65,6 @@ class Queue {
       }
       return queue.filter(item => item.oid !== object.oid)
     }
-    this.queueWs = resolveObject(this.queueWs, object)
     this.queueMaster = resolveObject(this.queueMaster, object)
     this.queueSecondary = resolveObject(this.queueSecondary, object)
   }
@@ -75,14 +73,13 @@ class Queue {
     assert(oid && err)
     const rejectObject = (queue, objOid, err) => {
       assert(queue && Array.isArray(queue))
-      for (let { context, oid, fromWs, resolve, reject } of queue) {
+      for (let { context, oid, resolve, reject } of queue) {
         if (oid === objOid) {
           reject(err)
         }
       }
       return queue.filter(item => item.oid !== objOid)
     }
-    this.queueWs = rejectObject(this.queueWs, oid, err)
     this.queueMaster = rejectObject(this.queueMaster, oid, err)
     this.queueSecondary = rejectObject(this.queueSecondary, oid, err)
   }
@@ -90,41 +87,41 @@ class Queue {
   // берет из очереди последний добавленный и отправляет на выполненеие
   next (context) {
     // если предыдущий запрос еще выполняется, то подождем...
-    if (context.getters.queryInProgress) return
+    if (context.rootState.objects.queryInProgress) return
     // извлечь из очереди сдедующие объекты для запроса на сервер. Проверяем на наличие
-    let itemsForQuery = []
-    let fromWs
-    if (this.queueWs.length) { // запрашиваем сразу все элементы мастерской (одним запросом)
-      fromWs = true
-      itemsForQuery = [...this.queueWs]
-    } else { // берем последние добавленные
-      fromWs = false
-      let totalQuery = [...this.queueSecondary, ...this.queueMaster]
-      for (let i = totalQuery.length - 1; i >= 0 && itemsForQuery.length < 5; i--) {
-        let queuedItem = totalQuery[i]
-        if (itemsForQuery.findIndex(item => item.oid === queuedItem.oid) >= 0) continue // такой уже есть
-        itemsForQuery.push(queuedItem)
-      }
+    let itemsForQuery = [] // элементы для следующего запроса
+    let totalQuery = [] // элементы из всех очередей (самые приоритетные - в конце)
+    for (let itemSec of this.queueSecondary) {
+      if (totalQuery.findIndex(item => item.oid === itemSec.oid) === -1) totalQuery.push(itemSec)
+    }
+    for (let itemMas of this.queueMaster) {
+      if (totalQuery.findIndex(item => item.oid === itemMas.oid) === -1) totalQuery.push(itemMas)
+    }
+    // берем последние добавленные (самые приоритетные - в конце)
+    for (let i = totalQuery.length - 1; i >= 0 && itemsForQuery.length < 5; i--) {
+      let queuedItem = totalQuery[i]
+      if (itemsForQuery.findIndex(item => item.oid === queuedItem.oid) >= 0) continue // такой уже есть
+      itemsForQuery.push(queuedItem)
     }
     if (itemsForQuery.length === 0) return
 
-    context.commit('stateSet', ['queryInProgress', true])
+    context.commit('objects/stateSet', ['queryInProgress', true], { root: true }) // Не более одного запроса в единицу времени
 
     apollo.clients.api.query({
       query: gql`
         ${fragments.objectFullFragment}
-        query objectList ($oids: [OID!]!, $fromWs: Boolean) {
-          objectList(oids: $oids, fromWs: $fromWs) {
+        query objectList ($oids: [OID!]!) {
+          objectList(oids: $oids) {
             ... objectFullFragment
           }
         }
       `,
       variables: {
-        oids: itemsForQuery.map(item => item.oid),
-        fromWs
+        oids: itemsForQuery.map(item => item.oid)
       }
     })
     .then(result => {
+      context.commit('objects/stateSet', ['queryInProgress', false], { root: true })
       let objectList = result.data.objectList
       for (let item of itemsForQuery) {
         let object = objectList.find(obj => obj.oid === item.oid)
@@ -136,32 +133,28 @@ class Queue {
         } else {
           this.rejectItem(item.oid, 'notFound')
         }
-        context.commit('stateSet', ['queryInProgress', false])
       }
       this.next(context)
     })
     .catch(err => {
+      context.commit('objects/stateSet', ['queryInProgress', false], { root: true })
       logE('error on fetch objectList', err)
-      for (let item of itemsForQuery) {
-        this.rejectItem(item.oid, 'fetchError')
-      }
-      context.commit('stateSet', ['queryInProgress', false])
+      for (let item of itemsForQuery) this.rejectItem(item.oid, 'fetchError')
     })
   }
 }
 
-const queue = new Queue()
+const queryAccumulator = new QueryAccumulator()
 
-// // Вернет объект из кэша, либо запросит его. и вернет промис, который возможно когда-то выполнится(когда дойдет очередь);
-// // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
-// // priority 0 - будут выполнены 20 последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
-// // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
-// todo формировать очередь запросов (запрашивать пачкой)
-export const get = async (context, { oid, priority, fromWs }) => {
-  logD('objects/get action start', { oid, priority, fromWs })
+// Вернет объект из кэша, либо запросит его. и вернет промис, который возможно когда-то выполнится(когда дойдет очередь);
+// Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
+// priority 0 - будут выполнены 20 последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
+// priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
+export const get = async (context, { oid, priority }) => {
+  logD('objects/get action start', { oid, priority })
   priority = priority || 0
   const fetchItemFunc = async () => {
-    let promise = queue.push(context, oid, priority, fromWs)
+    let promise = queryAccumulator.push(context, oid, priority)
     return await promise
   }
   let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
@@ -169,8 +162,8 @@ export const get = async (context, { oid, priority, fromWs }) => {
   return objectFull
 }
 
-// path ex: ['settings', 'general', 'language'] OR ['profile', 'gender']
-export const update = async (context, { oid, path, newValue }) => {
+// моментально изменит объект во вьюикс и запланирует изменения на сервере
+export const update = async (context, { oid, path, newValue, setter, actualAge }) => {
   logD('objects/update action start', oid)
   if (path === 'profile.thumbUrl') {
     let file = newValue
@@ -182,17 +175,47 @@ export const update = async (context, { oid, path, newValue }) => {
     })
     newValue = await toBase64(file)
   }
-  let { data: { objectChange } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      ${fragments.objectFullFragment}
-      mutation sw_network_only_objectChange ($oid: OID!, $path: String!, $newValue: RawJSON!) {
-        objectChange (oid: $oid, path: $path, newValue: $newValue){
-          ...objectFullFragment
+  let updateItemFunc = async (updatedItem) => {
+    assert(updatedItem.oid && updatedItem.revision)
+    assert(oid && path != null && newValue)
+    let { data: { objectChange } } = await apollo.clients.api.mutate({
+      mutation: gql`
+        ${fragments.objectFullFragment}
+        mutation sw_network_only_objectChange ($oid: OID!, $path: String!, $newValue: RawJSON!, $revision: Int!) {
+          objectChange (oid: $oid, path: $path, newValue: $newValue, revision: $revision){
+            ...objectFullFragment
+          }
         }
-      }
-    `,
-    variables: { oid, path, newValue }
-  })
+      `,
+      variables: { oid, path, newValue, revision: updatedItem.revision }
+    })
+    return objectChange
+  }
+  let fetchItemFunc = async () => {
+    let item = await context.dispatch('objects/get', { oid, priority: 0 }, { root: true })
+    return item
+  }
+  let mergeItemFunc = (path, serverItem, cacheItem) => {
+    assert(serverItem && cacheItem)
+    let mergedItem
+    if (path) {
+      // todo merge or throw error
+    } else {
+      // todo merge or throw error
+    }
+    assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
+    return mergedItem
+  }
+  let updatedItem = await context.dispatch('cache/update', {
+    key: oid,
+    path,
+    newValue,
+    setter,
+    actualAge,
+    updateItemFunc,
+    fetchItemFunc,
+    mergeItemFunc
+  }, {root: true})
   logD('objects/update action complete', oid)
-  return objectChange
+  return updatedItem
 }

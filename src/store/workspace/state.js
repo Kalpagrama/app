@@ -1,8 +1,5 @@
 export default {
   initialized: false,
-  // workspace: {
-  //   nodes: [],
-  //   spheres: []
-  // },
-  wsItem: null
+  wsItem: null, // черновик
+  revision: 0
 }

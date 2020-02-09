@@ -136,10 +136,10 @@ class Cache {
     let actualUntil = Date.now() + actualAge
     this.cacheLru.set(key, { actualUntil, actualAge })
     await this.cachePersist.setItem(key, { item, actualUntil, actualAge })
-    this.context.commit('setItem', { key, item })
+    return this.context.commit('setItem', { key, item })
   }
 
-  // recieveItemFunc - ф-я которая запросит сущность с бэкенда
+  // fetchItemFunc - ф-я которая запросит сущность с бэкенда
   async get (key, fetchItemFunc) {
     assert(key && fetchItemFunc)
     let result
@@ -185,7 +185,10 @@ class Cache {
     return result
   }
 
-  async update (key, path, newValue, setter, actualAge) {
+  // updateItemFunc - обновить данные на сервере
+  // mergeItemFunc - ф-я для устранения мердж-конфликтов
+  // newValue - это либо объект целиком, либо свойство объекта (тогда актуальны path и setter)
+  async update (key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc) {
     function setValue (obj, path, value, setter) {
       assert(obj && Array.isArray(path))
       path = path.filter(k => Boolean(k))
@@ -208,13 +211,54 @@ class Cache {
       logD('setValue:', value)
       return obj
     }
-
-    assert(key && path != null && (newValue || setter))
-    let item = this.context.state.cachedItems[key]
-    if (item && !item.failReason) {
-      let updatedItem = setValue(item, path.split('.'), newValue, setter)
-      await this.set(key, updatedItem, actualAge)
+    // logD('Cache::update params:', {key, path, newValue, setter, actualAge})
+    assert(!updateItemFunc || (fetchItemFunc && mergeItemFunc), 'fetchItemFunc, mergeItemFunc нужны для устранения конфликтов')
+    // обновим данные в кэше
+    let updatedItem
+    if (path || setter) {
+      assert(newValue == null || typeof newValue === 'object')
+      let vuexItem = this.context.state.cachedItems[key]
+      assert(vuexItem)
+      updatedItem = setValue(vuexItem, path.split('.'), newValue, setter)
+    } else {
+      assert(newValue)
+      updatedItem = newValue
     }
+    // logD('Cache::update. updatedItem = ', updatedItem)
+    assert(updatedItem && !updatedItem.failReason)
+    if (!updateItemFunc) {
+      updatedItem = await cache.set(key, updatedItem, actualAge)
+      return updatedItem
+    } else {
+      assert(updatedItem.oid)
+      updatedItem = await cache.set(key, updatedItem, 'year')// чтобы данные не устарели пока не ушел запрос на сервер(актуально для оффлайн версии)
+      // обновим данные на сервере
+      // todo накапливать изменения и делать запрос в фоне
+      assert(fetchItemFunc && mergeItemFunc)
+      try {
+        updatedItem = await updateItemFunc(updatedItem)
+      } catch (err) {
+        // todo err === 'version conflict'
+        logE('todo: !!! err=', err)
+        if (err === 'version conflict') {
+          // get current item objects/get
+          let serverItem = await fetchItemFunc()
+          // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
+          let mergedItem = mergeItemFunc(path, serverItem, updatedItem)
+          // еще раз попробуем обновить
+          updatedItem = await updateItemFunc(mergedItem)
+        } else throw err
+      }
+      assert(updatedItem)
+      updatedItem = await cache.set(key, updatedItem, actualAge)
+      return updatedItem
+    }
+  }
+
+  async expire (key) {
+    let item = this.context.state.cachedItems[key]
+    assert(item)
+    return await this.set(key, item, 'zero')
   }
 }
 
@@ -228,16 +272,26 @@ export const init = async (context) => {
   logD('cache/init done')
 }
 
+// fetchItemFunc ф-я для получения данных с сервера
 export const get = async (context, { key, fetchItemFunc }) => {
   assert(context.state.initialized)
   assert(typeof key === 'string')
   return await cache.get(key, fetchItemFunc)
 }
 
-export const update = async (context, { key, path, newValue, setter, fullItem, actualAge }) => {
-  if (fullItem) {
-    await cache.set(key, fullItem, actualAge || 'prolong')
-  } else {
-    await cache.update(key, path, newValue, setter, actualAge || 'zero')
-  }
+// updateItemFunc - ф-я для обновления данных на сервере (вернет обновленную сущность)
+// если указана updateItemFunc, то должны быть и fetchItemFunc, mergeItemFunc
+// Если path = ''  то newValue - это полный объект
+export const update = async (context, { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
+  assert(key)
+  assert(setter || newValue)
+  path = path || ''
+
+  return await cache.update(key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc)
+}
+
+export const expire = async (context, { key }) => {
+  assert(context.state.initialized)
+  assert(typeof key === 'string')
+  return await cache.expire(key)
 }

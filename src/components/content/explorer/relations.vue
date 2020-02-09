@@ -91,7 +91,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {types: ['VIDEO', 'AUDIO', 'IMAGE']}})
+    let {items} = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'CONTENTS'})
     this.$log('items', items)
     this.items = items
   },

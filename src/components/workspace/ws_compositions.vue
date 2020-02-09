@@ -52,7 +52,7 @@ export default {
     },
     async compositionsLoad () {
       this.$log('compositionsLoad')
-      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {types: ['COMPOSITION']}})
+      let {items} = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'COMPOSITIONS'})
       this.$log('items', items)
       return items
     }

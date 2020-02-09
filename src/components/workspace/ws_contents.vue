@@ -87,10 +87,9 @@ export default {
       this.$log('contentsLoad start')
       this.contentsLoading = true
       // await this.$wait(1000)
-      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^CONTENT-.{11}=$', types: ['NODE']}})
+      let {items} = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'CONTENTS'})
       this.$log('contentsLoad done', items)
       this.contentsLoading = false
-      // return items.map(i => i.object)
       return items
     },
     async contentsReload () {
@@ -100,14 +99,10 @@ export default {
     async contentFound (content) {
       this.$log('contentFound', content)
       // try to find item in ws by name CONTENT- + content.oid
-      let {items} = await this.$store.dispatch('lists/wsItems', {
-        pagination: {pageSize: 30, pageToken: null},
-        sortStrategy: 'HOT',
-        filter: {types: ['NODE'], name: 'CONTENT-' + content.oid}
-      })
-      this.$log('nodeFind', items)
+      let item = await this.$store.dispatch('workspace/get', {name: 'CONTENT-' + content.oid})
+      this.$log('nodeFind', item)
       // if no item create node content container
-      if (items.length === 0) {
+      if (!item) {
         // create node
         this.$log('CREATE WS NODE')
         let node = {

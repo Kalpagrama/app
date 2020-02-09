@@ -54,7 +54,6 @@ async function processEvent (context, event) {
   logD('processEvent start', event)
   switch (event.type) {
     case 'ERROR':
-      context.commit('stateSet', ['error', event])
       notifyError(event)
       break
     case 'PROGRESS':
@@ -63,7 +62,6 @@ async function processEvent (context, event) {
       if (event.action === 'CREATE_NODE') context.commit('stateSet', ['progressCreateNode', event])
       break
     case 'NOTICE':
-      context.commit('stateSet', ['notice', event])
       break
     case 'OBJECT_CHANGED':
       await context.dispatch('cache/update', {
@@ -77,14 +75,17 @@ async function processEvent (context, event) {
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
-      context.commit('stateSet', ['nodeCreated', event])
+      context.dispatch('cache/update', {
+        key: event.object.oid,
+        newValue: event.object,
+        actualAge: 'hour'
+      }, { root: true })
       context.commit('addEvent', { event, context })
       break
     case 'NODE_RATED':
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
-      context.commit('stateSet', ['nodeRated', event])
       await context.dispatch('cache/update', {
         key: event.object.oid,
         path: 'rate',
@@ -94,12 +95,10 @@ async function processEvent (context, event) {
       break
     case 'NODE_DELETED':
       notifyUserActionComplete(event.type, event.object)
-      context.commit('stateSet', ['nodeDeleted', event])
       context.commit('addEvent', { event, context })
       break
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
-      context.commit('stateSet', ['userSubscribed', event])
       if (event.subject.oid === context.rootState.auth.userOid) { // если это мы подписались
         await context.dispatch('cache/update', {
           key: event.subject.oid,
@@ -129,7 +128,6 @@ async function processEvent (context, event) {
       break
     case 'USER_UNSUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
-      context.commit('stateSet', ['userUnSubscribed', event])
       if (event.subject.oid === context.rootState.auth.userOid) {
         await context.dispatch('cache/update', {
           key: event.subject.oid,
@@ -174,51 +172,15 @@ async function processEventWs (context, event) {
   let type = event.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
   let object = event.object
   let objectType = object.__typename
-  await context.dispatch('cache/update', {
-    key: event.object.oid,
-    fullItem: object
-  }, { root: true })
-  // todo найти все ленты с мастерской. В какие из них добавлять???? видимо в те, где pageToken === null
-  for (let key in context.rootState.cache.cachedItems) {
-    let keyPattern = 'wsItems: '
-    if (key.startsWith(keyPattern)) {
-      let { pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
-      assert(pagination)
-      if (type === 'WS_ITEM_CREATED') { // добавляем object в начальные запросы
-        if (!pagination.pageToken) { // pageToken === null при начальном запросе.
-          await context.dispatch('cache/update', {
-            key: key,
-            path: '',
-            actualAge: 'zero', // обновить при следующем запросе
-            setter: ({ items, count, totalCount, nextPageToken }) => {
-              logD('setter: ', { items, count, totalCount, nextPageToken })
-              assert(items && count >= 0 && totalCount >= 0)
-              items.unshift(object)
-              count++
-              totalCount++
-              return { items, count, totalCount, nextPageToken }
-            }
-          }, { root: true })
-        }
-      } else if (type === 'WS_ITEM_DELETED') { // удаляем из всех лент object
-        await context.dispatch('cache/update', {
-          key: key,
-          path: '',
-          actualAge: 'zero', // обновить при следующем запросе
-          setter: ({ items, count, totalCount, nextPageToken }) => {
-            assert(items && count >= 0 && totalCount >= 0)
-            let indx = items.findIndex(item => item.oid === object.oid)
-            if (indx >= 0) {
-              items.splice(indx, 1)
-              count--
-              totalCount--
-            }
-            return { items, count, totalCount, nextPageToken }
-          }
-        }, { root: true })
-      }
-    }
+  assert(event.wsRevision)
+  assert(event.wsRevision > context.rootState.workspace.revision, `${event.wsRevision} ${context.rootState.workspace.revision}`)
+  if (event.wsRevision - context.rootState.workspace.revision > 1) {
+    logW('на сервере есть неучтенные изменения!')
+    await context.dispatch('workspace/expireWsCache', {}, { root: true })
   }
+  // обновим кэш мастерской
+  await context.dispatch('workspace/updateWsCache', { type, object }, { root: true })
+  context.commit('workspace/stateSet', ['revision', event.wsRevision], { root: true })
 }
 
 // вывести уведомление о действии пользователя

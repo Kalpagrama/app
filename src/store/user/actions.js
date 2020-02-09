@@ -11,9 +11,10 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 export const init = async (context) => {
   if (context.state.initialized) return
   // Запрашиваем юзера (после этого он будет в кэше лежать)
-  await context.dispatch('objects/get', { oid: context.rootState.auth.userOid, priority: 0 }, { root: true })
+  let user = await context.dispatch('objects/get', { oid: context.rootState.auth.userOid, priority: 0 }, { root: true })
+  assert(user)
   context.commit('init')
-  return true
+  return user
 }
 
 export const setFavouriteCategories = async (context, categoryTypes) => {

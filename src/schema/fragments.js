@@ -54,6 +54,7 @@ const objectFragment = gql`
     subscriberCnt
     subscribers {...objectShortFragment}
     meta{ ...metaFragment}
+    revision
   }
 `
 const compositionFragment = gql`
@@ -218,6 +219,7 @@ const eventFragment = gql`
       message
     }
     ... on EventWS{
+      wsRevision
       object {
         oid
         type
@@ -252,7 +254,7 @@ const userFragment = gql`
     ...objectFragment
     weightVal
     settings
-    wsVersion
+    wsRevision
     subscriptions{...objectShortFragment}
     profile{
       tutorial

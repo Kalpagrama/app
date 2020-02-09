@@ -15,6 +15,7 @@ export function init (state) {
 
 export function setItem (state, { key, item }) {
   state.cachedItems[key] = item
+  return state.cachedItems[key]
 }
 
 export function removeItem (state, key) {

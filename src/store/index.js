@@ -42,19 +42,16 @@ export default function (/* { ssrContext } */) {
       init: async (context) => {
         logD('vuex init')
         await context.dispatch('cache/init')
-        await context.dispatch('auth/init')
-        await context.dispatch('user/init')
-        if (!context.state.auth.userIsConfirmed) return false
+        let authInfo = await context.dispatch('auth/init')
+        if (!authInfo.userIsConfirmed) return false
+        let user = await context.dispatch('user/init')
         await context.dispatch('events/init')
         await context.dispatch('core/init')
         await context.dispatch('node/init')
         await context.dispatch('objects/init')
-        await context.dispatch('workspace/init')
+        await context.dispatch('workspace/init', user.wsRevision)
         await context.dispatch('lists/init')
         await context.dispatch('content/init')
-        let user = context.state.cache.cachedItems[context.state.auth.userOid]
-        logD('user', user)
-        assert(user)
         await i18next.changeLanguage(user.profile.lang)
         logD('vuex init done!')
         return true

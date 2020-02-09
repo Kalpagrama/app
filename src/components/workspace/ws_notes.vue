@@ -29,7 +29,7 @@ export default {
   methods: {
     async notesLoad () {
       this.$log('notesLoad start')
-      let {items} = await this.$store.dispatch('lists/wsItems', {pagination: {pageSize: 30, pageToken: null}, sortStrategy: 'HOT', filter: {nameRegExp: '^NOTE-.{11}=$', types: ['NODE']}})
+      let {items} = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'NOTES'})
       this.$log('notesLoad done', items)
       return items.map(i => i.object)
     },
