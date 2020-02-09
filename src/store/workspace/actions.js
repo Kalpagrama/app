@@ -244,13 +244,14 @@ export const wsItems = async (context, { wsItemsType, pagination, filter }) => {
   }
   let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
     { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc }, { root: true })
-  logD('wsItems complete', { items, count, totalCount, nextPageToken })
+  logD('wsItems complete short', { items, count, totalCount, nextPageToken })
   let fullItems = []
   for (let item of items) {
-    let fullItem = await context.dispatch('workspace/get', { oid: item.oid }, { root: true })
+    let fullItem = context.rootState.cache.cachedItems[makeKey(item)]
     assert(fullItem)
-    fullItems.push(fullItems)
+    fullItems.push(fullItem)
   }
+  // logD('wsItems complete full', { fullItems, count, totalCount, nextPageToken })
   return { items: fullItems, count, totalCount, nextPageToken }
 }
 
