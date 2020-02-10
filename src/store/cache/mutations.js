@@ -14,7 +14,9 @@ export function init (state) {
 }
 
 export function setItem (state, { key, item }) {
+  logD('setItem: item', item)
   state.cachedItems[key] = item
+  logD('setItem: state.cachedItems[key]', state.cachedItems[key])
 }
 
 export function removeItem (state, key) {

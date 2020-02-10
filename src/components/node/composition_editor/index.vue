@@ -81,9 +81,10 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
+        this.$log('node CHANGED', to)
         if (to) {
           if (this.ctx === 'composition') {
-            // this.nodeSave()
+            this.nodeSave()
           }
         }
       }
@@ -127,10 +128,10 @@ export default {
         this.nodeSaving = true
         let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
         this.$log('res', res)
+        this.$log('nodeSave done')
+        // this.node = res
         this.nodeSaving = false
         this.nodeSavingError = null
-        // this.node = res
-        this.$log('nodeSave done')
       } catch (e) {
         this.$log('nodeSave error', e)
         this.nodeSaving = false
