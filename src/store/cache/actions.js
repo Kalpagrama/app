@@ -44,6 +44,12 @@ class CachePersist {
   }
 }
 
+// очередь на обновление данных
+class Queue{
+  constructor (cache){
+
+  }
+}
 // в кэше хранятся только ключи. сами данные - во vuex
 class Cache {
   constructor (context) {
@@ -85,6 +91,14 @@ class Cache {
     }
   }
 
+  async clear () {
+    logD('clear cache')
+    await this.cachePersist.clear()
+    this.cacheLru.reset()
+    this.context.commit('clear')
+    logD('cache clear OK!')
+  }
+
   // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
   async set (key, item, actualAge) {
     assert(key && item)
@@ -119,19 +133,21 @@ class Cache {
         }
       }
         break
-      case 'doNotTouch': {
-        let current = this.cacheLru.get(key)
-        if (current) {
-          actualAge = current.actualUntil - Date.now()
-        } else {
-          actualAge = this.defaultActualAge
-        }
-      }
-        break
       default:
-        assert(actualAge == null || Number.isInteger(actualAge))
-        if (actualAge == null) actualAge = this.defaultActualAge
+      {
+        if (!Number.isInteger(actualAge)){
+          // такой элемент уже есть в кэше оставляем что было
+          let current = this.cacheLru.get(key)
+          if (current) {
+            actualAge = current.actualUntil - Date.now()
+          } else {
+            actualAge = this.defaultActualAge
+          }
+          assert(actualAge == null || Number.isInteger(actualAge))
+          if (actualAge == null) actualAge = this.defaultActualAge
+        }
         break
+      }
     }
     assert(actualAge >= 0)
     let actualUntil = Date.now() + actualAge
@@ -285,7 +301,14 @@ export const init = async (context) => {
   logD('cache/init done')
 }
 
+export const clearCache = async (context) => {
+
+}
 // fetchItemFunc ф-я для получения данных с сервера
+export const clear = async (context) => {
+  assert(context.state.initialized)
+  return await cache.clear()
+}
 export const get = async (context, { key, fetchItemFunc, force }) => {
   assert(context.state.initialized)
   assert(typeof key === 'string')

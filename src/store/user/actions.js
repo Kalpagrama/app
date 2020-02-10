@@ -70,3 +70,32 @@ export const unSubscribe = async (context, oid) => {
   logD('subscriptions', 'unSubscribe OK', oid)
   return unSubscribe
 }
+
+// прелетел эвент - создано ядро. Добавить ядро на личную сферу
+export const addNode = async (context, objectShort) => {
+  logD('addNode start')
+  assert(objectShort.oid && objectShort.name != null)
+  for (let key in context.rootState.cache.cachedItems) {
+    let keyPattern = 'sphereNodes: '
+    if (key.startsWith(keyPattern)) {
+      let { oid, pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
+      assert(oid)
+      if (oid === context.rootState.auth.userOid) {
+        await context.dispatch('cache/update', {
+          key: key,
+          path: '',
+          setter: ({ items, count, totalCount, nextPageToken }) => {
+            logD('setter: ', { items, count, totalCount, nextPageToken })
+            assert(items && count >= 0 && totalCount >= 0)
+            items.unshift({ oid: objectShort.oid, name: objectShort.name })// в самом списке - просто ссылка
+            count++
+            totalCount++
+            return { items, count, totalCount, nextPageToken }
+          }
+        }, { root: true })
+      }
+    }
+  }
+  logD('addNode complete')
+}
+

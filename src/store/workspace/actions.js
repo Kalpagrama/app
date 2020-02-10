@@ -302,7 +302,6 @@ export const updateWsCache = async (context, { type, object }) => {
     key: makeKey(object),
     newValue: object
   }, { root: true })
-  // todo найти все ленты с мастерской. В какие из них добавлять???? видимо в те, где pageToken === null
   if (type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED') {
     for (let key in context.rootState.cache.cachedItems) {
       let keyPattern = 'wsItems: '
