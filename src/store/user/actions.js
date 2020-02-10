@@ -98,4 +98,3 @@ export const addNode = async (context, objectShort) => {
   }
   logD('addNode complete')
 }
-

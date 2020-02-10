@@ -44,12 +44,6 @@ class CachePersist {
   }
 }
 
-// очередь на обновление данных
-class Queue{
-  constructor (cache){
-
-  }
-}
 // в кэше хранятся только ключи. сами данные - во vuex
 class Cache {
   constructor (context) {
