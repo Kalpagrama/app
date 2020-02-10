@@ -12,7 +12,7 @@ div(:style=`{position: 'relative'}`).row.full-width
     //- small.full-width.text-white layerIndex: {{layerIndex}}
     //- small.full-width.text-white layers:
     //- small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
-    small.full-width.text-white ctx: {{ctx}}
+    small.full-width.text-white ctx: {{ ctx }}
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
   div(

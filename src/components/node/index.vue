@@ -39,7 +39,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       :mini="fragmentMini === 0" @mini="fragmentChange(0)"
       :style=`{
         position: previewHeight > 0 ? 'absolute' : 'relative', zIndex: fragmentMini === 0 ? 200 : 150,
-        opacity: styles[0].opacity,
+        opacity: styles[0].opacity, borderRadius: '10px', overflow: 'hidden',
         maxWidth: styles[0].maxWidth+'%',
         bottom: styles[0].bottom+'px',
         right: styles[0].right+'px'}`)
@@ -58,7 +58,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       :style=`{
         position: 'absolute', zIndex: fragmentMini === 1 ? 200 : 150,
         height: fragmentMini === 1 ? 'auto' : previewHeight+'px',
-        opacity: styles[1].opacity,
+        opacity: styles[1].opacity, borderRadius: '10px', overflow: 'hidden',
         maxWidth: styles[1].maxWidth+'%',
         bottom: styles[1].bottom+'px',
         right: styles[1].right+'px'}`)
