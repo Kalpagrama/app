@@ -72,7 +72,7 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
     })
     return {
       item: { items, count, totalCount, nextPageToken },
-      actualAge: 'hour'
+      actualAge: 'zero'
     }
   }
   let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',

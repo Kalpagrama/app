@@ -134,6 +134,8 @@ class Cache {
     }
     assert(actualAge >= 0)
     let actualUntil = Date.now() + actualAge
+    logD('actualAge', actualAge)
+    logD('actualUntil', actualUntil)
     this.cacheLru.set(key, { actualUntil, actualAge })
     await this.cachePersist.setItem(key, { item, actualUntil, actualAge })
     this.context.commit('setItem', { key, item })
@@ -144,7 +146,8 @@ class Cache {
   async get (key, fetchItemFunc, force) {
     assert(key && fetchItemFunc)
     let result
-    let actualUntil = this.cacheLru.get(key)
+    let {actualUntil, actualAge} = this.cacheLru.get(key)
+    logD('actualUntil', actualUntil, Date.now(), Date.now() > actualUntil)
     if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
       if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {

@@ -27,7 +27,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('variables CHANGED', 'from=', from, ', to=', to)
-        if (to) this.nodesLoad(to)
+        if (to) this.itemsLoad(to)
       }
     }
   },
@@ -82,7 +82,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted', this.variables)
+    this.$log('mounted')
     // TODO: load all the items if they are in cache...
   },
   beforeDestroy () {

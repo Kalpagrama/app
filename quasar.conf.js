@@ -64,7 +64,8 @@ module.exports = function (ctx) {
       plugins: [
         'Notify',
         'BottomSheet',
-        'AppFullscreen'
+        'AppFullscreen',
+        'AddressbarColor'
       ]
       // iconSet: 'ionicons-v4'
       // lang: 'de' // Quasar language

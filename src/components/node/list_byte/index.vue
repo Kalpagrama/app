@@ -4,8 +4,10 @@
     v-for="(n,ni) in nodes" :key="ni"
     :class=`{}`
     :style=`{}`
-    ).row.full-width.window-height.br
-    span listByte node {{ ni }}
+    ).row.full-width.window-height.bg-black
+    img(
+      :src="n.thumbUrl"
+      :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
 </template>
 
 <script>
