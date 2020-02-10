@@ -68,6 +68,7 @@ export const wsNodeSave = async (context, node) => {
 
   const makeNodeInput = (node) => {
     let nodeInput = {}
+    nodeInput.revision = node.revision || 1
     nodeInput.layout = node.layout
     nodeInput.name = node.name
     nodeInput.category = node.category || 'FUN'
@@ -79,7 +80,11 @@ export const wsNodeSave = async (context, node) => {
       if (c !== null) {
         nodeInput.compositions.push({
           spheres: [],
-          operation: c.operation,
+          operation: {
+            operations: c.operation.operations,
+            items: c.operation.items,
+            type: c.operation.type
+          },
           layers: c.layers.map(l => {
             return {
               contentOid: l.content.oid,
@@ -107,6 +112,7 @@ export const wsNodeSave = async (context, node) => {
   let wsItem
   if (node.oid) { // обновить
     let updateItemFunc = async (updatedItem) => {
+      logD('updatedItem', updatedItem)
       assert(updatedItem.revision)
       let nodeInput = makeNodeInput(updatedItem)
       let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({

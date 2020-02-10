@@ -136,7 +136,8 @@ class Cache {
     let actualUntil = Date.now() + actualAge
     this.cacheLru.set(key, { actualUntil, actualAge })
     await this.cachePersist.setItem(key, { item, actualUntil, actualAge })
-    return this.context.commit('setItem', { key, item })
+    this.context.commit('setItem', { key, item })
+    return this.context.rootState.cache.cachedItems[key]
   }
 
   // fetchItemFunc - ф-я которая запросит сущность с бэкенда

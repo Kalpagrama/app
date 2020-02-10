@@ -115,6 +115,7 @@ export default {
       node: null,
       nodeNew: {
         name: '',
+        revision: 1,
         layout: 'PIP',
         category: 'FUN',
         spheres: [],
@@ -166,7 +167,8 @@ export default {
         let c = {
           url: '',
           name: '',
-          layers: [l]
+          layers: [l],
+          operation: {operations: null, items: [], type: 'CONCAT'}
         }
         this.$set(this.node.compositions, this.compositionIndex, c)
       }
@@ -197,8 +199,7 @@ export default {
         this.$log('res', res)
         this.nodeSaving = false
         this.nodeSavingError = null
-        // this.node = res.object
-        this.node = res
+        this.node = JSON.parse(JSON.stringify(res))
         this.$log('nodeSave done')
       } catch (e) {
         this.$log('nodeSave error', e)
