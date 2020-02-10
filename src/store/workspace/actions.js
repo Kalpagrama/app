@@ -68,6 +68,7 @@ export const wsNodeSave = async (context, node) => {
 
   const makeNodeInput = (node) => {
     let nodeInput = {}
+    nodeInput.revision = node.revision || 1
     nodeInput.layout = node.layout
     nodeInput.name = node.name
     nodeInput.category = node.category || 'FUN'
@@ -107,6 +108,7 @@ export const wsNodeSave = async (context, node) => {
   let wsItem
   if (node.oid) { // обновить
     let updateItemFunc = async (updatedItem) => {
+      assert(updatedItem)
       assert(updatedItem.revision)
       let nodeInput = makeNodeInput(updatedItem)
       let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({

@@ -136,7 +136,8 @@ class Cache {
     let actualUntil = Date.now() + actualAge
     this.cacheLru.set(key, { actualUntil, actualAge })
     await this.cachePersist.setItem(key, { item, actualUntil, actualAge })
-    return this.context.commit('setItem', { key, item })
+    this.context.commit('setItem', { key, item })
+    return this.context.rootState.cache.cachedItems[key]
   }
 
   // fetchItemFunc - ф-я которая запросит сущность с бэкенда
@@ -211,6 +212,7 @@ class Cache {
       logD('setValue:', value)
       return obj
     }
+
     // logD('Cache::update params:', {key, path, newValue, setter, actualAge})
     assert(!updateItemFunc || (fetchItemFunc && mergeItemFunc), 'fetchItemFunc, mergeItemFunc нужны для устранения конфликтов')
     // обновим данные в кэше
@@ -247,7 +249,9 @@ class Cache {
           let mergedItem = mergeItemFunc(path, serverItem, updatedItem)
           // еще раз попробуем обновить
           updatedItem = await updateItemFunc(mergedItem)
-        } else throw err
+        } else {
+          throw err
+        }
       }
       assert(updatedItem)
       updatedItem = await cache.set(key, updatedItem, actualAge)
