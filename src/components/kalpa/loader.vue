@@ -1,5 +1,5 @@
 <template lang="pug">
-  .row.full-width
+  .row.full-width.justify-center.items-start.content-start
     slot(name="items" :items="items")
 </template>
 
@@ -66,7 +66,10 @@ export default {
         case 'nodeNodes' :
           res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
-        default: throw new Error(`unknown type ${this.type}`)
+        case 'wsContents' :
+          res = await this.$store.dispatch('lists/wsItems', {pagination, filter, sortStrategy, wsItemsType: 'CONTENTS'})
+          break
+        default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }
       // parse res
       let { items, count, totalCount, nextPageToken } = res

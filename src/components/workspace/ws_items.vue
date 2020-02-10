@@ -43,7 +43,7 @@ div(
           borderRadius: '10px',
           color: page === p.id ? 'white !important' : '#4caf50',
           background: page === p.id ? '#4caf50' : 'none'}`
-        ).text-green.text-bold.cursor-pointer.q-pa-sm.q-mr-sm {{ p.name }}
+        ).text-green.cursor-pointer.q-pa-sm {{ p.name }}
     //- body
     div(v-show="width > 390").col.full-width
       component(:is="`ws-`+page" @item="itemClick('note', $event)" :ctx="ctx" :oid="oid")

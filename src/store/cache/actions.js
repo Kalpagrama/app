@@ -159,8 +159,7 @@ class Cache {
     let result
     let cachedData = this.cacheLru.get(key)
     let {actualUntil, actualAge} = cachedData ? cachedData : {}
-    logD('actualUntil', actualUntil, Date.now(), Date.now() > actualUntil)
-    if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
+    if (force || !cacheResult || !actualUntil || Date.now() >= actualUntil) { // данные отсутствуют в кэше, либо устарели
       if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {
         logD('запрашиваем данные с сервера...')
@@ -233,7 +232,7 @@ class Cache {
     // обновим данные в кэше
     let updatedItem
     if (path || setter) {
-      assert(newValue == null || typeof newValue === 'object')
+      // assert(newValue == null || typeof newValue === 'object')
       let vuexItem = this.context.state.cachedItems[key]
       assert(vuexItem)
       updatedItem = setValue(vuexItem, path.split('.'), newValue, setter)

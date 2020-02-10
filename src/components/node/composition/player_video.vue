@@ -3,19 +3,21 @@
   div(:style=`{position: 'relative'}`).row.fit
     video(
       ref="kalpaVideo"
-      playsinline :autoplay="false"
+      playsinline :autoplay="ctx === 'composition'" loop
       @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="videoEnded"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
       source(
         :src="url" type="video/mp4")
     //- debug
-    div(:style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000}`).row.bg-green
+    div(
+      v-if="false"
+      :style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000}`).row.bg-green
       span.full-width.text-white player: {{player}}
     //- progress
     div(
       v-if="true"
-      v-show="true"
+      v-show="!mini"
       :style=`{
         position: 'absolute', bottom: '16px', left: 0, zIndex: 1000}`
       ).row.full-width.items-start.content-start
@@ -61,15 +63,13 @@
 <script>
 export default {
   name: 'playerVideo',
-  props: ['url', 'source', 'start', 'end', 'visible'],
+  props: ['ctx', 'url', 'source', 'start', 'end', 'visible', 'mini'],
   data () {
     return {
       now: 0,
       player: {},
       moveInterval: null,
       progressHeight: 10
-      // start: 3,
-      // end: 30
     }
   },
   watch: {
@@ -120,7 +120,7 @@ export default {
     videoCanplay () {
       this.$log('videoCanplay')
       this.player.setCurrentTime(this.start || 0)
-      this.player.play()
+      // this.player.play()
     },
     videoPlay () {
       this.$log('videoPlay')
@@ -144,11 +144,8 @@ export default {
     },
     async videoClick (e) {
       this.$log('videoClick')
-      // this.$q.notify('Video click!')
       if (this.player.playing) this.player.pause()
       else this.player.play()
-      // if (this.player.playing) this.$refs.kalpaVideo.pause()
-      // else this.$refs.kalpaVideo.play()
     },
     playerInit () {
       if (this.source === 'KALPA') {
