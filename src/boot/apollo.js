@@ -1,4 +1,5 @@
 import { ApolloClient } from 'apollo-client'
+import { onError } from 'apollo-link-error'
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
 import introspectionQueryResultData from '../schema/graphql.schema.json'
 import { createHttpLink } from 'apollo-link-http'
@@ -24,6 +25,21 @@ export default async ({ Vue, store, app }) => {
   logD('process.env=', process.env)
   logD('SERVICES_URL=', SERVICES_URL)
   store.commit('auth/stateSet', ['SERVICES_URL', SERVICES_URL])
+
+  const errLink = onError(({ operation, response, graphQLErrors, networkError }) => {
+    logE('gql onError', { operation, response, graphQLErrors, networkError })
+    if (graphQLErrors){
+      for (let err of graphQLErrors) {
+        logE('gql err=', err)
+      }
+      graphQLErrors.forEach(({ message, locations, path }) =>
+        logE(
+          `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
+        )
+      )
+    }
+    if (networkError) logE('[Network error]:', networkError);
+  })
 
   // // todo После выхода apollo-client 3 - выкинуть fragmentMatcher и перейти на possibleTypes
   const fragmentMatcher = new IntrospectionFragmentMatcher({
@@ -60,6 +76,7 @@ export default async ({ Vue, store, app }) => {
     query: {
       fetchPolicy: 'no-cache',
     },
+    onError: errLink
   }
   const servicesApollo = new ApolloClient({
     link: createHttpLink({
