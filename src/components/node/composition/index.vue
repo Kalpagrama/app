@@ -9,9 +9,10 @@ div(:style=`{position: 'relative'}`).row.full-width
   div(
     v-if="false"
     :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000}`).row.bg-green
-    small.full-width.text-white layerIndex: {{layerIndex}}
-    small.full-width.text-white layers:
-    small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
+    //- small.full-width.text-white layerIndex: {{layerIndex}}
+    //- small.full-width.text-white layers:
+    //- small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
+    small.full-width.text-white ctx: {{ctx}}
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
   div(
@@ -45,7 +46,7 @@ div(:style=`{position: 'relative'}`).row.full-width
   player-video(
     v-if="composition && content && content.type === 'VIDEO'"
     ref="player"
-    :url="contentUrl" :source="contentSource"
+    :url="contentUrl" :source="contentSource" :ctx="ctx"
     :start="layerStart" :end="layerEnd" :visible="visible" :mini="mini"
     @player="$emit('player', $event)" @ended="layerEnded"
     :style=`{position:'absolute', zIndex: 100}`)
@@ -79,17 +80,17 @@ export default {
       return this.layer.figuresRelative
     },
     layerStart () {
-      if (this.layerFiguresRelative) {
-        return this.layerFiguresRelative[0].t
-      } else {
+      if (this.ctx === 'composition') {
         return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
+      } else {
+        return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
       }
     },
     layerEnd () {
-      if (this.layerFiguresRelative) {
-        return this.layerFiguresRelative[1].t
-      } else {
+      if (this.ctx === 'composition') {
         return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
+      } else {
+        return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
       }
     },
     layers () {
@@ -102,10 +103,10 @@ export default {
     },
     contentUrl () {
       if (this.content) {
-        if (this.layerFiguresRelative) {
-          return this.layer.url
-        } else {
+        if (this.ctx === 'composition') {
           return this.content.url
+        } else {
+          return this.layer.url
         }
       } else {
         return false

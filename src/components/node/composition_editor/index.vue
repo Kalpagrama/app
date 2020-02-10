@@ -4,11 +4,11 @@ div(:style=`{position: 'relative'}`).row.fit
   //- how to delete composition from the node
   div(v-if="node.compositions[compositionIndex]").col.full-height
     editor-video(
-      v-if="composition && content.type === 'VIDEO'"
+      v-if="composition && content.type === 'VIDEO'" :ctx="ctx"
       :composition="composition" :content="content"
       @layerExport="$emit('layerExport', $event)")
     editor-image(
-      v-if="composition && content.type === 'IMAGE'"
+      v-if="composition && content.type === 'IMAGE'" :ctx="ctx"
       :composition="composition" :content="content")
   //- TODO: where to finder to be? inside composition editor
   //- does it using somewhere else ??

@@ -3,7 +3,7 @@
   div(:style=`{position: 'relative'}`).row.fit
     video(
       ref="kalpaVideo"
-      playsinline :autoplay="false"
+      playsinline :autoplay="ctx === 'composition'" loop
       @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="videoEnded"
       :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
@@ -63,7 +63,7 @@
 <script>
 export default {
   name: 'playerVideo',
-  props: ['url', 'source', 'start', 'end', 'visible', 'mini'],
+  props: ['ctx', 'url', 'source', 'start', 'end', 'visible', 'mini'],
   data () {
     return {
       now: 0,

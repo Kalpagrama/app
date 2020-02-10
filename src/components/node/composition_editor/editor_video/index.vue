@@ -3,7 +3,7 @@
   div(:style=`{position: 'relative'}`).col.full-height
     .column.fit
       .col.full-width
-        composition(v-if="composition" :composition="composition" :mini="false" @player="player = $event").full-height
+        composition(v-if="composition" :composition="composition" :mini="false" @player="player = $event" :ctx="ctx").full-height
           template(v-slot:right)
             q-btn(
               v-if="false"
@@ -52,7 +52,7 @@ import layers from './layers'
 export default {
   name: 'compositionEditorVideo',
   components: {composition, layerEditor, layers},
-  props: ['composition', 'content'],
+  props: ['ctx', 'composition', 'content'],
   data () {
     return {
       editorHeight: 0,

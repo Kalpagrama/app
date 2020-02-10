@@ -221,7 +221,7 @@ class Cache {
     // обновим данные в кэше
     let updatedItem
     if (path || setter) {
-      assert(newValue == null || typeof newValue === 'object')
+      // assert(newValue == null || typeof newValue === 'object')
       let vuexItem = this.context.state.cachedItems[key]
       assert(vuexItem)
       updatedItem = setValue(vuexItem, path.split('.'), newValue, setter)

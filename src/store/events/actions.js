@@ -86,6 +86,8 @@ async function processEvent (context, event) {
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
+      logD('NODE_RATED', 'event.object.oid', event.object.oid)
+      logD('NODE_RATED', 'event.rate', event.rate)
       await context.dispatch('cache/update', {
         key: event.object.oid,
         path: 'rate',
