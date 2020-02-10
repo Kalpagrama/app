@@ -1,19 +1,9 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-grey-3
-  //- q-header(
-  //-   v-if="true"
-  //-   reveal
-  //-   ).row.full-width.justify-center.q-px-sm.bg-grey-3
-  //-   k-colls-tabs(
-  //-     :coll="coll" :colls="colls"
-  //-     @coll="coll = $event"
-  //-     :style=`{maxWidth: $store.state.ui.pageMaxWidth+'px', borderRadius: '0 0 10px 10px'}`).bg-white
-  q-footer(reveal).row.full-width.justify-center.bg-grey-3.lt-sm
-    slot(name="menuMobile")
+q-layout(view="hHh lpR fFf").bg-grey-7
   q-page-conainter.row.full-width.justify-center.items-start.content-start
-    kalpa-loader(type="sphereNodes" :variables="variables")
+    kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
-        node-list-byte(:nodes="items")
+        node-list(:nodes="items" :style=`{maxWidth: '600px'}`)
 </template>
 
 <script>
@@ -47,6 +37,14 @@ export default {
     },
   },
   watch: {
+    '$route.params.category': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route.params.category')
+        // TODO set first category?
+        if (!to) this.$router.push({params: {category: 'FUN'}})
+      }
+    }
   },
   methods: {
   },

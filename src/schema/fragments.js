@@ -11,6 +11,7 @@ const metaFragment = gql`
     ...on MetaNode {
       compositions{
         oid
+        thumbUrl(preferWidth: 600)
         meta {
           ... on MetaComposition{...metaComposition}
         }
@@ -137,6 +138,7 @@ const compositionFragment = gql`
         }
       }
       figuresAbsolute{...figureFragment}
+      figuresRelative {...figureFragment}
       speed
       spheres {...objectShortFragment}
       thumbUrl(preferWidth: 600)

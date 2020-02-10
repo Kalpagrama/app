@@ -146,9 +146,9 @@ class Cache {
   async get (key, fetchItemFunc, force) {
     assert(key && fetchItemFunc)
     let result
-    let {actualUntil, actualAge} = this.cacheLru.get(key)
-    logD('actualUntil', actualUntil, Date.now(), Date.now() > actualUntil)
-    if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
+    let cacheResult = this.cacheLru.get(key)
+    // logD('actualUntil', cacheResult.actualUntil, Date.now(), Date.now() > cacheResult.actualUntil)
+    if (force || !cacheResult || !cacheResult.actualUntil || Date.now() > cacheResult.actualUntil) { // данные отсутствуют в кэше, либо устарели
       if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {
         logD('запрашиваем данные с сервера...')

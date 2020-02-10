@@ -53,6 +53,7 @@ export default {
         this.$log('$route.params.page CHANGED', to)
         if (to) this.page = to
         if (to !== from) this.node = null
+        if (!to) this.$router.push({params: {page: 'nodes'}})
       }
     }
   },

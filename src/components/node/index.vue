@@ -1,5 +1,8 @@
 <template lang="pug">
 div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
+  //- action dialogs
+  q-dialog(v-model="compositionFinderOpened").bg-black
+    composition-finder(@layer="layerFound").bg-black
   //- fragments wrapper
   div(
     :style=`{
@@ -22,16 +25,17 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       .row.full-width.justify-center
         span(:style=`{fontSize: '50px'}`
           ).text-bold.text-white.text-center {{ voteLabel }}
-    component(:is="fc ? fc : 'nc-fragment'"
+    composition(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
-      :thumbUrl="node.meta.fragments[0].thumbUrl"
+      :thumbUrl="node.meta.compositions[0].thumbUrl" :extending="nodeExtending"
+      @extend="compositionExtend(0)"
       @previewWidth="$event => fragmentWidth(0, $event)"
       @previewHeight="$event => fragmentHeight(0, $event)"
       @ended="fragmentEnded(0)"
       @action="nodeActionStart"
       :visible="visible"
-      :fragment="nodeFull ? nodeFull.fragments[0] : null"
+      :composition="nodeFull ? nodeFull.compositions[0] : null"
       :mini="fragmentMini === 0" @mini="fragmentChange(0)"
       :style=`{
         position: previewHeight > 0 ? 'absolute' : 'relative', zIndex: fragmentMini === 0 ? 200 : 150,
@@ -39,16 +43,17 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
         maxWidth: styles[0].maxWidth+'%',
         bottom: styles[0].bottom+'px',
         right: styles[0].right+'px'}`)
-    component(:is="fc ? fc : 'nc-fragment'"
+    composition(
       ref="fragmentSecond"
       :ctx="ctx" :index="1"
-      :thumbUrl="node.meta.fragments[1].thumbUrl"
+      :thumbUrl="node.meta.compositions[1].thumbUrl" :extending="nodeExtending"
+      @extend="compositionExtend(1)"
       @previewWidth="$event => fragmentWidth(1, $event)"
       @previewHeight="$event => fragmentHeight(1, $event)"
       @ended="fragmentEnded(1)"
       @action="nodeActionStart"
       :visible="visible"
-      :fragment="nodeFull ? nodeFull.fragments[1] : null"
+      :composition="nodeFull ? nodeFull.compositions[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(1)"
       :style=`{
         position: 'absolute', zIndex: fragmentMini === 1 ? 200 : 150,
@@ -61,7 +66,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
     //- div(:style=`{position: 'absolute', zIndex: 100, right: 0+'px', bottom: 0+'px', height: '50px', maxWidth: 20+'%', width: '50px', opacity: 0.5}`).row.fit.bg-yellow
   //- name, essence
   div(
-    ref="nodeName" @click="$emit('nodeClick', [node, nodeFull])"
+    ref="nodeName" @click="nodeNameClick()"
     :style=`{minHeight: '60px'}`
     ).row.full-width.items-center.justify-center
     //- span.text-green.text-bold.q-mr-sm {{index}}
@@ -93,9 +98,11 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       v-if="votePanning"
       :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
       span Pan to vote
-    div( :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
-      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(node.rate)}}
-      span.text-bold.full-width.text-center {{voteHuman(node.rateUser)}}
+    div(
+      v-if="nodeFull"
+      :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
+      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(nodeFull.rate)}}
+      span.text-bold.full-width.text-center {{voteHuman(nodeFull.rateUser)}}
     //- user name
     div(
       @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
@@ -119,8 +126,11 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
           :style=`{}`).q-mr-sm.cursor-pointer
           span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
     //- timestamp
-    .row.full-width.justify-start.q-pa-md
+    .row.full-width.justify-start.items-center.content-center.q-pa-md
       small.text-grey-7 31.12.2019
+      .col
+      q-btn(push no-caps dense color="green" @click="nodeExtend()").q-px-sm.q-ml-sm
+        span Extend
 </template>
 
 <script>
@@ -136,6 +146,7 @@ export default {
   components: {nodeFragment, ncFragment},
   data () {
     return {
+      nodeExtending: false,
       nodeFullError: null,
       nodeFull: null,
       voteLeft: 0,
@@ -153,10 +164,12 @@ export default {
       fragmentMini: 1,
       fragmentMiniStart: 1,
       nodeVoting: false,
-      stylesMini: {right: 20, bottom: 20, maxWidth: 20, maxHeight: 20},
+      stylesMini: {right: 20, bottom: 40, maxWidth: 20, maxHeight: 20},
       stylesMaxi: {right: 0, bottom: 0, maxWidth: 100, maxHeight: 100},
-      styles: [{right: 0, bottom: 0, maxWidth: 100, opacity: 1}, {right: 20, bottom: 20, maxWidth: 20, opacity: 1}],
-      fragmentSecondPlaying: false
+      styles: [{right: 0, bottom: 0, maxWidth: 100, opacity: 1}, {right: 20, bottom: 40, maxWidth: 20, opacity: 1}],
+      fragmentSecondPlaying: false,
+      compositionIndex: 0,
+      compositionFinderOpened: false
     }
   },
   computed: {
@@ -315,6 +328,66 @@ export default {
         this.$refs.fragmentSecond.play()
       }
     },
+    nodeNameClick () {
+      this.$log('nodeNameClick')
+      // TODO opened nonce? open ) => opened once? go to node page
+      if (this.opened) {
+        // go to node page
+      } else {
+        this.opened = true
+      }
+    },
+    nodeNameExtend () {
+      this.$log('nodeNameExtend')
+    },
+    layerFound (l) {
+      this.$log('layerFound', l)
+      this.compositionFinderOpened = false
+      this.nodeExtending = false
+      // TODO create new composition then publish a node with this composition...
+      let c = {
+        url: '',
+        name: '',
+        layers: [l],
+        operation: {operations: null, items: [], type: 'CONCAT'}
+      }
+      let nodeNew = JSON.parse(JSON.stringify(this.nodeFull))
+      nodeNew.compositions[this.compositionIndex] = c
+      this.nodePublish(nodeNew)
+      // this.compositionIndex = undefined
+      // this.$set(this.node.compositions, this.compositionIndex, c)
+    },
+    compositionExtend (index) {
+      this.$log('compositionExtend', index)
+      this.compositionIndex = index
+      this.compositionFinderOpened = true
+    },
+    async nodePublish (node) {
+      try {
+        this.$log('nodePublish start')
+        // this.nodePublishing = true
+        // this.nodePublishCheck(this.node)
+        let res = await this.$store.dispatch('node/nodeCreate', node)
+        this.$log('res', res)
+        this.$log('nodePublish done')
+        // this.nodePublishing = false
+        // this.nodePublishingError = null
+        this.$log('nodePublish done')
+        // this.nodePublishing = false
+      } catch (e) {
+        this.$log('nodePublish error', e)
+        // this.nodePublishingError = e
+        // this.nodePublishing = false
+      }
+    },
+    nodeExtend () {
+      this.$log('nodeExtend')
+      if (this.nodeExtending) {
+        this.nodeExtending = false
+      } else {
+        this.nodeExtending = true
+      }
+    },
     nodeActionStart () {
       this.$log('nodeActionStart')
       this.$store.dispatch('ui/action', [
@@ -408,9 +481,10 @@ export default {
         })
       }
     },
-    async nodeDestroy(){
+    async nodeDestroy () {
+      this.$log('nodeDestroy')
       if (this.nodeFull && !this.needFull && !this.needFullPreload){
-        this.$log(` node CLEAR indx=${this.index} oid=${this.node.oid}`)
+        this.$log(`node CLEAR indx=${this.index} oid=${this.node.oid}`)
         this.nodeFull = null
       }
     }

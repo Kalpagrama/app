@@ -3,7 +3,7 @@
   div(:style=`{position: 'relative'}`).col.full-height
     .column.fit
       .col.full-width
-        composition(v-if="composition" :composition="composition" @player="player = $event")
+        composition(v-if="composition" :composition="composition" :mini="false" @player="player = $event").full-height
           template(v-slot:right)
             q-btn(
               v-if="false"

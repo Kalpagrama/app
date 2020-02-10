@@ -106,14 +106,14 @@ export const nodeCreate = async (context, node) => {
   logD('nodeCreate start', node)
   // checks
   {
-    assert.ok(node.category)
-    assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10)
-    assert.ok(node.compositions.length > 0)
-    assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
+    assert.ok(node.category, 'node.category')
+    assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10, 'node spheres')
+    assert.ok(node.compositions.length > 0, 'node.compositions.length > 0')
+    assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout), 'node.layout')
     for (let c of node.compositions) {
       assert.ok(c.layers.length > 0)
-      assert(c.spheres && c.spheres.length >= 0 && c.spheres.length <= 10)
-      assert(c.operation)
+      // assert(c.spheres && c.spheres.length >= 0 && c.spheres.length <= 10, 'c.spheres')
+      assert(c.operation, 'c.operation')
       let compositionLen = 0
       for (let l of c.layers) {
         assert.ok(l.content && l.content.oid)
@@ -139,9 +139,7 @@ export const nodeCreate = async (context, node) => {
   nodeInput.compositions = node.compositions.map(c => {
     return {
       thumbUrl: c.thumbUrl,
-      spheres: c.spheres.map(s => {
-        return { name: s.name }
-      }),
+      spheres: c.spheres ? c.spheres.map(s => ({ name: s.name })) : [],
       layers: c.layers.map(l => {
         return {
           contentOid: l.contentOid,

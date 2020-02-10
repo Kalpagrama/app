@@ -9,9 +9,11 @@ iframe {
 .row.full-width.items-start.content-start
   k-action
   //- kalpa-tutorial
-  .row.window-height.bg-grey-8
+  div(:style=`{position: 'fixed', zIndex: 10000, left: 0, top: 0}`).row.window-height.bg-grey-8.gt-sm
     kalpa-menu-desktop(v-if="!loading")
-  .col
+  div(:style=`{position: 'fixed', zIndex: 10000, bottom: 0}`).row.full-width.xs
+    kalpa-menu-mobile(v-if="!loading")
+  div(:style=`{paddingLeft: $q.screen.gt.sm ? '60px' : '0px'}`).col
     router-view(v-if="!loading")
     div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
       q-spinner(color="green" size="50px")

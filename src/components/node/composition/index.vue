@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit
+div(:style=`{position: 'relative'}`).row.full-width
   //- slots
   div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
     slot(name="left")
@@ -13,7 +13,9 @@ div(:style=`{position: 'relative'}`).row.fit
     small.full-width.text-white layers:
     small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
   //- content name & menu & action slots
+  //- TODO content click goes to content in workspace and adds it to your workspace automatically
   div(
+    v-if="!mini && content"
     :style=`{position: 'absolute', zIndex: 1000, top: 0, height: '60px'}`
     ).row.full-width.items-center.q-pa-md.cursor-pointer
     .col.full-height
@@ -24,30 +26,49 @@ div(:style=`{position: 'relative'}`).row.fit
             borderRadius: '10px', overflow: 'hidden',
             userSelect: 'none', pointerEvents: 'none',
             background: 'rgba(0,0,0,0.5)'}`
-          ).text-white.q-pa-sm {{content.name}}
+          ).text-white.q-pa-sm {{ content.name }}
+  //- extending
+  div(
+    v-if="extending"
+    :style=`{position: 'absolute', zIndex: 300, background: 'rgba(0,0,0,0.5)'}`
+    ).row.fit.items-center.content-center.justify-center
+    q-btn(round flat size="lg" icon="add" color="green" @click="$emit('extend')")
+  //- mini toggle
+  div(
+    v-if="mini" @click="$emit('mini')"
+    :style=`{position: 'absolute', zIndex: 200, opacity: 0.5}`).row.fit.cursor-pointer
+  //- preview
+  img(
+    v-if="thumbUrl" ref="compositionPreview" :src="thumbUrl" crossOrigin="anonymous" draggable="false" @load="previewLoad" @error="previewError"
+    :style=`{width: '100%'}`)
   //- players
-  //- TODO: content.type => player...
   player-video(
+    v-if="composition && content && content.type === 'VIDEO'"
+    ref="player"
     :url="contentUrl" :source="contentSource"
-    :start="layerStart" :end="layerEnd" :visible="visible"
-    @player="$emit('player', $event)" @ended="layerEnded")
+    :start="layerStart" :end="layerEnd" :visible="visible" :mini="mini"
+    @player="$emit('player', $event)" @ended="layerEnded"
+    :style=`{position:'absolute', zIndex: 100}`)
     //- TODO: props is options on one object...
     template(v-slot:layerEditor=`{player, now, progressHeight}`)
       slot(name="layerEditor" :player="player" :now="now" :progressHeight="progressHeight")
 </template>
 
 <script>
-import { throttle } from 'quasar'
+import { debounce } from 'quasar'
 import playerVideo from './player_video'
 import playerImage from './player_image'
 
 export default {
   name: 'composition',
   components: {playerVideo, playerImage},
-  props: ['ctx', 'composition', 'layerIndexPlay', 'visible'],
+  props: ['ctx', 'composition', 'layerIndexPlay', 'visible', 'active', 'mini', 'thumbUrl', 'extending'],
   data () {
     return {
-      layerIndex: 0
+      layerIndex: 0,
+      previewWidth: 0,
+      previewHeight: 0,
+      previewLoaded: false
     }
   },
   computed: {
@@ -72,28 +93,64 @@ export default {
       }
     },
     layers () {
-      return this.composition.layers
+      if (this.composition) return this.composition.layers
+      else return []
     },
     content () {
-      return this.composition.layers[this.layerIndex].content
+      if (this.composition) return this.composition.layers[this.layerIndex].content
+      else return null
     },
     contentUrl () {
-      return this.content.url
+      if (this.content) {
+        if (this.layerFiguresRelative) {
+          return this.layer.url
+        } else {
+          return this.content.url
+        }
+      } else {
+        return false
+      }
     },
     contentSource () {
-      return this.content.contentSource
+      if (this.content) return this.content.contentSource
+      else return null
+    }
+  },
+  watch: {
+    mini: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('mini CHANGED', to)
+        if (to) this.pause()
+        else this.play()
+      }
     }
   },
   methods: {
     contentNameClick () {
       this.$log('contentNameClick')
-      // TODO: show content modal...
+      // TODO: show content modal... or go to the workspace contents
+    },
+    previewLoad () {
+      // this.$log('previewLoad')
+      let h = this.$refs.compositionPreview.clientHeight
+      let w = this.$refs.compositionPreview.clientWidth
+      this.$emit('previewHeight', h)
+      this.$emit('previewWidth', w)
+      this.previewHeight = h
+      this.previewWidth = w
+      this.previewLoaded = true
+    },
+    previewError () {
+      this.$log('previewError')
     },
     play () {
       this.$log('play')
+      if (this.$refs.player && this.$refs.player.player && !this.mini) this.$refs.player.player.play()
     },
     pause () {
       this.$log('pause')
+      if (this.$refs.player && this.$refs.player.player) this.$refs.player.player.pause()
     },
     playPause () {
       this.$log('playPause')
@@ -101,7 +158,7 @@ export default {
     layerEnded () {
       this.$log('*** layerEnded')
       this.$log('NOW => ', this.layerIndex)
-      // TODO: throttle it ???))
+      if (this.mini) return
       if (this.layerIndexPlay) {
         this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
         this.layerIndex = this.layerIndexPlay
@@ -123,7 +180,7 @@ export default {
     }
   },
   created () {
-    this.layerEnded = throttle(this.layerEnded, 300)
+    this.layerEnded = debounce(this.layerEnded, 300)
   },
   mounted () {
     this.$log('mounted')
