@@ -112,7 +112,7 @@ export const wsNodeSave = async (context, node) => {
   let wsItem
   if (node.oid) { // обновить
     let updateItemFunc = async (updatedItem) => {
-      logD('updatedItem', updatedItem)
+      // logD('updatedItem', updatedItem)
       assert(updatedItem.revision)
       let nodeInput = makeNodeInput(updatedItem)
       let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
@@ -131,7 +131,7 @@ export const wsNodeSave = async (context, node) => {
       return wsNodeUpdate
     }
     let fetchItemFunc = async () => {
-      let item = await context.dispatch('workspace/get', { oid: node.oid }, { root: true })
+      let item = await context.dispatch('workspace/get', { oid: node.oid, force: true }, { root: true })
       return item
     }
     let mergeItemFunc = (path, serverItem, cacheItem) => {
@@ -197,7 +197,7 @@ export const wsItemDelete = async (context, oid) => {
 // При этом если мы хотим хранить контент. то мы создаем ядро с именем CONTENT-...........= (oid контента)и на этом ядре хранится контент и все лэеры этого контента
 // это же справедливо и для композиций (COMPOSITION-...........=) (oid композиции)
 // для сфер создается одно ядро со всеми сферами сразу с именем (SPHERES-...........=) (oid юзера)
-export const wsItems = async (context, { wsItemsType, pagination, filter }) => {
+export const wsItems = async (context, { wsItemsType, pagination, filter, force }) => {
   logD('wsItems start')
   pagination = pagination || { pageSize: 30, pageToken: null }
   filter = filter || {}
@@ -251,7 +251,7 @@ export const wsItems = async (context, { wsItemsType, pagination, filter }) => {
     }
   }
   let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
-    { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc }, { root: true })
+    { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc, force }, { root: true })
   logD('wsItems complete short', { items, count, totalCount, nextPageToken })
   let fullItems = []
   for (let item of items) {
@@ -350,10 +350,11 @@ export const updateWsCache = async (context, { type, object }) => {
 }
 
 // можно запрашивать по oid, либо имени (если оно уникально)
-export const get = async (context, { oid, name }) => {
+export const get = async (context, { oid, name, force }) => {
   let { items, count, totalCount, nextPageToken } = await context.dispatch('workspace/wsItems', {
     wsItemsType: 'ALL',
-    filter: oid ? { oids: [oid] } : { name }
+    filter: oid ? { oids: [oid] } : { name },
+    force
   }, { root: true })
   assert(count === 0 || count === 1)
   return items[0]

@@ -13,8 +13,5 @@ export function stateSet (state, [key, val]) {
   assert.ok(Object.prototype.hasOwnProperty.call(state, key))
   if (val) {
     Vue.set(state, key, val)
-    // state[key] = val
-  } else {
-    return state[key]
   }
 }

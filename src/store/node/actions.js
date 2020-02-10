@@ -132,7 +132,7 @@ export const nodeCreate = async (context, node) => {
   let nodeInput = {}
   nodeInput.layout = node.layout
   nodeInput.name = node.name
-  nodeInput.categories = node.categories
+  nodeInput.category = node.category || 'FUN'
   nodeInput.spheres = node.spheres.map(s => {
     return { name: s.name }
   })

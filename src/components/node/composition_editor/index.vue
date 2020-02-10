@@ -44,6 +44,7 @@ export default {
   },
   data () {
     return {
+      nodeSavePause: false,
       nodeSaving: false,
       nodeSavingError: null,
       compositionFinderOpened: false
@@ -82,8 +83,10 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('node CHANGED', to)
-        if (to) {
-          if (this.ctx === 'composition') {
+        if (to && this.ctx === 'composition') {
+          if (this.nodeSavePause) {
+            this.nodeSavePause = false
+          } else {
             this.nodeSave()
           }
         }
@@ -129,9 +132,11 @@ export default {
         let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
         this.$log('res', res)
         this.$log('nodeSave done')
-        // this.node = res
+        this.nodeSavePause = true
+        this.node = JSON.parse(JSON.stringify(res))
         this.nodeSaving = false
         this.nodeSavingError = null
+        // this.nodeSavePause = false
       } catch (e) {
         this.$log('nodeSave error', e)
         this.nodeSaving = false

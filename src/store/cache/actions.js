@@ -141,12 +141,12 @@ class Cache {
   }
 
   // fetchItemFunc - ф-я которая запросит сущность с бэкенда
-  async get (key, fetchItemFunc) {
+  async get (key, fetchItemFunc, force) {
     assert(key && fetchItemFunc)
     let result
     let actualUntil = this.cacheLru.get(key)
-    if (!actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
-      logD('данные отсутствуют в кэше, либо устарели!')
+    if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
+      if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {
         logD('запрашиваем данные с сервера...')
         let { item, actualAge } = await fetchItemFunc()
@@ -212,6 +212,7 @@ class Cache {
       logD('setValue:', value)
       return obj
     }
+
     // logD('Cache::update params:', {key, path, newValue, setter, actualAge})
     assert(!updateItemFunc || (fetchItemFunc && mergeItemFunc), 'fetchItemFunc, mergeItemFunc нужны для устранения конфликтов')
     // обновим данные в кэше
@@ -251,8 +252,9 @@ class Cache {
           logD('mergedItem', mergedItem)
           // еще раз попробуем обновить
           updatedItem = await updateItemFunc(mergedItem)
-          logD('updatedItem 1!', updatedItem)
-        } else throw err
+        } else {
+          throw err
+        }
       }
       assert(updatedItem)
       updatedItem = await cache.set(key, updatedItem, actualAge)
@@ -279,10 +281,10 @@ export const init = async (context) => {
 }
 
 // fetchItemFunc ф-я для получения данных с сервера
-export const get = async (context, { key, fetchItemFunc }) => {
+export const get = async (context, { key, fetchItemFunc, force }) => {
   assert(context.state.initialized)
   assert(typeof key === 'string')
-  return await cache.get(key, fetchItemFunc)
+  return await cache.get(key, fetchItemFunc, force)
 }
 
 // updateItemFunc - ф-я для обновления данных на сервере (вернет обновленную сущность)

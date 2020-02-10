@@ -106,6 +106,7 @@ export default {
   props: ['value'],
   data () {
     return {
+      nodeSavePause: false,
       nodeSaving: false,
       nodeSavingError: null,
       nodePublishing: false,
@@ -150,7 +151,11 @@ export default {
       handler (to, from) {
         this.$log('node CHANGED', to)
         if (to) {
-          this.nodeSave(to)
+          if (this.nodeSavePause) {
+            this.nodeSavePause = false
+          } else {
+            this.nodeSave(to)
+          }
         }
       }
     }
@@ -197,10 +202,11 @@ export default {
         this.nodeSaving = true
         let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node || this.node)))
         this.$log('res', res)
-        this.nodeSaving = false
-        this.nodeSavingError = null
+        this.nodeSavePause = true
         this.node = JSON.parse(JSON.stringify(res))
         this.$log('nodeSave done')
+        this.nodeSaving = false
+        this.nodeSavingError = null
       } catch (e) {
         this.$log('nodeSave error', e)
         this.nodeSavingError = e
