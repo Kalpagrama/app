@@ -142,7 +142,9 @@ export const wsNodeSave = async (context, node) => {
       } else {
         // todo merge or throw error
       }
-      assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
+      // TODO merge!
+      mergedItem = serverItem
+      // assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
       return mergedItem
     }
     wsItem = await context.dispatch('cache/update', {

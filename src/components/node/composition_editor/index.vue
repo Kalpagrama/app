@@ -19,7 +19,7 @@ div(:style=`{position: 'relative'}`).row.fit
 </template>
 
 <script>
-import { throttle } from 'quasar'
+import { debounce } from 'quasar'
 import editorVideo from './editor_video/index.vue'
 import editorImage from './editor_image/index.vue'
 
@@ -140,7 +140,7 @@ export default {
     }
   },
   created () {
-    this.nodeSave = throttle(this.nodeSave, 2000)
+    this.nodeSave = debounce(this.nodeSave, 2000)
   },
   mounted () {
     this.$log('mounted')

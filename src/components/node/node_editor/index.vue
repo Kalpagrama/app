@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import { throttle } from 'quasar'
+import { debounce } from 'quasar'
 
 export default {
   name: 'nodeEditor',
@@ -243,7 +243,7 @@ export default {
     }
   },
   created () {
-    this.nodeSave = throttle(this.nodeSave, 2000)
+    this.nodeSave = debounce(this.nodeSave, 2000)
   },
   mounted () {
     this.$log('mounted')

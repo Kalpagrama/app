@@ -239,19 +239,24 @@ class Cache {
       try {
         updatedItem = await updateItemFunc(updatedItem)
       } catch (err) {
+        // logD('err.code', err.toString())
         // todo err === 'version conflict'
         logE('todo: !!! err=', err)
-        if (err === 'version conflict') {
+        if (err) {
           // get current item objects/get
           let serverItem = await fetchItemFunc()
+          logD('serverItem', serverItem)
           // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
           let mergedItem = mergeItemFunc(path, serverItem, updatedItem)
+          logD('mergedItem', mergedItem)
           // еще раз попробуем обновить
           updatedItem = await updateItemFunc(mergedItem)
+          logD('updatedItem 1!', updatedItem)
         } else throw err
       }
       assert(updatedItem)
       updatedItem = await cache.set(key, updatedItem, actualAge)
+      logD('updatedItem 2!', updatedItem)
       return updatedItem
     }
   }
