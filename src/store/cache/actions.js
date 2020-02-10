@@ -159,7 +159,7 @@ class Cache {
     let result
     let cachedData = this.cacheLru.get(key)
     let {actualUntil, actualAge} = cachedData ? cachedData : {}
-    if (force || !cacheResult || !actualUntil || Date.now() >= actualUntil) { // данные отсутствуют в кэше, либо устарели
+    if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
       if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {
         logD('запрашиваем данные с сервера...')
