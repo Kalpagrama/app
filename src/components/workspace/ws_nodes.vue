@@ -16,7 +16,7 @@
     .col.full-width.scroll
       div(v-if="query").row.full-width.items-start.content-start.q-px-sm
         ws-node(
-          v-for="(n,ni) in query.items" :key="ni" @nodeClick="nodeClick"
+          v-for="(n, ni) in query.items" :key="n.oid" @nodeClick="nodeClick"
           :oid="oid" :node="n")
 </template>
 
