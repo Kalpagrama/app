@@ -9,7 +9,7 @@ div(
       'text-white': node.oid !== oid,
       'text-green': node.oid === oid,
       'text-bold': node.oid === oid}`
-    ) {{ node.name }}
+    ) {{ nodeFull ? nodeFull.name : node.name }}
 </template>
 
 <script>
@@ -30,7 +30,8 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.nodeFull = await this.$store.dispatch('workspace/get', {oid: this.node.oid})
+    this.$set(this, 'nodeFull', await this.$store.dispatch('workspace/get', {oid: this.node.oid}))
+    // this.nodeFull =
   }
 }
 </script>
