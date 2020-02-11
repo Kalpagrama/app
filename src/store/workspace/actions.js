@@ -245,7 +245,7 @@ export const wsItems = async (context, { wsItemsType, pagination, filter, force 
       let item = items[i]
       // храним списки отдельно от элементов
       context.dispatch('cache/update', { key: makeKey(item), newValue: item, actualAge: 'hour' }, { root: true })
-      items[i] = { oid: item.oid, name: item.name } // в самом списке - просто ссылка
+      items[i] = { oid: item.oid, name: 'item.name' } // в самом списке - просто ссылка
     }
     return {
       item: { items, count, totalCount, nextPageToken },
@@ -256,13 +256,6 @@ export const wsItems = async (context, { wsItemsType, pagination, filter, force 
   let listResult = await context.dispatch('cache/get',
     { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc, force }, { root: true })
   logD('wsItems complete short', listResult)
-  // let fullItems = []
-  // for (let item of items) {
-  //   let fullItem = context.rootState.cache.cachedItems[makeKey(item)]
-  //   assert(fullItem)
-  //   fullItems.push(fullItem)
-  // }
-  // logD('wsItems complete full', { fullItems, count, totalCount, nextPageToken })
   return listResult
 }
 
@@ -358,14 +351,43 @@ export const updateWsCache = async (context, { type, object }) => {
 
 // можно запрашивать по oid, либо имени (если оно уникально)
 export const get = async (context, { oid, name, force }) => {
-  let fullItem = context.rootState.cache.cachedItems[makeKey({oid})]
-  if (fullItem) return fullItem
-
-  let { items, count, totalCount, nextPageToken } = await context.dispatch('workspace/wsItems', {
-    wsItemsType: 'ALL',
-    filter: oid ? { oids: [oid] } : { name },
-    force
-  }, { root: true })
-  assert(count === 0 || count === 1)
-  return items[0]
+  const fetchItemFunc = async () => {
+    let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+      query: gql`
+        ${fragments.objectFullFragment}
+        query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
+          wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+            totalCount
+            count
+            nextPageToken
+            items {... objectFullFragment}
+          }
+        }
+      `,
+      variables: {
+        pagination: { pageSize: 2, pageToken: null },
+        filter: oid ? { oids: [oid] } : { name },
+        sortStrategy: 'HOT'
+      }
+    })
+    assert(items.length === 0 || items.length === 1)
+    return {
+      item: items[0],
+      actualAge: 'hour'
+    }
+  }
+  let item = await context.dispatch('cache/get',
+    { key: makeKey({oid}), fetchItemFunc, force }, { root: true })
+  logD('ws get Item complete', item)
+  return item
+  // let fullItem = context.rootState.cache.cachedItems[makeKey({oid})]
+  // if (fullItem) return fullItem
+  //
+  // let { items, count, totalCount, nextPageToken } = await context.dispatch('workspace/wsItems', {
+  //   wsItemsType: 'ALL',
+  //   filter: oid ? { oids: [oid] } : { name },
+  //   force
+  // }, { root: true })
+  // assert(count === 0 || count === 1)
+  // return items[0]
 }
