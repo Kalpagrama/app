@@ -13,8 +13,9 @@
       //- q-spinner(v-if="$route.name === 'create'" size="20px" color="white")
       q-icon(name="add" color="white")
     //- workspace
-    q-btn(round flat :color="$route.name === 'workspace' ? '#4caf50' : '#fff'" @click.stop="$router.push({name: 'workspace'})")
-      anvil(:width="26" :height="26" :color="$route.name === 'workspace' ? '#4caf50' : '#fff'")
+    q-btn(round flat :color="$route.name === 'workspace' ? 'green' : 'white'" @click.stop="$router.push({name: 'workspace'})"
+      icon="school")
+      //- anvil(:width="26" :height="26" :color="$route.name === 'workspace' ? '#4caf50' : '#fff'")
     //- menu
     q-btn(round flat icon="menu" :color="inMenu ? 'green' : 'white'" @click.stop="$router.push({name: 'menu'})")
 </template>

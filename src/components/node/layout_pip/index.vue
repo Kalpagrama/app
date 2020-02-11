@@ -10,21 +10,6 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       minHeight: previewHeight+'px', borderRadius: '10px', overflow: 'hidden',
       height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`
     ).row.full-width.items-start.bg-black
-    //- //- vote tint on fragments
-    //- div(
-    //-   v-if="votePanning"
-    //-   :style=`{
-    //-     position: 'absolute', zIndex: 1000, paddingBottom: '30px',
-    //-     borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}`
-    //-     ).row.fit.items-end.content-end.justify-center
-    //-   //- vote number
-    //-   div(
-    //-     :style=`{fontSize: 10*(voteValue/10) < 50 ? 50+'px' : 10*(voteValue/10)+'px'}`
-    //-   ).row.full-width.justify-center.items-end.text-bold.text-white {{ voteText }}
-    //-   //- vote text
-    //-   .row.full-width.justify-center
-    //-     span(:style=`{fontSize: '50px'}`
-    //-       ).text-bold.text-white.text-center {{ voteLabel }}
     composition(
       ref="fragmentFirst"
       :ctx="ctx" :index="0"
@@ -54,7 +39,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
   //- name, essence
   div(
     v-if="true"
-    ref="nodeName" @click="$emit('open')"
+    ref="nodeName" @click="$emit('open'), pause()"
     :style=`{minHeight: '60px'}`
     ).row.full-width.items-center.justify-center.cursor-pointer
     span.text-bold.text-center.cursor-pointer {{ node.name }}
@@ -78,7 +63,7 @@ export default {
   },
   watch: {
     visible: {
-      immediate: true,
+      immediate: false,
       async handler (to, from) {
         this.$log('visible CHANGED', to)
         if (to) this.play()
@@ -109,7 +94,7 @@ export default {
       // this.$log('fragmentHeight', index, height)
       if (index === 0) {
         this.previewHeight = height
-        this.$emit('previewHeight', height)
+        // this.$emit('previewHeight', height)
         if (this.visible) this.play()
         // TODO: emit scrollTop event of node in scroll wrapper
         // this.$emit('scrollTop', this.$el.scrollHeight)
@@ -155,6 +140,10 @@ export default {
       this.$log('nodeNameClick')
       this.$emit('open')
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    // this.play()
   }
 }
 </script>

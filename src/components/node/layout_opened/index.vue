@@ -1,55 +1,91 @@
 <template lang="pug">
-.row.full-width
-  //- name, essence
-  div(
-    v-if="true"
-    ref="nodeName" @click="nodeNameClick()"
-    :style=`{minHeight: '60px'}`
-    ).row.full-width.items-center.justify-center.cursor-pointer
-    span.text-bold.text-center.cursor-pointer {{ node.name }}
-  //- actions
-  div(
-    v-if="nodeFull && opened"
-    :style=`{
-      position: 'relative', height: '60px',
-      borderTop: '1px solid #eee', borderBottom: '1px solid #eee'}`).row.full-width.items-center
-    //- pan btn
-    div(
-      v-touch-pan.left.right.prevent.mouse="votePan"
-      :style=`{
-        position: 'absolute', left: voteLeft+'px', zIndex: 200,
-        height: '60px', width: '90px'}`
-        ).row.items-center.justify-center
-      q-btn(
-        round push color="white" :loading="nodeVoting" @click="nodeVote()"
-        :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
-        ).row.items-center.justify-center.bg-green.cursor-pointer
-        q-icon(name="blur_on" color="white" size="30px")
-    //- vote tint and helper text
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
+  //- header
+  //- div(:style=`{height: '60px'}`).row.full-width
+  //-   h1 hello
+  //- vote tint on fragments
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-pa-sm
     div(
       v-if="votePanning"
-      :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
-      span Pan to vote
+      :style=`{
+        position: 'absolute', zIndex: 1000, paddingBottom: '30px',
+        borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}`
+        ).row.fit.items-end.content-end.justify-center
+      //- vote number
+      div(
+        :style=`{fontSize: 10*(voteValue/10) < 50 ? 50+'px' : 10*(voteValue/10)+'px'}`
+      ).row.full-width.justify-center.items-end.text-bold.text-white {{ voteText }}
+      //- vote text
+      .row.full-width.justify-center
+        span(:style=`{fontSize: '50px'}`
+          ).text-bold.text-white.text-center {{ voteLabel }}
+    //- composition: ONE
+    composition(
+      ref="fragmentFirst"
+      :ctx="ctx" :index="0"
+      :thumbUrl="node.meta.compositions[0].thumbUrl"
+      :composition="nodeFull ? nodeFull.compositions[0] : null"
+      :mini="false" :visible="visible"
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+    //- name, essence
+    div(
+      v-if="true"
+      ref="nodeName" @click="nodeNameClick()"
+      :style=`{minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.justify-center.cursor-pointer.q-my-sm.bg-grey-2
+      span.text-bold.text-center.cursor-pointer {{ node.name }}
+    //- composition: TWO
+    composition(
+      ref="fragmentFirst"
+      :ctx="ctx" :index="0"
+      :thumbUrl="node.meta.compositions[1].thumbUrl"
+      @previewWidth="previewWidth = $event"
+      :composition="nodeFull ? nodeFull.compositions[1] : null"
+      :mini="false" :visible="visible"
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+  //- actions
+  .row.full-width.q-pa-sm
     div(
       v-if="nodeFull"
-      :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
-      span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(nodeFull.rate)}}
-      span.text-bold.full-width.text-center {{voteHuman(nodeFull.rateUser)}}
-    //- user name
-    div(
-      @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
-      .row.fit.items-center.justify-end.cursor-pointer
-        span(:style=`{userSelect: 'none'}`) {{ nodeFull.author.name | cut(40) }}
-    //- user avatar
-    div(
-      @click="$router.push('/user/' + nodeFull.author.oid)"
-      :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center.cursor-pointer
-      div(:style=`{height: '35px', width: '35px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-3
-        img(
-          :src="nodeFull.author.thumbUrl"
-          :style=`{width: '100%', height: '100%', objectFit: 'cover'}`)
+      :style=`{
+        position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-4
+      //- pan btn
+      div(
+        v-touch-pan.left.right.prevent.mouse="votePan"
+        :style=`{
+          position: 'absolute', left: voteLeft+'px', zIndex: 200,
+          height: '60px', width: '90px'}`
+          ).row.items-center.justify-center
+        q-btn(
+          round push color="white" :loading="nodeVoting" @click="nodeVote()"
+          :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
+          ).row.items-center.justify-center.bg-green.cursor-pointer
+          q-icon(name="blur_on" color="white" size="30px")
+      //- vote tint and helper text
+      div(
+        v-if="votePanning"
+        :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
+        span Pan to vote
+      div(
+        v-if="nodeFull"
+        :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
+        span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(nodeFull.rate)}}
+        span.text-bold.full-width.text-center {{voteHuman(nodeFull.rateUser)}}
+      //- user name
+      div(
+        @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
+        .row.fit.items-center.justify-end.cursor-pointer
+          span(:style=`{userSelect: 'none'}`) {{ nodeFull.author.name | cut(40) }}
+      //- user avatar
+      div(
+        @click="$router.push('/user/' + nodeFull.author.oid)"
+        :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center.cursor-pointer
+        div(:style=`{height: '35px', width: '35px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-3
+          img(
+            :src="nodeFull.author.thumbUrl"
+            :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
   //- spheres and timestamp
-  div(v-if="nodeFull && opened").row.full-width
+  div(v-if="nodeFull").row.full-width
     //- spheres
     div(:style=`{height: '50px'}`).row.full-width.scroll
       .row.justify-start.items-start.content-start.no-wrap.q-pa-md

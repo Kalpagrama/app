@@ -112,11 +112,11 @@ export default {
   },
   methods: {
     progressClick (e) {
-      this.$log('progressClick', e)
+      // this.$log('progressClick', e)
       let w = e.target.clientWidth
       let x = e.offsetX
       let now = (this.player.duration * x) / w
-      this.player.setCurrentTime(now)
+      if (now > this.start && now < this.end) this.player.setCurrentTime(now)
     },
     async videoMove () {
       // this.$log('videoMove')

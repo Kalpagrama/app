@@ -1,17 +1,20 @@
 <template lang="pug">
-node-layout-pip(
-  v-if="node.meta.layout === 'PIP'"
-  :ctx="ctx" :index="index"
-  :node="node" :nodeFull="nodeFull" :visible="visible" :active="active")
+.row.full-width.items-start.content-start
+  component(
+    :is="ctx === 'list' ? `node-layout-pip` : 'node-layout-opened'"
+    :ctx="ctx" :index="index"
+    :node="node" :nodeFull="nodeFull" :visible="visible" :active="active"
+    @open="$emit('open', [node, nodeFull])")
 </template>
 
 <script>
 import nodeLayoutPip from './layout_pip'
+import nodeLayoutOpened from './layout_opened'
 
 export default {
   name: 'node',
   props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
-  components: {nodeLayoutPip},
+  components: {nodeLayoutPip, nodeLayoutOpened},
   data () {
     return {
       nodeFull: null

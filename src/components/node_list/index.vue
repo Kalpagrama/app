@@ -1,13 +1,13 @@
 <template lang="pug">
 div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`).row.full-width.items-start.content-start.justify-start
   q-dialog(v-model="nodeDialogOpened" :maximized="true")
-    div(@click.self="nodeDialogOpened = false").row.fit.items-center.content-center.justify-center.bg-black
+    div(@click.self="nodeDialogOpened = false").row.fit.items-start.content-start.justify-center.bg-grey-10
       div(:style=`{maxWidth: '600px'}`).row.full-width
-        node(:node="node" :nodeFullReady="nodeFull" :visible="true" :active="true")
+        node(ctx="explorer" :node="node" :nodeFullReady="nodeFull" :visible="true" :active="true")
   node(
     v-for="(n, ni) in nodes" :key="n.oid" :accessKey="ni"
     v-if="nodesBan ? !nodesBan.includes(n.oid) : true"
-    :ctx="'inList'"
+    :ctx="'list'"
     :node="n" :index="ni"
     :needFull="ni >= nodeMiddle-0 && ni <= nodeMiddle+0"
     :needFullPreload="!(ni >= nodeMiddle-0 && ni <= nodeMiddle+0) && ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
@@ -15,7 +15,7 @@ div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`
     @open="node = $event[0], nodeFull = $event[1], nodeDialogOpened = true"
     @hide="nodesBan.push(n.oid)"
     @nodeClick="$event => { $emit('nodeClick', $event)}"
-    :style=`{}`
+    :style=`{borderRadius: '10px', overflow: 'hidden'}`
     v-observe-visibility=`{
       callback: nodeMiddleHandler,
       throttle: throttle,
