@@ -351,6 +351,7 @@ export const updateWsCache = async (context, { type, object }) => {
 
 // можно запрашивать по oid, либо имени (если оно уникально)
 export const get = async (context, { oid, name, force }) => {
+  logD('workspace/get start', { oid, name, force })
   const fetchItemFunc = async () => {
     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
@@ -371,6 +372,7 @@ export const get = async (context, { oid, name, force }) => {
       }
     })
     assert(items.length === 0 || items.length === 1)
+    logD('данные извлечены', items)
     return {
       item: items[0],
       actualAge: 'hour'

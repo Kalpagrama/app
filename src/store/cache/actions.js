@@ -165,10 +165,12 @@ class Cache {
         logD('запрашиваем данные с сервера...')
         let { item, actualAge } = await fetchItemFunc()
         logD('данные извлечены!')
-        assert(item && actualAge)
-        await this.set(key, item, actualAge)
-        logD('данные в кэше обновлены!')
-        result = item
+        if (item) {
+          assert(actualAge, `item && actualAge ${actualAge} ${item} `)
+          await this.set(key, item, actualAge)
+          logD('данные в кэше обновлены!')
+          result = item
+        }
       } catch (err) {
         if (err === 'queued object was evicted legally') {
           logD('очередь переполнилась', err)
@@ -197,7 +199,7 @@ class Cache {
     }
     if (!result) return null // см "queued object was evicted legally"
     if ('failReason' in result) throw new Error('cant fetch item: ' + result.failReason)
-    return this.context.state.cachedItems[key]
+    return result
   }
 
   // updateItemFunc - обновить данные на сервере
