@@ -69,7 +69,8 @@ class Cache {
           }, 0)
         } else { // удалить объект из indexed db и vuex
           await this.cachePersist.remove(key)
-          this.context.commit('removeItem', key)
+          // todo В общем случае - мы не знаем - ссылается ли что-то в приложении на этот объект во вьюикс
+          // this.context.commit('removeItem', key)
         }
       }
     })
@@ -280,9 +281,8 @@ class Cache {
     let item = this.context.state.cachedItems[key]
     if (!item) {
       logE('!item')
-    } else {
-      return await this.set(key, item, 'zero')
     }
+    if (item) return await this.set(key, item, 'zero')
   }
 }
 
