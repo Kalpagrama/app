@@ -14,9 +14,9 @@
         q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
     //- body
     .col.full-width.scroll
-      .row.full-width.items-start.content-start.q-px-sm
+      div(v-if="query").row.full-width.items-start.content-start.q-px-sm
         div(
-          v-for="(n,ni) in nodesFiltered" :key="ni" @click="nodeClick(n, ni)"
+          v-for="(n,ni) in query.items" :key="ni" @click="nodeClick(n, ni)"
           :class=`{'bg-grey-8': n.oid !== oid, 'bg-white': n.oid === oid}`
           :style=`{height: '40px', borderRadius: '10px'}`
           ).row.full-width.items-center.cursor-pointer.q-px-sm.q-mb-sm
@@ -34,7 +34,8 @@ export default {
   props: ['oid'],
   data () {
     return {
-      nodes: []
+      nodes: [],
+      query: null
     }
   },
   computed: {
@@ -52,10 +53,9 @@ export default {
     },
     async nodesLoad () {
       this.$log('nodesLoad start')
-      let {items} = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'NODES'})
-      this.$log('nodesLoad done', items)
-      // return items.map(i => i.object)
-      return items
+      let query = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'NODES'})
+      this.$log('nodesLoad done', query)
+      this.query = query
     },
     async nodesReload () {
       this.$log('nodesReload')
@@ -65,7 +65,7 @@ export default {
   async mounted () {
     this.$log('mounted')
     // TODO: initial load of items goes to kalpa-loader, and kalpa-loader is watching for updates...
-    this.nodes = await this.nodesLoad()
+    await this.nodesLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

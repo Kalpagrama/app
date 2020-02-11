@@ -19,7 +19,7 @@
     //- TODO: reuse q-dialog props from UI module of vuex...?
     q-dialog(v-model="compositionEditorOpened").bg-black
       composition-editor(
-        ctx="node"
+        ctx="composition"
         :node="node" :compositionIndex="compositionIndex").bg-black
     //- composition finder
     q-dialog(v-model="compositionFinderOpened").bg-black
@@ -27,7 +27,7 @@
     //- header
     div(
       :style=`{height: '60px'}`
-      ).row.full-width.items-center.content-center
+      ).row.full-width.items-center.content-center.q-px-sm
       .col.full-height
         .row.fit.items-center.content-center.q-px-md
           span.text-bold.text-green Node editor
@@ -38,9 +38,9 @@
     .col.full-width.scroll
       //- composition one
       div(
-        :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.bg-grey-9
-        composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :visible="compositionVisible[0]")
+        :style=`{position: 'relative', minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-start.content-start.bg-grey-9
+        composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :visible="compositionVisible[0]" ctx="composition")
         //- composition actions
         div(
           v-if="!node.compositions[0]"
@@ -59,9 +59,9 @@
           placeholder="Whats the essence?").fit.bg-white.kinput
       //- composition two
       div(
-        :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+        :style=`{position: 'relative', minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.bg-grey-9
-        composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :visible="compositionVisible[1]")
+        composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :visible="compositionVisible[1]" ctx="composition")
         //- composition actions
         div(
           v-if="!node.compositions[1]"

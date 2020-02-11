@@ -101,10 +101,16 @@ export default {
       this.$log('contentChoose')
     },
     async contentGetByUrl (url) {
-      this.$log('contentGetByUrl start', url)
-      let uploadContentUrl = await this.$store.dispatch('content/uploadContentUrl', url)
-      this.$log('contentGetByUrl done')
-      return uploadContentUrl
+      try {
+        this.$log('contentGetByUrl start', url)
+        let uploadContentUrl = await this.$store.dispatch('content/uploadContentUrl', url)
+        this.$log('contentGetByUrl done')
+        return uploadContentUrl
+      } catch (e) {
+        this.$log('contentGetByUrl error', e)
+        // TODO count tries...
+        this.contentGetByUrl(url)
+      }
     },
     async contentGetByFile (file) {
       this.$log('contentGetByFile start', file)

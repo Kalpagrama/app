@@ -1,12 +1,15 @@
 <template lang="pug">
-.row.fit.bg-black
-  div(:style=`{position: 'relative'}`).row.fit
+div(:class=`{'full-height': ctx === 'composition'}`).row.full-width.bg-black
+  div(
+    :class=`{'full-height': ctx === 'composition'}`
+    :style=`{position: 'relative'}`).row.full-width
     video(
       ref="kalpaVideo"
       playsinline :autoplay="ctx === 'composition'" loop
       @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="videoEnded"
-      :style=`{width: '100%', height: '100%', objectFit: 'contain'}`)
+      :class=`{'full-height': ctx === 'composition'}`
+      :style=`{width: '100%', objectFit: 'contain'}`)
       source(
         :src="url" type="video/mp4")
     //- debug

@@ -4,7 +4,7 @@ q-layout(view="hHh lpR fFf")
   q-page-container(
   ).row.full-width.window-height.bg-black
     ws-items(
-      ctx="workspace"
+      :ctx="$q.screen.gt.sm ? 'workspace' : 'finder'"
       :oid="node ? node.oid : false" :page="page"
       @page="$router.push({params: {page: $event}})" @item="itemClick").bg-grey-9
     .col.full-height.bg-grey-10

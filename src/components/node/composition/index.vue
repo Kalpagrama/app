@@ -12,11 +12,11 @@ div(:style=`{position: 'relative'}`).row.full-width
     //- small.full-width.text-white layerIndex: {{layerIndex}}
     //- small.full-width.text-white layers:
     //- small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
-    small.full-width.text-white ctx: {{ctx}}
+    small.full-width.text-white ctx: {{ ctx }}
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
   div(
-    v-if="!mini && content"
+    v-if="opened"
     :style=`{position: 'absolute', zIndex: 1000, top: 0, height: '60px'}`
     ).row.full-width.items-center.q-pa-md.cursor-pointer
     .col.full-height
@@ -49,7 +49,7 @@ div(:style=`{position: 'relative'}`).row.full-width
     :url="contentUrl" :source="contentSource" :ctx="ctx"
     :start="layerStart" :end="layerEnd" :visible="visible" :mini="mini"
     @player="$emit('player', $event)" @ended="layerEnded"
-    :style=`{position:'absolute', zIndex: 100}`)
+    :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`)
     //- TODO: props is options on one object...
     template(v-slot:layerEditor=`{player, now, progressHeight}`)
       slot(name="layerEditor" :player="player" :now="now" :progressHeight="progressHeight")
@@ -121,7 +121,7 @@ export default {
     mini: {
       immediate: true,
       handler (to, from) {
-        this.$log('mini CHANGED', to)
+        // this.$log('mini CHANGED', to)
         if (to) this.pause()
         else this.play()
       }
@@ -146,11 +146,11 @@ export default {
       this.$log('previewError')
     },
     play () {
-      this.$log('play')
+      // this.$log('play')
       if (this.$refs.player && this.$refs.player.player && !this.mini) this.$refs.player.player.play()
     },
     pause () {
-      this.$log('pause')
+      // this.$log('pause')
       if (this.$refs.player && this.$refs.player.player) this.$refs.player.player.pause()
     },
     playPause () {
@@ -184,10 +184,10 @@ export default {
     this.layerEnded = debounce(this.layerEnded, 300)
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
   }
 }
 </script>
