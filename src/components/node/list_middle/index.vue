@@ -1,16 +1,14 @@
 <template lang="pug">
-.row.full-width.q-px-md
+.row.full-width
+  span listMiddle
 </template>
 
 <script>
 export default {
-  name: 'nodeSpheres',
+  name: 'nodeListMiddle',
   data () {
     return {
     }
-  },
-  mounted () {
-    this.$log('mounted')
   }
 }
 </script>

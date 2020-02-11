@@ -1,7 +1,7 @@
 <template lang="pug">
 div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`).row.full-width.items-start.content-start.justify-start
   q-dialog(v-model="nodeDialogOpened" :maximized="true")
-    div(@click.self="nodeDialogOpened = false").row.fit.items-center.content-center.justify-center
+    div(@click.self="nodeDialogOpened = false").row.fit.items-center.content-center.justify-center.bg-black
       div(:style=`{maxWidth: '600px'}`).row.full-width
         node(:node="node" :nodeFullReady="nodeFull" :visible="true" :active="true")
   node(

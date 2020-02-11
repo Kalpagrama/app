@@ -16,6 +16,7 @@ const metaFragment = gql`
           ... on MetaComposition{...metaComposition}
         }
       }
+      layout
     }
     ...on MetaContent{
       type
