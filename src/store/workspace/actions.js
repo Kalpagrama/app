@@ -11,8 +11,8 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // делает ключ для элемента мастерской в кэше (чтобы отличать от реальных элементов)
 function makeKey (wsItem) {
-  assert(wsItem && wsItem.oid)
-  return 'wsItem:' + wsItem.oid
+  assert(wsItem && (wsItem.oid || wsItem.name))
+  return 'wsItem:' + (wsItem.oid || wsItem.name)
 }
 
 export const init = async (context, wsRevision) => {
@@ -366,7 +366,7 @@ export const get = async (context, { oid, name, force }) => {
       `,
       variables: {
         pagination: { pageSize: 2, pageToken: null },
-        filter: oid ? { oids: [oid] } : { name },
+        filter: oid ? { types: ['NODE'], oids: [oid] } : { types: ['NODE'], name },
         sortStrategy: 'HOT'
       }
     })
@@ -377,7 +377,7 @@ export const get = async (context, { oid, name, force }) => {
     }
   }
   let item = await context.dispatch('cache/get',
-    { key: makeKey({oid}), fetchItemFunc, force }, { root: true })
+    { key: makeKey({ oid, name }), fetchItemFunc, force }, { root: true })
   logD('ws get Item complete', item)
   return item
   // let fullItem = context.rootState.cache.cachedItems[makeKey({oid})]
