@@ -143,7 +143,7 @@ class Cache {
         break
       }
     }
-    assert(actualAge >= 0)
+    assert(Number.isInteger(actualAge), `Number.isInteger(actualAge):${actualAge}`)
     let actualUntil = Date.now() + actualAge
     logD('actualAge', actualAge)
     logD('actualUntil', actualUntil)
