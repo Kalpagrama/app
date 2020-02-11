@@ -150,6 +150,7 @@ export default {
       deep: true,
       handler (to, from) {
         this.$log('node CHANGED', to)
+        if (to.oid !== from.oid) return
         if (to) {
           if (this.nodeSavePause) {
             this.nodeSavePause = false

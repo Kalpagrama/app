@@ -1,6 +1,6 @@
 <template lang="pug">
   .row.full-width.justify-center.items-start.content-start
-    slot(name="items" :items="items")
+    slot(name="items" :items="query.items")
 </template>
 
 <script>
@@ -13,6 +13,7 @@ export default {
   data () {
     return {
       loaded: false,
+      query: null,
       items: [],
       itemsLoading: false,
       itemsMoreLoading: false,
@@ -55,6 +56,7 @@ export default {
       pagination = pagination || {pageSize: 2, pageToken: null}
       sortStrategy = sortStrategy || 'HOT'
       // get res
+      // TODO wsNodes, wsNotes, wsCompositions, wsSpheres
       let res
       switch (this.type) {
         case 'sphereNodes' :
@@ -73,10 +75,11 @@ export default {
       }
       // parse res
       let { items, count, totalCount, nextPageToken } = res
-      if (this.oid === oid && this.nextPageToken !== nextPageToken){
+      if (this.oid === oid && this.nextPageToken !== nextPageToken) {
         for (let item of items) this.nodes.push(item)
       } else this.nodes = items
       // set shit
+      this.query = res
       this.items = items
       this.nextPageToken = nextPageToken
       this.totalCount = totalCount
