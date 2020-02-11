@@ -15,22 +15,17 @@
     //- body
     .col.full-width.scroll
       div(v-if="query").row.full-width.items-start.content-start.q-px-sm
-        div(
-          v-for="(n,ni) in query.items" :key="ni" @click="nodeClick(n, ni)"
-          :class=`{'bg-grey-8': n.oid !== oid, 'bg-white': n.oid === oid}`
-          :style=`{height: '40px', borderRadius: '10px'}`
-          ).row.full-width.items-center.cursor-pointer.q-px-sm.q-mb-sm
-          span(
-            :class=`{
-              'text-white': n.oid !== oid,
-              'text-green': n.oid === oid,
-              'text-bold': n.oid === oid}`
-          ) {{ n.name }}
+        ws-node(
+          v-for="(n,ni) in query.items" :key="ni" @nodeClick="nodeClick"
+          :oid="oid" :node="n")
 </template>
 
 <script>
+import wsNode from './ws_node'
+
 export default {
   name: 'wsNodes',
+  components: {wsNode},
   props: ['oid'],
   data () {
     return {
