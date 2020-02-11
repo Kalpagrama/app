@@ -3,6 +3,7 @@ div(:class=`{'full-height': ctx === 'composition'}`).row.full-width.bg-black
   div(
     :class=`{'full-height': ctx === 'composition'}`
     :style=`{position: 'relative'}`).row.full-width
+    //- opacity: videoValid ? 1 : 0
     video(
       ref="kalpaVideo"
       playsinline :autoplay="ctx === 'composition'" loop
@@ -75,6 +76,11 @@ export default {
       progressHeight: 10
     }
   },
+  computed: {
+    videoValid () {
+      return this.now > this.start && this.now < this.end && this.player.playing
+    }
+  },
   watch: {
     now: {
       immediate: false,
@@ -98,7 +104,7 @@ export default {
     visible: {
       immediate: true,
       handler (to, from) {
-        this.$log('visible CHANGED', to)
+        // this.$log('visible CHANGED', to)
         if (to) this.videoPlay()
         else this.videoPause()
       }
@@ -106,11 +112,11 @@ export default {
   },
   methods: {
     progressClick (e) {
-      this.$log('progressClick', e)
+      // this.$log('progressClick', e)
       let w = e.target.clientWidth
       let x = e.offsetX
       let now = (this.player.duration * x) / w
-      this.player.setCurrentTime(now)
+      if (now > this.start && now < this.end) this.player.setCurrentTime(now)
     },
     async videoMove () {
       // this.$log('videoMove')
@@ -121,32 +127,34 @@ export default {
       }, 2500)
     },
     videoCanplay () {
-      this.$log('videoCanplay')
+      // this.$log('videoCanplay')
       this.player.setCurrentTime(this.start || 0)
       // this.player.play()
     },
     videoPlay () {
-      this.$log('videoPlay')
+      // this.$log('videoPlay')
       this.$set(this.player, 'playing', true)
     },
     videoPause () {
-      this.$log('videoPause')
+      // this.$log('videoPause')
       this.$set(this.player, 'playing', false)
     },
     videoTimeupdate () {
       // this.$log('videoTimeupdate')
       if (!this.player.started) this.$set(this.player, 'started', true)
-      this.$set(this.player, 'duration', this.$refs.kalpaVideo.duration)
-      this.$set(this.player, 'now', this.$refs.kalpaVideo.currentTime)
-      this.now = this.$refs.kalpaVideo.currentTime
+      if (this.$refs.kalpaVideo) {
+        this.$set(this.player, 'duration', this.$refs.kalpaVideo.duration)
+        this.$set(this.player, 'now', this.$refs.kalpaVideo.currentTime)
+        this.now = this.$refs.kalpaVideo.currentTime
+      }
     },
     videoEnded () {
-      this.$log('videoEnded')
+      // this.$log('videoEnded')
       // this.player.pause()
       this.$emit('ended')
     },
     async videoClick (e) {
-      this.$log('videoClick')
+      // this.$log('videoClick')
       if (this.player.playing) this.player.pause()
       else this.player.play()
     },
@@ -195,11 +203,11 @@ export default {
     }
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     this.playerInit()
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
   }
 }
 </script>
