@@ -14,13 +14,36 @@ export function init (state) {
 }
 
 export function clear (state) {
+  logD('CACHE: clear')
   state.cachedItems = {}
 }
 
+// var keys = {}
 export function setItem (state, { key, item }) {
-  logD('setItem: item', item)
-  state.cachedItems[key] = item
-  logD('setItem: state.cachedItems[key]', state.cachedItems[key])
+  // if (keys[key]) {
+  //   logD('GOT KEY: UPDATING')
+  //   for (const p in item) {
+  //     state.cachedItems[key][p] = item[p]
+  //   }
+  // } else {
+  //   logD('NO KEY: CREATING')
+  //   keys[key] = true
+  //   Vue.set(state.cachedItems, key, item)
+  // }
+  // Vue.set(state.cachedItems, key, JSON.parse(JSON.stringify(item)))
+  // if (item.oid === 'AsFglViDQRE=') logD('setItem: item', key)
+  if (state.cachedItems[key]) {
+    // if (item.oid === 'AsFglViDQRE=') logD('UPDATING', key)
+    for (const p in item) {
+      // if (state.cachedItems[key]) Vue.set(state.cachedItems[key], p, item[p])
+      // state.cachedItems[key][p] = item[p]
+      Vue.set(state.cachedItems[key], p, item[p])
+    }
+  } else {
+    // if (item.oid === 'AsFglViDQRE=') logD('CREATING', key)
+    Vue.set(state.cachedItems, key, item)
+  }
+  // logD('setItem: state.cachedItems[key]', state.cachedItems[key])
 }
 
 export function removeItem (state, key) {

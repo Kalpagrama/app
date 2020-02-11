@@ -279,7 +279,7 @@ class Cache {
 
   async expire (key) {
     let item = this.context.state.cachedItems[key]
-    assert(item)
+    // assert(item)
     return await this.set(key, item, 'zero')
   }
 }

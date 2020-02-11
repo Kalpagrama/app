@@ -14,6 +14,8 @@
         q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
     //- body
     .col.full-width.scroll
+      //- .row.full-width.bg-red
+      //-   span.text-white wsR: {{ $store.state.workspace.revision }}
       div(v-if="query").row.full-width.items-start.content-start.q-px-sm
         ws-node(
           v-for="(n, ni) in query.items" :key="n.oid" @nodeClick="nodeClick"
