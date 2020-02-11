@@ -4,7 +4,8 @@ div(
   :class=`{'bg-grey-8': node.oid !== oid, 'bg-white': node.oid === oid}`
   :style=`{height: '40px', borderRadius: '10px'}`
   ).row.full-width.items-center.cursor-pointer.q-px-sm.q-mb-sm
-  small.text-red.q-mr-sm.text-bold revision: {{ nodeFull ? nodeFull.revision : 1 }}
+  // small.text-red.q-mr-sm.text-bold revision: {{ nodeFull ? nodeFull.revision : 1 }}
+  small.text-red.q-mr-sm.text-bold indx: {{ nodeFull ? nodeFull.indx_ : 1 }}
   span(
     :class=`{
       'text-white': node.oid !== oid,

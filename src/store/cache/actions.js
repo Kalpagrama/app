@@ -197,7 +197,7 @@ class Cache {
     }
     if (!result) return null // см "queued object was evicted legally"
     if ('failReason' in result) throw new Error('cant fetch item: ' + result.failReason)
-    return result
+    return this.context.state.cachedItems[key]
   }
 
   // updateItemFunc - обновить данные на сервере
