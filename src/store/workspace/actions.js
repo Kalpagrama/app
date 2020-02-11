@@ -252,17 +252,18 @@ export const wsItems = async (context, { wsItemsType, pagination, filter, force 
       actualAge: 'hour'
     }
   }
-  let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
+  // { items, count, totalCount, nextPageToken }
+  let listResult = await context.dispatch('cache/get',
     { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc, force }, { root: true })
   logD('wsItems complete short', { items, count, totalCount, nextPageToken })
-  let fullItems = []
-  for (let item of items) {
-    let fullItem = context.rootState.cache.cachedItems[makeKey(item)]
-    assert(fullItem)
-    fullItems.push(fullItem)
-  }
+  // let fullItems = []
+  // for (let item of items) {
+  //   let fullItem = context.rootState.cache.cachedItems[makeKey(item)]
+  //   assert(fullItem)
+  //   fullItems.push(fullItem)
+  // }
   // logD('wsItems complete full', { fullItems, count, totalCount, nextPageToken })
-  return { items: fullItems, count, totalCount, nextPageToken }
+  return listResult
 }
 
 // подходит ли object под этот фильтр
@@ -316,13 +317,16 @@ export const updateWsCache = async (context, { type, object }) => {
               key: key,
               path: '',
               actualAge: 'zero', // обновить при следующем запросе
-              setter: ({ items, count, totalCount, nextPageToken }) => {
-                logD('setter: ', { items, count, totalCount, nextPageToken })
-                assert(items && count >= 0 && totalCount >= 0)
-                items.unshift({ oid: object.oid, name: object.name })// в самом списке - просто ссылка
-                count++
-                totalCount++
-                return { items, count, totalCount, nextPageToken }
+              setter: (value) => {
+                // { items, count, totalCount, nextPageToken }
+                logD('setter: ', value)
+                assert(value.items && value.count >= 0 && value.totalCount >= 0)
+                // элемент в самом списке - objectShort
+                // вставляем в начало используем splice для реактивности
+                value.items.splice(0, 0, { oid: object.oid, name: object.name })
+                value.count++
+                value.totalCount++
+                return value
               }
             }, { root: true })
           }
@@ -332,15 +336,17 @@ export const updateWsCache = async (context, { type, object }) => {
             key: key,
             path: '',
             actualAge: 'zero', // обновить при следующем запросе
-            setter: ({ items, count, totalCount, nextPageToken }) => {
-              assert(items && count >= 0 && totalCount >= 0)
-              let indx = items.findIndex(item => item.oid === object.oid)
+            setter: (value) => {
+              // { items, count, totalCount, nextPageToken }
+              assert(value.items && value.count >= 0 && value.totalCount >= 0)
+              let indx = value.items.findIndex(item => item.oid === object.oid)
               if (indx >= 0) {
-                items.splice(indx, 1)
-                count--
-                totalCount--
+                // splice для реактивности
+                value.items.splice(indx, 1)
+                value.count--
+                value.totalCount--
               }
-              return { items, count, totalCount, nextPageToken }
+              return value
             }
           }, { root: true })
         }

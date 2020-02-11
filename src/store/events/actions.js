@@ -76,7 +76,7 @@ async function processEvent (context, event) {
         notifyUserActionComplete(event.type, event.object)
       }
       // поместить ядро на личную сферу
-      await context.dispatch('user/addNode', event.object)
+      await context.dispatch('user/addNode', event.object, {root: true})
       context.commit('addEvent', { event, context })
       break
     case 'NODE_RATED':

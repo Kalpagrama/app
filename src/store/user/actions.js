@@ -84,13 +84,16 @@ export const addNode = async (context, objectShort) => {
         await context.dispatch('cache/update', {
           key: key,
           path: '',
-          setter: ({ items, count, totalCount, nextPageToken }) => {
-            logD('setter: ', { items, count, totalCount, nextPageToken })
-            assert(items && count >= 0 && totalCount >= 0)
-            items.unshift({ oid: objectShort.oid, name: objectShort.name })// в самом списке - просто ссылка
-            count++
-            totalCount++
-            return { items, count, totalCount, nextPageToken }
+          setter: (value) => {
+            // { items, count, totalCount, nextPageToken }
+            logD('setter: ', value)
+            assert(value.items && value.count >= 0 && value.totalCount >= 0)
+            // элемент в самом списке - objectShort
+            // вставляем в начало используем splice для реактивности
+            value.items.splice(0, 0, { oid: objectShort.oid, name: objectShort.name })
+            value.count++
+            value.totalCount++
+            return value
           }
         }, { root: true })
       }
