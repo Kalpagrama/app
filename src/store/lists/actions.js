@@ -75,10 +75,11 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
       actualAge: 'zero'
     }
   }
-  let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
+  // { items, count, totalCount, nextPageToken }
+  let listResult = await context.dispatch('cache/get',
     { key: 'sphereNodes: ' + JSON.stringify({ oid, pagination, filter, sortStrategy }), fetchItemFunc }, { root: true })
   logD('sphereNodes complete')
-  return { items, count, totalCount, nextPageToken }
+  return listResult
 }
 
 export const nodeNodes = async (context, { node, position, pagination, sortStrategy }) => {
@@ -120,13 +121,14 @@ export const nodeNodes = async (context, { node, position, pagination, sortStrat
       actualAge: 'hour'
     }
   }
-  let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
+  // { items, count, totalCount, nextPageToken }
+  let listResult = await context.dispatch('cache/get',
     {
       key: 'nodeNodes: ' + JSON.stringify({ oid: node.oid, position, pagination, sortStrategy }),
       fetchItemFunc
     }, { root: true })
   logD('nodeNodes complete')
-  return { items, count, totalCount, nextPageToken }
+  return listResult
 }
 
 export const feed = async (context, { pagination }) => {
@@ -152,10 +154,11 @@ export const feed = async (context, { pagination }) => {
       actualAge: 'hour'
     }
   }
-  let { items, count, totalCount, nextPageToken } = await context.dispatch('cache/get',
+  // { items, count, totalCount, nextPageToken }
+  let listResult = await context.dispatch('cache/get',
     { key: 'feed: ' + JSON.stringify({ pagination }), fetchItemFunc }, { root: true })
   logD('feed complete')
-  return { items, count, totalCount, nextPageToken }
+  return listResult
 }
 
 // wsItemsType 'CONTENTS' 'SPHERES' 'NODES' 'COMPOSITIONS' 'NOTES' 'ALL'

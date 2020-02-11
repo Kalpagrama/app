@@ -358,6 +358,9 @@ export const updateWsCache = async (context, { type, object }) => {
 
 // можно запрашивать по oid, либо имени (если оно уникально)
 export const get = async (context, { oid, name, force }) => {
+  let fullItem = context.rootState.cache.cachedItems[makeKey({oid})]
+  if (fullItem) return fullItem
+
   let { items, count, totalCount, nextPageToken } = await context.dispatch('workspace/wsItems', {
     wsItemsType: 'ALL',
     filter: oid ? { oids: [oid] } : { name },
