@@ -9,7 +9,6 @@ export function init (state, authInfo) {
 }
 
 export function stateSet (state, [key, val]) {
-  // console.debug('asdasd')
   assert.ok(Object.prototype.hasOwnProperty.call(state, key))
   if (val) {
     Vue.set(state, key, val)

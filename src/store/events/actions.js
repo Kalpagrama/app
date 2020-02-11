@@ -75,11 +75,8 @@ async function processEvent (context, event) {
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
-      context.dispatch('cache/update', {
-        key: event.object.oid,
-        newValue: event.object,
-        actualAge: 'hour'
-      }, { root: true })
+      // поместить ядро на личную сферу
+      await context.dispatch('user/addNode', event.object, {root: true})
       context.commit('addEvent', { event, context })
       break
     case 'NODE_RATED':

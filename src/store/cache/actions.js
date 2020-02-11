@@ -4,6 +4,7 @@ import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logI = getLogFunc(LogLevelEnum.INFO, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
@@ -84,6 +85,14 @@ class Cache {
     }
   }
 
+  async clear () {
+    logD('clear cache')
+    await this.cachePersist.clear()
+    this.cacheLru.reset()
+    this.context.commit('clear')
+    logD('cache clear OK!')
+  }
+
   // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
   async set (key, item, actualAge) {
     assert(key && item)
@@ -118,19 +127,21 @@ class Cache {
         }
       }
         break
-      case 'doNotTouch': {
-        let current = this.cacheLru.get(key)
-        if (current) {
-          actualAge = current.actualUntil - Date.now()
-        } else {
-          actualAge = this.defaultActualAge
-        }
-      }
-        break
       default:
-        assert(actualAge == null || Number.isInteger(actualAge))
-        if (actualAge == null) actualAge = this.defaultActualAge
+      {
+        if (!Number.isInteger(actualAge)){
+          // такой элемент уже есть в кэше оставляем что было
+          let current = this.cacheLru.get(key)
+          if (current) {
+            actualAge = current.actualUntil - Date.now()
+          } else {
+            actualAge = this.defaultActualAge
+          }
+          assert(actualAge == null || Number.isInteger(actualAge))
+          if (actualAge == null) actualAge = this.defaultActualAge
+        }
         break
+      }
     }
     assert(actualAge >= 0)
     let actualUntil = Date.now() + actualAge
@@ -146,9 +157,9 @@ class Cache {
   async get (key, fetchItemFunc, force) {
     assert(key && fetchItemFunc)
     let result
-    let cacheResult = this.cacheLru.get(key)
-    // logD('actualUntil', cacheResult.actualUntil, Date.now(), Date.now() > cacheResult.actualUntil)
-    if (force || !cacheResult || !cacheResult.actualUntil || Date.now() > cacheResult.actualUntil) { // данные отсутствуют в кэше, либо устарели
+    let cachedData = this.cacheLru.get(key)
+    let {actualUntil, actualAge} = cachedData ? cachedData : {}
+    if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
       if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {
         logD('запрашиваем данные с сервера...')
@@ -243,15 +254,15 @@ class Cache {
       try {
         updatedItem = await updateItemFunc(updatedItem)
       } catch (err) {
-        // logD('err.code', err.toString())
-        // todo err === 'version conflict'
-        logE('todo: !!! err=', err)
-        if (err) {
+        // logE('todo: !!! err=', JSON.stringify(err))
+        if (err.message.includes('VERSION_CONFLICT')) {
+          logI('VERSION_CONFLICT. try merge with server data')
           // get current item objects/get
           let serverItem = await fetchItemFunc()
           logD('serverItem', serverItem)
           // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
           let mergedItem = mergeItemFunc(path, serverItem, updatedItem)
+          logI('merge OK!')
           logD('mergedItem', mergedItem)
           // еще раз попробуем обновить
           updatedItem = await updateItemFunc(mergedItem)
@@ -283,7 +294,14 @@ export const init = async (context) => {
   logD('cache/init done')
 }
 
+export const clearCache = async (context) => {
+
+}
 // fetchItemFunc ф-я для получения данных с сервера
+export const clear = async (context) => {
+  assert(context.state.initialized)
+  return await cache.clear()
+}
 export const get = async (context, { key, fetchItemFunc, force }) => {
   assert(context.state.initialized)
   assert(typeof key === 'string')

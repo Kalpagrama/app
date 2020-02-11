@@ -97,7 +97,7 @@ export const nodeNodes = async (context, { node, position, pagination, sortStrat
       oid = node.sphereFromName.oid // запрашиваем ядра на суть
       filter.compositionOids = [node.compositions[0].oid, node.compositions[1].oid]
     } else if (position === 3) { // список для нижней части кубика-рубика (вторая композиция)
-      oid = node.compositions[0].oid // запрашиваем ядра второй композиции
+      oid = node.compositions[3].oid // запрашиваем ядра второй композиции
       filter.name = node.name
       filter.compositionOids = [node.compositions[0].oid]
     }

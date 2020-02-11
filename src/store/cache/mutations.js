@@ -13,6 +13,10 @@ export function init (state) {
   state.initialized = true
 }
 
+export function clear (state) {
+  state.cachedItems = {}
+}
+
 export function setItem (state, { key, item }) {
   logD('setItem: item', item)
   state.cachedItems[key] = item
