@@ -72,6 +72,8 @@
             :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
         q-btn(v-if="node.compositions[1]" round flat color="red" icon='clear' @click="compositionDelete(1)"
             :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
+      .row.full-width.bg-green
+        small.full-width.text-white revision: {{ node.revision }}
       //- category, spheres
       div(:style=`{minHeight: '60px'}`).row.full-width.items-start
         div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
