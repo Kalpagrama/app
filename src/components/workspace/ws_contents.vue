@@ -30,9 +30,9 @@
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
       q-btn(round flat color="green" icon="refresh" :loading="contentsLoading" @click="contentsReload()")
   .col.full-width.scroll
-    .row.full-with.items-start.content-start.q-px-sm
+    div(v-if="res").row.full-with.items-start.content-start.q-px-sm
       div(
-        v-for="(c,ci) in contents" :key="ci" @click="contentClick(c,ci)"
+        v-for="(c,ci) in res.items" :key="ci" @click="contentClick(c,ci)"
         :class=`{'bg-grey-8': c.oid !== oid, 'bg-white': c.oid === oid}`
         :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.cursor-pointer.q-mb-sm
@@ -57,7 +57,8 @@ export default {
       modes: ['list', 'gallery', 'feed'],
       content: null,
       contents: [],
-      contentsLoading: false
+      contentsLoading: false,
+      res: null
     }
   },
   watch: {
@@ -87,10 +88,11 @@ export default {
       this.$log('contentsLoad start')
       this.contentsLoading = true
       // await this.$wait(1000)
-      let {items} = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'CONTENTS'})
-      this.$log('contentsLoad done', items)
+      let res = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'CONTENTS'})
+      this.$log('contentsLoad done', res)
       this.contentsLoading = false
-      return items
+      // return
+      this.res = res
     },
     async contentsReload () {
       this.$log('contentsReload')
@@ -119,8 +121,8 @@ export default {
         }
         let res = await this.$store.dispatch('workspace/wsNodeSave', node)
         this.$log('res', res)
-        await this.$wait(300)
-        this.contentsReload()
+        // await this.$wait(300)
+        // this.contentsReload()
       } else {
         this.$log('USE WS NODE')
         // using node...
@@ -129,7 +131,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.contents = await this.contentsLoad()
+    await this.contentsLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

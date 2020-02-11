@@ -66,15 +66,11 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
     //- div(:style=`{position: 'absolute', zIndex: 100, right: 0+'px', bottom: 0+'px', height: '50px', maxWidth: 20+'%', width: '50px', opacity: 0.5}`).row.fit.bg-yellow
   //- name, essence
   div(
+    v-if="true"
     ref="nodeName" @click="nodeNameClick()"
     :style=`{minHeight: '60px'}`
     ).row.full-width.items-center.justify-center
-    //- span.text-green.text-bold.q-mr-sm {{index}}
     span.text-bold.text-center.cursor-pointer {{ node.name }}
-  //- .row.full-width.bg-red
-  //-   span.text-white.full-width stylesMaxi: {{stylesMaxi}}
-  //-   span.text-white.full-width stylesMini: {{stylesMini}}
-  //-   span.text-white.full-width styles[0]: {{styles[0].toString()}}
   //- actions
   div(
     v-if="nodeFull && opened"
@@ -134,16 +130,11 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
 </template>
 
 <script>
-import nodeFragment from 'components/node/fragment'
-import ncFragment from 'components/node_composer/nc_fragment'
-import { fragments } from 'src/schema/fragments'
-import { apollo } from 'src/boot/apollo'
-
 export default {
   name: 'nodeNew',
   // TODO заменить имя св-ва visible на active
-  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'fc'],
-  components: {nodeFragment, ncFragment},
+  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
+  components: {},
   data () {
     return {
       nodeExtending: false,
@@ -223,13 +214,7 @@ export default {
           this.nodeFull = this.nodeFullReady
         }
       }
-    },
-    // node: {
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('node CHANGED:', to)
-    //   }
-    // }
+    }
   },
   methods: {
     async play () {
@@ -334,7 +319,8 @@ export default {
       if (this.opened) {
         // go to node page
       } else {
-        this.opened = true
+        // this.opened = true
+        this.$emit('open', [this.node, this.nodeFull])
       }
     },
     nodeNameExtend () {
@@ -354,8 +340,6 @@ export default {
       let nodeNew = JSON.parse(JSON.stringify(this.nodeFull))
       nodeNew.compositions[this.compositionIndex] = c
       this.nodePublish(nodeNew)
-      // this.compositionIndex = undefined
-      // this.$set(this.node.compositions, this.compositionIndex, c)
     },
     compositionExtend (index) {
       this.$log('compositionExtend', index)
