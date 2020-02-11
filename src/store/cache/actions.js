@@ -127,9 +127,8 @@ class Cache {
         }
       }
         break
-      default:
-      {
-        if (!Number.isInteger(actualAge)){
+      default: {
+        if (!Number.isInteger(actualAge)) {
           // такой элемент уже есть в кэше оставляем что было
           let current = this.cacheLru.get(key)
           if (current) {
@@ -158,7 +157,7 @@ class Cache {
     assert(key && fetchItemFunc)
     let result
     let cachedData = this.cacheLru.get(key)
-    let {actualUntil, actualAge} = cachedData ? cachedData : {}
+    let { actualUntil, actualAge } = cachedData ? cachedData : {}
     if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
       if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {
@@ -279,8 +278,11 @@ class Cache {
 
   async expire (key) {
     let item = this.context.state.cachedItems[key]
-    assert(item)
-    return await this.set(key, item, 'zero')
+    if (!item) {
+      logE('!item')
+    } else {
+      return await this.set(key, item, 'zero')
+    }
   }
 }
 
