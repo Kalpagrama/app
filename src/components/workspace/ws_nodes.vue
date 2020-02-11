@@ -60,7 +60,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

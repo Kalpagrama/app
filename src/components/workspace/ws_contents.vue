@@ -27,29 +27,24 @@
         q-btn(dense :flat="mode !== 'list'" color="green" no-caps @click="mode = 'list'").q-px-sm.q-mx-sm List
         q-btn(dense :flat="mode !== 'gallery'" color="green" no-caps @click="mode = 'gallery'").q-px-sm Gallery
         q-btn(dense :flat="mode !== 'feed'" color="green" no-caps @click="mode = 'feed'").q-px-sm.q-mx-sm Feed
-    div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
-      q-btn(round flat color="green" icon="refresh" :loading="contentsLoading" @click="contentsReload()")
+    //- div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
+    //-   q-btn(round flat color="green" icon="refresh" :loading="contentsLoading" @click="contentsReload()")
   .col.full-width.scroll
-    div(v-if="res").row.full-with.items-start.content-start.q-px-sm
-      div(
-        v-for="(c,ci) in res.items" :key="ci" @click="contentClick(c,ci)"
-        :class=`{'bg-grey-8': c.oid !== oid, 'bg-white': c.oid === oid}`
-        :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.cursor-pointer.q-mb-sm
-        span(
-          :class=`{
-            'text-white': c.oid !== oid,
-            'text-green': c.oid === oid,
-            'text-bold': c.oid === oid}`
-        ).q-ma-sm.cursor-pointer {{ c.compositions[0].layers[0].content.name }}
+    .row.full-with.items-start.content-start.q-px-sm
+      kalpa-loader(type="wsContents" :variables=`{}`)
+        template(v-slot:items=`{items}`)
+          ws-content(
+            v-for="(n, ni) in items" :key="n.oid" @contentClick="contentClick"
+            :index="ni" :oid="oid", :node="n")
 </template>
 
 <script>
 import contentFinder from 'components/content/finder'
+import wsContent from './ws_content'
 
 export default {
   name: 'wsContents',
-  components: {contentFinder},
+  components: {contentFinder, wsContent},
   props: ['ctx', 'oid'],
   data () {
     return {
@@ -130,8 +125,8 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
-    await this.contentsLoad()
+    // this.$log('mounted')
+    // await this.contentsLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

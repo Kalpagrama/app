@@ -378,7 +378,7 @@ export const get = async (context, { oid, name, force }) => {
   }
   let item = await context.dispatch('cache/get',
     { key: makeKey({oid}), fetchItemFunc, force }, { root: true })
-  logD('ws get Item complete', item)
+  // logD('ws get Item complete', item)
   return item
   // let fullItem = context.rootState.cache.cachedItems[makeKey({oid})]
   // if (fullItem) return fullItem
