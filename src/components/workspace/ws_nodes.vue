@@ -9,17 +9,17 @@
     .row.full-width
       .col.full-height
       //- list, gallery, feed
-      div(:style=`{width: '60px', height: '60px'}`
-        ).row.items-center.content-center.justify-center
-        q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
+      //- div(:style=`{width: '60px', height: '60px'}`
+      //-   ).row.items-center.content-center.justify-center
+      //-   q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
     //- body
     .col.full-width.scroll
-      //- .row.full-width.bg-red
-      //-   span.text-white wsR: {{ $store.state.workspace.revision }}
-      div(v-if="query").row.full-width.items-start.content-start.q-px-sm
-        ws-node(
-          v-for="(n, ni) in query.items" :key="n.oid" @nodeClick="nodeClick"
-          :oid="oid" :node="n")
+      .row.full-width.items-start.content-start.q-px-sm
+        kalpa-loader(type="wsNodes" :variables=`{}`)
+          template(v-slot:items=`{items}`)
+            ws-node(
+              v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
+              :oid="oid" :node="n")
 </template>
 
 <script>
@@ -61,8 +61,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    // TODO: initial load of items goes to kalpa-loader, and kalpa-loader is watching for updates...
-    await this.nodesLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

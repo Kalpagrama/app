@@ -252,7 +252,7 @@ export default {
     }
   },
   created () {
-    this.nodeSave = debounce(this.nodeSave, 2000)
+    this.nodeSave = debounce(this.nodeSave, 1000)
   },
   mounted () {
     this.$log('mounted')

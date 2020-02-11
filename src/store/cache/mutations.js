@@ -18,35 +18,34 @@ export function clear (state) {
   state.cachedItems = {}
 }
 
-// var keys = {}
+// let indx_ = 0
+
 export function setItem (state, { key, item }) {
-  // if (keys[key]) {
-  //   logD('GOT KEY: UPDATING')
-  //   for (const p in item) {
-  //     state.cachedItems[key][p] = item[p]
-  //   }
-  // } else {
-  //   logD('NO KEY: CREATING')
-  //   keys[key] = true
-  //   Vue.set(state.cachedItems, key, item)
-  // }
-  // Vue.set(state.cachedItems, key, JSON.parse(JSON.stringify(item)))
-  // if (item.oid === 'AsFglViDQRE=') logD('setItem: item', key)
-  if (state.cachedItems[key]) {
-    // if (item.oid === 'AsFglViDQRE=') logD('UPDATING', key)
-    for (const p in item) {
-      // if (state.cachedItems[key]) Vue.set(state.cachedItems[key], p, item[p])
-      // state.cachedItems[key][p] = item[p]
-      Vue.set(state.cachedItems[key], p, item[p])
+  // if (item.oid === 'AsANtV_BQBo=') logD(`setItem: start key=${key}, item.indx=${item.indx_} indx_=${indx_}. item= `, item)
+  let existing = state.cachedItems[key]
+  if (existing) {
+    // if (item.oid === 'AsANtV_BQBo=') logD('setItem: exist')
+    // Object.assign(state.cachedItems[key], item)
+    for (let prop in item) {
+      Vue.set(existing, prop, item[prop])
+      // existing[prop] = item[prop]
     }
   } else {
-    // if (item.oid === 'AsFglViDQRE=') logD('CREATING', key)
+    // logD('setItem: !exist')
+    // if (item.oid === 'AsANtV_BQBo=') logD('setItem: !exist', state.cachedItems)
     Vue.set(state.cachedItems, key, item)
+    // Vue.set(state.cachedItems[key], 'indx_', indx_++)
+    // if (item.oid === 'AsANtV_BQBo=') logD('setItem: created!')
   }
+  // setInterval(() => {
+  //   state.cachedItems[key].name = state.cachedItems[key].name + '-'
+  // }, 1000)
   // logD('setItem: state.cachedItems[key]', state.cachedItems[key])
 }
 
 export function removeItem (state, key) {
-  assert(state.cachedItems[key])
-  delete state.cachedItems[key]
+  // if (key.includes('AsANtV_BQBo=')) logD('setItem: removeItem!')
+  logD('removeItem', key)
+  // assert(state.cachedItems[key])
+  // delete state.cachedItems[key]
 }

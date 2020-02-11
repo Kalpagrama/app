@@ -1,6 +1,6 @@
 <template lang="pug">
   .row.full-width.justify-center.items-start.content-start
-    slot(name="items" :items="query.items")
+    slot(v-if="query" name="items" :items="query.items")
 </template>
 
 <script>
@@ -53,7 +53,7 @@ export default {
       this.$log('itemsLoad start', variables)
       // get variables
       let { oid, pagination, filter, sortStrategy } = variables
-      pagination = pagination || {pageSize: 2, pageToken: null}
+      pagination = pagination || {pageSize: 30, pageToken: null}
       sortStrategy = sortStrategy || 'HOT'
       // get res
       // TODO wsNodes, wsNotes, wsCompositions, wsSpheres
@@ -71,13 +71,16 @@ export default {
         case 'wsContents' :
           res = await this.$store.dispatch('lists/wsItems', {pagination, filter, sortStrategy, wsItemsType: 'CONTENTS'})
           break
+        case 'wsNodes' :
+          res = await this.$store.dispatch('lists/wsItems', {pagination, filter, sortStrategy, wsItemsType: 'NODES'})
+          break
         default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }
       // parse res
       let { items, count, totalCount, nextPageToken } = res
-      if (this.oid === oid && this.nextPageToken !== nextPageToken) {
-        for (let item of items) this.nodes.push(item)
-      } else this.nodes = items
+      // if (this.oid === oid && this.nextPageToken !== nextPageToken) {
+      //   for (let item of items) this.nodes.push(item)
+      // } else this.nodes = items
       // set shit
       this.query = res
       this.items = items
