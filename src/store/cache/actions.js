@@ -145,8 +145,8 @@ class Cache {
     }
     assert(Number.isInteger(actualAge), `Number.isInteger(actualAge):${actualAge}`)
     let actualUntil = Date.now() + actualAge
-    logD('actualAge', actualAge)
-    logD('actualUntil', actualUntil)
+    // logD('actualAge', actualAge)
+    // logD('actualUntil', actualUntil)
     this.cacheLru.set(key, { actualUntil, actualAge })
     await this.cachePersist.setItem(key, { item, actualUntil, actualAge })
     this.context.commit('setItem', { key, item })

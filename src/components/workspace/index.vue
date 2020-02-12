@@ -1,36 +1,35 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf")
+  q-header(
+    v-if="$store.state.ui.debug"
+    :style=`{paddingLeft: '66px'}`).bg-grey-8.q-pa-sm
+    //- debug
+    div(
+      v-if="$store.state.ui.debug"
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.bg-green.q-pa-sm.q-my-sm
+      small.text-white.full-width node.oid: {{ node ? node.oid : false }}
   //- TODO: global theme styles: body :style=`{color: 'green !important'}`
-  q-page-container(
-  ).row.full-width.window-height.bg-black
+  q-page-container.row.full-width.window-height.bg-black
     ws-items(
       :ctx="$q.screen.gt.xs ? 'workspace' : 'finder'"
       :oid="node ? node.oid : false" :page="page"
       @page="$router.push({params: {page: $event}})" @item="itemClick").bg-grey-9
     .col.full-height.bg-grey-10
-      //- note-editor
       composition-editor(
         v-if="page === 'contents' && node && nodeIsContent(node)"
         ctx="composition"
         :node="node" :compositionIndex="0").bg-black
       node-editor(
         v-if="page === 'nodes'"
-        :value="node ? node : null")
+        :value="node ? node : null"
+        @node="nodeChanged")
       ws-settings(
         v-if="page === 'settings'")
-    //- div(
-    //-   v-if="false"
-    //-   :style=`{maxWidth: '500px', borderLeft: '1px solid #4caf50'}`
-    //-   ).row.fit.items-start.content-start
-    //-   node-editor
-  //- footer
-  q-footer.row.full-width.lt-sm
-    slot(name="menuMobile")
 </template>
 
 <script>
 import wsItems from './ws_items'
-// import compositionEditor from 'components/node/composition_editor'
 import nodeEditor from 'components/node/node_editor'
 import wsSettings from './ws_settings'
 
@@ -64,6 +63,10 @@ export default {
       this.$nextTick(() => {
         this.node = item
       })
+    },
+    nodeChanged (node) {
+      this.$log('nodeChanged', node)
+      this.$set(this, 'node', node)
     },
     nodeIsContent (node) {
       if (node.name.split('-')[0] === 'CONTENT') return true

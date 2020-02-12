@@ -6,13 +6,20 @@
       round push size="lg" color="green" icon="add" @click="nodeAdd()"
       :style=`{position: 'absolute', right: '16px', bottom: '16px'}`)
     //- header with filters...
-    .row.full-width
+    .row.full-width.q-px-sm
       .col.full-height
       //- list, gallery, feed
       //- div(:style=`{width: '60px', height: '60px'}`
       //-   ).row.items-center.content-center.justify-center
       //-   q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
+      //- debug
+      div(
+        v-if="$store.state.ui.debug"
+        :style=`{borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.content-center.bg-green.q-pa-sm.q-my-sm
+        small.text-white.full-width oid: {{ oid }}
     //- body
+    //- TODO add scroll area from quasar...
     .col.full-width.scroll
       .row.full-width.items-start.content-start.q-px-sm
         kalpa-loader(type="wsNodes" :variables=`{}`)

@@ -116,7 +116,8 @@ export default {
       let w = e.target.clientWidth
       let x = e.offsetX
       let now = (this.player.duration * x) / w
-      if (now > this.start && now < this.end) this.player.setCurrentTime(now)
+      // if (now > this.start && now < this.end)
+      this.player.setCurrentTime(now)
     },
     async videoMove () {
       // this.$log('videoMove')

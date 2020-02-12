@@ -73,8 +73,11 @@
         q-btn(v-if="node.compositions[1]" round flat color="red" icon='clear' @click="compositionDelete(1)"
             :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
       //- debug
-      div(v-if="false").row.full-width.bg-green
-        small.full-width.text-white revision: {{ node.revision }}
+      div(
+        v-if="$store.state.ui.debug"
+        :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
+        //- small.full-width.text-white revision: {{ node.revision }}
+        small.full-width.text-white oid: {{ node.oid }}
       //- category, spheres
       div(:style=`{minHeight: '60px'}`).row.full-width.items-start
         div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
@@ -143,7 +146,13 @@ export default {
       handler (to, from) {
         this.$log('value CHANGED', to)
         if (to) {
-          this.node = to
+          if (from) {
+            if (to.oid !== from.oid) {
+              this.node = to
+            }
+          } else {
+            this.node = to
+          }
         } else {
           this.node = this.nodeNew
         }
@@ -153,6 +162,7 @@ export default {
       deep: true,
       handler (to, from) {
         this.$log('node CHANGED', to)
+        if (to.oid) this.$emit('node', JSON.parse(JSON.stringify(to)))
         if (to.oid !== from.oid) return
         if (to) {
           if (this.nodeSavePause) {

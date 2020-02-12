@@ -30,7 +30,7 @@ div(
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
-        q-btn(round :flat="page !== 'spheres'" color="green" icon="style" @click="$emit('page', 'settings')")
+        q-btn(round :flat="page !== 'spheres'" color="green" icon="style" @click="$emit('page', 'spheres')")
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
