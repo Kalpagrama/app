@@ -16,7 +16,7 @@ iframe {
     kalpa-menu-desktop(v-if="!loading")
   div(:style=`{position: 'fixed', zIndex: 10000, bottom: 0}`).row.full-width.xs
     kalpa-menu-mobile(v-if="!loading")
-  div(:style=`{paddingLeft: $q.screen.gt.xs ? '0px' : '0px'}`).col
+  div(:style=`{paddingLeft: $q.screen.gt.xs ? '60px' : '0px'}`).col
     router-view(v-if="!loading")
     div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
       q-spinner(color="green" size="50px")
