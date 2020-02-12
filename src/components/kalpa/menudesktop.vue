@@ -22,7 +22,7 @@ div(
       div(@click="$router.push('/')").col.row.items-center
         //- mini box: width kalpagramma logo
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-          k-logo(:width="40" :height="40")
+          k-logo(:width="40" :height="40").cursor-pointer
         //- home page name, or kalpagramma name?
         div(v-if="width > 60").col.full-height
           .row.fit.items-center
@@ -61,6 +61,23 @@ div(
           div(v-if="width > 60").col.full-height
             .row.fit.items-center
               span.text-white {{ $t(p.name) }}
+        //- fullscreen
+        div(:style=`{}`).row.full-width.justify-start
+          div(
+            :style=`{width: '60px', height: '60px'}`
+            ).row.full-height.items-center.content-center.justify-center
+            q-btn(
+              round flat  @click="$q.fullscreen.toggle()"
+              :color="$q.fullscreen.isActive ? 'green' : 'white'"
+              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
+        //- cache clear
+        div(:style=`{}`).row.full-width.justify-start
+          div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+            q-btn(round flat icon="refresh" color="white" :loading="cacheClearing" @click="cacheClear()")
+        //- debug
+        div(:style=`{}`).row.full-width.justify-start
+          div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+            q-btn(round flat icon="bug_report" :color="$store.state.ui.debug ? 'green' : 'white'" @click="$store.commit('ui/stateSet', ['debug', !$store.state.ui.debug])")
       //- invite
       //- div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       //-   q-btn(
@@ -81,11 +98,6 @@ div(
       //-     :round="mini" push color="accent" no-caps icon="save_alt" @click="install"
       //-     :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
       //-     span(v-if="width === 230" :style=`{whiteSpace: 'nowrap'}`).text-bold.q-ml-md {{ $t('install_app') }}
-      //- refresh
-      //- div(:style=`{marginBottom: '70px'}`).row.full-width.q-px-md
-      //-   q-btn(
-      //-     outline color="accent" no-caps @click="appRefresh()"
-      //-     :style=`{borderRadius: '10px', whiteSpace: 'nowrap'}` ).full-width {{$t('Refresh')}}
       //- toggle
       div(:style=`{}`).row.full-width.justify-end
         div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
@@ -109,7 +121,8 @@ export default {
         { id: 'workspace', name: 'Workspace', icon: 'school' },
         { id: 'settings', name: 'Settings', icon: 'settings' }
       ],
-      userAvatarErrored: false
+      userAvatarErrored: false,
+      cacheClearing: false
     }
   },
   computed: {
@@ -130,7 +143,7 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('menuShow CHANGED', to)
-        this.$tween.to(this, 0.5, {width: to ? 260 : 60})
+        this.$tween.to(this, 0.3, {width: to ? 260 : 60})
       }
     }
   },
@@ -179,8 +192,11 @@ export default {
       this.$logD('installPrompt=', installPrompt)
       if (installPrompt) installPrompt.prompt()
     },
-    appRefresh () {
-      this.$log('appRefresh')
+    async cacheClear () {
+      this.$log('cacheClear')
+      this.cacheClearing = true
+      await this.$wait(500)
+      this.$store.dispatch('cache/clear')
       window.location.reload(true)
     }
   },

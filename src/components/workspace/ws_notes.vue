@@ -10,17 +10,17 @@
     //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start
-        div(
-          v-for="(n, ni) in notes" :key="ni"
-          :style=`{height: '40px'}`
-        ).row.full-width.items-center.content-center.bg-grey-8
-        //- span {{ noteName(n.name) }}
-        span.text-white {{ n }}
+        //- kalpa-loader(type="wsNotes" :variables="{}")
+        //-   template(v-slot:items=`{items}`)
+        //-     ws-note(
+        //-       v-for="(n, ni) in items" :key="ni" @noteClick="noteClick"
+        //-       :index="ni" :oid="oid" :node="n")
 </template>
 
 <script>
 export default {
   name: 'wsNotes',
+  props: ['oid'],
   data () {
     return {
       notes: []
@@ -35,6 +35,10 @@ export default {
     },
     noteName (name) {
       return this.name.split('-')[1]
+    },
+    noteClick (note) {
+      this.$log('noteClick', note)
+      this.$emit('item', note)
     },
     noteAdd () {
       this.$log('noteAdd')

@@ -26,5 +26,6 @@ export default {
   rectClone: null,
   actionOpened: false,
   actionKey: undefined,
-  actionOptions: null
+  actionOptions: null,
+  debug: false
 }

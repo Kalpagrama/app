@@ -12,7 +12,7 @@ import nodeLayoutPip from './layout_pip'
 import nodeLayoutOpened from './layout_opened'
 
 export default {
-  name: 'node',
+  name: 'nodeIndex',
   props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
   components: {nodeLayoutPip, nodeLayoutOpened},
   data () {
@@ -88,8 +88,8 @@ export default {
       }
     },
     async nodeDestroy () {
-      // this.$log('nodeDestroy')
-      if (this.nodeFull && !this.needFull && !this.needFullPreload){
+      // this.$log('nodeDestroy')  && !this.needFull && !this.needFullPreload
+      if (this.nodeFull) {
         this.$log(`node CLEAR indx=${this.index} oid=${this.node.oid}`)
         this.nodeFull = null
       }

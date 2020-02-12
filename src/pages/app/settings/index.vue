@@ -20,14 +20,10 @@ q-layout(view="hHh lpR fFf" :container="true" :style=`{width: $q.screen.width+'p
         ).row.full-width.items-center.cursor-pointer.q-px-md
           span(:style=`{color: pkey === page ? '#789dff' : 'black'}`) {{ $t(p.name) }}
   q-page-container.row.full-width
-    div(
-      :style=`{maxWidth: '300px'}`
-      ).row.full-height.bg-black.gt-xs
-      slot(name="menuDesktop")
     .col
       //- k-spinner(:width="200" :height="200" stroke="white" type="spinner")
       .row.full-width.justify-center
-        .row.full-width
+        .row.full-width.br
           //- div(:style=`{height: height-60+'px'}`).row
           //- .col.full-height
           notifications(v-if="page === 'notifications'")
@@ -58,6 +54,7 @@ import security from './security'
 import notifications from './notifications'
 import information from './information'
 import blacklist from './blacklist'
+
 export default {
   name: 'pageApp__settings',
   components: {information, blacklist, account, payments, privacy, security, notifications},

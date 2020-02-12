@@ -28,7 +28,7 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('variables CHANGED', 'from=', from, ', to=', to)
-        if (to) this.itemsLoad(to)
+        if (to && !this.query) this.itemsLoad(to)
       }
     }
   },
@@ -73,6 +73,9 @@ export default {
           break
         case 'wsNodes' :
           res = await this.$store.dispatch('lists/wsItems', {pagination, filter, sortStrategy, wsItemsType: 'NODES'})
+          break
+        case 'wsNotes' :
+          res = await this.$store.dispatch('lists/wsItems', {pagination, filter, sortStrategy, wsItemsType: 'NOTES'})
           break
         default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }

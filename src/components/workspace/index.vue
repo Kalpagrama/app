@@ -1,42 +1,45 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf")
+  q-header(
+    v-if="$store.state.ui.debug"
+    :style=`{paddingLeft: '66px'}`).bg-grey-8.q-pa-sm
+    //- debug
+    div(
+      v-if="$store.state.ui.debug"
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.bg-green.q-pa-sm.q-my-sm
+      small.text-white.full-width node.oid: {{ node ? node.oid : false }}
   //- TODO: global theme styles: body :style=`{color: 'green !important'}`
-  q-page-container(
-  ).row.full-width.window-height.bg-black
-    ws-items(
+  q-page-container.row.full-width.window-height.bg-black
+    ws-menu(
       :ctx="$q.screen.gt.xs ? 'workspace' : 'finder'"
       :oid="node ? node.oid : false" :page="page"
       @page="$router.push({params: {page: $event}})" @item="itemClick").bg-grey-9
     .col.full-height.bg-grey-10
-      //- note-editor
       composition-editor(
         v-if="page === 'contents' && node && nodeIsContent(node)"
         ctx="composition"
         :node="node" :compositionIndex="0").bg-black
       node-editor(
         v-if="page === 'nodes'"
-        :value="node ? node : null")
+        :value="node"
+        @node="nodeChanged")
+      ws-sphere(
+        v-if="page === 'spheres'"
+        :value="node")
       ws-settings(
         v-if="page === 'settings'")
-    //- div(
-    //-   v-if="false"
-    //-   :style=`{maxWidth: '500px', borderLeft: '1px solid #4caf50'}`
-    //-   ).row.fit.items-start.content-start
-    //-   node-editor
-  //- footer
-  q-footer.row.full-width.lt-sm
-    slot(name="menuMobile")
 </template>
 
 <script>
-import wsItems from './ws_items'
-// import compositionEditor from 'components/node/composition_editor'
+import wsMenu from './ws_menu'
 import nodeEditor from 'components/node/node_editor'
+import wsSphere from './ws_sphere'
 import wsSettings from './ws_settings'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, nodeEditor, wsSettings},
+  components: {wsMenu, nodeEditor, wsSphere, wsSettings},
   props: [],
   data () {
     return {
@@ -59,11 +62,15 @@ export default {
   },
   methods: {
     async itemClick ({type, item}) {
-      this.$log('nodeClick', type, item)
+      this.$log('itemClick', type, item)
       this.node = null
       this.$nextTick(() => {
         this.node = item
       })
+    },
+    nodeChanged (node) {
+      this.$log('nodeChanged', node)
+      this.$set(this, 'node', node)
     },
     nodeIsContent (node) {
       if (node.name.split('-')[0] === 'CONTENT') return true

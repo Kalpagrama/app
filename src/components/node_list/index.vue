@@ -1,6 +1,7 @@
 <template lang="pug">
-div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`).row.full-width.items-start.content-start.justify-start
-  q-dialog(v-model="nodeDialogOpened" :maximized="true")
+div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`
+  ).row.full-width.items-start.content-start.justify-start.q-px-sm
+  q-dialog(v-model="nodeDialogOpened" :maximized="true" full-height)
     div(@click.self="nodeDialogOpened = false").row.fit.items-start.content-start.justify-center.bg-grey-10
       div(:style=`{maxWidth: '600px'}`).row.full-width
         node(ctx="explorer" :node="node" :nodeFullReady="nodeFull" :visible="true" :active="true")
@@ -9,8 +10,8 @@ div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`
     v-if="nodesBan ? !nodesBan.includes(n.oid) : true"
     :ctx="'list'"
     :node="n" :index="ni"
-    :needFull="ni >= nodeMiddle-0 && ni <= nodeMiddle+0"
-    :needFullPreload="!(ni >= nodeMiddle-0 && ni <= nodeMiddle+0) && ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
+    :needFull="ni >= nodeMiddle-0 && ni <= nodeMiddle+1"
+    :needFullPreload="!(ni >= nodeMiddle-0 && ni <= nodeMiddle+1) && ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
     :visible="nodeMiddle === ni"
     @open="node = $event[0], nodeFull = $event[1], nodeDialogOpened = true"
     @hide="nodesBan.push(n.oid)"

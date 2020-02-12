@@ -19,13 +19,14 @@
         v-model="url"
         color="green" placeholder="Paste URL to add content"
         :loading="urlInputLoading"
-        :style=`{paddingRight: '0px'}`
-        ).full-width
-        template(v-slot:prepend)
-          q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm
+        :style=`{}`
+        :input-style=`{paddingLeft: '10px'}`
+        ).full-width.items-center.content-center
         template(v-slot:append)
-          q-btn(v-if="sources.includes('ws') && url.length === 0" round flat color="green" icon="add" @click="wsDialogShow = true").q-mr-sm
-          q-btn(v-if="!urlInputLoading && url.length > 0" round flat color="green" icon="clear" @click="url = ''").q-mr-sm
+          q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm
+        //- template(v-slot:append)
+        //-   q-btn(v-if="sources.includes('ws') && url.length === 0" round flat color="green" icon="add" @click="wsDialogShow = true").q-mr-sm
+        //-   q-btn(v-if="!urlInputLoading && url.length > 0" round flat color="green" icon="clear" @click="url = ''").q-mr-sm
 </template>
 
 <script>

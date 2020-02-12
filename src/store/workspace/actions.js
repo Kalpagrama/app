@@ -351,7 +351,7 @@ export const updateWsCache = async (context, { type, object }) => {
 
 // можно запрашивать по oid, либо имени (если оно уникально)
 export const get = async (context, { oid, name, force }) => {
-  logD('workspace/get start', { oid, name, force })
+  // logD('workspace/get start', { oid, name, force })
   const fetchItemFunc = async () => {
     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
@@ -380,7 +380,7 @@ export const get = async (context, { oid, name, force }) => {
   }
   let item = await context.dispatch('cache/get',
     { key: makeKey({ oid, name }), fetchItemFunc, force }, { root: true })
-  logD('ws get Item complete', item)
+  // logD('ws get Item complete', item)
   return item
   // let fullItem = context.rootState.cache.cachedItems[makeKey({oid})]
   // if (fullItem) return fullItem

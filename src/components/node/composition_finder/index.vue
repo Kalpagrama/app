@@ -1,22 +1,22 @@
 <template lang="pug">
 .row.fit.bg-grey-9
-  ws-items(
+  ws-menu(
     ctx="finder"
     :header="false" :toggle="false" :oid="oid"
     :pages="['contents', 'compositions']"
     @item="itemClick" @page="pageClick" :page="page"
     )
-  q-dialog(v-model="dialogOpened")
-    //- h1(v-if="node").text-red node.name {{node.name}}
-    //- h1 no node
-    composition-editor(
-      ctx="composition"
-      :node="node" :compositionIndex="0"
-      @layerExport="layerExport").bg-black
+  q-dialog(v-model="dialogOpened" :maximized="true" position="bottom")
+    div(@click.self="dialogOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
+      composition-editor(
+        ctx="composition"
+        :node="node" :compositionIndex="0"
+        @layerExport="layerExport"
+        :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden'}`).bg-black
 </template>
 
 <script>
-// search for all the contents and its layers, or composition + name...
+// TODO search for all the contents and its layers, or composition + name...
 // or create a composition
 export default {
   name: 'compositionFinder',
