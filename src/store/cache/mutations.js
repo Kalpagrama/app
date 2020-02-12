@@ -23,7 +23,6 @@ export function setItem (state, { key, item }) {
   if (existing) {
     for (let prop in item) {
       Vue.set(existing, prop, item[prop])
-      // existing[prop] = item[prop]
     }
   } else {
     Vue.set(state.cachedItems, key, item)

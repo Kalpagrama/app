@@ -69,7 +69,8 @@ class Cache {
           }, 0)
         } else { // удалить объект из indexed db и vuex
           await this.cachePersist.remove(key)
-          // todo В общем случае - мы не знаем - ссылается ли что-то в приложении на этот объект во вьюикс
+          // В общем случае - мы не знаем - ссылается ли что-то в приложении на этот объект во вьюикс
+          // поэтому при удалении элемента у кого то в приложении могут остаться копии(перестанут быть реактивными)
           // this.context.commit('removeItem', key)
         }
       }
@@ -145,8 +146,8 @@ class Cache {
     }
     assert(Number.isInteger(actualAge), `Number.isInteger(actualAge):${actualAge}`)
     let actualUntil = Date.now() + actualAge
-    logD('actualAge', actualAge)
-    logD('actualUntil', actualUntil)
+    // logD('actualAge', actualAge)
+    // logD('actualUntil', actualUntil)
     this.cacheLru.set(key, { actualUntil, actualAge })
     await this.cachePersist.setItem(key, { item, actualUntil, actualAge })
     this.context.commit('setItem', { key, item })
@@ -193,7 +194,7 @@ class Cache {
         result = this.context.state.cachedItems[key] // пробуем вернуть хоть что-то (подходит для оффлайн режима)
       }
     } else {
-      let item = this.context.state.cachedItems[key] // данные лежат во vuex
+      let item = this.context.state.cachedItems[key] // данные лежат во vuex и они актуальны
       assert(item)
       result = item
     }
