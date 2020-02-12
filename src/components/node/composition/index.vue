@@ -48,8 +48,10 @@ div(:style=`{position: 'relative'}`).row.full-width
     ref="player"
     :url="contentUrl" :source="contentSource" :ctx="ctx"
     :start="layerStart" :end="layerEnd" :visible="visible" :mini="mini"
+    :style=`thumbUrl ? {position: 'absolute', zIndex: 100} : null`
     @player="$emit('player', $event)" @ended="layerEnded"
-    :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`)
+    )
+    //- :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`
     //- TODO: props is options on one object...
     template(v-slot:layerEditor=`{player, now, progressHeight}`)
       slot(name="layerEditor" :player="player" :now="now" :progressHeight="progressHeight")

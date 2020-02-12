@@ -22,7 +22,7 @@ div(
       div(@click="$router.push('/')").col.row.items-center
         //- mini box: width kalpagramma logo
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-          k-logo(:width="40" :height="40")
+          k-logo(:width="40" :height="40").cursor-pointer
         //- home page name, or kalpagramma name?
         div(v-if="width > 60").col.full-height
           .row.fit.items-center
@@ -61,14 +61,23 @@ div(
           div(v-if="width > 60").col.full-height
             .row.fit.items-center
               span.text-white {{ $t(p.name) }}
-        //- debug
+        //- fullscreen
         div(:style=`{}`).row.full-width.justify-start
-          div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
-            q-btn(round flat icon="bug_report" :color="$store.state.ui.debug ? 'green' : 'white'" @click="$store.commit('ui/stateSet', ['debug', !$store.state.ui.debug])")
+          div(
+            :style=`{width: '60px', height: '60px'}`
+            ).row.full-height.items-center.content-center.justify-center
+            q-btn(
+              round flat  @click="$q.fullscreen.toggle()"
+              :color="$q.fullscreen.isActive ? 'green' : 'white'"
+              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'")
         //- cache clear
         div(:style=`{}`).row.full-width.justify-start
           div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round flat icon="refresh" color="white" :loading="cacheClearing" @click="cacheClear()")
+        //- debug
+        div(:style=`{}`).row.full-width.justify-start
+          div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+            q-btn(round flat icon="bug_report" :color="$store.state.ui.debug ? 'green' : 'white'" @click="$store.commit('ui/stateSet', ['debug', !$store.state.ui.debug])")
       //- invite
       //- div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       //-   q-btn(

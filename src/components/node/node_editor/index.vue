@@ -12,7 +12,7 @@
 .row.fit.justify-center
   //- column
   div(
-    :style=`{position: 'relative', maxWidth: '600px'}`
+    :style=`{position: 'relative'}`
     ).column.fit
     //- actions
     //- composition editor
@@ -26,81 +26,102 @@
       composition-finder(@layer="layerFound").bg-black
     //- header
     div(
-      :style=`{height: '60px'}`
-      ).row.full-width.items-center.content-center.q-px-sm
-      .col.full-height
-        .row.fit.items-center.content-center.q-px-md
-          span.text-bold.text-green Node editor
-      div(
-        :style=`{height: '60px', width: '60px'}`
-        ).row.items-center.content-center.justify-center
-        q-btn(round flat icon="refresh" color="green" :loading="nodeRefreshing" @click="nodeRefresh()")
+      :style=`{height: '113px'}`
+      ).row.full-width.items-start.content-start.justify-center.q-px-sm
+      div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
+        //- header
+        div(
+          :style=`{height: '60px'}`
+          ).row.full-width
+          //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+          //-   q-btn(round flat icon="wb_iridescent" color="green")
+          //- .col.full-height
+          //-   .row.fit.items-center.content-center
+          //-     span.text-bold.text-green Node editor
+          //- div(
+          //-   :style=`{height: '60px', width: '60px'}`
+          //-   ).row.items-center.content-center.justify-center
+          //-   q-btn(round flat icon="refresh" color="green" :loading="nodeRefreshing" @click="nodeRefresh()").q-mr-sm
+        //- header actions
+        div(
+          :style=`{height: '53px'}`
+          ).row.full-width.items-center.content-center.q-px-sm
+          q-btn(
+            v-if="node && node.oid"
+            outline color="red" no-caps :loading="nodeDeleting" @click="nodeDelete(node.oid)"
+            :style=`{borderRadius: '10px'}`)
+            span Delete
+          .col
+          q-btn(
+            v-if="node && node.oid"
+            outline color="green" no-caps :loading="nodeSaving" @click="nodeSave()"
+            :style=`{borderRadius: '10px'}`).q-mr-md
+            span().text-bold.text-green Save
+          //- .col.full-height
+          q-btn(
+            v-if="node && node.oid"
+            push color="green" no-caps :loading="nodePublishing" @click="nodePublish()"
+            :style=`{borderRadius: '10px'}`)
+            span().text-bold Publish
+    //- body
     .col.full-width.scroll
-      //- composition one
-      div(
-        :style=`{position: 'relative', minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-start.content-start.bg-grey-9
-        composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :visible="compositionVisible[0]" ctx="composition")
-        //- composition actions
-        div(
-          v-if="!node.compositions[0]"
-          :style=`{position: 'absolute', zIndex: 3000}`
-          ).row.fit.items-center.content-center.justify-center
-          q-btn(v-if="!node.compositions[0]" round flat color="green" icon="add" size="lg" @click="compositionFind(0)")
-        q-btn(v-if="node.compositions[0]" round flat color="white" icon="edit" @click="compositionEdit(0)"
-            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
-        q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
-            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
-      //- essence editor
-      div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
-        input(
-          v-if="node"
-          v-model="node.name"
-          placeholder="Whats the essence?").fit.bg-white.kinput
-      //- composition two
-      div(
-        :style=`{position: 'relative', minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.bg-grey-9
-        composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :visible="compositionVisible[1]" ctx="composition")
-        //- composition actions
-        div(
-          v-if="!node.compositions[1]"
-          :style=`{position: 'absolute', zIndex: 3000}`
-          ).row.fit.items-center.content-center.justify-center
-          q-btn(v-if="!node.compositions[1]" round flat color="green" icon="add" size="lg" @click="compositionFind(1)")
-        q-btn(v-if="node.compositions[1]" round flat color="white" icon="edit" @click="compositionEdit(1)"
-            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
-        q-btn(v-if="node.compositions[1]" round flat color="red" icon='clear' @click="compositionDelete(1)"
-            :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
-      //- debug
-      div(
-        v-if="$store.state.ui.debug"
-        :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
-        //- small.full-width.text-white revision: {{ node.revision }}
-        small.full-width.text-white oid: {{ node.oid }}
-      //- category, spheres
-      div(:style=`{minHeight: '60px'}`).row.full-width.items-start
-        div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-          span.text-bold.text-green Category & spheres
-        .row.full-width
-          span(
-            v-if="node"
-            v-for="(s,si) in node.spheres" :key="si"
-            :class=`{}`
-            :style=`{borderRadius: '10px'}`
-          ).text-green.q-pa-sm.bg-grey-10.q-mb-sm.q-mr-sm {{ s.name }}
-      //- footer: save, publish
-      div(:style=`{height: '60px'}`
-        ).row.full-width.items-center.q-px-sm
-        q-btn(
-          outline color="green" no-caps :loading="nodeSaving" @click="nodeSave()"
-          :style=`{borderRadius: '10px'}`)
-          span().text-bold.text-green Save
-        .col.full-height
-        q-btn(
-          push color="green" no-caps :loading="nodePublishing" @click="nodePublish()"
-          :style=`{borderRadius: '10px'}`)
-          span().text-bold Publish
+      .row.full-width.items-start.content-start.justify-center.q-px-sm
+        div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
+          //- composition one
+          div(
+            :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+            ).row.full-width.items-start.content-start.bg-grey-9
+            composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :visible="compositionVisible[0]" ctx="composition")
+            //- composition actions
+            div(
+              v-if="!node.compositions[0]"
+              :style=`{position: 'absolute', zIndex: 3000}`
+              ).row.fit.items-center.content-center.justify-center
+              q-btn(v-if="!node.compositions[0]" round flat color="green" icon="add" size="lg" @click="compositionFind(0)")
+            q-btn(v-if="node.compositions[0]" round flat color="white" icon="edit" @click="compositionEdit(0)"
+                :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
+            q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
+                :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
+          //- essence editor
+          div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
+            input(
+              v-if="node"
+              v-model="node.name"
+              placeholder="Whats the essence?").fit.bg-white.kinput
+          //- composition two
+          div(
+            :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+            ).row.full-width.bg-grey-9
+            composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :visible="compositionVisible[1]" ctx="composition")
+            //- composition actions
+            div(
+              v-if="!node.compositions[1]"
+              :style=`{position: 'absolute', zIndex: 3000}`
+              ).row.fit.items-center.content-center.justify-center
+              q-btn(v-if="!node.compositions[1]" round flat color="green" icon="add" size="lg" @click="compositionFind(1)")
+            q-btn(v-if="node.compositions[1]" round flat color="white" icon="edit" @click="compositionEdit(1)"
+                :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
+            q-btn(v-if="node.compositions[1]" round flat color="red" icon='clear' @click="compositionDelete(1)"
+                :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
+          //- debug
+          div(
+            v-if="$store.state.ui.debug"
+            :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
+            //- small.full-width.text-white revision: {{ node.revision }}
+            small.full-width.text-white oid: {{ node.oid }}
+          //- category, spheres
+          div(
+            v-if="node && node.name.length > 0"
+            :style=`{minHeight: '400px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-grey-10.q-my-md
+            div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+              span.text-bold.text-green Category & spheres
+            .row.full-width
+              span(
+                v-if="node"
+                v-for="(s,si) in node.spheres" :key="si"
+                :class=`{}`
+                :style=`{borderRadius: '10px'}`
+              ).text-green.q-pa-sm.bg-grey-10.q-mb-sm.q-mr-sm {{ s.name }}
 </template>
 
 <script>
@@ -119,6 +140,8 @@ export default {
       nodePublishingError: null,
       nodeRefreshing: false,
       nodeRefreshingError: null,
+      nodeDeleting: false,
+      nodeDeletingError: null,
       node: null,
       nodeNew: {
         name: '',
@@ -209,6 +232,25 @@ export default {
       this.$log('compositionDelete', index)
       this.compositionVisible[index] = false
       this.$delete(this.node.compositions, index)
+    },
+    async nodeDelete (oid) {
+      try {
+        this.$log('nodeDelete start')
+        if (!oid) throw new Error('Need oid to delete node!')
+        if (!confirm('Delete node?')) return
+        this.nodeDeleting = true
+        await this.$wait(1000)
+        let res = await this.$store.dispatch('workspace/wsItemDelete', oid)
+        this.$log('nodeDelete done')
+        this.nodeDeleting = false
+        this.nodeDeletingError = null
+        // TODO delete node and exit
+        this.node = this.nodeNew
+      } catch (e) {
+        this.$log('nodeDelete error', e)
+        this.nodeDeleting = false
+        this.nodeDeletingError = e
+      }
     },
     async nodeSave (node) {
       try {

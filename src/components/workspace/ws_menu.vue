@@ -64,7 +64,7 @@ import wsSpheres from './ws_spheres'
 import wsSettings from './ws_settings'
 
 export default {
-  name: 'wsItems',
+  name: 'wsMenu',
   components: {wsNotes, wsContents, wsCompositions, wsNodes, wsSpheres, wsSettings},
   props: {
     page: {

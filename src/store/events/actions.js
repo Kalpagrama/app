@@ -214,33 +214,33 @@ function notifyUserActionComplete (eventType, object) {
       break
   }
   // console.debug(eventMessage)
-  notify(
-    'info',
-    eventMessage,
-    {
-      avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
-      actions: [
-        {
-          label: i18n.t('GO'),
-          noDismiss: true,
-          color: 'green',
-          handler: () => {
-            // app/workspace/fragments
-            let route = '/'
-            if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
-              route = `/content/${object.oid}`
-            } else if (['NODE'].includes(object.type)) {
-              route = `/node/${object.oid}`
-            } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
-              route = `/sphere/${object.oid}`
-            } else {
-              throw new Error(`bad object ${JSON.stringify(object)}`)
-            }
-            router.push(route)
-          }
-        }
-      ]
-    })
+  // notify(
+  //   'info',
+  //   eventMessage,
+  //   {
+  //     avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
+  //     actions: [
+  //       {
+  //         label: i18n.t('GO'),
+  //         noDismiss: true,
+  //         color: 'green',
+  //         handler: () => {
+  //           // app/workspace/fragments
+  //           let route = '/'
+  //           if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
+  //             route = `/content/${object.oid}`
+  //           } else if (['NODE'].includes(object.type)) {
+  //             route = `/node/${object.oid}`
+  //           } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
+  //             route = `/sphere/${object.oid}`
+  //           } else {
+  //             throw new Error(`bad object ${JSON.stringify(object)}`)
+  //           }
+  //           router.push(route)
+  //         }
+  //       }
+  //     ]
+  //   })
 }
 
 function notifyError (event) {

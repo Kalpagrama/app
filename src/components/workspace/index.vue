@@ -11,7 +11,7 @@ q-layout(view="hHh lpR fFf")
       small.text-white.full-width node.oid: {{ node ? node.oid : false }}
   //- TODO: global theme styles: body :style=`{color: 'green !important'}`
   q-page-container.row.full-width.window-height.bg-black
-    ws-items(
+    ws-menu(
       :ctx="$q.screen.gt.xs ? 'workspace' : 'finder'"
       :oid="node ? node.oid : false" :page="page"
       @page="$router.push({params: {page: $event}})" @item="itemClick").bg-grey-9
@@ -22,20 +22,24 @@ q-layout(view="hHh lpR fFf")
         :node="node" :compositionIndex="0").bg-black
       node-editor(
         v-if="page === 'nodes'"
-        :value="node ? node : null"
+        :value="node"
         @node="nodeChanged")
+      ws-sphere(
+        v-if="page === 'spheres'"
+        :value="node")
       ws-settings(
         v-if="page === 'settings'")
 </template>
 
 <script>
-import wsItems from './ws_items'
+import wsMenu from './ws_menu'
 import nodeEditor from 'components/node/node_editor'
+import wsSphere from './ws_sphere'
 import wsSettings from './ws_settings'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, nodeEditor, wsSettings},
+  components: {wsMenu, nodeEditor, wsSphere, wsSettings},
   props: [],
   data () {
     return {
@@ -58,7 +62,7 @@ export default {
   },
   methods: {
     async itemClick ({type, item}) {
-      this.$log('nodeClick', type, item)
+      this.$log('itemClick', type, item)
       this.node = null
       this.$nextTick(() => {
         this.node = item

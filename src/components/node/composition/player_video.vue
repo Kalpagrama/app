@@ -1,5 +1,7 @@
 <template lang="pug">
-div(:class=`{'full-height': ctx === 'composition'}`).row.full-width.bg-black
+div(
+  :style=`videoStyles`
+  :class=`{'full-height': ctx === 'composition'}`).row.full-width.bg-black
   div(
     :class=`{'full-height': ctx === 'composition'}`
     :style=`{position: 'relative'}`).row.full-width
@@ -15,9 +17,10 @@ div(:class=`{'full-height': ctx === 'composition'}`).row.full-width.bg-black
         :src="url" type="video/mp4")
     //- debug
     div(
-      v-if="false"
-      :style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000}`).row.bg-green
-      span.full-width.text-white player: {{player}}
+      v-if="$store.state.ui.debug"
+      :style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
+      //- span.full-width.text-white player: {{player}}
+      small.text-white.full-width styles: {{videoStyles}}
     //- progress
     div(
       v-if="true"
@@ -31,6 +34,7 @@ div(:class=`{'full-height': ctx === 'composition'}`).row.full-width.bg-black
         div(:style=`{height: '60px'}`).row.full-width.items-center
           //- play/pause
           div(
+            v-show="player.controls"
             :style=`{width: '44px'}`
             ).row.full-height.items-center.content-center.justify-center
             q-btn(
@@ -44,10 +48,11 @@ div(:class=`{'full-height': ctx === 'composition'}`).row.full-width.bg-black
                 ).text-white.q-pa-sm.q-ml-sm {{$time(now)+' / '+$time(player.duration)}}
           //- fullscreen
           div(
+            v-show="player.controls"
             :style=`{width: '44px'}`
             ).row.full-height.items-center.content-center.justify-center
             q-btn(
-              round flat color="green" @click="$q.fullscreen.toggle()"
+              round flat color="green" @click="videoFullscreenToggle()"
               :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
               :style=`{background: 'rgba(0,0,0,0.3)'}`)
         //- progress bar & time
@@ -71,14 +76,35 @@ export default {
   data () {
     return {
       now: 0,
-      player: {},
+      player: {
+        controls: true
+      },
       moveInterval: null,
-      progressHeight: 10
+      progressHeight: 10,
+      fullscreen: false
     }
   },
   computed: {
     videoValid () {
       return this.now > this.start && this.now < this.end && this.player.playing
+    },
+    videoStyles () {
+      if (this.fullscreen) {
+        return {
+          position: 'fixed !important',
+          zIndex: 20000,
+          height: '100%',
+          width: '100%',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0
+        }
+      } else {
+        return {
+          position: 'relative'
+        }
+      }
     }
   },
   watch: {
@@ -120,7 +146,8 @@ export default {
       this.player.setCurrentTime(now)
     },
     async videoMove () {
-      // this.$log('videoMove')
+      if (!this.fullscreen) return
+      this.$log('videoMove')
       this.$set(this.player, 'controls', true)
       if (this.moveInterval) clearInterval(this.moveInterval)
       this.moveInterval = setTimeout(() => {
@@ -158,6 +185,11 @@ export default {
       // this.$log('videoClick')
       if (this.player.playing) this.player.pause()
       else this.player.play()
+    },
+    videoFullscreenToggle () {
+      this.$log('videoFullscreenToggle')
+      this.fullscreen = !this.fullscreen
+      this.$q.fullscreen.toggle()
     },
     playerInit () {
       if (this.source === 'KALPA') {

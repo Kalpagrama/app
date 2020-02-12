@@ -17,7 +17,7 @@
       :sources="['url', 'device']"
       @content="contentFound")
   //- actions, list, gallery, feed, list-expanded
-  div(:style=`{height: '60px'}`).row.full-width
+  div(v-if="false" :style=`{height: '60px'}`).row.full-width
     //- .col.full-height
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
       q-btn(round flat color="green" icon="search" @click="contentsFindStart()")
@@ -116,6 +116,7 @@ export default {
         }
         let res = await this.$store.dispatch('workspace/wsNodeSave', node)
         this.$log('res', res)
+        this.$emit('item', JSON.parse(JSON.stringify(res)))
         // await this.$wait(300)
         // this.contentsReload()
       } else {

@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.fit.bg-grey-9
-  ws-items(
+  ws-menu(
     ctx="finder"
     :header="false" :toggle="false" :oid="oid"
     :pages="['contents', 'compositions']"
@@ -16,7 +16,7 @@
 </template>
 
 <script>
-// search for all the contents and its layers, or composition + name...
+// TODO search for all the contents and its layers, or composition + name...
 // or create a composition
 export default {
   name: 'compositionFinder',
