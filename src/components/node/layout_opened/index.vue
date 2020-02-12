@@ -1,10 +1,19 @@
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
+  //- actions
+  //- composition finder
+  q-dialog(v-model="compositionFinderOpened" :maximized="true" position="bottom")
+    div(@click.self="compositionFinderOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
+      composition-finder(
+        @layer="layerFound"
+        :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
   //- header
-  //- div(:style=`{height: '60px'}`).row.full-width
-  //-   h1 hello
+  div(
+    v-if="false"
+    :style=`{height: '60px'}`).row.full-width
+    h1 hello
   //- vote tint on fragments
-  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-pa-sm
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-py-md.q-px-sm
     div(
       v-if="votePanning"
       :style=`{
@@ -20,31 +29,45 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         span(:style=`{fontSize: '50px'}`
           ).text-bold.text-white.text-center {{ voteLabel }}
     //- composition: ONE
-    composition(
-      ref="fragmentFirst"
-      :ctx="ctx" :index="0"
-      :thumbUrl="node.meta.compositions[0].thumbUrl"
-      :composition="nodeFull ? nodeFull.compositions[0] : null"
-      :mini="false" :visible="visible"
-      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+    div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+      composition(
+        ref="fragmentFirst"
+        :ctx="ctx" :index="0"
+        :thumbUrl="node.meta.compositions[0].thumbUrl"
+        :composition="nodeFull ? nodeFull.compositions[0] : null"
+        :mini="false" :visible="visible"
+        :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+      //- actions
+      q-btn(
+        round push color="green" icon="add" @click="extendComposition(0)"
+        :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
     //- name, essence
     div(
       v-if="true"
       ref="nodeName" @click="nodeNameClick()"
-      :style=`{minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.justify-center.cursor-pointer.q-my-sm.bg-grey-2
+      :style=`{position: 'relative', minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.justify-center.cursor-pointer.q-my-md.bg-grey-2
       span.text-bold.text-center.cursor-pointer {{ node.name }}
+      //- actions
+      q-btn(
+        round push color="green" icon="add" @click="extendEssence()"
+        :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
     //- composition: TWO
-    composition(
-      ref="fragmentFirst"
-      :ctx="ctx" :index="0"
-      :thumbUrl="node.meta.compositions[1].thumbUrl"
-      @previewWidth="previewWidth = $event"
-      :composition="nodeFull ? nodeFull.compositions[1] : null"
-      :mini="false" :visible="visible"
-      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+    div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+      composition(
+        ref="fragmentFirst"
+        :ctx="ctx" :index="1"
+        :thumbUrl="node.meta.compositions[1].thumbUrl"
+        @previewWidth="previewWidth = $event"
+        :composition="nodeFull ? nodeFull.compositions[1] : null"
+        :mini="false" :visible="visible"
+        :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+      //- actions
+      q-btn(
+        round push color="green" icon="add" @click="extendComposition(1)"
+        :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
   //- actions
-  .row.full-width.q-pa-sm
+  .row.full-width.q-px-sm
     div(
       v-if="nodeFull"
       :style=`{
@@ -79,11 +102,11 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       //- user avatar
       div(
         @click="$router.push('/user/' + nodeFull.author.oid)"
-        :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center.cursor-pointer
-        div(:style=`{height: '35px', width: '35px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-3
-          img(
-            :src="nodeFull.author.thumbUrl"
-            :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
+        :style=`{height: '60px', width: '75px'}`).row.items-center.justify-center.cursor-pointer
+        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-8
+          //- img(
+          //-   :src="nodeFull.author.thumbUrl"
+          //-   :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
   //- spheres and timestamp
   div(v-if="nodeFull").row.full-width
     //- spheres
@@ -94,7 +117,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :style=`{}`).q-mr-sm.cursor-pointer
           span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
     //- timestamp
-    .row.full-width.justify-start.items-center.content-center.q-pa-md
+    div(v-if="false").row.full-width.justify-start.items-center.content-center.q-pa-md
       small.text-grey-7 31.12.2019
       .col
       q-btn(push no-caps dense color="green" @click="nodeExtend()").q-px-sm.q-ml-sm
@@ -111,7 +134,9 @@ export default {
       votePanning: false,
       voteLeft: 0,
       previewWidth: 0,
-      previewHeight: 0
+      previewHeight: 0,
+      compositionIndex: undefined,
+      compositionFinderOpened: false
     }
   },
   computed: {
@@ -160,22 +185,25 @@ export default {
     layerFound (l) {
       this.$log('layerFound', l)
       this.compositionFinderOpened = false
-      this.nodeExtending = false
-      // TODO create new composition then publish a node with this composition...
-      let c = {
-        url: '',
-        name: '',
-        layers: [l],
-        operation: {operations: null, items: [], type: 'CONCAT'}
-      }
-      let nodeNew = JSON.parse(JSON.stringify(this.nodeFull))
-      nodeNew.compositions[this.compositionIndex] = c
-      this.nodePublish(nodeNew)
+      // this.nodeExtending = false
+      // // TODO create new composition then publish a node with this composition...
+      // let c = {
+      //   url: '',
+      //   name: '',
+      //   layers: [l],
+      //   operation: {operations: null, items: [], type: 'CONCAT'}
+      // }
+      // let nodeNew = JSON.parse(JSON.stringify(this.nodeFull))
+      // nodeNew.compositions[this.compositionIndex] = c
+      // this.nodePublish(nodeNew)
     },
     compositionExtend (index) {
       this.$log('compositionExtend', index)
       this.compositionIndex = index
       this.compositionFinderOpened = true
+    },
+    nodeNameClick () {
+      this.$log('nodeNameClick')
     },
     async nodePublish (node) {
       try {
@@ -194,6 +222,20 @@ export default {
         // this.nodePublishingError = e
         // this.nodePublishing = false
       }
+    },
+    extendEssence () {
+      this.$log('extendEssence')
+      // open essence finder
+      // preview the result
+      // publish
+    },
+    extendComposition (index) {
+      this.$log('extendComposition', index)
+      // open composition finder
+      // preview the result
+      // publish
+      this.compositionIndex = index
+      this.compositionFinderOpened = true
     },
     nodeExtend () {
       this.$log('nodeExtend')

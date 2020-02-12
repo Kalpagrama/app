@@ -143,7 +143,7 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('menuShow CHANGED', to)
-        this.$tween.to(this, 0.5, {width: to ? 260 : 60})
+        this.$tween.to(this, 0.3, {width: to ? 260 : 60})
       }
     }
   },
