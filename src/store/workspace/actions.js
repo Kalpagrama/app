@@ -130,11 +130,11 @@ export const wsNodeSave = async (context, node) => {
       })
       logD('xxx=', xxx)
       let { data: { wsNodeUpdate } } = xxx
-      return wsNodeUpdate
+      return {item: wsNodeUpdate, actualAge: 'hour'}
     }
     let fetchItemFunc = async () => {
       let item = await context.dispatch('workspace/get', { oid: node.oid, force: true }, { root: true })
-      return item
+      return {item, actualAge: 'hour'}
     }
     let mergeItemFunc = (path, serverItem, cacheItem) => {
       assert(serverItem && cacheItem)

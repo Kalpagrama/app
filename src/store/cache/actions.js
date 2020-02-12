@@ -60,7 +60,7 @@ class Cache {
       },
       maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
       dispose: async (key, { actualUntil, actualAge }) => {
-        assert(actualUntil && actualAge >= 0)
+        assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
         if (key === this.context.rootState.auth.userOid) { // кладем обратно! юзера нельзя удалять
           setTimeout(() => {
             let item = this.context.state.cachedItems[key] // данные лежат во vuex
@@ -71,7 +71,7 @@ class Cache {
           await this.cachePersist.remove(key)
           // В общем случае - мы не знаем - ссылается ли что-то в приложении на этот объект во вьюикс
           // поэтому при удалении элемента у кого то в приложении могут остаться копии(перестанут быть реактивными)
-          // this.context.commit('removeItem', key)
+          this.context.commit('removeItem', key)
         }
       }
     })
@@ -134,7 +134,7 @@ class Cache {
           // такой элемент уже есть в кэше оставляем что было
           let current = this.cacheLru.get(key)
           if (current) {
-            actualAge = current.actualUntil - Date.now()
+            actualAge = Math.max(0, current.actualUntil - Date.now())
           } else {
             actualAge = this.defaultActualAge
           }
@@ -144,7 +144,7 @@ class Cache {
         break
       }
     }
-    assert(Number.isInteger(actualAge), `Number.isInteger(actualAge):${actualAge}`)
+    assert(Number.isInteger(actualAge) && actualAge >= 0, `Number.isInteger(actualAge):${actualAge}`)
     let actualUntil = Date.now() + actualAge
     // logD('actualAge', actualAge)
     // logD('actualUntil', actualUntil)
@@ -207,77 +207,128 @@ class Cache {
   // mergeItemFunc - ф-я для устранения мердж-конфликтов
   // newValue - это либо объект целиком, либо свойство объекта (тогда актуальны path и setter)
   async update (key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc) {
-    function setValue (obj, path, value, setter) {
-      assert(obj && Array.isArray(path))
-      path = path.filter(k => Boolean(k))
-      let o = obj
-      for (let i = 0; i < path.length - 1; i++) {
-        let n = path[i]
-        if (!(n in o)) o[n] = {}
-        o = o[n]
-      }
-      if (setter) {
-        assert(!value)
-        logD('before setter:', o)
-        value = path.length ? setter(o[path[path.length - 1]]) : setter(o)
-      }
-      if (path.length) {
-        o[path[path.length - 1]] = value
-      } else {
-        obj = value
-      }
-      logD('setValue:', value)
-      return obj
-    }
+    // function setValue (obj, path, value, setter) {
+    //   assert(obj && Array.isArray(path))
+    //   path = path.filter(k => Boolean(k))
+    //   let o = obj
+    //   for (let i = 0; i < path.length - 1; i++) {
+    //     let n = path[i]
+    //     if (!(n in o)) o[n] = {}
+    //     o = o[n]
+    //   }
+    //   if (setter) {
+    //     assert(!value)
+    //     logD('before setter:', o)
+    //     value = path.length ? setter(o[path[path.length - 1]]) : setter(o)
+    //   }
+    //   if (path.length) {
+    //     o[path[path.length - 1]] = value
+    //   } else {
+    //     obj = value
+    //   }
+    //   logD('setValue:', value)
+    //   return obj
+    // }
+    //
+    // // logD('Cache::update params:', {key, path, newValue, setter, actualAge})
+    // assert(!updateItemFunc || (fetchItemFunc && mergeItemFunc), 'fetchItemFunc, mergeItemFunc нужны для устранения конфликтов')
+    // // обновим данные в кэше
+    // let updatedItem
+    // if (path || setter) {
+    //   // assert(newValue == null || typeof newValue === 'object')
+    //   c
+    //   assert(vuexItem)
+    //   updatedItem = setValue(vuexItem, path.split('.'), newValue, setter)
+    // } else {
+    //   assert(newValue)
+    //   updatedItem = newValue
+    // }
+    // // logD('Cache::update. updatedItem = ', updatedItem)
+    // assert(updatedItem && !updatedItem.failReason)
+    //
+    // if (!updateItemFunc) {
+    //   updatedItem = await cache.set(key, updatedItem, actualAge)
+    //   return updatedItem
+    // } else {
+    //   assert(updatedItem.oid)
+    //   updatedItem = await cache.set(key, updatedItem, 'year')// чтобы данные не устарели пока не ушел запрос на сервер(актуально для оффлайн версии)
+    //   // обновим данные на сервере
+    //   // todo накапливать изменения и делать запрос в фоне
+    //   assert(fetchItemFunc && mergeItemFunc)
+    //   try {
+    //     updatedItem = await updateItemFunc(updatedItem)
+    //   } catch (err) {
+    //     // logE('todo: !!! err=', JSON.stringify(err))
+    //     if (err.message.includes('VERSION_CONFLICT')) {
+    //       logI('VERSION_CONFLICT. try merge with server data')
+    //       // get current item objects/get
+    //       let { item: serverItem, actualAge } = await fetchItemFunc()
+    //       logD('serverItem', serverItem)
+    //       // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
+    //       let mergedItem = mergeItemFunc(path, serverItem, updatedItem)
+    //       logI('merge OK!')
+    //       logD('mergedItem', mergedItem)
+    //       // еще раз попробуем обновить
+    //       updatedItem = await updateItemFunc(mergedItem)
+    //     } else {
+    //       throw err
+    //     }
+    //   }
+    //   assert(updatedItem)
+    //   updatedItem = await cache.set(key, updatedItem, actualAge)
+    //   logD('updatedItem 2!', updatedItem)
+    //   return updatedItem
+    // }
 
-    // logD('Cache::update params:', {key, path, newValue, setter, actualAge})
-    assert(!updateItemFunc || (fetchItemFunc && mergeItemFunc), 'fetchItemFunc, mergeItemFunc нужны для устранения конфликтов')
-    // обновим данные в кэше
-    let updatedItem
-    if (path || setter) {
-      // assert(newValue == null || typeof newValue === 'object')
-      let vuexItem = this.context.state.cachedItems[key]
-      assert(vuexItem)
-      updatedItem = setValue(vuexItem, path.split('.'), newValue, setter)
-    } else {
-      assert(newValue)
-      updatedItem = newValue
+    let vuexItem = this.context.state.cachedItems[key]
+    if (!vuexItem) {
+      logD('item not found in cache (may be deleted on cache overflow)')
+      if (!path) {
+        vuexItem = await cache.set(key, newValue, actualAge)
+      }// записываем в кэш - то, что есть
+      else {
+        assert(fetchItemFunc, '!fetchItemFunc')
+        let { item: serverItem, actualAge } = await fetchItemFunc()
+        vuexItem = await cache.set(key, serverItem, actualAge) // записываем в кэш данные с сервера
+      }
     }
-    // logD('Cache::update. updatedItem = ', updatedItem)
-    assert(updatedItem && !updatedItem.failReason)
-    if (!updateItemFunc) {
-      updatedItem = await cache.set(key, updatedItem, actualAge)
-      return updatedItem
-    } else {
-      assert(updatedItem.oid)
-      updatedItem = await cache.set(key, updatedItem, 'year')// чтобы данные не устарели пока не ушел запрос на сервер(актуально для оффлайн версии)
+    assert(vuexItem, '!vuexItem')
+    this.context.commit('cache/updateItem', { key, path, newValue, setter }, { root: true }) // изменяем во вьюикс
+    assert(vuexItem === this.context.state.cachedItems[key], 'vuexItem === this.context.state.cachedItems[key]')
+    vuexItem = await cache.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
+
+    if (updateItemFunc) {
+      assert(vuexItem.oid)
+      // чтобы данные не устарели пока не ушел запрос на сервер(актуально для оффлайн версии) - ставим actualAge = year
+      // если данные устареют - они могут быть замененты свежими при очередном запросе get
+      vuexItem = await cache.set(key, vuexItem, 'year')
       // обновим данные на сервере
       // todo накапливать изменения и делать запрос в фоне
       assert(fetchItemFunc && mergeItemFunc)
       try {
-        updatedItem = await updateItemFunc(updatedItem)
+        let { item: dbItem, actualAge } = await updateItemFunc(vuexItem)
+        this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
+        vuexItem = await cache.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
       } catch (err) {
-        // logE('todo: !!! err=', JSON.stringify(err))
         if (err.message.includes('VERSION_CONFLICT')) {
-          logI('VERSION_CONFLICT. try merge with server data')
-          // get current item objects/get
-          let serverItem = await fetchItemFunc()
+          logI('VERSION_CONFLICT. try merge with server data. try get server version...')
+          let { item: serverItem } = await fetchItemFunc()
           logD('serverItem', serverItem)
           // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
-          let mergedItem = mergeItemFunc(path, serverItem, updatedItem)
-          logI('merge OK!')
-          logD('mergedItem', mergedItem)
+          let mergedItem = mergeItemFunc(path, serverItem, vuexItem)
+          logI('merge OK!', mergedItem)
           // еще раз попробуем обновить
-          updatedItem = await updateItemFunc(mergedItem)
+          let { item: dbItem, actualAge } = await updateItemFunc(mergedItem)
+          this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
+          vuexItem = await cache.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
         } else {
+          logE('cant update item on server')
           throw err
         }
       }
-      assert(updatedItem)
-      updatedItem = await cache.set(key, updatedItem, actualAge)
-      logD('updatedItem 2!', updatedItem)
-      return updatedItem
     }
+    if (!vuexItem) logW('item not found in cache!')
+    return vuexItem
   }
 
   async expire (key) {

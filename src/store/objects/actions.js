@@ -189,11 +189,11 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
       `,
       variables: { oid, path, newValue, revision: updatedItem.revision }
     })
-    return objectChange
+    return {item: objectChange, actualAge: 'hour'}
   }
   let fetchItemFunc = async () => {
     let item = await context.dispatch('objects/get', { oid, priority: 0 }, { root: true })
-    return item
+    return {item, actualAge: 'hour'}
   }
   let mergeItemFunc = (path, serverItem, cacheItem) => {
     assert(serverItem && cacheItem)
