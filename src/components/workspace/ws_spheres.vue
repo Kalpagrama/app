@@ -68,7 +68,7 @@ export default {
     async spheresLoad () {
       this.$log('spheresLoad')
       // try to load node with spheres
-      let name = 'SPHERE-' + this.$store.state.auth.userOid
+      let name = 'SPHERES-' + this.$store.state.auth.userOid
       let item = await this.$store.dispatch('workspace/get', { name })
       this.$log('nodeFind', item)
       if (!item) {

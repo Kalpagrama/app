@@ -172,8 +172,9 @@ async function processEventWs (context, event) {
   let object = event.object
   let objectType = object.__typename
   assert(event.wsRevision)
-  assert(event.wsRevision > context.rootState.workspace.revision, ` event.wsRevision > context.rootState.workspace.revision ${event.wsRevision} ${context.rootState.workspace.revision}`)
-  if (event.wsRevision - context.rootState.workspace.revision > 1) {
+  if (event.wsRevision - context.rootState.workspace.revision > 1 ||
+    context.rootState.workspace.revision > event.wsRevision // при очистке мастерской могло произойти такое
+  ) {
     logW('на сервере есть неучтенные изменения!')
     await context.dispatch('workspace/expireWsCache', {}, { root: true })
   }
