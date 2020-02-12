@@ -93,14 +93,14 @@ export const nodeNodes = async (context, { node, position, pagination, sortStrat
     if (position === 1) { // список для верхней части кубика-рубика (первая композици)
       oid = node.compositions[0].oid // запрашиваем ядра первой композиции
       filter.name = node.name
-      filter.compositionOids = [node.compositions[1].oid]
+      filter.compositionOids = [node.compositions[0].oid]
     } else if (position === 2) { // список для средней части кубика-рубика (суть)
       oid = node.sphereFromName.oid // запрашиваем ядра на суть
       filter.compositionOids = [node.compositions[0].oid, node.compositions[1].oid]
     } else if (position === 3) { // список для нижней части кубика-рубика (вторая композиция)
       oid = node.compositions[1].oid // запрашиваем ядра второй композиции
       filter.name = node.name
-      filter.compositionOids = [node.compositions[0].oid]
+      filter.compositionOids = [node.compositions[1].oid]
     }
     let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
