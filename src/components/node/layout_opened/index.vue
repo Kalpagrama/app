@@ -1,3 +1,10 @@
+<style lang="stylus">
+.q-dialog {
+  padding: 0;
+  margin: 0;
+}
+</style>
+
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- actions
@@ -13,7 +20,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     :style=`{height: '60px'}`).row.full-width
     h1 hello
   //- vote tint on fragments
-  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-py-md.q-px-sm
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-sm.q-pt-md
     div(
       v-if="votePanning"
       :style=`{
@@ -28,100 +35,126 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       .row.full-width.justify-center
         span(:style=`{fontSize: '50px'}`
           ).text-bold.text-white.text-center {{ voteLabel }}
-    //- composition: ONE
-    div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-      composition(
-        ref="fragmentFirst"
-        :ctx="ctx" :index="0"
-        :thumbUrl="node.meta.compositions[0].thumbUrl"
-        :composition="nodeFull ? nodeFull.compositions[0] : null"
-        :mini="false" :visible="visible"
-        :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
-      //- actions
-      q-btn(
-        round push color="green" icon="add" @click="extendComposition(0)"
-        :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
-    //- name, essence
-    div(
-      v-if="true"
-      ref="nodeName" @click="nodeNameClick()"
-      :style=`{position: 'relative', minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.justify-center.cursor-pointer.q-my-md.bg-grey-2
-      span.text-bold.text-center.cursor-pointer {{ node.name }}
-      //- actions
-      q-btn(
-        round push color="green" icon="add" @click="extendEssence()"
-        :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
-    //- composition: TWO
-    div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-      composition(
-        ref="fragmentFirst"
-        :ctx="ctx" :index="1"
-        :thumbUrl="node.meta.compositions[1].thumbUrl"
-        @previewWidth="previewWidth = $event"
-        :composition="nodeFull ? nodeFull.compositions[1] : null"
-        :mini="false" :visible="visible"
-        :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
-      //- actions
-      q-btn(
-        round push color="green" icon="add" @click="extendComposition(1)"
-        :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
-  //- actions
-  .row.full-width.q-px-sm
-    div(
-      v-if="nodeFull"
-      :style=`{
-        position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-4
-      //- pan btn
-      div(
-        v-touch-pan.left.right.prevent.mouse="votePan"
-        :style=`{
-          position: 'absolute', left: voteLeft+'px', zIndex: 200,
-          height: '60px', width: '90px'}`
-          ).row.items-center.justify-center
+    //- composition ONE query
+    .row.full-width.justify-center.q-py-md
+      div(:style=`{maxWidth: 600+'px', height: '100px'}`).row.full-width.scroll
+        div(v-if="compositionOneQuery").row.no-wrap
+          img(
+            v-for="(n,ni) in compositionOneQuery.items"
+            :src="n.meta.compositions[1].oid === node.meta.compositions[1].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
+            :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
+    //- composition ONE
+    .row.full-width.justify-center
+      div(:style=`{position: 'relative', maxWidth: 600+'px'}`).row.full-width.items-start.content-start
+        composition(
+          ref="fragmentFirst"
+          :ctx="ctx" :index="0"
+          :thumbUrl="node.meta.compositions[0].thumbUrl"
+          :composition="nodeFull ? nodeFull.compositions[0] : null"
+          :mini="false" :visible="visible"
+          :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+        //- actions
         q-btn(
-          round push color="white" :loading="nodeVoting" @click="nodeVote()"
-          :style=`{height: '40px', width: '40px', borderRadius: '50%'}`
-          ).row.items-center.justify-center.bg-green.cursor-pointer
-          q-icon(name="blur_on" color="white" size="30px")
-      //- vote tint and helper text
+          round push color="green" icon="add" @click="extendComposition(0)"
+          :style=`{position: 'absolute', zIndex: 200, top: '16px', right: '16px'}`)
+        q-btn(
+          round push color="green" icon="keyboard_arrow_right"
+          :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+    //- name, essence
+    .row.full-width.justify-center
       div(
-        v-if="votePanning"
-        :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
-        span Pan to vote
+        v-if="true"
+        ref="nodeName" @click="nodeNameClick()"
+        :style=`{position: 'relative', maxWidth: 600+'px', minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.justify-center.cursor-pointer.q-my-md.bg-grey-2
+        span.text-bold.text-center.cursor-pointer {{ node.name }}
+        //- actions
+        q-btn(
+          round push color="green" icon="add" @click="extendEssence()"
+          :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+    //- composition TWO
+    .row.full-width.justify-center
+      div(:style=`{position: 'relative', maxWidth: 600+'px'}`).row.full-width.items-start.content-start
+        composition(
+          ref="fragmentFirst"
+          :ctx="ctx" :index="1"
+          :thumbUrl="node.meta.compositions[1].thumbUrl"
+          @previewWidth="previewWidth = $event"
+          :composition="nodeFull ? nodeFull.compositions[1] : null"
+          :mini="false" :visible="visible"
+          :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+        //- actions
+        q-btn(
+          round push color="green" icon="add" @click="extendComposition(1)"
+          :style=`{position: 'absolute', zIndex: 200, top: '16px', right: '16px'}`)
+        q-btn(
+          round push color="green" icon="keyboard_arrow_right"
+          :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+    //- composition TWO query
+    .row.full-width.justify-center.q-py-md
+      div(:style=`{maxWidth: 600+'px', height: '100px'}`).row.full-width.scroll
+        div(v-if="compositionTwoQuery").row.no-wrap
+          img(
+            v-for="(n,ni) in compositionTwoQuery.items"
+            :src="n.meta.compositions[0].oid === node.meta.compositions[0].oid ? n.meta.compositions[0].thumbUrl : n.meta.compositions[1].thumbUrl"
+            :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
+  //- actions
+  .row.full-width.justify-center.q-px-sm.q-pb-md
+    div(:style=`{maxWidth: 600+'px'}`).row.full-width
       div(
         v-if="nodeFull"
-        :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
-        span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(nodeFull.rate)}}
-        span.text-bold.full-width.text-center {{voteHuman(nodeFull.rateUser)}}
-      //- user name
-      div(
-        @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
-        .row.fit.items-center.justify-end.cursor-pointer
-          span(:style=`{userSelect: 'none'}`) {{ nodeFull.author.name | cut(40) }}
-      //- user avatar
-      div(
-        @click="$router.push('/user/' + nodeFull.author.oid)"
-        :style=`{height: '60px', width: '75px'}`).row.items-center.justify-center.cursor-pointer
-        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-8
-          //- img(
-          //-   :src="nodeFull.author.thumbUrl"
-          //-   :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
-  //- spheres and timestamp
-  div(v-if="nodeFull").row.full-width
-    //- spheres
-    div(:style=`{height: '50px'}`).row.full-width.scroll
-      .row.justify-start.items-start.content-start.no-wrap.q-pa-md
+        :style=`{
+          position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-4
+        //- pan btn
         div(
-          v-for="(s, si) in nodeFull.spheres" :key="si" @click="$router.push('/sphere/' + s.oid)"
-          :style=`{}`).q-mr-sm.cursor-pointer
-          span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
-    //- timestamp
-    div(v-if="false").row.full-width.justify-start.items-center.content-center.q-pa-md
-      small.text-grey-7 31.12.2019
-      .col
-      q-btn(push no-caps dense color="green" @click="nodeExtend()").q-px-sm.q-ml-sm
-        span Extend
+          v-touch-pan.left.right.prevent.mouse="votePan"
+          :style=`{
+            position: 'absolute', left: voteLeft+'px', zIndex: 200,
+            height: '60px', width: '90px'}`
+            ).row.items-center.justify-center
+          q-btn(
+            round push color="white" :loading="nodeVoting" @click="nodeVote()"
+            :style=`{height: '40px', width: '40px', borderRadius: '50%', cursor: votePanning ? 'grab' : 'pointer'}`
+            ).row.items-center.justify-center.bg-green
+            q-icon(name="blur_on" color="white" size="30px")
+        //- vote tint and helper text
+        div(
+          v-if="votePanning"
+          :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
+          span Pan to vote
+        div(
+          v-if="nodeFull"
+          :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
+          span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(nodeFull.rate)}}
+          span.text-bold.full-width.text-center {{voteHuman(nodeFull.rateUser)}}
+        //- user name
+        div(
+          @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
+          .row.fit.items-center.justify-end.cursor-pointer
+            span(:style=`{userSelect: 'none'}`) {{ nodeFull.author.name | cut(40) }}
+        //- user avatar
+        div(
+          @click="$router.push('/user/' + nodeFull.author.oid)"
+          :style=`{height: '60px', width: '75px'}`).row.items-center.justify-center.cursor-pointer
+          div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-8
+            //- img(
+            //-   :src="nodeFull.author.thumbUrl"
+            //-   :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
+    //- spheres and timestamp
+    div(v-if="nodeFull").row.full-width
+      //- spheres
+      div(:style=`{height: '50px'}`).row.full-width.scroll
+        .row.justify-start.items-start.content-start.no-wrap.q-pa-md
+          div(
+            v-for="(s, si) in nodeFull.spheres" :key="si" @click="$router.push('/sphere/' + s.oid)"
+            :style=`{}`).q-mr-sm.cursor-pointer
+            span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
+      //- timestamp
+      div(v-if="false").row.full-width.justify-start.items-center.content-center.q-pa-md
+        small.text-grey-7 31.12.2019
+        .col
+        q-btn(push no-caps dense color="green" @click="nodeExtend()").q-px-sm.q-ml-sm
+          span Extend
 </template>
 
 <script>
@@ -136,7 +169,10 @@ export default {
       previewWidth: 0,
       previewHeight: 0,
       compositionIndex: undefined,
-      compositionFinderOpened: false
+      compositionFinderOpened: false,
+      compositionOneQuery: null,
+      compositionTwoQuery: null,
+      essenceQuery: null
     }
   },
   computed: {
@@ -187,15 +223,15 @@ export default {
       this.compositionFinderOpened = false
       // this.nodeExtending = false
       // // TODO create new composition then publish a node with this composition...
-      // let c = {
-      //   url: '',
-      //   name: '',
-      //   layers: [l],
-      //   operation: {operations: null, items: [], type: 'CONCAT'}
-      // }
-      // let nodeNew = JSON.parse(JSON.stringify(this.nodeFull))
-      // nodeNew.compositions[this.compositionIndex] = c
-      // this.nodePublish(nodeNew)
+      let c = {
+        url: '',
+        name: '',
+        layers: [l],
+        operation: {operations: null, items: [], type: 'CONCAT'}
+      }
+      let nodeNew = JSON.parse(JSON.stringify(this.nodeFull))
+      nodeNew.compositions[this.compositionIndex] = c
+      this.nodePublish(nodeNew)
     },
     compositionExtend (index) {
       this.$log('compositionExtend', index)
@@ -260,8 +296,10 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeFull, position: 1, pagination: {pageSize: 30}})
+    this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeFull, position: 3, pagination: {pageSize: 30}})
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
