@@ -3,7 +3,7 @@
   component(
     :is="ctx === 'list' ? `node-layout-pip` : 'node-layout-opened'"
     :ctx="ctx" :index="index"
-    :node="node" :nodeFull="nodeFull" :visible="visible" :active="active"
+    :node="node" :nodeFull="nodeFull" :visible="visible" :active="active" :nodeLoad="nodeLoad"
     @open="$emit('open', [node, nodeFull])")
 </template>
 

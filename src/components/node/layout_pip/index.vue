@@ -25,7 +25,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
         right: styles[0].right+'px'}`)
     composition(
       ref="fragmentSecond"
-      :ctx="ctx" :index="1" :thumbUrl="node.meta.compositions[1].thumbUrl"
+      :ctx="ctx" :index="1" :thumbUrl="node.meta.compositions[1].thumbUrl" :fullHeight="true"
       @previewWidth="$event => fragmentWidth(1, $event)" @previewHeight="$event => fragmentHeight(1, $event)"
       :composition="nodeFull ? nodeFull.compositions[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(1)" :visible="visible"
@@ -38,8 +38,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
         right: styles[1].right+'px'}`)
   //- name, essence
   div(
-    v-if="true"
-    ref="nodeName" @click="$emit('open'), pause()"
+    ref="nodeName" @click="nodeEssenceClick()"
     :style=`{minHeight: '60px'}`
     ).row.full-width.items-center.justify-center.cursor-pointer
     span.text-bold.text-center.cursor-pointer {{ node.name }}
@@ -48,7 +47,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
 <script>
 export default {
   name: 'nodeLayoutPip',
-  props: ['ctx', 'index', 'opened', 'node', 'nodeFull', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
+  props: ['ctx', 'index', 'opened', 'node', 'nodeFull', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'nodeLoad'],
   components: {},
   data () {
     return {
@@ -136,9 +135,11 @@ export default {
         this.$refs.fragmentSecond.play()
       }
     },
-    nodeNameClick () {
-      this.$log('nodeNameClick')
+    async nodeEssenceClick () {
+      this.$log('nodeEssenceClick')
+      if (!this.nodeFull) await this.nodeLoad()
       this.$emit('open')
+      this.pause()
     }
   },
   mounted () {

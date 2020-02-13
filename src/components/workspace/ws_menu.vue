@@ -7,7 +7,7 @@ div(
   ).row.fit
   //- toggle opened
   q-btn(
-    v-if="$q.screen.gt.xs"
+    v-if="ctx === 'workspace' && $q.screen.gt.xs"
     round push color="green" @click="opened = !opened"
     :icon="width === 0 ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
     :style=`{position: 'absolute', zIndex: 2000, right: width === 0 ? '-60px' : '-22px', top: '50%'}`)
@@ -36,7 +36,7 @@ div(
         q-btn(round :flat="page !== 'settings'" color="green" icon="settings" @click="$emit('page', 'settings')")
     kalpa-buttons(:value="pagesFiltered" :id="page" idKey="id" @id="$emit('page', $event)")
     .col.full-width
-      component(:is="`ws-`+page" @item="$emit('item', $event)" @add="$emit('add')" :ctx="ctx")
+      component(:is="`ws-`+page" @item="itemClick" @add="$emit('add')" :ctx="ctx")
 </template>
 
 <script>
@@ -51,6 +51,9 @@ export default {
   name: 'wsMenu',
   components: {wsNotes, wsContents, wsCompositions, wsNodes, wsSpheres, wsSettings},
   props: {
+    page: {
+      type: String
+    },
     ctx: {
       type: String,
       default () {
@@ -77,9 +80,9 @@ export default {
     }
   },
   computed: {
-    page () {
-      return this.$route.params.page
-    },
+    // page () {
+    //   return this.$route.params.page
+    // },
     pagesFiltered () {
       return this.pagesRaw.filter(p => this.pages.includes(p.id))
     }
@@ -93,9 +96,9 @@ export default {
     }
   },
   methods: {
-    itemClick (type, item) {
-      this.$log('itemClick', type, item)
-      this.$emit('item', {type: type, item: JSON.parse(JSON.stringify(item))})
+    itemClick (item) {
+      this.$log('itemClick', item)
+      this.$emit('item', JSON.parse(JSON.stringify(item)))
     }
   },
   mounted () {

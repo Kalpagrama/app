@@ -1,8 +1,8 @@
 <template lang="pug">
 .column.fit
-  //- header optional
+  //- header
+  //- TODO its not only layers, its VIDEO, content meta....
   div(
-    v-if="true"
     :style=`{height: '60px', order: -10}`
     ).row.full-width
     //- div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
@@ -15,7 +15,7 @@
           span.text-bold.text-green Layers
         //- q-icon(name="keyboard_arrow_down" color="green" size="19px").q-mt-xs.q-ml-sm
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
-      q-btn(round flat color="green" icon="keyboard_arrow_right")
+      q-btn(round flat color="green" icon="keyboard_arrow_right" @click="$emit('changePosition')")
       //- TODO change position of layers from bottom to right/bottom/top/left?
   //- body
   div(:style=`{position: 'relative'}`).col.full-width.scroll

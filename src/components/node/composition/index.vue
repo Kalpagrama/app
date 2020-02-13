@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width
+div(:style=`{position: 'relative'}`).row.full-width.bg-black
   //- slots
   div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
     slot(name="left")
@@ -28,12 +28,6 @@ div(:style=`{position: 'relative'}`).row.full-width
             userSelect: 'none', pointerEvents: 'none',
             background: 'rgba(0,0,0,0.5)'}`
           ).text-white.q-pa-sm {{ content.name }}
-  //- extending
-  div(
-    v-if="extending"
-    :style=`{position: 'absolute', zIndex: 300, background: 'rgba(0,0,0,0.5)'}`
-    ).row.fit.items-center.content-center.justify-center
-    q-btn(round flat size="lg" icon="add" color="green" @click="$emit('extend')")
   //- mini toggle
   div(
     v-if="mini" @click="$emit('mini')"
@@ -41,16 +35,15 @@ div(:style=`{position: 'relative'}`).row.full-width
   //- preview
   img(
     v-if="thumbUrl" ref="compositionPreview" :src="thumbUrl" crossOrigin="anonymous" draggable="false" @load="previewLoad" @error="previewError"
-    :style=`{width: '100%'}`)
+    :style=`{width: '100%', maxHeight: $q.screen.height/2+'px', objectFit: 'contain'}`)
   //- players
   player-video(
     v-if="composition && content && content.type === 'VIDEO'"
     ref="player"
-    :url="contentUrl" :source="contentSource" :ctx="ctx"
+    :url="contentUrl" :source="contentSource" :ctx="ctx" :fullHeight="fullHeight"
     :start="layerStart" :end="layerEnd" :visible="visible" :mini="mini"
-    :style=`thumbUrl ? {position: 'absolute', zIndex: 100} : null`
-    @player="$emit('player', $event)" @ended="layerEnded"
-    )
+    :style=`thumbUrl ? {maxHeight: $q.screen.height/2+'px', position: 'absolute', zIndex: 100} : null`
+    @player="$emit('player', $event)" @ended="layerEnded")
     //- :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`
     //- TODO: props is options on one object...
     template(v-slot:layerEditor=`{player, now, progressHeight}`)
@@ -65,7 +58,7 @@ import playerImage from './player_image'
 export default {
   name: 'composition',
   components: {playerVideo, playerImage},
-  props: ['ctx', 'composition', 'layerIndexPlay', 'visible', 'active', 'mini', 'thumbUrl', 'extending'],
+  props: ['ctx', 'composition', 'layerIndexPlay', 'visible', 'active', 'mini', 'thumbUrl', 'extending', 'fullHeight'],
   data () {
     return {
       layerIndex: 0,
@@ -82,14 +75,14 @@ export default {
       return this.layer.figuresRelative
     },
     layerStart () {
-      if (this.ctx === 'composition') {
+      if (this.ctx === 'workspace') {
         return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
       } else {
         return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
       }
     },
     layerEnd () {
-      if (this.ctx === 'composition') {
+      if (this.ctx === 'workspace') {
         return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
       } else {
         return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
@@ -105,7 +98,7 @@ export default {
     },
     contentUrl () {
       if (this.content) {
-        if (this.ctx === 'composition') {
+        if (this.ctx === 'workspace') {
           return this.content.url
         } else {
           return this.layer.url

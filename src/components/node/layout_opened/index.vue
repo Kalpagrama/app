@@ -8,9 +8,9 @@
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- actions
-  q-btn(
-    round flat color="green" icon="keyboard_arrow_left" @click="$router.back()"
-    :style=`{position: 'fixed', right: '16px', bottom: '16px', zIndex: 2000, background: 'rgba(0,0,0,0.2)'}`)
+  //- q-btn(
+  //-   round flat color="green" icon="keyboard_arrow_left" @click="$router.back()"
+  //-   :style=`{position: 'fixed', right: '16px', bottom: '16px', zIndex: 2000, background: 'rgba(0,0,0,0.2)'}`)
   //- composition finder
   q-dialog(v-model="compositionFinderOpened" :maximized="true" position="bottom")
     div(@click.self="compositionFinderOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
@@ -18,10 +18,10 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         @layer="layerFound"
         :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
   //- header
-  div(
-    v-if="false"
-    :style=`{height: '60px'}`).row.full-width
-    h1 hello
+  //- div(
+  //-   v-if="false"
+  //-   :style=`{height: '60px'}`).row.full-width
+  //-   h1 hello
   //- vote tint on fragments
   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-sm.q-pt-md
     div(
@@ -173,7 +173,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
 <script>
 export default {
   name: 'nodeLayoutOpened',
-  props: ['node', 'nodeFull'],
+  props: ['node', 'nodeFull', 'nodeLoad'],
   data () {
     return {
       voteValue: 0,

@@ -82,8 +82,8 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
-        if (to && this.ctx === 'composition') {
+        // this.$log('node CHANGED', to)
+        if (to && this.ctx === 'workspace') {
           if (this.nodeSavePause) {
             this.nodeSavePause = false
           } else {

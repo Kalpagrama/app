@@ -9,7 +9,7 @@
   q-dialog(v-model="dialogOpened" :maximized="true" position="bottom")
     div(@click.self="dialogOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
       composition-editor(
-        ctx="composition"
+        ctx="workspace"
         :node="node" :compositionIndex="0"
         @layerExport="layerExport"
         :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden'}`).bg-black
@@ -30,8 +30,8 @@ export default {
     }
   },
   methods: {
-    itemClick ({type, item}) {
-      this.$log('itemClick', type, item)
+    itemClick (item) {
+      this.$log('itemClick', item)
       this.node = null
       this.$nextTick(() => {
         this.node = item

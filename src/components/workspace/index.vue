@@ -10,7 +10,7 @@ q-layout(view="hHh lpR fFf")
   q-page-container.row.full-width.window-height.bg-black
     ws-menu(
       ctx="workspace"
-      :oid="node ? node.oid : false" :page="page"
+      :oid="node ? node.oid : false" :page="$route.params.page"
       @page="$router.push({params: {page: $event}}).catch(e=>e)" @item="itemClick" @add="itemAdd").bg-grey-9
     //- wsPage for desktop
     div(v-if="$q.screen.gt.xs").col.full-height.bg-grey-10.gt-xs
@@ -27,7 +27,6 @@ export default {
   props: [],
   data () {
     return {
-      page: undefined,
       pageDialogOpened: false,
       item: null
     }

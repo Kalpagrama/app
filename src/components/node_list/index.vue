@@ -2,8 +2,10 @@
 div(:style=`{position: 'relative', paddingTop: '100px', paddingBottom: '100px'}`
   ).row.full-width.items-start.content-start.justify-start.q-px-sm
   q-dialog(v-model="nodeDialogOpened" :maximized="true" full-height)
-    div(@click.self="nodeDialogOpened = false").row.fit.items-start.content-start.justify-center.bg-grey-10
-      //- div(:style=`{maxWidth: '600px'}`).row.full-width
+    div(@click.self="nodeDialogOpened = false" :style=`{position: 'relative'}`).row.fit.items-start.content-start.justify-center.bg-grey-10
+      q-btn(
+        round flat color="green" icon="keyboard_arrow_left" @click="nodeDialogOpened = false"
+        :style=`{position: 'fixed', top: '16px', left: '16px', zIndex: 2000}`)
       node(ctx="explorer" :node="node" :nodeFullReady="nodeFull" :visible="true" :active="true")
   node(
     v-for="(n, ni) in nodes" :key="n.oid" :accessKey="ni"

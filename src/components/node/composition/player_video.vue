@@ -1,20 +1,20 @@
 <template lang="pug">
 div(
   :style=`videoStyles`
-  :class=`{'full-height': ctx !== 'composition'}`).row.full-width.items-center.content-center.bg-green
+  :class=`{'full-height': fullHeight || ctx === 'workspace'}`).row.full-width.items-center.content-center.bg-black
   div(
     v-show=`show`
-    :class=`{'full-height': ctx !== 'composition'}`
+    :class=`{'full-height': ctx === 'workspace'}`
     :style=`{position: 'relative'}`).row.full-width.items-center.content-center
     //- opacity: videoValid ? 1 : 0
     video(
       ref="kalpaVideo"
-      playsinline :autoplay="ctx === 'composition'" loop
+      playsinline :autoplay="ctx === 'workspace'" loop
       @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="videoEnded"
-      :class=`{'full-height': ctx === 'composition'}`
+      :class=`{'full-height': fullHeight || ctx === 'workspace'}`
       :style=`{width: '100%', objectFit: 'contain'}`
-      :src="urlRaw" type="video/mp4").br
+      :src="urlRaw" type="video/mp4")
       //- source()
     //- debug
     div(
@@ -25,7 +25,7 @@ div(
       small.text-white.full-width url: {{ url }}
     //- progress
     div(
-      v-if="ctx === 'composition'"
+      v-if="ctx === 'workspace'"
       v-show="!mini"
       :style=`{
         position: 'absolute', bottom: '16px', left: 0, zIndex: 1000}`
@@ -74,7 +74,7 @@ div(
 <script>
 export default {
   name: 'playerVideo',
-  props: ['ctx', 'url', 'source', 'start', 'end', 'visible', 'mini'],
+  props: ['ctx', 'url', 'source', 'start', 'end', 'visible', 'mini', 'fullHeight'],
   data () {
     return {
       now: 0,

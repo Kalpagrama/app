@@ -29,19 +29,18 @@
                   ).row.full-height
             //- layer editor
             layer-editor(v-if="layer" :player="player" :now="now" :layers="layers" :layer="layer" :layerIndex="layerIndex" :style=`{height: editorHeight+'px'}`)
-      //- layers RIGHT
-      layers(
-        v-if="true"
-        :style=`{maxHeight: '50%'}`
-        :header="false"
-        :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport" :layerDelete="layerDelete")
-  //- layers BOTTOM
+      //- layers BOTTOM
+      div(v-if="layersBottom").col.full-width
+        layers(
+          :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport" :layerDelete="layerDelete"
+          @changePosition="layersBottom = !layersBottom")
+  //- layers RIGHT
   div(
-    v-if="false"
+    v-if="!layersBottom"
     :style=`{width: layersWidth+'px', overflow: 'hidden'}`).row.full-height.bg-grey-10
     layers(
-      :header="true"
-      :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport" :layerDelete="layerDelete")
+      :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport" :layerDelete="layerDelete"
+      @changePosition="layersBottom = !layersBottom")
 </template>
 
 <script>
@@ -59,7 +58,8 @@ export default {
       // player: null,
       layerIndex: -1,
       layersShow: true,
-      layersWidth: 400
+      layersWidth: 400,
+      layersBottom: true
     }
   },
   computed: {
