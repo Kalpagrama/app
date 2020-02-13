@@ -122,7 +122,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             height: '60px', width: '90px'}`
             ).row.items-center.justify-center
           q-btn(
-            round push color="white" :loading="nodeVoting" @click="nodeVote()"
+            round push color="white" :loading="nodeVoting"
             :style=`{height: '40px', width: '40px', borderRadius: '50%', cursor: votePanning ? 'grab' : 'pointer'}`
             ).row.items-center.justify-center.bg-green
             q-icon(name="blur_on" color="white" size="30px")
@@ -364,11 +364,12 @@ export default {
         this.nodeExtending = true
       }
     },
-    async nodeVote (rate = 0.5) {
+    async nodeVote (rate) {
       try {
         this.$log('nodeVote start', this.node.oid)
+        if (!rate) throw new Error('No rate!')
         this.nodeVoting = true
-        // await this.$wait(1000)
+        await this.$wait(500)
         this.$store.dispatch('node/nodeRate', {node: this.node, rateUser: rate})
           .catch(err => this.$logE('nodeVote err', err))
         this.$log('nodeVote done')
