@@ -72,32 +72,35 @@ export const unSubscribe = async (context, oid) => {
 }
 
 // прелетел эвент - создано ядро. Добавить ядро на личную сферу
-export const addNode = async (context, objectShort) => {
+export const addNode = async (context, event) => {
   logD('addNode start')
+  let objectShort = event.object
   assert(objectShort.oid && objectShort.name != null)
   for (let key in context.rootState.cache.cachedItems) {
     let keyPattern = 'sphereNodes: '
-    if (key.startsWith(keyPattern)) {
-      let { oid, pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
-      assert(oid)
-      if (oid === context.rootState.auth.userOid) {
-        await context.dispatch('cache/update', {
-          key: key,
-          path: '',
-          setter: (value) => {
-            // { items, count, totalCount, nextPageToken }
-            logD('setter: ', value)
-            assert(value.items && value.count >= 0 && value.totalCount >= 0)
-            // элемент в самом списке - objectShort
-            // вставляем в начало используем splice для реактивности
-            value.items.splice(0, 0, { oid: objectShort.oid, name: objectShort.name })
-            value.count++
-            value.totalCount++
-            return value
-          }
-        }, { root: true })
+    if (!key.startsWith(keyPattern)) continue
+    let { oid, pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
+    assert(oid && filter, 'oid && filter')
+    if (!filter || !filter.fastFilters) continue
+    if (oid !== context.rootState.auth.userOid) continue
+    let fastFilter = event.type === 'NODE_CREATED' ? 'CREATED_BY_USER' : 'VOTED_BY_USER'
+    if (!filter.fastFilters.includes(fastFilter)) continue
+    await context.dispatch('cache/update', {
+      key: key,
+      path: '',
+      setter: (value) => {
+        // { items, count, totalCount, nextPageToken }
+        logD('setter: ', value)
+        assert(value.items && value.count >= 0 && value.totalCount >= 0)
+        // элемент в самом списке - objectShort
+        // todo удалить старый объект (возможно при переголосовании)
+        // вставляем в начало используем splice для реактивности
+        value.items.splice(0, 0, { oid: objectShort.oid, name: objectShort.name })
+        value.count++
+        value.totalCount++
+        return value
       }
-    }
+    }, { root: true })
   }
   logD('addNode complete')
 }

@@ -309,7 +309,6 @@ export const updateWsCache = async (context, { type, object }) => {
             await context.dispatch('cache/update', {
               key: key,
               path: '',
-              actualAge: 'zero', // обновить при следующем запросе
               setter: (value) => {
                 // { items, count, totalCount, nextPageToken }
                 logD('setter: ', value)
@@ -328,7 +327,6 @@ export const updateWsCache = async (context, { type, object }) => {
           await context.dispatch('cache/update', {
             key: key,
             path: '',
-            actualAge: 'zero', // обновить при следующем запросе
             setter: (value) => {
               // { items, count, totalCount, nextPageToken }
               assert(value.items && value.count >= 0 && value.totalCount >= 0)

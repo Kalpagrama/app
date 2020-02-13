@@ -333,9 +333,6 @@ class Cache {
 
   async expire (key) {
     let item = this.context.state.cachedItems[key]
-    if (!item) {
-      logE('!item')
-    }
     if (item) return await this.set(key, item, 'zero')
   }
 }
@@ -367,6 +364,7 @@ export const get = async (context, { key, fetchItemFunc, force }) => {
 // updateItemFunc - ф-я для обновления данных на сервере (вернет обновленную сущность)
 // если указана updateItemFunc, то должны быть и fetchItemFunc, mergeItemFunc
 // Если path = ''  то newValue - это полный объект
+// если actualAge не указан - вычислится на основе actualUntil (либо если объекта нет - поставится дефолтное)
 export const update = async (context, { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
   assert(key)
   assert(setter || newValue)
