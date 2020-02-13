@@ -94,10 +94,15 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     .row.full-width.justify-center.q-py-md
       div(:style=`{maxWidth: 600+'px', height: '100px'}`).row.full-width.scroll
         div(v-if="compositionTwoQuery").row.no-wrap
-          img(
-            v-for="(n,ni) in compositionTwoQuery.items"
-            :src="n.meta.compositions[0].oid === node.meta.compositions[0].oid ? n.meta.compositions[0].thumbUrl : n.meta.compositions[1].thumbUrl"
-            :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
+          div(
+            v-for="(n,ni) in compositionTwoQuery.items" :key="ni"
+            :style=`{width: '100px', height: '100px'}`)
+            img(
+              :src="n.meta.compositions[0].thumbUrl"
+              :style=`{height: '50px', width: '100%', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
+            img(
+              :src="n.meta.compositions[1].thumbUrl"
+              :style=`{height: '50px', width: '100%', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
   //- actions
   .row.full-width.justify-center.q-px-sm.q-pb-md
     div(:style=`{maxWidth: 600+'px'}`).row.full-width
