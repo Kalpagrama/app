@@ -296,7 +296,7 @@ export default {
       let nodeRubick = JSON.parse(JSON.stringify(node))
       let nodeRubickFull = JSON.parse(JSON.stringify(await this.$store.dispatch('objects/get', { oid: node.oid, priority: 0 })))
       // swap?
-      let needSwap = nodeRubick.meta.compositions[0].oid !== this.nodeRubick.meta.compositions[0]
+      let needSwap = nodeRubick.meta.compositions[0].oid === this.nodeRubick.meta.compositions[0]
       if (needSwap) {
         this.$log('needSwap!')
         // swap nodeRubick
@@ -311,12 +311,15 @@ export default {
       // TODO swap in node meta??
       this.$log('NEW nodeRubick', nodeRubick)
       this.$log('NEW nodeRubickFull', nodeRubickFull)
+      // this.nodeRubick = this.$set(this, 'nodeRubick', nodeRubick)
+      // this.nodeRubickFull = this.$set(this, 'nodeRubickFull', nodeRubickFull)
       this.nodeRubick = null
       this.nodeRubickFull = null
       this.$nextTick(() => {
         this.nodeRubick = this.$set(this, 'nodeRubick', nodeRubick)
         this.nodeRubickFull = this.$set(this, 'nodeRubickFull', nodeRubickFull)
       })
+      // this.nodeRubickFull.compositions[needSwap ? 0 : 1] = nodeRubickFull.compositions[needSwap ? 0 : 1]
     },
     nodeNameClick () {
       this.$log('nodeNameClick')
