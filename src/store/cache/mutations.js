@@ -32,7 +32,7 @@ export function setItem (state, { key, item }) {
 
 // изменит
 export function updateItem (state, { key, path, newValue, setter }) {
-  // logD('cache/updateItem', { key, path, newValue, setter })
+  logD('cache/updateItem', { key, path, newValue, setter })
   let obj = state.cachedItems[key]
   if (!obj) return
   if (obj === newValue) return // оптимтизация (один и тот же объект)

@@ -90,7 +90,7 @@ export default {
       this.nextPageToken = nextPageToken
       this.totalCount = totalCount
       this.itemsCount = items.length
-      this.$log('itemsLoad done', this.items)
+      this.$log('itemsLoad done')
     }
   },
   async mounted () {
