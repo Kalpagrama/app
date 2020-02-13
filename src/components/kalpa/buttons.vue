@@ -3,11 +3,14 @@
   //- TODO create CSS variable for #4caf50 color...
   span(
     v-for="(i, ii) in value" :key="i[idKey]" @click="$emit('id', i[idKey])"
+    :class=`{
+      'bg-green': id === i[idKey],
+      'bg-grey-9': id !== i[idKey]
+    }`
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden',
-      color: id === i[idKey] ? 'white !important' : '#4caf50',
-      background: id === i[idkey] ? '#4caf50' : 'none'}`
-    ).text-green.cursor-pointer.q-pa-sm {{id}}-{{ i.name }}-{{idKey}}
+      color: id === i[idKey] ? 'white !important' : '#4caf50',}`
+    ).text-green.cursor-pointer.q-pa-sm.q-mr-sm.q-mb-sm {{ i.name }}
 </template>
 
 <script>

@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{height: '60px'}`
-  ).row.full-width
+  ).row.full-width.bg
   kalpa-buttons(:value="spheres" idKey="oid" :id="id")
 </template>
 
@@ -11,11 +11,12 @@ export default {
   props: ['node'],
   data () {
     return {
-      id: 'x',
-      spheres: [
-        {id: 'x', name: 'x'},
-        {id: 'y', name: 'y'}
-      ]
+      id: 'x'
+    }
+  },
+  computed: {
+    spheres () {
+      return this.node.spheres
     }
   }
 }

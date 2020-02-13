@@ -109,7 +109,7 @@
             :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
             //- small.full-width.text-white revision: {{ node.revision }}
             small.full-width.text-white oid: {{ node.oid }}
-          spheres(:node="node")
+          //- spheres(:node="node")
           //- div(
           //-   v-if="node && node.name.length > 0"
           //-   :style=`{minHeight: '400px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-grey-10.q-my-md

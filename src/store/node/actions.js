@@ -72,6 +72,12 @@ export const nodeRate = async (context, { node, rateUser }) => {
       rate: rateUser
     }
   })
+  // надо запомнить сейчас, тк с фвентом придет только общая оценка
+  await context.dispatch('cache/update', {
+    key: node.oid,
+    path: 'rateUser',
+    newValue: rateUser
+  }, { root: true })
   logD('nodeRate done', nodeRate)
   return nodeRate.rate
 }

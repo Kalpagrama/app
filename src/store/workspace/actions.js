@@ -10,9 +10,9 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // делает ключ для элемента мастерской в кэше (чтобы отличать от реальных элементов)
-function makeKey (wsItem) {
-  assert(wsItem && (wsItem.oid || wsItem.name))
-  return 'wsItem:' + (wsItem.oid || wsItem.name)
+export function makeKey (wsItem) {
+  assert(wsItem && (wsItem.oid || wsItem.name), `makeKey assert ${JSON.stringify(wsItem)}`)
+  return 'wsItem: ' + (wsItem.oid || wsItem.name)
 }
 
 export const init = async (context, wsRevision) => {
@@ -253,28 +253,17 @@ export const wsItems = async (context, { wsItemsType, pagination, filter, force 
     }
   }
   // { items, count, totalCount, nextPageToken }
-  let listResult = await context.dispatch('cache/get',
-    { key: 'wsItems: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc, force }, { root: true })
-  logD('wsItems complete short', listResult)
-  return listResult
-}
-
-// подходит ли object под этот фильтр
-function isRestricted (filter, object) {
-  assert(object.oid && object.type && object.name)
-  let result = true
-  if (filter.types) result = result && filter.types.includes(object.type)
-  if (filter.oids) result = result && filter.oids.includes(object.oid)
-  if (filter.name) result = result && filter.name === object.name
-  if (filter.nameRegExp) result = result && (object.name.search(new RegExp(filter.nameRegExp)) >= 0)
-  return result
+  let wsFeedResult = await context.dispatch('cache/get',
+    { key: 'listWS: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc, force }, { root: true })
+  logD('wsItems complete')
+  return wsFeedResult
 }
 
 // пометить элементы мастерской как outOfDate (запросятся при первой возможности)
 export const expireWsCache = async (context) => {
   logD('expireWsCache start')
   for (let key in context.rootState.cache.cachedItems) {
-    let keyPattern = 'wsItems: '
+    let keyPattern = 'listWS: '
     if (key.startsWith(keyPattern)) {
       context.dispatch('cache/expire', { key: key }, { root: true })
       let { items, count, totalCount, nextPageToken } = context.rootState.cache.cachedItems[key]
@@ -287,69 +276,9 @@ export const expireWsCache = async (context) => {
   }
   logD('expireWsCache complete')
 }
-// обновим кэш мастерской (прилетел эвент)
-export const updateWsCache = async (context, { type, object }) => {
-  logD('updateWsCache start')
-  assert(object.oid && object.name != null)
-  // обновим в кэше значение итема
-  await context.dispatch('cache/update', {
-    key: makeKey(object),
-    newValue: object
-  }, { root: true })
-  if (type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED') {
-    for (let key in context.rootState.cache.cachedItems) {
-      let keyPattern = 'wsItems: '
-      if (key.startsWith(keyPattern)) {
-        let { pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
-        assert(pagination)
-        if (type === 'WS_ITEM_CREATED') {
-          // добавляем object в начальные запросы (если фильтр запроса позволяет)
-          if (!pagination.pageToken) { // pageToken === null при начальном запросе.
-            if (!isRestricted(filter, object)) continue // элемент не подходит под этот фильр
-            await context.dispatch('cache/update', {
-              key: key,
-              path: '',
-              setter: (value) => {
-                // { items, count, totalCount, nextPageToken }
-                logD('setter: ', value)
-                assert(value.items && value.count >= 0 && value.totalCount >= 0)
-                // элемент в самом списке - objectShort
-                // вставляем в начало используем splice для реактивности
-                value.items.splice(0, 0, { oid: object.oid, name: object.name })
-                value.count++
-                value.totalCount++
-                return value
-              }
-            }, { root: true })
-          }
-        } else if (type === 'WS_ITEM_DELETED') {
-          // удаляем object из всех лент
-          await context.dispatch('cache/update', {
-            key: key,
-            path: '',
-            setter: (value) => {
-              // { items, count, totalCount, nextPageToken }
-              assert(value.items && value.count >= 0 && value.totalCount >= 0)
-              let indx = value.items.findIndex(item => item.oid === object.oid)
-              if (indx >= 0) {
-                // splice для реактивности
-                value.items.splice(indx, 1)
-                value.count--
-                value.totalCount--
-              }
-              return value
-            }
-          }, { root: true })
-        }
-      }
-    }
-  }
-  logD('updateWsCache complete')
-}
 
 // можно запрашивать по oid, либо имени (если оно уникально)
 export const get = async (context, { oid, name, force }) => {
-  // logD('workspace/get start', { oid, name, force })
   const fetchItemFunc = async () => {
     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
@@ -378,16 +307,5 @@ export const get = async (context, { oid, name, force }) => {
   }
   let item = await context.dispatch('cache/get',
     { key: makeKey({ oid, name }), fetchItemFunc, force }, { root: true })
-  // logD('ws get Item complete', item)
   return item
-  // let fullItem = context.rootState.cache.cachedItems[makeKey({oid})]
-  // if (fullItem) return fullItem
-  //
-  // let { items, count, totalCount, nextPageToken } = await context.dispatch('workspace/wsItems', {
-  //   wsItemsType: 'ALL',
-  //   filter: oid ? { oids: [oid] } : { name },
-  //   force
-  // }, { root: true })
-  // assert(count === 0 || count === 1)
-  // return items[0]
 }

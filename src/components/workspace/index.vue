@@ -53,17 +53,27 @@ export default {
   methods: {
     itemAdd () {
       this.$log('itemAdd')
-      if (this.$q.screen.xs) this.pageDialogOpened = true
-      this.item = null
       this.$router.push('/workspace/' + this.$route.params.page)
+        .then(() => {
+          this.item = null
+          if (this.$q.screen.xs) this.pageDialogOpened = true
+        })
+        .catch(e => {
+          this.item = null
+          if (this.$q.screen.xs) this.pageDialogOpened = true
+        })
     },
     async itemClick (item) {
       this.$log('itemClick', item)
-      if (this.$q.screen.xs) {
-        this.pageDialogOpened = true
-      }
-      this.item = item
-      this.$router.push({params: {oid: item.oid}}).catch(e => e)
+      this.$router.push({params: {oid: item.oid}})
+        .then(() => {
+          this.item = item
+          if (this.$q.screen.xs) this.pageDialogOpened = true
+        })
+        .catch(e => {
+          this.item = item
+          if (this.$q.screen.xs) this.pageDialogOpened = true
+        })
     }
   },
   mounted () {

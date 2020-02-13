@@ -75,11 +75,11 @@ async function processEvent (context, event) {
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
-      // поместить ядро на личную сферу
-      await context.dispatch('user/addNode', event, { root: true })
+      // поместить ядро во все ленты
+      await context.dispatch('lists/processEvent', event, { root: true })
       context.commit('addEvent', { event, context })
       break
-    case 'NODE_RATED':
+    case 'NODE_VOTED':
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
@@ -88,7 +88,7 @@ async function processEvent (context, event) {
         path: 'rate',
         newValue: event.rate
       }, { root: true })
-      await context.dispatch('user/addNode', event, { root: true })
+      await context.dispatch('lists/processEvent', event, { root: true })
       context.commit('addEvent', { event, context })
       break
     case 'NODE_DELETED':
@@ -167,9 +167,6 @@ async function processEvent (context, event) {
 }
 
 async function processEventWs (context, event) {
-  let type = event.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
-  let object = event.object
-  let objectType = object.__typename
   assert(event.wsRevision)
   if (event.wsRevision - context.rootState.workspace.revision > 1 ||
     context.rootState.workspace.revision > event.wsRevision // при очистке мастерской могло произойти такое
@@ -177,8 +174,15 @@ async function processEventWs (context, event) {
     logW('на сервере есть неучтенные изменения!')
     await context.dispatch('workspace/expireWsCache', {}, { root: true })
   }
-  // обновим кэш мастерской
-  await context.dispatch('workspace/updateWsCache', { type, object }, { root: true })
+  // обновим в кэше значение итема
+  logD('обновим в кэше значение итема')
+  await context.dispatch('cache/update', {
+    key: 'wsItem: ' + event.object.oid,
+    newValue: event.object
+  }, { root: true })
+  // обновим списки мастерской
+  logD('обновим списки мастерской')
+  await context.dispatch('lists/processEvent', event, { root: true })
   context.commit('workspace/stateSet', ['revision', event.wsRevision], { root: true })
 }
 
@@ -194,7 +198,7 @@ function notifyUserActionComplete (eventType, object) {
     case 'NODE_DELETED':
       eventMessage = i18n.t('node deleted')
       break
-    case 'NODE_RATED':
+    case 'NODE_VOTED':
       eventMessage = i18n.t('node rated')
       break
     case 'USER_SUBSCRIBED':
@@ -213,34 +217,33 @@ function notifyUserActionComplete (eventType, object) {
       eventMessage = i18n.t('ws element updated')
       break
   }
-  // console.debug(eventMessage)
-  // notify(
-  //   'info',
-  //   eventMessage,
-  //   {
-  //     avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
-  //     actions: [
-  //       {
-  //         label: i18n.t('GO'),
-  //         noDismiss: true,
-  //         color: 'green',
-  //         handler: () => {
-  //           // app/workspace/fragments
-  //           let route = '/'
-  //           if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
-  //             route = `/content/${object.oid}`
-  //           } else if (['NODE'].includes(object.type)) {
-  //             route = `/node/${object.oid}`
-  //           } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
-  //             route = `/sphere/${object.oid}`
-  //           } else {
-  //             throw new Error(`bad object ${JSON.stringify(object)}`)
-  //           }
-  //           router.push(route)
-  //         }
-  //       }
-  //     ]
-  //   })
+  notify(
+    'info',
+    eventMessage,
+    {
+      avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
+      actions: [
+        {
+          label: i18n.t('GO'),
+          noDismiss: true,
+          color: 'green',
+          handler: () => {
+            // app/workspace/fragments
+            let route = '/'
+            if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
+              route = `/content/${object.oid}`
+            } else if (['NODE'].includes(object.type)) {
+              route = `/node/${object.oid}`
+            } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
+              route = `/sphere/${object.oid}`
+            } else {
+              throw new Error(`bad object ${JSON.stringify(object)}`)
+            }
+            router.push(route)
+          }
+        }
+      ]
+    })
 }
 
 function notifyError (event) {

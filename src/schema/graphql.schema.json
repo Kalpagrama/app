@@ -1672,7 +1672,7 @@
             "deprecationReason": null
           },
           {
-            "name": "NODE_RATED",
+            "name": "NODE_VOTED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
