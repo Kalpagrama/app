@@ -45,7 +45,7 @@ import wsContent from './ws_content'
 export default {
   name: 'wsContents',
   components: {contentFinder, wsContent},
-  props: ['ctx', 'oid'],
+  props: ['ctx'],
   data () {
     return {
       mode: 'list',
@@ -56,19 +56,17 @@ export default {
       res: null
     }
   },
+  computed: {
+    oid () {
+      return this.$route.params.oid
+    }
+  },
   watch: {
   },
   methods: {
     contentClick (c, ci) {
       this.$log('contentClick', c, ci)
-      if (this.ctx === 'workspace') {
-        // open content for editing composition
-        this.content = c
-        this.$emit('item', c)
-      } else if (this.ctx === 'finder') {
-        // do something open contents for their layers, and look at them...
-        this.$emit('item', c)
-      }
+      this.$emit('item', c)
     },
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)

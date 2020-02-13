@@ -3,7 +3,7 @@
   div(:style=`{position: 'relative'}`).column.fit
     //- actions
     q-btn(
-      round push size="lg" color="green" icon="add" @click="noteAdd()"
+      round push size="lg" color="green" icon="add" @click="$emit('add')"
       :style=`{position: 'absolute', right: '16px', bottom: '16px'}`)
     //- header: filters
     div(:style=`{height: '60px'}`).row.full-width
@@ -40,16 +40,13 @@ export default {
       this.$log('noteClick', note)
       this.$emit('item', note)
     },
-    noteAdd () {
-      this.$log('noteAdd')
-    },
     noteDelete () {
       this.$log('noteDelete')
     }
   },
   async mounted () {
     this.$log('mounted')
-    this.notes = await this.notesLoad()
+    // this.notes = await this.notesLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

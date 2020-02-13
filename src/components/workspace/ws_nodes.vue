@@ -3,7 +3,7 @@
   div(:style=`{position: 'relative'}`).column.fit
     //- actions
     q-btn(
-      round push size="lg" color="green" icon="add" @click="nodeAdd()"
+      round push size="lg" color="green" icon="add" @click="$emit('add')"
       :style=`{position: 'absolute', right: '16px', bottom: '16px'}`)
     //- header with filters...
     .row.full-width.q-px-sm
@@ -25,7 +25,7 @@
         kalpa-loader(type="wsNodes" :variables=`{}`)
           template(v-slot:items=`{items}`)
             ws-node(
-              v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
+              v-for="(n, ni) in items" :key="n.oid" @nodeClick="$emit('item', $event)"
               :oid="oid" :node="n")
 </template>
 
@@ -35,42 +35,23 @@ import wsNode from './ws_node'
 export default {
   name: 'wsNodes',
   components: {wsNode},
-  props: ['oid'],
+  props: [],
   data () {
     return {
-      nodes: [],
-      query: null
     }
   },
   computed: {
-    nodesFiltered () {
-      return this.nodes
+    oid () {
+      return this.$route.params.oid
     }
   },
   methods: {
-    nodeAdd () {
-      this.$log('nodeAdd')
-    },
-    nodeClick (n, ni) {
-      this.$log('nodeClick', n, ni)
-      this.$emit('item', n)
-    },
-    async nodesLoad () {
-      this.$log('nodesLoad start')
-      let query = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'NODES'})
-      this.$log('nodesLoad done', query)
-      this.query = query
-    },
-    async nodesReload () {
-      this.$log('nodesReload')
-      this.nodes = await this.nodesLoad()
-    }
   },
   async mounted () {
     // this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
   }
 }
 </script>

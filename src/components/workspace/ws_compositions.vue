@@ -3,28 +3,24 @@
   div(:style=`{position: 'relative'}`).column.fit
     //- actions
     q-btn(
-      round push size="lg" color="green" icon="add" @click="add()"
+      round push size="lg" color="green" icon="add" @click="$emit('add')"
       :style=`{position: 'absolute', zIndex: 2000, right: '16px', bottom: '16px'}`)
     //- header
     div(
       :style=`{height: '60px'}`
       ).row.full-width.items-center
       .col.full-height
-      div(
-        :style=`{height: '60px', width: '60px'}`
-        ).row.items-center.justify-center
-        q-btn(round flat color="green" icon="refresh" @click="refresh()")
     //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start
-        div(
-          v-for="(c,ci) in compositions" :key="ci"
-          :class=`{
-            'bg-grey-9': true
-          }`
-          :style=`{height: '60px'}`
-          ).row.full-width.items-center.q-px-md
-          span {{ c.name }}
+        //- div(
+        //-   v-for="(c,ci) in compositions" :key="ci"
+        //-   :class=`{
+        //-     'bg-grey-9': true
+        //-   }`
+        //-   :style=`{height: '60px'}`
+        //-   ).row.full-width.items-center.q-px-md
+        //-   span {{ c.name }}
 </template>
 
 <script>
@@ -59,7 +55,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.compositions = await this.compositionsLoad()
+    // this.compositions = await this.compositionsLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

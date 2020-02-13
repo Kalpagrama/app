@@ -1,50 +1,35 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf")
-  q-header(
-    v-if="$store.state.ui.debug"
-    :style=`{paddingLeft: '66px'}`).bg-grey-8.q-pa-sm
-    //- debug
-    div(
-      v-if="$store.state.ui.debug"
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.content-center.bg-green.q-pa-sm.q-my-sm
-      small.text-white.full-width node.oid: {{ node ? node.oid : false }}
-  //- TODO: global theme styles: body :style=`{color: 'green !important'}`
+  //- wsPage dialog for mobile
+  q-dialog(v-model="pageDialogOpened" :maximized="true")
+    div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
+      q-btn(
+        round flat color="green" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
+        :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: '16px', background: 'rgba(0,0,0,0.2)'}`)
+      ws-page(:value="item")
   q-page-container.row.full-width.window-height.bg-black
     ws-menu(
-      :ctx="$q.screen.gt.xs ? 'workspace' : 'finder'"
+      ctx="workspace"
       :oid="node ? node.oid : false" :page="page"
-      @page="$router.push({params: {page: $event}})" @item="itemClick").bg-grey-9
-    .col.full-height.bg-grey-10
-      composition-editor(
-        v-if="page === 'contents' && node && nodeIsContent(node)"
-        ctx="composition"
-        :node="node" :compositionIndex="0").bg-black
-      node-editor(
-        v-if="page === 'nodes'"
-        :value="node"
-        @node="nodeChanged")
-      ws-sphere(
-        v-if="page === 'spheres'"
-        :value="node")
-      ws-settings(
-        v-if="page === 'settings'")
+      @page="$router.push({params: {page: $event}}).catch(e=>e)" @item="itemClick" @add="itemAdd").bg-grey-9
+    //- wsPage for desktop
+    div(v-if="$q.screen.gt.xs").col.full-height.bg-grey-10.gt-xs
+      ws-page(:value="item")
 </template>
 
 <script>
 import wsMenu from './ws_menu'
-import nodeEditor from 'components/node/node_editor'
-import wsSphere from './ws_sphere'
-import wsSettings from './ws_settings'
+import wsPage from './ws_page'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsMenu, nodeEditor, wsSphere, wsSettings},
+  components: {wsMenu, wsPage},
   props: [],
   data () {
     return {
       page: undefined,
-      node: null
+      pageDialogOpened: false,
+      item: null
     }
   },
   computed: {
@@ -54,27 +39,31 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('$route.params.page CHANGED', to)
-        if (to) this.page = to
-        if (to !== from) this.node = null
-        if (!to) this.$router.push({params: {page: 'nodes'}})
+        if (to) {
+          if (to !== from) {
+            this.item = null
+            this.$router.replace('/workspace/' + to).catch(e => e)
+          }
+        } else {
+          this.$router.push({params: {page: 'nodes'}})
+        }
       }
     }
   },
   methods: {
-    async itemClick ({type, item}) {
-      this.$log('itemClick', type, item)
-      this.node = null
-      this.$nextTick(() => {
-        this.node = item
-      })
+    itemAdd () {
+      this.$log('itemAdd')
+      if (this.$q.screen.xs) this.pageDialogOpened = true
+      this.item = null
+      this.$router.push('/workspace/' + this.$route.params.page)
     },
-    nodeChanged (node) {
-      this.$log('nodeChanged', node)
-      this.$set(this, 'node', node)
-    },
-    nodeIsContent (node) {
-      if (node.name.split('-')[0] === 'CONTENT') return true
-      else return false
+    async itemClick (item) {
+      this.$log('itemClick', item)
+      if (this.$q.screen.xs) {
+        this.pageDialogOpened = true
+      }
+      this.item = item
+      this.$router.push({params: {oid: item.oid}}).catch(e => e)
     }
   },
   mounted () {

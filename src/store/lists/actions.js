@@ -84,7 +84,7 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
 
 export const nodeNodes = async (context, { node, position, pagination, sortStrategy }) => {
   logD('nodeNodes start')
-  assert(position >= 1 && position <= 3)
+  assert(position >= 1 && position <= 5)
   assert(node.compositions && node.compositions.length === 2)
   assert(node.oid && node.sphereFromName && node.sphereFromName.oid)
   const fetchItemFunc = async () => {
@@ -100,6 +100,12 @@ export const nodeNodes = async (context, { node, position, pagination, sortStrat
     } else if (position === 3) { // список для нижней части кубика-рубика (вторая композиция)
       oid = node.sphereFromName.oid // запрашиваем ядра на суть (из них берем те, у которых совпадает суть и верхний контент)
       filter.name = node.name
+      filter.compositionOids = [node.compositions[0].oid]
+    } else if (position === 4) {
+      oid = node.compositions[1].oid
+      filter.compositionOids = [node.compositions[1].oid]
+    } else if (position === 5) {
+      oid = node.compositions[0].oid
       filter.compositionOids = [node.compositions[0].oid]
     }
     let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({

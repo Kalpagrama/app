@@ -1,7 +1,9 @@
 <template lang="pug">
 .column.fit
   //- header
-  div(:style=`{height: '60px'}`).row.full-width.items-center
+  div(
+    v-if="false"
+    :style=`{height: '60px'}`).row.full-width.items-center
     .col.full-height
       .row.fit.items-center.justify-start.q-px-md
         span.text-bold.text-green Settings

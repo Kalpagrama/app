@@ -2,9 +2,6 @@
 .row.full-width
   div(:style=`{height: '60px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
     ).row.full-width.items-center.content-center.justify-between.q-px-md
-    q-dialog(v-model="showDesktop" :maximized="true" position="left")
-      .row.fit.justify-start
-        kalpa-menu-desktop(:style=`{maxWidth: '80%'}`).bg-grey-10
     //- home
     //- div(:style=`{width: '50px', height: '60px'}` @click="$router.push({name: 'home'})").row
     //-   k-spinner(v-if="$route.name === 'home'" :width="40" :height="40")

@@ -32,9 +32,9 @@
         //- header
         div(
           :style=`{height: '60px'}`
-          ).row.full-width
+          ).row.full-width.items-center
           //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-          //-   q-btn(round flat icon="wb_iridescent" color="green")
+          //- q-btn(v-if="$q.screen.xs" round flat icon="keyboard_arrow_left" color="green" @click="$emit('close')")
           //- .col.full-height
           //-   .row.fit.items-center.content-center
           //-     span.text-bold.text-green Node editor
@@ -109,27 +109,28 @@
             :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
             //- small.full-width.text-white revision: {{ node.revision }}
             small.full-width.text-white oid: {{ node.oid }}
-          //- category, spheres
-          div(
-            v-if="node && node.name.length > 0"
-            :style=`{minHeight: '400px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-grey-10.q-my-md
-            div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
-              span.text-bold.text-green Category & spheres
-            .row.full-width
-              span(
-                v-if="node"
-                v-for="(s,si) in node.spheres" :key="si"
-                :class=`{}`
-                :style=`{borderRadius: '10px'}`
-              ).text-green.q-pa-sm.bg-grey-10.q-mb-sm.q-mr-sm {{ s.name }}
+          spheres(:node="node")
+          //- div(
+          //-   v-if="node && node.name.length > 0"
+          //-   :style=`{minHeight: '400px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.bg-grey-10.q-my-md
+          //-   div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
+          //-     span.text-bold.text-green Category & spheres
+          //-   .row.full-width
+          //-     span(
+          //-       v-if="node"
+          //-       v-for="(s,si) in node.spheres" :key="si"
+          //-       :class=`{}`
+          //-       :style=`{borderRadius: '10px'}`
+          //-     ).text-green.q-pa-sm.bg-grey-10.q-mb-sm.q-mr-sm {{ s.name }}
 </template>
 
 <script>
 import { debounce } from 'quasar'
+import spheres from './spheres'
 
 export default {
   name: 'nodeEditor',
-  components: {},
+  components: {spheres},
   props: ['value'],
   data () {
     return {

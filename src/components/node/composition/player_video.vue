@@ -1,10 +1,11 @@
 <template lang="pug">
 div(
   :style=`videoStyles`
-  :class=`{'full-height': ctx === 'composition'}`).row.full-width.bg-black
+  :class=`{'full-height': ctx !== 'composition'}`).row.full-width.items-center.content-center.bg-green
   div(
-    :class=`{'full-height': ctx === 'composition'}`
-    :style=`{position: 'relative'}`).row.full-width
+    v-show=`show`
+    :class=`{'full-height': ctx !== 'composition'}`
+    :style=`{position: 'relative'}`).row.full-width.items-center.content-center
     //- opacity: videoValid ? 1 : 0
     video(
       ref="kalpaVideo"
@@ -12,18 +13,19 @@ div(
       @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="videoEnded"
       :class=`{'full-height': ctx === 'composition'}`
-      :style=`{width: '100%', objectFit: 'contain'}`)
-      source(
-        :src="url" type="video/mp4")
+      :style=`{width: '100%', objectFit: 'contain'}`
+      :src="urlRaw" type="video/mp4").br
+      //- source()
     //- debug
     div(
-      v-if="$store.state.ui.debug"
+      v-if="false"
       :style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
       //- span.full-width.text-white player: {{player}}
-      small.text-white.full-width styles: {{videoStyles}}
+      //- small.text-white.full-width styles: {{videoStyles}}
+      small.text-white.full-width url: {{ url }}
     //- progress
     div(
-      v-if="true"
+      v-if="ctx === 'composition'"
       v-show="!mini"
       :style=`{
         position: 'absolute', bottom: '16px', left: 0, zIndex: 1000}`
@@ -81,7 +83,9 @@ export default {
       },
       moveInterval: null,
       progressHeight: 10,
-      fullscreen: false
+      fullscreen: false,
+      show: false,
+      urlRaw: undefined
     }
   },
   computed: {
@@ -108,6 +112,13 @@ export default {
     }
   },
   watch: {
+    url: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('url CHANGED', to)
+        if (to) this.$set(this, 'urlRaw', to)
+      }
+    },
     now: {
       immediate: false,
       handler (to, from) {
@@ -235,9 +246,11 @@ export default {
       this.$emit('player', this.player)
     }
   },
-  mounted () {
+  async mounted () {
     // this.$log('mounted')
     this.playerInit()
+    await this.$wait(1000)
+    this.show = true
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

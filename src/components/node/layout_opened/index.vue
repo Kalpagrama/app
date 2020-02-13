@@ -8,6 +8,9 @@
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- actions
+  q-btn(
+    round flat color="green" icon="keyboard_arrow_left" @click="$router.back()"
+    :style=`{position: 'fixed', right: '16px', bottom: '16px', zIndex: 2000, background: 'rgba(0,0,0,0.2)'}`)
   //- composition finder
   q-dialog(v-model="compositionFinderOpened" :maximized="true" position="bottom")
     div(@click.self="compositionFinderOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
@@ -52,18 +55,18 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         composition(
           v-if="nodeRubick"
           ref="fragmentFirst"
-          :ctx="ctx" :index="0"
-          :thumbUrl="nodeRubick.meta.compositions[0].thumbUrl"
-          :composition="nodeRubickFull ? nodeRubickFull.compositions[0] : null"
+          :ctx="ctx" :index="needSwap ? 1 : 0"
+          :thumbUrl="nodeRubick.meta.compositions[needSwap ? 1 : 0].thumbUrl"
+          :composition="nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 1 : 0] : null"
           :mini="false" :visible="visible"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         q-btn(
           round push color="green" icon="add" @click="extendComposition(0)"
-          :style=`{position: 'absolute', zIndex: 200, top: '16px', right: '16px'}`)
-        q-btn(
-          round push color="green" icon="keyboard_arrow_right"
           :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+        //- q-btn(
+        //-   round push color="green" icon="keyboard_arrow_right"
+        //-   :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
     //- name, essence
     .row.full-width.justify-center
       div(
@@ -82,19 +85,19 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         composition(
           v-if="nodeRubick"
           ref="fragmentFirst"
-          :ctx="ctx" :index="1"
-          :thumbUrl="nodeRubick.meta.compositions[1].thumbUrl"
+          :ctx="ctx" :index="needSwap ? 0 : 1"
+          :thumbUrl="nodeRubick.meta.compositions[needSwap ? 0 : 1].thumbUrl"
           @previewWidth="previewWidth = $event"
-          :composition="nodeRubickFull ? nodeRubickFull.compositions[1] : null"
+          :composition="nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 0 : 1] : null"
           :mini="false" :visible="visible"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         q-btn(
           round push color="green" icon="add" @click="extendComposition(1)"
-          :style=`{position: 'absolute', zIndex: 200, top: '16px', right: '16px'}`)
-        q-btn(
-          round push color="green" icon="keyboard_arrow_right"
           :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+        //- q-btn(
+        //-   round push color="green" icon="keyboard_arrow_right"
+        //-   :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
     //- composition TWO query
     .row.full-width.justify-center.q-py-md
       div(:style=`{maxWidth: 600+'px', height: '50px'}`).row.full-width.scroll
@@ -184,7 +187,8 @@ export default {
       compositionTwoQuery: null,
       essenceQuery: null,
       nodeRubick: null,
-      nodeRubickFull: null
+      nodeRubickFull: null,
+      needSwap: false
     }
   },
   computed: {
@@ -217,8 +221,6 @@ export default {
         this.$log('nodeFull CHANGED', to)
         this.$set(this, 'nodeRubickFull', JSON.parse(JSON.stringify(to)))
         this.loadRubicks()
-        // setInterval(() => {
-        // }, 1000)
       }
     },
     nodeRubick: {
@@ -238,8 +240,8 @@ export default {
   methods: {
     async loadRubicks () {
       this.$log('loadRubicks')
-      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeRubickFull, position: 1, pagination: {pageSize: 30}})
-      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeRubickFull, position: 3, pagination: {pageSize: 30}})
+      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeRubickFull, position: 4, pagination: {pageSize: 30}})
+      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeRubickFull, position: 5, pagination: {pageSize: 30}})
       // TODO load rubicks for essence...
       this.$log('compositionOneQuery', this.compositionOneQuery)
       this.$log('compositionTwoQuery', this.compositionTwoQuery)
@@ -292,34 +294,9 @@ export default {
     },
     async compositionRubickClick (node) {
       this.$log('compositionRubickClick', node)
-      // get nodes
-      let nodeRubick = JSON.parse(JSON.stringify(node))
-      let nodeRubickFull = JSON.parse(JSON.stringify(await this.$store.dispatch('objects/get', { oid: node.oid, priority: 0 })))
-      // swap?
-      let needSwap = nodeRubick.meta.compositions[0].oid === this.nodeRubick.meta.compositions[0]
-      if (needSwap) {
-        this.$log('needSwap!')
-        // swap nodeRubick
-        let t = nodeRubick.meta.compositions[0]
-        nodeRubick.meta.compositions[0] = nodeRubick.meta.compositions[1]
-        nodeRubick.meta.compositions[1] = t
-        // swap nodeRubickFull
-        let tmp = nodeRubickFull.compositions[0]
-        nodeRubickFull.compositions[0] = nodeRubickFull.compositions[1]
-        nodeRubickFull.compositions[1] = tmp
-      }
-      // TODO swap in node meta??
-      this.$log('NEW nodeRubick', nodeRubick)
-      this.$log('NEW nodeRubickFull', nodeRubickFull)
-      // this.nodeRubick = this.$set(this, 'nodeRubick', nodeRubick)
-      // this.nodeRubickFull = this.$set(this, 'nodeRubickFull', nodeRubickFull)
-      this.nodeRubick = null
-      this.nodeRubickFull = null
-      this.$nextTick(() => {
-        this.nodeRubick = this.$set(this, 'nodeRubick', nodeRubick)
-        this.nodeRubickFull = this.$set(this, 'nodeRubickFull', nodeRubickFull)
-      })
-      // this.nodeRubickFull.compositions[needSwap ? 0 : 1] = nodeRubickFull.compositions[needSwap ? 0 : 1]
+      this.needSwap = node.meta.compositions[0].oid !== this.nodeRubick.meta.compositions[0].oid
+      this.nodeRubick = node
+      this.nodeRubickFull = await this.$store.dispatch('objects/get', { oid: node.oid, priority: 0 })
     },
     nodeNameClick () {
       this.$log('nodeNameClick')
@@ -366,7 +343,7 @@ export default {
     },
     async nodeVote (rate) {
       try {
-        this.$log('nodeVote start', this.node.oid)
+        this.$log('nodeVote start', rate)
         if (!rate) throw new Error('No rate!')
         this.nodeVoting = true
         await this.$wait(500)

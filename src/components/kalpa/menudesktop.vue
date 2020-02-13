@@ -1,6 +1,6 @@
 <template lang="pug">
 div(
-  :style=`{position: 'relative', minHeight: '100vh', width: width+'px'}`).row
+  :style=`{position: 'fixed', zIndex: 2000, minHeight: '100vh', width: '100%'}`).row.bg-grey-8
   //- //- toggle menu
   //- div(
   //-   v-if="false"
@@ -24,7 +24,7 @@ div(
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
           k-logo(:width="40" :height="40").cursor-pointer
         //- home page name, or kalpagramma name?
-        div(v-if="width > 60").col.full-height
+        div(v-if="!mini").col.full-height
           .row.fit.items-center
             span.text-bold.text-white {{ $t('Home') }}
             //- span.text-white.text-bold Кальпаграмма 1.0.1 // зачем сломали номер версии? поставил обратно...
@@ -38,13 +38,13 @@ div(
           v-show="!userAvatarErrored"
           @error="userAvatarError"
           :src="$store.getters.currentUser.profile.thumbUrl"
-          :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
+          :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`).cursor-pointer
         div(
           v-if="userAvatarErrored"
           :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`
-          ).row.bg-grey-3
+          ).row.bg-grey-3.cursor-pointer
       //- user name, max 50?
-      div(v-if="width > 60").col.full-height
+      div(v-if="!mini").col.full-height
         .row.fit.items-center
           span.text-bold.text-white.cursor-pointer {{ $t($store.getters.currentUser.name) | cut(50) }}
     //- pages
@@ -58,7 +58,7 @@ div(
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
             q-btn(round flat :icon="p.icon" :color="$route.name === p.id ? 'green' : 'white'")
           //- page info, name
-          div(v-if="width > 60").col.full-height
+          div(v-if="!mini").col.full-height
             .row.fit.items-center
               span.text-white {{ $t(p.name) }}
         //- fullscreen
@@ -99,7 +99,7 @@ div(
       //-     :style=`mini ? {} : {height: '50px', borderRadius: '10px'}`)
       //-     span(v-if="width === 230" :style=`{whiteSpace: 'nowrap'}`).text-bold.q-ml-md {{ $t('install_app') }}
       //- toggle
-      div(:style=`{}`).row.full-width.justify-end
+      div(v-if="false && $q.screen.gt.xs").row.full-width.justify-end
         div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
           q-btn(
             round flat color="green" @click="menuShow = !menuShow"
@@ -111,10 +111,10 @@ import { checkUpdate, update } from 'src/system/service_worker'
 // img:statics/icons/anvil.svg
 export default {
   name: 'kalpaMenuDesktop',
-  props: [],
+  props: ['mini'],
   data () {
     return {
-      menuShow: false,
+      menuShow: true,
       width: 60,
       pages: [
         { id: 'trends', name: 'Trends', icon: 'whatshot' },
@@ -143,7 +143,11 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('menuShow CHANGED', to)
-        this.$tween.to(this, 0.3, {width: to ? 260 : 60})
+        if (this.$q.screen.xs) {
+          this.width = 260
+        } else {
+          this.$tween.to(this, 0.3, {width: to ? 260 : 60})
+        }
       }
     }
   },
@@ -176,6 +180,8 @@ export default {
         default:
           await this.$router.push('/' + p.id)
       }
+      if (this.$q.screen.xs) this.width = 0
+      else this.width = 60
     },
     async update () {
       if (this.$store.state.core.newVersionAvailable) {
