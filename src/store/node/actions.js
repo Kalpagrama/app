@@ -70,15 +70,6 @@ export const nodeRate = async (context, { node, rateUser }) => {
     variables: {
       oid: node.oid,
       rate: rateUser
-    },
-    optimisticResponse: {
-      __typename: 'Mutation',
-      nodeRate: {
-        __typename: 'Node',
-        oid: node.oid,
-        rate: node.rate,
-        rateUser: rateUser
-      }
     }
   })
   logD('nodeRate done', nodeRate)
