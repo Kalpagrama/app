@@ -80,7 +80,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
       user-created-nodes(
         v-if="pageId === 'Created nodes'"
         :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
-      user-created-nodes(
+      user-voted-nodes(
         v-if="pageId === 'Voted nodes'"
         :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
       user-following(
@@ -95,11 +95,11 @@ q-layout(view="hHh lpR fFf").bg-grey-3
 import userFollowers from './user_followers'
 import userFollowing from './user_following'
 import userCreatedNodes from './user_created_nodes'
-import userRatedNodes from './user_rated_nodes'
+import userVotedNodes from './user_voted_nodes'
 
 export default {
   name: 'pageApp__User',
-  components: {userRatedNodes, userCreatedNodes, userFollowing, userFollowers},
+  components: {userVotedNodes, userCreatedNodes, userFollowing, userFollowers},
   props: ['width', 'height'],
   data () {
     return {

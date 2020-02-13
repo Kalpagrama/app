@@ -98,10 +98,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             v-for="(n,ni) in compositionTwoQuery.items" :key="ni"
             :style=`{width: '100px', height: '100px'}`)
             img(
-              :src="n.meta.compositions[0].thumbUrl"
-              :style=`{height: '50px', width: '100%', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
-            img(
-              :src="n.meta.compositions[1].thumbUrl"
+              :src="n.meta.compositions[0].oid === node.meta.compositions[0].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
               :style=`{height: '50px', width: '100%', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm
   //- actions
   .row.full-width.justify-center.q-px-sm.q-pb-md
@@ -305,6 +302,8 @@ export default {
     this.$log('mounted')
     this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeFull, position: 1, pagination: {pageSize: 30}})
     this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeFull, position: 3, pagination: {pageSize: 30}})
+    this.$log('compositionOneQuery', this.compositionOneQuery)
+    this.$log('compositionTwoQuery', this.compositionTwoQuery)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -1,35 +1,16 @@
 <template lang="pug">
 .row.full-width
-  node-loader(ref="nodeLoader" :variables="variables" type="sphereNodes")
-    template(v-slot:default=`{nodes}`)
-      .row.full-width.items-start.content-start.q-pt-sm
-        div(
-          v-for="(n, ni) in nodes" :key="n.oid"
-          ).row.full-width.q-mb-xl
-          node(
-            @nameClick="nameClick" @action="$refs.nodeActionDialog.show()"
-            :style=`n.oid === nodeOid ? {...nodeStyles, ...{zIndex: nodeZIndex}} : {zIndex: zIndex}`
-            :zIndex="zIndex" :index="ni" :node="n" :opened="n.oid === nodeOid" :pinned="n.oid === nodeOid && nodePinned"
-            :active="nodesVisible[0] ? nodesVisible[0] === n.oid : false"
-            :ref="'node-'+n.oid" :lang="n.oid"
-            v-observe-visibility=`{
-              callback: nodeVisible,
-              throttle: 230,
-              intersection: {
-                threshold: 0.98
-              }
-            }`)
-          div(
-            v-if="n.oid === nodeOid"
-            :style=`{height: nodeRect.height+'px', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.bg-grey-3
-    div(v-if="!nodes" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
-      span {{$t('Пользователь не голосовал', 'User didnt rate')}}
+  kalpa-loader(ref="nodeLoader" :variables="variables" type="sphereNodes")
+    template(v-slot:items=`{items}`)
+      node-list(:nodes="items" @nodeClick="nodeClick")
+      div(v-if="items.length === 0" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
+        span {{$t('Пользователь не голосовал', 'User didnt rate')}}
 </template>
 <script>
 import node from './node'
+
 export default {
-  name: 'user__rated_nodes',
+  name: 'userVotedNodes',
   props: {
     zIndex: {type: Number, default () { return 100 }},
     node: {type: Object},
@@ -45,7 +26,7 @@ export default {
   data () {
     return {
       headerShow: true,
-      sphereOid: undefined,
+      // sphereOid: undefined,
       nodePinned: true,
       nodeOid: undefined,
       nodeRect: null,
@@ -64,6 +45,10 @@ export default {
   computed: {
     nodeZIndex () {
       return this.zIndex + 200
+    },
+    sphereOid () {
+      // return this.$store.getters.currentUser.oid
+      return this.$route.params.oid
     },
     variables () {
       return {
