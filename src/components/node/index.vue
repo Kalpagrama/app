@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   component(
-    :is="ctx === 'list' ? `node-layout-pip` : 'node-layout-rubick'"
+    :is="ctx === 'list' ? `node-layout-pip` : 'node-layout-opened'"
     :ctx="ctx" :index="index"
     :node="node" :nodeFull="nodeFull" :visible="visible" :active="active" :nodeLoad="nodeLoad"
     @open="$emit('open', [node, nodeFull])")

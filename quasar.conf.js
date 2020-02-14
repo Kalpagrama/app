@@ -28,7 +28,7 @@ module.exports = function (ctx) {
       // 'eva-icons'
     ],
     framework: {
-      all: false,
+      all: true,
       components: [
         'QLayout',
         // 'QPullToRefresh',
@@ -78,7 +78,7 @@ module.exports = function (ctx) {
       },
       scopeHoisting: true,
       vueRouterMode: 'history',
-      vueCompiler: false,
+      vueCompiler: true,
       distDir: 'dist',
       // gzip: true,
       // analyze: true,

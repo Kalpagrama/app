@@ -35,7 +35,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         round flat color="green" icon="link" @click="$router.push('/node/' + nodeRubick.oid)"
         :style=`{}`)
   //- composition ONE query
-  .row.full-width.justify-center.items-center.content-start
+  .row.full-width.justify-center.items-center.content-start.q-px-sm
     div(:style=`{position: 'relative', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
       div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
         div(
@@ -104,7 +104,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           round push color="green" icon="add" @click="extendComposition(1)"
           :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
   //- composition TWO query
-  .row.full-width.justify-center.items-start.content-start
+  .row.full-width.justify-center.items-start.content-start.q-px-sm
     div(:style=`{position: 'relatvie', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
       div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
         div(
@@ -116,7 +116,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
   //- actions wrapper
   //- TODO move to actions component...
-  .row.full-width.justify-center.items-start.content-start
+  .row.full-width.justify-center.items-start.content-start.q-px-sm
     div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
       div(
         v-if="nodeRubickFull"
@@ -157,10 +157,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             //- img(
             //-   :src="nodeRubickFull.author.thumbUrl"
             //-   :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
-  div(:style=`{minHeight: '400px'}`).row.full-width.justify-center.items-start.content-start
+  div(:style=`{minHeight: '400px'}`).row.full-width.justify-center.items-start.content-start.q-px-sm
     //- TODO move maxWidth to variable...
     div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-py-md
-      span.text-red spheres...
 </template>
 
 <script>
