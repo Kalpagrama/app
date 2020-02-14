@@ -11,8 +11,8 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // делает ключ для элемента мастерской в кэше (чтобы отличать от реальных элементов)
 export function makeKey (wsItem) {
-  assert(wsItem && (wsItem.oid || wsItem.name), `makeKey assert ${JSON.stringify(wsItem)}`)
-  return 'wsItem: ' + (wsItem.oid || wsItem.name)
+  assert(wsItem && wsItem.oid, `makeKey assert ${JSON.stringify(wsItem)}`)
+  return 'wsItem: ' + wsItem.oid
 }
 
 export const init = async (context, wsRevision) => {
@@ -130,11 +130,11 @@ export const wsNodeSave = async (context, node) => {
       })
       logD('xxx=', xxx)
       let { data: { wsNodeUpdate } } = xxx
-      return {item: wsNodeUpdate, actualAge: 'hour'}
+      return { item: wsNodeUpdate, actualAge: 'hour' }
     }
     let fetchItemFunc = async () => {
       let item = await context.dispatch('workspace/get', { oid: node.oid, force: true }, { root: true })
-      return {item, actualAge: 'hour'}
+      return { item, actualAge: 'hour' }
     }
     let mergeItemFunc = (path, serverItem, cacheItem) => {
       assert(serverItem && cacheItem)
@@ -245,7 +245,7 @@ export const wsItems = async (context, { wsItemsType, pagination, filter, force 
       let item = items[i]
       // храним списки отдельно от элементов
       context.dispatch('cache/update', { key: makeKey(item), newValue: item, actualAge: 'hour' }, { root: true })
-      items[i] = { oid: item.oid, name: 'item.name' } // в самом списке - просто ссылка
+      items[i] = { oid: item.oid } // в самом списке - просто ссылка
     }
     return {
       item: { items, count, totalCount, nextPageToken },
@@ -279,33 +279,43 @@ export const expireWsCache = async (context) => {
 
 // можно запрашивать по oid, либо имени (если оно уникально)
 export const get = async (context, { oid, name, force }) => {
-  const fetchItemFunc = async () => {
-    let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-      query: gql`
-        ${fragments.objectFullFragment}
-        query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
-          wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            totalCount
-            count
-            nextPageToken
-            items {... objectFullFragment}
+  if (name) {
+    // получаем список
+    let { items, count, totalCount, nextPageToken } = await context.dispatch('workspace/wsItems',
+      { wsItemsType: 'ALL', pagination: { pageSize: 1 }, filter: { name } },
+      { root: true })
+    assert(items.length === 1, 'items.length === 1')
+    let itemFull = await context.dispatch('workspace/get', { oid: items[0].oid }, { root: true }) // рекурсия
+    return itemFull
+  } else {
+    const fetchItemFunc = async () => {
+      let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+        query: gql`
+          ${fragments.objectFullFragment}
+          query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
+            wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+              totalCount
+              count
+              nextPageToken
+              items {... objectFullFragment}
+            }
           }
+        `,
+        variables: {
+          pagination: { pageSize: 2, pageToken: null },
+          filter: oid ? { types: ['NODE'], oids: [oid] } : { types: ['NODE'], name },
+          sortStrategy: 'HOT'
         }
-      `,
-      variables: {
-        pagination: { pageSize: 2, pageToken: null },
-        filter: oid ? { types: ['NODE'], oids: [oid] } : { types: ['NODE'], name },
-        sortStrategy: 'HOT'
+      })
+      assert(items.length === 0 || items.length === 1)
+      logD('данные извлечены', items)
+      return {
+        item: items[0],
+        actualAge: 'hour'
       }
-    })
-    assert(items.length === 0 || items.length === 1)
-    logD('данные извлечены', items)
-    return {
-      item: items[0],
-      actualAge: 'hour'
     }
+    let itemFull = await context.dispatch('cache/get',
+      { key: makeKey({ oid }), fetchItemFunc, force }, { root: true })
+    return itemFull
   }
-  let item = await context.dispatch('cache/get',
-    { key: makeKey({ oid, name }), fetchItemFunc, force }, { root: true })
-  return item
 }
