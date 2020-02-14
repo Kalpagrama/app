@@ -203,17 +203,15 @@ export const wsItems = async (context, { wsItemsType, pagination, filter }) => {
 
 // подходит ли object под этот фильтр
 function isRestricted (context, filter, objectShort) {
+  // logD('isRestricted', filter, objectShort)
   assert(objectShort.oid && objectShort.type && objectShort.name)
-  let result = true
   if (filter.types && !filter.types.includes(objectShort.type)) return false
   if (filter.oids && !filter.oids.includes(objectShort.oid)) return false
   if (filter.name && filter.name !== objectShort.name) return false
   if (filter.nameRegExp && objectShort.name.search(new RegExp(filter.nameRegExp)) === -1) return false
   if (filter.compositionOids) {
-    let objectFull = context.rootState.cache.cachedItems[objectShort.oid]
-    if (!objectFull || objectFull.compositions) return false
     for (let compositionOid of filter.compositionOids) {
-      if (!objectFull.compositions.map(composition => composition.oid).includes(compositionOid)) return false
+      if (!objectShort.meta.compositions.map(composition => composition.oid).includes(compositionOid)) return false
     }
   }
   return true
@@ -233,7 +231,7 @@ export const processEvent = async (context, event) => {
   }
 }
 
-// прелетел эвент - создано ядро. Добавить ядро во все ленты и на личную сферу
+// прелетел эвент - создано ядро(проголосовано ядро). Добавить ядро во все ленты и на личную сферу
 async function updateLists (context, event) {
   logD('addNode start')
   let objectShort = event.object
@@ -243,15 +241,20 @@ async function updateLists (context, event) {
     if (!key.startsWith(keyPattern)) continue
     let { oid, pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
     assert(oid && filter, 'oid && filter')
-    if (event.type === 'NODE_CREATED' || event.type === 'NODE_VOTED') {
+    if (oid === context.rootState.auth.userOid) {
+      assert(event.subject)
+      // прилетевшее ядро не создано этим пользователем и не проголосовано этим пользователем
+      if (event.subject.oid !== context.rootState.auth.userOid) continue
+      // список - это личная сфера этого пользователя
       if (!filter || !filter.fastFilters) continue
-      if (oid !== context.rootState.auth.userOid) continue
       let fastFilter = event.type === 'NODE_CREATED' ? 'CREATED_BY_USER' : 'VOTED_BY_USER'
       if (!filter.fastFilters.includes(fastFilter)) continue
+    } else {
+      if (event.type !== 'NODE_CREATED') continue
     }
     if (!isRestricted(context, filter, objectShort)) continue // элемент не подходит под этот фильр
 
-    logD('try add node to user sphere... ')
+    logD('try add node to sphere... ', { oid, pagination, filter, sortStrategy })
     await context.dispatch('cache/update', {
       key: key,
       path: '',
@@ -265,7 +268,7 @@ async function updateLists (context, event) {
         if (indx >= 0) value.items.splice(indx, 1)
 
         // вставляем в начало используем splice для реактивности
-        value.items.splice(0, 0, { oid: objectShort.oid, name: objectShort.name })
+        value.items.splice(0, 0, { ...objectShort })
         value.count++
         value.totalCount++
         return value
@@ -299,7 +302,7 @@ async function updateWsLists (context, event) {
                 assert(value.items && value.count >= 0 && value.totalCount >= 0)
                 // элемент в самом списке - objectShort
                 // вставляем в начало используем splice для реактивности
-                value.items.splice(0, 0, { oid: object.oid, name: object.name })
+                value.items.splice(0, 0, { oid: object.oid, name: object.name, meta: object.meta, type: object.type })
                 value.count++
                 value.totalCount++
                 return value

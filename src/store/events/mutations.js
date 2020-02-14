@@ -15,8 +15,8 @@ export function stateSet(state, [key, val]) {
 
 // todo куда добавлять эвенты (user.events не существует)
 export function addEvent(state, {event, context: { rootState, commit }}) {
-  logD('addEvent', event)
-  logE('not implemented!')
+  // logD('addEvent', event)
+  logE('addEvent not implemented!')
   // commit('cache/updateItem', {
   //   key: rootState.auth.userOid,
   //   path: 'events',
