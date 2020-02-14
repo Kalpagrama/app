@@ -197,7 +197,7 @@ export const wsItems = async (context, { wsItemsType, pagination, filter }) => {
 
 // подходит ли object под этот фильтр
 function isRestricted (context, filter, objectShort) {
-  logD('isRestricted', filter, objectShort)
+  // logD('isRestricted', filter, objectShort)
   assert(objectShort.oid && objectShort.type && objectShort.name)
   if (filter.types && !filter.types.includes(objectShort.type)) return false
   if (filter.oids && !filter.oids.includes(objectShort.oid)) return false
