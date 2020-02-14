@@ -7,7 +7,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
   div(
     :style=`{
       position: 'relative',
-      minHeight: previewHeight+'px', borderRadius: '10px', overflow: 'hidden',
+      minHeight: previewHeight+'px', borderRadius: '10px', overflow: 'hidden', zIndex: 100,
       height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`
     ).row.full-width.items-start.bg-black
     composition(

@@ -56,7 +56,6 @@ export default {
       pagination = pagination || {pageSize: 30, pageToken: null}
       sortStrategy = sortStrategy || 'HOT'
       // get res
-      // TODO wsNodes, wsNotes, wsCompositions, wsSpheres
       let res
       switch (this.type) {
         case 'sphereNodes' :

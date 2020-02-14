@@ -139,7 +139,7 @@ export default {
         this.$log('layer CHANGED', to)
         if (to) {
           this.framesWidthUpdate()
-          // TODO: wrong tween px...
+          // TODO: wrong initial position of tween
           this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
           this.player.setCurrentTime(to.figuresAbsolute[0].t)
         }

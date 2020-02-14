@@ -3,7 +3,6 @@ workspace
 </template>
 
 <script>
-// TODO: code splitting in vue.js app
 import workspace from 'components/workspace'
 
 export default {

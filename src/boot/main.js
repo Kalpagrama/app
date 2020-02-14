@@ -41,7 +41,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
       size: '2px',
       position: 'top'
     })
-    // TODO: memory leak with tweenmax
+    // TODO: memory leak with tweenmax, switch to tween lite
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {
       return date.formatDate(ts, format || 'YYYY.MM.DD', {

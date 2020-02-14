@@ -3,7 +3,6 @@ div(
   :style=`videoStyles`
   :class=`{'full-height': fullHeight || ctx === 'workspace'}`).row.full-width.items-center.content-center.bg-black
   div(
-    v-show=`show`
     :class=`{'full-height': ctx === 'workspace'}`
     :style=`{position: 'relative'}`).row.full-width.items-center.content-center
     //- opacity: videoValid ? 1 : 0
@@ -13,7 +12,7 @@ div(
       @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="videoEnded"
       :class=`{'full-height': fullHeight || ctx === 'workspace'}`
-      :style=`{width: '100%', objectFit: 'contain'}`
+      :style=`{width: '100%', objectFit: 'contain', opacity: opacity ? 1 : 0}`
       :src="urlRaw" type="video/mp4")
       //- source()
     //- debug
@@ -85,7 +84,8 @@ export default {
       progressHeight: 10,
       fullscreen: false,
       show: false,
-      urlRaw: undefined
+      urlRaw: undefined,
+      opacity: true
     }
   },
   computed: {
@@ -124,12 +124,12 @@ export default {
       handler (to, from) {
         // this.$log('now CHANGED', to)
         if (this.start) {
-          if (to < this.start) {
+          if (to < this.start - 0.3) {
             this.$log('now < start')
             this.player.setCurrentTime(this.start)
             this.player.play()
           }
-          else if (to >= this.end) {
+          else if (to >= this.end + 0.3) {
             this.$log('now > end')
             this.player.setCurrentTime(this.start)
             // this.$emit('ended')
@@ -168,7 +168,11 @@ export default {
     videoCanplay () {
       // this.$log('videoCanplay')
       this.player.setCurrentTime(this.start || 0)
-      // this.player.play()
+      if (this.visible && !this.mini) {
+        // this.$q.notify('can play')
+        this.opacity = true
+        this.player.play()
+      }
     },
     videoPlay () {
       // this.$log('videoPlay')
@@ -249,8 +253,8 @@ export default {
   async mounted () {
     // this.$log('mounted')
     this.playerInit()
-    await this.$wait(1000)
-    this.show = true
+    // await this.$wait(1000)
+    // this.show = true
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

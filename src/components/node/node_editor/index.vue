@@ -24,48 +24,39 @@
     //- composition finder
     q-dialog(v-model="compositionFinderOpened").bg-black
       composition-finder(@layer="layerFound").bg-black
-    //- header
-    div(
-      :style=`{height: '113px'}`
-      ).row.full-width.items-start.content-start.justify-center.q-px-sm
-      div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
-        //- header
-        div(
-          :style=`{height: '60px'}`
-          ).row.full-width.items-center
-          //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-          //- q-btn(v-if="$q.screen.xs" round flat icon="keyboard_arrow_left" color="green" @click="$emit('close')")
-          //- .col.full-height
-          //-   .row.fit.items-center.content-center
-          //-     span.text-bold.text-green Node editor
-          //- div(
-          //-   :style=`{height: '60px', width: '60px'}`
-          //-   ).row.items-center.content-center.justify-center
-          //-   q-btn(round flat icon="refresh" color="green" :loading="nodeRefreshing" @click="nodeRefresh()").q-mr-sm
-        //- header actions
-        div(
-          :style=`{height: '53px'}`
-          ).row.full-width.items-center.content-center.q-px-sm
-          q-btn(
-            v-if="node && node.oid"
-            outline color="red" no-caps :loading="nodeDeleting" @click="nodeDelete(node.oid)"
-            :style=`{borderRadius: '10px'}`)
-            span Delete
-          .col
-          q-btn(
-            v-if="node && node.oid"
-            outline color="green" no-caps :loading="nodeSaving" @click="nodeSave()"
-            :style=`{borderRadius: '10px'}`).q-mr-md
-            span().text-bold.text-green Save
-          //- .col.full-height
-          q-btn(
-            v-if="node && node.oid"
-            push color="green" no-caps :loading="nodePublishing" @click="nodePublish()"
-            :style=`{borderRadius: '10px'}`)
-            span().text-bold Publish
     //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start.justify-center.q-px-sm
+        //- header
+        div(
+          :style=`{height: '113px'}`
+          ).row.full-width.items-start.content-start.justify-center.q-px-sm
+          div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
+            //- header
+            div(
+              :style=`{height: '60px'}`
+              ).row.full-width.items-center
+            //- header actions
+            div(
+              :style=`{height: '53px'}`
+              ).row.full-width.items-center.content-center.q-px-sm
+              q-btn(
+                v-if="node && node.oid"
+                outline color="red" no-caps :loading="nodeDeleting" @click="nodeDelete(node.oid)"
+                :style=`{borderRadius: '10px'}`)
+                span Delete
+              .col
+              q-btn(
+                v-if="node && node.oid"
+                outline color="green" no-caps :loading="nodeSaving" @click="nodeSave()"
+                :style=`{borderRadius: '10px'}`).q-mr-md
+                span().text-bold.text-green Save
+              //- .col.full-height
+              q-btn(
+                v-if="node && node.oid"
+                push color="green" no-caps :loading="nodePublishing" @click="nodePublish()"
+                :style=`{borderRadius: '10px'}`)
+                span().text-bold Publish
         div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
           //- composition one
           div(
@@ -109,6 +100,8 @@
             :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
             //- small.full-width.text-white revision: {{ node.revision }}
             small.full-width.text-white oid: {{ node.oid }}
+        div(:style=`{height: '400px'}`).row.full-width
+          //- span hello
           //- spheres(:node="node")
           //- div(
           //-   v-if="node && node.name.length > 0"

@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.bg-black
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
   //- slots
   div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
     slot(name="left")
@@ -42,7 +42,7 @@ div(:style=`{position: 'relative'}`).row.full-width.bg-black
     ref="player"
     :url="contentUrl" :source="contentSource" :ctx="ctx" :fullHeight="fullHeight"
     :start="layerStart" :end="layerEnd" :visible="visible" :mini="mini"
-    :style=`thumbUrl ? {maxHeight: $q.screen.height/2+'px', position: 'absolute', zIndex: 100} : null`
+    :style=`thumbUrl ? {maxHeight: $q.screen.height*0.8+'px', position: 'absolute', zIndex: 100} : null`
     @player="$emit('player', $event)" @ended="layerEnded")
     //- :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`
     //- TODO: props is options on one object...
