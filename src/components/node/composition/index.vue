@@ -7,12 +7,14 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
     slot(name="right")
   //- debug
   div(
-    v-if="false"
-    :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000}`).row.bg-green
-    //- small.full-width.text-white layerIndex: {{layerIndex}}
+    v-if="$store.state.ui.debug"
+    :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
+    small.text-white.full-width ctx: {{ ctx }}
+    small.text-white.full-width layerIndex: {{ layerIndex }}
+    small.text-white.full-width layerIndexPlay: {{ layerIndexPlay }}
     //- small.full-width.text-white layers:
     //- small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
-    small.full-width.text-white ctx: {{ ctx }}
+    //- small.full-width.text-white ctx: {{ ctx }}
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
   div(
@@ -58,7 +60,7 @@ import playerImage from './player_image'
 export default {
   name: 'composition',
   components: {playerVideo, playerImage},
-  props: ['ctx', 'composition', 'layerIndexPlay', 'visible', 'active', 'mini', 'thumbUrl', 'extending', 'fullHeight'],
+  props: ['ctx', 'composition', 'layerIndexPlay', 'visible', 'active', 'mini', 'thumbUrl', 'extending', 'fullHeight', 'mode'],
   data () {
     return {
       layerIndex: 0,
@@ -71,21 +73,18 @@ export default {
     layer () {
       return this.layers[this.layerIndex]
     },
-    layerFiguresRelative () {
-      return this.layer.figuresRelative
-    },
     layerStart () {
-      if (this.ctx === 'workspace') {
-        return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
-      } else {
-        return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
+      if (this.mode === 'watch') return false
+      else {
+        if (this.ctx === 'workspace') return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
+        else return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
       }
     },
     layerEnd () {
-      if (this.ctx === 'workspace') {
-        return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
-      } else {
-        return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
+      if (this.mode === 'watch') return false
+      else {
+        if (this.ctx === 'workspace') return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
+        else return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
       }
     },
     layers () {
@@ -113,6 +112,15 @@ export default {
     }
   },
   watch: {
+    layerIndexPlay: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('layerIndexPlay')
+        if (to >= 0) {
+          this.layerIndex = to
+        }
+      }
+    },
     mini: {
       immediate: true,
       handler (to, from) {
@@ -155,9 +163,13 @@ export default {
       this.$log('*** layerEnded')
       this.$log('NOW => ', this.layerIndex)
       if (this.mini) return
-      if (this.layerIndexPlay) {
-        this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
-        this.layerIndex = this.layerIndexPlay
+      if (this.layerIndexPlay !== null) {
+        if (this.layerIndexPlay >= 0) {
+          this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
+          this.layerIndex = this.layerIndexPlay
+        } else {
+          this.layerIndex = -1
+        }
       } else {
         // move to the next layer, this composition player
         let layerTo = this.layerIndex + 1

@@ -79,6 +79,7 @@ export default {
       this.$log('item: node-spheres', item)
       if (item) {
         this.$log('*** USE node-spheres')
+        this.nodeSavePause = true
         this.node = JSON.parse(JSON.stringify(item))
       } else {
         this.$log('*** CREATE node-spheres')
