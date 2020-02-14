@@ -22,6 +22,11 @@ div(
       //- span.full-width.text-white player: {{player}}
       //- small.text-white.full-width styles: {{videoStyles}}
       small.text-white.full-width url: {{ url }}
+    //- fullscreen
+    //- q-btn(
+    //-   round flat color="green" @click="videoFullscreenToggle()"
+    //-   :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
+    //-   :style=`{position: 'absolute', top: '16px', right: '16px', zIndex: 1000, background: 'rgba(0,0,0,0.3)'}`)
     //- progress
     div(
       v-if="ctx === 'workspace'"

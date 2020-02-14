@@ -3,9 +3,9 @@ iframe {
   width: 100%;
   height: 500px;
 }
-// html {
-//   padding-left: 60px;
-// }
+.q-notification {
+  border-radius: 10px !important
+}
 </style>
 
 <template lang="pug">

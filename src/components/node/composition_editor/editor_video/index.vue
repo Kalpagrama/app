@@ -5,7 +5,7 @@
       .col.full-width
         composition(
           v-if="composition" :composition="composition" :mini="false" @player="player = $event" :ctx="ctx"
-          :layerIndexPlay="layerIndex").full-height
+          :layerIndexPlay="layerIndex" :mode="mode").full-height
           template(v-slot:right)
             q-btn(
               v-if="false"
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+// TODO do not destroy layers(content.meta) change styles/classes...
 import composition from 'components/node/composition'
 import layerEditor from './layer_editor'
 import layers from './layers'
@@ -61,7 +62,8 @@ export default {
       layerIndex: -1,
       layersShow: true,
       layersWidth: 400,
-      layersBottom: true
+      layersBottom: true,
+      mode: 'watch'
     }
   },
   computed: {
@@ -111,7 +113,7 @@ export default {
       this.$log('layerAdd', start, end)
       // TODO: check layers and find one last, or one first one
       let from = start || this.player.now
-      let to = end || from + 30 < this.player.duration ? from + 30 : this.player.duration
+      let to = end || from + 10 < this.player.duration ? from + 10 : this.player.duration
       // let to = this.player.duration
       // update first layer without figures, or create a new layer...
       if (this.layers.length === 1 && this.layers[0].figuresAbsolute.length === 0) {

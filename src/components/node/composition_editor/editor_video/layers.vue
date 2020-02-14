@@ -43,7 +43,12 @@
           :style=`{height: height+'px'}`
           ).row.full-width.items-end.content-end.justify-end.q-pa-sm
           //- span EXPORT, delete, use, fuck me
-          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.justify-end
+          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.justify-betweens
+            q-btn(round flat color="green" icon="keyboard_arrow_left" @click="l.figuresAbsolute[0].t -= 0.100")
+            q-btn(round flat color="green" icon="keyboard_arrow_right" @click="l.figuresAbsolute[0].t += 0.100")
+            q-btn(round flat color="green" icon="keyboard_arrow_left" @click="l.figuresAbsolute[1].t -= 0.100")
+            q-btn(round flat color="green" icon="keyboard_arrow_right" @click="l.figuresAbsolute[1].t += 0.100")
+            .col.full-height
             q-btn(round flat color="red" icon="delete" @click="layerDelete(li)").q-mr-sm
             q-btn(dense no-caps color="green" @click="layerExport(l, li)").q-px-sm Export
 </template>

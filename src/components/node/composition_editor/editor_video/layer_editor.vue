@@ -134,6 +134,7 @@ export default {
       }
     },
     layer: {
+      deep: true,
       immediate: false,
       handler (to, from) {
         this.$log('layer CHANGED', to)

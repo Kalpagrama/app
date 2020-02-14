@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   component(
-    :is="ctx === 'list' ? `node-layout-pip` : 'node-layout-opened'"
+    :is="ctx === 'list' ? `node-layout-pip` : 'node-layout-rubick'"
     :ctx="ctx" :index="index"
     :node="node" :nodeFull="nodeFull" :visible="visible" :active="active" :nodeLoad="nodeLoad"
     @open="$emit('open', [node, nodeFull])")
@@ -10,11 +10,12 @@
 <script>
 import nodeLayoutPip from './layout_pip'
 import nodeLayoutOpened from './layout_opened'
+import nodeLayoutRubick from './layout_rubick'
 
 export default {
   name: 'nodeIndex',
   props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible'],
-  components: {nodeLayoutPip, nodeLayoutOpened},
+  components: {nodeLayoutPip, nodeLayoutOpened, nodeLayoutRubick},
   data () {
     return {
       nodeFull: null

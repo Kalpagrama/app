@@ -11,6 +11,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   //- q-btn(
   //-   round flat color="green" icon="keyboard_arrow_left" @click="$router.back()"
   //-   :style=`{position: 'fixed', right: '16px', bottom: '16px', zIndex: 2000, background: 'rgba(0,0,0,0.2)'}`)
+  //- q-btn(
+  //-   round flat color="green" icon="link"
+  //-   :style=`{position: 'fixed', top: '16px', right: '16px', zIndex: 2000}`)
   //- composition finder
   q-dialog(v-model="compositionFinderOpened" :maximized="true" position="bottom")
     div(@click.self="compositionFinderOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
@@ -18,40 +21,49 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         @layer="layerFound"
         :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
   //- header
-  //- div(
-  //-   v-if="false"
-  //-   :style=`{height: '60px'}`).row.full-width
-  //-   h1 hello
-  //- vote tint on fragments
-  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-sm.q-pt-md
-    div(
-      v-if="votePanning"
-      :style=`{
-        position: 'absolute', zIndex: 1000, paddingBottom: '30px',
-        borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}`
-        ).row.fit.items-end.content-end.justify-center
-      //- vote number
+  div(
+    v-if="true"
+    :style=`{height: '60px'}`).row.full-width.justify-center
+    div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-center.content-center
+      q-btn(
+        v-if="$route.name !== 'node'"
+        round flat color="green" icon="keyboard_arrow_left" @click="$router.back()"
+        :style=`{}`)
+      .col.full-height
+      q-btn(
+        v-if="nodeRubick && $route.name !== 'node'"
+        round flat color="green" icon="link" @click="$router.push('/node/' + nodeRubick.oid)"
+        :style=`{}`)
+  //- composition ONE query
+  .row.full-width.justify-center.items-center.content-start
+    div(:style=`{position: 'relative', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
+      div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
+        div(
+          v-for="(n,ni) in compositionOneQuery.items" :key="ni" @click="compositionRubickClick(n)"
+          v-if="n.oid !== nodeRubick.oid"
+          :style=`{height: '50px'}`)
+          img(
+            :src="n.meta.compositions[0].oid === nodeRubick.meta.compositions[0].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
+            :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
+  //- node wrapper
+  div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-sm
+    div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
       div(
-        :style=`{fontSize: 10*(voteValue/10) < 50 ? 50+'px' : 10*(voteValue/10)+'px'}`
-      ).row.full-width.justify-center.items-end.text-bold.text-white {{ voteText }}
-      //- vote text
-      .row.full-width.justify-center
-        span(:style=`{fontSize: '50px'}`
-          ).text-bold.text-white.text-center {{ voteLabel }}
-    //- composition ONE query
-    .row.full-width.justify-center.q-py-md
-      div(:style=`{maxWidth: 600+'px', height: '50px'}`).row.full-width.scroll
-        div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
-          div(
-            v-for="(n,ni) in compositionOneQuery.items" :key="ni" @click="compositionRubickClick(n)"
-            v-if="n.oid !== nodeRubick.oid"
-            :style=`{height: '50px'}`)
-            img(
-              :src="n.meta.compositions[0].oid === nodeRubick.meta.compositions[0].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
-              :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
-    //- composition ONE
-    .row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: 600+'px'}`).row.full-width.items-start.content-start
+        v-if="votePanning"
+        :style=`{
+          position: 'absolute', zIndex: 1000, paddingBottom: '30px',
+          borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}`
+          ).row.fit.items-end.content-end.justify-center
+        //- vote number
+        div(
+          :style=`{fontSize: 10*(voteValue/10) < 50 ? 50+'px' : 10*(voteValue/10)+'px'}`
+        ).row.full-width.justify-center.items-end.text-bold.text-white {{ voteText }}
+        //- vote text
+        .row.full-width.justify-center
+          span(:style=`{fontSize: '50px'}`
+            ).text-bold.text-white.text-center {{ voteLabel }}
+      //- composition ONE
+      div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
         composition(
           v-if="nodeRubick"
           ref="fragmentFirst"
@@ -64,24 +76,20 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         q-btn(
           round push color="green" icon="add" @click="extendComposition(0)"
           :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
-        //- q-btn(
-        //-   round push color="green" icon="keyboard_arrow_right"
-        //-   :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
-    //- name, essence
-    .row.full-width.justify-center
-      div(
-        v-if="nodeRubick"
-        ref="nodeName" @click="nodeNameClick()"
-        :style=`{position: 'relative', maxWidth: 600+'px', minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.justify-center.cursor-pointer.q-my-md.bg-grey-2
-        span.text-bold.text-center.cursor-pointer {{ nodeRubick.name }}
-        //- actions
-        q-btn(
-          round push color="green" icon="add" @click="extendEssence()"
-          :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
-    //- composition TWO
-    .row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: 600+'px'}`).row.full-width.items-start.content-start
+      //- name, essence
+      .row.full-width.justify-center.items-center.content-center
+        div(
+          v-if="nodeRubick"
+          ref="nodeName" @click="nodeNameClick()"
+          :style=`{position: 'relative', maxWidth: 600+'px', minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
+          ).row.full-width.items-center.justify-center.cursor-pointer.q-my-md.bg-grey-2
+          span.text-bold.text-center.cursor-pointer {{ nodeRubick.name }}
+          //- actions
+          q-btn(
+            round push color="green" icon="add" @click="extendEssence()"
+            :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+      //- composition TWO
+      div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
         composition(
           v-if="nodeRubick"
           ref="fragmentFirst"
@@ -95,24 +103,21 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         q-btn(
           round push color="green" icon="add" @click="extendComposition(1)"
           :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
-        //- q-btn(
-        //-   round push color="green" icon="keyboard_arrow_right"
-        //-   :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
-    //- composition TWO query
-    .row.full-width.justify-center.q-py-md
-      div(:style=`{maxWidth: 600+'px', height: '50px'}`).row.full-width.scroll
-        div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
-          div(
-            v-for="(n,ni) in compositionTwoQuery.items" :key="ni" @click="compositionRubickClick(n)"
-            v-if="n.oid !== nodeRubick.oid"
-            :style=`{height: '50px'}`)
-            img(
-              :src="n.meta.compositions[0].oid === nodeRubick.meta.compositions[0].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
-              :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
-  //- actions
+  //- composition TWO query
+  .row.full-width.justify-center.items-start.content-start
+    div(:style=`{position: 'relatvie', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
+      div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
+        div(
+          v-for="(n,ni) in compositionTwoQuery.items" :key="ni" @click="compositionRubickClick(n)"
+          v-if="n.oid !== nodeRubick.oid"
+          :style=`{height: '50px'}`)
+          img(
+            :src="n.meta.compositions[0].oid === nodeRubick.meta.compositions[0].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
+            :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
+  //- actions wrapper
   //- TODO move to actions component...
-  .row.full-width.justify-center.q-px-sm.q-pb-md
-    div(:style=`{maxWidth: 600+'px'}`).row.full-width
+  .row.full-width.justify-center.items-start.content-start
+    div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
       div(
         v-if="nodeRubickFull"
         :style=`{
@@ -152,22 +157,10 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             //- img(
             //-   :src="nodeRubickFull.author.thumbUrl"
             //-   :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
-    //- spheres and timestamp
-    //- TODO move to spheres component
-    div(v-if="nodeRubickFull").row.full-width
-      //- spheres
-      div(:style=`{height: '50px'}`).row.full-width.scroll
-        .row.justify-start.items-start.content-start.no-wrap.q-pa-md
-          div(
-            v-for="(s, si) in nodeRubickFull.spheres" :key="si" @click="$router.push('/sphere/' + s.oid)"
-            :style=`{}`).q-mr-sm.cursor-pointer
-            span(:style=`{borderRadius: '4px', whiteSpace: 'nowrap', userSelect: 'none'}`).bg-grey-2.q-px-sm.q-py-xs {{ s.name }}
-      //- timestamp
-      div(v-if="false").row.full-width.justify-start.items-center.content-center.q-pa-md
-        small.text-grey-7 31.12.2019
-        .col
-        q-btn(push no-caps dense color="green" @click="nodeExtend()").q-px-sm.q-ml-sm
-          span Extend
+  div(:style=`{minHeight: '400px'}`).row.full-width.justify-center.items-start.content-start
+    //- TODO move maxWidth to variable...
+    div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-py-md
+      span.text-red spheres...
 </template>
 
 <script>
@@ -188,7 +181,8 @@ export default {
       essenceQuery: null,
       nodeRubick: null,
       nodeRubickFull: null,
-      needSwap: false
+      needSwap: false,
+      maxWidth: 400
     }
   },
   computed: {
@@ -220,13 +214,17 @@ export default {
       handler (to, from) {
         this.$log('nodeFull CHANGED', to)
         this.$set(this, 'nodeRubickFull', JSON.parse(JSON.stringify(to)))
-        this.loadRubicks()
+        if (to) this.loadRubicks()
+        else this.nodeLoad()
       }
     },
     nodeRubick: {
       deep: true,
       handler (to, from) {
         this.$log('nodeRubick CHANGED', to)
+        if (to) {
+          if (this.$route.name === 'node') this.$router.push('/node/' + to.oid).catch(e => e)
+        }
       }
     },
     nodeRubickFull: {
@@ -240,8 +238,14 @@ export default {
   methods: {
     async loadRubicks () {
       this.$log('loadRubicks')
-      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeRubickFull, position: 4, pagination: {pageSize: 30}})
-      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: this.nodeRubickFull, position: 5, pagination: {pageSize: 30}})
+      let nodeRubickFull = JSON.parse(JSON.stringify(this.nodeRubickFull))
+      if (this.needSwap) {
+        let t = nodeRubickFull.compositions[0]
+        nodeRubickFull.compositions[0] = nodeRubickFull.compositions[1]
+        nodeRubickFull.compositions[1] = t
+      }
+      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 1, pagination: {pageSize: 30}})
+      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 3, pagination: {pageSize: 30}})
       // TODO load rubicks for essence...
       this.$log('compositionOneQuery', this.compositionOneQuery)
       this.$log('compositionTwoQuery', this.compositionTwoQuery)
@@ -294,7 +298,7 @@ export default {
     },
     async compositionRubickClick (node) {
       this.$log('compositionRubickClick', node)
-      this.needSwap = node.meta.compositions[0].oid !== this.nodeRubick.meta.compositions[0].oid
+      // this.needSwap = node.meta.compositions[0].oid !== this.nodeRubick.meta.compositions[0].oid
       this.nodeRubick = node
       this.nodeRubickFull = await this.$store.dispatch('objects/get', { oid: node.oid, priority: 0 })
     },

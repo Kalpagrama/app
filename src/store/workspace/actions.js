@@ -284,7 +284,9 @@ export const get = async (context, { oid, name, force }) => {
     let { items, count, totalCount, nextPageToken } = await context.dispatch('workspace/wsItems',
       { wsItemsType: 'ALL', pagination: { pageSize: 1 }, filter: { name } },
       { root: true })
-    assert(items.length === 1, 'items.length === 1')
+    // logD('items', items)
+    // assert(items.length >= 1, 'items.length === 1')
+    if (items.length === 0) return null
     let itemFull = await context.dispatch('workspace/get', { oid: items[0].oid }, { root: true }) // рекурсия
     return itemFull
   } else {

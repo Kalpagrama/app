@@ -7,9 +7,10 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
     slot(name="right")
   //- debug
   div(
-    v-if="$store.state.ui.debug"
+    v-if="$store.state.ui.debug && !mini"
     :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
     small.text-white.full-width ctx: {{ ctx }}
+    small.text-white.full-width mode: {{ mode }}
     small.text-white.full-width layerIndex: {{ layerIndex }}
     small.text-white.full-width layerIndexPlay: {{ layerIndexPlay }}
     //- small.full-width.text-white layers:
@@ -18,7 +19,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
   div(
-    v-if="opened"
+    v-if="ctx === 'workspace'"
     :style=`{position: 'absolute', zIndex: 1000, top: 0, height: '60px'}`
     ).row.full-width.items-center.q-pa-md.cursor-pointer
     .col.full-height
@@ -92,8 +93,12 @@ export default {
       else return []
     },
     content () {
-      if (this.composition) return this.composition.layers[this.layerIndex].content
-      else return null
+      if (this.layerIndex >= 0) {
+        if (this.composition) return this.composition.layers[this.layerIndex].content
+        else return null
+      } else {
+        return null
+      }
     },
     contentUrl () {
       if (this.content) {
@@ -163,14 +168,12 @@ export default {
       this.$log('*** layerEnded')
       this.$log('NOW => ', this.layerIndex)
       if (this.mini) return
-      if (this.layerIndexPlay !== null) {
-        if (this.layerIndexPlay >= 0) {
-          this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
-          this.layerIndex = this.layerIndexPlay
-        } else {
-          this.layerIndex = -1
-        }
+      if (this.layerIndexPlay >= 0) {
+        this.$log('LAYER PLAY')
+        this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
+        this.layerIndex = this.layerIndexPlay
       } else {
+        this.$log('LAYER DEFAULT')
         // move to the next layer, this composition player
         let layerTo = this.layerIndex + 1
         if (this.layers[layerTo]) {
@@ -182,7 +185,6 @@ export default {
         else {
           this.$log('LAST => 0')
           this.$set(this, 'layerIndex', 0)
-          // this.layerIndex = 0
         }
       }
     }
