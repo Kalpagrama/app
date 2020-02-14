@@ -181,7 +181,7 @@ export default {
       nodeRubick: null,
       nodeRubickFull: null,
       needSwap: false,
-      maxWidth: 400
+      maxWidth: 600
     }
   },
   computed: {
@@ -243,8 +243,8 @@ export default {
         nodeRubickFull.compositions[0] = nodeRubickFull.compositions[1]
         nodeRubickFull.compositions[1] = t
       }
-      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 1, pagination: {pageSize: 30}})
-      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 3, pagination: {pageSize: 30}})
+      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 4, pagination: {pageSize: 30}})
+      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 5, pagination: {pageSize: 30}})
       // TODO load rubicks for essence...
       this.$log('compositionOneQuery', this.compositionOneQuery)
       this.$log('compositionTwoQuery', this.compositionTwoQuery)

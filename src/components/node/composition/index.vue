@@ -120,7 +120,7 @@ export default {
     layerIndexPlay: {
       immediate: true,
       handler (to, from) {
-        this.$log('layerIndexPlay')
+        // this.$log('layerIndexPlay')
         if (to >= 0) {
           this.layerIndex = to
         }
