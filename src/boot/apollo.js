@@ -23,8 +23,8 @@ export default async ({ Vue, store, app }) => {
   // Vue.use(VueApollo)
   let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
   SERVICES_URL = SERVICES_URL || 'https://dev.kalpagramma.com/graphql'
-  logD('process.env=', process.env)
-  logD('SERVICES_URL=', SERVICES_URL)
+  logD('process.env2=', process.env)
+  logD('SERVICES_URL2=', SERVICES_URL)
   store.commit('auth/stateSet', ['SERVICES_URL', SERVICES_URL])
 
   const errLink = onError(({ operation, response, graphQLErrors, networkError }) => {
