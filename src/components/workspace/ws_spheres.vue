@@ -29,24 +29,30 @@ import { debounce } from 'quasar'
 
 export default {
   name: 'wsSpheres',
-  props: ['oid'],
+  props: [],
   data () {
     return {
       sphere: '',
       node: null,
+      nodeSavePause: false,
       nodeSaving: false,
       nodeSavingError: null
     }
   },
   computed: {
+    oid () {
+      return this.$route.params.oid
+    }
   },
   watch: {
     node: {
       deep: true,
       handler (to, from) {
         this.$log('node CHANGED', to)
-        if (to) {
-          this.nodeSave()
+        if (this.nodeSavePause) {
+          this.nodeSavePause = false
+        } else {
+          this.nodeSave(to)
         }
       }
     }
@@ -70,9 +76,12 @@ export default {
       // try to load node with spheres
       let name = 'SPHERES-' + this.$store.state.auth.userOid
       let item = await this.$store.dispatch('workspace/get', { name })
-      this.$log('nodeFind', item)
-      if (!item) {
-        this.$log('create sphere node')
+      this.$log('item: node-spheres', item)
+      if (item) {
+        this.$log('*** USE node-spheres')
+        this.node = JSON.parse(JSON.stringify(item))
+      } else {
+        this.$log('*** CREATE node-spheres')
         let node = {
           name,
           layout: 'PIP',
@@ -80,23 +89,20 @@ export default {
           spheres: [],
           compositions: []
         }
-        let res = await this.$store.dispatch('workspace/wsNodeSave', node)
-        this.$log('res', res)
-        this.node = res
-      } else {
-        this.node = item
+        this.nodeSave(node)
       }
     },
     async nodeSave (node) {
       try {
-        this.$log('nodeSave start', this.node)
+        this.$log('nodeSave start', node)
         this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
+        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
         this.$log('res', res)
+        this.nodeSavePause = true
+        this.node = JSON.parse(JSON.stringify(res))
+        this.$log('nodeSave done')
         this.nodeSaving = false
         this.nodeSavingError = null
-        // this.node = JSON.parse(JSON.stringify(res))
-        this.$log('nodeSave done')
       } catch (e) {
         this.$log('nodeSave error', e)
         this.nodeSaving = false

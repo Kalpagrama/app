@@ -31,7 +31,7 @@ div(
       //- div(@click="$router.push('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       //-   q-btn(round flat icon="settings" color="white")
     //- user
-    div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid)").row.full-width
+    div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid).catch(e => e)").row.full-width
       //- mini box with user avatar
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
         img(
@@ -178,7 +178,7 @@ export default {
           this.$refs.logoutDialog.show()
           break
         default:
-          await this.$router.push('/' + p.id)
+          await this.$router.push('/' + p.id).catch(e => e)
       }
       if (this.$q.screen.xs) this.width = 0
       else this.width = 60
