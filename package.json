@@ -14,7 +14,7 @@
     "dev_pwa": "quasar dev -m pwa --content-base dist",
     "dev_cordova": "quasar dev -m cordova",
     "dev_electron": "quasar dev -m electron",
-    "build": "quasar build --debug -m pwa",
+    "build": "printenv && quasar build --debug -m pwa",
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",
     "build_cordova": "quasar build -m cordova",
