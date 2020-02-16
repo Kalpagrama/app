@@ -22,7 +22,7 @@
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0",
-    "now-build": "echo \"!!!now-build\" && ls && printenv && quasar build -m pwa"
+    "now-build": "echo \"!!!!now-build\" && ls && printenv && quasar build -m pwa"
   },
   "dependencies": {
     "@panter/vue-i18next": "^0.15.1",
