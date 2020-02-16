@@ -14,7 +14,7 @@
     "dev_pwa": "quasar dev -m pwa --content-base dist",
     "dev_cordova": "quasar dev -m cordova",
     "dev_electron": "quasar dev -m electron",
-    "build": "printenv && quasar build --debug -m pwa",
+    "build": "echo \"now-build\" && ls &&  printenv && quasar build --debug -m pwa",
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",
     "build_cordova": "quasar build -m cordova",
@@ -22,7 +22,7 @@
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0",
-    "now-build": "printenv && quasar build -m pwa"
+    "now-build": "echo \"now-build\" && ls && printenv && quasar build -m pwa"
   },
   "dependencies": {
     "@panter/vue-i18next": "^0.15.1",
