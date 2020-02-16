@@ -2,12 +2,12 @@
   "version": 2,
   "name": "kalpagramma",
   "env": {
-    "SERVICES_URL": "@https://test.kalpagramma.com/graphql",
-    "SERVICES_URL_DEBUG": "@https://dev.kalpagramma.com/graphql"
+    "SERVICES_URL": "https://test.kalpagramma.com/graphql",
+    "SERVICES_URL_DEBUG": "https://dev.kalpagramma.com/graphql"
   },
   "build": {
     "env": {
-      "SERVICES_URL3": "@secret-name"
+      "SERVICES_URL3": "secret-name"
     }
   },
   "builds": [{ "src": "package.json", "use": "@now/static-build" }],
