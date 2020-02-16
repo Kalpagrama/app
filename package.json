@@ -84,6 +84,7 @@
     "fs": "^0.0.1-security",
     "i18next-scanner": "^2.10.3",
     "node-fetch": "^2.6.0",
+    "now": "^17.0.3",
     "strip-ansi": "^6.0.0",
     "vue-template-compiler": "^2.6.10",
     "vuelidate": "^0.7.4",
