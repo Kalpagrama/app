@@ -7,7 +7,7 @@
   },
   "build": {
     "env": {
-      "SERVICES_URL2": "@secret-name"
+      "SERVICES_URL3": "@secret-name"
     }
   },
   "builds": [{ "src": "package.json", "use": "@now/static-build" }],
