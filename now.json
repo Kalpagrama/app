@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "kalpagramma",
   "build": {
     "env": {
       "SERVICES_URL": "https://test.kalpagramma.com/graphql",
