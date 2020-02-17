@@ -51,7 +51,7 @@ export const testWebPush = async (context) => {
 }
 
 async function processEvent (context, event) {
-  logD('processEvent start', event)
+  // logD('processEvent start', event)
   switch (event.type) {
     case 'ERROR':
       notifyError(event)
@@ -171,24 +171,30 @@ async function processEventWs (context, event) {
   if (event.wsRevision - context.rootState.workspace.revision > 1 ||
     context.rootState.workspace.revision > event.wsRevision // при очистке мастерской могло произойти такое
   ) {
-    logW('на сервере есть неучтенные изменения!')
+    logW('на сервере есть неучтенные изменения!!', event.wsRevision, context.rootState.workspace.revision)
     await context.dispatch('workspace/expireWsCache', {}, { root: true })
   }
   // обновим в кэше значение итема
-  logD('обновим в кэше значение итема')
-  await context.dispatch('cache/update', {
-    key: 'wsItem: ' + event.object.oid,
-    newValue: event.object
-  }, { root: true })
+  let key = 'wsItem: ' + event.object.oid
+  let vuexItem = context.rootState.cache.cachedItems[key]
+  if (!vuexItem || vuexItem.revision !== event.object.revision){
+    // если у имеющегося объекта та же ревизия - обновлять не надо (скорей всего это наши же изменения)
+    logD('обновим значение итема в кэше')
+    await context.dispatch('cache/update', {
+      key: key,
+      newValue: event.object
+    }, { root: true })
+  }
+
   // обновим списки мастерской
   logD('обновим списки мастерской')
   await context.dispatch('lists/processEvent', event, { root: true })
-  context.commit('workspace/stateSet', ['revision', event.wsRevision], { root: true })
+  context.dispatch('workspace/updateRevision', event.wsRevision, { root: true })
 }
 
 // вывести уведомление о действии пользователя
 function notifyUserActionComplete (eventType, object) {
-  logD('notifyUserActionComplete', object)
+  // logD('notifyUserActionComplete', object)
   assert.ok(eventType && object)
   let eventMessage = ''
   switch (eventType) {

@@ -98,7 +98,7 @@
           div(
             v-if="$store.state.ui.debug"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
-            //- small.full-width.text-white revision: {{ node.revision }}
+            small.full-width.text-white revision: {{ node.revision }}
             small.full-width.text-white oid: {{ node.oid }}
         div(:style=`{height: '400px'}`).row.full-width
           //- span hello
@@ -136,6 +136,7 @@ export default {
       nodeRefreshingError: null,
       nodeDeleting: false,
       nodeDeletingError: null,
+      nodeRes: null,
       node: null,
       nodeNew: {
         name: '',
@@ -187,6 +188,16 @@ export default {
           } else {
             this.nodeSave(to)
           }
+        }
+      }
+    },
+    nodeRes: {
+      deep: true,
+      handler (to, from) {
+        if (to) {
+          this.$log('nodeRes changed', to)
+          this.nodeSavePause = true
+          this.node = JSON.parse(JSON.stringify(to))
         }
       }
     }
@@ -250,11 +261,12 @@ export default {
       try {
         this.$log('nodeSave start', node || this.node)
         this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node || this.node)))
-        this.$log('res', res)
-        this.nodeSavePause = true
-        this.node = JSON.parse(JSON.stringify(res))
-        this.$log('nodeSave done')
+        this.nodeRes = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node || this.node)))
+        // let xxx = JSON.parse(JSON.stringify(this.nodeRes))
+        // this.$log('res', xxx)
+        // this.nodeSavePause = true
+        // this.node = JSON.parse(JSON.stringify(this.nodeRes))
+        // this.$log('nodeSave done', xxx)
         this.nodeSaving = false
         this.nodeSavingError = null
       } catch (e) {
