@@ -95,7 +95,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             round flat color="green" icon="add" @click="extendEssence()"
             :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px', background: 'rgba(0,0,0,0.2)'}`)
       //- composition TWO
-      div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+      div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
         composition(
           v-if="nodeRubick"
           ref="fragmentFirst"
@@ -106,9 +106,27 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :mini="false" :visible="visible" :active="true"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
+        //- add composition
         q-btn(
           round flat color="green" icon="add" @click="extendComposition(1)"
-          :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
+          :style=`{position: 'absolute', zIndex: 200, bottom: '4px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
+        //- go stats
+        small(
+          :style=`{position: 'absolute', zIndex: 300, top: '2px', left: 'calc(50% - 30px)', background: 'rgba(0,0,0,0.2)',
+            borderRadius: '10px'}`
+          ).text-white.q-pa-xs 12/1243
+        //- go prev
+        div(
+          v-ripple=`{color: 'white'}`
+          :style=`{position: 'absolute', zIndex: 300, left: 0, width: '12%'}`
+          ).row.full-height.items-center.content-center.justify-center.cursor-pointer
+          q-btn(round flat color="white" icon="keyboard_arrow_left")
+        //- go next
+        div(
+          v-ripple=`{color: 'white'}`
+          :style=`{position: 'absolute', zIndex: 300, right: 0, width: '12%'}`
+          ).row.full-height.items-center.content-center.justify-center.cursor-pointer
+          q-btn(round flat color="white" icon="keyboard_arrow_right")
   //- composition TWO query
   div(v-if="false").row.full-width.justify-center.items-start.content-start.q-px-sm
     div(:style=`{position: 'relatvie', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
@@ -122,12 +140,12 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
   //- actions wrapper
   //- TODO move to actions component...
-  .row.full-width.justify-center.items-start.content-start.q-px-xs.q-my-xs
+  .row.full-width.justify-center.items-start.content-start.q-px-xs.q-my-md
     div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
       div(
         v-if="nodeRubickFull"
         :style=`{
-          position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-4
+          position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-8
         //- pan btn
         div(
           v-touch-pan.left.right.prevent.mouse="votePan"
@@ -147,19 +165,19 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           span Pan to vote
         div(
           v-if="nodeRubickFull"
-          :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center
-          span(:style=`{borderBottom: '1px solid #eee'}`).text-bold.full-width.text-center {{voteHuman(nodeRubickFull.rate)}}
-          span.text-bold.full-width.text-center {{voteHuman(nodeRubickFull.rateUser)}}
+          :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center.q-px-sm
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold.text-center {{voteHuman(nodeRubickFull.rate)}}
+          span.text-white.text-center /{{voteHuman(nodeRubickFull.rateUser)}}
         //- user name
         div(
           @click="$router.push('/user/' + nodeRubickFull.author.oid)").col.full-height
           .row.fit.items-center.justify-end.cursor-pointer
-            span(:style=`{userSelect: 'none'}`) {{ nodeRubickFull.author.name | cut(40) }}
+            span(:style=`{userSelect: 'none'}`).text-white {{ nodeRubickFull.author.name | cut(40) }}
         //- user avatar
         div(
           @click="$router.push('/user/' + nodeRubickFull.author.oid)"
           :style=`{height: '60px', width: '75px'}`).row.items-center.justify-center.cursor-pointer
-          div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-8
+          div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-6
             //- img(
             //-   :src="nodeRubickFull.author.thumbUrl"
             //-   :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7

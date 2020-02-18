@@ -8,14 +8,15 @@
 import email from './email'
 
 export default {
-  name: 'pageLogin__index',
-  components: {email},
+  name: 'pageLoginIndex',
+  components: { email },
   mounted () {
     this.$log('mounted')
     //  localStorage.removeItem('ktoken')
-    localStorage.removeItem('ktokenExpires')
+    // localStorage.removeItem('ktokenExpires')
     localStorage.removeItem('ktokenInviteCode')
     let inviteCode = this.$route.query.invite
+    this.$log('inviteCode', inviteCode)
     if (inviteCode) localStorage.setItem('ktokenInviteCode', inviteCode)
   },
   beforeDestroy () {

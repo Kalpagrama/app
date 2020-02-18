@@ -7,40 +7,40 @@ div(:style=`{position: 'relative', borderRadius: '10px'}`).row.full-width.items-
   div(
     :style=`{
       position: 'relative',
-      minHeight: previewHeight+'px', borderRadius: '10px', overflow: 'hidden', zIndex: 100,
+      minHeight: compositionHeight+'px',
+      height: compositionHeight+'px',
+      borderRadius: '10px', overflow: 'hidden', zIndex: 100,
       height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`
     ).row.full-width.items-start.bg-black
     composition(
-      ref="fragmentFirst"
-      :ctx="ctx" :index="0"
-      :thumbUrl="node.meta.compositions[0].thumbUrl"
-      @previewWidth="$event => fragmentWidth(0, $event)" @previewHeight="$event => fragmentHeight(0, $event)"
-      @ended="compositionFirstEnded"
+      ref="compositionOne"
+      :ctx="ctx" :index="0" :thumbUrl="node.meta.compositions[0].thumbUrl" :fullHeight="false"
       :composition="nodeFull ? nodeFull.compositions[0] : null"
-      :mini="fragmentMini === 0" @mini="fragmentChange(0)" :visible="visible"
+      :mini="compositionMiniIndex === 0" :visible="false" :active="false"
+      @mini="compositionChange(0)" @ended="compositionChange(0)"
+      @height="compositionWidth = $event" @width="compositionHeight = $event"
       :style=`{
-        position: previewHeight > 0 ? 'absolute' : 'relative', zIndex: fragmentMini === 0 ? 200 : 150,
+        position: compositionHeight > 0 ? 'absolute' : 'relative', zIndex: compositionMiniIndex === 0 ? 200 : 150,
         opacity: styles[0].opacity, borderRadius: '10px', overflow: 'hidden',
         maxWidth: styles[0].maxWidth+'%',
         bottom: styles[0].bottom+'px',
         right: styles[0].right+'px'}`)
     composition(
-      ref="fragmentSecond"
+      ref="compositionTwo"
       :ctx="ctx" :index="1" :thumbUrl="node.meta.compositions[1].thumbUrl" :fullHeight="true"
-      @previewWidth="$event => fragmentWidth(1, $event)" @previewHeight="$event => fragmentHeight(1, $event)"
-      @ended="compositionSecondEnded"
       :composition="nodeFull ? nodeFull.compositions[1] : null"
-      :mini="fragmentMini === 1" @mini="fragmentChange(1)" :visible="visible"
+      :mini="compositionMiniIndex === 1" :visible="false" :active="false"
+      @mini="compositionChange(1)" @ended="compositionChange(1)"
       :style=`{
-        position: 'absolute', zIndex: fragmentMini === 1 ? 200 : 150,
-        height: fragmentMini === 1 ? 'auto' : previewHeight+'px',
+        position: 'absolute', zIndex: compositionMiniIndex === 1 ? 200 : 150,
+        height: compositionMiniIndex === 1 ? 'auto' : previewHeight+'px',
         opacity: styles[1].opacity, borderRadius: '10px', overflow: 'hidden',
         maxWidth: styles[1].maxWidth+'%',
         bottom: styles[1].bottom+'px',
         right: styles[1].right+'px'}`)
   //- name
   div(
-    ref="nodeName" @click="nodeEssenceClick()"
+    ref="nodeName" @click="nodeNameClick()"
     :style=`{minHeight: '60px'}`
     ).row.full-width.items-center.justify-center.cursor-pointer
     span.text-bold.text-center.cursor-pointer {{ node.name }}
@@ -48,15 +48,14 @@ div(:style=`{position: 'relative', borderRadius: '10px'}`).row.full-width.items-
 
 <script>
 export default {
-  name: 'nodeLayoutPip',
+  name: 'nodeLayoutPip2',
   props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'nodeLoad'],
   data () {
     return {
-      previewHeight: 0,
-      previewWidth: 0,
-      fragmentMini: 1,
-      fragmentMiniStart: 1,
-      styles: [{right: 0, bottom: 0, maxWidth: 140, opacity: 1}, {right: 10, bottom: 10, maxWidth: 30, opacity: 0.8}]
+      styles: [{right: 0, bottom: 0, maxWidth: 140, opacity: 1}, {right: 10, bottom: 10, maxWidth: 30, opacity: 0.8}],
+      compositionHeight: 0,
+      compositionWidth: 0,
+      compositionMiniIndex: 1
     }
   },
   watch: {
@@ -70,41 +69,38 @@ export default {
     }
   },
   methods: {
-    compositionFirstEnded () {
-      this.$log('compositionFirstEnded')
-      this.fragmentChange(1)
-    },
-    compositionSecondEnded () {
-      this.$log('compositionSecondEnded')
-      this.fragmentChange(0)
-    },
-    async play () {
-      if (this.nodeFull) {
-        if (this.fragmentMini === 0) await this.$refs.fragmentSecond.play()
-        else await this.$refs.fragmentFirst.play()
-      }
+    play () {
+      if (!this.nodeFull) return
+      if (this.compositionMiniIndex === 0) this.$refs.compositionOne.play()
+      else this.$refs.compositionTwo.play()
     },
     pause () {
       this.$log('pause')
-      if (this.fragmentMini === 0) this.$refs.fragmentSecond.pause()
-      else this.$refs.fragmentFirst.pause()
+      if (!this.nodeFull) return
+      // pause all compositions...
+      this.$refs.compositionOne.pause()
+      this.$refs.compositionTwo.pause()
     },
-    fragmentWidth (index, width) {
-      // this.$log('fragmentWidth', index, width)
-      if (index === 0) {
-        this.previewWidth = width
-        this.$emit('previewWidth', width)
-      }
-    },
-    fragmentHeight (index, height) {
-      // this.$log('fragmentHeight', index, height)
-      if (index === 0) {
-        this.previewHeight = height
-        // this.$emit('previewHeight', height)
-        // if (this.active) this.play()
-        // TODO: emit scrollTop event of node in scroll wrapper
-        // this.$emit('scrollTop', this.$el.scrollHeight)
-      }
+    compositionChange (index) {
+      this.$log('compositionChange', index)
+      this.$tween.to(
+        this.styles[index],
+        0.65,
+        {
+          width: this.compositionWidth,
+          height: this.compositionHeight,
+          onComplete: () => {
+            this.$tween.to(
+              this.styles[index === 0 ? 1 : 0],
+              0.1,
+              {
+                width: this.compositionWidth / 5,
+                height: 100
+              }
+            )
+          }
+        }
+      )
     },
     async fragmentChange (index) {
       this.$log('fragmentChange', index)
@@ -142,16 +138,13 @@ export default {
         this.$refs.fragmentSecond.play()
       }
     },
-    async nodeEssenceClick () {
-      this.$log('nodeEssenceClick')
+    async nodeNameClick () {
+      this.$log('nodeNameClick')
+      // load nodeFull in case we clicked on not loaded node? is it possible?
       if (!this.nodeFull) await this.nodeLoad()
       this.$emit('open')
       this.pause()
     }
-  },
-  mounted () {
-    // this.$log('mounted')
-    // this.play()
   }
 }
 </script>

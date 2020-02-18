@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import nodeLayoutPip from './layout_pip'
+import nodeLayoutPip from './layout_pip_2'
 import nodeLayoutOpened from './layout_opened'
 import nodeLayoutRubick from './layout_rubick'
 import nodeLayoutByte from './layout_byte'

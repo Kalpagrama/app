@@ -6,7 +6,7 @@
       div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white
         input(
           v-model="sphere" color="black" placeholder="Type a new sphere" @keyup.enter="sphereAdd"
-          :style=`{height: '56px'}`
+          :style=`{height: '56px', paddingLeft: '10px'}`
           ).full-width
     //- body
     .col.full-width.scroll
