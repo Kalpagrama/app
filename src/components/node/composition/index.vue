@@ -13,9 +13,6 @@ div(:style=`{position: 'relative'}` :class=`{'full-height': fullHeight && !mini}
     small.text-white.full-width mode: {{ mode }}
     small.text-white.full-width layerIndex: {{ layerIndex }}
     small.text-white.full-width layerIndexPlay: {{ layerIndexPlay }}
-    //- small.full-width.text-white layers:
-    //- small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
-    //- small.full-width.text-white ctx: {{ ctx }}
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
   div(
@@ -37,7 +34,9 @@ div(:style=`{position: 'relative'}` :class=`{'full-height': fullHeight && !mini}
     :style=`{position: 'absolute', zIndex: 200, opacity: 0.5}`).row.fit.cursor-pointer
   //- preview
   img(
-    v-if="thumbUrl" ref="compositionPreview" :src="thumbUrl" crossOrigin="anonymous" draggable="false" @load="previewLoad" @error="previewError"
+    v-if="thumbUrl" ref="compositionPreview" :src="thumbUrl" crossOrigin="anonymous" draggable="false"
+    @click="previewClick"
+    @load="previewLoad" @error="previewError"
     :class=`{'full-height': fullHeight}`
     :style=`{width: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
@@ -148,18 +147,23 @@ export default {
       this.$log('contentNameClick')
       // TODO: show content modal... or go to the workspace contents
     },
+    previewClick () {
+      this.$log('previewClick')
+    },
     previewLoad () {
       // this.$log('previewLoad')
       let h = this.$refs.compositionPreview.clientHeight
       let w = this.$refs.compositionPreview.clientWidth
-      this.$emit('previewHeight', h)
-      this.$emit('previewWidth', w)
+      this.$emit('height', h)
+      this.$emit('width', w)
       this.previewHeight = h
       this.previewWidth = w
       this.previewLoaded = true
     },
     previewError () {
       this.$log('previewError')
+      // TODO do not show node in the list
+      this.$emit('error')
     },
     play () {
       // this.$log('play')
@@ -168,9 +172,6 @@ export default {
     pause () {
       // this.$log('pause')
       if (this.$refs.player && this.$refs.player.player) this.$refs.player.player.pause()
-    },
-    playPause () {
-      this.$log('playPause')
     },
     layerEnded () {
       this.$log('*** layerEnded')

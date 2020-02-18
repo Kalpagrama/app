@@ -58,6 +58,13 @@ export default {
   },
   computed: {
   },
+  watch: {
+    nodeMiddle: {
+      handler (to, from) {
+        this.$log('nodeMiddle CHANGED', to)
+      }
+    }
+  },
   methods: {
     nodeMiddleHandler (isVisible, entry) {
       // this.$log('nodeMiddleHandler')
@@ -67,20 +74,11 @@ export default {
         let oid = arr[1]
         this.nodeMiddleOid = oid
         this.nodeMiddle = parseInt(index)
-        let nodeRef = this.$refs['node-' + oid][0]
-        this.$log('*** nodeRef', nodeRef)
-        this.nodeTop = nodeRef.$el.offsetTop
-        this.$log('*** nodeTop', this.nodeTop)
-        // this.nodeTop = this.nodeMiddle
-        // this.$log(`np-test: nodeMiddle=${this.nodeMiddle}, throttle=${this.throttle} name=${this.nodes[this.nodeMiddle].name}`)
       }
     }
   },
   async mounted () {
     this.$log(' mounted')
-    // this.throttle = 2000
-    // await this.$wait(2000)
-    // this.throttle = 300
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
