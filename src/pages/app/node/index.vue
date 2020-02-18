@@ -1,44 +1,42 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf")
-  q-header
-    div(:style=`{height: '60px'}`).row.full-width.items-center
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-        q-btn(round flat color="white" icon="keyboard_arrow_left")
-      span {{$t('Жидкий металл')}}
-  q-page-container
-    q-page
-      node-explorer
+  q-page-container.bg-grey-10
+    node(v-if="node" ctx="explorer" :node="node" :needFull="true" :visible="true" :active="true" layout="opened")
 </template>
 
 <script>
-import nodeExplorer from 'components/node_explorer'
-
 export default {
-  name: 'pageApp__Node',
-  components: { nodeExplorer },
-  props: ['width', 'height'],
+  name: 'pageAppNode',
+  components: {},
   data () {
     return {
-      node: null,
-      needFull: false,
-      tab: 'node',
-      active: false,
-      nodeFull: null,
-      nodesCurrent: [null, null],
-      nodes: [[], []]
+      node: null
     }
   },
   computed: {
   },
   watch: {
+    '$route.params.oid': {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('$route.params.oid CHANGED', to)
+        this.node = await this.nodeLoad(to)
+      }
+    }
   },
   methods: {
+    async nodeLoad (oid) {
+      this.$log('nodeLoad start', oid)
+      let node = await this.$store.dispatch('objects/get', { oid, priority: 0 })
+      this.$log('nodeLoad done', node)
+      return node
+    }
   },
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>

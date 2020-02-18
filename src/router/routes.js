@@ -2,11 +2,23 @@
 
 const routes = [
   {
+    path: '/login',
+    component: () => import('layouts/login_layout.vue'),
+    children: [
+      { name: 'index', path: '', component: () => import('pages/login/index.vue') },
+      { name: 'vk', path: 'vk', component: () => import('pages/login/vk') },
+      { name: 'email', path: 'email', component: () => import('pages/login/email') },
+      { name: 'phone', path: 'phone', component: () => import('pages/login/phone') },
+      { name: 'signIn', path: 'sign_in', component: () => import('pages/login/sign_in') },
+      // { name: '404', path: '*', component: () => import('pages/Error404.vue') }
+    ]
+  },
+  {
     path: '/',
     component: () => import('layouts/main_layout'),
     children: [
       // mobile
-      { name: 'home', path: '', component: () => import('pages/app/trends') },
+      { name: 'home', path: '', component: () => import('pages/app/home') },
       { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('pages/app/trends') },
       // { name: 'create', path: 'create', component: () => import('components/node_editor') },
       { name: 'share', path: 'share_target/:page?', component: () => import('layouts/share_layout.vue') },
@@ -18,7 +30,7 @@ const routes = [
       // { name: 'sphere', path: 'sphere/:oid?', component: () => import('components/sphere_explorer') },
       // { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
       // { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
-      // { name: 'node', path: 'node/:oid', component: () => import('components/node_explorer') },
+      { name: 'node', path: 'node/:oid?', component: () => import('pages/app/node') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
       { name: 'settings', path: 'settings', component: () => import('pages/app/settings') }
@@ -34,18 +46,6 @@ const routes = [
       //     await next('/')
       //   }
       // }
-    ]
-  },
-  {
-    path: '/login',
-    component: () => import('layouts/login_layout.vue'),
-    children: [
-      { name: 'index', path: '', component: () => import('pages/login/index.vue') },
-      { name: 'vk', path: 'vk', component: () => import('pages/login/vk') },
-      { name: 'email', path: 'email', component: () => import('pages/login/email') },
-      { name: 'phone', path: 'phone', component: () => import('pages/login/phone') },
-      { name: 'signIn', path: 'sign_in', component: () => import('pages/login/sign_in') },
-      // { name: '404', path: '*', component: () => import('pages/Error404.vue') }
     ]
   },
   {

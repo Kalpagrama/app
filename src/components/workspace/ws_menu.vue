@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    maxWidth: ctx === 'workspace' ? width+'px' : '100%',
+    maxWidth: '100%',
   }`
   ).row.fit
   //- toggle opened
@@ -10,7 +10,7 @@ div(
     v-if="ctx === 'workspace' && $q.screen.gt.xs"
     round push color="green" @click="opened = !opened"
     :icon="width === 0 ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
-    :style=`{position: 'absolute', zIndex: 2000, right: width === 0 ? '-60px' : '-22px', top: '50%'}`)
+    :style=`{position: 'absolute', zIndex: 2000, right: width === 0 ? '-60px' : '-22px', top: '50%'}`).gt-sm
   div(
     :style=`{position: 'relative', overflow: 'hidden'}`
     ).column.fit
@@ -25,7 +25,7 @@ div(
         q-btn(round flat color="green" icon="school")
       .col.full-height
         .row.fit.items-center
-          span.text-bold.text-green Workspace
+          span.text-bold.text-green Workspace {{ $store.state.workspace.revision }}
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center

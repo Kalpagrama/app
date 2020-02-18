@@ -27,10 +27,8 @@
         q-btn(dense :flat="mode !== 'list'" color="green" no-caps @click="mode = 'list'").q-px-sm.q-mx-sm List
         q-btn(dense :flat="mode !== 'gallery'" color="green" no-caps @click="mode = 'gallery'").q-px-sm Gallery
         q-btn(dense :flat="mode !== 'feed'" color="green" no-caps @click="mode = 'feed'").q-px-sm.q-mx-sm Feed
-    //- div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
-    //-   q-btn(round flat color="green" icon="refresh" :loading="contentsLoading" @click="contentsReload()")
   .col.full-width.scroll
-    .row.full-with.items-start.content-start.q-px-sm
+    div(:style=`{paddingBottom: '80px'}`).row.full-with.items-start.content-start.q-px-sm
       kalpa-loader(type="wsContents" :variables=`{}`)
         template(v-slot:items=`{items}`)
           ws-content(
@@ -74,9 +72,6 @@ export default {
       this.$log('contentLoad done', content)
       return content
     },
-    async contentsFindStart () {
-      this.$log('contentsFindStart')
-    },
     async contentsLoad () {
       this.$log('contentsLoad start')
       this.contentsLoading = true
@@ -93,15 +88,20 @@ export default {
     },
     async contentFound (content) {
       this.$log('contentFound', content)
-      // try to find item in ws by name CONTENT- + content.oid
-      let item = await this.$store.dispatch('workspace/get', {name: 'CONTENT-' + content.oid})
+      // try to find item in ws by name
+      let name = 'CONTENT-' + content.oid
+      let item = await this.$store.dispatch('workspace/get', {name})
       this.$log('nodeFind', item)
-      // if no item create node content container
-      if (!item) {
-        // create node
-        this.$log('CREATE WS NODE')
+      // if item use it, emit it
+      if (item) {
+        this.$log('*** USE node-content')
+        this.$emit('item', JSON.parse(JSON.stringify(item)))
+      }
+      // if no item, create node-content container, then emit it
+      else {
+        this.$log('*** CREATE node-content')
         let node = {
-          name: 'CONTENT-' + content.oid,
+          name,
           layout: 'PIP',
           category: 'FUN',
           spheres: [],
@@ -115,17 +115,11 @@ export default {
         let res = await this.$store.dispatch('workspace/wsNodeSave', node)
         this.$log('res', res)
         this.$emit('item', JSON.parse(JSON.stringify(res)))
-        // await this.$wait(300)
-        // this.contentsReload()
-      } else {
-        this.$log('USE WS NODE')
-        // using node...
       }
     }
   },
-  async mounted () {
-    // this.$log('mounted')
-    // await this.contentsLoad()
+  mounted () {
+    this.$log('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

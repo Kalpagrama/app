@@ -46,7 +46,8 @@ div(
       //- user name, max 50?
       div(v-if="!mini").col.full-height
         .row.fit.items-center
-          span.text-bold.text-white.cursor-pointer {{ $t($store.getters.currentUser.name) | cut(50) }}
+          //- span.text-bold.text-white.cursor-pointer {{ $t($store.getters.currentUser.name) | cut(50) }}
+          span.text-bold.text-white.cursor-pointer Account
     //- pages
     .col.full-width.scroll
       .row.full-width.items-start.content-start
@@ -60,7 +61,7 @@ div(
           //- page info, name
           div(v-if="!mini").col.full-height
             .row.fit.items-center
-              span.text-white {{ $t(p.name) }}
+              span.text-white {{ p.name }}
         //- fullscreen
         div(:style=`{}`).row.full-width.justify-start
           div(
@@ -78,6 +79,10 @@ div(
         div(:style=`{}`).row.full-width.justify-start
           div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round flat icon="bug_report" :color="$store.state.ui.debug ? 'green' : 'white'" @click="$store.commit('ui/stateSet', ['debug', !$store.state.ui.debug])")
+        //- logout
+        div(:style=`{}`).row.full-width.justify-start
+          div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+            q-btn(round flat icon="power_off" color="white" :loading="cacheClearing" @click="logout()")
       //- invite
       //- div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       //-   q-btn(

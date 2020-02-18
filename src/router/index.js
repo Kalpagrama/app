@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import routes from './routes'
 const debug = require('debug')('[router]:index')
-// debug.enabled = true
+debug.enabled = true
 Vue.use(VueRouter)
 
 export default function (/* { store, ssrContext } */) {
@@ -11,10 +11,10 @@ export default function (/* { store, ssrContext } */) {
       // debug('sb', to, from)
       // debug('scrollBehavior', to, from)
       if (savedPosition) {
-        debug('savedPosition', savedPosition)
+        debug('### savedPosition', savedPosition)
         return savedPosition
       } else {
-        debug('no savedPosition!')
+        debug('### no savedPosition!')
         return {x: 0, y: 0}
       }
     },

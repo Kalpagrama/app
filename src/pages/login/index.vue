@@ -6,11 +6,12 @@
 
 <script>
 import email from './email'
+
 export default {
   name: 'pageLogin__index',
   components: {email},
   mounted () {
-    this.$logD('mounted')
+    this.$log('mounted')
     //  localStorage.removeItem('ktoken')
     localStorage.removeItem('ktokenExpires')
     localStorage.removeItem('ktokenInviteCode')
@@ -18,7 +19,7 @@ export default {
     if (inviteCode) localStorage.setItem('ktokenInviteCode', inviteCode)
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    this.$log('beforeDestroy')
   },
 }
 </script>

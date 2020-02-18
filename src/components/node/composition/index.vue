@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
+div(:style=`{position: 'relative'}` :class=`{'full-height': fullHeight && !mini}`).row.full-width.items-start.content-start.bg-black
   //- slots
   div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
     slot(name="left")
@@ -7,16 +7,19 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
     slot(name="right")
   //- debug
   div(
-    v-if="false"
-    :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000}`).row.bg-green
-    //- small.full-width.text-white layerIndex: {{layerIndex}}
+    v-if="$store.state.ui.debug && !mini"
+    :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
+    small.text-white.full-width ctx: {{ ctx }}
+    small.text-white.full-width mode: {{ mode }}
+    small.text-white.full-width layerIndex: {{ layerIndex }}
+    small.text-white.full-width layerIndexPlay: {{ layerIndexPlay }}
     //- small.full-width.text-white layers:
     //- small(v-for="(l,li) in layers" :key="li").full-width.text-white {{ l.figuresAbsolute }}
-    small.full-width.text-white ctx: {{ ctx }}
+    //- small.full-width.text-white ctx: {{ ctx }}
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
   div(
-    v-if="opened"
+    v-if="ctx === 'workspace'"
     :style=`{position: 'absolute', zIndex: 1000, top: 0, height: '60px'}`
     ).row.full-width.items-center.q-pa-md.cursor-pointer
     .col.full-height
@@ -35,14 +38,15 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
   //- preview
   img(
     v-if="thumbUrl" ref="compositionPreview" :src="thumbUrl" crossOrigin="anonymous" draggable="false" @load="previewLoad" @error="previewError"
-    :style=`{width: '100%', maxHeight: $q.screen.height/2+'px', objectFit: 'contain'}`)
+    :class=`{'full-height': fullHeight}`
+    :style=`{width: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
   player-video(
-    v-if="composition && content && content.type === 'VIDEO'"
+    v-if="visible && composition && content && content.type === 'VIDEO'"
     ref="player"
     :url="contentUrl" :source="contentSource" :ctx="ctx" :fullHeight="fullHeight"
-    :start="layerStart" :end="layerEnd" :visible="visible" :mini="mini"
-    :style=`thumbUrl ? {maxHeight: $q.screen.height*0.8+'px', position: 'absolute', zIndex: 100} : null`
+    :start="layerStart" :end="layerEnd" :mini="mini" :active="active" :visible="visible"
+    :style=`thumbUrl ? {maxHeight: $q.screen.height+'px', position: 'absolute', zIndex: 100} : null`
     @player="$emit('player', $event)" @ended="layerEnded")
     //- :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`
     //- TODO: props is options on one object...
@@ -58,7 +62,7 @@ import playerImage from './player_image'
 export default {
   name: 'composition',
   components: {playerVideo, playerImage},
-  props: ['ctx', 'composition', 'layerIndexPlay', 'visible', 'active', 'mini', 'thumbUrl', 'extending', 'fullHeight'],
+  props: ['ctx', 'composition', 'layerIndexPlay', 'visible', 'active', 'mini', 'thumbUrl', 'extending', 'fullHeight', 'mode'],
   data () {
     return {
       layerIndex: 0,
@@ -71,21 +75,18 @@ export default {
     layer () {
       return this.layers[this.layerIndex]
     },
-    layerFiguresRelative () {
-      return this.layer.figuresRelative
-    },
     layerStart () {
-      if (this.ctx === 'workspace') {
-        return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
-      } else {
-        return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
+      if (this.mode === 'watch') return false
+      else {
+        if (this.ctx === 'workspace') return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
+        else return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
       }
     },
     layerEnd () {
-      if (this.ctx === 'workspace') {
-        return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
-      } else {
-        return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
+      if (this.mode === 'watch') return false
+      else {
+        if (this.ctx === 'workspace') return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
+        else return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
       }
     },
     layers () {
@@ -93,8 +94,12 @@ export default {
       else return []
     },
     content () {
-      if (this.composition) return this.composition.layers[this.layerIndex].content
-      else return null
+      if (this.layerIndex >= 0) {
+        if (this.composition) return this.composition.layers[this.layerIndex].content
+        else return null
+      } else {
+        return null
+      }
     },
     contentUrl () {
       if (this.content) {
@@ -113,12 +118,28 @@ export default {
     }
   },
   watch: {
+    layerIndexPlay: {
+      immediate: true,
+      handler (to, from) {
+        // this.$log('layerIndexPlay')
+        if (to >= 0) {
+          this.layerIndex = to
+        }
+      }
+    },
     mini: {
       immediate: true,
       handler (to, from) {
         // this.$log('mini CHANGED', to)
         if (to) this.pause()
         else this.play()
+      }
+    },
+    active: {
+      handler (to, from) {
+        this.$log('active CHANGED')
+        if (to) this.play()
+        else this.pause()
       }
     }
   },
@@ -155,10 +176,12 @@ export default {
       this.$log('*** layerEnded')
       this.$log('NOW => ', this.layerIndex)
       if (this.mini) return
-      if (this.layerIndexPlay) {
+      if (this.layerIndexPlay >= 0) {
+        this.$log('LAYER PLAY')
         this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
         this.layerIndex = this.layerIndexPlay
       } else {
+        this.$log('LAYER DEFAULT')
         // move to the next layer, this composition player
         let layerTo = this.layerIndex + 1
         if (this.layers[layerTo]) {
@@ -169,14 +192,15 @@ export default {
         }
         else {
           this.$log('LAST => 0')
-          this.$set(this, 'layerIndex', 0)
-          // this.layerIndex = 0
+          // TODO depend on mode, play first one or play next composition
+          this.$emit('ended')
+          // this.$set(this, 'layerIndex', 0)
         }
       }
     }
   },
   created () {
-    this.layerEnded = debounce(this.layerEnded, 300)
+    // this.layerEnded = debounce(this.layerEnded, 300)
   },
   mounted () {
     // this.$log('mounted')
