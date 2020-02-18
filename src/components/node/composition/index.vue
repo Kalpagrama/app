@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
+div(:style=`{position: 'relative'}` :class=`{'full-height': fullHeight && !mini}`).row.full-width.items-start.content-start.bg-black
   //- slots
   div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
     slot(name="left")
@@ -38,14 +38,15 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
   //- preview
   img(
     v-if="thumbUrl" ref="compositionPreview" :src="thumbUrl" crossOrigin="anonymous" draggable="false" @load="previewLoad" @error="previewError"
-    :style=`{width: '100%', maxHeight: $q.screen.height/2+'px', objectFit: 'contain'}`)
+    :class=`{'full-height': fullHeight}`
+    :style=`{width: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
   player-video(
-    v-if="composition && content && content.type === 'VIDEO'"
+    v-if="visible && composition && content && content.type === 'VIDEO'"
     ref="player"
     :url="contentUrl" :source="contentSource" :ctx="ctx" :fullHeight="fullHeight"
-    :start="layerStart" :end="layerEnd" :visible="visible" :mini="mini"
-    :style=`thumbUrl ? {maxHeight: $q.screen.height*0.8+'px', position: 'absolute', zIndex: 100} : null`
+    :start="layerStart" :end="layerEnd" :mini="mini" :active="active" :visible="visible"
+    :style=`thumbUrl ? {maxHeight: $q.screen.height+'px', position: 'absolute', zIndex: 100} : null`
     @player="$emit('player', $event)" @ended="layerEnded")
     //- :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`
     //- TODO: props is options on one object...
@@ -133,6 +134,13 @@ export default {
         if (to) this.pause()
         else this.play()
       }
+    },
+    active: {
+      handler (to, from) {
+        this.$log('active CHANGED')
+        if (to) this.play()
+        else this.pause()
+      }
     }
   },
   methods: {
@@ -184,13 +192,15 @@ export default {
         }
         else {
           this.$log('LAST => 0')
-          this.$set(this, 'layerIndex', 0)
+          // TODO depend on mode, play first one or play next composition
+          this.$emit('ended')
+          // this.$set(this, 'layerIndex', 0)
         }
       }
     }
   },
   created () {
-    this.layerEnded = debounce(this.layerEnded, 300)
+    // this.layerEnded = debounce(this.layerEnded, 300)
   },
   mounted () {
     // this.$log('mounted')

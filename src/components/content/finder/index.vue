@@ -110,7 +110,7 @@ export default {
       } catch (e) {
         this.$log('contentGetByUrl error', e)
         // TODO count tries...
-        this.contentGetByUrl(url)
+        // this.contentGetByUrl(url)
       }
     },
     async contentGetByFile (file) {

@@ -62,7 +62,7 @@
           div(
             :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-start.content-start.bg-grey-9
-            composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :visible="compositionVisible[0]" ctx="workspace")
+            composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :active="true" :visible="compositionVisible[0]" ctx="workspace")
             //- composition actions
             div(
               v-if="!node.compositions[0]"
@@ -83,7 +83,7 @@
           div(
             :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
-            composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :visible="compositionVisible[1]" ctx="workspace")
+            composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :active="active" :visible="compositionVisible[1]" ctx="workspace")
             //- composition actions
             div(
               v-if="!node.compositions[1]"
@@ -98,7 +98,7 @@
           div(
             v-if="$store.state.ui.debug"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
-            //- small.full-width.text-white revision: {{ node.revision }}
+            small.full-width.text-white revision: {{ node.revision }}
             small.full-width.text-white oid: {{ node.oid }}
         div(:style=`{height: '400px'}`).row.full-width
           //- span hello
@@ -137,6 +137,7 @@ export default {
       nodeDeleting: false,
       nodeDeletingError: null,
       node: null,
+      nodeRes: null,
       nodeNew: {
         name: '',
         revision: 1,
@@ -187,6 +188,16 @@ export default {
           } else {
             this.nodeSave(to)
           }
+        }
+      }
+    },
+    nodeRes: {
+      deep: true,
+      handler (to, from) {
+        this.$log('nodeRes CHANGED', to)
+        if (to) {
+          this.nodeSavePause = true
+          this.node = JSON.parse(JSON.stringify(to))
         }
       }
     }
@@ -252,8 +263,9 @@ export default {
         this.nodeSaving = true
         let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node || this.node)))
         this.$log('res', res)
-        this.nodeSavePause = true
-        this.node = JSON.parse(JSON.stringify(res))
+        if (!this.nodeRes) this.nodeRes = res
+        // this.nodeSavePause = true
+        // this.node = JSON.parse(JSON.stringify(res))
         this.$log('nodeSave done')
         this.nodeSaving = false
         this.nodeSavingError = null

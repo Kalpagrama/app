@@ -4,7 +4,7 @@
     //- actions
     q-btn(
       round push size="lg" color="green" icon="add" @click="$emit('add')"
-      :style=`{position: 'absolute', right: '16px', bottom: '16px'}`)
+      :style=`{position: 'absolute', zIndex:1000, right: '16px', bottom: '16px'}`)
     //- header with filters...
     .row.full-width.q-px-sm
       .col.full-height
@@ -19,9 +19,9 @@
         ).row.full-width.items-center.content-center.bg-green.q-pa-sm.q-my-sm
         small.text-white.full-width oid: {{ oid }}
     //- body
-    //- TODO add scroll area from quasar...
-    .col.full-width.scroll
-      .row.full-width.items-start.content-start.q-px-sm
+    //- TODO add scroll area from quasar... width initial scroll height
+    div(ref="wsNodesWrapper").col.full-width.scroll
+      div(:style=`{paddingTop: '0px', paddingBottom: '80px'}`).row.full-width.items-start.content-start.q-px-sm
         kalpa-loader(type="wsNodes" :variables=`{}`)
           template(v-slot:items=`{items}`)
             ws-node(
@@ -49,6 +49,7 @@ export default {
   },
   async mounted () {
     // this.$log('mounted')
+    // this.$refs.wsNodesWrapper.scrollTop = 80
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

@@ -216,10 +216,10 @@ export const wsItems = async (context, { wsItemsType, pagination, filter, force 
       filter.nameRegExp = '^NOTE-.{11}=$'
       break
     case 'SPHERES':
-      filter.nameRegExp = '^SPHERES-.{11}$'
+      filter.nameRegExp = '^SPHERES-.{11}=$'
       break
     case 'NODES':
-      filter.nameRegExp = '^(?!^CONTENT-.{11}=$|^COMPOSITION-.{11}=$|^NOTE-.{11}=$|^SPHERES-.{11}$)'
+      filter.nameRegExp = '^(?!^CONTENT-.{11}=$|^COMPOSITION-.{11}=$|^NOTE-.{11}=$|^SPHERES-.{11}=$)'
       break
     case 'ALL':
       break

@@ -133,16 +133,27 @@ export default {
         if (to) this.framesWidthUpdate()
       }
     },
+    layerIndex: {
+      immediate: true,
+      handler (to, from) {
+        if (to === from) return
+        this.$log('layerIndex CHANGED')
+        this.framesWidthUpdate()
+        this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
+        this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+      }
+    },
     layer: {
       deep: true,
       immediate: false,
       handler (to, from) {
-        this.$log('layer CHANGED', to)
         if (to) {
-          this.framesWidthUpdate()
-          // TODO: wrong initial position of tween
-          this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
-          this.player.setCurrentTime(to.figuresAbsolute[0].t)
+          if (from && to === from) return
+          if (this.panning || this.panningFrames) return
+          this.$log('layer CHANGED', to)
+          // this.framesWidthUpdate()
+          // this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
+          // this.player.setCurrentTime(to.figuresAbsolute[0].t)
         }
       }
     }
@@ -181,8 +192,14 @@ export default {
         // this.layer.figuresAbsolute[0].t = to
         this.$set(this.layer.figuresAbsolute[0], 't', to)
       }
-      if (e.isFirst) this.panning = true
-      if (e.isFinal) this.panning = false
+      if (e.isFirst) {
+        this.panning = true
+        this.player.editing = true
+      }
+      if (e.isFinal) {
+        this.panning = false
+        this.player.editing = false
+      }
     },
     panEnd (e) {
       // this.$log('panEnd', e)
@@ -192,10 +209,16 @@ export default {
         // this.layer.figuresAbsolute[1].t = to
         this.$set(this.layer.figuresAbsolute[1], 't', to)
       }
-      if (e.isFirst) this.panning = true
+      if (e.isFirst) {
+        this.panning = true
+        this.player.editing = true
+        this.player.pause()
+      }
       if (e.isFinal) {
         this.panning = false
+        this.player.editing = false
         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+        this.player.play()
       }
     },
     onResize (e) {

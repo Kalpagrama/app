@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-grey-7
+q-layout(view="hHh lpR fFf").bg-grey-8
   q-page-conainter.row.full-width.justify-center.items-start.content-start
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)

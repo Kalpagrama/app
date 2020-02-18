@@ -5,6 +5,7 @@
       .col.full-width
         composition(
           v-if="composition" :composition="composition" :mini="false" @player="player = $event" :ctx="ctx"
+          :fullHeight="true" :visible="true" :active="true"
           :layerIndexPlay="layerIndex" :mode="mode").full-height
           template(v-slot:right)
             q-btn(

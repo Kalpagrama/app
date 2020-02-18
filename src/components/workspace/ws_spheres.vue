@@ -2,13 +2,15 @@
 .row.fit
   .column.fit
     //- header
-    div(:style=`{height: '80px'}`).row.full-width.items-center.content-center.q-px-md
-      div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white
-        q-input(v-model="sphere" color="green" placeholder="Type a new sphere" @keyup.enter="sphereAdd"
-          :input-style=`{paddingLeft: '10px'}`).full-width
+    div(:style=`{height: '80px'}`).row.full-width.items-center.content-center.q-px-sm
+      div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white
+        input(
+          v-model="sphere" color="black" placeholder="Type a new sphere" @keyup.enter="sphereAdd"
+          :style=`{height: '56px'}`
+          ).full-width
     //- body
     .col.full-width.scroll
-      div(v-if="node").row.full-width.items-start.content-start.q-pa-md
+      div(v-if="node").row.full-width.items-start.content-start.q-px-sm
         div(
           v-for="(s,si) in node.spheres" :key="si" @click="sphereClick(s,si)"
           :class=`{'bg-grey-8': s.oid !== oid, 'bg-white': s.oid === oid}`

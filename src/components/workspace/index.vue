@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf")
+q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
   //- wsPage dialog for mobile
   q-dialog(v-model="pageDialogOpened" :maximized="true")
     div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
@@ -7,7 +7,7 @@ q-layout(view="hHh lpR fFf")
         round flat color="green" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
         :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: '16px', background: 'rgba(0,0,0,0.2)'}`)
       ws-page(:value="item")
-  q-page-container.row.full-width.window-height.bg-black
+  q-page-container.row.fit.full-width.bg-black
     ws-menu(
       ctx="workspace"
       :oid="node ? node.oid : false" :page="$route.params.page"

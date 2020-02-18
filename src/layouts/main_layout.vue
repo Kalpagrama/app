@@ -21,11 +21,11 @@ q-layout( view="hHh Lpr lff")
   //-   ).row.fit
   q-drawer(
     v-model="drawerShow"
-    show-if-above mini-to-overlay
+    show-if-above mini-to-overlay no-swipe-open no-swipe-close
     @mouseover="drawerMini = false" @mouseout="drawerMini = true"
-    :mini="drawerMini" :width="260" :breakpoint="500"
+    :mini="drawerMini" :width="$q.screen.width/2 < 260 ? $q.screen.width/2 : 260" :breakpoint="500"
     content-class="bg-grey-8")
-    kalpa-menu-desktop(v-if="!loading" :mini="drawerMini")
+    kalpa-menu-desktop(v-if="!loading" :mini="$q.screen.xs ? false : drawerMini")
   q-btn(
     round flat color="white" icon="menu" @click="drawerShow = !drawerShow"
     :style=`{position: 'fixed', left: '16px', bottom: '16px', zIndex: 10000, background: 'rgba(0,0,0,0.2)'}`).xs
@@ -94,12 +94,12 @@ export default {
     if (token) {
       localStorage.setItem('ktoken', token)
       localStorage.setItem('ktokenExpires', expires)
-      await this.$router.push('/')
+      await this.$router.push('/').catch(e => e)
     }
     if (!await this.$store.dispatch('init')) {
       this.$log('GO LOGIN')
-      await this.$router.push('/login')
-      return
+      await this.$router.push('/login').catch(e => e)
+      // return
     }
     this.loading = false
     // if (this.$store.getters.currentUser.profile.tutorial) {

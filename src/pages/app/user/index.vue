@@ -39,42 +39,46 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   //-           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
   //-           q-btn(v-else round flat @click="save()" color="white" icon="done")
   q-header(reveal)
-    div(v-if="user" :style=`{paddingLeft: '60px'}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
-      div().row.full-width.q-pa-md
+    div(v-if="user" :style=`{paddingLeft: '0px'}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
+      div().row.full-width.q-pa-xs
         //- <input type="file" @change="previewFiles" multiple>
         .row.full-width
           img(:src="user.profile.thumbUrl" @click="changePhoto()"
-            :style=`{width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
-          div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
-            q-btn(
-              rounded no-caps
-              @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
-              :label="include ? $t('Unfollow') : $t('Follow')"
-              :color="include ? 'red' : 'accent'"
-              style=`height: 40px`
-              ).q-px-md
-        .row.full-width.items-center.justify-start
-          .row.full-width
-            span.text-bold.text-h6.text-white {{ user.name }}
-          div(v-if="!editions").row.full-width
-            .row.full-width
-              span.text-grey-4 {{status}}
-            .row.full-width.q-mb-sm
-              span.text-grey {{about}}
-          div(v-if="editions").row.full-width
-            input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
-            input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
-            //- .row.full-width.q-mt-xs
-            //-   small About
-          div(v-if="false" @click="showInfo()").row.full-width
-            span.text-accent Show detailed information
-            //- span {{ user.subscriptions }}
+            :style=`{width: '50px', height: '50px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-7
+          .col
+            .row.fit.items-center.content-center.q-px-md
+              span.text-bold.text-white {{ user.name }}
+          //- TODO follow user
+          //- div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
+          //-   q-btn(
+          //-     rounded no-caps
+          //-     @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
+          //-     :label="include ? $t('Unfollow') : $t('Follow')"
+          //-     :color="include ? 'red' : 'accent'"
+          //-     style=`height: 40px`
+          //-     ).q-px-md
+        //- .row.full-width.items-center.justify-start
+        //-   .row.full-width
+        //-     span.text-bold.text-white {{ user.name }}
+        //-   div(v-if="!editions").row.full-width
+        //-     .row.full-width
+        //-       span.text-grey-4 {{status}}
+        //-     .row.full-width.q-mb-sm
+        //-       span.text-grey {{about}}
+        //-   div(v-if="editions").row.full-width
+        //-     input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
+        //-     input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
+        //-     //- .row.full-width.q-mt-xs
+        //-     //-   small About
+        //-   div(v-if="false" @click="showInfo()").row.full-width
+        //-     span.text-accent Show detailed information
+        //-     //- span {{ user.subscriptions }}
         .row.full-width.content-end.justify-start.text-white.q-mt-md.q-mb-sm
           span(
             v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
             :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'white'}`
             :class="{'bg-green' : pageId  === p}"
-            ).text-bold.q-pa-sm.q-mr-md.cursor-pointer {{ p }}
+            ).q-pa-sm.q-mr-xs.cursor-pointer {{ p }}
   q-page-container.row.full-width.justify-center
     div(:style=`{maxWidth: 600+'px'}`).row.full-width.q-pt-md
       user-created-nodes(

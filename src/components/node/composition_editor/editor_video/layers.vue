@@ -10,7 +10,7 @@
     .col.full-height
       .row.fit.items-center.content-center.q-px-sm
         //- TODO change meta information of the content: layers, nodes, users, spheres, etc...
-        q-btn(flat no-caps color="green" icon-right="keyboard_arrow_down"
+        q-btn(flat no-caps color="green" icon-right="keyboard_arrow_down" @click="layerClick(null, -1)"
           :style=`{borderRadius: '10px'}`)
           span.text-bold.text-green Layers
         //- q-icon(name="keyboard_arrow_down" color="green" size="19px").q-mt-xs.q-ml-sm

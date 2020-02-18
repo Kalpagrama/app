@@ -16,15 +16,20 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   //-   :style=`{position: 'fixed', top: '16px', right: '16px', zIndex: 2000}`)
   //- composition finder
   q-dialog(v-model="compositionFinderOpened" :maximized="true" position="bottom")
-    div(@click.self="compositionFinderOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
+    div(@click.self="compositionFinderOpened = false" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-start.content-start.justify-center.q-px-xs.q-pb-xs
+      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
+        q-btn(
+        round flat color="green" icon="keyboard_arrow_left" @click="compositionFinderOpened = false"
+        :style=`{}`)
+        .col.full-height
       composition-finder(
         @layer="layerFound"
-        :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
+        :style=`{maxWidth: '600px', maxHeight: 'calc(100% - 60px)', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
   //- header
   div(
     v-if="true"
-    :style=`{height: '60px'}`).row.full-width.justify-center
-    div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-center.content-center
+    :style=`{height: '60px'}`).row.full-width.justify-center.q-pa-xs
+    div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-center.content-center.q-px-md
       q-btn(
         v-if="$route.name !== 'node'"
         round flat color="green" icon="keyboard_arrow_left" @click="$router.back()"
@@ -35,7 +40,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         round flat color="green" icon="link" @click="$router.push('/node/' + nodeRubick.oid)"
         :style=`{}`)
   //- composition ONE query
-  .row.full-width.justify-center.items-center.content-start.q-px-sm
+  div(v-if="false").row.full-width.justify-center.items-center.content-start.q-px-sm
     div(:style=`{position: 'relative', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
       div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
         div(
@@ -46,7 +51,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             :src="n.meta.compositions[0].oid === nodeRubick.meta.compositions[0].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
             :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
   //- node wrapper
-  div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-sm
+  div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-xs
     div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
       div(
         v-if="votePanning"
@@ -70,24 +75,25 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :ctx="ctx" :index="needSwap ? 1 : 0"
           :thumbUrl="nodeRubick.meta.compositions[needSwap ? 1 : 0].thumbUrl"
           :composition="nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 1 : 0] : null"
-          :mini="false" :visible="visible"
+          :mini="false" :visible="visible" :active="true"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         q-btn(
-          round push color="green" icon="add" @click="extendComposition(0)"
-          :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+          round flat color="green" icon="add" @click="extendComposition(0)"
+          :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- name, essence
       .row.full-width.justify-center.items-center.content-center
         div(
           v-if="nodeRubick"
           ref="nodeName" @click="nodeNameClick()"
           :style=`{position: 'relative', maxWidth: 600+'px', minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
-          ).row.full-width.items-center.justify-center.cursor-pointer.q-my-md.bg-grey-2
+          ).row.full-width.items-center.justify-center.cursor-pointer.q-my-xs.bg-grey-2
           span.text-bold.text-center.cursor-pointer {{ nodeRubick.name }}
           //- actions
           q-btn(
-            round push color="green" icon="add" @click="extendEssence()"
-            :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+            v-if="false"
+            round flat color="green" icon="add" @click="extendEssence()"
+            :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px', background: 'rgba(0,0,0,0.2)'}`)
       //- composition TWO
       div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
         composition(
@@ -97,14 +103,14 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :thumbUrl="nodeRubick.meta.compositions[needSwap ? 0 : 1].thumbUrl"
           @previewWidth="previewWidth = $event"
           :composition="nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 0 : 1] : null"
-          :mini="false" :visible="visible"
+          :mini="false" :visible="visible" :active="true"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         q-btn(
-          round push color="green" icon="add" @click="extendComposition(1)"
-          :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px'}`)
+          round flat color="green" icon="add" @click="extendComposition(1)"
+          :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
   //- composition TWO query
-  .row.full-width.justify-center.items-start.content-start.q-px-sm
+  div(v-if="false").row.full-width.justify-center.items-start.content-start.q-px-sm
     div(:style=`{position: 'relatvie', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
       div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
         div(
@@ -116,7 +122,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
   //- actions wrapper
   //- TODO move to actions component...
-  .row.full-width.justify-center.items-start.content-start.q-px-sm
+  .row.full-width.justify-center.items-start.content-start.q-px-xs.q-my-xs
     div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
       div(
         v-if="nodeRubickFull"
@@ -181,7 +187,7 @@ export default {
       nodeRubick: null,
       nodeRubickFull: null,
       needSwap: false,
-      maxWidth: 600
+      maxWidth: 500
     }
   },
   computed: {

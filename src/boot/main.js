@@ -88,6 +88,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('node', () => import('components/node'))
     // Vue.component('nodeLoader', () => import('components/node_loader'))
     Vue.component('nodeList', () => import('components/node_list'))
+    Vue.component('nodeListByte', () => import('components/node/list_byte'))
     // Vue.component('nodeDialog', () => import('components/k_node_dialog'))
     // dialogs
     // Vue.component('kDialogMini', () => import('components/k_dialog_mini'))

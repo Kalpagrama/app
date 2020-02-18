@@ -28,7 +28,7 @@
         q-btn(dense :flat="mode !== 'gallery'" color="green" no-caps @click="mode = 'gallery'").q-px-sm Gallery
         q-btn(dense :flat="mode !== 'feed'" color="green" no-caps @click="mode = 'feed'").q-px-sm.q-mx-sm Feed
   .col.full-width.scroll
-    .row.full-with.items-start.content-start.q-px-sm
+    div(:style=`{paddingBottom: '80px'}`).row.full-with.items-start.content-start.q-px-sm
       kalpa-loader(type="wsContents" :variables=`{}`)
         template(v-slot:items=`{items}`)
           ws-content(

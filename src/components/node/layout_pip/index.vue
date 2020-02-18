@@ -1,8 +1,15 @@
 <template lang="pug">
-div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
+div(:style=`{position: 'relative', borderRadius: '10px'}`).row.full-width.items-start.content-start
   //- action dialogs
   //- q-dialog(v-model="compositionFinderOpened").bg-black
   //-   composition-finder(@layer="layerFound").bg-black
+  //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.bg-white.q-px-md
+  //-   small.text-bold active: {{active}}
+  //-   small.full-width visible: {{visible}}
+  //-   .col
+  //-   div(:style=`{width: '35px', height: '35px', borderRadius: '50%'}`).bg-grey-4
+  transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(v-if="!active" :style=`{position: 'absolute', zIndex: 300, opacity: 0.4, borderRadius: '10px'}`).row.fit.bg-grey-10
   //- fragments wrapper
   div(
     :style=`{
@@ -15,6 +22,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       :ctx="ctx" :index="0"
       :thumbUrl="node.meta.compositions[0].thumbUrl"
       @previewWidth="$event => fragmentWidth(0, $event)" @previewHeight="$event => fragmentHeight(0, $event)"
+      @ended="compositionFirstEnded"
       :composition="nodeFull ? nodeFull.compositions[0] : null"
       :mini="fragmentMini === 0" @mini="fragmentChange(0)" :visible="visible"
       :style=`{
@@ -27,6 +35,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
       ref="fragmentSecond"
       :ctx="ctx" :index="1" :thumbUrl="node.meta.compositions[1].thumbUrl" :fullHeight="true"
       @previewWidth="$event => fragmentWidth(1, $event)" @previewHeight="$event => fragmentHeight(1, $event)"
+      @ended="compositionSecondEnded"
       :composition="nodeFull ? nodeFull.compositions[1] : null"
       :mini="fragmentMini === 1" @mini="fragmentChange(1)" :visible="visible"
       :style=`{
@@ -47,7 +56,7 @@ div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start
 <script>
 export default {
   name: 'nodeLayoutPip',
-  props: ['ctx', 'index', 'opened', 'node', 'nodeFull', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'nodeLoad'],
+  props: ['ctx', 'index', 'opened', 'node', 'nodeFull', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'active', 'nodeLoad'],
   components: {},
   data () {
     return {
@@ -55,22 +64,28 @@ export default {
       previewWidth: 0,
       fragmentMini: 1,
       fragmentMiniStart: 1,
-      stylesMini: {right: 20, bottom: 40, maxWidth: 20, maxHeight: 20},
-      stylesMaxi: {right: 0, bottom: 0, maxWidth: 100, maxHeight: 100},
-      styles: [{right: 0, bottom: 0, maxWidth: 100, opacity: 1}, {right: 20, bottom: 40, maxWidth: 20, opacity: 1}],
+      styles: [{right: 0, bottom: 0, maxWidth: 140, opacity: 1}, {right: 10, bottom: 10, maxWidth: 30, opacity: 1}]
     }
   },
   watch: {
-    visible: {
+    active: {
       immediate: false,
       async handler (to, from) {
-        this.$log('visible CHANGED', to)
+        this.$log('active CHANGED', to)
         if (to) this.play()
         else this.pause()
       }
     }
   },
   methods: {
+    compositionFirstEnded () {
+      this.$log('compositionFirstEnded')
+      this.fragmentChange(1)
+    },
+    compositionSecondEnded () {
+      this.$log('compositionSecondEnded')
+      this.fragmentChange(0)
+    },
     async play () {
       if (this.nodeFull) {
         if (this.fragmentMini === 0) await this.$refs.fragmentSecond.play()
@@ -94,7 +109,7 @@ export default {
       if (index === 0) {
         this.previewHeight = height
         // this.$emit('previewHeight', height)
-        if (this.visible) this.play()
+        // if (this.active) this.play()
         // TODO: emit scrollTop event of node in scroll wrapper
         // this.$emit('scrollTop', this.$el.scrollHeight)
       }
@@ -115,8 +130,8 @@ export default {
             this.styles[index === 0 ? 1 : 0].opacity = 0
             this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.1, {
               maxWidth: 5,
-              right: 16,
-              bottom: 32,
+              right: 10,
+              bottom: 10,
               onComplete: () => {
                 this.$tween.to(this.styles[index === 0 ? 1 : 0], 0.1, {
                   maxWidth: 25,
