@@ -10,3 +10,12 @@ div(id="q-app").bg-black
   //-   small(style=`{font-size: 8px}`).text-bold.text-primary {{'offline'}}
   //- h1 hello
 </template>
+
+<script>
+export default {
+  name: 'App',
+  mounted () {
+    this.$log('mounted')
+  }
+}
+</script>
