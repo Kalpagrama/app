@@ -138,7 +138,6 @@ export default {
       nodeDeletingError: null,
       nodeRes: null,
       node: null,
-      nodeRes: null,
       nodeNew: {
         name: '',
         revision: 1,
