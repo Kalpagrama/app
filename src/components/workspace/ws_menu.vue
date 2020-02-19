@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    maxWidth: '100%',
+    maxWidth: ctx === 'workspace' ? width+'px' : '100%',
   }`
   ).row.fit
   //- toggle opened

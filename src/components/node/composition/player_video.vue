@@ -1,28 +1,29 @@
 <template lang="pug">
 div(
   :style=`videoStyles`
-  :class=`{'full-height': fullHeight || ctx === 'workspace'}`).row.full-width.items-center.content-center
+  :class=`{'full-height': fullHeight || ctx === 'workspace'}`).row.full-width.items-center.content-center.bg-black.fit
   div(
     :class=`{'full-height': fullHeight || ctx === 'workspace'}`
-    :style=`{position: 'relative'}`).row.full-width.items-center.content-center
+    :style=`{position: 'relative'}`).row.full-width.items-center.content-center.fit
     //- opacity: videoValid ? 1 : 0
     //- :autoplay="ctx === 'workspace'"
     video(
       ref="kalpaVideo"
-      playsinline loop :muted="muted"
+      playsinline loop :autoplay="ctx === 'workspace'" :muted="muted"
       @loadeddata="videoCanplay"
       @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="$emit('ended')"
       :class=`{'full-height': fullHeight || ctx === 'workspace'}`
-      :style=`{width: '100%', objectFit: 'contain', opacity: now > start ? 1 : 0}`
-      :src="urlRaw" type="video/mp4")
+      :style=`{width: '100%', objectFit: 'contain', opacity: 1}`
+      :src="urlRaw" type="video/mp4").fit
+      //- opacity: now > start ? 1 : 0
       //- source()
     //- debug
     div(
       v-if="false"
       :style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
-      //- span.full-width.text-white player: {{player}}
+      span.full-width.text-white player.playing: {{player.playing}}
       //- small.text-white.full-width styles: {{videoStyles}}
-      small.text-white.full-width url: {{ url }}
+      //- small.text-white.full-width url: {{ url }}
     //- fullscreen
     //- q-btn(
     //-   round flat color="green" @click="videoFullscreenToggle()"
@@ -33,7 +34,7 @@ div(
       v-if="ctx === 'workspace'"
       v-show="!mini"
       :style=`{
-        position: 'absolute', bottom: '16px', left: 0, zIndex: 1000}`
+        position: 'absolute', bottom: '16px', left: 0, zIndex: 2000}`
       ).row.full-width.items-start.content-start
       //- pregress wrapper
       .row.full-width.items-start.content-start.q-px-md
@@ -45,8 +46,8 @@ div(
             :style=`{width: '44px'}`
             ).row.full-height.items-center.content-center.justify-center
             q-btn(
-              round flat color="green" @click="videoClick"
-              :icon="player.playing === true ? 'pause' : 'play_arrow'"
+              round flat color="green" @click="videoPlayPause"
+              :icon="playing === true ? 'pause' : 'play_arrow'"
               :style=`{background: 'rgba(0,0,0,0.3)'}`)
           .col
             .row.fit.items-center.content-center
@@ -83,6 +84,7 @@ export default {
   data () {
     return {
       now: 0,
+      playing: false,
       player: {
         controls: true
       },
@@ -148,9 +150,9 @@ export default {
           else if (to >= this.end) {
             // this.$log('now > end')
             // this.$q.notify('NOW > END')
-            this.player.setCurrentTime(this.start + 0.1)
+            // this.player.setCurrentTime(this.start + 0.1)
             // this.player.play()
-            this.$emit('ended')
+            // this.$emit('ended')
           }
         }
       }
@@ -187,12 +189,17 @@ export default {
     videoPlay () {
       // this.$log('videoPlay')
       this.$set(this.player, 'playing', true)
-      // if (this.player.play) this.player.play()
+      this.playing = true
     },
     videoPause () {
       // this.$log('videoPause')
       this.$set(this.player, 'playing', false)
-      // if (this.player.pause) this.player.pause()
+      this.playing = false
+    },
+    videoPlayPause () {
+      this.$log('videoPlayPause')
+      if (this.player.playing) this.player.pause()
+      else this.player.play()
     },
     videoTimeupdate () {
       // this.$log('videoTimeupdate')

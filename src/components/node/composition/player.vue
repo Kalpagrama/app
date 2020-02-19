@@ -56,9 +56,9 @@ export default {
       height: 0,
       width: 0,
       stylesInitial: [
-        {zIndex: 300, maxWidth: 30, maxHeight: 100, opacity: 0.8},
+        {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.5},
         {zIndex: 200, maxWidth: 100, maxHeight: 100, opacity: 1},
-        {zIndex: 300, maxWidth: 30, maxHeight: 100, opacity: 0.8}
+        {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.5}
       ],
       styles: []
     }
@@ -101,16 +101,16 @@ export default {
         this.indexNexting = index
         let i = index > this.index ? 2 : 0
         this.$log('i', i)
-        // this.$tween.to(
-        //   this.styles[1],
-        //   0.5,
-        //   {
-        //     opacity: 0,
-        //     onComplete: () => {
-        //       this.$set(this.styles, 1, JSON.parse(JSON.stringify(this.stylesInitial[1])))
-        //     }
-        //   }
-        // )
+        this.$tween.to(
+          this.styles[1],
+          0.5,
+          {
+            opacity: 0,
+            onComplete: () => {
+              // this.$set(this.styles, 1, JSON.parse(JSON.stringify(this.stylesInitial[1])))
+            }
+          }
+        )
         this.$tween.to(
           this.styles[i],
           0.5,
@@ -120,14 +120,7 @@ export default {
             maxHeight: this.height,
             opacity: 1,
             onComplete: () => {
-              // if (index > this.index) this.$set(this.styles, 2, JSON.parse(JSON.stringify(this.stylesInitial[2])))
-              // else this.$set(this.styles, 0, JSON.parse(JSON.stringify(this.stylesInitial[0])))
-              // this.$set(this.styles, i, JSON.parse(JSON.stringify(this.stylesInitial[i])))
-              // this.$set(this.styles, 0, JSON.parse(JSON.stringify(this.stylesInitial[0])))
-              // this.$set(this.styles, 1, JSON.parse(JSON.stringify(this.stylesInitial[1])))
-              // this.$set(this.styles, 2, JSON.parse(JSON.stringify(this.stylesInitial[2])))
               this.$set(this, 'styles', JSON.parse(JSON.stringify(this.stylesInitial)))
-              // this.$set(this, 'index', index)
               this.index = index
               this.indexNexting = -1
             }

@@ -11,7 +11,8 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
     ws-menu(
       ctx="workspace"
       :oid="node ? node.oid : false" :page="$route.params.page"
-      @page="$router.push({params: {page: $event}}).catch(e=>e)" @item="itemClick" @add="itemAdd").bg-grey-9
+      @page="$router.push({params: {page: $event}}).catch(e=>e)" @item="itemClick" @add="itemAdd"
+      ).bg-grey-9
     //- wsPage for desktop
     div(v-if="$q.screen.gt.xs").col.full-height.bg-grey-10.gt-xs
       ws-page(:value="item")

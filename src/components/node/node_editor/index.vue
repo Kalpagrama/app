@@ -62,7 +62,7 @@
           div(
             :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-start.content-start.bg-grey-9
-            composition(v-if="node.compositions[0]" :composition="node.compositions[0]" :active="true" :visible="compositionVisible[0]" ctx="workspace")
+            composition(v-if="node.compositions[0]" :value="node.compositions[0]" :active="true" :visible="true" :mini="false" ctx="workspace")
             //- composition actions
             div(
               v-if="!node.compositions[0]"
@@ -83,7 +83,7 @@
           div(
             :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
-            composition(v-if="node.compositions[1]" :composition="node.compositions[1]" :active="active" :visible="compositionVisible[1]" ctx="workspace")
+            composition(v-if="node.compositions[1]" :value="node.compositions[1]" :active="true" :visible="true" :mini="false" ctx="workspace")
             //- composition actions
             div(
               v-if="!node.compositions[1]"
