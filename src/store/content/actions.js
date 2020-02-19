@@ -11,34 +11,33 @@ export const init = async (context) => {
   context.commit('init')
 }
 
-export const uploadContentUrl = async (context, url) => {
-  logD('uploadContentUrl start')
+export const contentCreateFromUrl = async (context, url) => {
+  logD('contentCreateFromUrl start')
   assert.ok(url)
-  let {data: {uploadContentUrl}} = await apollo.clients.upload.mutate({
+  let {data: {contentCreateFromUrl}} = await apollo.clients.upload.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
-      mutation sw_network_only_nc_contentGetByUrl ($url: String!, $onlyMeta: Boolean!) {
-        uploadContentUrl (url: $url, onlyMeta: $onlyMeta) {
+      mutation ($url: String!) {
+        contentCreateFromUrl (url: $url) {
           ...objectFullFragment
         }
       }
     `,
     variables: {
-      url: url,
-      onlyMeta: false
+      url
     }
   })
-  logD('uploadContentUrl complete')
-  return uploadContentUrl
+  logD('contentCreateFromUrl complete', contentCreateFromUrl)
+  return contentCreateFromUrl
 }
-export const uploadContentFile = async (context, file) => {
-  logD('uploadContentFile start')
+export const contentCreateFromFile = async (context, file) => {
+  logD('contentCreateFromFile start')
   assert.ok(file)
-  let {data: {uploadContentFile}} = await apollo.clients.upload.mutate({
+  let {data: {contentCreateFromFile}} = await apollo.clients.upload.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
-      mutation sw_network_only_nc_contentGetByFile ($file: Upload!, $length: Float!) {
-        uploadContentFile(file: $file, length: $length) {
+      mutation ($file: Upload!, $length: Float!) {
+        contentCreateFromFile(file: $file, length: $length) {
           ...objectFullFragment
         }
       }
@@ -48,6 +47,6 @@ export const uploadContentFile = async (context, file) => {
       length: file.size
     }
   })
-  logD('uploadContentFile complete')
-  return uploadContentFile
+  logD('contentCreateFromFile complete')
+  return contentCreateFromFile
 }

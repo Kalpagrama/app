@@ -104,9 +104,9 @@ export default {
     async contentGetByUrl (url) {
       try {
         this.$log('contentGetByUrl start', url)
-        let uploadContentUrl = await this.$store.dispatch('content/uploadContentUrl', url)
+        let contentCreateFromUrl = await this.$store.dispatch('content/contentCreateFromUrl', url)
         this.$log('contentGetByUrl done')
-        return uploadContentUrl
+        return contentCreateFromUrl
       } catch (e) {
         this.$log('contentGetByUrl error', e)
         // TODO count tries...
@@ -115,9 +115,9 @@ export default {
     },
     async contentGetByFile (file) {
       this.$log('contentGetByFile start', file)
-      let uploadContentFile = await this.$store.dispatch('content/uploadContentFile', file)
+      let contentCreateFromFile = await this.$store.dispatch('content/contentCreateFromFile', file)
       this.$log('contentGetByFile done')
-      return uploadContentFile
+      return contentCreateFromFile
     }
   },
   mounted () {
