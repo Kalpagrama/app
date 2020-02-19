@@ -160,6 +160,7 @@ export default {
   methods: {
     nowChanged (now) {
       // this.$log('nowChanged', now)
+      if (this.ctx === 'workspace') return
       if (now > this.layerEnd || now < this.layerStart) {
         this.$refs.player.player.setCurrentTime(this.layerStart)
         // this.$refs.player.player.play()

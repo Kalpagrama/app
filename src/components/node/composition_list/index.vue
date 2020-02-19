@@ -17,7 +17,7 @@ div(
   //- preview
   img(
     ref="compositionListPreview"
-    :src="compositions[1].preview" @load="previewLoad" @error="previewError"
+    :src="compositions[0].preview" @load="previewLoad" @error="previewError"
     :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0}`)
   //- compositions
   div(
@@ -89,7 +89,7 @@ export default {
       return ci === this.indexNexting ? false : ci !== this.index
     },
     previewLoad (e) {
-      this.$log('previewLoad', e)
+      // this.$log('previewLoad', e)
       // this.$q.notify('previewLoad')
       // this.$q.emit('previewLoad')
       // TODO list height? screen/3?, screen.width?, previewClientWidth?

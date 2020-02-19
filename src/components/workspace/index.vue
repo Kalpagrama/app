@@ -15,7 +15,7 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
       ).bg-grey-9
     //- wsPage for desktop
     div(v-if="$q.screen.gt.xs").col.full-height.bg-grey-10.gt-xs
-      ws-page(:value="item")
+      ws-page(:value="item" @node="item = $event")
 </template>
 
 <script>

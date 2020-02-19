@@ -44,6 +44,7 @@ export default {
   },
   data () {
     return {
+      nodeRes: null,
       nodeSavePause: false,
       nodeSaving: false,
       nodeSavingError: null,
@@ -80,15 +81,27 @@ export default {
     },
     node: {
       deep: true,
-      immediate: true,
+      immediate: false,
       handler (to, from) {
         // this.$log('node CHANGED', to)
+        if (to.oid !== from.oid) return
         if (to && this.ctx === 'workspace') {
           if (this.nodeSavePause) {
             this.nodeSavePause = false
           } else {
             this.nodeSave()
           }
+        }
+      }
+    },
+    nodeRes: {
+      deep: true,
+      handler (to, from) {
+        if (to) {
+          // this.$log('nodeRes changed', to)
+          this.nodeSavePause = true
+          // this.node = JSON.parse(JSON.stringify(to))
+          this.$emit('node', JSON.parse(JSON.stringify(to)))
         }
       }
     }
@@ -129,11 +142,11 @@ export default {
       try {
         this.$log('nodeSave start', this.node)
         this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
-        this.$log('res', res)
-        this.$log('nodeSave done')
-        this.nodeSavePause = true
-        this.node = JSON.parse(JSON.stringify(res))
+        this.nodeRes = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
+        // this.$log('res', res)
+        // this.$log('nodeSave done')
+        // this.nodeSavePause = true
+        // this.nodeRes = res
         this.nodeSaving = false
         this.nodeSavingError = null
         // this.nodeSavePause = false

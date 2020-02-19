@@ -3,12 +3,13 @@
   composition-editor(
     v-if="page === 'contents' && value"
     ctx="workspace"
-    :node="value" :compositionIndex="0")
+    :node="value" :compositionIndex="0"
+    @node="$emit('node', $event)")
   node-editor(
     v-if="page === 'nodes'"
     ctx="workspace"
     :value="value"
-    @node="nodeChanged")
+    @node="$emit('node', $event)")
   ws-sphere(
     v-if="page === 'spheres' && value"
     ctx="workspace"

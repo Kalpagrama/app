@@ -111,6 +111,7 @@ export default {
       // TODO: check layers and find one last, or one first one
       let from = start || this.player.now
       let to = end || from + 10 < this.player.duration ? from + 10 : this.player.duration
+      this.$log('from/to', from, to)
       // let to = this.player.duration
       // update first layer without figures, or create a new layer...
       if (this.layers.length === 1 && this.layers[0].figuresAbsolute.length === 0) {
@@ -127,6 +128,7 @@ export default {
             {t: to, points: []}
           ]
         }
+        this.$log('l', l)
         this.$set(this.composition, 'layers', [...this.composition.layers, l])
         this.layerIndex = this.layers.length - 1
       }

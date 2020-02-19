@@ -50,7 +50,7 @@ export default {
     active: {
       immediate: true,
       async handler (to, from) {
-        this.$log('active CHANGED', to)
+        // this.$log('active CHANGED', to)
         if (to) this.play()
         else this.pause()
       }
@@ -61,11 +61,11 @@ export default {
       openURL(url)
     },
     play () {
-      this.$log('play')
+      // this.$log('play')
       if (this.$refs.compositionList) this.$refs.compositionList.play()
     },
     pause () {
-      this.$log('pause')
+      // this.$log('pause')
       if (this.$refs.compositionList) this.$refs.compositionList.pause()
     },
     async nodeNameClick () {
