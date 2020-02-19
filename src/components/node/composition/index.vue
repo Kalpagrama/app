@@ -46,14 +46,14 @@ div(
       width: '100%', height: mini ? 'auto' : '100%',
       maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
+  //- TODO different players
   player-video(
     v-if="visible && content && content.type === 'VIDEO'"
     ref="player"
     :url="contentUrl" :source="content.contentSource" :ctx="ctx" :fullHeight="fullHeight"
     :start="layerStart" :end="layerEnd" :mini="mini" :active="active" :visible="visible"
     :style=`preview ? {maxHeight: $q.screen.height+'px', position: 'absolute', zIndex: 100} : null`
-    @player="$emit('player', $event)" @ended="layerEnded").fit
-    //- :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`
+    @player="$emit('player', $event)" @ended="layerEnded")
     //- TODO: props is options on one object...
     template(v-slot:layerEditor=`{player, now, progressHeight}`)
       slot(name="layerEditor" :player="player" :now="now" :progressHeight="progressHeight")

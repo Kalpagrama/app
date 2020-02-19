@@ -7,13 +7,6 @@
 
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
-  //- actions
-  //- q-btn(
-  //-   round flat color="green" icon="keyboard_arrow_left" @click="$router.back()"
-  //-   :style=`{position: 'fixed', right: '16px', bottom: '16px', zIndex: 2000, background: 'rgba(0,0,0,0.2)'}`)
-  //- q-btn(
-  //-   round flat color="green" icon="link"
-  //-   :style=`{position: 'fixed', top: '16px', right: '16px', zIndex: 2000}`)
   //- composition finder
   q-dialog(v-model="compositionFinderOpened" :maximized="true" position="bottom")
     div(@click.self="compositionFinderOpened = false" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-start.content-start.justify-center.q-px-xs.q-pb-xs
@@ -39,189 +32,73 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         v-if="nodeRubick && $route.name !== 'node'"
         round flat color="green" icon="link" @click="$router.push('/node/' + nodeRubick.oid)"
         :style=`{}`)
-  //- composition ONE query
-  div(v-if="false").row.full-width.justify-center.items-center.content-start.q-px-sm
-    div(:style=`{position: 'relative', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
-      div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
-        div(
-          v-for="(n,ni) in compositionOneQuery.items" :key="ni" @click="compositionRubickClick(n)"
-          v-if="n.oid !== nodeRubick.oid"
-          :style=`{height: '50px'}`)
-          img(
-            :src="n.meta.compositions[0].oid === nodeRubick.meta.compositions[0].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
-            :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
   //- node wrapper
   div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-xs
-    div(:style=`{position: 'relative', maxWidth: maxWidth+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-grey-3
-      div(
-        v-if="votePanning"
-        :style=`{
-          position: 'absolute', zIndex: 1000, paddingBottom: '30px',
-          borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}`
-          ).row.fit.items-end.content-end.justify-center
-        //- vote number
-        div(
-          :style=`{fontSize: 10*(voteValue/10) < 50 ? 50+'px' : 10*(voteValue/10)+'px'}`
-        ).row.full-width.justify-center.items-end.text-bold.text-white {{ voteText }}
-        //- vote text
-        .row.full-width.justify-center
-          span(:style=`{fontSize: '50px'}`
-            ).text-bold.text-white.text-center {{ voteLabel }}
+    div(:style=`{position: 'relative', maxWidth: maxWidth+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
+      vote-tint(v-if="votePanning" :voteValue="voteValue")
       //- composition ONE
       div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-        composition-player(
+        composition-list(
           v-if="nodeRubick"
-          ref="fragmentFirst"
+          ref="compositionListOne"
           :ctx="ctx" :index="needSwap ? 1 : 0"
+          @width="width = $event"
           :compositions="[{preview: nodeRubick.meta.compositions[needSwap ? 1 : 0].thumbUrl, composition: nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 1 : 0] : null}]"
           :mini="false" :visible="true" :active="true"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         //- q-btn(
-        //-   round flat color="green" icon="add" @click="extendComposition(0)"
+        //-   round flat color="green" icon="add" @click="compositionAdd(0)"
         //-   :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- name, essence
       .row.full-width.justify-center.items-center.content-center
         div(
           v-if="nodeRubick"
           ref="nodeName" @click="nodeNameClick()"
-          :style=`{position: 'relative', maxWidth: 600+'px', minHeight: '80px', borderRadius: '0px', overflow: 'hidden'}`
+          :style=`{
+            position: 'relative', maxWidth: 600+'px', minHeight: '80px', borderRadius: '0px', overflow: 'hidden',
+            marginTop: '-10px', marginBottom: '-10px'}`
           ).row.full-width.items-center.justify-center.cursor-pointer.bg-grey-2
           span.text-bold.text-center.cursor-pointer {{ nodeRubick.name }}
-          //- actions
-          q-btn(
-            v-if="false"
-            round flat color="green" icon="add" @click="extendEssence()"
-            :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px', background: 'rgba(0,0,0,0.2)'}`)
       //- composition TWO
       div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
-        composition-player(
+        composition-list(
           v-if="nodeRubick"
-          ref="fragmentFirst"
+          ref="compositionListTwo"
           :ctx="ctx" :index="needSwap ? 0 : 1"
           :thumbUrl="nodeRubick.meta.compositions[needSwap ? 0 : 1].thumbUrl"
-          @width="previewWidth = $event"
           :compositions="[...compositionsTwo, {preview: nodeRubick.meta.compositions[needSwap ? 0 : 1].thumbUrl, composition: nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 0 : 1] : null}]"
           :mini="false" :visible="true" :active="true"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
-        //- actions
-        //- add composition
-        //- q-btn(
-        //-   round flat color="green" icon="add" @click="extendComposition(1)"
-        //-   :style=`{position: 'absolute', zIndex: 200, bottom: '4px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
-        //- //- go stats
-        //- small(
-        //-   :style=`{position: 'absolute', zIndex: 300, top: '2px', left: 'calc(50% - 30px)', background: 'rgba(0,0,0,0.2)',
-        //-     borderRadius: '10px'}`
-        //-   ).text-white.q-pa-xs 12/1243
-        //- //- go prev
-        //- div(
-        //-   v-ripple=`{color: 'white'}`
-        //-   :style=`{position: 'absolute', zIndex: 300, left: 0, width: '12%'}`
-        //-   ).row.full-height.items-center.content-center.justify-center.cursor-pointer
-        //-   q-btn(round flat color="white" icon="keyboard_arrow_left")
-        //- //- go next
-        //- div(
-        //-   v-ripple=`{color: 'white'}`
-        //-   :style=`{position: 'absolute', zIndex: 300, right: 0, width: '12%'}`
-        //-   ).row.full-height.items-center.content-center.justify-center.cursor-pointer
-        //-   q-btn(round flat color="white" icon="keyboard_arrow_right")
-  //- composition TWO query
-  div(v-if="false").row.full-width.justify-center.items-start.content-start.q-px-sm
-    div(:style=`{position: 'relatvie', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
-      div(v-if="nodeRubick && compositionTwoQuery").row.no-wrap
-        div(
-          v-for="(n,ni) in compositionTwoQuery.items" :key="ni" @click="compositionRubickClick(n)"
-          v-if="n.oid !== nodeRubick.oid"
-          :style=`{height: '50px'}`)
-          img(
-            :src="n.meta.compositions[0].oid === nodeRubick.meta.compositions[0].oid ? n.meta.compositions[1].thumbUrl : n.meta.compositions[0].thumbUrl"
-            :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
-  //- actions wrapper
-  //- TODO move to actions component...
-  .row.full-width.justify-center.items-start.content-start.q-px-xs.q-my-md
-    div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
-      div(
-        v-if="nodeRubickFull"
-        :style=`{
-          position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-7
-        //- pan btn
-        div(
-          v-touch-pan.left.right.prevent.mouse="votePan"
-          :style=`{
-            position: 'absolute', left: voteLeft+'px', zIndex: 200,
-            height: '60px', width: '90px'}`
-            ).row.items-center.justify-center
-          q-btn(
-            round push color="white" :loading="nodeVoting"
-            :style=`{height: '40px', width: '40px', borderRadius: '50%', cursor: votePanning ? 'grab' : 'pointer'}`
-            ).row.items-center.justify-center.bg-green
-            q-icon(name="blur_on" color="white" size="30px")
-        //- vote tint and helper text
-        div(
-          v-if="votePanning"
-          :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
-          span Pan to vote
-        div(
-          v-if="nodeRubickFull"
-          :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center.q-px-sm
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold.text-center {{voteHuman(nodeRubickFull.rate)}}
-          span.text-white.text-center /{{voteHuman(nodeRubickFull.rateUser)}}
-        //- user name
-        div(
-          @click="$router.push('/user/' + nodeRubickFull.author.oid)").col.full-height
-          .row.fit.items-center.justify-end.cursor-pointer
-            span(:style=`{userSelect: 'none'}`).text-white {{ nodeRubickFull.author.name | cut(40) }}
-        //- user avatar
-        div(
-          @click="$router.push('/user/' + nodeRubickFull.author.oid)"
-          :style=`{height: '60px', width: '75px'}`).row.items-center.justify-center.cursor-pointer
-          div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-6
-            //- img(
-            //-   :src="nodeRubickFull.author.thumbUrl"
-            //-   :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
-  div(:style=`{minHeight: '400px'}`).row.full-width.justify-center.items-start.content-start.q-px-sm
-    //- TODO move maxWidth to variable...
-    div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-py-md
+  actions(
+    :node="nodeRubick" :nodeFull="nodeRubickFull" :width="width" :maxWidth="maxWidth"
+    @votePanning="votePanning = $event" @voteValue="voteValue = $event"
+    :style=`{marginBottom: '400px'}`)
+  //- TODO add spheres and node meta info
 </template>
 
 <script>
+import voteTint from './vote_tint'
+import actions from './actions'
+
 export default {
   name: 'nodeLayoutOpened',
   props: ['node', 'nodeFull', 'nodeLoad'],
+  components: {voteTint, actions},
   data () {
     return {
       voteValue: 0,
       votePanning: false,
-      voteLeft: 0,
-      previewWidth: 0,
-      previewHeight: 0,
+      width: 0,
       compositionIndex: undefined,
       compositionFinderOpened: false,
       compositionOneQuery: null,
       compositionTwoQuery: null,
       compositionsTwo: [],
-      essenceQuery: null,
       nodeRubick: null,
       nodeRubickFull: null,
       needSwap: false,
       maxWidth: 500
-    }
-  },
-  computed: {
-    voteText () {
-      let v = (this.voteValue / 10).toFixed(1)
-      let arr = v.split('.')
-      return arr[0] + ',' + arr[1]
-    },
-    voteLabel () {
-      let v = this.voteValue
-      if (v >= 0 && v < 20) return this.$t('That sucks')
-      else if (v >= 20 && v < 40) return this.$t('Nah')
-      else if (v >= 40 && v < 60) return this.$t('So so')
-      else if (v >= 60 && v < 80) return this.$t('High')
-      else if (v >= 80 && v < 100) return this.$t('Soo high')
-      else return this.$t('No way')
     }
   },
   watch: {
@@ -280,35 +157,9 @@ export default {
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 4, pagination: {pageSize: 30}})
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 5, pagination: {pageSize: 30}})
       this.loadCompositions()
-      // TODO load rubicks for essence...
+      // TODO load rubicks for nodeName...
       this.$log('compositionOneQuery', this.compositionOneQuery)
       this.$log('compositionTwoQuery', this.compositionTwoQuery)
-    },
-    voteHuman (vote) {
-      let v = ((vote * 100) / 10).toFixed(1)
-      let arr = v.split('.')
-      return arr[0] + ',' + arr[1]
-    },
-    async votePan (e) {
-      // this.$log('votePan', e.delta.x)
-      let to = this.voteLeft + e.delta.x
-      if (to > 0 && to <= this.previewWidth - 90) {
-        this.voteLeft += e.delta.x
-        let v = Math.round((this.voteLeft / (this.previewWidth - 90)) * 100)
-        if (v === 0) this.voteValue = 1
-        else if (v === 100) this.voteValue = 99
-        else this.voteValue = v
-      }
-      if (e.isFirst) {
-        this.$log('votePan FIRST')
-        this.votePanning = true
-      }
-      if (e.isFinal) {
-        this.$log('votePan FINAL', this.voteValue / 100)
-        await this.nodeVote(this.voteValue / 100)
-        this.$tween.to(this, 0.4, {voteLeft: 0})
-        this.votePanning = false
-      }
     },
     layerFound (l) {
       this.$log('layerFound', l)
@@ -325,8 +176,8 @@ export default {
       nodeNew.compositions[this.compositionIndex] = c
       this.nodePublish(nodeNew)
     },
-    compositionExtend (index) {
-      this.$log('compositionExtend', index)
+    compositionAdd (index) {
+      this.$log('compositionAdd', index)
       this.compositionIndex = index
       this.compositionFinderOpened = true
     },
@@ -355,43 +206,6 @@ export default {
         this.$log('nodePublish error', e)
         // this.nodePublishingError = e
         // this.nodePublishing = false
-      }
-    },
-    extendEssence () {
-      this.$log('extendEssence')
-      // open essence finder
-      // preview the result
-      // publish
-    },
-    extendComposition (index) {
-      this.$log('extendComposition', index)
-      // open composition finder
-      // preview the result
-      // publish
-      this.compositionIndex = index
-      this.compositionFinderOpened = true
-    },
-    nodeExtend () {
-      this.$log('nodeExtend')
-      if (this.nodeExtending) {
-        this.nodeExtending = false
-      } else {
-        this.nodeExtending = true
-      }
-    },
-    async nodeVote (rate) {
-      try {
-        this.$log('nodeVote start', rate)
-        if (!rate) throw new Error('No rate!')
-        this.nodeVoting = true
-        await this.$wait(500)
-        this.$store.dispatch('node/nodeRate', {node: this.node, rateUser: rate})
-          .catch(err => this.$logE('nodeVote err', err))
-        this.$log('nodeVote done')
-        this.nodeVoting = false
-      } catch (e) {
-        this.$log('nodeVote error', e)
-        this.nodeVoting = false
       }
     }
   },

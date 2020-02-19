@@ -1,80 +1,77 @@
 <template lang="pug">
+//- div(
+//-   :style=`videoStyles`
+//-   :class=`{'full-height': !mini || ctx === 'workspace'}`).row.full-width.items-center.content-center.bg-black
+//-   div(
+//-     :class=`{'full-height': fullHeight || ctx === 'workspace'}`
+//-     :style=`{position: 'relative'}`).row.full-width.items-center.content-center
+//-     //- opacity: videoValid ? 1 : 0
+//-     //- :autoplay="ctx === 'workspace'"
 div(
-  :style=`videoStyles`
-  :class=`{'full-height': fullHeight || ctx === 'workspace'}`).row.full-width.items-center.content-center.bg-black.fit
-  div(
-    :class=`{'full-height': fullHeight || ctx === 'workspace'}`
-    :style=`{position: 'relative'}`).row.full-width.items-center.content-center.fit
-    //- opacity: videoValid ? 1 : 0
-    //- :autoplay="ctx === 'workspace'"
-    video(
-      ref="kalpaVideo"
-      playsinline loop :autoplay="ctx === 'workspace'" :muted="muted"
-      @loadeddata="videoCanplay"
-      @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="$emit('ended')"
-      :class=`{'full-height': fullHeight || ctx === 'workspace'}`
-      :style=`{width: '100%', objectFit: 'contain', opacity: 1}`
-      :src="urlRaw" type="video/mp4").fit
-      //- opacity: now > start ? 1 : 0
-      //- source()
+  :class=`{'full-height': !mini || ctx === 'workspace'}`
+  :style=`{}`).row.full-width
+  video(
+    ref="kalpaVideo"
+    playsinline loop :autoplay="ctx === 'workspace'" :muted="muted"
+    @loadeddata="videoCanplay"
+    @click="videoClick" @play="videoPlay" @pause="videoPause" @timeupdate="videoTimeupdate" @ended="$emit('ended')"
+    :class=`{'full-height': !mini || ctx === 'workspace'}`
+    :style=`{width: '100%', objectFit: 'contain', opacity: 1}`
+    :src="urlRaw" type="video/mp4")
+    //- opacity: now > start ? 1 : 0
+    //- source()
     //- debug
-    div(
-      v-if="false"
-      :style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
-      span.full-width.text-white player.playing: {{player.playing}}
-      //- small.text-white.full-width styles: {{videoStyles}}
-      //- small.text-white.full-width url: {{ url }}
-    //- fullscreen
-    //- q-btn(
-    //-   round flat color="green" @click="videoFullscreenToggle()"
-    //-   :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
-    //-   :style=`{position: 'absolute', top: '16px', right: '16px', zIndex: 1000, background: 'rgba(0,0,0,0.3)'}`)
-    //- progress
-    div(
-      v-if="ctx === 'workspace'"
-      v-show="!mini"
-      :style=`{
-        position: 'absolute', bottom: '16px', left: 0, zIndex: 2000}`
-      ).row.full-width.items-start.content-start
-      //- pregress wrapper
-      .row.full-width.items-start.content-start.q-px-md
-        //- progress actions
-        div(:style=`{height: '60px'}`).row.full-width.items-center
-          //- play/pause
-          div(
-            v-show="player.controls"
-            :style=`{width: '44px'}`
-            ).row.full-height.items-center.content-center.justify-center
-            q-btn(
-              round flat color="green" @click="videoPlayPause"
-              :icon="playing === true ? 'pause' : 'play_arrow'"
-              :style=`{background: 'rgba(0,0,0,0.3)'}`)
-          .col
-            .row.fit.items-center.content-center
-              span(
-                :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
-                ).text-white.q-pa-sm.q-ml-sm {{$time(now)+' / '+$time(player.duration)}}
-          //- fullscreen
-          div(
-            v-show="player.controls"
-            :style=`{width: '44px'}`
-            ).row.full-height.items-center.content-center.justify-center
-            q-btn(
-              round flat color="green" @click="videoFullscreenToggle()"
-              :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
-              :style=`{background: 'rgba(0,0,0,0.3)'}`)
-        //- progress bar & time
+  div(
+    v-if="false"
+    :style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
+    span.full-width.text-white player.playing: {{player.playing}}
+    //- small.text-white.full-width styles: {{videoStyles}}
+    //- small.text-white.full-width url: {{ url }}
+  //- progress ctx === 'workspace'
+  div(
+    v-if="ctx === 'workspace'"
+    :style=`{
+      position: 'absolute', bottom: '16px', left: 0, zIndex: 2000}`
+    ).row.full-width.items-start.content-start
+    //- pregress wrapper
+    .row.full-width.items-start.content-start.q-px-md
+      //- progress actions
+      div(:style=`{height: '60px'}`).row.full-width.items-center
+        //- play/pause
         div(
-          :style=`{height: progressHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
-          //- progress
-          .col.full-height
-            div(
-              @click="progressClick"
-              :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
-              ).row.fit.bg-grey-9.cursor-pointer
-              //- progress %
-              div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
-      slot(name="layerEditor" :now="now" :player="player" :progressHeight="progressHeight")
+          v-show="player.controls"
+          :style=`{width: '44px'}`
+          ).row.full-height.items-center.content-center.justify-center
+          q-btn(
+            round flat color="green" @click="videoPlayPause"
+            :icon="playing === true ? 'pause' : 'play_arrow'"
+            :style=`{background: 'rgba(0,0,0,0.3)'}`)
+        .col
+          .row.fit.items-center.content-center
+            span(
+              :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
+              ).text-white.q-pa-sm.q-ml-sm {{$time(now)+' / '+$time(player.duration)}}
+        //- fullscreen
+        div(
+          v-show="player.controls"
+          :style=`{width: '44px'}`
+          ).row.full-height.items-center.content-center.justify-center
+          q-btn(
+            round flat color="green" @click="videoFullscreenToggle()"
+            :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
+            :style=`{background: 'rgba(0,0,0,0.3)'}`)
+      //- progress bar & time
+      div(
+        :style=`{height: progressHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
+        //- progress
+        .col.full-height
+          div(
+            @click="progressClick"
+            :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
+            ).row.fit.bg-grey-9.cursor-pointer
+            //- progress %
+            div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
+    slot(name="layerEditor" :now="now" :player="player" :progressHeight="progressHeight")
 </template>
 
 <script>

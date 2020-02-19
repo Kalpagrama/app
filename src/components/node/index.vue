@@ -1,21 +1,20 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
-  component(
-    :is="`node-layout-${layout || node.layout}`"
-    :ctx="ctx" :index="index"
-    :node="node" :nodeFull="nodeFull" :visible="visible" :active="active" :nodeLoad="nodeLoad"
-    @open="$emit('open', [node, nodeFull])")
+component(
+  :is="`node-layout-${layout || node.layout}`"
+  :ctx="ctx" :index="index"
+  :node="node" :nodeFull="nodeFull" :visible="visible" :active="active" :nodeLoad="nodeLoad"
+  @open="$emit('open', [node, nodeFull])")
 </template>
 
 <script>
-import nodeLayoutPip from './layout_pip_2'
+import nodeLayoutPip from './layout_pip'
 import nodeLayoutOpened from './layout_opened'
 import nodeLayoutRubick from './layout_rubick'
 import nodeLayoutByte from './layout_byte'
 
 export default {
   name: 'nodeIndex',
-  props: ['ctx', 'index', 'opened', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'active', 'layout'],
+  props: ['ctx', 'index', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'active', 'layout'],
   components: {nodeLayoutPip, nodeLayoutOpened, nodeLayoutRubick, nodeLayoutByte},
   data () {
     return {
