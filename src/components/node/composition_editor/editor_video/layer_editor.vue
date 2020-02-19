@@ -139,8 +139,18 @@ export default {
         if (to === from) return
         this.$log('layerIndex CHANGED')
         this.framesWidthUpdate()
-        this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
-        this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+        if (this.$refs.framesScrollWrapper) {
+          this.$tween.to(
+            this.$refs.framesScrollWrapper,
+            0.9,
+            {
+              scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50,
+              onComplete: () => {
+                this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+              }
+            })
+        }
+        // this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
       }
     },
     layer: {
@@ -174,7 +184,7 @@ export default {
     },
     framesWidthUpdate () {
       this.$log('framesWidthUpdate')
-      this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
+      if (this.$refs.framesScrollWrapper) this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
     },
     panFrames (e) {
       if (this.panning) return

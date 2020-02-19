@@ -4,14 +4,10 @@
     .column.fit
       .col.full-width
         composition(
-          v-if="composition" :composition="composition" :mini="false" @player="player = $event" :ctx="ctx"
-          :fullHeight="true" :visible="true" :active="true"
-          :layerIndexPlay="layerIndex" :mode="mode").full-height
-          template(v-slot:right)
-            q-btn(
-              v-if="false"
-              round push color="green" @click="layersShow = !layersShow"
-              :icon="layersShow ? 'keyboard_arrow_right' : 'layers'").q-ml-sm
+          v-if="composition" :value="composition"
+          :ctx="ctx" :mini="false" :visible="true" :active="true"
+          :layerIndexPlay="layerIndex" :mode="mode"
+          @player="player = $event").full-height
           //- layer editor
           template(v-slot:layerEditor=`{player, now, progressHeight}`)
             //- layer add

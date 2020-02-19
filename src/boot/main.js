@@ -115,6 +115,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('wsMenu', () => import('components/workspace/ws_menu'))
     Vue.component('compositionEditor', () => import('components/node/composition_editor'))
     Vue.component('compositionFinder', () => import('components/node/composition_finder'))
+    Vue.component('compositionPlayer', () => import('components/node/composition/player'))
     Vue.component('composition', () => import('components/node/composition'))
     // Vue.component('nodeListByte', () => import('components/node/list_byte'))
   } catch (err) {

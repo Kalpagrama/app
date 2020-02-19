@@ -1,43 +1,23 @@
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px'}`).row.full-width.items-start.content-start
+  //- debug
+  div(
+    v-if="$store.state.ui.debug"
+    :style=`{position: 'absolute', zIndex: 1000, top: '16px'}`).row.bg-green
+    small.text-white.full-width compositionHeight: {{ compositionHeight }}
   //- inactive tint
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(v-if="!active" :style=`{position: 'absolute', zIndex: 300, opacity: 0.4, borderRadius: '10px'}`).row.fit.bg-grey-10
   //- compositions wrapper
   div(
     :style=`{
-      position: 'relative',
-      minHeight: compositionHeight+'px',
-      height: compositionHeight+'px',
-      borderRadius: '10px', overflow: 'hidden', zIndex: 100,
-      height: previewHeight > 0 ? previewHeight+'px' : 'auto'}`
-    ).row.full-width.items-start.bg-black
-    composition(
-      ref="compositionOne"
-      :ctx="ctx" :index="0" :thumbUrl="node.meta.compositions[0].thumbUrl" :fullHeight="false"
-      :composition="nodeFull ? nodeFull.compositions[0] : null"
-      :mini="compositionMiniIndex === 0" :visible="false" :active="false"
-      @mini="compositionChange(0)" @ended="compositionChange(0)"
-      @height="compositionWidth = $event" @width="compositionHeight = $event"
-      :style=`{
-        position: compositionHeight > 0 ? 'absolute' : 'relative', zIndex: compositionMiniIndex === 0 ? 200 : 150,
-        opacity: styles[0].opacity, borderRadius: '10px', overflow: 'hidden',
-        maxWidth: styles[0].maxWidth+'%',
-        bottom: styles[0].bottom+'px',
-        right: styles[0].right+'px'}`)
-    composition(
-      ref="compositionTwo"
-      :ctx="ctx" :index="1" :thumbUrl="node.meta.compositions[1].thumbUrl" :fullHeight="true"
-      :composition="nodeFull ? nodeFull.compositions[1] : null"
-      :mini="compositionMiniIndex === 1" :visible="false" :active="false"
-      @mini="compositionChange(1)" @ended="compositionChange(1)"
-      :style=`{
-        position: 'absolute', zIndex: compositionMiniIndex === 1 ? 200 : 150,
-        height: compositionMiniIndex === 1 ? 'auto' : previewHeight+'px',
-        opacity: styles[1].opacity, borderRadius: '10px', overflow: 'hidden',
-        maxWidth: styles[1].maxWidth+'%',
-        bottom: styles[1].bottom+'px',
-        right: styles[1].right+'px'}`)
+      position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100}`
+    ).row.full-width.items-start.content-start.bg-black
+    composition-player(
+      :ctx="ctx"
+      :compositions="compositionsOne"
+      :visible="visible" :active="active"
+      @error="$emit('error')")
   //- name
   div(
     ref="nodeName" @click="nodeNameClick()"
@@ -52,10 +32,28 @@ export default {
   props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'nodeLoad'],
   data () {
     return {
-      styles: [{right: 0, bottom: 0, maxWidth: 140, opacity: 1}, {right: 10, bottom: 10, maxWidth: 30, opacity: 0.8}],
+      compositionTwoHeight: 0,
       compositionHeight: 0,
       compositionWidth: 0,
-      compositionMiniIndex: 1
+      compositionMiniIndex: 1,
+      styles: [
+        {maxWidth: 0, height: 0, right: 0, bottom: 0, opacity: 1},
+        {maxWidth: 0, height: 0, right: 0, bottom: 0, opacity: 0.8}
+      ]
+    }
+  },
+  computed: {
+    compositionsOne () {
+      return [
+        {preview: this.node.meta.compositions[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[0] : null},
+        {preview: this.node.meta.compositions[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[1] : null},
+        // {preview: this.node.meta.compositions[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[0] : null},
+        // {preview: this.node.meta.compositions[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[1] : null},
+        // {preview: this.node.meta.compositions[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[0] : null},
+        // {preview: this.node.meta.compositions[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[1] : null},
+        // {preview: this.node.meta.compositions[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[0] : null},
+        // {preview: this.node.meta.compositions[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[1] : null}
+      ]
     }
   },
   watch: {
@@ -70,16 +68,23 @@ export default {
   },
   methods: {
     play () {
-      if (!this.nodeFull) return
-      if (this.compositionMiniIndex === 0) this.$refs.compositionOne.play()
-      else this.$refs.compositionTwo.play()
+      // if (!this.nodeFull) return
+      // if (this.compositionMiniIndex === 0) this.$refs.compositionOne.play()
+      // else this.$refs.compositionTwo.play()
     },
     pause () {
       this.$log('pause')
-      if (!this.nodeFull) return
+      // if (!this.nodeFull) return
       // pause all compositions...
-      this.$refs.compositionOne.pause()
-      this.$refs.compositionTwo.pause()
+      // this.$refs.compositionOne.pause()
+      // this.$refs.compositionTwo.pause()
+    },
+    compositionOneLoaded () {
+      // this.$log('compositionOneLoaded', this.compositionWidth / 5)
+      this.$set(this.styles[1], 'maxWidth', this.compositionWidth / 4)
+      this.$set(this.styles[1], 'height', this.compositionTwoHeight)
+      // this.styles[1].width = this.compositionWidth / 5
+      // this.styles[1].height = this.compositionHeight / 5
     },
     compositionChange (index) {
       this.$log('compositionChange', index)
@@ -87,15 +92,15 @@ export default {
         this.styles[index],
         0.65,
         {
-          width: this.compositionWidth,
+          maxWidth: this.compositionWidth,
           height: this.compositionHeight,
           onComplete: () => {
             this.$tween.to(
               this.styles[index === 0 ? 1 : 0],
               0.1,
               {
-                width: this.compositionWidth / 5,
-                height: 100
+                maxWidth: this.compositionWidth / 4,
+                height: 0
               }
             )
           }

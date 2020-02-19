@@ -20,7 +20,8 @@ button:focus {
 }
 </style>
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-grey-3
+//- q-layout(view="hHh lpR fFf").bg-grey-3
+q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
   //- k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
   //- k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   //- input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
@@ -38,7 +39,7 @@ q-layout(view="hHh lpR fFf").bg-grey-3
   //-         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
   //-           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
   //-           q-btn(v-else round flat @click="save()" color="white" icon="done")
-  q-header(reveal)
+  q-header()
     div(v-if="user" :style=`{paddingLeft: '0px'}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
       div().row.full-width.q-pa-xs
         //- <input type="file" @change="previewFiles" multiple>
