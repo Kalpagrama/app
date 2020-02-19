@@ -18,7 +18,7 @@ div(id="q-app").bg-black
 export default {
   name: 'App',
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
   }
 }
 </script>
