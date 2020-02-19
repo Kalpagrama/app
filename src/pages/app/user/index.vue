@@ -21,7 +21,7 @@ button:focus {
 </style>
 <template lang="pug">
 //- q-layout(view="hHh lpR fFf").bg-grey-3
-q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
+q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`).bg-grey-10
   //- k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
   //- k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
   //- input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
@@ -40,7 +40,7 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
   //-           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
   //-           q-btn(v-else round flat @click="save()" color="white" icon="done")
   q-header()
-    div(v-if="user" :style=`{paddingLeft: '0px'}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
+    div(v-if="user" :style=`{paddingLeft: $q.screen.gt.xs ? '60px' : '0px'}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
       div().row.full-width.q-pa-xs
         //- <input type="file" @change="previewFiles" multiple>
         .row.full-width
@@ -80,7 +80,7 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
             :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'white'}`
             :class="{'bg-green' : pageId  === p}"
             ).q-pa-sm.q-mr-xs.cursor-pointer {{ p }}
-  q-page-container.row.full-width.justify-center
+  q-page-container.row.full-width.justify-center.bg-grey-10
     div(:style=`{maxWidth: 600+'px'}`).row.full-width.q-pt-md
       user-created-nodes(
         v-if="pageId === 'Created nodes'"

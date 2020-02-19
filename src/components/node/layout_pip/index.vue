@@ -9,6 +9,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(v-if="!active" :style=`{position: 'absolute', zIndex: 300, opacity: 0.4, borderRadius: '10px'}`).row.fit.bg-grey-10
   //- compositions wrapper
+  //- img(:src="compositions[0].preview").full-width.br
+  //- span(@click="open(compositions[0].preview)") {{compositions[0].preview}}
   div(
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100}`
@@ -27,6 +29,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
 </template>
 
 <script>
+import { openURL } from 'quasar'
+
 export default {
   name: 'nodeLayoutPip',
   props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'nodeLoad'],
@@ -53,6 +57,9 @@ export default {
     }
   },
   methods: {
+    open (url) {
+      openURL(url)
+    },
     play () {
       this.$log('play')
       if (this.$refs.compositionList) this.$refs.compositionList.play()

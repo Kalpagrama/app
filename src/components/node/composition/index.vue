@@ -53,6 +53,7 @@ div(
     :url="contentUrl" :source="content.contentSource" :ctx="ctx" :fullHeight="fullHeight"
     :start="layerStart" :end="layerEnd" :mini="mini" :active="active" :visible="visible"
     :style=`preview ? {maxHeight: $q.screen.height+'px', position: 'absolute', zIndex: 100} : null`
+    @now="nowChanged"
     @player="$emit('player', $event)" @ended="layerEnded")
     //- TODO: props is options on one object...
     template(v-slot:layerEditor=`{player, now, progressHeight}`)
@@ -60,7 +61,7 @@ div(
 </template>
 
 <script>
-import { debounce } from 'quasar'
+import { debounce, throttle } from 'quasar'
 import playerVideo from './player_video'
 import playerImage from './player_image'
 
@@ -148,9 +149,22 @@ export default {
         }
         else this.pause()
       }
+    },
+    visible: {
+      immediate: true,
+      handler (to, from) {
+        // if (to && this.$refs.player) this.$refs.player.player.setCurrentTime(this.layerStart)
+      }
     }
   },
   methods: {
+    nowChanged (now) {
+      // this.$log('nowChanged', now)
+      if (now > this.layerEnd || now < this.layerStart) {
+        this.$refs.player.player.setCurrentTime(this.layerStart)
+        // this.$refs.player.player.play()
+      }
+    },
     contentNameClick () {
       this.$log('contentNameClick')
       // TODO: show content modal... or go to the workspace contents
@@ -176,6 +190,7 @@ export default {
     previewError () {
       this.$log('previewError')
       this.$emit('error', 'previewError')
+      this.$emit('previewError')
     },
     play () {
       // this.$log('play')
@@ -213,7 +228,7 @@ export default {
     }
   },
   created () {
-    // this.layerEnded = debounce(this.layerEnded, 300)
+    this.nowChanged = throttle(this.nowChanged, 300)
   },
   mounted () {
     // this.$log('mounted')

@@ -13,10 +13,11 @@ div(
     :style=`{position: 'absolute', zIndex: 50000, top: '4px', right: 'calc(50% - 20px)', borderRadius: '10px', background: 'rgba(0,0,0,0.3)',
       userSelect: 'none'}`
     ).text-white.q-pa-xs {{ index + 1 }}/{{ compositions.length }}
+  //- h1.text-red bitch
   //- preview
   img(
     ref="compositionListPreview"
-    :src="compositions[0].preview" @load="previewLoad" @error="previewError"
+    :src="compositions[1].preview" @load="previewLoad" @error="previewError"
     :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0}`)
   //- compositions
   div(
@@ -69,6 +70,9 @@ export default {
       styles: []
     }
   },
+  mounted () {
+    // this.$q.notify('mounted')
+  },
   methods: {
     play () {
       this.$log('play')
@@ -85,7 +89,9 @@ export default {
       return ci === this.indexNexting ? false : ci !== this.index
     },
     previewLoad (e) {
-      // this.$log('previewLoad', e)
+      this.$log('previewLoad', e)
+      // this.$q.notify('previewLoad')
+      // this.$q.emit('previewLoad')
       // TODO list height? screen/3?, screen.width?, previewClientWidth?
       this.height = this.$refs.compositionListPreview.clientHeight
       // this.height = this.$refs.playerPreview.clientHeight > this.$q.screen.height / 3 ? this.$refs.playerPreview.clientHeight : this.$q.screen.height / 3
@@ -94,10 +100,12 @@ export default {
       this.styles = JSON.parse(JSON.stringify(this.stylesInitial))
       this.$emit('height', this.height)
       this.$emit('width', this.width)
+      // this.$q.notify('height', this.height)
     },
     previewError (e) {
       this.$log('previewError', e)
       this.$emit('error', 'previewError')
+      this.$q.notify('previewError')
     },
     compositionStyle (ci) {
       if (ci > this.index) return {right: '0px'}
