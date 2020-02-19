@@ -3,7 +3,7 @@ q-layout(view="hHh lpR fFf").bg-grey-8
   q-page-conainter.row.full-width.justify-center.items-start.content-start
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
-        node-list(:nodes="items" :style=`{maxWidth: '600px'}`)
+        node-list(:nodes="items" :style=`{maxWidth: '750px'}`)
 </template>
 
 <script>
@@ -30,7 +30,7 @@ export default {
     variables () {
       return {
         oid: this.sphereOid,
-        pagination: { pageSize: 100 },
+        pagination: { pageSize: 10 },
         sortStrategy: 'HOT',
         filter: { types: 'NODE' }
       }

@@ -207,8 +207,8 @@ export default {
       this.$log('videoClick')
       // TODO switch case mute/unmute play/pause
       this.muted = !this.muted
-      if (this.player.playing) this.player.pause()
-      else this.player.play()
+      // if (this.player.playing) this.player.pause()
+      // else this.player.play()
     },
     videoFullscreenToggle () {
       this.$log('videoFullscreenToggle')

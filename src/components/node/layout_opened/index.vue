@@ -52,7 +52,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`).q-mr-sm.cursor-pointer
   //- node wrapper
   div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-xs
-    div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
+    div(:style=`{position: 'relative', maxWidth: maxWidth+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-grey-3
       div(
         v-if="votePanning"
         :style=`{
@@ -86,8 +86,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         div(
           v-if="nodeRubick"
           ref="nodeName" @click="nodeNameClick()"
-          :style=`{position: 'relative', maxWidth: 600+'px', minHeight: '80px', borderRadius: '10px', overflow: 'hidden'}`
-          ).row.full-width.items-center.justify-center.cursor-pointer.q-my-xs.bg-grey-2
+          :style=`{position: 'relative', maxWidth: 600+'px', minHeight: '80px', borderRadius: '0px', overflow: 'hidden'}`
+          ).row.full-width.items-center.justify-center.cursor-pointer.bg-grey-2
           span.text-bold.text-center.cursor-pointer {{ nodeRubick.name }}
           //- actions
           q-btn(
@@ -145,7 +145,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       div(
         v-if="nodeRubickFull"
         :style=`{
-          position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-8
+          position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-7
         //- pan btn
         div(
           v-touch-pan.left.right.prevent.mouse="votePan"

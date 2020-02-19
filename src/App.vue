@@ -1,4 +1,7 @@
 <style lang="stylus">
+// * {
+//   user-select: none
+// }
 html {
   background: black;
 }

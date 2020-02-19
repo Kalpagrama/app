@@ -124,7 +124,7 @@ export default {
       pages: [
         { id: 'trends', name: 'Trends', icon: 'whatshot' },
         { id: 'workspace', name: 'Workspace', icon: 'school' },
-        { id: 'settings', name: 'Settings', icon: 'settings' }
+        // { id: 'settings', name: 'Settings', icon: 'settings' }
       ],
       userAvatarErrored: false,
       cacheClearing: false

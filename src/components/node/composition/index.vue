@@ -1,52 +1,58 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}` :class=`{'full-height': fullHeight && !mini}`).row.full-width.items-start.content-start.bg-black
+div(
+  :style=`{height: mini ? 'auto' : '100%', borderRadius: '10px', overflow: 'hidden'}`
+  ).row.full-width.items-center.content-center.bg-black
+  //- height: mini ? 'auto' : '100%',
+  //- maxWidth: maxWidth+'px', maxHeight: maxHeight+'px'
   //- slots
-  div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
-    slot(name="left")
-  div(:style=`{position: 'absolute', zIndex: 1000, right: '16px', top: '50%'}`).row
-    slot(name="right")
+  //- div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
+  //-   slot(name="left")
+  //- div(:style=`{position: 'absolute', zIndex: 1000, right: '16px', top: '50%'}`).row
+  //-   slot(name="right")
   //- debug
   div(
-    v-if="$store.state.ui.debug && !mini"
-    :style=`{position: 'absolute', top: '50px', left: '16px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
-    small.text-white.full-width ctx: {{ ctx }}
-    small.text-white.full-width mode: {{ mode }}
-    small.text-white.full-width layerIndex: {{ layerIndex }}
-    small.text-white.full-width layerIndexPlay: {{ layerIndexPlay }}
+    v-if="false"
+    :style=`{position: 'absolute', top: '2px', left: '2px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
+    //- small.text-white.full-width ctx: {{ ctx }}
+    small.text-white.full-width mini: {{ mini }}
+    //- small.text-white.full-width layerIndex: {{ layerIndex }}
+    //- small.text-white.full-width layerIndexPlay: {{ layerIndexPlay }}
+  //- composition menu
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
+  //- div(
+  //-   v-if="ctx === 'workspace'"
+  //-   :style=`{position: 'absolute', zIndex: 1000, top: 0, height: '60px'}`
+  //-   ).row.full-width.items-center.q-pa-md.cursor-pointer
+  //-   .col.full-height
+  //-     .row.fit.items-center.content-center
+  //-       span(
+  //-         @click="contentNameClick()"
+  //-         :style=`{
+  //-           borderRadius: '10px', overflow: 'hidden',
+  //-           userSelect: 'none', pointerEvents: 'none',
+  //-           background: 'rgba(0,0,0,0.5)'}`
+  //-         ).text-white.q-pa-sm {{ content.name }}
+  //- next tint
   div(
-    v-if="ctx === 'workspace'"
-    :style=`{position: 'absolute', zIndex: 1000, top: 0, height: '60px'}`
-    ).row.full-width.items-center.q-pa-md.cursor-pointer
-    .col.full-height
-      .row.fit.items-center.content-center
-        span(
-          @click="contentNameClick()"
-          :style=`{
-            borderRadius: '10px', overflow: 'hidden',
-            userSelect: 'none', pointerEvents: 'none',
-            background: 'rgba(0,0,0,0.5)'}`
-          ).text-white.q-pa-sm {{ content.name }}
-  //- mini toggle
-  div(
-    v-if="mini" @click="$emit('mini')"
+    v-if="mini" @click="$emit('next')"
     :style=`{position: 'absolute', zIndex: 200, opacity: 0.5}`).row.fit.cursor-pointer
   //- preview
   img(
-    v-if="thumbUrl" ref="compositionPreview" :src="thumbUrl" crossOrigin="anonymous" draggable="false"
-    @click="previewClick"
-    @load="previewLoad" @error="previewError"
-    :class=`{'full-height': fullHeight}`
-    :style=`{width: '100%', maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
+    v-if="preview" ref="compositionPreview" :src="preview" crossOrigin="anonymous" draggable="false"
+    @click="previewClick" @load="previewLoad" @error="previewError"
+    :style=`{
+      userSelect: 'none',
+      width: '100%', height: mini ? 'auto' : '100%',
+      maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
   player-video(
-    v-if="visible && composition && content && content.type === 'VIDEO'"
+    v-if="visible && content && content.type === 'VIDEO'"
     ref="player"
-    :url="contentUrl" :source="contentSource" :ctx="ctx" :fullHeight="fullHeight"
+    :url="contentUrl" :source="content.contentSource" :ctx="ctx" :fullHeight="fullHeight"
     :start="layerStart" :end="layerEnd" :mini="mini" :active="active" :visible="visible"
-    :style=`thumbUrl ? {maxHeight: $q.screen.height+'px', position: 'absolute', zIndex: 100} : null`
-    @player="$emit('player', $event)" @ended="layerEnded")
+    :style=`preview ? {maxHeight: $q.screen.height+'px', position: 'absolute', zIndex: 100} : null`
+    @player="$emit('player', $event)" @ended="layerEnded").fit
     //- :style=`{position: thumbUrl ? 'absolute' : 'relative', zIndex: 100}`
     //- TODO: props is options on one object...
     template(v-slot:layerEditor=`{player, now, progressHeight}`)
@@ -61,7 +67,14 @@ import playerImage from './player_image'
 export default {
   name: 'composition',
   components: {playerVideo, playerImage},
-  props: ['ctx', 'composition', 'layerIndexPlay', 'visible', 'active', 'mini', 'thumbUrl', 'extending', 'fullHeight', 'mode'],
+  props: {
+    ctx: {type: String},
+    value: {type: Object},
+    preview: {type: String},
+    visible: {type: Boolean},
+    active: {type: Boolean},
+    mini: {type: Boolean, default () { return false }}
+  },
   data () {
     return {
       layerIndex: 0,
@@ -71,6 +84,10 @@ export default {
     }
   },
   computed: {
+    layers () {
+      if (this.value) return this.value.layers
+      else return []
+    },
     layer () {
       return this.layers[this.layerIndex]
     },
@@ -88,17 +105,9 @@ export default {
         else return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
       }
     },
-    layers () {
-      if (this.composition) return this.composition.layers
-      else return []
-    },
     content () {
-      if (this.layerIndex >= 0) {
-        if (this.composition) return this.composition.layers[this.layerIndex].content
-        else return null
-      } else {
-        return null
-      }
+      if (this.layer) return this.layer.content
+      else return null
     },
     contentUrl () {
       if (this.content) {
@@ -110,10 +119,6 @@ export default {
       } else {
         return false
       }
-    },
-    contentSource () {
-      if (this.content) return this.content.contentSource
-      else return null
     }
   },
   watch: {
@@ -129,7 +134,7 @@ export default {
     mini: {
       immediate: true,
       handler (to, from) {
-        // this.$log('mini CHANGED', to)
+        // this.$log('mini CHANGED')
         if (to) this.pause()
         else this.play()
       }
@@ -137,7 +142,9 @@ export default {
     active: {
       handler (to, from) {
         this.$log('active CHANGED')
-        if (to) this.play()
+        if (to) {
+          if (!this.mini) this.play()
+        }
         else this.pause()
       }
     }
@@ -152,18 +159,22 @@ export default {
     },
     previewLoad () {
       // this.$log('previewLoad')
-      let h = this.$refs.compositionPreview.clientHeight
-      let w = this.$refs.compositionPreview.clientWidth
-      this.$emit('height', h)
-      this.$emit('width', w)
-      this.previewHeight = h
-      this.previewWidth = w
+      let previewRef = this.$refs.compositionPreview
+      this.previewHeight = previewRef.clientHeight
+      this.previewWidth = previewRef.clientWidth
+      this.$emit('height', this.previewHeight)
+      this.$emit('width', this.previewWidth)
       this.previewLoaded = true
+      // const interval = setInterval(() => {
+      //   if (previewRef.naturalWidth > 0 && previewRef.naturalHeight > 0) {
+      //     clearInterval(interval)
+      //     this.previewLoaded = true
+      //   }
+      // }, 20)
     },
     previewError () {
       this.$log('previewError')
-      // TODO do not show node in the list
-      this.$emit('error')
+      this.$emit('error', 'previewError')
     },
     play () {
       // this.$log('play')
@@ -204,10 +215,10 @@ export default {
     // this.layerEnded = debounce(this.layerEnded, 300)
   },
   mounted () {
-    // this.$log('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    // this.$log('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>
