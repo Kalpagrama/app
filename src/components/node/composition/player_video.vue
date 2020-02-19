@@ -263,7 +263,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     this.playerInit()
   },
   beforeDestroy () {

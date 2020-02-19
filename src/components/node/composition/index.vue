@@ -140,8 +140,9 @@ export default {
       }
     },
     active: {
+      immediate: true,
       handler (to, from) {
-        this.$log('active CHANGED')
+        // this.$log('active CHANGED')
         if (to) {
           if (!this.mini) this.play()
         }
@@ -185,25 +186,25 @@ export default {
       if (this.$refs.player && this.$refs.player.player) this.$refs.player.player.pause()
     },
     layerEnded () {
-      this.$log('*** layerEnded')
-      this.$log('NOW => ', this.layerIndex)
+      // this.$log('*** layerEnded')
+      // this.$log('NOW => ', this.layerIndex)
       if (this.mini) return
       if (this.layerIndexPlay >= 0) {
-        this.$log('LAYER PLAY')
+        // this.$log('LAYER PLAY')
         this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
         this.layerIndex = this.layerIndexPlay
       } else {
-        this.$log('LAYER DEFAULT')
+        // this.$log('LAYER DEFAULT')
         // move to the next layer, this composition player
         let layerTo = this.layerIndex + 1
         if (this.layers[layerTo]) {
           // this.$q.notify('NEXT layer next =>' + layerTo)
-          this.$log('NEXT => ', layerTo)
+          // this.$log('NEXT => ', layerTo)
           this.$set(this, 'layerIndex', layerTo)
           // this.layerIndex = layerTo
         }
         else {
-          this.$log('LAST => 0')
+          // this.$log('LAST => 0')
           // TODO depend on mode, play first one or play next composition
           this.$emit('ended')
           // this.$set(this, 'layerIndex', 0)
@@ -215,10 +216,10 @@ export default {
     // this.layerEnded = debounce(this.layerEnded, 300)
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
   }
 }
 </script>

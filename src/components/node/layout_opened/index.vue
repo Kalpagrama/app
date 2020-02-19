@@ -69,18 +69,17 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             ).text-bold.text-white.text-center {{ voteLabel }}
       //- composition ONE
       div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-        composition(
+        composition-player(
           v-if="nodeRubick"
           ref="fragmentFirst"
           :ctx="ctx" :index="needSwap ? 1 : 0"
-          :thumbUrl="nodeRubick.meta.compositions[needSwap ? 1 : 0].thumbUrl"
-          :composition="nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 1 : 0] : null"
-          :mini="false" :visible="visible" :active="true"
+          :compositions="[{preview: nodeRubick.meta.compositions[needSwap ? 1 : 0].thumbUrl, composition: nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 1 : 0] : null}]"
+          :mini="false" :visible="true" :active="true"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
-        q-btn(
-          round flat color="green" icon="add" @click="extendComposition(0)"
-          :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
+        //- q-btn(
+        //-   round flat color="green" icon="add" @click="extendComposition(0)"
+        //-   :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- name, essence
       .row.full-width.justify-center.items-center.content-center
         div(
@@ -96,37 +95,37 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             :style=`{position: 'absolute', zIndex: 200, top: 'calc(50% - 20px)', right: '16px', background: 'rgba(0,0,0,0.2)'}`)
       //- composition TWO
       div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
-        composition(
+        composition-player(
           v-if="nodeRubick"
           ref="fragmentFirst"
           :ctx="ctx" :index="needSwap ? 0 : 1"
           :thumbUrl="nodeRubick.meta.compositions[needSwap ? 0 : 1].thumbUrl"
-          @previewWidth="previewWidth = $event"
-          :composition="nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 0 : 1] : null"
-          :mini="false" :visible="visible" :active="true"
+          @width="previewWidth = $event"
+          :compositions="[...compositionsTwo, {preview: nodeRubick.meta.compositions[needSwap ? 0 : 1].thumbUrl, composition: nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 0 : 1] : null}]"
+          :mini="false" :visible="true" :active="true"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         //- add composition
-        q-btn(
-          round flat color="green" icon="add" @click="extendComposition(1)"
-          :style=`{position: 'absolute', zIndex: 200, bottom: '4px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
-        //- go stats
-        small(
-          :style=`{position: 'absolute', zIndex: 300, top: '2px', left: 'calc(50% - 30px)', background: 'rgba(0,0,0,0.2)',
-            borderRadius: '10px'}`
-          ).text-white.q-pa-xs 12/1243
-        //- go prev
-        div(
-          v-ripple=`{color: 'white'}`
-          :style=`{position: 'absolute', zIndex: 300, left: 0, width: '12%'}`
-          ).row.full-height.items-center.content-center.justify-center.cursor-pointer
-          q-btn(round flat color="white" icon="keyboard_arrow_left")
-        //- go next
-        div(
-          v-ripple=`{color: 'white'}`
-          :style=`{position: 'absolute', zIndex: 300, right: 0, width: '12%'}`
-          ).row.full-height.items-center.content-center.justify-center.cursor-pointer
-          q-btn(round flat color="white" icon="keyboard_arrow_right")
+        //- q-btn(
+        //-   round flat color="green" icon="add" @click="extendComposition(1)"
+        //-   :style=`{position: 'absolute', zIndex: 200, bottom: '4px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
+        //- //- go stats
+        //- small(
+        //-   :style=`{position: 'absolute', zIndex: 300, top: '2px', left: 'calc(50% - 30px)', background: 'rgba(0,0,0,0.2)',
+        //-     borderRadius: '10px'}`
+        //-   ).text-white.q-pa-xs 12/1243
+        //- //- go prev
+        //- div(
+        //-   v-ripple=`{color: 'white'}`
+        //-   :style=`{position: 'absolute', zIndex: 300, left: 0, width: '12%'}`
+        //-   ).row.full-height.items-center.content-center.justify-center.cursor-pointer
+        //-   q-btn(round flat color="white" icon="keyboard_arrow_left")
+        //- //- go next
+        //- div(
+        //-   v-ripple=`{color: 'white'}`
+        //-   :style=`{position: 'absolute', zIndex: 300, right: 0, width: '12%'}`
+        //-   ).row.full-height.items-center.content-center.justify-center.cursor-pointer
+        //-   q-btn(round flat color="white" icon="keyboard_arrow_right")
   //- composition TWO query
   div(v-if="false").row.full-width.justify-center.items-start.content-start.q-px-sm
     div(:style=`{position: 'relatvie', maxWidth: maxWidth+'px', height: '70px'}`).row.full-width.items-center.content-center.scroll
@@ -201,6 +200,7 @@ export default {
       compositionFinderOpened: false,
       compositionOneQuery: null,
       compositionTwoQuery: null,
+      compositionsTwo: [],
       essenceQuery: null,
       nodeRubick: null,
       nodeRubickFull: null,
@@ -259,6 +259,16 @@ export default {
     }
   },
   methods: {
+    loadCompositions () {
+      var compositions = []
+      if (this.compositionOneQuery) {
+        this.compositionOneQuery.items.map(async (i) => {
+          let nodeFull = await this.$store.dispatch('objects/get', { oid: i.oid, priority: 0 })
+          compositions.push({preview: i.meta.compositions[0].thumbUrl, composition: nodeFull.compositions[0]})
+        })
+      }
+      this.compositionsTwo = compositions
+    },
     async loadRubicks () {
       this.$log('loadRubicks')
       let nodeRubickFull = JSON.parse(JSON.stringify(this.nodeRubickFull))
@@ -269,6 +279,7 @@ export default {
       }
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 4, pagination: {pageSize: 30}})
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 5, pagination: {pageSize: 30}})
+      this.loadCompositions()
       // TODO load rubicks for essence...
       this.$log('compositionOneQuery', this.compositionOneQuery)
       this.$log('compositionTwoQuery', this.compositionTwoQuery)
