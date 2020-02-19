@@ -52,7 +52,7 @@ export const wsItemAdd = async (context, oid) => {
       oid, wsRevision: context.rootState.workspace.revision
     }
   })
-  context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'zero' }, { root: true }) // кладем в кэш на всяк случай
+  context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'hour' }, { root: true })
   logD('wsItemAdd done', wsItem)
   return wsItem
 }
@@ -172,9 +172,9 @@ export const wsNodeSave = async (context, node) => {
       }
     })
     wsItem = wsNodeCreate
-    context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'zero' }, { root: true }) // кладем в кэш на всяк случай
+    context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'hour' }, { root: true })
   }
-  logD('wsNodeSave done', wsItem)
+  logD('wsNodeSave done')
   return wsItem
 }
 export const wsItemDelete = async (context, oid) => {
@@ -277,6 +277,17 @@ export const expireWsCache = async (context) => {
   logD('expireWsCache complete')
 }
 
+export const updateRevision = async (context, revision) => {
+  // logD('updateRevision start')
+  context.commit('workspace/stateSet', ['revision', revision], { root: true })
+  await context.dispatch('cache/update', {
+    key: context.rootState.auth.userOid,
+    path: 'wsRevision',
+    newValue: revision,
+  }, {root: true})
+  // logD('updateVersion complete')
+}
+
 // можно запрашивать по oid, либо имени (если оно уникально)
 export const get = async (context, { oid, name, force }) => {
   if (name) {
@@ -284,8 +295,8 @@ export const get = async (context, { oid, name, force }) => {
     let { items, count, totalCount, nextPageToken } = await context.dispatch('workspace/wsItems',
       { wsItemsType: 'ALL', pagination: { pageSize: 1 }, filter: { name } },
       { root: true })
-    // logD('items', items)
-    // assert(items.length >= 1, 'items.length === 1')
+    // assert(items.length === 1, 'items.length === 1')
+    if (items.length === 0) return null
     if (items.length === 0) return null
     let itemFull = await context.dispatch('workspace/get', { oid: items[0].oid }, { root: true }) // рекурсия
     return itemFull

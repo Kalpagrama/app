@@ -178,7 +178,7 @@ export const nodeCreate = async (context, node) => {
       node: nodeInput
     }
   })
-  context.dispatch('cache/update', {key: createdNode.oid, newValue: createdNode, actualAge: 'zero'}, {root: true}) // кладем в кэш на всяк случай
+  context.dispatch('cache/update', {key: createdNode.oid, newValue: createdNode, actualAge: 'hour'}, {root: true})
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
 }

@@ -136,8 +136,8 @@ export default {
       nodeRefreshingError: null,
       nodeDeleting: false,
       nodeDeletingError: null,
-      node: null,
       nodeRes: null,
+      node: null,
       nodeNew: {
         name: '',
         revision: 1,
@@ -194,8 +194,8 @@ export default {
     nodeRes: {
       deep: true,
       handler (to, from) {
-        this.$log('nodeRes CHANGED', to)
         if (to) {
+          // this.$log('nodeRes changed', to)
           this.nodeSavePause = true
           this.node = JSON.parse(JSON.stringify(to))
         }
@@ -261,12 +261,12 @@ export default {
       try {
         this.$log('nodeSave start', node || this.node)
         this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node || this.node)))
-        this.$log('res', res)
-        if (!this.nodeRes) this.nodeRes = res
+        this.nodeRes = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node || this.node)))
+        // let xxx = JSON.parse(JSON.stringify(this.nodeRes))
+        // this.$log('res', xxx)
         // this.nodeSavePause = true
-        // this.node = JSON.parse(JSON.stringify(res))
-        this.$log('nodeSave done')
+        // this.node = JSON.parse(JSON.stringify(this.nodeRes))
+        // this.$log('nodeSave done', xxx)
         this.nodeSaving = false
         this.nodeSavingError = null
       } catch (e) {

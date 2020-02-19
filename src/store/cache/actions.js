@@ -18,6 +18,8 @@ import {
   clear as idbClear
 } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
 class CachePersist {
   constructor (props) {
     this.persistStore = new Store('vuexPersistStore', 'cache')
@@ -44,9 +46,85 @@ class CachePersist {
   }
 }
 
+class QueueUpdate {
+  constructor (context) {
+    this.context = context
+    this.queries = []
+    this.inProgress = false
+  }
+
+  push (key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc) {
+    // удаляем неактуальные изменения, которые перекрыты текущим
+    let newQueries = []
+    for (let query of this.queries) {
+      if (key === query.key) {
+        if (path === query.path) continue // удаляем запросы у которых тот же путь
+        if (!path && query.path) continue // Если меняется объект целиком - удаляем запросы у которых есть путь
+      }
+      newQueries.push(query)
+    }
+    this.queries = newQueries
+    this.queries.push({ key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc })
+    this.next().catch(err => {
+      logE('cant update item on server1', { key, path, newValue }, err)
+    })
+  }
+
+  async next () {
+    if (this.inProgress) return
+    if (this.queries.length === 0) return
+    let { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc } = this.queries.shift()
+
+    // пробуем обновить на сервере
+    try {
+      this.inProgress = true
+      await this.update(key, path, updateItemFunc, fetchItemFunc, mergeItemFunc)
+    } catch (err) {
+      // todo после обновления страницы данные об изменениях пропадут!!!
+      // кладем обратно
+      this.queries.unshift({ key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc })
+      //  todo сделать circuit breaker
+      await wait(5000)
+    } finally {
+      this.inProgress = false
+      this.next().catch(err => {
+        logE('cant update item on server2', { key, path, newValue }, err)
+      })
+    }
+  }
+
+  async update (key, path, updateItemFunc, fetchItemFunc, mergeItemFunc) {
+    assert(updateItemFunc && fetchItemFunc && mergeItemFunc)
+    assert(this.context.state.cachedItems[key], 'изменяемый объект обязан быть в кэше')
+    try {
+      logD('try send query to server')
+      let { item: dbItem, actualAge } = await updateItemFunc(this.context.state.cachedItems[key])
+      this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
+      await cache.set(key, this.context.state.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
+    } catch (err) {
+      if (err.message.includes('VERSION_CONFLICT')) {
+        logI('VERSION_CONFLICT. try merge with server data. try get server version...')
+        let { item: serverItem } = await fetchItemFunc()
+        logD('serverItem', serverItem)
+        // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
+        let mergedItem = mergeItemFunc(path, serverItem, this.context.state.cachedItems[key])
+        logD('merge OK!', mergedItem)
+        // еще раз попробуем обновить
+        let { item: dbItem, actualAge } = await updateItemFunc(mergedItem)
+        this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
+        await cache.set(key, this.context.state.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
+      } else {
+        logE('cant update item on server')
+        throw err
+      }
+    }
+  }
+}
+
 // в кэше хранятся только ключи. сами данные - во vuex
 class Cache {
   constructor (context) {
+    this.queue = new QueueUpdate(context)
     this.defaultActualAge = 1000 * 60 * 60 // 1 hour by default
     // TODO увеличить до 50 МБ после тестирования
     this.defaultCacheSize = 1 * 1024 * 1024 // 1Mb
@@ -54,14 +132,16 @@ class Cache {
     this.cachePersist = new CachePersist()
     // используется для контроля места
     this.cacheLru = new LruCache({
-      max: this.defaultCacheSize, // 50Mb
+      max: this.defaultCacheSize,
       length: function (n, key) {
         return JSON.stringify(n).length + key.length
       },
       maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
+      noDisposeOnSet: true,
       dispose: async (key, { actualUntil, actualAge }) => {
         assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-        if (key === this.context.rootState.auth.userOid) { // кладем обратно! юзера нельзя удалять
+        if (['authInfo', this.context.rootState.auth.userOid].includes(key)) {
+          // кладем обратно! юзера нельзя удалять и authInfo должна жить вечно
           setTimeout(() => {
             let item = this.context.state.cachedItems[key] // данные лежат во vuex
             assert(item)
@@ -79,9 +159,21 @@ class Cache {
 
   async init () {
     assert(this.cacheLru.itemCount === 0)
+
+    let idbItems = []
     for (let key of await this.cachePersist.keys()) {
-      let { item, actualUntil, actualAge } = await this.cachePersist.getItem(key)
-      assert(item && actualUntil)
+      let { item, actualUntil, actualAge, lastTouchDate } = await this.cachePersist.getItem(key)
+      idbItems.push({key, item, actualUntil, actualAge, lastTouchDate })
+    }
+    // сортируем по возрастанию даты последнего обращения
+    idbItems.sort((left, right) => {
+      return left.lastTouchDate - right.lastTouchDate
+    })
+    // добавляем в cacheLru и vuex (самые последние запрошенные - в конце (save "recently used"-ness of the key))
+    // это конечно не сохраняет LRU в полной мере... Но хоть что-то
+    for (let idbItem of idbItems) {
+      let {key, item, actualUntil, actualAge, lastTouchDate } = idbItem
+      assert(key && item && actualUntil)
       this.cacheLru.set(key, { actualUntil, actualAge })
       this.context.commit('setItem', { key, item })
     }
@@ -97,7 +189,7 @@ class Cache {
 
   // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
   async set (key, item, actualAge) {
-    assert(key && item)
+    assert(key && item, `key && item ${key} ${item}`)
     switch (actualAge) {
       case 'zero':
         actualAge = 0
@@ -149,7 +241,7 @@ class Cache {
     // logD('actualAge', actualAge)
     // logD('actualUntil', actualUntil)
     this.cacheLru.set(key, { actualUntil, actualAge })
-    await this.cachePersist.setItem(key, { item, actualUntil, actualAge })
+    await this.cachePersist.setItem(key, { item, actualUntil, actualAge, lastTouchDate: Date.now() })
     this.context.commit('setItem', { key, item })
     return this.context.rootState.cache.cachedItems[key]
   }
@@ -196,6 +288,9 @@ class Cache {
     } else {
       let item = this.context.state.cachedItems[key] // данные лежат во vuex и они актуальны
       assert(item)
+      // обновим lastTouchDate в фоне
+      this.cachePersist.setItem(key, { item, actualUntil, actualAge, lastTouchDate: Date.now() })
+        .catch(err => logE('cant update lastTouchDate', err))
       result = item
     }
     if (!result) return null // см "queued object was evicted legally"
@@ -289,6 +384,7 @@ class Cache {
       else {
         assert(fetchItemFunc, '!fetchItemFunc')
         let { item: serverItem, actualAge } = await fetchItemFunc()
+        assert(serverItem, '!serverItem')
         vuexItem = await cache.set(key, serverItem, actualAge) // записываем в кэш данные с сервера
       }
     }
@@ -296,36 +392,13 @@ class Cache {
     this.context.commit('cache/updateItem', { key, path, newValue, setter }, { root: true }) // изменяем во вьюикс
     assert(vuexItem === this.context.state.cachedItems[key], 'vuexItem === this.context.state.cachedItems[key]')
     vuexItem = await cache.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
-
     if (updateItemFunc) {
-      assert(vuexItem.oid)
+      assert(vuexItem, '!vuexItem')
       // чтобы данные не устарели пока не ушел запрос на сервер(актуально для оффлайн версии) - ставим actualAge = year
       // если данные устареют - они могут быть замененты свежими при очередном запросе get
       vuexItem = await cache.set(key, vuexItem, 'year')
-      // обновим данные на сервере
-      // todo накапливать изменения и делать запрос в фоне
-      assert(fetchItemFunc && mergeItemFunc)
-      try {
-        let { item: dbItem, actualAge } = await updateItemFunc(vuexItem)
-        this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
-        vuexItem = await cache.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
-      } catch (err) {
-        if (err.message.includes('VERSION_CONFLICT')) {
-          logI('VERSION_CONFLICT. try merge with server data. try get server version...')
-          let { item: serverItem } = await fetchItemFunc()
-          logD('serverItem', serverItem)
-          // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
-          let mergedItem = mergeItemFunc(path, serverItem, vuexItem)
-          logI('merge OK!', mergedItem)
-          // еще раз попробуем обновить
-          let { item: dbItem, actualAge } = await updateItemFunc(mergedItem)
-          this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
-          vuexItem = await cache.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
-        } else {
-          logE('cant update item on server')
-          throw err
-        }
-      }
+      // обновим данные на сервере (в фоне)
+      this.queue.push(key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc)
     }
     if (!vuexItem) logW('item not found in cache!')
     return vuexItem
