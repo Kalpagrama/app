@@ -2662,7 +2662,7 @@
             "deprecationReason": null
           },
           {
-            "name": "uploadContentFile",
+            "name": "contentCreateFromFile",
             "description": "Загрузить новые данные для создания ядра. length - длина видео",
             "args": [
               {
@@ -2707,7 +2707,7 @@
             "deprecationReason": null
           },
           {
-            "name": "uploadContentUrl",
+            "name": "contentCreateFromUrl",
             "description": "Загрузить новые данные для создания ядра",
             "args": [
               {
