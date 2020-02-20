@@ -177,6 +177,7 @@ async function processEventWs (context, event) {
   // обновим в кэше значение итема
   let key = 'wsItem: ' + event.object.oid
   let vuexItem = context.rootState.cache.cachedItems[key]
+  // logD('processEventWs:: ', vuexItem, event.object)
   if (!vuexItem || vuexItem.revision !== event.object.revision){
     // если у имеющегося объекта та же ревизия - обновлять не надо (скорей всего это наши же изменения)
     logD('обновим значение итема в кэше')
