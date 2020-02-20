@@ -1,22 +1,12 @@
 <template lang="pug">
 div(
-  :style=`{height: mini ? 'auto' : '100%', borderRadius: '10px', overflow: 'hidden'}`
-  ).row.full-width.items-center.content-center.bg-black
-  //- height: mini ? 'auto' : '100%',
-  //- maxWidth: maxWidth+'px', maxHeight: maxHeight+'px'
-  //- slots
-  //- div(:style=`{position: 'absolute', zIndex: 1000, left: '16px', top: '50%'}`).row
-  //-   slot(name="left")
-  //- div(:style=`{position: 'absolute', zIndex: 1000, right: '16px', top: '50%'}`).row
-  //-   slot(name="right")
+  :style=`{height: mini ? 'auto' : '100%'}`
+  ).row.full-width.items-start.content-start.bg-black
   //- debug
   div(
     v-if="false"
     :style=`{position: 'absolute', top: '2px', left: '2px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
-    //- small.text-white.full-width ctx: {{ ctx }}
     small.text-white.full-width mini: {{ mini }}
-    //- small.text-white.full-width layerIndex: {{ layerIndex }}
-    //- small.text-white.full-width layerIndexPlay: {{ layerIndexPlay }}
   //- composition menu
   //- content name & menu & action slots
   //- TODO content click goes to content in workspace and adds it to your workspace automatically
@@ -50,24 +40,23 @@ div(
   player-video(
     v-if="visible && content && content.type === 'VIDEO'"
     ref="player"
-    :url="contentUrl" :source="content.contentSource" :ctx="ctx" :fullHeight="fullHeight"
-    :start="layerStart" :end="layerEnd" :mini="mini" :active="active" :visible="visible"
-    :style=`preview ? {maxHeight: $q.screen.height+'px', position: 'absolute', zIndex: 100} : null`
-    @now="nowChanged"
-    @player="$emit('player', $event)" @ended="layerEnded")
-    //- TODO: props is options on one object...
-    template(v-slot:layerEditor=`{player, now, progressHeight}`)
-      slot(name="layerEditor" :player="player" :now="now" :progressHeight="progressHeight")
+    :src="contentUrl" :source="content.contentSource" :ctx="ctx"
+    :mini="mini" :active="active" :visible="visible"
+    :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 1000, overflow: 'hidden'}`).fit
+    template(v-slot:editor=`{player, meta}`)
+      player(:ctx="ctx" :content="content" :layers="layers" :player="player" :meta="meta" :active="active" :visible="visible" :mini="mini")
+      slot(name="editor" :player="player" :meta="meta")
 </template>
 
 <script>
 import { debounce, throttle } from 'quasar'
 import playerVideo from './player_video'
 import playerImage from './player_image'
+import player from './player'
 
 export default {
   name: 'composition',
-  components: {playerVideo, playerImage},
+  components: {playerVideo, playerImage, player},
   props: {
     ctx: {type: String},
     value: {type: Object},
@@ -85,87 +74,54 @@ export default {
     }
   },
   computed: {
-    layers () {
-      if (this.value) return this.value.layers
-      else return []
-    },
     layer () {
-      return this.layers[this.layerIndex]
-    },
-    layerStart () {
-      if (this.mode === 'watch') return false
-      else {
-        if (this.ctx === 'workspace') return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
-        else return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
-      }
-    },
-    layerEnd () {
-      if (this.mode === 'watch') return false
-      else {
-        if (this.ctx === 'workspace') return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
-        else return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
-      }
+      return this.value.layers[this.layerIndex]
     },
     content () {
-      if (this.layer) return this.layer.content
-      else return null
+      return this.value.layers[0].content
+      // return this.value.layers.reduce((acc, val) => {
+      //   if (!acc && val.figuresAbsolute.length === 0) acc = val.content
+      //   return acc
+      // }, null)
     },
     contentUrl () {
       if (this.content) {
-        if (this.ctx === 'workspace') {
+        if (this.content.contentSource === 'KALPA') {
+          if (this.ctx === 'workspace' || this.ctx === 'editor') {
+            return this.content.url
+          } else {
+            return this.layer.url
+          }
+        }
+        else if (this.content.contentSource === 'YOUTUBE') {
           return this.content.url
-        } else {
-          return this.layer.url
+        }
+        else {
+          return false
         }
       } else {
         return false
       }
+    },
+    layers () {
+      if (this.value) {
+        return this.value.layers
+      }
+      else {
+        return []
+      }
+      // if (this.value) {
+      //   return this.value.layers.filter((l, li) => {
+      //     return l.figuresAbsolute.length > 0
+      //   })
+      // } else {
+      //   return []
+      // }
     }
   },
   watch: {
-    layerIndexPlay: {
-      immediate: true,
-      handler (to, from) {
-        // this.$log('layerIndexPlay')
-        if (to >= 0) {
-          this.layerIndex = to
-        }
-      }
-    },
-    mini: {
-      immediate: true,
-      handler (to, from) {
-        // this.$log('mini CHANGED')
-        if (to) this.pause()
-        else this.play()
-      }
-    },
-    active: {
-      immediate: true,
-      handler (to, from) {
-        // this.$log('active CHANGED')
-        if (to) {
-          if (!this.mini) this.play()
-        }
-        else this.pause()
-      }
-    },
-    visible: {
-      immediate: true,
-      handler (to, from) {
-        // if (to && this.$refs.player) this.$refs.player.player.setCurrentTime(this.layerStart)
-      }
-    }
   },
   methods: {
-    nowChanged (now) {
-      // this.$log('nowChanged', now)
-      if (this.ctx === 'workspace') return
-      if (now > this.layerEnd || now < this.layerStart) {
-        this.$refs.player.player.setCurrentTime(this.layerStart)
-        // this.$refs.player.player.play()
-      }
-    },
     contentNameClick () {
       this.$log('contentNameClick')
       // TODO: show content modal... or go to the workspace contents
@@ -192,50 +148,7 @@ export default {
       this.$log('previewError')
       this.$emit('error', 'previewError')
       this.$emit('previewError')
-    },
-    play () {
-      // this.$log('play')
-      if (this.$refs.player && this.$refs.player.player && !this.mini) this.$refs.player.player.play()
-    },
-    pause () {
-      // this.$log('pause')
-      if (this.$refs.player && this.$refs.player.player) this.$refs.player.player.pause()
-    },
-    layerEnded () {
-      // this.$log('*** layerEnded')
-      // this.$log('NOW => ', this.layerIndex)
-      if (this.mini) return
-      if (this.layerIndexPlay >= 0) {
-        // this.$log('LAYER PLAY')
-        this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
-        this.layerIndex = this.layerIndexPlay
-      } else {
-        // this.$log('LAYER DEFAULT')
-        // move to the next layer, this composition player
-        let layerTo = this.layerIndex + 1
-        if (this.layers[layerTo]) {
-          // this.$q.notify('NEXT layer next =>' + layerTo)
-          // this.$log('NEXT => ', layerTo)
-          this.$set(this, 'layerIndex', layerTo)
-          // this.layerIndex = layerTo
-        }
-        else {
-          // this.$log('LAST => 0')
-          // TODO depend on mode, play first one or play next composition
-          this.$emit('ended')
-          // this.$set(this, 'layerIndex', 0)
-        }
-      }
     }
-  },
-  created () {
-    this.nowChanged = throttle(this.nowChanged, 300)
-  },
-  mounted () {
-    // this.$log('mounted')
-  },
-  beforeDestroy () {
-    // this.$log('beforeDestroy')
   }
 }
 </script>

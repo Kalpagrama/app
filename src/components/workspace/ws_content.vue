@@ -4,6 +4,7 @@ div(
   :class=`{'bg-grey-8': node.oid !== oid, 'bg-white': node.oid === oid}`
   :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
   ).row.full-width.items-center.cursor-pointer.q-mb-sm
+  //- .row.full-width {{node.oid}}
   span(
     :class=`{
       'text-white': node.oid !== oid,
@@ -22,7 +23,6 @@ export default {
     }
   },
   async mounted () {
-    // this.$log('mounted')
     this.nodeFull = await this.$store.dispatch('workspace/get', {oid: this.node.oid})
   }
 }

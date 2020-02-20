@@ -1,106 +1,58 @@
+<style lang="stylus">
+iframe {
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+.mejs__overlay-button {
+  display: none;
+}
+</style>
+
 <template lang="pug">
-//- div(
-//-   :style=`videoStyles`
-//-   :class=`{'full-height': !mini || ctx === 'workspace'}`).row.full-width.items-center.content-center.bg-black
-//-   div(
-//-     :class=`{'full-height': fullHeight || ctx === 'workspace'}`
-//-     :style=`{position: 'relative'}`).row.full-width.items-center.content-center
-//-     //- opacity: videoValid ? 1 : 0
-//-     //- :autoplay="ctx === 'workspace'"
-div(
-  :class=`{'full-height': !mini || ctx === 'workspace'}`
-  :style=`{position: 'relative'}`).row.full-width
-  video(
-    ref="kalpaVideo"
-    playsinline loop :autoplay="ctx === 'workspace'" :muted="muted" preload="auto"
-    @loadeddata="videoLoadeddata"
-    @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
-    :class=`{'full-height': !mini || ctx === 'workspace'}`
-    :style=`{width: '100%', objectFit: 'contain', opacity: 1}`
-    :src="urlRaw" type="video/mp4")
-    //- opacity: now > start ? 1 : 0
-    //- source()
-    //- debug
+div(:style=``).column.fit.items-start.content-start.bg-black
+  //- debug
   div(
-    v-if="false"
-    :style=`{position: 'absolute', left: '16px', bottom: '100px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
-    span.full-width.text-white now: {{now}}
-    span.full-width.text-white start: {{start}}
-    span.full-width.text-white end: {{end}}
-    //- small.text-white.full-width styles: {{videoStyles}}
-    //- small.text-white.full-width url: {{ url }}
-  //- progress ctx === 'workspace'
-  div(
-    v-if="ctx === 'workspace'"
-    :style=`{
-      position: 'absolute', bottom: '16px', left: 0, zIndex: 2000}`
-    ).row.full-width.items-start.content-start
-    //- pregress wrapper
-    .row.full-width.items-start.content-start.q-px-md
-      //- progress actions
-      div(:style=`{height: '60px'}`).row.full-width.items-center
-        //- play/pause
-        div(
-          v-show="player.controls"
-          :style=`{width: '44px'}`
-          ).row.full-height.items-center.content-center.justify-center
-          q-btn(
-            round flat color="green" @click="videoPlayPause"
-            :icon="playing === true ? 'pause' : 'play_arrow'"
-            :style=`{background: 'rgba(0,0,0,0.3)'}`)
-        .col
-          .row.fit.items-center.content-center
-            span(
-              :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
-              ).text-white.q-pa-sm.q-ml-sm {{$time(now)+' / '+$time(player.duration)}}
-        //- fullscreen
-        div(
-          v-show="player.controls"
-          :style=`{width: '44px'}`
-          ).row.full-height.items-center.content-center.justify-center
-          q-btn(
-            round flat color="green" @click="videoFullscreenToggle()"
-            :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
-            :style=`{background: 'rgba(0,0,0,0.3)'}`)
-      //- progress bar & time
-      div(
-        :style=`{height: progressHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
-        //- progress
-        .col.full-height
-          div(
-            @click="progressClick"
-            :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
-            ).row.fit.bg-grey-9.cursor-pointer
-            //- progress %
-            div(:style=`{position: 'absolute', zIndex: 100, left: 0, width: (now/player.duration)*100+'%', pointerEvents: 'none', borderRight: '2px solid #4caf50'}`).row.full-height.bg-grey-7
-    slot(name="layerEditor" :now="now" :player="player" :progressHeight="progressHeight")
+    v-if="!mini"
+    :style=`{position: 'absolute', left: '16px', top: '70px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
+    span.full-width.text-white duration/now: {{duration}}/{{now}}
+  //- video container
+  div(:style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
+    div(:style=`{position: 'absolute', zIndex: 11, top: '0px', height: 'calc(100% + 0px)'}`).row.full-width
+      video(
+        ref="kalpaVideo"
+        :src="src" :type="source === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
+        playsinline loop :autoplay="ctx === 'workspace' || ctx === 'editor'" :muted="muted" preload="auto"
+        @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
+        :style=`{
+          width: '100%', height: '100%', objectFit: 'contain'
+        }`)
+    player-video-progress(v-if="ctx === 'workspace' || ctx === 'editor'" :now="now" :duration="duration" :player="player" :videoUpdate="videoUpdate")
+  slot(name="editor" :meta="{now, duration, playing, muted, progressHeight}" :player="player")
 </template>
 
 <script>
+import playerVideoProgress from './player_video_progress'
+
 export default {
   name: 'playerVideo',
-  props: ['ctx', 'url', 'source', 'start', 'end', 'mini', 'fullHeight', 'active', 'visible'],
+  props: ['ctx', 'url', 'src', 'source', 'mini', 'fullHeight', 'active', 'visible'],
+  components: {playerVideoProgress},
   data () {
     return {
       now: 0,
+      duration: 0,
+      player: null,
       playing: false,
-      player: {
-        controls: true
-      },
-      moveInterval: null,
-      progressHeight: 10,
-      fullscreen: false,
-      show: false,
-      urlRaw: undefined,
-      opacity: true,
       muted: true,
-      videoInterval: null
+      fullscreen: false,
+      intervalUpdate: null,
+      intervalMove: null,
+      progressShow: false,
+      progressHeight: 20
     }
   },
   computed: {
-    videoValid () {
-      return this.now > this.start && this.now < this.end && this.player.playing
-    },
     videoStyles () {
       if (this.fullscreen) {
         return {
@@ -124,131 +76,108 @@ export default {
     visible: {
       immediate: true,
       handler (to, from) {
-        if (to && this.player.play) this.player.setCurrentTime(this.start)
+        // if (to && this.player.play) this.player.setCurrentTime(this.start)
       }
     },
-    url: {
+    source: {
       immediate: true,
-      async handler (to, from) {
-        // this.$log('url CHANGED', to)
+      handler (to, from) {
+        this.$log('source CHANGED', to)
         if (to) {
-          this.$set(this, 'urlRaw', to)
-          if (this.player && this.player.play) {
-            this.player.setCurrentTime(this.start)
-            this.player.play()
-            // this.muted = false
-          }
+          if (this.$refs.kalpaVideo) this.playerInit(to)
         }
       }
     },
-    now: {
-      immediate: false,
-      handler (to, from) {
-        // this.$log('now CHANGED', to)
-        // if (this.player && this.player.editing) return
-        // if (!this.active) return
-        if (this.start) {
-          if (to <= this.start) {
-            // this.$log('now < start')
-            // this.player.setCurrentTime(this.start + 0.1)
-            // this.player.play()
-          }
-          else if (to >= this.end) {
-            // this.$log('now > end')
-            // this.$q.notify('NOW > END')
-            // this.player.setCurrentTime(this.start + 0.1)
-            // this.player.play()
-            // this.$emit('ended')
-          }
+    src: {
+      immediate: true,
+      async handler (to, from) {
+        // this.$log('src CHANGED', to)
+        if (to) {
+          if (this.player) this.player.remove()
+          this.playerInit(this.source)
         }
       }
     }
   },
   methods: {
-    progressClick (e) {
-      // this.$log('progressClick', e)
-      let w = e.target.clientWidth
-      let x = e.offsetX
-      let to = (this.player.duration * x) / w
-      this.player.setCurrentTime(to)
-    },
     async videoMove () {
       if (!this.fullscreen) return
       this.$log('videoMove')
       this.$set(this.player, 'controls', true)
-      if (this.moveInterval) clearInterval(this.moveInterval)
-      this.moveInterval = setTimeout(() => {
+      if (this.intervalMove) clearInterval(this.intervalMove)
+      this.intervalMove = setTimeout(() => {
         this.$set(this.player, 'controls', false)
       }, 2500)
     },
     videoLoadeddata () {
       this.$log('videoLoadeddata')
-      this.player.setCurrentTime(this.start)
-      // this.videoInterval = requestAnimationFrame(this.videoStep)
-      this.videoInterval = setInterval(this.videoStep, 1000 / 60)
+      this.intervalUpdate = setInterval(this.intervalUpdate, 1000 / 60)
     },
     videoPlay () {
       this.$log('videoPlay')
-      this.$set(this.player, 'playing', true)
       this.playing = true
-      if (!this.videoInterval) this.videoInterval = setInterval(this.videoStep, 1000 / 60)
-      // videoInterval = requestAnimationFrame(this.videoStep)
+      if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 60)
     },
     videoPause () {
       this.$log('videoPause')
-      this.$set(this.player, 'playing', false)
       this.playing = false
-      if (this.videoInterval) clearInterval(this.videoInterval)
-      this.videoInterval = null
-      // cancelAnimationFrame(videoInterval)
+      if (this.intervalUpdate) clearInterval(this.intervalUpdate)
+      this.intervalUpdate = null
     },
     videoPlayPause () {
       this.$log('videoPlayPause')
-      if (this.player.playing) this.player.pause()
+      if (this.playing) this.player.pause()
       else this.player.play()
     },
-    videoStep () {
-      // this.$log('videoStep')
-      if (!this.$refs.kalpaVideo) return
-      this.$emit('now', this.$refs.kalpaVideo.currentTime)
-      this.$set(this.player, 'duration', this.$refs.kalpaVideo.duration)
-      this.$set(this.player, 'now', this.$refs.kalpaVideo.currentTime)
-      this.now = this.$refs.kalpaVideo.currentTime
+    videoSeeked () {
+      this.$log('videoSeeked')
+      this.videoUpdate()
+    },
+    videoUpdate (to) {
+      // this.$log('videoStep', this.now)
+      if (this.source === 'YOUTUBE') {
+        this.now = to || this.player.currentTime
+        this.duration = this.player.duration
+      }
+      else {
+        if (!this.$refs.kalpaVideo) return
+        this.now = to || this.$refs.kalpaVideo.currentTime
+        this.duration = this.$refs.kalpaVideo.duration
+      }
+      // this.$emit('now', to || this.now)
     },
     async videoClick (e) {
       this.$log('videoClick')
       // TODO switch case mute/unmute play/pause
       this.muted = !this.muted
-      // if (this.player.playing) this.player.pause()
-      // else this.player.play()
+      this.videoPlayPause()
     },
-    videoFullscreenToggle () {
-      this.$log('videoFullscreenToggle')
+    videoFullscreen () {
+      this.$log('videoFullscreen')
       this.fullscreen = !this.fullscreen
       this.$q.fullscreen.toggle()
     },
-    playerInit () {
-      if (this.source === 'KALPA') {
-        this.player.now = 0
-        this.player.duration = 0
-        this.player.playing = false
-        this.player.started = false
+    playerDelete () {},
+    playerInit (source) {
+      this.$log('playerInit', source)
+      if (source === 'KALPA') {
+        this.player = {}
         this.player.setCurrentTime = (ms) => {
           if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.currentTime = ms
-          // if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.fastSeek(ms)
         }
         this.player.play = () => {
-          // this.$log('PLAYER play()')
-          // this.$q.notify('PLAYER PLAY')
-          // this.$q.notify('player PLAY')
           if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.play()
         }
         this.player.pause = () => {
-          // this.$log('PLAYER pause()')
-          // this.$q.notify('player PAUSE')
           if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.pause()
         }
-      } else {
+        this.player.remove = () => {
+          // TODO
+        }
+        this.videoUpdate()
+        this.videoPlay()
+      }
+      else {
         let me = new window.MediaElementPlayer(this.$refs.kalpaVideo, {
           loop: true,
           autoplay: false,
@@ -261,14 +190,16 @@ export default {
           // ignorePauseOtherPlayersOption: false,
           clickToPlayPause: true,
           success: async (mediaElement, originalNode, instance) => {
+            this.$log('player YOUTUBE success')
             this.player = mediaElement
-            this.player.addEventListener('playing', this.videoPlay, {passive: true})
-            this.player.addEventListener('pause', this.videoPause, {passive: true})
-            this.player.addEventListener('timeupdate', this.videoTimeupdate, {passive: true})
-            this.player.play()
+            this.player.addEventListener('play', this.videoPlay)
+            this.player.addEventListener('pause', this.videoPause)
+            this.player.addEventListener('loadeddata', this.videoLoadeddata)
+            this.videoUpdate()
+            this.videoPlay()
           },
           error: async (mediaElement, originalNode, instance) => {
-            this.$log('playerStart error')
+            this.$log('player YOUTUBE error')
           }
         })
       }
@@ -276,11 +207,16 @@ export default {
     }
   },
   async mounted () {
-    // this.$log('mounted')
-    this.playerInit()
+    this.$log('mounted')
+    this.playerInit(this.source)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    if (this.source === 'YOUTUBE') {
+      this.player.removeEventListener('play', this.videoPlay)
+      this.player.removeEventListener('pause', this.videoPause)
+      this.player.removeEventListener('loadeddata', this.videoLoadeddata)
+    }
   }
 }
 </script>

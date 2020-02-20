@@ -1,62 +1,49 @@
 <template lang="pug">
-.row.fit
-  div(:style=`{position: 'relative'}`).col.full-height
-    .column.fit
-      .col.full-width
-        composition(
-          v-if="composition" :value="composition"
-          :ctx="ctx" :mini="false" :visible="true" :active="true"
-          :layerIndexPlay="layerIndex" :mode="mode"
-          @player="player = $event").full-height
-          //- layer editor
-          template(v-slot:layerEditor=`{player, now, progressHeight}`)
-            //- layer add
-            q-btn(
-              round push size="lg" color="green" icon="add" @click="layerAdd()"
-              :style=`{position: 'absolute', right: '40px', top: '-80px'}`)
-            //- layers on progress bar
-            div(:style=`{position: 'absolute', zIndex: 200, top: '60px', height: progressHeight+'px', pointerEvents: 'none'}`).row.full-width.q-px-md
-              div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.q-px-sm
-                div(
-                  v-for="(l, li) in layers" :key="li"
-                  v-if="l.figuresAbsolute && l.figuresAbsolute.length > 0"
-                  :style=`{
-                    position: 'absolute', zIndex: 200, opacity: li === layerIndex ? 0.9 : 0.5,
-                    left: (l.figuresAbsolute[0].t/player.duration)*100+'%',
-                    width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/player.duration)*100+'%',
-                    background: $randomColor(li)}`
-                  ).row.full-height
-            //- layer editor
-            layer-editor(v-if="layer" :player="player" :now="now" :layers="layers" :layer="layer" :layerIndex="layerIndex" :style=`{height: editorHeight+'px'}`)
-      //- layers BOTTOM
-      div(v-if="layersBottom").col.full-width
-        layers(
-          :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport" :layerDelete="layerDelete"
-          @changePosition="layersBottom = !layersBottom")
-  //- layers RIGHT
-  div(
-    v-if="!layersBottom"
-    :style=`{width: layersWidth+'px', overflow: 'hidden'}`).row.full-height.bg-grey-10
-    layers(
-      :layerIndex="layerIndex" :layer="layer" :layers="layers" :layerClick="layerClick" :layerExport="layerExport" :layerDelete="layerDelete"
-      @changePosition="layersBottom = !layersBottom")
+div(:style=`{position: 'relative', zIndex: 1000}`).row.full-width
+  //- layers on progress bar
+  div(:style=`{position: 'absolute', zIndex: 1000000, top: '-36px', height: 20+'px', pointerEvents: 'none'}`).row.full-width.q-px-sm
+    div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.q-px-sm
+      div(
+        v-for="(l, li) in layers" :key="li"
+        v-if="l.figuresAbsolute && l.figuresAbsolute.length > 0"
+        :style=`{
+          position: 'absolute', zIndex: 200, opacity: li === layerIndex ? 0.9 : 0.5,
+          left: (l.figuresAbsolute[0].t/meta.duration)*100+'%',
+          width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/meta.duration)*100+'%',
+          background: $randomColor(li)}`
+        ).row.full-height
+  layer-editor(:layer="layer" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd")
+  div(v-if="false").row.full-width
+    small.text-white.full-width layers: {{layers}}
+  //- layers
+  div(:style=`{height: $q.screen.height/3+'px'}`).row.full-width
+    .col.full-height
+      layers(
+        mode="edit"
+        :composition="composition"
+        :layerIndex="layerIndex" :layers="layers" :layer="layer" :meta="meta" :player="player"
+        @layerIndex="layerIndex = $event")
+    .col.full-height.br
+      layers(
+        mode="pick"
+        :composition="composition"
+        :layerIndex="layerIndex" :layers="layers" :layer="layer" :meta="meta" :player="player"
+        @layerIndex="layerIndex = $event")
 </template>
 
 <script>
-// TODO do not destroy layers(content.meta) change styles/classes...
-import composition from 'components/node/composition'
 import layerEditor from './layer_editor'
 import layers from './layers'
 
 export default {
   name: 'compositionEditorVideo',
-  components: {composition, layerEditor, layers},
-  props: ['ctx', 'composition', 'content'],
+  components: {layerEditor, layers},
+  props: ['ctx', 'composition', 'player', 'meta'],
   data () {
     return {
       editorHeight: 0,
-      // player: null,
-      layerIndex: -1,
+      layerIndex: 0,
+      layerInitialLength: 10,
       layersShow: true,
       layersWidth: 400,
       layersBottom: true,
@@ -65,62 +52,55 @@ export default {
   },
   computed: {
     layers () {
+      // return this.composition.layers.filter((l, li) => {
+      //   return l.figuresAbsolute.length > 0
+      // })
       return this.composition.layers
     },
     layer () {
-      if (this.layerIndex >= 0) return this.layers[this.layerIndex]
+      if (this.layers[this.layerIndex]) return this.layers[this.layerIndex]
       else return null
+    },
+    content () {
+      if (this.layer) return this.layer.content
+      else return null
+      // return this.layer.content
+      // return this.composition.layers.reduce((acc, val) => {
+      //   if (!acc && val.figuresAbsolute.length === 0) acc = val.content
+      //   return acc
+      // }, null)
     }
   },
   watch: {
-    layer: {
-      handler (to, from) {
-        this.$log('layer CHANGED', to)
-        this.$tween.to(this, 0.5, {editorHeight: to ? 100 : 0})
-      }
-    },
-    layersShow: {
-      handler (to, from) {
-        this.$log('layersShow CHANGED', to)
-        this.$tween.to(this, 0.5, {layersWidth: to ? 400 : 0})
-      }
-    }
+    // layer: {
+    //   handler (to, from) {
+    //     this.$log('layer CHANGED', to)
+    //     this.$tween.to(this, 0.5, {editorHeight: to ? 100 : 0})
+    //   }
+    // },
+    // layersShow: {
+    //   handler (to, from) {
+    //     this.$log('layersShow CHANGED', to)
+    //     this.$tween.to(this, 0.5, {layersWidth: to ? 400 : 0})
+    //   }
+    // }
   },
   methods: {
-    layerClick (l, li) {
-      this.$log('layerClick', l, li)
-      this.layerIndex = li
-      this.player.setCurrentTime(l.figuresAbsolute[0].t)
-    },
-    layerExport (l, li) {
-      this.$log('layerExport', l, li)
-      this.$emit('layerExport', l)
-    },
-    layerPlay () {
-      this.$log('layerPlay')
-    },
-    layerDelete (li) {
-      this.$log('layerDelete')
-      // TODO: check if the layer is the fucking last??
-      if (this.layers.length > 1) {
-        this.$delete(this.composition.layers, li)
-      }
-    },
     layerAdd (start, end) {
-      this.$log('layerAdd', start, end)
-      // TODO: check layers and find one last, or one first one
-      let from = start || this.player.now
-      let to = end || from + 10 < this.player.duration ? from + 10 : this.player.duration
-      this.$log('from/to', from, to)
-      // let to = this.player.duration
-      // update first layer without figures, or create a new layer...
+      this.$log('layerAdd start/end: ', start, end)
+      let from = start || this.meta.now
+      let to = end || from + this.layerInitialLength < this.meta.duration ? from + this.layerInitialLength : this.meta.duration
+      this.$log('layerAdd from/to: ', from, to)
+      // add to first layer figuresAbsolute
       if (this.layers.length === 1 && this.layers[0].figuresAbsolute.length === 0) {
         this.$set(this.composition.layers[0], 'figuresAbsolute', [
           {t: from, points: []},
           {t: to, points: []}
         ])
-        this.layerIndex = 0
-      } else {
+        this.$emit('layerIndex', 0)
+      }
+      // add layer
+      else {
         let l = {
           content: this.content,
           figuresAbsolute: [
@@ -128,10 +108,11 @@ export default {
             {t: to, points: []}
           ]
         }
-        this.$log('l', l)
-        this.$set(this.composition, 'layers', [...this.composition.layers, l])
-        this.layerIndex = this.layers.length - 1
+        this.$log('layerAdd layer: ', l)
+        this.$set(this.composition, 'layers', [l, ...this.composition.layers])
       }
+      this.$emit('layerIndex', 0)
+      this.$log('layerAdd done')
     }
   },
   mounted () {

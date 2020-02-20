@@ -6,13 +6,13 @@
     :pages="['contents', 'compositions']"
     @item="itemClick" @page="pageClick" :page="page"
     )
-  q-dialog(v-model="dialogOpened" :maximized="true" position="bottom")
-    div(@click.self="dialogOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
-      composition-editor(
-        ctx="workspace"
-        :node="node" :compositionIndex="0"
-        @layerExport="layerExport"
-        :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden'}`).bg-black
+  //- q-dialog(v-model="dialogOpened" :maximized="true" position="bottom")
+  //-   div(@click.self="dialogOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
+  //-     composition-editor(
+  //-       ctx="workspace"
+  //-       :node="node" :compositionIndex="0"
+  //-       @layerExport="layerExport"
+  //-       :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden'}`).bg-black
 </template>
 
 <script>
@@ -30,13 +30,26 @@ export default {
     }
   },
   methods: {
-    itemClick (item) {
-      this.$log('itemClick', item)
-      this.node = null
-      this.$nextTick(() => {
-        this.node = item
-      })
-      this.dialogOpened = true
+    itemClick ({type, item}) {
+      this.$log('itemClick', type, item)
+      if (type === 'content') {
+        // create composition with this content, but where to emit it?
+        // let content = item.compositions[0].layers.reduce((acc, val) => {
+        //   if (!acc && val.figuresAbsolute.length === 0) acc = val.content
+        //   return acc
+        // }, null)
+        let content = item.compositions[0].layers[0].content
+        this.$log('content', content)
+        let composition = {
+          operation: { type: 'CONCAT', items: [], operations: null },
+          layers: [{ content: content, figuresAbsolute: [] }]
+        }
+        this.$log('composition', composition)
+        this.$emit('composition', composition)
+      }
+      else if (type === 'composition') {
+        // TODO
+      }
     },
     pageClick (p) {
       this.$log('pageClick', p)

@@ -1,9 +1,9 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`).bg-black
-  q-page-conainter
+q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
+  q-page-conainter.row.full-width.justify-center.items-start.content-start.bg-grey-9
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
-        node-list-byte(:nodes="items")
+        node-list(:nodes="items" :style=`{maxWidth: '750px'}`)
 </template>
 
 <script>

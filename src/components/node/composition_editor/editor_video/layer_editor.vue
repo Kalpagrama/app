@@ -2,12 +2,18 @@
 div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
   q-resize-observer(@resize="onResize")
   div(:style=`{position: 'relative'}`).row.full-width
+    //- .row.full-width.bg-red
+    //-   small.text-white.full-width layer: {{layer}}
     //- debug
     div(
       v-if="false"
       :style=`{position: 'absolute', top: '-100', zIndex: 10000}`
       ).row.full-width.bg-green
       small.text-white.full-width width: {{width}}
+    //- add layer
+    q-btn(round push color="green" icon="add" @click="$emit('add')"
+      :style=`{position: 'absolute', zIndex: 100, right: '16px', top: '12px'}`)
+    //- frames
     div(
       ref="framesScrollWrapper"
       :style=`{height: '66px'}`).row.full-width.items-center.scroll
@@ -17,22 +23,22 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
         //- frames
         div(:style=`{position: 'relative', borderRadius: '10px'}`).row.no-wrap
           //- frames images from kalpa
-          div(v-if="content.contentSource === 'KALPA'").row.no-wrap
+          div(v-if="content.contentSource === 'KALPA'" :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap
             img(
               v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)" @load="frameLoaded"
               :src="f" draggable="false"
               :style=`{height: '50px', userSelect: 'none'}`)
           //- frames boxes for youtube
-          div(v-else).row.no-wrap
+          div(v-else :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap
             div(
               v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
               :style=`{height: '50px', width: '50px', borderLeft: fi === 0 ? 'none' : '1px solid grey'}`
               ).row.items-center.justify-center.bg-grey-5
-              small(:style=`{userSelect: 'none', pointerEvents: 'none'}`).cursor-pointer {{ $time((parseInt(((fi+1)*frameDuration)*100))/100) }}
+              small(:style=`{userSelect: 'none', pointerEvents: 'none'}`).cursor-pointer {{ $time((parseInt((((fi+1)*frameDuration)-frameDuration/2)*100))/100) }}
           //- layers tints
           div(
             v-for="(l, li) in layers" :key="li"
-            v-if="li !== layerIndex"
+            v-if="l.figuresAbsolute.length > 0 && li !== layerIndex"
             :style=`{
               position: 'absolute', height: '50px', background: $randomColor(li),
               pointerEvents: 'none', opacity: 0.5,
@@ -40,11 +46,13 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
               width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/duration)*100+'%'}`).row
           //- left tint
           div(
+            v-if="layer.figuresAbsolute.length > 0"
             :style=`{position: 'absolute', left: 0, top: 0, height: '50px',
               width: 'calc( '+(layer.figuresAbsolute[0].t/duration)*100+'% + 6px )',
               opacity: 0.6, pointerEvents: 'none'}`).row.bg-black
           //- middle layers
           div(
+            v-if="layer.figuresAbsolute.length > 0"
             :style=`{
               position: 'absolute', zIndex: 100, height: '66px', top: '-8px',
               left: (layer.figuresAbsolute[0].t/duration)*100+'%',
@@ -53,22 +61,25 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
           //- now second
           div(
             :style=`{position: 'absolute', zIndex: 300, height: '50px', top: '0px',
-              left: (now/duration)*100+'%', borderRadius: '2px',
+              left: (meta.now/meta.duration)*100+'%', borderRadius: '2px',
               width: '4px', pointerEvents: 'none'}`).row.bg-green
           //- layer start
           div(
+            v-if="layer.figuresAbsolute.length > 0"
             v-touch-pan.left.right.prevent.mouse="panStart"
             :style=`{position: 'absolute', zIndex: 101, top: 0,
               left: 'calc('+ (layer.figuresAbsolute[0].t/duration)*100+'%' +' - 25px)',
               width: '50px', height: '50px', opacity: 0.3, borderRadius: '50%', cursor: 'grab'}`).row.bg-green
           //- layer end
           div(
+            v-if="layer.figuresAbsolute.length > 0"
             v-touch-pan.left.right.prevent.mouse="panEnd"
             :style=`{position: 'absolute', zIndex: 102, top: 0,
               left: 'calc('+ (layer.figuresAbsolute[1].t/duration)*100+'%' +' - 25px)',
               width: '50px', height: '50px', opacity: 0.3, borderRadius: '50%', cursor: 'grab'}`).row.bg-green
           //- right tint
           div(
+            v-if="layer.figuresAbsolute.length > 0"
             :style=`{position: 'absolute', right: 0, top: 0, height: '50px',
               width: 'calc( '+((duration-layer.figuresAbsolute[1].t)/duration)*100+'% + 8px )',
               opacity: 0.6, pointerEvents: 'none'}`).row.bg-black
@@ -79,7 +90,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
 <script>
 export default {
   name: 'layerEditor',
-  props: ['layers', 'layer', 'layerIndex', 'player', 'now'],
+  props: ['content', 'layers', 'layer', 'layerIndex', 'player', 'meta'],
   data () {
     return {
       width: 0,
@@ -98,12 +109,11 @@ export default {
       }
     },
     duration () {
+      if (!this.content) return 0
       return this.content.duration
     },
-    content () {
-      return this.layer.content
-    },
     frames () {
+      if (!this.content) return []
       if (this.content.contentSource === 'KALPA') {
         return this.content.frameUrls.filter((f, fi) => {
           // return fi % 2 === 0
@@ -114,6 +124,7 @@ export default {
       }
     },
     framesCount () {
+      if (!this.content) return 0
       if (this.content.contentSource === 'KALPA') {
         return this.frames.length
       } else {
@@ -139,17 +150,17 @@ export default {
         if (to === from) return
         this.$log('layerIndex CHANGED')
         this.framesWidthUpdate()
-        if (this.$refs.framesScrollWrapper) {
-          this.$tween.to(
-            this.$refs.framesScrollWrapper,
-            0.9,
-            {
-              scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50,
-              onComplete: () => {
-                this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
-              }
-            })
-        }
+        // if (this.layer && this.$refs.framesScrollWrapper) {
+        //   this.$tween.to(
+        //     this.$refs.framesScrollWrapper,
+        //     0.9,
+        //     {
+        //       scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50,
+        //       onComplete: () => {
+        //         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+        //       }
+        //     })
+        // }
         // this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
       }
     },
@@ -158,8 +169,8 @@ export default {
       immediate: false,
       handler (to, from) {
         if (to) {
-          if (from && to === from) return
-          if (this.panning || this.panningFrames) return
+          // if (from && to === from) return
+          // if (this.panning || this.panningFrames) return
           this.$log('layer CHANGED', to)
           // this.framesWidthUpdate()
           // this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
@@ -174,6 +185,7 @@ export default {
       this.$log('layerX', e.layerX)
       let to = (fi * this.frameDuration) + (this.frameDuration / 2)
       this.player.setCurrentTime(to)
+      this.player.pause()
     },
     frameLoaded () {
       // this.$log('frameLoaded')
@@ -205,10 +217,13 @@ export default {
       if (e.isFirst) {
         this.panning = true
         this.player.editing = true
+        this.player.pause()
       }
       if (e.isFinal) {
         this.panning = false
         this.player.editing = false
+        this.player.setCurrentTime(to)
+        this.player.play()
       }
     },
     panEnd (e) {
