@@ -54,6 +54,11 @@ export default {
         if (to) this.play()
         else this.pause()
       }
+    },
+    visible: {
+      handler (to, from) {
+        this.$log('visible CHANGED', to)
+      }
     }
   },
   methods: {

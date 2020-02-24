@@ -2,8 +2,10 @@
 div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
   q-resize-observer(@resize="onResize")
   div(:style=`{position: 'relative'}`).row.full-width
-    //- .row.full-width.bg-red
-    //-   small.text-white.full-width layer: {{layer}}
+    //- debug, relative
+    div(v-if="false" :style=`{color: 'white'}`).row.full-width.bg-red
+      //- small.text-white.full-width layer: {{layer}}
+      small.full-width framesWidth/framesLoaded: {{framesWidth}}/{{framesLoaded}}
     //- debug
     div(
       v-if="false"
@@ -11,13 +13,23 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
       ).row.full-width.bg-green
       small.text-white.full-width width: {{width}}
     //- add layer
-    q-btn(round push color="green" icon="add" @click="$emit('add')"
+    q-btn(
+      v-show="content.contentSource === 'KALPA' ? framesLoaded : true"
+      round push color="green" icon="add" @click="$emit('add')"
       :style=`{position: 'absolute', zIndex: 100, right: '16px', top: '12px'}`)
     //- frames
     div(
       ref="framesScrollWrapper"
-      :style=`{height: '66px'}`).row.full-width.items-center.scroll
-      div(v-touch-pan.left.right.prevent.mouse="$q.screen.width > 600 ? panFrames : false").row.no-wrap
+      :style=`{position: 'relative', height: '66px'}`).row.full-width.items-center.scroll
+      //- frames loading spinner tint
+      div(
+        v-show="content.contentSource === 'KALPA' ? !framesLoaded : false"
+        :style=`{position: 'absolute', zIndex: 1000}`
+        ).row.fit.items-center.content-center.justify-center.bg-black
+        q-spinner(color="green" size="40px" :thickness="2")
+      //- frames
+      div(
+        v-touch-pan.left.right.prevent.mouse="$q.screen.width > 600 ? panFrames : false").row.no-wrap
         //- left padding
         div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
         //- frames
@@ -144,24 +156,23 @@ export default {
         if (to) this.framesWidthUpdate()
       }
     },
-    layerIndex: {
+    'meta.layerIndex': {
       immediate: true,
       handler (to, from) {
         if (to === from) return
-        this.$log('layerIndex CHANGED')
+        this.$log('meta.layerIndex CHANGED')
         this.framesWidthUpdate()
-        // if (this.layer && this.$refs.framesScrollWrapper) {
-        //   this.$tween.to(
-        //     this.$refs.framesScrollWrapper,
-        //     0.9,
-        //     {
-        //       scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50,
-        //       onComplete: () => {
-        //         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
-        //       }
-        //     })
-        // }
-        // this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+        if (this.layer && this.$refs.framesScrollWrapper) {
+          this.$tween.to(
+            this.$refs.framesScrollWrapper,
+            0.9,
+            {
+              scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50,
+              onComplete: () => {
+                // this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+              }
+            })
+        }
       }
     },
     layer: {
@@ -184,8 +195,10 @@ export default {
       this.$log('frameClick', fi)
       this.$log('layerX', e.layerX)
       let to = (fi * this.frameDuration) + (this.frameDuration / 2)
+      this.$emit('meta', ['mode', 'watch'])
       this.player.setCurrentTime(to)
       this.player.pause()
+      this.player.update()
     },
     frameLoaded () {
       // this.$log('frameLoaded')

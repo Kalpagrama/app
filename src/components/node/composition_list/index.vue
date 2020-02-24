@@ -3,10 +3,11 @@ div(
   v-touch-swipe.mouse.left.right="handleSwipe"
   :style=`{position: 'relative', minHeight: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-black
   //- debug
-  div(v-if="false" :style=`{position: 'absolute', zIndex: 1000, top: '60px'}`).row.bg-green
-    small.text-white.full-width index: {{index}}
-    small(v-if="styles.length > 0").text-white.full-width styles[2].maxWidth: {{ styles[2].maxWidth }}
-    small(v-if="styles.length > 0").text-white.full-width styles[0].maxWidth: {{ styles[0].maxWidth }}
+  div(v-if="true" :style=`{position: 'absolute', zIndex: 1000, top: '60px'}`).row.text-white.bg-green
+    //- small.text-white.full-width index: {{index}}
+    small.full-width visible: {{visible}}
+    //- small(v-if="styles.length > 0").text-white.full-width styles[2].maxWidth: {{ styles[2].maxWidth }}
+    //- small(v-if="styles.length > 0").text-white.full-width styles[0].maxWidth: {{ styles[0].maxWidth }}
   //- stats
   small(
     v-if="true"
@@ -36,12 +37,13 @@ div(
     composition(
       :ctx="ctx"
       :value="c.composition" :preview="c.preview"
-      :mini="isMini(ci)"
       :visible="visible && ci >= index-1 && ci <= index+1"
       :active="active && ci === index"
+      :mini="isMini(ci)"
       :style=`{borderRadius: '10px', overflow: 'hidden'}`
       @next="compositionNext(ci)"
       @error="$event => compositionError(ci, $event)")
+      //- :visible="visible && ci >= index-1 && ci <= index+1"
       //- @ended="compositionNext(ci + 1)"
 </template>
 
@@ -93,8 +95,8 @@ export default {
       // this.$q.notify('previewLoad')
       // this.$q.emit('previewLoad')
       // TODO list height? screen/3?, screen.width?, previewClientWidth?
-      this.height = this.$refs.compositionListPreview.clientHeight
-      // this.height = this.$refs.playerPreview.clientHeight > this.$q.screen.height / 3 ? this.$refs.playerPreview.clientHeight : this.$q.screen.height / 3
+      // this.height = this.$refs.compositionListPreview.clientHeight
+      this.height = this.$refs.compositionListPreview.clientHeight > this.$q.screen.height / 3 ? this.$refs.compositionListPreview.clientHeight : this.$q.screen.height / 3
       this.width = this.$refs.compositionListPreview.clientWidth
       this.stylesInitial[1].maxHeight = this.height
       this.styles = JSON.parse(JSON.stringify(this.stylesInitial))

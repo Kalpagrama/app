@@ -61,7 +61,7 @@
             :style=`{position: 'relative', minHeight: '330px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
             composition(
-              v-if="node.compositions[0]" ctx="workspace"
+              v-if="node.compositions[0]" ctx="editor"
               :value="node.compositions[0]"
               :active="compositionActive[0]"
               :visible="compositionVisible[0]"
@@ -87,7 +87,7 @@
             :style=`{position: 'relative', minHeight: '330px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
             composition(
-              v-if="node.compositions[1]" ctx="workspace"
+              v-if="node.compositions[1]" ctx="editor"
               :value="node.compositions[1]"
               :active="compositionActive[1]"
               :visible="compositionVisible[1]"

@@ -1,12 +1,21 @@
 <template lang="pug">
+div(:style=`{position: 'absolute', bottom: 'calc(50% + 50px)', zIndex: 1000, color: 'white', height: '50px'}`).row.full-width.bg-green.br
+  small(@click="modeClick()").full-width mode: {{ mode }}
 </template>
 
 <script>
+// on mode play, and watch we ignore the layerIndex
+// play one layer,  play all the layers,
+// just watch
+// video progress may be here, video controller is it u?
+
 export default {
   name: 'compositionPlayer',
-  props: ['ctx', 'player', 'meta', 'active', 'visible', 'mini', 'layers'],
+  props: ['ctx', 'mode', 'player', 'meta', 'active', 'visible', 'mini', 'layers'],
   data () {
     return {
+      // mode: 'play',
+      // modes: ['play', 'watch', 'layer'],
       layerIndex: 0
     }
   },
@@ -70,14 +79,47 @@ export default {
     'meta.now': {
       handler (to, from) {
         // this.$log('meta.now CHANGED', to)
-        if (this.ctx === 'workspace' || this.ctx === 'editor') return
-        if (to >= this.layerEnd) {
-          this.player.setCurrentTime(this.layerStart)
+        // play all the layers of composition, in case it is videos maybe of different contents
+        if (this.mode === 'play') {
+          if (to >= this.layerEnd) {
+            this.player.setCurrentTime(this.layerStart)
+          }
+          if (to < this.layerStart) {
+            this.player.setCurrentTime(this.layerStart + 0.01)
+          }
+        }
+        // just watch the content, dont show the layers shit...
+        else if (this.mode === 'watch') {
+          // this.player.setCurrentTime(0)
+        }
+        // play layer only one,
+        // where we take the current layer?
+        // spin watch?
+        else if (this.mode === 'layer') {
+          // TODO required layerIndex & layer to loop this layer...
+          if (to >= this.layerEnd) {
+            this.player.setCurrentTime(this.layerStart)
+          }
+          if (to < this.layerStart) {
+            this.player.setCurrentTime(this.layerStart + 0.01)
+            let layerNext = this.layerIndex + 1
+            if (this.layers[layerNext]) {
+              this.layerIndex = layerNext
+            }
+            else {
+              this.layerIndex = 0
+            }
+          }
         }
       }
     }
   },
   methods: {
+    modeClick () {
+      this.$log('modeClick')
+      if (this.mode === 'play') this.mode = 'watch'
+      else this.mode = 'play'
+    },
     layerEnded () {
       // this.$log('*** layerEnded')
       // this.$log('NOW => ', this.layerIndex)

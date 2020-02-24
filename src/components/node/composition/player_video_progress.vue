@@ -51,7 +51,7 @@ div(
 // TODO hide when playing...
 export default {
   name: 'playerVideoProgress',
-  props: ['player', 'now', 'duration', 'videoUpdate'],
+  props: ['player', 'now', 'duration', 'videoUpdate', 'meta'],
   data () {
     return {
       height: 20

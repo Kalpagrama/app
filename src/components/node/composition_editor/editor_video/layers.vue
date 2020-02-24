@@ -11,9 +11,12 @@
     .col.full-height
       .row.fit.items-center.content-center.q-px-sm
         //- TODO change meta information of the content: layers, nodes, users, spheres, etc...
-        //- q-btn(flat no-caps color="green" icon-right="keyboard_arrow_down" @click="layerClick(null, -1)"
-        //-   :style=`{borderRadius: '10px'}`)
-        //-   span.text-bold.text-green Layers
+        q-btn(
+          flat no-caps
+          color="green"
+          :icon="meta.mode === 'play' ? 'pause' : 'play'" @click="playPause()"
+          :style=`{borderRadius: '10px'}`)
+        span.text-bold.text-green Layers
         //- q-icon(name="keyboard_arrow_down" color="green" size="19px").q-mt-xs.q-ml-sm
     //- div(
     //-   v-if="mode === 'edit'"
@@ -24,12 +27,12 @@
     .row.full-width.items-start.content-start.q-pa-sm
       div(
         v-for="(l, li) in layersFiltered" :key="li"
-        :class=`{'bg-grey-10': li !== layerIndex, 'bg-grey-8': li === layerIndex}`
+        :class=`{'bg-grey-10': li !== meta.layerIndex, 'bg-grey-8': li === meta.layerIndex}`
         :style=`{position: 'relative', minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.content-center.q-mb-sm.cursor-pointer
         //- inactive tint
         div(
-          v-if="layerIndex !== li" @click="layerClick(l, li)"
+          v-if="meta.layerIndex !== li" @click="layerClick(l, li)"
           :style=`{position: 'absolute', zIndex: 200, opacity: 0.3}`
           ).row.fit.cursor-pointer.bg-black
         //- inactive layer
@@ -42,7 +45,7 @@
           span.text-white {{ $time(l.figuresAbsolute[1].t) }}
         //- active layer
         div(
-          v-if="layerIndex === li"
+          v-if="meta.layerIndex === li"
           :style=`{height: height+'px'}`
           ).row.full-width.items-end.content-end.justify-end.q-pa-sm
           //- active layer EDIT
@@ -65,7 +68,7 @@
 <script>
 export default {
   name: 'editorVideoLayers',
-  props: ['mode', 'layers', 'layerIndex', 'layer', 'composition', 'content', 'player', 'meta'],
+  props: ['mode', 'layers', 'layer', 'composition', 'player', 'meta'],
   data () {
     return {
       height: 100
@@ -78,23 +81,26 @@ export default {
       })
     }
   },
-  watch: {
-    // layerIndex: {
-    //   handler (to, from) {
-    //     this.$log('layerIndex CHANGED', to)
-    //     if (to !== from) {
-    //       this.height = 0
-    //       // this.$tween.to(this, 0.4, {height: 100})
-    //     }
-    //   }
-    // }
-  },
   methods: {
+    playPause () {
+      this.$log('playPause')
+      if (this.meta.mode === 'watch') {
+        this.$parent.$emit('meta', ['mode', 'watch'])
+        this.$parent.$emit('meta', ['layerIndex', 0])
+        this.$parent.$emit('meta', ['layerIndexPlay', -1])
+      }
+      else {
+        this.$parent.$emit('meta', ['mode', 'play'])
+        this.$parent.$emit('meta', ['layerIndex', 0])
+        this.$parent.$emit('meta', ['layerIndexPlay', -1])
+      }
+    },
     layerClick (l, li) {
       this.$log('layerClick', l, li)
-      this.$emit('layerIndex', li)
-      // this.layerIndex = li
-      this.player.setCurrentTime(l.figuresAbsolute[0].t)
+      this.$emit('meta', ['mode', 'layer'])
+      this.$emit('meta', ['layerIndexPlay', li])
+      // this.$set(this.meta, 'mode', 'layer')
+      // this.$set(this.meta, 'layerIndexPlay', li)
     },
     layerExport (l, li) {
       this.$log('layerExport', l, li)

@@ -7,12 +7,12 @@ div(:style=`{position: 'relative', zIndex: 1000}`).row.full-width
         v-for="(l, li) in layers" :key="li"
         v-if="l.figuresAbsolute && l.figuresAbsolute.length > 0"
         :style=`{
-          position: 'absolute', zIndex: 200, opacity: li === layerIndex ? 0.9 : 0.5,
+          position: 'absolute', zIndex: 200, opacity: li === meta.layerIndex ? 0.9 : 0.5,
           left: (l.figuresAbsolute[0].t/meta.duration)*100+'%',
           width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/meta.duration)*100+'%',
           background: $randomColor(li)}`
         ).row.full-height
-  layer-editor(:layer="layer" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd")
+  layer-editor(:layer="layer" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd" @meta="$parent.$emit('meta', $event)")
   div(v-if="false").row.full-width
     small.text-white.full-width layers: {{layers}}
   //- layers
@@ -21,14 +21,13 @@ div(:style=`{position: 'relative', zIndex: 1000}`).row.full-width
       layers(
         mode="edit"
         :composition="composition"
-        :layerIndex="layerIndex" :layers="layers" :layer="layer" :meta="meta" :player="player"
-        @layerIndex="layerIndex = $event")
-    .col.full-height.br
+        :layers="layers" :layer="layer" :meta="meta" :player="player"
+        @meta="$parent.$emit('meta', $event)")
+    div(v-if="false").col.full-height.br
       layers(
         mode="pick"
         :composition="composition"
-        :layerIndex="layerIndex" :layers="layers" :layer="layer" :meta="meta" :player="player"
-        @layerIndex="layerIndex = $event")
+        :layers="layers" :layer="layer" :meta="meta" :player="player")
 </template>
 
 <script>
@@ -42,12 +41,14 @@ export default {
   data () {
     return {
       editorHeight: 0,
-      layerIndex: 0,
+      // layerIndex: 0,
+      layerIndexPlay: false,
       layerInitialLength: 10,
       layersShow: true,
       layersWidth: 400,
       layersBottom: true,
-      mode: 'watch'
+      mode: 'watch',
+      modes: ['watch', 'play', 'layer']
     }
   },
   computed: {
@@ -58,7 +59,7 @@ export default {
       return this.composition.layers
     },
     layer () {
-      if (this.layers[this.layerIndex]) return this.layers[this.layerIndex]
+      if (this.layers[this.meta.layerIndex]) return this.layers[this.meta.layerIndex]
       else return null
     },
     content () {
@@ -97,7 +98,6 @@ export default {
           {t: from, points: []},
           {t: to, points: []}
         ])
-        this.$emit('layerIndex', 0)
       }
       // add layer
       else {
@@ -111,7 +111,9 @@ export default {
         this.$log('layerAdd layer: ', l)
         this.$set(this.composition, 'layers', [l, ...this.composition.layers])
       }
-      this.$emit('layerIndex', 0)
+      this.$parent.$emit('meta', ['mode', 'layer'])
+      this.$parent.$emit('meta', ['layerIndexPlay', -1])
+      this.$parent.$emit('meta', ['layerIndex', 0])
       this.$log('layerAdd done')
     }
   },

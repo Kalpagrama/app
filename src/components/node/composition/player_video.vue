@@ -10,37 +10,45 @@ iframe {
 </style>
 
 <template lang="pug">
-div(:style=``).column.fit.items-start.content-start.bg-black
+div(:style=`{position: 'relative'}`).column.fit.items-start.content-start.bg-black
+  //- opacity: videoGood ? 1 : 0
   //- debug
   div(
-    v-if="!mini"
-    :style=`{position: 'absolute', left: '16px', top: '70px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
-    span.full-width.text-white duration/now: {{duration}}/{{now}}
+    v-if="!mini && true"
+    :style=`{position: 'absolute', left: '16px', top: '10px', zIndex: 10000, borderRadius: '10px', color: 'white'}`).row.q-pa-sm.bg-green
+    small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
+    small.full-width duration/now: {{duration}}/{{now}}
+    //- small.full-width mode: {{mode}}
+    small.full-width start/end: {{layerStart}}/{{layerEnd}}
+    //- small.full-width layerIndex: {{layerIndex}}
+    //- small.full-width layerIndexPlay: {{layerIndexPlay}}
   //- video container
   div(:style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
     div(:style=`{position: 'absolute', zIndex: 11, top: '0px', height: 'calc(100% + 0px)'}`).row.full-width
       video(
         ref="kalpaVideo"
-        :src="src" :type="source === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
+        :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
         playsinline loop :autoplay="ctx === 'workspace' || ctx === 'editor'" :muted="muted" preload="auto"
         @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         :style=`{
           width: '100%', height: '100%', objectFit: 'contain'
         }`)
-    player-video-progress(v-if="ctx === 'workspace' || ctx === 'editor'" :now="now" :duration="duration" :player="player" :videoUpdate="videoUpdate")
-  slot(name="editor" :meta="{now, duration, playing, muted, progressHeight}" :player="player")
+    player-video-progress(v-show="mode === 'watch'" :now="now" :duration="duration" :player="player" :videoUpdate="videoUpdate" :meta="meta")
+  slot(name="editor" :meta="meta" :player="player")
 </template>
 
 <script>
+import {throttle} from 'quasar'
 import playerVideoProgress from './player_video_progress'
 
 export default {
   name: 'playerVideo',
-  props: ['ctx', 'url', 'src', 'source', 'mini', 'fullHeight', 'active', 'visible'],
+  props: ['ctx', 'composition', 'visible', 'active', 'mini'],
   components: {playerVideoProgress},
   data () {
     return {
       now: 0,
+      nowPause: false,
       duration: 0,
       player: null,
       playing: false,
@@ -49,71 +57,192 @@ export default {
       intervalUpdate: null,
       intervalMove: null,
       progressShow: false,
-      progressHeight: 20
+      progressHeight: 20,
+      mode: 'play',
+      layerIndex: 0,
+      layerIndexPlay: -1
     }
   },
   computed: {
-    videoStyles () {
-      if (this.fullscreen) {
-        return {
-          position: 'fixed !important',
-          zIndex: 20000,
-          height: '100%',
-          width: '100%',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0
-        }
-      } else {
-        return {
-          position: 'relative'
-        }
+    meta () {
+      return {
+        now: this.now,
+        duration: this.duration,
+        playing: this.playing,
+        muted: this.muted,
+        layerIndex: this.layerIndex,
+        layerIndexPlay: this.layerIndexPlay,
+        mode: this.mode,
+        progressHeight: this.progressHeight
+      }
+    },
+    layers () {
+      return this.composition.layers
+    },
+    layer () {
+      return this.layers[this.layerIndex]
+    },
+    layerStart () {
+      if (this.ctx === 'workspace' || this.ctx === 'editor') {
+        return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
+      }
+      else {
+        return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
+      }
+    },
+    layerEnd () {
+      if (this.ctx === 'workspace' || this.ctx === 'editor') {
+        return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
+      }
+      else {
+        return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
+      }
+    },
+    content () {
+      return this.layer.content
+    },
+    contentSource () {
+      return this.content ? this.content.contentSource : false
+    },
+    contentUrl () {
+      if (this.content.contentSource === 'YOUTUBE') {
+        return this.content.url
+      }
+      else if (this.content.contentSource === 'KALPA') {
+        if (this.ctx === 'editor' || this.ctx === 'workspace') return this.content.url
+        else return this.layer.url
+      }
+      else {
+        return false
+      }
+    },
+    videoGood () {
+      if (this.layerEnd && this.layerStart) {
+        return this.now > this.layerStart && this.now < this.layerEnd
+      }
+      else {
+        return true
       }
     }
   },
   watch: {
+    contentSource: {
+      immediate: false,
+      handler (to, from) {
+        this.$log('contentSource CHANGED', to)
+        if (to) this.playerInit()
+      }
+    },
     visible: {
       immediate: true,
       handler (to, from) {
-        // if (to && this.player.play) this.player.setCurrentTime(this.start)
+        this.$log('visible CHANGED', to)
+        if (this.layerStart && this.player) this.player.setCurrentTime(this.layerStart)
+        // if (to) {
+        //   this.$q.notify('visible!!!')
+        //   // this.player.play()
+        //   if (this.layerStart) this.player.setCurrentTime(this.layerStart)
+        // }
+        // else this.player.pause()
       }
     },
-    source: {
+    active: {
+      immediate: false,
+      handler (to, from) {
+        this.$log('active CHANGED', to)
+        if (to) this.player.play()
+        else this.player.pause()
+      }
+    },
+    mini: {
+      immediate: false,
+      handler (to, from) {
+        this.$log('mini CHANGED', to)
+        if (to) this.player.pause()
+        else this.player.play()
+      }
+    },
+    layerIndex: {
+      immediate: false,
+      handler (to, from) {
+        this.$log('layerIndex CHANGED', to)
+        if (to > -1) {
+          this.player.setCurrentTime(this.layerStart)
+          this.player.update()
+        }
+      }
+    },
+    layerIndexPlay: {
       immediate: true,
       handler (to, from) {
-        this.$log('source CHANGED', to)
-        if (to) {
-          if (this.$refs.kalpaVideo) this.playerInit(to)
-        }
+        this.$log('layerIndexPlay CHANGED', to)
+        if (to > -1) this.layerIndex = to
       }
     },
-    src: {
-      immediate: true,
-      async handler (to, from) {
-        // this.$log('src CHANGED', to)
-        if (to) {
-          if (this.player) this.player.remove()
-          this.playerInit(this.source)
-        }
+    now: {
+      handler (to, from) {
+        // this.$log('now CHANGED', to)
+        this.videoNow(to, from)
       }
     }
   },
   methods: {
+    videoNow (to, from) {
+      if (this.nowPause) return
+      if (this.mode === 'play') {
+        if (!this.layerStart && !this.layerEnd) return
+        if (to > this.layerEnd) {
+          let to = this.layerIndex + 1
+          if (this.layers[to]) {
+            this.$log('NEXT LAYER')
+            this.layerIndex = to
+          }
+          else {
+            if (this.layerIndex === 0) {
+              this.player.setCurrentTime(this.layerStart + 0.1)
+            }
+            else {
+              this.layerIndex = 0
+            }
+          }
+        }
+        if (to < this.layerStart) {
+          this.player.setCurrentTime(this.layerStart + 0.1)
+        }
+      }
+      else if (this.mode === 'layer') {
+        if (!this.layerStart && !this.layerEnd) return
+        if (this.layerIndexPlay > -1) {
+          if (to > this.layerEnd) {
+            this.$log('LAYER', this.layerIndex)
+            this.player.setCurrentTime(this.layerStart)
+          }
+          if (to < this.layerStart) {
+            this.player.setCurrentTime(this.layerStart)
+          }
+        }
+      }
+      else if (this.player.mode === 'watch') {
+      }
+    },
     async videoMove () {
       if (!this.fullscreen) return
       this.$log('videoMove')
-      this.$set(this.player, 'controls', true)
+      // this.$set(this.player, 'controls', true)
       if (this.intervalMove) clearInterval(this.intervalMove)
       this.intervalMove = setTimeout(() => {
-        this.$set(this.player, 'controls', false)
+        // this.$set(this.player, 'controls', false)
       }, 2500)
     },
     videoLoadeddata () {
       this.$log('videoLoadeddata')
-      this.intervalUpdate = setInterval(this.intervalUpdate, 1000 / 60)
+      // this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 60)
+      if (this.visible) {
+        this.player.setCurrentTime(this.layerStart)
+      }
+      if (this.visible && this.active && !this.mini) this.player.play()
     },
-    videoPlay () {
+    videoPlay (intervalUpdateIgnore) {
       this.$log('videoPlay')
       this.playing = true
       if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 60)
@@ -134,36 +263,41 @@ export default {
       this.videoUpdate()
     },
     videoUpdate (to) {
-      // this.$log('videoStep', this.now)
-      if (this.source === 'YOUTUBE') {
-        this.now = to || this.player.currentTime
-        this.duration = this.player.duration
-      }
-      else {
+      // this.$log('videoUpdate', this.now)
+      // for kalpa using native video element
+      if (this.contentSource === 'KALPA') {
         if (!this.$refs.kalpaVideo) return
         this.now = to || this.$refs.kalpaVideo.currentTime
         this.duration = this.$refs.kalpaVideo.duration
       }
-      // this.$emit('now', to || this.now)
+      // for yotube use mediaElementPlayer
+      else if (this.contentSource === 'YOUTUBE') {
+        this.now = to || this.player.currentTime
+        this.duration = this.player.duration
+      }
     },
     async videoClick (e) {
       this.$log('videoClick')
-      // TODO switch case mute/unmute play/pause
-      this.muted = !this.muted
-      this.videoPlayPause()
+      if (this.visible && this.active && !this.mini) {
+        // TODO switch case mute/unmute play/pause
+        this.muted = !this.muted
+        // this.videoPlayPause()
+      }
     },
     videoFullscreen () {
       this.$log('videoFullscreen')
       this.fullscreen = !this.fullscreen
       this.$q.fullscreen.toggle()
     },
-    playerDelete () {},
-    playerInit (source) {
-      this.$log('playerInit', source)
-      if (source === 'KALPA') {
+    playerInit () {
+      this.$log('playerInit', this.contentSource)
+      if (this.contentSource === 'KALPA') {
         this.player = {}
-        this.player.setCurrentTime = (ms) => {
+        this.player.setCurrentTime = async (ms) => {
           if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.currentTime = ms
+          this.nowPause = true
+          await this.$wait(600)
+          this.nowPause = false
         }
         this.player.play = () => {
           if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.play()
@@ -175,9 +309,9 @@ export default {
           // TODO
         }
         this.videoUpdate()
-        this.videoPlay()
+        // this.videoPlay()
       }
-      else {
+      else if (this.contentSource === 'YOUTUBE') {
         let me = new window.MediaElementPlayer(this.$refs.kalpaVideo, {
           loop: true,
           autoplay: false,
@@ -196,27 +330,44 @@ export default {
             this.player.addEventListener('pause', this.videoPause)
             this.player.addEventListener('loadeddata', this.videoLoadeddata)
             this.videoUpdate()
-            this.videoPlay()
+            // this.videoPlay()
           },
           error: async (mediaElement, originalNode, instance) => {
             this.$log('player YOUTUBE error')
           }
         })
       }
-      this.$emit('player', this.player)
+      // set player defaults
+      this.player.update = () => {
+        this.videoUpdate()
+      }
+    },
+    playerDestroy () {
+      this.$log('playerDestroy', this.contentSource)
+      if (this.contentSource === 'KALPA') {
+      }
+      else if (this.contentSource === 'YOTUBE') {
+        this.player.removeEventListener('play', this.videoPlay)
+        this.player.removeEventListener('pause', this.videoPause)
+        this.player.removeEventListener('loadeddata', this.videoLoadeddata)
+      }
     }
+  },
+  created () {
+    this.$log('created')
+    this.videoNow = throttle(this.videoNow, 300)
   },
   async mounted () {
     this.$log('mounted')
-    this.playerInit(this.source)
+    this.playerInit()
+    this.$on('meta', (val) => {
+      this.$log('meta.val', val)
+      this[val[0]] = val[1]
+    })
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    if (this.source === 'YOUTUBE') {
-      this.player.removeEventListener('play', this.videoPlay)
-      this.player.removeEventListener('pause', this.videoPause)
-      this.player.removeEventListener('loadeddata', this.videoLoadeddata)
-    }
+    this.playerDestroy()
   }
 }
 </script>

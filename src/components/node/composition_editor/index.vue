@@ -2,11 +2,11 @@
 div(:style=`{position: 'relative'}`).row.fit
   composition(
     v-if="composition" :value="composition"
-    :ctx="ctx" :mini="false" :visible="true" :active="true"
-    :layerIndexPlay="layerIndex" :mode="mode")
+    :ctx="ctx"
+    :visible="true" :active="true" :mini="false")
     template(v-slot:editor=`{player, meta}`)
       editor-video(
-        v-if="composition && content.type === 'VIDEO'"
+        v-if="composition"
         :ctx="ctx" :composition="composition" :meta="meta" :player="player")
 </template>
 

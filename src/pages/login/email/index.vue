@@ -12,7 +12,6 @@
 <template lang="pug">
 .row.full-width.justify-center
   div(:style=`{maxWidth: 330+'px'}`).row.full-width
-    //- h1 shit
     .row.fit.content-center.items-center
       div(v-if="!codeConfirmed && !codeWaiting").row.full-width.q-mb-sm
         div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mb-sm.bg-white
