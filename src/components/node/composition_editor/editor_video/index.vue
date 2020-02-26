@@ -20,7 +20,7 @@ div(:style=`{position: 'relative', zIndex: 1000}`).row.full-width
     q-btn(
       round flat color="green" @click="layersContentShow = !layersContentShow"
       :icon="layersContentShow ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
-      :style=`{position: 'absolute', zIndex: 1100, top: '10px', right: '10px'}`)
+      :style=`{position: 'absolute', zIndex: 1100, top: '10px', right: '16px'}`)
     .col.full-height
       layers(
         mode="edit"

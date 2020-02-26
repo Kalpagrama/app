@@ -1,5 +1,9 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
+  q-btn(outline color="red" no-caps @click="$emit('close')"
+    :style=`{position: 'absolute', zIndex: 9000, top: '16px', borderRadius: '10px', left: '16px'}`) Cancel
+  q-btn(push color="green" no-caps @click="$emit('close')"
+    :style=`{position: 'absolute', zIndex: 9000, top: '16px', borderRadius: '10px', right: '16px'}`) Ready
   composition(
     v-if="composition" :value="composition"
     :ctx="ctx"
@@ -76,25 +80,6 @@ export default {
     }
   },
   methods: {
-    layerFound (l) {
-      this.$log('layerFound', l)
-      // add layer to existing composition
-      if (this.node.compositions[this.compositionIndex]) {
-        // TODO: and if there is another content????
-        this.node.compositions[this.compositionIndex].layers.push(l)
-      }
-      // create new composition with given index and layer
-      else {
-        let c = {
-          url: '',
-          name: '',
-          layers: [l]
-        }
-        this.$set(this.node.compositions, this.compositionIndex, c)
-        // this.node.compositions[this.compositionIndex] = c
-      }
-      this.compositionFinderOpened = false
-    },
     async nodeSave (node) {
       try {
         this.$log('nodeSave start', node)

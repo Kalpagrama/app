@@ -14,14 +14,16 @@
   div(
     :style=`{position: 'relative'}`
     ).column.fit
-    //- dialog composition EDITOR
+    //- composition EDITOR dialog
     q-dialog(v-model="compositionEditorOpened" :maximized="true").bg-black
       composition-editor(
         ctx="editor"
-        :value="node" :compositionIndex="compositionIndex" @composition="compositionEdited").bg-black
-    //- dialog composition FINDER
+        :value="node" :compositionIndex="compositionIndex"
+        @composition="compositionEdited" @close="compositionEditorOpened = false").bg-black
+    //- composition FINDER dialog
     q-dialog(v-model="compositionFinderOpened").bg-black
-      composition-finder(@composition="compositionFound").bg-black
+      composition-finder(
+        @composition="compositionFound" @close="compositionFinderOpened = false").bg-black
     //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start.justify-center.q-px-sm
@@ -29,7 +31,7 @@
         div(
           :style=`{height: '113px'}`
           ).row.full-width.items-start.content-start.justify-center.q-px-sm
-          div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
+          div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
             //- header
             div(
               :style=`{height: '60px'}`
@@ -55,7 +57,7 @@
                 push color="green" no-caps :loading="nodePublishing" @click="nodePublish()"
                 :style=`{borderRadius: '10px'}`)
                 span().text-bold Publish
-        div(:style=`{maxWidth: '600px'}`).row.full-width
+        div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width
           //- composition one
           div(
             :style=`{position: 'relative', minHeight: '330px', borderRadius: '10px', overflow: 'hidden'}`
@@ -63,8 +65,8 @@
             composition(
               v-if="node.compositions[0]" ctx="editor"
               :value="node.compositions[0]"
-              :active="compositionActive[0]"
-              :visible="compositionVisible[0]"
+              :visible="compositionOneVisible"
+              :active="compositionOneActive"
               :mini="false")
             //- composition actions
             div(
@@ -89,8 +91,8 @@
             composition(
               v-if="node.compositions[1]" ctx="editor"
               :value="node.compositions[1]"
-              :active="compositionActive[1]"
-              :visible="compositionVisible[1]"
+              :visible="compositionTwoVisible"
+              :active="compositionTwoActive"
               :mini="false" )
             //- composition actions
             div(
@@ -137,6 +139,7 @@ export default {
   props: ['value'],
   data () {
     return {
+      maxWidth: 600,
       nodeSavePause: false,
       nodeSaving: false,
       nodeSavingError: null,
@@ -144,7 +147,6 @@ export default {
       nodePublishingError: null,
       nodeDeleting: false,
       nodeDeletingError: null,
-      nodeRes: null,
       node: null,
       nodeNew: {
         name: '',
@@ -152,18 +154,15 @@ export default {
         layout: 'PIP',
         category: 'FUN',
         spheres: [],
-        compositions: [
-          // {
-          //   operation: { type: 'CONCAT', items: [], operations: null },
-          //   layers: [{ content: content, figuresAbsolute: [] }]
-          // }
-        ]
+        compositions: []
       },
       compositionEditorOpened: false,
       compositionFinderOpened: false,
       compositionIndex: undefined,
-      compositionVisible: [true, true],
-      compositionActive: [true, true]
+      compositionOneVisible: true,
+      compositionOneActive: true,
+      compositionTwoVisible: true,
+      compositionTwoActive: true
     }
   },
   watch: {
@@ -178,7 +177,7 @@ export default {
         }
         else {
           this.nodeSavePause = true
-          this.node = this.nodeNew
+          this.node = JSON.parse(JSON.stringify(this.nodeNew))
         }
       }
     },
@@ -200,8 +199,8 @@ export default {
     compositionFind (index) {
       this.$log('compositionFind', index)
       this.compositionIndex = index
-      this.$set(this.compositionActive, 0, false)
-      this.$set(this.compositionActive, 1, false)
+      this.compositionOneActive = false
+      this.compositionTwoActive = false
       this.compositionFinderOpened = true
     },
     async compositionFound (c) {
@@ -215,24 +214,30 @@ export default {
     compositionEdit (index) {
       this.$log('compositionEdit', index)
       this.compositionIndex = index
-      this.$set(this.compositionActive, 0, false)
-      this.$set(this.compositionActive, 1, false)
+      this.compositionOneActive = false
+      this.compositionTwoActive = false
       this.compositionEditorOpened = true
     },
     compositionEdited (composition) {
       this.$log('compositionEdited', composition)
-      // this.nodeSavePause = true
-      // TODO work with value instead of emiting events...
-      // this.node.compositions[this.compositionIndex] = composition
-      this.$set(this.node.compositions, this.compositionIndex, composition)
-      this.$set(this.compositionActive, 0, true)
-      this.$set(this.compositionActive, 1, true)
+      // if we got empty composition
+      if (composition.layers.length === 0 && composition.layers[0].figuresAbsolute.length === 0) {
+        this.$log('cEMPTY')
+        this.$set(this.node.compositions, this.compositionIndex, null)
+      }
+      // we got good composition
+      else {
+        this.$log('cEDITED')
+        this.$set(this.node.compositions, this.compositionIndex, composition)
+        this.compositionOneActive = true
+        this.compositionTwoActive = true
+      }
     },
     compositionDelete (index) {
       this.$log('compositionDelete', index)
-      this.$set(this.compositionActive, 0, false)
-      this.$set(this.compositionActive, 1, false)
-      this.$delete(this.node.compositions, index)
+      this.compositionOneActive = false
+      this.compositionTwoActive = false
+      this.$set(this.node.compositions, index, null)
     },
     async nodeDelete (oid) {
       try {
@@ -260,6 +265,7 @@ export default {
         this.$log('nodeSave start', node.revision, node.name, node)
         this.nodeSaving = true
         let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
+        await this.$wait(600)
         this.$log('nodeSave res', res.revision, res.name, res)
         this.$log('nodeSave this.value', this.value)
         if (!this.value) {
@@ -268,7 +274,7 @@ export default {
           this.$store.commit('workspace/stateSet', ['itemType', 'node'])
           this.$store.commit('workspace/stateSet', ['item', res])
         }
-        this.$log('nodeSave done', node.revision, node.name)
+        this.$log('nodeSave done', res.revision, res.name)
         this.nodeSaving = false
         this.nodeSavingError = null
       } catch (e) {
@@ -283,6 +289,7 @@ export default {
         // TODO need prePublish check
         this.nodePublishing = true
         let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
+        await this.$wait(600)
         this.$log('res', res)
         this.$log('nodePublish done')
         this.nodePublishing = false
