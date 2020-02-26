@@ -25,7 +25,7 @@
         kalpa-loader(type="wsNodes" :variables=`{}`)
           template(v-slot:items=`{items}`)
             ws-node(
-              v-for="(n, ni) in items" :key="n.oid" @nodeClick="$emit('item', $event)"
+              v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
               :oid="oid" :node="n")
 </template>
 
@@ -46,6 +46,10 @@ export default {
     }
   },
   methods: {
+    nodeClick (node) {
+      this.$log('nodeClick', node)
+      this.$emit('item', {type: 'node', item: node})
+    }
   },
   async mounted () {
     // this.$log('mounted')

@@ -54,6 +54,11 @@ export default {
         if (to) this.play()
         else this.pause()
       }
+    },
+    visible: {
+      handler (to, from) {
+        this.$log('visible CHANGED', to)
+      }
     }
   },
   methods: {
@@ -70,8 +75,9 @@ export default {
     },
     async nodeNameClick () {
       this.$log('nodeNameClick')
+      this.$router.push('/node/' + this.node.oid).catch(e => e)
       this.pause()
-      this.$emit('open')
+      // this.$emit('open')
     }
   }
 }

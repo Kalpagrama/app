@@ -1,6 +1,6 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-grey-8
-  q-page-conainter.row.full-width.justify-center.items-start.content-start
+q-layout(view="hHh lpR fFf")
+  q-page-conainter.row.full-width.justify-center.items-start.content-start.bg-grey-9
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
         node-list(:nodes="items" :style=`{maxWidth: '750px'}`)
@@ -30,7 +30,7 @@ export default {
     variables () {
       return {
         oid: this.sphereOid,
-        pagination: { pageSize: 10 },
+        pagination: { pageSize: 200 },
         sortStrategy: 'HOT',
         filter: { types: 'NODE' }
       }

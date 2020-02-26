@@ -50,7 +50,6 @@ export default {
       modes: ['list', 'gallery', 'feed'],
       content: null,
       contents: [],
-      contentsLoading: false,
       res: null
     }
   },
@@ -62,29 +61,9 @@ export default {
   watch: {
   },
   methods: {
-    contentClick (c, ci) {
-      this.$log('contentClick', c, ci)
-      this.$emit('item', c)
-    },
-    async contentLoad (oid) {
-      this.$log('contentLoad start', oid)
-      let content = await this.$store.dispatch('objects/get', { oid, priority: 0 })
-      this.$log('contentLoad done', content)
-      return content
-    },
-    async contentsLoad () {
-      this.$log('contentsLoad start')
-      this.contentsLoading = true
-      // await this.$wait(1000)
-      let res = await this.$store.dispatch('lists/wsItems', {wsItemsType: 'CONTENTS'})
-      this.$log('contentsLoad done', res)
-      this.contentsLoading = false
-      // return
-      this.res = res
-    },
-    async contentsReload () {
-      this.$log('contentsReload')
-      this.contents = await this.contentsLoad()
+    contentClick (content) {
+      this.$log('contentClick', content)
+      this.$emit('item', {type: 'content', item: content})
     },
     async contentFound (content) {
       this.$log('contentFound', content)
@@ -97,10 +76,10 @@ export default {
         this.$log('*** USE node-content')
         this.$emit('item', JSON.parse(JSON.stringify(item)))
       }
-      // if no item, create node-content container, then emit it
+      // if no item, create nodeContent, then click it
       else {
         this.$log('*** CREATE node-content')
-        let node = {
+        let nodeContentInput = {
           name,
           layout: 'PIP',
           category: 'FUN',
@@ -112,9 +91,10 @@ export default {
             }
           ]
         }
-        let res = await this.$store.dispatch('workspace/wsNodeSave', node)
-        this.$log('res', res)
-        this.$emit('item', JSON.parse(JSON.stringify(res)))
+        this.$log('nodeContentInput', nodeContentInput)
+        let nodeContent = await this.$store.dispatch('workspace/wsNodeSave', nodeContentInput)
+        this.$log('nodeContent', nodeContent)
+        this.contentClick(nodeContent)
       }
     }
   },

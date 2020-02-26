@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    maxWidth: ctx === 'workspace' ? width+'px' : '100%',
+    maxWidth: widthComputed,
   }`
   ).row.fit
   //- toggle opened
@@ -36,7 +36,7 @@ div(
         q-btn(round :flat="page !== 'settings'" color="green" icon="settings" @click="$emit('page', 'settings')")
     kalpa-buttons(:value="pagesFiltered" :id="page" idKey="id" @id="$emit('page', $event)")
     .col.full-width
-      component(:is="`ws-`+page" @item="itemClick" @add="$emit('add')" :ctx="ctx")
+      component(:is="`ws-`+page" @item="$emit('item', $event)" @add="$emit('add')" :ctx="ctx")
 </template>
 
 <script>
@@ -80,9 +80,13 @@ export default {
     }
   },
   computed: {
-    // page () {
-    //   return this.$route.params.page
-    // },
+    widthComputed () {
+      if (this.$q.screen.xs) return '100%'
+      else {
+        if (this.ctx === 'workspace') return this.width + 'px'
+        else return '100%'
+      }
+    },
     pagesFiltered () {
       return this.pagesRaw.filter(p => this.pages.includes(p.id))
     }
@@ -96,10 +100,6 @@ export default {
     }
   },
   methods: {
-    itemClick (item) {
-      this.$log('itemClick', item)
-      this.$emit('item', JSON.parse(JSON.stringify(item)))
-    }
   },
   mounted () {
     this.$log('mounted')

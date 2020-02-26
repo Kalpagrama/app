@@ -28,13 +28,25 @@ export default {
   props: [],
   data () {
     return {
-      pageDialogOpened: false,
-      item: null
+      pageDialogOpened: false
+      // item: null
     }
   },
   computed: {
   },
   watch: {
+    '$store.state.workspace.item': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('item CHANGED', to)
+        // TODO item type?
+        if (to) {
+          this.$router.push({params: {oid: to.oid}}).catch(e => e)
+          if (this.$q.screen.xs) this.pageDialogOpened = true
+        }
+      }
+    },
     '$route.params.page': {
       immediate: true,
       handler (to, from) {
@@ -42,6 +54,8 @@ export default {
         if (to) {
           if (to !== from) {
             this.item = null
+            this.$store.commit('workspace/stateSet', ['item', null])
+            this.$store.commit('workspace/stateSet', ['itemType', undefined])
             this.$router.replace('/workspace/' + to).catch(e => e)
           }
         } else {
@@ -51,33 +65,26 @@ export default {
     }
   },
   methods: {
-    itemAdd () {
-      this.$log('itemAdd')
-      this.$router.push('/workspace/' + this.$route.params.page)
-        .then(() => {
-          this.item = null
-          if (this.$q.screen.xs) this.pageDialogOpened = true
-        })
-        .catch(e => {
-          this.item = null
-          if (this.$q.screen.xs) this.pageDialogOpened = true
-        })
+    itemClick ({type, item}) {
+      this.$log('itemClick', type, item)
+      this.$store.commit('workspace/stateSet', ['itemType', undefined])
+      this.$store.commit('workspace/stateSet', ['item', null])
+      this.$nextTick(() => {
+        this.$store.commit('workspace/stateSet', ['itemType', type])
+        this.$store.commit('workspace/stateSet', ['item', item])
+      })
     },
-    async itemClick (item) {
-      this.$log('itemClick', item)
-      this.$router.push({params: {oid: item.oid}})
-        .then(() => {
-          this.item = item
-          if (this.$q.screen.xs) this.pageDialogOpened = true
-        })
-        .catch(e => {
-          this.item = item
-          if (this.$q.screen.xs) this.pageDialogOpened = true
-        })
+    itemAdd (type, item) {
+      this.$log('itemAdd', type, item)
+      this.$router.push('/workspace/' + this.$route.params.page).catch(e => e)
+      this.$store.commit('workspace/stateSet', ['itemType', undefined])
+      this.$store.commit('workspace/stateSet', ['item', null])
+      // this.itemClick({type: undefined, item: null})
     }
   },
   mounted () {
     this.$log('mounted')
+    document.body.style.backgroundColor = '#424242'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

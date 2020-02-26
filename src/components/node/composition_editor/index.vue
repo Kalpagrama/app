@@ -1,49 +1,30 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  //- if we got composition of the node ??
-  //- how to delete composition from the node
-  div(v-if="node.compositions[compositionIndex]").col.full-height
-    editor-video(
-      v-if="composition && content.type === 'VIDEO'" :ctx="ctx"
-      :composition="composition" :content="content"
-      @layerExport="$emit('layerExport', $event)")
-    editor-image(
-      v-if="composition && content.type === 'IMAGE'" :ctx="ctx"
-      :composition="composition" :content="content")
-  //- TODO: where to finder to be? inside composition editor
-  //- does it using somewhere else ??
-  div(v-else).row.fit.items-center.content-center.justify-center
-    q-dialog(v-model="compositionFinderOpened")
-      composition-finder(@layer="layerFound")
-    q-btn(round flat size="lg" color="green" icon="add" @click="compositionAdd()")
+  composition(
+    v-if="composition" :value="composition"
+    :ctx="ctx"
+    :visible="true" :active="true" :mini="false")
+    template(v-slot:editor=`{player, meta}`)
+      editor-video(
+        v-if="composition"
+        :ctx="ctx" :composition="composition" :player="player" :meta="meta")
 </template>
 
 <script>
 import { debounce } from 'quasar'
 import editorVideo from './editor_video/index.vue'
-import editorImage from './editor_image/index.vue'
 
 export default {
   name: 'compositionEditor',
-  components: {editorVideo, editorImage},
+  components: {editorVideo},
   props: {
-    ctx: {
-      type: String
-    },
-    node: {
-      type: Object,
-      required: true
-    },
-    compositionIndex: {
-      type: Number,
-      required: true,
-      default () {
-        return 0
-      }
-    }
+    ctx: {type: String, default () { return 'workspace' }},
+    value: {type: Object, required: true},
+    compositionIndex: {type: Number, required: true, default () { return 0 }}
   },
   data () {
     return {
+      node: null,
       nodeRes: null,
       nodeSavePause: false,
       nodeSaving: false,
@@ -53,29 +34,24 @@ export default {
   },
   computed: {
     composition () {
-      if (this.node && this.compositionIndex !== undefined) {
-        return this.node.compositions[this.compositionIndex]
-      } else {
-        return null
-      }
+      if (this.node) return this.node.compositions[this.compositionIndex]
+      else return null
     },
     content () {
-      if (this.composition) {
-        return this.composition.layers[0].content
-      } else {
-        return null
-      }
+      if (this.composition) return this.composition.layers[0].content
+      else return null
     }
   },
   watch: {
-    compositionIndex: {
+    value: {
+      deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('compositionIndex CHANGED', to)
-        if (to !== undefined) {
-          if (!this.node.compositions[to]) {
-            // TODO: try to add composition to the node...
-          }
+        this.$log('value CHANGED', to)
+        if (to && this.node && this.ctx === 'editor') return
+        if (to && !this.nodeSaving) {
+          this.nodeSavePause = true
+          this.node = JSON.parse(JSON.stringify(to))
         }
       }
     },
@@ -83,25 +59,18 @@ export default {
       deep: true,
       immediate: false,
       handler (to, from) {
-        // this.$log('node CHANGED', to)
-        if (to.oid !== from.oid) return
-        if (to && this.ctx === 'workspace') {
-          if (this.nodeSavePause) {
-            this.nodeSavePause = false
-          } else {
-            this.nodeSave()
-          }
-        }
-      }
-    },
-    nodeRes: {
-      deep: true,
-      handler (to, from) {
+        this.$log('node CHANGED', to, this.nodeSavePause)
         if (to) {
-          // this.$log('nodeRes changed', to)
-          this.nodeSavePause = true
-          // this.node = JSON.parse(JSON.stringify(to))
-          this.$emit('node', JSON.parse(JSON.stringify(to)))
+          if (this.ctx === 'workspace') {
+            if (this.nodeSavePause) {
+              this.nodeSavePause = false
+            } else {
+              this.nodeSave(to)
+            }
+          }
+          else {
+            this.$emit('composition', to.compositions[this.compositionIndex])
+          }
         }
       }
     }
@@ -126,30 +95,14 @@ export default {
       }
       this.compositionFinderOpened = false
     },
-    compositionAdd () {
-      this.$log('compositionAdd')
-      // open modal to export layers from node CONTENT?
-      // find only content and do it live?
-      this.compositionFinderOpened = true
-    },
-    compositionExport () {
-      this.$log('compositionExport')
-    },
-    compositionDelete () {
-      this.$log('compositionDelete')
-    },
     async nodeSave (node) {
       try {
-        this.$log('nodeSave start', this.node)
+        this.$log('nodeSave start', node)
+        // if (this.nodeSaving) return
         this.nodeSaving = true
-        this.nodeRes = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(this.node)))
-        // this.$log('res', res)
-        // this.$log('nodeSave done')
-        // this.nodeSavePause = true
-        // this.nodeRes = res
+        await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
         this.nodeSaving = false
         this.nodeSavingError = null
-        // this.nodeSavePause = false
       } catch (e) {
         this.$log('nodeSave error', e)
         this.nodeSaving = false

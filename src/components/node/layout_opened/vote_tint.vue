@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'absolute', zIndex: 1000, paddingBottom: '30px',
+    position: 'absolute', zIndex: 10000, paddingBottom: '30px',
     borderRadius: '10px', overflow: 'hidden', background: 'rgba(0,0,0,0.5)'}`
     ).row.fit.items-end.content-end.justify-center
   //- vote number

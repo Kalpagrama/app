@@ -1,137 +1,150 @@
 <template lang="pug">
-div(
-  v-touch-swipe.mouse.left.right="handleSwipe"
-  :style=`{position: 'relative', minHeight: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-black
-  //- debug
-  div(v-if="false" :style=`{position: 'absolute', zIndex: 1000, top: '60px'}`).row.bg-green
-    small.text-white.full-width index: {{index}}
-    small(v-if="styles.length > 0").text-white.full-width styles[2].maxWidth: {{ styles[2].maxWidth }}
-    small(v-if="styles.length > 0").text-white.full-width styles[0].maxWidth: {{ styles[0].maxWidth }}
-  //- stats
-  small(
-    v-if="true"
-    :style=`{position: 'absolute', zIndex: 50000, top: '4px', right: 'calc(50% - 20px)', borderRadius: '10px', background: 'rgba(0,0,0,0.3)',
-      userSelect: 'none'}`
-    ).text-white.q-pa-xs {{ index + 1 }}/{{ compositions.length }}
-  //- preview
-  img(
-    ref="playerPreview"
-    :src="compositions[0].preview" @load="previewLoad" @error="previewError"
-    :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0}`)
-  //- compositions
-  div(
-    v-for="(c, ci) in compositions" :key="ci"
-    v-if="height > 0 && styles.length > 0 && ci > index-2 && ci < index+2"
-    :style=`{
-      ...compositionStyle(ci),
-      position: 'absolute', bottom: 0, borderRadius: '10px', overflow: 'hidden',
-      //- border: ci > index ? '2px solid red' : ci < index ? '2px solid blue' : 'none',
-      zIndex: ci === index ? 200 : 300,
-      opacity: ci === index ? styles[1].opacity : ci === index+1 ? styles[2].opacity : styles[0].opacity,
-      maxWidth: ci === index ? styles[1].maxWidth+'%' : ci === index+1 ? styles[2].maxWidth+'%' : styles[0].maxWidth+'%',
-      maxHeight: ci === index ? styles[1].maxHeight+'%'+'px' : ci === index+1 ? styles[2].maxHeight+'px' : styles[0].maxHeight+'px',
-      height: isMini(ci) ? 'auto' : '100%'
-    }`).row.full-width.items-end.content-end
-    composition(
-      :ctx="ctx"
-      :value="c.composition" :preview="c.preview"
-      :mini="isMini(ci)"
-      :visible="visible && ci >= index-1 && ci <= index+1"
-      :active="active && ci === index"
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`
-      @next="compositionNext(ci)"
-      @error="$event => compositionError(ci, $event)")
-      //- @ended="compositionNext(ci + 1)"
+div(:style=`{position: 'absolute', bottom: 'calc(50% + 50px)', zIndex: 1000, color: 'white', height: '50px'}`).row.full-width.bg-green.br
+  small(@click="modeClick()").full-width mode: {{ mode }}
 </template>
 
 <script>
+// on mode play, and watch we ignore the layerIndex
+// play one layer,  play all the layers,
+// just watch
+// video progress may be here, video controller is it u?
+
 export default {
   name: 'compositionPlayer',
-  props: ['ctx', 'visible', 'active', 'compositions'],
+  props: ['ctx', 'mode', 'player', 'meta', 'active', 'visible', 'mini', 'layers'],
   data () {
     return {
-      index: 0,
-      indexErrored: [],
-      indexNexting: -1,
-      height: 0,
-      width: 0,
-      stylesInitial: [
-        {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.5},
-        {zIndex: 200, maxWidth: 100, maxHeight: 100, opacity: 1},
-        {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.5}
-      ],
-      styles: []
+      // mode: 'play',
+      // modes: ['play', 'watch', 'layer'],
+      layerIndex: 0
+    }
+  },
+  computed: {
+    layer () {
+      if (this.layers[this.layerIndex]) return this.layers[this.layerIndex]
+      else return null
+    },
+    layerStart () {
+      if (this.mode === 'watch') return false
+      else {
+        if (this.ctx === 'workspace' || this.ctx === 'editor') return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
+        else return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
+      }
+    },
+    layerEnd () {
+      if (this.mode === 'watch') return false
+      else {
+        if (this.ctx === 'workspace' || this.ctx === 'editor') return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
+        else return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
+      }
+    }
+  },
+  watch: {
+    mini: {
+      handler (to, from) {
+        this.$log('mini CHANGED', to)
+        if (to && this.visible && this.active) {
+          this.player.play()
+        }
+        else {
+          this.player.play()
+        }
+      }
+    },
+    visible: {
+      handler (to, from) {
+        this.$log('visible CHANGED', to)
+        if (to) {
+          // go to start
+          let start = 0
+          this.player.setCurrentTime(start)
+        }
+        else {
+          this.player.pause()
+          // this.player.remove()
+        }
+      }
+    },
+    active: {
+      handler (to, from) {
+        this.$log('active CHANGED', to)
+        if (to) {
+          this.player.play()
+        }
+        else {
+          this.player.pause()
+        }
+      }
+    },
+    'meta.now': {
+      handler (to, from) {
+        // this.$log('meta.now CHANGED', to)
+        // play all the layers of composition, in case it is videos maybe of different contents
+        if (this.mode === 'play') {
+          if (to >= this.layerEnd) {
+            this.player.setCurrentTime(this.layerStart)
+          }
+          if (to < this.layerStart) {
+            this.player.setCurrentTime(this.layerStart + 0.01)
+          }
+        }
+        // just watch the content, dont show the layers shit...
+        else if (this.mode === 'watch') {
+          // this.player.setCurrentTime(0)
+        }
+        // play layer only one,
+        // where we take the current layer?
+        // spin watch?
+        else if (this.mode === 'layer') {
+          // TODO required layerIndex & layer to loop this layer...
+          if (to >= this.layerEnd) {
+            this.player.setCurrentTime(this.layerStart)
+          }
+          if (to < this.layerStart) {
+            this.player.setCurrentTime(this.layerStart + 0.01)
+            let layerNext = this.layerIndex + 1
+            if (this.layers[layerNext]) {
+              this.layerIndex = layerNext
+            }
+            else {
+              this.layerIndex = 0
+            }
+          }
+        }
+      }
     }
   },
   methods: {
-    handleSwipe (e) {
-      // this.$log('handleSwipe', e)
-      if (e.direction === 'left') this.compositionNext(this.index + 1)
-      else this.compositionNext(this.index - 1)
+    modeClick () {
+      this.$log('modeClick')
+      if (this.mode === 'play') this.mode = 'watch'
+      else this.mode = 'play'
     },
-    isMini (ci) {
-      return ci === this.indexNexting ? false : ci !== this.index
-    },
-    previewLoad (e) {
-      // this.$log('previewLoad', e)
-      // this.height = this.$refs.playerPreview.clientHeight
-      this.height = this.$refs.playerPreview.clientHeight > this.$q.screen.height / 3 ? this.$refs.playerPreview.clientHeight : this.$q.screen.height / 3
-      this.width = this.$refs.playerPreview.clientWidth
-      this.stylesInitial[1].maxHeight = this.height
-      this.styles = JSON.parse(JSON.stringify(this.stylesInitial))
-      this.$emit('height', this.height)
-      this.$emit('width', this.width)
-    },
-    previewError (e) {
-      this.$log('previewError', e)
-      this.$emit('error', 'previewError')
-    },
-    compositionStyle (ci) {
-      if (ci > this.index) return {right: '0px'}
-      else if (ci < this.index) return {left: '0px'}
-    },
-    compositionNext (index) {
-      this.$log('compositionNext', index)
-      if (this.nodeNexting >= 0) return
-      if (!this.compositions[index]) {
-        // this.index = 0
-        // this.compositionNext(0)
-        // this.indexNexting = 0
+    layerEnded () {
+      // this.$log('*** layerEnded')
+      // this.$log('NOW => ', this.layerIndex)
+      if (this.mini) return
+      if (this.layerIndexPlay >= 0) {
+        // this.$log('LAYER PLAY')
+        this.$q.notify('layerIndexPlay' + this.layerIndexPlay)
+        this.layerIndex = this.layerIndexPlay
       } else {
-        this.indexNexting = index
-        let i = index > this.index ? 2 : 0
-        this.$log('i', i)
-        this.$tween.to(
-          this.styles[1],
-          0.5,
-          {
-            opacity: 0,
-            onComplete: () => {
-              // this.$set(this.styles, 1, JSON.parse(JSON.stringify(this.stylesInitial[1])))
-            }
-          }
-        )
-        this.$tween.to(
-          this.styles[i],
-          0.5,
-          {
-            zIndex: 300,
-            maxWidth: 100,
-            maxHeight: this.height,
-            opacity: 1,
-            onComplete: () => {
-              this.$set(this, 'styles', JSON.parse(JSON.stringify(this.stylesInitial)))
-              this.index = index
-              this.indexNexting = -1
-            }
-          }
-        )
+        // this.$log('LAYER DEFAULT')
+        // move to the next layer, this composition player
+        let layerTo = this.layerIndex + 1
+        if (this.layers[layerTo]) {
+          // this.$q.notify('NEXT layer next =>' + layerTo)
+          // this.$log('NEXT => ', layerTo)
+          this.$set(this, 'layerIndex', layerTo)
+          // this.layerIndex = layerTo
+        }
+        else {
+          // this.$log('LAST => 0')
+          // TODO depend on mode, play first one or play next composition
+          this.$emit('ended')
+          // this.$set(this, 'layerIndex', 0)
+        }
       }
-    },
-    compositionError (index, error) {
-      this.$log('compositionError', index, error)
-      // TODO hide this composition by index... to indexErrored
-      this.$emit('error', error)
     }
   }
 }

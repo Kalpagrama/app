@@ -82,7 +82,7 @@ div(
         //- logout
         div(:style=`{}`).row.full-width.justify-start
           div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
-            q-btn(round flat icon="power_off" color="white" :loading="cacheClearing" @click="logout()")
+            q-btn(round flat icon="power_off" color="white" :loading="loggingOut" @click="logout()")
       //- invite
       //- div(:class="{'q-px-md': !mini}").row.full-width.items-center.justify-center.q-my-sm
       //-   q-btn(
@@ -127,7 +127,8 @@ export default {
         // { id: 'settings', name: 'Settings', icon: 'settings' }
       ],
       userAvatarErrored: false,
-      cacheClearing: false
+      cacheClearing: false,
+      loggingOut: false
     }
   },
   computed: {
@@ -160,8 +161,11 @@ export default {
     async logout (mytoken) {
       // this.tokenString = token
       this.$log('logout start')
+      this.loggingOut = true
+      await this.$wait(800)
       let res = await this.$store.dispatch('auth/logout', mytoken)
       this.$log('logout done', res)
+      this.loggingOut = false
     },
     userAvatarError (e) {
       this.$log('userAvatarError', e)
