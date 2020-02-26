@@ -198,7 +198,7 @@ export default {
     },
     now: {
       handler (to, from) {
-        this.$log('now CHANGED', to)
+        // this.$log('now CHANGED', to)
         this.videoNow(to, from)
       }
     }
