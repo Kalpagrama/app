@@ -22,7 +22,7 @@ let apollo
 export default async ({ Vue, store, app }) => {
   // Vue.use(VueApollo)
   let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
-  // SERVICES_URL = SERVICES_URL || 'https://dev.kalpagramma.com/graphql'
+  // SERVICES_URL = SERVICES_URL || 'https://dev.kalpa.app/graphql'
   logD('process.env2=', process.env)
   logD('SERVICES_URL2=', SERVICES_URL)
   store.commit('auth/stateSet', ['SERVICES_URL', SERVICES_URL])

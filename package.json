@@ -3,7 +3,7 @@
   "version": "0.6.0",
   "description": "Kalpagramma",
   "productName": "Кальпаграмма",
-  "cordovaId": "com.kalpagramma.app",
+  "cordovaId": "com.kalpa.app",
   "author": "Ivan Motovilov <ivanmoto@pm.me>",
   "private": true,
   "main": "index.js",
