@@ -103,6 +103,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    this.$emit('composition', this.node.compositions[this.compositionIndex])
   }
 }
 </script>

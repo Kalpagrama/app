@@ -15,7 +15,7 @@
     :style=`{position: 'relative'}`
     ).column.fit
     //- composition EDITOR dialog
-    q-dialog(v-model="compositionEditorOpened" :maximized="true").bg-black
+    q-dialog(v-model="compositionEditorOpened" :maximized="true" @hide="compositionOneActive = true, compositionTwoActive = true").bg-black
       composition-editor(
         ctx="editor"
         :value="node" :compositionIndex="compositionIndex"
@@ -229,8 +229,8 @@ export default {
       else {
         this.$log('cEDITED')
         this.$set(this.node.compositions, this.compositionIndex, composition)
-        this.compositionOneActive = true
-        this.compositionTwoActive = true
+        // this.compositionOneActive = true
+        // this.compositionTwoActive = true
       }
     },
     compositionDelete (index) {

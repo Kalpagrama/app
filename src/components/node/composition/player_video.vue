@@ -198,7 +198,7 @@ export default {
     },
     now: {
       handler (to, from) {
-        // this.$log('now CHANGED', to)
+        this.$log('now CHANGED', to)
         this.videoNow(to, from)
       }
     }
@@ -268,7 +268,7 @@ export default {
     videoPlay (intervalUpdateIgnore) {
       this.$log('videoPlay')
       this.playing = true
-      if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 60)
+      if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 20)
     },
     videoPause () {
       this.$log('videoPause')
