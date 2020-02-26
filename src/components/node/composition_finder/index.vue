@@ -4,15 +4,7 @@
     ctx="finder"
     :header="false" :toggle="false" :oid="oid"
     :pages="['contents', 'compositions']"
-    @item="itemClick" @page="pageClick" :page="page"
-    )
-  //- q-dialog(v-model="dialogOpened" :maximized="true" position="bottom")
-  //-   div(@click.self="dialogOpened = false").row.full-width.window-height.items-center.content-center.justify-center.q-py-md
-  //-     composition-editor(
-  //-       ctx="workspace"
-  //-       :node="node" :compositionIndex="0"
-  //-       @layerExport="layerExport"
-  //-       :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden'}`).bg-black
+    @item="itemClick" @page="pageClick" :page="page")
 </template>
 
 <script>
@@ -33,16 +25,11 @@ export default {
     itemClick ({type, item}) {
       this.$log('itemClick', type, item)
       if (type === 'content') {
-        // create composition with this content, but where to emit it?
-        // let content = item.compositions[0].layers.reduce((acc, val) => {
-        //   if (!acc && val.figuresAbsolute.length === 0) acc = val.content
-        //   return acc
-        // }, null)
         let content = item.compositions[0].layers[0].content
         this.$log('content', content)
         let composition = {
           operation: { type: 'CONCAT', items: [], operations: null },
-          layers: [{ content: content, figuresAbsolute: [] }]
+          layers: [{ content: content, figuresAbsolute: [], figuresRelative: [], spheres: [] }]
         }
         this.$log('composition', composition)
         this.$emit('composition', composition)

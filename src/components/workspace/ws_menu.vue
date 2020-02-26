@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    maxWidth: ctx === 'workspace' ? width+'px' : '100%',
+    maxWidth: widthComputed,
   }`
   ).row.fit
   //- toggle opened
@@ -80,6 +80,13 @@ export default {
     }
   },
   computed: {
+    widthComputed () {
+      if (this.$q.screen.xs) return '100%'
+      else {
+        if (this.ctx === 'workspace') return this.width + 'px'
+        else return '100%'
+      }
+    },
     pagesFiltered () {
       return this.pagesRaw.filter(p => this.pages.includes(p.id))
     }

@@ -30,7 +30,7 @@ export default {
     variables () {
       return {
         oid: this.sphereOid,
-        pagination: { pageSize: 10 },
+        pagination: { pageSize: 200 },
         sortStrategy: 'HOT',
         filter: { types: 'NODE' }
       }

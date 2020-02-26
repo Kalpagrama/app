@@ -14,7 +14,7 @@ div(
         ).row.full-height.items-center.content-center.justify-center
         q-btn(
           round flat color="green" @click="videoPlayPause"
-          :icon="playing === true ? 'pause' : 'play_arrow'"
+          :icon="meta.playing === true ? 'pause' : 'play_arrow'"
           :style=`{background: 'rgba(0,0,0,0.3)'}`)
       //- stats
       .col
@@ -51,7 +51,7 @@ div(
 // TODO hide when playing...
 export default {
   name: 'playerVideoProgress',
-  props: ['player', 'now', 'duration', 'videoUpdate', 'meta'],
+  props: ['player', 'now', 'duration', 'videoUpdate', 'videoPlayPause', 'meta'],
   data () {
     return {
       height: 20
@@ -63,6 +63,7 @@ export default {
       let w = e.target.clientWidth
       let x = e.offsetX
       let to = (this.duration * x) / w
+      this.$emit('meta', ['mode', 'watch'])
       this.player.setCurrentTime(to)
       this.videoUpdate(to)
     }

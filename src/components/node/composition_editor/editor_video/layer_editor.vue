@@ -72,6 +72,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
               borderRadius: '16px', border: '8px solid '+ $randomColor(layerIndex), pointerEvents: 'none'}`).row.br
           //- now second
           div(
+            v-if="true"
             :style=`{position: 'absolute', zIndex: 300, height: '50px', top: '0px',
               left: (meta.now/meta.duration)*100+'%', borderRadius: '2px',
               width: '4px', pointerEvents: 'none'}`).row.bg-green
@@ -145,6 +146,15 @@ export default {
     },
     frameDuration () {
       return this.duration / this.framesCount
+    },
+    nowShow () {
+      if (this.meta.mode === 'watch') {
+        return true
+      }
+      else {
+        if (this.meta.now < this.meta.layerStart || this.meta.now > this.meta.layerEnd) return false
+        else return true
+      }
     }
   },
   watch: {

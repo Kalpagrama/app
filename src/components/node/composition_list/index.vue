@@ -1,29 +1,28 @@
 <template lang="pug">
 div(
   v-touch-swipe.mouse.left.right="handleSwipe"
-  :style=`{position: 'relative', minHeight: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-black
+  :style=`{position: 'relative', minHeight: height+'px', overflow: 'hidden'}`).row.full-width.items-center.content-center.bg-black
   //- debug
-  div(v-if="true" :style=`{position: 'absolute', zIndex: 1000, top: '60px'}`).row.text-white.bg-green
-    //- small.text-white.full-width index: {{index}}
-    small.full-width visible: {{visible}}
-    //- small(v-if="styles.length > 0").text-white.full-width styles[2].maxWidth: {{ styles[2].maxWidth }}
-    //- small(v-if="styles.length > 0").text-white.full-width styles[0].maxWidth: {{ styles[0].maxWidth }}
+  //- small(:style=`{position: 'absolute', zIndex: 4100, top: '0px', right: '0px'}`).bg-red.text-white {{nodeOid}}
+  div(v-if="false" :style=`{position: 'absolute', zIndex: 1000, top: '60px'}`).row.text-white.bg-green
+    small.text-white.full-width index: {{index}}
+    small.full-width visible/active/mini {{visible}}/{{active}}/{{mini}}
   //- stats
   small(
     v-if="true"
-    :style=`{position: 'absolute', zIndex: 50000, top: '4px', right: 'calc(50% - 20px)', borderRadius: '10px', background: 'rgba(0,0,0,0.3)',
+    :style=`{position: 'absolute', zIndex: 4000, top: '4px', right: 'calc(50% - 20px)', borderRadius: '10px', background: 'rgba(0,0,0,0.3)',
       userSelect: 'none'}`
     ).text-white.q-pa-xs {{ index + 1 }}/{{ compositions.length }}
-  //- h1.text-red bitch
   //- preview
   img(
     ref="compositionListPreview"
     :src="compositions[0].preview" @load="previewLoad" @error="previewError"
-    :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0}`)
+    draggable="false"
+    :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0, userSelect: 'none'}`)
   //- compositions
   div(
-    v-for="(c, ci) in compositions" :key="ci"
-    v-if="height > 0 && styles.length > 0 && ci > index-2 && ci < index+2"
+    v-for="(c, ci) in compositionsFiltered" :key="ci"
+    v-if="true && height > 0 && styles.length > 0 && ci > index-2 && ci < index+2"
     :style=`{
       ...compositionStyle(ci),
       position: 'absolute', bottom: 0, borderRadius: '10px', overflow: 'hidden',
@@ -41,10 +40,46 @@ div(
       :active="active && ci === index"
       :mini="isMini(ci)"
       :style=`{borderRadius: '10px', overflow: 'hidden'}`
+      @compositionGet="compositionGet(c, ci)"
       @next="compositionNext(ci)"
       @error="$event => compositionError(ci, $event)")
-      //- :visible="visible && ci >= index-1 && ci <= index+1"
       //- @ended="compositionNext(ci + 1)"
+  //- preview list
+  div(
+    v-if="true && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '20px', zIndex: 3500}`).row.full-width.scroll.q-pa-sm
+    .row.full-width.no-wrap
+      div(
+        v-for="(c, ci) in compositionsFiltered" :key="ci"
+        :style=`{width: '40px', height: '40px', borderRadius: '10px', overflow: 'hidden',
+        border: c.node.oid === nodeOid ? '2px solid pink' : '1px solid red'}`
+        ).bg-black.q-mr-sm
+        img(
+          :src="c.preview"
+          :style=`{
+            borderRadius: '10px', overflow: 'hidden', userSelect: 'none', objectFit: 'contain',
+            border: ci === index ? '2px solid #4caf50' : '2px solid rgba(0,0,0,0)'}`
+          draggable="false").fit
+  //- preview node list...
+  div(
+    v-if="true && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '70px', zIndex: 3500}`).row.full-width.scroll.q-pa-sm
+    .row.full-width.no-wrap
+      div(
+        v-for="(c, ci) in compositionsFiltered" :key="ci"
+          :style=`{width: '40px', height: '80px',
+            borderRadius: '10px', border: ci === index ? '2px solid #4caf50' : '2px solid rgba(0,0,0,0)',
+            }`).bg-black.q-mr-sm
+        div(:style=`{height: '40px'}`).row.full-width
+          img(
+            :src="c.node.meta.compositions[0].thumbUrl" draggable="false"
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden', userSelect: 'none', objectFit: 'contain'}`).fit
+        div(:style=`{height: '40px'}`).row.full-width
+          img(
+            :src="c.node.meta.compositions[1].thumbUrl" draggable="false"
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden', userSelect: 'none', objectFit: 'contain'}`).fit
 </template>
 
 <script>
@@ -55,7 +90,9 @@ export default {
     mode: {type: String, default () { return 'manual' }},
     visible: {type: Boolean, default () { return false }},
     active: {type: Boolean, default () { return false }},
-    compositions: {type: Array}
+    compositions: {type: Array},
+    compositionOid: {type: String},
+    nodeOid: {type: String}
   },
   data () {
     return {
@@ -69,11 +106,31 @@ export default {
         {zIndex: 200, maxWidth: 100, maxHeight: 100, opacity: 1},
         {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.7}
       ],
-      styles: []
+      styles: [],
+      preview: undefined,
+      compositionsFiltered: []
     }
   },
-  mounted () {
-    // this.$q.notify('mounted')
+  watch: {
+    compositions: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('compositions CHANGED', to)
+        // if ()
+        if (this.ctx === 'rubick') {
+          if (to) {
+            this.compositionsFiltered = to.sort((a, b) => {
+              if (a.node.oid === this.nodeOid) return -1
+              else return 1
+            })
+            if (from) this.index = 0
+          }
+        }
+        else {
+          this.compositionsFiltered = to
+        }
+      }
+    }
   },
   methods: {
     play () {
@@ -91,7 +148,7 @@ export default {
       return ci === this.indexNexting ? false : ci !== this.index
     },
     previewLoad (e) {
-      // this.$log('previewLoad', e)
+      this.$log('previewLoad', e)
       // this.$q.notify('previewLoad')
       // this.$q.emit('previewLoad')
       // TODO list height? screen/3?, screen.width?, previewClientWidth?
@@ -113,6 +170,12 @@ export default {
       if (ci > this.index) return {right: '0px'}
       else if (ci < this.index) return {left: '0px'}
     },
+    async compositionGet (c, ci) {
+      this.$log('compositionGet', c, ci)
+      let nodeFull = await this.$store.dispatch('objects/get', { oid: c.node.oid, priority: 0 })
+      this.$log('compositionGet: nodeFull', nodeFull)
+      c.composition = nodeFull.compositions[c.compositionIndex]
+    },
     compositionNext (index) {
       this.$log('compositionNext', index)
       if (this.nodeNexting >= 0) return
@@ -121,9 +184,10 @@ export default {
         // this.compositionNext(0)
         // this.indexNexting = 0
       } else {
+        // this.$emit('next', index)
         this.indexNexting = index
         let i = index > this.index ? 2 : 0
-        this.$log('i', i)
+        // this.$log('i', i)
         this.$tween.to(
           this.styles[1],
           0.5,
@@ -146,6 +210,7 @@ export default {
               this.$set(this, 'styles', JSON.parse(JSON.stringify(this.stylesInitial)))
               this.index = index
               this.indexNexting = -1
+              this.$emit('next', index)
             }
           }
         )

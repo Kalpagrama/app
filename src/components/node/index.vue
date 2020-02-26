@@ -95,12 +95,6 @@ export default {
         this.nodeFull = null
       }
     }
-  },
-  mounted () {
-    // this.$log('mounted')
-  },
-  beforeDestroy () {
-    // this.$log('beforeDestroy')
   }
 }
 </script>

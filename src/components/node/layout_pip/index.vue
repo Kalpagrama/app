@@ -75,8 +75,9 @@ export default {
     },
     async nodeNameClick () {
       this.$log('nodeNameClick')
+      this.$router.push('/node/' + this.node.oid).catch(e => e)
       this.pause()
-      this.$emit('open')
+      // this.$emit('open')
     }
   }
 }

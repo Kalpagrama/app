@@ -7,7 +7,7 @@ div(
     v-if="false"
     :style=`{position: 'absolute', top: '2px', left: '2px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
     small.text-white.full-width mini: {{ mini }}
-  //- composition menu
+  //- TODO composition menu
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"
@@ -15,17 +15,17 @@ div(
   //- preview
   img(
     v-if="preview" ref="compositionPreview" :src="preview" crossOrigin="anonymous" draggable="false"
-    @click="previewClick" @load="previewLoad" @error="previewError"
+    @load="previewLoad" @error="previewError"
     :style=`{
       userSelect: 'none',
-      width: '100%', height: mini ? 'auto' : '100%',
+      width: '100%', height: mini ? 'auto' : '100%', opacity: 0.5,
       maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
   //- TODO different players
   player-video(
     v-if="visible && value"
     :ctx="ctx" :composition="value"
-    :visible="vis" :active="active" :mini="mini"
+    :visible="visible" :active="active" :mini="mini"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 1000}`).fit
     template(v-slot:editor=`{player, meta}`)
       slot(name="editor" :player="player" :meta="meta")
@@ -35,7 +35,6 @@ div(
 import { debounce, throttle } from 'quasar'
 import playerVideo from './player_video'
 import playerImage from './player_image'
-// import player from './player'
 
 export default {
   name: 'composition',
@@ -44,35 +43,40 @@ export default {
     ctx: {type: String},
     value: {type: Object},
     preview: {type: String},
-    visible: {type: Boolean, default () { return false }},
+    visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},
     mini: {type: Boolean, default () { return false }}
   },
   data () {
     return {
-      // layerIndex: 0,
-      vis: false,
       previewWidth: 0,
       previewHeight: 0,
       previewLoaded: false
     }
   },
   watch: {
+    value: {
+      immediate: true,
+      async handler (to, from) {
+        // this.$log('value CHANGED', to)
+        if (to) {
+        }
+        else {
+          if (this.ctx === 'rubick') {
+            this.$emit('compositionGet')
+          }
+        }
+      }
+    },
     visible: {
+      deep: true,
+      immediate: false,
       handler (to, from) {
         this.$log('visible CHANGED', to)
-        this.vis = to
       }
     }
   },
   methods: {
-    contentNameClick () {
-      this.$log('contentNameClick')
-      // TODO: show content modal... or go to the workspace contents
-    },
-    previewClick () {
-      this.$log('previewClick')
-    },
     previewLoad () {
       // this.$log('previewLoad')
       let previewRef = this.$refs.compositionPreview

@@ -10,18 +10,21 @@ iframe {
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit.items-start.content-start.bg-black
+div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).column.fit.items-start.content-start.bg-black
   //- opacity: videoGood ? 1 : 0
   //- debug
   div(
     v-if="!mini && true"
-    :style=`{position: 'absolute', left: '16px', top: '10px', zIndex: 10000, borderRadius: '10px', color: 'white'}`).row.q-pa-sm.bg-green
+    :style=`{
+      position: 'absolute', width: 'calc(100% - 20px)', left: '10px', top: '10px',
+      pointerEvents: 'none', userSelect: 'none',
+      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.3}`).row.q-pa-sm.bg-green
     small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
     small.full-width duration/now: {{duration}}/{{now}}
-    //- small.full-width mode: {{mode}}
+    small.full-width mode: {{mode}}
     small.full-width start/end: {{layerStart}}/{{layerEnd}}
-    //- small.full-width layerIndex: {{layerIndex}}
-    //- small.full-width layerIndexPlay: {{layerIndexPlay}}
+    small.full-width layerIndex: {{layerIndex}}
+    small.full-width layerIndexPlay: {{layerIndexPlay}}
   //- video container
   div(:style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
     div(:style=`{position: 'absolute', zIndex: 11, top: '0px', height: 'calc(100% + 0px)'}`).row.full-width
@@ -33,7 +36,13 @@ div(:style=`{position: 'relative'}`).column.fit.items-start.content-start.bg-bla
         :style=`{
           width: '100%', height: '100%', objectFit: 'contain'
         }`)
-    player-video-progress(v-show="mode === 'watch'" :now="now" :duration="duration" :player="player" :videoUpdate="videoUpdate" :meta="meta")
+    //- video actions, volume, progress
+    q-btn(
+      v-show="!mini"
+      round flat color="white" @click="videoToggleMuted()"
+      :icon="muted ? 'volume_off' : 'volume_up'"
+      :style=`{position: 'absolute', zIndex: 300, left: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
+    player-video-progress(v-show="progressShow" :now="now" :duration="duration" :player="player" :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause" :meta="meta" @meta="onMeta")
   slot(name="editor" :meta="meta" :player="player")
 </template>
 
@@ -56,7 +65,6 @@ export default {
       fullscreen: false,
       intervalUpdate: null,
       intervalMove: null,
-      progressShow: false,
       progressHeight: 20,
       mode: 'play',
       layerIndex: 0,
@@ -73,7 +81,9 @@ export default {
         layerIndex: this.layerIndex,
         layerIndexPlay: this.layerIndexPlay,
         mode: this.mode,
-        progressHeight: this.progressHeight
+        progressHeight: this.progressHeight,
+        layerStart: this.layerStart,
+        layerEnd: this.layerEnd
       }
     },
     layers () {
@@ -122,6 +132,13 @@ export default {
       }
       else {
         return true
+      }
+    },
+    progressShow () {
+      if (this.mini) return false
+      else {
+        if (this.ctx === 'workspace' || this.ctx === 'editor') return true
+        else return false
       }
     }
   },
@@ -181,7 +198,7 @@ export default {
     },
     now: {
       handler (to, from) {
-        // this.$log('now CHANGED', to)
+        this.$log('now CHANGED', to)
         this.videoNow(to, from)
       }
     }
@@ -189,6 +206,7 @@ export default {
   methods: {
     videoNow (to, from) {
       if (this.nowPause) return
+      if (!this.active) this.player.pause()
       if (this.mode === 'play') {
         if (!this.layerStart && !this.layerEnd) return
         if (to > this.layerEnd) {
@@ -199,7 +217,7 @@ export default {
           }
           else {
             if (this.layerIndex === 0) {
-              this.player.setCurrentTime(this.layerStart + 0.1)
+              this.player.setCurrentTime(this.layerStart)
             }
             else {
               this.layerIndex = 0
@@ -207,7 +225,7 @@ export default {
           }
         }
         if (to < this.layerStart) {
-          this.player.setCurrentTime(this.layerStart + 0.1)
+          this.player.setCurrentTime(this.layerStart)
         }
       }
       else if (this.mode === 'layer') {
@@ -224,6 +242,11 @@ export default {
       }
       else if (this.player.mode === 'watch') {
       }
+    },
+    videoToggleMuted () {
+      this.$log('videoToggleMuted')
+      // centralized volume settings, except ios safari...
+      this.muted = !this.muted
     },
     async videoMove () {
       if (!this.fullscreen) return
@@ -277,11 +300,11 @@ export default {
       }
     },
     async videoClick (e) {
-      this.$log('videoClick')
-      if (this.visible && this.active && !this.mini) {
+      this.$log('videoClick', this.visible, this.active, !this.mini)
+      if (this.active) {
         // TODO switch case mute/unmute play/pause
-        this.muted = !this.muted
-        // this.videoPlayPause()
+        // this.muted = !this.muted
+        this.videoPlayPause()
       }
     },
     videoFullscreen () {
@@ -351,6 +374,10 @@ export default {
         this.player.removeEventListener('pause', this.videoPause)
         this.player.removeEventListener('loadeddata', this.videoLoadeddata)
       }
+    },
+    onMeta (val) {
+      this.$log('onMeta', val)
+      this[val[0]] = val[1]
     }
   },
   created () {
@@ -360,10 +387,7 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.playerInit()
-    this.$on('meta', (val) => {
-      this.$log('meta.val', val)
-      this[val[0]] = val[1]
-    })
+    this.$on('meta', this.onMeta)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

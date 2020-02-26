@@ -1,5 +1,7 @@
 <template lang="pug">
 div(:style=`{position: 'relative', zIndex: 1000}`).row.full-width
+  //- red
+  //- div(:style=`{position: 'fixed', zIndex: 10000, top: '0px', right: '0px', width: '500px'}`).row.full-height.bg-red
   //- layers on progress bar
   div(:style=`{position: 'absolute', zIndex: 1000000, top: '-36px', height: 20+'px', pointerEvents: 'none'}`).row.full-width.q-px-sm
     div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.q-px-sm
@@ -13,21 +15,22 @@ div(:style=`{position: 'relative', zIndex: 1000}`).row.full-width
           background: $randomColor(li)}`
         ).row.full-height
   layer-editor(:layer="layer" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd" @meta="$parent.$emit('meta', $event)")
-  div(v-if="false").row.full-width
-    small.text-white.full-width layers: {{layers}}
   //- layers
-  div(:style=`{height: $q.screen.height/3+'px'}`).row.full-width
+  div(:style=`{position: 'relative', height: $q.screen.height/2+'px'}`).row.full-width
+    q-btn(
+      round flat color="green" @click="layersContentShow = !layersContentShow"
+      :icon="layersContentShow ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
+      :style=`{position: 'absolute', zIndex: 1100, top: '10px', right: '10px'}`)
     .col.full-height
       layers(
         mode="edit"
-        :composition="composition"
-        :layers="layers" :layer="layer" :meta="meta" :player="player"
+        :layers="layers" :meta="meta" :player="player"
         @meta="$parent.$emit('meta', $event)")
-    div(v-if="false").col.full-height.br
+    div(v-if="layersContentShow").col.full-height
       layers(
         mode="pick"
-        :composition="composition"
-        :layers="layers" :layer="layer" :meta="meta" :player="player")
+        :layers="layersContent" :meta="{layerIndex: -1, mode: 'watch'}" :player="player"
+        @pick="layerAdd(null,null,$event)")
 </template>
 
 <script>
@@ -40,22 +43,13 @@ export default {
   props: ['ctx', 'composition', 'player', 'meta'],
   data () {
     return {
-      editorHeight: 0,
-      // layerIndex: 0,
-      layerIndexPlay: false,
       layerInitialLength: 10,
-      layersShow: true,
-      layersWidth: 400,
-      layersBottom: true,
-      mode: 'watch',
-      modes: ['watch', 'play', 'layer']
+      layersContentShow: false,
+      layersContent: []
     }
   },
   computed: {
     layers () {
-      // return this.composition.layers.filter((l, li) => {
-      //   return l.figuresAbsolute.length > 0
-      // })
       return this.composition.layers
     },
     layer () {
@@ -63,32 +57,29 @@ export default {
       else return null
     },
     content () {
-      if (this.layer) return this.layer.content
-      else return null
-      // return this.layer.content
-      // return this.composition.layers.reduce((acc, val) => {
-      //   if (!acc && val.figuresAbsolute.length === 0) acc = val.content
-      //   return acc
-      // }, null)
+      return this.layer.content
     }
   },
   watch: {
-    // layer: {
-    //   handler (to, from) {
-    //     this.$log('layer CHANGED', to)
-    //     this.$tween.to(this, 0.5, {editorHeight: to ? 100 : 0})
-    //   }
-    // },
-    // layersShow: {
-    //   handler (to, from) {
-    //     this.$log('layersShow CHANGED', to)
-    //     this.$tween.to(this, 0.5, {layersWidth: to ? 400 : 0})
-    //   }
-    // }
+    layersContentShow: {
+      async handler (to, from) {
+        this.$log('layersContentShow CHANGED', to)
+        if (to) {
+          // load content-node container with layers... on THIS content...
+          let name = 'CONTENT-' + this.content.oid
+          let item = await this.$store.dispatch('workspace/get', { name })
+          // TODO save reactivity to update contents from THIS composition
+          this.$log('item', JSON.parse(JSON.stringify(item)))
+          let layers = item.compositions[0].layers
+          this.$log('layers', layers)
+          this.layersContent = layers
+        }
+      }
+    }
   },
   methods: {
-    layerAdd (start, end) {
-      this.$log('layerAdd start/end: ', start, end)
+    layerAdd (start, end, layer) {
+      this.$log('layerAdd start/end: ', start, end, layer)
       let from = start || this.meta.now
       let to = end || from + this.layerInitialLength < this.meta.duration ? from + this.layerInitialLength : this.meta.duration
       this.$log('layerAdd from/to: ', from, to)
@@ -101,12 +92,14 @@ export default {
       }
       // add layer
       else {
-        let l = {
+        let l = layer || {
           content: this.content,
           figuresAbsolute: [
             {t: from, points: []},
             {t: to, points: []}
-          ]
+          ],
+          figuresRelative: [],
+          spheres: []
         }
         this.$log('layerAdd layer: ', l)
         this.$set(this.composition, 'layers', [l, ...this.composition.layers])

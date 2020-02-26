@@ -15,7 +15,7 @@
     :style=`{position: 'relative'}`
     ).column.fit
     //- dialog composition EDITOR
-    q-dialog(v-model="compositionEditorOpened").bg-black
+    q-dialog(v-model="compositionEditorOpened" :maximized="true").bg-black
       composition-editor(
         ctx="editor"
         :value="node" :compositionIndex="compositionIndex" @composition="compositionEdited").bg-black
@@ -186,8 +186,6 @@ export default {
       deep: true,
       handler (to, from) {
         this.$log('node CHANGED', to)
-        // if (to.oid) this.$emit('node', JSON.parse(JSON.stringify(to)))
-        // if (to.oid !== from.oid) return
         if (to) {
           if (this.nodeSavePause) {
             this.nodeSavePause = false
@@ -227,6 +225,8 @@ export default {
       // TODO work with value instead of emiting events...
       // this.node.compositions[this.compositionIndex] = composition
       this.$set(this.node.compositions, this.compositionIndex, composition)
+      this.$set(this.compositionActive, 0, true)
+      this.$set(this.compositionActive, 1, true)
     },
     compositionDelete (index) {
       this.$log('compositionDelete', index)
@@ -257,10 +257,18 @@ export default {
     },
     async nodeSave (node) {
       try {
-        this.$log('nodeSave start', node || this.node)
+        this.$log('nodeSave start', node.revision, node.name, node)
         this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node || this.node)))
-        if (!this.$route.params.oid) this.$router.push('/workspace/nodes/' + res.oid).catch(e => e)
+        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
+        this.$log('nodeSave res', res.revision, res.name, res)
+        this.$log('nodeSave this.value', this.value)
+        if (!this.value) {
+          this.$log('nodeSave SET WS ITEM')
+          if (!this.$route.params.oid) this.$router.push('/workspace/nodes/' + res.oid).catch(e => e)
+          this.$store.commit('workspace/stateSet', ['itemType', 'node'])
+          this.$store.commit('workspace/stateSet', ['item', res])
+        }
+        this.$log('nodeSave done', node.revision, node.name)
         this.nodeSaving = false
         this.nodeSavingError = null
       } catch (e) {

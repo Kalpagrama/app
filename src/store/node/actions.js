@@ -139,7 +139,7 @@ export const nodeCreate = async (context, node) => {
       spheres: c.spheres ? c.spheres.map(s => ({ name: s.name })) : [],
       layers: c.layers.map(l => {
         return {
-          contentOid: l.contentOid,
+          contentOid: l.contentOid || l.content.oid,
           speed: l.speed,
           figuresAbsolute: l.figuresAbsolute.map(f => {
             return {

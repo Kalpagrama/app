@@ -3,25 +3,18 @@
   //- header
   //- TODO its not only layers, its VIDEO, content meta....
   div(
-    v-if="true"
     :style=`{height: '60px'}`
     ).row.full-width
-    //- div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
-    //-   q-btn(round flat color="green" icon="layers")
     .col.full-height
       .row.fit.items-center.content-center.q-px-sm
         //- TODO change meta information of the content: layers, nodes, users, spheres, etc...
         q-btn(
-          flat no-caps
+          v-if="mode === 'edit'"
+          flat round
           color="green"
-          :icon="meta.mode === 'play' ? 'pause' : 'play'" @click="playPause()"
+          :icon="meta.mode === 'play' ? 'pause' : 'play_arrow'" @click="playPause()"
           :style=`{borderRadius: '10px'}`)
         span.text-bold.text-green Layers
-        //- q-icon(name="keyboard_arrow_down" color="green" size="19px").q-mt-xs.q-ml-sm
-    //- div(
-    //-   v-if="mode === 'edit'"
-    //-   :style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
-    //-   q-btn(round push size="md" color="green" icon="add" @click="layerAdd()")
   //- body
   div(:style=`{position: 'relative'}`).col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-sm
@@ -51,27 +44,27 @@
           //- active layer EDIT
           div(
             v-if="mode === 'edit'"
-            :style=`{height: '60px'}`).row.full-width.items-center.content-center.justify-between
+            :style=`{height: '50px'}`).row.full-width.items-end.content-end.justify-between
             q-btn(round flat color="green" icon="keyboard_arrow_left" @click="l.figuresAbsolute[0].t -= 0.100")
             q-btn(round flat color="green" icon="keyboard_arrow_right" @click="l.figuresAbsolute[0].t += 0.100")
             q-btn(round flat color="green" icon="keyboard_arrow_left" @click="l.figuresAbsolute[1].t -= 0.100")
             q-btn(round flat color="green" icon="keyboard_arrow_right" @click="l.figuresAbsolute[1].t += 0.100")
             .col.full-height
-            q-btn(round flat color="red" icon="delete" @click="layerDelete(li)").q-mr-sm
+            q-btn(round flat color="red" icon="delete_outline" @click="layerDelete(li)").q-mr-sm
           //- active layer PICK
           div(
             v-if="mode === 'pick'"
-            :style=`{height: '60px'}`).row.full-width.items-center.content-center.justify-between
+            :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between
             q-btn(dense no-caps color="green" @click="layerExport(l, li)").q-px-sm Export
 </template>
 
 <script>
 export default {
   name: 'editorVideoLayers',
-  props: ['mode', 'layers', 'layer', 'composition', 'player', 'meta'],
+  props: ['mode', 'layers', 'composition', 'player', 'meta'],
   data () {
     return {
-      height: 100
+      height: 50
     }
   },
   computed: {
@@ -83,24 +76,28 @@ export default {
   },
   methods: {
     playPause () {
-      this.$log('playPause')
+      this.$log('playPause', this.meta.mode)
       if (this.meta.mode === 'watch') {
-        this.$parent.$emit('meta', ['mode', 'watch'])
-        this.$parent.$emit('meta', ['layerIndex', 0])
-        this.$parent.$emit('meta', ['layerIndexPlay', -1])
+        this.$emit('meta', ['mode', 'play'])
+        this.$emit('meta', ['layerIndex', 0])
+        this.$emit('meta', ['layerIndexPlay', -1])
+        this.player.play()
       }
       else {
-        this.$parent.$emit('meta', ['mode', 'play'])
-        this.$parent.$emit('meta', ['layerIndex', 0])
-        this.$parent.$emit('meta', ['layerIndexPlay', -1])
+        this.$emit('meta', ['mode', 'watch'])
+        this.$emit('meta', ['layerIndex', 0])
+        this.$emit('meta', ['layerIndexPlay', -1])
       }
     },
     layerClick (l, li) {
       this.$log('layerClick', l, li)
-      this.$emit('meta', ['mode', 'layer'])
-      this.$emit('meta', ['layerIndexPlay', li])
-      // this.$set(this.meta, 'mode', 'layer')
-      // this.$set(this.meta, 'layerIndexPlay', li)
+      if (this.mode === 'edit') {
+        this.$emit('meta', ['mode', 'layer'])
+        this.$emit('meta', ['layerIndexPlay', li])
+      }
+      else if (this.mode === 'pick') {
+        this.$emit('pick', JSON.parse(JSON.stringify(this.layers[li])))
+      }
     },
     layerExport (l, li) {
       this.$log('layerExport', l, li)

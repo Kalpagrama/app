@@ -7,7 +7,7 @@ div(:style=`{position: 'relative'}`).row.fit
     template(v-slot:editor=`{player, meta}`)
       editor-video(
         v-if="composition"
-        :ctx="ctx" :composition="composition" :meta="meta" :player="player")
+        :ctx="ctx" :composition="composition" :player="player" :meta="meta")
 </template>
 
 <script>

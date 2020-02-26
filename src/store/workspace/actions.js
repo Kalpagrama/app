@@ -174,7 +174,7 @@ export const wsNodeSave = async (context, node) => {
     wsItem = wsNodeCreate
     context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'hour' }, { root: true })
   }
-  logD('wsNodeSave done')
+  logD('wsNodeSave done', wsItem.revision)
   return wsItem
 }
 export const wsItemDelete = async (context, oid) => {

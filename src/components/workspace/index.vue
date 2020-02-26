@@ -77,11 +77,14 @@ export default {
     itemAdd (type, item) {
       this.$log('itemAdd', type, item)
       this.$router.push('/workspace/' + this.$route.params.page).catch(e => e)
-      this.itemClick({type: undefined, item: null})
+      this.$store.commit('workspace/stateSet', ['itemType', undefined])
+      this.$store.commit('workspace/stateSet', ['item', null])
+      // this.itemClick({type: undefined, item: null})
     }
   },
   mounted () {
     this.$log('mounted')
+    document.body.style.backgroundColor = '#424242'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
