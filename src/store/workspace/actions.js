@@ -161,7 +161,7 @@ export const wsNodeSave = async (context, node) => {
     let { data: { wsNodeCreate } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectFullFragment}
-        mutation sw_network_only_wsNodeCreate ($node: NodeInput!, $wsRevision: Int!) {
+        mutation wsNodeCreate ($node: NodeInput!, $wsRevision: Int!) {
           wsNodeCreate (node: $node, wsRevision: $wsRevision) {
             ...objectFullFragment
           }
@@ -171,8 +171,7 @@ export const wsNodeSave = async (context, node) => {
         node: nodeInput, wsRevision: context.rootState.workspace.revision
       }
     })
-    wsItem = wsNodeCreate
-    context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'hour' }, { root: true })
+    wsItem = await context.dispatch('cache/update', { key: makeKey(wsNodeCreate), newValue: wsNodeCreate, actualAge: 'hour' }, { root: true })
   }
   logD('wsNodeSave done', wsItem.revision)
   return wsItem
