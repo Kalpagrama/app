@@ -88,7 +88,11 @@ export const wsNodeSave = async (context, node) => {
           layers: c.layers.map(l => {
             return {
               contentOid: l.content.oid,
-              spheres: [],
+              spheres: l.spheres.map(s => {
+                return {
+                  name: s.name
+                }
+              }),
               figuresAbsolute: l.figuresAbsolute.map(f => {
                 return {
                   t: f.t,
