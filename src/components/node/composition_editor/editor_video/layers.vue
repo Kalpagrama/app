@@ -180,7 +180,7 @@ export default {
         this.$emit('meta', ['mode', 'layer'])
         this.$emit('meta', ['layerIndex', index])
         this.$emit('meta', ['layerIndexPlay', index])
-        await this.$wait(300)
+        // await this.$wait(300)
         this.$delete(this.layers, li)
       }
     },

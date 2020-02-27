@@ -11,15 +11,15 @@ div(
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"
-    :style=`{position: 'absolute', zIndex: 4000, opacity: 0.5}`).row.fit.cursor-pointer
+    :style=`{position: 'absolute', zIndex: 4000, opacity: 0.5}`).row.fit.cursor-pointer.bg-red
   //- preview
   img(
     v-if="preview" ref="compositionPreview" :src="preview" crossOrigin="anonymous" draggable="false"
     @load="previewLoad" @error="previewError"
     :style=`{
       userSelect: 'none',
-      width: '100%', height: mini ? 'auto' : '100%', opacity: 0.5,
-      maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
+      width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
+      maxHeight: $q.screen.height+'px', objectFit: 'contain'}`).br
   //- players
   //- TODO different players
   player-video(

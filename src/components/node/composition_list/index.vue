@@ -12,42 +12,55 @@ div(
     v-if="true"
     :style=`{position: 'absolute', zIndex: 4000, top: '4px', right: 'calc(50% - 20px)', borderRadius: '10px', background: 'rgba(0,0,0,0.3)',
       userSelect: 'none'}`
-    ).text-white.q-pa-xs {{ index + 1 }}/{{ compositions.length }}
+    ).text-white.q-pa-xs {{ indexTo + 1 }}/{{ compositionsFiltered.length }}
   //- preview
   img(
+    v-if="true"
     ref="compositionListPreview"
-    :src="compositions[0].preview" @load="previewLoad" @error="previewError"
+    :src="preview" @load="previewLoad" @error="previewError"
     draggable="false"
-    :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0, userSelect: 'none'}`)
+    :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0.5, userSelect: 'none'}`)
   //- compositions
-  div(
-    v-for="(c, ci) in compositionsFiltered" :key="ci"
-    v-if="true && height > 0 && styles.length > 0 && ci > index-2 && ci < index+2"
-    :style=`{
-      ...compositionStyle(ci),
-      position: 'absolute', bottom: 0, borderRadius: '10px', overflow: 'hidden',
-      //- border: ci > index ? '2px solid red' : ci < index ? '2px solid blue' : 'none',
-      zIndex: ci === index ? 200 : 300,
-      opacity: ci === index ? styles[1].opacity : ci === index+1 ? styles[2].opacity : styles[0].opacity,
-      maxWidth: ci === index ? styles[1].maxWidth+'%' : ci === index+1 ? styles[2].maxWidth+'%' : styles[0].maxWidth+'%',
-      maxHeight: ci === index ? styles[1].maxHeight+'%'+'px' : ci === index+1 ? styles[2].maxHeight+'px' : styles[0].maxHeight+'px',
-      height: isMini(ci) ? 'auto' : '100%'
-    }`).row.full-width.items-center.content-center
-    composition(
-      :ctx="ctx"
-      :value="c.composition" :preview="c.preview"
-      :visible="visible && ci >= index-1 && ci <= index+1"
-      :active="active && ci === index"
-      :mini="isMini(ci)"
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`
-      @compositionGet="compositionGet(c, ci)"
-      @next="compositionNext(ci)"
-      @error="$event => compositionError(ci, $event)")
+  div(v-if="comp3" :style=`{position: 'absolute', zIndex: 2000, opacity: 0.8}`).row.fit
+    div(
+      v-for="(c, ckey) in comp3" :key="ckey"
+      ).col.full-height.bg-black
+      composition(
+        v-if="c"
+        :ctx="ctx"
+        :value="c.composition" :preview="c.preview"
+        :visible="true" :active="ckey === 'middle'" :mini="ckey !== 'middle'"
+        @next="comp3changed(ckey)"
+        @compositionGet="compositionGet(c, ci)"
+        :style=`{}`)
+  //- div(
+  //-   v-for="(c, ci) in compositionsFiltered" :key="ci"
+  //-   v-if="true && height > 0 && styles.length > 0 && ci > index-2 && ci < index+2"
+  //-   :style=`{
+  //-     ...compositionStyle(ci),
+  //-     position: 'absolute', bottom: 0, borderRadius: '10px', overflow: 'hidden',
+  //-     //- border: ci > index ? '2px solid red' : ci < index ? '2px solid blue' : 'none',
+  //-     zIndex: ci === index ? 200 : 300,
+  //-     opacity: ci === index ? styles[1].opacity : ci === index+1 ? styles[2].opacity : styles[0].opacity,
+  //-     maxWidth: ci === index ? styles[1].maxWidth+'%' : ci === index+1 ? styles[2].maxWidth+'%' : styles[0].maxWidth+'%',
+  //-     maxHeight: ci === index ? styles[1].maxHeight+'%'+'px' : ci === index+1 ? styles[2].maxHeight+'px' : styles[0].maxHeight+'px',
+  //-     height: isMini(ci) ? 'auto' : '100%'
+  //-   }`).row.full-width.items-center.content-center
+  //-   composition(
+  //-     :ctx="ctx"
+  //-     :value="c.composition" :preview="c.preview"
+  //-     :visible="visible && ci >= index-1 && ci <= index+1"
+  //-     :active="active && ci === index"
+  //-     :mini="isMini(ci)"
+  //-     :style=`{borderRadius: '10px', overflow: 'hidden'}`
+  //-     @compositionGet="compositionGet(c, ci)"
+  //-     @next="compositionNext(ci)"
+  //-     @error="$event => compositionError(ci, $event)")
       //- @ended="compositionNext(ci + 1)"
   //- preview list
   div(
-    v-if="true && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '20px', zIndex: 3500}`).row.full-width.scroll.q-pa-sm
+    v-if="false && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '20px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositionsFiltered" :key="ci"
@@ -62,8 +75,8 @@ div(
           draggable="false").fit
   //- preview node list...
   div(
-    v-if="true && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '70px', zIndex: 3500}`).row.full-width.scroll.q-pa-sm
+    v-if="false && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '70px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositionsFiltered" :key="ci"
@@ -108,31 +121,92 @@ export default {
       ],
       styles: [],
       preview: undefined,
-      compositionsFiltered: []
+      compositionsFiltered: [],
+      compositionValue: null,
+      comp3: null,
+      indexTo: -1,
+      compositionOidOld: undefined
     }
   },
+  computed: {
+    // comp3 () {
+    //   if (this.compositionsFiltered.length === 0) return null
+    //   let currentIndex = this.compositionsFiltered.findIndex(i => i.node.oid === this.nodeOid)
+    //   if (currentIndex >= 0) {
+    //     return {
+    //       left: currentIndex > 0 ? this.compositionsFiltered[currentIndex - 1] : null,
+    //       middle: this.compositionsFiltered[currentIndex],
+    //       right: currentIndex < this.compositionsFiltered.length ? this.compositionsFiltered[currentIndex + 1] : null
+    //     }
+    //   }
+    //   else {
+    //     return null
+    //   }
+    // }
+  },
   watch: {
+    index: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('index CHANGED', to)
+        // this.compositionValue = this.compositionsFiltered[to]
+      }
+    },
     compositions: {
       immediate: true,
       handler (to, from) {
-        // this.$log('compositions CHANGED', to)
-        // if ()
-        if (this.ctx === 'rubick') {
-          if (to) {
-            this.compositionsFiltered = to.sort((a, b) => {
-              if (a.node.oid === this.nodeOid) return -1
-              else return 1
-            })
-            if (from) this.index = 0
+        this.$log('compositions CHANGED', to)
+        if (to) {
+          this.compositionsFiltered = to
+          if (this.ctx !== 'rubick') return
+          if (from) {
+            this.$log('FROM')
+            this.indexTo = to.findIndex(i => i.compositionOid === this.compositionOid)
+            this.$log('indexTo', this.indexTo)
+            if (this.indexTo >= 0) {
+              // if (!this.preview) this.preview = to[this.indexTo].preview
+              this.comp3.left = this.indexTo > 0 ? to[this.indexTo - 1] : null
+              this.comp3.right = this.indexTo < to.length ? to[this.indexTo + 1] : null
+              let middleNew = to[this.indexTo]
+              if (middleNew.compositionOid !== this.compositionOidOld) {
+                this.comp3.middle = middleNew
+                this.compositionOidOld = this.compositionOid
+              }
+              this.$log('comp3', this.comp3)
+            }
+          }
+          else {
+            this.$log('NEW')
+            this.indexTo = to.findIndex(i => i.compositionOid === this.compositionOid)
+            this.$log('indexTo', this.indexTo)
+            if (this.indexTo >= 0) {
+              if (!this.preview) this.preview = to[this.indexTo].preview
+              this.comp3 = {
+                left: this.indexTo > 0 ? to[this.indexTo - 1] : null,
+                middle: to[this.indexTo],
+                right: this.indexTo < to.length ? to[this.indexTo + 1] : null
+              }
+              this.$log('comp3', this.comp3)
+            }
           }
         }
         else {
-          this.compositionsFiltered = to
         }
       }
     }
   },
   methods: {
+    comp3changed (ckey) {
+      this.$log('comp3changed', ckey)
+      // let temp = this.comp3.middle
+      // this.comp3[ckey] = null
+      // this.comp3.middle = this.comp3[ckey]
+      // this.$set(this.comp3, ckey, null)
+      // this.$set(this.comp3, 'middle', this.comp3[ckey])
+      // this.$emit('next', index)
+      if (ckey === 'right') this.$emit('next', this.indexTo + 1)
+      else if (ckey === 'left') this.$emit('next', this.indexTo - 1)
+    },
     play () {
       this.$log('play')
     },

@@ -174,8 +174,8 @@ export default {
           this.$set(this, 'nodeRubick', JSON.parse(JSON.stringify(to)))
           this.compositionOneOid = to.meta.compositions[0].oid
           this.compositionTwoOid = to.meta.compositions[1].oid
-          this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
-          this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
+          this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
+          this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
         }
       }
     },
@@ -238,20 +238,18 @@ export default {
       let node = this.compositionOneItems[index].node
       let swap = this.compositionOneOid !== node.meta.compositions[0].oid
       this.$log('cONEnext swap', swap)
-      this.compositionOneOid = this.compositionOneItems[index].compositionOid
       this.nodeRubick = node
-      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: node, compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
-      // this.compositionOneOid = this.compositionOneItems[index].compositionOid
+      this.compositionOneOid = this.compositionOneItems[index].compositionOid
+      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
     },
     async compositionTwoNextIndex (index) {
       this.$log('cTWOnext index', index)
       let node = this.compositionTwoItems[index].node
       let swap = this.compositionTwoOid !== node.meta.compositions[1].oid
       this.$log('cTWOnext swap', swap)
-      this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
       this.nodeRubick = node
-      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: node, compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
-      // this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
+      this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
+      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
     },
     nodeNameClick () {
       this.$log('nodeNameClick')
