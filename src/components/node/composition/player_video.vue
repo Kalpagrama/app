@@ -93,38 +93,63 @@ export default {
       return this.layers[this.layerIndex]
     },
     layerStart () {
-      if (this.ctx === 'workspace' || this.ctx === 'editor') {
-        return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
-      }
-      else {
+      if (this.ctx === 'list' || this.ctx === 'rubick') {
         return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
       }
+      else {
+        return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
+      }
+      // if (this.ctx === 'workspace' || this.ctx === 'editor') {
+      //   return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
+      // }
+      // else {
+      //   return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
+      // }
     },
     layerEnd () {
-      if (this.ctx === 'workspace' || this.ctx === 'editor') {
-        return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
-      }
-      else {
+      if (this.ctx === 'list' || this.ctx === 'rubick') {
         return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
       }
+      else {
+        return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
+      }
+      // if (this.ctx === 'workspace' || this.ctx === 'editor') {
+      //   return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
+      // }
+      // else {
+      //   return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
+      // }
     },
     content () {
       return this.layer.content
     },
     contentSource () {
-      return this.content ? this.content.contentSource : false
-    },
-    contentUrl () {
-      if (this.content.contentSource === 'YOUTUBE') {
-        return this.content.url
-      }
-      else if (this.content.contentSource === 'KALPA') {
-        if (this.ctx === 'editor' || this.ctx === 'workspace') return this.content.url
-        else return this.layer.url
+      // return this.content ? this.content.contentSource : false
+      if (this.ctx === 'list' || this.ctx === 'rubick') {
+        return 'KALPA'
       }
       else {
-        return false
+        if (this.content.contentSource === 'YOUTUBE') return 'YOUTUBE'
+        else return 'KALPA'
       }
+    },
+    contentUrl () {
+      if (this.ctx === 'list' || this.ctx === 'rubick') {
+        return this.layer.url
+      }
+      else {
+        return this.content.url
+      }
+      // if (this.content.contentSource === 'YOUTUBE') {
+      //   return this.content.url
+      // }
+      // else if (this.content.contentSource === 'KALPA') {
+      //   if (this.ctx === 'editor' || this.ctx === 'workspace') return this.content.url
+      //   else return this.layer.url
+      // }
+      // else {
+      //   return false
+      // }
     },
     videoGood () {
       if (this.layerEnd && this.layerStart) {
@@ -268,7 +293,7 @@ export default {
     videoPlay (intervalUpdateIgnore) {
       this.$log('videoPlay')
       this.playing = true
-      if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 20)
+      if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 30)
     },
     videoPause () {
       this.$log('videoPause')

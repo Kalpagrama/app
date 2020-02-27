@@ -241,6 +241,7 @@ export default {
       this.compositionOneOid = this.compositionOneItems[index].compositionOid
       this.nodeRubick = node
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: node, compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
+      // this.compositionOneOid = this.compositionOneItems[index].compositionOid
     },
     async compositionTwoNextIndex (index) {
       this.$log('cTWOnext index', index)
@@ -250,6 +251,7 @@ export default {
       this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
       this.nodeRubick = node
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: node, compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
+      // this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
     },
     nodeNameClick () {
       this.$log('nodeNameClick')

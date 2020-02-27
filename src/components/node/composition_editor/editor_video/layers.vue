@@ -17,6 +17,9 @@
         span.text-bold.text-green Layers
   //- body
   div(:style=`{position: 'relative'}`).col.full-width.scroll
+    //- .row.full-width.q-px-sm
+    //-   .row.full-width.bg-red.text-white
+    //-     div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute}}
     .row.full-width.items-start.content-start.q-pa-sm
       div(
         v-for="(l, li) in layersFiltered" :key="li"
@@ -32,25 +35,32 @@
         div(
           v-if="l.figuresAbsolute.length > 0"
           :style=`{height: '40px'}`
-          ).row.full-width.items-center.content-center.q-px-sm
-          .col
-          span.text-white {{ $time(l.figuresAbsolute[0].t) }}-
-          span.text-white {{ $time(l.figuresAbsolute[1].t) }}
+          ).row.full-width.items-center.content-center
+          .col.full-height
+            div(@click="layerNameSet(l)").row.fit.items-center.content-center.q-px-sm.br
+              span(v-if="l.spheres.length > 0").text-white {{ l.spheres[0].name }}
+          div(:style=`{width: '83px'}`).row.full-height.justify-center.items-center.content-center
+            span.text-white {{ $time(l.figuresAbsolute[0].t) }}
+          div(:style=`{width: '83px'}`).row.full-height.justify-center.items-center.content-center
+            span.text-white {{ $time(l.figuresAbsolute[1].t) }}
         //- active layer
         div(
           v-if="meta.layerIndex === li"
           :style=`{height: height+'px'}`
-          ).row.full-width.items-end.content-end.justify-end.q-pa-sm
+          ).row.full-width.items-end.content-end.justify-end
           //- active layer EDIT
           div(
             v-if="mode === 'edit'"
-            :style=`{height: '50px'}`).row.full-width.items-end.content-end.justify-between
+            :style=`{height: '50px'}`).row.full-width.items-center.content-end.justify-end
+            .col.full-height
             q-btn(round flat color="green" icon="keyboard_arrow_left" @click="l.figuresAbsolute[0].t -= 0.100")
             q-btn(round flat color="green" icon="keyboard_arrow_right" @click="l.figuresAbsolute[0].t += 0.100")
             q-btn(round flat color="green" icon="keyboard_arrow_left" @click="l.figuresAbsolute[1].t -= 0.100")
             q-btn(round flat color="green" icon="keyboard_arrow_right" @click="l.figuresAbsolute[1].t += 0.100")
-            .col.full-height
-            q-btn(round flat color="red" icon="delete_outline" @click="layerDelete(li)").q-mr-sm
+            //- .col.full-height
+            q-btn(
+              v-if="layers.length > 1"
+              round flat color="red" icon="delete_outline" @click="layerDelete(li)").q-mr-sm
           //- active layer PICK
           div(
             v-if="mode === 'pick'"
@@ -111,8 +121,15 @@ export default {
       // TODO: check if the layer is the fucking last??
       // TODO: delete by finding the figuresAbsolute...
       if (this.layers.length > 1) {
+        this.$emit('meta', ['mode', 'layer'])
+        this.$emit('meta', ['layerIndex', this.meta.layerIndex - 1])
+        this.$emit('meta', ['layerIndexPlay', this.meta.layerIndex - 1])
         this.$delete(this.layers, li)
       }
+    },
+    layerNameSet (l) {
+      this.$log('layerNameSet', l)
+      this.$set(l.spheres, 0, {name: 'Layer: ' + l.figuresAbsolute[0].t})
     }
   },
   mounted () {

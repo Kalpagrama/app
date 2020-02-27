@@ -80,18 +80,19 @@ export default {
   methods: {
     layerAdd (start, end, layer) {
       this.$log('layerAdd start/end: ', start, end, layer)
+      this.$log('layerAdd layers', this.layers)
       let from = start || this.meta.now
       let to = end || from + this.layerInitialLength < this.meta.duration ? from + this.layerInitialLength : this.meta.duration
       this.$log('layerAdd from/to: ', from, to)
-      // add to first layer figuresAbsolute
+      // ALTER first layer with figuresAbsolute
+      // first layer is just a container for the content to play...
       if (this.layers.length === 1 && this.layers[0].figuresAbsolute.length === 0) {
-        this.$set(this.composition.layers[0], 'figuresAbsolute', [
-          {t: from, points: []},
-          {t: to, points: []}
-        ])
-      }
-      // add layer
-      else {
+        this.$log('ALTER first layer')
+        // this.$set(this.composition.layers[0], 'figuresAbsolute', [
+        //   {t: from, points: []},
+        //   {t: to, points: []}
+        // ])
+        let index = 0
         let l = layer || {
           content: this.content,
           figuresAbsolute: [
@@ -102,19 +103,40 @@ export default {
           spheres: []
         }
         this.$log('layerAdd layer: ', l)
-        this.$set(this.composition, 'layers', [l, ...this.composition.layers])
+        this.$set(this.composition.layers, index, l)
+        // change meta
+        this.$parent.$emit('meta', ['mode', 'layer'])
+        this.$parent.$emit('meta', ['layerIndexPlay', index])
+        this.$parent.$emit('meta', ['layerIndex', index])
       }
-      this.$parent.$emit('meta', ['mode', 'layer'])
-      this.$parent.$emit('meta', ['layerIndexPlay', -1])
-      this.$parent.$emit('meta', ['layerIndex', 0])
+      // ADD last layer, push
+      else {
+        this.$log('ADD last layer')
+        let index = this.composition.layers.length
+        let l = layer || {
+          content: this.content,
+          figuresAbsolute: [
+            {t: from, points: []},
+            {t: to, points: []}
+          ],
+          figuresRelative: [],
+          spheres: []
+        }
+        this.$log('layerAdd layer: ', l)
+        this.$set(this.composition.layers, index, l)
+        // change meta
+        this.$parent.$emit('meta', ['mode', 'layer'])
+        this.$parent.$emit('meta', ['layerIndexPlay', index])
+        this.$parent.$emit('meta', ['layerIndex', index])
+      }
       this.$log('layerAdd done')
     }
   },
   mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
   }
 }
 </script>

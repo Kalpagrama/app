@@ -115,7 +115,7 @@ export default {
     compositions: {
       immediate: true,
       handler (to, from) {
-        this.$log('compositions CHANGED', to)
+        // this.$log('compositions CHANGED', to)
         // if ()
         if (this.ctx === 'rubick') {
           if (to) {
@@ -148,7 +148,7 @@ export default {
       return ci === this.indexNexting ? false : ci !== this.index
     },
     previewLoad (e) {
-      this.$log('previewLoad', e)
+      // this.$log('previewLoad', e)
       // this.$q.notify('previewLoad')
       // this.$q.emit('previewLoad')
       // TODO list height? screen/3?, screen.width?, previewClientWidth?
@@ -162,7 +162,7 @@ export default {
       // this.$q.notify('height', this.height)
     },
     previewError (e) {
-      this.$log('previewError', e)
+      // this.$log('previewError', e)
       this.$emit('error', 'previewError')
       this.$q.notify('previewError')
     },
