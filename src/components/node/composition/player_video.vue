@@ -12,11 +12,19 @@ iframe {
 <template lang="pug">
 div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).column.fit.items-start.content-start.bg-black
   //- opacity: videoGood ? 1 : 0
+  //- layer name
+  span(
+    v-if="!mini && layer.spheres.length > 0" @click="layerNameClick()"
+    :style=`{
+      position: 'absolute', zIndex: 1000, top: '6px', left: '6px',
+      borderRadius: '10px', overflow: 'hidden',
+      color: 'white', background: 'rgba(0,0,0,0.3)'}`
+    ).q-pa-sm {{ layer.spheres[0].name | cut(50) }}
   //- debug
   div(
-    v-if="!mini && true"
+    v-if="!mini && $store.state.ui.debug"
     :style=`{
-      position: 'absolute', width: 'calc(100% - 20px)', left: '10px', top: '10px',
+      position: 'absolute', width: 'calc(100% - 20px)', left: '6px', top: '46px',
       pointerEvents: 'none', userSelect: 'none',
       zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.3}`).row.q-pa-sm.bg-green
     small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
@@ -386,8 +394,8 @@ export default {
         })
       }
       // set player defaults
-      this.player.update = () => {
-        this.videoUpdate()
+      this.player.update = (to) => {
+        this.videoUpdate(to)
       }
     },
     playerDestroy () {
@@ -403,6 +411,11 @@ export default {
     onMeta (val) {
       this.$log('onMeta', val)
       this[val[0]] = val[1]
+    },
+    layerNameClick () {
+      this.$log('layerNameClick')
+      // TODO this fucntion should not be here...
+      // go to sphere page...
     }
   },
   created () {

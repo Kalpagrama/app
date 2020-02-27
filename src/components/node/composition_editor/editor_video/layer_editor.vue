@@ -3,9 +3,11 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
   q-resize-observer(@resize="onResize")
   div(:style=`{position: 'relative'}`).row.full-width
     //- debug, relative
-    div(v-if="false" :style=`{color: 'white'}`).row.full-width.bg-red
-      //- small.text-white.full-width layer: {{layer}}
-      small.full-width framesWidth/framesLoaded: {{framesWidth}}/{{framesLoaded}}
+    div(v-if="$store.state.ui.debug").row.full-width.q-pa-sm
+      div(:style=`{borderRadius: '10px', color: 'white'}`).row.full-width.bg-green.q-pa-xs
+        //- small.text-white.full-width layer: {{layer}}
+        small.full-width width: {{width}}
+        small.full-width framesWidth/framesLoaded: {{framesWidth}}/{{framesLoaded}}
     //- debug
     div(
       v-if="false"
@@ -16,7 +18,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
     q-btn(
       v-show="content.contentSource === 'KALPA' ? framesLoaded : true"
       round push color="green" icon="add" @click="$emit('add')"
-      :style=`{position: 'absolute', zIndex: 100, right: '16px', top: '12px'}`)
+      :style=`{position: 'absolute', zIndex: 5000, right: '16px', top: '12px'}`)
     //- frames
     div(
       ref="framesScrollWrapper"
@@ -160,10 +162,20 @@ export default {
   watch: {
     framesLoaded: {
       handler (to, from) {
-        this.$log('framesLoaded', to)
-        // TODO: show loading until all the frames are loaded...
-        // moving strange(
-        if (to) this.framesWidthUpdate()
+        this.$log('framesLoaded CHANGED', to)
+        if (to) {
+          this.framesWidthUpdate()
+          this.framesTweenToLayer()
+        }
+      }
+    },
+    'meta.playing': {
+      handler (to, from) {
+        this.$log('meta.playing CHANGED', to)
+        if (to) {
+          // TODO maybe the meta.mode?
+          // this.framesTweenToLayer()
+        }
       }
     },
     'meta.layerIndex': {
@@ -173,16 +185,9 @@ export default {
         this.$log('meta.layerIndex CHANGED')
         this.framesWidthUpdate()
         if (this.layer && this.$refs.framesScrollWrapper) {
-          this.$tween.to(
-            this.$refs.framesScrollWrapper,
-            0.9,
-            {
-              scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50,
-              onComplete: () => {
-                // this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
-              }
-            })
+          this.framesTweenToLayer()
         }
+        if (this.content.contentSource === 'YOUTUBE') this.framesLoaded = true
       }
     },
     layer: {
@@ -192,7 +197,7 @@ export default {
         if (to) {
           // if (from && to === from) return
           // if (this.panning || this.panningFrames) return
-          this.$log('layer CHANGED', to)
+          // this.$log('layer CHANGED', to)
           // this.framesWidthUpdate()
           // this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
           // this.player.setCurrentTime(to.figuresAbsolute[0].t)
@@ -208,7 +213,7 @@ export default {
       this.$emit('meta', ['mode', 'watch'])
       this.player.setCurrentTime(to)
       this.player.pause()
-      this.player.update()
+      this.player.update(to)
     },
     frameLoaded () {
       // this.$log('frameLoaded')
@@ -220,6 +225,19 @@ export default {
     framesWidthUpdate () {
       this.$log('framesWidthUpdate')
       if (this.$refs.framesScrollWrapper) this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
+    },
+    framesTweenToLayer () {
+      this.$log('framesTweenToLayer start')
+      if (this.layer.figuresAbsolute.length === 0) return
+      this.$tween.to(
+        this.$refs.framesScrollWrapper,
+        0.9,
+        {
+          scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50,
+          onComplete: () => {
+            this.$log('framesTweenToLayer done')
+          }
+        })
     },
     panFrames (e) {
       if (this.panning) return

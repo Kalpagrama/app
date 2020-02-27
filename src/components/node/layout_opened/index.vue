@@ -132,7 +132,7 @@ export default {
       nodeRubickFull: null,
       nodeRubickNew: null,
       nodeRubickNext: null,
-      maxWidth: 500
+      maxWidth: 600
     }
   },
   computed: {

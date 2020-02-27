@@ -51,7 +51,7 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('value CHANGED', to)
+        // this.$log('value CHANGED', to)
         if (to && this.node && this.ctx === 'editor') return
         if (to && !this.nodeSaving) {
           this.nodeSavePause = true
@@ -63,7 +63,7 @@ export default {
       deep: true,
       immediate: false,
       handler (to, from) {
-        this.$log('node CHANGED', to, this.nodeSavePause)
+        // this.$log('node CHANGED', to, this.nodeSavePause)
         if (to) {
           if (this.ctx === 'workspace') {
             if (this.nodeSavePause) {

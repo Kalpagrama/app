@@ -3,10 +3,10 @@ div(
   :style=`{position: 'relative', height: mini ? 'auto' : '100%'}`
   ).row.full-width.items-start.content-start.bg-black
   //- debug
-  div(
-    v-if="false"
-    :style=`{position: 'absolute', top: '2px', left: '2px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
-    small.text-white.full-width mini: {{ mini }}
+  //- div(
+  //-   v-if="false"
+  //-   :style=`{position: 'absolute', top: '2px', left: '2px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
+  //-   small.text-white.full-width mini: {{ mini }}
   //- TODO composition menu
   //- next tint
   div(
