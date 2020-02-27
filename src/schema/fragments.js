@@ -144,10 +144,12 @@ const compositionFragment = gql`
       spheres {...objectShortFragment}
       thumbUrl(preferWidth: 600)
       url
+      contentSource
     }
     operation{... operationFragment}
     outputType
     url
+    contentSource
   }
 `
 

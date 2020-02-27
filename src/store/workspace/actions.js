@@ -304,7 +304,7 @@ export const get = async (context, { oid, name, force }) => {
       let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
         query: gql`
           ${fragments.objectFullFragment}
-          query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
+          query wsItems_get ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
             wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
               totalCount
               count
