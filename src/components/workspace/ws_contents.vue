@@ -87,7 +87,7 @@ export default {
           compositions: [
             {
               operation: { type: 'CONCAT', items: [], operations: null },
-              layers: [{ content: content, figuresAbsolute: [] }]
+              layers: [{ content: content, figuresAbsolute: [], figuresRelative: [], spheres: [] }]
             }
           ]
         }
