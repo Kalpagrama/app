@@ -135,6 +135,7 @@ export default {
           return true
         })
       } else {
+        // TODO min max screen width
         return Math.ceil(this.duration / 10)
       }
     },

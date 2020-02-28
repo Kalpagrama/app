@@ -11,7 +11,7 @@ div(
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"
-    :style=`{position: 'absolute', zIndex: 4000, opacity: 0.5}`).row.fit.cursor-pointer.bg-red
+    :style=`{position: 'absolute', zIndex: 4000, opacity: 0.5}`).row.fit.cursor-pointer
   //- preview
   img(
     v-if="preview" ref="compositionPreview" :src="preview" crossOrigin="anonymous" draggable="false"
@@ -19,7 +19,7 @@ div(
     :style=`{
       userSelect: 'none',
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
-      maxHeight: $q.screen.height+'px', objectFit: 'contain'}`).br
+      maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
   //- TODO different players
   player-video(
@@ -66,13 +66,6 @@ export default {
             this.$emit('compositionGet')
           }
         }
-      }
-    },
-    visible: {
-      deep: true,
-      immediate: false,
-      handler (to, from) {
-        this.$log('visible CHANGED', to)
       }
     }
   },
