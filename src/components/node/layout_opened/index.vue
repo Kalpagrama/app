@@ -88,7 +88,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           round outline color="green" icon="add" @click="compositionAdd(1)"
           :style=`{position: 'absolute', zIndex: 2000, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- debug node
-      div(v-if="nodeRubick").row.full-width.bg-red
+      div(v-if="false && nodeRubick").row.full-width.bg-red
         .row.full-width
           img(
             :src="nodeRubick.meta.compositions[0].thumbUrl"

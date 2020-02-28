@@ -8,6 +8,10 @@ div(
   //-   :style=`{position: 'absolute', top: '2px', left: '2px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
   //-   small.text-white.full-width mini: {{ mini }}
   //- TODO composition menu
+  q-btn(
+    v-if="!mini"
+    round flat color="white" icon="more_vert" @click="menuToggle"
+    :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)'}`)
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"
@@ -70,6 +74,9 @@ export default {
     }
   },
   methods: {
+    menuToggle () {
+      this.$log('menuToggle')
+    },
     previewLoad () {
       // this.$log('previewLoad')
       let previewRef = this.$refs.compositionPreview
