@@ -49,7 +49,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         composition-list(
           v-if="nodeRubick && compositionOneQuery"
           ref="compositionListOne"
-          :ctx="'rubick'"
+          :ctx="'rubick'" label="one"
           @width="width = $event"
           @next="compositionOneNextIndex"
           :compositions="compositionOneItems"
@@ -76,7 +76,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         composition-list(
           v-if="nodeRubick && compositionTwoQuery"
           ref="compositionListTwo"
-          :ctx="'rubick'"
+          :ctx="'rubick'" label="two"
           @next="compositionTwoNextIndex"
           :compositions="compositionTwoItems"
           :compositionOid="compositionTwoOid"
@@ -88,7 +88,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           round outline color="green" icon="add" @click="compositionAdd(1)"
           :style=`{position: 'absolute', zIndex: 2000, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- debug node
-      div(v-if="false && nodeRubick").row.full-width.bg-red
+      div(v-if="true && nodeRubick").row.full-width.bg-red
         .row.full-width
           img(
             :src="nodeRubick.meta.compositions[0].thumbUrl"
@@ -242,6 +242,7 @@ export default {
       this.compositionOneOid = this.compositionOneItems[index].compositionOid
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
+      // this.compositionOneOid = this.compositionOneItems[index].compositionOid
     },
     async compositionTwoNextIndex (index) {
       this.$log('cTWOnext index', index)
@@ -252,6 +253,7 @@ export default {
       this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
+      // this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
     },
     nodeNameClick () {
       this.$log('nodeNameClick')

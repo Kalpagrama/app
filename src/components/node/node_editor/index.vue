@@ -79,7 +79,7 @@
             q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
                 :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
           //- essence editor
-          div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
+          div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', border: nodeSaving ? '2px solid red' : '2px solid green'}`).row.full-width.q-my-md
             input(
               v-if="node"
               v-model="node.name"
@@ -140,6 +140,7 @@ export default {
   data () {
     return {
       maxWidth: 600,
+      nodeChanged: false,
       nodeSavePause: false,
       nodeSaving: false,
       nodeSavingError: null,
@@ -170,10 +171,16 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('value CHANGED', to)
+        this.$log('*** value CHANGED', to)
         if (to) {
-          this.nodeSavePause = true
-          this.node = JSON.parse(JSON.stringify(to))
+          if (this.nodeSaving) {
+            // this.nodeSave()
+            // if (to.revision !== this.node.revision) this.node = JSON.parse(JSON.stringify(to))
+          }
+          else {
+            this.nodeSavePause = true
+            this.node = JSON.parse(JSON.stringify(to))
+          }
         }
         else {
           this.nodeSavePause = true
@@ -184,12 +191,13 @@ export default {
     node: {
       deep: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
+        this.$log('*** node CHANGED', to)
         if (to) {
           if (this.nodeSavePause) {
             this.nodeSavePause = false
           } else {
-            this.nodeSave(to)
+            this.$store.commit('workspace/stateSet', ['item', to])
+            this.nodeSave()
           }
         }
       }
@@ -260,21 +268,22 @@ export default {
         this.nodeDeletingError = e
       }
     },
-    async nodeSave (node) {
+    nodeSaveDebounce () {
+      this.nodeSave()
+    },
+    async nodeSave () {
       try {
-        this.$log('nodeSave start', node.revision, node.name, node)
+        this.$log('nodeSave start')
         this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
-        await this.$wait(600)
-        this.$log('nodeSave res', res.revision, res.name, res)
-        this.$log('nodeSave this.value', this.value)
-        if (!this.value) {
-          this.$log('nodeSave SET WS ITEM')
-          if (!this.$route.params.oid) this.$router.push('/workspace/nodes/' + res.oid).catch(e => e)
-          this.$store.commit('workspace/stateSet', ['itemType', 'node'])
-          this.$store.commit('workspace/stateSet', ['item', res])
-        }
-        this.$log('nodeSave done', res.revision, res.name)
+        let res = await this.$store.dispatch('workspace/wsNodeSave', this.node)
+        this.$log('nodeSave res', res.revision, res.name)
+        // if (!this.value) {
+        //   this.$log('nodeSave SET WS ITEM')
+        //   if (!this.$route.params.oid) this.$router.push('/workspace/nodes/' + res.oid).catch(e => e)
+        //   this.$store.commit('workspace/stateSet', ['itemType', 'node'])
+        //   this.$store.commit('workspace/stateSet', ['item', res])
+        // }
+        this.$log('nodeSave done')
         this.nodeSaving = false
         this.nodeSavingError = null
       } catch (e) {

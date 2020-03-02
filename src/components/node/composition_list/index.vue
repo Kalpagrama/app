@@ -37,7 +37,7 @@ div(
       v-if="c"
       :ctx="ctx"
       :value="c.composition" :preview="c.preview"
-      :visible="visible" :active="active && ckey === 'current'" :mini="isMini(ckey)"
+      :visible="ckey === 'current'" :active="active && ckey === 'current'" :mini="isMini(ckey)"
       @next="compositionNext(ckey)"
       @compositionGet="compositionGet(c, ci)")
       //- ckey === 'current'
@@ -96,6 +96,7 @@ export default {
   name: 'compositionList',
   props: {
     ctx: {type: String},
+    label: {type: String, default () { return 'list' }},
     mode: {type: String, default () { return 'manual' }},
     visible: {type: Boolean, default () { return false }},
     active: {type: Boolean, default () { return false }},
@@ -124,13 +125,13 @@ export default {
     compositions: {
       immediate: true,
       handler (to, from) {
-        // this.$log('cCHANGED', to)
+        this.$log(this.label, 'cCHANGED', to)
         if (to) {
           if (this.ctx === 'rubick') {
             if (from) {
-              // this.$log('cCHANGED FROM')
+              this.$log(this.label, 'cCHANGED FROM')
               this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-              // this.$log('cCHANGED index', this.index)
+              this.$log(this.label, 'cCHANGED index', this.index)
               if (this.index >= 0) {
                 this.rubick.prev = this.index > 0 ? to[this.index - 1] : null
                 this.rubick.next = this.index < to.length ? to[this.index + 1] : null
@@ -142,9 +143,9 @@ export default {
               }
             }
             else {
-              // this.$log('cCHANGED NEW')
+              this.$log(this.label, 'cCHANGED NEW')
               this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-              // this.$log('cCHANGED index', this.index)
+              this.$log(this.label, 'cCHANGED index', this.index)
               if (this.index >= 0) {
                 if (!this.preview) this.preview = to[this.index].preview
                 this.rubick = {
@@ -156,6 +157,7 @@ export default {
             }
           }
           else {
+            this.$log(this.label, 'cCHANGED list')
             if (!this.preview) this.preview = to[0].preview
             this.rubick = {
               prev: null,
@@ -197,9 +199,9 @@ export default {
             this.ckeyNexting = undefined
             if (this.ctx === 'rubick') {
               this.compositionOidOld = this.rubick[ckey].compositionOid
-              let t = this.rubick.current
+              // let t = this.rubick.current
               this.rubick.current = this.rubick[ckey]
-              this.rubick[ckey] = t
+              // this.rubick[ckey] = t
               this.index = index
               this.$emit('next', index)
             }
@@ -209,12 +211,13 @@ export default {
               if (ckey === 'next') {
                 this.rubick.prev = t
                 this.rubick.next = null
+                this.index = 1
               }
               else {
                 this.rubick.next = t
                 this.rubick.prev = null
+                this.index = 0
               }
-              this.index = index
               this.$emit('next', index)
             }
           }
