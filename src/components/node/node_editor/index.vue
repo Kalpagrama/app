@@ -112,7 +112,8 @@
             small.full-width oid: {{ node.oid }}
             small.full-width compositionActive: {{compositionActive}}
             small.full-width compositionVisible: {{compositionVisible}}
-        div(:style=`{height: '400px'}`).row.full-width
+        div(:style=`{minHeight: '400px'}`).row.full-width.justify-center.q-py-md
+          spheres(v-if="node" :node="node" :style=`{maxWidth: maxWidth+'px'}`)
           //- span hello
           //- spheres(:node="node")
           //- div(

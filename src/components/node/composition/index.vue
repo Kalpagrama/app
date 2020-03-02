@@ -18,7 +18,7 @@ div(
     :style=`{position: 'absolute', zIndex: 4000, opacity: 0.5}`).row.fit.cursor-pointer
   //- preview
   img(
-    v-if="preview" ref="compositionPreview" :src="preview" crossOrigin="anonymous" draggable="false"
+    v-if="preview" ref="compositionPreview" :src="preview" draggable="false"
     @load="previewLoad" @error="previewError"
     :style=`{
       userSelect: 'none',
@@ -52,6 +52,7 @@ export default {
   },
   data () {
     return {
+      previewLocal: undefined,
       previewWidth: 0,
       previewHeight: 0,
       previewLoaded: false
@@ -120,6 +121,12 @@ export default {
       this.$emit('error', 'previewError')
       this.$emit('previewError')
     }
+  },
+  mounted () {
+    // this.$log('mounted')
+  },
+  beforeDestroy () {
+    // this.$log('beforeDestroy')
   }
 }
 </script>
