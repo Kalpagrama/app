@@ -270,16 +270,16 @@ export default {
         this.nodeSaving = true
         let res = await this.$store.dispatch('workspace/wsNodeSave', this.node)
         // await this.$wait(600)
-        this.$log('nodeSave res', res.revision, res.name, res)
-        this.$log('nodeSave this.value', this.value)
+        // this.$log('nodeSave res', res.revision, res.name, res)
+        // this.$log('nodeSave this.value', this.value)
         if (!this.value) {
           this.$log('nodeSave SET WS ITEM')
           if (!this.$route.params.oid) this.$router.push('/workspace/nodes/' + res.oid).catch(e => e)
           this.$store.commit('workspace/stateSet', ['itemType', 'node'])
           this.$store.commit('workspace/stateSet', ['item', res])
         }
-        this.$log('nodeSave done', res.revision, res.name)
         this.nodeSavingError = null
+        this.$log('nodeSave done', res.revision, res.name)
       } catch (e) {
         this.$logE('nodeSave error', e)
         this.nodeSavingError = e
