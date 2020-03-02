@@ -79,7 +79,7 @@
             q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
                 :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
           //- essence editor
-          div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden', border: nodeSaving ? '2px solid red' : '2px solid green'}`).row.full-width.q-my-md
+          div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
             input(
               v-if="node"
               v-model="node.name"
@@ -112,7 +112,8 @@
             small.full-width oid: {{ node.oid }}
             small.full-width compositionActive: {{compositionActive}}
             small.full-width compositionVisible: {{compositionVisible}}
-        div(:style=`{height: '400px'}`).row.full-width
+        div(:style=`{minHeight: '400px'}`).row.full-width.justify-center.q-py-md
+          spheres(v-if="node" :node="node" :style=`{maxWidth: maxWidth+'px'}`)
           //- span hello
           //- spheres(:node="node")
           //- div(
