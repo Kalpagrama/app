@@ -242,7 +242,6 @@ export default {
       this.compositionOneOid = this.compositionOneItems[index].compositionOid
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
-      // this.compositionOneOid = this.compositionOneItems[index].compositionOid
     },
     async compositionTwoNextIndex (index) {
       this.$log('cTWOnext index', index)
@@ -253,7 +252,6 @@ export default {
       this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
-      // this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
     },
     nodeNameClick () {
       this.$log('nodeNameClick')
