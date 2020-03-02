@@ -48,7 +48,7 @@
               .col
               q-btn(
                 v-if="node && node.oid"
-                outline color="green" no-caps :loading="nodeSaving" @click="nodeSave()"
+                outline color="green" no-caps :loading="nodeSaving" @click="nodeSaveImmediate()"
                 :style=`{borderRadius: '10px'}`).q-mr-md
                 span().text-bold.text-green Save
               //- .col.full-height
@@ -140,7 +140,7 @@ export default {
   data () {
     return {
       maxWidth: 600,
-      nodeSavePause: false,
+      nodeChanged: false, // ядро изменено пользователем(есть неотправленные во вьюикс изменения)
       nodeSaving: false,
       nodeSavingError: null,
       nodePublishing: false,
@@ -150,7 +150,7 @@ export default {
       node: null,
       nodeNew: {
         name: '',
-        revision: 1,
+        revision: 0,
         layout: 'PIP',
         category: 'FUN',
         spheres: [],
@@ -170,13 +170,18 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('value CHANGED', to)
         if (to) {
-          this.nodeSavePause = true
-          this.node = JSON.parse(JSON.stringify(to))
-        }
-        else {
-          this.nodeSavePause = true
+          if (this.node.revision !== to.revision){ // ядро изменено на сервере
+            if (this.nodeChanged) { // если пользователь успел изменить что-либо
+              this.$log('has user changes! try to save')
+              this.nodeSaveDebounce()
+            } else {
+              this.$log('value CHANGED1 ', to)
+              this.node = JSON.parse(JSON.stringify(to))
+            }
+          }
+        } else {
+          this.$log('value CHANGED2', to)
           this.node = JSON.parse(JSON.stringify(this.nodeNew))
         }
       }
@@ -184,12 +189,11 @@ export default {
     node: {
       deep: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
         if (to) {
-          if (this.nodeSavePause) {
-            this.nodeSavePause = false
-          } else {
-            this.nodeSave(to)
+          if (!from || from.revision === to.revision) { // ядро изменено пользователем
+            this.$log('node CHANGED:', to.revision, to.name)
+            this.nodeChanged = true
+            this.nodeSaveDebounce()
           }
         }
       }
@@ -251,8 +255,7 @@ export default {
         this.nodeDeleting = false
         this.nodeDeletingError = null
         // TODO delete node and exit
-        this.$router.replace('/workspace/nodes')
-        this.nodeSavePause = true
+        await this.$router.replace('/workspace/nodes')
         this.node = this.nodeNew
       } catch (e) {
         this.$log('nodeDelete error', e)
@@ -260,12 +263,13 @@ export default {
         this.nodeDeletingError = e
       }
     },
-    async nodeSave (node) {
+    async nodeSaveImmediate () {
       try {
-        this.$log('nodeSave start', node.revision, node.name, node)
+        if (!this.nodeChanged) return
+        this.$log('nodeSave start', this.node.revision, this.node.name)
         this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
-        await this.$wait(600)
+        let res = await this.$store.dispatch('workspace/wsNodeSave', this.node)
+        // await this.$wait(600)
         this.$log('nodeSave res', res.revision, res.name, res)
         this.$log('nodeSave this.value', this.value)
         if (!this.value) {
@@ -275,12 +279,13 @@ export default {
           this.$store.commit('workspace/stateSet', ['item', res])
         }
         this.$log('nodeSave done', res.revision, res.name)
-        this.nodeSaving = false
         this.nodeSavingError = null
       } catch (e) {
-        this.$log('nodeSave error', e)
+        this.$logE('nodeSave error', e)
         this.nodeSavingError = e
+      } finally {
         this.nodeSaving = false
+        this.nodeChanged = false
       }
     },
     async nodePublish () {
@@ -304,7 +309,7 @@ export default {
     }
   },
   created () {
-    this.nodeSave = debounce(this.nodeSave, 1000)
+    this.nodeSaveDebounce = debounce(this.nodeSaveImmediate, 1000)
   },
   mounted () {
     this.$log('mounted')
