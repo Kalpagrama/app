@@ -45,12 +45,18 @@ div(
   //- spheres NODE
   .row.full-width.items-start.content-start.q-py-sm
     span(
-      v-for="(s, si) in spheres" :key="si" @click="sphereClick(s,si)"
+      v-for="(s, si) in spheres" :key="si"
       :class=`{'full-width': si === sphereIndex}`
       :style=`{
-        color: 'white', borderRadius: '10px', userSelect: 'none',
+        position: 'relative', color: 'white', borderRadius: '10px', userSelect: 'none',
         overflow: 'hidden', whiteSpace: 'nowrap'}`
       ).bg-grey-9.q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer {{ s.name }}
+      //- inactive sphere
+      div(
+        v-if="si !== sphereIndex" @click="sphereClick(s,si)"
+        :style=`{position: 'absolute', top: '0px', left: '0px', zIndex: 200}`
+        ).row.fit
+      //- active sphere
       div(
         v-if="si === sphereIndex"
         :style=`{height: '60px'}`
@@ -110,8 +116,8 @@ export default {
     },
     sphereDelete (s, si) {
       this.$log('sphereDelete')
-      this.node.spheres = this.node.spheres.filter(i => i.oid !== s.oid)
       this.sphereIndex = -1
+      this.node.spheres = this.node.spheres.filter(i => i.oid !== s.oid)
     },
     async spheresWSget () {
       this.$log('spheresWSget')
