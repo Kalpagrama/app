@@ -25,13 +25,13 @@ div(
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
       maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
-  //- player-video(
-  //-   v-if="visible && value"
-  //-   :ctx="ctx" :composition="value"
-  //-   :visible="visible" :active="active" :mini="mini"
-  //-   :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 1000}`).fit
-  //-   template(v-slot:editor=`{player, meta}`)
-  //-     slot(name="editor" :player="player" :meta="meta")
+  player-video(
+    v-if="visible && value"
+    :ctx="ctx" :composition="value"
+    :visible="visible" :active="active" :mini="mini"
+    :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 1000}`).fit
+    template(v-slot:editor=`{player, meta}`)
+      slot(name="editor" :player="player" :meta="meta")
 </template>
 
 <script>
