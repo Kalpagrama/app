@@ -130,13 +130,13 @@ export const nodeNodes = async (context, { compositionOid, pagination, sortStrat
     })
     return {
       item: { items, count, totalCount, nextPageToken },
-      actualAge: 'zero'
+      actualAge: 'hour'
     }
   }
   // { items, count, totalCount, nextPageToken }
   let feedResult = await context.dispatch('cache/get',
     {
-      key: 'list: ' + JSON.stringify({ oid: oid, pagination, filter, sortStrategy }),
+      key: 'list: ' + JSON.stringify({oid, pagination, filter, sortStrategy }),
       fetchItemFunc
     }, { root: true })
   logD('nodeNodes complete')
