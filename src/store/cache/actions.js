@@ -70,7 +70,8 @@ class QueueUpdate {
     })
   }
 
-  async next () {
+  async next (retryCount = 0) {
+    if (retryCount > 3) return
     if (this.inProgress) return
     if (this.queries.length === 0) return
     let { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc } = this.queries.shift()
@@ -87,7 +88,7 @@ class QueueUpdate {
       await wait(5000)
     } finally {
       this.inProgress = false
-      this.next().catch(err => {
+      this.next(++retryCount).catch(err => {
         logE('cant update item on server2', { key, path, newValue }, err)
       })
     }
@@ -97,7 +98,7 @@ class QueueUpdate {
     assert(updateItemFunc && fetchItemFunc && mergeItemFunc)
     assert(this.context.state.cachedItems[key], 'изменяемый объект обязан быть в кэше')
     try {
-      logD('try send query to server')
+      logD('try send query to server', this.context.state.cachedItems[key].revision)
       let { item: dbItem, actualAge } = await updateItemFunc(this.context.state.cachedItems[key])
       this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
       await cache.set(key, this.context.state.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
@@ -163,7 +164,7 @@ class Cache {
     let idbItems = []
     for (let key of await this.cachePersist.keys()) {
       let { item, actualUntil, actualAge, lastTouchDate } = await this.cachePersist.getItem(key)
-      idbItems.push({key, item, actualUntil, actualAge, lastTouchDate })
+      idbItems.push({ key, item, actualUntil, actualAge, lastTouchDate })
     }
     // сортируем по возрастанию даты последнего обращения
     idbItems.sort((left, right) => {
@@ -172,7 +173,7 @@ class Cache {
     // добавляем в cacheLru и vuex (самые последние запрошенные - в конце (save "recently used"-ness of the key))
     // это конечно не сохраняет LRU в полной мере... Но хоть что-то
     for (let idbItem of idbItems) {
-      let {key, item, actualUntil, actualAge, lastTouchDate } = idbItem
+      let { key, item, actualUntil, actualAge, lastTouchDate } = idbItem
       assert(key && item && actualUntil)
       this.cacheLru.set(key, { actualUntil, actualAge })
       this.context.commit('setItem', { key, item })

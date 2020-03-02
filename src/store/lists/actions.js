@@ -130,7 +130,7 @@ export const nodeNodes = async (context, { compositionOid, pagination, sortStrat
     })
     return {
       item: { items, count, totalCount, nextPageToken },
-      actualAge: 'zero'
+      actualAge: 'hour'
     }
   }
   // { items, count, totalCount, nextPageToken }

@@ -29,8 +29,10 @@ export const init = async (context) => {
   }
 
   let authInfo = await context.dispatch('cache/get', { key: 'authInfo', fetchItemFunc }, { root: true })
-  context.commit('init', authInfo)
-  logD('auth init done!')
+  if (authInfo && authInfo.userIsConfirmed){
+    context.commit('init', authInfo)
+    logD('auth init done!')
+  }
   return authInfo
 }
 export const inviteEmail = async (context, email) => {

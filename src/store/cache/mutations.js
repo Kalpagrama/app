@@ -19,6 +19,7 @@ export function clear (state) {
 }
 
 export function setItem (state, { key, item }) {
+  logD(`cache/updateItem ${key} ${item.revision}`)
   let existing = state.cachedItems[key]
   if (existing === item) return // оптимтизация (один и тот же объект)
   if (existing) {
@@ -32,7 +33,7 @@ export function setItem (state, { key, item }) {
 
 // изменит
 export function updateItem (state, { key, path, newValue, setter }) {
-  // logD('cache/updateItem', { key, path, newValue, setter })
+  logD(`cache/updateItem ${key} ${newValue.revision}`)
   let obj = state.cachedItems[key]
   if (!obj) return
   if (obj === newValue) return // оптимтизация (один и тот же объект)
@@ -48,7 +49,9 @@ export function updateItem (state, { key, path, newValue, setter }) {
     assert(newValue == null, '!newValue')
     // logD('before setter:', o)
     newValue = path.length ? setter(o[path[path.length - 1]]) : setter(o)
-  } else assert(newValue != null, 'newValue != null')
+  } else {
+    assert(newValue != null, 'newValue != null')
+  }
   if (path.length) { // изменилась часть объекта
     let prop = path[path.length - 1]
     Vue.set(o, prop, newValue)
