@@ -64,7 +64,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'settings.notifications',
-          value: this.n
+          newValue: this.n
         })
         this.$log('changing done', res)
         this.$q.notify({message: 'Changing', color: 'green', textColor: 'white'})

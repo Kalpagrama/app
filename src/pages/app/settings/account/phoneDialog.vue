@@ -52,7 +52,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.phone',
-          value: '+7 ' + this.newPhone
+          newValue: '+7 ' + this.newPhone
         })
         this.$log('changePhone done', res)
         this.$q.notify({message: 'Changed PHONE', color: 'green', textColor: 'white'})

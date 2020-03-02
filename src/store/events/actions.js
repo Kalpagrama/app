@@ -1,6 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
 import { Notify } from 'quasar'
+import { notify } from 'src/boot/notify'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
@@ -24,9 +25,9 @@ export const init = async (context) => {
   })
 
   observerEvent.subscribe({
-    next: ({ data: { event } }) => {
+    next: async ({ data: { event } }) => {
       logD(`EVENT received ${event.type}`, event)
-      processEvent(context, event)
+      await processEvent(context, event)
     },
     error: (error) => {
       logE('EVENT error', error)
@@ -43,18 +44,16 @@ export const testWebPush = async (context) => {
     query: gql`
       query testWebPush {
         testWebPush
-      }`,
-    fetchPolicy: 'network-only'
+      }`
   })
   logD('testWebPush result = ', testWebPush)
   return testWebPush
 }
 
-function processEvent (context, event) {
-  logD('processEvent start', event)
+async function processEvent (context, event) {
+  // logD('processEvent start', event)
   switch (event.type) {
     case 'ERROR':
-      context.commit('stateSet', ['error', event])
       notifyError(event)
       break
     case 'PROGRESS':
@@ -63,11 +62,10 @@ function processEvent (context, event) {
       if (event.action === 'CREATE_NODE') context.commit('stateSet', ['progressCreateNode', event])
       break
     case 'NOTICE':
-      context.commit('stateSet', ['notice', event])
       break
     case 'OBJECT_CHANGED':
-      context.commit('objects/update', {
-        oid: event.object.oid,
+      await context.dispatch('cache/update', {
+        key: event.object.oid,
         path: event.path,
         newValue: event.value
       }, { root: true })
@@ -77,35 +75,34 @@ function processEvent (context, event) {
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
-      context.commit('stateSet', ['nodeCreated', event])
+      // поместить ядро во все ленты
+      await context.dispatch('lists/processEvent', event, { root: true })
       context.commit('addEvent', { event, context })
       break
-    case 'NODE_RATED':
+    case 'NODE_VOTED':
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
-      context.commit('stateSet', ['nodeRated', event])
-      context.commit('objects/update', {
-        oid: event.object.oid,
+      await context.dispatch('cache/update', {
+        key: event.object.oid,
         path: 'rate',
         newValue: event.rate
       }, { root: true })
+      await context.dispatch('lists/processEvent', event, { root: true })
       context.commit('addEvent', { event, context })
       break
     case 'NODE_DELETED':
       notifyUserActionComplete(event.type, event.object)
-      context.commit('stateSet', ['nodeDeleted', event])
       context.commit('addEvent', { event, context })
       break
     case 'USER_SUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
-      context.commit('stateSet', ['userSubscribed', event])
       if (event.subject.oid === context.rootState.auth.userOid) { // если это мы подписались
-        context.commit('objects/update', {
-          oid: event.subject.oid,
+        await context.dispatch('cache/update', {
+          key: event.subject.oid,
           path: 'subscriptions',
           setter: (oldValue) => {
-            let subscriptions = oldValue // JSON.parse(JSON.stringify(currentUser.subscriptions))
+            let subscriptions = oldValue
             let index = subscriptions.findIndex(s => s.oid === event.object.oid)
             assert.ok(index === -1)
             subscriptions.push(event.object)
@@ -113,11 +110,11 @@ function processEvent (context, event) {
           }
         }, { root: true })
         // на кого я подписан...
-        context.commit('objects/update', {
-          oid: event.object.oid,
+        await context.dispatch('cache/update', {
+          key: event.object.oid,
           path: 'subscribers',
           setter: (oldValue) => {
-            let subscribers = oldValue // JSON.parse(JSON.stringify(currentUser.subscriptions))
+            let subscribers = oldValue
             let index = subscribers.findIndex(s => s.oid === event.subject.oid)
             assert.ok(index === -1)
             subscribers.push(event.subject)
@@ -129,10 +126,9 @@ function processEvent (context, event) {
       break
     case 'USER_UNSUBSCRIBED':
       notifyUserActionComplete(event.type, event.object)
-      context.commit('stateSet', ['userUnSubscribed', event])
       if (event.subject.oid === context.rootState.auth.userOid) {
-        context.commit('objects/update', {
-          oid: event.subject.oid,
+        await context.dispatch('cache/update', {
+          key: event.subject.oid,
           path: 'subscriptions',
           setter: (oldValue) => {
             let subscriptions = oldValue
@@ -143,8 +139,8 @@ function processEvent (context, event) {
           }
         }, { root: true })
         // на кого я подписан...
-        context.commit('objects/update', {
-          oid: event.object.oid,
+        await context.dispatch('cache/update', {
+          key: event.object.oid,
           path: 'subscribers',
           setter: (oldValue) => {
             let subscribers = oldValue
@@ -160,11 +156,9 @@ function processEvent (context, event) {
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_UPDATED':
     case 'WS_ITEM_DELETED':
-      logD('try notifyUserActionComplete', event)
-      event.object = event.objectFull
       notifyUserActionComplete(event.type, event.object)
-      logD('try processEventWs')
-      processEventWs(context, event)
+      // logD('try processEventWs')
+      await processEventWs(context, event)
       break
     default:
       throw new Error(`unsupported Event ${event.type}`)
@@ -172,30 +166,36 @@ function processEvent (context, event) {
   logD('processEvent done')
 }
 
-function processEventWs (context, event) {
-  let type = event.type // WS_ITEM_CREATED, WS_ITEM_UPDATED, WS_ITEM_DELETED
-  let object = event.object
-  let objectType = object.__typename
-  let operationName
-  switch (type) {
-    case 'WS_ITEM_CREATED':
-      operationName = 'Create'
-      break
-    case 'WS_ITEM_UPDATED':
-      operationName = 'Update'
-      break
-    case 'WS_ITEM_DELETED':
-      operationName = 'Delete'
-      break
-    default:
-      throw new Error(`bad type ${type}`)
+async function processEventWs (context, event) {
+  assert(event.wsRevision)
+  if (event.wsRevision - context.rootState.workspace.revision > 1 ||
+    context.rootState.workspace.revision > event.wsRevision // при очистке мастерской могло произойти такое
+  ) {
+    logW('на сервере есть неучтенные изменения!!', event.wsRevision, context.rootState.workspace.revision)
+    await context.dispatch('workspace/expireWsCache', {}, { root: true })
   }
-  logD(operationName, objectType)
-  context.commit(`workspace/ws${objectType}${operationName}`, { object, context }, { root: true })
+  // обновим в кэше значение итема
+  let key = 'wsItem: ' + event.object.oid
+  let vuexItem = context.rootState.cache.cachedItems[key]
+  // logD('processEventWs:: ', vuexItem, event.object)
+  if (!vuexItem || vuexItem.revision !== event.object.revision){
+    // если у имеющегося объекта та же ревизия - обновлять не надо (скорей всего это наши же изменения)
+    logD('обновим значение итема в кэше')
+    await context.dispatch('cache/update', {
+      key: key,
+      newValue: event.object
+    }, { root: true })
+  }
+
+  // обновим списки мастерской
+  logD('обновим списки мастерской')
+  await context.dispatch('lists/processEvent', event, { root: true })
+  context.dispatch('workspace/updateRevision', event.wsRevision, { root: true })
 }
 
 // вывести уведомление о действии пользователя
 function notifyUserActionComplete (eventType, object) {
+  // logD('notifyUserActionComplete', object)
   assert.ok(eventType && object)
   let eventMessage = ''
   switch (eventType) {
@@ -205,7 +205,7 @@ function notifyUserActionComplete (eventType, object) {
     case 'NODE_DELETED':
       eventMessage = i18n.t('node deleted')
       break
-    case 'NODE_RATED':
+    case 'NODE_VOTED':
       eventMessage = i18n.t('node rated')
       break
     case 'USER_SUBSCRIBED':
@@ -224,53 +224,36 @@ function notifyUserActionComplete (eventType, object) {
       eventMessage = i18n.t('ws element updated')
       break
   }
-  // console.debug(eventMessage)
-  Notify.create(
+  notify(
+    'info',
+    eventMessage,
     {
-      position: 'top',
-      message: eventMessage,
       avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
-      actions: [{
-        label: i18n.t('Goto...'),
-        noDismiss: true,
-        handler: () => {
-          // app/workspace/fragments
-          let route = '/'
-          if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
-            route = `/content/${object.oid}`
-          } else if (['NODE'].includes(object.type)) {
-            route = `/node/${object.oid}`
-          } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
-            route = `/sphere/${object.oid}`
-          } else {
-            throw new Error(`bad object ${JSON.stringify(object)}`)
+      actions: [
+        {
+          label: i18n.t('GO'),
+          noDismiss: true,
+          color: 'green',
+          handler: () => {
+            // app/workspace/fragments
+            let route = '/'
+            if (['AUDIO', 'BOOK', 'FRAME', 'IMAGE', 'VIDEO'].includes(object.type)) {
+              route = `/content/${object.oid}`
+            } else if (['NODE'].includes(object.type)) {
+              route = `/node/${object.oid}`
+            } else if (['SPHERE', 'WORD', 'SENTENCE', 'CHAR'].includes(object.type)) {
+              route = `/sphere/${object.oid}`
+            } else {
+              throw new Error(`bad object ${JSON.stringify(object)}`)
+            }
+            router.push(route)
           }
-          // else if (['WSBookmark', 'WSSphere', 'WSContent', 'WSNode', 'WSFragment'].includes(object.__typename)) {
-          //   if (object.__typename === 'WSBookmark') {
-          //     route = '/app/workspace/bookmarks'
-          //   } else if (object.__typename === 'WSSphere') {
-          //     route = '/app/workspace/spheres'
-          //   } else if (object.__typename === 'WSContent') {
-          //     route = '/app/workspace/contents'
-          //   } else if (object.__typename === 'WSNode') {
-          //     route = '/app/workspace/nodes'
-          //   } else if (object.__typename === 'WSFragment') route = '/app/workspace/fragments'
-          // }
-
-          router.push(route)
         }
-      }]
-    }
-  )
+      ]
+    })
 }
 
 function notifyError (event) {
   assert.ok(event)
-
-  Notify.create(
-    {
-      position: 'top',
-      message: `${event.operation} ${event.code} ${event.message}`
-    }
-  )
+  notify('error', `${event.operation} ${event.code} ${event.message}`)
 }

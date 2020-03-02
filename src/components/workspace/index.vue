@@ -1,78 +1,93 @@
-<style lang="stylus">
-.q-drawer {
-  background: none !important
-}
-.q-footer {
-  background: none !important
-}
-.q-header {
-  background: none !important
-}
-</style>
-
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-grey-3
-  //- actions and dialogs
-  q-dialog(ref="settingsDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-    div(@click.self="$refs.settingsDialog.hide()").row.fit.justify-center.items-end.content.end
-      ws-settings(
-        @close="$refs.settingsDialog.hide()"
-        :style=`{
-          maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
-          borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
-  //- q-dialog(ref="spheresDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down")
-  //-   div(@click.self="$refs.spheresDialog.hide()").row.fit.justify-center.items-end.content-end
-  //-     ws-spheres(
-  //-       @close="$refs.spheresDialog.hide()"
-  //-       :style=`{
-  //-         maxHeight: $q.screen.height-60+'px', maxWidth: $store.state.ui.pageMaxWidth+'px',
-  //-         borderRadius: '10px 10px 0 0', oveflow: 'hidden'}`)
-  //- header
-  q-header.row.full-width.justify-center
-    div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px', color: 'black'}`).row.full-width.items-center.bg-grey-3
-      .col.full-height
-        .row.fit.items-center.q-px-md
-          span.text-bold {{$t('Workspace')}}
-      div(:style=`{height: '60px'}`).row.items-center.justify-center.q-px-sm
-        //- q-btn(round flat icon="style" color="grey-9" @click="$refs.spheresDialog.show()")
-        q-btn(round flat icon="settings" color="grey-9" @click="$refs.settingsDialog.show()")
-  //- body
-  q-page-container.row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-      ws-items(@itemClick="itemClick" :height="$q.screen.height-60-60+'px'")
-  //- footer
-  q-footer.row.full-width.justify-center
-    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
+q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
+  //- wsPage dialog for mobile
+  q-dialog(v-model="pageDialogOpened" :maximized="true")
+    div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
+      q-btn(
+        round flat color="green" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
+        :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: '16px', background: 'rgba(0,0,0,0.2)'}`)
+      ws-page(:value="item")
+  q-page-container.row.fit.full-width.bg-black
+    ws-menu(
+      ctx="workspace"
+      :oid="node ? node.oid : false" :page="$route.params.page"
+      @page="$router.push({params: {page: $event}}).catch(e=>e)" @item="itemClick" @add="itemAdd"
+      ).bg-grey-9
+    //- wsPage for desktop
+    div(v-if="$q.screen.gt.xs").col.full-height.bg-grey-10.gt-xs
+      ws-page(:value="item" @node="item = $event")
 </template>
 
 <script>
-import wsItems from './ws_items'
-import wsSpheres from './ws_spheres'
-import wsSettings from './ws_settings'
+import wsMenu from './ws_menu'
+import wsPage from './ws_page'
 
 export default {
-  name: 'workspace',
-  components: {wsItems, wsSpheres, wsSettings},
+  name: 'workspaceIndex',
+  components: {wsMenu, wsPage},
   props: [],
   data () {
     return {
+      pageDialogOpened: false
+      // item: null
     }
   },
   computed: {
   },
-  methods: {
-    itemClick (val) {
-      this.$log('itemClick', val)
-      this.$store.commit('workspace/stateSet', ['wsItem', val])
-      this.$router.push('/create')
+  watch: {
+    '$store.state.workspace.item': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('item CHANGED', to)
+        // TODO item type?
+        if (to) {
+          this.$router.push({params: {oid: to.oid}}).catch(e => e)
+          if (this.$q.screen.xs) this.pageDialogOpened = true
+        }
+      }
     },
-    itemAdd () {
-      this.$log('itemAdd')
-      // TODO: need to know the kcoll
-    },
-    cancel () {
-      this.$log('cancel')
+    '$route.params.page': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route.params.page CHANGED', to)
+        if (to) {
+          if (to !== from) {
+            this.item = null
+            this.$store.commit('workspace/stateSet', ['item', null])
+            this.$store.commit('workspace/stateSet', ['itemType', undefined])
+            this.$router.replace('/workspace/' + to).catch(e => e)
+          }
+        } else {
+          this.$router.push({params: {page: 'nodes'}})
+        }
+      }
     }
+  },
+  methods: {
+    itemClick ({type, item}) {
+      this.$log('itemClick', type, item)
+      this.$store.commit('workspace/stateSet', ['itemType', undefined])
+      this.$store.commit('workspace/stateSet', ['item', null])
+      this.$nextTick(() => {
+        this.$store.commit('workspace/stateSet', ['itemType', type])
+        this.$store.commit('workspace/stateSet', ['item', item])
+      })
+    },
+    itemAdd (type, item) {
+      this.$log('itemAdd', type, item)
+      this.$router.push('/workspace/' + this.$route.params.page).catch(e => e)
+      this.$store.commit('workspace/stateSet', ['itemType', undefined])
+      this.$store.commit('workspace/stateSet', ['item', null])
+      // this.itemClick({type: undefined, item: null})
+    }
+  },
+  mounted () {
+    this.$log('mounted')
+    document.body.style.backgroundColor = '#424242'
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
   }
 }
 </script>

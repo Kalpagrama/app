@@ -1,96 +1,62 @@
 <template lang="pug">
-.column.fit
-  //- div(:style=`{height: '60px'}`).row.full-width
-  k-dialog-bottom(ref="nodeActionDialog" :options="nodeDialogOptions" @action="nodeAction")
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
+.row.fit
+  div(:style=`{position: 'relative'}`).column.fit
+    //- actions
+    q-btn(
+      round push size="lg" color="green" icon="add" @click="$emit('add')"
+      :style=`{position: 'absolute', zIndex:1000, right: '16px', bottom: '16px'}`)
+    //- header with filters...
+    .row.full-width.q-px-sm
+      .col.full-height
+      //- list, gallery, feed
+      //- div(:style=`{width: '60px', height: '60px'}`
+      //-   ).row.items-center.content-center.justify-center
+      //-   q-btn(round flat color="green" icon="refresh" @click="nodesReload()")
+      //- debug
       div(
-        v-for="(i, ii) in nodes" :key="i.item.oid" @click="nodeClick(i, ii)"
-        :style=`{
-          height: '60px', borderRadius: '10px', overflow: 'hidden',
-          border: ii === nodeIndex ? '3px solid #4caf50' : '3px solid #eee'}`
-        ).row.full-width.items-center.justify-center.bg-white.q-mb-md.cursor-pointer
-        span {{ i.item.name }}
+        v-if="$store.state.ui.debug"
+        :style=`{borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.content-center.bg-green.q-pa-sm.q-my-sm
+        small.text-white.full-width oid: {{ oid }}
+    //- body
+    //- TODO add scroll area from quasar... width initial scroll height
+    div(ref="wsNodesWrapper").col.full-width.scroll
+      div(:style=`{paddingTop: '0px', paddingBottom: '80px'}`).row.full-width.items-start.content-start.q-px-sm
+        kalpa-loader(type="wsNodes" :variables=`{}`)
+          template(v-slot:items=`{items}`)
+            ws-node(
+              v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
+              :oid="oid" :node="n")
 </template>
 
 <script>
+import wsNode from './ws_node'
+
 export default {
   name: 'wsNodes',
+  components: {wsNode},
+  props: [],
   data () {
     return {
-      nodeIndex: -1,
-      nodeDialogOptions: {
-        header: false,
-        confirm: true,
-        confirmName: 'Edit',
-        actions: {
-          delete: {name: 'Delete', color: 'red'}
-        }
-      }
     }
   },
   computed: {
-    nodes () {
-      return this.$store.getters.currentUser.workspace.nodes
-        .reduce((acc, val) => {
-          if (val.fragments.length === 2) {
-            acc.push({
-              type: 'node',
-              item: val
-            })
-          }
-          return acc
-        }, [])
+    oid () {
+      return this.$route.params.oid
     }
   },
   methods: {
-    async nodeAction (action) {
-      this.$log('nodeAction', action)
-      this.$refs.nodeActionDialog.hide()
-      await this.$wait(600)
-      switch (action) {
-        case 'confirm': {
-          this.nodeUse(this.nodes[this.nodeIndex], this.nodeIndex)
-          break
-        }
-        case 'delete': {
-          this.nodeDelete(this.nodes[this.nodeIndex])
-          break
-        }
-      }
-      this.nodeIndex = -1
-    },
-    async nodeDelete (item) {
-      this.$log('nodeDelete', item)
-      let oid = item.item.oid
-      this.$log('nodeDelete OID', oid)
-      let res = await this.$store.dispatch('workspace/wsNodeDelete', oid)
-      this.$log('res', res)
-    },
-    async fragmentDelete (item) {
-      this.$log('fragmentDelete', item)
-      let node = item.node
-      node.fragments[item.fragmentIndex] = null
-      let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
-      this.$log('res', res)
-    },
-    async nodeClick (i, ii) {
-      this.$log('nodeClick', i, ii)
-      this.nodeIndex = ii
-      this.$refs.nodeActionDialog.show()
-    },
-    async nodeUse (i, ii) {
-      this.$log('nodeClick', i, ii)
-      this.$store.commit('workspace/stateSet', ['wsItem', {type: 'node', item: JSON.parse(JSON.stringify(i.item))}])
-      await this.$wait(300)
-      this.$router.push('/create')
+    nodeClick (node) {
+      this.$log('nodeClick', node)
+      this.$emit('item', {type: 'node', item: node})
     }
   },
-  mounted () {
-    this.$log('mounted')
+  async mounted () {
+    // this.$log('mounted')
+    // this.$refs.wsNodesWrapper.scrollTop = 80
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
   }
 }
 </script>

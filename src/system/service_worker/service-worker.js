@@ -1,5 +1,5 @@
-const swVer = 8
-const useCache = true
+const swVer = 9
+const useCache = false
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
   cacheGraphQl,
   cacheVideo
@@ -363,11 +363,12 @@ if (useCache) {
       /^http.*(yandexcloud|local_object_storage).+\.mp4$/,
       ({ url, event, params }) => cacheVideo(event)
     )
-    workbox.routing.registerRoute(// graphql
-      /^http.*\/graphql\/?$/,
-      ({ url, event, params }) => cacheGraphQl(event),
-      'POST'
-    )
+    // workbox.routing.registerRoute(// graphql
+    //   /^http.*\/graphql\/?$/,
+    //   ({ url, event, params }) => cacheGraphQl(event),
+    //   'POST'
+    // )
+
     // This "catch" handler is triggered when any of the other routes fail to
     // generate a response.
     workbox.routing.setCatchHandler(async ({ event }) => {

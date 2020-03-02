@@ -20,99 +20,91 @@ button:focus {
 }
 </style>
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-grey-3
-  k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
-  k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
-  input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  q-header(reveal).row.full-width.justify-center
-    div(
-      v-if="user"
-      :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.bg-primary
-      //- div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-      //-   q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-      .col
-        .row.full-width.justify-start.items-center.fit.q-px-sm
-          span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
-      .row
-        div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-          q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-          q-btn(v-else round flat @click="save()" color="white" icon="done")
-      .row.full-width.q-pa-sm.bg-primary
-        span(
-          v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
-          :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'white'}`
-          :class="{'bg-green': p === pageId}"
-          ).text-bold.q-pa-sm.q-mr-md.cursor-pointer.hr {{ p }}
-  q-page-container.row.full-width.justify-center
-    div(v-if="user").row.full-width.items-start.content-start.justify-center.bg-primary
-        //- header
-        //- div(:style=`{height: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-        //-   div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        //-     q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-        //-   .col
-        //-   .row
-        //-     div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-        //-       q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-        //-       q-btn(v-else round flat @click="save()" color="white" icon="done")
-            //- .row.full-width.justify-end.items-end.q-pb-sm.q-px-sm
-              q-btn(@click="" rounded no-caps dense style=`height: 30px` color="grey" icon="").q-px-md Edit profile
-        //- body
-        div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-px-sm.q-py-lg.bg-primary
-          //- <input type="file" @change="previewFiles" multiple>
-          .row.full-width
-            img(:src="user.profile.thumbUrl" @click="changePhoto()"
-              :style=`{width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden'}`)
-            div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
-              q-btn(
-                rounded no-caps
-                @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
-                :label="include ? $t('Unfollow') : $t('Follow')"
-                :color="include ? 'red' : 'accent'"
-                style=`height: 40px`
-                ).q-px-md
-          //- .row.full-width.items-center.justify-start
-          //-   .row.full-width
-          //-     span.text-bold.text-h6.text-white {{ user.name }}
-          //-   div(v-if="!editions").row.full-width
-          //-     .row.full-width
-          //-       span.text-grey-4 {{status}}
-          //-     .row.full-width.q-mb-sm
-          //-       span.text-grey {{about}}
-          //-   div(v-if="editions").row.full-width
-          //-     input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
-          //-     input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
-          //-     //- .row.full-width.q-mt-xs
-          //-     //-   small About
-          //-   div(v-if="false" @click="showInfo()").row.full-width
-          //-     span.text-accent Show detailed information
-          //-     //- span {{ user.subscriptions }}
-    .row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width.q-pt-md
-        user-created-nodes(
-          v-if="pageId === 'Created nodes'"
-          :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
-        user-created-nodes(
-          v-if="pageId === 'Voted nodes'"
-          :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
-        user-following(
-          v-if="pageId === 'Following'"
-          :subscriptions="user.subscriptions" :oid="user.oid")
-        user-followers(
-          v-if="pageId === 'Followers'"
-          :subscribers="user.subscribers" :oid="user.oid")
-  q-footer.row.full-width.justify-center
-    k-menu-mobile(:style=`{maxWidth: $store.state.ui.pageMaxWidth+'px'}`)
+//- q-layout(view="hHh lpR fFf").bg-grey-3
+q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`).bg-grey-10
+  //- k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
+  //- k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
+  //- input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
+  //- q-header(reveal).row.full-width.justify-center
+  //-   .row.full-width.justify-center.bg-primary
+  //-     div(
+  //-       v-if="user"
+  //-       :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
+  //-       div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+  //-         q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
+  //-       .col
+  //-         .row.full-width.justify-start.items-center.fit.q-px-sm
+  //-           span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
+  //-       .row
+  //-         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
+  //-           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
+  //-           q-btn(v-else round flat @click="save()" color="white" icon="done")
+  q-header()
+    div(v-if="user" :style=`{paddingLeft: $q.screen.gt.xs ? '60px' : '0px'}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
+      div().row.full-width.q-pa-xs
+        //- <input type="file" @change="previewFiles" multiple>
+        .row.full-width
+          img(:src="user.profile.thumbUrl" @click="changePhoto()"
+            :style=`{width: '50px', height: '50px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-7
+          .col
+            .row.fit.items-center.content-center.q-px-md
+              span.text-bold.text-white {{ user.name }}
+          //- TODO follow user
+          //- div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
+          //-   q-btn(
+          //-     rounded no-caps
+          //-     @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
+          //-     :label="include ? $t('Unfollow') : $t('Follow')"
+          //-     :color="include ? 'red' : 'accent'"
+          //-     style=`height: 40px`
+          //-     ).q-px-md
+        //- .row.full-width.items-center.justify-start
+        //-   .row.full-width
+        //-     span.text-bold.text-white {{ user.name }}
+        //-   div(v-if="!editions").row.full-width
+        //-     .row.full-width
+        //-       span.text-grey-4 {{status}}
+        //-     .row.full-width.q-mb-sm
+        //-       span.text-grey {{about}}
+        //-   div(v-if="editions").row.full-width
+        //-     input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
+        //-     input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
+        //-     //- .row.full-width.q-mt-xs
+        //-     //-   small About
+        //-   div(v-if="false" @click="showInfo()").row.full-width
+        //-     span.text-accent Show detailed information
+        //-     //- span {{ user.subscriptions }}
+        .row.full-width.content-end.justify-start.text-white.q-mt-md.q-mb-sm
+          span(
+            v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
+            :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'white'}`
+            :class="{'bg-green' : pageId  === p}"
+            ).q-pa-sm.q-mr-xs.cursor-pointer {{ p }}
+  q-page-container.row.full-width.justify-center.bg-grey-10
+    div(:style=`{maxWidth: 600+'px'}`).row.full-width.q-pt-md
+      user-created-nodes(
+        v-if="pageId === 'Created nodes'"
+        :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
+      user-voted-nodes(
+        v-if="pageId === 'Voted nodes'"
+        :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
+      user-following(
+        v-if="pageId === 'Following'"
+        :subscriptions="user.subscriptions" :oid="user.oid")
+      user-followers(
+        v-if="pageId === 'Followers'"
+        :subscribers="user.subscribers" :oid="user.oid")
 </template>
 
 <script>
 import userFollowers from './user_followers'
 import userFollowing from './user_following'
 import userCreatedNodes from './user_created_nodes'
-import userRatedNodes from './user_rated_nodes'
+import userVotedNodes from './user_voted_nodes'
 
 export default {
   name: 'pageApp__User',
-  components: {userRatedNodes, userCreatedNodes, userFollowing, userFollowers},
+  components: {userVotedNodes, userCreatedNodes, userFollowing, userFollowers},
   props: ['width', 'height'],
   data () {
     return {
@@ -130,6 +122,10 @@ export default {
     }
   },
   computed: {
+    colorButton () {
+      if (this.pageId === 'Created nodes') return 'bg-green'
+      else return 'bg-white'
+    },
     scroll () {
       if (window.scrollY > 100) return true
       else return false
@@ -165,7 +161,6 @@ export default {
       let options = {
         confirm: false,
         actions: {
-          share: {name: 'Share'},
           copy: {name: 'Copy Url'}
         }
       }
@@ -226,7 +221,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.about',
-            value: this.about
+            newValue: this.about
           })
           this.$log('changeAbout done', res)
         } catch (e) {
@@ -241,7 +236,7 @@ export default {
           let res = await this.$store.dispatch('objects/update', {
             oid: this.$store.getters.currentUser.oid,
             path: 'profile.status',
-            value: this.status
+            newValue: this.status
           })
           this.$log('changeStatus done', res)
         } catch (e) {
@@ -279,7 +274,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.thumbUrl',
-          value: file
+          newValue: file
         })
       } catch (e) {
         this.$log('changePhoto ERROR', e)
@@ -295,9 +290,6 @@ export default {
           break
         }
         case 'copy': {
-          break
-        }
-        case 'share': {
           break
         }
         case 'edit': {
@@ -335,7 +327,7 @@ export default {
     },
     async userLoad (oid) {
       this.$logD('userLoad start')
-      let user = await this.$store.dispatch('objects/get', { oid, fragmentName: 'userFragment', priority: 0 })
+      let user = await this.$store.dispatch('objects/get', { oid, priority: 0 })
       this.$logD('userLoad done', user)
       return user
     },

@@ -1,19 +1,28 @@
 import gql from 'graphql-tag'
 
 const metaFragment = gql`
+  fragment metaComposition on MetaComposition {
+    thumbUrl(preferWidth: 600)
+    height
+    width
+  }
   fragment metaFragment on Meta {
     type
     ...on MetaNode {
-      fragments {
-        width
-        height
+      compositions{
+        oid
         thumbUrl(preferWidth: 600)
+        meta {
+          ... on MetaComposition{...metaComposition}
+        }
       }
+      layout
     }
     ...on MetaContent{
       type
       uploadedFileInfo
     }
+    ... on MetaComposition {...metaComposition}
   }
 `
 const objectShortFragment = gql`
@@ -47,8 +56,103 @@ const objectFragment = gql`
     subscriberCnt
     subscribers {...objectShortFragment}
     meta{ ...metaFragment}
+    revision
   }
 `
+const compositionFragment = gql`
+  ${objectFragment} ${objectShortFragment}
+  fragment figureFragment on Figure {
+    t
+    points {
+      x
+      y
+    }
+  }
+  fragment operationFragment on LayerOperation{
+    type
+    items
+    operations{
+      type
+      items
+      operations{
+        type
+        items
+        operations{
+          type
+          items
+          operations{
+            type
+            items
+            operations{
+              type
+              items
+              operations{
+                type
+                items
+                operations{
+                  type
+                  items
+                  operations{
+                    type
+                    items
+                    operations{
+                      type
+                      items
+                      operations{
+                        type
+                        items
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  fragment compositionFragment on Composition {
+    ...objectFragment
+    spheres {...objectShortFragment}
+    operation {
+      type
+      operations {
+        type
+      }
+      items
+    }
+    layers {
+      contentOid
+      content {
+        oid
+        type
+        name
+        ...on Video {
+          url
+          duration
+          frameUrls
+          contentSource
+        }
+        ... on Image {
+          url
+        }
+      }
+      figuresAbsolute{...figureFragment}
+      figuresRelative {...figureFragment}
+      speed
+      spheres {...objectShortFragment}
+      thumbUrl(preferWidth: 600)
+      url
+      contentSource
+    }
+    operation{... operationFragment}
+    outputType
+    url
+    contentSource
+  }
+`
+
 const videoFragment = gql`
   ${objectFragment}
   fragment videoFragment on Video {
@@ -73,9 +177,10 @@ const imageFragment = gql`
   }
 `
 const nodeFragment = gql`
-  ${videoFragment} ${imageFragment} ${objectFragment}
+  ${videoFragment} ${imageFragment} ${objectFragment} ${compositionFragment} ${objectShortFragment}
   fragment nodeFragment on Node {
     ...objectFragment
+    sphereFromName{...objectShortFragment}
     rate
     rateUser
     viewCnt
@@ -89,25 +194,9 @@ const nodeFragment = gql`
       oid
       name
     }
-    categories
+    category
     layout
-    fragments {
-      name
-      url
-      content {
-        ...on Video {...videoFragment}
-        ...on Image {...imageFragment}
-      }
-      scale
-      cuts {
-        name
-        color
-        thumbUrl(preferWidth: 600)
-        points { x y z }
-        style
-      }
-      
-    }
+    compositions {...compositionFragment}
   }
 `
 const sphereFragment = gql`
@@ -135,7 +224,8 @@ const eventFragment = gql`
       message
     }
     ... on EventWS{
-      objectFull{
+      wsRevision
+      object {
         oid
         type
         name
@@ -164,17 +254,13 @@ const eventFragment = gql`
   }
 `
 const userFragment = gql`
-  ${objectShortFragment} ${nodeFragment} ${eventFragment} ${objectFragment}
+  ${objectShortFragment} ${nodeFragment} ${objectFragment}
   fragment userFragment on User {
     ...objectFragment
     weightVal
     settings
+    wsRevision
     subscriptions{...objectShortFragment}
-    workspace{
-      nodes { ...nodeFragment }
-      spheres { ...objectShortFragment }
-    }
-    events{...eventFragment}
     profile{
       tutorial
       about
@@ -203,10 +289,6 @@ const userFragment = gql`
 const objectFullFragment = gql`
   ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${objectFragment}
   fragment objectFullFragment on Object {
-#    oid
-#    type
-#    name
-#    thumbUrl(preferWidth: 600)
     ...objectFragment
     ...on Video {...videoFragment}
     ...on Image {...imageFragment}

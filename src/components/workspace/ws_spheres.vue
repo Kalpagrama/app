@@ -1,50 +1,124 @@
-<style lang="stylus">
-</style>
 <template lang="pug">
-.column.fit
-  //- div(:style=`{height: '60px'}`).row.full-width.items-center
-  //-   .col.full-height
-  //-     .row.fit.items-center.q-px-md
-  //-       span.text-bold {{ $t('Spheres') }}
-  //-   div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-  //-     q-btn(round flat icon="clear" color="grey" @click="$emit('close')")
-  .col.full-width.scroll.kscroll
-    .row.full-width.items-start.content-start.q-px-sm
-      div(
-        v-for="(s, skey, si) in spheres" :key="skey" @click="sphereClick(s)"
-        :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.q-mr-sm.q-mb-sm.bg-grey-4.cursor-pointer
-        //- div(:style=`{height: '40px', width: '40px', borderRadius: '10px', overflow: 'hidden', background: $randomColor(skey)}`).row
-        .col.full-height
-          .row.fit.items-center.q-px-sm
-            span.text-black {{ s.name }}
+.row.fit
+  .column.fit
+    //- header
+    div(:style=`{height: '80px'}`).row.full-width.items-center.content-center.q-px-sm
+      div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-white
+        input(
+          v-model="sphere" color="black" placeholder="Type a new sphere" @keyup.enter="sphereAdd"
+          :style=`{height: '56px', paddingLeft: '10px'}`
+          ).full-width
+    //- body
+    .col.full-width.scroll
+      div(v-if="node").row.full-width.items-start.content-start.q-px-sm
+        div(
+          v-for="(s,si) in node.spheres" :key="si" @click="sphereClick(s,si)"
+          :class=`{'bg-grey-8': s.oid !== oid, 'bg-white': s.oid === oid}`
+          :style=`{borderRadius: '10px', overflow: 'hidden'}`
+          ).row.q-mr-sm.q-mb-sm.cursor-pointer
+          span(
+            :class=`{
+              'text-bold': s.oid === oid,
+              'text-green': s.oid === oid,
+              'text-white': s.oid !== oid
+            }`
+            :style=`{whiteSpace: 'nowrap'}`
+            ).q-pa-sm {{ s.name }}
 </template>
 
 <script>
+import { debounce } from 'quasar'
+
 export default {
   name: 'wsSpheres',
+  props: [],
   data () {
     return {
+      sphere: '',
+      node: null,
+      nodeSavePause: false,
+      nodeSaving: false,
+      nodeSavingError: null
     }
   },
   computed: {
-    spheres () {
-      return this.$store.getters.currentUser.workspace.nodes.reduce((acc, val) => {
-        val.spheres.map(s => {
-          if (!acc[s.name]) acc[s.name] = s
-        })
-        return acc
-      }, {})
+    oid () {
+      return this.$route.params.oid
+    }
+  },
+  watch: {
+    node: {
+      deep: true,
+      handler (to, from) {
+        this.$log('node CHANGED', to)
+        if (this.nodeSavePause) {
+          this.nodeSavePause = false
+        } else {
+          this.nodeSave(to)
+        }
+      }
     }
   },
   methods: {
-    sphereClick (s) {
-      this.$log('sphereClick', s)
-      // TODO: go to wsItems with this sphere? or spheres: []
+    sphereAdd () {
+      this.$log('sphereAdd')
+      this.node.spheres.push({name: this.sphere})
+      this.sphere = ''
+    },
+    sphereClick (s, si) {
+      this.$log('sphereClick')
+      this.$emit('item', s)
+      // TODO open this sphere and show your nodes and system nodes on the right...
+      // then u can delete it? but... u are using this sphere in another nodes...
+      // delete it from everyone?
+      // this.node.spheres = this.node.spheres.filter(sphere => sphere.name !== s.name)
+    },
+    async spheresLoad () {
+      this.$log('spheresLoad')
+      // try to load node with spheres
+      let name = 'SPHERES-' + this.$store.state.auth.userOid
+      let item = await this.$store.dispatch('workspace/get', { name })
+      this.$log('item: node-spheres', item)
+      if (item) {
+        this.$log('*** USE node-spheres')
+        this.nodeSavePause = true
+        this.node = JSON.parse(JSON.stringify(item))
+      } else {
+        this.$log('*** CREATE node-spheres')
+        let node = {
+          name,
+          layout: 'PIP',
+          category: 'FUN',
+          spheres: [],
+          compositions: []
+        }
+        this.nodeSave(node)
+      }
+    },
+    async nodeSave (node) {
+      try {
+        this.$log('nodeSave start', node)
+        this.nodeSaving = true
+        let res = await this.$store.dispatch('workspace/wsNodeSave', JSON.parse(JSON.stringify(node)))
+        this.$log('res', res)
+        this.nodeSavePause = true
+        this.node = JSON.parse(JSON.stringify(res))
+        this.$log('nodeSave done')
+        this.nodeSaving = false
+        this.nodeSavingError = null
+      } catch (e) {
+        this.$log('nodeSave error', e)
+        this.nodeSaving = false
+        this.nodeSavingError = e
+      }
     }
+  },
+  created () {
+    this.nodeSave = debounce(this.nodeSave, 1000)
   },
   mounted () {
     this.$log('mounted')
+    this.spheresLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -56,7 +56,7 @@ export default {
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
           path: 'profile.email',
-          value: this.newEmail
+          newValue: this.newEmail
         })
         this.$log('changeEmail done', res)
         this.$q.notify({message: 'Changed EMAIL', color: 'green', textColor: 'white'})

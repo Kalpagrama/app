@@ -3,22 +3,37 @@ iframe {
   width: 100%;
   height: 500px;
 }
+.q-notification {
+  border-radius: 10px !important
+}
 </style>
 
 <template lang="pug">
-.row.full-width.items-start.content-start
-  k-action
-  router-view(v-if="!loading")
+q-layout( view="hHh Lpr lff")
+  kalpa-action
+  q-drawer(
+    v-model="drawerShow"
+    show-if-above mini-to-overlay no-swipe-open no-swipe-close
+    @mouseover="drawerMini = false" @mouseout="drawerMini = true"
+    :mini="drawerMini" :width="$q.screen.width/2 < 260 ? $q.screen.width/2 : 260" :breakpoint="500"
+    content-class="bg-grey-8")
+    kalpa-menu-desktop(v-if="!loading" :mini="$q.screen.xs ? false : drawerMini")
+  q-btn(
+    round flat color="white" icon="menu" @click="drawerShow = !drawerShow"
+    :style=`{position: 'fixed', left: '16px', bottom: '16px', zIndex: 10000, background: 'rgba(0,0,0,0.2)'}`).xs
+  q-page-container
+    router-view(v-if="!loading")
+    div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
+      q-spinner(color="green" size="50px")
 </template>
 
 <script>
-import kAction from 'components/k_action'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 
 export default {
   name: 'mainLayout',
-  components: {kAction},
+  components: {},
   data () {
     return {
       loading: true,
@@ -26,7 +41,8 @@ export default {
       height: 0,
       me: null,
       player: null,
-      showIframe: false
+      drawerShow: false,
+      drawerMini: true
     }
   },
   computed: {
@@ -41,6 +57,9 @@ export default {
     }
   },
   methods: {
+    menuToggle () {
+      this.$log('menuToggle')
+    },
     onResize (e) {
       this.$logD('onResize', e)
       this.width = e.width
@@ -55,11 +74,9 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    await this.$wait(3000)
-    this.showIframe = true
   },
   async created () {
-    this.$logD('created')
+    this.$log('created')
     this.loading = true
     // take token from redirect url
     let token = this.$route.query.token
@@ -67,15 +84,17 @@ export default {
     if (token) {
       localStorage.setItem('ktoken', token)
       localStorage.setItem('ktokenExpires', expires)
-      await this.$router.push('/')
+      await this.$router.push('/').catch(e => e)
     }
     if (!await this.$store.dispatch('init')) {
-      this.$logD('GO LOGIN')
-      await this.$router.push('/login')
-      return
+      this.$log('GO LOGIN')
+      await this.$router.push('/login').catch(e => e)
+      // return
     }
-    if (this.$store.getters.currentUser.profile.tutorial) this.$refs.kTutorialDialog.show()
-    else this.loading = false
+    this.loading = false
+    // if (this.$store.getters.currentUser.profile.tutorial) {
+    //   this.$refs.kTutorialDialog.show()
+    // } else this.loading = false
   }
  }
 </script>

@@ -7,6 +7,7 @@ module.exports = function (ctx) {
   return {
     preFetch: true,
     boot: [
+      'notify',
       'log',
       'i18n',
       'sw',
@@ -23,34 +24,37 @@ module.exports = function (ctx) {
       'material-icons',
       // 'ionicons-v4',
       // 'mdi-v3',
-      'fontawesome-v5'
+      // 'fontawesome-v5'
       // 'eva-icons'
     ],
     framework: {
       all: true,
       components: [
         'QLayout',
-        'QPullToRefresh',
+        // 'QPullToRefresh',
         'QHeader',
         'QFooter',
-        'QTabs',
-        'QTab',
+        // 'QTabs',
+        // 'QTab',
         'QDrawer',
         'QPageContainer',
-        'QExpansionItem',
-        'QPage',
-        'QToolbar',
-        'QToolbarTitle',
+        // 'QExpansionItem',
+        // 'QPage',
+        // 'QToolbar',
+        // 'QToolbarTitle',
         'QBtn',
         'QIcon',
-        'QList',
-        'QItem',
-        'QItemSection',
-        'QItemLabel',
-        'QCard',
-        'QItem',
-        'QAvatar',
-        'QVideo'
+        // 'QList',
+        // 'QItem',
+        // 'QItemSection',
+        // 'QItemLabel',
+        // 'QCard',
+        // 'QItem',
+        // 'QAvatar',
+        // 'QVideo',
+        'QResizeObserver',
+        'QInput',
+        'QDialog'
       ],
       directives: [
         'Ripple',
@@ -59,7 +63,9 @@ module.exports = function (ctx) {
       ],
       plugins: [
         'Notify',
-        'BottomSheet'
+        'BottomSheet',
+        'AppFullscreen',
+        'AddressbarColor'
       ]
       // iconSet: 'ionicons-v4'
       // lang: 'de' // Quasar language
@@ -142,8 +148,8 @@ module.exports = function (ctx) {
       port: 8282,
       open: true // opens browser window automatically
     },
-    animations: 'all',
-    // animations: [],
+    // animations: 'all',
+    animations: [],
     ssr: {
       pwa: false
     },
