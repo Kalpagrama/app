@@ -2,7 +2,7 @@
   "version": 2,
   "build": {
     "env": {
-      "SERVICES_URL": "https://test.kalpagramma.com/graphql",
+      "SERVICES_URL": "https://dev.kalpagramma.com/graphql",
       "SERVICES_URL_DEBUG": "https://dev.kalpagramma.com/graphql"
     }
   },
