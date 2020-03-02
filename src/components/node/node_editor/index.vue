@@ -48,7 +48,7 @@
               .col
               q-btn(
                 v-if="node && node.oid"
-                outline color="green" no-caps :loading="nodeSaving" @click="nodeSave()"
+                outline color="green" no-caps :loading="nodeSaving" @click="nodeSaveImmediate()"
                 :style=`{borderRadius: '10px'}`).q-mr-md
                 span().text-bold.text-green Save
               //- .col.full-height
@@ -141,8 +141,7 @@ export default {
   data () {
     return {
       maxWidth: 600,
-      nodeChanged: false,
-      nodeSavePause: false,
+      nodeChanged: false, // ядро изменено пользователем(есть неотправленные во вьюикс изменения)
       nodeSaving: false,
       nodeSavingError: null,
       nodePublishing: false,
@@ -152,7 +151,7 @@ export default {
       node: null,
       nodeNew: {
         name: '',
-        revision: 1,
+        revision: 0,
         layout: 'PIP',
         category: 'FUN',
         spheres: [],
@@ -172,19 +171,18 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('*** value CHANGED', to)
         if (to) {
-          if (this.nodeSaving) {
-            // this.nodeSave()
-            // if (to.revision !== this.node.revision) this.node = JSON.parse(JSON.stringify(to))
+          if (this.node.revision !== to.revision){ // ядро изменено на сервере
+            if (this.nodeChanged) { // если пользователь успел изменить что-либо
+              this.$log('has user changes! try to save')
+              this.nodeSaveDebounce()
+            } else {
+              this.$log('value CHANGED1 ', to)
+              this.node = JSON.parse(JSON.stringify(to))
+            }
           }
-          else {
-            this.nodeSavePause = true
-            this.node = JSON.parse(JSON.stringify(to))
-          }
-        }
-        else {
-          this.nodeSavePause = true
+        } else {
+          this.$log('value CHANGED2', to)
           this.node = JSON.parse(JSON.stringify(this.nodeNew))
         }
       }
@@ -192,13 +190,11 @@ export default {
     node: {
       deep: true,
       handler (to, from) {
-        this.$log('*** node CHANGED', to)
         if (to) {
-          if (this.nodeSavePause) {
-            this.nodeSavePause = false
-          } else {
-            this.$store.commit('workspace/stateSet', ['item', to])
-            this.nodeSave()
+          if (!from || from.revision === to.revision) { // ядро изменено пользователем
+            this.$log('node CHANGED:', to.revision, to.name)
+            this.nodeChanged = true
+            this.nodeSaveDebounce()
           }
         }
       }
@@ -260,8 +256,7 @@ export default {
         this.nodeDeleting = false
         this.nodeDeletingError = null
         // TODO delete node and exit
-        this.$router.replace('/workspace/nodes')
-        this.nodeSavePause = true
+        await this.$router.replace('/workspace/nodes')
         this.node = this.nodeNew
       } catch (e) {
         this.$log('nodeDelete error', e)
@@ -269,28 +264,29 @@ export default {
         this.nodeDeletingError = e
       }
     },
-    nodeSaveDebounce () {
-      this.nodeSave()
-    },
-    async nodeSave () {
+    async nodeSaveImmediate () {
       try {
-        this.$log('nodeSave start')
+        if (!this.nodeChanged) return
+        this.$log('nodeSave start', this.node.revision, this.node.name)
         this.nodeSaving = true
         let res = await this.$store.dispatch('workspace/wsNodeSave', this.node)
-        this.$log('nodeSave res', res.revision, res.name)
-        // if (!this.value) {
-        //   this.$log('nodeSave SET WS ITEM')
-        //   if (!this.$route.params.oid) this.$router.push('/workspace/nodes/' + res.oid).catch(e => e)
-        //   this.$store.commit('workspace/stateSet', ['itemType', 'node'])
-        //   this.$store.commit('workspace/stateSet', ['item', res])
-        // }
-        this.$log('nodeSave done')
-        this.nodeSaving = false
+        // await this.$wait(600)
+        this.$log('nodeSave res', res.revision, res.name, res)
+        this.$log('nodeSave this.value', this.value)
+        if (!this.value) {
+          this.$log('nodeSave SET WS ITEM')
+          if (!this.$route.params.oid) this.$router.push('/workspace/nodes/' + res.oid).catch(e => e)
+          this.$store.commit('workspace/stateSet', ['itemType', 'node'])
+          this.$store.commit('workspace/stateSet', ['item', res])
+        }
+        this.$log('nodeSave done', res.revision, res.name)
         this.nodeSavingError = null
       } catch (e) {
-        this.$log('nodeSave error', e)
+        this.$logE('nodeSave error', e)
         this.nodeSavingError = e
+      } finally {
         this.nodeSaving = false
+        this.nodeChanged = false
       }
     },
     async nodePublish () {
@@ -314,7 +310,7 @@ export default {
     }
   },
   created () {
-    this.nodeSave = debounce(this.nodeSave, 1000)
+    this.nodeSaveDebounce = debounce(this.nodeSaveImmediate, 1000)
   },
   mounted () {
     this.$log('mounted')

@@ -57,6 +57,9 @@ export function updateItem (state, { key, path, newValue, setter }) {
     Vue.set(o, prop, newValue)
   } else { // изменился весь объект
     assert(typeof newValue === 'object', 'typeof newValue === object')
+    if (newValue && obj.revision){
+      newValue.revision = Math.max(obj.revision, newValue.revision) // иногда ревизия на клиенте отстает (см src/components/node/node_editor/index.vue)
+    }
     for (let prop in newValue) {
       Vue.set(obj, prop, newValue[prop])
     }
