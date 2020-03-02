@@ -37,16 +37,17 @@ div(
       v-if="c"
       :ctx="ctx"
       :value="c.composition" :preview="c.preview"
-      :visible="ckey === 'current'" :active="active && ckey === 'current'" :mini="isMini(ckey)"
+      :visible="visible" :active="active && ckey === 'current'" :mini="isMini(ckey)"
       @next="compositionNext(ckey)"
       @compositionGet="compositionGet(c, ci)")
+      //- ckey === 'current'
   //- preview list
   div(
     v-if="true && ctx === 'rubick'"
     :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-px-sm
     div(
       v-for="(c,ci) in compositions" :key="ci"
-      :style=`{height: '3px'}`
+      :style=`{height: '4px'}`
       ).col.q-px-xs
       div(
         :class=`{'bg-green': ci === index, 'bg-grey-10': ci !== index}`
@@ -54,8 +55,8 @@ div(
         ).row.fit
   //- preview compositions
   div(
-    v-if="false && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-pa-sm
+    v-if="true && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"
@@ -70,8 +71,8 @@ div(
           draggable="false").fit
   //- preview nodes
   div(
-    v-if="false && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '40px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-pa-sm
+    v-if="true && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '40px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"
@@ -123,13 +124,13 @@ export default {
     compositions: {
       immediate: true,
       handler (to, from) {
-        this.$log('cCHANGED', to)
+        // this.$log('cCHANGED', to)
         if (to) {
           if (this.ctx === 'rubick') {
             if (from) {
-              this.$log('cCHANGED FROM')
+              // this.$log('cCHANGED FROM')
               this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-              this.$log('cCHANGED index', this.index)
+              // this.$log('cCHANGED index', this.index)
               if (this.index >= 0) {
                 this.rubick.prev = this.index > 0 ? to[this.index - 1] : null
                 this.rubick.next = this.index < to.length ? to[this.index + 1] : null
@@ -141,9 +142,9 @@ export default {
               }
             }
             else {
-              this.$log('cCHANGED NEW')
+              // this.$log('cCHANGED NEW')
               this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-              this.$log('cCHANGED index', this.index)
+              // this.$log('cCHANGED index', this.index)
               if (this.index >= 0) {
                 if (!this.preview) this.preview = to[this.index].preview
                 this.rubick = {
@@ -194,12 +195,28 @@ export default {
           onComplete: () => {
             this.$set(this, 'rubickStyles', JSON.parse(JSON.stringify(this.rubickStylesInitial)))
             this.ckeyNexting = undefined
-            this.compositionOidOld = this.rubick[ckey].compositionOid
-            let t = this.rubick.current
-            this.rubick.current = this.rubick[ckey]
-            this.rubick[ckey] = t
-            this.index = index
-            this.$emit('next', index)
+            if (this.ctx === 'rubick') {
+              this.compositionOidOld = this.rubick[ckey].compositionOid
+              let t = this.rubick.current
+              this.rubick.current = this.rubick[ckey]
+              this.rubick[ckey] = t
+              this.index = index
+              this.$emit('next', index)
+            }
+            else {
+              let t = this.rubick.current
+              this.rubick.current = this.rubick[ckey]
+              if (ckey === 'next') {
+                this.rubick.prev = t
+                this.rubick.next = null
+              }
+              else {
+                this.rubick.next = t
+                this.rubick.prev = null
+              }
+              this.index = index
+              this.$emit('next', index)
+            }
           }
         }
       )

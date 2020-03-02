@@ -39,7 +39,7 @@
           'bg-grey-10': meta.mode === 'watch' || li !== meta.layerIndex,
           'bg-grey-8': meta.mode !== 'watch' && li === meta.layerIndex}`
         :style=`{position: 'relative', minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.q-mb-sm.cursor-pointer
+        ).row.full-width.items-center.content-center.q-mb-sm
         //- inactive tint
         div(
           v-if="meta.mode === 'watch' || meta.layerIndex !== li" @click="layerClick(l, li)"
@@ -54,16 +54,24 @@
             //- name SHOW
             div(
               v-if="li !== layerNameSetting"
-              @click="layerNameSetStart(l,li)").row.fit.items-center.content-center.q-px-sm.cursor-pointer
-              span(v-if="l.spheres.length > 0").text-white {{ l.spheres[0].name }}
+              ).row.fit.items-center.content-center
+              div(v-if="l.spheres.length > 0").col.full-height
+                .row.fit.items-center.content-center.q-px-sm
+                  span(v-if="l.spheres.length > 0").text-white {{ l.spheres[0].name }}
+              q-btn(round flat dense color="white" icon="edit" @click="layerNameSetStart(l,li)").q-mx-sm
+              span(v-if="l.spheres.length === 0").text-grey-5 Set layer name
             //- name EDIT
             div(
-              v-if="li === layerNameSetting").row.fit.items-center.content-center
-              input(
-                v-model="layerName"
-                autofocus
-                @keyup.enter="layerNameSet(l,li)" @blur="layerNameSet(l, li)"
-                :style=`{background: 'none', color: 'white', borderRadius: '10px', overflow: 'hidden'}`).kinput.full-width.bg-green
+              v-if="li === layerNameSetting"
+              :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.bg-green
+              .col.full-height
+                .row.fit.items-center.content-center
+                  input(
+                    v-model="layerName"
+                    autofocus
+                    @keyup.enter="layerNameSet(l,li)" @blur="layerNameSet(l, li)"
+                    :style=`{background: 'none', color: 'white'}`).kinput.full-width
+              q-btn(round flat dense color="white" icon="check" @click="layerNameSet(l,li)").q-mx-sm
           div(:style=`{width: '83px'}`).row.full-height.justify-center.items-center.content-center
             span.text-white {{ $time(l.figuresAbsolute[0].t) }}
           div(:style=`{width: '83px'}`).row.full-height.justify-center.items-center.content-center

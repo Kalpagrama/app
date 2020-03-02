@@ -9,8 +9,8 @@ div(
   //-   small.text-white.full-width mini: {{ mini }}
   //- TODO composition menu
   q-btn(
-    v-if="!mini"
-    round flat color="white" icon="more_vert" @click="menuToggle"
+    v-if="active && !mini"
+    round flat color="white" icon="more_vert" @click="menuToggle()"
     :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)'}`)
   //- next tint
   div(
@@ -58,6 +58,20 @@ export default {
       previewLoaded: false
     }
   },
+  computed: {
+    actions () {
+      return {
+        save: {
+          name: 'Save composition',
+          payload: {oid: this.value.oid}
+        },
+        content: {
+          name: 'Go to content',
+          payload: {oid: this.value.layers[0].content.oid}
+        }
+      }
+    }
+  },
   watch: {
     value: {
       immediate: true,
@@ -74,8 +88,18 @@ export default {
     }
   },
   methods: {
-    menuToggle () {
+    async menuToggle () {
       this.$log('menuToggle')
+      const cb = {
+        save: () => {
+          this.$log('save composition')
+        },
+        content: () => {
+          this.$log('go to content')
+          this.$router.push('/content/' + this.value.layers[0].content.oid)
+        }
+      }
+      this.$store.dispatch('ui/action', [{actions: this.actions, timeout: 3000}, key => key ? cb[key]() : false])
     },
     previewLoad () {
       // this.$log('previewLoad')

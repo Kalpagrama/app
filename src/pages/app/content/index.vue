@@ -1,28 +1,14 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width
-  div.row.full-height.bg-black
-    slot(name="menuDesktop")
-  .col
-    content-explorer(
-      v-if="$route.params.oid && content" :content="content"
-      @create="content = null, $router.push('/content')")
-    div(v-if="$route.params.oid && !content").row.fit.items-center.content-center.justify-center.bg-black
-      q-spinner(size="50px" color="green")
-    content-finder(
-      v-if="!$route.params.oid"
-      @content="contentFound"
-      :sources="['device', 'url', 'ws']"
-      :style=`{height: $q.screen.height+'px'}`
-      ).bg-black
+div(:style=`{height: $q.screen.height+'px'}`).row.full-width
+  composition(
+    v-if="content"
+    ctx="workspace" :value="{layers: [{content, figuresAbsolute: [], figuresRelative: [], spheres: []}]}" :visible="true" :active="true" :mini="false")
 </template>
 
 <script>
-import contentFinder from 'components/content/finder'
-import contentExplorer from 'components/content/explorer'
-
 export default {
   name: 'pageAppContent',
-  components: {contentExplorer, contentFinder},
+  components: {},
   props: [],
   data () {
     return {

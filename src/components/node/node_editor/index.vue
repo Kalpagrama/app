@@ -106,7 +106,7 @@
                 :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
           //- debug
           div(
-            v-if="true"
+            v-if="$store.state.ui.debug"
             :style=`{color: 'white', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-green.q-pa-sm.q-my-sm
             small.full-width revision: {{ node.revision }}
             small.full-width oid: {{ node.oid }}

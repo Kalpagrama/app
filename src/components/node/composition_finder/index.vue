@@ -1,10 +1,13 @@
 <template lang="pug">
-.row.fit.bg-grey-9
-  ws-menu(
-    ctx="finder"
-    :header="false" :toggle="false" :oid="oid"
-    :pages="['contents', 'compositions']"
-    @item="itemClick" @page="pageClick" :page="page")
+.column.fit.bg-grey-9
+  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+    q-btn(round flat color="green" icon="keyboard_arrow_left" @click="$emit('close')")
+  .col.full-width
+    ws-menu(
+      ctx="finder"
+      :header="false" :toggle="false" :oid="oid"
+      :pages="['contents', 'compositions']"
+      @item="itemClick" @page="pageClick" :page="page")
 </template>
 
 <script>

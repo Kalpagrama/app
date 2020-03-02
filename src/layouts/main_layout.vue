@@ -9,16 +9,8 @@ iframe {
 </style>
 
 <template lang="pug">
-//- .row.full-width.items-start.content-start
 q-layout( view="hHh Lpr lff")
-  k-action
-  //- kalpa-tutorial
-  //- div(:style=`{}`).row.window-height.bg-grey-8
-  //- kalpa-menu-desktop(v-if="!loading" ref="kMenu")
-  //- div(
-  //-   v-if="$refs.kMenu && $refs.kMenu.width > 0 && $q.screen.xs" @click="$refs.kMenu.width === 0 ? $refs.kMenu.width = 260 : $refs.kMenu.width = 0"
-  //-   :style=`{position: 'fixed', zIndex: 1000, background: 'rgba(0,0,0,0.2)'}`
-  //-   ).row.fit
+  kalpa-action
   q-drawer(
     v-model="drawerShow"
     show-if-above mini-to-overlay no-swipe-open no-swipe-close
@@ -29,7 +21,6 @@ q-layout( view="hHh Lpr lff")
   q-btn(
     round flat color="white" icon="menu" @click="drawerShow = !drawerShow"
     :style=`{position: 'fixed', left: '16px', bottom: '16px', zIndex: 10000, background: 'rgba(0,0,0,0.2)'}`).xs
-  //- div(:style=`{paddingLeft: $q.screen.gt.xs ? '60px' : '0px'}`).col
   q-page-container
     router-view(v-if="!loading")
     div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
@@ -37,13 +28,12 @@ q-layout( view="hHh Lpr lff")
 </template>
 
 <script>
-import kAction from 'components/k_action'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 
 export default {
   name: 'mainLayout',
-  components: {kAction},
+  components: {},
   data () {
     return {
       loading: true,
