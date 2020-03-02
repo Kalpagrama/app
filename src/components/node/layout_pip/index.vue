@@ -15,7 +15,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     ).row.full-width.items-start.content-start.bg-black
     composition-list(
       ref="compositionList" :ctx="ctx"
-      :compositions="compositions" :nodeOid="nodeOid"
+      :compositions="compositions"
       :visible="visible" :active="active"
       @error="$event => $emit('error', $event)")
   //- name
@@ -34,7 +34,7 @@ export default {
   props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'nodeLoad'],
   data () {
     return {
-      nodeOid: false
+      // nodeOid: false
     }
   },
   computed: {
@@ -50,8 +50,8 @@ export default {
       immediate: true,
       async handler (to, from) {
         // this.$log('active CHANGED', to)
-        if (to) this.nodeOid = this.node.oid
-        else this.nodeOid = false
+        // if (to) this.nodeOid = this.node.oid
+        // else this.nodeOid = false
       }
     },
     // visible: {

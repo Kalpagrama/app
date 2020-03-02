@@ -88,7 +88,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           round outline color="green" icon="add" @click="compositionAdd(1)"
           :style=`{position: 'absolute', zIndex: 2000, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- debug node
-      div(v-if="true && nodeRubick").row.full-width.bg-red
+      div(v-if="false && nodeRubick").row.full-width.bg-red
         .row.full-width
           img(
             :src="nodeRubick.meta.compositions[0].thumbUrl"
@@ -101,19 +101,24 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             :style=`{width: '100px', height: '100px', objectFit: 'contain'}`)
   actions(
     :node="nodeRubick" :nodeFull="nodeRubickFull" :width="width" :maxWidth="maxWidth"
-    @votePanning="votePanning = $event" @voteValue="voteValue = $event"
-    :style=`{marginBottom: '400px'}`)
+    @votePanning="votePanning = $event" @voteValue="voteValue = $event")
   //- TODO add spheres and node meta info
+  .row.full-width.justify-center.items-start
+    spheres(
+      v-if="nodeRubickFull" mode="watch"
+      :node="nodeRubickFull"
+      :style=`{maxWidth: maxWidth+'px', marginBottom: '200px'}`)
 </template>
 
 <script>
 import voteTint from './vote_tint'
 import actions from './actions'
+import spheres from 'components/node/node_editor/spheres'
 
 export default {
   name: 'nodeLayoutOpened',
   props: ['node', 'nodeFull', 'nodeLoad'],
-  components: {voteTint, actions},
+  components: {voteTint, actions, spheres},
   data () {
     return {
       voteValue: 0,
@@ -172,6 +177,7 @@ export default {
         this.$log('node CHANGED', to)
         if (to && !this.nodeRubick) {
           this.$set(this, 'nodeRubick', JSON.parse(JSON.stringify(to)))
+          // let positionGood = this.nodeRubick.meta.compositions[0].oid === to.meta.compositions[0].oid
           this.compositionOneOid = to.meta.compositions[0].oid
           this.compositionTwoOid = to.meta.compositions[1].oid
           this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
@@ -183,17 +189,19 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('nodeFull CHANGED', to)
-        if (to && !this.nodeRubickFull) {
-          this.$set(this, 'nodeRubickFull', JSON.parse(JSON.stringify(to)))
-          // TODO load queries
-        }
+        this.nodeRubickFull = to
+        // if (to && !this.nodeRubickFull) {
+        //   this.$set(this, 'nodeRubickFull', JSON.parse(JSON.stringify(to)))
+        //   // TODO load queries
+        // }
       }
     },
     nodeRubick: {
       deep: true,
-      handler (to, from) {
+      async handler (to, from) {
         this.$log('nodeRubick CHANGED', to)
         if (to && this.$route.name === 'node') {
+          this.nodeRubickFull = await this.$store.dispatch('objects/get', { oid: to.oid, priority: 1 })
           this.$router.push('/node/' + to.oid).catch(e => e)
         }
       }
@@ -242,6 +250,7 @@ export default {
       this.compositionOneOid = this.compositionOneItems[index].compositionOid
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
+      // this.nodeRubick = node
     },
     async compositionTwoNextIndex (index) {
       this.$log('cTWOnext index', index)
@@ -252,6 +261,7 @@ export default {
       this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
       this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
       this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
+      // this.nodeRubick = node
     },
     nodeNameClick () {
       this.$log('nodeNameClick')

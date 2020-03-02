@@ -113,7 +113,9 @@
             small.full-width compositionActive: {{compositionActive}}
             small.full-width compositionVisible: {{compositionVisible}}
         div(:style=`{minHeight: '400px'}`).row.full-width.justify-center.q-py-md
-          spheres(v-if="node" :node="node" :style=`{maxWidth: maxWidth+'px'}`)
+          spheres(
+            v-if="node && node.oid" mode="edit"
+            :node="node" :style=`{maxWidth: maxWidth+'px'}`)
           //- span hello
           //- spheres(:node="node")
           //- div(
@@ -257,7 +259,7 @@ export default {
         this.nodeDeletingError = null
         // TODO delete node and exit
         await this.$router.replace('/workspace/nodes')
-        this.node = this.nodeNew
+        // this.node = this.nodeNew
       } catch (e) {
         this.$log('nodeDelete error', e)
         this.nodeDeleting = false

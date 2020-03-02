@@ -43,7 +43,7 @@ div(
       //- ckey === 'current'
   //- preview list
   div(
-    v-if="true && ctx === 'rubick'"
+    v-if="true && ctx === 'rubick' && compositions.length > 1"
     :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-px-sm
     div(
       v-for="(c,ci) in compositions" :key="ci"
@@ -55,7 +55,7 @@ div(
         ).row.fit
   //- preview compositions
   div(
-    v-if="true && ctx === 'rubick'"
+    v-if="false && ctx === 'rubick'"
     :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
@@ -71,7 +71,7 @@ div(
           draggable="false").fit
   //- preview nodes
   div(
-    v-if="true && ctx === 'rubick'"
+    v-if="false && ctx === 'rubick'"
     :style=`{position: 'absolute', top: '40px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
@@ -92,6 +92,8 @@ div(
 </template>
 
 <script>
+import { debounce } from 'quasar'
+
 export default {
   name: 'compositionList',
   props: {
@@ -123,12 +125,23 @@ export default {
   },
   watch: {
     nodeOid: {
+      immediate: false,
+      handler (to, from) {
+        // this.$log(this.label, 'nodeOid CHANGED')
+        this.compositionsChanged(this.compositions)
+      }
+    },
+    compositions: {
+      deep: true,
       immediate: true,
       handler (to, from) {
-        // this.$log('nodeOid CHANGED')
-        this.compositionsChanged(this.compositions, null)
+        // this.$log(this.label, 'compositions CHANGED')
+        this.compositionsChanged(to)
       }
     }
+  },
+  created () {
+    // this.compositionsChanged = debounce(this.compositionsChanged, 300)
   },
   methods: {
     compositionsChanged (to) {
@@ -186,6 +199,7 @@ export default {
           onComplete: () => {
             this.$set(this, 'rubickStyles', JSON.parse(JSON.stringify(this.rubickStylesInitial)))
             this.ckeyNexting = undefined
+            // this.compositionsChanged(this.compositions)
             if (this.ctx === 'rubick') {
               this.compositionOidOld = this.rubick[ckey].compositionOid
               // let t = this.rubick.current
@@ -193,22 +207,26 @@ export default {
               // this.rubick[ckey] = t
               this.index = index
               this.$emit('next', index)
+              // this.compositionsChanged(this.compositions)
             }
             else {
               let t = this.rubick.current
               this.rubick.current = this.rubick[ckey]
-              if (ckey === 'next') {
-                this.rubick.prev = t
-                this.rubick.next = null
-                this.index = 1
-              }
-              else {
-                this.rubick.next = t
-                this.rubick.prev = null
-                this.index = 0
-              }
+              this.rubick.next = t
+              // if (ckey === 'next') {
+              //   this.rubick.prev = t
+              //   this.rubick.next = null
+              //   this.index = 1
+              // }
+              // else {
+              //   this.rubick.next = t
+              //   this.rubick.prev = null
+              //   this.index = 0
+              // }
+              // this.compositionsChanged(this.compositions)
               this.$emit('next', index)
             }
+            // this.compositionsChanged(this.compositions)
           }
         }
       )

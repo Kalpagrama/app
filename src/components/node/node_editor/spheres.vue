@@ -12,7 +12,9 @@
 div(
   :style=`{minHeight: '60px'}`
   ).row.full-width.items-start.content-start
-  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.scroll
+  div(
+    v-if="mode === 'edit'"
+    :style=`{height: '60px'}`).row.full-width.items-center.content-center.scroll
     .row.no-wrap
       span(
         v-for="(c, ci) in categories" :key="ci" @click="categorySet(c, ci)"
@@ -25,14 +27,16 @@ div(
           color: 'white', whiteSpace: 'nowrap', textTransform: 'capitalize',
           borderRadius: '10px', overflow: 'hidden'}`
         ).cursor-pointer.q-pa-sm.q-mr-sm {{ c.sphere.name }}
-  div().row.full-width
+  div(
+    v-if="mode === 'edit'"
+    ).row.full-width
     input(
       v-model="sphere" placeholder="Find or add sphere"
       @keyup.enter="sphereAdd"
       :style=`{minHeight: '60px', borderRadius: '10px'}`).kinput.full-width.bg-grey-4
   //- spheres WS
   div(
-    v-if="sphere.length > 0"
+    v-if="mode === 'edit' && sphere.length > 0"
     ).row.full-width.items-start.content-start.q-py-sm
     span(
       v-for="(s,si) in spheresWSFiltered" :key="si" @click="sphereAdd(s,si)"
@@ -44,6 +48,10 @@ div(
       :style=`{borderRadius: '10px', overflow: 'hidden'}`) Add: {{ sphere }}
   //- spheres NODE
   .row.full-width.items-start.content-start.q-py-sm
+    span(
+      v-if="mode === 'watch'"
+      :style=`{textTransform: 'capitalize', borderRadius: '10px', overflow: 'hidden'}`
+    ).q-pa-sm.q-mr-sm.q-mb-sm.text-white.bg-green {{ categoryHuman(node.category) }}
     span(
       v-for="(s, si) in spheres" :key="si"
       :class=`{'full-width': si === sphereIndex}`
@@ -71,7 +79,10 @@ div(
 <script>
 export default {
   name: 'nodeEditorSpheres',
-  props: ['node'],
+  props: {
+    node: {type: Object},
+    mode: {type: String}
+  },
   data () {
     return {
       sphere: '',
@@ -93,6 +104,9 @@ export default {
     }
   },
   methods: {
+    categoryHuman (type) {
+      return this.categories.find(i => i.type === type).name
+    },
     categorySet (c, ci) {
       this.$log('categorySet', c, ci)
       this.node.category = c.type
@@ -100,7 +114,12 @@ export default {
     },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
-      this.sphereIndex = si
+      if (this.mode === 'watch') {
+        this.sphereExplore(s, si)
+      }
+      if (this.mode === 'edit') {
+        this.sphereIndex = si
+      }
     },
     sphereAdd () {
       this.$log('sphereAdd')
@@ -130,7 +149,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.spheresWSget()
+    if (this.ctx === 'edit') {
+      this.spheresWSget()
+    }
   }
 }
 </script>

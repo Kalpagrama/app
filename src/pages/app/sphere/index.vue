@@ -1,6 +1,17 @@
 <template lang="pug">
-div(:style=`{height: $q.screen.height+'px'}`).row.full-width
-  span {{sphere}}
+q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
+  q-header(reveal).bg-grey-8
+    div(
+      v-if="sphere"
+      :style=`{height: '60px', paddingLeft: $q.screen.gt.xs ? '70px' : '0px'}`).row.full-width.justify-center
+      div(:style=`{maxWidth: '750px'}`).row.fit.items-center.content-center.q-px-md
+        span {{ sphere.name }}
+        .col
+        q-btn(round flat color="white" icon="more_vert")
+  q-page-conainter.row.full-width.justify-center.items-start.content-start.bg-grey-9
+    kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
+      template(v-slot:items=`{items}`)
+        node-list(:nodes="items" :style=`{maxWidth: '750px'}`)
 </template>
 
 <script>
@@ -10,6 +21,23 @@ export default {
   data () {
     return {
       sphere: null
+    }
+  },
+  computed: {
+    sphereOid () {
+      return this.$route.params.oid
+      // if (this.$route.params.category) return this.categories.FUN.sphere.oid
+      // else return false
+      // return this.categories.FUN.sphere.oid
+      // else return false
+    },
+    variables () {
+      return {
+        oid: this.sphereOid,
+        pagination: { pageSize: 10 },
+        sortStrategy: 'HOT',
+        filter: { types: 'NODE' }
+      }
     }
   },
   watch: {
