@@ -37,7 +37,7 @@ div(
       v-if="c"
       :ctx="ctx"
       :value="c.composition" :preview="c.preview"
-      :visible="ckey === 'current'" :active="active && ckey === 'current'" :mini="isMini(ckey)"
+      :visible="visible && ckey === 'current'" :active="active && ckey === 'current'" :mini="isMini(ckey)"
       @next="compositionNext(ckey)"
       @compositionGet="compositionGet(c, ci)")
       //- ckey === 'current'
@@ -122,54 +122,43 @@ export default {
     }
   },
   watch: {
-    compositions: {
+    nodeOid: {
       immediate: true,
       handler (to, from) {
-        this.$log(this.label, 'cCHANGED', to)
-        if (to) {
-          if (this.ctx === 'rubick') {
-            if (from) {
-              this.$log(this.label, 'cCHANGED FROM')
-              this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-              this.$log(this.label, 'cCHANGED index', this.index)
-              if (this.index >= 0) {
-                this.rubick.prev = this.index > 0 ? to[this.index - 1] : null
-                this.rubick.next = this.index < to.length ? to[this.index + 1] : null
-                // this.rubick.current = to[this.index]
-                if (to[this.index].compositionOid !== this.compositionOidOld) {
-                  this.rubick.current = to[this.index]
-                  this.compositionOidOld = this.compositionOid
-                }
-              }
-            }
-            else {
-              this.$log(this.label, 'cCHANGED NEW')
-              this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-              this.$log(this.label, 'cCHANGED index', this.index)
-              if (this.index >= 0) {
-                if (!this.preview) this.preview = to[this.index].preview
-                this.rubick = {
-                  prev: this.index > 0 ? to[this.index - 1] : null,
-                  current: to[this.index],
-                  next: this.index < to.length ? to[this.index + 1] : null
-                }
-              }
-            }
-          }
-          else {
-            this.$log(this.label, 'cCHANGED list')
-            if (!this.preview) this.preview = to[0].preview
-            this.rubick = {
-              prev: null,
-              current: to[0],
-              next: to[1]
-            }
-          }
-        }
+        // this.$log('nodeOid CHANGED')
+        this.compositionsChanged(this.compositions, null)
       }
     }
   },
   methods: {
+    compositionsChanged (to) {
+      // this.$log(this.label, 'compositionsChanged')
+      if (to) {
+        if (this.ctx === 'rubick') {
+          if (!this.rubick) this.rubick = {}
+          if (!this.preview) this.preview = to[this.index].preview
+          this.index = to.findIndex(i => i.node.oid === this.nodeOid)
+          // this.$log(this.label, 'cCHANGED index', this.index)
+          if (this.index >= 0) {
+            this.rubick.prev = this.index > 0 ? to[this.index - 1] : null
+            this.rubick.next = this.index < to.length ? to[this.index + 1] : null
+            if (to[this.index].compositionOid !== this.compositionOidOld) {
+              this.rubick.current = to[this.index]
+              this.compositionOidOld = this.compositionOid
+            }
+          }
+        }
+        else {
+          // this.$log(this.label, 'cCHANGED list')
+          if (!this.preview) this.preview = to[0].preview
+          this.rubick = {
+            prev: null,
+            current: to[0],
+            next: to[1]
+          }
+        }
+      }
+    },
     compositionNext (ckey) {
       this.$log('compositionNext', ckey)
       this.$log('compositionNext this.index', this.index)
