@@ -25,7 +25,6 @@ div(
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
       maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
   //- players
-  //- TODO different players
   player-video(
     v-if="visible && value"
     :ctx="ctx" :composition="value"
