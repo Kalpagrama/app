@@ -1,48 +1,94 @@
 <template lang="pug">
 div(
   v-touch-swipe.mouse.left.right="handleSwipe"
-  :style=`{position: 'relative', minHeight: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-black
+  :style=`{position: 'relative', minHeight: height+'px', overflow: 'hidden'}`).row.full-width.items-center.content-center.bg-black
   //- debug
-  div(v-if="false" :style=`{position: 'absolute', zIndex: 1000, top: '60px'}`).row.bg-green
+  //- small(:style=`{position: 'absolute', zIndex: 4100, top: '0px', right: '0px'}`).bg-red.text-white {{nodeOid}}
+  div(v-if="false" :style=`{position: 'absolute', zIndex: 1000, top: '60px'}`).row.text-white.bg-green
     small.text-white.full-width index: {{index}}
-    small(v-if="styles.length > 0").text-white.full-width styles[2].maxWidth: {{ styles[2].maxWidth }}
-    small(v-if="styles.length > 0").text-white.full-width styles[0].maxWidth: {{ styles[0].maxWidth }}
+    small.full-width visible/active/mini {{visible}}/{{active}}/{{mini}}
   //- stats
   small(
-    v-if="true"
-    :style=`{position: 'absolute', zIndex: 50000, top: '4px', right: 'calc(50% - 20px)', borderRadius: '10px', background: 'rgba(0,0,0,0.3)',
+    v-if="false"
+    :style=`{position: 'absolute', zIndex: 4000, top: '4px', right: 'calc(50% - 20px)', borderRadius: '10px', background: 'rgba(0,0,0,0.3)',
       userSelect: 'none'}`
     ).text-white.q-pa-xs {{ index + 1 }}/{{ compositions.length }}
-  //- h1.text-red bitch
   //- preview
   img(
+    v-if="true"
     ref="compositionListPreview"
-    :src="compositions[0].preview" @load="previewLoad" @error="previewError"
-    :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0}`)
+    :src="preview" @load="previewLoad" @error="previewError"
+    draggable="false"
+    :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0, userSelect: 'none'}`)
   //- compositions
   div(
-    v-for="(c, ci) in compositions" :key="ci"
-    v-if="height > 0 && styles.length > 0 && ci > index-2 && ci < index+2"
+    v-for="(c, ckey) in rubick" :key="ckey"
+    v-if="rubick && height > 0"
     :style=`{
-      ...compositionStyle(ci),
-      position: 'absolute', bottom: 0, borderRadius: '10px', overflow: 'hidden',
-      //- border: ci > index ? '2px solid red' : ci < index ? '2px solid blue' : 'none',
-      zIndex: ci === index ? 200 : 300,
-      opacity: ci === index ? styles[1].opacity : ci === index+1 ? styles[2].opacity : styles[0].opacity,
-      maxWidth: ci === index ? styles[1].maxWidth+'%' : ci === index+1 ? styles[2].maxWidth+'%' : styles[0].maxWidth+'%',
-      maxHeight: ci === index ? styles[1].maxHeight+'%'+'px' : ci === index+1 ? styles[2].maxHeight+'px' : styles[0].maxHeight+'px',
-      height: isMini(ci) ? 'auto' : '100%'
-    }`).row.full-width.items-center.content-center
+      position: 'absolute', bottom: 0, ...compositionRightLeft(ckey), borderRadius: '10px', overflow: 'hidden',
+      zIndex: ckey === 'current' ? 200 : 300,
+      opacity: rubickStyles[ckey].opacity,
+      maxWidth: rubickStyles[ckey].maxWidth+'%',
+      maxHeight: rubickStyles[ckey].maxHeight+'px',
+      height: isMini(ckey) ? 'auto' : '100%'
+    }`
+    ).row.full-width.items-center.content-center
     composition(
+      v-if="c"
       :ctx="ctx"
       :value="c.composition" :preview="c.preview"
-      :mini="isMini(ci)"
-      :visible="visible && ci >= index-1 && ci <= index+1"
-      :active="active && ci === index"
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`
-      @next="compositionNext(ci)"
-      @error="$event => compositionError(ci, $event)")
-      //- @ended="compositionNext(ci + 1)"
+      :visible="ckey === 'current'" :active="active && ckey === 'current'" :mini="isMini(ckey)"
+      @next="compositionNext(ckey)"
+      @compositionGet="compositionGet(c, ci)")
+      //- ckey === 'current'
+  //- preview list
+  div(
+    v-if="true && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-px-sm
+    div(
+      v-for="(c,ci) in compositions" :key="ci"
+      :style=`{height: '4px'}`
+      ).col.q-px-xs
+      div(
+        :class=`{'bg-green': ci === index, 'bg-grey-10': ci !== index}`
+        :style=`{borderRadius: '2px',overflow: 'hidden'}`
+        ).row.fit
+  //- preview compositions
+  div(
+    v-if="true && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
+    .row.full-width.no-wrap
+      div(
+        v-for="(c, ci) in compositions" :key="ci"
+        :style=`{width: '30px', height: '30px', borderRadius: '10px', overflow: 'hidden',
+        border: c.node.oid === nodeOid ? '2px solid pink' : '1px solid red'}`
+        ).bg-black.q-mr-sm
+        img(
+          :src="c.preview"
+          :style=`{
+            borderRadius: '10px', overflow: 'hidden', userSelect: 'none', objectFit: 'contain',
+            border: ci === index ? '2px solid #4caf50' : '2px solid rgba(0,0,0,0)'}`
+          draggable="false").fit
+  //- preview nodes
+  div(
+    v-if="true && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '40px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
+    .row.full-width.no-wrap
+      div(
+        v-for="(c, ci) in compositions" :key="ci"
+          :style=`{width: '30px', height: '60px',
+            borderRadius: '10px', border: ci === index ? '2px solid #4caf50' : '2px solid rgba(0,0,0,0)',
+            }`).bg-black.q-mr-sm
+        div(:style=`{height: '30px'}`).row.full-width
+          img(
+            :src="c.node.meta.compositions[0].thumbUrl" draggable="false"
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden', userSelect: 'none', objectFit: 'contain'}`).fit
+        div(:style=`{height: '30px'}`).row.full-width
+          img(
+            :src="c.node.meta.compositions[1].thumbUrl" draggable="false"
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden', userSelect: 'none', objectFit: 'contain'}`).fit
 </template>
 
 <script>
@@ -50,30 +96,134 @@ export default {
   name: 'compositionList',
   props: {
     ctx: {type: String},
+    label: {type: String, default () { return 'list' }},
     mode: {type: String, default () { return 'manual' }},
     visible: {type: Boolean, default () { return false }},
     active: {type: Boolean, default () { return false }},
-    compositions: {type: Array}
+    compositions: {type: Array},
+    compositionOid: {type: String},
+    nodeOid: {type: String}
   },
   data () {
     return {
       index: 0,
-      indexErrored: [],
-      indexNexting: -1,
+      ckeyNexting: undefined,
       height: 0,
       width: 0,
-      stylesInitial: [
-        {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.7},
-        {zIndex: 200, maxWidth: 100, maxHeight: 100, opacity: 1},
-        {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.7}
-      ],
-      styles: []
+      preview: undefined,
+      compositionOidOld: undefined,
+      rubick: null,
+      rubickStylesInitial: {
+        prev: {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.7},
+        current: {zIndex: 200, maxWidth: 100, maxHeight: 100, opacity: 1},
+        next: {zIndex: 300, maxWidth: 25, maxHeight: 100, opacity: 0.7}
+      },
+      rubickStyles: {}
     }
   },
-  mounted () {
-    // this.$q.notify('mounted')
+  watch: {
+    compositions: {
+      immediate: true,
+      handler (to, from) {
+        this.$log(this.label, 'cCHANGED', to)
+        if (to) {
+          if (this.ctx === 'rubick') {
+            if (from) {
+              this.$log(this.label, 'cCHANGED FROM')
+              this.index = to.findIndex(i => i.node.oid === this.nodeOid)
+              this.$log(this.label, 'cCHANGED index', this.index)
+              if (this.index >= 0) {
+                this.rubick.prev = this.index > 0 ? to[this.index - 1] : null
+                this.rubick.next = this.index < to.length ? to[this.index + 1] : null
+                // this.rubick.current = to[this.index]
+                if (to[this.index].compositionOid !== this.compositionOidOld) {
+                  this.rubick.current = to[this.index]
+                  this.compositionOidOld = this.compositionOid
+                }
+              }
+            }
+            else {
+              this.$log(this.label, 'cCHANGED NEW')
+              this.index = to.findIndex(i => i.node.oid === this.nodeOid)
+              this.$log(this.label, 'cCHANGED index', this.index)
+              if (this.index >= 0) {
+                if (!this.preview) this.preview = to[this.index].preview
+                this.rubick = {
+                  prev: this.index > 0 ? to[this.index - 1] : null,
+                  current: to[this.index],
+                  next: this.index < to.length ? to[this.index + 1] : null
+                }
+              }
+            }
+          }
+          else {
+            this.$log(this.label, 'cCHANGED list')
+            if (!this.preview) this.preview = to[0].preview
+            this.rubick = {
+              prev: null,
+              current: to[0],
+              next: to[1]
+            }
+          }
+        }
+      }
+    }
   },
   methods: {
+    compositionNext (ckey) {
+      this.$log('compositionNext', ckey)
+      this.$log('compositionNext this.index', this.index)
+      this.$log('compositionNext compositions.length ', this.compositions.length)
+      let index
+      if (ckey === 'next' && this.index + 1 < this.compositions.length) {
+        index = this.index + 1
+      }
+      if (ckey === 'prev' && this.index - 1 >= 0) {
+        index = this.index - 1
+      }
+      this.$log('compositionNext index', index)
+      this.$log('compositionNext this.index', this.index)
+      if (index === undefined) return
+      this.ckeyNexting = ckey
+      this.$tween.to(this.rubickStyles.current, 0.5, {opacity: 0})
+      this.$tween.to(
+        this.rubickStyles[ckey],
+        0.5,
+        {
+          zIndex: 300,
+          maxWidth: 100,
+          maxHeight: this.height,
+          opacity: 1,
+          onComplete: () => {
+            this.$set(this, 'rubickStyles', JSON.parse(JSON.stringify(this.rubickStylesInitial)))
+            this.ckeyNexting = undefined
+            if (this.ctx === 'rubick') {
+              this.compositionOidOld = this.rubick[ckey].compositionOid
+              // let t = this.rubick.current
+              this.rubick.current = this.rubick[ckey]
+              // this.rubick[ckey] = t
+              this.index = index
+              this.$emit('next', index)
+            }
+            else {
+              let t = this.rubick.current
+              this.rubick.current = this.rubick[ckey]
+              if (ckey === 'next') {
+                this.rubick.prev = t
+                this.rubick.next = null
+                this.index = 1
+              }
+              else {
+                this.rubick.next = t
+                this.rubick.prev = null
+                this.index = 0
+              }
+              this.$emit('next', index)
+            }
+          }
+        }
+      )
+    },
     play () {
       this.$log('play')
     },
@@ -81,78 +231,35 @@ export default {
       this.$log('pause')
     },
     handleSwipe (e) {
-      // this.$log('handleSwipe', e)
-      if (e.direction === 'left') this.compositionNext(this.index + 1)
-      else this.compositionNext(this.index - 1)
+      this.compositionNext(e.direction === 'left' ? 'next' : 'prev')
     },
-    isMini (ci) {
-      return ci === this.indexNexting ? false : ci !== this.index
+    isMini (ckey) {
+      return ckey === this.ckeyNexting ? false : ckey !== 'current'
     },
     previewLoad (e) {
       // this.$log('previewLoad', e)
-      // this.$q.notify('previewLoad')
-      // this.$q.emit('previewLoad')
       // TODO list height? screen/3?, screen.width?, previewClientWidth?
-      this.height = this.$refs.compositionListPreview.clientHeight
-      // this.height = this.$refs.playerPreview.clientHeight > this.$q.screen.height / 3 ? this.$refs.playerPreview.clientHeight : this.$q.screen.height / 3
+      // this.height = this.$refs.compositionListPreview.clientHeight
+      this.height = this.$refs.compositionListPreview.clientHeight > this.$q.screen.height / 3 ? this.$refs.compositionListPreview.clientHeight : this.$q.screen.height / 3
       this.width = this.$refs.compositionListPreview.clientWidth
-      this.stylesInitial[1].maxHeight = this.height
-      this.styles = JSON.parse(JSON.stringify(this.stylesInitial))
+      this.rubickStylesInitial.current.maxHeight = this.height
+      this.rubickStyles = JSON.parse(JSON.stringify(this.rubickStylesInitial))
       this.$emit('height', this.height)
       this.$emit('width', this.width)
-      // this.$q.notify('height', this.height)
     },
     previewError (e) {
-      this.$log('previewError', e)
+      // this.$log('previewError', e)
       this.$emit('error', 'previewError')
-      this.$q.notify('previewError')
     },
-    compositionStyle (ci) {
-      if (ci > this.index) return {right: '0px'}
-      else if (ci < this.index) return {left: '0px'}
+    compositionRightLeft (ckey) {
+      if (ckey === 'next') return {right: '0px'}
+      if (ckey === 'prev') return {left: '0px'}
     },
-    compositionNext (index) {
-      this.$log('compositionNext', index)
-      if (this.nodeNexting >= 0) return
-      if (!this.compositions[index]) {
-        // this.index = 0
-        // this.compositionNext(0)
-        // this.indexNexting = 0
-      } else {
-        this.indexNexting = index
-        let i = index > this.index ? 2 : 0
-        this.$log('i', i)
-        this.$tween.to(
-          this.styles[1],
-          0.5,
-          {
-            opacity: 0,
-            onComplete: () => {
-              // this.$set(this.styles, 1, JSON.parse(JSON.stringify(this.stylesInitial[1])))
-            }
-          }
-        )
-        this.$tween.to(
-          this.styles[i],
-          0.5,
-          {
-            zIndex: 300,
-            maxWidth: 100,
-            maxHeight: this.height,
-            opacity: 1,
-            onComplete: () => {
-              this.$set(this, 'styles', JSON.parse(JSON.stringify(this.stylesInitial)))
-              this.index = index
-              this.indexNexting = -1
-            }
-          }
-        )
-      }
-    },
-    compositionError (index, error) {
-      this.$log('compositionError', index, error)
-      // TODO hide this composition by index... to indexErrored
-      this.$emit('error', error)
+    async compositionGet (c) {
+      this.$log('compositionGet', c)
+      let nodeFull = await this.$store.dispatch('objects/get', { oid: c.node.oid, priority: 0 })
+      this.$log('compositionGet: nodeFull', nodeFull)
+      c.composition = nodeFull.compositions[c.compositionIndex]
     }
   }
 }

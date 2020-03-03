@@ -107,31 +107,12 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
   return feedResult
 }
 
-export const nodeNodes = async (context, { node, position, pagination, sortStrategy }) => {
+export const nodeNodes = async (context, { compositionOid, pagination, sortStrategy }) => {
   logD('nodeNodes start')
-  assert(position >= 1 && position <= 5)
-  assert(node.compositions && node.compositions.length === 2)
-  assert(node.oid && node.sphereFromName && node.sphereFromName.oid)
   let filter = { types: ['NODE'] }
   let oid
-  if (position === 1) { // список для верхней части кубика-рубика (первая композици)
-    oid = node.sphereFromName.oid // запрашиваем ядра на суть (из них берем те, у которых совпадает суть и нижний контент)
-    filter.name = node.name
-    filter.compositionOids = [node.compositions[1].oid]
-  } else if (position === 2) { // список для средней части кубика-рубика (суть)
-    oid = node.compositions[0].oid // запрашиваем ядра первой композиции (можно и второй - это неважно)
-    filter.compositionOids = [node.compositions[0].oid, node.compositions[1].oid]
-  } else if (position === 3) { // список для нижней части кубика-рубика (вторая композиция)
-    oid = node.sphereFromName.oid // запрашиваем ядра на суть (из них берем те, у которых совпадает суть и верхний контент)
-    filter.name = node.name
-    filter.compositionOids = [node.compositions[0].oid]
-  } else if (position === 4) {
-    oid = node.compositions[1].oid
-    filter.compositionOids = [node.compositions[1].oid]
-  } else if (position === 5) {
-    oid = node.compositions[0].oid
-    filter.compositionOids = [node.compositions[0].oid]
-  }
+  oid = compositionOid
+  filter.compositionOids = [compositionOid]
   const fetchItemFunc = async () => {
     let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
@@ -155,7 +136,7 @@ export const nodeNodes = async (context, { node, position, pagination, sortStrat
   // { items, count, totalCount, nextPageToken }
   let feedResult = await context.dispatch('cache/get',
     {
-      key: 'list: ' + JSON.stringify({ oid: node.oid, pagination, filter, sortStrategy }),
+      key: 'list: ' + JSON.stringify({oid, pagination, filter, sortStrategy }),
       fetchItemFunc
     }, { root: true })
   logD('nodeNodes complete')

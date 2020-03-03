@@ -88,7 +88,11 @@ export const wsNodeSave = async (context, node) => {
           layers: c.layers.map(l => {
             return {
               contentOid: l.content.oid,
-              spheres: [],
+              spheres: l.spheres.map(s => {
+                return {
+                  name: s.name
+                }
+              }),
               figuresAbsolute: l.figuresAbsolute.map(f => {
                 return {
                   t: f.t,
@@ -115,7 +119,7 @@ export const wsNodeSave = async (context, node) => {
       // logD('updatedItem', updatedItem)
       assert(updatedItem.revision)
       let nodeInput = makeNodeInput(updatedItem)
-      let xxx = await apollo.clients.api.mutate({
+      let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
         mutation: gql`
           ${fragments.objectFullFragment}
           mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!, $wsRevision: Int!) {
@@ -128,8 +132,7 @@ export const wsNodeSave = async (context, node) => {
           oid: node.oid, node: nodeInput, wsRevision: context.rootState.workspace.revision
         }
       })
-      logD('xxx=', xxx)
-      let { data: { wsNodeUpdate } } = xxx
+      logD('wsNodeUpdate = ', wsNodeUpdate)
       return { item: wsNodeUpdate, actualAge: 'hour' }
     }
     let fetchItemFunc = async () => {
@@ -161,7 +164,7 @@ export const wsNodeSave = async (context, node) => {
     let { data: { wsNodeCreate } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectFullFragment}
-        mutation sw_network_only_wsNodeCreate ($node: NodeInput!, $wsRevision: Int!) {
+        mutation wsNodeCreate ($node: NodeInput!, $wsRevision: Int!) {
           wsNodeCreate (node: $node, wsRevision: $wsRevision) {
             ...objectFullFragment
           }
@@ -171,10 +174,9 @@ export const wsNodeSave = async (context, node) => {
         node: nodeInput, wsRevision: context.rootState.workspace.revision
       }
     })
-    wsItem = wsNodeCreate
-    context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'hour' }, { root: true })
+    wsItem = await context.dispatch('cache/update', { key: makeKey(wsNodeCreate), newValue: wsNodeCreate, actualAge: 'hour' }, { root: true })
   }
-  logD('wsNodeSave done')
+  logD('wsNodeSave done', wsItem.revision)
   return wsItem
 }
 export const wsItemDelete = async (context, oid) => {
@@ -305,7 +307,7 @@ export const get = async (context, { oid, name, force }) => {
       let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
         query: gql`
           ${fragments.objectFullFragment}
-          query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
+          query wsItems_get ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
             wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
               totalCount
               count

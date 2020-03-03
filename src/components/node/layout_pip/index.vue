@@ -2,7 +2,7 @@
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- debug
   div(
-    v-if="$store.state.ui.debug"
+    v-if="$store.state.ui.debug && false"
     :style=`{position: 'absolute', zIndex: 1000, top: '16px'}`).row.bg-green
     small.text-white.full-width active: {{ active }}
   //- inactive tint
@@ -54,6 +54,11 @@ export default {
         if (to) this.play()
         else this.pause()
       }
+    },
+    visible: {
+      handler (to, from) {
+        this.$log('visible CHANGED', to)
+      }
     }
   },
   methods: {
@@ -70,8 +75,9 @@ export default {
     },
     async nodeNameClick () {
       this.$log('nodeNameClick')
+      this.$router.push('/node/' + this.node.oid).catch(e => e)
       this.pause()
-      this.$emit('open')
+      // this.$emit('open')
     }
   }
 }

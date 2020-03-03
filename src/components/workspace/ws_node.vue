@@ -7,8 +7,7 @@ div(
   span(
     :class=`{
       'text-white': node.oid !== oid,
-      'text-green': node.oid === oid,
-      'text-bold': node.oid === oid}`
+      'text-green': node.oid === oid}`
     ) {{ nodeFull ? nodeFull.name : node.name }}
 </template>
 

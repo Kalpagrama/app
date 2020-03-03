@@ -16,8 +16,16 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         :style=`{}`)
         .col.full-height
       composition-finder(
-        @layer="layerFound"
+        @composition="compositionFound"
         :style=`{maxWidth: '600px', maxHeight: 'calc(100% - 60px)', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
+  //- composition editor
+  q-dialog(v-model="compositionEditorOpened" :maximized="true").bg-black
+    div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).row.fit
+      composition-editor(
+        ctx="editor"
+        :value="nodeRubickNew" :compositionIndex="compositionIndex" @composition="compositionEdited").bg-black
+      q-btn(push color="green" no-caps @click="compositionEditorOpened = false, compositionEditedFinal()"
+        :style=`{position: 'absolute', zIndex: 10000, top: '16px', right: '16px'}`) Ready!
   //- header
   div(
     v-if="true"
@@ -39,17 +47,20 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       //- composition ONE
       div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
         composition-list(
-          v-if="nodeRubick"
+          v-if="nodeRubick && compositionOneQuery"
           ref="compositionListOne"
-          :ctx="ctx" :index="needSwap ? 1 : 0"
+          :ctx="'rubick'" label="one"
           @width="width = $event"
-          :compositions="[{preview: nodeRubick.meta.compositions[needSwap ? 1 : 0].thumbUrl, composition: nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 1 : 0] : null}]"
-          :mini="false" :visible="true" :active="true"
+          @next="compositionOneNextIndex"
+          :compositions="compositionOneItems"
+          :compositionOid="compositionOneOid"
+          :nodeOid="nodeRubick ? nodeRubick.oid : node.oid"
+          :mini="false" :visible="compositionsVisible[0]" :active="compositionsActive[0]"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
-        //- q-btn(
-        //-   round flat color="green" icon="add" @click="compositionAdd(0)"
-        //-   :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
+        q-btn(
+          round outline color="green" icon="add" @click="compositionAdd(0)"
+          :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- name, essence
       .row.full-width.justify-center.items-center.content-center
         div(
@@ -63,13 +74,31 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       //- composition TWO
       div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
         composition-list(
-          v-if="nodeRubick"
+          v-if="nodeRubick && compositionTwoQuery"
           ref="compositionListTwo"
-          :ctx="ctx" :index="needSwap ? 0 : 1"
-          :thumbUrl="nodeRubick.meta.compositions[needSwap ? 0 : 1].thumbUrl"
-          :compositions="[...compositionsTwo, {preview: nodeRubick.meta.compositions[needSwap ? 0 : 1].thumbUrl, composition: nodeRubickFull ? nodeRubickFull.compositions[needSwap ? 0 : 1] : null}]"
-          :mini="false" :visible="true" :active="true"
+          :ctx="'rubick'" label="two"
+          @next="compositionTwoNextIndex"
+          :compositions="compositionTwoItems"
+          :compositionOid="compositionTwoOid"
+          :nodeOid="nodeRubick ? nodeRubick.oid : node.oid"
+          :mini="false" :visible="compositionsVisible[1]" :active="compositionsActive[1]"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
+        //- actions
+        q-btn(
+          round outline color="green" icon="add" @click="compositionAdd(1)"
+          :style=`{position: 'absolute', zIndex: 2000, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
+      //- debug node
+      div(v-if="true && nodeRubick").row.full-width.bg-red
+        .row.full-width
+          img(
+            :src="nodeRubick.meta.compositions[0].thumbUrl"
+            :style=`{width: '100px', height: '100px', objectFit: 'contain'}`)
+        .row.full-width
+          span {{nodeRubick.name}}
+        .row.full-width
+          img(
+            :src="nodeRubick.meta.compositions[1].thumbUrl"
+            :style=`{width: '100px', height: '100px', objectFit: 'contain'}`)
   actions(
     :node="nodeRubick" :nodeFull="nodeRubickFull" :width="width" :maxWidth="maxWidth"
     @votePanning="votePanning = $event" @voteValue="voteValue = $event"
@@ -92,38 +121,80 @@ export default {
       width: 0,
       compositionIndex: undefined,
       compositionFinderOpened: false,
+      compositionEditorOpened: false,
       compositionOneQuery: null,
+      compositionOneOid: undefined,
       compositionTwoQuery: null,
-      compositionsTwo: [],
+      compositionTwoOid: undefined,
+      compositionsVisible: [true, true],
+      compositionsActive: [true, true],
       nodeRubick: null,
       nodeRubickFull: null,
-      needSwap: false,
-      maxWidth: 500
+      nodeRubickNew: null,
+      nodeRubickNext: null,
+      maxWidth: 600
+    }
+  },
+  computed: {
+    compositionOneItems () {
+      if (!this.compositionOneQuery) return []
+      return this.compositionOneQuery.items.map(node => {
+        let same = this.compositionTwoOid === node.meta.compositions[1].oid
+        let index = same ? 0 : 1
+        return {
+          node: node,
+          preview: node.meta.compositions[index].thumbUrl,
+          composition: null,
+          compositionIndex: index,
+          compositionOid: node.meta.compositions[index].oid
+        }
+      })
+    },
+    compositionTwoItems () {
+      if (!this.compositionTwoQuery) return []
+      return this.compositionTwoQuery.items.map(node => {
+        let same = this.compositionOneOid === node.meta.compositions[0].oid
+        let index = same ? 1 : 0
+        return {
+          node: node,
+          preview: node.meta.compositions[index].thumbUrl,
+          composition: null,
+          compositionIndex: index,
+          compositionOid: node.meta.compositions[index].oid
+        }
+      })
     }
   },
   watch: {
     node: {
       immediate: true,
-      handler (to, from) {
+      async handler (to, from) {
         this.$log('node CHANGED', to)
-        if (to) this.$set(this, 'nodeRubick', JSON.parse(JSON.stringify(to)))
+        if (to && !this.nodeRubick) {
+          this.$set(this, 'nodeRubick', JSON.parse(JSON.stringify(to)))
+          this.compositionOneOid = to.meta.compositions[0].oid
+          this.compositionTwoOid = to.meta.compositions[1].oid
+          this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
+          this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
+        }
       }
     },
     nodeFull: {
       immediate: true,
       handler (to, from) {
         this.$log('nodeFull CHANGED', to)
-        this.$set(this, 'nodeRubickFull', JSON.parse(JSON.stringify(to)))
-        if (to) this.loadRubicks()
-        else this.nodeLoad()
+        if (to && !this.nodeRubickFull) {
+          this.$set(this, 'nodeRubickFull', JSON.parse(JSON.stringify(to)))
+          // TODO load queries
+        }
       }
     },
     nodeRubick: {
       deep: true,
       handler (to, from) {
         this.$log('nodeRubick CHANGED', to)
-        if (to) {
-          if (this.$route.name === 'node') this.$router.push('/node/' + to.oid).catch(e => e)
+        if (to && this.$route.name === 'node') {
+          this.$router.push('/node/' + to.oid).catch(e => e)
         }
       }
     },
@@ -131,61 +202,56 @@ export default {
       deep: true,
       handler (to, from) {
         this.$log('nodeRubickFull CHANGED', to)
-        if (to) this.loadRubicks()
       }
     }
   },
   methods: {
-    loadCompositions () {
-      var compositions = []
-      if (this.compositionOneQuery) {
-        this.compositionOneQuery.items.map(async (i) => {
-          let nodeFull = await this.$store.dispatch('objects/get', { oid: i.oid, priority: 0 })
-          compositions.push({preview: i.meta.compositions[0].thumbUrl, composition: nodeFull.compositions[0]})
-        })
-      }
-      this.compositionsTwo = compositions
-    },
-    async loadRubicks () {
-      this.$log('loadRubicks')
-      let nodeRubickFull = JSON.parse(JSON.stringify(this.nodeRubickFull))
-      if (this.needSwap) {
-        let t = nodeRubickFull.compositions[0]
-        nodeRubickFull.compositions[0] = nodeRubickFull.compositions[1]
-        nodeRubickFull.compositions[1] = t
-      }
-      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 4, pagination: {pageSize: 30}})
-      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: nodeRubickFull, position: 5, pagination: {pageSize: 30}})
-      this.loadCompositions()
-      // TODO load rubicks for nodeName...
-      this.$log('compositionOneQuery', this.compositionOneQuery)
-      this.$log('compositionTwoQuery', this.compositionTwoQuery)
-    },
-    layerFound (l) {
-      this.$log('layerFound', l)
-      this.compositionFinderOpened = false
-      // this.nodeExtending = false
-      // // TODO create new composition then publish a node with this composition...
-      let c = {
-        url: '',
-        name: '',
-        layers: [l],
-        operation: {operations: null, items: [], type: 'CONCAT'}
-      }
-      let nodeNew = JSON.parse(JSON.stringify(this.nodeRubickFull))
-      nodeNew.compositions[this.compositionIndex] = c
-      this.nodePublish(nodeNew)
-    },
     compositionAdd (index) {
       this.$log('compositionAdd', index)
+      this.$set(this.compositionsActive, 0, false)
+      this.$set(this.compositionsActive, 1, false)
       this.compositionIndex = index
       this.compositionFinderOpened = true
     },
-    async compositionRubickClick (node) {
-      this.$log('compositionRubickClick', node)
-      // this.needSwap = node.meta.compositions[0].oid !== this.nodeRubick.meta.compositions[0].oid
+    async compositionFound (composition) {
+      this.$log('compositionFound', composition)
+      this.nodeRubickNew = JSON.parse(JSON.stringify(this.nodeRubickFull))
+      this.nodeRubickNew.compositions[this.compositionIndex] = composition
+      this.compositionEditorOpened = true
+      await this.$wait(300)
+      this.compositionFinderOpened = false
+    },
+    compositionEdited (composition) {
+      this.$log('compositionEdited', composition)
+      this.$set(this.compositionsActive, 0, true)
+      this.$set(this.compositionsActive, 1, true)
+      this.$set(this.nodeRubickNew.compositions, this.compositionIndex, composition)
+      this.$log('compositionEdited: nodeNew', this.nodeRubickNew)
+    },
+    async compositionEditedFinal () {
+      this.$log('compositionEditedFinal', this.nodeRubickNew)
+      await this.nodePublish(this.nodeRubickNew)
+      this.nodeRubickNew = null
+    },
+    async compositionOneNextIndex (index) {
+      this.$log('cONEnext index', index)
+      let node = this.compositionOneItems[index].node
+      let swap = this.compositionOneOid !== node.meta.compositions[0].oid
+      this.$log('cONEnext swap', swap)
       this.nodeRubick = node
-      this.nodeRubickFull = await this.$store.dispatch('objects/get', { oid: node.oid, priority: 0 })
+      this.compositionOneOid = this.compositionOneItems[index].compositionOid
+      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
+      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
+    },
+    async compositionTwoNextIndex (index) {
+      this.$log('cTWOnext index', index)
+      let node = this.compositionTwoItems[index].node
+      let swap = this.compositionTwoOid !== node.meta.compositions[1].oid
+      this.$log('cTWOnext swap', swap)
+      this.nodeRubick = node
+      this.compositionTwoOid = this.compositionTwoItems[index].compositionOid
+      this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
+      this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
     },
     nodeNameClick () {
       this.$log('nodeNameClick')
@@ -194,7 +260,6 @@ export default {
       try {
         this.$log('nodePublish start')
         // this.nodePublishing = true
-        // this.nodePublishCheck(this.node)
         let res = await this.$store.dispatch('node/nodeCreate', node)
         this.$log('res', res)
         this.$log('nodePublish done')
@@ -208,12 +273,6 @@ export default {
         // this.nodePublishing = false
       }
     }
-  },
-  async mounted () {
-    this.$log('mounted')
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
   }
 }
 </script>
