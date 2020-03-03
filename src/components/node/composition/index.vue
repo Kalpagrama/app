@@ -9,7 +9,7 @@ div(
   //-   small.text-white.full-width mini: {{ mini }}
   //- TODO composition menu
   q-btn(
-    v-if="active && !mini"
+    v-if="visible && active && !mini && value"
     round flat color="white" icon="more_vert" @click="menuToggle()"
     :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)'}`)
   //- next tint
