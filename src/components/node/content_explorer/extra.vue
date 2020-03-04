@@ -17,7 +17,7 @@ export default {
   props: ['mode', 'content'],
   data () {
     return {
-      tab: 'info',
+      tab: 'nodes',
       tabs: [
         {id: 'info', name: 'Info'},
         {id: 'nodes', name: 'Nodes'},
