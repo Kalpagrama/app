@@ -125,7 +125,7 @@ export default {
   },
   watch: {
     nodeOid: {
-      immediate: false,
+      immediate: true,
       handler (to, from) {
         // this.$log(this.label, 'nodeOid CHANGED')
         this.compositionsChanged(this.compositions)
@@ -145,17 +145,18 @@ export default {
   },
   methods: {
     compositionsChanged (to) {
-      // this.$log(this.label, 'compositionsChanged')
+      this.$log(this.label, 'compositionsChanged')
       if (to) {
         if (this.ctx === 'rubick') {
           if (!this.rubick) this.rubick = {}
           if (!this.preview) this.preview = to[this.index].preview
           this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-          // this.$log(this.label, 'cCHANGED index', this.index)
+          this.$log(this.label, 'cCHANGED index', this.index)
           if (this.index >= 0) {
             this.rubick.prev = this.index > 0 ? to[this.index - 1] : null
             this.rubick.next = this.index < to.length ? to[this.index + 1] : null
             if (to[this.index].compositionOid !== this.compositionOidOld) {
+              this.$log(this.label, 'cCHANGED CURRENT ###')
               this.rubick.current = to[this.index]
               this.compositionOidOld = this.compositionOid
             }
@@ -188,6 +189,9 @@ export default {
       if (index === undefined) return
       this.ckeyNexting = ckey
       this.$tween.to(this.rubickStyles.current, 0.5, {opacity: 0})
+      this.$wait(400).then(() => {
+        this.rubick.current = this.rubick[ckey]
+      })
       this.$tween.to(
         this.rubickStyles[ckey],
         0.5,
@@ -196,46 +200,24 @@ export default {
           maxWidth: 100,
           maxHeight: this.height,
           opacity: 1,
-          onComplete: () => {
+          onComplete: async () => {
             this.$set(this, 'rubickStyles', JSON.parse(JSON.stringify(this.rubickStylesInitial)))
             this.ckeyNexting = undefined
-            // this.compositionsChanged(this.compositions)
             if (this.ctx === 'rubick') {
               this.compositionOidOld = this.rubick[ckey].compositionOid
-              // let t = this.rubick.current
-              this.rubick.current = this.rubick[ckey]
-              // this.rubick[ckey] = t
+              // this.rubick.current = this.rubick[ckey]
               this.index = index
               this.$emit('next', index)
-              // this.compositionsChanged(this.compositions)
             }
             else {
               let t = this.rubick.current
               this.rubick.current = this.rubick[ckey]
               this.rubick.next = t
-              // if (ckey === 'next') {
-              //   this.rubick.prev = t
-              //   this.rubick.next = null
-              //   this.index = 1
-              // }
-              // else {
-              //   this.rubick.next = t
-              //   this.rubick.prev = null
-              //   this.index = 0
-              // }
-              // this.compositionsChanged(this.compositions)
-              this.$emit('next', index)
+              // this.$emit('next', index)
             }
-            // this.compositionsChanged(this.compositions)
           }
         }
       )
-    },
-    play () {
-      this.$log('play')
-    },
-    pause () {
-      this.$log('pause')
     },
     handleSwipe (e) {
       this.compositionNext(e.direction === 'left' ? 'next' : 'prev')
@@ -263,9 +245,9 @@ export default {
       if (ckey === 'prev') return {left: '0px'}
     },
     async compositionGet (c) {
-      this.$log('compositionGet', c)
+      // this.$log('compositionGet', c)
       let nodeFull = await this.$store.dispatch('objects/get', { oid: c.node.oid, priority: 0 })
-      this.$log('compositionGet: nodeFull', nodeFull)
+      // this.$log('compositionGet: nodeFull', nodeFull)
       c.composition = nodeFull.compositions[c.compositionIndex]
     }
   }
