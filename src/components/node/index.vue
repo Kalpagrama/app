@@ -23,6 +23,15 @@ export default {
   computed: {
   },
   watch: {
+    // node: {
+    //   handler (to, from) {
+    //     if (to && this.nodeFull) {
+    //       if (to.oid !== this.nodeFull.oid) {
+    //         this.nodeLoad()
+    //       }
+    //     }
+    //   }
+    // },
     needFull: {
       immediate: true,
         async handler (to, from) {

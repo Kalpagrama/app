@@ -55,7 +55,7 @@ div(
         ).row.fit
   //- preview compositions
   div(
-    v-if="false && ctx === 'rubick'"
+    v-if="true && ctx === 'rubick'"
     :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
@@ -71,7 +71,7 @@ div(
           draggable="false").fit
   //- preview nodes
   div(
-    v-if="false && ctx === 'rubick'"
+    v-if="true && ctx === 'rubick'"
     :style=`{position: 'absolute', top: '40px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     compositionsChanged (to) {
-      this.$log(this.label, 'compositionsChanged')
+      // this.$log(this.label, 'compositionsChanged')
       if (to) {
         if (this.ctx === 'rubick') {
           if (!this.rubick) this.rubick = {}
@@ -175,8 +175,8 @@ export default {
     },
     compositionNext (ckey) {
       this.$log('compositionNext', ckey)
-      this.$log('compositionNext this.index', this.index)
-      this.$log('compositionNext compositions.length ', this.compositions.length)
+      // this.$log('compositionNext this.index', this.index)
+      // this.$log('compositionNext compositions.length ', this.compositions.length)
       let index
       if (ckey === 'next' && this.index + 1 < this.compositions.length) {
         index = this.index + 1
@@ -185,13 +185,15 @@ export default {
         index = this.index - 1
       }
       this.$log('compositionNext index', index)
-      this.$log('compositionNext this.index', this.index)
+      // this.$log('compositionNext this.index', this.index)
       if (index === undefined) return
       this.ckeyNexting = ckey
       this.$tween.to(this.rubickStyles.current, 0.5, {opacity: 0})
-      this.$wait(400).then(() => {
-        this.rubick.current = this.rubick[ckey]
-      })
+      if (this.ctx === 'rubick') {
+        this.$wait(250).then(() => {
+          this.rubick.current = this.rubick[ckey]
+        })
+      }
       this.$tween.to(
         this.rubickStyles[ckey],
         0.5,
@@ -206,8 +208,8 @@ export default {
             if (this.ctx === 'rubick') {
               this.compositionOidOld = this.rubick[ckey].compositionOid
               // this.rubick.current = this.rubick[ckey]
-              this.index = index
               this.$emit('next', index)
+              this.index = index
             }
             else {
               let t = this.rubick.current
@@ -245,7 +247,7 @@ export default {
       if (ckey === 'prev') return {left: '0px'}
     },
     async compositionGet (c) {
-      // this.$log('compositionGet', c)
+      this.$log('compositionGet', c)
       let nodeFull = await this.$store.dispatch('objects/get', { oid: c.node.oid, priority: 0 })
       // this.$log('compositionGet: nodeFull', nodeFull)
       c.composition = nodeFull.compositions[c.compositionIndex]

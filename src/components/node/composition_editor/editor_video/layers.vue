@@ -32,7 +32,7 @@
     //- .row.full-width.q-px-sm
     //-   .row.full-width.bg-red.text-white
     //-     div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute}}
-    .row.full-width.items-start.content-start.q-pa-sm
+    .row.full-width.items-start.content-start.q-pa-sm.br
       div(
         v-for="(l, li) in layersFiltered" :key="li"
         :class=`{
@@ -119,7 +119,8 @@ export default {
   computed: {
     layersFiltered () {
       return this.layers.filter(l => {
-        return l.figuresAbsolute.length > 0
+        // return l.figuresAbsolute.length > 0
+        return true
       })
     },
     layer () {

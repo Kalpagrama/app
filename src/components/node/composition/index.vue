@@ -19,7 +19,7 @@ div(
   //- preview
   img(
     v-if="preview" ref="compositionPreview" :src="preview" draggable="false"
-    @load="previewLoad" @error="previewError"
+    @load="previewLoad" @error="previewError" @click="previewClick"
     :style=`{
       userSelect: 'none',
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
@@ -120,6 +120,12 @@ export default {
       this.$log('previewError')
       this.$emit('error', 'previewError')
       this.$emit('previewError')
+    },
+    previewClick () {
+      this.$log('previewClick')
+      // if (!this.value) {
+      //   this.$emit('compositionGet')
+      // }
     }
   },
   mounted () {

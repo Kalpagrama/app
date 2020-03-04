@@ -62,7 +62,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :loading="compositionIndex === 0 && nodePublishing"
           :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- name, essence
-      essence(v-if="node && compositionOneQuery && compositionTwoQuery" :node="node" :nodes="[...compositionOneQuery.items, ...compositionTwoQuery.items]")
+      essence(v-if="node && compositionOneQuery && compositionTwoQuery" :node="node" :nodes="[...compositionOneQuery.items, ...compositionTwoQuery.items]"
+        :nodePublish="nodePublish")
       //- composition TWO
       div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
         composition-list(
@@ -126,7 +127,7 @@ export default {
       compositionsVisible: [true, true],
       compositionsActive: [true, true],
       nodeRubickNew: null,
-      nodePublishing: true,
+      nodePublishing: false,
       maxWidth: 600,
       same: true
     }

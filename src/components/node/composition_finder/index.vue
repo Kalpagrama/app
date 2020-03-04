@@ -19,7 +19,7 @@ export default {
   data () {
     return {
       oid: undefined,
-      page: 'contents',
+      page: 'content',
       node: null,
       dialogOpened: false
     }
