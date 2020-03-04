@@ -26,7 +26,7 @@ div(:style=`{position: 'relative', zIndex: 1000}`).row.full-width
         mode="edit"
         :layers="layers" :meta="meta" :player="player"
         @meta="$parent.$emit('meta', $event)")
-    div(v-if="mode !== 'content' && layersContentShow").col.full-height
+    div(v-if="layersContentShow").col.full-height
       layers(
         mode="pick"
         :layers="layersContent" :meta="{layerIndex: -1, mode: 'watch'}" :player="player"

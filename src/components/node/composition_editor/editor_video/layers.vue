@@ -29,12 +29,13 @@
   //- body
   div(
     :style=`{position: 'relative'}`).col.full-width.scroll
-    //- .row.full-width.q-px-sm
-    //-   .row.full-width.bg-red.text-white
-    //-     div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute}}
-    .row.full-width.items-start.content-start.q-pa-sm.br
+    .row.full-width.q-px-sm.bg-red
+      .row.full-width.bg-red.text-white
+        div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute.length}}
+    .row.full-width.items-start.content-start.q-pa-sm
       div(
-        v-for="(l, li) in layersFiltered" :key="li"
+        v-for="(l, li) in layers" :key="li"
+        v-if="l.figuresAbsolute.length > 0"
         :class=`{
           'bg-grey-10': meta.mode === 'watch' || li !== meta.layerIndex,
           'bg-grey-8': meta.mode !== 'watch' && li === meta.layerIndex}`
@@ -119,8 +120,8 @@ export default {
   computed: {
     layersFiltered () {
       return this.layers.filter(l => {
-        // return l.figuresAbsolute.length > 0
-        return true
+        return l.figuresAbsolute.length > 0
+        // return true
       })
     },
     layer () {

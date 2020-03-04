@@ -41,7 +41,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         round flat color="green" icon="link" @click="$router.push('/node/' + node.oid)"
         :style=`{}`)
   //- node wrapper
-  div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-pa-xs
+  div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-xs.q-pt-sm
     div(:style=`{position: 'relative', maxWidth: maxWidth+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
       vote-tint(v-if="votePanning" :voteValue="voteValue")
       //- composition ONE

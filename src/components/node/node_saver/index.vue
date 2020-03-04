@@ -53,10 +53,11 @@ export default {
     node: {
       deep: true,
       handler (to, from) {
+        this.$log('node CHANGED', to)
         if (to) {
           // user changed node
           if (!from || from.revision === to.revision) {
-            // this.$log('User changed node: ', to.revision, to.name)
+            this.$log('User changed node: ', to.revision, to.name)
             this.nodeChanged = true
             this.nodeSaveDebounce()
           }

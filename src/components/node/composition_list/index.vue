@@ -189,11 +189,12 @@ export default {
       if (index === undefined) return
       this.ckeyNexting = ckey
       this.$tween.to(this.rubickStyles.current, 0.5, {opacity: 0})
-      if (this.ctx === 'rubick') {
-        this.$wait(250).then(() => {
-          this.rubick.current = this.rubick[ckey]
-        })
-      }
+      let t = this.rubick.current
+      this.$wait(250).then(() => {
+        this.rubick.current = this.rubick[ckey]
+      })
+      // if (this.ctx === 'rubick') {
+      // }
       this.$tween.to(
         this.rubickStyles[ckey],
         0.5,
@@ -212,8 +213,8 @@ export default {
               this.index = index
             }
             else {
-              let t = this.rubick.current
-              this.rubick.current = this.rubick[ckey]
+              // let t = this.rubick.current
+              // this.rubick.current = this.rubick[ckey]
               this.rubick.next = t
               // this.$emit('next', index)
             }
