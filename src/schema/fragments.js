@@ -20,7 +20,7 @@ const metaFragment = gql`
     }
     ...on MetaContent{
       type
-      uploadedFileInfo
+      uploadedInfo
     }
     ... on MetaComposition {...metaComposition}
   }

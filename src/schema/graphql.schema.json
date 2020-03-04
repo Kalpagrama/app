@@ -4620,7 +4620,7 @@
             "deprecationReason": null
           },
           {
-            "name": "uploadedFileInfo",
+            "name": "uploadedInfo",
             "description": "информация о загруженном файле(кусочке фрагмента). Сейчас === null, тк\nитоговый фрагмент не компилируется (вместо этого используются катсы + политика\nих воспроизведения)",
             "args": [],
             "type": {
@@ -4820,7 +4820,7 @@
             "deprecationReason": null
           },
           {
-            "name": "uploadedFileInfo",
+            "name": "uploadedInfo",
             "description": "информация о загруженном файле(кусочке фрагмента)",
             "args": [],
             "type": {
@@ -7041,7 +7041,7 @@
             "deprecationReason": null
           },
           {
-            "name": "uploadedFileInfo",
+            "name": "uploadedInfo",
             "description": "информация о загруженном контенте",
             "args": [],
             "type": {
