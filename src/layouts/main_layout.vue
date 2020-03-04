@@ -13,11 +13,10 @@ q-layout( view="hHh Lpr lff")
   kalpa-action
   q-drawer(
     v-model="drawerShow"
-    show-if-above mini-to-overlay no-swipe-open no-swipe-close
-    @mouseover="drawerMini = false" @mouseout="drawerMini = true"
-    :mini="drawerMini" :width="$q.screen.width/2 < 260 ? $q.screen.width/2 : 260" :breakpoint="500"
+    no-swipe-open no-swipe-close show-if-above
+    :width="60" :breakpoint="1000"
     content-class="bg-grey-8")
-    kalpa-menu-desktop(v-if="!loading" :mini="$q.screen.xs ? false : drawerMini")
+    kalpa-menu-desktop(v-if="!loading" :mini="$q.screen.xs ? false : drawerMini" :style=`{zIndex: 10000}`)
   q-btn(
     round flat color="white" icon="menu" @click="drawerShow = !drawerShow"
     :style=`{position: 'fixed', left: '16px', bottom: '16px', zIndex: 10000, background: 'rgba(0,0,0,0.2)'}`).xs
@@ -41,7 +40,7 @@ export default {
       height: 0,
       me: null,
       player: null,
-      drawerShow: false,
+      drawerShow: true,
       drawerMini: true
     }
   },

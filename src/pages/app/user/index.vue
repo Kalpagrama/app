@@ -39,13 +39,12 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`).bg-grey-10
   //-         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
   //-           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
   //-           q-btn(v-else round flat @click="save()" color="white" icon="done")
-  q-header()
-    div(v-if="user" :style=`{paddingLeft: $q.screen.gt.xs ? '60px' : '0px'}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
+  q-header(:style=`{zIndex: 200}`)
+    div(v-if="user" :style=`{paddingLeft: $q.screen.gt.xs ? '70px' : '0px', zIndex: 500}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
       div().row.full-width.q-pa-xs
         //- <input type="file" @change="previewFiles" multiple>
         .row.full-width
-          img(:src="user.profile.thumbUrl" @click="changePhoto()"
-            :style=`{width: '50px', height: '50px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-7
+          kalpa-avatar(v-if="user" :url="user.profile.thumbUrl")
           .col
             .row.fit.items-center.content-center.q-px-md
               span.text-bold.text-white {{ user.name }}
