@@ -22,7 +22,7 @@ div(
       div(@click="$router.push('/')").col.row.items-center
         //- mini box: width kalpagramma logo
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-          k-logo(:width="40" :height="40").cursor-pointer
+          kalpa-spinner(:width="40" :height="40").cursor-pointer
         //- home page name, or kalpagramma name?
         div(v-if="!mini").col.full-height
           .row.fit.items-center
@@ -32,17 +32,7 @@ div(
       //-   q-btn(round flat icon="settings" color="white")
     //- user
     div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid).catch(e => e)").row.full-width
-      //- mini box with user avatar
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
-        img(
-          v-show="!userAvatarErrored"
-          @error="userAvatarError"
-          :src="$store.getters.currentUser.profile.thumbUrl"
-          :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`).cursor-pointer
-        div(
-          v-if="userAvatarErrored"
-          :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`
-          ).row.bg-grey-3.cursor-pointer
+      kalpa-avatar(:url="$store.getters.currentUser.profile.thumbUrl")
       //- user name, max 50?
       div(v-if="!mini").col.full-height
         .row.fit.items-center

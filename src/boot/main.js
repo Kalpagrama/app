@@ -84,8 +84,9 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('nodeSpheres', () => import('components/node/spheres'))
     Vue.component('nodeSpheresEditor', () => import('components/node/spheres_editor'))
     // kalpa
-    Vue.component('kalpaLogo', () => import('components/k_logo'))
+    Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
     Vue.component('kalpaAction', () => import('components/kalpa/action'))
+    Vue.component('kalpaAvatar', () => import('components/kalpa/avatar'))
     Vue.component('kalpaLoader', () => import('components/kalpa/loader'))
     Vue.component('kalpaButtons', () => import('components/kalpa/buttons'))
     Vue.component('kalpaLogo', () => import('components/kalpa/logo'))

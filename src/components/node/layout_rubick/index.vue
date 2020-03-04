@@ -81,7 +81,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :loading="compositionIndex === 1 && nodePublishing"
           :style=`{position: 'absolute', zIndex: 2000, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- debug node
-      div(v-if="node && false").row.full-width.bg-red
+      div(v-if="node && true").row.full-width.bg-red
         .row.full-width
           img(
             :src="node.meta.compositions[0].thumbUrl"
