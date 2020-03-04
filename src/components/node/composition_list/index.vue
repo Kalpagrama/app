@@ -44,7 +44,7 @@ div(
   //- preview list
   div(
     v-if="true && ctx === 'rubick' && compositions.length > 1"
-    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-px-sm
+    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-px-sm
     div(
       v-for="(c,ci) in compositions" :key="ci"
       :style=`{height: '4px'}`
@@ -56,7 +56,7 @@ div(
   //- preview compositions
   div(
     v-if="true && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
+    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"
@@ -72,7 +72,7 @@ div(
   //- preview nodes
   div(
     v-if="true && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '40px', zIndex: 3500, pointerEvents: 'none', opacity: 0.5}`).row.full-width.scroll.q-pa-sm
+    :style=`{position: 'absolute', top: '40px', zIndex: 3500, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"
