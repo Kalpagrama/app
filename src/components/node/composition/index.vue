@@ -9,7 +9,7 @@ div(
   //-   small.text-white.full-width mini: {{ mini }}
   //- TODO composition menu
   q-btn(
-    v-if="active && !mini"
+    v-if="visible && active && !mini && value"
     round flat color="white" icon="more_vert" @click="menuToggle()"
     :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)'}`)
   //- next tint
@@ -19,7 +19,7 @@ div(
   //- preview
   img(
     v-if="preview" ref="compositionPreview" :src="preview" draggable="false"
-    @load="previewLoad" @error="previewError"
+    @load="previewLoad" @error="previewError" @click="previewClick"
     :style=`{
       userSelect: 'none',
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
@@ -120,6 +120,12 @@ export default {
       this.$log('previewError')
       this.$emit('error', 'previewError')
       this.$emit('previewError')
+    },
+    previewClick () {
+      this.$log('previewClick')
+      // if (!this.value) {
+      //   this.$emit('compositionGet')
+      // }
     }
   },
   mounted () {

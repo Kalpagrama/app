@@ -37,12 +37,11 @@
 </template>
 
 <script>
-import contentFinder from 'components/content/finder'
 import wsContent from './ws_content'
 
 export default {
   name: 'wsContents',
-  components: {contentFinder, wsContent},
+  components: {wsContent},
   props: ['ctx'],
   data () {
     return {
@@ -100,9 +99,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
   }
 }
 </script>

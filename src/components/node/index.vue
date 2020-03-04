@@ -8,14 +8,13 @@ component(
 
 <script>
 import nodeLayoutPip from './layout_pip'
-import nodeLayoutOpened from './layout_opened'
 import nodeLayoutRubick from './layout_rubick'
 import nodeLayoutByte from './layout_byte'
 
 export default {
   name: 'nodeIndex',
   props: ['ctx', 'index', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'active', 'layout'],
-  components: {nodeLayoutPip, nodeLayoutOpened, nodeLayoutRubick, nodeLayoutByte},
+  components: {nodeLayoutPip, nodeLayoutRubick, nodeLayoutByte},
   data () {
     return {
       nodeFull: null
@@ -24,6 +23,15 @@ export default {
   computed: {
   },
   watch: {
+    // node: {
+    //   handler (to, from) {
+    //     if (to && this.nodeFull) {
+    //       if (to.oid !== this.nodeFull.oid) {
+    //         this.nodeLoad()
+    //       }
+    //     }
+    //   }
+    // },
     needFull: {
       immediate: true,
         async handler (to, from) {

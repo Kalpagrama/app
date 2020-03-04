@@ -151,20 +151,20 @@ const queryAccumulator = new QueryAccumulator()
 // priority 0 - будут выполнены 20 последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
 // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
 export const get = async (context, { oid, priority }) => {
-  logD('objects/get action start', { oid, priority })
+  // logD('objects/get action start', { oid, priority })
   priority = priority || 0
   const fetchItemFunc = async () => {
     let promise = queryAccumulator.push(context, oid, priority)
     return await promise
   }
   let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
-  logD('objects/get action complete', oid)
+  // logD('objects/get action complete', oid)
   return objectFull
 }
 
 // моментально изменит объект во вьюикс и запланирует изменения на сервере
 export const update = async (context, { oid, path, newValue, setter, actualAge }) => {
-  logD('objects/update action start', oid)
+  // logD('objects/update action start', oid)
   if (path === 'profile.thumbUrl') {
     let file = newValue
     const toBase64 = file => new Promise((resolve, reject) => {
@@ -216,6 +216,6 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
     fetchItemFunc,
     mergeItemFunc
   }, {root: true})
-  logD('objects/update action complete', oid)
+  // logD('objects/update action complete', oid)
   return updatedItem
 }

@@ -6,7 +6,7 @@
     ws-menu(
       ctx="finder"
       :header="false" :toggle="false" :oid="oid"
-      :pages="['contents', 'compositions']"
+      :pages="['content', 'composition']"
       @item="itemClick" @page="pageClick" :page="page")
 </template>
 
@@ -19,7 +19,7 @@ export default {
   data () {
     return {
       oid: undefined,
-      page: 'contents',
+      page: 'content',
       node: null,
       dialogOpened: false
     }

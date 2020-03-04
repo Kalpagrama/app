@@ -37,13 +37,13 @@ div(
       v-if="c"
       :ctx="ctx"
       :value="c.composition" :preview="c.preview"
-      :visible="ckey === 'current'" :active="active && ckey === 'current'" :mini="isMini(ckey)"
+      :visible="visible && ckey === 'current'" :active="active && ckey === 'current'" :mini="isMini(ckey)"
       @next="compositionNext(ckey)"
       @compositionGet="compositionGet(c, ci)")
       //- ckey === 'current'
   //- preview list
   div(
-    v-if="true && ctx === 'rubick'"
+    v-if="true && ctx === 'rubick' && compositions.length > 1"
     :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none'}`).row.full-width.scroll.q-px-sm
     div(
       v-for="(c,ci) in compositions" :key="ci"
@@ -92,6 +92,8 @@ div(
 </template>
 
 <script>
+import { debounce } from 'quasar'
+
 export default {
   name: 'compositionList',
   props: {
@@ -122,58 +124,59 @@ export default {
     }
   },
   watch: {
-    compositions: {
+    nodeOid: {
       immediate: true,
       handler (to, from) {
-        this.$log(this.label, 'cCHANGED', to)
-        if (to) {
-          if (this.ctx === 'rubick') {
-            if (from) {
-              this.$log(this.label, 'cCHANGED FROM')
-              this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-              this.$log(this.label, 'cCHANGED index', this.index)
-              if (this.index >= 0) {
-                this.rubick.prev = this.index > 0 ? to[this.index - 1] : null
-                this.rubick.next = this.index < to.length ? to[this.index + 1] : null
-                // this.rubick.current = to[this.index]
-                if (to[this.index].compositionOid !== this.compositionOidOld) {
-                  this.rubick.current = to[this.index]
-                  this.compositionOidOld = this.compositionOid
-                }
-              }
-            }
-            else {
-              this.$log(this.label, 'cCHANGED NEW')
-              this.index = to.findIndex(i => i.node.oid === this.nodeOid)
-              this.$log(this.label, 'cCHANGED index', this.index)
-              if (this.index >= 0) {
-                if (!this.preview) this.preview = to[this.index].preview
-                this.rubick = {
-                  prev: this.index > 0 ? to[this.index - 1] : null,
-                  current: to[this.index],
-                  next: this.index < to.length ? to[this.index + 1] : null
-                }
-              }
-            }
-          }
-          else {
-            this.$log(this.label, 'cCHANGED list')
-            if (!this.preview) this.preview = to[0].preview
-            this.rubick = {
-              prev: null,
-              current: to[0],
-              next: to[1]
-            }
-          }
-        }
+        // this.$log(this.label, 'nodeOid CHANGED')
+        this.compositionsChanged(this.compositions)
+      }
+    },
+    compositions: {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        // this.$log(this.label, 'compositions CHANGED')
+        this.compositionsChanged(to)
       }
     }
   },
+  created () {
+    // this.compositionsChanged = debounce(this.compositionsChanged, 300)
+  },
   methods: {
+    compositionsChanged (to) {
+      // this.$log(this.label, 'compositionsChanged')
+      if (to) {
+        if (this.ctx === 'rubick') {
+          if (!this.rubick) this.rubick = {}
+          if (!this.preview) this.preview = to[this.index].preview
+          this.index = to.findIndex(i => i.node.oid === this.nodeOid)
+          this.$log(this.label, 'cCHANGED index', this.index)
+          if (this.index >= 0) {
+            this.rubick.prev = this.index > 0 ? to[this.index - 1] : null
+            this.rubick.next = this.index < to.length ? to[this.index + 1] : null
+            if (to[this.index].compositionOid !== this.compositionOidOld) {
+              this.$log(this.label, 'cCHANGED CURRENT ###')
+              this.rubick.current = to[this.index]
+              this.compositionOidOld = this.compositionOid
+            }
+          }
+        }
+        else {
+          // this.$log(this.label, 'cCHANGED list')
+          if (!this.preview) this.preview = to[0].preview
+          this.rubick = {
+            prev: null,
+            current: to[0],
+            next: to[1]
+          }
+        }
+      }
+    },
     compositionNext (ckey) {
       this.$log('compositionNext', ckey)
-      this.$log('compositionNext this.index', this.index)
-      this.$log('compositionNext compositions.length ', this.compositions.length)
+      // this.$log('compositionNext this.index', this.index)
+      // this.$log('compositionNext compositions.length ', this.compositions.length)
       let index
       if (ckey === 'next' && this.index + 1 < this.compositions.length) {
         index = this.index + 1
@@ -182,10 +185,16 @@ export default {
         index = this.index - 1
       }
       this.$log('compositionNext index', index)
-      this.$log('compositionNext this.index', this.index)
+      // this.$log('compositionNext this.index', this.index)
       if (index === undefined) return
       this.ckeyNexting = ckey
       this.$tween.to(this.rubickStyles.current, 0.5, {opacity: 0})
+      let t = this.rubick.current
+      this.$wait(250).then(() => {
+        this.rubick.current = this.rubick[ckey]
+      })
+      // if (this.ctx === 'rubick') {
+      // }
       this.$tween.to(
         this.rubickStyles[ckey],
         0.5,
@@ -194,41 +203,24 @@ export default {
           maxWidth: 100,
           maxHeight: this.height,
           opacity: 1,
-          onComplete: () => {
+          onComplete: async () => {
             this.$set(this, 'rubickStyles', JSON.parse(JSON.stringify(this.rubickStylesInitial)))
             this.ckeyNexting = undefined
             if (this.ctx === 'rubick') {
               this.compositionOidOld = this.rubick[ckey].compositionOid
-              // let t = this.rubick.current
-              this.rubick.current = this.rubick[ckey]
-              // this.rubick[ckey] = t
-              this.index = index
+              // this.rubick.current = this.rubick[ckey]
               this.$emit('next', index)
+              this.index = index
             }
             else {
-              let t = this.rubick.current
-              this.rubick.current = this.rubick[ckey]
-              if (ckey === 'next') {
-                this.rubick.prev = t
-                this.rubick.next = null
-                this.index = 1
-              }
-              else {
-                this.rubick.next = t
-                this.rubick.prev = null
-                this.index = 0
-              }
-              this.$emit('next', index)
+              // let t = this.rubick.current
+              // this.rubick.current = this.rubick[ckey]
+              this.rubick.next = t
+              // this.$emit('next', index)
             }
           }
         }
       )
-    },
-    play () {
-      this.$log('play')
-    },
-    pause () {
-      this.$log('pause')
     },
     handleSwipe (e) {
       this.compositionNext(e.direction === 'left' ? 'next' : 'prev')
@@ -258,7 +250,7 @@ export default {
     async compositionGet (c) {
       this.$log('compositionGet', c)
       let nodeFull = await this.$store.dispatch('objects/get', { oid: c.node.oid, priority: 0 })
-      this.$log('compositionGet: nodeFull', nodeFull)
+      // this.$log('compositionGet: nodeFull', nodeFull)
       c.composition = nodeFull.compositions[c.compositionIndex]
     }
   }

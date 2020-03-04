@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf")
   q-page-container.bg-grey-10
-    node(v-if="node" ctx="explorer" :node="node" :needFull="true" :visible="true" :active="true" layout="opened")
+    node(v-if="node" ctx="explorer" :node="node" :needFull="true" :visible="true" :active="true" layout="rubick")
 </template>
 
 <script>

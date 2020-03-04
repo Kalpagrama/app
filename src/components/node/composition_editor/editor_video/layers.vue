@@ -29,12 +29,13 @@
   //- body
   div(
     :style=`{position: 'relative'}`).col.full-width.scroll
-    //- .row.full-width.q-px-sm
-    //-   .row.full-width.bg-red.text-white
-    //-     div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute}}
+    .row.full-width.q-px-sm.bg-red
+      .row.full-width.bg-red.text-white
+        div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute.length}}
     .row.full-width.items-start.content-start.q-pa-sm
       div(
-        v-for="(l, li) in layersFiltered" :key="li"
+        v-for="(l, li) in layers" :key="li"
+        v-if="l.figuresAbsolute.length > 0"
         :class=`{
           'bg-grey-10': meta.mode === 'watch' || li !== meta.layerIndex,
           'bg-grey-8': meta.mode !== 'watch' && li === meta.layerIndex}`
@@ -58,8 +59,8 @@
               div(v-if="l.spheres.length > 0").col.full-height
                 .row.fit.items-center.content-center.q-px-sm
                   span(v-if="l.spheres.length > 0").text-white {{ l.spheres[0].name }}
-              q-btn(round flat dense color="white" icon="edit" @click="layerNameSetStart(l,li)").q-mx-sm
-              span(v-if="l.spheres.length === 0").text-grey-5 Set layer name
+              q-btn(v-if="li === meta.layerIndex" round flat dense color="white" icon="edit" @click="layerNameSetStart(l,li)").q-mx-sm
+              span(v-if="li === meta.layerIndex && l.spheres.length === 0").text-grey-5 Set layer name
             //- name EDIT
             div(
               v-if="li === layerNameSetting"
@@ -71,7 +72,7 @@
                     autofocus
                     @keyup.enter="layerNameSet(l,li)" @blur="layerNameSet(l, li)"
                     :style=`{background: 'none', color: 'white'}`).kinput.full-width
-              q-btn(round flat dense color="white" icon="check" @click="layerNameSet(l,li)").q-mx-sm
+              q-btn(v-if="li === meta.layerIndex" round flat dense color="white" icon="check" @click="layerNameSet(l,li)").q-mx-sm
           div(:style=`{width: '83px'}`).row.full-height.justify-center.items-center.content-center
             span.text-white {{ $time(l.figuresAbsolute[0].t) }}
           div(:style=`{width: '83px'}`).row.full-height.justify-center.items-center.content-center
@@ -85,6 +86,11 @@
           div(
             v-if="mode === 'edit'"
             :style=`{height: '50px'}`).row.full-width.items-center.content-end.justify-end
+            q-btn(
+              round dense
+              :color="li === meta.layerIndexPlay ? 'red' : 'green'"
+              :icon="li === meta.layerIndexPlay ? 'pause' : 'play_arrow'").q-mx-sm
+            .col.full-height
             q-btn(
               v-if="layers.length > 1"
               round flat color="red" icon="delete_outline" @click="layerDelete(li)").q-mr-sm
@@ -115,6 +121,7 @@ export default {
     layersFiltered () {
       return this.layers.filter(l => {
         return l.figuresAbsolute.length > 0
+        // return true
       })
     },
     layer () {

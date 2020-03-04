@@ -40,7 +40,7 @@ import layers from './layers'
 export default {
   name: 'compositionEditorVideo',
   components: {layerEditor, layers},
-  props: ['ctx', 'composition', 'player', 'meta'],
+  props: ['ctx', 'mode', 'composition', 'player', 'meta'],
   data () {
     return {
       layerInitialLength: 10,

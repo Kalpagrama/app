@@ -62,6 +62,7 @@ export default {
     nodeMiddle: {
       handler (to, from) {
         this.$log('nodeMiddle CHANGED', to)
+        this.$emit('nodeMiddle', to)
       }
     }
   },

@@ -12,27 +12,17 @@
 div(
   :style=`{minHeight: '60px'}`
   ).row.full-width.items-start.content-start
-  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.scroll
-    .row.no-wrap
-      span(
-        v-for="(c, ci) in categories" :key="ci" @click="categorySet(c, ci)"
-        v-if="c.type !== 'ALL'"
-        :class=`{
-          'bg-green': c.type === node.category,
-          'text-bold': c.type === node.category
-        }`
-        :style=`{
-          color: 'white', whiteSpace: 'nowrap', textTransform: 'capitalize',
-          borderRadius: '10px', overflow: 'hidden'}`
-        ).cursor-pointer.q-pa-sm.q-mr-sm {{ c.sphere.name }}
-  div().row.full-width
+  //- input find/add
+  div(
+    v-if="mode === 'edit'"
+    ).row.full-width
     input(
       v-model="sphere" placeholder="Find or add sphere"
       @keyup.enter="sphereAdd"
       :style=`{minHeight: '60px', borderRadius: '10px'}`).kinput.full-width.bg-grey-4
   //- spheres WS
   div(
-    v-if="sphere.length > 0"
+    v-if="false && mode === 'edit' && sphere.length > 0"
     ).row.full-width.items-start.content-start.q-py-sm
     span(
       v-for="(s,si) in spheresWSFiltered" :key="si" @click="sphereAdd(s,si)"
@@ -44,13 +34,17 @@ div(
       :style=`{borderRadius: '10px', overflow: 'hidden'}`) Add: {{ sphere }}
   //- spheres NODE
   .row.full-width.items-start.content-start.q-py-sm
+    //- span(
+    //-   v-if="mode === 'watch'"
+    //-   :style=`{textTransform: 'capitalize', borderRadius: '10px', overflow: 'hidden'}`
+    //- ).q-pa-sm.q-mr-sm.q-mb-sm.text-white.bg-green {{ categoryHuman(node.category) }}
     span(
       v-for="(s, si) in spheres" :key="si"
       :class=`{'full-width': si === sphereIndex}`
       :style=`{
         position: 'relative', color: 'white', borderRadius: '10px', userSelect: 'none',
         overflow: 'hidden', whiteSpace: 'nowrap'}`
-      ).bg-grey-9.q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer {{ s.name }}
+      ).bg-grey-8.q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer {{ s.name }}
       //- inactive sphere
       div(
         v-if="si !== sphereIndex" @click="sphereClick(s,si)"
@@ -64,14 +58,17 @@ div(
         q-btn(round flat dense color="red" icon="delete_outline" @click="sphereDelete(s,si)")
         .col
         q-btn(
-          color="green" no-caps @click="sphereExplore(s, si)"
+          push color="green" no-caps @click="sphereExplore(s, si)"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`) Explore
 </template>
 
 <script>
 export default {
-  name: 'nodeEditorSpheres',
-  props: ['node'],
+  name: 'nodeSpheresEditor',
+  props: {
+    node: {type: Object},
+    mode: {type: String, default () { return 'watch' }}
+  },
   data () {
     return {
       sphere: '',
@@ -87,20 +84,20 @@ export default {
       return this.spheresWS.filter(i => {
         return i.name.includes(this.sphere)
       })
-    },
-    categories () {
-      return this.$store.state.node.categories
     }
   },
   methods: {
-    categorySet (c, ci) {
-      this.$log('categorySet', c, ci)
-      this.node.category = c.type
-      this.sphereIndex = -1
+    categoryHuman (type) {
+      return this.categories.find(i => i.type === type).name
     },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
-      this.sphereIndex = si
+      if (this.mode === 'watch') {
+        this.sphereExplore(s, si)
+      }
+      if (this.mode === 'edit') {
+        this.sphereIndex = si
+      }
     },
     sphereAdd () {
       this.$log('sphereAdd')
@@ -111,8 +108,9 @@ export default {
     },
     sphereExplore (s, si) {
       this.$log('sphereExplore', s, si)
-      this.sphereIndex = -1
-      this.$router.push('/sphere/' + s.oid).catch(e => e)
+      // this.sphereIndex = -1
+      this.$emit('explore', s)
+      // this.$router.push('/sphere/' + s.oid).catch(e => e)
     },
     sphereDelete (s, si) {
       this.$log('sphereDelete')
@@ -130,7 +128,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.spheresWSget()
+    if (this.ctx === 'edit') {
+      this.spheresWSget()
+    }
   }
 }
 </script>

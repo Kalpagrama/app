@@ -1,8 +1,5 @@
 <template lang="pug">
-div(:style=`{height: $q.screen.height+'px'}`).row.full-width
-  composition(
-    v-if="content"
-    ctx="workspace" :value="{layers: [{content, figuresAbsolute: [], figuresRelative: [], spheres: []}]}" :visible="true" :active="true" :mini="false")
+content-explorer(v-if="content" :content="content")
 </template>
 
 <script>
@@ -14,6 +11,8 @@ export default {
     return {
       content: null
     }
+  },
+  computed: {
   },
   watch: {
     $route: {
@@ -29,14 +28,6 @@ export default {
     }
   },
   methods: {
-    async contentFound (content) {
-      this.$log('contentFound', content)
-      // add content to ws
-      let res = await this.$store.dispatch('workspace/wsItemAdd', content.oid)
-      this.$log('res', res)
-      // go to content/oid
-      this.$router.push('/content/' + content.oid)
-    },
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
       let content = await this.$store.dispatch('objects/get', { oid, priority: 0 })

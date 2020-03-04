@@ -29,27 +29,27 @@ div(
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
-        q-btn(round :flat="page !== 'spheres'" color="green" icon="style" @click="$emit('page', 'spheres')")
+        q-btn(round :flat="page !== 'sphere'" color="green" icon="style" @click="$emit('page', 'sphere')")
       div(
         :style=`{height: '60px', width: '60px'}`
         ).row.items-center.justify-center
-        q-btn(round :flat="page !== 'settings'" color="green" icon="settings" @click="$emit('page', 'settings')")
+        q-btn(round :flat="page !== 'setting'" color="green" icon="settings" @click="$emit('page', 'setting')")
     kalpa-buttons(:value="pagesFiltered" :id="page" idKey="id" @id="$emit('page', $event)")
     .col.full-width
-      component(:is="`ws-`+page" @item="$emit('item', $event)" @add="$emit('add')" :ctx="ctx")
+      component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('add')" :ctx="ctx")
 </template>
 
 <script>
-import wsNotes from './ws_notes'
-import wsContents from './ws_contents'
-import wsCompositions from './ws_compositions'
-import wsNodes from './ws_nodes'
-import wsSpheres from './ws_spheres'
-import wsSettings from './ws_settings'
+import wsNoteList from './ws_note_list'
+import wsContentList from './ws_content_list'
+import wsCompositionList from './ws_composition_list'
+import wsNodeList from './ws_node_list'
+import wsSphereList from './ws_sphere_list'
+import wsSettingList from './ws_setting_list'
 
 export default {
   name: 'wsMenu',
-  components: {wsNotes, wsContents, wsCompositions, wsNodes, wsSpheres, wsSettings},
+  components: {wsNoteList, wsContentList, wsCompositionList, wsNodeList, wsSphereList, wsSettingList},
   props: {
     page: {
       type: String
@@ -63,7 +63,7 @@ export default {
     pages: {
       type: Array,
       default () {
-        return ['notes', 'contents', 'compositions', 'nodes']
+        return ['note', 'content', 'composition', 'node']
       }
     }
   },
@@ -72,10 +72,10 @@ export default {
       opened: true,
       width: 400,
       pagesRaw: [
-        {id: 'notes', name: 'Notes'},
-        {id: 'contents', name: 'Contents'},
-        {id: 'compositions', name: 'Compositions'},
-        {id: 'nodes', name: 'Nodes'}
+        {id: 'note', name: 'Notes'},
+        {id: 'content', name: 'Contents'},
+        {id: 'composition', name: 'Compositions'},
+        {id: 'node', name: 'Nodes'}
       ]
     }
   },

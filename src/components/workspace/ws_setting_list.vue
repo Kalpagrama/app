@@ -23,7 +23,7 @@
 
 <script>
 export default {
-  name: 'wsSettings',
+  name: 'wsSettingList',
   data () {
     return {
     }

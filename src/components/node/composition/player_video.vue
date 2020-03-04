@@ -429,7 +429,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.playerDestroy()
+    // this.playerDestroy()
   }
 }
 </script>

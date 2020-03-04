@@ -76,34 +76,16 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.prototype.$isInteger = (num) => {
       return (num ^ 0) === num
     }
-    // layout
-    // Vue.component('kPage', () => import('components/k_page'))
-    // Vue.component('kMenuDesktop', () => import('components/k_menu_desktop'))
-    // Vue.component('kMenuMobile', () => import('components/k_menu_mobile'))
-    // Vue.component('kSplit', () => import('components/k_split'))
-    // Vue.component('kColls', () => import('components/k_colls'))
-    // Vue.component('kCollsTabs', () => import('components/k_colls_tabs'))
-    // Vue.component('kCollsNew', () => import('components/k_colls_new'))
     // node
     Vue.component('node', () => import('components/node'))
-    // Vue.component('nodeLoader', () => import('components/node_loader'))
+    Vue.component('nodeSaver', () => import('components/node/node_saver'))
+    Vue.component('nodeEditor', () => import('components/node/node_editor'))
     Vue.component('nodeList', () => import('components/node_list'))
-    Vue.component('nodeListByte', () => import('components/node/list_byte'))
-    // Vue.component('nodeDialog', () => import('components/k_node_dialog'))
-    // dialogs
-    // Vue.component('kDialogMini', () => import('components/k_dialog_mini'))
-    // Vue.component('kDialogBottom', () => import('components/k_dialog_bottom'))
-    // Vue.component('kDialogTutorial', () => import('components/k_dialog_tutorial'))
-    // Vue.component('kInvite', () => import('components/k_invite'))
-    // helpers
-    // Vue.component('kSpinner', () => import('components/k_spinner'))
-    Vue.component('kLogo', () => import('components/k_logo'))
-    // Vue.component('anvil', () => import('components/k_icons/anvil'))
-    // Vue.component('kImg', () => import('components/k_img'))
+    Vue.component('nodeSpheres', () => import('components/node/spheres'))
+    Vue.component('nodeSpheresEditor', () => import('components/node/spheres_editor'))
     // kalpa
+    Vue.component('kalpaLogo', () => import('components/k_logo'))
     Vue.component('kalpaAction', () => import('components/kalpa/action'))
-    // Vue.component('kalpaColls', () => import('components/kalpa/colls'))
-    // Vue.component('kalpaIcon', () => import('components/kalpa/icon'))
     Vue.component('kalpaLoader', () => import('components/kalpa/loader'))
     Vue.component('kalpaButtons', () => import('components/kalpa/buttons'))
     Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
@@ -111,13 +93,20 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kalpaMenuMobile', () => import('components/kalpa/menumobile'))
     Vue.component('kalpaSpinner', () => import('components/kalpa/spinner'))
     Vue.component('kalpaTutorial', () => import('components/kalpa/tutorial'))
-    // new
+    Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))
+    // ws
     Vue.component('wsMenu', () => import('components/workspace/ws_menu'))
+    // Vue.component('noteEditor', () => import('components/'))
+    // composition
     Vue.component('composition', () => import('components/node/composition'))
     Vue.component('compositionList', () => import('components/node/composition_list'))
     Vue.component('compositionFinder', () => import('components/node/composition_finder'))
     Vue.component('compositionEditor', () => import('components/node/composition_editor'))
-    // Vue.component('nodeListByte', () => import('components/node/list_byte'))
+    // content
+    Vue.component('content', () => import('components/node/content'))
+    Vue.component('contentFinder', () => import('components/node/content_finder'))
+    Vue.component('contentEditor', () => import('components/node/content_editor'))
+    Vue.component('contentExplorer', () => import('components/node/content_explorer'))
   } catch (err) {
     logE(err)
   }
