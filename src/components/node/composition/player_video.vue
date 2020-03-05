@@ -49,7 +49,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
       v-show="!mini"
       round flat color="white" @click="videoToggleMuted()"
       :icon="muted ? 'volume_off' : 'volume_up'"
-      :style=`{position: 'absolute', zIndex: 300, left: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
+      :style=`{position: 'absolute', zIndex: 300, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
     player-video-progress(v-show="progressShow" :now="now" :duration="duration" :player="player" :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause" :meta="meta" @meta="onMeta")
   slot(name="editor" :meta="meta" :player="player")
 </template>
@@ -280,6 +280,7 @@ export default {
       this.$log('videoToggleMuted')
       // centralized volume settings, except ios safari...
       this.muted = !this.muted
+      this.player.setMuted(this.muted)
     },
     async videoMove () {
       if (!this.fullscreen) return
@@ -363,6 +364,9 @@ export default {
         }
         this.player.remove = () => {
           // TODO
+        }
+        this.player.setMuted = () => {
+          // if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.paus
         }
         this.videoUpdate()
         // this.videoPlay()

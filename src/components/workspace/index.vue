@@ -1,14 +1,20 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
   //- nodeEditor dialog for mobile
-  //- q-dialog(v-model="pageDialogOpened" :maximized="true")
-  //-   div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
-  //-     q-btn(
-  //-       round flat color="green" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
-  //-       :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: '16px', background: 'rgba(0,0,0,0.2)'}`)
-  //-     node-saver(:value="$store.state.workspace.item").fit
-  //-       template(v-slot:editor=`{node, saving}`)
-  //-         component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving")
+  q-dialog(v-model="pageDialogOpened" :maximized="true")
+    div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
+      q-btn(
+        round flat color="green" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
+        :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: '16px', background: 'rgba(0,0,0,0.2)'}`)
+      ws-sphere(
+        v-if="$route.params.page === 'sphere'")
+      ws-setting(
+        v-else-if="$route.params.page === 'setting'")
+      node-saver(
+        v-else
+        :value="item").fit
+        template(v-slot:editor=`{node, saving}`)
+          component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving")
   q-page-container.row.fit.full-width.bg-black
     ws-menu(
       ctx="workspace"
@@ -23,7 +29,7 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
         v-else-if="$route.params.page === 'setting'")
       node-saver(
         v-else
-        :value="$store.state.workspace.item").fit
+        :value="item").fit
         template(v-slot:editor=`{node, saving}`)
           component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving")
 </template>
@@ -43,27 +49,30 @@ export default {
     }
   },
   computed: {
+    item () {
+      return this.$store.state.workspace.item
+    }
   },
   watch: {
-    '$store.state.workspace.item': {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$log('item CHANGED', to)
-        // TODO item type?
-        if (to) {
-          this.$router.push({params: {oid: to.oid}}).catch(e => e)
-          if (this.$q.screen.xs) this.pageDialogOpened = true
-        }
-      }
-    },
+    // '$store.state.workspace.item': {
+    //   deep: true,
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.$log('item CHANGED', to)
+    //     // TODO item type?
+    //     if (to) {
+    //       this.$router.push({params: {oid: to.oid}}).catch(e => e)
+    //       if (this.$q.screen.xs) this.pageDialogOpened = true
+    //     }
+    //   }
+    // },
     '$route.params.page': {
       immediate: true,
       handler (to, from) {
         this.$log('$route.params.page CHANGED', to)
         if (to) {
           if (to !== from) {
-            this.item = null
+            // this.item = null
             this.$store.commit('workspace/stateSet', ['item', null])
             this.$store.commit('workspace/stateSet', ['itemType', undefined])
             this.$router.replace('/workspace/' + to).catch(e => e)
@@ -75,14 +84,24 @@ export default {
     }
   },
   methods: {
-    itemClick ({type, item}) {
+    async itemClick ({type, item}) {
       this.$log('itemClick', type, item)
       this.$store.commit('workspace/stateSet', ['itemType', undefined])
       this.$store.commit('workspace/stateSet', ['item', null])
       this.$nextTick(() => {
         this.$store.commit('workspace/stateSet', ['itemType', type])
         this.$store.commit('workspace/stateSet', ['item', item])
+        this.$router.push({params: {oid: item.oid}})
+          .then(() => {
+            if (this.$q.screen.xs) this.pageDialogOpened = true
+            // this.pageDialogOpened = true
+          })
+          .catch(e => e)
       })
+      // await this.$wait(300)
+      // this.$store.commit('workspace/stateSet', ['itemType', type])
+      // this.$store.commit('workspace/stateSet', ['item', item])
+      // this.pageDialogOpened = true
     },
     itemAdd (type, item) {
       this.$log('itemAdd', type, item)

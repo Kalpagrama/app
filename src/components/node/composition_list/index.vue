@@ -44,19 +44,19 @@ div(
   //- preview list
   div(
     v-if="true && ctx === 'rubick' && compositions.length > 1"
-    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-px-sm
+    :style=`{position: 'absolute', top: '8px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-px-sm
     div(
       v-for="(c,ci) in compositions" :key="ci"
       :style=`{height: '4px'}`
       ).col.q-px-xs
       div(
-        :class=`{'bg-green': ci === index, 'bg-grey-10': ci !== index}`
+        :class=`{'bg-green': ci === index, 'bg-grey-7': ci !== index}`
         :style=`{borderRadius: '2px',overflow: 'hidden'}`
         ).row.fit
   //- preview compositions
   div(
-    v-if="true && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '4px', zIndex: 3500, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
+    v-if="$store.state.ui.debug && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '4px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"
@@ -71,8 +71,8 @@ div(
           draggable="false").fit
   //- preview nodes
   div(
-    v-if="true && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '40px', zIndex: 3500, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
+    v-if="$store.state.ui.debug && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '40px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"

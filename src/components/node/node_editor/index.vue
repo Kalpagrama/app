@@ -115,21 +115,22 @@
             small.full-width compositionActive: {{compositionActive}}
             small.full-width compositionVisible: {{compositionVisible}}
         div(:style=`{minHeight: '400px'}`).row.full-width.items-start.content-start.justify-center.q-py-md
-          div(
-            v-if="node && node.oid"
-            :style=`{height: '60px', maxWidth: maxWidth+'px'}`).row.full-width.items-center.content-center.scroll
-            .row.no-wrap
-              span(
-                v-for="(c, ci) in categories" :key="ci" @click="categorySet(c, ci)"
-                v-if="c.type !== 'ALL'"
-                :class=`{
-                  'bg-green': c.type === node.category,
-                  'text-bold': c.type === node.category
-                }`
-                :style=`{
-                  color: 'white', whiteSpace: 'nowrap', textTransform: 'capitalize',
-                  borderRadius: '10px', overflow: 'hidden'}`
-                ).cursor-pointer.q-pa-sm.q-mr-sm {{ c.sphere.name }}
+          .row.full-width.justify-center
+            div(
+              v-if="node && node.oid"
+              :style=`{height: '60px', maxWidth: maxWidth+'px'}`).row.full-width.items-center.content-center.scroll
+              .row.no-wrap
+                span(
+                  v-for="(c, ci) in categories" :key="ci" @click="categorySet(c, ci)"
+                  v-if="c.type !== 'ALL'"
+                  :class=`{
+                    'bg-green': c.type === node.category,
+                    'text-bold': c.type === node.category
+                  }`
+                  :style=`{
+                    color: 'white', whiteSpace: 'nowrap', textTransform: 'capitalize',
+                    borderRadius: '10px', overflow: 'hidden'}`
+                  ).cursor-pointer.q-pa-sm.q-mr-sm {{ c.sphere.name }}
           node-spheres-editor(
             v-if="node && node.oid" mode="edit"
             :node="node" :style=`{maxWidth: maxWidth+'px'}`)
