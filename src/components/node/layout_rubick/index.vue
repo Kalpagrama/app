@@ -62,7 +62,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :loading="compositionIndex === 0 && nodePublishing"
           :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- name, essence
-      essence(v-if="node && compositionOneQuery && compositionTwoQuery" :node="node" :nodes="[...compositionOneQuery.items, ...compositionTwoQuery.items]"
+      essence(v-if="node && nodeNameQuery" :node="node" :nodes="nodeNameQuery.items"
         :nodePublish="nodePublish")
       //- composition TWO
       div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
@@ -124,12 +124,13 @@ export default {
       compositionOneOid: undefined,
       compositionTwoQuery: null,
       compositionTwoOid: undefined,
+      nodeNameQuery: null,
       compositionsVisible: [true, true],
       compositionsActive: [true, true],
       nodeRubickNew: null,
       nodePublishing: false,
       maxWidth: 600,
-      same: true
+      needSwap: false
     }
   },
   computed: {
@@ -167,13 +168,14 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('node CHANGED', to)
-        if (to) {
-          this.same = this.same ? false : to.meta.compositions[0].oid === this.compositionOneOid
-          this.$log('SAME SAME SAME', this.same)
-          this.compositionOneOid = to.meta.compositions[this.same ? 0 : 1].oid
-          this.compositionTwoOid = to.meta.compositions[this.same ? 1 : 0].oid
-          this.compositionOneQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionTwoOid, pagination: {pageSize: 30}})
-          this.compositionTwoQuery = await this.$store.dispatch('lists/nodeNodes', {node: to, compositionOid: this.compositionOneOid, pagination: {pageSize: 30}})
+        if (to && to.meta.compositions.length === 2) {
+          if (this.compositionOneOid) this.needSwap = to.meta.compositions[0].oid !== this.compositionOneOid
+          this.$log('NEED SWAP', this.needSwap)
+          this.compositionOneOid = to.meta.compositions[this.needSwap ? 1 : 0].oid
+          this.compositionTwoOid = to.meta.compositions[this.needSwap ? 0 : 1].oid
+          this.compositionOneQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionTwoOid], pagination: {pageSize: 30}})
+          this.compositionTwoQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid], pagination: {pageSize: 30}})
+          this.nodeNameQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid, this.compositionTwoOid], pagination: {pageSize: 30}})
         }
       }
     }

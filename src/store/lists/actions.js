@@ -107,12 +107,13 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
   return feedResult
 }
 
-export const nodeNodes = async (context, { compositionOid, pagination, sortStrategy }) => {
-  logD('nodeNodes start')
+// export const nodeNameNodes =
+export const compositionNodes = async (context, { compositionOids, pagination, sortStrategy }) => {
+  logD('compositionNodes start')
   let filter = { types: ['NODE'] }
   let oid
-  oid = compositionOid
-  filter.compositionOids = [compositionOid]
+  oid = compositionOids[0]
+  filter.compositionOids = compositionOids
   const fetchItemFunc = async () => {
     let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
@@ -139,7 +140,7 @@ export const nodeNodes = async (context, { compositionOid, pagination, sortStrat
       key: 'list: ' + JSON.stringify({oid, pagination, filter, sortStrategy }),
       fetchItemFunc
     }, { root: true })
-  logD('nodeNodes complete')
+  logD('compositionNodes complete')
   return feedResult
 }
 
