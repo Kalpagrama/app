@@ -49,7 +49,7 @@ div(
   //- help
   div(
     :style=`{width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
-    div(:style=`{width: '60px', height: '60px'}` @click="helpClick()").row.items-center.content-center.justify-center
+    div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
       q-btn(round flat icon="clear" color="red" size="lg" @click="$emit('close')")
     .row.full-width.justify-center
       small.text-white
