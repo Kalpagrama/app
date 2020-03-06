@@ -42,9 +42,15 @@ export default function (/* { ssrContext } */) {
       init: async (context) => {
         logD('vuex init')
         await context.dispatch('cache/init')
-        let authInfo = await context.dispatch('auth/init')
-        if (!authInfo.userIsConfirmed) return false
-        let user = await context.dispatch('user/init')
+
+        await context.dispatch('auth/init')
+        let userIsConfirmed = context.state.auth.userIsConfirmed
+        if (!userIsConfirmed) return false
+
+        await context.dispatch('user/init')
+        let user = context.getters.currentUser
+        assert(user && context.state.auth.userIsConfirmed)
+
         await context.dispatch('events/init')
         await context.dispatch('core/init')
         await context.dispatch('node/init')

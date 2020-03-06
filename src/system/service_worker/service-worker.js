@@ -1,5 +1,5 @@
-const swVer = 9
-const useCache = false
+const swVer = 11
+const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
   cacheGraphQl,
   cacheVideo
@@ -349,7 +349,7 @@ if (useCache) {
       }
     )
     workbox.routing.registerRoute( // content images
-      /^http.*(yandexcloud|local_object_storage).+\.jpg$/,
+      /^http.*(kalpa\.store).+\.jpg$/,
       new workbox.strategies.CacheFirst({
         cacheName: 'content_img',
         plugins: [
@@ -360,7 +360,7 @@ if (useCache) {
       })
     )
     workbox.routing.registerRoute( // content video
-      /^http.*(yandexcloud|local_object_storage).+\.mp4$/,
+      /^http.*(kalpa\.store).+\.mp4$/,
       ({ url, event, params }) => cacheVideo(event)
     )
     // workbox.routing.registerRoute(// graphql

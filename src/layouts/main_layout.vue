@@ -91,6 +91,7 @@ export default {
       // return
     }
     this.loading = false
+
     // if (this.$store.getters.currentUser.profile.tutorial) {
     //   this.$refs.kTutorialDialog.show()
     // } else this.loading = false

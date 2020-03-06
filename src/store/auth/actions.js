@@ -9,7 +9,6 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
-  // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
   logD('auth init')
   const fetchItemFunc = async () => {
@@ -25,15 +24,16 @@ export const init = async (context) => {
         }
       `
     })
+    logD('auth fetch complete! ', authInfo)
     return { item: authInfo, actualAge: 'zero' }
   }
 
   let authInfo = await context.dispatch('cache/get', { key: 'authInfo', fetchItemFunc }, { root: true })
   if (authInfo && authInfo.userIsConfirmed){
     context.commit('init', authInfo)
-    logD('auth init done!')
-  }
-  return authInfo
+    logD('auth init done!!')
+  } else logD('auth init fails!!!')
+  logD('auth fetch complete! ', authInfo)
 }
 export const inviteEmail = async (context, email) => {
   logD('@invite start')
