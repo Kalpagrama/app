@@ -31,22 +31,23 @@
       .row.full-width.items-start.content-start.justify-center.q-px-sm
         //- header
         div(
-          :style=`{height: '120px'}`
-          ).row.full-width.items-start.content-start.justify-center.q-px-sm
+          v-if="true"
+          :style=`{height: '60px', order: 10000, marginBottom: '300px'}`
+          ).row.full-width.items-start.content-start.justify-center
           div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
             //- header
-            div(
-              :style=`{height: '60px'}`
-              ).row.full-width.items-center
+            //- div(
+            //-   :style=`{height: '60px'}`
+            //-   ).row.full-width.items-center
             //- header actions
             div(
-              :style=`{height: '53px'}`
-              ).row.full-width.items-center.content-center.q-px-sm
+              :style=`{height: '60px'}`
+              ).row.full-width.items-center.content-cente
               q-btn(
                 v-if="node && node.oid"
                 outline color="red" no-caps :loading="nodeDeleting" @click="nodeDelete(node.oid)"
                 :style=`{borderRadius: '10px'}`)
-                span Delete
+                span Удалить
               .col
               //- q-btn(
               //-   v-if="node && node.oid"
@@ -58,8 +59,8 @@
                 v-if="node && node.oid"
                 push color="green" no-caps :loading="saving || nodePublishing" @click="nodePublish()"
                 :style=`{borderRadius: '10px'}`)
-                span().text-bold Publish
-        div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width
+                span().text-bold Опубликовать
+        div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-pt-sm
           //- composition one
           div(
             :style=`{position: 'relative', minHeight: '330px', borderRadius: '10px', overflow: 'hidden'}`
@@ -85,7 +86,7 @@
             input(
               v-if="node"
               v-model="node.name"
-              placeholder="Whats the essence?").fit.bg-white.kinput
+              placeholder="Whats the essence?").fit.bg-white.kinput.text-bold
           //- composition two
           div(
             :style=`{position: 'relative', minHeight: '330px', borderRadius: '10px', overflow: 'hidden'}`
@@ -114,7 +115,7 @@
             small.full-width oid: {{ node.oid }}
             small.full-width compositionActive: {{compositionActive}}
             small.full-width compositionVisible: {{compositionVisible}}
-        div(:style=`{minHeight: '400px'}`).row.full-width.items-start.content-start.justify-center.q-py-md
+        div(:style=`{minHeight: '100px'}`).row.full-width.items-start.content-start.justify-center.q-py-md
           .row.full-width.justify-center
             div(
               v-if="node && node.oid"

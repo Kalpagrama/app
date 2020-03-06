@@ -26,7 +26,7 @@ div(:style=`{height: $q.screen.height+'px'}`).row.full-width
         'full-width': $q.screen.width < 800,
         'row': $q.screen.width >= 800,
         'full-height': $q.screen.width >= 800
-      }`)
+      }`).bg-grey-10
       extra(:content="content")
 </template>
 

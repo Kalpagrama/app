@@ -18,32 +18,17 @@ q-layout( view="hHh Lpr lff")
     :width="$q.screen.xs ? $q.screen.width/2+30 : 60" :breakpoint="1000" :mini="!$q.screen.xs"
     content-class="bg-grey-8").gt-xs
     kalpa-menu-desktop(v-if="!loading" :mini="$q.screen.xs ? false : drawerMini" :style=`{zIndex: 10000}`)
-  //- q-dialog(
-  //-   v-model="drawerShow" position="bottom")
-  //-   div(
-  //-     @click="pageClick()"
-  //-     :style=`{position: 'relative', zIndex: 200, height: ($q.screen.width/3)*2+'px', borderRadius: '30px 30px 0 0'}`).row.full-width.bg-grey-8
-  //-     //- div(
-  //-     //-   :style=`{width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
-  //-     //-   kalpa-spinner(:width="40" :height="40").cursor-pointer.q-mb-sm
-  //-     //-   .row.full-width.justify-center
-  //-     //-     small.text-white Home
-  //-     div(
-  //-       v-for="(p, pi) in pages" :key="p.id"
-  //-       :style=`{position: 'relative', zIndex: 2000, width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
-  //-       q-btn(
-  //-         round flat @click="pageClick(p.id)"
-  //-         :color="$route.name === p.id ? 'green' : 'white'" size="lg" :icon="p.icon"
-  //-         :style=`{position: 'relative', zIndex: 2000}`)
-  //-       .row.full-width.justify-center.bg
-  //-         small(@click="pageClick(p.id)").text-white {{ p.name }}
+  q-dialog(
+    v-model="drawerShowMobile" position="bottom")
+    kalpa-menu-xs(@close="drawerShowMobile = false")
   div(
-    :style=`{position: 'absolute', zIndex: 3100, right: '0px', bottom: '0px',
-      width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
+    :style=`{position: 'fixed', zIndex: 1000, right: '0px', bottom: '0px',
+      width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center.xs
     q-btn(
-      round flat size="lg" color="green" @click="drawerShow = !drawerShow"
-      :icon="drawerShow ? 'keyboard_arrow_down' : 'menu'"
-      :style=`{background: drawerShow ? 'none' : 'rgba(0,0,0,0.3)'}`)
+      round flat size="lg" @click="drawerShow = !drawerShow, drawerShowMobile = !drawerShowMobile"
+      :color="drawerShowMobile ? 'red' : 'green'"
+      :icon="drawerShowMobile ? 'clear' : 'menu'"
+      :style=`{background: drawerShowMobile ? 'none' : 'rgba(0,0,0,0.3)'}`)
   q-page-container
     router-view(v-if="!loading")
     div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
@@ -65,13 +50,8 @@ export default {
       me: null,
       player: null,
       drawerShow: true,
-      drawerMini: true,
-      pages: [
-        {id: 'trends', name: 'Trends', icon: 'whatshot'},
-        {id: 'workspce', name: 'Workspace', icon: 'school'},
-        {id: 'refresh', name: 'Refresh', icon: 'refresh'},
-        {id: 'debug', name: 'Debug', icon: 'bug_report'}
-      ]
+      drawerShowMobile: false,
+      drawerMini: true
     }
   },
   computed: {
@@ -86,9 +66,6 @@ export default {
     }
   },
   methods: {
-    someShit () {
-      this.$log('someShit')
-    },
     pageClick (id) {
       this.$log('pageClick', id)
     },
@@ -113,7 +90,7 @@ export default {
   async created () {
     this.$log('created')
     this.loading = true
-    if (this.$q.screen.xs) this.drawerShow = false
+    // if (this.$q.screen.xs) this.drawerShow = false
     this.$q.addressbarColor.set('#424242')
     // take token from redirect url
     let token = this.$route.query.token

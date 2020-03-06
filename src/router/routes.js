@@ -27,13 +27,16 @@ const routes = [
       // rest
       // { name: 'invite', path: 'invite', component: () => import('components/k_invite') },
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
+      { name: 'account', path: 'account/:oid?/:page?', component: () => import('pages/app/user') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
       // { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       { name: 'node', path: 'node/:oid?', component: () => import('pages/app/node') },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
-      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') }
+      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
+      { name: 'debug', path: 'debug', component: () => import('pages/app/debug') },
+      { name: 'help', path: 'help', component: () => import('pages/app/help') }
       // {
       //   name: 'refresh',
       //   path: 'refresh',

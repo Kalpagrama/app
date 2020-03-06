@@ -4,8 +4,8 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
   q-dialog(v-model="pageDialogOpened" :maximized="true")
     div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
       q-btn(
-        round flat color="green" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
-        :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: '16px', background: 'rgba(0,0,0,0.2)'}`)
+        round flat color="red" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
+        :style=`{position: 'fixed', zIndex: 10000, left: '16px', bottom: '16px', background: 'rgba(0,0,0,0.3)'}`)
       ws-sphere(
         v-if="$route.params.page === 'sphere'")
       ws-setting(
