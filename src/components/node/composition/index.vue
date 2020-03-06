@@ -96,7 +96,7 @@ export default {
         },
         content: () => {
           this.$log('go to content')
-          this.$router.push('/content/' + this.value.layers[0].content.oid)
+          this.$router.push('/content/' + this.value.layers[0].content.oid).catch(e => e)
         }
       }
       this.$store.dispatch('ui/action', [{actions: this.actions, timeout: 3000}, key => key ? cb[key]() : false])

@@ -9,15 +9,10 @@
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- composition finder
   q-dialog(v-model="compositionFinderOpened" :maximized="true" position="bottom")
-    div(@click.self="compositionFinderOpened = false" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-start.content-start.justify-center.q-px-xs.q-pb-xs
-      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
-        q-btn(
-        round flat color="green" icon="keyboard_arrow_left" @click="compositionFinderOpened = false"
-        :style=`{}`)
-        .col.full-height
+    div(@click.self="compositionFinderOpened = false" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-start.content-start.justify-center.q-pa-sm
       composition-finder(
-        @composition="compositionFound"
-        :style=`{maxWidth: '600px', maxHeight: 'calc(100% - 60px)', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
+        @composition="compositionFound" @close="compositionFinderOpened = false"
+        :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
   //- composition editor
   q-dialog(v-model="compositionEditorOpened" :maximized="true").bg-black
     div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).row.fit
@@ -41,7 +36,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         round flat color="green" icon="link" @click="$router.push('/node/' + node.oid)"
         :style=`{}`)
   //- node wrapper
-  div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-xs.q-pt-sm
+  div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-xs.q-pt-xs
     div(:style=`{position: 'relative', maxWidth: maxWidth+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
       vote-tint(v-if="votePanning" :voteValue="voteValue")
       //- composition ONE
@@ -81,7 +76,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :loading="compositionIndex === 1 && nodePublishing"
           :style=`{position: 'absolute', zIndex: 2000, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- debug node
-      div(v-if="node && true").row.full-width.bg-red
+      div(v-if="node && $store.state.ui.debug").row.full-width.bg-red
         .row.full-width
           img(
             :src="node.meta.compositions[0].thumbUrl"
@@ -95,7 +90,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   actions(
     :node="node" :nodeFull="nodeFull" :width="width" :maxWidth="maxWidth"
     @votePanning="votePanning = $event" @voteValue="voteValue = $event")
-  .row.full-width.justify-center.items-start
+  .row.full-width.justify-center.items-start.q-px-xs
     node-spheres-editor(
       v-if="nodeFull" mode="watch"
       :node="nodeFull"
@@ -135,30 +130,32 @@ export default {
   },
   computed: {
     compositionOneItems () {
-      if (!this.compositionOneQuery) return []
-      return this.compositionOneQuery.items.map(node => {
+      let items = this.compositionOneQuery ? this.compositionOneQuery.items : []
+      return items.map(node => {
         let same = this.compositionTwoOid === node.meta.compositions[1].oid
-        let index = same ? 0 : 1
+        let compositionIndex = same ? 0 : 1
+        let compositionOid = node.meta.compositions[compositionIndex].oid
         return {
           node: node,
-          preview: node.meta.compositions[index].thumbUrl,
+          preview: node.meta.compositions[compositionIndex].thumbUrl,
           composition: null,
-          compositionIndex: index,
-          compositionOid: node.meta.compositions[index].oid
+          compositionIndex: compositionIndex,
+          compositionOid: compositionOid
         }
       })
     },
     compositionTwoItems () {
-      if (!this.compositionTwoQuery) return []
-      return this.compositionTwoQuery.items.map(node => {
+      let items = this.compositionTwoQuery ? this.compositionTwoQuery.items : []
+      return items.map(node => {
         let same = this.compositionOneOid === node.meta.compositions[0].oid
-        let index = same ? 1 : 0
+        let compositionIndex = same ? 1 : 0
+        let compositionOid = node.meta.compositions[compositionIndex].oid
         return {
           node: node,
-          preview: node.meta.compositions[index].thumbUrl,
+          preview: node.meta.compositions[compositionIndex].thumbUrl,
           composition: null,
-          compositionIndex: index,
-          compositionOid: node.meta.compositions[index].oid
+          compositionIndex: compositionIndex,
+          compositionOid: compositionOid
         }
       })
     }

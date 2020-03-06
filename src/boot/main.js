@@ -92,6 +92,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
     Vue.component('kalpaMenuDesktop', () => import('components/kalpa/menudesktop'))
     Vue.component('kalpaMenuMobile', () => import('components/kalpa/menumobile'))
+    Vue.component('kalpaMenuXs', () => import('components/kalpa/menuxs'))
     Vue.component('kalpaSpinner', () => import('components/kalpa/spinner'))
     Vue.component('kalpaTutorial', () => import('components/kalpa/tutorial'))
     Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))

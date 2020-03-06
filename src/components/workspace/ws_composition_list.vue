@@ -4,7 +4,7 @@
     //- actions
     q-btn(
       round push size="lg" color="green" icon="add" @click="$emit('add')"
-      :style=`{position: 'absolute', zIndex: 2000, right: '16px', bottom: '16px'}`)
+      :style=`{position: 'absolute', zIndex: 2000, left: '16px', bottom: '16px'}`)
     //- header
     div(
       :style=`{height: '60px'}`

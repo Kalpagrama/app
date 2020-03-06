@@ -161,13 +161,13 @@ module.exports = function (ctx) {
         // importWorkboxFrom: 'local'
       },
       manifest: {
-        name: 'Kalpagramma',
-        short_name: 'Kalpagramma',
+        name: 'Kalpa',
+        short_name: 'Kalpa',
         description: 'Find your halo-effect',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#000',
-        theme_color: '#000',
+        background_color: '#424242',
+        theme_color: '#424242',
         icons: [
           {
             src: 'statics/icons/icon-256x256.png',

@@ -35,10 +35,7 @@
       div(
         @click="$router.push('/user/' + nodeFull.author.oid)"
         :style=`{height: '60px', width: '75px'}`).row.items-center.justify-center.cursor-pointer
-        div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-6
-          //- img(
-          //-   :src="nodeFull.author.thumbUrl"
-          //-   :style=`{width: '100%', height: '100%', objectFit: 'cover'}`).bg-grey-7
+        kalpa-avatar(:url="nodeFull.author.thumbUrl")
 </template>
 
 <script>

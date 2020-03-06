@@ -42,7 +42,7 @@ div(
     .col.full-width.scroll
       .row.full-width.items-start.content-start
         div(
-          v-for="(p, pi) in pages" :key="p.id" @click="pageClick(p, pi)"
+          v-for="(p, pi) in $store.state.ui.pages" :key="p.id" @click="pageClick(p, pi)"
           :style=`{height: '60px'}`
           ).row.full-width.cursor-pointer
           //- page mini box, icon
@@ -111,11 +111,11 @@ export default {
     return {
       menuShow: true,
       width: 60,
-      pages: [
-        { id: 'trends', name: 'Trends', icon: 'whatshot' },
-        { id: 'workspace', name: 'Workspace', icon: 'school' },
-        // { id: 'settings', name: 'Settings', icon: 'settings' }
-      ],
+      // pages: [
+      //   { id: 'trends', name: 'Trends', icon: 'whatshot' },
+      //   { id: 'workspace', name: 'Workspace', icon: 'school' },
+      //   // { id: 'settings', name: 'Settings', icon: 'settings' }
+      // ],
       userAvatarErrored: false,
       cacheClearing: false,
       loggingOut: false

@@ -31,9 +31,8 @@ export const init = async (context) => {
   let authInfo = await context.dispatch('cache/get', { key: 'authInfo', fetchItemFunc }, { root: true })
   if (authInfo && authInfo.userIsConfirmed){
     context.commit('init', authInfo)
-    logD('auth init done!!')
-  } else logD('auth init fails!!!')
-  logD('auth fetch complete! ', authInfo)
+    logD('auth init done!')
+  } else logD('auth init fails!', authInfo)
 }
 export const inviteEmail = async (context, email) => {
   logD('@invite start')
@@ -90,7 +89,7 @@ export const logout = async (context, token) => {
   }
   logD('@logout done')
 }
-export const loginEmail = async (context, email) => {
+export const loginEmail = async (context, [email, inviteCode]) => {
   logD('@loginEmail start')
   let { data: { loginEmail: { token, expires, role } } } = await apollo.clients.auth.mutate({
     mutation: gql`
@@ -104,8 +103,7 @@ export const loginEmail = async (context, email) => {
     `,
     variables: {
       email,
-      inviteCode: localStorage.getItem('ktokenInviteCode')
-      // inviteCode: '171145051370487837'
+      inviteCode
     }
   })
   localStorage.setItem('ktoken', token)

@@ -14,12 +14,21 @@ q-layout( view="hHh Lpr lff")
   q-drawer(
     v-model="drawerShow"
     no-swipe-open no-swipe-close show-if-above
-    :width="60" :breakpoint="1000"
-    content-class="bg-grey-8")
+    :side="$q.screen.xs ? 'right' : 'left'"
+    :width="$q.screen.xs ? $q.screen.width/2+30 : 60" :breakpoint="1000" :mini="!$q.screen.xs"
+    content-class="bg-grey-8").gt-xs
     kalpa-menu-desktop(v-if="!loading" :mini="$q.screen.xs ? false : drawerMini" :style=`{zIndex: 10000}`)
-  q-btn(
-    round flat color="white" icon="menu" @click="drawerShow = !drawerShow"
-    :style=`{position: 'fixed', left: '16px', bottom: '16px', zIndex: 10000, background: 'rgba(0,0,0,0.2)'}`).xs
+  q-dialog(
+    v-model="drawerShowMobile" position="bottom")
+    kalpa-menu-xs(@close="drawerShowMobile = false")
+  div(
+    :style=`{position: 'fixed', zIndex: 1000, right: '0px', bottom: '0px',
+      width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center.xs
+    q-btn(
+      round flat size="lg" @click="drawerShow = !drawerShow, drawerShowMobile = !drawerShowMobile"
+      :color="drawerShowMobile ? 'red' : 'green'"
+      :icon="drawerShowMobile ? 'clear' : 'menu'"
+      :style=`{background: drawerShowMobile ? 'none' : 'rgba(0,0,0,0.3)'}`)
   q-page-container
     router-view(v-if="!loading")
     div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
@@ -41,6 +50,7 @@ export default {
       me: null,
       player: null,
       drawerShow: true,
+      drawerShowMobile: false,
       drawerMini: true
     }
   },
@@ -56,6 +66,9 @@ export default {
     }
   },
   methods: {
+    pageClick (id) {
+      this.$log('pageClick', id)
+    },
     menuToggle () {
       this.$log('menuToggle')
     },
@@ -77,6 +90,8 @@ export default {
   async created () {
     this.$log('created')
     this.loading = true
+    // if (this.$q.screen.xs) this.drawerShow = false
+    this.$q.addressbarColor.set('#424242')
     // take token from redirect url
     let token = this.$route.query.token
     let expires = this.$route.query.expires

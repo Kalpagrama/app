@@ -4,7 +4,7 @@
     //- actions
     q-btn(
       round push size="lg" color="green" icon="add" @click="$emit('add')"
-      :style=`{position: 'absolute', right: '16px', bottom: '16px'}`)
+      :style=`{position: 'absolute', left: '16px', bottom: '16px'}`)
     //- header: filters
     div(:style=`{height: '60px'}`).row.full-width
     //- body

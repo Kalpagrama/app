@@ -43,9 +43,12 @@ export default {
               this.$log('Set this.node value from vuex 1', to)
               this.node = JSON.parse(JSON.stringify(to))
             }
+          } else {
+            this.$log('Set this.node value from vuex 2')
+            if (!this.node) this.node = JSON.parse(JSON.stringify(to))
           }
         } else {
-          this.$log('Set this.node value from vuex 2')
+          this.$log('Set this.node value from vuex 3')
           this.node = JSON.parse(JSON.stringify(this.nodeNew))
         }
       }

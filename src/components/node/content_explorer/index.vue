@@ -1,19 +1,33 @@
 <template lang="pug">
 div(:style=`{height: $q.screen.height+'px'}`).row.full-width
-  div(:style=`{position: 'relative'}`).col.full-height
-    //- content.name, and layer name ??
-    span(
-      v-if="content"
-      :style=`{
-        position: 'absolute', zIndex: 2000, top: '10px', left: '10px',
-        borderRadius: '10px', background: 'rgba(0,0,0,0.2)'
+  div(
+    :class=`{
+      'column': $q.screen.width < 800,
+      'row': $q.screen.width >= 800
+    }`
+    ).fit
+    //- composition container
+    div(
+      :class=`{
+        'row': $q.screen.width < 800,
+        'full-width': $q.screen.width < 800,
+        'col': $q.screen.width >= 800
       }`
-      ).q-pa-sm.text-green.text-bold {{ content.name }}
-    composition(
-      v-if="content"
-      ctx="workspace" :value="{layers: [{content, figuresAbsolute: [], figuresRelative: [], spheres: []}]}" :visible="true" :active="true" :mini="false")
-  div(:style=`{width: '400px'}`).row.full-height
-    extra(:content="content")
+      :style=`{
+        height: $q.screen.width < 800 ? $q.screen.height/3+'px' : '100%'
+      }`)
+      composition(
+        v-if="content"
+        ctx="workspace" :value="{layers: [{content, figuresAbsolute: [], figuresRelative: [], spheres: []}]}" :visible="true" :active="true" :mini="false")
+    //- extra container
+    div(
+      :class=`{
+        'col': $q.screen.width < 800,
+        'full-width': $q.screen.width < 800,
+        'row': $q.screen.width >= 800,
+        'full-height': $q.screen.width >= 800
+      }`).bg-grey-10
+      extra(:content="content")
 </template>
 
 <script>
