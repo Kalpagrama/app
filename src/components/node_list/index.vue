@@ -21,7 +21,7 @@ div(:style=`{position: 'relative', paddingTop: '300px', paddingBottom: '300px'}`
     :node="n" :index="ni"
     :needFull="ni >= nodeMiddle-0 && ni <= nodeMiddle+1"
     :needFullPreload="!(ni >= nodeMiddle-1 && ni <= nodeMiddle+1) && ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
-    :visible="ni >= nodeMiddle-0 && ni <= nodeMiddle+1"
+    :visible="ni >= nodeMiddle-0 && ni <= nodeMiddle+0"
     :active="nodeMiddle === ni"
     @open="node = $event[0], nodeFull = $event[1], nodeDialogOpened = true"
     @hide="nodesBan.push(n.oid)"

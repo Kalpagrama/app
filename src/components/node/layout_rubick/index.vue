@@ -54,7 +54,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         //- actions
         q-btn(
           round outline color="green" icon="add" @click="compositionAdd(compositionOneOid)"
-          :loading="compositionIndex === 0 && nodePublishing"
+          :loading="nodePublishing"
           :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- name, essence
       essence(v-if="node && nodeNameQuery" :node="node" :nodes="nodeNameQuery.items"
@@ -73,7 +73,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         //- actions
         q-btn(
           round outline color="green" icon="add" @click="compositionAdd(compositionTwoOid)"
-          :loading="compositionIndex === 1 && nodePublishing"
+          :loading="nodePublishing"
           :style=`{position: 'absolute', zIndex: 2000, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- debug node
       div(v-if="node && $store.state.ui.debug").row.full-width.bg-red

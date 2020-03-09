@@ -29,9 +29,9 @@
   //- body
   div(
     :style=`{position: 'relative'}`).col.full-width.scroll
-    .row.full-width.q-px-sm.bg-red
-      .row.full-width.bg-red.text-white
-        div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute.length}}
+    //- .row.full-width.q-px-sm.bg-red
+    //-   .row.full-width.bg-red.text-white
+    //-     div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute.length}}
     .row.full-width.items-start.content-start.q-pa-sm
       div(
         v-for="(l, li) in layers" :key="li"

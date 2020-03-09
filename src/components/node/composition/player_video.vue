@@ -10,7 +10,7 @@ iframe {
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 1 : 1}`).column.fit.items-start.content-start.bg-black
+div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).column.fit.items-start.content-start.bg-black
   //- opacity: videoGood ? 1 : 0
   //- layer name
   span(
