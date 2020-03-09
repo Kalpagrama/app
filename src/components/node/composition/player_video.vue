@@ -10,7 +10,7 @@ iframe {
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).column.fit.items-start.content-start.bg-black
+div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 1 : 1}`).column.fit.items-start.content-start.bg-black
   //- opacity: videoGood ? 1 : 0
   //- layer name
   span(
@@ -24,7 +24,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
   div(
     v-if="!mini && $store.state.ui.debug"
     :style=`{
-      position: 'absolute', width: 'calc(100% - 20px)', left: '6px', top: '46px',
+      position: 'absolute', width: 'calc(100% - 20px)', left: '6px', bottom: '4px',
       pointerEvents: 'none', userSelect: 'none',
       zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.3}`).row.q-pa-sm.bg-green
     small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}

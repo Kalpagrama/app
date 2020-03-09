@@ -15,7 +15,7 @@ div(:style=`{position: 'relative'}`).row.fit
     template(v-slot:editor=`{player, meta}`)
       editor-video(
         v-if="composition" :mode="mode"
-        :ctx="ctx" :composition="composition" :player="player" :meta="meta")
+        :ctx="ctx" :composition="node.compositions[compositionIndex]" :player="player" :meta="meta")
 </template>
 
 <script>
@@ -44,6 +44,13 @@ export default {
     content () {
       if (this.composition) return this.composition.layers[0].content
       else return null
+    }
+  },
+  watch: {
+    node: {
+      handler (to, from) {
+        this.$log('node CHANGED', to)
+      }
     }
   }
 }

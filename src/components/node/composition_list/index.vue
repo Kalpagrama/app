@@ -55,8 +55,8 @@ div(
         ).row.fit
   //- preview compositions
   div(
-    v-if="$store.state.ui.debug && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '4px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
+    v-if="true && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '40px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"
@@ -71,8 +71,8 @@ div(
           draggable="false").fit
   //- preview nodes
   div(
-    v-if="$store.state.ui.debug && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '40px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
+    v-if="false && ctx === 'rubick'"
+    :style=`{position: 'absolute', top: '80px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"
@@ -145,7 +145,7 @@ export default {
   },
   methods: {
     compositionsChanged (to) {
-      // this.$log(this.label, 'compositionsChanged')
+      this.$log(this.label, 'compositionsChanged')
       if (to) {
         if (this.ctx === 'rubick') {
           if (!this.rubick) this.rubick = {}
@@ -193,8 +193,6 @@ export default {
       this.$wait(250).then(() => {
         this.rubick.current = this.rubick[ckey]
       })
-      // if (this.ctx === 'rubick') {
-      // }
       this.$tween.to(
         this.rubickStyles[ckey],
         0.5,

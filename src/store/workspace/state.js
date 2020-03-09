@@ -14,6 +14,7 @@ export default {
     // // { name: 'test share', icon: 'share', path: '/share_target' },
     // { name: 'Exit', icon: 'exit_to_app', path: '/logout' }
     { id: 'trends', name: 'Trends', icon: 'whatshot' },
-    { id: 'workspace', name: 'Workspace', icon: 'school' }
+    { id: 'workspace', name: 'Workspace', icon: 'school' },
+    { id: 'settings', name: 'Settings', icon: 'settings' }
   ]
 }
