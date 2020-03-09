@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative', paddingTop: '0px', paddingBottom: '0px'}`
+div(:style=`{position: 'relative', paddingTop: '300px', paddingBottom: '300px'}`
   ).row.full-width.items-start.content-start.justify-start.q-px-xs
   //- node top
   //- div(:style=`{position: 'absolute', top: nodeTop+'px', zIndex: 10000, borderRadius: '10px', overflow: 'hidden'}`).row.full-width.br

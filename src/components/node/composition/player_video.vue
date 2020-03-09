@@ -41,6 +41,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
         :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
         playsinline loop :autoplay="ctx === 'workspace' || ctx === 'editor'" :muted="muted" preload="auto"
         @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
+        @timeupdate="videoUpdate"
         :style=`{
           width: '100%', height: '100%', objectFit: 'contain'
         }`)
@@ -293,22 +294,22 @@ export default {
     },
     videoLoadeddata () {
       this.$log('videoLoadeddata')
-      // this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 60)
       if (this.visible) {
         this.player.setCurrentTime(this.layerStart)
       }
       if (this.visible && this.active && !this.mini) this.player.play()
+      this.videoUpdate()
     },
     videoPlay (intervalUpdateIgnore) {
       this.$log('videoPlay')
       this.playing = true
-      if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 30)
+      // if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 30)
     },
     videoPause () {
       this.$log('videoPause')
       this.playing = false
-      if (this.intervalUpdate) clearInterval(this.intervalUpdate)
-      this.intervalUpdate = null
+      // if (this.intervalUpdate) clearInterval(this.intervalUpdate)
+      // this.intervalUpdate = null
     },
     videoPlayPause () {
       this.$log('videoPlayPause')
@@ -319,18 +320,18 @@ export default {
       this.$log('videoSeeked')
       this.videoUpdate()
     },
-    videoUpdate (to) {
-      // this.$log('videoUpdate', this.now)
+    videoUpdate (e, to) {
+      // this.$log('videoUpdate', to, this.now)
       // for kalpa using native video element
       if (this.contentSource === 'KALPA') {
         if (!this.$refs.kalpaVideo) return
         this.now = to || this.$refs.kalpaVideo.currentTime
-        this.duration = this.$refs.kalpaVideo.duration
+        if (!this.duration) this.duration = this.$refs.kalpaVideo.duration
       }
       // for yotube use mediaElementPlayer
       else if (this.contentSource === 'YOUTUBE') {
         this.now = to || this.player.currentTime
-        this.duration = this.player.duration
+        if (!this.duration) this.duration = this.player.duration
       }
     },
     async videoClick (e) {
@@ -389,6 +390,7 @@ export default {
             this.player.addEventListener('play', this.videoPlay)
             this.player.addEventListener('pause', this.videoPause)
             this.player.addEventListener('loadeddata', this.videoLoadeddata)
+            this.player.addEventListener('timeupdate', this.videoUpdate)
             this.videoUpdate()
             // this.videoPlay()
           },
@@ -399,7 +401,7 @@ export default {
       }
       // set player defaults
       this.player.update = (to) => {
-        this.videoUpdate(to)
+        this.videoUpdate(null, to)
       }
     },
     playerDestroy () {
@@ -410,6 +412,7 @@ export default {
         this.player.removeEventListener('play', this.videoPlay)
         this.player.removeEventListener('pause', this.videoPause)
         this.player.removeEventListener('loadeddata', this.videoLoadeddata)
+        this.player.removeEventListener('timeupdate', this.videoUpdate)
       }
     },
     onMeta (val) {
@@ -433,7 +436,7 @@ export default {
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // this.playerDestroy()
+    this.playerDestroy()
   }
 }
 </script>

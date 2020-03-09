@@ -1,11 +1,14 @@
 <template lang="pug">
-q-dialog(ref="actionDialog" :maximized="true" transition-show="slide-up" transition-hide="slide-down" @hide="dialogClosed()")
+q-dialog(
+  ref="actionDialog" :maximized="true"
+  position="bottom"
+  transition-show="slide-up" transition-hide="slide-down" @hide="dialogClosed()")
   div(@click.self="$refs.actionDialog.hide()").row.fit.items-center.justify-center
     div(
       v-if="options"
-      :style=`{width: '300px', borderRadius: '10px', overflow: 'hidden'}`
+      :style=`{width: '100%', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
       ).row.items-start.content-start
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-white
+      div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-white
         div(
           v-for="(a, akey) in options.actions" :key="akey" @click="action(akey)"
           v-if="akey !== 'confirm'"
