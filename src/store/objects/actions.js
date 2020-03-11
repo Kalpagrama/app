@@ -198,11 +198,8 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
   let mergeItemFunc = (path, serverItem, cacheItem) => {
     assert(serverItem && cacheItem)
     let mergedItem
-    if (path) {
-      // todo merge or throw error
-    } else {
-      // todo merge or throw error
-    }
+    // берем значение с сервера
+    mergedItem = serverItem
     assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
     return mergedItem
   }

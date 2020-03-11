@@ -142,12 +142,7 @@ export const wsNodeSave = async (context, node) => {
     let mergeItemFunc = (path, serverItem, cacheItem) => {
       assert(serverItem && cacheItem)
       let mergedItem
-      if (path) {
-        // todo merge or throw error
-      } else {
-        // todo merge or throw error
-      }
-      // TODO merge!
+      // берем значение с сервера
       mergedItem = serverItem
       // assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
       return mergedItem
