@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width
-  slot(name='editor' :node="node")
+  slot(name='editor' :node="node" :nodeNew="nodeNew")
 </template>
 
 <script>
@@ -60,7 +60,7 @@ export default {
         if (to) {
           // user changed node
           if (!from || from.revision === to.revision) {
-            this.$log('User changed node: ', to.revision, to.name)
+            // this.$log('User changed node: ', to.revision, to.name)
             this.nodeChanged = true
             this.nodeSaveDebounce()
           }
@@ -76,15 +76,15 @@ export default {
         this.nodeSaving = true
         let res = await this.$store.dispatch('workspace/wsNodeSave', this.node)
         this.$log('nodeSave res', res.revision, res.name, res)
+        if (!res.revision) this.$q.notify({color: 'red', textColor: 'white', message: 'No revision!!!'})
         if (!this.value) {
           this.$log('nodeSave SET WS ITEM')
-          // this.$emit('value', res)
-          // if (!this.$route.params.oid) this.$router.push('/workspace/nodes/' + res.oid).catch(e => e)
           this.$router.push({params: {oid: res.oid}})
           this.$store.commit('workspace/stateSet', ['itemType', 'node'])
           this.$store.commit('workspace/stateSet', ['item', res])
         }
         this.$log('nodeSave done', res.revision, res.name)
+        this.nodeSaveWs()
         this.nodeSavingError = null
       } catch (e) {
         this.$logE('nodeSave error', e)
@@ -93,6 +93,12 @@ export default {
         this.nodeSaving = false
         this.nodeChanged = false
       }
+    },
+    nodeSaveWs () {
+      this.$log('nodeSaveWs')
+      // if ctx in content-container, or not in content-container
+      // we go througn compositoins and layers,
+      // find their containers. and save them to ws...
     }
   },
   created () {

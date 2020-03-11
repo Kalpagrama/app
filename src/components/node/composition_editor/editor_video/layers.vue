@@ -7,34 +7,45 @@
     outline: none;
   }
 }
+.kbtn {
+  border-radius: 10px
+}
 </style>
 <template lang="pug">
 .column.fit
+  //- dialogs
+  q-dialog(v-model="dialogNameShow" :maximized="$q.screen.xs")
+    .column.fit.bg-white
+      div(:style=`{minHeight: '60px'}`).row.full-width
+        input(v-model="layerName").fit.kinput
+      .col.full-width
+      div(:style=`{height: '60px'}`).row.full-width.q-pa-sm
+        q-btn(push no-caps color="green" @click="dialogNameShow = false, layer.spheres[0] = {name: layerName}, layerName = ''").full-width
+          span.text-bold Save
   //- header
-  //- TODO its not only layers, its VIDEO, content meta....
   div(
-    :style=`{height: '60px'}`
+    :style=`{height: '60px', order: 1000}`
     ).row.full-width
     .col.full-height
-      .row.fit.items-center.content-center.q-px-xl
-        //- TODO change meta information of the content: layers, nodes, users, spheres, etc...
-        //- meta.mode
-        span.text-bold.text-green {{ modeName }}
+      .row.fit.items-center.justify-start.q-px-sm
         q-btn(
-          v-if="mode === 'edit'"
-          push round no-caps @click="playPause()"
-          :color="meta.mode === 'play' ? 'red' : 'green'"
-          :style=`{borderRadius: '10px'}`).q-px-sm
-          span.text-bold {{meta.mode === 'play' ? 'Just watch' : 'Play all layers'}}
+          round push color="green" icon="play_arrow")
+    .col.full-height
+      .row.fit.items-center.justify-end.q-px-sm
+        span(
+          :class=`{
+            'text-red': compositionLength > 60,
+            'text-white': compositionLength < 60}`
+          ).text-bold Total length: {{ $time(compositionLength) }}
   //- body
   div(
+    ref="layersScrollWrapper"
     :style=`{position: 'relative'}`).col.full-width.scroll
-    //- .row.full-width.q-px-sm.bg-red
-    //-   .row.full-width.bg-red.text-white
-    //-     div(v-for="(l, li) in layers").row.full-width.q-pa-xs layer: {{li+1}}-{{l.figuresAbsolute.length}}
-    .row.full-width.items-start.content-start.q-pa-sm
+    div(
+      :style=`{marginTop: $q.screen.height/2+'px', marginBottom: $q.screen.height/2+'px'}`
+      ).row.full-width.items-start.content-start.q-pa-sm
       div(
-        v-for="(l, li) in layers" :key="li"
+        v-for="(l, li) in layers" :key="li" :ref="'layer-'+li"
         v-if="l.figuresAbsolute.length > 0"
         :class=`{
           'bg-grey-10': meta.mode === 'watch' || li !== meta.layerIndex,
@@ -55,50 +66,93 @@
             //- name SHOW
             div(
               v-if="li !== layerNameSetting"
+              :style=`{paddingLeft: '20px'}`
               ).row.fit.items-center.content-center
               div(v-if="l.spheres.length > 0").col.full-height
-                .row.fit.items-center.content-center.q-px-sm
-                  span(v-if="l.spheres.length > 0").text-white {{ l.spheres[0].name }}
-              q-btn(v-if="li === meta.layerIndex" round flat dense color="white" icon="edit" @click="layerNameSetStart(l,li)").q-mx-sm
-              span(v-if="li === meta.layerIndex && l.spheres.length === 0").text-grey-5 Set layer name
-            //- name EDIT
-            div(
-              v-if="li === layerNameSetting"
-              :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.bg-green
-              .col.full-height
-                .row.fit.items-center.content-center
-                  input(
-                    v-model="layerName"
-                    autofocus
-                    @keyup.enter="layerNameSet(l,li)" @blur="layerNameSet(l, li)"
-                    :style=`{background: 'none', color: 'white'}`).kinput.full-width
-              q-btn(v-if="li === meta.layerIndex" round flat dense color="white" icon="check" @click="layerNameSet(l,li)").q-mx-sm
-          div(:style=`{width: '83px'}`).row.full-height.justify-center.items-center.content-center
-            span.text-white {{ $time(l.figuresAbsolute[0].t) }}
-          div(:style=`{width: '83px'}`).row.full-height.justify-center.items-center.content-center
-            span.text-white {{ $time(l.figuresAbsolute[1].t) }}
+                div().row.fit.items-center.content-center
+                  span(
+                    v-if="l.spheres.length > 0"
+                    @click="layerName = l.spheres[0].name, dialogNameShow = true"
+                    ).text-white.cursor-pointer {{ l.spheres[0].name }}
+              //- q-btn(v-if="li === meta.layerIndex" round flat dense color="white" icon="edit" @click="layerNameSetStart(l,li)").q-mx-sm
+              span(
+                v-if="li === meta.layerIndex && l.spheres.length === 0"
+                @click="dialogNameShow = true"
+                ).text-grey-5.cursor-pointer Click to set layer name
+            //- //- name EDIT
+            //- div(
+            //-   v-if="li === layerNameSetting"
+            //-   :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.bg-green
+            //-   .col.full-height
+            //-     .row.fit.items-center.content-center
+            //-       input(
+            //-         v-model="layerName"
+            //-         autofocus
+            //-         @keyup.enter="layerNameSet(l,li)" @blur="layerNameSet(l, li)"
+            //-         :style=`{background: 'none', color: 'white'}`).kinput.full-width
+            //-   q-btn(v-if="li === meta.layerIndex" round flat dense color="white" icon="check" @click="layerNameSet(l,li)").q-mx-sm
+          .row.full-height.items-center.content-center.q-px-md
+            .row.full-height.justify-center.items-center.content-center
+              span.text-white {{ $time(l.figuresAbsolute[0].t) }}
+            span.text-white.q-mx-sm -
+            .row.full-height.justify-center.items-center.content-center
+              span.text-white {{ $time(l.figuresAbsolute[1].t) }}
         //- active layer
         div(
           v-if="meta.mode !== 'watch' && meta.layerIndex === li"
-          :style=`{height: height+'px'}`
-          ).row.full-width.items-end.content-end.justify-end
-          //- active layer EDIT
-          div(
-            v-if="mode === 'edit'"
-            :style=`{height: '50px'}`).row.full-width.items-center.content-end.justify-end
-            q-btn(
-              round dense
-              :color="li === meta.layerIndexPlay ? 'red' : 'green'"
-              :icon="li === meta.layerIndexPlay ? 'pause' : 'play_arrow'").q-mx-sm
+          :style=`{}`
+          ).row.full-width.items-start.content-start.justify-start
+          //- spheres
+          .row.full-width.q-px-lg.q-py-sm
+            small(
+              v-for="(s,si) in l.spheres" :key="si"
+              :style=`{borderRadius: '20px'}`).text-white.q-py-xs.q-px-sm.bg-grey-7.q-mr-sm.q-mb-sm {{ s.name }}
+            div(:style=`{width: '24px', height: '24px', borderRadius: '12px'}`).row.items-center.content-center.justify-center.cursor-pointer.bg-green
+              q-icon(color="white" name="add")
+          //- play, progress, total
+          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-xs
+            div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+              q-btn(
+                push round no-caps @click="meta.playing ? player.pause() : player.play()"
+                :color="meta.playing && meta.layerIndex === li ? 'red' : 'green'"
+                :icon="meta.playing && meta.layerIndex === li ? 'pause' : 'play_arrow'"
+                :style=`{}`)
             .col.full-height
-            q-btn(
-              v-if="layers.length > 1"
-              round flat color="red" icon="delete_outline" @click="layerDelete(li)").q-mr-sm
+              .row.fit.items-center.content-center
+                div(
+                  @click="layerProgressClick"
+                  :style=`{position: 'relative', height: '44px', borderRadius: '20px', overflow: 'hidden'}`).row.full-width.bg-grey-9.q-pa-xs
+                  //- progress
+                  div(:style=`{
+                    position: 'absolute', zIndex: 200,
+                    //- borderRadius: layerPersent > 99.9 ? '30px' : '30px 0 0 30px',
+                    borderRadius: '30px', pointerEvents: 'none',
+                    width: 'calc('+layerPersent+'% - 8px)',
+                    height: 'calc(100% - 8px)'}`).row.bg-grey-4
+            div(:style=`{height: '60px', width: '60px'}`).row.items-center.conent-center.justify-center
+              q-btn(round flat color="white" icon="more_vert" @click="layerMore()")
+          //- ticks
+          div(:style=`{height: '44px'}`).row.full-width.justify-center.content-center.items-center.q-px-md.q-mt-sm.q-mb-md
+            div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs
+              q-btn(round flat dense no-caps color="green" icon="keyboard_arrow_left" @click="layerTick(0, 0)").q-mr-lg
+              q-btn(round flat dense no-caps color="green" icon="keyboard_arrow_right" @click="layerTick(0, 1)")
             .col.full-height
-            q-btn(round flat color="green" icon="keyboard_arrow_left" @click="l.figuresAbsolute[0].t -= 0.100")
-            q-btn(round flat color="green" icon="keyboard_arrow_right" @click="l.figuresAbsolute[0].t += 0.100")
-            q-btn(round flat color="green" icon="keyboard_arrow_left" @click="l.figuresAbsolute[1].t -= 0.100")
-            q-btn(round flat color="green" icon="keyboard_arrow_right" @click="l.figuresAbsolute[1].t += 0.100")
+              .row.fit.items-center.content-center.justify-center
+                span.text-white {{ $time(l.figuresAbsolute[1].t-l.figuresAbsolute[0].t) }}
+                .row.full-width.justify-center.text-grey-5
+                  small Total
+            div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs
+              q-btn(round flat dense no-caps color="green" icon="keyboard_arrow_left" @click="layerTick(1, 0)").q-mr-lg
+              q-btn(round flat dense no-caps color="green" icon="keyboard_arrow_right" @click="layerTick(1, 1)")
+          //- actions: delete, copy, share, save
+          div(v-if="true").row.full-width.q-px-md.q-py-xs
+            q-btn(flat no-caps color="red" @click="layerDelete(li)"
+              :style=`{borderRadius: '10px'}`)
+              span.text-bold Delete
+            .col.full-height
+            q-btn(flat no-caps color="green"
+              :style=`{borderRadius: '10px'}`)
+              span.text-bold Save to composition
           //- active layer PICK
           div(
             v-if="mode === 'pick'"
@@ -112,9 +166,10 @@ export default {
   props: ['mode', 'layers', 'composition', 'player', 'meta'],
   data () {
     return {
-      height: 50,
+      height: 220,
       layerNameSetting: -1,
-      layerName: ''
+      layerName: '',
+      dialogNameShow: false
     }
   },
   computed: {
@@ -126,6 +181,12 @@ export default {
     },
     layer () {
       return this.layers[this.meta.layerIndex]
+    },
+    layerPersent () {
+      if (!this.layer) return 0
+      let dNow = this.meta.now - this.layer.figuresAbsolute[0].t
+      let dAll = this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t
+      return (dNow / dAll) * 100
     },
     modeName () {
       switch (this.meta.mode) {
@@ -143,15 +204,21 @@ export default {
           return 'Nothing'
         }
       }
+    },
+    compositionLength () {
+      return this.layersFiltered.reduce((acc, l) => {
+        return acc + (l.figuresAbsolute[1].t - l.figuresAbsolute[0].t)
+      }, 0)
     }
   },
   watch: {
     'meta.layerIndex': {
+      immediate: true,
       handler (to, from) {
         this.$log('meta.layerIndex CHANGED', to)
-        // TODO save the unsaved value?
         this.layerNameSetting = false
         this.layerName = ''
+        if (to >= 0) this.layerScrollTo(to)
       }
     }
   },
@@ -180,9 +247,35 @@ export default {
         this.$emit('pick', JSON.parse(JSON.stringify(this.layers[li])))
       }
     },
+    layerMore () {
+      this.$log('layerMore')
+    },
+    layerProgressClick (e) {
+      this.$log('layerProgressClick', e)
+      let width = e.path[0].clientWidth
+      let offsetX = e.offsetX
+      let k = offsetX / width
+      let d = this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t
+      let to = this.layer.figuresAbsolute[0].t + (k * d)
+      this.player.setCurrentTime(to)
+    },
+    layerTick (index, forward) {
+      this.$log('layerTick', index, forward)
+      let from = this.layer.figuresAbsolute[index].t
+      let to = forward ? from + 0.100 : from - 0.100
+      this.layer.figuresAbsolute[index].t = to
+      this.player.pause()
+      this.player.setCurrentTime(to)
+    },
+    async layerScrollTo (li) {
+      this.$log('layerScrollTo')
+      await this.$wait(150)
+      let l = this.$refs[`layer-${li}`][0]
+      let offset = l.offsetTop - 30
+      this.$tween.to(this.$refs.layersScrollWrapper, 0.5, {scrollTop: offset})
+    },
     layerExport (l, li) {
       this.$log('layerExport', l, li)
-      // this.$emit('layerExport', l)
     },
     layerPlay () {
       this.$log('layerPlay')

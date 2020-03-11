@@ -2,14 +2,9 @@
 div(
   :style=`{position: 'relative', height: mini ? 'auto' : '100%'}`
   ).row.full-width.items-start.content-start.bg-black
-  //- debug
-  //- div(
-  //-   v-if="false"
-  //-   :style=`{position: 'absolute', top: '2px', left: '2px', zIndex: 10000, borderRadius: '10px'}`).row.q-pa-sm.bg-green
-  //-   small.text-white.full-width mini: {{ mini }}
-  //- TODO composition menu
+  //- composition menu
   q-btn(
-    v-if="visible && active && !mini && value"
+    v-if="ctx !== 'workspace' && visible && active && !mini && value"
     round flat color="white" icon="more_vert" @click="menuToggle()"
     :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)'}`)
   //- next tint
@@ -23,13 +18,13 @@ div(
     :style=`{
       userSelect: 'none',
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
-      maxHeight: $q.screen.height+'px', objectFit: 'contain'}`)
+      maxHeight: $q.screen.height+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(
     v-if="visible && value"
     :ctx="ctx" :composition="value"
     :visible="visible" :active="active" :mini="mini"
-    :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 1000}`).fit
+    :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 1000, ...styles}`).fit
     template(v-slot:editor=`{player, meta}`)
       slot(name="editor" :player="player" :meta="meta")
 </template>
@@ -48,7 +43,8 @@ export default {
     preview: {type: String},
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},
-    mini: {type: Boolean, default () { return false }}
+    mini: {type: Boolean, default () { return false }},
+    styles: {type: Object, default () { return {} }}
   },
   data () {
     return {

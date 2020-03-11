@@ -32,8 +32,11 @@
       kalpa-loader(type="wsContents" :variables=`{}`)
         template(v-slot:items=`{items}`)
           ws-content(
-            v-for="(n, ni) in items" :key="n.oid" @contentClick="contentClick"
-            :index="ni" :oid="oid", :node="n")
+            v-for="(n, ni) in items" :key="n.oid"
+            :index="ni" :contentIndex="contentIndex" :oid="oid", :node="n"
+            @contentClick="contentClick"
+            @contentDelete="contentDelete"
+            @contentEdit="contentEdit")
 </template>
 
 <script>
@@ -48,6 +51,7 @@ export default {
       mode: 'list',
       modes: ['list', 'gallery', 'feed'],
       content: null,
+      contentIndex: -1,
       contents: [],
       res: null
     }
@@ -60,9 +64,20 @@ export default {
   watch: {
   },
   methods: {
-    contentClick (content) {
-      this.$log('contentClick', content)
+    contentClick (index) {
+      this.$log('contentClick', index)
+      this.contentIndex = index
+    },
+    contentEdit (content) {
+      this.$log('contentEdit', content)
       this.$emit('item', {type: 'content', item: content})
+    },
+    async contentDelete (oid) {
+      this.$log('contentDelete start', oid)
+      if (!confirm('Delete content?')) return
+      let res = await this.$store.dispatch('workspace/wsItemDelete', oid)
+      this.$log('contentDelete done', res)
+      this.contentIndex = -1
     },
     async contentFound (content) {
       this.$log('contentFound', content)
@@ -93,7 +108,7 @@ export default {
         this.$log('nodeContentInput', nodeContentInput)
         let nodeContent = await this.$store.dispatch('workspace/wsNodeSave', nodeContentInput)
         this.$log('nodeContent', nodeContent)
-        this.contentClick(nodeContent)
+        this.contentClick(0)
       }
     }
   },

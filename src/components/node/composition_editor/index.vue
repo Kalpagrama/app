@@ -1,30 +1,29 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  q-btn(
-    v-if="inDialog"
-    outline color="red" no-caps @click="$emit('close')"
-    :style=`{position: 'absolute', zIndex: 9000, top: '16px', borderRadius: '10px', left: '16px'}`) Cancel
-  q-btn(
-    v-if="inDialog"
-    push color="green" no-caps @click="$emit('close')"
-    :style=`{position: 'absolute', zIndex: 9000, top: '16px', borderRadius: '10px', right: '16px'}`) Ready
+  q-resize-observer(@resize="onResize")
+  //- actions
+  //- q-btn(
+  //-   outline color="red" no-caps @click="$emit('hide')"
+  //-   :style=`{position: 'absolute', zIndex: 9000, top: '16px', borderRadius: '10px', left: '16px'}`) Cancel
+  //- q-btn(
+  //-   push color="green" no-caps @click="$emit('hide')"
+  //-   :style=`{position: 'absolute', zIndex: 9000, top: '16px', borderRadius: '10px', right: '16px'}`) Ready
+  //- composition with COMPOSER slot
   composition(
     v-if="composition" :value="composition"
     :ctx="ctx"
-    :visible="true" :active="true" :mini="false")
+    :visible="true" :active="true" :mini="false"
+    :styles=`layoutVertical ? {paddingBottom: '400px'} : {paddingRight: '450px'}`).fit
     template(v-slot:editor=`{player, meta}`)
-      editor-video(
-        v-if="composition" :mode="mode"
-        :ctx="ctx" :composition="node.compositions[compositionIndex]" :player="player" :meta="meta")
+      video-composer(v-if="composition" :ctx="ctx" :composition="composition" :player="player" :meta="meta" :layoutVertical="layoutVertical")
 </template>
 
 <script>
-import { debounce } from 'quasar'
-import editorVideo from './editor_video/index.vue'
+import videoComposer from './video_composer'
 
 export default {
   name: 'compositionEditor',
-  components: {editorVideo},
+  components: {videoComposer},
   props: {
     ctx: {type: String, default () { return 'workspace' }},
     inDialog: {type: Boolean},
@@ -35,22 +34,22 @@ export default {
   },
   data () {
     return {
+      width: 0,
+      height: 0
     }
   },
   computed: {
     composition () {
       return this.node.compositions[this.compositionIndex]
     },
-    content () {
-      if (this.composition) return this.composition.layers[0].content
-      else return null
+    layoutVertical () {
+      return this.width < (this.height * 0.7) + 450
     }
   },
-  watch: {
-    node: {
-      handler (to, from) {
-        this.$log('node CHANGED', to)
-      }
+  methods: {
+    onResize (e) {
+      this.width = e.width
+      this.height = e.height
     }
   }
 }

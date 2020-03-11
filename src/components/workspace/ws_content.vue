@@ -1,37 +1,78 @@
 <template lang="pug">
 div(
-  @click="contentClick()"
-  :class=`{'bg-grey-8': node.oid !== oid, 'bg-white': node.oid === oid}`
-  :style=`{position: 'relative', minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
-  ).row.full-width.items-center.cursor-pointer.q-mb-sm
-  span(
-    :class=`{
-      'text-white': node.oid !== oid,
-      'text-green': node.oid === oid}`
-  ).q-ma-sm.cursor-pointer {{ nodeFull ? nodeFull.compositions[0].layers[0].content.name : node.name }}
+  :class=`{
+    position: 'relative', overflow: 'hidden',
+    'bg-grey-8': !contentActive,
+    'bg-white': contentActive
+  }`
+  :style=`{position: 'relative', height: height+'px', borderRadius: '10px', overflow: 'hidden'}`
+  ).row.full-width.items-start.content-start.q-mb-sm
+  //- content.name
+  div(:style=`{height: '40px'}`).row.full-width.items-center.content-center
+    span(
+      :class=`{
+        'text-white': !contentActive,
+        'text-green': contentActive,
+        'text-bold': contentActive}`
+      ).q-ma-sm.cursor-pointer {{ contentName || '' | cut(70) }}
+  //- content INACTIVE tint
   div(
-    v-if="showFull"
-    :style=`{position: 'relative', height: '300px'}`
-    ).row.full-width.bg-red
-    composition(ctx="workspace" :value="nodeFull.compositions[0]" :active="true" :visible="true" :mini="false")
+    v-if="!contentActive"
+    :style=`{position: 'absolute', zIndex: 200}` @click="$emit('contentClick', index)").row.fit.cursor-pointer
+  //- content active
+  div(
+    v-if="contentActive"
+    :style=`{}`).row.full-width.items-start.content-start
+    //- spheres
+    div(:style=`{maxHeight: '50px'}`).row.full-width.items-center.content-center.q-px-sm.scroll
+      .row.no-wrap
+        span(
+          v-for="(s, si) in 100" :key="si"
+          :style=`{whiteSpace: 'nowrap', borderRadius: '10px'}`
+          ).bg-grey-4.q-px-sm.q-py-xs.q-mr-sm.q-mb-sm.cursor-pointer sphere {{ si}}
+    //- actions
+    div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.q-px-sm
+      q-btn(round flat dense color="red" icon="delete_outline" @click="$emit('contentDelete', node.oid)")
+      .col
+      q-btn(
+        push no-caps color="green" @click="$emit('contentEdit', nodeFull)"
+        :style=`{borderRadius: '10px'}`)
+        span.text-bold Edit content
 </template>
 
 <script>
 export default {
   name: 'wsContent',
-  props: ['oid', 'node'],
+  props: ['oid', 'node', 'index', 'contentIndex'],
   data () {
     return {
       nodeFull: null,
-      showFull: false
+      showFull: false,
+      height: 40
+    }
+  },
+  computed: {
+    contentActive () {
+      return this.index === this.contentIndex
+    },
+    contentName () {
+      return this.nodeFull ? this.nodeFull.compositions[0].layers[0].content.name : this.node.name
+    }
+  },
+  watch: {
+    contentActive: {
+      async handler (to, from) {
+        this.$log('contentActive CHANGED', to)
+        if (to) {
+          await this.$wait(200)
+          this.$tween.to(this, 0.2, {height: 140})
+        } else {
+          this.$tween.to(this, 0.2, {height: 40})
+        }
+      }
     }
   },
   methods: {
-    contentClick () {
-      this.$log('contentClick')
-      // this.showFull = !this.showFull
-      this.$emit('contentClick', this.nodeFull)
-    }
   },
   async mounted () {
     this.nodeFull = await this.$store.dispatch('workspace/get', {oid: this.node.oid})

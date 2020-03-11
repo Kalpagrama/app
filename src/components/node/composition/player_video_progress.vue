@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'absolute', bottom: '16px', left: 0, zIndex: 300}`
+    position: 'absolute', bottom: '170px', left: 0, zIndex: 20000}`
   ).row.full-width.items-start.content-start
   //- pregress wrapper
   .row.full-width.items-start.content-start.q-px-sm

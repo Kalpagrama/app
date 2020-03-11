@@ -15,7 +15,7 @@ q-layout( view="hHh Lpr lff")
     v-model="$q.screen.xs ? false : drawerShow"
     no-swipe-open no-swipe-close show-if-above
     :side="$q.screen.xs ? 'right' : 'left'"
-    :width="$q.screen.xs ? $q.screen.width/2+30 : 60" :breakpoint="1000" :mini="!$q.screen.xs"
+    :width="$q.screen.xs ? $q.screen.width/2+30 : 60"
     content-class="bg-grey-8").gt-xs
     kalpa-menu-desktop(v-if="!loading" :mini="$q.screen.xs ? false : drawerMini" :style=`{zIndex: 10000}`)
   q-dialog(
@@ -23,7 +23,7 @@ q-layout( view="hHh Lpr lff")
     kalpa-menu-xs(@close="drawerShowMobile = false")
   div(
     :style=`{position: 'fixed', zIndex: 1000, right: '0px', bottom: '0px',
-      width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center.xs
+      width: $q.screen.width/4+'px', height: $q.screen.width/4+'px'}`).row.items-center.content-center.justify-center.xs
     q-btn(
       round flat size="lg" @click="drawerShow = !drawerShow, drawerShowMobile = !drawerShowMobile"
       :color="drawerShowMobile ? 'red' : 'green'"
