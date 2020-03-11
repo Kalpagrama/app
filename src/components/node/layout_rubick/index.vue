@@ -18,7 +18,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).row.fit
       composition-editor(
         ctx="editor"
-        :node="nodeRubickNew" :compositionIndex="compositionIndex" @composition="compositionEdited").bg-black
+        :node="nodeRubickNew" :compositionIndex="compositionIndex").bg-black
       q-btn(push color="green" no-caps @click="compositionEditorOpened = false, compositionEditedFinal()"
         :style=`{position: 'absolute', zIndex: 10000, top: '16px', right: '16px'}`) Ready!
   //- header
@@ -53,8 +53,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         q-btn(
-          round outline color="green" icon="add" @click="compositionAdd(0)"
-          :loading="compositionIndex === 0 && nodePublishing"
+          round outline color="green" icon="add" @click="compositionAdd(compositionOneOid)"
+          :loading="nodePublishing"
           :style=`{position: 'absolute', zIndex: 200, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- name, essence
       essence(v-if="node && nodeNameQuery" :node="node" :nodes="nodeNameQuery.items"
@@ -72,8 +72,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         q-btn(
-          round outline color="green" icon="add" @click="compositionAdd(1)"
-          :loading="compositionIndex === 1 && nodePublishing"
+          round outline color="green" icon="add" @click="compositionAdd(compositionTwoOid)"
+          :loading="nodePublishing"
           :style=`{position: 'absolute', zIndex: 2000, bottom: '16px', right: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.4)'}`)
       //- debug node
       div(v-if="node && $store.state.ui.debug").row.full-width.bg-red
@@ -173,22 +173,42 @@ export default {
           this.compositionOneQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionTwoOid], pagination: {pageSize: 30}})
           this.compositionTwoQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid], pagination: {pageSize: 30}})
           this.nodeNameQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid, this.compositionTwoOid], pagination: {pageSize: 30}})
+          this.$set(this.compositionsActive, [true, true])
+          this.nodeLoad()
         }
+      }
+    },
+    nodeFull: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('nodeFull CHANGED', to)
+      }
+    },
+    nodeRubickNew: {
+      handler (to, from) {
+        this.$log('nodeRubickNew CHANGED', to)
+      }
+    },
+    compositionsActive: {
+      handler (to, from) {
+        this.$log('compositionsActive CHANGED', to)
       }
     }
   },
   methods: {
-    compositionAdd (index) {
-      this.$log('compositionAdd', index)
-      this.$set(this.compositionsActive, 0, false)
-      this.$set(this.compositionsActive, 1, false)
-      this.compositionIndex = index
+    compositionAdd (oid) {
+      this.$log('compositionAdd', oid)
+      this.$set(this.compositionsActive, [false, false])
+      let i = this.nodeFull.compositions.findIndex(c => c.oid === oid)
+      this.compositionIndex = i
       this.compositionFinderOpened = true
     },
     async compositionFound (composition) {
       this.$log('compositionFound', composition)
-      this.nodeRubickNew = JSON.parse(JSON.stringify(this.nodeFull))
-      this.nodeRubickNew.compositions[this.compositionIndex] = composition
+      this.$set(this, 'nodeRubickNew', JSON.parse(JSON.stringify(this.nodeFull)))
+      this.$set(this.nodeRubickNew.compositions, this.compositionIndex, composition)
+      // this.nodeRubickNew = JSON.parse(JSON.stringify(this.nodeFull))
+      // this.nodeRubickNew.compositions[this.compositionIndex] = composition
       this.compositionEditorOpened = true
       this.$wait(300).then(() => {
         this.compositionFinderOpened = false
@@ -196,10 +216,8 @@ export default {
     },
     compositionEdited (composition) {
       this.$log('compositionEdited', composition)
-      this.$set(this.compositionsActive, 0, true)
-      this.$set(this.compositionsActive, 1, true)
       this.$set(this.nodeRubickNew.compositions, this.compositionIndex, composition)
-      this.$log('compositionEdited: nodeNew', this.nodeRubickNew)
+      this.$set(this.compositionsActive, [true, true])
     },
     async compositionEditedFinal () {
       this.$log('compositionEditedFinal', this.nodeRubickNew)
@@ -210,11 +228,19 @@ export default {
       this.$log('cONEnext index', index)
       let node = this.compositionOneItems[index].node
       this.$router.push('/node/' + node.oid)
+      // this.$set(this.compositionsActive, 0, false)
+      // this.$wait(300, () => {
+      //   this.$set(this.compositionsActive, 0, true)
+      // })
     },
     async compositionTwoNextIndex (index) {
       this.$log('cTWOnext index', index)
       let node = this.compositionTwoItems[index].node
       this.$router.push('/node/' + node.oid)
+      // this.$set(this.compositionsActive, 1, false)
+      // this.$wait(300, () => {
+      //   this.$set(this.compositionsActive, 1, true)
+      // })
     },
     async nodePublish (node) {
       try {

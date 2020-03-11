@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative', paddingTop: '0px', paddingBottom: '0px'}`
+div(:style=`{position: 'relative', paddingTop: '300px', paddingBottom: '300px'}`
   ).row.full-width.items-start.content-start.justify-start.q-px-xs
   //- node top
   //- div(:style=`{position: 'absolute', top: nodeTop+'px', zIndex: 10000, borderRadius: '10px', overflow: 'hidden'}`).row.full-width.br
@@ -21,7 +21,7 @@ div(:style=`{position: 'relative', paddingTop: '0px', paddingBottom: '0px'}`
     :node="n" :index="ni"
     :needFull="ni >= nodeMiddle-0 && ni <= nodeMiddle+1"
     :needFullPreload="!(ni >= nodeMiddle-1 && ni <= nodeMiddle+1) && ni >= nodeMiddle-8 && ni <= nodeMiddle+8"
-    :visible="ni >= nodeMiddle-0 && ni <= nodeMiddle+1"
+    :visible="ni >= nodeMiddle-0 && ni <= nodeMiddle+0"
     :active="nodeMiddle === ni"
     @open="node = $event[0], nodeFull = $event[1], nodeDialogOpened = true"
     @hide="nodesBan.push(n.oid)"

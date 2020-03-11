@@ -54,18 +54,18 @@ export default {
     }
   },
   watch: {
-    // '$store.state.workspace.item': {
-    //   deep: true,
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('item CHANGED', to)
-    //     // TODO item type?
-    //     if (to) {
-    //       this.$router.push({params: {oid: to.oid}}).catch(e => e)
-    //       if (this.$q.screen.xs) this.pageDialogOpened = true
-    //     }
-    //   }
-    // },
+    '$store.state.workspace.item': {
+      deep: true,
+      immediate: true,
+      handler (to, from) {
+        this.$log('item CHANGED', to)
+        // TODO item type?
+        if (to) {
+          this.$router.push({params: {oid: to.oid}}).catch(e => e)
+          if (this.$q.screen.xs) this.pageDialogOpened = true
+        }
+      }
+    },
     '$route.params.page': {
       immediate: true,
       handler (to, from) {

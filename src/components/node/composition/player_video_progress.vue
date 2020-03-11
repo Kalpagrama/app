@@ -65,7 +65,7 @@ export default {
       let to = (this.duration * x) / w
       this.$emit('meta', ['mode', 'watch'])
       this.player.setCurrentTime(to)
-      this.videoUpdate(to)
+      this.videoUpdate(null, to)
     }
   }
 }

@@ -12,7 +12,7 @@ iframe {
 q-layout( view="hHh Lpr lff")
   kalpa-action
   q-drawer(
-    v-model="drawerShow"
+    v-model="$q.screen.xs ? false : drawerShow"
     no-swipe-open no-swipe-close show-if-above
     :side="$q.screen.xs ? 'right' : 'left'"
     :width="$q.screen.xs ? $q.screen.width/2+30 : 60" :breakpoint="1000" :mini="!$q.screen.xs"
@@ -71,6 +71,9 @@ export default {
     },
     menuToggle () {
       this.$log('menuToggle')
+    },
+    onScroll (e) {
+      this.$log('onScroll', e)
     },
     onResize (e) {
       this.$logD('onResize', e)

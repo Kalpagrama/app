@@ -27,7 +27,7 @@ export default {
     variables: {
       immediate: true,
       async handler (to, from) {
-        this.$log('variables CHANGED', 'from=', from, ', to=', to)
+        // this.$log('variables CHANGED', 'from=', from, ', to=', to)
         if (to && !this.query) this.itemsLoad(to)
       }
     }
@@ -50,7 +50,7 @@ export default {
       }
     },
     async itemsLoad (variables, append = false) {
-      this.$log('itemsLoad start', variables)
+      // this.$log('itemsLoad start', variables)
       // get variables
       let { oid, pagination, filter, sortStrategy } = variables
       pagination = pagination || {pageSize: 30, pageToken: null}
@@ -89,15 +89,15 @@ export default {
       this.nextPageToken = nextPageToken
       this.totalCount = totalCount
       this.itemsCount = items.length
-      this.$log('itemsLoad done')
+      // this.$log('itemsLoad done')
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     // TODO: load all the items if they are in cache...
   },
   beforeDestroy () {
-    this.$logD('beforeDestroy')
+    // this.$logD('beforeDestroy')
   }
 }
 </script>

@@ -75,7 +75,7 @@ export default {
       // if (node) this.$log('nodePreLoad OK! indx=', this.index, oid)
     },
     async nodeLoad () {
-      if (this.nodeFull) return
+      // if (this.nodeFull) return
       let oid = this.node.oid
       this.$log(` nodeLoad start indx=${this.index}  oid=${oid}`)
       let node = null

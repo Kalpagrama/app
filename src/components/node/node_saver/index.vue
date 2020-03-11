@@ -56,7 +56,7 @@ export default {
     node: {
       deep: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
+        // this.$log('node CHANGED', to)
         if (to) {
           // user changed node
           if (!from || from.revision === to.revision) {
