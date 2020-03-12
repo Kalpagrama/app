@@ -18,7 +18,7 @@ div(
       v-if="ctx === 'workspace'"
       :style=`{height: '60px'}`
       ).row.full-width.items-center.content-center.justify-center
-      div(:style=`{maxWidth: maxWidth+'px', height: '60px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px'}`).row.full-width
         div(
           :style=`{height: '60px', width: '60px'}`
           ).row.items-center.justify-center
@@ -36,13 +36,13 @@ div(
           q-btn(round :flat="page !== 'setting'" color="green" icon="settings" @click="$emit('page', 'setting')")
     //- pages
     div(v-if="true").row.full-width.justify-center
-      div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width
+      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
         kalpa-buttons(:value="pagesFiltered" :id="page" idKey="id" @id="$emit('page', $event)")
     //- body
     .col.full-width
       .row.fit.justify-center
-        div(:style=`{maxWidth: maxWidth+'px'}`).row.fit
-          component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('add')" :ctx="ctx")
+        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit
+          component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('add', $event)" :ctx="ctx")
 </template>
 
 <script>

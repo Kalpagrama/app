@@ -3,7 +3,7 @@
   div(:style=`{position: 'relative'}`).column.fit
     //- actions
     q-btn(
-      round push size="lg" color="green" icon="add" @click="$emit('add')"
+      round push size="lg" color="green" icon="add" @click="$emit('add', {type: 'node', item: null})"
       :style=`{position: 'absolute', zIndex:1000, left: '16px', bottom: '16px'}`)
     //- header with filters...
     .row.full-width.q-px-sm

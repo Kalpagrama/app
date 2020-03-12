@@ -121,7 +121,7 @@ export default {
       compositionTwoOid: undefined,
       nodeNameQuery: null,
       compositionsVisible: [true, true],
-      compositionsActive: [true, false],
+      compositionsActive: [true, true],
       nodeRubickNew: null,
       nodePublishing: false,
       maxWidth: 600,

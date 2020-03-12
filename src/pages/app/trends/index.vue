@@ -1,9 +1,18 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf")
-  q-page-conainter.row.full-width.justify-center.items-start.content-start.bg-grey-9
+q-layout(
+  view="hHh lpR fFf"
+  :style=`{height: $q.screen.height+'px'}`)
+  q-header(:style=`{zIndex: 200, paddingLeft: $q.screen.xs ? '0px' : '60px'}`).row.full-width.justify-center.bg-grey-9
+    div(
+      :style=`{
+        height: '60px',
+        maxWidth: $store.state.ui.maxWidthPage+'px'
+      }`).row.full-width.items-center
+      span.text-green.text-bold Trends
+  q-page-conainter.row.full-width.justify-center.items-start.content-start.bg-grey-10
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
-        node-list(:nodes="items" :style=`{maxWidth: '750px'}`)
+        node-list(:nodes="items" :style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`)
 </template>
 
 <script>

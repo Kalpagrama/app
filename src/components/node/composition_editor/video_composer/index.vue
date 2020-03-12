@@ -9,7 +9,7 @@ div
       right: layoutVertical ? 10+'px': 450+10+'px'}`)
   //- layerEditor
   div(
-    v-if="page === 'layers'"
+    v-if="page === 'layers' && meta.layerIndexPlay >= 0"
     :style=`{
       position: 'absolute', zIndex: 2200, height: '170px',
       bottom: layoutVertical ? '400px' : '0px',
@@ -36,7 +36,7 @@ div
       content-info(
         v-if="page === 'info'" :content="composition.layers[0].content")
       layers(
-        v-if="page === 'layers'" :composition="composition" :player="player" :meta="meta" @meta="$parent.$emit('meta', $event)")
+        v-if="page === 'layers'" :layers="layers" :player="player" :meta="meta" @meta="$parent.$emit('meta', $event)")
       //- content-nodes()
       //- content-spheres()
 </template>
@@ -67,17 +67,10 @@ export default {
   },
   computed: {
     layers () {
-      return this.composition.layers.filter(l => {
-        return l.figuresAbsolute.length > 0
-      })
+      return this.composition.layers
     },
     layer () {
-      return this.composition.layers[this.meta.layerIndex]
-      // if (this.meta.layerIndex >= 0) {
-      //   return this.layers[this.meta.layerIndex]
-      // } else {
-      //   return this.composition.layers[0]
-      // }
+      return this.layers[this.meta.layerIndex]
     },
     content () {
       return this.layer.content

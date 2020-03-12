@@ -1,19 +1,6 @@
 <template lang="pug">
 div(:style=`{position: 'relative', paddingTop: '300px', paddingBottom: '300px'}`
   ).row.full-width.items-start.content-start.justify-start.q-px-xs
-  //- node top
-  //- div(:style=`{position: 'absolute', top: nodeTop+'px', zIndex: 10000, borderRadius: '10px', overflow: 'hidden'}`).row.full-width.br
-  //-   //- div(:style=`{height: '100px'}`).row.full-width.bg-red
-  //-   //-   small.full-width nodeMiddle: {{nodeMiddle}}
-  //-   //-   small.full-width nodeMiddleOid: {{nodeMiddleOid}}
-  //-   composition(v-if="nodeMiddleOid && $refs['node-'+nodeMiddleOid][0].nodeFull" :composition="$refs['node-'+nodeMiddleOid][0].nodeFull.compositions[0]" :visible="true")
-  //- node opened dialog
-  q-dialog(v-model="nodeDialogOpened" :maximized="true" full-height)
-    div(@click.self="nodeDialogOpened = false" :style=`{position: 'relative'}`).row.fit.items-start.content-start.justify-center.bg-grey-10
-      //- q-btn(
-      //-   round flat color="green" icon="keyboard_arrow_left" @click="nodeDialogOpened = false"
-      //-   :style=`{position: 'fixed', top: '16px', left: '16px', zIndex: 2000}`)
-      node(ctx="explorer" :node="node" :nodeFullReady="nodeFull" :visible="true" :active="true" layout="opened")
   node(
     v-for="(n, ni) in nodes" :key="n.oid" :accessKey="`${ni}-${n.oid}`"
     v-if="nodesBan ? !nodesBan.includes(n.oid) : true" layout="pip"
@@ -35,7 +22,6 @@ div(:style=`{position: 'relative', paddingTop: '300px', paddingBottom: '300px'}`
       }
     }`
     ).bg-grey-2
-    //- border: nodeMiddle === ni ? '2px solid red' : 'none'
 </template>
 
 <script>

@@ -18,7 +18,7 @@ div(
   //- content INACTIVE tint
   div(
     v-if="!contentActive"
-    :style=`{position: 'absolute', zIndex: 200}` @click="$emit('contentClick', index)").row.fit.cursor-pointer
+    :style=`{position: 'absolute', zIndex: 200}` @click="$emit('contentClick', node.oid)").row.fit.cursor-pointer
   //- content active
   div(
     v-if="contentActive"
@@ -43,7 +43,7 @@ div(
 <script>
 export default {
   name: 'wsContent',
-  props: ['oid', 'node', 'index', 'contentIndex'],
+  props: ['node', 'index', 'contentOid', 'contentIndex'],
   data () {
     return {
       nodeFull: null,
@@ -53,7 +53,8 @@ export default {
   },
   computed: {
     contentActive () {
-      return this.index === this.contentIndex
+      // return this.index === this.contentIndex
+      return this.node.oid === this.contentOid
     },
     contentName () {
       return this.nodeFull ? this.nodeFull.compositions[0].layers[0].content.name : this.node.name

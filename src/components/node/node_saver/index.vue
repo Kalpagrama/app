@@ -79,7 +79,7 @@ export default {
         if (!res.revision) this.$q.notify({color: 'red', textColor: 'white', message: 'No revision!!!'})
         if (!this.value) {
           this.$log('nodeSave SET WS ITEM')
-          this.$router.push({params: {oid: res.oid}})
+          // this.$router.push({params: {oid: res.oid}})
           this.$store.commit('workspace/stateSet', ['itemType', 'node'])
           this.$store.commit('workspace/stateSet', ['item', res])
         }

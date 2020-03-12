@@ -11,8 +11,8 @@ div(
   ).row.full-width.q-mb-xs
   //- default header
   div(:style=`{height: '36px'}`).row.full-width.items-center.content-center
-    span(v-if="layerName").text-white.q-ml-md {{ layerName }}
-    span(v-if="layerActive && !layerName").text-white.cursor-pointer.q-ml-md Set layer name
+    span(v-if="layerName" @click="$emit('layerNameSetStart', index)").text-white.cursor-pointer.q-ml-md {{ layerName }}
+    span(v-if="layerActive && !layerName" @click="$emit('layerNameSetStart', index)").text-white.cursor-pointer.q-ml-md Set layer name
     .col
       .row.fit.items-center.content-center.justify-end.q-px-md
         span.text-white {{$time(layer.figuresAbsolute[0].t)}}-{{$time(layer.figuresAbsolute[1].t)}} / {{ $time(layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t) }}
@@ -25,7 +25,7 @@ div(
     :style=`{position: 'absolute', zIndex: 200,}`).row.fit.cursor-pointer
   //- ACTIVE layer
   div(
-    :style=`{position: 'relative', height: height+'px', overflow: 'hidden'}`).row.full-width
+    :style=`{position: 'relative', height: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start
     //- PLAYER progress
     div(:style=`{height: '60px'}`).row.full-width
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
@@ -48,8 +48,24 @@ div(
               ).row.bg-grey-4
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="white" icon="refresh" @click="player.setCurrentTime(layer.figuresAbsolute[0].t)")
-    .row.full-width.bg {{layer.figuresAbsolute}}
-    .row.full-width.br {{meta}}
+    //- TICKS
+    div(:style=`{height: '44px'}`).row.full-width.justify-center.content-center.items-center.q-px-md
+      div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs
+        q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_left" @click="layerTick(0, 0)").q-mr-lg
+        q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_right" @click="layerTick(0, 1)")
+      .col.full-height
+        .row.fit.items-center.content-center.justify-center
+          span.text-white {{ $time(layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t) }}
+          .row.full-width.justify-center.text-grey-5
+            small Total
+      div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs
+        q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_left" @click="layerTick(1, 0)").q-mr-lg
+        q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_right" @click="layerTick(1, 1)")
+    //- ACTIONS: delete, copy, share, save
+    .row.full-width.q-px-lg.q-py-sm
+      q-btn(round flat icon="delete_outline" color="red" @click="$emit('layerDelete', index)")
+      .col.full-height
+      q-btn(round flat icon="favorite_border" color="white" @click="layerLove()")
 </template>
 
 <script>
@@ -64,7 +80,7 @@ export default {
   computed: {
     layerName () {
       if (this.layer.spheres.length > 0) {
-        return this.layers.spheres[0].name
+        return this.layer.spheres[0].name
       } else {
         return false
       }
@@ -86,7 +102,7 @@ export default {
         this.$log(this.index, 'layerActive CHANGED', to)
         if (to) {
           // await this.$wait(300)
-          this.$tween.to(this, 0.3, {height: 200})
+          this.$tween.to(this, 0.3, {height: 165})
         }
         else {
           this.$tween.to(this, 0.3, {height: 0})
@@ -106,6 +122,17 @@ export default {
       this.$emit('meta', ['layerIndexPlay', this.index])
       if (this.meta.playing) this.player.pause()
       else this.player.play()
+    },
+    layerTick (index, forward) {
+      this.$log('layerTick', index, forward)
+      let from = this.layer.figuresAbsolute[index].t
+      let to = forward ? from + 0.100 : from - 0.100
+      this.layer.figuresAbsolute[index].t = to
+      this.player.pause()
+      this.player.setCurrentTime(to)
+    },
+    layerLove () {
+      this.$log('layerLove')
     }
   }
 }
