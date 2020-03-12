@@ -21,7 +21,7 @@ div(:style=`{position: 'relative', paddingTop: '300px', paddingBottom: '300px'}`
         rootMargin: -($q.screen.height/2-10)+'px 0px'
       }
     }`
-    ).bg-grey-2
+    )
 </template>
 
 <script>

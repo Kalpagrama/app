@@ -36,11 +36,19 @@
         q-btn(push color="green" no-caps @click="layerNameSet"
           :style=`{borderRadius: '10px'}`).fit
           span Save
-  //- div(:style=`{height: '60px'}`).row.full-width.items-center
-  .row.full-width.q-px-sm
-    small.text-white {{meta}}
+  //- header
+  div(:style=`{height: '60px'}`).row.full-width.q-px-sm
+    div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+      q-btn(
+        round push @click="compositionPlayButtonClick()"
+        :color="meta.mode === 'play' && meta.playting ? 'red' : 'green'"
+        :icon="meta.mode === 'play' && meta.playing ? 'pause' : 'play_arrow'")
+    span WS
+  //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-px-sm
+      .row.full-width.q-pa-xs
+        small.text-white {{meta}}
       layer(
         v-for="(l, li) in layers" :key="li"
         v-if="l.figuresAbsolute.length > 0"
@@ -67,6 +75,18 @@ export default {
   computed: {
   },
   methods: {
+    compositionPlayButtonClick () {
+      this.$log('compositionPlayButtonClick')
+      if (this.meta.playing && this.meta.mode === 'play') {
+        this.player.pause()
+      }
+      else {
+        this.$emit('meta', ['mode', 'play'])
+        this.$emit('meta', ['layerIndex', 0])
+        this.$emit('meta', ['layerIndexPlay', -1])
+        this.player.play()
+      }
+    },
     layerNameSetStart (index) {
       this.$log('layerNameSetStart', index)
       this.layerNameSetIndex = index

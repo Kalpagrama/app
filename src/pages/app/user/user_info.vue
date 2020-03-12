@@ -1,17 +1,23 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-9
   //- dialogs
-  q-dialog(v-model="userNameDialogOpened")
-    .column.fit.bg-white
+  //- settings
+  q-dialog(v-model="userSettingsDialogOpened" :maximized="$q.screen.xs")
+    user-settings(:value="user" @hide="userSettingsDialogOpened = false")
+  //- TODO notifications, dm
+  //- cover
   img(
     @click="userCoverClick()"
     src="https://www.ecopetit.cat/wpic/mpic/28-289473_twitter-cover-photo-45-stars.jpg"
     :style=`{position: 'absolute', bottom: '190px', objectFit: 'cover'}`).fit
+  //- wrapper
   div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-xl
+    //- logo, db, notifications, follow
     .row.full-width.q-pa-sm
       kalpa-avatar(:url="user.profile.thumbUrl" :width="100" :height="100" @click.native="userAvatarClick()")
       .col.full-height
         .row.fit.items-center.content-center.justify-end
+          q-btn(v-if="userIsMe" round flat color="green" icon="settings" @click="userSettingsDialogOpened = true").q-mr-sm
           q-btn(round dense outline color="green" icon="mail_outline" @click="userDM()").q-mr-sm
           q-btn(round dense outline color="green" icon="notifications_none" @click="userSetNotifications()").q-mr-sm
           q-btn(push no-caps color="green" @click="userFollow()"
@@ -33,12 +39,15 @@ div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-9
 </template>
 
 <script>
+import userSettings from './user_settings'
+
 export default {
   name: 'pageAppUser_userInfo',
+  components: { userSettings },
   props: ['user', 'page'],
   data () {
     return {
-      userNameDialogOpened: false,
+      userSettingsDialogOpened: false,
       pages: [
         {id: 'created', name: 'Created'},
         {id: 'voted', name: 'Voted'},
@@ -47,30 +56,17 @@ export default {
       ]
     }
   },
+  computed: {
+    userIsMe () {
+      return this.user.oid === this.$store.getters.currentUser.oid
+    }
+  },
   methods: {
     userSetNotifications () {
       this.$log('userSetNotifications')
     },
     userDM () {
       this.$log('userDM')
-    },
-    userCoverClick () {
-      this.$log('userColverClick')
-    },
-    userAvatarClick () {
-      this.$log('userAvatarClick')
-    },
-    userNameClick () {
-      this.$log('userNameClick')
-    },
-    userUsernameClick () {
-      this.$log('userUsernameClick')
-    },
-    userStatusClick () {
-      this.$log('userStatusClick')
-    },
-    userAboutClick () {
-      this.$log('userAboutClick')
     },
     async userFollow () {
        try {

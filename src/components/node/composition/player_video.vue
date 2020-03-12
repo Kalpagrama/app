@@ -173,12 +173,11 @@ export default {
       }
     },
     progressShow () {
-      return true
-      // if (this.mini) return false
-      // else {
-      //   if (this.ctx === 'workspace' || this.ctx === 'editor') return true
-      //   else return false
-      // }
+      if (this.mini) return false
+      else {
+        if (this.ctx === 'workspace' || this.ctx === 'editor') return true
+        else return false
+      }
     }
   },
   watch: {

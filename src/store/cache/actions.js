@@ -440,6 +440,8 @@ export const get = async (context, { key, fetchItemFunc, force }) => {
 // Если path = ''  то newValue - это полный объект
 // если actualAge не указан - вычислится на основе actualUntil (либо если объекта нет - поставится дефолтное)
 export const update = async (context, { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
+  assert(newValue, 'newValue exists')
+  assert(newValue.revision, 'newValue.revision exists')
   assert(key)
   assert(setter || newValue)
   path = path || ''

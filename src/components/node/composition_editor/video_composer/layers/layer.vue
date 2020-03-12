@@ -29,7 +29,7 @@ div(
     //- PLAYER progress
     div(:style=`{height: '60px'}`).row.full-width
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round push @click="layerClickPlay()"
+        q-btn(round push @click="layerPlayButtonClick()"
           :color="meta.mode === 'layer' && meta.playing ? 'red' : 'green'"
           :icon="meta.playing && layerActive ? 'pause' : 'play_arrow'")
       .col.full-height
@@ -86,7 +86,7 @@ export default {
       }
     },
     layerActive () {
-      return this.meta.layerIndex === this.index
+      return this.meta.layerIndexPlay === this.index
     },
     layerPercent () {
       if (!this.layer) return 0
@@ -115,8 +115,8 @@ export default {
       this.$log('layerClick')
       this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
     },
-    layerClickPlay () {
-      this.$log('layerClickPlay')
+    layerPlayButtonClick () {
+      this.$log('layerPlayButtonClick')
       this.$emit('meta', ['mode', 'layer'])
       this.$emit('meta', ['layerIndex', this.index])
       this.$emit('meta', ['layerIndexPlay', this.index])
