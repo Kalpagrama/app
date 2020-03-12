@@ -1,6 +1,7 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
+import VueYandexMetrika from 'vue-yandex-metrika'
 
 const debug = require('debug')('[boot]:main')
 debug.enabled = true
@@ -33,6 +34,12 @@ var router
 export default async ({ Vue, store, router: VueRouter }) => {
   try {
     router = VueRouter
+    Vue.use(VueYandexMetrika, {
+      id: 60818698,
+      router: router,
+      // env: process.env.NODE_ENV
+      // other options
+    })
     Vue.use(Viewer)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))

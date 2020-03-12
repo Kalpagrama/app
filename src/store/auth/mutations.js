@@ -2,6 +2,7 @@ import Vue from 'vue'
 import assert from 'assert'
 
 export function init (state, authInfo) {
+  assert(authInfo, '!authInfo')
   state.initialized = true
   state.userIsAuthorized = authInfo.userIsAuthorized
   state.userIsConfirmed = authInfo.userIsConfirmed
