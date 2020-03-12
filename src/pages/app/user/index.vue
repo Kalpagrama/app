@@ -21,69 +21,41 @@ button:focus {
 </style>
 <template lang="pug">
 q-layout(
-  view="hHh lpR fFf"
+  view="hhh lpR fFf"
   :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  q-header(:style=`{zIndex: 200, paddingLeft: $q.screen.xs ? '0px' : '60px'}`).row.full-width.justify-center.bg-grey-9
+  q-header(
+    v-if="false"
+    reveal
+    :style=`{zIndex: 200, paddingLeft: $q.screen.xs ? '0px' : '60px'}`).row.full-width.justify-center.bg-grey-9
     div(
       v-if="user"
       :style=`{
+        height: '60px',
         maxWidth: $store.state.ui.maxWidthPage+'px'
       }`
-      ).row.full-width.items-start.content-start.justify-center.bg-grey-9
-      .row.full-width.q-pa-xs
-        .row.full-width
-          kalpa-avatar(v-if="user" :url="user.profile.thumbUrl")
-          .col
-            .row.fit.items-center.content-center.q-px-md
-              span.text-bold.text-white {{ user.name }}
-          //- TODO follow user
-          //- div(v-if="myoid !== user.oid ").col.row.justify-end.q-mt-sm
-          //-   q-btn(
-          //-     rounded no-caps
-          //-     @click="include ? unfollowUser(user.oid) : followUser(user.oid)"
-          //-     :label="include ? $t('Unfollow') : $t('Follow')"
-          //-     :color="include ? 'red' : 'accent'"
-          //-     style=`height: 40px`
-          //-     ).q-px-md
-        //- .row.full-width.items-center.justify-start
-        //-   .row.full-width
-        //-     span.text-bold.text-white {{ user.name }}
-        //-   div(v-if="!editions").row.full-width
-        //-     .row.full-width
-        //-       span.text-grey-4 {{status}}
-        //-     .row.full-width.q-mb-sm
-        //-       span.text-grey {{about}}
-        //-   div(v-if="editions").row.full-width
-        //-     input(v-model="status" placeholder="Status").full-width.text-white.q-mb-sm
-        //-     input(v-model="about" placeholder="About").full-width.text-white.q-mb-sm
-        //-     //- .row.full-width.q-mt-xs
-        //-     //-   small About
-        //-   div(v-if="false" @click="showInfo()").row.full-width
-        //-     span.text-accent Show detailed information
-        //-     //- span {{ user.subscriptions }}
-        .row.full-width.content-end.justify-start.text-white.q-mt-md.q-mb-sm
-          span(
-            v-for="(p, pi) in pages" :key="pi" @click="pageId = p"
-            :style=`{position: 'relative', borderRadius: '10px'}` v-ripple=`{color: 'white'}`
-            :class="{'bg-green' : pageId  === p}"
-            ).q-pa-sm.q-mr-xs.cursor-pointer {{ p }}
+      ).row.full-width.items-center.content-center.justify-start.q-px-sm
+      span.text-bold.text-white {{ user.name }}
+      .row.full-width
+        small.text-white @{{ user.name }}
   q-page-container.row.full-width.justify-center.bg-grey-10
+    user-info(v-if="user" :user="user" :page="page" @page="page = $event")
     div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-md
       user-created-nodes(
-        v-if="pageId === 'Created nodes'"
+        v-if="page === 'created'"
         :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
       user-voted-nodes(
-        v-if="pageId === 'Voted nodes'"
+        v-if="page === 'voted'"
         :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
-      user-following(
-        v-if="pageId === 'Following'"
-        :subscriptions="user.subscriptions" :oid="user.oid")
-      user-followers(
-        v-if="pageId === 'Followers'"
-        :subscribers="user.subscribers" :oid="user.oid")
+      //- user-following(
+      //-   v-if="page === 'following'"
+      //-   :subscriptions="user.subscriptions" :oid="user.oid")
+      //- user-followers(
+      //-   v-if="page === 'followers'"
+      //-   :subscribers="user.subscribers" :oid="user.oid")
 </template>
 
 <script>
+import userInfo from './user_info'
 import userFollowers from './user_followers'
 import userFollowing from './user_following'
 import userCreatedNodes from './user_created_nodes'
@@ -91,21 +63,18 @@ import userVotedNodes from './user_voted_nodes'
 
 export default {
   name: 'pageApp__User',
-  components: {userVotedNodes, userCreatedNodes, userFollowing, userFollowers},
+  components: {userInfo, userVotedNodes, userCreatedNodes, userFollowing, userFollowers},
   props: ['width', 'height'],
   data () {
     return {
       user: null,
-      page: 'nodes',
+      page: 'created',
       showI: false,
-      coll: 'created',
       theStream: '',
       file: null,
       editions: false,
       status: null,
-      about: null,
-      pageId: 'Created nodes',
-      pages: ['Created nodes', 'Voted nodes', 'Following', 'Followers']
+      about: null
     }
   },
   computed: {
@@ -180,16 +149,12 @@ export default {
     $route: {
       immediate: true,
       async handler (to, from) {
-        this.$logD('$route CHANGED', to)
+        this.$log('$route CHANGED', to)
         if (to.params.oid) {
-          this.$logD('GOT USER OID', to.params.oid)
           this.user = await this.userLoad(to.params.oid)
-          this.page = 'nodes'
-          this.status = this.user.profile.status
-          this.about = this.user.profile.about
-          this.pageId = 'Created nodes'
-        } else {
-          this.$logD('NO USER OID!')
+        }
+        else {
+          this.$log('NO USER OID!')
           this.$router.push({params: {oid: this.$store.getters.currentUser.oid}})
         }
       }
@@ -267,60 +232,11 @@ export default {
         this.$log('changePhoto ERROR', e)
       }
     },
-    userSettingsAction (a) {
-      this.$logD('userSettingsAction', a)
-      switch (a) {
-        case 'report': {
-          break
-        }
-        case 'block': {
-          break
-        }
-        case 'copy': {
-          break
-        }
-        case 'edit': {
-          this.editions = !this.editions
-          break
-        }
-        case 'changePhoto': {
-          this.changePhoto()
-          break
-        }
-      }
-    },
-    async followUser () {
-       try {
-        this.$logD('subcribe start')
-        let res = await this.$store.dispatch('user/subscribe', this.user.oid)
-        this.user = await this.userLoad(this.$route.params.oid)
-        this.$logD('res', res)
-        this.$logD('subcribe done')
-      } catch (error) {
-        this.$logD('subcribe error', error)
-      }
-    },
-    async unfollowUser () {
-      try {
-        this.$logD('subDelete start')
-        let res = await this.$store.dispatch('user/unSubscribe', this.user.oid)
-        this.$logD('res', res)
-        // this.$delete(this.userSubscriptions, ss)
-        this.user = await this.userLoad(this.$route.params.oid)
-        this.$logD('subDelete done')
-      } catch (error) {
-        this.$logD('subDelete error', error)
-      }
-    },
     async userLoad (oid) {
-      this.$logD('userLoad start')
+      this.$log('userLoad start')
       let user = await this.$store.dispatch('objects/get', { oid, priority: 0 })
-      this.$logD('userLoad done', user)
+      this.$log('userLoad done', user)
       return user
-    },
-    avatarError (e) {
-      // this.$logD('avatarError', e)
-      e.target.src = 'statics/logo.png'
     }
   },
   mounted () {
