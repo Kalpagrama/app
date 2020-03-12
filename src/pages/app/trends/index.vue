@@ -2,13 +2,25 @@
 q-layout(
   view="hHh lpR fFf"
   :style=`{height: $q.screen.height+'px'}`)
-  q-header(:style=`{zIndex: 200, paddingLeft: $q.screen.xs ? '0px' : '60px'}`).row.full-width.justify-center.bg-grey-9
+  q-header(
+    reveal
+    :style=`{zIndex: 200, paddingLeft: $q.screen.xs ? '0px' : '60px'}`).row.full-width.justify-center.bg-grey-9
     div(
       :style=`{
         height: '60px',
         maxWidth: $store.state.ui.maxWidthPage+'px'
       }`).row.full-width.items-center
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+        q-btn(round flat color="green" icon="whatshot")
       span.text-green.text-bold Trends
+    div(
+      :style=`{
+        height: '60px',
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+        textTransform: 'capitalize', whiteSpace: 'nowrap'}`
+      ).row.full-width.scroll
+        //- .row.no-wrap
+        kalpa-buttons(:value="categoriesFiltered" :id="$route.params.category" idKey="id" @id="$router.push({params: {category: $event}})").no-wrap
   q-page-conainter.row.full-width.justify-center.items-start.content-start.bg-grey-10
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
@@ -21,6 +33,7 @@ export default {
   props: [],
   data () {
     return {
+      // category: 'FUN'
     }
   },
   computed: {
@@ -30,7 +43,14 @@ export default {
         return acc
       }, {})
     },
+    categoriesFiltered () {
+      return this.$store.state.node.categories.reduce((acc, val) => {
+        acc.push({id: val.type, name: val.name})
+        return acc
+      }, [])
+    },
     sphereOid () {
+      // return this.categories[this.category].sphere.oid
       if (this.$route.params.category) return this.categories[this.$route.params.category].sphere.oid
       else return false
       // return this.categories.FUN.sphere.oid
@@ -51,7 +71,7 @@ export default {
       handler (to, from) {
         this.$log('$route.params.category')
         // TODO set first category?
-        if (!to) this.$router.push({params: {category: 'FUN'}})
+        if (!to) this.$router.replace({params: {category: 'FUN'}})
       }
     }
   },

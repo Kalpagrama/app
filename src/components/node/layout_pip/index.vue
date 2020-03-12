@@ -7,7 +7,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     small.text-white.full-width active: {{ active }}
   //- inactive tint
   transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    div(v-if="!active" :style=`{position: 'absolute', zIndex: 300, opacity: 0.4, borderRadius: '10px'}`).row.fit.bg-grey-10
+    div(v-if="!active" :style=`{position: 'absolute', zIndex: 190, opacity: 0.4, borderRadius: '10px'}`).row.fit.bg-grey-10
   //- compositions wrapper
   div(
     :style=`{
@@ -21,8 +21,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   //- name
   div(
     ref="nodeName" @click="nodeNameClick()"
-    :style=`{minHeight: '50px'}`
-    ).row.full-width.items-center.justify-center.cursor-pointer
+    :style=`{marginTop: '-20px', paddingTop: '20px', minHeight: '70px'}`
+    ).row.full-width.items-center.justify-center.cursor-pointer.bg-grey-2
     span.text-bold.text-center.cursor-pointer {{ node.name }}
 </template>
 

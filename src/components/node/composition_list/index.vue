@@ -146,7 +146,7 @@ export default {
   },
   methods: {
     compositionsChanged (to) {
-      this.$log(this.label, 'compositionsChanged')
+      // this.$log(this.label, 'compositionsChanged')
       if (to) {
         if (this.ctx === 'rubick') {
           if (!this.rubick) this.rubick = {}

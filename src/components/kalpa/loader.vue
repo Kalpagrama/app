@@ -25,10 +25,13 @@ export default {
   },
   watch: {
     variables: {
+      deep: true,
       immediate: true,
       async handler (to, from) {
-        // this.$log('variables CHANGED', 'from=', from, ', to=', to)
-        if (to && !this.query) this.itemsLoad(to)
+        this.$log('variables CHANGED', 'from=', from, ', to=', to)
+        if (to) {
+          this.itemsLoad(to)
+        }
       }
     }
   },
