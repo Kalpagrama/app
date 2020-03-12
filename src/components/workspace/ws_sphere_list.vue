@@ -38,7 +38,8 @@ export default {
     // },
     sphereExplore (s) {
       this.$log('sphereExplore', s)
-      this.$router.push({params: { oid: s.oid }})
+      // this.$router.push({params: { oid: s.oid }})
+      this.$router.push('/sphere/' + s.oid)
     },
     async spheresLoad () {
       this.$log('spheresLoad')

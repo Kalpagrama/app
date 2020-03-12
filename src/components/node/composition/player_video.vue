@@ -2,6 +2,8 @@
 iframe {
   width: 100%;
   height: 100%;
+  min-width: 100%;
+  min-height: 100%;
   z-index: 100;
 }
 .mejs__overlay-button {
@@ -77,7 +79,8 @@ export default {
       progressHeight: 20,
       mode: 'play',
       layerIndex: 0,
-      layerIndexPlay: -1
+      layerIndexPlay: -1,
+      editing: false
     }
   },
   computed: {
@@ -92,7 +95,8 @@ export default {
         mode: this.mode,
         progressHeight: this.progressHeight,
         layerStart: this.layerStart,
-        layerEnd: this.layerEnd
+        layerEnd: this.layerEnd,
+        editing: this.editing
       }
     },
     layers () {
@@ -169,11 +173,12 @@ export default {
       }
     },
     progressShow () {
-      if (this.mini) return false
-      else {
-        if (this.ctx === 'workspace' || this.ctx === 'editor') return true
-        else return false
-      }
+      return true
+      // if (this.mini) return false
+      // else {
+      //   if (this.ctx === 'workspace' || this.ctx === 'editor') return true
+      //   else return false
+      // }
     }
   },
   watch: {
@@ -241,6 +246,7 @@ export default {
     videoNow (to, from) {
       if (this.nowPause) return
       if (!this.active) this.player.pause()
+      if (this.editing) return
       if (this.mode === 'play') {
         if (!this.layerStart && !this.layerEnd) return
         if (to > this.layerEnd) {

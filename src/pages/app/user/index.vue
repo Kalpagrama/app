@@ -20,29 +20,17 @@ button:focus {
 }
 </style>
 <template lang="pug">
-//- q-layout(view="hHh lpR fFf").bg-grey-3
-q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  //- k-dialog-bottom(ref="userSettingsDialog" mode="actions" :options="userSettingsDialogOptions" @action="userSettingsAction")
-  //- k-dialog-bottom(ref="userPhotoDialog" mode="actions" :options="userPhotoDialogOptions" @action="userPhotoAction")
-  //- input(ref="fileInput" type="file" @change="fileChanged" :style=`{display: 'none'}`)
-  //- q-header(reveal).row.full-width.justify-center
-  //-   .row.full-width.justify-center.bg-primary
-  //-     div(
-  //-       v-if="user"
-  //-       :style=`{minHeight: '60px', maxWidth: $store.state.ui.pageMaxWidth+'px'}`).row.full-width
-  //-       div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-  //-         q-btn(round @click="$router.back(1)" flat color="white" icon="arrow_back")
-  //-       .col
-  //-         .row.full-width.justify-start.items-center.fit.q-px-sm
-  //-           span(:style=`{fontSize: '16px'}`).text-bold.text-white {{ user.name }}
-  //-       .row
-  //-         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
-  //-           q-btn(v-if="!editions" round flat @click="$refs.userSettingsDialog.show()" color="white" icon="more_vert")
-  //-           q-btn(v-else round flat @click="save()" color="white" icon="done")
-  q-header(:style=`{zIndex: 200}`)
-    div(v-if="user" :style=`{paddingLeft: $q.screen.gt.xs ? '70px' : '0px', zIndex: 500}`).row.full-width.items-start.content-start.justify-center.bg-grey-9
-      div().row.full-width.q-pa-xs
-        //- <input type="file" @change="previewFiles" multiple>
+q-layout(
+  view="hHh lpR fFf"
+  :style=`{height: $q.screen.height+'px'}`).bg-grey-10
+  q-header(:style=`{zIndex: 200, paddingLeft: $q.screen.xs ? '0px' : '60px'}`).row.full-width.justify-center.bg-grey-9
+    div(
+      v-if="user"
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px'
+      }`
+      ).row.full-width.items-start.content-start.justify-center.bg-grey-9
+      .row.full-width.q-pa-xs
         .row.full-width
           kalpa-avatar(v-if="user" :url="user.profile.thumbUrl")
           .col
@@ -80,7 +68,7 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`).bg-grey-10
             :class="{'bg-green' : pageId  === p}"
             ).q-pa-sm.q-mr-xs.cursor-pointer {{ p }}
   q-page-container.row.full-width.justify-center.bg-grey-10
-    div(:style=`{maxWidth: 600+'px'}`).row.full-width.q-pt-md
+    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-md
       user-created-nodes(
         v-if="pageId === 'Created nodes'"
         :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")

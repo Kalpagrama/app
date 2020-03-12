@@ -1,19 +1,19 @@
 <template lang="pug">
 div(
   :style=`{position: 'relative', zIndex: 200,
-  height: $q.screen.width+'px',
+  height: ($q.screen.width/4)*2+'px',
   borderRadius: '30px 30px 0 0'}`
   ).row.full-width.bg-grey-8
   //- home
   div(
-    :style=`{width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
+    :style=`{width: $q.screen.width/4+'px', height: $q.screen.width/4+'px'}`).row.items-center.content-center.justify-center
     kalpa-spinner(:width="40" :height="40" @click.native="homeClick()").cursor-pointer.q-mt-sm
     .row.full-width.justify-center
       small.text-white.q-mt-sm Home
   //- pages
   div(
     v-for="(p, pi) in pages" :key="p.id"
-    :style=`{position: 'relative', zIndex: 2000, width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
+    :style=`{position: 'relative', zIndex: 2000, width: $q.screen.width/4+'px', height: $q.screen.width/4+'px'}`).row.items-center.content-center.justify-center
     q-btn(
       round flat @click="pageClick(p)"
       :color="$route.name === p.id ? 'green' : 'white'" :icon="p.icon"
@@ -48,6 +48,7 @@ div(
   //-     small.text-white
   //- help
   div(
+    v-if="false"
     :style=`{width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
       q-btn(round flat icon="clear" color="red" size="lg" @click="$emit('close')")

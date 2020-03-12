@@ -32,8 +32,11 @@
       kalpa-loader(type="wsContents" :variables=`{}`)
         template(v-slot:items=`{items}`)
           ws-content(
-            v-for="(n, ni) in items" :key="n.oid" @contentClick="contentClick"
-            :index="ni" :oid="oid", :node="n")
+            v-for="(n, ni) in items" :key="n.oid"
+            :node="n" :contentOid="contentOid"
+            @contentClick="contentClick"
+            @contentDelete="contentDelete"
+            @contentEdit="contentEdit")
 </template>
 
 <script>
@@ -48,36 +51,33 @@ export default {
       mode: 'list',
       modes: ['list', 'gallery', 'feed'],
       content: null,
-      contents: [],
-      res: null
+      contentOid: null
     }
-  },
-  computed: {
-    oid () {
-      return this.$route.params.oid
-    }
-  },
-  watch: {
   },
   methods: {
-    contentClick (content) {
-      this.$log('contentClick', content)
+    contentClick (oid) {
+      this.$log('contentClick', oid)
+      this.contentOid = oid
+    },
+    contentEdit (content) {
+      this.$log('contentEdit', content)
       this.$emit('item', {type: 'content', item: content})
+    },
+    async contentDelete (oid) {
+      this.$log('contentDelete start', oid)
+      if (!confirm('Delete content?')) return
+      let res = await this.$store.dispatch('workspace/wsItemDelete', oid)
+      this.$log('contentDelete done', res)
+      this.contentOid = null
     },
     async contentFound (content) {
       this.$log('contentFound', content)
       // try to find item in ws by name
       let name = 'CONTENT-' + content.oid
       let item = await this.$store.dispatch('workspace/get', {name})
-      this.$log('nodeFind', item)
-      // if item use it, emit it
-      if (item) {
-        this.$log('*** USE node-content')
-        this.$emit('item', JSON.parse(JSON.stringify(item)))
-      }
-      // if no item, create nodeContent, then click it
-      else {
-        this.$log('*** CREATE node-content')
+      this.$log('item before', item)
+      if (!item) {
+        this.$log('*** CREATE content-node')
         let nodeContentInput = {
           name,
           layout: 'PIP',
@@ -91,10 +91,11 @@ export default {
           ]
         }
         this.$log('nodeContentInput', nodeContentInput)
-        let nodeContent = await this.$store.dispatch('workspace/wsNodeSave', nodeContentInput)
-        this.$log('nodeContent', nodeContent)
-        this.contentClick(nodeContent)
+        item = await this.$store.dispatch('workspace/wsNodeSave', nodeContentInput)
       }
+      this.$log('item after', item)
+      this.$emit('item', {type: 'content', item: item})
+      this.contentClick(item.oid)
     }
   },
   mounted () {

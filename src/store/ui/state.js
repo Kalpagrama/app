@@ -7,7 +7,7 @@ export default {
   radiusDesktop: 4,
   radiusDefault: 4,
   radiusMobile: 0,
-  pageMaxWidth: 1100,
+  maxWidthPage: 750,
   menuMaxWidth: 240,
   nodeMaxWidth: 640,
   page: null,

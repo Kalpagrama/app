@@ -1,11 +1,12 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
-  //- nodeEditor dialog for mobile
-  q-dialog(v-model="pageDialogOpened" :maximized="true")
+q-layout(
+  view="hHh lpR fFf"
+  :style=`{height: $q.screen.height+'px'}`)
+  q-dialog(v-model="pageDialogOpened" :maximized="true" @hide="itemEdited")
     div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
       q-btn(
-        round flat color="red" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
-        :style=`{position: 'fixed', zIndex: 10000, left: '16px', bottom: '16px', background: 'rgba(0,0,0,0.3)'}`)
+        round flat color="white" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
+        :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.3)'}`)
       ws-sphere(
         v-if="$route.params.page === 'sphere'")
       ws-setting(
@@ -15,23 +16,12 @@ q-layout(view="hHh lpR fFf" :style=`{height: $q.screen.height+'px'}`)
         :value="item").fit
         template(v-slot:editor=`{node, saving}`)
           component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving")
-  q-page-container.row.fit.full-width.bg-black
+  q-page-container.fit
     ws-menu(
       ctx="workspace"
       :oid="node ? node.oid : false" :page="$route.params.page"
       @page="$router.push({params: {page: $event}}).catch(e=>e)" @item="itemClick" @add="itemAdd"
-      ).bg-grey-9
-    //- nodeEditor for desktop
-    div(v-if="$q.screen.gt.xs").col.full-height.bg-grey-10.gt-xs
-      ws-sphere(
-        v-if="$route.params.page === 'sphere'")
-      ws-setting(
-        v-else-if="$route.params.page === 'setting'")
-      node-saver(
-        v-else
-        :value="item").fit
-        template(v-slot:editor=`{node, saving}`)
-          component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving")
+      ).bg-grey-9.full-width
 </template>
 
 <script>
@@ -54,18 +44,6 @@ export default {
     }
   },
   watch: {
-    '$store.state.workspace.item': {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$log('item CHANGED', to)
-        // TODO item type?
-        if (to) {
-          this.$router.push({params: {oid: to.oid}}).catch(e => e)
-          if (this.$q.screen.xs) this.pageDialogOpened = true
-        }
-      }
-    },
     '$route.params.page': {
       immediate: true,
       handler (to, from) {
@@ -86,26 +64,18 @@ export default {
   methods: {
     async itemClick ({type, item}) {
       this.$log('itemClick', type, item)
-      this.$store.commit('workspace/stateSet', ['itemType', undefined])
-      this.$store.commit('workspace/stateSet', ['item', null])
-      this.$nextTick(() => {
-        this.$store.commit('workspace/stateSet', ['itemType', type])
-        this.$store.commit('workspace/stateSet', ['item', item])
-        this.$router.push({params: {oid: item.oid}})
-          .then(() => {
-            if (this.$q.screen.xs) this.pageDialogOpened = true
-            // this.pageDialogOpened = true
-          })
-          .catch(e => e)
-      })
-      // await this.$wait(300)
-      // this.$store.commit('workspace/stateSet', ['itemType', type])
-      // this.$store.commit('workspace/stateSet', ['item', item])
-      // this.pageDialogOpened = true
+      this.$store.commit('workspace/stateSet', ['itemType', type])
+      this.$store.commit('workspace/stateSet', ['item', item])
+      this.pageDialogOpened = true
     },
-    itemAdd (type, item) {
+    itemAdd ({type, item}) {
       this.$log('itemAdd', type, item)
-      this.$router.push('/workspace/' + this.$route.params.page).catch(e => e)
+      this.$store.commit('workspace/stateSet', ['itemType', type])
+      this.$store.commit('workspace/stateSet', ['item', item])
+      this.pageDialogOpened = true
+    },
+    itemEdited () {
+      this.$log('itemEdited')
       this.$store.commit('workspace/stateSet', ['itemType', undefined])
       this.$store.commit('workspace/stateSet', ['item', null])
     }

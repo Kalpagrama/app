@@ -19,7 +19,7 @@ div(
     ref="compositionListPreview"
     :src="preview" @load="previewLoad" @error="previewError"
     draggable="false"
-    :style=`{position: 'relative', width: '100%', objectFit: 'contain', opacity: 0, userSelect: 'none'}`)
+    :style=`{position: 'relative', width: '100%', maxHeight: $q.screen.height/3+'px', objectFit: 'contain', opacity: 0, userSelect: 'none'}`)
   //- compositions
   div(
     v-for="(c, ckey) in rubick" :key="ckey"
@@ -71,7 +71,7 @@ div(
           draggable="false").fit
   //- preview nodes
   div(
-    v-if="false && ctx === 'rubick'"
+    v-if="true && ctx === 'rubick'"
     :style=`{position: 'absolute', top: '80px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
@@ -125,6 +125,7 @@ export default {
   },
   watch: {
     nodeOid: {
+      deep: true,
       immediate: true,
       handler (to, from) {
         // this.$log(this.label, 'nodeOid CHANGED')

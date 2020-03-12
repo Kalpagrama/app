@@ -107,6 +107,7 @@ export default {
         // change meta
         this.$parent.$emit('meta', ['mode', 'layer'])
         this.$parent.$emit('meta', ['layerIndexPlay', index])
+        this.$parent.$emit('meta', ['layerIndex', -1])
         this.$parent.$emit('meta', ['layerIndex', index])
       }
       // ADD last layer, push
@@ -130,6 +131,16 @@ export default {
         this.$parent.$emit('meta', ['layerIndex', index])
       }
       this.$log('layerAdd done')
+      this.layerAddToWs()
+    },
+    layerAddToWs () {
+      this.$log('layerAddToWs')
+      // depends on ctx? on every new layer... we must
+      // on every layer update...
+      // on every node update... we must iterate over all the layers...
+      // no dups, no dups in container, save all good to your named layers... and the name is not unique...
+      // unique is figuresAbsolute...
+      // move this logic in nodeSaver?
     }
   },
   mounted () {

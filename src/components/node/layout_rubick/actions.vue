@@ -7,6 +7,7 @@
         position: 'relative', height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.bg-grey-7
       //- pan btn
       div(
+        v-if="canVote"
         v-touch-pan.left.right.prevent.mouse="votePan"
         :style=`{
           position: 'absolute', left: voteLeft+'px', zIndex: 200,
@@ -23,7 +24,7 @@
         :style=`{position: 'absolute', zIndex: 198}`).row.fit.items-center.justify-center.bg-white
         span Pan to vote
       div(
-        :style=`{marginLeft: '70px'}`).row.full-height.items-center.content-center.q-px-sm
+        :style=`{marginLeft: canVote ? '70px' : '10px'}`).row.full-height.items-center.content-center.q-px-sm
         span(:style=`{fontSize: '18px'}`).text-white.text-bold.text-center {{ voteHuman(nodeFull.rate) }}
         span.text-white.text-center.q-mt-xs /{{ voteHuman(nodeFull.rateUser) }}
       //- user name
@@ -51,6 +52,12 @@ export default {
     }
   },
   computed: {
+    userOid () {
+      return this.$store.state.auth.userOid
+    },
+    canVote () {
+      return this.userOid !== this.node.author.oid
+    }
   },
   watch: {
     votePanning: {
@@ -95,6 +102,7 @@ export default {
       try {
         this.$log('nodeVote start', rate)
         if (!rate) throw new Error('No rate!')
+        if (!this.canVote) throw new Error('Cant vote for your node!')
         this.voteVoting = true
         await this.$wait(800)
         this.$store.dispatch('node/nodeRate', {node: this.node, rateUser: rate})

@@ -44,13 +44,13 @@ div(
       :style=`{
         position: 'relative', color: 'white', borderRadius: '10px', userSelect: 'none',
         overflow: 'hidden', whiteSpace: 'nowrap'}`
-      ).bg-grey-8.q-pa-sm.q-mr-sm.q-mb-sm.cursor-pointer {{ s.name }}
-      //- inactive sphere
+      ).bg-grey-8.q-pa-sm.q-mr-sm.q-mb-sm {{ s.name }}
+      //- INACTIVE sphere
       div(
         v-if="si !== sphereIndex" @click="sphereClick(s,si)"
         :style=`{position: 'absolute', top: '0px', left: '0px', zIndex: 200}`
-        ).row.fit
-      //- active sphere
+        ).row.fit.cursor-pointer
+      //- ACTIVE sphere
       div(
         v-if="si === sphereIndex"
         :style=`{height: '60px'}`
@@ -114,6 +114,7 @@ export default {
     },
     sphereDelete (s, si) {
       this.$log('sphereDelete')
+      if (!confirm('Delete sphere?')) return
       this.sphereIndex = -1
       this.node.spheres = this.node.spheres.filter(i => i.oid !== s.oid)
     },

@@ -166,14 +166,19 @@ export default {
       async handler (to, from) {
         this.$log('node CHANGED', to)
         if (to && to.meta.compositions.length === 2) {
-          if (this.compositionOneOid) this.needSwap = to.meta.compositions[0].oid !== this.compositionOneOid
+          if (this.compositionOneOid) {
+            // if (this.needSwap) this.needSwap = false
+            // else this.needSwap = to.meta.compositions[0].oid !== this.compositionOneOid
+            this.needSwap = to.meta.compositions[0].oid !== this.compositionOneOid
+          }
           this.$log('NEED SWAP', this.needSwap)
+          // await this.$wait(1000)
           this.compositionOneOid = to.meta.compositions[this.needSwap ? 1 : 0].oid
           this.compositionTwoOid = to.meta.compositions[this.needSwap ? 0 : 1].oid
           this.compositionOneQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionTwoOid], pagination: {pageSize: 30}})
           this.compositionTwoQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid], pagination: {pageSize: 30}})
           this.nodeNameQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid, this.compositionTwoOid], pagination: {pageSize: 30}})
-          this.$set(this.compositionsActive, [true, true])
+          this.$set(this.compositionsActive, [true, false])
           this.nodeLoad()
         }
       }
@@ -228,19 +233,11 @@ export default {
       this.$log('cONEnext index', index)
       let node = this.compositionOneItems[index].node
       this.$router.push('/node/' + node.oid)
-      // this.$set(this.compositionsActive, 0, false)
-      // this.$wait(300, () => {
-      //   this.$set(this.compositionsActive, 0, true)
-      // })
     },
     async compositionTwoNextIndex (index) {
       this.$log('cTWOnext index', index)
       let node = this.compositionTwoItems[index].node
       this.$router.push('/node/' + node.oid)
-      // this.$set(this.compositionsActive, 1, false)
-      // this.$wait(300, () => {
-      //   this.$set(this.compositionsActive, 1, true)
-      // })
     },
     async nodePublish (node) {
       try {

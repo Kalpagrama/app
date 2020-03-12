@@ -15,17 +15,19 @@
     :style=`{position: 'relative'}`
     ).column.fit
     //- composition EDITOR dialog
-    q-dialog(v-model="compositionEditorOpened" :maximized="true" no-route-dismiss @hide="compositionOneActive = true, compositionTwoActive = true").bg-black
+    q-dialog(v-model="compositionEditorOpened" no-route-dismiss :maximized="true"
+      @hide="compositionEdited").bg-black
       composition-editor(
         ctx="editor"
         :inDialog="true"
         :node="node" :compositionIndex="compositionIndex"
-        @composition="compositionEdited" @close="compositionEditorOpened = false").bg-black
+        @hide="compositionEditorOpened = false").bg-black
     //- composition FINDER dialog
-    q-dialog(v-model="compositionFinderOpened" no-route-dismiss).bg-black
+    q-dialog(v-model="compositionFinderOpened" no-route-dismiss :maximized="$q.screen.xs").bg-black
       composition-finder(
         :inDialog="true"
-        @composition="compositionFound" @close="compositionFinderOpened = false").bg-black
+        @composition="compositionFound"
+        @hide="compositionFinderOpened = false").bg-black
     //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start.justify-center.q-px-sm
@@ -35,10 +37,6 @@
           :style=`{height: '60px', order: 10000, marginBottom: '300px'}`
           ).row.full-width.items-start.content-start.justify-center
           div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
-            //- header
-            //- div(
-            //-   :style=`{height: '60px'}`
-            //-   ).row.full-width.items-center
             //- header actions
             div(
               :style=`{height: '60px'}`
@@ -78,7 +76,7 @@
               ).row.fit.items-center.content-center.justify-center
               q-btn(v-if="!node.compositions[0]" round flat color="green" icon="add" size="lg" @click="compositionFind(0)")
             q-btn(v-if="node.compositions[0]" round flat color="white" icon="edit" @click="compositionEdit(0)"
-                :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
+                :style=`{position: 'absolute', zIndex: 3000, left: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
             q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
                 :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
           //- essence editor
@@ -104,7 +102,7 @@
               ).row.fit.items-center.content-center.justify-center
               q-btn(v-if="!node.compositions[1]" round flat color="green" icon="add" size="lg" @click="compositionFind(1)")
             q-btn(v-if="node.compositions[1]" round flat color="white" icon="edit" @click="compositionEdit(1)"
-                :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
+                :style=`{position: 'absolute', zIndex: 3000, left: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
             q-btn(v-if="node.compositions[1]" round flat color="red" icon='clear' @click="compositionDelete(1)"
                 :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
           //- debug
@@ -141,7 +139,7 @@
 export default {
   name: 'nodeEditor',
   components: {},
-  props: ['node', 'saving'],
+  props: ['node', 'nodeNew', 'saving'],
   data () {
     return {
       maxWidth: 600,
@@ -180,13 +178,13 @@ export default {
       this.compositionTwoActive = false
       this.compositionFinderOpened = true
     },
-    async compositionFound (c) {
-      this.$log('compositionFound', c)
-      // TODO add second content to composition...
-      this.$set(this.node.compositions, this.compositionIndex, c)
+    async compositionFound (composition) {
+      this.$log('compositionFound', composition)
+      this.$set(this.node.compositions, this.compositionIndex, composition)
       this.compositionEdit(this.compositionIndex)
-      await this.$wait(300)
-      this.compositionFinderOpened = false
+      this.$wait(300).then(() => {
+        this.compositionFinderOpened = false
+      })
     },
     compositionEdit (index) {
       this.$log('compositionEdit', index)
@@ -195,16 +193,17 @@ export default {
       this.compositionTwoActive = false
       this.compositionEditorOpened = true
     },
-    compositionEdited (composition) {
+    compositionEdited () {
+      let composition = this.node.compositions[this.compositionIndex]
       this.$log('compositionEdited', composition)
       // if we got empty composition
       if (composition.layers[0].figuresAbsolute.length === 0) {
-        this.$log('cEMPTY')
+        this.$log('composition EMPTY')
         this.$set(this.node.compositions, this.compositionIndex, null)
       }
-      // we got good composition
+      // we got good composition with layers with figuresAbsolute
       else {
-        this.$log('cEDITED')
+        this.$log('composition EDITED')
         this.$set(this.node.compositions, this.compositionIndex, composition)
       }
     },
@@ -227,7 +226,7 @@ export default {
         this.nodeDeletingError = null
         // TODO delete node and exit
         await this.$router.replace('/workspace/node')
-        // this.node = this.nodeNew
+        this.node = JSON.stringify(JSON.parse(this.nodeNew))
       } catch (e) {
         this.$log('nodeDelete error', e)
         this.nodeDeleting = false

@@ -1,7 +1,7 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
+div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
   q-resize-observer(@resize="onResize")
-  div(:style=`{position: 'relative'}`).row.full-width
+  div(:style=`{position: 'relative'}`).row.fit
     //- debug, relative
     div(v-if="$store.state.ui.debug").row.full-width.q-pa-sm
       div(:style=`{borderRadius: '10px', color: 'white'}`).row.full-width.bg-green.q-pa-xs
@@ -11,9 +11,14 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
     //- debug
     div(
       v-if="false"
-      :style=`{position: 'absolute', top: '-100', zIndex: 10000}`
+      :style=`{position: 'absolute', bottom: '0px', zIndex: 10000}`
       ).row.full-width.bg-green
       small.text-white.full-width width: {{width}}
+    //- layer NAME
+    span(
+      v-if="layer.spheres.length > 0"
+      :style=`{position: 'absolute', zIndex: 1000, top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`
+      ).text-white.q-pa-sm {{ layer.spheres[0].name }}
     //- add layer
     q-btn(
       v-if="false"
@@ -23,7 +28,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center
     //- frames
     div(
       ref="framesScrollWrapper"
-      :style=`{position: 'relative', height: '66px'}`).row.full-width.items-center.scroll
+      :style=`{position: 'relative', height: '100%'}`).row.full-width.items-center.scroll
       //- frames loading spinner tint
       div(
         v-show="content.contentSource === 'KALPA' ? !framesLoaded : false"
@@ -261,12 +266,14 @@ export default {
         this.panning = true
         this.player.editing = true
         this.player.pause()
+        this.$emit('meta', ['editing', true])
       }
       if (e.isFinal) {
         this.panning = false
         this.player.editing = false
         this.player.setCurrentTime(to)
         this.player.play()
+        this.$emit('meta', ['editing', false])
       }
     },
     panEnd (e) {
@@ -281,12 +288,14 @@ export default {
         this.panning = true
         this.player.editing = true
         this.player.pause()
+        this.$emit('meta', ['editing', true])
       }
       if (e.isFinal) {
         this.panning = false
         this.player.editing = false
         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
         this.player.play()
+        this.$emit('meta', ['editing', false])
       }
     },
     onResize (e) {

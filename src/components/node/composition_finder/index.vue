@@ -1,7 +1,7 @@
 <template lang="pug">
 .column.fit.bg-grey-9
   div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-    q-btn(round flat color="green" icon="keyboard_arrow_left" @click="$emit('close')")
+    q-btn(round flat color="green" icon="keyboard_arrow_left" @click="$emit('hide')")
   .col.full-width
     ws-menu(
       ctx="finder"
