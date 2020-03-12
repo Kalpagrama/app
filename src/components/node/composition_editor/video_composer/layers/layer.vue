@@ -22,7 +22,8 @@ div(
   div(
     v-if="!layerActive"
     @click="$emit('meta', ['layerIndex', index]), $emit('meta', ['layerIndexPlay', index])"
-    :style=`{position: 'absolute', zIndex: 200,}`).row.fit.cursor-pointer
+    :class=`{'bg-grey-6': index === meta.layerIndex}`
+    :style=`{position: 'absolute', zIndex: 200, borderRadius: '10px', opacity: 0.5}`).row.fit.cursor-pointer
   //- ACTIVE layer
   div(
     :style=`{position: 'relative', height: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start

@@ -41,7 +41,7 @@
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
       q-btn(
         round push @click="compositionPlayButtonClick()"
-        :color="meta.mode === 'play' && meta.playting ? 'red' : 'green'"
+        :color="meta.mode === 'play' && meta.playing ? 'red' : 'green'"
         :icon="meta.mode === 'play' && meta.playing ? 'pause' : 'play_arrow'")
     span WS
   //- body

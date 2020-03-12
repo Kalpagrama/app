@@ -446,6 +446,7 @@ export const update = async (context, { key, path, newValue, setter, actualAge, 
   }
   assert(key)
   assert(setter || newValue)
+  newValue = JSON.parse(JSON.stringify(newValue))
   path = path || ''
 
   return await cache.update(key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc)
