@@ -259,8 +259,8 @@ export default {
       let to = this.layer.figuresAbsolute[0].t + (e.delta.x * this.k)
       if (to >= 0 && to < this.layer.figuresAbsolute[1].t && to <= this.duration) {
         this.player.setCurrentTime(to)
-        // this.layer.figuresAbsolute[0].t = to
-        this.$set(this.layer.figuresAbsolute[0], 't', to)
+        this.layer.figuresAbsolute[0].t = to
+        // this.$set(this.layer.figuresAbsolute[0], 't', to)
       }
       if (e.isFirst) {
         this.panning = true
@@ -281,8 +281,8 @@ export default {
       let to = this.layer.figuresAbsolute[1].t + (e.delta.x * this.k)
       if (to >= 0 && to > this.layer.figuresAbsolute[0].t && to <= this.duration) {
         this.player.setCurrentTime(to)
-        // this.layer.figuresAbsolute[1].t = to
-        this.$set(this.layer.figuresAbsolute[1], 't', to)
+        this.layer.figuresAbsolute[1].t = to
+        // this.$set(this.layer.figuresAbsolute[1], 't', to)
       }
       if (e.isFirst) {
         this.panning = true
