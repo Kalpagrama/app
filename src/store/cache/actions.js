@@ -115,7 +115,7 @@ class QueueUpdate {
         this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
         await cache.set(key, this.context.state.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
       } else {
-        logE('cant update item on server')
+        logE('cant update item on server', err)
         throw err
       }
     }

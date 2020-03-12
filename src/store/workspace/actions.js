@@ -117,7 +117,7 @@ export const wsNodeSave = async (context, node) => {
   if (node.oid) { // обновить
     let updateItemFunc = async (updatedItem) => {
       // logD('updatedItem', updatedItem)
-      assert(updatedItem.revision)
+      assert(updatedItem.revision, '!updatedItem.revision')
       let nodeInput = makeNodeInput(updatedItem)
       let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
         mutation: gql`
@@ -326,6 +326,8 @@ export const get = async (context, { oid, name, force }) => {
     }
     let itemFull = await context.dispatch('cache/get',
       { key: makeKey({ oid }), fetchItemFunc, force }, { root: true })
+    assert(itemFull, '!itemFull')
+    assert(itemFull.revision, '!itemFull.revision')
     return itemFull
   }
 }

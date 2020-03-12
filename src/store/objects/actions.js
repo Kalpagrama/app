@@ -159,6 +159,8 @@ export const get = async (context, { oid, priority }) => {
   }
   let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
   // logD('objects/get action complete', oid)
+  assert(objectFull, '!itemFull')
+  assert(objectFull.revision, '!objectFull.revision')
   return objectFull
 }
 
