@@ -1,5 +1,8 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-9
+  //- dialogs
+  q-dialog(v-model="userNameDialogOpened")
+    .column.fit.bg-white
   img(
     @click="userCoverClick()"
     src="https://www.ecopetit.cat/wpic/mpic/28-289473_twitter-cover-photo-45-stars.jpg"
@@ -16,7 +19,7 @@ div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-9
             span.text-bold Follow
     //- name
     .row.full-width.items-center.content-center.q-px-sm
-      span(:style=`{fontSize: '25px', lineHeight: '25px'}` @click="userNameClick()").text-white.text-bold Motovilov Ivan
+      span(:style=`{fontSize: '25px', lineHeight: '25px'}` @click="userNameClick()").text-white.text-bold {{user.name}}
       .row.full-width
         span(:style=`{padding: 0, margin: 0}` @click="userUsernameClick()").text-white @ivanmoto
     //- status/about
@@ -35,6 +38,7 @@ export default {
   props: ['user', 'page'],
   data () {
     return {
+      userNameDialogOpened: false,
       pages: [
         {id: 'created', name: 'Created'},
         {id: 'voted', name: 'Voted'},
