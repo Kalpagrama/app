@@ -1,5 +1,5 @@
 <template lang="pug">
-  .row.full-width.justify-center.items-start.content-start
+  .row.fit.justify-center.items-start.content-start
     slot(v-if="query" name="items" :items="query.items")
 </template>
 

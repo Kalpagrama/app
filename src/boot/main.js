@@ -80,7 +80,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('node', () => import('components/node'))
     Vue.component('nodeSaver', () => import('components/node/node_saver'))
     Vue.component('nodeEditor', () => import('components/node/node_editor'))
-    Vue.component('nodeList', () => import('components/node_list'))
+    Vue.component('nodeList', () => import('components/node/list'))
     Vue.component('nodeSpheres', () => import('components/node/spheres'))
     Vue.component('nodeSpheresEditor', () => import('components/node/spheres_editor'))
     // kalpa

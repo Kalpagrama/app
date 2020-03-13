@@ -36,43 +36,66 @@
         q-btn(push color="green" no-caps @click="layerNameSet"
           :style=`{borderRadius: '10px'}`).fit
           span Save
+  //- q-dialog(v-model="layerContentLayersShow" full-height position="right").window-height
+  //-   div(:style=`{height: $q.screen.height+'px', width: '450px'}`).column.bg-red
+  //-     h1 layer content layers
   //- header
-  div(:style=`{height: '60px'}`).row.full-width.q-px-sm
+  div(
+    v-if="true"
+    :style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
       q-btn(
         round push @click="compositionPlayButtonClick()"
         :color="meta.mode === 'play' && meta.playing ? 'red' : 'green'"
         :icon="meta.mode === 'play' && meta.playing ? 'pause' : 'play_arrow'")
-    span WS
+    .col
+    q-btn(round flat color="green" icon="school" @click="layerContentLayersShow = true")
+    //- span WS
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
-      .row.full-width.q-pa-xs
-        small.text-white {{meta}}
-      layer(
-        v-for="(l, li) in layers" :key="li"
-        v-if="l.figuresAbsolute.length > 0"
-        :index="li" :layer="l" :player="player" :meta="meta"
-        @layerNameSetStart="layerNameSetStart"
-        @layerDelete="layerDelete"
-        @meta="$emit('meta', $event)")
+    div(:style=`{paddingBottom: '300px'}`).row.full-width.items-start.content-start.q-pa-sm
+      //- .row.full-width
+      //-   small(v-for="(l,li) in layers" :key="li").full-width.text-white.q-ml-md {{l.spheres.length > 0 ? l.spheres[0].name : li}}
+      //- .row.full-width.q-pa-xs
+      //-   small.text-white {{ meta }}
+      draggable(v-model="layers" handle=".layerhandle" @start="layerMoveStart" @end="layerMoved")
+        //- transition-group
+        layer(
+          v-for="(l, li) in layers" :key="li"
+          v-if="l.figuresAbsolute.length > 0"
+          :index="li" :layer="l" :player="player" :meta="meta"
+          @layerNameSetStart="layerNameSetStart"
+          @layerDelete="layerDelete"
+          @meta="$emit('meta', $event)")
 </template>
 
 <script>
+import draggable from 'vuedraggable'
 import layer from './layer'
+
+const swap = (arr, x, y) => {
+  var b = arr[x]
+  arr[x] = arr[y]
+  arr[y] = b
+  return arr
+}
 
 export default {
   name: 'videoComposerLayers',
-  components: { layer },
-  props: ['layers', 'player', 'meta'],
+  components: { draggable, layer },
+  props: ['composition', 'layers', 'player', 'meta'],
   data () {
     return {
       layerNameDialogOpened: false,
       layerNameSetIndex: -1,
-      layerName: ''
+      layerName: '',
+      layerContentLayersShow: false
     }
   },
   computed: {
+    layersFiltered () {
+      return this.layers
+    }
   },
   methods: {
     compositionPlayButtonClick () {
@@ -85,6 +108,18 @@ export default {
         this.$emit('meta', ['layerIndex', 0])
         this.$emit('meta', ['layerIndexPlay', -1])
         this.player.play()
+      }
+    },
+    layerMoveStart (e) {
+      this.$log('layerMoveStart')
+      this.$emit('meta', ['mode', 'play'])
+      this.$emit('meta', ['layerIndex', 0])
+      this.$emit('meta', ['layerIndexPlay', -1])
+    },
+    layerMoved (e) {
+      this.$log('layerMoved', e)
+      if (e.oldIndex !== e.newIndex) {
+        this.$set(this.composition, 'layers', this.layers)
       }
     },
     layerNameSetStart (index) {

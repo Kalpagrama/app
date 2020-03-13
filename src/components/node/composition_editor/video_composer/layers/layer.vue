@@ -23,7 +23,7 @@ div(
     v-if="!layerActive"
     @click="$emit('meta', ['layerIndex', index]), $emit('meta', ['layerIndexPlay', index])"
     :class=`{'bg-grey-6': index === meta.layerIndex}`
-    :style=`{position: 'absolute', zIndex: 200, borderRadius: '10px', opacity: 0.5}`).row.fit.cursor-pointer
+    :style=`{position: 'absolute', zIndex: 200, borderRadius: '10px', opacity: 0.5}`).row.fit.cursor-pointer.layerhandle
   //- ACTIVE layer
   div(
     :style=`{position: 'relative', height: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start
@@ -100,13 +100,15 @@ export default {
     layerActive: {
       immediate: true,
       async handler (to, from) {
-        this.$log(this.index, 'layerActive CHANGED', to)
+        this.$log(this.index, 'layerActive CHANGED', to, from)
         if (to) {
-          // await this.$wait(300)
-          this.$tween.to(this, 0.3, {height: 165})
+          if (to !== from) {
+            if (this.height !== 165) this.$tween.to(this, 0.3, {height: 165})
+            // this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+          }
         }
         else {
-          this.$tween.to(this, 0.3, {height: 0})
+          if (this.height !== 0) this.$tween.to(this, 0.3, {height: 0})
         }
       }
     }
@@ -135,6 +137,9 @@ export default {
     layerLove () {
       this.$log('layerLove')
     }
+  },
+  mounted () {
+    this.$log('mounted')
   }
 }
 </script>

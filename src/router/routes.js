@@ -36,7 +36,9 @@ const routes = [
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
       { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
       { name: 'debug', path: 'debug', component: () => import('pages/app/debug') },
-      { name: 'help', path: 'help', component: () => import('pages/app/help') }
+      { name: 'help', path: 'help', component: () => import('pages/app/help') },
+      { name: 'byte', path: 'byte', component: () => import('pages/app/byte') },
+      { name: 'refresh', path: 'refresh', component: () => import('pages/app/refresh') }
       // {
       //   name: 'refresh',
       //   path: 'refresh',

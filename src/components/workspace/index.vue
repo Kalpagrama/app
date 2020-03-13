@@ -6,7 +6,7 @@ q-layout(
     div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
       q-btn(
         round flat color="white" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
-        :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.3)'}`)
+        :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: 'calc(20% - 20px)', background: 'rgba(0,0,0,0.3)'}`)
       ws-sphere(
         v-if="$route.params.page === 'sphere'")
       ws-setting(

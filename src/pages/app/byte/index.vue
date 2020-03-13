@@ -4,12 +4,12 @@ q-layout(view="hHh lpR fFf"
   q-page-conainter.row.fit.justify-center.items-start.content-start.bg-grey-9
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
-        node-list(:nodes="items")
+        node-list(:nodes="items" mode="test")
 </template>
 
 <script>
 export default {
-  name: 'pageAppHome',
+  name: 'pageAppByte',
   props: [],
   data () {
     return {

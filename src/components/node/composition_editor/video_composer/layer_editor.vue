@@ -16,7 +16,7 @@ div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
       small.text-white.full-width width: {{width}}
     //- layer NAME
     span(
-      v-if="layer.spheres.length > 0"
+      v-if="false & layer.spheres.length > 0"
       :style=`{position: 'absolute', zIndex: 1000, top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`
       ).text-white.q-pa-sm {{ layer.spheres[0].name }}
     //- add layer

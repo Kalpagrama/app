@@ -1,10 +1,10 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'absolute', bottom: '170px', left: 0, zIndex: 20000}`
+    position: 'absolute', bottom: '70px', left: 0, zIndex: 20000}`
   ).row.full-width.items-start.content-start
   //- pregress wrapper
-  .row.full-width.items-start.content-start.q-px-sm
+  .row.full-width.items-start.content-start.q-px-xl
     //- progress actions
     div(:style=`{height: '60px'}`).row.full-width.items-center
       //- play/pause
@@ -33,18 +33,18 @@ div(
           :style=`{background: 'rgba(0,0,0,0.3)'}`)
     //- progress bar & time
     div(
-      :style=`{height: height+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-10
+      @click="progressClick"
+      :style=`{height: height+'px', borderRadius: '10px'}`).row.full-width.items-center.content-center
       //- progress
-      .col.full-height
-        div(
-          @click="progressClick"
-          :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
-          ).row.fit.bg-grey-9.cursor-pointer
-          //- progress %
-          div(:style=`{
-            position: 'absolute', zIndex: 100, left: 0, width: (now/duration)*100+'%',
-            pointerEvents: 'none', borderRight: '2px solid #4caf50'}`
-            ).row.full-height.bg-grey-7
+      div(
+        :style=`{position: 'relative', height: '20px', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.bg-grey-9.cursor-pointer
+        //- progress %
+        div(:style=`{
+          position: 'absolute', zIndex: 100, left: 0, width: (now/duration)*100+'%',
+          pointerEvents: 'none', borderRight: '2px solid #4caf50'}`
+          ).row.full-height.bg-grey-3
+          div(:style=`{position: 'absolute', right: '-10px', top: '0px', height: '20px', width: '20px', borderRadius: '50%'}`).bg-green
 </template>
 
 <script>
@@ -64,6 +64,7 @@ export default {
       let x = e.offsetX
       let to = (this.duration * x) / w
       this.$emit('meta', ['mode', 'watch'])
+      this.$emit('meta', ['layerIndexPlay', -1])
       this.player.setCurrentTime(to)
       this.videoUpdate(null, to)
     }

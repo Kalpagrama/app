@@ -37,15 +37,16 @@ q-layout(
       span.text-bold.text-white {{ user.name }}
       .row.full-width
         small.text-white @{{ user.name }}
-  q-page-container.row.full-width.justify-center.bg-grey-10
-    user-info(v-if="user" :user="user" :page="page" @page="page = $event")
-    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-md
-      user-created-nodes(
-        v-if="page === 'created'"
-        :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
-      user-voted-nodes(
-        v-if="page === 'voted'"
-        :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
+  q-page-container.row.fit.justify-center.bg-grey-10
+    //- user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+    user-created-nodes(
+      v-if="page === 'created'"
+      :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
+      template(v-slot:header)
+        user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+      //- user-voted-nodes(
+      //-   v-if="page === 'voted'"
+      //-   :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
       //- user-following(
       //-   v-if="page === 'following'"
       //-   :subscriptions="user.subscriptions" :oid="user.oid")
