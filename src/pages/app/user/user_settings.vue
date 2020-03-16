@@ -1,39 +1,35 @@
 <template lang="pug">
-div(:style=`{borderRadius: '10px'}`).column.fit.bg-white
-  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-pl-md.q-pr-sm
-    span.text-bold User settings
+.row.full-width
+  div(:style=`{height: '40px'}`).row.full-width.items-start.content-start.q-px-sm
+    span.text-bold.text-white User settings
     .col
-    q-btn(round flat color="red" icon="clear" @click="cancel()")
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
-      //- cover
-      //- avatar
-      //- set status
-      .row.full-width.q-px-sm.q-mt-md
-        span Set status
-      input(
-        v-model="user.profile.about"
-        :style=`{height: '60px', border: 'none', borderRadius: '10px'}`).full-width.bg-grey-4.q-px-md.q-py-sm
-      //- name
-      .row.full-width.q-px-sm.q-mt-md
-        span Set name
-      input(
-        v-model="user.name"
-        :style=`{height: '60px', borderRadius: '10px'}`).full-width.bg-grey-4.q-px-md
-      //- set about
-      .row.full-width.q-px-sm.q-mt-md
-        span Set about
-      textarea(
-        v-model="user.profile.about"
-        :style=`{minHeight: '120px', border: 'none', borderRadius: '10px'}`).full-width.bg-grey-4.q-px-md.q-py-sm
-      //- login
-      //- password
-      //- email
-      //- phone
-      //- span {{ user }}
-  div(:style=`{height: '70px'}`).row.full-width.q-pa-sm
+  .row.full-width.items-start.content-start
+    //- cover
+    //- avatar
+    //- set status
+    q-input(
+      v-model="user.profile.about"
+      filled dark color="green" label="Set your status"
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
+    //- name
+    q-input(
+      v-model="user.name"
+      filled dark color="green" label="Set your name"
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
+    //- set about
+    q-input(
+      v-model="user.profile.about"
+      type="textarea"
+      filled dark color="green" label="Tell about youtself"
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
+    //- login
+    //- password
+    //- email
+    //- phone
+    //- span {{ user }}
+  div(:style=`{height: '70px'}`).row.full-width.q-py-sm
     q-btn(push no-caps color="green" @click="save()").fit
-      span.text-bold Save
+      span.text-bold Save settings
 </template>
 
 <script>

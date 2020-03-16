@@ -2,10 +2,11 @@
 
 const routes = [
   {
-    path: '/login',
-    component: () => import('layouts/login_layout.vue'),
+    path: '/auth',
+    component: () => import('layouts/auth_layout.vue'),
     children: [
-      { name: 'index', path: '', component: () => import('pages/login/index.vue') },
+      { name: 'index', path: '', component: () => import('pages/auth/signin.vue') },
+      { name: 'signup', path: 'signup', component: () => import('pages/auth/signup.vue')}
       // { name: 'vk', path: 'vk', component: () => import('pages/login/vk') },
       // { name: 'email', path: 'email', component: () => import('pages/login/email') },
       // { name: 'phone', path: 'phone', component: () => import('pages/login/phone') },
@@ -18,6 +19,7 @@ const routes = [
     component: () => import('layouts/main_layout'),
     children: [
       // mobile
+      { name: 'welcome', path: 'welcome', component: () => import('pages/app/welcome')},
       { name: 'home', path: '', component: () => import('pages/app/home') },
       { name: 'trends', path: 'trends/:category?/:sort?', component: () => import('pages/app/trends') },
       // { name: 'create', path: 'create', component: () => import('components/node_editor') },
@@ -51,6 +53,13 @@ const routes = [
       //     await next('/')
       //   }
       // }
+    ]
+  },
+  {
+    path: '/help',
+    component: () => import('layouts/help_layout.vue'),
+    children: [
+      {name: 'policy', path: 'policy', component: () => import('pages/help/policy')}
     ]
   },
   {

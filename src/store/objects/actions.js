@@ -177,7 +177,7 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
   }
   let updateItemFunc = async (updatedItem) => {
     assert(updatedItem.oid && updatedItem.revision)
-    assert(oid && path != null && newValue)
+    assert(oid && path != null && newValue !== undefined)
     let { data: { objectChange } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectFullFragment}

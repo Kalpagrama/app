@@ -445,7 +445,7 @@ export const update = async (context, { key, path, newValue, setter, actualAge, 
     assert(newValue.revision, 'newValue.revision exists')
   }
   assert(key)
-  assert(setter || newValue)
+  assert(setter || newValue !== undefined)
   newValue = JSON.parse(JSON.stringify(newValue))
   path = path || ''
 
