@@ -8,6 +8,7 @@ div(:style=`{position: 'relative'}`).row.fit
   //- q-btn(
   //-   push color="green" no-caps @click="$emit('hide')"
   //-   :style=`{position: 'absolute', zIndex: 9000, top: '16px', borderRadius: '10px', right: '16px'}`) Ready
+  //- div(:style=`{height: '50px'}`).row.full-width.bg-black
   //- composition with COMPOSER slot
   composition(
     v-if="composition" :value="composition"

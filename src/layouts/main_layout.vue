@@ -20,7 +20,7 @@ q-layout( view="hHh Lpr lff")
     v-model="drawerShowMobile" position="bottom")
     kalpa-menu-xs(@close="drawerShowMobile = false")
   div(
-    v-if="$route.name == 'welcome'"
+    v-if="$route.name !== 'welcome'"
     :style=`{position: 'fixed', zIndex: 1000, right: '0px', bottom: '0px',
       width: $q.screen.width/4+'px', height: $q.screen.width/4+'px'}`).row.items-center.content-center.justify-center.xs
     q-btn(

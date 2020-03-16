@@ -49,6 +49,14 @@
         :color="meta.mode === 'play' && meta.playing ? 'red' : 'green'"
         :icon="meta.mode === 'play' && meta.playing ? 'pause' : 'play_arrow'")
     .col
+      .row.fit.items-center.content-center
+        span(
+          :class=`{
+            'text-green': layersLength <= 60,
+            'text-red': layersLength > 60,
+            'text-bold': layersLength > 60
+          }`
+        ) {{ $time(layersLength) }}
     q-btn(round flat color="green" icon="school" @click="layerContentLayersShow = true")
     //- span WS
   //- body
@@ -95,6 +103,12 @@ export default {
   computed: {
     layersFiltered () {
       return this.layers
+    },
+    layersLength () {
+      return this.layersFiltered.reduce((acc, l) => {
+        acc += l.figuresAbsolute[1].t - l.figuresAbsolute[0].t
+        return acc
+      }, 0)
     }
   },
   methods: {
@@ -141,8 +155,8 @@ export default {
     },
     async layerDelete (i) {
       this.$log('layerDelete', i)
+      if (!confirm('Delete layer?')) return
       if (this.layers.length > 1) {
-        if (!confirm('Delete layer?')) return
         let index = i === 0 ? this.meta.layerIndex + 1 : this.meta.layerIndex - 1
         this.$emit('meta', ['mode', 'layer'])
         this.$emit('meta', ['layerIndex', index])
@@ -150,6 +164,18 @@ export default {
         this.$wait(300).then(() => {
           this.$delete(this.layers, i)
         })
+      }
+      else {
+        let layer = {
+          content: this.layers[0].content,
+          figuresAbsolute: [],
+          figuresRelative: [],
+          spheres: []
+        }
+        this.$set(this.layers, 0, layer)
+        this.$emit('meta', ['mode', 'watch'])
+        this.$emit('meta', ['layerIndex', 0])
+        this.$emit('meta', ['layerIndexPlay', -1])
       }
     }
   }

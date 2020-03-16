@@ -5,13 +5,13 @@ div
     round push color="green" icon="add" @click="layerAdd()"
     :style=`{
       position: 'absolute', zIndex: 30000,
-      bottom: layoutVertical ? 400+90+10+'px' : 190+10+'px',
+      bottom: layoutVertical ? 400+90+10+'px' : 260+10+'px',
       right: layoutVertical ? 10+'px': 450+10+'px'}`)
   //- layerEditor
   div(
     v-if="page === 'layers' && meta.layerIndexPlay >= 0"
     :style=`{
-      position: 'absolute', zIndex: 2200, height: '70px',
+      position: 'absolute', zIndex: 2200, height: '170px',
       bottom: layoutVertical ? '400px' : '0px',
       width: layoutVertical ? '100%' : 'calc(100% - 450px)',
       background: 'rgba(0,0,0,0.9)'

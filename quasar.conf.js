@@ -59,7 +59,8 @@ module.exports = function (ctx) {
       directives: [
         'Ripple',
         'TouchPan',
-        'TouchSwipe'
+        'TouchSwipe',
+        'TouchRepeat'
       ],
       plugins: [
         'Notify',

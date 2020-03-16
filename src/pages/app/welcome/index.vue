@@ -19,7 +19,7 @@ q-layout(
         user-settings(:value="$store.getters.currentUser")
     //- actions
     .row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.justify-start.q-py-md
+      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.justify-start.q-py-md.q-px-sm
         q-btn(v-if="page === 'who'" outline color="green" no-caps @click="page = 'like'" icon="keyboard_arrow_left"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`)
           span Back to categories

@@ -16,7 +16,7 @@ div(
       //- div(@click="$router.push('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       //-   q-btn(round flat icon="settings" color="white")
     //- user
-    router-link(tp="/account" :style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid).catch(e => e)").row.full-width
+    router-link(to="/account" :style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid).catch(e => e)").row.full-width
       div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
         kalpa-avatar(:url="$store.getters.currentUser.profile.thumbUrl" :width="40" :height="40")
       //- user name, max 50?
