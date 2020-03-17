@@ -54,7 +54,7 @@ export default {
         let inviteEmail = await this.$store.dispatch('auth/inviteEmail', this.email)
         // let { data: { inviteEmail } } = await this.$apollo.mutate({
         //   mutation: gql`
-        //     mutation sw_network_only_inviteEmail ($email: String!){
+        //     mutation inviteEmail ($email: String!){
         //       inviteEmail(email: $email)
         //     }
         //   `,
@@ -81,7 +81,7 @@ export default {
         let inviteUrl = await this.$store.dispatch('auth/inviteUrl')
         // let { data: { inviteUrl } } = await this.$apollo.mutate({
         // mutation: gql`
-        //   mutation sw_network_only_inviteUrl {
+        //   mutation inviteUrl {
         //     inviteUrl
         //   }
         // `,

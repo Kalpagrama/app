@@ -38,7 +38,7 @@ export const inviteEmail = async (context, email) => {
   logD('@invite start')
   let { data: { inviteEmail } } = await apollo.clients.auth.mutate({
     mutation: gql`
-      mutation sw_network_only_inviteEmail ($email: String!){
+      mutation inviteEmail ($email: String!){
         inviteEmail(email: $email)
       }
     `,
@@ -53,7 +53,7 @@ export const inviteUrl = async (context) => {
   logD('@invite start')
   let { data: { inviteUrl } } = await apollo.clients.auth.mutate({
     mutation: gql`
-      mutation sw_network_only_inviteUrl{
+      mutation inviteUrl{
         inviteUrl
       }
     `
@@ -66,7 +66,7 @@ export const logout = async (context, token) => {
   try {
     let { data: { logout } } = await apollo.clients.auth.mutate({
       mutation: gql`
-        mutation sw_network_only_logout($token: String) {
+        mutation logout($token: String) {
           logout(token: $token)
         }
       `,
@@ -93,7 +93,7 @@ export const loginEmail = async (context, [email, inviteCode]) => {
   logD('@loginEmail start')
   let { data: { loginEmail: { token, expires, role } } } = await apollo.clients.auth.mutate({
     mutation: gql`
-      mutation sw_network_only_loginEmail ($email: String!, $inviteCode: String){
+      mutation loginEmail ($email: String!, $inviteCode: String){
         loginEmail(email: $email, inviteCode: $inviteCode){
           token
           expires
@@ -114,7 +114,7 @@ export const loginPhone = async (context, phone) => {
   logD('@loginPhone start')
   let { data: { loginPhone: { token, expires, role } } } = await apollo.clients.auth.mutate({
     mutation: gql`
-      mutation sw_network_only_loginPhone ($phone: String!, $inviteCode: String){
+      mutation loginPhone ($phone: String!, $inviteCode: String){
         loginPhone(phone: $phone, inviteCode: $inviteCode){
           token
           expires
@@ -136,7 +136,7 @@ export const loginPassword = async (context, { login, password }) => {
   logD('@loginPassword start')
   let { data: { login: { token, expires, role } } } = await apollo.clients.auth.mutate({
     mutation: gql`
-      mutation sw_network_only_login ($login: String!, $password: String!, $inviteCode: String){
+      mutation login ($login: String!, $password: String!, $inviteCode: String){
         login(login: $login, password: $password  inviteCode: $inviteCode){
           token
           expires
@@ -160,7 +160,7 @@ export const confirm = async (context, code) => {
   let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await apollo.clients.auth.mutate({
     client: 'authApollo',
     mutation: gql`
-      mutation sw_network_only_codeConfirmEmail ($code: String!) {
+      mutation codeConfirmEmail ($code: String!) {
         confirm(code: $code){
           result
           nextAttemptDate

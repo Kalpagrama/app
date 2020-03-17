@@ -27,7 +27,7 @@ export const wsClear = async (context) => {
   logD('wsClear start')
   let { data: { wsClear } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_wsClear {
+      mutation wsClear {
         wsClear
       }
     `
@@ -42,7 +42,7 @@ export const wsItemAdd = async (context, oid) => {
   let { data: { wsItemAdd: wsItem } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
-      mutation sw_network_only_wsItemAdd ($oid: OID!, $wsRevision: Int!) {
+      mutation wsItemAdd ($oid: OID!, $wsRevision: Int!) {
         wsItemAdd (oid: $oid, wsRevision: $wsRevision) {
           ...objectFullFragment
         }
@@ -122,7 +122,7 @@ export const wsNodeSave = async (context, node) => {
       let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
         mutation: gql`
           ${fragments.objectFullFragment}
-          mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!, $wsRevision: Int!) {
+          mutation wsNodeUpdate ($oid: OID!, $node: NodeInput!, $wsRevision: Int!) {
             wsNodeUpdate (oid: $oid, node: $node, wsRevision: $wsRevision) {
               ...objectFullFragment
             }
@@ -179,7 +179,7 @@ export const wsItemDelete = async (context, oid) => {
   assert.ok(oid)
   let { data: { wsItemDelete } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_wsItemDelete ($oid: OID!, $wsRevision: Int!) {
+      mutation wsItemDelete ($oid: OID!, $wsRevision: Int!) {
         wsItemDelete (oid: $oid, wsRevision: $wsRevision)
       }
     `,

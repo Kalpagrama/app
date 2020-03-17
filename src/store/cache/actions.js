@@ -79,15 +79,19 @@ class QueueUpdate {
     // пробуем обновить на сервере
     try {
       this.inProgress = true
+      logD('try update. retryCount=', retryCount)
       await this.update(key, path, updateItemFunc, fetchItemFunc, mergeItemFunc)
     } catch (err) {
+      if (!err.networkError) throw err // если ошибка не сетевая - выходим с неудачей
+      // если ошибка сетевая - пытаемся выполнить повторно
       // todo после обновления страницы данные об изменениях пропадут!!!
       // кладем обратно
       this.queries.unshift({ key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc })
       //  todo сделать circuit breaker
-      await wait(5000)
+      await wait(3000 * (retryCount + 1))
     } finally {
       this.inProgress = false
+      logD('recursion update. retryCount=', retryCount)
       this.next(++retryCount).catch(err => {
         logE('cant update item on server2', { key, path, newValue }, err)
       })
@@ -114,6 +118,7 @@ class QueueUpdate {
         let { item: dbItem, actualAge } = await updateItemFunc(mergedItem)
         this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
         await cache.set(key, this.context.state.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
+        logD('VERSION_CONFLICT resolved!', mergedItem)
       } else {
         logE('cant update item on server', err)
         throw err
@@ -440,15 +445,13 @@ export const get = async (context, { key, fetchItemFunc, force }) => {
 // Если path = ''  то newValue - это полный объект
 // если actualAge не указан - вычислится на основе actualUntil (либо если объекта нет - поставится дефолтное)
 export const update = async (context, { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
-  if (!path) {
-    assert(newValue, 'newValue exists')
-    assert(newValue.revision, 'newValue.revision exists')
-  }
   assert(key)
-  assert(setter || newValue)
-  newValue = JSON.parse(JSON.stringify(newValue))
+  assert(setter != null || newValue != null)
+  if (!path && !setter) {
+    assert(newValue.revision, 'newValue.revision exists')
+    newValue = JSON.parse(JSON.stringify(newValue)) // иначе newValue станет реактивным, и его нельзя будет менять вне vuex
+  }
   path = path || ''
-
   return await cache.update(key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc)
 }
 
