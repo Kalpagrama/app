@@ -21,10 +21,10 @@ q-layout(
       ).row.full-width.scroll
         //- .row.no-wrap
         kalpa-buttons(:value="categoriesFiltered" :id="$route.params.category" idKey="id" @id="$router.push({params: {category: $event}})").no-wrap
-  q-page-conainter.row.full-width.justify-center.items-start.content-start.bg-grey-10
+  q-page-conainter.row.fit.justify-center.items-start.content-start.bg-grey-10
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
-        node-list(:nodes="items" :style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`)
+        node-list(:nodes="items")
 </template>
 
 <script>

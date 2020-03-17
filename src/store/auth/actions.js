@@ -83,7 +83,7 @@ export const logout = async (context, token) => {
       localStorage.removeItem('ktoken')
       localStorage.removeItem('ktokenExpires')
       await checkUpdate()
-      await router.push('/login')
+      await router.push('/auth')
       await update()
     }
   }
@@ -132,7 +132,7 @@ export const loginPhone = async (context, phone) => {
   localStorage.setItem('ktokenExpires', expires)
   logD('@loginPhone done')
 }
-export const loginPassword = async (context, { login, password }) => {
+export const loginPassword = async (context, { login, password, inviteCode }) => {
   logD('@loginPassword start')
   let { data: { login: { token, expires, role } } } = await apollo.clients.auth.mutate({
     mutation: gql`
@@ -147,8 +147,7 @@ export const loginPassword = async (context, { login, password }) => {
     variables: {
       login,
       password,
-      inviteCode: localStorage.getItem('ktokenInviteCode')
-      // inviteCode: '171145051370487837'
+      inviteCode
     }
   })
   localStorage.setItem('ktoken', token)

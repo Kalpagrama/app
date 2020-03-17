@@ -1,21 +1,6 @@
 <template lang="pug">
 div(
   :style=`{position: 'fixed', zIndex: 2000, minHeight: '100vh', width: '100%'}`).row.bg-grey-8
-  //- //- toggle menu
-  //- div(
-  //-   v-if="false"
-  //-   :style=`{
-  //-     position: 'absolute', top: 0, right: '-72px', zIndex: 1000,
-  //-     width: '72px', height: '72px'}`
-  //-   ).row.items-center.justify-center
-  //-   q-btn(
-  //-     flat color="green" icon="menu" @click="menuShow = !menuShow"
-  //-     :style=`{width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255, 0.3)'}`)
-  //- dialogs
-  //- q-dialog(ref="inviteDialog" :maximized="true" transition-show="slide-left" transition-hide="slide-right")
-  //-   k-invite(@hide="$refs.inviteDialog.hide()")
-  //- k-dialog-bottom(ref="logoutDialog" mode="actions" :options="logoutDialogOptions" @action="logoutDialogAction")
-  //- borderRight: '1px solid #4caf50'
   div(:style=`{position: 'relative', overflow: 'hidden'}`).column.fit
     //- home, kalpagramma
     div(:style=`{height: '60px'}`).row.full-width.cursor-pointer
@@ -31,8 +16,9 @@ div(
       //- div(@click="$router.push('/settings')" :style=`{height: '60px', width: '60px'}`).row.items-center.justify-center
       //-   q-btn(round flat icon="settings" color="white")
     //- user
-    div(:style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid).catch(e => e)").row.full-width
-      kalpa-avatar(:url="$store.getters.currentUser.profile.thumbUrl")
+    router-link(to="/account" :style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid).catch(e => e)").row.full-width
+      div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+        kalpa-avatar(:url="$store.getters.currentUser.profile.thumbUrl" :width="40" :height="40")
       //- user name, max 50?
       div(v-if="!mini").col.full-height
         .row.fit.items-center
@@ -106,16 +92,18 @@ import { checkUpdate, update } from 'src/system/service_worker'
 // img:statics/icons/anvil.svg
 export default {
   name: 'kalpaMenuDesktop',
-  props: ['mini'],
+  props: {
+    mini: {
+      type: Boolean,
+      default () {
+        return true
+      }
+    }
+  },
   data () {
     return {
       menuShow: true,
       width: 60,
-      // pages: [
-      //   { id: 'trends', name: 'Trends', icon: 'whatshot' },
-      //   { id: 'workspace', name: 'Workspace', icon: 'school' },
-      //   // { id: 'settings', name: 'Settings', icon: 'settings' }
-      // ],
       userAvatarErrored: false,
       cacheClearing: false,
       loggingOut: false
@@ -134,32 +122,21 @@ export default {
       }
     }
   },
-  watch: {
-    menuShow: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('menuShow CHANGED', to)
-        if (this.$q.screen.xs) {
-          this.width = 260
-        } else {
-          this.$tween.to(this, 0.3, {width: to ? 260 : 60})
-        }
-      }
-    }
-  },
   methods: {
-    async logout (mytoken) {
-      // this.tokenString = token
-      this.$log('logout start')
-      this.loggingOut = true
-      await this.$wait(800)
-      let res = await this.$store.dispatch('auth/logout', mytoken)
-      this.$log('logout done', res)
-      this.loggingOut = false
-    },
-    userAvatarError (e) {
-      this.$log('userAvatarError', e)
-      this.userAvatarErrored = true
+    async logout () {
+      try {
+        this.$log('logout start')
+        this.loggingOut = true
+        await this.$wait(800)
+        if (!confirm('Really logout?')) throw new Error('Changed your mind')
+        let res = await this.$store.dispatch('auth/logout')
+        this.$log('logout done', res)
+        this.loggingOut = false
+      }
+      catch (e) {
+        this.loggingOut = false
+        this.$log('logout error', e)
+      }
     },
     async logoutDialogAction (action) {
       this.$logD('logoutDialogAction', action)

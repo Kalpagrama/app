@@ -3,7 +3,7 @@ q-layout.bg-grey-10
   //- q-page-container
   //-   .column
   //-     div(:style=`{height: 400+'px'}`).row.full-width.content-center
-  //-       k-spinner(:width="100" :height="100" @click.native="$router.push('/login')")
+  //-       k-spinner(:width="100" :height="100" @click.native="$router.push('/auth')")
   //-       .row.full-width.justify-center.q-mt-sm
   //-         span.text-h6.text-white.text-bold KALPAGRAMMA
   //- q-footer(style=`height: 50%`)

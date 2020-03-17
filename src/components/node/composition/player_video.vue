@@ -14,14 +14,7 @@ iframe {
 <template lang="pug">
 div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).column.fit.items-start.content-start.bg-black
   //- opacity: videoGood ? 1 : 0
-  //- layer name
-  span(
-    v-if="!mini && layer.spheres.length > 0" @click="layerNameClick()"
-    :style=`{
-      position: 'absolute', zIndex: 1000, top: '6px', left: '6px',
-      borderRadius: '10px', overflow: 'hidden',
-      color: 'white', background: 'rgba(0,0,0,0.3)'}`
-    ).q-pa-sm {{ layer.spheres[0].name | cut(50) }}
+  //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row.bg-red
   //- debug
   div(
     v-if="!mini && $store.state.ui.debug"
@@ -37,22 +30,59 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
     small.full-width layerIndexPlay: {{layerIndexPlay}}
   //- video container
   div(:style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
-    div(:style=`{position: 'absolute', zIndex: 11, top: '0px', height: 'calc(100% + 0px)'}`).row.full-width
+    //- layer name
+    //- span(
+    //-   v-if="videoGood && !mini && layer.spheres.length > 0" @click="layerNameClick()"
+    //-   :style=`{
+    //-     position: 'absolute', zIndex: 20000, top: '6px', left: '6px',
+    //-     borderRadius: '10px', overflow: 'hidden',
+    //-     color: 'white', background: 'rgba(0,0,0,0.3)'}`
+    //-   ).q-pa-sm {{ layer.spheres[0].name | cut(50) }}
+    //- video actions, volume, progress
+    //- q-btn(
+    //-   v-show="!mini && videoGood"
+    //-   round flat @click="videoToggleMuted()"
+    //-   :color="muted ? 'grey-6' : 'white'"
+    //-   :icon="muted ? 'volume_off' : 'volume_up'"
+    //-   :style=`{position: 'absolute', zIndex: 20000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
+    div(
+      v-on:dblclick="videoForward(0)" @click="forwarding === 'left' ? videoForward(0) : videoClick()"
+      v-ripple=`forwarding === 'left' ? {color: 'white'} : false`
+      :style=`{position: 'absolute', zIndex: 20, top: '0px', width: '33%', left: '0px',
+        'border-top-right-radius': '100%', 'border-bottom-right-radius': '100%',
+        background: forwarding === 'left' ? 'rgba(255,255,255,0.3)' : 'none'}`).row.full-height.items-center.content-center.justify-center.q-px-md
+        q-btn(
+          v-show="forwarding === 'left'"
+          round flat size="md" color="white" icon="keyboard_arrow_left"
+          :style=`{pointerEvents: 'none'}`)
+        span(
+          v-show="forwarding === 'left'"
+          :style=`{userSelect: 'none', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).text-white.q-pa-sm {{ $time(forwardingCount) }}
+    div(
+      v-on:dblclick="videoForward(1)" @click="forwarding === 'right' ? videoForward(1) : videoClick()"
+      v-ripple=`forwarding === 'right' ? {color: 'white'} : false`
+      :style=`{position: 'absolute', zIndex: 20, top: '0px', width: '33%', right: '0px',
+        'border-top-left-radius': '100%', 'border-bottom-left-radius': '100%',
+        background: forwarding === 'right' ? 'rgba(255,255,255,0.3)' : 'none'}`).row.full-height.items-center.content-center.justify-center.q-px-md
+        q-btn(
+          v-show="forwarding === 'right'"
+          round flat size="lg" color="white"  icon="keyboard_arrow_right"
+          :style=`{pointerEvents: 'none'}`)
+        span(
+          v-show="forwarding === 'right'"
+          :style=`{userSelect: 'none', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).text-white.q-pa-sm {{ $time(forwardingCount) }}
+    div(:style=`{position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)'}`).row.full-width
+      //- preload="auto"
       video(
         ref="kalpaVideo"
         :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
-        playsinline loop :autoplay="ctx === 'workspace' || ctx === 'editor'" :muted="muted" preload="auto"
+        playsinline :loop="true" :autoplay="true" :muted="muted" :controls="false"
         @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         @timeupdate="videoUpdate"
         :style=`{
-          width: '100%', height: '100%', objectFit: 'contain'
+          transformStyle: videoGood ? 'preserve-3d !important' : 'none',
+          position: 'relative', width: '100%', height: '100%', objectFit: 'contain', zIndex: -1
         }`)
-    //- video actions, volume, progress
-    q-btn(
-      v-show="!mini"
-      round flat color="white" @click="videoToggleMuted()"
-      :icon="muted ? 'volume_off' : 'volume_up'"
-      :style=`{position: 'absolute', zIndex: 300, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
     player-video-progress(v-show="progressShow" :now="now" :duration="duration" :player="player" :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause" :meta="meta" @meta="onMeta")
   slot(name="editor" :meta="meta" :player="player")
 </template>
@@ -80,7 +110,10 @@ export default {
       mode: 'play',
       layerIndex: 0,
       layerIndexPlay: -1,
-      editing: false
+      editing: false,
+      forwarding: null,
+      forwardingInterval: null,
+      forwardingCount: 0
     }
   },
   computed: {
@@ -282,6 +315,26 @@ export default {
       else if (this.player.mode === 'watch') {
       }
     },
+    videoForward (right) {
+      // this.$log('videoForward')
+      let to = this.now
+      if (right > 0) {
+        this.forwarding = 'right'
+        to = to + 10 < this.duration ? to + 10 : this.duration
+      }
+      else {
+        this.forwarding = 'left'
+        to = to - 10 > 0 ? to - 10 : 0
+      }
+      this.forwardingCount += 10
+      this.player.setCurrentTime(to)
+      this.videoUpdate(null, to)
+      if (this.forwardingInterval) clearTimeout(this.forwardingInterval)
+      this.forwardingInterval = setTimeout(() => {
+        this.forwarding = null
+        this.forwardingCount = 0
+      }, 400)
+    },
     videoToggleMuted () {
       this.$log('videoToggleMuted')
       // centralized volume settings, except ios safari...
@@ -363,7 +416,11 @@ export default {
           this.nowPause = false
         }
         this.player.play = () => {
-          if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.play()
+          // this.$q.notify('play ?')
+          if (this.$refs.kalpaVideo) {
+            // this.$q.notify('play !')
+            this.$refs.kalpaVideo.play()
+          }
         }
         this.player.pause = () => {
           if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.pause()

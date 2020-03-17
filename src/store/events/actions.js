@@ -156,7 +156,7 @@ async function processEvent (context, event) {
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_UPDATED':
     case 'WS_ITEM_DELETED':
-      notifyUserActionComplete(event.type, event.object)
+      // notifyUserActionComplete(event.type, event.object)
       // logD('try processEventWs')
       await processEventWs(context, event)
       break

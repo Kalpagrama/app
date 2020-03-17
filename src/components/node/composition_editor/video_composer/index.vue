@@ -5,7 +5,7 @@ div
     round push color="green" icon="add" @click="layerAdd()"
     :style=`{
       position: 'absolute', zIndex: 30000,
-      bottom: layoutVertical ? 400+190+10+'px' : 190+10+'px',
+      bottom: layoutVertical ? 400+90+10+'px' : 260+10+'px',
       right: layoutVertical ? 10+'px': 450+10+'px'}`)
   //- layerEditor
   div(
@@ -25,7 +25,7 @@ div
       width: layoutVertical ? '100%' : '450px',
       right: '0px', bottom: '0px'
     }`).column.bg-grey-10
-    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+    div(v-if="true" :style=`{height: '60px'}`).row.full-width.items-center.content-center
       //- q-btn(round flat color="white"
       //-   :icon="isHorizSet ? 'keyboard_arrow_right' : 'keyboard_arrow_down'" @click="isHorizSet = !isHorizSet")
       //- .col
@@ -36,7 +36,8 @@ div
       content-info(
         v-if="page === 'info'" :content="composition.layers[0].content")
       layers(
-        v-if="page === 'layers'" :layers="layers" :player="player" :meta="meta" @meta="$parent.$emit('meta', $event)")
+        v-if="page === 'layers'" :composition="composition" :layers="layers" :player="player" :meta="meta"
+        @meta="$parent.$emit('meta', $event)")
       //- content-nodes()
       //- content-spheres()
 </template>

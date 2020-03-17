@@ -3,7 +3,8 @@ component(
   :is="`node-layout-${layout || node.layout}`"
   :ctx="ctx" :index="index"
   :node="node" :nodeFull="nodeFull" :visible="visible" :active="active" :nodeLoad="nodeLoad"
-  @open="$emit('open', [node, nodeFull])")
+  @tintClick="$emit('tintClick', index)"
+  @height="$emit('height', $event)")
 </template>
 
 <script>
@@ -95,6 +96,7 @@ export default {
           // if (this.visible) await this.play()
         })
       }
+      // this.$emit('height', this.$el.clientHeight)
     },
     async nodeDestroy () {
       // this.$log('nodeDestroy')  && !this.needFull && !this.needFullPreload
@@ -103,6 +105,9 @@ export default {
         this.nodeFull = null
       }
     }
+  },
+  mounted () {
+    // this.$emit('height', this.$el.clientHeight)
   }
 }
 </script>

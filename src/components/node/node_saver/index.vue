@@ -71,8 +71,8 @@ export default {
   methods: {
     async nodeSaveImmediate () {
       try {
-        if (!this.nodeChanged) return
         this.$log('nodeSave start', this.node.revision, this.node.name)
+        if (!this.nodeChanged) return
         this.nodeSaving = true
         let res = await this.$store.dispatch('workspace/wsNodeSave', this.node)
         this.$log('nodeSave res', res.revision, res.name, res)

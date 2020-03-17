@@ -24,7 +24,7 @@ div(
     v-if="visible && value"
     :ctx="ctx" :composition="value"
     :visible="visible" :active="active" :mini="mini"
-    :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 1000, ...styles}`).fit
+    :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
     template(v-slot:editor=`{player, meta}`)
       slot(name="editor" :player="player" :meta="meta")
 </template>

@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.q-px-xs
+.row.fit.items-start.content-start
   //- progress create node
   //- div(
   //-   v-if="progress"
@@ -13,6 +13,8 @@
   kalpa-loader(v-if="variables" ref="nodeLoader" :variables="variables" type="sphereNodes")
     template(v-slot:items=`{items}`)
       node-list(:nodes="items" @nodeClick="nodeClick")
+        template(v-slot:header)
+          slot(name="header")
   div(v-if="nodes" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
     span {{$t('Пользователь не создавал ядра', 'User didnt create nodes')}}
 </template>
