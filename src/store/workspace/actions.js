@@ -109,6 +109,9 @@ export const wsNodeSave = async (context, node) => {
           })
         })
       }
+      else {
+        return null
+      }
     })
     return nodeInput
   }

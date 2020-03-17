@@ -58,7 +58,6 @@
           }`
         ) {{ $time(layersLength) }}
     q-btn(round flat color="green" icon="school" @click="layerContentLayersShow = true")
-    //- span WS
   //- body
   .col.full-width.scroll
     div(:style=`{paddingBottom: '300px'}`).row.full-width.items-start.content-start.q-pa-sm
@@ -105,10 +104,14 @@ export default {
       return this.layers
     },
     layersLength () {
-      return this.layersFiltered.reduce((acc, l) => {
-        acc += l.figuresAbsolute[1].t - l.figuresAbsolute[0].t
-        return acc
-      }, 0)
+      return this.layers
+        .filter(l => {
+          return l.figuresAbsolute.length > 0
+        })
+        .reduce((acc, l) => {
+          acc += l.figuresAbsolute[1].t - l.figuresAbsolute[0].t
+          return acc
+        }, 0)
     }
   },
   methods: {
