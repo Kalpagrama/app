@@ -36,9 +36,12 @@
         q-btn(push color="green" no-caps @click="layerNameSet"
           :style=`{borderRadius: '10px'}`).fit
           span Save
-  //- q-dialog(v-model="layerContentLayersShow" full-height position="right").window-height
-  //-   div(:style=`{height: $q.screen.height+'px', width: '450px'}`).column.bg-red
-  //-     h1 layer content layers
+  //- layerContentLayers
+  layer-content-layers(
+    v-if="layerContentLayersShow && meta.layerIndexPlay >= 0"
+    :layer="layers[meta.layerIndexPlay]"
+    @hide="layerContentLayersShow = false"
+    :style=`{position: 'absolute', zIndex: 1000, right: '0px'}`).fit
   //- header
   div(
     v-if="true"
@@ -57,9 +60,10 @@
             'text-bold': layersLength > 60
           }`
         ) {{ $time(layersLength) }}
-    q-btn(round flat color="green" icon="school" @click="layerContentLayersShow = true")
+    q-btn(round flat color="green" icon="school" @click="layerContentLayersShow = !layerContentLayersShow")
   //- body
-  .col.full-width.scroll
+  div(:style=`{position: 'relative'}`).col.full-width.scroll
+    //- wrapper of layers
     div(:style=`{paddingBottom: '300px'}`).row.full-width.items-start.content-start.q-pa-sm
       //- .row.full-width
       //-   small(v-for="(l,li) in layers" :key="li").full-width.text-white.q-ml-md {{l.spheres.length > 0 ? l.spheres[0].name : li}}
@@ -79,17 +83,11 @@
 <script>
 import draggable from 'vuedraggable'
 import layer from './layer'
-
-const swap = (arr, x, y) => {
-  var b = arr[x]
-  arr[x] = arr[y]
-  arr[y] = b
-  return arr
-}
+import layerContentLayers from './layer_content_layers'
 
 export default {
   name: 'videoComposerLayers',
-  components: { draggable, layer },
+  components: { draggable, layer, layerContentLayers },
   props: ['composition', 'layers', 'player', 'meta'],
   data () {
     return {

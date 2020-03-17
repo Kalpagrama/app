@@ -83,7 +83,12 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
           transformStyle: videoGood ? 'preserve-3d !important' : 'none',
           position: 'relative', width: '100%', height: '100%', objectFit: 'contain', zIndex: -1
         }`)
-    player-video-progress(v-show="progressShow" :now="now" :duration="duration" :player="player" :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause" :meta="meta" @meta="onMeta")
+    player-video-progress(
+      v-show="progressShow"
+      :now="now" :duration="duration" :player="player"
+      :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause"
+      :meta="meta" @meta="onMeta"
+      :style=`{position: 'absolute', bottom: '190px', left: '0px', zIndex: 20000}`)
   slot(name="editor" :meta="meta" :player="player")
 </template>
 

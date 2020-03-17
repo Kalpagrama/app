@@ -1,14 +1,12 @@
 <template lang="pug">
-div(
-  :style=`{
-    position: 'absolute', bottom: '0px', left: 0, zIndex: 20000}`
-  ).row.full-width.items-start.content-start
+.row.full-width.items-start.content-start
   //- pregress wrapper
   .row.full-width.items-start.content-start.q-px-xl
     //- progress bar & time
     div(
       @click="progressClick"
-      :style=`{height: height+'px', borderRadius: '10px'}`).row.full-width.items-center.content-center
+      v-touch-pan.left.right.prevent.mouse="progressPan"
+      :style=`{height: '20px', borderRadius: '10px'}`).row.full-width.items-center.content-center
       //- progress
       div(
         :style=`{position: 'relative', height: '20px', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
@@ -76,6 +74,21 @@ export default {
       this.$emit('meta', ['layerIndexPlay', -1])
       this.player.setCurrentTime(to)
       this.videoUpdate(null, to)
+    },
+    progressPan (e) {
+      // this.$log('progressPan', e)
+      let w = e.evt.target.clientWidth
+      let x = e.evt.offsetX
+      let to = (this.duration * x) / w
+      if (e.isFirst) {
+        this.player.pause()
+        this.$emit('meta', ['mode', 'watch'])
+        this.$emit('meta', ['layerIndexPlay', -1])
+      }
+      if (e.isFinal) {
+        this.videoUpdate(null, to)
+      }
+      this.player.setCurrentTime(to)
     }
   }
 }

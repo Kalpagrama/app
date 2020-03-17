@@ -22,8 +22,12 @@ div(
   div(
     v-if="!layerActive"
     @click="$emit('meta', ['layerIndex', index]), $emit('meta', ['layerIndexPlay', index])"
-    :class=`{'bg-grey-6': index === meta.layerIndex}`
-    :style=`{position: 'absolute', zIndex: 200, borderRadius: '10px', opacity: 0.5}`).row.fit.cursor-pointer.layerhandle
+    :style=`{position: 'absolute', zIndex: 200, borderRadius: '10px', overflow: 'hidden', opacity: 0.5}`).row.fit.cursor-pointer.layerhandle
+    //- percent
+    div(
+      v-if="layerOver"
+      :style=`{position: 'absolute', zIndex: 210, left: '0px', width: layerPercent+'%', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`
+      ).row.full-height.bg-grey-6
   //- ACTIVE layer
   div(
     :style=`{position: 'relative', height: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start
@@ -36,7 +40,9 @@ div(
       .col.full-height
         .row.fit.items-center.content-center
           //- progress wrapper
-          div(:style=`{position: 'relative', height: '44px', borderRadius: '22px', overflow: 'hidden', border: '4px solid #616161'}`).row.full-width.bg-grey-8
+          div(
+            @click="layerProgressClick"
+            :style=`{position: 'relative', height: '44px', borderRadius: '22px', overflow: 'hidden', border: '4px solid #616161'}`).row.full-width.bg-grey-8
             //- progress bar white
             div(
               v-show="!meta.editing"
@@ -45,7 +51,8 @@ div(
                 border: '0px solid #616161',
                 height: 'calc(100% - 0px)',
                 width: 'calc(' + layerPercent + '% - 0px)',
-                borderRadius: layerPercent > 5 ? '22px' : '22px'}`
+                borderRadius: layerPercent > 5 ? '22px' : '22px',
+                pointerEvents: 'none'}`
               ).row.bg-grey-4
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="white" icon="refresh" @click="player.setCurrentTime(layer.figuresAbsolute[0].t)")
@@ -88,6 +95,14 @@ export default {
     },
     layerActive () {
       return this.meta.layerIndexPlay === this.index
+    },
+    layerOver () {
+      if (this.meta.now >= this.layer.figuresAbsolute[0].t && this.meta.now <= this.layer.figuresAbsolute[1].t) {
+        return true
+      }
+      else {
+        return false
+      }
     },
     layerPercent () {
       if (!this.layer) return 0
@@ -133,6 +148,18 @@ export default {
       this.layer.figuresAbsolute[index].t = to
       this.player.pause()
       this.player.setCurrentTime(to)
+    },
+    layerProgressClick (e) {
+      // this.$log('layerProgressClick', e)
+      let width = e.path[0].clientWidth
+      let offsetX = e.offsetX
+      let k = offsetX / width
+      let d = this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t
+      let to = this.layer.figuresAbsolute[0].t + (k * d)
+      this.player.setCurrentTime(to)
+    },
+    layerProgressPan (e) {
+      this.$log('layerProgressPan', e)
     },
     layerLove () {
       this.$log('layerLove')

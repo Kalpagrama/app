@@ -60,8 +60,7 @@ export default {
       pages: [
         {id: 'info', name: 'Info'},
         {id: 'layers', name: 'Layers'},
-        {id: 'nodes', name: 'Nodes'},
-        {id: 'spheres', name: 'Spheres'}
+        {id: 'nodes', name: 'Explore nodes'}
       ],
       layerInitialLength: 10
     }
