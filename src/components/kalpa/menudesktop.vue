@@ -18,7 +18,7 @@ div(
     //- user
     router-link(to="/account" :style=`{height: '60px'}` @click="$router.push(`/user/` + $store.getters.currentUser.oid).catch(e => e)").row.full-width
       div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
-        kalpa-avatar(:url="$store.getters.currentUser.profile.thumbUrl" :width="40" :height="40")
+        kalpa-avatar(:url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
       //- user name, max 50?
       div(v-if="!mini").col.full-height
         .row.fit.items-center

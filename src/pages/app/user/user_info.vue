@@ -14,7 +14,7 @@ div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-9
   div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-xl
     //- logo, db, notifications, follow
     .row.full-width.q-pa-sm
-      kalpa-avatar(:url="user.profile.thumbUrl" :width="100" :height="100" @click.native="userAvatarClick()")
+      kalpa-avatar(:url="user.profile.photoUrl" :width="100" :height="100" @click.native="userAvatarClick()")
       .col.full-height
         .row.fit.items-center.content-center.justify-end
           q-btn(v-if="userIsMe" round flat color="green" icon="settings" @click="userSettingsDialogOpened = true").q-mr-sm

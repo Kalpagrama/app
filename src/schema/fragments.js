@@ -265,7 +265,8 @@ const userFragment = gql`
       tutorial
       about
       status
-      thumbUrl(preferWidth: 600)
+      photoUrl
+      coverUrl
       city
       country
       dateBirth
