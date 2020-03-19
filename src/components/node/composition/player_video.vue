@@ -4,6 +4,8 @@ iframe {
   height: 100%;
   min-width: 100%;
   min-height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   z-index: 100;
 }
 .mejs__overlay-button {
@@ -17,7 +19,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row.bg-red
   //- debug
   div(
-    v-if="!mini && $store.state.ui.debug"
+    v-if="!mini && false"
     :style=`{
       position: 'absolute', width: 'calc(100% - 20px)', left: '6px', bottom: '4px',
       pointerEvents: 'none', userSelect: 'none',
@@ -45,6 +47,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
     //-   :color="muted ? 'grey-6' : 'white'"
     //-   :icon="muted ? 'volume_off' : 'volume_up'"
     //-   :style=`{position: 'absolute', zIndex: 20000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
+    //- video forward
     div(
       v-on:dblclick="videoForward(0)" @click="forwarding === 'left' ? videoForward(0) : videoClick()"
       v-ripple=`forwarding === 'left' ? {color: 'white'} : false`
@@ -58,6 +61,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
         span(
           v-show="forwarding === 'left'"
           :style=`{userSelect: 'none', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).text-white.q-pa-sm {{ $time(forwardingCount) }}
+    //- video forward
     div(
       v-on:dblclick="videoForward(1)" @click="forwarding === 'right' ? videoForward(1) : videoClick()"
       v-ripple=`forwarding === 'right' ? {color: 'white'} : false`
@@ -83,13 +87,13 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
           transformStyle: videoGood ? 'preserve-3d !important' : 'none',
           position: 'relative', width: '100%', height: '100%', objectFit: 'contain', zIndex: -1
         }`)
-    player-video-progress(
-      v-show="progressShow"
-      :now="now" :duration="duration" :player="player"
-      :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause"
-      :meta="meta" @meta="onMeta"
-      :style=`{position: 'absolute', bottom: '190px', left: '0px', zIndex: 20000}`)
-  slot(name="editor" :meta="meta" :player="player")
+    //- player-video-progress(
+    //-   v-show="true"
+    //-   :now="now" :duration="duration" :player="player"
+    //-   :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause"
+    //-   :meta="meta" @meta="onMeta"
+    //-   :style=`{position: 'absolute', bottom: '190px', left: '0px', zIndex: 20000}`)
+  slot(name="editor" :meta="meta" :player="player" :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause")
 </template>
 
 <script>
@@ -445,7 +449,7 @@ export default {
           autoplay: false,
           controls: false,
           features: [], // 'playpause'
-          enableAutosize: true,
+          // enableAutosize: true,
           stretching: 'fill',
           pauseOtherPlayers: false,
           // plugins: ['youtube'],
@@ -484,7 +488,20 @@ export default {
     },
     onMeta (val) {
       this.$log('onMeta', val)
-      this[val[0]] = val[1]
+      switch (val[0]) {
+        case 'videoUpdate': {
+          this.videoUpdate(null, val[1])
+          break
+        }
+        case 'videoPlayPause': {
+          this.videoPlayPause()
+          break
+        }
+        default: {
+          this.$log('onMeta SET')
+          this[val[0]] = val[1]
+        }
+      }
     },
     layerNameClick () {
       this.$log('layerNameClick')

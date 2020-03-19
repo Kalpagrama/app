@@ -12,9 +12,10 @@ q-layout( view="hHh Lpr lff")
     v-if="$q.screen.gt.xs && $route.name !== 'welcome'"
     v-model="$q.screen.xs ? false : drawerShow"
     no-swipe-open no-swipe-close
+    behavior="desktop"
     :side="$q.screen.xs ? 'right' : 'left'"
     :width="60"
-    content-class="bg-grey-8").gt-xs
+    content-class="bg-grey-8")
     kalpa-menu-desktop(v-if="!loading" :style=`{zIndex: 10000}`)
   q-dialog(
     v-model="drawerShowMobile" position="bottom")

@@ -21,7 +21,7 @@ div(
   //- INACTIVE tint
   div(
     v-if="!layerActive"
-    @click="$emit('meta', ['layerIndex', index]), $emit('meta', ['layerIndexPlay', index])"
+    @click="$emit('meta', ['mode', 'layer']), $emit('meta', ['layerIndex', index]), $emit('meta', ['layerIndexPlay', index])"
     :style=`{position: 'absolute', zIndex: 200, borderRadius: '10px', overflow: 'hidden', opacity: 0.5}`).row.fit.cursor-pointer.layerhandle
     //- percent
     div(
@@ -33,31 +33,36 @@ div(
     :style=`{position: 'relative', height: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start
     //- PLAYER progress
     div(:style=`{height: '60px'}`).row.full-width
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round push @click="layerPlayButtonClick()"
-          :color="meta.mode === 'layer' && meta.playing ? 'red' : 'green'"
-          :icon="meta.playing && layerActive ? 'pause' : 'play_arrow'")
-      .col.full-height
+      //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+      //-   q-btn(round push @click="layerPlayButtonClick()"
+      //-     :color="meta.mode === 'layer' && meta.playing ? 'red' : 'green'"
+      //-     :icon="meta.playing && layerActive ? 'pause' : 'play_arrow'")
+      .col.full-height.q-px-md
         .row.fit.items-center.content-center
           //- progress wrapper
           div(
             @click="layerProgressClick"
-            :style=`{position: 'relative', height: '44px', borderRadius: '22px', overflow: 'hidden', border: '4px solid #616161'}`).row.full-width.bg-grey-8
+            :style=`{position: 'relative', height: '20px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-8
             //- progress bar white
             div(
               v-show="!meta.editing"
               :style=`{
                 position: 'absolute', left: '0px', top: '0px',
-                border: '0px solid #616161',
                 height: 'calc(100% - 0px)',
                 width: 'calc(' + layerPercent + '% - 0px)',
-                borderRadius: layerPercent > 5 ? '22px' : '22px',
+                borderRadius: 'none',
                 pointerEvents: 'none'}`
               ).row.bg-grey-4
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="white" icon="refresh" @click="player.setCurrentTime(layer.figuresAbsolute[0].t)")
+            div(:style=`{position: 'absolute',
+              left: 'calc('+layerPercent+'% - 10px)',
+              width: '20px', height: '20px', borderRadius: '50%'}`).bg-green
+      //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+      //-   q-btn(round flat color="white" icon="refresh" @click="player.setCurrentTime(layer.figuresAbsolute[0].t)")
     //- TICKS
     div(:style=`{height: '44px'}`).row.full-width.justify-center.content-center.items-center.q-px-md
+      q-btn(round push @click="layerPlayButtonClick()"
+        :color="meta.mode === 'layer' && meta.playing ? 'red' : 'green'"
+        :icon="meta.playing && layerActive ? 'pause' : 'play_arrow'").q-mr-md
       div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_left" @click="layerTick(0, 0)").q-mr-lg
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_right" @click="layerTick(0, 1)")
@@ -69,8 +74,9 @@ div(
       div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_left" @click="layerTick(1, 0)").q-mr-lg
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_right" @click="layerTick(1, 1)")
+      q-btn(round flat color="white" icon="refresh" @click="player.setCurrentTime(layer.figuresAbsolute[0].t)").q-ml-md
     //- ACTIONS: delete, copy, share, save
-    .row.full-width.q-px-lg.q-py-sm
+    .row.full-width.items-center.content.center.q-px-lg
       q-btn(round flat icon="delete_outline" color="red" @click="$emit('layerDelete', index)")
       .col.full-height
       q-btn(round flat icon="favorite_border" color="white" @click="layerLove()")
@@ -79,7 +85,7 @@ div(
 <script>
 export default {
   name: 'videoComposer_layersLayer',
-  props: ['index', 'layer', 'active', 'player', 'meta'],
+  props: ['index', 'layer', 'player', 'meta'],
   data () {
     return {
       height: 0
@@ -118,7 +124,7 @@ export default {
         this.$log(this.index, 'layerActive CHANGED', to, from)
         if (to) {
           if (to !== from) {
-            if (this.height !== 165) this.$tween.to(this, 0.3, {height: 165})
+            if (this.height !== 165) this.$tween.to(this, 0.3, {height: 150})
             // this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
           }
         }
