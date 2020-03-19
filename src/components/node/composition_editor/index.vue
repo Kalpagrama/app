@@ -1,6 +1,6 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  video-composer(:composition="composition" @cancel="$emit('cancel')")
+  video-composer(:ctx="ctx" :mode="mode" :composition="composition" @cancel="$emit('cancel')")
 </template>
 
 <script>

@@ -34,8 +34,8 @@ div(
     .col
       .row.fit.items-center.content-center.justify-end.q-px-md
         span.text-white {{$time(layer.figuresAbsolute[0].t)}}-{{$time(layer.figuresAbsolute[1].t)}} / {{ $time(layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t) }}
-    div(:style=`{height: '36px', width: '36px'}`).row.items-center.content-center.justify-center.cursor-pointer
-      q-icon(color="white" size="20px" name="drag_indicator")
+    //- div(:style=`{height: '36px', width: '36px'}`).row.items-center.content-center.justify-center.cursor-pointer
+    //-   q-icon(color="white" size="20px" name="drag_indicator")
   //- ACTIVE layer
   div(
     :style=`{position: 'relative', height: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start
@@ -85,10 +85,10 @@ div(
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_right" @click="layerTick(1, 1)")
       q-btn(round flat color="white" icon="refresh" @click="player.setCurrentTime(layer.figuresAbsolute[0].t)").q-ml-md
     //- ACTIONS: delete, copy, share, save
-    div(v-if="true").row.full-width.items-center.content.center.q-px-lg
-      q-btn(round flat icon="delete_outline" color="red" @click="$emit('layerDelete', index)")
-      .col.full-height
-      q-btn(round flat icon="favorite_border" color="white" @click="layerLove()")
+    div(v-if="true").row.full-width.items-center.content.center.justify-center.q-px-lg
+      q-btn(round flat icon="delete_outline" color="red" @click="$emit('layerDelete', index)").q-mr-sm
+      //- .col.full-height
+      q-btn(round flat icon="favorite_border" color="white" @click="layerLove()").q-ml-sm
 </template>
 
 <script>

@@ -26,7 +26,7 @@ div
         q-btn(round flat color="green" icon="menu" @click="drawerToggle()")
       .col.full-height
         .row.fit.items-center.content-center
-          span.text-white.text-bold Content editor
+          span.text-white.text-bold {{ctx === 'contentEditor' ? 'Content editor' : 'Composition editor'}}
     div(v-if="true" :style=`{height: '60px'}`).row.full-width.items-center.content-center
       //- q-btn(round flat color="white"
       //-   :icon="isHorizSet ? 'keyboard_arrow_right' : 'keyboard_arrow_down'" @click="isHorizSet = !isHorizSet")
@@ -38,8 +38,10 @@ div
       content-info(
         v-if="page === 'info'" :content="composition.layers[0].content")
       layers(
-        v-if="page === 'layers'" :composition="composition" :layers="layers" :player="player" :meta="meta"
+        v-if="page === 'layers'"
+        :ctx="ctx" :composition="composition" :layers="layers" :player="player" :meta="meta"
         @layerClick="layerClick"
+        @layerAdd="layerAdd(null, null, $event)"
         @drawerToggle="drawerToggle"
         @meta="$parent.$emit('meta', $event)")
   //- drawer CLOSER
@@ -88,7 +90,7 @@ import contentInfo from './content_info'
 export default {
   name: 'videoComposer_composer',
   components: {layer, layers, playerVideoProgress, layerEditor, contentInfo},
-  props: ['composition', 'meta', 'player', 'styles'],
+  props: ['ctx', 'mode', 'composition', 'meta', 'player', 'styles'],
   data () {
     return {
       page: 'layers',

@@ -19,7 +19,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
   div(
-    v-if="!mini && true"
+    v-if="!mini && false"
     :style=`{
       position: 'absolute', width: 'calc(100% - 20px)', left: '6px', bottom: '4px',
       pointerEvents: 'none', userSelect: 'none',
@@ -80,7 +80,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
       video(
         ref="kalpaVideo"
         :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
-        playsinline :loop="true" :autoplay="true" :muted="muted" :controls="false"
+        playsinline :loop="true" :autoplay="true" :muted="mutedComputed" :controls="false"
         @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         @timeupdate="videoUpdate"
         :style=`{
@@ -219,6 +219,14 @@ export default {
       else {
         if (this.ctx === 'workspace' || this.ctx === 'editor') return true
         else return false
+      }
+    },
+    mutedComputed () {
+      if (this.ctx === 'contentEditor') {
+        return false
+      }
+      else {
+        return this.muted
       }
     }
   },
@@ -438,6 +446,7 @@ export default {
           // TODO
         }
         this.player.setMuted = () => {
+          this.muted = !this.muted
           // if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.paus
         }
         this.videoUpdate()

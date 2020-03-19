@@ -16,8 +16,9 @@
 .column.fit
   //- layerContentLayers
   layer-content-layers(
-    v-if="layerContentLayersShow && meta.layerIndexPlay >= 0"
-    :layer="layers[meta.layerIndexPlay]"
+    v-if="layerContentLayersShow && meta.layerIndex >= 0"
+    :layer="layers[meta.layerIndex]"
+    @layerAdd="$emit('layerAdd', $event), layerContentLayersShow = false"
     @hide="layerContentLayersShow = false"
     :style=`{position: 'absolute', zIndex: 1000, right: '0px'}`).fit
   //- header
@@ -38,7 +39,9 @@
             'text-bold': layersLength > 60
           }`
         ) {{ $time(layersLength) }}
-    q-btn(round flat color="green" icon="school" @click="layerContentLayersShow = !layerContentLayersShow")
+    q-btn(
+      v-if="ctx !== 'contentEditor'"
+      round flat color="green" icon="school" @click="layerContentLayersShow = !layerContentLayersShow")
   //- body
   div(:style=`{position: 'relative'}`).col.full-width.scroll
     //- wrapper of layers
@@ -80,7 +83,7 @@ import layerContentLayers from './layer_content_layers'
 export default {
   name: 'videoComposerLayers',
   components: { draggable, layer, layerContentLayers },
-  props: ['composition', 'layers', 'player', 'meta'],
+  props: ['ctx', 'composition', 'layers', 'player', 'meta'],
   data () {
     return {
       layerContentLayersShow: false

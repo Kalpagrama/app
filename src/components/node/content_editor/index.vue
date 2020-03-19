@@ -2,7 +2,7 @@
 .row.fit
   composition-editor(
     v-if="node && node.compositions.length > 0"
-    mode="content" :node="node"
+    ctx="contentEditor" mode="content" :node="node"
     @cancel="$emit('cancel')")
   div(
     v-else
