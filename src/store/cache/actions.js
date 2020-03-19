@@ -447,10 +447,8 @@ export const get = async (context, { key, fetchItemFunc, force }) => {
 export const update = async (context, { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
   assert(key)
   assert(setter != null || newValue != null)
-  if (!path && !setter) {
-    assert(newValue.revision, 'newValue.revision exists')
-    newValue = JSON.parse(JSON.stringify(newValue)) // иначе newValue станет реактивным, и его нельзя будет менять вне vuex
-  }
+  if (!path && !setter) assert(newValue.revision, 'newValue.revision exists')
+  if (newValue) newValue = JSON.parse(JSON.stringify(newValue)) // иначе newValue станет реактивным, и его нельзя будет менять вне vuex
   path = path || ''
   return await cache.update(key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc)
 }

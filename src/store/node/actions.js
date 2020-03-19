@@ -179,6 +179,7 @@ export const nodeCreate = async (context, node) => {
     }
   })
   context.dispatch('cache/update', {key: createdNode.oid, newValue: createdNode, actualAge: 'zero'}, {root: true})
+  await context.dispatch('workspace/exportLayersFromNode', node, { root: true }) // сохраним слои из созданного ядра в мастерской
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
 }

@@ -47,8 +47,12 @@ export default {
         this.loading = true
         await this.$wait(500)
         this.passwordCheck()
-        let res = await this.$store.dispatch('auth/loginPassword', {password: this.password, login: this.login, inviteCode: '2018'})
-        await this.$wait(500)
+        let { login, loginType, userExist, needInvite, token, expires } = await this.$store.dispatch('auth/userIdentify', this.login)
+        this.$log('enterKalpa userIdentify done', { login, loginType, userExist, needInvite, token, expires })
+        let { result, role, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/userAuthenticate', {password: this.password, inviteCode: '2018'})
+        if (!result) alert('userAuthenticate fails!!! \r\n' + failReason)
+        this.$log('enterKalpa userAuthenticate done', { result, role, nextAttemptDate, attempts, failReason })
+        // await this.$wait(500)
         this.$log('enterKalpa done')
         this.loading = false
         this.$router.push('/')

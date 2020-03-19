@@ -75,10 +75,9 @@ export const wsNodeSave = async (context, node) => {
     nodeInput.spheres = node.spheres.map(s => {
       return { name: s.name }
     })
-    nodeInput.compositions = []
-    node.compositions.map(c => {
-      if (c !== null) {
-        nodeInput.compositions.push({
+    nodeInput.compositions = node.compositions.map(c => {
+      if (c) {
+        return {
           spheres: [],
           operation: {
             operations: c.operation.operations,
@@ -94,6 +93,7 @@ export const wsNodeSave = async (context, node) => {
                 }
               }),
               figuresAbsolute: l.figuresAbsolute.map(f => {
+                assert(f.t >= 0, 'f.t >= 0')
                 return {
                   t: f.t,
                   points: f.points.map(p => {
@@ -107,12 +107,12 @@ export const wsNodeSave = async (context, node) => {
               })
             }
           })
-        })
-      }
-      else {
+        }
+      } else {
         return null
       }
     })
+    logD('wsNodeSave start. nodeInput=', nodeInput)
     return nodeInput
   }
 
@@ -172,7 +172,11 @@ export const wsNodeSave = async (context, node) => {
         node: nodeInput, wsRevision: context.rootState.workspace.revision
       }
     })
-    wsItem = await context.dispatch('cache/update', { key: makeKey(wsNodeCreate), newValue: wsNodeCreate, actualAge: 'hour' }, { root: true })
+    wsItem = await context.dispatch('cache/update', {
+      key: makeKey(wsNodeCreate),
+      newValue: wsNodeCreate,
+      actualAge: 'hour'
+    }, { root: true })
   }
   logD('wsNodeSave done', wsItem.revision)
   return wsItem
@@ -283,8 +287,8 @@ export const updateRevision = async (context, revision) => {
   await context.dispatch('cache/update', {
     key: context.rootState.auth.userOid,
     path: 'wsRevision',
-    newValue: revision,
-  }, {root: true})
+    newValue: revision
+  }, { root: true })
   // logD('updateVersion complete')
 }
 
@@ -332,5 +336,43 @@ export const get = async (context, { oid, name, force }) => {
     assert(itemFull, '!itemFull')
     assert(itemFull.revision, '!itemFull.revision')
     return itemFull
+  }
+}
+
+// сохранить слои из созданного ядра в мастерской (если их там еще нет)
+export const exportLayersFromNode = async (context, node) => {
+  assert(node && node.compositions, 'node && node.compositions')
+  for (let composition of node.compositions) {
+    if (!composition) continue
+    assert(composition.layers, 'composition.layers')
+    for (let layer of composition.layers) { // пробуем сохранить в мастерской каждый слой из созданного ядра
+      assert(layer.spheres)
+      assert(layer.figuresAbsolute)
+      if (!layer.spheres.length) continue // сохраняем только слои с именем
+      let contentContainer = await context.dispatch('workspace/get', { name: 'CONTENT-' + layer.contentOid }, { root: true })
+      logD('layer=', layer)
+      logD('contentContainer=', contentContainer)
+      assert(contentContainer, '!contentContainer')
+      assert(contentContainer.compositions && contentContainer.compositions.length === 1, 'contentContainer.compositions && contentContainer.compositions.length === 1')
+      assert(contentContainer.compositions[0].layers, 'contentContainer.compositions.layers')
+      let existing = contentContainer.compositions[0].layers.find(existingLayer => {
+        logD('existingLayer=', existingLayer)
+        assert(existingLayer.figuresAbsolute)
+        if (JSON.stringify(existingLayer.figuresAbsolute) === JSON.stringify(layer.figuresAbsolute)) {
+          return true
+        } else {
+          return false
+        }
+      })
+      if (!existing) { // сохраняем только если такого еще нет
+        logD('!exist')
+        contentContainer = JSON.parse(JSON.stringify(contentContainer))
+        contentContainer.compositions[0].layers.push(layer)
+        if (contentContainer.compositions[0].layers[0].figuresAbsolute.length === 0) { // удаляем слой-болванку
+          contentContainer.compositions[0].layers.splice(0, 1)
+        }
+        await context.dispatch('workspace/wsNodeSave', contentContainer, { root: true })
+      }
+    }
   }
 }

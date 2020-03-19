@@ -97,7 +97,7 @@ export default {
       this.$log('emailSend start', this.email)
       this.emailSending = true
       if (this.email.length === 0) this.$q.notify({message: 'Wrong email! Enter correct Email!', color: 'white', position: 'bottom', textColor: 'red', icon: 'error'})
-      await this.$store.dispatch('auth/loginEmail', [this.email, this.promocode])
+      let { login, loginType, userExist, needInvite, token, expires } = await this.$store.dispatch('auth/userIdentify', this.email)
       this.emailSending = false
       this.codeWaiting = true
       this.$log('emailSend code', this.codeWaiting)
@@ -121,7 +121,7 @@ export default {
       this.codeSending = true
       this.codeConfirmed = false
       if (this.code.length !== 4) throw { message: 'Wrong code!' }
-      let { result, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/confirm', this.code)
+      let { result, role, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/userAuthenticate', {password: this.code, inviteCode: '2018'})
       this.codeSending = false
       this.codeWaiting = false
       if (result) {

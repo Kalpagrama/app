@@ -76,7 +76,6 @@ export default {
     }
     if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     this.loading = false
-
   }
 }
 </script>
