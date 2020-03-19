@@ -45,27 +45,7 @@
      this.$logD('smsSend start', this.phone)
      this.smsSending = true
      if (this.phone.length === 0) throw { message: 'Wrong phone!' }
-      await this.$store.dispatch('auth/loginPhone', this.phone)
-     // let { data: { loginPhone: { token, expires, role } } } = await this.$apollo.mutate({
-     //  client: 'authApollo',
-     //  mutation: gql`
-     //    mutation loginPhone ($phone: String!, $inviteCode: String){
-     //      loginPhone(phone: $phone, inviteCode: $inviteCode){
-     //        token
-     //        expires
-     //        role
-     //      }
-     //    }
-     //  `,
-     //  variables: {
-     //    phone: this.phone,
-     //    inviteCode: localStorage.getItem('ktokenInviteCode')
-     //  }
-     // })
-     // this.$logD('token', token)
-     // localStorage.setItem('ktoken', token)
-     // localStorage.setItem('ktokenExpires', expires)
-     // this.$logD('smsSend done')
+     let { login, loginType, userExist, needInvite, token, expires } = await this.$store.dispatch('auth/userIdentify', this.phone)
      this.smsSending = false
      this.codeWaiting = true
     } catch (error) {
@@ -80,23 +60,7 @@
      this.codeSending = true
      this.codeConfirmed = false
      if (this.code.length !== 4) throw { message: 'Wrong code!' }
-     let { result, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/confirm', this.code)
-     // let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await this.$apollo.mutate({
-     //  client: 'authApollo',
-     //  mutation: gql`
-     //        mutation codeConfirmPhone ($code: String!) {
-     //          confirm(code: $code){
-     //            result
-     //            nextAttemptDate
-     //            attempts
-     //            failReason
-     //          }
-     //        }
-     //      `,
-     //  variables: {
-     //   code: this.code
-     //  }
-     // })
+     let { result, role, nextAttemptDate, attempts, failReason } = await this.$store.dispatch('auth/userAuthenticate', {password: this.code, inviteCode: '2018'})
      this.codeSending = false
      this.codeWaiting = false
      if (result) {

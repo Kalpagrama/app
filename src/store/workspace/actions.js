@@ -27,7 +27,7 @@ export const wsClear = async (context) => {
   logD('wsClear start')
   let { data: { wsClear } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_wsClear {
+      mutation wsClear {
         wsClear
       }
     `
@@ -42,7 +42,7 @@ export const wsItemAdd = async (context, oid) => {
   let { data: { wsItemAdd: wsItem } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
-      mutation sw_network_only_wsItemAdd ($oid: OID!, $wsRevision: Int!) {
+      mutation wsItemAdd ($oid: OID!, $wsRevision: Int!) {
         wsItemAdd (oid: $oid, wsRevision: $wsRevision) {
           ...objectFullFragment
         }
@@ -75,10 +75,9 @@ export const wsNodeSave = async (context, node) => {
     nodeInput.spheres = node.spheres.map(s => {
       return { name: s.name }
     })
-    nodeInput.compositions = []
-    node.compositions.map(c => {
-      if (c !== null) {
-        nodeInput.compositions.push({
+    nodeInput.compositions = node.compositions.map(c => {
+      if (c) {
+        return {
           spheres: [],
           operation: {
             operations: c.operation.operations,
@@ -94,6 +93,7 @@ export const wsNodeSave = async (context, node) => {
                 }
               }),
               figuresAbsolute: l.figuresAbsolute.map(f => {
+                assert(f.t >= 0, 'f.t >= 0')
                 return {
                   t: f.t,
                   points: f.points.map(p => {
@@ -107,12 +107,12 @@ export const wsNodeSave = async (context, node) => {
               })
             }
           })
-        })
-      }
-      else {
+        }
+      } else {
         return null
       }
     })
+    logD('wsNodeSave start. nodeInput=', nodeInput)
     return nodeInput
   }
 
@@ -120,12 +120,12 @@ export const wsNodeSave = async (context, node) => {
   if (node.oid) { // обновить
     let updateItemFunc = async (updatedItem) => {
       // logD('updatedItem', updatedItem)
-      assert(updatedItem.revision)
+      assert(updatedItem.revision, '!updatedItem.revision')
       let nodeInput = makeNodeInput(updatedItem)
       let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
         mutation: gql`
           ${fragments.objectFullFragment}
-          mutation sw_network_only_wsNodeUpdate ($oid: OID!, $node: NodeInput!, $wsRevision: Int!) {
+          mutation wsNodeUpdate ($oid: OID!, $node: NodeInput!, $wsRevision: Int!) {
             wsNodeUpdate (oid: $oid, node: $node, wsRevision: $wsRevision) {
               ...objectFullFragment
             }
@@ -145,12 +145,7 @@ export const wsNodeSave = async (context, node) => {
     let mergeItemFunc = (path, serverItem, cacheItem) => {
       assert(serverItem && cacheItem)
       let mergedItem
-      if (path) {
-        // todo merge or throw error
-      } else {
-        // todo merge or throw error
-      }
-      // TODO merge!
+      // берем значение с сервера
       mergedItem = serverItem
       // assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
       return mergedItem
@@ -177,7 +172,11 @@ export const wsNodeSave = async (context, node) => {
         node: nodeInput, wsRevision: context.rootState.workspace.revision
       }
     })
-    wsItem = await context.dispatch('cache/update', { key: makeKey(wsNodeCreate), newValue: wsNodeCreate, actualAge: 'hour' }, { root: true })
+    wsItem = await context.dispatch('cache/update', {
+      key: makeKey(wsNodeCreate),
+      newValue: wsNodeCreate,
+      actualAge: 'hour'
+    }, { root: true })
   }
   logD('wsNodeSave done', wsItem.revision)
   return wsItem
@@ -187,7 +186,7 @@ export const wsItemDelete = async (context, oid) => {
   assert.ok(oid)
   let { data: { wsItemDelete } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_wsItemDelete ($oid: OID!, $wsRevision: Int!) {
+      mutation wsItemDelete ($oid: OID!, $wsRevision: Int!) {
         wsItemDelete (oid: $oid, wsRevision: $wsRevision)
       }
     `,
@@ -288,8 +287,8 @@ export const updateRevision = async (context, revision) => {
   await context.dispatch('cache/update', {
     key: context.rootState.auth.userOid,
     path: 'wsRevision',
-    newValue: revision,
-  }, {root: true})
+    newValue: revision
+  }, { root: true })
   // logD('updateVersion complete')
 }
 
@@ -334,6 +333,46 @@ export const get = async (context, { oid, name, force }) => {
     }
     let itemFull = await context.dispatch('cache/get',
       { key: makeKey({ oid }), fetchItemFunc, force }, { root: true })
+    assert(itemFull, '!itemFull')
+    assert(itemFull.revision, '!itemFull.revision')
     return itemFull
+  }
+}
+
+// сохранить слои из созданного ядра в мастерской (если их там еще нет)
+export const exportLayersFromNode = async (context, node) => {
+  assert(node && node.compositions, 'node && node.compositions')
+  for (let composition of node.compositions) {
+    if (!composition) continue
+    assert(composition.layers, 'composition.layers')
+    for (let layer of composition.layers) { // пробуем сохранить в мастерской каждый слой из созданного ядра
+      assert(layer.spheres)
+      assert(layer.figuresAbsolute)
+      if (!layer.spheres.length) continue // сохраняем только слои с именем
+      let contentContainer = await context.dispatch('workspace/get', { name: 'CONTENT-' + layer.contentOid }, { root: true })
+      logD('layer=', layer)
+      logD('contentContainer=', contentContainer)
+      assert(contentContainer, '!contentContainer')
+      assert(contentContainer.compositions && contentContainer.compositions.length === 1, 'contentContainer.compositions && contentContainer.compositions.length === 1')
+      assert(contentContainer.compositions[0].layers, 'contentContainer.compositions.layers')
+      let existing = contentContainer.compositions[0].layers.find(existingLayer => {
+        logD('existingLayer=', existingLayer)
+        assert(existingLayer.figuresAbsolute)
+        if (JSON.stringify(existingLayer.figuresAbsolute) === JSON.stringify(layer.figuresAbsolute)) {
+          return true
+        } else {
+          return false
+        }
+      })
+      if (!existing) { // сохраняем только если такого еще нет
+        logD('!exist')
+        contentContainer = JSON.parse(JSON.stringify(contentContainer))
+        contentContainer.compositions[0].layers.push(layer)
+        if (contentContainer.compositions[0].layers[0].figuresAbsolute.length === 0) { // удаляем слой-болванку
+          contentContainer.compositions[0].layers.splice(0, 1)
+        }
+        await context.dispatch('workspace/wsNodeSave', contentContainer, { root: true })
+      }
+    }
   }
 }

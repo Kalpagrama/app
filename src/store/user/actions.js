@@ -21,7 +21,7 @@ export const setFavouriteCategories = async (context, categoryTypes) => {
   logD('setFavouriteCategories start')
   let { data: { setFavouriteCategories } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_setFavouriteCategories ($categories: [CategoryEnum!]!){
+      mutation setFavouriteCategories ($categories: [CategoryEnum!]!){
         setFavouriteCategories(categories: $categories)
       }
     `,
@@ -38,7 +38,7 @@ export const subscribe = async (context, oid) => {
   let { data: { subscribe } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectShortFragment}
-      mutation sw_network_only_subscribe ($oid: OID!) {
+      mutation subscribe ($oid: OID!) {
         subscribe (oid: $oid){
           ...objectShortFragment
         }
@@ -57,7 +57,7 @@ export const unSubscribe = async (context, oid) => {
   let { data: { unSubscribe } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectShortFragment}
-      mutation sw_network_only_unSubscribe ($oid: OID!) {
+      mutation unSubscribe ($oid: OID!) {
         unSubscribe (oid: $oid){
           ...objectShortFragment
         }

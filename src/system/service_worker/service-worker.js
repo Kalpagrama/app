@@ -1,6 +1,6 @@
-const swVer = 9
-const useCache = false
-let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlStore, videoStore, swShareStore,
+const swVer = 11
+const useCache = true
+let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
   cacheVideo
 
@@ -33,7 +33,6 @@ let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlSto
   logDebug('swVer=', swVer)
   logDebug('init idb')
   swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
-  gqlStore = new idbKeyval.Store('sw-cache-gql', 'graphql-responses')
   videoStore = new idbKeyval.Store('sw-cache-video', 'video-responses')
   logDebug('init idb ok')
 
@@ -144,44 +143,6 @@ let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, gqlSto
 if (useCache) {
   // custom resolver for graphql & video requests
   {
-    cacheGraphQl = async function (event) {
-      try {
-        logDebug('cacheGraphQl start')
-        // return await networkOnly(event)// для кэширования gql ДОЛЖЕН используется apollo-cache-persist src/boot/apollo.js:10
-        // // eslint-disable-next-line no-unreachable
-        let requestCopy = event.request.clone()
-        let body
-        try {
-          body = await requestCopy.json()
-        } catch (err) {
-        }
-        if (!body || !body.operationName) return await networkOnly(event) // например, upload (multipart/form-data)
-        logDebug('gql cacheGraphQl', body.operationName)
-        let type = body && body.query && body.query.startsWith('mutation') ? 'mutation' : 'query'
-        if (body.operationName.startsWith('sw_network_only_')) {
-          return await networkOnly(event)
-        } else if (body.operationName.startsWith('sw_cache_only_')) {
-          return await cacheOnly(event, gqlStore)
-        } else if (body.operationName.startsWith('sw_network_first_')) {
-          return await networkFirst(event, gqlStore, 1200)
-        } else if (body.operationName.startsWith('sw_cache_first_')) {
-          return await cacheFirst(event, gqlStore)
-        } else if (body.operationName.startsWith('sw_stale_')) {
-          return await StaleWhileRevalidate(event, gqlStore)
-        } else {
-          logDebug(`gql warn. query ${body.operationName} not contains sw strategy. use defaults`)
-          if (type === 'mutation') {
-            return await networkFirst(event, gqlStore)
-          } else {
-            return await networkFirst(event, gqlStore)
-          }
-        }
-      } catch (e) {
-        logCritical('error on cacheGraphQl', e)
-        throw e
-        // return await networkOnly(event)
-      }
-    }
     cacheVideo = async function (event) {
       // let requestCopy = event.request.clone()
       // logDebug('video cacheVideo', requestCopy.url, requestCopy)
@@ -349,7 +310,7 @@ if (useCache) {
       }
     )
     workbox.routing.registerRoute( // content images
-      /^http.*(yandexcloud|local_object_storage).+\.jpg$/,
+      /^http.*(kalpa\.store).+\.jpg$/,
       new workbox.strategies.CacheFirst({
         cacheName: 'content_img',
         plugins: [
@@ -360,7 +321,7 @@ if (useCache) {
       })
     )
     workbox.routing.registerRoute( // content video
-      /^http.*(yandexcloud|local_object_storage).+\.mp4$/,
+      /^http.*(kalpa\.store).+\.mp4$/,
       ({ url, event, params }) => cacheVideo(event)
     )
     // workbox.routing.registerRoute(// graphql

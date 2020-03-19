@@ -159,6 +159,8 @@ export const get = async (context, { oid, priority }) => {
   }
   let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
   // logD('objects/get action complete', oid)
+  assert(objectFull, '!itemFull')
+  assert(objectFull.revision, '!objectFull.revision')
   return objectFull
 }
 
@@ -181,7 +183,7 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
     let { data: { objectChange } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectFullFragment}
-        mutation sw_network_only_objectChange ($oid: OID!, $path: String!, $newValue: RawJSON!, $revision: Int!) {
+        mutation objectChange ($oid: OID!, $path: String!, $newValue: RawJSON!, $revision: Int!) {
           objectChange (oid: $oid, path: $path, newValue: $newValue, revision: $revision){
             ...objectFullFragment
           }
@@ -198,11 +200,8 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
   let mergeItemFunc = (path, serverItem, cacheItem) => {
     assert(serverItem && cacheItem)
     let mergedItem
-    if (path) {
-      // todo merge or throw error
-    } else {
-      // todo merge or throw error
-    }
+    // берем значение с сервера
+    mergedItem = serverItem
     assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
     return mergedItem
   }

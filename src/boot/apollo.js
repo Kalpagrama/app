@@ -34,7 +34,9 @@ export default async ({ Vue, store, app }) => {
         err.message = err.code + ':' + err.message
       }
     }
-    if (networkError) logE('gql network error', networkError)
+    if (networkError) {
+      logE('gql network error', networkError)
+    }
   })
 
   // // todo После выхода apollo-client 3 - выкинуть fragmentMatcher и перейти на possibleTypes
@@ -83,7 +85,7 @@ export default async ({ Vue, store, app }) => {
   })
 
   let { data: { services } } = await servicesApollo.query({
-    query: gql`query sw_network_first_services {services}`
+    query: gql`query services {services}`
   })
   logD('services', services)
   let linkAuth = services.AUTH

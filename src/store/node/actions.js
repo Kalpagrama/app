@@ -12,7 +12,7 @@ export const init = async (context) => {
   if (context.state.initialized) return
   let { data: { categories } } = await apollo.clients.api.query({
     query: gql`
-      query sw_cache_first_categories {
+      query categories {
         categories {
           type
           name
@@ -37,7 +37,7 @@ export const nodeUnrate = async (context, oid) => {
   if (!oid) return
   let { data: { nodeUnrate } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_nodeUnrate ($oid: OID!) {
+      mutation nodeUnrate ($oid: OID!) {
         nodeUnrate (oid: $oid){
           oid
           rate
@@ -59,7 +59,7 @@ export const nodeRate = async (context, { node, rateUser }) => {
   assert(node.oid && rateUser)
   let { data: { nodeRate } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_nodeRate ($oid: OID!, $rate: Float!) {
+      mutation nodeRate ($oid: OID!, $rate: Float!) {
         nodeRate (oid: $oid, rate: $rate){
           oid
           rate
@@ -87,7 +87,7 @@ export const nodeDelete = async (context, oid) => {
   assert.ok(oid)
   let { data: { deleteObject } } = await apollo.clients.api.mutate({
     mutation: gql`
-      mutation sw_network_only_deleteNode($oid: OID!) {
+      mutation deleteNode($oid: OID!) {
         deleteObject (oid: $oid)
       }
     `,
@@ -168,7 +168,7 @@ export const nodeCreate = async (context, node) => {
   let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
-      mutation sw_network_only_nodeCreate ($node: NodeInput!) {
+      mutation nodeCreate ($node: NodeInput!) {
         nodeCreate (node: $node){
           ...objectFullFragment
         }
@@ -178,7 +178,8 @@ export const nodeCreate = async (context, node) => {
       node: nodeInput
     }
   })
-  context.dispatch('cache/update', {key: createdNode.oid, newValue: createdNode, actualAge: 'hour'}, {root: true})
+  context.dispatch('cache/update', {key: createdNode.oid, newValue: createdNode, actualAge: 'zero'}, {root: true})
+  await context.dispatch('workspace/exportLayersFromNode', node, { root: true }) // сохраним слои из созданного ядра в мастерской
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
 }

@@ -9,9 +9,9 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
-  // if (context.state.initialized) throw new Error('events state initialized already')
   if (context.state.initialized) return
   logD('auth init')
+  // TODO при скором протухании токена - вызвать refreshSession
   const fetchItemFunc = async () => {
     let { data: { authInfo } } = await apollo.clients.auth.query({
       client: 'apiApollo',
@@ -25,7 +25,7 @@ export const init = async (context) => {
         }
       `
     })
-    logD('auth fetch complete!', authInfo)
+    logD('auth fetch complete! ', authInfo)
     return { item: authInfo, actualAge: 'zero' }
   }
 
@@ -33,14 +33,13 @@ export const init = async (context) => {
   if (authInfo && authInfo.userIsConfirmed){
     context.commit('init', authInfo)
     logD('auth init done!')
-  }
-  return authInfo
+  } else logD('auth init fails!', authInfo)
 }
 export const inviteEmail = async (context, email) => {
   logD('@invite start')
-  let { data: { inviteEmail } } = await apollo.clients.auth.mutate({
-    mutation: gql`
-      mutation sw_network_only_inviteEmail ($email: String!){
+  let { data: { inviteEmail } } = await apollo.clients.auth.query({
+    query: gql`
+      query ($email: String!){
         inviteEmail(email: $email)
       }
     `,
@@ -53,9 +52,9 @@ export const inviteEmail = async (context, email) => {
 }
 export const inviteUrl = async (context) => {
   logD('@invite start')
-  let { data: { inviteUrl } } = await apollo.clients.auth.mutate({
-    mutation: gql`
-      mutation sw_network_only_inviteUrl{
+  let { data: { inviteUrl } } = await apollo.clients.auth.query({
+    query: gql`
+      query {
         inviteUrl
       }
     `
@@ -66,9 +65,9 @@ export const inviteUrl = async (context) => {
 export const logout = async (context, token) => {
   logD('@logout start')
   try {
-    let { data: { logout } } = await apollo.clients.auth.mutate({
-      mutation: gql`
-        mutation sw_network_only_logout($token: String) {
+    let { data: { logout } } = await apollo.clients.auth.query({
+      query: gql`
+        query ($token: String) {
           logout(token: $token)
         }
       `,
@@ -91,89 +90,62 @@ export const logout = async (context, token) => {
   }
   logD('@logout done')
 }
-export const loginEmail = async (context, [email, inviteCode]) => {
-  logD('@loginEmail start')
-  let { data: { loginEmail: { token, expires, role } } } = await apollo.clients.auth.mutate({
-    mutation: gql`
-      mutation sw_network_only_loginEmail ($email: String!, $inviteCode: String){
-        loginEmail(email: $email, inviteCode: $inviteCode){
+
+export const checkLoginFree = async (context, login) => {
+  let { data: { checkLoginFree } } = await apollo.clients.auth.query({
+    query: gql`
+      query ($login: String!){
+        checkLoginFree(login: $login)
+      }
+    `,
+    variables: {
+      login
+    }
+  })
+  return checkLoginFree
+}
+
+export const userIdentify = async (context, userLogin) => {
+  logD('@userIdentify start. userLogin=', userLogin)
+  assert(userLogin)
+  let { data: { userIdentify: { login, loginType, userExist, needInvite, token, expires } } } = await apollo.clients.auth.query({
+    query: gql`
+      query  ($login: String!){
+        userIdentify(login: $login){
+          login
+          loginType
+          userExist
+          needInvite
           token
           expires
-          role
         }
       }
     `,
     variables: {
-      email,
-      inviteCode
+      login: userLogin
     }
   })
   localStorage.setItem('ktoken', token)
   localStorage.setItem('ktokenExpires', expires)
-  logD('@loginEmail done')
+  logD('@userIdentify done')
+  return { login, loginType, userExist, needInvite, token, expires }
 }
-export const loginPhone = async (context, phone) => {
-  logD('@loginPhone start')
-  let { data: { loginPhone: { token, expires, role } } } = await apollo.clients.auth.mutate({
-    mutation: gql`
-      mutation sw_network_only_loginPhone ($phone: String!, $inviteCode: String){
-        loginPhone(phone: $phone, inviteCode: $inviteCode){
-          token
-          expires
-          role
-        }
-      }
-    `,
-    variables: {
-      phone,
-      inviteCode: localStorage.getItem('ktokenInviteCode')
-      // inviteCode: '171145051370487837'
-    }
-  })
-  localStorage.setItem('ktoken', token)
-  localStorage.setItem('ktokenExpires', expires)
-  logD('@loginPhone done')
-}
-export const loginPassword = async (context, { login, password, inviteCode }) => {
-  logD('@loginPassword start')
-  let { data: { login: { token, expires, role } } } = await apollo.clients.auth.mutate({
-    mutation: gql`
-      mutation sw_network_only_login ($login: String!, $password: String!, $inviteCode: String){
-        login(login: $login, password: $password  inviteCode: $inviteCode){
-          token
-          expires
-          role
-        }
-      }
-    `,
-    variables: {
-      login,
-      password,
-      inviteCode
-    }
-  })
-  localStorage.setItem('ktoken', token)
-  localStorage.setItem('ktokenExpires', expires)
-  logD('@loginPassword done')
-}
-export const confirm = async (context, code) => {
-  logD('@confirm start')
-  let { data: { confirm: { result, nextAttemptDate, attempts, failReason } } } = await apollo.clients.auth.mutate({
-    client: 'authApollo',
-    mutation: gql`
-      mutation sw_network_only_codeConfirmEmail ($code: String!) {
-        confirm(code: $code){
+export const userAuthenticate = async (context, {password, inviteCode}) => {
+  logD('@userAuthenticate start')
+  let { data: { userAuthenticate: { result, role, nextAttemptDate, attempts, failReason } } } = await apollo.clients.auth.query({
+    query: gql`
+      query ($password: String!, $inviteCode: String) {
+        userAuthenticate(password: $password, inviteCode: $inviteCode){
           result
+          role
           nextAttemptDate
           attempts
           failReason
         }
       }
     `,
-    variables: {
-      code
-    }
+    variables: { password, inviteCode }
   })
-  logD('@confirm done')
-  return { result, nextAttemptDate, attempts, failReason }
+  logD('@userAuthenticate done')
+  return { result, role, nextAttemptDate, attempts, failReason }
 }
