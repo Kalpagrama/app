@@ -6,7 +6,7 @@ div
       q-btn(round flat color="green" icon="menu" @click="drawerToggle()")
     .col.full-height
       .row.fit.items-center.content-center
-        span.text-white.text-bold {{ composition.name }}
+        //- span.text-white.text-bold {{ composition.name }}
     div(:style=`{height: '60px'}`).row.items-center.content-center.q-px-md
       q-btn(outline no-caps color="red" @click="$emit('cancel')"
         :style=`{borderRadius: '10px'}`).q-mr-md Close
@@ -18,7 +18,7 @@ div
     :style=`{
       position: 'absolute', zIndex: 1000, left: '0px', top: '0px',
       height: 'calc(100% - 0px)',
-      width: styles.paddingLeft+'px',
+      width: $q.screen.width > 800 ? styles.paddingLeft+'px' : drawerWidth+'px',
       overflow: 'hidden',
     }`).column.bg-grey-10
     div(:style=`{height: '60px'}`).row.full-width
@@ -39,7 +39,12 @@ div
         v-if="page === 'info'" :content="composition.layers[0].content")
       layers(
         v-if="page === 'layers'" :composition="composition" :layers="layers" :player="player" :meta="meta"
+        @layerClick="layerClick"
+        @drawerToggle="drawerToggle"
         @meta="$parent.$emit('meta', $event)")
+  //- drawer CLOSER
+  div(v-if="drawerWidth > 0 && $q.screen.width <= 800" @click="drawerToggle()"
+    :style=`{position: 'absolute', zIndex: 950, right: '0px', top: '0px', width: '100%', background: 'rgba(0,0,0,0.8)'}`).row.full-height
   //- layerEditor
   div(
     :style=`{
@@ -49,16 +54,19 @@ div
     }`).row.bg-black
     //- tint play/pause
     div(
-      v-if="tintShow"
-      :style=`{position: 'absolute', zIndex: 10000, top: '-155px', height: '155px', background: 'rgba(0,0,0,0.9)'}`).row.full-width
+      v-if="$q.screen.width > 800 && tintShow"
+      :style=`{position: 'absolute', zIndex: 910, top: '-155px', height: '155px', background: 'rgba(0,0,0,0.9)'}`).row.full-width
     player-video-progress(
       :player="player" :meta="meta"
       @meta="$parent.$emit('meta', $event)"
-      :style=`{position: 'absolute', zIndex: 20000, top: '-90px'}`)
-    layer-editor(:layer="layer" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd" @meta="$parent.$emit('meta', $event)"
+      :style=`{position: 'absolute', zIndex: 920, top: '-90px'}`)
+    layer-editor(:layer="layer" :layerIndex="meta.layerIndexPlay" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd" @meta="$parent.$emit('meta', $event)"
       :style=`{maxHeight: '70px'}`)
-    div(:style=`{height: '200px'}`).row.full-width.justify-center.q-py-sm
+    div(
+      v-if="meta.layerIndexPlay >= 0 "
+      :style=`{height: '200px'}`).row.full-width.justify-center.q-pa-sm
       layer(
+        v-if="layer.figuresAbsolute.length > 0"
         :index="meta.layerIndexPlay" :layer="layer" :player="player" :meta="meta"
         @layerNameSetStart="layerNameSetStart"
         @layerDelete="layerDelete"
@@ -67,7 +75,7 @@ div
   //- layerAdd
   q-btn(
     round push size="lg" color="green" icon="add" @click="layerAdd()"
-    :style=`{position: 'absolute', zIndex: 30000, bottom: styles.paddingBottom+100+'px', right: '50px'}`)
+    :style=`{position: 'absolute', zIndex: 920, bottom: styles.paddingBottom+100+'px', right: '50px'}`)
 </template>
 
 <script>
@@ -90,7 +98,8 @@ export default {
         {id: 'nodes', name: 'Explore nodes'}
       ],
       layerInitialLength: 10,
-      tintShow: false
+      tintShow: false,
+      drawerWidth: 0
     }
   },
   computed: {
@@ -122,10 +131,10 @@ export default {
       handler (to, from) {
         this.$log('meta.mode CHANGED', to)
         if (to === 'layer') {
-          this.$tween.to(this.styles, 0.4, {paddingBottom: 270})
+          this.$tween.to(this.styles, 0.3, {paddingBottom: 270})
         }
         if (to !== 'layer' && to !== from) {
-          this.$tween.to(this.styles, 0.4, {paddingBottom: 0})
+          this.$tween.to(this.styles, 0.3, {paddingBottom: 0})
         }
       }
     }
@@ -133,7 +142,23 @@ export default {
   methods: {
     drawerToggle () {
       this.$log('drawerToggle')
-      this.$tween.to(this.styles, 0.4, {paddingLeft: this.styles.paddingLeft === 0 ? 400 : 0})
+      if (this.$q.screen.width > 800) {
+        this.$tween.to(this.styles, 0.4, {paddingLeft: this.styles.paddingLeft === 0 ? 400 : 0})
+      }
+      else {
+        this.$tween.to(this, 0.4, {drawerWidth: this.drawerWidth === 0 ? this.$q.screen.width - 50 : 0})
+      }
+    },
+    layerClick (index) {
+      this.$log('layerClick', index)
+      this.$parent.$emit('meta', ['mode', 'layer'])
+      this.$parent.$emit('meta', ['layerIndexPlay', index])
+      this.$parent.$emit('meta', ['layerIndex', index])
+      if (this.$q.screen.width > 800) {
+      }
+      else {
+        this.drawerToggle()
+      }
     },
     layerAdd (start, end, layer) {
       this.$log('layerAdd start/end: ', start, end, layer)
@@ -188,10 +213,36 @@ export default {
         this.$parent.$emit('meta', ['layerIndex', index])
       }
       this.$log('layerAdd done')
+    },
+    async layerDelete (i) {
+      this.$log('layerDelete', i)
+      if (!confirm('Delete layer?')) return
+      if (this.layers.length > 1) {
+        let index = i === 0 ? this.meta.layerIndex + 1 : this.meta.layerIndex - 1
+        this.$parent.$emit('meta', ['mode', 'layer'])
+        this.$parent.$emit('meta', ['layerIndex', index])
+        this.$parent.$emit('meta', ['layerIndexPlay', index])
+        this.$parent.$wait(300).then(() => {
+          this.$delete(this.layers, i)
+        })
+      }
+      else {
+        let layer = {
+          content: this.layers[0].content,
+          figuresAbsolute: [],
+          figuresRelative: [],
+          spheres: []
+        }
+        this.$set(this.layers, 0, layer)
+        this.$parent.$emit('meta', ['mode', 'watch'])
+        this.$parent.$emit('meta', ['layerIndex', 0])
+        this.$parent.$emit('meta', ['layerIndexPlay', -1])
+      }
     }
   },
   mounted () {
     this.$log('mounted')
+    if (!this.$q.screen.xs) this.drawerToggle()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

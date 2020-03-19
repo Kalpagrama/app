@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit.bg-red
+div(:style=`{position: 'relative'}`).row.fit
   video-composer(:composition="composition" @cancel="$emit('cancel')")
 </template>
 

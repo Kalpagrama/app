@@ -4,9 +4,6 @@ q-layout(
   :style=`{height: $q.screen.height+'px'}`)
   q-dialog(v-model="pageDialogOpened" :maximized="true" @hide="itemEdited")
     div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
-      q-btn(
-        round flat color="white" icon="keyboard_arrow_left" @click="pageDialogOpened = false"
-        :style=`{position: 'fixed', zIndex: 10000, left: '16px', top: 'calc(20% - 20px)', background: 'rgba(0,0,0,0.3)'}`)
       ws-sphere(
         v-if="$route.params.page === 'sphere'")
       ws-setting(
@@ -15,7 +12,7 @@ q-layout(
         v-else
         :value="item").fit
         template(v-slot:editor=`{node, saving}`)
-          component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving")
+          component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving" @cancel="pageDialogOpened = false")
   q-page-container.fit
     ws-menu(
       ctx="workspace"

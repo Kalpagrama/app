@@ -8,7 +8,7 @@ div(
     //-   div(
     //-     v-if="opened"
     //-     :style=`{height: '46px'}`).row.full-width.items-center.q-px-sm
-    //-     div(:style=`{height: '36px', width: '36px', borderRadius: '50%'}`).row.bg-red
+    //-     div(:style=`{height: '36px', width: '36px', borderRadius: '50%'}`).row
     //-     .col.full-height
     //-       .row.fit.items-center.q-px-sm
     //-         span Ivanov Ivan

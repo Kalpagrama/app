@@ -21,13 +21,13 @@
         ctx="editor"
         :inDialog="true"
         :node="node" :compositionIndex="compositionIndex"
-        @hide="compositionEditorOpened = false").bg-black
+        @cancel="compositionEditorOpened = false").bg-black
     //- composition FINDER dialog
     q-dialog(v-model="compositionFinderOpened" no-route-dismiss :maximized="$q.screen.xs").bg-black
       composition-finder(
         :inDialog="true"
         @composition="compositionFound"
-        @hide="compositionFinderOpened = false").bg-black
+        @cancel="compositionFinderOpened = false").bg-black
     //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start.justify-center.q-px-sm
@@ -61,7 +61,7 @@
         div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-pt-sm
           //- composition one
           div(
-            :style=`{position: 'relative', minHeight: '330px', borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
             composition(
               v-if="node.compositions[0]" ctx="editor"
@@ -87,7 +87,7 @@
               placeholder="Whats the essence?").fit.bg-white.kinput.text-bold
           //- composition two
           div(
-            :style=`{position: 'relative', minHeight: '330px', borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
             composition(
               v-if="node.compositions[1]" ctx="editor"

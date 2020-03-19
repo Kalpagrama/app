@@ -18,7 +18,6 @@
           ).row.full-height.bg-grey-3
           div(:style=`{position: 'absolute', right: '-10px', top: '0px', height: '20px', width: '20px', borderRadius: '50%'}`).bg-green
     //- progress actions
-    //- .row.full-width.bg-red.q-pa-sm
     div(:style=`{height: '60px'}`).row.full-width.items-center
       //- play/pause
       div(
@@ -34,7 +33,7 @@
         .row.fit.items-center.content-center
           span(
             :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
-            ).text-white.q-pa-sm.q-ml-sm {{ $time(meta.now)+' / '+$time(duration) }}
+            ).text-white.q-pa-sm.q-ml-sm {{ $time(meta.now)+' / '+$time(meta.duration) }}
       //- sound
       div(
         :style=`{width: '60px', height: '60px'}`

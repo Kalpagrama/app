@@ -16,12 +16,12 @@
         :style=`{position: 'absolute', zIndex: 100, left: 0, width: progress.progress+'%'}`
         ).row.full-height.bg-green
       q-input(
-        v-model="url"
+        v-model="url" filled
         color="green" placeholder="Paste URL to add content"
         :loading="urlInputLoading"
-        :style=`{}`
+        :style=`{borderRadius: '10px', overflow: 'hidden'}`
         :input-style=`{paddingLeft: '10px'}`
-        ).full-width.items-center.content-center
+        ).full-width.bg-grey-1
         template(v-slot:append)
           q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm
         //- template(v-slot:append)

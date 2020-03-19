@@ -16,7 +16,7 @@ iframe {
 <template lang="pug">
 div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).column.fit.items-start.content-start.bg-black
   //- opacity: videoGood ? 1 : 0
-  //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row.bg-red
+  //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
   div(
     v-if="!mini && false"
@@ -464,6 +464,10 @@ export default {
             this.player.addEventListener('timeupdate', this.videoUpdate)
             this.videoUpdate()
             // this.videoPlay()
+          },
+          youtube: {
+            iv_load_policy: 3,
+            modestbranding: 1
           },
           error: async (mediaElement, originalNode, instance) => {
             this.$log('player YOUTUBE error')
