@@ -12,7 +12,7 @@
               div(
                 v-if="progress"
                 :style=`{height: '400px', borderRadius: '10px', overflow: 'hidden'}`
-                ).row.full-width.items-center.content-center.justify-center.bg-grey-7
+                ).row.full-width.items-center.content-center.justify-center.bg-grey-8
                 .row.full-width.justify-center
                   q-spinner(color="white" size="50px" :thickness="3")
                 .row.full-width.justify-center

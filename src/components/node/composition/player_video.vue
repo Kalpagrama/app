@@ -19,7 +19,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
   div(
-    v-if="!mini && false"
+    v-if="!mini && true"
     :style=`{
       position: 'absolute', width: 'calc(100% - 20px)', left: '6px', bottom: '4px',
       pointerEvents: 'none', userSelect: 'none',

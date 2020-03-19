@@ -49,7 +49,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :compositions="compositionOneItems"
           :compositionOid="compositionOneOid"
           :nodeOid="node.oid"
-          :mini="false" :visible="compositionsVisible[0]" :active="compositionsActive[0]"
+          :mini="false" :visible="compositionOneVisible" :active="compositionOneActive"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         q-btn(
@@ -60,7 +60,11 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       essence(v-if="node && nodeNameQuery" :node="node" :nodes="nodeNameQuery.items"
         :nodePublish="nodePublish")
       //- composition TWO
-      div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
+      div(
+        :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
+        div(
+          v-if="compositionTwoActive === false" @click="compositionTwoActive = true"
+          :style=`{position: 'absolute', zIndex: 1000, opacity: 0.5}`).row.fit
         composition-list(
           v-if="node && compositionTwoQuery"
           :ctx="'rubick'" label="two"
@@ -68,7 +72,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :compositions="compositionTwoItems"
           :compositionOid="compositionTwoOid"
           :nodeOid="node.oid"
-          :mini="false" :visible="compositionsVisible[1]" :active="compositionsActive[1]"
+          :mini="false" :visible="compositionTwoVisible" :active="compositionTwoActive"
           :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`)
         //- actions
         q-btn(
@@ -120,8 +124,10 @@ export default {
       compositionTwoQuery: null,
       compositionTwoOid: undefined,
       nodeNameQuery: null,
-      compositionsVisible: [true, true],
-      compositionsActive: [true, true],
+      compositionOneVisible: true,
+      compositionOneActive: true,
+      compositionTwoVisible: true,
+      compositionTwoActive: false,
       nodeRubickNew: null,
       nodePublishing: false,
       maxWidth: 600,
@@ -178,7 +184,6 @@ export default {
           this.compositionOneQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionTwoOid], pagination: {pageSize: 30}})
           this.compositionTwoQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid], pagination: {pageSize: 30}})
           this.nodeNameQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid, this.compositionTwoOid], pagination: {pageSize: 30}})
-          this.$set(this.compositionsActive, [true, false])
           this.nodeLoad()
         }
       }
@@ -193,17 +198,14 @@ export default {
       handler (to, from) {
         this.$log('nodeRubickNew CHANGED', to)
       }
-    },
-    compositionsActive: {
-      handler (to, from) {
-        this.$log('compositionsActive CHANGED', to)
-      }
     }
   },
   methods: {
     compositionAdd (oid) {
       this.$log('compositionAdd', oid)
-      this.$set(this.compositionsActive, [false, false])
+      // this.$set(this.compositionsActive, [false, false])
+      this.compositionOneActive = false
+      this.compositionTwoActive = false
       let i = this.nodeFull.compositions.findIndex(c => c.oid === oid)
       this.compositionIndex = i
       this.compositionFinderOpened = true
@@ -222,7 +224,9 @@ export default {
     compositionEdited (composition) {
       this.$log('compositionEdited', composition)
       this.$set(this.nodeRubickNew.compositions, this.compositionIndex, composition)
-      this.$set(this.compositionsActive, [true, true])
+      this.compositionOneActive = true
+      this.compositionTwoActive = false
+      // this.$set(this.compositionsActive, [true, true])
     },
     async compositionEditedFinal () {
       this.$log('compositionEditedFinal', this.nodeRubickNew)

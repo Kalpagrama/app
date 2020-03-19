@@ -8,10 +8,10 @@ div
       .row.fit.items-center.content-center
         //- span.text-white.text-bold {{ composition.name }}
     div(:style=`{height: '60px'}`).row.items-center.content-center.q-px-md
-      q-btn(outline no-caps color="red" @click="$emit('cancel')"
-        :style=`{borderRadius: '10px'}`).q-mr-md Close
-      q-btn(push no-caps color="green"
-        :style=`{borderRadius: '10px'}`)
+      //- q-btn(outline no-caps color="red" @click="$emit('cancel')"
+      //-   :style=`{borderRadius: '10px'}`).q-mr-md Close
+      q-btn(push no-caps color="green" @click="$emit('cancel')"
+        :style=`{minWidth: '100px', borderRadius: '10px', overflow: 'hidden'}`)
         span.text-white Done
   //- drawer
   div(

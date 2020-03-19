@@ -28,6 +28,9 @@
         :inDialog="true"
         @composition="compositionFound"
         @cancel="compositionFinderOpened = false").bg-black
+    //- header
+    //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
+    //-   q-btn(outline color="edit")
     //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start.justify-center.q-px-sm
@@ -47,11 +50,12 @@
                 :style=`{borderRadius: '10px'}`)
                 span Удалить
               .col
-              //- q-btn(
-              //-   v-if="node && node.oid"
-              //-   outline color="green" no-caps :loading="saving" @click="nodeSaveImmediate()"
-              //-   :style=`{borderRadius: '10px'}`).q-mr-md
-              //-   span().text-bold.text-green Save
+                .row.full-width.justify-center
+                  q-btn(
+                    v-if="node && node.oid"
+                    outline color="green" no-caps :loading="saving" @click="$emit('cancel')"
+                    :style=`{borderRadius: '10px'}`).q-mr-md
+                    span().text-bold.text-green Сохранить
               //- .col.full-height
               q-btn(
                 v-if="node && node.oid"
@@ -61,7 +65,7 @@
         div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-pt-sm
           //- composition one
           div(
-            :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{position: 'relative', minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
             composition(
               v-if="node.compositions[0]" ctx="editor"
@@ -87,7 +91,7 @@
               placeholder="Whats the essence?").fit.bg-white.kinput.text-bold
           //- composition two
           div(
-            :style=`{position: 'relative', minHeight: '200px', borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{position: 'relative', minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
             composition(
               v-if="node.compositions[1]" ctx="editor"
@@ -216,6 +220,8 @@ export default {
         this.$log('composition EDITED')
         this.$set(this.node.compositions, this.compositionIndex, composition)
       }
+      this.compositionOneActive = true
+      this.compositionTwoActive = true
     },
     compositionDelete (index) {
       this.$log('compositionDelete', index)
@@ -234,13 +240,12 @@ export default {
         this.$log('nodeDelete done')
         this.nodeDeleting = false
         this.nodeDeletingError = null
-        // TODO delete node and exit
-        await this.$router.replace('/workspace/node')
-        this.node = JSON.stringify(JSON.parse(this.nodeNew))
+        this.$emit('cancel')
       } catch (e) {
         this.$log('nodeDelete error', e)
         this.nodeDeleting = false
         this.nodeDeletingError = e
+        this.$emit('cancel')
       }
     },
     async nodePublish () {
