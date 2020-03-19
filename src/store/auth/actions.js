@@ -10,7 +10,6 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
   if (context.state.initialized) return
-  logD('auth init')
   // TODO при скором протухании токена - вызвать refreshSession
   const fetchItemFunc = async () => {
     let { data: { authInfo } } = await apollo.clients.auth.query({

@@ -16,9 +16,9 @@ export const setWebPushToken = async (context, token) => {
   if (context.state.initialized) return
   if (token) {
     if (context.state.webPushToken === token) return // это значение было отправлено ранее и сервер уже знает его
-    let { data: { objectChange } } = await apollo.clients.auth.mutate({
-      mutation: gql`
-        mutation setWebPushToken ($token: String!) {
+    let { data: { objectChange } } = await apollo.clients.auth.query({
+      query: gql`
+        query ($token: String!) {
           setWebPushToken (token: $token)
         }
       `,
