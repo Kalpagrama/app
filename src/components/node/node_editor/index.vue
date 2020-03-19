@@ -163,6 +163,16 @@ export default {
       return this.$store.state.node.categories
     }
   },
+  watch: {
+    // '$store.state.events.progressCreateNode': {
+    //   handler (to, from) {
+    //     this.$log('progressCreateNode CHANGED', to)
+    //     if (to && to.progress === 100 && to.action === 'CREATE_NODE' && to.oid) {
+    //       this.$router.push('/account').catch(e => e)
+    //     }
+    //   }
+    // }
+  },
   methods: {
     categoryHuman (type) {
       return this.categories.find(i => i.type === type).name
@@ -240,6 +250,7 @@ export default {
         let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
         this.$log('res', res)
         this.$log('nodePublish done')
+        this.$router.push('/account').catch(e => e)
         this.nodePublishing = false
         this.nodePublishingError = null
       } catch (e) {
