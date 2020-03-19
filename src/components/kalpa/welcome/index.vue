@@ -84,8 +84,8 @@ export default {
 //         .row.full-width.justify-center.q-mt-md
 //           q-btn(unelevated @click="changePhoto()" color="accent") {{$t('Add a photo')}}
 //       div(style=`height: 50%`).row.row.full-width.justify-center.q-mt-md.content-start
-//         div(v-if="$store.state.user.user.profile.thumbUrl").row.full-width.justify-center
-//           img(:src="$store.state.user.user.profile.thumbUrl" :style=`{width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
+//         div(v-if="$store.state.user.user.profile.photoUrl").row.full-width.justify-center
+//           img(:src="$store.state.user.user.profile.photoUrl" :style=`{width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
 //         div(v-else).row.full-width.justify-center
 //           img(src="statics/default_photo.png" :style=`{width: '150px', height: '150px', position: 'center', borderRadius: '50%', overflow: 'hidden'}`).bg-grey-2
 //         .row.full-width.justify-center.q-mt-md
@@ -184,7 +184,7 @@ export default {
 //         this.$log('changePhoto start')
 //         let res = await this.$store.dispatch('objects/update', {
 //           oid: this.$store.getters.currentUser.oid,
-//           path: 'profile.thumbUrl',
+//           path: 'profile.photoUrl',
 //           newValue: file
 //         })
 //       } catch (e) {
@@ -206,7 +206,7 @@ export default {
 //       this.slide = '3'
 //       this.file = 'statics/default_photo.png'
 //       this.$log('file changed', this.file)
-//       if (!this.file && !this.$store.state.user.user.profile.thumbUrl) {
+//       if (!this.file && !this.$store.state.user.user.profile.photoUrl) {
 //         this.$log('default photo')
 //       }
 //     },

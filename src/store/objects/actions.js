@@ -167,7 +167,7 @@ export const get = async (context, { oid, priority }) => {
 // моментально изменит объект во вьюикс и запланирует изменения на сервере
 export const update = async (context, { oid, path, newValue, setter, actualAge }) => {
   // logD('objects/update action start', oid)
-  if (path === 'profile.thumbUrl') {
+  if (path === 'profile.photo' || path === 'profile.cover') {
     let file = newValue
     const toBase64 = file => new Promise((resolve, reject) => {
       const reader = new FileReader()

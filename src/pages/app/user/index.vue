@@ -226,7 +226,7 @@ export default {
         this.$log('changePhoto start')
         let res = await this.$store.dispatch('objects/update', {
           oid: this.$store.getters.currentUser.oid,
-          path: 'profile.thumbUrl',
+          path: 'profile.photo',
           newValue: file
         })
       } catch (e) {
