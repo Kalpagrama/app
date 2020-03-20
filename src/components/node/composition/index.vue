@@ -4,7 +4,7 @@ div(
   ).row.full-width.items-start.content-start.bg-black
   //- composition menu
   q-btn(
-    v-if="ctx !== 'workspace' && visible && active && !mini && value"
+    v-if="false &ctx !== 'workspace' && visible && active && !mini && value"
     round flat color="white" icon="more_vert" @click="menuToggle()"
     :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)'}`)
   //- next tint

@@ -14,31 +14,13 @@
 
 <template lang="pug">
 .column.fit
-  //- dialogs
-  //- layerName
-  q-dialog(v-model="layerNameDialogOpened" :maximized="$q.screen.xs" @hide="layerNameSet")
-    div(
-      :style=`{
-        maxHeight: $q.screen.xs ? '100%' : '200px',
-        maxWidth: $q.screen.xs ? '100%' : '300px',
-        borderRadius: '10px'
-      }`).column.fit.bg-white
-      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-        span.text-bold.text-black Set layer name
-      div(:style=`{height: '60px'}`).row.full-width.q-px-sm
-        input(
-          v-model="layerName"
-          autofocus placeholder="Suggest layer name"
-          @keyup.enter="layerNameSet"
-          :style=`{borderRadius: '10px'}`).kinput.full-width.bg-grey-4
-      .col.full-width
-      div(:style=`{height: '70px'}`).row.full-width.q-pa-sm
-        q-btn(push color="green" no-caps @click="layerNameSet"
-          :style=`{borderRadius: '10px'}`).fit
-          span Save
-  //- q-dialog(v-model="layerContentLayersShow" full-height position="right").window-height
-  //-   div(:style=`{height: $q.screen.height+'px', width: '450px'}`).column.bg-red
-  //-     h1 layer content layers
+  //- layerContentLayers
+  layer-content-layers(
+    v-if="layerContentLayersShow && meta.layerIndex >= 0"
+    :layer="layers[meta.layerIndex]"
+    @layerAdd="$emit('layerAdd', $event), layerContentLayersShow = false"
+    @hide="layerContentLayersShow = false"
+    :style=`{position: 'absolute', zIndex: 1000, right: '0px'}`).fit
   //- header
   div(
     v-if="true"
@@ -57,45 +39,53 @@
             'text-bold': layersLength > 60
           }`
         ) {{ $time(layersLength) }}
-    q-btn(round flat color="green" icon="school" @click="layerContentLayersShow = true")
+    q-btn(
+      v-if="ctx !== 'contentEditor'"
+      round flat color="green" icon="school" @click="layerContentLayersShow = !layerContentLayersShow")
   //- body
-  .col.full-width.scroll
+  div(:style=`{position: 'relative'}`).col.full-width.scroll
+    //- wrapper of layers
     div(:style=`{paddingBottom: '300px'}`).row.full-width.items-start.content-start.q-pa-sm
       //- .row.full-width
       //-   small(v-for="(l,li) in layers" :key="li").full-width.text-white.q-ml-md {{l.spheres.length > 0 ? l.spheres[0].name : li}}
       //- .row.full-width.q-pa-xs
       //-   small.text-white {{ meta }}
-      draggable(v-model="layers" handle=".layerhandle" @start="layerMoveStart" @end="layerMoved")
+      draggable(v-model="layers" handle=".layerhandle" @start="layerMoveStart" @end="layerMoved").full-width
         //- transition-group
-        layer(
+        div(
           v-for="(l, li) in layers" :key="li"
           v-if="l.figuresAbsolute.length > 0"
-          :index="li" :layer="l" :player="player" :meta="meta"
-          @layerNameSetStart="layerNameSetStart"
-          @layerDelete="layerDelete"
-          @meta="$emit('meta', $event)")
+          :class=`{
+            'bg-grey-9': li !== meta.layerIndexPlay,
+            'bg-green': li === meta.layerIndexPlay
+          }`
+          :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`
+          ).row.full-width.items-center.content-center.q-mb-xs
+          div(
+            @click="$emit('layerClick', li)"
+            ).col.full-height.cursor-pointer
+            .row.fit.items-center.content-center
+              span(
+                v-if="l.spheres.length > 0"
+                ).text-white.cursor-pointer.q-ml-md {{ l.spheres[0].name }}
+              .col.full-height
+                .row.fit.items-center.content-center.justify-end.q-px-xs
+                  small.text-white {{$time(l.figuresAbsolute[0].t)}}-{{$time(l.figuresAbsolute[1].t)}} / {{ $time(l.figuresAbsolute[1].t - l.figuresAbsolute[0].t) }}
+          div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center.layerhandle
+            q-icon(color="white" size="20px" name="drag_indicator")
 </template>
 
 <script>
 import draggable from 'vuedraggable'
 import layer from './layer'
-
-const swap = (arr, x, y) => {
-  var b = arr[x]
-  arr[x] = arr[y]
-  arr[y] = b
-  return arr
-}
+import layerContentLayers from './layer_content_layers'
 
 export default {
   name: 'videoComposerLayers',
-  components: { draggable, layer },
-  props: ['composition', 'layers', 'player', 'meta'],
+  components: { draggable, layer, layerContentLayers },
+  props: ['ctx', 'composition', 'layers', 'player', 'meta'],
   data () {
     return {
-      layerNameDialogOpened: false,
-      layerNameSetIndex: -1,
-      layerName: '',
       layerContentLayersShow: false
     }
   },
@@ -126,6 +116,11 @@ export default {
         this.$emit('meta', ['layerIndexPlay', -1])
         this.player.play()
       }
+      if (this.$q.screen.width > 800) {
+      }
+      else {
+        this.$emit('drawerToggle')
+      }
     },
     layerMoveStart (e) {
       this.$log('layerMoveStart')
@@ -137,48 +132,6 @@ export default {
       this.$log('layerMoved', e)
       if (e.oldIndex !== e.newIndex) {
         this.$set(this.composition, 'layers', this.layers)
-      }
-    },
-    layerNameSetStart (index) {
-      this.$log('layerNameSetStart', index)
-      this.layerNameSetIndex = index
-      let layer = this.layers[index]
-      if (layer.spheres.length > 0) {
-        this.layerName = layer.spheres[0].name
-      }
-      this.layerNameDialogOpened = true
-    },
-    layerNameSet () {
-      this.$log('layerNameSet', this.layerNameSetIndex)
-      this.layerNameDialogOpened = false
-      if (this.layerName.length === 0) return
-      this.$set(this.layers[this.layerNameSetIndex].spheres, 0, {name: this.layerName})
-      this.layerName = ''
-      this.layerNameSetIndex = -1
-    },
-    async layerDelete (i) {
-      this.$log('layerDelete', i)
-      if (!confirm('Delete layer?')) return
-      if (this.layers.length > 1) {
-        let index = i === 0 ? this.meta.layerIndex + 1 : this.meta.layerIndex - 1
-        this.$emit('meta', ['mode', 'layer'])
-        this.$emit('meta', ['layerIndex', index])
-        this.$emit('meta', ['layerIndexPlay', index])
-        this.$wait(300).then(() => {
-          this.$delete(this.layers, i)
-        })
-      }
-      else {
-        let layer = {
-          content: this.layers[0].content,
-          figuresAbsolute: [],
-          figuresRelative: [],
-          spheres: []
-        }
-        this.$set(this.layers, 0, layer)
-        this.$emit('meta', ['mode', 'watch'])
-        this.$emit('meta', ['layerIndex', 0])
-        this.$emit('meta', ['layerIndexPlay', -1])
       }
     }
   }

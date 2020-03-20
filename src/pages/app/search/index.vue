@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.bg-red
+.row.full-width
   span search
 </template>
 

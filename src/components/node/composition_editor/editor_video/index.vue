@@ -1,7 +1,5 @@
 <template lang="pug">
 div(:style=`{position: 'relative', zIndex: 1000}`).row.full-width
-  //- red
-  //- div(:style=`{position: 'fixed', zIndex: 10000, top: '0px', right: '0px', width: '500px'}`).row.full-height.bg-red
   //- layers on progress bar
   div(:style=`{position: 'absolute', zIndex: 1000000, top: '-36px', height: 20+'px', pointerEvents: 'none'}`).row.full-width.q-px-sm
     div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center.q-px-sm

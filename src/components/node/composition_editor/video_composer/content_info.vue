@@ -1,6 +1,8 @@
 <template lang="pug">
-.row.full-width
-  span content: {{content}}
+.column.fit
+  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
+    span.text-white {{ content.name }}
+  .col.full-width.scroll
 </template>
 
 <script>

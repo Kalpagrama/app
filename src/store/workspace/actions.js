@@ -78,6 +78,7 @@ export const wsNodeSave = async (context, node) => {
     nodeInput.compositions = node.compositions.map(c => {
       if (c) {
         return {
+          // name: c.name || '',
           spheres: [],
           operation: {
             operations: c.operation.operations,

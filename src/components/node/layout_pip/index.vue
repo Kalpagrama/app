@@ -26,7 +26,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     ref="nodeName" @click="nodeNameClick()"
     :style=`{marginTop: '-20px', paddingTop: '20px', minHeight: '70px'}`
     ).row.full-width.items-center.justify-center.cursor-pointer.bg-grey-2
-    span.text-bold.text-center.cursor-pointer {{index}}-{{ node.name }}
+    span.text-bold.text-center.cursor-pointer {{ node.name }}
 </template>
 
 <script>

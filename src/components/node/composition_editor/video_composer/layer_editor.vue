@@ -185,7 +185,7 @@ export default {
         }
       }
     },
-    'meta.layerIndex': {
+    'meta.layerIndexPlay': {
       immediate: true,
       handler (to, from) {
         if (to === from) return

@@ -5,22 +5,24 @@ q-layout(
   q-header(
     reveal
     :style=`{zIndex: 200, paddingLeft: $q.screen.xs ? '0px' : '60px'}`).row.full-width.justify-center.bg-grey-9
-    div(
-      :style=`{
-        height: '60px',
-        maxWidth: $store.state.ui.maxWidthPage+'px'
-      }`).row.full-width.items-center
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="green" icon="whatshot")
-      span.text-green.text-bold Trends
-    div(
-      :style=`{
-        height: '60px',
-        maxWidth: $store.state.ui.maxWidthPage+'px',
-        textTransform: 'capitalize', whiteSpace: 'nowrap'}`
-      ).row.full-width.scroll
-        //- .row.no-wrap
-        kalpa-buttons(:value="categoriesFiltered" :id="$route.params.category" idKey="id" @id="$router.push({params: {category: $event}})").no-wrap
+    .row.full-width.justify-center
+      div(
+        :style=`{
+          height: '60px',
+          maxWidth: $store.state.ui.maxWidthPage+'px'
+        }`).row.full-width.items-center
+        div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+          q-btn(round flat color="green" icon="whatshot")
+        span.text-green.text-bold Trends
+    .row.full-width.justify-center
+      div(
+        :style=`{
+          height: '60px',
+          maxWidth: $store.state.ui.maxWidthPage+'px',
+          textTransform: 'capitalize', whiteSpace: 'nowrap'}`
+        ).row.full-width.scroll
+          //- .row.no-wrap
+          kalpa-buttons(:value="categoriesFiltered" :id="$route.params.category" idKey="id" @id="$router.push({params: {category: $event}})").no-wrap
   q-page-conainter.row.fit.justify-center.items-start.content-start.bg-grey-10
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
       template(v-slot:items=`{items}`)
