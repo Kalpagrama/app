@@ -35,7 +35,7 @@ div(
           ).row.items-center.justify-center
           q-btn(round :flat="page !== 'setting'" color="green" icon="settings" @click="$emit('page', 'setting')")
     //- pages
-    div(v-if="true").row.full-width.justify-center
+    div(v-if="true" :style=`{}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
         kalpa-buttons(:value="pagesFiltered" :id="page" idKey="id" @id="$emit('page', $event)")
     //- body

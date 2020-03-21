@@ -2,49 +2,25 @@
 div(
   :style=`{
     position: 'relative',
+    height: '160px',
     borderRadius: '10px'
   }`
-  ).row.full-width.q-mb-xs.bg-grey-9
-  //- dialogs
-  //- layerName
-  q-dialog(v-model="layerNameDialogOpened" :maximized="$q.screen.xs" @hide="layerNameSet")
-    div(
-      :style=`{
-        maxHeight: $q.screen.xs ? '100%' : '200px',
-        maxWidth: $q.screen.xs ? '100%' : '300px',
-        borderRadius: '10px'
-      }`).column.fit.bg-white
-      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-        span.text-bold.text-black Set layer name
-      div(:style=`{height: '60px'}`).row.full-width.q-px-sm
-        input(
-          v-model="layerNameInput"
-          autofocus placeholder="Suggest layer name"
-          @keyup.enter="layerNameSet"
-          :style=`{borderRadius: '10px'}`).kinput.full-width.bg-grey-4
-      .col.full-width
-      div(:style=`{height: '70px'}`).row.full-width.q-pa-sm
-        q-btn(push color="green" no-caps @click="layerNameSet"
-          :style=`{borderRadius: '10px'}`).fit
-          span Save
+  ).row.full-width.items-start.content-start.bg-grey-9
   //- default header
   div(:style=`{height: '36px'}`).row.full-width.items-center.content-center
-    span(v-if="layerName" @click="layerNameSetStart").text-white.cursor-pointer.q-ml-md {{ layerName }}
-    span(v-if="layerActive && !layerName" @click="layerNameSetStart").text-white.cursor-pointer.q-ml-md Set layer name
+    span(v-if="layerName").text-white.cursor-pointer.q-ml-md {{ layerName || 'Set layer name' }}
+      q-menu(ref="layerMenu" max-width="200px" anchor="center right" self="center left")
+        layer-menu(
+          :layer="layer" :index="index"
+          @hide="$refs.layerMenu.hide()" @layerDelete="$emit('layerDelete')")
     .col
       .row.fit.items-center.content-center.justify-end.q-px-md
         span.text-white {{$time(layer.figuresAbsolute[0].t)}}-{{$time(layer.figuresAbsolute[1].t)}} / {{ $time(layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t) }}
-    //- div(:style=`{height: '36px', width: '36px'}`).row.items-center.content-center.justify-center.cursor-pointer
-    //-   q-icon(color="white" size="20px" name="drag_indicator")
   //- ACTIVE layer
   div(
-    :style=`{position: 'relative', height: height+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start
+    :style=`{position: 'relative', height: 110+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start
     //- PLAYER progress
     div(:style=`{height: '60px'}`).row.full-width
-      //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-      //-   q-btn(round push @click="layerPlayButtonClick()"
-      //-     :color="meta.mode === 'layer' && meta.playing ? 'red' : 'green'"
-      //-     :icon="meta.playing && layerActive ? 'pause' : 'play_arrow'")
       .col.full-height.q-px-md
         .row.fit.items-center.content-center
           //- progress wrapper
@@ -65,36 +41,33 @@ div(
             div(:style=`{position: 'absolute',
               left: 'calc('+layerPercent+'% - 10px)',
               width: '20px', height: '20px', borderRadius: '50%'}`).bg-green
-      //- div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-      //-   q-btn(round flat color="white" icon="refresh" @click="player.setCurrentTime(layer.figuresAbsolute[0].t)")
     //- TICKS
-    div(:style=`{height: '44px'}`).row.full-width.justify-center.content-center.items-center.q-px-md
+    div(:style=`{height: '44px'}`).row.full-width.justify-center.content-center.items-center.q-px-xs
       q-btn(round push @click="layerPlayButtonClick()"
         :color="meta.mode === 'layer' && meta.playing ? 'red' : 'green'"
         :icon="meta.playing && layerActive ? 'pause' : 'play_arrow'").q-mr-md
-      div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs
+      div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs.q-mr-xs
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_left" @click="layerTick(0, 0)").q-mr-lg
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_right" @click="layerTick(0, 1)")
-      .col.full-height
-        .row.fit.items-center.content-center.justify-center
-          span.text-white {{ $time(layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t) }}
-          .row.full-width.justify-center.text-grey-5
-            small Total
-      div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs
+      //- .col.full-height
+      div(:style=`{borderRadius: '30px'}`).row.full-height.items-center.content-center.bg-grey-7.q-pa-xs.q-ml-xs
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_left" @click="layerTick(1, 0)").q-mr-lg
         q-btn(round flat dense no-caps color="white" icon="keyboard_arrow_right" @click="layerTick(1, 1)")
       q-btn(round flat color="white" icon="refresh" @click="player.setCurrentTime(layer.figuresAbsolute[0].t)").q-ml-md
     //- ACTIONS: delete, copy, share, save
-    div(v-if="true").row.full-width.items-center.content.center.justify-center.q-px-lg
+    div(v-if="false").row.full-width.items-center.content.center.justify-center.q-px-lg
       q-btn(round flat icon="delete_outline" color="red" @click="$emit('layerDelete', index)").q-mr-sm
       //- .col.full-height
       q-btn(round flat icon="favorite_border" color="white" @click="layerLove()").q-ml-sm
 </template>
 
 <script>
+import layerMenu from './layer_menu'
+
 export default {
   name: 'videoComposer_layersLayer',
   props: ['index', 'layer', 'player', 'meta'],
+  components: {layerMenu},
   data () {
     return {
       height: 0,
@@ -135,7 +108,7 @@ export default {
         this.$log(this.index, 'layerActive CHANGED', to, from)
         if (to) {
           if (to !== from) {
-            if (this.height !== 165) this.$tween.to(this, 0.3, {height: 150})
+            if (this.height !== 165) this.$tween.to(this, 0.3, {height: 104})
             // this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
           }
         }
@@ -178,13 +151,22 @@ export default {
       this.player.setCurrentTime(to)
     },
     layerProgressClick (e) {
-      // this.$log('layerProgressClick', e)
-      let width = e.path[0].clientWidth
-      let offsetX = e.offsetX
-      let k = offsetX / width
-      let d = this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t
-      let to = this.layer.figuresAbsolute[0].t + (k * d)
-      this.player.setCurrentTime(to)
+      try {
+        // this.$log('layerProgressClick', e)
+        // this.$q.notify('layerProgressClick')
+        let width = e.target.clientWidth
+        let offsetX = e.offsetX
+        let k = offsetX / width
+        let d = this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t
+        let to = this.layer.figuresAbsolute[0].t + (k * d)
+        // this.$q.notify(`${width}, ${offsetX}, ${k}, ${d}, ${to}`)
+        this.$emit('meta', ['videoUpdate', to])
+        this.player.setCurrentTime(to)
+      }
+      catch (e) {
+        this.$log('layerProgressClick error', e)
+        this.$q.notify({message: 'layerProgressClick error' + e, color: 'red', textColor: 'white'})
+      }
     },
     layerProgressPan (e) {
       this.$log('layerProgressPan', e)

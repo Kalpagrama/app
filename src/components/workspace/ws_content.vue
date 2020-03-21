@@ -18,7 +18,7 @@ div(
   //- content INACTIVE tint
   div(
     v-if="!contentActive"
-    :style=`{position: 'absolute', zIndex: 200}` @click="$emit('contentClick', node.oid)").row.fit.cursor-pointer
+    :style=`{position: 'absolute', zIndex: 200}` @click="$emit('contentEdit', nodeFull)").row.fit.cursor-pointer
   //- content active
   div(
     v-if="contentActive"
