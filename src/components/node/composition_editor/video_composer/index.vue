@@ -26,8 +26,8 @@ export default {
       styles: {
         paddingLeft: 0,
         paddingRight: 0,
-        paddingBottom: 0,
-        paddingTop: 60
+        paddingBottom: 140,
+        paddingTop: 0
       }
     }
   }

@@ -18,15 +18,20 @@
           ).row.full-height.bg-grey-3
           div(:style=`{position: 'absolute', right: '-10px', top: '0px', height: '20px', width: '20px', borderRadius: '50%'}`).bg-green
     //- progress actions
-    div(:style=`{height: '60px'}`).row.full-width.items-center
+    div(:style=`{height: '60px', order: -1}`).row.full-width.items-center
       //- play/pause
       div(
-        :style=`{width: '60px', height: '60px'}`
-        ).row.full-height.items-center.content-center.justify-center
+        :style=`{minWidth: '60px', height: '60px'}`
+        ).row.full-height.items-center.content-center.justify-center.q-px-md
         q-btn(
-          round push  @click="$emit('meta', ['videoPlayPause', null])"
-          :color="meta.playing ? 'red' : 'green'"
+          round outline @click="$emit('meta', ['videoPlayPause', null])"
+          :color="'white'"
           :icon="meta.playing ? 'pause' : 'play_arrow'"
+          :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-md
+        q-btn(
+          round outline @click="player.setMuted(meta.muted), $emit('meta', ['muted', !meta.muted])"
+          color="white"
+          :icon="meta.muted ? 'volume_up' : 'volume_off'"
           :style=`{background: 'rgba(0,0,0,0.3)'}`)
       //- stats
       .col
@@ -36,6 +41,7 @@
             ).text-white.q-pa-sm.q-ml-sm {{ $time(meta.now)+' / '+$time(meta.duration) }}
       //- sound
       div(
+        v-if="false"
         :style=`{width: '60px', height: '60px'}`
         ).row.full-height.items-center.content-center.justify-center
         q-btn(
@@ -71,7 +77,7 @@ export default {
       let x = e.offsetX
       let to = (this.meta.duration * x) / w
       this.$emit('meta', ['mode', 'watch'])
-      this.$emit('meta', ['layerIndexPlay', -1])
+      // this.$emit('meta', ['layerIndexPlay', -1])
       this.player.setCurrentTime(to)
       this.$emit('meta', ['videoUpdate', to])
     },
@@ -83,7 +89,7 @@ export default {
       if (e.isFirst) {
         this.player.pause()
         this.$emit('meta', ['mode', 'watch'])
-        this.$emit('meta', ['layerIndexPlay', -1])
+        // this.$emit('meta', ['layerIndexPlay', -1])
       }
       if (e.isFinal) {
         this.$emit('meta', ['videoUpdate', to])

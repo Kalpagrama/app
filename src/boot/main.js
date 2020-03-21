@@ -44,8 +44,8 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     LoadingBar.setDefaults({
-      color: '#52b156',
-      size: '2px',
+      color: '#4caf50',
+      size: '6px',
       position: 'top'
     })
     // TODO: memory leak with tweenmax, switch to tween lite

@@ -29,14 +29,31 @@
         @composition="compositionFound"
         @cancel="compositionFinderOpened = false").bg-black
     //- header
-    //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
-    //-   q-btn(outline color="edit")
+    div(:style=`{height: '60px', order: 1000}`).row.full-width.justify-center.q-px-md.bg-grey-8
+      div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-center.content-center
+        q-btn(no-caps outline color="red"
+          :style=`{borderRadius: '10px'}` @click="$emit('cancel')").q-mr-sm Back
+        q-btn(
+          v-if="node && node.oid"
+          no-caps outline color="red" icon="delete_outline" @click="nodeDelete(node.oid)"
+          :style=`{borderRadius: '10px', width: '36px'}`).q-mr-sm
+        q-btn(
+          v-if="node && node.oid"
+          no-caps outline color="green" @click="nodeSave()"
+          :loading="nodeSaving"
+          :style=`{borderRadius: '10px'}`).q-mr-sm Save & close
+        .col
+        q-btn(
+          v-if="node && node.oid"
+          no-caps push color="green"
+          :loading="nodePublishing"
+          :style=`{borderRadius: '10px'}` @click="nodePublish()") Publish
     //- body
     .col.full-width.scroll
       .row.full-width.items-start.content-start.justify-center.q-px-sm
         //- header
         div(
-          v-if="true"
+          v-if="false"
           :style=`{height: '60px', order: 10000, marginBottom: '300px'}`
           ).row.full-width.items-start.content-start.justify-center
           div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-start.content-start
@@ -62,10 +79,10 @@
                 push color="green" no-caps :loading="saving || nodePublishing" @click="nodePublish()"
                 :style=`{borderRadius: '10px'}`)
                 span().text-bold Опубликовать
-        div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-pt-sm
+        div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-pt-md
           //- composition one
           div(
-            :style=`{position: 'relative', minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{position: 'relative', zIndex: 200, minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
             composition(
               v-if="node.compositions[0]" ctx="editor"
@@ -84,14 +101,14 @@
             q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
                 :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
           //- essence editor
-          div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-md
+          div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-my-sm
             input(
               v-if="node"
               v-model="node.name"
               placeholder="Whats the essence?").fit.bg-white.kinput.text-bold
           //- composition two
           div(
-            :style=`{position: 'relative', minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{position: 'relative', zIndex: 200, minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.bg-grey-9
             composition(
               v-if="node.compositions[1]" ctx="editor"
@@ -117,7 +134,10 @@
             small.full-width oid: {{ node.oid }}
             small.full-width compositionActive: {{compositionActive}}
             small.full-width compositionVisible: {{compositionVisible}}
-        div(:style=`{minHeight: '100px'}`).row.full-width.items-start.content-start.justify-center.q-py-md
+        div(:style=`{minHeight: '100px'}`).row.full-width.items-start.content-start.justify-center.q-py-md.q-mt-md
+          div(v-if="node && node.oid").row.full-width.justify-center
+            div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-px-md
+              span(:style=`{fontSize: '20px'}`).text-white.text-bold Choose category
           .row.full-width.justify-center
             div(
               v-if="node && node.oid"
@@ -134,9 +154,12 @@
                     color: 'white', whiteSpace: 'nowrap', textTransform: 'capitalize',
                     borderRadius: '10px', overflow: 'hidden'}`
                   ).cursor-pointer.q-pa-sm.q-mr-sm {{ c.sphere.name }}
+          div(v-if="node && node.oid").row.full-width.justify-center.q-mt-md.q-pb-xs
+            div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-px-md
+              span(:style=`{fontSize: '20px'}`).text-white.text-bold Add spheres
           node-spheres-editor(
             v-if="node && node.oid" mode="edit"
-            :node="node" :style=`{maxWidth: maxWidth+'px'}`)
+            :node="node" :style=`{maxWidth: maxWidth+'px', paddingBottom: '300px'}`)
 </template>
 
 <script>
@@ -229,6 +252,13 @@ export default {
       this.compositionTwoActive = false
       this.$set(this.node.compositions, index, null)
     },
+    async nodeSave () {
+      this.$log('nodeSave')
+      this.nodeSaving = true
+      await this.$wait(800)
+      this.nodeSaving = false
+      this.$emit('cancel')
+    },
     async nodeDelete (oid) {
       try {
         this.$log('nodeDelete start')
@@ -252,6 +282,7 @@ export default {
       try {
         this.$log('nodePublish start')
         this.nodePublishing = true
+        await this.$wait(900)
         let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
         this.$log('res', res)
         this.$log('nodePublish done')

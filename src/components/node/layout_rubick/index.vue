@@ -9,18 +9,19 @@
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- composition finder
   q-dialog(v-model="compositionFinderOpened" :maximized="true" position="bottom")
-    div(@click.self="compositionFinderOpened = false" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-start.content-start.justify-center.q-pa-sm
+    div(@click.self="compositionFinderOpened = false" :style=`{height: $q.screen.height+'px'}`).row.full-width.items-start.content-start.justify-center
       composition-finder(
-        @composition="compositionFound" @close="compositionFinderOpened = false"
-        :style=`{maxWidth: '600px', borderRadius: '10px', overflow: 'hidden', opacity: 1}`).bg-black
+        @composition="compositionFound" @cancel="compositionFinderOpened = false"
+        :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', opacity: 1}`).bg-black
   //- composition editor
   q-dialog(v-model="compositionEditorOpened" :maximized="true").bg-black
     div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).row.fit
       composition-editor(
         ctx="editor"
-        :node="nodeRubickNew" :compositionIndex="compositionIndex").bg-black
-      q-btn(push color="green" no-caps @click="compositionEditorOpened = false, compositionEditedFinal()"
-        :style=`{position: 'absolute', zIndex: 10000, top: '16px', right: '16px'}`) Ready!
+        :node="nodeRubickNew" :compositionIndex="compositionIndex"
+        @cancel="compositionEditorOpened = false, compositionEditedFinal()").bg-black
+      //- q-btn(push color="green" no-caps @click="compositionEditorOpened = false, compositionEditedFinal()"
+      //-   :style=`{position: 'absolute', zIndex: 10000, top: '16px', right: '16px'}`) Ready!
   //- header
   div(
     v-if="false"
@@ -62,9 +63,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       //- composition TWO
       div(
         :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
-        div(
-          v-if="compositionTwoActive === false" @click="compositionTwoActive = true"
-          :style=`{position: 'absolute', zIndex: 1000, opacity: 0.5}`).row.fit
+        //- div(
+        //-   v-if="compositionTwoActive === false" @click="compositionTwoActive = true"
+        //-   :style=`{position: 'absolute', zIndex: 1000, opacity: 0.5}`).row.fit
         composition-list(
           v-if="node && compositionTwoQuery"
           :ctx="'rubick'" label="two"
@@ -94,6 +95,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   actions(
     :node="node" :nodeFull="nodeFull" :width="width" :maxWidth="maxWidth"
     @votePanning="votePanning = $event" @voteValue="voteValue = $event")
+  .row.full-width.justify-center.items-start.q-px-xs
+    div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-pt-md
+      span(:style=`{textTransform: 'capitalize', fontSize: '20px'}`).text-bold.text-white {{ $store.state.node.categories.find(c => c.type === nodeFull.category).name }}
   .row.full-width.justify-center.items-start.q-px-xs
     node-spheres-editor(
       v-if="nodeFull" mode="watch"
@@ -172,15 +176,13 @@ export default {
       async handler (to, from) {
         this.$log('node CHANGED', to)
         if (to && to.meta.compositions.length === 2) {
-          if (this.compositionOneOid) {
-            // if (this.needSwap) this.needSwap = false
-            // else this.needSwap = to.meta.compositions[0].oid !== this.compositionOneOid
-            this.needSwap = to.meta.compositions[0].oid !== this.compositionOneOid
-          }
-          this.$log('NEED SWAP', this.needSwap)
-          // await this.$wait(1000)
-          this.compositionOneOid = to.meta.compositions[this.needSwap ? 1 : 0].oid
-          this.compositionTwoOid = to.meta.compositions[this.needSwap ? 0 : 1].oid
+          let swap
+          if (this.compositionOneOid && this.compositionOneOid === to.meta.compositions[1].oid) swap = true
+          else if (this.compositionTwoOid && this.compositionTwoOid === to.meta.compositions[0].oid) swap = true
+          else swap = false
+          this.$log('*** SWAP SWAP SWAP ***', swap)
+          this.compositionOneOid = to.meta.compositions[swap ? 1 : 0].oid
+          this.compositionTwoOid = to.meta.compositions[swap ? 0 : 1].oid
           this.compositionOneQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionTwoOid], pagination: {pageSize: 30}})
           this.compositionTwoQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid], pagination: {pageSize: 30}})
           this.nodeNameQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid, this.compositionTwoOid], pagination: {pageSize: 30}})
@@ -214,8 +216,6 @@ export default {
       this.$log('compositionFound', composition)
       this.$set(this, 'nodeRubickNew', JSON.parse(JSON.stringify(this.nodeFull)))
       this.$set(this.nodeRubickNew.compositions, this.compositionIndex, composition)
-      // this.nodeRubickNew = JSON.parse(JSON.stringify(this.nodeFull))
-      // this.nodeRubickNew.compositions[this.compositionIndex] = composition
       this.compositionEditorOpened = true
       this.$wait(300).then(() => {
         this.compositionFinderOpened = false
@@ -226,7 +226,6 @@ export default {
       this.$set(this.nodeRubickNew.compositions, this.compositionIndex, composition)
       this.compositionOneActive = true
       this.compositionTwoActive = false
-      // this.$set(this.compositionsActive, [true, true])
     },
     async compositionEditedFinal () {
       this.$log('compositionEditedFinal', this.nodeRubickNew)

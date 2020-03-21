@@ -1,13 +1,17 @@
 <template lang="pug">
 .column.fit.bg-grey-9
-  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-    q-btn(round flat color="green" icon="keyboard_arrow_left" @click="$emit('cancel')")
+  //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+  //-   q-btn(round flat color="green" icon="keyboard_arrow_left" @click="$emit('cancel')")
   .col.full-width
     ws-menu(
       ctx="finder"
       :header="false" :toggle="false" :oid="oid"
       :pages="['content', 'composition']"
       @item="itemClick" @page="pageClick" :page="page")
+  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm.bg-grey-8
+    q-btn(
+      outline no-caps color="red" @click="$emit('cancel')"
+      :style=`{borderRadius: '10px'}`) Back
 </template>
 
 <script>
