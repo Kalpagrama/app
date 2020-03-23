@@ -31,7 +31,7 @@
         q-btn(
           round outline @click="player.setMuted(meta.muted), $emit('meta', ['muted', !meta.muted])"
           color="white"
-          :icon="meta.muted ? 'volume_up' : 'volume_off'"
+          :icon="meta.muted ? 'volume_off' : 'volume_up'"
           :style=`{background: 'rgba(0,0,0,0.3)'}`)
       //- stats
       .col

@@ -1,10 +1,18 @@
 <template lang="pug">
-.row.full-width
-  kalpa-loader(ref="nodeLoader" :variables="variables" type="sphereNodes")
+//- .row.full-width
+//-   kalpa-loader(ref="nodeLoader" :variables="variables" type="sphereNodes")
+//-     template(v-slot:items=`{items}`)
+//-       node-list(:nodes="items" @nodeClick="nodeClick")
+//-       div(v-if="items.length === 0" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
+//-         span {{$t('Пользователь не голосовал', 'User didnt rate')}}
+.row.fit.items-start.content-start
+  kalpa-loader(v-if="variables" ref="nodeLoader" :variables="variables" type="sphereNodes")
     template(v-slot:items=`{items}`)
       node-list(:nodes="items" @nodeClick="nodeClick")
-      div(v-if="items.length === 0" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
-        span {{$t('Пользователь не голосовал', 'User didnt rate')}}
+        template(v-slot:header)
+          slot(name="header")
+    //- div(v-if="items.length === 0" style=`border-radius: 10px`).row.full-width.justify-center.bg-white.q-pa-lg
+    //-   span {{$t('Пользователь не голосовал', 'User didnt rate')}}
 </template>
 <script>
 import node from './node'

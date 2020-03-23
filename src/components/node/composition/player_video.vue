@@ -41,12 +41,12 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
     //-     color: 'white', background: 'rgba(0,0,0,0.3)'}`
     //-   ).q-pa-sm {{ layer.spheres[0].name | cut(50) }}
     //- video actions, volume, progress
-    //- q-btn(
-    //-   v-show="!mini && videoGood"
-    //-   round flat @click="videoToggleMuted()"
-    //-   :color="muted ? 'grey-6' : 'white'"
-    //-   :icon="muted ? 'volume_off' : 'volume_up'"
-    //-   :style=`{position: 'absolute', zIndex: 20000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
+    q-btn(
+      v-show="!mini"
+      round flat @click="videoToggleMuted()"
+      :color="muted ? 'grey-6' : 'white'"
+      :icon="muted ? 'volume_off' : 'volume_up'"
+      :style=`{position: 'absolute', zIndex: 20000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
     //- video forward
     div(
       v-on:dblclick="videoForward(0)" @click="forwarding === 'left' ? videoForward(0) : videoClick()"
@@ -111,7 +111,7 @@ export default {
       duration: 0,
       player: null,
       playing: false,
-      muted: true,
+      muted: false,
       fullscreen: false,
       intervalUpdate: null,
       intervalMove: null,
@@ -355,7 +355,7 @@ export default {
     videoToggleMuted () {
       this.$log('videoToggleMuted')
       // centralized volume settings, except ios safari...
-      this.muted = !this.muted
+      // this.muted = !this.muted
       this.player.setMuted(this.muted)
     },
     async videoMove () {
