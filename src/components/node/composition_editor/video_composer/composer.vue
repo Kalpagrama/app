@@ -71,8 +71,9 @@ div
     player-video-progress(
       :player="player" :meta="meta"
       @meta="$parent.$emit('meta', $event)"
-      :style=`{position: 'absolute', zIndex: 920, top: '-90px'}`)
+      :style=`{position: 'absolute', zIndex: 920, bottom: styles.paddingBottom-70+'px'}`)
     layer-editor(
+      v-if="true"
       :layer="layer" :layerIndex="meta.layerIndexPlay" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd" @meta="$parent.$emit('meta', $event)"
       :style=`{maxHeight: '70px'}`)
     div(

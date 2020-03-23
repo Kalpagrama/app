@@ -43,7 +43,7 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
     //- video actions, volume, progress
     q-btn(
       v-show="!mini"
-      round flat @click="videoToggleMuted()"
+      round flat @click="player.mutedToggle()"
       :color="muted ? 'grey-6' : 'white'"
       :icon="muted ? 'volume_off' : 'volume_up'"
       :style=`{position: 'absolute', zIndex: 20000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
@@ -352,12 +352,6 @@ export default {
         this.forwardingCount = 0
       }, 400)
     },
-    videoToggleMuted () {
-      this.$log('videoToggleMuted')
-      // centralized volume settings, except ios safari...
-      // this.muted = !this.muted
-      this.player.setMuted(this.muted)
-    },
     async videoMove () {
       if (!this.fullscreen) return
       this.$log('videoMove')
@@ -445,10 +439,6 @@ export default {
         this.player.remove = () => {
           // TODO
         }
-        this.player.setMuted = () => {
-          this.muted = !this.muted
-          // if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.paus
-        }
         this.videoUpdate()
         // this.videoPlay()
       }
@@ -486,6 +476,15 @@ export default {
       // set player defaults
       this.player.update = (to) => {
         this.videoUpdate(null, to)
+      }
+      // muted custom toggle
+      this.player.mutedToggle = () => {
+        this.muted = !this.muted
+        if (this.contentSource === 'KALPA') {
+        }
+        else if (this.contentSource === 'YOUTUBE') {
+          this.player.setMuted(this.muted)
+        }
       }
     },
     playerDestroy () {

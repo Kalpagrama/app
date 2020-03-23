@@ -2,7 +2,9 @@
 q-layout(
   view="hHh lpR fFf"
   :style=`{height: $q.screen.height+'px'}`)
-  q-dialog(v-model="pageDialogOpened" :maximized="true" @hide="itemEdited")
+  q-dialog(
+    v-model="pageDialogOpened" :maximized="true"
+    @hide="itemEdited")
     div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
       ws-sphere(
         v-if="$route.params.page === 'sphere'")

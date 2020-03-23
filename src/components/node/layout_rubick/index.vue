@@ -24,7 +24,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       //-   :style=`{position: 'absolute', zIndex: 10000, top: '16px', right: '16px'}`) Ready!
   //- header
   div(
-    v-if="false"
+    v-if="true"
     :style=`{height: '60px'}`).row.full-width.justify-center.q-pa-xs
     div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-center.content-center.q-px-md
       q-btn(
@@ -95,9 +95,14 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   actions(
     :node="node" :nodeFull="nodeFull" :width="width" :maxWidth="maxWidth"
     @votePanning="votePanning = $event" @voteValue="voteValue = $event")
+  //- category
   .row.full-width.justify-center.items-start.q-px-xs
     div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.q-pt-md
-      span(:style=`{textTransform: 'capitalize', fontSize: '20px'}`).text-bold.text-white {{ $store.state.node.categories.find(c => c.type === nodeFull.category).name }}
+      router-link(
+        v-if="nodeFull" :to="'/trends/'+$store.state.node.categories.find(c => c.type === nodeFull.category).type"
+        :style=`{textTransform: 'capitalize', fontSize: '20px'}`
+        ).text-bold.text-white {{ $store.state.node.categories.find(c => c.type === nodeFull.category).name }}
+  //- spheres
   .row.full-width.justify-center.items-start.q-px-xs
     node-spheres-editor(
       v-if="nodeFull" mode="watch"

@@ -5,18 +5,33 @@
     //- progress bar & time
     div(
       @click="progressClick"
-      v-touch-pan.left.right.prevent.mouse="progressPan"
-      :style=`{height: '20px', borderRadius: '10px'}`).row.full-width.items-center.content-center
-      //- progress
+      v-touch-pan.mouse.prevent.left.right="progressPan"
+      :style=`{position: 'relative', zIndex: 300, height: '20px', borderRadius: '10px'}`).row.full-width.items-center.content-center
+      //- progress WRAPPER
       div(
-        :style=`{position: 'relative', height: '20px', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`
+        ref="progressWrapper"
+        :style=`{position: 'relative', height: '4px', zIndex: 200, borderRadius: '10px'}`
         ).row.full-width.bg-grey-9.cursor-pointer
         //- progress %
-        div(:style=`{
-          position: 'absolute', zIndex: 100, left: 0, width: (meta.now/meta.duration)*100+'%',
-          pointerEvents: 'none', borderRight: '2px solid #4caf50'}`
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 100,
+            left: 0,
+            width: progressPercentWidth,
+            borderRadius: '10px',
+            pointerEvents: 'none', borderRight: '2px solid #4caf50'
+          }`
           ).row.full-height.bg-grey-3
-          div(:style=`{position: 'absolute', right: '-10px', top: '0px', height: '20px', width: '20px', borderRadius: '50%'}`).bg-green
+          //- progress POINT
+          div(
+            :style=`{
+              position: 'absolute',
+              top: -8+pointTop+'px',
+              right: -pointHeight/2+'px',
+              height: pointHeight+'px',
+              width: pointHeight+'px',
+              borderRadius: '50%'
+            }`).bg-green
     //- progress actions
     div(:style=`{height: '60px', order: -1}`).row.full-width.items-center
       //- play/pause
@@ -24,12 +39,12 @@
         :style=`{minWidth: '60px', height: '60px'}`
         ).row.full-height.items-center.content-center.justify-center.q-px-md
         q-btn(
-          round outline @click="$emit('meta', ['videoPlayPause', null])"
+          round flat @click="$emit('meta', ['videoPlayPause', null])"
           :color="'white'"
           :icon="meta.playing ? 'pause' : 'play_arrow'"
           :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-md
         q-btn(
-          round outline @click="player.setMuted(meta.muted), $emit('meta', ['muted', !meta.muted])"
+          round flat @click="player.mutedToggle()"
           color="white"
           :icon="meta.muted ? 'volume_off' : 'volume_up'"
           :style=`{background: 'rgba(0,0,0,0.3)'}`)
@@ -45,7 +60,7 @@
         :style=`{width: '60px', height: '60px'}`
         ).row.full-height.items-center.content-center.justify-center
         q-btn(
-          round outline @click="player.setMuted(meta.muted), $emit('meta', ['muted', !meta.muted])"
+          round outline @click="player.mutedToggle()"
           color="white"
           :icon="meta.muted ? 'volume_up' : 'volume_off'"
           :style=`{background: 'rgba(0,0,0,0.3)'}`)
@@ -67,7 +82,35 @@ export default {
   props: ['player', 'meta'],
   data () {
     return {
-      height: 20
+      height: 20,
+      progressPanning: false,
+      progressWrapperLeft: 0,
+      progressWrapperWidth: 0,
+      progressDelta: 0,
+      pointHeight: 20,
+      pointTop: 0
+    }
+  },
+  computed: {
+    progressPercentWidth () {
+      if (this.progressPanning) {
+        return this.progressDelta + 'px'
+      }
+      else {
+        let to = (this.meta.now / this.meta.duration) * 100
+        if (this.pointDelta > 0 && this.progressPercentWidth > 0) {
+          let from = (this.pointDelta / this.progressPercentWidth) * 100
+          if (from === to) {
+            return to + '%'
+          }
+          else {
+            return from + '%'
+          }
+        }
+        else {
+          return to + '%'
+        }
+      }
     }
   },
   methods: {
@@ -77,24 +120,38 @@ export default {
       let x = e.offsetX
       let to = (this.meta.duration * x) / w
       this.$emit('meta', ['mode', 'watch'])
-      // this.$emit('meta', ['layerIndexPlay', -1])
       this.player.setCurrentTime(to)
       this.$emit('meta', ['videoUpdate', to])
     },
     progressPan (e) {
       // this.$log('progressPan', e)
-      let w = e.evt.target.clientWidth
-      let x = e.evt.offsetX
-      let to = (this.meta.duration * x) / w
+      // start
       if (e.isFirst) {
+        this.progressPanning = true
+        let progressWrapperRef = this.$refs.progressWrapper
+        // this.$log('progressWrapperRef', progressWrapperRef)
+        let rect = progressWrapperRef.getBoundingClientRect()
+        // this.$log('rect', rect)
+        this.progressWrapperLeft = rect.left
+        this.progressWrapperWidth = rect.width
         this.player.pause()
         this.$emit('meta', ['mode', 'watch'])
-        // this.$emit('meta', ['layerIndexPlay', -1])
+        // point style
+        this.$tween.to(this, 0.2, {pointHeight: 34, pointTop: -7})
       }
-      if (e.isFinal) {
-        this.$emit('meta', ['videoUpdate', to])
-      }
+      // get x position
+      let x = e.position.left - this.progressWrapperLeft
+      if (x > this.progressWrapperWidth) return
+      let to = (this.meta.duration * x) / this.progressWrapperWidth
+      this.progressDelta = x
       this.player.setCurrentTime(to)
+      // final
+      if (e.isFinal) {
+        this.progressPanning = false
+        this.$emit('meta', ['videoUpdate', to])
+        // point style
+        this.$tween.to(this, 0.2, {pointHeight: 20, pointTop: 0})
+      }
     }
   }
 }
