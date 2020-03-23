@@ -1,4 +1,4 @@
-const swVer = 11
+const swVer = 5
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
@@ -152,7 +152,10 @@ if (useCache) {
       return await getCache(event.request, store)
     }
     const networkOnly = async (event) => {
-      return await fetch(event.request.clone())
+      return await fetch(event.request.clone(), {
+        credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+        mode: 'cors' // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+      })
     }
     const StaleWhileRevalidate = async (event, store) => {
       logDebug('gql StaleWhileRevalidate')
@@ -317,12 +320,19 @@ if (useCache) {
           new workbox.expiration.Plugin({
             maxEntries: 2000
           })
-        ]
+        ],
+        fetchOptions: {
+          credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+          mode: 'cors' // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+        },
       })
     )
     workbox.routing.registerRoute( // content video
       /^http.*(kalpa\.store).+\.mp4$/,
-      ({ url, event, params }) => cacheVideo(event)
+      ({ url, event, params }) => {
+        logDebug('workbox.routing.registerRoute video', event)
+        return cacheVideo(event)
+      }
     )
     // workbox.routing.registerRoute(// graphql
     //   /^http.*\/graphql\/?$/,

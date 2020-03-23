@@ -7,6 +7,7 @@ module.exports = function (ctx) {
   return {
     preFetch: true,
     boot: [
+      'cache',
       'notify',
       'log',
       'i18n',

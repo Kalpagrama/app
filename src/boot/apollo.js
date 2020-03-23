@@ -13,6 +13,7 @@ import possibleTypes from 'src/statics/scripts/possibleTypes.json'
 import assert from 'assert'
 
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { cache } from 'src/boot/cache'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
@@ -26,7 +27,6 @@ export default async ({ Vue, store, app }) => {
   logD('process.env2=', process.env)
   logD('SERVICES_URL2=', SERVICES_URL)
   store.commit('auth/stateSet', ['SERVICES_URL', SERVICES_URL])
-
   const errLink = onError(({ operation, response, graphQLErrors, networkError }) => {
     if (graphQLErrors) {
       for (let err of graphQLErrors) {
@@ -84,9 +84,18 @@ export default async ({ Vue, store, app }) => {
     cache
   })
 
-  let { data: { services } } = await servicesApollo.query({
-    query: gql`query services {services}`
-  })
+  const fetchItemFunc = async () => {
+    let { data: { services } } = await servicesApollo.query({
+      query: gql`query services {services}`
+    })
+    return {
+      item: services,
+      actualAge: 'zero'
+    }
+  }
+  let services = await store.dispatch('cache/get', { key: 'services', fetchItemFunc }, { root: true })
+  // logD('objects/get action complete', oid)
+
   logD('services', services)
   let linkAuth = services.AUTH
   let linkApi = services.API

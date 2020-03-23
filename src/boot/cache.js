@@ -9,11 +9,11 @@ import {
   Store
 } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
 const logI = getLogFunc(LogLevelEnum.INFO, LogModulesEnum.VUEX)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
+
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // долговременное(между запусками) хранилище объектов
@@ -44,9 +44,9 @@ class CachePersist {
 }
 
 class QueueUpdate {
-  constructor (context, cache) {
-    assert(context && cache)
-    this.context = context
+  constructor (store, cache) {
+    assert(store && cache)
+    this.store = store
     this.cache = cache
     this.queries = []
     this.inProgress = false
@@ -99,24 +99,24 @@ class QueueUpdate {
 
   async update (key, path, updateItemFunc, fetchItemFunc, mergeItemFunc) {
     assert(updateItemFunc && fetchItemFunc && mergeItemFunc)
-    assert(this.context.state.cachedItems[key], 'изменяемый объект обязан быть в кэше')
+    assert(this.store.state.cache.cachedItems[key], 'изменяемый объект обязан быть в кэше')
     try {
-      logD('try send query to server', this.context.state.cachedItems[key].revision)
-      let { item: dbItem, actualAge } = await updateItemFunc(this.context.state.cachedItems[key])
-      this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
-      await this.cache.set(key, this.context.state.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
+      logD('try send query to server', this.store.state.cache.cachedItems[key].revision)
+      let { item: dbItem, actualAge } = await updateItemFunc(this.store.state.cache.cachedItems[key])
+      this.store.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
+      await this.cache.set(key, this.store.state.cache.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
     } catch (err) {
       if (err.message.includes('VERSION_CONFLICT')) {
         logI('VERSION_CONFLICT. try merge with server data. try get server version...')
         let { item: serverItem } = await fetchItemFunc()
         logD('serverItem', serverItem)
         // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
-        let mergedItem = mergeItemFunc(path, serverItem, this.context.state.cachedItems[key])
+        let mergedItem = mergeItemFunc(path, serverItem, this.store.state.cache.cachedItems[key])
         logD('merge OK!', mergedItem)
         // еще раз попробуем обновить
         let { item: dbItem, actualAge } = await updateItemFunc(mergedItem)
-        this.context.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
-        await this.cache.set(key, this.context.state.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
+        this.store.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
+        await this.cache.set(key, this.store.state.cache.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
         logD('VERSION_CONFLICT resolved!', mergedItem)
       } else {
         logE('cant update item on server', err)
@@ -128,12 +128,12 @@ class QueueUpdate {
 
 // в cacheLru хранятся только ключи. сами данные - во vuex и CachePersist
 class Cache {
-  constructor (context) {
-    this.queue = new QueueUpdate(context, this)
+  constructor (store) {
+    this.queue = new QueueUpdate(store, this)
     this.defaultActualAge = 1000 * 60 * 60 // 1 hour by default
     // TODO увеличить до 50 МБ после тестирования
     this.defaultCacheSize = 1 * 1024 * 1024 // 1Mb
-    this.context = context
+    this.store = store
     this.cachePersist = new CachePersist()
     // используется для контроля места
     this.cacheLru = new LruCache({
@@ -145,10 +145,10 @@ class Cache {
       noDisposeOnSet: true,
       dispose: async (key, { actualUntil, actualAge }) => {
         assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-        if (['authInfo', this.context.rootState.auth.userOid].includes(key)) {
+        if (['authInfo', this.store.state.auth.userOid].includes(key)) {
           // кладем обратно! юзера нельзя удалять и authInfo должна жить вечно
           setTimeout(() => {
-            let item = this.context.state.cachedItems[key] // данные лежат во vuex
+            let item = this.store.state.cache.cachedItems[key] // данные лежат во vuex
             assert(item)
             this.cacheLru.set(key, { actualUntil, actualAge })
           }, 0)
@@ -156,7 +156,7 @@ class Cache {
           await this.cachePersist.remove(key)
           // В общем случае - мы не знаем - ссылается ли что-то в приложении на этот объект во вьюикс
           // поэтому при удалении элемента у кого то в приложении могут остаться копии(перестанут быть реактивными)
-          this.context.commit('removeItem', key)
+          this.store.commit('cache/removeItem', key, {root: true})
         }
       }
     })
@@ -180,7 +180,7 @@ class Cache {
       let { key, item, actualUntil, actualAge, lastTouchDate } = idbItem
       assert(key && item && actualUntil)
       this.cacheLru.set(key, { actualUntil, actualAge })
-      this.context.commit('setItem', { key, item })
+      this.store.commit('cache/setItem', { key, item }, {root: true})
     }
   }
 
@@ -188,7 +188,7 @@ class Cache {
     logD('clear cache')
     await this.cachePersist.clear()
     this.cacheLru.reset()
-    this.context.commit('clear')
+    this.store.commit('cache/clear', {root: true})
     logD('cache clear OK!')
   }
 
@@ -245,13 +245,13 @@ class Cache {
     let actualUntil = Date.now() + actualAge
     this.cacheLru.set(key, { actualUntil, actualAge })
     await this.cachePersist.setItem(key, { item, actualUntil, actualAge, lastTouchDate: Date.now() })
-    this.context.commit('setItem', { key, item })
-    return this.context.rootState.cache.cachedItems[key]
+    this.store.commit('cache/setItem', { key, item }, {root: true})
+    return this.store.state.cache.cachedItems[key]
   }
 
   // fetchItemFunc - ф-я которая запросит сущность с бэкенда
   async get (key, fetchItemFunc, force) {
-    assert(key && fetchItemFunc)
+    assert(key && fetchItemFunc, 'key && fetchFunc')
     let result
     let cachedData = this.cacheLru.get(key)
     let { actualUntil, actualAge } = cachedData ? cachedData : {}
@@ -259,7 +259,10 @@ class Cache {
       if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {
         logD('запрашиваем данные с сервера...')
-        let { item, actualAge } = await fetchItemFunc()
+        let fetchRes = await fetchItemFunc()
+        assert('item' in fetchRes, 'item not in fetchRes!')
+        assert('actualAge' in fetchRes, 'actualAge not in fetchRes!')
+        let { item, actualAge } = fetchRes
         logD('данные извлечены!')
         if (item) {
           assert(actualAge, `item && actualAge ${actualAge} ${item} `)
@@ -275,21 +278,21 @@ class Cache {
           await this.set(key, { failReason: err }, 'year') // таких данных на сервере нет. Нечего больше их запрашивать
         } else if (err === 'fetchError') {
           logD('an error occurred while getting the object', err)
-          let item = this.context.state.cachedItems[key] || { failReason: err }
+          let item = this.store.state.cache.cachedItems[key] || { failReason: err }
           await this.set(key, item, 'minute')// ошибка при извлечении. Через минуту можно еще попробовать
         } else if (err === 'deleted') {
           logD('object was deleted', err)
           await this.set(key, { failReason: err }, 'year')// данные удалены. Нечего больше запрашивать
         } else {
           logE('неизвестная ошибка при попытке запросить данные!', err)
-          let item = this.context.state.cachedItems[key] || { failReason: 'unknownError: ' + err.message }
+          let item = this.store.state.cache.cachedItems[key] || { failReason: 'unknownError: ' + err.message }
           // TODO поставить 'minute'
           await this.set(key, item, 'zero')// ошибка при извлечении. Через минуту можно еще попробовать
         }
-        result = this.context.state.cachedItems[key] // пробуем вернуть хоть что-то (подходит для оффлайн режима)
+        result = this.store.state.cache.cachedItems[key] // пробуем вернуть хоть что-то (подходит для оффлайн режима)
       }
     } else {
-      let item = this.context.state.cachedItems[key] // данные лежат во vuex и они актуальны
+      let item = this.store.state.cache.cachedItems[key] // данные лежат во vuex и они актуальны
       assert(item)
       // обновим lastTouchDate в фоне
       this.cachePersist.setItem(key, { item, actualUntil, actualAge, lastTouchDate: Date.now() })
@@ -297,7 +300,7 @@ class Cache {
       result = item
     }
     if (!result) return null // см "queued object was evicted legally"
-    if ('failReason' in result) throw new Error('cant fetch item: ' + result.failReason)
+    if (typeof result === 'object' && 'failReason' in result) throw new Error('cant fetch item: ' + result.failReason)
     return result
   }
 
@@ -378,7 +381,7 @@ class Cache {
     //   return updatedItem
     // }
 
-    let vuexItem = this.context.state.cachedItems[key]
+    let vuexItem = this.store.state.cache.cachedItems[key]
     if (!vuexItem) {
       logD('item not found in cache (may be deleted on cache overflow)')
       if (!path) {
@@ -392,8 +395,8 @@ class Cache {
       }
     }
     assert(vuexItem, '!vuexItem')
-    this.context.commit('cache/updateItem', { key, path, newValue, setter }, { root: true }) // изменяем во вьюикс
-    assert(vuexItem === this.context.state.cachedItems[key], 'vuexItem === this.context.state.cachedItems[key]')
+    this.store.commit('cache/updateItem', { key, path, newValue, setter }, { root: true }) // изменяем во вьюикс
+    assert(vuexItem === this.store.state.cache.cachedItems[key], 'vuexItem === this.store.state.cache.cachedItems[key]')
     vuexItem = await this.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
     if (updateItemFunc) {
       assert(vuexItem, '!vuexItem')
@@ -408,9 +411,19 @@ class Cache {
   }
 
   async expire (key) {
-    let item = this.context.state.cachedItems[key]
+    let item = this.store.state.cache.cachedItems[key]
     if (item) return await this.set(key, item, 'zero')
   }
 }
 
-export { Cache }
+let cache
+export default async ({ Vue, store, router: VueRouter }) => {
+  try {
+    cache = new Cache(store)
+    await store.dispatch('cache/init', cache, {root: true})
+  } catch (err) {
+    logE(err)
+  }
+}
+
+export { cache }

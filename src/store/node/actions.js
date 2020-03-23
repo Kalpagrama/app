@@ -9,24 +9,32 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 
 export const init = async (context) => {
   logD('node/init')
-  if (context.state.initialized) return
-  let { data: { categories } } = await apollo.clients.api.query({
-    query: gql`
-      query categories {
-        categories {
-          type
-          name
-          alias
-          icon
-          sphere {
-            oid
+
+  const fetchItemFunc = async () => {
+    let { data: { categories } } = await apollo.clients.api.query({
+      query: gql`
+        query categories {
+          categories {
             type
             name
-            thumbUrl(preferWidth: 600)
+            alias
+            icon
+            sphere {
+              oid
+              type
+              name
+              thumbUrl(preferWidth: 600)
+            }
           }
-        }
-      }`
-  })
+        }`
+    })
+    return {
+      item: categories,
+      actualAge: 'day'
+    }
+  }
+  let categories = await context.dispatch('cache/get', { key: 'categories', fetchItemFunc }, { root: true })
+  if (context.state.initialized) return
   context.commit('init', categories)
   logD('node/init done')
   return categories

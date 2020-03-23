@@ -61,6 +61,7 @@ export const inviteUrl = async (context) => {
   logD('@invite done')
   return inviteUrl
 }
+// если токен не указан - выйдет из всех сессий
 export const logout = async (context, token) => {
   logD('@logout start')
   try {
@@ -82,6 +83,7 @@ export const logout = async (context, token) => {
     if (!token || token === localStorage.getItem('ktoken')) {
       localStorage.removeItem('ktoken')
       localStorage.removeItem('ktokenExpires')
+      await clearCache()
       await checkUpdate()
       await router.push('/auth')
       await update()
@@ -124,6 +126,7 @@ export const userIdentify = async (context, userLogin) => {
       login: userLogin
     }
   })
+  await clearCache()
   localStorage.setItem('ktoken', token)
   localStorage.setItem('ktokenExpires', expires)
   logD('@userIdentify done')
