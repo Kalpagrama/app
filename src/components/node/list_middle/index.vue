@@ -76,23 +76,23 @@ export default {
     onHeight (e) {
       this.$log('onHeight', e)
       this.paddingBottom = this.$refs.nodeListMiddleScroll.clientHeight / 2
-      let nodeFirstRef = this.$refs[`node-${this.nodes[0].oid}`][0]
-      this.$log('OH nodeFirstRef', nodeFirstRef)
-      let nodeFirstOffsetTop = nodeFirstRef.$el.offsetTop
-      this.$log('OH nodeFirstOffsetTop', nodeFirstOffsetTop)
-      let nodeFirstClientHeight = e
-      this.$log('OH nodeFirstClientHeight', nodeFirstClientHeight)
-      let d = (this.$refs.nodeListMiddleScroll.clientHeight - nodeFirstClientHeight) / 2
-      this.$log('OH d', d)
-      if (nodeFirstOffsetTop < d) {
-        this.$log('OH nodeFirstOffsetTop < d')
-        this.paddingTop = d
-      }
-      else {
-        this.$log('OH nodeFirstOffsetTop > d')
-        // this.paddingTop = nodeFirstOffsetTop - d
-      }
-      this.$log('OH', this.paddingTop)
+      // let nodeFirstRef = this.$refs[`node-${this.nodes[0].oid}`][0]
+      // this.$log('OH nodeFirstRef', nodeFirstRef)
+      // let nodeFirstOffsetTop = nodeFirstRef.$el.offsetTop
+      // this.$log('OH nodeFirstOffsetTop', nodeFirstOffsetTop)
+      // let nodeFirstClientHeight = e
+      // this.$log('OH nodeFirstClientHeight', nodeFirstClientHeight)
+      // let d = (this.$refs.nodeListMiddleScroll.clientHeight - nodeFirstClientHeight) / 2
+      // this.$log('OH d', d)
+      // if (nodeFirstOffsetTop < d) {
+      //   this.$log('OH nodeFirstOffsetTop < d')
+      //   this.paddingTop = d
+      // }
+      // else {
+      //   this.$log('OH nodeFirstOffsetTop > d')
+      //   // this.paddingTop = nodeFirstOffsetTop - d
+      // }
+      // this.$log('OH', this.paddingTop)
     },
     onSwipe (e, i) {
       this.$log('onSwipe', e)
