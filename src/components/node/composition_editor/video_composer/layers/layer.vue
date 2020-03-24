@@ -8,7 +8,7 @@ div(
   ).row.full-width.items-start.content-start.bg-grey-9
   //- default header
   div(:style=`{height: '36px'}`).row.full-width.items-center.content-center
-    span(v-if="layerName").text-white.cursor-pointer.q-ml-md {{ layerName || 'Set layer name' }}
+    span(v-if="true").text-white.cursor-pointer.q-ml-md {{ layerName || 'Set layer name' }}
       q-menu(ref="layerMenu" max-width="200px" anchor="center right" self="center left")
         layer-menu(
           :layer="layer" :index="index"

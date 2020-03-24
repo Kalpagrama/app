@@ -44,15 +44,21 @@ q-layout(
       :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
       template(v-slot:header)
         user-info(v-if="user" :user="user" :page="page" @page="page = $event")
-      //- user-voted-nodes(
-      //-   v-if="page === 'voted'"
-      //-   :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
-      //- user-following(
-      //-   v-if="page === 'following'"
-      //-   :subscriptions="user.subscriptions" :oid="user.oid")
-      //- user-followers(
-      //-   v-if="page === 'followers'"
-      //-   :subscribers="user.subscribers" :oid="user.oid")
+    user-voted-nodes(
+      v-if="page === 'voted'"
+      :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
+      template(v-slot:header)
+        user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+    user-following(
+      v-if="page === 'following'"
+      :subscriptions="user.subscriptions" :oid="user.oid")
+      template(v-slot:header)
+        user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+    user-followers(
+      v-if="page === 'followers'"
+      :subscribers="user.subscribers" :oid="user.oid")
+      template(v-slot:header)
+        user-info(v-if="user" :user="user" :page="page" @page="page = $event")
 </template>
 
 <script>

@@ -4,9 +4,9 @@
     div(:style=`{color: 'white', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center
       span.full-width scrollTop: {{ scrollTop }}
       span.full-width nodeFirstHeight: {{nodeFirstHeight}}
+  //- v-touch-swipe.mouse.vertical="onSwipe"
   div(
     ref="nodeListMiddleScroll"
-    v-touch-swipe.mouse.vertical="onSwipe"
     ).col.full-width.scroll
     .row.full-width.justify-center
       slot(name="header")
@@ -70,29 +70,29 @@ export default {
         else index = parseInt(entry.target.accessKey)
         this.nodeMiddle = index
         // help to swipe to node
-        if (index > 0 && !this.$q.screen.xs) this.onSwipe(null, index)
+        // if (index > 0 && !this.$q.screen.xs) this.onSwipe(null, index)
       }
     },
     onHeight (e) {
       this.$log('onHeight', e)
       this.paddingBottom = this.$refs.nodeListMiddleScroll.clientHeight / 2
-      let nodeFirstRef = this.$refs[`node-${this.nodes[0].oid}`][0]
-      this.$log('OH nodeFirstRef', nodeFirstRef)
-      let nodeFirstOffsetTop = nodeFirstRef.$el.offsetTop
-      this.$log('OH nodeFirstOffsetTop', nodeFirstOffsetTop)
-      let nodeFirstClientHeight = e
-      this.$log('OH nodeFirstClientHeight', nodeFirstClientHeight)
-      let d = (this.$refs.nodeListMiddleScroll.clientHeight - nodeFirstClientHeight) / 2
-      this.$log('OH d', d)
-      if (nodeFirstOffsetTop < d) {
-        this.$log('OH nodeFirstOffsetTop < d')
-        this.paddingTop = d
-      }
-      else {
-        this.$log('OH nodeFirstOffsetTop > d')
-        // this.paddingTop = nodeFirstOffsetTop - d
-      }
-      this.$log('OH', this.paddingTop)
+      // let nodeFirstRef = this.$refs[`node-${this.nodes[0].oid}`][0]
+      // this.$log('OH nodeFirstRef', nodeFirstRef)
+      // let nodeFirstOffsetTop = nodeFirstRef.$el.offsetTop
+      // this.$log('OH nodeFirstOffsetTop', nodeFirstOffsetTop)
+      // let nodeFirstClientHeight = e
+      // this.$log('OH nodeFirstClientHeight', nodeFirstClientHeight)
+      // let d = (this.$refs.nodeListMiddleScroll.clientHeight - nodeFirstClientHeight) / 2
+      // this.$log('OH d', d)
+      // if (nodeFirstOffsetTop < d) {
+      //   this.$log('OH nodeFirstOffsetTop < d')
+      //   this.paddingTop = d
+      // }
+      // else {
+      //   this.$log('OH nodeFirstOffsetTop > d')
+      //   // this.paddingTop = nodeFirstOffsetTop - d
+      // }
+      // this.$log('OH', this.paddingTop)
     },
     onSwipe (e, i) {
       this.$log('onSwipe', e)

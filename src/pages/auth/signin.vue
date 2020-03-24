@@ -117,7 +117,7 @@ export default {
           this.reset()
         }
         else {
-          this.$router.push('/')
+          this.$router.replace('/')
         }
       }
       catch (e) {

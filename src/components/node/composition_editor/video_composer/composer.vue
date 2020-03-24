@@ -68,16 +68,17 @@ div
     div(
       v-if="$q.screen.width > 800 && tintShow"
       :style=`{position: 'absolute', zIndex: 910, top: '-155px', height: '155px', background: 'rgba(0,0,0,0.9)'}`).row.full-width
-    player-video-progress(
-      :player="player" :meta="meta"
-      @meta="$parent.$emit('meta', $event)"
-      :style=`{position: 'absolute', zIndex: 920, top: '-90px'}`)
+    //- player-video-progress(
+    //-   :player="player" :meta="meta"
+    //-   @meta="$parent.$emit('meta', $event)"
+    //-   :style=`{position: 'absolute', zIndex: 920, bottom: styles.paddingBottom-70+'px'}`)
     layer-editor(
+      v-if="true"
       :layer="layer" :layerIndex="meta.layerIndexPlay" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd" @meta="$parent.$emit('meta', $event)"
       :style=`{maxHeight: '70px'}`)
     div(
       v-if="meta.layerIndexPlay >= 0"
-      :style=`{height: '170px'}`).row.full-width.justify-center
+      :style=`{height: '160px'}`).row.full-width.justify-center.q-mb-sm
       div(:style=`{maxWidth: '500px'}`).row.full-width.justify-center
         q-btn(flat dense color="white" icon="keyboard_arrow_left" @click="layerNext(0)"
           :style=`{width: '30px', height: '100%', borderRadius: '10px', overflow: 'hidden'}`).q-mr-xs

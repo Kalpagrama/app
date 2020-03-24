@@ -59,7 +59,9 @@
       //-   small(v-for="(l,li) in layers" :key="li").full-width.text-white.q-ml-md {{l.spheres.length > 0 ? l.spheres[0].name : li}}
       //- .row.full-width.q-pa-xs
       //-   small.text-white {{ meta }}
-      draggable(v-model="layers" handle=".layerdragger" @start="layerMoveStart" @end="layerMoved").full-width
+      draggable(
+        v-model="layers" handle=".layerdragger" :sort="true"
+        @start="layerMoveStart" @move="layerMoveCheck" @end="layerMoved").full-width
         //- transition-group
         div(
           v-for="(l, li) in layers" :key="li"
@@ -175,6 +177,9 @@ export default {
       // this.$emit('meta', ['mode', 'play'])
       // this.$emit('meta', ['layerIndex', 0])
       // this.$emit('meta', ['layerIndexPlay', -1])
+    },
+    layerMoveCheck (e) {
+      this.$log('layerMoveCheck', e)
     },
     layerMoved (e) {
       this.$log('layerMoved', e)

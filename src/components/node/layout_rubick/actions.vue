@@ -28,15 +28,17 @@
         span(:style=`{fontSize: '18px'}`).text-white.text-bold.text-center {{ voteHuman(nodeFull.rate) }}
         span.text-white.text-center.q-mt-xs /{{ voteHuman(nodeFull.rateUser) }}
       //- user name
-      div(
-        @click="$router.push('/user/' + nodeFull.author.oid)").col.full-height
+      router-link(
+        :to="'/user/'+nodeFull.author.oid"
+        ).col.full-height
         .row.fit.items-center.justify-end.cursor-pointer
           span(:style=`{userSelect: 'none'}`).text-white {{ nodeFull.author.name | cut(40) }}
       //- user avatar
-      div(
-        @click="$router.push('/user/' + nodeFull.author.oid)"
-        :style=`{height: '60px', width: '75px'}`).row.items-center.justify-center.cursor-pointer
-        kalpa-avatar(:url="nodeFull.author.thumbUrl")
+      router-link(
+        :to="'/user/'+nodeFull.author.oid"
+        :style=`{height: '60px', width: '75px'}`
+        ).row.items-center.justify-center.cursor-pointer
+        kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="45" :height="45")
 </template>
 
 <script>
