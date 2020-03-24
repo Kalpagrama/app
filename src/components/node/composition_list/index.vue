@@ -11,7 +11,7 @@ div(
   small(
     v-if="false"
     :style=`{position: 'absolute', zIndex: 4000, top: '4px', right: 'calc(50% - 20px)', borderRadius: '10px', background: 'rgba(0,0,0,0.3)',
-      userSelect: 'none'}`
+      userSelect: 'none', transform: 'translate3d(0,0,0)'}`
     ).text-white.q-pa-xs {{ index + 1 }}/{{ compositions.length }}
   //- preview
   img(
@@ -27,6 +27,7 @@ div(
     :style=`{
       position: 'absolute', bottom: 0, ...compositionRightLeft(ckey), borderRadius: '10px', overflow: 'hidden',
       zIndex: ckey === 'current' ? 200 : 300,
+      transform: ckey === 'current' ? 'none' : 'translate3d(0,0,0)',
       opacity: rubickStyles[ckey].opacity,
       maxWidth: rubickStyles[ckey].maxWidth+'%',
       maxHeight: rubickStyles[ckey].maxHeight+'px',
@@ -44,7 +45,7 @@ div(
   //- preview list
   div(
     v-if="true && ctx === 'rubick' && compositions.length > 1"
-    :style=`{position: 'absolute', top: '8px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-px-sm
+    :style=`{position: 'absolute', top: '8px', zIndex: 400, pointerEvents: 'none', opacity: 0.8, transform: 'translate3d(0,0,0)'}`).row.full-width.scroll.q-px-sm
     div(
       v-for="(c,ci) in compositions" :key="ci"
       :style=`{height: '4px'}`
@@ -56,7 +57,7 @@ div(
   //- preview compositions
   div(
     v-if="true && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '40px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
+    :style=`{position: 'absolute', top: '40px', zIndex: 400, pointerEvents: 'none', opacity: 0.8, transform: 'translate3d(0,0,0)'}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"
@@ -72,7 +73,7 @@ div(
   //- preview nodes
   div(
     v-if="true && ctx === 'rubick'"
-    :style=`{position: 'absolute', top: '80px', zIndex: 400, pointerEvents: 'none', opacity: 0.8}`).row.full-width.scroll.q-pa-sm
+    :style=`{position: 'absolute', top: '80px', zIndex: 400, pointerEvents: 'none', opacity: 0.8, transform: 'translate3d(0,0,0)'}`).row.full-width.scroll.q-pa-sm
     .row.full-width.no-wrap
       div(
         v-for="(c, ci) in compositions" :key="ci"

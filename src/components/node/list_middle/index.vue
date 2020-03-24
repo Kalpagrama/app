@@ -4,9 +4,9 @@
     div(:style=`{color: 'white', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center
       span.full-width scrollTop: {{ scrollTop }}
       span.full-width nodeFirstHeight: {{nodeFirstHeight}}
+  //- v-touch-swipe.mouse.vertical="onSwipe"
   div(
     ref="nodeListMiddleScroll"
-    v-touch-swipe.mouse.vertical="onSwipe"
     ).col.full-width.scroll
     .row.full-width.justify-center
       slot(name="header")
@@ -70,7 +70,7 @@ export default {
         else index = parseInt(entry.target.accessKey)
         this.nodeMiddle = index
         // help to swipe to node
-        if (index > 0 && !this.$q.screen.xs) this.onSwipe(null, index)
+        // if (index > 0 && !this.$q.screen.xs) this.onSwipe(null, index)
       }
     },
     onHeight (e) {

@@ -136,7 +136,7 @@ export default {
       compositionOneVisible: true,
       compositionOneActive: true,
       compositionTwoVisible: true,
-      compositionTwoActive: false,
+      compositionTwoActive: true,
       nodeRubickNew: null,
       nodePublishing: false,
       maxWidth: 600,

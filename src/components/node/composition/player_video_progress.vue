@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
   //- pregress wrapper
-  .row.full-width.items-start.content-start.q-px-xl
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-lg
     //- progress bar & time
     div(
       @click="progressClick"
@@ -26,14 +26,25 @@
           div(
             :style=`{
               position: 'absolute',
-              top: -8+pointTop+'px',
+              top: -pointHeight/2+2+'px',
               right: -pointHeight/2+'px',
               height: pointHeight+'px',
               width: pointHeight+'px',
               borderRadius: '50%'
             }`).bg-green
     //- progress actions
-    div(:style=`{height: '60px', order: -1}`).row.full-width.items-center
+    div(:style=`{position: 'relative'}`).row.full-width
+      div(:style=`{position: 'absolute', top: '-10px', zIndex: 100, height: '25px'}`).row.full-width.items-center.content-center
+        small(
+          :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
+          ).text-white.q-px-xs.q-py-xs {{ $time(now) }}
+        .col
+        small(
+              :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
+              ).text-white.q-px-xs.q-py-xs -{{ $time(duration-now) }}
+    div(
+      v-if="false"
+      :style=`{height: '60px', order: -1}`).row.full-width.items-center
       //- play/pause
       div(
         :style=`{minWidth: '60px', height: '60px'}`
@@ -79,7 +90,7 @@
 // TODO hide when playing...
 export default {
   name: 'playerVideoProgress',
-  props: ['player', 'meta'],
+  props: ['ctx', 'player', 'meta', 'start', 'end'],
   data () {
     return {
       height: 20,
@@ -87,29 +98,46 @@ export default {
       progressWrapperLeft: 0,
       progressWrapperWidth: 0,
       progressDelta: 0,
-      pointHeight: 20,
+      pointHeight: 10,
       pointTop: 0
     }
   },
   computed: {
+    duration () {
+      if (this.ctx === 'list') {
+        return this.end - this.start
+      }
+      else {
+        return this.meta.duration
+      }
+    },
+    now () {
+      if (this.ctx === 'list') {
+        return this.meta.now - this.start
+      }
+      else {
+        return this.meta.now
+      }
+    },
     progressPercentWidth () {
       if (this.progressPanning) {
         return this.progressDelta + 'px'
       }
       else {
-        let to = (this.meta.now / this.meta.duration) * 100
-        if (this.pointDelta > 0 && this.progressPercentWidth > 0) {
-          let from = (this.pointDelta / this.progressPercentWidth) * 100
-          if (from === to) {
-            return to + '%'
-          }
-          else {
-            return from + '%'
-          }
-        }
-        else {
-          return to + '%'
-        }
+        let to = (this.now / this.duration) * 100
+        return to + '%'
+        // if (this.pointDelta > 0 && this.progressPercentWidth > 0) {
+        //   let from = (this.pointDelta / this.progressPercentWidth) * 100
+        //   if (from === to) {
+        //     return to + '%'
+        //   }
+        //   else {
+        //     return from + '%'
+        //   }
+        // }
+        // else {
+        //   return to + '%'
+        // }
       }
     }
   },
@@ -118,8 +146,11 @@ export default {
       // this.$log('progressClick', e)
       let w = e.target.clientWidth
       let x = e.offsetX
-      let to = (this.meta.duration * x) / w
-      this.$emit('meta', ['mode', 'watch'])
+      let to = (this.duration * x) / w
+      if (this.ctx === 'list') to += this.start
+      if (this.ctx !== 'list') {
+        this.$emit('meta', ['mode', 'watch'])
+      }
       this.player.setCurrentTime(to)
       this.$emit('meta', ['videoUpdate', to])
     },
@@ -134,15 +165,17 @@ export default {
         // this.$log('rect', rect)
         this.progressWrapperLeft = rect.left
         this.progressWrapperWidth = rect.width
-        this.player.pause()
-        this.$emit('meta', ['mode', 'watch'])
+        if (this.ctx !== 'list') {
+          this.$emit('meta', ['mode', 'watch'])
+        }
         // point style
         this.$tween.to(this, 0.2, {pointHeight: 34, pointTop: -7})
       }
       // get x position
       let x = e.position.left - this.progressWrapperLeft
-      if (x > this.progressWrapperWidth) return
-      let to = (this.meta.duration * x) / this.progressWrapperWidth
+      if (x > this.progressWrapperWidth || x < 0) return
+      let to = (this.duration * x) / this.progressWrapperWidth
+      if (this.ctx === 'list') to += this.start
       this.progressDelta = x
       this.player.setCurrentTime(to)
       // final
@@ -150,7 +183,7 @@ export default {
         this.progressPanning = false
         this.$emit('meta', ['videoUpdate', to])
         // point style
-        this.$tween.to(this, 0.2, {pointHeight: 20, pointTop: 0})
+        this.$tween.to(this, 0.2, {pointHeight: 10, pointTop: 0})
       }
     }
   }

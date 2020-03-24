@@ -68,10 +68,10 @@ div
     div(
       v-if="$q.screen.width > 800 && tintShow"
       :style=`{position: 'absolute', zIndex: 910, top: '-155px', height: '155px', background: 'rgba(0,0,0,0.9)'}`).row.full-width
-    player-video-progress(
-      :player="player" :meta="meta"
-      @meta="$parent.$emit('meta', $event)"
-      :style=`{position: 'absolute', zIndex: 920, bottom: styles.paddingBottom-70+'px'}`)
+    //- player-video-progress(
+    //-   :player="player" :meta="meta"
+    //-   @meta="$parent.$emit('meta', $event)"
+    //-   :style=`{position: 'absolute', zIndex: 920, bottom: styles.paddingBottom-70+'px'}`)
     layer-editor(
       v-if="true"
       :layer="layer" :layerIndex="meta.layerIndexPlay" :layers="layers" :player="player" :meta="meta" :content="content" @add="layerAdd" @meta="$parent.$emit('meta', $event)"

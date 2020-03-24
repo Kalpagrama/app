@@ -14,19 +14,22 @@ iframe {
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).column.fit.items-start.content-start.bg-black
+div(
+  :class=`{'bg-black': videoGood}`
+  :style=`{position: 'relative'}`
+  ).column.fit.items-start.content-start
   //- opacity: videoGood ? 1 : 0
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
   div(
-    v-if="!mini && false"
+    v-if="!mini && $store.state.ui.debug"
     :style=`{
-      position: 'absolute', width: 'calc(100% - 20px)', left: '6px', bottom: '4px',
-      pointerEvents: 'none', userSelect: 'none',
-      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.3}`).row.q-pa-sm.bg-green
+      position: 'absolute', width: 'calc(100% - 20px)', left: '6px', top: '4px',
+      pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
+      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.5}`).row.q-pa-sm.bg-green
     small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
-    small.full-width duration/now: {{duration}}/{{now}}
-    small.full-width mode: {{mode}}
+    small.full-width now/duration: {{now}}/{{duration}}
+    small.full-width ctx/mode: {{ctx}}/{{mode}}
     small.full-width start/end: {{layerStart}}/{{layerEnd}}
     small.full-width layerIndex: {{layerIndex}}
     small.full-width layerIndexPlay: {{layerIndexPlay}}
@@ -42,11 +45,12 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
     //-   ).q-pa-sm {{ layer.spheres[0].name | cut(50) }}
     //- video actions, volume, progress
     q-btn(
+      v-if="true"
       v-show="!mini"
       round flat @click="player.mutedToggle()"
       :color="muted ? 'grey-6' : 'white'"
       :icon="muted ? 'volume_off' : 'volume_up'"
-      :style=`{position: 'absolute', zIndex: 20000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)'}`)
+      :style=`{position: 'absolute', zIndex: 20000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)', transform: 'translate3d(0,0,0)'}`)
     //- video forward
     div(
       v-on:dblclick="videoForward(0)" @click="forwarding === 'left' ? videoForward(0) : videoClick()"
@@ -75,30 +79,55 @@ div(:style=`{position: 'relative', opacity: ctx === 'list' ? videoGood ? 1 : 0 :
         span(
           v-show="forwarding === 'right'"
           :style=`{userSelect: 'none', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).text-white.q-pa-sm {{ $time(forwardingCount) }}
-    div(:style=`{position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)'}`).row.full-width
+    //- video wrapper
+    div(:style=`{position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)',
+      opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).row.full-width
       //- preload="auto"
       video(
         ref="kalpaVideo"
         :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
-        playsinline :loop="true" :autoplay="true" :muted="mutedComputed" :controls="false"
+        playsinline :loop="true" :autoplay="autoplay" :muted="mutedComputed" :controls="false"
         @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         @timeupdate="videoUpdate"
         :style=`{
-          transformStyle: videoGood ? 'preserve-3d !important' : 'none',
-          position: 'relative', width: '100%', height: '100%', objectFit: 'contain', zIndex: -1
+          position: 'relative', width: '100%', height: '100%', objectFit: 'contain'
         }`)
-    //- player-video-progress(
-    //-   v-show="true"
-    //-   :now="now" :duration="duration" :player="player"
-    //-   :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause"
-    //-   :meta="meta" @meta="onMeta"
-    //-   :style=`{position: 'absolute', bottom: '190px', left: '0px', zIndex: 20000}`)
-  slot(name="editor" :meta="meta" :player="player" :videoUpdate="videoUpdate" :videoPlayPause="videoPlayPause")
+    //- video tools
+    //- progress
+    player-video-progress(
+      :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
+      :start="layerStart || 0" :end="layerEnd || duration"
+      :style=`{position: 'absolute', bottom: '10px', left: '0px', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
+    //- red
+    //- div(:style=`{position: 'absolute', right: '0px', top: '50px', width: '50px', height: '50px'}`).row.bg-red
+  slot(name="editor" :meta="meta" :player="player")
 </template>
 
 <script>
 import {throttle} from 'quasar'
 import playerVideoProgress from './player_video_progress'
+
+const sendTouchEvent = (x, y, element, eventType) => {
+  const touchObj = new Touch({
+    identifier: Date.now(),
+    target: element,
+    clientX: x,
+    clientY: y,
+    radiusX: 2.5,
+    radiusY: 2.5,
+    rotationAngle: 10,
+    force: 0.5,
+  })
+  const touchEvent = new TouchEvent(eventType, {
+    cancelable: true,
+    bubbles: true,
+    touches: [touchObj],
+    targetTouches: [],
+    changedTouches: [touchObj],
+    shiftKey: true,
+  })
+  element.dispatchEvent(touchEvent)
+}
 
 export default {
   name: 'playerVideo',
@@ -111,7 +140,8 @@ export default {
       duration: 0,
       player: null,
       playing: false,
-      muted: false,
+      muted: true,
+      autoplay: true,
       fullscreen: false,
       intervalUpdate: null,
       intervalMove: null,
@@ -231,6 +261,28 @@ export default {
     }
   },
   watch: {
+    // videoGood: {
+    //   async handler (to, from) {
+    //     this.$log('videoGood CHANGED', to)
+    //     this.actionsShow = false
+    //     await this.$wait(500)
+    //     this.actionsShow = true
+    //     // this.player.mutedToggle()
+    //     // this.$q.notify('videoGood CHANGED: ' + to)
+    //     // this.$refs.kalpaVideo.click()
+    //     // this.player.play()
+    //     // let r = this.$refs.kalpaVideo
+    //     // sendTouchEvent(150, 150, r, 'touchstart')
+    //     // sendTouchEvent(220, 200, r, 'touchmove')
+    //     // sendTouchEvent(220, 200, r, 'touchend')
+    //     // sendTouchEvent()
+    //     // this.$refs.kalpaVideo.click()
+    //     // this.autoplay = false
+    //     // var evt = document.createEvent('MouseEvents')
+    //     // evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+    //     // r.dispatchEvent(evt)
+    //   }
+    // },
     contentSource: {
       immediate: false,
       handler (to, from) {
@@ -314,6 +366,7 @@ export default {
           }
         }
         if (to < this.layerStart) {
+          // this.$q.notify('to < this.layerStart' + this.layerStart)
           this.player.setCurrentTime(this.layerStart)
         }
       }
@@ -382,7 +435,14 @@ export default {
     },
     videoPlayPause () {
       this.$log('videoPlayPause')
-      if (this.playing) this.player.pause()
+      if (this.playing) {
+        if (this.muted) {
+          this.player.mutedToggle()
+        }
+        else {
+          this.player.pause()
+        }
+      }
       else this.player.play()
     },
     videoSeeked () {
