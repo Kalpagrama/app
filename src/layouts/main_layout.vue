@@ -23,17 +23,18 @@ q-layout( view="hHh Lpr lff")
     content-class="bg-grey-8")
     kalpa-menu-desktop(v-if="!loading" :style=`{zIndex: 10000}`)
   q-dialog(
-    v-model="drawerShowMobile" position="bottom")
-    kalpa-menu-xs(@close="drawerShowMobile = false")
-  div(
-    v-if="$route.name !== 'welcome'"
-    :style=`{position: 'fixed', zIndex: 1000, right: '0px', bottom: '0px',
-      width: $q.screen.width/4+'px', height: $q.screen.width/4+'px'}`).row.items-center.content-center.justify-center.xs
-    q-btn(
-      round flat size="lg" @click="drawerShow = !drawerShow, drawerShowMobile = !drawerShowMobile"
-      :color="drawerShowMobile ? 'red' : 'green'"
-      :icon="drawerShowMobile ? 'clear' : 'menu'"
-      :style=`{background: drawerShowMobile ? 'none' : 'rgba(0,0,0,0.3)'}`)
+    :value="$store.state.ui.menuAppShow" @hide="$store.commit('ui/stateSet', ['menuAppShow', false])" position="bottom")
+    kalpa-menu-xs
+  //- div(:style=`{position: 'fixed', top: '50%', width: '200px', right: ''}`)
+  //- div(
+  //-   v-if="$route.name !== 'welcome'"
+  //-   :style=`{position: 'fixed', zIndex: 1000, right: '0px', bottom: '0px',
+  //-     width: $q.screen.width/4+'px', height: $q.screen.width/4+'px'}`).row.items-center.content-center.justify-center.xs
+  //-   q-btn(
+  //-     round flat size="lg" @click="drawerShow = !drawerShow, drawerShowMobile = !drawerShowMobile"
+  //-     :color="drawerShowMobile ? 'red' : 'green'"
+  //-     :icon="drawerShowMobile ? 'clear' : 'menu'"
+  //-     :style=`{background: drawerShowMobile ? 'none' : 'rgba(0,0,0,0.3)'}`)
   q-page-container
     q-page
       router-view(v-if="!loading")

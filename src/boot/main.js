@@ -104,7 +104,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kalpaTutorial', () => import('components/kalpa/tutorial'))
     Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))
     // ws
-    Vue.component('wsMenu', () => import('components/workspace/ws_menu'))
+    Vue.component('wsItems', () => import('components/workspace/ws_items'))
     // Vue.component('noteEditor', () => import('components/'))
     // composition
     Vue.component('composition', () => import('components/node/composition'))

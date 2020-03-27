@@ -2,7 +2,7 @@
 div(
   :style=`{position: 'relative', zIndex: 200,
   height: ($q.screen.width/4)*2+'px',
-  borderRadius: '30px 30px 0 0'}`
+  borderRadius: '30px'}`
   ).row.full-width.bg-grey-8
   //- home
   div(

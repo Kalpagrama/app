@@ -7,7 +7,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
       div(
         v-if="sphere"
         :style=`{
-          height: '60px',
+          height: '60px', background: 'rgba(33,33,33, 0.8)',
           maxWidth: $store.state.ui.maxWidthPage+'px'
         }`
         ).row.full-width.items-center.content-center
@@ -33,7 +33,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
         //-         v-for="(s,si) in 100" :key="si"
         //-         :style=`{borderRadius: '10px', whiteSpace: 'nowrap'}`).text-white.q-pa-sm.q-mr-sm.q-mb-sm.bg-grey-7 #sphere-{{si}}
   q-page-conainter
-    q-page
+    q-page.q-pt-xl
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
         template(v-slot:items=`{items}`)
           node-list(:nodes="items")

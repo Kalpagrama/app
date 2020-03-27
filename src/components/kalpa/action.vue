@@ -17,7 +17,7 @@ q-dialog(
         v-for="(a, akey) in options.actions" :key="akey" @click="action(akey)"
         v-if="akey !== 'confirm'"
         :style=`{height: '55px'}`
-        ).row.full-width.items-center.justify-center.cursor-pointer.hr.q-px-sm
+        ).row.full-width.items-center.justify-center.cursor-pointer.q-px-sm
         span.text-center.text-white {{ a.name }}
     //- footer
       //- //- confirm

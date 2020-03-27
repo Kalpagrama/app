@@ -1,11 +1,10 @@
 <template lang="pug">
-div(:style=`{height: height || '120px'}`).row.full-width
+div(:style=`{height: height || '120px'}`
+  ).row.full-width.items-start.content-start.justify-start
   router-link(
-    v-for="(s,si) in spheres" :key="s.oid"
-    :to="'/sphere/'+s.oid"
-    :style=`{}`
-    ).q-pa-sm
-    span(:style=`{whiteSpace: 'nowrap', borderRadius: '10px'}`).q-pa-sm.text-white.q-mr-sm.q-mb-sm.bg-grey-7 {{ '#'+s.name }}
+    v-for="(s,si) in spheres" :key="s.oid" :to="'/sphere/'+s.oid"
+    :style=`{borderRadius: '10px'}`
+    ).text-white.q-pa-sm.q-mr-sm.q-mb-sm.bg-grey-8 {{ '#'+s.name }}
 </template>
 
 <script>

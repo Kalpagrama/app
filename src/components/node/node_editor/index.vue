@@ -13,7 +13,7 @@
   border-radius: 10px
 </style>
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
   q-dialog(
     v-model="compositionEditorOpened" no-route-dismiss :maximized="true"
     @hide="compositionEdited").bg-grey-10
@@ -72,7 +72,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
     q-page.fit
         //- q-scroll-area.fit
         .row.full-width.items-start.content-start.justify-center
-          div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+          div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-px-sm
             //- composition one
             div(
               :style=`{position: 'relative', zIndex: 200, minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`

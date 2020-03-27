@@ -5,8 +5,7 @@
   .col.full-width.scroll
     kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables" ref="contentNodesLoader")
       template(v-slot:items=`{items}`)
-        node-list(:nodes="items" :style=`{maxWidth: '390px'}`
-          @nodeMiddle="nodeMiddle")
+        node-list(:nodes="items" @nodeMiddle="nodeMiddle")
 </template>
 
 <script>

@@ -1,20 +1,22 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', width: $q.screen.width+'px'}`)
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center.content-center
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')")
-        .col
-          span.text-white.text-bold Composition finder
+        div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')")
+        .col.full-height
+          .row.fit.items-center.content-center.justify-center
+            span.text-white.text-bold Composition finder
+        div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
   q-page-container
     q-page
       .row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
-          ws-menu(
+          ws-items(
             ctx="finder"
-            :header="false" :toggle="false" :oid="oid"
-            :pages="['content', 'composition']"
-            @item="itemClick" @page="pageClick" :page="page")
+            :pages="pages" :page="page" @page="pageClick"
+            @item="itemClick")
 </template>
 
 <script>
@@ -26,9 +28,13 @@ export default {
   data () {
     return {
       oid: undefined,
-      page: 'content',
       node: null,
-      dialogOpened: false
+      dialogOpened: false,
+      page: 'content',
+      pages: [
+        {id: 'content', name: 'Contents'},
+        {id: 'node', name: 'Nodes'}
+      ]
     }
   },
   methods: {

@@ -34,11 +34,17 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', mi
       v-touch-pan.mouse.prevent.vertical="extraPan"
       :style=`{
         position: 'absolute', zIndex: 200, top: '0px',
-        height: extraHeight < $q.screen.height-200 ? '100%' : '60px'
-      }`).row.full-width
-      div(:style=`{height: '60px'}`).row.full-width.items-center
-        kalpa-buttons(:value="tabs" :id="tab" @id="extraHeaderClick(), tab = $event")
-    div(:style=`{paddingTop: '60px'}`).col.full-width
+        height: extraHeight < $q.screen.height-200 ? '100%' : '60px',
+        background: 'rgba(33,33,33, 0.8)'
+      }`).row.full-width.items-start.content-start
+      .row.full-width.items-center.justify-center
+        div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.items-center.content-center
+          .col
+            kalpa-buttons(:value="tabs" :id="tab" @id="extraHeaderClick(), tab = $event")
+          q-btn(
+            round flat color="grey-3" @click="extraSwipe({direction: extraHeight > 100 ? 'down' : 'up'})"
+            :icon="extraHeight > 100 ? 'keyboard_arrow_down' : 'keyboard_arrow_up'").q-mr-sm
+    div().col.full-width
       component(:is="`extra-${tab}`" :mode="mode" :content="content")
 </template>
 
@@ -92,8 +98,11 @@ export default {
       }
     },
     extraSwipe (e) {
-      // this.$log('extraSwipe', e)
+      this.$log('extraSwipe', e)
       if (this.extraPanning) return
+      e.distance = e.distance || {y: 16}
+      if (e.distance.y < 15) return
+      // this.$q.notify('distance.y:' + e.distance.y)
       this.extraSwiping = true
       this.$tween.to(this, 0.3, {extraHeight: e.direction === 'up' ? this.$q.screen.height - 200 : 100})
       this.$wait(300).then(() => {
@@ -103,6 +112,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    document.body.style.backgroundColor = '#222'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
