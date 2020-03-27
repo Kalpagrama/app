@@ -1,16 +1,17 @@
 <template lang="pug">
-div(:style=`{height: '120px'}`).row.full-width
+div(:style=`{height: height || '120px'}`).row.full-width
   router-link(
     v-for="(s,si) in spheres" :key="s.oid"
     :to="'/sphere/'+s.oid"
-    )
-    span(:style=`{borderRadius: '10px'}`).text-white.q-pa-sm.q-mr-sm.q-mb-sm.bg-grey-7 {{ '#'+s.name }}
+    :style=`{}`
+    ).q-pa-sm
+    span(:style=`{whiteSpace: 'nowrap', borderRadius: '10px'}`).q-pa-sm.text-white.q-mr-sm.q-mb-sm.bg-grey-7 {{ '#'+s.name }}
 </template>
 
 <script>
 export default {
   name: 'sphereSpheres',
-  props: ['oid'],
+  props: ['oid', 'height'],
   data () {
     return {
       spheres: []

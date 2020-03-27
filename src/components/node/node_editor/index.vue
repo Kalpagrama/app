@@ -29,6 +29,15 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
       :inDialog="true"
       @composition="compositionFound"
       @cancel="compositionFinderOpened = false").bg-grey-10
+  q-dialog(
+    v-model="categoryDialogOpened" no-route-dismiss)
+    div(:style=`{width: '200px'}`).column
+      .col.full-width.scroll
+        .row.full-width.items-start.content-start
+          div(
+            v-for="(c,ci) in categories" :key="ci"
+            :style=`{height: '50px'}`
+            ).row.full-width.items-center.content-center
   q-header(reveal)
     div(
       :style=`{height: '60px', background: 'rgba(33,33,33, 0.8)'}`
@@ -42,7 +51,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
         div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
           q-btn(round flat color="white" icon="more_vert")
   q-footer(
-    v-if="!nodeNameInputFocused"
+    v-if="footerShow"
     reveal)
     div(
       :style=`{height: '60px'}`
@@ -92,7 +101,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
                   v-model="node.name"
                   filled  count color="green" dark
                   autogrow counter :maxlength="250"
-                  @focus="nodeNameInputFocused = true" @blur="nodeNameInputFocused = false"
+                  @focus="footerShow = false" @blur="footerShow = true"
                   :input-style=`{minHeight: '100px'}`
                   :style=`{padding: '0px', margin: '0px', whiteSpace: 'pre-wrap'}`
                   placeholder="Whats the essence?").fit.text-bold.bg-grey-8
@@ -103,6 +112,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
                 span(:style=`{fontSize: '18px'}`).text-green.text-bold #Choose category
             node-spheres-editor(
               v-if="node && node.oid" mode="edit"
+              @focus="footerShow = false" @blur="footerShow = true"
               :node="node" :style=`{maxWidth: $store.state.ui.maxWidhPage+'px', paddingBottom: '300px'}`)
 </template>
 
@@ -127,23 +137,13 @@ export default {
       compositionOneActive: true,
       compositionTwoVisible: true,
       compositionTwoActive: true,
-      nodeNameInputFocused: false
+      footerShow: true
     }
   },
   computed: {
     categories () {
       return this.$store.state.node.categories
     }
-  },
-  watch: {
-    // '$store.state.events.progressCreateNode': {
-    //   handler (to, from) {
-    //     this.$log('progressCreateNode CHANGED', to)
-    //     if (to && to.progress === 100 && to.action === 'CREATE_NODE' && to.oid) {
-    //       this.$router.push('/account').catch(e => e)
-    //     }
-    //   }
-    // }
   },
   methods: {
     categoryHuman (type) {
@@ -196,13 +196,6 @@ export default {
       this.compositionOneActive = false
       this.compositionTwoActive = false
       this.$set(this.node.compositions, index, null)
-    },
-    async nodeSave () {
-      this.$log('nodeSave')
-      this.nodeSaving = true
-      await this.$wait(800)
-      this.nodeSaving = false
-      this.$emit('cancel')
     },
     async nodeDelete (oid) {
       try {

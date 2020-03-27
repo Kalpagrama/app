@@ -22,6 +22,7 @@ div(
       placeholder="Find or add sphere"
       filled dark color="green"
       @keyup.enter="sphereAdd"
+      @focus="$emit('focus')" @blur="$emit('blur')"
       :style=`{}`).fit.bg-grey-8
   //- spheres WS
   div(
