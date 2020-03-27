@@ -55,18 +55,6 @@ export default {
     }
   },
   computed: {
-    actions () {
-      return {
-        save: {
-          name: 'Save composition',
-          payload: {oid: this.value.oid}
-        },
-        content: {
-          name: 'Go to content',
-          payload: {oid: this.value.layers[0].content.oid}
-        }
-      }
-    }
   },
   watch: {
     value: {
@@ -86,16 +74,28 @@ export default {
   methods: {
     async menuToggle () {
       this.$log('menuToggle')
-      const cb = {
-        save: () => {
-          this.$log('save composition')
-        },
-        content: () => {
-          this.$log('go to content')
-          this.$router.push('/content/' + this.value.layers[0].content.oid).catch(e => e)
+      let options = {
+        timeout: 3000,
+        header: this.value.layers[0].content.name,
+        actions: {
+          save: {
+            name: 'Save composition',
+            payload: {oid: this.value.oid},
+            cb: () => {
+              this.$log('save composition')
+            }
+          },
+          content: {
+            name: 'Go to content',
+            payload: {oid: this.value.layers[0].content.oid},
+            cb: () => {
+              this.$log('go to content')
+              this.$router.push('/content/' + this.value.layers[0].content.oid).catch(e => e)
+            }
+          }
         }
       }
-      this.$store.dispatch('ui/action', [{actions: this.actions, timeout: 3000}, key => key ? cb[key]() : false])
+      this.$store.dispatch('ui/action', [options, key => key ? options.actions[key].cb() : false])
     },
     previewLoad () {
       // this.$log('previewLoad')

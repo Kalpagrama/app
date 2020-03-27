@@ -59,7 +59,7 @@ export default {
         case 'workspace':
         case 'settings':
         case 'account': {
-          this.$router.push('/account').catch(e => e)
+          this.$router.push('/' + p.id).catch(e => e)
           break
         }
         case 'logout': {

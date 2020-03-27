@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{paddingRight: '200px'}`).row.full-width.items-start.content-start
+div(:style=`{paddingRight: '100px'}`).row.full-width.items-start.content-start
   //- pregress wrapper
   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-lg
     //- progress bar & time

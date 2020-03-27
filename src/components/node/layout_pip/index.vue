@@ -34,12 +34,12 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   //- name
   div(
     ref="nodeName"
-    :style=`{minHeight: '60px'}`
+    :style=`{height: 'auto'}`
     ).row.full-width
     div(:style=`{width: '60px', minHeight: '60px'}`).row.full-height.items-center.content-center.justify-center
       q-btn(round push color="green" icon="blur_on" :style=`{borderRadius: '50% !important'}`)
-    div(:style=`{minHeight: '60px'}`).col
-      .row.fit.items-center.content-center.q-px-sm
+    div(:style=`{}`).col
+      .row.fit.items-center.content-center.q-pa-sm
         router-link(:to="'/node/'+node.oid")
           span.text-bold.text-grey-3.cursor-pointer {{ node.name }}
     div(:style=`{width: '60px', minHeight: '60px'}`).row.full-height.items-center.content-center.justify-center

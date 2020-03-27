@@ -5,9 +5,9 @@ iframe
 .q-btn
   borderRadius: 10px
 .q-header
-  background: none
+  background: none !important
 .q-footer
-  background: none
+  background: none !important
 </style>
 
 <template lang="pug">

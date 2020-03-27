@@ -4,7 +4,7 @@ import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 
 export const action = async (context, [options, cb]) => {
-  logD('@action start')
+  logD('@action start', options)
   context.commit('stateSet', ['actionOptions', options])
   context.commit('stateSet', ['actionOpened', true])
   let intervalTimeTotal = 0

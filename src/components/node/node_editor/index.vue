@@ -34,14 +34,19 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
       :style=`{height: '60px', background: 'rgba(33,33,33, 0.8)'}`
       ).row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center.content-center
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')")
-        .col
-          span.text-bold.text-white Node editor
-        q-btn(round flat color="white" icon="more_vert")
-  q-footer(reveal)
+        div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')")
+        .col.full-height
+          .row.fit.items-center.content-center.justify-center
+            span.text-bold.text-white Node editor
+        div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+          q-btn(round flat color="white" icon="more_vert")
+  q-footer(
+    v-if="!nodeNameInputFocused"
+    reveal)
     div(
       :style=`{height: '60px'}`
-      ).row.full-width.justify-center.q-px-md
+      ).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0'}`).row.full-width.items-center.content-center.bg-grey-8.q-px-sm
         q-btn(
           v-if="node && node.oid"
@@ -87,6 +92,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
                   v-model="node.name"
                   filled  count color="green" dark
                   autogrow counter :maxlength="250"
+                  @focus="nodeNameInputFocused = true" @blur="nodeNameInputFocused = false"
                   :input-style=`{minHeight: '100px'}`
                   :style=`{padding: '0px', margin: '0px', whiteSpace: 'pre-wrap'}`
                   placeholder="Whats the essence?").fit.text-bold.bg-grey-8
@@ -120,7 +126,8 @@ export default {
       compositionOneVisible: true,
       compositionOneActive: true,
       compositionTwoVisible: true,
-      compositionTwoActive: true
+      compositionTwoActive: true,
+      nodeNameInputFocused: false
     }
   },
   computed: {
