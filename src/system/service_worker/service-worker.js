@@ -1,4 +1,4 @@
-const swVer = 5
+const swVer = 2
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
@@ -153,9 +153,9 @@ if (useCache) {
     }
     const networkOnly = async (event) => {
       return await fetch(event.request.clone(), {
-        credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
-        mode: 'cors' // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
-      })
+          credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+          mode: 'cors' // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+        })
     }
     const StaleWhileRevalidate = async (event, store) => {
       logDebug('gql StaleWhileRevalidate')
@@ -189,7 +189,6 @@ if (useCache) {
             logDebug('gql networkFirst. save to cache...')
             await setCache(event.request, networkResponse, store)
           }
-
           resolve(networkResponse)
         }).catch(err => {
           if (cachedResponse) {
@@ -204,7 +203,10 @@ if (useCache) {
     const cacheFirst = async (event, store) => {
       logDebug('gql cacheFirst')
       let cachedResponse = await cacheOnly(event, store)
-      if (cachedResponse) return cachedResponse
+      if (cachedResponse) {
+        logDebug('gql cacheFirst. resolve from cache ok!', cachedResponse)
+        return cachedResponse
+      }
       return await networkFirst(event, store)
     }
 
@@ -324,20 +326,16 @@ if (useCache) {
         fetchOptions: {
           credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
           mode: 'cors' // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
-        },
+        }
       })
     )
-    workbox.routing.registerRoute( // content video
-      /^http.*(kalpa\.store).+\.mp4$/,
-      ({ url, event, params }) => {
-        logDebug('workbox.routing.registerRoute video', event)
-        return cacheVideo(event)
-      }
-    )
-    // workbox.routing.registerRoute(// graphql
-    //   /^http.*\/graphql\/?$/,
-    //   ({ url, event, params }) => cacheGraphQl(event),
-    //   'POST'
+    // // почему-то закэшитрованное видео не играет...
+    // workbox.routing.registerRoute( // content video
+    //   /^http.*(kalpa\.store).+\.mp4$/,
+    //   ({ url, event, params }) => {
+    //     logDebug('workbox.routing.registerRoute video', event)
+    //     return cacheVideo(event)
+    //   }
     // )
 
     // This "catch" handler is triggered when any of the other routes fail to

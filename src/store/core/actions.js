@@ -16,7 +16,10 @@ export const init = async (context) => {
 // сообщит токен на сервер (при условии что тот еще не был сообщен)
 export const setWebPushToken = async (context, token) => {
   logD('core/setWebPushToken action start')
-  assert(token)
+  if (!token) {
+    logW('core/setWebPushToken token === null')
+    return
+  }
   const fetchItemFunc = async () => {
     let { data: { objectChange } } = await apollo.clients.auth.query({
       query: gql`
