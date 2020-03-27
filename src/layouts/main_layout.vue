@@ -1,8 +1,13 @@
-<style lang="stylus">
-iframe {
-  width: 100%;
-  height: 500px;
-}
+<style lang="sass">
+iframe
+  width: 100%
+  height: 500px
+.q-btn
+  borderRadius: 10px
+.q-header
+  background: none
+.q-footer
+  background: none
 </style>
 
 <template lang="pug">
@@ -30,9 +35,10 @@ q-layout( view="hHh Lpr lff")
       :icon="drawerShowMobile ? 'clear' : 'menu'"
       :style=`{background: drawerShowMobile ? 'none' : 'rgba(0,0,0,0.3)'}`)
   q-page-container
-    router-view(v-if="!loading")
-    div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
-      q-spinner(color="green" size="50px")
+    q-page
+      router-view(v-if="!loading")
+      div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
+        q-spinner(color="green" size="50px")
 </template>
 
 <script>

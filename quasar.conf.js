@@ -39,7 +39,7 @@ module.exports = function (ctx) {
         'QDrawer',
         'QPageContainer',
         // 'QExpansionItem',
-        // 'QPage',
+        'QPage',
         // 'QToolbar',
         // 'QToolbarTitle',
         'QBtn',
@@ -54,7 +54,8 @@ module.exports = function (ctx) {
         // 'QVideo',
         'QResizeObserver',
         'QInput',
-        'QDialog'
+        'QDialog',
+        'QScrollArea'
       ],
       directives: [
         'Ripple',

@@ -97,7 +97,7 @@ div(
     player-video-progress(
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
-      :style=`{position: 'absolute', bottom: '10px', left: '0px', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
+      :style=`{position: 'absolute', bottom: '14px', left: '0px', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
     //- red
     //- div(:style=`{position: 'absolute', right: '0px', top: '50px', width: '50px', height: '50px'}`).row.bg-red
   slot(name="editor" :meta="meta" :player="player")

@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.items-start.content-start
+div(:style=`{paddingRight: '200px'}`).row.full-width.items-start.content-start
   //- pregress wrapper
   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-lg
     //- progress bar & time
@@ -34,7 +34,7 @@
             }`).bg-green
     //- progress actions
     div(:style=`{position: 'relative'}`).row.full-width
-      div(:style=`{position: 'absolute', top: '-10px', zIndex: 100, height: '25px'}`).row.full-width.items-center.content-center
+      div(:style=`{position: 'absolute', top: '-10px', zIndex: 100, height: '18px'}`).row.full-width.items-center.content-center
         small(
           :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
           ).text-white.q-px-xs.q-py-xs {{ $time(now) }}

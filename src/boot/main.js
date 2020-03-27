@@ -111,6 +111,8 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('compositionList', () => import('components/node/composition_list'))
     Vue.component('compositionFinder', () => import('components/node/composition_finder'))
     Vue.component('compositionEditor', () => import('components/node/composition_editor'))
+    // sphere
+    Vue.component('sphereSpheres', () => import('components/sphere_spheres'))
     // content
     Vue.component('content', () => import('components/node/content'))
     Vue.component('contentFinder', () => import('components/node/content_finder'))

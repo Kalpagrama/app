@@ -16,6 +16,7 @@ div(
     :style=`{position: 'relative', zIndex: 2000, width: $q.screen.width/4+'px', height: $q.screen.width/4+'px'}`).row.items-center.content-center.justify-center
     q-btn(
       round flat @click="pageClick(p)"
+      :loading="p.id === pageLoading"
       :color="$route.name === p.id ? 'green' : 'white'" :icon="p.icon"
       :size="$route.name === p.id ? 'xl' : 'lg'"
       :style=`{position: 'relative', zIndex: 2000}`)
@@ -26,34 +27,6 @@ div(
           'text-green': $route.name === p.id,
           'text-white': $route.name !== p.id
         }`).text-white {{ p.name }}
-  //- help
-  //- div(
-  //-   :style=`{width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
-  //-   div(:style=`{width: '60px', height: '60px'}` @click="helpClick()").row.items-center.content-center.justify-center
-  //-     small(
-  //-       :class=`{
-  //-         'text-bold': $route.name === 'help',
-  //-         'text-green': $route.name === 'help',
-  //-         'text-white': $route.name !== 'help'
-  //-       }`
-  //-       :style=`{fontSize: '40px',}`) ?
-  //-   .row.full-width.justify-center
-  //-     small.text-white Help
-  //- logout
-  //- div(
-  //-   :style=`{width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
-  //-   div(:style=`{width: '60px', height: '60px'}` @click="helpClick()").row.items-center.content-center.justify-center
-  //-     q-btn(round flat icon="power_off" color="white" size="lg" @click="pageCli")
-  //-   .row.full-width.justify-center
-  //-     small.text-white
-  //- help
-  div(
-    v-if="false"
-    :style=`{width: $q.screen.width/3+'px', height: $q.screen.width/3+'px'}`).row.items-center.content-center.justify-center
-    div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
-      q-btn(round flat icon="clear" color="red" size="lg" @click="$emit('close')")
-    .row.full-width.justify-center
-      small.text-white
 </template>
 
 <script>
@@ -70,6 +43,7 @@ export default {
         {id: 'debug', name: 'Debug', icon: 'bug_report'},
         {id: 'logout', name: 'Logout', icon: 'power_off'}
       ],
+      pageLoading: null,
       cacheClearing: false
     }
   },
@@ -85,17 +59,26 @@ export default {
         case 'workspace':
         case 'settings':
         case 'account': {
-          this.$router.push('/' + p.id).catch(e => e)
+          this.$router.push('/account').catch(e => e)
           break
         }
         case 'logout': {
-          this.$log('logout start')
-          // this.loggingOut = true
-          // await this.$wait(800)
-          let res = await this.$store.dispatch('auth/logout')
-          this.$log('logout done', res)
-          // this.loggingOut = false
-          break
+          try {
+            this.$log('logout start')
+            this.pageLoading = 'logout'
+            if (!confirm('Really logout?')) throw new Error('User changed mind')
+            this.$wait(1500).then(() => {
+              this.pageLoading = null
+            })
+            let res = await this.$store.dispatch('auth/logout')
+            this.$log('logout done', res)
+            break
+          }
+          catch (e) {
+            this.$log('logout error', e)
+            this.pageLoading = null
+            break
+          }
         }
         case 'debug': {
           this.$store.commit('ui/stateSet', ['debug', !this.$store.state.ui.debug])
@@ -104,11 +87,11 @@ export default {
         }
         case 'refresh': {
           this.$log('cacheClear')
-          this.cacheClearing = true
-          await this.$wait(800)
-          this.cacheClearing = false
+          this.pageLoading = 'refresh'
+          await this.$wait(1500)
+          this.pageLoading = null
           this.$store.dispatch('cache/clear')
-          window.location.reload(true)
+          window.location.reload()
           break
         }
       }

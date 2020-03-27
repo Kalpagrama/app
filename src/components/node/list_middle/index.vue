@@ -16,7 +16,7 @@
           paddingTop: paddingTop+'px',
           paddingBottom: paddingBottom+'px'
         }`
-        ).row.fit.items-start.content-start.justify-start.q-px-xs
+        ).row.fit.items-start.content-start.justify-start
         node(
           v-for="(n, ni, nii) in nodes" :key="n.oid" :accessKey="ni"
           v-if="nodesBan ? !nodesBan.includes(n.oid) : true" layout="pip"
@@ -76,6 +76,7 @@ export default {
     onHeight (e) {
       this.$log('onHeight', e)
       this.paddingBottom = this.$refs.nodeListMiddleScroll.clientHeight / 2
+      this.paddingTop = 100
       // let nodeFirstRef = this.$refs[`node-${this.nodes[0].oid}`][0]
       // this.$log('OH nodeFirstRef', nodeFirstRef)
       // let nodeFirstOffsetTop = nodeFirstRef.$el.offsetTop

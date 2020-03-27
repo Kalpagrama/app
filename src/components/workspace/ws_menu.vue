@@ -13,27 +13,27 @@ div(
   div(
     :style=`{position: 'relative', overflow: 'hidden'}`
     ).column.fit
-    //- header for WS
-    div(
-      v-if="ctx === 'workspace'"
-      :style=`{height: '60px'}`
-      ).row.full-width.items-center.content-center.justify-center
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px'}`).row.full-width
-        div(
-          :style=`{height: '60px', width: '60px'}`
-          ).row.items-center.justify-center
-          q-btn(round flat color="green" icon="school")
-        .col.full-height
-          .row.fit.items-center.content-center
-            span.text-bold.text-green Workspace
-        div(
-          :style=`{height: '60px', width: '60px'}`
-          ).row.items-center.justify-center
-          q-btn(round :flat="page !== 'sphere'" color="green" icon="style" @click="$emit('page', 'sphere')")
-        div(
-          :style=`{height: '60px', width: '60px'}`
-          ).row.items-center.justify-center
-          q-btn(round :flat="page !== 'setting'" color="green" icon="settings" @click="$emit('page', 'setting')")
+    //- //- header for WS
+    //- div(
+    //-   v-if="ctx === 'workspace'"
+    //-   :style=`{height: '60px'}`
+    //-   ).row.full-width.items-center.content-center.justify-center
+    //-   div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px'}`).row.full-width
+    //-     div(
+    //-       :style=`{height: '60px', width: '60px'}`
+    //-       ).row.items-center.justify-center
+    //-       q-btn(round flat color="green" icon="school")
+    //-     .col.full-height
+    //-       .row.fit.items-center.content-center
+    //-         span.text-bold.text-green Workspace
+    //-     div(
+    //-       :style=`{height: '60px', width: '60px'}`
+    //-       ).row.items-center.justify-center
+    //-       q-btn(round :flat="page !== 'sphere'" color="green" icon="style" @click="$emit('page', 'sphere')")
+    //-     div(
+    //-       :style=`{height: '60px', width: '60px'}`
+    //-       ).row.items-center.justify-center
+    //-       q-btn(round :flat="page !== 'setting'" color="green" icon="settings" @click="$emit('page', 'setting')")
     //- pages
     div(v-if="true" :style=`{}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width

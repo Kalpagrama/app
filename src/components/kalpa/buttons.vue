@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{height: '60px'}`).row.q-pa-sm
+div(:style=`{height: '60px'}`).row.items-center.content-center.q-pa-sm
   //- TODO create CSS variable for #4caf50 color...
   span(
     v-for="(i, ii) in value" :key="i[idKey]" @click="$emit('id', i[idKey])"
@@ -10,7 +10,7 @@ div(:style=`{height: '60px'}`).row.q-pa-sm
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden',
       color: id === i[idKey] ? 'white !important' : '#4caf50',}`
-    ).text-green.cursor-pointer.q-pa-sm.q-mr-sm.q-mb-sm {{ i.name }}
+    ).text-green.cursor-pointer.q-pa-sm.q-mr-sm {{ i.name }}
 </template>
 
 <script>

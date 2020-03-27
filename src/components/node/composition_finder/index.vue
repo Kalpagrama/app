@@ -1,17 +1,20 @@
 <template lang="pug">
-.column.fit.bg-grey-9
-  //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-  //-   q-btn(round flat color="green" icon="keyboard_arrow_left" @click="$emit('cancel')")
-  .col.full-width
-    ws-menu(
-      ctx="finder"
-      :header="false" :toggle="false" :oid="oid"
-      :pages="['content', 'composition']"
-      @item="itemClick" @page="pageClick" :page="page")
-  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm.bg-grey-8
-    q-btn(
-      outline no-caps color="red" @click="$emit('cancel')"
-      :style=`{borderRadius: '10px'}`) Back
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', width: $q.screen.width+'px'}`)
+  q-header(reveal)
+    div(:style=`{height: '60px'}`).row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center.content-center
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')")
+        .col
+          span.text-white.text-bold Composition finder
+  q-page-container
+    q-page
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+          ws-menu(
+            ctx="finder"
+            :header="false" :toggle="false" :oid="oid"
+            :pages="['content', 'composition']"
+            @item="itemClick" @page="pageClick" :page="page")
 </template>
 
 <script>

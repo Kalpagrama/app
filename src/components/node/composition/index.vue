@@ -4,9 +4,9 @@ div(
   ).row.full-width.items-start.content-start.bg-black
   //- composition menu
   q-btn(
-    v-if="false &ctx !== 'workspace' && visible && active && !mini && value"
+    v-if="true &ctx !== 'workspace' && visible && active && !mini && value"
     round flat color="white" icon="more_vert" @click="menuToggle()"
-    :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)'}`)
+    :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)', transform: 'translate3d(0,0,0)'}`)
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"

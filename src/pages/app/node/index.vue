@@ -4,7 +4,7 @@ q-layout(
   :style=`{height: $q.screen.height+'px'}`)
   q-page-conainter.row.fit.justify-center.items-start.content-start.bg-grey-9
     .column.fit
-      .col.full-width.scroll
+      div(:style=`{position: 'relative'}`).col.full-width.scroll
         node(v-if="node" ctx="explorer" :node="node" :needFull="true" :visible="true" :active="true" layout="rubick")
 </template>
 

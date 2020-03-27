@@ -1,13 +1,14 @@
 <template lang="pug">
 q-dialog(
-  ref="actionDialog" :maximized="true"
-  position="bottom"
+  ref="actionDialog"
+  :maximized="$q.screen.xs"
+  :position="$q.screen.xs ? 'bottom' : 'center'"
   transition-show="slide-up" transition-hide="slide-down" @hide="dialogClosed()")
   div(@click.self="$refs.actionDialog.hide()").row.fit.items-center.justify-center
     div(
       v-if="options"
       :style=`{width: '100%', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
-      ).row.items-start.content-start
+      ).row.items-start.content-start.bg-grey-10.q-pa-md
       div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-white
         div(
           v-for="(a, akey) in options.actions" :key="akey" @click="action(akey)"
