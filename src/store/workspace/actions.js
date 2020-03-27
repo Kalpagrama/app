@@ -342,6 +342,7 @@ export const get = async (context, { oid, name, force }) => {
 
 // сохранить слои из созданного ядра в мастерской (если их там еще нет)
 export const exportLayersFromNode = async (context, node) => {
+  logD('try to save node layers in ws')
   assert(node && node.compositions, 'node && node.compositions')
   for (let composition of node.compositions) {
     if (!composition) continue
@@ -351,8 +352,6 @@ export const exportLayersFromNode = async (context, node) => {
       assert(layer.figuresAbsolute)
       if (!layer.spheres.length) continue // сохраняем только слои с именем
       let contentContainer = await context.dispatch('workspace/get', { name: 'CONTENT-' + layer.contentOid }, { root: true })
-      logD('layer=', layer)
-      logD('contentContainer=', contentContainer)
       assert(contentContainer, '!contentContainer')
       assert(contentContainer.compositions && contentContainer.compositions.length === 1, 'contentContainer.compositions && contentContainer.compositions.length === 1')
       assert(contentContainer.compositions[0].layers, 'contentContainer.compositions.layers')
@@ -376,4 +375,5 @@ export const exportLayersFromNode = async (context, node) => {
       }
     }
   }
+  logD('save node layers in ws complete')
 }

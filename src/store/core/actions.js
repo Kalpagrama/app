@@ -1,4 +1,5 @@
 import { apollo } from 'src/boot/apollo'
+import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
@@ -11,14 +12,18 @@ export const init = async (context) => {
   context.commit('init')
   return true
 }
+
+// сообщит токен на сервер (при условии что тот еще не был сообщен)
 export const setWebPushToken = async (context, token) => {
   logD('core/setWebPushToken action start')
-  if (context.state.initialized) return
-  if (token) {
-    if (context.state.webPushToken === token) return // это значение было отправлено ранее и сервер уже знает его
-    let { data: { objectChange } } = await apollo.clients.auth.mutate({
-      mutation: gql`
-        mutation setWebPushToken ($token: String!) {
+  if (!token) {
+    logW('core/setWebPushToken token === null')
+    return
+  }
+  const fetchItemFunc = async () => {
+    let { data: { objectChange } } = await apollo.clients.auth.query({
+      query: gql`
+        query ($token: String!) {
           setWebPushToken (token: $token)
         }
       `,
@@ -26,8 +31,12 @@ export const setWebPushToken = async (context, token) => {
         token: token
       }
     })
-    context.commit('stateSet', ['webPushToken', token])
+    return {
+      item: true,
+      actualAge: 'day'
+    }
   }
+  let result = await context.dispatch('cache/get', { key: `setWebPushToken: ${token}`, fetchItemFunc }, { root: true })
   logD('core/setWebPushToken action complete')
-  return true
+  return result
 }

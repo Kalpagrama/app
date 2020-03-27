@@ -41,7 +41,7 @@ export default function (/* { ssrContext } */) {
     actions: {
       init: async (context) => {
         logD('vuex init')
-        await context.dispatch('cache/init')
+        // await context.dispatch('cache/init') cache инициализируется в boot модуле
 
         await context.dispatch('auth/init')
         let userIsConfirmed = context.state.auth.userIsConfirmed

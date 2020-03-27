@@ -10,7 +10,6 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
   if (context.state.initialized) return
-  logD('auth init')
   // TODO при скором протухании токена - вызвать refreshSession
   const fetchItemFunc = async () => {
     let { data: { authInfo } } = await apollo.clients.auth.query({
@@ -62,6 +61,7 @@ export const inviteUrl = async (context) => {
   logD('@invite done')
   return inviteUrl
 }
+// если токен не указан - выйдет из всех сессий
 export const logout = async (context, token) => {
   logD('@logout start')
   try {
@@ -83,6 +83,7 @@ export const logout = async (context, token) => {
     if (!token || token === localStorage.getItem('ktoken')) {
       localStorage.removeItem('ktoken')
       localStorage.removeItem('ktokenExpires')
+      await clearCache()
       await checkUpdate()
       await router.push('/auth')
       await update()
@@ -125,6 +126,7 @@ export const userIdentify = async (context, userLogin) => {
       login: userLogin
     }
   })
+  await clearCache()
   localStorage.setItem('ktoken', token)
   localStorage.setItem('ktokenExpires', expires)
   logD('@userIdentify done')

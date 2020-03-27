@@ -81,7 +81,7 @@ export const events = async (context, { pagination }) => {
 export const sphereNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('sphereNodes start')
   const fetchItemFunc = async () => {
-    let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+    let { data: { sphereNodes: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectShortWithMetaFragment}
         query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
@@ -96,7 +96,7 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
       variables: { oid, pagination, filter, sortStrategy }
     })
     return {
-      item: { items, count, totalCount, nextPageToken },
+      item: { items, count, totalCount, nextPageToken, prevPageToken },
       actualAge: 'hour'
     }
   }
@@ -107,7 +107,6 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
   return feedResult
 }
 
-// export const nodeNameNodes =
 export const compositionNodes = async (context, { compositionOids, pagination, sortStrategy }) => {
   logD('compositionNodes start')
   let filter = { types: ['NODE'] }
@@ -137,11 +136,77 @@ export const compositionNodes = async (context, { compositionOids, pagination, s
   // { items, count, totalCount, nextPageToken }
   let feedResult = await context.dispatch('cache/get',
     {
-      key: 'list: ' + JSON.stringify({oid, pagination, filter, sortStrategy }),
+      key: 'list: ' + JSON.stringify({ oid, pagination, filter, sortStrategy }),
       fetchItemFunc
     }, { root: true })
   logD('compositionNodes complete')
   return feedResult
+}
+
+// вернет ядра контента относительно метки времени (nodeList).
+// nodeList может изменится в после одного из последующих вызовов getIdx
+// getIdx - вернет индекс ядра в nodeList
+// getT - вернет время на контенте на основе индекса ядра
+// contentNodes - вызывается один раз (при инициализации окна контента)
+// getIdx - может вызываться не более чем раз в секунду (иногда этот вызов приведет к тому, что данные дозапросятся и дополнят nodeList)
+export const contentNodes = async (context, { contentOid }) => {
+  logD('contentNodes start')
+  const fetchItemFunc = async () => {
+    // TODO делать запрос с пагинацией по 30 (а потом дозапрашивать при вызове getT)
+    let { items, count, totalCount, nextPageToken, prevPageToken } = await sphereNodes(context, {
+      oid: contentOid,
+      pagination: { pageSize: 1000, pageToken: null },
+      filter: null,
+      sortStrategy: 'RELATING_TO_TIME'
+    })
+    return {
+      item: { nodeList: items, nextPageToken, prevPageToken },
+      actualAge: 'hour'
+    }
+  }
+  let { nodeList, nextPageToken, prevPageToken } = await context.dispatch('cache/get', {
+    key: 'contentNodes: ' + contentOid,
+    fetchItemFunc
+  }, { root: true })
+
+  // вернет расстояние от t до начала ядра. началом ядра считается начало первого по списку слоя с этим(contentOid) контентом
+  const getDistance = (contentOid, t, node) => {
+    assert(contentOid && node, 'contentOid && node')
+    assert(node.meta && node.meta.compositions && node.meta.compositions.length > 0, 'node.meta && node.meta.compositions && node.meta.compositions.length > 0')
+    // ищем первый layer на этот контент
+    for (let c of node.meta.compositions) {
+      assert(c.layers, 'c.layers')
+      for (let l of c.layers) {
+        assert(l.figuresAbsolute, 'l.figuresAbsolute')
+        assert(l.contentOid)
+        if (l.contentOid === contentOid) {
+          assert(l.figuresAbsolute.length, 'l.figuresAbsolute.length')
+          let nodeStart = l.figuresAbsolute[0].t
+          return Math.abs(nodeStart - t)
+        }
+      }
+    }
+    return Infinity
+  }
+
+  // вернет индекс ближайшего ядра к t
+  // TODO запрашивать fetchItemFunc не более 30 ядер. Остальные дозапрашивать по мере роста t
+  const getIdx = (t) => {
+    for (let i = 0; i < nodeList.length; i++) {
+      let distance, nextDistance
+      distance = getDistance(contentOid, t, nodeList[i])
+      if (i + 1 < nodeList.length) nextDistance = getDistance(contentOid, t, nodeList[i + 1])
+      if (!nextDistance || nextDistance > distance) return i
+    }
+    // let tRounded = Math.round(t / 60) * 60 // округляем до ближайшей минуты (для того чтобы ключ для sphereNodes не получался каждый раз - разным)
+    return -1
+  }
+  const getT = (indx) => {
+    assert(indx && indx < nodeList.length, 'indx && indx < nodeList.length')
+    return getDistance(contentOid, 0, nodeList[indx])
+  }
+  logD('contentNodes complete')
+  return { nodeList, getIdx, getT }
 }
 
 export const feed = async (context, { pagination }) => {

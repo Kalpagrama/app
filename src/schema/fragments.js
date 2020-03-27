@@ -12,6 +12,13 @@ const metaFragment = gql`
       compositions{
         oid
         thumbUrl(preferWidth: 600)
+        layers{
+          contentOid
+          figuresAbsolute{
+            points{x y}
+            t
+          }
+        }
         meta {
           ... on MetaComposition{...metaComposition}
         }

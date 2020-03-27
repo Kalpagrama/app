@@ -155,7 +155,7 @@ async function initSw (store) {
   logD('initSw OK!')
 }
 
-// очистить кэш сервис-воркера + indexedDB
+// очистить кэш сервис-воркера + vuexPersistStore
 async function clearCache (force = false) {
   logD('clearCache start')
   if (registration && registration.waiting) { // если есть новый ожидающий SW - активируем его

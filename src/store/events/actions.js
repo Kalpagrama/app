@@ -1,6 +1,5 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
-import { Notify } from 'quasar'
 import { notify } from 'src/boot/notify'
 import { router } from 'boot/main'
 import assert from 'assert'
@@ -178,7 +177,7 @@ async function processEventWs (context, event) {
   let key = 'wsItem: ' + event.object.oid
   let vuexItem = context.rootState.cache.cachedItems[key]
   // logD('processEventWs:: ', vuexItem, event.object)
-  if (!vuexItem || vuexItem.revision !== event.object.revision){
+  if (!vuexItem || vuexItem.revision !== event.object.revision) {
     // если у имеющегося объекта та же ревизия - обновлять не надо (скорей всего это наши же изменения)
     logD('обновим значение итема в кэше')
     await context.dispatch('cache/update', {
