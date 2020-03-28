@@ -2,7 +2,8 @@
 div(
   :style=`{position: 'relative', zIndex: 200,
   height: ($q.screen.width/4)*2+'px',
-  borderRadius: '30px'}`
+  maxWidth: $store.state.ui.maxWidthPage+'px',
+  borderRadius: '10px'}`
   ).row.full-width.bg-grey-8
   //- home
   div(

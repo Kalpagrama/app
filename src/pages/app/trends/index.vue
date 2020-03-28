@@ -8,7 +8,7 @@ q-layout(
   view="hHh lpR fFf" container
   :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px'}`).bg-grey-10
   q-dialog(v-model="categoriesDialogShow")
-    div(:style=`{width: '250px', height: $q.screen.height-200+'px', borderRadius: '10px', overflow: 'hidden'}`).row
+    div(:style=`{width: '240px', height: $q.screen.height-200+'px', borderRadius: '10px', overflow: 'hidden'}`).row
       categories
   q-header(
     reveal
@@ -40,8 +40,11 @@ q-layout(
   q-footer(
     reveal)
     div(:style=`{height: '60px'}`).row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius:  '10px 10px 0 0'}`
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius:  '10px 10px 0 0'}`
         ).row.fit.items-center.content-center.justify-between.bg-grey-8
+        q-btn(
+          round push color="green" icon="add"
+          :style=`{position: 'absolute', top: '-20px', left: '50%', transform: 'translate(-50%, 0)',borderRadius: '50% !important'}`)
         .col.full-height
           .row.fit.items-center.content-center.q-px-sm
             q-btn(flat no-caps color="white" @click="categoriesDialogShow = true")
@@ -54,7 +57,7 @@ q-layout(
         position: 'fixed', width: '200px', top: '200px',
         height: $q.screen.height-300+'px',
         left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-200-60+'px',
-        borderRadius: '10px'
+        borderRadius: '10px', overflow: 'hidden'
       }`
       ).row.bg-grey-9
       categories

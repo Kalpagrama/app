@@ -21,7 +21,7 @@
         :loading="urlInputLoading"
         :style=`{borderRadius: '10px', overflow: 'hidden'}`
         :input-style=`{paddingLeft: '10px'}`
-        ).full-width.bg-grey-1
+        ).full-width.bg-grey-2
         template(v-slot:append)
           q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm
         //- template(v-slot:append)

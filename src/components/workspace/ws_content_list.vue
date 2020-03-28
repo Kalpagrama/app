@@ -11,11 +11,12 @@
 .column.fit
   //- add content
   div(
-    :style=`{height: '90px'}`
-    ).row.full-width.q-pa-sm
-    content-finder(
-      :sources="['url', 'device']"
-      @content="contentFound")
+    :style=`{height: '70px'}`
+    ).row.full-width.justify-center.q-pa-sm
+    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+      content-finder(
+        :sources="['url', 'device']"
+        @content="contentFound")
   //- actions, list, gallery, feed, list-expanded
   div(v-if="false" :style=`{height: '60px'}`).row.full-width
     //- .col.full-height
@@ -28,15 +29,16 @@
         q-btn(dense :flat="mode !== 'gallery'" color="green" no-caps @click="mode = 'gallery'").q-px-sm Gallery
         q-btn(dense :flat="mode !== 'feed'" color="green" no-caps @click="mode = 'feed'").q-px-sm.q-mx-sm Feed
   .col.full-width.scroll
-    div(:style=`{paddingBottom: '80px'}`).row.full-with.items-start.content-start.q-px-sm
-      kalpa-loader(type="wsContents" :variables=`{}`)
-        template(v-slot:items=`{items}`)
-          ws-content(
-            v-for="(n, ni) in items" :key="n.oid"
-            :node="n" :contentOid="contentOid"
-            @contentClick="contentClick"
-            @contentDelete="contentDelete"
-            @contentEdit="contentEdit")
+    .row.full-width.justify-center
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '80px'}`).row.full-width.items-start.content-start
+        kalpa-loader(type="wsContents" :variables=`{}`)
+          template(v-slot:items=`{items}`)
+            ws-content(
+              v-for="(n, ni) in items" :key="n.oid"
+              :node="n" :contentOid="contentOid"
+              @contentClick="contentClick"
+              @contentDelete="contentDelete"
+              @contentEdit="contentEdit")
 </template>
 
 <script>

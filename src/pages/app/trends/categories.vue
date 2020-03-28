@@ -1,14 +1,14 @@
 <template lang="pug">
 .column.fit.bg-grey-9
-  div(:style=`{height: '60px', paddingLeft: '28px'}`).row.full-width.items-center
-    span.text-white.text-bold Categories
+  div(:style=`{height: '60px'}`).row.full-width.items-center.justify-center
+    span.text-white.text-bold Choose category
   .col.full-width.scroll
-    .row.full-width.items-start.content-start
+    .row.full-width.items-start.content-start.q-py-md
       div(
         v-for="(c,ci) in categoriesFiltered" :key="ci"
         v-if="c.id !== 'ALL'"
         :style=`{height: '45px'}`
-        ).row.full-width.items-center.content-center.q-px-md
+        ).row.full-width.items-center.content-center.justify-center.q-px-md
         q-btn(
           no-caps
           :flat="c.id !== $route.params.category"

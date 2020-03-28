@@ -1,7 +1,8 @@
 <template lang="pug">
 .column.fit
-  div(:style=`{height: '60px'}`).row.full-width
-    kalpa-buttons(:value="pages" :id="page" idKey="id" @id="$emit('page', $event)")
+  div(:style=`{height: '60px'}`).row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+      kalpa-buttons(:value="pages" :id="page" idKey="id" @id="$emit('page', $event)")
   .col.full-width
     component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('add', $event)" :ctx="ctx")
 </template>
