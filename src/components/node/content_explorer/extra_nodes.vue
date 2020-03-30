@@ -34,10 +34,14 @@ export default {
       this.$log('nodeMiddle')
       let node = this.$refs.contentNodesLoader.query.items[index]
       this.$log('node.name', node.name)
+    },
+    loadNodes () {
+      this.$log('loadNodes')
     }
   },
   mounted () {
     this.$log('mounted')
+    this.loadNodes()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
