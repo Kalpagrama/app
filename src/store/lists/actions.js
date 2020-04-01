@@ -209,8 +209,38 @@ export const contentNodes = async (context, { contentOid }) => {
   return { nodeList, getIdx, getT }
 }
 
-export const nodeChains = async (context, {nodeOid}) => {
-  // todo
+export const nodeChains = async (context, { nodeOid }) => {
+  logD('sphereNodes start')
+  const fetchItemFunc = async () => {
+    let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
+      query: gql`
+        ${fragments.objectShortWithMetaFragment}
+        query nodeChains ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
+          sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+            count
+            totalCount
+            nextPageToken
+            items {... objectShortWithMetaFragment}
+          }
+        }
+      `,
+      variables: {
+        oid: nodeOid,
+        pagination: { pageSize: 100, pageToken: null },
+        filter: null,
+        sortStrategy: 'HOT'
+      }
+    })
+    return {
+      item: { items, count, totalCount, nextPageToken, prevPageToken },
+      actualAge: 'hour'
+    }
+  }
+  // { items, count, totalCount, nextPageToken }
+  let feedResult = await context.dispatch('cache/get',
+    { key: 'list: ' + JSON.stringify({ nodeOid }), fetchItemFunc }, { root: true })
+  logD('sphereNodes complete')
+  return feedResult
 }
 
 export const feed = async (context, { pagination }) => {
