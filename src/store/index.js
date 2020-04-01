@@ -60,13 +60,13 @@ export default function (/* { ssrContext } */) {
         await context.dispatch('content/init')
         await i18next.changeLanguage(user.profile.lang)
         logD('vuex init done!')
-        let chain = {
-          spheres: [],
-          links: [
-            { leftOid: 'AwFnLYEBQAM', rightOid: 'AwFnz1MBQAU', type: 'ESSENCE' }
-          ]
-        }
-        await context.dispatch('node/chainCreate', chain)
+        // let chain = {
+        //   spheres: [],
+        //   links: [
+        //     { leftOid: 'AwFnLYEBQAM', rightOid: 'AwFnz1MBQAU', type: 'ESSENCE' }
+        //   ]
+        // }
+        // await context.dispatch('node/chainCreate', chain)
         return true
       }
     },
