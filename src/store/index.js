@@ -67,8 +67,8 @@ export default function (/* { ssrContext } */) {
         //   ]
         // }
         // await context.dispatch('node/chainCreate', chain)
-        let res = await context.dispatch('lists/nodeChains', { nodeOid: 'AvxgHQuBQAM' })
-        logD('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', res)
+        // let res = await context.dispatch('lists/nodeChains', { nodeOid: 'AvxgHQuBQAM' })
+        // logD('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', res)
         return true
       }
     },
