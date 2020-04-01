@@ -28,8 +28,10 @@ module.exports = function (ctx) {
       // 'fontawesome-v5'
       // 'eva-icons'
     ],
+    animations: 'all',
     framework: {
       all: true,
+      animations: 'all',
       components: [
         'QLayout',
         // 'QPullToRefresh',

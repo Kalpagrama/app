@@ -32,6 +32,12 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
         //-       span(
         //-         v-for="(s,si) in 100" :key="si"
         //-         :style=`{borderRadius: '10px', whiteSpace: 'nowrap'}`).text-white.q-pa-sm.q-mr-sm.q-mb-sm.bg-grey-7 #sphere-{{si}}
+  q-footer(reveal)
+    .row.full-width.justify-center
+      div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0 ', overflow: 'hidden'}`
+        ).row.full-width.items-center.content-center.justify-between.bg-grey-8
+        .col
+        q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['menuAppShow', true])").q-mr-sm
   q-page-conainter
     q-page.q-pt-xl
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")

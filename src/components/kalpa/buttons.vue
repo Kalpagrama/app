@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{height: '60px'}`).row.items-center.content-center.q-pa-sm
+div(:style=`{height: '50px'}`).row.items-center.content-center.q-pa-sm
   //- TODO create CSS variable for #4caf50 color...
   span(
     v-for="(i, ii) in value" :key="i[idKey]" @click="$emit('id', i[idKey])"
