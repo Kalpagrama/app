@@ -1609,6 +1609,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "Chain",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "Image",
             "ofType": null
           },
@@ -1704,7 +1709,7 @@
             "deprecationReason": null
           },
           {
-            "name": "RESEARCH",
+            "name": "CHAIN",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -2238,7 +2243,7 @@
             "deprecationReason": null
           },
           {
-            "name": "NODE_VOTED",
+            "name": "VOTED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -2285,7 +2290,7 @@
       {
         "kind": "ENUM",
         "name": "SortStrategyEnum",
-        "description": "HOT - наверху быстрорастущие; ESSENTIALLY - наверху близкие к сути; AGE - наверху - свежие",
+        "description": "HOT - наверху быстрорастущие; ESSENTIALLY - наверху близкие к сути; AGE -\nнаверху - свежие; RELATING_TO_TIME - HOT, пересортированные по расположению на контенте",
         "fields": null,
         "inputFields": null,
         "interfaces": null,
@@ -2304,6 +2309,12 @@
           },
           {
             "name": "AGE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RELATING_TO_TIME",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -2981,6 +2992,20 @@
                   }
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "force",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Boolean",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -3020,6 +3045,37 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "Node",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "chainCreate",
+            "description": null,
+            "args": [
+              {
+                "name": "chain",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ChainInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "Chain",
                 "ofType": null
               }
             },
@@ -4304,7 +4360,7 @@
             "deprecationReason": null
           },
           {
-            "name": "researchCnt",
+            "name": "chainCnt",
             "description": "Количество исследований, куда ядро добавлено",
             "args": [],
             "type": {
@@ -5035,6 +5091,612 @@
               "ofType": {
                 "kind": "ENUM",
                 "name": "LayerOperationEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ChainInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "name",
+            "description": "если не указать - то возмется из первого линка",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "links",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ChainLinkInput",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "spheres",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ObjectShortInput",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "revision",
+            "description": "версия объекта по мнению клиента (нужно при апдейте)",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ChainLinkInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "name",
+            "description": "если не указать - то возмется из первого ядра",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "leftOid",
+            "description": "либо-либо",
+            "type": {
+              "kind": "SCALAR",
+              "name": "OID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "leftSphere",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "leftNode",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NodeInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "leftComposition",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "CompositionInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "rightOid",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "OID",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "rightSphere",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "rightNode",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NodeInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "rightComposition",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "CompositionInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "type",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "LinkTypeEnum",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "LinkTypeEnum",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ESSENCE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CAUSE_EFFECT",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ASSOCIATIVE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "Chain",
+        "description": null,
+        "fields": [
+          {
+            "name": "oid",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "OID",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "ObjectTypeEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "thumbUrl",
+            "description": null,
+            "args": [
+              {
+                "name": "preferWidth",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Int",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "name",
+            "description": "словесное наименование выявленной сути. заголовок из body",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "sphereFromName",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "ObjectShort",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subscribers",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "INTERFACE",
+                  "name": "ObjectShort",
+                  "ofType": null
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subscriberCnt",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "meta",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "INTERFACE",
+              "name": "Meta",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "createdAt",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "deletedAt",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "DateTime",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "revision",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "author",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "ObjectShort",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "links",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "ChainLink",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "spheres",
+            "description": "хэштеги",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INTERFACE",
+                    "name": "ObjectShort",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rate",
+            "description": "рейтинг цепочки",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "weight",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Float",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rateUser",
+            "description": "оценка текущего пользователя",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "Float",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "viewCnt",
+            "description": "число просмотров",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "Int",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Object",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "ChainLink",
+        "description": null,
+        "fields": [
+          {
+            "name": "name",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "leftObject",
+            "description": "ядро или конент(композиция/сфера)",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Object",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "rightObject",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Object",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "type",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "LinkTypeEnum",
                 "ofType": null
               }
             },
@@ -8645,7 +9307,7 @@
             "deprecationReason": null
           },
           {
-            "name": "rateNodeAvgVal",
+            "name": "rateObjAvgVal",
             "description": "средний рейтинг ядер пользователя (с учетом их веса) [от 0 до 1]",
             "args": [],
             "type": {
@@ -8661,8 +9323,8 @@
             "deprecationReason": null
           },
           {
-            "name": "nodesRates",
-            "description": "список ядер этого пользователя. nodesRates: {4563-4234-123123-123123: { rate:\n0.55, weight: 0.0255229},4563-4234-123123-123123: { rate: 0.650003,weight:\n0.0231659}} oid,rate,weight - это характеристики ядра",
+            "name": "objRates",
+            "description": "список ядер этого пользователя. objRates: {4563-4234-123123-123123: { rate:\n0.55, weight: 0.0255229},4563-4234-123123-123123: { rate: 0.650003,weight:\n0.0231659}} oid,rate,weight - это характеристики ядра",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -8693,7 +9355,7 @@
             "deprecationReason": null
           },
           {
-            "name": "nodesRankSumVal",
+            "name": "objRankSumVal",
             "description": "-- Σ(NodeWeight*rate), где nodeWeight*rate- это rank оценки",
             "args": [],
             "type": {
@@ -8709,7 +9371,7 @@
             "deprecationReason": null
           },
           {
-            "name": "nodesWeightSumVal",
+            "name": "objWeightSumVal",
             "description": "-- Σ(nodeWeight)",
             "args": [],
             "type": {
@@ -8726,7 +9388,7 @@
           },
           {
             "name": "xPos",
-            "description": "положение на шкале от 0 до N, где N нелинейно зависит от числа пользователей в\nсистеме (например, при 10 пользователях n = 10, при 100 - 50, при 1000 - 100,\nпри 10000 - 200) т.е. N = 8888- (8888/(x+8888))*8888. на малых х функция ведет\nсебя почти линейно(y=x) на больших x функция бесконечно стремится к 8888. При\nголосовании за ядро пользователя xPos смещается вправо или влево. Направление\nсмещения опредляется rateNodeAvgVal. Если оценка, поставленная ядру больше,\nчем rateNodeAvgVal, то xPos смещается вправо пропорционально разнице оценки и\nrateNodeAvgVal. И наоборот. Т.е Δx =  оценка ядру - rateNodeAvgVal. При этом\nxPos >= 0 и xPos =< N",
+            "description": "положение на шкале от 0 до N, где N нелинейно зависит от числа пользователей в\nсистеме (например, при 10 пользователях n = 10, при 100 - 50, при 1000 - 100,\nпри 10000 - 200) т.е. N = 8888- (8888/(x+8888))*8888. на малых х функция ведет\nсебя почти линейно(y=x) на больших x функция бесконечно стремится к 8888. При\nголосовании за ядро пользователя xPos смещается вправо или влево. Направление\nсмещения опредляется rateObjAvgVal. Если оценка, поставленная ядру больше, чем\nrateObjAvgVal, то xPos смещается вправо пропорционально разнице оценки и\nrateObjAvgVal. И наоборот. Т.е Δx =  оценка ядру - rateObjAvgVal. При этом\nxPos >= 0 и xPos =< N",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -8758,7 +9420,7 @@
           },
           {
             "name": "weightVal",
-            "description": "MAX(0.0001, rateNodeAvgVal* rateVolatileVal * A)",
+            "description": "MAX(0.0001, rateObjAvgVal* rateVolatileVal * A)",
             "args": [],
             "type": {
               "kind": "NON_NULL",

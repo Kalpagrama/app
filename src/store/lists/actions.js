@@ -209,6 +209,10 @@ export const contentNodes = async (context, { contentOid }) => {
   return { nodeList, getIdx, getT }
 }
 
+export const nodeChains = async (context, {nodeOid}) => {
+  // todo
+}
+
 export const feed = async (context, { pagination }) => {
   logD('feed start')
   assert.ok(pagination)
@@ -271,7 +275,7 @@ export const processEvent = async (context, event) => {
     case 'WS_ITEM_UPDATED':
       return await updateWsLists(context, event)
     case 'NODE_CREATED':
-    case 'NODE_VOTED':
+    case 'VOTED':
       return await updateLists(context, event)
     default:
       throw new Error(`bad event type ${event.type}`)

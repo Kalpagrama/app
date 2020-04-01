@@ -1,1 +1,1 @@
-{"Object":["Node","Composition","User","Image","Video","Sphere"],"ObjectShort":["ObjectShortConcrete"],"Meta":["MetaContent","MetaUser","MetaSphere","MetaComposition","MetaNode"],"Event":["EventProgress","EventError","EventGeneral","EventRate","EventChange","EventWS","EventNotice"]}
+{"Object":["Node","Composition","Chain","User","Image","Video","Sphere"],"ObjectShort":["ObjectShortConcrete"],"Meta":["MetaContent","MetaUser","MetaSphere","MetaComposition","MetaNode"],"Event":["EventProgress","EventError","EventGeneral","EventRate","EventChange","EventWS","EventNotice"]}

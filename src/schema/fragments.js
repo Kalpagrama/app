@@ -206,6 +206,33 @@ const nodeFragment = gql`
     compositions {...compositionFragment}
   }
 `
+const chainFragment = gql`
+  ${videoFragment} ${imageFragment} ${objectFragment} ${compositionFragment} ${objectShortFragment}
+  fragment chainFragment on Chain {
+    ...objectFragment
+    sphereFromName{...objectShortFragment}
+    rate
+    rateUser
+    viewCnt
+    author {
+      oid
+      type
+      name
+      thumbUrl(preferWidth: 50)
+    }
+    spheres {
+      oid
+      name
+    }
+    links{
+      name
+      leftObject{...objectFragment}
+      rightObject{...objectFragment}
+      type
+    }
+  }
+`
+
 const sphereFragment = gql`
   ${objectFragment}
   fragment sphereFragment on Object {

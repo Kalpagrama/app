@@ -186,8 +186,18 @@ export const nodeCreate = async (context, node) => {
       node: nodeInput
     }
   })
-  context.dispatch('cache/update', {key: createdNode.oid, newValue: createdNode, actualAge: 'zero'}, {root: true})
+  context.dispatch('cache/update', { key: createdNode.oid, newValue: createdNode, actualAge: 'zero' }, { root: true })
   await context.dispatch('workspace/exportLayersFromNode', node, { root: true }) // сохраним слои из созданного ядра в мастерской
   logD('nodeCreate done', nodeCreate)
   return nodeCreate
+}
+
+export const chainCreate = async (context, chainInput) => {
+// todo
+}
+export const rate = async (context, { oid, rateUser }) => {
+  // todo
+}
+export const unrate = async (context, { oid, rateUser }) => {
+// todo
 }

@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     textAction (e) {
-      if (e.type === 'NODE_VOTED') return 'rated'
+      if (e.type === 'VOTED') return 'rated'
       if (e.type === 'NODE_CREATED') return 'created'
       if (e.type === 'NODE_DELETED') return 'deleted'
       if (e.type === 'USER_SUBSCRIBED') return 'subscribed to'
