@@ -78,7 +78,7 @@ async function processEvent (context, event) {
       await context.dispatch('lists/processEvent', event, { root: true })
       context.commit('addEvent', { event, context })
       break
-    case 'NODE_VOTED':
+    case 'VOTED':
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
       }
@@ -204,7 +204,7 @@ function notifyUserActionComplete (eventType, object) {
     case 'NODE_DELETED':
       eventMessage = i18n.t('node deleted')
       break
-    case 'NODE_VOTED':
+    case 'VOTED':
       eventMessage = i18n.t('node rated')
       break
     case 'USER_SUBSCRIBED':
