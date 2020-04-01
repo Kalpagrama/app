@@ -209,6 +209,10 @@ export const contentNodes = async (context, { contentOid }) => {
   return { nodeList, getIdx, getT }
 }
 
+export const nodeChains = async (context, {nodeOid}) => {
+  // todo
+}
+
 export const feed = async (context, { pagination }) => {
   logD('feed start')
   assert.ok(pagination)
