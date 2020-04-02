@@ -232,7 +232,6 @@ const chainFragment = gql`
     }
   }
 `
-
 const sphereFragment = gql`
   ${objectFragment}
   fragment sphereFragment on Object {
@@ -322,7 +321,7 @@ const userFragment = gql`
   }
 `
 const objectFullFragment = gql`
-  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${objectFragment}
+  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment}
   fragment objectFullFragment on Object {
     ...objectFragment
     ...on Video {...videoFragment}
@@ -330,6 +329,7 @@ const objectFullFragment = gql`
     ...on Node {... nodeFragment}
     ...on Sphere {... sphereFragment}
     ...on User {... userFragment}
+    ...on Chain {...chainFragment}
   }
 `
 
