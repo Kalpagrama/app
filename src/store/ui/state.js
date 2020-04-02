@@ -5,5 +5,7 @@ export default {
   maxWidthPage: 750,
   actionOptions: null,
   actionOpened: false,
-  actionKey: null
+  actionKey: null,
+  height: 0,
+  offsetTop: 0
 }

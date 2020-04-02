@@ -8,6 +8,9 @@ iframe
   background: none !important
 .q-footer
   background: none !important
+// html, body
+//   position: fixed
+//   bottom: 0px
 </style>
 
 <template lang="pug">
@@ -43,6 +46,7 @@ q-layout( view="hHh Lpr lff")
 </template>
 
 <script>
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 
@@ -54,18 +58,22 @@ export default {
       loading: true,
       drawerShow: true,
       drawerShowMobile: false,
-      drawerMini: true
+      drawerMini: true,
+      offsetTop: null
     }
   },
-  // watch: {
-  //   $route: {
-  //     immediate: false,
-  //     handler (to, from) {
-  //       // check for tutolrial
-  //       if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
-  //     }
-  //   }
-  // },
+  methods: {
+    onResize (e) {
+      this.$log('onResize', e)
+      let vv = window.visualViewport
+      this.$log('vv', vv)
+      let height = vv.height
+      this.offsetTop = vv.offsetTop
+      this.$store.commit('ui/stateSet', ['height', height])
+      this.$store.commit('ui/stateSet', ['offsetTop', this.offsetTop])
+      this.$q.notify('onResize: ' + height + '/' + this.offsetTop)
+    }
+  },
   async created () {
     this.$log('created')
     this.loading = true
@@ -84,6 +92,13 @@ export default {
     }
     if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     this.loading = false
+  },
+  mounted () {
+    window.visualViewport.addEventListener('resize', this.onResize)
+    this.onResize()
+  },
+  beforeDestroy () {
+    window.visualViewport.removeEventListener('resize', this.onResize)
   }
 }
 </script>
