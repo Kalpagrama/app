@@ -160,7 +160,7 @@ export const contentNodes = async (context, { contentOid }) => {
       sortStrategy: 'RELATING_TO_TIME'
     })
     return {
-      item: { nodeList: items, nextPageToken, prevPageToken },
+      item: { nodeList: items, count, totalCount, nextPageToken, prevPageToken },
       actualAge: 'hour'
     }
   }
@@ -192,6 +192,7 @@ export const contentNodes = async (context, { contentOid }) => {
   // вернет индекс ближайшего ядра к t
   // TODO запрашивать fetchItemFunc не более 30 ядер. Остальные дозапрашивать по мере роста t
   const getIdx = (t) => {
+    // todo запрашивать новые порции данных
     for (let i = 0; i < nodeList.length; i++) {
       let distance, nextDistance
       distance = getDistance(contentOid, t, nodeList[i])
@@ -202,6 +203,7 @@ export const contentNodes = async (context, { contentOid }) => {
     return -1
   }
   const getT = (indx) => {
+    // todo запрашивать новые порции данных
     assert(indx >= 0 && indx < nodeList.length, 'indx && indx < nodeList.length')
     return getDistance(contentOid, 0, nodeList[indx])
   }
@@ -209,8 +211,40 @@ export const contentNodes = async (context, { contentOid }) => {
   return { nodeList, getIdx, getT }
 }
 
-export const nodeChains = async (context, {nodeOid}) => {
-  // todo
+export const nodeChains = async (context, { nodeOid }) => {
+  logD('nodeChains start')
+  const fetchItemFunc = async () => {
+    let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
+      query: gql`
+        ${fragments.objectShortWithMetaFragment}
+        query nodeChains ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
+          sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+            count
+            totalCount
+            nextPageToken
+            items {... objectShortWithMetaFragment}
+          }
+        }
+      `,
+      variables: {
+        oid: nodeOid,
+        pagination: { pageSize: 500, pageToken: null },
+        filter: null,
+        sortStrategy: 'HOT'
+      }
+    })
+    return {
+      item: { chainList: items, count, totalCount, nextPageToken, prevPageToken },
+      actualAge: 'hour'
+    }
+  }
+  let { chainList, nextPageToken, prevPageToken } = await context.dispatch('cache/get',
+    { key: 'list: ' + JSON.stringify({ nodeOid }), fetchItemFunc }, { root: true })
+  const setCurrentIndx = (indx) => {
+    // todo запрашивать новые порции данных
+  }
+  logD('nodeChains complete')
+  return { chainList, setCurrentIndx }
 }
 
 export const feed = async (context, { pagination }) => {

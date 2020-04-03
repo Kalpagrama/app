@@ -598,6 +598,71 @@
             "deprecationReason": null
           },
           {
+            "name": "sphereItems",
+            "description": "вывод объектов этой сферы сути (ядра/цепочки)",
+            "args": [
+              {
+                "name": "sphereOid",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "OID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "pagination",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "PaginationInput",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "sortStrategy",
+                "description": null,
+                "type": {
+                  "kind": "ENUM",
+                  "name": "SortStrategyEnum",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "filter",
+                "description": null,
+                "type": {
+                  "kind": "INPUT_OBJECT",
+                  "name": "Filter",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "FeedResult",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "sphereSpheres",
             "description": "горизонтальная лента близких сфер",
             "args": [
@@ -1875,6 +1940,11 @@
         "possibleTypes": [
           {
             "kind": "OBJECT",
+            "name": "MetaChain",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "MetaComposition",
             "ofType": null
           },
@@ -3083,8 +3153,53 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeRate",
+            "name": "rate",
             "description": "проголосовать за ядро",
+            "args": [
+              {
+                "name": "oid",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "OID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "rate",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "Float",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Object",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nodeRate",
+            "description": null,
             "args": [
               {
                 "name": "oid",
@@ -3128,8 +3243,39 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeUnrate",
+            "name": "unrate",
             "description": "снять голос",
+            "args": [
+              {
+                "name": "oid",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "OID",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
+              }
+            ],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "Object",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "nodeUnrate",
+            "description": null,
             "args": [
               {
                 "name": "oid",
@@ -5196,7 +5342,7 @@
           },
           {
             "name": "leftOid",
-            "description": "либо-либо",
+            "description": "leftOid - может быть и из мастерской",
             "type": {
               "kind": "SCALAR",
               "name": "OID",
@@ -5208,8 +5354,8 @@
             "name": "leftSphere",
             "description": null,
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "INPUT_OBJECT",
+              "name": "ObjectShortInput",
               "ofType": null
             },
             "defaultValue": null
@@ -5236,7 +5382,7 @@
           },
           {
             "name": "rightOid",
-            "description": null,
+            "description": "rightOid - может быть и из мастерской",
             "type": {
               "kind": "SCALAR",
               "name": "OID",
@@ -7603,6 +7749,39 @@
             "deprecationReason": null
           }
         ],
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "MetaChain",
+        "description": null,
+        "fields": [
+          {
+            "name": "type",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Meta",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
         "possibleTypes": null
       },
       {

@@ -59,13 +59,16 @@ div(:style=`{}`).column.fit.bg-grey-10
     .col
     q-btn(outline color="green" no-caps).q-mr-sm
       span Save
-    q-btn(push color="green" no-caps)
+    q-btn(
+      push color="green" no-caps @click="chainAdd()"
+      :loading="chainAdding")
       span.text-white.text-bold Publish
 </template>
 
 <script>
 export default {
   name: 'nodeExplorer_extraExplore_chainAdd',
+  props: ['node'],
   data () {
     return {
       input: '',
@@ -92,17 +95,42 @@ export default {
     async chainAdd () {
       try {
         this.$log('chainAdd start')
-        // let chain = {
-        //   spheres: [],
-        //   links: [
-        //     { leftOid: 'AwFnLYEBQAM', rightOid: 'AwFnz1MBQAU', type: 'ESSENCE' }
-        //   ]
-        // }
-        // await context.dispatch('node/chainCreate', chain)
-        this.$log('chainAdd done')
+        this.chainAdding = true
+        await this.$wait(1000)
+        let chain = {
+          spheres: [],
+          links: [
+            {
+              type: 'ESSENCE',
+              leftOid: this.node.oid,
+              // rightOid: 'AwFnz1MBQAU',
+              rightNode: {
+                name: this.nameInput,
+                category: 'FUN',
+                layout: 'PIP',
+                spheres: [{name: 'some'}, {name: 'sphere'}, {name: 'here'}],
+                compositions: [
+                  this.node.compositions[1]
+                ]
+              }
+            }
+          ]
+        }
+        let res = await this.$store.dispatch('node/chainCreate', chain)
+        this.$log('chainAdd done', res)
+        this.chainAdding = false
       }
       catch (e) {
         this.$log('chainAdd error', e)
+        this.chainAdding = false
+      }
+    },
+    async chainSave () {
+      try {
+        this.$log('chainSave')
+      }
+      catch (e) {
+        this.$log('chainSave error', e)
       }
     }
   }

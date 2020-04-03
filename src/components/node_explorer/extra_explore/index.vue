@@ -53,7 +53,7 @@ div(:style=`{position: 'relative'}`).column.fit
     div(
       v-touch-swipe.mouse.prevent.vertical="onSwipe").row.fit.items-start.content-start
       div(
-        v-for="(c,ci) in 100" :key="ci"
+        v-for="(c,ci) in chains" :key="ci"
         :style=`{paddingBottom: '54px'}`).row.fit.q-px-xs.q-pt-xs
         div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.bg-grey-9
           img(
@@ -62,31 +62,25 @@ div(:style=`{position: 'relative'}`).column.fit
           .row.full-width.q-pa-sm
             span.text-white.text-bold {{ name }}
   //- gallery
+  div(v-if="height < 300").col.full-width
   div(
-    v-if="height > 200 && mode === 'gallery'"
+    v-if="height > 300 && mode === 'gallery'"
     ).col.full-width.scroll
     .row.full-width.items-start.content-start
       span.text-white gallery
-  //- list
-  div(
-    v-if="height > 200 && mode === 'list'"
-    ).col.full-width.scroll
-    div(
-      ).row.full-width.items-start.content-start.q-pa-xs
-      div(
-        v-for="(c,ci) in 100" :key="ci"
-        :style=`{height: '35px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.q-px-sm.q-mb-xs.bg-grey-9
-        span.text-white chain-{{ci}}
+  chain-list(v-if="height > 300 && mode === 'list'" :node="node" :chains="chains")
   //- dialogs
   chain-add(
     @hide="chainAddDialogShow = false"
+    :node="node"
     :style=`{
       position: 'absolute', zIndex: 3000, top: '0px', left: 500-chainAddDialogRight+'px',
       borderRadius: '10px', overflow: 'hidden'}`)
   //- actions
   div(
     v-if="height >= 120"
-    :style=`{position: 'absolute', zIndex: 200, bottom: '60px', height: '50px', background: 'rgba(0,0,0,0.7)'}`).row.full-width
+    :style=`{position: 'absolute', zIndex: 200, bottom: '60px', height: '50px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
+      ).row.full-width.bg-grey-10
     .col.full-height
       .row.fit.items-center.content-center.q-px-xs
         q-btn(round flat :color="mode === 'byte' ? 'green' : 'grey-5'" icon="branding_watermark" @click="mode = 'byte'")
@@ -103,11 +97,12 @@ div(:style=`{position: 'relative'}`).column.fit
 
 <script>
 import chainAdd from './chain_add'
+import chainList from './chain_list'
 
 export default {
   name: 'nodeExplorer_extraExplore',
-  components: {chainAdd},
-  props: ['node', 'tabs', 'tab', 'height'],
+  components: {chainAdd, chainList},
+  props: ['node', 'tabs', 'tab', 'height', 'heightKey'],
   data () {
     return {
       nameInput: '',
@@ -119,6 +114,7 @@ export default {
       headerShow: false,
       chainAddDialogShow: false,
       chainAddDialogRight: 0,
+      chains: [],
       mode: 'list'
     }
   },
@@ -153,10 +149,22 @@ export default {
       else this.scrollDirection = 'up'
       this.scrollTop = to
       if (this.scrollDirection === 'down' && to - this.scrollTopDirection > 60) this.headerShow = false
+    },
+    async chainsLoad () {
+      try {
+        this.$log('chainsLoad start')
+        let {chainList, setCurrentIndx} = await this.$store.dispatch('lists/nodeChains', {nodeOid: this.node.oid})
+        this.$log('chainsLoad done', chainList)
+        this.chains = chainList
+      }
+      catch (e) {
+        this.$log('chainsLoad error', e)
+      }
     }
   },
   mounted () {
     this.$log('mounted')
+    this.chainsLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

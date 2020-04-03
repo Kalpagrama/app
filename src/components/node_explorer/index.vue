@@ -22,7 +22,7 @@ q-layout(view="hHh lpR fFf" container
         :style=`{position: 'relative', height: $q.screen.height-extraHeight+'px'}`).row.full-width
         //- back
         q-btn(
-          flat round icon="keyboard_arrow_left" color="white"
+          flat round icon="keyboard_arrow_left" color="white" @click="$router.back()"
           :style=`{position: 'absolute', top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`)
         //- tint
         div(
@@ -54,16 +54,17 @@ q-layout(view="hHh lpR fFf" container
                         }`).full-width
                     //- name
                     .row.full-width.q-pa-sm
-                      span.text-white.text-bold {{name}}
+                      span.text-white.text-bold {{ node.name }}
                   //- author
                   div(:style=`{height: '60px'}`).row.full-width
                     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
                       div(:style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.bg-grey-4
+                        img(:src="node.author.thumbUrl").fit
                     .col.full-height
                       .row.fit.items-start.content-start.q-pt-sm
                         .row.full-width.items-end
-                          span.text-white.text-bold Ivan Motovilov
-                          small.text-white.full-width @ivanmoto
+                          span.text-white.text-bold {{node.author.name}}
+                          small.text-white.full-width {{'@'+node.author.name}}
                 //- actions
                 div(:style=`{height: '50px'}`).row.full-width.items-center.justify-between.q-px-sm
                   q-btn(flat round color="green" icon="favorite_border")
@@ -83,7 +84,7 @@ q-layout(view="hHh lpR fFf" container
         ).row.full-width.bg-grey-10
         component(
           :is="`extra-${tab}`" :node="node" :nodeFull="nodeFull"
-          :height="extraHeight"
+          :height="extraHeight" :heightKey="heightKey"
           :tabs="tabs" :tab="tab" @tab="tab = $event, tabChanged($event)")
 </template>
 
