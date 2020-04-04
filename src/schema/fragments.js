@@ -134,10 +134,13 @@ const compositionFragment = gql`
       content {
         oid
         type
+        thumbUrl(preferWidth: 600)
         name
         ...on Video {
           url
           duration
+          width
+          height
           frameUrls
           contentSource
         }

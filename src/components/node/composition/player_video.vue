@@ -7,6 +7,8 @@ iframe {
   max-width: 100%;
   max-height: 100%;
   z-index: 100;
+  border-radius: 10px;
+  overflow: hidden;
 }
 .mejs__overlay-button {
   display: none;
@@ -90,14 +92,14 @@ div(
         @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         @timeupdate="videoUpdate"
         :style=`{
-          position: 'relative', width: '100%', height: '100%', objectFit: 'contain'
+          position: 'relative', width: '100%', height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'
         }`)
     //- video tools
     //- progress
     player-video-progress(
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
-      :style=`{position: 'absolute', bottom: '14px', left: '0px', maxWidth: '75%', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
+      :style=`{position: 'absolute', bottom: '0px', left: '0px', maxWidth: '75%', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
     //- red
     //- div(:style=`{position: 'absolute', right: '0px', top: '50px', width: '50px', height: '50px'}`).row.bg-red
   slot(name="editor" :meta="meta" :player="player")
@@ -131,7 +133,7 @@ const sendTouchEvent = (x, y, element, eventType) => {
 
 export default {
   name: 'playerVideo',
-  props: ['ctx', 'composition', 'visible', 'active', 'mini'],
+  props: ['ctx', 'composition', 'visible', 'active', 'mini', 'bgClass'],
   components: {playerVideoProgress},
   data () {
     return {

@@ -1,13 +1,17 @@
 <template lang="pug">
-div(
-  :style=`{height: '35px', borderRadius: '10px', overflow: 'hidden'}`
-  ).row.full-width.items-center.content-center.q-px-sm.q-mb-xs.bg-grey-9
-  span(v-if="node").text-white {{ node.name }}
+.row.fit.q-px-xs.q-pt-xs
+  div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-grey-9
+    img(
+      v-if="node"
+      :src="node.meta.compositions[0].thumbUrl" draggable="false"
+      :style=`{borderRadius: '10px', overflow: 'hidden', objectFit: 'contain', pointerEvents: 'none'}`).full-width
+    .row.full-width.q-pa-sm
+      span(v-if="node").text-white.text-bold {{ node.name }}
 </template>
 
 <script>
 export default {
-  name: 'chainListItem',
+  name: 'extraExplore_chainByteItem',
   props: ['nodeExplore', 'chain'],
   data () {
     return {

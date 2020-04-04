@@ -4,7 +4,8 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
     div(:style=`{height: '60px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center.content-center
         div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')")
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')"
+            :style=`{background: 'rgba(0,0,0,0.5)'}`)
         .col.full-height
           .row.fit.items-center.content-center.justify-center
             span.text-white.text-bold Composition finder

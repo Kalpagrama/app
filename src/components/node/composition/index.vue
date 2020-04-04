@@ -1,12 +1,12 @@
 <template lang="pug">
 div(
   :style=`{position: 'relative', height: mini ? 'auto' : '100%'}`
-  ).row.full-width.items-start.content-start.bg-black
+  ).row.full-width.items-start.content-start
   //- composition menu
   q-btn(
     v-if="true &ctx !== 'workspace' && visible && active && !mini && value"
     round flat color="white" icon="more_vert" @click="menuToggle()"
-    :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)', transform: 'translate3d(0,0,0)'}`)
+    :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.8)', transform: 'translate3d(0,0,0)'}`)
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"
@@ -24,6 +24,7 @@ div(
     v-if="visible && value"
     :ctx="ctx" :composition="value"
     :visible="visible" :active="active" :mini="mini"
+    :bgClass="bgClass"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
     template(v-slot:editor=`{player, meta}`)
       slot(name="editor" :player="player" :meta="meta")
@@ -44,7 +45,8 @@ export default {
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},
     mini: {type: Boolean, default () { return false }},
-    styles: {type: Object, default () { return {} }}
+    styles: {type: Object, default () { return {} }},
+    bgClass: {type: String, default () { return 'bg-black' }}
   },
   data () {
     return {

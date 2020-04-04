@@ -12,24 +12,27 @@ body
 </style>
 
 <template lang="pug">
-//- position: 'fixed', top: $store.state.ui.offsetTop+'px', height: $store.state.ui.height+'px'
-q-layout(view="hHh lpR fFf" container
-  :style=`{position: 'fixed', top: 0+'px', height: $q.screen.height+'px'}` @scroll="onScrollLayout").bg-black
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}` @scroll="onScrollLayout").bg-grey-10
   q-page-container
-    q-page
+    q-page.row.full-width.justify-center
+      //- div(:style=`{width: '500px', height: $q.screen.height+'px', order: 1000}`).row.bg-red
       div(
         v-touch-pan.mouse.stop.mightPrevent="onPanBody"
-        :style=`{position: 'relative', height: $q.screen.height-extraHeight+'px'}`).row.full-width
+        :style=`{
+          position: 'relative', height: $q.screen.height-extraHeight+'px',
+          maxWidth: $store.state.ui.maxWidthPage+'px'}`
+        ).row.full-width
         //- back
         q-btn(
           flat round icon="keyboard_arrow_left" color="white" @click="$router.back()"
-          :style=`{position: 'absolute', top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`)
+          :style=`{position: 'fixed', top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`)
         //- tint
         div(
           v-if="extraMode === 'mini'"
           @click="extraHeight = 'natural'"
           :style=`{position: 'absolute', zIndex: 2000}`).row.fit
         .column.fit
+          div(:style=`{height: '60px'}`).row.full-width
           .col.full-width.q-pa-xs
             div(
               v-if="$q.screen.height - extraHeight < nodeHeightPreview"
@@ -39,7 +42,8 @@ q-layout(view="hHh lpR fFf" container
                 :style=`{objectFit: 'contain', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).fit
             div(
               v-if="$q.screen.height - extraHeight > nodeHeightPreview"
-              ref="nodeWrapperAll").row.full-width.items-start.content-start
+              :style=`{borderRadius: '10px', overflow: 'hidden'}`
+              ref="nodeWrapperAll").row.full-width.items-start.content-start.bg-grey-9
               div(ref="nodeWrapperActions").row.full-width
                 div(ref="nodeWrapperAuthor").row.full-width
                   div(ref="nodeWrapperName").row.full-width
@@ -58,7 +62,7 @@ q-layout(view="hHh lpR fFf" container
                   //- author
                   div(:style=`{height: '60px'}`).row.full-width
                     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-                      div(:style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.bg-grey-4
+                      div(:style=`{height: '40px', width: '40px', borderRadius: '50%', overflow: 'hidden'}`).row.bg-grey-4
                         img(:src="node.author.thumbUrl").fit
                     .col.full-height
                       .row.fit.items-start.content-start.q-pt-sm
@@ -72,20 +76,23 @@ q-layout(view="hHh lpR fFf" container
                   q-btn(flat round color="grey-6" icon="cloud_queue")
                   q-btn(flat round color="grey-6" icon="share")
               //- spheres
-              div().row.full-width.q-pa-md
-                small(v-for="(s,si) in name.split(' ')" :key="si" :style=`{borderRadius: '10px'}`).text-white.q-py-xs.q-px-sm.q-mr-xs.q-mb-xs.bg-grey-9 {{'#'+s}}
+              div(:style=`{marginBottom: '100px'}`).row.full-width.q-pa-md
+                small(v-for="(s,si) in name.split(' ')" :key="si" :style=`{borderRadius: '10px'}`).text-white.q-py-xs.q-px-sm.q-mr-xs.q-mb-xs.bg-grey-8 {{'#'+s}}
       //- fixed
       //- v-touch-pan.mouse.vertical.prevent="onPanBody"
       div(
         :style=`{
           position: 'fixed', zIndex: 1000, bottom: '0px', right: '0px',
           borderRadius: '10px 10px 0 0', overflow: 'hidden',
-          height: extraHeight+'px'}`
-        ).row.full-width.bg-grey-10
+          height: extraHeight+'px',
+          maxWidth: $store.state.ui.maxWidthPage+'px',
+          left: '50%', right: '50%', transform: 'translate(-50%, 0)'}`
+        ).row.full-width.justify-center.bg-grey-8
         component(
           :is="`extra-${tab}`" :node="node" :nodeFull="nodeFull"
           :height="extraHeight" :heightKey="heightKey"
-          :tabs="tabs" :tab="tab" @tab="tab = $event, tabChanged($event)")
+          :tabs="tabs" :tab="tab" @tab="tab = $event, tabChanged($event)"
+          :style=`{maxWidth: $store.state.ui.maxWidth+'px'}`)
 </template>
 
 <script>
@@ -126,6 +133,7 @@ export default {
         preview: this.nodeHeightPreview + 8,
         name: this.nodeHeightName + 8,
         auhtor: this.nodeHeightAuthor + 8,
+        middle: this.$q.screen.height / 2,
         actions: this.nodeHeightActions + 8,
         node: this.nodeHeightAll + 8,
         maxi: this.$q.screen.height - 60

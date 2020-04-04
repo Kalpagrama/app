@@ -6,7 +6,7 @@
     div(
       @click="progressClick"
       v-touch-pan.mouse.prevent.left.right="progressPan"
-      :style=`{position: 'relative', zIndex: 300, height: '20px', borderRadius: '10px'}`).row.full-width.items-center.content-center
+      :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '10px', borderRadius: '10px'}`).row.full-width.items-center.content-center
       //- progress WRAPPER
       div(
         ref="progressWrapper"
@@ -34,14 +34,14 @@
             }`).bg-green
     //- progress actions
     div(:style=`{position: 'relative'}`).row.full-width
-      div(:style=`{position: 'absolute', top: '-10px', zIndex: 100, height: '18px'}`).row.full-width.items-center.content-center
+      div(:style=`{position: 'absolute', top: '-20px', zIndex: 100, height: '18px'}`).row.full-width.items-center.content-center
         small(
           :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
-          ).text-white.q-px-xs.q-py-xs {{ $time(now) }}
+          ).text-white.q-px-xs {{ $time(now) }}
         .col
         small(
               :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
-              ).text-white.q-px-xs.q-py-xs -{{ $time(duration-now) }}
+              ).text-white.q-px-xs -{{ $time(duration-now) }}
     div(
       v-if="false"
       :style=`{height: '60px', order: -1}`).row.full-width.items-center

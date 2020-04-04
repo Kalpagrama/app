@@ -29,7 +29,7 @@
         q-btn(dense :flat="mode !== 'gallery'" color="green" no-caps @click="mode = 'gallery'").q-px-sm Gallery
         q-btn(dense :flat="mode !== 'feed'" color="green" no-caps @click="mode = 'feed'").q-px-sm.q-mx-sm Feed
   .col.full-width.scroll
-    .row.full-width.justify-center
+    .row.full-width.justify-center.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '80px'}`).row.full-width.items-start.content-start
         kalpa-loader(type="wsContents" :variables=`{}`)
           template(v-slot:items=`{items}`)

@@ -11,7 +11,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       v-if="!active" @click="$emit('tintClick')"
       :style=`{position: 'absolute', zIndex: 300, borderRadius: '10px', background: 'rgba(0,0,0,0.4)'}`).row.fit
   //- header
-  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+  div(
+    v-if="false"
+    :style=`{height: '60px'}`).row.full-width.items-center.content-center
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
       router-link(v-if="nodeFull" :to="'/user/'+nodeFull.author.oid")
         img(:src="nodeFull.author.thumbUrl" :style=`{width: '40px', height: '40px', borderRadius: '50%', overflow: 'hidden'}`)
@@ -42,8 +44,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     ref="nodeName"
     :style=`{height: 'auto'}`
     ).row.full-width
-    div(:style=`{width: '60px', minHeight: '60px'}`).row.full-height.items-center.content-center.justify-center
-      q-btn(round push color="green" icon="blur_on" :style=`{borderRadius: '50% !important'}`)
+    //- div(:style=`{width: '60px', minHeight: '60px'}`).row.full-height.items-center.content-center.justify-center
+    //-   q-btn(round push color="green" icon="blur_on" :style=`{borderRadius: '50% !important'}`)
     div(:style=`{}`).col
       .row.fit.items-center.content-center.q-pa-sm
         router-link(:to="'/node/'+node.oid")
