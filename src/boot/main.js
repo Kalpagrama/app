@@ -11,6 +11,7 @@ import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'v-viewer'
+import VueMasonry from 'vue-masonry-css'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -34,6 +35,7 @@ var router
 export default async ({ Vue, store, router: VueRouter }) => {
   try {
     router = VueRouter
+    Vue.use(VueMasonry)
     Vue.use(VueYandexMetrika, {
       id: 60818698,
       router: router,
