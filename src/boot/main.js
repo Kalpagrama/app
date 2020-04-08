@@ -121,6 +121,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('contentFinder', () => import('components/node/content_finder'))
     Vue.component('contentEditor', () => import('components/node/content_editor'))
     Vue.component('contentExplorer', () => import('components/node/content_explorer'))
+    Vue.component('listMasonry', () => import('components/list_masonry'))
   } catch (err) {
     logE(err)
   }
