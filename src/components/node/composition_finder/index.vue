@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
+q-layout(view="hHh lpR fFf" container :style=`{height: height ? height+'px' : $q.screen.height+'px'}`)
   q-header(reveal)
     div(:style=`{height: '60px'}`).row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center.content-center
@@ -25,6 +25,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
 // or create a composition
 export default {
   name: 'compositionFinder',
+  props: ['height'],
   components: {},
   data () {
     return {
