@@ -1,6 +1,6 @@
 <template lang="pug">
 div(
-  :style=`{position: 'relative', height: mini ? 'auto' : '100%'}`
+  :style=`{position: 'relative', height: mini ? 'auto' : '100%', borderRadius: '10px', overflow: 'hidden'}`
   ).row.full-width.items-start.content-start
   //- composition menu
   q-btn(

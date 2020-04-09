@@ -82,7 +82,9 @@ div(
           v-show="forwarding === 'right'"
           :style=`{userSelect: 'none', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).text-white.q-pa-sm {{ $time(forwardingCount) }}
     //- video wrapper
-    div(:style=`{position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)',
+    div(:style=`{
+      position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)',
+      borderRadius: '10px', overflow: 'hidden',
       opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).row.full-width
       //- preload="auto"
       video(
