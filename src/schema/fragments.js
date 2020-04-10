@@ -9,19 +9,9 @@ const metaFragment = gql`
   fragment metaFragment on Meta {
     type
     ...on MetaNode {
-      compositions{
+      items{
         oid
         thumbUrl(preferWidth: 600)
-        layers{
-          contentOid
-          figuresAbsolute{
-            points{x y}
-            t
-          }
-        }
-        meta {
-          ... on MetaComposition{...metaComposition}
-        }
       }
       layout
     }
@@ -51,8 +41,7 @@ const objectShortWithMetaFragment = gql`
   }
 `
 
-const objectFragment = gql`
-  ${metaFragment} ${objectShortFragment}
+const objectFragment = gql`${metaFragment} ${objectShortFragment}
   fragment objectFragment on Object {
     type
     oid
@@ -66,8 +55,33 @@ const objectFragment = gql`
     revision
   }
 `
-const compositionFragment = gql`
-  ${objectFragment} ${objectShortFragment}
+const sphereFragment = gql`${objectFragment}
+  fragment sphereFragment on Object {
+    ...objectFragment
+  }
+`
+const videoFragment = gql`${objectFragment}
+  fragment videoFragment on Video {
+    ...objectFragment
+    url
+    urlOriginal
+    duration
+    width
+    height
+    frameUrls
+    contentSource
+  }
+`
+const imageFragment = gql`${objectFragment}
+  fragment imageFragment on Image {
+    ...objectFragment
+    url
+    urlOriginal
+    width
+    height
+  }
+`
+const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment}
   fragment figureFragment on Figure {
     t
     points {
@@ -136,17 +150,8 @@ const compositionFragment = gql`
         type
         thumbUrl(preferWidth: 600)
         name
-        ...on Video {
-          url
-          duration
-          width
-          height
-          frameUrls
-          contentSource
-        }
-        ... on Image {
-          url
-        }
+        ...on Video {...videoFragment}
+        ...on Image {...imageFragment}
       }
       figuresAbsolute{...figureFragment}
       figuresRelative {...figureFragment}
@@ -162,55 +167,7 @@ const compositionFragment = gql`
     contentSource
   }
 `
-
-const videoFragment = gql`
-  ${objectFragment}
-  fragment videoFragment on Video {
-    ...objectFragment
-    url
-    urlOriginal
-    duration
-    width
-    height
-    frameUrls
-    contentSource
-  }
-`
-const imageFragment = gql`
-  ${objectFragment}
-  fragment imageFragment on Image {
-    ...objectFragment
-    url
-    urlOriginal
-    width
-    height
-  }
-`
-const nodeFragment = gql`
-  ${videoFragment} ${imageFragment} ${objectFragment} ${compositionFragment} ${objectShortFragment}
-  fragment nodeFragment on Node {
-    ...objectFragment
-    sphereFromName{...objectShortFragment}
-    rate
-    rateUser
-    viewCnt
-    author {
-      oid
-      type
-      name
-      thumbUrl(preferWidth: 50)
-    }
-    spheres {
-      oid
-      name
-    }
-    category
-    layout
-    compositions {...compositionFragment}
-  }
-`
-const chainFragment = gql`
-  ${videoFragment} ${imageFragment} ${objectFragment} ${compositionFragment} ${objectShortFragment}
+const chainFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment}
   fragment chainFragment on Chain {
     ...objectFragment
     sphereFromName{...objectShortFragment}
@@ -229,18 +186,35 @@ const chainFragment = gql`
     }
     links{
       name
-      leftObject{...objectFragment}
-      rightObject{...objectFragment}
+      leftItem{...objectShortFragment}
+      rightItem{...objectShortFragment}
       type
     }
   }
 `
-const sphereFragment = gql`
-  ${objectFragment}
-  fragment sphereFragment on Object {
+const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment}
+  fragment nodeFragment on Node {
     ...objectFragment
+    sphereFromName{...objectShortFragment}
+    rate
+    rateUser
+    viewCnt
+    author {
+      oid
+      type
+      name
+      thumbUrl(preferWidth: 50)
+    }
+    spheres {
+      oid
+      name
+    }
+    category
+    layout
+    items {...objectShortFragment}
   }
 `
+
 const eventFragment = gql`
   ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${objectShortFragment} ${objectShortWithMetaFragment}
   fragment eventFragment on Event {
@@ -324,7 +298,7 @@ const userFragment = gql`
   }
 `
 const objectFullFragment = gql`
-  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment}
+  ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment}
   fragment objectFullFragment on Object {
     ...objectFragment
     ...on Video {...videoFragment}
@@ -333,6 +307,7 @@ const objectFullFragment = gql`
     ...on Sphere {... sphereFragment}
     ...on User {... userFragment}
     ...on Chain {...chainFragment}
+    ...on Composition {...compositionFragment}
   }
 `
 

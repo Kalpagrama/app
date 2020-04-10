@@ -21,7 +21,7 @@ export default {
         layout: 'PIP',
         category: 'FUN',
         spheres: [],
-        compositions: []
+        items: []
       }
     }
   },

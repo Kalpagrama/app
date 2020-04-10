@@ -43,7 +43,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           :ctx="'rubick'" label="one"
           @width="width = $event"
           @next="compositionOneNextIndex"
-          :compositions="compositionOneItems"
+          :items="compositionOneItems"
           :compositionOid="compositionOneOid"
           :nodeOid="node.oid"
           :mini="false" :visible="compositionOneVisible" :active="compositionOneActive"
@@ -66,7 +66,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           v-if="node && compositionTwoQuery"
           :ctx="'rubick'" label="two"
           @next="compositionTwoNextIndex"
-          :compositions="compositionTwoItems"
+          :items="compositionTwoItems"
           :compositionOid="compositionTwoOid"
           :nodeOid="node.oid"
           :mini="false" :visible="compositionTwoVisible" :active="compositionTwoActive"
@@ -80,13 +80,13 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       div(v-if="node && $store.state.ui.debug").row.full-width.bg-red
         .row.full-width
           img(
-            :src="node.meta.compositions[0].thumbUrl"
+            :src="node.meta.items[0].thumbUrl"
             :style=`{width: '100px', height: '100px', objectFit: 'contain'}`)
         .row.full-width
           span {{node.name}}
         .row.full-width
           img(
-            :src="node.meta.compositions[1].thumbUrl"
+            :src="node.meta.items[1].thumbUrl"
             :style=`{width: '100px', height: '100px', objectFit: 'contain'}`)
   actions(
     :node="node" :nodeFull="nodeFull" :width="width" :maxWidth="maxWidth"
@@ -143,12 +143,12 @@ export default {
     compositionOneItems () {
       let items = this.compositionOneQuery ? this.compositionOneQuery.items : []
       return items.map(node => {
-        let same = this.compositionTwoOid === node.meta.compositions[1].oid
+        let same = this.compositionTwoOid === node.meta.items[1].oid
         let compositionIndex = same ? 0 : 1
-        let compositionOid = node.meta.compositions[compositionIndex].oid
+        let compositionOid = node.meta.items[compositionIndex].oid
         return {
           node: node,
-          preview: node.meta.compositions[compositionIndex].thumbUrl,
+          preview: node.meta.items[compositionIndex].thumbUrl,
           composition: null,
           compositionIndex: compositionIndex,
           compositionOid: compositionOid
@@ -158,12 +158,12 @@ export default {
     compositionTwoItems () {
       let items = this.compositionTwoQuery ? this.compositionTwoQuery.items : []
       return items.map(node => {
-        let same = this.compositionOneOid === node.meta.compositions[0].oid
+        let same = this.compositionOneOid === node.meta.items[0].oid
         let compositionIndex = same ? 1 : 0
-        let compositionOid = node.meta.compositions[compositionIndex].oid
+        let compositionOid = node.meta.items[compositionIndex].oid
         return {
           node: node,
-          preview: node.meta.compositions[compositionIndex].thumbUrl,
+          preview: node.meta.items[compositionIndex].thumbUrl,
           composition: null,
           compositionIndex: compositionIndex,
           compositionOid: compositionOid
@@ -176,14 +176,14 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('node CHANGED', to)
-        if (to && to.meta.compositions.length === 2) {
+        if (to && to.meta.items.length === 2) {
           let swap
-          if (this.compositionOneOid && this.compositionOneOid === to.meta.compositions[1].oid) swap = true
-          else if (this.compositionTwoOid && this.compositionTwoOid === to.meta.compositions[0].oid) swap = true
+          if (this.compositionOneOid && this.compositionOneOid === to.meta.items[1].oid) swap = true
+          else if (this.compositionTwoOid && this.compositionTwoOid === to.meta.items[0].oid) swap = true
           else swap = false
           this.$log('*** SWAP SWAP SWAP ***', swap)
-          this.compositionOneOid = to.meta.compositions[swap ? 1 : 0].oid
-          this.compositionTwoOid = to.meta.compositions[swap ? 0 : 1].oid
+          this.compositionOneOid = to.meta.items[swap ? 1 : 0].oid
+          this.compositionTwoOid = to.meta.items[swap ? 0 : 1].oid
           this.compositionOneQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionTwoOid], pagination: {pageSize: 30}})
           this.compositionTwoQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid], pagination: {pageSize: 30}})
           this.nodeNameQuery = await this.$store.dispatch('lists/compositionNodes', {compositionOids: [this.compositionOneOid, this.compositionTwoOid], pagination: {pageSize: 30}})
@@ -209,14 +209,14 @@ export default {
       // this.$set(this.compositionsActive, [false, false])
       this.compositionOneActive = false
       this.compositionTwoActive = false
-      let i = this.nodeFull.compositions.findIndex(c => c.oid === oid)
+      let i = this.nodeFull.items.findIndex(c => c.oid === oid)
       this.compositionIndex = i
       this.compositionFinderOpened = true
     },
     async compositionFound (composition) {
       this.$log('compositionFound', composition)
       this.$set(this, 'nodeRubickNew', JSON.parse(JSON.stringify(this.nodeFull)))
-      this.$set(this.nodeRubickNew.compositions, this.compositionIndex, composition)
+      this.$set(this.nodeRubickNew.items, this.compositionIndex, composition)
       this.compositionEditorOpened = true
       this.$wait(300).then(() => {
         this.compositionFinderOpened = false
@@ -224,7 +224,7 @@ export default {
     },
     compositionEdited (composition) {
       this.$log('compositionEdited', composition)
-      this.$set(this.nodeRubickNew.compositions, this.compositionIndex, composition)
+      this.$set(this.nodeRubickNew.items, this.compositionIndex, composition)
       this.compositionOneActive = true
       this.compositionTwoActive = false
     },

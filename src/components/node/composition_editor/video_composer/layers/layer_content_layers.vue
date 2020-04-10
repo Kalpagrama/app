@@ -36,7 +36,7 @@ export default {
     },
     layers () {
       if (this.nodeContent) {
-        return this.nodeContent.compositions[0].layers
+        return this.nodeContent.items[0].layers
       }
       else {
         return []

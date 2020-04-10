@@ -81,11 +81,11 @@ export const events = async (context, { pagination }) => {
 export const sphereNodes = async (context, { oid, pagination, filter, sortStrategy }) => {
   logD('sphereNodes start')
   const fetchItemFunc = async () => {
-    let { data: { sphereNodes: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
+    let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectShortWithMetaFragment}
         query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-          sphereNodes (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+          sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
             count
             totalCount
             nextPageToken
@@ -101,47 +101,50 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
     }
   }
   // { items, count, totalCount, nextPageToken }
-  let feedResult = await context.dispatch('cache/get',
+  let { items, count, totalCount, nextPageToken, prevPageToken } = await context.dispatch('cache/get',
     { key: 'list: ' + JSON.stringify({ oid, pagination, filter, sortStrategy }), fetchItemFunc }, { root: true })
   logD('sphereNodes complete')
-  return feedResult
+  const setCurrentIndx = (indx) => {
+    // todo запрашивать новые порции данных
+  }
+  return { items, count, totalCount, nextPageToken, prevPageToken, setCurrentIndx }
 }
 
-export const compositionNodes = async (context, { compositionOids, pagination, sortStrategy }) => {
-  logD('compositionNodes start')
-  let filter = { types: ['NODE'] }
-  let oid
-  oid = compositionOids[0]
-  filter.compositionOids = compositionOids
-  const fetchItemFunc = async () => {
-    let { data: { sphereNodes: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-      query: gql`
-        ${fragments.objectShortWithMetaFragment}
-        query nodeNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-          sphereNodes (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            count
-            totalCount
-            nextPageToken
-            items {... objectShortWithMetaFragment}
-          }
-        }
-      `,
-      variables: { oid, pagination, filter, sortStrategy }
-    })
-    return {
-      item: { items, count, totalCount, nextPageToken },
-      actualAge: 'hour'
-    }
-  }
-  // { items, count, totalCount, nextPageToken }
-  let feedResult = await context.dispatch('cache/get',
-    {
-      key: 'list: ' + JSON.stringify({ oid, pagination, filter, sortStrategy }),
-      fetchItemFunc
-    }, { root: true })
-  logD('compositionNodes complete')
-  return feedResult
-}
+// export const compositionNodes = async (context, { compositionOids, pagination, sortStrategy }) => {
+//   logD('compositionNodes start')
+//   let filter = { types: ['NODE'] }
+//   let oid
+//   oid = compositionOids[0]
+//   filter.compositionOids = compositionOids
+//   const fetchItemFunc = async () => {
+//     let { data: { sphereItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+//       query: gql`
+//         ${fragments.objectShortWithMetaFragment}
+//         query nodeNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
+//           sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+//             count
+//             totalCount
+//             nextPageToken
+//             items {... objectShortWithMetaFragment}
+//           }
+//         }
+//       `,
+//       variables: { oid, pagination, filter, sortStrategy }
+//     })
+//     return {
+//       item: { items, count, totalCount, nextPageToken },
+//       actualAge: 'hour'
+//     }
+//   }
+//   // { items, count, totalCount, nextPageToken }
+//   let feedResult = await context.dispatch('cache/get',
+//     {
+//       key: 'list: ' + JSON.stringify({ oid, pagination, filter, sortStrategy }),
+//       fetchItemFunc
+//     }, { root: true })
+//   logD('compositionNodes complete')
+//   return feedResult
+// }
 
 // вернет ядра контента относительно метки времени (nodeList).
 // nodeList может изменится в после одного из последующих вызовов getIdx
@@ -153,7 +156,7 @@ export const contentNodes = async (context, { contentOid }) => {
   logD('contentNodes start')
   const fetchItemFunc = async () => {
     // TODO делать запрос с пагинацией по 30 (а потом дозапрашивать при вызове getT)
-    let { items, count, totalCount, nextPageToken, prevPageToken } = await sphereNodes(context, {
+    let { items, count, totalCount, nextPageToken, prevPageToken, setCurrentIndx} = await sphereNodes(context, {
       oid: contentOid,
       pagination: { pageSize: 1000, pageToken: null },
       filter: null,
@@ -172,9 +175,9 @@ export const contentNodes = async (context, { contentOid }) => {
   // вернет расстояние от t до начала ядра. началом ядра считается начало первого по списку слоя с этим(contentOid) контентом
   const getDistance = (contentOid, t, node) => {
     assert(contentOid && node, 'contentOid && node')
-    assert(node.meta && node.meta.compositions && node.meta.compositions.length > 0, 'node.meta && node.meta.compositions && node.meta.compositions.length > 0')
+    assert(node.meta && node.meta.items && node.meta.items.length > 0, 'node.meta && node.meta.items && node.meta.items.length > 0')
     // ищем первый layer на этот контент
-    for (let c of node.meta.compositions) {
+    for (let c of node.meta.items) {
       assert(c.layers, 'c.layers')
       for (let l of c.layers) {
         assert(l.figuresAbsolute, 'l.figuresAbsolute')
@@ -199,7 +202,7 @@ export const contentNodes = async (context, { contentOid }) => {
       if (i + 1 < nodeList.length) nextDistance = getDistance(contentOid, t, nodeList[i + 1])
       if (!nextDistance || nextDistance > distance) return i
     }
-    // let tRounded = Math.round(t / 60) * 60 // округляем до ближайшей минуты (для того чтобы ключ для sphereNodes не получался каждый раз - разным)
+    // let tRounded = Math.round(t / 60) * 60 // округляем до ближайшей минуты (для того чтобы ключ для sphereItems не получался каждый раз - разным)
     return -1
   }
   const getT = (indx) => {
@@ -239,7 +242,7 @@ export const nodeChains = async (context, { nodeOid }) => {
     }
   }
   let { chainList, nextPageToken, prevPageToken } = await context.dispatch('cache/get',
-    { key: 'list: ' + JSON.stringify({ nodeOid }), fetchItemFunc }, { root: true })
+    { key: 'list: ' + JSON.stringify({ oid: nodeOid }), fetchItemFunc }, { root: true })
   const setCurrentIndx = (indx) => {
     // todo запрашивать новые порции данных
   }
@@ -289,14 +292,15 @@ export const wsItems = async (context, { wsItemsType, pagination, filter }) => {
 // подходит ли object под этот фильтр
 function isRestricted (context, filter, objectShort) {
   // logD('isRestricted', filter, objectShort)
-  assert(objectShort.oid && objectShort.type && objectShort.name)
+  assert(objectShort && objectShort.oid && objectShort.type && objectShort.name, '!objectShort')
+  if (!filter) return true
   if (filter.types && !filter.types.includes(objectShort.type)) return false
   if (filter.oids && !filter.oids.includes(objectShort.oid)) return false
   if (filter.name && filter.name !== objectShort.name) return false
   if (filter.nameRegExp && objectShort.name.search(new RegExp(filter.nameRegExp)) === -1) return false
   if (filter.compositionOids) {
     for (let compositionOid of filter.compositionOids) {
-      if (!objectShort.meta.compositions.map(composition => composition.oid).includes(compositionOid)) return false
+      if (!objectShort.meta.items.map(composition => composition.oid).includes(compositionOid)) return false
     }
   }
   return true
@@ -309,6 +313,7 @@ export const processEvent = async (context, event) => {
     case 'WS_ITEM_UPDATED':
       return await updateWsLists(context, event)
     case 'NODE_CREATED':
+    case 'CHAIN_CREATED':
     case 'VOTED':
       return await updateLists(context, event)
     default:
@@ -335,11 +340,11 @@ async function updateLists (context, event) {
       let fastFilter = event.type === 'NODE_CREATED' ? 'CREATED_BY_USER' : 'VOTED_BY_USER'
       if (!filter.fastFilters.includes(fastFilter)) continue
     } else {
-      if (event.type !== 'NODE_CREATED') continue
+      if (event.type !== 'NODE_CREATED' && event.type !== 'CHAIN_CREATED') continue
     }
     if (!isRestricted(context, filter, objectShort)) continue // элемент не подходит под этот фильр
 
-    logD('try add node to sphere... ', { oid, pagination, filter, sortStrategy })
+    logD('try add item to list... ', { oid, pagination, filter, sortStrategy })
     await context.dispatch('cache/update', {
       key: key,
       path: '',

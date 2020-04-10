@@ -3817,7 +3817,7 @@
             "defaultValue": null
           },
           {
-            "name": "compositions",
+            "name": "items",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -4390,7 +4390,7 @@
             "deprecationReason": null
           },
           {
-            "name": "compositions",
+            "name": "items",
             "description": "Пересечение 2х Composition - есть это ядро.",
             "args": [],
             "type": {
@@ -5802,7 +5802,7 @@
             "deprecationReason": null
           },
           {
-            "name": "leftObject",
+            "name": "leftItem",
             "description": "ядро или конент(композиция/сфера)",
             "args": [],
             "type": {
@@ -7986,7 +7986,7 @@
             "deprecationReason": null
           },
           {
-            "name": "compositions",
+            "name": "items",
             "description": null,
             "args": [],
             "type": {

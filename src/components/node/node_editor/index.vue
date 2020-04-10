@@ -78,20 +78,20 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
               :style=`{position: 'relative', zIndex: 200, minHeight: '300px', borderRadius: '10px', overflow: 'hidden'}`
               ).row.full-width.bg-grey-9
               composition(
-                v-if="node.compositions[0]" ctx="editor"
-                :value="node.compositions[0]"
+                v-if="node.items[0]" ctx="editor"
+                :value="node.items[0]"
                 :visible="compositionOneVisible"
                 :active="compositionOneActive"
                 :mini="false")
               //- composition actions
               div(
-                v-if="!node.compositions[0]"
+                v-if="!node.items[0]"
                 :style=`{position: 'absolute', zIndex: 3000}`
                 ).row.fit.items-center.content-center.justify-center
-                q-btn(v-if="!node.compositions[0]" round flat color="green" icon="add" size="lg" @click="compositionFind(0)")
-              q-btn(v-if="node.compositions[0]" round flat color="white" icon="edit" @click="compositionEdit(0)"
+                q-btn(v-if="!node.items[0]" round flat color="green" icon="add" size="lg" @click="compositionFind(0)")
+              q-btn(v-if="node.items[0]" round flat color="white" icon="edit" @click="compositionEdit(0)"
                   :style=`{position: 'absolute', zIndex: 3000, left: '16px', top: '40%', background: 'rgba(0,0,0,0.3)'}`)
-              q-btn(v-if="node.compositions[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
+              q-btn(v-if="node.items[0]" round flat color="red" icon='clear' @click="compositionDelete(0)"
                   :style=`{position: 'absolute', zIndex: 3000, right: '16px', top: '16px', background: 'rgba(0,0,0,0.3)'}`)
             //- essence editor
             div(v-if="node").row.full-width.q-my-sm
@@ -162,7 +162,7 @@ export default {
     },
     async compositionFound (composition) {
       this.$log('compositionFound', composition)
-      this.$set(this.node.compositions, this.compositionIndex, composition)
+      this.$set(this.node.items, this.compositionIndex, composition)
       this.compositionEdit(this.compositionIndex)
       this.$wait(300).then(() => {
         this.compositionFinderOpened = false
@@ -176,17 +176,17 @@ export default {
       this.compositionEditorOpened = true
     },
     compositionEdited () {
-      let composition = this.node.compositions[this.compositionIndex]
+      let composition = this.node.items[this.compositionIndex]
       this.$log('compositionEdited', composition)
       // if we got empty composition
       if (composition.layers[0].figuresAbsolute.length === 0) {
         this.$log('composition EMPTY')
-        this.$set(this.node.compositions, this.compositionIndex, null)
+        this.$set(this.node.items, this.compositionIndex, null)
       }
       // we got good composition with layers with figuresAbsolute
       else {
         this.$log('composition EDITED')
-        this.$set(this.node.compositions, this.compositionIndex, composition)
+        this.$set(this.node.items, this.compositionIndex, composition)
       }
       this.compositionOneActive = true
       this.compositionTwoActive = true
@@ -195,7 +195,7 @@ export default {
       this.$log('compositionDelete', index)
       this.compositionOneActive = false
       this.compositionTwoActive = false
-      this.$set(this.node.compositions, index, null)
+      this.$set(this.node.items, index, null)
     },
     async nodeDelete (oid) {
       try {

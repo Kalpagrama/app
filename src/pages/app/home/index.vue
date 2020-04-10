@@ -52,7 +52,7 @@ q-layout(
           height: $q.screen.height-136+'px'
         }`).row.full-width.bg-grey-10
         composition-finder(
-          v-if="!node.compositions[0]"
+          v-if="!node.items[0]"
           @composition="compositionFound"
           @cancel="compositionFinderDialogShow = false"
           ).bg-grey-9
@@ -70,9 +70,9 @@ q-layout(
               position: 'absolute', zIndex: 1000, left: '8px', top: '50%', transfrom: 'translate(0, -50%)',
               background: 'rgba(0,0,0,0.5)'}`)
           composition(
-            v-if="node.compositions[0]"
+            v-if="node.items[0]"
             ctx="editor"
-            :value="node.compositions[0]"
+            :value="node.items[0]"
             :visible="true"
             :active="!compositionEditorDialogShow"
             :mini="false")
@@ -139,7 +139,7 @@ export default {
       compositionIndex: 0,
       node: {
         name: '',
-        compositions: []
+        items: []
       }
     }
   },
@@ -174,7 +174,7 @@ export default {
     },
     compositionFound (composition) {
       this.$log('compositionFound', composition)
-      this.$set(this.node.compositions, this.compositionIndex, composition)
+      this.$set(this.node.items, this.compositionIndex, composition)
       this.compositionEdit(this.compositionIndex)
       // this.$wait(300).then(() => {
       //   this.compositionFinderDialogShow = false

@@ -78,6 +78,14 @@ async function processEvent (context, event) {
       await context.dispatch('lists/processEvent', event, { root: true })
       context.commit('addEvent', { event, context })
       break
+    case 'CHAIN_CREATED':
+      if (event.subject.oid === context.rootState.auth.userOid) {
+        notifyUserActionComplete(event.type, event.object)
+      }
+      // поместить ядро во все ленты
+      await context.dispatch('lists/processEvent', event, { root: true })
+      context.commit('addEvent', { event, context })
+      break
     case 'VOTED':
       if (event.subject.oid === context.rootState.auth.userOid) {
         notifyUserActionComplete(event.type, event.object)
@@ -200,6 +208,9 @@ function notifyUserActionComplete (eventType, object) {
   switch (eventType) {
     case 'NODE_CREATED':
       eventMessage = i18n.t('node created')
+      break
+    case 'CHAIN_CREATED':
+      eventMessage = i18n.t('chain created')
       break
     case 'NODE_DELETED':
       eventMessage = i18n.t('node deleted')

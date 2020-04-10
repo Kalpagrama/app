@@ -14,7 +14,7 @@
     .col.full-width.scroll
       .row.full-width.items-start.content-start
         //- div(
-        //-   v-for="(c,ci) in compositions" :key="ci"
+        //-   v-for="(c,ci) in items" :key="ci"
         //-   :class=`{
         //-     'bg-grey-9': true
         //-   }`
@@ -28,14 +28,14 @@ export default {
   name: 'wsCompositions',
   data () {
     return {
-      compositions: []
+      items: []
     }
   },
   computed: {
     compositionsGrouped () {
-      return this.compositions.reduce((acc, val) => {
-        // get contents from compositions
-        // group by content for compositions
+      return this.items.reduce((acc, val) => {
+        // get contents from items
+        // group by content for items
         return acc
       }, {})
     }
@@ -43,8 +43,8 @@ export default {
   methods: {
     refresh () {
       this.$log('refresh')
-      this.compositions = []
-      this.compositions = this.compositionsLoad()
+      this.items = []
+      this.items = this.compositionsLoad()
     },
     async compositionsLoad () {
       this.$log('compositionsLoad')
@@ -55,7 +55,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    // this.compositions = await this.compositionsLoad()
+    // this.items = await this.compositionsLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

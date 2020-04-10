@@ -18,7 +18,7 @@ export default {
     node () {
       if (!this.chainFull) return null
       let link = this.chainFull.links[0]
-      if (link.leftObject.oid === this.nodeExplore.oid) return link.rightObject
+      if (link.leftItem.oid === this.nodeExplore.oid) return link.rightItem
       else return link.rightObject
     }
   },

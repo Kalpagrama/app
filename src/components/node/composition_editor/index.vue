@@ -19,7 +19,7 @@ export default {
   },
   computed: {
     composition () {
-      return this.node.compositions[this.compositionIndex]
+      return this.node.items[this.compositionIndex]
     }
   }
 }

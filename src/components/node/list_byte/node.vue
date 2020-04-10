@@ -8,7 +8,7 @@ div(
       :src="node.thumbUrl"
       :style=`{width: '100%', objectFit: 'contain'}`)
     composition(
-      v-if="nodeFull" :composition="nodeFull.compositions[0]"
+      v-if="nodeFull" :composition="nodeFull.items[0]"
       :style=`{position: 'absolute', zIndex: 100, opacity: 1}`)
   //- essence
   div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-md
@@ -19,7 +19,7 @@ div(
       :src="node.thumbUrl"
       :style=`{width: '100%', objectFit: 'contain'}`)
     composition(
-      v-if="nodeFull" :composition="nodeFull.compositions[1]"
+      v-if="nodeFull" :composition="nodeFull.items[1]"
       :style=`{position: 'absolute', zIndex: 100, opacity: 1}`)
 </template>
 
