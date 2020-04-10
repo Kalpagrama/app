@@ -75,39 +75,45 @@ export const wsNodeSave = async (context, node) => {
     nodeInput.spheres = node.spheres.map(s => {
       return { name: s.name }
     })
-    nodeInput.items = node.items.map(c => {
-      if (c) {
-        return {
-          // name: c.name || '',
-          spheres: [],
-          operation: {
-            operations: c.operation.operations,
-            items: c.operation.items,
-            type: c.operation.type
-          },
-          layers: c.layers.map(l => {
-            return {
-              contentOid: l.content.oid,
-              spheres: l.spheres.map(s => {
+    nodeInput.items = node.items.map(item => {
+      if (item) {
+        if (item.composition) {
+          return {
+            composition: {
+              spheres: [],
+              operation: {
+                operations: item.composition.operation.operations,
+                items: item.composition.operation.items,
+                type: item.composition.operation.type
+              },
+              layers: item.composition.layers.map(l => {
                 return {
-                  name: s.name
-                }
-              }),
-              figuresAbsolute: l.figuresAbsolute.map(f => {
-                assert(f.t >= 0, 'f.t >= 0')
-                return {
-                  t: f.t,
-                  points: f.points.map(p => {
+                  contentOid: l.content.oid,
+                  spheres: l.spheres.map(s => {
                     return {
-                      x: p.x,
-                      y: p.y,
-                      z: p.z
+                      name: s.name
+                    }
+                  }),
+                  figuresAbsolute: l.figuresAbsolute.map(f => {
+                    assert(f.t >= 0, 'f.t >= 0')
+                    return {
+                      t: f.t,
+                      points: f.points.map(p => {
+                        return {
+                          x: p.x,
+                          y: p.y,
+                          z: p.z
+                        }
+                      })
                     }
                   })
                 }
               })
             }
-          })
+          }
+        }
+        else {
+          return null
         }
       } else {
         return null

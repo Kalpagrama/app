@@ -77,6 +77,7 @@ export default {
   },
   async mounted () {
     this.nodeFull = await this.$store.dispatch('workspace/get', {oid: this.node.oid})
+    this.nodeFull.items[0] = await this.$store.dispatch('workspace/get', {oid: this.nodeFull.items[0].oid})
   }
 }
 </script>

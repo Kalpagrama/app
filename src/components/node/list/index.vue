@@ -1,7 +1,7 @@
 <template lang="pug">
 .column.fit
   //- header
-  div(v-if="true").row.full-width.justify-center.q-pa-xs
+  div(v-if="false").row.full-width.justify-center.q-pa-xs
     div(
       :style=`{
         maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px',

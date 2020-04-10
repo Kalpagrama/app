@@ -9,7 +9,7 @@
     ref="nodeListMiddleScroll"
     ).col.full-width.scroll
     .row.full-width.justify-center.q-pt-md
-      slot(name="header")
+      //- slot(name="header")
       div(
         :style=`{
           maxWidth: $store.state.ui.maxWidthPage+'px',

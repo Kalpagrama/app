@@ -16,15 +16,15 @@ iframe
 <template lang="pug">
 q-layout( view="hHh Lpr lff")
   kalpa-action
-  //- q-drawer(
-  //-   v-if="$q.screen.gt.xs && $route.name !== 'welcome'"
-  //-   v-model="$q.screen.xs ? false : drawerShow"
-  //-   no-swipe-open no-swipe-close
-  //-   behavior="desktop"
-  //-   :side="$q.screen.xs ? 'right' : 'left'"
-  //-   :width="60"
-  //-   content-class="bg-grey-8")
-  //-   kalpa-menu-desktop(v-if="!loading" :style=`{zIndex: 10000}`)
+  q-drawer(
+    v-if="$q.screen.gt.xs && $route.name !== 'welcome'"
+    v-model="$q.screen.xs ? false : drawerShow"
+    no-swipe-open no-swipe-close
+    behavior="desktop"
+    :side="$q.screen.xs ? 'right' : 'left'"
+    :width="60"
+    content-class="bg-grey-8")
+    kalpa-menu-desktop(v-if="!loading" :style=`{zIndex: 10000}`)
   q-dialog(
     :value="$store.state.ui.menuAppShow" @hide="$store.commit('ui/stateSet', ['menuAppShow', false])" position="bottom")
     kalpa-menu-xs

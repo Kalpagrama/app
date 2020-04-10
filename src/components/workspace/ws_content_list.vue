@@ -87,9 +87,10 @@ export default {
           spheres: [],
           items: [
             {
-              // name: content.name,
-              operation: { type: 'CONCAT', items: [], operations: null },
-              layers: [{ content: content, figuresAbsolute: [], figuresRelative: [], spheres: [] }]
+              composition: {
+                operation: { type: 'CONCAT', items: [], operations: null },
+                layers: [{ content: content, figuresAbsolute: [], figuresRelative: [], spheres: [] }]
+              }
             }
           ]
         }
