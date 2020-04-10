@@ -1,19 +1,25 @@
 <template lang="pug">
 .column.fit
   div(
-    v-show="height > 100"
-    :style=`{position: 'relative', minHeight: '60px'}`).row.full-width.items-center.justify-center
-    //- img(:src="content.thumbUrl" :style=`{width: '100%', pointerEvents: 'none'}`)
-    div(:style=`{position: 'absolute', zIndex: 100, background: 'rgba(0,0,0,0.2)'}`).row.fit.items-end.q-pa-sm
-      span(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.8)'}`).text-bold.text-white.q-pa-sm {{ content.name }}
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
+    v-if="height > 100"
+    :style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
+    span(:style=`{borderRadius: '10px'}`).text-bold.text-white {{ content.name }}
+  div(
+    v-if="height > 120"
+    ).col.full-width.scroll
+    .row.full-width.items-start.content-start.q-px-md
+      span.text-white {{text}}
 </template>
 
 <script>
 export default {
   name: 'videoComposer_extraNodes',
   props: ['composition', 'meta', 'player', 'height'],
+  data () {
+    return {
+      text: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic'
+    }
+  },
   computed: {
     layers () {
       return this.composition.layers
@@ -23,10 +29,6 @@ export default {
     },
     content () {
       return this.layer.content
-    }
-  },
-  data () {
-    return {
     }
   }
 }

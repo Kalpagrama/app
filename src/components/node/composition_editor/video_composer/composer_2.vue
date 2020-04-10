@@ -29,7 +29,7 @@ div
       .col
         kalpa-buttons(:value="tabs" :id="tab" @id="tabChanged($event)").justify-center
       q-btn(
-        push color="green" icon="check" @click="$emit('cancel')"
+        push color="green" no-caps icon="check" @click="$emit('cancel')"
         :style=`{width: '38px', height: '38px'}`)
 </template>
 

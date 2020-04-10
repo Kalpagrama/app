@@ -53,7 +53,7 @@ div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
             div(
               v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
               :style=`{height: '50px', width: '50px', borderLeft: fi === 0 ? 'none' : '1px solid grey'}`
-              ).row.items-center.justify-center.bg-grey-5
+              ).row.items-center.justify-center.bg-white
               small(:style=`{userSelect: 'none', pointerEvents: 'none'}`).cursor-pointer {{ $time((parseInt((((fi+1)*frameDuration)-frameDuration/2)*100))/100) }}
           //- layers tints
           div(
@@ -61,15 +61,18 @@ div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
             v-if="l.figuresAbsolute.length > 0 && li !== layerIndex"
             :style=`{
               position: 'absolute', height: '50px', background: $randomColor(li),
-              pointerEvents: 'none', opacity: 0.5,
+              pointerEvents: 'none', opacity: 0.1,
               left: (l.figuresAbsolute[0].t/duration)*100+'%',
               width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/duration)*100+'%'}`).row
           //- left tint
           div(
             v-if="layer.figuresAbsolute.length > 0"
-            :style=`{position: 'absolute', left: 0, top: 0, height: '50px',
+            :style=`{
+              position: 'absolute', left: 0, top: 0, height: '50px',
               width: 'calc( '+(layer.figuresAbsolute[0].t/duration)*100+'% + 6px )',
-              opacity: 0.6, pointerEvents: 'none'}`).row.bg-black
+              borderRadius: '10px 0 0 10px', overflow: 'hidden',
+              opacity: 0.6, pointerEvents: 'none'
+            }`).row.bg-black
           //- middle layers
           div(
             v-if="layer.figuresAbsolute.length > 0"
@@ -101,9 +104,12 @@ div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
           //- right tint
           div(
             v-if="layer.figuresAbsolute.length > 0"
-            :style=`{position: 'absolute', right: 0, top: 0, height: '50px',
+            :style=`{
+              position: 'absolute', right: 0, top: 0, height: '50px',
               width: 'calc( '+((duration-layer.figuresAbsolute[1].t)/duration)*100+'% + 8px )',
-              opacity: 0.6, pointerEvents: 'none'}`).row.bg-black
+              borderRadius: '0 10px 10px 0 ', overflow: 'hidden',
+              opacity: 0.6, pointerEvents: 'none'
+            }`).row.bg-black
         //- right padding
         div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
 </template>

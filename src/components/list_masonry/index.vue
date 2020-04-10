@@ -28,7 +28,8 @@ div(
           v-for="(i, ii) in items" :key="i.oid"
           @mouseenter="itemEnter(i, ii)"
           @mouseleave="itemLeave(i, ii)"
-          :class=`{}`
+          :class=`{
+          }`
           :style=`{
             position: 'relative'
           }`
@@ -45,6 +46,9 @@ div(
           //- slot
           div(
             :ref="`item-${i.oid}`"
+            :class=`{
+              'shadow-20': i.oid === itemOid
+            }`
             :style="itemStyles(i.oid)"
             ).row.fit
             slot(name="item" :item="i" :index="ii" :isHovered="i.oid === itemOidHovered")
@@ -79,7 +83,7 @@ export default {
         return to
       }
       else {
-        return 0.2
+        return 0.1
       }
     }
   },
@@ -123,7 +127,9 @@ export default {
           left: m.left + 'px',
           top: m.top + 'px',
           maxWidth: width + 'px',
-          maxHeight: height + 'px'
+          maxHeight: height + 'px',
+          borderRadius: '10px',
+          oveflow: 'hidden'
         }
       }
       else {

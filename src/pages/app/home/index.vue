@@ -11,11 +11,12 @@ q-layout(
   q-header(reveal).row.full-width.justify-center.q-px-sm
     div(
       :style=`{
-        height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px',
+        height: '60px',
+        maxWidth: $store.state.ui.maxWidthPage+'px',
         zIndex: 10000,
         borderRadius: '0 0 10px 10px', overflow: 'hidden'
       }`
-      ).row.full-width.items-center.content-center.justify-center.bg-grey-4
+      ).row.full-width.items-center.content-center.justify-center.bg-grey-4.shadow-20
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="black" icon="keyboard_arrow_left" @click="$router.back()")
       .col.full-height
@@ -26,7 +27,7 @@ q-layout(
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
       v-if="!compositionFinderDialogShow"
-      push color="green" no-caps @click="compositionFinderDialogShow = true"
+      push color="green" no-caps @click="compositionFind()"
       :style=`{
         position: 'fixed', zIndex: 1000, bottom: '8px', left: '50%', transform: 'translate(-50%, 0%)',
         width: '250px', height: '50px', borderRadius: '25px'
@@ -49,7 +50,7 @@ q-layout(
           maxWidth: $store.state.ui.maxWidthPage+'px',
           borderRadius: '10px', overflow: 'hidden',
           height: $q.screen.height-136+'px'
-        }`).row.full-width
+        }`).row.full-width.bg-grey-10
         composition-finder(
           v-if="!node.compositions[0]"
           @composition="compositionFound"
@@ -57,8 +58,17 @@ q-layout(
           ).bg-grey-9
         div(
           :style=`{
-            height: $q.screen.height-136-120+'px'
+            position: 'relative',
+            zIndex: 300,
+            height: $q.screen.height-136-120+'px',
+            borderRadius: '10px',
+            overflow: 'hidden'
           }`).row.full-width
+          q-btn(
+            flat round color="white" icon="edit" @click="compositionEdit(0)"
+            :style=`{
+              position: 'absolute', zIndex: 1000, left: '8px', top: '50%', transfrom: 'translate(0, -50%)',
+              background: 'rgba(0,0,0,0.5)'}`)
           composition(
             v-if="node.compositions[0]"
             ctx="editor"
@@ -97,9 +107,6 @@ q-layout(
               position: 'relative'
             }`
             ).row.fit
-            //- div(
-            //-   v-if="!isOver"
-            //-   :style=`{position: 'absolute', zIndex: 100, background: 'rgba(0,0,0,0.15)', borderRadius: '10px', overflow: 'hidden'}`).row.fit
             //- layer name
             small(
               v-if="isHovered"
@@ -158,6 +165,13 @@ export default {
     }
   },
   methods: {
+    compositionFind () {
+      this.$log('compositionFind')
+      this.$refs.listMasonry.itemClick(null, null)
+      this.$wait(350).then(() => {
+        this.compositionFinderDialogShow = true
+      })
+    },
     compositionFound (composition) {
       this.$log('compositionFound', composition)
       this.$set(this.node.compositions, this.compositionIndex, composition)

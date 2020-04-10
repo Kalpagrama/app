@@ -36,7 +36,7 @@ div(:style=`{}`).column.fit
           'bg-grey-8': li !== meta.layerIndexPlay,
         }`
         :style=`{minHeight: '35px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.q-px-sm.q-mb-sm
+        ).row.full-width.items-center.content-center.q-px-sm.q-mb-sm.cursor-pointer
         //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
         //-   div(
         //-     v-if="li === meta.layerIndexPlay"
@@ -77,13 +77,14 @@ export default {
     'meta.layerIndexPlay': {
       handler (to, from) {
         this.$log('meta.layerIndexPlay CHANGED', to)
-        if (to < 0) return
+        // if (to < 0) return
         // let refs = this.$refs[`layer-${to}`]
-        let ref = this.$refs[`layer-${to}`][0]
-        this.$log('ref', ref)
-        let offsetTop = ref.offsetTop
-        this.$log('offsetTop', offsetTop)
-        this.$tween.to(this.$refs.extraNodesScroll, 0.2, {scrollTop: offsetTop - 8})
+        // let ref = refs ? refs[0] : null
+        // if (!ref) return
+        // this.$log('ref', ref)
+        // let offsetTop = ref.offsetTop
+        // this.$log('offsetTop', offsetTop)
+        // this.$tween.to(this.$refs.extraNodesScroll, 0.2, {scrollTop: offsetTop - 8})
       }
     }
   },
