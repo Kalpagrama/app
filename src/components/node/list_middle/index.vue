@@ -2,13 +2,13 @@
 .column.fit
   div(v-if="false" :style=`{height: '60px'}`).row.full-width.justify-center
     div(:style=`{color: 'white', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center
-      span.full-width scrollTop: {{ scrollTop }}
-      span.full-width nodeFirstHeight: {{nodeFirstHeight}}
+      small.full-width scrollTop: {{ scrollTop }}
+      small.full-width nodeFirstHeight: {{nodeFirstHeight}}
   //- v-touch-swipe.mouse.vertical="onSwipe"
   div(
     ref="nodeListMiddleScroll"
     ).col.full-width.scroll
-    .row.full-width.justify-center
+    .row.full-width.justify-center.q-pt-md
       slot(name="header")
       div(
         :style=`{
@@ -17,8 +17,9 @@
           paddingBottom: paddingBottom+'px'
         }`
         ).row.fit.items-start.content-start.justify-start.q-px-xs
+        //- @tintClick="onSwipe({direction: $event > nodeMiddle ? 'up' : 'down'})"
         node(
-          v-for="(n, ni, nii) in nodes" :key="n.oid" :accessKey="ni"
+          v-for="(n, ni) in nodes" :key="n.oid" :accessKey="ni"
           v-if="nodesBan ? !nodesBan.includes(n.oid) : true" layout="pip"
           :ref="'node-'+n.oid" :ctx="'list'"
           :node="n" :index="ni"
@@ -27,8 +28,8 @@
           :visible="ni >= nodeMiddle-0 && ni <= nodeMiddle+0"
           :active="nodeMiddle === ni"
           @height="ni === 0 ? onHeight($event) : 0"
-          @tintClick="onSwipe({direction: $event > nodeMiddle ? 'up' : 'down'})"
-          :style=`{borderRadius: '10px', overflow: 'hidden', marginBottom: '30px', marginTop: '30px'}`
+          @tintClick="scrollToIndex(ni)"
+          :style=`{borderRadius: '10px', overflow: 'hidden', marginBottom: '50px'}`
           v-observe-visibility=`{
             callback: nodeMiddleHandler,
             throttle: throttle,
@@ -44,6 +45,7 @@ export default {
   props: {
     nodes: {type: Array},
     nodesBan: {type: Array, default () { return [] }},
+    nodeIndex: {type: Number},
     throttle: {type: Number, default () { return 200 }}
   },
   data () {
@@ -56,9 +58,18 @@ export default {
   },
   watch: {
     nodeMiddle: {
+      immediate: false,
       handler (to, from) {
         this.$log('nodeMiddle CHANGED', to)
         this.$emit('nodeMiddle', to)
+      }
+    },
+    nodeIndex: {
+      handler (to, from) {
+        if (to >= 0) {
+          this.$log('nodeIndex', to)
+          this.scrollToIndex(to)
+        }
       }
     }
   },
@@ -76,6 +87,7 @@ export default {
     onHeight (e) {
       this.$log('onHeight', e)
       this.paddingBottom = this.$refs.nodeListMiddleScroll.clientHeight / 2
+      // this.paddingTop = 60
       // let nodeFirstRef = this.$refs[`node-${this.nodes[0].oid}`][0]
       // this.$log('OH nodeFirstRef', nodeFirstRef)
       // let nodeFirstOffsetTop = nodeFirstRef.$el.offsetTop
@@ -111,6 +123,17 @@ export default {
       this.$log('onSwipe scrollToDelta', scrollToDelta)
       let scrollTo = nodeToOffsetTop - scrollToDelta
       this.$tween.to(this.$refs.nodeListMiddleScroll, 0.4, {scrollTop: scrollTo})
+    },
+    scrollToIndex (indx) {
+      this.$log('scrollToIndex', indx)
+      if (indx === null) return
+      let oid = this.nodes[indx].oid
+      this.$log('oid', oid)
+      let ref = this.$refs[`node-${oid}`][0]
+      this.$log('ref', ref)
+      let offsetTop = ref.$el.offsetTop
+      this.$log('offsetTop', offsetTop)
+      this.$tween.to(this.$refs.nodeListMiddleScroll, 0.4, {scrollTop: offsetTop})
     }
   },
   mounted () {

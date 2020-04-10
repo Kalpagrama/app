@@ -1,13 +1,17 @@
 <template lang="pug">
 .row.fit
   div(:style=`{position: 'relative'}`).column.fit
-    //- actions
-    q-btn(
-      round push size="lg" color="green" icon="add" @click="$emit('add', {type: 'node', item: null})"
-      :style=`{position: 'absolute', zIndex:1000, left: '16px', bottom: '16px'}`)
     //- header with filters...
     .row.full-width.q-px-sm
-      .col.full-height
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '70px'}`).row.full-width.items-center.content-center
+          q-input(
+            v-model="searchInput" filled color="green"
+            placeholder="Search nodes"
+            :input-style=`{paddingLeft: '10px'}`
+            :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.bg-grey-2
+          //- div(:style=`{height: '40px'}`).row.full-width
+      //- .col.full-height
       //- list, gallery, feed
       //- div(:style=`{width: '60px', height: '60px'}`
       //-   ).row.items-center.content-center.justify-center
@@ -21,12 +25,19 @@
     //- body
     //- TODO add scroll area from quasar... width initial scroll height
     div(ref="wsNodesWrapper").col.full-width.scroll
-      div(:style=`{paddingTop: '0px', paddingBottom: '80px'}`).row.full-width.items-start.content-start.q-px-sm
-        kalpa-loader(type="wsNodes" :variables=`{}`)
-          template(v-slot:items=`{items}`)
-            ws-node(
-              v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
-              :oid="oid" :node="n")
+      .row.full-width.justify-center
+        div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingTop: '0px', paddingBottom: '80px'}`
+          ).row.full-width.items-start.content-start
+          //- ADD action
+          q-btn(
+            round push size="lg" color="green" icon="add" @click="$emit('add', {type: 'node', item: null})"
+            :style=`{position: 'absolute', zIndex:1000, right: '16px', bottom: '16px', borderRadius: '50% !important'}`)
+          //- nodes
+          kalpa-loader(type="wsNodes" :variables=`{}`)
+            template(v-slot:items=`{items}`)
+              ws-node(
+                v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
+                :oid="oid" :node="n")
 </template>
 
 <script>
@@ -38,6 +49,7 @@ export default {
   props: [],
   data () {
     return {
+      searchInput: ''
     }
   },
   computed: {

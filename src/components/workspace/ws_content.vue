@@ -17,11 +17,11 @@ div(
       ).q-ma-sm.cursor-pointer {{ contentName }}
   //- content INACTIVE tint
   div(
-    v-if="!contentActive"
+    v-if="true"
     :style=`{position: 'absolute', zIndex: 200}` @click="$emit('contentEdit', nodeFull)").row.fit.cursor-pointer
   //- content active
   div(
-    v-if="contentActive"
+    v-if="contentActive && false"
     :style=`{height: height+'px'}`).row.full-width.items-start.content-start
     //- spheres
     div(v-if="false" :style=`{maxHeight: '50px'}`).row.full-width.items-center.content-center.q-px-sm.scroll
@@ -31,13 +31,13 @@ div(
           :style=`{whiteSpace: 'nowrap', borderRadius: '10px'}`
           ).bg-grey-4.q-px-sm.q-py-xs.q-mr-sm.q-mb-sm.cursor-pointer sphere {{ si}}
     //- actions
-    div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.q-px-sm
-      q-btn(round flat dense color="red" icon="delete_outline" @click="$emit('contentDelete', node.oid)")
-      .col
-      q-btn(
-        push no-caps color="green" @click="$emit('contentEdit', nodeFull)"
-        :style=`{borderRadius: '10px'}`)
-        span.text-bold Edit content
+    //- div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.q-px-sm
+    //-   q-btn(round flat dense color="red" icon="delete_outline" @click="$emit('contentDelete', node.oid)")
+    //-   .col
+    //-   q-btn(
+    //-     push no-caps color="green" @click="$emit('contentEdit', nodeFull)"
+    //-     :style=`{borderRadius: '10px'}`)
+    //-     span.text-bold Edit content
 </template>
 
 <script>

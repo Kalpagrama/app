@@ -28,8 +28,10 @@ module.exports = function (ctx) {
       // 'fontawesome-v5'
       // 'eva-icons'
     ],
+    animations: 'all',
     framework: {
       all: true,
+      animations: 'all',
       components: [
         'QLayout',
         // 'QPullToRefresh',
@@ -40,7 +42,7 @@ module.exports = function (ctx) {
         'QDrawer',
         'QPageContainer',
         // 'QExpansionItem',
-        // 'QPage',
+        'QPage',
         // 'QToolbar',
         // 'QToolbarTitle',
         'QBtn',
@@ -55,7 +57,8 @@ module.exports = function (ctx) {
         // 'QVideo',
         'QResizeObserver',
         'QInput',
-        'QDialog'
+        'QDialog',
+        'QScrollArea'
       ],
       directives: [
         'Ripple',

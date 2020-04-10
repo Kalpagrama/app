@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
-  v-touch-swipe.mouse.left.right="handleSwipe"
   :style=`{position: 'relative', minHeight: height+'px', overflow: 'hidden'}`).row.full-width.items-center.content-center.bg-black
+  //- v-touch-swipe.mouse.left.right="handleSwipe"
   //- debug
   //- small(:style=`{position: 'absolute', zIndex: 4100, top: '0px', right: '0px'}`).text-white {{nodeOid}}
   div(v-if="false" :style=`{position: 'absolute', zIndex: 1000, top: '60px'}`).row.text-white.bg-green

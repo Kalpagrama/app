@@ -28,14 +28,10 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     :style=`{height: '60px'}`).row.full-width.justify-center.q-pa-xs
     div(:style=`{maxWidth: maxWidth+'px'}`).row.full-width.items-center.content-center.q-px-md
       q-btn(
-        v-if="$route.name !== 'node'"
-        round flat color="green" icon="keyboard_arrow_left" @click="$router.back()"
+        v-if="true"
+        round flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
         :style=`{}`)
       .col.full-height
-      q-btn(
-        v-if="node && $route.name !== 'node'"
-        round flat color="green" icon="link" @click="$router.push('/node/' + node.oid)"
-        :style=`{}`)
   //- node wrapper
   div(:style=`{position: 'relative'}`).row.full-width.justify-center.items-start.content-start.q-px-xs.q-pt-xs
     div(:style=`{position: 'relative', maxWidth: maxWidth+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start

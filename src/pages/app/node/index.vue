@@ -1,11 +1,12 @@
 <template lang="pug">
-q-layout(
-  view="hHh lpR fFf"
-  :style=`{height: $q.screen.height+'px'}`)
-  q-page-conainter.row.fit.justify-center.items-start.content-start.bg-grey-9
-    .column.fit
-      .col.full-width.scroll
-        node(v-if="node" ctx="explorer" :node="node" :needFull="true" :visible="true" :active="true" layout="rubick")
+//- q-layout(
+//-   view="hHh lpR fFf"
+//-   :style=`{height: $q.screen.height+'px'}`)
+//-   q-page-conainter.row.fit.justify-center.items-start.content-start.bg-grey-9
+//-     .column.fit
+//-       div(:style=`{position: 'relative'}`).col.full-width.scroll
+//-         node(v-if="node" ctx="explorer" :node="node" :needFull="true" :visible="true" :active="true" layout="rubick")
+node-explorer(v-if="node" :node="node")
 </template>
 
 <script>
@@ -44,6 +45,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus" scoped>
-</style>

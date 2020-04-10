@@ -11,6 +11,7 @@ import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'v-viewer'
+import VueMasonry from 'vue-masonry-css'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -34,6 +35,7 @@ var router
 export default async ({ Vue, store, router: VueRouter }) => {
   try {
     router = VueRouter
+    Vue.use(VueMasonry)
     Vue.use(VueYandexMetrika, {
       id: 60818698,
       router: router,
@@ -90,6 +92,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('nodeList', () => import('components/node/list'))
     Vue.component('nodeSpheres', () => import('components/node/spheres'))
     Vue.component('nodeSpheresEditor', () => import('components/node/spheres_editor'))
+    Vue.component('nodeExplorer', () => import('components/node_explorer'))
     // kalpa
     Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
     Vue.component('kalpaAction', () => import('components/kalpa/action'))
@@ -104,18 +107,21 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kalpaTutorial', () => import('components/kalpa/tutorial'))
     Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))
     // ws
-    Vue.component('wsMenu', () => import('components/workspace/ws_menu'))
+    Vue.component('wsItems', () => import('components/workspace/ws_items'))
     // Vue.component('noteEditor', () => import('components/'))
     // composition
     Vue.component('composition', () => import('components/node/composition'))
     Vue.component('compositionList', () => import('components/node/composition_list'))
     Vue.component('compositionFinder', () => import('components/node/composition_finder'))
     Vue.component('compositionEditor', () => import('components/node/composition_editor'))
+    // sphere
+    Vue.component('sphereSpheres', () => import('components/sphere_spheres'))
     // content
     Vue.component('content', () => import('components/node/content'))
     Vue.component('contentFinder', () => import('components/node/content_finder'))
     Vue.component('contentEditor', () => import('components/node/content_editor'))
     Vue.component('contentExplorer', () => import('components/node/content_explorer'))
+    Vue.component('listMasonry', () => import('components/list_masonry'))
   } catch (err) {
     logE(err)
   }

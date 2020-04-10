@@ -94,8 +94,8 @@ div
           :style=`{width: '30px', height: '100%', borderRadius: '10px', overflow: 'hidden'}`).q-ml-xs
   //- layerAdd
   q-btn(
-    round push size="lg" color="green" icon="add" @click="layerAdd()"
-    :style=`{position: 'absolute', zIndex: 920, bottom: styles.paddingBottom+40+'px', right: '50px'}`)
+    round push size="md" color="green" icon="add" @click="layerAdd()"
+    :style=`{position: 'absolute', zIndex: 920, bottom: styles.paddingBottom+4+'px', borderRadius: '50%', right: '10px'}`)
 </template>
 
 <script>

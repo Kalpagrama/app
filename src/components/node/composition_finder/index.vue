@@ -1,17 +1,25 @@
 <template lang="pug">
-.column.fit.bg-grey-9
-  //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-  //-   q-btn(round flat color="green" icon="keyboard_arrow_left" @click="$emit('cancel')")
-  .col.full-width
-    ws-menu(
-      ctx="finder"
-      :header="false" :toggle="false" :oid="oid"
-      :pages="['content', 'composition']"
-      @item="itemClick" @page="pageClick" :page="page")
-  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm.bg-grey-8
-    q-btn(
-      outline no-caps color="red" @click="$emit('cancel')"
-      :style=`{borderRadius: '10px'}`) Back
+.column.fit
+  //- q-layout(view="hHh lpR fFf" container :style=`{height: height ? height+'px' : $q.screen.height+'px'}`)
+  //- q-header(reveal)
+  div(:style=`{height: '60px'}`).row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit.items-center.content-center
+        //- div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+        //-   q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')"
+        //-     :style=`{background: 'rgba(0,0,0,0.5)'}`)
+        .col.full-height
+          .row.fit.items-center.content-center.justify-center
+            span.text-white.text-bold {{ name || 'Давай найдем что-нибудь'}}
+        //- div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
+  //- q-page-container
+  //-   q-page
+  .col.full-width.scroll
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+          ws-items(
+            ctx="finder"
+            :pages="pages" :page="page" @page="pageClick"
+            @item="itemClick")
 </template>
 
 <script>
@@ -19,13 +27,18 @@
 // or create a composition
 export default {
   name: 'compositionFinder',
+  props: ['name', 'height'],
   components: {},
   data () {
     return {
       oid: undefined,
-      page: 'content',
       node: null,
-      dialogOpened: false
+      dialogOpened: false,
+      page: 'content',
+      pages: [
+        {id: 'content', name: 'Contents'},
+        {id: 'node', name: 'Nodes'}
+      ]
     }
   },
   methods: {

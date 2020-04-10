@@ -1,12 +1,12 @@
 <template lang="pug">
 div(
-  :style=`{position: 'relative', height: mini ? 'auto' : '100%'}`
-  ).row.full-width.items-start.content-start.bg-black
+  :style=`{position: 'relative', height: mini ? 'auto' : '100%', borderRadius: '10px', overflow: 'hidden'}`
+  ).row.full-width.items-start.content-start
   //- composition menu
   q-btn(
-    v-if="false &ctx !== 'workspace' && visible && active && !mini && value"
+    v-if="true &ctx !== 'workspace' && visible && active && !mini && value"
     round flat color="white" icon="more_vert" @click="menuToggle()"
-    :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.2)'}`)
+    :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.8)', transform: 'translate3d(0,0,0)'}`)
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"
@@ -24,6 +24,7 @@ div(
     v-if="visible && value"
     :ctx="ctx" :composition="value"
     :visible="visible" :active="active" :mini="mini"
+    :bgClass="bgClass"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
     template(v-slot:editor=`{player, meta}`)
       slot(name="editor" :player="player" :meta="meta")
@@ -44,7 +45,8 @@ export default {
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},
     mini: {type: Boolean, default () { return false }},
-    styles: {type: Object, default () { return {} }}
+    styles: {type: Object, default () { return {} }},
+    bgClass: {type: String, default () { return 'bg-black' }}
   },
   data () {
     return {
@@ -55,18 +57,6 @@ export default {
     }
   },
   computed: {
-    actions () {
-      return {
-        save: {
-          name: 'Save composition',
-          payload: {oid: this.value.oid}
-        },
-        content: {
-          name: 'Go to content',
-          payload: {oid: this.value.layers[0].content.oid}
-        }
-      }
-    }
   },
   watch: {
     value: {
@@ -86,16 +76,28 @@ export default {
   methods: {
     async menuToggle () {
       this.$log('menuToggle')
-      const cb = {
-        save: () => {
-          this.$log('save composition')
-        },
-        content: () => {
-          this.$log('go to content')
-          this.$router.push('/content/' + this.value.layers[0].content.oid).catch(e => e)
+      let options = {
+        timeout: 3000,
+        header: this.value.layers[0].content.name,
+        actions: {
+          save: {
+            name: 'Save composition',
+            payload: {oid: this.value.oid},
+            cb: () => {
+              this.$log('save composition')
+            }
+          },
+          content: {
+            name: 'Go to content',
+            payload: {oid: this.value.layers[0].content.oid},
+            cb: () => {
+              this.$log('go to content')
+              this.$router.push('/content/' + this.value.layers[0].content.oid).catch(e => e)
+            }
+          }
         }
       }
-      this.$store.dispatch('ui/action', [{actions: this.actions, timeout: 3000}, key => key ? cb[key]() : false])
+      this.$store.dispatch('ui/action', [options, key => key ? options.actions[key].cb() : false])
     },
     previewLoad () {
       // this.$log('previewLoad')

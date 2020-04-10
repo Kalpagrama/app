@@ -20,45 +20,46 @@ button:focus {
 }
 </style>
 <template lang="pug">
-q-layout(
-  view="hhh lpR fFf"
-  :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  q-header(
-    v-if="false"
-    reveal
-    :style=`{zIndex: 200, paddingLeft: $q.screen.xs ? '0px' : '60px'}`).row.full-width.justify-center.bg-grey-9
-    div(
-      v-if="user"
-      :style=`{
-        height: '60px',
-        maxWidth: $store.state.ui.maxWidthPage+'px'
-      }`
-      ).row.full-width.items-center.content-center.justify-start.q-px-sm
-      span.text-bold.text-white {{ user.name }}
-      .row.full-width
-        small.text-white @{{ user.name }}
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px'}`).bg-grey-10
+  q-header(reveal)
+    .row.full-width.justify-center
+      div(
+        v-if="user"
+        :style=`{
+          height: '60px',
+          maxWidth: $store.state.ui.maxWidthPage+'px'
+        }`
+        ).row.full-width.items-center.content-center.justify-start.q-px-sm
+        span.text-bold.text-white {{ user.name }}
+        .row.full-width
+          small.text-white @{{ user.name }}
+  q-footer(reveal)
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px'}`).row.full-width.bg-red
+        q-btn(round flat color="white" icon="menu")
   q-page-container.row.fit.justify-center.bg-grey-10
+    user-info(v-if="user" :user="user" :page="page" @page="page = $event")
     //- user-info(v-if="user" :user="user" :page="page" @page="page = $event")
     user-created-nodes(
       v-if="page === 'created'"
       :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
-      template(v-slot:header)
-        user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+      //- template(v-slot:header)
+        //- user-info(v-if="user" :user="user" :page="page" @page="page = $event")
     user-voted-nodes(
       v-if="page === 'voted'"
       :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
-      template(v-slot:header)
-        user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+      //- template(v-slot:header)
+      //-   user-info(v-if="user" :user="user" :page="page" @page="page = $event")
     user-following(
       v-if="page === 'following'"
       :subscriptions="user.subscriptions" :oid="user.oid")
-      template(v-slot:header)
-        user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+      //- template(v-slot:header)
+      //-   user-info(v-if="user" :user="user" :page="page" @page="page = $event")
     user-followers(
       v-if="page === 'followers'"
       :subscribers="user.subscribers" :oid="user.oid")
-      template(v-slot:header)
-        user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+      //- template(v-slot:header)
+      //-   user-info(v-if="user" :user="user" :page="page" @page="page = $event")
 </template>
 
 <script>

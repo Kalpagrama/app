@@ -2,9 +2,9 @@
 .row.fit
   div(:style=`{position: 'relative'}`).column.fit
     //- actions
-    q-btn(
-      round push size="lg" color="green" icon="add" @click="$emit('add')"
-      :style=`{position: 'absolute', left: '16px', bottom: '16px'}`)
+    //- q-btn(
+    //-   round push size="lg" color="green" icon="add" @click="$emit('add')"
+    //-   :style=`{position: 'absolute', bottom: '16px', right: '16px'}`)
     //- header: filters
     div(:style=`{height: '60px'}`).row.full-width
     //- body

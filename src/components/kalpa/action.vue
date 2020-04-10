@@ -1,26 +1,31 @@
 <template lang="pug">
 q-dialog(
-  ref="actionDialog" :maximized="true"
-  position="bottom"
+  ref="actionDialog"
   transition-show="slide-up" transition-hide="slide-down" @hide="dialogClosed()")
-  div(@click.self="$refs.actionDialog.hide()").row.fit.items-center.justify-center
+  div(
+    v-if="options"
+    @click.self="$refs.actionDialog.hide()"
+    :style=`{borderRadius: '10px', overflow: 'hidden'}`
+    ).row.items-center.justify-center.bg-grey-10.q-pa-sm
+    //- header
+    div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-py-sm.q-px-md
+      span.text-white.text-bold {{options.header}}
+    //- body
     div(
-      v-if="options"
-      :style=`{width: '100%', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
-      ).row.items-start.content-start
-      div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-white
-        div(
-          v-for="(a, akey) in options.actions" :key="akey" @click="action(akey)"
-          v-if="akey !== 'confirm'"
-          :style=`{height: '55px'}`
-          ).row.full-width.items-center.justify-center.cursor-pointer.hr.q-px-sm
-          span.text-bold.text-center.text-black {{ a.name }}
-      //- confirm
-      div(v-if="options && options.actions.confirm").row.full-width.q-mt-sm
-        q-btn(
-          push no-caps color="green" @click="action('confirm')"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width
-          span.text-bold {{ options.actions.confirm.name || $t('Confirm') }}
+      :style=`{}`).row.full-width.items-start.content-start
+      div(
+        v-for="(a, akey) in options.actions" :key="akey" @click="action(akey)"
+        v-if="akey !== 'confirm'"
+        :style=`{height: '55px'}`
+        ).row.full-width.items-center.justify-center.cursor-pointer.q-px-sm
+        span.text-center.text-white {{ a.name }}
+    //- footer
+      //- //- confirm
+      //- div(v-if="options && options.actions.confirm").row.full-width.q-mt-sm
+      //-   q-btn(
+      //-     push no-caps color="green" @click="action('confirm')"
+      //-     :style=`{height: '60px', borderRadius: '10px'}`).full-width
+      //-     span.text-bold {{ options.actions.confirm.name || $t('Confirm') }}
 </template>
 
 <script>

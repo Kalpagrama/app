@@ -207,7 +207,7 @@ export const contentNodes = async (context, { contentOid }) => {
   }
   const getT = (indx) => {
     // todo запрашивать новые порции данных
-    assert(indx && indx < nodeList.length, 'indx && indx < nodeList.length')
+    assert(indx >= 0 && indx < nodeList.length, 'indx && indx < nodeList.length')
     return getDistance(contentOid, 0, nodeList[indx])
   }
   logD('contentNodes complete')

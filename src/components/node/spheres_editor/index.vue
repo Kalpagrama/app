@@ -15,11 +15,15 @@ div(
   //- input find/add
   div(
     v-if="mode === 'edit'"
+    :style=`{overflow: 'hidden', borderRadius: '10px'}`
     ).row.full-width
-    input(
-      v-model="sphere" placeholder="Find or add sphere"
+    q-input(
+      v-model="sphere"
+      placeholder="Find or add sphere"
+      filled dark color="green"
       @keyup.enter="sphereAdd"
-      :style=`{minHeight: '60px', borderRadius: '10px'}`).kinput.full-width.bg-grey-4
+      @focus="$emit('focus')" @blur="$emit('blur')"
+      :style=`{}`).fit.bg-grey-8
   //- spheres WS
   div(
     v-if="false && mode === 'edit' && sphere.length > 0"
