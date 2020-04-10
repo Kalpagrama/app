@@ -85,7 +85,7 @@ export default {
           layout: 'PIP',
           category: 'FUN',
           spheres: [],
-          compositions: [
+          items: [
             {
               // name: content.name,
               operation: { type: 'CONCAT', items: [], operations: null },

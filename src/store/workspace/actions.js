@@ -62,7 +62,7 @@ export const wsNodeSave = async (context, node) => {
   // checks
   {
     assert.ok(node.spheres.length >= 0)
-    assert.ok(node.compositions.length >= 0)
+    assert.ok(node.items.length >= 0)
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
   }
 
@@ -75,7 +75,7 @@ export const wsNodeSave = async (context, node) => {
     nodeInput.spheres = node.spheres.map(s => {
       return { name: s.name }
     })
-    nodeInput.compositions = node.compositions.map(c => {
+    nodeInput.items = node.items.map(c => {
       if (c) {
         return {
           // name: c.name || '',
@@ -343,8 +343,8 @@ export const get = async (context, { oid, name, force }) => {
 // сохранить слои из созданного ядра в мастерской (если их там еще нет)
 export const exportLayersFromNode = async (context, node) => {
   logD('try to save node layers in ws')
-  assert(node && node.compositions, 'node && node.compositions')
-  for (let composition of node.compositions) {
+  assert(node && node.items, 'node && node.items')
+  for (let composition of node.items) {
     if (!composition) continue
     assert(composition.layers, 'composition.layers')
     for (let layer of composition.layers) { // пробуем сохранить в мастерской каждый слой из созданного ядра
@@ -353,9 +353,9 @@ export const exportLayersFromNode = async (context, node) => {
       if (!layer.spheres.length) continue // сохраняем только слои с именем
       let contentContainer = await context.dispatch('workspace/get', { name: 'CONTENT-' + layer.contentOid }, { root: true })
       assert(contentContainer, '!contentContainer')
-      assert(contentContainer.compositions && contentContainer.compositions.length === 1, 'contentContainer.compositions && contentContainer.compositions.length === 1')
-      assert(contentContainer.compositions[0].layers, 'contentContainer.compositions.layers')
-      let existing = contentContainer.compositions[0].layers.find(existingLayer => {
+      assert(contentContainer.items && contentContainer.items.length === 1, 'contentContainer.items && contentContainer.items.length === 1')
+      assert(contentContainer.items[0].layers, 'contentContainer.items.layers')
+      let existing = contentContainer.items[0].layers.find(existingLayer => {
         logD('existingLayer=', existingLayer)
         assert(existingLayer.figuresAbsolute)
         if (JSON.stringify(existingLayer.figuresAbsolute) === JSON.stringify(layer.figuresAbsolute)) {
@@ -367,9 +367,9 @@ export const exportLayersFromNode = async (context, node) => {
       if (!existing) { // сохраняем только если такого еще нет
         logD('!exist')
         contentContainer = JSON.parse(JSON.stringify(contentContainer))
-        contentContainer.compositions[0].layers.push(layer)
-        if (contentContainer.compositions[0].layers[0].figuresAbsolute.length === 0) { // удаляем слой-болванку
-          contentContainer.compositions[0].layers.splice(0, 1)
+        contentContainer.items[0].layers.push(layer)
+        if (contentContainer.items[0].layers[0].figuresAbsolute.length === 0) { // удаляем слой-болванку
+          contentContainer.items[0].layers.splice(0, 1)
         }
         await context.dispatch('workspace/wsNodeSave', contentContainer, { root: true })
       }

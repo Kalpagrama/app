@@ -31,15 +31,15 @@ div(:style=`{}`).column.fit.bg-grey-8
       :style=`{position: 'relative', height: '200px', borderRadius: '10px', overflow: 'hidden'}`
       ).row.full-width.items-center.content-center.justify-center.bg-grey-9.q-mb-sm
       composition(
-        v-if="nodeNew.compositions[0]" ctx="editor"
-        :value="nodeNew.compositions[0]"
+        v-if="nodeNew.items[0]" ctx="editor"
+        :value="nodeNew.items[0]"
         :visible="true" :active="true" :mini="false")
       q-btn(
-        v-if="!nodeNew.compositions[0]"
+        v-if="!nodeNew.items[0]"
         round outline color="green" size="lg" icon="add" @click="compositionFind(0)"
         :style=`{borderRadius: '50%'}`)
       q-btn(
-        v-if="nodeNew.compositions[0]"
+        v-if="nodeNew.items[0]"
         round flat color="white" icon="edit" @click="compositionEdit(0)"
         :style=`{position: 'absolute', zIndex: 3000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.3)'}`)
     //- set name
@@ -93,7 +93,7 @@ export default {
         name: '',
         layout: 'PIP',
         category: 'FUN',
-        compositions: [],
+        items: [],
         spheres: []
       }
     }
@@ -135,7 +135,7 @@ export default {
     },
     compositionFound (composition) {
       this.$log('compositionFound', composition)
-      this.$set(this.nodeNew.compositions, this.compositionIndex, composition)
+      this.$set(this.nodeNew.items, this.compositionIndex, composition)
       this.compositionEdit(this.compositionIndex)
       this.$wait(300).then(() => {
         this.compositionFinderDialogShow = false
@@ -147,23 +147,23 @@ export default {
       this.compositionEditorDialogShow = true
     },
     compositionEdited () {
-      let composition = this.nodeNew.compositions[this.compositionIndex]
+      let composition = this.nodeNew.items[this.compositionIndex]
       this.$log('compositionEdited', composition)
       // if we got empty composition
       if (composition.layers[0].figuresAbsolute.length === 0) {
         this.$log('composition EMPTY')
-        this.$set(this.nodeNew.compositions, this.compositionIndex, null)
+        this.$set(this.nodeNew.items, this.compositionIndex, null)
       }
       // we got good composition with layers with figuresAbsolute
       else {
         this.$log('composition EDITED')
-        this.$set(this.nodeNew.compositions, this.compositionIndex, composition)
+        this.$set(this.nodeNew.items, this.compositionIndex, composition)
       }
     },
     compositionDelete (index) {
       this.$log('compositionDelete', index)
-      // this.$set(this.nodeNew.compositions, index, null)
-      this.$delete(this.nodeNew.compositions, index)
+      // this.$set(this.nodeNew.items, index, null)
+      this.$delete(this.nodeNew.items, index)
     },
     async chainAdd () {
       try {
@@ -183,8 +183,8 @@ export default {
               //   category: 'FUN',
               //   layout: 'PIP',
               //   spheres: [{name: 'some'}, {name: 'sphere'}, {name: 'here'}],
-              //   compositions: [
-              //     this.node.compositions[1]
+              //   items: [
+              //     this.node.items[1]
               //   ]
               // }
             }

@@ -59,7 +59,7 @@ export default {
           layout: 'PIP',
           category: 'FUN',
           spheres: [],
-          compositions: []
+          items: []
         }
         this.nodeRes = await this.$store.dispatch('workspace/wsNodeSave', node)
       }

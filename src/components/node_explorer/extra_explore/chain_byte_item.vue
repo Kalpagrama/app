@@ -3,7 +3,7 @@
   div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-grey-9
     img(
       v-if="node"
-      :src="node.meta.compositions[0].thumbUrl" draggable="false"
+      :src="node.meta.items[0].thumbUrl" draggable="false"
       :style=`{borderRadius: '10px', overflow: 'hidden', objectFit: 'contain', pointerEvents: 'none'}`).full-width
     .row.full-width.q-pa-sm
       span(v-if="node").text-white.text-bold {{ node.name }}
@@ -22,7 +22,7 @@ export default {
     node () {
       if (!this.chainFull) return null
       let link = this.chainFull.links[0]
-      if (link.leftObject.oid === this.nodeExplore.oid) return link.rightObject
+      if (link.leftItem.oid === this.nodeExplore.oid) return link.rightItem
       else return link.rightObject
     }
   },

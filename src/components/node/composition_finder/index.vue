@@ -45,7 +45,7 @@ export default {
     itemClick ({type, item}) {
       this.$log('itemClick', type, item)
       if (type === 'content') {
-        let content = item.compositions[0].layers[0].content
+        let content = item.items[0].layers[0].content
         this.$log('content', content)
         let composition = {
           operation: { type: 'CONCAT', items: [], operations: null },

@@ -28,14 +28,14 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           div(:style=`{height: '15px', width: '120px', borderRadius: '10px', overflow: 'hidden'}`).bg-grey-8
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
       q-btn(round flat color="grey-6" icon="more_horiz")
-  //- compositions wrapper
+  //- items wrapper
   div(
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100}`
     ).row.full-width.items-start.content-start.bg-black
     composition-list(
       ref="compositionList" :ctx="ctx"
-      :compositions="compositions"
+      :items="items"
       :visible="visible" :active="active"
       @height="$emit('height', $event)"
       @error="$event => $emit('error', $event)")
@@ -83,10 +83,10 @@ export default {
     }
   },
   computed: {
-    compositions () {
+    items () {
       let res = []
-      if (this.node.meta.compositions[0]) res.push({preview: this.node.meta.compositions[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[0] : null})
-      if (this.node.meta.compositions[1]) res.push({preview: this.node.meta.compositions[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.compositions[1] : null})
+      if (this.node.meta.items[0]) res.push({preview: this.node.meta.items[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[0] : null})
+      if (this.node.meta.items[1]) res.push({preview: this.node.meta.items[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[1] : null})
       return res
     }
   },

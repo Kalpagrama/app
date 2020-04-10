@@ -7,8 +7,8 @@ div(:style=`{position: 'relative'}`).column.fit.bg-black
     composition(
       ref="cOne"
       :ctx="ctx" :index="0"
-      :thumbUrl="node.meta.compositions[0].thumbUrl" :fullHeight="true"
-      :composition="nodeFull ? nodeFull.compositions[0] : null"
+      :thumbUrl="node.meta.items[0].thumbUrl" :fullHeight="true"
+      :composition="nodeFull ? nodeFull.items[0] : null"
       :mini="false" :active="active" :visible="visible"
       :style=`{}`)
     q-btn(
@@ -35,8 +35,8 @@ div(:style=`{position: 'relative'}`).column.fit.bg-black
     composition(
       ref="cTwo"
       :ctx="ctx" :index="1"
-      :thumbUrl="node.meta.compositions[1].thumbUrl" :fullHeight="true"
-      :composition="nodeFull ? nodeFull.compositions[1] : null"
+      :thumbUrl="node.meta.items[1].thumbUrl" :fullHeight="true"
+      :composition="nodeFull ? nodeFull.items[1] : null"
       :mini="false" :active="false" :visible="false"
       :style=`{}`).full-height
     q-btn(

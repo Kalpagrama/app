@@ -175,9 +175,9 @@ export const contentNodes = async (context, { contentOid }) => {
   // вернет расстояние от t до начала ядра. началом ядра считается начало первого по списку слоя с этим(contentOid) контентом
   const getDistance = (contentOid, t, node) => {
     assert(contentOid && node, 'contentOid && node')
-    assert(node.meta && node.meta.compositions && node.meta.compositions.length > 0, 'node.meta && node.meta.compositions && node.meta.compositions.length > 0')
+    assert(node.meta && node.meta.items && node.meta.items.length > 0, 'node.meta && node.meta.items && node.meta.items.length > 0')
     // ищем первый layer на этот контент
-    for (let c of node.meta.compositions) {
+    for (let c of node.meta.items) {
       assert(c.layers, 'c.layers')
       for (let l of c.layers) {
         assert(l.figuresAbsolute, 'l.figuresAbsolute')
@@ -300,7 +300,7 @@ function isRestricted (context, filter, objectShort) {
   if (filter.nameRegExp && objectShort.name.search(new RegExp(filter.nameRegExp)) === -1) return false
   if (filter.compositionOids) {
     for (let compositionOid of filter.compositionOids) {
-      if (!objectShort.meta.compositions.map(composition => composition.oid).includes(compositionOid)) return false
+      if (!objectShort.meta.items.map(composition => composition.oid).includes(compositionOid)) return false
     }
   }
   return true

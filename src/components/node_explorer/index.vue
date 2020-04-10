@@ -38,7 +38,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}` @
               v-if="$q.screen.height - extraHeight < nodeHeightPreview"
               ).row.fit
               img(
-                :src="node.meta.compositions[0].thumbUrl"
+                :src="node.meta.items[0].thumbUrl"
                 :style=`{objectFit: 'contain', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).fit
             div(
               v-if="$q.screen.height - extraHeight > nodeHeightPreview"
@@ -50,7 +50,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}` @
                     div(ref="nodeWrapperPreview").row.full-width.items-start.content-start
                       img(
                         ref="nodePreview"
-                        :src="node.meta.compositions[0].thumbUrl"
+                        :src="node.meta.items[0].thumbUrl"
                         @load="imgLoaded"
                         :style=`{
                           objectFit: 'contain', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden',

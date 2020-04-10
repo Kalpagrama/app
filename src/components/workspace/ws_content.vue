@@ -57,7 +57,7 @@ export default {
       return this.node.oid === this.contentOid
     },
     contentName () {
-      return this.nodeFull ? this.nodeFull.compositions[0].layers[0].content.name : this.node.name
+      return this.nodeFull ? this.nodeFull.items[0].layers[0].content.name : this.node.name
     }
   },
   watch: {

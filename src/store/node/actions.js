@@ -156,7 +156,7 @@ function makeNodeInput (node){
     // checks
     assert.ok(node.category, 'node.category')
     assert.ok(node.spheres.length >= 0 && node.spheres.length <= 10, 'node spheres')
-    assert.ok(node.compositions.length > 0, 'node.compositions.length > 0')
+    assert.ok(node.items.length > 0, 'node.items.length > 0')
     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout), 'node.layout')
   }
   let nodeInput = {}
@@ -166,7 +166,7 @@ function makeNodeInput (node){
   nodeInput.spheres = node.spheres.map(s => {
     return { name: s.name, oid: s.oid }
   })
-  nodeInput.compositions = node.compositions.map(composition => {
+  nodeInput.items = node.items.map(composition => {
     return makeCompositionInput(composition)
   })
   return nodeInput

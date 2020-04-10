@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.fit
   composition-editor(
-    v-if="node && node.compositions.length > 0"
+    v-if="node && node.items.length > 0"
     ctx="contentEditor" mode="content" :node="node"
     @cancel="$emit('cancel')")
   div(
