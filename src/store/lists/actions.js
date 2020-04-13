@@ -302,7 +302,7 @@ export const processEvent = async (context, event) => {
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_DELETED':
     case 'WS_ITEM_UPDATED':
-      return await updateWsLists(context, event)
+      return context.dispatch('workspace/updateWsLists', event, { root: true })
     case 'NODE_CREATED':
     case 'CHAIN_CREATED':
     case 'VOTED':
@@ -357,58 +357,4 @@ async function updateLists (context, event) {
     }, { root: true })
   }
   logD('addNode complete')
-}
-
-// обновим кэш мастерской (прилетел эвент WS_XXXXXXXX)
-async function updateWsLists (context, event) {
-  logD('updateWsItems start')
-  let { type, object } = event
-  assert(object.oid && object.name != null)
-  if (type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED') {
-    for (let key in context.rootState.cache.cachedItems) {
-      let keyPattern = 'listWS: '
-      if (key.startsWith(keyPattern)) {
-        let collection = key.slice(keyPattern.length)
-        if (type === 'WS_ITEM_CREATED') {
-          await context.dispatch('cache/update', {
-            key: key,
-            path: '',
-            setter: (value) => {
-              // { items, count, totalCount, nextPageToken }
-              // logD('setter: ', value)
-              assert(value.items && value.count >= 0 && value.totalCount >= 0)
-              let indx = value.items.findIndex(item => item.oid === object.oid)
-              if (indx === -1){
-                // элемент в самом списке - objectShort
-                // вставляем в начало используем splice для реактивности
-                value.items.splice(0, 0, { oid: object.oid, name: object.name, wsItemType: object.wsItemType, unique: object.unique, thumbUrl: object.thumbUrl })
-                value.count++
-                value.totalCount++
-              }
-              return value
-            }
-          }, { root: true })
-        } else if (type === 'WS_ITEM_DELETED') {
-          // удаляем object из всех лент
-          await context.dispatch('cache/update', {
-            key: key,
-            path: '',
-            setter: (value) => {
-              // { items, count, totalCount, nextPageToken }
-              assert(value.items && value.count >= 0 && value.totalCount >= 0)
-              let indx = value.items.findIndex(item => item.oid === object.oid)
-              if (indx >= 0) {
-                // splice для реактивности
-                value.items.splice(indx, 1)
-                value.count--
-                value.totalCount--
-              }
-              return value
-            }
-          }, { root: true })
-        }
-      }
-    }
-  }
-  logD('updateWsItems complete')
 }

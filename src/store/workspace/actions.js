@@ -7,13 +7,8 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 
+const listKeyPattern = 'listWS: '
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-
-// делает ключ для элемента мастерской в кэше (чтобы отличать от реальных элементов)
-export function makeKey (wsItem) {
-  assert(wsItem && wsItem.oid, `makeKey assert ${JSON.stringify(wsItem)}`)
-  return 'wsItem: ' + wsItem.oid
-}
 
 export const init = async (context, wsRevision) => {
   assert(wsRevision)
@@ -40,7 +35,7 @@ export const wsItems = async (context, collection) => {
   logD('wsItems start')
   const fetchItemFunc = async () => {
     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-      query: gql`        
+      query: gql`
         ${fragments.wsObjectShortFragment}
         query wsItems ( $collection: WsCollectionEnum!){
           wsItems (collection: $collection) {
@@ -60,7 +55,7 @@ export const wsItems = async (context, collection) => {
   }
   // { items, count, totalCount, nextPageToken }
   let wsFeedResult = await context.dispatch('cache/get',
-    { key: 'listWS: ' + collection, fetchItemFunc }, { root: true })
+    { key: listKeyPattern + collection, fetchItemFunc }, { root: true })
   logD('wsItems complete')
   return wsFeedResult
 }
@@ -145,4 +140,90 @@ export const updateRevision = async (context, revision) => {
     newValue: revision
   }, { root: true })
   // logD('updateVersion complete')
+}
+
+function getCollection (wsItemType) {
+  return wsItemType + '_LIST'
+}
+
+function makeWsObjectShort (wsItem) {
+  assert(wsItem.oid && wsItem.type && wsItem.wsItemType, '!(wsItem.oid && wsItem.type, wsItem.wsItemType)')
+  return {
+    oid: wsItem.oid,
+    type: wsItem.type,
+    name: wsItem.name,
+    wsItemType: wsItem.wsItemType,
+    unique: wsItem.unique,
+    thumbUrl: wsItem.thumbUrl
+  }
+}
+
+// обновим кэш мастерской (прилетел эвент WS_ITEM_CREATED/WS_ITEM_DELETED/WS_ITEM_UPDATED)
+export const updateWsLists = async (context, event) => {
+  logD('updateWsItems start')
+  let { type, object } = event
+  assert(object.oid && object.name != null)
+  assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
+  for (let key in context.rootState.cache.cachedItems) {
+    if (!key.startsWith(listKeyPattern)) continue
+    let collection = key.slice(listKeyPattern.length)
+    assert(object.wsItemType, '!object.wsItemType')
+    if (getCollection(object.wsItemType) !== collection) continue
+    if (type === 'WS_ITEM_CREATED') {
+      await context.dispatch('cache/update', {
+        key: key,
+        path: '',
+        setter: (value) => {
+          // { items, count, totalCount, nextPageToken }
+          // logD('setter: ', value)
+          assert(value.items && value.count >= 0 && value.totalCount >= 0)
+          let indx = value.items.findIndex(item => item.oid === object.oid)
+          if (indx === -1) {
+            // элемент в самом списке - objectShort
+            // вставляем в начало используем splice для реактивности
+            value.items.splice(0, 0, makeWsObjectShort(object))
+            value.count++
+            value.totalCount++
+          }
+          return value
+        }
+      }, { root: true })
+    } else if (type === 'WS_ITEM_DELETED') {
+      await context.dispatch('cache/update', {
+        key: key,
+        path: '',
+        setter: (value) => {
+          // { items, count, totalCount, nextPageToken }
+          assert(value.items && value.count >= 0 && value.totalCount >= 0)
+          let indx = value.items.findIndex(item => item.oid === object.oid)
+          if (indx >= 0) {
+            // splice для реактивности
+            value.items.splice(indx, 1)
+            value.count--
+            value.totalCount--
+          }
+          return value
+        }
+      }, { root: true })
+    } else if (type === 'WS_ITEM_UPDATED') {
+      await context.dispatch('cache/update', {
+        key: key,
+        path: '',
+        setter: (value) => {
+          // { items, count, totalCount, nextPageToken }
+          // logD('setter: ', value)
+          assert(value.items && value.count >= 0 && value.totalCount >= 0)
+          let indx = value.items.findIndex(item => item.oid === object.oid)
+          if (indx >= 0) {
+            // элемент в самом списке - objectShort. удаляем элемент и на его место вставляем новый используем splice для реактивности
+            value.items.splice(indx, 1, makeWsObjectShort(object))
+            value.count++
+            value.totalCount++
+          }
+          return value
+        }
+      }, { root: true })
+    }
+  }
+  logD('updateWsItems complete')
 }
