@@ -216,7 +216,7 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
 `
 
 const eventFragment = gql`
-  ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${objectShortFragment} ${objectShortWithMetaFragment}
+  ${objectShortFragment} ${objectShortWithMetaFragment}
   fragment eventFragment on Event {
     type
     ... on EventError{
@@ -240,10 +240,11 @@ const eventFragment = gql`
         type
         name
         thumbUrl(preferWidth: 600)
-        ...on Video {...videoFragment}
-        ...on Image {...imageFragment}
-        ...on Node {...nodeFragment}
-        ...on Sphere {...sphereFragment}
+        ...on WSItem {
+          wsItemType
+          unique
+          rawData
+        }
       }
     }
     ... on EventChange{
