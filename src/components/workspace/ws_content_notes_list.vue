@@ -31,22 +31,22 @@
   .col.full-width.scroll
     .row.full-width.justify-center.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '80px'}`).row.full-width.items-start.content-start
-        kalpa-loader(type="wsContents" :variables=`{}`)
-          template(v-slot:items=`{items}`)
-            ws-content(
-              v-for="(n, ni) in items" :key="n.oid"
-              :node="n" :contentOid="contentOid"
-              @contentClick="contentClick"
-              @contentDelete="contentDelete"
-              @contentEdit="contentEdit")
+        //- kalpa-loader(type="wsContents" :variables=`{}`)
+        //-   template(v-slot:items=`{items}`)
+        //-     ws-content(
+        //-       v-for="(n, ni) in items" :key="n.oid"
+        //-       :node="n" :contentOid="contentOid"
+        //-       @contentClick="contentClick"
+        //-       @contentDelete="contentDelete"
+        //-       @contentEdit="contentEdit")
 </template>
 
 <script>
-import wsContent from './ws_content'
+import wsContentNotes from './ws_content_notes'
 
 export default {
   name: 'wsContents',
-  components: {wsContent},
+  components: {wsContentNotes},
   props: ['ctx'],
   data () {
     return {
@@ -76,30 +76,39 @@ export default {
       this.$log('contentFound', content)
       // try to find item in ws by name
       let name = 'CONTENT-' + content.oid
-      let item = await this.$store.dispatch('workspace/get', {name})
-      this.$log('item before', item)
-      if (!item) {
-        this.$log('*** CREATE content-node')
-        let nodeContentInput = {
-          name,
-          layout: 'PIP',
-          category: 'FUN',
-          spheres: [],
-          items: [
-            {
-              composition: {
-                operation: { type: 'CONCAT', items: [], operations: null },
-                layers: [{ content: content, figuresAbsolute: [], figuresRelative: [], spheres: [] }]
-              }
-            }
-          ]
+      let itemInput = {
+        name: content.name,
+        unique: content.oid,
+        rawData: {
+          figuresAbsolute: []
         }
-        this.$log('nodeContentInput', nodeContentInput)
-        item = await this.$store.dispatch('workspace/wsNodeSave', nodeContentInput)
       }
+      this.$log('itemInput', itemInput)
+      let item = await this.$store.dispatch('workspace/wsItemCreate', itemInput)
+      // let item = await this.$store.dispatch('workspace/get', {name})
+      // this.$log('item before', item)
+      // if (!item) {
+      //   this.$log('*** CREATE content-node')
+      //   let nodeContentInput = {
+      //     name,
+      //     layout: 'PIP',
+      //     category: 'FUN',
+      //     spheres: [],
+      //     items: [
+      //       {
+      //         composition: {
+      //           operation: { type: 'CONCAT', items: [], operations: null },
+      //           layers: [{ content: content, figuresAbsolute: [], figuresRelative: [], spheres: [] }]
+      //         }
+      //       }
+      //     ]
+      //   }
+      //   this.$log('nodeContentInput', nodeContentInput)
+      //   item = await this.$store.dispatch('workspace/wsNodeSave', nodeContentInput)
+      // }
       this.$log('item after', item)
-      this.$emit('item', {type: 'content', item: item})
-      this.contentClick(item.oid)
+      // this.$emit('item', {type: 'content', item: item})
+      // this.contentClick(item.oid)
     }
   },
   mounted () {
