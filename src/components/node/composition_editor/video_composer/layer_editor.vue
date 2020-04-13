@@ -15,10 +15,10 @@ div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
       ).row.full-width.bg-green
       small.text-white.full-width width: {{width}}
     //- layer NAME
-    span(
-      v-if="false & layer.spheres.length > 0"
-      :style=`{position: 'absolute', zIndex: 1000, top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`
-      ).text-white.q-pa-sm {{ layer.spheres[0].name }}
+    //- span(
+    //-   v-if="false & layer.spheres.length > 0"
+    //-   :style=`{position: 'absolute', zIndex: 1000, top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`
+    //-   ).text-white.q-pa-sm {{ layer.spheres[0].name }}
     //- add layer
     q-btn(
       v-if="false"
@@ -241,7 +241,7 @@ export default {
     },
     framesTweenToLayer () {
       this.$log('framesTweenToLayer start')
-      if (this.layer.figuresAbsolute.length === 0) return
+      if (!this.layer || this.layer.figuresAbsolute.length === 0) return
       this.$tween.to(
         this.$refs.framesScrollWrapper,
         0.9,

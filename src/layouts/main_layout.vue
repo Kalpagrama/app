@@ -14,7 +14,7 @@ iframe
 </style>
 
 <template lang="pug">
-q-layout( view="hHh Lpr lff")
+q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
   kalpa-action
   q-drawer(
     v-if="$q.screen.gt.xs && $route.name !== 'welcome'"

@@ -3,7 +3,7 @@
   div(
     v-if="height > 100"
     :style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
-    span(:style=`{borderRadius: '10px'}`).text-bold.text-white {{ content.name }}
+    span(:style=`{borderRadius: '10px'}`).text-bold.text-white {{ meta.content.name }}
   div(
     v-if="height > 120"
     ).col.full-width.scroll
@@ -21,15 +21,6 @@ export default {
     }
   },
   computed: {
-    layers () {
-      return this.composition.layers
-    },
-    layer () {
-      return this.layers[this.meta.layerIndex]
-    },
-    content () {
-      return this.layer.content
-    }
   }
 }
 </script>

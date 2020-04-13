@@ -17,10 +17,11 @@ div(:style=`{}`).column.fit
     v-if="height > 100"
     :style=`{height: '70px'}`).row.full-width
     layer-editor(
-      :layers="layers"
+      v-if="meta.layer"
+      :layers="meta.layers"
       :layerIndex="meta.layerIndexPlay"
-      :layer="layers[meta.layerIndexPlay >= 0 ? meta.layerIndexPlay : meta.layerIndex]"
-      :content="content" :player="player" :meta="meta")
+      :layer="meta.layer"
+      :content="meta.content" :player="player" :meta="meta" @meta="$emit('meta', $event)")
   //- body
   div(
     ref="extraNodesScroll"
@@ -29,10 +30,10 @@ div(:style=`{}`).column.fit
     ).col.full-width.scroll.q-pa-sm
     div(:style=`{marginTop: '0px', marginBottom: '1000px'}`).row.full-width.items-start.content-start
       div(
-        v-for="(l,li) in layers" :key="li" :ref="`layer-${li}`"
+        v-for="(l,li) in meta.layers" :key="li" :ref="`layer-${li}`"
         v-if="l.figuresAbsolute.length > 0" @click="layerClick(l, li)"
         :class=`{
-          'bg-grey-7': li === meta.layerIndexPlay,
+          'bg-grey-6': li === meta.layerIndexPlay,
           'bg-grey-8': li !== meta.layerIndexPlay,
         }`
         :style=`{minHeight: '35px', borderRadius: '10px', overflow: 'hidden'}`
@@ -52,7 +53,7 @@ div(:style=`{}`).column.fit
 import layerEditor from '../layer_editor'
 
 export default {
-  name: 'extraNodes',
+  name: 'extraLayers',
   components: {layerEditor},
   props: ['composition', 'player', 'meta', 'height'],
   data () {
@@ -63,15 +64,6 @@ export default {
     }
   },
   computed: {
-    layers () {
-      return this.composition.layers
-    },
-    layer () {
-      return this.layers[this.meta.layerIndex]
-    },
-    content () {
-      return this.layer.content
-    }
   },
   watch: {
     'meta.layerIndexPlay': {
@@ -108,9 +100,10 @@ export default {
       let end = endInput || start + 10 < this.meta.duration ? start + 10 : this.meta.duration
       this.$log('layerAdd start/end: ', start, end)
       // get index
-      let index
-      if (this.layers.length === 1 && this.layers[0].figuresAbsolute.length === 0) index = 0
-      else index = this.composition.layers.length
+      // let index
+      // if (this.meta.layers.length === 1 && this.metalayers[0].figuresAbsolute.length === 0) index = 0
+      // else index = this.composition.layers.length
+      let index = this.meta.layers.length
       this.$log('layerIndex index:', index)
       // get layer
       let l = layerInput || {

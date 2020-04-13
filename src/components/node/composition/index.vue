@@ -22,7 +22,7 @@ div(
   //- players
   player-video(
     v-if="visible && value"
-    :ctx="ctx" :composition="value"
+    :ctx="ctx" :composition="value" :contentInput="content"
     :visible="visible" :active="active" :mini="mini"
     :bgClass="bgClass"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
@@ -41,6 +41,7 @@ export default {
   props: {
     ctx: {type: String},
     value: {type: Object},
+    content: {type: Object},
     preview: {type: String},
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},

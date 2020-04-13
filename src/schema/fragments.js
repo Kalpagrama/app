@@ -323,6 +323,11 @@ const objectFullFragment = gql`
     ...on User {... userFragment}
     ...on Chain {...chainFragment}
     ...on Composition {...compositionFragment}
+    ...on WSItem {
+      wsItemType
+      unique
+      rawData
+    }
   }
 `
 

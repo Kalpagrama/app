@@ -79,7 +79,8 @@ export default {
         wsItemType: 'CONTENT_NOTES',
         rawData: {
           content: content,
-          figuresAbsolute: []
+          layers: [],
+          // figuresAbsolute: []
         }
       }
       this.$log('itemInput', itemInput)

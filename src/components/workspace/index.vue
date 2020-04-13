@@ -1,18 +1,29 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-9
   q-dialog(
-    v-model="pageDialogOpened" :maximized="true"
+    v-model="pageDialogOpened" :maximized="true" position="bottom"
     @hide="itemEdited")
-    div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
-      ws-sphere(
-        v-if="$route.params.page === 'sphere'")
-      ws-setting(
-        v-else-if="$route.params.page === 'setting'")
-      node-saver(
-        v-else
-        :value="item").fit
-        template(v-slot:editor=`{node, saving}`)
-          component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving" @cancel="pageDialogOpened = false")
+    div(
+      @click.self="pageDialogOpened = false"
+      :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center
+      //- ws-sphere(
+      //-   v-if="$route.params.page === 'sphere'")
+      //- ws-setting(
+      //-   v-if="true")
+      //- node-saver(
+      //-   v-if="$store.state.workspace.item"
+      //-   :value="item").fit
+      //-   template(v-slot:editor=`{node, saving}`)
+      //-     component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving" @cancel="pageDialogOpened = false")
+      //- content-noter(v-if="$store.state.workspace.itemType === 'content'" :value="$store.state.workspace.item")
+      composition-editor(
+        v-if="$store.state.workspace.itemType === 'content'"
+        :ctx="'workspace'"
+        :content="$store.state.workspace.item.rawData.content"
+        :composition="$store.state.workspace.item.rawData"
+        :style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`)
+  //- q-dialog(
+  //-   v-model="")
   q-header()
     .row.full-width.justify-center.bg-grey-9
       div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
@@ -49,10 +60,11 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
 import wsItems from './ws_items'
 import wsSphere from './ws_sphere'
 import wsSetting from './ws_setting'
+import contentNoter from 'components/node/content_noter'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsSphere, wsSetting},
+  components: {wsItems, wsSphere, wsSetting, contentNoter},
   props: [],
   data () {
     return {
@@ -86,6 +98,11 @@ export default {
           this.$router.push({params: {page: 'node'}})
         }
       }
+    },
+    '$store.state.workspace.item': {
+      handler (to, from) {
+        this.$log('item CHANGED', to)
+      }
     }
   },
   methods: {
@@ -101,8 +118,10 @@ export default {
       this.$store.commit('workspace/stateSet', ['item', item])
       this.pageDialogOpened = true
     },
-    itemEdited () {
+    async itemEdited () {
       this.$log('itemEdited')
+      let res = await this.$store.dispatch('workspace/wsItemUpdate', this.$store.state.workspace.item)
+      this.$log('res', res)
       this.$store.commit('workspace/stateSet', ['itemType', undefined])
       this.$store.commit('workspace/stateSet', ['item', null])
     }
