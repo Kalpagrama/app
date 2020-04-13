@@ -41,13 +41,21 @@ export const wsItems = async (context, collection) => {
   const fetchItemFunc = async () => {
     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
+<<<<<<< HEAD
         ${fragments.objectShortFragment}
+=======
+        ${fragments.wsObjectShortFragment}
+>>>>>>> 5bcf4ad1cf24928bdd16d54933d01d07d9fbe81c
         query wsItems ( $collection: WsCollectionEnum!){
           wsItems (collection: $collection) {
             totalCount
             count
             nextPageToken
+<<<<<<< HEAD
             items {... objectShortFragment}
+=======
+            items {...wsObjectShortFragment}
+>>>>>>> 5bcf4ad1cf24928bdd16d54933d01d07d9fbe81c
           }
         }
       `,
