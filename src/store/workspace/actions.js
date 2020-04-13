@@ -60,7 +60,7 @@ export const wsItems = async (context, collection) => {
   }
   // { items, count, totalCount, nextPageToken }
   let wsFeedResult = await context.dispatch('cache/get',
-    { key: 'listWS: ' + JSON.stringify(collection), fetchItemFunc }, { root: true })
+    { key: 'listWS: ' + collection, fetchItemFunc }, { root: true })
   logD('wsItems complete')
   return wsFeedResult
 }

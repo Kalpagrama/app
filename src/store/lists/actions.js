@@ -368,28 +368,26 @@ async function updateWsLists (context, event) {
     for (let key in context.rootState.cache.cachedItems) {
       let keyPattern = 'listWS: '
       if (key.startsWith(keyPattern)) {
-        let { pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
-        assert(pagination)
+        let collection = key.slice(keyPattern.length)
         if (type === 'WS_ITEM_CREATED') {
-          // добавляем object в начальные запросы (если фильтр запроса позволяет)
-          if (!pagination.pageToken) { // pageToken === null при начальном запросе.
-            if (!isRestricted(context, filter, object)) continue // элемент не подходит под этот фильр
-            await context.dispatch('cache/update', {
-              key: key,
-              path: '',
-              setter: (value) => {
-                // { items, count, totalCount, nextPageToken }
-                logD('setter: ', value)
-                assert(value.items && value.count >= 0 && value.totalCount >= 0)
+          await context.dispatch('cache/update', {
+            key: key,
+            path: '',
+            setter: (value) => {
+              // { items, count, totalCount, nextPageToken }
+              // logD('setter: ', value)
+              assert(value.items && value.count >= 0 && value.totalCount >= 0)
+              let indx = value.items.findIndex(item => item.oid === object.oid)
+              if (indx === -1){
                 // элемент в самом списке - objectShort
                 // вставляем в начало используем splice для реактивности
-                value.items.splice(0, 0, { oid: object.oid, name: object.name, meta: object.meta, type: object.type })
+                value.items.splice(0, 0, { oid: object.oid, name: object.name, wsItemType: object.wsItemType, unique: object.unique, thumbUrl: object.thumbUrl })
                 value.count++
                 value.totalCount++
-                return value
               }
-            }, { root: true })
-          }
+              return value
+            }
+          }, { root: true })
         } else if (type === 'WS_ITEM_DELETED') {
           // удаляем object из всех лент
           await context.dispatch('cache/update', {
