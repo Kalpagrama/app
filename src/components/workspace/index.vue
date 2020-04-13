@@ -16,12 +16,16 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
       //-   template(v-slot:editor=`{node, saving}`)
       //-     component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving" @cancel="pageDialogOpened = false")
       //- content-noter(v-if="$store.state.workspace.itemType === 'content'" :value="$store.state.workspace.item")
-      composition-editor(
-        v-if="$store.state.workspace.itemType === 'content'"
-        :ctx="'workspace'"
-        :content="$store.state.workspace.item.rawData.content"
-        :composition="$store.state.workspace.item.rawData"
-        :style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`)
+      ws-item-saver(v-if="$store.state.workspace.item" :value="$store.state.workspace.item")
+        template(v-slot=`{item}`)
+          composition-editor(
+            v-if="item"
+            :ctx="'workspace'"
+            :content="item.rawData.content"
+            :composition="item.rawData"
+            :style=`{
+              maxWidth: $store.state.ui.maxWidthPage+'px'
+            }`)
   //- q-dialog(
   //-   v-model="")
   q-header()
@@ -61,10 +65,11 @@ import wsItems from './ws_items'
 import wsSphere from './ws_sphere'
 import wsSetting from './ws_setting'
 import contentNoter from 'components/node/content_noter'
+import wsItemSaver from './ws_item_saver'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsSphere, wsSetting, contentNoter},
+  components: {wsItems, wsSphere, wsSetting, contentNoter, wsItemSaver},
   props: [],
   data () {
     return {
@@ -78,9 +83,9 @@ export default {
     }
   },
   computed: {
-    item () {
-      return this.$store.state.workspace.item
-    }
+    // item () {
+    //   return this.$store.state.workspace.item
+    // }
   },
   watch: {
     '$route.params.page': {
@@ -120,8 +125,8 @@ export default {
     },
     async itemEdited () {
       this.$log('itemEdited')
-      let res = await this.$store.dispatch('workspace/wsItemUpdate', this.$store.state.workspace.item)
-      this.$log('res', res)
+      // let res = await this.$store.dispatch('workspace/wsItemUpdate', this.$store.state.workspace.item)
+      // this.$log('res', res)
       this.$store.commit('workspace/stateSet', ['itemType', undefined])
       this.$store.commit('workspace/stateSet', ['item', null])
     }
