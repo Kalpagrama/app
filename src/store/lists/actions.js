@@ -110,42 +110,6 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
   return { items, count, totalCount, nextPageToken, prevPageToken, setCurrentIndx }
 }
 
-// export const compositionNodes = async (context, { compositionOids, pagination, sortStrategy }) => {
-//   logD('compositionNodes start')
-//   let filter = { types: ['NODE'] }
-//   let oid
-//   oid = compositionOids[0]
-//   filter.compositionOids = compositionOids
-//   const fetchItemFunc = async () => {
-//     let { data: { sphereItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-//       query: gql`
-//         ${fragments.objectShortWithMetaFragment}
-//         query nodeNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-//           sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-//             count
-//             totalCount
-//             nextPageToken
-//             items {... objectShortWithMetaFragment}
-//           }
-//         }
-//       `,
-//       variables: { oid, pagination, filter, sortStrategy }
-//     })
-//     return {
-//       item: { items, count, totalCount, nextPageToken },
-//       actualAge: 'hour'
-//     }
-//   }
-//   // { items, count, totalCount, nextPageToken }
-//   let feedResult = await context.dispatch('cache/get',
-//     {
-//       key: 'list: ' + JSON.stringify({ oid, pagination, filter, sortStrategy }),
-//       fetchItemFunc
-//     }, { root: true })
-//   logD('compositionNodes complete')
-//   return feedResult
-// }
-
 // вернет ядра контента относительно метки времени (nodeList).
 // nodeList может изменится в после одного из последующих вызовов getIdx
 // getIdx - вернет индекс ядра в nodeList
