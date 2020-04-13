@@ -70,14 +70,14 @@ export default {
         case 'nodeNodes' :
           res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
-        case 'wsContents' :
-          res = await this.$store.dispatch('lists/wsItems', {pagination, filter, sortStrategy, wsItemsType: 'CONTENTS'})
+        case 'CONTENT_NOTES_LIST' :
+          res = await this.$store.dispatch('workspace/wsItems', 'CONTENT_NOTES_LIST')
           break
-        case 'wsNodes' :
-          res = await this.$store.dispatch('lists/wsItems', {pagination, filter, sortStrategy, wsItemsType: 'NODES'})
+        case 'NODE_LIST' :
+          res = await this.$store.dispatch('workspace/wsItems', 'NODE_LIST')
           break
-        case 'wsNotes' :
-          res = await this.$store.dispatch('lists/wsItems', {pagination, filter, sortStrategy, wsItemsType: 'NOTES'})
+        case 'SPHERE_LIST':
+          res = await this.$store.dispatch('workspace/wsItems', 'SPHERE_LIST')
           break
         default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }

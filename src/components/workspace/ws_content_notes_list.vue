@@ -31,14 +31,14 @@
   .col.full-width.scroll
     .row.full-width.justify-center.q-px-sm
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '80px'}`).row.full-width.items-start.content-start
-        //- kalpa-loader(type="wsContents" :variables=`{}`)
-        //-   template(v-slot:items=`{items}`)
-        //-     ws-content(
-        //-       v-for="(n, ni) in items" :key="n.oid"
-        //-       :node="n" :contentOid="contentOid"
-        //-       @contentClick="contentClick"
-        //-       @contentDelete="contentDelete"
-        //-       @contentEdit="contentEdit")
+        kalpa-loader(type="CONTENT_NOTES_LIST" :variables=`{}`)
+          template(v-slot:items=`{items}`)
+            ws-content(
+              v-for="(n, ni) in items" :key="n.oid"
+              :node="n" :contentOid="contentOid"
+              @contentClick="contentClick"
+              @contentDelete="contentDelete"
+              @contentEdit="contentEdit")
 </template>
 
 <script>
@@ -75,11 +75,13 @@ export default {
     async contentFound (content) {
       this.$log('contentFound', content)
       // try to find item in ws by name
-      let name = 'CONTENT-' + content.oid
+      // let name = 'CONTENT-' + content.oid
       let itemInput = {
         name: content.name,
         unique: content.oid,
+        wsItemType: 'CONTENT_NOTES',
         rawData: {
+          content: content,
           figuresAbsolute: []
         }
       }

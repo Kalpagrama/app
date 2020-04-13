@@ -57,10 +57,10 @@ export default {
   data () {
     return {
       pageDialogOpened: false,
-      page: 'node',
+      page: 'contentNotes',
       pages: [
-        {id: 'note', name: 'Notes'},
-        {id: 'content', name: 'Contents'},
+        // {id: 'note', name: 'Notes'},
+        {id: 'contentNotes', name: 'Contents'},
         {id: 'node', name: 'Nodes'}
       ]
     }

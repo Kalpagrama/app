@@ -33,7 +33,7 @@
             round push size="lg" color="green" icon="add" @click="$emit('add', {type: 'node', item: null})"
             :style=`{position: 'absolute', zIndex:1000, right: '16px', bottom: '16px', borderRadius: '50% !important'}`)
           //- nodes
-          kalpa-loader(type="wsNodes" :variables=`{}`)
+          kalpa-loader(type="NODE_LIST" :variables=`{}`)
             template(v-slot:items=`{items}`)
               ws-node(
                 v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
