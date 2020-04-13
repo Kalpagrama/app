@@ -30,6 +30,18 @@ const objectShortFragment = gql`
     thumbUrl(preferWidth: 600)
   }
 `
+const wsObjectShortFragment = gql`
+  fragment wsObjectShortFragment on ObjectShort {
+    type
+    oid
+    name
+    thumbUrl(preferWidth: 600)
+    ... on WSObjectShort{
+      unique
+      wsItemType
+    }
+  }
+`
 const objectShortWithMetaFragment = gql`
   ${metaFragment}
   fragment objectShortWithMetaFragment on ObjectShort {
@@ -317,6 +329,7 @@ const fragments = {
   objectFullFragment,
   userFragment,
   objectShortFragment,
+  wsObjectShortFragment,
   objectShortWithMetaFragment,
   nodeFragment,
   sphereFragment

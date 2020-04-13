@@ -41,13 +41,13 @@ export const wsItems = async (context, collection) => {
   const fetchItemFunc = async () => {
     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
-        ${fragments.objectFullFragment}
+        ${fragments.wsObjectShortFragment}
         query wsItems ( $collection: WsCollectionEnum!){
           wsItems (collection: $collection) {
             totalCount
             count
             nextPageToken
-            items {... objectFullFragment}
+            items {...wsObjectShortFragment}
           }
         }
       `,
