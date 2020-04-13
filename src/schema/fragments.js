@@ -252,6 +252,7 @@ const eventFragment = gql`
         type
         name
         thumbUrl(preferWidth: 600)
+        revision
         ...on WSItem {
           wsItemType
           unique

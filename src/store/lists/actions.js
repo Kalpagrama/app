@@ -280,15 +280,6 @@ export const feed = async (context, { pagination }) => {
   return feedResult
 }
 
-// wsItemsType 'CONTENTS' 'SPHERES' 'NODES' 'COMPOSITIONS' 'NOTES' 'ALL'
-// Все сущности в мастерской лежат в ядрах. Ядро - как контейнер
-// При этом если мы хотим хранить контент. то мы создаем ядро с именем CONTENT-...........= (oid контента)и на этом ядре хранится контент и все лэеры этого контента
-// это же справедливо и для композиций (COMPOSITION-...........=) (oid композиции)
-// для сфер создается одно ядро со всеми сферами сразу с именем (SPHERES-...........=) (oid юзера)
-export const wsItems = async (context, { wsItemsType, pagination, filter }) => {
-  return context.dispatch('workspace/wsItems', { wsItemsType, pagination, filter }, { root: true })
-}
-
 // подходит ли object под этот фильтр
 function isRestricted (context, filter, objectShort) {
   // logD('isRestricted', filter, objectShort)
