@@ -1,19 +1,14 @@
 <template lang="pug">
 div(
   :class=`{
-    position: 'relative', overflow: 'hidden',
-    'bg-grey-8': !contentActive,
-    'bg-white': contentActive
+    position: 'relative', overflow: 'hidden'
   }`
   :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
-  ).row.full-width.items-start.content-start.q-mb-sm
+  ).row.full-width.items-start.content-start.q-mb-sm.br
   //- content.name
   div(:style=`{minHeight: '40px'}`).row.full-width.items-center.content-center
     span(
-      :class=`{
-        'text-white': !contentActive,
-        'text-green': contentActive,
-        'text-bold': contentActive}`
+      :class=`{}`
       ).q-ma-sm.cursor-pointer {{ item.name }}
   //- content INACTIVE tint
   div(

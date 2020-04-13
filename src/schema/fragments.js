@@ -251,6 +251,7 @@ const eventFragment = gql`
         oid
         type
         name
+        revision
         thumbUrl(preferWidth: 600)
         revision
         ...on WSItem {

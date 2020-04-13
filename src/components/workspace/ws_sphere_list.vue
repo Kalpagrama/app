@@ -1,10 +1,11 @@
 <template lang="pug">
 .row.fit.q-px-sm
-  node-saver(:value="nodeRes")
-    template(v-slot:editor=`{node, saving}`)
-      node-spheres-editor(
-        :node="node" mode="edit"
-        @explore="sphereExplore")
+  kalpa-loader(type="SPHERE_LIST")
+    template(v-slot:items=`{items}`)
+      div(
+        v-for="(i,ii) in items" :key="ii"
+        ).row.items-center.content-center.q-pa-sm
+        span item {{ ii }}
 </template>
 
 <script>
@@ -39,35 +40,35 @@ export default {
     sphereExplore (s) {
       this.$log('sphereExplore', s)
       // this.$router.push({params: { oid: s.oid }})
-      this.$router.push('/sphere/' + s.oid)
+      // this.$router.push('/sphere/' + s.oid)
     },
-    async spheresLoad () {
-      this.$log('spheresLoad')
-      // try to load node with spheres
-      let name = 'SPHERES-' + this.$store.state.auth.userOid
-      let item = await this.$store.dispatch('workspace/get', { name })
-      this.$log('item: node-spheres', item)
-      if (item) {
-        this.$log('*** USE node-spheres')
-        this.nodeSavePause = true
-        // this.node = JSON.parse(JSON.stringify(item))
-        this.nodeRes = item
-      } else {
-        this.$log('*** CREATE node-spheres')
-        let node = {
-          name,
-          layout: 'PIP',
-          category: 'FUN',
-          spheres: [],
-          items: []
-        }
-        this.nodeRes = await this.$store.dispatch('workspace/wsNodeSave', node)
-      }
-    }
+    // async spheresLoad () {
+    //   this.$log('spheresLoad')
+    //   // try to load node with spheres
+    //   let name = 'SPHERES-' + this.$store.state.auth.userOid
+    //   let item = await this.$store.dispatch('workspace/get', { name })
+    //   this.$log('item: node-spheres', item)
+    //   if (item) {
+    //     this.$log('*** USE node-spheres')
+    //     this.nodeSavePause = true
+    //     // this.node = JSON.parse(JSON.stringify(item))
+    //     this.nodeRes = item
+    //   } else {
+    //     this.$log('*** CREATE node-spheres')
+    //     let node = {
+    //       name,
+    //       layout: 'PIP',
+    //       category: 'FUN',
+    //       spheres: [],
+    //       items: []
+    //     }
+    //     this.nodeRes = await this.$store.dispatch('workspace/wsNodeSave', node)
+    //   }
+    // }
   },
   mounted () {
     this.$log('mounted')
-    this.spheresLoad()
+    // this.spheresLoad()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
