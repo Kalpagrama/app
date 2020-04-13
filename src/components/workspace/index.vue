@@ -23,7 +23,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
             q-btn(round flat color="white" icon="school")
             span.text-bold.text-white Workspace
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-          q-btn(round flat color="grey-5" icon="settings")
+          q-btn(round flat color="grey-5" icon="settings" @click="$router.push({params: {page: 'setting'}})")
   q-footer()
     .row.full-width.justify-center
       div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0'}`

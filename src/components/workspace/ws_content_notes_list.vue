@@ -35,14 +35,15 @@
           template(v-slot:items=`{items}`)
             ws-content-notes(
               v-for="(i, ii) in items" :key="i.oid"
-              :item="i" :contentOid="contentOid")
+              :item="i" :contentOid="contentOid"
+              @content="$emit('item', {type: 'content', item: $event})")
 </template>
 
 <script>
 import wsContentNotes from './ws_content_notes'
 
 export default {
-  name: 'wsContents',
+  name: 'wsContentNotesList',
   components: {wsContentNotes},
   props: ['ctx'],
   data () {

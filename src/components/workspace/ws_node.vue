@@ -23,7 +23,7 @@ export default {
   methods: {
     async nodeClick () {
       this.$log('nodeClick', this.node)
-      let nodeFull = await this.$store.dispatch('object/get', {oid: this.node.oid})
+      let nodeFull = await this.$store.dispatch('objects/get', {oid: this.node.oid})
       this.$log('nodeFull', nodeFull)
       this.$emit('nodeClick', nodeFull)
     }
