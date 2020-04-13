@@ -36,207 +36,14 @@ export const wsClear = async (context) => {
   return wsClear
 }
 
-// работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
-export const wsItemAdd = async (context, oid) => {
-  logD('wsItemAdd start', oid)
-  let { data: { wsItemAdd: wsItem } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      ${fragments.objectFullFragment}
-      mutation wsItemAdd ($oid: OID!, $wsRevision: Int!) {
-        wsItemAdd (oid: $oid, wsRevision: $wsRevision) {
-          ...objectFullFragment
-        }
-      }
-    `,
-    variables: {
-      oid, wsRevision: context.rootState.workspace.revision
-    }
-  })
-  context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'hour' }, { root: true })
-  logD('wsItemAdd done', wsItem)
-  return wsItem
-}
-export const wsNodeSave = async (context, node) => {
-  logD('wsNodeSave start', node)
-
-  // checks
-  {
-    assert.ok(node.spheres.length >= 0)
-    assert.ok(node.items.length >= 0)
-    assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
-  }
-
-  const makeNodeInput = (node) => {
-    let nodeInput = {}
-    nodeInput.revision = node.revision || 1
-    nodeInput.layout = node.layout
-    nodeInput.name = node.name
-    nodeInput.category = node.category || 'FUN'
-    nodeInput.spheres = node.spheres.map(s => {
-      return { name: s.name }
-    })
-    nodeInput.items = node.items.map(c => {
-      if (c) {
-        return {
-          // name: c.name || '',
-          spheres: [],
-          operation: {
-            operations: c.operation.operations,
-            items: c.operation.items,
-            type: c.operation.type
-          },
-          layers: c.layers.map(l => {
-            return {
-              contentOid: l.content.oid,
-              spheres: l.spheres.map(s => {
-                return {
-                  name: s.name
-                }
-              }),
-              figuresAbsolute: l.figuresAbsolute.map(f => {
-                assert(f.t >= 0, 'f.t >= 0')
-                return {
-                  t: f.t,
-                  points: f.points.map(p => {
-                    return {
-                      x: p.x,
-                      y: p.y,
-                      z: p.z
-                    }
-                  })
-                }
-              })
-            }
-          })
-        }
-      } else {
-        return null
-      }
-    })
-    logD('wsNodeSave start. nodeInput=', nodeInput)
-    return nodeInput
-  }
-
-  let wsItem
-  if (node.oid) { // обновить
-    let updateItemFunc = async (updatedItem) => {
-      // logD('updatedItem', updatedItem)
-      assert(updatedItem.revision, '!updatedItem.revision')
-      let nodeInput = makeNodeInput(updatedItem)
-      let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
-        mutation: gql`
-          ${fragments.objectFullFragment}
-          mutation wsNodeUpdate ($oid: OID!, $node: NodeInput!, $wsRevision: Int!) {
-            wsNodeUpdate (oid: $oid, node: $node, wsRevision: $wsRevision) {
-              ...objectFullFragment
-            }
-          }
-        `,
-        variables: {
-          oid: node.oid, node: nodeInput, wsRevision: context.rootState.workspace.revision
-        }
-      })
-      logD('wsNodeUpdate = ', wsNodeUpdate)
-      return { item: wsNodeUpdate, actualAge: 'hour' }
-    }
-    let fetchItemFunc = async () => {
-      let item = await context.dispatch('workspace/get', { oid: node.oid, force: true }, { root: true })
-      return { item, actualAge: 'hour' }
-    }
-    let mergeItemFunc = (path, serverItem, cacheItem) => {
-      assert(serverItem && cacheItem)
-      let mergedItem
-      // берем значение с сервера
-      mergedItem = serverItem
-      // assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
-      return mergedItem
-    }
-    wsItem = await context.dispatch('cache/update', {
-      key: makeKey(node),
-      newValue: node,
-      updateItemFunc,
-      fetchItemFunc,
-      mergeItemFunc
-    }, { root: true })
-  } else { // создать
-    let nodeInput = makeNodeInput(node)
-    let { data: { wsNodeCreate } } = await apollo.clients.api.mutate({
-      mutation: gql`
-        ${fragments.objectFullFragment}
-        mutation wsNodeCreate ($node: NodeInput!, $wsRevision: Int!) {
-          wsNodeCreate (node: $node, wsRevision: $wsRevision) {
-            ...objectFullFragment
-          }
-        }
-      `,
-      variables: {
-        node: nodeInput, wsRevision: context.rootState.workspace.revision
-      }
-    })
-    wsItem = await context.dispatch('cache/update', {
-      key: makeKey(wsNodeCreate),
-      newValue: wsNodeCreate,
-      actualAge: 'hour'
-    }, { root: true })
-  }
-  logD('wsNodeSave done', wsItem.revision)
-  return wsItem
-}
-export const wsItemDelete = async (context, oid) => {
-  logD('wsItemDelete start', oid)
-  assert.ok(oid)
-  let { data: { wsItemDelete } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      mutation wsItemDelete ($oid: OID!, $wsRevision: Int!) {
-        wsItemDelete (oid: $oid, wsRevision: $wsRevision)
-      }
-    `,
-    variables: {
-      oid, wsRevision: context.rootState.workspace.revision
-    }
-  })
-  logD('wsItemDelete done', wsItemDelete)
-  return wsItemDelete
-}
-
-// wsItemsType 'CONTENTS' 'SPHERES' 'NODES' 'COMPOSITIONS' 'NOTES' 'ALL'
-// Все сущности в мастерской лежат в ядрах. Ядро - как контейнер
-// При этом если мы хотим хранить контент. то мы создаем ядро с именем CONTENT-...........= (oid контента)и на этом ядре хранится контент и все лэеры этого контента
-// это же справедливо и для композиций (COMPOSITION-...........=) (oid композиции)
-// для сфер создается одно ядро со всеми сферами сразу с именем (SPHERES-...........=) (oid юзера)
-export const wsItems = async (context, { wsItemsType, pagination, filter, force }) => {
+export const wsItems = async (context, collection) => {
   logD('wsItems start')
-  pagination = pagination || { pageSize: 30, pageToken: null }
-  filter = filter || {}
-  let sortStrategy = 'HOT'
-  filter.types = ['NODE']
-  switch (wsItemsType) {
-    case 'CONTENTS':
-      filter.nameRegExp = '^CONTENT-.{11}=$'
-      break
-    case 'COMPOSITIONS':
-      filter.nameRegExp = '^COMPOSITION-.{11}=$'
-      break
-    case 'NOTES':
-      filter.nameRegExp = '^NOTE-.{11}=$'
-      break
-    case 'SPHERES':
-      filter.nameRegExp = '^SPHERES-.{11}=$'
-      break
-    case 'NODES':
-      filter.nameRegExp = '^(?!^CONTENT-.{11}=$|^COMPOSITION-.{11}=$|^NOTE-.{11}=$|^SPHERES-.{11}=$)'
-      break
-    case 'ALL':
-      break
-    default:
-      throw new Error(`bad wsItemsType ${wsItemsType}`)
-  }
   const fetchItemFunc = async () => {
     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectFullFragment}
-        query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
-          wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+        query wsItems ( $collection: WsCollectionEnum!){
+          wsItems (collection: $collection) {
             totalCount
             count
             nextPageToken
@@ -244,14 +51,8 @@ export const wsItems = async (context, { wsItemsType, pagination, filter, force 
           }
         }
       `,
-      variables: { pagination, filter, sortStrategy }
+      variables: { collection }
     })
-    for (let i = 0; i < items.length; i++) {
-      let item = items[i]
-      // храним списки отдельно от элементов
-      context.dispatch('cache/update', { key: makeKey(item), newValue: item, actualAge: 'hour' }, { root: true })
-      items[i] = { oid: item.oid } // в самом списке - просто ссылка
-    }
     return {
       item: { items, count, totalCount, nextPageToken },
       actualAge: 'hour'
@@ -259,16 +60,299 @@ export const wsItems = async (context, { wsItemsType, pagination, filter, force 
   }
   // { items, count, totalCount, nextPageToken }
   let wsFeedResult = await context.dispatch('cache/get',
-    { key: 'listWS: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc, force }, { root: true })
+    { key: 'listWS: ' + JSON.stringify(collection), fetchItemFunc }, { root: true })
   logD('wsItems complete')
   return wsFeedResult
 }
+
+// работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
+export const wsItemCreate = async (context, item) => {
+  logD('wsItemCreate start', item)
+  let { data: { wsItemCreate: wsItem } } = await apollo.clients.api.mutate({
+    mutation: gql`
+      ${fragments.objectFullFragment}
+      mutation wsItemCreate ($item: WSItemInput!) {
+        wsItemCreate (item: $item) {
+          ...objectFullFragment
+        }
+      }
+    `,
+    variables: { item }
+  })
+  context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
+  logD('wsItemCreate done', wsItem)
+  return wsItem
+}
+// работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
+export const wsItemUpdate = async (context, item) => {
+  logD('wsItemUpdate start', item)
+  let { data: { wsItemUpdate: wsItem } } = await apollo.clients.api.mutate({
+    mutation: gql`
+      ${fragments.objectFullFragment}
+      mutation wsItemUpdate ($item: WSItemInput!) {
+        wsItemUpdate (item: $item) {
+          ...objectFullFragment
+        }
+      }
+    `,
+    variables: { item }
+  })
+  context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
+  logD('wsItemUpdate done', wsItem)
+  return wsItem
+}
+// работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
+export const wsItemDelete = async (context, oid) => {
+  logD('wsItemDelete start')
+  let { data: { wsItemDelete: result } } = await apollo.clients.api.mutate({
+    mutation: gql`
+      ${fragments.objectFullFragment}
+      mutation wsItemDelete ($oid: OID!) {
+        wsItemDelete (oid: $oid) {
+          ...objectFullFragment
+        }
+      }
+    `,
+    variables: { oid }
+  })
+  // todo выкинуть из кэша
+  logD('wsItemDelete done')
+  return result
+}
+
+// // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
+// export const wsItemAdd = async (context, oid) => {
+//   logD('wsItemAdd start', oid)
+//   let { data: { wsItemAdd: wsItem } } = await apollo.clients.api.mutate({
+//     mutation: gql`
+//       ${fragments.objectFullFragment}
+//       mutation wsItemAdd ($oid: OID!, $wsRevision: Int!) {
+//         wsItemAdd (oid: $oid, wsRevision: $wsRevision) {
+//           ...objectFullFragment
+//         }
+//       }
+//     `,
+//     variables: {
+//       oid, wsRevision: context.rootState.workspace.revision
+//     }
+//   })
+//   context.dispatch('cache/update', { key: makeKey(wsItem), newValue: wsItem, actualAge: 'hour' }, { root: true })
+//   logD('wsItemAdd done', wsItem)
+//   return wsItem
+// }
+// export const wsNodeSave = async (context, node) => {
+//   logD('wsNodeSave start', node)
+//
+//   // checks
+//   {
+//     assert.ok(node.spheres.length >= 0)
+//     assert.ok(node.items.length >= 0)
+//     assert.ok(['PIP', 'SLIDER', 'VERTICAL', 'HORIZONTAL'].includes(node.layout))
+//   }
+//
+//   const makeNodeInput = (node) => {
+//     let nodeInput = {}
+//     nodeInput.revision = node.revision || 1
+//     nodeInput.layout = node.layout
+//     nodeInput.name = node.name
+//     nodeInput.category = node.category || 'FUN'
+//     nodeInput.spheres = node.spheres.map(s => {
+//       return { name: s.name }
+//     })
+//     nodeInput.items = node.items.map(c => {
+//       if (c) {
+//         return {
+//           // name: c.name || '',
+//           spheres: [],
+//           operation: {
+//             operations: c.operation.operations,
+//             items: c.operation.items,
+//             type: c.operation.type
+//           },
+//           layers: c.layers.map(l => {
+//             return {
+//               contentOid: l.content.oid,
+//               spheres: l.spheres.map(s => {
+//                 return {
+//                   name: s.name
+//                 }
+//               }),
+//               figuresAbsolute: l.figuresAbsolute.map(f => {
+//                 assert(f.t >= 0, 'f.t >= 0')
+//                 return {
+//                   t: f.t,
+//                   points: f.points.map(p => {
+//                     return {
+//                       x: p.x,
+//                       y: p.y,
+//                       z: p.z
+//                     }
+//                   })
+//                 }
+//               })
+//             }
+//           })
+//         }
+//       } else {
+//         return null
+//       }
+//     })
+//     logD('wsNodeSave start. nodeInput=', nodeInput)
+//     return nodeInput
+//   }
+//
+//   let wsItem
+//   if (node.oid) { // обновить
+//     let updateItemFunc = async (updatedItem) => {
+//       // logD('updatedItem', updatedItem)
+//       assert(updatedItem.revision, '!updatedItem.revision')
+//       let nodeInput = makeNodeInput(updatedItem)
+//       let { data: { wsNodeUpdate } } = await apollo.clients.api.mutate({
+//         mutation: gql`
+//           ${fragments.objectFullFragment}
+//           mutation wsNodeUpdate ($oid: OID!, $node: NodeInput!, $wsRevision: Int!) {
+//             wsNodeUpdate (oid: $oid, node: $node, wsRevision: $wsRevision) {
+//               ...objectFullFragment
+//             }
+//           }
+//         `,
+//         variables: {
+//           oid: node.oid, node: nodeInput, wsRevision: context.rootState.workspace.revision
+//         }
+//       })
+//       logD('wsNodeUpdate = ', wsNodeUpdate)
+//       return { item: wsNodeUpdate, actualAge: 'hour' }
+//     }
+//     let fetchItemFunc = async () => {
+//       let item = await context.dispatch('workspace/get', { oid: node.oid, force: true }, { root: true })
+//       return { item, actualAge: 'hour' }
+//     }
+//     let mergeItemFunc = (path, serverItem, cacheItem) => {
+//       assert(serverItem && cacheItem)
+//       let mergedItem
+//       // берем значение с сервера
+//       mergedItem = serverItem
+//       // assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
+//       return mergedItem
+//     }
+//     wsItem = await context.dispatch('cache/update', {
+//       key: makeKey(node),
+//       newValue: node,
+//       updateItemFunc,
+//       fetchItemFunc,
+//       mergeItemFunc
+//     }, { root: true })
+//   } else { // создать
+//     let nodeInput = makeNodeInput(node)
+//     let { data: { wsNodeCreate } } = await apollo.clients.api.mutate({
+//       mutation: gql`
+//         ${fragments.objectFullFragment}
+//         mutation wsNodeCreate ($node: NodeInput!, $wsRevision: Int!) {
+//           wsNodeCreate (node: $node, wsRevision: $wsRevision) {
+//             ...objectFullFragment
+//           }
+//         }
+//       `,
+//       variables: {
+//         node: nodeInput, wsRevision: context.rootState.workspace.revision
+//       }
+//     })
+//     wsItem = await context.dispatch('cache/update', {
+//       key: makeKey(wsNodeCreate),
+//       newValue: wsNodeCreate,
+//       actualAge: 'hour'
+//     }, { root: true })
+//   }
+//   logD('wsNodeSave done', wsItem.revision)
+//   return wsItem
+// }
+// export const wsItemDelete = async (context, oid) => {
+//   logD('wsItemDelete start', oid)
+//   assert.ok(oid)
+//   let { data: { wsItemDelete } } = await apollo.clients.api.mutate({
+//     mutation: gql`
+//       mutation wsItemDelete ($oid: OID!, $wsRevision: Int!) {
+//         wsItemDelete (oid: $oid, wsRevision: $wsRevision)
+//       }
+//     `,
+//     variables: {
+//       oid, wsRevision: context.rootState.workspace.revision
+//     }
+//   })
+//   logD('wsItemDelete done', wsItemDelete)
+//   return wsItemDelete
+// }
+
+// // wsItemsType 'CONTENTS' 'SPHERES' 'NODES' 'COMPOSITIONS' 'NOTES' 'ALL'
+// // Все сущности в мастерской лежат в ядрах. Ядро - как контейнер
+// // При этом если мы хотим хранить контент. то мы создаем ядро с именем CONTENT-...........= (oid контента)и на этом ядре хранится контент и все лэеры этого контента
+// // это же справедливо и для композиций (COMPOSITION-...........=) (oid композиции)
+// // для сфер создается одно ядро со всеми сферами сразу с именем (SPHERES-...........=) (oid юзера)
+// export const wsItems = async (context, { wsItemsType, pagination, filter, force }) => {
+//   logD('wsItems start')
+//   pagination = pagination || { pageSize: 30, pageToken: null }
+//   filter = filter || {}
+//   let sortStrategy = 'HOT'
+//   filter.types = ['NODE']
+//   switch (wsItemsType) {
+//     case 'CONTENTS':
+//       filter.nameRegExp = '^CONTENT-.{11}=$'
+//       break
+//     case 'COMPOSITIONS':
+//       filter.nameRegExp = '^COMPOSITION-.{11}=$'
+//       break
+//     case 'NOTES':
+//       filter.nameRegExp = '^NOTE-.{11}=$'
+//       break
+//     case 'SPHERES':
+//       filter.nameRegExp = '^SPHERES-.{11}=$'
+//       break
+//     case 'NODES':
+//       filter.nameRegExp = '^(?!^CONTENT-.{11}=$|^COMPOSITION-.{11}=$|^NOTE-.{11}=$|^SPHERES-.{11}=$)'
+//       break
+//     case 'ALL':
+//       break
+//     default:
+//       throw new Error(`bad wsItemsType ${wsItemsType}`)
+//   }
+//   const fetchItemFunc = async () => {
+//     let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+//       query: gql`
+//         ${fragments.objectFullFragment}
+//         query wsItems ( $pagination: PaginationInput!, $filter: Filter!, $sortStrategy: SortStrategyEnum){
+//           wsItems (pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+//             totalCount
+//             count
+//             nextPageToken
+//             items {... objectFullFragment}
+//           }
+//         }
+//       `,
+//       variables: { pagination, filter, sortStrategy }
+//     })
+//     for (let i = 0; i < items.length; i++) {
+//       let item = items[i]
+//       // храним списки отдельно от элементов
+//       context.dispatch('cache/update', { key: makeKey(item), newValue: item, actualAge: 'hour' }, { root: true })
+//       items[i] = { oid: item.oid } // в самом списке - просто ссылка
+//     }
+//     return {
+//       item: { items, count, totalCount, nextPageToken },
+//       actualAge: 'hour'
+//     }
+//   }
+//   // { items, count, totalCount, nextPageToken }
+//   let wsFeedResult = await context.dispatch('cache/get',
+//     { key: 'listWS: ' + JSON.stringify({ pagination, filter, sortStrategy }), fetchItemFunc, force }, { root: true })
+//   logD('wsItems complete')
+//   return wsFeedResult
+// }
 
 // пометить элементы мастерской как outOfDate (запросятся при первой возможности)
 export const expireWsCache = async (context) => {
   logD('expireWsCache start')
   for (let key in context.rootState.cache.cachedItems) {
-    let keyPattern = 'listWS: '
+    let keyPattern = 'listWS:'
     if (key.startsWith(keyPattern)) {
       context.dispatch('cache/expire', { key: key }, { root: true })
       let { items, count, totalCount, nextPageToken } = context.rootState.cache.cachedItems[key]
