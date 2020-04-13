@@ -33,12 +33,9 @@
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '80px'}`).row.full-width.items-start.content-start
         kalpa-loader(type="CONTENT_NOTES_LIST" :variables=`{}`)
           template(v-slot:items=`{items}`)
-            ws-content(
-              v-for="(n, ni) in items" :key="n.oid"
-              :node="n" :contentOid="contentOid"
-              @contentClick="contentClick"
-              @contentDelete="contentDelete"
-              @contentEdit="contentEdit")
+            ws-content-notes(
+              v-for="(i, ii) in items" :key="i.oid"
+              :item="i" :contentOid="contentOid")
 </template>
 
 <script>
@@ -74,11 +71,10 @@ export default {
     },
     async contentFound (content) {
       this.$log('contentFound', content)
-      // try to find item in ws by name
-      // let name = 'CONTENT-' + content.oid
       let itemInput = {
         name: content.name,
         unique: content.oid,
+        thumbOid: content.oid,
         wsItemType: 'CONTENT_NOTES',
         rawData: {
           content: content,
@@ -87,30 +83,7 @@ export default {
       }
       this.$log('itemInput', itemInput)
       let item = await this.$store.dispatch('workspace/wsItemCreate', itemInput)
-      // let item = await this.$store.dispatch('workspace/get', {name})
-      // this.$log('item before', item)
-      // if (!item) {
-      //   this.$log('*** CREATE content-node')
-      //   let nodeContentInput = {
-      //     name,
-      //     layout: 'PIP',
-      //     category: 'FUN',
-      //     spheres: [],
-      //     items: [
-      //       {
-      //         composition: {
-      //           operation: { type: 'CONCAT', items: [], operations: null },
-      //           layers: [{ content: content, figuresAbsolute: [], figuresRelative: [], spheres: [] }]
-      //         }
-      //       }
-      //     ]
-      //   }
-      //   this.$log('nodeContentInput', nodeContentInput)
-      //   item = await this.$store.dispatch('workspace/wsNodeSave', nodeContentInput)
-      // }
       this.$log('item after', item)
-      // this.$emit('item', {type: 'content', item: item})
-      // this.contentClick(item.oid)
     }
   },
   mounted () {
