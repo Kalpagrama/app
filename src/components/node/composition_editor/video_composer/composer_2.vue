@@ -108,9 +108,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.styles.paddingTop = 4
-    this.styles.paddingLeft = 4
-    this.styles.paddingRight = 4
+    // this.styles.paddingTop = 8
+    // this.styles.paddingLeft = 4
+    // this.styles.paddingRight = 4
   }
 }
 </script>

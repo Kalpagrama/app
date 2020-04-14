@@ -36,7 +36,7 @@ export default {
       dialogOpened: false,
       page: 'content',
       pages: [
-        {id: 'content', name: 'Contents'},
+        {id: 'contentNotes', name: 'Contents'},
         {id: 'node', name: 'Nodes'}
       ]
     }

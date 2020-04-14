@@ -4,25 +4,16 @@ import { debounce } from 'quasar'
 export default {
   render () {
     return this.$scopedSlots.default({
-      item: this.node
+      item: this.item
     })
   },
   name: 'wsItemSaver',
-  props: ['value', 'mode'],
+  props: ['value'],
   data () {
     return {
-      nodeChanged: false,
-      nodeSaving: false,
-      nodeSavingError: null,
-      node: null,
-      nodeNew: {
-        name: '',
-        revision: 0,
-        layout: 'PIP',
-        category: 'FUN',
-        spheres: [],
-        items: []
-      }
+      item: null,
+      itemUpdateAuthor: null,
+      itemUpdating: false
     }
   },
   watch: {
@@ -30,72 +21,37 @@ export default {
       deep: true,
       immediate: true,
       handler (to, from) {
-        if (to) {
-          // node changed by server
-          if (this.node && this.node.revision !== to.revision) {
-            // если пользователь успел изменить что-либо
-            if (this.nodeChanged) {
-              this.$log('User changed something! try to save!')
-              this.nodeSaveDebounce()
-            }
-            // user dont changed anything
-            else {
-              this.$log('Set this.node value from vuex 1', to)
-              this.node = JSON.parse(JSON.stringify(to))
-            }
-          } else {
-            this.$log('Set this.node value from vuex 2')
-            if (!this.node) this.node = JSON.parse(JSON.stringify(to))
-          }
-        } else {
-          this.$log('Set this.node value from vuex 3')
-          this.node = JSON.parse(JSON.stringify(this.nodeNew))
-        }
+        if (!to) return
+        this.$log('value CHANGED', to.revision)
+        this.item = JSON.parse(JSON.stringify(to))
       }
     },
-    node: {
+    item: {
       deep: true,
       handler (to, from) {
-        this.$log('node CHANGED', to)
-        if (to) {
-          // user changed node
-          if (!from || from.revision === to.revision) {
-            // this.$log('User changed node: ', to.revision, to.name)
-            this.nodeChanged = true
-            this.nodeSaveDebounce()
-          }
-        }
+        // this.$log('item CHANGED to', to.revision)
+        if (this.itemUpdating) return
+        this.itemUpdate()
       }
     }
   },
   methods: {
-    async nodeSaveImmediate () {
+    async itemUpdate () {
       try {
-        this.$log('nodeSave start', this.node.revision, this.node.name)
-        if (!this.nodeChanged) return
-        this.nodeSaving = true
-        let res = await this.$store.dispatch('workspace/wsItemUpdate', this.node)
-        this.$log('nodeSave res', res.revision, res.name, res)
-        if (!res.revision) this.$q.notify({color: 'red', textColor: 'white', message: 'No revision!!!'})
-        // if (!this.value) {
-        //   this.$log('nodeSave SET WS ITEM')
-        //   // this.$router.push({params: {oid: res.oid}})
-        //   this.$store.commit('workspace/stateSet', ['itemType', 'node'])
-        //   this.$store.commit('workspace/stateSet', ['item', res])
-        // }
-        this.$log('nodeSave done', res.revision, res.name)
-        this.nodeSavingError = null
+        this.$log('itemUpdate start revision: ', this.item.revision)
+        if (this.itemUpdating) return
+        this.itemUpdating = true
+        let item = await this.$store.dispatch('workspace/wsItemUpdate', JSON.parse(JSON.stringify(this.item)))
+        this.$log('itemUpdate done revision:', item.revision)
       } catch (e) {
-        this.$logE('nodeSave error', e)
-        this.nodeSavingError = e
+        this.$logE('itemUpdate error', e)
       } finally {
-        this.nodeSaving = false
-        this.nodeChanged = false
+        this.itemUpdating = false
       }
     }
   },
   created () {
-    this.nodeSaveDebounce = debounce(this.nodeSaveImmediate, 1000)
+    this.itemUpdate = debounce(this.itemUpdate, 1000)
   }
 }
 </script>

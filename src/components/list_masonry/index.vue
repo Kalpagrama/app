@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{position: 'relative'}`
-  ).column.fit.bg-grey-10
+  ).column.fit.items-center.content-center.justify-center.bg-grey-10
   //- tint
   div(
     v-if="true"
@@ -21,9 +21,9 @@ div(
     ).col.full-width.scroll
     .row.full-width.justify-center
       masonry(
-        :cols="{default: 7, 1800: 6, 1500: 5, 1200: 4, 900: 3, 600: 2}"
-        :gutter="{default: 10, 1200: 10, 900: 10, 600: 10}"
-        :style=`{position: 'relative', marginTop: '70px', marginBottom: '500px'}`).q-px-sm
+        :cols="{default: 3}"
+        :gutter="{default: 10}"
+        :style=`{position: 'relative', marginTop: '70px', marginBottom: '500px'}`)
         div(
           v-for="(i, ii) in items" :key="i.oid"
           @mouseenter="itemEnter(i, ii)"
@@ -78,7 +78,7 @@ export default {
     tintOpacity () {
       let item = this.itemsMeta[this.itemsMeta.length - 1]
       if (item) {
-        let to = 1 - (Math.abs(this.scrollDelta) / (this.itemMaxWidth - this.itemMinWidth))
+        let to = 1 - (Math.abs(this.scrollDelta) / (this.$store.state.ui.maxWidthPage - this.itemMinWidth))
         if (to > 0.7) to = 0.7
         return to
       }
@@ -111,7 +111,7 @@ export default {
     itemStyles (oid) {
       let m = this.itemsMeta.find(x => x.oid === oid)
       if (m) {
-        let maxWidth = 750
+        let maxWidth = this.$store.state.ui.maxWidthPage
         let minWidth = m.widthOriginal
         let width = m.width - Math.abs(this.scrollDelta)
         if (width < minWidth) width = minWidth
@@ -172,7 +172,7 @@ export default {
       let {height, width, left, top} = itemRef.getBoundingClientRect()
       this.itemOffsetTop = itemRef.offsetHeight
       this.$log('itemOffsetTop', this.itemOffsetTop)
-      this.itemMaxWidth = 750
+      this.itemMaxWidth = this.$store.state.ui.maxWidthPage
       this.itemMinWidth = width
       // this.$log('itemTo rect', height, width, left, top)
       this.itemsMeta.push({
@@ -194,9 +194,9 @@ export default {
         0.6,
         {
           height: this.$q.screen.width > 500 ? 500 : this.$q.screen.width - 16,
-          width: this.$q.screen.width > 750 ? 750 : this.$q.screen.width - 16 - 60,
-          left: this.$q.screen.width > 750 ? (this.$q.screen.width - 750) / 2 : 8,
-          top: 70,
+          width: this.$q.screen.width > this.$store.state.ui.maxWidthPage ? this.$store.state.ui.maxWidthPage : this.$q.screen.width - 16 - 60,
+          left: this.$q.screen.width > this.$store.state.ui.maxWidthPage ? (this.$q.screen.width - this.$store.state.ui.maxWidthPage) / 2 : 8,
+          top: 68,
           onComplete: () => {
           }
         }
@@ -254,9 +254,9 @@ export default {
         itemRef,
         0.5,
         {
-          top: 70,
-          left: this.$q.screen.width > 750 ? (this.$q.screen.width - 750) / 2 : 8,
-          maxWidth: 750,
+          top: 68,
+          left: this.$q.screen.width > this.$store.state.ui.maxWidthPage ? (this.$q.screen.width - this.$store.state.ui.maxWidthPage) / 2 : 8,
+          maxWidth: this.$store.state.ui.maxWidthPage,
           maxHeight: 500
         }
       )

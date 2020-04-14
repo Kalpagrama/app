@@ -7,8 +7,23 @@
 q-layout(
   view="hHh lpR fFf" container
   :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px'}`).bg-grey-10
-  q-dialog(v-model="categoriesDialogShow")
-    div(:style=`{width: '240px', height: $q.screen.height-200+'px', borderRadius: '10px', overflow: 'hidden'}`).row
+  //- menu
+  div(
+    v-if="$q.screen.width > $store.state.ui.maxWidthPage+300+300"
+    :style=`{
+      position: 'fixed',
+      top: '0px',
+      zIndex: 1000,
+      width: $store.state.ui.maxWidthMenu+'px',
+      height: $q.screen.height+'px',
+      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
+      paddingTop: '68px',
+    }`).row.items-start.content-start.q-px-sm.q-pb-sm
+    div(
+      :style=`{
+        borderRadius: '10px', overflow: 'hidden'
+      }`
+      ).column.full-width.bg-grey-9
       categories
   q-header(
     reveal
@@ -28,39 +43,20 @@ q-layout(
             span.text-white.text-bold Trends
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
           q-btn(round flat color="grey-5" icon="more_vert")
-    //- categories
-    div(v-if="false").row.full-width.justify-center
-      div(
-        :style=`{
-          height: '60px',
-          maxWidth: $store.state.ui.maxWidthPage+'px',
-          textTransform: 'capitalize', whiteSpace: 'nowrap'}`
-        ).row.full-width.scroll
-          kalpa-buttons(:value="categoriesFiltered" :id="$route.params.category" idKey="id" @id="$router.push({params: {category: $event}})").no-wrap
-  q-footer(
-    reveal)
-    div(:style=`{height: '60px'}`).row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius:  '10px 10px 0 0'}`
-        ).row.fit.items-center.content-center.justify-between.bg-grey-8
-        q-btn(
-          round push color="green" icon="add"
-          :style=`{position: 'absolute', top: '-20px', left: '50%', transform: 'translate(-50%, 0)',borderRadius: '50% !important'}`)
-        .col.full-height
-          .row.fit.items-center.content-center.q-px-sm
-            q-btn(flat no-caps color="white" @click="categoriesDialogShow = true")
-              span(:style=`{textTransform: 'capitalize'}`).text-white {{ '#'+categories[$route.params.category].name }}
-        q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['menuAppShow', true])").q-mr-sm
+  //- q-footer(
+  //-   reveal)
+  //-   div(:style=`{height: '60px'}`).row.full-width.justify-center
+  //-     div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius:  '10px 10px 0 0'}`
+  //-       ).row.fit.items-center.content-center.justify-between.bg-grey-8
+  //-       q-btn(
+  //-         round push color="green" icon="add"
+  //-         :style=`{position: 'absolute', top: '-20px', left: '50%', transform: 'translate(-50%, 0)',borderRadius: '50% !important'}`)
+  //-       .col.full-height
+  //-         .row.fit.items-center.content-center.q-px-sm
+  //-           q-btn(flat no-caps color="white" @click="categoriesDialogShow = true")
+  //-             span(:style=`{textTransform: 'capitalize'}`).text-white {{ '#'+categories[$route.params.category].name }}
+  //-       q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['menuAppShow', true])").q-mr-sm
   q-page-conainter.row.fit.justify-center.items-start.content-start.bg-grey-10
-    div(
-      v-if="$q.screen.width > $store.state.ui.maxWidthPage+260+260"
-      :style=`{
-        position: 'fixed', width: '200px', top: '200px',
-        height: $q.screen.height-300+'px',
-        left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-200-60+'px',
-        borderRadius: '10px', overflow: 'hidden'
-      }`
-      ).row.bg-grey-9
-      categories
     q-page.q-pt-xl
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
         template(v-slot:items=`{items}`)

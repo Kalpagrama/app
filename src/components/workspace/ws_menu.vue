@@ -51,11 +51,11 @@ import wsContentList from './ws_content_list'
 import wsCompositionList from './ws_composition_list'
 import wsNodeList from './ws_node_list'
 import wsSphereList from './ws_sphere_list'
-import wsSettingList from './ws_setting_list'
+// import wsSettingList from './ws_setting_list'
 
 export default {
   name: 'wsMenu',
-  components: {wsNoteList, wsContentList, wsCompositionList, wsNodeList, wsSphereList, wsSettingList},
+  components: {wsNoteList, wsContentList, wsCompositionList, wsNodeList, wsSphereList},
   props: {
     page: {
       type: String
