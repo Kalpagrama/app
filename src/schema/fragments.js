@@ -3,8 +3,6 @@ import gql from 'graphql-tag'
 const metaFragment = gql`
   fragment metaComposition on MetaComposition {
     thumbUrl(preferWidth: 600)
-    height
-    width
   }
   fragment metaFragment on Meta {
     type
@@ -88,8 +86,6 @@ const videoFragment = gql`${objectFragment}
     url
     urlOriginal
     duration
-    width
-    height
     frameUrls
     contentSource
   }
@@ -99,8 +95,6 @@ const imageFragment = gql`${objectFragment}
     ...objectFragment
     url
     urlOriginal
-    width
-    height
   }
 `
 const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${videoFragment} ${imageFragment}

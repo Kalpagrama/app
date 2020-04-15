@@ -4,12 +4,12 @@ div(
   ).column.fit.items-center.content-center.justify-center.bg-grey-10
   //- tint
   div(
-    v-if="true"
+    v-if="false"
     :style=`{
       position: 'fixed', zIndex: 200, background: 'rgba(0,0,0,'+tintOpacity+')',
       pointerEvents: 'none'
     }`
-    ).row.fit
+    ).row.fit.bg
   //- body items
   div(
     ref="scrollWrapper"
@@ -23,7 +23,7 @@ div(
       masonry(
         :cols="{default: 3}"
         :gutter="{default: 10}"
-        :style=`{position: 'relative', marginTop: '70px', marginBottom: '500px'}`)
+        :style=`{position: 'relative', marginTop: '20px', maxWidth: $store.state.ui.maxWidthPage+'px', marginBottom: '500px'}`).full-width
         div(
           v-for="(i, ii) in items" :key="i.oid"
           @mouseenter="itemEnter(i, ii)"
@@ -41,7 +41,7 @@ div(
             @click="itemClick(null, null)"
             :ref="`item-img-${i.oid}`"
             draggable="false"
-            :src="i.thumbUrl"
+            :src="i.meta.items[0].thumbUrl"
             :style=`{opacity: 0.1, width: '100%', borderRadius: '10px', overflow: 'hidden'}`)
           //- slot
           div(
@@ -288,9 +288,9 @@ export default {
         this.itemClick(null, null)
       }
     }
-    this.$wait(0).then(() => {
-      this.itemClick(this.items[5], 5)
-    })
+    // this.$wait(0).then(() => {
+    //   this.itemClick(this.items[5], 5)
+    // })
   }
 }
 </script>

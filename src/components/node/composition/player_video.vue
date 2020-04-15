@@ -85,6 +85,7 @@ div(
     div(:style=`{
       position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)',
       borderRadius: '10px', overflow: 'hidden',
+      opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1
       }`).row.full-width
       //- opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1
       //- preload="auto"
@@ -187,13 +188,24 @@ export default {
       else return this.compositionContent
     },
     contentSource () {
-      if (this.content) return this.content.contentSource
-      else return null
+      if (this.ctx === 'workspace') {
+        return 'YOUTUBE'
+      }
+      else {
+        return 'KALPA'
+      }
+      // if (this.content) return this.content.contentSource
+      // else return null
       // return this.content.contentSource
     },
     contentUrl () {
-      if (this.content) return this.content.url
-      else return null
+      if (this.ctx === 'workspace') {
+        if (this.content) return this.content.url
+        else return null
+      }
+      else {
+        return this.layer.url
+      }
       // return this.content.url
     },
     videoGood () {

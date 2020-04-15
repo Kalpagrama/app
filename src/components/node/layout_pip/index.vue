@@ -52,7 +52,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     //-   q-btn(round push color="green" icon="blur_on" :style=`{borderRadius: '50% !important'}`)
     div(:style=`{}`).col
       .row.fit.items-center.content-center.q-pa-sm
-        router-link(:to="'/sphere/'+node.oid")
+        router-link(:to="'/sphere/'+sphereOid")
           span.text-bold.text-grey-3.cursor-pointer {{ node.name }}
     div(:style=`{width: '60px', minHeight: '60px'}`).row.full-height.items-center.content-center.justify-center
       q-btn(
@@ -88,6 +88,14 @@ export default {
     }
   },
   computed: {
+    sphereOid () {
+      if (this.nodeFull) {
+        return this.nodeFull.sphereFromName.oid
+      }
+      else {
+        return ''
+      }
+    }
     // items () {
     //   let res = []
     //   if (this.node.meta.items[0]) res.push({preview: this.node.meta.items[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[0] : null})

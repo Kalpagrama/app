@@ -42,7 +42,26 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
     q-page.q-pt-xl
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
         template(v-slot:items=`{items}`)
-          node-list(:nodes="items")
+          //- node-list(:nodes="items")
+          list-masonry(ref="listMasonry" :items="items")
+            template(v-slot:item=`{item, index, isHovered}`)
+              div(
+                :style=`{
+                  position: 'relative'
+                }`
+                ).row.fit
+                //- layer name
+                small(
+                  v-if="isHovered"
+                  :style=`{position: 'absolute', top: '8px', left: '8px', borderRadius: '10px', background: 'rgba(0,0,0,0.5)'}`
+                  ).q-pa-sm.text-white {{item.oid}}
+                //- thumbUrl
+                img(
+                  @click="$refs.listMasonry.itemClick(item, index)"
+                  draggable="false"
+                  :src="item.meta.items[0].thumbUrl"
+                  :style=`{width: '100%', objectFit: 'contain', userSelect: 'none', borderRadius: '10px', overflow: 'hidden'}`
+                  ).bg-black.cursor-pointer.fit
 </template>
 
 <script>
