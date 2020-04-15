@@ -36,7 +36,7 @@
             "description": "аутентификация для тестов",
             "args": [
               {
-                "name": "login",
+                "name": "userId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -80,10 +80,10 @@
           },
           {
             "name": "checkUserIdFree",
-            "description": null,
+            "description": "userId = username/ email/ phone",
             "args": [
               {
-                "name": "login",
+                "name": "userId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -111,10 +111,10 @@
           },
           {
             "name": "userIdentify",
-            "description": "login - email/phone/randomLogin",
+            "description": "userId - email/phone/username",
             "args": [
               {
-                "name": "login",
+                "name": "userId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -229,7 +229,7 @@
             "description": "Восстановление пароля по почте. Если к учетке привязана почта, то на нее придет новый пароль",
             "args": [
               {
-                "name": "login",
+                "name": "userId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -284,10 +284,10 @@
           },
           {
             "name": "restorePassword",
-            "description": "Восстановление пароля в соответствии с настройками, указанными в профиле (по-умолчанию - через почту)",
+            "description": "Восстановление userId в соответствии с настройками, указанными в профиле (по-умолчанию - через почту)",
             "args": [
               {
-                "name": "login",
+                "name": "userId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -817,7 +817,18 @@
           {
             "name": "testWebPush",
             "description": null,
-            "args": [],
+            "args": [
+              {
+                "name": "message",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              }
+            ],
             "type": {
               "kind": "NON_NULL",
               "name": null,
@@ -968,7 +979,7 @@
         "description": null,
         "fields": [
           {
-            "name": "login",
+            "name": "userId",
             "description": null,
             "args": [],
             "type": {
@@ -2158,6 +2169,11 @@
           },
           {
             "kind": "OBJECT",
+            "name": "EventNodeCreate",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
             "name": "EventNotice",
             "ofType": null
           },
@@ -2707,7 +2723,7 @@
             "description": "аутентификация для тестов",
             "args": [
               {
-                "name": "login",
+                "name": "userId",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -6583,22 +6599,6 @@
             "deprecationReason": null
           },
           {
-            "name": "content",
-            "description": "объект, полученный по contentOid",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "INTERFACE",
-                "name": "Object",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "figuresAbsolute",
             "description": "ограничение контента (координаты даны относительно начала контента) в\nпространстве и времени (с возможностью анимировать изменение формы границ со времением)",
             "args": [],
@@ -7257,6 +7257,95 @@
                 "kind": "INTERFACE",
                 "name": "ObjectShort",
                 "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [
+          {
+            "kind": "INTERFACE",
+            "name": "Event",
+            "ofType": null
+          }
+        ],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "EventNodeCreate",
+        "description": null,
+        "fields": [
+          {
+            "name": "type",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "EventEnum",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "subject",
+            "description": "кто сделал(user)",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "ObjectShort",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "object",
+            "description": "что сделал (данные)",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INTERFACE",
+                "name": "ObjectShort",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "sphereOids",
+            "description": "на какие сферы попало ядро(временное решение. Потом будет решаться через подписку)",
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "SCALAR",
+                    "name": "OID",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -10127,97 +10216,6 @@
             "ofType": null
           }
         ],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "WSFeedResult",
-        "description": null,
-        "fields": [
-          {
-            "name": "items",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "WSObjectShort",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "count",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "totalCount",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "Int",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "nextPageToken",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "RawJSON",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "prevPageToken",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "RawJSON",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
         "enumValues": null,
         "possibleTypes": null
       },
