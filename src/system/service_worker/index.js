@@ -319,4 +319,4 @@ async function showNotification (title, body) {
   }
 }
 
-export { initSw, initWebPush, checkUpdate, update, clearCache }
+export { initSw, checkUpdate, update, clearCache }

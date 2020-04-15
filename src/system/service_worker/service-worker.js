@@ -1,4 +1,4 @@
-const swVer = 2
+const swVer = 3
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
@@ -408,10 +408,10 @@ if (useCache) {
     //   logDebug('Message received . ', payload)
     //   // ...
     // })
-    messaging.onTokenRefresh(async () => {
-      let token = await messaging.getToken()
-      logDebug('messaging.onTokenRefresh = ', token)
-    })
+    // messaging.onTokenRefresh(async () => {
+    //   let token = await messaging.getToken()
+    //   logDebug('messaging.onTokenRefresh = ', token)
+    // })
 
     messaging.setBackgroundMessageHandler(function (payload) {
       logDebug('[firebase-messaging-sw.js] Received background message ', payload)
