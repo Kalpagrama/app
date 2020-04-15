@@ -74,7 +74,7 @@
             @keyup.enter="userAuthenticate()"
             :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
         //- password
-        div(v-if="loginType && loginType === 'PASSWORD'").row.full-width
+        div(v-if="loginType && loginType === 'USERNAME'").row.full-width
           div(:style=`{height: '60px'}`
             ).row.full-width.items-center.content-center.text-center.justify-start.q-py-sm
             q-btn(round flat color="white" icon="keyboard_arrow_left" @click="reset()")
@@ -102,7 +102,7 @@
         //- confirm
         q-btn(
           push no-caps color="green" @click="userAuthenticate()" label="Enter kalpa"
-          :disable="loginType === 'PASSWORD' && !userExist ? password !== passwordSecond : false"
+          :disable="loginType === 'USERNAME' && !userExist ? password !== passwordSecond : false"
           :loading="userAuthenticating"
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-my-md
       //- help/policy
@@ -146,6 +146,7 @@ export default {
         await this.$wait(500)
         let res = await this.$store.dispatch('auth/userIdentify', this.login)
         this.$log('userIdentify done', res)
+        this.login = res.userId
         this.userIdentifying = false
         this.userIdentified = true
         this.userExist = res.userExist
@@ -163,7 +164,7 @@ export default {
         this.$log('userAuthenticate start')
         this.userAuthenticating = true
         await this.$wait(500)
-        if (this.loginType === 'PASSWORD') {
+        if (this.loginType === 'USERNAME') {
           if (this.userExist === false) {
             if (this.password !== this.passwordSecond) {
               this.passwordShow = true

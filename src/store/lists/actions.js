@@ -178,42 +178,6 @@ export const contentNodes = async (context, { contentOid }) => {
   return { nodeList, getIdx, getT }
 }
 
-export const nodeChains = async (context, { nodeOid }) => {
-  logD('nodeChains start')
-  const fetchItemFunc = async () => {
-    let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
-      query: gql`
-        ${fragments.objectShortWithMetaFragment}
-        query nodeChains ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-          sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            count
-            totalCount
-            nextPageToken
-            items {... objectShortWithMetaFragment}
-          }
-        }
-      `,
-      variables: {
-        oid: nodeOid,
-        pagination: { pageSize: 500, pageToken: null },
-        filter: null,
-        sortStrategy: 'HOT'
-      }
-    })
-    return {
-      item: { chainList: items, count, totalCount, nextPageToken, prevPageToken },
-      actualAge: 'hour'
-    }
-  }
-  let { chainList, nextPageToken, prevPageToken } = await context.dispatch('cache/get',
-    { key: 'list: ' + JSON.stringify({ oid: nodeOid }), fetchItemFunc }, { root: true })
-  const setCurrentIndx = (indx) => {
-    // todo запрашивать новые порции данных
-  }
-  logD('nodeChains complete')
-  return { chainList, setCurrentIndx }
-}
-
 export const feed = async (context, { pagination }) => {
   logD('feed start')
   assert.ok(pagination)

@@ -97,7 +97,7 @@ export default {
       this.$log('emailSend start', this.email)
       this.emailSending = true
       if (this.email.length === 0) this.$q.notify({message: 'Wrong email! Enter correct Email!', color: 'white', position: 'bottom', textColor: 'red', icon: 'error'})
-      let { login, loginType, userExist, needInvite, token, expires } = await this.$store.dispatch('auth/userIdentify', this.email)
+      let { userId, loginType, userExist, needInvite, token, expires } = await this.$store.dispatch('auth/userIdentify', this.email)
       this.emailSending = false
       this.codeWaiting = true
       this.$log('emailSend code', this.codeWaiting)
