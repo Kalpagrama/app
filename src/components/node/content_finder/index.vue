@@ -13,20 +13,17 @@
       :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-3
       div(
         v-if="progress"
-        :style=`{position: 'absolute', zIndex: 100, left: 0, width: progress.progress+'%'}`
+        :style=`{position: 'absolute', zIndex: 100, left: 0, width: progress.progress+'%', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-height.bg-green
       q-input(
         v-model="url" filled
-        color="green" placeholder="Paste URL to add content"
+        color="green" placeholder="Find content or paste URL"
         :loading="urlInputLoading"
-        :style=`{borderRadius: '10px', overflow: 'hidden'}`
-        :input-style=`{paddingLeft: '10px'}`
-        ).full-width.bg-grey-2
+        :input-style=`{}`
+        :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+        ).full-width.bg-grey-1
         template(v-slot:append)
           q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm
-        //- template(v-slot:append)
-        //-   q-btn(v-if="sources.includes('ws') && url.length === 0" round flat color="green" icon="add" @click="wsDialogShow = true").q-mr-sm
-        //-   q-btn(v-if="!urlInputLoading && url.length > 0" round flat color="green" icon="clear" @click="url = ''").q-mr-sm
 </template>
 
 <script>

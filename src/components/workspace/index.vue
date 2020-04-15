@@ -4,12 +4,17 @@
     background: #888
 </style>
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', background: '#333'}`)
   //- menu
   div(
-    v-if="$q.screen.width > $store.state.ui.maxWidthPage+300+300"
+    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
     :style=`{
-      position: 'fixed', zIndex: 1000, width: '300px', height: $q.screen.height+'px', top: '0px', right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-300+'px',
+      position: 'fixed',
+      top: '0px',
+      zIndex: 1000,
+      width: $store.state.ui.maxWidthMenu+'px',
+      height: $q.screen.height+'px',
+      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
       paddingTop: '68px',
     }`).row.items-start.content-start.q-px-sm.q-pb-sm
     div(
@@ -31,6 +36,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
             :class=`{
             }`
             ).text-white {{ p.name }}
+  //- item editors
   q-dialog(
     v-model="pageDialogOpened" :maximized="true" position="bottom"
     @hide="itemEdited")
@@ -57,20 +63,19 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
             :style=`{
               maxWidth: $store.state.ui.maxWidthPage+'px'
             }`)
-      //- span(
-      //-   v-if="$store.state.workspace.item"
-      //-   :style=`{position: 'fixed', top: '8px', zIndex: 10000}`).bg-red {{$store.state.workspace.item.revision}}
+  //- header
   q-header()
-    .row.full-width.justify-center.bg-grey-10
-      div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
-        div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-          q-btn(round flat color="grey-5" icon="keyboard_arrow_left" @click="$router.back()")
+    div(:style=`{background: '#333'}`).row.full-width.justify-center
+      div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`).row.full-width
         .col.full-height
-          .row.fit.items-center.content-center.justify-center
-            q-btn(round flat color="white" icon="school")
-            span.text-bold.text-white Workspace
-        div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-          q-btn(round flat color="grey-5" icon="settings" @click="$router.push({params: {page: 'setting'}})")
+          .row.fit.items-center.content-center.justify-start.q-px-sm
+            .row.full-height.items-center.content-center.q-mr-sm
+              q-btn(round flat color="white")
+                q-icon(name="school" size="30px")
+            .row.full-height
+              span(:style=`{fontSize: '20px', lineHeight: 0.9}`).text-white.q-mt-md Workspace
+              span().text-white.full-width {{ pages.find(p => p.id === $route.params.page).name }}
+  //- footer
   q-footer(v-if="$q.screen.width < 1300")
     .row.full-width.justify-center
       div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0'}`
@@ -90,6 +95,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
             borderRadius: '10px', overflow: 'hidden'
           }`).row.fit.bg-grey-9
           ws-settings(v-if="$route.params.page === 'settings'")
+          ws-spheres(v-if="$route.params.page === 'spheres'")
           ws-items(
             v-else
             ctx="workspace"
@@ -99,37 +105,35 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
             @add="itemAdd"
             :style=`{
               borderRadius: '10px', overflow: 'hidden'
-            }`)
+            }`).bg-grey-9
 </template>
 
 <script>
 import wsItems from './ws_items'
-import wsSphere from './ws_sphere'
+import wsSpheres from './ws_spheres'
 import wsSettings from './ws_settings'
 import contentNoter from 'components/node/content_noter'
 import wsItemSaver from './ws_item_saver'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsSphere, wsSettings, contentNoter, wsItemSaver},
+  components: {wsItems, wsSpheres, wsSettings, contentNoter, wsItemSaver},
   props: [],
   data () {
     return {
       pageDialogOpened: false,
       page: 'contentNotes',
       pages: [
-        {id: 'notes', name: 'Notes'},
+        {id: 'note', name: 'Notes'},
         {id: 'contentNotes', name: 'Contents'},
         {id: 'node', name: 'Nodes'},
-        {id: 'chains', name: 'Chains'},
+        {id: 'chain', name: 'Chains'},
+        {id: 'spheres', name: 'Spheres'},
         {id: 'settings', name: 'Settings'}
       ]
     }
   },
   computed: {
-    // item () {
-    //   return this.$store.state.workspace.item
-    // }
   },
   watch: {
     '$route.params.page': {
@@ -147,12 +151,7 @@ export default {
           this.$router.push({params: {page: 'node'}})
         }
       }
-    },
-    // '$store.state.workspace.item': {
-    //   handler (to, from) {
-    //     this.$log('item CHANGED', to)
-    //   }
-    // }
+    }
   },
   methods: {
     async itemClick ({type, item}) {

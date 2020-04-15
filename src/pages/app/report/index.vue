@@ -4,14 +4,18 @@ q-layout(
   :style=`{height: $q.screen.height+'px'}`).bg-grey-10
   q-page-conainter
     q-page
-      div(:style=`{height: '60px'}`).row.full-width
+      div(:style=`{height: '60px'}`).row.full-width.justify-center
+        div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`
+          ).row.full-width.items-center.q-px-sm
+          span(:style=`{fontSize: '30px'}`).text-white Report a bug
       .row.full-width.justify-center.q-pt-sm
         div(
           :style=`{
             maxWidth: $store.state.ui.maxWidthPage+'px',
-            borderRadius: '10px', overflow: 'hidden'
+            borderRadius: '10px', overflow: 'hidden',
+            minHeight: $q.screen.width > $store.state.ui.maxWidthPage ? $store.state.ui.maxWidthPage+'px' : $q.screen.width+'px'
           }`).row.full-width.bg-grey-9.q-pa-md
-          h1.text-white Report a bug
+          //- h1.text-white Report a bug
 </template>
 
 <script>

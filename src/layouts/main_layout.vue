@@ -1,7 +1,7 @@
 <style lang="sass">
-iframe
-  width: 100%
-  height: 500px
+// iframe
+//   width: 100%
+//   height: 500px
 .q-btn
   borderRadius: 10px
 .q-header
@@ -15,33 +15,18 @@ h1
 // html, body
 //   position: fixed
 //   bottom: 0px
+.menu-item
+  &:hover
+    background: #888
 </style>
 
 <template lang="pug">
 q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
   kalpa-action
-  //- q-drawer(
-  //-   v-if="$q.screen.gt.xs && $route.name !== 'welcome'"
-  //-   v-model="$q.screen.xs ? false : drawerShow"
-  //-   no-swipe-open no-swipe-close overlay
-  //-   behavior="desktop"
-  //-   :side="$q.screen.xs ? 'right' : 'left'"
-  //-   :width="60"
-  //-   content-class="bg-grey-8")
-  //-   kalpa-menu-desktop(v-if="!loading" :style=`{zIndex: 10000}`)
   q-dialog(
     :value="$store.state.ui.menuAppShow" @hide="$store.commit('ui/stateSet', ['menuAppShow', false])" position="bottom")
     kalpa-menu-xs
-  //- div(:style=`{position: 'fixed', top: '50%', width: '200px', right: ''}`)
-  //- div(
-  //-   v-if="$route.name !== 'welcome'"
-  //-   :style=`{position: 'fixed', zIndex: 1000, right: '0px', bottom: '0px',
-  //-     width: $q.screen.width/4+'px', height: $q.screen.width/4+'px'}`).row.items-center.content-center.justify-center.xs
-  //-   q-btn(
-  //-     round flat size="lg" @click="drawerShow = !drawerShow, drawerShowMobile = !drawerShowMobile"
-  //-     :color="drawerShowMobile ? 'red' : 'green'"
-  //-     :icon="drawerShowMobile ? 'clear' : 'menu'"
-  //-     :style=`{background: drawerShowMobile ? 'none' : 'rgba(0,0,0,0.3)'}`)
+  //- menu
   div(
     v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
     :style=`{
@@ -51,7 +36,7 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
       width: $store.state.ui.maxWidthMenu+'px',
       height: $q.screen.height+'px',
       left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '8px',
+      paddingTop: '0px',
     }`).column.q-px-sm.q-pb-sm
     div(
       :style=`{height: '60px'}`
@@ -59,8 +44,8 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
           q-icon(name="blur_on" size="36px" color="white")
-      span.text-white.text-bold Kalpagramma
-    .col.full-width
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Kalpagramma
+    .col.full-width.q-pt-sm
       div(
         :style=`{
           borderRadius: '10px', overflow: 'hidden'
@@ -75,8 +60,6 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
               .row.fit.items-center.content-center
                 span(:style=`{lineHeight: 1.1}`).text-white.text-bold Ivan Motovilov
                 small.text-white.full-width @ivanmoto
-          //- .col.full-width.scroll
-          //-   .row.full-width.items-start.content-start
           router-link(
             v-for="(p,pi) in pages" :key="p.id"
             :to="{name: p.id}"
@@ -86,7 +69,7 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
             :style=`{
               height: '50px'
             }`
-            ).row.full-width.items-center
+            ).row.full-width.items-center.menu-item
             div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
               q-btn(round dense flat :icon="p.icon" color="white")
             span.text-white {{ p.name }}
@@ -94,8 +77,11 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
             small.text-white 1.0.0
   q-page-container
     q-page
-      router-view(v-if="!loading")
-      div(v-else).row.full-width.window-height.items-center.content-center.justify-center.bg-black
+      router-view(
+        v-if="!loading")
+      div(
+        v-else
+        ).row.full-width.window-height.items-center.content-center.justify-center.bg-black
         q-spinner(color="green" size="50px")
 </template>
 

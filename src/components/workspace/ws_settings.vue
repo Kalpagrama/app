@@ -9,10 +9,10 @@
         span.text-bold.text-green Settings
   //- body
   .col.full-width.scroll
-    .row.full-width.justify-center.q-pt-sm
+    .row.full-width.justify-center.q-pt-md
       div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.q-px-sm.bg-grey-9
-        .row.full-width.q-pa-md
-          span(:style=`{fontSize: '30px'}`).text-white.text-bold Settings
+        //- .row.full-width.q-pa-md
+        //-   span(:style=`{fontSize: '30px'}`).text-white.text-bold Settings
         //- export import
         .row.full-width.q-px-md
           span(:style=`{fontSize: '20px'}`).text-white Portability

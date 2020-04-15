@@ -1,7 +1,7 @@
 <style lang="sass">
-.q-dialog
-  &__backdrop
-    background: none
+// .q-dialog
+//   &__backdrop
+//     background: none
 </style>
 
 <template lang="pug">
@@ -30,7 +30,7 @@ q-layout(
     push color="green" no-caps @click="compositionFind()"
     :style=`{
       position: 'fixed', zIndex: 1000, bottom: '8px', left: '50%', transform: 'translate(-50%, 0%)',
-      width: '250px', height: '50px', borderRadius: '25px'
+      width: '200px', height: '50px'
     }`).shadow-10
     span.text-white.text-bold Добавить свой образ
   q-dialog(v-model="compositionFinderDialogShow" maximized position="bottom")
@@ -61,13 +61,13 @@ q-layout(
             :style=`{
               position: 'absolute', zIndex: 1000, left: '8px', top: '50%', transfrom: 'translate(0, -50%)',
               background: 'rgba(0,0,0,0.5)'}`)
-          composition(
-            v-if="node.items[0]"
-            ctx="editor"
-            :value="node.items[0]"
-            :visible="true"
-            :active="!compositionEditorDialogShow"
-            :mini="false")
+          //- composition(
+          //-   v-if="node.items[0]"
+          //-   ctx="editor"
+          //-   :value="node.items[0]"
+          //-   :visible="true"
+          //-   :active="!compositionEditorDialogShow"
+          //-   :mini="false")
         div(:style=`{height: '120px'}`).row.full-width.items-end.content-end.bg-grey-9
           div(:style=`{height: '60px'}`).row.full-width.items-center.q-px-sm
             .col
@@ -80,11 +80,12 @@ q-layout(
           position: 'relative', zIndex: 200, transform: 'translate3d(0,0,0)',
           maxWidth: $store.state.ui.maxWidthPage+'px',
           borderRadius: '10px', overflow: 'hidden',
-          height: $q.screen.height-136+'px'
+          height: $q.screen.height-68+'px'
         }`
         ).row.full-width
         composition-editor(
-          :node="node" :compositionIndex="compositionIndex"
+          v-if="node.items[itemIndex]"
+          :composition="node.items[itemIndex]" :content="node.items[itemIndex].content"
           @cancel="compositionEditorDialogShow = false"
           ).bg-grey-8
   q-page-conainter
@@ -131,7 +132,7 @@ export default {
       itemsLoading: false,
       compositionFinderDialogShow: false,
       compositionEditorDialogShow: false,
-      compositionIndex: 0,
+      itemIndex: 0,
       node: {
         name: '',
         items: []
@@ -169,11 +170,11 @@ export default {
     },
     compositionFound (composition) {
       this.$log('compositionFound', composition)
-      this.$set(this.node.items, this.compositionIndex, composition)
-      this.compositionEdit(this.compositionIndex)
-      // this.$wait(300).then(() => {
-      //   this.compositionFinderDialogShow = false
-      // })
+      this.$set(this.node.items, 0, composition)
+      this.compositionEdit(this.itemIndex)
+      this.$wait(300).then(() => {
+        this.compositionFinderDialogShow = false
+      })
     },
     compositionEdit (index) {
       this.$log('compositionEdit', index)
