@@ -33,12 +33,16 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100}`
     ).row.full-width.items-start.content-start.bg-black
-    composition-list(
-      ref="compositionList" :ctx="ctx"
-      :items="items"
-      :visible="visible" :active="active"
-      @height="$emit('height', $event)"
-      @error="$event => $emit('error', $event)")
+    //- composition-list(
+    //-   ref="compositionList" :ctx="ctx"
+    //-   :items="items"
+    //-   :visible="visible" :active="active"
+    //-   @height="$emit('height', $event)"
+    //-   @error="$event => $emit('error', $event)")
+    composition(
+      :preview="node.meta.items[0].thumbUrl"
+      :value="composition"
+      :visible="visible" :active="active")
   //- name
   div(
     ref="nodeName"
@@ -48,7 +52,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     //-   q-btn(round push color="green" icon="blur_on" :style=`{borderRadius: '50% !important'}`)
     div(:style=`{}`).col
       .row.fit.items-center.content-center.q-pa-sm
-        router-link(:to="'/node/'+node.oid")
+        router-link(:to="'/sphere/'+node.oid")
           span.text-bold.text-grey-3.cursor-pointer {{ node.name }}
     div(:style=`{width: '60px', minHeight: '60px'}`).row.full-height.items-center.content-center.justify-center
       q-btn(
@@ -79,15 +83,26 @@ export default {
       // nodeOid: false
       offsetTop: 0,
       opened: false,
-      openedHeight: 0
+      openedHeight: 0,
+      composition: null
     }
   },
   computed: {
-    items () {
-      let res = []
-      if (this.node.meta.items[0]) res.push({preview: this.node.meta.items[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[0] : null})
-      if (this.node.meta.items[1]) res.push({preview: this.node.meta.items[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[1] : null})
-      return res
+    // items () {
+    //   let res = []
+    //   if (this.node.meta.items[0]) res.push({preview: this.node.meta.items[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[0] : null})
+    //   if (this.node.meta.items[1]) res.push({preview: this.node.meta.items[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[1] : null})
+    //   return res
+    // }
+  },
+  watch: {
+    nodeFull: {
+      async handler (to, from) {
+        this.$log('nodeFull CHANGED', to)
+        if (to) {
+          this.composition = await this.$store.dispatch('objects/get', {oid: to.items[0].oid})
+        }
+      }
     }
   },
   methods: {

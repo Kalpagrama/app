@@ -28,7 +28,7 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
     kalpa-menu-xs
   //- menu
   div(
-    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
+    v-if="$route.name !== 'welcome' && $q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
     :style=`{
       position: 'fixed',
       zIndex: 1000,

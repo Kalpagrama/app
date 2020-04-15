@@ -5,11 +5,11 @@
 
 <script>
 export default {
-  name: 'pageAppRefresh',
+  name: 'pageAppLogout',
   async mounted () {
     await this.$wait(1000)
     await this.$store.dispatch('cache/clear')
-    this.$router.back()
+    await this.$store.dispatch('auth/logout')
   }
 }
 </script>

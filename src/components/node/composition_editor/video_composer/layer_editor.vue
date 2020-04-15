@@ -20,17 +20,18 @@ div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
     //-   :style=`{position: 'absolute', zIndex: 1000, top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`
     //-   ).text-white.q-pa-sm {{ layer.spheres[0].name }}
     //- add layer
-    q-btn(
-      v-if="false"
-      v-show="content.contentSource === 'KALPA' ? framesLoaded : true"
-      round push color="green" icon="add" @click="$emit('add')"
-      :style=`{position: 'absolute', zIndex: 5000, right: '16px', top: '12px'}`)
+    //- q-btn(
+    //-   v-if="content"
+    //-   v-show="content.contentSource === 'KALPA' ? framesLoaded : true"
+    //-   round push color="green" icon="add" @click="$emit('add')"
+    //-   :style=`{position: 'absolute', zIndex: 5000, right: '16px', top: '12px'}`)
     //- frames
     div(
       ref="framesScrollWrapper"
       :style=`{position: 'relative', height: '100%'}`).row.full-width.items-center.scroll
       //- frames loading spinner tint
       div(
+        v-if="content"
         v-show="content.contentSource === 'KALPA' ? !framesLoaded : false"
         :style=`{position: 'absolute', zIndex: 1000}`
         ).row.fit.items-center.content-center.justify-center.bg-black
@@ -200,7 +201,7 @@ export default {
         if (this.layer && this.$refs.framesScrollWrapper) {
           this.framesTweenToLayer()
         }
-        if (this.content.contentSource === 'YOUTUBE') this.framesLoaded = true
+        if (this.content && this.content.contentSource === 'YOUTUBE') this.framesLoaded = true
       }
     },
     layer: {

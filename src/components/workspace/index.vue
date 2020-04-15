@@ -43,23 +43,13 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', ba
     div(
       @click.self="pageDialogOpened = false"
       :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center.q-pb-sm
-      //- ws-sphere(
-      //-   v-if="$route.params.page === 'sphere'")
-      //- ws-setting(
-      //-   v-if="true")
-      //- node-saver(
-      //-   v-if="$store.state.workspace.item"
-      //-   :value="item").fit
-      //-   template(v-slot:editor=`{node, saving}`)
-      //-     component(:is="`${$route.params.page}-editor`" :node="node" :saving="saving" @cancel="pageDialogOpened = false")
-      //- content-noter(v-if="$store.state.workspace.itemType === 'content'" :value="$store.state.workspace.item")
       ws-item-saver(v-if="$store.state.workspace.item" :value="$store.state.workspace.item")
         template(v-slot=`{item}`)
           composition-editor(
             v-if="item"
-            :ctx="'workspace'"
-            :content="item.rawData.content"
+            ctx="workspace"
             :composition="item.rawData"
+            @cancel="pageDialogOpened = fals"
             :style=`{
               maxWidth: $store.state.ui.maxWidthPage+'px'
             }`)
@@ -148,7 +138,7 @@ export default {
             this.$router.replace('/workspace/' + to).catch(e => e)
           }
         } else {
-          this.$router.push({params: {page: 'node'}})
+          this.$router.push({params: {page: 'contentNotes'}})
         }
       }
     }

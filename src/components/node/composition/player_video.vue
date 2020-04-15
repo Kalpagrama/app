@@ -17,9 +17,9 @@ iframe {
 
 <template lang="pug">
 div(
-  :class=`{'bg-black': videoGood}`
   :style=`{position: 'relative'}`
-  ).column.fit.items-start.content-start
+  ).column.fit.items-start.content-start.bg-black
+  //- :class=`{'bg-black': videoGood}`
   //- opacity: videoGood ? 1 : 0
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
@@ -85,7 +85,8 @@ div(
     div(:style=`{
       position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)',
       borderRadius: '10px', overflow: 'hidden',
-      opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1}`).row.full-width
+      }`).row.full-width
+      //- opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1
       //- preload="auto"
       video(
         ref="kalpaVideo"
@@ -113,7 +114,7 @@ import playerVideoProgress from './player_video_progress'
 
 export default {
   name: 'playerVideo',
-  props: ['ctx', 'composition', 'contentInput', 'visible', 'active', 'mini', 'bgClass'],
+  props: ['ctx', 'composition', 'visible', 'active', 'mini', 'bgClass'],
   components: {playerVideoProgress},
   data () {
     return {
@@ -134,7 +135,8 @@ export default {
       editing: false,
       forwarding: null,
       forwardingInterval: null,
-      forwardingCount: 0
+      forwardingCount: 0,
+      compositionContent: null
     }
   },
   computed: {
@@ -181,13 +183,18 @@ export default {
       }
     },
     content () {
-      return this.contentInput || this.layer.content
+      if (this.layer) return this.layer.content
+      else return this.compositionContent
     },
     contentSource () {
-      return this.content.contentSource
+      if (this.content) return this.content.contentSource
+      else return null
+      // return this.content.contentSource
     },
     contentUrl () {
-      return this.content.url
+      if (this.content) return this.content.url
+      else return null
+      // return this.content.url
     },
     videoGood () {
       if (this.layerEnd && this.layerStart) {
@@ -214,13 +221,35 @@ export default {
     }
   },
   watch: {
-    contentSource: {
-      immediate: false,
-      handler (to, from) {
-        this.$log('contentSource CHANGED', to)
-        if (to) this.playerInit()
-      }
-    },
+    // composition: {
+    //   immediate: false,
+    //   async handler (to, from) {
+    //     if (to) {
+    //       if (to.contentOid) {
+    //         this.compositionContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+    //       }
+    //     }
+    //   }
+    // },
+    // content: {
+    //   handler (to, from) {
+    //     this.$log('content CHANGED', to)
+    //     if (to) {
+    //       if (!this.player) {
+    //         this.$nextTick(() => {
+    //           this.playerInit()
+    //         })
+    //       }
+    //     }
+    //   }
+    // },
+    // contentSource: {
+    //   immediate: false,
+    //   handler (to, from) {
+    //     this.$log('contentSource CHANGED', to)
+    //     // if (to) this.playerInit()
+    //   }
+    // },
     visible: {
       immediate: true,
       handler (to, from) {
@@ -242,6 +271,14 @@ export default {
         this.$log('mini CHANGED', to)
         if (to) this.player.pause()
         else this.player.play()
+      }
+    },
+    layer: {
+      immediate: true,
+      async handler (to, from) {
+        if (to) {
+          if (!to.content) to.content = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+        }
       }
     },
     layerIndex: {
@@ -428,7 +465,10 @@ export default {
         // this.videoPlay()
       }
       else if (this.contentSource === 'YOUTUBE') {
-        let me = new window.MediaElementPlayer(this.$refs.kalpaVideo, {
+        let ref = this.$refs.kalpaVideo
+        this.$log('playerInit ref: ', ref)
+        this.$log('playerInit url:', this.content.url)
+        let me = new window.MediaElementPlayer(ref, {
           loop: true,
           autoplay: false,
           controls: false,
@@ -506,13 +546,16 @@ export default {
       // go to sphere page...
     }
   },
-  created () {
+  async created () {
     this.$log('created')
     this.videoNow = throttle(this.videoNow, 300)
   },
   async mounted () {
     this.$log('mounted')
-    this.playerInit()
+    if (this.composition.contentOid) this.compositionContent = await this.$store.dispatch('objects/get', {oid: this.composition.contentOid})
+    this.$nextTick(() => {
+      this.playerInit()
+    })
     this.$on('meta', this.onMeta)
   },
   beforeDestroy () {

@@ -1,16 +1,17 @@
+<style lang="sass">
+.layer-item
+  &:hover
+    background: #888 !important
+</style>
+
 <template lang="pug">
 div(:style=`{}`).column.fit
   //- actions
   //- add
   q-btn(
-    v-if="meta.layerIndexPlay < 0"
-    round push color="green" icon="add" @click="layerAdd()"
-    :style=`{position: 'absolute', zIndex: 1000, right: '10px', top: '-50px', borderRadius: '50%'}`)
-  //- confirm
-  q-btn(
-    v-if="meta.layerIndexPlay >= 0"
-    round push color="green" icon="check" @click="layerConfirm()"
-    :style=`{position: 'absolute', zIndex: 1000, right: '10px', top: '-50px', borderRadius: '50%'}`)
+    v-if="true"
+    round push color="green" icon="add" size="lg" @click="layerAdd()"
+    :style=`{position: 'absolute', zIndex: 1000, right: '30px', top: '-90px', borderRadius: '50%'}`)
   //- header
   //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
   div(
@@ -32,21 +33,56 @@ div(:style=`{}`).column.fit
       div(
         v-for="(l,li) in meta.layers" :key="li" :ref="`layer-${li}`"
         v-if="l.figuresAbsolute.length > 0" @click="layerClick(l, li)"
-        :class=`{
-          'bg-grey-6': li === meta.layerIndexPlay,
-          'bg-grey-8': li !== meta.layerIndexPlay,
-        }`
-        :style=`{minHeight: '35px', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.q-px-sm.q-mb-sm.cursor-pointer
-        //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-        //-   div(
-        //-     v-if="li === meta.layerIndexPlay"
-        //-     :style=`{height: '70px'}`).row.full-width
-        //-     //- layer-editor(:layer="l" :layerIndex="li" :content="content" :layers="layers" :player="player" :meta="meta")
-        div(:style=`{height: '35px'}`).row.full-width.items-center.content-center
-          .col
-          small.text-white {{$time(l.figuresAbsolute[0].t)}}-
-          small.text-white {{$time(l.figuresAbsolute[1].t)}}
+        ).row.full-width.q-mb-sm
+        div(:style=`{height: '35px', width: '35px'}`).row
+        .col
+          div(
+            :class=`{
+              'bg-grey-6': li === meta.layerIndexPlay,
+              'bg-grey-8': li !== meta.layerIndexPlay,
+            }`
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden'
+            }`
+            ).row.fit.cursor-pointer.layer-item
+            div(
+              :style=`{height: '35px', borderRadius: '10px', oveflow: 'hidden'}`
+              ).row.full-width.items-center.content-center.q-pr-sm
+              .col
+              small.text-white {{$time(l.figuresAbsolute[0].t)}}-
+              small.text-white {{$time(l.figuresAbsolute[1].t)}}
+        div(:style=`{height: '35px', width: '35px'}`).row.items-center.content-center.justify-center
+          q-btn(round flat dense color="grey-5" icon="drag_indicator")
+  //- layers workspace modal
+  div(
+    v-if="showLayersFromWorkspace"
+    :style=`{
+      position: 'absolute', zIndex: 400, right: '0px', top: '0px',
+      maxWidth: '66%', maxHeight: 'calc(100% - 120px)',
+      borderRadius: '10px', overflow: 'hidden',
+    }`).column.fit.bg-grey-8
+    //- header
+    div(:style=`{height: '60px'}`).row.full-width.items-center
+      .col
+        .row.fit.items-center.content-center.q-px-md
+          span.text-white Layers from workspace
+      q-btn(round flat dense color="white" icon="more_vert").q-mr-md
+    //- body
+    .col.full-width.scroll
+      .row.full-width.items-start.content-start.q-pa-sm
+        div(
+          v-for="(l,li) in composition.layersWorkspace" :key="li" @click="layerWorkspaceClick(l,li)"
+          :style=`{height: '35px', borderRadius: '10px'}`
+          ).row.full-width.items-center.bg-grey-7.cursor-pointer.q-px-md.q-mb-sm
+          span.text-white {{l.figuresAbsolute[0].t}}-{{l.figuresAbsolute[1].t}}
+  //- footer
+  div(
+    :style=`{height: '60px'}`
+    ).row.full-width.items-center.q-px-sm
+    .col
+    q-btn(
+      v-if="composition.layersWorkspace" @click="showLayersFromWorkspace = !showLayersFromWorkspace"
+      flat color="green" no-caps) From workspace
 </template>
 
 <script>
@@ -61,6 +97,7 @@ export default {
       scrollTweening: false,
       scrollOverflow: 'auto',
       scrollTimeout: null,
+      showLayersFromWorkspace: false
     }
   },
   computed: {
@@ -81,6 +118,11 @@ export default {
     }
   },
   methods: {
+    layerWorkspaceClick (l, li) {
+      this.$log('layerWorkspaceClick', l, li)
+      this.layerAdd(null, null, l)
+      this.showLayersFromWorkspace = false
+    },
     layerClick (l, li) {
       this.$log('layerClick', l, li)
       this.$emit('meta', ['mode', 'layer'])
@@ -93,21 +135,19 @@ export default {
       this.scrollOverflow = 'auto'
       this.$tween.to(this.$refs.extraNodesScroll, 0.2, {scrollTop: 0})
     },
-    layerAdd (startInput, endInput, layerInput) {
+    async layerAdd (startInput, endInput, layerInput) {
       this.$log('layerAdd start')
       this.$log('layerAdd inputs: ', startInput, endInput, layerInput)
       let start = startInput || this.meta.now - 3 > 0 ? this.meta.now - 3 : 0
       let end = endInput || start + 10 < this.meta.duration ? start + 10 : this.meta.duration
       this.$log('layerAdd start/end: ', start, end)
       // get index
-      // let index
-      // if (this.meta.layers.length === 1 && this.metalayers[0].figuresAbsolute.length === 0) index = 0
-      // else index = this.composition.layers.length
       let index = this.meta.layers.length
       this.$log('layerIndex index:', index)
       // get layer
       let l = layerInput || {
-        content: this.content,
+        contentOid: this.meta.content.oid,
+        content: await this.$store.dispatch('objects/get', {oid: this.meta.content.oid}),
         figuresAbsolute: [
           {t: start, points: []},
           {t: end, points: []}
@@ -134,7 +174,7 @@ export default {
       this.$log('onScrollend')
       clearTimeout(this.scrollTimeout)
       this.scrollTimeout = null
-      let ref = this.$refs.extraNodesScroll
+      // let ref = this.$refs.extraNodesScroll
       // scrollTop to 100
       // if (ref.scrollTop < 100) {
       //   if (this.scrollTweening) return

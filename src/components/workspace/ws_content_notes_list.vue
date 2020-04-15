@@ -79,7 +79,12 @@ export default {
         rawData: {
           layers: [],
           spheres: [],
-          content: content
+          contentOid: content.oid,
+          operation: {
+            items: null,
+            operations: null,
+            type: 'CONCAT'
+          }
         }
       }
       this.$log('itemInput', itemInput)
