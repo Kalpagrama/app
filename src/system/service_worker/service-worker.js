@@ -1,8 +1,14 @@
-const swVer = 2
+const swVer = 3
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
   cacheVideo
+
+let webPushToken = 'empty'
+
+function sendMsg (type, msgData) {
+  self.clients.matchAll().then(all => all.map(client => client.postMessage({type, msgData})))
+}
 
 // log
 {
@@ -128,7 +134,10 @@ let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoS
             self.skipWaiting()
             break
           case 'sendVersion':
-            self.clients.matchAll().then(all => all.map(client => client.postMessage(swVer)))
+            sendMsg('swVer', swVer)
+            break
+          case 'sendWebPushToken':
+            sendMsg('webPushToken', webPushToken)
             break
           default:
             logCritical('bad event.data.type', event.data.type)
@@ -153,9 +162,9 @@ if (useCache) {
     }
     const networkOnly = async (event) => {
       return await fetch(event.request.clone(), {
-          credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
-          mode: 'cors' // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
-        })
+        credentials: 'same-origin', // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+        mode: 'cors' // для того чтобы пришел нормальный ответ (не opaque). Opaque не кэшируется
+      })
     }
     const StaleWhileRevalidate = async (event, store) => {
       logDebug('gql StaleWhileRevalidate')
@@ -372,8 +381,8 @@ if (useCache) {
 
 // web-push
 {
-  importScripts('https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js')
-  importScripts('https://www.gstatic.com/firebasejs/7.5.0/firebase-messaging.js')
+  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js')
+  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-messaging.js')
 
   /* global firebase */
   firebase.initializeApp({
@@ -390,13 +399,27 @@ if (useCache) {
   let i = 0
   if (firebase.messaging.isSupported()) {
     const messaging = firebase.messaging()
+    // messaging.useServiceWorker(registration)
+    messaging.getToken().then(token => {
+      logDebug('messaging.getToken() = ', token)
+      webPushToken = token
+    })
+    // messaging.onMessage((payload) => {
+    //   logDebug('Message received . ', payload)
+    //   // ...
+    // })
+    // messaging.onTokenRefresh(async () => {
+    //   let token = await messaging.getToken()
+    //   logDebug('messaging.onTokenRefresh = ', token)
+    // })
+
     messaging.setBackgroundMessageHandler(function (payload) {
       logDebug('[firebase-messaging-sw.js] Received background message ', payload)
 
       // Customize notification here
       const notificationTitle = `#${++i} ${payload.data.type} event received!`
       const notificationOptions = {
-        body: `payload: ${JSON.stringify(payload.data.type)}`,
+        body: `payload: ${JSON.stringify(payload.data.type)} ${payload.data.message ? 'message' + payload.data.message : ''}`,
         icon: '/statics/icons/icon-192x192.png',
         badge: '/statics/icons/badge3.png',
         vibrate: [150, 200, 150, 200, 150, 100, 150, 100],

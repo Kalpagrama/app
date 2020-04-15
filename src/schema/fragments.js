@@ -67,6 +67,16 @@ const objectFragment = gql`${metaFragment} ${objectShortFragment}
     revision
   }
 `
+const wsItemFragment = gql`${objectFragment}
+  fragment wsItemFragment on WSItem {
+    ...objectFragment
+    revision
+    rawData
+    unique
+    wsItemType
+  }
+`
+
 const sphereFragment = gql`${objectFragment}
   fragment sphereFragment on Object {
     ...objectFragment
@@ -228,7 +238,7 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
 `
 
 const eventFragment = gql`
-  ${objectShortFragment} ${objectShortWithMetaFragment}
+  ${objectShortFragment} ${objectShortWithMetaFragment} ${wsItemFragment}
   fragment eventFragment on Event {
     type
     ... on EventError{
@@ -247,19 +257,7 @@ const eventFragment = gql`
     }
     ... on EventWS{
       wsRevision
-      object {
-        oid
-        type
-        name
-        revision
-        thumbUrl(preferWidth: 600)
-        revision
-        ...on WSItem {
-          wsItemType
-          unique
-          rawData
-        }
-      }
+      object {...wsItemFragment}
     }
     ... on EventChange{
       subject{... objectShortFragment}
@@ -313,7 +311,8 @@ const userFragment = gql`
   }
 `
 const objectFullFragment = gql`
-  ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment} ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment}
+  ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment} 
+  ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment} ${wsItemFragment}
   fragment objectFullFragment on Object {
     ...objectFragment
     ...on Video {...videoFragment}
@@ -323,11 +322,7 @@ const objectFullFragment = gql`
     ...on User {... userFragment}
     ...on Chain {...chainFragment}
     ...on Composition {...compositionFragment}
-    ...on WSItem {
-      wsItemType
-      unique
-      rawData
-    }
+    ...on WSItem {...wsItemFragment}
   }
 `
 

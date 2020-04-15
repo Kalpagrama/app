@@ -79,7 +79,7 @@
             "deprecationReason": null
           },
           {
-            "name": "checkLoginFree",
+            "name": "checkUserIdFree",
             "description": null,
             "args": [
               {

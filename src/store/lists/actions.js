@@ -110,42 +110,6 @@ export const sphereNodes = async (context, { oid, pagination, filter, sortStrate
   return { items, count, totalCount, nextPageToken, prevPageToken, setCurrentIndx }
 }
 
-// export const compositionNodes = async (context, { compositionOids, pagination, sortStrategy }) => {
-//   logD('compositionNodes start')
-//   let filter = { types: ['NODE'] }
-//   let oid
-//   oid = compositionOids[0]
-//   filter.compositionOids = compositionOids
-//   const fetchItemFunc = async () => {
-//     let { data: { sphereItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-//       query: gql`
-//         ${fragments.objectShortWithMetaFragment}
-//         query nodeNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-//           sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-//             count
-//             totalCount
-//             nextPageToken
-//             items {... objectShortWithMetaFragment}
-//           }
-//         }
-//       `,
-//       variables: { oid, pagination, filter, sortStrategy }
-//     })
-//     return {
-//       item: { items, count, totalCount, nextPageToken },
-//       actualAge: 'hour'
-//     }
-//   }
-//   // { items, count, totalCount, nextPageToken }
-//   let feedResult = await context.dispatch('cache/get',
-//     {
-//       key: 'list: ' + JSON.stringify({ oid, pagination, filter, sortStrategy }),
-//       fetchItemFunc
-//     }, { root: true })
-//   logD('compositionNodes complete')
-//   return feedResult
-// }
-
 // вернет ядра контента относительно метки времени (nodeList).
 // nodeList может изменится в после одного из последующих вызовов getIdx
 // getIdx - вернет индекс ядра в nodeList
@@ -214,42 +178,6 @@ export const contentNodes = async (context, { contentOid }) => {
   return { nodeList, getIdx, getT }
 }
 
-export const nodeChains = async (context, { nodeOid }) => {
-  logD('nodeChains start')
-  const fetchItemFunc = async () => {
-    let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
-      query: gql`
-        ${fragments.objectShortWithMetaFragment}
-        query nodeChains ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-          sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            count
-            totalCount
-            nextPageToken
-            items {... objectShortWithMetaFragment}
-          }
-        }
-      `,
-      variables: {
-        oid: nodeOid,
-        pagination: { pageSize: 500, pageToken: null },
-        filter: null,
-        sortStrategy: 'HOT'
-      }
-    })
-    return {
-      item: { chainList: items, count, totalCount, nextPageToken, prevPageToken },
-      actualAge: 'hour'
-    }
-  }
-  let { chainList, nextPageToken, prevPageToken } = await context.dispatch('cache/get',
-    { key: 'list: ' + JSON.stringify({ oid: nodeOid }), fetchItemFunc }, { root: true })
-  const setCurrentIndx = (indx) => {
-    // todo запрашивать новые порции данных
-  }
-  logD('nodeChains complete')
-  return { chainList, setCurrentIndx }
-}
-
 export const feed = async (context, { pagination }) => {
   logD('feed start')
   assert.ok(pagination)
@@ -302,7 +230,7 @@ export const processEvent = async (context, event) => {
     case 'WS_ITEM_CREATED':
     case 'WS_ITEM_DELETED':
     case 'WS_ITEM_UPDATED':
-      return await updateWsLists(context, event)
+      return context.dispatch('workspace/updateWsLists', event, { root: true })
     case 'NODE_CREATED':
     case 'CHAIN_CREATED':
     case 'VOTED':
@@ -357,58 +285,4 @@ async function updateLists (context, event) {
     }, { root: true })
   }
   logD('addNode complete')
-}
-
-// обновим кэш мастерской (прилетел эвент WS_XXXXXXXX)
-async function updateWsLists (context, event) {
-  logD('updateWsItems start')
-  let { type, object } = event
-  assert(object.oid && object.name != null)
-  if (type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED') {
-    for (let key in context.rootState.cache.cachedItems) {
-      let keyPattern = 'listWS: '
-      if (key.startsWith(keyPattern)) {
-        let collection = key.slice(keyPattern.length)
-        if (type === 'WS_ITEM_CREATED') {
-          await context.dispatch('cache/update', {
-            key: key,
-            path: '',
-            setter: (value) => {
-              // { items, count, totalCount, nextPageToken }
-              // logD('setter: ', value)
-              assert(value.items && value.count >= 0 && value.totalCount >= 0)
-              let indx = value.items.findIndex(item => item.oid === object.oid)
-              if (indx === -1){
-                // элемент в самом списке - objectShort
-                // вставляем в начало используем splice для реактивности
-                value.items.splice(0, 0, { oid: object.oid, name: object.name, wsItemType: object.wsItemType, unique: object.unique, thumbUrl: object.thumbUrl })
-                value.count++
-                value.totalCount++
-              }
-              return value
-            }
-          }, { root: true })
-        } else if (type === 'WS_ITEM_DELETED') {
-          // удаляем object из всех лент
-          await context.dispatch('cache/update', {
-            key: key,
-            path: '',
-            setter: (value) => {
-              // { items, count, totalCount, nextPageToken }
-              assert(value.items && value.count >= 0 && value.totalCount >= 0)
-              let indx = value.items.findIndex(item => item.oid === object.oid)
-              if (indx >= 0) {
-                // splice для реактивности
-                value.items.splice(indx, 1)
-                value.count--
-                value.totalCount--
-              }
-              return value
-            }
-          }, { root: true })
-        }
-      }
-    }
-  }
-  logD('updateWsItems complete')
 }

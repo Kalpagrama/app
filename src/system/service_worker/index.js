@@ -1,6 +1,3 @@
-// Внимание! firebase подключается через CDN  в src/system/service_worker/service-worker.js
-import * as firebase from 'firebase/app'
-import '@firebase/messaging'
 import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Notify } from 'quasar'
@@ -127,14 +124,29 @@ async function initSw (store) {
       }
       { // получаем версию текущего sw (просим сервисворкнра записать ее в iDb)
         navigator.serviceWorker.addEventListener('message', function handler (event) {
-          let swVer = event.data
-          logD('sw version =', swVer);
-          store.commit('core/stateSet', ['version', `${store.state.core.version}-${swVer}`])
-        });
-        if (registration.active) registration.active.postMessage({ type: 'sendVersion' })
+          let eventData = event.data
+          switch (eventData.type) {
+            case 'swVer':
+              logD('sw version =', eventData.msgData)
+              store.commit('core/stateSet', ['version', `${store.state.core.version}-${eventData.msgData}`])
+              break
+            case 'webPushToken':
+              logD('webPushToken =', eventData.msgData)
+              // store.dispatch('core/setWebPushToken', eventData.msgData) нельзя вызывать тк аполло еше не инициализирован
+              store.commit('core/stateSet', ['webPushTokenDraft', eventData.msgData])
+              break
+            default:
+              logD('sw unknown message recieved!', eventData)
+          }
+        })
+        if (registration.active) {
+          registration.active.postMessage({ type: 'sendVersion' })
+          registration.active.postMessage({ type: 'sendWebPushToken' })
+        }
       }
     }
-    await initWebPush(store)
+    logD('initSw complete')
+    // await initWebPush(store)
   }
 
   function handleNetworkChange (event) {
@@ -182,48 +194,48 @@ async function clearCache (force = false) {
   logD('clearCache end!')
 }
 
-async function initWebPush (store) {
-  logD('initWebPush start')
-  if ('safari' in window && 'pushNotification' in window.safari) { // APNS
-    // let permissionData = window.safari.pushNotification.permission('mac.kalpagramma.com')
-    // checkSafariRemotePermission(permissionData, store)
-  } else { // FCM
-    const hasPerm = await askForNPerm()
-    if (!hasPerm) {
-      logD('Notification permission denied!')
-      return
-    }
-    if (firebase.messaging.isSupported() && registration && !messaging) {
-      firebase.initializeApp({
-        apiKey: 'AIzaSyAznncIqhrqA35A3yBQkTnxyNGI45sxeNk',
-        authDomain: 'kalpagramma-7a913.firebaseapp.com',
-        databaseURL: 'https://kalpagramma-7a913.firebaseio.com',
-        projectId: 'kalpagramma-7a913',
-        storageBucket: 'kalpagramma-7a913.appspot.com',
-        messagingSenderId: '1082935232322',
-        appId: '1:1082935232322:web:a4f0203aa4015e8f86eadb',
-        measurementId: 'G-D8QZ67XLM5'
-      })
-      messaging = firebase.messaging()
-      messaging.useServiceWorker(registration)
-      // - a message is received while the app has focus
-      messaging.onMessage((payload) => {
-        logD('Message received . ', payload)
-        // ...
-      })
-      let token = await messaging.getToken()
-      store.commit('core/stateSet', ['webPushTokenDraft', token])
-      await showNotification('application loaded', `version=${store.state.core.version}`)
-      // todo send to server
-      messaging.onTokenRefresh(async () => {
-        let token = await messaging.getToken()
-        await store.dispatch('core/setWebPushToken', token)
-      })
-      return token
-    }
-  }
-  logD('initWebPush end')
-}
+// async function initWebPush (store) {
+//   logD('initWebPush start')
+//   if ('safari' in window && 'pushNotification' in window.safari) { // APNS
+//     // let permissionData = window.safari.pushNotification.permission('mac.kalpagramma.com')
+//     // checkSafariRemotePermission(permissionData, store)
+//   } else { // FCM
+//     const hasPerm = await askForNPerm()
+//     if (!hasPerm) {
+//       logD('Notification permission denied!')
+//       return
+//     }
+//     if (firebase.messaging.isSupported() && registration && !messaging) {
+//       firebase.initializeApp({
+//         apiKey: 'AIzaSyAznncIqhrqA35A3yBQkTnxyNGI45sxeNk',
+//         authDomain: 'kalpagramma-7a913.firebaseapp.com',
+//         databaseURL: 'https://kalpagramma-7a913.firebaseio.com',
+//         projectId: 'kalpagramma-7a913',
+//         storageBucket: 'kalpagramma-7a913.appspot.com',
+//         messagingSenderId: '1082935232322',
+//         appId: '1:1082935232322:web:a4f0203aa4015e8f86eadb',
+//         measurementId: 'G-D8QZ67XLM5'
+//       })
+//       messaging = firebase.messaging()
+//       messaging.useServiceWorker(registration)
+//       // - a message is received while the app has focus
+//       messaging.onMessage((payload) => {
+//         logD('Message received . ', payload)
+//         // ...
+//       })
+//       let token = await messaging.getToken()
+//       store.commit('core/stateSet', ['webPushTokenDraft', token])
+//       await showNotification('application loaded', `version=${store.state.core.version}`)
+//       // todo send to server
+//       messaging.onTokenRefresh(async () => {
+//         let token = await messaging.getToken()
+//         await store.dispatch('core/setWebPushToken', token)
+//       })
+//       return token
+//     }
+//   }
+//   logD('initWebPush end')
+// }
 
 async function checkUpdate () {
   logD('checkUpdate1')
@@ -307,4 +319,4 @@ async function showNotification (title, body) {
   }
 }
 
-export { initSw, initWebPush, checkUpdate, update, clearCache }
+export { initSw, checkUpdate, update, clearCache }

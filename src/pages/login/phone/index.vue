@@ -45,7 +45,7 @@
      this.$logD('smsSend start', this.phone)
      this.smsSending = true
      if (this.phone.length === 0) throw { message: 'Wrong phone!' }
-     let { login, loginType, userExist, needInvite, token, expires } = await this.$store.dispatch('auth/userIdentify', this.phone)
+     let { userId, loginType, userExist, needInvite, token, expires } = await this.$store.dispatch('auth/userIdentify', this.phone)
      this.smsSending = false
      this.codeWaiting = true
     } catch (error) {

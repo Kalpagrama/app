@@ -92,28 +92,28 @@ export const logout = async (context, token) => {
   logD('@logout done')
 }
 
-export const checkLoginFree = async (context, login) => {
-  let { data: { checkLoginFree } } = await apollo.clients.auth.query({
+export const checkUserIdFree = async (context, userId) => {
+  let { data: { checkUserIdFree } } = await apollo.clients.auth.query({
     query: gql`
-      query ($login: String!){
-        checkLoginFree(login: $login)
+      query ($userId: String!){
+        checkUserIdFree(userId: $userId)
       }
     `,
     variables: {
-      login
+      userId
     }
   })
-  return checkLoginFree
+  return checkUserIdFree
 }
 
-export const userIdentify = async (context, userLogin) => {
-  logD('@userIdentify start. userLogin=', userLogin)
-  assert(userLogin)
-  let { data: { userIdentify: { login, loginType, userExist, needInvite, token, expires } } } = await apollo.clients.auth.query({
+export const userIdentify = async (context, userId_) => {
+  logD('@userIdentify start. userId=', userId_)
+  assert(userId_)
+  let { data: { userIdentify: { userId, loginType, userExist, needInvite, token, expires } } } = await apollo.clients.auth.query({
     query: gql`
-      query  ($login: String!){
-        userIdentify(login: $login){
-          login
+      query  ($userId: String!){
+        userIdentify(userId: $userId){
+          userId
           loginType
           userExist
           needInvite
@@ -123,14 +123,14 @@ export const userIdentify = async (context, userLogin) => {
       }
     `,
     variables: {
-      login: userLogin
+      userId: userId_
     }
   })
   await clearCache()
   localStorage.setItem('ktoken', token)
   localStorage.setItem('ktokenExpires', expires)
   logD('@userIdentify done')
-  return { login, loginType, userExist, needInvite, token, expires }
+  return { userId, loginType, userExist, needInvite, token, expires }
 }
 export const userAuthenticate = async (context, {password, inviteCode}) => {
   logD('@userAuthenticate start')
