@@ -111,31 +111,9 @@ div(
 import {throttle} from 'quasar'
 import playerVideoProgress from './player_video_progress'
 
-const sendTouchEvent = (x, y, element, eventType) => {
-  const touchObj = new Touch({
-    identifier: Date.now(),
-    target: element,
-    clientX: x,
-    clientY: y,
-    radiusX: 2.5,
-    radiusY: 2.5,
-    rotationAngle: 10,
-    force: 0.5,
-  })
-  const touchEvent = new TouchEvent(eventType, {
-    cancelable: true,
-    bubbles: true,
-    touches: [touchObj],
-    targetTouches: [],
-    changedTouches: [touchObj],
-    shiftKey: true,
-  })
-  element.dispatchEvent(touchEvent)
-}
-
 export default {
   name: 'playerVideo',
-  props: ['ctx', 'composition', 'visible', 'active', 'mini', 'bgClass'],
+  props: ['ctx', 'composition', 'contentInput', 'visible', 'active', 'mini', 'bgClass'],
   components: {playerVideoProgress},
   data () {
     return {
@@ -166,12 +144,15 @@ export default {
         duration: this.duration,
         playing: this.playing,
         muted: this.muted,
-        layerIndex: this.layerIndex,
-        layerIndexPlay: this.layerIndexPlay,
         mode: this.mode,
         progressHeight: this.progressHeight,
+        content: this.content,
+        layerIndexPlay: this.layerIndexPlay,
+        layerIndex: this.layerIndex,
         layerStart: this.layerStart,
         layerEnd: this.layerEnd,
+        layers: this.layers,
+        layer: this.layer,
         editing: this.editing
       }
     },
@@ -179,66 +160,34 @@ export default {
       return this.composition.layers
     },
     layer () {
-      return this.layers[this.layerIndex]
+      return this.layers[this.layerIndex] || null
     },
     layerStart () {
-      if (this.ctx === 'list' || this.ctx === 'rubick') {
-        return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
+      if (!this.layer) return false
+      if (this.ctx === 'workspace') {
+        return this.layer.figuresAbsolute[0].t
       }
       else {
-        return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
+        return this.layer.figuresRelative[0].t
       }
-      // if (this.ctx === 'workspace' || this.ctx === 'editor') {
-      //   return this.layer.figuresAbsolute[0] ? this.layer.figuresAbsolute[0].t : false
-      // }
-      // else {
-      //   return this.layer.figuresRelative[0] ? this.layer.figuresRelative[0].t : false
-      // }
     },
     layerEnd () {
-      if (this.ctx === 'list' || this.ctx === 'rubick') {
-        return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
+      if (!this.layer) return false
+      if (this.ctx === 'workspace') {
+        return this.layer.figuresAbsolute[1].t
       }
       else {
-        return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
+        return this.layer.figuresRelative[1].t
       }
-      // if (this.ctx === 'workspace' || this.ctx === 'editor') {
-      //   return this.layer.figuresAbsolute[1] ? this.layer.figuresAbsolute[1].t : false
-      // }
-      // else {
-      //   return this.layer.figuresRelative[1] ? this.layer.figuresRelative[1].t : false
-      // }
     },
     content () {
-      return this.layer.content
+      return this.contentInput || this.layer.content
     },
     contentSource () {
-      // return this.content ? this.content.contentSource : false
-      if (this.ctx === 'list' || this.ctx === 'rubick') {
-        return 'KALPA'
-      }
-      else {
-        if (this.content.contentSource === 'YOUTUBE') return 'YOUTUBE'
-        else return 'KALPA'
-      }
+      return this.content.contentSource
     },
     contentUrl () {
-      if (this.ctx === 'list' || this.ctx === 'rubick') {
-        return this.layer.url
-      }
-      else {
-        return this.content.url
-      }
-      // if (this.content.contentSource === 'YOUTUBE') {
-      //   return this.content.url
-      // }
-      // else if (this.content.contentSource === 'KALPA') {
-      //   if (this.ctx === 'editor' || this.ctx === 'workspace') return this.content.url
-      //   else return this.layer.url
-      // }
-      // else {
-      //   return false
-      // }
+      return this.content.url
     },
     videoGood () {
       if (this.layerEnd && this.layerStart) {
@@ -265,28 +214,6 @@ export default {
     }
   },
   watch: {
-    // videoGood: {
-    //   async handler (to, from) {
-    //     this.$log('videoGood CHANGED', to)
-    //     this.actionsShow = false
-    //     await this.$wait(500)
-    //     this.actionsShow = true
-    //     // this.player.mutedToggle()
-    //     // this.$q.notify('videoGood CHANGED: ' + to)
-    //     // this.$refs.kalpaVideo.click()
-    //     // this.player.play()
-    //     // let r = this.$refs.kalpaVideo
-    //     // sendTouchEvent(150, 150, r, 'touchstart')
-    //     // sendTouchEvent(220, 200, r, 'touchmove')
-    //     // sendTouchEvent(220, 200, r, 'touchend')
-    //     // sendTouchEvent()
-    //     // this.$refs.kalpaVideo.click()
-    //     // this.autoplay = false
-    //     // var evt = document.createEvent('MouseEvents')
-    //     // evt.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
-    //     // r.dispatchEvent(evt)
-    //   }
-    // },
     contentSource: {
       immediate: false,
       handler (to, from) {
@@ -299,12 +226,6 @@ export default {
       handler (to, from) {
         this.$log('visible CHANGED', to)
         if (this.layerStart && this.player) this.player.setCurrentTime(this.layerStart)
-        // if (to) {
-        //   this.$q.notify('visible!!!')
-        //   // this.player.play()
-        //   if (this.layerStart) this.player.setCurrentTime(this.layerStart)
-        // }
-        // else this.player.pause()
       }
     },
     active: {

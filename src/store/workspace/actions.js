@@ -81,6 +81,15 @@ export const wsItemCreate = async (context, item) => {
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
 export const wsItemUpdate = async (context, item) => {
   logD('wsItemUpdate start', item)
+  let itemInput = {
+    oid: item.oid,
+    unique: item.unique,
+    thumbOid: item.thumbOid,
+    name: item.name,
+    wsItemType: item.wsItemType,
+    revision: item.revision,
+    rawData: item.rawData
+  }
   let { data: { wsItemUpdate: wsItem } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
@@ -90,7 +99,7 @@ export const wsItemUpdate = async (context, item) => {
         }
       }
     `,
-    variables: { item }
+    variables: { item: itemInput }
   })
   context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
   logD('wsItemUpdate done', wsItem)

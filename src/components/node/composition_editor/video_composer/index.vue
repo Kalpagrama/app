@@ -2,7 +2,9 @@
 div(:style=`{position: 'relative'}`).row.fit
   composition(
     v-if="composition"
-    :ctx="ctx" :mode="mode" :value="composition"
+    ctx="workspace"
+    :value="composition"
+    :content="content"
     :visible="true" :active="true" :mini="false"
     :styles=`{
       paddingLeft: styles.paddingLeft+'px',
@@ -10,8 +12,12 @@ div(:style=`{position: 'relative'}`).row.fit
       paddingBottom: styles.paddingBottom+'px',
       paddingTop: styles.paddingTop+'px',
     }`).fit
-    template(v-slot:editor=`{player, meta}`)
-      composer(:ctx="ctx" :mode="mode" :composition="composition" :player="player" :meta="meta" :styles="styles" @cancel="$emit('cancel')")
+    template(v-slot:editor=`{content, player, meta}`)
+      composer(
+        ctx="workspace"
+        :composition="composition"
+        :player="player" :meta="meta"
+        :styles="styles" @cancel="$emit('cancel')")
 </template>
 
 <script>
@@ -20,7 +26,7 @@ import composer from './composer_2'
 export default {
   name: 'videoComposer_index',
   components: {composer},
-  props: ['ctx', 'mode', 'composition'],
+  props: ['ctx', 'mode', 'composition', 'content'],
   data () {
     return {
       styles: {

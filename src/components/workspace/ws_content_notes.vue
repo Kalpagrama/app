@@ -1,19 +1,22 @@
 <template lang="pug">
 div(
   :class=`{
-    position: 'relative', overflow: 'hidden'
+    position: 'relative', overflow: 'hidden',
+    'bg-grey-8': true
   }`
   :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
-  ).row.full-width.items-start.content-start.q-mb-sm.br
+  ).row.full-width.items-start.content-start.q-mb-sm
   //- content.name
   div(:style=`{minHeight: '40px'}`).row.full-width.items-center.content-center
     span(
-      :class=`{}`
+      :class=`{
+        'text-white': true
+      }`
       ).q-ma-sm.cursor-pointer {{ item.name }}
   //- content INACTIVE tint
   div(
     v-if="true"
-    :style=`{position: 'absolute', zIndex: 200}` @click="$emit('contentEdit', nodeFull)").row.fit.cursor-pointer
+    :style=`{position: 'absolute', zIndex: 200}` @click="contentClick()").row.fit.cursor-pointer
   //- //- content active
   //- div(
   //-   v-if="contentActive && false"
@@ -37,42 +40,25 @@ div(
 
 <script>
 export default {
-  name: 'wsContent',
+  name: 'wsContentNotes',
   props: ['itemOid', 'item'],
   data () {
     return {
-      nodeFull: null,
-      showFull: false,
-      height: 40
     }
   },
   computed: {
-    // contentActive () {
-    //   // return this.index === this.contentIndex
-    //   return this.node.oid === this.contentOid
-    // },
-    // contentName () {
-    //   return this.nodeFull ? this.nodeFull.items[0].layers[0].content.name : this.node.name
-    // }
   },
   watch: {
-    // contentActive: {
-    //   async handler (to, from) {
-    //     this.$log('contentActive CHANGED', to)
-    //     if (to) {
-    //       await this.$wait(200)
-    //       this.$tween.to(this, 0.2, {height: 50})
-    //     } else {
-    //       this.$tween.to(this, 0.2, {height: 0})
-    //     }
-    //   }
-    // }
   },
   methods: {
+    async contentClick () {
+      this.$log('contentClick')
+      let content = await this.$store.dispatch('objects/get', {oid: this.item.oid})
+      this.$log('content', content)
+      this.$emit('content', content)
+    }
   },
   async mounted () {
-    // this.nodeFull = await this.$store.dispatch('workspace/get', {oid: this.node.oid})
-    // this.nodeFull.items[0] = await this.$store.dispatch('workspace/get', {oid: this.nodeFull.items[0].oid})
   }
 }
 </script>

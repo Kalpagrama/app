@@ -35,12 +35,12 @@ div
 
 <script>
 import extraInfo from './extra/extra_info'
-import extraNodes from './extra/extra_nodes'
+import extraLayers from './extra/extra_layers'
 import extraExplore from './extra/extra_explore'
 
 export default {
   name: 'videoComposer_composer',
-  components: {extraInfo, extraNodes, extraExplore},
+  components: {extraInfo, extraLayers, extraExplore},
   props: ['ctx', 'mode', 'composition', 'meta', 'player', 'styles'],
   data () {
     return {
@@ -48,21 +48,12 @@ export default {
       tab: 'info',
       tabs: [
         {id: 'info', name: 'Info'},
-        {id: 'nodes', name: 'Nodes'},
-        {id: 'explore', name: 'Explore'}
+        {id: 'layers', name: 'Layers'},
+        // {id: 'explore', name: 'Explore'}
       ]
     }
   },
   computed: {
-    layers () {
-      return this.composition.layers
-    },
-    layer () {
-      return this.layers[this.meta.layerIndex]
-    },
-    content () {
-      return this.layer.content
-    },
     heights () {
       return {
         mini: 120,
@@ -117,11 +108,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.styles.paddingTop = 4
-    this.styles.paddingLeft = 4
-    this.styles.paddingRight = 4
-    // this.styles.paddingBottom = this.$q.screen.height / 2
-    // this.styles.paddingBottom = this.extraHeight + 4
+    // this.styles.paddingTop = 8
+    // this.styles.paddingLeft = 4
+    // this.styles.paddingRight = 4
   }
 }
 </script>

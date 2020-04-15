@@ -9,15 +9,13 @@
 
 <template lang="pug">
 .column.fit
-  //- add content
-  div(
-    :style=`{height: '70px'}`
-    ).row.full-width.justify-center.q-pa-sm
-    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+  //- add content finder
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pa-sm
       content-finder(
         :sources="['url', 'device']"
         @content="contentFound")
-  //- actions, list, gallery, feed, list-expanded
+  //- header actions, list, gallery, feed, list-expanded
   div(v-if="false" :style=`{height: '60px'}`).row.full-width
     //- .col.full-height
     div(:style=`{width: '60px', height: '60px'}`).row.items-center.justify-center
@@ -28,21 +26,23 @@
         q-btn(dense :flat="mode !== 'list'" color="green" no-caps @click="mode = 'list'").q-px-sm.q-mx-sm List
         q-btn(dense :flat="mode !== 'gallery'" color="green" no-caps @click="mode = 'gallery'").q-px-sm Gallery
         q-btn(dense :flat="mode !== 'feed'" color="green" no-caps @click="mode = 'feed'").q-px-sm.q-mx-sm Feed
-  .col.full-width.scroll
-    .row.full-width.justify-center.q-px-sm
+  //- body
+  .col.full-width.scroll.q-pa-sm
+    .row.full-width.justify-center
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '80px'}`).row.full-width.items-start.content-start
         kalpa-loader(type="CONTENT_NOTES_LIST" :variables=`{}`)
           template(v-slot:items=`{items}`)
             ws-content-notes(
               v-for="(i, ii) in items" :key="i.oid"
-              :item="i" :contentOid="contentOid")
+              :item="i" :contentOid="contentOid"
+              @content="$emit('item', {type: 'content', item: $event})")
 </template>
 
 <script>
 import wsContentNotes from './ws_content_notes'
 
 export default {
-  name: 'wsContents',
+  name: 'wsContentNotesList',
   components: {wsContentNotes},
   props: ['ctx'],
   data () {
@@ -78,7 +78,8 @@ export default {
         wsItemType: 'CONTENT_NOTES',
         rawData: {
           content: content,
-          figuresAbsolute: []
+          layers: [],
+          // figuresAbsolute: []
         }
       }
       this.$log('itemInput', itemInput)
