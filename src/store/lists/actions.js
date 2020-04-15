@@ -120,7 +120,7 @@ export const contentNodes = async (context, { contentOid }) => {
   logD('contentNodes start')
   const fetchItemFunc = async () => {
     // TODO делать запрос с пагинацией по 30 (а потом дозапрашивать при вызове getT)
-    let { items, count, totalCount, nextPageToken, prevPageToken, setCurrentIndx} = await sphereNodes(context, {
+    let { items, count, totalCount, nextPageToken, prevPageToken, setCurrentIndx } = await sphereNodes(context, {
       oid: contentOid,
       pagination: { pageSize: 1000, pageToken: null },
       filter: null,
@@ -232,17 +232,18 @@ export const processEvent = async (context, event) => {
     case 'WS_ITEM_UPDATED':
       return context.dispatch('workspace/updateWsLists', event, { root: true })
     case 'NODE_CREATED':
+      return await updateListsNodeCreated(context, event)
     case 'CHAIN_CREATED':
     case 'VOTED':
-      return await updateLists(context, event)
+      return
     default:
       throw new Error(`bad event type ${event.type}`)
   }
 }
 
-// прелетел эвент - создано ядро(проголосовано ядро). Добавить ядро во все ленты и на личную сферу
-async function updateLists (context, event) {
-  logD('addNode start')
+// прелетел эвент - создано ядро. Добавить ядро во все сферы и на личную сферу
+async function updateListsNodeCreated (context, event) {
+  logD('addNode start', event)
   let objectShort = event.object
   assert(objectShort.oid && objectShort.name != null)
   for (let key in context.rootState.cache.cachedItems) {
@@ -250,17 +251,14 @@ async function updateLists (context, event) {
     if (!key.startsWith(keyPattern)) continue
     let { oid, pagination, filter, sortStrategy } = JSON.parse(key.slice(keyPattern.length))
     assert(oid && filter, 'oid && filter')
-    if (oid === context.rootState.auth.userOid) {
+
+    if (oid === context.rootState.auth.userOid) { // личная сфера пользователя
       assert(event.subject)
-      // прилетевшее ядро не создано этим пользователем и не проголосовано этим пользователем
-      if (event.subject.oid !== context.rootState.auth.userOid) continue
+      if (event.subject.oid !== context.rootState.auth.userOid) continue // прилетевшее ядро создано НЕ этим пользователем
       // список - это личная сфера этого пользователя
-      if (!filter || !filter.fastFilters) continue
-      let fastFilter = event.type === 'NODE_CREATED' ? 'CREATED_BY_USER' : 'VOTED_BY_USER'
-      if (!filter.fastFilters.includes(fastFilter)) continue
-    } else {
-      if (event.type !== 'NODE_CREATED' && event.type !== 'CHAIN_CREATED') continue
     }
+    assert(event.sphereOids)
+    if (!event.sphereOids.includes(oid)) continue // sphereOids - список сфер, на которые падает созданное ядро
     if (!isRestricted(context, filter, objectShort)) continue // элемент не подходит под этот фильр
 
     logD('try add item to list... ', { oid, pagination, filter, sortStrategy })
@@ -271,13 +269,11 @@ async function updateLists (context, event) {
         // { items, count, totalCount, nextPageToken }
         logD('setter: ', value)
         assert(value.items && value.count >= 0 && value.totalCount >= 0)
-        // элемент в самом списке - objectShort
-        // удалить старый объект (возможно при переголосовании)
-        let indx = value.items.findIndex(item => item.oid === objectShort.oid)
-        if (indx >= 0) value.items.splice(indx, 1)
-
+        let insertedIndx
+        if (oid === context.rootState.auth.userOid) insertedIndx = 0
+        else insertedIndx = value.items.length
         // вставляем в начало используем splice для реактивности
-        value.items.splice(0, 0, { ...objectShort })
+        value.items.splice(insertedIndx, 0, { ...objectShort })
         value.count++
         value.totalCount++
         return value

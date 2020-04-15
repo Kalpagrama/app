@@ -261,6 +261,11 @@ const eventFragment = gql`
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
     }
+    ... on EventNodeCreate{
+      subject{... objectShortFragment}
+      object{... objectShortWithMetaFragment}
+      sphereOids
+    }
     ... on EventRate{
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
@@ -303,7 +308,7 @@ const userFragment = gql`
   }
 `
 const objectFullFragment = gql`
-  ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment} 
+  ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
   ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment} ${wsItemFragment}
   fragment objectFullFragment on Object {
     ...objectFragment

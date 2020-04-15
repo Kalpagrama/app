@@ -125,18 +125,19 @@ async function initSw (store) {
       { // получаем версию текущего sw (просим сервисворкнра записать ее в iDb)
         navigator.serviceWorker.addEventListener('message', function handler (event) {
           let eventData = event.data
-          switch (eventData.type) {
-            case 'swVer':
-              logD('sw version =', eventData.msgData)
-              store.commit('core/stateSet', ['version', `${store.state.core.version}-${eventData.msgData}`])
-              break
-            case 'webPushToken':
-              logD('webPushToken =', eventData.msgData)
-              // store.dispatch('core/setWebPushToken', eventData.msgData) нельзя вызывать тк аполло еше не инициализирован
-              store.commit('core/stateSet', ['webPushTokenDraft', eventData.msgData])
-              break
-            default:
-              logD('sw unknown message recieved!', eventData)
+          if (eventData.firebaseMessaging) {
+            logD('web push message recieved!', eventData.firebaseMessaging.payload.data)
+            const notificationTitle = `${eventData.firebaseMessaging.payload.data.type} event received!`
+            showNotification(notificationTitle, 'body')
+          } else if (eventData.type === 'swVer') {
+            logD('sw version =', eventData.msgData)
+            store.commit('core/stateSet', ['version', `${store.state.core.version}-${eventData.msgData}`])
+          } else if (eventData.type === 'webPushToken') {
+            logD('webPushToken =', eventData.msgData)
+            // store.dispatch('core/setWebPushToken', eventData.msgData) нельзя вызывать тк аполло еше не инициализирован
+            store.commit('core/stateSet', ['webPushTokenDraft', eventData.msgData])
+          } else {
+            logD('sw unknown message recieved!', eventData)
           }
         })
         if (registration.active) {
@@ -164,7 +165,8 @@ async function initSw (store) {
   window.addEventListener('online', handleNetworkChange)
   window.addEventListener('offline', handleNetworkChange)
   store.commit('core/stateSet', ['online', navigator.onLine])
-  logD('initSw OK!')
+  const hasPerm = await askForNPerm() // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
+  logD('initSw OK! notification permission = ', hasPerm)
 }
 
 // очистить кэш сервис-воркера + vuexPersistStore
@@ -295,7 +297,7 @@ async function showNotification (title, body) {
     body: body,
     icon: '/statics/icons/icon-192x192.png',
     badge: '/statics/icons/badge3.png',
-    vibrate: [150, 200, 150, 200, 150, 100, 150, 100],
+    vibrate: [500, 100, 500],
     tag: 'tag: sample'
   }
   // let notification = new Notification('direct:' + title, options)
