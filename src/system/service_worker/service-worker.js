@@ -1,4 +1,4 @@
-const swVer = 3
+const swVer = 2
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
@@ -7,7 +7,7 @@ let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoS
 let webPushToken = 'empty'
 
 function sendMsg (type, msgData) {
-  self.clients.matchAll().then(all => all.map(client => client.postMessage({type, msgData})))
+  self.clients.matchAll().then(all => all.map(client => client.postMessage({ type, msgData })))
 }
 
 // log
@@ -396,23 +396,15 @@ if (useCache) {
     measurementId: 'G-D8QZ67XLM5'
   })
 //
+  logDebug('firebase.messaging.isSupported() = ', firebase.messaging.isSupported())
   let i = 0
   if (firebase.messaging.isSupported()) {
     const messaging = firebase.messaging()
-    // messaging.useServiceWorker(registration)
+    // messaging.useServiceWorker(self.registration)
     messaging.getToken().then(token => {
       logDebug('messaging.getToken() = ', token)
       webPushToken = token
     })
-    // messaging.onMessage((payload) => {
-    //   logDebug('Message received . ', payload)
-    //   // ...
-    // })
-    // messaging.onTokenRefresh(async () => {
-    //   let token = await messaging.getToken()
-    //   logDebug('messaging.onTokenRefresh = ', token)
-    // })
-
     messaging.setBackgroundMessageHandler(function (payload) {
       logDebug('[firebase-messaging-sw.js] Received background message ', payload)
 
@@ -422,8 +414,8 @@ if (useCache) {
         body: `payload: ${JSON.stringify(payload.data.type)} ${payload.data.message ? 'message' + payload.data.message : ''}`,
         icon: '/statics/icons/icon-192x192.png',
         badge: '/statics/icons/badge3.png',
-        vibrate: [150, 200, 150, 200, 150, 100, 150, 100],
-        tag: `tag: sample ${i}`,
+        vibrate: [500, 100, 500],
+        tag: payload.data.type, // Поле тега позволяет заменить старое уведомление на новое
         actions: [
           {
             action: 'test',
@@ -445,12 +437,52 @@ if (useCache) {
 
   self.addEventListener('notificationclick', function (event) {
     event.notification.close()
-    if (event.action === 'test') {
-      logDebug('test action was clicked')
-      self.clients.openWindow('/trends/SCIENCE?sort=HOT')
-    } else {
-      // Main body of notification was clicked
-      self.clients.openWindow('/')
-    }
+    logDebug('notificationclick')
+    event.waitUntil(
+      // Получаем список клиентов SW.
+      self.clients.matchAll().then(function(clientList) {
+        // Если есть хотя бы один клиент, фокусируем его.
+        if (clientList.length > 0) {
+          return clientList[0].focus();
+        }
+        // В противном случае открываем новую страницу.
+        return self.clients.openWindow('/');
+      })
+    )
   }, false)
+
+  // Регистрируем функцию на событие 'push'
+  self.addEventListener('push', function (event) {
+    logDebug('push event recieved = ', event)
+    let payload = event.data ? event.data.text() : 'Alohomora'
+
+    event.waitUntil(
+      // Получить список клиентов для SW
+      self.clients.matchAll().then(function (clientList) {
+        // Проверяем, есть ли хотя бы один сфокусированный клиент.
+        var focused = clientList.some(function (client) {
+          return client.focused
+        })
+
+        var notificationMessage
+        if (focused) {
+          notificationMessage = 'Imperio! You\'re still here, thanks!'
+        } else if (clientList.length > 0) {
+          notificationMessage = 'Imperio! You haven\'t closed the page, ' +
+            'click here to focus it!'
+        } else {
+          notificationMessage = 'Imperio! You have closed the page, ' +
+            'click here to re-open it!'
+        }
+        // Показывать уведомление с заголовком «Unforgiveable Curses»
+        // и телом в зависимости от состоянию клиентов SW
+        // * 1, страница сфокусирована;
+        // * 2, страница по-прежнему открыта, но не сфокусирована;
+        // * 3, страница закрыта).
+        return self.registration.showNotification('Unforgiveable Curses', {
+          body: notificationMessage
+        })
+      })
+    )
+  })
 }
