@@ -166,8 +166,10 @@ function makeNodeInput (node){
   nodeInput.spheres = node.spheres.map(s => {
     return { name: s.name, oid: s.oid }
   })
-  nodeInput.items = node.items.map(composition => {
-    return makeCompositionInput(composition)
+  nodeInput.items = node.items.map(i => {
+    return {
+      composition: makeCompositionInput(i)
+    }
   })
   return nodeInput
 }

@@ -17,7 +17,8 @@ div
     ).column.full-width.bg-grey-9
     //- body
     .col.full-width
-      component(v-if="tab" :is="`extra-${tab}`"
+      component(
+        v-if="tab" :is="`extra-${tab}`"
         :composition="composition" :meta="meta" :player="player" :styles="styles"
         :height="extraHeight"
         @meta="$parent.$emit('meta', $event)")
@@ -106,8 +107,12 @@ export default {
       }
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    await this.$wait(400).then(() => {
+      // this.tab = 'layers'
+      this.tabChanged('layers')
+    })
     // this.styles.paddingTop = 8
     // this.styles.paddingLeft = 4
     // this.styles.paddingRight = 4
