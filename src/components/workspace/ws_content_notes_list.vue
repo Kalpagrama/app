@@ -77,9 +77,9 @@ export default {
         thumbOid: content.oid,
         wsItemType: 'CONTENT_NOTES',
         rawData: {
-          content: content,
           layers: [],
-          // figuresAbsolute: []
+          spheres: [],
+          content: content
         }
       }
       this.$log('itemInput', itemInput)
