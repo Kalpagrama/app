@@ -167,14 +167,6 @@ const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${video
     }
     layers {
       contentOid
-      content {
-        oid
-        type
-        thumbUrl(preferWidth: 600)
-        name
-        ...on Video {...videoFragment}
-        ...on Image {...imageFragment}
-      }
       figuresAbsolute{...figureFragment}
       figuresRelative {...figureFragment}
       speed
