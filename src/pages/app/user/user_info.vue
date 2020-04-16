@@ -1,41 +1,30 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-9
-  //- dialogs
-  //- settings
-  q-dialog(v-model="userSettingsDialogOpened" :maximized="$q.screen.xs")
-    user-settings(:value="user" @hide="userSettingsDialogOpened = false")
-  //- TODO notifications, dm
+div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-10
   //- cover
-  img(
-    @click="userCoverClick()"
-    src="https://www.ecopetit.cat/wpic/mpic/28-289473_twitter-cover-photo-45-stars.jpg"
-    :style=`{position: 'absolute', bottom: '190px', objectFit: 'cover'}`).fit
-  //- wrapper
-  div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-xl
-    //- logo, db, notifications, follow
-    .row.full-width.q-pa-sm
+  div(:style=`{position: 'relative', height: '300px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
+    div(:style=`{position: 'absolute', zIndex: 10, borderRadius: '10px', background: 'rgba(0,0,0,0.2)'}`).row.fit
+    img(
+      @click="userCoverClick()"
+      src="https://www.ecopetit.cat/wpic/mpic/28-289473_twitter-cover-photo-45-stars.jpg"
+      :style=`{position: 'absolute', objectFit: 'cover', borderRadius: '10px', overflow: 'hidden'}`).fit
+    div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px', height: '100px'}`).row.full-width.q-px-md
       kalpa-avatar(:url="user.profile.photoUrl" :width="100" :height="100" @click.native="userAvatarClick()")
       .col.full-height
-        .row.fit.items-center.content-center.justify-end
-          q-btn(v-if="userIsMe" round flat color="green" icon="settings" @click="userSettingsDialogOpened = true").q-mr-sm
-          q-btn(round dense outline color="green" icon="mail_outline" @click="userDM()").q-mr-sm
-          q-btn(round dense outline color="green" icon="notifications_none" @click="userSetNotifications()").q-mr-sm
-          q-btn(push no-caps color="green" @click="userFollow()"
-            :style=`{borderRadius: '20px'}`).q-px-sm
+        .row.fit.items-center.content-center.q-px-sm
+          span(:style=`{fontSize: '25px', lineHeight: 0.9}` @click="userNameClick()").text-white.text-bold {{user.name}}
+          .row.full-width
+            span(:style=`{padding: 0, margin: 0}` @click="userUsernameClick()").text-white @ivanmoto
+    div(:style=`{position: 'absolute', zIndex: 200, bottom: '0px', height: '40px'}`
+      ).row.full-width.items-center.content-center.justify-end.q-px-md
+          q-btn(round push dense color="green" icon="mail_outline" @click="userDM()").q-mr-sm
+          q-btn(round push dense color="green" icon="notifications_none" @click="userSetNotifications()").q-mr-sm
+          q-btn(push no-caps color="green" @click="userFollow()").q-px-sm
             span.text-bold Follow
-    //- name
-    .row.full-width.items-center.content-center.q-px-sm
-      span(:style=`{fontSize: '25px', lineHeight: '25px'}` @click="userNameClick()").text-white.text-bold {{user.name}}
-      .row.full-width
-        span(:style=`{padding: 0, margin: 0}` @click="userUsernameClick()").text-white @ivanmoto
-    //- status/about
-    .row.full-width.q-pa-sm
-      span(:style=`{fontSize: '18px'}` @click="userStatusClick()").text-white.text-grey-4 😱 My status quo 😤
-      .row.full-width
-        span(@click="userAboutClick()").text-white.text-grey-4 Helping people to help them 😺
-    //- pages
-    .row.full-width
-      kalpa-buttons(:value="pages" :id="page" idKey="id" @id="$emit('page', $event)")
+  //- status
+  div(
+    :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+    ).row.full-width.q-pa-md.bg-grey-9
+    p(:style=`{fontSize: '14px'}` @click="userStatusClick()").text-white.text-grey-4 😱 My status quo 😤 <br> Helping people to help them 😺
 </template>
 
 <script>

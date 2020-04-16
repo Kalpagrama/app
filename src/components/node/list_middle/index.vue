@@ -20,7 +20,7 @@
         //- @tintClick="onSwipe({direction: $event > nodeMiddle ? 'up' : 'down'})"
         node(
           v-for="(n, ni) in nodes" :key="n.oid" :accessKey="ni"
-          v-if="nodesBan ? !nodesBan.includes(n.oid) : true" layout="pip"
+          v-if="nodesBan ? !nodesBan.includes(n.oid) : true" layout="pip" :essence="true"
           :ref="'node-'+n.oid" :ctx="'list'"
           :node="n" :index="ni"
           :needFull="ni >= nodeMiddle-0 && ni <= nodeMiddle+1"

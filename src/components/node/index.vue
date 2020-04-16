@@ -2,7 +2,7 @@
 component(
   :is="`node-layout-${layout || node.layout}`"
   :ctx="ctx" :index="index"
-  :node="node" :nodeFull="nodeFull" :visible="visible" :active="active" :nodeLoad="nodeLoad"
+  :node="node" :nodeFull="nodeFull" :visible="visible" :active="active" :nodeLoad="nodeLoad" :essence="essence" :mini="mini"
   @tintClick="$emit('tintClick', index)"
   @height="$emit('height', $event)")
 </template>
@@ -14,7 +14,7 @@ import nodeLayoutByte from './layout_byte'
 
 export default {
   name: 'nodeIndex',
-  props: ['ctx', 'index', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'active', 'layout'],
+  props: ['ctx', 'index', 'node', 'needFull', 'needFullPreload', 'nodeFullReady', 'visible', 'active', 'layout', 'essence', 'mini'],
   components: {nodeLayoutPip, nodeLayoutRubick, nodeLayoutByte},
   data () {
     return {

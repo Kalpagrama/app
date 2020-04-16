@@ -24,7 +24,7 @@ const routes = [
       { name: 'report', path: 'report', component: () => import('pages/app/report') },
       { name: 'logout', path: 'logout', component: () => import('pages/app/logout') },
       // pages
-      { name: 'account', path: 'account/:oid?/:page?', component: () => import('pages/app/user') },
+      // { name: 'account', path: 'account/:oid?/:page?', component: () => import('pages/app/user') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?', component: () => import('pages/app/content') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },

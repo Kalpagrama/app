@@ -31,11 +31,12 @@
     .row.full-width.justify-center
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '80px'}`).row.full-width.items-start.content-start
         kalpa-loader(type="CONTENT_NOTES_LIST" :variables=`{}`)
-          template(v-slot:items=`{items}`)
-            ws-content-notes(
-              v-for="(i, ii) in items" :key="i.oid"
-              :item="i" :contentOid="contentOid"
-              @content="$emit('item', {type: 'content', item: $event})")
+          template(v-slot="{items}")
+            .row.full-width.items-start
+              ws-content-notes(
+                v-for="(i, ii) in items" :key="i.oid"
+                :item="i" :contentOid="contentOid"
+                @content="$emit('item', {type: 'contentNotes', item: $event})")
 </template>
 
 <script>

@@ -1,9 +1,7 @@
 <template lang="pug">
 .column.full-width.bg-grey-9
-  //- div(:style=`{height: '60px'}`).row.full-width.items-center.justify-center
-  //-   span.text-white.text-bold Choose category
-  .col.full-width.scroll
-  .row.full-width.items-start.content-start.q-py-md
+  //- .col.full-width.scroll
+  .row.full-width.items-start.content-start
     router-link(
       v-for="(c,ci) in categoriesFiltered" :key="ci" :to="'/trends/'+c.id"
       v-if="c.id !== 'ALL'"
@@ -12,7 +10,7 @@
         }`
       :style=`{height: '40px'}`
       ).row.full-width.items-center.q-px-md
-      span(:style=`{textTransform: 'capitalize'}`).text-white {{c.name}}
+      span(:style=`{textTransform: 'capitalize'}`).text-white {{'#'+c.name}}
 </template>
 
 <script>

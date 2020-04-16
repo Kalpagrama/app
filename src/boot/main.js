@@ -87,8 +87,8 @@ export default async ({ Vue, store, router: VueRouter }) => {
     }
     // node
     Vue.component('node', () => import('components/node'))
-    Vue.component('nodeSaver', () => import('components/node/node_saver'))
-    Vue.component('nodeEditor', () => import('components/node/node_editor'))
+    // Vue.component('nodeSaver', () => import('components/node/node_saver'))
+    Vue.component('nodeEditor', () => import('components/node_editor'))
     Vue.component('nodeList', () => import('components/node/list'))
     Vue.component('nodeSpheres', () => import('components/node/spheres'))
     Vue.component('nodeSpheresEditor', () => import('components/node/spheres_editor'))
@@ -108,6 +108,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))
     // ws
     Vue.component('wsItems', () => import('components/workspace/ws_items'))
+    Vue.component('wsItemFinder', () => import('components/workspace/ws_item_finder'))
     // Vue.component('noteEditor', () => import('components/'))
     // composition
     Vue.component('composition', () => import('components/node/composition'))

@@ -1,27 +1,43 @@
-<style lang="stylus">
-.q-footer {
-  background: none !important
-}
-input {
-  background-color: transparent;
-  border: 0px solid;
-  height: 20px;
-  width: 160px;
-}
-input:focus,
-select:focus,
-textarea:focus,
-button:focus {
-    outline: none;
-}
-::placeholder {
-  opacity: 1;
-  color: grey
-}
+<style lang="sass">
+.page-item
+  &:hover
+    background: #777 !important
 </style>
+
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px'}`).bg-grey-10
-  q-header(reveal)
+  //- menu
+  div(
+    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
+    :style=`{
+      position: 'fixed',
+      top: '0px',
+      zIndex: 1000,
+      width: $store.state.ui.maxWidthMenu+'px',
+      height: $q.screen.height+'px',
+      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
+      paddingTop: '68px',
+    }`).row.items-start.content-start.q-px-sm.q-pb-sm
+    div(
+      :style=`{
+        borderRadius: '10px', overflow: 'hidden',
+        maxHeight: '70vh'
+      }`
+      ).column.fit.bg-grey-9
+      //- pages
+      router-link(
+        v-for="(p,pi) in pages" :key="p.id"
+        :to=`{params: {page: p.id}}`
+        :style=`{height: '50px'}`).row.full-width.items-center.content-center.q-px-md.page-item
+        span.text-white {{ p.name }}
+      //- spheres
+      div(:style=`{height: '50px'}`).row.full-width.items-center.q-px-md
+        span.text-white Related spheres
+      .col.full-width.scroll
+        .row.full-width.q-pa-sm
+          sphere-spheres(v-if="user" :oid="user.oid")
+  //- header
+  q-header(v-if="false" reveal)
     .row.full-width.justify-center
       div(
         v-if="user"
@@ -35,31 +51,21 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', mi
           small.text-white @{{ user.name }}
   q-footer(reveal)
     .row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px'}`).row.full-width.bg-red
-        q-btn(round flat color="white" icon="menu")
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px', borderRadius: '10px 10px 0 0'}`
+        ).row.full-width.items-center.content-center.bg-grey-9.q-px-sm
+        q-btn(
+          round push color="green" icon="add"
+          :style=`{position: 'absolute', zIndex: 100, top: '-20px', left: '50%', transform: 'translate(-50%, 0)', borderRadius: '50%'}`)
+        q-btn(round flat color="grey-2" icon="menu")
+        .col
+        q-btn(round flat color="grey-2" icon="more_vert")
   q-page-container.row.fit.justify-center.bg-grey-10
-    user-info(v-if="user" :user="user" :page="page" @page="page = $event")
-    //- user-info(v-if="user" :user="user" :page="page" @page="page = $event")
+    user-info(v-if="user" :user="user")
     user-created-nodes(
-      v-if="page === 'created'"
+      v-if="$route.params.page === 'created'"
       :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
       //- template(v-slot:header)
         //- user-info(v-if="user" :user="user" :page="page" @page="page = $event")
-    user-voted-nodes(
-      v-if="page === 'voted'"
-      :filter="{ types: ['NODE'], fastFilters: ['VOTED_BY_USER']}")
-      //- template(v-slot:header)
-      //-   user-info(v-if="user" :user="user" :page="page" @page="page = $event")
-    user-following(
-      v-if="page === 'following'"
-      :subscriptions="user.subscriptions" :oid="user.oid")
-      //- template(v-slot:header)
-      //-   user-info(v-if="user" :user="user" :page="page" @page="page = $event")
-    user-followers(
-      v-if="page === 'followers'"
-      :subscribers="user.subscribers" :oid="user.oid")
-      //- template(v-slot:header)
-      //-   user-info(v-if="user" :user="user" :page="page" @page="page = $event")
 </template>
 
 <script>
@@ -76,13 +82,13 @@ export default {
   data () {
     return {
       user: null,
-      page: 'created',
-      showI: false,
-      theStream: '',
-      file: null,
-      editions: false,
-      status: null,
-      about: null
+      // page: 'created',
+      pages: [
+        {id: 'created', name: 'Created'},
+        {id: 'voted', name: 'Voted'},
+        {id: 'followers', name: 'Followers'},
+        {id: 'following', name: 'Following'}
+      ]
     }
   },
   computed: {
@@ -160,6 +166,9 @@ export default {
         this.$log('$route CHANGED', to)
         if (to.params.oid) {
           this.user = await this.userLoad(to.params.oid)
+          if (!to.params.page) {
+            this.$router.push({params: {page: 'created'}})
+          }
         }
         else {
           this.$log('NO USER OID!')

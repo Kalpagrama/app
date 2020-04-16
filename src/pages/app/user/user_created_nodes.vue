@@ -2,7 +2,7 @@
 .row.fit.items-start.content-start
   //- nodes
   kalpa-loader(v-if="variables" ref="nodeLoader" :variables="variables" type="sphereNodes")
-    template(v-slot:items=`{items}`)
+    template(v-slot=`{items}`)
       node-list(:nodes="items" @nodeClick="nodeClick")
         template(v-slot:header)
           slot(name="header")

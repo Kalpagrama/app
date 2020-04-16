@@ -1,10 +1,17 @@
+<style lang="sass">
+.sphere-item
+  &:hover
+    background: #777 !important
+</style>
 <template lang="pug">
 div(:style=`{height: height || '120px'}`
   ).row.full-width.items-start.content-start.justify-start
   router-link(
     v-for="(s,si) in spheres" :key="s.oid" :to="'/sphere/'+s.oid"
+    v-if="s.name !== '*unnamed*'"
     :style=`{borderRadius: '10px'}`
-    ).text-white.q-pa-sm.q-mr-sm.q-mb-sm.bg-grey-8 {{ '#'+s.name }}
+    ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.bg-grey-8.sphere-item
+    small(:style=`{userSelect: 'none'}`) {{ '#'+s.name }}
 </template>
 
 <script>

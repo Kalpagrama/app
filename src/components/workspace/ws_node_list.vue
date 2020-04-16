@@ -34,10 +34,11 @@ div(:style=`{position: 'relative'}`).column.fit
         ).row.full-width.items-start.content-start.q-px-sm
         //- nodes
         kalpa-loader(type="NODE_LIST" :variables=`{}`)
-          template(v-slot:items=`{items}`)
-            ws-node(
-              v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
-              :oid="oid" :node="n")
+          template(v-slot="{items}")
+            .row.full-width
+              ws-node(
+                v-for="(n, ni) in items" :key="n.oid" @nodeClick="nodeClick"
+                :oid="oid" :node="n")
 </template>
 
 <script>

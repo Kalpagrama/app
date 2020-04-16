@@ -31,12 +31,11 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
     v-if="$route.name !== 'welcome' && $q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
     :style=`{
       position: 'fixed',
-      zIndex: 1000,
+      zIndex: 1,
       top: '0px',
       width: $store.state.ui.maxWidthMenu+'px',
-      height: $q.screen.height+'px',
       left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '0px',
+      paddingTop: '0px'
     }`).column.q-px-sm.q-pb-sm
     div(
       :style=`{height: '60px'}`
@@ -51,11 +50,13 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
           borderRadius: '10px', overflow: 'hidden'
         }`
         ).column.full-width.bg-grey-9
-          div(
+          router-link(
+            v-if="!loading"
+            :to="'/user/'+$store.getters.currentUser.oid"
             :style=`{height: '70px'}`
             ).row.full-width.items-center.content-center
             div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-              div(:style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.bg-grey-3
+              kalpa-avatar(:url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
             .col.full-height
               .row.fit.items-center.content-center
                 span(:style=`{lineHeight: 1.1}`).text-white.text-bold Ivan Motovilov
@@ -75,8 +76,8 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
             span.text-white {{ p.name }}
           .row.full-width.items-center.q-px-md.q-py-sm
             small.text-white 1.0.0
-  q-page-container
-    q-page
+  q-page-container.fit
+    q-page.fit
       router-view(
         v-if="!loading")
       div(

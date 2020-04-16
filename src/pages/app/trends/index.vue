@@ -24,7 +24,10 @@ q-layout(
         borderRadius: '10px', overflow: 'hidden'
       }`
       ).column.full-width.bg-grey-9
+      div(:style=`{height: '50px'}`).row.full-width.items-center.content-content-center.q-px-md
+        span.text-white.text-bold Trending now
       categories
+  //- header
   q-header(
     reveal
     :style=`{zIndex: 200}`).row.full-width.justify-center.bg-grey-8
@@ -57,9 +60,9 @@ q-layout(
   //-             span(:style=`{textTransform: 'capitalize'}`).text-white {{ '#'+categories[$route.params.category].name }}
   //-       q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['menuAppShow', true])").q-mr-sm
   q-page-conainter.row.fit.justify-center.items-start.content-start.bg-grey-10
-    q-page.q-pt-xl
+    q-page
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
-        template(v-slot:items=`{items}`)
+        template(v-slot=`{items}`)
           node-list(:nodes="items")
 </template>
 
