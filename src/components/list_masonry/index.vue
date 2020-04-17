@@ -4,9 +4,9 @@ div(
   ).column.fit.items-center.content-center.justify-center.bg-grey-10
   //- tint
   //- div(
-  //-   v-if="true"
+  //-   v-if="nodeOid"
   //-   :style=`{
-  //-     position: 'fixed', top: '0px', zIndex: 200, transform: 'translate3d(0,0,0)', background: 'rgba(0,0,0,'+0.1+')',
+  //-     position: 'fixed', top: '0px', zIndex: 200, transform: 'translate3d(0,0,0)', background: 'rgba(0,0,0,'+0.9+')',
   //-     pointerEvents: 'none'
   //-   }`
   //-   ).row.fit

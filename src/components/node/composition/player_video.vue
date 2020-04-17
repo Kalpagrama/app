@@ -236,35 +236,6 @@ export default {
     }
   },
   watch: {
-    // composition: {
-    //   immediate: false,
-    //   async handler (to, from) {
-    //     if (to) {
-    //       if (to.contentOid) {
-    //         this.compositionContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
-    //       }
-    //     }
-    //   }
-    // },
-    // content: {
-    //   handler (to, from) {
-    //     this.$log('content CHANGED', to)
-    //     if (to) {
-    //       if (!this.player) {
-    //         this.$nextTick(() => {
-    //           this.playerInit()
-    //         })
-    //       }
-    //     }
-    //   }
-    // },
-    // contentSource: {
-    //   immediate: false,
-    //   handler (to, from) {
-    //     this.$log('contentSource CHANGED', to)
-    //     // if (to) this.playerInit()
-    //   }
-    // },
     visible: {
       immediate: true,
       handler (to, from) {
@@ -398,6 +369,7 @@ export default {
         this.player.setCurrentTime(this.layerStart)
       }
       if (this.visible && this.active && !this.mini) this.player.play()
+      if (!this.active) this.player.pause()
       this.videoUpdate()
     },
     videoPlay (intervalUpdateIgnore) {

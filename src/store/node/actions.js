@@ -62,9 +62,9 @@ export const nodeUnrate = async (context, oid) => {
   return nodeUnrate
 }
 
-export const nodeRate = async (context, { node, rateUser }) => {
-  logD('nodeRate start', node.oid, rateUser)
-  assert(node.oid && rateUser)
+export const nodeVote = async (context, { oid, vote }) => {
+  logD('nodeVote start', oid, vote)
+  assert(oid && vote, 'oid && vote')
   let { data: { nodeRate } } = await apollo.clients.api.mutate({
     mutation: gql`
       mutation nodeRate ($oid: OID!, $rate: Float!) {
@@ -76,18 +76,18 @@ export const nodeRate = async (context, { node, rateUser }) => {
       }
     `,
     variables: {
-      oid: node.oid,
-      rate: rateUser
+      oid: oid,
+      rate: vote
     }
   })
   // надо запомнить сейчас, тк с фвентом придет только общая оценка
   await context.dispatch('cache/update', {
-    key: node.oid,
+    key: oid,
     path: 'rateUser',
-    newValue: rateUser
+    newValue: vote
   }, { root: true })
-  logD('nodeRate done', nodeRate)
-  return nodeRate.rate
+  logD('noteVote done', nodeRate)
+  return nodeVote.rate
 }
 
 export const nodeDelete = async (context, oid) => {

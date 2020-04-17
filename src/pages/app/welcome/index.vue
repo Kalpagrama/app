@@ -16,7 +16,7 @@ q-layout(
       ).row.full-width.bg-grey-10.q-pa-md
       like(v-show="page === 'like'" @types="types = $event")
       div(v-show="page === 'who'").row.full-width
-        user-settings(:value="$store.getters.currentUser")
+        //- user-settings(:value="$store.getters.currentUser")
     //- actions
     .row.full-width.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.justify-start.q-py-md.q-px-sm
@@ -35,11 +35,11 @@ q-layout(
 
 <script>
 import like from './like'
-import userSettings from 'pages/app/user/user_settings'
+// import userSettings from 'pages/app/user/user_settings'
 
 export default {
   name: 'pageAppWelcome',
-  components: {like, userSettings},
+  components: {like},
   data () {
     return {
       page: 'like',

@@ -14,42 +14,58 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       :preview="node.meta.items[0].thumbUrl"
       :value="composition"
       :visible="visible" :active="active" :mini="mini")
+    vote(v-if="voteShow" :oid="node.oid" @end="voteShow = false")
   //- essence
   div(
     v-if="essence"
-    :style=`{minHeight: '50px'}`
+    :style=`{height: '50px'}`
     ).row.full-width.items-center.content-center.justify-start.q-px-md.q-py-sm
     router-link(:to="'/sphere/'+sphereOid").text-white.text-bold {{ node.name }}
   //- author and vote
   div(
     v-if="opened && nodeFull"
     :style=`{height: '50px'}`
-    ).row.full-width.items-center.content-center.q-px-md.q-py-sm.br
-    kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="36" :height="36" @click.native="userAvatarClick()")
+    ).row.full-width.items-center.content-center.q-px-md.q-py-sm
+    kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="42" :height="42" @click.native="$router.push('/user/'+nodeFull.auhtor.oid)")
     .col
-    q-btn(round push color="green" icon="blur_on")
+      .row.fit.items-center.content-center.q-px-sm
+        router-link(:to="'/user/'+nodeFull.author.oid")
+          span(:style=`{lineHeight: 0.9}`).text-white {{nodeFull.author.name}}
+        router-link(:to="'/user/'+nodeFull.author.oid").full-width
+          small.text-white.full-width {{nodeFull.author.name}}
+    .col
+      .row.fit.items-center.content-center.justify-end.q-px-sm
+        span(:style=`{fontSize: '24px'}`).text-white.text-bold {{nodeFull.rate}}
+    q-btn(
+      round push color="green" icon="blur_on" @click="voteStart()"
+      :loading="voteShow"
+      :style=`{borderRadius: '50%'}`)
   //- spheres
   div(
-    v-if="opened && nodeFull"
-    :style=`{height: 100+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-px-sm
+    v-if="opened && nodeFull && nodeFull.spheres.length > 9"
+    :style=`{height: 60+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start.q-py-sm.q-px-md
     //- div(:style=`{height: '100px', marginBottom: -openedHeight+'px'}`).row.full-width
+    //- target="_blank"
     router-link(
       v-for="(s,si) in nodeFull.spheres" :key="si"
       :to="'/sphere/'+s.oid"
       :style=`{borderRadius: '10px', userSelect: 'none'}`
-      ).text-white.q-pa-sm.bg-grey-8.q-mr-sm.q-mb-sm.cursor-pointer {{ s.name }}
+      ).text-white.q-px-sm.q-py-xs.bg-grey-8.q-mr-xs.q-mb-xs.cursor-pointer
+      small {{ s.name }}
 </template>
 
 <script>
 // import { openURL } from 'quasar'
+import vote from './vote'
 
 export default {
   name: 'nodeLayoutPip',
-  props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'essence', 'mini', 'nodeLoad'],
+  props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'essence', 'mini', 'opened', 'nodeLoad'],
+  components: {vote},
   data () {
     return {
-      opened: false,
-      composition: null
+      composition: null,
+      voteShow: false
     }
   },
   computed: {
@@ -79,6 +95,15 @@ export default {
     }
   },
   methods: {
+    voteStart () {
+      this.$log('voteStart')
+      if (this.voteShow) {
+        this.voteShow = false
+      }
+      else {
+        this.voteShow = true
+      }
+    }
   }
 }
 </script>

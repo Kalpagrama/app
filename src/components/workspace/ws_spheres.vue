@@ -1,25 +1,27 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
-  div().row.full-width.q-pa-sm
+  //- header
+  .row.full-width.q-pa-sm
     q-input(
       v-model="sphereInput"
       filled color="green" placeholder="Find or add sphere"
       @keyup.enter="sphereInputEnter"
       :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
       ).full-width.bg-grey-1
+  //- body
   .col.full-width.scroll
     kalpa-loader(type="SPHERE_LIST" :variables=`{}`)
-      template(v-slot:items=`{items}`)
-        div(
-          v-for="(i,ii) in items" :key="i.oid"
-          ).row.q-pa-sm
-          span.text-white {{ i.name }}
+      template(v-slot=`{items}`)
+        .row.full-width.items-start.content-start
+          div(
+            v-for="(i,ii) in items" :key="i.oid"
+            ).row.q-pa-sm
+            span.text-white {{ i.name }}
 </template>
 
 <script>
 export default {
   name: 'wsSpheres',
-  props: ['value'],
   data () {
     return {
       sphere: null,

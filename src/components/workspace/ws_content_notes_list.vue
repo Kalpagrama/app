@@ -1,10 +1,7 @@
-<style lang="stylus">
-.ws-content {
-  color: white;
-  &:hover {
-    color: #4caf50 !important;
-  }
-}
+<style lang="sass">
+.content-item
+  &:hover
+    background: #777 !important
 </style>
 
 <template lang="pug">
@@ -12,7 +9,7 @@
   //- add content finder
   .row.full-width.justify-center
     div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pa-sm
-      content-finder(
+      ws-content-finder(
         :sources="['url', 'device']"
         @content="contentFound")
   //- header actions, list, gallery, feed, list-expanded
@@ -33,19 +30,16 @@
         kalpa-loader(type="CONTENT_NOTES_LIST" :variables=`{}`)
           template(v-slot="{items}")
             .row.full-width.items-start
-              ws-content-notes(
-                v-for="(i, ii) in items" :key="i.oid"
-                :item="i" :contentOid="contentOid"
-                @content="$emit('item', {type: 'contentNotes', item: $event})")
+              div(
+                v-for="(c,ci) in items" :key="c.oid" @click="contentClick(c.oid)"
+                :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`
+                ).row.full-width.items-center.bg-grey-8.q-px-md.q-mb-sm.cursor-pointer.content-item
+                span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
 </template>
 
 <script>
-import wsContentNotes from './ws_content_notes'
-
 export default {
   name: 'wsContentNotesList',
-  components: {wsContentNotes},
-  props: ['ctx'],
   data () {
     return {
       mode: 'list',
@@ -55,13 +49,11 @@ export default {
     }
   },
   methods: {
-    contentClick (oid) {
+    async contentClick (oid) {
       this.$log('contentClick', oid)
-      this.contentOid = oid
-    },
-    contentEdit (content) {
-      this.$log('contentEdit', content)
-      this.$emit('item', {type: 'content', item: content})
+      let content = await this.$store.dispatch('objects/get', {oid: oid})
+      this.$log('contentClick', content)
+      this.$emit('item', {type: 'contentNotes', item: content})
     },
     async contentDelete (oid) {
       this.$log('contentDelete start', oid)

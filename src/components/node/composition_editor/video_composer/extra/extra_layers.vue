@@ -86,7 +86,7 @@ div(:style=`{}`).column.fit
 </template>
 
 <script>
-import layerEditor from '../layer_editor'
+import layerEditor from './extra_layers_editor'
 
 export default {
   name: 'extraLayers',

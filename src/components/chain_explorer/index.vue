@@ -1,11 +1,10 @@
 <template lang="pug">
-.row.full-width
-  span player BOOK
+span chain explorer
 </template>
 
 <script>
 export default {
-  name: 'playerBook',
+  name: 'chainExplorer',
   data () {
     return {
     }

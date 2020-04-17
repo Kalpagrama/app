@@ -7,7 +7,8 @@
 div(:style=`{height: height || '120px'}`
   ).row.full-width.items-start.content-start.justify-start
   router-link(
-    v-for="(s,si) in spheres" :key="s.oid" :to="'/sphere/'+s.oid"
+    v-for="(s,si) in spheres" :key="s.oid"
+    :to="'/sphere/'+s.oid"
     v-if="s.name !== '*unnamed*'"
     :style=`{borderRadius: '10px'}`
     ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.bg-grey-8.sphere-item

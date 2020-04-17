@@ -1,5 +1,6 @@
 <template lang="pug">
 div(
+  v-if="node"
   :style=`{
     position: 'relative',
     borderRadius: '10px', overflow: 'hidden'
@@ -8,14 +9,14 @@ div(
   //- dialogs
   //- ws item finder dialog
   q-dialog(v-model="itemFinderOpened" maximized position="bottom")
-    div(:style=`{height: $q.screen.height+'px', paddingTop: '68px'}` @click.self="itemFinderOpened = false"
+    div(:style=`{height: $q.screen.height+'px', paddingTop: paddingTop+'px'}` @click.self="itemFinderOpened = false"
       ).row.full-width.items-start.content-start.justify-center.q-px-sm
       div(
         :style=`{
           position: 'relative',
           maxWidth: $store.state.ui.maxWidthPage+'px',
           borderRadius: '10px', overflow: 'hidden',
-          height: $q.screen.height-60-8-8+'px'
+          height: $q.screen.height-8-8+'px'
         }`).row.full-width.bg-grey-9
         ws-item-finder(
           v-if="!node.items[0]"
@@ -24,7 +25,7 @@ div(
           @cancel="itemFinderOpened = false")
   //- composition editor dialog
   q-dialog(v-model="itemEditorOpened" maximized position="bottom")
-    div(:style=`{height: $q.screen.height+'px', paddingTop: '68px'}` @click.self="itemEditorOpened = false"
+    div(:style=`{height: $q.screen.height+'px', paddingTop: paddingTop+'px'}` @click.self="itemEditorOpened = false"
       ).row.full-width.items-start.content-start.justify-center.q-px-sm
       div(
         :style=`{
@@ -73,6 +74,7 @@ div(
           :mini="false")
       //- essence and add
       div(
+        v-if="mode === 'edit'"
         :style=`{
           height: '60px'
         }`
@@ -88,8 +90,12 @@ div(
           :style=`{width: '50px', background: '#555'}`)
   //- footer
   div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+    q-btn(round flat color="grey-6" icon="keyboard_arrow_left" @click="$emit('cancel')")
     .col
-    q-btn(push color="green" no-caps @click="nodePublish()").q-px-sm Publish
+      //- span.text-white essence: {{essence}}
+    q-btn(
+      push color="green" no-caps @click="nodePublish()"
+      :loading="nodePublishing").q-px-sm Publish
 </template>
 
 <script>
@@ -97,46 +103,26 @@ import assert from 'assert'
 
 export default {
   name: 'nodeEditor',
-  props: ['value', 'wsItemFinderOnBoot'],
+  props: ['mode', 'essence', 'node', 'wsItemFinderOnBoot', 'paddingTop'],
   data () {
     return {
       itemFinderOpened: false,
       itemEditorOpened: false,
       itemIndex: 0,
-      node: null,
-      nodeNew: {
-        name: '',
-        items: [],
-        spheres: [],
-        category: 'FUN',
-        layout: 'PIP'
-      }
+      nodePublishing: false
     }
   },
   watch: {
-    value: {
-      deep: true,
-      immediate: true,
-      handler (to, from) {
-        this.$log('value CHANGED', to)
-        if (to) {
-          this.node = JSON.parse(JSON.stringify(to))
-        }
-        else {
-          this.node = JSON.parse(JSON.stringify(this.nodeNew))
-        }
-        if (this.node.items.length === 0) {
-          if (this.wsItemFinderOnBoot) {
-            this.itemFind(0)
-          }
-        }
-      }
-    },
     node: {
       deep: true,
       immediate: true,
       handler (to, from) {
         this.$log('node CHANGED', to)
+        if (to) {
+        }
+        else {
+          this.node = JSON.parse(JSON.stringify(this.nodeNew))
+        }
       }
     }
   },
@@ -190,17 +176,37 @@ export default {
     async nodePublish () {
       try {
         this.$log('nodePublish start')
-        let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
+        this.nodePublishing = true
+        let nodeInput = JSON.parse(JSON.stringify(this.node))
+        switch (this.mode) {
+          case 'edit': {
+            break
+          }
+          case 'extend': {
+            nodeInput.name = this.essence
+            break
+          }
+        }
+        this.$log('nodeInput', nodeInput)
+        let res = await this.$store.dispatch('node/nodeCreate', nodeInput)
         this.$log('nodePublish res', res)
         this.$log('nodePublish done')
+        this.nodePublishing = false
+        this.$emit('cancel')
       }
       catch (e) {
         this.$log('nodePublish error', e)
+        this.nodePublishing = false
       }
     }
   },
   mounted () {
     this.$log('mounted')
+    if (this.node && this.node.items.length === 0 && this.node.name.length === 0) {
+      if (this.wsItemFinderOnBoot) {
+        this.itemFind(0)
+      }
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -1,11 +1,15 @@
 <template lang="pug">
 .row.full-width
-  span player BOOK
+  router-link(
+    :to="s.oid ? '/sphere/'+s.oid : null"
+    ).q-mr-xs.q-mb-xs.q-py-xs.q-px-sm
+    small(:style=`{userSelect: 'none'}`).text-white {{ s.name }}
 </template>
 
 <script>
 export default {
-  name: 'playerBook',
+  name: 'sphereList',
+  props: ['spheres', 'sphereStyle'],
   data () {
     return {
     }

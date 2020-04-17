@@ -1,13 +1,15 @@
 <template lang="pug">
-.row.full-width
-  span player BOOK
+chain-explorer(v-if="chain" :chain="chain" :loading="chainLoading")
 </template>
 
 <script>
 export default {
-  name: 'playerBook',
+  name: 'pageApp-chain',
   data () {
     return {
+      chain: null,
+      chainLoading: false,
+      chainLoadingError: null
     }
   },
   mounted () {

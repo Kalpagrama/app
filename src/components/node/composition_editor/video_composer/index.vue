@@ -21,10 +21,10 @@ div(:style=`{position: 'relative'}`).row.fit
 </template>
 
 <script>
-import composer from './composer_2'
+import composer from './composer'
 
 export default {
-  name: 'videoComposer_index',
+  name: 'videoComposer',
   components: {composer},
   props: ['ctx', 'mode', 'composition', 'content'],
   data () {
