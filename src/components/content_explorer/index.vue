@@ -20,7 +20,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
         composition(
           v-if="content"
           ctx="workspace"
-          :value="{layers: [{content, figuresAbsolute: [], figuresRelative: [], spheres: []}]}"
+          :value="{layers: [{contentOid: content.oid, figuresAbsolute: [], figuresRelative: [], spheres: []}]}"
           :visible="true" :active="true" :mini="false"
           :styles=`{
             paddingBottom: extraHeight+'px',
