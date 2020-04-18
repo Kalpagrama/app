@@ -108,20 +108,20 @@ export const nodeDelete = async (context, oid) => {
 }
 
 function makeCompositionInput (composition){
-  assert.ok(composition.layers.length > 0)
+  assert.ok(composition.layers.length > 0, 'composition.layers.length > 0')
   assert(composition.operation, 'operation')
   let compositionLen = 0
   for (let l of composition.layers) {
-    assert.ok(l.content && l.content.oid)
-    assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10)
-    assert.ok(l.figuresAbsolute && l.figuresAbsolute.length === 2)
+    assert.ok(l.content && l.content.oid, 'l.content && l.content.oid')
+    assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10, 'l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10')
+    assert.ok(l.figuresAbsolute && l.figuresAbsolute.length === 2, 'l.figuresAbsolute && l.figuresAbsolute.length === 2')
     let start = l.figuresAbsolute[0].t
     let end = l.figuresAbsolute[1].t
-    assert.ok(start >= 0 && end > 0)
-    assert.ok(end > start)
+    assert.ok(start >= 0 && end > 0, 'start >= 0 && end > 0')
+    assert.ok(end > start, 'end > start')
     compositionLen += (end - start)
   }
-  assert(compositionLen <= 60)
+  assert(compositionLen <= 60, 'compositionLen <= 60')
   return {
     thumbUrl: composition.thumbUrl,
     spheres: composition.spheres ? composition.spheres.map(s => ({ name: s.name })) : [],

@@ -149,7 +149,6 @@ async function initSw (store) {
     logD('initSw complete')
     // await initWebPush(store)
   }
-
   function handleNetworkChange (event) {
     logD('handleNetworkChange', navigator.onLine)
     store.commit('core/stateSet', ['online', navigator.onLine])
@@ -165,7 +164,7 @@ async function initSw (store) {
   window.addEventListener('online', handleNetworkChange)
   window.addEventListener('offline', handleNetworkChange)
   store.commit('core/stateSet', ['online', navigator.onLine])
-  const hasPerm = await askForNPerm() // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
+  const hasPerm = await askForNPerm(store) // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
   logD('initSw OK! notification permission = ', hasPerm)
 }
 
@@ -202,7 +201,7 @@ async function clearCache (force = false) {
 //     // let permissionData = window.safari.pushNotification.permission('mac.kalpagramma.com')
 //     // checkSafariRemotePermission(permissionData, store)
 //   } else { // FCM
-//     const hasPerm = await askForNPerm()
+//     const hasPerm = await askForNPerm(store)
 //     if (!hasPerm) {
 //       logD('Notification permission denied!')
 //       return
@@ -252,23 +251,55 @@ async function update () {
   await window.location.reload()
 }
 
-async function askForNPerm () {
+async function askForNPerm (store) {
   return new Promise((resolve, reject) => {
-    if (!('Notification' in window)) {
-      logD('This browser does not support desktop notification')
-      return resolve(false)
-    }
-    if (Notification.permission === 'granted') return resolve(true)
-
-    Notification.requestPermission(function (result) {
-      logD('User choice', result)
-      if (result !== 'granted') {
-        logD('No notification permission granted!')
+    if ('safari' in window) {
+      // todo
+      // if ('pushNotification' in window.safari) {
+      //   logE('Push notifications are not supported!!!')
+      //   return resolve(false)
+      // }
+      // let permissionData = window.safari.pushNotification.permission('web.app.kalpa')
+      // const checkRemotePermission = (permissionData) => {
+      //   if (permissionData.permission === 'default') {
+      //     // This is a new web service URL and its validity is unknown.
+      //     window.safari.pushNotification.requestPermission(
+      //       'https://kalpa.app', // The web service URL.
+      //       'web.app.kalpa', // The Website Push ID.
+      //       {}, // Data that you choose to send to your server to help you identify the user.
+      //       checkRemotePermission // The callback function.
+      //     )
+      //   } else if (permissionData.permission === 'denied') {
+      //     logW('User not allowed notifications')
+      //   } else if (permissionData.permission === 'granted') {
+      //     // The web service URL is a valid push provider, and the user said yes.
+      //     // permissionData.deviceToken is now available to use.
+      //     logD('permissionData.deviceToken=', permissionData.deviceToken)
+      //     store.commit('core/stateSet', ['webPushTokenDraft', permissionData.deviceToken])
+      //   }
+      // }
+    } else {
+      // CHROME HERE
+      if (!('Notification' in window)) {
+        logD('This browser does not support desktop notification')
         return resolve(false)
-      } else {
-        return resolve(true)
       }
-    })
+      if (!('PushManager' in window)) {
+        logE('Push notifications are not supported!!!')
+        return resolve(false)
+      }
+      if (Notification.permission === 'granted') return resolve(true)
+
+      Notification.requestPermission(function (result) {
+        logD('User choice', result)
+        if (result !== 'granted') {
+          logD('No notification permission granted!')
+          return resolve(false)
+        } else {
+          return resolve(true)
+        }
+      })
+    }
   })
 }
 

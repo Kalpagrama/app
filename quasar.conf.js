@@ -23,12 +23,7 @@ module.exports = function (ctx) {
     extras: [
       'roboto-font',
       'material-icons',
-      // 'ionicons-v4',
-      // 'mdi-v3',
-      // 'fontawesome-v5'
-      // 'eva-icons'
     ],
-    animations: 'all',
     framework: {
       all: true,
       animations: 'all',
@@ -72,8 +67,6 @@ module.exports = function (ctx) {
         'AppFullscreen',
         'AddressbarColor'
       ]
-      // iconSet: 'ionicons-v4'
-      // lang: 'de' // Quasar language
     },
     supportIE: false,
     build: {
@@ -210,29 +203,11 @@ module.exports = function (ctx) {
         }
       }
     },
-    cordova: {
-      // id: 'org.cordova.quasar.app'
-    },
-    electron: {
-      // bundler: 'builder', // or 'packager'
-      extendWebpack (cfg) {
-        // do something with Electron main process Webpack cfg
-        // chainWebpack also available besides this extendWebpack
-      },
-      packager: {
-        // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-        // OS X / Mac App Store
-        // appBundleId: '',
-        // appCategoryType: '',
-        // osxSign: '',
-        // protocol: 'myapp://path',
-        // Window only
-        // win32metadata: { ... }
-      },
-      builder: {
-        // https://www.electron.build/configuration/configuration
-        // appId: 'quasar-app'
-      }
+    capacitor: {
+      appName: 'QWERTY',
+      appId: 'com.company.appname',
+      // iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices
+      backButtonExit: false // Quasar handles app exit on mobile phone back button
     }
   }
 }
