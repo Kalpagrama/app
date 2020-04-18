@@ -3,6 +3,7 @@
   &:hover
     background: #888
 </style>
+
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', background: '#333'}`)
   //- menu
@@ -23,7 +24,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', ba
       }`
       ).column.full-width.bg-grey-9
       //- .col.full-width.scroll
-      .row.full-width.items-start.q-my-sm
+      .row.full-width.items-start
         router-link(
           :to="p.id"
           v-for="(p,pi) in pages" :key="pi"
@@ -62,9 +63,9 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', ba
             .row.full-height.items-center.content-center.q-mr-sm
               q-btn(round flat color="white")
                 q-icon(name="school" size="30px")
-            .row.full-height
-              span(:style=`{fontSize: '20px', lineHeight: 0.9}`).text-white.q-mt-md Workspace
-              span().text-white.full-width {{ pages.find(p => p.id === $route.params.page).name }}
+            .row.full-height.items-center.content-center
+              span(:style=`{fontSize: '20px', lineHeight: 1}`).text-white Workspace
+              span(:style=`{lineHeight: 1.1}`).text-white.full-width {{ pages.find(p => p.id === $route.params.page).name }}
   //- footer
   q-footer(v-if="$q.screen.width < 1300")
     .row.full-width.justify-center
@@ -102,12 +103,11 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', ba
 import wsItems from './ws_items'
 import wsSpheres from './ws_spheres'
 import wsSettings from './ws_settings'
-import contentNoter from 'components/node/content_noter'
 import wsItemSaver from './ws_item_saver'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsSpheres, wsSettings, contentNoter, wsItemSaver},
+  components: {wsItems, wsSpheres, wsSettings, wsItemSaver},
   props: [],
   data () {
     return {

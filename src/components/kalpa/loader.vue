@@ -1,10 +1,10 @@
-<template lang="pug">
-  .row.fit.justify-center.items-start.content-start
-    slot(v-if="query" name="items" :items="query.items")
-</template>
-
 <script>
 export default {
+  render () {
+    return this.$scopedSlots.default({
+      items: this.query ? this.query.items : []
+    })
+  },
   name: 'kalpaLoader',
   props: {
     type: {type: String, required: true},
@@ -94,13 +94,6 @@ export default {
       this.itemsCount = items.length
       // this.$log('itemsLoad done')
     }
-  },
-  async mounted () {
-    // this.$log('mounted')
-    // TODO: load all the items if they are in cache...
-  },
-  beforeDestroy () {
-    // this.$logD('beforeDestroy')
   }
 }
 </script>

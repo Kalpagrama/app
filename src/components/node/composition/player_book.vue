@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width
-  span player book
+  span player BOOK
 </template>
 
 <script>

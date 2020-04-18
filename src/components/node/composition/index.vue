@@ -2,11 +2,24 @@
 div(
   :style=`{position: 'relative', height: mini ? 'auto' : '100%', borderRadius: '10px', overflow: 'hidden'}`
   ).row.full-width.items-start.content-start
+  //- debug
+  div(
+    v-if="false"
+    :style=`{
+      position: 'absolute', zIndex: 1000, top: '0px', color: 'white',
+      transform: 'translate3d(0,0,0)',
+    }`
+    ).row.full-width
+    .row.bg-red
+      small active: {{active}}
   //- composition menu
   q-btn(
     v-if="true &ctx !== 'workspace' && visible && active && !mini && value"
     round flat color="white" icon="more_vert" @click="menuToggle()"
-    :style=`{position: 'absolute', zIndex: 2000, top: '10px', right: '10px', background: 'rgba(0,0,0,0.8)', transform: 'translate3d(0,0,0)'}`)
+    :style=`{
+      position: 'absolute', zIndex: 2000, top: '10px', right: '10px',
+      background: 'rgba(0,0,0,0.5)', transform: 'translate3d(0,0,0)'
+    }`)
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"

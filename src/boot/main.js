@@ -1,16 +1,11 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
-import VueYandexMetrika from 'vue-yandex-metrika'
+// import VueYandexMetrika from 'vue-yandex-metrika'
 
-const debug = require('debug')('[boot]:main')
-debug.enabled = true
-
-import { LoadingBar, date, Notify } from 'quasar'
+import { LoadingBar, date } from 'quasar'
 import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
-import 'viewerjs/dist/viewer.css'
-import Viewer from 'v-viewer'
 import VueMasonry from 'vue-masonry-css'
 
 const time = (sec) => {
@@ -36,21 +31,19 @@ export default async ({ Vue, store, router: VueRouter }) => {
   try {
     router = VueRouter
     Vue.use(VueMasonry)
-    Vue.use(VueYandexMetrika, {
-      id: 60818698,
-      router: router,
-      // env: process.env.NODE_ENV
-      // other options
-    })
-    Vue.use(Viewer)
+    // Vue.use(VueYandexMetrika, {
+    //   id: 60818698,
+    //   router: router,
+    //   // env: process.env.NODE_ENV
+    //   // other options
+    // })
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-    LoadingBar.setDefaults({
-      color: '#4caf50',
-      size: '6px',
-      position: 'top'
-    })
-    // TODO: memory leak with tweenmax, switch to tween lite
+    // LoadingBar.setDefaults({
+    //   color: 'purple',
+    //   size: '50px',
+    //   position: 'top'
+    // })
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {
       return date.formatDate(ts, format || 'YYYY.MM.DD', {
@@ -58,7 +51,6 @@ export default async ({ Vue, store, router: VueRouter }) => {
         monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
       })
     }
-    // sync(store, router, { moduleName: 'route' })
     Vue.prototype.$time = time
     Vue.prototype.$random = function (min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min
@@ -72,56 +64,37 @@ export default async ({ Vue, store, router: VueRouter }) => {
         return colors[id] || (colors[id] = `rgb(${r()}, ${r()}, ${r()})`)
       }
     }
-    Vue.prototype.$deleteTypename = function (obj) {
-      let round = (obj) => {
-        if (obj.__typename) delete obj.__typename
-        for (const k in obj) {
-          if (obj[k] === Object(obj[k])) round(obj[k])
-        }
-      }
-      round(obj)
-      return obj
-    }
-    Vue.prototype.$isInteger = (num) => {
-      return (num ^ 0) === num
-    }
     // node
-    Vue.component('node', () => import('components/node'))
-    Vue.component('nodeSaver', () => import('components/node/node_saver'))
-    Vue.component('nodeEditor', () => import('components/node/node_editor'))
-    Vue.component('nodeList', () => import('components/node/list'))
-    Vue.component('nodeSpheres', () => import('components/node/spheres'))
-    Vue.component('nodeSpheresEditor', () => import('components/node/spheres_editor'))
-    Vue.component('nodeExplorer', () => import('components/node_explorer'))
+    Vue.component('node', () => import('components/node/index.vue'))
+    Vue.component('composition', () => import('components/node/composition'))
+    // editors
+    Vue.component('nodeEditor', () => import('components/node_editor'))
+    Vue.component('compositionEditor', () => import('components/node/composition_editor'))
+    Vue.component('contentEditor', () => import('components/content_editor'))
+    // Vue.component('chainEditor', () => import('components/chain_editor'))
+    // workspace
+    Vue.component('wsItems', () => import('components/workspace/ws_items'))
+    Vue.component('wsItemFinder', () => import('components/workspace/ws_item_finder'))
+    Vue.component('wsContentFinder', () => import('components/workspace/ws_content_finder'))
+    Vue.component('wsItemSaver', () => import('components/workspace/ws_item_saver'))
+    // explore
+    Vue.component('userExplorer', () => import('components/user_explorer'))
+    Vue.component('sphereExplorer', () => import('components/sphere_explorer'))
+    Vue.component('sphereSpheres', () => import('components/sphere_spheres'))
+    Vue.component('sphereListTop', () => import('components/sphere_list_top'))
+    Vue.component('contentExplorer', () => import('components/content_explorer'))
+    Vue.component('chainExplorer', () => import('components/chain_explorer'))
+    // lists
+    Vue.component('listMasonry', () => import('components/list_masonry'))
+    Vue.component('listMiddle', () => import('components/list_middle'))
     // kalpa
-    Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
     Vue.component('kalpaAction', () => import('components/kalpa/action'))
     Vue.component('kalpaAvatar', () => import('components/kalpa/avatar'))
-    Vue.component('kalpaLoader', () => import('components/kalpa/loader'))
     Vue.component('kalpaButtons', () => import('components/kalpa/buttons'))
     Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
-    Vue.component('kalpaMenuDesktop', () => import('components/kalpa/menudesktop'))
-    Vue.component('kalpaMenuMobile', () => import('components/kalpa/menumobile'))
-    Vue.component('kalpaMenuXs', () => import('components/kalpa/menuxs'))
-    Vue.component('kalpaSpinner', () => import('components/kalpa/spinner'))
-    Vue.component('kalpaTutorial', () => import('components/kalpa/tutorial'))
     Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))
-    // ws
-    Vue.component('wsItems', () => import('components/workspace/ws_items'))
-    // Vue.component('noteEditor', () => import('components/'))
-    // composition
-    Vue.component('composition', () => import('components/node/composition'))
-    Vue.component('compositionList', () => import('components/node/composition_list'))
-    Vue.component('compositionFinder', () => import('components/node/composition_finder'))
-    Vue.component('compositionEditor', () => import('components/node/composition_editor'))
-    // sphere
-    Vue.component('sphereSpheres', () => import('components/sphere_spheres'))
-    // content
-    Vue.component('content', () => import('components/node/content'))
-    Vue.component('contentFinder', () => import('components/node/content_finder'))
-    Vue.component('contentEditor', () => import('components/node/content_editor'))
-    Vue.component('contentExplorer', () => import('components/node/content_explorer'))
-    Vue.component('listMasonry', () => import('components/list_masonry'))
+    Vue.component('kalpaLoader', () => import('components/kalpa/loader'))
+    // Vue.component('kalpaSettings', () => import('components/kalpa/settings'))
   } catch (err) {
     logE(err)
   }

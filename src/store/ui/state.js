@@ -2,7 +2,7 @@ export default {
   initialized: false,
   menuAppShow: false,
   borderRadius: 8,
-  maxWidthPage: 700,
+  maxWidthPage: 800,
   maxWidthMenu: 230,
   actionOptions: null,
   actionOpened: false,

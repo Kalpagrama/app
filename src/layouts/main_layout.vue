@@ -1,20 +1,4 @@
 <style lang="sass">
-// iframe
-//   width: 100%
-//   height: 500px
-.q-btn
-  borderRadius: 10px
-.q-header
-  background: none !important
-.q-footer
-  background: none !important
-h1
-  font-size: 60px
-  font-weight: 400
-  margin: 0
-// html, body
-//   position: fixed
-//   bottom: 0px
 .menu-item
   &:hover
     background: #888
@@ -31,12 +15,11 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
     v-if="$route.name !== 'welcome' && $q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
     :style=`{
       position: 'fixed',
-      zIndex: 1000,
+      zIndex: 1,
       top: '0px',
       width: $store.state.ui.maxWidthMenu+'px',
-      height: $q.screen.height+'px',
       left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '0px',
+      paddingTop: '0px'
     }`).column.q-px-sm.q-pb-sm
     div(
       :style=`{height: '60px'}`
@@ -51,15 +34,17 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
           borderRadius: '10px', overflow: 'hidden'
         }`
         ).column.full-width.bg-grey-9
-          div(
+          router-link(
+            v-if="!loading && $store.getters.currentUser"
+            :to="'/user/'+$store.getters.currentUser.oid"
             :style=`{height: '70px'}`
             ).row.full-width.items-center.content-center
             div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-              div(:style=`{height: '40px', width: '40px', borderRadius: '50%'}`).row.bg-grey-3
+              kalpa-avatar(:url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
             .col.full-height
               .row.fit.items-center.content-center
-                span(:style=`{lineHeight: 1.1}`).text-white.text-bold Ivan Motovilov
-                small.text-white.full-width @ivanmoto
+                span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser.name}}
+                small.text-white.full-width {{ '@'+$store.getters.currentUser.name }}
           router-link(
             v-for="(p,pi) in pages" :key="p.id"
             :to="{name: p.id}"
@@ -74,7 +59,7 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
               q-btn(round dense flat :icon="p.icon" color="white")
             span.text-white {{ p.name }}
           .row.full-width.items-center.q-px-md.q-py-sm
-            small.text-white 1.0.0
+            small.text-grey-6.q-ml-xs 1.0
   q-page-container
     q-page
       router-view(
@@ -86,24 +71,20 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
 </template>
 
 <script>
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
+// import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 
 export default {
   name: 'mainLayout',
-  components: {},
   data () {
     return {
       loading: true,
-      drawerShow: true,
-      drawerShowMobile: false,
-      drawerMini: true,
       offsetTop: null,
       pages: [
         {id: 'home', name: 'Home', icon: 'home'},
-        {id: 'subscriptions', name: 'Subscriptions', icon: 'list'},
-        {id: 'notifications', name: 'Notifications', icon: 'notifications'},
+        // {id: 'subscriptions', name: 'Subscriptions', icon: 'list'},
+        // {id: 'notifications', name: 'Notifications', icon: 'notifications'},
         {id: 'trends', name: 'Trends', icon: 'whatshot'},
         {id: 'workspace', name: 'Workspace', icon: 'school'},
         {id: 'settings', name: 'Settings', icon: 'tune'},
@@ -122,7 +103,6 @@ export default {
       this.offsetTop = vv.offsetTop
       this.$store.commit('ui/stateSet', ['height', height])
       this.$store.commit('ui/stateSet', ['offsetTop', this.offsetTop])
-      // this.$q.notify('onResize: ' + height + '/' + this.offsetTop)
     }
   },
   async created () {
@@ -141,6 +121,7 @@ export default {
       this.$log('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
     }
+    // go to welcom...
     if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     this.loading = false
   },

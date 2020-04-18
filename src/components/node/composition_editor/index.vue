@@ -1,6 +1,6 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  video-composer(:content="content" :composition="composition" @cancel="$emit('cancel')")
+  video-composer(:composition="composition" :loading="loading" @cancel="$emit('cancel')")
   //- image composer
   //- book composer
   //- html composer
@@ -12,10 +12,6 @@ import videoComposer from './video_composer'
 export default {
   name: 'compositionEditor',
   components: { videoComposer },
-  props: {
-    saving: {type: Boolean},
-    composition: {type: Object},
-    content: {type: Object}
-  }
+  props: ['composition', 'saving']
 }
 </script>

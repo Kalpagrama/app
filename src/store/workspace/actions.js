@@ -176,8 +176,10 @@ export const updateWsLists = async (context, event) => {
   for (let key in context.rootState.cache.cachedItems) {
     if (!key.startsWith(listKeyPattern)) continue
     let collection = key.slice(listKeyPattern.length)
+    logD('updateWsItems collection', collection)
     assert(object.wsItemType, '!object.wsItemType')
     if (getCollection(object.wsItemType) !== collection) continue
+    logD('updateWsItems after CONTINUE', key)
     if (type === 'WS_ITEM_CREATED') {
       await context.dispatch('cache/update', {
         key: key,

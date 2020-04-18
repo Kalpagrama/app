@@ -1,15 +1,15 @@
 <template lang="pug">
 div(
-  :style=`{position: 'relative'}`
+  :style=`{}`
   ).column.fit.items-center.content-center.justify-center.bg-grey-10
   //- tint
-  div(
-    v-if="false"
-    :style=`{
-      position: 'fixed', zIndex: 200, background: 'rgba(0,0,0,'+tintOpacity+')',
-      pointerEvents: 'none'
-    }`
-    ).row.fit.bg
+  //- div(
+  //-   v-if="nodeOid"
+  //-   :style=`{
+  //-     position: 'fixed', top: '0px', zIndex: 200, transform: 'translate3d(0,0,0)', background: 'rgba(0,0,0,'+0.9+')',
+  //-     pointerEvents: 'none'
+  //-   }`
+  //-   ).row.fit
   //- body items
   div(
     ref="scrollWrapper"
@@ -19,39 +19,38 @@ div(
       overflow: scrollOverflow
     }`
     ).col.full-width.scroll
-    .row.full-width.justify-center
-      masonry(
-        :cols="{default: 3}"
-        :gutter="{default: 10}"
-        :style=`{position: 'relative', marginTop: '20px', maxWidth: $store.state.ui.maxWidthPage+'px', marginBottom: '500px'}`).full-width
+    masonry(
+      :cols="{default: 3}"
+      :gutter="{default: 10}"
+      :style=`{position: 'relative', marginTop: '8px', paddingRight: '8px', marginBottom: '2000px'}`).row.full-width.justify-center
+      div(
+        v-for="(i, ii) in items" :key="i.oid"
+        @mouseenter="itemEnter(i, ii)"
+        @mouseleave="itemLeave(i, ii)"
+        :class=`{
+        }`
+        :style=`{
+          position: 'relative'
+        }`
+        ).row.full-width.items-start.content-start.q-mb-sm
+        //- div(:style=`{position: 'absolute', top: '8px', left: '8px', zIndex: 100}`).row.bg-red
+        //-   small Lorem ipsum !!!
+        //- copy
+        img(
+          @click="itemClick(null, null)"
+          :ref="`item-img-${i.oid}`"
+          draggable="false"
+          :src="i.meta.items[0].thumbUrl"
+          :style=`{opacity: 0.1, width: '100%', borderRadius: '10px', overflow: 'hidden'}`)
+        //- slot
         div(
-          v-for="(i, ii) in items" :key="i.oid"
-          @mouseenter="itemEnter(i, ii)"
-          @mouseleave="itemLeave(i, ii)"
+          :ref="`item-${i.oid}`"
           :class=`{
+            'shadow-20': i.oid === itemOid
           }`
-          :style=`{
-            position: 'relative'
-          }`
-          ).row.full-width.items-start.content-start.q-mb-sm
-          //- div(:style=`{position: 'absolute', top: '8px', left: '8px', zIndex: 100}`).row.bg-red
-          //-   small Lorem ipsum !!!
-          //- copy
-          img(
-            @click="itemClick(null, null)"
-            :ref="`item-img-${i.oid}`"
-            draggable="false"
-            :src="i.meta.items[0].thumbUrl"
-            :style=`{opacity: 0.1, width: '100%', borderRadius: '10px', overflow: 'hidden'}`)
-          //- slot
-          div(
-            :ref="`item-${i.oid}`"
-            :class=`{
-              'shadow-20': i.oid === itemOid
-            }`
-            :style="itemStyles(i.oid)"
-            ).row.fit
-            slot(name="item" :item="i" :index="ii" :isHovered="i.oid === itemOidHovered")
+          :style="itemStyles(i.oid)"
+          ).row.fit
+          slot(name="item" :item="i" :index="ii" :isOpened="i.oid === itemOid" :isHovered="i.oid === itemOidHovered")
 </template>
 
 <script>
@@ -278,14 +277,15 @@ export default {
     this.$log('mounted')
     window.onkeydown = (e) => {
       if (e.keyCode === 32) {
-        // e.preventDefault()
-        // let i = this.itemIndex + 1
-        // if (!this.items[i]) i = 0
-        // this.itemClick(this.items[i], i)
-        // // this.$tween.to(this.$refs.scrollWrapper, 0.5, {scrollTop: this.itemOffsetTop + 300})
+        e.preventDefault()
+        let i = this.itemIndex + 1
+        if (!this.items[i]) i = 0
+        this.itemClick(this.items[i], i)
+        // this.$tween.to(this.$refs.scrollWrapper, 0.5, {scrollTop: this.itemOffsetTop + 300})
       }
       else if (e.key === 'Escape') {
         this.itemClick(null, null)
+        this.itemOid = null
       }
     }
     // this.$wait(0).then(() => {

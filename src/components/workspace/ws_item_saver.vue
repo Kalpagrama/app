@@ -29,7 +29,7 @@ export default {
     item: {
       deep: true,
       handler (to, from) {
-        // this.$log('item CHANGED to', to.revision)
+        this.$log('item CHANGED to', to.revision)
         if (this.itemUpdating) return
         this.itemUpdate()
       }
@@ -41,6 +41,7 @@ export default {
         this.$log('itemUpdate start revision: ', this.item.revision)
         if (this.itemUpdating) return
         this.itemUpdating = true
+        if (this.item.rawData.name) this.item.name = this.item.rawData.name
         let item = await this.$store.dispatch('workspace/wsItemUpdate', JSON.parse(JSON.stringify(this.item)))
         this.$log('itemUpdate done revision:', item.revision)
       } catch (e) {
