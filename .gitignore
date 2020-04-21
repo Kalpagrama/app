@@ -2,11 +2,8 @@
 .DS_Store
 .thumbs.db
 node_modules
+src-capacitor____
 /dist
-/src-cordova/node_modules
-/src-cordova/platforms
-/src-cordova/plugins
-/src-cordova/www
 /src-cordova/*.keystore
 /public
 npm-debug.log*

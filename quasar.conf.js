@@ -204,8 +204,6 @@ module.exports = function (ctx) {
       }
     },
     capacitor: {
-      appName: 'QWERTY',
-      appId: 'com.company.appname',
       // iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices
       backButtonExit: false // Quasar handles app exit on mobile phone back button
     }

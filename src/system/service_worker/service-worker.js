@@ -56,8 +56,7 @@ function sendMsg (type, msgData) {
     // порядок вызовов precacheAndRoute и registerRoute имеет значение
     // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
     workbox.precaching.precacheAndRoute(self.__precacheManifest, {})
-    workbox.routing.registerRoute( // share_target
-      /\/share_target\/?$/,
+    workbox.routing.registerRoute(/\/share_target\/?$/,
       async ({ url, event, params }) => {
         logDebug('share_target 1', url, workbox.precaching.getCacheKeyForURL('/index.html'))
         // if (event.request.method === 'POST') {

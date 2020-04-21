@@ -1,0 +1,13 @@
+{
+  "name": "kalpagramma",
+  "version": "1.0.1",
+  "description": "Kalpagramma application",
+  "author": "kalpagramma <info@kalpagramma.ru>",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^2.0.1",
+    "@capacitor/cli": "^1.0.0",
+    "@capacitor/core": "^1.0.0",
+    "@capacitor/ios": "^2.0.1"
+  }
+}

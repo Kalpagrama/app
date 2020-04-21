@@ -54,7 +54,8 @@ const LogModulesEnum = Object.freeze({
   VUEX: 'vuex',
   BOOT: 'boot',
   VUEX_WS: 'vuex_ws',
-  ML: 'mainLayout'
+  ML: 'mainLayout',
+  CP: 'capacitor'
 })
 Object.freeze(LogModulesEnum)
 

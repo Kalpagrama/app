@@ -1,14 +1,15 @@
 {
   "name": "kalpagramma",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Kalpagramma application",
   "productName": "KALPAGRAMMA",
   "cordovaId": "app.kalpa",
   "capacitorId": "app.kalpa",
-  "author": "Ivan Motovilov <ivanmoto@pm.me>",
+  "author": "kalpagramma <info@kalpagramma.ru>",
+  "license": "ISC",
   "private": true,
   "main": "index.js",
-  "scripts":  {
+  "scripts": {
     "dev": "quasar dev -m spa",
     "dev_spa": "quasar dev -m spa",
     "dev_pwa": "quasar dev -m pwa --content-base dist",
@@ -18,7 +19,7 @@
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",
     "build_android": "quasar build -m capacitor -T android",
-    "build_ios": "quasar build -m capacitor -T ios",
+    "build_ios": "quasar build -m capacitor -T ios -ide",
     "gql": "apollo schema:download -k ./src/schema/graphql.schema.json && node ./src/system/gql/possible_types.js",
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
