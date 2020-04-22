@@ -20,15 +20,7 @@ q-layout(
       right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
       paddingTop: '68px',
     }`).row.items-start.content-start.q-px-sm.q-pb-sm
-    div(
-      :style=`{
-        borderRadius: '10px', overflow: 'hidden'
-      }`
-      ).column.full-width.bg-grey-9
-      div(:style=`{height: '50px'}`).row.full-width.items-center.content-content-center.q-px-md
-        span.text-white.text-bold Trending now
-      .col.full-width
-        sphere-list-top(:oid="$route.params.oid" @oid="$router.push({params: {oid: $event}})")
+    menu-right
   //- header
   q-header(
     reveal
@@ -49,18 +41,27 @@ q-layout(
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
           q-btn(round flat color="grey-5" icon="more_vert")
   //- footer
-  q-footer(
-    reveal)
+  q-footer(reveal)
     div(:style=`{height: '60px'}`).row.full-width.justify-center
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius:  '10px 10px 0 0'}`
         ).row.fit.items-center.content-center.justify-between.bg-grey-8.q-px-sm
         q-btn(
-          round push color="green" icon="add" size="lg"
-          :style=`{position: 'absolute', top: '-40px', left: '50%', transform: 'translate(-50%, 0)',borderRadius: '50% !important'}`)
-        q-btn(round flat color="grey-4" icon="menu").q-mr-sm
+          round push color="green" icon="add" size="md"
+          :style=`{position: 'absolute', zIndex: 1000, top: '-26px', left: '50%', transform: 'translate(-50%, 0)',borderRadius: '50% !important'}`)
+        q-btn(round flat color="grey-5" icon="menu")
+          q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
+            div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-9
+              kalpa-menu
         .col.full-height
           .row.fit.items-center.content-center.q-px-sm
-        q-btn(round flat color="grey-4" icon="more_vert").q-mr-sm
+        q-btn(round flat color="grey-4" icon="more_vert")
+          q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
+            div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-8
+              //- div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-pa-md
+              //-   span.text-white {{ content.name }}
+              menu-right
+              //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+              //-   q-btn(round flat color="grey-5" icon="keyboard_arrow_left")
   //- page
   q-page-conainter
     q-page
@@ -76,8 +77,11 @@ q-layout(
 </template>
 
 <script>
+import menuRight from './menu_right'
+
 export default {
-  name: 'pageApp-trends',
+  name: 'trendsExplorer',
+  components: {menuRight},
   props: ['sphere'],
   data () {
     return {
@@ -86,7 +90,7 @@ export default {
   },
   computed: {
     sphereOid () {
-      return this.$route.params.oid
+      return this.sphere.oid
     },
     variables () {
       return {
@@ -104,7 +108,7 @@ export default {
   mounted () {
     this.$log('mounted')
     // this.$q.addressbarColor.set('#222')
-    // document.body.style.background = '#222'
+    document.body.style.background = '#222'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

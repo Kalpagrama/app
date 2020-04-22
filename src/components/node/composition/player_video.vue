@@ -96,7 +96,7 @@ div(
         @timeupdate="videoUpdate"
         :style=`{
           position: 'relative', width: '100%', height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden',
-          opacity: videoLoadeddataDone && videoGood ? 1 : 1,
+          opacity: videoLoadeddataDone && videoGood ? 1 : 0,
           border: videoLoadeddataDone && videoGood ? 'none' : '0.5px solid red'
         }`)
     //- video tools

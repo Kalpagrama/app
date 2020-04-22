@@ -12,17 +12,15 @@ const routes = [
     component: () => import('layouts/main_layout'),
     children: [
       { name: 'welcome', path: 'welcome', component: () => import('pages/app/welcome') },
-      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
+      { name: 'home', path: '', component: () => import('components/home_explorer') },
       { name: 'workspace', path: 'workspace/:page?/:oid?', component: () => import('components/workspace') },
-      // lists
-      { name: 'home', path: '', component: () => import('pages/app/home') },
-      { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/trends') },
+      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
       // items
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
+      { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?/:page?', component: () => import('pages/app/content') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
-      // { name: 'node', path: 'node/:oid?', component: () => import('pages/app/node') },
       // tools
       { name: 'refresh', path: 'refresh', component: () => import('pages/app/refresh') },
       { name: 'report', path: 'report', component: () => import('pages/app/report') },

@@ -14,7 +14,7 @@
       :style=`{
         borderRadius: '10px', overflow: 'hidden'
       }`
-      ).column.full-width.bg-grey-9
+      ).column.full-width.bg-grey-8
         router-link(
           v-if="$store.getters.currentUser"
           :to="'/user/'+$store.getters.currentUser.oid"

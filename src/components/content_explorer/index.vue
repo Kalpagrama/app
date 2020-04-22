@@ -26,7 +26,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
     .row.full-width.justify-center
       div(
         :style=`{height: '60px', maxWidth: $store.state.maxWidthPage+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
-        ).row.full-width.items-center.bg-grey-9.q-px-sm
+        ).row.full-width.items-center.bg-grey-8.q-px-sm
         q-btn(round flat color="grey-5" icon="menu")
           q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
             div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-9
@@ -34,7 +34,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
         .col
         q-btn(round flat color="grey-5" icon="more_vert")
           q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
-            div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-9
+            div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-8
               div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-pa-md
                 span.text-white {{ content.name }}
               menu-right
