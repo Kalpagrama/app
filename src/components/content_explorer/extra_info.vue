@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
+div(:style=`{position: 'relative'}`).column.full-width
   //- header
   .row.full-width.justify-center
     div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.items-center.q-px-md

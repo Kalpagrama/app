@@ -13,12 +13,15 @@ export default {
   computed: {
   },
   watch: {
-    $route: {
+    '$route.params.oid': {
       immediate: true,
       async handler (to, from) {
-        if (to && to.params.oid) {
-          this.$log('$route CHANGED to.params.oid', to.params.oid)
-          this.content = await this.contentLoad(to.params.oid)
+        if (to) {
+          this.$log('$route CHANGED to.params.oid', to)
+          this.content = await this.contentLoad(to)
+        }
+        else {
+          this.$q.notify({color: 'red', textColor: 'white', message: 'No content!'})
         }
       }
     }

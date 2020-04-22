@@ -96,7 +96,7 @@ div(
         @timeupdate="videoUpdate"
         :style=`{
           position: 'relative', width: '100%', height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden',
-          opacity: videoLoadeddataDone && videoGood ? 1 : 0,
+          opacity: videoLoadeddataDone && videoGood ? 1 : 1,
           border: videoLoadeddataDone && videoGood ? 'none' : '0.5px solid red'
         }`)
     //- video tools
@@ -122,9 +122,11 @@ export default {
   data () {
     return {
       now: 0,
+      count: 0,
       nowPause: false,
       duration: 0,
       player: null,
+      playerInited: false,
       playing: false,
       muted: true,
       autoplay: true,
@@ -139,8 +141,8 @@ export default {
       forwarding: null,
       forwardingInterval: null,
       forwardingCount: 0,
-      compositionContent: null,
-      videoLoadeddataDone: false
+      videoLoadeddataDone: false,
+      content: null,
     }
   },
   computed: {
@@ -166,7 +168,7 @@ export default {
       return this.composition.layers
     },
     layer () {
-      return this.layers[this.layerIndex] || null
+      return this.layers[this.layerIndex]
     },
     layerStart () {
       if (!this.layer) return false
@@ -185,10 +187,6 @@ export default {
       else {
         return this.layer.figuresRelative[1].t
       }
-    },
-    content () {
-      if (this.layer) return this.layer.content
-      else return this.compositionContent
     },
     contentSource () {
       if (this.ctx === 'workspace') {
@@ -262,18 +260,16 @@ export default {
     layer: {
       immediate: true,
       async handler (to, from) {
+        this.$log('layer CHANGED', to)
         if (to) {
-          if (!to.content) to.content = await this.$store.dispatch('objects/get', {oid: to.contentOid})
-        }
-      }
-    },
-    layerIndex: {
-      immediate: false,
-      handler (to, from) {
-        this.$log('layerIndex CHANGED', to)
-        if (to > -1) {
-          this.player.setCurrentTime(this.layerStart)
-          this.player.update()
+          this.content = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+          this.$nextTick(() => {
+            if (!this.player) this.playerInit()
+          })
+          if (this.player) {
+            this.player.setCurrentTime(this.layerStart)
+            this.player.update()
+          }
         }
       }
     },
@@ -427,7 +423,8 @@ export default {
       this.$q.fullscreen.toggle()
     },
     playerInit () {
-      this.$log('playerInit', this.contentSource)
+      this.$log('playerInit START')
+      this.$log('platerInit content', this.content)
       if (this.contentSource === 'KALPA') {
         this.player = {}
         this.player.setCurrentTime = async (ms) => {
@@ -540,10 +537,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    if (this.composition.contentOid) this.compositionContent = await this.$store.dispatch('objects/get', {oid: this.composition.contentOid})
-    this.$nextTick(() => {
-      this.playerInit()
-    })
     this.$on('meta', this.onMeta)
   },
   beforeDestroy () {

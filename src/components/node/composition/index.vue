@@ -13,13 +13,22 @@ div(
     .row.bg-red
       small active: {{active}}
   //- composition menu
+  //- TODO move to player_video...
   q-btn(
-    v-if="true &ctx !== 'workspace' && visible && active && !mini && value"
-    round flat color="white" icon="more_vert" @click="menuToggle()"
+    v-if="true && ctx !== 'workspace' && visible && active && !mini && value"
+    round flat color="white" icon="more_vert"
     :style=`{
       position: 'absolute', zIndex: 2000, top: '10px', right: '10px',
       background: 'rgba(0,0,0,0.5)', transform: 'translate3d(0,0,0)'
     }`)
+    q-menu(cover anchor="top right" max-width="300px")
+      .column.fit.bg-grey-9
+        div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
+          //- span.text-white.text-bold {{ value.layers[0].content.name }}
+        .col.full-width.scroll
+          //- .row.full-width.items-center.content-center
+          q-btn(flat dark no-caps align="left" :to="'/content/'+value.layers[0].contentOid").full-width Go to content
+          q-btn(flat dark no-caps align="left").full-width Report
   //- next tint
   div(
     v-if="mini" @click="$emit('next')"
@@ -35,7 +44,7 @@ div(
   //- players
   player-video(
     v-if="visible && value"
-    :ctx="ctx" :composition="value" :contentInput="content"
+    :ctx="ctx" :composition="value"
     :visible="visible" :active="active" :mini="mini"
     :bgClass="bgClass"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
@@ -54,7 +63,6 @@ export default {
   props: {
     ctx: {type: String},
     value: {type: Object},
-    content: {type: Object},
     preview: {type: String},
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},

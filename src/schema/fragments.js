@@ -10,6 +10,15 @@ const metaFragment = gql`
       items{
         oid
         thumbUrl(preferWidth: 600)
+        ...on Composition {
+          oid
+          layers {
+            contentOid
+            figuresAbsolute {
+              t
+            }
+          }
+        }
       }
       layout
     }

@@ -138,7 +138,7 @@ export default {
             this.$router.replace('/workspace/' + to).catch(e => e)
           }
         } else {
-          this.$router.push({params: {page: 'contentNotes'}})
+          this.$router.replace({params: {page: 'contentNotes'}})
         }
       }
     }
