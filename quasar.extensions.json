@@ -17,6 +17,9 @@
         },
         "spa": {
           "iconHash": "baef8a49557fbc815337f7a18c5b7421"
+        },
+        "pwa": {
+          "iconHash": "baef8a49557fbc815337f7a18c5b7421"
         }
       },
       "build": {
@@ -27,6 +30,9 @@
           "backgroundColor": "#FFFFFF"
         },
         "spa": {
+          "iconHash": "baef8a49557fbc815337f7a18c5b7421"
+        },
+        "pwa": {
           "iconHash": "baef8a49557fbc815337f7a18c5b7421"
         }
       }

@@ -3,5 +3,7 @@
   "appName": "KALPAGRAMMA",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
-  "webDir": "www"
+  "webDir": "www",
+  "backgroundColor": "#22222222",
+  "server": {}
 }

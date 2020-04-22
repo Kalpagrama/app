@@ -144,6 +144,8 @@ module.exports = function (ctx) {
       // },
       // https: true,
       port: 8282,
+      // https: true,
+      // host: 'mac.kalpagramma.com',
       open: true // opens browser window automatically
     },
     // animations: 'all',

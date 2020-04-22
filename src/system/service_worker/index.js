@@ -2,6 +2,7 @@ import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'boot/i18n'
+import { capacitorInit } from 'src/system/capacitor'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
@@ -74,8 +75,9 @@ async function initSw (store) {
   if ('serviceWorker' in navigator && !registration) {
     // init sw
     {
+      logD('try navigator.serviceWorker.register service-worker.js')
       registration = await navigator.serviceWorker.register('/service-worker.js')
-      logD('Registration sw succeeded. Scope is ' + registration.scope)
+      logD('Registration sw succeeded. Scope is ', registration.scope)
 
       wait(100).then(() => {
         logD('sendMessageToSW...')
@@ -148,7 +150,7 @@ async function initSw (store) {
     }
     logD('initSw complete')
     // await initWebPush(store)
-  }
+  } else logW('serviceWorker disabled!')
 
   function handleNetworkChange (event) {
     logD('handleNetworkChange', navigator.onLine)
@@ -254,8 +256,7 @@ async function update () {
 
 async function askForWebPushPerm (store) {
   if (Platform.is.capacitor) {
-    const moduleCapacitor = await import('src/system/capacitor.js')
-    await moduleCapacitor.capacitorWebPushInit()
+    await capacitorInit()
     return true
   } else {
     return new Promise((resolve, reject) => {

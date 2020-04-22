@@ -1,27 +1,34 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import assert from 'assert'
 import {
   Plugins,
   PushNotification,
   PushNotificationToken,
-  PushNotificationActionPerformed
-} from '@capacitor/core'
+  PushNotificationActionPerformed } from '../../src-capacitor/node_modules/@capacitor/core';
+const { PushNotifications, Share } = Plugins;
 import { Platform } from 'quasar'
-
-const { PushNotifications, Share } = Plugins
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.CP)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.CP)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.CP)
 
-let shareRet = Share.addListener('qwerty', () => {
-  alert('share menu!!!')
-})
+// let PushNotifications, Share
+
+async function capacitorInit(){
+  alert('-+++-Platform.is=' + JSON.stringify(Platform.is))
+  if (Platform.is.capacitor) {
+    // const capacitor = await import('../../src-capacitor/node_modules/@capacitor/core')
+    // PushNotifications = capacitor.Plugins.PushNotifications
+    // Share = capacitor.Plugins.Share
+    // logD('PushNotifications=', PushNotifications)
+    // logD('Share=', Share)
+    capacitorShowShareDialog().catch(err => logD('err on capacitor init', err))
+    await capacitorWebPushInit()
+  }
+}
 
 async function capacitorWebPushInit () {
-  alert('----Platform.is=' + JSON.stringify(Platform.is))
-
-  await capacitorShowShareDialog()
-
+  assert(PushNotifications)
   // Request permission to use push notifications
   // iOS will prompt user and return if they granted permission or not
   // Android will just grant without prompting
@@ -59,10 +66,12 @@ async function capacitorWebPushInit () {
 }
 
 async function capacitorShareInit () {
+  assert(Share)
   let shareRet = await Share.addListener()
 }
 
 async function capacitorShowShareDialog () {
+  assert(Share)
   let shareRet = await Share.share({
     title: 'title kalpagramma share data',
     text: 'text kalpagramma share data',
@@ -71,4 +80,4 @@ async function capacitorShowShareDialog () {
   })
 }
 
-export { capacitorWebPushInit }
+export { capacitorInit }
