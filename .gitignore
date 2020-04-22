@@ -2,7 +2,7 @@
 .DS_Store
 .thumbs.db
 node_modules
-src-capacitor____
+src-pwa
 /dist
 /src-cordova/*.keystore
 /public
