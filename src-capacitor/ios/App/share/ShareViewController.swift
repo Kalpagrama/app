@@ -2,7 +2,7 @@
 //  ShareViewController.swift
 //  share
 //
-//  Created by IGOR on 21.04.2020.
+//  Created by IGOR on 22.04.2020.
 //
 
 import UIKit
