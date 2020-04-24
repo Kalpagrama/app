@@ -23,6 +23,7 @@ module.exports = function (ctx) {
     extras: [
       'roboto-font',
       'material-icons',
+      'fontawesome-v5'
     ],
     framework: {
       all: true,
@@ -62,6 +63,7 @@ module.exports = function (ctx) {
         'TouchRepeat'
       ],
       plugins: [
+        'Meta',
         'Notify',
         'BottomSheet',
         'AppFullscreen',

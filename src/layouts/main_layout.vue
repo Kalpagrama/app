@@ -30,6 +30,7 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
         v-else
         ).row.full-width.window-height.items-center.content-center.justify-center.bg-black
         q-spinner(color="green" size="50px")
+    //- h1.text-white hello
 </template>
 
 <script>
