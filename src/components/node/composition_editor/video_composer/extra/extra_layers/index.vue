@@ -10,8 +10,8 @@ div(:style=`{}`).column.fit
   //- add
   q-btn(
     v-if="true"
-    round push color="green" icon="add" size="lg" @click="layerAdd()"
-    :style=`{position: 'absolute', zIndex: 1000, right: '30px', top: '-90px', borderRadius: '50%'}`)
+    round push color="green" icon="add" size="md" @click="layerAdd()"
+    :style=`{position: 'absolute', zIndex: 1000, right: '20px', top: '-50px', borderRadius: '50%'}`)
   //- header
   //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
   div(
@@ -32,29 +32,27 @@ div(:style=`{}`).column.fit
       div(
         v-for="(l,li) in meta.layers" :key="li" :ref="`layer-${li}`"
         v-if="l.figuresAbsolute.length > 0"
-        :class=`{
-          'bg-grey-6': li === meta.layerIndexPlay,
-          'bg-grey-7': li !== meta.layerIndexPlay,
-        }`
         :style=`{
-          position: 'relative',
-          borderRadius: '10px', overflow: 'hidden'
+          position: 'relative'
         }`
         ).row.full-width.q-mb-sm
-        //- inactive tint
-        div(v-if="li !== meta.layerIndexPlay" :style=`{position: 'absolute', zIndex: 1000}` @click="layerClick(l, li)").row.fit.cursor-pointer
         //- default layer header
         .row.full-width
           //- div(:style=`{height: '35px', width: '35px'}`).row
           .col
             div(
               :style=`{
-                borderRadius: '10px', overflow: 'hidden'
               }`
               ).row.fit.cursor-pointer
               div(
-                :style=`{height: '35px', borderRadius: '10px', oveflow: 'hidden'}`
+                :class=`{
+                  'bg-grey-6': li === meta.layerIndexPlay,
+                  'bg-grey-7': li !== meta.layerIndexPlay,
+                }`
+                :style=`{position: 'relative', height: '35px', borderRadius: li === meta.layerIndexPlay ? '10px 10px 0 0' : '10px', oveflow: 'hidden'}`
                 ).row.full-width.items-center.content-center.q-pr-sm
+                //- inactive tint
+                div(v-if="li !== meta.layerIndexPlay" :style=`{position: 'absolute', zIndex: 1000}` @click="layerClick(l, li)").row.fit.cursor-pointer
                 .col
                   .row.full-height.q-px-md
                     span(
@@ -66,7 +64,7 @@ div(:style=`{}`).column.fit
                   small.text-white {{$time(l.figuresAbsolute[0].t)}}-
                   small.text-white {{$time(l.figuresAbsolute[1].t)}}
           div(:style=`{height: '35px', width: '40px'}`).row.items-center.content-center.justify-center
-            q-btn(round flat dense color="grey-5" icon="drag_indicator")
+            q-btn(round flat dense color="grey-6" icon="drag_indicator")
         layer-active(
           v-if="li === meta.layerIndexPlay"
           v-bind="$props" :layer="l" :index="li")

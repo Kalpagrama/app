@@ -2,50 +2,48 @@
 div(
   :style=`{position: 'relative'}`
   ).row.full-width
-  q-btn(
-    flat round color="grey-2" icon="more_vert"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', right: '0px'}`)
-    q-menu(cover anchor="bottom right")
-      layer-editor-actions(v-bind="$props")
-  //- play layer...
-  div(:style=`{height: '40px'}`).row.full-width.items-center.content-center.q-px-xs
+  div(:style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).col.bg-grey-6
+    //- play layer...
+    div(:style=`{height: '40px'}`).row.full-width.items-center.content-center.q-px-xs
+      q-btn(
+        round flat dense color="grey-2" @click="layerPlay()"
+        :icon="layerPlaying ? 'pause' : 'play_arrow'" )
+      .col
+        .row.fit.items-center.content-center.q-px-sm
+          //- bar
+          div(
+            @click="layerBarClick"
+            :style=`{position: 'relative', height: '24px'}`
+            ).row.full-width.items-center.content-center.cursor-pointer
+            div(:style=`{position: 'relative', height: '4px', borderRadius: '2px'}`).row.full-width.bg-grey-2
+              //- bar point
+              div(
+                :style=`{
+                  position: 'absolute',
+                  top: '-8px',
+                  left: layerPointPercent+'%',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  pointerEvents: 'none',
+                  background: $randomColor(index)
+                }`).row
+      q-btn(round flat dense color="grey-2" icon="refresh" @click="layerRefresh()")
+    //- ticks left/right
+    div(:style=`{height: '40px', padding: '0 30px 0'}`).row.full-width
+      q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="layerTick(true, false)")
+      q-btn(round flat color="grey-2" icon="keyboard_arrow_right" @click="layerTick(true, true)")
+      .col
+      q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="layerTick(false, false)")
+      q-btn(round flat color="grey-2" icon="keyboard_arrow_right" @click="layerTick(false, true)")
+  //- right actions
+  div(:style=`{width: '40px'}`).row.full-height.justify-center.content-end.items-end
     q-btn(
-      round flat dense color="grey-2" @click="layerPlay()"
-      :icon="layerPlaying ? 'pause' : 'play_arrow'" )
-    .col
-      .row.fit.items-center.content-center.q-px-sm
-        //- bar
-        div(
-          @click="layerBarClick"
-          :style=`{position: 'relative', height: '24px'}`
-          ).row.full-width.items-center.content-center.cursor-pointer
-          div(:style=`{position: 'relative', height: '4px', borderRadius: '2px'}`).row.full-width.bg-grey-2
-            //- bar point
-            div(
-              :style=`{
-                position: 'absolute',
-                top: '-8px',
-                left: layerPointPercent+'%',
-                width: '20px',
-                height: '20px',
-                borderRadius: '50%',
-                pointerEvents: 'none',
-                background: $randomColor(index)
-              }`).row
-    q-btn(round flat dense color="grey-2" icon="refresh" @click="layerRefresh()")
-  //- ticks left/right
-  div(:style=`{height: '40px', padding: '0 30px 0'}`).row.full-width
-    q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="layerTick(true, false)")
-    q-btn(round flat color="grey-2" icon="keyboard_arrow_right" @click="layerTick(true, true)")
-    .col
-    q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="layerTick(false, false)")
-    q-btn(round flat color="grey-2" icon="keyboard_arrow_right" @click="layerTick(false, true)")
-  //- actions: delete, export, save, share...
-  div(
-    v-if="false"
-    :style=`{height: '50px'}`).row.full-width.q-px-sm
-    q-btn(round flat dense color="red-4" icon="delete_outline")
-    q-btn(round flat dense color='grey-2' icon="")
+      flat round dense color="grey-6" icon="more_vert"
+      :style=`{}`)
+      //- anchor="bottom right"
+      q-menu(cover anchor="bottom right" :offset="[-50, 0]")
+        layer-editor-actions(v-bind="$props")
 </template>
 
 <script>
