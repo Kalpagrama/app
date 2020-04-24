@@ -6,40 +6,14 @@
 
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  //- menu
-  div(
-    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
-    :style=`{
-      position: 'fixed',
-      top: '0px',
-      zIndex: 1000,
-      width: $store.state.ui.maxWidthMenu+'px',
-      height: $q.screen.height+'px',
-      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '68px',
-      borderRadius: '10px',
-      overflow: 'hidden'
-    }`).row.items-start.content-start.q-px-sm.q-pb-sm
+  kalpa-menu-right
+    menu-right(:style=`{borderRadius: '10px', overflow: 'hidden'}`)
+  kalpa-menu-footer
+    div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-pa-md
+      span.text-white {{ content.name }}
     menu-right
-  //- footer
-  q-footer
-    .row.full-width.justify-center
-      div(
-        :style=`{height: '60px', maxWidth: $store.state.maxWidthPage+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`
-        ).row.full-width.items-center.bg-grey-8.q-px-sm
-        q-btn(round flat color="grey-5" icon="menu")
-          q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
-            div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-9
-              kalpa-menu
-        .col
-        q-btn(round flat color="grey-5" icon="more_vert")
-          q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
-            div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-8
-              div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-pa-md
-                span.text-white {{ content.name }}
-              menu-right
-              div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-                q-btn(round flat color="grey-5" icon="keyboard_arrow_left")
+    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+      q-btn(round flat color="grey-5" icon="keyboard_arrow_left")
   //- page
   q-page-container
     q-page

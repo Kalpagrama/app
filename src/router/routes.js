@@ -14,7 +14,7 @@ const routes = [
       { name: 'welcome', path: 'welcome', component: () => import('pages/app/welcome') },
       { name: 'home', path: '', component: () => import('components/home_explorer') },
       { name: 'workspace', path: 'workspace/:page?/:oid?', component: () => import('components/workspace') },
-      { name: 'settings', path: 'settings', component: () => import('pages/app/settings') },
+      { name: 'settings', path: 'settings/:page?', component: () => import('pages/app/settings') },
       // items
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },

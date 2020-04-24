@@ -1,17 +1,7 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
   //- menu
-  div(
-    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
-    :style=`{
-      position: 'fixed',
-      top: '0px',
-      zIndex: 1000,
-      width: $store.state.ui.maxWidthMenu+'px',
-      height: $q.screen.height+'px',
-      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '68px',
-    }`).row.items-start.content-start.q-px-sm.q-pb-sm
+  kalpa-menu-right
     div(
       :style=`{
         borderRadius: '10px', overflow: 'hidden',
@@ -40,21 +30,8 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
         .col.full-height
           .row.fit.items-center.content-center.justify-center
             span.text-white.text-bold {{ '#'+sphere.name }}
-        //- div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
-        //-   q-btn(
-        //-     round flat color="white" @click="sphereOpen()"
-        //-     :icon="openedHeight > 0 ? 'keyboard_arrow_up' : 'style'")
   //- footer
-  q-footer(reveal)
-    .row.full-width.justify-center
-      div(:style=`{position: 'relative', height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0 '}`
-        ).row.full-width.items-center.content-center.justify-between.bg-grey-8.q-px-sm
-        //- q-btn(
-        //-   round push color="green" icon="add"
-        //-   :style=`{position: 'absolute', top: '-20px', left: '50%', transform: 'translate(-50%, 0)', borderRadius: '50%'}`)
-        q-btn(round flat color="grey-4" icon="menu" @click="$store.commit('ui/stateSet', ['menuAppShow', true])")
-        .col
-        q-btn(round flat color="grey-4" icon="more_vert")
+  kalpa-menu-footer
   //- add node
   q-btn(
     v-if="!nodeEditorShow"

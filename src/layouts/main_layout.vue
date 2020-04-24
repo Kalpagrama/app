@@ -9,10 +9,7 @@
 
 <template lang="pug">
 q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
-  kalpa-action
-  q-dialog(
-    :value="$store.state.ui.menuAppShow" @hide="$store.commit('ui/stateSet', ['menuAppShow', false])" position="bottom")
-    kalpa-menu-xs
+  //- kalpa-action
   //- menu
   div(
     v-if="$route.name !== 'welcome' && $q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
@@ -24,7 +21,7 @@ q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
       left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
       paddingTop: '0px'
     }`).row.q-px-sm.q-pb-sm
-    kalpa-menu
+    kalpa-menu(v-if="!loading")
   q-page-container
     q-page
       router-view(

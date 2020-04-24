@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit
+div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
   composition(
     v-if="composition"
     ctx="workspace"

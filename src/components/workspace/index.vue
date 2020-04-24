@@ -6,55 +6,8 @@
 
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', background: '#333'}`)
-  //- menu
-  div(
-    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
-    :style=`{
-      position: 'fixed',
-      top: '0px',
-      zIndex: 1000,
-      width: $store.state.ui.maxWidthMenu+'px',
-      height: $q.screen.height+'px',
-      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '68px',
-    }`).row.items-start.content-start.q-px-sm.q-pb-sm
-    div(
-      :style=`{
-        borderRadius: '10px', overflow: 'hidden'
-      }`
-      ).column.full-width.bg-grey-9
-      //- .col.full-width.scroll
-      .row.full-width.items-start
-        router-link(
-          :to="p.id"
-          v-for="(p,pi) in pages" :key="pi"
-          :class=`{
-            'bg-grey-7': $route.params.page === p.id
-          }`
-          :style=`{height: '40px'}`
-          ).row.full-width.items-center.content-center.ws-menu-item.q-px-md
-          span(
-            :class=`{
-            }`
-            ).text-white {{ p.name }}
-  //- item editors
-  q-dialog(
-    v-model="pageDialogOpened" :maximized="true" position="bottom"
-    @hide="itemEdited")
-    div(
-      @click.self="pageDialogOpened = false"
-      :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center.q-pb-sm
-      ws-item-saver(v-if="$store.state.workspace.item" :value="$store.state.workspace.item")
-        template(v-slot=`{item}`)
-          composition-editor(
-            v-if="item"
-            ctx="workspace"
-            :composition="item.rawData"
-            @cancel="pageDialogOpened = fals"
-            :style=`{
-              maxWidth: $store.state.ui.maxWidthPage+'px'
-            }`)
-  //- header
+  kalpa-menu-right
+    menu-right(:pages="pages")
   q-header()
     div(:style=`{background: '#333'}`).row.full-width.justify-center
       div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`).row.full-width
@@ -66,20 +19,29 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', ba
             .row.full-height.items-center.content-center
               span(:style=`{fontSize: '20px', lineHeight: 1}`).text-white Workspace
               span(:style=`{lineHeight: 1.1}`).text-white.full-width {{ pages.find(p => p.id === $route.params.page).name }}
-  //- footer
-  q-footer(v-if="$q.screen.width < 1300")
-    .row.full-width.justify-center
-      div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0'}`
-        ).row.full-width.items-center.content-center.bg-grey-8
-        .col
-          kalpa-buttons(
-            :value="pages"
-          :id="$route.params.page" idKey="id"
-          @id="$router.push({params: {page: $event}}).catch(e=>e)")
-        q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['menuAppShow', true])").q-mr-sm
+  kalpa-menu-footer
+    template(v-slot:menuRight)
+      menu-right(:pages="pages")
+  //- item editors
+  q-dialog(
+    v-model="pageDialogOpened" :maximized="true" position="bottom"
+    @hide="itemEdited")
+    //- @click.self="pageDialogOpened = false"
+    div(
+      :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center
+      ws-item-saver(v-if="$store.state.workspace.item" :value="$store.state.workspace.item")
+        template(v-slot=`{item}`)
+          composition-editor(
+            v-if="item"
+            ctx="workspace"
+            :composition="item.rawData"
+            @cancel="pageDialogOpened = fals"
+            :style=`{
+              maxWidth: $store.state.ui.maxWidthPage+'px'
+            }`)
   q-page-container
-    q-page(:style=`{height: $q.screen.height-60+'px'}`)
-      div(:style=`{minHeight: '100%'}`).row.fit.justify-center.q-py-sm
+    q-page(:style=`{height: $q.screen.height-120+'px'}`)
+      div(:style=`{minHeight: '100%'}`).row.fit.justify-center.q-py-sm.q-px-xs
         div(
           :style=`{
             maxWidth: $store.state.ui.maxWidthPage+'px',
@@ -104,10 +66,11 @@ import wsItems from './ws_items'
 import wsSpheres from './ws_spheres'
 import wsSettings from './ws_settings'
 import wsItemSaver from './ws_item_saver'
+import menuRight from './menu_right'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsSpheres, wsSettings, wsItemSaver},
+  components: {wsItems, wsSpheres, wsSettings, wsItemSaver, menuRight},
   props: [],
   data () {
     return {

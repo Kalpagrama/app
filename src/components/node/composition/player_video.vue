@@ -36,23 +36,51 @@ div(
     small.full-width layerIndex: {{layerIndex}}
     small.full-width layerIndexPlay: {{layerIndexPlay}}
   //- video container
-  div(:style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
-    //- layer name
-    //- span(
-    //-   v-if="videoGood && !mini && layer.spheres.length > 0" @click="layerNameClick()"
+  div(
+    @mouseenter="actionsHovered = true" @mouseleave="actionsHovered = false"
+    :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
+    //- actions
+    //- div(
+    //-   v-if="ctx !== 'workspace'"
+    //-   @mouseenter="actionsHovered = true" @mouseleave="actionsHovered = false"
     //-   :style=`{
-    //-     position: 'absolute', zIndex: 20000, top: '6px', left: '6px',
-    //-     borderRadius: '10px', overflow: 'hidden',
-    //-     color: 'white', background: 'rgba(0,0,0,0.3)'}`
-    //-   ).q-pa-sm {{ layer.spheres[0].name | cut(50) }}
+    //-     position: 'absolute', zIndex: 1000,
+    //-   }`
+    //-   ).row.fit.br
+    //- layer name layer.spheres.length > 0
+    span(
+      v-if="actionsShow && ctx !== 'workspace' && visible && active && !mini" @click="layerNameClick()"
+      :style=`{
+        position: 'absolute', zIndex: 20000, top: '-1px', left: '-1px',
+        borderRadius: '10px', overflow: 'hidden',
+        background: 'rgba(0,0,0,0.15)'}`
+      ).q-pa-sm.text-grey-2 Layer name
+    //- {{ layer.spheres[0].name | cut(50) }}
+    //- layer menu
+    q-btn(
+      v-if="true && ctx !== 'workspace' && visible && active && !mini"
+      round flat color="grey-2" icon="more_vert"
+      :style=`{
+        position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
+        background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'
+      }`)
+      q-menu(cover anchor="top right" max-width="300px")
+        .column.fit.bg-grey-9
+          div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
+            span.text-white.text-bold {{ content.name }}
+          .col.full-width.scroll
+            q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
+              span.text-white Go to content
+            q-btn(flat no-caps align="left").full-width
+              span.text-white Report
     //- video actions, volume, progress
     q-btn(
-      v-if="true"
+      v-if="actionsShow && visible && active && !mini"
       v-show="!mini"
       round flat @click="player.mutedToggle()"
-      :color="muted ? 'grey-6' : 'white'"
+      :color="muted ? 'grey-2' : 'grey-2'"
       :icon="muted ? 'volume_off' : 'volume_up'"
-      :style=`{position: 'absolute', zIndex: 20000, right: '10px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.2)', transform: 'translate3d(0,0,0)'}`)
+      :style=`{position: 'absolute', zIndex: 20000, right: '0px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'}`)
     //- video forward
     div(
       v-on:dblclick="videoForward(0)" @click="forwarding === 'left' ? videoForward(0) : videoClick()"
@@ -102,12 +130,10 @@ div(
     //- video tools
     //- progress
     player-video-progress(
-      v-if="!mini"
+      v-if="actionsShow && !mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
       :style=`{position: 'absolute', bottom: '0px', left: '0px', maxWidth: '75%', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
-    //- red
-    //- div(:style=`{position: 'absolute', right: '0px', top: '50px', width: '50px', height: '50px'}`).row.bg-red
   slot(name="editor" :meta="meta" :player="player")
 </template>
 
@@ -143,6 +169,8 @@ export default {
       forwardingCount: 0,
       videoLoadeddataDone: false,
       content: null,
+      actionsActive: false,
+      actionsHovered: false
     }
   },
   computed: {
@@ -224,6 +252,19 @@ export default {
         else return false
       }
     },
+    actionsShow () {
+      if (this.ctx === 'workspace') {
+        return true
+      }
+      else {
+        if (this.$q.platform.is.mobile) {
+          return this.actionsActive
+        }
+        else {
+          return this.actionsHovered
+        }
+      }
+    },
     mutedComputed () {
       if (this.ctx === 'contentEditor') {
         return false
@@ -238,13 +279,15 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('visible CHANGED', to)
-        if (this.layerStart && this.player) this.player.setCurrentTime(this.layerStart)
+        if (!this.player) return
+        if (this.layerStart) this.player.setCurrentTime(this.layerStart)
       }
     },
     active: {
       immediate: false,
       handler (to, from) {
         this.$log('active CHANGED', to)
+        if (!this.player) return
         if (to) this.player.play()
         else this.player.pause()
       }
@@ -253,6 +296,7 @@ export default {
       immediate: false,
       handler (to, from) {
         this.$log('mini CHANGED', to)
+        if (!this.player) return
         if (to) this.player.pause()
         else this.player.play()
       }
@@ -263,13 +307,24 @@ export default {
         this.$log('layer CHANGED', to)
         if (to) {
           this.content = await this.$store.dispatch('objects/get', {oid: to.contentOid})
-          this.$nextTick(() => {
-            if (!this.player) this.playerInit()
-          })
+          // this.$nextTick(() => {
+          //   if (!this.player) this.playerInit()
+          // })
           if (this.player) {
             this.player.setCurrentTime(this.layerStart)
             this.player.update()
           }
+        }
+      }
+    },
+    content: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('content CHANGED', to)
+        if (to) {
+          this.$nextTick(() => {
+            if (!this.player) this.playerInit()
+          })
         }
       }
     },
@@ -290,6 +345,7 @@ export default {
   methods: {
     videoNow (to, from) {
       if (this.nowPause) return
+      if (!this.player) return
       if (!this.active) this.player.pause()
       if (this.editing) return
       if (this.mode === 'play') {
@@ -330,7 +386,8 @@ export default {
       }
     },
     videoForward (right) {
-      // this.$log('videoForward')
+      this.$log('videoForward')
+      if (!this.player) return
       let to = this.now
       if (right > 0) {
         this.forwarding = 'right'
@@ -538,6 +595,9 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.$on('meta', this.onMeta)
+    if (this.composition.contentOid) {
+      this.content = await this.$store.dispatch('objects/get', {oid: this.composition.contentOid})
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

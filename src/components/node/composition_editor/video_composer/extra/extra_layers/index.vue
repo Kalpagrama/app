@@ -16,8 +16,8 @@ div(:style=`{}`).column.fit
   //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
   div(
     v-if="height > 100"
-    :style=`{height: '70px'}`).row.full-width
-    layer-editor(
+    :style=`{height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+    layer-editor-figures(
       v-if="meta.layer"
       :layers="meta.layers"
       :layerIndex="meta.layerIndexPlay"
@@ -26,33 +26,50 @@ div(:style=`{}`).column.fit
   //- body
   div(
     ref="extraNodesScroll"
-    :style=`{position: 'relative', overflow: scrollOverflow}`
-    @scroll="onScroll"
-    ).col.full-width.scroll.q-pa-sm
-    div(:style=`{marginTop: '0px', marginBottom: '1000px'}`).row.full-width.items-start.content-start
+    :style=`{position: 'relative'}`
+    ).col.full-width.scroll.bg-grey-9
+    div(:style=`{marginTop: '0px', marginBottom: '1000px'}`).row.full-width.items-start.content-start.q-pt-sm.q-px-xs
       div(
         v-for="(l,li) in meta.layers" :key="li" :ref="`layer-${li}`"
-        v-if="l.figuresAbsolute.length > 0" @click="layerClick(l, li)"
+        v-if="l.figuresAbsolute.length > 0"
+        :class=`{
+          'bg-grey-6': li === meta.layerIndexPlay,
+          'bg-grey-7': li !== meta.layerIndexPlay,
+        }`
+        :style=`{
+          position: 'relative',
+          borderRadius: '10px', overflow: 'hidden'
+        }`
         ).row.full-width.q-mb-sm
-        div(:style=`{height: '35px', width: '35px'}`).row
-        .col
-          div(
-            :class=`{
-              'bg-grey-6': li === meta.layerIndexPlay,
-              'bg-grey-8': li !== meta.layerIndexPlay,
-            }`
-            :style=`{
-              borderRadius: '10px', overflow: 'hidden'
-            }`
-            ).row.fit.cursor-pointer.layer-item
+        //- inactive tint
+        div(v-if="li !== meta.layerIndexPlay" :style=`{position: 'absolute', zIndex: 1000}` @click="layerClick(l, li)").row.fit.cursor-pointer
+        //- default layer header
+        .row.full-width
+          //- div(:style=`{height: '35px', width: '35px'}`).row
+          .col
             div(
-              :style=`{height: '35px', borderRadius: '10px', oveflow: 'hidden'}`
-              ).row.full-width.items-center.content-center.q-pr-sm
-              .col
-              small.text-white {{$time(l.figuresAbsolute[0].t)}}-
-              small.text-white {{$time(l.figuresAbsolute[1].t)}}
-        div(:style=`{height: '35px', width: '35px'}`).row.items-center.content-center.justify-center
-          q-btn(round flat dense color="grey-5" icon="drag_indicator")
+              :style=`{
+                borderRadius: '10px', overflow: 'hidden'
+              }`
+              ).row.fit.cursor-pointer
+              div(
+                :style=`{height: '35px', borderRadius: '10px', oveflow: 'hidden'}`
+                ).row.full-width.items-center.content-center.q-pr-sm
+                .col
+                  .row.full-height.q-px-md
+                    span(
+                      @click="layerSetNameStart()"
+                      ).text-white.text-bold.cursor-pointer {{l.spheres.length > 0 ? l.spheres[0].name : li === meta.layerIndexPlay ? 'Set layer name' : ''}}
+                      q-popup-proxy
+                        layer-editor-spheres(:layer="l" :index="li")
+                .row.full-height.items-center.content-center
+                  small.text-white {{$time(l.figuresAbsolute[0].t)}}-
+                  small.text-white {{$time(l.figuresAbsolute[1].t)}}
+          div(:style=`{height: '35px', width: '40px'}`).row.items-center.content-center.justify-center
+            q-btn(round flat dense color="grey-5" icon="drag_indicator")
+        layer-active(
+          v-if="li === meta.layerIndexPlay"
+          v-bind="$props" :layer="l" :index="li")
   //- layers workspace modal
   div(
     v-if="showLayersFromWorkspace"
@@ -77,6 +94,7 @@ div(:style=`{}`).column.fit
           span.text-white {{l.figuresAbsolute[0].t}}-{{l.figuresAbsolute[1].t}}
   //- footer
   div(
+    v-if="false"
     :style=`{height: '60px'}`
     ).row.full-width.items-center.q-px-sm
     .col
@@ -86,18 +104,21 @@ div(:style=`{}`).column.fit
 </template>
 
 <script>
-import layerEditor from './extra_layers_editor'
+import layerEditorFigures from './layer_editor_figures'
+import layerEditorSpheres from './layer_editor_spheres'
+import layerActive from './layer_active'
 
 export default {
   name: 'extraLayers',
-  components: {layerEditor},
+  components: {layerEditorFigures, layerEditorSpheres, layerActive},
   props: ['composition', 'player', 'meta', 'height'],
   data () {
     return {
       scrollTweening: false,
       scrollOverflow: 'auto',
       scrollTimeout: null,
-      showLayersFromWorkspace: false
+      showLayersFromWorkspace: false,
+      layerNameEditing: false
     }
   },
   computed: {
@@ -164,6 +185,10 @@ export default {
       this.$emit('meta', ['layerIndex', index])
       // scroll to layer?
       this.$log('layerAdd done')
+    },
+    layerSetNameStart () {
+      this.$log('layerSetNameStart')
+      this.layerNameEditing = true
     },
     onScroll () {
       // this.$log('onScroll')

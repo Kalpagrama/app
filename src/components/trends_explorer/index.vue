@@ -4,24 +4,9 @@
 </style>
 
 <template lang="pug">
-q-layout(
-  view="hHh lpR fFf"
-  container
-  :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  //- menu
-  div(
-    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
-    :style=`{
-      position: 'fixed',
-      top: '0px',
-      zIndex: 1000,
-      width: $store.state.ui.maxWidthMenu+'px',
-      height: $q.screen.height+'px',
-      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '68px',
-    }`).row.items-start.content-start.q-px-sm.q-pb-sm
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
+  kalpa-menu-right
     menu-right
-  //- header
   q-header(
     reveal
     :style=`{zIndex: 200}`).row.full-width.justify-center.bg-grey-8
@@ -40,29 +25,9 @@ q-layout(
             span.text-white.text-bold Trends
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
           q-btn(round flat color="grey-5" icon="more_vert")
-  //- footer
-  q-footer(reveal)
-    div(:style=`{height: '60px'}`).row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius:  '10px 10px 0 0'}`
-        ).row.fit.items-center.content-center.justify-between.bg-grey-8.q-px-sm
-        q-btn(
-          round push color="green" icon="add" size="md"
-          :style=`{position: 'absolute', zIndex: 1000, top: '-26px', left: '50%', transform: 'translate(-50%, 0)',borderRadius: '50% !important'}`)
-        q-btn(round flat color="grey-5" icon="menu")
-          q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
-            div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-9
-              kalpa-menu
-        .col.full-height
-          .row.fit.items-center.content-center.q-px-sm
-        q-btn(round flat color="grey-4" icon="more_vert")
-          q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
-            div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-8
-              //- div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-pa-md
-              //-   span.text-white {{ content.name }}
-              menu-right
-              //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-              //-   q-btn(round flat color="grey-5" icon="keyboard_arrow_left")
-  //- page
+  kalpa-menu-footer
+    template(v-slot:menuRight)
+      menu-right
   q-page-conainter
     q-page
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")

@@ -12,24 +12,7 @@ div(
     ).row.full-width
     .row.bg-red
       small active: {{active}}
-  //- composition menu
-  //- TODO move to player_video...
-  q-btn(
-    v-if="true && ctx !== 'workspace' && visible && active && !mini && value"
-    round flat color="white" icon="more_vert"
-    :style=`{
-      position: 'absolute', zIndex: 2000, top: '10px', right: '10px',
-      background: 'rgba(0,0,0,0.5)', transform: 'translate3d(0,0,0)'
-    }`)
-    q-menu(cover anchor="top right" max-width="300px")
-      .column.fit.bg-grey-9
-        div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
-          //- span.text-white.text-bold {{ value.layers[0].content.name }}
-        .col.full-width.scroll
-          //- .row.full-width.items-center.content-center
-          q-btn(flat dark no-caps align="left" :to="'/content/'+value.layers[0].contentOid").full-width Go to content
-          q-btn(flat dark no-caps align="left").full-width Report
-  //- next tint
+  //- mini tint
   div(
     v-if="mini" @click="$emit('next')"
     :style=`{position: 'absolute', zIndex: 4000, opacity: 0.5}`).row.fit.cursor-pointer
@@ -40,7 +23,7 @@ div(
     :style=`{
       userSelect: 'none',
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
-      maxHeight: $q.screen.height+'px', objectFit: 'contain', ...styles}`)
+      maxHeight: 500+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(
     v-if="visible && value"
