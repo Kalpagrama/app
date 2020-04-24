@@ -13,13 +13,15 @@ let messaging = null
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function sendMessageToSW (message) {
+  logD('sendMessageToSW: ', message)
   // This wraps the message posting/response in a promise, which will
   // resolve if the response doesn't contain an error, and reject with
   // the error if it does. If you'd prefer, it's possible to call
   // controller.postMessage() and set up the onmessage handler
   // independently of a promise, but this is a convenient wrapper.
   return new Promise(function (resolve, reject) {
-    var messageChannel = new MessageChannel()
+    logD('sendMessageToSW1')
+    let messageChannel = new MessageChannel()
     messageChannel.port1.onmessage = function (event) {
       if (event.data.error) {
         reject(event.data.error)
@@ -80,7 +82,7 @@ async function initSw (store) {
       logD('Registration sw succeeded. Scope is ', registration.scope)
 
       wait(100).then(() => {
-        logD('sendMessageToSW...')
+        logD('sendMessageToSW   ...')
         sendMessageToSW({
           type: 'logInit',
           logModulesBlackList: store.state.core.logModulesBlackList,

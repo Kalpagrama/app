@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const webpack = require('webpack')
 require('dotenv').config()
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
@@ -145,7 +146,12 @@ module.exports = function (ctx) {
       // https: true,
       port: 8282,
       // https: true,
-      // host: 'mac.kalpagramma.com',
+      // host: 'mac.kalpa.app',
+      // https: {
+      //   key: fs.readFileSync('deploy/dev_server_cert/private.key'),
+      //   cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
+      //   // ca: fs.readFileSync('/path/to/ca.pem'),
+      // },
       open: true // opens browser window automatically
     },
     // animations: 'all',
