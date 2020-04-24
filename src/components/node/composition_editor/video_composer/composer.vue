@@ -15,10 +15,10 @@ div
       borderRadius: '10px 10px 0 0'
       }`
     ).column.full-width.bg-grey-9
-    q-btn(
-      v-touch-pan.mouse.vertical.prevent="onExtraPan"
-      round flat dense color="white" icon="drag_indicator"
-      :style=`{position: 'absolute', zIndex: 1000, top: '8px', right: '8px', background: 'rgba(0,0,0,0.2)'}`)
+    //- q-btn(
+    //-   v-touch-pan.mouse.vertical.prevent="onExtraPan"
+    //-   round flat dense color="white" icon="drag_indicator"
+    //-   :style=`{position: 'absolute', zIndex: 1000, top: '8px', right: '8px', background: 'rgba(0,0,0,0.2)'}`)
     //- body
     .col.full-width
       component(
@@ -27,15 +27,18 @@ div
         :height="extraHeight"
         @meta="$parent.$emit('meta', $event)")
     //- footer
-    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+    div(
+      v-touch-pan.mouse.vertical.prevent="onExtraPan"
+      :style=`{height: '60px', order: -1}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(
         flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')"
-        :style=`{width: '38px', height: '38px', background: 'rgba(0,0,0,0.3)'}`)
-      .col
-        kalpa-buttons(:value="tabs" :id="tab" @id="tabChanged($event)").justify-center
+        :style=`{width: '42px', height: '42px', background: 'rgba(0,0,0,0.3)'}`)
+      .col.q-px-sm
+        kalpa-buttons(:value="tabs" :id="tab" @id="tabChanged($event)").justify-start
       q-btn(
-        push color="green" no-caps icon="check" @click="$emit('cancel')"
-        :style=`{width: '38px', height: '38px'}`)
+        push color="green" no-caps @click="$emit('cancel')"
+        :style=`{height: '42px'}`)
+        span Done
 </template>
 
 <script>
