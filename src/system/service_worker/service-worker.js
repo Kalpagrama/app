@@ -1,4 +1,4 @@
-const swVer = 2
+const swVer = 4
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
@@ -36,11 +36,69 @@ function sendMsg (type, msgData) {
   /* global idbKeyval, MD5 */
   importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
   importScripts('/statics/scripts/md5.js')
+  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js')
+  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-messaging.js')
   logDebug('swVer=', swVer)
   logDebug('init idb')
   swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
   videoStore = new idbKeyval.Store('sw-cache-video', 'video-responses')
   logDebug('init idb ok')
+  function initWebPush(){
+    logDebug('try init web push with firebase...')
+    /* global firebase */
+    firebase.initializeApp({
+      apiKey: 'AIzaSyAznncIqhrqA35A3yBQkTnxyNGI45sxeNk',
+      authDomain: 'kalpagramma-7a913.firebaseapp.com',
+      databaseURL: 'https://kalpagramma-7a913.firebaseio.com',
+      projectId: 'kalpagramma-7a913',
+      storageBucket: 'kalpagramma-7a913.appspot.com',
+      messagingSenderId: '1082935232322',
+      appId: '1:1082935232322:web:a4f0203aa4015e8f86eadb',
+      measurementId: 'G-D8QZ67XLM5'
+    })
+    logDebug('firebase.messaging.isSupported() = ', firebase.messaging.isSupported())
+    let i = 0
+    if (firebase.messaging.isSupported()) {
+      try {
+        const messaging = firebase.messaging()
+        // messaging.useServiceWorker(self.registration)
+        messaging.getToken().then(token => {
+          logDebug('messaging.getToken() = ', token)
+          webPushToken = token
+        })
+        messaging.setBackgroundMessageHandler(function (payload) {
+          logDebug('[firebase-messaging-sw.js] Received background message ', payload)
+
+          // Customize notification here
+          const notificationTitle = `#${++i} ${payload.data.type} event received!`
+          const notificationOptions = {
+            body: `payload: ${JSON.stringify(payload.data.type)} ${payload.data.message ? 'message' + payload.data.message : ''}`,
+            icon: '/statics/icons/icon-192x192.png',
+            badge: '/statics/icons/badge3.png',
+            vibrate: [500, 100, 500],
+            tag: payload.data.type, // Поле тега позволяет заменить старое уведомление на новое
+            actions: [
+              {
+                action: 'test',
+                title: 'action-test',
+                icon: '/statics/kalpagramma-logo.png'
+              }
+            ]
+          }
+          return self.registration.showNotification(notificationTitle, notificationOptions)
+
+          //   const notificationOptions = {
+          //     body: 'Background Message body.',
+          //     icon: '/firebase-logo.png'
+          //   }
+          //   return self.registration.showNotification(notificationTitle,
+          //     notificationOptions);
+        })
+      } catch (err){
+        logCritical('firebase init error!', err)
+      }
+    }
+  }
 
   // workbox init
   {
@@ -92,7 +150,6 @@ function sendMsg (type, msgData) {
       'POST'
     )
   }
-
   // listeners
   {
     self.addEventListener('install', event => {
@@ -104,6 +161,7 @@ function sendMsg (type, msgData) {
     })
     self.addEventListener('activate', event => {
       logDebug('activated!', swVer)
+      initWebPush()
     })
     self.addEventListener('fetch', async event => {
       // logDebug('ready to handle fetches! request=', event.request)
@@ -144,6 +202,54 @@ function sendMsg (type, msgData) {
       } else {
         logCritical('event.data is null')
       }
+    })
+    self.addEventListener('notificationclick', function (event) {
+      event.notification.close()
+      logDebug('notificationclick')
+      event.waitUntil(
+        // Получаем список клиентов SW.
+        self.clients.matchAll().then(function(clientList) {
+          // Если есть хотя бы один клиент, фокусируем его.
+          if (clientList.length > 0) {
+            return clientList[0].focus();
+          }
+          // В противном случае открываем новую страницу.
+          return self.clients.openWindow('/');
+        })
+      )
+    }, false)
+    self.addEventListener('push', function (event) {
+      logDebug('push event recieved = ', event)
+      let payload = event.data ? event.data.text() : 'Alohomora'
+
+      event.waitUntil(
+        // Получить список клиентов для SW
+        self.clients.matchAll().then(function (clientList) {
+          // Проверяем, есть ли хотя бы один сфокусированный клиент.
+          var focused = clientList.some(function (client) {
+            return client.focused
+          })
+
+          var notificationMessage
+          if (focused) {
+            notificationMessage = 'Imperio! You\'re still here, thanks!'
+          } else if (clientList.length > 0) {
+            notificationMessage = 'Imperio! You haven\'t closed the page, ' +
+              'click here to focus it!'
+          } else {
+            notificationMessage = 'Imperio! You have closed the page, ' +
+              'click here to re-open it!'
+          }
+          // Показывать уведомление с заголовком «Unforgiveable Curses»
+          // и телом в зависимости от состоянию клиентов SW
+          // * 1, страница сфокусирована;
+          // * 2, страница по-прежнему открыта, но не сфокусирована;
+          // * 3, страница закрыта).
+          return self.registration.showNotification('Unforgiveable Curses', {
+            body: notificationMessage
+          })
+        })
+      )
     })
   }
 }
@@ -376,112 +482,4 @@ if (useCache) {
       }
     })
   }
-}
-
-// web-push
-{
-  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js')
-  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-messaging.js')
-
-  /* global firebase */
-  firebase.initializeApp({
-    apiKey: 'AIzaSyAznncIqhrqA35A3yBQkTnxyNGI45sxeNk',
-    authDomain: 'kalpagramma-7a913.firebaseapp.com',
-    databaseURL: 'https://kalpagramma-7a913.firebaseio.com',
-    projectId: 'kalpagramma-7a913',
-    storageBucket: 'kalpagramma-7a913.appspot.com',
-    messagingSenderId: '1082935232322',
-    appId: '1:1082935232322:web:a4f0203aa4015e8f86eadb',
-    measurementId: 'G-D8QZ67XLM5'
-  })
-//
-  logDebug('firebase.messaging.isSupported() = ', firebase.messaging.isSupported())
-  let i = 0
-  if (firebase.messaging.isSupported()) {
-    const messaging = firebase.messaging()
-    // messaging.useServiceWorker(self.registration)
-    messaging.getToken().then(token => {
-      logDebug('messaging.getToken() = ', token)
-      webPushToken = token
-    })
-    messaging.setBackgroundMessageHandler(function (payload) {
-      logDebug('[firebase-messaging-sw.js] Received background message ', payload)
-
-      // Customize notification here
-      const notificationTitle = `#${++i} ${payload.data.type} event received!`
-      const notificationOptions = {
-        body: `payload: ${JSON.stringify(payload.data.type)} ${payload.data.message ? 'message' + payload.data.message : ''}`,
-        icon: '/statics/icons/icon-192x192.png',
-        badge: '/statics/icons/badge3.png',
-        vibrate: [500, 100, 500],
-        tag: payload.data.type, // Поле тега позволяет заменить старое уведомление на новое
-        actions: [
-          {
-            action: 'test',
-            title: 'action-test',
-            icon: '/statics/kalpagramma-logo.png'
-          }
-        ]
-      }
-      return self.registration.showNotification(notificationTitle, notificationOptions)
-
-      //   const notificationOptions = {
-      //     body: 'Background Message body.',
-      //     icon: '/firebase-logo.png'
-      //   }
-      //   return self.registration.showNotification(notificationTitle,
-      //     notificationOptions);
-    })
-  }
-
-  self.addEventListener('notificationclick', function (event) {
-    event.notification.close()
-    logDebug('notificationclick')
-    event.waitUntil(
-      // Получаем список клиентов SW.
-      self.clients.matchAll().then(function(clientList) {
-        // Если есть хотя бы один клиент, фокусируем его.
-        if (clientList.length > 0) {
-          return clientList[0].focus();
-        }
-        // В противном случае открываем новую страницу.
-        return self.clients.openWindow('/');
-      })
-    )
-  }, false)
-
-  // Регистрируем функцию на событие 'push'
-  self.addEventListener('push', function (event) {
-    logDebug('push event recieved = ', event)
-    let payload = event.data ? event.data.text() : 'Alohomora'
-
-    event.waitUntil(
-      // Получить список клиентов для SW
-      self.clients.matchAll().then(function (clientList) {
-        // Проверяем, есть ли хотя бы один сфокусированный клиент.
-        var focused = clientList.some(function (client) {
-          return client.focused
-        })
-
-        var notificationMessage
-        if (focused) {
-          notificationMessage = 'Imperio! You\'re still here, thanks!'
-        } else if (clientList.length > 0) {
-          notificationMessage = 'Imperio! You haven\'t closed the page, ' +
-            'click here to focus it!'
-        } else {
-          notificationMessage = 'Imperio! You have closed the page, ' +
-            'click here to re-open it!'
-        }
-        // Показывать уведомление с заголовком «Unforgiveable Curses»
-        // и телом в зависимости от состоянию клиентов SW
-        // * 1, страница сфокусирована;
-        // * 2, страница по-прежнему открыта, но не сфокусирована;
-        // * 3, страница закрыта).
-        return self.registration.showNotification('Unforgiveable Curses', {
-          body: notificationMessage
-        })
-      })
-    )
-  })
 }

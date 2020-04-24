@@ -1,7 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 require('dotenv').config()
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = function (ctx) {
   return {
@@ -102,9 +102,9 @@ module.exports = function (ctx) {
             gql: 'graphql-tag'
           })
         )
-        cfg.plugins.push(
-          new BundleAnalyzerPlugin()
-        )
+        // cfg.plugins.push(
+        //   new BundleAnalyzerPlugin()
+        // )
         { // todo отключить когда не потребуется debug(увеличивает размер js в 2 раза)
           cfg.devtool = 'source-map'
           cfg.plugins.push(

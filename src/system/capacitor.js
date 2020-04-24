@@ -15,14 +15,15 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.CP)
 // let PushNotifications, Share
 
 async function capacitorInit(){
-  alert('-+++-Platform.is=' + JSON.stringify(Platform.is))
+  // alert('-+++-Platform.is=' + JSON.stringify(Platform.is))
   if (Platform.is.capacitor) {
     // const capacitor = await import('../../src-capacitor/node_modules/@capacitor/core')
     // PushNotifications = capacitor.Plugins.PushNotifications
     // Share = capacitor.Plugins.Share
     // logD('PushNotifications=', PushNotifications)
     // logD('Share=', Share)
-    capacitorShowShareDialog().catch(err => logD('err on capacitor init', err))
+
+    // capacitorShowShareDialog().catch(err => logD('err on capacitor init', err))
     await capacitorWebPushInit()
   }
 }
