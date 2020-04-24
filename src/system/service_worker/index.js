@@ -13,14 +13,12 @@ let messaging = null
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function sendMessageToSW (message) {
-  logD('sendMessageToSW: ', message)
   // This wraps the message posting/response in a promise, which will
   // resolve if the response doesn't contain an error, and reject with
   // the error if it does. If you'd prefer, it's possible to call
   // controller.postMessage() and set up the onmessage handler
   // independently of a promise, but this is a convenient wrapper.
   return new Promise(function (resolve, reject) {
-    logD('sendMessageToSW1')
     let messageChannel = new MessageChannel()
     messageChannel.port1.onmessage = function (event) {
       if (event.data.error) {
@@ -38,6 +36,7 @@ function sendMessageToSW (message) {
     // https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
     if (navigator && navigator.serviceWorker && navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage(message, [messageChannel.port2])
+      resolve()
     } else {
       reject('no controller!!!')
     }
@@ -82,7 +81,6 @@ async function initSw (store) {
       logD('Registration sw succeeded. Scope is ', registration.scope)
 
       wait(100).then(() => {
-        logD('sendMessageToSW   ...')
         sendMessageToSW({
           type: 'logInit',
           logModulesBlackList: store.state.core.logModulesBlackList,
@@ -152,7 +150,9 @@ async function initSw (store) {
     }
     logD('initSw complete')
     // await initWebPush(store)
-  } else logW('serviceWorker disabled!')
+  } else {
+    logW('serviceWorker disabled!')
+  }
 
   function handleNetworkChange (event) {
     logD('handleNetworkChange', navigator.onLine)
@@ -165,7 +165,6 @@ async function initSw (store) {
       }
     )
   }
-
   window.addEventListener('online', handleNetworkChange)
   window.addEventListener('offline', handleNetworkChange)
   store.commit('core/stateSet', ['online', navigator.onLine])
@@ -263,6 +262,7 @@ async function askForWebPushPerm (store) {
   } else {
     return new Promise((resolve, reject) => {
       if (Platform.is.safari && !Platform.is.ios) {
+        return resolve(false)
         // safari mobile (partial support)
         // todo
         // assert(window.safari)

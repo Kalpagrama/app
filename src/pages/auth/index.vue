@@ -1,49 +1,47 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center.q-pa-xs
+.row.full-width.items-start.content-start.justify-center
   //- wrapper
   div(
     :style=`{
-      minHeight: $q.screen.xs ? $q.screen.height-8+'px' : '600px',
+      minHeight: $q.screen.xs ? $q.screen.height+'px' : '600px',
       marginTop: $q.screen.xs ? 0 : ($q.screen.height-600)/2+'px',
       marginBottom: $q.screen.height+'px',
       maxWidth: 600+'px',
-      borderRadius: '10px'
+      borderRadius: $q.screen.width > 600 ? '10px' : '0px'
     }`
-    ).row.full-width.items-start.content-start.justify-center.bg-grey-9.q-pb-xl
+    ).row.full-width.items-start.content-start.justify-center.bg-grey-9
     //- header
     .row.full-width.items-center.q-pa-md
       div(:style=`{width: '50px', height: '50px'}`).row
         //- kalpa-spinner(:width="50" :height="50")
         //- q-btn(flat round icon="blur_on" color="white" size="lg")
-        q-icon(name="blur_on" color="white" size="50px")
+        q-icon(name="blur_on" color="white" size="50px" @click="$router.replace('/auth')").cursor-pointer
       .col.full-height
         .row.fit.items-center.content-center.q-px-sm
-          span(:style=`{fontSize: '20px'}`).text-white.text-bold Kalpa
+          span(
+            @click="$router.replace('/auth')"
+            :style=`{fontSize: '20px', lineHeight: 1.2}`).text-white.text-bold Kalpagramma
+          .row.full-width
+            small.text-white Up the essence!
     //- form
-    div(:style=`{maxWidth: '400px'}`).row.full-width.justify-center.q-py-xl.q-px-sm
+    div(:style=`{maxWidth: '350px'}`).row.full-width.justify-center.q-py-xl.q-px-sm
       //- get started
       div(v-if="!userIdentified").row.full-width.items-center.content-center.justify-center.text-bold.text-center.q-py-lg
-        span(:style=`{fontSize: '20px'}`).text-white.q-mr-sm Get started with
-        span(:style=`{fontSize: '20px'}`).text-green Kalpa
+        span(:style=`{fontSize: '20px'}`).text-white.q-mr-sm Identify yourself with
+        //- span(:style=`{fontSize: '20px'}`).text-green Kalpa
       //- socials
-      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-        div(v-if="!userIdentified").row.full-width.justify-between.q-py-md
-          div(
-            v-for="n in 8" :key="n"
-            :style=`{width: '40px', height: '40px', borderRadius: '50%'}`
-            ).row.items-center.content-center.justify-center.bg-grey-8.cursor-pointer
-            span.text-white.text-bold {{n}}
+      with-socials(v-if="!userIdentified")
       //- NOT identified
       div(v-if="!userIdentified").row.full-width
         q-input(
           v-model="login"
-          dark color="green" filled label="Enter your login/email/phone"
+          dark color="green" filled label="Enter username / email / phone"
           @keyup.enter="userIdentify()"
           :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
         q-btn(
           push no-caps color="green" @click="userIdentify()"
           :loading="userIdentifying" :disable="login.length < 4"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm
+          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-my-sm
             span.text-bold.text-white Continue
       //- IDENTIFIED
       div(v-else).row.full-width
@@ -109,13 +107,19 @@
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-my-md
       //- help/policy
       .row.full-width.justify-center.q-pb-sm.q-px-md.text-center
-        router-link(to="/help/policy")
-          small.text-grey-8.text-center By clicking "Enter kalpa", you agree to the terms of the Privacy Policy.
+        //- router-link(to="/help/policy")
+        small.text-grey-8.text-center By clicking "Enter kalpa", you agree to the terms of the Privacy Policy.
 </template>
 
 <script>
+import withSocials from './with_socials'
+
 export default {
   name: 'pageAuth-index',
+  meta: {
+    title: 'Kalpagramma - Identify'
+  },
+  components: {withSocials},
   data () {
     return {
       login: '',
@@ -137,6 +141,33 @@ export default {
   watch: {
     login (newVal) {
       this.$set(this, 'login', newVal.replace(/[^0-9a-zA-Z-_.@]/g, ''))
+    },
+    '$route.query.token': {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('$route.query.token CHANGED', to)
+        if (to) {
+          this.$log('GOT TOKEN', to)
+          this.$q.notify('GOT TOKEN')
+          let q = this.$route.query
+          this.$log('q', q)
+          localStorage.setItem('ktoken', q.token)
+          localStorage.setItem('ktokenExpires', q.expires)
+          await this.$wait(200)
+          if (q.needInvite === 'false') {
+            this.inviteCode = '2020'
+            this.userAuthenticate()
+          }
+          else {
+            this.userIdentifying = false
+            this.userIdentified = true
+            this.userExist = q.userExist === 'true' ? true : false
+            this.login = q.userId
+            this.loginType = q.loginType
+            this.needInvite = q.needInvite
+          }
+        }
+      }
     }
   },
   methods: {
@@ -148,10 +179,10 @@ export default {
         await this.$wait(500)
         let res = await this.$store.dispatch('auth/userIdentify', this.login)
         this.$log('userIdentify done', res)
-        this.login = res.userId
         this.userIdentifying = false
         this.userIdentified = true
         this.userExist = res.userExist
+        this.login = res.userId
         this.loginType = res.loginType
         this.needInvite = res.needInvite
       }
