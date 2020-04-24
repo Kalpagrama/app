@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.fit
+div(:style=`{minHeight: '500px'}`).column.fit
   .col.full-width
     .row.fit.items-center.content-center.justify-center
       small.text-white Coming soon

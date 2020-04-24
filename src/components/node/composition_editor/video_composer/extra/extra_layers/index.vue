@@ -92,7 +92,7 @@ div(:style=`{}`).column.fit
           span.text-white {{l.figuresAbsolute[0].t}}-{{l.figuresAbsolute[1].t}}
   //- footer
   div(
-    v-if="false"
+    v-if="true"
     :style=`{height: '60px'}`
     ).row.full-width.items-center.q-px-sm
     .col

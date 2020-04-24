@@ -1,12 +1,13 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
-  //- footer MOBILE ONLY
-  //- div(:style=`{height: '60px'}`).row.full-width.justify-center
-  //-   div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.items-center.q-px-sm
-  //-     q-btn(round flat color="white" icon="menu").q-mr-sm
-  //-     kalpa-buttons(:value="pages" :id="page" idKey="id" @id="$emit('page', $event)")
-  //- body
-  .col.full-width
+//- div(:style=`{position: 'relative'}`).column.fit
+//-   //- footer MOBILE ONLY
+//-   //- div(:style=`{height: '60px'}`).row.full-width.justify-center
+//-   //-   div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.items-center.q-px-sm
+//-   //-     q-btn(round flat color="white" icon="menu").q-mr-sm
+//-   //-     kalpa-buttons(:value="pages" :id="page" idKey="id" @id="$emit('page', $event)")
+//-   //- body
+//-   .col.full-width
+.row.full-width
     component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('add', $event)" :ctx="ctx")
 </template>
 

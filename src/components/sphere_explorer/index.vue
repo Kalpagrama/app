@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`)
   //- menu
   kalpa-menu-right
     div(

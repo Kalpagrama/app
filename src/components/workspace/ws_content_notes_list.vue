@@ -24,9 +24,9 @@
         q-btn(dense :flat="mode !== 'gallery'" color="green" no-caps @click="mode = 'gallery'").q-px-sm Gallery
         q-btn(dense :flat="mode !== 'feed'" color="green" no-caps @click="mode = 'feed'").q-px-sm.q-mx-sm Feed
   //- body
-  .col.full-width.scroll.q-pa-sm
+  .col.full-width.scroll.q-px-sm
     .row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '80px'}`).row.full-width.items-start.content-start
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '0px'}`).row.full-width.items-start.content-start
         kalpa-loader(type="CONTENT_NOTES_LIST" :variables=`{}`)
           template(v-slot="{items}")
             .row.full-width.items-start

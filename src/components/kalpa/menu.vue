@@ -7,14 +7,18 @@
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
       q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
         q-icon(name="blur_on" size="36px" color="white")
-    span(:style=`{fontSize: '18px'}`).text-white.text-bold Kalpagramma
+    .col
+      .row.fit.items-center.content-center
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold Kalpagramma
+        .row.full-width
+          small.text-white Up the essence!
   //- body
   .col.full-width.q-pt-sm
     div(
       :style=`{
         borderRadius: '10px', overflow: 'hidden'
       }`
-      ).column.full-width.bg-grey-8
+      ).column.full-width.bg-grey-9
         router-link(
           v-if="$store.getters.currentUser"
           :to="'/user/'+$store.getters.currentUser.oid"

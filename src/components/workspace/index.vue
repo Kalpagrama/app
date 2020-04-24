@@ -8,7 +8,7 @@
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', background: '#333'}`)
   kalpa-menu-right
     menu-right(:pages="pages")
-  q-header()
+  q-header(reveal)
     div(:style=`{background: '#333'}`).row.full-width.justify-center
       div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`).row.full-width
         .col.full-height
@@ -40,8 +40,8 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', ba
               maxWidth: $store.state.ui.maxWidthPage+'px'
             }`)
   q-page-container
-    q-page(:style=`{height: $q.screen.height-120+'px'}`)
-      div(:style=`{minHeight: '100%'}`).row.fit.justify-center.q-py-sm.q-px-xs
+    q-page
+      .row.fit.justify-center.q-py-sm.q-px-xs
         div(
           :style=`{
             maxWidth: $store.state.ui.maxWidthPage+'px',
@@ -59,6 +59,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', ba
             :style=`{
               borderRadius: '10px', overflow: 'hidden'
             }`).bg-grey-9
+        div(:style=`{height: '1000px'}`).row.full-width
 </template>
 
 <script>

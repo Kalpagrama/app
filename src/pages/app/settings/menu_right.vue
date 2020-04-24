@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.full-width
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).column.full-width.bg-grey-9
   div(:style=`{height: '60px'}`).row.full-width.items-center
   .col.full-width.scroll
     .row.full-width.items-start.content-start
