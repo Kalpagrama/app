@@ -65,6 +65,7 @@ export default function (/* { ssrContext } */) {
     },
     getters: {
       currentUser: (state, getters, rootState, rootGetters) => {
+        // logD('state.auth.userOid', state.auth.userOid)
         assert(state.auth.userOid, 'unknown user oid!')
         let user = state.cache.cachedItems[state.auth.userOid]
         assert(user, 'user not in cache!!!!')

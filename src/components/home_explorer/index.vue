@@ -1,9 +1,5 @@
 <template lang="pug">
-q-layout(
-  view="hHh lpR fFf"
-  container
-  :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  //- header
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
   q-header(reveal).row.full-width.justify-center.q-px-sm
     div(
       :style=`{
@@ -20,6 +16,9 @@ q-layout(
           span.text-black.text-bold Home
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="black" icon="more_vert")
+  kalpa-menu-footer
+    template(v-slot:menuRight)
+      menu-right
   //- page
   q-page-conainter
     q-page
@@ -35,8 +34,11 @@ q-layout(
 </template>
 
 <script>
+import menuRight from './menu_right'
+
 export default {
-  name: 'pageApp-home',
+  name: 'homeExplorer',
+  components: {menuRight},
   data () {
     return {
     }

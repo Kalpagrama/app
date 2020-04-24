@@ -9,14 +9,16 @@
       maxWidth: 600+'px',
       borderRadius: '10px'
     }`
-    ).row.full-width.items-start.content-start.justify-center.bg-grey-10.q-pb-xl
+    ).row.full-width.items-start.content-start.justify-center.bg-grey-9.q-pb-xl
     //- header
     .row.full-width.items-center.q-pa-md
       div(:style=`{width: '50px', height: '50px'}`).row
-        kalpa-spinner(:width="50" :height="50")
+        //- kalpa-spinner(:width="50" :height="50")
+        //- q-btn(flat round icon="blur_on" color="white" size="lg")
+        q-icon(name="blur_on" color="white" size="50px")
       .col.full-height
         .row.fit.items-center.content-center.q-px-sm
-          span(:style=`{fontSize: '20px'}`).text-white.text-bold.q-mb-sm Kalpa
+          span(:style=`{fontSize: '20px'}`).text-white.text-bold Kalpa
     //- form
     div(:style=`{maxWidth: '400px'}`).row.full-width.justify-center.q-py-xl.q-px-sm
       //- get started

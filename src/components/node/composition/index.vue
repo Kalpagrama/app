@@ -12,15 +12,7 @@ div(
     ).row.full-width
     .row.bg-red
       small active: {{active}}
-  //- composition menu
-  q-btn(
-    v-if="true &ctx !== 'workspace' && visible && active && !mini && value"
-    round flat color="white" icon="more_vert" @click="menuToggle()"
-    :style=`{
-      position: 'absolute', zIndex: 2000, top: '10px', right: '10px',
-      background: 'rgba(0,0,0,0.5)', transform: 'translate3d(0,0,0)'
-    }`)
-  //- next tint
+  //- mini tint
   div(
     v-if="mini" @click="$emit('next')"
     :style=`{position: 'absolute', zIndex: 4000, opacity: 0.5}`).row.fit.cursor-pointer
@@ -31,11 +23,11 @@ div(
     :style=`{
       userSelect: 'none',
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
-      maxHeight: $q.screen.height+'px', objectFit: 'contain', ...styles}`)
+      maxHeight: 500+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(
     v-if="visible && value"
-    :ctx="ctx" :composition="value" :contentInput="content"
+    :ctx="ctx" :composition="value"
     :visible="visible" :active="active" :mini="mini"
     :bgClass="bgClass"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
@@ -54,7 +46,6 @@ export default {
   props: {
     ctx: {type: String},
     value: {type: Object},
-    content: {type: Object},
     preview: {type: String},
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},

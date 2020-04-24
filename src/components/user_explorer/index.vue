@@ -6,40 +6,8 @@
 
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px'}`).bg-grey-10
-  //- menu
-  div(
-    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
-    :style=`{
-      position: 'fixed',
-      top: '0px',
-      zIndex: 1000,
-      width: $store.state.ui.maxWidthMenu+'px',
-      height: $q.screen.height+'px',
-      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '68px',
-    }`).row.items-start.content-start.q-px-sm.q-pb-sm
-    div(
-      :style=`{
-        borderRadius: '10px', overflow: 'hidden',
-        maxHeight: '70vh'
-      }`
-      ).column.fit.bg-grey-9
-      //- pages
-      router-link(
-        v-for="(p,pi) in pages" :key="p.id"
-        :to=`{params: {page: p.id}}`
-        :class=`{
-          'bg-grey-7': $route.params.page === p.id
-        }`
-        :style=`{height: '40px'}`).row.full-width.items-center.content-center.q-px-md.page-item
-        span.text-white {{ p.name }}
-      //- spheres
-      div(:style=`{height: '50px'}`).row.full-width.items-center.q-px-md
-        span.text-white Related spheres
-      .col.full-width.scroll
-        .row.full-width.q-pa-sm
-          sphere-spheres(v-if="user" :oid="user.oid")
-  //- header
+  kalpa-menu-right
+    menu-right(:user="user")
   q-header(v-if="false" reveal)
     .row.full-width.justify-center
       div(
@@ -52,31 +20,18 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', mi
         span.text-bold.text-white {{ user.name }}
         .row.full-width
           small.text-white @{{ user.name }}
-  //- footer
-  q-footer(reveal)
-    .row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px', borderRadius: '10px 10px 0 0'}`
-        ).row.full-width.items-center.content-center.bg-grey-9.q-px-sm
-        q-btn(
-          round push color="green" icon="add" size="lg"
-          :style=`{
-            position: 'absolute', zIndex: 100, top: '-44px', left: '50%',
-            transform: 'translate(-50%, 0)', borderRadius: '50%'
-          }`)
-        q-btn(round flat color="grey-2" icon="menu")
-        .col
-        q-btn(round flat color="grey-2" icon="more_vert")
-  //- page
+  kalpa-menu-footer
+    template(v-slot:menuRight)
+      menu-right(:user="user")
   q-page-container.row.fit.justify-center.bg-grey-10
     user-info(v-if="user" :user="user")
     user-created-nodes(
       v-if="$route.params.page === 'created'"
       :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
-      //- template(v-slot:header)
-        //- user-info(v-if="user" :user="user" :page="page" @page="page = $event")
 </template>
 
 <script>
+import menuRight from './menu_right'
 import userInfo from './user_info'
 import userFollowers from './user_followers'
 import userFollowing from './user_following'
@@ -85,7 +40,7 @@ import userVotedNodes from './user_voted_nodes'
 
 export default {
   name: 'userExplorer',
-  components: {userInfo, userVotedNodes, userCreatedNodes, userFollowing, userFollowers},
+  components: {menuRight, userInfo, userVotedNodes, userCreatedNodes, userFollowing, userFollowers},
   props: ['user'],
   data () {
     return {

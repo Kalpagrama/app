@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center
   q-resize-observer(@resize="onResize")
   div(:style=`{position: 'relative'}`).row.fit
     //- debug, relative
@@ -14,17 +14,6 @@ div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
       :style=`{position: 'absolute', bottom: '0px', zIndex: 10000}`
       ).row.full-width.bg-green
       small.text-white.full-width width: {{width}}
-    //- layer NAME
-    //- span(
-    //-   v-if="false & layer.spheres.length > 0"
-    //-   :style=`{position: 'absolute', zIndex: 1000, top: '10px', left: '10px', background: 'rgba(0,0,0,0.3)'}`
-    //-   ).text-white.q-pa-sm {{ layer.spheres[0].name }}
-    //- add layer
-    //- q-btn(
-    //-   v-if="content"
-    //-   v-show="content.contentSource === 'KALPA' ? framesLoaded : true"
-    //-   round push color="green" icon="add" @click="$emit('add')"
-    //-   :style=`{position: 'absolute', zIndex: 5000, right: '16px', top: '12px'}`)
     //- frames
     div(
       ref="framesScrollWrapper"
@@ -117,7 +106,7 @@ div(:style=`{position: 'relative'}`).row.fit.items-center.content-center
 
 <script>
 export default {
-  name: 'layerEditor',
+  name: 'extraLayers-layerEditorFigures',
   props: ['content', 'layers', 'layer', 'layerIndex', 'player', 'meta'],
   data () {
     return {

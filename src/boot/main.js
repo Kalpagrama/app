@@ -79,6 +79,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('wsItemSaver', () => import('components/workspace/ws_item_saver'))
     // explore
     Vue.component('userExplorer', () => import('components/user_explorer'))
+    Vue.component('trendsExplorer', () => import('components/trends_explorer'))
     Vue.component('sphereExplorer', () => import('components/sphere_explorer'))
     Vue.component('sphereSpheres', () => import('components/sphere_spheres'))
     Vue.component('sphereListTop', () => import('components/sphere_list_top'))
@@ -88,6 +89,9 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('listMasonry', () => import('components/list_masonry'))
     Vue.component('listMiddle', () => import('components/list_middle'))
     // kalpa
+    Vue.component('kalpaMenu', () => import('components/kalpa/menu'))
+    Vue.component('kalpaMenuRight', () => import('components/kalpa/menu_right'))
+    Vue.component('kalpaMenuFooter', () => import('components/kalpa/menu_footer'))
     Vue.component('kalpaAction', () => import('components/kalpa/action'))
     Vue.component('kalpaAvatar', () => import('components/kalpa/avatar'))
     Vue.component('kalpaButtons', () => import('components/kalpa/buttons'))

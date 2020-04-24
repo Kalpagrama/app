@@ -12,7 +12,7 @@ div(:style=`{position: 'relative'}`).column.fit
           paddingTop: paddingTop+'px',
           paddingBottom: paddingBottom+'px'
         }`
-        ).row.fit.items-start.content-start.justify-start.q-px-xs
+        ).row.fit.items-start.content-start.justify-start
         div(
           v-for="(i,ii) in items" :key="i.oid" :accessKey="ii"
           :ref="`node-`+i.oid"

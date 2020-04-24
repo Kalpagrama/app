@@ -1,6 +1,7 @@
 <template lang="pug">
-sphere-explorer(
+component(
   v-if="sphere"
+  :is="`${$route.name}-explorer`"
   :sphere="sphere"
   :loading="sphereLoading")
 </template>

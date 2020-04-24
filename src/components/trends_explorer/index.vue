@@ -4,32 +4,9 @@
 </style>
 
 <template lang="pug">
-q-layout(
-  view="hHh lpR fFf"
-  container
-  :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  //- menu
-  div(
-    v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
-    :style=`{
-      position: 'fixed',
-      top: '0px',
-      zIndex: 1000,
-      width: $store.state.ui.maxWidthMenu+'px',
-      height: $q.screen.height+'px',
-      right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '68px',
-    }`).row.items-start.content-start.q-px-sm.q-pb-sm
-    div(
-      :style=`{
-        borderRadius: '10px', overflow: 'hidden'
-      }`
-      ).column.full-width.bg-grey-9
-      div(:style=`{height: '50px'}`).row.full-width.items-center.content-content-center.q-px-md
-        span.text-white.text-bold Trending now
-      .col.full-width
-        sphere-list-top(:oid="$route.params.oid" @oid="$router.push({params: {oid: $event}})")
-  //- header
+q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
+  kalpa-menu-right
+    menu-right
   q-header(
     reveal
     :style=`{zIndex: 200}`).row.full-width.justify-center.bg-grey-8
@@ -48,20 +25,9 @@ q-layout(
             span.text-white.text-bold Trends
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
           q-btn(round flat color="grey-5" icon="more_vert")
-  //- footer
-  q-footer(
-    reveal)
-    div(:style=`{height: '60px'}`).row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius:  '10px 10px 0 0'}`
-        ).row.fit.items-center.content-center.justify-between.bg-grey-8.q-px-sm
-        q-btn(
-          round push color="green" icon="add" size="lg"
-          :style=`{position: 'absolute', top: '-40px', left: '50%', transform: 'translate(-50%, 0)',borderRadius: '50% !important'}`)
-        q-btn(round flat color="grey-4" icon="menu").q-mr-sm
-        .col.full-height
-          .row.fit.items-center.content-center.q-px-sm
-        q-btn(round flat color="grey-4" icon="more_vert").q-mr-sm
-  //- page
+  kalpa-menu-footer
+    template(v-slot:menuRight)
+      menu-right
   q-page-conainter
     q-page
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
@@ -76,8 +42,11 @@ q-layout(
 </template>
 
 <script>
+import menuRight from './menu_right'
+
 export default {
-  name: 'pageApp-trends',
+  name: 'trendsExplorer',
+  components: {menuRight},
   props: ['sphere'],
   data () {
     return {
@@ -86,7 +55,7 @@ export default {
   },
   computed: {
     sphereOid () {
-      return this.$route.params.oid
+      return this.sphere.oid
     },
     variables () {
       return {
@@ -104,7 +73,7 @@ export default {
   mounted () {
     this.$log('mounted')
     // this.$q.addressbarColor.set('#222')
-    // document.body.style.background = '#222'
+    document.body.style.background = '#222'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
