@@ -24,7 +24,7 @@
       },
       "build": {
         "capacitor": {
-          "iconHash": "baef8a49557fbc815337f7a18c5b7421",
+          "iconHash": "13fcee5eeafd589587b6a116c6c4f2a6",
           "splashscreenHash": "8aaa1808ce322490a536e4429478af99",
           "splashscreenType": "pure",
           "backgroundColor": "#FFFFFF"
