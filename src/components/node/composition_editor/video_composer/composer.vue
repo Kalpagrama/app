@@ -8,13 +8,17 @@ div
   //- header
   //- div(:style=`{position: 'absolute', zIndex: 1000, height: '60px', left: '0px', width: 'calc(100% + 0px)', top: '0px'}`).row.bg-grey-10.bg
   //- extra
+  //- v-touch-pan.mouse.vertical.prevent="onExtraPan"
   div(
-    v-touch-pan.mouse.vertical.prevent="onExtraPan"
     :style=`{
       position: 'absolute', height: extraHeight+'px', left: '0px', bottom: '0px',
       borderRadius: '10px 10px 0 0'
       }`
     ).column.full-width.bg-grey-9
+    q-btn(
+      v-touch-pan.mouse.vertical.prevent="onExtraPan"
+      round flat dense color="white" icon="drag_indicator"
+      :style=`{position: 'absolute', zIndex: 1000, top: '8px', right: '8px', background: 'rgba(0,0,0,0.2)'}`)
     //- body
     .col.full-width
       component(
