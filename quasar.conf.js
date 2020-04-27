@@ -2,6 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const webpack = require('webpack')
 require('dotenv').config()
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = function (ctx) {
@@ -106,14 +107,25 @@ module.exports = function (ctx) {
           })
         )
         if (!ctx.mode.capacitor){ // для PWA и SPA такая зависимость не нужна (см src/system/capacitor)
-          cfg.plugins.push(
+            cfg.plugins.push(
             new webpack.IgnorePlugin(/@capacitor\/core/)
           )
         }
         // cfg.plugins.push(
+        //   new CopyWebpackPlugin([
+        //     {
+        //       from: 'src/_redirects',
+        //       to: cfg.output.path
+        //     }
+        //   ])
+        // )
+
+        // cfg.plugins.push(
         //   new BundleAnalyzerPlugin()
         // )
-        { // todo отключить когда не потребуется debug(увеличивает размер js в 2 раза)
+
+        // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
+        {
           cfg.devtool = 'source-map'
           cfg.plugins.push(
             new webpack.SourceMapDevToolPlugin({
@@ -126,6 +138,7 @@ module.exports = function (ctx) {
             })
           )
         }
+
         cfg.resolve.alias = {
           ...cfg.resolve.alias,
           schema: path.resolve(__dirname, './src/schema')
@@ -151,14 +164,13 @@ module.exports = function (ctx) {
       //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
       // },
       // https: true,
-      port: 8282,
+      port: ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
       // https: true,
-      // host: 'mac.kalpa.app',
-      // https: {
-      //   key: fs.readFileSync('deploy/dev_server_cert/private.key'),
-      //   cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
-      //   // ca: fs.readFileSync('/path/to/ca.pem'),
-      // },
+      host: 'mac.kalpa.app',
+      https: {
+        key: fs.readFileSync('deploy/dev_server_cert/private.key'),
+        cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
+      },
       open: true // opens browser window automatically
     },
     // animations: 'all',

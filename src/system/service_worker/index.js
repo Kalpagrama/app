@@ -2,6 +2,7 @@ import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'boot/i18n'
+import { register } from 'register-service-worker'
 // import { capacitorInit } from 'src/system/capacitor'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
@@ -59,8 +60,43 @@ function showNotifyNewVer () {
   )
 }
 
+async function initSw2 (store) {
+  register('/service-worker.js', {
+
+    ready (/* registration */) {
+      logD('Service worker is active.')
+    },
+
+    registered (/* registration */) {
+      logD('Service worker has been registered.')
+    },
+
+    cached (/* registration */) {
+      logD('Content has been cached for offline use.')
+    },
+
+    updatefound (/* registration */) {
+      logD('New content is downloading.')
+    },
+
+    updated (/* registration */) {
+      logD('New content is available; please refresh.')
+    },
+
+    offline () {
+      logD('No internet connection found. App is running in offline mode.')
+    },
+
+    error (err) {
+      logE('Error during service worker registration:', err)
+    }
+  })
+}
+
 async function initSw (store) {
-  logD('initSw')
+  logD('initSw1')
+  // await initSw2()
+  logD('initSw2')
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
     logD('beforeinstallprompt')

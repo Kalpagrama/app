@@ -5,5 +5,7 @@
   "npmClient": "yarn",
   "webDir": "www",
   "backgroundColor": "#22222222",
-  "server": {}
+  "server": {
+    "url": "https://mac.kalpa.app:8484"
+  }
 }
