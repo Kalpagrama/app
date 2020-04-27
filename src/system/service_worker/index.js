@@ -19,7 +19,7 @@ function sendMessageToSW (message) {
   // controller.postMessage() and set up the onmessage handler
   // independently of a promise, but this is a convenient wrapper.
   return new Promise(function (resolve, reject) {
-    var messageChannel = new MessageChannel()
+    let messageChannel = new MessageChannel()
     messageChannel.port1.onmessage = function (event) {
       if (event.data.error) {
         reject(event.data.error)
@@ -36,6 +36,7 @@ function sendMessageToSW (message) {
     // https://html.spec.whatwg.org/multipage/workers.html#dom-worker-postmessage
     if (navigator && navigator.serviceWorker && navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage(message, [messageChannel.port2])
+      resolve()
     } else {
       reject('no controller!!!')
     }
@@ -80,7 +81,6 @@ async function initSw (store) {
       logD('Registration sw succeeded. Scope is ', registration.scope)
 
       wait(100).then(() => {
-        logD('sendMessageToSW...')
         sendMessageToSW({
           type: 'logInit',
           logModulesBlackList: store.state.core.logModulesBlackList,
@@ -150,7 +150,9 @@ async function initSw (store) {
     }
     logD('initSw complete')
     // await initWebPush(store)
-  } else logW('serviceWorker disabled!')
+  } else {
+    logW('serviceWorker disabled!')
+  }
 
   function handleNetworkChange (event) {
     logD('handleNetworkChange', navigator.onLine)
@@ -256,11 +258,13 @@ async function update () {
 
 async function askForWebPushPerm (store) {
   if (Platform.is.capacitor) {
-    // await capacitorInit()
+    const {capacitorInit} = await import('src/system/capacitor')
+    await capacitorInit()
     return true
   } else {
     return new Promise((resolve, reject) => {
       if (Platform.is.safari && !Platform.is.ios) {
+        return resolve(false)
         // safari mobile (partial support)
         // todo
         // assert(window.safari)
