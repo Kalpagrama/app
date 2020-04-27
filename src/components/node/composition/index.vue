@@ -22,7 +22,7 @@ div(
     @load="previewLoad" @error="previewError" @click="previewClick"
     :style=`{
       userSelect: 'none',
-      width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
+      width: '100%', height: mini ? 'auto' : '100%', opacity: 0,
       maxHeight: 500+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(

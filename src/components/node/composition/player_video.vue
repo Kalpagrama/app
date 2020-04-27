@@ -58,7 +58,7 @@ div(
     //- {{ layer.spheres[0].name | cut(50) }}
     //- layer menu
     q-btn(
-      v-if="true && ctx !== 'workspace' && visible && active && !mini"
+      v-if="content && ctx !== 'workspace' && visible && active && !mini"
       round flat color="grey-2" icon="more_vert"
       :style=`{
         position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
