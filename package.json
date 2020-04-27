@@ -28,6 +28,7 @@
     "now": "now"
   },
   "dependencies": {
+    "@capacitor/core": "^2.0.1",
     "@panter/vue-i18next": "^0.15.1",
     "@quasar/extras": "^1.6.4",
     "apollo-cache-inmemory": "^1.6.5",
