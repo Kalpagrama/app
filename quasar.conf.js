@@ -105,6 +105,11 @@ module.exports = function (ctx) {
             gql: 'graphql-tag'
           })
         )
+        if (!ctx.mode.capacitor){ // для PWA и SPA такая зависимость не нужна (см src/system/capacitor)
+          cfg.plugins.push(
+            new webpack.IgnorePlugin(/@capacitor\/core/)
+          )
+        }
         // cfg.plugins.push(
         //   new BundleAnalyzerPlugin()
         // )
