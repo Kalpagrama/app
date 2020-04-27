@@ -2,7 +2,7 @@ import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'boot/i18n'
-import { capacitorInit } from 'src/system/capacitor'
+// import { capacitorInit } from 'src/system/capacitor'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
@@ -256,7 +256,7 @@ async function update () {
 
 async function askForWebPushPerm (store) {
   if (Platform.is.capacitor) {
-    await capacitorInit()
+    // await capacitorInit()
     return true
   } else {
     return new Promise((resolve, reject) => {
