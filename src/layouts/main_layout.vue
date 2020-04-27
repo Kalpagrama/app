@@ -46,6 +46,9 @@ export default {
       offsetTop: null
     }
   },
+  meta: {
+    title: 'Kalpagramma'
+  },
   methods: {
     onResize (e) {
       this.$log('onResize', e)
