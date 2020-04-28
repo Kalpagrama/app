@@ -29,14 +29,15 @@ div(:style=`{}`).column.fit
       draggable(
         :list="meta.layers" group="layers" handle=".layer-drag-handle"
         :move="layerOnMove"
-        @start="layersDragging = true" @end="layersDragging = false").full-width
+        @start="layersDragging = true"
+        @end="layersDragging = false, layerIndexFuture = null").full-width
         div(
           v-for="(l,li) in meta.layers" :key="li" :ref="`layer-${li}`"
           v-if="l.figuresAbsolute.length > 0"
           :style=`{
             position: 'relative'
           }`
-          ).row.full-width.q-mb-sm
+          ).row.full-width.q-mb-xs
           //- default layer header
           .row.full-width
             //- div(:style=`{height: '35px', width: '35px'}`).row
@@ -49,16 +50,17 @@ div(:style=`{}`).column.fit
                   :class=`{
                     'bg-grey-6': li === meta.layerIndexPlay,
                     'bg-grey-7': li !== meta.layerIndexPlay,
+                    'layer-item': li !== meta.layerIndexPlay
                   }`
                   :style=`{position: 'relative', height: '35px', borderRadius: li === meta.layerIndexPlay ? '10px 10px 0 0' : '10px', oveflow: 'hidden'}`
                   ).row.full-width.items-center.content-center.q-pr-sm
                   //- layerIndexFuture bar
-                  //- div(
-                  //-   v-if="li === layerIndexFuture"
-                  //-   :style=`{
-                  //-     position: 'absolute', zIndex: 1200, bottom: '-8px', height: '8px'
-                  //-   }`
-                  //-   ).row.full-width.br
+                  div(
+                    v-if="false"
+                    :style=`{
+                      position: 'absolute', zIndex: 1200, bottom: '-8px', height: '8px'
+                    }`
+                    ).row.full-width.br
                   //- inactive tint
                   div(v-if="li !== meta.layerIndexPlay" :style=`{position: 'absolute', zIndex: 1000}` @click="layerClick(l, li)").row.fit.cursor-pointer
                   //- now tint
@@ -187,7 +189,8 @@ export default {
     layerOnMove (e, evt) {
       this.$log('layerDragMove', e, evt)
       this.$log('layerIndexFuture', e.draggedContext.futureIndex)
-      this.layerIndexFuture = e.draggedContext.futureIndex
+      this.$set(this, 'layerIndexFuture', e.draggedContext.futureIndex + 1)
+      // this.layerIndexFuture = e.draggedContext.futureIndex
     },
     layerWorkspaceClick (l, li) {
       this.$log('layerWorkspaceClick', l, li)

@@ -50,7 +50,7 @@
           .row.full-width.justify-start.q-py-sm.q-px-md
             span.text-grey-3 New users need invite code
           q-input(
-            v-model="inviteCode" dark color="green" filled label="Enter invite code"
+            v-model="inviteCode" dark color="green" filled label="Enter invite code" autofocus
             :style=`{borderRadius: '10px', overflow: 'hidden'}`
             ).full-width.q-mb-sm.bg-grey-9
         //- email

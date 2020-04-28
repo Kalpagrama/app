@@ -16,10 +16,22 @@ div(
             :style=`{position: 'relative', height: '24px'}`
             ).row.full-width.items-center.content-center.cursor-pointer
             div(:style=`{position: 'relative', height: '4px', borderRadius: '2px'}`).row.full-width.bg-grey-2
+              //- bar point to left
+              div(
+                :style=`{
+                  position: 'absolute',
+                  zIndex: 100,
+                  borderRadius: '2px',
+                  width: 'calc(2px + '+layerPointPercent+'%)',
+                  pointerEvents: 'none',
+                  background: $randomColor(index)
+                }`
+                ).row.full-height
               //- bar point
               div(
                 :style=`{
                   position: 'absolute',
+                  zIndex: 110,
                   top: '-8px',
                   left: layerPointPercent+'%',
                   width: '20px',
