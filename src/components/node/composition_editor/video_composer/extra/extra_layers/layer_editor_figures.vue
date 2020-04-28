@@ -32,6 +32,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
         //- frames
         div(:style=`{position: 'relative', borderRadius: '10px'}`).row.no-wrap
+          //- FRAMES from youtube or kalpa...
           //- frames images from kalpa
           div(v-if="content.contentSource === 'KALPA'" :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap
             img(
@@ -45,18 +46,19 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
               :style=`{height: '50px', width: '50px', borderLeft: fi === 0 ? 'none' : '1px solid grey'}`
               ).row.items-center.justify-center.bg-white
               small(:style=`{userSelect: 'none', pointerEvents: 'none'}`).cursor-pointer {{ $time((parseInt((((fi+1)*frameDuration)-frameDuration/2)*100))/100) }}
+          //- LAYER
           //- layers tints
           div(
-            v-for="(l, li) in layers" :key="li"
-            v-if="l.figuresAbsolute.length > 0 && li !== layerIndex"
+            v-for="(l, li) in meta.layers" :key="li"
+            v-if="l.figuresAbsolute.length > 0 && li !== meta.layerIndex"
             :style=`{
               position: 'absolute', height: '50px', background: $randomColor(li),
-              pointerEvents: 'none', opacity: 0.1,
+              pointerEvents: 'none', opacity: 0.3,
               left: (l.figuresAbsolute[0].t/duration)*100+'%',
               width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/duration)*100+'%'}`).row
           //- left tint
           div(
-            v-if="layer.figuresAbsolute.length > 0"
+            v-if="layer && layer.figuresAbsolute.length > 0"
             :style=`{
               position: 'absolute', left: 0, top: 0, height: '50px',
               width: 'calc( '+(layer.figuresAbsolute[0].t/duration)*100+'% + 6px )',
@@ -65,12 +67,12 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             }`).row.bg-black
           //- middle layers rectangle of color
           div(
-            v-if="layer.figuresAbsolute.length > 0"
+            v-if="layer && layer.figuresAbsolute.length > 0"
             :style=`{
               position: 'absolute', zIndex: 120, height: '66px', top: '-8px',
               left: (layer.figuresAbsolute[0].t/duration)*100+'%',
               width: ((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/duration)*100+'%',
-              borderRadius: '16px', border: '8px solid '+ $randomColor(layerIndex), pointerEvents: 'none'}`).row
+              borderRadius: '16px', border: '8px solid '+ $randomColor(meta.layerIndex), pointerEvents: 'none'}`).row.br
           //- now second
           div(
             v-if="true"
@@ -79,21 +81,21 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
               width: '4px', pointerEvents: 'none'}`).row.bg-green
           //- layer start round grabber
           div(
-            v-if="layer.figuresAbsolute.length > 0"
+            v-if="layer && layer.figuresAbsolute.length > 0"
             v-touch-pan.left.right.prevent.mouse="panStart"
             :style=`{position: 'absolute', zIndex: 101, top: 0,
               left: 'calc('+ (layer.figuresAbsolute[0].t/duration)*100+'%' +' - 20px)',
               width: '50px', height: '50px', opacity: 0.3, borderRadius: '50%', cursor: 'grab'}`).row.bg-green
           //- layer end round grabber
           div(
-            v-if="layer.figuresAbsolute.length > 0"
+            v-if="layer && layer.figuresAbsolute.length > 0"
             v-touch-pan.left.right.prevent.mouse="panEnd"
             :style=`{position: 'absolute', zIndex: 102, top: 0,
               left: 'calc('+ (layer.figuresAbsolute[1].t/duration)*100+'%' +' - 30px)',
               width: '50px', height: '50px', opacity: 0.3, borderRadius: '50%', cursor: 'grab'}`).row.bg-green
           //- right tint
           div(
-            v-if="layer.figuresAbsolute.length > 0"
+            v-if="layer && layer.figuresAbsolute.length > 0"
             :style=`{
               position: 'absolute', right: 0, top: 0, height: '50px',
               width: 'calc( '+((duration-layer.figuresAbsolute[1].t)/duration)*100+'% + 8px )',
@@ -107,7 +109,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
 <script>
 export default {
   name: 'extraLayers-layerEditorFigures',
-  props: ['content', 'layers', 'layer', 'layerIndex', 'player', 'meta'],
+  props: ['player', 'meta'],
   data () {
     return {
       width: 0,
@@ -119,15 +121,25 @@ export default {
     }
   },
   computed: {
+    content () {
+      return this.meta.content
+    },
+    duration () {
+      return this.meta.duration
+    },
+    layer () {
+      if (this.meta.layerIndexPlay >= 0) {
+        return this.meta.layers[this.meta.layerIndexPlay]
+      }
+      else {
+        return null
+      }
+    },
     k () {
       if (this.framesWidth === 0) return 1
       else {
         return this.duration / this.framesWidth
       }
-    },
-    duration () {
-      if (!this.content) return 0
-      return this.content.duration
     },
     frames () {
       if (!this.content) return []
@@ -198,12 +210,6 @@ export default {
       immediate: false,
       handler (to, from) {
         if (to) {
-          // if (from && to === from) return
-          // if (this.panning || this.panningFrames) return
-          // this.$log('layer CHANGED', to)
-          // this.framesWidthUpdate()
-          // this.$tween.to(this.$refs.framesScrollWrapper, 0.9, {scrollLeft: (to.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50})
-          // this.player.setCurrentTime(to.figuresAbsolute[0].t)
         }
       }
     }

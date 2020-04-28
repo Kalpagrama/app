@@ -119,6 +119,35 @@ export default {
     this.$wait(200).then(() => {
       this.tabChanged('layers')
     })
+    window.onkeydown = (e) => {
+      switch (e.keyCode) {
+        // space
+        case 32: {
+          if (this.meta.playing) this.player.pause()
+          else this.player.play()
+          break
+        }
+        // left
+        case 37: {
+          let to = this.meta.now - 5
+          if (to < 0) to = 0
+          this.$parent.$emit('meta', ['mode', 'watch'])
+          this.player.setCurrentTime(to)
+          this.player.update()
+          break
+        }
+        // right
+        case 39: {
+          let to = this.meta.now + 5
+          if (to > this.meta.duration) to = this.meta.duration
+          this.$parent.$emit('meta', ['mode', 'watch'])
+          this.player.setCurrentTime(to)
+          this.player.update()
+          break
+        }
+      }
+    }
+    // this.player.mutedToggle()
     // this.styles.paddingTop = 8
     // this.styles.paddingLeft = 4
     // this.styles.paddingRight = 4

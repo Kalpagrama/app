@@ -73,10 +73,17 @@ export default {
       else return p
     },
     layerPlaying () {
-      if (this.meta.playing && this.meta.layerIndexPlay === this.index) {
+      if
+      (
+        this.meta.mode === 'layer' &&
+        this.meta.playing &&
+        this.meta.layerIndexPlay === this.index
+      )
+      {
         return true
       }
-      else {
+      else
+      {
         return false
       }
     }
@@ -88,6 +95,8 @@ export default {
         this.player.pause()
       }
       else {
+        this.$emit('meta', ['mode', 'layer'])
+        this.$emit('meta', ['layerIndexPlay', this.index])
         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
         this.player.play()
         this.player.update()

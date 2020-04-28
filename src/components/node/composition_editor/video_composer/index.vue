@@ -16,7 +16,7 @@ div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
       composer(
         ctx="workspace"
         :composition="composition"
-        :player="player" :meta="meta"
+        :player="player" :meta="meta" @meta="$parent.emit('meta', $event)"
         :styles="styles" @cancel="$emit('cancel')")
 </template>
 

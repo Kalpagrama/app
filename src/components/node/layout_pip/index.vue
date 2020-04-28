@@ -16,11 +16,12 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       :visible="visible" :active="active" :mini="mini")
     vote(v-if="voteShow" :oid="node.oid" @end="voteShow = false")
   //- essence
-  div(
+  router-link(
     v-if="essence"
+    :to="'/sphere/'+sphereOid"
     :style=`{height: '50px'}`
     ).row.full-width.items-center.content-center.justify-start.q-px-md.q-py-sm
-    router-link(:to="'/sphere/'+sphereOid").text-white.text-bold {{ node.name }}
+    span.text-white.text-bold {{ node.name }}
   //- author and vote
   div(
     v-if="opened && nodeFull"

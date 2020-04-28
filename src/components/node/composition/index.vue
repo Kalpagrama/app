@@ -22,12 +22,12 @@ div(
     @load="previewLoad" @error="previewError" @click="previewClick"
     :style=`{
       userSelect: 'none',
-      width: '100%', height: mini ? 'auto' : '100%', opacity: 0,
+      width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
       maxHeight: 500+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(
     v-if="visible && value"
-    :ctx="ctx" :composition="value"
+    :ctx="ctx" :composition="value" :preview="preview"
     :visible="visible" :active="active" :mini="mini"
     :bgClass="bgClass"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
@@ -50,15 +50,15 @@ export default {
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},
     mini: {type: Boolean, default () { return false }},
-    styles: {type: Object, default () { return {} }},
-    bgClass: {type: String, default () { return 'bg-black' }}
+    styles: {type: Object, default () { return {} }}
   },
   data () {
     return {
       previewLocal: undefined,
       previewWidth: 0,
       previewHeight: 0,
-      previewLoaded: false
+      previewLoaded: false,
+      playerLoaded: false
     }
   },
   computed: {

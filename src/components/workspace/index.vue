@@ -28,7 +28,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', ba
     @hide="itemEdited")
     //- @click.self="pageDialogOpened = false"
     div(
-      :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center
+      :style=`{position: 'relative', height: $q.screen.height+'px', background: 'rgba(0,0,0,0.8)'}`).row.full-width.justify-center
       ws-item-saver(v-if="$store.state.workspace.item" :value="$store.state.workspace.item")
         template(v-slot=`{item}`)
           composition-editor(

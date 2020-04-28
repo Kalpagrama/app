@@ -30,7 +30,9 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
                 ctx="list" layout="PIP"
                 :node="item" :index="index" :essence="true"
                 :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
-                :visible="true" :active="index === indexMiddle" :mini="false")
+                :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
+                :active="index === indexMiddle"
+                :mini="false")
 </template>
 
 <script>

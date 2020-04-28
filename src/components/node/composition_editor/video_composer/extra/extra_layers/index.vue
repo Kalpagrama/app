@@ -18,57 +18,79 @@ div(:style=`{}`).column.fit
     v-if="height > 100"
     :style=`{height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
     layer-editor-figures(
-      v-if="meta.layer"
-      :layers="meta.layers"
-      :layerIndex="meta.layerIndexPlay"
-      :layer="meta.layer"
-      :content="meta.content" :player="player" :meta="meta" @meta="$emit('meta', $event)")
+      v-if="meta.content"
+      :player="player" :meta="meta" @meta="$emit('meta', $event)")
   //- body
   div(
     ref="extraNodesScroll"
     :style=`{position: 'relative'}`
     ).col.full-width.scroll.bg-grey-9
     div(:style=`{marginTop: '0px', marginBottom: '1000px'}`).row.full-width.items-start.content-start.q-pt-sm.q-px-xs
-      div(
-        v-for="(l,li) in meta.layers" :key="li" :ref="`layer-${li}`"
-        v-if="l.figuresAbsolute.length > 0"
-        :style=`{
-          position: 'relative'
-        }`
-        ).row.full-width.q-mb-sm
-        //- default layer header
-        .row.full-width
-          //- div(:style=`{height: '35px', width: '35px'}`).row
-          .col
-            div(
-              :style=`{
-              }`
-              ).row.fit.cursor-pointer
+      draggable(
+        :list="meta.layers" group="layers" handle=".layer-drag-handle"
+        :move="layerOnMove"
+        @start="layersDragging = true" @end="layersDragging = false").full-width
+        div(
+          v-for="(l,li) in meta.layers" :key="li" :ref="`layer-${li}`"
+          v-if="l.figuresAbsolute.length > 0"
+          :style=`{
+            position: 'relative'
+          }`
+          ).row.full-width.q-mb-sm
+          //- default layer header
+          .row.full-width
+            //- div(:style=`{height: '35px', width: '35px'}`).row
+            .col
               div(
-                :class=`{
-                  'bg-grey-6': li === meta.layerIndexPlay,
-                  'bg-grey-7': li !== meta.layerIndexPlay,
+                :style=`{
                 }`
-                :style=`{position: 'relative', height: '35px', borderRadius: li === meta.layerIndexPlay ? '10px 10px 0 0' : '10px', oveflow: 'hidden'}`
-                ).row.full-width.items-center.content-center.q-pr-sm
-                //- inactive tint
-                div(v-if="li !== meta.layerIndexPlay" :style=`{position: 'absolute', zIndex: 1000}` @click="layerClick(l, li)").row.fit.cursor-pointer
-                .col
-                  .row.full-height.q-px-md
-                    span(
-                      @click="layerSetNameStart()"
-                      ).text-white.text-bold.cursor-pointer {{l.spheres.length > 0 ? l.spheres[0].name : li === meta.layerIndexPlay ? 'Set layer name' : ''}}
-                      q-popup-proxy
-                        layer-editor-spheres(:layer="l" :index="li")
-                .row.full-height.items-center.content-center
-                  small.text-white {{$time(l.figuresAbsolute[0].t)}}-
-                  small.text-white {{$time(l.figuresAbsolute[1].t)}}
-          div(:style=`{height: '35px', width: '40px'}`).row.items-center.content-center.justify-center
-            q-btn(round flat dense color="grey-6" icon="drag_indicator")
-        layer-active(
-          v-if="li === meta.layerIndexPlay"
-          v-bind="$props" :layer="l" :index="li")
-  //- layers workspace modal
+                ).row.fit.cursor-pointer
+                div(
+                  :class=`{
+                    'bg-grey-6': li === meta.layerIndexPlay,
+                    'bg-grey-7': li !== meta.layerIndexPlay,
+                  }`
+                  :style=`{position: 'relative', height: '35px', borderRadius: li === meta.layerIndexPlay ? '10px 10px 0 0' : '10px', oveflow: 'hidden'}`
+                  ).row.full-width.items-center.content-center.q-pr-sm
+                  //- layerIndexFuture bar
+                  //- div(
+                  //-   v-if="li === layerIndexFuture"
+                  //-   :style=`{
+                  //-     position: 'absolute', zIndex: 1200, bottom: '-8px', height: '8px'
+                  //-   }`
+                  //-   ).row.full-width.br
+                  //- inactive tint
+                  div(v-if="li !== meta.layerIndexPlay" :style=`{position: 'absolute', zIndex: 1000}` @click="layerClick(l, li)").row.fit.cursor-pointer
+                  //- now tint
+                  div(
+                    v-if="li !== meta.layerIndexPlay && meta.now > l.figuresAbsolute[0].t && meta.now < l.figuresAbsolute[1].t"
+                    :style=`{
+                      position: 'absolute', zIndex: 1100, left: '0px', pointerEvents: 'none',
+                      background: 'rgba(255,255,255,0.4)',
+                      borderRadius: '10px', overflow: 'hidden',
+                      width: ((meta.now-l.figuresAbsolute[0].t)/(l.figuresAbsolute[1].t-l.figuresAbsolute[0].t))*100+'%'
+                    }`).row.full-height
+                  .col
+                    .row.full-height.q-px-md
+                      span(
+                        @click="layerSetNameStart()"
+                        ).text-white.text-bold.cursor-pointer {{l.spheres.length > 0 ? l.spheres[0].name : li === meta.layerIndexPlay ? 'Set layer name' : ''}}
+                        q-popup-proxy
+                          layer-editor-spheres(:layer="l" :index="li")
+                  .row.full-height.items-center.content-center
+                    small.text-white {{$time(l.figuresAbsolute[0].t)}}-
+                    small.text-white {{$time(l.figuresAbsolute[1].t)}}
+                    small.text-white.q-mx-xs /
+                    small.text-white {{$time(l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)}}
+            div(:style=`{height: '35px', width: '40px'}`).row.items-center.content-center.justify-center
+              q-btn(
+                round flat dense color="grey-6" icon="drag_indicator"
+                :style=`{cursor: layersDragging ? 'grabbing' : 'grab'}`).layer-drag-handle
+          layer-active(
+            v-if="li === meta.layerIndexPlay"
+            v-bind="$props" :layer="l" :index="li"
+            @meta="$emit('meta', $event)")
+  //- layers FROM WORKSPACE modal
   div(
     v-if="showLayersFromWorkspace"
     :style=`{
@@ -89,26 +111,41 @@ div(:style=`{}`).column.fit
           v-for="(l,li) in composition.layersWorkspace" :key="li" @click="layerWorkspaceClick(l,li)"
           :style=`{height: '35px', borderRadius: '10px'}`
           ).row.full-width.items-center.bg-grey-7.cursor-pointer.q-px-md.q-mb-sm
-          span.text-white {{l.figuresAbsolute[0].t}}-{{l.figuresAbsolute[1].t}}
+          .col
+            .row.fit.items-center.content-center-q-px-md
+              span(v-if="l.spheres.length > 0").text-white {{ l.spheres[0].name }}
+          span.text-white {{$time(l.figuresAbsolute[0].t)}}-{{$time(l.figuresAbsolute[1].t)}}
   //- footer
   div(
     v-if="true"
-    :style=`{height: '60px'}`
-    ).row.full-width.items-center.q-px-sm
+    :style=`{height: '40px'}`
+    ).row.full-width.items-center
     .col
-    q-btn(
-      v-if="composition.layersWorkspace" @click="showLayersFromWorkspace = !showLayersFromWorkspace"
-      flat color="green" no-caps) From workspace
+      q-btn(
+        @click="layersPlayAll()"
+        flat color="white" no-caps
+        ) Play all
+      q-btn(
+        @click="layersWatch()"
+        flat color="white" no-caps
+        ) Watch
+      q-btn(
+        v-if="composition.layersWorkspace" @click="showLayersFromWorkspace = !showLayersFromWorkspace"
+        flat color="green" no-caps) From workspace
+    span.text-white {{$time(layersTotalTime)}}
+    div(:style=`{width: '50px'}`).row.full-height.items-center.justify-center
+      span.text-white Total
 </template>
 
 <script>
 import layerEditorFigures from './layer_editor_figures'
 import layerEditorSpheres from './layer_editor_spheres'
 import layerActive from './layer_active'
+import draggable from 'vuedraggable'
 
 export default {
   name: 'extraLayers',
-  components: {layerEditorFigures, layerEditorSpheres, layerActive},
+  components: {layerEditorFigures, layerEditorSpheres, layerActive, draggable},
   props: ['composition', 'player', 'meta', 'height'],
   data () {
     return {
@@ -116,10 +153,20 @@ export default {
       scrollOverflow: 'auto',
       scrollTimeout: null,
       showLayersFromWorkspace: false,
-      layerNameEditing: false
+      layerNameEditing: false,
+      layerIndexFuture: null,
+      layersDragging: false
     }
   },
   computed: {
+    layersTotalTime () {
+      return this.meta.layers.reduce((acc, val) => {
+        if (val.figuresAbsolute.length > 0) {
+          acc += (val.figuresAbsolute[1].t - val.figuresAbsolute[0].t)
+        }
+        return acc
+      }, 0)
+    }
   },
   watch: {
     'meta.layerIndexPlay': {
@@ -137,6 +184,11 @@ export default {
     }
   },
   methods: {
+    layerOnMove (e, evt) {
+      this.$log('layerDragMove', e, evt)
+      this.$log('layerIndexFuture', e.draggedContext.futureIndex)
+      this.layerIndexFuture = e.draggedContext.futureIndex
+    },
     layerWorkspaceClick (l, li) {
       this.$log('layerWorkspaceClick', l, li)
       this.layerAdd(null, null, l)
@@ -187,6 +239,19 @@ export default {
     layerSetNameStart () {
       this.$log('layerSetNameStart')
       this.layerNameEditing = true
+    },
+    layersPlayAll () {
+      this.$log('layersPlayAll')
+      this.$emit('meta', ['layerIndex', 0])
+      this.$emit('meta', ['layerIndexPlay', -1])
+      this.$emit('meta', ['mode', 'play'])
+      this.player.play()
+    },
+    layersWatch () {
+      this.$log('layersWatch')
+      this.$emit('meta', ['mode', 'watch'])
+      this.$emit('meta', ['layerIndexPlay', -1])
+      this.player.play()
     },
     onScroll () {
       // this.$log('onScroll')

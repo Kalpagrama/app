@@ -1,14 +1,16 @@
 <style lang="stylus">
 iframe {
-  width: 100%;
-  height: 100%;
-  min-width: 100%;
-  min-height: 100%;
-  max-width: 100%;
-  max-height: 100%;
+  width: 1000%;
+  height: 1000%;
+  min-width: 1000%;
+  min-height: 1000%;
+  max-width: 1000%;
+  max-height: 1000%;
   z-index: 100;
-  border-radius: 10px;
+  border-radius: 1px;
   overflow: hidden;
+  transform: scale(0.1);
+  transform-origin: top left;
 }
 .mejs__overlay-button {
   display: none;
@@ -24,11 +26,11 @@ div(
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
   div(
-    v-if="!mini && $store.state.ui.debug"
+    v-if="!mini && false"
     :style=`{
-      position: 'absolute', width: 'calc(100% - 20px)', left: '6px', top: '4px',
+      position: 'absolute', width: 'calc(100% - 90px)', left: '6px', top: '4px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
-      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.5}`).row.q-pa-sm.bg-green
+      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.9}`).row.q-pa-sm.bg-green
     small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
     small.full-width now/duration: {{now}}/{{duration}}
     small.full-width ctx/mode: {{ctx}}/{{mode}}
@@ -143,7 +145,7 @@ import playerVideoProgress from './player_video_progress'
 
 export default {
   name: 'playerVideo',
-  props: ['ctx', 'composition', 'visible', 'active', 'mini', 'bgClass'],
+  props: ['ctx', 'composition', 'visible', 'active', 'mini'],
   components: {playerVideoProgress},
   data () {
     return {
@@ -424,6 +426,12 @@ export default {
       if (this.visible && this.active && !this.mini) this.player.play()
       if (!this.active) this.player.pause()
       this.videoUpdate()
+      if (this.ctx === 'workspace') {
+        this.player.mutedToggle()
+      }
+      this.$wait(400).then(() => {
+        this.$emit('loaded')
+      })
     },
     videoPlay (intervalUpdateIgnore) {
       this.$log('videoPlay')
