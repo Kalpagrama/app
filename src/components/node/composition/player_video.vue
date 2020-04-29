@@ -1,20 +1,23 @@
-<style lang="stylus">
-iframe {
-  width: 1000%;
-  height: 1000%;
-  min-width: 1000%;
-  min-height: 1000%;
-  max-width: 1000%;
-  max-height: 1000%;
-  z-index: 100;
-  border-radius: 1px;
-  overflow: hidden;
-  transform: scale(0.1);
-  transform-origin: top left;
-}
-.mejs__overlay-button {
-  display: none;
-}
+<style lang="sass">
+iframe
+  width: 100%
+  height: 100%
+  z-index: 100
+  border-radius: 10px
+  overflow: hidden
+@media (min-width: 600px)
+  iframe
+    width: 1000%
+    height: 1000%
+    min-width: 1000%
+    min-height: 1000%
+    z-index: 100
+    border-radius: 1px
+    overflow: hidden
+    transform: scale(0.1)
+    transform-origin: top left
+.mejs__overlay-button
+  display: none
 </style>
 
 <template lang="pug">
@@ -427,6 +430,7 @@ export default {
     videoLoadeddata () {
       this.$log('videoLoadeddata')
       this.videoLoadeddataDone = true
+      if (!this.player) return
       if (this.visible) {
         if (this.player) {
           this.player.setCurrentTime(this.layerStart)

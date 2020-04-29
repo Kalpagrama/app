@@ -13,7 +13,7 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
         q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
       .col.full-height
         .row.fit.items-center.content-center.justify-center
-          span.text-black.text-bold Home
+          span.text-grey-2.text-bold Home
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="grey-2" icon="more_vert")
   kalpa-menu-footer
