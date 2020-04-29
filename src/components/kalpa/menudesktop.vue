@@ -88,7 +88,7 @@ div(
 </template>
 
 <script>
-import { checkUpdate, update } from 'src/system/service_worker'
+import { checkUpdate, update } from 'src/system/services'
 // img:statics/icons/anvil.svg
 export default {
   name: 'kalpaMenuDesktop',

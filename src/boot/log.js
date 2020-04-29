@@ -1,5 +1,3 @@
-// import * as Sentry from '@sentry/browser'
-import { Notify } from 'quasar'
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {
   // eslint-disable-next-line no-extend-native
@@ -16,29 +14,6 @@ if (!('toJSON' in Error.prototype)) {
     configurable: true,
     writable: true
   })
-}
-
-let logD = (...msg) => console.log(...msg)
-let logI = (...msg) => console.log(...msg)
-let logW = (...msg) => console.warn(...msg)
-let logE = (...msg) => console.error(...msg)
-let logC = (...msg) => console.error(...msg)
-
-function getLogFunc (level, module) {
-  switch (level) {
-    case 'debug':
-      return (...args) => logD.call({ logModuleName: module }, ...args)
-    case 'info':
-      return (...args) => logI.call({ logModuleName: module }, ...args)
-    case 'warning':
-      return (...args) => logW.call({ logModuleName: module }, ...args)
-    case 'error':
-      return (...args) => logE.call({ logModuleName: module }, ...args)
-    case 'critical':
-      return (...args) => logC.call({ logModuleName: module }, ...args)
-    default:
-      return (...args) => logD.call({ logModuleName: module }, ...args)
-  }
 }
 
 const LogLevelEnum = Object.freeze({
@@ -66,6 +41,7 @@ class Logger {
     // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
   }
 
+  // создаст для каждого модуля свою ф-ю
   getLoggerFunc (module) {
     if (!this.loggerFuncs[module]) {
       this.loggerFuncs[module] = require('debug')(`[${module}]`)
@@ -106,7 +82,7 @@ class Logger {
 
   error (module, ...msg) {
     try {
-      // if (this.store.state.core.logModulesBlackList.includes(module)) return
+      alert('error! \n' + JSON.stringify(msg))
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevel) {
         this.getLoggerFunc(module)(...msg)
       }
@@ -120,7 +96,7 @@ class Logger {
 
   critical (module, ...msg) {
     try {
-      // if (this.store.state.core.logModulesBlackList.includes(module)) return
+      alert('error! \n' + JSON.stringify(msg))
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
         this.getLoggerFunc(module)(...msg)
       }
@@ -130,6 +106,28 @@ class Logger {
     } catch (err) {
       console.error('error on logging error!!!', err)
     }
+  }
+}
+
+let logD = (...msg) => console.log(...msg)
+let logI = (...msg) => console.log(...msg)
+let logW = (...msg) => console.warn(...msg)
+let logE = (...msg) => console.error(...msg)
+let logC = (...msg) => console.error(...msg)
+function getLogFunc (level, module) {
+  switch (level) {
+    case 'debug':
+      return (...args) => logD.call({ logModuleName: module }, ...args)
+    case 'info':
+      return (...args) => logI.call({ logModuleName: module }, ...args)
+    case 'warning':
+      return (...args) => logW.call({ logModuleName: module }, ...args)
+    case 'error':
+      return (...args) => logE.call({ logModuleName: module }, ...args)
+    case 'critical':
+      return (...args) => logC.call({ logModuleName: module }, ...args)
+    default:
+      return (...args) => logD.call({ logModuleName: module }, ...args)
   }
 }
 
@@ -163,17 +161,16 @@ export default async ({ Vue, store, app }) => {
     Vue.prototype.$logC = logC = function (...msg) {
       logger.critical(detectModuleName(this), ...msg)
     }
-
     Vue.config.errorHandler = function (err, vm, info) {
-      // Notify.create('vue.onerror')
+      console.log('Vue.config.errorHandler')
       if (err) {
         if (err.processed) return
         err.processed = true
       }
       try {
         logE(err, info)
-        let clearCache = require('src/system/service_worker').clearCache
-        // clearCache()
+        const { clearCache } = require('src/system/services')
+        clearCache()
       } catch (e) {
         console.error(e, info)
       }
@@ -184,15 +181,15 @@ export default async ({ Vue, store, app }) => {
     }
     // глобальный обработчик ошибок для всего. Сработает только если ОПРЕДЕЛЕНА Vue.config.errorHandler. Это странно...
     window.onerror = function (message, source, line, column, error) {
-      // Notify.create('window.onerror')
+      console.log('window.onerror')
       if (error) {
         if (error.processed) return
         error.processed = true
       }
       try {
         logE('window.onerror', message, source, line, column, error)
-        let clearCache = require('src/system/service_worker').clearCache
-        // clearCache()
+        const { clearCache } = require('src/system/services')
+        clearCache()
       } catch (e) {
         console.error(e)
       }

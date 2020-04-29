@@ -3,37 +3,28 @@
     "minify_dev": "pngquant",
     "minify_build": "optipng",
     "cordova": {
-      "background_color": "#FFFFFF",
+      "background_color": "#222222",
       "splashscreen_type": "pure"
     },
     "build_always": false,
     "__internal": {
       "dev": {
-        "capacitor": {
-          "iconHash": "13fcee5eeafd589587b6a116c6c4f2a6",
+        "cordova": {
+          "iconHash": "522cd07468b2e0169a20a132cbc61e92",
           "splashscreenHash": "8aaa1808ce322490a536e4429478af99",
           "splashscreenType": "pure",
-          "backgroundColor": "#FFFFFF"
-        },
-        "spa": {
-          "iconHash": "13fcee5eeafd589587b6a116c6c4f2a6"
-        },
-        "pwa": {
-          "iconHash": "13fcee5eeafd589587b6a116c6c4f2a6"
+          "backgroundColor": "#222222"
         }
       },
       "build": {
-        "capacitor": {
-          "iconHash": "13fcee5eeafd589587b6a116c6c4f2a6",
+        "pwa": {
+          "iconHash": "522cd07468b2e0169a20a132cbc61e92"
+        },
+        "cordova": {
+          "iconHash": "522cd07468b2e0169a20a132cbc61e92",
           "splashscreenHash": "8aaa1808ce322490a536e4429478af99",
           "splashscreenType": "pure",
-          "backgroundColor": "#FFFFFF"
-        },
-        "spa": {
-          "iconHash": "13fcee5eeafd589587b6a116c6c4f2a6"
-        },
-        "pwa": {
-          "iconHash": "baef8a49557fbc815337f7a18c5b7421"
+          "backgroundColor": "#222222"
         }
       }
     }

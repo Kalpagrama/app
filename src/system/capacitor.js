@@ -52,13 +52,13 @@ async function capacitorWebPushInit () {
 
   // Show us the notification payload if the app is open on our device
   PushNotifications.addListener('pushNotificationReceived', (notification) => {
-      logD('Push received (app is opened): ', notification)
+    logD('Push received (app is opened): ', notification)
     }
   )
 
   // Method called when tapping on a notification
   PushNotifications.addListener('pushNotificationActionPerformed', (notification) => {
-      logD('Push action performed: ', notification)
+    logD('Push action performed: ', notification)
     }
   )
 }

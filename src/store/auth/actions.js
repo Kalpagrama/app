@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { router } from 'boot/main'
-import { checkUpdate, clearCache, update } from 'src/system/service_worker'
+import { checkUpdate, clearCache, update } from 'src/system/services'
 import assert from 'assert'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
