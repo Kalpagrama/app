@@ -5,5 +5,12 @@
   "npmClient": "yarn",
   "webDir": "www",
   "backgroundColor": "#22222222",
-  "server": {}
+  "server": {
+    "url": "https://whatwebcando.today/offline.html",
+    "allowNavigation": [
+      "kalpa.app",
+      "*.kalpa.app",
+      "kalpagramma.ru"
+    ]
+  }
 }

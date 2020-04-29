@@ -6,6 +6,11 @@
   "webDir": "www",
   "backgroundColor": "#22222222",
   "server": {
-    "url": "http://192.168.88.12:8282"
+    "url": "https://dev.kalpa.app",
+    "allowNavigation": [
+      "kalpa.app",
+      "*.kalpa.app",
+      "kalpagramma.ru"
+    ]
   }
 }

@@ -1,0 +1,21 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "app.kalpa"
+    },
+    "cordova-plugin-wkwebview-engine": {
+      "PACKAGE_NAME": "app.kalpa"
+    },
+    "cordova-plugin-splashscreen": {
+      "PACKAGE_NAME": "app.kalpa"
+    }
+  },
+  "dependent_plugins": {}
+}
