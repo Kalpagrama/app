@@ -8,5 +8,6 @@ export default {
   actionOpened: false,
   actionKey: null,
   height: 0,
-  offsetTop: 0
+  offsetTop: 0,
+  iWantSound: false
 }

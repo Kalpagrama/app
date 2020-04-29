@@ -1,5 +1,11 @@
+<style lang="sass" scoped>
+.essence
+  &:hover
+    background: #777 !important
+</style>
+
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.bg-grey-9
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- //- inactive tint
   //- transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
   //-   div(
@@ -13,27 +19,29 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     composition(
       :preview="node.meta.items[0].thumbUrl"
       :value="composition"
-      :visible="visible" :active="active" :mini="mini")
+      :visible="visible" :active="active" :mini="mini"
+      @height="$emit('meta', ['height', $event])")
     vote(v-if="voteShow" :oid="node.oid" @end="voteShow = false")
   //- essence
   router-link(
     v-if="essence"
-    :to="'/sphere/'+sphereOid"
-    :style=`{height: '50px'}`
-    ).row.full-width.items-center.content-center.justify-start.q-px-md.q-py-sm
+    :to="'/node/'+node.oid"
+    :class=`{
+      'essence': ctx !== 'explorer'
+    }`
+    :style=`{height: '60px', marginTop: '-10px'}`
+    ).row.full-width.items-center.content-center.justify-start.q-px-md.q-py-sm.bg-grey-9
     span.text-white.text-bold {{ node.name }}
   //- author and vote
   div(
     v-if="opened && nodeFull"
-    :style=`{height: '50px'}`
-    ).row.full-width.items-center.content-center.q-px-md.q-py-sm
+    :style=`{height: '60px'}`
+    ).row.full-width.items-center.content-center.q-px-md.q-py-sm.bg-grey-9
     kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="42" :height="42" @click.native="$router.push('/user/'+nodeFull.auhtor.oid)")
-    .col
+    router-link(:to="'/user/'+nodeFull.author.oid").col
       .row.fit.items-center.content-center.q-px-sm
-        router-link(:to="'/user/'+nodeFull.author.oid")
-          span(:style=`{lineHeight: 0.9}`).text-white {{nodeFull.author.name}}
-        router-link(:to="'/user/'+nodeFull.author.oid").full-width
-          small.text-white.full-width {{nodeFull.author.name}}
+        span(:style=`{lineHeight: 1.2}`).text-white {{nodeFull.author.name}}
+        small(:style=`{lineHeight: 1, margin: 0, padding: 0}`).text-white.full-width {{nodeFull.author.name}}
     .col
       .row.fit.items-center.content-center.justify-end.q-px-sm
         span(:style=`{fontSize: '24px'}`).text-white.text-bold {{nodeFull.rate}}

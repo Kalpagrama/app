@@ -128,12 +128,12 @@ export default {
         if (to.params.oid) {
           this.user = await this.userLoad(to.params.oid)
           if (!to.params.page) {
-            this.$router.push({params: {page: 'created'}})
+            this.$router.replace({params: {page: 'created'}})
           }
         }
         else {
           this.$log('NO USER OID!')
-          this.$router.push({params: {oid: this.$store.getters.currentUser.oid}})
+          this.$router.replace({params: {oid: this.$store.getters.currentUser.oid}})
         }
       }
     }

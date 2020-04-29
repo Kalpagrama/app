@@ -17,6 +17,7 @@ const routes = [
       { name: 'settings', path: 'settings/:page?', component: () => import('pages/app/settings') },
       // items
       { name: 'user', path: 'user/:oid?/:page?', component: () => import('pages/app/user') },
+      { name: 'node', path: 'node/:oid', component: () => import('pages/app/node') },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?/:page?', component: () => import('pages/app/content') },

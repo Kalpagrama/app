@@ -1,6 +1,6 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  q-header(reveal).row.full-width.justify-center.q-px-sm
+  q-header(reveal).row.full-width.justify-center.q-px-xs
     div(
       :style=`{
         height: '60px',
@@ -8,20 +8,20 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
         zIndex: 10000,
         borderRadius: '0 0 10px 10px', overflow: 'hidden'
       }`
-      ).row.full-width.items-center.content-center.justify-center.bg-grey-4.shadow-20
+      ).row.full-width.items-center.content-center.justify-center.bg-grey-8
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="black" icon="keyboard_arrow_left" @click="$router.back()")
+        q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
       .col.full-height
         .row.fit.items-center.content-center.justify-center
           span.text-black.text-bold Home
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="black" icon="more_vert")
+        q-btn(round flat color="grey-2" icon="more_vert")
   kalpa-menu-footer
     template(v-slot:menuRight)
       menu-right
   //- page
   q-page-conainter
-    q-page
+    q-page.q-px-xs
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
         template(v-slot=`{items}`)
           list-middle(:items="items" :style=`{paddingTop: '68px'}`)

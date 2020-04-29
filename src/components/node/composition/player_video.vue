@@ -51,16 +51,15 @@ div(
     //-   ).row.fit.br
     //- layer name layer.spheres.length > 0
     span(
-      v-if="actionsShow && ctx !== 'workspace' && visible && active && !mini" @click="layerNameClick()"
+      v-if="actionsShow && ctx !== 'workspace' && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '-1px', left: '-1px',
         borderRadius: '10px', overflow: 'hidden',
         background: 'rgba(0,0,0,0.15)'}`
-      ).q-pa-sm.text-grey-2 Layer name
-    //- {{ layer.spheres[0].name | cut(50) }}
+      ).q-pa-sm.text-grey-2.cursor-pointer {{ layer.spheres[0].name | cut(50) }}
     //- layer menu
     q-btn(
-      v-if="content && ctx !== 'workspace' && visible && active && !mini"
+      v-if="actionsShow && content && ctx !== 'workspace' && visible && active && !mini"
       round flat color="grey-2" icon="more_vert"
       :style=`{
         position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
@@ -132,7 +131,7 @@ div(
     //- video tools
     //- progress
     player-video-progress(
-      v-if="actionsShow && !mini"
+      v-if="actionsShow && ctx === 'workspace' && !mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
       :style=`{position: 'absolute', bottom: '0px', left: '0px', maxWidth: '75%', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
@@ -342,6 +341,14 @@ export default {
         // this.$log('now CHANGED', to)
         this.videoNow(to, from)
       }
+    },
+    videoGood: {
+      handler (to, from) {
+        this.$log('videoGood CHANGED', to)
+        if (to) {
+          this.$emit('good')
+        }
+      }
     }
   },
   methods: {
@@ -421,10 +428,13 @@ export default {
       this.$log('videoLoadeddata')
       this.videoLoadeddataDone = true
       if (this.visible) {
-        this.player.setCurrentTime(this.layerStart)
+        if (this.player) {
+          this.player.setCurrentTime(this.layerStart)
+        }
       }
       if (this.visible && this.active && !this.mini) this.player.play()
       if (!this.active) this.player.pause()
+      if (!this.visible) this.player.pause()
       this.videoUpdate()
       if (this.ctx === 'workspace') {
         this.player.mutedToggle()
@@ -560,6 +570,10 @@ export default {
         else if (this.contentSource === 'YOUTUBE') {
           this.player.setMuted(this.muted)
         }
+        if (!this.$store.state.ui.iWantSound) this.$store.commit('ui/stateSet', ['iWantSound', true])
+      }
+      if (this.$store.state.ui.iWantSound) {
+        this.player.mutedToggle()
       }
     },
     playerDestroy () {

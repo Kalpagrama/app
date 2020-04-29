@@ -23,7 +23,7 @@ div(:style=`{}`).column.fit
   //- body
   div(
     ref="extraNodesScroll"
-    :style=`{position: 'relative'}`
+    :style=`{position: 'relative', overflowX: 'hidden'}`
     ).col.full-width.scroll.bg-grey-9
     div(:style=`{marginTop: '0px', marginBottom: '1000px'}`).row.full-width.items-start.content-start.q-pt-sm.q-px-xs
       draggable(

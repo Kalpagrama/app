@@ -22,7 +22,7 @@ div(
     @load="previewLoad" @error="previewError" @click="previewClick"
     :style=`{
       userSelect: 'none',
-      width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
+      width: '100%', height: mini ? 'auto' : '100%', opacity: playerGood ? 0 : 1,
       maxHeight: 500+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(
@@ -30,6 +30,7 @@ div(
     :ctx="ctx" :composition="value" :preview="preview"
     :visible="visible" :active="active" :mini="mini"
     :bgClass="bgClass"
+    @good="playerGood = true"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
     template(v-slot:editor=`{player, meta}`)
       slot(name="editor" :player="player" :meta="meta")
@@ -58,52 +59,24 @@ export default {
       previewWidth: 0,
       previewHeight: 0,
       previewLoaded: false,
-      playerLoaded: false
+      playerGood: false
     }
   },
   computed: {
   },
   watch: {
-    value: {
-      immediate: true,
-      async handler (to, from) {
-        // this.$log('value CHANGED', to)
+    visible: {
+      handler (to, from) {
+        this.$log('visible CHANGED', to)
         if (to) {
         }
         else {
-          if (this.ctx === 'rubick') {
-            this.$emit('compositionGet')
-          }
+          this.playerGood = false
         }
       }
     }
   },
   methods: {
-    async menuToggle () {
-      this.$log('menuToggle')
-      let options = {
-        timeout: 3000,
-        header: this.value.layers[0].content.name,
-        actions: {
-          save: {
-            name: 'Save composition',
-            payload: {oid: this.value.oid},
-            cb: () => {
-              this.$log('save composition')
-            }
-          },
-          content: {
-            name: 'Go to content',
-            payload: {oid: this.value.layers[0].content.oid},
-            cb: () => {
-              this.$log('go to content')
-              this.$router.push('/content/' + this.value.layers[0].content.oid).catch(e => e)
-            }
-          }
-        }
-      }
-      this.$store.dispatch('ui/action', [options, key => key ? options.actions[key].cb() : false])
-    },
     previewLoad () {
       // this.$log('previewLoad')
       let previewRef = this.$refs.compositionPreview

@@ -8,7 +8,7 @@
 </style>
 
 <template lang="pug">
-q-layout( view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
+q-layout(view="hHh Lpr lff")
   //- kalpa-action
   //- menu
   div(

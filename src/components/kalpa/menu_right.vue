@@ -1,5 +1,6 @@
 <template lang="pug">
 div(
+  @scroll="onScroll"
   v-if="$q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
   :style=`{
     position: 'fixed',
@@ -9,12 +10,18 @@ div(
     height: $q.screen.height+'px',
     right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
     paddingTop: '68px',
+    overflow: 'auto'
   }`).row.items-start.content-start.q-px-sm.q-pb-sm
   slot()
 </template>
 
 <script>
 export default {
-  name: 'kalpaMenuRight'
+  name: 'kalpaMenuRight',
+  methods: {
+    onScroll (e) {
+      this.$log('onScroll', e)
+    }
+  }
 }
 </script>

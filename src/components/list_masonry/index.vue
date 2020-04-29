@@ -20,9 +20,9 @@ div(
     }`
     ).col.full-width.scroll
     masonry(
-      :cols="{default: 3}"
+      :cols="{default: $q.screen.width > 600 ? 3 : 2}"
       :gutter="{default: 10}"
-      :style=`{position: 'relative', marginTop: '8px', paddingRight: '8px', marginBottom: '2000px'}`).row.full-width.justify-center
+      :style=`{position: 'relative', width: 'calc(100% + 8px)', marginBottom: '80px'}`).row.justify-center
       div(
         v-for="(i, ii) in items" :key="i.oid"
         @mouseenter="itemEnter(i, ii)"

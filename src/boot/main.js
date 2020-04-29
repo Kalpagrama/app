@@ -79,6 +79,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('wsItemSaver', () => import('components/workspace/ws_item_saver'))
     // explore
     Vue.component('userExplorer', () => import('components/user_explorer'))
+    Vue.component('nodeExplorer', () => import('components/node_explorer'))
     Vue.component('trendsExplorer', () => import('components/trends_explorer'))
     Vue.component('sphereExplorer', () => import('components/sphere_explorer'))
     Vue.component('sphereSpheres', () => import('components/sphere_spheres'))

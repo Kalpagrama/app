@@ -1,5 +1,5 @@
 <template lang="pug">
-q-footer(v-if="$q.screen.width < 1300")
+q-footer(v-if="$q.screen.width < 1300" reveal)
   .row.full-width.justify-center
     div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0'}`
       ).row.full-width.items-center.content-center.bg-grey-8.q-px-sm

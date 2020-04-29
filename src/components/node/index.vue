@@ -18,6 +18,12 @@ export default {
     }
   },
   watch: {
+    node: {
+      handler (to, from) {
+        this.$log('node CHANGED', to)
+        this.nodeLoad()
+      }
+    },
     needFull: {
       immediate: true,
         async handler (to, from) {
