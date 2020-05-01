@@ -3,13 +3,14 @@
 
 plugin add cordova-plugin-firebase-messaging
 
-cordova plugin add cordova-plugin-openwith-cxm \
-  --variable ANDROID_MIME_TYPE="image/*" \
-  --variable ANDROID_MIME_TYPE="video/*" \
+// https://www.npmjs.com/package/cc.fovea.cordova.openwith
+cordova plugin add cc.fovea.cordova.openwith \
   --variable ANDROID_MIME_TYPE="audio/*" \
+  --variable ANDROID_MIME_TYPE="image/*" \
   --variable ANDROID_MIME_TYPE="text/*" \
+  --variable ANDROID_MIME_TYPE="video/*" \
   --variable IOS_URL_SCHEME=kalpa \
+  --variable IOS_UNIFORM_TYPE_IDENTIFIER=public.audio \
   --variable IOS_UNIFORM_TYPE_IDENTIFIER=public.image \
   --variable IOS_UNIFORM_TYPE_IDENTIFIER=public.text \
-  --variable IOS_UNIFORM_TYPE_IDENTIFIER=public.video \
-  --variable IOS_UNIFORM_TYPE_IDENTIFIER=public.audio
+  --variable IOS_UNIFORM_TYPE_IDENTIFIER=public.video
