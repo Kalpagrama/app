@@ -14,7 +14,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.CP)
 
 // let PushNotifications, Share
 
-async function capacitorInit () {
+async function capacitorInit (store) {
   // const capacitor = await import('../../src-capacitor/node_modules/@capacitor/core')
   // PushNotifications = capacitor.Plugins.PushNotifications
   // Share = capacitor.Plugins.Share
@@ -22,10 +22,10 @@ async function capacitorInit () {
   // logD('Share=', Share)
 
   // capacitorShowShareDialog().catch(err => logD('err on capacitor init', err))
-  await capacitorWebPushInit()
+  await capacitorWebPushInit(store)
 }
 
-async function capacitorWebPushInit () {
+async function capacitorWebPushInit (store) {
   assert(PushNotifications)
   // Request permission to use push notifications
   // iOS will prompt user and return if they granted permission or not

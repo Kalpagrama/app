@@ -1,5 +1,25 @@
 {
     "declarations": {},
-    "sources": {},
-    "libraries": {}
+    "sources": {
+        "https://github.com/CocoaPods/Specs.git": {
+            "source": "https://github.com/CocoaPods/Specs.git",
+            "count": 1
+        },
+        "https://cdn.cocoapods.org/": {
+            "source": "https://cdn.cocoapods.org/",
+            "count": 2
+        }
+    },
+    "libraries": {
+        "Firebase/Analytics": {
+            "name": "Firebase/Analytics",
+            "spec": "~> 6.21.0",
+            "count": 1
+        },
+        "Firebase/Messaging": {
+            "name": "Firebase/Messaging",
+            "spec": "~> 6.21.0",
+            "count": 1
+        }
+    }
 }

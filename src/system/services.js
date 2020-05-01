@@ -33,6 +33,7 @@ function initOfflineEvents (store) {
       }
     )
   }
+
   window.addEventListener('online', handleNetworkChange)
   window.addEventListener('offline', handleNetworkChange)
   store.commit('core/stateSet', ['online', navigator.onLine])
@@ -226,11 +227,11 @@ async function update () {
 async function askForWebPushPerm (store) {
   if (Platform.is.capacitor) {
     const { capacitorInit } = await import('src/system/capacitor.js')
-    await capacitorInit()
+    await capacitorInit(store)
     return true
   } else if (Platform.is.cordova) {
     const { cordovaInit } = await import('src/system/cordova.js')
-    await cordovaInit()
+    await cordovaInit(store)
     return true
   } else {
     return new Promise((resolve, reject) => {
