@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1082935232322-b4ig7b98dhikfurbjj1d4uciarl6q1fd.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1082935232322-b4ig7b98dhikfurbjj1d4uciarl6q1fd</string>
+	<key>API_KEY</key>
+	<string>AIzaSyAsHeK6TO2l1LhKpSqdqZla6tOS_-ykj54</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1082935232322</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>app.kalpa</string>
+	<key>PROJECT_ID</key>
+	<string>kalpagramma-7a913</string>
+	<key>STORAGE_BUCKET</key>
+	<string>kalpagramma-7a913.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1082935232322:ios:a012e9f282bdf9e486eadb</string>
+	<key>DATABASE_URL</key>
+	<string>https://kalpagramma-7a913.firebaseio.com</string>
+</dict>
+</plist>
