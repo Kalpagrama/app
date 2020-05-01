@@ -126,6 +126,7 @@ div(
       video(
         ref="kalpaVideo"
         :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
+        preload="auto"
         playsinline :loop="true" :autoplay="autoplay" :muted="mutedComputed" :controls="false"
         @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         @timeupdate="videoUpdate"

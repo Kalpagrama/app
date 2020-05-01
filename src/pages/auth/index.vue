@@ -1,3 +1,8 @@
+<style lang="sass" scoped>
+input
+  outline: none
+</style>
+
 <template lang="pug">
 .row.full-width.items-start.content-start.justify-center
   //- wrapper
@@ -5,30 +10,21 @@
     :style=`{
       minHeight: $q.screen.xs ? $q.screen.height+'px' : '600px',
       marginTop: $q.screen.xs ? 0 : ($q.screen.height-600)/2+'px',
-      marginBottom: $q.screen.height+'px',
       maxWidth: 600+'px',
       borderRadius: $q.screen.width > 600 ? '10px' : '0px'
     }`
-    ).row.full-width.items-start.content-start.justify-center.bg-grey-9
-    //- header
-    .row.full-width.items-center.q-pa-md
-      div(:style=`{width: '50px', height: '50px'}`).row
-        //- kalpa-spinner(:width="50" :height="50")
-        //- q-btn(flat round icon="blur_on" color="white" size="lg")
-        q-icon(name="blur_on" color="white" size="50px" @click="$router.replace('/auth')").cursor-pointer
-      .col.full-height
-        .row.fit.items-center.content-center.q-px-sm
-          span(
-            @click="$router.replace('/auth')"
-            :style=`{fontSize: '20px', lineHeight: 1.2}`).text-white.text-bold Kalpagramma
-          .row.full-width
-            small.text-white Up the essence!
+    ).row.full-width.items-center.content-center.justify-center.bg-grey-9
+    div().row.full-width.justify-center.q-my-md
+      q-icon(name="blur_on" color="white" size="100px" @click="$router.replace('/auth')").cursor-pointer
+      .row.full-width.justify-center
+        span(:style=`{fontSize: '24px'}`).text-bold.text-white Kalpagramma
     //- form
-    div(:style=`{maxWidth: '350px'}`).row.full-width.justify-center.q-py-xl.q-px-sm
-      //- get started
-      div(v-if="!userIdentified").row.full-width.items-center.content-center.justify-center.text-bold.text-center.q-py-lg
-        span(:style=`{fontSize: '20px'}`).text-white.q-mr-sm Identify yourself with
-        //- span(:style=`{fontSize: '20px'}`).text-green Kalpa
+    div(:style=`{maxWidth: '350px'}`).row.full-width.justify-center.q-pa-sm
+      div(:style=`{borderRadius: '10px', oveflow: 'hidden'}`).row.fit.items-end.q-pa-sm.q-mb-sm
+        //- get started
+        div(v-if="!userIdentified").row.full-width.items-end.content-end.justify-center
+          span(:style=`{fontSize: '18px'}`).text-white.q-mr-sm Identify yourself to sign in
+          //- span(:style=`{fontSize: '20px'}`).text-green Kalpa
       //- socials
       with-socials(v-if="!userIdentified")
       //- NOT identified
@@ -44,7 +40,7 @@
           :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-my-sm
             span.text-bold.text-white Continue
       //- IDENTIFIED
-      div(v-else).row.full-width
+      div(v-if="userIdentified").row.full-width
         //- userExist & needInvite
         div(v-if="needInvite === true && userExist === false").row.full-width
           .row.full-width.justify-start.q-py-sm.q-px-md
@@ -55,14 +51,32 @@
             ).full-width.q-mb-sm.bg-grey-9
         //- email
         div(v-if="loginType && loginType === 'EMAIL'").row.full-width
-          .row.full-width.items-center.content-center.justify-start.q-py-sm.q-px-md
-            q-btn(round flat color="white" icon="keyboard_arrow_left" @click="reset()")
-            span(:style=`{fontSize: '20px'}`).text-white.q-mr-sm Enter code, we sent you to:
-            span(:style=`{fontSize: '20px'}`).text-green {{ login }}
-          q-input(
-            v-model="password" autofocus dark color="green" filled label="Enter code" type="tel"
-            @keyup.enter="userAuthenticate()"
-            :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
+          //- .row.full-width.justify-center
+          //-   q-btn(flat round color="grey-2" no-caps icon="keyboard_arrow_left")
+          div(:style=`{}`).row.full-width.justify-center
+            input(
+              v-model="password"
+              type="tel" maxlength="4"
+              placeholder="0000" autofocus
+              :style=`{
+                height: '110px',
+                fontSize: '90px',
+                letterSpacing: '10px',
+                background: 'none',
+                maxWidth: '240px',
+                margin: 0,
+                padding: 0,
+                border: 'none'
+              }`).text-bold.text-white
+          .row.full-width.items-center.content-center.justify-center.q-py-sm.q-px-md
+            //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="reset()")
+            span(:style=`{fontSize: '14px'}`).text-grey-2 Enter confirmation code, we sent you to:
+          .row.full-width.justify-center
+            span(:style=`{fontSize: '14px'}`).text-white.text-bold {{ login }}
+          //- q-input(
+          //-   v-model="password" autofocus dark color="green" filled label="Enter code" type="tel"
+          //-   @keyup.enter="userAuthenticate()"
+          //-   :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
         //- phone
         div(v-if="loginType && loginType === 'PHONE'").row.full-width
           .row.full-width.justify-start.q-py-sm.q-px-md
@@ -108,7 +122,7 @@
       //- help/policy
       .row.full-width.justify-center.q-pb-sm.q-px-md.text-center
         //- router-link(to="/help/policy")
-        small.text-grey-8.text-center By clicking "Enter kalpa", you agree to the terms of the Privacy Policy.
+        small.text-grey-8.text-center By clicking "Continue", you agree to the terms of the Privacy Policy.
 </template>
 
 <script>
@@ -142,6 +156,16 @@ export default {
     login (newVal) {
       this.$set(this, 'login', newVal.replace(/[^0-9a-zA-Z-_.@]/g, ''))
     },
+    password: {
+      handler (to, from) {
+        this.$log('password CHANGED', to)
+        if (to) {
+          if (to.length === 4) {
+            this.userAuthenticate()
+          }
+        }
+      }
+    },
     '$route.query.token': {
       immediate: true,
       async handler (to, from) {
@@ -153,19 +177,19 @@ export default {
           this.$log('q', q)
           localStorage.setItem('ktoken', q.token)
           localStorage.setItem('ktokenExpires', q.expires)
-          await this.$wait(200)
-          if (q.needInvite === 'false') {
-            this.inviteCode = '2020'
-            this.userAuthenticate()
-          }
-          else {
-            this.userIdentifying = false
-            this.userIdentified = true
-            this.userExist = q.userExist === 'true' ? true : false
-            this.login = q.userId
-            this.loginType = q.loginType
-            this.needInvite = q.needInvite
-          }
+          // await this.$wait(200)
+          // if (q.needInvite === 'false') {
+          //   this.inviteCode = '2020'
+          //   this.userAuthenticate()
+          // }
+          // else {
+          //   this.userIdentifying = false
+          //   this.userIdentified = true
+          //   this.userExist = q.userExist === 'true' ? true : false
+          //   this.login = q.userId
+          //   this.loginType = q.loginType
+          //   this.needInvite = q.needInvite
+          // }
         }
       }
     }

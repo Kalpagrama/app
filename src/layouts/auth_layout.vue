@@ -12,11 +12,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    if (this.$q.screen.width > 600) {
-    }
-    else {
-      document.body.style.background = '#424242'
-    }
+    // if (this.$q.screen.width > 600) {
+    // }
+    // else {
+    // }
+    document.body.style.background = '#424242'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
