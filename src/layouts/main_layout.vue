@@ -1,7 +1,4 @@
 <style lang="sass">
-.menu-item
-  &:hover
-    background: #888
 .q-menu
   border-radius: 10px !important
   background: none !important

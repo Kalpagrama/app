@@ -40,7 +40,8 @@ div(:style=`{}`).column.fit
           ).row.full-width.q-mb-xs
           //- default layer header
           .row.full-width
-            //- div(:style=`{height: '35px', width: '35px'}`).row
+            div(:style=`{height: '35px', width: '35px'}`).row
+              span.text-bold.text-white V
             .col
               div(
                 :style=`{

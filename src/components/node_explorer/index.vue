@@ -1,18 +1,18 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
-  //- kalpa-menu-right
-  //-   div(
-  //-     :style=`{
-  //-       borderRadius: '10px', overflow: 'hidden',
-  //-       maxHeight: '70vh'
-  //-     }`
-  //-     ).column.fit.bg-grey-9
-  //-     menu-right
+  kalpa-menu-right
+    div(
+      :style=`{
+        borderRadius: '10px', overflow: 'hidden',
+        maxHeight: '70vh'
+      }`
+      ).column.fit.bg-grey-9
+      menu-right
       //- div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-md
       //-   span.text-white.text-bold Related spheres
       //- .col.full-width.scroll
       //-   .row.full-width.q-pa-sm
-      //-     //- sphere-spheres(v-if="true" :oid="sphereOid")
+          //- sphere-spheres(v-if="true" :oid="sphereOid")
   kalpa-menu-footer
   //- q-header(reveal)
   //-   .row.full-width.justify-center
@@ -35,6 +35,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
           q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
           node(
+            v-if="node"
             ctx="explorer"
             :node="node" :needFull="true"
             :essence="true" :opened="true"
@@ -57,7 +58,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
               borderRadius: '0 0 10px 10px'
             }`
             ).row.full-width.items-center.content-center.q-px-md.bg-grey-9
-            span.text-white.text-bold {{node.name}}
+            span(v-if="node").text-white.text-bold {{node.name}}
         //- essence relative
         //- div(
         //-   ref="nodeEssence"
@@ -74,7 +75,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
         //-     ).row.full-width.items-center.content-center.q-px-md.bg-grey-9
         //-     span.text-white.text-bold {{node.name}}
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
-          kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
+          kalpa-loader(v-if="sphereOid && node" type="sphereNodes" :variables="variables")
             template(v-slot=`{items}`)
               list-masonry(
                 ref="listMasonry" :items="items"
@@ -116,7 +117,8 @@ export default {
   },
   computed: {
     sphereOid () {
-      return this.node.sphereFromName.oid
+      if (!this.node) return null
+      else return this.node.sphereFromName.oid
     },
     variables () {
       return {

@@ -72,6 +72,10 @@ div(
           :visible="true"
           :active="!itemEditorOpened"
           :mini="false")
+      .row.full-width.q-pa-sm
+        q-btn(
+          flat icon="add" color="green"
+          :style=`{height: '56px'}`).full-width.bg-grey-8
       //- essence and add
       div(
         v-if="mode === 'edit'"
@@ -79,15 +83,15 @@ div(
           height: '60px'
         }`
         ).row.full-width.q-pa-sm
-        .col.q-pr-sm
+        .col
           q-input(
             v-model="node.name"
             filled color="green" dark
             placeholder="Whats the essence?"
             :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`
             ).full-width.bg-grey-9
-        q-btn(round flat color="green" icon="add" @click="itemFind(node.items.length)"
-          :style=`{width: '50px', background: '#555'}`)
+        //- q-btn(round flat color="green" icon="add" @click="itemFind(node.items.length)"
+        //-   :style=`{width: '50px', background: '#555'}`)
   //- footer
   div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
     q-btn(round flat color="grey-6" icon="keyboard_arrow_left" @click="$emit('cancel')")

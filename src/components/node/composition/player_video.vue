@@ -29,17 +29,18 @@ div(
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
   div(
-    v-if="!mini && false"
+    v-if="!mini && true"
     :style=`{
       position: 'absolute', width: 'calc(100% - 90px)', left: '6px', top: '4px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
       zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.9}`).row.q-pa-sm.bg-green
-    small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
-    small.full-width now/duration: {{now}}/{{duration}}
-    small.full-width ctx/mode: {{ctx}}/{{mode}}
-    small.full-width start/end: {{layerStart}}/{{layerEnd}}
-    small.full-width layerIndex: {{layerIndex}}
-    small.full-width layerIndexPlay: {{layerIndexPlay}}
+    //- small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
+    //- small.full-width now/duration: {{now}}/{{duration}}
+    //- small.full-width ctx/mode: {{ctx}}/{{mode}}
+    //- small.full-width start/end: {{layerStart}}/{{layerEnd}}
+    //- small.full-width layerIndex: {{layerIndex}}
+    //- small.full-width layerIndexPlay: {{layerIndexPlay}}
+    small.full-width actionsHovered: {{actionsHovered}}
   //- video container
   div(
     @mouseenter="actionsHovered = true" @mouseleave="actionsHovered = false"
@@ -62,7 +63,7 @@ div(
       ).q-pa-sm.text-grey-2.cursor-pointer {{ layer.spheres[0].name | cut(50) }}
     //- layer menu
     q-btn(
-      v-if="actionsShow && content && ctx !== 'workspace' && visible && active && !mini"
+      v-if="true && content && ctx !== 'workspace' && visible && active && !mini"
       round flat color="grey-2" icon="more_vert"
       :style=`{
         position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
@@ -74,7 +75,9 @@ div(
             span.text-white.text-bold {{ content.name }}
           .col.full-width.scroll
             q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
-              span.text-white Go to content
+              span.text-white Explore content
+            q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
+              span.text-white Save to workspace
             q-btn(flat no-caps align="left").full-width
               span.text-white Report
     //- video actions, volume, progress
@@ -555,7 +558,8 @@ export default {
           },
           youtube: {
             iv_load_policy: 3,
-            modestbranding: 1
+            modestbranding: 1,
+            controls: 0
           },
           error: async (mediaElement, originalNode, instance) => {
             this.$log('player YOUTUBE error')

@@ -1,3 +1,9 @@
+<style lang="sass">
+.menu-item
+  &:hover
+    background: #888
+</style>
+
 <template lang="pug">
 .row.fit
   .col
@@ -45,8 +51,22 @@
               div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
                 q-btn(round dense flat :icon="p.icon" color="white")
               span.text-white {{ p.name }}
+            //- refresh
+            div(
+              :style=`{height: '50px'}` @click="refresh()"
+              ).row.full-width.items-center.content-center.menu-item.cursor-pointer
+              div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
+                q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
+              span(:style=`{userSelect: 'none', pointerEvents: 'none'}`).text-white Refresh
+            //- logout
+            div(
+              :style=`{height: '50px'}` @click="logout()"
+              ).row.full-width.items-center.content-center.menu-item.cursor-pointer
+              div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
+                q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
+              span(:style=`{userSelect: 'none', pointerEvents: 'none'}`).text-white Logout
             .row.full-width.items-center.q-px-md.q-py-sm
-              small(:style=`{marginLeft: '6px'}`).text-grey-6 1.0
+              small(:style=`{marginLeft: '6px'}`).text-grey-6 0.1
             //- slot(name="footer")
   //- .col.br
 </template>
@@ -61,15 +81,32 @@ export default {
         {id: 'trends', name: 'Trends', icon: 'whatshot'},
         {id: 'workspace', name: 'Workspace', icon: 'school'},
         {id: 'settings', name: 'Settings', icon: 'tune'},
-        {id: 'report', name: 'Report a bug', icon: 'bug_report'},
-        {id: 'refresh', name: 'Refresh', icon: 'refresh'},
-        {id: 'logout', name: 'Logout', icon: 'power_off'},
-      ]
+        {id: 'report', name: 'Report a bug', icon: 'bug_report'}
+      ],
+      refreshLoading: false,
+      logoutLoading: false
     }
   },
   computed: {
   },
   methods: {
+    async refresh () {
+      this.$log('refresh')
+      this.refreshLoading = true
+      await this.$wait(1000)
+      await this.$store.dispatch('cache/clear')
+      window.location.reload(true)
+      this.refreshLoading = false
+    },
+    async logout () {
+      this.$log('logout')
+      if (!confirm('Really logout ?')) return
+      this.logoutLoading = true
+      await this.$wait(1000)
+      await this.$store.dispatch('cache/clear')
+      await this.$store.dispatch('auth/logout')
+      this.logoutLoading = false
+    }
   }
 }
 </script>

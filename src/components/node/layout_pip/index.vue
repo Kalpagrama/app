@@ -37,7 +37,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     v-if="opened && nodeFull"
     :style=`{height: '60px'}`
     ).row.full-width.items-center.content-center.q-px-md.q-py-sm.bg-grey-9
-    kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="42" :height="42" @click.native="$router.push('/user/'+nodeFull.auhtor.oid)")
+    kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="42" :height="42" @click.native="$router.push('/user/'+nodeFull.author.oid)")
     router-link(:to="'/user/'+nodeFull.author.oid").col
       .row.fit.items-center.content-center.q-px-sm
         span(:style=`{lineHeight: 1.2}`).text-white {{nodeFull.author.name}}
