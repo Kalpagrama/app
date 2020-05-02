@@ -6,7 +6,8 @@ import {
   PushNotificationToken,
   PushNotificationActionPerformed
 } from '@capacitor/core'
-const { PushNotifications, Share } = Plugins
+
+const { PushNotifications, Share, App } = Plugins
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.CP)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.CP)
@@ -23,6 +24,11 @@ async function capacitorInit (store) {
 
   // capacitorShowShareDialog().catch(err => logD('err on capacitor init', err))
   await capacitorWebPushInit(store)
+
+  App.addListener('appUrlOpen', (url) => {
+    alert('cap url:::' + JSON.stringify(url))
+    // data.url contains the url that is opening your app
+  })
 }
 
 async function capacitorWebPushInit (store) {

@@ -6,7 +6,7 @@
   "webDir": "www",
   "backgroundColor": "#22222222",
   "server": {
-    "url": "https://whatwebcando.today/offline.html",
+    "url": "http://192.168.88.12:8484",
     "allowNavigation": [
       "kalpa.app",
       "*.kalpa.app",

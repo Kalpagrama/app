@@ -21,7 +21,7 @@
     <author email="info@kalpagramma.com" href="https://kalpagramma.com">
         KALPAGRAMMA Team
     </author>
-    <content src="http://192.168.88.12:8484" />
+    <content src="https://mac.kalpa.app:8484" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -30,7 +30,7 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
     <allow-navigation href="about:*" />
-    <allow-navigation href="http://192.168.88.12:8484" />
+    <allow-navigation href="https://mac.kalpa.app:8484" />
     <allow-intent href="market:*" />
     <icon density="ldpi" src="res/android/icon-36-ldpi.png" />
     <icon density="mdpi" src="res/android/icon-48-mdpi.png" />

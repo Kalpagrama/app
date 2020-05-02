@@ -6,7 +6,8 @@
   "webDir": "www",
   "backgroundColor": "#22222222",
   "server": {
-    "url": "https://dev.kalpa.app",
+    "url": "https://mac.kalpa.app:8484",
+    "iosScheme": "kalpa",
     "allowNavigation": [
       "kalpa.app",
       "*.kalpa.app",
