@@ -5,7 +5,7 @@ q-footer(v-if="$q.screen.width < 1300" reveal)
       ).row.full-width.items-center.content-center.bg-grey-8.q-px-sm
       q-btn(round flat color="grey-5" icon="menu")
         q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
-          div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-9
+          div(:style=`{width: $q.screen.width-19+'px', height: $q.screen.height+'px', borderRadius: '10px', overflow: 'hidden'}`).row.bg-grey-9.br
             kalpa-menu
       .col
         .row.fit.items-center.content-center.justify-center

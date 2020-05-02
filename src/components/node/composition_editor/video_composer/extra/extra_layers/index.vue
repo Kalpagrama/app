@@ -25,7 +25,7 @@ div(:style=`{}`).column.fit
     ref="extraNodesScroll"
     :style=`{position: 'relative', overflowX: 'hidden'}`
     ).col.full-width.scroll.bg-grey-9
-    div(:style=`{marginTop: '0px', marginBottom: '1000px'}`).row.full-width.items-start.content-start.q-pt-sm.q-px-xs
+    div(:style=`{marginTop: '0px', marginBottom: '80px'}`).row.full-width.items-start.content-start.q-pt-sm.q-px-xs
       draggable(
         :list="meta.layers" group="layers" handle=".layer-drag-handle"
         :move="layerOnMove"
@@ -40,8 +40,10 @@ div(:style=`{}`).column.fit
           ).row.full-width.q-mb-xs
           //- default layer header
           .row.full-width
-            div(:style=`{height: '35px', width: '35px'}`).row
-              span.text-bold.text-white V
+            div(:style=`{height: '35px', width: '40px'}`).row.items-center.content-center.justify-center
+              //- span.text-bold.text-white V
+              //- input(type="checkbox").fit
+              q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6" )
             .col
               div(
                 :style=`{
@@ -77,10 +79,13 @@ div(:style=`{}`).column.fit
                     .row.full-height.q-px-md
                       span(
                         @click="layerSetNameStart()"
+                        :style=`{
+                          userSelect: 'none'
+                        }`
                         ).text-white.text-bold.cursor-pointer {{l.spheres.length > 0 ? l.spheres[0].name : li === meta.layerIndexPlay ? 'Set layer name' : ''}}
                         q-popup-proxy
                           layer-editor-spheres(:layer="l" :index="li")
-                  .row.full-height.items-center.content-center
+                  div(:style=`{userSelect: 'none'}`).row.full-height.items-center.content-center
                     small.text-white {{$time(l.figuresAbsolute[0].t)}}-
                     small.text-white {{$time(l.figuresAbsolute[1].t)}}
                     small.text-white.q-mx-xs /
@@ -118,6 +123,16 @@ div(:style=`{}`).column.fit
             .row.fit.items-center.content-center-q-px-md
               span(v-if="l.spheres.length > 0").text-white {{ l.spheres[0].name }}
           span.text-white {{$time(l.figuresAbsolute[0].t)}}-{{$time(l.figuresAbsolute[1].t)}}
+  //- layers selected
+  div(
+    v-if="layersSelected.length > 0"
+    :style=`{height: '40px'}`).row.full-width.q-px-xs
+    div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
+      div(:style=`{width: '20px', height: '20px', borderRadius: '2px'}`).row.items-center.content-center.justify-center.bg-grey-6
+        span.text-white.text-bold {{layersSelected.length}}
+    .col
+      .row.fit.items-center.content-center.q-px-sm
+        span.text-white Delete, Create node
   //- footer
   div(
     v-if="true"
@@ -158,7 +173,8 @@ export default {
       showLayersFromWorkspace: false,
       layerNameEditing: false,
       layerIndexFuture: null,
-      layersDragging: false
+      layersDragging: false,
+      layersSelected: []
     }
   },
   computed: {

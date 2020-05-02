@@ -80,6 +80,7 @@ export default {
     previewLoad () {
       // this.$log('previewLoad')
       let previewRef = this.$refs.compositionPreview
+      if (!previewRef) return
       this.previewHeight = previewRef.clientHeight
       this.previewWidth = previewRef.clientWidth
       this.$emit('height', this.previewHeight)

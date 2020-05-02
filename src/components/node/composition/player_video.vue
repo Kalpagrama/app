@@ -16,6 +16,11 @@ iframe
     overflow: hidden
     transform: scale(0.1)
     transform-origin: top left
+// iframe
+//   width: 100%
+//   height: 100%
+//   border-radius: 10px
+//   overflow: hidden
 .mejs__overlay-button
   display: none
 </style>
@@ -29,33 +34,29 @@ div(
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
   div(
-    v-if="!mini && true"
+    v-if="true && !mini"
     :style=`{
       position: 'absolute', width: 'calc(100% - 90px)', left: '6px', top: '4px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
-      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.9}`).row.q-pa-sm.bg-green
-    //- small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
-    //- small.full-width now/duration: {{now}}/{{duration}}
+      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.9}`).row.q-pa-xs.bg-green
+    small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
+    small.full-width now/duration: {{now}}/{{duration}}
     //- small.full-width ctx/mode: {{ctx}}/{{mode}}
     //- small.full-width start/end: {{layerStart}}/{{layerEnd}}
     //- small.full-width layerIndex: {{layerIndex}}
     //- small.full-width layerIndexPlay: {{layerIndexPlay}}
-    small.full-width actionsHovered: {{actionsHovered}}
+    //- small.full-width actionsHovered: {{actionsHovered}}
+    small.full-width player: {{player ? true : false}}
+    small.full-width videoContainerHovered: {{videoContainerHovered}}
   //- video container
+  //- @mouseover="videoContainerMouseover"
+  //- @mousemove="videoContainerMousemove"
   div(
-    @mouseenter="actionsHovered = true" @mouseleave="actionsHovered = false"
     :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
     //- actions
-    //- div(
-    //-   v-if="ctx !== 'workspace'"
-    //-   @mouseenter="actionsHovered = true" @mouseleave="actionsHovered = false"
-    //-   :style=`{
-    //-     position: 'absolute', zIndex: 1000,
-    //-   }`
-    //-   ).row.fit.br
-    //- layer name layer.spheres.length > 0
+    //- layer name
     span(
-      v-if="actionsShow && ctx !== 'workspace' && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
+      v-if="videoContainerHovered && ctx !== 'workspace' && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '-1px', left: '-1px',
         borderRadius: '10px', overflow: 'hidden',
@@ -63,26 +64,29 @@ div(
       ).q-pa-sm.text-grey-2.cursor-pointer {{ layer.spheres[0].name | cut(50) }}
     //- layer menu
     q-btn(
-      v-if="true && content && ctx !== 'workspace' && visible && active && !mini"
+      v-if="true && content && visible && active && !mini"
+      ref="layerMenuBtn"
       round flat color="grey-2" icon="more_vert"
       :style=`{
         position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
         background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'
       }`)
-      q-menu(cover anchor="top right" max-width="300px")
-        .column.fit.bg-grey-9
-          div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
-            span.text-white.text-bold {{ content.name }}
-          .col.full-width.scroll
-            q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
-              span.text-white Explore content
-            q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
-              span.text-white Save to workspace
-            q-btn(flat no-caps align="left").full-width
-              span.text-white Report
+    q-menu(
+      :target="$refs.layerMenuBtn"
+      cover anchor="top right" max-width="300px")
+      div(v-if="content").column.fit.bg-grey-9
+        div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
+          span.text-white.text-bold {{ content.name }}
+        .col.full-width.scroll
+          q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
+            span.text-white Explore content
+          q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
+            span.text-white Save to workspace
+          q-btn(flat no-caps align="left").full-width
+            span.text-white Report
     //- video actions, volume, progress
     q-btn(
-      v-if="actionsShow && visible && active && !mini"
+      v-if="videoContainerHovered && visible && active && !mini"
       v-show="!mini"
       round flat @click="player.mutedToggle()"
       :color="muted ? 'grey-2' : 'grey-2'"
@@ -123,11 +127,12 @@ div(
       }`).row.full-width
       //- opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1
       //- preload="auto"
+      //- :autoplay="autoplay"
       video(
         ref="kalpaVideo"
         :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
         preload="auto"
-        playsinline :loop="true" :autoplay="autoplay" :muted="mutedComputed" :controls="false"
+        playsinline :loop="true" :muted="mutedComputed" :controls="false"
         @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         @timeupdate="videoUpdate"
         :style=`{
@@ -138,7 +143,7 @@ div(
     //- video tools
     //- progress
     player-video-progress(
-      v-if="actionsShow && ctx === 'workspace' && !mini"
+      v-if="videoContainerHovered && !mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
       :style=`{position: 'absolute', bottom: '0px', left: '0px', maxWidth: '75%', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
@@ -178,10 +183,16 @@ export default {
       videoLoadeddataDone: false,
       content: null,
       actionsActive: false,
-      actionsHovered: false
+      actionsHovered: false,
+      mouseOverTimer: null,
+      mousemoveTimer: null,
+      videoContainerHovered: false
     }
   },
   computed: {
+    videoRef () {
+      return this.$refs.kalpaVideo
+    },
     meta () {
       return {
         now: this.now,
@@ -359,6 +370,27 @@ export default {
     }
   },
   methods: {
+    videoContainerMouseover (e) {
+      this.$log('videoContainerMouseover', e)
+      // if (this.mouseOverTimer) {
+      //   clearTimeout(this.mouseOverTimer)
+      //   this.mouseOverTimer = null
+      // }
+      // this.videoContainerHovered = true
+      // this.mouseOverTimer = setTimeout(() => {
+      //   this.videoContainerHovered = false
+      // }, 2000)
+    },
+    videoContainerMousemove (e) {
+      // this.$log('videoContainerMousemove', e)
+      if (this.mousemoveTimer) {
+        clearTimeout(this.mousemoveTimer)
+      }
+      this.videoContainerHovered = true
+      this.mousemoveTimer = setTimeout(() => {
+        this.videoContainerHovered = false
+      }, 2000)
+    },
     videoNow (to, from) {
       if (this.nowPause) return
       if (!this.player) return
@@ -582,7 +614,11 @@ export default {
         if (!this.$store.state.ui.iWantSound) this.$store.commit('ui/stateSet', ['iWantSound', true])
       }
       if (this.$store.state.ui.iWantSound) {
-        this.player.mutedToggle()
+        if (this.$q.platform.is.ios) {
+        }
+        else {
+          this.player.mutedToggle()
+        }
       }
     },
     playerDestroy () {

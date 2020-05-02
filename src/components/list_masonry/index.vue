@@ -22,7 +22,7 @@ div(
     masonry(
       :cols="{default: $q.screen.width > 600 ? 3 : 2}"
       :gutter="{default: 10}"
-      :style=`{position: 'relative', width: 'calc(100% + 8px)', marginBottom: '80px'}`).row.justify-center
+      :style=`{position: 'relative', width: 'calc(100% + 8px)', marginBottom: '80px'}`).row.justify-center.q-mt-sm
       div(
         v-for="(i, ii) in items" :key="i.oid"
         @mouseenter="itemEnter(i, ii)"

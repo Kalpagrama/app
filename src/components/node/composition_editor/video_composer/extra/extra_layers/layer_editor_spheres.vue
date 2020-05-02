@@ -45,7 +45,7 @@ export default {
     if (this.layer && this.layer.spheres.length > 0) {
       this.nameInput = this.layer.spheres[0].name
     }
-    await this.$wait(300)
+    await this.$wait(400)
     this.$refs.nameInput.focus()
   },
   beforeDestroy () {

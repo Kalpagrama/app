@@ -5,7 +5,7 @@
     //- progress bar & time
     div(
       @click="progressClick"
-      v-touch-pan.mouse.prevent.left.right="progressPan"
+      v-touch-pan.mouse.left.right="progressPan"
       :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '10px', borderRadius: '10px'}`).row.full-width.items-center.content-center
       //- progress WRAPPER
       div(

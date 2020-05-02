@@ -2,6 +2,10 @@
 div(
   :style=`{position: 'relative'}`
   ).row.full-width
+  //- left actions
+  div(:style=`{width: '40px'}`).row.full-height.justify-center.content-end.items-end
+    q-btn(round flat dense color="grey-4" icon="keyboard_arrow_up" @click="$emit('meta', ['layerIndexPlay', -1])")
+  //- middle
   div(:style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).col.bg-grey-6
     //- play layer...
     div(:style=`{height: '40px'}`).row.full-width.items-center.content-center.q-px-xs

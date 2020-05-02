@@ -177,19 +177,19 @@ export default {
           this.$log('q', q)
           localStorage.setItem('ktoken', q.token)
           localStorage.setItem('ktokenExpires', q.expires)
-          // await this.$wait(200)
-          // if (q.needInvite === 'false') {
-          //   this.inviteCode = '2020'
-          //   this.userAuthenticate()
-          // }
-          // else {
-          //   this.userIdentifying = false
-          //   this.userIdentified = true
-          //   this.userExist = q.userExist === 'true' ? true : false
-          //   this.login = q.userId
-          //   this.loginType = q.loginType
-          //   this.needInvite = q.needInvite
-          // }
+          await this.$wait(200)
+          if (q.needInvite === 'false') {
+            this.inviteCode = '2020'
+            this.userAuthenticate()
+          }
+          else {
+            this.userIdentifying = false
+            this.userIdentified = true
+            this.userExist = q.userExist === 'true' ? true : false
+            this.login = q.userId
+            this.loginType = q.loginType
+            this.needInvite = q.needInvite === 'true' ? true : false
+          }
         }
       }
     }

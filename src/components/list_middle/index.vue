@@ -21,7 +21,7 @@ div(:style=`{position: 'relative'}`).column.fit
           }`
           v-observe-visibility=`{
             callback: indexMiddleHandler,
-            throttle: 200,
+            throttle: 150,
             intersection: {
               rootMargin: -($q.screen.height/2-10)+'px 0px'
             }
