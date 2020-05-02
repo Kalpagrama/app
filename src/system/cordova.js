@@ -5,18 +5,17 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.CP)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.CP)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.CP)
 
-async function cordovaInit (store) {
+async function initCordova (store) {
   assert(store)
   // const capacitor = await import('../../src-capacitor/node_modules/@capacitor/core')
   // PushNotifications = capacitor.Plugins.PushNotifications
   // Share = capacitor.Plugins.Share
   // logD('PushNotifications=', PushNotifications)
   // logD('Share=', Share)
-  await initPushPlugin(store)
 }
 
 // use cordova-plugin-firebase-messaging for FCM PUSH
-async function initPushPlugin (store) {
+async function initCordovaPushPlugin (store) {
   cordova.plugins.firebase.messaging.requestPermission({ forceShow: false }).then(function () {
     alert('Push messaging is allowed')
   })
@@ -36,4 +35,4 @@ async function initPushPlugin (store) {
   })
 }
 
-export { cordovaInit }
+export { initCordova, initCordovaPushPlugin }

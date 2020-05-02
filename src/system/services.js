@@ -14,7 +14,15 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 async function initServices (store) {
   logD('initServices', Platform.is)
-  if (Platform.is.pwa) await initPWA(store)
+  // if (Platform.is.pwa) await initPWA(store)
+  // else if (Platform.is.capacitor) {
+  //   const { initCapacitor } = await import('src/system/capacitor.js')
+  //   await initCapacitor(store)
+  // }
+  // else if (Platform.is.cordova) {
+  //   const { initCordova } = await import('src/system/cordova.js')
+  //   await initCordova(store)
+  // }
   initOfflineEvents(store)
   // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
   const hasPerm = await askForWebPushPerm(store)
@@ -226,12 +234,12 @@ async function update () {
 
 async function askForWebPushPerm (store) {
   if (Platform.is.capacitor) {
-    const { capacitorInit } = await import('src/system/capacitor.js')
-    await capacitorInit(store)
+    const { initCapacitorPushPlugin } = await import('src/system/capacitor.js')
+    await initCapacitorPushPlugin(store)
     return true
   } else if (Platform.is.cordova) {
-    const { cordovaInit } = await import('src/system/cordova.js')
-    await cordovaInit(store)
+    const { initCordovaPushPlugin } = await import('src/system/cordova.js')
+    await initCordovaPushPlugin(store)
     return true
   } else {
     return new Promise((resolve, reject) => {

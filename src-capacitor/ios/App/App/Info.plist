@@ -27,7 +27,7 @@
 			<string>app.kalpa</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kalpa</string>
+				<string>app.kalpa</string>
 			</array>
 		</dict>
 	</array>
