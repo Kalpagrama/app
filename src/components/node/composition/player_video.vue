@@ -70,27 +70,28 @@ div(
         background: 'rgba(0,0,0,0.15)'}`
       ).q-pa-sm.text-grey-2.cursor-pointer {{ layer.spheres[0].name | cut(50) }}
     //- layer menu
-    q-btn(
-      v-if="true && content && visible && active && !mini"
-      ref="layerMenuBtn"
-      round flat color="grey-2" icon="more_vert"
-      :style=`{
-        position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
-        background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'
-      }`)
-    q-menu(
-      :target="$refs.layerMenuBtn"
-      cover anchor="top right" max-width="300px")
-      div(v-if="content").column.fit.bg-grey-9
-        div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
-          span.text-white.text-bold {{ content.name }}
-        .col.full-width.scroll
-          q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
-            span.text-white Explore content
-          q-btn(flat no-caps align="left" @click="nodeWorkspace()").full-width
-            span.text-white Save to workspace
-          q-btn(flat no-caps align="left").full-width
-            span.text-white Report
+    //- q-btn(
+    //-   v-if="true && content && visible && active && !mini"
+    //-   v-show="ctx !== 'workspace'"
+    //-   ref="layerMenuBtn"
+    //-   round flat color="grey-2" icon="more_vert"
+    //-   :style=`{
+    //-     position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
+    //-     background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'
+    //-   }`)
+    //- q-menu(
+    //-   :target="$refs.layerMenuBtn"
+    //-   cover anchor="top right" max-width="300px")
+    //-   div(v-if="content").column.fit.bg-grey-9
+    //-     div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
+    //-       span.text-white.text-bold {{ content.name }}
+    //-     .col.full-width.scroll
+    //-       q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
+    //-         span.text-white Explore content
+    //-       q-btn(flat no-caps align="left" @click="nodeWorkspace()").full-width
+    //-         span.text-white Save to workspace
+    //-       q-btn(flat no-caps align="left").full-width
+    //-         span.text-white Report
     //- video actions
     //- volume
     q-btn(
