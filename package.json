@@ -2,7 +2,7 @@
   "name": "kalpagramma",
   "version": "1.0.1",
   "description": "Kalpagramma application",
-  "productName": "KALPAGRAMMA",
+  "productName": "Kalpagramma",
   "cordovaId": "app.kalpa",
   "capacitorId": "app.kalpa",
   "author": "kalpagramma <info@kalpagramma.ru>",

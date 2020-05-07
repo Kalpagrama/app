@@ -7,8 +7,16 @@ export default {
   },
   name: 'kalpaLoader',
   props: {
-    type: {type: String, required: true},
-    variables: {type: Object}
+    type: {
+      type: String,
+      required: true
+    },
+    variables: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
   },
   data () {
     return {

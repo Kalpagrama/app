@@ -39,9 +39,9 @@ div(
   div(
     v-if="true && !mini"
     :style=`{
-      position: 'absolute', width: 'calc(100% - 90px)', left: '0px', top: '8px',
+      position: 'absolute', width: 'calc(100% - 90px)', left: '0px', top: '50px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
-      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.7}`).row.q-pa-sm.bg-green
+      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.4}`).row.q-pa-sm.bg-green
     small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
     small.full-width now/duration: {{now}}/{{duration}}
     small.full-width ctx/mode: {{ctx}}/{{mode}}

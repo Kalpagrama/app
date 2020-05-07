@@ -177,9 +177,9 @@ module.exports = function (ctx) {
         // importWorkboxFrom: 'local'
       },
       manifest: {
-        name: 'Kalpa',
-        short_name: 'Kalpa',
-        description: 'Find your halo-effect',
+        name: 'Kalpagramma',
+        short_name: 'Kalpagramma',
+        description: 'Up the essence',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#424242',

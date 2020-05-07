@@ -11,8 +11,7 @@ div(:style=`{position: 'relative'}`).column.fit
   q-dialog(
     v-model="nodeEditorOpened" :maximized="true" position="bottom")
     div(
-      @click.self="nodeEditorOpened = false"
-      :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center.q-py-sm
+      :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center
       ws-item-saver(:value="node")
         template(v-slot=`{item}`)
           node-editor(
@@ -24,37 +23,54 @@ div(:style=`{position: 'relative'}`).column.fit
             }`)
   //- actions
   //- add
-  q-btn(
-    round push size="lg" color="green" icon="add" @click="nodeAddStart()"
-    :style=`{position: 'absolute', zIndex:1000, right: '16px', bottom: '16px', borderRadius: '50% !important'}`)
+  //- q-btn(
+  //-   round push size="lg" color="green" icon="add" @click="nodeAddStart()"
+  //-   :style=`{position: 'absolute', zIndex:1000, right: '16px', bottom: '16px', borderRadius: '50% !important'}`)
   //- header
-  .row.full-width
-    .row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.items-center.content-center.q-pa-sm
+  .row.full-width.justify-center
+    div(
+      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.q-pa-sm.bg-grey-8
+      .col.q-pr-sm
         q-input(
-          v-model="searchInput" filled color="green"
+          v-model="nodeSearchString" filled color="green"
           placeholder="Find or add node"
-          :input-style=`{}`
           :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
           ).full-width.bg-grey-1
+      div(:style=`{}`).row.full-height
+        q-btn(
+          round flat color="white" icon="add" @click="nodeAddStart()"
+          :style=`{height: '56px', width: '56px'}`).bg-grey-6
   //- body
   .col.full-width.scroll
     .row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingTop: '0px', paddingBottom: '80px'}`
-        ).row.full-width.items-start.content-start.q-px-sm
+      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px'}`
+        ).row.full-width.items-start.content-start.q-pt-sm
         //- nodes
-        kalpa-loader(type="NODE_LIST" :variables=`{}`)
+        kalpa-loader(type="NODE_LIST")
           template(v-slot="{items}")
             .row.full-width.items-start
               div(
-                v-for="(n, ni) in items" :key="n.oid" @click="nodeClick(n.oid)"
+                v-for="(n, ni) in nodesFilter(items)" :key="n.oid"
                 :style=`{
-                  height: '40px',
-                  borderRadius: '10px',
-                  overflow: 'hidden'
+                  height: '40px'
                 }`
-                ).row.full-width.items-center.content-center.bg-grey-8.q-mb-sm.cursor-pointer.q-px-md.node-item
-                span(:style=`{userSelect: 'none'}`).text-white {{ n.name }}
+                ).row.full-width.q-mb-sm
+                //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
+                //-   q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
+                .col
+                  div(
+                    @click="nodeClick(n.oid)"
+                    :style=`{
+                      borderRadius: '10px', overflow: 'hidden'
+                    }`
+                    ).row.fit.items-center.content-center.q-px-md.cursor-pointer.node-item.bg-grey-9
+                    span(:style=`{userSelect: 'none'}`).text-white {{ n.name }}
+                //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
+                //-   q-btn(round flat dense color="grey-6" icon="more_vert")
+              div(:style=`{height: '500px'}`).row.full-width
+  //- .row.full-width
+    span nodesSelected: {{nodesSelected}}
 </template>
 
 <script>
@@ -64,7 +80,8 @@ export default {
     return {
       node: null,
       nodeEditorOpened: false,
-      searchInput: ''
+      nodeSearchString: '',
+      nodesSelected: []
     }
   },
   computed: {
@@ -73,20 +90,28 @@ export default {
     }
   },
   methods: {
+    nodesFilter (arr) {
+      if (this.nodeSearchString.length > 0) {
+        return arr.filter(i => i.name.includes(this.nodeSearchString))
+      }
+      else {
+        return arr
+      }
+    },
     async nodeClick (oid) {
       this.$log('nodeClick', oid)
       this.node = await this.$store.dispatch('objects/get', {oid: oid})
       this.$log('nodeClick node', this.node)
+      // await this.$wait(300)
       this.nodeEditorOpened = true
-      // this.$emit('item', {type: 'node', item: nodeFull})
     },
     async nodeAddStart () {
       this.$log('nodeAddStart')
       let nodeInput = {
-        name: 'New node',
+        name: this.nodeSearchString,
         wsItemType: 'NODE',
         rawData: {
-          name: 'New node' + Date.now(),
+          name: this.nodeSearchString,
           items: [],
           spheres: [],
           category: 'FUN',
@@ -95,8 +120,10 @@ export default {
       }
       this.$log('nodeAddStart nodeInput', nodeInput)
       this.node = await this.$store.dispatch('workspace/wsItemCreate', nodeInput)
+      this.nodeSearchString = ''
       this.$log('nodeAddStart node', this.node)
-      // this.nodeEditorOpened = true
+      // await this.$wait(300)
+      this.nodeEditorOpened = true
     }
   },
   async mounted () {

@@ -5,61 +5,56 @@
 </style>
 
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', background: '#333'}`)
+//- q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', background: '#333'}`)
+div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-width
   kalpa-menu-right
     menu-right(:pages="pages")
-  q-header(reveal)
-    div(:style=`{background: '#333'}`).row.full-width.justify-center
-      div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`).row.full-width
-        .col.full-height
-          .row.fit.items-center.content-center.justify-start.q-px-sm
-            .row.full-height.items-center.content-center.q-mr-sm
-              q-btn(round flat color="white")
-                q-icon(name="school" size="30px")
-            .row.full-height.items-center.content-center
-              span(:style=`{fontSize: '20px', lineHeight: 1}`).text-white Workspace
-              span(:style=`{lineHeight: 1.1}`).text-white.full-width {{ pages.find(p => p.id === $route.params.page).name }}
-  kalpa-menu-footer
-    template(v-slot:menuRight)
-      menu-right(:pages="pages")
+  //- q-header(reveal)
+  div(:style=`{position: 'relative'}`).row.full-width.justify-center
+    div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+      .col.full-height
+        .row.fit.items-center.content-center.justify-start.q-px-sm
+          .row.full-height.items-center.content-center.q-mr-sm
+            q-btn(round flat color="white")
+              q-icon(name="school" size="30px")
+          .row.full-height.items-center.content-center
+            span(:style=`{fontSize: '20px', lineHeight: 1}`).text-white Workspace
+            span(:style=`{lineHeight: 1.1}`).text-white.full-width {{ pages.find(p => p.id === $route.params.page).name }}
+  //- kalpa-menu-footer
+  //-   template(v-slot:menuRight)
+  //-     menu-right(:pages="pages")
   //- item editors
-  q-dialog(
-    v-model="pageDialogOpened" :maximized="true" position="bottom"
-    @hide="itemEdited")
-    //- @click.self="pageDialogOpened = false"
-    div(
-      :style=`{position: 'relative', height: $q.screen.height+'px', background: 'rgba(0,0,0,0.8)'}`).row.full-width.justify-center
-      ws-item-saver(v-if="$store.state.workspace.item" :value="$store.state.workspace.item")
-        template(v-slot=`{item}`)
-          composition-editor(
-            v-if="item"
-            ctx="workspace"
-            :composition="item.rawData"
-            @cancel="pageDialogOpened = fals"
-            :style=`{
-              maxWidth: $store.state.ui.maxWidthPage+'px'
-            }`)
-  q-page-container
-    q-page
-      .row.fit.justify-center.q-py-sm.q-px-xs
+  //- q-dialog(
+  //-   v-model="pageDialogOpened" :maximized="true" position="bottom"
+  //-   @hide="itemEdited")
+  //-   //- @click.self="pageDialogOpened = false"
+  //-   div(
+  //-     :style=`{position: 'relative', height: $q.screen.height+'px', background: 'rgba(0,0,0,0.8)'}`).row.full-width.justify-center
+  //-     ws-item-saver(v-if="$store.state.workspace.item" :value="$store.state.workspace.item")
+  //-       template(v-slot=`{item}`)
+  //-         composition-editor(
+  //-           v-if="item"
+  //-           ctx="workspace"
+  //-           :composition="item.rawData"
+  //-           @cancel="pageDialogOpened = fals"
+  //-           :style=`{
+  //-             maxWidth: $store.state.ui.maxWidthPage+'px'
+  //-           }`)
+  .col.full-width.q-pt-sm
+      //- q-page-container
+      //-   q-page
+      .row.fit.justify-center
         div(
           :style=`{
             maxWidth: $store.state.ui.maxWidthPage+'px',
-            borderRadius: '10px', overflow: 'hidden'
-          }`).row.fit.bg-grey-9
+          }`).row.fit
           ws-settings(v-if="$route.params.page === 'settings'")
           ws-spheres(v-if="$route.params.page === 'spheres'")
           ws-items(
             v-else
             ctx="workspace"
             :pages="pages" :page="$route.params.page"
-            @page="$router.push({params: {page: $event}}).catch(e=>e)"
-            @item="itemClick"
-            @add="itemAdd"
-            :style=`{
-              borderRadius: '10px', overflow: 'hidden'
-            }`).bg-grey-9
-        div(:style=`{height: '1000px'}`).row.full-width
+            @page="$router.push({params: {page: $event}}).catch(e=>e)")
 </template>
 
 <script>
