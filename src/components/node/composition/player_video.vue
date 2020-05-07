@@ -503,7 +503,7 @@ export default {
     },
     async videoClick (e) {
       this.$log('videoClick', this.videoActionsShow)
-      if (this.videoActionsTimeout) clearTimeout(this.videoActionsTimeout)
+      // if (this.videoActionsTimeout) clearTimeout(this.videoActionsTimeout)
       this.videoActionsShow = true
       this.videoPlayPause()
       // if (this.videoActionsShow) {
@@ -513,10 +513,10 @@ export default {
       //   this.videoActionsShow = true
       //   // if (this.videoActionsTimeout) clearTimeout(this.videoActionsTimeout)
       // }
-      this.videoActionsTimeout = setTimeout(() => {
-        this.videoActionsShow = false
-        this.videoActionsTimeout = null
-      }, 2400)
+      // this.videoActionsTimeout = setTimeout(() => {
+      //   this.videoActionsShow = false
+      //   this.videoActionsTimeout = null
+      // }, 2400)
     },
     playerInit () {
       this.$log('playerInit START')

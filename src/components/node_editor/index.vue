@@ -2,7 +2,7 @@
 div(
   v-if="node"
   :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
-  ).column.fit.items-start.bg-grey-9
+  ).column.fit.items-start.bg-grey-10
   //- header
   div(:style=`{order: -1}`).row.full-width.items-center.content-center.q-px-sm
     //- main navigation
@@ -45,7 +45,7 @@ import editPreview from './edit_preview'
 
 export default {
   name: 'nodeEditor',
-  components: {editSpheres, editItems},
+  components: {editItems, editSpheres, editPreview},
   props: ['mode', 'essence', 'node', 'wsItemFinderOnBoot', 'paddingTop'],
   data () {
     return {

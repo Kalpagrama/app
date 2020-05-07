@@ -41,10 +41,10 @@
         v-for="(i,ii) in node.items" :key="ii"
         :style=`{
           position: 'relative',
-          height: '400px',
+          height: '860px',
           borderRadius: '10px',
           overflow: 'hidden',
-          maxHeight: '400px',
+          maxHeight: itemIndex === ii ? '860px' : '460px',
         }`
         ).row.full-width.q-mb-sm
         //- composition container
@@ -53,8 +53,22 @@
             ctx="workspace"
             :value="i"
             :visible="true"
-            :active="false"
-            :mini="false")
+            :active="itemIndex === ii"
+            :mini="false"
+            :styles=`{
+              paddingBottom: itemIndex === ii ? '480px' : '0px'
+            }`)
+            template(v-slot:editor=`{content, player, meta}`)
+              composer(
+                v-if="itemIndex === ii"
+                ctx="workspace"
+                :composition="i"
+                :player="player" :meta="meta"
+                @meta="$parent.emit('meta', $event)"
+                @cancel="$emit('cancel')"
+                :styles=`{
+                  paddingBottom: itemIndex === ii ? 460 : 0
+                }`)
         //- composition actions: delete, edit, add
         div(:style=`{width: '60px'}`).row.full-height.justify-center.items-between.content-between.q-px-sm
           q-btn(round flat color="red-4" icon="delete_outline" @click="itemDelete(ii)"
@@ -75,9 +89,11 @@
 
 <script>
 import assert from 'assert'
+import composer from 'components/node/composition_editor/video_composer/composer'
 
 export default {
   name: 'nodeEditor-editItems',
+  components: {composer},
   props: {
     node: {type: Object}
   },
@@ -119,8 +135,14 @@ export default {
     itemEdit (index) {
       this.$log('itemEdit', index)
       assert(index >= 0, 'itemEdit: No index!')
-      this.itemIndex = index
-      this.itemEditorOpened = true
+      if (this.itemIndex === index) {
+        this.itemIndex = null
+      }
+      else {
+        this.itemIndex = index
+      }
+      // this.itemIndex = index
+      // this.itemEditorOpened = true
     },
     itemEdited () {
       this.$log('itemEdited')

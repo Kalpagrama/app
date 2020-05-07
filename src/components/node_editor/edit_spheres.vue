@@ -43,12 +43,13 @@ export default {
     },
     sphereClick (s, si) {
       this.$log('sphereClick', s, si)
-      if (this.sphereIndex === si) {
-        this.sphereIndex = null
-      }
-      else {
-        this.sphereIndex = si
-      }
+      // if (this.sphereIndex === si) {
+      //   this.sphereIndex = null
+      // }
+      // else {
+      //   this.sphereIndex = si
+      // }
+      this.$delete(this.node.spheres, si)
     }
   },
   mounted () {
