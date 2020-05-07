@@ -119,6 +119,13 @@ export default {
     this.$wait(200).then(() => {
       this.tabChanged('layers')
     })
+    // window.addEventListener('blur', () => {
+    //   alert('blur')
+    //   window.focus()
+    // })
+    // window.addEventListener('focus', () => {
+    //   alert('focus')
+    // })
     window.onkeydown = (e) => {
       switch (e.keyCode) {
         // space

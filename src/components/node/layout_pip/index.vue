@@ -21,6 +21,14 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       :value="composition"
       :visible="visible" :active="active" :mini="mini"
       @height="$emit('meta', ['height', $event])")
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 1000, right: '0px', bottom: '0px',
+        maxWidth: '25%', height: '150px',
+        borderRadius: '10px', overflow: 'hidden',
+        background: 'rgba(0,0,0,0.5)'
+      }`
+      ).row.full-width
     vote(v-if="voteShow" :oid="node.oid" @end="voteShow = false")
   //- essence
   router-link(
@@ -31,7 +39,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     }`
     :style=`{height: '60px', marginTop: '-10px'}`
     ).row.full-width.items-center.content-center.justify-start.q-px-md.q-py-sm.bg-grey-9
-    span.text-white.text-bold {{ node.name }}
+    span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
   //- author and vote
   div(
     v-if="opened && nodeFull"

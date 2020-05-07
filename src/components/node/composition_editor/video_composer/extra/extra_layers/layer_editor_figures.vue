@@ -61,7 +61,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             v-if="layer && layer.figuresAbsolute.length > 0"
             :style=`{
               position: 'absolute', left: 0, top: 0, height: '50px',
-              width: 'calc( '+(layer.figuresAbsolute[0].t/duration)*100+'% + 6px )',
+              width: 'calc( '+(layer.figuresAbsolute[0].t/duration)*100+'% + 0px )',
               borderRadius: '10px 0 0 10px', overflow: 'hidden',
               opacity: 0.6, pointerEvents: 'none'
             }`).row.bg-black
@@ -70,14 +70,16 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             v-if="layer && layer.figuresAbsolute.length > 0"
             :style=`{
               position: 'absolute', zIndex: 120, height: '66px', top: '-8px',
-              left: (layer.figuresAbsolute[0].t/duration)*100+'%',
-              width: ((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/duration)*100+'%',
-              borderRadius: '16px', border: '8px solid '+ $randomColor(meta.layerIndex), pointerEvents: 'none'}`).row.br
+              left: 'calc('+(layer.figuresAbsolute[0].t/duration)*100+'% - 8px)',
+              width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/duration)*100+'% + 16px)',
+              borderRadius: '16px', border: '8px solid '+ $randomColor(meta.layerIndex), pointerEvents: 'none'}`).row
           //- now second
+          //- (meta.now/duration)*100+'%',
           div(
             v-if="true"
             :style=`{position: 'absolute', zIndex: 300, height: '50px', top: '0px',
-              left: (meta.now/meta.duration)*100+'%', borderRadius: '2px',
+              left: (meta.now/duration)*100+'%',
+              borderRadius: '2px',
               width: '4px', pointerEvents: 'none'}`).row.bg-green
           //- layer start round grabber
           div(
@@ -98,7 +100,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             v-if="layer && layer.figuresAbsolute.length > 0"
             :style=`{
               position: 'absolute', right: 0, top: 0, height: '50px',
-              width: 'calc( '+((duration-layer.figuresAbsolute[1].t)/duration)*100+'% + 8px )',
+              width: 'calc( '+((duration-layer.figuresAbsolute[1].t)/duration)*100+'% + 0px )',
               borderRadius: '0 10px 10px 0 ', overflow: 'hidden',
               opacity: 0.6, pointerEvents: 'none'
             }`).row.bg-black

@@ -55,7 +55,7 @@ div(:style=`{}`).column.fit
                     'bg-grey-7': li !== meta.layerIndexPlay,
                     'layer-item': li !== meta.layerIndexPlay
                   }`
-                  :style=`{position: 'relative', height: '35px', borderRadius: li === meta.layerIndexPlay ? '10px 10px 0 0' : '10px', oveflow: 'hidden'}`
+                  :style=`{position: 'relative', height: '35px', borderRadius: li === meta.layerIndexPlay ? '10px 10px 0 0' : '10px', overflow: 'hidden'}`
                   ).row.full-width.items-center.content-center.q-pr-sm
                   //- layerIndexFuture bar
                   div(
@@ -83,8 +83,8 @@ div(:style=`{}`).column.fit
                           userSelect: 'none'
                         }`
                         ).text-white.text-bold.cursor-pointer {{l.spheres.length > 0 ? l.spheres[0].name : li === meta.layerIndexPlay ? 'Set layer name' : ''}}
-                        q-popup-proxy
-                          layer-editor-spheres(:layer="l" :index="li")
+                        q-popup-proxy(:ref="'les-'+li")
+                          layer-editor-spheres(:layer="l" :index="li" :dialog="$refs['les-'+li] ? $refs['les-'+li][0] : null")
                   div(:style=`{userSelect: 'none'}`).row.full-height.items-center.content-center
                     small.text-white {{$time(l.figuresAbsolute[0].t)}}-
                     small.text-white {{$time(l.figuresAbsolute[1].t)}}
@@ -128,11 +128,14 @@ div(:style=`{}`).column.fit
     v-if="layersSelected.length > 0"
     :style=`{height: '40px'}`).row.full-width.q-px-xs
     div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
-      div(:style=`{width: '20px', height: '20px', borderRadius: '2px'}`).row.items-center.content-center.justify-center.bg-grey-6
-        span.text-white.text-bold {{layersSelected.length}}
+      div(:style=`{height: '18px', minWidth: '18px', borderRadius: '2px'}`).row.items-center.content-center.justify-center.bg-grey-6
+        span.text-white {{layersSelected.length}}
     .col
-      .row.fit.items-center.content-center.q-px-sm
-        span.text-white Delete, Create node
+      .row.fit.items-center
+        span.text-grey-2.q-mr-sm Layers selected,
+        q-btn(flat dense no-caps color="red" @click="layersSelectedDelete()").q-mr-sm Delete them
+        span.text-grey-2.q-mx-xs or
+        q-btn(flat dense no-caps color="grey-2" @click="layersSelectedExport()") Create node with them
   //- footer
   div(
     v-if="true"
@@ -148,8 +151,9 @@ div(:style=`{}`).column.fit
         flat color="white" no-caps
         ) Watch
       q-btn(
-        v-if="composition.layersWorkspace" @click="showLayersFromWorkspace = !showLayersFromWorkspace"
-        flat color="green" no-caps) From workspace
+        v-if="composition.layersWorkspace"
+        @click="showLayersFromWorkspace = !showLayersFromWorkspace"
+        round flat icon="school" color="grey-2")
     span.text-white {{$time(layersTotalTime)}}
     div(:style=`{width: '50px'}`).row.full-height.items-center.justify-center
       span.text-white Total
@@ -203,6 +207,20 @@ export default {
     }
   },
   methods: {
+    layersSelectedDelete () {
+      this.$log('layersSeletedDelete')
+      if (!confirm('Delete selected layers?')) return
+      // find tha smallest index to go to?
+      this.layersSelected.map((i, ii) => {
+        this.$delete(this.composition.layers, ii)
+      })
+      // set layerIndexPlay, layerIndex, mode?
+      this.$set(this, 'layersSelected', [])
+      // this.layersSelected = []
+    },
+    layersSelectedExport () {
+      this.$log('layersSelectedExport')
+    },
     layerOnMove (e, evt) {
       this.$log('layerDragMove', e, evt)
       this.$log('layerIndexFuture', e.draggedContext.futureIndex)

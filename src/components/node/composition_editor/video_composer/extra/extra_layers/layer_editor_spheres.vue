@@ -19,14 +19,14 @@ div(:style=`{minWidth: '300px', minHeight: '300px'}`).column.fit.bg-grey-6
   //- footer
   div(:style=`{}`).row.full-width.items-center.items-center.content-center.q-pa-sm
     q-btn(
-      push no-caps color="green" @click="$emit('ready')"
+      push no-caps color="green" @click="ready()"
       :style=`{height: '50px'}`).full-width Ready
 </template>
 
 <script>
 export default {
   name: 'extraLayers-layerEditorSpheres',
-  props: ['layer'],
+  props: ['layer', 'index', 'dialog'],
   data () {
     return {
       nameInput: ''
@@ -38,6 +38,10 @@ export default {
         // this.layer.spheres[0] = {name: this.nameInput}
         this.$set(this.layer.spheres, 0, {name: this.nameInput})
       }
+    },
+    ready () {
+      this.$log('ready')
+      this.dialog.toggle()
     }
   },
   async mounted () {

@@ -1,5 +1,6 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
+//- container :style=`{height: $q.screen.height+'px'}`
+q-layout(view="hHh lpR fFf").bg-grey-10
   q-header(reveal).row.full-width.justify-center.q-px-xs
     div(
       :style=`{

@@ -25,6 +25,13 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
             height: $q.screen.height+'px',
             maxWidth: $store.state.ui.maxWidthPage+'px'
           }`).row.full-width.q-px-xs
+          //- header
+          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+            q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
+            .col
+              span.text-bold.text-white {{ content.name }}
+            q-btn(round flat color="grey-2" icon="more_vert")
+          //- body
           composition(
             v-if="content"
             ctx="workspace"

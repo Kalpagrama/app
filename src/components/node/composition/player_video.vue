@@ -1,12 +1,14 @@
 <style lang="sass">
-iframe
+// mejs_017595170116808223_youtube_iframe
+iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
   z-index: 100
   border-radius: 10px
   overflow: hidden
+  pointer-events: none
 @media (min-width: 600px)
-  iframe
+  iframe[id$="_youtube_iframe"]
     width: 1000%
     height: 1000%
     min-width: 1000%
@@ -16,13 +18,14 @@ iframe
     overflow: hidden
     transform: scale(0.1)
     transform-origin: top left
-// iframe
+    pointer-events: none
+// iframe[id$="_youtube_iframe"]
 //   width: 100%
 //   height: 100%
 //   border-radius: 10px
 //   overflow: hidden
-.mejs__overlay-button
-  display: none
+// .mejs__overlay-button
+//   display: none
 </style>
 
 <template lang="pug">
@@ -36,12 +39,12 @@ div(
   div(
     v-if="true && !mini"
     :style=`{
-      position: 'absolute', width: 'calc(100% - 90px)', left: '6px', top: '4px',
+      position: 'absolute', width: 'calc(100% - 90px)', left: '0px', top: '8px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
-      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.9}`).row.q-pa-xs.bg-green
+      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.7}`).row.q-pa-sm.bg-green
     small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
     small.full-width now/duration: {{now}}/{{duration}}
-    //- small.full-width ctx/mode: {{ctx}}/{{mode}}
+    small.full-width ctx/mode: {{ctx}}/{{mode}}
     //- small.full-width start/end: {{layerStart}}/{{layerEnd}}
     //- small.full-width layerIndex: {{layerIndex}}
     //- small.full-width layerIndexPlay: {{layerIndexPlay}}
@@ -53,10 +56,14 @@ div(
   //- @mousemove="videoContainerMousemove"
   div(
     :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
+    div(
+      @click="videoClick()"
+      :style=`{position: 'absolute', zIndex: 1000}`
+      ).row.fit
     //- actions
     //- layer name
     span(
-      v-if="videoContainerHovered && ctx !== 'workspace' && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
+      v-if="true && ctx !== 'workspace' && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '-1px', left: '-1px',
         borderRadius: '10px', overflow: 'hidden',
@@ -80,13 +87,14 @@ div(
         .col.full-width.scroll
           q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
             span.text-white Explore content
-          q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
+          q-btn(flat no-caps align="left" @click="nodeWorkspace()").full-width
             span.text-white Save to workspace
           q-btn(flat no-caps align="left").full-width
             span.text-white Report
-    //- video actions, volume, progress
+    //- video actions
+    //- volume
     q-btn(
-      v-if="videoContainerHovered && visible && active && !mini"
+      v-if="false && visible && active && !mini"
       v-show="!mini"
       round flat @click="player.mutedToggle()"
       :color="muted ? 'grey-2' : 'grey-2'"
@@ -94,7 +102,7 @@ div(
       :style=`{position: 'absolute', zIndex: 20000, right: '0px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'}`)
     //- video forward
     div(
-      v-on:dblclick="videoForward(0)" @click="forwarding === 'left' ? videoForward(0) : videoClick()"
+      v-on:dblclick="videoForward(0)" @click="videoForward(0)"
       v-ripple=`forwarding === 'left' ? {color: 'white'} : false`
       :style=`{position: 'absolute', zIndex: 20, top: '0px', width: '33%', left: '0px',
         'border-top-right-radius': '100%', 'border-bottom-right-radius': '100%',
@@ -108,7 +116,7 @@ div(
           :style=`{userSelect: 'none', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).text-white.q-pa-sm {{ $time(forwardingCount) }}
     //- video forward
     div(
-      v-on:dblclick="videoForward(1)" @click="forwarding === 'right' ? videoForward(1) : videoClick()"
+      v-on:dblclick="videoForward(1)" @click="videoForward(1)"
       v-ripple=`forwarding === 'right' ? {color: 'white'} : false`
       :style=`{position: 'absolute', zIndex: 20, top: '0px', width: '33%', right: '0px',
         'border-top-left-radius': '100%', 'border-bottom-left-radius': '100%',
@@ -133,17 +141,15 @@ div(
         :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
         preload="auto"
         playsinline :loop="true" :muted="mutedComputed" :controls="false"
-        @loadeddata="videoLoadeddata" @click="videoClick" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
+        @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         @timeupdate="videoUpdate"
         :style=`{
           position: 'relative', width: '100%', height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden',
           opacity: videoLoadeddataDone && videoGood ? 1 : 0,
           border: videoLoadeddataDone && videoGood ? 'none' : '0.5px solid red'
         }`)
-    //- video tools
-    //- progress
     player-video-progress(
-      v-if="videoContainerHovered && !mini"
+      v-show="videoActionsShow && !mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
       :style=`{position: 'absolute', bottom: '0px', left: '0px', maxWidth: '75%', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
@@ -181,6 +187,7 @@ export default {
       forwardingInterval: null,
       forwardingCount: 0,
       videoLoadeddataDone: false,
+      videoActionsShow: false,
       content: null,
       actionsActive: false,
       actionsHovered: false,
@@ -271,19 +278,6 @@ export default {
         else return false
       }
     },
-    actionsShow () {
-      if (this.ctx === 'workspace') {
-        return true
-      }
-      else {
-        if (this.$q.platform.is.mobile) {
-          return this.actionsActive
-        }
-        else {
-          return this.actionsHovered
-        }
-      }
-    },
     mutedComputed () {
       if (this.ctx === 'contentEditor') {
         return false
@@ -370,26 +364,8 @@ export default {
     }
   },
   methods: {
-    videoContainerMouseover (e) {
-      this.$log('videoContainerMouseover', e)
-      // if (this.mouseOverTimer) {
-      //   clearTimeout(this.mouseOverTimer)
-      //   this.mouseOverTimer = null
-      // }
-      // this.videoContainerHovered = true
-      // this.mouseOverTimer = setTimeout(() => {
-      //   this.videoContainerHovered = false
-      // }, 2000)
-    },
-    videoContainerMousemove (e) {
-      // this.$log('videoContainerMousemove', e)
-      if (this.mousemoveTimer) {
-        clearTimeout(this.mousemoveTimer)
-      }
-      this.videoContainerHovered = true
-      this.mousemoveTimer = setTimeout(() => {
-        this.videoContainerHovered = false
-      }, 2000)
+    nodeWorkspace () {
+      this.$log('nodeWorkspace')
     },
     videoNow (to, from) {
       if (this.nowPause) return
@@ -525,17 +501,21 @@ export default {
       }
     },
     async videoClick (e) {
-      this.$log('videoClick', this.visible, this.active, !this.mini)
-      if (this.active) {
-        // TODO switch case mute/unmute play/pause
-        // this.muted = !this.muted
-        this.videoPlayPause()
-      }
-    },
-    videoFullscreen () {
-      this.$log('videoFullscreen')
-      this.fullscreen = !this.fullscreen
-      this.$q.fullscreen.toggle()
+      this.$log('videoClick', this.videoActionsShow)
+      if (this.videoActionsTimeout) clearTimeout(this.videoActionsTimeout)
+      this.videoActionsShow = true
+      this.videoPlayPause()
+      // if (this.videoActionsShow) {
+      //   this.videoPlayPause()
+      // }
+      // else {
+      //   this.videoActionsShow = true
+      //   // if (this.videoActionsTimeout) clearTimeout(this.videoActionsTimeout)
+      // }
+      this.videoActionsTimeout = setTimeout(() => {
+        this.videoActionsShow = false
+        this.videoActionsTimeout = null
+      }, 2400)
     },
     playerInit () {
       this.$log('playerInit START')
@@ -578,7 +558,7 @@ export default {
           pauseOtherPlayers: false,
           // plugins: ['youtube'],
           // ignorePauseOtherPlayersOption: false,
-          clickToPlayPause: true,
+          clickToPlayPause: false,
           success: async (mediaElement, originalNode, instance) => {
             this.$log('player YOUTUBE success')
             this.player = mediaElement

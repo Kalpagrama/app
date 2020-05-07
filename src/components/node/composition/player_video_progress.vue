@@ -6,12 +6,13 @@
     div(
       @click="progressClick"
       v-touch-pan.mouse.left.right="progressPan"
-      :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '10px', borderRadius: '10px'}`).row.full-width.items-center.content-center
+      :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '10px', borderRadius: '10px'}`
+      ).row.full-width.items-center.content-center.cursor-pointer
       //- progress WRAPPER
       div(
         ref="progressWrapper"
         :style=`{position: 'relative', height: '4px', zIndex: 200, borderRadius: '10px'}`
-        ).row.full-width.bg-grey-9.cursor-pointer
+        ).row.full-width.bg-grey-7.cursor-pointer
         //- progress %
         div(
           :style=`{
@@ -21,7 +22,7 @@
             borderRadius: '10px',
             pointerEvents: 'none', borderRight: '2px solid #4caf50'
           }`
-          ).row.full-height.bg-grey-3
+          ).row.full-height.bg-green
           //- progress POINT
           div(
             :style=`{
@@ -32,62 +33,51 @@
               width: pointHeight+'px',
               borderRadius: '50%'
             }`).bg-green
-    //- progress actions
-    div(:style=`{position: 'relative'}`).row.full-width
-      div(:style=`{position: 'absolute', top: '-20px', zIndex: 100, height: '18px'}`).row.full-width.items-center.content-center
-        small(
-          :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
-          ).text-white.q-px-xs {{ $time(now) }}
-        .col
-        small(
-              :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
-              ).text-white.q-px-xs -{{ $time(duration-now) }}
+    //- actions
     div(
-      v-if="false"
       :style=`{height: '60px', order: -1}`).row.full-width.items-center
       //- play/pause
       div(
-        :style=`{minWidth: '60px', height: '60px'}`
-        ).row.full-height.items-center.content-center.justify-center.q-px-md
+        :style=`{height: '60px'}`
+        ).row.full-height.items-end.content-end.justify-center
         q-btn(
           round flat @click="$emit('meta', ['videoPlayPause', null])"
           :color="'white'"
           :icon="meta.playing ? 'pause' : 'play_arrow'"
-          :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-md
+          :style=`{background: 'rgba(0,0,0,0.3)'}`)
+      //- stats
+      .col.full-height
+        .row.fit.items-end.content-end.justify-start.q-px-sm
+          span(
+            :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)', userSelect: 'none', padding: '10.5px'}`
+            ).text-white {{ $time(meta.now)+' / '+$time(meta.duration) }}
+      //- sound
+      div(
+        :style=`{height: '60px'}`
+        ).row.full-height.items-end.content-end.justify-center
+        q-btn(
+          round flat @click="videoForward(0)"
+          color="white"
+          icon="fast_rewind"
+          :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-sm
+        q-btn(
+          round flat @click="videoForward(1)"
+          color="white"
+          icon="fast_forward"
+          :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-sm
         q-btn(
           round flat @click="player.mutedToggle()"
           color="white"
           :icon="meta.muted ? 'volume_off' : 'volume_up'"
           :style=`{background: 'rgba(0,0,0,0.3)'}`)
-      //- stats
-      .col
-        .row.fit.items-center.content-center
-          span(
-            :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)'}`
-            ).text-white.q-pa-sm.q-ml-sm {{ $time(meta.now)+' / '+$time(meta.duration) }}
-      //- sound
-      div(
-        v-if="false"
-        :style=`{width: '60px', height: '60px'}`
-        ).row.full-height.items-center.content-center.justify-center
-        q-btn(
-          round outline @click="player.mutedToggle()"
-          color="white"
-          :icon="meta.muted ? 'volume_up' : 'volume_off'"
-          :style=`{background: 'rgba(0,0,0,0.3)'}`)
-      //- fullscreen
-      //- div(
-      //-   v-show="false"
-      //-   :style=`{width: '44px'}`
-      //-   ).row.full-height.items-center.content-center.justify-center
-      //-   q-btn(
-      //-     round flat color="green" @click="videoFullscreen()"
-      //-     :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"
-      //-     :style=`{background: 'rgba(0,0,0,0.3)'}`)
+        //- q-btn(
+        //-   round flat @click="player.mutedToggle()"
+        //-   color="white"
+        //-   :icon="meta.muted ? 'volume_off' : 'volume_up'"
+        //-   :style=`{background: 'rgba(0,0,0,0.3)'}`).q-ml-sm
 </template>
 
 <script>
-// TODO hide when playing...
 export default {
   name: 'playerVideoProgress',
   props: ['ctx', 'player', 'meta', 'start', 'end'],
@@ -142,6 +132,16 @@ export default {
     }
   },
   methods: {
+    videoForward (forward) {
+      this.$log('videoForward', forward)
+      let to = this.meta.now
+      if (forward > 0) to += 5
+      else to -= 5
+      if (to > this.meta.duration) to = this.meta.duration
+      if (to < 0) to = 0
+      this.player.setCurrentTime(to)
+      this.player.update(to)
+    },
     progressClick (e) {
       // this.$log('progressClick', e)
       let w = e.target.clientWidth

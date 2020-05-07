@@ -59,6 +59,7 @@ export default {
   },
   async created () {
     this.$log('created')
+    // alert('created')
     this.loading = true
     this.$q.addressbarColor.set('#424242')
     // take token from redirect url
@@ -71,6 +72,7 @@ export default {
     }
     if (!await this.$store.dispatch('init')) {
       this.$log('GO LOGIN')
+      // alert('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
     }
     // go to welcom...

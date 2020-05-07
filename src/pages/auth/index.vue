@@ -15,7 +15,7 @@ input
     }`
     ).row.full-width.items-center.content-center.justify-center.bg-grey-9
     div().row.full-width.justify-center.q-my-md
-      q-icon(name="blur_on" color="white" size="100px" @click="$router.replace('/auth')").cursor-pointer
+      q-icon(name="blur_on" color="white" size="100px" @click="$router.replace('/auth').catch(e => e)").cursor-pointer
       .row.full-width.justify-center
         span(:style=`{fontSize: '24px'}`).text-bold.text-white Kalpagramma
     //- form
@@ -23,7 +23,7 @@ input
       div(:style=`{borderRadius: '10px', oveflow: 'hidden'}`).row.fit.items-end.q-pa-sm.q-mb-sm
         //- get started
         div(v-if="!userIdentified").row.full-width.items-end.content-end.justify-center
-          span(:style=`{fontSize: '18px'}`).text-white.q-mr-sm Identify yourself to sign in
+          span(:style=`{fontSize: '18px'}`).text-white.q-mr-sm Welcome, identify yourself
           //- span(:style=`{fontSize: '20px'}`).text-green Kalpa
       //- socials
       with-socials(v-if="!userIdentified")
@@ -33,7 +33,10 @@ input
           v-model="login"
           dark color="green" filled label="Enter username / email / phone"
           @keyup.enter="userIdentify()"
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
+          :style=`{
+            fontSize: '20px',
+            borderRadius: '10px', overflow: 'hidden',
+          }`).full-width.q-mb-sm.bg-grey-9
         q-btn(
           push no-caps color="green" @click="userIdentify()"
           :loading="userIdentifying" :disable="login.length < 4"
@@ -42,7 +45,7 @@ input
       //- IDENTIFIED
       div(v-if="userIdentified").row.full-width
         //- userExist & needInvite
-        div(v-if="needInvite === true && userExist === false").row.full-width
+        div(v-if="true").row.full-width
           .row.full-width.justify-start.q-py-sm.q-px-md
             span.text-grey-3 New users need invite code
           q-input(
@@ -131,7 +134,7 @@ import withSocials from './with_socials'
 export default {
   name: 'pageAuth-index',
   meta: {
-    title: 'Kalpagramma - Identify'
+    title: 'Kalpagramma - Auth'
   },
   components: {withSocials},
   data () {
@@ -177,19 +180,15 @@ export default {
           this.$log('q', q)
           localStorage.setItem('ktoken', q.token)
           localStorage.setItem('ktokenExpires', q.expires)
-          await this.$wait(200)
-          if (q.needInvite === 'false') {
-            this.inviteCode = '2020'
-            this.userAuthenticate()
-          }
-          else {
-            this.userIdentifying = false
-            this.userIdentified = true
-            this.userExist = q.userExist === 'true' ? true : false
-            this.login = q.userId
-            this.loginType = q.loginType
-            this.needInvite = q.needInvite === 'true' ? true : false
-          }
+          // await this.$wait(200)
+          this.userIdentifying = false
+          this.userIdentified = true
+          this.login = q.userId
+          this.loginType = q.loginType
+          this.userExist = q.userExist === 'true' ? true : false
+          this.needInvite = q.needInvite === 'true' ? true : false
+          // if userExist and !needInvite... this.userAuthenticate()
+          // this.$router.replace('/auth')
         }
       }
     }
@@ -230,6 +229,10 @@ export default {
             }
           }
         }
+        // alert('userAuthenticate', this.password, this.inviteCode)
+        this.$q.notify('userAuthenticate' + this.password + '/' + this.inviteCode)
+        this.$log('userAuthenticate password', this.password)
+        this.$log('userAuthenticate inviteCode', this.inviteCode)
         let res = await this.$store.dispatch('auth/userAuthenticate', {password: this.password, inviteCode: this.inviteCode})
         this.$log('userAuthenticate done', res)
         this.userAuthenticating = false

@@ -33,9 +33,11 @@ export default {
   methods: {
     serviceClick (s, si) {
       this.$log('serviceClick', s, si)
-      let {url} = this.$store.state.auth[s.id]
+      const auth = this.$store.state.auth[s.id]
+      if (!auth) return
+      const {url} = auth
       this.$log('url', url)
-      let location = window.location
+      const location = window.location
       this.$log('location', location)
       let to = `${url}&state={"origin":"${location}"}`
       this.$log('to', to)
