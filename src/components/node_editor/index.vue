@@ -23,8 +23,7 @@ div(
         q-input(
           v-model="node.name"
           filled color="green" dark
-          placeholder="Whats the essence?"
-          label="Essence"
+          label="Whats the essence?"
           :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`
           ).full-width.bg-grey-8
     //- pages
@@ -39,13 +38,14 @@ div(
 
 <script>
 import assert from 'assert'
+import editInfo from './edit_info'
 import editItems from './edit_items'
 import editSpheres from './edit_spheres'
 import editPreview from './edit_preview'
 
 export default {
   name: 'nodeEditor',
-  components: {editItems, editSpheres, editPreview},
+  components: {editInfo, editItems, editSpheres, editPreview},
   props: ['mode', 'essence', 'node', 'wsItemFinderOnBoot', 'paddingTop'],
   data () {
     return {
@@ -55,6 +55,7 @@ export default {
       nodePublishing: false,
       pageId: 'items',
       pages: [
+        {id: 'info', name: 'Info'},
         {id: 'items', name: 'Items'},
         {id: 'spheres', name: 'Spheres'},
         {id: 'preview', name: 'Preview'}

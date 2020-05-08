@@ -72,6 +72,7 @@ module.exports = function (ctx) {
         'AddressbarColor'
       ]
     },
+    animations: 'all',
     supportIE: false,
     build: {
       env: {
@@ -164,8 +165,8 @@ module.exports = function (ctx) {
       },
       open: true // opens browser window automatically
     },
-    // animations: 'all',
-    animations: [],
+    animations: 'all',
+    // animations: [],
     ssr: {
       pwa: false
     },

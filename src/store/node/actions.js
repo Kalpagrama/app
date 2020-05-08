@@ -112,7 +112,7 @@ function makeCompositionInput (composition){
   assert(composition.operation, 'operation')
   let compositionLen = 0
   for (let l of composition.layers) {
-    assert.ok(l.content && l.content.oid, 'l.content && l.content.oid')
+    // assert.ok(l.content && l.content.oid, 'l.content && l.content.oid')
     assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10, 'l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10')
     assert.ok(l.figuresAbsolute && l.figuresAbsolute.length === 2, 'l.figuresAbsolute && l.figuresAbsolute.length === 2')
     let start = l.figuresAbsolute[0].t

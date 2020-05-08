@@ -1,7 +1,7 @@
 <template lang="pug">
 .column.fit
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-pl-sm
+    .row.full-width.items-start.content-start
       //- dialogs
       //- ws item finder dialog
       q-dialog(v-model="itemFinderOpened" maximized position="bottom")
@@ -38,53 +38,82 @@
               ).bg-grey-8
       //- items
       div(
-        v-for="(i,ii) in node.items" :key="ii"
+        v-for="(i, ii) in node.items" :key="i.oid"
+        :class=`{}`
         :style=`{
           position: 'relative',
           height: '860px',
           borderRadius: '10px',
           overflow: 'hidden',
-          maxHeight: itemIndex === ii ? '860px' : '460px',
+          maxHeight: itemsEdit[i.oid] ? '860px' : '460px',
         }`
         ).row.full-width.q-mb-sm
+        //- composition actions LEFT: select, mini
+        div(
+          :style=`{width: '60px'}`
+          ).row.full-height.justify-center.items-between.content-between.q-px-sm
+          q-checkbox(v-model="itemsSelected" :val="i.oid" dark dense color="grey-6"
+            :style=`{borderRadius: '10px', padding: '10px'}`).bg-grey-9
+          q-btn(
+            round flat color="grey-6" @click="itemsEdit[i.oid] = false"
+            :icon="itemsEdit[i.oid] ? 'keyboard_arrow_up' : 'keyboard_arrow_down'").bg-grey-9
         //- composition container
-        div(:style=`{position: 'relative', maxWidth: '100%'}`).col.full-height
+        div(
+          @mouseenter="itemsActive[i.oid] = true"
+          @mouseleave="itemsActive[i.oid] = false"
+          :style=`{position: 'relative', maxWidth: '100%'}`).col.full-height
           composition(
             ctx="workspace"
             :value="i"
             :visible="true"
-            :active="itemIndex === ii"
+            :active="true"
             :mini="false"
             :styles=`{
-              paddingBottom: itemIndex === ii ? '480px' : '0px'
+              paddingBottom: itemsEdit[i.oid] === true ? '480px' : '0px'
             }`)
             template(v-slot:editor=`{content, player, meta}`)
               composer(
-                v-if="itemIndex === ii"
+                v-if="itemsEdit[i.oid]"
                 ctx="workspace"
                 :composition="i"
                 :player="player" :meta="meta"
                 @meta="$parent.emit('meta', $event)"
                 @cancel="$emit('cancel')"
                 :styles=`{
-                  paddingBottom: itemIndex === ii ? 460 : 0
+                  paddingBottom: itemsEdit[i.oid] === true ? 460 : 0
                 }`)
-        //- composition actions: delete, edit, add
+        //- composition actions RIGHT: delete, edit, add
         div(:style=`{width: '60px'}`).row.full-height.justify-center.items-between.content-between.q-px-sm
-          q-btn(round flat color="red-5" icon="delete_outline" @click="itemDelete(ii)"
+          q-btn(round flat color="grey-6" icon="drag_indicator").bg-grey-9
+          q-btn(round flat color="red-5" icon="delete_outline" @click="itemDelete(i.oid)"
             :style=`{background: 'rgba(0,0,0,0.1)'}`).bg-grey-9
-          q-btn(round flat color="white" icon="edit" @click="itemEdit(ii)").bg-grey-9
+          q-btn(round flat color="white" icon="edit" @click="itemEdit(i.oid)").bg-grey-9
       //- add first item
-      div(v-if="node.items.length === 0").row.full-width.q-pr-sm
+      div(v-if="node.items.length === 0").row.full-width.q-px-sm
         q-btn(
-          flat icon="add" color="green" @click="itemFind(node.items.length)"
-          :style=`{height: '200px'}`).full-width.bg-grey-8
+          flat icon-right="add" color="green" no-caps @click="itemFind()"
+          :style=`{height: '400px'}`).full-width.bg-grey-8
+          span.text-bold Add item
       //- add second and beyond items
       div(v-if="node.items.length > 0").row.full-width
+        div(:style=`{width: '60px'}`).row.q-pa-sm
         .col.q-pb-sm
-          q-btn(flat no-caps color="green" icon="add" @click="itemFind(node.items.length)"
+          q-btn(flat no-caps color="green" icon="add" @click="itemFind()"
             :style=`{height: '42px'}`).full-width.bg-grey-9
         div(:style=`{width: '60px'}`).row.q-pa-sm
+  //- footer
+  div(
+    v-if="itemsSelected.length > 0"
+    :style=`{minHeight: '60px'}`).row.full-width
+    div(
+      :style=`{height: '60px'}`).row.full-width.bg-grey-9
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+        q-btn(round flat color="grey-2").bg-grey-8
+          span.text-bold {{itemsSelected.length}}
+      .col.full-height
+        .row.fit.items-center.content-center.q-px-sm
+          q-btn(flat no-caps color="red" @click="itemsSelectedDelete()") Delete
+          q-btn(flat no-caps color="grey-6" @click="itemsSelectedDiscard()") Discard
 </template>
 
 <script>
@@ -99,18 +128,21 @@ export default {
   },
   data () {
     return {
-      itemIndex: null,
       itemFinderOpened: false,
-      itemEditorOpened: false
+      itemEditorOpened: false,
+      itemsSelected: [],
+      itemsActive: {},
+      itemsMaxi: {},
+      itemsEdit: {}
     }
   },
   computed: {
   },
+  watch: {
+  },
   methods: {
-    itemFind (index) {
-      this.$log('itemFind', index)
-      assert(index >= 0, 'itemFind: No index!')
-      this.itemIndex = index
+    itemFind () {
+      this.$log('itemFind')
       this.itemFinderOpened = true
     },
     async itemFound ({type, item}) {
@@ -120,10 +152,11 @@ export default {
         case 'contentNotes': {
           let compositionInput = JSON.parse(JSON.stringify(item.rawData))
           // add layers workspace, non reactive...
+          compositionInput.oid = Date.now().toString()
           compositionInput.layersWorkspace = compositionInput.layers
           compositionInput.layers = []
-          this.$set(this.node.items, this.itemIndex, compositionInput)
-          this.itemEdit(this.itemIndex)
+          this.$set(this.node.items, this.node.items.length, compositionInput)
+          this.itemEdit(compositionInput.oid)
           await this.$wait(300)
           this.itemFinderOpened = false
           break
@@ -133,24 +166,36 @@ export default {
         }
       }
     },
-    itemEdit (index) {
-      this.$log('itemEdit', index)
-      assert(index >= 0, 'itemEdit: No index!')
-      if (this.itemIndex === index) {
-        this.itemIndex = null
-      }
-      else {
-        this.itemIndex = index
-      }
-      // this.itemIndex = index
-      // this.itemEditorOpened = true
+    itemEdit (oid) {
+      this.$log('itemEdit', oid)
+      // this.$set(this.itemsMaxi, oid, true)
+      this.$set(this.itemsEdit, oid, true)
+      // this.itemsMaxi[oid] = true
+      // this.itemsEdit[oid] = true
     },
-    itemDelete (index) {
-      this.$log('itemDelete', index)
-      assert(index >= 0, 'itemDelete: No index!')
+    itemDelete (oid) {
+      this.$log('itemDelete', oid)
       if (!confirm('Delete item ?!')) return
-      this.itemIndex = null
-      this.$delete(this.node.items, index)
+      let i = this.node.items.findIndex(item => item.oid === oid)
+      this.$log('itemDelete i', i)
+      if (i) {
+        this.$delete(this.node.items, i)
+      }
+    },
+    itemsSelectedDelete () {
+      this.$log('itemsSelectedDelete')
+      if (!confirm('Delete items ?!')) return
+      this.itemsSelected.map(oid => {
+        let i = this.node.items.findIndex(item => item.oid === oid)
+        this.$log('itemsSelectedDelete i', i)
+        if (i) {
+          this.$delete(this.node.items, i)
+        }
+      })
+    },
+    itemsSelectedDiscard () {
+      this.$log('itemsSelectedDiscard')
+      this.$set(this, 'itemsSelected', [])
     }
   },
   mounted () {

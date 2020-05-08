@@ -75,6 +75,7 @@ export default {
         thumbOid: content.oid,
         wsItemType: 'CONTENT_NOTES',
         rawData: {
+          oid: Date.now().toString(),
           layers: [],
           spheres: [],
           contentOid: content.oid,

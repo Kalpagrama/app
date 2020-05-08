@@ -52,7 +52,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             v-for="(l, li) in meta.layers" :key="li"
             v-if="l.figuresAbsolute.length > 0 && li !== meta.layerIndex"
             :style=`{
-              position: 'absolute', height: '50px', background: $randomColor(li),
+              position: 'absolute', height: '50px', background: l.color,
               pointerEvents: 'none', opacity: 0.3,
               left: (l.figuresAbsolute[0].t/duration)*100+'%',
               width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/duration)*100+'%'}`).row
@@ -72,7 +72,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
               position: 'absolute', zIndex: 120, height: '66px', top: '-8px',
               left: 'calc('+(layer.figuresAbsolute[0].t/duration)*100+'% - 8px)',
               width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/duration)*100+'% + 16px)',
-              borderRadius: '16px', border: '8px solid '+ $randomColor(meta.layerIndex), pointerEvents: 'none'}`).row
+              borderRadius: '16px', border: '8px solid '+ layer.color, pointerEvents: 'none'}`).row
           //- now second
           //- (meta.now/duration)*100+'%',
           div(

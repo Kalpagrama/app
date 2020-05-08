@@ -28,7 +28,7 @@ div(
                   borderRadius: '2px',
                   width: 'calc(2px + '+layerPointPercent+'%)',
                   pointerEvents: 'none',
-                  background: $randomColor(index)
+                  background: layer.color
                 }`
                 ).row.full-height
               //- bar point
@@ -42,7 +42,7 @@ div(
                   height: '20px',
                   borderRadius: '50%',
                   pointerEvents: 'none',
-                  background: $randomColor(index)
+                  background: layer.color
                 }`).row
       q-btn(round flat dense color="grey-2" icon="refresh" @click="layerRefresh()")
     //- ticks left/right

@@ -38,7 +38,7 @@ div(
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
   //- debug
   div(
-    v-if="true && !mini"
+    v-if="false && !mini"
     :style=`{
       position: 'absolute', width: 'calc(100% - 90px)', left: '0px', top: '50px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
@@ -93,43 +93,6 @@ div(
               span.text-white Save to workspace
             q-btn(flat no-caps align="left").full-width
               span.text-white Report
-    //- video actions
-    //- volume
-    q-btn(
-      v-if="false && visible && active && !mini"
-      v-show="!mini"
-      round flat @click="player.mutedToggle()"
-      :color="muted ? 'grey-2' : 'grey-2'"
-      :icon="muted ? 'volume_off' : 'volume_up'"
-      :style=`{position: 'absolute', zIndex: 20000, right: '0px', top: 'calc(50% - 20px)', background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'}`)
-    //- video forward
-    div(
-      v-on:dblclick="videoForward(0)" @click="videoForward(0)"
-      v-ripple=`forwarding === 'left' ? {color: 'white'} : false`
-      :style=`{position: 'absolute', zIndex: 20, top: '0px', width: '33%', left: '0px',
-        'border-top-right-radius': '100%', 'border-bottom-right-radius': '100%',
-        background: forwarding === 'left' ? 'rgba(255,255,255,0.3)' : 'none'}`).row.full-height.items-center.content-center.justify-center.q-px-md
-        q-btn(
-          v-show="forwarding === 'left'"
-          round flat size="md" color="white" icon="keyboard_arrow_left"
-          :style=`{pointerEvents: 'none'}`)
-        span(
-          v-show="forwarding === 'left'"
-          :style=`{userSelect: 'none', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).text-white.q-pa-sm {{ $time(forwardingCount) }}
-    //- video forward
-    div(
-      v-on:dblclick="videoForward(1)" @click="videoForward(1)"
-      v-ripple=`forwarding === 'right' ? {color: 'white'} : false`
-      :style=`{position: 'absolute', zIndex: 20, top: '0px', width: '33%', right: '0px',
-        'border-top-left-radius': '100%', 'border-bottom-left-radius': '100%',
-        background: forwarding === 'right' ? 'rgba(255,255,255,0.3)' : 'none'}`).row.full-height.items-center.content-center.justify-center.q-px-md
-        q-btn(
-          v-show="forwarding === 'right'"
-          round flat size="lg" color="white"  icon="keyboard_arrow_right"
-          :style=`{pointerEvents: 'none'}`)
-        span(
-          v-show="forwarding === 'right'"
-          :style=`{userSelect: 'none', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).text-white.q-pa-sm {{ $time(forwardingCount) }}
     //- video wrapper
     div(:style=`{
       position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)',

@@ -32,7 +32,7 @@ div(:style=`{}`).column.fit
         @start="layersDragging = true"
         @end="layersDragging = false, layerIndexFuture = null").full-width
         div(
-          v-for="(l,li) in meta.layers" :key="li" :ref="`layer-${li}`"
+          v-for="(l,li) in meta.layers" :key="l.oid"
           v-if="l.figuresAbsolute.length > 0"
           :style=`{
             position: 'relative'
@@ -40,10 +40,11 @@ div(:style=`{}`).column.fit
           ).row.full-width.q-mb-xs
           //- default layer header
           .row.full-width
+            //- layers actions LEFT: select
             div(:style=`{height: '35px', width: '40px'}`).row.items-center.content-center.justify-center
               //- span.text-bold.text-white V
               //- input(type="checkbox").fit
-              q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6" )
+              q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6")
             .col
               div(
                 :style=`{
@@ -217,6 +218,7 @@ export default {
           layout: 'PIP',
           items: [
             {
+              oid: Date.now().toString(),
               contentOid: this.meta.content.oid,
               layers: this.layersSelected.reduce((acc, val) => {
                 acc.push(this.meta.layers[val])
@@ -273,9 +275,11 @@ export default {
       let index = this.meta.layers.length
       this.$log('layerIndex index:', index)
       // get layer
+      let lId = Date.now().toString()
       let l = layerInput || {
+        oid: lId,
+        color: this.$randomColor(lId),
         contentOid: this.meta.content.oid,
-        // content: await this.$store.dispatch('objects/get', {oid: this.meta.content.oid}),
         figuresAbsolute: [
           {t: start, points: []},
           {t: end, points: []}
