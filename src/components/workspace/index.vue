@@ -85,15 +85,6 @@ export default {
   computed: {
   },
   watch: {
-    '$route.query.node': {
-      immediate: true,
-      handler (to, from) {
-        this.$log('$route.query.node CHANGED', to)
-        if (to) {
-          // create node and delete query params
-        }
-      }
-    },
     '$route.params.page': {
       immediate: true,
       handler (to, from) {
@@ -103,7 +94,7 @@ export default {
             // this.item = null
             this.$store.commit('workspace/stateSet', ['item', null])
             this.$store.commit('workspace/stateSet', ['itemType', undefined])
-            this.$router.replace('/workspace/' + to).catch(e => e)
+            // this.$router.replace('/workspace/' + to).catch(e => e)
           }
         } else {
           this.$router.replace({params: {page: 'contentNotes'}})

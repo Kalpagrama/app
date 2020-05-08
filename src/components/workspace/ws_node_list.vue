@@ -9,7 +9,7 @@ div(:style=`{position: 'relative'}`).column.fit
   //- dialogs
   //- node editor
   q-dialog(
-    v-model="nodeEditorOpened" :maximized="true" position="bottom")
+    v-model="nodeEditorOpened" persistent :maximized="true" position="bottom")
     div(
       :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center
       ws-item-saver(:value="node")
@@ -89,6 +89,19 @@ export default {
       return this.$route.params.oid
     }
   },
+  watch: {
+    '$route.query.node': {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('$route.query.node CHANGED', to)
+        if (to) {
+          // create node and delete query params
+          await this.nodeAddStart(JSON.parse(to))
+          this.$router.replace(this.$route.path)
+        }
+      }
+    },
+  },
   methods: {
     nodesFilter (arr) {
       if (this.nodeSearchString.length > 0) {
@@ -105,9 +118,9 @@ export default {
       // await this.$wait(300)
       this.nodeEditorOpened = true
     },
-    async nodeAddStart () {
+    async nodeAddStart (_nodeInput) {
       this.$log('nodeAddStart')
-      let nodeInput = {
+      let nodeInput = _nodeInput || {
         name: this.nodeSearchString,
         wsItemType: 'NODE',
         rawData: {

@@ -234,7 +234,7 @@ export default {
       }
       this.$log('layersSelectedExport nodeInput', nodeInput)
       this.layersSelected = []
-      // this.$router.push({name: 'workspace', params: {page: 'node'}, query: {node: JSON.stringify(nodeInput)}})
+      this.$router.push({name: 'workspace', params: {page: 'node'}, query: {node: JSON.stringify(nodeInput)}})
     },
     layersSelectedDiscard () {
       this.$log('layersSelectedDiscard')

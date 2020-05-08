@@ -71,9 +71,9 @@
                 }`)
         //- composition actions: delete, edit, add
         div(:style=`{width: '60px'}`).row.full-height.justify-center.items-between.content-between.q-px-sm
-          q-btn(round flat color="red-4" icon="delete_outline" @click="itemDelete(ii)"
-            :style=`{background: 'rgba(0,0,0,0.1)'}`)
-          q-btn(round flat color="white" icon="edit" @click="itemEdit(ii)").bg-grey-8
+          q-btn(round flat color="red-5" icon="delete_outline" @click="itemDelete(ii)"
+            :style=`{background: 'rgba(0,0,0,0.1)'}`).bg-grey-9
+          q-btn(round flat color="white" icon="edit" @click="itemEdit(ii)").bg-grey-9
       //- add first item
       div(v-if="node.items.length === 0").row.full-width.q-pr-sm
         q-btn(
