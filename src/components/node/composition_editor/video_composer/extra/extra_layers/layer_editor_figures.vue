@@ -311,7 +311,9 @@ export default {
     this.$log('mounted')
     this.width = this.$el.clientWidth
     await this.$wait(1000)
-    this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
+    if (this.$refs.framesScrollWrapper) {
+      this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

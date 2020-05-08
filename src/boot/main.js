@@ -99,6 +99,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
     Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))
     Vue.component('kalpaLoader', () => import('components/kalpa/loader'))
+    Vue.component('kalpaKeyboardEvents', () => import('components/kalpa/keyboard_events'))
     // Vue.component('kalpaSettings', () => import('components/kalpa/settings'))
   } catch (err) {
     logE(err)

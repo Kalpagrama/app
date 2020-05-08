@@ -3,7 +3,7 @@
   div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
     q-btn(round flat color="grey-5" icon="keyboard_arrow_left" @click="$emit('cancel')").q-mr-sm
     kalpa-buttons(:value="pages" :id="page" idKey="id" @id="page = $event")
-  .col
+  .col.q-px-sm
     ws-items(
       :page="page"
       @item="itemFound")

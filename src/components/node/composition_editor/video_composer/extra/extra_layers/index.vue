@@ -11,7 +11,7 @@ div(:style=`{}`).column.fit
   q-btn(
     v-if="true"
     round push color="green" icon="add" size="md" @click="layerAdd()"
-    :style=`{position: 'absolute', zIndex: 1000, right: '20px', top: '-50px', borderRadius: '50%'}`)
+    :style=`{position: 'absolute', zIndex: 1000, right: '20px', top: '-75px', borderRadius: '50%'}`)
   //- header
   //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
   div(
@@ -132,10 +132,10 @@ div(:style=`{}`).column.fit
         span.text-white {{layersSelected.length}}
     .col
       .row.fit.items-center
-        span.text-grey-2.q-mr-sm Layers selected,
-        q-btn(flat dense no-caps color="red" @click="layersSelectedDelete()").q-mr-sm Delete them
-        span.text-grey-2.q-mx-xs or
-        q-btn(flat dense no-caps color="grey-2" @click="layersSelectedExport()") Create node with them
+        span.text-grey-2.q-mr-sm selected:
+        q-btn(flat dense no-caps color="red" @click="layersSelectedDelete()").q-mr-sm Delete
+        q-btn(flat dense no-caps color="grey-2" @click="layersSelectedExport()").q-mr-sm Export
+        q-btn(flat dense no-caps color="grey-2" @click="layersSelectedDiscard()").q-mr-sm Discard
   //- footer
   div(
     v-if="true"
@@ -192,40 +192,31 @@ export default {
     }
   },
   watch: {
-    'meta.layerIndexPlay': {
-      handler (to, from) {
-        this.$log('meta.layerIndexPlay CHANGED', to)
-        // if (to < 0) return
-        // let refs = this.$refs[`layer-${to}`]
-        // let ref = refs ? refs[0] : null
-        // if (!ref) return
-        // this.$log('ref', ref)
-        // let offsetTop = ref.offsetTop
-        // this.$log('offsetTop', offsetTop)
-        // this.$tween.to(this.$refs.extraNodesScroll, 0.2, {scrollTop: offsetTop - 8})
-      }
-    }
   },
   methods: {
     layersSelectedDelete () {
       this.$log('layersSeletedDelete')
       if (!confirm('Delete selected layers?')) return
-      // find tha smallest index to go to?
       this.layersSelected.map((i, ii) => {
         this.$delete(this.composition.layers, ii)
       })
-      // set layerIndexPlay, layerIndex, mode?
       this.$set(this, 'layersSelected', [])
-      // this.layersSelected = []
+      // set layerIndexPlay, layerIndex, mode?
+      // find tha smallest index to go to?
     },
     layersSelectedExport () {
       this.$log('layersSelectedExport')
+      // open node-editor modal? or just save it to workspace as node?
+    },
+    layersSelectedDiscard () {
+      this.$log('layersSelectedDiscard')
+      this.$set(this, 'layersSelected', [])
     },
     layerOnMove (e, evt) {
       this.$log('layerDragMove', e, evt)
       this.$log('layerIndexFuture', e.draggedContext.futureIndex)
       this.$set(this, 'layerIndexFuture', e.draggedContext.futureIndex + 1)
-      // this.layerIndexFuture = e.draggedContext.futureIndex
+      // TODO why +1 ?
     },
     layerWorkspaceClick (l, li) {
       this.$log('layerWorkspaceClick', l, li)
@@ -290,33 +281,6 @@ export default {
       this.$emit('meta', ['mode', 'watch'])
       this.$emit('meta', ['layerIndexPlay', -1])
       this.player.play()
-    },
-    onScroll () {
-      // this.$log('onScroll')
-      // if (this.scrollTweening) return
-      if (this.scrollTimeout === null) this.scrollTimeout = setTimeout(this.onScrollend, 500)
-    },
-    onScrollend () {
-      this.$log('onScrollend')
-      clearTimeout(this.scrollTimeout)
-      this.scrollTimeout = null
-      // let ref = this.$refs.extraNodesScroll
-      // scrollTop to 100
-      // if (ref.scrollTop < 100) {
-      //   if (this.scrollTweening) return
-      //   this.$q.notify('SCROLL TO 100')
-      //   this.scrollOverflow = 'hidden'
-      //   this.scrollTweening = true
-      //   this.$tween.to(ref, 0.1, {
-      //     scrollTop: 100,
-      //     onComplete: () => {
-      //       this.$wait(600).then(() => {
-      //         this.scrollOverflow = 'auto'
-      //         this.scrollTweening = false
-      //       })
-      //     }
-      //   })
-      // }
     }
   }
 }

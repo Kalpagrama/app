@@ -1,11 +1,14 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
+  kalpa-keyboard-events(@keyup="windowKeyup")
   //- pregress wrapper
   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-lg
     //- progress bar & time
     div(
       @click="progressClick"
       v-touch-pan.mouse.left.right="progressPan"
+      @mousemove="progressMousemove"
+      @mouseleave="progressMouseleave"
       :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '10px', borderRadius: '10px'}`
       ).row.full-width.items-center.content-center.cursor-pointer
       //- progress WRAPPER
@@ -13,14 +16,31 @@
         ref="progressWrapper"
         :style=`{position: 'relative', height: '4px', zIndex: 200, borderRadius: '10px'}`
         ).row.full-width.bg-grey-7.cursor-pointer
+        //- progress TIP
+        div(
+          v-if="progressMousemoveTime"
+          :style=`{
+            position: 'absolute',
+            zIndex: 200,
+            left: progressMousemoveLeft-25+'px',
+            top: '-50px',
+            minWidth: '50px',
+            background: 'rgba(0,0,0,0.7)',
+            borderRadius: '10px',
+            padding: '10.5px',
+            overflow: 'hidden'
+          }`
+          ).row
+          span.text-white {{ $time(progressMousemoveTime) }}
         //- progress %
         div(
           :style=`{
             position: 'absolute', zIndex: 100,
             left: 0,
             width: progressPercentWidth,
+            borderRight: '2px solid #4caf50',
             borderRadius: '10px',
-            pointerEvents: 'none', borderRight: '2px solid #4caf50'
+            pointerEvents: 'none',
           }`
           ).row.full-height.bg-green
           //- progress POINT
@@ -89,7 +109,10 @@ export default {
       progressWrapperWidth: 0,
       progressDelta: 0,
       pointHeight: 10,
-      pointTop: 0
+      pointTop: 0,
+      progressMousemoveLeft: null,
+      progressMousemoveWidth: null,
+      progressMousemoveTime: null
     }
   },
   computed: {
@@ -142,6 +165,20 @@ export default {
       this.player.setCurrentTime(to)
       this.player.update(to)
     },
+    progressMousemove (e) {
+      // this.$log('progressMousemove', e)
+      let left = e.layerX
+      let w = e.target.clientWidth
+      // this.$log('left/w', left, w)
+      if (!this.progressMousemoveWidth) this.progressMousemoveWidth = w
+      this.progressMousemoveLeft = left
+      this.progressMousemoveTime = (this.meta.duration * left) / w
+    },
+    progressMouseleave (e) {
+      // this.$log('progressMouseleave', e)
+      this.progressMousemoveLeft = null
+      this.progressMousemoveTime = null
+    },
     progressClick (e) {
       // this.$log('progressClick', e)
       let w = e.target.clientWidth
@@ -184,6 +221,22 @@ export default {
         this.$emit('meta', ['videoUpdate', to])
         // point style
         this.$tween.to(this, 0.2, {pointHeight: 10, pointTop: 0})
+        this.progressMouseleave()
+      }
+    },
+    windowKeyup (e) {
+      this.$log('windowKeyup', e.keyCode)
+      switch (e.keyCode) {
+        // left
+        case 37: {
+          this.videoForward(0)
+          break
+        }
+        // right
+        case 39: {
+          this.videoForward(1)
+          break
+        }
       }
     }
   }

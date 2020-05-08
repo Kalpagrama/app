@@ -32,6 +32,7 @@ iframe[id$="_youtube_iframe"]
 div(
   :style=`{position: 'relative'}`
   ).column.fit.items-start.content-start
+  kalpa-keyboard-events(@keyup="windowKeyup")
   //- :class=`{'bg-black': videoGood}`
   //- opacity: videoGood ? 1 : 0
   //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
@@ -63,35 +64,35 @@ div(
     //- actions
     //- layer name
     span(
-      v-if="true && ctx !== 'workspace' && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
+      v-if="true && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '-1px', left: '-1px',
         borderRadius: '10px', overflow: 'hidden',
         background: 'rgba(0,0,0,0.15)'}`
       ).q-pa-sm.text-grey-2.cursor-pointer {{ layer.spheres[0].name | cut(50) }}
     //- layer menu
-    //- q-btn(
-    //-   v-if="true && content && visible && active && !mini"
-    //-   v-show="ctx !== 'workspace'"
-    //-   ref="layerMenuBtn"
-    //-   round flat color="grey-2" icon="more_vert"
-    //-   :style=`{
-    //-     position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
-    //-     background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'
-    //-   }`)
-    //- q-menu(
-    //-   :target="$refs.layerMenuBtn"
-    //-   cover anchor="top right" max-width="300px")
-    //-   div(v-if="content").column.fit.bg-grey-9
-    //-     div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
-    //-       span.text-white.text-bold {{ content.name }}
-    //-     .col.full-width.scroll
-    //-       q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
-    //-         span.text-white Explore content
-    //-       q-btn(flat no-caps align="left" @click="nodeWorkspace()").full-width
-    //-         span.text-white Save to workspace
-    //-       q-btn(flat no-caps align="left").full-width
-    //-         span.text-white Report
+    q-btn(
+      v-if="true && content && visible && active && !mini"
+      v-show="ctx !== 'workspace'"
+      ref="layerMenuBtn"
+      round flat color="grey-2" icon="more_vert"
+      :style=`{
+        position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
+        background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'
+      }`)
+      //- :target="$refs.layerMenuBtn"
+      q-menu(
+        cover anchor="top right" max-width="300px")
+        div(v-if="content").column.fit.bg-grey-9
+          div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
+            span.text-white.text-bold {{ content.name }}
+          .col.full-width.scroll
+            q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
+              span.text-white Explore content
+            q-btn(flat no-caps align="left" @click="nodeWorkspace()").full-width
+              span.text-white Save to workspace
+            q-btn(flat no-caps align="left").full-width
+              span.text-white Report
     //- video actions
     //- volume
     q-btn(
@@ -634,6 +635,34 @@ export default {
       this.$log('layerNameClick')
       // TODO this fucntion should not be here...
       // go to sphere page...
+    },
+    windowKeyup (e) {
+      this.$log('windowKeyup', e.keyCode)
+      switch (e.keyCode) {
+        // space
+        case 32: {
+          this.videoPlayPause()
+          break
+        }
+        // left
+        // case 37: {
+        //   let to = this.now - 5
+        //   if (to < 0) to = 0
+        //   // this.$parent.$emit('meta', ['mode', 'watch'])
+        //   this.player.setCurrentTime(to)
+        //   this.player.update()
+        //   break
+        // }
+        // // right
+        // case 39: {
+        //   let to = this.now + 5
+        //   if (to > this.duration) to = this.duration
+        //   // this.$parent.$emit('meta', ['mode', 'watch'])
+        //   this.player.setCurrentTime(to)
+        //   this.player.update()
+        //   break
+        // }
+      }
     }
   },
   async created () {
@@ -646,9 +675,11 @@ export default {
     if (this.composition.contentOid) {
       this.content = await this.$store.dispatch('objects/get', {oid: this.composition.contentOid})
     }
+    // window.addEventListener('keyup', this.windowKeyup)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    // window.removeEventListener('keyup', this.windowKeyup)
     this.playerDestroy()
   }
 }

@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: 'videoComposer_extraNodes',
+  name: 'videoComposer-extraNodes',
   props: ['composition', 'meta', 'player', 'height'],
   data () {
     return {

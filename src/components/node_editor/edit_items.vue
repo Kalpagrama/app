@@ -1,7 +1,7 @@
 <template lang="pug">
 .column.fit
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-pt-sm.q-pl-sm
+    .row.full-width.items-start.content-start.q-pl-sm
       //- dialogs
       //- ws item finder dialog
       q-dialog(v-model="itemFinderOpened" maximized position="bottom")
@@ -82,8 +82,8 @@
       //- add second and beyond items
       div(v-if="node.items.length > 0").row.full-width
         .col.q-pb-sm
-          q-btn(flat color="white" icon="add" @click="itemFind(node.items.length)"
-            :style=`{height: '42px'}`).full-width.bg-grey-8
+          q-btn(flat no-caps color="green" icon="add" @click="itemFind(node.items.length)"
+            :style=`{height: '42px'}`).full-width.bg-grey-9
         div(:style=`{width: '60px'}`).row.q-pa-sm
 </template>
 
@@ -115,6 +115,7 @@ export default {
     },
     async itemFound ({type, item}) {
       this.$log('itemFound', type, item)
+      // set node.name if there is no node.name and we have layer.name. in items...
       switch (type) {
         case 'contentNotes': {
           let compositionInput = JSON.parse(JSON.stringify(item.rawData))
@@ -143,11 +144,6 @@ export default {
       }
       // this.itemIndex = index
       // this.itemEditorOpened = true
-    },
-    itemEdited () {
-      this.$log('itemEdited')
-      this.itemIndex = null
-      this.itemEditorOpened = false
     },
     itemDelete (index) {
       this.$log('itemDelete', index)

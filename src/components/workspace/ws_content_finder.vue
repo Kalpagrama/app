@@ -1,5 +1,6 @@
-<style lang="stylus">
+<style lang="sass">
 </style>
+
 <template lang="pug">
 .row.fit.items-center.content-center.justify-center
   div(:style=`{}`).row.full-width.items-center.content-center.justify-center
@@ -10,20 +11,25 @@
     //- input url
     div(
       v-if="sources.includes('url')"
-      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.bg-grey-3
-      div(
-        v-if="progress"
-        :style=`{position: 'absolute', zIndex: 100, left: 0, width: progress.progress+'%', borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-height.bg-green
-      q-input(
-        v-model="url" filled
-        color="green" placeholder="Find content or paste URL"
-        :loading="urlInputLoading"
-        :input-style=`{}`
-        :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
-        ).full-width.bg-grey-1
-        template(v-slot:append)
-          q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()").q-ml-sm
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-pa-sm.bg-grey-8
+      div(:style=`{position: 'relative'}`).row.fit
+        //- progress bar
+        div(
+          v-if="progress"
+          :style=`{
+            position: 'absolute', zIndex: 1000, left: '0px',
+            width: progress.progress+'%', borderRadius: '10px', overflow: 'hidden', opacity: 0.9
+          }`
+          ).row.fit.bg-green
+        q-input(
+          v-model="url" filled
+          color="green" placeholder="Find content or paste URL"
+          :loading="urlInputLoading"
+          :input-style=`{}`
+          :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+          ).full-width.bg-grey-1
+          template(v-slot:append)
+            q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()")
 </template>
 
 <script>

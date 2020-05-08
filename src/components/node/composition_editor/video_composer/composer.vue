@@ -1,24 +1,11 @@
 <template lang="pug">
 div
-  //- actions
-  //- q-btn(
-  //-   round push color="green" icon="add"
-  //-   :style=`{position: 'absolute', zIndex: 1000, right: '30px', bottom: styles.paddingBottom+0+'px', borderRadius: '50%'}`
-  //- )
-  //- header
-  //- div(:style=`{position: 'absolute', zIndex: 1000, height: '60px', left: '0px', width: 'calc(100% + 0px)', top: '0px'}`).row.bg-grey-10.bg
-  //- extra
-  //- v-touch-pan.mouse.vertical.prevent="onExtraPan"
   div(
     :style=`{
       position: 'absolute', height: extraHeight+'px', left: '0px', bottom: '0px',
       borderRadius: '10px 10px 0 0'
       }`
     ).column.full-width.bg-grey-9
-    //- q-btn(
-    //-   v-touch-pan.mouse.vertical.prevent="onExtraPan"
-    //-   round flat dense color="white" icon="drag_indicator"
-    //-   :style=`{position: 'absolute', zIndex: 1000, top: '8px', right: '8px', background: 'rgba(0,0,0,0.2)'}`)
     //- body
     .col.full-width
       component(
@@ -45,10 +32,11 @@ div
 import extraInfo from './extra/extra_info'
 import extraLayers from './extra/extra_layers'
 import extraExplore from './extra/extra_explore'
+import extraSpheres from './extra/extra_spheres'
 
 export default {
   name: 'videoComposer-composer',
-  components: {extraInfo, extraLayers, extraExplore},
+  components: {extraInfo, extraLayers, extraExplore, extraSpheres},
   props: ['ctx', 'mode', 'composition', 'meta', 'player', 'styles'],
   data () {
     return {
@@ -56,8 +44,9 @@ export default {
       tab: 'info',
       tabs: [
         {id: 'info', name: 'Info'},
-        {id: 'layers', name: 'Layers'},
-        // {id: 'explore', name: 'Explore'}
+        {id: 'layers', name: 'Notes'},
+        {id: 'spheres', name: 'Spheres'},
+        {id: 'explore', name: 'Explore'}
       ]
     }
   },
@@ -119,45 +108,6 @@ export default {
     this.$wait(200).then(() => {
       this.tabChanged('layers')
     })
-    // window.addEventListener('blur', () => {
-    //   alert('blur')
-    //   window.focus()
-    // })
-    // window.addEventListener('focus', () => {
-    //   alert('focus')
-    // })
-    window.onkeydown = (e) => {
-      switch (e.keyCode) {
-        // space
-        case 32: {
-          if (this.meta.playing) this.player.pause()
-          else this.player.play()
-          break
-        }
-        // left
-        case 37: {
-          let to = this.meta.now - 5
-          if (to < 0) to = 0
-          this.$parent.$emit('meta', ['mode', 'watch'])
-          this.player.setCurrentTime(to)
-          this.player.update()
-          break
-        }
-        // right
-        case 39: {
-          let to = this.meta.now + 5
-          if (to > this.meta.duration) to = this.meta.duration
-          this.$parent.$emit('meta', ['mode', 'watch'])
-          this.player.setCurrentTime(to)
-          this.player.update()
-          break
-        }
-      }
-    }
-    // this.player.mutedToggle()
-    // this.styles.paddingTop = 8
-    // this.styles.paddingLeft = 4
-    // this.styles.paddingRight = 4
   }
 }
 </script>

@@ -8,7 +8,7 @@ div(
     //- main navigation
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
       q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$emit('cancel')")
-      .col
+      .col.q-px-sm
         //- span.text-white essence: {{essence}}
         span.text-white.text-bold Node editor
       q-btn(
@@ -95,7 +95,8 @@ export default {
         this.$log('nodePublish res', res)
         this.$log('nodePublish done')
         this.nodePublishing = false
-        this.$emit('cancel')
+        // this.$emit('cancel')
+        this.$emit('publish', res.oid)
       }
       catch (e) {
         this.$log('nodePublish error', e)

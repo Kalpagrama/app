@@ -9,19 +9,19 @@
         span.text-bold.text-green Settings
   //- body
   .col.full-width.scroll
-    .row.full-width.justify-center.q-pt-md
-      div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.q-px-sm.bg-grey-9
+    .row.full-width.justify-center
+      div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.q-px-sm.bg-grey-9.q-py-md
         //- .row.full-width.q-pa-md
         //-   span(:style=`{fontSize: '30px'}`).text-white.text-bold Settings
         //- export import
-        .row.full-width.q-px-md
-          span(:style=`{fontSize: '20px'}`).text-white Portability
-        .row.full-width.q-px-md.q-py-sm
-          q-btn(outline color='green' no-caps @click="wsExport()").q-mr-sm Import
-          q-btn(outline color='green' no-caps @click="wsExport()") Export
+        //- .row.full-width.q-px-md
+        //-   span(:style=`{fontSize: '20px'}`).text-white Portability
+        //- .row.full-width.q-px-md.q-py-sm
+        //-   q-btn(outline color='green' no-caps @click="wsExport()").q-mr-sm Import
+        //-   q-btn(outline color='green' no-caps @click="wsExport()") Export
         //- something
         div(:style=`{height: '300px'}`).row.full-width.q-px-md
-          span(:style=`{fontSize: '20px'}`).text-white Something
+          //- span(:style=`{fontSize: '20px'}`).text-white Something
         //- danger
         .row.full-width.q-px-md.q-py-sm
           span(:style=`{fontSize: '20px'}`).text-red Danger zone
@@ -32,7 +32,7 @@
             )
             span.text-bold Delete my workspace
           .row.full-width.q-py-sm.q-mb-md
-            small.text-white Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s
+            //- small.text-white Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s
 </template>
 
 <script>

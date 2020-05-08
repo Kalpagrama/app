@@ -64,7 +64,7 @@ div(:style=`{position: 'relative'}`).column.fit
                     :style=`{
                       borderRadius: '10px', overflow: 'hidden'
                     }`
-                    ).row.fit.items-center.content-center.q-px-md.cursor-pointer.node-item.bg-grey-9
+                    ).row.fit.items-center.content-center.q-px-md.cursor-pointer.node-item.bg-grey-8
                     span(:style=`{userSelect: 'none'}`).text-white {{ n.name }}
                 //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
                 //-   q-btn(round flat dense color="grey-6" icon="more_vert")
