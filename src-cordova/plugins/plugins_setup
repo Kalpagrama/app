@@ -1,0 +1,11 @@
+
+
+
+plugin add cordova-plugin-firebase-messaging
+
+// https://www.npmjs.com/package/cc.fovea.cordova.openwith
+cordova plugin add https://github.com/4321ip/cordova-plugin-openwith.git \
+  --variable ANDROID_MIME_TYPE="*/*" \
+  --variable IOS_URL_SCHEME=kalpa \
+  --variable IOS_UNIFORM_TYPE_IDENTIFIER=public.item \
+  --variable IOS_GROUP_IDENTIFIER=group.app.kalpa

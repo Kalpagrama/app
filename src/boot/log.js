@@ -82,29 +82,31 @@ class Logger {
 
   error (module, ...msg) {
     try {
-      alert('error! \n' + JSON.stringify(msg))
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevel) {
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry) {
         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
       }
+      alert('error! \n' + JSON.stringify(msg))
     } catch (err) {
       console.error('error on logging error!!!', err)
+      alert('error on log error! \n' + JSON.stringify(err))
     }
   }
 
   critical (module, ...msg) {
     try {
-      alert('error! \n' + JSON.stringify(msg))
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry) {
         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Critical)
       }
+      alert('critical! \n' + JSON.stringify(msg))
     } catch (err) {
       console.error('error on logging error!!!', err)
+      alert('error on log error! \n' + JSON.stringify(err))
     }
   }
 }

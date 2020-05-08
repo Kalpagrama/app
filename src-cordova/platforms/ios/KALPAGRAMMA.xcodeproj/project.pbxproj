@@ -10,16 +10,20 @@
 		0207DA581B56EA530066E2B4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0207DA571B56EA530066E2B4 /* Images.xcassets */; };
 		1D3623260D0F684500981E51 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* AppDelegate.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		278A23DFE82644079AB85663 /* CDVWKWebViewEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CED175A5FE842839C50AFCB /* CDVWKWebViewEngine.m */; };
 		301BF552109A68D80062928A /* libCordova.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 301BF535109A57CC0062928A /* libCordova.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		302D95F114D2391D003F00A1 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 302D95EF14D2391D003F00A1 /* MainViewController.m */; };
 		302D95F214D2391D003F00A1 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 302D95F014D2391D003F00A1 /* MainViewController.xib */; };
 		6AFF5BF91D6E424B00AB3073 /* CDVLaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6AFF5BF81D6E424B00AB3073 /* CDVLaunchScreen.storyboard */; };
-		278A23DFE82644079AB85663 /* CDVWKWebViewEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CED175A5FE842839C50AFCB /* CDVWKWebViewEngine.m */; };
 		7CB9BFD3007B4B34B7017230 /* CDVWKWebViewUIDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = EF2892B98D5F45DF9B5411BC /* CDVWKWebViewUIDelegate.m */; };
-		C42AFECCB59547228ED3D3AB /* CDVWKProcessPoolFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = ACDA41A4E6C44B59A1317D53 /* CDVWKProcessPoolFactory.m */; };
-		8FE21C92DDED4DC2A598AC4C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4E0C976A02460BB8AA984E /* WebKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		872EB78771E5402D93CAF90A /* CDVSplashScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FF72BEE7D404C48A8596F61 /* CDVSplashScreen.m */; };
 		856089618C294EF59C957F51 /* CDVViewController+SplashScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 9300110CC59E47ACB1765B76 /* CDVViewController+SplashScreen.m */; };
+		872EB78771E5402D93CAF90A /* CDVSplashScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 5FF72BEE7D404C48A8596F61 /* CDVSplashScreen.m */; };
+		8FE21C92DDED4DC2A598AC4C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4E0C976A02460BB8AA984E /* WebKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		C42AFECCB59547228ED3D3AB /* CDVWKProcessPoolFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = ACDA41A4E6C44B59A1317D53 /* CDVWKProcessPoolFactory.m */; };
+		C721FA88160DF52DEBCFD0FC /* libPods-KALPAGRAMMA.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 48AF23252D7BAA6FF6D8DB4B /* libPods-KALPAGRAMMA.a */; };
+		AA779E423D404D6985405BAD /* FirebaseAnalyticsPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 22EE9A84B99A443B9DE1CED2 /* FirebaseAnalyticsPlugin.m */; };
+		1CF70B93E4B84D19A980DD32 /* AppDelegate+FirebaseMessagingPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = B894EEF8873D427DB0CF446B /* AppDelegate+FirebaseMessagingPlugin.m */; };
+		E63D309E51D1421DB974C39A /* FirebaseMessagingPlugin.m in Sources */ = {isa = PBXBuildFile; fileRef = 356CA3F6D1E14C25A5DF97C7 /* FirebaseMessagingPlugin.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,10 +51,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0207DA571B56EA530066E2B4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "KALPAGRAMMA/Images.xcassets"; sourceTree = SOURCE_ROOT; };
+		0207DA571B56EA530066E2B4 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = KALPAGRAMMA/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		1D3623240D0F684500981E51 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		1D6058910D05DD3D006BFB54 /* KALPAGRAMMA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KALPAGRAMMA.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* KALPAGRAMMA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KALPAGRAMMA.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		27602D135C1BCE5DBF1139DA /* Pods-KALPAGRAMMA.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KALPAGRAMMA.debug.xcconfig"; path = "Target Support Files/Pods-KALPAGRAMMA/Pods-KALPAGRAMMA.debug.xcconfig"; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		301BF52D109A57CC0062928A /* CordovaLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CordovaLib.xcodeproj; path = CordovaLib/CordovaLib.xcodeproj; sourceTree = "<group>"; };
 		301BF56E109A69640062928A /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; path = www; sourceTree = SOURCE_ROOT; };
@@ -61,23 +66,31 @@
 		3047A5101AB8059700498E2A /* build-release.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = "build-release.xcconfig"; path = "cordova/build-release.xcconfig"; sourceTree = SOURCE_ROOT; };
 		3047A5111AB8059700498E2A /* build.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = build.xcconfig; path = cordova/build.xcconfig; sourceTree = SOURCE_ROOT; };
 		32CA4F630368D1EE00C91783 /* KALPAGRAMMA-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "KALPAGRAMMA-Prefix.pch"; sourceTree = "<group>"; };
-		6AFF5BF81D6E424B00AB3073 /* CDVLaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = CDVLaunchScreen.storyboard; path = "KALPAGRAMMA/CDVLaunchScreen.storyboard"; sourceTree = SOURCE_ROOT; };
+		48AF23252D7BAA6FF6D8DB4B /* libPods-KALPAGRAMMA.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KALPAGRAMMA.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5CED175A5FE842839C50AFCB /* CDVWKWebViewEngine.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = CDVWKWebViewEngine.m; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewEngine.m"; sourceTree = "<group>"; };
+		5FF72BEE7D404C48A8596F61 /* CDVSplashScreen.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = CDVSplashScreen.m; path = "cordova-plugin-splashscreen/CDVSplashScreen.m"; sourceTree = "<group>"; };
+		6AFF5BF81D6E424B00AB3073 /* CDVLaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = CDVLaunchScreen.storyboard; path = KALPAGRAMMA/CDVLaunchScreen.storyboard; sourceTree = SOURCE_ROOT; };
 		8D1107310486CEB800E47090 /* KALPAGRAMMA-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "KALPAGRAMMA-Info.plist"; path = "KALPAGRAMMA/KALPAGRAMMA-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = SOURCE_ROOT; };
+		8DF55F953C974864B5AFE1B8 /* CDVWKProcessPoolFactory.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVWKProcessPoolFactory.h; path = "cordova-plugin-wkwebview-engine/CDVWKProcessPoolFactory.h"; sourceTree = "<group>"; };
+		9300110CC59E47ACB1765B76 /* CDVViewController+SplashScreen.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = "CDVViewController+SplashScreen.m"; path = "cordova-plugin-splashscreen/CDVViewController+SplashScreen.m"; sourceTree = "<group>"; };
+		ACDA41A4E6C44B59A1317D53 /* CDVWKProcessPoolFactory.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = CDVWKProcessPoolFactory.m; path = "cordova-plugin-wkwebview-engine/CDVWKProcessPoolFactory.m"; sourceTree = "<group>"; };
+		C695958247B64646A9302A2F /* CDVSplashScreen.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVSplashScreen.h; path = "cordova-plugin-splashscreen/CDVSplashScreen.h"; sourceTree = "<group>"; };
+		CD52B06BD2814925B7DA5885 /* CDVWKWebViewEngine.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVWKWebViewEngine.h; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewEngine.h"; sourceTree = "<group>"; };
+		D164E0A6F0A14B2089B2DB34 /* CDVWKWebViewUIDelegate.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = CDVWKWebViewUIDelegate.h; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewUIDelegate.h"; sourceTree = "<group>"; };
+		DA4E0C976A02460BB8AA984E /* WebKit.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		DC10FDFBB3E0AF1D206F2233 /* Pods-KALPAGRAMMA.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KALPAGRAMMA.release.xcconfig"; path = "Target Support Files/Pods-KALPAGRAMMA/Pods-KALPAGRAMMA.release.xcconfig"; sourceTree = "<group>"; };
 		EB87FDF31871DA8E0020F90C /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = ../../www; sourceTree = "<group>"; };
 		EB87FDF41871DAF40020F90C /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = ../../config.xml; sourceTree = "<group>"; };
 		ED33DF2A687741AEAF9F8254 /* Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Bridging-Header.h"; path = "Bridging-Header.h"; sourceTree = "<group>"; };
-		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = "KALPAGRAMMA/config.xml"; sourceTree = "<group>"; };
-		5CED175A5FE842839C50AFCB /* CDVWKWebViewEngine.m */ = {isa = PBXFileReference; name = "CDVWKWebViewEngine.m"; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewEngine.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
-		EF2892B98D5F45DF9B5411BC /* CDVWKWebViewUIDelegate.m */ = {isa = PBXFileReference; name = "CDVWKWebViewUIDelegate.m"; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewUIDelegate.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
-		ACDA41A4E6C44B59A1317D53 /* CDVWKProcessPoolFactory.m */ = {isa = PBXFileReference; name = "CDVWKProcessPoolFactory.m"; path = "cordova-plugin-wkwebview-engine/CDVWKProcessPoolFactory.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
-		CD52B06BD2814925B7DA5885 /* CDVWKWebViewEngine.h */ = {isa = PBXFileReference; name = "CDVWKWebViewEngine.h"; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewEngine.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
-		D164E0A6F0A14B2089B2DB34 /* CDVWKWebViewUIDelegate.h */ = {isa = PBXFileReference; name = "CDVWKWebViewUIDelegate.h"; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewUIDelegate.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
-		8DF55F953C974864B5AFE1B8 /* CDVWKProcessPoolFactory.h */ = {isa = PBXFileReference; name = "CDVWKProcessPoolFactory.h"; path = "cordova-plugin-wkwebview-engine/CDVWKProcessPoolFactory.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
-		DA4E0C976A02460BB8AA984E /* WebKit.framework */ = {isa = PBXFileReference; name = "WebKit.framework"; path = "System/Library/Frameworks/WebKit.framework"; sourceTree = SDKROOT; fileEncoding = undefined; lastKnownFileType = wrapper.framework; explicitFileType = undefined; includeInIndex = 0; };
-		5FF72BEE7D404C48A8596F61 /* CDVSplashScreen.m */ = {isa = PBXFileReference; name = "CDVSplashScreen.m"; path = "cordova-plugin-splashscreen/CDVSplashScreen.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
-		9300110CC59E47ACB1765B76 /* CDVViewController+SplashScreen.m */ = {isa = PBXFileReference; name = "CDVViewController+SplashScreen.m"; path = "cordova-plugin-splashscreen/CDVViewController+SplashScreen.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
-		C695958247B64646A9302A2F /* CDVSplashScreen.h */ = {isa = PBXFileReference; name = "CDVSplashScreen.h"; path = "cordova-plugin-splashscreen/CDVSplashScreen.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
-		FCB75A2179F04B49A11403D8 /* CDVViewController+SplashScreen.h */ = {isa = PBXFileReference; name = "CDVViewController+SplashScreen.h"; path = "cordova-plugin-splashscreen/CDVViewController+SplashScreen.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		EF2892B98D5F45DF9B5411BC /* CDVWKWebViewUIDelegate.m */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.objc; name = CDVWKWebViewUIDelegate.m; path = "cordova-plugin-wkwebview-engine/CDVWKWebViewUIDelegate.m"; sourceTree = "<group>"; };
+		F840E1F0165FE0F500CFE078 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = config.xml; path = KALPAGRAMMA/config.xml; sourceTree = "<group>"; };
+		FCB75A2179F04B49A11403D8 /* CDVViewController+SplashScreen.h */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 4; includeInIndex = 0; lastKnownFileType = sourcecode.c.h; name = "CDVViewController+SplashScreen.h"; path = "cordova-plugin-splashscreen/CDVViewController+SplashScreen.h"; sourceTree = "<group>"; };
+		22EE9A84B99A443B9DE1CED2 /* FirebaseAnalyticsPlugin.m */ = {isa = PBXFileReference; name = "FirebaseAnalyticsPlugin.m"; path = "cordova-plugin-firebase-analytics/FirebaseAnalyticsPlugin.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
+		C7D51A47722F427EB4FC0AD5 /* FirebaseAnalyticsPlugin.h */ = {isa = PBXFileReference; name = "FirebaseAnalyticsPlugin.h"; path = "cordova-plugin-firebase-analytics/FirebaseAnalyticsPlugin.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		B894EEF8873D427DB0CF446B /* AppDelegate+FirebaseMessagingPlugin.m */ = {isa = PBXFileReference; name = "AppDelegate+FirebaseMessagingPlugin.m"; path = "cordova-plugin-firebase-messaging/AppDelegate+FirebaseMessagingPlugin.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
+		356CA3F6D1E14C25A5DF97C7 /* FirebaseMessagingPlugin.m */ = {isa = PBXFileReference; name = "FirebaseMessagingPlugin.m"; path = "cordova-plugin-firebase-messaging/FirebaseMessagingPlugin.m"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; explicitFileType = undefined; includeInIndex = 0; };
+		815BDB795B4440D7A24494D9 /* AppDelegate+FirebaseMessagingPlugin.h */ = {isa = PBXFileReference; name = "AppDelegate+FirebaseMessagingPlugin.h"; path = "cordova-plugin-firebase-messaging/AppDelegate+FirebaseMessagingPlugin.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
+		19F91218E31A4A25AAAE3EB1 /* FirebaseMessagingPlugin.h */ = {isa = PBXFileReference; name = "FirebaseMessagingPlugin.h"; path = "cordova-plugin-firebase-messaging/FirebaseMessagingPlugin.h"; sourceTree = "<group>"; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +100,7 @@
 			files = (
 				301BF552109A68D80062928A /* libCordova.a in Frameworks */,
 				8FE21C92DDED4DC2A598AC4C /* WebKit.framework in Frameworks */,
+				C721FA88160DF52DEBCFD0FC /* libPods-KALPAGRAMMA.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,7 +117,7 @@
 				1D3623250D0F684500981E51 /* AppDelegate.m */,
 			);
 			name = Classes;
-			path = "KALPAGRAMMA/Classes";
+			path = KALPAGRAMMA/Classes;
 			sourceTree = SOURCE_ROOT;
 		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
@@ -114,7 +128,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+		29B97314FDCFA39411CA2CEA = {
 			isa = PBXGroup;
 			children = (
 				EB87FDF41871DAF40020F90C /* config.xml */,
@@ -127,6 +141,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				40C1D902FC6E6099BA5AA758 /* Pods */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -139,7 +154,7 @@
 				ED33DF2A687741AEAF9F8254 /* Bridging-Header.h */,
 			);
 			name = "Other Sources";
-			path = "KALPAGRAMMA";
+			path = KALPAGRAMMA;
 			sourceTree = "<group>";
 		};
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
@@ -151,13 +166,14 @@
 				6AFF5BF81D6E424B00AB3073 /* CDVLaunchScreen.storyboard */,
 			);
 			name = Resources;
-			path = "KALPAGRAMMA/Resources";
+			path = KALPAGRAMMA/Resources;
 			sourceTree = "<group>";
 		};
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				DA4E0C976A02460BB8AA984E /* WebKit.framework */,
+				48AF23252D7BAA6FF6D8DB4B /* libPods-KALPAGRAMMA.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -194,10 +210,26 @@
 				9300110CC59E47ACB1765B76 /* CDVViewController+SplashScreen.m */,
 				C695958247B64646A9302A2F /* CDVSplashScreen.h */,
 				FCB75A2179F04B49A11403D8 /* CDVViewController+SplashScreen.h */,
+				22EE9A84B99A443B9DE1CED2 /* FirebaseAnalyticsPlugin.m */,
+				C7D51A47722F427EB4FC0AD5 /* FirebaseAnalyticsPlugin.h */,
+				B894EEF8873D427DB0CF446B /* AppDelegate+FirebaseMessagingPlugin.m */,
+				356CA3F6D1E14C25A5DF97C7 /* FirebaseMessagingPlugin.m */,
+				815BDB795B4440D7A24494D9 /* AppDelegate+FirebaseMessagingPlugin.h */,
+				19F91218E31A4A25AAAE3EB1 /* FirebaseMessagingPlugin.h */,
 			);
 			name = Plugins;
-			path = "KALPAGRAMMA/Plugins";
+			path = KALPAGRAMMA/Plugins;
 			sourceTree = SOURCE_ROOT;
+		};
+		40C1D902FC6E6099BA5AA758 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				27602D135C1BCE5DBF1139DA /* Pods-KALPAGRAMMA.debug.xcconfig */,
+				DC10FDFBB3E0AF1D206F2233 /* Pods-KALPAGRAMMA.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
 		};
 		EB87FDF11871DA420020F90C /* Staging */ = {
 			isa = PBXGroup;
@@ -215,6 +247,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "KALPAGRAMMA" */;
 			buildPhases = (
+				63068035A927C922C9C74BC4 /* [CP] Check Pods Manifest.lock */,
 				304B58A110DAC018002A0835 /* Copy www directory */,
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
@@ -225,8 +258,8 @@
 			dependencies = (
 				301BF551109A68C00062928A /* PBXTargetDependency */,
 			);
-			name = "KALPAGRAMMA";
-			productName = "KALPAGRAMMA";
+			name = KALPAGRAMMA;
+			productName = KALPAGRAMMA;
 			productReference = 1D6058910D05DD3D006BFB54 /* KALPAGRAMMA.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -247,7 +280,8 @@
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
-			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			mainGroup = 29B97314FDCFA39411CA2CEA;
+			productRefGroup = 19C28FACFE9D520D11CA2CBB /* Products */;
 			projectDirPath = "";
 			projectReferences = (
 				{
@@ -308,6 +342,28 @@
 			shellScript = "\"$SRCROOT/KALPAGRAMMA/Scripts/copy-www-build-step.sh\"";
 			showEnvVarsInLog = 0;
 		};
+		63068035A927C922C9C74BC4 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KALPAGRAMMA-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -323,6 +379,9 @@
 				C42AFECCB59547228ED3D3AB /* CDVWKProcessPoolFactory.m in Sources */,
 				872EB78771E5402D93CAF90A /* CDVSplashScreen.m in Sources */,
 				856089618C294EF59C957F51 /* CDVViewController+SplashScreen.m in Sources */,
+				AA779E423D404D6985405BAD /* FirebaseAnalyticsPlugin.m in Sources */,
+				1CF70B93E4B84D19A980DD32 /* AppDelegate+FirebaseMessagingPlugin.m in Sources */,
+				E63D309E51D1421DB974C39A /* FirebaseMessagingPlugin.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,10 +480,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = app.kalpa;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = NO;
 				WK_WEB_VIEW_ONLY = 0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.kalpa;
 			};
 			name = Debug;
 		};
@@ -462,10 +521,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = app.kalpa;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = NO;
 				WK_WEB_VIEW_ONLY = 0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.kalpa;
 			};
 			name = Release;
 		};

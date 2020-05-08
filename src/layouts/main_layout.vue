@@ -74,9 +74,10 @@ export default {
       this.$log('GO LOGIN')
       // alert('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
+    } else {
+      // go to welcom...
+      if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     }
-    // go to welcom...
-    if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     this.loading = false
   },
   mounted () {

@@ -16,28 +16,28 @@ div(
 </template>
 
 <script>
+  import assert from 'assert'
 export default {
   name: 'pageAuth-withSocials',
   data () {
     return {
       socials: [
-        {id: 'yandex', name: 'Yandex', icon: 'fab fa-yandex'},
-        {id: 'facebook', name: 'Facebook', icon: 'fab fa-facebook-f'},
-        {id: 'AUTH_VK', name: 'Vkontakte', icon: 'fab fa-vk'},
-        {id: 'google', name: 'Google', icon: 'fab fa-twitter'},
-        {id: 'twitter', name: 'Twitter', icon: 'fab fa-google'},
-        {id: 'github', name: 'Github', icon: 'fab fa-github'}
+        {id: 'oAuthUrlYandex', name: 'Yandex', icon: 'fab fa-yandex'},
+        {id: 'oAuthUrlFacebook', name: 'Facebook', icon: 'fab fa-facebook-f'},
+        {id: 'oAuthUrlVk', name: 'Vkontakte', icon: 'fab fa-vk'},
+        {id: 'oAuthUrlTwitter', name: 'Twitter', icon: 'fab fa-twitter'},
+        {id: 'oAuthUrlGoogle', name: 'Google', icon: 'fab fa-google'},
+        {id: 'goAuthUrlGithub', name: 'Github', icon: 'fab fa-github'}
       ]
     }
   },
   methods: {
     serviceClick (s, si) {
-      this.$log('serviceClick', s, si)
-      const auth = this.$store.state.auth[s.id]
-      if (!auth) return
-      const {url} = auth
-      this.$log('url', url)
-      const location = window.location
+      this.$log('serviceClick', s, si, this.$store.state.auth.services)
+      let url = this.$store.state.auth.services[s.id]
+      this.$log('oauth url = ', url)
+      assert(url, '!url')
+      let location = window.location
       this.$log('location', location)
       let to = `${url}&state={"origin":"${location}"}`
       this.$log('to', to)

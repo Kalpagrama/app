@@ -156,12 +156,12 @@ module.exports = function (ctx) {
       // },
       // https: true,
       port: ctx.mode.capacitor || ctx.mode.cordova ? 8484 : ctx.mode.pwa ? 8383 : 8282,
+      host: ctx.mode.capacitor || ctx.mode.cordova ? null : 'mac.kalpa.app',
       // https: true,
-      // host: 'mac.kalpa.app',
-      // https: {
-      //   key: fs.readFileSync('deploy/dev_server_cert/private.key'),
-      //   cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
-      // },
+      https: ctx.mode.capacitor || ctx.mode.cordova ? false : {
+        key: fs.readFileSync('deploy/dev_server_cert/private.key'),
+        cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
+      },
       open: true // opens browser window automatically
     },
     // animations: 'all',

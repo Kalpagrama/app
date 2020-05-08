@@ -5,8 +5,17 @@
   "npmClient": "yarn",
   "webDir": "www",
   "backgroundColor": "#22222222",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    }
+  },
   "server": {
-    "url": "https://whatwebcando.today/offline.html",
+    "iosScheme": "app.kalpa",
     "allowNavigation": [
       "kalpa.app",
       "*.kalpa.app",

@@ -3,6 +3,9 @@ import assert from 'assert'
 
 export function init (state, authInfo) {
   assert(authInfo, '!authInfo')
+  assert(authInfo.userOid, '!authInfo.userOid')
+  assert(authInfo.userIsAuthorized, '!authInfo.userIsAuthorized')
+  assert(authInfo.userIsConfirmed, '!authInfo.userIsConfirmed')
   state.initialized = true
   state.userIsAuthorized = authInfo.userIsAuthorized
   state.userIsConfirmed = authInfo.userIsConfirmed

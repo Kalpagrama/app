@@ -86,7 +86,16 @@ export default async ({ Vue, store, app }) => {
 
   const fetchItemFunc = async () => {
     let { data: { services } } = await servicesApollo.query({
-      query: gql`query services {services}`
+      query: gql`query {
+        services {
+          authUrl
+          apiUrl
+          uploadUrl
+          subscriptionsUrl
+          oAuthUrlVk
+          oAuthUrlGoogle
+        }
+      }`
     })
     return {
       item: services,
@@ -97,12 +106,14 @@ export default async ({ Vue, store, app }) => {
   // logD('objects/get action complete', oid)
 
   logD('services', services)
-  let linkAuth = services.AUTH
-  let linkApi = services.API
-  let linkWs = services.SUBSCRIPTIONS
-  let linkUpload = services.UPLOAD
-  store.commit('auth/stateSet', ['AUTH_URL', services.AUTH])
-  store.commit('auth/stateSet', ['AUTH_VK', services.AUTH_VK])
+  let linkAuth = services.authUrl
+  let linkApi = services.apiUrl
+  let linkWs = services.subscriptionsUrl
+  let linkUpload = services.uploadUrl
+  store.commit('auth/stateSet', ['services', services])
+  // store.commit('auth/stateSet', ['AUTH_URL', services.authUrl])
+  // store.commit('auth/stateSet', ['AUTH_VK', services.oAuthUrlVk])
+  // store.commit('auth/stateSet', ['AUTH_GOOGLE', services.oAuthUrlGoogle])
   const authApollo = new ApolloClient({
     link: ApolloLink.from([
       errLink,

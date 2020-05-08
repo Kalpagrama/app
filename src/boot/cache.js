@@ -145,8 +145,8 @@ class Cache {
       noDisposeOnSet: true,
       dispose: async (key, { actualUntil, actualAge }) => {
         assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-        if (['authInfo', this.store.state.auth.userOid].includes(key)) {
-          // кладем обратно! юзера нельзя удалять и authInfo должна жить вечно
+        if (!this.clearInProgress && ['authInfo', this.store.state.auth.userOid].includes(key)) {
+          // кладем обратно! юзера нельзя удалять + authInfo должна жить вечно
           setTimeout(() => {
             let item = this.store.state.cache.cachedItems[key] // данные лежат во vuex
             assert(item)
@@ -186,9 +186,11 @@ class Cache {
 
   async clear () {
     logD('clear cache')
+    this.clearInProgress = true
     await this.cachePersist.clear()
     this.cacheLru.reset()
     this.store.commit('cache/clear', {root: true})
+    delete this.clearInProgress
     logD('cache clear OK!')
   }
 

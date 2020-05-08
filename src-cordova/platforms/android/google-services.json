@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1082935232322",
+    "firebase_url": "https://kalpagramma-7a913.firebaseio.com",
+    "project_id": "kalpagramma-7a913",
+    "storage_bucket": "kalpagramma-7a913.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1082935232322:android:7a06a1ddcff827a386eadb",
+        "android_client_info": {
+          "package_name": "app.kalpa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1082935232322-t0f4032eejr8kq8dt9oeqciii8mbubc8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQvhFyI31vYnVW0HNHx99iJ-83EPejQV4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1082935232322-t0f4032eejr8kq8dt9oeqciii8mbubc8.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1082935232322-7pemkm59eqp9quoijh3ervne36bi9fd0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "kalpa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

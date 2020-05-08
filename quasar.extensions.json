@@ -15,8 +15,17 @@
           "splashscreenType": "pure",
           "backgroundColor": "#222222"
         },
+        "capacitor": {
+          "iconHash": "48e020f7b39d3668661a33e96f71b261",
+          "splashscreenHash": "8aaa1808ce322490a536e4429478af99",
+          "splashscreenType": "pure",
+          "backgroundColor": "#222222"
+        },
+        "pwa": {
+          "iconHash": "48e020f7b39d3668661a33e96f71b261"
+        },
         "spa": {
-          "iconHash": "522cd07468b2e0169a20a132cbc61e92"
+          "iconHash": "48e020f7b39d3668661a33e96f71b261"
         }
       },
       "build": {
@@ -25,6 +34,12 @@
         },
         "cordova": {
           "iconHash": "522cd07468b2e0169a20a132cbc61e92",
+          "splashscreenHash": "8aaa1808ce322490a536e4429478af99",
+          "splashscreenType": "pure",
+          "backgroundColor": "#222222"
+        },
+        "capacitor": {
+          "iconHash": "48e020f7b39d3668661a33e96f71b261",
           "splashscreenHash": "8aaa1808ce322490a536e4429478af99",
           "splashscreenType": "pure",
           "backgroundColor": "#222222"
