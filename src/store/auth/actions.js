@@ -34,33 +34,7 @@ export const init = async (context) => {
     logD('auth init done!')
   } else logD('auth init fails!', authInfo)
 }
-export const inviteEmail = async (context, email) => {
-  logD('@invite start')
-  let { data: { inviteEmail } } = await apollo.clients.auth.query({
-    query: gql`
-      query ($email: String!){
-        inviteEmail(email: $email)
-      }
-    `,
-    variables: {
-      email: email
-    }
-  })
-  logD('@invite done')
-  return inviteEmail
-}
-export const inviteUrl = async (context) => {
-  logD('@invite start')
-  let { data: { inviteUrl } } = await apollo.clients.auth.query({
-    query: gql`
-      query {
-        inviteUrl
-      }
-    `
-  })
-  logD('@invite done')
-  return inviteUrl
-}
+
 // если токен не указан - выйдет из всех сессий
 export const logout = async (context, token) => {
   logD('@logout start')
@@ -90,20 +64,6 @@ export const logout = async (context, token) => {
     }
   }
   logD('@logout done')
-}
-
-export const checkUserIdFree = async (context, userId) => {
-  let { data: { checkUserIdFree } } = await apollo.clients.auth.query({
-    query: gql`
-      query ($userId: String!){
-        checkUserIdFree(userId: $userId)
-      }
-    `,
-    variables: {
-      userId
-    }
-  })
-  return checkUserIdFree
 }
 
 export const userIdentify = async (context, userId_) => {
@@ -150,4 +110,45 @@ export const userAuthenticate = async (context, {password, inviteCode}) => {
   })
   logD('@userAuthenticate done')
   return { result, role, nextAttemptDate, attempts, failReason }
+}
+
+export const inviteEmail = async (context, email) => {
+  logD('@invite start')
+  let { data: { inviteEmail } } = await apollo.clients.auth.query({
+    query: gql`
+      query ($email: String!){
+        inviteEmail(email: $email)
+      }
+    `,
+    variables: {
+      email: email
+    }
+  })
+  logD('@invite done')
+  return inviteEmail
+}
+export const inviteUrl = async (context) => {
+  logD('@invite start')
+  let { data: { inviteUrl } } = await apollo.clients.auth.query({
+    query: gql`
+      query {
+        inviteUrl
+      }
+    `
+  })
+  logD('@invite done')
+  return inviteUrl
+}
+export const checkUserIdFree = async (context, userId) => {
+  let { data: { checkUserIdFree } } = await apollo.clients.auth.query({
+    query: gql`
+      query ($userId: String!){
+        checkUserIdFree(userId: $userId)
+      }
+    `,
+    variables: {
+      userId
+    }
+  })
+  return checkUserIdFree
 }

@@ -5,13 +5,21 @@
   "npmClient": "yarn",
   "webDir": "www",
   "backgroundColor": "#22222222",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    }
+  },
   "server": {
     "iosScheme": "app.kalpa",
     "allowNavigation": [
       "kalpa.app",
       "*.kalpa.app",
       "kalpagramma.ru"
-    ],
-    "url": "http://192.168.88.12:8484"
+    ]
   }
 }

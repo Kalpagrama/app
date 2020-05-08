@@ -14,15 +14,15 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 async function initServices (store) {
   logD('initServices', Platform.is)
-  // if (Platform.is.pwa) await initPWA(store)
-  // else if (Platform.is.capacitor) {
-  //   const { initCapacitor } = await import('src/system/capacitor.js')
-  //   await initCapacitor(store)
-  // }
-  // else if (Platform.is.cordova) {
-  //   const { initCordova } = await import('src/system/cordova.js')
-  //   await initCordova(store)
-  // }
+  if (Platform.is.pwa) await initPWA(store)
+  else if (Platform.is.capacitor) {
+    const { initCapacitor } = await import('src/system/capacitor.js')
+    await initCapacitor(store)
+  }
+  else if (Platform.is.cordova) {
+    const { initCordova } = await import('src/system/cordova.js')
+    await initCordova(store)
+  }
   initOfflineEvents(store)
   // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
   const hasPerm = await askForWebPushPerm(store)
@@ -117,7 +117,7 @@ async function initPWA (store) {
         navigator.serviceWorker.addEventListener('message', function handler (event) {
           let eventData = event.data
           if (eventData.firebaseMessaging) {
-            logD('web push message recieved!', eventData.firebaseMessaging.payload.data)
+            logD('web push message recieved!!!', eventData.firebaseMessaging.payload.data)
             const notificationTitle = `${eventData.firebaseMessaging.payload.data.type} event received!`
             showNotification(notificationTitle, 'body')
           } else if (eventData.type === 'swVer') {
@@ -126,7 +126,7 @@ async function initPWA (store) {
           } else if (eventData.type === 'webPushToken') {
             logD('webPushToken =', eventData.msgData)
             // store.dispatch('core/setWebPushToken', eventData.msgData) нельзя вызывать тк аполло еше не инициализирован
-            store.commit('core/stateSet', ['webPushTokenDraft', eventData.msgData])
+            store.dispatch('core/setWebPushToken', eventData.msgData)
           } else {
             logD('sw unknown message recieved!', eventData)
           }

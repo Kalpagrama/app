@@ -5,6 +5,15 @@
   "npmClient": "yarn",
   "webDir": "www",
   "backgroundColor": "#22222222",
+  "plugins": {
+    "PushNotifications": {
+      "presentationOptions": [
+        "badge",
+        "sound",
+        "alert"
+      ]
+    }
+  },
   "server": {
     "iosScheme": "app.kalpa",
     "allowNavigation": [

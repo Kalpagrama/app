@@ -2,6 +2,8 @@ import UIKit
 import Capacitor
 import Firebase
 
+
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -43,7 +45,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // todo получить text полученный из share extension
     // todo извлечь расшаренные данные из совместного хранилища (app groups)
     // todo передать эти данные в  webVew (открыть мастерскую)
-
+    // CAPBridge.triggerWindowJSEvent(eventName: "shareEventKalpa", data: "custom data")
     return CAPBridge.handleOpenUrl(url, options)
   }
 
