@@ -85,6 +85,15 @@ export default {
   computed: {
   },
   watch: {
+    '$route.query.node': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route.query.node CHANGED', to)
+        if (to) {
+          // create node and delete query params
+        }
+      }
+    },
     '$route.params.page': {
       immediate: true,
       handler (to, from) {

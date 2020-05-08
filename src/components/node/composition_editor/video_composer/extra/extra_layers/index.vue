@@ -205,8 +205,36 @@ export default {
       // find tha smallest index to go to?
     },
     layersSelectedExport () {
-      this.$log('layersSelectedExport')
+      this.$log('layersSelectedExport start')
       // open node-editor modal? or just save it to workspace as node?
+      let nodeInput = {
+        name: '',
+        wsItemType: 'NODE',
+        rawData: {
+          name: '',
+          spheres: [],
+          category: 'FUN',
+          layout: 'PIP',
+          items: [
+            {
+              contentOid: this.meta.content.oid,
+              layers: this.layersSelected.reduce((acc, val) => {
+                acc.push(this.meta.layers[val])
+                return acc
+              }, []),
+              spheres: [],
+              operation: {
+                items: null,
+                operations: null,
+                type: 'CONCAT'
+              }
+            }
+          ],
+        }
+      }
+      this.$log('layersSelectedExport nodeInput', nodeInput)
+      this.layersSelected = []
+      // this.$router.push({name: 'workspace', params: {page: 'node'}, query: {node: JSON.stringify(nodeInput)}})
     },
     layersSelectedDiscard () {
       this.$log('layersSelectedDiscard')
@@ -247,7 +275,7 @@ export default {
       // get layer
       let l = layerInput || {
         contentOid: this.meta.content.oid,
-        content: await this.$store.dispatch('objects/get', {oid: this.meta.content.oid}),
+        // content: await this.$store.dispatch('objects/get', {oid: this.meta.content.oid}),
         figuresAbsolute: [
           {t: start, points: []},
           {t: end, points: []}
