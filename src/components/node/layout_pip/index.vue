@@ -6,6 +6,16 @@
 
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
+  //- debug
+  div(
+    v-if="false"
+    :style=`{
+      position: 'absolute',
+      zIndex: 1000,
+      right: '0px', top: '50px'
+    }`
+    ).row.text-white.q-pa-sm.bg-pink-5
+    small(v-if="nodeFull").full-width items: {{nodeFull.items.length}}
   //- //- inactive tint
   //- transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
   //-   div(
@@ -15,20 +25,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   div(
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100}`
-    ).row.full-width.items-start.content-start.bg-black
-    composition(
-      :preview="node.meta.items[0].thumbUrl"
-      :value="composition"
-      :visible="visible" :active="active" :mini="mini"
-      @height="$emit('meta', ['height', $event])")
-    div(
-      :style=`{
-        position: 'absolute', zIndex: 1000, right: '0px', bottom: '0px',
-        maxWidth: '25%', height: '150px',
-        borderRadius: '10px', overflow: 'hidden',
-        background: 'rgba(0,0,0,0.5)'
-      }`
-      ).row.full-width
+    ).row.full-width.items-start.content-start
+    items-player(v-bind="$props")
+    //- voting
     vote(v-if="voteShow" :oid="node.oid" @end="voteShow = false")
   //- essence
   router-link(
@@ -72,44 +71,21 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
 </template>
 
 <script>
-// import { openURL } from 'quasar'
+import itemsPlayer from './items_player'
 import vote from './vote'
 
 export default {
   name: 'nodeLayoutPip',
   props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'essence', 'mini', 'opened', 'nodeLoad'],
-  components: {vote},
+  components: {itemsPlayer, vote},
   data () {
     return {
-      composition: null,
       voteShow: false
     }
   },
   computed: {
-    sphereOid () {
-      if (this.nodeFull) {
-        return this.nodeFull.sphereFromName.oid
-      }
-      else {
-        return ''
-      }
-    }
-    // items () {
-    //   let res = []
-    //   if (this.node.meta.items[0]) res.push({preview: this.node.meta.items[0].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[0] : null})
-    //   if (this.node.meta.items[1]) res.push({preview: this.node.meta.items[1].thumbUrl, composition: this.nodeFull ? this.nodeFull.items[1] : null})
-    //   return res
-    // }
   },
   watch: {
-    nodeFull: {
-      async handler (to, from) {
-        this.$log('nodeFull CHANGED', to)
-        if (to) {
-          this.composition = await this.$store.dispatch('objects/get', {oid: to.items[0].oid})
-        }
-      }
-    }
   },
   methods: {
     voteStart () {

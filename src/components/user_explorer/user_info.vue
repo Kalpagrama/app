@@ -3,11 +3,13 @@ div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-10
   //- cover
   .row.full-width.justify-center
     div(:style=`{position: 'relative', height: '300px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
+      //- what
       div(:style=`{position: 'absolute', zIndex: 10, borderRadius: '10px', background: 'rgba(0,0,0,0.2)'}`).row.fit
       img(
         @click="userCoverClick()"
         src="https://www.ecopetit.cat/wpic/mpic/28-289473_twitter-cover-photo-45-stars.jpg"
         :style=`{position: 'absolute', objectFit: 'cover', borderRadius: '10px', overflow: 'hidden'}`).fit
+      //- what
       div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px', height: '100px'}`).row.full-width.q-px-md
         kalpa-avatar(:url="user.profile.photoUrl" :width="100" :height="100" @click.native="userAvatarClick()")
         .col.full-height
@@ -15,12 +17,16 @@ div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-10
             span(:style=`{fontSize: '25px', lineHeight: 0.9}` @click="userNameClick()").text-white.text-bold {{user.name}}
             .row.full-width
               span(:style=`{padding: 0, margin: 0}` @click="userUsernameClick()").text-white @ivanmoto
-      div(:style=`{position: 'absolute', zIndex: 200, bottom: '0px', height: '40px'}`
-        ).row.full-width.items-center.content-center.justify-end.q-px-md
-            q-btn(round push dense color="green" icon="mail_outline" @click="userDM()").q-mr-sm
-            q-btn(round push dense color="green" icon="notifications_none" @click="userSetNotifications()").q-mr-sm
-            q-btn(push no-caps color="green" @click="userFollow()").q-px-sm
-              span.text-bold Follow
+      //- what
+      div(:style=`{position: 'absolute', zIndex: 200, bottom: '0px', height: '50px'}`
+        ).row.full-width.items-center.content-center.justify-end.q-px-sm
+          //- TODO show after u followed this user...
+          //- q-btn(round push dense color="green" icon="mail_outline" @click="userDM()").q-mr-sm
+          //- q-btn(round push dense color="green" icon="notifications_none" @click="userSetNotifications()").q-mr-sm
+          q-btn(
+            v-if="!userIsMe"
+            push no-caps color="green" @click="userFollow()").q-px-sm
+            span.text-bold Follow
   //- status
   .row.full-width.justify-center
     div(

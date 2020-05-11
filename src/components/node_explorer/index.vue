@@ -29,11 +29,13 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
     ).q-px-md Add your node
   q-page-container
     q-page.q-px-xs
+      //- header
       .row.full-width.justify-center
-        //- header
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px'}`).row.full-width.items-center.content-center.q-px-xs
           q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
-        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
+      //- node
+      .row.full-width.justify-center
+        div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
           node(
             v-if="node"
             ctx="explorer"
@@ -59,21 +61,8 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
             }`
             ).row.full-width.items-center.content-center.q-px-md.bg-grey-9
             span(v-if="node").text-white.text-bold {{node.name}}
-        //- essence relative
-        //- div(
-        //-   ref="nodeEssence"
-        //-   :style=`{
-        //-     position: 'relative',
-        //-     height: '60px'
-        //-   }`).row.full-width.justify-center
-        //-   div(
-        //-     :style=`{
-        //-       maxWidth: $store.state.ui.maxWidthPage+'px',
-        //-       marginTop: '-10px',
-        //-       borderRadius: '0 0 10px 10px'
-        //-     }`
-        //-     ).row.full-width.items-center.content-center.q-px-md.bg-grey-9
-        //-     span.text-white.text-bold {{node.name}}
+      //- body
+      div(v-if="false").row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
           kalpa-loader(v-if="sphereOid && node" type="sphereNodes" :variables="variables")
             template(v-slot=`{items}`)

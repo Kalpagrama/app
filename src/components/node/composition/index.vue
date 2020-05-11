@@ -22,14 +22,13 @@ div(
     @load="previewLoad" @error="previewError" @click="previewClick"
     :style=`{
       userSelect: 'none',
-      width: '100%', height: mini ? 'auto' : '100%', opacity: playerGood ? 0 : 1,
+      width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
       maxHeight: 500+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(
-    v-if="visible && value"
-    :ctx="ctx" :composition="value" :preview="preview"
+    v-if="visible && composition"
+    :ctx="ctx" :composition="composition"
     :visible="visible" :active="active" :mini="mini"
-    :bgClass="bgClass"
     @good="playerGood = true"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
     template(v-slot:editor=`{player, meta}`)
@@ -55,6 +54,7 @@ export default {
   },
   data () {
     return {
+      composition: null,
       previewLocal: undefined,
       previewWidth: 0,
       previewHeight: 0,
@@ -65,6 +65,21 @@ export default {
   computed: {
   },
   watch: {
+    value: {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('value CHANGED', to)
+        if (to) {
+          // if visible, mini, active???
+          if (to.__typename === 'ObjectShortConcrete') {
+            this.composition = await this.$store.dispatch('objects/get', {oid: to.oid})
+          }
+          else {
+            this.composition = to
+          }
+        }
+      }
+    },
     visible: {
       handler (to, from) {
         this.$log('visible CHANGED', to)
@@ -86,12 +101,6 @@ export default {
       this.$emit('height', this.previewHeight)
       this.$emit('width', this.previewWidth)
       this.previewLoaded = true
-      // const interval = setInterval(() => {
-      //   if (previewRef.naturalWidth > 0 && previewRef.naturalHeight > 0) {
-      //     clearInterval(interval)
-      //     this.previewLoaded = true
-      //   }
-      // }, 20)
     },
     previewError () {
       this.$log('previewError')
@@ -100,16 +109,13 @@ export default {
     },
     previewClick () {
       this.$log('previewClick')
-      // if (!this.value) {
-      //   this.$emit('compositionGet')
-      // }
     }
   },
   mounted () {
-    // this.$log('mounted')
+    this.$log('mounted')
   },
   beforeDestroy () {
-    // this.$log('beforeDestroy')
+    this.$log('beforeDestroy')
   }
 }
 </script>
