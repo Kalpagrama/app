@@ -17,13 +17,17 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.CP)
 // let PushNotifications, Share
 
 async function initCapacitor (store) {
+  App.addListener('appStateChange', (state) => {
+    alert('appStateChange:' + JSON.stringify(state))
+  })
   // share для ios (не разобрался как из ios послать эвент в js без плагина)
   App.addListener('appUrlOpen', (openData) => {
+    alert('appUrlOpen: ' + JSON.stringify(openData))
     let url = new URL(openData.url)
     let data = url.searchParams.get('data')
     let text = url.searchParams.get('contentText')
-    alert(data)
-    alert(text)
+    alert('appUrlOpen. data = ' + data)
+    alert('appUrlOpen. text = ' + text)
   })
   // share для android
   window.addEventListener('shareEventKalpa', (e) => {
@@ -48,7 +52,7 @@ async function initCapacitorPushPlugin (store) {
 
   // On success, we should be able to receive notifications
   PushNotifications.addListener('registration', (token) => {
-      alert('Push registration success, token: ' + token.value)
+      // alert('Push registration success, token: ' + token.value)
       logD('Push registration success, token: ' + token.value)
       store.dispatch('core/setWebPushToken', token.value)
     }

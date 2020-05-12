@@ -17,6 +17,7 @@ div(
 
 <script>
   import assert from 'assert'
+  import { Platform } from 'quasar'
 export default {
   name: 'pageAuth-withSocials',
   data () {
@@ -37,9 +38,17 @@ export default {
       let url = this.$store.state.auth.services[s.id]
       this.$log('oauth url = ', url)
       assert(url, '!url')
-      let location = window.location
+      let location
+      // eslint-disable-next-line no-constant-condition
+      if (Platform.is.capacitor) {
+        location = 'app.kalpa://redirect_to_app/path' // custom_url_scheme for android & ios
+      } else {
+        location = window.location
+        location = location.toString().replace('#', '_octothorp_') // vk режет все после символа #
+      }
       this.$log('location', location)
-      let to = `${url}&state={"origin":"${location}"}`
+      let to = `${url}&state={"origin":"${location}"}` // сообщаем серверу куда делать редирект после успешной аутентификации
+      alert(to)
       this.$log('to', to)
       window.location = to
     }

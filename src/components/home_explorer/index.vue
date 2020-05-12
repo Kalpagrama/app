@@ -48,7 +48,7 @@ export default {
   },
   computed: {
     sphereOid () {
-      return this.$store.getters.currentUser.oid
+      return this.$store.getters.currentUser ? this.$store.getters.currentUser.oid : null
     },
     variables () {
       return {

@@ -72,7 +72,6 @@ module.exports = function (ctx) {
         'AddressbarColor'
       ]
     },
-    animations: 'all',
     supportIE: false,
     build: {
       env: {
@@ -117,7 +116,7 @@ module.exports = function (ctx) {
         // )
         // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
         // eslint-disable-next-line no-constant-condition
-        if (false) {
+        if (!ctx.mode.capacitor) {
           cfg.devtool = 'source-map'
           cfg.plugins.push(
             new webpack.SourceMapDevToolPlugin({
@@ -224,7 +223,7 @@ module.exports = function (ctx) {
     },
     capacitor: {
       // iosStatusBarPadding: true, // add the dynamic top padding on iOS mobile devices
-      backButtonExit: false // Quasar handles app exit on mobile phone back button
+      // backButtonExit: false // Quasar handles app exit on mobile phone back button
     }
   }
 }

@@ -45,9 +45,9 @@ input
       //- IDENTIFIED
       div(v-if="userIdentified").row.full-width
         //- userExist & needInvite
-        div(v-if="true").row.full-width
+        div(v-if="needInvite").row.full-width
           .row.full-width.justify-start.q-py-sm.q-px-md
-            span.text-grey-3 New users need invite code
+            span.text-grey-3 {{$t('Need invite code (beta testing in progress...)')}}
           q-input(
             v-model="inviteCode" dark color="green" filled label="Enter invite code" autofocus
             :style=`{borderRadius: '10px', overflow: 'hidden'}`
@@ -175,9 +175,9 @@ export default {
         this.$log('$route.query.token CHANGED', to)
         if (to) {
           this.$log('GOT TOKEN', to)
-          this.$q.notify('GOT TOKEN')
+          // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
           let q = this.$route.query
-          this.$log('q', q)
+          this.$log('q=', q)
           localStorage.setItem('ktoken', q.token)
           localStorage.setItem('ktokenExpires', q.expires)
           // await this.$wait(200)
@@ -187,6 +187,7 @@ export default {
           this.loginType = q.loginType
           this.userExist = q.userExist === 'true' ? true : false
           this.needInvite = q.needInvite === 'true' ? true : false
+          this.$log('this.needInvite = ', this.needInvite)
           // if userExist and !needInvite... this.userAuthenticate()
           // this.$router.replace('/auth')
         }

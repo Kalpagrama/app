@@ -13,8 +13,8 @@ let messaging = null
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 async function initServices (store) {
-  logD('initServices', Platform.is)
-  if (Platform.is.pwa) await initPWA(store)
+  logD('initServices', Platform.is, process.env.MODE)
+  if (process.env.MODE === 'pwa') await initPWA(store)
   else if (Platform.is.capacitor) {
     const { initCapacitor } = await import('src/system/capacitor.js')
     await initCapacitor(store)
@@ -48,7 +48,6 @@ function initOfflineEvents (store) {
 }
 
 async function initPWA (store) {
-  assert(Platform.is.pwa)
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
     logD('beforeinstallprompt')

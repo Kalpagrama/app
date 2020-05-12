@@ -92,8 +92,10 @@ export default async ({ Vue, store, app }) => {
           apiUrl
           uploadUrl
           subscriptionsUrl
+          oAuthUrlYandex
           oAuthUrlVk
           oAuthUrlGoogle
+          oAuthUrlFacebook
         }
       }`
     })

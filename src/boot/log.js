@@ -34,6 +34,8 @@ const LogModulesEnum = Object.freeze({
 })
 Object.freeze(LogModulesEnum)
 
+const showAlert = false
+
 class Logger {
   constructor (store) {
     this.store = store
@@ -88,10 +90,10 @@ class Logger {
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry) {
         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
       }
-      alert('error! \n' + JSON.stringify(msg))
+      if (showAlert) alert('error! \n' + JSON.stringify(msg))
     } catch (err) {
       console.error('error on logging error!!!', err)
-      alert('error on log error! \n' + JSON.stringify(err))
+      if (showAlert) alert('error on log error! \n' + JSON.stringify(err))
     }
   }
 
@@ -103,10 +105,10 @@ class Logger {
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry) {
         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Critical)
       }
-      alert('critical! \n' + JSON.stringify(msg))
+      if (showAlert) alert('critical! \n' + JSON.stringify(msg))
     } catch (err) {
       console.error('error on logging error!!!', err)
-      alert('error on log error! \n' + JSON.stringify(err))
+      if (showAlert) alert('error on log error! \n' + JSON.stringify(err))
     }
   }
 }
@@ -116,6 +118,7 @@ let logI = (...msg) => console.log(...msg)
 let logW = (...msg) => console.warn(...msg)
 let logE = (...msg) => console.error(...msg)
 let logC = (...msg) => console.error(...msg)
+
 function getLogFunc (level, module) {
   switch (level) {
     case 'debug':

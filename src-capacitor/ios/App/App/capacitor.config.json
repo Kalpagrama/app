@@ -1,6 +1,6 @@
 {
   "appId": "app.kalpa",
-  "appName": "KALPAGRAMMA",
+  "appName": "Kalpagramma",
   "bundledWebRuntime": false,
   "npmClient": "yarn",
   "webDir": "www",
@@ -19,7 +19,14 @@
     "allowNavigation": [
       "kalpa.app",
       "*.kalpa.app",
-      "kalpagramma.ru"
-    ]
+      "kalpagramma.ru",
+      "kalpagramma.com",
+      "oauth.yandex.ru",
+      "passport.yandex.ru",
+      "oauth.vk.com",
+      "accounts.google.com",
+      "www.facebook.com"
+    ],
+    "url": "http://192.168.88.12:8484"
   }
 }
