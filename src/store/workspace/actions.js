@@ -91,7 +91,6 @@ export const wsItemCreate = async (context, item) => {
   })
   context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
   logD('wsItemCreate done', wsItem)
-  context.commit('cache/normalizeWsItem', wsItem, {root: true})
   return wsItem
 }
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
@@ -125,7 +124,6 @@ export const wsItemUpdate = async (context, item) => {
   })
   context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
   logD('wsItemUpdate done', wsItem)
-  context.commit('cache/normalizeWsItem', wsItem, {root: true})
   return wsItem
 }
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
