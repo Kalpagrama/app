@@ -16,7 +16,7 @@ div(:style=`{position: 'relative'}`).column.fit
         template(v-slot=`{item}`)
           node-editor(
             ctx="workspace" mode="edit"
-            :node="item.rawData" :wsItemFinderOnBoot="true" :paddingTop="8"
+            :node="item" :wsItemFinderOnBoot="true" :paddingTop="8"
             @cancel="nodeEditorOpened = false"
             :style=`{
               maxWidth: $store.state.ui.maxWidthPage+'px'
@@ -39,8 +39,21 @@ div(:style=`{position: 'relative'}`).column.fit
           ).full-width.bg-grey-1
       div(:style=`{}`).row.full-height
         q-btn(
-          round flat color="white" icon="add" @click="nodeAddStart()"
-          :style=`{height: '56px', width: '56px'}`).bg-grey-6
+          push color="green" icon="add" @click="nodeAddStart()"
+          :style=`{height: '56px', width: '56px'}`)
+  //- header: search, tabs
+  .row.full-width.justify-center.q-pt-sm
+    div(
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px', background: 'rgb(94,94,94)',
+        borderRadius: '10px', overflow: 'hidden'
+      }`
+      ).row.full-width.items-center.content-center.q-pa-sm
+      .col
+        kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
+      q-btn(
+        flat color="grey-2" no-caps
+        :style=`{height: '40px'}`).bg-grey-7 Spheres
   //- body
   .col.full-width.scroll
     .row.full-width.justify-center
@@ -81,7 +94,14 @@ export default {
       node: null,
       nodeEditorOpened: false,
       nodeSearchString: '',
-      nodesSelected: []
+      nodesSelected: [],
+      tabId: 'all',
+      tabs: [
+        {id: 'all', name: 'All'},
+        {id: 'selected', name: 'Selected'},
+        {id: 'drafts', name: 'Drafts'},
+        {id: 'published', name: 'Published'}
+      ]
     }
   },
   computed: {
@@ -104,6 +124,14 @@ export default {
   },
   methods: {
     nodesFilter (arr) {
+      // return arr.filter(node => {
+      //   // check node string match
+      //   let nodeStringMatch = true
+      //   if (this.nodeSearchString.length > 0) {
+      //     if (!node.name.includes(this.nodeSearchString)) nodeStringMatch = false
+      //   }
+      //   // check tab.id
+      // })
       if (this.nodeSearchString.length > 0) {
         return arr.filter(i => i.name.includes(this.nodeSearchString))
       }
@@ -123,13 +151,10 @@ export default {
       let nodeInput = _nodeInput || {
         name: this.nodeSearchString,
         wsItemType: 'NODE',
-        rawData: {
-          name: this.nodeSearchString,
-          items: [],
-          spheres: [],
-          category: 'FUN',
-          layout: 'PIP'
-        }
+        items: [],
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP'
       }
       this.$log('nodeAddStart nodeInput', nodeInput)
       this.node = await this.$store.dispatch('workspace/wsItemCreate', nodeInput)

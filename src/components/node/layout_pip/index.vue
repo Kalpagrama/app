@@ -53,6 +53,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       .row.fit.items-center.content-center.justify-end.q-px-sm
         span(:style=`{fontSize: '24px'}`).text-white.text-bold {{nodeFull.rate}}
     q-btn(
+      v-if="!nodeIsMine"
       round push color="green" icon="blur_on" @click="voteStart()"
       :loading="voteShow"
       :style=`{borderRadius: '50%'}`)
@@ -84,6 +85,10 @@ export default {
     }
   },
   computed: {
+    nodeIsMine () {
+      // return this.user.oid === this.$store.getters.currentUser.oid
+      return true
+    }
   },
   watch: {
   },

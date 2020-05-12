@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
-  kalpa-keyboard-events(@keyup="windowKeyup")
+  //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- pregress wrapper
   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-lg
     //- progress bar & time

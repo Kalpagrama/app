@@ -11,7 +11,7 @@ div(
     div(:style=`{height: '40px'}`).row.full-width.items-center.content-center.q-px-xs
       q-btn(
         round flat dense color="grey-2" @click="layerPlay()"
-        :icon="layerPlaying ? 'pause' : 'play_arrow'" )
+        :icon="layerPlaying ? 'pause' : 'play_arrow'")
       .col
         .row.fit.items-center.content-center.q-px-sm
           //- bar

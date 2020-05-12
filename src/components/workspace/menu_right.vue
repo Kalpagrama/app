@@ -1,9 +1,9 @@
 <template lang="pug">
 div(
   :style=`{
-    borderRadius: '10px', overflow: 'hidden'
+    borderRadius: '10px', overflow: 'hidden', background: 'rgb(54,54,54)'
   }`
-  ).column.full-width.bg-grey-9
+  ).column.full-width
   //- .col.full-width.scroll
   .row.full-width.items-start
     router-link(

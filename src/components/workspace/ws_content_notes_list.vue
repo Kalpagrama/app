@@ -16,7 +16,7 @@ div(:style=`{position: 'relative'}`).column.fit
             composition-editor(
               v-if="item"
               ctx="workspace"
-              :composition="item.rawData"
+              :composition="item"
               @cancel="contentEditorOpened = false"
               :style=`{
                 maxWidth: $store.state.ui.maxWidthPage+'px'
@@ -27,6 +27,19 @@ div(:style=`{position: 'relative'}`).column.fit
       ws-content-finder(
         :sources="['url', 'device']"
         @content="contentFound")
+  //- header: search, tabs
+  .row.full-width.justify-center.q-pt-sm
+    div(
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px', background: 'rgb(94,94,94)',
+        borderRadius: '10px', overflow: 'hidden'
+      }`
+      ).row.full-width.items-center.content-center.q-pa-sm
+      .col
+        kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
+      q-btn(
+        flat color="grey-2" no-caps
+        :style=`{height: '40px'}`).bg-grey-7 Spheres
   //- body
   .col.full-width.scroll
     .row.full-width.justify-center
@@ -50,7 +63,13 @@ export default {
     return {
       content: null,
       contentFinderOpened: false,
-      contentEditorOpened: false
+      contentEditorOpened: false,
+      tabId: 'video',
+      tabs: [
+        {id: 'all', name: 'All'},
+        {id: 'video', name: 'Video'},
+        {id: 'books', name: 'Books'}
+      ]
     }
   },
   methods: {
@@ -70,20 +89,18 @@ export default {
     async contentFound (content) {
       this.$log('contentFound', content)
       let contentInput = {
-        name: content.name,
+        oid: Date.now().toString(),
+        wsItemType: 'CONTENT_NOTES',
         unique: content.oid,
         thumbOid: content.oid,
-        wsItemType: 'CONTENT_NOTES',
-        rawData: {
-          oid: Date.now().toString(),
-          layers: [],
-          spheres: [],
-          contentOid: content.oid,
-          operation: {
-            items: null,
-            operations: null,
-            type: 'CONCAT'
-          }
+        name: content.name,
+        layers: [],
+        spheres: [],
+        contentOid: content.oid,
+        operation: {
+          items: null,
+          operations: null,
+          type: 'CONCAT'
         }
       }
       this.$log('contentFound contentInput', contentInput)

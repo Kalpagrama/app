@@ -125,39 +125,46 @@ div(:style=`{}`).column.fit
               span(v-if="l.spheres.length > 0").text-white {{ l.spheres[0].name }}
           span.text-white {{$time(l.figuresAbsolute[0].t)}}-{{$time(l.figuresAbsolute[1].t)}}
   //- layers selected
-  div(
-    v-if="layersSelected.length > 0"
-    :style=`{height: '40px'}`).row.full-width.q-px-xs
-    div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
-      div(:style=`{height: '18px', minWidth: '18px', borderRadius: '2px'}`).row.items-center.content-center.justify-center.bg-grey-6
-        span.text-white {{layersSelected.length}}
-    .col
-      .row.fit.items-center
-        span.text-grey-2.q-mr-sm selected:
-        q-btn(flat dense no-caps color="red" @click="layersSelectedDelete()").q-mr-sm Delete
-        q-btn(flat dense no-caps color="grey-2" @click="layersSelectedExport()").q-mr-sm Export
-        q-btn(flat dense no-caps color="grey-2" @click="layersSelectedDiscard()").q-mr-sm Discard
+  div(:style=`{overflow: 'hidden'}`).row.full-width
+    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
+      div(
+        v-if="layersSelected.length > 0"
+        :style=`{height: '44px', background: 'rgb(81,81,81)'}`).row.full-width.q-px-xs
+        //- left: total selected layers number
+        div(:style=`{height: '44px', width: '40px'}`).row.items-center.content-center.justify-center
+          div(:style=`{height: '18px', minWidth: '18px', borderRadius: '2px'}`).row.items-center.content-center.justify-center.bg-grey-6
+            span.text-white {{layersSelected.length}}
+        //- actions wrapper: drop, create node, delete
+        .col
+          .row.fit.items-center.content-center
+            q-btn(flat dense no-caps color="white" @click="layersSelectedDrop()").bg-grey-7.q-mr-sm.q-px-sm Drop selection
+            q-btn(flat dense no-caps color="white" @click="layersSelectedCreateNode()").bg-grey-7.q-mr-sm.q-px-sm Create node
+            q-btn(flat dense no-caps color="white" @click="layersSelectedDelete()").bg-grey-7.q-mr-sm.q-px-sm Delete
+        //- right...
   //- footer
   div(
     v-if="true"
-    :style=`{height: '40px'}`
-    ).row.full-width.items-center
+    :style=`{height: '50px'}`
+    ).row.full-width.items-center.content-center.bg-grey-8.q-px-sm
+    //- actions wrapper: play all, watch, workspace
     .col
+      //- actions
       q-btn(
         @click="layersPlayAll()"
         flat color="white" no-caps
-        ) Play all
+        ).bg-grey-7.q-mr-sm Play all
       q-btn(
         @click="layersWatch()"
         flat color="white" no-caps
-        ) Watch
+        ).bg-grey-7.q-mr-sm Watch
       q-btn(
         v-if="composition.layersWorkspace"
         @click="showLayersFromWorkspace = !showLayersFromWorkspace"
         round flat icon="school" color="grey-2")
-    span.text-white {{$time(layersTotalTime)}}
-    div(:style=`{width: '50px'}`).row.full-height.items-center.justify-center
-      span.text-white Total
+    //- right: total
+    q-btn(
+      flat no-caps color="white"
+      ).bg-grey-7 Total: {{$time(layersTotalTime)}}
 </template>
 
 <script>
@@ -205,8 +212,8 @@ export default {
       // set layerIndexPlay, layerIndex, mode?
       // find tha smallest index to go to?
     },
-    layersSelectedExport () {
-      this.$log('layersSelectedExport start')
+    layersSelectedCreateNode () {
+      this.$log('layersSelectedCreateNode start')
       // open node-editor modal? or just save it to workspace as node?
       let nodeInput = {
         name: '',
@@ -234,12 +241,12 @@ export default {
           ],
         }
       }
-      this.$log('layersSelectedExport nodeInput', nodeInput)
+      this.$log('layersSelectedCreateNode nodeInput', nodeInput)
       this.layersSelected = []
       this.$router.push({name: 'workspace', params: {page: 'node'}, query: {node: JSON.stringify(nodeInput)}})
     },
-    layersSelectedDiscard () {
-      this.$log('layersSelectedDiscard')
+    layersSelectedDrop () {
+      this.$log('layersSelectedDrop')
       this.$set(this, 'layersSelected', [])
     },
     layerOnMove (e, evt) {

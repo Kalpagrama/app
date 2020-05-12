@@ -37,7 +37,7 @@ iframe[id$="_youtube_iframe"]
 div(
   :style=`{position: 'relative'}`
   ).column.fit.items-start.content-start
-  kalpa-keyboard-events(@keyup="windowKeyup")
+  //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- debug
   div(
     v-if="true && !mini"
@@ -60,27 +60,27 @@ div(
       :style=`{position: 'absolute', zIndex: 1000}`
       ).row.fit
     //- video actions
-    //- layer name
-    span(
-      v-if="true && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
-      :style=`{
-        position: 'absolute', zIndex: 20000, top: '8px', left: '8px',
-        borderRadius: '10px', overflow: 'hidden',
-        background: 'rgba(0,0,0,0.5)'
-      }`
-      ).q-pa-sm.text-grey-2.cursor-pointer.layer-name {{ layer.spheres[0].name | cut(50) }}
     //- content name
     router-link(
       v-if="true && layer && content && visible && active && !mini"
       :to="'/content/'+content.oid"
       :style=`{
         position: 'absolute', zIndex: 20000, left: '8px',
-        top: layer.spheres.length > 0 ? '48px' : '8px',
+        top: '8px',
         borderRadius: '10px', overflow: 'hidden',
-        background: 'rgba(0,0,0,0.5)', margin: 0
+        background: 'rgba(0,0,0,0.3)'
       }`
       ).q-px-sm.q-py-xs.text-grey-2.cursor-pointer.layer-name
-      small(:style=`{userSelect: 'none'}`) {{ content.name | cut(50) }}
+      small(:style=`{userSelect: 'none'}`) {{ content.name }}
+    //- layer name
+    span(
+      v-if="true && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
+      :style=`{
+        position: 'absolute', zIndex: 20000, top: '40px', left: '8px',
+        borderRadius: '10px', overflow: 'hidden',
+        background: 'rgba(0,0,0,0.3)'
+      }`
+      ).q-pa-sm.text-grey-2.cursor-pointer.layer-name {{ layer.spheres[0].name | cut(50) }}
     //- layer menu
     q-btn(
       v-if="true && content && visible && active && !mini"

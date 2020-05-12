@@ -22,9 +22,9 @@
   div(:style=`{overflowX: 'hidden'}`).col.full-width.q-pt-sm
     div(
       :style=`{
-        borderRadius: '10px', overflow: 'hidden'
+        borderRadius: '10px', overflow: 'hidden', background: 'rgb(54,54,54)'
       }`
-      ).column.full-width.bg-grey-9
+      ).column.full-width
         router-link(
           v-if="$store.getters.currentUser"
           :to="'/user/'+$store.getters.currentUser.oid"
@@ -43,7 +43,7 @@
             'bg-grey-7': $route.name === p.id
           }`
           :style=`{
-            height: '50px'
+            height: '60px'
           }`
           ).row.full-width.items-center.menu-item
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
@@ -65,13 +65,15 @@
           span(:style=`{userSelect: 'none', pointerEvents: 'none'}`).text-white Logout
         //- create node
         div(
-          :style=`{height: '50px'}`
-          ).row.full-width.items-center.content-center.q-px-md
-          q-btn(push color="green" no-caps align="left").full-width
+          :style=`{}`
+          ).row.full-width.items-center.content-center.q-px-md.q-py-sm
+          q-btn(
+            push color="green" no-caps align="left"
+            :style=`{height: '50px'}`).full-width
             span.q-ml-lg Create node
         //- version
         .row.full-width.items-center.q-px-md.q-py-sm
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 0.1
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.1.0-12.05.2020
         //- slot(name="footer")
 </template>
 
@@ -84,8 +86,8 @@ export default {
         {id: 'home', name: 'Home', icon: 'home'},
         {id: 'trends', name: 'Trends', icon: 'whatshot'},
         {id: 'workspace', name: 'Workspace', icon: 'school'},
-        {id: 'settings', name: 'Settings', icon: 'tune'},
-        {id: 'report', name: 'Report a bug', icon: 'bug_report'}
+        // {id: 'settings', name: 'Settings', icon: 'tune'},
+        // {id: 'report', name: 'Report a bug', icon: 'bug_report'}
       ],
       refreshLoading: false,
       logoutLoading: false

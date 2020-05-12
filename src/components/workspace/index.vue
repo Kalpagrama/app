@@ -9,17 +9,19 @@
 div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-width
   kalpa-menu-right
     menu-right(:pages="pages")
-  //- q-header(reveal)
-  div(:style=`{position: 'relative'}`).row.full-width.justify-center
-    div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
-      .col.full-height
-        .row.fit.items-center.content-center.justify-start.q-px-sm
-          .row.full-height.items-center.content-center.q-mr-sm
-            q-btn(round flat color="white")
-              q-icon(name="school" size="30px")
-          .row.full-height.items-center.content-center
-            span(:style=`{fontSize: '20px', lineHeight: 1}`).text-white Workspace
-            span(:style=`{lineHeight: 1.1}`).text-white.full-width {{ pages.find(p => p.id === $route.params.page).name }}
+  //- header
+  .row.full-width.justify-center
+    div(
+      :style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`
+      ).row.full-width.items-center.content-center
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+        q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
+          q-icon(name="school" size="36px" color="white")
+      .col
+        .row.fit.items-center.content-center
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold Workspace
+          .row.full-width
+            small.text-white {{ pages.find(p => p.id === $route.params.page).name }}
   //- kalpa-menu-footer
   //-   template(v-slot:menuRight)
   //-     menu-right(:pages="pages")
@@ -41,20 +43,20 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
   //-             maxWidth: $store.state.ui.maxWidthPage+'px'
   //-           }`)
   .col.full-width.q-pt-sm
-      //- q-page-container
-      //-   q-page
-      .row.fit.justify-center
-        div(
-          :style=`{
-            maxWidth: $store.state.ui.maxWidthPage+'px',
-          }`).row.fit
-          ws-settings(v-if="$route.params.page === 'settings'")
-          ws-spheres(v-if="$route.params.page === 'spheres'")
-          ws-items(
-            v-else
-            ctx="workspace"
-            :pages="pages" :page="$route.params.page"
-            @page="$router.push({params: {page: $event}}).catch(e=>e)")
+    //- q-page-container
+    //-   q-page
+    .row.fit.justify-center
+      div(
+        :style=`{
+          maxWidth: $store.state.ui.maxWidthPage+'px',
+        }`).row.fit
+        ws-settings(v-if="$route.params.page === 'settings'")
+        ws-spheres(v-if="$route.params.page === 'spheres'")
+        ws-items(
+          v-else
+          ctx="workspace"
+          :pages="pages" :page="$route.params.page"
+          @page="$router.push({params: {page: $event}}).catch(e=>e)")
 </template>
 
 <script>
