@@ -38,7 +38,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
         div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
           node(
             v-if="node"
-            ctx="explorer"
+            ctx="list"
             :node="node" :needFull="true"
             :essence="true" :opened="true"
             @meta="onNodeMeta"

@@ -119,7 +119,10 @@ export default {
       panningFrames: false,
       framesWidth: 0,
       framesLoadedCount: 0,
-      framesLoaded: false
+      framesLoaded: false,
+      // using to update item after editing only
+      layerCopy: null,
+      layerUpdating: false
     }
   },
   computed: {
@@ -131,7 +134,7 @@ export default {
     },
     layer () {
       if (this.meta.layerIndexPlay >= 0) {
-        return this.meta.layers[this.meta.layerIndexPlay]
+        return this.layerCopy
       }
       else {
         return null
@@ -177,6 +180,15 @@ export default {
     }
   },
   watch: {
+    // layer: {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     this.$log('layer CHANGED', to)
+    //     // if (this.layerUpdating) return
+    //     // this.localCopy = JSON.parse(JSON.stringify(this.meta.layers[this.meta.layerIndexPlay]))
+    //     // this.localCopy = to
+    //   }
+    // },
     framesLoaded: {
       handler (to, from) {
         this.$log('framesLoaded CHANGED', to)
@@ -201,18 +213,11 @@ export default {
         if (to === from) return
         this.$log('meta.layerIndex CHANGED')
         this.framesWidthUpdate()
-        if (this.layer && this.$refs.framesScrollWrapper) {
+        if (this.$refs.framesScrollWrapper) {
           this.framesTweenToLayer()
+          this.layerCopy = JSON.parse(JSON.stringify(this.meta.layers[to]))
         }
         if (this.content && this.content.contentSource === 'YOUTUBE') this.framesLoaded = true
-      }
-    },
-    layer: {
-      deep: true,
-      immediate: false,
-      handler (to, from) {
-        if (to) {
-        }
       }
     }
   },
@@ -264,7 +269,6 @@ export default {
       if (to >= 0 && to < this.layer.figuresAbsolute[1].t && to <= this.duration) {
         this.player.setCurrentTime(to)
         this.layer.figuresAbsolute[0].t = to
-        // this.$set(this.layer.figuresAbsolute[0], 't', to)
       }
       if (e.isFirst) {
         this.panning = true
@@ -278,6 +282,9 @@ export default {
         this.player.setCurrentTime(to)
         this.player.play()
         this.$emit('meta', ['editing', false])
+        // this.layerUpdating = true
+        this.$set(this.meta.layers, this.meta.layerIndexPlay, this.layerCopy)
+        // this.layerUpdating = false
       }
     },
     panEnd (e) {
@@ -286,7 +293,6 @@ export default {
       if (to >= 0 && to > this.layer.figuresAbsolute[0].t && to <= this.duration) {
         this.player.setCurrentTime(to)
         this.layer.figuresAbsolute[1].t = to
-        // this.$set(this.layer.figuresAbsolute[1], 't', to)
       }
       if (e.isFirst) {
         this.panning = true
@@ -300,6 +306,9 @@ export default {
         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
         this.player.play()
         this.$emit('meta', ['editing', false])
+        // this.layerUpdating = true
+        this.$set(this.meta.layers, this.meta.layerIndexPlay, this.layerCopy)
+        // this.layerUpdating = false
       }
     },
     onResize (e) {

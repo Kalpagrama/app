@@ -26,7 +26,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100}`
     ).row.full-width.items-start.content-start
-    items-player(v-bind="$props")
+    items-player(v-bind="$props" :ctx="ctx")
     //- voting
     vote(v-if="voteShow" :oid="node.oid" @end="voteShow = false")
   //- essence
@@ -46,8 +46,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     ).row.full-width.items-center.content-center.q-px-md.q-py-sm.bg-grey-9
     kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="42" :height="42" @click.native="$router.push('/user/'+nodeFull.author.oid)")
     router-link(:to="'/user/'+nodeFull.author.oid").col
-      .row.fit.items-center.content-center.q-px-sm
-        span(:style=`{lineHeight: 1.2}`).text-white {{nodeFull.author.name}}
+      .row.fit.items-center.content-center.q-px-md
+        span(:style=`{lineHeight: 1.2}`).text-white.text-bold {{nodeFull.author.name}}
         small(:style=`{lineHeight: 1, margin: 0, padding: 0}`).text-white.full-width {{nodeFull.author.name}}
     .col
       .row.fit.items-center.content-center.justify-end.q-px-sm

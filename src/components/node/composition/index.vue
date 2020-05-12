@@ -23,13 +23,16 @@ div(
     :style=`{
       userSelect: 'none',
       width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
+      margin: '0.5px',
       maxHeight: 500+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(
     v-if="visible && composition"
     :ctx="ctx" :composition="composition"
     :visible="visible" :active="active" :mini="mini"
+    :itemsCount="itemsCount"
     @good="playerGood = true"
+    @ended="$emit('ended', $event)"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
     template(v-slot:editor=`{player, meta}`)
       slot(name="editor" :player="player" :meta="meta")
@@ -45,12 +48,14 @@ export default {
   components: {playerVideo, playerImage},
   props: {
     ctx: {type: String},
+    position: {type: String},
     value: {type: Object},
     preview: {type: String},
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},
     mini: {type: Boolean, default () { return false }},
-    styles: {type: Object, default () { return {} }}
+    styles: {type: Object, default () { return {} }},
+    itemsCount: {type: Number}
   },
   data () {
     return {
@@ -70,12 +75,11 @@ export default {
       async handler (to, from) {
         this.$log('value CHANGED', to)
         if (to) {
-          // if visible, mini, active???
-          if (to.__typename === 'ObjectShortConcrete') {
-            this.composition = await this.$store.dispatch('objects/get', {oid: to.oid})
+          if (this.ctx === 'workspace') {
+            this.composition = to
           }
           else {
-            this.composition = to
+            this.composition = await this.$store.dispatch('objects/get', {oid: to.oid})
           }
         }
       }
@@ -111,11 +115,11 @@ export default {
       this.$log('previewClick')
     }
   },
-  mounted () {
-    this.$log('mounted')
+  async mounted () {
+    // this.$log('mounted')
   },
   beforeDestroy () {
-    this.$log('beforeDestroy')
+    // this.$log('beforeDestroy')
   }
 }
 </script>

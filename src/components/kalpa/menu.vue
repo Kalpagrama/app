@@ -63,6 +63,13 @@
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
           span(:style=`{userSelect: 'none', pointerEvents: 'none'}`).text-white Logout
+        //- create node
+        div(
+          :style=`{height: '50px'}`
+          ).row.full-width.items-center.content-center.q-px-md
+          q-btn(push color="green" no-caps align="left").full-width
+            span.q-ml-lg Create node
+        //- version
         .row.full-width.items-center.q-px-md.q-py-sm
           small(:style=`{marginLeft: '6px'}`).text-grey-6 0.1
         //- slot(name="footer")

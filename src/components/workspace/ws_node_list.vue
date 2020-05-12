@@ -55,7 +55,7 @@ div(:style=`{position: 'relative'}`).column.fit
                 :style=`{
                   height: '40px'
                 }`
-                ).row.full-width.q-mb-sm
+                ).row.full-width.q-mb-xs
                 //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
                 //-   q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
                 .col
@@ -100,7 +100,7 @@ export default {
           this.$router.replace(this.$route.path)
         }
       }
-    },
+    }
   },
   methods: {
     nodesFilter (arr) {

@@ -38,7 +38,7 @@ div(:style=`{position: 'relative'}`).column.fit
               div(
                 v-for="(c,ci) in items" :key="c.oid" @click="contentClick(c.oid)"
                 :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
-                ).row.full-width.items-center.bg-grey-8.q-px-md.q-py-sm.q-mb-sm.cursor-pointer.content-item
+                ).row.full-width.items-center.bg-grey-8.q-px-md.q-py-sm.q-mb-xs.cursor-pointer.content-item
                 span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
         div(:style=`{height: '1000px'}`).row.full-width
 </template>
