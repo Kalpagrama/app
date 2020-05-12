@@ -13,6 +13,17 @@ export function init (state) {
   state.initialized = true
 }
 
+export function normalizeWsItem (state, wsItem) {
+  if (wsItem.rawData) {
+    Object.keys(wsItem.rawData).map(k => {
+      if (k !== 'rawData') {
+        wsItem[k] = wsItem.rawData[k]
+      }
+    })
+    delete wsItem.rawData
+  }
+}
+
 export function clear (state) {
   logD('CACHE: clear')
   state.cachedItems = {}

@@ -50,7 +50,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           //- layers tints
           div(
             v-for="(l, li) in meta.layers" :key="li"
-            v-if="l.figuresAbsolute.length > 0 && li !== meta.layerIndex"
+            v-if="l.figuresAbsolute.length > 0 && li !== meta.layerIndexPlay"
             :style=`{
               position: 'absolute', height: '50px', background: l.color,
               pointerEvents: 'none', opacity: 0.3,
@@ -86,14 +86,14 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
             v-if="layer && layer.figuresAbsolute.length > 0"
             v-touch-pan.left.right.prevent.mouse="panStart"
             :style=`{position: 'absolute', zIndex: 101, top: 0,
-              left: 'calc('+ (layer.figuresAbsolute[0].t/duration)*100+'%' +' - 20px)',
+              left: 'calc('+ (layer.figuresAbsolute[0].t/duration)*100+'%' +' - 30px)',
               width: '50px', height: '50px', opacity: 0.3, borderRadius: '50%', cursor: 'grab'}`).row.bg-green
           //- layer end round grabber
           div(
             v-if="layer && layer.figuresAbsolute.length > 0"
             v-touch-pan.left.right.prevent.mouse="panEnd"
             :style=`{position: 'absolute', zIndex: 102, top: 0,
-              left: 'calc('+ (layer.figuresAbsolute[1].t/duration)*100+'%' +' - 30px)',
+              left: 'calc('+ (layer.figuresAbsolute[1].t/duration)*100+'%' +' - 20px)',
               width: '50px', height: '50px', opacity: 0.3, borderRadius: '50%', cursor: 'grab'}`).row.bg-green
           //- right tint
           div(
@@ -119,7 +119,10 @@ export default {
       panningFrames: false,
       framesWidth: 0,
       framesLoadedCount: 0,
-      framesLoaded: false
+      framesLoaded: false,
+      // using to update item after editing only
+      layerCopy: null,
+      layerUpdating: false
     }
   },
   computed: {
@@ -131,7 +134,7 @@ export default {
     },
     layer () {
       if (this.meta.layerIndexPlay >= 0) {
-        return this.meta.layers[this.meta.layerIndexPlay]
+        return this.layerCopy
       }
       else {
         return null
@@ -165,15 +168,6 @@ export default {
     },
     frameDuration () {
       return this.duration / this.framesCount
-    },
-    nowShow () {
-      if (this.meta.mode === 'watch') {
-        return true
-      }
-      else {
-        if (this.meta.now < this.meta.layerStart || this.meta.now > this.meta.layerEnd) return false
-        else return true
-      }
     }
   },
   watch: {
@@ -186,33 +180,17 @@ export default {
         }
       }
     },
-    'meta.playing': {
-      handler (to, from) {
-        this.$log('meta.playing CHANGED', to)
-        if (to) {
-          // TODO maybe the meta.mode?
-          // this.framesTweenToLayer()
-        }
-      }
-    },
     'meta.layerIndexPlay': {
       immediate: true,
       handler (to, from) {
         if (to === from) return
         this.$log('meta.layerIndex CHANGED')
         this.framesWidthUpdate()
-        if (this.layer && this.$refs.framesScrollWrapper) {
-          this.framesTweenToLayer()
+        this.framesTweenToLayer()
+        if (to >= 0 && this.meta.layers[to]) {
+          this.layerCopy = JSON.parse(JSON.stringify(this.meta.layers[to]))
         }
         if (this.content && this.content.contentSource === 'YOUTUBE') this.framesLoaded = true
-      }
-    },
-    layer: {
-      deep: true,
-      immediate: false,
-      handler (to, from) {
-        if (to) {
-        }
       }
     }
   },
@@ -240,6 +218,7 @@ export default {
     framesTweenToLayer () {
       this.$log('framesTweenToLayer start')
       if (!this.layer || this.layer.figuresAbsolute.length === 0) return
+      if (!this.$refs.framesScrollWrapper) return
       this.$tween.to(
         this.$refs.framesScrollWrapper,
         0.9,
@@ -264,7 +243,6 @@ export default {
       if (to >= 0 && to < this.layer.figuresAbsolute[1].t && to <= this.duration) {
         this.player.setCurrentTime(to)
         this.layer.figuresAbsolute[0].t = to
-        // this.$set(this.layer.figuresAbsolute[0], 't', to)
       }
       if (e.isFirst) {
         this.panning = true
@@ -278,6 +256,7 @@ export default {
         this.player.setCurrentTime(to)
         this.player.play()
         this.$emit('meta', ['editing', false])
+        this.$set(this.meta.layers, this.meta.layerIndexPlay, this.layerCopy)
       }
     },
     panEnd (e) {
@@ -286,7 +265,6 @@ export default {
       if (to >= 0 && to > this.layer.figuresAbsolute[0].t && to <= this.duration) {
         this.player.setCurrentTime(to)
         this.layer.figuresAbsolute[1].t = to
-        // this.$set(this.layer.figuresAbsolute[1], 't', to)
       }
       if (e.isFirst) {
         this.panning = true
@@ -300,6 +278,7 @@ export default {
         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
         this.player.play()
         this.$emit('meta', ['editing', false])
+        this.$set(this.meta.layers, this.meta.layerIndexPlay, this.layerCopy)
       }
     },
     onResize (e) {
@@ -310,10 +289,8 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.width = this.$el.clientWidth
-    await this.$wait(1000)
-    if (this.$refs.framesScrollWrapper) {
-      this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
-    }
+    // await this.$wait(1000)
+    this.framesWidthUpdate()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -1,5 +1,5 @@
 <style lang="sass">
-// mejs_017595170116808223_youtube_iframe
+// iframe id looks like => mejs_017595170116808223_youtube_iframe
 iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
@@ -24,52 +24,63 @@ iframe[id$="_youtube_iframe"]
 //   height: 100%
 //   border-radius: 10px
 //   overflow: hidden
-// .mejs__overlay-button
-//   display: none
+.mejs__overlay-button
+  // display: none
+  opacity: 0.2
+  transform: scale(2)
+.layer-name
+  &:hover
+    background: rgba(255,255,255,0.3) !important
 </style>
 
 <template lang="pug">
 div(
   :style=`{position: 'relative'}`
   ).column.fit.items-start.content-start
-  kalpa-keyboard-events(@keyup="windowKeyup")
-  //- :class=`{'bg-black': videoGood}`
-  //- opacity: videoGood ? 1 : 0
-  //- div(:style=`{position: 'absolute', zIndex: 100000, top: '50px', left: '50px', width: '50px', height: '50px'}`).row
+  //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- debug
   div(
-    v-if="false && !mini"
+    v-if="true && !mini"
     :style=`{
-      position: 'absolute', width: 'calc(100% - 90px)', left: '0px', top: '50px',
+      position: 'absolute', width: 'calc(50%)', left: '8px', top: '80px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
       zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.4}`).row.q-pa-sm.bg-green
     small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
     small.full-width now/duration: {{now}}/{{duration}}
     small.full-width ctx/mode: {{ctx}}/{{mode}}
-    //- small.full-width start/end: {{layerStart}}/{{layerEnd}}
-    //- small.full-width layerIndex: {{layerIndex}}
-    //- small.full-width layerIndexPlay: {{layerIndexPlay}}
-    //- small.full-width actionsHovered: {{actionsHovered}}
+    small.full-width start/end: {{layerStart}}/{{layerEnd}}
+    small.full-width layerIndex: {{layerIndex}}
+    small.full-width layerIndexPlay: {{layerIndexPlay}}
     small.full-width player: {{player ? true : false}}
-    small.full-width videoContainerHovered: {{videoContainerHovered}}
   //- video container
-  //- @mouseover="videoContainerMouseover"
-  //- @mousemove="videoContainerMousemove"
   div(
     :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
     div(
       @click="videoClick()"
       :style=`{position: 'absolute', zIndex: 1000}`
       ).row.fit
-    //- actions
+    //- video actions
+    //- content name
+    router-link(
+      v-if="true && layer && content && visible && active && !mini"
+      :to="'/content/'+content.oid"
+      :style=`{
+        position: 'absolute', zIndex: 20000, left: '8px',
+        top: '8px',
+        borderRadius: '10px', overflow: 'hidden',
+        background: 'rgba(0,0,0,0.3)'
+      }`
+      ).q-px-sm.q-py-xs.text-grey-2.cursor-pointer.layer-name
+      small(:style=`{userSelect: 'none'}`) {{ content.name }}
     //- layer name
     span(
       v-if="true && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
       :style=`{
-        position: 'absolute', zIndex: 20000, top: '-1px', left: '-1px',
+        position: 'absolute', zIndex: 20000, top: '40px', left: '8px',
         borderRadius: '10px', overflow: 'hidden',
-        background: 'rgba(0,0,0,0.15)'}`
-      ).q-pa-sm.text-grey-2.cursor-pointer {{ layer.spheres[0].name | cut(50) }}
+        background: 'rgba(0,0,0,0.3)'
+      }`
+      ).q-pa-sm.text-grey-2.cursor-pointer.layer-name {{ layer.spheres[0].name | cut(50) }}
     //- layer menu
     q-btn(
       v-if="true && content && visible && active && !mini"
@@ -77,10 +88,9 @@ div(
       ref="layerMenuBtn"
       round flat color="grey-2" icon="more_vert"
       :style=`{
-        position: 'absolute', zIndex: 2000, top: '0px', right: '0px',
+        position: 'absolute', zIndex: 2000, top: '8px', right: '8px',
         background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'
       }`)
-      //- :target="$refs.layerMenuBtn"
       q-menu(
         cover anchor="top right" max-width="300px")
         div(v-if="content").column.fit.bg-grey-9
@@ -98,26 +108,25 @@ div(
       position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)',
       borderRadius: '10px', overflow: 'hidden',
       }`).row.full-width
-      //- opacity: ctx === 'list' ? videoGood ? 1 : 0 : 1
-      //- preload="auto"
-      //- :autoplay="autoplay"
       video(
         ref="kalpaVideo"
         :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
-        preload="auto"
         playsinline :loop="true" :muted="mutedComputed" :controls="false"
         @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
         @timeupdate="videoUpdate"
         :style=`{
           position: 'relative', width: '100%', height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden',
-          opacity: videoLoadeddataDone && videoGood ? 1 : 0,
-          border: videoLoadeddataDone && videoGood ? 'none' : '0.5px solid red'
+          opacity: videoLoadeddataDone && videoGood ? 1 : 0
         }`)
     player-video-progress(
-      v-show="videoActionsShow && !mini"
+      v-if="visible && active"
+      v-show="!mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
-      :style=`{position: 'absolute', bottom: '0px', left: '0px', maxWidth: '75%', zIndex: 20000, transform: 'translate3d(0,0,0)'}`)
+      :style=`{
+        position: 'absolute', zIndex: 20000, bottom: '0px', left: '0px', transform: 'translate3d(0,0,0)',
+        maxWidth: itemsCount > 1 ? '75%' : 'calc(100% - 60px)'
+      }`)
   slot(name="editor" :meta="meta" :player="player")
 </template>
 
@@ -127,38 +136,24 @@ import playerVideoProgress from './player_video_progress'
 
 export default {
   name: 'playerVideo',
-  props: ['ctx', 'composition', 'visible', 'active', 'mini'],
+  props: ['ctx', 'composition', 'visible', 'active', 'mini', 'itemsCount'],
   components: {playerVideoProgress},
   data () {
     return {
       now: 0,
-      count: 0,
-      nowPause: false,
+      nowWorking: false,
       duration: 0,
       player: null,
       playerInited: false,
       playing: false,
       muted: true,
       autoplay: true,
-      fullscreen: false,
-      intervalUpdate: null,
-      intervalMove: null,
-      progressHeight: 20,
       mode: 'play',
       layerIndex: 0,
       layerIndexPlay: -1,
       editing: false,
-      forwarding: null,
-      forwardingInterval: null,
-      forwardingCount: 0,
       videoLoadeddataDone: false,
-      videoActionsShow: false,
-      content: null,
-      actionsActive: false,
-      actionsHovered: false,
-      mouseOverTimer: null,
-      mousemoveTimer: null,
-      videoContainerHovered: false
+      content: null
     }
   },
   computed: {
@@ -172,7 +167,6 @@ export default {
         playing: this.playing,
         muted: this.muted,
         mode: this.mode,
-        progressHeight: this.progressHeight,
         content: this.content,
         layerIndexPlay: this.layerIndexPlay,
         layerIndex: this.layerIndex,
@@ -224,6 +218,7 @@ export default {
         else return null
       }
       else {
+        // return `${this.layer.url}#t=${this.layerStart},${this.layerEnd}`
         return this.layer.url
       }
       // return this.content.url
@@ -333,29 +328,29 @@ export default {
       this.$log('nodeWorkspace')
     },
     videoNow (to, from) {
-      if (this.nowPause) return
-      if (!this.player) return
-      if (!this.active) this.player.pause()
+      if (this.nowWorking) return
+      this.nowWorking = true
       if (this.editing) return
       if (this.mode === 'play') {
         if (!this.layerStart && !this.layerEnd) return
         if (to > this.layerEnd) {
+          // alert('to > this.layerEnd')
           let to = this.layerIndex + 1
-          if (this.layers[to]) {
-            this.$log('NEXT LAYER')
-            this.layerIndex = to
-          }
-          else {
-            if (this.layerIndex === 0) {
-              this.player.setCurrentTime(this.layerStart)
-            }
-            else {
-              this.layerIndex = 0
-            }
-          }
+          this.$emit('ended')
+          // if (this.layers[to]) {
+          //   this.$log('NEXT LAYER')
+          //   this.layerIndex = to
+          // }
+          // else {
+          //   if (this.layerIndex === 0) {
+          //     this.player.setCurrentTime(this.layerStart)
+          //   }
+          //   else {
+          //     this.layerIndex = 0
+          //   }
+          // }
         }
         if (to < this.layerStart) {
-          // this.$q.notify('to < this.layerStart' + this.layerStart)
           this.player.setCurrentTime(this.layerStart)
         }
       }
@@ -373,39 +368,11 @@ export default {
       }
       else if (this.player.mode === 'watch') {
       }
-    },
-    videoForward (right) {
-      this.$log('videoForward')
-      if (!this.player) return
-      let to = this.now
-      if (right > 0) {
-        this.forwarding = 'right'
-        to = to + 10 < this.duration ? to + 10 : this.duration
-      }
-      else {
-        this.forwarding = 'left'
-        to = to - 10 > 0 ? to - 10 : 0
-      }
-      this.forwardingCount += 10
-      this.player.setCurrentTime(to)
-      this.videoUpdate(null, to)
-      if (this.forwardingInterval) clearTimeout(this.forwardingInterval)
-      this.forwardingInterval = setTimeout(() => {
-        this.forwarding = null
-        this.forwardingCount = 0
-      }, 400)
-    },
-    async videoMove () {
-      if (!this.fullscreen) return
-      this.$log('videoMove')
-      // this.$set(this.player, 'controls', true)
-      if (this.intervalMove) clearInterval(this.intervalMove)
-      this.intervalMove = setTimeout(() => {
-        // this.$set(this.player, 'controls', false)
-      }, 2500)
+      this.nowWorking = false
     },
     videoLoadeddata () {
       this.$log('videoLoadeddata')
+      // alert('videoLoadeddata' + this.composition.oid)
       this.videoLoadeddataDone = true
       if (!this.player) return
       if (this.visible) {
@@ -427,13 +394,10 @@ export default {
     videoPlay (intervalUpdateIgnore) {
       this.$log('videoPlay')
       this.playing = true
-      // if (!this.intervalUpdate) this.intervalUpdate = setInterval(this.videoUpdate, 1000 / 30)
     },
     videoPause () {
       this.$log('videoPause')
       this.playing = false
-      // if (this.intervalUpdate) clearInterval(this.intervalUpdate)
-      // this.intervalUpdate = null
     },
     videoPlayPause () {
       this.$log('videoPlayPause')
@@ -466,48 +430,24 @@ export default {
       }
     },
     async videoClick (e) {
-      this.$log('videoClick', this.videoActionsShow)
-      // if (this.videoActionsTimeout) clearTimeout(this.videoActionsTimeout)
-      this.videoActionsShow = true
+      this.$log('videoClick')
       this.videoPlayPause()
-      // if (this.videoActionsShow) {
-      //   this.videoPlayPause()
-      // }
-      // else {
-      //   this.videoActionsShow = true
-      //   // if (this.videoActionsTimeout) clearTimeout(this.videoActionsTimeout)
-      // }
-      // this.videoActionsTimeout = setTimeout(() => {
-      //   this.videoActionsShow = false
-      //   this.videoActionsTimeout = null
-      // }, 2400)
     },
     playerInit () {
       this.$log('playerInit START')
-      this.$log('platerInit content', this.content)
+      // this.$log('platerInit content', this.content)
       if (this.contentSource === 'KALPA') {
         this.player = {}
         this.player.setCurrentTime = async (ms) => {
           if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.currentTime = ms
-          this.nowPause = true
-          await this.$wait(600)
-          this.nowPause = false
         }
         this.player.play = () => {
-          // this.$q.notify('play ?')
-          if (this.$refs.kalpaVideo) {
-            // this.$q.notify('play !')
-            this.$refs.kalpaVideo.play()
-          }
+          if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.play()
         }
         this.player.pause = () => {
           if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.pause()
         }
-        this.player.remove = () => {
-          // TODO
-        }
         this.videoUpdate()
-        // this.videoPlay()
       }
       else if (this.contentSource === 'YOUTUBE') {
         let ref = this.$refs.kalpaVideo
@@ -544,7 +484,7 @@ export default {
           }
         })
       }
-      // set player defaults
+      // set player defaults for all the players
       this.player.update = (to) => {
         this.videoUpdate(null, to)
       }
@@ -630,10 +570,11 @@ export default {
   },
   async created () {
     this.$log('created')
-    this.videoNow = throttle(this.videoNow, 300)
+    // this.videoNow = throttle(this.videoNow, 300)
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
+    // alert('mounted')
     this.$on('meta', this.onMeta)
     if (this.composition.contentOid) {
       this.content = await this.$store.dispatch('objects/get', {oid: this.composition.contentOid})

@@ -162,6 +162,13 @@ export const get = async (context, { oid, priority }) => {
   assert(objectFull, '!itemFull')
   // assert(objectFull.revision, '!objectFull.revision')
   assert(objectFull.revision >= 0, 'objectFull.revision >= 0')
+  context.commit('cache/normalizeWsItem', objectFull, {root: true})
+  // if (objectFull.rawData) {
+  //   let result = {...objectFull, ...objectFull.rawData}
+  //   delete result.rawData
+  //   return result
+  // }
+  // else return objectFull
   return objectFull
 }
 

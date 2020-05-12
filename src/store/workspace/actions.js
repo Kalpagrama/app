@@ -63,6 +63,21 @@ export const wsItems = async (context, collection) => {
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
 export const wsItemCreate = async (context, item) => {
   logD('wsItemCreate start', item)
+  let itemInput = {
+    oid: item.oid,
+    unique: item.unique,
+    thumbOid: item.thumbOid,
+    name: item.name,
+    wsItemType: item.wsItemType,
+    revision: item.revision,
+    rawData: JSON.parse(JSON.stringify(item))
+  }
+  delete itemInput.rawData.oid
+  delete itemInput.rawData.unique
+  delete itemInput.rawData.thumbOid
+  delete itemInput.rawData.name
+  delete itemInput.rawData.wsItemType
+  delete itemInput.rawData.revision
   let { data: { wsItemCreate: wsItem } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
@@ -72,10 +87,11 @@ export const wsItemCreate = async (context, item) => {
         }
       }
     `,
-    variables: { item }
+    variables: { item: itemInput }
   })
   context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
   logD('wsItemCreate done', wsItem)
+  context.commit('cache/normalizeWsItem', wsItem, {root: true})
   return wsItem
 }
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
@@ -88,8 +104,14 @@ export const wsItemUpdate = async (context, item) => {
     name: item.name,
     wsItemType: item.wsItemType,
     revision: item.revision,
-    rawData: item.rawData
+    rawData: JSON.parse(JSON.stringify(item))
   }
+  delete itemInput.rawData.oid
+  delete itemInput.rawData.unique
+  delete itemInput.rawData.thumbOid
+  delete itemInput.rawData.name
+  delete itemInput.rawData.wsItemType
+  delete itemInput.rawData.revision
   let { data: { wsItemUpdate: wsItem } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
@@ -103,6 +125,7 @@ export const wsItemUpdate = async (context, item) => {
   })
   context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
   logD('wsItemUpdate done', wsItem)
+  context.commit('cache/normalizeWsItem', wsItem, {root: true})
   return wsItem
 }
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events

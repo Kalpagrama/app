@@ -19,10 +19,11 @@ div(
       overflow: scrollOverflow
     }`
     ).col.full-width.scroll
+    //- TODO justify-center/justify-start depends on items count? more that 3 => justify-center else justify-start
     masonry(
       :cols="{default: $q.screen.width > 600 ? 3 : 2}"
       :gutter="{default: 10}"
-      :style=`{position: 'relative', width: 'calc(100% + 8px)', marginBottom: '80px'}`).row.justify-center.q-mt-sm
+      :style=`{position: 'relative', width: 'calc(100% + 8px)', marginBottom: '80px'}`).row.justify-start.q-mt-sm
       div(
         v-for="(i, ii) in items" :key="i.oid"
         @mouseenter="itemEnter(i, ii)"

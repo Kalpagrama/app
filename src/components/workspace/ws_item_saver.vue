@@ -1,5 +1,5 @@
 <script>
-import { debounce } from 'quasar'
+import { throttle } from 'quasar'
 
 export default {
   render () {
@@ -41,7 +41,8 @@ export default {
         this.$log('itemUpdate start revision: ', this.item.revision)
         if (this.itemUpdating) return
         this.itemUpdating = true
-        if (this.item.rawData.name) this.item.name = this.item.rawData.name
+        // await this.$wait(1000)
+        // if (this.item.rawData.name) this.item.name = this.item.rawData.name
         let item = await this.$store.dispatch('workspace/wsItemUpdate', JSON.parse(JSON.stringify(this.item)))
         this.$log('itemUpdate done revision:', item.revision)
       } catch (e) {
@@ -52,7 +53,7 @@ export default {
     }
   },
   created () {
-    this.itemUpdate = debounce(this.itemUpdate, 1000)
+    this.itemUpdate = throttle(this.itemUpdate, 1000)
   }
 }
 </script>

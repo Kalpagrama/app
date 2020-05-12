@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px'}`).bg-grey-10
+q-layout(view="hHh lpR fFf").bg-grey-10
   kalpa-menu-right
     menu-right(:user="user")
   q-header(v-if="false" reveal)

@@ -22,15 +22,17 @@ div(
     @load="previewLoad" @error="previewError" @click="previewClick"
     :style=`{
       userSelect: 'none',
-      width: '100%', height: mini ? 'auto' : '100%', opacity: playerGood ? 0 : 1,
+      width: '100%', height: mini ? 'auto' : '100%', opacity: 1,
+      margin: '0.5px',
       maxHeight: 500+'px', objectFit: 'contain', ...styles}`)
   //- players
   player-video(
-    v-if="visible && value"
-    :ctx="ctx" :composition="value" :preview="preview"
+    v-if="visible && composition"
+    :ctx="ctx" :composition="composition"
     :visible="visible" :active="active" :mini="mini"
-    :bgClass="bgClass"
+    :itemsCount="itemsCount"
     @good="playerGood = true"
+    @ended="$emit('ended', $event)"
     :style=`{maxHeight: $q.screen.height+'px', position: 'absolute', top: '0px', zIndex: 100, ...styles}`).fit
     template(v-slot:editor=`{player, meta}`)
       slot(name="editor" :player="player" :meta="meta")
@@ -46,15 +48,18 @@ export default {
   components: {playerVideo, playerImage},
   props: {
     ctx: {type: String},
+    position: {type: String},
     value: {type: Object},
     preview: {type: String},
     visible: {type: Boolean},
     active: {type: Boolean, default () { return false }},
     mini: {type: Boolean, default () { return false }},
-    styles: {type: Object, default () { return {} }}
+    styles: {type: Object, default () { return {} }},
+    itemsCount: {type: Number}
   },
   data () {
     return {
+      composition: null,
       previewLocal: undefined,
       previewWidth: 0,
       previewHeight: 0,
@@ -65,6 +70,20 @@ export default {
   computed: {
   },
   watch: {
+    value: {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('value CHANGED', to)
+        if (to) {
+          if (this.ctx === 'workspace') {
+            this.composition = to
+          }
+          else {
+            this.composition = await this.$store.dispatch('objects/get', {oid: to.oid})
+          }
+        }
+      }
+    },
     visible: {
       handler (to, from) {
         this.$log('visible CHANGED', to)
@@ -86,12 +105,6 @@ export default {
       this.$emit('height', this.previewHeight)
       this.$emit('width', this.previewWidth)
       this.previewLoaded = true
-      // const interval = setInterval(() => {
-      //   if (previewRef.naturalWidth > 0 && previewRef.naturalHeight > 0) {
-      //     clearInterval(interval)
-      //     this.previewLoaded = true
-      //   }
-      // }, 20)
     },
     previewError () {
       this.$log('previewError')
@@ -100,12 +113,9 @@ export default {
     },
     previewClick () {
       this.$log('previewClick')
-      // if (!this.value) {
-      //   this.$emit('compositionGet')
-      // }
     }
   },
-  mounted () {
+  async mounted () {
     // this.$log('mounted')
   },
   beforeDestroy () {

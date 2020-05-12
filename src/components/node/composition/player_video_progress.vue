@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.items-start.content-start
-  kalpa-keyboard-events(@keyup="windowKeyup")
+  //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- pregress wrapper
   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-lg
     //- progress bar & time
@@ -70,7 +70,11 @@
         .row.fit.items-end.content-end.justify-start.q-px-sm
           span(
             :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)', userSelect: 'none', padding: '10.5px'}`
-            ).text-white {{ $time(meta.now)+' / '+$time(meta.duration) }}
+            ).text-white {{ $time(now)+' / '+$time(duration) }}
+          span(
+            v-if="false"
+            :style=`{background: 'rgba(0,0,0,0.3)', padding: '10.5px'}`
+            ).text-white {{progressPercentWidth}}
       //- sound
       div(
         :style=`{height: '60px'}`
@@ -138,29 +142,18 @@ export default {
       }
       else {
         let to = (this.now / this.duration) * 100
+        if (to > 100) to = 100
         return to + '%'
-        // if (this.pointDelta > 0 && this.progressPercentWidth > 0) {
-        //   let from = (this.pointDelta / this.progressPercentWidth) * 100
-        //   if (from === to) {
-        //     return to + '%'
-        //   }
-        //   else {
-        //     return from + '%'
-        //   }
-        // }
-        // else {
-        //   return to + '%'
-        // }
       }
     }
   },
   methods: {
     videoForward (forward) {
       this.$log('videoForward', forward)
-      let to = this.meta.now
+      let to = this.now
       if (forward > 0) to += 5
       else to -= 5
-      if (to > this.meta.duration) to = this.meta.duration
+      if (to > this.duration) to = this.duration
       if (to < 0) to = 0
       this.player.setCurrentTime(to)
       this.player.update(to)
@@ -172,7 +165,7 @@ export default {
       // this.$log('left/w', left, w)
       if (!this.progressMousemoveWidth) this.progressMousemoveWidth = w
       this.progressMousemoveLeft = left
-      this.progressMousemoveTime = (this.meta.duration * left) / w
+      this.progressMousemoveTime = (this.duration * left) / w
     },
     progressMouseleave (e) {
       // this.$log('progressMouseleave', e)

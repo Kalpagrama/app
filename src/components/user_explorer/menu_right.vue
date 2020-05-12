@@ -23,6 +23,7 @@ div(
 </template>
 
 <script>
+// created, voted, contents, spheres, people following, followers
 export default {
   name: 'userExplorer-menuRight',
   props: ['user'],
