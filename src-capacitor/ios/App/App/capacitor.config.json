@@ -18,8 +18,7 @@
     "iosScheme": "app.kalpa",
     "allowNavigation": [
       "*.kalpa.app"
-    ],
-    "url": "http://192.168.88.12:8485"
+    ]
   },
   "android": {
     "overrideUserAgent": "custom"

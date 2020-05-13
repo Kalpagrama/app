@@ -8,9 +8,8 @@
       0
     ],
     "icon": "app-icon.png",
-    "background": "app-splashscreen.png",
     "themeColor": "222222",
-    "splashscreenIconRatio": "0"
+    "splashscreenIconRatio": "33"
   },
   "assets": []
 }
