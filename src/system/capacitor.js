@@ -40,7 +40,7 @@ async function initCapacitor (store) {
       }
       alert('shareItem = ' + JSON.stringify(shareItem))
       store.commit('workspace/stateSet', ['shareItem', shareItem], {root: true})
-      await router.push({ path: 'workspace/share' })
+      await router.push({ path: '/workspace/contentNotes', query: {share: true} })
     } else if (userId) {
       // alert('appUrlOpen. auth.userId = ' + userId)
       await router.push({ path: 'auth',
