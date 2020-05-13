@@ -1,16 +1,16 @@
 <template lang="pug">
 .column.fit
   //- header
-  .row.full-width.q-pa-sm
+  .row.full-width.q-px-sm
     q-input(
       v-model="sphereSearch" @keyup.enter="sphereEnter"
       filled dark color="green"
-      placeholder="Add sphere"
+      label="Add sphere"
       :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
-      ).full-width.bg-grey-8
+      ).full-width.b-100
   //- body
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
+  .col.full-width.scroll.q-px-sm.q-pb-sm
+    .row.full-width.items-start.content-start.b-50
       div(
         v-for="(s,si) in node.spheres" :key="si" @click="sphereClick(s, si)"
         :class=`{

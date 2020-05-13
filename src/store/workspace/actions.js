@@ -89,9 +89,9 @@ export const wsItemCreate = async (context, item) => {
     `,
     variables: { item: itemInput }
   })
-  context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
-  logD('wsItemCreate done', wsItem)
-  return wsItem
+  let updatedItem = await context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
+  logD('wsItemCreate done', updatedItem)
+  return updatedItem
 }
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
 export const wsItemUpdate = async (context, item) => {
@@ -122,9 +122,9 @@ export const wsItemUpdate = async (context, item) => {
     `,
     variables: { item: itemInput }
   })
-  context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
-  logD('wsItemUpdate done', wsItem)
-  return wsItem
+  let updatedItem = context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
+  logD('wsItemUpdate done', updatedItem)
+  return updatedItem
 }
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
 export const wsItemDelete = async (context, oid) => {

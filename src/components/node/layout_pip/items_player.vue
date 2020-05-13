@@ -43,7 +43,7 @@ div(
             }`).row.fit
     //- item prev
     div(
-      v-if="visible && active && itemIndex !== 0" @click="itemsPrev()"
+      v-if="visible && active && itemIndex !== 0 && items.length > 1" @click="itemsPrev()"
       :style=`{
         position: 'absolute', top: '10%', height: '70%', zIndex: 20000, width: '20%',
         borderRadius: '0 10px 10px 0'

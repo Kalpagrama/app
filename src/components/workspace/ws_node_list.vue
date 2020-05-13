@@ -54,6 +54,10 @@ div(:style=`{position: 'relative'}`).column.fit
       q-btn(
         flat color="grey-2" no-caps
         :style=`{height: '40px'}`).bg-grey-7 Spheres
+      q-btn(
+        flat round color="grey-2" icon="edit"
+        :style=`{}`
+        ).bg-grey-7.q-ml-sm
   //- body
   .col.full-width.scroll
     .row.full-width.justify-center
@@ -160,7 +164,8 @@ export default {
       this.node = await this.$store.dispatch('workspace/wsItemCreate', nodeInput)
       this.nodeSearchString = ''
       this.$log('nodeAddStart node', this.node)
-      // await this.$wait(300)
+      // await this.$wait(1000)
+      // this.$log('nodeAddStart node AFTER', this.node)
       this.nodeEditorOpened = true
     }
   },

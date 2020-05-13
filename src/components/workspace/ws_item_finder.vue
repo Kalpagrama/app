@@ -1,11 +1,16 @@
 <template lang="pug">
 .column.fit
-  div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-    q-btn(round flat color="grey-5" icon="keyboard_arrow_left" @click="$emit('cancel')").q-mr-sm
+  div(
+    v-if="options.header"
+    :style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+    q-btn(
+      v-if="options.backButton"
+      round flat color="grey-5" icon="keyboard_arrow_left" @click="$emit('cancel')").q-mr-sm
     kalpa-buttons(:value="pages" :id="page" idKey="id" @id="page = $event")
-  .col.q-px-sm
+  .col.q-pa-sm
     ws-items(
       :page="page"
+      :options="options"
       @item="itemFound")
 </template>
 
@@ -14,6 +19,7 @@ import wsItems from './ws_items'
 
 export default {
   name: 'wsItemFinder',
+  props: ['options'],
   components: {wsItems},
   data () {
     return {

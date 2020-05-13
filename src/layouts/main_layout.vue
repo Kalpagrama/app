@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+q-layout(view="hHh Lpr lff").bg-30
   //- menu
   div(
     v-if="$route.name !== 'welcome' && $q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"

@@ -2,18 +2,19 @@
 div(
   v-if="node"
   :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
-  ).column.fit.items-start.bg-grey-10
+  ).column.fit.items-start.b-30
   //- header
   div(:style=`{order: -1}`).row.full-width.items-center.content-center.q-px-sm
     //- main navigation
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
       q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$emit('cancel')")
-      .col.q-px-sm
-        //- span.text-white essence: {{essence}}
-        span.text-white.text-bold Node editor
+      .col.full-height
+        .row.fit.items-center.content-center.q-px-sm
+          span(:style=`{fontSize: '20px'}`).text-white.text-bold Node editor
       q-btn(
         push color="green" no-caps @click="nodePublish()"
-        :loading="nodePublishing").q-px-sm Publish
+        :loading="nodePublishing"
+        :style=`{height: '42px'}`).q-px-sm Publish
     //- essence
     div(
       :style=`{
@@ -25,10 +26,11 @@ div(
           filled color="green" dark
           label="Whats the essence?"
           :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`
-          ).full-width.bg-grey-8
+          ).full-width.b-100
     //- pages
-    div(:style=`{}`).row.full-width.items-center
-      kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event")
+    .row.full-width.items-center.content-center.q-py-sm
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-100.q-px-sm
+        kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event")
   //- body
   .col.full-width
     component(v-if="node" :is="`edit-${pageId}`" :node="node")

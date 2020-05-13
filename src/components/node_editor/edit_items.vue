@@ -1,6 +1,25 @@
+<style lang="sass">
+.q-checkbox__inner
+  border-radius: 10px !important
+  &:before
+    border-radius: 10px !important
+</style>
+
 <template lang="pug">
 .column.fit
-  .col.full-width.scroll
+  //- add first item
+  div(v-if="node.items.length === 0").col.full-width.q-px-sm.q-pb-sm
+    div(:style=`{borderRadius: '10px'}`).column.fit.b-50
+      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
+        span(:style=`{}`).text-white.text-bold Select first item
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.full-width.b-50
+        ws-item-finder(
+          :types="['contentNotes', 'node']"
+          :options="{}"
+          @item="itemFound"
+          @cancel="itemFinderOpened = false")
+  //- node.items
+  div(v-if="node.items.length > 0").col.full-width.scroll
     .row.full-width.items-start.content-start
       //- dialogs
       //- ws item finder dialog
@@ -17,6 +36,7 @@
             ws-item-finder(
               v-if="true"
               :types="['contentNotes', 'node']"
+              :options="{header: true, backButton: true}"
               @item="itemFound"
               @cancel="itemFinderOpened = false")
       //- composition editor dialog
@@ -55,8 +75,8 @@
           q-checkbox(v-model="itemsSelected" :val="i.oid" dark dense color="grey-6"
             :style=`{borderRadius: '10px', padding: '10px'}`).bg-grey-9
           q-btn(
-            round flat color="grey-6" @click="itemsEdit[i.oid] = false"
-            :icon="itemsEdit[i.oid] ? 'keyboard_arrow_up' : 'keyboard_arrow_down'").bg-grey-9
+            round flat color="white" @click="itemEdit(i.oid)"
+            :icon="itemsEdit[i.oid] ? 'keyboard_arrow_up' : 'edit'").bg-grey-9
         //- composition container
         div(
           @mouseenter="itemsActive[i.oid] = true"
@@ -87,33 +107,30 @@
           q-btn(round flat color="grey-6" icon="drag_indicator").bg-grey-9
           q-btn(round flat color="red-5" icon="delete_outline" @click="itemDelete(i.oid)"
             :style=`{background: 'rgba(0,0,0,0.1)'}`).bg-grey-9
-          q-btn(round flat color="white" icon="edit" @click="itemEdit(i.oid)").bg-grey-9
-      //- add first item
-      div(v-if="node.items.length === 0").row.full-width.q-px-sm
-        q-btn(
-          flat icon-right="add" color="green" no-caps @click="itemFind()"
-          :style=`{height: '400px'}`).full-width.bg-grey-8
-          span.text-bold Add item
+          //- q-btn(round flat color="white" icon="edit" @click="itemEdit(i.oid)").bg-grey-9
       //- add second and beyond items
       div(v-if="node.items.length > 0").row.full-width
         div(:style=`{width: '60px'}`).row.q-pa-sm
         .col.q-pb-sm
-          q-btn(flat no-caps color="green" icon="add" @click="itemFind()"
-            :style=`{height: '42px'}`).full-width.bg-grey-9
+          q-btn(
+            push no-caps color="green" icon="add" @click="itemFind()"
+            :style=`{height: '60px'}`).full-width
         div(:style=`{width: '60px'}`).row.q-pa-sm
-  //- footer
-  div(
-    v-if="itemsSelected.length > 0"
-    :style=`{minHeight: '60px'}`).row.full-width
-    div(
-      :style=`{height: '60px'}`).row.full-width.bg-grey-9
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="grey-2").bg-grey-8
-          span.text-bold {{itemsSelected.length}}
-      .col.full-height
-        .row.fit.items-center.content-center.q-px-sm
-          q-btn(flat no-caps color="red" @click="itemsSelectedDelete()") Delete
-          q-btn(flat no-caps color="grey-6" @click="itemsSelectedDiscard()") Discard
+  //- footer: items selected
+  div(:style=`{overflow: 'hidden'}`).row.full-width
+    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+      div(
+        v-if="itemsSelected.length > 0"
+        :style=`{minHeight: '60px'}`).row.full-width
+        div(
+          :style=`{height: '60px'}`).row.full-width.bg-grey-9
+          div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+            q-btn(round flat color="grey-2").bg-grey-8
+              span.text-bold {{itemsSelected.length}}
+          .col.full-height
+            .row.fit.items-center.content-center.q-px-sm
+              q-btn(flat no-caps color="red" @click="itemsSelectedDelete()").b-80 Delete
+              q-btn(flat no-caps color="grey-6" @click="itemsSelectedDrop()").b-80 Drop
 </template>
 
 <script>
@@ -150,9 +167,9 @@ export default {
       // set node.name if there is no node.name and we have layer.name. in items...
       switch (type) {
         case 'contentNotes': {
-          let compositionInput = JSON.parse(JSON.stringify(item.rawData))
+          let compositionInput = JSON.parse(JSON.stringify(item))
           // add layers workspace, non reactive...
-          compositionInput.oid = Date.now().toString()
+          // compositionInput.oid = Date.now().toString()
           compositionInput.layersWorkspace = compositionInput.layers
           compositionInput.layers = []
           this.$set(this.node.items, this.node.items.length, compositionInput)
@@ -168,10 +185,12 @@ export default {
     },
     itemEdit (oid) {
       this.$log('itemEdit', oid)
-      // this.$set(this.itemsMaxi, oid, true)
-      this.$set(this.itemsEdit, oid, true)
-      // this.itemsMaxi[oid] = true
-      // this.itemsEdit[oid] = true
+      if (this.itemsEdit[oid] === true) {
+        this.$set(this.itemsEdit, oid, false)
+      }
+      else {
+        this.$set(this.itemsEdit, oid, true)
+      }
     },
     itemDelete (oid) {
       this.$log('itemDelete', oid)
@@ -193,8 +212,8 @@ export default {
         }
       })
     },
-    itemsSelectedDiscard () {
-      this.$log('itemsSelectedDiscard')
+    itemsSelectedDrop () {
+      this.$log('itemsSelectedDrop')
       this.$set(this, 'itemsSelected', [])
     }
   },

@@ -22,9 +22,9 @@
   div(:style=`{overflowX: 'hidden'}`).col.full-width.q-pt-sm
     div(
       :style=`{
-        borderRadius: '10px', overflow: 'hidden', background: 'rgb(54,54,54)'
+        borderRadius: '10px', overflow: 'hidden'
       }`
-      ).column.full-width
+      ).column.full-width.b-50
         router-link(
           v-if="$store.getters.currentUser"
           :to="'/user/'+$store.getters.currentUser.oid"

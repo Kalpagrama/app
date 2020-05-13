@@ -10,8 +10,8 @@ div(:style=`{}`).column.fit
   //- add
   q-btn(
     v-if="true"
-    round push color="green" icon="add" size="md" @click="layerAdd()"
-    :style=`{position: 'absolute', zIndex: 1000, right: '20px', top: '-75px', borderRadius: '50%'}`)
+    round push color="green" icon="add" size="lg" @click="layerAdd()"
+    :style=`{position: 'absolute', zIndex: 3000, right: '20px', top: '-70px', borderRadius: '50%'}`)
   //- header
   //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
   div(

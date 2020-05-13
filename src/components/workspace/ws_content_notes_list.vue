@@ -22,7 +22,7 @@ div(:style=`{position: 'relative'}`).column.fit
                 maxWidth: $store.state.ui.maxWidthPage+'px'
               }`)
   //- header content finder
-  .row.full-width.justify-center
+  div(v-if="true").row.full-width.justify-center
     div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
       ws-content-finder(
         ref="wsContentFinder"
@@ -54,12 +54,13 @@ div(:style=`{position: 'relative'}`).column.fit
                 :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
                 ).row.full-width.items-center.bg-grey-8.q-px-md.q-py-sm.q-mb-xs.cursor-pointer.content-item
                 span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
-        div(:style=`{height: '1000px'}`).row.full-width
+        //- div(:style=`{height: '1000px'}`).row.full-width
 </template>
 
 <script>
 export default {
   name: 'wsContentNotesList',
+  props: ['options'],
   data () {
     return {
       content: null,
@@ -85,7 +86,7 @@ export default {
       this.$log('contentClick', oid)
       this.content = await this.$store.dispatch('objects/get', {oid: oid})
       this.$log('contentClick', this.content)
-      this.contentEditorOpened = true
+      // this.contentEditorOpened = true
       this.$emit('item', {type: 'contentNotes', item: this.content})
     },
     async contentDelete (oid) {
@@ -132,7 +133,8 @@ export default {
             let ref = this.$refs.wsContentFinder
             this.$log('ref', ref)
             ref.urlChanged(item.url)
-            // this.$store.commit('workspace/stateSet', ['shareItem', null])
+            this.$store.commit('workspace/stateSet', ['shareItem', null])
+            this.$router.replace('/workspace/contentNotes')
             break
           }
         }

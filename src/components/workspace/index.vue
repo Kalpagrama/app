@@ -14,6 +14,7 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
     div(
       :style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`
       ).row.full-width.items-center.content-center
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").b-50
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
           q-icon(name="school" size="36px" color="white")
