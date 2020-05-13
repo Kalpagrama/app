@@ -17,16 +17,14 @@
   "server": {
     "iosScheme": "app.kalpa",
     "allowNavigation": [
-      "kalpa.app",
-      "*.kalpa.app",
-      "kalpagramma.ru",
-      "kalpagramma.com",
-      "oauth.yandex.ru",
-      "passport.yandex.ru",
-      "oauth.vk.com",
-      "accounts.google.com",
-      "www.facebook.com"
+      "*.kalpa.app"
     ],
-    "url": "http://192.168.88.12:8484"
+    "url": "http://192.168.88.12:8485"
+  },
+  "android": {
+    "overrideUserAgent": "custom"
+  },
+  "ios": {
+    "overrideUserAgent": "custom"
   }
 }

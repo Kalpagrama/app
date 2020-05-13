@@ -28,7 +28,7 @@ export default {
         {id: 'oAuthUrlVk', name: 'Vkontakte', icon: 'fab fa-vk'},
         {id: 'oAuthUrlTwitter', name: 'Twitter', icon: 'fab fa-twitter'},
         {id: 'oAuthUrlGoogle', name: 'Google', icon: 'fab fa-google'},
-        {id: 'goAuthUrlGithub', name: 'Github', icon: 'fab fa-github'}
+        {id: 'oAuthUrlGithub', name: 'Github', icon: 'fab fa-github'}
       ]
     }
   },
@@ -48,7 +48,7 @@ export default {
       }
       this.$log('location', location)
       let to = `${url}&state={"origin":"${location}"}` // сообщаем серверу куда делать редирект после успешной аутентификации
-      alert(to)
+      // alert(to)
       this.$log('to', to)
       window.location = to
     }

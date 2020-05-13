@@ -7,6 +7,7 @@ export default {
   shareItem: null,
   shareItemExample: {
     type: 'IMAGE', // VIDEO
-    url: 'http://'
+    url: 'http://....',
+    file: null
   }
 }

@@ -95,6 +95,7 @@ export default async ({ Vue, store, app }) => {
           oAuthUrlYandex
           oAuthUrlVk
           oAuthUrlGoogle
+          oAuthUrlGithub
           oAuthUrlFacebook
         }
       }`

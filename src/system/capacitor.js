@@ -1,6 +1,6 @@
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import assert from 'assert'
-import { notify } from 'src/boot/notify'
+import { router } from 'boot/main'
 import {
   Plugins,
   PushNotification,
@@ -17,22 +17,48 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.CP)
 // let PushNotifications, Share
 
 async function initCapacitor (store) {
-  App.addListener('appStateChange', (state) => {
-    alert('appStateChange:' + JSON.stringify(state))
-  })
   // share для ios (не разобрался как из ios послать эвент в js без плагина)
-  App.addListener('appUrlOpen', (openData) => {
-    alert('appUrlOpen: ' + JSON.stringify(openData))
+  App.addListener('appUrlOpen', async (openData) => {
+    // alert('appUrlOpen: ' + JSON.stringify(openData))
     let url = new URL(openData.url)
     let data = url.searchParams.get('data')
     let text = url.searchParams.get('contentText')
-    alert('appUrlOpen. data = ' + data)
-    alert('appUrlOpen. text = ' + text)
+
+    let userId = url.searchParams.get('userId')
+    let loginType = url.searchParams.get('loginType')
+    let userExist = url.searchParams.get('userExist')
+    let needInvite = url.searchParams.get('needInvite')
+    let token = url.searchParams.get('token')
+    let expires = url.searchParams.get('expires')
+    if (data || text) {
+      alert('appUrlOpen. data = ' + data)
+      alert('appUrlOpen. text = ' + text)
+      let shareItem = {
+        type: 'VIDEO',
+        url: text,
+        file: null
+      }
+      alert('shareItem = ' + JSON.stringify(shareItem))
+      store.commit('workspace/stateSet', ['shareItem', shareItem], {root: true})
+      await router.push({ path: 'workspace/share' })
+    } else if (userId) {
+      // alert('appUrlOpen. auth.userId = ' + userId)
+      await router.push({ path: 'auth',
+        query: { userId, loginType, userExist, needInvite, token, expires} })
+    }
   })
   // share для android
-  window.addEventListener('shareEventKalpa', (e) => {
+  window.addEventListener('shareEventKalpa', async (e) => {
     // Prevent the mini-info bar from appearing.
-    alert('shareEventKalpa !!!!!!!!!!!!!!!!!!!!!' + JSON.stringify(e))
+    alert('shareEventKalpa !' + JSON.stringify(e))
+    let shareItem = {
+      type: 'VIDEO',
+      url: e.dataKey,
+      file: null
+    }
+    alert('shareItem = ' + JSON.stringify(shareItem))
+    store.commit('workspace/stateSet', ['shareItem', shareItem], {root: true})
+    await router.push({ path: '/workspace/contentNotes', query: {share: true} })
   })
 }
 

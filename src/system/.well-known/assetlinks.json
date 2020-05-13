@@ -1,5 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target" : { "namespace": "android_app", "package_name": "app.kalpa",
-    "sha256_cert_fingerprints": ["A1:80:6C:2E:71:35:E3:6F:86:1A:91:4D:5B:69:B2:A9:E9:71:C3:F8:78:71:95:92:83:4D:90:EB:42:4D:73:B5"] }
-}]
