@@ -3,7 +3,11 @@ div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-10
   //- cover
   .row.full-width.justify-center
     div(:style=`{position: 'relative', height: '300px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
-      //- what
+      //- actions
+      q-btn(
+        round flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
+        :style=`{position: 'absolute', zIndex: 100, top: '16px', left: '8px'}`)
+      //- tint
       div(:style=`{position: 'absolute', zIndex: 10, borderRadius: '10px', background: 'rgba(0,0,0,0.2)'}`).row.fit
       img(
         @click="userCoverClick()"

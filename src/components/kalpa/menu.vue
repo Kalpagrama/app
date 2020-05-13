@@ -28,6 +28,9 @@
         router-link(
           v-if="$store.getters.currentUser"
           :to="'/user/'+$store.getters.currentUser.oid"
+          :class=`{
+            'bg-grey-7': $route.name === 'user'
+          }`
           :style=`{height: '70px'}`
           ).row.full-width.items-center.content-center
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center

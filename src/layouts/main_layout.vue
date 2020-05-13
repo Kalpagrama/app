@@ -6,7 +6,6 @@
 
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  //- kalpa-action
   //- menu
   div(
     v-if="$route.name !== 'welcome' && $q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
@@ -27,7 +26,6 @@ q-layout(view="hHh Lpr lff")
         v-else
         ).row.full-width.window-height.items-center.content-center.justify-center.bg-black
         q-spinner(color="green" size="50px")
-    //- h1.text-white hello
 </template>
 
 <script>

@@ -25,6 +25,7 @@ div(:style=`{position: 'relative'}`).column.fit
   .row.full-width.justify-center
     div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
       ws-content-finder(
+        ref="wsContentFinder"
         :sources="['url', 'device']"
         @content="contentFound")
   //- header: search, tabs
@@ -72,6 +73,13 @@ export default {
       ]
     }
   },
+  watch: {
+    // '$route.query.share': {
+    //   immediate: false,
+    //   handler (to, from) {
+    //   }
+    // }
+  },
   methods: {
     async contentClick (oid) {
       this.$log('contentClick', oid)
@@ -110,8 +118,26 @@ export default {
       this.contentClick(item.oid)
     }
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
+    // TODO wait for mounted wsContentFinder...
+    await this.$wait(1000)
+    let to = this.$route.query?.share
+    if (to) {
+      let item = this.$store.state.workspace.shareItem
+      this.$log('item', item)
+      if (item) {
+        switch (item.type) {
+          case 'VIDEO': {
+            let ref = this.$refs.wsContentFinder
+            this.$log('ref', ref)
+            ref.urlChanged(item.url)
+            // this.$store.commit('workspace/stateSet', ['shareItem', null])
+            break
+          }
+        }
+      }
+    }
   }
 }
 </script>

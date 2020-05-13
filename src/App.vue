@@ -6,7 +6,7 @@ div(id="q-app")
   export default {
     name: 'App',
     mounted () {
-      alert('app mounted: ' + window.location.toString())
+      // alert('app mounted: ' + window.location.toString())
     }
   }
 </script>
