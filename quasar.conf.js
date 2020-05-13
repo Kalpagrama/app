@@ -155,10 +155,10 @@ module.exports = function (ctx) {
       //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
       // },
       // https: true,
-      port: ctx.mode.capacitor || ctx.mode.cordova ? 8484 : ctx.mode.pwa ? 8383 : 8282,
-      host: ctx.mode.capacitor || ctx.mode.cordova || ctx.mode.spa ? null : 'mac.kalpa.app',
+      port: ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
+      host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
       // https: true,
-      https: ctx.mode.capacitor || ctx.mode.cordova || ctx.mode.spa ? false : {
+      https: ctx.mode.capacitor || ctx.mode.spa ? false : {
         key: fs.readFileSync('deploy/dev_server_cert/private.key'),
         cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
       },
