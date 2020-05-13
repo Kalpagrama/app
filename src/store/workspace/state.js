@@ -4,7 +4,10 @@ export default {
   revision: 0,
   item: null,
   itemType: undefined,
-  shareItem: null,
+  shareItem: {
+    type: 'VIDEO',
+    url: 'https://www.youtube.com/watch?v=KdDPhoyypcg'
+  },
   shareItemExample: {
     type: 'IMAGE', // VIDEO
     url: 'http://....',
