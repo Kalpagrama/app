@@ -25,6 +25,7 @@
     "build_ios_cordova": "quasar build -m cordova -T ios -ide",
     "build_ios": "quasar build -m capacitor -T ios -ide",
     "gql": "apollo schema:download -k ./src/schema/graphql.schema.json && node ./src/system/gql/possible_types.js",
+    "generate_icons": "icongenie generate -p .icongenie.profile.json",
     "tr": "i18next-scanner --config src/i18n/i18next-scanner.config.js",
     "lint": "eslint --ext .js,.vue src",
     "test": "echo \"No test specified\" && exit 0",
