@@ -21,26 +21,22 @@ div(:style=`{position: 'relative'}`).column.fit
               :style=`{
                 maxWidth: $store.state.ui.maxWidthPage+'px'
               }`)
-  //- header content finder
-  div(v-if="true").row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+  //- header: content finder, filters, edit
+  div(v-if="true").row.full-width.items-start.content-start.justify-center
+    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px', oveflow: 'hidden'}`).row.full-width.items-start.content-start.b-70
       ws-content-finder(
         ref="wsContentFinder"
         :sources="['url', 'device']"
         @content="contentFound")
-  //- header: search, tabs
-  .row.full-width.justify-center.q-pt-sm
-    div(
-      :style=`{
-        maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px', background: 'rgb(94,94,94)',
-        borderRadius: '10px', overflow: 'hidden'
-      }`
-      ).row.full-width.items-center.content-center.q-pa-sm
-      .col
-        kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
-      q-btn(
-        flat color="grey-2" no-caps
-        :style=`{height: '40px'}`).bg-grey-7 Spheres
+      div(
+        :style=`{
+        }`
+        ).row.full-width.items-center.content-center.q-px-sm
+        .col
+          kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
+        q-btn(
+          flat color="grey-2" no-caps
+          :style=`{height: '36px'}`).b-90 Spheres
   //- body
   .col.full-width.scroll
     .row.full-width.justify-center

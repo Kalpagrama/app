@@ -8,8 +8,8 @@
 div(:style=`{position: 'relative'}`).column.fit
   //- header
   div(
-    :style=`{borderRadius: '10px', overflow: 'hidden'}`
-    ).row.full-width.q-pa-sm.bg-grey-8
+    :style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+    ).row.full-width.q-pa-sm.b-70
     q-input(
       v-model="sphereInput"
       filled color="green" placeholder="Find or add sphere"
@@ -56,7 +56,7 @@ div(:style=`{position: 'relative'}`).column.fit
 // TODO add spheres drag and drop sorting, selecting, color shit, exploring...
 
 export default {
-  name: 'wsSpheres',
+  name: 'wsTags',
   data () {
     return {
       sphere: null,
@@ -107,9 +107,7 @@ export default {
       let sphereInput = {
         name: name,
         wsItemType: 'SPHERE',
-        rawData: {
-          color: 'red'
-        }
+        color: 'red'
       }
       // TODO add color picker
       this.$log('sphereInput', sphereInput)

@@ -11,7 +11,7 @@
     //- input url
     div(
       v-if="sources.includes('url')"
-      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-pa-sm.bg-grey-8
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-px-sm
       div(:style=`{position: 'relative'}`).row.fit
         //- progress bar
         div(

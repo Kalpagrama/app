@@ -105,9 +105,9 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.$wait(200).then(() => {
-      this.tabChanged('layers')
-    })
+    // this.$wait(200).then(() => {
+    //   this.tabChanged('layers')
+    // })
   }
 }
 </script>

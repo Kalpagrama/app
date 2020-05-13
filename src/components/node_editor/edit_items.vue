@@ -6,9 +6,9 @@
 </style>
 
 <template lang="pug">
-.column.fit
+.row.full-width.items-start.content-start
   //- add first item
-  div(v-if="node.items.length === 0").col.full-width.q-px-sm.q-pb-sm
+  div(v-if="node.items.length === 0").row.fit.q-px-sm.q-pb-sm
     div(:style=`{borderRadius: '10px'}`).column.fit.b-50
       div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
         span(:style=`{}`).text-white.text-bold Select first item
@@ -19,7 +19,7 @@
           @item="itemFound"
           @cancel="itemFinderOpened = false")
   //- node.items
-  div(v-if="node.items.length > 0").col.full-width.scroll
+  div(v-if="node.items.length > 0").row.full-width
     .row.full-width.items-start.content-start
       //- dialogs
       //- ws item finder dialog
@@ -59,16 +59,17 @@
       //- items
       div(
         v-for="(i, ii) in node.items" :key="i.oid"
+        :ref="`item-${i.oid}`"
         :class=`{}`
         :style=`{
           position: 'relative',
-          height: '860px',
+          height: $q.screen.height+'px',
           borderRadius: '10px',
           overflow: 'hidden',
-          maxHeight: itemsEdit[i.oid] ? '860px' : '460px',
+          maxHeight: itemsEdit[i.oid] ? $q.screen.height+'px' : '460px',
         }`
         ).row.full-width.q-mb-sm
-        //- composition actions LEFT: select, mini
+        //- item actions LEFT: select, mini
         div(
           :style=`{width: '60px'}`
           ).row.full-height.justify-center.items-between.content-between.q-px-sm
@@ -77,32 +78,16 @@
           q-btn(
             round flat color="white" @click="itemEdit(i.oid)"
             :icon="itemsEdit[i.oid] ? 'keyboard_arrow_up' : 'edit'").bg-grey-9
-        //- composition container
+        //- item container
         div(
           @mouseenter="itemsActive[i.oid] = true"
           @mouseleave="itemsActive[i.oid] = false"
           :style=`{position: 'relative', maxWidth: '100%'}`).col.full-height
-          composition(
+          composition-editor(
             ctx="workspace"
-            :value="i"
-            :visible="true"
-            :active="true"
-            :mini="false"
-            :styles=`{
-              paddingBottom: itemsEdit[i.oid] === true ? '480px' : '0px'
-            }`)
-            template(v-slot:editor=`{content, player, meta}`)
-              composer(
-                v-if="itemsEdit[i.oid]"
-                ctx="workspace"
-                :composition="i"
-                :player="player" :meta="meta"
-                @meta="$parent.emit('meta', $event)"
-                @cancel="$emit('cancel')"
-                :styles=`{
-                  paddingBottom: itemsEdit[i.oid] === true ? 460 : 0
-                }`)
-        //- composition actions RIGHT: delete, edit, add
+            :composition="i"
+            :options=`{visible: true, active: true, mini: false}`)
+        //- item actions RIGHT: delete, edit, add
         div(:style=`{width: '60px'}`).row.full-height.justify-center.items-between.content-between.q-px-sm
           q-btn(round flat color="grey-6" icon="drag_indicator").bg-grey-9
           q-btn(round flat color="red-5" icon="delete_outline" @click="itemDelete(i.oid)"
@@ -191,6 +176,10 @@ export default {
       else {
         this.$set(this.itemsEdit, oid, true)
       }
+      let ref = this.$refs[`item-${oid}`][0]
+      this.$log('ref', ref.offsetTop)
+      this.$emit('scrollTo', ref.offsetTop)
+      // ref.scrollIntoView(true)
     },
     itemDelete (oid) {
       this.$log('itemDelete', oid)

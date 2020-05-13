@@ -29,35 +29,29 @@ div(:style=`{position: 'relative'}`).column.fit
   //- header
   .row.full-width.justify-center
     div(
-      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.content-center.q-pa-sm.bg-grey-8
-      .col.q-pr-sm
-        q-input(
-          v-model="nodeSearchString" filled color="green"
-          placeholder="Find or add node"
-          :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
-          ).full-width.bg-grey-1
-      div(:style=`{}`).row.full-height
+      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+      ).row.full-width.items-start.content-start.q-px-sm.b-70
+      .row.full-width
+        .col.q-pr-sm
+          q-input(
+            v-model="nodeSearchString" filled color="green"
+            placeholder="Find or add node"
+            :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+            ).full-width.bg-grey-1
+        div(:style=`{}`).row.full-height
+          q-btn(
+            push color="green" icon="add" @click="nodeAddStart()"
+            :style=`{height: '56px', width: '56px'}`)
+      .row.full-width.items-center.content-center
+        .col
+          kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
         q-btn(
-          push color="green" icon="add" @click="nodeAddStart()"
-          :style=`{height: '56px', width: '56px'}`)
-  //- header: search, tabs
-  .row.full-width.justify-center.q-pt-sm
-    div(
-      :style=`{
-        maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px', background: 'rgb(94,94,94)',
-        borderRadius: '10px', overflow: 'hidden'
-      }`
-      ).row.full-width.items-center.content-center.q-pa-sm
-      .col
-        kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
-      q-btn(
-        flat color="grey-2" no-caps
-        :style=`{height: '40px'}`).bg-grey-7 Spheres
-      q-btn(
-        flat round color="grey-2" icon="edit"
-        :style=`{}`
-        ).bg-grey-7.q-ml-sm
+          flat color="grey-2" no-caps
+          :style=`{height: '36px'}`).q-mr-sm.b-90 Tags
+        q-btn(
+          flat color="grey-2" icon="edit"
+          :style=`{height: '36px'}`
+          ).b-90
   //- body
   .col.full-width.scroll
     .row.full-width.justify-center

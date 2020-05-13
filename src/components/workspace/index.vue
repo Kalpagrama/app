@@ -10,11 +10,11 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
   kalpa-menu-right
     menu-right(:pages="pages")
   //- header
-  .row.full-width.justify-center
+  .row.full-width.justify-center.q-pt-sm
     div(
-      :style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`
-      ).row.full-width.items-center.content-center
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").b-50
+      :style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0'}`
+      ).row.full-width.items-center.content-center.q-px-sm.b-70
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
           q-icon(name="school" size="36px" color="white")
@@ -38,12 +38,12 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
   //-         composition-editor(
   //-           v-if="item"
   //-           ctx="workspace"
-  //-           :composition="item.rawData"
+  //-           :composition="item"
   //-           @cancel="pageDialogOpened = fals"
   //-           :style=`{
   //-             maxWidth: $store.state.ui.maxWidthPage+'px'
   //-           }`)
-  .col.full-width.q-pt-sm
+  .col.full-width
     //- q-page-container
     //-   q-page
     .row.fit.justify-center
@@ -52,7 +52,7 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
           maxWidth: $store.state.ui.maxWidthPage+'px',
         }`).row.fit
         ws-settings(v-if="$route.params.page === 'settings'")
-        ws-spheres(v-if="$route.params.page === 'spheres'")
+        ws-tags(v-if="$route.params.page === 'tags'")
         ws-items(
           v-else
           ctx="workspace"
@@ -62,14 +62,14 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
 
 <script>
 import wsItems from './ws_items'
-import wsSpheres from './ws_spheres'
+import wsTags from './ws_tags'
 import wsSettings from './ws_settings'
 import wsItemSaver from './ws_item_saver'
 import menuRight from './menu_right'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsSpheres, wsSettings, wsItemSaver, menuRight},
+  components: {wsItems, wsTags, wsSettings, wsItemSaver, menuRight},
   props: [],
   data () {
     return {
@@ -80,7 +80,7 @@ export default {
         {id: 'contentNotes', name: 'Contents'},
         {id: 'node', name: 'Nodes'},
         {id: 'chain', name: 'Chains'},
-        {id: 'spheres', name: 'Spheres'},
+        {id: 'tags', name: 'Tags'},
         {id: 'settings', name: 'Settings'}
       ]
     }

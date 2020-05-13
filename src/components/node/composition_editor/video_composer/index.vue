@@ -1,23 +1,21 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit.bg-grey-10
-  composition(
-    v-if="composition"
-    ctx="workspace"
-    :value="composition"
-    :content="content"
-    :visible="true" :active="true" :mini="false"
-    :styles=`{
-      paddingLeft: styles.paddingLeft+'px',
-      paddingRight: styles.paddingRight+'px',
-      paddingBottom: styles.paddingBottom+'px',
-      paddingTop: styles.paddingTop+'px',
-    }`).fit
-    template(v-slot:editor=`{content, player, meta}`)
-      composer(
-        ctx="workspace"
-        :composition="composition"
-        :player="player" :meta="meta" @meta="$parent.emit('meta', $event)"
-        :styles="styles" @cancel="$emit('cancel')")
+composition(
+  v-if="composition"
+  :ctx="ctx"
+  :value="composition"
+  :visible="options.visible" :active="options.active" :mini="options.mini"
+  :styles=`{
+    paddingLeft: styles.paddingLeft+'px',
+    paddingRight: styles.paddingRight+'px',
+    paddingBottom: styles.paddingBottom+'px',
+    paddingTop: styles.paddingTop+'px',
+  }`)
+  template(v-slot:editor=`{player, meta}`)
+    composer(
+      :ctx="ctx"
+      :composition="composition"
+      :player="player" :meta="meta" @meta="$parent.emit('meta', $event)"
+      :styles="styles" @cancel="$emit('cancel')")
 </template>
 
 <script>
@@ -26,7 +24,20 @@ import composer from './composer'
 export default {
   name: 'videoComposer',
   components: {composer},
-  props: ['ctx', 'mode', 'composition', 'content'],
+  props: {
+    ctx: {type: String},
+    composition: {type: Object},
+    options: {
+      type: Object,
+      default () {
+        return {
+          visible: true,
+          active: true,
+          mini: false
+        }
+      }
+    }
+  },
   data () {
     return {
       styles: {

@@ -216,30 +216,27 @@ export default {
       this.$log('layersSelectedCreateNode start')
       // open node-editor modal? or just save it to workspace as node?
       let nodeInput = {
-        name: '',
         wsItemType: 'NODE',
-        rawData: {
-          name: '',
-          spheres: [],
-          category: 'FUN',
-          layout: 'PIP',
-          items: [
-            {
-              oid: Date.now().toString(),
-              contentOid: this.meta.content.oid,
-              layers: this.layersSelected.reduce((acc, val) => {
-                acc.push(this.meta.layers[val])
-                return acc
-              }, []),
-              spheres: [],
-              operation: {
-                items: null,
-                operations: null,
-                type: 'CONCAT'
-              }
+        name: '',
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP',
+        items: [
+          {
+            oid: Date.now().toString(),
+            contentOid: this.meta.content.oid,
+            layers: this.layersSelected.reduce((acc, val) => {
+              acc.push(this.meta.layers[val])
+              return acc
+            }, []),
+            spheres: [],
+            operation: {
+              items: null,
+              operations: null,
+              type: 'CONCAT'
             }
-          ],
-        }
+          }
+        ]
       }
       this.$log('layersSelectedCreateNode nodeInput', nodeInput)
       this.layersSelected = []
