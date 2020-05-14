@@ -73,7 +73,7 @@ export default {
     value: {
       immediate: true,
       async handler (to, from) {
-        this.$log('value CHANGED', to)
+        // this.$log('value CHANGED', to)
         if (to) {
           if (this.ctx === 'workspace') {
             this.composition = to

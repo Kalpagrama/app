@@ -6,7 +6,45 @@
 </style>
 
 <template lang="pug">
-.row.full-width.items-start.content-start
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+  div(:style=`{marginTop: '-10px', borderRadius: '0 0 10px 10px'}`).row.full-width.q-pt-md.q-pb-sm.q-px-sm.b-80.q-mb-sm
+    .col
+    q-btn(flat round color="white" icon="edit")
+  //- dialogs
+  //- ws item finder dialog
+  q-dialog(v-model="itemFinderOpened" maximized position="bottom")
+    div(:style=`{height: $q.screen.height+'px', paddingTop: paddingTop+'px'}` @click.self="itemFinderOpened = false"
+      ).row.full-width.items-start.content-start.justify-center.q-px-sm
+      div(
+        :style=`{
+          position: 'relative',
+          maxWidth: $store.state.ui.maxWidthPage+'px',
+          borderRadius: '10px', overflow: 'hidden',
+          height: $q.screen.height-8-8+'px'
+        }`).row.full-width.bg-grey-9
+        ws-item-finder(
+          v-if="true"
+          :types="['contentNotes', 'node']"
+          :options="{header: true, backButton: true}"
+          @item="itemFound"
+          @cancel="itemFinderOpened = false")
+  //- composition editor dialog
+  q-dialog(v-model="itemEditorOpened" maximized position="bottom")
+    div(:style=`{height: $q.screen.height+'px', paddingTop: 0+'px'}` @click.self="itemEditorOpened = false"
+      ).row.full-width.items-start.content-start.justify-center.q-px-sm
+      div(
+        :style=`{
+          position: 'relative', zIndex: 200, transform: 'translate3d(0,0,0)',
+          maxWidth: $store.state.ui.maxWidthPage+'px',
+          borderRadius: '10px', overflow: 'hidden',
+          height: $q.screen.height+'px'
+        }`
+        ).row.full-width
+        composition-editor(
+          v-if="node.items[itemIndex]"
+          :composition="node.items[itemIndex]" :content="node.items[itemIndex].content"
+          @cancel="itemEditorOpened = false"
+          ).bg-grey-8
   //- add first item
   div(v-if="node.items.length === 0").row.fit.q-px-sm.q-pb-sm
     div(:style=`{borderRadius: '10px'}`).column.fit.b-50
@@ -20,42 +58,7 @@
           @cancel="itemFinderOpened = false")
   //- node.items
   div(v-if="node.items.length > 0").row.full-width
-    .row.full-width.items-start.content-start
-      //- dialogs
-      //- ws item finder dialog
-      q-dialog(v-model="itemFinderOpened" maximized position="bottom")
-        div(:style=`{height: $q.screen.height+'px', paddingTop: paddingTop+'px'}` @click.self="itemFinderOpened = false"
-          ).row.full-width.items-start.content-start.justify-center.q-px-sm
-          div(
-            :style=`{
-              position: 'relative',
-              maxWidth: $store.state.ui.maxWidthPage+'px',
-              borderRadius: '10px', overflow: 'hidden',
-              height: $q.screen.height-8-8+'px'
-            }`).row.full-width.bg-grey-9
-            ws-item-finder(
-              v-if="true"
-              :types="['contentNotes', 'node']"
-              :options="{header: true, backButton: true}"
-              @item="itemFound"
-              @cancel="itemFinderOpened = false")
-      //- composition editor dialog
-      q-dialog(v-model="itemEditorOpened" maximized position="bottom")
-        div(:style=`{height: $q.screen.height+'px', paddingTop: 0+'px'}` @click.self="itemEditorOpened = false"
-          ).row.full-width.items-start.content-start.justify-center.q-px-sm
-          div(
-            :style=`{
-              position: 'relative', zIndex: 200, transform: 'translate3d(0,0,0)',
-              maxWidth: $store.state.ui.maxWidthPage+'px',
-              borderRadius: '10px', overflow: 'hidden',
-              height: $q.screen.height+'px'
-            }`
-            ).row.full-width
-            composition-editor(
-              v-if="node.items[itemIndex]"
-              :composition="node.items[itemIndex]" :content="node.items[itemIndex].content"
-              @cancel="itemEditorOpened = false"
-              ).bg-grey-8
+    .row.full-width.items-start.content-start.q-px-sm
       //- items
       div(
         v-for="(i, ii) in node.items" :key="i.oid"
@@ -63,37 +66,46 @@
         :class=`{}`
         :style=`{
           position: 'relative',
-          height: $q.screen.height+'px',
           borderRadius: '10px',
-          overflow: 'hidden',
-          maxHeight: itemsEdit[i.oid] ? $q.screen.height+'px' : '460px',
+          overflow: 'hidden'
         }`
-        ).row.full-width.q-mb-sm
-        //- item actions LEFT: select, mini
+        ).row.full-width.items-start.content-start.q-mb-sm
+        div(:style=`{height: '500px'}`).row.full-width
+          //- item actions LEFT: select, mini
+          div(
+            v-if="false"
+            :style=`{width: '60px'}`
+            ).row.full-height.justify-center.items-between.content-between.q-px-sm
+            q-checkbox(v-model="itemsSelected" :val="i.oid" dark dense color="grey-6"
+              :style=`{borderRadius: '10px', padding: '10px'}`).bg-grey-9
+            q-btn(
+              round flat color="white" @click="itemEdit(i.oid)"
+              :icon="itemsEdit[i.oid] ? 'keyboard_arrow_up' : 'edit'").bg-grey-9
+          //- item container
+          div(
+            @mouseenter="itemsActive[i.oid] = true"
+            @mouseleave="itemsActive[i.oid] = false"
+            :style=`{position: 'relative', maxWidth: '100%'}`).col.full-height
+            composition-editor(
+              ctx="workspace"
+              :composition="i"
+              :options=`{visible: true, active: true, mini: false}`)
+          //- item actions RIGHT: delete, edit, add
+          div(
+            v-if="false"
+            :style=`{width: '60px'}`).row.full-height.justify-center.items-between.content-between.q-px-sm
+            q-btn(round flat color="grey-6" icon="drag_indicator").bg-grey-9
+            q-btn(round flat color="red-5" icon="delete_outline" @click="itemDelete(i.oid)"
+              :style=`{background: 'rgba(0,0,0,0.1)'}`).bg-grey-9
+        //- footer
         div(
-          :style=`{width: '60px'}`
-          ).row.full-height.justify-center.items-between.content-between.q-px-sm
+          :style=`{marginTop: '-10px'}`
+          ).row.full-width.items-center.content-center.q-px-sm.q-pt-md.q-pb-sm.b-70
           q-checkbox(v-model="itemsSelected" :val="i.oid" dark dense color="grey-6"
-            :style=`{borderRadius: '10px', padding: '10px'}`).bg-grey-9
-          q-btn(
-            round flat color="white" @click="itemEdit(i.oid)"
-            :icon="itemsEdit[i.oid] ? 'keyboard_arrow_up' : 'edit'").bg-grey-9
-        //- item container
-        div(
-          @mouseenter="itemsActive[i.oid] = true"
-          @mouseleave="itemsActive[i.oid] = false"
-          :style=`{position: 'relative', maxWidth: '100%'}`).col.full-height
-          composition-editor(
-            ctx="workspace"
-            :composition="i"
-            :options=`{visible: true, active: true, mini: false}`)
-        //- item actions RIGHT: delete, edit, add
-        div(:style=`{width: '60px'}`).row.full-height.justify-center.items-between.content-between.q-px-sm
-          q-btn(round flat color="grey-6" icon="drag_indicator").bg-grey-9
-          q-btn(round flat color="red-5" icon="delete_outline" @click="itemDelete(i.oid)"
-            :style=`{background: 'rgba(0,0,0,0.1)'}`).bg-grey-9
-          //- q-btn(round flat color="white" icon="edit" @click="itemEdit(i.oid)").bg-grey-9
-      //- add second and beyond items
+            :style=`{borderRadius: '10px', padding: '10px'}`).b-90
+          .col
+          q-btn(round flat color="white" icon="more_vert").b-90
+      //- ADD second and beyond items
       div(v-if="node.items.length > 0").row.full-width
         div(:style=`{width: '60px'}`).row.q-pa-sm
         .col.q-pb-sm
@@ -178,7 +190,7 @@ export default {
       }
       let ref = this.$refs[`item-${oid}`][0]
       this.$log('ref', ref.offsetTop)
-      this.$emit('scrollTo', ref.offsetTop)
+      this.$emit('scrollTo', ref.offsetTop - 8)
       // ref.scrollIntoView(true)
     },
     itemDelete (oid) {

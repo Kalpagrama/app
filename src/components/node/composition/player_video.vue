@@ -127,10 +127,11 @@ div(
         position: 'absolute', zIndex: 20000, bottom: '0px', left: '0px', transform: 'translate3d(0,0,0)',
         maxWidth: itemsCount > 1 ? '75%' : 'calc(100% - 80px)'
       }`)
+    //- progress tint
     div(
       :style=`{
         position: 'absolute', zIndex: 2000, height: '77px', bottom: '0px', pointerEvents: 'none',
-        borderRadius: '0 0 10px 10px',
+        borderRadius: '10px', overflow: 'hidden',
         background: 'rgb(0,0,0)',
         background: 'linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 100%)'
       }`).row.full-width

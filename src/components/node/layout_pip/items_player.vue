@@ -51,7 +51,7 @@ div(
       ).row.items-center.content-center.justify-center.cursor-pointer.item-prev
         q-btn(round flat color="white" icon="keyboard_arrow_left")
     //- item last
-    div(v-if="itemIndex+1 === items.length" @click="itemsAgain()"
+    div(v-if="items.length > 1 && itemIndex+1 === items.length" @click="itemsAgain()"
       :style=`{
         position: 'absolute', zIndex: 20000, right: '0px', bottom: '0px',
         maxWidth: '25%', height: '100px',

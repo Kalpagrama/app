@@ -6,23 +6,11 @@
 
 <template lang="pug">
 //- q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', background: '#333'}`)
+//- div(:style=`{position: 'relative'}`).row.full-width
 div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-width
   kalpa-menu-right
     menu-right(:pages="pages")
   //- header
-  .row.full-width.justify-center.q-pt-sm
-    div(
-      :style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px 10px 0 0'}`
-      ).row.full-width.items-center.content-center.q-px-sm.b-70
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
-          q-icon(name="school" size="36px" color="white")
-      .col
-        .row.fit.items-center.content-center
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold Workspace
-          .row.full-width
-            small.text-white {{ pages.find(p => p.id === $route.params.page).name }}
   //- kalpa-menu-footer
   //-   template(v-slot:menuRight)
   //-     menu-right(:pages="pages")
@@ -43,14 +31,12 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
   //-           :style=`{
   //-             maxWidth: $store.state.ui.maxWidthPage+'px'
   //-           }`)
-  .col.full-width
-    //- q-page-container
-    //-   q-page
-    .row.fit.justify-center
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.maxWidthPage+'px',
-        }`).row.fit
+  //- .col.full-width
+  //-   //- q-page-container
+  //-   //-   q-page
+  div(:style=`{}`).col.full-width.scroll.q-mb-sm
+    .row.fit.items-start.content-start.justify-center
+      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit
         ws-settings(v-if="$route.params.page === 'settings'")
         ws-tags(v-if="$route.params.page === 'tags'")
         ws-items(
@@ -58,6 +44,19 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
           ctx="workspace"
           :pages="pages" :page="$route.params.page"
           @page="$router.push({params: {page: $event}}).catch(e=>e)")
+          template(v-slot:header)
+            div(
+              :style=`{position: 'relative', height: '60px', borderRadius: '10px'}`
+              ).row.full-width.items-center.content-center.q-px-sm.b-100
+              q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+              div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+                q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
+                  q-icon(name="school" size="36px" color="white")
+              .col
+                .row.fit.items-center.content-center
+                  span(:style=`{fontSize: '18px'}`).text-white.text-bold Workspace
+                  .row.full-width
+                    small.text-white {{ pages.find(p => p.id === $route.params.page).name }}
 </template>
 
 <script>
@@ -80,7 +79,7 @@ export default {
         {id: 'contentNotes', name: 'Contents'},
         {id: 'node', name: 'Nodes'},
         {id: 'chain', name: 'Chains'},
-        {id: 'tags', name: 'Tags'},
+        {id: 'spheres', name: 'Spheres'},
         {id: 'settings', name: 'Settings'}
       ]
     }

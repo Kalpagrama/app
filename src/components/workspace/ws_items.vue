@@ -1,5 +1,7 @@
 <template lang="pug">
 component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('add', $event)" :ctx="ctx" :options="options")
+  template(v-slot:header)
+    slot(name="header")
 </template>
 
 <script>

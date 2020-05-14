@@ -1,11 +1,13 @@
 <style lang="sass">
 .node-item
   &:hover
-    background: #777 !important
+    background: rgb(100,100,100) !important
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
+//- div(:style=`{position: 'relative'}`).row.full-width
+//- q-layout(container :style=`{height: $q.screen.height+'px'}`)
+.column.fit
   //- dialogs
   //- node editor
   q-dialog(
@@ -29,8 +31,8 @@ div(:style=`{position: 'relative'}`).column.fit
   //- header
   .row.full-width.justify-center
     div(
-      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
-      ).row.full-width.items-start.content-start.q-px-sm.b-70
+      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px', overflow: 'hidden'}`
+      ).row.full-width.items-start.content-start.q-px-sm.b-100.br
       .row.full-width
         .col.q-pr-sm
           q-input(
@@ -47,41 +49,35 @@ div(:style=`{position: 'relative'}`).column.fit
           kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
         q-btn(
           flat color="grey-2" no-caps
-          :style=`{height: '36px'}`).q-mr-sm.b-90 Tags
+          :style=`{height: '36px'}`).q-mr-sm.b-90 Spheres
         q-btn(
           flat color="grey-2" icon="edit"
           :style=`{height: '36px'}`
           ).b-90
   //- body
   .col.full-width.scroll
-    .row.full-width.justify-center
-      div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px'}`
-        ).row.full-width.items-start.content-start.q-pt-sm
-        //- nodes
-        kalpa-loader(type="NODE_LIST")
-          template(v-slot="{items}")
-            .row.full-width.items-start
-              div(
-                v-for="(n, ni) in nodesFilter(items)" :key="n.oid"
-                :style=`{
-                  height: '40px'
-                }`
-                ).row.full-width.q-mb-xs
-                //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
-                //-   q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
-                .col
-                  div(
-                    @click="nodeClick(n.oid)"
-                    :style=`{
-                      borderRadius: '10px', overflow: 'hidden'
-                    }`
-                    ).row.fit.items-center.content-center.q-px-md.cursor-pointer.node-item.bg-grey-8
-                    span(:style=`{userSelect: 'none'}`).text-white {{ n.name }}
-                //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
-                //-   q-btn(round flat dense color="grey-6" icon="more_vert")
-              div(:style=`{height: '500px'}`).row.full-width
-  //- .row.full-width
-    span nodesSelected: {{nodesSelected}}
+    .row.full-width.items-start.content-start.q-pt-md
+      kalpa-loader(type="NODE_LIST")
+        template(v-slot="{items}")
+          .row.full-width.items-start
+            div(
+              v-for="(n, ni) in nodesFilter(items)" :key="n.oid"
+              :style=`{
+                height: '40px'
+              }`
+              ).row.full-width.q-mb-xs
+              //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
+              //-   q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
+              .col
+                div(
+                  @click="nodeClick(n.oid)"
+                  :style=`{
+                    borderRadius: '10px', overflow: 'hidden'
+                  }`
+                  ).row.fit.items-center.content-center.q-px-md.cursor-pointer.node-item.b-70
+                  span(:style=`{userSelect: 'none'}`).text-white {{ n.name }}
+              //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
+              //-   q-btn(round flat dense color="grey-6" icon="more_vert")
 </template>
 
 <script>

@@ -1,21 +1,30 @@
+<style lang="sass" scoped>
+.menu-item
+  &:hover
+    background: rgb(70,70,70) !important
+</style>
+
 <template lang="pug">
 div(
   :style=`{
-    borderRadius: '10px', overflow: 'hidden', background: 'rgb(54,54,54)'
+    borderRadius: '10px', overflow: 'hidden'
   }`
-  ).column.full-width
+  ).column.full-width.b-50
   //- .col.full-width.scroll
   .row.full-width.items-start
     router-link(
       :to="p.id"
       v-for="(p,pi) in pages" :key="pi"
       :class=`{
-        'bg-grey-7': $route.params.page === p.id
+        'b-100': $route.params.page === p.id
       }`
-      :style=`{height: '40px'}`
-      ).row.full-width.items-center.content-center.ws-menu-item.q-px-md
+      :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.menu-item.q-px-md
       span(
         :class=`{
+        }`
+        :style=`{
+          fontSize: '16px'
         }`
         ).text-white {{ p.name }}
 </template>

@@ -9,7 +9,7 @@ composition(
     paddingRight: styles.paddingRight+'px',
     paddingBottom: styles.paddingBottom+'px',
     paddingTop: styles.paddingTop+'px',
-  }`)
+  }`).b-100
   template(v-slot:editor=`{player, meta}`)
     composer(
       :ctx="ctx"

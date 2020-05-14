@@ -1,6 +1,6 @@
 <template lang="pug">
 //- container :style=`{height: $q.screen.height+'px'}`
-q-layout(view="hHh lpR fFf").bg-grey-10
+q-layout(view="hHh lpR fFf").b-30
   q-header(reveal).row.full-width.justify-center.q-px-xs
     div(
       :style=`{
@@ -9,7 +9,7 @@ q-layout(view="hHh lpR fFf").bg-grey-10
         zIndex: 10000,
         borderRadius: '0 0 10px 10px', overflow: 'hidden'
       }`
-      ).row.full-width.items-center.content-center.justify-center.bg-grey-8
+      ).row.full-width.items-center.content-center.justify-center.b-100
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
       .col.full-height

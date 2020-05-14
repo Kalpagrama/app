@@ -16,7 +16,7 @@ div(:style=`{}`).column.fit
   //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
   div(
     v-if="height > 100"
-    :style=`{height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+    :style=`{height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-60
     layer-editor-figures(
       v-if="meta.content"
       :player="player" :meta="meta" @meta="$emit('meta', $event)")
@@ -24,7 +24,7 @@ div(:style=`{}`).column.fit
   div(
     ref="extraNodesScroll"
     :style=`{position: 'relative', overflowX: 'hidden'}`
-    ).col.full-width.scroll.bg-grey-9
+    ).col.full-width.scroll.b-60
     div(:style=`{marginTop: '0px', marginBottom: '80px'}`).row.full-width.items-start.content-start.q-pt-sm.q-px-xs
       draggable(
         :list="meta.layers" group="layers" handle=".layer-drag-handle"
@@ -126,10 +126,10 @@ div(:style=`{}`).column.fit
           span.text-white {{$time(l.figuresAbsolute[0].t)}}-{{$time(l.figuresAbsolute[1].t)}}
   //- layers selected
   div(:style=`{overflow: 'hidden'}`).row.full-width
-    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
+    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
         v-if="layersSelected.length > 0"
-        :style=`{height: '44px', background: 'rgb(81,81,81)'}`).row.full-width.q-px-xs
+        :style=`{borderRadius: '10px 10px 0 0', marginBottom: '-20px', paddingBottom: '20px'}`).row.full-width.q-px-xs.b-70
         //- left: total selected layers number
         div(:style=`{height: '44px', width: '40px'}`).row.items-center.content-center.justify-center
           div(:style=`{height: '18px', minWidth: '18px', borderRadius: '2px'}`).row.items-center.content-center.justify-center.bg-grey-6
@@ -144,27 +144,27 @@ div(:style=`{}`).column.fit
   //- footer
   div(
     v-if="true"
-    :style=`{height: '50px'}`
-    ).row.full-width.items-center.content-center.bg-grey-8.q-px-sm
+    :style=`{borderRadius: '10px 10px 0 0', marginBottom: '-20px', paddingBottom: '30px'}`
+    ).row.full-width.items-center.content-center.q-pa-sm.b-80
     //- actions wrapper: play all, watch, workspace
     .col
       //- actions
       q-btn(
         @click="layersPlayAll()"
         flat color="white" no-caps
-        ).bg-grey-7.q-mr-sm Play all
+        ).q-mr-sm.b-100 Play all
       q-btn(
         @click="layersWatch()"
         flat color="white" no-caps
-        ).bg-grey-7.q-mr-sm Watch
+        ).q-mr-sm.b-100 Watch
       q-btn(
         v-if="composition.layersWorkspace"
         @click="showLayersFromWorkspace = !showLayersFromWorkspace"
-        round flat icon="school" color="grey-2")
+        round flat icon="school" color="grey-2").b-100
     //- right: total
     q-btn(
       flat no-caps color="white"
-      ).bg-grey-7 Total: {{$time(layersTotalTime)}}
+      ).b-100 Total: {{$time(layersTotalTime)}}
 </template>
 
 <script>
