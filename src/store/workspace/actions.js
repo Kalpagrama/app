@@ -2,6 +2,7 @@ import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { denormalizeWSItem, normalizeWSItem } from 'src/store/workspace/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
@@ -58,25 +59,6 @@ export const wsItems = async (context, collection) => {
     { key: listKeyPattern + collection, fetchItemFunc }, { root: true })
   logD('wsItems complete')
   return wsFeedResult
-}
-
-// todo extendedFields - временное решение для элементов мастерской (пока структура элемента мастерской не стабилизировалась) В последствии планируестся провести через графкуэль
-function denormalizeWSItem (item) {
-  let wsItem = { extendedFields: {} }
-  for (let key of Object.keys(item)) {
-    if (['oid', 'unique', 'thumbOid', 'name', 'wsItemType', 'revision'].includes(key)) {
-      wsItem[key] = item[key]
-    } else {
-      wsItem.extendedFields[key] = item[key]
-    }
-  }
-  return wsItem
-}
-function normalizeWSItem (item) {
-  assert(item.extendedFields, '!item.extendedFields')
-  let wsItem = {...item, ...item.extendedFields}
-  delete wsItem.extendedFields
-  return wsItem
 }
 
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events

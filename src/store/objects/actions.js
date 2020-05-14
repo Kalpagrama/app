@@ -1,6 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
 import assert from 'assert'
+import { normalizeWSItem } from 'src/store/workspace/index'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
@@ -125,6 +126,7 @@ class QueryAccumulator {
       let objectList = result.data.objectList
       for (let item of itemsForQuery) {
         let object = objectList.find(obj => obj.oid === item.oid)
+        if (object.type === 'WS_ITEM') object = normalizeWSItem(object)
         // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
         if (object && !object.deletedAt) {
           this.resolveItem(object)

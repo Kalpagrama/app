@@ -4,6 +4,7 @@ import { notify } from 'src/boot/notify'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
+import { normalizeWSItem } from 'src/store/workspace/index'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
@@ -175,12 +176,6 @@ async function processEvent (context, event) {
 
 async function processEventWs (context, event) {
   assert(event.wsRevision)
-  function normalizeWSItem (item) {
-    assert(item.extendedFields, '!item.extendedFields2')
-    let wsItem = {...item, ...item.extendedFields}
-    delete wsItem.extendedFields
-    return wsItem
-  }
   if (event.wsRevision - context.rootState.workspace.revision > 1 ||
     context.rootState.workspace.revision > event.wsRevision // при очистке мастерской могло произойти такое
   ) {
