@@ -3,6 +3,7 @@ import { fragments } from 'src/schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { denormalizeWSItem, normalizeWSItem } from 'src/store/workspace/index'
+import { clearCache } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
@@ -28,6 +29,8 @@ export const wsClear = async (context) => {
       }
     `
   })
+  await clearCache()
+  await window.location.reload()
   logD('wsClear done', wsClear)
   return wsClear
 }

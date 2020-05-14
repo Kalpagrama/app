@@ -14,12 +14,16 @@ export const init = async (context, cache_) => {
   context.commit('init')
   logD('cache/init done')
 }
-
-// fetchItemFunc ф-я для получения данных с сервера
+/*!
+ * модуль для кэширования данных во вьюикс
+ * реальный класс кэширования cache - src/boot/cache.js
+ * во вьюикс - временный кэш. Постоянный - в boot/cache
+ */
 export const clear = async (context) => {
   assert(context.state.initialized, '!context.state.initialized')
   return await cache.clear()
 }
+// fetchItemFunc ф-я для получения данных с сервера
 export const get = async (context, { key, fetchItemFunc, force }) => {
   assert(context.state.initialized, '!context.state.initialized')
   assert(typeof key === 'string', 'typeof key === string')
