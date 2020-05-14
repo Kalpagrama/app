@@ -46,7 +46,7 @@ div(:style=`{position: 'relative'}`).column.fit
     .row.full-width.justify-center
       div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px', paddingBottom: '0px'}`
         ).row.full-width.items-start.content-start.q-pt-sm
-        kalpa-loader(type="CONTENT_NOTES_LIST")
+        kalpa-loader(type="CONTENT_LIST")
           template(v-slot="{items}")
             .row.full-width.items-start
               div(
@@ -98,7 +98,7 @@ export default {
       this.$log('contentFound', content)
       let contentInput = {
         oid: Date.now().toString(),
-        wsItemType: 'CONTENT_NOTES',
+        wsItemType: 'CONTENT_WITH_NOTES',
         unique: content.oid,
         thumbOid: content.oid,
         name: content.name,

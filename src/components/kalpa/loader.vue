@@ -78,8 +78,8 @@ export default {
         case 'nodeNodes' :
           res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
-        case 'CONTENT_NOTES_LIST' :
-          res = await this.$store.dispatch('workspace/wsItems', 'CONTENT_NOTES_LIST')
+        case 'CONTENT_LIST' :
+          res = await this.$store.dispatch('workspace/wsItems', 'CONTENT_LIST')
           break
         case 'NODE_LIST' :
           res = await this.$store.dispatch('workspace/wsItems', 'NODE_LIST')

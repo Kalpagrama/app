@@ -175,6 +175,12 @@ async function processEvent (context, event) {
 
 async function processEventWs (context, event) {
   assert(event.wsRevision)
+  function normalizeWSItem (item) {
+    assert(item.extendedFields, '!item.extendedFields2')
+    let wsItem = {...item, ...item.extendedFields}
+    delete wsItem.extendedFields
+    return wsItem
+  }
   if (event.wsRevision - context.rootState.workspace.revision > 1 ||
     context.rootState.workspace.revision > event.wsRevision // при очистке мастерской могло произойти такое
   ) {
@@ -182,15 +188,16 @@ async function processEventWs (context, event) {
     await context.dispatch('workspace/expireWsCache', {}, { root: true })
   }
   // обновим в кэше значение итема
-  let key = 'wsItem: ' + event.object.oid
+  let wsItem = normalizeWSItem(event.object)
+  let key = 'wsItem: ' + wsItem.oid
   let vuexItem = context.rootState.cache.cachedItems[key]
-  // logD('processEventWs:: ', vuexItem, event.object)
-  if (!vuexItem || vuexItem.revision !== event.object.revision) {
+  // logD('processEventWs:: ', vuexItem, wsItem)
+  if (!vuexItem || vuexItem.revision !== wsItem.revision) {
     // если у имеющегося объекта та же ревизия - обновлять не надо (скорей всего это наши же изменения)
     logD('обновим значение итема в кэше')
     await context.dispatch('cache/update', {
       key: key,
-      newValue: event.object
+      newValue: wsItem
     }, { root: true })
   }
 

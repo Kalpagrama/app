@@ -66,6 +66,7 @@ export default {
     url: {
       handler (to, from) {
         this.$log('url CHANGED', to)
+        if (!to) return // PPV new URL(null) throw error!
         try {
           this.$log('url CHANGED WATCHER', to)
           if (new URL(to)) this.urlChanged(to)

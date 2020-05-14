@@ -78,9 +78,9 @@ const wsItemFragment = gql`${objectFragment}
   fragment wsItemFragment on WSItem {
     ...objectFragment
     revision
-    rawData
     unique
     wsItemType
+    extendedFields
   }
 `
 

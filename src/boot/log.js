@@ -34,7 +34,7 @@ const LogModulesEnum = Object.freeze({
 })
 Object.freeze(LogModulesEnum)
 
-const showAlert = false
+const showAlert = true
 
 class Logger {
   constructor (store) {

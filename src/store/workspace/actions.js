@@ -60,24 +60,30 @@ export const wsItems = async (context, collection) => {
   return wsFeedResult
 }
 
+// todo extendedFields - временное решение для элементов мастерской (пока структура элемента мастерской не стабилизировалась) В последствии планируестся провести через графкуэль
+function denormalizeWSItem (item) {
+  let wsItem = { extendedFields: {} }
+  for (let key of Object.keys(item)) {
+    if (['oid', 'unique', 'thumbOid', 'name', 'wsItemType', 'revision'].includes(key)) {
+      wsItem[key] = item[key]
+    } else {
+      wsItem.extendedFields[key] = item[key]
+    }
+  }
+  return wsItem
+}
+function normalizeWSItem (item) {
+  assert(item.extendedFields, '!item.extendedFields')
+  let wsItem = {...item, ...item.extendedFields}
+  delete wsItem.extendedFields
+  return wsItem
+}
+
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
 export const wsItemCreate = async (context, item) => {
   logD('wsItemCreate start', item)
-  let itemInput = {
-    oid: item.oid,
-    unique: item.unique,
-    thumbOid: item.thumbOid,
-    name: item.name,
-    wsItemType: item.wsItemType,
-    revision: item.revision,
-    rawData: JSON.parse(JSON.stringify(item))
-  }
-  delete itemInput.rawData.oid
-  delete itemInput.rawData.unique
-  delete itemInput.rawData.thumbOid
-  delete itemInput.rawData.name
-  delete itemInput.rawData.wsItemType
-  delete itemInput.rawData.revision
+  let itemInput = denormalizeWSItem(item)
+  logD('denormalizeWSItem=', itemInput)
   let { data: { wsItemCreate: wsItem } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
@@ -89,28 +95,19 @@ export const wsItemCreate = async (context, item) => {
     `,
     variables: { item: itemInput }
   })
-  let updatedItem = await context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
+  wsItem = normalizeWSItem(wsItem)
+  let updatedItem = await context.dispatch('cache/update', {
+    key: wsItem.oid,
+    newValue: wsItem,
+    actualAge: 'hour'
+  }, { root: true })
   logD('wsItemCreate done', updatedItem)
   return updatedItem
 }
 // работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
 export const wsItemUpdate = async (context, item) => {
   logD('wsItemUpdate start', item)
-  let itemInput = {
-    oid: item.oid,
-    unique: item.unique,
-    thumbOid: item.thumbOid,
-    name: item.name,
-    wsItemType: item.wsItemType,
-    revision: item.revision,
-    rawData: JSON.parse(JSON.stringify(item))
-  }
-  delete itemInput.rawData.oid
-  delete itemInput.rawData.unique
-  delete itemInput.rawData.thumbOid
-  delete itemInput.rawData.name
-  delete itemInput.rawData.wsItemType
-  delete itemInput.rawData.revision
+  let itemInput = denormalizeWSItem(item)
   let { data: { wsItemUpdate: wsItem } } = await apollo.clients.api.mutate({
     mutation: gql`
       ${fragments.objectFullFragment}
@@ -122,7 +119,12 @@ export const wsItemUpdate = async (context, item) => {
     `,
     variables: { item: itemInput }
   })
-  let updatedItem = context.dispatch('cache/update', { key: wsItem.oid, newValue: wsItem, actualAge: 'hour' }, { root: true })
+  wsItem = normalizeWSItem(wsItem)
+  let updatedItem = context.dispatch('cache/update', {
+    key: wsItem.oid,
+    newValue: wsItem,
+    actualAge: 'hour'
+  }, { root: true })
   logD('wsItemUpdate done', updatedItem)
   return updatedItem
 }
@@ -173,7 +175,18 @@ export const updateRevision = async (context, revision) => {
 }
 
 function getCollection (wsItemType) {
-  return wsItemType + '_LIST'
+  switch (wsItemType) {
+    case 'NODE':
+      return 'NODE_LIST'
+    case 'CONTENT_WITH_NOTES':
+      return 'CONTENT_LIST'
+    case 'SPHERE':
+      return 'SPHERE_LIST'
+    case 'CHAIN':
+      return 'CHAIN_LIST'
+    default:
+      assert(false, 'bad wsItemType: ' + wsItemType)
+  }
 }
 
 function makeWsObjectShort (wsItem) {
