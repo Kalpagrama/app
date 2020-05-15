@@ -1,7 +1,7 @@
 <style lang="sass" scoped>
 .page-item
   &:hover
-    background: #777 !important
+    background: rgb(70,70,70) !important
 </style>
 
 <template lang="pug">
@@ -10,16 +10,16 @@ div(
     borderRadius: '10px', overflow: 'hidden',
     maxHeight: '70vh'
   }`
-  ).column.full-width.bg-grey-9
+  ).column.full-width.b-50
   //- pages
   router-link(
     v-for="(p,pi) in pages" :key="p.id"
     :to=`{params: {page: p.id}}`
     :class=`{
-      'bg-grey-7': $route.params.page === p.id
+      'b-100': $route.params.page === p.id
     }`
-    :style=`{height: '40px'}`).row.full-width.items-center.content-center.q-px-md.page-item
-    span.text-white {{ p.name }}
+    :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
+    span(:style=`{userSelect: 'none'}`).text-white {{ p.name }}
   //- //- spheres
   //- div(:style=`{height: '50px'}`).row.full-width.items-center.q-px-md
   //-   span.text-white Related spheres
@@ -40,7 +40,7 @@ export default {
         {id: 'voted', name: 'Voted'},
         {id: 'followers', name: 'Followers'},
         {id: 'following', name: 'Following'},
-        {id: 'spheres', name: 'Spheres'}
+        // {id: 'spheres', name: 'Spheres'}
       ]
     }
   }

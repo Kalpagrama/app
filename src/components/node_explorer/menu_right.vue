@@ -1,6 +1,21 @@
+<style lang="sass" scoped>
+.page-item
+  &:hover
+    background: rgb(70,70,70) !important
+</style>
+
 <template lang="pug">
-.column.fit.bg-grey-9
+div(:style=`{position: 'relative'}`).column.full-width.b-50
   .col.full-width.scroll
+    .row.full-width.items-start.content-start
+    router-link(
+      v-for="(p,pi) in pages" :key="p.id"
+      :to=`{params: {page: p.id}}`
+      :class=`{
+        'b-100': $route.params.page === p.id
+      }`
+      :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
+      span.text-white {{ p.name }}
 </template>
 
 <script>
@@ -12,7 +27,11 @@ export default {
   data () {
     return {
       pageId: null,
-      pages: []
+      pages: [
+        {id: 'nodes', name: 'Nodes'},
+        {id: 'contents', name: 'Contents'},
+        {id: 'chains', name: 'Chains'}
+      ]
     }
   }
 }

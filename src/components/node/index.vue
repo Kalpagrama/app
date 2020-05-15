@@ -20,7 +20,7 @@ export default {
   watch: {
     node: {
       handler (to, from) {
-        this.$log('node CHANGED', to)
+        // this.$log('node CHANGED', to)
         this.nodeLoad()
       }
     },
@@ -36,7 +36,7 @@ export default {
       immediate: true,
       handler (to, from) {
         if (to) {
-          this.$log('nodeFullReady CHANGED', to)
+          // this.$log('nodeFullReady CHANGED', to)
           this.nodeFull = this.nodeFullReady
         }
       }
@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     async nodeLoad () {
-      this.$log('nodeLoad start', this.node.oid)
+      // this.$log('nodeLoad start', this.node.oid)
       let nodeFull = null
       try {
         nodeFull = await this.$store.dispatch('objects/get', { oid: this.node.oid, priority: 0 })
@@ -55,7 +55,7 @@ export default {
     },
     async nodeDestroy () {
       if (!this.nodeFull) return
-      this.$log('nodeDestroy', this.node.oid)
+      // this.$log('nodeDestroy', this.node.oid)
       this.nodeFull = null
     }
   }

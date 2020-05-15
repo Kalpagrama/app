@@ -16,11 +16,11 @@ div
     //- footer
     div(
       v-touch-pan.mouse.vertical.prevent="onExtraPan"
-      :style=`{height: '60px', order: 10}`).row.full-width.items-center.content-center.q-px-sm.bg-grey-7
-      q-btn(
-        flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')"
-        :style=`{width: '42px', height: '42px', background: 'rgba(0,0,0,0.1)'}`)
-      .col.q-px-sm
+      :style=`{height: '60px', order: 10, borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-sm.b-100
+      //- q-btn(
+      //-   flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')"
+      //-   :style=`{width: '42px', height: '42px', background: 'rgba(0,0,0,0.1)'}`)
+      .col
         kalpa-buttons(:value="tabs" :id="tab" @id="tabChanged($event)").justify-start
       q-btn(
         push color="green" no-caps @click="$emit('cancel')"
@@ -44,9 +44,9 @@ export default {
       tab: 'info',
       tabs: [
         {id: 'info', name: 'Info'},
-        {id: 'layers', name: 'Notes'},
-        {id: 'spheres', name: 'Spheres'},
-        {id: 'explore', name: 'Explore'}
+        {id: 'layers', name: 'Layers'},
+        // {id: 'spheres', name: 'Spheres'},
+        // {id: 'explore', name: 'Explore'}
       ]
     }
   },
@@ -105,9 +105,9 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.$wait(200).then(() => {
-      this.tabChanged('layers')
-    })
+    // this.$wait(200).then(() => {
+    //   this.tabChanged('layers')
+    // })
   }
 }
 </script>

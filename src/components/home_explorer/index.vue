@@ -1,15 +1,15 @@
 <template lang="pug">
 //- container :style=`{height: $q.screen.height+'px'}`
-q-layout(view="hHh lpR fFf").bg-grey-10
-  q-header(reveal).row.full-width.justify-center.q-px-xs
+q-layout(view="hHh lpR fFf").b-30
+  q-header(reveal :style=`{zIndex: 30000}`).row.full-width.justify-center
     div(
       :style=`{
         height: '60px',
         maxWidth: $store.state.ui.maxWidthPage+'px',
-        zIndex: 10000,
+        zIndex: 30000,
         borderRadius: '0 0 10px 10px', overflow: 'hidden'
       }`
-      ).row.full-width.items-center.content-center.justify-center.bg-grey-8
+      ).row.full-width.items-center.content-center.justify-center.b-100
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
       .col.full-height
@@ -17,15 +17,15 @@ q-layout(view="hHh lpR fFf").bg-grey-10
           span.text-grey-2.text-bold Home
       div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
         q-btn(round flat color="grey-2" icon="more_vert")
-  kalpa-menu-footer
-    template(v-slot:menuRight)
-      menu-right
+  kalpa-menu-footer(:options=`{showMenuPage: false}`)
+    //- template(v-slot:menuRight)
+    //-   menu-right
   //- page
   q-page-conainter
-    q-page.q-px-xs
+    q-page
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
         template(v-slot=`{items}`)
-          list-middle(:items="items" :style=`{paddingTop: '68px'}`)
+          list-middle(:items="items")
             template(v-slot:item=`{item, index, indexMiddle}`)
               node(
                 ctx="list" layout="PIP"
@@ -57,7 +57,7 @@ export default {
         sortStrategy: 'HOT',
         filter: { types: 'NODE' }
       }
-    },
+    }
   },
   methods: {
   },

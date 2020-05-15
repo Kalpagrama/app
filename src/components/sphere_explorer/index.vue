@@ -46,7 +46,7 @@ q-layout(view="hHh lpR fFf")
     div(:style=`{height: $q.screen.height+'px', paddingTop: '68px'}` @click.self="nodeEditorShow = false"
       ).row.full-width.items-start.content-start.justify-center.q-px-sm
       node-editor(
-        mode="extend" :essence="sphere ? sphere.name : ''" :node="node.rawData" :wsItemFinderOnBoot="true"
+        mode="extend" :essence="sphere ? sphere.name : ''" :node="node" :wsItemFinderOnBoot="true"
         @cancel="nodeEditorShow = false"
         :style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`)
   //- page
@@ -81,15 +81,12 @@ export default {
     return {
       nodeEditorShow: false,
       node: {
-        name: '',
         wsItemType: 'NODE',
-        rawData: {
-          name: '',
-          items: [],
-          spheres: [],
-          category: 'FUN',
-          layout: 'PIP'
-        }
+        name: '',
+        items: [],
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP'
       }
     }
   },

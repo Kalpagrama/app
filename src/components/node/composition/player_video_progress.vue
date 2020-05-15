@@ -3,19 +3,20 @@
   //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- pregress wrapper
   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-lg
+    //- div(:style=`{position: 'absolute', top: '15px', background: 'rgba(0,0,0,0.2)', pointerEvents: 'none'}`).row.fit
     //- progress bar & time
     div(
       @click="progressClick"
       v-touch-pan.mouse.left.right="progressPan"
       @mousemove="progressMousemove"
       @mouseleave="progressMouseleave"
-      :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '10px', borderRadius: '10px'}`
+      :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '0px', order: -1}`
       ).row.full-width.items-center.content-center.cursor-pointer
       //- progress WRAPPER
       div(
         ref="progressWrapper"
         :style=`{position: 'relative', height: '4px', zIndex: 200, borderRadius: '10px'}`
-        ).row.full-width.bg-grey-7.cursor-pointer
+        ).row.full-width.bg-grey-5.cursor-pointer
         //- progress TIP
         div(
           v-if="progressMousemoveTime"
@@ -55,45 +56,45 @@
             }`).bg-green
     //- actions
     div(
-      :style=`{height: '60px', order: -1}`).row.full-width.items-center
+      :style=`{height: '60px'}`).row.full-width.items-center.content-center
       //- play/pause
       div(
         :style=`{height: '60px'}`
-        ).row.full-height.items-end.content-end.justify-center
+        ).row.full-height.items-start.content-start.justify-center
         q-btn(
           round flat @click="$emit('meta', ['videoPlayPause', null])"
           :color="'white'"
           :icon="meta.playing ? 'pause' : 'play_arrow'"
-          :style=`{background: 'rgba(0,0,0,0.3)'}`)
+          :style=`{background: 'rgba(60,60,60,0.3)'}`)
       //- stats
       .col.full-height
-        .row.fit.items-end.content-end.justify-start.q-px-sm
+        .row.fit.items-start.content-start.justify-start.q-px-sm
           span(
             :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)', userSelect: 'none', padding: '10.5px'}`
-            ).text-white {{ $time(now)+' / '+$time(duration) }}
+            ).text-white.q-mr-sm {{ $time(now)+' / '+$time(duration) }}
           span(
             v-if="false"
             :style=`{background: 'rgba(0,0,0,0.3)', padding: '10.5px'}`
-            ).text-white {{progressPercentWidth}}
+            ).text-white.q-mr-sm {{progressPercentWidth}}
+          q-btn(
+            round flat @click="videoForward(0)"
+            color="white"
+            icon="fast_rewind"
+            :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-sm
+          q-btn(
+            round flat @click="videoForward(1)"
+            color="white"
+            icon="fast_forward"
+            :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-sm
+          q-btn(
+            round flat @click="player.mutedToggle()"
+            color="white"
+            :icon="meta.muted ? 'volume_off' : 'volume_up'"
+            :style=`{background: 'rgba(0,0,0,0.3)'}`)
       //- sound
-      div(
-        :style=`{height: '60px'}`
-        ).row.full-height.items-end.content-end.justify-center
-        q-btn(
-          round flat @click="videoForward(0)"
-          color="white"
-          icon="fast_rewind"
-          :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-sm
-        q-btn(
-          round flat @click="videoForward(1)"
-          color="white"
-          icon="fast_forward"
-          :style=`{background: 'rgba(0,0,0,0.3)'}`).q-mr-sm
-        q-btn(
-          round flat @click="player.mutedToggle()"
-          color="white"
-          :icon="meta.muted ? 'volume_off' : 'volume_up'"
-          :style=`{background: 'rgba(0,0,0,0.3)'}`)
+      //- div(
+      //-   :style=`{height: '60px'}`
+      //-   ).row.full-height.items-start.content-start.justify-start
         //- q-btn(
         //-   round flat @click="player.mutedToggle()"
         //-   color="white"

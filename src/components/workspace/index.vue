@@ -6,25 +6,18 @@
 
 <template lang="pug">
 //- q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px', background: '#333'}`)
+//- div(:style=`{position: 'relative'}`).row.full-width
 div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-width
   kalpa-menu-right
-    menu-right(:pages="pages")
-  //- header
-  .row.full-width.justify-center
-    div(
-      :style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`
-      ).row.full-width.items-center.content-center
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
-          q-icon(name="school" size="36px" color="white")
-      .col
-        .row.fit.items-center.content-center
-          span(:style=`{fontSize: '18px'}`).text-white.text-bold Workspace
-          .row.full-width
-            small.text-white {{ pages.find(p => p.id === $route.params.page).name }}
-  //- kalpa-menu-footer
-  //-   template(v-slot:menuRight)
-  //-     menu-right(:pages="pages")
+    menu-right(:pages="pages").b-50
+  //- footer
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    kalpa-menu-footer(
+      v-if="$store.state.workspace.showFooter"
+      :options=`{showMenuPage: true}`)
+      template(v-slot:menuRight)
+        menu-right(:pages="pages").b-50
+  //- actions
   //- item editors
   //- q-dialog(
   //-   v-model="pageDialogOpened" :maximized="true" position="bottom"
@@ -37,19 +30,14 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
   //-         composition-editor(
   //-           v-if="item"
   //-           ctx="workspace"
-  //-           :composition="item.rawData"
+  //-           :composition="item"
   //-           @cancel="pageDialogOpened = fals"
   //-           :style=`{
   //-             maxWidth: $store.state.ui.maxWidthPage+'px'
   //-           }`)
-  .col.full-width.q-pt-sm
-    //- q-page-container
-    //-   q-page
-    .row.fit.justify-center
-      div(
-        :style=`{
-          maxWidth: $store.state.ui.maxWidthPage+'px',
-        }`).row.fit
+  div(:style=`{}`).col.full-width.q-mb-sm
+    .row.fit.items-start.content-start.justify-center
+      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit
         ws-settings(v-if="$route.params.page === 'settings'")
         ws-spheres(v-if="$route.params.page === 'spheres'")
         ws-items(
@@ -57,6 +45,22 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
           ctx="workspace"
           :pages="pages" :page="$route.params.page"
           @page="$router.push({params: {page: $event}}).catch(e=>e)")
+          template(v-slot:header)
+            div(
+              :style=`{
+                position: 'relative',
+                height: '60px',
+                borderRadius: $q.screen.width > 600 ? '10px' : '0px'}`
+              ).row.full-width.items-center.content-center.q-px-sm.b-100
+              q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+              div(:style=`{height: '60px'}`).row.items-center.content-center.justify-center
+                q-btn(round flat color="white")
+                  q-icon(name="school" size="36px" color="white")
+              .col
+                .row.fit.items-center.content-center.q-px-sm
+                  span(:style=`{fontSize: '18px'}`).text-white.text-bold Workspace
+                  .row.full-width
+                    small.text-white {{ pages.find(p => p.id === $route.params.page).name }}
 </template>
 
 <script>
@@ -127,8 +131,8 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$q.addressbarColor.set('#222')
-    document.body.style.background = '#222'
+    this.$q.addressbarColor.set('rgb(30,30,30)')
+    document.body.style.background = 'rgb(30,30,30)'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

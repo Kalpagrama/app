@@ -2,7 +2,7 @@
 </style>
 
 <template lang="pug">
-.row.fit.items-center.content-center.justify-center
+.row.full-width.items-center.content-center.justify-center
   div(:style=`{}`).row.full-width.items-center.content-center.justify-center
     //- input file
     input(
@@ -11,7 +11,7 @@
     //- input url
     div(
       v-if="sources.includes('url')"
-      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-pa-sm.bg-grey-8
+      :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-px-sm
       div(:style=`{position: 'relative'}`).row.fit
         //- progress bar
         div(
@@ -20,14 +20,14 @@
             position: 'absolute', zIndex: 1000, left: '0px',
             width: progress.progress+'%', borderRadius: '10px', overflow: 'hidden', opacity: 0.9
           }`
-          ).row.fit.bg-green
+          ).row.fit.b-220
         q-input(
           v-model="url" filled
-          color="green" placeholder="Find content or paste URL"
+          color="green" label="Find content or paste URL"
           :loading="urlInputLoading"
           :input-style=`{}`
           :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
-          ).full-width.bg-grey-1
+          ).full-width.b-220
           template(v-slot:append)
             q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()")
 </template>

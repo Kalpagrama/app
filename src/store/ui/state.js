@@ -3,7 +3,7 @@ export default {
   menuAppShow: false,
   borderRadius: 8,
   maxWidthPage: 800,
-  maxWidthMenu: 230,
+  maxWidthMenu: 280,
   actionOptions: null,
   actionOpened: false,
   actionKey: null,

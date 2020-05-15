@@ -1,5 +1,7 @@
 <template lang="pug">
-component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('add', $event)" :ctx="ctx")
+component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('add', $event)" :ctx="ctx" :options="options")
+  template(v-slot:header)
+    slot(name="header")
 </template>
 
 <script>
@@ -11,7 +13,7 @@ import wsChainList from './ws_chain_list'
 export default {
   name: 'wsItems',
   components: {wsNoteList, wsContentNotesList, wsNodeList, wsChainList},
-  props: ['page', 'pages'],
+  props: ['page', 'pages', 'options'],
   data () {
     return {
     }

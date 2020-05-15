@@ -5,22 +5,8 @@
 
 <template lang="pug">
 .column.fit
-  .row.full-width.justify-center
-    div(:style=`{maxWidth: '400px'}`).row.full-width.q-px-sm
-      //- span.text-white edit info
-      q-btn(push color="red" no-caps @click="shuffle()" icon-right="casino").full-width
-        span.text-white.text-bold.q-mr-md Shuffle
-  .col.full-width.scroll
-    .row.full-width.justify-center
-      div(:style=`{maxWidth: '400px'}`).row.full-width.items-center.content-center.content-start.q-pa-sm
-        transition-group(
-          name="flip-list"
-          enter-active-class="animated fadeIn"
-          leave-active-class="animated fadeOut").full-width
-          div(
-            v-for="(i,ii) in items" :key="i.oid"
-            ).row.full-width.q-mb-md
-            edit-info-item(:item="i" :index="ii")
+  .col.full-width.q-px-sm.q-pb-sm
+    div(:style=`{borderRadius: '10px'}`).row.fit.b-50
 </template>
 
 <script>

@@ -9,7 +9,7 @@ div(
     width: $store.state.ui.maxWidthMenu+'px',
     height: $q.screen.height+'px',
     right: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-    paddingTop: '68px',
+    paddingTop: '8px',
     overflow: 'auto'
   }`).row.items-start.content-start.q-px-sm.q-pb-sm
   slot()

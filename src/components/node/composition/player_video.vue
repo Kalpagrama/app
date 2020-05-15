@@ -62,7 +62,7 @@ div(
     //- video actions
     //- content name
     router-link(
-      v-if="true && layer && content && visible && active && !mini"
+      v-if="false && layer && content && visible && active && !mini"
       :to="'/content/'+content.oid"
       :style=`{
         position: 'absolute', zIndex: 20000, left: '8px',
@@ -71,7 +71,7 @@ div(
         background: 'rgba(0,0,0,0.3)'
       }`
       ).q-px-sm.q-py-xs.text-grey-2.cursor-pointer.layer-name
-      small(:style=`{userSelect: 'none'}`) {{ content.name }}
+      small(:style=`{lineHeight: 0.5, userSelect: 'none'}`) {{ content.name }}
     //- layer name
     span(
       v-if="true && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
@@ -119,14 +119,23 @@ div(
           opacity: videoLoadeddataDone && videoGood ? 1 : 0
         }`)
     player-video-progress(
-      v-if="visible && active"
+      v-if="true && visible && active"
       v-show="!mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
       :style=`{
         position: 'absolute', zIndex: 20000, bottom: '0px', left: '0px', transform: 'translate3d(0,0,0)',
-        maxWidth: itemsCount > 1 ? '75%' : 'calc(100% - 60px)'
+        maxWidth: itemsCount > 1 ? '75%' : 'calc(100% - 80px)'
       }`)
+    //- progress tint
+    div(
+      v-if="false"
+      :style=`{
+        position: 'absolute', zIndex: 2000, height: '77px', bottom: '0px', pointerEvents: 'none',
+        borderRadius: '10px', overflow: 'hidden',
+        background: 'rgb(0,0,0)',
+        background: 'linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 100%)'
+      }`).row.full-width
   slot(name="editor" :meta="meta" :player="player")
 </template>
 
@@ -153,7 +162,8 @@ export default {
       layerIndexPlay: -1,
       editing: false,
       videoLoadeddataDone: false,
-      content: null
+      content: null,
+      ended: false
     }
   },
   computed: {
@@ -331,24 +341,29 @@ export default {
       if (this.nowWorking) return
       this.nowWorking = true
       if (this.editing) return
+      if (this.ended) return
       if (this.mode === 'play') {
         if (!this.layerStart && !this.layerEnd) return
         if (to > this.layerEnd) {
           // alert('to > this.layerEnd')
           let to = this.layerIndex + 1
-          this.$emit('ended')
-          // if (this.layers[to]) {
-          //   this.$log('NEXT LAYER')
-          //   this.layerIndex = to
-          // }
-          // else {
-          //   if (this.layerIndex === 0) {
-          //     this.player.setCurrentTime(this.layerStart)
-          //   }
-          //   else {
-          //     this.layerIndex = 0
-          //   }
-          // }
+          if (this.layers[to]) {
+            this.$log('NEXT LAYER')
+            alert('NEXT LAYER')
+            this.layerIndex = to
+          }
+          else {
+            // if (this.layerIndex === 0) {
+            //   this.player.setCurrentTime(this.layerStart)
+            // }
+            // else {
+            //   this.layerIndex = 0
+            // }
+            this.ended = true
+            this.player.pause()
+            this.$emit('ended')
+            alert('ended')
+          }
         }
         if (to < this.layerStart) {
           this.player.setCurrentTime(this.layerStart)
@@ -400,16 +415,14 @@ export default {
       this.playing = false
     },
     videoPlayPause () {
-      this.$log('videoPlayPause')
+      this.$log('videoPlayPause', this.playing)
       if (this.playing) {
-        if (this.muted) {
-          this.player.mutedToggle()
-        }
-        else {
-          this.player.pause()
-        }
+        this.player.pause()
       }
       else this.player.play()
+      if (this.muted) {
+        this.player.mutedToggle()
+      }
     },
     videoSeeked () {
       this.$log('videoSeeked')

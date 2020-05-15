@@ -1,42 +1,44 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.justify-center.bg-grey-10
+div(:style=`{}`).row.full-width.items-start.content-start.justify-center.b-30
   //- cover
-  .row.full-width.justify-center
-    div(:style=`{position: 'relative', height: '300px', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
-      //- actions
+  div(
+    :class=`{
+      'q-mt-sm': $q.screen.width > 600
+    }`
+    :style=`{
+      position: 'relative', zIndex: 1000,
+      height: '200px',
+      borderRadius: $q.screen.width > 600 ? '10px' : '0px',
+      backgroundImage: 'url(https://www.ecopetit.cat/wpic/mpic/28-289473_twitter-cover-photo-45-stars.jpg)'
+    }`
+    ).row.full-width.items-end.content-end.b-100
+    q-btn(
+      round flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
+      :style=`{position: 'absolute', zIndex: 2000, top: '8px', left: '8px'}`).b-40
+    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+      kalpa-avatar(v-if="user" :url="user.profile.photoUrl" :width="40" :height="40" @click.native="userAvatarClick()")
+      .col.full-height
+        .row.fit.items-center.content-center.q-px-sm
+          span(:style=`{fontSize: '25px', lineHeight: 0.9}` @click="userNameClick()").text-white.text-bold {{user.name}}
       q-btn(
-        round flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
-        :style=`{position: 'absolute', zIndex: 100, top: '16px', left: '8px'}`)
-      //- tint
-      div(:style=`{position: 'absolute', zIndex: 10, borderRadius: '10px', background: 'rgba(0,0,0,0.2)'}`).row.fit
-      img(
-        @click="userCoverClick()"
-        src="https://www.ecopetit.cat/wpic/mpic/28-289473_twitter-cover-photo-45-stars.jpg"
-        :style=`{position: 'absolute', objectFit: 'cover', borderRadius: '10px', overflow: 'hidden'}`).fit
-      //- what
-      div(:style=`{position: 'absolute', zIndex: 100, bottom: '0px', height: '100px'}`).row.full-width.q-px-md
-        kalpa-avatar(:url="user.profile.photoUrl" :width="100" :height="100" @click.native="userAvatarClick()")
-        .col.full-height
-          .row.fit.items-center.content-center.q-px-sm
-            span(:style=`{fontSize: '25px', lineHeight: 0.9}` @click="userNameClick()").text-white.text-bold {{user.name}}
-            .row.full-width
-              span(:style=`{padding: 0, margin: 0}` @click="userUsernameClick()").text-white @ivanmoto
-      //- what
-      div(:style=`{position: 'absolute', zIndex: 200, bottom: '0px', height: '50px'}`
-        ).row.full-width.items-center.content-center.justify-end.q-px-sm
-          //- TODO show after u followed this user...
-          //- q-btn(round push dense color="green" icon="mail_outline" @click="userDM()").q-mr-sm
-          //- q-btn(round push dense color="green" icon="notifications_none" @click="userSetNotifications()").q-mr-sm
-          q-btn(
-            v-if="!userIsMe"
-            push no-caps color="green" @click="userFollow()").q-px-sm
-            span.text-bold Follow
+        v-if="false || !userIsMe"
+        push no-caps color="green" @click="userFollow()").q-px-sm
+        span.text-bold Follow
   //- status
-  .row.full-width.justify-center
-    div(
-      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
-      ).row.full-width.q-pa-md.bg-grey-9
-      p(:style=`{fontSize: '14px'}` @click="userStatusClick()").text-white.text-grey-4 😱 My status quo 😤 <br> Helping people to help them 😺
+  div(
+    :style=`{
+      position: 'relative', zIndex: 100, borderRadius: '0 0 10px 10px', overflow: 'hidden',
+      marginTop: '-20px', paddingTop: '30px'
+    }`
+    ).row.full-width.q-pa-sm.b-100
+    p(:style=`{fontSize: '14px'}` @click="userStatusClick()").text-white 😱 My status quo 😤 <br> Helping people to help them 😺
+  //- tabs
+  div(
+    :style=`{
+      position: 'sticky', marginTop: '-20px', paddingTop: '20px',
+      borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+    ).row.full-width.q-pa-sm.b-80
+    kalpa-buttons(:value="pages" :id="$route.params.page" @id="$router.push({params: {page: $event}})").justify-start
 </template>
 
 <script>
@@ -63,12 +65,6 @@ export default {
     }
   },
   methods: {
-    userSetNotifications () {
-      this.$log('userSetNotifications')
-    },
-    userDM () {
-      this.$log('userDM')
-    },
     async userFollow () {
        try {
         this.$log('userFollow start', this.user.oid)
@@ -76,7 +72,7 @@ export default {
         // this.user = await this.userLoad(this.$route.params.oid)
         this.$log('userFollow done', res)
       } catch (error) {
-        this.$logD('userFollow error', error)
+        this.$log('userFollow error', error)
       }
     },
     async userUnfollow () {
@@ -85,9 +81,9 @@ export default {
         let res = await this.$store.dispatch('user/unSubscribe', this.user.oid)
         // this.$delete(this.userSubscriptions, ss)
         // this.user = await this.userLoad(this.$route.params.oid)
-        this.$logD('userUnfollow done', res)
+        this.$log('userUnfollow done', res)
       } catch (error) {
-        this.$logD('userUnfollow error', error)
+        this.$log('userUnfollow error', error)
       }
     }
   },

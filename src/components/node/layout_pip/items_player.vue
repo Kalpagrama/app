@@ -19,13 +19,15 @@ div(
   :style=`{
     position: 'relative'
   }`
-  ).row.full-width.items-start.content-start
+  ).row.full-width.items-start.content-start.b-50
   //- preview
   img(
     :src="preview" draggable="false"
-    :style=`{maxHeight: 500+'px', userSelect: 'none', objectFit: 'contain', opacity: 0}`).full-width
+    :style=`{maxHeight: 500+'px', userSelect: 'none', objectFit: 'contain', opacity: active ? 1 : 0.5}`).full-width
   //- items wrapper
-  div(:style=`{position: 'absolute'}`).row.fit.bg-black
+  div(
+    v-if="true"
+    :style=`{position: 'absolute'}`).row.fit.bg-black
     //- items stats
     div(
       v-if="visible && active && items.length > 1"
@@ -43,7 +45,7 @@ div(
             }`).row.fit
     //- item prev
     div(
-      v-if="visible && active && itemIndex !== 0" @click="itemsPrev()"
+      v-if="visible && active && itemIndex !== 0 && items.length > 1" @click="itemsPrev()"
       :style=`{
         position: 'absolute', top: '10%', height: '70%', zIndex: 20000, width: '20%',
         borderRadius: '0 10px 10px 0'
@@ -51,7 +53,8 @@ div(
       ).row.items-center.content-center.justify-center.cursor-pointer.item-prev
         q-btn(round flat color="white" icon="keyboard_arrow_left")
     //- item last
-    div(v-if="itemIndex+1 === items.length" @click="itemsAgain()"
+    div(
+      v-if="items.length > 1 && itemIndex+1 === items.length" @click="itemsAgain()"
       :style=`{
         position: 'absolute', zIndex: 20000, right: '0px', bottom: '0px',
         maxWidth: '25%', height: '100px',
@@ -143,7 +146,8 @@ export default {
       this.$log('compositionEnded', index)
       let itemIndexTo = index + 1
       if (this.items[itemIndexTo]) {
-        this.itemIndex = itemIndexTo
+        // this.itemIndex = itemIndexTo
+        this.itemsNext()
       }
       else {
         this.itemIndex = 0

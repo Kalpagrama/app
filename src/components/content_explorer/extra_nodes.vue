@@ -1,39 +1,58 @@
+<style lang="sass" scroped>
+.note-item
+  cursor: pointer
+  &:hover
+    background: #777 !important
+</style>
+
 <template lang="pug">
-.column.fit
-  //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
-  .col.full-width.scroll
-    //- kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables" ref="contentNodesLoader")
-    //-   template(v-slot:items=`{items}`)
-    node-list(
-      v-if="query" :nodes="query.nodeList"
-      :nodeIndex="nodeIndex"
-      :nodesHighlight="nodesHighlight"
-      @nodeMiddle="nodeMiddle")
+.column.full-width
+  div(
+    ref="extraNotesScroll"
+    @scroll="onScroll").col.full-width.scroll
+    div(
+      v-if="query"
+      :style=`{paddingBottom: '1000px'}`).row.full-width.items-start.content-start.q-pt-sm
+      //- div(:style=`{height: 500+'px'}`).row.full-width
+      //- kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
+      //-   template(v-slot=`{items}`)
+      //-     .row.full-width.items-start.content-start
+      div(
+        v-for="(i, ii) in query.nodeList" :key="i.oid" @click="itemClick(i, ii)"
+        :class=`{
+          'bg-grey-6': ii === nodeIndex,
+          'bg-grey-9': ii !== nodeIndex
+        }`
+        :style=`{height: '40px', borderRadius: '10px'}`
+        ).row.full-width.items-center.q-px-md.q-mb-sm.q-py-sm.note-item
+        span.text-white {{ i.name }}
+        .col
+        small.text-white {{ $time(i.meta.items[0].layers[0].figuresAbsolute[0].t) }}
+        small.text-white.q-mx-xs -
+        small.text-white {{ $time(i.meta.items[0].layers[0].figuresAbsolute[1].t) }}
 </template>
 
 <script>
-
-import { throttle } from 'quasar'
+import {throttle} from 'quasar'
 
 export default {
-  name: 'contentExplorer_extraNodes',
-  props: ['mode', 'content', 'player', 'meta'],
+  name: 'extraNotes',
+  props: ['meta', 'player'],
   data () {
     return {
       query: null,
-      nodeIndex: null,
-      nodesHighlight: []
+      nodeIndex: null
     }
   },
   computed: {
     sphereOid () {
-      return this.content.oid
+      return this.$route.params.oid
     },
     variables () {
       return {
         oid: this.sphereOid,
         pagination: { pageSize: 10 },
-        sortStrategy: 'HOT',
+        sortStrategy: 'RELATING_TO_TIME',
         filter: { types: 'NODE' }
       }
     }
@@ -42,46 +61,48 @@ export default {
     'meta.now': {
       handler (to, from) {
         // this.$log('meta.now CHAGNGED', to)
-        // this.nowChanged(to)
+        this.nowChangedThrottle(to)
       }
     }
   },
   methods: {
+    itemClick (i, ii) {
+      this.$log('itemClick', i, ii)
+      let to = i.meta.items[0].layers[0].figuresAbsolute[0].t
+      this.player.setCurrentTime(to)
+      this.$emit('meta', ['videoUpdate', to])
+      this.nowChanged(to)
+    },
     nowChanged (to) {
       this.$log('nowChanged', to)
-      this.nowChanging = true
-      let i = this.query.getIdx(to)
-      this.$log('nowChanged i', i)
-      this.nodeIndex = i
-      this.nodesHighlight = [i]
-      this.$wait(500).then(() => {
-        this.nowChanging = false
-      })
+      for (let i = 0; i < this.query.nodeList.length; i++) {
+        let node = this.query.nodeList[i]
+        let layer = node.meta.items.find(item => {
+          return item.layers[0].contentOid === this.meta.content.oid &&
+            item.layers[0].figuresAbsolute[0].t <= this.meta.now &&
+            item.layers[0].figuresAbsolute[1].t >= this.meta.now
+        })
+        if (layer) {
+          this.nodeIndex = i
+          break
+        }
+      }
+      this.scrollToIndex(this.nodeIndex)
     },
-    nodeMiddle (index) {
-      this.$log('nodeMiddle', index)
-      if (this.nowChanging) return
-      this.nodeIndex = null
-      let t = this.query.getT(index)
-      this.$log('t', t)
-      this.player.setCurrentTime(t)
+    scrollToIndex (index) {
+      this.$log('scrollToIndex', index)
+      this.$tween.to(this.$refs.extraNotesScroll, 0.5, {scrollTop: index * 48})
     },
-    async loadNodes () {
-      this.$log('loadNodes')
-      this.query = await this.$store.dispatch('lists/contentNodes', {contentOid: this.content.oid})
-      this.$log('loadNodes query', this.query)
-      this.nodeMiddle(0)
+    onScroll (e) {
+      // this.$log('onScroll', e.target.scrollTop)
     }
   },
   created () {
-    this.nowChanged = throttle(this.nowChanged, 1000)
+    this.nowChangedThrottle = throttle(this.nowChanged, 2000)
   },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
-    this.loadNodes()
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.query = await this.$store.dispatch('lists/contentNodes', {contentOid: this.sphereOid})
   }
 }
 </script>

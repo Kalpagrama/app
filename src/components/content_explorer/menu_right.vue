@@ -1,6 +1,5 @@
 <template lang="pug">
-.column.full-width.bg-grey-8
-  //- .col.full-width.scroll
+div(:style=`{}`).column.full-width.b-50
   .row.full-width.items-start
     router-link(
       :to="{params: {page: p.id}}"
@@ -23,7 +22,7 @@ export default {
     return {
       pages: [
         {id: 'info', name: 'Info'},
-        {id: 'notes', name: 'Notes'},
+        {id: 'nodes', name: 'Nodes'},
         {id: 'users', name: 'People'},
         {id: 'ws', name: 'Workspace'}
       ]

@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-q-layout(view="hHh Lpr lff")
+q-layout(view="hHh Lpr lff").bg-30
   //- menu
   div(
     v-if="$route.name !== 'welcome' && $q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
@@ -14,9 +14,8 @@ q-layout(view="hHh Lpr lff")
       zIndex: 1,
       top: '0px',
       width: $store.state.ui.maxWidthMenu+'px',
-      left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px',
-      paddingTop: '0px'
-    }`).row.q-px-sm.q-pb-sm
+      left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px'
+    }`).row.q-pa-sm
     kalpa-menu(v-if="!loading")
   q-page-container
     q-page

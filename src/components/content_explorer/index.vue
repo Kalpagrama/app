@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
+q-layout(view="hHh lpR fFf")
   kalpa-menu-right
     menu-right(:style=`{borderRadius: '10px', overflow: 'hidden'}`)
   kalpa-menu-footer
@@ -28,8 +28,9 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
           //- header
           div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
             q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
-            .col
-              span.text-bold.text-white {{ content.name }}
+            .col.full-height
+              .row.fit.items-center.content-center.q-px-sm
+                span(:style=`{minHeight: '42px', borderRadius: '10px'}`).text-bold.text-white.q-pa-sm {{ content.name }}
             q-btn(round flat color="grey-2" icon="more_vert")
           //- body
           composition(
@@ -56,13 +57,12 @@ q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).
 import menuRight from './menu_right'
 import extraInfo from './extra_info'
 import extraNodes from './extra_nodes'
-import extraNotes from './extra_notes'
 import extraUsers from './extra_users'
 import extraWs from './extra_ws'
 
 export default {
   name: 'contentExplorer',
-  components: {extraInfo, extraNodes, extraNotes, extraUsers, extraWs, menuRight},
+  components: {extraInfo, extraNodes, extraUsers, extraWs, menuRight},
   props: ['content'],
   data () {
     return {
@@ -91,7 +91,7 @@ export default {
         if (to) {
         }
         else {
-          this.$router.replace({params: {page: 'info'}})
+          this.$router.replace({params: {page: 'nodes'}})
         }
       }
     }

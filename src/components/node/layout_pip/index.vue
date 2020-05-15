@@ -8,13 +8,18 @@
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- debug
   div(
-    v-if="false"
+    v-if="true"
     :style=`{
       position: 'absolute',
       zIndex: 1000,
-      right: '0px', top: '50px'
+      right: '0px', top: '50px',
+      fontSize: '12px',
+      width: '80px'
     }`
-    ).row.text-white.q-pa-sm.bg-pink-5
+    ).row.text-white.bg-pink-5
+    small.full-width {{node.oid}}
+    small.full-width visible: {{visible}}
+    small.full-width active: {{active}}
     small(v-if="nodeFull").full-width items: {{nodeFull.items.length}}
   //- //- inactive tint
   //- transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
@@ -24,7 +29,10 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   //- items wrapper
   div(
     :style=`{
-      position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100}`
+      position: 'relative', zIndex: 101,
+      borderRadius: '10px', overflow: 'hidden',
+      marginBottom: '-10px'
+    }`
     ).row.full-width.items-start.content-start
     items-player(v-bind="$props" :ctx="ctx")
     //- voting
@@ -34,15 +42,17 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     v-if="essence"
     :to="'/node/'+node.oid"
     :class=`{
-      'essence': ctx !== 'explorer'
+      'b-50': !visible && !active,
+      'b-70': visible && !active,
+      'b-90': visible && active
     }`
-    :style=`{height: '60px', marginTop: '-10px'}`
-    ).row.full-width.items-center.content-center.justify-start.q-px-md.q-py-sm.bg-grey-9
+    :style=`{zIndex: 100, height: '70px', borderRadius: '0 0 10px 10px', overflow: 'hidden', marginBottom: '-10px'}`
+    ).row.full-width.items-center.content-center.justify-start.q-px-md.q-py-sm
     span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
   //- author and vote
   div(
     v-if="opened && nodeFull"
-    :style=`{height: '60px'}`
+    :style=`{zIndex: 99, height: '80px', borderRadius: '0 0 10px 10px', marginBottom: '-10px'}`
     ).row.full-width.items-center.content-center.q-px-md.q-py-sm.bg-grey-9
     kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="42" :height="42" @click.native="$router.push('/user/'+nodeFull.author.oid)")
     router-link(:to="'/user/'+nodeFull.author.oid").col

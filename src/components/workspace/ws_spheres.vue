@@ -8,14 +8,15 @@
 div(:style=`{position: 'relative'}`).column.fit
   //- header
   div(
-    :style=`{borderRadius: '10px', overflow: 'hidden'}`
-    ).row.full-width.q-pa-sm.bg-grey-8
+    :style=`{borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+    ).row.full-width.q-pa-sm.b-100
     q-input(
       v-model="sphereInput"
-      filled color="green" placeholder="Find or add sphere"
+      filled color="green"
+      label="Find or add sphere"
       @keyup.enter="sphereInputEnter"
       :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
-      ).full-width.bg-grey-1
+      ).full-width.b-220
   //- body
   .col.full-width.scroll
     kalpa-loader(type="SPHERE_LIST")
@@ -56,7 +57,7 @@ div(:style=`{position: 'relative'}`).column.fit
 // TODO add spheres drag and drop sorting, selecting, color shit, exploring...
 
 export default {
-  name: 'wsSpheres',
+  name: 'wsTags',
   data () {
     return {
       sphere: null,
@@ -107,9 +108,7 @@ export default {
       let sphereInput = {
         name: name,
         wsItemType: 'SPHERE',
-        rawData: {
-          color: 'red'
-        }
+        color: 'red'
       }
       // TODO add color picker
       this.$log('sphereInput', sphereInput)
