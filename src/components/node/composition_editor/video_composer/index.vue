@@ -43,7 +43,7 @@ export default {
       styles: {
         paddingLeft: 0,
         paddingRight: 0,
-        paddingBottom: 140,
+        paddingBottom: 0,
         paddingTop: 0
       }
     }

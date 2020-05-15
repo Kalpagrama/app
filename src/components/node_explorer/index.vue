@@ -1,5 +1,17 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
+  //- dialogs
+  q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
+    node-editor(
+      ctx="workspace"
+      :node="nodeEditorItem"
+      @cancel="nodeEditorOpened = false"
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+        minHeight: $q.screen.height+'px',
+        maxHeight: $q.screen.height+'px',
+        height: $q.screen.height+'px',
+      }`)
   kalpa-menu-right
     div(
       :style=`{
@@ -17,8 +29,8 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
     template(v-slot:menuRight)
       menu-right
   q-btn(
-    v-if="scrollTop >= nodeHeight"
-    push color="green" no-caps
+    v-if="true"
+    push color="green" no-caps @click="nodeAdd()"
     :style=`{
       position: 'fixed', zIndex: 2000, bottom: '8px', left: '50%', transform: 'translate(-50%, 0)',
       height: '50px'
@@ -39,7 +51,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
             :node="node" :needFull="true"
             :essence="true" :opened="true"
             @meta="onNodeMeta"
-            :visible="nodeVisible" :active="nodeActive" :mini="nodeMini")
+            :visible="true" :active="true" :mini="false")
         //- essence fixed
         div(
           v-if="false && scrollTop >= nodeHeight"
@@ -59,7 +71,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
             q-btn(round flat color="white" icon="keyboard_arrow_left")
             span(v-if="node").text-white.text-bold {{node.name}}
       //- body
-      div(v-if="false").row.full-width.justify-center
+      div(v-if="true").row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
           kalpa-loader(v-if="sphereOid && node" type="sphereNodes" :variables="variables")
             template(v-slot=`{items}`)
@@ -77,9 +89,9 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
                     :needFull="isOpened ? true : isHovered"
                     :visible="isOpened ? true : isHovered"
                     :active="isOpened ? true : isHovered" layout="pip"
-                    :mini="!isOpened"
-                    :opened="isOpened"
-                    :essence="isOpened")
+                    :mini="true"
+                    :opened="false"
+                    :essence="false")
           //- div(:style=`{height: '1000px'}`).row.full-width.bg-red
 </template>
 
@@ -98,7 +110,9 @@ export default {
       nodeHeight: 0,
       nodeEssenceOffsetTop: 0,
       nodeEssenceStickyShow: false,
-      scrollTop: 0
+      scrollTop: 0,
+      nodeEditorOpened: false,
+      nodeEditorItem: null
     }
   },
   computed: {
@@ -138,6 +152,19 @@ export default {
         left: 0,
         behavior: 'smooth'
       })
+    },
+    nodeAdd () {
+      this.$log('nodeAdd')
+      let nodeInput = {
+        name: this.node.name,
+        wsItemType: 'NODE',
+        items: [],
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP'
+      }
+      this.nodeEditorItem = nodeInput
+      this.nodeEditorOpened = true
     },
     onNodeMeta ([key, val]) {
       this.$log('onNodeMeta', key, val)

@@ -23,7 +23,7 @@ div(:style=`{position: 'relative'}`).column.fit
         ws-item-finder(
           v-if="true"
           :types="['contentNotes', 'node']"
-          :options="{header: true, backButton: true}"
+          :options="{header: true, backButton: true, onItemClick: 'emit'}"
           @item="itemFound"
           @cancel="itemFinderOpened = false")
   //- composition editor dialog
@@ -45,12 +45,16 @@ div(:style=`{position: 'relative'}`).column.fit
           ).bg-grey-8
   //- header: edit
   div(
-    v-if="false"
+    v-if="true"
     :style=`{
-      position: 'sticky',
+      position: 'relative',
       marginTop: '-10px', borderRadius: '0 0 10px 10px'
     }`).row.full-width.q-pt-md.q-pb-sm.q-px-sm.b-80
-    .col
+    .col.full-height
+      div(v-if="itemsSelected.length > 0").row.fit.items-center.content-center
+        q-btn(flat no-caps color="white").q-mr-sm.b-90 {{itemsSelected.length}}
+        q-btn(flat no-caps color="white").q-mr-sm.b-90 Drop selection
+        q-btn(flat no-caps color="white").q-mr-sm.b-90 Delete
     q-btn(flat round color="white" icon="edit").b-90
   //- add first item
   div(v-if="true && node.items.length === 0").col.full-width.q-pa-sm
@@ -67,8 +71,8 @@ div(:style=`{position: 'relative'}`).column.fit
           @item="itemFound"
           @cancel="itemFinderOpened = false")
   //- node.items
-  div(v-if="false && node.items.length > 0").col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
+  div(v-if="true && node.items.length > 0").col.full-width.scroll
+    .row.full-width.items-start.content-start.q-py-sm
       //- items
       div(
         v-for="(i, ii) in node.items" :key="i.oid"
@@ -80,34 +84,8 @@ div(:style=`{position: 'relative'}`).column.fit
           overflow: 'hidden'
         }`
         ).row.full-width.items-start.content-start.q-mb-sm
-        div(:style=`{height: '500px'}`).row.full-width
-          //- item actions LEFT: select, mini
-          div(
-            v-if="false"
-            :style=`{width: '60px'}`
-            ).row.full-height.justify-center.items-between.content-between.q-px-sm
-            q-checkbox(v-model="itemsSelected" :val="i.oid" dark dense color="grey-6"
-              :style=`{borderRadius: '10px', padding: '10px'}`).bg-grey-9
-            q-btn(
-              round flat color="white" @click="itemEdit(i.oid)"
-              :icon="itemsEdit[i.oid] ? 'keyboard_arrow_up' : 'edit'").bg-grey-9
-          //- item container
-          div(
-            @mouseenter="itemsActive[i.oid] = true"
-            @mouseleave="itemsActive[i.oid] = false"
-            :style=`{position: 'relative', maxWidth: '100%'}`).col.full-height
-            composition-editor(
-              ctx="workspace"
-              :composition="i"
-              :options=`{visible: true, active: true, mini: false}`)
-          //- item actions RIGHT: delete, edit, add
-          div(
-            v-if="false"
-            :style=`{width: '60px'}`).row.full-height.justify-center.items-between.content-between.q-px-sm
-            q-btn(round flat color="grey-6" icon="drag_indicator").bg-grey-9
-            q-btn(round flat color="red-5" icon="delete_outline" @click="itemDelete(i.oid)"
-              :style=`{background: 'rgba(0,0,0,0.1)'}`).bg-grey-9
-        //- footer
+        item-active(:item="i" :itemIndex="ii")
+        //- item-footer
         div(
           :style=`{marginTop: '-10px'}`
           ).row.full-width.items-center.content-center.q-px-sm.q-pt-md.q-pb-sm.b-70
@@ -117,12 +95,10 @@ div(:style=`{position: 'relative'}`).column.fit
           q-btn(round flat color="white" icon="more_vert").b-90
       //- ADD second and beyond items
       div(v-if="node.items.length > 0").row.full-width
-        div(:style=`{width: '60px'}`).row.q-pa-sm
         .col.q-pb-sm
           q-btn(
             push no-caps color="green" icon="add" @click="itemFind()"
             :style=`{height: '60px'}`).full-width
-        div(:style=`{width: '60px'}`).row.q-pa-sm
   //- footer: items selected
   div(
     v-if="false"
@@ -144,10 +120,11 @@ div(:style=`{position: 'relative'}`).column.fit
 
 <script>
 import assert from 'assert'
+import itemActive from './item_active'
 
 export default {
   name: 'nodeEditor-editItems',
-  components: {},
+  components: {itemActive},
   props: {
     node: {type: Object}
   },
@@ -179,9 +156,10 @@ export default {
           // add layers workspace, non reactive...
           compositionInput.layersWorkspace = compositionInput.layers
           compositionInput.layers = []
+          this.$log('compositionInput', compositionInput)
           this.$set(this.node.items, this.node.items.length, compositionInput)
-          this.itemEdit(compositionInput.oid)
-          await this.$wait(300)
+          // this.itemEdit(compositionInput.oid)
+          // await this.$wait(300)
           this.itemFinderOpened = false
           break
         }

@@ -146,7 +146,8 @@ export default {
       this.$log('compositionEnded', index)
       let itemIndexTo = index + 1
       if (this.items[itemIndexTo]) {
-        this.itemIndex = itemIndexTo
+        // this.itemIndex = itemIndexTo
+        this.itemsNext()
       }
       else {
         this.itemIndex = 0

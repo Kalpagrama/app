@@ -129,7 +129,7 @@ div(
       }`)
     //- progress tint
     div(
-      v-if="true"
+      v-if="false"
       :style=`{
         position: 'absolute', zIndex: 2000, height: '77px', bottom: '0px', pointerEvents: 'none',
         borderRadius: '10px', overflow: 'hidden',
@@ -162,7 +162,8 @@ export default {
       layerIndexPlay: -1,
       editing: false,
       videoLoadeddataDone: false,
-      content: null
+      content: null,
+      ended: false
     }
   },
   computed: {
@@ -340,24 +341,29 @@ export default {
       if (this.nowWorking) return
       this.nowWorking = true
       if (this.editing) return
+      if (this.ended) return
       if (this.mode === 'play') {
         if (!this.layerStart && !this.layerEnd) return
         if (to > this.layerEnd) {
           // alert('to > this.layerEnd')
           let to = this.layerIndex + 1
-          this.$emit('ended')
-          // if (this.layers[to]) {
-          //   this.$log('NEXT LAYER')
-          //   this.layerIndex = to
-          // }
-          // else {
-          //   if (this.layerIndex === 0) {
-          //     this.player.setCurrentTime(this.layerStart)
-          //   }
-          //   else {
-          //     this.layerIndex = 0
-          //   }
-          // }
+          if (this.layers[to]) {
+            this.$log('NEXT LAYER')
+            alert('NEXT LAYER')
+            this.layerIndex = to
+          }
+          else {
+            // if (this.layerIndex === 0) {
+            //   this.player.setCurrentTime(this.layerStart)
+            // }
+            // else {
+            //   this.layerIndex = 0
+            // }
+            this.ended = true
+            this.player.pause()
+            this.$emit('ended')
+            alert('ended')
+          }
         }
         if (to < this.layerStart) {
           this.player.setCurrentTime(this.layerStart)
@@ -409,16 +415,14 @@ export default {
       this.playing = false
     },
     videoPlayPause () {
-      this.$log('videoPlayPause')
+      this.$log('videoPlayPause', this.playing)
       if (this.playing) {
-        if (this.muted) {
-          this.player.mutedToggle()
-        }
-        else {
-          this.player.pause()
-        }
+        this.player.pause()
       }
       else this.player.play()
+      if (this.muted) {
+        this.player.mutedToggle()
+      }
     },
     videoSeeked () {
       this.$log('videoSeeked')
