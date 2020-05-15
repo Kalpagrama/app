@@ -226,10 +226,6 @@ function isRestricted (context, filter, objectShort) {
 
 export const processEvent = async (context, event) => {
   switch (event.type) {
-    case 'WS_ITEM_CREATED':
-    case 'WS_ITEM_DELETED':
-    case 'WS_ITEM_UPDATED':
-      return context.dispatch('workspace/updateWsLists', event, { root: true })
     case 'NODE_CREATED':
       return await updateListsNodeCreated(context, event)
     case 'CHAIN_CREATED':

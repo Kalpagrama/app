@@ -2,7 +2,6 @@ import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { denormalizeWSItem, normalizeWSItem } from 'src/store/workspace/index'
 import { clearCache } from 'src/system/services'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
@@ -353,7 +352,7 @@ export const wsClear = async (context) => {
 //  (прилетел эвент WS_ITEM_CREATED/WS_ITEM_DELETED/WS_ITEM_UPDATED) обновим wsUnsavedChanges
 export const processEvent = async (context, event) => {
   logD('updateWsItems start')
-  let { type, object: itemServer } = event
+  let { type, object: itemServer, wsRevision } = event
   assert(itemServer.oid && itemServer.name != null && itemServer.unique, 'assert itemServer !check')
   assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
   assert(itemServer.revision, '!itemServer.revision')
@@ -391,142 +390,5 @@ export const processEvent = async (context, event) => {
       return value
     }
   }, { root: true })
-}
-
-// работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
-export const wsItemCreate = async (context, item) => {
-  logD('wsItemCreate start', item)
-  let itemInput = denormalizeWSItem(item)
-  logD('denormalizeWSItem=', itemInput)
-  let { data: { wsItemCreate: wsItem } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      ${fragments.objectFullFragment}
-      mutation wsItemCreate ($item: WSItemInput!) {
-        wsItemCreate (item: $item) {
-          ...objectFullFragment
-        }
-      }
-    `,
-    variables: { item: itemInput }
-  })
-  wsItem = normalizeWSItem(wsItem)
-  let updatedItem = await context.dispatch('cache/update', {
-    key: wsItem.oid,
-    newValue: wsItem,
-    actualAge: 'hour'
-  }, { root: true })
-  logD('wsItemCreate done', updatedItem)
-  return updatedItem
-}
-// работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
-export const wsItemUpdate = async (context, item) => {
-  logD('wsItemUpdate start', item)
-  let itemInput = denormalizeWSItem(item)
-  let { data: { wsItemUpdate: wsItem } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      ${fragments.objectFullFragment}
-      mutation wsItemUpdate ($item: WSItemInput!) {
-        wsItemUpdate (item: $item) {
-          ...objectFullFragment
-        }
-      }
-    `,
-    variables: { item: itemInput }
-  })
-  wsItem = normalizeWSItem(wsItem)
-  let updatedItem = context.dispatch('cache/update', {
-    key: wsItem.oid,
-    newValue: wsItem,
-    actualAge: 'hour'
-  }, { root: true })
-  logD('wsItemUpdate done', updatedItem)
-  return updatedItem
-}
-// работа с мастерской идет через эвенты. Мутация на сервере вызывает эвент, котрый отлавливается в модуле events
-export const wsItemDelete = async (context, oid) => {
-  logD('wsItemDelete start')
-  let { data: { wsItemDelete: result } } = await apollo.clients.api.mutate({
-    mutation: gql`
-      ${fragments.objectFullFragment}
-      mutation wsItemDelete ($oid: OID!) {
-        wsItemDelete (oid: $oid)
-      }
-    `,
-    variables: { oid }
-  })
-  // todo выкинуть из кэша
-  logD('wsItemDelete done')
-  return result
-}
-
-// обновим кэш мастерской (прилетел эвент WS_ITEM_CREATED/WS_ITEM_DELETED/WS_ITEM_UPDATED)
-export const updateWsLists = async (context, event) => {
-  logD('updateWsItems start')
-  let { type, object } = event
-  assert(object.oid && object.name != null)
-  assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
-  for (let key in context.rootState.cache.cachedItems) {
-    if (!key.startsWith(listKeyPattern)) continue
-    let collection = key.slice(listKeyPattern.length)
-    logD('updateWsItems collection', collection)
-    assert(object.wsItemType, '!object.wsItemType')
-    if (getCollection(object.wsItemType) !== collection) continue
-    logD('updateWsItems after CONTINUE', key)
-    if (type === 'WS_ITEM_CREATED') {
-      await context.dispatch('cache/update', {
-        key: key,
-        path: '',
-        setter: (value) => {
-          // { items, count, totalCount, nextPageToken }
-          // logD('setter: ', value)
-          assert(value.items && value.count >= 0 && value.totalCount >= 0)
-          let indx = value.items.findIndex(item => item.oid === object.oid)
-          if (indx === -1) {
-            // элемент в самом списке - objectShort
-            // вставляем в начало используем splice для реактивности
-            value.items.splice(0, 0, makeWsObjectShort(object))
-            value.count++
-            value.totalCount++
-          }
-          return value
-        }
-      }, { root: true })
-    } else if (type === 'WS_ITEM_DELETED') {
-      await context.dispatch('cache/update', {
-        key: key,
-        path: '',
-        setter: (value) => {
-          // { items, count, totalCount, nextPageToken }
-          assert(value.items && value.count >= 0 && value.totalCount >= 0)
-          let indx = value.items.findIndex(item => item.oid === object.oid)
-          if (indx >= 0) {
-            // splice для реактивности
-            value.items.splice(indx, 1)
-            value.count--
-            value.totalCount--
-          }
-          return value
-        }
-      }, { root: true })
-    } else if (type === 'WS_ITEM_UPDATED') {
-      await context.dispatch('cache/update', {
-        key: key,
-        path: '',
-        setter: (value) => {
-          // { items, count, totalCount, nextPageToken }
-          // logD('setter: ', value)
-          assert(value.items && value.count >= 0 && value.totalCount >= 0)
-          let indx = value.items.findIndex(item => item.oid === object.oid)
-          if (indx >= 0) {
-            // элемент в самом списке - objectShort. удаляем элемент и на его место вставляем новый используем splice для реактивности
-            value.items.splice(indx, 1, makeWsObjectShort(object))
-            value.count++
-            value.totalCount++
-          }
-          return value
-        }
-      }, { root: true })
-    }
-  }
-  logD('updateWsItems complete')
+  await updateWsRevision(context, wsRevision)
 }

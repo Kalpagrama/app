@@ -174,6 +174,7 @@ export default {
     nodesSelectedDelete () {
       this.$log('nodeSeletedDelete')
       if (!confirm('Delete selected nodes?')) return
+      alert('TODO!!!! wsItemDelete ожидает не oid, а item')
       this.nodesSelected.map(oid => {
         this.$store.dispatch('workspace/wsItemDelete', oid)
       })
@@ -200,6 +201,7 @@ export default {
     },
     async nodeClick (oid) {
       this.$log('nodeClick', oid)
+      alert('TODO!!! objects/get теперь нельзя вызывать для элементов мастерской!!! Все что надо - есть сразу (см wsItems)')
       this.node = await this.$store.dispatch('objects/get', {oid: oid})
       this.$log('nodeClick node', this.node)
       // await this.$wait(300)

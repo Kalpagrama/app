@@ -4,7 +4,6 @@ import { notify } from 'src/boot/notify'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
-import { normalizeWSItem } from 'src/store/workspace/index'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
@@ -166,33 +165,12 @@ async function processEvent (context, event) {
     case 'WS_ITEM_DELETED':
       // notifyUserActionComplete(event.type, event.object)
       // logD('try processEventWs')
-      await processEventWs(context, event)
+      await context.dispatch('workspace/processEvent', event, { root: true })
       break
     default:
       throw new Error(`unsupported Event ${event.type}`)
   }
   logD('processEvent done')
-}
-
-async function processEventWs (context, event) {
-  assert(event.wsRevision)
-  // обновим в кэше значение итема
-  let wsItem = normalizeWSItem(event.object)
-  let key = 'wsItem: ' + wsItem.oid
-  let vuexItem = context.rootState.cache.cachedItems[key]
-  // logD('processEventWs:: ', vuexItem, wsItem)
-  if (!vuexItem || vuexItem.revision !== wsItem.revision) {
-    // если у имеющегося объекта та же ревизия - обновлять не надо (скорей всего это наши же изменения)
-    logD('обновим значение итема в кэше')
-    await context.dispatch('cache/update', {
-      key: key,
-      newValue: wsItem
-    }, { root: true })
-  }
-
-  // обновим списки мастерской
-  logD('обновим списки мастерской')
-  await context.dispatch('lists/processEvent', event, { root: true })
 }
 
 // вывести уведомление о действии пользователя

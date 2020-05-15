@@ -119,10 +119,10 @@ export default {
         }
       }
     },
-    async contentDelete (oid) {
-      this.$log('contentDelete start', oid)
+    async contentDelete (item) {
+      this.$log('contentDelete start', item)
       if (!confirm('Delete content & notes ?')) return
-      let res = await this.$store.dispatch('workspace/wsItemDelete', oid)
+      let res = await this.$store.dispatch('workspace/wsItemDelete', item)
       this.$log('contentDelete done', res)
     },
     async contentFound (content) {

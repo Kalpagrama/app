@@ -1,7 +1,6 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
 import assert from 'assert'
-import { normalizeWSItem } from 'src/store/workspace/index'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
