@@ -176,12 +176,6 @@ async function processEvent (context, event) {
 
 async function processEventWs (context, event) {
   assert(event.wsRevision)
-  if (event.wsRevision - context.rootState.workspace.revision > 1 ||
-    context.rootState.workspace.revision > event.wsRevision // при очистке мастерской могло произойти такое
-  ) {
-    logW('на сервере есть неучтенные изменения!!', event.wsRevision, context.rootState.workspace.revision)
-    await context.dispatch('workspace/expireWsCache', {}, { root: true })
-  }
   // обновим в кэше значение итема
   let wsItem = normalizeWSItem(event.object)
   let key = 'wsItem: ' + wsItem.oid
@@ -199,7 +193,6 @@ async function processEventWs (context, event) {
   // обновим списки мастерской
   logD('обновим списки мастерской')
   await context.dispatch('lists/processEvent', event, { root: true })
-  context.dispatch('workspace/updateRevision', event.wsRevision, { root: true })
 }
 
 // вывести уведомление о действии пользователя

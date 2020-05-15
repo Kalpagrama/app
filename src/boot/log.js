@@ -174,8 +174,8 @@ export default async ({ Vue, store, app }) => {
       }
       try {
         logE(err, info)
-        const { clearCache } = require('src/system/services')
-        clearCache()
+        // const { clearCache } = require('src/system/services')
+        // clearCache() нельзя очищать кэш просто на всякий случай! (там могут быть несохраненные изменения в мастерской)
       } catch (e) {
         console.error(e, info)
       }
@@ -193,8 +193,8 @@ export default async ({ Vue, store, app }) => {
       }
       try {
         logE('window.onerror', message, source, line, column, error)
-        const { clearCache } = require('src/system/services')
-        clearCache()
+        // const { clearCache } = require('src/system/services')
+        // clearCache() нельзя очищать кэш просто на всякий случай! (там могут быть несохраненные изменения в мастерской)
       } catch (e) {
         console.error(e)
       }

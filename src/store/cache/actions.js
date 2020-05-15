@@ -16,7 +16,7 @@ export const init = async (context, cache_) => {
 }
 /*!
  * модуль для кэширования данных во вьюикс
- * реальный класс кэширования cache - src/boot/cache.js
+ * реальный класс кэширования cache - src/boot/cache.js. Он умеет писать b в idb и в VUEX
  * во вьюикс - временный кэш. Постоянный - в boot/cache
  */
 export const clear = async (context) => {
@@ -34,10 +34,12 @@ export const get = async (context, { key, fetchItemFunc, force }) => {
 // если указана updateItemFunc, то должны быть и fetchItemFunc, mergeItemFunc
 // Если path = ''  то newValue - это полный объект
 // если actualAge не указан - вычислится на основе actualUntil (либо если объекта нет - поставится дефолтное)
+// можно использовать ф-ю для добавления данных в кэш (в этом случае - updateItemFunc не указывается)
 export const update = async (context, { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
   assert(context.state.initialized, '!context.state.initialized')
   assert(key)
   assert(setter != null || newValue != null)
+  if (setter) assert(setter.constructor.name !== 'AsyncFunction', 'setter should by sync function (NOT async!)')
   if (!path && !setter) assert(newValue.revision, 'newValue.revision exists')
   if (newValue) newValue = JSON.parse(JSON.stringify(newValue)) // иначе newValue станет реактивным, и его нельзя будет менять вне vuex
   path = path || ''

@@ -112,7 +112,7 @@ export default {
         }
       }
       this.$log('contentFound contentInput', contentInput)
-      let item = await this.$store.dispatch('workspace/wsItemCreate', contentInput)
+      let item = await this.$store.dispatch('workspace/wsItemUpsert', contentInput)
       this.$log('contentFound item', item)
       await this.$wait(300)
       this.contentClick(item.oid)

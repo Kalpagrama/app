@@ -157,7 +157,7 @@ export default {
         layout: 'PIP'
       }
       this.$log('nodeAddStart nodeInput', nodeInput)
-      this.node = await this.$store.dispatch('workspace/wsItemCreate', nodeInput)
+      this.node = await this.$store.dispatch('workspace/wsItemUpsert', nodeInput)
       this.nodeSearchString = ''
       this.$log('nodeAddStart node', this.node)
       // await this.$wait(300)

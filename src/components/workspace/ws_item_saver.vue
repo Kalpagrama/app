@@ -43,7 +43,7 @@ export default {
         this.itemUpdating = true
         // await this.$wait(1000)
         // if (this.item.rawData.name) this.item.name = this.item.rawData.name
-        let item = await this.$store.dispatch('workspace/wsItemUpdate', JSON.parse(JSON.stringify(this.item)))
+        let item = await this.$store.dispatch('workspace/wsItemUpsert', this.item) // wsItemUpsert делает копию item
         this.$log('itemUpdate done revision:', item.revision)
       } catch (e) {
         this.$logE('itemUpdate error', e)

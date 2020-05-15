@@ -145,8 +145,9 @@ class Cache {
       noDisposeOnSet: true,
       dispose: async (key, { actualUntil, actualAge }) => {
         assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-        if (!this.clearInProgress && ['authInfo', this.store.state.auth.userOid].includes(key)) {
+        if (!this.clearInProgress && ['wsUnsavedChanges', 'authInfo', this.store.state.auth.userOid].includes(key)) {
           // кладем обратно! юзера нельзя удалять + authInfo должна жить вечно
+          // wsUnsavedChanges - изменения в мастерской, которые еще не ушли на сервер
           setTimeout(() => {
             let item = this.store.state.cache.cachedItems[key] // данные лежат во vuex
             assert(item)
@@ -255,8 +256,7 @@ class Cache {
   async get (key, fetchItemFunc, force) {
     assert(key && fetchItemFunc, 'key && fetchFunc')
     let result
-    let cachedData = this.cacheLru.get(key)
-    let { actualUntil, actualAge } = cachedData ? cachedData : {}
+    let { actualUntil, actualAge } = this.cacheLru.get(key) || {}
     if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
       if (!force) logD('данные отсутствуют в кэше, либо устарели!')
       try {
