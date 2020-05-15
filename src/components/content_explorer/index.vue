@@ -27,11 +27,11 @@ q-layout(view="hHh lpR fFf")
           }`).row.full-width.q-px-xs
           //- header
           div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-            q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()").b-50
+            q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
             .col.full-height
               .row.fit.items-center.content-center.q-px-sm
-                span(:style=`{minHeight: '42px', borderRadius: '10px'}`).text-bold.text-white.q-pa-sm.b-50 {{ content.name }}
-            q-btn(round flat color="grey-2" icon="more_vert").b-50
+                span(:style=`{minHeight: '42px', borderRadius: '10px'}`).text-bold.text-white.q-pa-sm {{ content.name }}
+            q-btn(round flat color="grey-2" icon="more_vert")
           //- body
           composition(
             v-if="content"

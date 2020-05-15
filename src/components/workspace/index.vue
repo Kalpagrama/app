@@ -11,9 +11,12 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
   kalpa-menu-right
     menu-right(:pages="pages").b-50
   //- footer
-  kalpa-menu-footer(:options=`{showMenuPage: true}`)
-    template(v-slot:menuRight)
-      menu-right(:pages="pages").b-50
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    kalpa-menu-footer(
+      v-if="$store.state.workspace.showFooter"
+      :options=`{showMenuPage: true}`)
+      template(v-slot:menuRight)
+        menu-right(:pages="pages").b-50
   //- actions
   //- item editors
   //- q-dialog(
@@ -50,11 +53,11 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
                 borderRadius: $q.screen.width > 600 ? '10px' : '0px'}`
               ).row.full-width.items-center.content-center.q-px-sm.b-100
               q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-              div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-                q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
+              div(:style=`{height: '60px'}`).row.items-center.content-center.justify-center
+                q-btn(round flat color="white")
                   q-icon(name="school" size="36px" color="white")
               .col
-                .row.fit.items-center.content-center
+                .row.fit.items-center.content-center.q-px-sm
                   span(:style=`{fontSize: '18px'}`).text-white.text-bold Workspace
                   .row.full-width
                     small.text-white {{ pages.find(p => p.id === $route.params.page).name }}

@@ -1,7 +1,7 @@
 <style lang="sass" scoped>
 .page-item
   &:hover
-    background: #777 !important
+    background: rgb(70,70,70) !important
 </style>
 
 <template lang="pug">
@@ -10,7 +10,7 @@ div(
     borderRadius: '10px', overflow: 'hidden',
     maxHeight: '70vh'
   }`
-  ).column.full-width.bg-grey-9
+  ).column.full-width.b-50
   //- pages
   router-link(
     v-for="(p,pi) in pages" :key="p.id"
@@ -19,7 +19,7 @@ div(
       'b-100': $route.params.page === p.id
     }`
     :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
-    span.text-white {{ p.name }}
+    span(:style=`{userSelect: 'none'}`).text-white {{ p.name }}
   //- //- spheres
   //- div(:style=`{height: '50px'}`).row.full-width.items-center.q-px-md
   //-   span.text-white Related spheres

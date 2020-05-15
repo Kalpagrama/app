@@ -29,7 +29,10 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
   //- items wrapper
   div(
     :style=`{
-      position: 'relative', borderRadius: '10px', overflow: 'hidden', zIndex: 100}`
+      position: 'relative', zIndex: 101,
+      borderRadius: '10px', overflow: 'hidden',
+      marginBottom: '-10px'
+    }`
     ).row.full-width.items-start.content-start
     items-player(v-bind="$props" :ctx="ctx")
     //- voting
@@ -43,13 +46,13 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       'b-70': visible && !active,
       'b-90': visible && active
     }`
-    :style=`{height: '60px', marginTop: '-10px'}`
+    :style=`{zIndex: 100, height: '70px', borderRadius: '0 0 10px 10px', overflow: 'hidden', marginBottom: '-10px'}`
     ).row.full-width.items-center.content-center.justify-start.q-px-md.q-py-sm
     span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
   //- author and vote
   div(
     v-if="opened && nodeFull"
-    :style=`{height: '60px'}`
+    :style=`{zIndex: 99, height: '80px', borderRadius: '0 0 10px 10px', marginBottom: '-10px'}`
     ).row.full-width.items-center.content-center.q-px-md.q-py-sm.bg-grey-9
     kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="42" :height="42" @click.native="$router.push('/user/'+nodeFull.author.oid)")
     router-link(:to="'/user/'+nodeFull.author.oid").col

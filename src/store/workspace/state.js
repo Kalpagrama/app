@@ -4,6 +4,8 @@ export default {
   revision: 0,
   item: null,
   itemType: undefined,
+  showFooter: true,
+  showHeader: true,
   shareItem: {
     type: 'VIDEO',
     url: 'https://www.youtube.com/watch?v=KdDPhoyypcg'

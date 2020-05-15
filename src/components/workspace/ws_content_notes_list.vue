@@ -33,7 +33,7 @@ div(:style=`{position: 'relative'}`).column.fit
     ).col.full-width.scroll
     slot(name="header")
     //- header: content finder, filters, edit
-    div(:style=`{marginTop: '-20px', paddingTop: '30px'}`
+    div(:style=`{marginTop: '-20px', paddingTop: '30px', borderRadius: '10px'}`
       ).row.full-width.items-start.content-start.justify-center.b-100
       ws-content-finder(
         ref="wsContentFinder"
@@ -53,9 +53,11 @@ div(:style=`{position: 'relative'}`).column.fit
           flat color="white" no-caps
           :style=`{height: '36px'}`).b-110 Spheres
     //- header: edit
-    div(:style=`{
-      position: 'sticky', top: '-20px',
-      borderRadius: '0 0 10px 10px', marginTop: '-20px', paddingTop: '28px'}`
+    div(
+      v-if="options.editing"
+      :style=`{
+        position: 'sticky', top: '-20px',
+        borderRadius: '0 0 10px 10px', marginTop: '-20px', paddingTop: '28px'}`
       ).row.full-width.q-px-sm.q-pb-sm.b-80
       //- q-btn(flat round color="white").b-90
         q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6")
@@ -75,7 +77,14 @@ div(:style=`{position: 'relative'}`).column.fit
 <script>
 export default {
   name: 'wsContentNotesList',
-  props: ['options'],
+  props: {
+    options: {
+      type: Object,
+      default () {
+        return {}
+      }
+    }
+  },
   data () {
     return {
       content: null,
@@ -96,9 +105,19 @@ export default {
       this.$log('contentClick', oid)
       this.content = await this.$store.dispatch('objects/get', {oid: oid})
       this.$log('contentClick', this.content)
-      // TODO add switch to edit or select, depends on mode...
-      this.contentEditorOpened = true
-      // this.$emit('item', {type: 'contentNotes', item: this.content})
+      switch (this.options.onItemClick) {
+        case 'edit': {
+          this.contentEditorOpened = true
+          break
+        }
+        case 'emit': {
+          this.$emit('item', {type: 'contentNotes', item: this.content})
+          break
+        }
+        default: {
+          alert('this.options.onItemClick NONE')
+        }
+      }
     },
     async contentDelete (oid) {
       this.$log('contentDelete start', oid)

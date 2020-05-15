@@ -1,46 +1,48 @@
 <template lang="pug">
 div(
   v-if="node"
-  :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`
-  ).column.fit.items-start.b-30
+  :style=`{position: 'relative'}`
+  ).column.full-width.b-30
+  //- header
+  div(
+    v-if="true"
+    :style=`{
+      position: 'relative',
+      zIndex: 1000,
+      borderRadius: $q.screen.width > 600 ? '10px' : '0 0 10px 10px'
+    }`
+    ).row.full-width.items-center.content-center.q-px-sm.b-100
+    //- main navigation
+    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
+      q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$emit('cancel')")
+      .col.full-height
+        .row.fit.items-center.content-center.q-px-sm
+          span(:style=`{fontSize: '20px'}`).text-white.text-bold Node editor
+      q-btn(
+        push color="green" no-caps @click="nodePublish()"
+        :style=`{height: '42px'}`).q-px-sm Publish
+    //- essence
+    div(
+      :style=`{
+        zIndex: 100
+      }`
+      ).row.full-width
+      .col
+        q-input(
+          v-model="node.name"
+          filled color="white" dark
+          label="Whats the essence?"
+          :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+          ).full-width.b-150
+    //- pages
+    .row.full-width.items-center.content-center
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-100
+        kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event")
   //- body
-  div(ref="nodeEditorScrollArea" @scroll="onScroll").col.full-width.scroll
-    //- header
-    div(:style=`{position: 'relative', zIndex: 1000, borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-sm.b-100
-      //- main navigation
-      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
-        q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$emit('cancel')")
-        .col.full-height
-          .row.fit.items-center.content-center.q-px-sm
-            span(:style=`{fontSize: '20px'}`).text-white.text-bold Node editor
-        q-btn(
-          push color="green" no-caps @click="nodePublish()"
-          :style=`{height: '42px'}`).q-px-sm Publish
-      //- essence
-      div(
-        :style=`{
-          zIndex: 100
-        }`
-        ).row.full-width
-        .col
-          q-input(
-            v-model="node.name"
-            filled color="white" dark
-            label="Whats the essence?"
-            :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden'}`
-            ).full-width.b-150
-      //- pages
-      .row.full-width.items-center.content-center
-        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-100
-          kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event")
-    //- edit component
+  .col.full-width
     component(
       :is="`edit-${pageId}`"
-      :node="node"
-      :scrollHeight="scrollHeight"
-      :scrollTop="scrollTop"
-      @scrollTo="scrollTo")
-    div(:style=`{height: '1000px'}`).row.full-width.bg-red
+      :node="node")
 </template>
 
 <script>

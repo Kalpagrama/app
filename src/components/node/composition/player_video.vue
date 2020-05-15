@@ -40,7 +40,7 @@ div(
   //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- debug
   div(
-    v-if="false && !mini"
+    v-if="true && !mini"
     :style=`{
       position: 'absolute', width: 'calc(50%)', left: '8px', top: '80px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
@@ -119,7 +119,7 @@ div(
           opacity: videoLoadeddataDone && videoGood ? 1 : 0
         }`)
     player-video-progress(
-      v-if="false && visible && active"
+      v-if="true && visible && active"
       v-show="!mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
@@ -129,7 +129,7 @@ div(
       }`)
     //- progress tint
     div(
-      v-if="false"
+      v-if="true"
       :style=`{
         position: 'absolute', zIndex: 2000, height: '77px', bottom: '0px', pointerEvents: 'none',
         borderRadius: '10px', overflow: 'hidden',

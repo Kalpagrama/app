@@ -11,7 +11,7 @@ div(:style=`{borderRadius: '10px'}`).column.fit.b-50
     :style=`{height: '60px'}`
     ).row.full-width.items-center.content-center
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-      q-btn(round flat color="white" :style=`{borderRadius: '50%'}`)
+      q-btn(round flat color="white")
         q-icon(name="blur_on" size="36px" color="white")
     .col
       .row.fit.items-center.content-center

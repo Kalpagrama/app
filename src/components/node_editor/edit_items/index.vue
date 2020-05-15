@@ -6,10 +6,8 @@
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-  div(:style=`{marginTop: '-10px', borderRadius: '0 0 10px 10px'}`).row.full-width.q-pt-md.q-pb-sm.q-px-sm.b-80.q-mb-sm
-    .col
-    q-btn(flat round color="white" icon="edit")
+div(:style=`{position: 'relative'}`).column.fit
+  //- actions
   //- dialogs
   //- ws item finder dialog
   q-dialog(v-model="itemFinderOpened" maximized position="bottom")
@@ -45,19 +43,31 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
           :composition="node.items[itemIndex]" :content="node.items[itemIndex].content"
           @cancel="itemEditorOpened = false"
           ).bg-grey-8
+  //- header: edit
+  div(
+    v-if="false"
+    :style=`{
+      position: 'sticky',
+      marginTop: '-10px', borderRadius: '0 0 10px 10px'
+    }`).row.full-width.q-pt-md.q-pb-sm.q-px-sm.b-80
+    .col
+    q-btn(flat round color="white" icon="edit").b-90
   //- add first item
-  div(v-if="node.items.length === 0").row.fit.q-px-sm.q-pb-sm
+  div(v-if="true && node.items.length === 0").col.full-width.q-pa-sm
     div(:style=`{borderRadius: '10px'}`).column.fit.b-50
       div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
         span(:style=`{}`).text-white.text-bold Select first item
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.full-width.b-50
         ws-item-finder(
           :types="['contentNotes', 'node']"
-          :options="{}"
+          :options=`{
+            editing: false,
+            onItemClick: 'emit'
+          }`
           @item="itemFound"
           @cancel="itemFinderOpened = false")
   //- node.items
-  div(v-if="node.items.length > 0").row.full-width
+  div(v-if="false && node.items.length > 0").col.full-width.scroll
     .row.full-width.items-start.content-start.q-px-sm
       //- items
       div(
@@ -114,7 +124,9 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
             :style=`{height: '60px'}`).full-width
         div(:style=`{width: '60px'}`).row.q-pa-sm
   //- footer: items selected
-  div(:style=`{overflow: 'hidden'}`).row.full-width
+  div(
+    v-if="false"
+    :style=`{overflow: 'hidden'}`).row.full-width
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
         v-if="itemsSelected.length > 0"
@@ -132,11 +144,10 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
 
 <script>
 import assert from 'assert'
-import composer from 'components/node/composition_editor/video_composer/composer'
 
 export default {
   name: 'nodeEditor-editItems',
-  components: {composer},
+  components: {},
   props: {
     node: {type: Object}
   },
@@ -166,7 +177,6 @@ export default {
         case 'contentNotes': {
           let compositionInput = JSON.parse(JSON.stringify(item))
           // add layers workspace, non reactive...
-          // compositionInput.oid = Date.now().toString()
           compositionInput.layersWorkspace = compositionInput.layers
           compositionInput.layers = []
           this.$set(this.node.items, this.node.items.length, compositionInput)
@@ -176,6 +186,7 @@ export default {
           break
         }
         default: {
+          alert(`NO SUCH TYPE: ${type}`)
           this.$log('No such type!')
         }
       }

@@ -6,19 +6,16 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
         borderRadius: '10px', overflow: 'hidden',
         maxHeight: '70vh'
       }`
-      ).column.fit.bg-grey-9
+      ).column.full-width.bg-grey-9
       menu-right
       //- div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-md
       //-   span.text-white.text-bold Related spheres
       //- .col.full-width.scroll
       //-   .row.full-width.q-pa-sm
           //- sphere-spheres(v-if="true" :oid="sphereOid")
-  kalpa-menu-footer
-  //- q-header(reveal)
-  //-   .row.full-width.justify-center
-  //-     div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px'}`
-  //-       ).row.full-width.items-center.content-center
-  //-       //- span.text-white Node explorer
+  kalpa-menu-footer(:options=`{showMenuPage: true}`)
+    template(v-slot:menuRight)
+      menu-right
   q-btn(
     v-if="scrollTop >= nodeHeight"
     push color="green" no-caps
@@ -45,21 +42,21 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
             :visible="nodeVisible" :active="nodeActive" :mini="nodeMini")
         //- essence fixed
         div(
-          v-if="scrollTop >= nodeHeight"
+          v-if="false && scrollTop >= nodeHeight"
           @click="nodeEssenceStickyClick()"
           :style=`{
             position: 'fixed',
             top: '0px',
             height: '60px',
             zIndex: 1000
-          }`).row.full-width.justify-center.q-px-xs.cursor-pointer
+          }`).row.full-width.justify-center.cursor-pointer.br
           div(
             :style=`{
               maxWidth: $store.state.ui.maxWidthPage+'px',
-              marginTop: '-10px',
               borderRadius: '0 0 10px 10px'
             }`
-            ).row.full-width.items-center.content-center.q-px-md.bg-grey-9
+            ).row.full-width.items-center.content-center.q-px-sm.b-100
+            q-btn(round flat color="white" icon="keyboard_arrow_left")
             span(v-if="node").text-white.text-bold {{node.name}}
       //- body
       div(v-if="false").row.full-width.justify-center
@@ -115,6 +112,19 @@ export default {
         pagination: { pageSize: 10 },
         sortStrategy: 'HOT',
         filter: { types: 'NODE' }
+      }
+    }
+  },
+  watch: {
+    '$router.params.page': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('$route.params.page CHANGED', to)
+        if (to) {
+        }
+        else {
+          this.$router.replace({params: {page: 'nodes'}}).catch(e => e)
+        }
       }
     }
   },
