@@ -40,7 +40,7 @@ div(
   //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- debug
   div(
-    v-if="true && !mini"
+    v-if="false && !mini"
     :style=`{
       position: 'absolute', width: 'calc(50%)', left: '8px', top: '80px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
@@ -62,7 +62,7 @@ div(
     //- video actions
     //- content name
     router-link(
-      v-if="true && layer && content && visible && active && !mini"
+      v-if="false && layer && content && visible && active && !mini"
       :to="'/content/'+content.oid"
       :style=`{
         position: 'absolute', zIndex: 20000, left: '8px',
@@ -71,7 +71,7 @@ div(
         background: 'rgba(0,0,0,0.3)'
       }`
       ).q-px-sm.q-py-xs.text-grey-2.cursor-pointer.layer-name
-      small(:style=`{userSelect: 'none'}`) {{ content.name }}
+      small(:style=`{lineHeight: 0.5, userSelect: 'none'}`) {{ content.name }}
     //- layer name
     span(
       v-if="true && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
@@ -119,7 +119,7 @@ div(
           opacity: videoLoadeddataDone && videoGood ? 1 : 0
         }`)
     player-video-progress(
-      v-if="visible && active"
+      v-if="false && visible && active"
       v-show="!mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
@@ -129,6 +129,7 @@ div(
       }`)
     //- progress tint
     div(
+      v-if="false"
       :style=`{
         position: 'absolute', zIndex: 2000, height: '77px', bottom: '0px', pointerEvents: 'none',
         borderRadius: '10px', overflow: 'hidden',

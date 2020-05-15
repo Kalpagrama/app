@@ -7,9 +7,10 @@
 <template lang="pug">
 div(
   :style=`{
+    position: 'relative',
     borderRadius: '10px', overflow: 'hidden'
   }`
-  ).column.full-width.b-50
+  ).column.full-width
   //- .col.full-width.scroll
   .row.full-width.items-start
     router-link(

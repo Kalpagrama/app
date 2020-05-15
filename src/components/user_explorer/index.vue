@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf").bg-grey-10
+q-layout(view="hHh lpR fFf").b-30
   kalpa-menu-right
     menu-right(:user="user")
   q-header(v-if="false" reveal)
@@ -14,17 +14,14 @@ q-layout(view="hHh lpR fFf").bg-grey-10
         span.text-bold.text-white {{ user.name }}
         .row.full-width
           small.text-white @{{ user.name }}
-  kalpa-menu-footer
+  kalpa-menu-footer(:options=`{showMenuPage: true}`)
     template(v-slot:menuRight)
       menu-right(:user="user")
-  q-page-container.row.fit.justify-center.bg-grey-10
-    user-info(v-if="user" :user="user")
-    //- user-created-nodes(
-    //-   v-if="pageId === 'created'"
-    //-   :filter="{ types: ['NODE'], fastFilters: ['CREATED_BY_USER']}")
-    //- user-voted
-    //- user-followers
-    //- user-following
+  q-page-container
+    q-page.row.full-width.justify-center
+      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+        user-info(v-if="user" :user="user")
+        component(:is="`user-${pageId}`")
 </template>
 
 <script>
@@ -32,12 +29,12 @@ import menuRight from './menu_right'
 import userInfo from './user_info'
 import userFollowers from './user_followers'
 import userFollowing from './user_following'
-import userCreatedNodes from './user_created_nodes'
-import userVotedNodes from './user_voted_nodes'
+import userCreated from './user_created'
+import userVoted from './user_voted'
 
 export default {
   name: 'userExplorer',
-  components: {menuRight, userInfo, userVotedNodes, userCreatedNodes, userFollowing, userFollowers},
+  components: {menuRight, userInfo, userVoted, userCreated, userFollowing, userFollowers},
   props: ['user'],
   data () {
     return {

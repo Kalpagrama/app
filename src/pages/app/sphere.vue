@@ -16,6 +16,19 @@ export default {
       sphereLoadingError: null
     }
   },
+  computed: {
+    spheresTop () {
+      return this.$store.state.node.categories.reduce((acc, val) => {
+        if (val.type !== 'ALL') {
+          acc.push({
+            oid: val.sphere.oid,
+            name: val.sphere.name
+          })
+        }
+        return acc
+      }, [])
+    }
+  },
   watch: {
     '$route.params.oid': {
       deep: true,
@@ -26,7 +39,12 @@ export default {
           this.sphere = await this.sphereLoad(to)
         }
         else {
-          this.$router.replace({params: {oid: this.$store.getters.currentUser.oid}})
+          if (this.$route.name === 'trends') {
+            this.$router.replace({params: {oid: this.spheresTop[0].oid}})
+          }
+          else {
+            this.$router.replace({params: {oid: this.$store.getters.currentUser.oid}})
+          }
         }
       }
     }

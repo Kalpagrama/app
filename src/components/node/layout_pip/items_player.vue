@@ -19,13 +19,15 @@ div(
   :style=`{
     position: 'relative'
   }`
-  ).row.full-width.items-start.content-start
+  ).row.full-width.items-start.content-start.b-50
   //- preview
   img(
     :src="preview" draggable="false"
-    :style=`{maxHeight: 500+'px', userSelect: 'none', objectFit: 'contain', opacity: 0}`).full-width
+    :style=`{maxHeight: 500+'px', userSelect: 'none', objectFit: 'contain', opacity: active ? 1 : 0.5}`).full-width
   //- items wrapper
-  div(:style=`{position: 'absolute'}`).row.fit.bg-black
+  div(
+    v-if="true"
+    :style=`{position: 'absolute'}`).row.fit.bg-black
     //- items stats
     div(
       v-if="visible && active && items.length > 1"
@@ -51,7 +53,8 @@ div(
       ).row.items-center.content-center.justify-center.cursor-pointer.item-prev
         q-btn(round flat color="white" icon="keyboard_arrow_left")
     //- item last
-    div(v-if="items.length > 1 && itemIndex+1 === items.length" @click="itemsAgain()"
+    div(
+      v-if="items.length > 1 && itemIndex+1 === items.length" @click="itemsAgain()"
       :style=`{
         position: 'absolute', zIndex: 20000, right: '0px', bottom: '0px',
         maxWidth: '25%', height: '100px',

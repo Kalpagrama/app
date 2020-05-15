@@ -7,7 +7,13 @@
 <template lang="pug">
 //- div(:style=`{position: 'relative'}`).row.full-width
 //- q-layout(container :style=`{height: $q.screen.height+'px'}`)
-.column.fit
+div(:style=`{position: 'relative'}`).column.fit
+  q-btn(
+    round push color="green" icon="add" size="lg"
+    :style=`{
+      position: 'absolute', zIndex: 1000, bottom: '8px', right: '8px',
+      borderRadius: '50%'
+    }`)
   //- dialogs
   //- node editor
   q-dialog(
@@ -23,27 +29,22 @@
             :style=`{
               maxWidth: $store.state.ui.maxWidthPage+'px'
             }`)
-  //- actions
-  //- add
-  //- q-btn(
-  //-   round push size="lg" color="green" icon="add" @click="nodeAddStart()"
-  //-   :style=`{position: 'absolute', zIndex:1000, right: '16px', bottom: '16px', borderRadius: '50% !important'}`)
   //- header
   .row.full-width.justify-center
     div(
       :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px', overflow: 'hidden'}`
       ).row.full-width.items-start.content-start.q-px-sm.b-100.br
       .row.full-width
-        .col.q-pr-sm
+        .col
           q-input(
             v-model="nodeSearchString" filled color="green"
             placeholder="Find or add node"
             :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
             ).full-width.bg-grey-1
-        div(:style=`{}`).row.full-height
-          q-btn(
-            push color="green" icon="add" @click="nodeAddStart()"
-            :style=`{height: '56px', width: '56px'}`)
+        //- div(:style=`{}`).row.full-height
+        //-   q-btn(
+        //-     push color="green" icon="add" @click="nodeAddStart()"
+        //-     :style=`{height: '56px', width: '56px'}`)
       .row.full-width.items-center.content-center
         .col
           kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start

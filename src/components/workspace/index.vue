@@ -9,11 +9,11 @@
 //- div(:style=`{position: 'relative'}`).row.full-width
 div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-width
   kalpa-menu-right
-    menu-right(:pages="pages")
+    menu-right(:pages="pages").b-50
   //- header
-  //- kalpa-menu-footer
-  //-   template(v-slot:menuRight)
-  //-     menu-right(:pages="pages")
+  kalpa-menu-footer(:options=`{showMenuPage: true}`)
+    template(v-slot:menuRight)
+      menu-right(:pages="pages").b-50
   //- item editors
   //- q-dialog(
   //-   v-model="pageDialogOpened" :maximized="true" position="bottom"
@@ -46,7 +46,10 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
           @page="$router.push({params: {page: $event}}).catch(e=>e)")
           template(v-slot:header)
             div(
-              :style=`{position: 'relative', height: '60px', borderRadius: '10px'}`
+              :style=`{
+                position: 'relative',
+                height: '60px',
+                borderRadius: $q.screen.width > 600 ? '10px' : '0px'}`
               ).row.full-width.items-center.content-center.q-px-sm.b-100
               q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
               div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
@@ -127,8 +130,8 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$q.addressbarColor.set('#222')
-    document.body.style.background = '#222'
+    this.$q.addressbarColor.set('rgb(30,30,30)')
+    document.body.style.background = 'rgb(30,30,30)'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

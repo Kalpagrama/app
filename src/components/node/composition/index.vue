@@ -7,7 +7,7 @@ div(
     v-if="false"
     :style=`{
       position: 'absolute', zIndex: 1000, top: '0px', color: 'white',
-      transform: 'translate3d(0,0,0)',
+      transform: 'translate3d(0,0,0)'
     }`
     ).row.full-width
     .row.bg-red

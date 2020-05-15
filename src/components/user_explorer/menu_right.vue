@@ -16,9 +16,9 @@ div(
     v-for="(p,pi) in pages" :key="p.id"
     :to=`{params: {page: p.id}}`
     :class=`{
-      'bg-grey-7': $route.params.page === p.id
+      'b-100': $route.params.page === p.id
     }`
-    :style=`{height: '40px'}`).row.full-width.items-center.content-center.q-px-md.page-item
+    :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
     span.text-white {{ p.name }}
   //- //- spheres
   //- div(:style=`{height: '50px'}`).row.full-width.items-center.q-px-md
@@ -40,7 +40,7 @@ export default {
         {id: 'voted', name: 'Voted'},
         {id: 'followers', name: 'Followers'},
         {id: 'following', name: 'Following'},
-        {id: 'spheres', name: 'Spheres'}
+        // {id: 'spheres', name: 'Spheres'}
       ]
     }
   }

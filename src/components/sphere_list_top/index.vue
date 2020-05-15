@@ -1,7 +1,7 @@
 <style lang="sass">
 .sphere-item
   &:hover
-    background: #888
+    background: rgb(70,70,70)
 </style>
 
 <template lang="pug">
@@ -11,11 +11,11 @@
       div(
         v-for="(c,ci) in categories" :key="c.oid" @click="$emit('oid', c.oid)"
         :class=`{
-            'bg-grey-7': oid === c.oid
-          }`
-        :style=`{height: '40px'}`
+          'b-100': oid === c.oid
+        }`
+        :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.q-px-md.cursor-pointer.sphere-item
-        span(:style=`{userSelect: 'none', textTransform: 'capitalize'}`).text-white {{'#'+c.name}}
+        span(:style=`{userSelect: 'none', textTransform: 'capitalize'}`).text-white {{'✳ '+c.name}}
 </template>
 
 <script>

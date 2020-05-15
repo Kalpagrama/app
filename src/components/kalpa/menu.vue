@@ -29,7 +29,7 @@ div(:style=`{borderRadius: '10px'}`).column.fit.b-50
           v-if="$store.getters.currentUser"
           :to="'/user/'+$store.getters.currentUser.oid"
           :class=`{
-            'bg-grey-7': $route.name === 'user'
+            'b-100': $route.name === 'user'
           }`
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
           ).row.full-width.items-center.content-center.menu-item
@@ -72,11 +72,11 @@ div(:style=`{borderRadius: '10px'}`).column.fit.b-50
           ).row.full-width.items-center.content-center.q-px-md.q-py-sm
           q-btn(
             push color="green" no-caps align="left"
-            :style=`{height: '50px'}`).full-width
-            span.q-ml-lg Create node
+            :style=`{height: '50px'}`)
+            span(:style=`{fontSize: '18px'}`).q-mx-lg Create node
         //- version
         .row.full-width.items-center.q-px-md.q-py-sm
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.1.0-12.05.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.0.1-15.05.2020
         //- slot(name="footer")
 </template>
 

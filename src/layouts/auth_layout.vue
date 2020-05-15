@@ -12,7 +12,14 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    document.body.style.background = '#424242'
+    let bg
+    if (this.$q.screen.width > 600) {
+      bg = 'rgb(30,30,30)'
+    }
+    else {
+      bg = 'rgb(70,70,70)'
+    }
+    document.body.style.background = 'red'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

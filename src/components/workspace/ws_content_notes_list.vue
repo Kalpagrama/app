@@ -25,7 +25,12 @@ div(:style=`{position: 'relative'}`).column.fit
             minHeight: $q.screen.height+'px'
           }`)
   //- body
-  div(:style=`{position: 'relative'}`).col.full-width.scroll.q-pt-sm
+  div(
+    ref="wsContentNotesScrollArea"
+    :class=`{
+      'q-pt-sm': $q.screen.width > 600
+    }`
+    :style=`{position: 'relative'}`).col.full-width.scroll
     slot(name="header")
     //- header: content finder, filters, edit
     div(:style=`{marginTop: '-20px', paddingTop: '30px'}`).row.full-width.items-start.content-start.justify-center.b-100
@@ -46,9 +51,10 @@ div(:style=`{position: 'relative'}`).column.fit
         q-btn(
           flat color="grey-2" no-caps
           :style=`{height: '36px'}`).b-110 Spheres
-    div(:style=`{position: 'sticky', top: '-28px', borderRadius: '0 0 10px 10px', marginTop: '-20px', paddingTop: '28px'}`).row.full-width.q-px-sm.q-pb-sm.b-80
-      q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6")
-      .col
+    div(:style=`{position: 'sticky', top: '-20px', borderRadius: '0 0 10px 10px', marginTop: '-20px', paddingTop: '28px'}`).row.full-width.q-px-sm.q-pb-sm.b-80
+      //- q-btn(flat round color="white").b-90
+        q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6")
+      div(@click.self="scrollTo(0)").col
       q-btn(flat round color="white" icon="edit").b-90
     kalpa-loader(type="CONTENT_NOTES_LIST")
       template(v-slot="{items}")
@@ -90,6 +96,7 @@ export default {
       this.$log('contentClick', oid)
       this.content = await this.$store.dispatch('objects/get', {oid: oid})
       this.$log('contentClick', this.content)
+      // TODO add switch to edit or select, depends on mode...
       this.contentEditorOpened = true
       // this.$emit('item', {type: 'contentNotes', item: this.content})
     },
@@ -121,6 +128,13 @@ export default {
       this.$log('contentFound item', item)
       await this.$wait(300)
       this.contentClick(item.oid)
+    },
+    scrollTo (val) {
+      this.$log('scrollTo', val)
+      let ref = this.$refs.wsContentNotesScrollArea
+      if (ref) {
+        this.$tween.to(ref, 0.5, {scrollTop: val})
+      }
     }
   },
   async mounted () {

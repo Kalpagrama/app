@@ -13,7 +13,7 @@ input
       maxWidth: 600+'px',
       borderRadius: $q.screen.width > 600 ? '10px' : '0px'
     }`
-    ).row.full-width.items-center.content-center.justify-center.bg-grey-9
+    ).row.full-width.items-center.content-center.justify-center.b-70
     div().row.full-width.justify-center.q-my-md
       q-icon(name="blur_on" color="white" size="100px" @click="$router.replace('/auth').catch(e => e)").cursor-pointer
       .row.full-width.justify-center
@@ -36,6 +36,7 @@ input
           :style=`{
             fontSize: '20px',
             borderRadius: '10px', overflow: 'hidden',
+            transform: 'translate3d(0,0,0)',
           }`).full-width.q-mb-sm.bg-grey-9
         q-btn(
           push no-caps color="green" @click="userIdentify()"
@@ -50,7 +51,7 @@ input
             span.text-grey-3 {{$t('Need invite code (beta testing in progress...)')}}
           q-input(
             v-model="inviteCode" dark color="green" filled label="Enter invite code" autofocus
-            :style=`{borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
             ).full-width.q-mb-sm.bg-grey-9
         //- email
         div(v-if="loginType && loginType === 'EMAIL'").row.full-width
@@ -89,7 +90,7 @@ input
           q-input(
             v-model="password" autofocus dark color="green" filled label="Enter code" type="tel"
             @keyup.enter="userAuthenticate()"
-            :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
+            :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
         //- password
         div(v-if="loginType && loginType === 'USERNAME'").row.full-width
           div(:style=`{height: '60px'}`
@@ -101,7 +102,7 @@ input
             v-model="password" autofocus dark color="green" filled label="Enter password"
             :type="passwordShow ? 'text' : 'password'"
             @keyup.enter="userAuthenticate()"
-            :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
+            :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
             template(v-slot:append)
               q-icon(
                 size="22px" color="white" @click="passwordShow = !passwordShow"
@@ -111,7 +112,7 @@ input
             v-model="passwordSecond" dark color="green" filled label="Confirm password"
             :type="passwordSecondShow ? 'text' : 'password'"
             @keyup.enter="userAuthenticate()"
-            :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
+            :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
             template(v-slot:append)
               q-icon(
                 size="22px" color="white" @click="passwordSecondShow = !passwordSecondShow"

@@ -4,9 +4,6 @@ div(id="q-app")
 </template>
 <script>
   export default {
-    name: 'App',
-    mounted () {
-      // alert('app mounted: ' + window.location.toString())
-    }
+    name: 'App'
   }
 </script>
