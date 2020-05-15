@@ -21,7 +21,7 @@ div(:style=`{}`).row.full-width.items-start.content-start.justify-center.b-30
         .row.fit.items-center.content-center.q-px-sm
           span(:style=`{fontSize: '25px', lineHeight: 0.9}` @click="userNameClick()").text-white.text-bold {{user.name}}
       q-btn(
-        v-if="true || !userIsMe"
+        v-if="false || !userIsMe"
         push no-caps color="green" @click="userFollow()").q-px-sm
         span.text-bold Follow
   //- status

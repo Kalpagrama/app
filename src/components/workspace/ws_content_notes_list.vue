@@ -8,11 +8,10 @@
 
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
-  //- dialog editor
+  //- actions
+  //- dialogs
+  //- composition editor
   q-dialog(v-model="contentEditorOpened" persistent position="bottom")
-    //- .row.fit.justify-center
-    //-   div(
-    //-     :style=`{position: 'relative', height: $q.screen.height+'px', background: 'rgba(0,0,0,0)'}`).row.full-width.justify-center
     ws-item-saver(v-if="content" :value="content")
       template(v-slot=`{item}`)
         composition-editor(
@@ -30,16 +29,18 @@ div(:style=`{position: 'relative'}`).column.fit
     :class=`{
       'q-pt-sm': $q.screen.width > 600
     }`
-    :style=`{position: 'relative'}`).col.full-width.scroll
+    :style=`{position: 'relative'}`
+    ).col.full-width.scroll
     slot(name="header")
     //- header: content finder, filters, edit
-    div(:style=`{marginTop: '-20px', paddingTop: '30px'}`).row.full-width.items-start.content-start.justify-center.b-100
-      //- div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.b-100
+    div(:style=`{marginTop: '-20px', paddingTop: '30px'}`
+      ).row.full-width.items-start.content-start.justify-center.b-100
       ws-content-finder(
         ref="wsContentFinder"
         :sources="['url', 'device']"
         @content="contentFound"
         :style=`{}`).b-100
+      //- tabs
       div(
         :style=`{
           zIndex: 100,
@@ -49,9 +50,13 @@ div(:style=`{position: 'relative'}`).column.fit
         .col
           kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
         q-btn(
-          flat color="grey-2" no-caps
+          flat color="white" no-caps
           :style=`{height: '36px'}`).b-110 Spheres
-    div(:style=`{position: 'sticky', top: '-20px', borderRadius: '0 0 10px 10px', marginTop: '-20px', paddingTop: '28px'}`).row.full-width.q-px-sm.q-pb-sm.b-80
+    //- header: edit
+    div(:style=`{
+      position: 'sticky', top: '-20px',
+      borderRadius: '0 0 10px 10px', marginTop: '-20px', paddingTop: '28px'}`
+      ).row.full-width.q-px-sm.q-pb-sm.b-80
       //- q-btn(flat round color="white").b-90
         q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6")
       div(@click.self="scrollTo(0)").col
@@ -85,11 +90,6 @@ export default {
     }
   },
   watch: {
-    // '$route.query.share': {
-    //   immediate: false,
-    //   handler (to, from) {
-    //   }
-    // }
   },
   methods: {
     async contentClick (oid) {

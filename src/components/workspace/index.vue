@@ -10,10 +10,11 @@
 div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-width
   kalpa-menu-right
     menu-right(:pages="pages").b-50
-  //- header
+  //- footer
   kalpa-menu-footer(:options=`{showMenuPage: true}`)
     template(v-slot:menuRight)
       menu-right(:pages="pages").b-50
+  //- actions
   //- item editors
   //- q-dialog(
   //-   v-model="pageDialogOpened" :maximized="true" position="bottom"
@@ -31,14 +32,11 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
   //-           :style=`{
   //-             maxWidth: $store.state.ui.maxWidthPage+'px'
   //-           }`)
-  //- .col.full-width
-  //-   //- q-page-container
-  //-   //-   q-page
-  div(:style=`{}`).col.full-width.scroll.q-mb-sm
+  div(:style=`{}`).col.full-width.q-mb-sm
     .row.fit.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit
         ws-settings(v-if="$route.params.page === 'settings'")
-        ws-tags(v-if="$route.params.page === 'tags'")
+        ws-spheres(v-if="$route.params.page === 'spheres'")
         ws-items(
           v-else
           ctx="workspace"
@@ -64,14 +62,14 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
 
 <script>
 import wsItems from './ws_items'
-import wsTags from './ws_tags'
+import wsSpheres from './ws_spheres'
 import wsSettings from './ws_settings'
 import wsItemSaver from './ws_item_saver'
 import menuRight from './menu_right'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsTags, wsSettings, wsItemSaver, menuRight},
+  components: {wsItems, wsSpheres, wsSettings, wsItemSaver, menuRight},
   props: [],
   data () {
     return {

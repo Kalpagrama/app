@@ -5,80 +5,86 @@
 </style>
 
 <template lang="pug">
-//- div(:style=`{position: 'relative'}`).row.full-width
-//- q-layout(container :style=`{height: $q.screen.height+'px'}`)
 div(:style=`{position: 'relative'}`).column.fit
+  //- actions
+  //- action: ADD
   q-btn(
-    round push color="green" icon="add" size="lg"
+    round push color="green" icon="add" size="lg" @click="nodeAddStart()"
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '8px', right: '8px',
       borderRadius: '50%'
     }`)
   //- dialogs
   //- node editor
-  q-dialog(
-    v-model="nodeEditorOpened" persistent :maximized="true" position="bottom")
-    div(
-      :style=`{position: 'relative', height: $q.screen.height+'px'}`).row.full-width.justify-center
-      ws-item-saver(:value="node")
-        template(v-slot=`{item}`)
-          node-editor(
-            ctx="workspace" mode="edit"
-            :node="item" :wsItemFinderOnBoot="true" :paddingTop="8"
-            @cancel="nodeEditorOpened = false"
-            :style=`{
-              maxWidth: $store.state.ui.maxWidthPage+'px'
-            }`)
-  //- header
-  .row.full-width.justify-center
-    div(
-      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-start.content-start.q-px-sm.b-100.br
-      .row.full-width
-        .col
-          q-input(
-            v-model="nodeSearchString" filled color="green"
-            placeholder="Find or add node"
-            :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
-            ).full-width.bg-grey-1
-        //- div(:style=`{}`).row.full-height
-        //-   q-btn(
-        //-     push color="green" icon="add" @click="nodeAddStart()"
-        //-     :style=`{height: '56px', width: '56px'}`)
-      .row.full-width.items-center.content-center
+  q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
+    ws-item-saver(v-if="node" :value="node")
+      template(v-slot=`{item}`)
+        node-editor(
+          ctx="workspace"
+          :node="item"
+          @cancel="nodeEditorOpened = false"
+          :style=`{
+            maxWidth: $store.state.ui.maxWidthPage+'px',
+            minHeight: $q.screen.height+'px'
+          }`)
+  //- body
+  div(
+    ref="wsNodeListScrollArea"
+    :class=`{
+      'q-pt-sm': $q.screen.width > 600
+    }`
+    ).col.full-width.scroll
+    slot(name="header")
+    //- header: essence input
+    div(:style=`{marginTop: '-20px', paddingTop: '30px'}`
+      ).row.full-width.items-start.content-start.justify-center.b-100
+      .row.full-width.q-px-sm
+        q-input(
+          v-model="nodeSearchString" filled color="green"
+          label="Find or add node"
+          :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+          ).full-width.q-mx-sm.b-220
+      //- tabs
+      div(
+        :style=`{
+          zIndex: 100,
+          borderRadius: '0 0 10px 10px', overflow: 'hidden'
+        }`
+        ).row.full-width.items-center.content-center.q-px-sm.b-100
         .col
           kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
         q-btn(
-          flat color="grey-2" no-caps
-          :style=`{height: '36px'}`).q-mr-sm.b-90 Spheres
-        q-btn(
-          flat color="grey-2" icon="edit"
-          :style=`{height: '36px'}`
-          ).b-90
-  //- body
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-pt-md
-      kalpa-loader(type="NODE_LIST")
-        template(v-slot="{items}")
-          .row.full-width.items-start
-            div(
-              v-for="(n, ni) in nodesFilter(items)" :key="n.oid"
-              :style=`{
-                height: '40px'
-              }`
-              ).row.full-width.q-mb-xs
-              //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
-              //-   q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
-              .col
-                div(
-                  @click="nodeClick(n.oid)"
-                  :style=`{
-                    borderRadius: '10px', overflow: 'hidden'
-                  }`
-                  ).row.fit.items-center.content-center.q-px-md.cursor-pointer.node-item.b-70
-                  span(:style=`{userSelect: 'none'}`).text-white {{ n.name }}
-              //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
-              //-   q-btn(round flat dense color="grey-6" icon="more_vert")
+          flat color="white" no-caps
+          :style=`{height: '36px'}`).b-110 Spheres
+    //- header: edit
+    div(:style=`{
+      position: 'sticky', top: '-20px',
+      borderRadius: '0 0 10px 10px', marginTop: '-20px', paddingTop: '28px'}`
+      ).row.full-width.q-px-sm.q-pb-sm.b-80
+      div(@click.self="scrollTo(0)").col
+      q-btn(flat round color="white" icon="edit").b-90
+    kalpa-loader(type="NODE_LIST")
+      template(v-slot="{items}")
+        .row.full-width.items-start.q-py-sm
+          div(
+            v-for="(n, ni) in nodesFilter(items)" :key="n.oid"
+            :style=`{
+              height: '40px'
+            }`
+            ).row.full-width.q-mb-xs
+            //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
+            //-   q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
+            .col
+              div(
+                @click="nodeClick(n.oid)"
+                :style=`{
+                  borderRadius: '10px', overflow: 'hidden'
+                }`
+                ).row.fit.items-center.content-center.q-px-md.cursor-pointer.node-item.b-70
+                span(:style=`{userSelect: 'none'}`).text-white {{ n.name }}
+            //- div(:style=`{height: '40px', width: '40px'}`).row.items-center.content-center.justify-center
+            //-   q-btn(round flat dense color="grey-6" icon="more_vert")
+    div(:style=`{height: '1000px'}`).row.full-width
 </template>
 
 <script>
@@ -158,6 +164,13 @@ export default {
       // await this.$wait(1000)
       // this.$log('nodeAddStart node AFTER', this.node)
       this.nodeEditorOpened = true
+    },
+    scrollTo (val) {
+      this.$log('scrollTo', val)
+      let ref = this.$refs.wsNodeListScrollArea
+      if (ref) {
+        this.$tween.to(ref, 0.5, {scrollTop: val})
+      }
     }
   },
   async mounted () {

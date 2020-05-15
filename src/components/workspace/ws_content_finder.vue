@@ -20,10 +20,10 @@
             position: 'absolute', zIndex: 1000, left: '0px',
             width: progress.progress+'%', borderRadius: '10px', overflow: 'hidden', opacity: 0.9
           }`
-          ).row.fit.bg-green
+          ).row.fit.b-220
         q-input(
           v-model="url" filled
-          color="green" placeholder="Find content or paste URL"
+          color="green" label="Find content or paste URL"
           :loading="urlInputLoading"
           :input-style=`{}`
           :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
