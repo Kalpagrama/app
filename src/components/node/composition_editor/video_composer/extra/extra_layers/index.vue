@@ -16,7 +16,7 @@ div(:style=`{}`).column.fit
   //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated fadeOut")
   div(
     v-if="height > 100"
-    :style=`{height: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-60
+    :style=`{minHeight: '70px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-60
     layer-editor-figures(
       v-if="meta.content"
       :player="player" :meta="meta" @meta="$emit('meta', $event)")
@@ -68,14 +68,14 @@ div(:style=`{}`).column.fit
                   //- inactive tint
                   div(v-if="li !== meta.layerIndexPlay" :style=`{position: 'absolute', zIndex: 1000}` @click="layerClick(l, li)").row.fit.cursor-pointer
                   //- now tint
-                  div(
-                    v-if="li !== meta.layerIndexPlay && meta.now > l.figuresAbsolute[0].t && meta.now < l.figuresAbsolute[1].t"
-                    :style=`{
-                      position: 'absolute', zIndex: 1100, left: '0px', pointerEvents: 'none',
-                      background: 'rgba(255,255,255,0.4)',
-                      borderRadius: '10px', overflow: 'hidden',
-                      width: ((meta.now-l.figuresAbsolute[0].t)/(l.figuresAbsolute[1].t-l.figuresAbsolute[0].t))*100+'%'
-                    }`).row.full-height
+                  //- div(
+                  //-   v-if="false && li !== meta.layerIndexPlay && meta.now > l.figuresAbsolute[0].t && meta.now < l.figuresAbsolute[1].t"
+                  //-   :style=`{
+                  //-     position: 'absolute', zIndex: 1100, left: '0px', pointerEvents: 'none',
+                  //-     background: 'rgba(255,255,255,0.4)',
+                  //-     borderRadius: '10px', overflow: 'hidden',
+                  //-     width: ((meta.now-l.figuresAbsolute[0].t)/(l.figuresAbsolute[1].t-l.figuresAbsolute[0].t))*100+'%'
+                  //-   }`).row.full-height
                   .col
                     .row.full-height.q-px-md
                       span(
@@ -165,6 +165,9 @@ div(:style=`{}`).column.fit
     q-btn(
       flat no-caps color="white"
       ).b-100 Total: {{$time(layersTotalTime)}}
+    q-btn(
+      flat color="white" icon="edit"
+      :style=`{width: '36px'}`).q-ml-sm.b-100
 </template>
 
 <script>
@@ -272,7 +275,7 @@ export default {
     async layerAdd (startInput, endInput, layerInput) {
       this.$log('layerAdd start')
       this.$log('layerAdd inputs: ', startInput, endInput, layerInput)
-      let start = startInput || this.meta.now - 3 > 0 ? this.meta.now - 3 : 0
+      let start = startInput || this.meta.now
       let end = endInput || start + 10 < this.meta.duration ? start + 10 : this.meta.duration
       this.$log('layerAdd start/end: ', start, end)
       // get index

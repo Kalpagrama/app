@@ -9,5 +9,6 @@ export default {
   actionKey: null,
   height: 0,
   offsetTop: 0,
-  iWantSound: false
+  iWantSound: false,
+  showDrawerLeft: false
 }

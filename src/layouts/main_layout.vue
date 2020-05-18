@@ -2,6 +2,11 @@
 .q-menu
   border-radius: 10px !important
   background: none !important
+.q-drawer
+  z-index: 100000
+  // border-radius: 10px 10px 0 0 !important
+  border-radius: 10px !important
+  background: none !important
 </style>
 
 <template lang="pug">
@@ -18,13 +23,19 @@ q-layout(view="hHh Lpr lff").bg-30
     }`).row.q-pa-sm
     kalpa-menu(v-if="!loading")
   q-page-container
-    q-page
+    q-page(:style=`{}`)
       router-view(
         v-if="!loading")
       div(
         v-else
         ).row.full-width.window-height.items-center.content-center.justify-center.bg-black
         q-spinner(color="green" size="50px")
+  q-drawer(side="left" :value="$store.state.ui.showDrawerLeft" @hide="$store.commit('ui/stateSet', ['showDrawerLeft', false])")
+    kalpa-menu(
+      v-if="!loading"
+      :style=`{
+        borderRadius: '0 10px 10px 0'
+      }`)
 </template>
 
 <script>
@@ -37,7 +48,8 @@ export default {
   data () {
     return {
       loading: true,
-      offsetTop: null
+      offsetTop: null,
+      showLeftDrawer: false
     }
   },
   meta: {

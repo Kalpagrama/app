@@ -8,13 +8,13 @@
 q-layout(view="hHh lpR fFf")
   kalpa-menu-right
     menu-right(:style=`{borderRadius: '10px', overflow: 'hidden'}`)
-  kalpa-menu-footer
-    template(v-slot:menuRight)
-      div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-pa-md
-        span.text-white {{ content.name }}
-      menu-right
-      div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-        q-btn(round flat color="grey-5" icon="keyboard_arrow_left")
+  kalpa-menu-footer(:options=`{showMenuPage: true}`)
+    template(v-slot:menuRight=`{inDrawer}`)
+      //- div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-pa-md
+      //-   span.text-white {{ contentName }}
+      menu-right(:inDrawer="inDrawer" :contentName="contentName")
+      //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+      //-   q-btn(round flat color="grey-5" icon="keyboard_arrow_left")
   //- page
   q-page-container
     q-page
@@ -30,7 +30,7 @@ q-layout(view="hHh lpR fFf")
             q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
             .col.full-height
               .row.fit.items-center.content-center.q-px-sm
-                span(:style=`{minHeight: '42px', borderRadius: '10px'}`).text-bold.text-white.q-pa-sm {{ content.name }}
+                span(:style=`{minHeight: '42px', borderRadius: '10px'}`).text-bold.text-white.q-pa-sm {{ contentName }}
             q-btn(round flat color="grey-2" icon="more_vert")
           //- body
           composition(
@@ -70,6 +70,10 @@ export default {
     }
   },
   computed: {
+    contentName () {
+      if (this.content) return this.content.name.slice(0, 50)
+      else return ''
+    },
     composition () {
       return {
         layers: [

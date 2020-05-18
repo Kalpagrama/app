@@ -57,7 +57,7 @@ div(
       v-if="items.length > 1 && itemIndex+1 === items.length" @click="itemsAgain()"
       :style=`{
         position: 'absolute', zIndex: 20000, right: '0px', bottom: '0px',
-        maxWidth: '25%', height: '100px',
+        maxWidth: '100px', height: '100px',
         borderRadius: '10px', overflow: 'hidden',
         background: 'rgba(255,255,255,0.1)',
       }`
@@ -68,7 +68,7 @@ div(
       v-for="(i,ii) in items" :key="i.oid+'-'+ii"
       v-if="ii >= itemIndex && ii <= itemIndex+1"
       :style=`{
-        position: 'absolute', zIndex: 100+ii, right: '0px', bottom: '0px',
+        position: 'absolute', zIndex: 100+ii, right: '0px', bottom: '-0.5px',
         maxWidth: itemIndex === ii ? nowMaxWidth+'%' : nextMaxWidth+'%',
         maxHeight: itemIndex === ii ? nowMaxHeight+'%' : nextMaxHeight+'%',
         opacity: itemIndex === ii ? 1 : (nextMaxWidth / 100) + 0.3

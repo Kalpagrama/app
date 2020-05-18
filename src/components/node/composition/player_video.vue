@@ -127,6 +127,12 @@ div(
         position: 'absolute', zIndex: 20000, bottom: '0px', left: '0px', transform: 'translate3d(0,0,0)',
         maxWidth: itemsCount > 1 ? '75%' : 'calc(100% - 80px)'
       }`)
+    player-video-progress-mini(
+      v-if="true && visible && active && !mini"
+      :player="player" :meta="meta"
+      :style=`{
+        position: 'absolute', zIndex: 30000, bottom: '0px', transform: 'translate3d(0,0,0)',
+      }`)
     //- progress tint
     div(
       v-if="false"
@@ -142,11 +148,12 @@ div(
 <script>
 import {throttle} from 'quasar'
 import playerVideoProgress from './player_video_progress'
+import playerVideoProgressMini from './player_video_progress_mini'
 
 export default {
   name: 'playerVideo',
   props: ['ctx', 'composition', 'visible', 'active', 'mini', 'itemsCount'],
-  components: {playerVideoProgress},
+  components: {playerVideoProgress, playerVideoProgressMini},
   data () {
     return {
       now: 0,
@@ -338,10 +345,34 @@ export default {
       this.$log('nodeWorkspace')
     },
     videoNow (to, from) {
-      if (this.nowWorking) return
+      // this.$log('videoNow', to)
+      // switch (this.mode) {
+      //   case 'play': {
+      //     if (to > this.layerEnd)
+      //     break
+      //   }
+      //   case 'layer': {
+      //     if (to > this.layerEnd) {
+      //       this.nowWorking = true
+      //     }
+      //     else if (to < this.layerStart) {
+      //       this.nowWorking = true
+      //     }
+      //     // all good
+      //     else {
+      //       this.nowWorking = false
+      //     }
+      //     break
+      //   }
+      //   case 'watch': {
+      //     break
+      //   }
+      // }
+      if (this.nowWorking || this.editing || this.ended) {
+        this.nowWorking = false
+        return
+      }
       this.nowWorking = true
-      if (this.editing) return
-      if (this.ended) return
       if (this.mode === 'play') {
         if (!this.layerStart && !this.layerEnd) return
         if (to > this.layerEnd) {
@@ -349,7 +380,7 @@ export default {
           let to = this.layerIndex + 1
           if (this.layers[to]) {
             this.$log('NEXT LAYER')
-            alert('NEXT LAYER')
+            // alert('NEXT LAYER')
             this.layerIndex = to
           }
           else {
@@ -362,7 +393,7 @@ export default {
             this.ended = true
             this.player.pause()
             this.$emit('ended')
-            alert('ended')
+            // alert('ended')
           }
         }
         if (to < this.layerStart) {
@@ -373,10 +404,12 @@ export default {
         if (!this.layerStart && !this.layerEnd) return
         if (this.layerIndexPlay > -1) {
           if (to > this.layerEnd) {
-            this.$log('LAYER', this.layerIndex)
+            alert('mode:layer, to > layerEnd')
+            // this.$log('LAYER', this.layerIndex)
             this.player.setCurrentTime(this.layerStart)
           }
           if (to < this.layerStart) {
+            alert('mode:layer, to < layerStart')
             this.player.setCurrentTime(this.layerStart)
           }
         }

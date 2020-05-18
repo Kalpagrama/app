@@ -1,3 +1,6 @@
+<style lang="sass">
+</style>
+
 <template lang="pug">
 div(id="q-app")
   router-view
