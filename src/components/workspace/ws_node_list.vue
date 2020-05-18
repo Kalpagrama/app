@@ -92,7 +92,7 @@ div(:style=`{position: 'relative'}`).column.fit
               q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
             .col
               div(
-                @click="nodeClick(n.oid)"
+                @click="nodeClick(n)"
                 :style=`{
                   borderRadius: '10px', overflow: 'hidden'
                 }`
@@ -199,10 +199,9 @@ export default {
         return arr
       }
     },
-    async nodeClick (oid) {
-      this.$log('nodeClick', oid)
-      alert('TODO!!! objects/get теперь нельзя вызывать для элементов мастерской!!! Все что надо - есть сразу (см wsItems)')
-      this.node = await this.$store.dispatch('objects/get', {oid: oid})
+    async nodeClick (wsItem) {
+      this.$log('nodeClick', wsItem)
+      this.node = wsItem // await this.$store.dispatch('workspace/wsItem', item.wsItemKey)
       this.$log('nodeClick node', this.node)
       // await this.$wait(300)
       this.nodeEditorOpened = true
@@ -223,7 +222,7 @@ export default {
       this.$log('nodeAddStart node', this.node)
       // await this.$wait(1000)
       // this.$log('nodeAddStart node AFTER', this.node)
-      this.nodeEditorOpened = true
+      // this.nodeEditorOpened = true
     },
     scrollTo (val) {
       this.$log('scrollTo', val)

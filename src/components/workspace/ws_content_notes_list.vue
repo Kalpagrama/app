@@ -67,7 +67,7 @@ div(:style=`{position: 'relative'}`).column.fit
       template(v-slot="{items}")
         .row.full-width.items-start.q-py-sm
           div(
-            v-for="(c,ci) in items" :key="c.oid" @click="contentClick(c.oid)"
+            v-for="(c,ci) in items" :key="c.oid" @click="contentClick(c)"
             :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.q-px-md.q-py-sm.q-mb-xs.cursor-pointer.content-item.b-70
             span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
@@ -75,6 +75,7 @@ div(:style=`{position: 'relative'}`).column.fit
 </template>
 
 <script>
+import { assert } from 'assert'
 export default {
   name: 'wsContentNotesList',
   props: {
@@ -101,9 +102,9 @@ export default {
   watch: {
   },
   methods: {
-    async contentClick (oid) {
-      this.$log('contentClick', oid)
-      this.content = await this.$store.dispatch('objects/get', {oid: oid})
+    async contentClick (wsItem) {
+      this.$log('contentClick', wsItem)
+      this.content = wsItem // await this.$store.dispatch('workspace/wsItem', wsItemKey)
       this.$log('contentClick', this.content)
       switch (this.options.onItemClick) {
         case 'edit': {
@@ -127,10 +128,15 @@ export default {
     },
     async contentFound (content) {
       this.$log('contentFound', content)
+      // смотрим - нет ли такого уже.
+      let existing = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST', filterFunc: item => item.contentOid === content.oid})
+      assert(Array.isArray(existing), '(Array.isArray(existing)!')
+      if (existing.length > 1) this.$logE('LOGICAL ERROR! only one item per content allowed')// может быть только один элемент с этим контентом
+      if (existing.length) return existing[0]
+      // Такого нет. Создаем новый
       let contentInput = {
         oid: Date.now().toString(),
         wsItemType: 'CONTENT_WITH_NOTES',
-        unique: content.oid,
         thumbOid: content.oid,
         name: content.name,
         layers: [],
@@ -146,7 +152,7 @@ export default {
       let item = await this.$store.dispatch('workspace/wsItemUpsert', contentInput)
       this.$log('contentFound item', item)
       await this.$wait(300)
-      this.contentClick(item.oid)
+      this.contentClick(item)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)

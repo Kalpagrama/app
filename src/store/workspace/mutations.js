@@ -10,6 +10,6 @@ export function init (state) {
 }
 
 export function stateSet (state, [key, val]) {
-  assert.ok(Object.prototype.hasOwnProperty.call(state, key))
+  assert(Object.prototype.hasOwnProperty.call(state, key), 'bad prop: ' + key + JSON.stringify(val))
   state[key] = val
 }

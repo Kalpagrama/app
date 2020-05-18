@@ -8,7 +8,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 
 export const init = async (context) => {
-  logD('node/init')
+  // logD('node/init')
 
   const fetchItemFunc = async () => {
     let { data: { categories } } = await apollo.clients.api.query({
@@ -36,7 +36,7 @@ export const init = async (context) => {
   let categories = await context.dispatch('cache/get', { key: 'categories', fetchItemFunc }, { root: true })
   if (context.state.initialized) return
   context.commit('init', categories)
-  logD('node/init done')
+  // logD('node/init done')
   return categories
 }
 

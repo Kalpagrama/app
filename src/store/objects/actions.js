@@ -9,10 +9,10 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 export const init = async (context) => {
-  logD('objects/init')
+  // logD('objects/init')
   if (context.state.initialized) return
   context.commit('init')
-  logD('objects/init done')
+  // logD('objects/init done')
 }
 
 // сцепляет запросы и отправляет пачкой
@@ -125,7 +125,6 @@ class QueryAccumulator {
       let objectList = result.data.objectList
       for (let item of itemsForQuery) {
         let object = objectList.find(obj => obj.oid === item.oid)
-        if (object.type === 'WS_ITEM') object = normalizeWSItem(object)
         // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
         if (object && !object.deletedAt) {
           this.resolveItem(object)
@@ -199,7 +198,7 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
     let item = await context.dispatch('objects/get', { oid, priority: 0 }, { root: true })
     return {item, actualAge: 'hour'}
   }
-  let mergeItemFunc = (path, serverItem, cacheItem) => {
+  let mergeItemFunc = (serverItem, cacheItem) => {
     assert(serverItem && cacheItem)
     let mergedItem
     // берем значение с сервера

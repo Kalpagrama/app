@@ -47,7 +47,7 @@ export function setItem (state, { key, item }) {
 export function updateItem (state, { key, path, newValue, setter }) {
   // logD(`cache/updateItem ${key} ${newValue.revision}`)
   let obj = state.cachedItems[key]
-  if (!obj) return
+  if (!obj) return // обязательное условие!
   if (obj === newValue) return // оптимтизация (один и тот же объект)
   path = path.split('.')
   path = path.filter(k => Boolean(k))

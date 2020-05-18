@@ -31,7 +31,7 @@ export const init = async (context) => {
   let authInfo = await context.dispatch('cache/get', { key: 'authInfo', fetchItemFunc }, { root: true })
   if (authInfo && authInfo.userIsConfirmed){
     context.commit('init', authInfo)
-    logD('auth init done!')
+    // logD('auth init done!')
   } else logD('auth init fails!', authInfo)
 }
 

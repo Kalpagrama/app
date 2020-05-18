@@ -40,7 +40,7 @@ export default function (/* { ssrContext } */) {
     strict: process.env.DEV,
     actions: {
       init: async (context) => {
-        logD('vuex init')
+        // logD('vuex init')
         // await context.dispatch('cache/init') cache инициализируется в boot модуле
 
         await context.dispatch('auth/init')
@@ -59,7 +59,7 @@ export default function (/* { ssrContext } */) {
         await context.dispatch('lists/init')
         await context.dispatch('content/init')
         await i18next.changeLanguage(user.profile.lang)
-        logD('vuex init done!')
+        // logD('vuex init done!')
         return true
       }
     },

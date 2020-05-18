@@ -1,6 +1,8 @@
 export default {
   initialized: false,
-  shareItem: null
+  shareItem: null,
+  item: null,
+  itemType: null,
   showFooter: true,
-  showHeader: true,
+  showHeader: true
 }

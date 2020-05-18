@@ -8,11 +8,11 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 let cache
 export const init = async (context, cache_) => {
-  logD('cache/init')
+  // logD('cache/init')
   cache = cache_
   await cache.init()
   context.commit('init')
-  logD('cache/init done')
+  // logD('cache/init done')
 }
 /*!
  * модуль для кэширования данных во вьюикс
@@ -35,18 +35,17 @@ export const get = async (context, { key, fetchItemFunc, force }) => {
 // Если path = ''  то newValue - это полный объект
 // если actualAge не указан - вычислится на основе actualUntil (либо если объекта нет - поставится дефолтное)
 // можно использовать ф-ю для добавления данных в кэш (в этом случае - updateItemFunc не указывается)
-export const update = async (context, { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
+// если в кэше ничего нет - то значение возмется либо из newValue, либо из fetchItemFunc, либо defaultValue. Если ничего не указано - то ничего не произойдет
+export const update = async (context, { key, path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
   assert(context.state.initialized, '!context.state.initialized')
   assert(key)
-  assert(setter != null || newValue != null)
-  if (setter) assert(setter.constructor.name !== 'AsyncFunction', 'setter should by sync function (NOT async!)')
-  if (!path && !setter) assert(newValue.revision, 'newValue.revision exists')
+  assert(setter != null || newValue != null, 'setter != null || newValue != null')
   if (newValue) newValue = JSON.parse(JSON.stringify(newValue)) // иначе newValue станет реактивным, и его нельзя будет менять вне vuex
   path = path || ''
-  return await cache.update(key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc)
+  return await cache.update(key, {path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc})
 }
-export const expire = async (context, { key }) => {
+export const expire = async (context, key) => {
   assert(context.state.initialized, '!context.state.initialized')
-  assert(typeof key === 'string')
+  assert(key && typeof key === 'string', 'key && typeof key')
   return await cache.expire(key)
 }

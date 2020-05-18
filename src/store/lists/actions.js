@@ -267,7 +267,7 @@ async function updateListsNodeCreated (context, event) {
         let insertedIndx
         if (oid === context.rootState.auth.userOid) insertedIndx = 0
         else insertedIndx = value.items.length
-        // вставляем в начало используем splice для реактивности
+        // вставляем в insertedIndx используем splice для реактивности
         value.items.splice(insertedIndx, 0, { ...objectShort })
         value.count++
         value.totalCount++
