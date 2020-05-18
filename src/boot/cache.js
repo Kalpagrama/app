@@ -10,10 +10,10 @@ import {
 } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
-const logI = getLogFunc(LogLevelEnum.INFO, LogModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_CACHE)
+const logI = getLogFunc(LogLevelEnum.INFO, LogModulesEnum.VUEX_CACHE)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_CACHE)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_CACHE)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -53,24 +53,27 @@ class QueueUpdate {
     this.inProgress = false
   }
 
-  push (key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, lagMsec = 0) {
+  push (key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, debounceMsec = 1000) {
     let itemForSend = JSON.parse(JSON.stringify(vuexItem)) // копия данных на момент отправки
     let newQuery = { key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc }
     // удаляем неактуальные изменения, которые перекрыты текущим
     let indx = this.queries.findIndex(query => query.key === key)
     if (indx >= 0) {
+      assert(this.queries[indx].debounceTimer, 'this.queries[indx].debounceTimer')
+      clearTimeout(this.queries[indx].debounceTimer)
       this.queries[indx] = newQuery
     } else {
       this.queries.push(newQuery)
     }
     logD('изменения добавлены в очередь!')
-    this.next().catch(err => {
-      logE('cant update item on server!', key, itemForSend, err)
-    })
-    // ждем lagMsec. На тот случай, если шлется подряд много измений. Например, выделяется range видео-редакторе. Избавляет от лишних отправок
-    wait(lagMsec).then(() => this.next()).catch(err => {
-      logE('cant update item on server!', key, itemForSend, err)
-    })
+
+    // ждем debounceMsec. На тот случай, если шлется подряд много измений. Например, выделяется range в видео-редакторе.
+    // Избавляет от слишком частых отправок изменений одной сущности
+    newQuery.debounceTimer = setTimeout(() => {
+      this.next().catch(err => {
+        logE('cant update item on server!', key, itemForSend, err)
+      })
+    }, debounceMsec)
   }
 
   async next (failCount = 0) {
@@ -314,8 +317,8 @@ class Cache {
   // updateItemFunc - обновить данные на сервере
   // mergeItemFunc - ф-я для устранения мердж-конфликтов
   // newValue - это  объект целиком, либо свойство объекта (тогда актуален path)
-  // подождет lagMsec перед отправкой на сервер. Отправится только последний вариант
-  async update (key, { path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc, lagMsec }) {
+  // подождет debounceMsec перед отправкой на сервер. Отправится только последний вариант
+  async update (key, { path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc, debounceMsec }) {
     let vuexItem = this.store.state.cache.cachedItems[key]
     if (!vuexItem) { // в кэше ничего не нашлось. Либо не было изначально, либо было удалено при переполнении кэша
       if (!path && newValue) { // меняется целиком
@@ -337,7 +340,7 @@ class Cache {
       // если данные устареют - они могут быть замененты свежими при очередном запросе get
       if (vuexItem) vuexItem = await this.set(key, vuexItem, 'year')
       // обновим данные на сервере (в фоне)
-      if (vuexItem) this.queue.push(key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, lagMsec)
+      if (vuexItem) this.queue.push(key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, debounceMsec)
     }
     if (!vuexItem) logW('item not found in cache!')
     return vuexItem

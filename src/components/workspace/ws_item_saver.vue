@@ -12,8 +12,8 @@ export default {
   data () {
     return {
       item: null,
-      itemUpdateAuthor: null,
-      itemUpdating: false
+      itemUpdateAuthor: null
+      // itemUpdating: false
     }
   },
   watch: {
@@ -29,8 +29,8 @@ export default {
     item: {
       deep: true,
       handler (to, from) {
-        this.$log('item CHANGED to', to.revision)
-        if (this.itemUpdating) return
+        // this.$log('item CHANGED to', to)
+        // if (this.itemUpdating) return
         this.itemUpdate()
       }
     }
@@ -38,15 +38,15 @@ export default {
   methods: {
     async itemUpdate () {
       try {
-        this.$log('itemUpdate start revision: ', this.item.revision)
-        if (this.itemUpdating) return
-        this.itemUpdating = true
+        this.$log(`itemUpdate start revision:${this.item.revision} item:`, this.item)
+        // if (this.itemUpdating) return
+        // this.itemUpdating = true
         let item = await this.$store.dispatch('workspace/wsItemUpsert', this.item) // wsItemUpsert делает копию item
         this.$log('itemUpdate done revision:', item.revision)
       } catch (e) {
         this.$logE('itemUpdate error', e)
       } finally {
-        this.itemUpdating = false
+        // this.itemUpdating = false
       }
     }
   },

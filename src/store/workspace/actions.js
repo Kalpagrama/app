@@ -321,7 +321,7 @@ class WsLocal {
       updateItemFunc: !updateInProgress && !externalChange ? updateItemFunc : null,
       fetchItemFunc: !updateInProgress && !externalChange ? fetchItemFunc : null,
       mergeItemFunc: !updateInProgress && !externalChange ? mergeItemFunc : null,
-      lagMsec: 8000 // отправим через 8 сек (чтобы не отправлять  лишнего)
+      debounceMsec: 4000 // ждем 4 секунды. Если за это время изменений больше не будет - они уйдут на сервер
     }, { root: true })
     // поправить все списки (удалить элемент из всех списков, а затем вставить на новое место)
     let collectionItems = await this.getItems(getCollection(item.wsItemType)) // полный перечень элементов этой коллекции
@@ -334,7 +334,6 @@ class WsLocal {
         path: '',
         setter: listItems => {
           assert(listItems && Array.isArray(listItems))
-          logD(`изменям список мастерской ${key}. len = ${listItems.length}`)
           let indx = listItems.findIndex(listItem => listItem.wsItemKey === item.wsItemKey)
           if (indx >= 0) listItems.splice(indx, 1) // удаляем элемент. используем splice для реактивности
           if (operation === OperationEnum.UPSERT) { // вставляем на нужные места
@@ -351,7 +350,6 @@ class WsLocal {
               listItems.splice(insertPos, 0, item)
             }
           }
-          logD(`список изменен ${key}. len = ${listItems.length}`)
           return listItems
         }
       }, { root: true })

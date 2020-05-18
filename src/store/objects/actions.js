@@ -3,9 +3,9 @@ import { fragments } from 'src/schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_OBJECTS)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_OBJECTS)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_OBJECTS)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 export const init = async (context) => {
