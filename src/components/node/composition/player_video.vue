@@ -368,10 +368,10 @@ export default {
       //     break
       //   }
       // }
-      if (this.nowWorking || this.editing || this.ended) {
-        this.nowWorking = false
-        return
-      }
+      // if (this.nowWorking || this.editing || this.ended) {
+      //   this.nowWorking = false
+      //   return
+      // }
       this.nowWorking = true
       if (this.mode === 'play') {
         if (!this.layerStart && !this.layerEnd) return
@@ -401,20 +401,25 @@ export default {
         }
       }
       else if (this.mode === 'layer') {
-        if (!this.layerStart && !this.layerEnd) return
+        // if (!this.layerStart && !this.layerEnd) return
+        if (this.editing) {
+          // alert('GOT editing')
+          return
+        }
         if (this.layerIndexPlay > -1) {
           if (to > this.layerEnd) {
-            alert('mode:layer, to > layerEnd')
             // this.$log('LAYER', this.layerIndex)
+            this.player.pause()
             this.player.setCurrentTime(this.layerStart)
+            // alert('mode:layer, to > layerEnd')
           }
           if (to < this.layerStart) {
-            alert('mode:layer, to < layerStart')
             this.player.setCurrentTime(this.layerStart)
+            // alert('mode:layer, to < layerStart')
           }
         }
       }
-      else if (this.player.mode === 'watch') {
+      else if (this.mode === 'watch') {
       }
       this.nowWorking = false
     },

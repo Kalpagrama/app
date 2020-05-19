@@ -12,6 +12,24 @@
       @mouseleave="progressMouseleave"
       :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '0px', order: -1}`
       ).row.full-width.items-center.content-center.cursor-pointer
+      //- progress LAYERS
+      div(
+        v-if="false"
+        :style=`{
+          position: 'absolute', zIndex: 300, top: '-50px',
+          height: '50px', borderRadius: '10px'
+        }`
+        ).row.full-width.b-100
+        div(
+          v-for="(l,li) in meta.layers" :key="li"
+          :style=`{
+            position: 'absolute',
+            height: '10px', borderRadius: '5px',
+            left: (l.figuresAbsolute[0].t/meta.duration)*100+'%',
+            width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/meta.duration)*100+'%',
+            background: l.color
+          }`
+          ).row
       //- progress WRAPPER
       div(
         ref="progressWrapper"
@@ -22,7 +40,7 @@
           v-if="progressMousemoveTime"
           :style=`{
             position: 'absolute',
-            zIndex: 200,
+            zIndex: 2000,
             left: progressMousemoveLeft-25+'px',
             top: '-50px',
             minWidth: '50px',

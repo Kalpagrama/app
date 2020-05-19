@@ -96,8 +96,12 @@ export default {
   },
   computed: {
     nodeIsMine () {
-      // return this.user.oid === this.$store.getters.currentUser.oid
-      return true
+      if (this.nodeFull) {
+        return this.nodeFull.author.oid === this.$store.getters.currentUser.oid
+      }
+      else {
+        return true
+      }
     }
   },
   watch: {

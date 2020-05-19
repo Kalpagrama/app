@@ -25,9 +25,9 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
       //- .col.full-width.scroll
       //-   .row.full-width.q-pa-sm
           //- sphere-spheres(v-if="true" :oid="sphereOid")
-  kalpa-menu-footer(:options=`{showMenuPage: true}`)
-    template(v-slot:menuRight)
-      menu-right
+  //- kalpa-menu-footer(:options=`{showMenuPage: true}`)
+  //-   template(v-slot:menuRight)
+  //-     menu-right
   q-btn(
     v-if="true"
     push color="green" no-caps @click="nodeAdd()"

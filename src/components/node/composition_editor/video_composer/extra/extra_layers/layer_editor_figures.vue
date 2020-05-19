@@ -15,6 +15,7 @@
       div(:style=`{height: '70px', width: width/2+'px'}`)
       div(
         @click="framesClick"
+        v-touch-pan.left.right.prevent.mouse="$q.screen.width > 600 ? panFrames : false"
         :style=`{
           position: 'relative',
           height: '50px',
@@ -97,7 +98,9 @@ export default {
       width: 0,
       scrollWidth: 0,
       scrollLeft: 0,
-      layerCopy: null
+      layerCopy: null,
+      panning: false,
+      panningFrames: false
     }
   },
   computed: {
@@ -114,7 +117,7 @@ export default {
       deep: false,
       handler (to, from) {
         // this.$log('meta.layer CHANGED', to)
-        this.layerCopy = JSON.parse(JSON.stringify(to))
+        // this.layerCopy = JSON.parse(JSON.stringify(to))
       }
     },
     'meta.layerIndexPlay': {
@@ -129,8 +132,16 @@ export default {
     }
   },
   methods: {
+    panFrames (e) {
+      if (this.panning) return
+      if (this.$q.screen.width < 600) return
+      // this.$log('panFrames', e)
+      this.$refs.layerEditorScrollArea.scrollLeft -= e.delta.x
+      if (e.isFirst) this.panningFrames = true
+      if (e.isFinal) this.panningFrames = false
+    },
     panStart (e, index) {
-      this.$log('panStart', e)
+      // this.$log('panStart', e)
       let to = this.layer.figuresAbsolute[index].t + ((e.delta.x / this.scrollWidth) * this.meta.duration)
       // TODO: min/max values of start/end
       if (to >= 0 && to <= this.meta.duration) {
@@ -152,11 +163,11 @@ export default {
       if (e.isFinal) {
         this.panning = false
         this.player.editing = false
+        this.player.pause()
         this.player.setCurrentTime(to)
-        this.player.play()
         this.$emit('meta', ['editing', false])
         this.$set(this.meta.layers, this.meta.layerIndexPlay, this.layerCopy)
-        this.framesScrollToLayer()
+        // this.framesScrollToLayer()
       }
     },
     framesClick (e) {

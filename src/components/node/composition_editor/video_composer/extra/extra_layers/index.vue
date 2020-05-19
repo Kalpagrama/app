@@ -138,8 +138,8 @@ div(:style=`{}`).column.fit
         .col
           .row.fit.items-center.content-center
             q-btn(flat dense no-caps color="white" @click="layersSelectedDrop()").bg-grey-7.q-mr-sm.q-px-sm Drop selection
-            q-btn(flat dense no-caps color="white" @click="layersSelectedCreateNode()").bg-grey-7.q-mr-sm.q-px-sm Create node
             q-btn(flat dense no-caps color="white" @click="layersSelectedDelete()").bg-grey-7.q-mr-sm.q-px-sm Delete
+            q-btn(flat dense no-caps color="white" @click="layersSelectedCreateNode()").bg-grey-7.q-mr-sm.q-px-sm Create node
         //- right...
   //- footer
   div(
@@ -208,12 +208,27 @@ export default {
     layersSelectedDelete () {
       this.$log('layersSeletedDelete')
       if (!confirm('Delete selected layers?')) return
+      // check layerIndex
+      if (this.layersSelected.includes(this.meta.layerIndex)) {
+        let to = this.meta.layerIndex - 1
+        if (this.meta.layers[to]) {
+          this.$emit('meta', ['layerIndex', to])
+        }
+        else {
+          // if we got layer? or not???
+          this.$emit('meta', ['layerIndex', 0])
+        }
+      }
+      // check layerIndexPlay
+      if (this.layersSelected.includes(this.meta.layerIndexPlay)) {
+        this.$emit('meta', ['layerIndexPlay', -1])
+      }
+      // delete layers
       this.layersSelected.map((i, ii) => {
         this.$delete(this.composition.layers, ii)
       })
+      // drop layersSelected
       this.$set(this, 'layersSelected', [])
-      // set layerIndexPlay, layerIndex, mode?
-      // find tha smallest index to go to?
     },
     layersSelectedCreateNode () {
       this.$log('layersSelectedCreateNode start')

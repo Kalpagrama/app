@@ -30,7 +30,7 @@ div
 
 <script>
 import extraInfo from './extra/extra_info'
-import extraLayers from './extra/extra_layers'
+import extraLayers from './extra/extra_layers_new'
 import extraExplore from './extra/extra_explore'
 import extraSpheres from './extra/extra_spheres'
 
@@ -105,9 +105,9 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.$wait(200).then(() => {
-      this.tabChanged('layers')
-    })
+    // this.$wait(200).then(() => {
+    //   this.tabChanged('layers')
+    // })
   }
 }
 </script>

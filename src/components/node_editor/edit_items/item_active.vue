@@ -18,11 +18,11 @@ div(
       maxWidth: height+'px',
       maxHeight: height+'px'
     }`
-    ).row.fit
-    composition-editor(
+    ).row.fit.br
+    composition(
       ctx="workspace"
       :composition="item"
-      :options=`{visible: true, active: true, mini: false}`)
+      :visible="true" :active="false" :mini="false")
 </template>
 
 <script>
@@ -31,7 +31,7 @@ export default {
   props: ['item', 'itemIndex', 'itemEditing'],
   data () {
     return {
-      height: 100
+      height: 200
     }
   },
   methods: {
