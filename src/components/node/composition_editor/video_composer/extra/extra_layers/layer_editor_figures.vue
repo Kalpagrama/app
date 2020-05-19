@@ -18,7 +18,7 @@
         :style=`{
           position: 'relative',
           height: '50px',
-          borderRadius: '10px'
+          borderRadius: '10px',
         }`).row.no-wrap.items-center.content-center.justify-start.b-190
         //- frames
         div(
