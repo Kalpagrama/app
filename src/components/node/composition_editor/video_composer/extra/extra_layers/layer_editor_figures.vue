@@ -1,299 +1,197 @@
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.items-center.content-center
+.row.full-width.items-start.content-start
   q-resize-observer(@resize="onResize")
-  div(:style=`{position: 'relative'}`).row.fit
-    //- debug, relative
-    div(v-if="$store.state.ui.debug").row.full-width.q-pa-sm
-      div(:style=`{borderRadius: '10px', color: 'white'}`).row.full-width.bg-green.q-pa-xs
-        //- small.text-white.full-width layer: {{layer}}
-        small.full-width width: {{width}}
-        small.full-width framesWidth/framesLoaded: {{framesWidth}}/{{framesLoaded}}
-    //- debug
-    div(
-      v-if="false"
-      :style=`{position: 'absolute', bottom: '0px', zIndex: 10000}`
-      ).row.full-width.bg-green
-      small.text-white.full-width width: {{width}}
-    //- frames
-    div(
-      ref="framesScrollWrapper"
-      :style=`{position: 'relative', height: '100%'}`).row.full-width.items-center.scroll
-      //- frames loading spinner tint
+  //- debug
+  div(v-if="false").row.full-width.q-pa-sm.text-white.bg-red
+    small.full-width width: {{width}}
+    small.full-width scrollLeft: {{scrollLeft}}
+    small.full-width scrollWidth: {{scrollWidth}}
+  div(
+    ref="layerEditorScrollArea" @scroll="onScroll"
+    :class=`{}`
+    :style=`{position: 'relative', height: '80px'}`).row.full-width.items-end.content-end.scroll
+    .row.items-center.content-center.no-wrap
+      //- LEFT scroll padding
+      div(:style=`{height: '70px', width: width/2+'px'}`)
       div(
-        v-if="content"
-        v-show="content.contentSource === 'KALPA' ? !framesLoaded : false"
-        :style=`{position: 'absolute', zIndex: 1000}`
-        ).row.fit.items-center.content-center.justify-center.bg-black
-        q-spinner(color="green" size="40px" :thickness="2")
-      //- frames
-      div(
-        v-touch-pan.left.right.prevent.mouse="$q.screen.width > 600 ? panFrames : false").row.no-wrap
-        //- left padding
-        div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
+        @click="framesClick"
+        :style=`{
+          position: 'relative',
+          height: '50px',
+          borderRadius: '10px',
+        }`).row.no-wrap.items-center.content-center.justify-start.b-190
         //- frames
-        div(:style=`{position: 'relative', borderRadius: '10px'}`).row.no-wrap
-          //- FRAMES from youtube or kalpa...
-          //- frames images from kalpa
-          div(v-if="content.contentSource === 'KALPA'" :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap
-            img(
-              v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)" @load="frameLoaded"
-              :src="f" draggable="false"
-              :style=`{height: '50px', userSelect: 'none'}`)
-          //- frames boxes for youtube
-          div(v-else :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap
-            div(
-              v-for="(f,fi) in frames" :key="fi" @click="$event => frameClick(f, fi, $event)"
-              :style=`{height: '50px', width: '50px', borderLeft: fi === 0 ? 'none' : '1px solid grey'}`
-              ).row.items-center.justify-center.bg-white
-              small(:style=`{userSelect: 'none', pointerEvents: 'none'}`).cursor-pointer {{ $time((parseInt((((fi+1)*frameDuration)-frameDuration/2)*100))/100) }}
-          //- LAYER
-          //- layers tints
+        div(
+          v-for="(f,fi) in 50" :key="fi"
+          :style=`{height: '50px', width: '50px', pointerEvents: 'none', borderRight: '1px solid rgb(120,120,120)'}`
+          ).row.items-center.content-center.justify-center {{ fi }}
+        //- now
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 1000,
+            left: (meta.now/meta.duration)*100+'%',
+            width: '4px', height: '50px',
+            borderRadius: '2px', overflow: 'hidden',
+            pointerEvents: 'none'
+          }`
+          ).bg-green
+        //- layer START
+        div(
+          v-if="layer"
+          :style=`{
+            position: 'absolute', zIndex: 2000,
+            left: (layer.figuresAbsolute[0].t/meta.duration)*100+'%',
+            width: '4px', height: '50px',
+          }`
+          ).row
           div(
-            v-for="(l, li) in meta.layers" :key="li"
-            v-if="l.figuresAbsolute.length > 0 && li !== meta.layerIndexPlay"
+            v-touch-pan.left.right.prevent.mouse="e => panStart(e, 0)"
             :style=`{
-              position: 'absolute', height: '50px', background: l.color,
-              pointerEvents: 'none', opacity: 0.3,
-              left: (l.figuresAbsolute[0].t/duration)*100+'%',
-              width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/duration)*100+'%'}`).row
-          //- left tint
+              position: 'absolute', top: '0px', left: '-25px', zIndex: 2100,
+              width: '50px', height: '50px',
+              borderRadius: '50%',
+              opacity: 0.5
+            }`
+            ).row.bg-green
+        //- layer END
+        div(
+          v-if="layer"
+          :style=`{
+            position: 'absolute', zIndex: 2000,
+            left: (layer.figuresAbsolute[1].t/meta.duration)*100+'%',
+            width: '4px', height: '50px',
+          }`
+          ).row
           div(
-            v-if="layer && layer.figuresAbsolute.length > 0"
+            v-touch-pan.left.right.prevent.mouse="e => panStart(e, 1)"
             :style=`{
-              position: 'absolute', left: 0, top: 0, height: '50px',
-              width: 'calc( '+(layer.figuresAbsolute[0].t/duration)*100+'% + 0px )',
-              borderRadius: '10px 0 0 10px', overflow: 'hidden',
-              opacity: 0.6, pointerEvents: 'none'
-            }`).row.bg-black
-          //- middle layers rectangle of color
-          div(
-            v-if="layer && layer.figuresAbsolute.length > 0"
-            :style=`{
-              position: 'absolute', zIndex: 120, height: '66px', top: '-8px',
-              left: 'calc('+(layer.figuresAbsolute[0].t/duration)*100+'% - 8px)',
-              width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/duration)*100+'% + 16px)',
-              borderRadius: '16px', border: '8px solid '+ layer.color, pointerEvents: 'none'}`).row
-          //- now second
-          //- (meta.now/duration)*100+'%',
-          div(
-            v-if="true"
-            :style=`{position: 'absolute', zIndex: 300, height: '50px', top: '0px',
-              left: (meta.now/duration)*100+'%',
-              borderRadius: '2px',
-              width: '4px', pointerEvents: 'none'}`).row.bg-green
-          //- layer start round grabber
-          div(
-            v-if="layer && layer.figuresAbsolute.length > 0"
-            v-touch-pan.left.right.prevent.mouse="panStart"
-            :style=`{position: 'absolute', zIndex: 101, top: 0,
-              left: 'calc('+ (layer.figuresAbsolute[0].t/duration)*100+'%' +' - 30px)',
-              width: '50px', height: '50px', opacity: 0.3, borderRadius: '50%', cursor: 'grab'}`).row.bg-green
-          //- layer end round grabber
-          div(
-            v-if="layer && layer.figuresAbsolute.length > 0"
-            v-touch-pan.left.right.prevent.mouse="panEnd"
-            :style=`{position: 'absolute', zIndex: 102, top: 0,
-              left: 'calc('+ (layer.figuresAbsolute[1].t/duration)*100+'%' +' - 20px)',
-              width: '50px', height: '50px', opacity: 0.3, borderRadius: '50%', cursor: 'grab'}`).row.bg-green
-          //- right tint
-          div(
-            v-if="layer && layer.figuresAbsolute.length > 0"
-            :style=`{
-              position: 'absolute', right: 0, top: 0, height: '50px',
-              width: 'calc( '+((duration-layer.figuresAbsolute[1].t)/duration)*100+'% + 0px )',
-              borderRadius: '0 10px 10px 0 ', overflow: 'hidden',
-              opacity: 0.6, pointerEvents: 'none'
-            }`).row.bg-black
-        //- right padding
-        div(:style=`{height: '50px', width: width/2+'px', minWidth: width/2+'px'}`).row
+              position: 'absolute', top: '0px', left: '-25px', zIndex: 2900,
+              width: '50px', height: '50px',
+              borderRadius: '50%',
+              opacity: 0.5
+            }`
+            ).row.bg-green
+        //- layer RECT
+        div(
+          v-if="layer"
+          :style=`{
+            position: 'absolute', top: '-8px', zIndex: 2000,
+            left: 'calc('+(layer.figuresAbsolute[0].t/meta.duration)*100+'% - 8px)',
+            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/meta.duration)*100+'% + 16px)',
+            height: 50+8+8+'px',
+            border: '8px solid '+layer.color,
+            borderRadius: '12px',
+            pointerEvents: 'none'
+          }`
+          ).row
+      //- RIGHT scroll padding
+      div(:style=`{height: '70px', width: width/2+'px'}`)
 </template>
 
 <script>
 export default {
-  name: 'extraLayers-layerEditorFigures',
+  name: 'layerEditorFigures',
   props: ['player', 'meta'],
   data () {
     return {
       width: 0,
-      panning: false,
-      panningFrames: false,
-      framesWidth: 0,
-      framesLoadedCount: 0,
-      framesLoaded: false,
-      // using to update item after editing only
-      layerCopy: null,
-      layerUpdating: false
+      scrollWidth: 0,
+      scrollLeft: 0,
+      layerCopy: null
     }
   },
   computed: {
-    content () {
-      return this.meta.content
-    },
-    duration () {
-      return this.meta.duration
+    frames () {
+      return []
     },
     layer () {
-      if (this.meta.layerIndexPlay >= 0) {
-        return this.layerCopy
-      }
-      else {
-        return null
-      }
-    },
-    k () {
-      if (this.framesWidth === 0) return 1
-      else {
-        return this.duration / this.framesWidth
-      }
-    },
-    frames () {
-      if (!this.content) return []
-      if (this.content.contentSource === 'KALPA') {
-        return this.content.frameUrls.filter((f, fi) => {
-          // return fi % 2 === 0
-          return true
-        })
-      } else {
-        // TODO min max screen width
-        return Math.ceil(this.duration / 10)
-      }
-    },
-    framesCount () {
-      if (!this.content) return 0
-      if (this.content.contentSource === 'KALPA') {
-        return this.frames.length
-      } else {
-        return this.frames
-      }
-    },
-    frameDuration () {
-      return this.duration / this.framesCount
+      if (this.meta.layerIndexPlay >= 0) return this.layerCopy
+      else return null
     }
   },
   watch: {
-    framesLoaded: {
+    'meta.layer': {
+      deep: false,
       handler (to, from) {
-        this.$log('framesLoaded CHANGED', to)
-        if (to) {
-          this.framesWidthUpdate()
-          this.framesTweenToLayer()
-        }
+        // this.$log('meta.layer CHANGED', to)
+        this.layerCopy = JSON.parse(JSON.stringify(to))
       }
     },
     'meta.layerIndexPlay': {
       immediate: true,
       handler (to, from) {
-        if (to === from) return
-        this.$log('meta.layerIndex CHANGED')
-        this.framesWidthUpdate()
-        this.framesTweenToLayer()
-        if (to >= 0 && this.meta.layers[to]) {
+        this.$log('meta.layerIndexPlay CHANGED', to)
+        if (to >= 0) {
           this.layerCopy = JSON.parse(JSON.stringify(this.meta.layers[to]))
+          this.framesScrollToLayer()
         }
-        if (this.content && this.content.contentSource === 'YOUTUBE') this.framesLoaded = true
       }
     }
   },
   methods: {
-    frameClick (f, fi, e) {
-      this.$log('frameClick', fi)
-      this.$log('layerX', e.layerX)
-      let to = (fi * this.frameDuration) + (this.frameDuration / 2)
+    panStart (e, index) {
+      this.$log('panStart', e)
+      let to = this.layer.figuresAbsolute[index].t + ((e.delta.x / this.scrollWidth) * this.meta.duration)
+      // TODO: min/max values of start/end
+      if (to >= 0 && to <= this.meta.duration) {
+        // if (index === 0 && to > this.layer.figuresAbsolute[1].t) {
+        //   this.layer.figuresAbsolute[1].t = to
+        // }
+        // if (index === 1 && to < this.layer.figuresAbsolute[0].t) {
+        //   this.layer.figuresAbsolute[0].t = to
+        // }
+        this.player.setCurrentTime(to)
+        this.layer.figuresAbsolute[index].t = to
+      }
+      if (e.isFirst) {
+        this.panning = true
+        this.player.editing = true
+        this.player.pause()
+        this.$emit('meta', ['editing', true])
+      }
+      if (e.isFinal) {
+        this.panning = false
+        this.player.editing = false
+        this.player.setCurrentTime(to)
+        this.player.play()
+        this.$emit('meta', ['editing', false])
+        this.$set(this.meta.layers, this.meta.layerIndexPlay, this.layerCopy)
+        this.framesScrollToLayer()
+      }
+    },
+    framesClick (e) {
+      this.$log('frameClick', e.offsetX)
+      let t = e.offsetX / this.scrollWidth * this.meta.duration
+      this.$log('t', t)
+      this.player.setCurrentTime(t)
+      this.player.update(t)
       this.$emit('meta', ['mode', 'watch'])
-      this.player.setCurrentTime(to)
-      this.player.pause()
-      this.player.update(to)
     },
-    frameLoaded () {
-      // this.$log('frameLoaded')
-      this.framesLoadedCount += 1
-      if (this.framesLoadedCount === this.framesCount) {
-        this.framesLoaded = true
-      }
+    framesScrollToLayer () {
+      this.$log('framesScrollToLayer')
+      if (!this.layer || !this.$refs.layerEditorScrollArea) return
+      let layerLeft = ((this.layer.figuresAbsolute[0].t / this.meta.duration) * this.scrollWidth) + (this.width / 2)
+      let layerWidth = ((this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t) / this.meta.duration) * this.scrollWidth
+      let scrollLeft = layerLeft - (this.width - layerWidth) / 2
+      this.$log('scrollLeft', scrollLeft)
+      this.$tween.to(this.$refs.layerEditorScrollArea, 0.5, {scrollLeft: scrollLeft})
     },
-    framesWidthUpdate () {
-      this.$log('framesWidthUpdate')
-      if (this.$refs.framesScrollWrapper) this.framesWidth = this.$refs.framesScrollWrapper.scrollWidth - this.$refs.framesScrollWrapper.clientWidth
-    },
-    framesTweenToLayer () {
-      this.$log('framesTweenToLayer start')
-      if (!this.layer || this.layer.figuresAbsolute.length === 0) return
-      if (!this.$refs.framesScrollWrapper) return
-      this.$tween.to(
-        this.$refs.framesScrollWrapper,
-        0.9,
-        {
-          scrollLeft: (this.layer.figuresAbsolute[0].t / this.k) + this.$refs.framesScrollWrapper.clientWidth / 2 - 50,
-          onComplete: () => {
-            this.$log('framesTweenToLayer done')
-          }
-        })
-    },
-    panFrames (e) {
-      if (this.panning) return
-      if (this.$q.screen.width < 800) return
-      // this.$log('panFrames', e)
-      this.$refs.framesScrollWrapper.scrollLeft -= e.delta.x
-      if (e.isFirst) this.panningFrames = true
-      if (e.isFinal) this.panningFrames = false
-    },
-    panStart (e) {
-      // this.$log('panStart', e)
-      let to = this.layer.figuresAbsolute[0].t + (e.delta.x * this.k)
-      if (to >= 0 && to < this.layer.figuresAbsolute[1].t && to <= this.duration) {
-        this.player.setCurrentTime(to)
-        this.layer.figuresAbsolute[0].t = to
-      }
-      if (e.isFirst) {
-        this.panning = true
-        this.player.editing = true
-        this.player.pause()
-        this.$emit('meta', ['editing', true])
-      }
-      if (e.isFinal) {
-        this.panning = false
-        this.player.editing = false
-        this.player.setCurrentTime(to)
-        this.player.play()
-        this.$emit('meta', ['editing', false])
-        this.$set(this.meta.layers, this.meta.layerIndexPlay, this.layerCopy)
-      }
-    },
-    panEnd (e) {
-      // this.$log('panEnd', e)
-      let to = this.layer.figuresAbsolute[1].t + (e.delta.x * this.k)
-      if (to >= 0 && to > this.layer.figuresAbsolute[0].t && to <= this.duration) {
-        this.player.setCurrentTime(to)
-        this.layer.figuresAbsolute[1].t = to
-      }
-      if (e.isFirst) {
-        this.panning = true
-        this.player.editing = true
-        this.player.pause()
-        this.$emit('meta', ['editing', true])
-      }
-      if (e.isFinal) {
-        this.panning = false
-        this.player.editing = false
-        this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
-        this.player.play()
-        this.$emit('meta', ['editing', false])
-        this.$set(this.meta.layers, this.meta.layerIndexPlay, this.layerCopy)
-      }
+    onScroll (e) {
+      // this.$log('onScroll', e)
+      this.scrollLeft = e.target.scrollLeft
+      this.scrollWidth = e.target.scrollWidth - this.width
     },
     onResize (e) {
-      this.$log('onResize', e.width)
+      this.$log('onResize', e)
       this.width = e.width
+      this.scrollWidth = this.$refs.layerEditorScrollArea.scrollWidth
     }
   },
-  async mounted () {
+  mounted () {
     this.$log('mounted')
-    this.width = this.$el.clientWidth
-    // await this.$wait(1000)
-    this.framesWidthUpdate()
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
+    if (this.layer) {
+      this.framesScrollToLayer()
+    }
   }
 }
 </script>

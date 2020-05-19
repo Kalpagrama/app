@@ -6,34 +6,40 @@
 
 <template lang="pug">
 div(
+  :class=`{
+    'full-height': inDrawer
+  }`
   :style=`{
     position: 'relative',
     borderRadius: '10px', overflow: 'hidden'
   }`
   ).column.full-width
-  //- .col.full-width.scroll
-  .row.full-width.items-start
-    router-link(
-      :to="p.id"
-      v-for="(p,pi) in pages" :key="pi"
-      :class=`{
-        'b-100': $route.params.page === p.id
-      }`
-      :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.content-center.menu-item.q-px-md
-      span(
+  div(:style=`{height: '70px'}`).row.full-width.items-center.content-center.q-px-md
+    span(:style=`{fontSize: '20px'}`).text-white.text-bold Workspace
+    //- span.text-white inDrawer {{inDrawer}}
+  .col.full-width.scroll
+    .row.full-width.items-start
+      router-link(
+        :to="p.id"
+        v-for="(p,pi) in pages" :key="pi"
         :class=`{
+          'b-100': $route.params.page === p.id
         }`
-        :style=`{
-          fontSize: '16px'
-        }`
-        ).text-white {{ p.name }}
+        :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.content-center.menu-item.q-px-md
+        span(
+          :class=`{
+          }`
+          :style=`{
+            fontSize: '16px'
+          }`
+          ).text-white {{ p.name }}
 </template>
 
 <script>
 export default {
   name: 'workspace-menuRight',
-  props: ['pages'],
+  props: ['pages', 'inDrawer'],
   data () {
     return {
     }

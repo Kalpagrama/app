@@ -28,8 +28,8 @@ q-layout(view="hHh lpR fFf").b-30
         div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
           q-btn(round flat color="white" icon="more_vert")
   kalpa-menu-footer(:options=`{showMenuPage: true}`)
-    template(v-slot:menuRight)
-      menu-right
+    template(v-slot:menuRight=`{inDrawer}`)
+      menu-right(:inDrawer="inDrawer")
   q-page-conainter
     q-page
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")

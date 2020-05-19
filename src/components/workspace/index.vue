@@ -15,26 +15,8 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
     kalpa-menu-footer(
       v-if="$store.state.workspace.showFooter"
       :options=`{showMenuPage: true}`)
-      template(v-slot:menuRight)
-        menu-right(:pages="pages").b-50
-  //- actions
-  //- item editors
-  //- q-dialog(
-  //-   v-model="pageDialogOpened" :maximized="true" position="bottom"
-  //-   @hide="itemEdited")
-  //-   //- @click.self="pageDialogOpened = false"
-  //-   div(
-  //-     :style=`{position: 'relative', height: $q.screen.height+'px', background: 'rgba(0,0,0,0.8)'}`).row.full-width.justify-center
-  //-     ws-item-saver(v-if="$store.state.workspace.item" :value="$store.state.workspace.item")
-  //-       template(v-slot=`{item}`)
-  //-         composition-editor(
-  //-           v-if="item"
-  //-           ctx="workspace"
-  //-           :composition="item"
-  //-           @cancel="pageDialogOpened = fals"
-  //-           :style=`{
-  //-             maxWidth: $store.state.ui.maxWidthPage+'px'
-  //-           }`)
+      template(v-slot:menuRight=`{inDrawer}`)
+        menu-right(:pages="pages" :inDrawer="inDrawer").b-50
   div(:style=`{}`).col.full-width.q-mb-sm
     .row.fit.items-start.content-start.justify-center
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit
@@ -44,6 +26,7 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
           v-else
           ctx="workspace"
           :pages="pages" :page="$route.params.page"
+          :options=`{onItemClick: 'edit'}`
           @page="$router.push({params: {page: $event}}).catch(e=>e)")
           template(v-slot:header)
             div(

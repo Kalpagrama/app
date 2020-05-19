@@ -100,6 +100,18 @@ export default {
     }
   },
   watch: {
+    contentEditorOpened: {
+      handler (to, from) {
+        this.$log('contentEditorOpened CHANGED', to)
+        if (to) {
+          this.$store.commit('workspace/stateSet', ['showFooter', false])
+          this.$store.commit('workspace/stateSet', ['showHeader', false])
+        } else {
+          this.$store.commit('workspace/stateSet', ['showFooter', true])
+          this.$store.commit('workspace/stateSet', ['showHeader', true])
+        }
+      }
+    }
   },
   methods: {
     async contentClick (wsItem) {

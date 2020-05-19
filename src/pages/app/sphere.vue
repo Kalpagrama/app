@@ -40,7 +40,7 @@ export default {
         }
         else {
           if (this.$route.name === 'trends') {
-            this.$router.replace({params: {oid: this.spheresTop[0].oid}})
+            this.$router.replace({params: {oid: this.spheresTop[3].oid}})
           }
           else {
             this.$router.replace({params: {oid: this.$store.getters.currentUser.oid}})
