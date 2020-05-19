@@ -61,27 +61,34 @@ function getItemTypeFromKey (wsItemKey) {
  * Мастерская полностью на клиенте. Репликация с сервером - в фоне
  * Данные хранятся в виде списков "wsList::collection::filterFunc::sortFunc". Список - массив из wsItemKey (аналог oid, но генерится клиентом)
  * Сами объекты - хранятся по отдельности. Ключ: 'WS::' + wsItemType + '::' + Date.now()
- * При изменении данных - они добавляются в список wsLocalChanges. Взводится operation (UPSERT/DELETE).
- * wsLocalChanges: {wsItemKey: { item, operation, itemSent, operationSent }} - хранится в кэше вечно (как и юзер)
+ * При изменении данных - они добавляются в список wsLocalChanges. Взводится operation (UPSERT/DELETE). увеличивается item.revisionClient
+ * wsLocalChanges: {wsItemKey: { item, operation }} - хранится в кэше вечно (как и юзер)
  * При получении данных - к полученным данным подмешивается wsLocalChanges
- * При получении ответа сервера - itemSent и operationSent очищается. если operation не взведен(все изменения сохранены) - вся запись удаляется
- * Если при старте мастерской есть отправленные данные, для которых не получен ответ - они отправляются еще раз
+ * При получении ответа сервера - проверяется item.revisionClient.
+ * если revisionClient совпадает с присланным с сервера(все изменения сохранены) - вся запись удаляется
+ * если revisionClient выше чем присланный с ссервера - считается что есть несохраненные изменения(отправятся позже)
  */
 class WsLocal {
   async init (context) {
     this.context = context
-    // очищаем инфу о начатых отправлениях. Позже будет предпринята попытка повторно отправить данные (на основе item и operation)
     await this.updateLocalChanges(value => {
-      if (Object.keys(value).length) logD('Обнаружены несохраненные изменения!')
-      for (let wsItemKey in value) {
-        assert(value[wsItemKey].item, '!item') // тут должна лежать последняя локальная версия
-        value[wsItemKey].operation = value[wsItemKey].operation || value[wsItemKey].operationSent // operation - при отправке очищается
-        delete value[wsItemKey].itemSent
-        delete value[wsItemKey].operationSent
-      }
-      return value
+      return value || {}
     })
-    await this.sendAllChanges()
+    // обойти все wsLocalChanges и отправить неотправленные
+    logD('Пытаемся отправить на сервер все локальные изменения')
+    let cnt = 0
+    for (let wsItemKey in this.context.rootState.cache.cachedItems.wsLocalChanges) {
+      let { item, operation, itemSent, operationSent } = this.context.rootState.cache.cachedItems.wsLocalChanges[wsItemKey]
+      if (operation && !itemSent) { // есть неотправленные изменения
+        cnt++
+        await this.changeItem(item, operation)
+      }
+    }
+    if (cnt) {
+      logD('все локальные изменения отправлены.', cnt)
+    } else {
+      logD('несохраненных локальных измений нет.')
+    }
   }
 
   // обновить версию локальной мастерской (по результатам обработки эвентов). пришедшая ревизия должна быть строго на 1 больше текущей
@@ -164,6 +171,7 @@ class WsLocal {
   }
 
   // вернет полные элементы из кэша, либо с сервера(при этом - подмешает к ним wsLocalChanges. сохранит список отдельно от элементов. обновит все фильтрованные списки)
+  // попытается отправить несохраненные данные
   async getItems (collection, filterFunc, sortFunc) {
     assert(collection in WsCollectionEnum, 'bad collection' + collection)
     const fetchItemFunc = async () => {
@@ -183,17 +191,36 @@ class WsLocal {
         })
         // подмешиваем несохраненную информацию (хранится локально)
         assert(this.context.rootState.cache.cachedItems.wsLocalChanges, '!wsLocalChanges')
-        for (let wsItemKey in this.context.rootState.cache.cachedItems.wsLocalChanges) {
-          let { item, operation, itemSent, operationSent } = this.context.rootState.cache.cachedItems.wsLocalChanges[wsItemKey]
+        let changedItemsKeys = Object.keys(this.context.rootState.cache.cachedItems.wsLocalChanges)
+        for (let wsItemKeyChanged of changedItemsKeys) {
+          let localChangesOutdated = false
+          let { item, operation } = this.context.rootState.cache.cachedItems.wsLocalChanges[wsItemKeyChanged]
           let indx = items.findIndex(itemFromServer => item.wsItemKey === itemFromServer.wsItemKey)
-          if (operation) {
-            if (indx >= 0 && operation === OperationEnum.UPSERT) {
-              items[indx] = item
-            }// заменяем
-            else if (indx >= 0 && operation === OperationEnum.DELETE) {
-              items.splice(indx, 1)
-            }// удаляем
-            else if (indx === -1 && operation === OperationEnum.UPSERT) items.push(item) // добавляем
+          if (indx >= 0) {
+            let itemServer = items[indx]
+            // серверная ревизия должна совпадать и есть несохраненные изменения
+            if (itemServer.revision === item.revision && item.revisionClient > itemServer.revisionClient) {
+              if (operation === OperationEnum.UPSERT) {
+                items[indx] = item // заменяем
+              } else if (operation === OperationEnum.DELETE) {
+                items.splice(indx, 1) // удаляем
+              }
+            } else {
+              logE('локальные изменения устарели и будут отброшены!', itemServer, item)
+              localChangesOutdated = true
+            }
+          } else if (indx === -1) { // на сервере такой нет
+            if (operation === OperationEnum.UPSERT) {
+              items.push(item) // добавляем
+            }
+          }
+          if (localChangesOutdated) { // удаляем локальные изменения (они устарели)
+            await this.updateLocalChanges(value => {
+              delete value[wsItemKeyChanged]
+              return value
+            })
+          } else {
+            await this.changeItem(item, operation) // отправим изменения на сервер
           }
         }
         // заново набиваем фильтрованные списки в соответствии с listFilterFunc и listSortFunc
@@ -227,7 +254,7 @@ class WsLocal {
       for (let wsItemKey of items) fullItems[wsItemKey] = await this.getItem(wsItemKey)
       if (filterFunc) {
         let filterFuncWrap = (wsItemKey) => fullItems[wsItemKey] ? filterFunc(fullItems[wsItemKey]) : false
-        items = items.filer(filterFuncWrap)
+        items = items.filter(filterFuncWrap)
       }
       if (sortFunc) {
         let sortFuncWrap = (wsItemKeyLeft, wsItemKeyRight) => fullItems[wsItemKeyLeft] ? sortFunc(fullItems[wsItemKeyLeft], wsItemKeyRight) : 0
@@ -261,12 +288,13 @@ class WsLocal {
     return item
   }
 
-  // изменить элемент в мастерской. Если externalChange не наши изменения (пришли из другого клиетна)! (Нужно в processEvent)
+  // изменить элемент в мастерской. Если externalChange - то это НЕ наши изменения (пришли из другого клиетна)! (Нужно в processEvent)
   async changeItem (item, operation, externalChange = false) {
     item = JSON.parse(JSON.stringify(item)) // нельзя чтобы передынный итем стал реактивным!
+    let itemChangedKey = item.wsItemKey
     assert(item && operation in OperationEnum, 'bad params' + operation + JSON.stringify(item))
-    assert(item.wsItemKey && item.wsItemType in WsItemTypeEnum, 'bad item' + JSON.stringify(item))
-    assert(getItemTypeFromKey(item.wsItemKey) === item.wsItemType, 'bad item' + JSON.stringify(item))
+    assert(itemChangedKey && item.wsItemType in WsItemTypeEnum, 'bad item' + JSON.stringify(item))
+    assert(getItemTypeFromKey(itemChangedKey) === item.wsItemType, 'bad item' + JSON.stringify(item))
     let updateItemFunc = async (updatedItem) => {
       let { data: { wsItemUpsert, wsItemDelete } } = await apollo.clients.api.mutate({
         mutation: operation === OperationEnum.UPSERT
@@ -282,7 +310,7 @@ class WsLocal {
       return { item: wsItemUpsert || wsItemDelete, actualAge: 'day' } // wsItemDelete вернет boolean
     }
     let fetchItemFunc = async () => {
-      let itemFetched = await this.getItem(item.wsItemKey) // getItem возмет с кэша, либо запросит с сервера
+      let itemFetched = await this.getItem(itemChangedKey) // getItem возмет с кэша, либо запросит с сервера
       return { item: itemFetched, actualAge: 'day' }
     }
     let mergeItemFunc = (serverItem, cacheItem) => {
@@ -293,34 +321,32 @@ class WsLocal {
       assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
       return mergedItem
     }
-    let updateInProgress = false // данные по этому item отправлены на сервер и ответ еще не получен
+    let onUpdateFailsFunc = (err) => {
+      logE('Невозможно применить обновления! Удаляем локальные изменения', err)
+      this.updateLocalChanges(value => {
+        delete value[itemChangedKey]
+        return value
+      })
+    }
     // Изменить wsLocalChanges. По приходу эвента - привести wsLocalChanges в исходное сосотояние (см processEvent)
-    if (!externalChange) { // запоминаем локальные изменеия только если сделали их сами
+    if (!externalChange) { // запоминаем локальные изменения только если сделали их сами (см processEvent)
       await this.updateLocalChanges(value => {
-        let itemLocalChanges = value[item.wsItemKey] || {}
-        if (itemLocalChanges.item) { // если это не первое сохранение этого item
-          if (itemLocalChanges.operation === OperationEnum.DELETE && operation === OperationEnum.UPSERT) assert(false, 'cant update deleted item!') // нельзя менять уже удаленый item
-          assert(itemLocalChanges.operationSent !== OperationEnum.DELETE, 'item delete sent before!') // нельзя менять или удалять уже удаленый item
-          if (itemLocalChanges.itemSent) updateInProgress = true // данные по этому item ушли на сервер, но ответа еще не было...
+        if (value[itemChangedKey]) { // если это не первое сохранение этого item
+          assert(value[itemChangedKey].item && value[itemChangedKey].operation, '!value[itemChangedKey]')
+          if (value[itemChangedKey].operation === OperationEnum.DELETE && operation === OperationEnum.UPSERT) assert(false, 'cant update deleted item!') // нельзя менять уже удаленый item
         }
-        itemLocalChanges.item = item // тут самые последние изменения
-        itemLocalChanges.operation = operation // последняя сделанная операция
-        if (!updateInProgress) { // при отправке - запоминаем то что отправили
-          itemLocalChanges.itemSent = JSON.parse(JSON.stringify(item)) // последняя отправленная версия данных
-          itemLocalChanges.operationSent = itemLocalChanges.operation // последняя отправленная операция
-          delete itemLocalChanges.operation // неотправленных изменений пока что нет
-        }
-        value[item.wsItemKey] = itemLocalChanges
+        value[itemChangedKey] = { item, operation } // тут самые последние изменения и последняя сделанная операция
         return value
       })
     }
     // данные запишутся в кэш и В ФОНЕ отправятся на сервер(если это наши измения и нет незавршенных измениий этого item)
     let updatedItem = await this.context.dispatch('cache/update', {
-      key: item.wsItemKey,
+      key: itemChangedKey,
       newValue: item,
-      updateItemFunc: !updateInProgress && !externalChange ? updateItemFunc : null,
-      fetchItemFunc: !updateInProgress && !externalChange ? fetchItemFunc : null,
-      mergeItemFunc: !updateInProgress && !externalChange ? mergeItemFunc : null,
+      updateItemFunc: !externalChange ? updateItemFunc : null,
+      fetchItemFunc: !externalChange ? fetchItemFunc : null,
+      mergeItemFunc: !externalChange ? mergeItemFunc : null,
+      onUpdateFailsFunc: !externalChange ? mergeItemFunc : null,
       debounceMsec: 4000 // ждем 4 секунды. Если за это время изменений больше не будет - они уйдут на сервер
     }, { root: true })
     // поправить все списки (удалить элемент из всех списков, а затем вставить на новое место)
@@ -334,7 +360,7 @@ class WsLocal {
         path: '',
         setter: listItems => {
           assert(listItems && Array.isArray(listItems))
-          let indx = listItems.findIndex(listItem => listItem.wsItemKey === item.wsItemKey)
+          let indx = listItems.findIndex(listItem => listItem.wsItemKey === itemChangedKey)
           if (indx >= 0) listItems.splice(indx, 1) // удаляем элемент. используем splice для реактивности
           if (operation === OperationEnum.UPSERT) { // вставляем на нужные места
             if (!listFilterFunc || listFilterFunc(item)) { // список подходит
@@ -347,7 +373,7 @@ class WsLocal {
                   }
                 }
               }
-              listItems.splice(insertPos, 0, item)
+              listItems.splice(insertPos, 0, updatedItem)
             }
           }
           return listItems
@@ -363,29 +389,45 @@ class WsLocal {
     assert(itemServer.oid && itemServer.name != null && itemServer.wsItemKey, 'assert itemServer !check')
     assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
     assert(itemServer.revision, '!itemServer.revision')
+    assert(itemServer.revisionClient, '!itemServer.revisionClient')
     // обновим wsLocalChanges
     await this.updateLocalChanges(value => {
       let itemLocalChanges = value[itemServer.wsItemKey]
       if (itemLocalChanges) { // у нас были изменения этого item!
-        if (itemLocalChanges.itemSent && (!itemLocalChanges.itemSent.revision || itemLocalChanges.itemSent.revision === itemServer.revision - 1)) {
-          // все ок. Мы изменили данные - они поменялись на сервере и к нам прилетело подтверждение
-          logD('Мы меняли данные и получили подтверждение. Все ОК!')
-          if (!itemLocalChanges.operation) { // локальных изменений больше сделано не было. удаляем весь объект
-            logD('больше изменеий по этом item - нет')
+        assert(itemLocalChanges.item && itemLocalChanges.item.revision >= 0 && itemLocalChanges.item.revisionClient, 'bad item:' + JSON.stringify(itemLocalChanges.item))
+        if (itemLocalChanges.item.revision === itemServer.revision - 1) {
+          if (itemLocalChanges.item.revisionClient === itemServer.revisionClient) {
+            logD('несохраненных изменений больше нет')
             delete value[itemServer.wsItemKey]
-          } else { // пока изменения сохранялись на сервере - юзер что-то сделал еще. отправим изменения позже (sendAllChanges)
-            logD('Пока данные менялись на сервере - были сделаны еще изменения этого item')
-            delete itemLocalChanges.itemSent
-            delete itemLocalChanges.operationSent
+            this.context.dispatch('cache/update', {
+              key: itemServer.wsItemKey,
+              setter: item => {
+                item.revision = itemServer.revision
+                item.oid = itemServer.oid
+                return item
+              }
+            }, {root: true})
+          } else if (itemLocalChanges.item.revisionClient > itemServer.revisionClient) {
+            logD('есть еще изменения!')
+            this.context.dispatch('cache/update', {
+              key: itemServer.wsItemKey,
+              setter: item => {
+                item.revision = itemServer.revision
+                item.oid = itemServer.oid
+                return item
+              }
+            }, {root: true})
+          } else {
+            logE('Мы меняли данные. Но параллельно данные изменены из другого клиента(revisionClient)!', itemLocalChanges.item, itemServer)
+            // ничего не поделать - удаляем локальные изменения, принимаем версию сервера. На сервер не шлем(externalChange = true).
+            delete value[itemServer.wsItemKey]
+            this.changeItem(itemServer, type === 'WS_ITEM_DELETED' ? OperationEnum.DELETE : OperationEnum.UPSERT, true) // setter не может быть async. выполняем в фоне
           }
-        } else { // проблема! мы изменяли данные. Но ответ от сервера - ответ НЕ НА НАШИ изменения (либо мы вообще еще не успели ничего отправить)
-          // Есть несохраненные данные! по всей видимости данные изменены из другого клиента
-          logE(`Мы меняли данные. Но параллельно данные изменены из другого клиента! 
-            itemServer.revision=${itemServer.revision} 
-            existingChanges=${itemLocalChanges}`)
-          // ничего не поделать - удаляем локальные изменения, принимаем версию сервера. На сервер не шлем(sendToServer = false).
+        } else {
+          logE('Мы меняли данные. Но параллельно данные изменены из другого клиента(revision)!', itemLocalChanges.item, itemServer)
+          // ничего не поделать - удаляем локальные изменения, принимаем версию сервера. На сервер не шлем(externalChange = true).
           delete value[itemServer.wsItemKey]
-          this.changeItem(itemServer, type === 'WS_ITEM_DELETED' ? OperationEnum.DELETE : OperationEnum.UPSERT, true)
+          this.changeItem(itemServer, type === 'WS_ITEM_DELETED' ? OperationEnum.DELETE : OperationEnum.UPSERT, true) // setter не может быть async. выполняем в фоне
         }
       } else {
         // мы ничего не меняли. применяем ко всем спискам!
@@ -397,25 +439,6 @@ class WsLocal {
       return value
     })
     await this.updateWsRevision(wsRevision) // обновим ревизию мастерской
-    await this.sendAllChanges() // отправим неотправленное
-  }
-
-  // обойти все wsLocalChanges и отправить неотправленные
-  async sendAllChanges () {
-    logD('Пытаемся отправить на сервер все локальные изменения')
-    let cnt = 0
-    for (let wsItemKey in this.context.rootState.cache.cachedItems.wsLocalChanges) {
-      let { item, operation, itemSent, operationSent } = this.context.rootState.cache.cachedItems.wsLocalChanges[wsItemKey]
-      if (operation && !itemSent) { // есть неотправленные изменения
-        cnt++
-        await this.changeItem(item, operation)
-      }
-    }
-    if (cnt) {
-      logD('все локальные изменения сохранены.', cnt)
-    } else {
-      logD('локальных измений нет.')
-    }
   }
 }
 
@@ -427,11 +450,6 @@ export const init = async (context) => {
   return true
 }
 
-// атавизм. Этот метод не нужен, тк wsItems возвращает полные сущности
-export const wsItem = async (context, wsItemKey) => {
-  logW('method workspace/wsItem is deprecated! use wsItems instead!', wsItemKey)
-  return await wsLocal.getItem(wsItemKey)
-}
 // получить списки из мастерской (содержит полные элементы)
 export const wsItems = async (context, { collection, filterFunc, sortFunc }) => {
   let items = await wsLocal.getItems(collection, filterFunc, sortFunc)
@@ -439,6 +457,9 @@ export const wsItems = async (context, { collection, filterFunc, sortFunc }) => 
 }
 export const wsItemUpsert = async (context, item) => {
   if (!item.wsItemKey) item.wsItemKey = makeWsItemKey(item.wsItemType) // генерируем wsItemKey для нового элемента
+  if (!item.revision) item.revision = 0
+  if (!item.revisionClient) item.revisionClient = 0
+  item.revisionClient++ // каждое измение увеличивает revisionClient
   return await wsLocal.changeItem(item, OperationEnum.UPSERT)
 }
 export const wsItemDelete = async (context, item) => {

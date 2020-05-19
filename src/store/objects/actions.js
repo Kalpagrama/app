@@ -206,6 +206,9 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
     assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
     return mergedItem
   }
+  let onUpdateFailsFunc = (err) => {
+    logW('cant update!', err)
+  }
   let updatedItem = await context.dispatch('cache/update', {
     key: oid,
     path,
@@ -214,7 +217,8 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
     actualAge,
     updateItemFunc,
     fetchItemFunc,
-    mergeItemFunc
+    mergeItemFunc,
+    onUpdateFailsFunc
   }, {root: true})
   // logD('objects/update action complete', oid)
   return updatedItem

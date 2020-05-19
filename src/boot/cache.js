@@ -53,9 +53,10 @@ class QueueUpdate {
     this.inProgress = false
   }
 
-  push (key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, debounceMsec = 1000) {
+  push (key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec = 1000) {
+    assert(updateItemFunc && fetchItemFunc && mergeItemFunc && onUpdateFailsFunc, 'bad funcs')
     let itemForSend = JSON.parse(JSON.stringify(vuexItem)) // копия данных на момент отправки
-    let newQuery = { key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc }
+    let newQuery = { key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc }
     // удаляем неактуальные изменения, которые перекрыты текущим
     let indx = this.queries.findIndex(query => query.key === key)
     if (indx >= 0) {
@@ -78,32 +79,33 @@ class QueueUpdate {
 
   async next (failCount = 0) {
     if (failCount > 5) return
-    logD('разребаем очередь...', failCount)
+    logD('разгребаем очередь...', failCount)
 
     if (this.inProgress) return
     if (this.queries.length === 0) {
       logD('очередь пуста. выходим.')
       return
     }
-    let { key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc } = this.queries.shift()
+    let { key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc } = this.queries.shift()
 
     // пробуем обновить на сервере
     try {
       this.inProgress = true
       logD(`изменения извлечены из очереди. попытка отправки№${failCount}. item:`, itemForSend)
-      await this.updateItem(key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc)
+      await this.updateItem(key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc)
       failCount = 0 // изменения прошли удачно! сбрасываем failCount
       logD('изменения успешно отправлены')
     } catch (err) {
       if (!err.networkError) { // если ошибка не сетевая - выходим с неудачей
         logE('попытка отправки не удалась. Попыток больше не будет предпринято.', err)
-        failCount = 100500 //
+        failCount = 100500
+        onUpdateFailsFunc(err) // обновить не получится. Прекратить попытки
       } else { // если ошибка сетевая - пытаемся выполнить повторно
         // после обновления страницы данные об изменениях пропадут!!!
         // кладем обратно
         let timeout = Math.min(3000 * (failCount), 20 * 1000) // ждем (не не более 20 сек)
         logD(`попытка отправки не удалась по причине отсутствия сети. Попробуем через ${timeout / 1000}c`)
-        this.queries.unshift({ key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc })
+        this.queries.unshift({ key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc })
         //  todo сделать circuit breaker
         ++failCount
         await wait(timeout)
@@ -318,7 +320,7 @@ class Cache {
   // mergeItemFunc - ф-я для устранения мердж-конфликтов
   // newValue - это  объект целиком, либо свойство объекта (тогда актуален path)
   // подождет debounceMsec перед отправкой на сервер. Отправится только последний вариант
-  async update (key, { path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc, debounceMsec }) {
+  async update (key, { path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec }) {
     let vuexItem = this.store.state.cache.cachedItems[key]
     if (!vuexItem) { // в кэше ничего не нашлось. Либо не было изначально, либо было удалено при переполнении кэша
       if (!path && newValue) { // меняется целиком
@@ -340,7 +342,7 @@ class Cache {
       // если данные устареют - они могут быть замененты свежими при очередном запросе get
       if (vuexItem) vuexItem = await this.set(key, vuexItem, 'year')
       // обновим данные на сервере (в фоне)
-      if (vuexItem) this.queue.push(key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, debounceMsec)
+      if (vuexItem) this.queue.push(key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec)
     }
     if (!vuexItem) logW('item not found in cache!')
     return vuexItem

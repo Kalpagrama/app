@@ -12,8 +12,8 @@ export default {
   data () {
     return {
       item: null,
-      itemUpdateAuthor: null
-      // itemUpdating: false
+      itemUpdateAuthor: null,
+      externalUpdate: false // если данные были изменены извне
     }
   },
   watch: {
@@ -23,14 +23,18 @@ export default {
       handler (to, from) {
         if (!to) return
         this.$log('value CHANGED', to.revision)
+        if (from) this.externalUpdate = true
         this.item = JSON.parse(JSON.stringify(to))
       }
     },
     item: {
       deep: true,
       handler (to, from) {
-        // this.$log('item CHANGED to', to)
-        // if (this.itemUpdating) return
+        this.$log('item CHANGED to', to.revision, this.externalUpdate)
+        if (this.externalUpdate) {
+          this.externalUpdate = false
+          return
+        }
         this.itemUpdate()
       }
     }
