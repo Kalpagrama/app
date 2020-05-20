@@ -13,8 +13,9 @@ div(
       .row.fit.items-center.content-center.q-px-sm
         span(:style=`{fontSize: '20px'}`).text-white.text-bold Node editor
     q-btn(
-      push color="green" no-caps @click="nodePublish()"
-      :style=`{height: '42px'}`).q-px-sm Publish
+      flat color="green" no-caps @click="nodePublish()"
+      :style=`{height: '42px'}`).q-px-sm.b-120
+      span.text-bold Publish
   //- essence
   div(
     :style=`{

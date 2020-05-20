@@ -56,8 +56,8 @@ export default {
         mini: 120,
         original: this.$q.screen.height / 3,
         middle: this.$q.screen.height / 2,
-        maxiPre: this.$q.screen.height - 120,
-        maxi: this.$q.screen.height - 60
+        maxiPre: this.$q.screen.height - 60,
+        maxi: this.$q.screen.height - 0
       }
     }
   },
@@ -105,9 +105,9 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    // this.$wait(200).then(() => {
-    //   this.tabChanged('layers')
-    // })
+    this.$wait(200).then(() => {
+      this.tabChanged('layers')
+    })
   }
 }
 </script>

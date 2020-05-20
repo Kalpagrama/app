@@ -1,6 +1,9 @@
 <template lang="pug">
-.row.full-width
-  node(:node="node" :needFull="true")
+.column.fit
+  .row.full-width
+    slot(name="header")
+  .col.full-width.scroll.q-pa-sm
+    small.text-white {{node}}
 </template>
 
 <script>

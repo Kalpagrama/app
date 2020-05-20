@@ -1,16 +1,20 @@
 <template lang="pug">
 .column.fit
+  slot(name="header")
   //- header
-  .row.full-width.q-pa-sm
-    q-input(
-      v-model="sphereSearch" @keyup.enter="sphereEnter"
-      filled color="green"
-      label="Add sphere"
-      :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
-      ).full-width.b-220
+  .row.full-width.q-px-sm.q-pt-sm
+    div(:style=`{borderRadius: node.spheres.length > 0 ? '10px 10px 0 0' : '10px'}`).row.full-width.q-pa-sm.b-70
+      q-input(
+        v-model="sphereSearch" @keyup.enter="sphereEnter"
+        filled color="white"
+        label="Add sphere"
+        :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+        ).full-width.b-220
   //- body
   .col.full-width.scroll.q-px-sm.q-pb-sm
-    .row.full-width.items-start.content-start
+    div(
+      v-if="node.spheres.length > 0"
+      :style=`{borderRadius: '0 0 10px 10px'}`).row.full-width.items-start.content-start.q-pa-sm.b-70
       div(
         v-for="(s,si) in node.spheres" :key="si" @click="sphereClick(s, si)"
         :class=`{

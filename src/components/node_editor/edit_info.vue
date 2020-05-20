@@ -5,8 +5,10 @@
 
 <template lang="pug">
 .column.fit
-  .col.full-width.q-px-sm.q-pb-sm
-    div(:style=`{borderRadius: '10px'}`).row.fit.b-50
+  .row.full-width
+    slot(name="header")
+  .col.full-width.q-pa-sm
+    div(:style=`{borderRadius: '10px'}`).row.fit.b-70
 </template>
 
 <script>

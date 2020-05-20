@@ -4,7 +4,7 @@ component(
   :ctx="ctx"
   :composition="composition"
   :options="options"
-  @close="$emit('close')")
+  @cancel="$emit('cancel')")
 </template>
 
 <script>

@@ -11,48 +11,41 @@
 
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
-  //- actions
-  //- dialogs
-  //- ws item finder dialog
-  q-dialog(v-model="itemFinderOpened" maximized position="bottom")
-    div(:style=`{height: $q.screen.height+'px', paddingTop: paddingTop+'px'}` @click.self="itemFinderOpened = false"
-      ).row.full-width.items-start.content-start.justify-center.q-px-sm
-      div(
-        :style=`{
-          position: 'relative',
-          maxWidth: $store.state.ui.maxWidthPage+'px',
-          borderRadius: '10px', overflow: 'hidden',
-          height: $q.screen.height-8-8+'px'
-        }`).row.full-width.bg-grey-9
-        ws-item-finder(
-          v-if="true"
-          :types="['contentNotes', 'node']"
-          :options="{header: true, backButton: true, onItemClick: 'emit'}"
-          @item="itemFound"
-          @cancel="itemFinderOpened = false")
-  //- composition editor dialog
-  q-dialog(v-model="itemEditorOpened" maximized position="bottom")
-    div(:style=`{height: $q.screen.height+'px', paddingTop: 0+'px'}` @click.self="itemEditorOpened = false"
-      ).row.full-width.items-start.content-start.justify-center.q-px-sm
-      div(
-        :style=`{
-          position: 'relative', zIndex: 200, transform: 'translate3d(0,0,0)',
-          maxWidth: $store.state.ui.maxWidthPage+'px',
-          borderRadius: '10px', overflow: 'hidden',
-          height: $q.screen.height+'px'
-        }`
-        ).row.full-width
-        composition-editor(
-          v-if="node.items[itemIndex]"
-          :composition="node.items[itemIndex]" :content="node.items[itemIndex].content"
-          @cancel="itemEditorOpened = false"
-          ).bg-grey-8
+  //- item finder dialog
+  q-dialog(v-model="itemFinderOpened" persistent position="bottom")
+    div(
+      :style=`{
+        position: 'relative',
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px'
+      }`).row.full-width
+      ws-item-finder(
+        v-if="true"
+        :types="['contentNotes', 'node']"
+        :options="{header: true, backButton: true, onItemClick: 'emit'}"
+        @item="itemFound"
+        @cancel="itemFinderOpened = false")
+  //- item editor dialog
+  q-dialog(v-model="itemEditorOpened" persistent position="bottom")
+    div(
+      :style=`{
+        position: 'relative',
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px'
+      }`).row.full-width
+      composition-editor(
+        v-if="itemEditingIndex >= 0 && node.items[itemEditingIndex]"
+        :ctx="'workspace'"
+        :composition="node.items[itemEditingIndex]"
+        @cancel="itemEditorOpened = false")
   //- add first item
-  div(v-if="node.items.length === 0").column.fit.b-40
+  div(v-if="node.items.length === 0" :style=`{position: 'relative'}`).column.fit
     slot(name="header")
-    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
+    div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
       span(:style=`{fontSize: '16px'}`).text-white.text-bold Select first item
-    div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.full-width.q-pa-sm
+    div(:style=`{overflow: 'hidden'}`).col.full-width.q-pa-sm
       ws-item-finder(
         :types="['contentNotes', 'node']"
         :options=`{
@@ -69,6 +62,7 @@ div(:style=`{position: 'relative'}`).row.fit
   div(v-else :style=`{position: 'relative'}`).column.fit
     div(:style=`{position: 'relative'}`).col.full-width.scroll
       slot(name="header")
+      //- header
       div(
         :style=`{
           position: 'sticky', top: '-20px', zIndex: 1000,
@@ -84,56 +78,63 @@ div(:style=`{position: 'relative'}`).row.fit
           :color="itemsView === 'feed' ? 'green' : 'white'").b-90
         .col
           .row.fit.items-center.content-center.justify-end
-            q-btn(flat round color="white" icon="edit" @click="itemsEdit()").b-90
+            q-btn(
+              flat round icon="edit" @click="itemsEdit()"
+              :color="itemsEditing ? 'green' : 'white'").b-90
       //- items
       div(
         v-if="node.items.length > 0"
         ).row.full-width.items-start.content-start.q-pa-sm
         //- items
-        div(
-          v-for="(i, ii) in node.items" :key="i.oid"
-          :ref="`item-${i.oid}`"
-          :class=`{}`
-          :style=`{
-            position: 'relative',
-            borderRadius: '10px',
-            overflow: 'hidden',
-            marginBottom: itemsEditToolsMarginBottom+'px'
-          }`
-          ).row.full-width.items-start.content-start
-          div(:style=`{width: itemsEditToolsWidth+'px', overflow: 'hidden'}`).row.justify-start
-            q-checkbox(v-model="itemsSelected" :val="i.oid" dark color="grey-6")
-          div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.b-70
-            div(:style=`{position: 'relative', height: itemsView === 'list' ? '40px' : '500px'}`).column.full-width
-              div(
-                v-if="itemsView === 'feed'"
-                :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width.b-60
-                composition(
-                  ctx="workspace"
-                  :value="i" :visible="true" :active="false" :mini="false")
-              //- item footer
-              div(
-                @click="itemsOpened.push(i.oid)"
-                :class=`{
-                  'item-tint': itemsView === 'list'
-                }`
-                :style=`{position: 'relative', height: '50px'}`).row.full-width.items-center.content-center.q-px-md
-                span(:style=`{userSelect: 'none'}`).text-white Item name
-          div(:style=`{width: itemsEditToolsWidth+'px', overflow: 'hidden'}`).row.justify-end
-            q-btn(flat round color="grey-6" icon="drag_indicator")
-              q-menu
-                item-menu
-          //- //- item-active(:item="i" :itemIndex="ii")
-          //- //- item-footer
-          //- div(
-          //-   :style=`{
-          //-     marginTop: '-10px'
-          //-   }`
-          //-   ).row.full-width.items-center.content-center.q-px-sm.q-pt-md.q-pb-sm.b-70.br
-          //-   q-checkbox(v-model="itemsSelected" :val="i.oid" dark dense color="grey-6"
-          //-     :style=`{borderRadius: '10px', padding: '10px'}`).b-90
-          //-   .col
-          //-   q-btn(round flat color="white" icon="more_vert").b-90
+        draggable(
+          :list="node.items" group="items" handle=".item-drag-handle"
+          :move="itemsOnDrag"
+          @start="itemsDragging = true"
+          @end="itemsDragging = false, itemsDraggingIndexNext = null").full-width
+          div(
+            v-for="(i, ii) in node.items" :key="i.oid"
+            :ref="`item-${i.oid}`"
+            :class=`{}`
+            :style=`{
+              position: 'relative',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              marginBottom: '10px'
+            }`
+            ).row.full-width.items-start.content-start
+            //- LEFT: select
+            div(:style=`{width: itemsEditToolsWidth+'px', overflow: 'hidden'}`).row.justify-start
+              q-checkbox(v-model="itemsSelected" :val="i.oid" dark color="grey-6")
+            //- CENTER: item, composition
+            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).col.b-70
+              div(:style=`{position: 'relative', height: itemsView === 'list' ? '40px' : '500px'}`).column.full-width
+                //- item body, composition, chain, ...
+                div(
+                  v-if="itemsView === 'feed'"
+                  :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width.b-60
+                  composition(
+                    ctx="workspace"
+                    :value="i" :visible="true" :active="true" :mini="false")
+                //- item footer
+                div(
+                  @click="itemsOpened.push(i.oid)"
+                  :class=`{
+                    'item-tint': itemsView === 'list'
+                  }`
+                  :style=`{
+                    position: 'relative',
+                    height: '50px'
+                  }`
+                  ).row.full-width.items-center.content-center.q-px-md
+                  span(:style=`{userSelect: 'none'}`).text-white Item name {{ i.oid }}
+                  q-btn(
+                    round flat dense color="white" icon="edit" @click="itemEdit(i.oid)"
+                    :style=`{position: 'absolute', zIndex: 100, right: '3px', top: '3px'}`)
+            //- RIGHT: menu, dragging
+            div(:style=`{width: itemsEditToolsWidth+'px', overflow: 'hidden'}`).row.justify-end
+              q-btn(flat round color="grey-6" icon="drag_indicator").item-drag-handle
+                q-menu(auto-close anchor="top left" self="top right")
+                  item-menu(@edit="itemEdit(i, ii)" @copy="itemCopy(i, ii)" @delete="itemDelete(i, ii)")
         //- ADD second and beyond items
         div(v-if="node.items.length > 0").row.full-width.q-pb-sm
           div(:style=`{width: itemsEditToolsWidth+'px'}`).row
@@ -142,6 +143,7 @@ div(:style=`{position: 'relative'}`).row.fit
               push no-caps color="green" icon="add" @click="itemFind()"
               :style=`{height: '40px'}`).full-width
           div(:style=`{width: itemsEditToolsWidth+'px'}`).row
+    //- footer: selected items
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
         v-if="itemsSelected.length > 0"
@@ -154,12 +156,12 @@ div(:style=`{position: 'relative'}`).row.fit
 
 <script>
 import assert from 'assert'
-import itemActive from './item_active'
 import itemMenu from './item_menu'
+import draggable from 'vuedraggable'
 
 export default {
   name: 'nodeEditor-editItems',
-  components: {itemActive, itemMenu},
+  components: {itemMenu, draggable},
   props: {
     node: {type: Object}
   },
@@ -172,7 +174,10 @@ export default {
       itemsEditToolsWidth: 0,
       itemsEditToolsMarginBottom: 4,
       itemsEditing: false,
-      itemsView: 'list'
+      itemEditingIndex: null,
+      itemsView: 'list',
+      itemsDragging: false,
+      itemsDraggingIndexNext: null
     }
   },
   computed: {
@@ -227,8 +232,6 @@ export default {
           compositionInput.layers = []
           this.$log('compositionInput', compositionInput)
           this.$set(this.node.items, this.node.items.length, compositionInput)
-          // this.itemEdit(compositionInput.oid)
-          // await this.$wait(300)
           this.itemFinderOpened = false
           break
         }
@@ -237,28 +240,35 @@ export default {
           this.$log('No such type!')
         }
       }
+      // open editor for the first item
+      if (this.node.items.length === 1) {
+        this.itemEdit(null, 0)
+      }
     },
-    itemEdit (oid) {
-      this.$log('itemEdit', oid)
-      // if (this.itemsEdit[oid] === true) {
-      //   this.$set(this.itemsEdit, oid, false)
-      // }
-      // else {
-      //   this.$set(this.itemsEdit, oid, true)
-      // }
-      // let ref = this.$refs[`item-${oid}`][0]
-      // this.$log('ref', ref.offsetTop)
-      // this.$emit('scrollTo', ref.offsetTop - 8)
-      // ref.scrollIntoView(true)
+    itemEdit (i, ii) {
+      this.$log('itemEdit', i, ii)
+      this.itemEditingIndex = ii
+      this.itemEditorOpened = true
     },
-    itemDelete (oid) {
+    itemCopy ({oid}, ii) {
+      this.$log('itemCopy', oid, ii)
+      let item = JSON.parse(JSON.stringify(this.node.items[ii]))
+      item.oid = Date.now().toString()
+      this.node.items.splice(ii + 1, 0, item)
+    },
+    itemDelete ({oid}, ii) {
       this.$log('itemDelete', oid)
       if (!confirm('Delete item ?!')) return
-      let i = this.node.items.findIndex(item => item.oid === oid)
-      this.$log('itemDelete i', i)
-      if (i) {
-        this.$delete(this.node.items, i)
+      let index = this.node.items.findIndex(item => item.oid === oid)
+      this.$log('itemDelete index', index)
+      if (index >= 0) {
+        this.$delete(this.node.items, index)
       }
+    },
+    itemsOnDrag (e, evt) {
+      // this.$log('itemsOnDrag', e, evt)
+      this.$log('itemsDraggingIndexNext', e.draggedContext.futureIndex)
+      this.$set(this, 'itemsDraggingIndexNext', e.draggedContext.futureIndex + 1)
     },
     itemsEdit () {
       this.$log('itemsEdit', this.itemsEditing)

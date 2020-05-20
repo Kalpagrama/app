@@ -18,7 +18,7 @@
 
 <script>
 export default {
-  name: 'itemMenu',
+  name: 'extraLayers-layerMenu',
   data () {
     return {
       items: [

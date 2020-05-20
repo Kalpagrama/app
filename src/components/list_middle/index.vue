@@ -66,6 +66,7 @@ export default {
     },
     clientHeight () {
       return this.$q.screen.height
+      // return this.$el.clientHeight
     }
   },
   watch: {
