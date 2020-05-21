@@ -107,7 +107,7 @@ export default {
       if (!name) return
       let sphereInput = {
         name: name,
-        wsItemType: 'SPHERE',
+        wsItemType: 'WS_SPHERE',
         color: 'red'
       }
       // TODO add color picker

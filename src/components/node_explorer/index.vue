@@ -157,7 +157,7 @@ export default {
       this.$log('nodeAdd')
       let nodeInput = {
         name: this.node.name,
-        wsItemType: 'NODE',
+        wsItemType: 'WS_NODE',
         items: [],
         spheres: [],
         category: 'FUN',

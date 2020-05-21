@@ -108,7 +108,7 @@ export const userAuthenticate = async (context, {password, inviteCode}) => {
     `,
     variables: { password, inviteCode }
   })
-  logD('@userAuthenticate done', role)
+  logD('@userAuthenticate done', { result, role, nextAttemptDate, attempts, failReason })
   localStorage.setItem('userRole', role)
   return { result, role, nextAttemptDate, attempts, failReason }
 }
