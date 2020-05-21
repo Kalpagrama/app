@@ -113,6 +113,7 @@ class Workspace {
     let actual = false
     // todo use Local Documents https://rxdb.info/rx-local-document.html#
     let rxCollectionEnum = getRxCollectionEnum(wsCollectionEnum)
+
     let collectionMetaInfo = await this.rxdb.meta.findOne().where('rxCollection').eq(rxCollectionEnum).exec()
     if (collectionMetaInfo) {
       let lastFetchDate = collectionMetaInfo.fetchedAt

@@ -244,12 +244,28 @@ export const wsSchemaMeta = {
   type: 'object',
   additionalProperties: true,
   properties: {
-    rxCollection: {
-      type: 'string',
-      primary: true
+    fetchedCollections: {
+      type: 'array',
+      maxItems: 88,
+      items: {
+        type: 'object',
+        properties: {
+          rxCollectionName: {
+            type: 'string'
+          },
+          fetchedAt: {
+            type: 'integer'
+          }
+        }
+      }
     },
-    fetchedAt: {
-      type: 'integer'
+    unsavedItemIds: {
+      type: 'array',
+      maxItems: 8888,
+      uniqueItems: true,
+      items: {
+        type: 'integer'
+      }
     }
   },
   required: ['rxCollection', 'fetchedAt']

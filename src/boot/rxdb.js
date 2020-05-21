@@ -95,64 +95,8 @@ class RxDBWrapper {
     await this.workspace.clear()
   }
 
-  async setReactiveQuery (vueObject, propName, rxCollectionEnum, searchObj) {
-    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollection' + rxCollectionEnum)
-    let rxCollection = this.getRxCollection(rxCollectionEnum)
-    let query = rxCollection.find(searchObj)
-    query.$.subscribe(results => {
-      logD('RX в БД список изменился', results)
-      assert(Array.isArray(results), 'Array.isArray(results)')
-      vueObject.$set(vueObject, propName, results)
-      logD('изменения отправлены в UI')
-    })
-    let docs = await query.exec()
-    logD('RX получен список', docs)
-    assert(Array.isArray(docs), 'Array.isArray(docs)')
-    vueObject.$set(vueObject, propName, docs)
-  }
-
-  setReactiveItem (vueObject, propName, rxDoc) {
-    logD('setReactiveItem...')
-    assert(vueObject._isVue, '!isVue')
-    assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
-    vueObject.counter = vueObject.counter || 0
-    vueObject.$set(vueObject, propName, rxDoc.toJSON())
-    vueObject.rxUnWatchers = vueObject.rxUnWatchers || {}
-    vueObject.rxUnWatchers[propName] = vueObject.rxUnWatchers[propName] || []
-    for (let unwatch of vueObject.rxUnWatchers[propName]) unwatch() // убиваем предыдущие
-    // подписываемся на изменения проперти в UI
-    const unwatchNew = vueObject.$watch(propName, async (from, to) => {
-      if (vueObject.counter++ > 10) {
-        logW('!!!!!!!!!!!!!!!!!!achtung!!!!!!!!!')
-        await wait(1000)
-      }
-      if (!to) return
-      logD('RX элемент изменен в UI...', to)
-      const changesFromClientOrigin = to.changesFromClient
-      try {
-        to.changesFromClient = true // ставим флаг, чтобы не дергаться в rxDoc.$.subscribe(infinite loop). флаг снимется когда придут изменения с сервера
-        await this.getItemRxCollection(to).atomicUpsert(to)
-      } catch (err) {
-        to.changesFromClient = changesFromClientOrigin
-      }
-
-      logD('RX изменения применены в БД', to)
-    }, { deep: true, immediate: false })
-    vueObject.rxUnWatchers[propName].push(unwatchNew)
-
-    // подписываемся на измение документа в RXDB
-    rxDoc.$.subscribe(changeEvent => {
-      logD('RX элемент изменился в БД...', changeEvent.changesFromClient)
-      if (changeEvent.changesFromClient) return
-      vueObject.$set(vueObject, propName, JSON.parse(JSON.stringify(changeEvent))) // changeEvent нельзя менять вовне
-      logD('изменения отправлены в UI')
-    })
-    logD('setReactiveItem complete...')
-  }
-
   async upsertItem (item) {
     logD('upsertItem item=', item)
-    item.changesFromClient = true
     let doc
     // просто atomicUpsert не получается использовать тк не срабатывают хуки (normalizeWsItem)
     if (item.id) {
