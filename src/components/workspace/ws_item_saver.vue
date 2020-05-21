@@ -52,9 +52,7 @@ export default {
         }
         // if (this.itemUpdating) return
         // this.itemUpdating = true
-        if (this.item.wsItemType === 'NODE') await this.$rxdb.wsNode.atomicUpsert(this.item)
-        else if (this.item.wsItemType === 'CONTENT_WITH_NOTES') await this.$rxdb.wsContent.atomicUpsert(this.item)
-        else throw new Error('bad item!!!' + JSON.stringify(this.item))
+        await this.$rxdb.upsertItem(this.item)
         // let item = await this.$store.dispatch('workspace/wsItemUpsert', this.item) // wsItemUpsert делает копию item
         this.$log('itemUpdate done:' + JSON.stringify(this.item))
       } catch (e) {

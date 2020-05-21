@@ -40,10 +40,10 @@ function getItemWsCollection (item) {
 }
 function getRxCollectionEnum(wsCollectionEnum){
   switch (wsCollectionEnum) {
-    case WsCollectionEnum.NODE_LIST: return RxCollectionEnum.wsNode
-    case WsCollectionEnum.CONTENT_LIST: return RxCollectionEnum.wsContent
-    case WsCollectionEnum.CHAIN_LIST: return RxCollectionEnum.wsChain
-    case WsCollectionEnum.SPHERE_LIST: return RxCollectionEnum.wsSphere
+    case WsCollectionEnum.NODE_LIST: return RxCollectionEnum.WS_NODE
+    case WsCollectionEnum.CONTENT_LIST: return RxCollectionEnum.WS_CONTENT
+    case WsCollectionEnum.CHAIN_LIST: return RxCollectionEnum.WS_CHAIN
+    case WsCollectionEnum.SPHERE_LIST: return RxCollectionEnum.WS_SPHERE
     default: throw new Error('bad wsCollectionEnum:' + wsCollectionEnum)
   }
 }
@@ -94,13 +94,13 @@ class Workspace {
   getRxCollection (rxCollectionEnum) {
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollection' + rxCollectionEnum)
     switch (rxCollectionEnum) {
-      case RxCollectionEnum.wsNode:
+      case RxCollectionEnum.WS_NODE:
         return this.rxdb.node
-      case RxCollectionEnum.wsContent:
+      case RxCollectionEnum.WS_CONTENT:
         return this.rxdb.content
-      case RxCollectionEnum.wsChain:
+      case RxCollectionEnum.WS_CHAIN:
         return this.rxdb.chain
-      case RxCollectionEnum.wsSphere:
+      case RxCollectionEnum.WS_SPHERE:
         return this.rxdb.sphere
       default:
         throw new Error('bad collection' + rxCollectionEnum)
@@ -202,4 +202,4 @@ class Workspace {
   }
 }
 
-export { Workspace, getItemWsCollection, getRxCollectionEnum}
+export { Workspace, WsItemTypeEnum}

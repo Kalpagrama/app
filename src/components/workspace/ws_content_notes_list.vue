@@ -77,6 +77,7 @@ div(:style=`{position: 'relative'}`).column.fit
 <script>
 import { assert } from 'assert'
 import { isRxDocument } from 'rxdb'
+import Vue from 'vue'
 export default {
   name: 'wsContentNotesList',
   props: {
@@ -143,13 +144,14 @@ export default {
       this.$log('contentCreated', content)
       if (isRxDocument(content)) content = content.toJSON()
       // смотрим - нет ли такого уже.
-      let existing = await this.$rxdb.wsContent.findOne({
+      let tmp = new Vue({data: {existingItems: {}}})
+      await this.$rxdb.setReactiveQuery(tmp, 'existingItems', 'WS_CONTENT', {
         selector: {
-          contentOid: {$eq: content.oid}
+          contentOid: { $eq: content.oid }
         }
-      }).exec()
+      })
       // let existing = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST', filterFunc: item => item.contentOid === content.oid})
-      if (existing) return existing
+      if (tmp.existingItems.length) return tmp.existingItems[0]
       // Такого нет. Создаем новый
       let contentInput = {
         wsItemType: 'CONTENT_WITH_NOTES',
@@ -165,7 +167,7 @@ export default {
         }
       }
       this.$log('contentCreated contentInput', contentInput)
-      let wsItem = await this.$rxdb.wsContent.insert(contentInput)
+      let wsItem = await this.$rxdb.upsertItem(contentInput)
       // let item = await this.$store.dispatch('workspace/wsItemUpsert', contentInput)
       this.$log('contentCreated item', wsItem)
       await this.$wait(300)

@@ -2,7 +2,7 @@
 export default {
   render () {
     return this.$scopedSlots.default({
-      items: this.query ? this.query.items : []
+      items: this.items // this.query ? this.query.items : []
     })
   },
   name: 'kalpaLoader',
@@ -80,21 +80,21 @@ export default {
           res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
         case 'CONTENT_LIST' :
-          rxQuery = this.$rxdb.wsContent.find().sort('updatedAt')
+          await this.$rxdb.setReactiveQuery(this, 'items', 'WS_CONTENT', null)
           // res = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST'})
           break
-        case 'NODE_LIST' :{
-          rxQuery = this.$rxdb.wsNode.find().sort('updatedAt')
+        case 'NODE_LIST':
+          await this.$rxdb.setReactiveQuery(this, 'items', 'WS_NODE', null)
           // res = await this.$store.dispatch('workspace/wsItems', {collection: 'NODE_LIST'})
           break
-        }
         case 'SPHERE_LIST':
-          res = await this.$store.dispatch('workspace/wsItems', {collection: 'SPHERE_LIST'})
+          await this.$rxdb.setReactiveQuery(this, 'items', 'WS_SPHERE', null)
+          // res = await this.$store.dispatch('workspace/wsItems', {collection: 'SPHERE_LIST'})
           break
         default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }
 
-      let apply = (res) => {
+      if (res) {
         let { items, count, totalCount, nextPageToken } = res
         this.query = res
         this.items = items
@@ -102,18 +102,27 @@ export default {
         this.totalCount = totalCount
         this.itemsCount = items.length
       }
-      if (rxQuery){
-        rxQuery.$.subscribe(results => {
-          res = {
-            items: results,
-            count: results.length,
-            totalCount: results.length,
-            nextPageToken: null
-          }
-          apply(res)
-        })
-        await rxQuery.exec()
-      } else apply(res)
+
+      // let apply = (res) => {
+      //   let { items, count, totalCount, nextPageToken } = res
+      //   this.query = res
+      //   this.items = items
+      //   this.nextPageToken = nextPageToken
+      //   this.totalCount = totalCount
+      //   this.itemsCount = items.length
+      // }
+      // if (rxQuery){
+      //   rxQuery.$.subscribe(results => {
+      //     res = {
+      //       items: results,
+      //       count: results.length,
+      //       totalCount: results.length,
+      //       nextPageToken: null
+      //     }
+      //     apply(res)
+      //   })
+      //   await rxQuery.exec()
+      // } else apply(res)
     }
   }
 }

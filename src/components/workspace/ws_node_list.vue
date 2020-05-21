@@ -192,15 +192,9 @@ export default {
       }
       return arr
     },
-    async nodeClick (wsItem) {
-      this.$log('nodeClick', wsItem)
-      this.$rxdb.setReactiveItem(this, 'node', wsItem)
-      this.$wait(5000).then(() => {
-        this.node.name = '0987'
-      })
-      this.$wait(2000).then(() => {
-        this.node.name = '1234'
-      })
+    async nodeClick (rxDoc) {
+      this.$log('nodeClick', rxDoc)
+      this.$rxdb.setReactiveItem(this, 'node', rxDoc)
       // this.$log('nodeClick node', this.node)
       // await this.$wait(300)
       this.nodeEditorOpened = true
@@ -217,9 +211,9 @@ export default {
         layout: 'PIP'
       }
 
+      await this.$rxdb.upsertItem(nodeInput)
       // this.node = await this.$store.dispatch('workspace/wsItemUpsert', nodeInput)
       this.nodeSearchString = ''
-      this.node = await this.$rxdb.wsNode.insert(nodeInput)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)
