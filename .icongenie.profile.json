@@ -1,0 +1,15 @@
+{
+  "params": {
+    "quality": 8,
+    "include": ["all"],
+    "skipTrim": false,
+    "padding": [
+      0,
+      0
+    ],
+    "icon": "app-icon.png",
+    "themeColor": "222222",
+    "splashscreenIconRatio": "33"
+  },
+  "assets": []
+}

@@ -37,18 +37,7 @@ const objectShortFragment = gql`
     thumbUrl(preferWidth: 600)
   }
 `
-const wsObjectShortFragment = gql`
-  fragment wsObjectShortFragment on ObjectShort {
-    type
-    oid
-    name
-    thumbUrl(preferWidth: 600)
-    ... on WSObjectShort{
-      unique
-      wsItemType
-    }
-  }
-`
+
 const objectShortWithMetaFragment = gql`
   ${metaFragment}
   fragment objectShortWithMetaFragment on ObjectShort {
@@ -72,15 +61,6 @@ const objectFragment = gql`${metaFragment} ${objectShortFragment}
     subscribers {...objectShortFragment}
     meta{ ...metaFragment}
     revision
-  }
-`
-const wsItemFragment = gql`${objectFragment}
-  fragment wsItemFragment on WSItem {
-    ...objectFragment
-    revision
-    rawData
-    unique
-    wsItemType
   }
 `
 
@@ -233,7 +213,7 @@ const nodeFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${o
 `
 
 const eventFragment = gql`
-  ${objectShortFragment} ${objectShortWithMetaFragment} ${wsItemFragment}
+  ${objectShortFragment} ${objectShortWithMetaFragment}
   fragment eventFragment on Event {
     type
     ... on EventError{
@@ -252,7 +232,7 @@ const eventFragment = gql`
     }
     ... on EventWS{
       wsRevision
-      object {...wsItemFragment}
+      wsItem
     }
     ... on EventChange{
       subject{... objectShortFragment}
@@ -312,7 +292,7 @@ const userFragment = gql`
 `
 const objectFullFragment = gql`
   ${compositionFragment} ${videoFragment} ${imageFragment} ${nodeFragment}
-  ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment} ${wsItemFragment}
+  ${sphereFragment} ${userFragment} ${chainFragment} ${objectFragment}
   fragment objectFullFragment on Object {
     ...objectFragment
     ...on Video {...videoFragment}
@@ -322,7 +302,6 @@ const objectFullFragment = gql`
     ...on User {... userFragment}
     ...on Chain {...chainFragment}
     ...on Composition {...compositionFragment}
-    ...on WSItem {...wsItemFragment}
   }
 `
 
@@ -331,7 +310,6 @@ const fragments = {
   objectFullFragment,
   userFragment,
   objectShortFragment,
-  wsObjectShortFragment,
   objectShortWithMetaFragment,
   nodeFragment,
   sphereFragment

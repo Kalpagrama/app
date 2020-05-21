@@ -9,10 +9,11 @@ import {
   Store
 } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
-const logI = getLogFunc(LogLevelEnum.INFO, LogModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
+
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_CACHE)
+const logI = getLogFunc(LogLevelEnum.INFO, LogModulesEnum.VUEX_CACHE)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_CACHE)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_CACHE)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -43,83 +44,94 @@ class CachePersist {
   }
 }
 
+// очередь на отправку изменений на сервер.
 class QueueUpdate {
-  constructor (store, cache) {
-    assert(store && cache)
+  constructor (store) {
+    assert(store)
     this.store = store
-    this.cache = cache
     this.queries = []
     this.inProgress = false
   }
 
-  push (key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc) {
+  push (key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec = 1000) {
+    assert(updateItemFunc && fetchItemFunc && mergeItemFunc && onUpdateFailsFunc, 'bad funcs')
+    let itemForSend = JSON.parse(JSON.stringify(vuexItem)) // копия данных на момент отправки
+    let newQuery = { key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc }
     // удаляем неактуальные изменения, которые перекрыты текущим
-    let newQueries = []
-    for (let query of this.queries) {
-      if (key === query.key) {
-        if (path === query.path) continue // удаляем запросы у которых тот же путь
-        if (!path && query.path) continue // Если меняется объект целиком - удаляем запросы у которых есть путь
-      }
-      newQueries.push(query)
+    let indx = this.queries.findIndex(query => query.key === key)
+    if (indx >= 0) {
+      assert(this.queries[indx].debounceTimer, 'this.queries[indx].debounceTimer')
+      clearTimeout(this.queries[indx].debounceTimer)
+      this.queries[indx] = newQuery
+    } else {
+      this.queries.push(newQuery)
     }
-    this.queries = newQueries
-    this.queries.push({ key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc })
-    this.next().catch(err => {
-      logE('cant update item on server1', { key, path, newValue }, err)
-    })
+    logD('изменения добавлены в очередь!')
+
+    // ждем debounceMsec. На тот случай, если шлется подряд много измений. Например, выделяется range в видео-редакторе.
+    // Избавляет от слишком частых отправок изменений одной сущности
+    newQuery.debounceTimer = setTimeout(() => {
+      this.next().catch(err => {
+        logE('cant update item on server!', key, itemForSend, err)
+      })
+    }, debounceMsec)
   }
 
-  async next (retryCount = 0) {
-    if (retryCount > 3) return
+  async next (failCount = 0) {
+    if (failCount > 5) return
+    logD('разгребаем очередь...', failCount)
+
     if (this.inProgress) return
-    if (this.queries.length === 0) return
-    let { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc } = this.queries.shift()
+    if (this.queries.length === 0) {
+      logD('очередь пуста. выходим.')
+      return
+    }
+    let { key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc } = this.queries.shift()
 
     // пробуем обновить на сервере
     try {
       this.inProgress = true
-      logD('try update. retryCount=', retryCount)
-      await this.update(key, path, updateItemFunc, fetchItemFunc, mergeItemFunc)
+      logD(`изменения извлечены из очереди. попытка отправки№${failCount}. item:`, itemForSend)
+      await this.updateItem(key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc)
+      failCount = 0 // изменения прошли удачно! сбрасываем failCount
+      logD('изменения успешно отправлены')
     } catch (err) {
-      if (!err.networkError) throw err // если ошибка не сетевая - выходим с неудачей
-      // если ошибка сетевая - пытаемся выполнить повторно
-      // todo после обновления страницы данные об изменениях пропадут!!!
-      // кладем обратно
-      this.queries.unshift({ key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc })
-      //  todo сделать circuit breaker
-      await wait(3000 * (retryCount + 1))
+      if (!err.networkError) { // если ошибка не сетевая - выходим с неудачей
+        logE('попытка отправки не удалась. Попыток больше не будет предпринято.', err)
+        failCount = 100500
+        onUpdateFailsFunc(err) // обновить не получится. Прекратить попытки
+      } else { // если ошибка сетевая - пытаемся выполнить повторно
+        // после обновления страницы данные об изменениях пропадут!!!
+        // кладем обратно
+        let timeout = Math.min(3000 * (failCount), 20 * 1000) // ждем (не не более 20 сек)
+        logD(`попытка отправки не удалась по причине отсутствия сети. Попробуем через ${timeout / 1000}c`)
+        this.queries.unshift({ key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc })
+        //  todo сделать circuit breaker
+        ++failCount
+        await wait(timeout)
+      }
     } finally {
       this.inProgress = false
-      logD('recursion update. retryCount=', retryCount)
-      this.next(++retryCount).catch(err => {
-        logE('cant update item on server2', { key, path, newValue }, err)
-      })
+      await this.next(failCount)
     }
   }
 
-  async update (key, path, updateItemFunc, fetchItemFunc, mergeItemFunc) {
+  async updateItem (key, itemForSend, updateItemFunc, fetchItemFunc, mergeItemFunc) {
     assert(updateItemFunc && fetchItemFunc && mergeItemFunc)
-    assert(this.store.state.cache.cachedItems[key], 'изменяемый объект обязан быть в кэше')
     try {
-      logD('try send query to server', this.store.state.cache.cachedItems[key].revision)
-      let { item: dbItem, actualAge } = await updateItemFunc(this.store.state.cache.cachedItems[key])
-      this.store.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
-      await this.cache.set(key, this.store.state.cache.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
+      let { item: dbItem, actualAge } = await updateItemFunc(itemForSend)
     } catch (err) {
       if (err.message.includes('VERSION_CONFLICT')) {
-        logI('VERSION_CONFLICT. try merge with server data. try get server version...')
+        logI('отправка изменений не удалась! VERSION_CONFLICT. Пробуем получить версию сервера...')
         let { item: serverItem } = await fetchItemFunc()
-        logD('serverItem', serverItem)
-        // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
-        let mergedItem = mergeItemFunc(path, serverItem, this.store.state.cache.cachedItems[key])
-        logD('merge OK!', mergedItem)
-        // еще раз попробуем обновить
+        logD('версия сервера получена. Пытаемся слить ее с локальной версией. serverItem=', serverItem)
+        let mergedItem = mergeItemFunc(serverItem, itemForSend) // бросит исключение в случае невозможности слияния
+        logD('слияние прошло успешно. отправляем mergedItem на сервер...', mergedItem)
         let { item: dbItem, actualAge } = await updateItemFunc(mergedItem)
-        this.store.commit('cache/updateItem', { key, path: '', newValue: dbItem }, { root: true }) // изменяем во вьюикс
-        await this.cache.set(key, this.store.state.cache.cachedItems[key], actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
-        logD('VERSION_CONFLICT resolved!', mergedItem)
+        await this.store.commit('cache/updateItem', { key, newValue: dbItem }, { root: true }) // изменяем во вьюикс
+        logD('конфликт разрешен успешно!', mergedItem)
       } else {
-        logE('cant update item on server', err)
+        logE('не удалось оправить изменения на сервер!', err)
         throw err
       }
     }
@@ -129,7 +141,7 @@ class QueueUpdate {
 // в cacheLru хранятся только ключи. сами данные - во vuex и CachePersist
 class Cache {
   constructor (store) {
-    this.queue = new QueueUpdate(store, this)
+    this.queue = new QueueUpdate(store)
     this.defaultActualAge = 1000 * 60 * 60 // 1 hour by default
     // TODO увеличить до 50 МБ после тестирования
     this.defaultCacheSize = 1 * 1024 * 1024 // 1Mb
@@ -145,8 +157,9 @@ class Cache {
       noDisposeOnSet: true,
       dispose: async (key, { actualUntil, actualAge }) => {
         assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-        if (!this.clearInProgress && ['authInfo', this.store.state.auth.userOid].includes(key)) {
+        if (!this.clearInProgress && ['wsLocalChanges', 'authInfo', this.store.state.auth.userOid].includes(key)) {
           // кладем обратно! юзера нельзя удалять + authInfo должна жить вечно
+          // wsLocalChanges - изменения в мастерской, которые еще не ушли на сервер
           setTimeout(() => {
             let item = this.store.state.cache.cachedItems[key] // данные лежат во vuex
             assert(item)
@@ -156,7 +169,7 @@ class Cache {
           await this.cachePersist.remove(key)
           // В общем случае - мы не знаем - ссылается ли что-то в приложении на этот объект во вьюикс
           // поэтому при удалении элемента у кого то в приложении могут остаться копии(перестанут быть реактивными)
-          this.store.commit('cache/removeItem', key, {root: true})
+          this.store.commit('cache/removeItem', key, { root: true })
         }
       }
     })
@@ -180,7 +193,7 @@ class Cache {
       let { key, item, actualUntil, actualAge, lastTouchDate } = idbItem
       assert(key && item && actualUntil)
       this.cacheLru.set(key, { actualUntil, actualAge })
-      this.store.commit('cache/setItem', { key, item }, {root: true})
+      this.store.commit('cache/setItem', { key, item }, { root: true })
     }
   }
 
@@ -189,7 +202,7 @@ class Cache {
     this.clearInProgress = true
     await this.cachePersist.clear()
     this.cacheLru.reset()
-    this.store.commit('cache/clear', {root: true})
+    this.store.commit('cache/clear', { root: true })
     delete this.clearInProgress
     logD('cache clear OK!')
   }
@@ -247,7 +260,7 @@ class Cache {
     let actualUntil = Date.now() + actualAge
     this.cacheLru.set(key, { actualUntil, actualAge })
     await this.cachePersist.setItem(key, { item, actualUntil, actualAge, lastTouchDate: Date.now() })
-    this.store.commit('cache/setItem', { key, item }, {root: true})
+    this.store.commit('cache/setItem', { key, item }, { root: true })
     return this.store.state.cache.cachedItems[key]
   }
 
@@ -255,41 +268,38 @@ class Cache {
   async get (key, fetchItemFunc, force) {
     assert(key && fetchItemFunc, 'key && fetchFunc')
     let result
-    let cachedData = this.cacheLru.get(key)
-    let { actualUntil, actualAge } = cachedData ? cachedData : {}
+    let { actualUntil, actualAge } = this.cacheLru.get(key) || {}
     if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
-      if (!force) logD('данные отсутствуют в кэше, либо устарели!')
+      if (!force) logD('данные отсутствуют в кэше, либо устарели!', key)
       try {
         logD('запрашиваем данные с сервера...')
         let fetchRes = await fetchItemFunc()
         assert('item' in fetchRes, 'item not in fetchRes!')
         assert('actualAge' in fetchRes, 'actualAge not in fetchRes!')
         let { item, actualAge } = fetchRes
-        logD('данные извлечены!')
+        logD('данные с сервера получены', item)
         if (item) {
+          logD('Обновляем кэш...')
           assert(actualAge, `item && actualAge ${actualAge} ${item} `)
-          await this.set(key, item, actualAge)
-          logD('данные в кэше обновлены!')
-          result = item
+          result = await this.set(key, item, actualAge)
         }
       } catch (err) {
         if (err === 'queued object was evicted legally') {
-          logD('очередь переполнилась', err)
+          logD('Данные не получены! запрос на сервер был отброшен(легально) по причне переполнения очереди!', err)
         } else if (err === 'notFound') {
-          logD('объект не найден на сервере', err)
+          logW('Данные не получены! объект не найден на сервере', err)
           await this.set(key, { failReason: err }, 'year') // таких данных на сервере нет. Нечего больше их запрашивать
         } else if (err === 'fetchError') {
-          logD('an error occurred while getting the object', err)
+          logD('Данные не получены! Произошла ошибка. Через минуту  можно пробовать еще', err)
           let item = this.store.state.cache.cachedItems[key] || { failReason: err }
           await this.set(key, item, 'minute')// ошибка при извлечении. Через минуту можно еще попробовать
         } else if (err === 'deleted') {
-          logD('object was deleted', err)
+          logD('Данные не получены! Объект был удален!', err)
           await this.set(key, { failReason: err }, 'year')// данные удалены. Нечего больше запрашивать
         } else {
-          logE('неизвестная ошибка при попытке запросить данные!', err)
+          logE('Данные не получены! неизвестная ошибка. Через минуту  можно пробовать еще', err)
           let item = this.store.state.cache.cachedItems[key] || { failReason: 'unknownError: ' + err.message }
-          // TODO поставить 'minute'
-          await this.set(key, item, 'zero')// ошибка при извлечении. Через минуту можно еще попробовать
+          await this.set(key, item, 'minute')// ошибка при извлечении. Через минуту можно еще попробовать
         }
         result = this.store.state.cache.cachedItems[key] // пробуем вернуть хоть что-то (подходит для оффлайн режима)
       }
@@ -308,105 +318,31 @@ class Cache {
 
   // updateItemFunc - обновить данные на сервере
   // mergeItemFunc - ф-я для устранения мердж-конфликтов
-  // newValue - это либо объект целиком, либо свойство объекта (тогда актуальны path и setter)
-  async update (key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc) {
-    // function setValue (obj, path, value, setter) {
-    //   assert(obj && Array.isArray(path))
-    //   path = path.filter(k => Boolean(k))
-    //   let o = obj
-    //   for (let i = 0; i < path.length - 1; i++) {
-    //     let n = path[i]
-    //     if (!(n in o)) o[n] = {}
-    //     o = o[n]
-    //   }
-    //   if (setter) {
-    //     assert(!value)
-    //     logD('before setter:', o)
-    //     value = path.length ? setter(o[path[path.length - 1]]) : setter(o)
-    //   }
-    //   if (path.length) {
-    //     o[path[path.length - 1]] = value
-    //   } else {
-    //     obj = value
-    //   }
-    //   logD('setValue:', value)
-    //   return obj
-    // }
-    //
-    // // logD('Cache::update params:', {key, path, newValue, setter, actualAge})
-    // assert(!updateItemFunc || (fetchItemFunc && mergeItemFunc), 'fetchItemFunc, mergeItemFunc нужны для устранения конфликтов')
-    // // обновим данные в кэше
-    // let updatedItem
-    // if (path || setter) {
-    //   // assert(newValue == null || typeof newValue === 'object')
-    //   c
-    //   assert(vuexItem)
-    //   updatedItem = setValue(vuexItem, path.split('.'), newValue, setter)
-    // } else {
-    //   assert(newValue)
-    //   updatedItem = newValue
-    // }
-    // // logD('Cache::update. updatedItem = ', updatedItem)
-    // assert(updatedItem && !updatedItem.failReason)
-    //
-    // if (!updateItemFunc) {
-    //   updatedItem = await cache.set(key, updatedItem, actualAge)
-    //   return updatedItem
-    // } else {
-    //   assert(updatedItem.oid)
-    //   updatedItem = await cache.set(key, updatedItem, 'year')// чтобы данные не устарели пока не ушел запрос на сервер(актуально для оффлайн версии)
-    //   // обновим данные на сервере
-    //   // todo накапливать изменения и делать запрос в фоне
-    //   assert(fetchItemFunc && mergeItemFunc)
-    //   try {
-    //     updatedItem = await updateItemFunc(updatedItem)
-    //   } catch (err) {
-    //     // logE('todo: !!! err=', JSON.stringify(err))
-    //     if (err.message.includes('VERSION_CONFLICT')) {
-    //       logI('VERSION_CONFLICT. try merge with server data')
-    //       // get current item objects/get
-    //       let { item: serverItem, actualAge } = await fetchItemFunc()
-    //       logD('serverItem', serverItem)
-    //       // пробуем слить локальную и серверную версию (бросит исключение в случае невозможности слияния)
-    //       let mergedItem = mergeItemFunc(path, serverItem, updatedItem)
-    //       logI('merge OK!')
-    //       logD('mergedItem', mergedItem)
-    //       // еще раз попробуем обновить
-    //       updatedItem = await updateItemFunc(mergedItem)
-    //     } else {
-    //       throw err
-    //     }
-    //   }
-    //   assert(updatedItem)
-    //   updatedItem = await cache.set(key, updatedItem, actualAge)
-    //   logD('updatedItem 2!', updatedItem)
-    //   return updatedItem
-    // }
-
+  // newValue - это  объект целиком, либо свойство объекта (тогда актуален path)
+  // подождет debounceMsec перед отправкой на сервер. Отправится только последний вариант
+  async update (key, { path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec }) {
     let vuexItem = this.store.state.cache.cachedItems[key]
-    if (!vuexItem) {
-      logD('item not found in cache (may be deleted on cache overflow)')
-      if (!path) {
+    if (!vuexItem) { // в кэше ничего не нашлось. Либо не было изначально, либо было удалено при переполнении кэша
+      if (!path && newValue) { // меняется целиком
         vuexItem = await this.set(key, newValue, actualAge)
       }// записываем в кэш - то, что есть
-      else {
-        assert(fetchItemFunc, '!fetchItemFunc')
+      else if (fetchItemFunc) { // берем с сервера
         let { item: serverItem, actualAge } = await fetchItemFunc()
         assert(serverItem, '!serverItem')
         vuexItem = await this.set(key, serverItem, actualAge) // записываем в кэш данные с сервера
+      } else if (defaultValue) {
+        vuexItem = await this.set(key, defaultValue, actualAge)
       }
     }
-    assert(vuexItem, '!vuexItem')
     this.store.commit('cache/updateItem', { key, path, newValue, setter }, { root: true }) // изменяем во вьюикс
     assert(vuexItem === this.store.state.cache.cachedItems[key], 'vuexItem === this.store.state.cache.cachedItems[key]')
-    vuexItem = await this.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись (оверхеда при повторном измении vuex не будет)
+    if (vuexItem) vuexItem = await this.set(key, vuexItem, actualAge) // обновляем в кэше измененную запись(actualAge) (оверхеда при повторном измении vuex не будет)
     if (updateItemFunc) {
-      assert(vuexItem, '!vuexItem')
       // чтобы данные не устарели пока не ушел запрос на сервер(актуально для оффлайн версии) - ставим actualAge = year
       // если данные устареют - они могут быть замененты свежими при очередном запросе get
-      vuexItem = await this.set(key, vuexItem, 'year')
+      if (vuexItem) vuexItem = await this.set(key, vuexItem, 'year')
       // обновим данные на сервере (в фоне)
-      this.queue.push(key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc)
+      if (vuexItem) this.queue.push(key, vuexItem, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec)
     }
     if (!vuexItem) logW('item not found in cache!')
     return vuexItem
@@ -422,7 +358,7 @@ let cache
 export default async ({ Vue, store, router: VueRouter }) => {
   try {
     cache = new Cache(store)
-    await store.dispatch('cache/init', cache, {root: true})
+    await store.dispatch('cache/init', cache, { root: true })
   } catch (err) {
     logE(err)
   }

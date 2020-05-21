@@ -26,15 +26,18 @@ const LogLevelEnum = Object.freeze({
 Object.freeze(LogLevelEnum)
 const LogModulesEnum = Object.freeze({
   SW: 'sw',
-  VUEX: 'vuex',
+  VUEX: 'vx',
+  VUEX_WS: 'vx_ws',
+  VUEX_CACHE: 'vx_cache',
+  VUEX_OBJECTS: 'vx_obj',
+  RXDB: 'rxdb',
   BOOT: 'boot',
-  VUEX_WS: 'vuex_ws',
   ML: 'mainLayout',
   CP: 'capacitor'
 })
 Object.freeze(LogModulesEnum)
 
-const showAlert = false
+const showAlert = true
 
 class Logger {
   constructor (store) {
@@ -174,8 +177,8 @@ export default async ({ Vue, store, app }) => {
       }
       try {
         logE(err, info)
-        const { clearCache } = require('src/system/services')
-        clearCache()
+        // const { clearCache } = require('src/system/services')
+        // clearCache() нельзя очищать кэш просто на всякий случай! (там могут быть несохраненные изменения в мастерской)
       } catch (e) {
         console.error(e, info)
       }
@@ -193,8 +196,8 @@ export default async ({ Vue, store, app }) => {
       }
       try {
         logE('window.onerror', message, source, line, column, error)
-        const { clearCache } = require('src/system/services')
-        clearCache()
+        // const { clearCache } = require('src/system/services')
+        // clearCache() нельзя очищать кэш просто на всякий случай! (там могут быть несохраненные изменения в мастерской)
       } catch (e) {
         console.error(e)
       }

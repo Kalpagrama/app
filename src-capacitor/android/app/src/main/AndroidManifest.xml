@@ -13,7 +13,7 @@
 
     <meta-data
       android:name="com.google.firebase.messaging.default_notification_icon"
-      android:resource="@drawable/ic_stat_name"
+      android:resource="@drawable/ic_push_notifications"
       />
 
     <activity
@@ -32,19 +32,6 @@
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
         <data android:scheme="@string/custom_url_scheme" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="https" android:host="*.kalpa.app" />
-      </intent-filter>
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-        <data android:scheme="http" android:host="*.kalpa.app" />
-        <data android:scheme="http" android:host="192.168.88.12" />
       </intent-filter>
       <intent-filter>
       <action android:name="android.intent.action.SEND" />

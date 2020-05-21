@@ -18,21 +18,20 @@ export function clear (state) {
   state.cachedItems = {}
 }
 
-// todo rawData - временное решение для элементов мастерской (пока структура элемента мастерской не стабилизировалась) В последствии планируестся провести через графкуэль
-function normalizeWSItem (item) {
-  if (item.rawData) {
-    Object.keys(item.rawData).map(k => {
-      if (k !== 'rawData') {
-        item[k] = item.rawData[k]
-      }
-    })
-    delete item.rawData
-  }
-}
+// function normalizeWSItem (item) {
+//   if (item.extendedFields) {
+//     Object.keys(item.extendedFields).map(k => {
+//       if (k !== 'extendedFields') {
+//         item[k] = item.extendedFields[k]
+//       }
+//     })
+//     delete item.extendedFields
+//   }
+// }
 
 export function setItem (state, { key, item }) {
   // logD(`cache/updateItem ${key} ${item.revision}`)
-  normalizeWSItem(item)
+  // normalizeWSItem(item)
   let existing = state.cachedItems[key]
   if (existing === item) return // оптимтизация (один и тот же объект)
   if (existing) {
@@ -48,7 +47,7 @@ export function setItem (state, { key, item }) {
 export function updateItem (state, { key, path, newValue, setter }) {
   // logD(`cache/updateItem ${key} ${newValue.revision}`)
   let obj = state.cachedItems[key]
-  if (!obj) return
+  if (!obj) return // обязательное условие!
   if (obj === newValue) return // оптимтизация (один и тот же объект)
   path = path.split('.')
   path = path.filter(k => Boolean(k))
@@ -70,7 +69,7 @@ export function updateItem (state, { key, path, newValue, setter }) {
     Vue.set(o, prop, newValue)
   } else { // изменился весь объект
     assert(typeof newValue === 'object', 'typeof newValue === object')
-    normalizeWSItem(newValue)
+    // normalizeWSItem(newValue)
     if (newValue && obj.revision){
       newValue.revision = Math.max(obj.revision, newValue.revision) // иногда ревизия на клиенте отстает (см src/components/node/node_editor/index.vue)
     }

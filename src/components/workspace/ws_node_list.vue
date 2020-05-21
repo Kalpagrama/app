@@ -92,7 +92,7 @@ div(:style=`{position: 'relative'}`).column.fit
               q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
             .col
               div(
-                @click="nodeClick(n.oid)"
+                @click="nodeClick(n)"
                 :style=`{
                   borderRadius: '10px', overflow: 'hidden'
                 }`
@@ -111,6 +111,9 @@ div(:style=`{position: 'relative'}`).column.fit
 </template>
 
 <script>
+import { isRxDocument } from 'rxdb'
+import assert from 'assert'
+import Vue from 'vue'
 export default {
   name: 'wsNodeList',
   data () {
@@ -174,6 +177,7 @@ export default {
     nodesSelectedDelete () {
       this.$log('nodeSeletedDelete')
       if (!confirm('Delete selected nodes?')) return
+      alert('TODO!!!! wsItemDelete ожидает не oid, а item')
       this.nodesSelected.map(oid => {
         this.$store.dispatch('workspace/wsItemDelete', oid)
       })
@@ -183,31 +187,22 @@ export default {
       this.nodesSelected = []
     },
     nodesFilter (arr) {
-      // return arr.filter(node => {
-      //   // check node string match
-      //   let nodeStringMatch = true
-      //   if (this.nodeSearchString.length > 0) {
-      //     if (!node.name.includes(this.nodeSearchString)) nodeStringMatch = false
-      //   }
-      //   // check tab.id
-      // })
       if (this.nodeSearchString.length > 0) {
-        return arr.filter(i => i.name.includes(this.nodeSearchString))
+        arr = arr.filter(i => i.name.includes(this.nodeSearchString))
       }
-      else {
-        return arr
-      }
+      return arr
     },
-    async nodeClick (oid) {
-      this.$log('nodeClick', oid)
-      this.node = await this.$store.dispatch('objects/get', {oid: oid})
-      this.$log('nodeClick node', this.node)
+    async nodeClick (rxDoc) {
+      this.$log('nodeClick', rxDoc)
+      this.$rxdb.setReactiveItem(this, 'node', rxDoc)
+      // this.$log('nodeClick node', this.node)
       // await this.$wait(300)
       this.nodeEditorOpened = true
     },
-    async nodeAddStart (_nodeInput) {
+    async nodeAddStart (nodeInput) {
+      this.$log('nodeAddStart...', this.node)
       this.$log('nodeAddStart')
-      let nodeInput = _nodeInput || {
+      nodeInput = nodeInput || {
         name: this.nodeSearchString,
         wsItemType: 'NODE',
         items: [],
@@ -215,13 +210,10 @@ export default {
         category: 'FUN',
         layout: 'PIP'
       }
-      this.$log('nodeAddStart nodeInput', nodeInput)
-      this.node = await this.$store.dispatch('workspace/wsItemCreate', nodeInput)
+
+      await this.$rxdb.upsertItem(nodeInput)
+      // this.node = await this.$store.dispatch('workspace/wsItemUpsert', nodeInput)
       this.nodeSearchString = ''
-      this.$log('nodeAddStart node', this.node)
-      // await this.$wait(1000)
-      // this.$log('nodeAddStart node AFTER', this.node)
-      this.nodeEditorOpened = true
     },
     scrollTo (val) {
       this.$log('scrollTo', val)

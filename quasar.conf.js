@@ -3,12 +3,13 @@ const fs = require('fs')
 const webpack = require('webpack')
 require('dotenv').config()
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = function (ctx) {
   return {
     preFetch: true,
     boot: [
+      'rxdb',
       'cache',
       'notify',
       'log',
@@ -111,9 +112,11 @@ module.exports = function (ctx) {
             new webpack.IgnorePlugin(/@capacitor\/core/)
           )
         }
-        // cfg.plugins.push(
-        //   new BundleAnalyzerPlugin()
-        // )
+        if (ctx.mode.spa){
+          cfg.plugins.push(
+            new BundleAnalyzerPlugin()
+          )
+        }
         // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
         // eslint-disable-next-line no-constant-condition
         if (!ctx.mode.capacitor) {
@@ -155,10 +158,10 @@ module.exports = function (ctx) {
       //   'Content-Security-Policy': "default-src 'unsafe-eval' 'unsafe-inline' 'self' wss://*:* http://*:* https://*:*",
       // },
       // https: true,
-      port: ctx.mode.capacitor || ctx.mode.cordova ? 8484 : ctx.mode.pwa ? 8383 : 8282,
-      host: ctx.mode.capacitor || ctx.mode.cordova || ctx.mode.spa ? null : 'mac.kalpa.app',
+      port: ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
+      host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
       // https: true,
-      https: ctx.mode.capacitor || ctx.mode.cordova || ctx.mode.spa ? false : {
+      https: ctx.mode.capacitor || ctx.mode.spa ? false : {
         key: fs.readFileSync('deploy/dev_server_cert/private.key'),
         cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
       },
@@ -182,12 +185,32 @@ module.exports = function (ctx) {
         description: 'Up the essence',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#424242',
-        theme_color: '#424242',
+        background_color: '#222222',
+        theme_color: '#222222',
         icons: [
+          {
+            src: 'statics/icons/icon-128x128.png',
+            sizes: '128x128',
+            type: 'image/png'
+          },
+          {
+            src: 'statics/icons/icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
           {
             src: 'statics/icons/icon-256x256.png',
             sizes: '256x256',
+            type: 'image/png'
+          },
+          {
+            src: 'statics/icons/icon-384x384.png',
+            sizes: '384x384',
+            type: 'image/png'
+          },
+          {
+            src: 'statics/icons/icon-512x512.png',
+            sizes: '512x512',
             type: 'image/png'
           }
         ],

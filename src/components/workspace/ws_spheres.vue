@@ -112,7 +112,7 @@ export default {
       }
       // TODO add color picker
       this.$log('sphereInput', sphereInput)
-      let sphere = await this.$store.dispatch('workspace/wsItemCreate', sphereInput)
+      let sphere = await this.$store.dispatch('workspace/wsItemUpsert', sphereInput)
       this.$log('sphereInput done', sphere)
     }
   },

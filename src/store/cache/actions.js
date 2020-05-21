@@ -8,18 +8,22 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 let cache
 export const init = async (context, cache_) => {
-  logD('cache/init')
+  // logD('cache/init')
   cache = cache_
   await cache.init()
   context.commit('init')
-  logD('cache/init done')
+  // logD('cache/init done')
 }
-
-// fetchItemFunc ф-я для получения данных с сервера
+/*!
+ * модуль для кэширования данных во вьюикс
+ * реальный класс кэширования cache - src/boot/cache.js. Он умеет писать b в idb и в VUEX
+ * во вьюикс - временный кэш. Постоянный - в boot/cache
+ */
 export const clear = async (context) => {
   assert(context.state.initialized, '!context.state.initialized')
   return await cache.clear()
 }
+// fetchItemFunc ф-я для получения данных с сервера
 export const get = async (context, { key, fetchItemFunc, force }) => {
   assert(context.state.initialized, '!context.state.initialized')
   assert(typeof key === 'string', 'typeof key === string')
@@ -30,17 +34,18 @@ export const get = async (context, { key, fetchItemFunc, force }) => {
 // если указана updateItemFunc, то должны быть и fetchItemFunc, mergeItemFunc
 // Если path = ''  то newValue - это полный объект
 // если actualAge не указан - вычислится на основе actualUntil (либо если объекта нет - поставится дефолтное)
-export const update = async (context, { key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc }) => {
+// можно использовать ф-ю для добавления данных в кэш (в этом случае - updateItemFunc не указывается)
+// если в кэше ничего нет - то значение возмется либо из newValue, либо из fetchItemFunc, либо defaultValue. Если ничего не указано - то ничего не произойдет
+export const update = async (context, { key, path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec }) => {
   assert(context.state.initialized, '!context.state.initialized')
   assert(key)
-  assert(setter != null || newValue != null)
-  if (!path && !setter) assert(newValue.revision, 'newValue.revision exists')
+  assert(setter != null || newValue != null, 'setter != null || newValue != null')
   if (newValue) newValue = JSON.parse(JSON.stringify(newValue)) // иначе newValue станет реактивным, и его нельзя будет менять вне vuex
   path = path || ''
-  return await cache.update(key, path, newValue, setter, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc)
+  return await cache.update(key, {path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec})
 }
-export const expire = async (context, { key }) => {
+export const expire = async (context, key) => {
   assert(context.state.initialized, '!context.state.initialized')
-  assert(typeof key === 'string')
+  assert(key && typeof key === 'string', 'key && typeof key')
   return await cache.expire(key)
 }

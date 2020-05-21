@@ -83,8 +83,9 @@ export default {
       this.$log('GO LOGIN')
       // alert('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
-    } else {
-      // go to welcom...
+    } else { // залогинились
+      await this.$rxdb.init(localStorage.getItem('userRole')) // workspace, etc...
+      // go to welcome...
       if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     }
     this.loading = false

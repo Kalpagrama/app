@@ -1,17 +1,8 @@
 export default {
   initialized: false,
-  wsItem: null,
-  revision: 0,
+  shareItem: null,
   item: null,
-  itemType: undefined,
+  itemType: null,
   showFooter: true,
-  showHeader: true,
-  shareItem: {
-    type: 'VIDEO',
-    url: 'https://www.youtube.com/watch?v=KdDPhoyypcg'
-  },
-  shareItemExample: {
-    type: 'IMAGE', // VIDEO
-    url: 'http://'
-  }
+  showHeader: true
 }

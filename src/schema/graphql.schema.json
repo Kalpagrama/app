@@ -948,6 +948,22 @@
             "deprecationReason": null
           },
           {
+            "name": "oAuthUrlYandex",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "oAuthUrlVk",
             "description": null,
             "args": [],
@@ -965,6 +981,38 @@
           },
           {
             "name": "oAuthUrlGoogle",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "oAuthUrlGithub",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "oAuthUrlFacebook",
             "description": null,
             "args": [],
             "type": {
@@ -2429,7 +2477,7 @@
             "deprecationReason": null
           },
           {
-            "name": "CONTENT_NOTES_LIST",
+            "name": "CONTENT_LIST",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -5217,7 +5265,7 @@
             "deprecationReason": null
           },
           {
-            "name": "CONTENT_NOTES",
+            "name": "CONTENT_WITH_NOTES",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

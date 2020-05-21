@@ -5,12 +5,11 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 import Vue from 'vue'
 
-export function init (state, wsRevision) {
+export function init (state) {
   state.initialized = true
-  state.revision = wsRevision
 }
 
 export function stateSet (state, [key, val]) {
-  assert.ok(Object.prototype.hasOwnProperty.call(state, key))
+  assert(Object.prototype.hasOwnProperty.call(state, key), 'bad prop: ' + key + JSON.stringify(val))
   state[key] = val
 }

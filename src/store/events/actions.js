@@ -4,6 +4,7 @@ import { notify } from 'src/boot/notify'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
+import {rxdb} from 'boot/rxdb'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
@@ -12,7 +13,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
 
 export const init = async (context) => {
   if (context.state.initialized) return
-  logD('init events')
+  // logD('init events')
   const observerEvent = apollo.clients.ws.subscribe({
     client: 'wsApollo',
     query: gql`
@@ -165,39 +166,13 @@ async function processEvent (context, event) {
     case 'WS_ITEM_DELETED':
       // notifyUserActionComplete(event.type, event.object)
       // logD('try processEventWs')
-      await processEventWs(context, event)
+      // await context.dispatch('workspace/processEvent', event, { root: true })
+      await rxdb.processEvent(event)
       break
     default:
       throw new Error(`unsupported Event ${event.type}`)
   }
   logD('processEvent done')
-}
-
-async function processEventWs (context, event) {
-  assert(event.wsRevision)
-  if (event.wsRevision - context.rootState.workspace.revision > 1 ||
-    context.rootState.workspace.revision > event.wsRevision // при очистке мастерской могло произойти такое
-  ) {
-    logW('на сервере есть неучтенные изменения!!', event.wsRevision, context.rootState.workspace.revision)
-    await context.dispatch('workspace/expireWsCache', {}, { root: true })
-  }
-  // обновим в кэше значение итема
-  let key = 'wsItem: ' + event.object.oid
-  let vuexItem = context.rootState.cache.cachedItems[key]
-  // logD('processEventWs:: ', vuexItem, event.object)
-  if (!vuexItem || vuexItem.revision !== event.object.revision) {
-    // если у имеющегося объекта та же ревизия - обновлять не надо (скорей всего это наши же изменения)
-    logD('обновим значение итема в кэше')
-    await context.dispatch('cache/update', {
-      key: key,
-      newValue: event.object
-    }, { root: true })
-  }
-
-  // обновим списки мастерской
-  logD('обновим списки мастерской')
-  await context.dispatch('lists/processEvent', event, { root: true })
-  context.dispatch('workspace/updateRevision', event.wsRevision, { root: true })
 }
 
 // вывести уведомление о действии пользователя

@@ -3,16 +3,16 @@ import { fragments } from 'src/schema/index'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_OBJECTS)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_OBJECTS)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_OBJECTS)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 export const init = async (context) => {
-  logD('objects/init')
+  // logD('objects/init')
   if (context.state.initialized) return
   context.commit('init')
-  logD('objects/init done')
+  // logD('objects/init done')
 }
 
 // сцепляет запросы и отправляет пачкой
@@ -198,13 +198,16 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
     let item = await context.dispatch('objects/get', { oid, priority: 0 }, { root: true })
     return {item, actualAge: 'hour'}
   }
-  let mergeItemFunc = (path, serverItem, cacheItem) => {
+  let mergeItemFunc = (serverItem, cacheItem) => {
     assert(serverItem && cacheItem)
     let mergedItem
     // берем значение с сервера
     mergedItem = serverItem
     assert(mergedItem, 'надо вернуть либо смердженный объект, либо исключение')
     return mergedItem
+  }
+  let onUpdateFailsFunc = (err) => {
+    logW('cant update!', err)
   }
   let updatedItem = await context.dispatch('cache/update', {
     key: oid,
@@ -214,7 +217,8 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
     actualAge,
     updateItemFunc,
     fetchItemFunc,
-    mergeItemFunc
+    mergeItemFunc,
+    onUpdateFailsFunc
   }, {root: true})
   // logD('objects/update action complete', oid)
   return updatedItem

@@ -38,7 +38,7 @@ div(:style=`{position: 'relative'}`).column.fit
       ws-content-finder(
         ref="wsContentFinder"
         :sources="['url', 'device']"
-        @content="contentFound"
+        @content="contentCreated"
         :style=`{}`).b-100
       //- tabs
       div(
@@ -63,11 +63,11 @@ div(:style=`{position: 'relative'}`).column.fit
         q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6")
       div(@click.self="scrollTo(0)").col
       q-btn(flat round color="white" icon="edit").b-90
-    kalpa-loader(type="CONTENT_NOTES_LIST")
+    kalpa-loader(type="CONTENT_LIST")
       template(v-slot="{items}")
         .row.full-width.items-start.q-py-sm
           div(
-            v-for="(c,ci) in items" :key="c.oid" @click="contentClick(c.oid)"
+            v-for="(c,ci) in items" :key="c.oid" @click="contentClick(c)"
             :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`
             ).row.full-width.items-center.q-px-md.q-py-sm.q-mb-xs.cursor-pointer.content-item.b-70
             span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
@@ -75,6 +75,9 @@ div(:style=`{position: 'relative'}`).column.fit
 </template>
 
 <script>
+import { assert } from 'assert'
+import { isRxDocument } from 'rxdb'
+import Vue from 'vue'
 export default {
   name: 'wsContentNotesList',
   props: {
@@ -113,9 +116,9 @@ export default {
     }
   },
   methods: {
-    async contentClick (oid) {
-      this.$log('contentClick', oid)
-      this.content = await this.$store.dispatch('objects/get', {oid: oid})
+    async contentClick (wsItem) {
+      this.$log('contentClick', wsItem)
+      this.content = wsItem // await this.$store.dispatch('workspace/wsItem', wsItemKey)
       this.$log('contentClick', this.content)
       switch (this.options.onItemClick) {
         case 'edit': {
@@ -131,18 +134,27 @@ export default {
         }
       }
     },
-    async contentDelete (oid) {
-      this.$log('contentDelete start', oid)
+    async contentDelete (item) {
+      this.$log('contentDelete start', item)
       if (!confirm('Delete content & notes ?')) return
-      let res = await this.$store.dispatch('workspace/wsItemDelete', oid)
+      let res = await this.$store.dispatch('workspace/wsItemDelete', item)
       this.$log('contentDelete done', res)
     },
-    async contentFound (content) {
-      this.$log('contentFound', content)
+    async contentCreated (content) {
+      this.$log('contentCreated', content)
+      if (isRxDocument(content)) content = content.toJSON()
+      // смотрим - нет ли такого уже.
+      let tmp = new Vue({data: {existingItems: {}}})
+      await this.$rxdb.setReactiveQuery(tmp, 'existingItems', 'WS_CONTENT', {
+        selector: {
+          contentOid: { $eq: content.oid }
+        }
+      })
+      // let existing = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST', filterFunc: item => item.contentOid === content.oid})
+      if (tmp.existingItems.length) return tmp.existingItems[0]
+      // Такого нет. Создаем новый
       let contentInput = {
-        oid: Date.now().toString(),
-        wsItemType: 'CONTENT_NOTES',
-        unique: content.oid,
+        wsItemType: 'CONTENT_WITH_NOTES',
         thumbOid: content.oid,
         name: content.name,
         layers: [],
@@ -154,11 +166,12 @@ export default {
           type: 'CONCAT'
         }
       }
-      this.$log('contentFound contentInput', contentInput)
-      let item = await this.$store.dispatch('workspace/wsItemCreate', contentInput)
-      this.$log('contentFound item', item)
+      this.$log('contentCreated contentInput', contentInput)
+      let wsItem = await this.$rxdb.upsertItem(contentInput)
+      // let item = await this.$store.dispatch('workspace/wsItemUpsert', contentInput)
+      this.$log('contentCreated item', wsItem)
       await this.$wait(300)
-      this.contentClick(item.oid)
+      this.contentClick(wsItem)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)

@@ -1,6 +1,7 @@
 <script>
 import { throttle } from 'quasar'
-
+import { isRxDocument } from 'rxdb'
+import assert from 'assert'
 export default {
   render () {
     return this.$scopedSlots.default({
@@ -8,12 +9,12 @@ export default {
     })
   },
   name: 'wsItemSaver',
-  props: ['value'],
+  props: ['value'], // сваливается сверху
   data () {
     return {
-      item: null,
+      item: null, // то, что мы меняем
       itemUpdateAuthor: null,
-      itemUpdating: false
+      externalUpdate: false // если данные были изменены извне
     }
   },
   watch: {
@@ -22,31 +23,42 @@ export default {
       immediate: true,
       handler (to, from) {
         if (!to) return
-        this.$log('value CHANGED', to.revision)
-        this.item = JSON.parse(JSON.stringify(to))
+        assert(!isRxDocument(to), '!isRxDocument(to)')
+        this.$log('value CHANGED', isRxDocument(to))
+        if (from) this.externalUpdate = true
+        this.item = to // JSON.parse(JSON.stringify(to))
       }
     },
     item: {
       deep: true,
       handler (to, from) {
-        this.$log('item CHANGED to', to.revision)
-        if (this.itemUpdating) return
-        this.itemUpdate()
+        this.$log('item CHANGED to', this.externalUpdate, isRxDocument(this.item), from, to)
+        this.$log('item CHANGED to', JSON.stringify(from) === JSON.stringify(to))
+        // if (this.externalUpdate) {
+        //   this.externalUpdate = false
+        //   return
+        // }
+        // this.itemUpdate()
       }
     }
   },
   methods: {
     async itemUpdate () {
       try {
-        this.$log('itemUpdate start revision: ', this.item.revision)
-        if (this.itemUpdating) return
-        this.itemUpdating = true
-        let item = await this.$store.dispatch('workspace/wsItemUpdate', JSON.parse(JSON.stringify(this.item)))
-        this.$log('itemUpdate done revision:', item.revision)
+        this.$log(`itemUpdate start revision:${this.item.revision} item:` + JSON.stringify(this.item))
+        if (isRxDocument(this.item)){
+          this.$log('todo!!!', this.item)
+          return
+        }
+        // if (this.itemUpdating) return
+        // this.itemUpdating = true
+        await this.$rxdb.upsertItem(this.item)
+        // let item = await this.$store.dispatch('workspace/wsItemUpsert', this.item) // wsItemUpsert делает копию item
+        this.$log('itemUpdate done:' + JSON.stringify(this.item))
       } catch (e) {
         this.$logE('itemUpdate error', e)
       } finally {
-        this.itemUpdating = false
+        // this.itemUpdating = false
       }
     }
   },
