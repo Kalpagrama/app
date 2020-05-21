@@ -12,6 +12,7 @@ export default {
   props: ['value'],
   data () {
     return {
+      subscribed: false,
       item: null
     }
   },
@@ -21,14 +22,16 @@ export default {
       immediate: true,
       handler (to, from) {
         this.$log('value CHANGED', to)
-        if (!from) to.$.subscribe(this.valueChanged)
+        if (this.subscribed) return
+        to.$.subscribe(this.valueChanged)
+        this.subscribed = true
       }
     },
     item: {
       deep: true,
       handler (to, from) {
         this.$log('item CHANGED', to)
-        this.itemUpdate()
+        this.itemUpdateThrottle()
       }
     }
   },
@@ -49,7 +52,10 @@ export default {
     }
   },
   created () {
-    this.itemUpdate = throttle(this.itemUpdate, 1000)
+    this.itemUpdateThrottle = throttle(this.itemUpdate, 1000)
+  },
+  async beforeDestroy () {
+    await this.itemUpdate()
   }
 }
 </script>

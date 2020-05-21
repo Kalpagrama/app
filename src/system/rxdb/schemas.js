@@ -237,36 +237,35 @@ export const wsSchemaSphere = {
   indexes: ['oid', 'name', 'createdAt', 'updatedAt']
 }
 
-export const wsSchemaMeta = {
-  title: 'wsSchemaMeta',
+export const wsSchemaMetaCollections = {
+  title: 'wsSchemaMetaCollections',
   version: 0,
-  description: 'wsSchemaMeta',
+  description: 'wsSchemaMetaCollections',
+  type: 'object',
+  additionalProperties: true,
+    properties: {
+      rxCollectionEnum: {
+        type: 'string',
+        primary: true
+      },
+      fetchedAt: {
+        type: 'integer'
+      }
+    },
+  required: ['rxCollectionEnum', 'fetchedAt']
+}
+
+export const wsSchemaMetaUnsaved = {
+  title: 'wsSchemaMetaUnsaved',
+  version: 0,
+  description: 'wsSchemaMetaUnsaved',
   type: 'object',
   additionalProperties: true,
   properties: {
-    fetchedCollections: {
-      type: 'array',
-      maxItems: 88,
-      items: {
-        type: 'object',
-        properties: {
-          rxCollectionName: {
-            type: 'string'
-          },
-          fetchedAt: {
-            type: 'integer'
-          }
-        }
-      }
-    },
-    unsavedItemIds: {
-      type: 'array',
-      maxItems: 8888,
-      uniqueItems: true,
-      items: {
-        type: 'integer'
-      }
+    id: {
+      type: 'string',
+      primary: true
     }
   },
-  required: ['rxCollection', 'fetchedAt']
+  required: ['id']
 }

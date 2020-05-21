@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { getItemWsCollection, getRxCollectionEnum, Workspace, WsItemTypeEnum } from 'src/system/rxdb/workspace'
+import { getRxCollectionEnum, Workspace, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/workspace'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { cache } from 'src/boot/cache'
 import { addRxPlugin, createRxDatabase, isRxDocument } from 'rxdb'
@@ -17,10 +17,7 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB)
 // })
 
 const RxCollectionEnum = Object.freeze({
-  WS_NODE: 'WS_NODE',
-  WS_CONTENT: 'WS_CONTENT',
-  WS_CHAIN: 'WS_CHAIN',
-  WS_SPHERE: 'WS_SPHERE'
+  ...WsCollectionEnum
 })
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 class RxDBWrapper {
@@ -37,6 +34,7 @@ class RxDBWrapper {
   }
 
   async init (userRole) {
+    logD('init RXDB', userRole)
     assert(this.workspace, '!this.workspace')
     assert(!this.initialized, 'call init once!')
     assert(['ADMIN', 'MODERATOR', 'MEMBER', 'GUEST'].includes(userRole), '!userRole:' + userRole)
@@ -65,19 +63,9 @@ class RxDBWrapper {
   }
 
   getItemRxCollection (item) {
-    assert(item.wsItemType, '!item.wsItemType')
-    switch (item.wsItemType) {
-      case WsItemTypeEnum.NODE:
-        return this.getRxCollection(RxCollectionEnum.WS_NODE)
-      case WsItemTypeEnum.CONTENT_WITH_NOTES:
-        return this.getRxCollection(RxCollectionEnum.WS_CONTENT)
-      case WsItemTypeEnum.CHAIN:
-        return this.getRxCollection(RxCollectionEnum.WS_CHAIN)
-      case WsItemTypeEnum.SPHERE:
-        return this.getRxCollection(RxCollectionEnum.WS_SPHERE)
-      default:
-        assert(false, 'bad wsItemType:' + item.wsItemType)
-    }
+    assert(item, '!item')
+    assert(item.wsItemType in WsItemTypeEnum, 'bad! wsItemType')
+    return this.getRxCollection(item.wsItemType)
   }
 
   async processEvent (event) {

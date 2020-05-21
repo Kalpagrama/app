@@ -234,7 +234,7 @@ export default {
       this.$log('layersSelectedCreateNode start')
       // open node-editor modal? or just save it to workspace as node?
       let nodeInput = {
-        wsItemType: 'NODE',
+        wsItemType: 'WS_NODE',
         name: '',
         spheres: [],
         category: 'FUN',

@@ -19,7 +19,7 @@ div(:style=`{position: 'relative'}`).column.fit
       ).full-width.b-220
   //- body
   .col.full-width.scroll
-    kalpa-loader(type="SPHERE_LIST")
+    kalpa-loader(type="WS_SPHERE")
       template(v-slot=`{items}`)
         .row.full-width.items-start.content-start.q-py-sm
           div(

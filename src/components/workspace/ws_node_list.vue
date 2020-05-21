@@ -72,7 +72,7 @@ div(:style=`{position: 'relative'}`).column.fit
           q-btn(flat color="white" no-caps @click="nodesSelectedDrop()").b-90 Drop selection
       q-btn(flat color="white" icon="edit" @click="nodesEdit()").b-90.q-mr-sm
     //- :variables=`{selector: {name: 'hello'}}`
-    kalpa-loader(type="NODE_LIST")
+    kalpa-loader(type="WS_NODE")
       template(v-slot="{items}")
         .row.full-width.items-start.q-py-sm
           div(
@@ -202,7 +202,7 @@ export default {
       this.$log('nodeAddStart start', this.node)
       let nodeInput = _nodeInput || {
         name: this.nodeSearchString,
-        wsItemType: 'NODE',
+        wsItemType: 'WS_NODE',
         items: [],
         spheres: [],
         category: 'FUN',

@@ -1,9 +1,15 @@
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 
 import assert from 'assert'
-import { wsSchemaChain, wsSchemaContent, wsSchemaMeta, wsSchemaNode, wsSchemaSphere } from 'src/system/rxdb/schemas'
+import {
+  wsSchemaChain,
+  wsSchemaContent,
+  wsSchemaMeta,
+  wsSchemaMetaCollections, wsSchemaMetaUnsaved,
+  wsSchemaNode,
+  wsSchemaSphere
+} from 'src/system/rxdb/schemas'
 import { apollo } from 'src/boot/apollo'
-import {RxCollectionEnum} from 'src/boot/rxdb'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
@@ -11,42 +17,13 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB)
 
 const WsItemTypeEnum = Object.freeze({
-  NODE: 'NODE',
-  CONTENT_WITH_NOTES: 'CONTENT_WITH_NOTES',
-  CHAIN: 'CHAIN',
-  SPHERE: 'SPHERE'
+  WS_NODE: 'WS_NODE',
+  WS_CONTENT: 'WS_CONTENT',
+  WS_CHAIN: 'WS_CHAIN',
+  WS_SPHERE: 'WS_SPHERE'
 })
-const WsCollectionEnum = Object.freeze({
-  NODE_LIST: 'NODE_LIST',
-  CONTENT_LIST: 'CONTENT_LIST',
-  CHAIN_LIST: 'CHAIN_LIST',
-  SPHERE_LIST: 'SPHERE_LIST'
-})
+const WsCollectionEnum = Object.freeze({ ...WsItemTypeEnum })
 const WsOperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
-
-function getItemWsCollection (item) {
-  switch (item.wsItemType) {
-    case WsItemTypeEnum.NODE:
-      return WsCollectionEnum.NODE_LIST
-    case WsItemTypeEnum.CONTENT_WITH_NOTES:
-      return WsCollectionEnum.CONTENT_LIST
-    case WsItemTypeEnum.SPHERE:
-      return WsCollectionEnum.SPHERE_LIST
-    case WsItemTypeEnum.CHAIN:
-      return WsCollectionEnum.CHAIN_LIST
-    default:
-      assert(false, 'bad wsItemType:' + item.wsItemType)
-  }
-}
-function getRxCollectionEnum(wsCollectionEnum){
-  switch (wsCollectionEnum) {
-    case WsCollectionEnum.NODE_LIST: return RxCollectionEnum.WS_NODE
-    case WsCollectionEnum.CONTENT_LIST: return RxCollectionEnum.WS_CONTENT
-    case WsCollectionEnum.CHAIN_LIST: return RxCollectionEnum.WS_CHAIN
-    case WsCollectionEnum.SPHERE_LIST: return RxCollectionEnum.WS_SPHERE
-    default: throw new Error('bad wsCollectionEnum:' + wsCollectionEnum)
-  }
-}
 
 class Workspace {
   constructor (rxdb) {
@@ -66,7 +43,8 @@ class Workspace {
     await this.rxdb.collection({ name: 'content', schema: wsSchemaContent })
     await this.rxdb.collection({ name: 'chain', schema: wsSchemaChain })
     await this.rxdb.collection({ name: 'sphere', schema: wsSchemaSphere })
-    await this.rxdb.collection({ name: 'meta', schema: wsSchemaMeta })
+    await this.rxdb.collection({ name: 'meta_collections', schema: wsSchemaMetaCollections })
+    await this.rxdb.collection({ name: 'meta_unsaved', schema: wsSchemaMetaUnsaved })
     let normalizeWsItem = (item) => {
       // assert(item.revision, '!revision')
       assert(item.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + item.wsItemType)
@@ -75,7 +53,7 @@ class Workspace {
       if (!item.id) item.id = `${Date.now()}` // генерируем id для нового элемента
       item.revisionServer = item.revisionServer || 1
       item.revisionClient = item.revisionClient || 1
-      logD('normalizeWsItem::' + JSON.stringify(item))
+      // logD('normalizeWsItem::' + JSON.stringify(item))
     }
     this.rxdb.node.preInsert(normalizeWsItem, false)
     this.rxdb.node.preSave(normalizeWsItem, false)
@@ -91,19 +69,19 @@ class Workspace {
     for (let wsCollection in WsCollectionEnum) await this.refreshWsCollection(wsCollection)
   }
 
-  getRxCollection (rxCollectionEnum) {
-    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollection' + rxCollectionEnum)
-    switch (rxCollectionEnum) {
-      case RxCollectionEnum.WS_NODE:
+  getRxCollection (wsCollectionEnum) {
+    assert(wsCollectionEnum in WsCollectionEnum, 'bad wsCollection' + wsCollectionEnum)
+    switch (wsCollectionEnum) {
+      case WsCollectionEnum.WS_NODE:
         return this.rxdb.node
-      case RxCollectionEnum.WS_CONTENT:
+      case WsCollectionEnum.WS_CONTENT:
         return this.rxdb.content
-      case RxCollectionEnum.WS_CHAIN:
+      case WsCollectionEnum.WS_CHAIN:
         return this.rxdb.chain
-      case RxCollectionEnum.WS_SPHERE:
+      case WsCollectionEnum.WS_SPHERE:
         return this.rxdb.sphere
       default:
-        throw new Error('bad collection' + rxCollectionEnum)
+        throw new Error('bad collection' + wsCollectionEnum)
     }
   }
 
@@ -112,20 +90,17 @@ class Workspace {
     // alert(wsCollectionEnum)
     let actual = false
     // todo use Local Documents https://rxdb.info/rx-local-document.html#
-    let rxCollectionEnum = getRxCollectionEnum(wsCollectionEnum)
-
-    let collectionMetaInfo = await this.rxdb.meta.findOne().where('rxCollection').eq(rxCollectionEnum).exec()
-    if (collectionMetaInfo) {
-      let lastFetchDate = collectionMetaInfo.fetchedAt
+    let collectionMeta = await this.rxdb.meta_collections.findOne(wsCollectionEnum).exec()
+    if (collectionMeta) {
       // проверить - не устарела ли....
-      let diffMsec = Date.now() - lastFetchDate
+      let diffMsec = Date.now() - collectionMeta.fetchedAt
       if (diffMsec > 0 && diffMsec < 1000 * 60 * 60 * 24) actual = true
     }
     if (!actual) {
       logD('refreshWsCollection', wsCollectionEnum)
       let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
         query: gql`
-          query wsItems ( $collection: WsCollectionEnum!){
+          query wsItems ( $collection: WsItemTypeEnum!){
             wsItems (collection: $collection) {
               totalCount
               count
@@ -136,10 +111,10 @@ class Workspace {
         `,
         variables: { collection: wsCollectionEnum }
       })
-      let rxCollection = this.getRxCollection(rxCollectionEnum)
+      let rxCollection = this.getRxCollection(wsCollectionEnum)
       const result = await rxCollection.bulkInsert(items)
-      await this.rxdb.meta.atomicUpsert({
-        rxCollection: rxCollectionEnum,
+      await this.rxdb.meta_collections.atomicUpsert({
+        rxCollectionEnum: wsCollectionEnum,
         fetchedAt: Date.now()
       })
     }
@@ -147,7 +122,13 @@ class Workspace {
 
   async clear () {
     logD('workspace::clear')
-    await removeRxDatabase('ws', 'idb')
+    for (let wsCollection in WsCollectionEnum) {
+      let collection = this.getRxCollection(wsCollection)
+      // logD('clear ', wsCollection, collection)
+      if (collection) await collection.remove()
+    }
+    if (this.rxdb.meta_collections) await this.rxdb.meta_collections.remove()
+    if (this.rxdb.meta_unsaved) await this.rxdb.meta_unsaved.remove()
   }
 
   // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
@@ -161,15 +142,15 @@ class Workspace {
     assert(itemServer.revisionClient, '!itemServer.revisionClient')
 
     logD('меняем item в rxdb. item=', itemServer)
-    let rxCollectionEnum = getRxCollectionEnum(getItemWsCollection(itemServer))
+    assert(itemServer.wsItemType in WsItemTypeEnum)
     try {
       this.processEventInProgress = true // не реагировать на эти изменения в saveToServer
       if (type !== 'WS_ITEM_DELETED') {
-        const doc = await this.getRxCollection(rxCollectionEnum).atomicUpsert(itemServer)
+        const doc = await this.getRxCollection(itemServer.wsItemType).atomicUpsert(itemServer)
         logD('изменили. doc=', doc)
         // await doc.save()
       } else {
-        await this.getRxCollection(rxCollectionEnum).find().where('id').eq(itemServer.id).remove()
+        await this.getRxCollection(itemServer.wsItemType).find().where('id').eq(itemServer.id).remove()
       }
     } finally {
       this.processEventInProgress = false
@@ -203,4 +184,4 @@ class Workspace {
   }
 }
 
-export { Workspace, WsItemTypeEnum}
+export { Workspace, WsItemTypeEnum, WsCollectionEnum }

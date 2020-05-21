@@ -81,7 +81,7 @@ export default {
     return {
       nodeEditorShow: false,
       node: {
-        wsItemType: 'NODE',
+        wsItemType: 'WS_NODE',
         name: '',
         items: [],
         spheres: [],
