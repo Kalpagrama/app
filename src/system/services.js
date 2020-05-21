@@ -3,6 +3,7 @@ import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'boot/i18n'
 import { assert } from 'assert'
+import {rxdb} from 'boot/rxdb'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
@@ -215,6 +216,7 @@ async function clearCache (force = false) {
   await clear(swShareStore)
   await clear(vuexPersistStore)
   await clear(videoStore)
+  await rxdb.clear()
   logD('clearCache end!')
 }
 

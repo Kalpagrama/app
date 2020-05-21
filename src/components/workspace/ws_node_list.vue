@@ -111,6 +111,9 @@ div(:style=`{position: 'relative'}`).column.fit
 </template>
 
 <script>
+import { isRxDocument } from 'rxdb'
+import assert from 'assert'
+import Vue from 'vue'
 export default {
   name: 'wsNodeList',
   data () {
@@ -184,31 +187,28 @@ export default {
       this.nodesSelected = []
     },
     nodesFilter (arr) {
-      // return arr.filter(node => {
-      //   // check node string match
-      //   let nodeStringMatch = true
-      //   if (this.nodeSearchString.length > 0) {
-      //     if (!node.name.includes(this.nodeSearchString)) nodeStringMatch = false
-      //   }
-      //   // check tab.id
-      // })
       if (this.nodeSearchString.length > 0) {
-        return arr.filter(i => i.name.includes(this.nodeSearchString))
+        arr = arr.filter(i => i.name.includes(this.nodeSearchString))
       }
-      else {
-        return arr
-      }
+      return arr
     },
     async nodeClick (wsItem) {
       this.$log('nodeClick', wsItem)
-      this.node = wsItem // await this.$store.dispatch('workspace/wsItem', item.wsItemKey)
-      this.$log('nodeClick node', this.node)
+      this.$rxdb.setReactiveItem(this, 'node', wsItem)
+      this.$wait(5000).then(() => {
+        this.node.name = '0987'
+      })
+      this.$wait(2000).then(() => {
+        this.node.name = '1234'
+      })
+      // this.$log('nodeClick node', this.node)
       // await this.$wait(300)
       this.nodeEditorOpened = true
     },
-    async nodeAddStart (_nodeInput) {
+    async nodeAddStart (nodeInput) {
+      this.$log('nodeAddStart...', this.node)
       this.$log('nodeAddStart')
-      let nodeInput = _nodeInput || {
+      nodeInput = nodeInput || {
         name: this.nodeSearchString,
         wsItemType: 'NODE',
         items: [],
@@ -216,13 +216,10 @@ export default {
         category: 'FUN',
         layout: 'PIP'
       }
-      this.$log('nodeAddStart nodeInput', nodeInput)
-      this.node = await this.$store.dispatch('workspace/wsItemUpsert', nodeInput)
+
+      // this.node = await this.$store.dispatch('workspace/wsItemUpsert', nodeInput)
       this.nodeSearchString = ''
-      this.$log('nodeAddStart node', this.node)
-      // await this.$wait(1000)
-      // this.$log('nodeAddStart node AFTER', this.node)
-      // this.nodeEditorOpened = true
+      this.node = await this.$rxdb.wsNode.insert(nodeInput)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)

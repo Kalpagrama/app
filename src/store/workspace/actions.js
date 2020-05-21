@@ -406,7 +406,7 @@ class WsLocal {
                 item.oid = itemServer.oid
                 return item
               }
-            }, {root: true})
+            }, { root: true })
           } else if (itemLocalChanges.item.revisionClient > itemServer.revisionClient) {
             logD('есть еще изменения!')
             this.context.dispatch('cache/update', {
@@ -416,7 +416,7 @@ class WsLocal {
                 item.oid = itemServer.oid
                 return item
               }
-            }, {root: true})
+            }, { root: true })
           } else {
             logE('Мы меняли данные. Но параллельно данные изменены из другого клиента(revisionClient)!', itemLocalChanges.item, itemServer)
             // ничего не поделать - удаляем локальные изменения, принимаем версию сервера. На сервер не шлем(externalChange = true).

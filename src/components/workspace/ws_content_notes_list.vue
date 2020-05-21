@@ -38,7 +38,7 @@ div(:style=`{position: 'relative'}`).column.fit
       ws-content-finder(
         ref="wsContentFinder"
         :sources="['url', 'device']"
-        @content="contentFound"
+        @content="contentCreated"
         :style=`{}`).b-100
       //- tabs
       div(
@@ -76,6 +76,7 @@ div(:style=`{position: 'relative'}`).column.fit
 
 <script>
 import { assert } from 'assert'
+import { isRxDocument } from 'rxdb'
 export default {
   name: 'wsContentNotesList',
   props: {
@@ -138,16 +139,19 @@ export default {
       let res = await this.$store.dispatch('workspace/wsItemDelete', item)
       this.$log('contentDelete done', res)
     },
-    async contentFound (content) {
-      this.$log('contentFound', content)
+    async contentCreated (content) {
+      this.$log('contentCreated', content)
+      if (isRxDocument(content)) content = content.toJSON()
       // смотрим - нет ли такого уже.
-      let existing = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST', filterFunc: item => item.contentOid === content.oid})
-      assert(Array.isArray(existing), '(Array.isArray(existing)!')
-      if (existing.length > 1) this.$logE('LOGICAL ERROR! only one item per content allowed')// может быть только один элемент с этим контентом
-      if (existing.length) return existing[0]
+      let existing = await this.$rxdb.wsContent.findOne({
+        selector: {
+          contentOid: {$eq: content.oid}
+        }
+      }).exec()
+      // let existing = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST', filterFunc: item => item.contentOid === content.oid})
+      if (existing) return existing
       // Такого нет. Создаем новый
       let contentInput = {
-        oid: Date.now().toString(),
         wsItemType: 'CONTENT_WITH_NOTES',
         thumbOid: content.oid,
         name: content.name,
@@ -160,11 +164,12 @@ export default {
           type: 'CONCAT'
         }
       }
-      this.$log('contentFound contentInput', contentInput)
-      let item = await this.$store.dispatch('workspace/wsItemUpsert', contentInput)
-      this.$log('contentFound item', item)
+      this.$log('contentCreated contentInput', contentInput)
+      let wsItem = await this.$rxdb.wsContent.insert(contentInput)
+      // let item = await this.$store.dispatch('workspace/wsItemUpsert', contentInput)
+      this.$log('contentCreated item', wsItem)
       await this.$wait(300)
-      this.contentClick(item)
+      this.contentClick(wsItem)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)

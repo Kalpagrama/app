@@ -11785,6 +11785,31 @@ pouchdb-abstract-mapreduce@7.0.0:
     pouchdb-md5 "7.0.0"
     pouchdb-utils "7.0.0"
 
+pouchdb-adapter-idb@^7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/pouchdb-adapter-idb/-/pouchdb-adapter-idb-7.2.1.tgz#43acdaccebd180c78e7dd45a6d207a6483653465"
+  integrity sha512-wr6clFBxehmJdtr9mdl+LE51W572wdA8dm2CN8s2E4jmHgP4juj/kY+XBP2kGStdu20VxL9gF97599VSt1BsOQ==
+  dependencies:
+    pouchdb-adapter-utils "7.2.1"
+    pouchdb-binary-utils "7.2.1"
+    pouchdb-collections "7.2.1"
+    pouchdb-errors "7.2.1"
+    pouchdb-json "7.2.1"
+    pouchdb-merge "7.2.1"
+    pouchdb-utils "7.2.1"
+
+pouchdb-adapter-utils@7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/pouchdb-adapter-utils/-/pouchdb-adapter-utils-7.2.1.tgz#d2583bc5c6bfcd6cf0d20acd54cb51683a196d37"
+  integrity sha512-asMAhH6mJRgz6JFEvaS/gMcfWR9pCM+DLPzzIN5vSAm8jUEaMApCONx86xhBwVgzAJ8aVzrG11J9D5iJlM7LSQ==
+  dependencies:
+    pouchdb-binary-utils "7.2.1"
+    pouchdb-collections "7.2.1"
+    pouchdb-errors "7.2.1"
+    pouchdb-md5 "7.2.1"
+    pouchdb-merge "7.2.1"
+    pouchdb-utils "7.2.1"
+
 pouchdb-all-dbs@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/pouchdb-all-dbs/-/pouchdb-all-dbs-1.0.2.tgz#8fa1aa4b01665e00e0da9c61bf6dbb99eca05d3c"
@@ -11912,6 +11937,13 @@ pouchdb-generate-replication-id@7.2.1:
   dependencies:
     pouchdb-collate "7.2.1"
     pouchdb-md5 "7.2.1"
+
+pouchdb-json@7.2.1:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/pouchdb-json/-/pouchdb-json-7.2.1.tgz#41836bdffed1d1b6207793f0b26bf771105c0c61"
+  integrity sha512-YGRX/qDl+iEX2vz23kzBtMoH0hpb9xASKnEGZPH76BTDq4RQ+eUOxyXU9E1fPdQhsq8+0pcEQN7VCnFEdQ7MUQ==
+  dependencies:
+    vuvuzela "1.0.3"
 
 pouchdb-mapreduce-utils@7.0.0:
   version "7.0.0"
@@ -15114,6 +15146,11 @@ vue-router@3.1.6, vue-router@^3.1.3:
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.1.6.tgz#45f5a3a3843e31702c061dd829393554e4328f89"
   integrity sha512-GYhn2ynaZlysZMkFE5oCHRUTqE8BWs/a9YbKpNLi0i7xD6KG1EzDqpHQmv1F5gXjr8kL5iIVS8EOtRaVUEXTqA==
 
+vue-rx@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/vue-rx/-/vue-rx-6.2.0.tgz#c3b86462b252626edd16417385bb9054a3a23acb"
+  integrity sha512-tpKUcqS5IUYS+HsdbR5TlE5LL9PK4zwlplEtmMeydnbqaUTa9ciLMplJXAtFSiQw1vuURoyEJmCXqMxaVEIloQ==
+
 vue-server-renderer@2.6.11:
   version "2.6.11"
   resolved "https://registry.yarnpkg.com/vue-server-renderer/-/vue-server-renderer-2.6.11.tgz#be8c9abc6aacc309828a755c021a05fc474b4bc3"
@@ -15194,6 +15231,11 @@ vuex@^3.1.2:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/vuex/-/vuex-3.2.0.tgz#86da7f26c3e131ff374870580109145a640ee5a8"
   integrity sha512-qBZGJJ1gUNWZbfZlH7ylIPwENg3R0Ckpq+qPexF065kOMOt1Ixt8WDJmtssVv7OhepWD0+Qie7pOS8f0oQy1JA==
+
+vuvuzela@1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/vuvuzela/-/vuvuzela-1.0.3.tgz#3be145e58271c73ca55279dd851f12a682114b0b"
+  integrity sha1-O+FF5YJxxzylUnndhR8SpoIRSws=
 
 watchpack@^1.6.0:
   version "1.6.1"

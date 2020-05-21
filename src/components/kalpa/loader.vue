@@ -68,6 +68,7 @@ export default {
       sortStrategy = sortStrategy || 'HOT'
       // get res
       let res
+      let rxQuery
       switch (this.type) {
         case 'sphereNodes' :
           res = await this.$store.dispatch('lists/sphereNodes', { oid, pagination, filter, sortStrategy })
@@ -79,28 +80,40 @@ export default {
           res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
         case 'CONTENT_LIST' :
-          res = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST'})
+          rxQuery = this.$rxdb.wsContent.find().sort('updatedAt')
+          // res = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST'})
           break
-        case 'NODE_LIST' :
-          res = await this.$store.dispatch('workspace/wsItems', {collection: 'NODE_LIST'})
+        case 'NODE_LIST' :{
+          rxQuery = this.$rxdb.wsNode.find().sort('updatedAt')
+          // res = await this.$store.dispatch('workspace/wsItems', {collection: 'NODE_LIST'})
           break
+        }
         case 'SPHERE_LIST':
           res = await this.$store.dispatch('workspace/wsItems', {collection: 'SPHERE_LIST'})
           break
         default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }
-      // parse res
-      let { items, count, totalCount, nextPageToken } = res
-      // if (this.oid === oid && this.nextPageToken !== nextPageToken) {
-      //   for (let item of items) this.nodes.push(item)
-      // } else this.nodes = items
-      // set shit
-      this.query = res
-      this.items = items
-      this.nextPageToken = nextPageToken
-      this.totalCount = totalCount
-      this.itemsCount = items.length
-      // this.$log('itemsLoad done')
+
+      let apply = (res) => {
+        let { items, count, totalCount, nextPageToken } = res
+        this.query = res
+        this.items = items
+        this.nextPageToken = nextPageToken
+        this.totalCount = totalCount
+        this.itemsCount = items.length
+      }
+      if (rxQuery){
+        rxQuery.$.subscribe(results => {
+          res = {
+            items: results,
+            count: results.length,
+            totalCount: results.length,
+            nextPageToken: null
+          }
+          apply(res)
+        })
+        await rxQuery.exec()
+      } else apply(res)
     }
   }
 }

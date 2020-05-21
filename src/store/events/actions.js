@@ -4,6 +4,7 @@ import { notify } from 'src/boot/notify'
 import { router } from 'boot/main'
 import assert from 'assert'
 import { i18n } from 'boot/i18n'
+import {rxdb} from 'boot/rxdb'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
@@ -165,7 +166,8 @@ async function processEvent (context, event) {
     case 'WS_ITEM_DELETED':
       // notifyUserActionComplete(event.type, event.object)
       // logD('try processEventWs')
-      await context.dispatch('workspace/processEvent', event, { root: true })
+      // await context.dispatch('workspace/processEvent', event, { root: true })
+      await rxdb.processEvent(event)
       break
     default:
       throw new Error(`unsupported Event ${event.type}`)

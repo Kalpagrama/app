@@ -30,6 +30,7 @@ const LogModulesEnum = Object.freeze({
   VUEX_WS: 'vx_ws',
   VUEX_CACHE: 'vx_cache',
   VUEX_OBJECTS: 'vx_obj',
+  RXDB: 'rxdb',
   BOOT: 'boot',
   ML: 'mainLayout',
   CP: 'capacitor'

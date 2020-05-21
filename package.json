@@ -57,6 +57,7 @@
     "i18next-browser-languagedetector": "^4.0.1",
     "lru-cache": "^5.1.1",
     "mediaelement": "^4.2.14",
+    "pouchdb-adapter-idb": "^7.2.1",
     "pug": "^2.0.4",
     "pug-loader": "^2.4.0",
     "pug-plain-loader": "^1.0.0",

@@ -109,6 +109,7 @@ export const userAuthenticate = async (context, {password, inviteCode}) => {
     variables: { password, inviteCode }
   })
   logD('@userAuthenticate done')
+  localStorage.setItem('userRole', role)
   return { result, role, nextAttemptDate, attempts, failReason }
 }
 

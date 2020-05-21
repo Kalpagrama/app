@@ -3,12 +3,13 @@ const fs = require('fs')
 const webpack = require('webpack')
 require('dotenv').config()
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 module.exports = function (ctx) {
   return {
     preFetch: true,
     boot: [
+      'rxdb',
       'cache',
       'notify',
       'log',
@@ -111,9 +112,11 @@ module.exports = function (ctx) {
             new webpack.IgnorePlugin(/@capacitor\/core/)
           )
         }
-        // cfg.plugins.push(
-        //   new BundleAnalyzerPlugin()
-        // )
+        if (ctx.mode.spa){
+          cfg.plugins.push(
+            new BundleAnalyzerPlugin()
+          )
+        }
         // todo отключить source-map когда не потребуется debug(увеличивает размер js в 2 раза)
         // eslint-disable-next-line no-constant-condition
         if (!ctx.mode.capacitor) {
