@@ -195,6 +195,7 @@ export default {
         figuresRelative: [],
         spheres: []
       }
+      this.$log('layerInput', l)
       // set layer
       this.$set(this.composition.layers, index, l)
       // set meta

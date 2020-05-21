@@ -116,10 +116,11 @@ export default {
     }
   },
   methods: {
-    async contentClick (wsItem) {
-      this.$log('contentClick', wsItem)
-      this.content = wsItem // await this.$store.dispatch('workspace/wsItem', wsItemKey)
-      this.$log('contentClick', this.content)
+    async contentClick (rxDoc) {
+      this.$log('contentClick', rxDoc)
+      // this.content = wsItem // await this.$store.dispatch('workspace/wsItem', wsItemKey)
+      this.$rxdb.setReactiveItem(this, 'content', rxDoc)
+      // this.$log('contentClick', this.content)
       switch (this.options.onItemClick) {
         case 'edit': {
           this.contentEditorOpened = true

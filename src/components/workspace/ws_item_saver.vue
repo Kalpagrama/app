@@ -23,7 +23,7 @@ export default {
       immediate: true,
       handler (to, from) {
         if (!to) return
-        assert(!isRxDocument(to), '!isRxDocument(to)')
+        // assert(!isRxDocument(to), '!isRxDocument(to)')
         this.$log('value CHANGED', isRxDocument(to))
         if (from) this.externalUpdate = true
         this.item = to // JSON.parse(JSON.stringify(to))
