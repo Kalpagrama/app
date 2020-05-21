@@ -7,6 +7,10 @@ import { LoadingBar, date } from 'quasar'
 import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
+// import Vue from 'vue'
+// window.Vue = null
+// import VueRx from 'vue-rx'
+// Vue.use(VueRx)
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -31,12 +35,13 @@ export default async ({ Vue, store, router: VueRouter }) => {
   try {
     router = VueRouter
     Vue.use(VueMasonry)
+    // VueRx(Vue)
     // Vue.use(VueYandexMetrika, {
-    //   id: 60818698,
-    //   router: router,
-    //   // env: process.env.NODE_ENV
-    //   // other options
-    // })
+      //   id: 60818698,
+      //   router: router,
+      //   // env: process.env.NODE_ENV
+      //   // other options
+      // })
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     // LoadingBar.setDefaults({

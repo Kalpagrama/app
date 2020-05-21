@@ -57,7 +57,7 @@ div(:style=`{position: 'relative'}`).column.fit
             ).row.full-width
             //- LEFT
             div(
-              v-if="layersEditing"
+              v-if="true"
               v-show="layersView !== 'line'"
               :style=`{width: layersEditingToolsWidth+'px', overflow: 'hidden'}`).row.justify-start.items-start.content-start
               q-checkbox(v-model="layersSelected" :val="l.oid" dark color="grey-6")
@@ -72,7 +72,7 @@ div(:style=`{position: 'relative'}`).column.fit
                 @meta="$emit('meta', $event)")
             //- RIGHT
             div(
-              v-if="layersEditing"
+              v-if="true"
               v-show="layersView !== 'line'"
               :style=`{width: layersEditingToolsWidth+'px', overflow: 'hidden'}`).row.justify-end.items-start.content-start
               q-btn(flat round icon="drag_indicator" color="white").layer-drag-handle
@@ -135,6 +135,7 @@ export default {
     },
     layersEdit () {
       this.$log('layersEdit')
+      if (this.layersView === 'line') this.layersView = 'normal'
       this.layersEditing = !this.layersEditing
     },
     layersDraggingMove (e, evt) {
