@@ -22,7 +22,7 @@ const RxCollectionEnum = Object.freeze({
   WS_CHAIN: 'WS_CHAIN',
   WS_SPHERE: 'WS_SPHERE'
 })
-
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 class RxDBWrapper {
   async postCreate () {
     addRxPlugin(require('pouchdb-adapter-idb'))
@@ -115,14 +115,19 @@ class RxDBWrapper {
     logD('setReactiveItem...')
     assert(vueObject._isVue, '!isVue')
     assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
+    vueObject.counter = vueObject.counter || 0
     vueObject.$set(vueObject, propName, rxDoc.toJSON())
     vueObject.rxUnWatchers = vueObject.rxUnWatchers || {}
     vueObject.rxUnWatchers[propName] = vueObject.rxUnWatchers[propName] || []
     for (let unwatch of vueObject.rxUnWatchers[propName]) unwatch() // убиваем предыдущие
     // подписываемся на изменения проперти в UI
     const unwatchNew = vueObject.$watch(propName, async (from, to) => {
+      if (vueObject.counter++ > 10) {
+        logW('!!!!!!!!!!!!!!!!!!achtung!!!!!!!!!')
+        await wait(1000)
+      }
       if (!to) return
-      logD('RX элемент изменен на клиенте...', to)
+      logD('RX элемент изменен в UI...', to)
       const changesFromClientOrigin = to.changesFromClient
       try {
         to.changesFromClient = true // ставим флаг, чтобы не дергаться в rxDoc.$.subscribe(infinite loop). флаг снимется когда придут изменения с сервера
@@ -137,7 +142,7 @@ class RxDBWrapper {
 
     // подписываемся на измение документа в RXDB
     rxDoc.$.subscribe(changeEvent => {
-      logD('RX элемент изменился в БД...', changeEvent)
+      logD('RX элемент изменился в БД...', changeEvent.changesFromClient)
       if (changeEvent.changesFromClient) return
       vueObject.$set(vueObject, propName, JSON.parse(JSON.stringify(changeEvent))) // changeEvent нельзя менять вовне
       logD('изменения отправлены в UI')
@@ -147,6 +152,7 @@ class RxDBWrapper {
 
   async upsertItem (item) {
     logD('upsertItem item=', item)
+    item.changesFromClient = true
     let doc
     // просто atomicUpsert не получается использовать тк не срабатывают хуки (normalizeWsItem)
     if (item.id) {
@@ -161,6 +167,7 @@ class RxDBWrapper {
 
   async deleteItem (item) {
     assert(item && item.id, 'bad item!')
+    item.changesFromClient = true
     await this.getItemRxCollection(item).find().where('id').eq(item.id).remove()
   }
 }

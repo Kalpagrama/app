@@ -33,7 +33,7 @@ export default {
       deep: true,
       handler (to, from) {
         this.$log('item CHANGED to', this.externalUpdate, isRxDocument(this.item), from, to)
-        this.$log('item CHANGED to', JSON.stringify(from) === JSON.stringify(to))
+        // this.$log('item CHANGED to', JSON.stringify(from) === JSON.stringify(to))
         // if (this.externalUpdate) {
         //   this.externalUpdate = false
         //   return
