@@ -110,7 +110,7 @@ class RxDBWrapper {
   }
 
   async deleteItem (item) {
-    assert(item && item.id, 'bad item!')
+    assert(item && item.id, 'item && item.id => bad item!')
     item.changesFromClient = true
     await this.getItemRxCollection(item).find().where('id').eq(item.id).remove()
   }

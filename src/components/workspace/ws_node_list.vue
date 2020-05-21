@@ -71,6 +71,7 @@ div(:style=`{position: 'relative'}`).column.fit
           q-btn(flat color="white" no-caps @click="nodesSelectedDelete()").b-90.q-mr-sm Delete
           q-btn(flat color="white" no-caps @click="nodesSelectedDrop()").b-90 Drop selection
       q-btn(flat color="white" icon="edit" @click="nodesEdit()").b-90.q-mr-sm
+    //- :variables=`{selector: {name: 'hello'}}`
     kalpa-loader(type="NODE_LIST")
       template(v-slot="{items}")
         .row.full-width.items-start.q-py-sm
@@ -111,9 +112,8 @@ div(:style=`{position: 'relative'}`).column.fit
 </template>
 
 <script>
-import { isRxDocument } from 'rxdb'
 import assert from 'assert'
-import Vue from 'vue'
+
 export default {
   name: 'wsNodeList',
   data () {
@@ -194,15 +194,13 @@ export default {
     },
     async nodeClick (rxDoc) {
       this.$log('nodeClick', rxDoc)
-      this.$rxdb.setReactiveItem(this, 'node', rxDoc)
-      // this.$log('nodeClick node', this.node)
-      // await this.$wait(300)
+      this.node = rxDoc
+      await this.$wait(300)
       this.nodeEditorOpened = true
     },
-    async nodeAddStart (nodeInput) {
-      this.$log('nodeAddStart...', this.node)
-      this.$log('nodeAddStart')
-      nodeInput = nodeInput || {
+    async nodeAddStart (_nodeInput) {
+      this.$log('nodeAddStart start', this.node)
+      let nodeInput = _nodeInput || {
         name: this.nodeSearchString,
         wsItemType: 'NODE',
         items: [],
@@ -210,10 +208,10 @@ export default {
         category: 'FUN',
         layout: 'PIP'
       }
-
-      await this.$rxdb.upsertItem(nodeInput)
-      // this.node = await this.$store.dispatch('workspace/wsItemUpsert', nodeInput)
+      let rxDoc = await this.$rxdb.upsertItem(nodeInput)
+      this.$log('nodeAddStart rxDoc', rxDoc)
       this.nodeSearchString = ''
+      this.nodeClick(rxDoc)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)
