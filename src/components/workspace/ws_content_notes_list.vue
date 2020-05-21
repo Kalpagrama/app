@@ -118,9 +118,7 @@ export default {
   methods: {
     async contentClick (rxDoc) {
       this.$log('contentClick', rxDoc)
-      // this.content = wsItem // await this.$store.dispatch('workspace/wsItem', wsItemKey)
-      this.$rxdb.setReactiveItem(this, 'content', rxDoc)
-      // this.$log('contentClick', this.content)
+      this.content = rxDoc
       switch (this.options.onItemClick) {
         case 'edit': {
           this.contentEditorOpened = true
@@ -135,44 +133,35 @@ export default {
         }
       }
     },
-    async contentDelete (item) {
-      this.$log('contentDelete start', item)
+    async contentDelete (rxDoc) {
+      this.$log('contentDelete start', rxDoc)
       if (!confirm('Delete content & notes ?')) return
-      let res = await this.$store.dispatch('workspace/wsItemDelete', item)
-      this.$log('contentDelete done', res)
+      await this.$rxdb.deleteItem(rxDoc)
     },
     async contentCreated (content) {
       this.$log('contentCreated', content)
-      if (isRxDocument(content)) content = content.toJSON()
-      // смотрим - нет ли такого уже.
-      let tmp = new Vue({data: {existingItems: {}}})
-      await this.$rxdb.setReactiveQuery(tmp, 'existingItems', 'WS_CONTENT', {
-        selector: {
-          contentOid: { $eq: content.oid }
+      let rxDoc = await this.$rxdb.WS_CONTENT.findOne({selector: {contentOid: content.oid}}).exec()
+      this.$log('contentCreated rxDoc before', rxDoc)
+      // create rxDoc
+      if (!rxDoc) {
+        let contentInput = {
+          wsItemType: 'CONTENT_WITH_NOTES',
+          thumbOid: content.oid,
+          name: content.name,
+          layers: [],
+          spheres: [],
+          contentOid: content.oid,
+          operation: {
+            items: null,
+            operations: null,
+            type: 'CONCAT'
+          }
         }
-      })
-      // let existing = await this.$store.dispatch('workspace/wsItems', {collection: 'CONTENT_LIST', filterFunc: item => item.contentOid === content.oid})
-      if (tmp.existingItems.length) return tmp.existingItems[0]
-      // Такого нет. Создаем новый
-      let contentInput = {
-        wsItemType: 'CONTENT_WITH_NOTES',
-        thumbOid: content.oid,
-        name: content.name,
-        layers: [],
-        spheres: [],
-        contentOid: content.oid,
-        operation: {
-          items: null,
-          operations: null,
-          type: 'CONCAT'
-        }
+        this.$log('contentCreated contentInput', contentInput)
+        rxDoc = await this.$rxdb.upsertItem(contentInput)
       }
-      this.$log('contentCreated contentInput', contentInput)
-      let wsItem = await this.$rxdb.upsertItem(contentInput)
-      // let item = await this.$store.dispatch('workspace/wsItemUpsert', contentInput)
-      this.$log('contentCreated item', wsItem)
-      await this.$wait(300)
-      this.contentClick(wsItem)
+      this.$log('contentCreated rxDoc after', rxDoc)
+      this.contentClick(rxDoc)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)
