@@ -48,7 +48,7 @@ div(:style=`{position: 'relative'}`).column.fit
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
         draggable(
           :list="meta.layers" group="layers" handle=".layer-drag-handle"
-          :move="itemsDraggingMove"
+          :move="layersDraggingMove" @onChange="layersDraggingUpdate" :sort="true"
           @start="layersDragging = true"
           @end="layersDragging = false, layersDraggingFutureIndex = null").full-width
           div(
@@ -141,6 +141,9 @@ export default {
     layersDraggingMove (e, evt) {
       this.$log('layersDraggingMove', e.draggedContext.futureIndex)
       this.$set(this, 'layersDraggingFutureIndex', e.draggedContext.futureIndex + 1)
+    },
+    layersDraggingUpdate (e, evt) {
+      this.$log('layersDraggingUpdate', e, evt)
     },
     layersSelectedDrop () {
       this.$log('layersSelectedDrop')

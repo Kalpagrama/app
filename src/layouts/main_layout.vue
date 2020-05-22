@@ -21,7 +21,7 @@ q-layout(view="hHh Lpr lff").bg-30
       width: $store.state.ui.maxWidthMenu+'px',
       left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px'
     }`).row.q-pa-sm
-    kalpa-menu(v-if="!loading")
+    kalpa-menu(v-if="!loading" :style=`{borderRadius: '10px', overflow: 'hidden'}`)
   q-page-container
     q-page(:style=`{}`)
       router-view(

@@ -27,7 +27,7 @@ export default {
     item: {
       deep: true,
       handler (to, from) {
-        this.$log('item CHANGED', to)
+        // this.$log('item CHANGED', to)
         this.itemUpdate()
       }
     }

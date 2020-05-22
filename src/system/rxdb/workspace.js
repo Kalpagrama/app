@@ -75,7 +75,7 @@ class Workspace {
       if (!item.id) item.id = `${Date.now()}` // генерируем id для нового элемента
       item.revisionServer = item.revisionServer || 1
       item.revisionClient = item.revisionClient || 1
-      logD('normalizeWsItem::' + JSON.stringify(item))
+      // logD('normalizeWsItem::' + JSON.stringify(item))
     }
     this.rxdb.node.preInsert(normalizeWsItem, false)
     this.rxdb.node.preSave(normalizeWsItem, false)
