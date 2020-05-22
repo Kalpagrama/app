@@ -110,20 +110,11 @@
             color="white"
             :icon="meta.muted ? 'volume_off' : 'volume_up'"
             :style=`{background: 'rgba(0,0,0,0.3)'}`)
-      //- sound
-      //- div(
-      //-   :style=`{height: '60px'}`
-      //-   ).row.full-height.items-start.content-start.justify-start
-        //- q-btn(
-        //-   round flat @click="player.mutedToggle()"
-        //-   color="white"
-        //-   :icon="meta.muted ? 'volume_off' : 'volume_up'"
-        //-   :style=`{background: 'rgba(0,0,0,0.3)'}`).q-ml-sm
 </template>
 
 <script>
 export default {
-  name: 'playerVideoProgress',
+  name: 'playerVideo-progressMaxi',
   props: ['ctx', 'player', 'meta', 'start', 'end'],
   data () {
     return {

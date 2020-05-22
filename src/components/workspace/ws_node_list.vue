@@ -135,7 +135,7 @@ div(:style=`{position: 'relative'}`).column.fit
                     q-btn(flat dense color="white" no-caps align="left" @click="nodeDelete(n.id)").q-px-sm.full-width Delete
     //- nodeSearchStringCreate
     div(
-      v-if="nodeSearchStringCreateShow"
+      v-if="nodeSearchStringCreateShow && nodeSearchString.length > 0"
       ).row.full-width.items-center.content-center.q-px-sm
       small.text-white.q-mr-sm Create node
       q-btn(no-caps color="green" @click="nodeSearchStringCreate") {{nodeSearchString}}
@@ -171,24 +171,21 @@ export default {
       return this.$route.params.oid
     },
     variables () {
+      let res = {selector: {}}
       if (this.nodeSearchString.length > 0) {
         let nameRegExp = new RegExp(this.nodeSearchString, 'i')
-        return {
-          selector: {
-            name: {$regex: nameRegExp}
-          }
-        }
+        res.selector.name = {$regex: nameRegExp}
       }
-      else {
-        return {
-          selector: {}
-        }
+      if (this.tabId !== 'all') {
+        res.selector.stage = this.tabId
       }
+      return res
     }
   },
   watch: {
     // tabId: {},
     nodeSearchString: {
+      immediate: true,
       handler (to, from) {
         this.$log('nodeSearchString CHANGED', to)
         if (to.length === 0) {
@@ -279,7 +276,8 @@ export default {
         items: [],
         spheres: [],
         category: 'FUN',
-        layout: 'PIP'
+        layout: 'PIP',
+        stage: 'draft'
       }
       let rxDoc = await this.$rxdb.upsertItem(nodeInput)
       this.$log('nodeAddStart rxDoc', rxDoc)

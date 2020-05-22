@@ -1,6 +1,8 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
+q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
+  //- actions
   //- dialogs
+  //- node
   q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
     node-editor(
       ctx="workspace"
@@ -12,6 +14,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
         maxHeight: $q.screen.height+'px',
         height: $q.screen.height+'px',
       }`)
+  //- menu right desktop
   kalpa-menu-right
     div(
       :style=`{
@@ -20,29 +23,30 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
       }`
       ).column.full-width.bg-grey-9
       menu-right
-      //- div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-md
-      //-   span.text-white.text-bold Related spheres
-      //- .col.full-width.scroll
-      //-   .row.full-width.q-pa-sm
-          //- sphere-spheres(v-if="true" :oid="sphereOid")
-  //- kalpa-menu-footer(:options=`{showMenuPage: true}`)
-  //-   template(v-slot:menuRight)
-  //-     menu-right
+  //- header
+  q-header(reveal).row.full-width.justify-center
+    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`).row.full-width.q-pa-sm.b-30
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+      .col.full-height
+        .row.fit.items-center.content-center.q-px-sm
+          span().text-white.text-bold Node explorer
+  //- footer
+  kalpa-menu-footer(v-if="!nodeEditorOpened" :options=`{showMenuPage: true}`)
+    template(v-slot:menuRight=`{inDrawer}`)
+      menu-right(:inDrawer="inDrawer")
+  //- reply
   q-btn(
     v-if="true"
     push color="green" no-caps @click="nodeAdd()"
     :style=`{
-      position: 'fixed', zIndex: 2000, bottom: '8px', left: '50%', transform: 'translate(-50%, 0)',
+      position: 'fixed', zIndex: 2000, left: '50%', transform: 'translate(-50%, 0)',
+      bottom: $q.screen.xs ? 60+8+'px' : 8+'px',
       height: '50px'
     }`
-    ).q-px-md Add your node
+    ).q-px-md Reply with node
+  //- page body
   q-page-container
-    q-page.q-px-xs
-      //- header
-      .row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', height: '60px'}`).row.full-width.items-center.content-center.q-px-xs
-          q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
-      //- node
+    q-page
       .row.full-width.justify-center
         div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
           node(
@@ -52,47 +56,35 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll")
             :essence="true" :opened="true"
             @meta="onNodeMeta"
             :visible="true" :active="true" :mini="false")
-        //- essence fixed
-        div(
-          v-if="false && scrollTop >= nodeHeight"
-          @click="nodeEssenceStickyClick()"
-          :style=`{
-            position: 'fixed',
-            top: '0px',
-            height: '60px',
-            zIndex: 1000
-          }`).row.full-width.justify-center.cursor-pointer.br
-          div(
-            :style=`{
-              maxWidth: $store.state.ui.maxWidthPage+'px',
-              borderRadius: '0 0 10px 10px'
-            }`
-            ).row.full-width.items-center.content-center.q-px-sm.b-100
-            q-btn(round flat color="white" icon="keyboard_arrow_left")
-            span(v-if="node").text-white.text-bold {{node.name}}
       //- body
-      div(v-if="true").row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
-          kalpa-loader(v-if="sphereOid && node" type="sphereNodes" :variables="variables")
+      div(v-if="$route.params.page === 'nodes'").row.full-width.justify-center
+        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-py-md
+          kalpa-loader(v-if="$q.screen.xs && sphereOid && node" type="sphereNodes" :variables="variables")
             template(v-slot=`{items}`)
-              list-masonry(
-                ref="listMasonry" :items="items"
-                :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', paddingTop: '60px'}`)
-                template(v-slot:item=`{item, index, isOpened, isHovered}`)
-                  div(
-                    v-if="!isOpened"
-                    @click="$router.push('/node/'+item.oid).catch(e => e), nodeActive = true"
-                    :style=`{position: 'absolute', zIndex: 300, borderRadius: '10px', overflow: 'hidden', opacity: 0}`).row.fit.cursor-pointer
+              list-middle(:items="items")
+                template(v-slot:item=`{item, index, indexMiddle}`)
                   node(
-                    :node="item"
-                    :index="index"
-                    :needFull="isOpened ? true : isHovered"
-                    :visible="isOpened ? true : isHovered"
-                    :active="isOpened ? true : isHovered" layout="pip"
-                    :mini="true"
-                    :opened="false"
-                    :essence="false")
-          //- div(:style=`{height: '1000px'}`).row.full-width.bg-red
+                    ctx="list" layout="PIP"
+                    :node="item" :index="index" :essence="true"
+                    :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
+                    :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
+                    :active="index === indexMiddle"
+                    :mini="false")
+          kalpa-loader(v-if="$q.screen.gt.xs && sphereOid && node" type="sphereNodes" :variables="variables")
+            template(v-slot=`{items}`)
+              list-masonry(:items="items")
+                template(v-slot:item=`{item, index, isOpened, isHovered}`)
+                  div(:style=`{position: 'absolute', zIndex: 3000, opacity: 0.5}` @click="$router.push('/node/'+item.oid).catch(e => e)").row.fit.cursor-pointer
+                  node(
+                    ctx="list" layout="PIP"
+                    :node="item" :index="index" :needFull="true"
+                    :visible="isHovered" :active="isHovered" :mini="true")
+      //- contents
+      div(v-if="$route.params.page === 'contents'").row.full-width.q-pa-md
+        h6.text-white Contents
+      //- chains
+      div(v-if="$route.params.page === 'chaing'").row.full-width.q-pa-md
+        h6.text-white Chains
 </template>
 
 <script>
@@ -119,6 +111,9 @@ export default {
     sphereOid () {
       if (!this.node) return null
       else return this.node.sphereFromName.oid
+    },
+    pageId () {
+      return this.$route.params.page
     },
     variables () {
       return {

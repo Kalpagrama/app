@@ -40,18 +40,19 @@ div(
   //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- debug
   div(
-    v-if="true && !mini"
+    v-if="false"
     :style=`{
       position: 'absolute', width: 'calc(50%)', left: '8px', top: '80px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
-      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.4}`).row.q-pa-sm.bg-green
-    small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
-    small.full-width now/duration: {{now}}/{{duration}}
-    small.full-width ctx/mode: {{ctx}}/{{mode}}
-    small.full-width start/end: {{layerStart}}/{{layerEnd}}
-    small.full-width layerIndex: {{layerIndex}}
-    small.full-width layerIndexPlay: {{layerIndexPlay}}
-    small.full-width player: {{player ? true : false}}
+      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.4}`).row.q-pa-sm.bg-red
+    //- small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
+    //- small.full-width now/duration: {{now}}/{{duration}}
+    //- small.full-width ctx/mode: {{ctx}}/{{mode}}
+    //- small.full-width start/end: {{layerStart}}/{{layerEnd}}
+    //- small.full-width layerIndex: {{layerIndex}}
+    //- small.full-width layerIndexPlay: {{layerIndexPlay}}
+    //- small.full-width player: {{player ? true : false}}
+    small.full-wdith mini: {{mini}}
   //- video container
   div(
     :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
@@ -62,7 +63,7 @@ div(
     //- video actions
     //- content name
     router-link(
-      v-if="false && layer && content && visible && active && !mini"
+      v-if="$q.screen.gt.xs && layer && content && visible && active && !mini"
       :to="'/content/'+content.oid"
       :style=`{
         position: 'absolute', zIndex: 20000, left: '8px',
@@ -74,7 +75,7 @@ div(
       small(:style=`{lineHeight: 0.5, userSelect: 'none'}`) {{ content.name }}
     //- layer name
     span(
-      v-if="true && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
+      v-if="$q.screen.gt.xs && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '40px', left: '8px',
         borderRadius: '10px', overflow: 'hidden',
@@ -118,42 +119,36 @@ div(
           position: 'relative', width: '100%', height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden',
           opacity: videoLoadeddataDone && videoGood ? 1 : 0
         }`)
-    player-video-progress(
-      v-if="true && visible && active"
-      v-show="!mini"
+    progress-maxi(
+      v-if="ctx === 'workspace' || $q.screen.gt.xs && visible && active && !mini"
       :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
       :start="layerStart || 0" :end="layerEnd || duration"
       :style=`{
         position: 'absolute', zIndex: 20000, bottom: '0px', left: '0px', transform: 'translate3d(0,0,0)',
         maxWidth: itemsCount > 1 ? '75%' : 'calc(100% - 80px)'
       }`)
-    player-video-progress-mini(
-      v-if="true && visible && active && !mini"
+    progress-mini(
+      v-if="ctx !== 'workspace' && !mini"
       :player="player" :meta="meta"
       :style=`{
-        position: 'absolute', zIndex: 30000, bottom: '0px', transform: 'translate3d(0,0,0)',
+        position: 'absolute', zIndex: 30000, bottom: '1px', transform: 'translate3d(0,0,0)',
       }`)
-    //- progress tint
-    div(
-      v-if="false"
-      :style=`{
-        position: 'absolute', zIndex: 2000, height: '77px', bottom: '0px', pointerEvents: 'none',
-        borderRadius: '10px', overflow: 'hidden',
-        background: 'rgb(0,0,0)',
-        background: 'linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.15) 100%)'
-      }`).row.full-width
+    progress-tint(
+      v-if="$q.screen.gt.xs && visible && active && !mini"
+      )
   slot(name="editor" :meta="meta" :player="player")
 </template>
 
 <script>
 import {throttle} from 'quasar'
-import playerVideoProgress from './player_video_progress'
-import playerVideoProgressMini from './player_video_progress_mini'
+import progressMaxi from './progress_maxi'
+import progressMini from './progress_mini'
+import progressTint from './progress_tint'
 
 export default {
   name: 'playerVideo',
   props: ['ctx', 'composition', 'visible', 'active', 'mini', 'itemsCount'],
-  components: {playerVideoProgress, playerVideoProgressMini},
+  components: {progressMaxi, progressMini, progressTint},
   data () {
     return {
       now: 0,
@@ -286,9 +281,9 @@ export default {
       immediate: false,
       handler (to, from) {
         this.$log('mini CHANGED', to)
-        if (!this.player) return
-        if (to) this.player.pause()
-        else this.player.play()
+        // if (!this.player) return
+        // if (to) this.player.pause()
+        // else this.player.play()
       }
     },
     layer: {
@@ -341,8 +336,14 @@ export default {
     }
   },
   methods: {
-    nodeWorkspace () {
+    async nodeWorkspace () {
       this.$log('nodeWorkspace')
+      // TODO: what to save to ws? whole node? composition? layer?
+      let nodeInput = {
+        wsItemType: 'WS_NODE',
+        stage: 'selected'
+      }
+      // let rxDoc = await this.$rxdb.upsertItem(nodeInput)
     },
     videoNow (to, from) {
       // this.$log('videoNow', to)

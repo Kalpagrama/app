@@ -49,11 +49,11 @@ div(:style=`{position: 'relative'}`).column.fit
         .col
           kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
         q-btn(
-          v-if="false"
+          v-if="true"
           flat color="white" no-caps
-          :style=`{height: '36px'}`).b-110 Spheres
+          :style=`{height: '36px'}`).b-110 Filters
           q-menu()
-            ws-finder-spheres
+            //- ws-finder-spheres
     //- header: edit
     div(
       v-if="options.editing"

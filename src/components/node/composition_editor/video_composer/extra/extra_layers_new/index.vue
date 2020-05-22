@@ -10,8 +10,14 @@ div(:style=`{position: 'relative'}`).column.fit
     }`
   )
   //- layersWorkspace
-  q-dialog(v-model="layersWorkspaceShow")
-    div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).column.fit.b-50
+  q-dialog(v-model="layersWorkspaceShow" position="bottom")
+    div(
+      :style=`{
+        position: 'relative',
+        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : 500+'px',
+        borderRadius: '10px',
+        overflow: 'hidden'
+      }`).column.fit.b-50
       div(:style=`{height: '60px'}`
         ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="layersWorkspaceShow = false")

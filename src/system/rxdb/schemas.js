@@ -62,6 +62,9 @@ export const wsSchemaNode = {
     },
     layout: {
       type: 'string'
+    },
+    stage: {
+      type: 'string'
     }
   },
   required: ['id', 'wsItemType', 'revisionServer', 'revisionClient', 'createdAt', 'updatedAt'],

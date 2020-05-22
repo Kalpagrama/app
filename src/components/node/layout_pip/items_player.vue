@@ -40,8 +40,8 @@ div(
           v-for="(i,ii) in items" :key="ii"
           :style=`{height: '4px'}`).col.q-px-xs
             div(:style=`{
-              borderRadius: '0 0 2px 2px', overflow: 'hidden',
-              background: itemIndex === ii ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)'
+              borderRadius: '2px', overflow: 'hidden',
+              background: itemIndex === ii ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)'
             }`).row.fit
     //- item prev
     div(
@@ -57,7 +57,7 @@ div(
       v-if="items.length > 1 && itemIndex+1 === items.length" @click="itemsAgain()"
       :style=`{
         position: 'absolute', zIndex: 20000, right: '0px', bottom: '0px',
-        maxWidth: '100px', height: '100px',
+        maxWidth: '60px', height: '60px',
         borderRadius: '10px', overflow: 'hidden',
         background: 'rgba(255,255,255,0.1)',
       }`
@@ -81,7 +81,7 @@ div(
         :ctx="ctx" :preview="i.thumbUrl" :value="i"
         :visible="visible"
         :active="visible && active && itemIndex === ii || visible && active && nextMaxWidth > 25"
-        :mini="itemIndex !== ii || nextMaxWidth > 50"
+        :mini="mini || itemIndex !== ii || nextMaxWidth > 50"
         :itemsCount="items.length"
         @ended="compositionEnded(ii)")
 </template>

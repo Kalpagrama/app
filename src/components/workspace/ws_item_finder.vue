@@ -23,9 +23,9 @@ export default {
   components: {wsItems},
   data () {
     return {
-      page: 'contentNotes',
+      page: 'content',
       pages: [
-        {id: 'contentNotes', name: 'Contents'},
+        {id: 'content', name: 'Contents'},
         {id: 'node', name: 'Nodes'}
       ]
     }

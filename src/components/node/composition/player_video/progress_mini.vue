@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: 'playerVideoProgressMini',
+  name: 'playerVideo-progressMini',
   props: ['player', 'meta'],
   data () {
     return {

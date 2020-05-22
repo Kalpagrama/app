@@ -5,17 +5,29 @@
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.full-width.b-50
+div(
+  :class=`{
+    'full-height': inDrawer
+  }`
+  :style=`{
+    position: 'relative',
+    borderRadius: '10px', overflow: 'hidden',
+  }`
+  ).column.full-width.b-50
+  //- header
+  div(:style=`{height: '70px'}`).row.full-width.items-center.content-center.q-px-md
+    span.text-white.text-bold Node explorer
+  //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start
-    router-link(
-      v-for="(p,pi) in pages" :key="p.id"
-      :to=`{params: {page: p.id}}`
-      :class=`{
-        'b-100': $route.params.page === p.id
-      }`
-      :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
-      span.text-white {{ p.name }}
+      router-link(
+        v-for="(p,pi) in pages" :key="p.id"
+        :to=`{params: {page: p.id}}`
+        :class=`{
+          'b-100': $route.params.page === p.id
+        }`
+        :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
+        span.text-white {{ p.name }}
 </template>
 
 <script>
@@ -24,6 +36,7 @@ div(:style=`{position: 'relative'}`).column.full-width.b-50
 
 export default {
   name: 'nodeExplorer-menuRight',
+  props: ['inDrawer'],
   data () {
     return {
       pageId: null,

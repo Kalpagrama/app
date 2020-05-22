@@ -3,10 +3,10 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
   div(
     :style=`{
       maxWidth: $store.state.ui.maxWidthPage+'px',
-      paddingTop: paddingTop+'px',
+      paddingTop: '0px',
       paddingBottom: paddingBottom+'px'
     }`
-    ).row.fit.items-start.content-start.justify-start
+    ).row.full-width.items-start.content-start.justify-start
     div(
       v-for="(i,ii) in items" :key="i.oid" :accessKey="ii"
       :ref="`item-${i.oid}`"
@@ -101,7 +101,7 @@ export default {
     this.$log('mounted')
     this.paddingTop = this.options.paddingTop
     // this.paddingTop = this.$q.screen.height / 2
-    this.paddingBottom = this.$q.screen.height / 2
+    this.paddingBottom = this.$q.screen.height / 3
     if (this.items && this.items.length > 0) {
       await this.$wait(500)
       this.itemInactiveClick(this.items[0], 0)
