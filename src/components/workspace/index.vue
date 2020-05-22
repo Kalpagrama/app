@@ -63,7 +63,7 @@ export default {
       page: 'contentNotes',
       pages: [
         {id: 'note', name: 'Notes'},
-        {id: 'contentNotes', name: 'Contents'},
+        {id: 'content', name: 'Contents'},
         {id: 'node', name: 'Nodes'},
         {id: 'chain', name: 'Chains'},
         {id: 'spheres', name: 'Spheres'},

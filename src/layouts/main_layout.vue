@@ -7,6 +7,11 @@
   // border-radius: 10px 10px 0 0 !important
   border-radius: 10px !important
   background: none !important
+.q-input
+  z-index: 100
+  border-radius: 10px
+  overflow: hidden
+  transform: translate3d(0,0,0)
 </style>
 
 <template lang="pug">

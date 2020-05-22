@@ -21,7 +21,7 @@ export default {
       deep: false,
       immediate: true,
       handler (to, from) {
-        this.$log('value CHANGED', to)
+        // this.$log('value CHANGED', to)
         if (this.subscribed) return
         to.$.subscribe(this.valueChanged)
         this.subscribed = true
@@ -30,7 +30,7 @@ export default {
     item: {
       deep: true,
       handler (to, from) {
-        this.$log('item CHANGED', to)
+        // this.$log('item CHANGED', to)
         this.itemUpdateThrottle()
       }
     }

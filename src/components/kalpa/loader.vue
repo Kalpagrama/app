@@ -41,6 +41,12 @@ export default {
           this.itemsLoad(to)
         }
       }
+    },
+    items: {
+      handler (to, from) {
+        this.$log('items CHANGED', to)
+        this.$emit('itemsLength', to.length)
+      }
     }
   },
   methods: {
@@ -80,17 +86,17 @@ export default {
           res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
         case 'WS_CONTENT' :
-          this.$rxdb.WS_CONTENT.find(null).$.subscribe(results => {
+          this.$rxdb.WS_CONTENT.find(variables || null).$.subscribe(results => {
             this.items = results
           })
           break
         case 'WS_NODE':
-          this.$rxdb.WS_NODE.find(null).$.subscribe(results => {
+          this.$rxdb.WS_NODE.find(variables || null).$.subscribe(results => {
             this.items = results
           })
           break
         case 'WS_SPHERE':
-          this.$rxdb.WS_SPHERE.find(null).$.subscribe(results => {
+          this.$rxdb.WS_SPHERE.find(variables || null).$.subscribe(results => {
             this.items = results
           })
           break

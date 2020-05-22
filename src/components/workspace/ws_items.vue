@@ -6,13 +6,13 @@ component(:is="`ws-`+page+`-list`" @item="$emit('item', $event)" @add="$emit('ad
 
 <script>
 import wsNoteList from './ws_note_list'
-import wsContentNotesList from './ws_content_notes_list'
+import wsContentList from './ws_content_list'
 import wsNodeList from './ws_node_list'
 import wsChainList from './ws_chain_list'
 
 export default {
   name: 'wsItems',
-  components: {wsNoteList, wsContentNotesList, wsNodeList, wsChainList},
+  components: {wsNoteList, wsContentList, wsNodeList, wsChainList},
   props: ['page', 'pages', 'options'],
   data () {
     return {

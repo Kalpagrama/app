@@ -59,6 +59,8 @@ class Workspace {
     this.rxdb.node.preSave(normalizeWsItem, false)
     this.rxdb.content.preInsert(normalizeWsItem, false)
     this.rxdb.content.preSave(normalizeWsItem, false)
+    this.rxdb.sphere.preInsert(normalizeWsItem, false)
+    this.rxdb.sphere.preSave(normalizeWsItem, false)
     this.rxdb.$.subscribe(async changeEvent => {
       let { operation, documentId, documentData } = changeEvent
       logD('rxDB::changeEvent = ', changeEvent)

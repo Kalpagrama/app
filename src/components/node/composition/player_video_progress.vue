@@ -88,6 +88,7 @@
       .col.full-height
         .row.fit.items-start.content-start.justify-start.q-px-sm
           span(
+            v-if="$q.screen.width > 600"
             :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)', userSelect: 'none', padding: '10.5px'}`
             ).text-white.q-mr-sm {{ $time(now)+' / '+$time(duration) }}
           span(

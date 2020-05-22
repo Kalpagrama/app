@@ -133,6 +133,9 @@ export const wsSchemaContent = {
     contentOid: {
       type: 'string'
     },
+    contentType: {
+      type: 'string'
+    },
     operation: {
       type: 'object'
     }
@@ -231,6 +234,9 @@ export const wsSchemaSphere = {
     },
     deletedAt: {
       type: 'integer'
+    },
+    color: {
+      type: 'string'
     }
   },
   required: ['id', 'wsItemType', 'revisionServer', 'revisionClient', 'createdAt', 'updatedAt'],

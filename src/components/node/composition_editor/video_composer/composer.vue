@@ -79,7 +79,7 @@ export default {
       else {
         this.tab = to
         switch (to) {
-          case 'nodes': {
+          case 'layers': {
             this.$tween.to(this, 0.3, {extraHeight: this.$q.screen.height - this.heights.original})
             break
           }
