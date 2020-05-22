@@ -79,17 +79,17 @@ export default {
         case 'nodeNodes' :
           res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
-        case 'CONTENT_LIST' :
+        case 'WS_CONTENT' :
           this.$rxdb.WS_CONTENT.find(null).$.subscribe(results => {
             this.items = results
           })
           break
-        case 'NODE_LIST':
+        case 'WS_NODE':
           this.$rxdb.WS_NODE.find(null).$.subscribe(results => {
             this.items = results
           })
           break
-        case 'SPHERE_LIST':
+        case 'WS_SPHERE':
           this.$rxdb.WS_SPHERE.find(null).$.subscribe(results => {
             this.items = results
           })

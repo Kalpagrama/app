@@ -63,7 +63,7 @@ div(:style=`{position: 'relative'}`).column.fit
         q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6")
       div(@click.self="scrollTo(0)").col
       q-btn(flat round color="white" icon="edit").b-90
-    kalpa-loader(type="CONTENT_LIST")
+    kalpa-loader(type="WS_CONTENT")
       template(v-slot="{items}")
         .row.full-width.items-start.q-py-sm
           div(
@@ -145,7 +145,7 @@ export default {
       // create rxDoc
       if (!rxDoc) {
         let contentInput = {
-          wsItemType: 'CONTENT_WITH_NOTES',
+          wsItemType: 'WS_CONTENT',
           thumbOid: content.oid,
           name: content.name,
           layers: [],

@@ -8,29 +8,23 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_WS)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_WS)
 const WsItemTypeEnum = Object.freeze({
-  NODE: 'NODE',
-  CONTENT_WITH_NOTES: 'CONTENT_WITH_NOTES',
-  CHAIN: 'CHAIN',
-  SPHERE: 'SPHERE'
-})
-const WsCollectionEnum = Object.freeze({
-  NODE_LIST: 'NODE_LIST',
-  CONTENT_LIST: 'CONTENT_LIST',
-  CHAIN_LIST: 'CHAIN_LIST',
-  SPHERE_LIST: 'SPHERE_LIST'
+  WS_NODE: 'WS_NODE',
+  WS_CONTENT: 'WS_CONTENT',
+  WS_CHAIN: 'WS_CHAIN',
+  WS_SPHERE: 'WS_SPHERE'
 })
 const OperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
 
 function getCollection (wsItemType) {
   switch (wsItemType) {
-    case WsItemTypeEnum.NODE:
-      return WsCollectionEnum.NODE_LIST
-    case WsItemTypeEnum.CONTENT_WITH_NOTES:
-      return WsCollectionEnum.CONTENT_LIST
-    case WsItemTypeEnum.SPHERE:
-      return WsCollectionEnum.SPHERE_LIST
-    case WsItemTypeEnum.CHAIN:
-      return WsCollectionEnum.CHAIN_LIST
+    case WsItemTypeEnum.WS_NODE:
+      return WsItemTypeEnum.WS_NODE
+    case WsItemTypeEnum.WS_CONTENT:
+      return WsItemTypeEnum.WS_CONTENT
+    case WsItemTypeEnum.WS_SPHERE:
+      return WsItemTypeEnum.WS_SPHERE
+    case WsItemTypeEnum.WS_CHAIN:
+      return WsItemTypeEnum.WS_CHAIN
     default:
       assert(false, 'bad wsItemType:' + wsItemType)
   }
@@ -173,12 +167,12 @@ class WsLocal {
   // вернет полные элементы из кэша, либо с сервера(при этом - подмешает к ним wsLocalChanges. сохранит список отдельно от элементов. обновит все фильтрованные списки)
   // попытается отправить несохраненные данные
   async getItems (collection, filterFunc, sortFunc) {
-    assert(collection in WsCollectionEnum, 'bad collection' + collection)
+    assert(collection in WsItemTypeEnum, 'bad collection' + collection)
     const fetchItemFunc = async () => {
       const fetchItemFunc = async () => {
         let { data: { wsItems: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
           query: gql`
-            query wsItems ( $collection: WsCollectionEnum!){
+            query ( $collection: WsItemTypeEnum!){
               wsItems (collection: $collection) {
                 totalCount
                 count
@@ -298,11 +292,11 @@ class WsLocal {
     let updateItemFunc = async (updatedItem) => {
       let { data: { wsItemUpsert, wsItemDelete } } = await apollo.clients.api.mutate({
         mutation: operation === OperationEnum.UPSERT
-          ? gql`mutation wsItemUpsert($item: RawJSON!) {
+          ? gql`mutation ($item: RawJSON!) {
                   wsItemUpsert (item: $item)
                 }`
           : gql`
-                  mutation wsItemDelete($item: RawJSON!) {
+                  mutation ($item: RawJSON!) {
                     wsItemDelete (item: $item)
                   }`,
         variables: { item: updatedItem }

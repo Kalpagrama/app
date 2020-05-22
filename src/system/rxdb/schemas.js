@@ -237,20 +237,35 @@ export const wsSchemaSphere = {
   indexes: ['oid', 'name', 'createdAt', 'updatedAt']
 }
 
-export const wsSchemaMeta = {
-  title: 'wsSchemaMeta',
+export const wsSchemaMetaCollections = {
+  title: 'wsSchemaMetaCollections',
   version: 0,
-  description: 'wsSchemaMeta',
+  description: 'wsSchemaMetaCollections',
+  type: 'object',
+  additionalProperties: true,
+    properties: {
+      rxCollectionEnum: {
+        type: 'string',
+        primary: true
+      },
+      fetchedAt: {
+        type: 'integer'
+      }
+    },
+  required: ['rxCollectionEnum', 'fetchedAt']
+}
+
+export const wsSchemaMetaUnsaved = {
+  title: 'wsSchemaMetaUnsaved',
+  version: 0,
+  description: 'wsSchemaMetaUnsaved',
   type: 'object',
   additionalProperties: true,
   properties: {
-    rxCollection: {
+    id: {
       type: 'string',
       primary: true
-    },
-    fetchedAt: {
-      type: 'integer'
     }
   },
-  required: ['rxCollection', 'fetchedAt']
+  required: ['id']
 }
