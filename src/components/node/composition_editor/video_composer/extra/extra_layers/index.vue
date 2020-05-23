@@ -29,17 +29,18 @@ div(:style=`{position: 'relative'}`).column.fit
             :style=`{height: '44px', borderRadius: '10px'}`
             ).row.full-width.items-center.content-center.q-px-md.b-70.q-mb-xs
             span.text-white {{ l.spheres }}
-  //- header
-  div(:style=`{borderRadius: '10px'}`
-    ).row.full-width.items-center.content-center.q-pa-sm.b-100
+  //- footer
+  div(
+    :style=`{borderRadius: '10px', order: 10, marginBottom: '-20px', paddingBottom: '28px'}`
+    ).row.full-width.items-end.content-end.q-pt-sm.q-px-sm.b-90
     //- q-btn(round flat color="white" icon="keyboard_arrow_up").q-mr-sm.b-110
     //- q-btn(round flat color="white" icon="search").q-mr-sm.b-110
-    q-btn(
-      round flat icon="line_style" @click="layersView = 'line'"
-      :color="layersView === 'line' ? 'green' : 'white'").q-mr-sm.b-110
-    q-btn(
-      round flat icon="reorder" @click="layersView = 'normal'"
-      :color="layersView === 'normal' ? 'green' : 'white'").q-mr-sm.b-110
+    //- q-btn(
+    //-   round flat icon="line_style" @click="layersView = 'line'"
+    //-   :color="layersView === 'line' ? 'green' : 'white'").q-mr-sm.b-110
+    //- q-btn(
+    //-   round flat icon="reorder" @click="layersView = 'normal'"
+    //-   :color="layersView === 'normal' ? 'green' : 'white'").q-mr-sm.b-110
     q-btn(
       round flat icon="school" @click="layersWorkspaceShow = !layersWorkspaceShow"
       :color="layersWorkspaceShow ? 'green' : 'white'").q-mr-sm.b-110
@@ -49,7 +50,10 @@ div(:style=`{position: 'relative'}`).column.fit
       round flat icon="edit" @click="layersEdit()"
       :color="layersEditing ? 'green' : 'white'").b-110
   //- body
-  .col.full-width.scroll.q-py-sm
+  div(
+    ref="extraLayersScrollArea"
+    :style=`{}`
+    ).col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-sm
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
         draggable(
@@ -59,6 +63,7 @@ div(:style=`{position: 'relative'}`).column.fit
           @end="layersDragging = false, layersDraggingFutureIndex = null").full-width
           div(
             v-for="(l,li) in meta.layers" :key="l.oid"
+            :ref="`layer-${l.oid}`"
             :style=`{marginBottom: layersView === 'line' ? '0px' : '4px'}`
             ).row.full-width
             //- LEFT
@@ -84,6 +89,8 @@ div(:style=`{position: 'relative'}`).column.fit
               q-btn(flat round icon="drag_indicator" color="white").layer-drag-handle
                 q-menu(auto-close anchor="top left" self="top right")
                   layer-menu()
+    //- margin bottom
+    div(:style=`{height: '1000px'}`).row.full-width
   //- footer: layersSelected
   div(:style=`{overflow: 'hidden'}`).row.full-width
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
@@ -114,7 +121,7 @@ export default {
       layersDragging: false,
       layersDraggingFutureIndex: null,
       layersWorkspaceShow: false,
-      layersView: 'line',
+      layersView: 'normal',
       layersViews: ['line', 'normal']
     }
   },
@@ -128,6 +135,16 @@ export default {
         else {
           this.$tween.to(this, 0.5, {layersEditingToolsWidth: 0})
         }
+      }
+    },
+    'meta.layerIndexPlay': {
+      handler (to, from) {
+        // this.$log('meta.layerIndexPlay CHANGED', to)
+        if (to < 0) return
+        let oid = this.meta.layers[to].oid
+        let ref = this.$refs[`layer-${oid}`][0]
+        let scrollTop = ref.offsetTop - 4
+        this.$tween.to(this.$refs.extraLayersScrollArea, 0.5, {scrollTop: scrollTop})
       }
     }
   },
@@ -209,9 +226,9 @@ export default {
       this.$set(this.composition.layers, index, l)
       // set meta
       this.$emit('meta', ['mode', 'layer'])
-      this.$emit('meta', ['layerIndexPlay', index])
-      this.$emit('meta', ['layerIndex', -1])
       this.$emit('meta', ['layerIndex', index])
+      this.$emit('meta', ['layerIndexPlay', index])
+      // this.$emit('meta', ['layerIndex', -1])
       // scroll to layer?
       this.$log('layerAdd done')
     },

@@ -7,7 +7,7 @@ div
       }`
     ).column.full-width.bg-grey-9
     //- body
-    .col.full-width
+    div(:style=`{position: 'relative'}`).col.full-width
       component(
         v-if="tab" :is="`extra-${tab}`"
         :composition="composition" :meta="meta" :player="player" :styles="styles"
@@ -16,7 +16,11 @@ div
     //- footer
     div(
       v-touch-pan.mouse.vertical.prevent="onExtraPan"
-      :style=`{height: '60px', order: 10, borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-sm.b-100
+      :style=`{
+        position: 'relative', zIndex: 100,
+        height: '60px', order: 10,
+        borderRadius: '10px', zIndex: 100
+      }`).row.full-width.items-center.content-center.q-px-sm.b-100
       //- q-btn(
       //-   flat color="white" icon="keyboard_arrow_left" @click="$emit('cancel')"
       //-   :style=`{width: '42px', height: '42px', background: 'rgba(0,0,0,0.1)'}`)
@@ -30,7 +34,7 @@ div
 
 <script>
 import extraInfo from './extra/extra_info'
-import extraLayers from './extra/extra_layers_new'
+import extraLayers from './extra/extra_layers'
 import extraExplore from './extra/extra_explore'
 import extraSpheres from './extra/extra_spheres'
 

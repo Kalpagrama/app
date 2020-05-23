@@ -93,8 +93,8 @@ div(
 
 <script>
 export default {
-  name: 'layerItem-frames',
-  props: ['player', 'meta', 'layer', 'width'],
+  name: 'layerItem-layerFrames',
+  props: ['player', 'meta', 'layer', 'width', 'mode'],
   data () {
     return {
       frameWidth: 50,
@@ -110,6 +110,15 @@ export default {
     },
     framesWidth () {
       return this.frames * this.frameWidth
+    }
+  },
+  watch: {
+    mode: {
+      handler (to, from) {
+        if (to === 'edit') {
+          this.framesDragToLayer()
+        }
+      }
     }
   },
   methods: {

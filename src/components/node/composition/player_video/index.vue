@@ -42,17 +42,18 @@ div(
   div(
     v-if="false"
     :style=`{
-      position: 'absolute', width: 'calc(50%)', left: '8px', top: '80px',
+      position: 'absolute', width: 'calc(50%)', left: '8px', top: '60px',
       pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
-      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.4}`).row.q-pa-sm.bg-red
-    //- small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
+      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.8
+    }`).row.q-pa-xs.bg-red
+    small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
+    small.full-width ctx/mode: {{ctx}}/{{mode}}
     //- small.full-width now/duration: {{now}}/{{duration}}
-    //- small.full-width ctx/mode: {{ctx}}/{{mode}}
     //- small.full-width start/end: {{layerStart}}/{{layerEnd}}
-    //- small.full-width layerIndex: {{layerIndex}}
-    //- small.full-width layerIndexPlay: {{layerIndexPlay}}
+    small.full-width layerIndex: {{layerIndex}}
+    small.full-width layerIndexPlay: {{layerIndexPlay}}
     //- small.full-width player: {{player ? true : false}}
-    small.full-wdith mini: {{mini}}
+    //- small.full-wdith mini: {{mini}}
   //- video container
   div(
     :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
@@ -133,9 +134,9 @@ div(
       :style=`{
         position: 'absolute', zIndex: 30000, bottom: '1px', transform: 'translate3d(0,0,0)',
       }`)
-    progress-tint(
-      v-if="$q.screen.gt.xs && visible && active && !mini"
-      )
+    //- progress-tint(
+    //-   v-if="$q.screen.gt.xs && visible && active && !mini"
+    //-   )
   slot(name="editor" :meta="meta" :player="player")
 </template>
 

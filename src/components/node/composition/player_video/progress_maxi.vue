@@ -32,6 +32,7 @@
           ).row
       //- progress WRAPPER
       div(
+        v-if="false"
         ref="progressWrapper"
         :style=`{position: 'relative', height: '4px', zIndex: 200, borderRadius: '10px'}`
         ).row.full-width.bg-grey-5.cursor-pointer
