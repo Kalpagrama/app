@@ -54,7 +54,7 @@ div(:style=`{position: 'relative'}`).column.fit
     :class=`{
       'q-pt-sm': $q.screen.width > 600
     }`
-    ).col.full-width.scroll
+    ).col.full-width.scroll.br
     slot(name="header")
     //- header: essence input
     div(:style=`{marginTop: '-20px', paddingTop: '30px'}`

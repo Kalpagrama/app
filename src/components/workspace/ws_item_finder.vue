@@ -1,8 +1,8 @@
 <template lang="pug">
-.column.fit
+div(:style=`{borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).column.fit
   div(
     v-if="options.header"
-    :style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm.b-100
+    :style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm.b-50
     q-btn(
       v-if="options.backButton"
       round flat color="grey-5" icon="keyboard_arrow_left" @click="$emit('cancel')").q-mr-sm

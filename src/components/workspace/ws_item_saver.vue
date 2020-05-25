@@ -31,6 +31,7 @@ export default {
       deep: true,
       handler (to, from) {
         // this.$log('item CHANGED', to)
+        // if (to.synced) return
         this.itemUpdateThrottle()
       }
     }

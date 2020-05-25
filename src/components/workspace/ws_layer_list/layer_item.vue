@@ -44,6 +44,7 @@ export default {
   methods: {
     layerClick () {
       this.$log('layerClick')
+      this.$log('content', this.content)
     },
     layerPreview () {
       this.$log('layerPreview')

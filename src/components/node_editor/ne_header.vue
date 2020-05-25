@@ -5,7 +5,7 @@ div(
     zIndex: 2000,
     borderRadius: $q.screen.width > 600 ? '10px' : '0 0 10px 10px'
   }`
-  ).row.full-width.items-center.content-center.q-px-sm.b-100
+  ).row.full-width.items-center.content-center.q-px-sm.b-50
   //- main navigation
   div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
     q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$emit('cancel')")
@@ -13,8 +13,9 @@ div(
       .row.fit.items-center.content-center.q-px-sm
         span(:style=`{fontSize: '20px'}`).text-white.text-bold Node editor
     q-btn(
+      v-if="false"
       flat color="green" no-caps @click="nodePublish()"
-      :style=`{height: '42px'}`).q-px-sm.b-120
+      :style=`{height: '42px'}`).q-px-sm.b-120.br
       span.text-bold Publish
   //- essence
   div(
@@ -28,10 +29,10 @@ div(
         filled color="white" dark
         label="Whats the essence?"
         :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
-        ).full-width.b-150
+        ).full-width.b-70
   //- pages
   .row.full-width.items-center.content-center
-    div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-100
+    div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width
       kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="$emit('pageId', $event)")
 </template>
 

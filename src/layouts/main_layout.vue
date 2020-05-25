@@ -12,6 +12,17 @@
   border-radius: 10px
   overflow: hidden
   transform: translate3d(0,0,0)
+.k-input
+  border: none
+  border-radius: 10px
+  overflow: hidden
+  padding-left: 16px
+  padding-right: 16px
+  color: white
+  height: 42px
+  &:focus
+    outline: none
+    border: 1px solid rgb(150,150,150)
 </style>
 
 <template lang="pug">
@@ -61,15 +72,15 @@ export default {
     title: 'Kalpagramma'
   },
   methods: {
-    onResize (e) {
-      this.$log('onResize', e)
-      let vv = window.visualViewport
-      this.$log('vv', vv)
-      let height = vv.height
-      this.offsetTop = vv.offsetTop
-      this.$store.commit('ui/stateSet', ['height', height])
-      this.$store.commit('ui/stateSet', ['offsetTop', this.offsetTop])
-    }
+    // onResize (e) {
+    //   this.$log('onResize', e)
+    //   let vv = window.visualViewport
+    //   this.$log('vv', vv)
+    //   let height = vv.height
+    //   this.offsetTop = vv.offsetTop
+    //   this.$store.commit('ui/stateSet', ['height', height])
+    //   this.$store.commit('ui/stateSet', ['offsetTop', this.offsetTop])
+    // }
   },
   async created () {
     this.$log('created')
@@ -96,11 +107,11 @@ export default {
     this.loading = false
   },
   mounted () {
-    window.visualViewport.addEventListener('resize', this.onResize)
-    this.onResize()
+    // window.visualViewport.addEventListener('resize', this.onResize)
+    // this.onResize()
   },
   beforeDestroy () {
-    window.visualViewport.removeEventListener('resize', this.onResize)
+    // window.visualViewport.removeEventListener('resize', this.onResize)
   }
 }
 </script>

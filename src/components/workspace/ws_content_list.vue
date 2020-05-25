@@ -32,20 +32,20 @@ div(:style=`{position: 'relative'}`).column.fit
     slot(name="header")
     //- header: contentCreator, filters, edit
     div(:style=`{marginTop: '-20px', paddingTop: '30px', borderRadius: '10px'}`
-      ).row.full-width.items-start.content-start.justify-center.b-100
+      ).row.full-width.items-start.content-start.justify-center.b-50
       ws-content-creator(
         ref="wsContentCreator"
         :sources="['url', 'device']"
         @searchString="searchString = $event"
         @content="contentCreated"
-        :style=`{}`).b-100
+        :style=`{}`).b-50
       //- tabs
       div(
         :style=`{
           zIndex: 100,
           borderRadius: '0 0 10px 10px', overflow: 'hidden'
         }`
-        ).row.full-width.items-center.content-center.q-px-sm.b-100
+        ).row.full-width.items-center.content-center.q-px-sm.b-50
         .col
           kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
         q-btn(
@@ -69,7 +69,7 @@ div(:style=`{position: 'relative'}`).column.fit
       type="WS_CONTENT"
       :variables=`{selector: {contentType: tabId}}`)
       template(v-slot="{items}")
-        .row.full-width.items-start.q-py-sm
+        .row.full-width.items-start.q-pa-sm
           div(
             v-for="(c,ci) in items" :key="c.oid" @click="contentClick(c)"
             :style=`{minHeight: '40px', borderRadius: '10px', overflow: 'hidden'}`

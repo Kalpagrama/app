@@ -16,9 +16,9 @@ div(:style=`{position: 'relative'}`).row.fit
     div(
       :style=`{
         position: 'relative',
+        maxWidth: 600+'px',
         height: $q.screen.height+'px',
-        minHeight: $q.screen.height+'px',
-        maxWidth: $store.state.ui.maxWidthPage+'px'
+        maxHeight: $q.screen.height*0.8+'px'
       }`).row.full-width
       ws-item-finder(
         v-if="true"
@@ -64,11 +64,12 @@ div(:style=`{position: 'relative'}`).row.fit
       slot(name="header")
       //- header
       div(
+        v-if="false"
         :style=`{
           position: 'sticky', top: '-20px', zIndex: 1000,
           marginTop: '-20px', paddingTop: '30px',
           borderRadius: '0 0 10px 10px'
-        }`).row.full-width.q-pt-md.q-pb-sm.q-px-sm.b-80
+        }`).row.full-width.q-pt-md.q-pb-sm.q-px-sm.b-80.br
         div(:style=`{width: itemsEditToolsWidth+'px'}`).row.full-height
         q-btn(
           flat round icon="view_headline" @click="itemsView = 'list'"
