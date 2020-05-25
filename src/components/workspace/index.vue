@@ -22,6 +22,7 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit
         ws-settings(v-if="$route.params.page === 'settings'")
         ws-spheres(v-if="$route.params.page === 'spheres'")
+        ws-layers(v-if="$route.params.page === 'layers'")
         ws-items(
           v-else
           ctx="workspace"
@@ -48,6 +49,7 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
 
 <script>
 import wsItems from './ws_items'
+import wsLayers from './ws_layers'
 import wsSpheres from './ws_spheres'
 import wsSettings from './ws_settings'
 import wsItemSaver from './ws_item_saver'
@@ -55,7 +57,7 @@ import menuRight from './menu_right'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsSpheres, wsSettings, wsItemSaver, menuRight},
+  components: {wsItems, wsLayers, wsSpheres, wsSettings, wsItemSaver, menuRight},
   props: [],
   data () {
     return {
@@ -64,6 +66,7 @@ export default {
       pages: [
         {id: 'note', name: 'Notes'},
         {id: 'content', name: 'Contents'},
+        {id: 'layers', name: 'Layers'},
         {id: 'node', name: 'Nodes'},
         {id: 'chain', name: 'Chains'},
         {id: 'spheres', name: 'Spheres'},

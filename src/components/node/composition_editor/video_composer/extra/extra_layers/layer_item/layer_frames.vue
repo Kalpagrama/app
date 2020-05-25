@@ -23,7 +23,7 @@ div(
           borderRight: fi === frames-1 ? 'none' : '1px solid rgb(120,120,120)',
         }`
         ).row.items-center.content-center.justify-center
-        span(:style=`{userSelect: 'none'}`).text-grey-8 {{ fi }}
+        span(:style=`{userSelect: 'none'}`).text-grey-8 {{ $time(((fi*frameWidth)/framesWidth)*meta.duration) }}
       //- now
       div(
         v-show="!poingDragging"

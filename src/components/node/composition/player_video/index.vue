@@ -129,10 +129,11 @@ div(
         maxWidth: itemsCount > 1 ? '75%' : 'calc(100% - 80px)'
       }`)
     progress-mini(
-      v-if="ctx !== 'workspace' && !mini"
-      :player="player" :meta="meta"
+      v-if="true"
+      :ctx="ctx" :player="player" :meta="meta"
+      :start="layerStart || 0" :end="layerEnd || duration"
       :style=`{
-        position: 'absolute', zIndex: 30000, bottom: '1px', transform: 'translate3d(0,0,0)',
+        position: 'absolute', zIndex: 30000, bottom: '0px', transform: 'translate3d(0,0,0)',
       }`)
     //- progress-tint(
     //-   v-if="$q.screen.gt.xs && visible && active && !mini"

@@ -29,7 +29,7 @@ export default {
   data () {
     return {
       mode: 'norm',
-      height: 44
+      height: 50
     }
   },
   computed: {
@@ -37,7 +37,7 @@ export default {
       return {
         norm: {
           fn: () => {
-            this.$tween.to(this, 0.5, {height: 44})
+            this.$tween.to(this, 0.5, {height: 50})
             this.$emit('meta', ['mode', 'watch'])
             this.$emit('meta', ['layerIndexPlay', -1])
           }

@@ -2,8 +2,7 @@
 .row.full-width.items-start.content-start
   //- kalpa-keyboard-events(@keyup="windowKeyup")
   //- pregress wrapper
-  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-lg
-    //- div(:style=`{position: 'absolute', top: '15px', background: 'rgba(0,0,0,0.2)', pointerEvents: 'none'}`).row.fit
+  div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.q-px-sm
     //- progress bar & time
     div(
       @click="progressClick"
@@ -12,24 +11,6 @@
       @mouseleave="progressMouseleave"
       :style=`{position: 'relative', zIndex: 300, height: '30px', paddingBottom: '0px', order: -1}`
       ).row.full-width.items-center.content-center.cursor-pointer
-      //- progress LAYERS
-      div(
-        v-if="false"
-        :style=`{
-          position: 'absolute', zIndex: 300, top: '-50px',
-          height: '50px', borderRadius: '10px'
-        }`
-        ).row.full-width.b-100
-        div(
-          v-for="(l,li) in meta.layers" :key="li"
-          :style=`{
-            position: 'absolute',
-            height: '10px', borderRadius: '5px',
-            left: (l.figuresAbsolute[0].t/meta.duration)*100+'%',
-            width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/meta.duration)*100+'%',
-            background: l.color
-          }`
-          ).row
       //- progress WRAPPER
       div(
         v-if="false"
@@ -92,10 +73,6 @@
             v-if="$q.screen.width > 600"
             :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)', userSelect: 'none', padding: '10.5px'}`
             ).text-white.q-mr-sm {{ $time(now)+' / '+$time(duration) }}
-          span(
-            v-if="false"
-            :style=`{background: 'rgba(0,0,0,0.3)', padding: '10.5px'}`
-            ).text-white.q-mr-sm {{progressPercentWidth}}
           q-btn(
             round flat @click="videoForward(0)"
             color="white"

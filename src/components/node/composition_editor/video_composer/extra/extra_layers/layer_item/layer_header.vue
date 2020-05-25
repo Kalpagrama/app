@@ -1,8 +1,15 @@
+<style lang="sass" scoped>
+.layer-tint
+  cursor: pointer
+  &:hover
+    background: rgba(150,150,150,0.4) !important
+</style>
+
 <template lang="pug">
 div(
   :style=`{
     position: 'relative',
-    height: 44+'px'
+    height: 50+'px'
   }`
   ).row.full-width.items-center.content-center
   //- editor
@@ -21,7 +28,7 @@ div(
     :style=`{
       position: 'absolute', zIndex: 200,
     }`
-    ).row.fit
+    ).row.fit.layer-tint
   //- minibar
   div(:style=`{position: 'absolute', top: '0px', height: '8px', borderRadius: '4px', overflow: 'hidden', pointerEvents: 'none'}`).row.full-width.b-100
     div(
@@ -37,10 +44,14 @@ div(
       ).row
   //- body
   .col.full-height
-    .row.fit.items-center.content-center.q-px-md
-      span(
-        v-show="layerNameShow"
-        @click="layerNameClick()").text-white {{ layerName }}
+    .row.fit.items-center.content-center.q-px-sm
+      q-btn(
+        v-if="layerNameShow"
+        @click="layerNameClick()"
+        flat no-caps color="white"
+        :class=`{
+          'b-110': layer.spheres.length === 0
+        }`) {{ layerName }}
   small.text-white {{ $time(layer.figuresAbsolute[0].t) }} -
   small.text-white.q-mx-xs {{ $time(layer.figuresAbsolute[1].t) }} /
   small.text-white.q-mr-sm {{ $time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t) }}

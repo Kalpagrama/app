@@ -42,13 +42,18 @@ div(:style=`{position: 'relative'}`).column.fit
     //-   round flat icon="reorder" @click="layersView = 'normal'"
     //-   :color="layersView === 'normal' ? 'green' : 'white'").q-mr-sm.b-110
     q-btn(
-      round flat icon="school" @click="layersWorkspaceShow = !layersWorkspaceShow"
-      :color="layersWorkspaceShow ? 'green' : 'white'").q-mr-sm.b-110
-    .col
-    q-btn(round flat color="white" icon="sort" @click="layersSort()").b-110.q-mr-sm
-    q-btn(
       round flat icon="edit" @click="layersEdit()"
       :color="layersEditing ? 'green' : 'white'").b-110
+    //- q-btn(
+    //-   round flat icon="school" @click="layersWorkspaceShow = !layersWorkspaceShow"
+    //-   :color="layersWorkspaceShow ? 'green' : 'white'").q-mr-sm.b-110
+    .col
+    q-btn(round flat color="white" icon="search").b-110.q-mr-sm
+    q-btn(round flat color="white" icon="sort" @click="layersSort()").b-110.q-mr-sm
+    q-btn(
+      round push color="green" icon="add" no-caps @click="layerAddFromWorkspace()"
+      :style=`{borderRadius: '50%'}`
+      ).q-mx-md
   //- body
   div(
     ref="extraLayersScrollArea"
@@ -97,9 +102,9 @@ div(:style=`{position: 'relative'}`).column.fit
       div(
         v-if="layersSelected.length > 0"
         :style=`{borderRadius: '10px'}`).row.full-width.q-pa-sm.b-80
-        q-btn(flat color="white" no-caps).q-mr-sm.b-90 {{layersSelected.length}}
-        q-btn(flat no-caps color="white" @click="layersSelectedDrop()").q-mr-sm.b-90 Drop
-        q-btn(flat no-caps color="white" @click="layersSelectedDelete()").q-mr-sm.b-90 Delete
+        q-btn(flat color="white" icon="clear" @click="layersSelectedDrop()"
+          :style=`{width: '40px'}`).q-mr-sm.b-90
+        q-btn(flat no-caps color="red" @click="layersSelectedDelete()").q-mr-sm.b-90 Delete
         q-btn(flat no-caps color="white" @click="layersSelectedCreateNode()").q-mr-sm.b-90 Create node
 </template>
 
@@ -138,9 +143,10 @@ export default {
       }
     },
     'meta.layerIndexPlay': {
-      handler (to, from) {
+      async handler (to, from) {
         // this.$log('meta.layerIndexPlay CHANGED', to)
         if (to < 0) return
+        await this.$wait(100)
         let oid = this.meta.layers[to].oid
         let ref = this.$refs[`layer-${oid}`][0]
         let scrollTop = ref.offsetTop - 4
@@ -198,6 +204,12 @@ export default {
     },
     layerDelete (l, li) {
       this.$log('layerDelete', l, li)
+    },
+    layerAddFromWorkspace () {
+      this.$log('layerAddFromWorkspace')
+    },
+    layerAddFromContent () {
+      this.$log('layerAddFromContent')
     },
     async layerAdd (startInput, endInput, layerInput) {
       this.$log('layerAdd start')
