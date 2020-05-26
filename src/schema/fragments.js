@@ -60,7 +60,7 @@ const objectFragment = gql`${metaFragment} ${objectShortFragment}
     subscriberCnt
     subscribers {...objectShortFragment}
     meta{ ...metaFragment}
-    revision
+    rev
   }
 `
 

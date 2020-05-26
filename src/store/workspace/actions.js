@@ -193,7 +193,7 @@ class WsLocal {
           if (indx >= 0) {
             let itemServer = items[indx]
             // серверная ревизия должна совпадать и есть несохраненные изменения
-            if (itemServer.revision === item.revision && item.revisionClient > itemServer.revisionClient) {
+            if (itemServer.rev === item.rev && item.revisionClient > itemServer.revisionClient) {
               if (operation === OperationEnum.UPSERT) {
                 items[indx] = item // заменяем
               } else if (operation === OperationEnum.DELETE) {
@@ -382,21 +382,21 @@ class WsLocal {
     let { type, wsItem: itemServer, wsRevision } = event
     assert(itemServer.oid && itemServer.name != null && itemServer.wsItemKey, 'assert itemServer !check')
     assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
-    assert(itemServer.revision, '!itemServer.revision')
+    assert(itemServer.rev, '!itemServer.rev')
     assert(itemServer.revisionClient, '!itemServer.revisionClient')
     // обновим wsLocalChanges
     await this.updateLocalChanges(value => {
       let itemLocalChanges = value[itemServer.wsItemKey]
       if (itemLocalChanges) { // у нас были изменения этого item!
-        assert(itemLocalChanges.item && itemLocalChanges.item.revision >= 0 && itemLocalChanges.item.revisionClient, 'bad item:' + JSON.stringify(itemLocalChanges.item))
-        if (itemLocalChanges.item.revision === itemServer.revision - 1) {
+        assert(itemLocalChanges.item && itemLocalChanges.item.rev >= 0 && itemLocalChanges.item.revisionClient, 'bad item:' + JSON.stringify(itemLocalChanges.item))
+        if (itemLocalChanges.item.rev === itemServer.rev - 1) {
           if (itemLocalChanges.item.revisionClient === itemServer.revisionClient) {
             logD('несохраненных изменений больше нет')
             delete value[itemServer.wsItemKey]
             this.context.dispatch('cache/update', {
               key: itemServer.wsItemKey,
               setter: item => {
-                item.revision = itemServer.revision
+                item.rev = itemServer.rev
                 item.oid = itemServer.oid
                 return item
               }
@@ -406,7 +406,7 @@ class WsLocal {
             this.context.dispatch('cache/update', {
               key: itemServer.wsItemKey,
               setter: item => {
-                item.revision = itemServer.revision
+                item.rev = itemServer.rev
                 item.oid = itemServer.oid
                 return item
               }
@@ -418,7 +418,7 @@ class WsLocal {
             this.changeItem(itemServer, type === 'WS_ITEM_DELETED' ? OperationEnum.DELETE : OperationEnum.UPSERT, true) // setter не может быть async. выполняем в фоне
           }
         } else {
-          logE('Мы меняли данные. Но параллельно данные изменены из другого клиента(revision)!', itemLocalChanges.item, itemServer)
+          logE('Мы меняли данные. Но параллельно данные изменены из другого клиента(rev)!', itemLocalChanges.item, itemServer)
           // ничего не поделать - удаляем локальные изменения, принимаем версию сервера. На сервер не шлем(externalChange = true).
           delete value[itemServer.wsItemKey]
           this.changeItem(itemServer, type === 'WS_ITEM_DELETED' ? OperationEnum.DELETE : OperationEnum.UPSERT, true) // setter не может быть async. выполняем в фоне
@@ -451,7 +451,7 @@ export const wsItems = async (context, { collection, filterFunc, sortFunc }) => 
 }
 export const wsItemUpsert = async (context, item) => {
   if (!item.wsItemKey) item.wsItemKey = makeWsItemKey(item.wsItemType) // генерируем wsItemKey для нового элемента
-  if (!item.revision) item.revision = 0
+  if (!item.rev) item.rev = 0
   if (!item.revisionClient) item.revisionClient = 0
   item.revisionClient++ // каждое измение увеличивает revisionClient
   return await wsLocal.changeItem(item, OperationEnum.UPSERT)

@@ -43,9 +43,10 @@ export default {
       }
     },
     items: {
-      handler (to, from) {
-        this.$log('items CHANGED', to)
-        this.$emit('itemsLength', to.length)
+      deep: false,
+      immediate: false,
+      handler(to, from){
+        this.$log('items CHANGED', 'from=', from, ', to=', to)
       }
     }
   },
@@ -86,19 +87,10 @@ export default {
           res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
           break
         case 'WS_CONTENT' :
-          this.$rxdb.WS_CONTENT.find(variables || null).$.subscribe(results => {
-            this.items = results
-          })
-          break
         case 'WS_NODE':
-          this.$rxdb.WS_NODE.find(variables || null).$.subscribe(results => {
-            this.items = results
-          })
-          break
         case 'WS_SPHERE':
-          this.$rxdb.WS_SPHERE.find(variables || null).$.subscribe(results => {
-            this.items = results
-          })
+          this.$log('items find...')
+          this.items = await this.$rxdb.findWs(this.type, null)
           break
         default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }

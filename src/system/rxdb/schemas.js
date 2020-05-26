@@ -8,10 +8,6 @@ export const wsSchemaNode = {
       type: 'string',
       primary: true
     },
-    changesFromClient: {
-      type: 'boolean',
-      default: false
-    },
     oid: {
       type: 'string'
     },
@@ -22,13 +18,13 @@ export const wsSchemaNode = {
       type: 'string',
       default: '!_unnamed_!'
     },
-    revisionServer: {
+    rev: {
       type: 'integer',
       default: 0
     },
-    revisionClient: {
-      type: 'integer',
-      default: 0
+    changedBy: {
+      type: 'string',
+      default: 'USER'
     },
     createdAt: {
       type: 'integer',
@@ -67,7 +63,7 @@ export const wsSchemaNode = {
       type: 'string'
     }
   },
-  required: ['id', 'wsItemType', 'revisionServer', 'revisionClient', 'createdAt', 'updatedAt'],
+  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
   indexes: ['oid', 'name', 'createdAt', 'updatedAt']
 }
 export const wsSchemaContent = {
@@ -75,15 +71,10 @@ export const wsSchemaContent = {
   version: 0,
   description: 'wsSchemaContent',
   type: 'object',
-  additionalProperties: true,
   properties: {
     id: {
       type: 'string',
       primary: true
-    },
-    changesFromClient: {
-      type: 'boolean',
-      default: false
     },
     oid: {
       type: 'string'
@@ -95,13 +86,13 @@ export const wsSchemaContent = {
       type: 'string',
       default: '!_unnamed_!'
     },
-    revisionServer: {
+    rev: {
       type: 'integer',
       default: 0
     },
-    revisionClient: {
-      type: 'integer',
-      default: 0
+    changedBy: {
+      type: 'string',
+      default: 'USER'
     },
     createdAt: {
       type: 'integer',
@@ -143,7 +134,7 @@ export const wsSchemaContent = {
       type: 'object'
     }
   },
-  required: ['id', 'wsItemType', 'revisionServer', 'revisionClient', 'createdAt', 'updatedAt'],
+  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
   indexes: ['oid', 'name', 'createdAt', 'updatedAt']
 }
 export const wsSchemaChain = {
@@ -151,15 +142,10 @@ export const wsSchemaChain = {
   version: 0,
   description: 'wsSchemaChain',
   type: 'object',
-  additionalProperties: true,
   properties: {
     id: {
       type: 'string',
       primary: true
-    },
-    changesFromClient: {
-      type: 'boolean',
-      default: false
     },
     oid: {
       type: 'string'
@@ -171,13 +157,13 @@ export const wsSchemaChain = {
       type: 'string',
       default: '!_unnamed_!'
     },
-    revisionServer: {
+    rev: {
       type: 'integer',
       default: 0
     },
-    revisionClient: {
-      type: 'integer',
-      default: 0
+    changedBy: {
+      type: 'string',
+      default: 'USER'
     },
     createdAt: {
       type: 'integer',
@@ -191,7 +177,7 @@ export const wsSchemaChain = {
       type: 'integer'
     }
   },
-  required: ['id', 'wsItemType', 'revisionServer', 'revisionClient', 'createdAt', 'updatedAt'],
+  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
   indexes: ['oid', 'name', 'createdAt', 'updatedAt']
 }
 export const wsSchemaSphere = {
@@ -199,15 +185,10 @@ export const wsSchemaSphere = {
   version: 0,
   description: 'wsSchemaSphere',
   type: 'object',
-  additionalProperties: true,
   properties: {
     id: {
       type: 'string',
       primary: true
-    },
-    changesFromClient: {
-      type: 'boolean',
-      default: false
     },
     oid: {
       type: 'string'
@@ -219,13 +200,13 @@ export const wsSchemaSphere = {
       type: 'string',
       default: '!_unnamed_!'
     },
-    revisionServer: {
+    rev: {
       type: 'integer',
       default: 0
     },
-    revisionClient: {
-      type: 'integer',
-      default: 0
+    changedBy: {
+      type: 'string',
+      default: 'USER'
     },
     createdAt: {
       type: 'integer',
@@ -242,39 +223,40 @@ export const wsSchemaSphere = {
       type: 'string'
     }
   },
-  required: ['id', 'wsItemType', 'revisionServer', 'revisionClient', 'createdAt', 'updatedAt'],
+  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
   indexes: ['oid', 'name', 'createdAt', 'updatedAt']
 }
 
-export const wsSchemaMetaCollections = {
-  title: 'wsSchemaMetaCollections',
+export const wsSchemaMeta = {
+  title: 'wsSchemaMeta',
   version: 0,
-  description: 'wsSchemaMetaCollections',
+  description: 'wsSchemaMeta',
   type: 'object',
-  additionalProperties: true,
     properties: {
-      rxCollectionEnum: {
+      key: {
         type: 'string',
         primary: true
       },
-      fetchedAt: {
-        type: 'integer'
+      value: {
+        type: 'string'
       }
     },
-  required: ['rxCollectionEnum', 'fetchedAt']
+  required: ['key', 'value']
 }
 
-export const wsSchemaMetaUnsaved = {
-  title: 'wsSchemaMetaUnsaved',
+export const wsSchemaLocalChanges = {
+  title: 'wsSchemaLocalChanges',
   version: 0,
-  description: 'wsSchemaMetaUnsaved',
+  description: 'wsSchemaLocalChanges',
   type: 'object',
-  additionalProperties: true,
   properties: {
     id: {
       type: 'string',
       primary: true
+    },
+    operation: {
+      type: 'string'
     }
   },
-  required: ['id']
+  required: ['id', 'operation']
 }

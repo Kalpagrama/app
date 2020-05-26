@@ -46,6 +46,7 @@ export default {
     async wsClear () {
       if (!confirm('Do really want to clear your workspace?')) return
       this.$log('wsClear start')
+      await this.$rxdb.clearModule('WS')
       let wsClear = await this.$store.dispatch('workspace/wsClear')
       this.$log('wsClear done', wsClear)
       window.location.reload()

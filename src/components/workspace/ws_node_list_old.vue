@@ -20,34 +20,16 @@ div(:style=`{position: 'relative'}`).column.fit
       }`)
   //- node editor
   q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
-    ws-item-saver(v-if="node" :value="node")
-      template(v-slot=`{item}`)
-        node-editor(
-          ctx="workspace"
-          :node="item"
-          @cancel="nodeEditorOpened = false"
-          :style=`{
-            maxWidth: $store.state.ui.maxWidthPage+'px',
-            minHeight: $q.screen.height+'px',
-            maxHeight: $q.screen.height+'px',
-            height: $q.screen.height+'px',
-          }`)
-  //- nodes selected
-  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      v-if="nodesSelected.length > 0"
+    node-editor(
+      ctx="workspace"
+      :node="node"
+      @cancel="nodeEditorOpened = false"
       :style=`{
-        position: 'absolute', zIndex: 900,
-        bottom: $q.screen.width > 600 ? '0px' : '46px',
-        borderRadius: '10px 10px 0 0', overflow: 'hidden',
-      }`).row.full-width.q-px-sm.q-py-sm.q-pb-md.b-90
-      q-btn(
-        flat icon="clear" color="white" @click="nodesSelectedDrop()"
-        :style=`{width: '36px'}`).b-110.q-mr-sm
-      q-btn(
-        flat color="white" no-caps @click="nodesSelectedDelete()"
-        :style=`{}`
-        ).b-110.q-mr-sm Delete
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+        minHeight: $q.screen.height+'px',
+        maxHeight: $q.screen.height+'px',
+        height: $q.screen.height+'px',
+      }`)
   //- body
   div(
     ref="wsNodeListScrollArea"
@@ -262,9 +244,9 @@ export default {
       // do something
       let x = '2'
     },
-    async nodeClick (rxDoc) {
-      this.$log('nodeClick', rxDoc)
-      this.node = rxDoc
+    async nodeClick (item) {
+      this.$log('nodeClick', item)
+      this.node = item
       await this.$wait(300)
       this.nodeEditorOpened = true
     },
@@ -279,10 +261,10 @@ export default {
         layout: 'PIP',
         stage: 'draft'
       }
-      let rxDoc = await this.$rxdb.upsertItem(nodeInput)
-      this.$log('nodeAddStart rxDoc', rxDoc)
+      let item = await this.$rxdb.upsertItem(nodeInput)
+      this.$log('nodeAddStart item', item)
       this.nodeSearchString = ''
-      this.nodeClick(rxDoc)
+      this.nodeClick(item)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)
