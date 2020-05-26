@@ -160,8 +160,8 @@ export const get = async (context, { oid, priority }) => {
   let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
   // logD('objects/get action complete', oid)
   assert(objectFull, '!itemFull')
-  // assert(objectFull.revision, '!objectFull.revision')
-  assert(objectFull.revision >= 0, 'objectFull.revision >= 0')
+  // assert(objectFull.rev, '!objectFull.rev')
+  assert(objectFull.rev >= 0, 'objectFull.rev >= 0')
   return objectFull
 }
 
@@ -179,18 +179,18 @@ export const update = async (context, { oid, path, newValue, setter, actualAge }
     newValue = await toBase64(file)
   }
   let updateItemFunc = async (updatedItem) => {
-    assert(updatedItem.oid && updatedItem.revision)
+    assert(updatedItem.oid && updatedItem.rev)
     assert(oid && path != null && newValue !== undefined)
     let { data: { objectChange } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectFullFragment}
         mutation objectChange ($oid: OID!, $path: String!, $newValue: RawJSON!, $revision: Int!) {
-          objectChange (oid: $oid, path: $path, newValue: $newValue, revision: $revision){
+          objectChange (oid: $oid, path: $path, newValue: $newValue, rev: $revision){
             ...objectFullFragment
           }
         }
       `,
-      variables: { oid, path, newValue, revision: updatedItem.revision }
+      variables: { oid, path, newValue, rev: updatedItem.rev }
     })
     return {item: objectChange, actualAge: 'hour'}
   }

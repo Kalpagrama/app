@@ -1,6 +1,7 @@
 <script>
 import { throttle } from 'quasar'
 import assert from 'assert'
+import { isRxDocument } from 'rxdb'
 
 export default {
   render () {
@@ -9,53 +10,67 @@ export default {
     })
   },
   name: 'wsItemSaver',
-  props: ['value'],
+  props: ['value'], // original item
   data () {
     return {
-      subscribed: false,
-      item: null
+      item: null, // copy of original item
+      rxDocSubscription: null,
     }
   },
   watch: {
     value: {
-      deep: false,
+      deep: true,
       immediate: true,
       handler (to, from) {
-        this.$log('value CHANGED', to)
-        if (this.subscribed) return
-        to.$.subscribe(this.valueChanged)
-        this.subscribed = true
+        // this.$log('original CHANGED', to)
+        // this.subscribeRx(to)
+        this.item = to
       }
     },
     item: {
       deep: true,
+      immediate: true,
       handler (to, from) {
-        this.$log('item CHANGED', to)
-        this.itemUpdateThrottle()
+        // this.$log('copy CHANGED', to)
+        // if (!to) return
+        // if (to.changedBy === 'USER') this.itemUpdateThrottle()
       }
     }
   },
   methods: {
-    valueChanged (change) {
-      this.$log('valueChanged', change)
-      this.item = change
-    },
-    async itemUpdate () {
-      try {
-        this.$log('itemUpdate start')
-        await this.$rxdb.upsertItem(this.item)
-        this.$log('itemUpdate done')
-      } catch (e) {
-        this.$logE('itemUpdate error', e)
-      } finally {
-      }
-    }
+    // subscribeRx(rxDoc){
+    //   assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
+    //   if (this.rxDocSubscription) return
+    //   // this.$log('subscribe to rxDoc:', rxDoc)
+    //   this.rxDocSubscription = rxDoc.$.subscribe(change => {
+    //     this.$log('rxDoc changed', change)
+    //     change.changedBy = 'SYSTEM'
+    //     this.item = JSON.parse(JSON.stringify(change))
+    //   })
+    // },
+    // unsubscribeRx(){
+    //   if (!this.rxDocSubscription) return
+    //   this.rxDocSubscription.unsubscribe()
+    //   delete this.rxDocSubscription
+    // },
+    //
+    // async itemUpdate () {
+    //   try {
+    //     this.$log('itemUpdate start')
+    //     this.unsubscribeRx()
+    //     await this.$rxdb.upsertItem(this.item)
+    //     if (this.value) this.subscribeRx(this.value)
+    //     this.$log('itemUpdate done')
+    //   } catch (e) {
+    //     this.$logE('itemUpdate error', e)
+    //   }
+    // }
   },
   created () {
-    this.itemUpdateThrottle = throttle(this.itemUpdate, 1000)
+    // this.itemUpdateThrottle = throttle(this.itemUpdate, 1000)
   },
   async beforeDestroy () {
-    await this.itemUpdate()
+    // await this.itemUpdate()
   }
 }
 </script>

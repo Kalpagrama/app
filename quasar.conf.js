@@ -9,10 +9,10 @@ module.exports = function (ctx) {
   return {
     preFetch: true,
     boot: [
+      'log',
       'rxdb',
       'cache',
       'notify',
-      'log',
       'i18n',
       'services',
       'apollo',

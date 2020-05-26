@@ -30,7 +30,7 @@ export function clear (state) {
 // }
 
 export function setItem (state, { key, item }) {
-  // logD(`cache/updateItem ${key} ${item.revision}`)
+  // logD(`cache/updateItem ${key} ${item.rev}`)
   // normalizeWSItem(item)
   let existing = state.cachedItems[key]
   if (existing === item) return // оптимтизация (один и тот же объект)
@@ -45,7 +45,7 @@ export function setItem (state, { key, item }) {
 
 // изменит
 export function updateItem (state, { key, path, newValue, setter }) {
-  // logD(`cache/updateItem ${key} ${newValue.revision}`)
+  // logD(`cache/updateItem ${key} ${newValue.rev}`)
   let obj = state.cachedItems[key]
   if (!obj) return // обязательное условие!
   if (obj === newValue) return // оптимтизация (один и тот же объект)
@@ -70,8 +70,8 @@ export function updateItem (state, { key, path, newValue, setter }) {
   } else { // изменился весь объект
     assert(typeof newValue === 'object', 'typeof newValue === object')
     // normalizeWSItem(newValue)
-    if (newValue && obj.revision){
-      newValue.revision = Math.max(obj.revision, newValue.revision) // иногда ревизия на клиенте отстает (см src/components/node/node_editor/index.vue)
+    if (newValue && obj.rev){
+      newValue.rev = Math.max(obj.rev, newValue.rev) // иногда ревизия на клиенте отстает (см src/components/node/node_editor/index.vue)
     }
     for (let prop in newValue) {
       Vue.set(obj, prop, newValue[prop])

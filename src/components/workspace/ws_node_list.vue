@@ -19,18 +19,18 @@ div(:style=`{position: 'relative'}`).column.fit
   //- dialogs
   //- node editor
   q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
-    ws-item-saver(v-if="node" :value="node")
+    // ws-item-saver(v-if="node" :value="node")
       template(v-slot=`{item}`)
-        node-editor(
-          ctx="workspace"
-          :node="item"
-          @cancel="nodeEditorOpened = false"
-          :style=`{
-            maxWidth: $store.state.ui.maxWidthPage+'px',
-            minHeight: $q.screen.height+'px',
-            maxHeight: $q.screen.height+'px',
-            height: $q.screen.height+'px',
-          }`)
+    node-editor(
+      ctx="workspace"
+      :node="node"
+      @cancel="nodeEditorOpened = false"
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+        minHeight: $q.screen.height+'px',
+        maxHeight: $q.screen.height+'px',
+        height: $q.screen.height+'px',
+      }`)
   //- body
   div(
     ref="wsNodeListScrollArea"
@@ -192,9 +192,9 @@ export default {
       }
       return arr
     },
-    async nodeClick (rxDoc) {
-      this.$log('nodeClick', rxDoc)
-      this.node = rxDoc
+    async nodeClick (item) {
+      this.$log('nodeClick', item)
+      this.node = item
       await this.$wait(300)
       this.nodeEditorOpened = true
     },
@@ -208,10 +208,10 @@ export default {
         category: 'FUN',
         layout: 'PIP'
       }
-      let rxDoc = await this.$rxdb.upsertItem(nodeInput)
-      this.$log('nodeAddStart rxDoc', rxDoc)
+      let item = await this.$rxdb.upsertItem(nodeInput)
+      this.$log('nodeAddStart item', item)
       this.nodeSearchString = ''
-      this.nodeClick(rxDoc)
+      this.nodeClick(item)
     },
     scrollTo (val) {
       this.$log('scrollTo', val)

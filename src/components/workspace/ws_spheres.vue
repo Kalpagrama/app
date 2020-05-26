@@ -112,8 +112,9 @@ export default {
       }
       // TODO add color picker
       this.$log('sphereInput', sphereInput)
-      let sphere = await this.$store.dispatch('workspace/wsItemUpsert', sphereInput)
-      this.$log('sphereInput done', sphere)
+      let rxDoc = await this.$rxdb.upsertItem(sphereInput)
+      // let sphere = await this.$store.dispatch('workspace/wsItemUpsert', sphereInput)
+      this.$log('sphereInput done', rxDoc)
     }
   },
   mounted () {

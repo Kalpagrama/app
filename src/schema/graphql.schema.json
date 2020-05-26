@@ -1715,7 +1715,7 @@
             "deprecationReason": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": "версия изменяемого объекта(например, ядро в мастерской, или пользователь)",
             "args": [],
             "type": {
@@ -3028,7 +3028,7 @@
           },
           {
             "name": "objectChange",
-            "description": "revision - версия объекта(по мнению клиента) изменить свойство объекта.\nНапример User. path ex: 'settings.general.language'",
+            "description": "rev - версия объекта(по мнению клиента) изменить свойство объекта.\nНапример User. path ex: 'settings.general.language'",
             "args": [
               {
                 "name": "oid",
@@ -3073,7 +3073,7 @@
                 "defaultValue": null
               },
               {
-                "name": "revision",
+                "name": "rev",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
@@ -3833,7 +3833,7 @@
             "defaultValue": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": "версия объекта по мнению клиента (нужно при апдейте)",
             "type": {
               "kind": "SCALAR",
@@ -4301,7 +4301,7 @@
             "defaultValue": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": "версия объекта по мнению клиента (нужно при апдейте)",
             "type": {
               "kind": "SCALAR",
@@ -4613,7 +4613,7 @@
             "deprecationReason": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": null,
             "args": [],
             "type": {
@@ -4977,7 +4977,7 @@
             "deprecationReason": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": null,
             "args": [],
             "type": {
@@ -6265,7 +6265,7 @@
             "deprecationReason": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": null,
             "args": [],
             "type": {
@@ -7760,7 +7760,7 @@
             "deprecationReason": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": null,
             "args": [],
             "type": {
@@ -9026,7 +9026,7 @@
             "deprecationReason": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": null,
             "args": [],
             "type": {
@@ -9238,7 +9238,7 @@
             "deprecationReason": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": null,
             "args": [],
             "type": {
@@ -9935,7 +9935,7 @@
             "deprecationReason": null
           },
           {
-            "name": "revision",
+            "name": "rev",
             "description": null,
             "args": [],
             "type": {
