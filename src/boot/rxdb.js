@@ -1,12 +1,10 @@
-import Vue from 'vue'
 import assert from 'assert'
-import { Workspace, WsCollectionEnum, Mutex } from 'src/system/rxdb/workspace'
+import { Workspace, WsCollectionEnum } from 'src/system/rxdb/workspace'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { addRxPlugin, createRxDatabase, isRxDocument, isRxQuery, removeRxDatabase } from 'rxdb'
-import { skip } from 'rxjs/operators'
+import { addRxPlugin } from 'rxdb'
+
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
-import debounce from 'lodash/debounce'
-// import difference from 'lodash/difference'
+import { ReactiveItemHolder, ReactiveListHolder } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
@@ -23,188 +21,10 @@ const RxModuleEnum = Object.freeze({
 let rxdbProxy
 let rxdbWrapper
 
-// класс-обертка над rxDoc для реактивности
-class ReactiveItemHolder {
-  constructor (rxDoc) {
-    assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
-    logD('ReactiveItemHolder::constructor', rxDoc.id)
-    this.rxDoc = rxDoc
-    this.mutex = new Mutex()
-    this.vm = new Vue({
-      data: {
-        item: rxDoc.toJSON()
-      }
-    })
-    this.rxDocSubscribe()
-    this.itemSubscribe()
-  }
-
-  rxDocSubscribe () {
-    const f = this.rxDocSubscribe
-    if (this.rxDocSubscription) return
-    // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
-    this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async change => {
-      try {
-        await this.mutex.lock()
-        this.itemUnsubscribe()
-        logD(f, 'rxDoc changed', change)
-        for (let key in change) this.vm.item[key] = change[key] // изменившиеся и добавившиеся
-        for (let key in this.vm.item) {
-          if (!(key in change)) delete this.vm.item[key] // удалившиеся
-        }
-      } finally {
-        this.itemSubscribe()
-        this.mutex.release()
-      }
-    })
-  }
-
-  rxDocUnsubscribe () {
-    if (this.rxDocSubscription) this.rxDocSubscription.unsubscribe()
-    delete this.rxDocSubscription
-  }
-
-  itemSubscribe () {
-    const f = this.itemSubscribe
-    if (this.itemUnsubscribeFunc) return
-    this.itemUnsubscribeFunc = this.vm.$watch('item', (newVal, oldVal) => {
-      // item изменилась (из UI)
-      // logD(f, 'item changed from UI', newVal)
-      if (!this.debouncedItemSave) {
-        this.debouncedItemSave = debounce(async (newVal) => {
-          let f = this.debouncedItemSave
-          try {
-            await this.mutex.lock()
-            this.rxDocUnsubscribe()
-            logD(f, 'item changed from UI (debounce)', newVal)
-            await rxdbWrapper.upsertItem(newVal) // сохраним в БД
-          } finally {
-            this.rxDocSubscribe()
-            this.mutex.release()
-          }
-        }, 2000)
-      }
-      this.debouncedItemSave(newVal)
-    }, { deep: true, immediate: false })
-  }
-
-  itemUnsubscribe () {
-    const f = this.itemUnsubscribe
-    if (this.itemUnsubscribeFunc) this.itemUnsubscribeFunc()
-    delete this.itemUnsubscribeFunc
-  }
-
-  get () {
-    return this.vm.item
-  }
-}
-
-class ReactiveListHolder {
-  async create (rxQuery) {
-    logD('ReactiveListHolder::constructor', rxQuery)
-    assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
-    this.rxQuery = rxQuery
-    this.mutex = new Mutex()
-    let docs = await rxQuery.exec()
-    assert(Array.isArray(docs), 'Array.isArray(docs)')
-    this.vm = new Vue({
-      data: {
-        list: docs.map(rxDoc => {
-          let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-          return reactiveItemHolder.get()
-        })
-      }
-    })
-    assert(Array.isArray(this.vm.list), 'Array.isArray(this.vm.list)')
-    this.rxQuerySubscribe()
-    this.listSubscribe()
-    return this.vm.list
-  }
-
-  rxQuerySubscribe () {
-    const f = this.rxQuerySubscribe
-    if (this.rxQuerySubscription) return
-    // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
-    this.rxQuerySubscription = this.rxQuery.$.pipe(skip(1)).subscribe(async results => {
-      try {
-        await this.mutex.lock()
-        this.listUnsubscribe()
-        // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
-        if (this.vm.list.length === results.length) {
-          let arrayChanged = false
-          for (let i = 0; i < results.length; i++) {
-            if (results[i].id !== this.vm.list[i].id) {
-              arrayChanged = true
-              break
-            }
-          }
-          if (!arrayChanged) return // если список не изменился - просто выходим
-        }
-        logD(f, 'rxQuery changed', results)
-        let items = results.map(rxDoc => {
-          let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-          return reactiveItemHolder.get()
-        })
-        this.vm.list.splice(0, this.vm.list.length, ...items)
-      } finally {
-        this.listSubscribe()
-        this.mutex.release()
-      }
-    })
-  }
-
-  rxQueryUnsubscribe () {
-    if (this.rxQuerySubscription) this.rxQuerySubscription.unsubscribe()
-    delete this.rxQuerySubscription
-  }
-
-  listSubscribe () {
-    const f = this.listSubscribe
-    if (this.listUnsubscribeFunc) return
-    this.listUnsubscribeFunc = this.vm.$watch('list', async (newVal, oldVal) => {
-      assert(false, 'изменения списка из UI запрещены')
-      // // list изменился (из UI)
-      // if (!this.debouncedListSave) {
-      //   this.debouncedListSave = debounce(async (newVal, oldVal) => {
-      //     let f = this.debouncedListSave
-      //     try {
-      //       await this.mutex.lock()
-      //       this.rxQueryUnsubscribe()
-      //       logD(f, 'reactive list changed from UI', newVal)
-      //       let insertedItems = difference(newVal, oldVal, (left, right) => left.id === right.id) // что добавилось в массив
-      //       let deletedItems = difference(oldVal, newVal, (left, right) => left.id === right.id) // что удалено из массива
-      //
-      //       for (let insertedItem of insertedItems) {
-      //         assert(!insertedItem.id)
-      //         await rxdbWrapper.upsertItem(insertedItem) // сохраним в БД
-      //       }
-      //       for (let deletedItem of deletedItems) {
-      //         assert(deletedItem.id)
-      //         await rxdbWrapper.delete(deletedItem.id) // сохраним в БД
-      //       }
-      //     } finally {
-      //       this.rxQuerySubscribe()
-      //       this.mutex.release()
-      //     }
-      //   }, 300)
-      // }
-      // this.debouncedListSave(newVal, oldVal)
-    }, { deep: false, immediate: false })
-  }
-
-  listUnsubscribe () {
-    if (this.listUnsubscribeFunc) this.listUnsubscribeFunc()
-    delete this.listUnsubscribeFunc
-  }
-}
-
 class RxDBWrapper {
   async create () {
     addRxPlugin(require('pouchdb-adapter-idb'))
     addRxPlugin(RxDBLeaderElectionPlugin)
-    this.created = false
-    this.workspace = new Workspace()
-    await this.workspace.create()
     this.created = true
   }
 
@@ -225,9 +45,9 @@ class RxDBWrapper {
 
     logD('init RXDB')
     assert(this.created, '!created')
-    assert(this.workspace, '!this.workspace')
     assert(!this.initialized, 'call init once!')
-    await this.workspace.init(new UserDoc())
+    this.workspace = new Workspace()
+    await this.workspace.create(new UserDoc())
     this.initialized = true
   }
 
@@ -273,10 +93,10 @@ class RxDBWrapper {
   }
 
   // определит по итему - откуда он и вставит в нужную коллекцию
-  async upsertItem (item) {
-    let rxDoc = await this.workspace.upsertItem(item)
+  async upsertItem (item, withLock = true) {
+    let rxDoc = await this.workspace.upsertItem(item, withLock)
     let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return reactiveItemHolder.get()
+    return reactiveItemHolder.item
   }
 
   async deleteItem (id) {
@@ -287,6 +107,14 @@ class RxDBWrapper {
     let rxQuery = this.getCollection(rxCollectionEnum).find(query)
     let holder = new ReactiveListHolder()
     return await holder.create(rxQuery)
+  }
+
+  async lock() {
+    await this.workspace.lock()
+  }
+
+  release() {
+    this.workspace.release()
   }
 }
 
