@@ -49,7 +49,7 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px'}`).column.full-
 
 <script>
 import wsItems from './ws_items'
-import wsLayerList from './ws_layer_list'
+// import wsLayerList from './ws_layer_list'
 import wsSpheres from './ws_spheres'
 import wsSettings from './ws_settings'
 import wsItemSaver from './ws_item_saver'
@@ -57,7 +57,7 @@ import menuRight from './menu_right'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsItems, wsLayerList, wsSpheres, wsSettings, wsItemSaver, menuRight},
+  components: {wsItems, wsSpheres, wsSettings, wsItemSaver, menuRight},
   props: [],
   data () {
     return {
@@ -66,7 +66,7 @@ export default {
       pages: [
         {id: 'note', name: 'Notes'},
         {id: 'content', name: 'Contents'},
-        {id: 'layers', name: 'Layers'},
+        // {id: 'layers', name: 'Layers'},
         {id: 'node', name: 'Nodes'},
         {id: 'chain', name: 'Chains'},
         {id: 'spheres', name: 'Spheres'},

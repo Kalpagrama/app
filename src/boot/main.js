@@ -71,7 +71,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     }
     // node
     Vue.component('node', () => import('components/node/index.vue'))
-    Vue.component('composition', () => import('components/node/composition'))
+    Vue.component('composition', () => import('components/node/composition_new'))
     // editors
     Vue.component('nodeEditor', () => import('components/node_editor'))
     Vue.component('compositionEditor', () => import('components/node/composition_editor'))
@@ -81,6 +81,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('wsItems', () => import('components/workspace/ws_items'))
     Vue.component('wsItemFinder', () => import('components/workspace/ws_item_finder'))
     Vue.component('wsContentCreator', () => import('components/workspace/ws_content_creator'))
+    Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
     Vue.component('wsItemSaver', () => import('components/workspace/ws_item_saver'))
     Vue.component('wsFinderSpheres', () => import('components/workspace/ws_finder_spheres'))
     // explore

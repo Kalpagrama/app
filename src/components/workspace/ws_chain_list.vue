@@ -1,7 +1,12 @@
 <template lang="pug">
-div(:style=`{maxHeight: '500px', borderRadius: '0 0 10px 10px'}`).column.fit.b-70
+div(
+  :style=`{
+    maxHeight: '500px',
+    borderRadius: '10px',
+    overflow: 'hidden',
+  }`).column.fit.q-mt-sm.b-50
   .col.full-width
-    .row.fit.items-center.justify-center
+    .row.fit.items-center.content-center.justify-center
       span.text-white Coming soon
 </template>
 

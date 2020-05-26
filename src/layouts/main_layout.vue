@@ -12,6 +12,8 @@
   border-radius: 10px
   overflow: hidden
   transform: translate3d(0,0,0)
+.q-dialog__backdrop
+  background: rgba(0,0,0,0.8) !important
 .k-input
   border: none
   border-radius: 10px

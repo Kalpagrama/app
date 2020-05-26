@@ -1,7 +1,10 @@
 <template lang="pug">
 q-expansion-item(
+  @click="$emit('choose')"
+  expand-icon-toggle
   :label="contentName"
   color="white" dark
+  :group="contentIndex"
   :style=`{
     borderRadius: '10px',
     overflow: 'hidden'
@@ -22,14 +25,16 @@ q-expansion-item(
         layer-item(
           v-for="(l,li) in contentLayers" :key="li"
           :content="content" :contentIndex="contentIndex"
-          :layer="l" :layerIndex="li")
+          :layer="l" :layerIndex="li"
+          @choose="$emit('layerChoose', [content, li])"
+          @preview="$emit('layerPreview', [content, li])")
 </template>
 
 <script>
 import layerItem from './layer_item'
 
 export default {
-  name: 'wsLayers-contentItem',
+  name: 'contentItem',
   props: ['content', 'contentIndex'],
   components: {layerItem},
   data () {

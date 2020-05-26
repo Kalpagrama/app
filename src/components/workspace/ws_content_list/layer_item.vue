@@ -20,6 +20,7 @@ div(
   ).row.full-width.items-center.content-center.justify-start.q-px-md.b-90.q-mb-xs.layer
   span(:style=`{userSelect: 'none'}`).text-white {{ layerName }}
   q-btn(
+    v-show="layerPreviewShow"
     flat no-caps color="white" @click="layerPreview()"
     :class=`{
       'b-130': mouseIsOver
@@ -29,7 +30,7 @@ div(
 
 <script>
 export default {
-  name: 'wsLayers-layerItem',
+  name: 'layerItem',
   props: ['layer', 'content', 'layerIndex', 'contentIndex'],
   data () {
     return {
@@ -39,15 +40,24 @@ export default {
   computed: {
     layerName () {
       return this.layer.spheres[0].name
+    },
+    layerPreviewShow () {
+      if (this.$q.screen.xs) {
+        return true
+      }
+      else {
+        return this.mouseIsOver
+      }
     }
   },
   methods: {
     layerClick () {
       this.$log('layerClick')
-      this.$log('content', this.content)
+      this.$emit('choose')
     },
     layerPreview () {
       this.$log('layerPreview')
+      this.$emit('preview')
     }
   }
 }

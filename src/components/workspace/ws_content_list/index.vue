@@ -3,6 +3,36 @@
 
 <template lang="pug">
 .column.fit.q-pt-sm
+  //- ws content editor
+  q-dialog(v-model="contentEditorOpened" position="bottom")
+    div(
+      :style=`{
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px'
+      }`
+      ).row.full-width
+      ws-content-editor(
+        v-if="content" :value="content"
+        @close="contentEditorOpened = false")
+    //- div(
+    //-   :style=`{
+    //-     position: 'relative',
+    //-     maxWidth: '600px',
+    //-     maxHeight: $q.screen.height+'px',
+    //-     borderRadius: '10px', overflow: 'hidden'
+    //-   }`
+    //-   ).row.full-width.b-50
+    //-   //- div(:style=`{position: 'relative'}`).col.full-width
+    //-   composition(
+    //-     ctx="workspace"
+    //-     :value="composition"
+    //-     :visible="true" :active="true" :mini="false")
+    //-     template(v-slot:editor=`{player, meta}`)
+    //-       div(:style=`{height: '400px'}`).row.full-width.bg-red
+    //-         span.text-white {{meta}}
+    //-   div.row.full-width.q-pa-sm
+    //-     q-btn(round flat color="white" icon="edit").b-70.q-mr-sm
   //- header
   div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
@@ -24,7 +54,10 @@
           div(v-if="items.length > 0").row.full-width.items-start.content-start
             content-item(
               v-for="(c,ci) in items" :key="ci"
-              :content="c" :contentIndex="ci")
+              :content="c" :contentIndex="ci"
+              @choose="contentChoose(c,ci)"
+              @layerChoose="layerChoose"
+              @layerPreview="layerPreview")
           //- nothing found
           div(
             v-else
@@ -37,7 +70,7 @@
 import contentItem from './content_item'
 
 export default {
-  name: 'wsLayers',
+  name: 'wsContentList',
   components: {contentItem},
   data () {
     return {
@@ -48,10 +81,25 @@ export default {
         {id: 'IMAGE', name: 'Images'},
         {id: 'BOOK', name: 'Books'}
       ],
-      searchString: ''
+      searchString: '',
+      content: null,
+      contentEditorOpened: false
     }
   },
   computed: {
+    composition () {
+      if (this.layer) {
+        return {
+          // contentOid: ,
+          preview: this.layer.content.thumbUrl,
+          contentType: 'VIDEO',
+          layers: [this.layer]
+        }
+      }
+      else {
+        return null
+      }
+    },
     variables () {
       let res = {selector: {}}
       if (this.searchString.length > 0) {
@@ -62,6 +110,19 @@ export default {
         res.selector.contentType = this.type
       }
       return res
+    }
+  },
+  methods: {
+    contentChoose (content, ci) {
+      this.$log('contentChoose', content, ci)
+    },
+    layerChoose ([content, li]) {
+      this.$log('layerChoose', content, li)
+    },
+    layerPreview ([content, li]) {
+      this.$log('layerPreview', content, li)
+      this.content = content
+      this.contentEditorOpened = true
     }
   }
 }
