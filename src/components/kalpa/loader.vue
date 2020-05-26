@@ -90,7 +90,7 @@ export default {
         case 'WS_NODE':
         case 'WS_SPHERE':
           this.$log('items find...')
-          this.items = await this.$rxdb.findWs(this.type, null)
+          this.items = await this.$rxdb.findWs(this.type, variables)
           break
         default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }

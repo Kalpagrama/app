@@ -13,7 +13,7 @@ div(
   :class=`{}`
   :style=`{
     position: 'relative',
-    height: '50px',
+    height: '30px',
     borderRadius: '10px',
     overflow: 'hidden'
   }`

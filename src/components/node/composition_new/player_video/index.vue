@@ -110,18 +110,23 @@ export default {
   watch: {
     composition: {
       immediate: true,
-      handler (to, from) {
+      async handler (to, from) {
         this.$log('composition CHANGED', to)
         if (to.layers.length > 0) {
           if (!this.layerId) this.layerId = to.layers[0].oid
         }
+        else {
+          this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+        }
       }
     },
     layer: {
-      immediate: true,
+      immediate: false,
       async handler (to, from) {
         this.$log('layer CHANGED', to)
-        this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+        if (to) {
+          this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+        }
       }
     },
     videoSrc: {
@@ -140,6 +145,7 @@ export default {
       const videoRef = this.$refs.videoRef
       if (this.ctx === 'workspace') {
         this.$log('player WORKSPACE start', this.videoSrc)
+        alert('player WORKSPACE start')
         let me = new window.MediaElementPlayer(videoRef, {
           loop: true,
           autoplay: true,
@@ -222,6 +228,7 @@ export default {
   beforeDestroy () {
     this.$log('beforeDestroy')
     if (this.ctx === 'workspace') {
+      if (!this.player) return
       this.player.removeEventListener('play', this.videoPlay)
       this.player.removeEventListener('pause', this.videoPause)
       this.player.removeEventListener('loadeddata', this.videoLoadeddata)

@@ -23,9 +23,15 @@ div(:style=`{position: 'relative'}`).column.fit.q-pt-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Nodes
     div.row.full-width.q-px-sm
-      input(
-        v-model="searchString" autofocus
-        placeholder="Search").full-width.b-70.k-input
+      q-input(
+        v-model="searchString"
+        filled dense color="grey-6" dark
+        placeholder="Search"
+        ).full-width.b-70
+        template(v-slot:append)
+          q-btn(
+            v-if="searchString.length > 0"
+            flat dense color="grey-2" icon="clear" @click="searchString = ''")
     div(:style=`{}`).row.full-width.items-center.content-center.q-px-sm
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start

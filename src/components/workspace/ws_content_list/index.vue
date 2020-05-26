@@ -15,33 +15,24 @@
       ws-content-editor(
         v-if="content" :value="content"
         @close="contentEditorOpened = false")
-    //- div(
-    //-   :style=`{
-    //-     position: 'relative',
-    //-     maxWidth: '600px',
-    //-     maxHeight: $q.screen.height+'px',
-    //-     borderRadius: '10px', overflow: 'hidden'
-    //-   }`
-    //-   ).row.full-width.b-50
-    //-   //- div(:style=`{position: 'relative'}`).col.full-width
-    //-   composition(
-    //-     ctx="workspace"
-    //-     :value="composition"
-    //-     :visible="true" :active="true" :mini="false")
-    //-     template(v-slot:editor=`{player, meta}`)
-    //-       div(:style=`{height: '400px'}`).row.full-width.bg-red
-    //-         span.text-white {{meta}}
-    //-   div.row.full-width.q-pa-sm
-    //-     q-btn(round flat color="white" icon="edit").b-70.q-mr-sm
   //- header
   div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Content layers
     div.row.full-width.q-px-sm
-      input(
-        v-model="searchString"
-        placeholder="Search").full-width.b-70.k-input
+      q-input(
+        v-model="searchStringRaw"
+        filled dense color="grey-6" dark
+        placeholder="Search or paste URL"
+        ).full-width.b-70
+        template(v-slot:append)
+          q-btn(
+            v-if="searchStringRaw.length > 0"
+            flat dense color="grey-2" icon="clear" @click="searchStringRaw = ''")
+          q-btn(
+            v-else
+            flat dense color="grey-2" icon="attach_file" @click="contentFromFILEStart()")
     div(:style=`{}`).row.full-width.items-center.content-center.q-px-sm
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
@@ -53,9 +44,10 @@
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
             content-item(
-              v-for="(c,ci) in items" :key="ci"
+              v-for="(c,ci) in items" :key="c.id"
               :content="c" :contentIndex="ci"
               @choose="contentChoose(c,ci)"
+              @delete="contentDelete(c,ci)"
               @layerChoose="layerChoose"
               @layerPreview="layerPreview")
           //- nothing found
@@ -82,6 +74,7 @@ export default {
         {id: 'BOOK', name: 'Books'}
       ],
       searchString: '',
+      searchStringRaw: '',
       content: null,
       contentEditorOpened: false
     }
@@ -112,9 +105,36 @@ export default {
       return res
     }
   },
+  watch: {
+    searchStringRaw: {
+      async handler (to, from) {
+        this.$log('searchString CHANGED', to)
+        if (this.isURL(to)) {
+          this.contentChoose(await this.contentAdd(await this.contentFromURL(to)))
+          this.searchStringRaw = ''
+        }
+        else {
+          this.searchString = to
+        }
+      }
+    }
+  },
   methods: {
+    isURL (str) {
+      let a = document.createElement('a')
+      a.href = str
+      return (a.host && a.host !== window.location.host)
+    },
     contentChoose (content, ci) {
       this.$log('contentChoose', content, ci)
+      // TODO depends on mode
+      this.content = content
+      this.contentEditorOpened = true
+    },
+    async contentDelete (content, ci) {
+      this.$log('contentDelete', content, ci)
+      if (!confirm('Delete content ?!')) return
+      await this.$rxdb.deleteItem(content.id)
     },
     layerChoose ([content, li]) {
       this.$log('layerChoose', content, li)
@@ -123,6 +143,55 @@ export default {
       this.$log('layerPreview', content, li)
       this.content = content
       this.contentEditorOpened = true
+    },
+    async contentAdd (content) {
+      this.$log('contentAdd content', content)
+      let contentFind = await this.$rxdb.findWs('WS_CONTENT', {selector: {contentOid: content.oid}})
+      this.$log('contentAdd contentFind', contentFind)
+      // create rxDoc
+      if (contentFind.length === 0) {
+        let contentInput = {
+          wsItemType: 'WS_CONTENT',
+          thumbOid: content.oid,
+          name: content.name,
+          layers: [],
+          spheres: [],
+          contentOid: content.oid,
+          contentType: content.type,
+          operation: {
+            items: null,
+            operations: null,
+            type: 'CONCAT'
+          }
+        }
+        this.$log('contentAdd contentInput', contentInput)
+        return await this.$rxdb.upsertItem(contentInput)
+      } else {
+        return contentFind[0]
+      }
+    },
+    async contentFromURL (url) {
+      try {
+        this.$log('contentFromURL start', url)
+        let content = await this.$store.dispatch('content/contentCreateFromUrl', url)
+        this.$log('contentFromURL done')
+        return content
+      } catch (e) {
+        this.$log('contentFromURL error', e)
+      }
+    },
+    async contentFromFILEStart () {
+      this.$log('contentFromFILEStart')
+    },
+    async contentFromFILE () {
+      try {
+        this.$log('contentFromFILE start')
+        let content = null
+        this.$log('contentFromFILE done')
+        return content
+      } catch (e) {
+        this.$log('contentFromFILE error', e)
+      }
     }
   }
 }
