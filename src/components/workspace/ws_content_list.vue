@@ -8,8 +8,6 @@
 
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
-  //- actions
-  //- dialogs
   //- composition editor
   q-dialog(v-model="contentEditorOpened" persistent position="bottom")
     ws-item-saver(v-if="content" :value="content")
@@ -25,19 +23,20 @@ div(:style=`{position: 'relative'}`).column.fit
           }`)
   //- body
   div(
-    ref="wsContentNotesScrollArea"
+    ref="wsContentListScrollArea"
     :class=`{
       'q-pt-sm': $q.screen.width > 600
     }`
     :style=`{position: 'relative'}`
     ).col.full-width.scroll
     slot(name="header")
-    //- header: content finder, filters, edit
+    //- header: contentCreator, filters, edit
     div(:style=`{marginTop: '-20px', paddingTop: '30px', borderRadius: '10px'}`
       ).row.full-width.items-start.content-start.justify-center.b-100
-      ws-content-finder(
-        ref="wsContentFinder"
+      ws-content-creator(
+        ref="wsContentCreator"
         :sources="['url', 'device']"
+        @searchString="searchString = $event"
         @content="contentCreated"
         :style=`{}`).b-100
       //- tabs
@@ -50,8 +49,11 @@ div(:style=`{position: 'relative'}`).column.fit
         .col
           kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
         q-btn(
+          v-if="true"
           flat color="white" no-caps
-          :style=`{height: '36px'}`).b-110 Spheres
+          :style=`{height: '36px'}`).b-110 Filters
+          q-menu()
+            //- ws-finder-spheres
     //- header: edit
     div(
       v-if="options.editing"
@@ -63,7 +65,9 @@ div(:style=`{position: 'relative'}`).column.fit
         q-checkbox(v-model="layersSelected" :val="li" dark dense color="grey-6")
       div(@click.self="scrollTo(0)").col
       q-btn(flat round color="white" icon="edit").b-90
-    kalpa-loader(type="WS_CONTENT")
+    kalpa-loader(
+      type="WS_CONTENT"
+      :variables=`{selector: {contentType: tabId}}`)
       template(v-slot="{items}")
         .row.full-width.items-start.q-py-sm
           div(
@@ -75,11 +79,8 @@ div(:style=`{position: 'relative'}`).column.fit
 </template>
 
 <script>
-import { assert } from 'assert'
-import { isRxDocument } from 'rxdb'
-import Vue from 'vue'
 export default {
-  name: 'wsContentNotesList',
+  name: 'wsContentList',
   props: {
     options: {
       type: Object,
@@ -93,15 +94,21 @@ export default {
       content: null,
       contentFinderOpened: false,
       contentEditorOpened: false,
-      tabId: 'video',
+      tabId: 'VIDEO',
       tabs: [
         {id: 'all', name: 'All'},
-        {id: 'video', name: 'Video'},
-        {id: 'books', name: 'Books'}
-      ]
+        {id: 'VIDEO', name: 'Video'},
+        {id: 'BOOK', name: 'Books'}
+      ],
+      searchString: ''
     }
   },
   watch: {
+    tabId: {
+      handler (to, from) {
+        this.$log('tabId CHANGED', to)
+      }
+    },
     contentEditorOpened: {
       handler (to, from) {
         this.$log('contentEditorOpened CHANGED', to)
@@ -125,7 +132,7 @@ export default {
           break
         }
         case 'emit': {
-          this.$emit('item', {type: 'contentNotes', item: this.content})
+          this.$emit('item', {type: 'content', item: this.content})
           break
         }
         default: {
@@ -139,7 +146,7 @@ export default {
       await this.$rxdb.deleteItem(rxDoc)
     },
     async contentCreated (content) {
-      this.$log('contentCreated', content)
+      this.$log('contentCreated content', content)
       let rxDoc = await this.$rxdb.WS_CONTENT.findOne({selector: {contentOid: content.oid}}).exec()
       this.$log('contentCreated rxDoc before', rxDoc)
       // create rxDoc
@@ -151,6 +158,7 @@ export default {
           layers: [],
           spheres: [],
           contentOid: content.oid,
+          contentType: content.type,
           operation: {
             items: null,
             operations: null,
@@ -165,7 +173,7 @@ export default {
     },
     scrollTo (val) {
       this.$log('scrollTo', val)
-      let ref = this.$refs.wsContentNotesScrollArea
+      let ref = this.$refs.wsContentListScrollArea
       if (ref) {
         this.$tween.to(ref, 0.5, {scrollTop: val})
       }

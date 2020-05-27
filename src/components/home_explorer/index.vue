@@ -25,7 +25,7 @@ q-layout(view="hHh lpR fFf").b-30
     q-page
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
         template(v-slot=`{items}`)
-          list-middle(:items="items")
+          list-middle(:items="items" :options=`{paddingTop: 60}`)
             template(v-slot:item=`{item, index, indexMiddle}`)
               node(
                 ctx="list" layout="PIP"

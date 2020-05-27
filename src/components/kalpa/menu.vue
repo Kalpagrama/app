@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-div().column.fit.b-50
+div(:style=`{}`).column.fit.b-50
   //- header
   div(
     :style=`{height: '60px'}`

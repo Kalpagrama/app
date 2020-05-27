@@ -32,6 +32,7 @@
           ).row
       //- progress WRAPPER
       div(
+        v-if="false"
         ref="progressWrapper"
         :style=`{position: 'relative', height: '4px', zIndex: 200, borderRadius: '10px'}`
         ).row.full-width.bg-grey-5.cursor-pointer
@@ -88,6 +89,7 @@
       .col.full-height
         .row.fit.items-start.content-start.justify-start.q-px-sm
           span(
+            v-if="$q.screen.width > 600"
             :style=`{pointerEvents: 'none', borderRadius: '10px', background: 'rgba(0,0,0,0.3)', userSelect: 'none', padding: '10.5px'}`
             ).text-white.q-mr-sm {{ $time(now)+' / '+$time(duration) }}
           span(
@@ -109,20 +111,11 @@
             color="white"
             :icon="meta.muted ? 'volume_off' : 'volume_up'"
             :style=`{background: 'rgba(0,0,0,0.3)'}`)
-      //- sound
-      //- div(
-      //-   :style=`{height: '60px'}`
-      //-   ).row.full-height.items-start.content-start.justify-start
-        //- q-btn(
-        //-   round flat @click="player.mutedToggle()"
-        //-   color="white"
-        //-   :icon="meta.muted ? 'volume_off' : 'volume_up'"
-        //-   :style=`{background: 'rgba(0,0,0,0.3)'}`).q-ml-sm
 </template>
 
 <script>
 export default {
-  name: 'playerVideoProgress',
+  name: 'playerVideo-progressMaxi',
   props: ['ctx', 'player', 'meta', 'start', 'end'],
   data () {
     return {

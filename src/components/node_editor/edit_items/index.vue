@@ -47,7 +47,7 @@ div(:style=`{position: 'relative'}`).row.fit
       span(:style=`{fontSize: '16px'}`).text-white.text-bold Select first item
     div(:style=`{overflow: 'hidden'}`).col.full-width.q-pa-sm
       ws-item-finder(
-        :types="['contentNotes', 'node']"
+        :types="['content', 'node']"
         :options=`{
           editing: false,
           onItemClick: 'emit'
@@ -129,7 +129,7 @@ div(:style=`{position: 'relative'}`).row.fit
                   span(:style=`{userSelect: 'none'}`).text-white Item name {{ i.oid }}
                   q-btn(
                     round flat dense color="white" icon="edit" @click="itemEdit(i.oid)"
-                    :style=`{position: 'absolute', zIndex: 100, right: '3px', top: '3px'}`)
+                    :style=`{position: 'absolute', zIndex: 100, right: '6px', bottom: '6px'}`).b-100
             //- RIGHT: menu, dragging
             div(:style=`{width: itemsEditToolsWidth+'px', overflow: 'hidden'}`).row.justify-end
               q-btn(flat round color="grey-6" icon="drag_indicator").item-drag-handle
@@ -225,7 +225,7 @@ export default {
       this.$log('itemFound', type, item)
       // set node.name if there is no node.name and we have layer.name. in items...
       switch (type) {
-        case 'contentNotes': {
+        case 'content': {
           let compositionInput = JSON.parse(JSON.stringify(item))
           // add layers workspace, non reactive...
           compositionInput.layersWorkspace = compositionInput.layers

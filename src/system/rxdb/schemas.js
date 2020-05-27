@@ -58,6 +58,9 @@ export const wsSchemaNode = {
     },
     layout: {
       type: 'string'
+    },
+    stage: {
+      type: 'string'
     }
   },
   required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
@@ -122,6 +125,9 @@ export const wsSchemaContent = {
       }
     },
     contentOid: {
+      type: 'string'
+    },
+    contentType: {
       type: 'string'
     },
     operation: {
@@ -212,6 +218,9 @@ export const wsSchemaSphere = {
     },
     deletedAt: {
       type: 'integer'
+    },
+    color: {
+      type: 'string'
     }
   },
   required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],

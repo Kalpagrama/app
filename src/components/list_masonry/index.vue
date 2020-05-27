@@ -276,19 +276,19 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    window.onkeydown = (e) => {
-      if (e.keyCode === 32) {
-        e.preventDefault()
-        let i = this.itemIndex + 1
-        if (!this.items[i]) i = 0
-        this.itemClick(this.items[i], i)
-        // this.$tween.to(this.$refs.scrollWrapper, 0.5, {scrollTop: this.itemOffsetTop + 300})
-      }
-      else if (e.key === 'Escape') {
-        this.itemClick(null, null)
-        this.itemOid = null
-      }
-    }
+    // window.onkeydown = (e) => {
+    //   if (e.keyCode === 32) {
+    //     e.preventDefault()
+    //     let i = this.itemIndex + 1
+    //     if (!this.items[i]) i = 0
+    //     this.itemClick(this.items[i], i)
+    //     // this.$tween.to(this.$refs.scrollWrapper, 0.5, {scrollTop: this.itemOffsetTop + 300})
+    //   }
+    //   else if (e.key === 'Escape') {
+    //     this.itemClick(null, null)
+    //     this.itemOid = null
+    //   }
+    // }
     // this.$wait(0).then(() => {
     //   this.itemClick(this.items[5], 5)
     // })

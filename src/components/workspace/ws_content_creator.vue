@@ -23,18 +23,19 @@
           ).row.fit.b-220
         q-input(
           v-model="url" filled
-          color="green" label="Find content or paste URL"
+          label="Find content or paste URL"
+          color="green-7"
           :loading="urlInputLoading"
           :input-style=`{}`
           :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
           ).full-width.b-220
           template(v-slot:append)
-            q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green" icon="attach_file" @click="$refs.fileInput.click()")
+            q-btn(v-if="sources.includes('device') && url.length === 0" round flat color="green-7" icon="attach_file" @click="$refs.fileInput.click()")
 </template>
 
 <script>
 export default {
-  name: 'wsContentFinder',
+  name: 'wsContentCreator',
   props: ['sources'],
   components: {},
   data () {
@@ -66,13 +67,14 @@ export default {
     url: {
       handler (to, from) {
         this.$log('url CHANGED', to)
-        if (!to) return // PPV new URL(null) throw error!
+        // if (!to) return // PPV new URL(null) throw error!
         try {
-          this.$log('url CHANGED WATCHER', to)
+          // this.$log('url CHANGED WATCHER', to)
           if (new URL(to)) this.urlChanged(to)
-          else this.$log('WRONG URL')
+          // else this.$log('WRONG URL')
         } catch (e) {
-          this.$log('URL WRONG', e)
+          // this.$log('URL WRONG', e)
+          this.$emit('searchString', to)
         }
       }
     }

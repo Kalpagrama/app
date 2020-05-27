@@ -8,7 +8,7 @@
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
   //- debug
   div(
-    v-if="true"
+    v-if="false"
     :style=`{
       position: 'absolute',
       zIndex: 1000,

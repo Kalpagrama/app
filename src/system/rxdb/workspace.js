@@ -69,6 +69,8 @@ class Mutex {
         this.locked = true
         resolve()
       }
+    this.rxdb.sphere.preInsert(normalizeWsItem, false)
+    this.rxdb.sphere.preSave(normalizeWsItem, false)
     })
   }
 

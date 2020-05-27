@@ -1,7 +1,7 @@
 <style lang="sass" scoped>
 .kalpa-button
   &:hover
-    background: rgb(114,114,114) !important
+    // background: rgb(114,114,114) !important
 </style>
 
 <template lang="pug">

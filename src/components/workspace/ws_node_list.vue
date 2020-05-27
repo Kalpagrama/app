@@ -7,16 +7,17 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
   //- actions
-  //- action: ADD
-  q-btn(
-    round push color="green" icon="add" size="lg" @click="nodeAddStart()"
-    :style=`{
-      position: 'absolute', zIndex: 1000,
-      bottom: $q.screen.width > 600 ? 8+'px' : 60+8+'px',
-      right: '8px',
-      borderRadius: '50%'
-    }`)
-  //- dialogs
+  //- node ADD
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    q-btn(
+      v-if="nodesSelected.length === 0"
+      round push color="green" icon="add" size="lg" @click="nodeAddStart()"
+      :style=`{
+        position: 'absolute', zIndex: 1000,
+        bottom: $q.screen.width > 600 ? 8+'px' : 60+8+'px',
+        right: '8px',
+        borderRadius: '50%'
+      }`)
   //- node editor
   q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
     // ws-item-saver(v-if="node" :value="node")
@@ -31,6 +32,22 @@ div(:style=`{position: 'relative'}`).column.fit
         maxHeight: $q.screen.height+'px',
         height: $q.screen.height+'px',
       }`)
+  //- nodes selected
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    div(
+      v-if="nodesSelected.length > 0"
+      :style=`{
+        position: 'absolute', zIndex: 900,
+        bottom: $q.screen.width > 600 ? '0px' : '46px',
+        borderRadius: '10px 10px 0 0', overflow: 'hidden',
+      }`).row.full-width.q-px-sm.q-py-sm.q-pb-md.b-90
+      q-btn(
+        flat icon="clear" color="white" @click="nodesSelectedDrop()"
+        :style=`{width: '36px'}`).b-110.q-mr-sm
+      q-btn(
+        flat color="white" no-caps @click="nodesSelectedDelete()"
+        :style=`{}`
+        ).b-110.q-mr-sm Delete
   //- body
   div(
     ref="wsNodeListScrollArea"
@@ -58,6 +75,7 @@ div(:style=`{position: 'relative'}`).column.fit
         .col
           kalpa-buttons(:value="tabs" :id="tabId" @id="tabId = $event").justify-start
         q-btn(
+          v-if="false"
           flat color="white" no-caps
           :style=`{height: '36px'}`).b-110 Spheres
     //- header: edit
@@ -69,14 +87,17 @@ div(:style=`{position: 'relative'}`).column.fit
         div(v-if="nodesSelected.length > 0").row.fit.items-center.content-center.q-px-sm
           q-btn(flat color="white").b-90.q-mr-sm {{nodesSelected.length}}
           q-btn(flat color="white" no-caps @click="nodesSelectedDelete()").b-90.q-mr-sm Delete
-          q-btn(flat color="white" no-caps @click="nodesSelectedDrop()").b-90 Drop selection
-      q-btn(flat color="white" icon="edit" @click="nodesEdit()").b-90.q-mr-sm
-    //- :variables=`{selector: {name: 'hello'}}`
-    kalpa-loader(type="WS_NODE")
+          q-btn(flat color="white" no-caps @click="nodesSelectedDrop()").b-90.q-mr-sm Drop selection
+          q-btn(flat color="white" no-caps @click="nodesSelectedMerge()").b-90.q-mr-sm Merge
+      q-btn(
+        flat color="white" icon="edit" @click="nodesEdit()"
+        :style=`{width: '36px'}`).b-90.q-mr-sm
+    //- nodes list
+    kalpa-loader(type="WS_NODE" :variables="variables" @itemsLength="itemsLengthChanged")
       template(v-slot="{items}")
         .row.full-width.items-start.q-py-sm
           div(
-            v-for="(n, ni) in nodesFilter(items)" :key="n.oid"
+            v-for="(n, ni) in items" :key="n.oid"
             :style=`{
               height: '40px'
             }`
@@ -90,7 +111,7 @@ div(:style=`{position: 'relative'}`).column.fit
               }`
               ).row.items-center.content-center.justify-center
               //- q-btn(round flat color="white" icon="more_vert")
-              q-checkbox(v-model="nodesSelected" :val="n.oid" dark dense color="grey-6" )
+              q-checkbox(v-model="nodesSelected" :val="n.id" dark dense color="grey-6" )
             .col
               div(
                 @click="nodeClick(n)"
@@ -108,6 +129,17 @@ div(:style=`{position: 'relative'}`).column.fit
               }`
               ).row.items-center.content-center.justify-center
               q-btn(round flat dense color="grey-6" icon="drag_indicator")
+                q-menu(auto-close anchor="top left" self="top right")
+                  .row.full-width.b-100
+                    q-btn(flat dense color="white" no-caps align="left" @click="nodeClick(n)").q-px-sm.full-width Edit
+                    q-btn(flat dense color="white" no-caps align="left" @click="nodeDelete(n.id)").q-px-sm.full-width Delete
+    //- nodeSearchStringCreate
+    div(
+      v-if="nodeSearchStringCreateShow && nodeSearchString.length > 0"
+      ).row.full-width.items-center.content-center.q-px-sm
+      small.text-white.q-mr-sm Create node
+      q-btn(no-caps color="green" @click="nodeSearchStringCreate") {{nodeSearchString}}
+    //- paddingBottom
     div(:style=`{height: '1000px'}`).row.full-width
 </template>
 
@@ -121,6 +153,7 @@ export default {
       node: null,
       nodeEditorOpened: false,
       nodeSearchString: '',
+      nodeSearchStringCreateShow: false,
       nodesSelected: [],
       nodesEditing: false,
       nodesEditingWidth: 0,
@@ -128,7 +161,7 @@ export default {
       tabs: [
         {id: 'all', name: 'All'},
         {id: 'selected', name: 'Selected'},
-        {id: 'drafts', name: 'Drafts'},
+        {id: 'draft', name: 'Drafts'},
         {id: 'published', name: 'Published'}
       ]
     }
@@ -136,9 +169,30 @@ export default {
   computed: {
     oid () {
       return this.$route.params.oid
+    },
+    variables () {
+      let res = {selector: {}}
+      if (this.nodeSearchString.length > 0) {
+        let nameRegExp = new RegExp(this.nodeSearchString, 'i')
+        res.selector.name = {$regex: nameRegExp}
+      }
+      if (this.tabId !== 'all') {
+        res.selector.stage = this.tabId
+      }
+      return res
     }
   },
   watch: {
+    // tabId: {},
+    nodeSearchString: {
+      immediate: true,
+      handler (to, from) {
+        this.$log('nodeSearchString CHANGED', to)
+        if (to.length === 0) {
+          this.nodeSearchStringCreateShow = false
+        }
+      }
+    },
     nodesEditing: {
       handler (to, from) {
         this.$log('nodesEditing')
@@ -174,23 +228,39 @@ export default {
       this.$log('nodesEdit')
       this.nodesEditing = !this.nodesEditing
     },
+    itemsLengthChanged (to) {
+      this.$log('itemsLengthChanged', to)
+      if (to === 0) {
+        this.nodeSearchStringCreateShow = true
+      }
+      else {
+        this.nodeSearchStringCreateShow = false
+      }
+    },
+    nodeSearchStringCreate () {
+      this.$log('nodeSearchStringCreate')
+      this.nodeAddStart()
+    },
     nodesSelectedDelete () {
       this.$log('nodeSeletedDelete')
       if (!confirm('Delete selected nodes?')) return
-      alert('TODO!!!! wsItemDelete ожидает не oid, а item')
-      this.nodesSelected.map(oid => {
-        this.$store.dispatch('workspace/wsItemDelete', oid)
-      })
+      // this.nodesSelected.map(oid => {
+      //   this.$rxdb.deleteItem(oid)
+      // })
+      this.nodesSelectedDrop = []
     },
     nodesSelectedDrop () {
       this.$log('nodesSelectedDrop')
       this.nodesSelected = []
     },
-    nodesFilter (arr) {
-      if (this.nodeSearchString.length > 0) {
-        arr = arr.filter(i => i.name.includes(this.nodeSearchString))
-      }
-      return arr
+    nodesSelectedMerge () {
+      this.$log('nodesSelectedMerge')
+    },
+    nodeDelete (id) {
+      this.$log('nodeDelete', id)
+      if (!confirm('Delete node?!')) return
+      // do something
+      let x = '2'
     },
     async nodeClick (item) {
       this.$log('nodeClick', item)
@@ -206,7 +276,8 @@ export default {
         items: [],
         spheres: [],
         category: 'FUN',
-        layout: 'PIP'
+        layout: 'PIP',
+        stage: 'draft'
       }
       let item = await this.$rxdb.upsertItem(nodeInput)
       this.$log('nodeAddStart item', item)
