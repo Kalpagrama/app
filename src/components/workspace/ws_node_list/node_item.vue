@@ -13,7 +13,7 @@ div(
     borderRadius: '10px',
     overflow: 'hidden',
   }`
-  ).row.full-width.items-center.content-center.q-px-md.b-70.q-mb-sm.node
+  ).row.full-width.items-center.content-center.q-px-md.b-70.q-mb-xs.node
   span(:style=`{userSelect: 'none'}`).text-white {{node.name}}
 </template>
 

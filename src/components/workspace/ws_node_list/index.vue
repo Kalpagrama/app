@@ -6,25 +6,24 @@ div(:style=`{position: 'relative'}`).column.fit.q-pt-sm
   //- node add
   q-btn(
     @click="nodeAdd()"
-    push round color="green" icon="add" size="xl"
+    push round color="green" icon="add"
+    :size="$q.screen.gt.xs ? 'xl' : 'md'"
     :style=`{
       position: 'absolute', zIndex: 1000, right: '10px', bottom: '10px',
       borderRadius: '50%'
     }`)
   //- node editor
-  q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
-    ws-item-saver(v-if="node" :value="node")
-      template(v-slot=`{item}`)
-        node-editor(
-          ctx="workspace"
-          :node="node"
-          @cancel="nodeEditorOpened = false"
-          :style=`{
-            maxWidth: $store.state.ui.maxWidthPage+'px',
-            minHeight: $q.screen.height+'px',
-            maxHeight: $q.screen.height+'px',
-            height: $q.screen.height+'px',
-          }`)
+  q-dialog(v-model="nodeEditorOpened" position="bottom")
+    ws-node-editor(
+      ctx="workspace"
+      :node="node"
+      @close="nodeEditorOpened = false"
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+        minHeight: $q.screen.height+'px',
+        maxHeight: $q.screen.height+'px',
+        height: $q.screen.height+'px',
+      }`)
   //- header
   div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
     //- header
@@ -109,6 +108,7 @@ export default {
     },
     nodeChoose (node) {
       this.$log('nodeChoose', node)
+      this.nodeEdit(node)
     },
     async nodeDelete (node) {
       this.$log('nodeDelete', node)

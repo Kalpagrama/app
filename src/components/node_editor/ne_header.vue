@@ -28,7 +28,10 @@ div(
         v-model="node.name"
         filled color="white" dark
         label="Whats the essence?"
-        :style=`{zIndex: 100, borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+        autofocus autogrow
+        :style=`{
+          borderRadius: '10px', overflow: 'hidden',
+        }`
         ).full-width.b-70
   //- pages
   .row.full-width.items-center.content-center

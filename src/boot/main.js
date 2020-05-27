@@ -82,8 +82,10 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('wsItemFinder', () => import('components/workspace/ws_item_finder'))
     Vue.component('wsContentCreator', () => import('components/workspace/ws_content_creator'))
     Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
+    Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
     Vue.component('wsItemSaver', () => import('components/workspace/ws_item_saver'))
     Vue.component('wsFinderSpheres', () => import('components/workspace/ws_finder_spheres'))
+    Vue.component('wsNodeEditor', () => import('components/workspace/ws_node_editor'))
     // explore
     Vue.component('userExplorer', () => import('components/user_explorer'))
     Vue.component('nodeExplorer', () => import('components/node_explorer'))

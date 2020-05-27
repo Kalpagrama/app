@@ -20,12 +20,12 @@ div(:style=`{position: 'relative'}`).row.fit
         height: $q.screen.height+'px',
         maxHeight: $q.screen.height*0.8+'px'
       }`).row.full-width
-      ws-item-finder(
-        v-if="true"
-        :types="['contentNotes', 'node']"
-        :options="{header: true, backButton: true, onItemClick: 'emit'}"
-        @item="itemFound"
-        @cancel="itemFinderOpened = false")
+      //- ws-item-finder(
+      //-   v-if="true"
+      //-   :types="['contentNotes', 'node']"
+      //-   :options="{header: true, backButton: true, onItemClick: 'emit'}"
+      //-   @item="itemFound"
+      //-   @cancel="itemFinderOpened = false")
   //- item editor dialog
   q-dialog(v-model="itemEditorOpened" persistent position="bottom")
     div(
@@ -43,7 +43,7 @@ div(:style=`{position: 'relative'}`).row.fit
   //- add first item
   div(v-if="node.items.length === 0" :style=`{position: 'relative'}`).column.fit
     slot(name="header")
-    div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
+    div(:style=`{}`).row.full-width.items-center.content-center.q-px-md.q-pt-md
       span(:style=`{fontSize: '16px'}`).text-white.text-bold Select first item
     div(:style=`{overflow: 'hidden'}`).col.full-width.q-pa-sm
       ws-item-finder(

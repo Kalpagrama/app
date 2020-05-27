@@ -5,7 +5,8 @@ div(
   ).row.full-width.b-30
   component(
     :is="`edit-${pageId}`"
-    :node="node")
+    :node="node"
+    @close="$emit('close')")
     template(v-slot:header=`{}`)
       ne-header(:node="node" :pages="pages" :pageId="pageId" @pageId="pageId = $event" @cancel="$emit('cancel')")
 </template>

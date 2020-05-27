@@ -19,8 +19,9 @@ div(
       borderRadius: '10px',
       overflow: 'hidden',
     }`
-    ).row.full-width.items-center.content-center.b-140
+    ).row.full-width.items-center.content-center.b-140.cursor-pointer
     div(
+      v-if="meta.now >= layerStart && meta.now <= layerEnd"
       :style=`{
         position: 'absolute', zIndex: 1000,
         left: '0px',

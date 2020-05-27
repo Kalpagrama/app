@@ -23,7 +23,9 @@ div(
   //- header
   div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
     //- header
-    div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
+    div(
+      v-if="ctx === 'workspace'"
+      :style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Content
     //- search
@@ -47,7 +49,7 @@ div(
       q-btn(flat no-caps color="white").b-70 Filters
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-py-md
+    .row.full-width.items-start.content-start.q-py-md.q-px-sm
       kalpa-loader(type="WS_CONTENT" :variables="variables")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
@@ -72,6 +74,14 @@ import contentItem from './content_item'
 export default {
   name: 'wsContentList',
   components: {contentItem},
+  props: {
+    ctx: {
+      type: String,
+      default () {
+        return 'workspace'
+      }
+    }
+  },
   data () {
     return {
       type: 'VIDEO',
@@ -152,6 +162,9 @@ export default {
     },
     layerChoose ([content, li]) {
       this.$log('layerChoose', content, li)
+      if (this.ctx === 'nodeEditor') {
+        this.$emit('layer', content.layers[li])
+      }
     },
     layerPreview ([content, li]) {
       this.$log('layerPreview', content, li)

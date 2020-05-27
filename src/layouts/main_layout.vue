@@ -9,8 +9,8 @@
   background: none !important
 .q-input
   z-index: 100
-  border-radius: 10px
-  overflow: hidden
+  border-radius: 10px !important
+  overflow: hidden !important
   transform: translate3d(0,0,0)
 .q-dialog__backdrop
   background: rgba(0,0,0,0.8) !important
