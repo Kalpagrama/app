@@ -1,6 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
+    position: 'relative'
   }`
   ).row.full-width
   //- img(
@@ -14,10 +15,9 @@ div(
   player-video(
     v-if="composition"
     :ctx="ctx" :composition="composition"
-    :visible="visible" :active="active" :mini="mini"
-    )
-    template(v-slot:editor=`{player, meta}`)
-      slot(name="editor" :player="player" :meta="meta")
+    :visible="visible" :active="active" :mini="mini")
+    template(v-for="(_, scopedSlotName) in $scopedSlots" v-slot:[scopedSlotName]="slotData")
+      slot( :name="scopedSlotName" v-bind="slotData")
 </template>
 
 <script>

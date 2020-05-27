@@ -2,7 +2,12 @@
 </style>
 
 <template lang="pug">
-.column.fit.q-pt-sm
+div(
+  :class=`{
+    position: 'relative',
+    'q-pt-sm': $q.screen.gt.xs
+  }`
+  ).column.fit
   //- ws content editor
   q-dialog(v-model="contentEditorOpened" position="bottom")
     div(
@@ -17,9 +22,11 @@
         @close="contentEditorOpened = false")
   //- header
   div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
-    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+    //- header
+    div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold Content layers
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold Content
+    //- search
     div.row.full-width.q-px-sm
       q-input(
         v-model="searchStringRaw"
@@ -33,6 +40,7 @@
           q-btn(
             v-else
             flat dense color="grey-2" icon="attach_file" @click="contentFromFILEStart()")
+    //- actions
     div(:style=`{}`).row.full-width.items-center.content-center.q-px-sm
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
@@ -116,6 +124,12 @@ export default {
         else {
           this.searchString = to
         }
+      }
+    },
+    contentEditorOpened: {
+      handler (to, from) {
+        this.$log('contentEditorOpened CHANGED', to)
+        this.$store.commit('workspace/stateSet', ['showFooter', !to])
       }
     }
   },

@@ -16,12 +16,22 @@ div(
     round flat color="white" @click="mutedToggle()"
     :icon="meta.muted ? 'volume_off' : 'volume_up'"
     :style=`{zIndex: 1400}`)
+  q-btn(
+    round flat color="white" @click="videoForward(0)"
+    icon="fast_rewind"
+    )
+  q-btn(
+    round flat color="white" @click="videoForward(1)"
+    icon="fast_forward")
   //- bar
   div(
     @click="barClick"
     @mouseenter="mouseOverBar = true"
     @mouseleave="mouseOverBar = false"
     v-touch-pan.mouse.left.right="barDrag"
+    :class=`{
+      'b-30': mouseOverBar
+    }`
     :style=`{
       position: 'absolute', zIndex: 1200, bottom: '0px', left: '0px', height: '17px',
       borderRadius: '10px', overflow: 'hidden',
@@ -57,9 +67,9 @@ export default {
   },
   computed: {},
   watch: {
-    visible: {},
-    active: {},
-    mini: {},
+    // visible: {},
+    // active: {},
+    // mini: {},
     mouseOverBar: {
       handler (to, from) {
         // this.$log('mouseOverBar', to)
@@ -70,6 +80,20 @@ export default {
   methods: {
     mutedToggle () {
       this.$log('mutedToggle')
+    },
+    videoForward (right) {
+      // this.$log('videoForward', right)
+      let t = this.meta.now
+      if (right) {
+        t += 10
+        if (t > this.meta.duration) t = this.meta.duration
+      }
+      else {
+        t -= 10
+        if (t < 0) t = 0
+      }
+      this.player.setCurrentTime(t)
+      this.player.update(t)
     },
     barDrag (e) {
       // this.$log('barDrag', e)
@@ -97,6 +121,7 @@ export default {
       let left = e.offsetX
       let t = (this.meta.duration * left) / width
       this.player.setCurrentTime(t)
+      // tween to
       let tPercentNow = (this.meta.now / this.meta.duration) * 100
       let tPercentNext = (t / this.meta.duration) * 100
       this.barWidth = tPercentNow

@@ -1,14 +1,6 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
   q-resize-observer(@resize="onResize")
-  //- //- actions
-  //- q-btn(
-  //-   round push color="green" icon="add" size="lg" @click="layerAdd()"
-  //-   :style=`{
-  //-     position: 'absolute', zIndex: 1000, top: '-80px', right: '18px',
-  //-     borderRadius: '50%'
-  //-   }`
-  //- )
   //- layersWorkspace
   q-dialog(v-model="layersWorkspaceShow" position="bottom")
     div(
@@ -29,35 +21,10 @@ div(:style=`{position: 'relative'}`).column.fit
             :style=`{height: '44px', borderRadius: '10px'}`
             ).row.full-width.items-center.content-center.q-px-md.b-70.q-mb-xs
             span.text-white {{ l.spheres }}
-  //- footer
-  div(
-    :style=`{borderRadius: '10px', order: 10, marginBottom: '-20px', paddingBottom: '28px'}`
-    ).row.full-width.items-end.content-end.q-pt-sm.q-px-sm.b-90
-    //- q-btn(round flat color="white" icon="keyboard_arrow_up").q-mr-sm.b-110
-    //- q-btn(round flat color="white" icon="search").q-mr-sm.b-110
-    //- q-btn(
-    //-   round flat icon="line_style" @click="layersView = 'line'"
-    //-   :color="layersView === 'line' ? 'green' : 'white'").q-mr-sm.b-110
-    //- q-btn(
-    //-   round flat icon="reorder" @click="layersView = 'normal'"
-    //-   :color="layersView === 'normal' ? 'green' : 'white'").q-mr-sm.b-110
-    q-btn(
-      round flat icon="edit" @click="layersEdit()"
-      :color="layersEditing ? 'green' : 'white'").b-110
-    //- q-btn(
-    //-   round flat icon="school" @click="layersWorkspaceShow = !layersWorkspaceShow"
-    //-   :color="layersWorkspaceShow ? 'green' : 'white'").q-mr-sm.b-110
-    .col
-    q-btn(round flat color="white" icon="search").b-110.q-mr-sm
-    q-btn(round flat color="white" icon="sort" @click="layersSort()").b-110.q-mr-sm
-    q-btn(
-      round push color="green" icon="add" no-caps @click="layerAddFromWorkspace()"
-      :style=`{borderRadius: '50%'}`
-      ).q-mx-md
   //- body
   div(
     ref="extraLayersScrollArea"
-    :style=`{}`
+    :style=`{position: 'relative'}`
     ).col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-sm
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
@@ -67,8 +34,8 @@ div(:style=`{position: 'relative'}`).column.fit
           @start="layersDragging = true"
           @end="layersDragging = false, layersDraggingFutureIndex = null").full-width
           div(
-            v-for="(l,li) in meta.layers" :key="l.oid"
-            :ref="`layer-${l.oid}`"
+            v-for="(l,li) in meta.layers" :key="l.id"
+            :ref="`layer-${l.id}`"
             :style=`{marginBottom: layersView === 'line' ? '0px' : '4px'}`
             ).row.full-width
             //- LEFT
@@ -76,10 +43,11 @@ div(:style=`{position: 'relative'}`).column.fit
               v-if="true"
               v-show="layersView !== 'line'"
               :style=`{width: layersEditingToolsWidth+'px', overflow: 'hidden'}`).row.justify-start.items-start.content-start
-              q-checkbox(v-model="layersSelected" :val="l.oid" dark color="grey-6")
+              q-checkbox(v-model="layersSelected" :val="l.id" dark color="grey-6")
             //- CENTER
             .col.full-height
               layer-item(
+                :editorType="editorType"
                 :layer="l" :layerIndex="li"
                 :layerIsFirst="li === 0" :layerIsLast="li === meta.layers.length-1"
                 :layersView="layersView"
@@ -93,19 +61,55 @@ div(:style=`{position: 'relative'}`).column.fit
               :style=`{width: layersEditingToolsWidth+'px', overflow: 'hidden'}`).row.justify-end.items-start.content-start
               q-btn(flat round icon="drag_indicator" color="white").layer-drag-handle
                 q-menu(auto-close anchor="top left" self="top right")
-                  layer-menu()
-    //- margin bottom
-    div(:style=`{height: '1000px'}`).row.full-width
-  //- footer: layersSelected
-  div(:style=`{overflow: 'hidden'}`).row.full-width
+                  layer-menu(
+                    @edit="layerEdit(l, li)"
+                    @copy="layerCopy(l, li)"
+                    @delete="layerDelete(l, li)")
+    //- footer: layersSelected
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
         v-if="layersSelected.length > 0"
-        :style=`{borderRadius: '10px'}`).row.full-width.q-pa-sm.b-80
+        :style=`{
+          position: 'absolute', zIndex: 2000, bottom: '0px',
+          borderRadius: '10px', overflow: 'hidden',
+        }`).row.full-width.q-pa-sm.b-80
         q-btn(flat color="white" icon="clear" @click="layersSelectedDrop()"
           :style=`{width: '40px'}`).q-mr-sm.b-90
         q-btn(flat no-caps color="red" @click="layersSelectedDelete()").q-mr-sm.b-90 Delete
         q-btn(flat no-caps color="white" @click="layersSelectedCreateNode()").q-mr-sm.b-90 Create node
+  //- footer
+  div(
+    :style=`{
+      borderRadius: $q.screen.gt.xs ? '10px' : '10px 10px 0 0',
+    }`
+    ).row.full-width.items-end.content-end.q-pa-sm.b-70
+    //- q-btn(round flat color="white" icon="keyboard_arrow_up").q-mr-sm.b-110
+    //- q-btn(round flat color="white" icon="search").q-mr-sm.b-110
+    //- q-btn(
+    //-   round flat icon="line_style" @click="layersView = 'line'"
+    //-   :color="layersView === 'line' ? 'green' : 'white'").q-mr-sm.b-110
+    //- q-btn(
+    //-   round flat icon="reorder" @click="layersView = 'normal'"
+    //-   :color="layersView === 'normal' ? 'green' : 'white'").q-mr-sm.b-110
+    q-btn(
+      round flat icon="edit" @click="layersEdit()"
+      :color="layersEditing ? 'green' : 'white'").b-90
+    .col
+    q-btn(
+      v-if="editorType === 'content'"
+      round flat color="white" icon="search").b-90.q-mr-sm
+    q-btn(
+      v-if="editorType === 'content'"
+      round flat color="white" icon="sort" @click="layersSort()").b-90.q-mr-sm
+    //- //- add from ws?
+    //- q-btn(
+    //-   v-if="editorType === 'composition'"
+    //-   round push color="green" icon="add" no-caps @click="layerAddFromWorkspace()"
+    //-   :style=`{borderRadius: '50%'}`
+    //-   ).q-mx-md
+    q-btn(
+      round flat color="white" icon="menu_open"
+      ).b-90
 </template>
 
 <script>
@@ -114,9 +118,9 @@ import layerItem from './layer_item'
 import draggable from 'vuedraggable'
 
 export default {
-  name: 'extraLayersNew',
+  name: 'editLayers',
   components: {layerItem, layerMenu, draggable},
-  props: ['player', 'meta', 'composition'],
+  props: ['editorType', 'player', 'meta', 'composition'],
   data () {
     return {
       width: 0,
@@ -144,13 +148,13 @@ export default {
     },
     'meta.layerIndexPlay': {
       async handler (to, from) {
-        // this.$log('meta.layerIndexPlay CHANGED', to)
-        if (to < 0) return
-        await this.$wait(100)
-        let oid = this.meta.layers[to].oid
-        let ref = this.$refs[`layer-${oid}`][0]
-        let scrollTop = ref.offsetTop - 4
-        this.$tween.to(this.$refs.extraLayersScrollArea, 0.5, {scrollTop: scrollTop})
+        // // this.$log('meta.layerIndexPlay CHANGED', to)
+        // if (to < 0) return
+        // await this.$wait(100)
+        // let oid = this.meta.layers[to].oid
+        // let ref = this.$refs[`layer-${oid}`][0]
+        // let scrollTop = ref.offsetTop - 4
+        // this.$tween.to(this.$refs.extraLayersScrollArea, 0.5, {scrollTop: scrollTop})
       }
     }
   },
@@ -182,8 +186,8 @@ export default {
       this.$log('layersSelectedDelete')
       if (!confirm('Delete selected layers?')) return
       // delete layers
-      this.layersSelected.map(oid => {
-        let i = this.meta.layers.findIndex(l => l.oid === oid)
+      this.layersSelected.map(id => {
+        let i = this.meta.layers.findIndex(l => l.id === id)
         if (i >= 0) {
           if (this.meta.layerIndexPlay === i) this.$emit('meta', ['layerIndexPlay', -1])
           // TODO: if layerIndex? go to previous?
@@ -198,12 +202,19 @@ export default {
     },
     layerEdit (l, li) {
       this.$log('layerEdit', l, li)
+      // ???
     },
     layerCopy (l, li) {
       this.$log('layerCopy', l, li)
+      this.layerAdd(l)
     },
     layerDelete (l, li) {
       this.$log('layerDelete', l, li)
+      let i = this.meta.layers.findIndex(layer => layer.id === l.id)
+      if (i >= 0) {
+        if (!confirm('Delete layer ?!')) return
+        this.$delete(this.meta.layers, i)
+      }
     },
     layerAddFromWorkspace () {
       this.$log('layerAddFromWorkspace')
@@ -211,37 +222,33 @@ export default {
     layerAddFromContent () {
       this.$log('layerAddFromContent')
     },
-    async layerAdd (startInput, endInput, layerInput) {
-      this.$log('layerAdd start')
-      this.$log('layerAdd inputs: ', startInput, endInput, layerInput)
-      let start = startInput || this.meta.now
-      let end = endInput || start + 10 < this.meta.duration ? start + 10 : this.meta.duration
-      this.$log('layerAdd start/end: ', start, end)
-      // get index
-      let index = this.meta.layers.length
-      this.$log('layerIndex index:', index)
-      // get layer
-      let lId = Date.now().toString()
-      let l = layerInput || {
-        oid: lId,
-        color: this.$randomColor(lId),
-        contentOid: this.meta.content.oid,
-        figuresAbsolute: [
-          {t: start, points: []},
-          {t: end, points: []}
-        ],
-        figuresRelative: [],
-        spheres: []
+    async layerAdd (layerInput) {
+      this.$log('layerAdd start', layerInput)
+      let start = this.meta.now
+      let end = start + 10 > this.meta.duration ? this.meta.duration : start + 10
+      if (!layerInput) {
+        layerInput = {
+          contentOid: this.meta.content.oid,
+          figuresAbsolute: [
+            {t: start, points: []},
+            {t: end, points: []}
+          ],
+          figuresRelative: [],
+          spheres: []
+        }
       }
-      this.$log('layerInput', l)
+      let layerIndex = this.meta.layers.length
+      let layerId = Date.now().toString()
+      layerInput.id = layerId
+      layerInput.color = this.$randomColor(layerId)
+      this.$log('layerAdd layerInput', layerInput)
       // set layer
-      this.$set(this.composition.layers, index, l)
+      this.$set(this.composition.layers, layerIndex, layerInput)
       // set meta
-      this.$emit('meta', ['mode', 'layer'])
-      this.$emit('meta', ['layerIndex', index])
-      this.$emit('meta', ['layerIndexPlay', index])
+      // this.$emit('meta', ['mode', 'layer'])
+      // this.$emit('meta', ['layerIndex', index])
+      // this.$emit('meta', ['layerIndexPlay', index])
       // this.$emit('meta', ['layerIndex', -1])
-      // scroll to layer?
       this.$log('layerAdd done')
     },
     onResize (e) {

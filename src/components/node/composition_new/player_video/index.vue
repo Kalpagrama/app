@@ -26,9 +26,10 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).column.fit
+  slot(name="header")
   div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-30
-    //- div(:style=`{}`)
+    slot(name="video")
     q-spinner(
       v-if="!loaded"
       size="50px" color="green"
@@ -48,7 +49,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'
       }`)
     video-progress(v-bind="$props" :player="player" :meta="meta")
-  slot(name="editor" :player="player" :meta="meta")
+  .col.full-width
+    slot(name="editor" :player="player" :meta="meta")
+  slot(name="footer")
 </template>
 
 <script>
@@ -77,7 +80,9 @@ export default {
         duration: this.duration,
         playing: this.playing,
         loaded: this.loaded,
-        layer: this.layer
+        layer: this.layer,
+        layers: this.composition.layers,
+        content: this.layerContent
       }
     },
     layer () {
@@ -115,9 +120,7 @@ export default {
         if (to.layers.length > 0) {
           if (!this.layerId) this.layerId = to.layers[0].oid
         }
-        else {
-          this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
-        }
+        this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
       }
     },
     layer: {
@@ -145,7 +148,7 @@ export default {
       const videoRef = this.$refs.videoRef
       if (this.ctx === 'workspace') {
         this.$log('player WORKSPACE start', this.videoSrc)
-        alert('player WORKSPACE start')
+        // alert('player WORKSPACE start')
         let me = new window.MediaElementPlayer(videoRef, {
           loop: true,
           autoplay: true,
@@ -162,7 +165,7 @@ export default {
             this.player.addEventListener('play', this.videoPlay)
             this.player.addEventListener('pause', this.videoPause)
             this.player.addEventListener('loadeddata', this.videoLoadeddata)
-            this.player.addEventListener('timeupdate', this.videoTimeupdate)
+            // this.player.addEventListener('timeupdate', this.videoTimeupdate)
             // this.videoUpdate()
             // this.videoPlay()
             // this.player.play()
@@ -191,6 +194,9 @@ export default {
       this.player.update = (to) => {
         this.videoTimeupdate(null, to)
       }
+      this.player.meta = ([key, val]) => {
+        this[key] = val
+      }
       this.$log('playerInit done')
     },
     videoLoadeddata (e) {
@@ -204,15 +210,24 @@ export default {
       }
     },
     videoPlay (e) {
-      // this.$log('videoPlay', e)
+      this.$log('videoPlay', e)
       this.playing = true
+      if (this.ctx === 'workspace') {
+        if (this.playingInterval) clearInterval(this.playingInterval)
+        this.playingInterval = setInterval(this.videoTimeupdate, 50)
+      }
     },
     videoPause (e) {
-      // this.$log('videoPause', e)
+      this.$log('videoPause', e)
       this.playing = false
+      if (this.ctx === 'workspace') {
+        clearInterval(this.playingInterval)
+        this.playingInterval = null
+      }
     },
     videoTimeupdate (e, t) {
-      this.$log('videoTimeupdate', e, t)
+      // this.$log('videoTimeupdate')
+      // TODO: prevent to emit event on
       if (this.ctx === 'workspace') {
         this.now = t || this.player.currentTime
       }
@@ -232,7 +247,7 @@ export default {
       this.player.removeEventListener('play', this.videoPlay)
       this.player.removeEventListener('pause', this.videoPause)
       this.player.removeEventListener('loadeddata', this.videoLoadeddata)
-      this.player.removeEventListener('timeupdate', this.videoTimeupdate)
+      // this.player.removeEventListener('timeupdate', this.videoTimeupdate)
     }
     // alert('beforeDestroy')
   }

@@ -3,6 +3,14 @@
 
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit.q-pt-sm
+  //- node add
+  q-btn(
+    @click="nodeAdd()"
+    push round color="green" icon="add" size="xl"
+    :style=`{
+      position: 'absolute', zIndex: 1000, right: '10px', bottom: '10px',
+      borderRadius: '50%'
+    }`)
   //- node editor
   q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
     ws-item-saver(v-if="node" :value="node")
@@ -19,9 +27,11 @@ div(:style=`{position: 'relative'}`).column.fit.q-pt-sm
           }`)
   //- header
   div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
-    div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
+    //- header
+    div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Nodes
+    //- search
     div.row.full-width.q-px-sm
       q-input(
         v-model="searchString"
@@ -32,10 +42,12 @@ div(:style=`{position: 'relative'}`).column.fit.q-pt-sm
           q-btn(
             v-if="searchString.length > 0"
             flat dense color="grey-2" icon="clear" @click="searchString = ''")
+    //- actions
     div(:style=`{}`).row.full-width.items-center.content-center.q-px-sm
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
-      q-btn(flat no-caps color="white").b-70 Filters
+      q-btn(flat no-caps color="white").b-70 Filter
+      q-btn(push no-caps color="green" @click="nodeAdd()").q-ml-sm.gt-xs New
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md
@@ -84,14 +96,42 @@ export default {
       if (this.type !== 'all') {
         res.selector.stage = this.type
       }
+      // TODO: add spheres
       return res
     }
   },
+  watch: {},
   methods: {
-    nodeEdit (n, ni) {
-      this.$log('nodeEdit', n, ni)
-      this.node = n
+    nodeEdit (node, ni) {
+      this.$log('nodeEdit', node, ni)
+      this.node = node
       this.nodeEditorOpened = true
+    },
+    nodeChoose (node) {
+      this.$log('nodeChoose', node)
+    },
+    async nodeDelete (node) {
+      this.$log('nodeDelete', node)
+      if (!confirm('Delete node ?!')) return
+      await this.$rxdb.deleteItem(node.id)
+    },
+    async nodeAdd (nodeInput) {
+      this.$log('nodeAdd start')
+      if (!nodeInput) {
+        nodeInput = {
+          name: '',
+          wsItemType: 'WS_NODE',
+          items: [],
+          spheres: [],
+          category: 'FUN',
+          layout: 'PIP',
+          stage: 'draft'
+        }
+      }
+      let item = await this.$rxdb.upsertItem(nodeInput)
+      this.$log('nodeAddStart item', item)
+      this.searchString = ''
+      this.nodeChoose(item)
     }
   }
 }
