@@ -35,6 +35,7 @@ const LogModulesEnum = Object.freeze({
   RXDB: 'rxdb',
   RXDB_REACTIVE: 'rxdb_reactive',
   RXDB_WS: 'rxdb_ws',
+  RXDB_: 'rxdb_ws',
   BOOT: 'boot',
   ML: 'mainLayout',
   CP: 'capacitor'

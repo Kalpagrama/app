@@ -3,16 +3,16 @@ import assert from 'assert'
 import { isRxDocument, isRxQuery } from 'rxdb'
 
 import { skip } from 'rxjs/operators'
-import {rxdb} from 'src/boot/rxdb'
+import { rxdb } from 'src/boot/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Mutex } from 'src/system/rxdb/workspace'
+
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_REACTIVE)
 
 const debounceIntervalItem = 2000
-
 // класс-обертка над rxDoc для реактивности
 class ReactiveItemHolder {
   constructor (rxDoc) {
