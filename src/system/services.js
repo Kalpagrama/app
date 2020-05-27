@@ -3,7 +3,8 @@ import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'boot/i18n'
 import { assert } from 'assert'
-import {rxdb} from 'boot/rxdb'
+import { rxdb } from 'boot/rxdb'
+import { notify } from 'src/boot/notify'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
@@ -13,14 +14,16 @@ let registration = null // ServiceWorkerRegistration
 let messaging = null
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
+const forceUpdatePWA = true // обновлять приложение без разрешения прользователя
+
 async function initServices (store) {
   logD('initServices', Platform.is, process.env.MODE)
-  if (process.env.MODE === 'pwa') await initPWA(store)
-  else if (Platform.is.capacitor) {
+  if (process.env.MODE === 'pwa') {
+    await initPWA(store)
+  } else if (Platform.is.capacitor) {
     const { initCapacitor } = await import('src/system/capacitor.js')
     await initCapacitor(store)
-  }
-  else if (Platform.is.cordova) {
+  } else if (Platform.is.cordova) {
     const { initCordova } = await import('src/system/cordova.js')
     await initCordova(store)
   }
@@ -102,7 +105,14 @@ async function initPWA (store) {
                 // todo show prompt for SW to activate sw immediately and reload page
                 newSW.postMessage({ type: 'skipWaiting' })
                 store.commit('core/stateSet', ['newVersionAvailable', true])
-                showNotifyNewVer()
+                if (!forceUpdatePWA) {
+                  showNotifyNewVer()
+                } else {
+                  notify('info', 'new version will installed!')
+                  updatePWA().then(() => {
+                    notify('info', 'version updated!')
+                  })
+                }
               } else {
                 // Otherwise, this newly installed SW will soon become the
                 // active SW. Rather than explicitly wait for that to happen,
@@ -185,7 +195,7 @@ function showNotifyNewVer () {
         label: i18n.t('update_app', 'Update application'),
         noDismiss: true,
         handler: async () => {
-          await update()
+          await updatePWA()
         }
       }]
     }
@@ -227,7 +237,7 @@ async function checkUpdate () {
   }
 }
 
-async function update () {
+async function updatePWA () {
   await clearCache()
   await window.location.reload()
 }
@@ -347,4 +357,4 @@ async function showNotification (title, body) {
   }
 }
 
-export { initServices, checkUpdate, update, clearCache }
+export { initServices, checkUpdate, clearCache }

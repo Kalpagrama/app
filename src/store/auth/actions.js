@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { router } from 'boot/main'
-import { checkUpdate, clearCache, update } from 'src/system/services'
+import { checkUpdate, clearCache } from 'src/system/services'
 import assert from 'assert'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
@@ -60,7 +60,7 @@ export const logout = async (context, token) => {
       await clearCache()
       await checkUpdate()
       await router.push('/auth')
-      await update()
+      await window.location.reload()
     }
   }
   logD('@logout done')
