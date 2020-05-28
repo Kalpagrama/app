@@ -47,6 +47,7 @@ q-layout(view="hHh Lpr lff").bg-30
 // import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
+import assert from 'assert'
 
 export default {
   name: 'mainLayout',
@@ -90,7 +91,9 @@ export default {
       await this.$router.push('/auth').catch(e => e)
     } else { // залогинились
       // await this.$rxdb.init(localStorage.getItem('userRole')) // workspace, etc...
-      await this.$rxdb.init() // workspace, user, cache etc...
+      let userOid = localStorage.getItem('userOid')
+      assert(userOid, '!userOid')
+      await this.$rxdb.init(userOid) // workspace, user, cache etc...
       // go to welcome...
       if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     }

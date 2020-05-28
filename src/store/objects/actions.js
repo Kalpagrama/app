@@ -1,5 +1,6 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/schema/index'
+import {rxdb} from 'src/boot/rxdb'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
@@ -110,7 +111,7 @@ class QueryAccumulator {
     apollo.clients.api.query({
       query: gql`
         ${fragments.objectFullFragment}
-        query objectList ($oids: [OID!]!) {
+        query objectList2 ($oids: [OID!]!) {
           objectList(oids: $oids) {
             ... objectFullFragment
           }
@@ -122,7 +123,7 @@ class QueryAccumulator {
     })
     .then(result => {
       context.commit('objects/stateSet', ['queryInProgress', false], { root: true })
-      let objectList = result.data.objectList
+      let objectList = result.data.objectList2
       for (let item of itemsForQuery) {
         let object = objectList.find(obj => obj.oid === item.oid)
         // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
@@ -157,10 +158,10 @@ export const get = async (context, { oid, priority }) => {
     let promise = queryAccumulator.push(context, oid, priority)
     return await promise
   }
-  let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
-  // logD('objects/get action complete', oid)
+  let objectFull = await rxdb.findObjectOne(oid, priority)
+  logD('objectFull = ', objectFull)
+  // let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
   assert(objectFull, '!itemFull')
-  // assert(objectFull.rev, '!objectFull.rev')
   assert(objectFull.rev >= 0, 'objectFull.rev >= 0')
   return objectFull
 }

@@ -35,7 +35,7 @@ const LogModulesEnum = Object.freeze({
   RXDB: 'rxdb',
   RXDB_REACTIVE: 'rxdb_reactive',
   RXDB_WS: 'rxdb_ws',
-  RXDB_: 'rxdb_ws',
+  RXDB_CACHE: 'rxdb_cache',
   BOOT: 'boot',
   ML: 'mainLayout',
   CP: 'capacitor'
@@ -69,14 +69,12 @@ class Logger {
     return loggerModule
   }
 
-  prepareParams(msg, notice){
+  prepareParams(msg, highlight){
     let func = null
-    if (msg.length && notice){
-      msg.splice(0, 0, `%c<<${notice}>>`, 'background: #222; color: #ff0000')
-    }
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55')
+      if (highlight)msg.splice(0, 1, `%c[${func.name}]`, 'background: #69f542; color: #f54242')
+      else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55')
     }
   }
 
@@ -126,7 +124,7 @@ class Logger {
     try {
       if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevel) {
-        this.prepareParams(msg, 'ERROR')
+        this.prepareParams(msg, true)
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry) {
@@ -142,7 +140,7 @@ class Logger {
     try {
       if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
-        this.prepareParams(msg, 'CRITICAL')
+        this.prepareParams(msg, true)
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry) {

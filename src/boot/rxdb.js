@@ -1,10 +1,14 @@
 import assert from 'assert'
-import { Workspace, WsCollectionEnum } from 'src/system/rxdb/workspace'
+import { Workspace, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/workspace'
+import { Cache, ObjectQueries } from 'src/system/rxdb/cache'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { addRxPlugin } from 'rxdb'
 
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
 import { ReactiveItemHolder, ReactiveListHolder } from 'src/system/rxdb/reactive'
+import { apollo } from 'src/boot/apollo'
+import { fragments } from 'src/schema'
+import { CurrentUser } from 'src/system/rxdb/user'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
@@ -25,29 +29,37 @@ class RxDBWrapper {
   async create () {
     addRxPlugin(require('pouchdb-adapter-idb'))
     addRxPlugin(RxDBLeaderElectionPlugin)
+    this.cache = new Cache()
+    await this.cache.create()
+    this.objectQueries = new ObjectQueries(this.cache)
+    this.workspace = new Workspace()
+    await this.workspace.create()
     this.created = true
   }
 
-  async init () {
-    // todo проинициализировать модуль юзера. Взять оттуда userDoc = {wsRevision и userRole}
-    logE('TODO!!!!!')
-
-    class UserDoc {
-      constructor () {
-        this.wsRevision = 0
-        this.userRole = 'MEMBER'
-      }
-
-      async atomicSet (prop, value) {
-        this.wsRevision = value
-      }
-    }
+  async init (userOid) {
+    this.currentUser = await this.objectQueries.findOne(userOid)
+    await this.currentUser.init()
 
     logD('init RXDB')
     assert(this.created, '!created')
     assert(!this.initialized, 'call init once!')
-    this.workspace = new Workspace()
-    await this.workspace.create(new UserDoc())
+    // eslint-disable-next-line no-constant-condition
+    if (true) {
+      class UserDoc {
+        constructor () {
+          this.wsRevision = 0
+          this.userRole = 'MEMBER'
+        }
+
+        async atomicSet (prop, value) {
+          this.wsRevision = value
+        }
+      }
+
+      let currentUser = new UserDoc()
+      this.workspace.switchOnSynchro(currentUser)
+    }
     this.initialized = true
   }
 
@@ -81,6 +93,14 @@ class RxDBWrapper {
     }
   }
 
+  async lock () {
+    await this.workspace.lock()
+  }
+
+  release () {
+    this.workspace.release()
+  }
+
   async processEvent (event) {
     switch (event.type) {
       case 'WS_ITEM_CREATED':
@@ -94,27 +114,30 @@ class RxDBWrapper {
 
   // определит по итему - откуда он и вставит в нужную коллекцию
   async upsertItem (item, withLock = true) {
-    let rxDoc = await this.workspace.upsertItem(item, withLock)
-    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return reactiveItemHolder.item
+    if (item.wsItemType && item.wsItemType in WsItemTypeEnum){
+      let rxDoc = await this.workspace.upsertItem(item, withLock)
+      let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+      return reactiveItemHolder.reactiveItem
+    }
   }
 
   async deleteItem (id) {
-    return await this.workspace.deleteItem(id)
+    let keyParts = id.split('::')
+    assert(keyParts.length === 2, 'bad id' + id)
+    let collection = keyParts[0]
+    if (collection in WsCollectionEnum){
+      return await this.workspace.deleteItem(id)
+    } else throw new Error('bad id!!' + id)
   }
 
-  async findWs (rxCollectionEnum, query) {
-    let rxQuery = this.getCollection(rxCollectionEnum).find(query)
+  async findWs (rxCollectionEnum, mangoQuery) {
+    let rxQuery = this.getCollection(rxCollectionEnum).find(mangoQuery)
     let holder = new ReactiveListHolder()
     return await holder.create(rxQuery)
   }
 
-  async lock() {
-    await this.workspace.lock()
-  }
-
-  release() {
-    this.workspace.release()
+  async findObjectOne (oid, priority) {
+    return await this.objectQueries.findOneQueue(oid, priority)
   }
 }
 

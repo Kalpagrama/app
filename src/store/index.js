@@ -49,7 +49,8 @@ export default function (/* { ssrContext } */) {
 
         await context.dispatch('user/init')
         let user = context.getters.currentUser
-        assert(user && context.state.auth.userIsConfirmed)
+        // logD('user = ', user, context.state.auth)
+        assert(user && context.state.auth.userIsConfirmed, 'user && context.state.auth.userIsConfirmed')
 
         await context.dispatch('events/init')
         await context.dispatch('core/init')

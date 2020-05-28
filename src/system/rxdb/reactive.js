@@ -6,7 +6,6 @@ import { skip } from 'rxjs/operators'
 import { rxdb } from 'src/boot/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { Mutex } from 'src/system/rxdb/workspace'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_REACTIVE)
@@ -17,19 +16,20 @@ const debounceIntervalItem = 2000
 class ReactiveItemHolder {
   constructor (rxDoc) {
     assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
+    assert(rxDoc.id, '!rxDoc.id')
     logD('ReactiveItemHolder::constructor', rxDoc.id)
     if (rxDoc.reactiveItemHolder) {
-      this.item = rxDoc.reactiveItemHolder.item
+      this.reactiveItem = rxDoc.reactiveItemHolder.reactiveItem
     } else {
-      rxDoc.reactiveItemHolder = this
       this.rxDoc = rxDoc
       this.mutex = new Mutex()
       this.vm = new Vue({
         data: {
-          item: rxDoc.toJSON()
+          reactiveItem: rxDoc.toJSON()
         }
       })
-      this.item = this.vm.item
+      this.reactiveItem = this.vm.reactiveItem
+      rxDoc.reactiveItemHolder = this
       this.rxDocSubscribe()
       this.itemSubscribe()
     }
@@ -45,9 +45,9 @@ class ReactiveItemHolder {
         await this.mutex.lock()
         this.itemUnsubscribe()
         logD(f, `rxDoc changed ${change.id} rev ${change.rev}`)
-        for (let key in change) this.item[key] = change[key] // изменившиеся и добавившиеся
-        for (let key in this.item) {
-          if (!(key in change)) delete this.item[key] // удалившиеся
+        for (let key in change) this.reactiveItem[key] = change[key] // изменившиеся и добавившиеся
+        for (let key in this.reactiveItem) {
+          if (!(key in change)) delete this.reactiveItem[key] // удалившиеся
         }
       } finally {
         this.itemSubscribe()
@@ -66,19 +66,20 @@ class ReactiveItemHolder {
   itemSubscribe () {
     const f = this.itemSubscribe
     if (this.itemUnsubscribeFunc) return
-    this.itemUnsubscribeFunc = this.vm.$watch('item', (newVal, oldVal) => {
-      // item изменилась (из UI)
-      // logD(f, 'item changed from UI', newVal)
+    this.itemUnsubscribeFunc = this.vm.$watch('reactiveItem', (newVal, oldVal) => {
+      // reactiveItem изменилась (из UI)
+      // logD(f, 'reactiveItem changed from UI', newVal)
       if (!this.debouncedItemSave) {
         this.debouncedItemSave = debounce(async (newVal) => {
-          // игнорируем newVal (берем из this.item)!!! this.item содержит самые актуальные данные!
+          // игнорируем newVal (берем из this.reactiveItem)!!! this.reactiveItem содержит самые актуальные данные!
           let f = this.debouncedItemSave
+          if (this.rxDoc.deleted) return // на всякий случай
           try {
             await this.mutex.lock()
             await rxdb.lock() // необходимо заблокировать до вызова this.rxDocUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
             this.rxDocUnsubscribe()
-            logD(f, 'item changed from UI (debounce)', this.item)
-            await rxdb.upsertItem(this.item, false) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
+            logD(f, 'reactiveItem changed from UI (debounce)', this.reactiveItem)
+            await rxdb.upsertItem(this.reactiveItem, false) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
           } finally {
             this.rxDocSubscribe()
             await rxdb.release()
@@ -102,8 +103,7 @@ class ReactiveListHolder {
     logD('ReactiveListHolder::constructor', rxQuery)
     assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
     if (rxQuery.reactiveListHolder) {
-      this.list = rxQuery.reactiveListHolder.list
-      return this.list
+      this.reactiveList = rxQuery.reactiveListHolder.reactiveList
     } else {
       rxQuery.reactiveListHolder = this
       this.rxQuery = rxQuery
@@ -112,18 +112,18 @@ class ReactiveListHolder {
       assert(Array.isArray(docs), 'Array.isArray(docs)')
       this.vm = new Vue({
         data: {
-          list: docs.map(rxDoc => {
+          reactiveList: docs.map(rxDoc => {
             let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-            return reactiveItemHolder.item
+            return reactiveItemHolder.reactiveItem
           })
         }
       })
-      this.list = this.vm.list
-      assert(Array.isArray(this.vm.list), 'Array.isArray(this.vm.list)')
+      this.reactiveList = this.vm.reactiveList
+      assert(Array.isArray(this.vm.reactiveList), 'Array.isArray(this.vm.reactiveList)')
       this.rxQuerySubscribe()
       this.listSubscribe()
-      return this.list
     }
+    return this.reactiveList
   }
 
   rxQuerySubscribe () {
@@ -135,10 +135,10 @@ class ReactiveListHolder {
         await this.mutex.lock()
         this.listUnsubscribe()
         // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
-        if (this.vm.list.length === results.length) {
+        if (this.vm.reactiveList.length === results.length) {
           let arrayChanged = false
           for (let i = 0; i < results.length; i++) {
-            if (results[i].id !== this.vm.list[i].id) {
+            if (results[i].id !== this.vm.reactiveList[i].id) {
               arrayChanged = true
               break
             }
@@ -148,9 +148,9 @@ class ReactiveListHolder {
         logD(f, 'rxQuery changed', results)
         let items = results.map(rxDoc => {
           let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-          return reactiveItemHolder.item
+          return reactiveItemHolder.reactiveItem
         })
-        this.vm.list.splice(0, this.vm.list.length, ...items)
+        this.vm.reactiveList.splice(0, this.vm.reactiveList.length, ...items)
       } finally {
         this.listSubscribe()
         this.mutex.release()
@@ -166,9 +166,9 @@ class ReactiveListHolder {
   listSubscribe () {
     const f = this.listSubscribe
     if (this.listUnsubscribeFunc) return
-    this.listUnsubscribeFunc = this.vm.$watch('list', async (newVal, oldVal) => {
+    this.listUnsubscribeFunc = this.vm.$watch('reactiveList', async (newVal, oldVal) => {
       assert(false, 'изменения списка из UI запрещены')
-      // // list изменился (из UI)
+      // // reactiveList изменился (из UI)
       // if (!this.debouncedListSave) {
       //   this.debouncedListSave = debounce(async (newVal, oldVal) => {
       //     let f = this.debouncedListSave
@@ -176,7 +176,7 @@ class ReactiveListHolder {
       //       await this.mutex.lock()
       //       await rxdb.lock() // необходимо заблокировать до вызова this.rxQueryUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
       //       this.rxQueryUnsubscribe()
-      //       logD(f, 'reactive list changed from UI', newVal)
+      //       logD(f, 'reactiveList changed from UI', newVal)
       //       let insertedItems = difference(newVal, oldVal, (left, right) => left.id === right.id) // что добавилось в массив
       //       let deletedItems = difference(oldVal, newVal, (left, right) => left.id === right.id) // что удалено из массива
       //
@@ -205,4 +205,31 @@ class ReactiveListHolder {
   }
 }
 
-export { ReactiveItemHolder, ReactiveListHolder }
+class Mutex {
+  constructor () {
+    this.queue = []
+    this.locked = false
+  }
+
+  lock () {
+    return new Promise((resolve, reject) => {
+      if (this.locked) {
+        this.queue.push([resolve, reject])
+      } else {
+        this.locked = true
+        resolve()
+      }
+    })
+  }
+
+  release () {
+    if (this.queue.length > 0) {
+      const [resolve, reject] = this.queue.shift()
+      resolve()
+    } else {
+      this.locked = false
+    }
+  }
+}
+
+export { ReactiveItemHolder, ReactiveListHolder, Mutex }

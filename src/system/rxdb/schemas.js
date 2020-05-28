@@ -1,3 +1,20 @@
+export const schemaKeyValue = {
+  title: 'schemaKeyValue',
+  version: 0,
+  description: 'schemaKeyValue',
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      primary: true
+    },
+    value: {
+      type: 'string'
+    }
+  },
+  required: ['id', 'value']
+}
+
 export const wsSchemaNode = {
   title: 'wsSchemaNode',
   version: 0,
@@ -226,24 +243,6 @@ export const wsSchemaSphere = {
   required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
   indexes: ['oid', 'name', 'createdAt', 'updatedAt']
 }
-
-export const wsSchemaMeta = {
-  title: 'wsSchemaMeta',
-  version: 0,
-  description: 'wsSchemaMeta',
-  type: 'object',
-    properties: {
-      key: {
-        type: 'string',
-        primary: true
-      },
-      value: {
-        type: 'string'
-      }
-    },
-  required: ['key', 'value']
-}
-
 export const wsSchemaLocalChanges = {
   title: 'wsSchemaLocalChanges',
   version: 0,
@@ -259,4 +258,21 @@ export const wsSchemaLocalChanges = {
     }
   },
   required: ['id', 'operation']
+}
+
+export const cacheSchema = {
+  title: 'cacheSchema',
+  version: 0,
+  description: 'cacheSchema',
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      primary: true
+    },
+    item: {
+      type: 'object'
+    }
+  },
+  required: ['id', 'item']
 }

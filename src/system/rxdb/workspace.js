@@ -6,10 +6,11 @@ import {
   wsSchemaContent,
   wsSchemaNode,
   wsSchemaSphere,
-  wsSchemaLocalChanges, wsSchemaMeta
+  wsSchemaLocalChanges, schemaKeyValue
 } from 'src/system/rxdb/schemas'
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { Mutex } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_WS)
@@ -55,33 +56,6 @@ const WsItemTypeEnum = Object.freeze({
 const WsCollectionEnum = Object.freeze({ ...WsItemTypeEnum })
 const WsOperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
 
-class Mutex {
-  constructor () {
-    this.queue = []
-    this.locked = false
-  }
-
-  lock () {
-    return new Promise((resolve, reject) => {
-      if (this.locked) {
-        this.queue.push([resolve, reject])
-      } else {
-        this.locked = true
-        resolve()
-      }
-    })
-  }
-
-  release () {
-    if (this.queue.length > 0) {
-      const [resolve, reject] = this.queue.shift()
-      resolve()
-    } else {
-      this.locked = false
-    }
-  }
-}
-
 // Workspace вызывается 1: из UI(upsertItem/deleteItem); 2: из сети(processEvent); 3: synchroLoop.
 // Эти ф-ии сериализованы(вызываются строго друг за другом) (см Mutex)
 class Workspace {
@@ -121,7 +95,7 @@ class Workspace {
     await this.db.collection({ name: 'ws_sphere', schema: wsSchemaSphere, migrationStrategies: migrationProxy({}) })
     await this.db.collection({
       name: 'ws_meta',
-      schema: wsSchemaMeta,
+      schema: schemaKeyValue,
       migrationStrategies: migrationProxy({})
     })
     await this.db.collection({
@@ -133,9 +107,9 @@ class Workspace {
       logD(f, 'RXDB::WS::LEADER!!!!')
       this.isLeader = true
     })
-    // обработка события измения мастерской (запоминает измененные элементы)
-    let pushChangedItems = async (id, operation) => {
-      const f = pushChangedItems
+    // обработка события измения мастерской пользователем (запоминает измененные элементы)
+    let onWsChangedByUser = async (id, operation) => {
+      const f = onWsChangedByUser
       if (!this.isLeader) return
       assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
       await this.db.ws_changes.atomicUpsert({ id, operation })
@@ -143,73 +117,30 @@ class Workspace {
     }
     for (let wsCollectionEnum in WsCollectionEnum) {
       this.getWsCollection(wsCollectionEnum).postInsert(async (plainData) => {
-        await pushChangedItems(plainData.id, WsOperationEnum.UPSERT)
+        await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
       }, false)
       this.getWsCollection(wsCollectionEnum).postSave(async (plainData) => {
-        await pushChangedItems(plainData.id, WsOperationEnum.UPSERT)
+        await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
       }, false)
       this.getWsCollection(wsCollectionEnum).postRemove(async (plainData) => {
-        await pushChangedItems(plainData.id, WsOperationEnum.DELETE)
+        await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE)
       }, false)
     }
   }
 
+  // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
   async purgeDb () {
     let f = this.purgeDb
     logD(f, 'purgeDb ws_db')
-    try {
-      await this.mutex.lock()
-      let purgeLastDateDoc = await this.db.ws_meta.findOne('purgeLastDate').exec()
-      let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc.value) : 0
-      if (Date.now() - purgeLastDate < purgePeriod) return
-      await this.db.ws_meta.atomicUpsert({ key: 'purgeLastDate', value: Date.now().toString() })
-      let dump = await this.db.dump()
-      await this.db.remove()
-      await this.db.destroy()
-      await this.createDb()
-      await this.db.importDump(dump)
-    } finally {
-      this.mutex.release()
-    }
-  }
-
-  async create (userDoc, recursive = false) {
-    const f = this.create
-    assert(!this.created, 'this.created')
-    try {
-      this.synchroLoopWaitObj = new WaitBreakable(synchroTimeMin)
-      this.mutex = new Mutex()
-      await this.createDb()
-
-      if (userDoc) { // для гостей мастерская НЕ синхронится с сервером!
-        this.userDoc = userDoc
-        assert(userDoc.wsRevision >= 0, '!userDoc.wsRevision')
-        // синхроним изменения в цикле
-        let synchroLoop = async () => {
-          const f = synchroLoop
-          while (true) {
-            logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
-            try {
-              await this.mutex.lock()
-              if (this.isLeader) await this.synchronize()
-            } catch (err) {
-              logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
-              this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeMin * 10))
-            } finally {
-              this.mutex.release()
-            }
-            await this.synchroLoopWaitObj.wait()
-          }
-        }
-        synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
-      }
-      this.created = true
-      await this.purgeDb() // очистит бд от старых данных
-    } catch (err) {
-      logE(f, 'ошибка при создания Workspace! очищаем и пересоздаем!', err)
-      await this.clear()
-      if (!recursive) await this.create(userDoc, true)
-    }
+    let purgeLastDateDoc = await this.db.ws_meta.findOne('purgeLastDate').exec()
+    let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc.value) : 0
+    if (Date.now() - purgeLastDate < purgePeriod) return
+    await this.db.ws_meta.atomicUpsert({ id: 'purgeLastDate', value: Date.now().toString() })
+    let dump = await this.db.dump()
+    await this.db.remove()
+    await this.db.destroy()
+    await this.createDb()
+    await this.db.importDump(dump)
   }
 
   // удалить все данные из мастерской
@@ -219,6 +150,49 @@ class Workspace {
     await removeRxDatabase('ws', 'idb')
     this.created = false
     logD(f, 'complete')
+  }
+
+  switchOnSynchro(userDoc){
+    const f = this.switchOnSynchro
+    assert(userDoc, '!userDoc')
+    if (userDoc) { // для гостей мастерская НЕ синхронится с сервером!
+      this.userDoc = userDoc
+      assert(userDoc.wsRevision >= 0, '!userDoc.wsRevision')
+      // синхроним изменения в цикле
+      let synchroLoop = async () => {
+        const f = synchroLoop
+        while (true) {
+          logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
+          try {
+            await this.mutex.lock()
+            if (this.isLeader) await this.synchronize()
+          } catch (err) {
+            logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
+            this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeMin * 10))
+          } finally {
+            this.mutex.release()
+          }
+          await this.synchroLoopWaitObj.wait()
+        }
+      }
+      synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
+    }
+  }
+
+  async create (recursive = false) {
+    const f = this.create
+    assert(!this.created, 'this.created')
+    try {
+      this.synchroLoopWaitObj = new WaitBreakable(synchroTimeMin)
+      this.mutex = new Mutex()
+      await this.createDb()
+      await this.purgeDb() // очистит бд от старых данных
+      this.created = true
+    } catch (err) {
+      logE(f, 'ошибка при создания Workspace! очищаем и пересоздаем!', err)
+      await this.clear()
+      if (!recursive) await this.create(true)
+    }
   }
 
   async synchronize () {
@@ -265,7 +239,7 @@ class Workspace {
           }
         }
         // logD('set wsRevision', wsServer.rev.toString())
-        await this.db.ws_meta.atomicUpsert({ key: 'wsRevision', value: wsServer.rev.toString() }) // версия по мнению клиента
+        await this.db.ws_meta.atomicUpsert({ id: 'wsRevision', value: wsServer.rev.toString() }) // версия по мнению клиента
         await this.userDoc.atomicSet('wsRevision', wsServer.rev) // версия по мнению сервера
         logD(f, 'pull ws complete')
       }
@@ -299,15 +273,20 @@ class Workspace {
     for (let rxDocUnsavedItem of unsavedItems) {
       let { id, operation, updatedAt } = rxDocUnsavedItem
       let itemCollection = this.getWsCollectionByItem({ id })
-      let rxDoc = await itemCollection.findOne(id).exec()
-      logD(f, `try sync rxDoc: ${operation} ${id} rev:${rxDoc.rev}`)
-      let plainDoc = operation === WsOperationEnum.DELETE ? { id } : rxDoc.toJSON()
-      assert(plainDoc, 'документ не найден!' + id)
+      let plainDoc
+      if (operation === WsOperationEnum.DELETE) plainDoc = { id }
+      else {
+        let rxDoc = await itemCollection.findOne(id).exec()
+        if (!rxDoc) { // в мастерской нет такого элемента!
+          await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
+          continue
+        }
+        operation = rxDoc.toJSON()
+      }
       try {
-        // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрееБ чем закончится saveToServer)
+        // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
         await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
         await saveToServer(operation, plainDoc)
-        // todo проверить что действительно удаляется!!!  // await rxDocUnsavedItem.remove()
         this.synchroLoopWaitObj.setTimeout(synchroTimeMin)
       } catch (err) {
         if (err.networkError) { // если ошибка не сетевая - увеличить интервал
@@ -380,7 +359,7 @@ class Workspace {
         logD(f, `event проигнорирован (у нас самая актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-      await this.db.ws_meta.atomicUpsert({ key: 'wsRevision', value: wsRevision.toString() }) // версия по мнению клиента
+      await this.db.ws_meta.atomicUpsert({ id: 'wsRevision', value: wsRevision.toString() }) // версия по мнению клиента
       logD(f, 'complete')
     } finally {
       this.mutex.release()
@@ -455,4 +434,4 @@ class Workspace {
   }
 }
 
-export { Workspace, WsCollectionEnum, Mutex }
+export { Workspace, WsCollectionEnum, WsItemTypeEnum }
