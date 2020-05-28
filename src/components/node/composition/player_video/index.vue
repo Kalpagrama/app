@@ -34,10 +34,10 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
       v-if="!loaded"
       size="50px" color="green"
       :style=`{position: 'absolute', top: 'calc(50% - 25px)', left: 'calc(50% - 25px)'}`)
+    //- :src="videoSrc" :type="videoType"
     video(
       ref="videoRef"
-      :src="videoSrc"
-      :type="videoType"
+      :src="videoSrc" :type="videoType"
       :playsinline="true"
       :loop="true"
       :controls="false"
@@ -48,6 +48,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
       :style=`{
         position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'
       }`)
+      //- source(:src="videoSrc" :type="videoType")
     video-progress(v-bind="$props" :player="player" :meta="meta")
   .col.full-width
     slot(name="editor" :player="player" :meta="meta")
@@ -63,6 +64,8 @@ export default {
   props: ['ctx', 'composition', 'visible', 'active', 'mini'],
   data () {
     return {
+      mode: 'content',
+      modes: ['content', 'layer', 'composition'],
       layerId: null,
       layerContent: null,
       now: 0,
@@ -81,6 +84,7 @@ export default {
         playing: this.playing,
         loaded: this.loaded,
         layer: this.layer,
+        layerId: this.layerId,
         layers: this.composition.layers,
         content: this.layerContent
       }
@@ -132,16 +136,28 @@ export default {
       async handler (to, from) {
         this.$log('layer CHANGED', to)
         if (to) {
+          // this.layerContent = null
+          // this.$nextTick(async () => {
+          //   this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+          // })
           this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
         }
       }
     },
     videoSrc: {
       async handler (to, from) {
-        this.$log('videoSrc', to)
+        this.$log('videoSrc CHANGED', to)
         if (to) {
           await this.$wait(1000)
-          if (!this.player) this.playerInit()
+          // if (!this.player) this.playerInit()
+          if (this.player) {
+            this.player.src = to
+            // this.videoLoadeddata()
+            // this.player.update()
+          }
+          else {
+            this.playerInit()
+          }
         }
       }
     }
@@ -199,6 +215,7 @@ export default {
         this.videoTimeupdate(null, to)
       }
       this.player.meta = ([key, val]) => {
+        this.$log('player.meta()', key, val)
         this[key] = val
       }
       if (this.ctx === 'workspace') {

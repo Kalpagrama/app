@@ -1,5 +1,6 @@
 <style lang="sass" scoped>
 .menu-item
+  cursor: pointer
   &:hover
     background: rgb(70,70,70) !important
 </style>

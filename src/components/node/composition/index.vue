@@ -17,7 +17,15 @@ div(
     :ctx="ctx" :composition="composition"
     :visible="visible" :active="active" :mini="mini")
     template(v-for="(_, scopedSlotName) in $scopedSlots" v-slot:[scopedSlotName]="slotData")
-      slot( :name="scopedSlotName" v-bind="slotData")
+      slot(:name="scopedSlotName" v-bind="slotData")
+      div(
+        v-if="scopedSlotName === 'video'"
+        :style=`{
+          position: 'absolute', zIndex: 10000, top: '0px',
+          borderRadius: '10px', overflow: 'hidden',
+        }`
+        ).row.full-width.bg-red.q-pa-sm
+        span.text-white hello
 </template>
 
 <script>

@@ -22,7 +22,7 @@ div(
   div(:style=`{height: '60px'}`).row.full-width.items-center.content-center
     q-btn(round flat color="white" icon="more_vert").b-110
     .col
-    q-btn(round flat color="white" icon="check" @click="layerClose()").b-110
+    q-btn(round color="green" icon="check" @click="layerClose()").b-110
 </template>
 
 <script>

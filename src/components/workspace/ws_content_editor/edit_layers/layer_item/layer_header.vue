@@ -87,11 +87,17 @@ export default {
       else {
         return 'Set layer name'
       }
+    },
+    layerStart () {
+      return this.layer.figuresAbsolute[0].t
     }
   },
   methods: {
     layerTintClick () {
       this.$log('layerTintClick')
+      this.player.meta(['layerId', this.layer.id])
+      this.player.setCurrentTime(this.layerStart)
+      this.player.update(this.layerStart)
       this.$emit('mode', 'edit')
     },
     layerNameClick () {

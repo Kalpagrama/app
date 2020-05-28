@@ -40,15 +40,15 @@ export default {
         norm: {
           fn: () => {
             this.$tween.to(this, 0.5, {height: 50})
-            this.$emit('meta', ['mode', 'watch'])
-            this.$emit('meta', ['layerIndexPlay', -1])
+            this.player.meta(['mode', 'content'])
+            // this.player.meta(['layerId', this.layer.id])
           }
         },
         edit: {
           fn: () => {
             this.$tween.to(this, 0.5, {height: 318})
-            this.$emit('meta', ['mode', 'layer'])
-            this.$emit('meta', ['layerIndexPlay', this.layerIndex])
+            this.player.meta(['mode', 'layer'])
+            this.player.meta(['layerId', this.layer.id])
           }
         },
       }
@@ -62,40 +62,19 @@ export default {
         this.modes[to].fn()
       }
     },
-    'meta.layerIndexPlay': {
-      immediate: true,
-      async handler (to, from) {
-        // this.$log('meta.layerIndexPlay CHANGED', to)
-        if (to < 0) return
-        if (to === this.layerIndex) {
-          this.mode = 'edit'
-        }
-        else {
-          await this.$wait(600)
-          // this.height = 44
-          this.mode = 'norm'
+    'meta.layerId': {
+      handler (to, from) {
+        this.$log('meta.layerId CHANGED', to)
+        if (to) {
+          if (to === this.layer.id) {
+            this.mode = 'edit'
+          }
+          else {
+            this.mode = 'norm'
+          }
         }
       }
     }
-    // layersView: {
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('layersView', to)
-    //     switch (to) {
-    //       case 'line': {
-    //         this.$tween.to(this, 0.5, {height: this.heightMin})
-    //         break
-    //       }
-    //       case 'normal': {
-    //         if (this.height === this.heightMin) {
-    //           this.$tween.to(this, 0.5, {height: this.heightNormal})
-    //         }
-    //         this.framesDragToLayer()
-    //         break
-    //       }
-    //     }
-    //   }
-    // }
   }
 }
 </script>

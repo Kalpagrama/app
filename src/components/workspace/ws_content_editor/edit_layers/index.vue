@@ -22,7 +22,7 @@ div(:style=`{position: 'relative'}`).column.fit
       overflowX: 'hidden',
     }`
     ).col.full-width.scroll
-    div(:style=`{}`).row.full-width.items-start.content-start.q-pa-sm
+    div(:style=`{paddingBottom: '200px'}`).row.full-width.items-start.content-start.q-pa-sm
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
         draggable(
           :list="meta.layers" group="layers" handle=".layer-drag-handle"
@@ -148,15 +148,14 @@ export default {
         }
       }
     },
-    'meta.layerIndexPlay': {
+    'meta.layerId': {
       async handler (to, from) {
-        // // this.$log('meta.layerIndexPlay CHANGED', to)
-        // if (to < 0) return
+        this.$log('meta.layerId CHANGED', to)
+        if (!to) return
         // await this.$wait(100)
-        // let oid = this.meta.layers[to].oid
-        // let ref = this.$refs[`layer-${oid}`][0]
-        // let scrollTop = ref.offsetTop - 4
-        // this.$tween.to(this.$refs.extraLayersScrollArea, 0.5, {scrollTop: scrollTop})
+        let ref = this.$refs[`layer-${to}`][0]
+        let scrollTop = ref.offsetTop - 4
+        this.$tween.to(this.$refs.extraLayersScrollArea, 0.5, {scrollTop: scrollTop})
       }
     }
   },
@@ -253,10 +252,10 @@ export default {
       // set layer
       this.$set(this.composition.layers, layerIndex, layerInput)
       // set meta
-      // this.$emit('meta', ['mode', 'layer'])
-      // this.$emit('meta', ['layerIndex', index])
-      // this.$emit('meta', ['layerIndexPlay', index])
-      // this.$emit('meta', ['layerIndex', -1])
+      this.$nextTick(() => {
+        this.player.meta(['layerId', layerId])
+        this.player.meta(['mode', 'layer'])
+      })
       this.$log('layerAdd done')
     },
     onResize (e) {
