@@ -8,7 +8,7 @@
 div(:style=`{}`).column.fit.b-50
   //- header
   div(
-    :style=`{height: '60px'}`
+    :style=`{height: '80px'}`
     ).row.full-width.items-center.content-center
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
       q-btn(round flat color="white")
@@ -77,7 +77,7 @@ div(:style=`{}`).column.fit.b-50
             span(:style=`{fontSize: '18px'}`).q-mx-lg Create node
         //- version
         .row.full-width.items-center.q-px-md.q-py-sm
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.0.1-15.05.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.0.2-28.05.2020
         //- slot(name="footer")
 </template>
 

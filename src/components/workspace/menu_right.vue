@@ -15,7 +15,7 @@ div(
   }`
   ).column.full-width
   div(:style=`{height: '70px'}`).row.full-width.items-center.content-center.q-px-md
-    span(:style=`{fontSize: '20px'}`).text-white.text-bold Workspace
+    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Workspace
     //- span.text-white inDrawer {{inDrawer}}
   .col.full-width.scroll
     .row.full-width.items-start
@@ -31,7 +31,8 @@ div(
           :class=`{
           }`
           :style=`{
-            fontSize: '16px'
+            fontSize: '16px',
+            userSelect: 'none'
           }`
           ).text-white {{ p.name }}
 </template>

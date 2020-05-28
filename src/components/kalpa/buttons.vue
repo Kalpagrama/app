@@ -7,18 +7,19 @@
 <template lang="pug">
 div(:style=`{}`).row.items-center.content-center.q-py-sm
   //- TODO create CSS variable for #4caf50 color...
-  div(
-    v-for="(i, ii) in value" :key="i[idKey]" @click="$emit('id', i[idKey])"
-    :class=`{
-      'bg-green': id === i[idKey]
-    }`
-    :style=`{
-      position: 'relative', borderRadius: '10px', overflow: 'hidden', userSelect: 'none',
-      height: '36px',
-      minWidth: '50px',
-      color: id === i[idKey] ? 'white !important' : '#4caf50',}`
-    ).row.items-center.content-center.justify-center.text-green.cursor-pointer.q-px-sm.q-mr-sm.kalpa-button
-    span {{ i.name }}
+  div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap.b-70
+    div(
+      v-for="(i, ii) in value" :key="i[idKey]" @click="$emit('id', i[idKey])"
+      :class=`{
+        'bg-green': id === i[idKey]
+      }`
+      :style=`{
+        position: 'relative', borderRadius: '10px', overflow: 'hidden', userSelect: 'none',
+        height: '36px',
+        minWidth: '50px',
+        color: id === i[idKey] ? 'white !important' : '#4caf50',}`
+      ).row.items-center.content-center.justify-center.text-green.cursor-pointer.q-px-md.kalpa-button
+      span.text-white {{ i.name }}
 </template>
 
 <script>

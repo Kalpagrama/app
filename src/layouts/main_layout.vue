@@ -1,7 +1,7 @@
 <style lang="sass">
 .q-menu
   border-radius: 10px !important
-  background: none !important
+  // background: none !important
 .q-drawer
   z-index: 100000
   // border-radius: 10px 10px 0 0 !important
@@ -9,9 +9,24 @@
   background: none !important
 .q-input
   z-index: 100
+  border-radius: 10px !important
+  overflow: hidden !important
+  transform: translate3d(0,0,0)
+.q-dialog__backdrop
+  background: rgba(0,0,0,0.8) !important
+.k-input
+  border: none
   border-radius: 10px
   overflow: hidden
-  transform: translate3d(0,0,0)
+  padding-left: 16px
+  padding-right: 16px
+  color: white
+  height: 42px
+  &:focus
+    outline: none
+    border: 1px solid rgb(150,150,150)
+// *
+//   outline: 0.5px solid red
 </style>
 
 <template lang="pug">
@@ -62,15 +77,15 @@ export default {
     title: 'Kalpagramma'
   },
   methods: {
-    onResize (e) {
-      this.$log('onResize', e)
-      let vv = window.visualViewport
-      this.$log('vv', vv)
-      let height = vv.height
-      this.offsetTop = vv.offsetTop
-      this.$store.commit('ui/stateSet', ['height', height])
-      this.$store.commit('ui/stateSet', ['offsetTop', this.offsetTop])
-    }
+    // onResize (e) {
+    //   this.$log('onResize', e)
+    //   let vv = window.visualViewport
+    //   this.$log('vv', vv)
+    //   let height = vv.height
+    //   this.offsetTop = vv.offsetTop
+    //   this.$store.commit('ui/stateSet', ['height', height])
+    //   this.$store.commit('ui/stateSet', ['offsetTop', this.offsetTop])
+    // }
   },
   async created () {
     this.$log('created')
@@ -96,11 +111,11 @@ export default {
     this.loading = false
   },
   mounted () {
-    window.visualViewport.addEventListener('resize', this.onResize)
-    this.onResize()
+    // window.visualViewport.addEventListener('resize', this.onResize)
+    // this.onResize()
   },
   beforeDestroy () {
-    window.visualViewport.removeEventListener('resize', this.onResize)
+    // window.visualViewport.removeEventListener('resize', this.onResize)
   }
 }
 </script>

@@ -1,5 +1,9 @@
 <style lang="sass">
-// iframe id looks like => mejs_017595170116808223_youtube_iframe
+// iframe[id$="_youtube_iframe"]
+//   width: 100%
+//   height: 100%
+//   border-radius: 10px
+//   overflow: hidden
 iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
@@ -19,625 +23,257 @@ iframe[id$="_youtube_iframe"]
     transform: scale(0.1)
     transform-origin: top left
     pointer-events: none
-// iframe[id$="_youtube_iframe"]
-//   width: 100%
-//   height: 100%
-//   border-radius: 10px
-//   overflow: hidden
-.mejs__overlay-button
-  // display: none
-  opacity: 0.2
-  transform: scale(2)
-.layer-name
-  &:hover
-    background: rgba(255,255,255,0.3) !important
 </style>
 
 <template lang="pug">
-div(
-  :style=`{position: 'relative'}`
-  ).column.fit.items-start.content-start
-  //- kalpa-keyboard-events(@keyup="windowKeyup")
-  //- debug
-  div(
-    v-if="false"
-    :style=`{
-      position: 'absolute', width: 'calc(50%)', left: '8px', top: '60px',
-      pointerEvents: 'none', userSelect: 'none', transform: 'translate3d(0,0,0)',
-      zIndex: 10000, borderRadius: '10px', color: 'white', opacity: 0.8
-    }`).row.q-pa-xs.bg-red
-    small.full-width visible/active/mini: {{visible}}/{{active}}/{{mini}}
-    small.full-width ctx/mode: {{ctx}}/{{mode}}
-    //- small.full-width now/duration: {{now}}/{{duration}}
-    //- small.full-width start/end: {{layerStart}}/{{layerEnd}}
-    small.full-width layerIndex: {{layerIndex}}
-    small.full-width layerIndexPlay: {{layerIndexPlay}}
-    //- small.full-width player: {{player ? true : false}}
-    //- small.full-wdith mini: {{mini}}
-  //- video container
-  div(
-    :style=`{position: 'relative', overflow: 'hidden'}`).col.full-width
-    div(
-      @click="videoClick()"
-      :style=`{position: 'absolute', zIndex: 1000}`
-      ).row.fit
-    //- video actions
-    //- content name
-    router-link(
-      v-if="$q.screen.gt.xs && layer && content && visible && active && !mini"
-      :to="'/content/'+content.oid"
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).column.fit
+  slot(name="header")
+  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-30
+    slot(name="video")
+    q-spinner(
+      v-if="!loaded"
+      size="50px" color="green"
+      :style=`{position: 'absolute', top: 'calc(50% - 25px)', left: 'calc(50% - 25px)'}`)
+    //- :src="videoSrc" :type="videoType"
+    video(
+      ref="videoRef"
+      :src="videoSrc" :type="videoType"
+      :playsinline="true"
+      :loop="true"
+      :controls="false"
+      :muted="videoMuted"
+      :autoplay="videoAutoplay"
+      @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
+      @timeupdate="videoTimeupdate"
       :style=`{
-        position: 'absolute', zIndex: 20000, left: '8px',
-        top: '8px',
-        borderRadius: '10px', overflow: 'hidden',
-        background: 'rgba(0,0,0,0.3)'
-      }`
-      ).q-px-sm.q-py-xs.text-grey-2.cursor-pointer.layer-name
-      small(:style=`{lineHeight: 0.5, userSelect: 'none'}`) {{ content.name }}
-    //- layer name
-    span(
-      v-if="$q.screen.gt.xs && layer && layer.spheres.length > 0 && visible && active && !mini" @click="layerNameClick()"
-      :style=`{
-        position: 'absolute', zIndex: 20000, top: '40px', left: '8px',
-        borderRadius: '10px', overflow: 'hidden',
-        background: 'rgba(0,0,0,0.3)'
-      }`
-      ).q-pa-sm.text-grey-2.cursor-pointer.layer-name {{ layer.spheres[0].name | cut(50) }}
-    //- layer menu
-    q-btn(
-      v-if="true && content && visible && active && !mini"
-      v-show="ctx !== 'workspace'"
-      ref="layerMenuBtn"
-      round flat color="grey-2" icon="more_vert"
-      :style=`{
-        position: 'absolute', zIndex: 2000, top: '8px', right: '8px',
-        background: 'rgba(0,0,0,0.15)', transform: 'translate3d(0,0,0)'
+        position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'
       }`)
-      q-menu(
-        cover anchor="top right" max-width="300px")
-        div(v-if="content").column.fit.bg-grey-9
-          div(:style=`{minHeight: '50px'}`).row.full-width.items-center.content-center.q-pa-md
-            span.text-white.text-bold {{ content.name }}
-          .col.full-width.scroll
-            q-btn(flat no-caps align="left" :to="'/content/'+content.oid").full-width
-              span.text-white Explore content
-            q-btn(flat no-caps align="left" @click="nodeWorkspace()").full-width
-              span.text-white Save to workspace
-            q-btn(flat no-caps align="left").full-width
-              span.text-white Report
-    //- video wrapper
-    div(:style=`{
-      position: 'absolute', zIndex: 10, top: '0px', height: 'calc(100% + 0px)',
-      borderRadius: '10px', overflow: 'hidden',
-      }`).row.full-width
-      video(
-        ref="kalpaVideo"
-        :src="contentUrl" :type="contentSource === 'YOUTUBE' ? 'video/youtube' : 'video/mp4'"
-        playsinline :loop="true" :muted="mutedComputed" :controls="false"
-        @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
-        @timeupdate="videoUpdate"
-        :style=`{
-          position: 'relative', width: '100%', height: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden',
-          opacity: videoLoadeddataDone && videoGood ? 1 : 0
-        }`)
-    progress-maxi(
-      v-if="ctx === 'workspace' || $q.screen.gt.xs && visible && active && !mini"
-      :ctx="ctx" :player="player" :meta="meta" @meta="onMeta"
-      :start="layerStart || 0" :end="layerEnd || duration"
-      :style=`{
-        position: 'absolute', zIndex: 20000, bottom: '0px', left: '0px', transform: 'translate3d(0,0,0)',
-        maxWidth: itemsCount > 1 ? '75%' : 'calc(100% - 80px)'
-      }`)
-    progress-mini(
-      v-if="ctx !== 'workspace' && !mini"
-      :player="player" :meta="meta"
-      :style=`{
-        position: 'absolute', zIndex: 30000, bottom: '1px', transform: 'translate3d(0,0,0)',
-      }`)
-    //- progress-tint(
-    //-   v-if="$q.screen.gt.xs && visible && active && !mini"
-    //-   )
-  slot(name="editor" :meta="meta" :player="player")
+      //- source(:src="videoSrc" :type="videoType")
+    video-progress(v-bind="$props" :player="player" :meta="meta")
+  .col.full-width
+    slot(name="editor" :player="player" :meta="meta")
+  slot(name="footer")
 </template>
 
 <script>
-import {throttle} from 'quasar'
-import progressMaxi from './progress_maxi'
-import progressMini from './progress_mini'
-import progressTint from './progress_tint'
+import videoProgress from './video_progress'
 
 export default {
-  name: 'playerVideo',
-  props: ['ctx', 'composition', 'visible', 'active', 'mini', 'itemsCount'],
-  components: {progressMaxi, progressMini, progressTint},
+  name: 'composition-playerVideo',
+  components: {videoProgress},
+  props: ['ctx', 'composition', 'visible', 'active', 'mini'],
   data () {
     return {
+      mode: 'content',
+      modes: ['content', 'layer', 'composition'],
+      layerId: null,
+      layerContent: null,
       now: 0,
-      nowWorking: false,
       duration: 0,
       player: null,
-      playerInited: false,
       playing: false,
-      muted: true,
-      autoplay: true,
-      mode: 'play',
-      layerIndex: 0,
-      layerIndexPlay: -1,
-      editing: false,
-      videoLoadeddataDone: false,
-      content: null,
-      ended: false
+      loaded: false,
+      muted: false
     }
   },
   computed: {
-    videoRef () {
-      return this.$refs.kalpaVideo
-    },
     meta () {
       return {
         now: this.now,
         duration: this.duration,
         playing: this.playing,
-        muted: this.muted,
-        mode: this.mode,
-        content: this.content,
-        layerIndexPlay: this.layerIndexPlay,
-        layerIndex: this.layerIndex,
-        layerStart: this.layerStart,
-        layerEnd: this.layerEnd,
-        layers: this.layers,
+        loaded: this.loaded,
         layer: this.layer,
-        editing: this.editing
+        layerId: this.layerId,
+        layers: this.composition.layers,
+        content: this.layerContent
       }
-    },
-    layers () {
-      return this.composition.layers
     },
     layer () {
-      return this.layers[this.layerIndex]
+      let layer = this.composition.layers.find(l => l.id === this.layerId)
+      if (layer) return layer
+      else return null
     },
-    layerStart () {
-      if (!this.layer) return false
-      if (this.ctx === 'workspace') {
-        return this.layer.figuresAbsolute[0].t
-      }
-      else {
-        return this.layer.figuresRelative[0].t
-      }
+    videoSrc () {
+      return this.ctx === 'workspace' ? this.layerContent?.url : this.layer?.url
     },
-    layerEnd () {
-      if (!this.layer) return false
-      if (this.ctx === 'workspace') {
-        return this.layer.figuresAbsolute[1].t
-      }
-      else {
-        return this.layer.figuresRelative[1].t
-      }
+    videoType () {
+      return this.ctx === 'workspace' ? 'video/youtube' : 'video/mp4'
     },
-    contentSource () {
-      if (this.ctx === 'workspace') {
-        return 'YOUTUBE'
-      }
-      else {
-        return 'KALPA'
-      }
-      // if (this.content) return this.content.contentSource
-      // else return null
-      // return this.content.contentSource
-    },
-    contentUrl () {
-      if (this.ctx === 'workspace') {
-        if (this.content) return this.content.url
-        else return null
-      }
-      else {
-        // return `${this.layer.url}#t=${this.layerStart},${this.layerEnd}`
-        return this.layer.url
-      }
-      // return this.content.url
-    },
-    videoGood () {
-      if (this.layerEnd && this.layerStart) {
-        return this.now > this.layerStart && this.now < this.layerEnd
-      }
-      else {
-        return true
-      }
-    },
-    progressShow () {
-      if (this.mini) return false
-      else {
-        if (this.ctx === 'workspace' || this.ctx === 'editor') return true
-        else return false
-      }
-    },
-    mutedComputed () {
-      if (this.ctx === 'contentEditor') {
-        return false
-      }
-      else {
+    videoMuted () {
+      if (this.muted) {
         return this.muted
       }
+      else {
+        if (this.$q.screen.xs) {
+          return true
+        }
+        else {
+          // if in localstorage i need sound
+          return false
+        }
+      }
+    },
+    videoAutoplay () {
+      return true
     }
   },
   watch: {
-    visible: {
+    composition: {
       immediate: true,
-      handler (to, from) {
-        this.$log('visible CHANGED', to)
-        if (!this.player) return
-        if (this.layerStart) this.player.setCurrentTime(this.layerStart)
-      }
-    },
-    active: {
-      immediate: false,
-      handler (to, from) {
-        this.$log('active CHANGED', to)
-        if (!this.player) return
-        if (to) this.player.play()
-        else this.player.pause()
-      }
-    },
-    mini: {
-      immediate: false,
-      handler (to, from) {
-        this.$log('mini CHANGED', to)
-        // if (!this.player) return
-        // if (to) this.player.pause()
-        // else this.player.play()
+      async handler (to, from) {
+        this.$log('composition CHANGED', to)
+        if (to.layers.length > 0) {
+          if (!this.layerId) this.layerId = to.layers[0].id
+          if (!this.layerContent) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.layers[0].contentOid})
+        }
+        this.$log('to.contentOid', to.contentOid)
+        if (to.contentOid) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
       }
     },
     layer: {
-      immediate: true,
+      immediate: false,
       async handler (to, from) {
         this.$log('layer CHANGED', to)
         if (to) {
-          this.content = await this.$store.dispatch('objects/get', {oid: to.contentOid})
-          // this.$nextTick(() => {
-          //   if (!this.player) this.playerInit()
+          // this.layerContent = null
+          // this.$nextTick(async () => {
+          //   this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
           // })
+          this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+        }
+      }
+    },
+    videoSrc: {
+      async handler (to, from) {
+        this.$log('videoSrc CHANGED', to)
+        if (to) {
+          await this.$wait(1000)
+          // if (!this.player) this.playerInit()
           if (this.player) {
-            this.player.setCurrentTime(this.layerStart)
-            this.player.update()
+            this.player.src = to
+            // this.videoLoadeddata()
+            // this.player.update()
           }
-        }
-      }
-    },
-    content: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('content CHANGED', to)
-        if (to) {
-          this.$nextTick(() => {
-            if (!this.player) this.playerInit()
-          })
-        }
-      }
-    },
-    layerIndexPlay: {
-      immediate: true,
-      handler (to, from) {
-        this.$log('layerIndexPlay CHANGED', to)
-        if (to > -1) this.layerIndex = to
-      }
-    },
-    now: {
-      handler (to, from) {
-        // this.$log('now CHANGED', to)
-        this.videoNow(to, from)
-      }
-    },
-    videoGood: {
-      handler (to, from) {
-        this.$log('videoGood CHANGED', to)
-        if (to) {
-          this.$emit('good')
+          else {
+            this.playerInit()
+          }
         }
       }
     }
   },
   methods: {
-    async nodeWorkspace () {
-      this.$log('nodeWorkspace')
-      // TODO: what to save to ws? whole node? composition? layer?
-      let nodeInput = {
-        wsItemType: 'WS_NODE',
-        stage: 'selected'
-      }
-      // let rxDoc = await this.$rxdb.upsertItem(nodeInput)
-    },
-    videoNow (to, from) {
-      // this.$log('videoNow', to)
-      // switch (this.mode) {
-      //   case 'play': {
-      //     if (to > this.layerEnd)
-      //     break
-      //   }
-      //   case 'layer': {
-      //     if (to > this.layerEnd) {
-      //       this.nowWorking = true
-      //     }
-      //     else if (to < this.layerStart) {
-      //       this.nowWorking = true
-      //     }
-      //     // all good
-      //     else {
-      //       this.nowWorking = false
-      //     }
-      //     break
-      //   }
-      //   case 'watch': {
-      //     break
-      //   }
-      // }
-      // if (this.nowWorking || this.editing || this.ended) {
-      //   this.nowWorking = false
-      //   return
-      // }
-      this.nowWorking = true
-      if (this.mode === 'play') {
-        if (!this.layerStart && !this.layerEnd) return
-        if (to > this.layerEnd) {
-          // alert('to > this.layerEnd')
-          let to = this.layerIndex + 1
-          if (this.layers[to]) {
-            this.$log('NEXT LAYER')
-            // alert('NEXT LAYER')
-            this.layerIndex = to
-          }
-          else {
-            // if (this.layerIndex === 0) {
-            //   this.player.setCurrentTime(this.layerStart)
-            // }
-            // else {
-            //   this.layerIndex = 0
-            // }
-            this.ended = true
-            this.player.pause()
-            this.$emit('ended')
-            // alert('ended')
-          }
-        }
-        if (to < this.layerStart) {
-          this.player.setCurrentTime(this.layerStart)
-        }
-      }
-      else if (this.mode === 'layer') {
-        // if (!this.layerStart && !this.layerEnd) return
-        if (this.editing) {
-          // alert('GOT editing')
-          return
-        }
-        if (this.layerIndexPlay > -1) {
-          if (to > this.layerEnd) {
-            // this.$log('LAYER', this.layerIndex)
-            this.player.pause()
-            this.player.setCurrentTime(this.layerStart)
-            // alert('mode:layer, to > layerEnd')
-          }
-          if (to < this.layerStart) {
-            this.player.setCurrentTime(this.layerStart)
-            // alert('mode:layer, to < layerStart')
-          }
-        }
-      }
-      else if (this.mode === 'watch') {
-      }
-      this.nowWorking = false
-    },
-    videoLoadeddata () {
-      this.$log('videoLoadeddata')
-      // alert('videoLoadeddata' + this.composition.oid)
-      this.videoLoadeddataDone = true
-      if (!this.player) return
-      if (this.visible) {
-        if (this.player) {
-          this.player.setCurrentTime(this.layerStart)
-        }
-      }
-      if (this.visible && this.active && !this.mini) this.player.play()
-      if (!this.active) this.player.pause()
-      if (!this.visible) this.player.pause()
-      this.videoUpdate()
-      if (this.ctx === 'workspace') {
-        this.player.mutedToggle()
-      }
-      this.$wait(400).then(() => {
-        this.$emit('loaded')
-      })
-    },
-    videoPlay (intervalUpdateIgnore) {
-      this.$log('videoPlay')
-      this.playing = true
-    },
-    videoPause () {
-      this.$log('videoPause')
-      this.playing = false
-    },
-    videoPlayPause () {
-      this.$log('videoPlayPause', this.playing)
-      if (this.playing) {
-        this.player.pause()
-      }
-      else this.player.play()
-      if (this.muted) {
-        this.player.mutedToggle()
-      }
-    },
-    videoSeeked () {
-      this.$log('videoSeeked')
-      this.videoUpdate()
-    },
-    videoUpdate (e, to) {
-      // this.$log('videoUpdate', to, this.now)
-      // for kalpa using native video element
-      if (this.contentSource === 'KALPA') {
-        if (!this.$refs.kalpaVideo) return
-        this.now = to || this.$refs.kalpaVideo.currentTime
-        if (!this.duration) this.duration = this.$refs.kalpaVideo.duration
-      }
-      // for yotube use mediaElementPlayer
-      else if (this.contentSource === 'YOUTUBE') {
-        this.now = to || this.player.currentTime
-        if (!this.duration) this.duration = this.player.duration
-      }
-    },
-    async videoClick (e) {
-      this.$log('videoClick')
-      this.videoPlayPause()
-    },
     playerInit () {
-      this.$log('playerInit START')
-      // this.$log('platerInit content', this.content)
-      if (this.contentSource === 'KALPA') {
-        this.player = {}
-        this.player.setCurrentTime = async (ms) => {
-          if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.currentTime = ms
-        }
-        this.player.play = () => {
-          if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.play()
-        }
-        this.player.pause = () => {
-          if (this.$refs.kalpaVideo) this.$refs.kalpaVideo.pause()
-        }
-        this.videoUpdate()
-      }
-      else if (this.contentSource === 'YOUTUBE') {
-        let ref = this.$refs.kalpaVideo
-        this.$log('playerInit ref: ', ref)
-        this.$log('playerInit url:', this.content.url)
-        let me = new window.MediaElementPlayer(ref, {
+      this.$log('playerInit START', this.ctx)
+      const videoRef = this.$refs.videoRef
+      if (this.ctx === 'workspace') {
+        this.$log('player WORKSPACE start', this.videoSrc)
+        // alert('player WORKSPACE start')
+        let me = new window.MediaElementPlayer(videoRef, {
           loop: true,
-          autoplay: false,
+          autoplay: true,
           controls: false,
-          features: [], // 'playpause'
+          features: [],
           // enableAutosize: true,
           stretching: 'fill',
-          pauseOtherPlayers: false,
+          pauseOtherPlayers: true,
+          clickToPlayPause: true,
           // plugins: ['youtube'],
-          // ignorePauseOtherPlayersOption: false,
-          clickToPlayPause: false,
           success: async (mediaElement, originalNode, instance) => {
-            this.$log('player YOUTUBE success')
+            this.$log('player WORKSPACE done')
             this.player = mediaElement
             this.player.addEventListener('play', this.videoPlay)
             this.player.addEventListener('pause', this.videoPause)
             this.player.addEventListener('loadeddata', this.videoLoadeddata)
-            this.player.addEventListener('timeupdate', this.videoUpdate)
-            this.videoUpdate()
+            // this.player.addEventListener('timeupdate', this.videoTimeupdate)
+            // this.videoUpdate()
             // this.videoPlay()
-          },
-          youtube: {
-            iv_load_policy: 3,
-            modestbranding: 1,
-            controls: 0
+            // this.player.play()
           },
           error: async (mediaElement, originalNode, instance) => {
-            this.$log('player YOUTUBE error')
+            this.$log('player WORKSPACE error')
           }
         })
       }
+      else {
+        this.$log('player KALPA start', this.videoSrc)
+        this.player = {}
+        this.player.setCurrentTime = async (ms) => {
+          videoRef.currentTime = ms
+        }
+        this.player.play = () => {
+          videoRef.play()
+        }
+        this.player.pause = () => {
+          videoRef.pause()
+        }
+        this.$log('player KALPA done')
+        // this.videoUpdate()
+      }
       // set player defaults for all the players
       this.player.update = (to) => {
-        this.videoUpdate(null, to)
+        this.videoTimeupdate(null, to)
       }
-      // muted custom toggle
-      this.player.mutedToggle = () => {
-        this.muted = !this.muted
-        if (this.contentSource === 'KALPA') {
-        }
-        else if (this.contentSource === 'YOUTUBE') {
-          this.player.setMuted(this.muted)
-        }
-        if (!this.$store.state.ui.iWantSound) this.$store.commit('ui/stateSet', ['iWantSound', true])
+      this.player.meta = ([key, val]) => {
+        this.$log('player.meta()', key, val)
+        this[key] = val
       }
-      if (this.$store.state.ui.iWantSound) {
-        if (this.$q.platform.is.ios) {
-        }
-        else {
-          this.player.mutedToggle()
-        }
+      if (this.ctx === 'workspace') {
+        this.player.play()
+      }
+      this.$log('playerInit done')
+    },
+    videoLoadeddata (e) {
+      // this.$log('videoLoadeddata', e)
+      this.loaded = true
+      if (this.ctx === 'workspace') {
+        this.duration = this.player.duration
+      }
+      else {
+        this.duration = this.$refs.videoRef.duration
       }
     },
-    playerDestroy () {
-      this.$log('playerDestroy', this.contentSource)
-      if (this.contentSource === 'KALPA') {
-      }
-      else if (this.contentSource === 'YOTUBE') {
-        this.player.removeEventListener('play', this.videoPlay)
-        this.player.removeEventListener('pause', this.videoPause)
-        this.player.removeEventListener('loadeddata', this.videoLoadeddata)
-        this.player.removeEventListener('timeupdate', this.videoUpdate)
+    videoPlay (e) {
+      this.$log('videoPlay', e)
+      this.playing = true
+      if (this.ctx === 'workspace') {
+        if (this.playingInterval) clearInterval(this.playingInterval)
+        this.playingInterval = setInterval(this.videoTimeupdate, 50)
       }
     },
-    onMeta (val) {
-      this.$log('onMeta', val)
-      switch (val[0]) {
-        case 'videoUpdate': {
-          this.videoUpdate(null, val[1])
-          break
-        }
-        case 'videoPlayPause': {
-          this.videoPlayPause()
-          break
-        }
-        default: {
-          this.$log('onMeta SET')
-          this[val[0]] = val[1]
-        }
+    videoPause (e) {
+      this.$log('videoPause', e)
+      this.playing = false
+      if (this.ctx === 'workspace') {
+        clearInterval(this.playingInterval)
+        this.playingInterval = null
       }
     },
-    layerNameClick () {
-      this.$log('layerNameClick')
-      // TODO this fucntion should not be here...
-      // go to sphere page...
-    },
-    windowKeyup (e) {
-      this.$log('windowKeyup', e.keyCode)
-      switch (e.keyCode) {
-        // space
-        case 32: {
-          this.videoPlayPause()
-          break
-        }
-        // left
-        // case 37: {
-        //   let to = this.now - 5
-        //   if (to < 0) to = 0
-        //   // this.$parent.$emit('meta', ['mode', 'watch'])
-        //   this.player.setCurrentTime(to)
-        //   this.player.update()
-        //   break
-        // }
-        // // right
-        // case 39: {
-        //   let to = this.now + 5
-        //   if (to > this.duration) to = this.duration
-        //   // this.$parent.$emit('meta', ['mode', 'watch'])
-        //   this.player.setCurrentTime(to)
-        //   this.player.update()
-        //   break
-        // }
+    videoTimeupdate (e, t) {
+      // this.$log('videoTimeupdate')
+      // TODO: prevent to emit event on
+      if (this.ctx === 'workspace') {
+        this.now = t || this.player.currentTime
+      }
+      else {
+        this.now = t || this.$refs.videoRef.currentTime
       }
     }
   },
-  async created () {
-    this.$log('created')
-    // this.videoNow = throttle(this.videoNow, 300)
-  },
-  async mounted () {
-    // this.$log('mounted')
+  mounted () {
+    this.$log('mounted')
     // alert('mounted')
-    this.$on('meta', this.onMeta)
-    if (this.composition.contentOid) {
-      this.content = await this.$store.dispatch('objects/get', {oid: this.composition.contentOid})
-    }
-    // window.addEventListener('keyup', this.windowKeyup)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    // window.removeEventListener('keyup', this.windowKeyup)
-    this.playerDestroy()
+    if (this.ctx === 'workspace') {
+      if (!this.player) return
+      this.player.removeEventListener('play', this.videoPlay)
+      this.player.removeEventListener('pause', this.videoPause)
+      this.player.removeEventListener('loadeddata', this.videoLoadeddata)
+      // this.player.removeEventListener('timeupdate', this.videoTimeupdate)
+    }
+    // alert('beforeDestroy')
   }
 }
 </script>

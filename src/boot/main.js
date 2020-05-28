@@ -70,19 +70,17 @@ export default async ({ Vue, store, router: VueRouter }) => {
       }
     }
     // node
+    Vue.component('chain', () => import('components/chain/index.vue'))
     Vue.component('node', () => import('components/node/index.vue'))
     Vue.component('composition', () => import('components/node/composition'))
-    // editors
-    Vue.component('nodeEditor', () => import('components/node_editor'))
-    Vue.component('compositionEditor', () => import('components/node/composition_editor'))
-    Vue.component('contentEditor', () => import('components/content_editor'))
-    // Vue.component('chainEditor', () => import('components/chain_editor'))
     // workspace
-    Vue.component('wsItems', () => import('components/workspace/ws_items'))
-    Vue.component('wsItemFinder', () => import('components/workspace/ws_item_finder'))
-    Vue.component('wsContentCreator', () => import('components/workspace/ws_content_creator'))
-    Vue.component('wsItemSaver', () => import('components/workspace/ws_item_saver'))
-    Vue.component('wsFinderSpheres', () => import('components/workspace/ws_finder_spheres'))
+    Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
+    Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
+    Vue.component('wsChainList', () => import('components/workspace/ws_chain_list'))
+    Vue.component('wsChainEditor', () => import('components/workspace/ws_chain_editor'))
+    Vue.component('wsNodeList', () => import('components/workspace/ws_node_list'))
+    Vue.component('wsNodeEditor', () => import('components/workspace/ws_node_editor'))
+    Vue.component('wsSphereList', () => import('components/workspace/ws_sphere_list'))
     // explore
     Vue.component('userExplorer', () => import('components/user_explorer'))
     Vue.component('nodeExplorer', () => import('components/node_explorer'))
@@ -95,11 +93,12 @@ export default async ({ Vue, store, router: VueRouter }) => {
     // lists
     Vue.component('listMasonry', () => import('components/list_masonry'))
     Vue.component('listMiddle', () => import('components/list_middle'))
+    Vue.component('listTable', () => import('components/list_table'))
     // kalpa
     Vue.component('kalpaMenu', () => import('components/kalpa/menu'))
     Vue.component('kalpaMenuRight', () => import('components/kalpa/menu_right'))
     Vue.component('kalpaMenuFooter', () => import('components/kalpa/menu_footer'))
-    Vue.component('kalpaAction', () => import('components/kalpa/action'))
+    // Vue.component('kalpaAction', () => import('components/kalpa/action'))
     Vue.component('kalpaAvatar', () => import('components/kalpa/avatar'))
     Vue.component('kalpaButtons', () => import('components/kalpa/buttons'))
     Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
