@@ -4,28 +4,30 @@ div(
     position: 'relative'
   }`
   ).row.full-width
-  //- img(
-  //-   v-if="preview"
-  //-   draggable="false"
-  //-   :style=`{
-  //-     userSelect: 'none',
-  //-     objectFit: 'contain'
-  //-   }`
-  //-   ).full-width
-  player-video(
-    v-if="composition"
-    :ctx="ctx" :composition="composition"
-    :visible="visible" :active="active" :mini="mini")
-    template(v-for="(_, scopedSlotName) in $scopedSlots" v-slot:[scopedSlotName]="slotData")
-      slot(:name="scopedSlotName" v-bind="slotData")
-      div(
-        v-if="scopedSlotName === 'video'"
-        :style=`{
-          position: 'absolute', zIndex: 10000, top: '0px',
-          borderRadius: '10px', overflow: 'hidden',
-        }`
-        ).row.full-width.bg-red.q-pa-sm
-        span.text-white hello
+  kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '50%'}` :options=`{ctx,visible,active,mini}`)
+  img(
+    v-if="preview"
+    :src="preview"
+    draggable="false"
+    :style=`{
+      userSelect: 'none',
+      objectFit: 'contain'
+    }`
+    ).full-width
+  //- player-video(
+  //-   v-if="composition"
+  //-   :ctx="ctx" :composition="composition"
+  //-   :visible="visible" :active="active" :mini="mini")
+  //-   template(v-for="(_, scopedSlotName) in $scopedSlots" v-slot:[scopedSlotName]="slotData")
+  //-     slot(:name="scopedSlotName" v-bind="slotData")
+      //- div(
+      //-   v-if="scopedSlotName === 'video'"
+      //-   :style=`{
+      //-     position: 'absolute', zIndex: 10000, top: '0px',
+      //-     borderRadius: '10px', overflow: 'hidden',
+      //-   }`
+      //-   ).row.full-width.bg-red.q-pa-sm
+      //-   span.text-white hello
 </template>
 
 <script>

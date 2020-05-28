@@ -7,7 +7,8 @@ div(
   //- layer progress
   .row.full-width
     q-btn(
-      round flat @click="layerPlay()"
+      round @click="layerPlay()"
+      :flat="!layerIsPlaying"
       :color="layerIsPlaying ? 'red' : 'white'"
       :icon="layerIsPlaying ? 'pause' : 'play_arrow'").b-110.q-mr-sm
     .col.q-px-sm
@@ -38,8 +39,7 @@ export default {
   },
   computed: {
     layerIsPlaying () {
-      if (this.layerIndex === this.meta.layerIndexPlay && this.layerPlaying) return true
-      else return false
+      return this.meta.playing
     },
     layerStart () {
       return this.layer.figuresAbsolute[0].t
@@ -86,7 +86,11 @@ export default {
     },
     layerForward (index, isRight) {
       this.$log('layerForward', index, isRight)
-      this.layer.figuresAbsolute[index].t += isRight ? 0.1 : -0.1
+      let t = this.layer.figuresAbsolute[index].t + (isRight ? 0.1 : -0.1)
+      this.layer.figuresAbsolute[index].t = t
+      this.player.pause()
+      this.player.setCurrentTime(t)
+      this.player.update(t)
     }
   }
 }

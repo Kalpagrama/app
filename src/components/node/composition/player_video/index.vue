@@ -30,6 +30,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
   slot(name="header")
   div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-30
     slot(name="video")
+    kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{mode,now,duration,timeupdateStop}`)
     q-spinner(
       v-if="!loaded"
       size="50px" color="green"
@@ -73,7 +74,8 @@ export default {
       player: null,
       playing: false,
       loaded: false,
-      muted: false
+      muted: false,
+      timeupdateStop: false
     }
   },
   computed: {
@@ -86,13 +88,20 @@ export default {
         layer: this.layer,
         layerId: this.layerId,
         layers: this.composition.layers,
-        content: this.layerContent
+        content: this.layerContent,
+        timeupdateStop: this.timeupdateStop
       }
     },
     layer () {
       let layer = this.composition.layers.find(l => l.id === this.layerId)
       if (layer) return layer
       else return null
+    },
+    layerStart () {
+      return this.layer.figuresAbsolute[0].t
+    },
+    layerEnd () {
+      return this.layer.figuresAbsolute[1].t
     },
     videoSrc () {
       return this.ctx === 'workspace' ? this.layerContent?.url : this.layer?.url
@@ -250,13 +259,34 @@ export default {
       }
     },
     videoTimeupdate (e, t) {
-      // this.$log('videoTimeupdate')
+      this.$log('videoTimeupdate')
       // TODO: prevent to emit event on
       if (this.ctx === 'workspace') {
         this.now = t || this.player.currentTime
       }
       else {
         this.now = t || this.$refs.videoRef.currentTime
+      }
+      if (this.timeupdateStop) return
+      if (this.mode === 'layer') this.videoTimeupdateLayer(this.now)
+      else if (this.mode === 'content') this.videoTimeupdateContent(this.now)
+      else if (this.mode === 'composition') this.videoTimeupdateComposition(this.now)
+    },
+    videoTimeupdateLayer (t) {
+      if (t >= this.layerEnd) {
+        this.player.pause()
+        this.player.setCurrentTime(this.layerStart)
+        this.player.play()
+        // alert('t >= this.layerEnd')
+      }
+    },
+    videoTimeupdateContent (t) {
+      // do nothing?
+    },
+    videoTimeupdateComposition (t) {
+      if (t >= this.layerEnd) {
+        // find next layer
+        this.player.setCurrentTime(this.layerStart)
       }
     }
   },

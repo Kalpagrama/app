@@ -30,7 +30,10 @@ div(
         :style=`{
           position: 'absolute', zIndex: 200,
           left: 'calc('+(meta.now/meta.duration)*100+'% - 0px)',
-          height: '100%', width: '4px', borderRadius: '4px', overflow: 'hidden',
+          top: '-16px',
+          height: 'calc(100% + 32px)',
+          width: '4px',
+          borderRadius: '4px', overflow: 'hidden',
           pointerEvents: 'none'
         }`
         ).bg-grey-10
@@ -156,12 +159,14 @@ export default {
       this.player.update(t)
       this.layer.figuresAbsolute[index].t = t
       if (e.isFirst) {
+        this.player.meta(['timeupdateStop', true])
         this.pointDragging = true
         this.pointDraggingIndex = index
         this.player.pause()
         // this.$emit('meta', ['editing', true])
       }
       if (e.isFinal) {
+        this.player.meta(['timeupdateStop', false])
         this.pointDragging = false
         this.pointDraggingIndex = null
         this.player.play()

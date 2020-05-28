@@ -1,9 +1,16 @@
+<style lang="sass" scoped>
+.sphere
+  cursor: pointer
+  &:hover
+    background: rgb(90,90,90) !important
+</style>
+
 <template lang="pug">
 div(
   :style=`{
     position: 'relative',
   }`
-  ).column.fit
+  ).column.fit.q-pt-sm
   //- cateory
   div().row.full-width.q-px-sm
     q-select(
@@ -14,7 +21,7 @@ div(
       :style=`{
         borderRadius: '10px', overflow: 'hidden',
         minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
-      }`)
+      }`).full-width
   //- spheres
   div(:style=`{}`).row.full-width.q-pa-sm
     q-input(
@@ -32,7 +39,7 @@ div(
           borderRadius: '10px',
           overflow: 'hidden',
         }`
-        ).q-pa-sm.q-mr-sm.q-mb-sm.b-80
+        ).row.q-px-md.q-py-sm.q-mr-xs.q-mb-sm.b-80.sphere
         span.text-white {{ s.name }}
   //- div(:style=`{}`).row.full-width.q-pa-sm
 </template>

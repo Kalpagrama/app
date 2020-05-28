@@ -16,9 +16,7 @@ div(
         ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
         span.text-white.text-bold {{ contentName }}
-        //- debug
-        div(v-if="true").row.full-width
-          small.text-white type: {{editorType}}
+        kalpa-debug(:options=`{editorType}`)
     template(v-slot:video)
       q-btn(
         v-if="tab === 'layers'"

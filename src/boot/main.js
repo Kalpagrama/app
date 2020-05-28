@@ -95,6 +95,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('listMiddle', () => import('components/list_middle'))
     Vue.component('listTable', () => import('components/list_table'))
     // kalpa
+    Vue.component('kalpaDebug', () => import('components/kalpa/debug'))
     Vue.component('kalpaMenu', () => import('components/kalpa/menu'))
     Vue.component('kalpaMenuRight', () => import('components/kalpa/menu_right'))
     Vue.component('kalpaMenuFooter', () => import('components/kalpa/menu_footer'))
