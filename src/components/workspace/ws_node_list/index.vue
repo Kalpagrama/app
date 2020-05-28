@@ -1,19 +1,28 @@
-<style lang="sass" scoped>
+<style lang="sass">
+.q-dialog
+  border-radius: 0px !important
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit.q-pt-sm
+div(
+  :class=`{
+    'q-pt-sm': $q.screen.gt.xs
+  }`
+  :style=`{
+    position: 'relative'
+  }`).column.fit
   //- node add
   q-btn(
     @click="nodeAdd()"
     push round color="green" icon="add"
-    :size="$q.screen.gt.xs ? 'xl' : 'md'"
+    :size="$q.screen.gt.xs ? 'xl' : 'lg'"
     :style=`{
-      position: 'absolute', zIndex: 1000, right: '10px', bottom: '10px',
+      position: 'absolute', zIndex: 1000, right: '10px',
+      bottom: $q.screen.gt.xs ? 10+'px' : 60+10+'px',
       borderRadius: '50%'
     }`)
   //- node editor
-  q-dialog(v-model="nodeEditorOpened" position="bottom")
+  q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
     ws-node-editor(
       ctx="workspace"
       :node="node"
@@ -25,7 +34,11 @@ div(:style=`{position: 'relative'}`).column.fit.q-pt-sm
         height: $q.screen.height+'px',
       }`)
   //- header
-  div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
+  div(
+    :style=`{
+      borderRadius: $q.screen.gt.xs ? '10px' : '0 0 10px 10px',
+    }`
+    ).row.full-width.items-start.content-start.b-50
     //- header
     div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
@@ -45,11 +58,11 @@ div(:style=`{position: 'relative'}`).column.fit.q-pt-sm
     div(:style=`{}`).row.full-width.items-center.content-center.q-px-sm
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
-      q-btn(flat no-caps color="white").b-70 Filter
+      q-btn(flat no-caps color="white").b-70 Filters
       q-btn(push no-caps color="green" @click="nodeAdd()").q-ml-sm.gt-xs New
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-py-md
+    .row.full-width.items-start.content-start.q-py-md.q-px-sm
       kalpa-loader(type="WS_NODE" :variables="variables")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
@@ -99,7 +112,14 @@ export default {
       return res
     }
   },
-  watch: {},
+  watch: {
+    nodeEditorOpened: {
+      handler (to, from) {
+        this.$log('nodeEditorOpened CHANGED', to)
+        this.$store.commit('workspace/stateSet', ['showFooter', !to])
+      }
+    }
+  },
   methods: {
     nodeEdit (node, ni) {
       this.$log('nodeEdit', node, ni)

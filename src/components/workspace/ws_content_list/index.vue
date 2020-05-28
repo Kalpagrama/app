@@ -7,22 +7,21 @@ div(
     position: 'relative',
     'q-pt-sm': $q.screen.gt.xs
   }`
-  ).column.fit
+  ).column.full-width
   //- ws content editor
   q-dialog(v-model="contentEditorOpened" position="bottom")
-    div(
+    ws-content-editor(
+      v-if="content" :value="content"
+      @close="contentEditorOpened = false"
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
-        maxWidth: $store.state.ui.maxWidthPage+'px'
-      }`
-      ).row.full-width
-      ws-content-editor(
-        v-if="content" :value="content"
-        @close="contentEditorOpened = false")
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+      }`)
   //- header
   div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
-    //- header
+    slot(name="header")
+    //- header: workspace
     div(
       v-if="ctx === 'workspace'"
       :style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
@@ -33,6 +32,7 @@ div(
       q-input(
         v-model="searchStringRaw"
         filled dense color="grey-6" dark
+        :autofocus="ctx === 'workpsace'"
         placeholder="Search or paste URL"
         ).full-width.b-70
         template(v-slot:append)
@@ -55,7 +55,7 @@ div(
           div(v-if="items.length > 0").row.full-width.items-start.content-start
             content-item(
               v-for="(c,ci) in items" :key="c.id"
-              :content="c" :contentIndex="ci"
+              :ctx="ctx" :content="c" :contentIndex="ci"
               @choose="contentChoose(c,ci)"
               @delete="contentDelete(c,ci)"
               @layerChoose="layerChoose"

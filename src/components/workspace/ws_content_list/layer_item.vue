@@ -31,7 +31,7 @@ div(
 <script>
 export default {
   name: 'layerItem',
-  props: ['layer', 'content', 'layerIndex', 'contentIndex'],
+  props: ['ctx', 'layer', 'content', 'layerIndex', 'contentIndex'],
   data () {
     return {
       mouseIsOver: false

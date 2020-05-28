@@ -5,7 +5,9 @@ div(
     borderRadius: $q.screen.gt.xs ? '10px' : '0px',
     overflow: 'hidden'
   }`
-  ).column.fit.b-50
+  ).column.full-width.b-50
+  q-drawer(v-model="menuShow" side="right")
+    menu-right(:tabs="tabs" :tab="tab" @tab="tab = $event, menuShow = false").b-50
   composition(
     ctx="workspace" :visible="true" :active="true" :mini="false"
     :value="value").full-height
@@ -30,19 +32,27 @@ div(
         ).column.fit
         .col.full-width.scroll
           component(
-            editorType="content"
+            @menuToggle="menuShow = !menuShow"
+            :editorType="editorType"
             :ref="`ref-edit-${tab}`" :is="`edit-${tab}`"
             :player="player" :meta="meta" :composition="value")
 </template>
 
 <script>
+import menuRight from './menu_right'
 import editInfo from './edit_info'
 import editLayers from './edit_layers'
 
 export default {
   name: 'wsContentEditor',
-  components: {editInfo, editLayers},
+  components: {menuRight, editInfo, editLayers},
   props: {
+    editorType: {
+      value: String,
+      default () {
+        return 'content'
+      }
+    },
     value: {
       type: Object,
       required: true
@@ -50,40 +60,28 @@ export default {
   },
   data () {
     return {
-      toolsHeight: 60,
-      editing: false,
       tab: 'layers',
       tabs: [
         {id: 'info', name: 'Info'},
         {id: 'layers', name: 'Layers'}
-      ]
+      ],
+      menuShow: false
     }
   },
   computed: {
     contentName () {
-      return this.value.name.slice(0, 40)
+      let res = this.value.name.slice(0, 40)
+      if (res.length === 0) return 'Content editor'
+      else return res
     }
   },
   watch: {
-    editing: {
-      handler (to, from) {
-        this.$log('editing CHANGED', to)
-        this.$tween.to(this, 0.5, {toolsHeight: to ? 500 : 60})
-      }
-    }
   },
   methods: {
     layerAdd () {
       this.$log('layerAdd')
       let ref = this.$refs['ref-edit-layers']
       if (ref) ref.layerAdd()
-    },
-    editStart () {
-      this.$log('editStart')
-      this.editing = !this.editing
-      // let h = this.$el.clientHeight
-      // this.$log('h', h)
-      // this.$tween.to(this, 0.5, {toolsHeight: 500})
     }
   },
   mounted () {

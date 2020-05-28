@@ -1,16 +1,24 @@
 <template lang="pug">
-.column.fit
+div(
+  :class=`{
+    'q-pt-sm': $q.screen.gt.xs
+  }`
+  :style=`{
+    position: 'relative'
+  }`
+  ).column.fit
   //- header
   div(
-    v-if="false"
-    :style=`{height: '60px'}`).row.full-width.items-center
-    .col.full-height
-      .row.fit.items-center.justify-start.q-px-md
-        span.text-bold.text-green Settings
+    :style=`{
+      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
+    }`
+    ).row.full-width.items-center.content-center.q-pa-md.b-50
+    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
+    span(:style=`{fontSize: '20px'}`).text-white.text-bold Settings
   //- body
   .col.full-width.scroll
     .row.full-width.justify-center
-      div(:style=`{borderRadius: '0 0 10px 10px'}`).row.full-width.items-start.content-start.q-px-sm.q-py-md.b-70
+      div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.q-px-sm.q-py-md
         //- .row.full-width.q-pa-md
         //-   span(:style=`{fontSize: '30px'}`).text-white.text-bold Settings
         //- export import
@@ -28,8 +36,7 @@
         .row.full-width.q-px-md
           //- span.text-white Clear workpace
           q-btn(
-            outline color="red" no-caps @click="wsClear()"
-            )
+            color="red" no-caps @click="wsClear()")
             span.text-bold Delete my workspace
           .row.full-width.q-py-sm.q-mb-md
             //- small.text-white Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s
@@ -37,7 +44,7 @@
 
 <script>
 export default {
-  name: 'wsSettingList',
+  name: 'wsSettings',
   data () {
     return {
     }

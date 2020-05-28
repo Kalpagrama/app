@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    borderRadius: '10px',
+    borderRadius: $q.screen.gt.xs ? '10px' : 'none',
     overflow: 'hidden',
   }`
   ).column.full-width.b-50

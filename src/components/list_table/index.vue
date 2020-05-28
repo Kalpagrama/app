@@ -1,13 +1,9 @@
 <template lang="pug">
-.column.fit
+.column.full-width
 </template>
 
 <script>
 export default {
-  name: 'contentEditor',
-  data () {
-    return {
-    }
-  }
+  name: 'listTable'
 }
 </script>

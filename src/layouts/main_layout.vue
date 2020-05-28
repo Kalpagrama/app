@@ -25,6 +25,8 @@
   &:focus
     outline: none
     border: 1px solid rgb(150,150,150)
+// *
+//   outline: 0.5px solid red
 </style>
 
 <template lang="pug">

@@ -1,5 +1,7 @@
 <template lang="pug">
 q-expansion-item(
+  @before-show="isOpened = true"
+  @after-hide="isOpened = false"
   :label="contentName"
   color="white" dark
   :dense="false"
@@ -10,13 +12,21 @@ q-expansion-item(
   }`
   ).full-width.b-70.q-mb-xs
   div(
-    v-if="true"
+    v-if="isOpened"
     :style=`{height: '330px'}`).column.full-width
-    //- header: actions
-    .row.full-width.q-pa-sm
+    //- header: actions for workspace
+    div(
+      v-if="ctx === 'workspace'"
+      ).row.full-width.q-pa-sm
       q-btn(no-caps push color="green" @click="$emit('choose')") Edit content
       .col
       q-btn(no-caps flat color="red" @click="$emit('delete')").b-80 Delete
+    div(
+      v-if="ctx === 'nodeEditor'"
+      ).row.full-width.q-pa-sm
+      q-btn(no-caps flat color="white").b-80 Take only content
+      .col
+      q-btn(no-caps flat color="white").b-80 Take all layers
     //- header: find layer
     div().row.full-width.q-px-sm
       q-input(
@@ -28,7 +38,7 @@ q-expansion-item(
       .row.full-width.items-start.content-start.q-pa-sm
         layer-item(
           v-for="(l,li) in contentLayers" :key="li"
-          :content="content" :contentIndex="contentIndex"
+          :ctx="ctx" :content="content" :contentIndex="contentIndex"
           :layer="l" :layerIndex="li"
           @choose="$emit('layerChoose', [content, li])"
           @preview="$emit('layerPreview', [content, li])")
@@ -39,10 +49,11 @@ import layerItem from './layer_item'
 
 export default {
   name: 'contentItem',
-  props: ['content', 'contentIndex'],
+  props: ['ctx', 'content', 'contentIndex'],
   components: {layerItem},
   data () {
     return {
+      isOpened: false,
       searchString: ''
     }
   },

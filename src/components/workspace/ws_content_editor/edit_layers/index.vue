@@ -1,32 +1,28 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
   q-resize-observer(@resize="onResize")
-  //- layersWorkspace
+  //- layer from workspace
   q-dialog(v-model="layersWorkspaceShow" position="bottom")
-    div(
+    ws-content-list(
+      ctx="nodeEditor" @layer="layerFound"
       :style=`{
-        position: 'relative',
-        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : 500+'px',
-        borderRadius: '10px',
-        overflow: 'hidden'
-      }`).column.fit.b-50
-      div(:style=`{height: '60px'}`
-        ).row.full-width.items-center.content-center.q-px-sm
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="layersWorkspaceShow = false")
-        span.text-white.text-bold Layers from workspace
-      .col.full-width.scroll
-        .row.full-width.items-start.content-start.q-pa-sm
-          div(
-            v-for="(l,li) in composition.layersWorkspace" :key="l.oid"
-            :style=`{height: '44px', borderRadius: '10px'}`
-            ).row.full-width.items-center.content-center.q-px-md.b-70.q-mb-xs
-            span.text-white {{ l.spheres }}
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+      }`).b-30
+      template(v-slot:header)
+        div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="layersWorkspaceShow = false")
+          span.text-white.text-bold Find layer
   //- body
   div(
     ref="extraLayersScrollArea"
-    :style=`{position: 'relative'}`
+    :style=`{
+      position: 'relative',
+      overflowX: 'hidden',
+    }`
     ).col.full-width.scroll
-    .row.full-width.items-start.content-start.q-pa-sm
+    div(:style=`{}`).row.full-width.items-start.content-start.q-pa-sm
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
         draggable(
           :list="meta.layers" group="layers" handle=".layer-drag-handle"
@@ -65,18 +61,27 @@ div(:style=`{position: 'relative'}`).column.fit
                     @edit="layerEdit(l, li)"
                     @copy="layerCopy(l, li)"
                     @delete="layerDelete(l, li)")
-    //- footer: layersSelected
-    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-      div(
-        v-if="layersSelected.length > 0"
-        :style=`{
-          position: 'absolute', zIndex: 2000, bottom: '0px',
-          borderRadius: '10px', overflow: 'hidden',
-        }`).row.full-width.q-pa-sm.b-80
-        q-btn(flat color="white" icon="clear" @click="layersSelectedDrop()"
-          :style=`{width: '40px'}`).q-mr-sm.b-90
-        q-btn(flat no-caps color="red" @click="layersSelectedDelete()").q-mr-sm.b-90 Delete
-        q-btn(flat no-caps color="white" @click="layersSelectedCreateNode()").q-mr-sm.b-90 Create node
+  //- footer: import layer from ws
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    q-btn(
+      v-if="layersSelected.length === 0" @click="layerAddFromWorkspace()"
+      round push color="green" icon="add"
+      :style=`{
+        position: 'absolute', zIndex: 1900, bottom: '70px', right: '10px',
+        borderRadius: '50%',
+      }`)
+  //- footer: layersSelected
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    div(
+      v-if="layersSelected.length > 0"
+      :style=`{
+        position: 'absolute', zIndex: 2000, bottom: '60px',
+        borderRadius: '10px', overflow: 'hidden',
+      }`).row.full-width.q-pa-sm.b-80
+      q-btn(flat color="white" icon="clear" @click="layersSelectedDrop()"
+        :style=`{width: '40px'}`).q-mr-sm.b-90
+      q-btn(flat no-caps color="red" @click="layersSelectedDelete()").q-mr-sm.b-90 Delete
+      q-btn(flat no-caps color="white" @click="layersSelectedCreateNode()").q-mr-sm.b-90 Create node
   //- footer
   div(
     :style=`{
@@ -92,7 +97,8 @@ div(:style=`{position: 'relative'}`).column.fit
     //-   round flat icon="reorder" @click="layersView = 'normal'"
     //-   :color="layersView === 'normal' ? 'green' : 'white'").q-mr-sm.b-110
     q-btn(
-      round flat icon="edit" @click="layersEdit()"
+      round icon="edit" @click="layersEdit()"
+      :flat="!layersEditing"
       :color="layersEditing ? 'green' : 'white'").b-90
     .col
     q-btn(
@@ -101,14 +107,9 @@ div(:style=`{position: 'relative'}`).column.fit
     q-btn(
       v-if="editorType === 'content'"
       round flat color="white" icon="sort" @click="layersSort()").b-90.q-mr-sm
-    //- //- add from ws?
-    //- q-btn(
-    //-   v-if="editorType === 'composition'"
-    //-   round push color="green" icon="add" no-caps @click="layerAddFromWorkspace()"
-    //-   :style=`{borderRadius: '50%'}`
-    //-   ).q-mx-md
+    //- menu toggle
     q-btn(
-      round flat color="white" icon="menu_open"
+      round flat color="white" icon="menu_open" @click="$emit('menuToggle')"
       ).b-90
 </template>
 
@@ -131,7 +132,8 @@ export default {
       layersDraggingFutureIndex: null,
       layersWorkspaceShow: false,
       layersView: 'normal',
-      layersViews: ['line', 'normal']
+      layersViews: ['line', 'normal'],
+      showRightDrawer: false
     }
   },
   watch: {
@@ -218,15 +220,21 @@ export default {
     },
     layerAddFromWorkspace () {
       this.$log('layerAddFromWorkspace')
+      this.layersWorkspaceShow = true
+    },
+    layerFound (l, li) {
+      this.$log('layerFound', l, li)
+      this.layersWorkspaceShow = false
+      this.layerAdd(l)
     },
     layerAddFromContent () {
       this.$log('layerAddFromContent')
     },
     async layerAdd (layerInput) {
       this.$log('layerAdd start', layerInput)
-      let start = this.meta.now
-      let end = start + 10 > this.meta.duration ? this.meta.duration : start + 10
       if (!layerInput) {
+        let start = this.meta.now
+        let end = start + 10 > this.meta.duration ? this.meta.duration : start + 10
         layerInput = {
           contentOid: this.meta.content.oid,
           figuresAbsolute: [
