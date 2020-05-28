@@ -10,7 +10,7 @@ import {
 } from 'src/system/rxdb/schemas'
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { Mutex } from 'src/system/rxdb/reactive'
+import { Mutex, ReactiveItemHolder, ReactiveListHolder } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_WS)
@@ -62,6 +62,7 @@ class Workspace {
   async createDb () {
     let f = this.createDb
     this.isLeader = false
+    logD(f, 'start')
     this.db = await createRxDatabase({
       name: 'ws',
       adapter: 'idb', // <- storage-adapter
@@ -147,36 +148,9 @@ class Workspace {
   async clear () {
     const f = this.clear
     logD(f, 'start')
-    await removeRxDatabase('ws', 'idb')
-    this.created = false
+    await this.db.remove()
+    await this.createDb()
     logD(f, 'complete')
-  }
-
-  switchOnSynchro(userDoc){
-    const f = this.switchOnSynchro
-    assert(userDoc, '!userDoc')
-    if (userDoc) { // для гостей мастерская НЕ синхронится с сервером!
-      this.userDoc = userDoc
-      assert(userDoc.wsRevision >= 0, '!userDoc.wsRevision')
-      // синхроним изменения в цикле
-      let synchroLoop = async () => {
-        const f = synchroLoop
-        while (true) {
-          logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
-          try {
-            await this.mutex.lock()
-            if (this.isLeader) await this.synchronize()
-          } catch (err) {
-            logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
-            this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeMin * 10))
-          } finally {
-            this.mutex.release()
-          }
-          await this.synchroLoopWaitObj.wait()
-        }
-      }
-      synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
-    }
   }
 
   async create (recursive = false) {
@@ -195,18 +169,47 @@ class Workspace {
     }
   }
 
+  switchOnSynchro (reactiveUser) { // для гостей мастерская НЕ синхронится с сервером!
+    const f = this.switchOnSynchro
+    assert(reactiveUser, '!reactiveUser')
+    assert(reactiveUser.wsRevision >= 0, '!reactiveUser.wsRevision')
+    this.reactiveUser = reactiveUser
+    // синхроним изменения в цикле
+    let synchroLoop = async () => {
+      const f = synchroLoop
+      while (this.reactiveUser) {
+        logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
+        try {
+          await this.mutex.lock()
+          if (this.isLeader) await this.synchronize()
+        } catch (err) {
+          logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
+          this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeMin * 10))
+        } finally {
+          this.mutex.release()
+        }
+        await this.synchroLoopWaitObj.wait()
+      }
+    }
+    synchroLoop().catch(err => logE(f, 'не удалось запустить цикл синхронизации', err))
+  }
+
+  switchOffSynchro () {
+    delete this.reactiveUser
+  }
+
   async synchronize () {
     const f = this.synchronize
     assert(this.isLeader, '!isLeader')
     // запросит при необходимости данные и сольет с локальными изменениями
     const synchronizeWsWhole = async (forceMerge = false) => {
       const f = synchronizeWsWhole
-      assert(this.userDoc && this.userDoc.wsRevision >= 0, '!wsRevision')
+      assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
 
       let wsRevisionLocalDoc = await this.db.ws_meta.findOne('wsRevision').exec()
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc.value) : -1
-      if (forceMerge || wsRevisionLocal !== this.userDoc.wsRevision) { // ревизия мастерской на сервере отличается (this.userDoc.wsRevision меняется в processEvent)
-        logD(f, 'pull ws from server... ', forceMerge, wsRevisionLocal, this.userDoc.wsRevision)
+      if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
+        logD(f, 'pull ws from server... ', forceMerge, wsRevisionLocal, this.reactiveUser.wsRevision)
         let { data: { ws: wsServer } } = await apollo.clients.api.query({
           query: gql`query{ws}`
         })
@@ -240,13 +243,14 @@ class Workspace {
         }
         // logD('set wsRevision', wsServer.rev.toString())
         await this.db.ws_meta.atomicUpsert({ id: 'wsRevision', value: wsServer.rev.toString() }) // версия по мнению клиента
-        await this.userDoc.atomicSet('wsRevision', wsServer.rev) // версия по мнению сервера
+        this.reactiveUser.wsRevision = wsServer.rev // версия по мнению сервера
         logD(f, 'pull ws complete')
       }
     }
     // отправить изменения на сервер
     const saveToServer = async (wsOperationEnum, item) => {
       const f = saveToServer
+      assert(item, '!item')
       logD(f, `start ${item.id} rev:${item.rev}`)
       assert(this.isLeader, '!this.isLeader')
       assert(this.created, '!this.created')
@@ -274,14 +278,15 @@ class Workspace {
       let { id, operation, updatedAt } = rxDocUnsavedItem
       let itemCollection = this.getWsCollectionByItem({ id })
       let plainDoc
-      if (operation === WsOperationEnum.DELETE) plainDoc = { id }
-      else {
+      if (operation === WsOperationEnum.DELETE) {
+        plainDoc = { id }
+      } else {
         let rxDoc = await itemCollection.findOne(id).exec()
         if (!rxDoc) { // в мастерской нет такого элемента!
           await this.db.ws_changes.find({ selector: { id: id } }).remove() // удаляем информацию из очереди на отправку
           continue
         }
-        operation = rxDoc.toJSON()
+        plainDoc = rxDoc.toJSON()
       }
       try {
         // сначала удаляем из очереди, а потом шлем на отправку (processEvent сработает быстрее, чем закончится saveToServer)
@@ -319,13 +324,13 @@ class Workspace {
       let { type, wsItem: itemServer, wsRevision } = event
       logD(f, `start ${itemServer.id} rev:${itemServer.rev}`)
       assert(this.created, '!this.created')
-      assert(this.userDoc, '!this.userDoc') // почему я получил этот эвент, если я гость???
+      assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
       assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
 
       let wsRevisionLocalDoc = await this.db.ws_meta.findOne('wsRevision').exec()
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc.value) : 0 // версия локальной мастерской
-      await this.userDoc.atomicSet('wsRevision', wsRevision) // версия мастерской по мнению сервера
+      this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера
       if (wsRevisionLocal + 1 !== wsRevision) {
         logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
         // здесь нельзя явно вызывать synchronizeWsWhole (только в рамках synchronize, тк оно работает параллельно)
@@ -406,13 +411,21 @@ class Workspace {
       itemCopy.updatedAt = Date.now()
       if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
       if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}` // генерируем id для нового элемента
-      let doc = await this.getWsCollectionByItem(itemCopy).atomicUpsert(itemCopy)
-      assert(isRxDocument(doc), '!isRxDocument' + JSON.stringify(doc))
+      let rxDoc = await this.getWsCollectionByItem(itemCopy).atomicUpsert(itemCopy)
+      assert(isRxDocument(rxDoc), '!isRxDocument' + JSON.stringify(rxDoc))
       logD(f, 'complete')
-      return doc
+      let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+      return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem }
     } finally {
       if (withLock) this.mutex.release()
     }
+  }
+
+  async find (wsCollectionEnum, mangoQuery) {
+    let rxQuery = this.getWsCollection(wsCollectionEnum).find(mangoQuery)
+    let holder = new ReactiveListHolder()
+    let reactiveList = await holder.create(rxQuery)
+    return { rxQuery, reactiveList }
   }
 
   async deleteItem (id) {

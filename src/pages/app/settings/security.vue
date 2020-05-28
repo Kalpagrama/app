@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import { logout } from 'src/system/auth'
+
 export default {
   name: 'pageApp__Settings__Security',
   data () {
@@ -59,7 +61,7 @@ export default {
     async deleteSession (token) {
       // this.tokenString = token
       this.$log('delete start')
-      let res = await this.$store.dispatch('auth/logout', token)
+      let res = await logout(token)
       this.$log('deleted done', res)
       this.$q.notify({message: 'Session deleted', color: 'green', textColor: 'white'})
     }

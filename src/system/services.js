@@ -226,6 +226,7 @@ async function clearCache (force = false) {
   await clear(swShareStore)
   await clear(vuexPersistStore)
   await clear(videoStore)
+  await rxdb.clearAll()
   logD('clearCache end!')
 }
 

@@ -14,6 +14,7 @@ import lists from './lists'
 import content from './content'
 import i18next from 'i18next'
 import assert from 'assert'
+import { rxdb } from 'src/boot/rxdb'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
@@ -40,17 +41,17 @@ export default function (/* { ssrContext } */) {
     strict: process.env.DEV,
     actions: {
       init: async (context) => {
-        // logD('vuex init')
-        // await context.dispatch('cache/init') cache инициализируется в boot модуле
-
-        await context.dispatch('auth/init')
-        let userIsConfirmed = context.state.auth.userIsConfirmed
-        if (!userIsConfirmed) return false
-
-        await context.dispatch('user/init')
-        let user = context.getters.currentUser
+        // await context.dispatch('auth/init')
+        // let userIsConfirmed = context.state.auth.userIsConfirmed
+        // if (!userIsConfirmed) return false
+        // await context.dispatch('user/init')
+        // // let user = context.getters.currentUser
         // logD('user = ', user, context.state.auth)
-        assert(user && context.state.auth.userIsConfirmed, 'user && context.state.auth.userIsConfirmed')
+        // assert(user && context.state.auth.userIsConfirmed, 'user && context.state.auth.userIsConfirmed')
+        if (!localStorage.getItem('kuser_oid')) return false
+        logD('before rxdb.init')
+        await rxdb.init(localStorage.getItem('kuser_oid'))
+        logD('after rxdb.init')
 
         await context.dispatch('events/init')
         await context.dispatch('core/init')
@@ -59,7 +60,7 @@ export default function (/* { ssrContext } */) {
         await context.dispatch('workspace/init', user.wsRevision)
         await context.dispatch('lists/init')
         await context.dispatch('content/init')
-        await i18next.changeLanguage(user.profile.lang)
+        await i18next.changeLanguage(rxdb.currentUser().profile.lang)
         // logD('vuex init done!')
         return true
       }
@@ -68,8 +69,9 @@ export default function (/* { ssrContext } */) {
       currentUser: (state, getters, rootState, rootGetters) => {
         // logD('state.auth.userOid', state.auth.userOid)
         // if (!state.auth.userOid) return null
-        assert(state.auth.userOid, 'empty user oid!' + state.auth.userOid)
-        let user = state.cache.cachedItems[state.auth.userOid]
+        // assert(state.auth.userOid, 'empty user oid!' + state.auth.userOid)
+        let user = rxdb.currentUser()
+        // let user = state.cache.cachedItems[state.auth.userOid]
         // в момент очистки кэша - юзера нет, а запросы от форм - идут! т.o. может вернуться null
         // assert(user, 'user not in cache!!!!')
         return user

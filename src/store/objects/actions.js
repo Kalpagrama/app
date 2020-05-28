@@ -158,7 +158,7 @@ export const get = async (context, { oid, priority }) => {
     let promise = queryAccumulator.push(context, oid, priority)
     return await promise
   }
-  let objectFull = await rxdb.findObjectOne(oid, priority)
+  let objectFull = await rxdb.findByOid(oid, priority)
   logD('objectFull = ', objectFull)
   // let objectFull = await context.dispatch('cache/get', { key: oid, fetchItemFunc }, { root: true })
   assert(objectFull, '!itemFull')

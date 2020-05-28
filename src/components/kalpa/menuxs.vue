@@ -31,6 +31,8 @@ div(
 </template>
 
 <script>
+  import { logoutSession } from 'src/system/auth'
+
 export default {
   name: 'kalpaMenuXs',
   data () {
@@ -71,7 +73,7 @@ export default {
             this.$wait(1500).then(() => {
               this.pageLoading = null
             })
-            let res = await this.$store.dispatch('auth/logout')
+            let res = await logoutSession()
             this.$log('logout done', res)
             break
           }

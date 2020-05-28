@@ -90,10 +90,6 @@ export default {
       // alert('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
     } else { // залогинились
-      // await this.$rxdb.init(localStorage.getItem('userRole')) // workspace, etc...
-      let userOid = localStorage.getItem('userOid')
-      assert(userOid, '!userOid')
-      await this.$rxdb.init(userOid) // workspace, user, cache etc...
       // go to welcome...
       if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     }

@@ -18,8 +18,8 @@ class ReactiveItemHolder {
     assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
     assert(rxDoc.id, '!rxDoc.id')
     logD('ReactiveItemHolder::constructor', rxDoc.id)
-    if (rxDoc.reactiveItemHolder) {
-      this.reactiveItem = rxDoc.reactiveItemHolder.reactiveItem
+    if (rxDoc.reactiveItemHolderMaster) {
+      this.reactiveItem = rxDoc.reactiveItemHolderMaster.reactiveItem
     } else {
       this.rxDoc = rxDoc
       this.mutex = new Mutex()
@@ -29,7 +29,7 @@ class ReactiveItemHolder {
         }
       })
       this.reactiveItem = this.vm.reactiveItem
-      rxDoc.reactiveItemHolder = this
+      rxDoc.reactiveItemHolderMaster = this
       this.rxDocSubscribe()
       this.itemSubscribe()
     }
@@ -102,10 +102,10 @@ class ReactiveListHolder {
   async create (rxQuery) {
     logD('ReactiveListHolder::constructor', rxQuery)
     assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
-    if (rxQuery.reactiveListHolder) {
-      this.reactiveList = rxQuery.reactiveListHolder.reactiveList
+    if (rxQuery.reactiveListHolderMaster) {
+      this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
     } else {
-      rxQuery.reactiveListHolder = this
+      rxQuery.reactiveListHolderMaster = this
       this.rxQuery = rxQuery
       this.mutex = new Mutex()
       let docs = await rxQuery.exec()

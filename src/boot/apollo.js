@@ -14,6 +14,7 @@ import assert from 'assert'
 
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { cache } from 'src/boot/cache'
+import { logoutSession } from 'src/system/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
@@ -32,6 +33,7 @@ export default async ({ Vue, store, app }) => {
       for (let err of graphQLErrors) {
         logE('gql error', err)
         err.message = err.code + ':' + err.message
+        if (err.code === 'USER_NOT_AUTH') logoutSession()
       }
     }
     if (networkError) {

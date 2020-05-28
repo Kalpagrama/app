@@ -5,21 +5,21 @@ import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { addRxPlugin } from 'rxdb'
 
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
-import { ReactiveItemHolder, ReactiveListHolder } from 'src/system/rxdb/reactive'
-import { apollo } from 'src/boot/apollo'
-import { fragments } from 'src/schema'
-import { CurrentUser } from 'src/system/rxdb/user'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB)
 
 const RxCollectionEnum = Object.freeze({
-  ...WsCollectionEnum
+  ...WsCollectionEnum,
+  SPHERE_NODES: 'SPHERE_NODES',
+  NODE_NODES: 'NODE_NODES',
+  SPHERE_SPHERES: 'SPHERE_SPHERES'
 })
 const RxModuleEnum = Object.freeze({
   WS: 'WS',
-  SETTINGS: 'SETTINGS'
+  SETTINGS: 'SETTINGS',
+  CACHE: 'CACHE'
 })
 
 let rxdbProxy
@@ -37,59 +37,33 @@ class RxDBWrapper {
     this.created = true
   }
 
+  // вызывать после логина
   async init (userOid) {
-    this.currentUser = await this.objectQueries.findOne(userOid)
-    await this.currentUser.init()
-
     logD('init RXDB')
     assert(this.created, '!created')
-    assert(!this.initialized, 'call init once!')
-    // eslint-disable-next-line no-constant-condition
-    if (true) {
-      class UserDoc {
-        constructor () {
-          this.wsRevision = 0
-          this.userRole = 'MEMBER'
-        }
-
-        async atomicSet (prop, value) {
-          this.wsRevision = value
-        }
-      }
-
-      let currentUser = new UserDoc()
-      this.workspace.switchOnSynchro(currentUser)
-    }
-    this.initialized = true
+    let {rxDoc: rxDocUser, reactiveItem} = await this.objectQueries.findOne(userOid)
+    this.reactiveUser = reactiveItem
+    logD('before switchOnSynchro', this.reactiveUser)
+    this.workspace.switchOnSynchro(this.reactiveUser)
   }
 
   async clearAll () {
-    for (let module in RxModuleEnum) await this.clearModule()
+    for (let module in RxModuleEnum) await this.clearModule(module)
   }
 
   async clearModule (rxModuleEnum) {
     assert(rxModuleEnum in RxModuleEnum, 'bad rxModuleEnum')
     switch (rxModuleEnum) {
       case RxModuleEnum.WS:
+        this.workspace.switchOffSynchro()
         return await this.workspace.clear()
       case RxModuleEnum.SETTINGS:
-        throw new Error('not impl' + rxModuleEnum)
+        // throw new Error('not impl' + rxModuleEnum)
+        return
+      case RxModuleEnum.CACHE:
+        return await this.cache.clear()
       default:
         throw new Error('bad module' + rxModuleEnum)
-    }
-  }
-
-  getCollection (rxCollectionEnum) {
-    assert(this.initialized, '!init')
-    assert(rxCollectionEnum in RxCollectionEnum, 'bad collection' + rxCollectionEnum)
-    switch (rxCollectionEnum) {
-      case RxCollectionEnum.WS_NODE:
-      case RxCollectionEnum.WS_CONTENT:
-      case RxCollectionEnum.WS_CHAIN:
-      case RxCollectionEnum.WS_SPHERE:
-        return this.workspace.getWsCollection(rxCollectionEnum)
-      default:
-        throw new Error('bad rxCollectionEnum' + rxCollectionEnum)
     }
   }
 
@@ -115,9 +89,8 @@ class RxDBWrapper {
   // определит по итему - откуда он и вставит в нужную коллекцию
   async upsertItem (item, withLock = true) {
     if (item.wsItemType && item.wsItemType in WsItemTypeEnum){
-      let rxDoc = await this.workspace.upsertItem(item, withLock)
-      let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-      return reactiveItemHolder.reactiveItem
+      let { rxDoc, reactiveItem } = await this.workspace.upsertItem(item, withLock)
+      return reactiveItem
     }
   }
 
@@ -130,14 +103,28 @@ class RxDBWrapper {
     } else throw new Error('bad id!!' + id)
   }
 
-  async findWs (rxCollectionEnum, mangoQuery) {
-    let rxQuery = this.getCollection(rxCollectionEnum).find(mangoQuery)
-    let holder = new ReactiveListHolder()
-    return await holder.create(rxQuery)
+  async find (rxCollectionEnum, mangoQuery) {
+    if (rxCollectionEnum in WsCollectionEnum){
+      let {rxQuery, reactiveList} = await this.workspace.find(rxCollectionEnum, mangoQuery)
+      return reactiveList
+    } else {
+      switch (rxCollectionEnum) {
+        case RxCollectionEnum.SPHERE_NODES: break
+        case RxCollectionEnum.SPHERE_SPHERES: break
+        case RxCollectionEnum.NODE_NODES: break
+      }
+    }
   }
 
-  async findObjectOne (oid, priority) {
-    return await this.objectQueries.findOneQueue(oid, priority)
+  async findByOid (oid, priority) {
+    let {rxDoc, reactiveItem} = await this.objectQueries.findOneQueue(oid, priority)
+    return reactiveItem
+  }
+
+  currentUser(){
+    let f = this.currentUser
+    logD(f, 'reactiveUser=', this.reactiveUser)
+    return this.reactiveUser
   }
 }
 

@@ -89,6 +89,7 @@ div(
 
 <script>
 import { checkUpdate, update } from 'src/system/services'
+import { logoutSession } from 'src/system/auth'
 // img:statics/icons/anvil.svg
 export default {
   name: 'kalpaMenuDesktop',
@@ -129,7 +130,7 @@ export default {
         this.loggingOut = true
         await this.$wait(800)
         if (!confirm('Really logout?')) throw new Error('Changed your mind')
-        let res = await this.$store.dispatch('auth/logout')
+        let res = await logoutSession()
         this.$log('logout done', res)
         this.loggingOut = false
       }

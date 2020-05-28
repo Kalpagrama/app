@@ -131,6 +131,7 @@ input
 
 <script>
 import withSocials from './with_socials'
+import { userAuthenticate, userIdentify } from 'src/system/auth'
 
 export default {
   name: 'pageAuth-index',
@@ -202,7 +203,8 @@ export default {
         if (this.login.length < 3) throw new Error('Short login/email/phone!')
         this.userIdentifying = true
         await this.$wait(500)
-        let res = await this.$store.dispatch('auth/userIdentify', this.login)
+        let res = await userIdentify(this.login)
+        // let res = await this.$store.dispatch('auth/userIdentify', this.login)
         this.$log('userIdentify done', res)
         this.userIdentifying = false
         this.userIdentified = true
@@ -235,7 +237,8 @@ export default {
         this.$q.notify('userAuthenticate' + this.password + '/' + this.inviteCode)
         this.$log('userAuthenticate password', this.password)
         this.$log('userAuthenticate inviteCode', this.inviteCode)
-        let res = await this.$store.dispatch('auth/userAuthenticate', {password: this.password, inviteCode: this.inviteCode})
+        let res = await userAuthenticate(this.password, this.inviteCode)
+        // let res = await this.$store.dispatch('auth/userAuthenticate', {password: this.password, inviteCode: this.inviteCode})
         this.$log('userAuthenticate done', res)
         this.userAuthenticating = false
         this.userAuthenticated = true

@@ -28,6 +28,7 @@ const LogLevelEnum = Object.freeze({
 Object.freeze(LogLevelEnum)
 const LogModulesEnum = Object.freeze({
   SW: 'sw',
+  AUTH: 'auth',
   VUEX: 'vx',
   VUEX_WS: 'vx_ws',
   VUEX_CACHE: 'vx_cache',

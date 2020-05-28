@@ -25,72 +25,77 @@ const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // класс для кэширования gql запросов
 class Cache {
+  async createDb () {
+    let f = this.createDb
+    this.isLeader = false
+    this.db = await createRxDatabase({
+      name: 'cache',
+      adapter: 'idb', // <- storage-adapter
+      multiInstance: true, // <- multiInstance (optional, default: true)
+      eventReduce: true, // <- eventReduce (optional, default: true)
+      pouchSettings: { revs_limit: 1 }
+    })
+    await this.db.collection({ name: 'cache', schema: cacheSchema })
+    await this.db.collection({ name: 'cache_meta', schema: schemaKeyValue })
+    this.db.waitForLeadership().then(() => {
+      logD(f, 'RXDB::CACHE::LEADER!!!!')
+      this.isLeader = true
+    })
+    // // хуки на измения элементов в кэше пользователем
+    // let onCachedObjectChangedByUser = async (id, operation) => {
+    //   const f = onCachedObjectChangedByUser
+    //   if (!this.isLeader) return
+    //   assert(id && operation && operation in CacheOperationEnum, 'bad params' + id + operation)
+    //   // todo пока что изменяется только currentUser (настройки, ленты и пр)
+    //   // assert(false, 'assert(false, todo! not impl!)')
+    //   logD(f, `complete. ${id}`)
+    // }
+    // this.db.cache_object.postInsert(async (plainData) => {
+    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.UPSERT)
+    // }, false)
+    // this.db.cache_object.postSave(async (plainData) => {
+    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.UPSERT)
+    // }, false)
+    // this.db.cache_object.postRemove(async (plainData) => {
+    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.DELETE)
+    // }, false)
+  }
+
+  // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
+  async purgeDb () {
+    let f = this.purgeDb
+    logD(f, 'purgeDb cache_db')
+    let purgeLastDateDoc = await this.db.cache_meta.findOne('purgeLastDate').exec()
+    let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc.value) : 0
+    if (Date.now() - purgeLastDate < purgePeriod) return
+    await this.db.cache_meta.atomicUpsert({ id: 'purgeLastDate', value: Date.now().toString() })
+    let dump = await this.db.dump()
+    await this.db.remove()
+    await this.db.destroy()
+    await this.createDb()
+    await this.db.importDump(dump)
+  }
+
+  // удалить все данные из кэша
+  async clear () {
+    const f = this.clear
+    logD(f, 'start')
+    await this.db.remove()
+    try {
+      this.lruResetInProgress = true
+      this.cacheLru.reset()
+    } finally {
+      this.lruResetInProgress = true
+    }
+
+    await this.createDb()
+    logD(f, 'complete')
+  }
+
   async create (recursive = false) {
     const f = this.create
+    logD(f, 'start')
     assert(!this.created, 'this.created')
-    this.createDb = async () => {
-      let f = this.createDb
-      this.isLeader = false
-      this.db = await createRxDatabase({
-        name: 'cache',
-        adapter: 'idb', // <- storage-adapter
-        multiInstance: true, // <- multiInstance (optional, default: true)
-        eventReduce: true, // <- eventReduce (optional, default: true)
-        pouchSettings: { revs_limit: 1 }
-      })
-      await this.db.collection({ name: 'cache', schema: cacheSchema })
-      await this.db.collection({ name: 'cache_meta', schema: schemaKeyValue })
-      this.db.waitForLeadership().then(() => {
-        logD(f, 'RXDB::CACHE::LEADER!!!!')
-        this.isLeader = true
-      })
-      // // хуки на измения элементов в кэше пользователем
-      // let onCachedObjectChangedByUser = async (id, operation) => {
-      //   const f = onCachedObjectChangedByUser
-      //   if (!this.isLeader) return
-      //   assert(id && operation && operation in CacheOperationEnum, 'bad params' + id + operation)
-      //   // todo пока что изменяется только currentUser (настройки, ленты и пр)
-      //   // assert(false, 'assert(false, todo! not impl!)')
-      //   logD(f, `complete. ${id}`)
-      // }
-      // this.db.cache_object.postInsert(async (plainData) => {
-      //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.UPSERT)
-      // }, false)
-      // this.db.cache_object.postSave(async (plainData) => {
-      //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.UPSERT)
-      // }, false)
-      // this.db.cache_object.postRemove(async (plainData) => {
-      //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.DELETE)
-      // }, false)
-    }
-    // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
-    this.purgeDb = async () => {
-      let f = this.purgeDb
-      logD(f, 'purgeDb cache_db')
-      let purgeLastDateDoc = await this.db.cache_meta.findOne('purgeLastDate').exec()
-      let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc.value) : 0
-      if (Date.now() - purgeLastDate < purgePeriod) return
-      await this.db.cache_meta.atomicUpsert({ id: 'purgeLastDate', value: Date.now().toString() })
-      let dump = await this.db.dump()
-      await this.db.remove()
-      await this.db.destroy()
-      await this.createDb()
-      await this.db.importDump(dump)
-    }
-    // удалить все данные из кэша
-    this.clear = async () => {
-      const f = this.clear
-      try {
-        logD(f, 'start')
-        this.clearInProgress = true
-        await removeRxDatabase('cache', 'idb')
-        this.cacheLru.reset()
-        this.created = false
-        logD(f, 'complete')
-      } finally {
-        delete this.clearInProgress
-      }
-    }
     try {
       this.mutex = new Mutex()
       await this.createDb()
@@ -104,6 +109,7 @@ class Cache {
         maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
         noDisposeOnSet: true,
         dispose: async (id, { actualUntil, actualAge }) => {
+          if (this.lruResetInProgress) return
           assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
           await this.db.cache.find().where('id').eq(id).remove() //  удалим из rxdb
         }
@@ -129,6 +135,7 @@ class Cache {
       }
 
       this.created = true
+      logD(f, 'complete')
     } catch (err) {
       logE(f, 'ошибка при создания CACHE! очищаем и пересоздаем!', err)
       await this.clear()
@@ -224,22 +231,26 @@ class Cache {
           assert(fetchRes, '!fetchRes')
           assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes')
           logD(f, `данные с сервера получены ${fetchRes.item.oid}`)
-          await this.setItem(id, fetchRes.item, fetchRes.actualAge)
+          let res = await this.setItem(id, fetchRes.item, fetchRes.actualAge)
           logD(f, `записаны в кэш${fetchRes.item.oid}`)
+          return res
         }
         logD(f, 'запрашиваем данные с сервера...')
         if (rxDoc && !rxDoc.failReason) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
           fetchFunc().then(saveFunc).catch(processFetchErrorFunc)
         } else { // ждем ответа сервра
           try {
-            await saveFunc(await fetchFunc())
+            rxDoc = await saveFunc(await fetchFunc())
           } catch (err) {
             await processFetchErrorFunc(err)
           }
         }
       }
     }
-    if (!rxDoc) return null // см "queued item was evicted legally"
+    if (!rxDoc) { // см "queued item was evicted legally"
+      logD(f, 'not found', rxDoc)
+      return null
+    }
     if (rxDoc.failReason) {
       let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
       let tryAfter = Math.max(0, (actualUntil - Date.now()) / 1000)
@@ -394,7 +405,7 @@ class ObjectQueries {
 
   // вернет реактивный список (все элементы списка - тоже реактивны)
   async find (mangoQuery) {
-
+    return { rxQuery: null, reactiveList: null }
   }
 
   // вернет реактивный объект
@@ -419,7 +430,7 @@ class ObjectQueries {
     let rxDoc = await this.cache.getItem(this.makeObjectId(oid), fetchObjectFunc)
     if (!rxDoc) throw new Error('объект не найден на сервере')
     let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return reactiveItemHolder.reactiveItem.item
+    return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.item }
   }
 
   // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);
@@ -432,10 +443,10 @@ class ObjectQueries {
       return await promise
     }
     let rxDoc = await this.cache.getItem(this.makeObjectId(oid), fetchItemFunc)
-    if (!rxDoc) return null // см "queued item was evicted legally"
+    if (!rxDoc) return { rxDoc: null, reactiveItem: null } // см "queued item was evicted legally"
     assert(rxDoc.item, '!rxDoc.item')
     let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return reactiveItemHolder.reactiveItem.item
+    return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.item }
   }
 
   // от сервера прилетел эвент

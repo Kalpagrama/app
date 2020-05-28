@@ -82,6 +82,8 @@ div(:style=`{}`).column.fit.b-50
 </template>
 
 <script>
+  import { logoutSession } from 'src/system/auth'
+
 export default {
   name: 'kalpaMenu',
   data () {
@@ -112,9 +114,8 @@ export default {
       this.$log('logout')
       if (!confirm('Really logout ?')) return
       this.logoutLoading = true
-      await this.$wait(1000)
-      await this.$store.dispatch('cache/clear')
-      await this.$store.dispatch('auth/logout')
+      await this.$wait(500)
+      await logoutSession()
       this.logoutLoading = false
     }
   }
