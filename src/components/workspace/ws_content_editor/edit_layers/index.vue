@@ -62,14 +62,14 @@ div(:style=`{position: 'relative'}`).column.fit
                     @copy="layerCopy(l, li)"
                     @delete="layerDelete(l, li)")
   //- footer: import layer from ws
-  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    q-btn(
-      v-if="layersSelected.length === 0" @click="layerAddFromWorkspace()"
-      round push color="green" icon="add"
-      :style=`{
-        position: 'absolute', zIndex: 1900, bottom: '70px', right: '10px',
-        borderRadius: '50%',
-      }`)
+  //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  //-   q-btn(
+  //-     v-if="layersSelected.length === 0" @click="layerAddFromWorkspace()"
+  //-     round push color="green" icon="add"
+  //-     :style=`{
+  //-       position: 'absolute', zIndex: 1900, bottom: '70px', right: '10px',
+  //-       borderRadius: '50%',
+  //-     }`)
   //- footer: layersSelected
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
@@ -107,9 +107,13 @@ div(:style=`{position: 'relative'}`).column.fit
     q-btn(
       v-if="editorType === 'content'"
       round flat color="white" icon="sort" @click="layersSort()").b-90.q-mr-sm
+    q-btn(
+      v-if="editorType === 'composition'"
+      flat color="white" icon="school" icon-right="add" @click="layerAddFromWorkspace()"
+      :style=`{height: '42px'}`).b-90.q-mr-sm
     //- menu toggle
     q-btn(
-      round flat color="white" icon="menu_open" @click="$emit('menuToggle')"
+      round flat color="white" icon="menu_open"  @click="$emit('menuToggle')"
       ).b-90
 </template>
 

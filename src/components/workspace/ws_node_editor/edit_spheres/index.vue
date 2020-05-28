@@ -4,14 +4,18 @@ div(
     position: 'relative',
   }`
   ).column.fit
+  //- cateory
   div().row.full-width.q-px-sm
-    q-btn(
-      flat no-caps color="white"
-      icon-right="keyboard_arrow_down"
+    q-select(
+      filled
+      dark color="white" label="Category"
+      :value="category(node.category)" @input="categorySelected"
+      :options="categories"
       :style=`{
-        height: '50px',
-        maxWidth: '300px',
-      }`).b-80.full-width Category
+        borderRadius: '10px', overflow: 'hidden',
+        minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
+      }`)
+  //- spheres
   div(:style=`{}`).row.full-width.q-pa-sm
     q-input(
       v-model="searchString"
@@ -43,7 +47,28 @@ export default {
       searchString: ''
     }
   },
+  computed: {
+    categories () {
+      return this.$store.state.node.categories.reduce((acc, val) => {
+        if (val.type !== 'ALL') {
+          acc.push({
+            value: val.type,
+            label: val.sphere.name.charAt(0).toUpperCase() + val.sphere.name.slice(1)
+          })
+        }
+        return acc
+      }, [])
+    }
+  },
   methods: {
+    category (val) {
+      return this.categories.find(c => c.value === val)
+    },
+    categorySelected (e) {
+      this.$log('categorySelected', e)
+      // this.$set(this.node, 'category', e.value)
+      this.node.category = e.value
+    },
     sphereClick (s, si) {
       this.$log('sphereClick')
       this.sphereDelete(s, si)

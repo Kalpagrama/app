@@ -1,7 +1,7 @@
 <style lang="sass">
 .q-menu
   border-radius: 10px !important
-  background: none !important
+  // background: none !important
 .q-drawer
   z-index: 100000
   // border-radius: 10px 10px 0 0 !important

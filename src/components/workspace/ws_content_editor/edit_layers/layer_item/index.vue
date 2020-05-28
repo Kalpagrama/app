@@ -38,8 +38,10 @@ export default {
     modes () {
       return {
         norm: {
-          fn: () => {
+          fn: async () => {
+            await this.$wait(500)
             this.$tween.to(this, 0.5, {height: 50})
+            if (!this.player) return
             this.player.meta(['mode', 'content'])
             // this.player.meta(['layerId', this.layer.id])
           }
@@ -47,6 +49,7 @@ export default {
         edit: {
           fn: () => {
             this.$tween.to(this, 0.5, {height: 318})
+            if (!this.player) return
             this.player.meta(['mode', 'layer'])
             this.player.meta(['layerId', this.layer.id])
           }
