@@ -28,6 +28,9 @@ div(:style=`{position: 'relative'}`).column.fit
   //- body
   .col.full-width
     layer-list(v-bind="$props" @layerId="layerClicked")
+  composition-controller(
+    v-if="editorType === 'composition'"
+    v-bind="$props")
   //- footer
   transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
@@ -67,10 +70,11 @@ div(:style=`{position: 'relative'}`).column.fit
 <script>
 import layerList from './layer_list'
 import layerEditor from './layer_editor'
+import compositionController from './composition_controller'
 
 export default {
   name: 'editLayers',
-  components: {layerList, layerEditor},
+  components: {layerList, layerEditor, compositionController},
   props: ['editorType', 'player', 'meta', 'composition', 'pages', 'pageId'],
   data () {
     return {

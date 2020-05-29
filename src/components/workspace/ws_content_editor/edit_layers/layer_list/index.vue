@@ -54,12 +54,16 @@ div(:style=`{position: 'relative'}`).row.fit.b-40
               .col
                 div(
                   @click="$emit('layerId', l.id)"
+                  :class=`{
+                    'b-70': l.id !== meta.layerId,
+                    'b-100': l.id === meta.layerId
+                  }`
                   :style=`{
                     height: '40px',
                     borderRadius: '10px',
                     overflow: 'hidden',
                   }`
-                  ).row.full-width.items-center.content-center.b-70.q-px-md.layer
+                  ).row.full-width.items-center.content-center.q-px-md.layer
                   span(
                     v-if="l.spheres.length > 0"
                     :style=`{userSelect: 'none'}`

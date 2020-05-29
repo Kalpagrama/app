@@ -6,7 +6,7 @@ div(
   ).row.full-width.items-start.content-start
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   img(
-    v-if="preview"
+    v-if="preview && !active"
     :src="preview"
     draggable="false"
     @load="previewLoaded"
@@ -16,14 +16,14 @@ div(
       objectFit: 'contain'
     }`
     ).full-width
-  //- player-video(
-  //-   v-if="composition && active"
-  //-   :ctx="ctx" :composition="composition"
-  //-   :visible="visible" :active="active" :mini="mini")
-  //-   template(
-  //-     v-for="(_, scopedSlotName) in $scopedSlots"
-  //-     v-slot:[scopedSlotName]="slotData")
-  //-     slot(:name="scopedSlotName" v-bind="slotData")
+  player-video(
+    v-if="composition && active"
+    :ctx="ctx" :composition="composition"
+    :visible="visible" :active="active" :mini="mini")
+    template(
+      v-for="(_, scopedSlotName) in $scopedSlots"
+      v-slot:[scopedSlotName]="slotData")
+      slot(:name="scopedSlotName" v-bind="slotData")
       //- div(
       //-   v-if="scopedSlotName === 'video'"
       //-   :style=`{

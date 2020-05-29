@@ -35,9 +35,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
   slot(name="header")
   div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-30
     slot(name="video")
-    kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId}`)
+    //- kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId}`)
     q-spinner(
-      v-if="!loaded"
+      v-if="ctx === 'workspace' && !loaded"
       size="50px" color="green"
       :style=`{position: 'absolute', top: 'calc(50% - 25px)', left: 'calc(50% - 25px)'}`)
     //- :src="videoSrc" :type="videoType"
@@ -107,10 +107,10 @@ export default {
       else return null
     },
     layerStart () {
-      return this.layer.figuresAbsolute[0].t
+      return this?.layer?.figuresAbsolute[0].t
     },
     layerEnd () {
-      return this.layer.figuresAbsolute[1].t
+      return this?.layer?.figuresAbsolute[1].t
     },
     videoSrc () {
       return this.ctx === 'workspace' ? this.layerContent?.url : this.layer?.url
@@ -147,9 +147,12 @@ export default {
         if (to.layers.length > 0) {
           if (!this.layerId) this.layerId = to.layers[0].id
           if (!this.layerContent) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.layers[0].contentOid})
-          this.$nextTick(() => {
-            if (!this.player) this.playerInit()
-          })
+          // this.$nextTick(() => {
+          //   if (!this.player) {
+          //     alert('playerInit')
+          //     this.playerInit()
+          //   }
+          // })
         }
         this.$log('to.contentOid', to.contentOid)
         if (to.contentOid) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
@@ -161,6 +164,16 @@ export default {
         this.$log('layer CHANGED', to)
         if (to) {
           this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+        }
+      }
+    },
+    layerContent: {
+      handler (to, from) {
+        this.$log('layerContent CHANGED', to)
+        if (to) {
+          this.$nextTick(() => {
+            if (!this.player) this.playerInit()
+          })
         }
       }
     }

@@ -25,7 +25,7 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`)
   //- header
-  kalpa-debug(:options=`{ctx}`)
+  //- kalpa-debug(:options=`{ctx}`)
   div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
@@ -65,16 +65,21 @@ div(
       kalpa-loader(type="WS_CONTENT" :variables="variables")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
-            div(v-if="ctx === 'workspace'").row.full-width.items-start.content-start
+            div(v-if="ctx === 'workspace'" :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
               div(
                 v-for="(c,ci) in items" :key="c.id" @click="contentChoose(c,ci)"
                 :style=`{
                   position: 'relative',
+                  height: '60px',
                   borderRadius: '10px',
                   overflow: 'hidden',
                 }`
-                ).row.full-width.items-center.content-center.q-px-md.q-py-sm.q-mb-xs.b-60.content-item
-                span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
+                ).row.full-width.items-center.content-center.q-mb-sm.b-60.content-item
+                div(:style=`{width: '60px', height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.b-70
+                  img(:src="c.thumbOid" :style=`{objectFit: 'cover'}`).fit
+                .col.full-height
+                  .row.fit.items-start.content-start.q-pa-sm
+                    span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
             div(v-if="ctx === 'nodeEditor'").row.full-width.items-start.content-start
               content-item(
                 v-for="(c,ci) in items" :key="c.id"
@@ -202,7 +207,7 @@ export default {
       if (contentFind.length === 0) {
         let contentInput = {
           wsItemType: 'WS_CONTENT',
-          thumbOid: content.oid,
+          thumbOid: content.thumbUrl,
           name: content.name,
           layers: [],
           spheres: [],

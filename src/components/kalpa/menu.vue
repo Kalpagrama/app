@@ -68,7 +68,7 @@ div(:style=`{}`).column.fit.b-50
           span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Logout
         //- create node
         div(
-          v-if="false"
+          v-if="true"
           :style=`{}`
           ).row.full-width.items-center.content-center.q-px-md.q-py-sm
           q-btn(
