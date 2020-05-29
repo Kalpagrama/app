@@ -3,8 +3,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
   div(
     :style=`{
       maxWidth: $store.state.ui.maxWidthPage+'px',
-      paddingTop: '0px',
-      paddingBottom: paddingBottom+'px'
+      paddingTop: options.paddingTop+'px',
+      paddingBottom: options.paddingBottom+'px'
     }`
     ).row.full-width.items-start.content-start.justify-start
     div(
@@ -36,14 +36,16 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
 <script>
 export default {
   name: 'listMiddle',
-  // props: ['items', 'scrollWrapper'],
   props: {
     items: {type: Array},
     scrollWrapper: {type: Object},
     options: {
       type: Object,
       default () {
-        return {}
+        return {
+          paddingTop: 0,
+          paddingBottom: 0
+        }
       }
     }
   },

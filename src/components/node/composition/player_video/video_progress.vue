@@ -98,6 +98,7 @@ export default {
     barDrag (e) {
       // this.$log('barDrag', e)
       if (e.isFirst) {
+        this.player.meta(['mode', 'content'])
         this.$tween.to(this, 0.3, {barHeight: this.barHeightMax})
         // this.barWidth = (this.meta.now / this.meta.duration) * 100
         this.barWidth = (e.evt.layerX / this.$el.clientWidth) * 100
@@ -117,6 +118,7 @@ export default {
     },
     barClick (e) {
       // this.$log('barClick', e)
+      this.player.meta(['mode', 'content'])
       let width = e.target.clientWidth
       let left = e.offsetX
       let t = (this.meta.duration * left) / width

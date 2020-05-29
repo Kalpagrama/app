@@ -11,5 +11,6 @@ export default {
   offsetTop: 0,
   iWantSound: false,
   showDrawerLeft: false,
-  ws_showFooter: true
+  appShowMenu: false,
+  wsShowMenu: true
 }

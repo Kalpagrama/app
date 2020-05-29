@@ -4,20 +4,26 @@ q-layout(view="hHh lpR fFf").b-30
   q-header(reveal :style=`{zIndex: 30000}`).row.full-width.justify-center
     div(
       :style=`{
-        height: '60px',
         maxWidth: $store.state.ui.maxWidthPage+'px',
         zIndex: 30000,
         borderRadius: '0 0 10px 10px', overflow: 'hidden'
       }`
-      ).row.full-width.items-center.content-center.justify-center.b-100
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
-      .col.full-height
-        .row.fit.items-center.content-center.justify-center
-          span.text-grey-2.text-bold Home
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="grey-2" icon="more_vert")
-  kalpa-menu-footer(:options=`{showMenuPage: false}`)
+      ).row.full-width.items-center.content-center.justify-start.b-50.q-py-md.q-px-sm
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
+      span(:style=`{fontSize: '16px'}`).text-white.text-bold Home
+  q-footer(
+    v-if="$q.screen.xs"
+    reveal
+    ).row.full-width.justify-center
+    div(
+      v-if="!$store.state.ui.appShowMenu"
+      :style=`{borderRadius: '10px 10px 0 0'}`
+      ).row.full-width.items-center.content-center.q-pa-sm.b-50
+      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])").b-60
+      .col.q-pb-sm.q-px-sm
+        //- kalpa-buttons(:value="pagesHot" :id="$route.params.page" @id="$router.push({params: {page: $event}})").justify-center
+      //- q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = !showMenuRight").b-60
+  //- kalpa-menu-footer(:options=`{showMenuPage: false}`)
     //- template(v-slot:menuRight)
     //-   menu-right
   //- page
@@ -25,7 +31,7 @@ q-layout(view="hHh lpR fFf").b-30
     q-page
       kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
         template(v-slot=`{items}`)
-          list-middle(:items="items" :options=`{paddingTop: 60}`)
+          list-middle(:items="items" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`)
             template(v-slot:item=`{item, index, indexMiddle}`)
               node(
                 ctx="list" layout="PIP"

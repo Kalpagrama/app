@@ -11,16 +11,14 @@
     :style=`{
       borderRadius: $q.screen.gt.xs ? '10px' : '10px 10px 0 0',
     }`
-    ).row.full-width.items-end.content-end.q-pa-sm.b-70
-    .col
-    q-btn(
-      round flat color="white" icon="menu_open" @click="$emit('menuToggle')"
-      ).b-90
+    ).row.full-width.items-end.content-end.q-pb-sm.q-px-sm.b-50.justify-center
+    kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="$emit('pageId', $event)")
 </template>
 
 <script>
 export default {
   name: 'editInfo',
+  props: ['pages', 'pageId'],
   data () {
     return {
     }

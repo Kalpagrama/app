@@ -17,7 +17,8 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'relative'
+    position: 'relative',
+    //- minHeight: '400px',
   }`
   ).row.full-width.items-start.content-start.b-50
   //- preview
@@ -71,7 +72,7 @@ div(
         position: 'absolute', zIndex: 100+ii, right: '0px', bottom: '-0.5px',
         maxWidth: itemIndex === ii ? nowMaxWidth+'%' : nextMaxWidth+'%',
         maxHeight: itemIndex === ii ? nowMaxHeight+'%' : nextMaxHeight+'%',
-        opacity: itemIndex === ii ? 1 : (nextMaxWidth / 100) + 0.3
+        opacity: itemIndex === ii ? 1 : (nextMaxWidth / 100) + 0.3,
       }`).row.full-width
       //- item next
       div(v-if="ii === itemIndex+1" @click="itemsNext()" :style=`{position: 'absolute', zIndex: 20000}`).row.fit.cursor-pointer.item-next

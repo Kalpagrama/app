@@ -1,15 +1,21 @@
 <style lang="sass">
+.content-item
+  cursor: pointer
+  &:hover
+    background: rgb(80,80,80)
 </style>
 
 <template lang="pug">
 div(
-  :class=`{
-    position: 'relative',
-    'q-pt-sm': $q.screen.gt.xs
+  :style=`{
+    position: 'relative'
   }`
   ).column.full-width
   //- ws content editor
-  q-dialog(v-model="contentEditorOpened" position="bottom")
+  q-dialog(
+    v-model="contentEditorOpened" position="bottom"
+    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
+    @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
     ws-content-editor(
       v-if="content" :value="content"
       @close="contentEditorOpened = false"
@@ -19,22 +25,28 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`)
   //- header
-  div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
+  kalpa-debug(:options=`{ctx}`)
+  div(
+    :style=`{
+      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
+    }`).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
     slot(name="header")
-    //- header: workspace
+    //- navigation
     div(
       v-if="ctx === 'workspace'"
-      :style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+      :style=`{}`).row.full-width.items-center.content-center.q-py-md
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Content
     //- search
-    div.row.full-width.q-px-sm
+    div.row.full-width
       q-input(
         v-model="searchStringRaw"
-        filled dense color="grey-6" dark
+        filled dense dark color="white"
         :autofocus="ctx === 'workpsace'"
         placeholder="Search or paste URL"
-        ).full-width.b-70
+        @focus="searchStringFocused"
+        @blur="searchStringBlurred"
+        ).full-width
         template(v-slot:append)
           q-btn(
             v-if="searchStringRaw.length > 0"
@@ -43,7 +55,7 @@ div(
             v-else
             flat dense color="grey-2" icon="attach_file" @click="contentFromFILEStart()")
     //- actions
-    div(:style=`{}`).row.full-width.items-center.content-center.q-px-sm
+    div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
       q-btn(flat no-caps color="white").b-70 Filters
@@ -53,13 +65,24 @@ div(
       kalpa-loader(type="WS_CONTENT" :variables="variables")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
-            content-item(
-              v-for="(c,ci) in items" :key="c.id"
-              :ctx="ctx" :content="c" :contentIndex="ci"
-              @choose="contentChoose(c,ci)"
-              @delete="contentDelete(c,ci)"
-              @layerChoose="layerChoose"
-              @layerPreview="layerPreview")
+            div(v-if="ctx === 'workspace'").row.full-width.items-start.content-start
+              div(
+                v-for="(c,ci) in items" :key="c.id" @click="contentChoose(c,ci)"
+                :style=`{
+                  position: 'relative',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                }`
+                ).row.full-width.items-center.content-center.q-px-md.q-py-sm.q-mb-xs.b-60.content-item
+                span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
+            div(v-if="ctx === 'nodeEditor'").row.full-width.items-start.content-start
+              content-item(
+                v-for="(c,ci) in items" :key="c.id"
+                :ctx="ctx" :content="c" :contentIndex="ci"
+                @choose="contentChoose(c,ci)"
+                @delete="contentDelete(c,ci)"
+                @layerChoose="layerChoose"
+                @layerPreview="layerPreview")
           //- nothing found
           div(
             v-else
@@ -220,6 +243,14 @@ export default {
       } catch (e) {
         this.$log('contentFromFILE error', e)
       }
+    },
+    searchStringFocused () {
+      this.$log('searchStringFocused')
+      this.$store.commit('ui/stateSet', ['wsShowMenu', false])
+    },
+    searchStringBlurred () {
+      this.$log('searchStringBlurred')
+      this.$store.commit('ui/stateSet', ['wsShowMenu', true])
     }
   }
 }

@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-div(:style=`{}`).row.items-center.content-center.q-py-sm
+div(:style=`{}`).row.items-center.content-center.q-pt-sm
   //- TODO create CSS variable for #4caf50 color...
   div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap.b-70
     div(

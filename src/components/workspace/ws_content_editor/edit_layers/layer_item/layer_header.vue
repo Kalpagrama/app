@@ -23,7 +23,7 @@ div(
       }`)
   //- tint
   div(
-    v-if="mode === 'norm'"
+    v-if="meta.layerId !== layer.id"
     @click="layerTintClick()"
     :style=`{
       position: 'absolute', zIndex: 200,
@@ -60,7 +60,7 @@ div(
   //- stats: start,end,total
   small.text-white {{ $time(layer.figuresAbsolute[0].t) }} -
   small.text-white.q-mx-xs {{ $time(layer.figuresAbsolute[1].t) }} /
-  small.text-white.q-mr-sm {{ $time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t) }}
+  small.text-white.q-mr-md {{ $time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t) }}
 </template>
 
 <script>
@@ -96,8 +96,10 @@ export default {
     layerTintClick () {
       this.$log('layerTintClick')
       this.player.meta(['layerId', this.layer.id])
+      this.player.meta(['mode', 'layer'])
       this.player.setCurrentTime(this.layerStart)
       this.player.update(this.layerStart)
+      this.player.play()
       this.$emit('mode', 'edit')
     },
     layerNameClick () {

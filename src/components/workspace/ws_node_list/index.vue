@@ -5,12 +5,10 @@
 
 <template lang="pug">
 div(
-  :class=`{
-    'q-pt-sm': $q.screen.gt.xs
-  }`
   :style=`{
     position: 'relative'
-  }`).column.fit
+  }`
+  ).column.fit
   //- node add
   q-btn(
     @click="nodeAdd()"
@@ -38,24 +36,24 @@ div(
     :style=`{
       borderRadius: $q.screen.gt.xs ? '10px' : '0 0 10px 10px',
     }`
-    ).row.full-width.items-start.content-start.b-50
+    ).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
     //- header
-    div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+    div(:style=`{}`).row.full-width.items-center.content-center.q-py-md
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Nodes
     //- search
-    div.row.full-width.q-px-sm
+    div().row.full-width
       q-input(
         v-model="searchString"
-        filled dense color="grey-6" dark
-        placeholder="Search"
-        ).full-width.b-70
+        filled dark dense color="white"
+        placeholder="Search..."
+        ).full-width
         template(v-slot:append)
           q-btn(
             v-if="searchString.length > 0"
             flat dense color="grey-2" icon="clear" @click="searchString = ''")
     //- actions
-    div(:style=`{}`).row.full-width.items-center.content-center.q-px-sm
+    div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
       q-btn(flat no-caps color="white").b-70 Filters

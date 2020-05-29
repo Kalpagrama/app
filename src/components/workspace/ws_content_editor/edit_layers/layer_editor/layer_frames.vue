@@ -97,7 +97,7 @@ div(
 <script>
 export default {
   name: 'layerItem-layerFrames',
-  props: ['player', 'meta', 'layer', 'width', 'mode'],
+  props: ['player', 'meta', 'layer', 'width'],
   data () {
     return {
       frameWidth: 50,
@@ -126,13 +126,13 @@ export default {
     }
   },
   watch: {
-    mode: {
-      handler (to, from) {
-        if (to === 'edit') {
-          this.framesDragToLayer()
-        }
-      }
-    }
+    // mode: {
+    //   handler (to, from) {
+    //     if (to === 'edit') {
+    //       this.framesDragToLayer()
+    //     }
+    //   }
+    // }
   },
   methods: {
     async pointDrag (e, index) {
@@ -203,8 +203,14 @@ export default {
       this.$log('t', t)
       this.player.setCurrentTime(t)
       this.player.update(t)
-      this.$emit('meta', ['mode', 'watch'])
+      if (t < this.meta.layerStart || t > this.meta.layerEnd) {
+        this.player.meta(['mode', 'content'])
+      }
     },
+  },
+  mounted () {
+    this.$log('mounted')
+    this.framesDragToLayer()
   }
 }
 </script>

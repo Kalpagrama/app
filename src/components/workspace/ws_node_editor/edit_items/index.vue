@@ -52,6 +52,8 @@ div(
       :icon="itemsEditing ? 'check' : 'edit'"
       ).b-70.q-mr-sm
     q-btn(round flat color="white" icon="search").b-70
+  //- footer
+  div(:style=`{height: '50px', order: 1000}`).row.full-width
   //- body
   div(
     :style=`{
@@ -90,10 +92,18 @@ div(
             }`).row.justify-start
             q-btn(round flat color="white" icon="drag_indicator").fit.item-drag-handle
     //- add first item
-    ws-content-list(v-else ctx="nodeEditor" @layer="layerFound").full-height
-      template(v-slot:header)
-        div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
-          span.text-white.text-bold Add first item
+    div(v-else).row.fit.items-center.content-center.justify-center.q-pa-md
+      ws-content-list(
+        ctx="nodeEditor" @layer="layerFound"
+        :style=`{
+          maxWidth: '650px',
+          maxHeight: '650px',
+          borderRadius: '10px',
+          overflow: 'hidden'
+        }`).full-height.b-50
+        template(v-slot:header)
+          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
+            span(:style=`{fontSize: '16px'}`).text-white.text-bold Add first item
     //- items selected
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(

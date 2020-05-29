@@ -23,13 +23,19 @@ iframe[id$="_youtube_iframe"]
     transform: scale(0.1)
     transform-origin: top left
     pointer-events: none
+.mejs__overlay-button
+  display: none
+  // opacity: 0.2
+  // transform: scale(2)
 </style>
 
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).column.fit
+  video-controller(v-bind="$props" :player="player" :meta="meta")
   slot(name="header")
   div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-30
     slot(name="video")
+    kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId}`)
     q-spinner(
       v-if="!loaded"
       size="50px" color="green"
@@ -43,6 +49,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
       :controls="false"
       :muted="videoMuted"
       :autoplay="videoAutoplay"
+      @click="playing ? player.pause() : player.play()"
       @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
       @timeupdate="videoTimeupdate"
       :style=`{
@@ -57,15 +64,15 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
 
 <script>
 import videoProgress from './video_progress'
+import videoController from './video_controller'
 
 export default {
   name: 'composition-playerVideo',
-  components: {videoProgress},
+  components: {videoProgress, videoController},
   props: ['ctx', 'composition', 'visible', 'active', 'mini'],
   data () {
     return {
-      mode: 'content',
-      modes: ['content', 'layer', 'composition'],
+      mode: 'composition', // content, layer, composition
       layerId: null,
       layerContent: null,
       now: 0,
@@ -73,26 +80,37 @@ export default {
       player: null,
       playing: false,
       loaded: false,
-      muted: false
+      muted: false,
+      timeupdateStop: false
     }
   },
   computed: {
     meta () {
       return {
+        mode: this.mode,
         now: this.now,
         duration: this.duration,
         playing: this.playing,
         loaded: this.loaded,
         layer: this.layer,
+        layerStart: this.layerStart,
+        layerEnd: this.layerEnd,
         layerId: this.layerId,
         layers: this.composition.layers,
-        content: this.layerContent
+        content: this.layerContent,
+        timeupdateStop: this.timeupdateStop
       }
     },
     layer () {
       let layer = this.composition.layers.find(l => l.id === this.layerId)
       if (layer) return layer
       else return null
+    },
+    layerStart () {
+      return this.layer.figuresAbsolute[0].t
+    },
+    layerEnd () {
+      return this.layer.figuresAbsolute[1].t
     },
     videoSrc () {
       return this.ctx === 'workspace' ? this.layerContent?.url : this.layer?.url
@@ -105,7 +123,10 @@ export default {
         return this.muted
       }
       else {
-        if (this.$q.screen.xs) {
+        // if (this.$q.screen.xs) {
+        //   return true
+        // }
+        if (this.$q.platform.is.ios) {
           return true
         }
         else {
@@ -126,6 +147,9 @@ export default {
         if (to.layers.length > 0) {
           if (!this.layerId) this.layerId = to.layers[0].id
           if (!this.layerContent) this.layerContent = await this.$rxdb.findByOid(to.layers[0].contentOid, 0)
+          this.$nextTick(() => {
+            if (!this.player) this.playerInit()
+          })
         }
         this.$log('to.contentOid', to.contentOid)
         if (to.contentOid) this.layerContent = await this.$rxdb.findByOid(to.contentOid, 0)
@@ -137,23 +161,6 @@ export default {
         this.$log('layer CHANGED', to)
         if (to) {
           this.layerContent = await this.$rxdb.findByOid(to.contentOid, 0)
-        }
-      }
-    },
-    videoSrc: {
-      async handler (to, from) {
-        this.$log('videoSrc CHANGED', to)
-        if (to) {
-          await this.$wait(1000)
-          // if (!this.player) this.playerInit()
-          if (this.player) {
-            this.player.src = to
-            // this.videoLoadeddata()
-            // this.player.update()
-          }
-          else {
-            this.playerInit()
-          }
         }
       }
     }
@@ -193,6 +200,7 @@ export default {
       }
       else {
         this.$log('player KALPA start', this.videoSrc)
+        // alert('player KALPA start')
         this.player = {}
         this.player.setCurrentTime = async (ms) => {
           videoRef.currentTime = ms
@@ -258,18 +266,20 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // alert('mounted')
+    if (this.ctx === 'workspace') {
+      if (this.playingInterval) clearInterval(this.playingInterval)
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
     if (this.ctx === 'workspace') {
+      if (this.playingInterval) clearInterval(this.playingInterval)
       if (!this.player) return
       this.player.removeEventListener('play', this.videoPlay)
       this.player.removeEventListener('pause', this.videoPause)
       this.player.removeEventListener('loadeddata', this.videoLoadeddata)
       // this.player.removeEventListener('timeupdate', this.videoTimeupdate)
     }
-    // alert('beforeDestroy')
   }
 }
 </script>

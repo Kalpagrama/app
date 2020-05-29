@@ -1,8 +1,5 @@
 <template lang="pug">
 div(
-  :class=`{
-    'q-pt-sm': $q.screen.gt.xs
-  }`
   :style=`{
     position: 'relative'
   }`
@@ -12,13 +9,14 @@ div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
     }`
-    ).row.full-width.items-center.content-center.q-pa-md.b-50
-    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-    span(:style=`{fontSize: '20px'}`).text-white.text-bold Settings
+    ).row.full-width.items-center.content-center.b-50.q-px-sm
+    .row.full-width.items-center.content-center.q-py-md
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold Settings
   //- body
   .col.full-width.scroll
-    .row.full-width.justify-center
-      div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.q-px-sm.q-py-md
+    .row.full-width.justify-center.q-px-sm.q-py-md
+      div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
         //- .row.full-width.q-pa-md
         //-   span(:style=`{fontSize: '30px'}`).text-white.text-bold Settings
         //- export import

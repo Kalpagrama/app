@@ -30,7 +30,7 @@ q-expansion-item(
     //- header: find layer
     div().row.full-width.q-px-sm
       q-input(
-        v-model="searchString" autofocus
+        v-model="searchString"
         filled dark dense color="grey-2" placeholder="Find layer"
         :style=`{}`).full-width.b-90
     //- body

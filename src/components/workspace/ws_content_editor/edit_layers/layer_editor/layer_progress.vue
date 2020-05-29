@@ -32,8 +32,9 @@ div(
           pointerEvents: 'none',
           borderRadius: '10px',
           overflow: 'hidden',
+          background: layer.color,
         }`
-      ).row.full-height.bg-green
+      ).row.full-height
   q-btn(round flat color="white" icon="refresh" @click="layerPlayAgain()").b-110
 </template>
 
@@ -70,6 +71,7 @@ export default {
   methods: {
     layerPlay () {
       this.$log('layerPlay')
+      this.player.meta(['mode', 'layer'])
       if (this.meta.playing) this.player.pause()
       else {
         if (!this.layerPlayStarted) {
