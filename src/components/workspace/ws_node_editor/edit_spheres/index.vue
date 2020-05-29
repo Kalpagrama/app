@@ -23,25 +23,23 @@ div(
         minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
       }`).full-width
   //- spheres
-  div(:style=`{}`).row.full-width.q-pa-sm
-    q-input(
-      v-model="searchString"
-      @keyup.enter="searchStringEnter()"
-      filled dark dense autofocus
-      color="white"
-      label="Find or create sphere"
-      ).full-width
-  .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-px-sm
-      div(
-        v-for="(s,si) in node.spheres" :key="si" @click="sphereClick(s,si)"
-        :style=`{
-          borderRadius: '10px',
-          overflow: 'hidden',
-        }`
-        ).row.q-px-md.q-py-sm.q-mr-xs.q-mb-sm.b-80.sphere
-        span.text-white {{ s.name }}
-  //- div(:style=`{}`).row.full-width.q-pa-sm
+  .col.full-width
+    ws-sphere-list(
+      :showHeader="false"
+      :showItems="showSpheresFromWs"
+      @created="sphereCreated($event), showSpheresFromWs = false"
+      @chosen="sphereChosen, showSpheresFromWs = false"
+      @searchStarted="showSpheresFromWs = true"
+      @searchEnded="showSpheresFromWs = false"
+      ).full-height
+      template(v-slot:items=`{items, searchString}`)
+        div().row.full-width.items-start.content-start
+          div(v-if="searchString.length === 0").row.full-width
+            ws-sphere(
+              v-for="(s,si) in node.spheres" :key="si"
+              :sphere="s"
+              @sphereClick="sphereClick(s,si)"
+              ).q-mr-sm.q-mb-sm
 </template>
 
 <script>
@@ -51,7 +49,8 @@ export default {
   props: ['node'],
   data () {
     return {
-      searchString: ''
+      searchString: '',
+      showSpheresFromWs: false
     }
   },
   computed: {
@@ -73,8 +72,14 @@ export default {
     },
     categorySelected (e) {
       this.$log('categorySelected', e)
-      // this.$set(this.node, 'category', e.value)
       this.node.category = e.value
+    },
+    sphereCreated (s) {
+      this.$log('sphereCreated', s)
+      this.node.spheres.push(s)
+    },
+    sphereChosen (s) {
+      this.$log('sphereChoosen', s)
     },
     sphereClick (s, si) {
       this.$log('sphereClick')
@@ -83,17 +88,6 @@ export default {
     sphereDelete(s, si) {
       this.$log('sphereDelete')
       this.$delete(this.node.spheres, si)
-    },
-    async searchStringEnter () {
-      this.$log('searchStringEnter')
-      // check length
-      if (this.searchString.length === 0) return
-      // check dups
-      let i = this.node.spheres.find(s => s.name === this.searchString)
-      if (!i) {
-        this.node.spheres.push({name: this.searchString})
-      }
-      this.searchString = ''
     }
   }
 }

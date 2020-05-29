@@ -4,22 +4,26 @@ div(
     position: 'relative'
   }`
   ).row.full-width
-  kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '50%'}` :options=`{ctx,visible,active,mini}`)
+  kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '150px'}` :options=`{ctx,visible,active,mini}`)
   img(
-    v-if="preview"
+    v-if="preview && !active"
     :src="preview"
     draggable="false"
+    @load="previewLoaded"
+    @error="previewErrored"
     :style=`{
       userSelect: 'none',
       objectFit: 'contain'
     }`
     ).full-width
-  //- player-video(
-  //-   v-if="composition"
-  //-   :ctx="ctx" :composition="composition"
-  //-   :visible="visible" :active="active" :mini="mini")
-  //-   template(v-for="(_, scopedSlotName) in $scopedSlots" v-slot:[scopedSlotName]="slotData")
-  //-     slot(:name="scopedSlotName" v-bind="slotData")
+  player-video(
+    v-if="composition && active"
+    :ctx="ctx" :composition="composition"
+    :visible="visible" :active="active" :mini="mini")
+    template(
+      v-for="(_, scopedSlotName) in $scopedSlots"
+      v-slot:[scopedSlotName]="slotData")
+      slot(:name="scopedSlotName" v-bind="slotData")
       //- div(
       //-   v-if="scopedSlotName === 'video'"
       //-   :style=`{
@@ -28,6 +32,9 @@ div(
       //-   }`
       //-   ).row.full-width.bg-red.q-pa-sm
       //-   span.text-white hello
+      //- img(
+      //-   v-if="scopedSlotName === 'video'"
+      //-   :style=`{position: 'relative',}`)
 </template>
 
 <script>
@@ -77,6 +84,14 @@ export default {
         }
       }
     },
+  },
+  methods: {
+    previewLoaded () {
+      this.$log('previewLoaded')
+    },
+    previewErrored () {
+      // this.$log('previewErrored')
+    }
   }
 }
 </script>

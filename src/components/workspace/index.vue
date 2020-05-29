@@ -18,7 +18,13 @@ div(
   //- body
   div(:style=`{}`).col.full-width.q-mb-sm
     .row.fit.items-start.content-start.justify-center
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.fit
+      div(
+        :class=`{
+          'q-pt-sm': $q.screen.gt.xs
+        }`
+        :style=`{
+          maxWidth: $store.state.ui.maxWidthPage+'px',
+        }`).row.fit
         ws-note-list(v-if="$route.params.page === 'note'")
         ws-content-list(v-if="$route.params.page === 'content'")
         ws-node-list(v-if="$route.params.page === 'node'")

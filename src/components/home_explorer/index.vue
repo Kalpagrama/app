@@ -4,19 +4,13 @@ q-layout(view="hHh lpR fFf").b-30
   q-header(reveal :style=`{zIndex: 30000}`).row.full-width.justify-center
     div(
       :style=`{
-        height: '60px',
         maxWidth: $store.state.ui.maxWidthPage+'px',
         zIndex: 30000,
         borderRadius: '0 0 10px 10px', overflow: 'hidden'
       }`
-      ).row.full-width.items-center.content-center.justify-center.b-100
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
-      .col.full-height
-        .row.fit.items-center.content-center.justify-center
-          span.text-grey-2.text-bold Home
-      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-        q-btn(round flat color="grey-2" icon="more_vert")
+      ).row.full-width.items-center.content-center.justify-start.b-50.q-pa-md
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+      span(:style=`{fontSize: '16px'}`).text-white.text-bold Home
   kalpa-menu-footer(:options=`{showMenuPage: false}`)
     //- template(v-slot:menuRight)
     //-   menu-right
@@ -25,7 +19,7 @@ q-layout(view="hHh lpR fFf").b-30
     q-page
       kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
         template(v-slot=`{items}`)
-          list-middle(:items="items" :options=`{paddingTop: 60}`)
+          list-middle(:items="items" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`)
             template(v-slot:item=`{item, index, indexMiddle}`)
               node(
                 ctx="list" layout="PIP"

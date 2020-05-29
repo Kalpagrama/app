@@ -36,7 +36,7 @@ div(
           borderRadius: '4px', overflow: 'hidden',
           pointerEvents: 'none'
         }`
-        ).bg-grey-10
+        ).bg-grey-9
       //- left tint
       div(
         :style=`{
@@ -169,7 +169,7 @@ export default {
         this.player.meta(['timeupdateStop', false])
         this.pointDragging = false
         this.pointDraggingIndex = null
-        this.player.play()
+        // this.player.play()
         // this.player.setCurrentTime(t)
         // TODO: where to go after drag event
         this.player.setCurrentTime(this.layer.figuresAbsolute[0].t)

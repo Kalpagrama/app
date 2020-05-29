@@ -1,8 +1,5 @@
 <template lang="pug">
 div(
-  :class=`{
-    'q-pt-sm': $q.screen.gt.xs
-  }`
   :style=`{
     position: 'relative'
   }`

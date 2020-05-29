@@ -1,5 +1,10 @@
 <template lang="pug">
-div(:style=`{borderRadius: '10px'}`).row.full-width.bg-green.q-pa-xs
+div(
+  :style=`{
+    borderRadius: '10px', opacity: 0.8,
+    pointerEvents: 'none',
+    userSelect: 'none',
+  }`).row.full-width.bg-green.q-pa-xs
   div(
     v-for="(o,okey) in options" :key="oi"
     :style=`{fontSize: '11px', color: 'white'}`

@@ -21,15 +21,17 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
         borderRadius: '10px', overflow: 'hidden',
         maxHeight: '70vh'
       }`
-      ).column.full-width.bg-grey-9
-      menu-right
+      ).column.full-width
+      menu-right.b-50
   //- header
   q-header(reveal).row.full-width.justify-center
-    div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`).row.full-width.q-pa-sm.b-30
+    div(
+      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`
+      ).row.full-width.q-pa-md.b-50
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       .col.full-height
         .row.fit.items-center.content-center.q-px-sm
-          span().text-white.text-bold Node explorer
+          span(:style=`{fontSize: '16px'}`).text-white.text-bold Node explorer
   //- footer
   kalpa-menu-footer(v-if="!nodeEditorOpened" :options=`{showMenuPage: true}`)
     template(v-slot:menuRight=`{inDrawer}`)

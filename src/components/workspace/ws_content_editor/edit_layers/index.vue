@@ -102,6 +102,9 @@ div(:style=`{position: 'relative'}`).column.fit
       :color="layersEditing ? 'green' : 'white'").b-90
     .col
     q-btn(
+      round flat color="white" icon="play_arrow" @click="player.meta(['mode', 'composition'])"
+      ).b-90.q-mr-sm
+    q-btn(
       v-if="editorType === 'content'"
       round flat color="white" icon="search").b-90.q-mr-sm
     q-btn(

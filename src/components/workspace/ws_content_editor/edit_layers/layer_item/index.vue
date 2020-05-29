@@ -30,7 +30,7 @@ export default {
     return {
       mode: 'norm',
       height: 50,
-      heightMax: 318,
+      heightMax: 290,
       heightMin: 50
     }
   },
@@ -48,7 +48,7 @@ export default {
         },
         edit: {
           fn: () => {
-            this.$tween.to(this, 0.5, {height: 318})
+            this.$tween.to(this, 0.5, {height: 290})
             if (!this.player) return
             this.player.meta(['mode', 'layer'])
             this.player.meta(['layerId', this.layer.id])

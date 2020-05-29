@@ -4,33 +4,37 @@ div(
   @mouseleave="mouseOver = false"
   :style=`{
     position: 'relative',
-    height: '33px',
-    paddingLeft: paddingX+'px',
-    paddingRight: paddingX+'px',
-    borderRadius: '10px',
+    borderRadius: '0px',
     overflow: 'hidden',
-  }`).row.full-width.items-center.content-center
-  div(
-    @click="progressClick"
-    v-touch-pan.mouse.left.right="progressDrag"
-    :style=`{
-      position: 'relative',
-      height: '20px',
-      borderRadius: '10px',
-      overflow: 'hidden',
-    }`
-    ).row.full-width.items-center.content-center.b-140.cursor-pointer
+  }`).row.full-width.items-center.content-center.q-px-sm
+  q-btn(
+    round @click="layerPlay()"
+    :flat="!layerIsPlaying"
+    :color="layerIsPlaying ? 'red' : 'white'"
+    :icon="layerIsPlaying ? 'pause' : 'play_arrow'").b-110.q-mr-sm
+  .col.q-px-md
     div(
-      v-if="meta.now >= layerStart && meta.now <= layerEnd"
+      @click="progressClick"
+      v-touch-pan.mouse.left.right="progressDrag"
       :style=`{
-        position: 'absolute', zIndex: 1000,
-        left: '0px',
-        width: progressPercentRaw ? progressPercentRaw+'%' : progressPercent+'%',
-        pointerEvents: 'none',
+        position: 'relative',
+        height: '20px',
         borderRadius: '10px',
         overflow: 'hidden',
       }`
-    ).row.full-height.bg-green
+      ).row.full-width.items-center.content-center.b-140.cursor-pointer
+      div(
+        v-if="meta.now >= layerStart && meta.now <= layerEnd"
+        :style=`{
+          position: 'absolute', zIndex: 1000,
+          left: '0px',
+          width: progressPercentRaw ? progressPercentRaw+'%' : progressPercent+'%',
+          pointerEvents: 'none',
+          borderRadius: '10px',
+          overflow: 'hidden',
+        }`
+      ).row.full-height.bg-green
+  q-btn(round flat color="white" icon="refresh" @click="layerPlayAgain()").b-110
 </template>
 
 <script>
@@ -57,9 +61,29 @@ export default {
     },
     layerDuration () {
       return this.layerEnd - this.layerStart
-    }
+    },
+    layerIsPlaying () {
+      return this.meta.playing
+    },
   },
   methods: {
+    layerPlay () {
+      this.$log('layerPlay')
+      if (this.meta.playing) this.player.pause()
+      else {
+        this.player.meta(['mode', 'layer'])
+        this.player.meta(['layerId', this.layer.id])
+        this.player.setCurrentTime(this.layerStart)
+        this.player.update(this.layerStart)
+        this.player.play()
+      }
+    },
+    layerPlayAgain () {
+      this.$log('layerPlayAgain')
+      this.player.setCurrentTime(this.layerStart)
+      this.player.update(this.layerStart)
+      this.player.play()
+    },
     progressClick (e) {
       this.$log('progressClick')
       let width = e.target.clientWidth

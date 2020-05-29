@@ -23,6 +23,10 @@ iframe[id$="_youtube_iframe"]
     transform: scale(0.1)
     transform-origin: top left
     pointer-events: none
+.mejs__overlay-button
+  display: none
+  // opacity: 0.2
+  // transform: scale(2)
 </style>
 
 <template lang="pug">
@@ -30,7 +34,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
   slot(name="header")
   div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-30
     slot(name="video")
-    kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{mode,now,duration,timeupdateStop}`)
+    kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop}`)
     q-spinner(
       v-if="!loaded"
       size="50px" color="green"
@@ -44,6 +48,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
       :controls="false"
       :muted="videoMuted"
       :autoplay="videoAutoplay"
+      @click="playing ? player.pause() : player.play()"
       @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
       @timeupdate="videoTimeupdate"
       :style=`{
@@ -65,7 +70,7 @@ export default {
   props: ['ctx', 'composition', 'visible', 'active', 'mini'],
   data () {
     return {
-      mode: 'content',
+      mode: 'composition',
       modes: ['content', 'layer', 'composition'],
       layerId: null,
       layerContent: null,
@@ -135,6 +140,9 @@ export default {
         if (to.layers.length > 0) {
           if (!this.layerId) this.layerId = to.layers[0].id
           if (!this.layerContent) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.layers[0].contentOid})
+          this.$nextTick(() => {
+            if (!this.player) this.playerInit()
+          })
         }
         this.$log('to.contentOid', to.contentOid)
         if (to.contentOid) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
@@ -153,23 +161,23 @@ export default {
         }
       }
     },
-    videoSrc: {
-      async handler (to, from) {
-        this.$log('videoSrc CHANGED', to)
-        if (to) {
-          await this.$wait(1000)
-          // if (!this.player) this.playerInit()
-          if (this.player) {
-            this.player.src = to
-            // this.videoLoadeddata()
-            // this.player.update()
-          }
-          else {
-            this.playerInit()
-          }
-        }
-      }
-    }
+    // videoSrc: {
+    //   async handler (to, from) {
+    //     this.$log('videoSrc CHANGED', to)
+    //     if (to) {
+    //       await this.$wait(1000)
+    //       // if (!this.player) this.playerInit()
+    //       if (this.player) {
+    //         this.player.src = to
+    //         // this.videoLoadeddata()
+    //         // this.player.update()
+    //       }
+    //       else {
+    //         this.playerInit()
+    //       }
+    //     }
+    //   }
+    // }
   },
   methods: {
     playerInit () {
@@ -177,7 +185,7 @@ export default {
       const videoRef = this.$refs.videoRef
       if (this.ctx === 'workspace') {
         this.$log('player WORKSPACE start', this.videoSrc)
-        // alert('player WORKSPACE start')
+        alert('player WORKSPACE start')
         let me = new window.MediaElementPlayer(videoRef, {
           loop: true,
           autoplay: true,
@@ -206,6 +214,7 @@ export default {
       }
       else {
         this.$log('player KALPA start', this.videoSrc)
+        alert('player KALPA start')
         this.player = {}
         this.player.setCurrentTime = async (ms) => {
           videoRef.currentTime = ms
@@ -286,16 +295,27 @@ export default {
     videoTimeupdateComposition (t) {
       if (t >= this.layerEnd) {
         // find next layer
+        let i = this.composition.layers.findIndex(l => l.id === this.layerId)
+        if (i >= 0) {
+          if (this.composition.layers[i + 1]) {
+            this.layerId = this.composition.layers[i + 1].id
+          }
+          else {
+            this.layerId = this.composition.layers[0].id
+          }
+        }
         this.player.setCurrentTime(this.layerStart)
       }
     }
   },
   mounted () {
     this.$log('mounted')
+    if (this.playingInterval) clearInterval(this.playingInterval)
     // alert('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    if (this.playingInterval) clearInterval(this.playingInterval)
     if (this.ctx === 'workspace') {
       if (!this.player) return
       this.player.removeEventListener('play', this.videoPlay)

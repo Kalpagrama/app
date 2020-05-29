@@ -47,6 +47,7 @@ export default {
       immediate: false,
       handler(to, from){
         this.$log('items CHANGED', 'from=', from, ', to=', to)
+        this.$emit('itemsCount', to.length)
       }
     }
   },

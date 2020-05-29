@@ -1,12 +1,6 @@
 <template lang="pug">
 div(
-  :class=`{
-    'q-mt-sm': $q.screen.gt.xs
-  }`
   :style=`{
-    maxHeight: '500px',
-    borderRadius: '10px',
-    overflow: 'hidden',
   }`).column.fit
   //- header
   div(
@@ -14,9 +8,18 @@ div(
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
       overflow: 'hidden'
     }`
-    ).row.full-width.items-center.content-center.q-pa-md.b-50
-    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-    span(:style=`{fontSize: '20px'}`).text-white.text-bold Notes
+    ).row.full-width.items-start.content-start.b-50.q-pb-sm
+    //- navigation
+    .row.full-width.items-center.content-center.q-pa-md.b-50
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold Notes
+    //- search
+    .row.full-width.q-px-sm
+      q-input(
+        v-model="searchString"
+        filled dark dense color="white"
+        label="Search..."
+        ).full-width
   //- body
   .col.full-width.scroll
 </template>
@@ -27,7 +30,7 @@ export default {
   props: [],
   data () {
     return {
-      notes: []
+      searchString: '',
     }
   },
   methods: {

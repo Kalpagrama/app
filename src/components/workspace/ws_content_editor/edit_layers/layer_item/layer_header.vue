@@ -96,8 +96,10 @@ export default {
     layerTintClick () {
       this.$log('layerTintClick')
       this.player.meta(['layerId', this.layer.id])
+      this.player.meta(['mode', 'layer'])
       this.player.setCurrentTime(this.layerStart)
       this.player.update(this.layerStart)
+      this.player.play()
       this.$emit('mode', 'edit')
     },
     layerNameClick () {

@@ -3,9 +3,8 @@
 
 <template lang="pug">
 div(
-  :class=`{
-    position: 'relative',
-    'q-pt-sm': $q.screen.gt.xs
+  :style=`{
+    position: 'relative'
   }`
   ).column.full-width
   //- ws content editor
@@ -19,22 +18,25 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`)
   //- header
-  div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
+  div(
+    :style=`{
+      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
+    }`).row.full-width.items-start.content-start.b-50.q-pb-sm
     slot(name="header")
     //- header: workspace
     div(
       v-if="ctx === 'workspace'"
-      :style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
+      :style=`{}`).row.full-width.items-center.content-center.q-pa-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Content
     //- search
     div.row.full-width.q-px-sm
       q-input(
         v-model="searchStringRaw"
-        filled dense color="grey-6" dark
+        filled dense dark color="white"
         :autofocus="ctx === 'workpsace'"
         placeholder="Search or paste URL"
-        ).full-width.b-70
+        ).full-width
         template(v-slot:append)
           q-btn(
             v-if="searchStringRaw.length > 0"
