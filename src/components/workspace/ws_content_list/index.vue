@@ -70,6 +70,7 @@ div(
 
 <script>
 import contentItem from './content_item'
+import { ContentApi } from 'src/api/content'
 
 export default {
   name: 'wsContentList',
@@ -139,7 +140,7 @@ export default {
     contentEditorOpened: {
       handler (to, from) {
         this.$log('contentEditorOpened CHANGED', to)
-        this.$store.commit('workspace/stateSet', ['showFooter', !to])
+        this.$store.commit('ui/stateSet', ['ws_showFooter', !to])
       }
     }
   },
@@ -200,7 +201,7 @@ export default {
     async contentFromURL (url) {
       try {
         this.$log('contentFromURL start', url)
-        let content = await this.$store.dispatch('content/contentCreateFromUrl', url)
+        let content = await ContentApi.contentCreateFromUrl(url)
         this.$log('contentFromURL done')
         return content
       } catch (e) {

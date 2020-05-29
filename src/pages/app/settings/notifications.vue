@@ -61,12 +61,13 @@ export default {
     async save (n) {
       try {
         this.$log('changing start', n)
-        let res = await this.$store.dispatch('objects/update', {
-          oid: this.$store.getters.currentUser.oid,
-          path: 'settings.notifications',
-          newValue: this.n
-        })
-        this.$log('changing done', res)
+        // todo
+        // let res = await this.$store.dispatch('objects/update', {
+        //   oid: this.$store.getters.currentUser.oid,
+        //   path: 'settings.notifications',
+        //   newValue: this.n
+        // })
+        this.$log('changing done')
         this.$q.notify({message: 'Changing', color: 'green', textColor: 'white'})
       } catch (e) {
         this.$log('changing ERROR', e)

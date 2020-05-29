@@ -2,7 +2,7 @@ import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { onError } from 'apollo-link-error'
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
-import introspectionQueryResultData from '../schema/graphql.schema.json'
+import introspectionQueryResultData from '../api/graphql.schema.json'
 import { createHttpLink } from 'apollo-link-http'
 // import VueApollo from 'vue-apollo'
 // import { persistCache } from 'apollo-cache-persist'
@@ -11,10 +11,12 @@ import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
 import assert from 'assert'
+import { rxdb } from 'src/system/rxdb'
 
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { cache } from 'src/boot/cache'
-import { logoutSession } from 'src/system/auth'
+import { logoutSession } from 'src/api/auth'
+import { CacheItemTypeEnum } from 'src/system/rxdb/cache'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
@@ -104,11 +106,11 @@ export default async ({ Vue, store, app }) => {
     })
     return {
       item: services,
-      actualAge: 'zero'
+      actualAge: 'day'
     }
   }
-  let services = await store.dispatch('cache/get', { key: 'services', fetchItemFunc }, { root: true })
-  // logD('objects/get action complete', oid)
+
+  let services = await rxdb.getItem(CacheItemTypeEnum.OTHER + '::services', fetchItemFunc)
 
   logD('services', services)
   let linkAuth = services.authUrl

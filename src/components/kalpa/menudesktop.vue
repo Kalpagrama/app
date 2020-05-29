@@ -89,7 +89,7 @@ div(
 
 <script>
 import { checkUpdate, update } from 'src/system/services'
-import { logoutSession } from 'src/system/auth'
+import { AuthApi } from 'src/api/auth'
 // img:statics/icons/anvil.svg
 export default {
   name: 'kalpaMenuDesktop',
@@ -130,7 +130,7 @@ export default {
         this.loggingOut = true
         await this.$wait(800)
         if (!confirm('Really logout?')) throw new Error('Changed your mind')
-        let res = await logoutSession()
+        let res = await AuthApi.logout()
         this.$log('logout done', res)
         this.loggingOut = false
       }
@@ -179,7 +179,8 @@ export default {
       this.$log('cacheClear')
       this.cacheClearing = true
       await this.$wait(500)
-      this.$store.dispatch('cache/clear')
+      await this.$rxdb.clearAll()
+      // this.$store.dispatch('cache/clear')
       window.location.reload(true)
     }
   },

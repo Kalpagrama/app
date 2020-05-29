@@ -57,11 +57,12 @@ export default {
     },
     async save () {
       this.$log('save')
-      let res = await this.$store.dispatch('objects/update', {
-        oid: this.user.oid,
-        path: 'profile.nameFull',
-        newValue: this.user.name
-      })
+      // todo
+      // let res = await this.$store.dispatch('objects/update', {
+      //   oid: this.user.oid,
+      //   path: 'profile.nameFull',
+      //   newValue: this.user.name
+      // })
     }
   }
 }

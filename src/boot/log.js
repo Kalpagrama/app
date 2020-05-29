@@ -29,14 +29,16 @@ Object.freeze(LogLevelEnum)
 const LogModulesEnum = Object.freeze({
   SW: 'sw',
   AUTH: 'auth',
+  GQL: 'gql',
   VUEX: 'vx',
-  VUEX_WS: 'vx_ws',
   VUEX_CACHE: 'vx_cache',
-  VUEX_OBJECTS: 'vx_obj',
   RXDB: 'rxdb',
   RXDB_REACTIVE: 'rxdb_reactive',
   RXDB_WS: 'rxdb_ws',
   RXDB_CACHE: 'rxdb_cache',
+  RXDB_OBJ: 'rxdb_obj',
+  RXDB_LST: 'rxdb_lst',
+  RXDB_EVENT: 'rxdb_ev',
   BOOT: 'boot',
   ML: 'mainLayout',
   CP: 'capacitor'

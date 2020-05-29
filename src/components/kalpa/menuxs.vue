@@ -31,7 +31,7 @@ div(
 </template>
 
 <script>
-  import { logoutSession } from 'src/system/auth'
+  import { AuthApi } from 'src/api/auth'
 
 export default {
   name: 'kalpaMenuXs',
@@ -73,7 +73,7 @@ export default {
             this.$wait(1500).then(() => {
               this.pageLoading = null
             })
-            let res = await logoutSession()
+            let res = await AuthApi.logout()
             this.$log('logout done', res)
             break
           }
@@ -93,7 +93,8 @@ export default {
           this.pageLoading = 'refresh'
           await this.$wait(1500)
           this.pageLoading = null
-          this.$store.dispatch('cache/clear')
+          await this.$rxdb.clearAll()
+          // this.$store.dispatch('cache/clear')
           window.location.reload()
           break
         }

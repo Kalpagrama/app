@@ -53,12 +53,13 @@ export default {
     async changeEmail () {
       try {
         this.$log('changeEmail start')
-        let res = await this.$store.dispatch('objects/update', {
-          oid: this.$store.getters.currentUser.oid,
-          path: 'profile.email',
-          newValue: this.newEmail
-        })
-        this.$log('changeEmail done', res)
+        // todo
+        // let res = await this.$store.dispatch('objects/update', {
+        //   oid: this.$store.getters.currentUser.oid,
+        //   path: 'profile.email',
+        //   newValue: this.newEmail
+        // })
+        this.$log('changeEmail done')
         this.$q.notify({message: 'Changed EMAIL', color: 'green', textColor: 'white'})
       } catch (e) {
         this.$log('changeEmail ERROR', e)

@@ -2,18 +2,18 @@ import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 import LruCache from 'lru-cache'
 import assert from 'assert'
 import { schemaKeyValue, cacheSchema } from 'src/system/rxdb/schemas'
-import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Mutex, ReactiveItemHolder } from 'src/system/rxdb/reactive'
 import { WsCollectionEnum } from 'src/system/rxdb/workspace'
-import { fragments } from 'src/schema'
+import { fragments } from 'src/api'
+import { ObjectsApi } from 'src/api/objects'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_CACHE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_CACHE)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_CACHE)
 
-const CacheItemTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST' })
+const CacheItemTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST', OTHER: 'OTHER' })
 
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 // TODO увеличить до 50 МБ после тестирования
@@ -21,10 +21,20 @@ const lruDumpPeriod = 1000 * 60 * 8 // периодически(раз в 8 ми
 const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию)
 // TODO увеличить до 50 МБ после тестирования
 const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить!
-const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // класс для кэширования gql запросов
 class Cache {
+  constructor () {
+    this.getItemTypeById = (id) => {
+      let keyParts = id.split('::')
+      assert(keyParts.length === 2 && keyParts[0] in CacheItemTypeEnum, 'bad id' + id)
+      return keyParts[0]
+    }
+    this.makeListId = (mangoQuery) => CacheItemTypeEnum.LST + '::' + JSON.stringify(mangoQuery)
+    this.makeObjectId = (oid) => CacheItemTypeEnum.OBJ + '::' + oid
+    this.makeOtherId = (key) => CacheItemTypeEnum.OTHER + '::' + key
+  }
+
   async createDb () {
     let f = this.createDb
     this.isLeader = false
@@ -155,6 +165,7 @@ class Cache {
   async setItem (id, item, actualAge) {
     assert(this.created, '!this.created')
     assert(id && item, `id && item ${id} ${item}`)
+    assert(typeof item === 'object', 'typeof item === object')
     let f = this.getItem
     switch (actualAge) {
       case 'zero':
@@ -247,7 +258,7 @@ class Cache {
         }
       }
     }
-    if (!rxDoc) { // см "queued item was evicted legally"
+    if (!rxDoc) { // если задана fetchFunc - см "queued item was evicted legally"
       logD(f, 'not found', rxDoc)
       return null
     }
@@ -261,207 +272,4 @@ class Cache {
   }
 }
 
-// сцепляет запросы и отправляет пачкой
-class QueryAccumulator {
-  constructor () {
-    this.queueMaster = []
-    this.queueSecondary = []
-  }
-
-  // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
-  push (oid, priority) {
-    assert(oid && priority >= 0, 'oid && priority')
-    return new Promise((resolve, reject) => {
-      let queue
-      let queueMaxSz = 0
-      if (priority === 0) {
-        queue = this.queueMaster
-        queueMaxSz = 20
-      } else if (priority === 1) {
-        queue = this.queueSecondary
-        queueMaxSz = 4
-      }
-      assert(queue && queueMaxSz)
-      if (queue.findIndex(item => item.oid === oid) === -1) {
-        queue.push({ oid, resolve, reject })
-      }
-      while (queue.length > queueMaxSz) {
-        let firstItem = queue.shift()
-        let { oid, resolve, reject } = firstItem
-        reject('queued item was evicted legally')
-      }
-      // ждем, параллельных вызовов(чтобы выполнить пачкой). Иначе, первый запрос пойдет отдельно, а остальные - пачкой
-      wait(100).then(() => this.next()).catch(reject)
-    })
-  }
-
-  // вызывать после получения объекта с сервера. разрезолвит объект во всех очередях
-  resolveItem (object) {
-    assert(object && object.oid)
-    const resolveObject = (queue, object) => {
-      assert(queue && Array.isArray(queue))
-      for (let { oid, resolve, reject } of queue) {
-        if (oid === object.oid) {
-          let result = {
-            item: object,
-            actualAge: 'hour'
-          }
-          resolve(result)
-        }
-      }
-      return queue.filter(item => item.oid !== object.oid)
-    }
-    this.queueMaster = resolveObject(this.queueMaster, object)
-    this.queueSecondary = resolveObject(this.queueSecondary, object)
-  }
-
-  rejectItem (oid, err) {
-    assert(oid && err)
-    const rejectObject = (queue, objOid, err) => {
-      assert(queue && Array.isArray(queue))
-      for (let { oid, resolve, reject } of queue) {
-        if (oid === objOid) {
-          reject(err)
-        }
-      }
-      return queue.filter(item => item.oid !== objOid)
-    }
-    this.queueMaster = rejectObject(this.queueMaster, oid, err)
-    this.queueSecondary = rejectObject(this.queueSecondary, oid, err)
-  }
-
-  // берет из очереди последний добавленный и отправляет на выполненеие
-  next () {
-    // если предыдущий запрос еще выполняется, то подождем...
-    if (this.queryInProgress) return
-    // извлечь из очереди сдедующие объекты для запроса на сервер. Проверяем на наличие
-    let itemsForQuery = [] // элементы для следующего запроса
-    let totalQuery = [] // элементы из всех очередей (самые приоритетные - в конце)
-    for (let itemSec of this.queueSecondary) {
-      if (totalQuery.findIndex(item => item.oid === itemSec.oid) === -1) totalQuery.push(itemSec)
-    }
-    for (let itemMas of this.queueMaster) {
-      if (totalQuery.findIndex(item => item.oid === itemMas.oid) === -1) totalQuery.push(itemMas)
-    }
-    // берем последние добавленные (самые приоритетные - в конце)
-    for (let i = totalQuery.length - 1; i >= 0 && itemsForQuery.length < 5; i--) {
-      let queuedItem = totalQuery[i]
-      if (itemsForQuery.findIndex(item => item.oid === queuedItem.oid) >= 0) continue // такой уже есть
-      itemsForQuery.push(queuedItem)
-    }
-    if (itemsForQuery.length === 0) return
-    this.queryInProgress = true // Не более одного запроса в единицу времени
-
-    apollo.clients.api.query({
-      query: gql`
-        ${fragments.objectFullFragment}
-        query objectList ($oids: [OID!]!) {
-          objectList(oids: $oids) {
-            ... objectFullFragment
-          }
-        }
-      `,
-      variables: {
-        oids: itemsForQuery.map(item => item.oid)
-      }
-    })
-    .then(result => {
-      this.queryInProgress = false
-      let objectList = result.data.objectList
-      for (let item of itemsForQuery) {
-        let object = objectList.find(obj => obj.oid === item.oid)
-        // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
-        if (object && !object.deletedAt) {
-          this.resolveItem(object)
-        } else if (object && !object.deletedAt) {
-          this.rejectItem(item.oid, 'deleted')
-        } else {
-          this.rejectItem(item.oid, 'notFound')
-        }
-      }
-      this.next()
-    })
-    .catch(err => {
-      this.queryInProgress = false
-      logE('error on fetch objectList', err)
-      for (let item of itemsForQuery) this.rejectItem(item.oid, 'fetchError')
-    })
-  }
-}
-
-// класс для запроса списков и отдельных объектов
-class ObjectQueries {
-  constructor (cache) {
-    this.cache = cache
-    this.queryAccumulator = new QueryAccumulator()
-    this.getItemTypeById = (id) => {
-      let keyParts = id.split('::')
-      assert(keyParts.length === 2 && keyParts[0] in CacheItemTypeEnum, 'bad id' + id)
-      return keyParts[0]
-    }
-    this.makeListId = (mangoQuery) => CacheItemTypeEnum.LST + '::' + JSON.stringify(mangoQuery)
-    this.makeObjectId = (oid) => CacheItemTypeEnum.OBJ + '::' + oid
-  }
-
-  // вернет реактивный список (все элементы списка - тоже реактивны)
-  async find (mangoQuery) {
-    return { rxQuery: null, reactiveList: null }
-  }
-
-  // вернет реактивный объект
-  async findOne (oid) {
-    let fetchObjectFunc = async () => {
-      let { data: { objectFull } } = await apollo.clients.api.query({
-        query: gql`
-          ${fragments.objectFullFragment}
-          query objectFull ($oid: OID!) {
-            objectFull(oid: $oid) {
-              ... objectFullFragment
-            }
-          }
-        `,
-        variables: { oid }
-      })
-      return {
-        item: objectFull,
-        actualAge: 'day'
-      }
-    }
-    let rxDoc = await this.cache.getItem(this.makeObjectId(oid), fetchObjectFunc)
-    if (!rxDoc) throw new Error('объект не найден на сервере')
-    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.item }
-  }
-
-  // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);
-  // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
-  // priority 0 - будут выполнены 20 последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
-  // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
-  async findOneQueue (oid, priority) {
-    const fetchItemFunc = async () => {
-      let promise = this.queryAccumulator.push(oid, priority)
-      return await promise
-    }
-    let rxDoc = await this.cache.getItem(this.makeObjectId(oid), fetchItemFunc)
-    if (!rxDoc) return { rxDoc: null, reactiveItem: null } // см "queued item was evicted legally"
-    assert(rxDoc.item, '!rxDoc.item')
-    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.item }
-  }
-
-  // от сервера прилетел эвент
-  async processEvent (event) {
-    try {
-      await this.mutex.lock()
-      const f = this.processEvent
-      logD(f, 'start')
-      if (!this.isLeader) return
-      let { type, wsItem: itemServer, wsRevision } = event
-      logD(f, 'complete')
-    } finally {
-      this.mutex.release()
-    }
-  }
-}
-
-export { Cache, ObjectQueries }
+export { Cache, CacheItemTypeEnum }

@@ -78,12 +78,13 @@ export default {
     async changePassword () {
       try {
         this.$log('changePassword start')
-        let res = await this.$store.dispatch('objects/update', {
-          oid: this.$store.getters.currentUser.oid,
-          path: 'profile.password',
-          newValue: this.newPas
-        })
-        this.$log('changePassword done', res)
+        // todo
+        // let res = await this.$store.dispatch('objects/update', {
+        //   oid: this.$store.getters.currentUser.oid,
+        //   path: 'profile.password',
+        //   newValue: this.newPas
+        // })
+        this.$log('changePassword done')
         this.$q.notify({message: 'Changed password', color: 'green', textColor: 'white'})
       } catch (e) {
         this.$log('changePassword ERROR', e)

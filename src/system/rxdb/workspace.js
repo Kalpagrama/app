@@ -8,9 +8,10 @@ import {
   wsSchemaSphere,
   wsSchemaLocalChanges, schemaKeyValue
 } from 'src/system/rxdb/schemas'
-import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Mutex, ReactiveItemHolder, ReactiveListHolder } from 'src/system/rxdb/reactive'
+import { WorkspaceApi } from 'src/api/workspace'
+import { RxCollectionEnum } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_WS)
@@ -209,11 +210,7 @@ class Workspace {
       let wsRevisionLocalDoc = await this.db.ws_meta.findOne('wsRevision').exec()
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc.value) : -1
       if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
-        logD(f, 'pull ws from server... ', forceMerge, wsRevisionLocal, this.reactiveUser.wsRevision)
-        let { data: { ws: wsServer } } = await apollo.clients.api.query({
-          query: gql`query{ws}`
-        })
-
+        let wsServer = await WorkspaceApi.getWs()
         for (let wsCollectionEnum in WsCollectionEnum) {
           logD(f, `try merge collection: ${wsCollectionEnum}`)
           let itemsServer = wsServer[wsCollectionEnum] || []
@@ -256,17 +253,9 @@ class Workspace {
       assert(this.created, '!this.created')
       assert(item && item.id, '!item')
       assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
-      let { data: { wsItemUpsert, wsItemDelete } } = await apollo.clients.api.mutate({
-        mutation: wsOperationEnum === WsOperationEnum.UPSERT
-          ? gql`mutation wsItemUpsert($item: RawJSON!) {
-                  wsItemUpsert (item: $item)
-                }`
-          : gql`
-                  mutation wsItemDelete($item: RawJSON!) {
-                    wsItemDelete (item: $item)
-                  }`,
-        variables: { item }
-      })
+      let wsItemUpsert, wsItemDelete
+      if (wsOperationEnum === WsOperationEnum.UPSERT) wsItemUpsert = await WorkspaceApi.wsItemUpsert(item)
+      else wsItemDelete = await WorkspaceApi.wsItemDelete(item)
       logD(f, 'complete')
       return { wsItemUpsert, wsItemDelete }
     }
@@ -421,8 +410,12 @@ class Workspace {
     }
   }
 
-  async find (wsCollectionEnum, mangoQuery) {
-    let rxQuery = this.getWsCollection(wsCollectionEnum).find(mangoQuery)
+  async find (mangoQuery) {
+    assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query' + JSON.stringify(mangoQuery))
+    let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+    delete mangoQuery.selector.rxCollectionEnum
+    let rxQuery = this.getWsCollection(rxCollectionEnum).find(mangoQuery)
     let holder = new ReactiveListHolder()
     let reactiveList = await holder.create(rxQuery)
     return { rxQuery, reactiveList }

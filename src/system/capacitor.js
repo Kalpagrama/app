@@ -7,6 +7,7 @@ import {
   PushNotificationToken,
   PushNotificationActionPerformed
 } from '@capacitor/core'
+import { AuthApi } from 'src/api/auth'
 
 const { PushNotifications, Share, App } = Plugins
 
@@ -80,7 +81,7 @@ async function initCapacitorPushPlugin (store) {
   PushNotifications.addListener('registration', (token) => {
       // alert('Push registration success, token: ' + token.value)
       logD('Push registration success, token: ' + token.value)
-      store.dispatch('core/setWebPushToken', token.value)
+      AuthApi.setWebPushToken(token.value).catch(err => logE(err))
     }
   )
 

@@ -1,20 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import workspace from './workspace'
 import core from './core'
-import cache from './cache'
-import node from './node'
-import auth from './auth'
 import ui from './ui'
-import events from './events'
-import objects from './objects'
-import user from './user'
-import lists from './lists'
-import content from './content'
 import i18next from 'i18next'
-import assert from 'assert'
-import { rxdb } from 'src/boot/rxdb'
+import { rxdb } from 'src/system/rxdb'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
@@ -26,17 +16,8 @@ Vue.use(Vuex)
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      cache,
-      workspace,
       core,
-      node,
-      auth,
-      ui,
-      events,
-      objects,
-      user,
-      lists,
-      content
+      ui
     },
     strict: process.env.DEV,
     actions: {
@@ -53,13 +34,7 @@ export default function (/* { ssrContext } */) {
         await rxdb.init(localStorage.getItem('kuser_oid'))
         logD('after rxdb.init')
 
-        await context.dispatch('events/init')
         await context.dispatch('core/init')
-        await context.dispatch('node/init')
-        await context.dispatch('objects/init')
-        await context.dispatch('workspace/init', user.wsRevision)
-        await context.dispatch('lists/init')
-        await context.dispatch('content/init')
         await i18next.changeLanguage(rxdb.currentUser().profile.lang)
         // logD('vuex init done!')
         return true
@@ -67,13 +42,7 @@ export default function (/* { ssrContext } */) {
     },
     getters: {
       currentUser: (state, getters, rootState, rootGetters) => {
-        // logD('state.auth.userOid', state.auth.userOid)
-        // if (!state.auth.userOid) return null
-        // assert(state.auth.userOid, 'empty user oid!' + state.auth.userOid)
         let user = rxdb.currentUser()
-        // let user = state.cache.cachedItems[state.auth.userOid]
-        // в момент очистки кэша - юзера нет, а запросы от форм - идут! т.o. может вернуться null
-        // assert(user, 'user not in cache!!!!')
         return user
       }
     }

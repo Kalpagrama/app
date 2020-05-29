@@ -293,7 +293,7 @@ export default {
       async handler (to, from) {
         this.$log('layer CHANGED', to)
         if (to) {
-          this.content = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+          this.content = await this.$rxdb.findByOid(to.contentOid, 0)
           // this.$nextTick(() => {
           //   if (!this.player) this.playerInit()
           // })
@@ -631,7 +631,7 @@ export default {
     // alert('mounted')
     this.$on('meta', this.onMeta)
     if (this.composition.contentOid) {
-      this.content = await this.$store.dispatch('objects/get', {oid: this.composition.contentOid})
+      this.content = await this.$rxdb.findByOid(this.composition.contentOid, 0)
     }
     // window.addEventListener('keyup', this.windowKeyup)
   },

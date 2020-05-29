@@ -10,5 +10,6 @@ export default {
   height: 0,
   offsetTop: 0,
   iWantSound: false,
-  showDrawerLeft: false
+  showDrawerLeft: false,
+  ws_showFooter: true
 }

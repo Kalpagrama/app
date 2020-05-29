@@ -47,7 +47,7 @@ export default {
       // this.$log('nodeLoad start', this.node.oid)
       let nodeFull = null
       try {
-        nodeFull = await this.$store.dispatch('objects/get', { oid: this.node.oid, priority: 0 })
+        nodeFull = await this.$rxdb.findByOid(this.node.oid, 0)
       } catch (err) {
         this.$emit('meta', ['error', 'nodeLoad'])
       }

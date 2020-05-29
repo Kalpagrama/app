@@ -10,7 +10,7 @@ div(
   //- footer
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     kalpa-menu-footer(
-      v-if="$store.state.workspace.showFooter"
+      v-if="$store.state.ui.ws_showFooter"
       :options=`{showMenuPage: true}`)
       template(v-slot:menuRight=`{inDrawer}`)
         menu-right(:pages="pages" :inDrawer="inDrawer").b-50

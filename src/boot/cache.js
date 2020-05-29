@@ -15,6 +15,7 @@ const logI = getLogFunc(LogLevelEnum.INFO, LogModulesEnum.VUEX_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_CACHE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_CACHE)
 
+// todo DEPRECATED!!!!! модуль не нужен (не выкинул - тк код рабочий и может пригодиться)
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 // долговременное(между запусками) хранилище объектов
@@ -320,6 +321,14 @@ class Cache {
   // mergeItemFunc - ф-я для устранения мердж-конфликтов
   // newValue - это  объект целиком, либо свойство объекта (тогда актуален path)
   // подождет debounceMsec перед отправкой на сервер. Отправится только последний вариант
+  // updateItemFunc - ф-я для обновления данных на сервере (вернет обновленную сущность)
+
+// если указана updateItemFunc, то должны быть и fetchItemFunc, mergeItemFunc
+// Если path = ''  то newValue - это полный объект
+// если actualAge не указан - вычислится на основе actualUntil (либо если объекта нет - поставится дефолтное)
+// можно использовать ф-ю для добавления данных в кэш (в этом случае - updateItemFunc не указывается)
+// если в кэше ничего нет - то значение возмется либо из newValue, либо из fetchItemFunc, либо defaultValue. Если ничего не указано - то ничего не произойдет
+
   async update (key, { path, newValue, setter, defaultValue, actualAge, updateItemFunc, fetchItemFunc, mergeItemFunc, onUpdateFailsFunc, debounceMsec }) {
     let vuexItem = this.store.state.cache.cachedItems[key]
     if (!vuexItem) { // в кэше ничего не нашлось. Либо не было изначально, либо было удалено при переполнении кэша

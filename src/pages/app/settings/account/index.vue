@@ -118,12 +118,13 @@ export default {
       if (this.date !== this.currentDate) {
         try {
           this.$log('changeDate start')
-          let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currentUser.oid,
-            path: 'profile.dateBirth',
-            newValue: this.date
-          })
-          this.$log('changeDate done', res)
+          // todo
+          // let res = await this.$store.dispatch('objects/update', {
+          //   oid: this.$store.getters.currentUser.oid,
+          //   path: 'profile.dateBirth',
+          //   newValue: this.date
+          // })
+          this.$log('changeDate done')
         } catch (e) {
           this.$log('changeDate ERROR', this.city)
         }
@@ -133,12 +134,13 @@ export default {
       if (this.city !== this.currentCity) {
         try {
           this.$log('changeCity start')
-          let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currentUser.oid,
-            path: 'profile.city',
-            newValue: this.city
-          })
-          this.$log('changeCity done', res)
+          // todo
+          // let res = await this.$store.dispatch('objects/update', {
+          //   oid: this.$store.getters.currentUser.oid,
+          //   path: 'profile.city',
+          //   newValue: this.city
+          // })
+          this.$log('changeCity done')
         } catch (e) {
           this.$log('changeCity ERROR', this.city)
         }
@@ -152,12 +154,13 @@ export default {
           this.$logD('change lang from: ', this.$i18n.i18next.language, 'to: ', this.lang)
           this.$i18n.i18next.changeLanguage(this.lang).catch(err => this.$logE(err))
           this.$forceUpdate();
-          let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currentUser.oid,
-            path: 'profile.lang',
-            newValue: this.lang
-          })
-          this.$log('changeLanguage done', res)
+          // todo
+          // let res = await this.$store.dispatch('objects/update', {
+          //   oid: this.$store.getters.currentUser.oid,
+          //   path: 'profile.lang',
+          //   newValue: this.lang
+          // })
+          this.$log('changeLanguage done')
           this.$q.notify({message: 'Changed Language', color: 'green', textColor: 'white'})
         } catch (e) {
           this.$log('changeLanguage ERROR', e)
@@ -169,12 +172,13 @@ export default {
       if (this.country !== this.currentCountry) {
         try {
           this.$log('changeCountry start')
-          let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currentUser.oid,
-            path: 'profile.country',
-            newValue: this.country
-          })
-          this.$log('changeCountry done', res)
+          // todo
+          // let res = await this.$store.dispatch('objects/update', {
+          //   oid: this.$store.getters.currentUser.oid,
+          //   path: 'profile.country',
+          //   newValue: this.country
+          // })
+          this.$log('changeCountry done')
           this.$q.notify({message: 'Changed Country', color: 'green', textColor: 'white'})
         } catch (e) {
           this.$log('changeCountry ERROR', e)
@@ -186,12 +190,13 @@ export default {
       if (this.gender !== this.currentGender) {
         try {
           this.$log('changeGender start')
-          let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currentUser.oid,
-            path: 'profile.gender',
-            newValue: this.gender
-          })
-          this.$log('changeGender done', res)
+          // todo
+          // let res = await this.$store.dispatch('objects/update', {
+          //   oid: this.$store.getters.currentUser.oid,
+          //   path: 'profile.gender',
+          //   newValue: this.gender
+          // })
+          this.$log('changeGender done')
           this.$q.notify({message: 'Changed Gender', color: 'green', textColor: 'white'})
         } catch (e) {
           this.$log('changeGender ERROR', e)
@@ -203,12 +208,13 @@ export default {
       if (this.nameFirst !== this.currentNameFirst) {
         try {
           this.$log('changeNameFirst start')
-          let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currentUser.oid,
-            path: 'profile.nameFirst',
-            newValue: this.nameFirst
-          })
-          this.$log('changeNameFirst done', res)
+          // todo
+          // let res = await this.$store.dispatch('objects/update', {
+          //   oid: this.$store.getters.currentUser.oid,
+          //   path: 'profile.nameFirst',
+          //   newValue: this.nameFirst
+          // })
+          this.$log('changeNameFirst done')
           this.$q.notify({message: 'Changed First name', color: 'green', textColor: 'white'})
         } catch (e) {
           this.$log('changeNameFirst ERROR', e)
@@ -220,12 +226,13 @@ export default {
       if (this.nameSecond !== this.currentNameSecond) {
         try {
           this.$log('changeNameSecond start')
-          let res = await this.$store.dispatch('objects/update', {
-            oid: this.$store.getters.currentUser.oid,
-            path: 'profile.nameSecond',
-            newValue: this.nameSecond
-          })
-          this.$log('changeNameSecond done', res)
+          // todo
+          // let res = await this.$store.dispatch('objects/update', {
+          //   oid: this.$store.getters.currentUser.oid,
+          //   path: 'profile.nameSecond',
+          //   newValue: this.nameSecond
+          // })
+          this.$log('changeNameSecond done')
           this.$q.notify({message: 'Changed Second name', color: 'green', textColor: 'white'})
         } catch (e) {
           this.$log('changeNameSecond ERROR', e)

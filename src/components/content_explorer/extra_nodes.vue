@@ -14,7 +14,7 @@
       v-if="query"
       :style=`{paddingBottom: '1000px'}`).row.full-width.items-start.content-start.q-pt-sm
       //- div(:style=`{height: 500+'px'}`).row.full-width
-      //- kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
+      //- kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
       //-   template(v-slot=`{items}`)
       //-     .row.full-width.items-start.content-start
       div(
@@ -34,6 +34,7 @@
 
 <script>
 import {throttle} from 'quasar'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'extraNotes',
@@ -102,7 +103,14 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.query = await this.$store.dispatch('lists/contentNodes', {contentOid: this.sphereOid})
+    let { items, count, totalCount, nextPageToken } = await this.$rxdb.find({
+      selector: {
+        rxCollectionEnum: RxCollectionEnum.LST_CONTENT_NODES,
+        oid: this.sphereOid
+      }
+    })
+    this.query = {nodeList: items}
+    // this.query = await this.$store.dispatch('lists/contentNodes', {contentOid: this.sphereOid})
   }
 }
 </script>

@@ -116,7 +116,7 @@ export default {
     nodeEditorOpened: {
       handler (to, from) {
         this.$log('nodeEditorOpened CHANGED', to)
-        this.$store.commit('workspace/stateSet', ['showFooter', !to])
+        this.$store.commit('ui/stateSet', ['ws_showFooter', !to])
       }
     }
   },

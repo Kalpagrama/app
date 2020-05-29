@@ -54,7 +54,7 @@ export default {
       try {
         this.$log('sphereLoad start', oid)
         this.sphereLoading = true
-        let sphere = await this.$store.dispatch('objects/get', { oid, priority: 0 })
+        let sphere = await this.$rxdb.findByOid(oid, 0)
         this.$log('sphereLoad sphere', sphere)
         this.sphereLoading = false
         this.sphereLoadingError = null

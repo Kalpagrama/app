@@ -3,8 +3,9 @@ import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'boot/i18n'
 import { assert } from 'assert'
-import { rxdb } from 'boot/rxdb'
+import { rxdb } from 'src/system/rxdb'
 import { notify } from 'src/boot/notify'
+import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
@@ -135,8 +136,7 @@ async function initPWA (store) {
             store.commit('core/stateSet', ['version', `${store.state.core.version}-${eventData.msgData}`])
           } else if (eventData.type === 'webPushToken') {
             logD('webPushToken =', eventData.msgData)
-            // store.dispatch('core/setWebPushToken', eventData.msgData) нельзя вызывать тк аполло еше не инициализирован
-            store.dispatch('core/setWebPushToken', eventData.msgData)
+            AuthApi.setWebPushToken(eventData.msgData)
           } else {
             logD('sw unknown message recieved!', eventData)
           }
@@ -323,7 +323,7 @@ function checkSafariRemotePermission (permissionData, vuexContext) {
   } else if (permissionData.permission === 'granted') {
     // The web service URL is a valid push provider, and the user said yes.
     // permissionData.deviceToken is now available to use.
-    vuexContext.dispatch('core/setWebPushToken', permissionData.deviceToken).catch(err => {
+    AuthApi.setWebPushToken(permissionData.deviceToken).catch(err => {
       console.error('err on save in vuex:', err)
     })
   }

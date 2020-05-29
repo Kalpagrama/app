@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.q-pt-md
-  kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
+  kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
     template(v-slot=`{items}`)
       list-middle(:items="items" :options="{paddingTop: 0}")
         template(v-slot:item=`{item, index, indexMiddle}`)
@@ -24,7 +24,9 @@ export default {
   },
   computed: {
     progress () {
-      return this.$store.state.events.progressCreateNode
+      this.$logW('todo !!!!')
+      // return this.$store.state.events.progressCreateNode
+      return 100
     },
     sphereOid () {
       // return this.$store.getters.currentUser.oid

@@ -16,6 +16,8 @@ div(:style=`{height: height || '120px'}`
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'sphereSpheres',
   props: ['oid', 'height'],
@@ -26,14 +28,19 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    let res = await this.$store.dispatch('lists/sphereSpheres', {
-      oid: this.oid,
-      pagination: {pageSize: 30, pageToken: null},
-      filter: null,
-      sortStrategy: 'HOT'
+    let { items, count, totalCount, nextPageToken } = await this.$rxdb.find({
+      selector: {
+        rxCollectionEnum: RxCollectionEnum.LST_SPHERE_SPHERES,
+        oid: this.oid
+      }
     })
-    this.$log('res', res)
-    this.spheres = res.items
+    // let res = await this.$store.dispatch('lists/sphereSpheres', {
+    //   oid: this.oid,
+    //   pagination: {pageSize: 30, pageToken: null},
+    //   filter: null,
+    //   sortStrategy: 'HOT'
+    // })
+    this.spheres = items
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

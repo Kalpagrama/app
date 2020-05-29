@@ -125,10 +125,10 @@ export default {
         this.$log('composition CHANGED', to)
         if (to.layers.length > 0) {
           if (!this.layerId) this.layerId = to.layers[0].id
-          if (!this.layerContent) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.layers[0].contentOid})
+          if (!this.layerContent) this.layerContent = await this.$rxdb.findByOid(to.layers[0].contentOid, 0)
         }
         this.$log('to.contentOid', to.contentOid)
-        if (to.contentOid) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+        if (to.contentOid) this.layerContent = await this.$rxdb.findByOid(to.contentOid, 0)
       }
     },
     layer: {
@@ -136,11 +136,7 @@ export default {
       async handler (to, from) {
         this.$log('layer CHANGED', to)
         if (to) {
-          // this.layerContent = null
-          // this.$nextTick(async () => {
-          //   this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
-          // })
-          this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+          this.layerContent = await this.$rxdb.findByOid(to.contentOid, 0)
         }
       }
     },

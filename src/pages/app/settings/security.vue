@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { logout } from 'src/system/auth'
+import { logout } from 'src/api/auth'
 
 export default {
   name: 'pageApp__Settings__Security',

@@ -59,7 +59,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
       //- body
       div(v-if="$route.params.page === 'nodes'").row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-py-md
-          kalpa-loader(v-if="$q.screen.xs && sphereOid && node" type="sphereNodes" :variables="variables")
+          kalpa-loader(v-if="$q.screen.xs && sphereOid && node" type="LST_SPHERE_NODES" :variables="variables")
             template(v-slot=`{items}`)
               list-middle(:items="items")
                 template(v-slot:item=`{item, index, indexMiddle}`)
@@ -70,7 +70,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
                     :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
                     :active="index === indexMiddle"
                     :mini="false")
-          kalpa-loader(v-if="$q.screen.gt.xs && sphereOid && node" type="sphereNodes" :variables="variables")
+          kalpa-loader(v-if="$q.screen.gt.xs && sphereOid && node" type="LST_SPHERE_NODES" :variables="variables")
             template(v-slot=`{items}`)
               list-masonry(:items="items")
                 template(v-slot:item=`{item, index, isOpened, isHovered}`)
