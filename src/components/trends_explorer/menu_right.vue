@@ -4,14 +4,13 @@ div(
     'full-height': inDrawer
   }`
   :style=`{
-    borderRadius: '10px', overflow: 'hidden'
+    borderRadius: '10px',
+    overflow: 'hidden',
   }`
   ).column.full-width.b-50
   //- header
-  div(
-    :style=`{height: '70px'}`
-    ).row.full-width.items-center.content-content-center.q-px-md
-    span.text-white.text-bold Trending spheres
+  div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
+    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Trends
   //- body
   .col.full-width.scroll
     sphere-list-top(:oid="$route.params.oid" @oid="$router.push({params: {oid: $event}})")

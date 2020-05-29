@@ -8,10 +8,10 @@
 div(:style=`{}`).column.fit.b-50
   //- header
   div(
-    :style=`{height: '80px'}`
+    :style=`{height: '90px'}`
     ).row.full-width.items-center.content-center
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-      q-btn(round flat color="white")
+      q-btn(round flat color="white" @click="$router.push('/')")
         q-icon(name="blur_on" size="36px" color="white")
     .col
       .row.fit.items-center.content-center

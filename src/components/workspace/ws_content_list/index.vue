@@ -43,6 +43,8 @@ div(
         filled dense dark color="white"
         :autofocus="ctx === 'workpsace'"
         placeholder="Search or paste URL"
+        @focus="searchStringFocused"
+        @blur="searchStringBlurred"
         ).full-width
         template(v-slot:append)
           q-btn(
@@ -237,6 +239,14 @@ export default {
       } catch (e) {
         this.$log('contentFromFILE error', e)
       }
+    },
+    searchStringFocused () {
+      this.$log('searchStringFocused')
+      this.$store.commit('ui/stateSet', ['wsShowMenu', false])
+    },
+    searchStringBlurred () {
+      this.$log('searchStringBlurred')
+      this.$store.commit('ui/stateSet', ['wsShowMenu', true])
     }
   }
 }

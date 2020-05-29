@@ -13,8 +13,8 @@ div(
     position: 'relative',
     borderRadius: '10px', overflow: 'hidden'
   }`
-  ).column.full-width
-  div(:style=`{height: '70px'}`).row.full-width.items-center.content-center.q-px-md
+  ).column.full-width.q-pt-sm
+  div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
     span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Workspace
     //- span.text-white inDrawer {{inDrawer}}
   .col.full-width.scroll

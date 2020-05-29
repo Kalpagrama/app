@@ -8,10 +8,22 @@ q-layout(view="hHh lpR fFf").b-30
         zIndex: 30000,
         borderRadius: '0 0 10px 10px', overflow: 'hidden'
       }`
-      ).row.full-width.items-center.content-center.justify-start.b-50.q-pa-md
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+      ).row.full-width.items-center.content-center.justify-start.b-50.q-py-md.q-px-sm
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '16px'}`).text-white.text-bold Home
-  kalpa-menu-footer(:options=`{showMenuPage: false}`)
+  q-footer(
+    v-if="$q.screen.xs"
+    reveal
+    ).row.full-width.justify-center
+    div(
+      v-if="!$store.state.ui.appShowMenu"
+      :style=`{borderRadius: '10px 10px 0 0'}`
+      ).row.full-width.items-center.content-center.q-pa-sm.b-50
+      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])").b-60
+      .col.q-pb-sm.q-px-sm
+        //- kalpa-buttons(:value="pagesHot" :id="$route.params.page" @id="$router.push({params: {page: $event}})").justify-center
+      //- q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = !showMenuRight").b-60
+  //- kalpa-menu-footer(:options=`{showMenuPage: false}`)
     //- template(v-slot:menuRight)
     //-   menu-right
   //- page

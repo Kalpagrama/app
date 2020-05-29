@@ -16,14 +16,14 @@ div(
       objectFit: 'contain'
     }`
     ).full-width
-  player-video(
-    v-if="composition && active"
-    :ctx="ctx" :composition="composition"
-    :visible="visible" :active="active" :mini="mini")
-    template(
-      v-for="(_, scopedSlotName) in $scopedSlots"
-      v-slot:[scopedSlotName]="slotData")
-      slot(:name="scopedSlotName" v-bind="slotData")
+  //- player-video(
+  //-   v-if="composition && active"
+  //-   :ctx="ctx" :composition="composition"
+  //-   :visible="visible" :active="active" :mini="mini")
+  //-   template(
+  //-     v-for="(_, scopedSlotName) in $scopedSlots"
+  //-     v-slot:[scopedSlotName]="slotData")
+  //-     slot(:name="scopedSlotName" v-bind="slotData")
       //- div(
       //-   v-if="scopedSlotName === 'video'"
       //-   :style=`{
@@ -73,7 +73,7 @@ export default {
     value: {
       immediate: true,
       async handler (to, from) {
-        this.$log('value CHANGED', to)
+        // this.$log('value CHANGED', to)
         if (to) {
           if (this.ctx === 'workspace') {
             this.composition = to
@@ -87,7 +87,7 @@ export default {
   },
   methods: {
     previewLoaded () {
-      this.$log('previewLoaded')
+      // this.$log('previewLoaded')
     },
     previewErrored () {
       // this.$log('previewErrored')
