@@ -10,11 +10,14 @@ div(
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
       overflow: 'hidden',
     }`
-    ).row.full-width.items-start.content-start.b-50.q-pb-sm
-    .row.full-width.items-center.content-center.q-pa-md
+    ).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
+    slot(name="header")
+    //- navigation
+    div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Chains
-    .row.full-width.q-px-sm
+    //- search
+    div(v-if="true").row.full-width
       q-input(
         v-model="searchString"
         filled dense dark color="white"

@@ -27,7 +27,7 @@ div(
     div(
       v-if="ctx === 'workspace'"
       :style=`{}`).row.full-width.items-center.content-center.q-pa-md
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Content
     //- search
     div.row.full-width.q-px-sm
@@ -45,7 +45,7 @@ div(
             v-else
             flat dense color="grey-2" icon="attach_file" @click="contentFromFILEStart()")
     //- actions
-    div(:style=`{}`).row.full-width.items-center.content-center.q-px-sm
+    div(:style=`{}`).row.full-width.items-end.content-end.q-px-sm
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
       q-btn(flat no-caps color="white").b-70 Filters

@@ -10,18 +10,20 @@ div(
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
       overflow: 'hidden',
     }`
-    ).row.full-width.items-start.content-start.b-50.q-pb-sm.q-mb-sm
+    ).row.full-width.items-start.content-start.b-50.q-px-sm.q-pb-sm.q-mb-sm
+    slot(name="header")
+    //- navigation
     div(
-      v-if="showHeader").row.full-width.items-center.content-center.q-pa-md
+      v-if="!$slots.header").row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Spheres
-    //- header: search
+    //- search
     div(
       v-if="showSearch"
-      ).row.full-width.q-px-sm
+      ).row.full-width
       q-input(
         v-model="searchString"
-        filled dense dark color="white"
+        filled dense dark color="grey-6"
         label="Find or create sphere"
         @keyup.enter="searchStringEnter()").full-width
         template(v-slot:append)

@@ -12,7 +12,7 @@ div(
   }`
   ).column.fit.q-pt-sm
   //- cateory
-  div().row.full-width.q-px-sm
+  div().row.full-width.q-px-sm.q-mb-sm
     q-select(
       filled
       dark color="white" label="Category"
@@ -23,18 +23,24 @@ div(
         minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
       }`).full-width
   //- spheres
-  .col.full-width
+  .col.full-width.q-px-sm.q-pb-sm
     ws-sphere-list(
       :showHeader="false"
       :showItems="showSpheresFromWs"
+      @sphereClick="sphereClickWs($event), showSpheresFromWs = false"
       @created="sphereCreated($event), showSpheresFromWs = false"
-      @chosen="sphereChosen, showSpheresFromWs = false"
       @searchStarted="showSpheresFromWs = true"
       @searchEnded="showSpheresFromWs = false"
-      ).full-height
+      :style=`{
+        borderRadius: '10px',
+        overflow: 'hidden',
+      }`).full-height.b-50
+      template(v-slot:header)
+        .row.full-width.q-px-sm.q-py-md
+          span.text-white.text-bold Spheres
       template(v-slot:items=`{items, searchString}`)
         div().row.full-width.items-start.content-start
-          div(v-if="searchString.length === 0").row.full-width
+          div(v-if="searchString.length === 0").row.full-width.q-py-sm
             ws-sphere(
               v-for="(s,si) in node.spheres" :key="si"
               :sphere="s"
@@ -76,14 +82,21 @@ export default {
     },
     sphereCreated (s) {
       this.$log('sphereCreated', s)
-      this.node.spheres.push(s)
-    },
-    sphereChosen (s) {
-      this.$log('sphereChoosen', s)
+      this.sphereAdd(s)
     },
     sphereClick (s, si) {
       this.$log('sphereClick')
       this.sphereDelete(s, si)
+    },
+    sphereClickWs (s) {
+      this.$log('sphereClickWs', s)
+      this.sphereAdd(s)
+    },
+    sphereAdd (s) {
+      this.$log('sphereAdd', s)
+      let i = this.node.spheres.findIndex(sphere => sphere.name === s.name)
+      if (i >= 0) return
+      this.node.spheres.push(s)
     },
     sphereDelete(s, si) {
       this.$log('sphereDelete')

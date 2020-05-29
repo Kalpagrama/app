@@ -60,7 +60,7 @@ div(
   //- stats: start,end,total
   small.text-white {{ $time(layer.figuresAbsolute[0].t) }} -
   small.text-white.q-mx-xs {{ $time(layer.figuresAbsolute[1].t) }} /
-  small.text-white.q-mr-sm {{ $time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t) }}
+  small.text-white.q-mr-md {{ $time(layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t) }}
 </template>
 
 <script>

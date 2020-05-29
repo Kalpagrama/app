@@ -11,18 +11,18 @@ div(
     round @click="layerPlay()"
     :flat="!layerIsPlaying"
     :color="layerIsPlaying ? 'red' : 'white'"
-    :icon="layerIsPlaying ? 'pause' : 'play_arrow'").b-110.q-mr-sm
-  .col.q-px-md
+    :icon="layerIsPlaying ? 'pause' : 'play_arrow'").b-110
+  .col.q-px-sm
     div(
       @click="progressClick"
       v-touch-pan.mouse.left.right="progressDrag"
       :style=`{
         position: 'relative',
-        height: '20px',
+        height: '42px',
         borderRadius: '10px',
         overflow: 'hidden',
       }`
-      ).row.full-width.items-center.content-center.b-140.cursor-pointer
+      ).row.full-width.items-center.content-center.b-120.cursor-pointer
       div(
         v-if="meta.now >= layerStart && meta.now <= layerEnd"
         :style=`{
@@ -46,7 +46,8 @@ export default {
       paddingX: 46,
       mouseOver: false,
       progressPercentRaw: null,
-      progressHeight: 0
+      progressHeight: 0,
+      layerPlayStarted: false
     }
   },
   computed: {
@@ -71,10 +72,13 @@ export default {
       this.$log('layerPlay')
       if (this.meta.playing) this.player.pause()
       else {
-        this.player.meta(['mode', 'layer'])
-        this.player.meta(['layerId', this.layer.id])
-        this.player.setCurrentTime(this.layerStart)
-        this.player.update(this.layerStart)
+        if (!this.layerPlayStarted) {
+          this.player.meta(['mode', 'layer'])
+          this.player.meta(['layerId', this.layer.id])
+          this.player.setCurrentTime(this.layerStart)
+          this.player.update(this.layerStart)
+        }
+        this.layerPlayStarted = true
         this.player.play()
       }
     },

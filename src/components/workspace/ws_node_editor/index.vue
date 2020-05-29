@@ -5,19 +5,23 @@ div(
     borderRadius: $q.screen.gt.xs ? '10px' : 'none',
     overflow: 'hidden',
   }`
-  ).column.full-width.b-50
+  ).column.full-width.b-40
   //- header
-  div().row.full-width.items-start.content-start
-    //- main
-    div(:style=`{}`).row.full-width.items-center.content-center.q-pa-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Node editor
+  div(
+    :style=`{
+      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
+      overflow: 'hidden'
+    }`
+    ).row.full-width.items-start.content-start.b-50.q-px-sm.q-pb-sm.q-mb-sm
+    slot(name="header")
+    //- navigation
+    div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.q-py-md
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold Node editor
     //- essence
-    .row.full-width.q-px-sm
-      edit-essence(:node="node")
-    //- tabs
-    .row.full-width.q-px-sm
-      kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event")
+    edit-essence(:node="node")
+    //- pages
+    kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageChanged")
   //- body
   .col.full-width
     component(:is="`edit-${pageId}`" :node="node" @close="$emit('close')")
@@ -43,6 +47,16 @@ export default {
         {id: 'spheres', name: 'Spheres'},
         {id: 'preview', name: 'Preview'}
       ]
+    }
+  },
+  methods: {
+    pageChanged (id) {
+      this.$log('pageChanged', id)
+      // check node.items for preview page
+      if (id === 'preview') {
+        if (this.node.items.length === 0) return
+      }
+      this.pageId = id
     }
   }
 }
