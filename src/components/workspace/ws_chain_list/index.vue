@@ -25,6 +25,11 @@ div(
         ).full-width
   //- body
   .col.full-width.scroll
+    .row.full-width.items-start.content-start.q-py-md.q-px-sm
+      div(
+        v-for="c in 3" :key="c"
+        :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.b-50.q-mb-md
   //- footer
   div.row.full-width
 </template>

@@ -15,8 +15,8 @@ div(
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Settings
   //- body
   .col.full-width.scroll
-    .row.full-width.justify-center
-      div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.q-px-sm.q-py-md
+    .row.full-width.justify-center.q-px-sm.q-py-md
+      div(:style=`{borderRadius: '10px'}`).row.full-width.items-start.content-start.b-50
         //- .row.full-width.q-pa-md
         //-   span(:style=`{fontSize: '30px'}`).text-white.text-bold Settings
         //- export import

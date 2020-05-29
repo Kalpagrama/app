@@ -12,7 +12,7 @@ div(
     ctx="workspace" :visible="true" :active="true" :mini="false"
     :value="value").full-height
     template(v-slot:header)
-      //- kalpa-debug(:options=`{editorType}`)
+      kalpa-debug(:options=`{editorType}`)
       div(:style=`{height: '70px'}`
         ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
@@ -77,7 +77,10 @@ export default {
   computed: {
     contentName () {
       let res = this.value.name.slice(0, 40)
-      if (res.length === 0) return 'Content editor'
+      if (res.length === 0) {
+        if (this.editorType === 'composition') return 'Composition editor'
+        else return 'Content editor'
+      }
       else return res
     }
   },

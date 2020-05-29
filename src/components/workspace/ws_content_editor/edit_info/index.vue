@@ -11,7 +11,7 @@
     :style=`{
       borderRadius: $q.screen.gt.xs ? '10px' : '10px 10px 0 0',
     }`
-    ).row.full-width.items-end.content-end.q-pb-sm.q-px-sm.b-50
+    ).row.full-width.items-end.content-end.q-pb-sm.q-px-sm.b-50.justify-center
     kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="$emit('pageId', $event)")
 </template>
 

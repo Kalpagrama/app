@@ -25,12 +25,13 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`)
   //- header
+  kalpa-debug(:options=`{ctx}`)
   div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
     }`).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
     slot(name="header")
-    //- header: workspace
+    //- navigation
     div(
       v-if="ctx === 'workspace'"
       :style=`{}`).row.full-width.items-center.content-center.q-py-md
@@ -64,22 +65,24 @@ div(
       kalpa-loader(type="WS_CONTENT" :variables="variables")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
-            div(
-              v-for="(c,ci) in items" :key="c.id" @click="contentChoose(c,ci)"
-              :style=`{
-                position: 'relative',
-                borderRadius: '10px',
-                overflow: 'hidden',
-              }`
-              ).row.full-width.items-center.content-center.q-px-md.q-py-sm.q-mb-xs.b-60.content-item
-              span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
-            //- content-item(
-            //-   v-for="(c,ci) in items" :key="c.id"
-            //-   :ctx="ctx" :content="c" :contentIndex="ci"
-            //-   @choose="contentChoose(c,ci)"
-            //-   @delete="contentDelete(c,ci)"
-            //-   @layerChoose="layerChoose"
-            //-   @layerPreview="layerPreview")
+            div(v-if="ctx === 'workspace'").row.full-width.items-start.content-start
+              div(
+                v-for="(c,ci) in items" :key="c.id" @click="contentChoose(c,ci)"
+                :style=`{
+                  position: 'relative',
+                  borderRadius: '10px',
+                  overflow: 'hidden',
+                }`
+                ).row.full-width.items-center.content-center.q-px-md.q-py-sm.q-mb-xs.b-60.content-item
+                span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
+            div(v-if="ctx === 'nodeEditor'").row.full-width.items-start.content-start
+              content-item(
+                v-for="(c,ci) in items" :key="c.id"
+                :ctx="ctx" :content="c" :contentIndex="ci"
+                @choose="contentChoose(c,ci)"
+                @delete="contentDelete(c,ci)"
+                @layerChoose="layerChoose"
+                @layerPreview="layerPreview")
           //- nothing found
           div(
             v-else

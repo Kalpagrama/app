@@ -37,7 +37,7 @@ div(:style=`{position: 'relative'}`).column.fit
         borderRadius: '10px',
         overflow: 'hidden',
       }`
-      ).row.full-width.items-end.content-end.q-px-sm.q-pb-sm.b-50
+      ).row.full-width.items-end.content-end.justify-center.q-px-sm.q-pb-sm.b-50
       kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="$emit('pageId', $event)")
   //-     //- q-btn(
   //-     //-   round icon="edit" @click="layersEdit()"

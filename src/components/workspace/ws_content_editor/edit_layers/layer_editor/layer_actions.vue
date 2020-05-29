@@ -2,18 +2,8 @@
 div(
   :style=`{
     position: 'relative',
-    height: '160px'
+    height: '120px'
   }`).row.full-width.items-start.content-start
-  //- layer spheres
-  q-dialog(v-model="layerSpheresEditorOpened" position="bottom")
-    layer-spheres(
-      :layer="layer"
-      @close="layerSpheresEditorOpened = false"
-      :style=`{
-        maxWidth: $q.screen.xs ? $q.screen.width+'px' : 600+'px',
-        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
-        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
-      }`)
   layer-progress(:layer="layer" :layerIndex="layerIndex" :player="player" :meta="meta")
   div(
     :style=`{
@@ -38,15 +28,13 @@ div(
 
 <script>
 import layerProgress from './layer_progress'
-import layerSpheres from './layer_spheres'
 
 export default {
   name: 'layerItem-layerActions',
-  components: {layerProgress, layerSpheres},
+  components: {layerProgress},
   props: ['player', 'meta', 'layer', 'mode', 'layerIndex'],
   data () {
     return {
-      layerSpheresEditorOpened: false
     }
   },
   computed: {
