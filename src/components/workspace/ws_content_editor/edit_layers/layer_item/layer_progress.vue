@@ -100,7 +100,7 @@ export default {
       let tPercentNow = ((this.meta.now - this.layerStart) / this.layerDuration) * 100
       let tPercentNext = ((t - this.layerStart) / this.layerDuration) * 100
       this.progressPercentRaw = tPercentNow
-      this.$tween.to(this, 0.3, {
+      this.$tween.to(this, 0.1, {
         progressPercentRaw: tPercentNext,
         onComplete: () => {
           this.progressPercentRaw = null

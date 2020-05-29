@@ -6,141 +6,72 @@ div(:style=`{position: 'relative'}`).column.fit
     ws-content-list(
       ctx="nodeEditor" @layer="layerFound"
       :style=`{
-        height: $q.screen.height+'px',
-        minHeight: $q.screen.height+'px',
-        maxWidth: $store.state.ui.maxWidthPage+'px',
+        maxWidth: $q.screen.xs ? $q.screen.width+'px' : 600+'px',
+        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
+        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
       }`).b-30
       template(v-slot:header)
         div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="layersWorkspaceShow = false")
           span.text-white.text-bold Find layer
+  //- layer editor
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    layer-editor(
+      v-if="layerEditing"
+      @close="layerEditing = null"
+      :style=`{
+        position: 'absolute', zIndex: 2000,
+        borderRadius: '10px', overflow: 'hidden'
+      }`)
   //- body
-  div(
-    ref="extraLayersScrollArea"
-    :style=`{
-      position: 'relative',
-      overflowX: 'hidden',
-    }`
-    ).col.full-width.scroll
-    div(:style=`{paddingBottom: '200px'}`).row.full-width.items-start.content-start.q-pa-sm
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start
-        draggable(
-          :list="meta.layers" group="layers" handle=".layer-drag-handle"
-          :move="layersDraggingMove" @onChange="layersDraggingUpdate" :sort="true"
-          @start="layersDragging = true"
-          @end="layersDragging = false, layersDraggingFutureIndex = null").full-width
-          div(
-            v-for="(l,li) in meta.layers" :key="l.id"
-            :ref="`layer-${l.id}`"
-            :style=`{marginBottom: layersView === 'line' ? '0px' : '4px'}`
-            ).row.full-width
-            //- LEFT
-            div(
-              v-if="true"
-              v-show="layersView !== 'line'"
-              :style=`{width: layersEditingToolsWidth+'px', overflow: 'hidden'}`).row.justify-start.items-start.content-start
-              q-checkbox(v-model="layersSelected" :val="l.id" dark color="grey-6")
-            //- CENTER
-            .col.full-height
-              layer-item(
-                :editorType="editorType"
-                :layer="l" :layerIndex="li"
-                :layerIsFirst="li === 0" :layerIsLast="li === meta.layers.length-1"
-                :layersView="layersView"
-                :player="player" :meta="meta"
-                :width="width"
-                @meta="$emit('meta', $event)")
-            //- RIGHT
-            div(
-              v-if="true"
-              v-show="layersView !== 'line'"
-              :style=`{width: layersEditingToolsWidth+'px', overflow: 'hidden'}`).row.justify-end.items-start.content-start
-              q-btn(flat round icon="drag_indicator" color="white").layer-drag-handle
-                q-menu(auto-close anchor="top left" self="top right")
-                  layer-menu(
-                    @edit="layerEdit(l, li)"
-                    @copy="layerCopy(l, li)"
-                    @delete="layerDelete(l, li)")
-  //- footer: import layer from ws
-  //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-  //-   q-btn(
-  //-     v-if="layersSelected.length === 0" @click="layerAddFromWorkspace()"
-  //-     round push color="green" icon="add"
-  //-     :style=`{
-  //-       position: 'absolute', zIndex: 1900, bottom: '70px', right: '10px',
-  //-       borderRadius: '50%',
-  //-     }`)
-  //- footer: layersSelected
+  .col.full-width
+    layer-list(v-bind="$props" @layerId="layerEditing = $event")
+  //- footer
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
-      v-if="layersSelected.length > 0"
+      v-if="!layerEditing"
       :style=`{
-        position: 'absolute', zIndex: 2000, bottom: '60px',
-        borderRadius: '10px', overflow: 'hidden',
-      }`).row.full-width.q-pa-sm.b-80
-      q-btn(flat color="white" icon="clear" @click="layersSelectedDrop()"
-        :style=`{width: '40px'}`).q-mr-sm.b-90
-      q-btn(flat no-caps color="red" @click="layersSelectedDelete()").q-mr-sm.b-90 Delete
-      q-btn(flat no-caps color="white" @click="layersSelectedCreateNode()").q-mr-sm.b-90 Create node
-  //- footer
-  div(
-    :style=`{
-      borderRadius: $q.screen.gt.xs ? '10px' : '10px 10px 0 0',
-    }`
-    ).row.full-width.items-end.content-end.q-pa-sm.b-70
-    //- q-btn(round flat color="white" icon="keyboard_arrow_up").q-mr-sm.b-110
-    //- q-btn(round flat color="white" icon="search").q-mr-sm.b-110
-    //- q-btn(
-    //-   round flat icon="line_style" @click="layersView = 'line'"
-    //-   :color="layersView === 'line' ? 'green' : 'white'").q-mr-sm.b-110
-    //- q-btn(
-    //-   round flat icon="reorder" @click="layersView = 'normal'"
-    //-   :color="layersView === 'normal' ? 'green' : 'white'").q-mr-sm.b-110
-    q-btn(
-      round icon="edit" @click="layersEdit()"
-      :flat="!layersEditing"
-      :color="layersEditing ? 'green' : 'white'").b-90
-    .col
-    q-btn(
-      round flat color="white" icon="play_arrow" @click="player.meta(['mode', 'composition'])"
-      ).b-90.q-mr-sm
-    q-btn(
-      v-if="editorType === 'content'"
-      round flat color="white" icon="search").b-90.q-mr-sm
-    q-btn(
-      v-if="editorType === 'content'"
-      round flat color="white" icon="sort" @click="layersSort()").b-90.q-mr-sm
-    q-btn(
-      v-if="editorType === 'composition'"
-      flat color="white" icon="school" icon-right="add" @click="layerAddFromWorkspace()"
-      :style=`{height: '42px'}`).b-90.q-mr-sm
-    //- menu toggle
-    q-btn(
-      round flat color="white" icon="menu_open"  @click="$emit('menuToggle')"
-      ).b-90
+        borderRadius: $q.screen.gt.xs ? '10px' : '10px 10px 0 0',
+      }`
+      ).row.full-width.items-end.content-end.q-pa-sm.b-70.br
+      //- q-btn(
+      //-   round icon="edit" @click="layersEdit()"
+      //-   :flat="!layersEditing"
+      //-   :color="layersEditing ? 'green' : 'white'").b-90.q-mr-sm
+      //- q-btn(
+      //-   v-if="editorType === 'composition'"
+      //-   round flat color="white" icon="play_arrow" @click="compositionPlay()"
+      //-   ).b-90.q-mr-sm
+      .col
+      //- q-btn(
+      //-   v-if="editorType === 'content'"
+      //-   round flat color="white" icon="search").b-90.q-mr-sm
+      //- q-btn(
+      //-   v-if="editorType === 'content'"
+      //-   round flat color="white" icon="sort" @click="layersSort()").b-90.q-mr-sm
+      q-btn(
+        v-if="editorType === 'composition'"
+        flat color="white" icon="school" icon-right="add" @click="layerAddFromWorkspace()"
+        :style=`{height: '42px'}`).b-90.q-mr-sm
+      //- menu toggle
+      q-btn(
+        round flat color="white" icon="menu_open"  @click="$emit('menuToggle')"
+        ).b-90
 </template>
 
 <script>
-import layerMenu from './layer_menu'
-import layerItem from './layer_item'
-import draggable from 'vuedraggable'
+import layerList from './layer_list'
+import layerEditor from './layer_editor'
 
 export default {
   name: 'editLayers',
-  components: {layerItem, layerMenu, draggable},
+  components: {layerList, layerEditor},
   props: ['editorType', 'player', 'meta', 'composition'],
   data () {
     return {
       width: 0,
-      layersEditing: false,
-      layersEditingToolsWidth: 0,
-      layersSelected: [],
-      layersDragging: false,
-      layersDraggingFutureIndex: null,
+      layerEditing: null,
       layersWorkspaceShow: false,
-      layersView: 'normal',
-      layersViews: ['line', 'normal'],
-      showRightDrawer: false
     }
   },
   watch: {
@@ -155,18 +86,29 @@ export default {
         }
       }
     },
-    'meta.layerId': {
-      async handler (to, from) {
-        this.$log('meta.layerId CHANGED', to)
-        if (!to) return
-        // await this.$wait(100)
-        let ref = this.$refs[`layer-${to}`][0]
-        let scrollTop = ref.offsetTop - 4
-        this.$tween.to(this.$refs.extraLayersScrollArea, 0.5, {scrollTop: scrollTop})
-      }
-    }
+    // 'meta.layerId': {
+    //   async handler (to, from) {
+    //     this.$log('meta.layerId CHANGED', to)
+    //     if (!to) return
+    //     // await this.$wait(100)
+    //     let ref = this.$refs[`layer-${to}`][0]
+    //     let scrollTop = ref.offsetTop - 4
+    //     this.$tween.to(this.$refs.extraLayersScrollArea, 0.5, {scrollTop: scrollTop})
+    //   }
+    // }
   },
   methods: {
+    compositionPlay () {
+      this.$log('compositionPlay')
+      if (this.meta.mode === 'composition') {
+        if (this.meta.playing) this.player.pause()
+        else this.player.play()
+      }
+      else {
+        this.player.meta(['mode', 'composition'])
+        this.player.play()
+      }
+    },
     layersSort () {
       this.$log('layersSort')
       this.composition.layers.sort((a, b) => {

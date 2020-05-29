@@ -12,11 +12,11 @@ div(
     ctx="workspace" :visible="true" :active="true" :mini="false"
     :value="value").full-height
     template(v-slot:header)
+      kalpa-debug(:options=`{editorType}`)
       div(:style=`{height: '70px'}`
         ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
         span.text-white.text-bold {{ contentName }}
-        kalpa-debug(:options=`{editorType}`)
     template(v-slot:video)
       q-btn(
         v-if="tab === 'layers'"
@@ -37,6 +37,9 @@ div(
             :editorType="editorType"
             :ref="`ref-edit-${tab}`" :is="`edit-${tab}`"
             :player="player" :meta="meta" :composition="value")
+    template(v-if="editorType === 'composition'" v-slot:footer)
+      div().row.full-width.q-pa-sm.bg-red
+        span hello
 </template>
 
 <script>

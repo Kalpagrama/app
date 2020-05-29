@@ -23,7 +23,7 @@ div(
       }`)
   //- tint
   div(
-    v-if="mode === 'norm'"
+    v-if="meta.layerId !== layer.id"
     @click="layerTintClick()"
     :style=`{
       position: 'absolute', zIndex: 200,
