@@ -1,36 +1,38 @@
 <template lang="pug">
 div(
-  :class=`{}`
+  :class=`{
+    'q-pt-sm': $q.screen.gt.xs
+  }`
   :style=`{
     position: 'relative',
     height: $q.screen.height+'px'
-  }`).column.full-width
+  }`).row.full-width.items-start.content-start.justify-center
+  //- body
+  component(
+    :is="page.comp"
+    :style=`{
+      maxWidth: $store.state.ui.maxWidthPage+'px',
+    }`
+    ).fit
+  //- menu right mobile
+  q-drawer(
+    v-model="showMenuRight" side="right"
+    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
+    @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
+    menu-right(:pages="pages" :inDrawer="true").b-50
+  //- menu right desktop
   kalpa-menu-right
     menu-right(:pages="pages").b-50
-  //- footer
-  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    kalpa-menu-footer(
-      v-if="$store.state.workspace.showFooter"
-      :options=`{showMenuPage: true}`)
-      template(v-slot:menuRight=`{inDrawer}`)
-        menu-right(:pages="pages" :inDrawer="inDrawer").b-50
-  //- header
-  //- body
-  div(:style=`{}`).col.full-width.q-mb-sm
-    .row.fit.items-start.content-start.justify-center
-      div(
-        :class=`{
-          'q-pt-sm': $q.screen.gt.xs
-        }`
-        :style=`{
-          maxWidth: $store.state.ui.maxWidthPage+'px',
-        }`).row.fit
-        ws-note-list(v-if="$route.params.page === 'note'")
-        ws-content-list(v-if="$route.params.page === 'content'")
-        ws-node-list(v-if="$route.params.page === 'node'")
-        ws-chain-list(v-if="$route.params.page === 'chain'")
-        ws-sphere-list(v-if="$route.params.page === 'sphere'")
-        ws-settings(v-if="$route.params.page === 'settings'")
+  //- menu mobile
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    div(
+      v-if="$q.screen.xs && $store.state.ui.wsShowMenu && !$store.state.ui.appShowMenu"
+      :style=`{position: 'absolute', bottom: '0px', zIndex: 10000, borderRadius: '10px 10px 0 0'}`
+      ).row.full-width.items-center.content-center.q-px-sm.b-50
+      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])").b-60
+      .col.q-pb-sm.q-px-sm
+        kalpa-buttons(:value="pagesHot" :id="$route.params.page" @id="$router.push({params: {page: $event}})").justify-center
+      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = !showMenuRight").b-60
 </template>
 
 <script>
@@ -47,17 +49,25 @@ export default {
   components: {wsNoteList, wsContentList, wsNodeList, wsChainList, wsSphereList, wsSettings, menuRight},
   data () {
     return {
+      showMenuRight: false,
       pages: [
-        {id: 'note', name: 'Notes'},
-        {id: 'content', name: 'Contents'},
+        {id: 'note', name: 'Notes', comp: 'ws-note-list'},
+        {id: 'content', name: 'Content', comp: 'ws-content-list'},
+        {id: 'node', name: 'Nodes', comp: 'ws-node-list'},
+        {id: 'chain', name: 'Chains', comp: 'ws-chain-list'},
+        {id: 'sphere', name: 'Spheres', comp: 'ws-sphere-list'},
+        {id: 'settings', name: 'Settings', comp: 'ws-settings'}
+      ],
+      pagesHot: [
+        {id: 'content', name: 'Content'},
         {id: 'node', name: 'Nodes'},
-        {id: 'chain', name: 'Chains'},
-        {id: 'sphere', name: 'Spheres'},
-        {id: 'settings', name: 'Settings'}
       ]
     }
   },
   computed: {
+    page () {
+      return this.pages.find(p => p.id === this.$route.params.page)
+    }
   },
   watch: {
     '$route.params.page': {
@@ -75,8 +85,8 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.$q.addressbarColor.set('rgb(30,30,30)')
-    document.body.style.background = 'rgb(30,30,30)'
+    // this.$q.addressbarColor.set('rgb(30,30,30)')
+    // document.body.style.background = 'rgb(30,30,30)'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

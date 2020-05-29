@@ -3,8 +3,8 @@ div(
   :style=`{
     position: 'relative'
   }`
-  ).row.full-width
-  kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
+  ).row.full-width.items-start.content-start
+  //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   img(
     v-if="preview && !active"
     :src="preview"

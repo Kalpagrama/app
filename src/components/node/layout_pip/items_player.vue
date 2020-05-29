@@ -18,7 +18,7 @@
 div(
   :style=`{
     position: 'relative',
-    minHeight: '400px',
+    //- minHeight: '400px',
   }`
   ).row.full-width.items-start.content-start.b-50
   //- preview

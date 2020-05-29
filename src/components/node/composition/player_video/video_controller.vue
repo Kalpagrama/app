@@ -49,22 +49,22 @@ export default {
         }
         // COMPOSITION
         else if (this.meta.mode === 'composition') {
-          if (to >= this.meta.layerEnd) {
-            // find next layer or go to first one
-            let layerIndex = this.meta.layer.findIndex(layer => layer.id === this.meta.layerId)
-            let layerIndexNext = layerIndex + 1
-            if (this.layers[layerIndexNext]) {
-              // this.meta.layerId = this.layers[layerIndexNext].id
-              this.player.meta(['layerId', this.layers[layerIndexNext].id])
-            }
-            else {
-              this.player.meta(['layerId', this.layers[0].id])
-              // this.meta.layerId = this.layers[0].id
-            }
-          }
-          if (to <= this.meta.layerStart) {
-            this.player.setCurrentTime(this.meta.layerStart)
-          }
+          // if (to >= this.meta.layerEnd) {
+          //   // find next layer or go to first one
+          //   let layerIndex = this.meta.layers.findIndex(layer => layer.id === this.meta.layerId)
+          //   let layerIndexNext = layerIndex + 1
+          //   if (this.meta.layers[layerIndexNext]) {
+          //     // this.meta.layerId = this.layers[layerIndexNext].id
+          //     this.player.meta(['layerId', this.meta.layers[layerIndexNext].id])
+          //   }
+          //   else {
+          //     this.player.meta(['layerId', this.meta.layers[0].id])
+          //     // this.meta.layerId = this.layers[0].id
+          //   }
+          // }
+          // if (to <= this.meta.layerStart) {
+          //   this.player.setCurrentTime(this.meta.layerStart)
+          // }
         }
         // CONTENT
         else if (this.meta.mode === 'content') {

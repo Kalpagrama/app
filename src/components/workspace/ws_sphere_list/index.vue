@@ -15,7 +15,7 @@ div(
     //- navigation
     div(
       v-if="!$slots.header").row.full-width.items-center.content-center.q-py-md
-      q-btn(round flat color="white" icon="keyboard_arrow_left").q-mr-sm
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Spheres
     //- search
     div(
@@ -25,6 +25,8 @@ div(
         v-model="searchString"
         filled dense dark color="grey-6"
         label="Find or create sphere"
+        @focus="searchStringFocused"
+        @blur="searchStringBlurred"
         @keyup.enter="searchStringEnter()").full-width
         template(v-slot:append)
           q-btn(v-if="searchString.length > 0" flat round dense icon="clear" color="white" @click="searchString = ''")
@@ -34,9 +36,11 @@ div(
       template(v-slot=`{items}`)
         .row.full-width.items-start.content-start.q-px-sm
           slot(name="items" :searchString="searchString" :items="items")
-          div(v-if="items.length === 0").row.full-width.items-center.contetn.center.q-pa-md
-            span.text-white.q-mr-sm Create sphere
-            q-btn(color="green" no-caps @click="sphereCreate()") {{ searchString }}
+          div(v-if="items.length === 0").row.full-width.items-center.content-center.justify-center.q-pa-md
+            //- span.text-white.q-mr-sm Create sphere
+            q-btn(
+              color="green" push no-caps @click="sphereCreate()"
+              :style=`{minHeight: '50px'}`) Create sphere "{{ searchString }}"
           div(v-if="showItems && items.length > 0").row.full-width.q-py-sm
             ws-sphere(
               v-for="(s, si) in items" :key="s.id"
@@ -115,6 +119,14 @@ export default {
     searchStringEnter () {
       this.$log('searchStringEnter')
       this.sphereCreate()
+    },
+    searchStringFocused () {
+      this.$log('searchStringFocused')
+      this.$store.commit('ui/stateSet', ['wsShowMenu', false])
+    },
+    searchStringBlurred () {
+      this.$log('searchStringBlurred')
+      this.$store.commit('ui/stateSet', ['wsShowMenu', true])
     }
   }
 }

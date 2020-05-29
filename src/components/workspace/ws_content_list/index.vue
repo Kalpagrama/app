@@ -1,4 +1,8 @@
 <style lang="sass">
+.content-item
+  cursor: pointer
+  &:hover
+    background: rgb(80,80,80)
 </style>
 
 <template lang="pug">
@@ -8,7 +12,10 @@ div(
   }`
   ).column.full-width
   //- ws content editor
-  q-dialog(v-model="contentEditorOpened" position="bottom")
+  q-dialog(
+    v-model="contentEditorOpened" position="bottom"
+    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
+    @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
     ws-content-editor(
       v-if="content" :value="content"
       @close="contentEditorOpened = false"
@@ -55,13 +62,22 @@ div(
       kalpa-loader(type="WS_CONTENT" :variables="variables")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
-            content-item(
-              v-for="(c,ci) in items" :key="c.id"
-              :ctx="ctx" :content="c" :contentIndex="ci"
-              @choose="contentChoose(c,ci)"
-              @delete="contentDelete(c,ci)"
-              @layerChoose="layerChoose"
-              @layerPreview="layerPreview")
+            div(
+              v-for="(c,ci) in items" :key="c.id" @click="contentChoose(c,ci)"
+              :style=`{
+                position: 'relative',
+                borderRadius: '10px',
+                overflow: 'hidden',
+              }`
+              ).row.full-width.items-center.content-center.q-px-md.q-py-sm.q-mb-xs.b-60.content-item
+              span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
+            //- content-item(
+            //-   v-for="(c,ci) in items" :key="c.id"
+            //-   :ctx="ctx" :content="c" :contentIndex="ci"
+            //-   @choose="contentChoose(c,ci)"
+            //-   @delete="contentDelete(c,ci)"
+            //-   @layerChoose="layerChoose"
+            //-   @layerPreview="layerPreview")
           //- nothing found
           div(
             v-else

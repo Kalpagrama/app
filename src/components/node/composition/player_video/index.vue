@@ -123,7 +123,10 @@ export default {
         return this.muted
       }
       else {
-        if (this.$q.screen.xs) {
+        // if (this.$q.screen.xs) {
+        //   return true
+        // }
+        if (this.$q.platform.is.ios) {
           return true
         }
         else {

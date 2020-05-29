@@ -18,6 +18,8 @@ div(:style=`{position: 'relative'}`).column.fit
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     layer-editor(
       v-if="layerEditing"
+      v-bind="$props"
+      :width="width"
       @close="layerEditing = null"
       :style=`{
         position: 'absolute', zIndex: 2000,
@@ -25,38 +27,41 @@ div(:style=`{position: 'relative'}`).column.fit
       }`)
   //- body
   .col.full-width
-    layer-list(v-bind="$props" @layerId="layerEditing = $event")
+    layer-list(v-bind="$props" @layerId="layerClicked")
   //- footer
-  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="!layerEditing"
       :style=`{
-        borderRadius: $q.screen.gt.xs ? '10px' : '10px 10px 0 0',
+        zIndex: 1000,
+        borderRadius: '10px',
+        overflow: 'hidden',
       }`
-      ).row.full-width.items-end.content-end.q-pa-sm.b-70.br
-      //- q-btn(
-      //-   round icon="edit" @click="layersEdit()"
-      //-   :flat="!layersEditing"
-      //-   :color="layersEditing ? 'green' : 'white'").b-90.q-mr-sm
-      //- q-btn(
-      //-   v-if="editorType === 'composition'"
-      //-   round flat color="white" icon="play_arrow" @click="compositionPlay()"
-      //-   ).b-90.q-mr-sm
-      .col
-      //- q-btn(
-      //-   v-if="editorType === 'content'"
-      //-   round flat color="white" icon="search").b-90.q-mr-sm
-      //- q-btn(
-      //-   v-if="editorType === 'content'"
-      //-   round flat color="white" icon="sort" @click="layersSort()").b-90.q-mr-sm
-      q-btn(
-        v-if="editorType === 'composition'"
-        flat color="white" icon="school" icon-right="add" @click="layerAddFromWorkspace()"
-        :style=`{height: '42px'}`).b-90.q-mr-sm
-      //- menu toggle
-      q-btn(
-        round flat color="white" icon="menu_open"  @click="$emit('menuToggle')"
-        ).b-90
+      ).row.full-width.items-end.content-end.q-px-sm.q-pb-sm.b-50
+      kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="$emit('pageId', $event)")
+  //-     //- q-btn(
+  //-     //-   round icon="edit" @click="layersEdit()"
+  //-     //-   :flat="!layersEditing"
+  //-     //-   :color="layersEditing ? 'green' : 'white'").b-90.q-mr-sm
+  //-     //- q-btn(
+  //-     //-   v-if="editorType === 'composition'"
+  //-     //-   round flat color="white" icon="play_arrow" @click="compositionPlay()"
+  //-     //-   ).b-90.q-mr-sm
+  //-     .col
+  //-     //- q-btn(
+  //-     //-   v-if="editorType === 'content'"
+  //-     //-   round flat color="white" icon="search").b-90.q-mr-sm
+  //-     //- q-btn(
+  //-     //-   v-if="editorType === 'content'"
+  //-     //-   round flat color="white" icon="sort" @click="layersSort()").b-90.q-mr-sm
+  //-     q-btn(
+  //-       v-if="editorType === 'composition'"
+  //-       flat color="white" icon="school" icon-right="add" @click="layerAddFromWorkspace()"
+  //-       :style=`{height: '42px'}`).b-90.q-mr-sm
+  //-     //- menu toggle
+  //-     //- q-btn(
+  //-     //-   round flat color="white" icon="menu_open"  @click="$emit('menuToggle')"
+  //-     //-   ).b-90
 </template>
 
 <script>
@@ -66,12 +71,12 @@ import layerEditor from './layer_editor'
 export default {
   name: 'editLayers',
   components: {layerList, layerEditor},
-  props: ['editorType', 'player', 'meta', 'composition'],
+  props: ['editorType', 'player', 'meta', 'composition', 'pages', 'pageId'],
   data () {
     return {
       width: 0,
       layerEditing: null,
-      layersWorkspaceShow: false,
+      layersWorkspaceShow: false
     }
   },
   watch: {
@@ -109,6 +114,11 @@ export default {
         this.player.play()
       }
     },
+    layerClicked (id) {
+      this.layerEditing = id
+      this.player.meta(['mode', 'layer'])
+      this.player.meta(['layerId', id])
+    },
     layersSort () {
       this.$log('layersSort')
       this.composition.layers.sort((a, b) => {
@@ -127,28 +137,6 @@ export default {
     },
     layersDraggingUpdate (e, evt) {
       this.$log('layersDraggingUpdate', e, evt)
-    },
-    layersSelectedDrop () {
-      this.$log('layersSelectedDrop')
-      this.$set(this, 'layersSelected', [])
-    },
-    layersSelectedDelete () {
-      this.$log('layersSelectedDelete')
-      if (!confirm('Delete selected layers?')) return
-      // delete layers
-      this.layersSelected.map(id => {
-        let i = this.meta.layers.findIndex(l => l.id === id)
-        if (i >= 0) {
-          if (this.meta.layerIndexPlay === i) this.$emit('meta', ['layerIndexPlay', -1])
-          // TODO: if layerIndex? go to previous?
-          this.$delete(this.meta.layers, i)
-        }
-      })
-      // drop layersSelected
-      this.$set(this, 'layersSelected', [])
-    },
-    layersSelectedCreateNode () {
-      this.$log('layersSelectedCreateNode')
     },
     layerEdit (l, li) {
       this.$log('layerEdit', l, li)
@@ -205,6 +193,7 @@ export default {
         this.player.meta(['layerId', layerId])
         this.player.meta(['mode', 'layer'])
       })
+      this.layerEditing = layerId
       this.$log('layerAdd done')
     },
     onResize (e) {

@@ -52,6 +52,8 @@ div(
       :icon="itemsEditing ? 'check' : 'edit'"
       ).b-70.q-mr-sm
     q-btn(round flat color="white" icon="search").b-70
+  //- footer
+  div(:style=`{height: '50px', order: 1000}`).row.full-width
   //- body
   div(
     :style=`{

@@ -50,7 +50,7 @@ q-layout(view="hHh Lpr lff").bg-30
         v-else
         ).row.full-width.window-height.items-center.content-center.justify-center.bg-black
         q-spinner(color="green" size="50px")
-  q-drawer(side="left" :value="$store.state.ui.showDrawerLeft" @hide="$store.commit('ui/stateSet', ['showDrawerLeft', false])")
+  q-drawer(side="left" :value="$store.state.ui.appShowMenu" @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
       v-if="!loading"
       :style=`{
