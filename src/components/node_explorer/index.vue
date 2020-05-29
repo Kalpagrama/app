@@ -33,9 +33,18 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
         .row.fit.items-center.content-center.q-px-sm
           span(:style=`{fontSize: '16px'}`).text-white.text-bold Node explorer
   //- footer
-  kalpa-menu-footer(v-if="!nodeEditorOpened" :options=`{showMenuPage: true}`)
-    template(v-slot:menuRight=`{inDrawer}`)
-      menu-right(:inDrawer="inDrawer")
+  q-footer(reveal)
+    div(
+      v-if="$q.screen.xs && $store.state.ui.wsShowMenu && !$store.state.ui.appShowMenu"
+      :style=`{position: 'absolute', bottom: '0px', zIndex: 10000, borderRadius: '10px 10px 0 0'}`
+      ).row.full-width.items-center.content-center.q-px-sm.b-50
+      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])").b-60
+      .col.q-pb-sm.q-px-sm
+        //- kalpa-buttons(:value="pages" :id="$route.params.page" @id="$router.push({params: {page: $event}})").justify-center
+      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = !showMenuRight").b-60
+  //- kalpa-menu-footer(v-if="!nodeEditorOpened" :options=`{showMenuPage: true}`)
+  //-   template(v-slot:menuRight=`{inDrawer}`)
+  //-     menu-right(:inDrawer="inDrawer")
   //- reply
   q-btn(
     v-if="true"
@@ -106,7 +115,12 @@ export default {
       nodeEssenceStickyShow: false,
       scrollTop: 0,
       nodeEditorOpened: false,
-      nodeEditorItem: null
+      nodeEditorItem: null,
+      showMenuRight: false,
+      pages: [
+        {id: 'nodes', name: 'Nodes'},
+        {id: 'chains', name: 'Chains'}
+      ]
     }
   },
   computed: {

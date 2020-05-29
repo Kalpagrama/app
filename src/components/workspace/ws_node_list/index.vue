@@ -36,13 +36,13 @@ div(
     :style=`{
       borderRadius: $q.screen.gt.xs ? '10px' : '0 0 10px 10px',
     }`
-    ).row.full-width.items-start.content-start.b-50.q-pb-sm
+    ).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
     //- header
-    div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
+    div(:style=`{}`).row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Nodes
     //- search
-    div().row.full-width.q-px-sm
+    div().row.full-width
       q-input(
         v-model="searchString"
         filled dark dense color="white"
@@ -53,7 +53,7 @@ div(
             v-if="searchString.length > 0"
             flat dense color="grey-2" icon="clear" @click="searchString = ''")
     //- actions
-    div(:style=`{}`).row.full-width.items-end.content-end.q-px-sm
+    div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
       q-btn(flat no-caps color="white").b-70 Filters

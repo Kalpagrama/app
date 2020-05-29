@@ -6,7 +6,7 @@ div(
   ).row.full-width.items-start.content-start
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   img(
-    v-if="preview && !active"
+    v-if="preview"
     :src="preview"
     draggable="false"
     @load="previewLoaded"

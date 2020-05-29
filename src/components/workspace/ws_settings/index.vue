@@ -9,9 +9,10 @@ div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
     }`
-    ).row.full-width.items-center.content-center.q-pa-md.b-50
-    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-    span(:style=`{fontSize: '20px'}`).text-white.text-bold Settings
+    ).row.full-width.items-center.content-center.b-50.q-px-sm
+    .row.full-width.items-center.content-center.q-py-md
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold Settings
   //- body
   .col.full-width.scroll
     .row.full-width.justify-center
