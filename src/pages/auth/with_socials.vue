@@ -18,6 +18,7 @@ div(
 <script>
   import assert from 'assert'
   import { Platform } from 'quasar'
+  import { CacheItemTypeEnum } from 'src/system/rxdb/cache'
 export default {
   name: 'pageAuth-withSocials',
   data () {
@@ -33,9 +34,11 @@ export default {
     }
   },
   methods: {
-    serviceClick (s, si) {
-      this.$log('serviceClick', s, si, this.$store.state.auth.services)
-      let url = this.$store.state.auth.services[s.id]
+    async serviceClick (s, si) {
+      let services = await this.$rxdb.get('services')
+      assert(services, '!services')
+      this.$log('serviceClick', s, si, services)
+      let url = services[s.id]
       this.$log('oauth url = ', url)
       assert(url, '!url')
       let location

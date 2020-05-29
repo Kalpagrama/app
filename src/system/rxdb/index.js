@@ -4,10 +4,14 @@ import { Cache, CacheItemTypeEnum } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { addRxPlugin } from 'rxdb'
-import {Event} from 'src/system/rxdb/event'
+import { Event } from 'src/system/rxdb/event'
 
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
 import { Lists } from 'src/system/rxdb/lists'
+import { ReactiveItemHolder } from 'src/system/rxdb/reactive'
+import { ListsApi as ListApi } from 'src/api/lists'
+import { NodeApi } from 'src/api/node'
+import { ObjectsApi } from 'src/api/objects'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
@@ -47,10 +51,30 @@ class RxDBWrapper {
     logD('init RXDB')
     assert(this.created, '!created')
     await this.event.init()
-    let { rxDoc: rxDocUser, reactiveItem } = await this.objects.findOne(userOid)
-    this.reactiveUser = reactiveItem
-    logD('before switchOnSynchro', this.reactiveUser)
-    this.workspace.switchOnSynchro(this.reactiveUser)
+    // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
+    let fetchCurrentUserFunc = async () => {
+      return {
+        notEvict: true, // живет вечно
+        type: CacheItemTypeEnum.OBJ,
+        item: await ObjectsApi.objectFull(userOid),
+        actualAge: 'day'
+      }
+    }
+    let currentUser = await this.get(userOid, fetchCurrentUserFunc)
+    let fetchCategoriesFunc = async () => {
+      return {
+        notEvict: true, // живет вечно
+        type: CacheItemTypeEnum.OTHER,
+        item: await NodeApi.nodeCategories(),
+        actualAge: 'day'
+      }
+    }
+    let nodeCategories = await this.get('nodeCategories', fetchCategoriesFunc)
+    logD('currentUser=', currentUser)
+    logD('nodeCategories=', nodeCategories)
+    if (currentUser) { // синхронизация мастерской с сервером
+      this.workspace.switchOnSynchro(currentUser)
+    }
   }
 
   async clearAll () {
@@ -106,37 +130,29 @@ class RxDBWrapper {
     assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query' + JSON.stringify(mangoQuery))
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-    let items = []
     if (rxCollectionEnum in WsCollectionEnum) {
-      let { rxQuery, reactiveList } = await this.workspace.find(mangoQuery)
-      items = reactiveList
+      return await this.workspace.find(mangoQuery)
     } else {
-      let { rxDoc, reactiveList } = await this.lists.find(mangoQuery)
-      items = reactiveList
+      return await this.lists.find(mangoQuery)
     }
-    return { items, count: items.length, totalCount: items.length, nextPageToken: null }
   }
 
   async findByOid (oid, priority) {
-    let { rxDoc, reactiveItem } = await this.objects.findOneQueue(oid, priority)
-    return reactiveItem
+    return await this.objects.findOneQueue(oid, priority)
   }
 
-  async getItem (id, fetchFunc) {
-    assert(this.cache.getItemTypeById(id) in CacheItemTypeEnum, 'bad id' + id)
-    return await this.cache.getItem(id, fetchFunc)
+  async get (id, fetchFunc) {
+    let rxDoc = await this.cache.get(id, fetchFunc)
+    if (!rxDoc) return null
+    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+    return reactiveItemHolder.reactiveItem.cached.data
   }
 
-  async setItem (id, item, actualAge) {
-    assert(this.cache.getItemTypeById(id) in CacheItemTypeEnum, 'bad id' + id)
-    return await this.cache.setItem(id, item, actualAge)
-  }
-
-  currentUser () {
-    let f = this.currentUser
-    logD(f, 'reactiveUser=', this.reactiveUser)
-    assert(this.currentUser, '!this.currentUser')
-    return this.reactiveUser
+  async set (id, data, actualAge) {
+    let rxDoc = await this.cache.set(id, this.cache.getType({data}), data, actualAge, false)
+    if (!rxDoc) return null
+    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+    return reactiveItemHolder.reactiveItem.cached.data
   }
 }
 

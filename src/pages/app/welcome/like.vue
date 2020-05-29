@@ -26,12 +26,13 @@ export default {
   name: 'pageAppWelcome',
   data () {
     return {
+      nodeCategories: [],
       types: []
     }
   },
   computed: {
     categories () {
-      return this.$store.state.node.categories
+      return this.nodeCategories
     }
   },
   watch: {
@@ -50,8 +51,9 @@ export default {
       else this.types.push(c.type)
     }
   },
-  mounted () {
-    this.$log('mounted')
+  async beforeCreate () {
+    this.$log('beforeCreate')
+    this.nodeCategories = await this.$rxdb.get('nodeCategories')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

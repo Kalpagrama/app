@@ -13,15 +13,15 @@ let currentWebPushToken
 
 class AuthApi {
   static async checkExpire () {
-    if (localStorage.getItem('ktoken_expires')) {
-      let expires = localStorage.getItem('ktoken_expires')
+    if (localStorage.getItem('k_token_expires')) {
+      let expires = localStorage.getItem('k_token_expires')
       // todo при необходимости продлить токен (если скоро истекает)
     }
   }
 
   // если токен не указан - выйдет из всех сессий
   static async logout (token) {
-    let f = this.logoutSession
+    let f = this.logout
     logD(f, ' start')
     try {
       let { data: { logout } } = await apollo.clients.auth.query({
@@ -37,11 +37,11 @@ class AuthApi {
     } catch (err) {
       logE('error on logout! err=', err)
     } finally {
-      if (!token || token === localStorage.getItem('ktoken')) {
-        localStorage.removeItem('ktoken')
-        localStorage.removeItem('ktoken_expires')
-        localStorage.removeItem('kuser_oid')
-        localStorage.removeItem('kuser_role')
+      if (!token || token === localStorage.getItem('k_token')) {
+        localStorage.removeItem('k_token')
+        localStorage.removeItem('k_token_expires')
+        localStorage.removeItem('k_user_oid')
+        localStorage.removeItem('k_user_role')
         await clearCache()
         await checkUpdate()
         await router.push('/auth')
@@ -71,8 +71,8 @@ class AuthApi {
         userId: userId_
       }
     })
-    localStorage.setItem('ktoken', token)
-    localStorage.setItem('ktoken_expires', expires)
+    localStorage.setItem('k_token', token)
+    localStorage.setItem('k_token_expires', expires)
     // setWebPushToken мог быть вызван до userIdentify
     if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
     logD(f, 'done')
@@ -97,8 +97,8 @@ class AuthApi {
       `,
       variables: { password, inviteCode }
     })
-    localStorage.setItem('kuser_role', role)
-    if (oid) localStorage.setItem('kuser_oid', oid)
+    localStorage.setItem('k_user_role', role)
+    if (oid) localStorage.setItem('k_user_oid', oid)
     logD(f, 'done', { result, role, oid, nextAttemptDate, attempts, failReason })
     return { result, role, nextAttemptDate, attempts, failReason }
   }
@@ -152,7 +152,7 @@ class AuthApi {
     logD(f, 'start', token)
     assert(token)
     currentWebPushToken = token
-    if (!localStorage.getItem('ktoken')) return
+    if (!localStorage.getItem('k_token')) return
     if (localStorage.getItem('k_web_push_token') === currentWebPushToken) return // (чтобы не дергать сервер каждый раз с одим и тем же токеном)
 
     let { data: { setWebPushToken } } = await apollo.clients.auth.query({

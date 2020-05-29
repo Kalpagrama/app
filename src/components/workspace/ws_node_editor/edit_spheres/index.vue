@@ -44,12 +44,13 @@ export default {
   props: ['node'],
   data () {
     return {
+      nodeCategories: [],
       searchString: ''
     }
   },
   computed: {
     categories () {
-      return this.$store.state.node.categories.reduce((acc, val) => {
+      return this.nodeCategories.reduce((acc, val) => {
         if (val.type !== 'ALL') {
           acc.push({
             value: val.type,
@@ -88,6 +89,10 @@ export default {
       }
       this.searchString = ''
     }
+  },
+  async beforeCreate () {
+    this.$log('beforeCreate')
+    this.nodeCategories = await this.$rxdb.get('nodeCategories')
   }
 }
 </script>

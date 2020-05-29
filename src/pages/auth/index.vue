@@ -180,7 +180,7 @@ export default {
           // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
           let q = this.$route.query
           this.$log('q=', q)
-          localStorage.setItem('ktoken', q.token)
+          localStorage.setItem('k_token', q.token)
           localStorage.setItem('ktokenExpires', q.expires)
           // await this.$wait(200)
           this.userIdentifying = false

@@ -53,6 +53,7 @@ class QueryAccumulator {
       for (let { oid, resolve, reject } of queue) {
         if (oid === object.oid) {
           let result = {
+            type: CacheItemTypeEnum.OBJ,
             item: object,
             actualAge: 'hour'
           }
@@ -223,19 +224,20 @@ class Objects {
     this.queryAccumulator = new QueryAccumulator()
   }
 
-  // вернет реактивный объект
-  async findOne (oid) {
-    let fetchFunc = async () => {
-      return {
-        item: await ObjectsApi.objectFull(oid),
-        actualAge: 'day'
-      }
-    }
-    let rxDoc = await this.cache.getItem(this.cache.makeObjectId(oid), fetchFunc)
-    if (!rxDoc) throw new Error('объект не найден на сервере')
-    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.item }
-  }
+  // // вернет реактивный объект
+  // async findOne (oid) {
+  //   let fetchFunc = async () => {
+  //     return {
+  //       type: CacheItemTypeEnum.OBJ,
+  //       item: await ObjectsApi.objectFull(oid),
+  //       actualAge: 'day'
+  //     }
+  //   }
+  //   let rxDoc = await this.cache.get(oid, fetchFunc)
+  //   if (!rxDoc) throw new Error('объект не найден на сервере')
+  //   let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+  //   return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.cached.data }
+  // }
 
   // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);
   // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
@@ -246,20 +248,21 @@ class Objects {
       let promise = this.queryAccumulator.push(oid, priority)
       return await promise
     }
-    let rxDoc = await this.cache.getItem(this.cache.makeObjectId(oid), fetchFunc)
+    let rxDoc = await this.cache.get(oid, fetchFunc)
     if (!rxDoc) return { rxDoc: null, reactiveItem: null } // см "queued item was evicted legally"
-    assert(rxDoc.item, '!rxDoc.item')
+    assert(rxDoc.cached, '!rxDoc.cached')
     let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.item }
+    return reactiveItemHolder.reactiveItem.cached.data
   }
 
   // от сервера прилетел эвент
   async processEvent (event) {
+    if (!this.cache.isLeader) return
     const f = this.processEvent
     logD(f, 'start')
     switch (event.type) {
       case 'OBJECT_CHANGED': {
-        let rxDoc = await this.cache.getItem(this.cache.makeObjectId(event.object.oid))
+        let rxDoc = await this.cache.get(event.object.oid)
         if (rxDoc) {
           if (!event.path) {
             await rxDoc.atomicUpdate(old => event.value)
@@ -270,7 +273,7 @@ class Objects {
         break
       }
       case 'VOTED': {
-        let rxDoc = await this.cache.getItem(this.cache.makeObjectId(event.object.oid))
+        let rxDoc = await this.cache.get(event.object.oid)
         if (rxDoc) {
           await rxDoc.atomicSet('rate', event.rate)
         }

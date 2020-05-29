@@ -45,7 +45,7 @@ class Event {
         await this.objects.processEvent(event)
         break
       case 'NODE_CREATED':
-        if (event.subject.oid === rxdb.currentUser().oid) {
+        if (event.subject.oid === localStorage.getItem('k_user_oid')) {
           this.notifyUserActionComplete(event.type, event.object)
         }
         // поместить ядро во все ленты
@@ -59,7 +59,7 @@ class Event {
         await this.lists.processEvent(event)
         break
       case 'VOTED':
-        if (event.subject.oid === rxdb.currentUser().oid) {
+        if (event.subject.oid === localStorage.getItem('k_user_oid')) {
           this.notifyUserActionComplete(event.type, event.object)
         }
         await this.objects.processEvent(event) // обновить ядро

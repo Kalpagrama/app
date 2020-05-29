@@ -13,7 +13,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_CACHE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_CACHE)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_CACHE)
 
-const CacheItemTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST', OTHER: 'OTHER' })
+const CacheItemTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST', OTHER: 'OTHER', ERROR: 'ERROR' })
 
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 // TODO увеличить до 50 МБ после тестирования
@@ -24,15 +24,16 @@ const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить!
 
 // класс для кэширования gql запросов
 class Cache {
-  constructor () {
-    this.getItemTypeById = (id) => {
-      let keyParts = id.split('::')
-      assert(keyParts.length === 2 && keyParts[0] in CacheItemTypeEnum, 'bad id' + id)
-      return keyParts[0]
-    }
-    this.makeListId = (mangoQuery) => CacheItemTypeEnum.LST + '::' + JSON.stringify(mangoQuery)
-    this.makeObjectId = (oid) => CacheItemTypeEnum.OBJ + '::' + oid
-    this.makeOtherId = (key) => CacheItemTypeEnum.OTHER + '::' + key
+  getType (cached) {
+    assert(cached, '!cached')
+    assert('data' in cached, '!data in cached')
+    let type = CacheItemTypeEnum.OTHER
+    if (cached.data.oid) {
+      type = CacheItemTypeEnum.OBJ
+    } else if (cached.data.items && Array.isArray(cached.data.items)) {
+      type = CacheItemTypeEnum.LST
+    } else if (cached.failReason) type = CacheItemTypeEnum.ERROR
+    return type
   }
 
   async createDb () {
@@ -121,7 +122,16 @@ class Cache {
         dispose: async (id, { actualUntil, actualAge }) => {
           if (this.lruResetInProgress) return
           assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
-          await this.db.cache.find().where('id').eq(id).remove() //  удалим из rxdb
+          let rxDoc = await this.db.cache.findOne(id).exec()
+          if (rxDoc) {
+            if (rxDoc.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
+              setTimeout(() => {
+                this.cacheLru.set(id, { actualUntil, actualAge })
+              }, 0)
+            } else { // удалим из rxdb (освобождаем от старых данных)
+              await rxDoc.remove()
+            }
+          }
         }
       })
 
@@ -162,11 +172,14 @@ class Cache {
   }
 
   // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
-  async setItem (id, item, actualAge) {
+  async set (id, type, cached, actualAge, notEvict) {
     assert(this.created, '!this.created')
-    assert(id && item, `id && item ${id} ${item}`)
-    assert(typeof item === 'object', 'typeof item === object')
-    let f = this.getItem
+    assert(id && cached, `id && cached ${id} ${cached}`)
+    assert(typeof cached === 'object', 'typeof cached === object')
+    assert(type in CacheItemTypeEnum, 'bad type' + type)
+    assert(type === this.getType(cached), 'type')
+    assert('data' in cached, '!data in cached')
+    let f = this.set
     switch (actualAge) {
       case 'zero':
         actualAge = 0
@@ -216,15 +229,15 @@ class Cache {
     assert(Number.isInteger(actualAge) && actualAge >= 0, `Number.isInteger(actualAge):${actualAge}`)
     let actualUntil = Date.now() + actualAge
     this.cacheLru.set(id, { actualUntil, actualAge }) // сохраняем в lru
-    const rxDoc = await this.db.cache.atomicUpsert({ id, item }) // сохраняем в rxdb
+    const rxDoc = await this.db.cache.atomicUpsert({ id, type, notEvict, cached}) // сохраняем в rxdb
     return rxDoc
   }
 
   // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null
-  async getItem (id, fetchFunc, force) {
+  async get (id, fetchFunc, force) {
     assert(this.created, '!this.created')
     assert(id)
-    let f = this.getItem
+    let f = this.get
     logD(f, 'start')
     let rxDoc = await this.db.cache.findOne(id).exec()
     let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
@@ -235,19 +248,24 @@ class Cache {
             logD(f, 'Данные не получены! запрос на сервер был отброшен(легально) по причне переполнения очереди!', err)
           } else {
             logE('Данные не получены! Произошла ошибка. Через минуту  можно пробовать еще', err)
-            this.setItem(id, rxDoc.item || { failReason: err }, 'minute')
+            let cached = rxDoc ? rxDoc.cached : { failReason: err, data: null }
+            let notEvict = rxDoc ? rxDoc.notEvict : false
+            this.set(id, this.getType(cached), cached, 'minute', notEvict)
           }
         }
         let saveFunc = async (fetchRes) => {
+          logD(f, 'данные с сервера получены', fetchRes)
           assert(fetchRes, '!fetchRes')
-          assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes')
-          logD(f, `данные с сервера получены ${fetchRes.item.oid}`)
-          let res = await this.setItem(id, fetchRes.item, fetchRes.actualAge)
-          logD(f, `записаны в кэш${fetchRes.item.oid}`)
+          assert('item' in fetchRes && 'actualAge' in fetchRes && 'type' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
+          assert(fetchRes.type in CacheItemTypeEnum, 'bad type: ' + fetchRes.type)
+          assert(fetchRes.type === this.getType({data: fetchRes.item}), 'bad fetchRes.type' + fetchRes.type)
+          let notEvict = fetchRes.notEvict || false
+          let res = await this.set(id, fetchRes.type, {data: fetchRes.item}, fetchRes.actualAge, notEvict)
+          logD(f, 'записаны в кэш')
           return res
         }
         logD(f, 'запрашиваем данные с сервера...')
-        if (rxDoc && !rxDoc.failReason) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
+        if (rxDoc && !rxDoc.cached.failReason) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
           fetchFunc().then(saveFunc).catch(processFetchErrorFunc)
         } else { // ждем ответа сервра
           try {
@@ -262,12 +280,12 @@ class Cache {
       logD(f, 'not found', rxDoc)
       return null
     }
-    if (rxDoc.failReason) {
+    if (rxDoc.cached.failReason) {
       let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
       let tryAfter = Math.max(0, (actualUntil - Date.now()) / 1000)
-      throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек` + rxDoc.failReason)
+      throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек` + rxDoc.cached.failReason)
     }
-    logD(f, 'complete', rxDoc)
+    logD(f, 'complete')
     return rxDoc
   }
 }

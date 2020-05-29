@@ -143,7 +143,7 @@ export default {
       this.$logD('logoutDialogAction', action)
       switch (action) {
         case 'confirm': {
-          await this.logout(localStorage.getItem('ktoken'))
+          await this.logout(localStorage.getItem('k_token'))
         }
       }
     },

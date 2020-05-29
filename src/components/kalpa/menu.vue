@@ -108,7 +108,7 @@ export default {
       await this.$wait(1000)
       await this.$rxdb.clearAll()
       // await this.$store.dispatch('cache/clear')
-      window.location.reload(true)
+      // window.location.reload(true)
       this.refreshLoading = false
     },
     async logout () {

@@ -20,26 +20,29 @@ class Lists {
   // вернет реактивный список (все элементы списка - тоже реактивны)
   async find (mangoQuery) {
     let fetchFunc = async () => {
+      let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
       return {
-        item: await ListApi.getList(mangoQuery),
+        type: CacheItemTypeEnum.LST,
+        item: { items, count, totalCount, nextPageToken },
         actualAge: 'day'
       }
     }
-    let rxDoc = await this.cache.getItem(this.cache.makeListId(mangoQuery), fetchFunc)
+    let rxDoc = await this.cache.get(JSON.stringify(mangoQuery), fetchFunc)
     if (!rxDoc) throw new Error('объект не найден на сервере')
     let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return { rxDoc, reactiveList: reactiveItemHolder.reactiveItem.item }
+    return reactiveItemHolder.reactiveItem.cached.data
   }
 
   // от сервера прилетел эвент
   async processEvent (event) {
+    if (!this.cache.isLeader) return
     const f = this.processEvent
     logD(f, 'start')
     switch (event.type) {
       case 'USER_SUBSCRIBED': {
-        let rxDocSubj = await this.cache.getItem(this.cache.makeObjectId(event.subject.oid))
-        let rxDocObj = await this.cache.getItem(this.cache.makeObjectId(event.object.oid))
-        if (event.subject.oid === rxdb.currentUser().oid) { // если это мы подписались
+        let rxDocSubj = await this.cache.get(event.subject.oid)
+        let rxDocObj = await this.cache.get(event.object.oid)
+        if (event.subject.oid === localStorage.getItem('k_user_oid')) { // если это мы подписались
           // todo!
           // await context.dispatch('cache/update', {
           //   key: event.subject.oid,
@@ -68,9 +71,9 @@ class Lists {
         break
       }
       case 'USER_UNSUBSCRIBED': {
-        let rxDocSubj = await this.cache.getItem(this.cache.makeObjectId(event.subject.oid))
-        let rxDocObj = await this.cache.getItem(this.cache.makeObjectId(event.object.oid))
-        if (event.subject.oid === rxdb.currentUser().oid) { // если это мы подписались
+        let rxDocSubj = await this.cache.get(event.subject.oid)
+        let rxDocObj = await this.cache.get(event.object.oid)
+        if (event.subject.oid === localStorage.getItem('k_user_oid')) { // если это мы подписались
           // todo!
           // if (event.subject.oid === context.rootState.auth.userOid) {
           //   await context.dispatch('cache/update', {
@@ -165,8 +168,11 @@ class Lists {
           logD('setter: ', value)
           assert(value.items && value.count >= 0 && value.totalCount >= 0)
           let insertedIndx
-          if (oid === context.rootState.auth.userOid) insertedIndx = 0
-          else insertedIndx = value.items.length
+          if (oid === context.rootState.auth.userOid) {
+            insertedIndx = 0
+          } else {
+            insertedIndx = value.items.length
+          }
           // вставляем в insertedIndx используем splice для реактивности
           value.items.splice(insertedIndx, 0, { ...objectShort })
           value.count++

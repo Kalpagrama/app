@@ -52,7 +52,7 @@ export default {
       return this.$store.getters.currentUser.sessions
     },
     mytoken () {
-      let str = localStorage.getItem('ktoken')
+      let str = localStorage.getItem('k_token')
       // let newstr = str.split('::')[0]
       return str
     }

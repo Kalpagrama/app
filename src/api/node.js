@@ -10,6 +10,30 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
 
 class NodeApi {
+  static async nodeCategories () {
+    let f = this.nodeCategories
+    logD(f, 'start')
+    let { data: { categories } } = await apollo.clients.auth.query({
+      query: gql`
+        query {
+          categories{
+            alias
+            icon
+            name
+            sphere{
+              oid
+              type
+              name
+            }
+            type
+          }
+        }
+      `
+    })
+    logD(f, 'done')
+    return categories
+  }
+
   static makeCompositionInput (composition) {
     assert.ok(composition.layers.length > 0, 'composition.layers.length > 0')
     assert(composition.operation, 'operation')
@@ -192,7 +216,7 @@ class NodeApi {
       }
     })
     let id = CacheItemTypeEnum.OBJ + '::' + createdNode.oid
-    let reactiveNode = await rxdb.setItem(id, createdNode, 'zero') // поместим ядро в кэш (на всяк случай)
+    let reactiveNode = await rxdb.set(id, createdNode, 'zero') // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdNode
   }
@@ -216,7 +240,7 @@ class NodeApi {
       }
     })
     let id = CacheItemTypeEnum.OBJ + '::' + createdChain.oid
-    let reactiveChain = await rxdb.setItem(id, createdChain, 'zero') // поместим ядро в кэш (на всяк случай)
+    let reactiveChain = await rxdb.set(id, createdChain, 'zero') // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdChain
   }

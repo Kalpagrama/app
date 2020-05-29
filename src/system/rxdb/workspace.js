@@ -418,7 +418,7 @@ class Workspace {
     let rxQuery = this.getWsCollection(rxCollectionEnum).find(mangoQuery)
     let holder = new ReactiveListHolder()
     let reactiveList = await holder.create(rxQuery)
-    return { rxQuery, reactiveList }
+    return {items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
   }
 
   async deleteItem (id) {

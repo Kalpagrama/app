@@ -270,9 +270,16 @@ export const cacheSchema = {
       type: 'string',
       primary: true
     },
-    item: {
+    type: {
+      type: 'string'
+    },
+    notEvict: {
+      type: 'boolean'
+    },
+    cached: {
       type: 'object'
     }
   },
-  required: ['id', 'item']
+  required: ['id', 'type', 'notEvict', 'cached'],
+  indexes: ['type']
 }

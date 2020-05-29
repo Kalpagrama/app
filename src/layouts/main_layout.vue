@@ -96,7 +96,7 @@ export default {
     let token = this.$route.query.token
     let expires = this.$route.query.expires
     if (token) {
-      localStorage.setItem('ktoken', token)
+      localStorage.setItem('k_token', token)
       localStorage.setItem('ktokenExpires', expires)
       await this.$router.push('/').catch(e => e)
     }
