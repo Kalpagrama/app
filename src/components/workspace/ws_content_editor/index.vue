@@ -12,7 +12,7 @@ div(
     ctx="workspace" :visible="true" :active="true" :mini="false"
     :value="value").full-height
     template(v-slot:header)
-      kalpa-debug(:options=`{editorType}`)
+      //- kalpa-debug(:options=`{editorType}`)
       div(:style=`{height: '70px'}`
         ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
