@@ -45,7 +45,7 @@ const LogModulesEnum = Object.freeze({
 })
 Object.freeze(LogModulesEnum)
 
-const showAlert = false
+const showAlert = true
 
 class Logger {
   constructor (store) {
@@ -78,6 +78,8 @@ class Logger {
       func = msg[0]
       if (highlight)msg.splice(0, 1, `%c[${func.name}]`, 'background: #69f542; color: #f54242')
       else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55')
+    } else if (highlight) {
+      msg.splice(0, 0, `%c[${'UNKNOWN_FUNC'}]`, 'background: #69f542; color: #f54242')
     }
   }
 

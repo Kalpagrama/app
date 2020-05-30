@@ -7,13 +7,14 @@ import { Mutex, ReactiveItemHolder } from 'src/system/rxdb/reactive'
 import { WsCollectionEnum } from 'src/system/rxdb/workspace'
 import { fragments } from 'src/api'
 import { ObjectsApi } from 'src/api/objects'
+import { getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_CACHE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_CACHE)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_CACHE)
 
-const CacheItemTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST', OTHER: 'OTHER', ERROR: 'ERROR' })
+// const CachedTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST', OTHER: 'OTHER', ERROR: 'ERROR' })
 
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 // TODO увеличить до 50 МБ после тестирования
@@ -24,18 +25,6 @@ const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить!
 
 // класс для кэширования gql запросов
 class Cache {
-  getType (cached) {
-    assert(cached, '!cached')
-    assert('data' in cached, '!data in cached')
-    let type = CacheItemTypeEnum.OTHER
-    if (cached.data.oid) {
-      type = CacheItemTypeEnum.OBJ
-    } else if (cached.data.items && Array.isArray(cached.data.items)) {
-      type = CacheItemTypeEnum.LST
-    } else if (cached.failReason) type = CacheItemTypeEnum.ERROR
-    return type
-  }
-
   async createDb () {
     let f = this.createDb
     this.isLeader = false
@@ -124,7 +113,7 @@ class Cache {
           assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
           let rxDoc = await this.db.cache.findOne(id).exec()
           if (rxDoc) {
-            if (rxDoc.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
+            if (rxDoc.props.notEvict) { // кладем обратно в LRU! (некоторые данные должны жить вечно!)
               setTimeout(() => {
                 this.cacheLru.set(id, { actualUntil, actualAge })
               }, 0)
@@ -172,14 +161,13 @@ class Cache {
   }
 
   // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
-  async set (id, type, cached, actualAge, notEvict) {
+  //   cached: {data} data может быть как объектом, так и любым другим типом
+  async set (id, data, actualAge, notEvict, failReason) {
     assert(this.created, '!this.created')
-    assert(id && cached, `id && cached ${id} ${cached}`)
-    assert(typeof cached === 'object', 'typeof cached === object')
-    assert(type in CacheItemTypeEnum, 'bad type' + type)
-    assert(type === this.getType(cached), 'type')
-    assert('data' in cached, '!data in cached')
+    assert(id, '!id', id, data)
+    let rxCollectionEnum = getRxCollectionEnumFromId(id)
     let f = this.set
+    logD(f, 'start', id)
     switch (actualAge) {
       case 'zero':
         actualAge = 0
@@ -229,7 +217,16 @@ class Cache {
     assert(Number.isInteger(actualAge) && actualAge >= 0, `Number.isInteger(actualAge):${actualAge}`)
     let actualUntil = Date.now() + actualAge
     this.cacheLru.set(id, { actualUntil, actualAge }) // сохраняем в lru
-    const rxDoc = await this.db.cache.atomicUpsert({ id, type, notEvict, cached}) // сохраняем в rxdb
+    const rxDoc = await this.db.cache.atomicUpsert({
+      id,
+      props: {
+        notEvict,
+        oid: data && data.oid ? data.oid : undefined, // есть только у RxCollectionEnum.OBJ
+        rxCollectionEnum,
+        failReason: failReason ? failReason : undefined
+      },
+      cached: {data}}) // сохраняем в rxdb
+    logD(f, 'complete')
     return rxDoc
   }
 
@@ -238,7 +235,7 @@ class Cache {
     assert(this.created, '!this.created')
     assert(id)
     let f = this.get
-    logD(f, 'start')
+    logD(f, 'start', id)
     let rxDoc = await this.db.cache.findOne(id).exec()
     let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
     if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
@@ -248,24 +245,24 @@ class Cache {
             logD(f, 'Данные не получены! запрос на сервер был отброшен(легально) по причне переполнения очереди!', err)
           } else {
             logE('Данные не получены! Произошла ошибка. Через минуту  можно пробовать еще', err)
-            let cached = rxDoc ? rxDoc.cached : { failReason: err, data: null }
+            let data = rxDoc ? rxDoc.cached.data : null
             let notEvict = rxDoc ? rxDoc.notEvict : false
-            this.set(id, this.getType(cached), cached, 'minute', notEvict)
+            this.set(id, data, 'minute', notEvict, 'fetch error: ' + err.toString())
           }
         }
         let saveFunc = async (fetchRes) => {
           logD(f, 'данные с сервера получены', fetchRes)
           assert(fetchRes, '!fetchRes')
-          assert('item' in fetchRes && 'actualAge' in fetchRes && 'type' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
-          assert(fetchRes.type in CacheItemTypeEnum, 'bad type: ' + fetchRes.type)
-          assert(fetchRes.type === this.getType({data: fetchRes.item}), 'bad fetchRes.type' + fetchRes.type)
+          assert('item' in fetchRes && 'actualAge' in fetchRes && 'rxCollectionEnum' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
+          assert(fetchRes.rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum: ' + fetchRes.rxCollectionEnum)
+          assert(fetchRes.rxCollectionEnum === getRxCollectionEnumFromId(id), 'bad fetchRes.rxCollectionEnum' + fetchRes.rxCollectionEnum)
           let notEvict = fetchRes.notEvict || false
-          let res = await this.set(id, fetchRes.type, {data: fetchRes.item}, fetchRes.actualAge, notEvict)
+          let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, null)
           logD(f, 'записаны в кэш')
           return res
         }
         logD(f, 'запрашиваем данные с сервера...')
-        if (rxDoc && !rxDoc.cached.failReason) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
+        if (rxDoc && !rxDoc.props.failReason) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
           fetchFunc().then(saveFunc).catch(processFetchErrorFunc)
         } else { // ждем ответа сервра
           try {
@@ -280,14 +277,14 @@ class Cache {
       logD(f, 'not found', rxDoc)
       return null
     }
-    if (rxDoc.cached.failReason) {
+    if (rxDoc.props.failReason) {
       let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
       let tryAfter = Math.max(0, (actualUntil - Date.now()) / 1000)
-      throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек` + rxDoc.cached.failReason)
+      throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек` + rxDoc.props.failReason)
     }
     logD(f, 'complete')
     return rxDoc
   }
 }
 
-export { Cache, CacheItemTypeEnum }
+export { Cache }

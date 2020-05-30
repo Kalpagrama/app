@@ -2,8 +2,8 @@
 import assert from 'assert'
 import { ObjectsApi } from 'src/api/objects'
 import { ReactiveItemHolder } from 'src/system/rxdb/reactive'
-import { CacheItemTypeEnum } from 'src/system/rxdb/cache'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getReactive, RxCollectionEnum } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_OBJ)
@@ -20,7 +20,7 @@ class QueryAccumulator {
 
   // вернет промис, который выполнится когда-то... (когда данные запросятся и вернутся)
   push (oid, priority) {
-    assert(oid && priority >= 0, 'oid && priority')
+    assert(oid && priority >= 0, 'oid && priority' + oid + priority)
     return new Promise((resolve, reject) => {
       let queue
       let queueMaxSz = 0
@@ -53,7 +53,7 @@ class QueryAccumulator {
       for (let { oid, resolve, reject } of queue) {
         if (oid === object.oid) {
           let result = {
-            type: CacheItemTypeEnum.OBJ,
+            rxCollectionEnum: RxCollectionEnum.OBJ,
             item: object,
             actualAge: 'hour'
           }
@@ -217,6 +217,10 @@ class QueueUpdate {
   }
 }
 
+function makeObjectCacheId(item){
+  assert(item && item.oid, '!oid' + JSON.stringify(item))
+  return RxCollectionEnum.OBJ + '::' + item.oid
+}
 // класс для запроса списков и отдельных объектов
 class Objects {
   constructor (cache) {
@@ -233,7 +237,7 @@ class Objects {
   //       actualAge: 'day'
   //     }
   //   }
-  //   let rxDoc = await this.cache.get(oid, fetchFunc)
+  //   let rxDoc = await this.cache.get(makeObjectCacheId({oid}), fetchFunc)
   //   if (!rxDoc) throw new Error('объект не найден на сервере')
   //   let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
   //   return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem.cached.data }
@@ -248,11 +252,10 @@ class Objects {
       let promise = this.queryAccumulator.push(oid, priority)
       return await promise
     }
-    let rxDoc = await this.cache.get(oid, fetchFunc)
-    if (!rxDoc) return { rxDoc: null, reactiveItem: null } // см "queued item was evicted legally"
+    let rxDoc = await this.cache.get(makeObjectCacheId({oid}), fetchFunc)
+    if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')
-    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return reactiveItemHolder.reactiveItem.cached.data
+    return getReactive(rxDoc)
   }
 
   // от сервера прилетел эвент
@@ -262,7 +265,7 @@ class Objects {
     logD(f, 'start')
     switch (event.type) {
       case 'OBJECT_CHANGED': {
-        let rxDoc = await this.cache.get(event.object.oid)
+        let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
         if (rxDoc) {
           if (!event.path) {
             await rxDoc.atomicUpdate(old => event.value)
@@ -273,7 +276,7 @@ class Objects {
         break
       }
       case 'VOTED': {
-        let rxDoc = await this.cache.get(event.object.oid)
+        let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
         if (rxDoc) {
           await rxDoc.atomicSet('rate', event.rate)
         }
@@ -287,4 +290,4 @@ class Objects {
   }
 }
 
-export { Objects }
+export { Objects, makeObjectCacheId }

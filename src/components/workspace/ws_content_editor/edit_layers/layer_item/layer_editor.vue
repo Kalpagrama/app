@@ -119,7 +119,7 @@ export default {
         wsItemType: 'WS_SPHERE',
         name: this.sphereString
       }
-      let rxDoc = await this.$rxdb.upsertItem(sphereInput)
+      let rxDoc = await this.$rxdb.setWs(sphereInput)
       this.sphereChoose(rxDoc)
       this.sphereString = ''
     },

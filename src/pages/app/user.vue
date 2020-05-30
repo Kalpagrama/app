@@ -31,7 +31,7 @@ export default {
       try {
         this.$log('userLoad start', oid)
         this.userLoading = true
-        let user = await this.$rxdb.findByOid(oid, 0)
+        let user = await this.$rxdb.getObject(oid, 0)
         this.$log('userLoad user', user)
         this.userLoading = false
         this.userLoadingError = null

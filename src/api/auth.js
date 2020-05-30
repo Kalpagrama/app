@@ -19,6 +19,25 @@ class AuthApi {
     }
   }
 
+  static async services(servicesApollo) {
+    let { data: { services } } = await servicesApollo.query({
+      query: gql`query {
+        services {
+          authUrl
+          apiUrl
+          uploadUrl
+          subscriptionsUrl
+          oAuthUrlYandex
+          oAuthUrlVk
+          oAuthUrlGoogle
+          oAuthUrlGithub
+          oAuthUrlFacebook
+        }
+      }`
+    })
+    return services
+  }
+
   // если токен не указан - выйдет из всех сессий
   static async logout (token) {
     let f = this.logout

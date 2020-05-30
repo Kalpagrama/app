@@ -79,7 +79,7 @@ export default {
             this.composition = to
           }
           else {
-            this.composition = await this.$rxdb.findByOid(to.oid, 0)
+            this.composition = await this.$rxdb.getObject(to.oid, 0)
           }
         }
       }

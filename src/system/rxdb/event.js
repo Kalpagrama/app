@@ -28,6 +28,8 @@ class Event {
     await EventApi.init()
   }
 
+  async clear(){}
+
   async processEvent (event) {
     // logD('processEvent start', event)
     switch (event.type) {

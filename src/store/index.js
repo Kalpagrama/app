@@ -35,7 +35,7 @@ export default function (/* { ssrContext } */) {
         if (!localStorage.getItem('k_user_oid')) return false
         logD('before rxdb.init')
         await rxdb.init(localStorage.getItem('k_user_oid'))
-        currentUser = await rxdb.get(localStorage.getItem('k_user_oid'))
+        currentUser = await rxdb.getObject(localStorage.getItem('k_user_oid'), 0)
         assert(currentUser, '!currentUser')
         logD('after rxdb.init')
 

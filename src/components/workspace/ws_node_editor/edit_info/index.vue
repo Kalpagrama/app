@@ -24,7 +24,7 @@ export default {
     async nodeDelete () {
       this.$log('nodeDelete')
       if (!confirm('Delete node ?!')) return
-      await this.$rxdb.deleteItem(this.node.id)
+      await this.$rxdb.remove(this.node.id)
       this.$emit('close')
     }
   }

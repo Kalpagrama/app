@@ -2,8 +2,7 @@ import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
 import { fragments } from 'src/api/fragments'
-import { rxdb } from 'src/system/rxdb'
-import { CacheItemTypeEnum } from 'src/system/rxdb/cache'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
@@ -175,7 +174,7 @@ class NodeApi {
       }
     })
     // надо запомнить сейчас, тк эвентом придет только общая оценка
-    let nodeFull = rxdb.findByOid(oid, 0)
+    let nodeFull = rxdb.getObject(oid, 0)
     if (nodeFull) nodeFull.rateUser = rate // nodeFull реактивен!
     logD(f, 'done')
     return rate
@@ -215,7 +214,7 @@ class NodeApi {
         node: nodeInput
       }
     })
-    let id = CacheItemTypeEnum.OBJ + '::' + createdNode.oid
+    let id = RxCollectionEnum.OBJ + '::' + createdNode.oid
     let reactiveNode = await rxdb.set(id, createdNode, 'zero') // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdNode
@@ -239,7 +238,7 @@ class NodeApi {
         chain: chainInput
       }
     })
-    let id = CacheItemTypeEnum.OBJ + '::' + createdChain.oid
+    let id = RxCollectionEnum.OBJ + '::' + createdChain.oid
     let reactiveChain = await rxdb.set(id, createdChain, 'zero') // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdChain

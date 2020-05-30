@@ -1,16 +1,32 @@
 import assert from 'assert'
 import { ObjectsApi } from 'src/api/objects'
-import { ReactiveItemHolder } from 'src/system/rxdb/reactive'
-import { CacheItemTypeEnum } from 'src/system/rxdb/cache'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getReactive, getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
+import { WsCollectionEnum } from 'src/system/rxdb/workspace'
+import { makeObjectCacheId } from 'src/system/rxdb/objects'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_LST)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_LST)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_LST)
 
+const LstCollectionEnum = Object.freeze({
+  LST_SPHERE_NODES: 'LST_SPHERE_NODES',
+  LST_NODE_NODES: 'LST_NODE_NODES',
+  LST_CONTENT_NODES: 'LST_CONTENT_NODES',
+  LST_SPHERE_SPHERES: 'LST_SPHERE_SPHERES',
+  LST_FEED: 'LST_FEED',
+  LST_USER_SUBSCRIBERS: 'LST_USER_SUBSCRIBERS', // подписчики пользователя
+  LST_USER_SUBSCRIBES: 'LST_USER_SUBSCRIBES' // подписки пользователя
+})
+
+function makeListCacheId(mangoQuery){
+  assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query' + JSON.stringify(mangoQuery))
+  let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+  assert(rxCollectionEnum in LstCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
+  return rxCollectionEnum + '::' + JSON.stringify(mangoQuery)
+}
 // класс для запроса списков
 class Lists {
   constructor (cache) {
@@ -19,18 +35,18 @@ class Lists {
 
   // вернет реактивный список (все элементы списка - тоже реактивны)
   async find (mangoQuery) {
+    let id = makeListCacheId(mangoQuery)
     let fetchFunc = async () => {
       let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
       return {
-        type: CacheItemTypeEnum.LST,
+        rxCollectionEnum: getRxCollectionEnumFromId(id),
         item: { items, count, totalCount, nextPageToken },
         actualAge: 'day'
       }
     }
-    let rxDoc = await this.cache.get(JSON.stringify(mangoQuery), fetchFunc)
-    if (!rxDoc) throw new Error('объект не найден на сервере')
-    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return reactiveItemHolder.reactiveItem.cached.data
+    let rxDoc = await this.cache.get(id, fetchFunc)
+    if (!rxDoc) throw new Error('объект не найден')
+    return getReactive(rxDoc)
   }
 
   // от сервера прилетел эвент
@@ -40,9 +56,10 @@ class Lists {
     logD(f, 'start')
     switch (event.type) {
       case 'USER_SUBSCRIBED': {
-        let rxDocSubj = await this.cache.get(event.subject.oid)
-        let rxDocObj = await this.cache.get(event.object.oid)
+        let rxDocSubj = await this.cache.get(makeObjectCacheId(event.subject))
+        let rxDocObj = await this.cache.get(makeObjectCacheId(event.object))
         if (event.subject.oid === localStorage.getItem('k_user_oid')) { // если это мы подписались
+
           // todo!
           // await context.dispatch('cache/update', {
           //   key: event.subject.oid,
@@ -71,8 +88,8 @@ class Lists {
         break
       }
       case 'USER_UNSUBSCRIBED': {
-        let rxDocSubj = await this.cache.get(event.subject.oid)
-        let rxDocObj = await this.cache.get(event.object.oid)
+        let rxDocSubj = await this.cache.get(makeObjectCacheId(event.subject))
+        let rxDocObj = await this.cache.get(makeObjectCacheId(event.object))
         if (event.subject.oid === localStorage.getItem('k_user_oid')) { // если это мы подписались
           // todo!
           // if (event.subject.oid === context.rootState.auth.userOid) {
@@ -185,4 +202,4 @@ class Lists {
   }
 }
 
-export { Lists }
+export { Lists, LstCollectionEnum }

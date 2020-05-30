@@ -18,7 +18,6 @@ div(
 <script>
   import assert from 'assert'
   import { Platform } from 'quasar'
-  import { CacheItemTypeEnum } from 'src/system/rxdb/cache'
 export default {
   name: 'pageAuth-withSocials',
   data () {

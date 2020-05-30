@@ -270,16 +270,28 @@ export const cacheSchema = {
       type: 'string',
       primary: true
     },
-    type: {
-      type: 'string'
-    },
-    notEvict: {
-      type: 'boolean'
+    props: {
+      type: 'object',
+      properties: {
+        notEvict: {
+          type: 'boolean',
+          default: false
+        },
+        oid: {
+          type: 'string'
+        },
+        rxCollectionEnum: {
+          type: 'string'
+        },
+        failReason: {
+          type: 'string'
+        }
+      }
     },
     cached: {
       type: 'object'
     }
   },
-  required: ['id', 'type', 'notEvict', 'cached'],
-  indexes: ['type']
+  required: ['id', 'props', 'cached'],
+  indexes: ['props.oid', 'props.rxCollectionEnum']
 }

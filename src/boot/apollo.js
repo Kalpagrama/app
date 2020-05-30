@@ -11,11 +11,10 @@ import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
 import assert from 'assert'
-import { rxdb } from 'src/system/rxdb'
+import { rxdb, RxCollectionEnum} from 'src/system/rxdb'
 
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { cache } from 'src/boot/cache'
-import { CacheItemTypeEnum } from 'src/system/rxdb/cache'
 import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
@@ -87,25 +86,10 @@ export default async ({ Vue, store, app }) => {
   })
 
   const fetchItemFunc = async () => {
-    let { data: { services } } = await servicesApollo.query({
-      query: gql`query {
-        services {
-          authUrl
-          apiUrl
-          uploadUrl
-          subscriptionsUrl
-          oAuthUrlYandex
-          oAuthUrlVk
-          oAuthUrlGoogle
-          oAuthUrlGithub
-          oAuthUrlFacebook
-        }
-      }`
-    })
     return {
       notEvict: true, // живет вечно
-      type: CacheItemTypeEnum.OTHER,
-      item: services,
+      rxCollectionEnum: RxCollectionEnum.OTHER,
+      item: await AuthApi.services(servicesApollo),
       actualAge: 'day'
     }
   }

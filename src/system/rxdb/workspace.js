@@ -11,7 +11,7 @@ import {
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Mutex, ReactiveItemHolder, ReactiveListHolder } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
-import { RxCollectionEnum } from 'src/system/rxdb/index'
+import { getReactive, getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_WS)
@@ -384,15 +384,15 @@ class Workspace {
   getWsCollectionEnumByItem (item) {
     assert(item && (item.id || item.wsItemType), 'bad item!' + JSON.stringify(item))
     if (item.wsItemType) return item.wsItemType
-    let keyParts = item.id.split('::')
-    assert(keyParts.length === 2 && keyParts[0] in WsCollectionEnum, 'bad id' + item.id)
-    return keyParts[0]
+    let rxCollectionEnum = getRxCollectionEnumFromId(item.id)
+    assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
+    return rxCollectionEnum
   }
 
-  async upsertItem (item, withLock = true) {
+  async set (item, withLock = true) {
     try {
       if (withLock) await this.mutex.lock()
-      const f = this.upsertItem
+      const f = this.set
       assert(this.created, '!this.created')
       let itemCopy = JSON.parse(JSON.stringify(item))
       logD(f, `start. item ${item.id}, ${item.rev}`)
@@ -403,8 +403,7 @@ class Workspace {
       let rxDoc = await this.getWsCollectionByItem(itemCopy).atomicUpsert(itemCopy)
       assert(isRxDocument(rxDoc), '!isRxDocument' + JSON.stringify(rxDoc))
       logD(f, 'complete')
-      let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-      return { rxDoc, reactiveItem: reactiveItemHolder.reactiveItem }
+      return rxDoc
     } finally {
       if (withLock) this.mutex.release()
     }
@@ -421,7 +420,12 @@ class Workspace {
     return {items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
   }
 
-  async deleteItem (id) {
+  async get(id) {
+    let rxDoc = await this.getWsCollectionByItem({ id }).findOne(id).exec()
+    return rxDoc
+  }
+
+  async remove (id) {
     try {
       await this.mutex.lock()
       assert(this.created, '!this.created')

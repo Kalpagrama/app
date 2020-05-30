@@ -1,13 +1,13 @@
 import assert from 'assert'
 import { Workspace, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/workspace'
-import { Cache, CacheItemTypeEnum } from 'src/system/rxdb/cache'
-import { Objects } from 'src/system/rxdb/objects'
+import { Cache } from 'src/system/rxdb/cache'
+import { makeObjectCacheId, Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { addRxPlugin } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
-import { Lists } from 'src/system/rxdb/lists'
+import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { ReactiveItemHolder } from 'src/system/rxdb/reactive'
 import { ListsApi as ListApi } from 'src/api/lists'
 import { NodeApi } from 'src/api/node'
@@ -17,19 +17,35 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB)
 
+// id: RxCollectionEnum::rawId
 const RxCollectionEnum = Object.freeze({
-  ...WsCollectionEnum,
-  LST_SPHERE_NODES: 'LST_SPHERE_NODES',
-  LST_NODE_NODES: 'LST_NODE_NODES',
-  LST_CONTENT_NODES: 'LST_CONTENT_NODES',
-  LST_SPHERE_SPHERES: 'LST_SPHERE_SPHERES',
-  LST_FEED: 'LST_FEED'
+  ...WsCollectionEnum, // списки мастерской
+  ...LstCollectionEnum, // списки из objectShort
+  OBJ: 'OBJ', // список закэшированных объектов
+  OTHER: 'OTHER' // иное
 })
 const RxModuleEnum = Object.freeze({
   WS: 'WS',
   SETTINGS: 'SETTINGS',
   CACHE: 'CACHE'
 })
+
+function getRxCollectionEnumFromId (id) {
+  assert(id, '!id')
+  let res = RxCollectionEnum.OTHER
+  let parts = id.split('::')
+  assert(parts.length === 1 || parts.length === 2, 'bad id!' + id)
+  if (parts.length === 2) {
+    res = parts[0]
+  }
+  assert(res in RxCollectionEnum, 'bad res' + res)
+  return res
+}
+
+function getReactive (rxDoc) {
+  let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+  return reactiveItemHolder.reactiveItem.cached ? reactiveItemHolder.reactiveItem.cached.data : reactiveItemHolder.reactiveItem
+}
 
 class RxDBWrapper {
   async create () {
@@ -55,23 +71,21 @@ class RxDBWrapper {
     let fetchCurrentUserFunc = async () => {
       return {
         notEvict: true, // живет вечно
-        type: CacheItemTypeEnum.OBJ,
+        rxCollectionEnum: RxCollectionEnum.OBJ,
         item: await ObjectsApi.objectFull(userOid),
         actualAge: 'day'
       }
     }
-    let currentUser = await this.get(userOid, fetchCurrentUserFunc)
+    let currentUser = await this.get(makeObjectCacheId({ oid: userOid }), fetchCurrentUserFunc)
     let fetchCategoriesFunc = async () => {
       return {
         notEvict: true, // живет вечно
-        type: CacheItemTypeEnum.OTHER,
+        rxCollectionEnum: RxCollectionEnum.OTHER,
         item: await NodeApi.nodeCategories(),
         actualAge: 'day'
       }
     }
     let nodeCategories = await this.get('nodeCategories', fetchCategoriesFunc)
-    logD('currentUser=', currentUser)
-    logD('nodeCategories=', nodeCategories)
     if (currentUser) { // синхронизация мастерской с сервером
       this.workspace.switchOnSynchro(currentUser)
     }
@@ -109,50 +123,70 @@ class RxDBWrapper {
     await this.event.processEvent(event)
   }
 
-  // определит по итему - откуда он и вставит в нужную коллекцию
-  async upsertItem (item, withLock = true) {
-    if (item.wsItemType && item.wsItemType in WsItemTypeEnum) {
-      let { rxDoc, reactiveItem } = await this.workspace.upsertItem(item, withLock)
-      return reactiveItem
-    }
-  }
-
-  async deleteItem (id) {
-    let keyParts = id.split('::')
-    assert(keyParts.length === 2, 'bad id' + id)
-    let collection = keyParts[0]
-    if (collection in WsCollectionEnum) {
-      return await this.workspace.deleteItem(id)
-    } else throw new Error('bad id!!' + id)
-  }
-
   async find (mangoQuery) {
     assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query' + JSON.stringify(mangoQuery))
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     if (rxCollectionEnum in WsCollectionEnum) {
       return await this.workspace.find(mangoQuery)
-    } else {
+    } else if (rxCollectionEnum in LstCollectionEnum) {
       return await this.lists.find(mangoQuery)
+    } else {
+      throw new Error('bad collection: ' + rxCollectionEnum)
     }
   }
 
-  async findByOid (oid, priority) {
-    return await this.objects.findOneQueue(oid, priority)
-  }
-
   async get (id, fetchFunc) {
-    let rxDoc = await this.cache.get(id, fetchFunc)
+    let rxCollectionEnum = getRxCollectionEnumFromId(id)
+    let rxDoc
+    if (rxCollectionEnum in WsCollectionEnum) {
+      rxDoc = await this.workspace.get(id)
+    } else if (rxCollectionEnum in LstCollectionEnum ||
+      rxCollectionEnum === RxCollectionEnum.OBJ ||
+      rxCollectionEnum === RxCollectionEnum.OTHER) {
+      rxDoc = await this.cache.get(id, fetchFunc)
+    } else {
+      throw new Error('bad collection' + rxCollectionEnum)
+    }
     if (!rxDoc) return null
-    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return reactiveItemHolder.reactiveItem.cached.data
+    return getReactive(rxDoc)
   }
 
   async set (id, data, actualAge) {
-    let rxDoc = await this.cache.set(id, this.cache.getType({data}), data, actualAge, false)
+    let rxCollectionEnum = getRxCollectionEnumFromId(id)
+    let rxDoc
+    if (rxCollectionEnum in WsCollectionEnum) {
+      throw new Error('use rxdb.setWs instead set !')
+    } else if (rxCollectionEnum in LstCollectionEnum ||
+      rxCollectionEnum === RxCollectionEnum.OBJ ||
+      rxCollectionEnum === RxCollectionEnum.OTHER) {
+      rxDoc = await this.cache.set(id, data, actualAge, false, null)
+    } else {
+      throw new Error('bad collection' + rxCollectionEnum)
+    }
     if (!rxDoc) return null
-    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    return reactiveItemHolder.reactiveItem.cached.data
+    return getReactive(rxDoc)
+  }
+
+  async remove (id) {
+    let collection = getRxCollectionEnumFromId(id)
+    if (collection in WsCollectionEnum) {
+      return await this.workspace.remove(id)
+    } else {
+      throw new Error('bad id!!' + id)
+    }
+  }
+
+  // определит по итему - откуда он и вставит в нужную коллекцию
+  async setWs (item, withLock = true) {
+    if (item.wsItemType && item.wsItemType in WsItemTypeEnum) {
+      let rxDoc = await this.workspace.set(item, withLock)
+      return getReactive(rxDoc)
+    }
+  }
+
+  async getObject (oid, priority) {
+    return await this.objects.findOneQueue(oid, priority)
   }
 }
 
@@ -175,4 +209,4 @@ const rxdbWrapper = new RxDBWrapper()
 //   }
 // })
 
-export { rxdbWrapper as rxdb, RxModuleEnum, RxCollectionEnum }
+export { rxdbWrapper as rxdb, RxModuleEnum, RxCollectionEnum, getRxCollectionEnumFromId, getReactive }

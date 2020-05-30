@@ -94,6 +94,7 @@ div(
 <script>
 import contentItem from './content_item'
 import { ContentApi } from 'src/api/content'
+import { WsItemTypeEnum as RxCollectionEnum } from 'src/system/rxdb/workspace'
 
 export default {
   name: 'wsContentList',
@@ -163,7 +164,6 @@ export default {
     contentEditorOpened: {
       handler (to, from) {
         this.$log('contentEditorOpened CHANGED', to)
-        this.$store.commit('ui/stateSet', ['ws_showFooter', !to])
       }
     }
   },
@@ -182,7 +182,7 @@ export default {
     async contentDelete (content, ci) {
       this.$log('contentDelete', content, ci)
       if (!confirm('Delete content ?!')) return
-      await this.$rxdb.deleteItem(content.id)
+      await this.$rxdb.remove(content.id)
     },
     layerChoose ([content, li]) {
       this.$log('layerChoose', content, li)
@@ -197,7 +197,12 @@ export default {
     },
     async contentAdd (content) {
       this.$log('contentAdd content', content)
-      let contentFind = await this.$rxdb.findWs('WS_CONTENT', {selector: {contentOid: content.oid}})
+      let contentFind = await this.$rxdb.find({
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+          oid: content.oid
+        }
+      })
       this.$log('contentAdd contentFind', contentFind)
       // create rxDoc
       if (contentFind.length === 0) {
@@ -216,7 +221,7 @@ export default {
           }
         }
         this.$log('contentAdd contentInput', contentInput)
-        return await this.$rxdb.upsertItem(contentInput)
+        return await this.$rxdb.setWs(contentInput)
       } else {
         return contentFind[0]
       }

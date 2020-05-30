@@ -29,7 +29,7 @@ export default {
       try {
         this.$log('nodeLoad start', oid)
         this.nodeLoading = true
-        let sphere = await this.$rxdb.findByOid(oid, 0)
+        let sphere = await this.$rxdb.getObject(oid, 0)
         this.$log('nodeLoad sphere', sphere)
         this.nodeLoading = false
         this.nodeLoadingError = null

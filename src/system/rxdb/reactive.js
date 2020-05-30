@@ -6,6 +6,7 @@ import { skip } from 'rxjs/operators'
 import { rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getReactive } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_REACTIVE)
@@ -79,7 +80,7 @@ class ReactiveItemHolder {
             await rxdb.lock() // необходимо заблокировать до вызова this.rxDocUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
             this.rxDocUnsubscribe()
             logD(f, 'reactiveItem changed from UI (debounce)', this.reactiveItem)
-            await rxdb.upsertItem(this.reactiveItem, false) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
+            await rxdb.setWs(this.reactiveItem, false) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
           } finally {
             this.rxDocSubscribe()
             await rxdb.release()
@@ -112,10 +113,7 @@ class ReactiveListHolder {
       assert(Array.isArray(docs), 'Array.isArray(docs)')
       this.vm = new Vue({
         data: {
-          reactiveList: docs.map(rxDoc => {
-            let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-            return reactiveItemHolder.reactiveItem
-          })
+          reactiveList: docs.map(rxDoc => getReactive(rxDoc))
         }
       })
       this.reactiveList = this.vm.reactiveList

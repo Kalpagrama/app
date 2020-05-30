@@ -146,13 +146,13 @@ export default {
         this.$log('composition CHANGED', to)
         if (to.layers.length > 0) {
           if (!this.layerId) this.layerId = to.layers[0].id
-          if (!this.layerContent) this.layerContent = await this.$rxdb.findByOid(to.layers[0].contentOid, 0)
+          if (!this.layerContent) this.layerContent = await this.$rxdb.getObject(to.layers[0].contentOid, 0)
           this.$nextTick(() => {
             if (!this.player) this.playerInit()
           })
         }
         this.$log('to.contentOid', to.contentOid)
-        if (to.contentOid) this.layerContent = await this.$rxdb.findByOid(to.contentOid, 0)
+        if (to.contentOid) this.layerContent = await this.$rxdb.getObject(to.contentOid, 0)
       }
     },
     layer: {
@@ -160,7 +160,7 @@ export default {
       async handler (to, from) {
         this.$log('layer CHANGED', to)
         if (to) {
-          this.layerContent = await this.$rxdb.findByOid(to.contentOid, 0)
+          this.layerContent = await this.$rxdb.getObject(to.contentOid, 0)
         }
       }
     }

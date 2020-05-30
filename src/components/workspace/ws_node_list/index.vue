@@ -114,7 +114,6 @@ export default {
     nodeEditorOpened: {
       handler (to, from) {
         this.$log('nodeEditorOpened CHANGED', to)
-        this.$store.commit('ui/stateSet', ['ws_showFooter', !to])
       }
     }
   },
@@ -131,7 +130,7 @@ export default {
     async nodeDelete (node) {
       this.$log('nodeDelete', node)
       if (!confirm('Delete node ?!')) return
-      await this.$rxdb.deleteItem(node.id)
+      await this.$rxdb.remove(node.id)
     },
     async nodeAdd (nodeInput) {
       this.$log('nodeAdd start')
@@ -146,7 +145,7 @@ export default {
           stage: 'draft'
         }
       }
-      let item = await this.$rxdb.upsertItem(nodeInput)
+      let item = await this.$rxdb.setWs(nodeInput)
       this.$log('nodeAddStart item', item)
       this.searchString = ''
       this.nodeChoose(item)

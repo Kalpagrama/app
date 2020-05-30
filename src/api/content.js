@@ -8,8 +8,8 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
 
 class ContentApi {
-  static async contentCreateFromUrl (context, url) {
-    logD('contentCreateFromUrl start')
+  static async contentCreateFromUrl (url) {
+    logD('contentCreateFromUrl start', url)
     assert.ok(url)
     let { data: { contentCreateFromUrl } } = await apollo.clients.upload.mutate({
       mutation: gql`
@@ -28,7 +28,7 @@ class ContentApi {
     return contentCreateFromUrl
   }
 
-  static async contentCreateFromFile (context, file) {
+  static async contentCreateFromFile (file) {
     logD('contentCreateFromFile start')
     assert.ok(file)
     let { data: { contentCreateFromFile } } = await apollo.clients.upload.mutate({

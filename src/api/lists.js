@@ -2,7 +2,7 @@ import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import assert from 'assert'
-import { RxCollectionEnum } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
@@ -28,6 +28,14 @@ class ListsApi {
       case RxCollectionEnum.LST_NODE_NODES:
         assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
         res = await ListsApi.sphereNodes(mangoQuery.selector.oid, pagination)
+        break
+      case RxCollectionEnum.LST_USER_SUBSCRIBERS:
+        assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
+        res = await ListsApi.userSubscribers(mangoQuery.selector.oid, pagination)
+        break
+      case RxCollectionEnum.LST_USER_SUBSCRIBES:
+        assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
+        res = await ListsApi.userSubscriptions(mangoQuery.selector.oid, pagination)
         break
       default:
         throw new Error('bad rxCollectionEnum: ' + rxCollectionEnum)
@@ -159,6 +167,30 @@ class ListsApi {
       variables: { pagination }
     })
     return { items, count, totalCount, nextPageToken }
+  }
+
+  static async userSubscriptions (oid, pagination) {
+    let user = await rxdb.getObject(oid, 0)
+    assert(user && user.subscriptions, '!user')
+    assert(Array.isArray(user.subscriptions), '!Array.isArray(user.subscriptions)')
+    return {
+      items: user.subscriptions,
+      count: user.subscriptions.length,
+      totalCount: user.subscriptions.length,
+      nextPageToken: null
+    }
+  }
+
+  static async userSubscribers (oid, pagination) {
+    let user = await rxdb.getObject(oid, 0)
+    assert(user && user.subscribers, '!user')
+    assert(Array.isArray(user.subscribers), '!Array.isArray(user.subscribers)')
+    return {
+      items: user.subscribers,
+      count: user.subscribers.length,
+      totalCount: user.subscribers.length,
+      nextPageToken: null
+    }
   }
 }
 

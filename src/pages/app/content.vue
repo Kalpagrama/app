@@ -29,7 +29,7 @@ export default {
   methods: {
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
-      let content = await this.$rxdb.findByOid(oid, 0)
+      let content = await this.$rxdb.getObject(oid, 0)
       this.$log('contentLoad done', content)
       return content
     }

@@ -31,22 +31,6 @@ export default {
     }
   },
   watch: {
-    nodeCategories: {
-      deep: false,
-      immediate: true,
-      async handler (to, from) {
-        // по-моему - что-то тут не так...
-        if (this.nodeCategories.length < 4) return
-        if (!this.$route.params.oid){
-          if (this.$route.name === 'trends') {
-            this.$router.replace({params: {oid: this.nodeCategories[4].sphere.oid}})
-          }
-          else {
-            this.$router.replace({params: {oid: this.$store.getters.currentUser.oid}})
-          }
-        }
-      }
-    },
     '$route.params.oid': {
       deep: true,
       immediate: true,
@@ -54,6 +38,15 @@ export default {
         this.$log('$route CHANGED', to)
         if (to) {
           this.sphere = await this.sphereLoad(to)
+        } else {
+          if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get('nodeCategories')
+          // по-моему - что-то тут не так...
+          if (this.nodeCategories.length > 4 && this.$route.name === 'trends') {
+            this.$router.replace({params: {oid: this.nodeCategories[4].sphere.oid}})
+          }
+          else {
+            this.$router.replace({params: {oid: this.$store.getters.currentUser.oid}})
+          }
         }
       }
     }
@@ -63,7 +56,7 @@ export default {
       try {
         this.$log('sphereLoad start', oid)
         this.sphereLoading = true
-        let sphere = await this.$rxdb.findByOid(oid, 0)
+        let sphere = await this.$rxdb.getObject(oid, 0)
         this.$log('sphereLoad sphere', sphere)
         this.sphereLoading = false
         this.sphereLoadingError = null
@@ -80,7 +73,7 @@ export default {
   },
   async beforeCreate() {
     this.$log('beforeCreate')
-    this.nodeCategories = await this.$rxdb.get('nodeCategories')
+    if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get('nodeCategories')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
