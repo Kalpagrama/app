@@ -41,7 +41,13 @@ div(:style=`{position: 'relative'}`).column.fit
         overflow: 'hidden',
       }`
       ).row.full-width.items-end.content-end.justify-center.q-px-sm.q-pb-sm.b-50
-      kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="$emit('pageId', $event)")
+      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$emit('close')")
+      .col
+        kalpa-buttons(
+          :value="pages" :id="pageId" idKey="id"
+          screenSet="gt.xs"
+          @id="$emit('pageId', $event)").justify-center
+      q-btn(round flat dense color="white" icon="tune")
   //-     //- q-btn(
   //-     //-   round icon="edit" @click="layersEdit()"
   //-     //-   :flat="!layersEditing"

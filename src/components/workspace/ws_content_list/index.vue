@@ -41,9 +41,11 @@ div(
     div.row.full-width
       q-input(
         v-model="searchStringRaw"
+        ref="searchStringInput"
         filled dense dark color="white"
         :autofocus="ctx === 'workpsace'"
         placeholder="Search or paste URL"
+        :loading="searchStringLoading"
         @focus="searchStringFocused"
         @blur="searchStringBlurred"
         ).full-width
@@ -58,36 +60,39 @@ div(
     div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
-      q-btn(flat no-caps color="white").b-70 Filters
+      q-btn-group(flat :style=`{borderRadius: '10px'}`).b-70
+        q-btn(
+          v-for="(v,vi) in listViews" :key="v.id" @click="listView = v.id"
+          round dense flat
+          :icon="v.icon"
+          :color="listView === v.id ? 'green' : 'white'")
+      //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70 {{$q.screen.xs ? '' : 'Filters'}}
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
       kalpa-loader(type="WS_CONTENT" :variables="variables")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
-            div(v-if="ctx === 'workspace'" :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
-              div(
+            div(
+              v-if="listView === 'mini'"
+              :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
+              content-item-mini(
+                v-for="(c,ci) in items" :key="c.id" @edit="contentChoose(c,ci)"
+                :content="c" :contentIndex="ci")
+            div(
+              v-if="listView === 'maxi'"
+              :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
+              content-item-maxi(
                 v-for="(c,ci) in items" :key="c.id" @click="contentChoose(c,ci)"
-                :style=`{
-                  position: 'relative',
-                  height: '60px',
-                  borderRadius: '10px',
-                  overflow: 'hidden',
-                }`
-                ).row.full-width.items-center.content-center.q-mb-sm.b-60.content-item
-                div(:style=`{width: '60px', height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.b-70
-                  img(:src="c.thumbOid" :style=`{objectFit: 'cover'}`).fit
-                .col.full-height
-                  .row.fit.items-start.content-start.q-pa-sm
-                    span(:style=`{userSelect: 'none'}`).text-white {{ c.name }}
-            div(v-if="ctx === 'nodeEditor'").row.full-width.items-start.content-start
-              content-item(
-                v-for="(c,ci) in items" :key="c.id"
-                :ctx="ctx" :content="c" :contentIndex="ci"
-                @choose="contentChoose(c,ci)"
-                @delete="contentDelete(c,ci)"
-                @layerChoose="layerChoose"
-                @layerPreview="layerPreview")
+                :content="c" :contentIndex="ci")
+            //- div(v-if="ctx === 'nodeEditor'").row.full-width.items-start.content-start
+            //-   content-item(
+            //-     v-for="(c,ci) in items" :key="c.id"
+            //-     :ctx="ctx" :content="c" :contentIndex="ci"
+            //-     @choose="contentChoose(c,ci)"
+            //-     @delete="contentDelete(c,ci)"
+            //-     @layerChoose="layerChoose"
+            //-     @layerPreview="layerPreview")
           //- nothing found
           div(
             v-else
@@ -98,10 +103,12 @@ div(
 
 <script>
 import contentItem from './content_item'
+import contentItemMini from './content_item_mini'
+import contentItemMaxi from './content_item_maxi'
 
 export default {
   name: 'wsContentList',
-  components: {contentItem},
+  components: {contentItem, contentItemMini, contentItemMaxi},
   props: {
     ctx: {
       type: String,
@@ -121,8 +128,14 @@ export default {
       ],
       searchString: '',
       searchStringRaw: '',
+      searchStringLoading: false,
       content: null,
-      contentEditorOpened: false
+      contentEditorOpened: false,
+      listView: 'mini', // mini, maxi
+      listViews: [
+        {id: 'mini', icon: 'view_list'},
+        {id: 'maxi', icon: 'view_agenda'}
+      ]
     }
   },
   computed: {
@@ -141,6 +154,7 @@ export default {
     },
     variables () {
       let res = {selector: {}}
+      // selector
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
@@ -148,6 +162,8 @@ export default {
       if (this.type !== 'all') {
         res.selector.contentType = this.type
       }
+      // sort
+      res.sort = [{updatedAt: 'desc'}]
       return res
     }
   },
@@ -156,8 +172,16 @@ export default {
       async handler (to, from) {
         this.$log('searchString CHANGED', to)
         if (this.isURL(to)) {
-          this.contentChoose(await this.contentAdd(await this.contentFromURL(to)))
+          this.searchStringLoading = true
+          this.$q.loading.show({
+            delay: 2000
+          })
           this.searchStringRaw = ''
+          this.$refs.searchStringInput.blur()
+          await this.$wait(2000)
+          this.$q.loading.hide()
+          this.searchStringLoading = false
+          this.contentChoose(await this.contentAdd(await this.contentFromURL(to)))
         }
         else {
           this.searchString = to
@@ -182,6 +206,8 @@ export default {
       // TODO depends on mode
       this.content = content
       this.contentEditorOpened = true
+      // this.$router.push('/workspace/content/' + content.id)
+      // this.$router.push({params: {id: content.id}})
     },
     async contentDelete (content, ci) {
       this.$log('contentDelete', content, ci)

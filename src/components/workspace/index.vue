@@ -9,11 +9,14 @@ div(
   }`).row.full-width.items-start.content-start.justify-center
   //- body
   component(
+    v-if="!$route.params.id"
     :is="page.comp"
     :style=`{
       maxWidth: $store.state.ui.maxWidthPage+'px',
     }`
     ).fit
+  ws-content-explorer(
+    v-if="$route.params.id")
   //- menu right mobile
   q-drawer(
     v-model="showMenuRight" side="right"
@@ -31,7 +34,10 @@ div(
       ).row.full-width.items-center.content-center.q-px-sm.b-50
       q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])").b-60
       .col.q-pb-sm.q-px-sm
-        kalpa-buttons(:value="pagesHot" :id="$route.params.page" @id="$router.push({params: {page: $event}})").justify-center
+        kalpa-buttons(
+          :value="pagesHot" :id="$route.params.page"
+          screenSet="gt.xs"
+          @id="$router.push({params: {page: $event}})").justify-center
       q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = !showMenuRight").b-60
 </template>
 
@@ -43,10 +49,11 @@ import wsChainList from './ws_chain_list'
 import wsSphereList from './ws_sphere_list'
 import wsSettings from './ws_settings'
 import menuRight from './menu_right'
+import wsContentExplorer from './ws_content_explorer'
 
 export default {
   name: 'workspaceIndex',
-  components: {wsNoteList, wsContentList, wsNodeList, wsChainList, wsSphereList, wsSettings, menuRight},
+  components: {wsNoteList, wsContentList, wsNodeList, wsChainList, wsSphereList, wsSettings, menuRight, wsContentExplorer},
   data () {
     return {
       showMenuRight: false,

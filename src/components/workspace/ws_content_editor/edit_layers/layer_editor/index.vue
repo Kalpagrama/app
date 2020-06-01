@@ -1,5 +1,5 @@
 <template lang="pug">
-.column.fit.b-50
+div(:style=`{position: 'relative'}`).column.fit.b-50
   //- layer spheres
   q-dialog(v-model="layerSpheresEditorOpened" position="bottom" @hide="layerSpheresEditorOpened = false")
     layer-spheres(
@@ -11,33 +11,37 @@
         minHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
       }`)
   div.row.full-width
+    //- div(:style=`{}`).row.full-width.bg-green.q-pa-sm
+    //-   span hello
     layer-frames(v-bind="$props" :layer="meta.layer" :width="width")
-  .col.full-width
     layer-actions(v-bind="$props" :layer="meta.layer" :width="width")
-    div().row.full-width.q-px-sm
-      q-btn(
-        @click="layerSpheresEditorOpened = true"
-        size="lg" flat color="white" no-caps
-        ).b-70 {{ layerName }}
+  .col.full-width
+    layer-names(v-bind="$props" :layer="meta.layer")
+  //- footer
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 2000, bottom: '0px',
+      borderRadius: '10px 10px 0 0', overflow: 'hidden'
+    }`).row.full-width.items-start.content-start.b-90
     .row.full-width.q-pa-sm
-      ws-sphere(
-        v-for="(s,si) in layer.spheres" :key="s.id"
-        v-if="si > 0"
-        :sphere="s").q-mr-sm.q-mb-sm
-  div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-pa-sm.b-70
-    q-btn(flat color="white" no-caps @click="layerDelete()").b-80 Delete layer
-    .col
-    q-btn(push color="green" no-caps @click="$emit('close')").q-px-md Save
+      q-btn(round flat color="white" icon="keyboard_arrow_left").b-100
+      .col
+      q-btn(round flat color="white" icon="keyboard_arrow_right").b-100
+    .row.full-width.q-pa-sm
+      q-btn(flat color="white" no-caps @click="layerDelete()").b-100 Delete layer
+      .col
+      q-btn(push color="green" no-caps @click="$emit('close')").q-px-md Save
 </template>
 
 <script>
+import layerNames from './layer_names'
 import layerFrames from './layer_frames'
 import layerActions from './layer_actions'
 import layerSpheres from './layer_spheres'
 
 export default {
   name: 'layerEditor',
-  components: {layerFrames, layerActions, layerSpheres},
+  components: {layerNames, layerFrames, layerActions, layerSpheres},
   props: ['editorType', 'player', 'meta', 'composition', 'width'],
   data () {
     return {

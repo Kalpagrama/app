@@ -21,7 +21,7 @@ div(
     ).col.full-width.scroll
     //- TODO justify-center/justify-start depends on items count? more that 3 => justify-center else justify-start
     masonry(
-      :cols="{default: $q.screen.width > 600 ? 3 : 2}"
+      :cols="{default: $q.screen.width > 600 ? 2 : 2}"
       :gutter="{default: 10}"
       :style=`{position: 'relative', width: 'calc(100% + 8px)', marginBottom: '80px'}`).row.justify-start.q-mt-sm
       div(

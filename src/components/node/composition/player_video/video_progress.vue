@@ -96,14 +96,17 @@ export default {
       this.player.update(t)
     },
     barDrag (e) {
-      // this.$log('barDrag', e)
+      this.$log('barDrag', e)
       if (e.isFirst) {
+        let left = e.evt.layerX || e.position.left
+        // alert('barDrag first' + left)
         this.player.meta(['mode', 'content'])
         this.$tween.to(this, 0.3, {barHeight: this.barHeightMax})
         // this.barWidth = (this.meta.now / this.meta.duration) * 100
-        this.barWidth = (e.evt.layerX / this.$el.clientWidth) * 100
+        this.barWidth = (left / this.$el.clientWidth) * 100
       }
       if (e.isFinal) {
+        // alert('barDrag final')
         this.$tween.to(this, 0.3, {barHeight: this.barHeightMin})
         this.barWidth = null
       }

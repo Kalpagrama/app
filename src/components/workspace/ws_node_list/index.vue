@@ -20,7 +20,10 @@ div(
       borderRadius: '50%'
     }`)
   //- node editor
-  q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
+  q-dialog(
+    v-model="nodeEditorOpened" persistent position="bottom"
+    @before-show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
+    @before-hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
     ws-node-editor(
       ctx="workspace"
       :node="node"

@@ -10,17 +10,24 @@ div(
       borderRadius: '0 0 10px 10px', overflow: 'hidden',
       paddingLeft: '60px', paddingRight: '60px',
     }`
-    ).row.full-width.items-center.content-center.q-py-sm
-    q-btn(round flat color="white" icon="first_page" @click="layerSet(0)").b-90.q-mr-sm
-    q-btn-group(flat color="white" :style=`{borderRadius: '10px'}`).q-mr-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="layerForward(0,0)").b-90
-      q-btn(round flat color="white" icon="keyboard_arrow_right" @click="layerForward(0,1)").b-90
+    ).row.full-width.items-center.content-center.q-py-xs
+    q-btn(round flat dense color="white" icon="first_page" @click="layerSet(0)").b-90.q-mr-xs
+    q-btn-group(flat color="white" :style=`{borderRadius: '10px'}`)
+      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(0,0)").b-90
+      q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(0,1)").b-90
     .col
-    q-btn-group(flat color="white" :style=`{borderRadius: '10px'}`).q-mr-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="layerForward(1,0)").b-90
-      q-btn(round flat color="white" icon="keyboard_arrow_right" @click="layerForward(1,1)").b-90
-    q-btn(round flat color="white" icon="last_page" @click="layerSet(1)").b-90
-  //- div(:style=`{}`).row.full-width.items-center.content-center.q-pa-sm
+    q-btn-group(flat color="white" :style=`{borderRadius: '10px'}`).q-mr-xs
+      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(1,0)").b-90
+      q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(1,1)").b-90
+    q-btn(round flat dense color="white" icon="last_page" @click="layerSet(1)").b-90
+  //- div(
+  //-   :style=`{paddingLeft: '60px', paddingRight: '60px'}`
+  //-   ).row.full-width.items-center.content-center
+  //-   q-btn(flat dense color="white").b-100.q-px-md {{$time(meta.layerStart)}}
+  //-   .col
+  //-     .row.full-width.justify-center
+  //-       span.text-white {{ $time(meta.layerEnd - meta.layerStart) }}
+  //-   q-btn(flat dense color="white").b-100.q-px-md {{$time(meta.layerEnd)}}
   //-   q-btn(round flat color="white" icon="tune" @click="layerSpheresEditorOpened = !layerSpheresEditorOpened").b-110
   //-   .col
   //-   q-btn(round color="green" icon="check" @click="layerClose()").b-110

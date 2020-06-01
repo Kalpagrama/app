@@ -11,12 +11,12 @@ div(
   composition(
     ctx="workspace" :visible="true" :active="true" :mini="false"
     :value="value").full-height
-    template(v-slot:header)
-      //- kalpa-debug(:options=`{editorType}`)
-      div(:style=`{height: '70px'}`
-        ).row.full-width.items-center.content-center.q-px-sm
-        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-        span.text-white.text-bold {{ contentName }}
+    //- template(v-slot:header)
+    //-   //- kalpa-debug(:options=`{editorType}`)
+    //-   div(:style=`{height: '70px'}`
+    //-     ).row.full-width.items-center.content-center.q-px-sm
+    //-     q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
+    //-     span.text-white.text-bold {{ contentName }}
     template(v-slot:video)
       q-btn(
         v-if="pageId === 'layers'"
@@ -38,7 +38,8 @@ div(
             :is="`edit-${pageId}`"
             :player="player" :meta="meta" :composition="value"
             @pageId="pageId = $event"
-            :pages="pages" :pageId="pageId")
+            :pages="pages" :pageId="pageId"
+            @close="$emit('close')")
     //- template(v-slot:footer)
     //-   div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-px-sm.q-pb-sm.b-60
     //-     kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event")

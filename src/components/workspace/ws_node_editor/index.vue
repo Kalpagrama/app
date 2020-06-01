@@ -15,13 +15,18 @@ div(
     ).row.full-width.items-start.content-start.b-50.q-px-sm.q-pb-sm.q-mb-sm
     slot(name="header")
     //- navigation
-    div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.q-py-md
+    div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.justify-between.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Node editor
+      q-btn(
+        @click="pageId === 'info' ? pageId = 'items' : pageId = 'info'"
+        round icon="tune"
+        :color="pageId === 'info' ? 'green' : 'white'"
+        :flat="pageId !== 'info'")
     //- essence
-    edit-essence(:node="node")
+    edit-essence(v-if="pageId !== 'info'" :node="node")
     //- pages
-    kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageChanged")
+    kalpa-buttons(v-if="pageId !== 'info'" :value="pages" :id="pageId" idKey="id" screenSet="gt.xs" @id="pageChanged")
   //- body
   .col.full-width
     component(:is="`edit-${pageId}`" :node="node" @close="$emit('close')")
@@ -42,10 +47,10 @@ export default {
     return {
       pageId: 'items',
       pages: [
-        {id: 'info', name: 'Info'},
-        {id: 'items', name: 'Items'},
-        {id: 'spheres', name: 'Spheres'},
-        {id: 'preview', name: 'Preview'}
+        // {id: 'info', name: 'Info'},
+        {id: 'items', name: '1. Items'},
+        {id: 'spheres', name: '2. Spheres'},
+        {id: 'preview', name: '3. Preview'}
       ]
     }
   },

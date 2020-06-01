@@ -5,8 +5,13 @@ div(
   }`
   ).row.full-width.items-start.content-start
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
+  //- menu
+  //- q-btn(
+  //-   v-if="visible && active"
+  //-   round flat color="white" icon="more_vert"
+  //-   :style=`{position: 'absolute', top: '8px', right: '8px', zIndex: 10000, background: 'rgba(0,0,0,0.1)'}`)
   img(
-    v-if="preview && !active"
+    v-if="preview"
     :src="preview"
     draggable="false"
     @load="previewLoaded"
@@ -24,17 +29,6 @@ div(
       v-for="(_, scopedSlotName) in $scopedSlots"
       v-slot:[scopedSlotName]="slotData")
       slot(:name="scopedSlotName" v-bind="slotData")
-      //- div(
-      //-   v-if="scopedSlotName === 'video'"
-      //-   :style=`{
-      //-     position: 'absolute', zIndex: 10000, top: '0px',
-      //-     borderRadius: '10px', overflow: 'hidden',
-      //-   }`
-      //-   ).row.full-width.bg-red.q-pa-sm
-      //-   span.text-white hello
-      //- img(
-      //-   v-if="scopedSlotName === 'video'"
-      //-   :style=`{position: 'relative',}`)
 </template>
 
 <script>

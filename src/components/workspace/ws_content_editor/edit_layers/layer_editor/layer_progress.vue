@@ -23,6 +23,7 @@ div(
         overflow: 'hidden',
       }`
       ).row.full-width.items-center.content-center.b-120.cursor-pointer
+      //- progress
       div(
         v-if="meta.now >= layerStart && meta.now <= layerEnd"
         :style=`{
@@ -32,9 +33,20 @@ div(
           pointerEvents: 'none',
           borderRadius: '10px',
           overflow: 'hidden',
-          background: layer.color,
+          background: 'white',
         }`
       ).row.full-height
+      //- stats
+      div(
+        :style=`{
+          position: 'absolute', zIndex: 1100,
+          bottom: '8px', pointerEvents: 'none',
+        }`).row.full-width.q-px-xs
+        small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(meta.layerStart)}}
+        .col
+          .row.full-width.justify-center
+            small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{ $time(meta.layerEnd - meta.layerStart) }}
+        small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(meta.layerEnd)}}
   q-btn(round flat color="white" icon="refresh" @click="layerPlayAgain()").b-110
 </template>
 

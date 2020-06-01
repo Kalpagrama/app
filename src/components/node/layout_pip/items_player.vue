@@ -24,7 +24,9 @@ div(
   //- preview
   img(
     :src="preview" draggable="false"
-    :style=`{maxHeight: 500+'px', userSelect: 'none', objectFit: 'contain', opacity: active ? 1 : 0.5}`).full-width
+    :style=`{
+      //- maxHeight: 500+'px',
+      userSelect: 'none', objectFit: 'contain', opacity: active ? 1 : 0.5}`).full-width
   //- items wrapper
   div(
     v-if="true"
