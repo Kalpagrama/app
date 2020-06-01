@@ -49,7 +49,7 @@ export default {
     //   else return null
     // },
     sessions () {
-      return this.$store.getters.currentUser.sessions
+      return this.$store.getters.currentUser().sessions
     },
     mytoken () {
       let str = localStorage.getItem('k_token')

@@ -46,7 +46,7 @@ export default {
   },
   computed: {
     currentPassword () {
-      return this.$store.getters.currentUser.profile.password
+      return this.$store.getters.currentUser().profile.password
     },
     errorLength () {
       if (this.errors) return this.errors.length

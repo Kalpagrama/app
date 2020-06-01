@@ -62,7 +62,7 @@ export default {
   },
   computed: {
     userIsMe () {
-      return this.user.oid === this.$store.getters.currentUser.oid
+      return this.user.oid === this.$store.getters.currentUser().oid
     }
   },
   methods: {

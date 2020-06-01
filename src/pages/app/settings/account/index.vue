@@ -48,31 +48,31 @@ export default {
   },
   computed: {
     currentLang () {
-      return this.$store.getters.currentUser.profile.lang
+      return this.$store.getters.currentUser().profile.lang
     },
     currentGender () {
-      return this.$store.getters.currentUser.profile.gender
+      return this.$store.getters.currentUser().profile.gender
     },
     currentCountry () {
-      return this.$store.getters.currentUser.profile.country
+      return this.$store.getters.currentUser().profile.country
     },
     currentCity () {
-      return this.$store.getters.currentUser.profile.city
+      return this.$store.getters.currentUser().profile.city
     },
     currentDate () {
-      return this.$store.getters.currentUser.profile.dateBirth
+      return this.$store.getters.currentUser().profile.dateBirth
     },
     currentNameFirst () {
-      return this.$store.getters.currentUser.profile.nameFirst
+      return this.$store.getters.currentUser().profile.nameFirst
     },
     currentNameSecond () {
-      return this.$store.getters.currentUser.profile.nameSecond
+      return this.$store.getters.currentUser().profile.nameSecond
     },
     currentNameFull () {
-      return this.$store.getters.currentUser.profile.nameFull
+      return this.$store.getters.currentUser().profile.nameFull
     },
     currentRole () {
-      return this.$store.getters.currentUser.profile.role
+      return this.$store.getters.currentUser().profile.role
     },
     nameFull () {
       return this.nameSecond + ' ' + this.nameFirst
@@ -242,13 +242,13 @@ export default {
     }
   },
   mounted () {
-    this.gender = this.$store.getters.currentUser.profile.gender
-    this.country = this.$store.getters.currentUser.profile.country
-    this.nameFirst = this.$store.getters.currentUser.profile.nameFirst
-    this.nameSecond = this.$store.getters.currentUser.profile.nameSecond
-    this.lang = this.$store.getters.currentUser.profile.lang
-    this.city = this.$store.getters.currentUser.profile.city
-    this.date = this.$store.getters.currentUser.profile.dateBirth
+    this.gender = this.$store.getters.currentUser().profile.gender
+    this.country = this.$store.getters.currentUser().profile.country
+    this.nameFirst = this.$store.getters.currentUser().profile.nameFirst
+    this.nameSecond = this.$store.getters.currentUser().profile.nameSecond
+    this.lang = this.$store.getters.currentUser().profile.lang
+    this.city = this.$store.getters.currentUser().profile.city
+    this.date = this.$store.getters.currentUser().profile.dateBirth
   },
   created () {
     this.$logD('created')

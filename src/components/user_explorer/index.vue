@@ -49,7 +49,7 @@ export default {
       else return this.user.subscribers.length
     },
     following () {
-      return this.$store.getters.currentUser.subscriptions
+      return this.$store.getters.currentUser().subscriptions
     }
   },
   watch: {

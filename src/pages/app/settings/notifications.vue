@@ -77,13 +77,13 @@ export default {
   },
   mounted () {
     this.$logD('mounted')
-    this.pauseAllNotifications = this.$store.getters.currentUser.settings.notifications.pauseAllNotifications
-    this.assessmentsNotifications = this.$store.getters.currentUser.settings.notifications.assessmentsNotifications
-    this.subscriptionsNotifications = this.$store.getters.currentUser.settings.notifications.subscriptionsNotifications
-    this.mentionsNotifications = this.$store.getters.currentUser.settings.notifications.mentionsNotifications
-    this.sharedNotifications = this.$store.getters.currentUser.settings.notifications.sharedNotifications
-    this.nodeCreatedNotifications = this.$store.getters.currentUser.settings.notifications.nodeCreatedNotifications
-    this.nodeAddedNotifications = this.$store.getters.currentUser.settings.notifications.nodeAddedNotifications
+    this.pauseAllNotifications = this.$store.getters.currentUser().settings.notifications.pauseAllNotifications
+    this.assessmentsNotifications = this.$store.getters.currentUser().settings.notifications.assessmentsNotifications
+    this.subscriptionsNotifications = this.$store.getters.currentUser().settings.notifications.subscriptionsNotifications
+    this.mentionsNotifications = this.$store.getters.currentUser().settings.notifications.mentionsNotifications
+    this.sharedNotifications = this.$store.getters.currentUser().settings.notifications.sharedNotifications
+    this.nodeCreatedNotifications = this.$store.getters.currentUser().settings.notifications.nodeCreatedNotifications
+    this.nodeAddedNotifications = this.$store.getters.currentUser().settings.notifications.nodeAddedNotifications
   },
   beforeDestroy () {
     this.$logD('beforeDestroy')

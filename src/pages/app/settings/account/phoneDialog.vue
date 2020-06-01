@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     currentPhone () {
-      return this.$store.getters.currentUser.profile.phone
+      return this.$store.getters.currentUser().profile.phone
     }
   },
   methods: {

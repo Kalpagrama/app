@@ -97,7 +97,7 @@ export default {
   computed: {
     nodeIsMine () {
       if (this.nodeFull) {
-        return this.nodeFull.author.oid === this.$store.getters.currentUser.oid
+        return this.nodeFull.author.oid === this.$store.getters.currentUser().oid
       }
       else {
         return true

@@ -106,7 +106,7 @@ export default {
       await this.$router.push('/auth').catch(e => e)
     } else { // залогинились
       // go to welcome...
-      if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
+      if (this.$store.getters.currentUser().profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     }
     this.loading = false
   },

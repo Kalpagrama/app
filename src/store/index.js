@@ -13,10 +13,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 
 Vue.use(Vuex)
 
-// var currentUser = null
-// function getCurrentUser () {
-//   return currentUser
-// }
+var currentUser = null
 
 // todo action currentUser instead of mutation!!!!
 export default function (/* { ssrContext } */) {
@@ -27,12 +24,6 @@ export default function (/* { ssrContext } */) {
     },
     strict: process.env.DEV,
     state: {
-      currentUser: null
-    },
-    mutations: {
-      setCurrentUser (state, user) {
-        state.currentUser = user
-      }
     },
     actions: {
       init: async (context) => {
@@ -46,22 +37,21 @@ export default function (/* { ssrContext } */) {
         if (!localStorage.getItem('k_user_oid')) return false
         logD('before rxdb.init')
         await rxdb.init(localStorage.getItem('k_user_oid'))
-        // context.state.currentUser =
-        context.commit('setCurrentUser', await rxdb.get(RxCollectionEnum.OBJ, localStorage.getItem('k_user_oid')))
-        logD('currentUser', context.state.currentUser)
-        assert(context.state.currentUser, '!currentUser')
+        currentUser = await rxdb.get(RxCollectionEnum.OBJ, localStorage.getItem('k_user_oid'))
+        // context.commit('setCurrentUser', await rxdb.get(RxCollectionEnum.OBJ, localStorage.getItem('k_user_oid')))
+        logD('currentUser', currentUser)
+        assert(currentUser, '!currentUser')
         logD('after rxdb.init')
 
         await context.dispatch('core/init')
-        await i18next.changeLanguage(context.state.currentUser.profile.lang)
+        await i18next.changeLanguage(currentUser.profile.lang)
         // logD('vuex init done!')
         return true
       }
     },
     getters: {
-      currentUser: (state, getters, rootState, rootGetters) => {
-        logD('getter currentUser', state.currentUser)
-        return state.currentUser
+      currentUser: (state, getters, rootState, rootGetters) => id => {
+        return currentUser
       }
     }
   })

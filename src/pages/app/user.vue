@@ -23,7 +23,7 @@ export default {
           this.user = await this.userLoad(to)
         }
         else {
-          this.$router.replace({params: {oid: this.$store.getters.currentUser.oid}})
+          this.$router.replace({params: {oid: this.$store.getters.currentUser().oid}})
         }
       }
     },
