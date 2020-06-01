@@ -14,7 +14,7 @@
       v-if="query"
       :style=`{paddingBottom: '1000px'}`).row.full-width.items-start.content-start.q-pt-sm
       //- div(:style=`{height: 500+'px'}`).row.full-width
-      //- kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
+      //- kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       //-   template(v-slot=`{items}`)
       //-     .row.full-width.items-start.content-start
       div(
@@ -49,13 +49,19 @@ export default {
     sphereOid () {
       return this.$route.params.oid
     },
-    variables () {
+    mangoQuery () {
       return {
-        oid: this.sphereOid,
-        pagination: { pageSize: 10 },
-        sortStrategy: 'RELATING_TO_TIME',
-        filter: { types: 'NODE' }
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oid: this.sphereOid
+        }
       }
+      // return {
+      //   oid: this.sphereOid,
+      //   pagination: { pageSize: 10 },
+      //   sortStrategy: 'RELATING_TO_TIME',
+      //   filter: { types: 'NODE' }
+      // }
     }
   },
   watch: {

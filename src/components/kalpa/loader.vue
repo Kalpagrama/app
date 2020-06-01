@@ -7,14 +7,10 @@ export default {
   },
   name: 'kalpaLoader',
   props: {
-    type: {
-      type: String,
-      required: true
-    },
-    variables: {
+    mangoQuery: {
       type: Object,
       default () {
-        return {}
+        return null
       }
     }
   },
@@ -32,11 +28,11 @@ export default {
     }
   },
   watch: {
-    variables: {
+    mangoQuery: {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        this.$log('variables CHANGED', 'from=', from, ', to=', to)
+        this.$log('mangoQuery CHANGED', 'from=', from, ', to=', to)
         if (to) {
           this.itemsLoad(to)
         }
@@ -46,51 +42,38 @@ export default {
       deep: false,
       immediate: false,
       handler(to, from){
-        this.$log('items CHANGED', 'from=', from, ', to=', to)
+        // this.$log('items CHANGED', 'from=', from, ', to=', to)
         this.$emit('itemsCount', to.length)
       }
     }
   },
   methods: {
     async itemsMore () {
-      try {
-        this.$log('itemsMore start')
-        // checks
-        if (this.itemsCount >= this.totalCount) return
-        this.itemsMoreLoading = true
-        // TODO: do not mutate pageToken... in variables
-        // сработает вотчер и запросит новые данные
-        this.variables.pagination.pageToken = this.nextPageToken
-        this.$log('itemsMore done')
-        this.itemsMoreLoading = false
-      } catch (e) {
-        this.$log('itemsMore error', e)
-        this.itemsMoreLoading = false
-      }
+      // todo переделать variables на mangoQuery
+      // try {
+      //   this.$log('itemsMore start')
+      //   // checks
+      //   if (this.itemsCount >= this.totalCount) return
+      //   this.itemsMoreLoading = true
+      //   // TODO: do not mutate pageToken... in variables
+      //   // сработает вотчер и запросит новые данные
+      //   this.variables.pagination.pageToken = this.nextPageToken
+      //   this.$log('itemsMore done')
+      //   this.itemsMoreLoading = false
+      // } catch (e) {
+      //   this.$log('itemsMore error', e)
+      //   this.itemsMoreLoading = false
+      // }
     },
     async itemsLoad (mangoQuery, append = false) {
       // this.$log('itemsLoad start', mangoQuery)
       // get mangoQuery
-      let { oid, pagination, filter, sortStrategy } = mangoQuery
-      pagination = pagination || {pageSize: 30, pageToken: null}
-      sortStrategy = sortStrategy || 'HOT'
+      // let { oid, pagination, filter, sortStrategy } = mangoQuery
+      // pagination = pagination || {pageSize: 30, pageToken: null}
+      // sortStrategy = sortStrategy || 'HOT'
       // get res
       let res
       mangoQuery = mangoQuery || {selector: {}}
-      mangoQuery.selector.rxCollectionEnum = this.type
-      let rxQuery
-      switch (this.type) {
-        case 'LST_SPHERE_NODES' :
-        case 'LST_NODE_NODES' :
-          mangoQuery.selector.oid = oid
-          break
-        case 'LST_FEED' :
-        case 'WS_CONTENT' :
-        case 'WS_NODE':
-        case 'WS_SPHERE':
-          break
-        default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
-      }
       let { items, count, totalCount, nextPageToken } = await this.$rxdb.find(mangoQuery)
       this.items = items
       this.nextPageToken = nextPageToken

@@ -264,7 +264,7 @@ class Objects {
     let rxDoc = await this.cache.get(id, fetchFunc)
     if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')
-    return getReactive(rxDoc)
+    return rxDoc
   }
 
   // от сервера прилетел эвент (поправим данные в кэше)

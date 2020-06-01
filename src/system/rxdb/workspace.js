@@ -6,12 +6,12 @@ import {
   wsSchemaContent,
   wsSchemaNode,
   wsSchemaSphere,
-  wsSchemaLocalChanges, schemaKeyValue
+  wsSchemaLocalChanges, schemaKeyValue, wsSchemaItem
 } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Mutex } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
-import { getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_WS)
@@ -20,7 +20,6 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_WS)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 const synchroTimeMin = 1000 * 60 * 8 // раз в 8 минут шлем изменения на сервер
 class WaitBreakable {
   constructor (ms) {
@@ -54,23 +53,18 @@ const WsItemTypeEnum = Object.freeze({
   WS_CHAIN: 'WS_CHAIN',
   WS_SPHERE: 'WS_SPHERE'
 })
-const WsCollectionEnum = Object.freeze({ ...WsItemTypeEnum })
+const WsCollectionEnum = Object.freeze({
+  ...WsItemTypeEnum,
+  WS_CHANGES: 'WS_CHANGES'
+})
 const WsOperationEnum = Object.freeze({ UPSERT: 'UPSERT', DELETE: 'DELETE' })
 
 // Workspace вызывается 1: из UI(upsertItem/deleteItem); 2: из сети(processEvent); 3: synchroLoop.
 // Эти ф-ии сериализованы(вызываются строго друг за другом) (см Mutex)
 class Workspace {
-  async createDb () {
-    let f = this.createDb
-    this.isLeader = false
+  async createCollections () {
+    let f = this.createCollections
     logD(f, 'start')
-    this.db = await createRxDatabase({
-      name: 'ws',
-      adapter: 'idb', // <- storage-adapter
-      multiInstance: true, // <- multiInstance (optional, default: true)
-      eventReduce: true, // <- eventReduce (optional, default: true)
-      pouchSettings: { revs_limit: 1 }
-    })
     // добавлет дефолтный вариант для пропущенных стратегий
     const migrationProxy = (migrationStrategies) => {
       return new Proxy(migrationStrategies, {
@@ -87,6 +81,7 @@ class Workspace {
         }
       })
     }
+    await this.db.collection({ name: 'ws_items', schema: wsSchemaItem, migrationStrategies: migrationProxy({}) })
     await this.db.collection({ name: 'ws_node', schema: wsSchemaNode, migrationStrategies: migrationProxy({}) })
     await this.db.collection({
       name: 'ws_content',
@@ -95,29 +90,17 @@ class Workspace {
     })
     await this.db.collection({ name: 'ws_chain', schema: wsSchemaChain, migrationStrategies: migrationProxy({}) })
     await this.db.collection({ name: 'ws_sphere', schema: wsSchemaSphere, migrationStrategies: migrationProxy({}) })
-    await this.db.collection({
-      name: 'ws_meta',
-      schema: schemaKeyValue,
-      migrationStrategies: migrationProxy({})
-    })
-    await this.db.collection({
-      name: 'ws_changes',
-      schema: wsSchemaLocalChanges,
-      migrationStrategies: migrationProxy({})
-    })
-    this.db.waitForLeadership().then(() => {
-      logD(f, 'RXDB::WS::LEADER!!!!')
-      this.isLeader = true
-    })
+    await this.db.collection({ name: 'ws_changes', schema: wsSchemaLocalChanges })
     // обработка события измения мастерской пользователем (запоминает измененные элементы)
     let onWsChangedByUser = async (id, operation) => {
       const f = onWsChangedByUser
-      if (!this.isLeader) return
+      if (!rxdb.isLeader()) return
       assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
       await this.db.ws_changes.atomicUpsert({ id, operation })
       logD(f, `complete. ${id}`)
     }
     for (let wsCollectionEnum in WsCollectionEnum) {
+      if (wsCollectionEnum === WsCollectionEnum.WS_CHANGES) continue
       this.getWsCollection(wsCollectionEnum).postInsert(async (plainData) => {
         await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
       }, false)
@@ -130,43 +113,34 @@ class Workspace {
     }
   }
 
-  // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
-  async purgeDb () {
-    let f = this.purgeDb
-    logD(f, 'purgeDb ws_db')
-    let purgeLastDateDoc = await this.db.ws_meta.findOne('purgeLastDate').exec()
-    let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc.value) : 0
-    if (Date.now() - purgeLastDate < purgePeriod) return
-    await this.db.ws_meta.atomicUpsert({ id: 'purgeLastDate', value: Date.now().toString() })
-    let dump = await this.db.dump()
-    await this.db.remove()
-    await this.db.destroy()
-    await this.createDb()
-    await this.db.importDump(dump)
-  }
-
   // удалить все данные из мастерской
-  async clear () {
-    const f = this.clear
+  async clearCollections () {
+    const f = this.clearCollections
     logD(f, 'start')
-    await this.db.remove()
-    await this.createDb()
+    for (let wsCollectionEnum in WsCollectionEnum) {
+      let collection = this.getWsCollection(wsCollectionEnum)
+      if (collection) {
+        await collection.destroy()
+        await collection.remove()
+      }
+    }
+    await this.createCollections()
     logD(f, 'complete')
   }
 
-  async create (recursive = false) {
+  async create (db, recursive = false) {
     const f = this.create
     assert(!this.created, 'this.created')
     try {
+      this.db = db
       this.synchroLoopWaitObj = new WaitBreakable(synchroTimeMin)
       this.mutex = new Mutex()
-      await this.createDb()
-      await this.purgeDb() // очистит бд от старых данных
+      await this.createCollections()
       this.created = true
     } catch (err) {
       logE(f, 'ошибка при создания Workspace! очищаем и пересоздаем!', err)
-      await this.clear()
-      if (!recursive) await this.create(true)
+      await this.clearCollections()
+      if (!recursive) await this.create(db, true)
     }
   }
 
@@ -182,7 +156,7 @@ class Workspace {
         logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
         try {
           await this.mutex.lock()
-          if (this.isLeader) await this.synchronize()
+          if (rxdb.isLeader()) await this.synchronize()
         } catch (err) {
           logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
           this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeMin * 10))
@@ -201,17 +175,18 @@ class Workspace {
 
   async synchronize () {
     const f = this.synchronize
-    assert(this.isLeader, '!isLeader')
+    assert(rxdb.isLeader(), '!isLeader')
     // запросит при необходимости данные и сольет с локальными изменениями
     const synchronizeWsWhole = async (forceMerge = false) => {
       const f = synchronizeWsWhole
       assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
 
-      let wsRevisionLocalDoc = await this.db.ws_meta.findOne('wsRevision').exec()
+      let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc.value) : -1
       if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
         let wsServer = await WorkspaceApi.getWs()
         for (let wsCollectionEnum in WsCollectionEnum) {
+          if (wsCollectionEnum === WsCollectionEnum.WS_CHANGES) continue
           logD(f, `try merge collection: ${wsCollectionEnum}`)
           let itemsServer = wsServer[wsCollectionEnum] || []
           let wsCollection = this.getWsCollection(wsCollectionEnum)
@@ -239,7 +214,7 @@ class Workspace {
           }
         }
         // logD('set wsRevision', wsServer.rev.toString())
-        await this.db.ws_meta.atomicUpsert({ id: 'wsRevision', value: wsServer.rev.toString() }) // версия по мнению клиента
+        await rxdb.set(RxCollectionEnum.META, {id: 'wsRevision', valueString: wsServer.rev.toString()})
         this.reactiveUser.wsRevision = wsServer.rev // версия по мнению сервера
         logD(f, 'pull ws complete')
       }
@@ -249,13 +224,16 @@ class Workspace {
       const f = saveToServer
       assert(item, '!item')
       logD(f, `start ${item.id} rev:${item.rev}`)
-      assert(this.isLeader, '!this.isLeader')
+      assert(rxdb.isLeader(), '!this.isLeader')
       assert(this.created, '!this.created')
       assert(item && item.id, '!item')
       assert(wsOperationEnum in WsOperationEnum, 'bad operation' + wsOperationEnum)
       let wsItemUpsert, wsItemDelete
-      if (wsOperationEnum === WsOperationEnum.UPSERT) wsItemUpsert = await WorkspaceApi.wsItemUpsert(item)
-      else wsItemDelete = await WorkspaceApi.wsItemDelete(item)
+      if (wsOperationEnum === WsOperationEnum.UPSERT) {
+        wsItemUpsert = await WorkspaceApi.wsItemUpsert(item)
+      } else {
+        wsItemDelete = await WorkspaceApi.wsItemDelete(item)
+      }
       logD(f, 'complete')
       return { wsItemUpsert, wsItemDelete }
     }
@@ -268,7 +246,7 @@ class Workspace {
       let itemCollection = this.getWsCollectionByItem({ id })
       let plainDoc
       if (operation === WsOperationEnum.DELETE) {
-        plainDoc = { id }
+        plainDoc = { id, wsItemType: getRxCollectionEnumFromId(id) }
       } else {
         let rxDoc = await itemCollection.findOne(id).exec()
         if (!rxDoc) { // в мастерской нет такого элемента!
@@ -310,14 +288,14 @@ class Workspace {
       await this.mutex.lock()
       const f = this.processEvent
       logD(f, 'start')
-      if (!this.isLeader) return
+      if (!rxdb.isLeader()) return
       let { type, wsItem: itemServer, wsRevision } = event
       assert(this.created, '!this.created')
       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
       assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
 
-      let wsRevisionLocalDoc = await this.db.ws_meta.findOne('wsRevision').exec()
+      let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc.value) : 0 // версия локальной мастерской
       this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера
       if (wsRevisionLocal + 1 !== wsRevision) {
@@ -353,7 +331,7 @@ class Workspace {
         logD(f, `event проигнорирован (у нас самая актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-      await this.db.ws_meta.atomicUpsert({ id: 'wsRevision', value: wsRevision.toString() }) // версия по мнению клиента
+      await rxdb.set(RxCollectionEnum.META, {id: 'wsRevision', valueString: wsRevision.toString()})
       logD(f, 'complete')
     } finally {
       this.mutex.release()
@@ -371,6 +349,8 @@ class Workspace {
         return this.db.ws_chain
       case WsCollectionEnum.WS_SPHERE:
         return this.db.ws_sphere
+      case WsCollectionEnum.WS_CHANGES:
+        return this.db.ws_changes
       default:
         throw new Error('bad collection' + wsCollectionEnum)
     }
@@ -418,7 +398,7 @@ class Workspace {
     return rxQuery
   }
 
-  async get(id) {
+  async get (id) {
     let rxDoc = await this.getWsCollectionByItem({ id }).findOne(id).exec()
     return rxDoc
   }

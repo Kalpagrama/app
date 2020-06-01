@@ -16,17 +16,21 @@ function getReactive (rxDoc) {
   let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
   return getItemData(reactiveItemHolder.reactiveItem)
 }
-function getItemData(reactiveItem){
-  return reactiveItem.cached ? reactiveItem.cached.data : reactiveItem
+
+function getItemData (reactiveItem) {
+  if (reactiveItem.valueString) return reactiveItem.valueString
+  if (reactiveItem.cached) return reactiveItem.cached.data
+  return reactiveItem
 }
 
 const debounceIntervalItem = 2000
+
 // класс-обертка над rxDoc для реактивности
 class ReactiveItemHolder {
   constructor (rxDoc) {
     assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
     assert(rxDoc.id, '!rxDoc.id')
-    logD('ReactiveItemHolder::constructor', rxDoc.id)
+    // logD('ReactiveItemHolder::constructor', rxDoc.id)
     if (rxDoc.reactiveItemHolderMaster) {
       this.reactiveItem = rxDoc.reactiveItemHolderMaster.reactiveItem
     } else {
@@ -46,7 +50,7 @@ class ReactiveItemHolder {
 
   rxDocSubscribe () {
     const f = this.rxDocSubscribe
-    logD(f, `rxDoc subscribe ${this.rxDoc.id} rev: ${this.rxDoc.rev}`)
+    // logD(f, `rxDoc subscribe ${this.rxDoc.id} rev: ${this.rxDoc.rev}`)
     if (this.rxDocSubscription) return
     // skip - для пропуска n первых эвантов (после subscribe - сразу генерится эвент(даже если данные не менялись))
     this.rxDocSubscription = this.rxDoc.$.pipe(skip(1)).subscribe(async change => {
@@ -89,7 +93,7 @@ class ReactiveItemHolder {
             this.rxDocUnsubscribe()
             logD(f, 'reactiveItem changed from UI (debounce)', this.reactiveItem)
             assert(this.reactiveItem.id, '!this.reactiveItem.id')
-            await rxdb.set(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), {withLock: false}) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
+            await rxdb.set(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), { withLock: false }) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
           } finally {
             this.rxDocSubscribe()
             await rxdb.release()

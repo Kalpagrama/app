@@ -70,7 +70,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
       //- body
       div(v-if="$route.params.page === 'nodes'").row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-py-md
-          kalpa-loader(v-if="$q.screen.xs && sphereOid && node" type="LST_SPHERE_NODES" :variables="variables")
+          kalpa-loader(v-if="$q.screen.xs && sphereOid && node" :mangoQuery="mangoQuery")
             template(v-slot=`{items}`)
               list-middle(:items="items")
                 template(v-slot:item=`{item, index, indexMiddle}`)
@@ -81,7 +81,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
                     :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
                     :active="index === indexMiddle"
                     :mini="false")
-          kalpa-loader(v-if="$q.screen.gt.xs && sphereOid && node" type="LST_SPHERE_NODES" :variables="variables")
+          kalpa-loader(v-if="$q.screen.gt.xs && sphereOid && node" :mangoQuery="mangoQuery")
             template(v-slot=`{items}`)
               list-masonry(:items="items")
                 template(v-slot:item=`{item, index, isOpened, isHovered}`)
@@ -100,6 +100,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
 
 <script>
 import menuRight from './menu_right'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeExplorer',
@@ -131,13 +132,19 @@ export default {
     pageId () {
       return this.$route.params.page
     },
-    variables () {
+    mangoQuery () {
       return {
-        oid: this.sphereOid,
-        pagination: { pageSize: 10 },
-        sortStrategy: 'HOT',
-        filter: { types: 'NODE' }
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oid: this.sphereOid
+        }
       }
+      // return {
+      //   oid: this.sphereOid,
+      //   pagination: { pageSize: 10 },
+      //   sortStrategy: 'HOT',
+      //   filter: { types: 'NODE' }
+      // }
     }
   },
   watch: {

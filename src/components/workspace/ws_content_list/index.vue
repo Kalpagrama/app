@@ -72,7 +72,7 @@ div(
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
-      kalpa-loader(type="WS_CONTENT" :variables="variables")
+      kalpa-loader(:mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
             div(
@@ -156,8 +156,8 @@ export default {
         return null
       }
     },
-    variables () {
-      let res = {selector: {}}
+    mangoQuery () {
+      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT}}
       // selector
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')

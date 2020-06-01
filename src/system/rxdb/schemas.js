@@ -8,11 +8,80 @@ export const schemaKeyValue = {
       type: 'string',
       primary: true
     },
-    value: {
+    valueString: {
       type: 'string'
     }
   },
-  required: ['id', 'value']
+  required: ['id', 'valueString']
+}
+
+export const wsSchemaItem = {
+  title: 'wsSchemaItem',
+  version: 0,
+  description: 'wsSchemaItem',
+  type: 'object',
+  properties: {
+    id: {
+      type: 'string',
+      primary: true
+    },
+    oid: {
+      type: 'string'
+    },
+    wsItemType: {
+      type: 'string'
+    },
+    name: {
+      type: 'string',
+      default: '!_unnamed_!'
+    },
+    rev: {
+      type: 'integer',
+      default: 0
+    },
+    changedBy: {
+      type: 'string',
+      default: 'USER'
+    },
+    createdAt: {
+      type: 'integer',
+      default: 0
+    },
+    updatedAt: {
+      type: 'integer',
+      default: 0
+    },
+    deletedAt: {
+      type: 'integer'
+    },
+    items: {
+      type: 'array',
+      maxItems: 88,
+      uniqueItems: false,
+      items: {
+        type: 'object'
+      }
+    },
+    spheres: {
+      type: 'array',
+      maxItems: 888,
+      uniqueItems: false,
+      items: {
+        type: 'object'
+      }
+    },
+    category: {
+      type: 'string'
+    },
+    layout: {
+      type: 'string'
+    },
+    stage: {
+      type: 'string'
+    }
+  },
+  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
+  indexes: ['oid', 'name', 'createdAt', 'updatedAt']
 }
 
 export const wsSchemaNode = {
