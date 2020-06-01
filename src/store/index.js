@@ -46,7 +46,7 @@ export default function (/* { ssrContext } */) {
       }
     },
     getters: {
-      currentUser: (state, getters, rootState, rootGetters) => {
+      currentUser: (state, getters, rootState, rootGetters) => id => {
         return currentUser
       }
     }

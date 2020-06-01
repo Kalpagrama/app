@@ -47,7 +47,7 @@ export default {
             this.$router.replace({params: {oid: this.nodeCategories[4].sphere.oid}})
           }
           else {
-            this.$router.replace({params: {oid: this.$store.getters.currentUser.oid}})
+            this.$router.replace({params: {oid: this.$store.getters.currentUser().oid}})
           }
         }
       }

@@ -26,19 +26,19 @@ div(:style=`{}`).column.fit.b-50
       }`
       ).column.full-width.b-50
         router-link(
-          v-if="$store.getters.currentUser"
-          :to="'/user/'+$store.getters.currentUser.oid"
+          v-if="$store.getters.currentUser()"
+          :to="'/user/'+$store.getters.currentUser().oid"
           :class=`{
             'b-100': $route.name === 'user'
           }`
           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
           ).row.full-width.items-center.content-center.menu-item
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-            kalpa-avatar(:url="$store.getters.currentUser.profile.photoUrl" :width="40" :height="40")
+            kalpa-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
           .col.full-height
             .row.fit.items-center.content-center
-              span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser.name}}
-              small.text-white.full-width {{ '@'+$store.getters.currentUser.name }}
+              span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
+              small.text-white.full-width {{ '@'+$store.getters.currentUser().name }}
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
           :to="{name: p.id}"
