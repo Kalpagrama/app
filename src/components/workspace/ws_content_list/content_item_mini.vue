@@ -1,6 +1,6 @@
 <template lang="pug">
 div(
-  @click="$emit('edit')"
+  @click.self="$emit('edit')"
   @mousenter="mouseIsOver = true"
   @mouseleave="mouseIsOver = false"
   :style=`{
@@ -12,7 +12,7 @@ div(
   ).row.full-width.items-center.content-center.q-mb-sm.b-60.content-item
   //- thumb
   div(
-    :style=`{width: '100px', height: '100px', borderRadius: '10px', overflow: 'hidden'}`
+    :style=`{width: '180px', height: '100px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.items-center.content-center.justify-center.b-80
     img(
       v-if="!thumbErrored"
@@ -39,6 +39,14 @@ div(
   //- right
   div(:style=`{width: '40px'}`).row.full-height.items-start.content-start.q-pt-sm
     q-btn(round flat dense color="grey-6" icon="more_vert")
+      q-menu(cover auto-close anchor="top right")
+        div(:style=`{minWidth: '150px', maxWidth: '150px'}`).column.fit.b-70
+          .col.full-width
+            q-btn(
+              v-for="(a,aId) in contentActions" :key="aId"
+              @click="a.fn()"
+              flat no-caps color="white" align="left"
+              ).full-width {{a.name}}
 </template>
 
 <script>
@@ -54,6 +62,27 @@ export default {
   computed: {
     contentName () {
       return this.content.name
+    },
+    contentActions () {
+      return {
+        edit: {
+          name: 'Edit',
+          fn: () => {
+          }
+        },
+        explore: {
+          name: 'Explore',
+          fn: () => {
+          }
+        },
+        delete: {
+          name: 'Delete',
+          fn: async () => {
+            if (!confirm('Delete content?')) return
+            await this.$rxdb.remove(this.content.id)
+          }
+        }
+      }
     }
   },
   methods: {
