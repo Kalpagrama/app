@@ -19,12 +19,19 @@
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'sphereListTop',
+  data () {
+    return {
+      nodeCategories: []
+    }
+  },
   props: ['oid'],
   computed: {
     categories () {
-      return this.$store.state.node.categories.reduce((acc, val) => {
+      return this.nodeCategories.reduce((acc, val) => {
         if (val.type !== 'ALL') {
           acc.push({
             oid: val.sphere.oid,
@@ -34,6 +41,10 @@ export default {
         return acc
       }, [])
     }
+  },
+  async beforeCreate () {
+    this.$log('beforeCreate')
+    this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
   }
 }
 </script>

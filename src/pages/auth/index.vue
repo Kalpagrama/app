@@ -131,6 +131,7 @@ input
 
 <script>
 import withSocials from './with_socials'
+import { AuthApi } from 'src/api/auth'
 
 export default {
   name: 'pageAuth-index',
@@ -179,7 +180,7 @@ export default {
           // this.$q.notify('GOT TOKEN' + JSON.stringify(this.$route.query))
           let q = this.$route.query
           this.$log('q=', q)
-          localStorage.setItem('ktoken', q.token)
+          localStorage.setItem('k_token', q.token)
           localStorage.setItem('ktokenExpires', q.expires)
           // await this.$wait(200)
           this.userIdentifying = false
@@ -202,7 +203,7 @@ export default {
         if (this.login.length < 3) throw new Error('Short login/email/phone!')
         this.userIdentifying = true
         await this.$wait(500)
-        let res = await this.$store.dispatch('auth/userIdentify', this.login)
+        let res = await AuthApi.userIdentify(this.login)
         this.$log('userIdentify done', res)
         this.userIdentifying = false
         this.userIdentified = true
@@ -235,7 +236,8 @@ export default {
         this.$q.notify('userAuthenticate' + this.password + '/' + this.inviteCode)
         this.$log('userAuthenticate password', this.password)
         this.$log('userAuthenticate inviteCode', this.inviteCode)
-        let res = await this.$store.dispatch('auth/userAuthenticate', {password: this.password, inviteCode: this.inviteCode})
+        let res = await AuthApi.userAuthenticate(this.password, this.inviteCode)
+        // let res = await this.$store.dispatch('auth/userAuthenticate', {password: this.password, inviteCode: this.inviteCode})
         this.$log('userAuthenticate done', res)
         this.userAuthenticating = false
         this.userAuthenticated = true

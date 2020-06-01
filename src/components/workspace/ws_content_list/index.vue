@@ -106,6 +106,8 @@ import contentItem from './content_item'
 import contentItemMini from './content_item_mini'
 import contentItemMaxi from './content_item_maxi'
 
+import { ContentApi } from 'src/api/content'
+import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'wsContentList',
   components: {contentItem, contentItemMini, contentItemMaxi},
@@ -191,7 +193,6 @@ export default {
     contentEditorOpened: {
       handler (to, from) {
         this.$log('contentEditorOpened CHANGED', to)
-        this.$store.commit('workspace/stateSet', ['showFooter', !to])
       }
     }
   },
@@ -212,7 +213,7 @@ export default {
     async contentDelete (content, ci) {
       this.$log('contentDelete', content, ci)
       if (!confirm('Delete content ?!')) return
-      await this.$rxdb.deleteItem(content.id)
+      await this.$rxdb.remove(content.id)
     },
     layerChoose ([content, li]) {
       this.$log('layerChoose', content, li)
@@ -227,7 +228,12 @@ export default {
     },
     async contentAdd (content) {
       this.$log('contentAdd content', content)
-      let contentFind = await this.$rxdb.findWs('WS_CONTENT', {selector: {contentOid: content.oid}})
+      let {items: contentFind} = await this.$rxdb.find({
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+          oid: content.oid
+        }
+      })
       this.$log('contentAdd contentFind', contentFind)
       // create rxDoc
       if (contentFind.length === 0) {
@@ -246,7 +252,9 @@ export default {
           }
         }
         this.$log('contentAdd contentInput', contentInput)
-        return await this.$rxdb.upsertItem(contentInput)
+        let res = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
+        this.$log('contentAdd res', res)
+        return res
       } else {
         return contentFind[0]
       }
@@ -254,7 +262,7 @@ export default {
     async contentFromURL (url) {
       try {
         this.$log('contentFromURL start', url)
-        let content = await this.$store.dispatch('content/contentCreateFromUrl', url)
+        let content = await ContentApi.contentCreateFromUrl(url)
         this.$log('contentFromURL done')
         return content
       } catch (e) {

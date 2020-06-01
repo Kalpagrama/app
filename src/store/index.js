@@ -1,18 +1,10 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import workspace from './workspace'
 import core from './core'
-import cache from './cache'
-import node from './node'
-import auth from './auth'
 import ui from './ui'
-import events from './events'
-import objects from './objects'
-import user from './user'
-import lists from './lists'
-import content from './content'
 import i18next from 'i18next'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
@@ -21,57 +13,55 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX)
 
 Vue.use(Vuex)
 
+// var currentUser = null
+// function getCurrentUser () {
+//   return currentUser
+// }
+
 // todo action currentUser instead of mutation!!!!
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      cache,
-      workspace,
       core,
-      node,
-      auth,
-      ui,
-      events,
-      objects,
-      user,
-      lists,
-      content
+      ui
     },
     strict: process.env.DEV,
+    state: {
+      currentUser: null
+    },
+    mutations: {
+      setCurrentUser (state, user) {
+        state.currentUser = user
+      }
+    },
     actions: {
       init: async (context) => {
-        // logD('vuex init')
-        // await context.dispatch('cache/init') cache инициализируется в boot модуле
+        // await context.dispatch('auth/init')
+        // let userIsConfirmed = context.state.auth.userIsConfirmed
+        // if (!userIsConfirmed) return false
+        // await context.dispatch('user/init')
+        // // let user = context.getters.currentUser
+        // logD('user = ', user, context.state.auth)
+        // assert(user && context.state.auth.userIsConfirmed, 'user && context.state.auth.userIsConfirmed')
+        if (!localStorage.getItem('k_user_oid')) return false
+        logD('before rxdb.init')
+        await rxdb.init(localStorage.getItem('k_user_oid'))
+        // context.state.currentUser =
+        context.commit('setCurrentUser', await rxdb.get(RxCollectionEnum.OBJ, localStorage.getItem('k_user_oid')))
+        logD('currentUser', context.state.currentUser)
+        assert(context.state.currentUser, '!currentUser')
+        logD('after rxdb.init')
 
-        await context.dispatch('auth/init')
-        let userIsConfirmed = context.state.auth.userIsConfirmed
-        if (!userIsConfirmed) return false
-
-        await context.dispatch('user/init')
-        let user = context.getters.currentUser
-        assert(user && context.state.auth.userIsConfirmed)
-
-        await context.dispatch('events/init')
         await context.dispatch('core/init')
-        await context.dispatch('node/init')
-        await context.dispatch('objects/init')
-        await context.dispatch('workspace/init', user.wsRevision)
-        await context.dispatch('lists/init')
-        await context.dispatch('content/init')
-        await i18next.changeLanguage(user.profile.lang)
+        await i18next.changeLanguage(context.state.currentUser.profile.lang)
         // logD('vuex init done!')
         return true
       }
     },
     getters: {
       currentUser: (state, getters, rootState, rootGetters) => {
-        // logD('state.auth.userOid', state.auth.userOid)
-        // if (!state.auth.userOid) return null
-        assert(state.auth.userOid, 'empty user oid!' + state.auth.userOid)
-        let user = state.cache.cachedItems[state.auth.userOid]
-        // в момент очистки кэша - юзера нет, а запросы от форм - идут! т.o. может вернуться null
-        // assert(user, 'user not in cache!!!!')
-        return user
+        logD('getter currentUser', state.currentUser)
+        return state.currentUser
       }
     }
   })

@@ -21,18 +21,19 @@ div(
       objectFit: 'contain'
     }`
     ).full-width
-  player-video(
-    v-if="composition && active"
-    :ctx="ctx" :composition="composition"
-    :visible="visible" :active="active" :mini="mini")
-    template(
-      v-for="(_, scopedSlotName) in $scopedSlots"
-      v-slot:[scopedSlotName]="slotData")
-      slot(:name="scopedSlotName" v-bind="slotData")
+  //- player-video(
+  //-   v-if="composition && active"
+  //-   :ctx="ctx" :composition="composition"
+  //-   :visible="visible" :active="active" :mini="mini")
+  //-   template(
+  //-     v-for="(_, scopedSlotName) in $scopedSlots"
+  //-     v-slot:[scopedSlotName]="slotData")
+  //-     slot(:name="scopedSlotName" v-bind="slotData")
 </template>
 
 <script>
 import playerVideo from './player_video'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'composition',
@@ -73,7 +74,7 @@ export default {
             this.composition = to
           }
           else {
-            this.composition = await this.$store.dispatch('objects/get', {oid: to.oid})
+            this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
           }
         }
       }

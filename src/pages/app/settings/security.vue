@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import { logout } from 'src/api/auth'
+
 export default {
   name: 'pageApp__Settings__Security',
   data () {
@@ -50,7 +52,7 @@ export default {
       return this.$store.getters.currentUser.sessions
     },
     mytoken () {
-      let str = localStorage.getItem('ktoken')
+      let str = localStorage.getItem('k_token')
       // let newstr = str.split('::')[0]
       return str
     }
@@ -59,7 +61,7 @@ export default {
     async deleteSession (token) {
       // this.tokenString = token
       this.$log('delete start')
-      let res = await this.$store.dispatch('auth/logout', token)
+      let res = await logout(token)
       this.$log('deleted done', res)
       this.$q.notify({message: 'Session deleted', color: 'green', textColor: 'white'})
     }

@@ -82,6 +82,8 @@ div(:style=`{}`).column.fit.b-50
 </template>
 
 <script>
+  import { AuthApi } from 'src/api/auth'
+
 export default {
   name: 'kalpaMenu',
   data () {
@@ -104,17 +106,17 @@ export default {
       this.$log('refresh')
       this.refreshLoading = true
       await this.$wait(1000)
-      await this.$store.dispatch('cache/clear')
-      window.location.reload(true)
+      await this.$rxdb.clearAll()
+      // await this.$store.dispatch('cache/clear')
+      // window.location.reload(true)
       this.refreshLoading = false
     },
     async logout () {
       this.$log('logout')
       if (!confirm('Really logout ?')) return
       this.logoutLoading = true
-      await this.$wait(1000)
-      await this.$store.dispatch('cache/clear')
-      await this.$store.dispatch('auth/logout')
+      await this.$wait(500)
+      await AuthApi.logout()
       this.logoutLoading = false
     }
   }

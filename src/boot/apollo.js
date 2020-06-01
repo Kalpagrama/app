@@ -2,7 +2,7 @@ import { ApolloClient } from 'apollo-client'
 import { ApolloLink } from 'apollo-link'
 import { onError } from 'apollo-link-error'
 import { InMemoryCache, IntrospectionFragmentMatcher } from 'apollo-cache-inmemory'
-import introspectionQueryResultData from '../schema/graphql.schema.json'
+import introspectionQueryResultData from '../api/graphql.schema.json'
 import { createHttpLink } from 'apollo-link-http'
 // import VueApollo from 'vue-apollo'
 // import { persistCache } from 'apollo-cache-persist'
@@ -11,9 +11,11 @@ import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
 import assert from 'assert'
+import { rxdb, RxCollectionEnum} from 'src/system/rxdb'
 
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { cache } from 'src/boot/cache'
+import { AuthApi } from 'src/api/auth'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
@@ -24,14 +26,13 @@ export default async ({ Vue, store, app }) => {
   // Vue.use(VueApollo)
   let SERVICES_URL = (process.env.NODE_ENV === 'development' ? process.env.SERVICES_URL_DEBUG : process.env.SERVICES_URL)
   // SERVICES_URL = SERVICES_URL || 'https://dev.kalpa.app/graphql'
-  logD('process.env2=', process.env)
-  logD('SERVICES_URL2=', SERVICES_URL)
-  store.commit('auth/stateSet', ['SERVICES_URL', SERVICES_URL])
+  logD('SERVICES_URL=', SERVICES_URL)
   const errLink = onError(({ operation, response, graphQLErrors, networkError }) => {
     if (graphQLErrors) {
       for (let err of graphQLErrors) {
         logE('gql error', err)
         err.message = err.code + ':' + err.message
+        if (err.code === 'USER_NOT_AUTH') AuthApi.logout(localStorage.getItem('k_token'))
       }
     }
     if (networkError) {
@@ -75,7 +76,7 @@ export default async ({ Vue, store, app }) => {
     link: createHttpLink({
       uri: SERVICES_URL,
       fetch (uri, options) {
-        const d = localStorage.getItem('kdebug')
+        const d = localStorage.getItem('k_debug')
         if (d) options.headers['X-Kalpagramma-debug'] = d
         return fetch(uri, options)
       }
@@ -84,47 +85,30 @@ export default async ({ Vue, store, app }) => {
     cache
   })
 
-  const fetchItemFunc = async () => {
-    let { data: { services } } = await servicesApollo.query({
-      query: gql`query {
-        services {
-          authUrl
-          apiUrl
-          uploadUrl
-          subscriptionsUrl
-          oAuthUrlYandex
-          oAuthUrlVk
-          oAuthUrlGoogle
-          oAuthUrlGithub
-          oAuthUrlFacebook
-        }
-      }`
-    })
+  const fetchFunc = async () => {
     return {
-      item: services,
-      actualAge: 'zero'
+      notEvict: true, // живет вечно
+      item: await AuthApi.services(servicesApollo),
+      actualAge: 'day'
     }
   }
-  let services = await store.dispatch('cache/get', { key: 'services', fetchItemFunc }, { root: true })
-  // logD('objects/get action complete', oid)
+
+  let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', {fetchFunc, clientFirst: false})
 
   logD('services', services)
   let linkAuth = services.authUrl
   let linkApi = services.apiUrl
   let linkWs = services.subscriptionsUrl
   let linkUpload = services.uploadUrl
-  store.commit('auth/stateSet', ['services', services])
-  // store.commit('auth/stateSet', ['AUTH_URL', services.authUrl])
-  // store.commit('auth/stateSet', ['AUTH_VK', services.oAuthUrlVk])
-  // store.commit('auth/stateSet', ['AUTH_GOOGLE', services.oAuthUrlGoogle])
   const authApollo = new ApolloClient({
     link: ApolloLink.from([
       errLink,
       createHttpLink({
         uri: linkAuth,
         fetch (uri, options) {
-          const token = localStorage.getItem('ktoken')
-          const d = localStorage.getItem('kdebug')
+          // logD('authApollo::fetch', localStorage.getItem('k_token'))
+          const token = localStorage.getItem('k_token')
+          const d = localStorage.getItem('k_debug')
           if (token) options.headers.Authorization = token
           if (d) options.headers['X-Kalpagramma-debug'] = d
           return fetch(uri, options)
@@ -141,8 +125,8 @@ export default async ({ Vue, store, app }) => {
       createHttpLink({
         uri: linkApi,
         fetch (uri, options) {
-          const token = localStorage.getItem('ktoken')
-          const d = localStorage.getItem('kdebug')
+          const token = localStorage.getItem('k_token')
+          const d = localStorage.getItem('k_debug')
           if (token) options.headers.Authorization = token
           if (d) options.headers['X-Kalpagramma-debug'] = d
           return fetch(uri, options)
@@ -165,8 +149,8 @@ export default async ({ Vue, store, app }) => {
           lazy: true,
           connectionParams: () => {
             return {
-              Authorization: localStorage.getItem('ktoken'),
-              'X-Kalpagramma-debug': localStorage.getItem('kdebug')
+              Authorization: localStorage.getItem('k_token'),
+              'X-Kalpagramma-debug': localStorage.getItem('k_debug')
             }
           }
         }
@@ -181,8 +165,8 @@ export default async ({ Vue, store, app }) => {
       createUploadLink({
         uri: linkUpload,
         fetch (uri, options) {
-          const token = localStorage.getItem('ktoken')
-          const d = localStorage.getItem('kdebug')
+          const token = localStorage.getItem('k_token')
+          const d = localStorage.getItem('k_debug')
           if (token) options.headers.Authorization = token
           if (d) options.headers['X-Kalpagramma-debug'] = d
           return fetch(uri, options)

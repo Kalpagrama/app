@@ -3,6 +3,8 @@ user-explorer(v-if="user" :user="user" :loading="userLoading")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'pageApp-user',
   data () {
@@ -31,7 +33,7 @@ export default {
       try {
         this.$log('userLoad start', oid)
         this.userLoading = true
-        let user = await this.$store.dispatch('objects/get', {oid})
+        let user = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
         this.$log('userLoad user', user)
         this.userLoading = false
         this.userLoadingError = null

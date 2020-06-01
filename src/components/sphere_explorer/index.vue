@@ -52,7 +52,7 @@ q-layout(view="hHh lpR fFf")
   //- page
   q-page-conainter(:style=`{height: $q.screen.height-60+'px'}`)
     q-page(:style=`{height: $q.screen.height+'px'}`).row.full-width.justify-center
-      kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
+      kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
         template(v-slot=`{items}`)
           list-masonry(
             ref="listMasonry" :items="items"

@@ -7,6 +7,7 @@ node-layout-pip(
 <script>
 // :is="`node-layout-${layout || node.layout}`"
 import nodeLayoutPip from './layout_pip'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeIndex',
@@ -47,7 +48,7 @@ export default {
       // this.$log('nodeLoad start', this.node.oid)
       let nodeFull = null
       try {
-        nodeFull = await this.$store.dispatch('objects/get', { oid: this.node.oid, priority: 0 })
+        nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
       } catch (err) {
         this.$emit('meta', ['error', 'nodeLoad'])
       }

@@ -50,18 +50,21 @@ div(
 
 <script>
 // TODO: search from WS in your spheres...
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'editSpheres',
   props: ['node'],
   data () {
     return {
+      nodeCategories: [],
       searchString: '',
       showSpheresFromWs: false
     }
   },
   computed: {
     categories () {
-      return this.$store.state.node.categories.reduce((acc, val) => {
+      return this.nodeCategories.reduce((acc, val) => {
         if (val.type !== 'ALL') {
           acc.push({
             value: val.type,
@@ -102,6 +105,10 @@ export default {
       this.$log('sphereDelete')
       this.$delete(this.node.spheres, si)
     }
+  },
+  async beforeCreate () {
+    this.$log('beforeCreate')
+    this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
   }
 }
 </script>

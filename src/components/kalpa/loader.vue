@@ -76,34 +76,25 @@ export default {
       sortStrategy = sortStrategy || 'HOT'
       // get res
       let res
+      let mangoQuery = {selector: {rxCollectionEnum: this.type}}
       let rxQuery
       switch (this.type) {
-        case 'sphereNodes' :
-          res = await this.$store.dispatch('lists/sphereNodes', { oid, pagination, filter, sortStrategy })
+        case 'LST_SPHERE_NODES' :
+        case 'LST_NODE_NODES' :
+          mangoQuery.selector.oid = oid
           break
-        case 'feed' :
-          res = await this.$store.dispatch('lists/feed', { oid, pagination, filter, sortStrategy })
-          break
-        case 'nodeNodes' :
-          res = await this.$store.dispatch('lists/nodeNodes', { oid, pagination, filter, sortStrategy })
-          break
+        case 'LST_FEED' :
         case 'WS_CONTENT' :
         case 'WS_NODE':
         case 'WS_SPHERE':
-          this.$log('items find...')
-          this.items = await this.$rxdb.findWs(this.type, variables)
           break
         default: throw new Error(`Unknown kalpaLoader.type ${this.type}`)
       }
-
-      if (res) {
-        let { items, count, totalCount, nextPageToken } = res
-        this.query = res
-        this.items = items
-        this.nextPageToken = nextPageToken
-        this.totalCount = totalCount
-        this.itemsCount = items.length
-      }
+      let { items, count, totalCount, nextPageToken } = await this.$rxdb.find(mangoQuery)
+      this.items = items
+      this.nextPageToken = nextPageToken
+      this.totalCount = totalCount
+      this.itemsCount = items.length
     }
   }
 }

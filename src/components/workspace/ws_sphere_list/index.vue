@@ -49,6 +49,7 @@ div(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'wsSphereList',
   props: {
@@ -109,7 +110,7 @@ export default {
         name: this.searchString,
         color: ''
       }
-      let res = await this.$rxdb.upsertItem(sphereInput)
+      let res = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
       // let sphereColor = this.$randomColor(res.id)
       if (res.color.length === 0) res.color = this.$randomColor(res.id)
       this.$log('res', res)

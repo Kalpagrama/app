@@ -41,6 +41,8 @@ div(
 </template>
 
 <script>
+import { WorkspaceApi } from 'src/api/workspace'
+
 export default {
   name: 'wsSettings',
   data () {
@@ -51,10 +53,9 @@ export default {
     async wsClear () {
       if (!confirm('Do really want to clear your workspace?')) return
       this.$log('wsClear start')
-      await this.$rxdb.clearModule('WS')
-      let wsClear = await this.$store.dispatch('workspace/wsClear')
+      let wsClear = await WorkspaceApi.wsClear()
       this.$log('wsClear done', wsClear)
-      window.location.reload()
+      // window.location.reload()
     },
     wsExport () {
       this.$log('wsExport')

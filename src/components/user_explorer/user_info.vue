@@ -43,6 +43,7 @@ div(:style=`{}`).row.full-width.items-start.content-start.justify-center.b-30
 
 <script>
 import userSettings from './user_settings'
+import { UserApi } from 'src/api/user'
 
 export default {
   name: 'pageAppUser_userInfo',
@@ -68,7 +69,7 @@ export default {
     async userFollow () {
        try {
         this.$log('userFollow start', this.user.oid)
-        let res = await this.$store.dispatch('user/subscribe', this.user.oid)
+        let res = await UserApi.subscribe(this.user.oid)
         // this.user = await this.userLoad(this.$route.params.oid)
         this.$log('userFollow done', res)
       } catch (error) {
@@ -78,7 +79,7 @@ export default {
     async userUnfollow () {
       try {
         this.$log('userUnfollow start')
-        let res = await this.$store.dispatch('user/unSubscribe', this.user.oid)
+        let res = await UserApi.unSubscribe(this.user.oid)
         // this.$delete(this.userSubscriptions, ss)
         // this.user = await this.userLoad(this.$route.params.oid)
         this.$log('userUnfollow done', res)

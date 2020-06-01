@@ -62,6 +62,7 @@ q-layout(view="hHh Lpr lff").bg-30
 // import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
+import assert from 'assert'
 
 export default {
   name: 'mainLayout',
@@ -95,7 +96,7 @@ export default {
     let token = this.$route.query.token
     let expires = this.$route.query.expires
     if (token) {
-      localStorage.setItem('ktoken', token)
+      localStorage.setItem('k_token', token)
       localStorage.setItem('ktokenExpires', expires)
       await this.$router.push('/').catch(e => e)
     }
@@ -104,8 +105,6 @@ export default {
       // alert('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
     } else { // залогинились
-      // await this.$rxdb.init(localStorage.getItem('userRole')) // workspace, etc...
-      await this.$rxdb.init() // workspace, user, cache etc...
       // go to welcome...
       if (this.$store.getters.currentUser.profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     }

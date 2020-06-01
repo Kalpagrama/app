@@ -28,19 +28,24 @@ const LogLevelEnum = Object.freeze({
 Object.freeze(LogLevelEnum)
 const LogModulesEnum = Object.freeze({
   SW: 'sw',
+  AUTH: 'auth',
+  GQL: 'gql',
   VUEX: 'vx',
-  VUEX_WS: 'vx_ws',
   VUEX_CACHE: 'vx_cache',
-  VUEX_OBJECTS: 'vx_obj',
   RXDB: 'rxdb',
+  RXDB_REACTIVE: 'rxdb_reactive',
   RXDB_WS: 'rxdb_ws',
+  RXDB_CACHE: 'rxdb_cache',
+  RXDB_OBJ: 'rxdb_obj',
+  RXDB_LST: 'rxdb_lst',
+  RXDB_EVENT: 'rxdb_ev',
   BOOT: 'boot',
   ML: 'mainLayout',
   CP: 'capacitor'
 })
 Object.freeze(LogModulesEnum)
 
-const showAlert = false
+const showAlert = true
 
 class Logger {
   constructor (store) {
@@ -67,15 +72,24 @@ class Logger {
     return loggerModule
   }
 
-  prepareParams(msg, notice){
+  prepareParams(msg, highlightColor, textColor){ // #69f542
     let func = null
-    if (msg.length && notice){
-      msg.splice(0, 0, `%c<<${notice}>>`, 'color: #ff0000')
-    }
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55')
+      if (highlightColor)msg.splice(0, 1, `%c[${func.name}]`, `background: ${highlightColor}; color: ${textColor}`)
+      else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55')
+    } else if (highlightColor) {
+      msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`)
     }
+  }
+
+  showAlert(msg){
+    let func = null
+    let message = msg[0]
+    if (msg.length && typeof msg[0] === 'function') {
+      message = msg[1]
+    }
+    alert('ERR! \n' + JSON.stringify(message))
   }
 
   debug (module, ...msg) {
@@ -103,7 +117,7 @@ class Logger {
   warn (module, ...msg) {
     if (this.store.state.core.logModulesBlackList.includes(module)) return
     if (LogLevelEnum.WARNING >= this.store.state.core.logLevel) {
-      this.prepareParams(msg)
+      this.prepareParams(msg, 'Yellow', 'Black')
       this.getLoggerFunc(module)(...msg)
     }
     if (LogLevelEnum.WARNING >= this.store.state.core.logLevelSentry) {
@@ -113,15 +127,13 @@ class Logger {
 
   error (module, ...msg) {
     try {
+      if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevel) {
-        this.prepareParams(msg, 'ERROR')
+        this.prepareParams(msg, 'Red', 'Lime')
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry) {
         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Error)
-      }
-      if (showAlert) {
-        alert('error! \n' + JSON.stringify(msg))
       }
     } catch (err) {
       console.error('error on logging error!!!', err)
@@ -131,14 +143,14 @@ class Logger {
 
   critical (module, ...msg) {
     try {
+      if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
-        this.prepareParams(msg, 'CRITICAL')
+        this.prepareParams(msg, 'Red', 'Lime')
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry) {
         // Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Critical)
       }
-      if (showAlert) alert('critical! \n' + JSON.stringify(msg))
     } catch (err) {
       console.error('error on logging error!!!', err)
       if (showAlert) alert('error on log error! \n' + JSON.stringify(err))

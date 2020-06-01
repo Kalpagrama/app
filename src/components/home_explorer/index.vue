@@ -29,7 +29,7 @@ q-layout(view="hHh lpR fFf").b-30
   //- page
   q-page-conainter
     q-page
-      kalpa-loader(v-if="sphereOid" type="sphereNodes" :variables="variables")
+      kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
         template(v-slot=`{items}`)
           list-middle(:items="items" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`)
             template(v-slot:item=`{item, index, indexMiddle}`)

@@ -81,6 +81,7 @@ div(
 
 <script>
 import nodeItem from './node_item'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsNodeLsit',
@@ -117,7 +118,6 @@ export default {
     nodeEditorOpened: {
       handler (to, from) {
         this.$log('nodeEditorOpened CHANGED', to)
-        this.$store.commit('workspace/stateSet', ['showFooter', !to])
       }
     }
   },
@@ -134,7 +134,7 @@ export default {
     async nodeDelete (node) {
       this.$log('nodeDelete', node)
       if (!confirm('Delete node ?!')) return
-      await this.$rxdb.deleteItem(node.id)
+      await this.$rxdb.remove(node.id)
     },
     async nodeAdd (nodeInput) {
       this.$log('nodeAdd start')
@@ -149,7 +149,7 @@ export default {
           stage: 'draft'
         }
       }
-      let item = await this.$rxdb.upsertItem(nodeInput)
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeAddStart item', item)
       this.searchString = ''
       this.nodeChoose(item)

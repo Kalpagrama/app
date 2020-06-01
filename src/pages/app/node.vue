@@ -3,6 +3,8 @@ node-explorer(:node="node")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'pageApp-node',
   data () {
@@ -29,7 +31,7 @@ export default {
       try {
         this.$log('nodeLoad start', oid)
         this.nodeLoading = true
-        let sphere = await this.$store.dispatch('objects/get', { oid, priority: 0 })
+        let sphere = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
         this.$log('nodeLoad sphere', sphere)
         this.nodeLoading = false
         this.nodeLoadingError = null

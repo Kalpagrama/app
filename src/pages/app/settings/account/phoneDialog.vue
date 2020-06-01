@@ -49,12 +49,13 @@ export default {
     async changePhone () {
       try {
         this.$log('changePhone start')
-        let res = await this.$store.dispatch('objects/update', {
-          oid: this.$store.getters.currentUser.oid,
-          path: 'profile.phone',
-          newValue: '+7 ' + this.newPhone
-        })
-        this.$log('changePhone done', res)
+        // todo
+        // let res = await this.$store.dispatch('objects/update', {
+        //   oid: this.$store.getters.currentUser.oid,
+        //   path: 'profile.phone',
+        //   newValue: '+7 ' + this.newPhone
+        // })
+        this.$log('changePhone done')
         this.$q.notify({message: 'Changed PHONE', color: 'green', textColor: 'white'})
       } catch (e) {
         this.$log('changePhone ERROR', e)

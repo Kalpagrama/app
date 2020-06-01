@@ -38,6 +38,8 @@ div(
 </template>
 
 <script>
+import { NodeApi } from 'src/api/node'
+
 export default {
   name: 'layoutPip-vote',
   props: ['oid'],
@@ -56,7 +58,7 @@ export default {
   methods: {
     async voteEnd (id) {
       this.$log('voteEnd')
-      let res = await this.$store.dispatch('node/nodeVote', {oid: this.oid, vote: id})
+      let res = await NodeApi.nodeVote(this.oid, id)
       this.$log('voteEnd', res)
       this.$emit('end')
     }

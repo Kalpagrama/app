@@ -11,11 +11,10 @@ module.exports = function (ctx) {
     boot: [
       'log',
       'rxdb',
-      'cache',
       'notify',
       'i18n',
-      'services',
       'apollo',
+      'services',
       'main',
       'filters'
     ],
@@ -135,7 +134,7 @@ module.exports = function (ctx) {
 
         cfg.resolve.alias = {
           ...cfg.resolve.alias,
-          schema: path.resolve(__dirname, './src/schema')
+          schema: path.resolve(__dirname, './src/api')
         }
       }
     },

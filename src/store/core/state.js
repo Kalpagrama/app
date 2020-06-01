@@ -5,7 +5,6 @@ export default {
   version: '2.0.0',
   online: true, // если сеть недоступна - присваивается false
   shareData: null, // данные от меню "поделиться в приложение"
-  webPushTokenDraft: null,
   newVersionAvailable: false,
   installPrompt: null, // ф-я вызова диалога "установить приложение"
   logLevel: LogLevelEnum.DEBUG,

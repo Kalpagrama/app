@@ -65,6 +65,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
 <script>
 import videoProgress from './video_progress'
 import videoController from './video_controller'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'composition-playerVideo',
@@ -146,7 +147,7 @@ export default {
         this.$log('composition CHANGED', to)
         if (to.layers.length > 0) {
           if (!this.layerId) this.layerId = to.layers[0].id
-          if (!this.layerContent) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.layers[0].contentOid})
+          if (!this.layerContent) this.layerContent = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)
           // this.$nextTick(() => {
           //   if (!this.player) {
           //     alert('playerInit')
@@ -155,7 +156,7 @@ export default {
           // })
         }
         this.$log('to.contentOid', to.contentOid)
-        if (to.contentOid) this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+        if (to.contentOid) this.layerContent = await this.$rxdb.get(RxCollectionEnum.OBJ, to.contentOid)
       }
     },
     layer: {
@@ -163,7 +164,7 @@ export default {
       async handler (to, from) {
         this.$log('layer CHANGED', to)
         if (to) {
-          this.layerContent = await this.$store.dispatch('objects/get', {oid: to.contentOid})
+          this.layerContent = await this.$rxdb.get(RxCollectionEnum.OBJ, to.contentOid)
         }
       }
     },

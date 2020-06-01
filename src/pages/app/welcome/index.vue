@@ -35,6 +35,7 @@ q-layout(
 
 <script>
 import like from './like'
+import { UserApi } from 'src/api/user'
 // import userSettings from 'pages/app/user/user_settings'
 
 export default {
@@ -51,12 +52,13 @@ export default {
     async welcomeDone () {
       this.$log('welcomeDone')
       this.loading = true
-      await this.$store.dispatch('user/setFavouriteCategories', this.types)
-      await this.$store.dispatch('objects/update', {
-        oid: this.$store.getters.currentUser.oid,
-        path: 'profile.tutorial',
-        newValue: false
-      })
+      await UserApi.setFavouriteCategories(this.types)
+      // todo
+      // await this.$store.dispatch('objects/update', {
+      //   oid: this.$store.getters.currentUser.oid,
+      //   path: 'profile.tutorial',
+      //   newValue: false
+      // })
       await this.$wait(1000)
       // TODO some account shit
       this.loading = false
