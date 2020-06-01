@@ -146,6 +146,7 @@ import {throttle} from 'quasar'
 import progressMaxi from './progress_maxi'
 import progressMini from './progress_mini'
 import progressTint from './progress_tint'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'playerVideo',
@@ -293,7 +294,7 @@ export default {
       async handler (to, from) {
         this.$log('layer CHANGED', to)
         if (to) {
-          this.content = await this.$rxdb.getObject(to.contentOid, 0)
+          this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, to.contentOid)
           // this.$nextTick(() => {
           //   if (!this.player) this.playerInit()
           // })
@@ -631,7 +632,7 @@ export default {
     // alert('mounted')
     this.$on('meta', this.onMeta)
     if (this.composition.contentOid) {
-      this.content = await this.$rxdb.getObject(this.composition.contentOid, 0)
+      this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.composition.contentOid)
     }
     // window.addEventListener('keyup', this.windowKeyup)
   },

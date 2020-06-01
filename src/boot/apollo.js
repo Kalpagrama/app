@@ -85,16 +85,15 @@ export default async ({ Vue, store, app }) => {
     cache
   })
 
-  const fetchItemFunc = async () => {
+  const fetchFunc = async () => {
     return {
       notEvict: true, // живет вечно
-      rxCollectionEnum: RxCollectionEnum.OTHER,
       item: await AuthApi.services(servicesApollo),
       actualAge: 'day'
     }
   }
 
-  let services = await rxdb.get('services', fetchItemFunc)
+  let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', {fetchFunc, clientFirst: false})
 
   logD('services', services)
   let linkAuth = services.authUrl

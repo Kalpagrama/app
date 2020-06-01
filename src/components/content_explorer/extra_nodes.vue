@@ -105,7 +105,7 @@ export default {
     this.$log('mounted')
     let { items, count, totalCount, nextPageToken } = await this.$rxdb.find({
       selector: {
-        rxCollectionEnum: RxCollectionEnum.LST_CONTENT_NODES,
+        rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
         oid: this.sphereOid
       }
     })

@@ -78,6 +78,7 @@ div(
 
 <script>
 import nodeItem from './node_item'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'wsNodeLsit',
@@ -145,7 +146,7 @@ export default {
           stage: 'draft'
         }
       }
-      let item = await this.$rxdb.setWs(nodeInput)
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeAddStart item', item)
       this.searchString = ''
       this.nodeChoose(item)

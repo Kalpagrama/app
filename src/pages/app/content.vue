@@ -3,6 +3,8 @@ content-explorer(v-if="content" :content="content")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'pageApp-content',
   data () {
@@ -29,7 +31,7 @@ export default {
   methods: {
     async contentLoad (oid) {
       this.$log('contentLoad start', oid)
-      let content = await this.$rxdb.getObject(oid, 0)
+      let content = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
       this.$log('contentLoad done', content)
       return content
     }

@@ -4,7 +4,7 @@ import Vuex from 'vuex'
 import core from './core'
 import ui from './ui'
 import i18next from 'i18next'
-import { rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 
@@ -35,7 +35,7 @@ export default function (/* { ssrContext } */) {
         if (!localStorage.getItem('k_user_oid')) return false
         logD('before rxdb.init')
         await rxdb.init(localStorage.getItem('k_user_oid'))
-        currentUser = await rxdb.getObject(localStorage.getItem('k_user_oid'), 0)
+        currentUser = await rxdb.get(RxCollectionEnum.OBJ, localStorage.getItem('k_user_oid'))
         assert(currentUser, '!currentUser')
         logD('after rxdb.init')
 

@@ -72,14 +72,14 @@ class Logger {
     return loggerModule
   }
 
-  prepareParams(msg, highlight){
+  prepareParams(msg, highlightColor, textColor){ // #69f542
     let func = null
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      if (highlight)msg.splice(0, 1, `%c[${func.name}]`, 'background: #69f542; color: #f54242')
+      if (highlightColor)msg.splice(0, 1, `%c[${func.name}]`, `background: ${highlightColor}; color: ${textColor}`)
       else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55')
-    } else if (highlight) {
-      msg.splice(0, 0, `%c[${'UNKNOWN_FUNC'}]`, 'background: #69f542; color: #f54242')
+    } else if (highlightColor) {
+      msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`)
     }
   }
 
@@ -117,7 +117,7 @@ class Logger {
   warn (module, ...msg) {
     if (this.store.state.core.logModulesBlackList.includes(module)) return
     if (LogLevelEnum.WARNING >= this.store.state.core.logLevel) {
-      this.prepareParams(msg)
+      this.prepareParams(msg, 'Yellow', 'Black')
       this.getLoggerFunc(module)(...msg)
     }
     if (LogLevelEnum.WARNING >= this.store.state.core.logLevelSentry) {
@@ -129,7 +129,7 @@ class Logger {
     try {
       if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevel) {
-        this.prepareParams(msg, true)
+        this.prepareParams(msg, 'Red', 'Lime')
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevelSentry) {
@@ -145,7 +145,7 @@ class Logger {
     try {
       if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
-        this.prepareParams(msg, true)
+        this.prepareParams(msg, 'Red', 'Lime')
         this.getLoggerFunc(module)(...msg)
       }
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevelSentry) {

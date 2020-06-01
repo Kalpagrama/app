@@ -19,6 +19,8 @@
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'sphereListTop',
   data () {
@@ -42,7 +44,7 @@ export default {
   },
   async beforeCreate () {
     this.$log('beforeCreate')
-    this.nodeCategories = await this.$rxdb.get('nodeCategories')
+    this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
   }
 }
 </script>

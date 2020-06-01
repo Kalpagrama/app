@@ -3,10 +3,8 @@ import LruCache from 'lru-cache'
 import assert from 'assert'
 import { schemaKeyValue, cacheSchema } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { Mutex, ReactiveItemHolder } from 'src/system/rxdb/reactive'
-import { WsCollectionEnum } from 'src/system/rxdb/workspace'
-import { fragments } from 'src/api'
-import { ObjectsApi } from 'src/api/objects'
+import { Mutex } from 'src/system/rxdb/reactive'
+import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_CACHE)
@@ -17,11 +15,12 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_CACHE)
 // const CachedTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST', OTHER: 'OTHER', ERROR: 'ERROR' })
 
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
-// TODO увеличить до 50 МБ после тестирования
-const lruDumpPeriod = 1000 * 60 * 8 // периодически(раз в 8 минут) сохраняем LRU в idb
+const debounceIntervalDumpLru = 1000 * 8 // сохраняем весь LRU в idb с дебаунсом 8 сек
 const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию)
-// TODO увеличить до 50 МБ после тестирования
-const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить!
+const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить до 50 МБ после тестирования
+if (defaultCacheSize < 20 * 1024 * 1024) logW('TODO увеличить кэш до 50 МБ после тестирования')
+
+const DEBUG_IGNORE_CACHE = false // если === true - брать из сети (игнорить кэш)
 
 // класс для кэширования gql запросов
 class Cache {
@@ -109,6 +108,7 @@ class Cache {
         maxAge: 0, // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
         noDisposeOnSet: true,
         dispose: async (id, { actualUntil, actualAge }) => {
+          const f = this.dispose
           if (this.lruResetInProgress) return
           assert(actualUntil && actualAge >= 0, `actualUntil && actualAge >= 0 ${actualUntil} ${actualAge}`)
           let rxDoc = await this.db.cache.findOne(id).exec()
@@ -118,6 +118,7 @@ class Cache {
                 this.cacheLru.set(id, { actualUntil, actualAge })
               }, 0)
             } else { // удалим из rxdb (освобождаем от старых данных)
+              logD(f, 'элемент вытеснен из кэша', id)
               await rxDoc.remove()
             }
           }
@@ -126,19 +127,25 @@ class Cache {
 
       // заполняем cacheLru из idb
       let lruDump = await this.db.cache_meta.findOne('lruDump').exec()
-      if (lruDump) this.cacheLru.load(JSON.parse(lruDump.value))
+      if (lruDump) {
+        lruDump = JSON.parse(lruDump.value)
+        logD(f, 'восстанавливаем Lru')
+        this.cacheLru.load(lruDump)
+      }
 
-      setInterval(async () => { // периодически сохраняем lru
+      this.debouncedDumpLru = debounce(async () => {
+        const f = this.debouncedDumpLru
+        logD(f, 'start. debouncedDumpLru')
         let lruDump = this.cacheLru.dump()
         await this.db.cache_meta.atomicUpsert({ id: 'lruDump', value: JSON.stringify(lruDump) })
-      }, lruDumpPeriod)
+      }, debounceIntervalDumpLru)
 
-      // из-за периодического сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
+      // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
       for (let rxDoc of await this.db.cache.find().exec()) {
         if (!this.cacheLru.get(rxDoc.id)) {
           this.cacheLru.set(rxDoc.id, {
-            actualUntil: Date.now() + lruDumpPeriod,
-            actualAge: lruDumpPeriod
+            actualUntil: Date.now() + debounceIntervalDumpLru,
+            actualAge: 1000 * 60
           })
         }
       }
@@ -160,11 +167,15 @@ class Cache {
     this.mutex.release()
   }
 
+  async find (mangoQuery) {
+    return await this.db.cache.find(mangoQuery).exec()
+  }
+
   // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
   //   cached: {data} data может быть как объектом, так и любым другим типом
-  async set (id, data, actualAge, notEvict, failReason) {
+  async set (id, data, actualAge, notEvict) {
     assert(this.created, '!this.created')
-    assert(id, '!id', id, data)
+    assert(id && data, '!id && data' + id + JSON.stringify(data))
     let rxCollectionEnum = getRxCollectionEnumFromId(id)
     let f = this.set
     logD(f, 'start', id)
@@ -199,21 +210,9 @@ class Cache {
         }
       }
         break
-      default: {
-        if (!Number.isInteger(actualAge)) {
-          // такой элемент уже есть в кэше оставляем что было
-          let current = this.cacheLru.get(id)
-          if (current) {
-            actualAge = Math.max(0, current.actualUntil - Date.now())
-          } else {
-            actualAge = defaultActualAge
-          }
-          assert(actualAge == null || Number.isInteger(actualAge))
-          if (actualAge == null) actualAge = defaultActualAge
-        }
-        break
-      }
+      default: throw new Error('bad actualAge:' + actualAge)
     }
+    if (DEBUG_IGNORE_CACHE) actualAge = 0 // игнорируем кэш
     assert(Number.isInteger(actualAge) && actualAge >= 0, `Number.isInteger(actualAge):${actualAge}`)
     let actualUntil = Date.now() + actualAge
     this.cacheLru.set(id, { actualUntil, actualAge }) // сохраняем в lru
@@ -222,22 +221,25 @@ class Cache {
       props: {
         notEvict,
         oid: data && data.oid ? data.oid : undefined, // есть только у RxCollectionEnum.OBJ
-        rxCollectionEnum,
-        failReason: failReason ? failReason : undefined
+        rxCollectionEnum
       },
-      cached: {data}}) // сохраняем в rxdb
+      cached: { data }
+    }) // сохраняем в rxdb
+    await this.debouncedDumpLru()
     logD(f, 'complete')
     return rxDoc
   }
 
   // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null
-  async get (id, fetchFunc, force) {
+  async get (id, fetchFunc, clientFirst = true, force = false) {
     assert(this.created, '!this.created')
     assert(id)
     let f = this.get
     logD(f, 'start', id)
+    if (DEBUG_IGNORE_CACHE) logW(f, 'DEBUG_IGNORE_CACHE is ON!!!')
     let rxDoc = await this.db.cache.findOne(id).exec()
-    let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
+    let { actualUntil, actualAge, failReason } = this.cacheLru.get(id) || {}
+    // logD(f, 'start2', force, new Date(actualUntil), new Date(Date.now()), Date.now() > actualUntil)
     if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
       if (fetchFunc) {
         let processFetchErrorFunc = async (err) => {
@@ -245,24 +247,21 @@ class Cache {
             logD(f, 'Данные не получены! запрос на сервер был отброшен(легально) по причне переполнения очереди!', err)
           } else {
             logE('Данные не получены! Произошла ошибка. Через минуту  можно пробовать еще', err)
-            let data = rxDoc ? rxDoc.cached.data : null
-            let notEvict = rxDoc ? rxDoc.notEvict : false
-            this.set(id, data, 'minute', notEvict, 'fetch error: ' + err.toString())
+            const min = 1000 * 60
+            this.cacheLru.set(id, { actualUntil: Date.now() + min, actualAge: min, failReason: 'fetch error: ' + err.toString()})
           }
         }
         let saveFunc = async (fetchRes) => {
           logD(f, 'данные с сервера получены', fetchRes)
           assert(fetchRes, '!fetchRes')
-          assert('item' in fetchRes && 'actualAge' in fetchRes && 'rxCollectionEnum' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
-          assert(fetchRes.rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum: ' + fetchRes.rxCollectionEnum)
-          assert(fetchRes.rxCollectionEnum === getRxCollectionEnumFromId(id), 'bad fetchRes.rxCollectionEnum' + fetchRes.rxCollectionEnum)
+          assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
           let notEvict = fetchRes.notEvict || false
           let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, null)
           logD(f, 'записаны в кэш')
           return res
         }
         logD(f, 'запрашиваем данные с сервера...')
-        if (rxDoc && !rxDoc.props.failReason) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
+        if (rxDoc && clientFirst) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
           fetchFunc().then(saveFunc).catch(processFetchErrorFunc)
         } else { // ждем ответа сервра
           try {
@@ -273,17 +272,22 @@ class Cache {
         }
       }
     }
-    if (!rxDoc) { // если задана fetchFunc - см "queued item was evicted legally"
-      logD(f, 'not found', rxDoc)
+    if (!rxDoc) {
+      logD(f, 'not found', rxDoc, failReason)
+      if (failReason) {
+        let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
+        let tryAfter = Math.max(0, (actualUntil - Date.now()) / 1000)
+        throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек` + failReason)
+      }
       return null
-    }
-    if (rxDoc.props.failReason) {
-      let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
-      let tryAfter = Math.max(0, (actualUntil - Date.now()) / 1000)
-      throw new Error(`При извлечении из БД произошла ошибка можно попробовать через ${Math.ceil(tryAfter)} сек` + rxDoc.props.failReason)
     }
     logD(f, 'complete')
     return rxDoc
+  }
+
+  expire(id){
+    let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
+    if (actualUntil) this.cacheLru.set(id, { actualUntil: Date.now(), actualAge: 0})
   }
 }
 

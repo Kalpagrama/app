@@ -50,6 +50,8 @@ div(
 
 <script>
 // TODO: search from WS in your spheres...
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'editSpheres',
   props: ['node'],
@@ -106,7 +108,7 @@ export default {
   },
   async beforeCreate () {
     this.$log('beforeCreate')
-    this.nodeCategories = await this.$rxdb.get('nodeCategories')
+    this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
   }
 }
 </script>

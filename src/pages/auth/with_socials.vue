@@ -18,6 +18,7 @@ div(
 <script>
   import assert from 'assert'
   import { Platform } from 'quasar'
+  import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'pageAuth-withSocials',
   data () {
@@ -34,7 +35,7 @@ export default {
   },
   methods: {
     async serviceClick (s, si) {
-      let services = await this.$rxdb.get('services')
+      let services = await this.$rxdb.get(RxCollectionEnum.OTHER, 'services')
       assert(services, '!services')
       this.$log('serviceClick', s, si, services)
       let url = services[s.id]

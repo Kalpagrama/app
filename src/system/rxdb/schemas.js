@@ -282,9 +282,6 @@ export const cacheSchema = {
         },
         rxCollectionEnum: {
           type: 'string'
-        },
-        failReason: {
-          type: 'string'
         }
       }
     },

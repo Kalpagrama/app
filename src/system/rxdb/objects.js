@@ -1,9 +1,9 @@
 // сцепляет запросы и отправляет пачкой
 import assert from 'assert'
 import { ObjectsApi } from 'src/api/objects'
-import { ReactiveItemHolder } from 'src/system/rxdb/reactive'
+import { ReactiveItemHolder, getReactive } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { getReactive, RxCollectionEnum } from 'src/system/rxdb/index'
+import { RxCollectionEnum } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_OBJ)
@@ -12,6 +12,7 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_OBJ)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
+const QUEUE_MAX_SZ = 50 // todo change to 20
 class QueryAccumulator {
   constructor () {
     this.queueMaster = []
@@ -26,7 +27,7 @@ class QueryAccumulator {
       let queueMaxSz = 0
       if (priority === 0) {
         queue = this.queueMaster
-        queueMaxSz = 20
+        queueMaxSz = QUEUE_MAX_SZ
       } else if (priority === 1) {
         queue = this.queueSecondary
         queueMaxSz = 4
@@ -53,7 +54,6 @@ class QueryAccumulator {
       for (let { oid, resolve, reject } of queue) {
         if (oid === object.oid) {
           let result = {
-            rxCollectionEnum: RxCollectionEnum.OBJ,
             item: object,
             actualAge: 'hour'
           }
@@ -221,6 +221,15 @@ function makeObjectCacheId(item){
   assert(item && item.oid, '!oid' + JSON.stringify(item))
   return RxCollectionEnum.OBJ + '::' + item.oid
 }
+
+function getOidFromId(id){
+  assert(id, '!id')
+  let parts = id.split('::')
+  assert(parts.length === 2, 'bad id' + id)
+  let oid = parts[1]
+  assert(oid, '!oid')
+  return oid
+}
 // класс для запроса списков и отдельных объектов
 class Objects {
   constructor (cache) {
@@ -245,40 +254,37 @@ class Objects {
 
   // Вернет объект из кэша, либо запросит его. и вернет промис, который ВОЗМОЖНО когда-то выполнится(когда дойдет очередь);
   // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
-  // priority 0 - будут выполнены 20 последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
+  // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
-  async findOneQueue (oid, priority) {
+  async get (id, priority) {
     const fetchFunc = async () => {
-      let promise = this.queryAccumulator.push(oid, priority)
+      let promise = this.queryAccumulator.push(getOidFromId(id), priority)
       return await promise
     }
-    let rxDoc = await this.cache.get(makeObjectCacheId({oid}), fetchFunc)
+    let rxDoc = await this.cache.get(id, fetchFunc)
     if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')
     return getReactive(rxDoc)
   }
 
-  // от сервера прилетел эвент
+  // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    if (!this.cache.isLeader) return
     const f = this.processEvent
-    logD(f, 'start')
+    logD(f, 'start', this.cache.isLeader)
+    if (!this.cache.isLeader) return
     switch (event.type) {
       case 'OBJECT_CHANGED': {
         let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
         if (rxDoc) {
-          if (!event.path) {
-            await rxDoc.atomicUpdate(old => event.value)
-          } else {
-            await rxDoc.atomicSet(event.path, event.value)
-          }
+          const path = event.path ? 'cached.data.' + event.path : 'cached.data'
+          await rxDoc.atomicSet(path, event.value)
         }
         break
       }
       case 'VOTED': {
         let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
         if (rxDoc) {
-          await rxDoc.atomicSet('rate', event.rate)
+          await rxDoc.atomicSet('cached.data.rate', event.rate)
         }
         break
       }

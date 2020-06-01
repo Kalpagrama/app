@@ -24,7 +24,6 @@ class ListsApi {
         res = await ListsApi.sphereSpheres(mangoQuery.selector.oid, pagination)
         break
       case RxCollectionEnum.LST_SPHERE_NODES:
-      case RxCollectionEnum.LST_CONTENT_NODES:
       case RxCollectionEnum.LST_NODE_NODES:
         assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
         res = await ListsApi.sphereNodes(mangoQuery.selector.oid, pagination)
@@ -33,59 +32,59 @@ class ListsApi {
         assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
         res = await ListsApi.userSubscribers(mangoQuery.selector.oid, pagination)
         break
-      case RxCollectionEnum.LST_USER_SUBSCRIBES:
+      case RxCollectionEnum.LST_USER_SUBSCRIPTIONS:
         assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
         res = await ListsApi.userSubscriptions(mangoQuery.selector.oid, pagination)
         break
       default:
         throw new Error('bad rxCollectionEnum: ' + rxCollectionEnum)
     }
-    if (rxCollectionEnum === RxCollectionEnum.LST_CONTENT_NODES) {
-      // вернет ядра контента относительно метки времени (nodeList).
-      // nodeList может изменится в после одного из последующих вызовов getIdx
-      // getIdx - вернет индекс ядра в nodeList
-      // getT - вернет время на контенте на основе индекса ядра
-      // contentNodes - вызывается один раз (при инициализации окна контента)
-      // getIdx - может вызываться не более чем раз в секунду (иногда этот вызов приведет к тому, что данные дозапросятся и дополнят nodeList)
-
-      // вернет расстояние от t до начала ядра. началом ядра считается начало первого по списку слоя с этим(contentOid) контентом
-      const getDistance = (contentOid, t, node) => {
-        assert(contentOid && node, 'contentOid && node')
-        assert(node.meta && node.meta.items && node.meta.items.length > 0, 'node.meta && node.meta.items && node.meta.items.length > 0')
-        // ищем первый layer на этот контент
-        for (let c of node.meta.items) {
-          assert(c.layers, 'c.layers')
-          for (let l of c.layers) {
-            assert(l.figuresAbsolute, 'l.figuresAbsolute')
-            assert(l.contentOid)
-            if (l.contentOid === contentOid) {
-              assert(l.figuresAbsolute.length, 'l.figuresAbsolute.length')
-              let nodeStart = l.figuresAbsolute[0].t
-              return Math.abs(nodeStart - t)
-            }
-          }
-        }
-        return Infinity
-      }
-      let nodeList = res.items
-      let contentOid = mangoQuery.selector.oid
-      res.getIdx = (t) => {
-        // todo запрашивать новые порции данных
-        for (let i = 0; i < nodeList.length; i++) {
-          let distance, nextDistance
-          distance = getDistance(contentOid, t, nodeList[i])
-          if (i + 1 < nodeList.length) nextDistance = getDistance(contentOid, t, nodeList[i + 1])
-          if (!nextDistance || nextDistance > distance) return i
-        }
-        // let tRounded = Math.round(t / 60) * 60 // округляем до ближайшей минуты (для того чтобы ключ для sphereItems не получался каждый раз - разным)
-        return -1
-      }
-      res.getT = (indx) => {
-        // todo запрашивать новые порции данных
-        assert(indx >= 0 && indx < nodeList.length, 'indx && indx < nodeList.length')
-        return getDistance(contentOid, 0, nodeList[indx])
-      }
-    }
+    // if (rxCollectionEnum === RxCollectionEnum.LST_CONTENT_NODES) {
+    //   // вернет ядра контента относительно метки времени (nodeList).
+    //   // nodeList может изменится в после одного из последующих вызовов getIdx
+    //   // getIdx - вернет индекс ядра в nodeList
+    //   // getT - вернет время на контенте на основе индекса ядра
+    //   // contentNodes - вызывается один раз (при инициализации окна контента)
+    //   // getIdx - может вызываться не более чем раз в секунду (иногда этот вызов приведет к тому, что данные дозапросятся и дополнят nodeList)
+    //
+    //   // вернет расстояние от t до начала ядра. началом ядра считается начало первого по списку слоя с этим(contentOid) контентом
+    //   const getDistance = (contentOid, t, node) => {
+    //     assert(contentOid && node, 'contentOid && node')
+    //     assert(node.meta && node.meta.items && node.meta.items.length > 0, 'node.meta && node.meta.items && node.meta.items.length > 0')
+    //     // ищем первый layer на этот контент
+    //     for (let c of node.meta.items) {
+    //       assert(c.layers, 'c.layers')
+    //       for (let l of c.layers) {
+    //         assert(l.figuresAbsolute, 'l.figuresAbsolute')
+    //         assert(l.contentOid)
+    //         if (l.contentOid === contentOid) {
+    //           assert(l.figuresAbsolute.length, 'l.figuresAbsolute.length')
+    //           let nodeStart = l.figuresAbsolute[0].t
+    //           return Math.abs(nodeStart - t)
+    //         }
+    //       }
+    //     }
+    //     return Infinity
+    //   }
+    //   let nodeList = res.items
+    //   let contentOid = mangoQuery.selector.oid
+    //   res.getIdx = (t) => {
+    //     // todo запрашивать новые порции данных
+    //     for (let i = 0; i < nodeList.length; i++) {
+    //       let distance, nextDistance
+    //       distance = getDistance(contentOid, t, nodeList[i])
+    //       if (i + 1 < nodeList.length) nextDistance = getDistance(contentOid, t, nodeList[i + 1])
+    //       if (!nextDistance || nextDistance > distance) return i
+    //     }
+    //     // let tRounded = Math.round(t / 60) * 60 // округляем до ближайшей минуты (для того чтобы ключ для sphereItems не получался каждый раз - разным)
+    //     return -1
+    //   }
+    //   res.getT = (indx) => {
+    //     // todo запрашивать новые порции данных
+    //     assert(indx >= 0 && indx < nodeList.length, 'indx && indx < nodeList.length')
+    //     return getDistance(contentOid, 0, nodeList[indx])
+    //   }
+    // }
     return res
   }
 
@@ -170,7 +169,7 @@ class ListsApi {
   }
 
   static async userSubscriptions (oid, pagination) {
-    let user = await rxdb.getObject(oid, 0)
+    let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
     assert(user && user.subscriptions, '!user')
     assert(Array.isArray(user.subscriptions), '!Array.isArray(user.subscriptions)')
     return {
@@ -182,7 +181,7 @@ class ListsApi {
   }
 
   static async userSubscribers (oid, pagination) {
-    let user = await rxdb.getObject(oid, 0)
+    let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
     assert(user && user.subscribers, '!user')
     assert(Array.isArray(user.subscribers), '!Array.isArray(user.subscribers)')
     return {

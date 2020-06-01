@@ -7,6 +7,8 @@ component(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'pageApp-sphere',
   data () {
@@ -39,7 +41,7 @@ export default {
         if (to) {
           this.sphere = await this.sphereLoad(to)
         } else {
-          if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get('nodeCategories')
+          if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
           // по-моему - что-то тут не так...
           if (this.nodeCategories.length > 4 && this.$route.name === 'trends') {
             this.$router.replace({params: {oid: this.nodeCategories[4].sphere.oid}})
@@ -56,7 +58,7 @@ export default {
       try {
         this.$log('sphereLoad start', oid)
         this.sphereLoading = true
-        let sphere = await this.$rxdb.getObject(oid, 0)
+        let sphere = await this.$rxdb.get(RxCollectionEnum.OBJ, oid)
         this.$log('sphereLoad sphere', sphere)
         this.sphereLoading = false
         this.sphereLoadingError = null
@@ -73,7 +75,7 @@ export default {
   },
   async beforeCreate() {
     this.$log('beforeCreate')
-    if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get('nodeCategories')
+    if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

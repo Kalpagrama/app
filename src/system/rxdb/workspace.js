@@ -9,9 +9,9 @@ import {
   wsSchemaLocalChanges, schemaKeyValue
 } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { Mutex, ReactiveItemHolder, ReactiveListHolder } from 'src/system/rxdb/reactive'
+import { Mutex } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
-import { getReactive, getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_WS)
@@ -309,9 +309,9 @@ class Workspace {
     try {
       await this.mutex.lock()
       const f = this.processEvent
+      logD(f, 'start')
       if (!this.isLeader) return
       let { type, wsItem: itemServer, wsRevision } = event
-      logD(f, `start ${itemServer.id} rev:${itemServer.rev}`)
       assert(this.created, '!this.created')
       assert(this.reactiveUser, '!this.reactiveUser') // почему я получил этот эвент, если я гость???
       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
@@ -415,9 +415,7 @@ class Workspace {
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     delete mangoQuery.selector.rxCollectionEnum
     let rxQuery = this.getWsCollection(rxCollectionEnum).find(mangoQuery)
-    let holder = new ReactiveListHolder()
-    let reactiveList = await holder.create(rxQuery)
-    return {items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
+    return rxQuery
   }
 
   async get(id) {

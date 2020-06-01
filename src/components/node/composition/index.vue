@@ -39,6 +39,7 @@ div(
 
 <script>
 import playerVideo from './player_video'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'composition',
@@ -79,7 +80,7 @@ export default {
             this.composition = to
           }
           else {
-            this.composition = await this.$rxdb.getObject(to.oid, 0)
+            this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
           }
         }
       }

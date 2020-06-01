@@ -30,8 +30,10 @@ class Event {
 
   async clear(){}
 
+  // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    // logD('processEvent start', event)
+    const f = this.processEvent
+    logD(f, 'start', event)
     switch (event.type) {
       case 'ERROR':
         this.notifyError(event)

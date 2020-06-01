@@ -66,6 +66,7 @@ div(
 </template>
 
 <script>
+  import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'layerItem-layerNameEditor',
   props: ['layer'],
@@ -119,7 +120,7 @@ export default {
         wsItemType: 'WS_SPHERE',
         name: this.sphereString
       }
-      let rxDoc = await this.$rxdb.setWs(sphereInput)
+      let rxDoc = await this.$rxdb.set(RxCollectionEnum.WS_SPHERE, sphereInput)
       this.sphereChoose(rxDoc)
       this.sphereString = ''
     },

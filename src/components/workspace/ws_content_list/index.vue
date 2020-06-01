@@ -99,8 +99,7 @@ div(
 <script>
 import contentItem from './content_item'
 import { ContentApi } from 'src/api/content'
-import { WsItemTypeEnum as RxCollectionEnum } from 'src/system/rxdb/workspace'
-
+import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'wsContentList',
   components: {contentItem},
@@ -202,7 +201,7 @@ export default {
     },
     async contentAdd (content) {
       this.$log('contentAdd content', content)
-      let contentFind = await this.$rxdb.find({
+      let {items: contentFind} = await this.$rxdb.find({
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
           oid: content.oid
@@ -226,7 +225,9 @@ export default {
           }
         }
         this.$log('contentAdd contentInput', contentInput)
-        return await this.$rxdb.setWs(contentInput)
+        let res = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
+        this.$log('contentAdd res', res)
+        return res
       } else {
         return contentFind[0]
       }

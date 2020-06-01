@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { NodeApi } from 'src/api/node'
+
 export default {
   name: 'editPreview',
   props: ['node'],
@@ -51,16 +53,16 @@ export default {
         this.$log('nodePublish start')
         this.nodePublishing = true
         // await this.$wait(2000)
-        let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
-        this.$log('res', res)
-        this.nodePublishing = false
+
+        let res = await NodeApi.nodeCreate(this.node)
+        // let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
+        this.$log('nodePublish res=', res)
+        // this.nodePublishing = false
         // go to node
         this.node.stage = 'published'
         this.$emit('close')
         // this.$router.push('/account')
-      }
-      catch (e) {
-        this.$log('nodePublish error', e)
+      } finally {
         this.nodePublishing = false
       }
     }

@@ -6,11 +6,19 @@ import { skip } from 'rxjs/operators'
 import { rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { getReactive } from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_REACTIVE)
+
+function getReactive (rxDoc) {
+  let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+  return getItemData(reactiveItemHolder.reactiveItem)
+}
+function getItemData(reactiveItem){
+  return reactiveItem.cached ? reactiveItem.cached.data : reactiveItem
+}
 
 const debounceIntervalItem = 2000
 // класс-обертка над rxDoc для реактивности
@@ -80,7 +88,8 @@ class ReactiveItemHolder {
             await rxdb.lock() // необходимо заблокировать до вызова this.rxDocUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
             this.rxDocUnsubscribe()
             logD(f, 'reactiveItem changed from UI (debounce)', this.reactiveItem)
-            await rxdb.setWs(this.reactiveItem, false) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
+            assert(this.reactiveItem.id, '!this.reactiveItem.id')
+            await rxdb.set(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), {withLock: false}) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
           } finally {
             this.rxDocSubscribe()
             await rxdb.release()
@@ -230,4 +239,4 @@ class Mutex {
   }
 }
 
-export { ReactiveItemHolder, ReactiveListHolder, Mutex }
+export { ReactiveItemHolder, ReactiveListHolder, Mutex, getReactive }
