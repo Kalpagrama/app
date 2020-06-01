@@ -68,15 +68,16 @@ export default {
         this.itemsMoreLoading = false
       }
     },
-    async itemsLoad (variables, append = false) {
-      // this.$log('itemsLoad start', variables)
-      // get variables
-      let { oid, pagination, filter, sortStrategy } = variables
+    async itemsLoad (mangoQuery, append = false) {
+      // this.$log('itemsLoad start', mangoQuery)
+      // get mangoQuery
+      let { oid, pagination, filter, sortStrategy } = mangoQuery
       pagination = pagination || {pageSize: 30, pageToken: null}
       sortStrategy = sortStrategy || 'HOT'
       // get res
       let res
-      let mangoQuery = {selector: {rxCollectionEnum: this.type}}
+      mangoQuery = mangoQuery || {selector: {}}
+      mangoQuery.selector.rxCollectionEnum = this.type
       let rxQuery
       switch (this.type) {
         case 'LST_SPHERE_NODES' :
