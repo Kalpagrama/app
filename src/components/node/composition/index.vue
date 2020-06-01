@@ -21,14 +21,14 @@ div(
       objectFit: 'contain'
     }`
     ).full-width
-  //- player-video(
-  //-   v-if="composition && active"
-  //-   :ctx="ctx" :composition="composition"
-  //-   :visible="visible" :active="active" :mini="mini")
-  //-   template(
-  //-     v-for="(_, scopedSlotName) in $scopedSlots"
-  //-     v-slot:[scopedSlotName]="slotData")
-  //-     slot(:name="scopedSlotName" v-bind="slotData")
+  player-video(
+    v-if="composition && active && ctx !== 'list'"
+    :ctx="ctx" :composition="composition"
+    :visible="visible" :active="active" :mini="mini")
+    template(
+      v-for="(_, scopedSlotName) in $scopedSlots"
+      v-slot:[scopedSlotName]="slotData")
+      slot(:name="scopedSlotName" v-bind="slotData")
 </template>
 
 <script>

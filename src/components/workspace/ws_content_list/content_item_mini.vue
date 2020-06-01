@@ -1,6 +1,5 @@
 <template lang="pug">
 div(
-  @click.self="$emit('edit')"
   @mousenter="mouseIsOver = true"
   @mouseleave="mouseIsOver = false"
   :style=`{
@@ -12,6 +11,7 @@ div(
   ).row.full-width.items-center.content-center.q-mb-sm.b-60.content-item
   //- thumb
   div(
+    @click="$emit('edit')"
     :style=`{width: '180px', height: '100px', borderRadius: '10px', overflow: 'hidden'}`
     ).row.items-center.content-center.justify-center.b-80
     img(
@@ -23,7 +23,9 @@ div(
       v-if="thumbErrored"
       name="photo" color="grey-8" size="150px")
   //- center name
-  div(:style=`{position: 'relative'}`).col.full-height
+  div(
+    @click="$emit('edit')"
+    :style=`{position: 'relative'}`).col.full-height
     .row.fit.items-start.content-start.q-pa-sm
       span(:style=`{userSelect: 'none'}`).text-white {{ contentName }}
       //- stats
