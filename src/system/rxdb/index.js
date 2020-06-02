@@ -60,7 +60,7 @@ class RxDBWrapper {
     let f = this.purgeDb
     logD(f, 'purgeDb rxdb')
     let purgeLastDateDoc = await this.get(RxCollectionEnum.META, 'purgeLastDate')
-    let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc.value) : 0
+    let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc) : 0
     if (Date.now() - purgeLastDate < purgePeriod) return
     await this.set(RxCollectionEnum.META, {id: 'purgeLastDate', valueString: Date.now().toString()})
     let dump = await this.db.dump()
@@ -68,7 +68,7 @@ class RxDBWrapper {
     await this.db.importDump(dump)
   }
 
-  async create () {
+  async init () {
     const f = this.create
     this.db = await createRxDatabase({
       name: 'rxdb',
@@ -87,18 +87,18 @@ class RxDBWrapper {
       logD(f, 'RXDB::LEADER!!!!')
       this.isLeader_ = true
     })
-    this.workspace = new Workspace()
-    await this.workspace.create(this.db)
-    this.cache = new Cache()
-    await this.cache.create(this.db)
+    this.workspace = new Workspace(this.db)
+    this.cache = new Cache(this.db)
     this.objects = new Objects(this.cache)
     this.lists = new Lists(this.cache)
     this.event = new Event(this.workspace, this.objects, this.lists)
+    await this.workspace.create()
+    await this.cache.create()
     this.created = true
   }
 
   // вызывать после логина
-  async init (userOid) {
+  async setUser (userOid) {
     logD('init RXDB')
     assert(this.created, '!created')
     await this.event.init()
@@ -126,8 +126,8 @@ class RxDBWrapper {
 
   async clearAll () {
     for (let module in RxModuleEnum) await this.clearModule(module)
-    await this.db.meta.destroy()
     await this.db.meta.remove()
+    await this.db.meta.destroy()
   }
 
   async clearModule (rxModuleEnum) {

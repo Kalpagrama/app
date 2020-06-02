@@ -33,7 +33,8 @@ class Event {
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
     const f = this.processEvent
-    logD(f, 'start', event)
+    logD(f, 'start', rxdb.isLeader(), event)
+    if (!rxdb.isLeader()) return
     switch (event.type) {
       case 'ERROR':
         this.notifyError(event)

@@ -230,10 +230,11 @@ export default {
     },
     async contentAdd (content) {
       this.$log('contentAdd content', content)
+      // todo неверное решение! мастерская автономна! oid появится только после синхронизации!!!!
       let {items: contentFind} = await this.$rxdb.find({
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-          oid: content.oid
+          contentOid: content.oid
         }
       })
       this.$log('contentAdd contentFind', contentFind)

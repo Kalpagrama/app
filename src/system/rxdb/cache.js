@@ -1,11 +1,12 @@
 import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 import LruCache from 'lru-cache'
 import assert from 'assert'
-import { schemaKeyValue, cacheSchema } from 'src/system/rxdb/schemas'
+import { cacheSchema } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Mutex } from 'src/system/rxdb/reactive'
 import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { WsCollectionEnum } from 'src/system/rxdb/workspace'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_CACHE)
@@ -23,27 +24,14 @@ const DEBUG_IGNORE_CACHE = false // если === true - брать из сети
 
 // класс для кэширования gql запросов
 class Cache {
+  constructor (db) {
+    assert(db, '!rxdb')
+    this.db = db
+  }
+
   async createCollections () {
     let f = this.createCollections
     await this.db.collection({ name: 'cache', schema: cacheSchema })
-    // // хуки на измения элементов в кэше пользователем
-    // let onCachedObjectChangedByUser = async (id, operation) => {
-    //   const f = onCachedObjectChangedByUser
-    //   if (!rxdb.isLeader()) return
-    //   assert(id && operation && operation in CacheOperationEnum, 'bad params' + id + operation)
-    //   // todo пока что изменяется только currentUser (настройки, ленты и пр)
-    //   // assert(false, 'assert(false, todo! not impl!)')
-    //   logD(f, `complete. ${id}`)
-    // }
-    // this.db.cache_object.postInsert(async (plainData) => {
-    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.UPSERT)
-    // }, false)
-    // this.db.cache_object.postSave(async (plainData) => {
-    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.UPSERT)
-    // }, false)
-    // this.db.cache_object.postRemove(async (plainData) => {
-    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.DELETE)
-    // }, false)
   }
 
   // удалить все данные из кэша
@@ -57,18 +45,19 @@ class Cache {
     } finally {
       this.lruResetInProgress = true
     }
-
+    if (this.db.cache) {
+      await this.db.cache.remove()
+      await this.db.cache.destroy()
+    }
     await this.createCollections()
     logD(f, 'complete')
   }
 
-  async create (db, recursive = false) {
+  async create (recursive = false) {
     const f = this.create
     logD(f, 'start')
-    assert(db, '!rxdb')
     assert(!this.created, 'this.created')
     try {
-      this.db = db
       this.mutex = new Mutex()
       await this.createCollections()
       // используется для контроля места
@@ -100,8 +89,8 @@ class Cache {
       // заполняем cacheLru из idb
       let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump')
       if (lruDump) {
-        lruDump = JSON.parse(lruDump.value)
         logD(f, 'восстанавливаем Lru')
+        lruDump = JSON.parse(lruDump)
         this.cacheLru.load(lruDump)
       }
 
@@ -109,7 +98,7 @@ class Cache {
         const f = this.debouncedDumpLru
         logD(f, 'start. debouncedDumpLru')
         let lruDump = this.cacheLru.dump()
-        await rxdb.set(RxCollectionEnum.META, {id: 'lruDump', valueString: JSON.stringify(lruDump)})
+        await rxdb.set(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
       }, debounceIntervalDumpLru)
 
       // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
@@ -127,7 +116,7 @@ class Cache {
     } catch (err) {
       logE(f, 'ошибка при создания CACHE! очищаем и пересоздаем!', err)
       await this.clearCollections()
-      if (!recursive) await this.create(db, true)
+      if (!recursive) await this.create(true)
     }
   }
 
