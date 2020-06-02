@@ -2,6 +2,7 @@
 div(
   ref="layerItemFramesScrollArea"
   :style=`{}`).row.full-width.scroll.q-py-md
+  q-resize-observer(@resize="e => width = e.width")
   .row.items-start.content-start.no-wrap
     //- left margin width/2
     div(:style=`{height: '50px', width: width/2+'px'}`)
@@ -97,14 +98,16 @@ div(
 <script>
 export default {
   name: 'layerItem-layerFrames',
-  props: ['player', 'meta', 'layer', 'width'],
+  props: ['player', 'meta', 'layer'],
   data () {
     return {
+      width: 0,
       frameWidth: 50,
       framesDragging: false,
       pointDragging: false,
       pointDraggingIndex: null,
-      pointDraggingError: false
+      pointDraggingError: false,
+      screenDuration: 60
     }
   },
   computed: {
@@ -114,6 +117,7 @@ export default {
     },
     framesWidth () {
       return this.frames * this.frameWidth
+      // return (this.meta.duration * this.width) / this.screenDuration
     },
     layerStart () {
       return this.layer.figuresAbsolute[0].t

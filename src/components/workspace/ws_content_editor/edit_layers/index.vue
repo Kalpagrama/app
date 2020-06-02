@@ -27,7 +27,7 @@ div(:style=`{position: 'relative'}`).column.fit
       }`)
   //- body
   .col.full-width
-    layer-list(v-bind="$props" @layerId="layerClicked")
+    layer-list(v-bind="$props" @layerId="layerClicked" :layerAdd="layerAdd")
   composition-controller(
     v-if="editorType === 'composition'"
     v-bind="$props")
@@ -176,7 +176,7 @@ export default {
     layerAddFromContent () {
       this.$log('layerAddFromContent')
     },
-    async layerAdd (layerInput) {
+    async layerAdd (layerInput, openEditor = true) {
       this.$log('layerAdd start', layerInput)
       if (!layerInput) {
         let start = this.meta.now
@@ -196,14 +196,15 @@ export default {
       layerInput.id = layerId
       layerInput.color = this.$randomColor(layerId)
       this.$log('layerAdd layerInput', layerInput)
+      // if (this.composition.layers.findIndex(layer => layer.id === layerId) >= 0) alert('DUPLICATE ID')
       // set layer
       this.$set(this.composition.layers, layerIndex, layerInput)
       // set meta
       this.$nextTick(() => {
         this.player.meta(['layerId', layerId])
         this.player.meta(['mode', 'layer'])
+        if (openEditor) this.layerEditing = layerId
       })
-      this.layerEditing = layerId
       this.$log('layerAdd done')
     },
     onResize (e) {

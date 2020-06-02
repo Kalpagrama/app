@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    borderRadius: $q.screen.gt.xs ? '10px' : '0px',
+    borderRadius: $q.screen.gt.xs ? '0px' : '0px',
     overflow: 'hidden'
   }`
   ).column.full-width.b-50
@@ -11,12 +11,12 @@ div(
   composition(
     ctx="workspace" :visible="true" :active="true" :mini="false"
     :value="value").full-height
-    //- template(v-slot:header)
-    //-   //- kalpa-debug(:options=`{editorType}`)
-    //-   div(:style=`{height: '70px'}`
-    //-     ).row.full-width.items-center.content-center.q-px-sm
-    //-     q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-    //-     span.text-white.text-bold {{ contentName }}
+    template(v-if="$q.screen.gt.xs" v-slot:header)
+      kalpa-debug(:options=`{editorType}`)
+      div(:style=`{height: '70px'}`
+        ).row.full-width.items-center.content-center.q-px-sm
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
+        span.text-white.text-bold {{ contentName }}
     template(v-slot:video)
       q-btn(
         v-if="pageId === 'layers'"
@@ -49,10 +49,11 @@ div(
 import menuRight from './menu_right'
 import editInfo from './edit_info'
 import editLayers from './edit_layers'
+import editWorkspace from './edit_workspace'
 
 export default {
   name: 'wsContentEditor',
-  components: {menuRight, editInfo, editLayers},
+  components: {menuRight, editInfo, editLayers, editWorkspace},
   props: {
     editorType: {
       value: String,
@@ -70,7 +71,8 @@ export default {
       pageId: 'layers',
       pages: [
         {id: 'info', name: 'Info'},
-        {id: 'layers', name: 'Layers'}
+        {id: 'layers', name: 'Layers'},
+        {id: 'workspace', name: 'Library'}
       ],
       menuShow: false
     }

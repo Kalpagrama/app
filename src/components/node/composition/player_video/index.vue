@@ -8,7 +8,7 @@ iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
   z-index: 100
-  border-radius: 10px
+  border-radius: 0px
   overflow: hidden
   pointer-events: none
 @media (min-width: 600px)
@@ -30,10 +30,10 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).column.fit
+div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden'}`).column.fit
   video-controller(v-bind="$props" :player="player" :meta="meta")
   slot(name="header")
-  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-30
+  div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden'}`).row.full-width.b-30
     slot(name="video")
     //- kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId}`)
     q-spinner(
@@ -53,7 +53,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).c
       @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
       @timeupdate="videoTimeupdate"
       :style=`{
-        position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '10px', overflow: 'hidden'
+        position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '0px', overflow: 'hidden'
       }`)
       //- source(:src="videoSrc" :type="videoType")
     video-progress(v-bind="$props" :player="player" :meta="meta")

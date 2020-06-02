@@ -21,25 +21,24 @@ div(
       :style=`{objectFit: 'cover'}`).fit
     q-icon(
       v-if="thumbErrored"
-      name="photo" color="grey-8" size="150px")
+      name="photo" size="150px" :style=`{color: 'rgb(90,90,90)'}`).full-width
   //- center name
   div(
     @click="$emit('edit')"
     :style=`{position: 'relative'}`).col.full-height
     .row.fit.items-start.content-start.q-pa-sm
-      span(:style=`{userSelect: 'none'}`).text-white {{ contentName }}
-      //- stats
-      q-btn(
-        v-if="content.layers.length > 0"
-        flat dense color="grey-4"
-        icon="layers"
-        :style=`{
-          position: 'absolute', left: '8px', bottom: '8px', zIndex: 1000,
-        }`
-        ).b-70
-        span.q-ml-sm.q-mr-xs {{content.layers.length}}
+      span(:style=`{userSelect: 'none', lineHeight: 1.1}`).text-white {{ contentName }}
+  //- stats
+  q-btn(
+    v-if="content.layers.length > 0"
+    flat dense color="grey-5"
+    icon-right="layers"
+    :style=`{
+      position: 'absolute', right: '3px', bottom: '0px', zIndex: 1000,
+    }`)
+    small {{ content.layers.length }}
   //- right
-  div(:style=`{width: '40px'}`).row.full-height.items-start.content-start.q-pt-sm
+  div(:style=`{width: '36px'}`).row.full-height.items-start.content-start.q-pt-sm
     q-btn(round flat dense color="grey-6" icon="more_vert")
       q-menu(cover auto-close anchor="top right")
         div(:style=`{minWidth: '150px', maxWidth: '150px'}`).column.fit.b-70

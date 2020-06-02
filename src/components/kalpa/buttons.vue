@@ -17,7 +17,7 @@ div(:style=`{}`).row.items-center.content-center.q-pt-sm
       }`
       :style=`{
         position: 'relative', borderRadius: '10px', overflow: 'hidden', userSelect: 'none',
-        height: '36px',
+        height: '34px',
         minWidth: '50px',
         color: id === i[idKey] ? 'white !important' : '#4caf50',}`
       ).row.items-center.content-center.justify-center.text-green.cursor-pointer.q-px-md.kalpa-button

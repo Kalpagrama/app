@@ -17,6 +17,7 @@
     "dev_android": "quasar dev -m capacitor -T android",
     "dev_ios_cordova": "quasar dev -m cordova -T ios",
     "dev_ios": "quasar dev -m capacitor -T ios",
+    "dev_bex": "quasar dev -m bex",
     "build": "quasar build --debug -m pwa",
     "build_spa": "quasar build -m spa",
     "build_pwa": "quasar build -m pwa",

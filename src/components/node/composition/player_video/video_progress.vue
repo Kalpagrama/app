@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'absolute', zIndex: 1000, bottom: '0px',
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: '0px', overflow: 'hidden',
     background: meta.playing ? 'none' : 'rgb(0,0,0)',
     background: meta.playing ? 'none' : 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)',
   }`
@@ -30,11 +30,11 @@ div(
     @mouseleave="mouseOverBar = false"
     v-touch-pan.mouse.left.right="barDrag"
     :class=`{
-      'b-30': mouseOverBar
+      //- 'b-30': mouseOverBar
     }`
     :style=`{
       position: 'absolute', zIndex: 1200, bottom: '0px', left: '0px', height: '17px',
-      borderRadius: '10px', overflow: 'hidden',
+      borderRadius: '0px', overflow: 'hidden',
       cursor: 'pointer'
     }`
     ).row.full-width

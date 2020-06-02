@@ -67,7 +67,7 @@ div(
           v-for="(v,vi) in listViews" :key="v.id" @click="listView = v.id"
           round dense flat
           :icon="v.icon"
-          :color="listView === v.id ? 'green' : 'white'")
+          :color="listView === v.id ? 'green' : 'grey-6'")
       //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70 {{$q.screen.xs ? '' : 'Filters'}}
   //- body
   .col.full-width.scroll

@@ -158,7 +158,7 @@ module.exports = function (ctx) {
       // },
       // https: true,
       port: ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
-      host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
+      // host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
       // https: true,
       https: ctx.mode.capacitor || ctx.mode.spa ? false : {
         key: fs.readFileSync('deploy/dev_server_cert/private.key'),

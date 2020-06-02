@@ -73,11 +73,14 @@ div(:style=`{position: 'relative'}`).row.fit.b-40
                 :style=`{width: '40px'}`).row.items-center.content-center.justify-center
                 q-btn(flat dense round color="white").layer-drag-handle
                   q-icon(name="drag_indicator" size="25px" color="grey-4")
-                  //- q-menu(auto-close anchor="top left" self="top right")
-                  //-   layer-menu(
-                  //-     @edit="layerEdit(l, li)"
-                  //-     @copy="layerCopy(l, li)"
-                  //-     @delete="layerDelete(l, li)")
+                  q-menu(cover auto-close anchor="top right")
+                    div(:style=`{minWidth: '150px', maxWidth: '150px'}`).column.fit.b-70
+                      .col.full-width
+                        q-btn(
+                          v-for="(a,akey) in layerActions" :key="akey"
+                          @click="a.fn(l, li)"
+                          flat no-caps color="white" align="left"
+                          ).full-width {{a.name}}
 </template>
 
 <script>
@@ -86,7 +89,7 @@ import draggable from 'vuedraggable'
 export default {
   name: 'layerList',
   components: {draggable},
-  props: ['editorType', 'player', 'meta', 'composition'],
+  props: ['editorType', 'player', 'meta', 'composition', 'layerAdd'],
   data () {
     return {
       layersEditing: false,
@@ -94,6 +97,34 @@ export default {
       layersSelected: [],
       layersDragging: false,
       layersDraggingFutureIndex: null,
+    }
+  },
+  computed: {
+    layerActions () {
+      return {
+        edit: {
+          name: 'Edit',
+          fn: (layer, layerIndex) => {
+            this.$log('Edit', layer, layerIndex)
+          }
+        },
+        copy: {
+          name: 'Copy',
+          fn: (layer, layerIndex) => {
+            this.$log('copy', layer, layerIndex)
+            let layerCopy = JSON.parse(JSON.stringify(layer))
+            this.layerAdd(layerCopy, false)
+          }
+        },
+        delete: {
+          name: 'Delete',
+          fn: (layer, layerIndex) => {
+            this.$log('delete', layer, layerIndex)
+            if (!confirm('Delete layer?')) return
+            if (layerIndex >= 0) this.$delete(this.composition.layers, layerIndex)
+          }
+        }
+      }
     }
   },
   watch: {},

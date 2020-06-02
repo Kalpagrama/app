@@ -25,11 +25,11 @@ div(
         height: $q.screen.height+'px',
         borderRadius: '10px',
         overflow: 'hidden'
-      }`)
+      }`).b-30
       template(v-slot:header)
-        div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
-          q-btn(round flat icon="keyboard_arrow_left" @click="itemFinderOpened = false")
-          span.text-white.text-bold Find item
+        div(:style=`{marginBottom: '20px'}`).row.full-width.items-center.content-center.q-pt-md.q-px-sm
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false")
+          span(:style=`{fontSize: '16px'}`).text-white.text-bold Find item
   //- item edit
   q-dialog(v-model="itemEditorOpened" position="bottom")
     ws-content-editor(
@@ -53,7 +53,7 @@ div(
       ).b-70.q-mr-sm
     q-btn(round flat color="white" icon="search").b-70
   //- footer
-  div(:style=`{height: '50px', order: 1000}`).row.full-width
+  //- div(:style=`{height: '50px', order: 1000}`).row.full-width
   //- body
   div(
     :style=`{
@@ -92,18 +92,24 @@ div(
             }`).row.justify-start
             q-btn(round flat color="white" icon="drag_indicator").fit.item-drag-handle
     //- add first item
-    div(v-else).row.fit.items-center.content-center.justify-center.q-pa-md
-      ws-content-list(
-        ctx="nodeEditor" @layer="layerFound"
-        :style=`{
-          maxWidth: '650px',
-          maxHeight: '650px',
-          borderRadius: '10px',
-          overflow: 'hidden'
-        }`).full-height.b-50
-        template(v-slot:header)
-          div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
-            span(:style=`{fontSize: '16px'}`).text-white.text-bold Add first item
+    div(v-else).row.fit.items-start.content-start.justify-center.q-pa-sm
+      div(
+        v-for="i in 3" :key="i" @click="itemAdd()"
+        :style=`{}`
+        ).row.full-width.justify-center.q-mb-sm
+        div(:style=`{maxWidth: '600px', height: '300px', borderRadius: '10px'}`
+          ).row.full-width.items-center.content-center.justify-center.b-60
+          q-btn(round flat color="green" icon="add" size="xl")
+      //- ws-content-list(
+      //-   ctx="nodeEditor" @layer="layerFound"
+      //-   :style=`{
+      //-     borderRadius: '10px',
+      //-     overflow: 'hidden'
+      //-   }`).full-height.b-50
+      //-   template(v-slot:header)
+      //-     .row.full-width.q-pt-sm
+          //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
+          //-   span(:style=`{fontSize: '16px'}`).text-white.text-bold Add first item
     //- items selected
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
