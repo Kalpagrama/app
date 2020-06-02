@@ -27,7 +27,7 @@ div(
     @click="$emit('edit')"
     :style=`{position: 'relative'}`).col.full-height
     .row.fit.items-start.content-start.q-pa-sm
-      span(:style=`{userSelect: 'none', lineHeight: 1.1}`).text-white {{ contentName }}
+      span(:style=`{userSelect: 'none', lineHeight: 1.2}`).text-white.text-bold {{ contentName }}
   //- stats
   q-btn(
     v-if="content.layers.length > 0"
