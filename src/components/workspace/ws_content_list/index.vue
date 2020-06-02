@@ -77,7 +77,7 @@ div(
           div(v-if="items.length > 0").row.full-width.items-start.content-start
             div(
               :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
-              content-item-mini(
+              content-item(
                 v-for="(c,ci) in items" :key="c.id"
                 @pick="contentPicked(c,ci)"
                 @explore="contentExplore(c,ci)"
