@@ -29,7 +29,7 @@ const RxModuleEnum = Object.freeze({
   SETTINGS: 'SETTINGS',
   CACHE: 'CACHE'
 })
-const purgePeriod = 1000 // * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
+const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 
 function getRxCollectionEnumFromId (id) {
   assert(id, '!id')
@@ -77,13 +77,8 @@ class RxDBWrapper {
       eventReduce: true, // <- eventReduce (optional, default: true)
       pouchSettings: { revs_limit: 1 }
     })
-    await this.db.collection({
-      name: 'meta',
-      schema: schemaKeyValue
-    })
-    logD(f, 'start2', this.db.meta)
+    await this.db.collection({ name: 'meta', schema: schemaKeyValue })
     await this.purgeDb() // очистит бд от старых данных
-    logD(f, 'start3', this.db.meta)
 
     this.db.waitForLeadership().then(() => {
       logD(f, 'RXDB::LEADER!!!!')
@@ -113,7 +108,8 @@ class RxDBWrapper {
         actualAge: 'day'
       }
     }
-    let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, { fetchFunc: fetchCurrentUserFunc })
+    // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
+    let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, { fetchFunc: fetchCurrentUserFunc, force: true, clientFirst: false })
     let fetchCategoriesFunc = async () => {
       return {
         notEvict: true, // живет вечно
@@ -132,6 +128,7 @@ class RxDBWrapper {
     logD(f, 'start')
     for (let module in RxModuleEnum) await this.clearModule(module)
     await this.db.meta.remove()
+    await this.db.collection({ name: 'meta', schema: schemaKeyValue })
     logD(f, 'complete')
   }
 
@@ -180,7 +177,7 @@ class RxDBWrapper {
     }
   }
 
-  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0 } = {}) {
+  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     assert(!rawId.includes('::'), '')
     let id = makeId(rxCollectionEnum, rawId)
@@ -189,9 +186,9 @@ class RxDBWrapper {
       rxDoc = await this.workspace.get(id)
     } else if (rxCollectionEnum in LstCollectionEnum ||
       rxCollectionEnum === RxCollectionEnum.OTHER) {
-      rxDoc = await this.cache.get(id, fetchFunc, clientFirst)
+      rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force)
     } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
-      rxDoc = await this.objects.get(id, priority)
+      rxDoc = await this.objects.get(id, priority, clientFirst, force)
     } else if (rxCollectionEnum === RxCollectionEnum.META) {
       rxDoc = await this.db.meta.findOne(rawId).exec()
     } else {

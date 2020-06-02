@@ -256,12 +256,12 @@ class Objects {
   // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
   // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
-  async get (id, priority) {
+  async get (id, priority, clientFirst, force) {
     const fetchFunc = async () => {
       let promise = this.queryAccumulator.push(getOidFromId(id), priority)
       return await promise
     }
-    let rxDoc = await this.cache.get(id, fetchFunc)
+    let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force)
     if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')
     return rxDoc

@@ -20,7 +20,7 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_WS)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-const synchroTimeMin = 1000 // * 60 * 8 // раз в 8 минут шлем изменения на сервер
+const synchroTimeMin = 1000 * 60 * 8 // раз в 8 минут шлем изменения на сервер
 class WaitBreakable {
   constructor (ms) {
     assert(ms >= synchroTimeMin, 'bad ms')
