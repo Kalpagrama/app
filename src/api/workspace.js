@@ -29,7 +29,7 @@ class WorkspaceApi {
     let { data: { ws } } = await apollo.clients.api.query({
       query: gql`query{ws}`
     })
-    logD(f, 'complete')
+    logD(f, 'complete', ws)
     return ws
   }
 

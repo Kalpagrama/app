@@ -93,7 +93,7 @@ export default async ({ Vue, store, app }) => {
     }
   }
 
-  let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', {fetchFunc, clientFirst: false})
+  let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', {fetchFunc, clientFirst: false, force: true})
 
   logD('services', services)
   let linkAuth = services.authUrl

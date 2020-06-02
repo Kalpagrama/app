@@ -31,7 +31,7 @@ export default {
     let { items, count, totalCount, nextPageToken } = await this.$rxdb.find({
       selector: {
         rxCollectionEnum: RxCollectionEnum.LST_SPHERE_SPHERES,
-        oid: this.oid
+        oidSphere: this.oid
       }
     })
     // let res = await this.$store.dispatch('lists/sphereSpheres', {

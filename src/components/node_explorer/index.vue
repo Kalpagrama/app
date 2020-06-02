@@ -136,7 +136,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          oid: this.sphereOid
+          oidSphere: this.sphereOid
         }
       }
       // return {

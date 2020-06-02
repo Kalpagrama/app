@@ -38,7 +38,6 @@ class Cache {
   async clearCollections () {
     const f = this.clearCollections
     logD(f, 'start')
-    await this.db.remove()
     try {
       this.lruResetInProgress = true
       this.cacheLru.reset()
@@ -47,7 +46,6 @@ class Cache {
     }
     if (this.db.cache) {
       await this.db.cache.remove()
-      await this.db.cache.destroy()
     }
     await this.createCollections()
     logD(f, 'complete')
