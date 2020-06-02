@@ -10,11 +10,11 @@ div(:style=`{position: 'relative'}`).column.fit.b-50
         maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
         minHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
       }`)
+  //- header
   div.row.full-width
-    //- div(:style=`{}`).row.full-width.bg-green.q-pa-sm
-    //-   span hello
-    layer-frames(v-bind="$props" :layer="meta.layer" :width="width")
-    layer-actions(v-bind="$props" :layer="meta.layer" :width="width")
+    layer-frames(v-bind="$props" :layer="meta.layer")
+    layer-actions(v-bind="$props" :layer="meta.layer")
+  //- body
   .col.full-width
     layer-names(v-bind="$props" :layer="meta.layer")
   //- footer
@@ -24,11 +24,11 @@ div(:style=`{position: 'relative'}`).column.fit.b-50
       borderRadius: '10px 10px 0 0', overflow: 'hidden'
     }`).row.full-width.items-start.content-start.b-90
     .row.full-width.q-pa-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left").b-100
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('prev')").b-100
       .col
-      q-btn(round flat color="white" icon="keyboard_arrow_right").b-100
+      q-btn(round flat color="white" icon="keyboard_arrow_right" @click="$emit('next')").b-100
     .row.full-width.q-pa-sm
-      q-btn(flat color="white" no-caps @click="layerDelete()").b-100 Delete layer
+      q-btn(flat round dense color="red" no-caps icon="delete_outline" @click="$emit('delete')")
       .col
       q-btn(push color="green" no-caps @click="$emit('close')").q-px-md Save
 </template>
@@ -42,7 +42,7 @@ import layerSpheres from './layer_spheres'
 export default {
   name: 'layerEditor',
   components: {layerNames, layerFrames, layerActions, layerSpheres},
-  props: ['editorType', 'player', 'meta', 'composition', 'width'],
+  props: ['editorType', 'player', 'meta', 'composition'],
   data () {
     return {
       layerSpheresEditorOpened: false
@@ -60,6 +60,8 @@ export default {
   methods: {
     layerDelete () {
       this.$log('layerDelete')
+      if (!confirm('Delete layer ?!')) return
+      this.$emit('delete')
     }
   },
   mounted () {

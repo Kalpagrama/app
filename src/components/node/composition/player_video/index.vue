@@ -30,21 +30,26 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden', opacity: now < layerStart ? 0 : 1}`).column.fit
+div(
+  :style=`{
+    position: 'relative',
+    borderRadius: '10px',
+    overflow: 'hidden',
+    opacity: opacity,
+  }`).column.fit
   video-controller(v-bind="$props" :player="player" :meta="meta")
   slot(name="header" :player="player" :meta="meta")
   div(
     :class=`{
       'full-height': ctx !== 'workspace'
     }`
-    :style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden'}`).row.full-width.b-50
+    :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-50
     slot(name="video" :player="player" :meta="meta")
-    //- kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId,layerStart,layerEnd}`)
-    //- q-spinner(
-    //-   v-if="ctx === 'workspace' && !loaded"
-    //-   size="50px" color="green"
-    //-   :style=`{position: 'absolute', top: 'calc(50% - 25px)', left: 'calc(50% - 25px)'}`)
-    //- :src="videoSrc" :type="videoType"
+    kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId,layerStart,layerEnd,videoMuted}`)
+    q-spinner(
+      v-if="ctx === 'workspace' && !loaded"
+      size="50px" color="green"
+      :style=`{position: 'absolute', top: 'calc(50% - 25px)', left: 'calc(50% - 25px)'}`)
     video(
       ref="videoRef"
       :src="videoSrc" :type="videoType"
@@ -62,7 +67,6 @@ div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden', opac
       :style=`{
         position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '0px', overflow: 'hidden',
       }`)
-      //- source(:src="videoSrc" :type="videoType")
     video-progress(v-bind="$props" :player="player" :meta="meta")
   .col.full-width
     slot(name="editor" :player="player" :meta="meta")
@@ -80,7 +84,7 @@ export default {
   props: ['ctx', 'composition', 'visible', 'active', 'mini'],
   data () {
     return {
-      mode: 'composition', // content, layer, composition
+      mode: 'content', // content, layer, composition
       layerId: null,
       layerContent: null,
       now: 0,
@@ -93,6 +97,13 @@ export default {
     }
   },
   computed: {
+    opacity () {
+      if (this.ctx === 'workspace') return 1
+      else {
+        if (this.now < this.layerStart) return 0
+        else return 1
+      }
+    },
     meta () {
       return {
         mode: this.mode,

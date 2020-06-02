@@ -94,12 +94,11 @@ div(
     //- add first item
     div(v-else).row.fit.items-start.content-start.justify-center.q-pa-sm
       div(
-        v-for="i in 3" :key="i" @click="itemAdd()"
         :style=`{}`
         ).row.full-width.justify-center.q-mb-sm
-        div(:style=`{maxWidth: '600px', height: '300px', borderRadius: '10px'}`
+        div(:style=`{maxWidth: '700px', height: '400px', borderRadius: '10px'}`
           ).row.full-width.items-center.content-center.justify-center.b-60
-          q-btn(round flat color="green" icon="add" size="xl")
+          q-btn(round flat color="green" icon="add" size="xl" @click="itemAdd()")
       //- ws-content-list(
       //-   ctx="nodeEditor" @layer="layerFound"
       //-   :style=`{

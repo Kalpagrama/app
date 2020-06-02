@@ -141,10 +141,10 @@ export default {
   methods: {
     async pointDrag (e, index) {
       // if (this.pointDraggingError) return
-      this.$log('pointDrag', e, index)
+      // this.$log('pointDrag', e, index)
       let t = this.layer.figuresAbsolute[index].t + ((e.delta.x / this.framesWidth) * this.meta.duration)
       if (t > this.meta.duration || t < 0) return
-      this.$log('t', t)
+      // this.$log('t', t)
       if (index === 0) {
         if (t >= this.layerEnd) {
           // alert('t >= this.layerEnd')

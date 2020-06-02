@@ -1,3 +1,12 @@
+<style lang="sass">
+.q-tab
+  border-radius: 10px !important
+  overflow: hidden
+.q-tab-panel
+  padding: 0
+  margin: 0
+</style>
+
 <template lang="pug">
 div(
   :style=`{
@@ -6,59 +15,78 @@ div(
     overflow: 'hidden'
   }`
   ).column.full-width.b-50
-  //- q-drawer(v-model="menuShow" side="right")
-  //-   menu-right(:tabs="tabs" :tab="tab" @tab="tab = $event, menuShow = false").b-50
   composition(
-    ctx="workspace" :visible="true" :active="true" :mini="false"
+    ctx="workspace"
+    :visible="true" :active="true" :mini="false"
     :value="value").full-height
-    template(v-if="$q.screen.gt.xs" v-slot:header)
-      kalpa-debug(:options=`{editorType}`)
+    template(v-if="showHeader" v-slot:header)
+      kalpa-debug(:options=`{editorType,pageId}`)
       div(:style=`{height: '70px'}`
         ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
         span.text-white.text-bold {{ contentName }}
     template(v-slot:video)
       q-btn(
-        v-if="pageId === 'layers'"
-        round push color="green" icon="add" @click="layerAdd()"
+        v-show="pageId === 'layers'"
+        round push color="green" icon="add" @click="$refs.layersEditor.layerAdd()"
         :size="$q.screen.gt.xs ? 'lg' : 'md'"
         :style=`{
           position: 'absolute', zIndex: 2000, bottom: '18px', right: '18px',
           borderRadius: '50%'
         }`)
     template(v-slot:editor=`{player, meta}`)
-      div(
-        :style=`{
-        }`
-        ).column.fit
-        .col.full-width.scroll
-          component(
-            :editorType="editorType"
-            :ref="`ref-edit-${pageId}`"
-            :is="`edit-${pageId}`"
-            :player="player" :meta="meta" :composition="value"
-            @pageId="pageId = $event"
-            :pages="pages" :pageId="pageId"
-            @close="$emit('close')")
-    template(v-slot:footer)
-      div(
-        :style=`{
-          borderRadius: '10px',
-          overflow: 'hidden'
-        }`
-        ).row.full-width.justify-center.q-pb-sm
-        kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event").justify-center
+      .column.fit
+        //- header bar
+        //- div(:style=`{marginTop: '-20px', paddingTop: '20px'}`).row.full-width
+        //-   div(:style=`{height: '70px', borderRadius: '0 0 10px 10px'}`).row.full-width.b-60
+        q-tab-panels(
+          v-model="pageId" animated
+          keep-alive infinite swipeable
+          :style=`{background: 'none'}`
+          ).col.full-width
+          q-tab-panel(name="info")
+            info-editor(
+              :editorType="editorType"
+              :composition="value"
+              :player="player" :meta="meta")
+          q-tab-panel(name="layers")
+            layers-editor(
+              ref="layersEditor"
+              :editorType="editorType"
+              :composition="value"
+              :player="player" :meta="meta")
+          q-tab-panel(name="workspace")
+            layers-workspace(
+              :editorType="editorType"
+              :composition="value"
+              :player="player" :meta="meta"
+              @pick="layerAdd")
+        .row.full-width.justify-between.q-pa-sm
+          q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" @click="$emit('close')")
+          q-tabs(
+            v-model="pageId"
+            align="center"
+            active-color="white"
+            active-bg-color="green"
+            dense color="white"
+            :style=`{borderRadius: '10px'}`).b-60
+            q-tab(
+              v-for="(p,pkey) in pages" :key="pkey"
+              :name="pkey"
+              :label="p.name"
+              no-caps content-class="text-white"
+              :style=`{color: 'white'}`)
+          q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" :style=`{opacity: 0}`)
 </template>
 
 <script>
-import menuRight from './menu_right'
-import editInfo from './edit_info'
-import editLayers from './edit_layers'
-import editWorkspace from './edit_workspace'
+import infoEditor from './info_editor'
+import layersEditor from './layers_editor'
+import layersWorkspace from './layers_workspace'
 
 export default {
   name: 'wsContentEditor',
-  components: {menuRight, editInfo, editLayers, editWorkspace},
+  components: {infoEditor, layersEditor, layersWorkspace},
   props: {
     editorType: {
       value: String,
@@ -73,16 +101,25 @@ export default {
   },
   data () {
     return {
-      pageId: 'layers',
-      pages: [
-        {id: 'info', name: 'Info'},
-        {id: 'layers', name: 'Layers'},
-        {id: 'workspace', name: 'Library'}
-      ],
-      menuShow: false
+      pageId: 'layers'
     }
   },
   computed: {
+    pages () {
+      let res = {
+        info: {name: 'Info'},
+        layers: {name: 'Layers'}
+      }
+      if (this.editorType === 'composition') {
+        res.workspace = {name: 'Workspace'}
+      }
+      res.workspace = {name: 'Workspace'}
+      return res
+    },
+    showHeader () {
+      return this.$q.screen.gt.xs
+      // return true
+    },
     contentName () {
       let res = this.value.name.slice(0, 40)
       if (res.length === 0) {
@@ -95,10 +132,11 @@ export default {
   watch: {
   },
   methods: {
-    layerAdd () {
+    layerAdd (val) {
       this.$log('layerAdd')
-      let ref = this.$refs['ref-edit-layers']
-      if (ref) ref.layerAdd()
+      let ref = this.$refs.layersEditor
+      this.$log('layerAdd ref', ref)
+      if (ref) ref.layerAdd(val)
     }
   },
   mounted () {

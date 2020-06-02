@@ -25,7 +25,7 @@ div(
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
         maxWidth: $store.state.ui.maxWidthPage+'px',
-      }`)
+      }`).b-50
   //- header
   kalpa-debug(:options=`{ctx}`)
   div(
@@ -121,6 +121,7 @@ export default {
       searchStringRaw: '',
       searchStringLoading: false,
       content: null,
+      contentShow: false,
       contentEditorOpened: false,
       listView: 'mini',
       listViews: [
@@ -175,9 +176,7 @@ export default {
       this.$log('contentPicked')
       if (this.ctx === 'workspace') {
         this.content = content
-        this.$nextTick(() => {
-          this.contentEditorOpened = true
-        })
+        this.contentEditorOpened = true
       }
       else {
         this.$emit('content', JSON.parse(JSON.stringify(content)))

@@ -33,6 +33,7 @@ export default {
           // do noting?
         }
         else if (to === 'composition') {
+          if (this.ctx === 'workspace') this.player.meta(['mode', 'content'])
           // set first layer? if from !== composition?
           // this.meta.layerId = this.composition.layers[0].id
           this.player.meta(['layerId', this.composition.layers[0].id])

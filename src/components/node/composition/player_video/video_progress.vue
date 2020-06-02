@@ -10,35 +10,36 @@ div(
   //- actions
   div(
     :style=`{
-      background: 'rgba(0,0,0,0.2)',
+      opacity: 0.8,
+      background: 'rgba(0,0,0,0.4)',
       borderRadius: '10px',
       overflow: 'hidden',
     }`
-    ).row.br
+    ).row
     q-btn(
-      round flat color="white" @click="meta.playing ? player.pause() : player.play()"
+      round dense flat color="grey-4" @click="meta.playing ? player.pause() : player.play()"
       :icon="meta.playing ? 'pause' : 'play_arrow'"
       :style=`{zIndex: 1400}`)
     //- stats
     q-btn(
-      flat color="white"
+      flat dense color="grey-4"
       :style=`{
       }`)
       small.text-white.q-mr-sm {{ $time(now) }} /
       small.text-white {{ $time(duration) }}
     q-btn(
-      round flat color="white" @click="mutedToggle()"
+      round dense flat color="grey-4" @click="mutedToggle()"
       :icon="meta.muted ? 'volume_off' : 'volume_up'"
       :style=`{zIndex: 1400}`)
     q-btn(
-      round flat color="white" @click="videoForward(0)"
+      round dense flat color="grey-4" @click="videoForward(0)"
       icon="fast_rewind"
       )
     q-btn(
-      round flat color="white" @click="videoForward(1)"
+      round dense flat color="white" @click="videoForward(1)"
       icon="fast_forward")
     q-btn(
-      round flat color="white" @click="layerAgain()"
+      round dense flat color="grey-4" @click="layerAgain()"
       icon="refresh"
       :style=`{order: 1}`)
   //- bar
@@ -141,7 +142,7 @@ export default {
       // this.player.update(t)
     },
     barDrag (e) {
-      this.$log('barDrag', e)
+      // this.$log('barDrag', e)
       if (e.isFirst) {
         let left = e.evt.layerX || e.position.left
         // alert('barDrag first' + left)

@@ -6,17 +6,27 @@ div(:style=`{position: 'relative'}`).column.fit
       v-if="layerEditing"
       v-bind="$props"
       @close="layerEditing = null"
+      @prev="layerForward(false)"
+      @next="layerForward(true)"
       :style=`{
         position: 'absolute', zIndex: 2000,
         borderRadius: '10px', overflow: 'hidden'
       }`)
   //- body
   .col.full-width
-    layer-list(v-bind="$props" @layerId="layerClicked" :layerAdd="layerAdd")
+    layer-list(
+      v-bind="$props"
+      mode="layers"
+      @pick="layerPick"
+      :actions=`layerActions`)
+      template(v-slot:headerSelected=`{layersSelected}`)
+        .row
+          q-btn(dense no-caps color="green" @click="layersSelectedCreateNode(layersSelected)").q-px-sm.q-mr-sm Create node
+          q-btn(dense no-caps color="green" @click="layersSelectedDelete(layersSelected)").q-px-sm Delete
 </template>
 
 <script>
-import layerList from './layer_list'
+import layerList from '../layer_list'
 import layerEditor from './layer_editor'
 import compositionController from './composition_controller'
 
@@ -26,11 +36,47 @@ export default {
   props: ['editorType', 'player', 'meta', 'composition', 'pages', 'pageId'],
   data () {
     return {
+      layerEditing: null,
+    }
+  },
+  computed: {
+    layerActions () {
+      let res = {
+        edit: {
+          name: 'Edit',
+          fn: (layer) => {
+            this.$log('Edit', layer)
+          }
+        },
+        copy: {
+          name: 'Copy',
+          fn: (layer) => {
+            this.$log('Copy', layer)
+          }
+        },
+        createNode: {
+          name: 'Create node'
+        },
+        delete: {
+          name: 'Delete',
+          fn: (layer) => {
+            this.$log('Delete', layer)
+          }
+        }
+      }
+      return res
     }
   },
   watch: {
   },
   methods: {
+    layerForward (isNext) {
+      this.$log('layerForward', isNext)
+    },
+    layerPick (layer) {
+      this.$log('layerPick', layer)
+      this.layerEditing = layer.id
+    },
     layerClicked (id) {
       this.layerEditing = id
       this.player.meta(['mode', 'layer'])
@@ -48,13 +94,16 @@ export default {
       if (this.layersView === 'line') this.layersView = 'normal'
       this.layersEditing = !this.layersEditing
     },
-    layersDraggingMove (e, evt) {
-      this.$log('layersDraggingMove', e.draggedContext.futureIndex)
-      this.$set(this, 'layersDraggingFutureIndex', e.draggedContext.futureIndex + 1)
+    layerSelectedDelete (arr) {
+      this.$log('layersSelectedDelete', arr)
     },
-    layersDraggingUpdate (e, evt) {
-      this.$log('layersDraggingUpdate', e, evt)
-    },
+    // layersDraggingMove (e, evt) {
+    //   this.$log('layersDraggingMove', e.draggedContext.futureIndex)
+    //   this.$set(this, 'layersDraggingFutureIndex', e.draggedContext.futureIndex + 1)
+    // },
+    // layersDraggingUpdate (e, evt) {
+    //   this.$log('layersDraggingUpdate', e, evt)
+    // },
     layerEdit (l, li) {
       this.$log('layerEdit', l, li)
       // ???
