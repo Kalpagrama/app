@@ -64,12 +64,12 @@ class RxDBWrapper {
     if (Date.now() - purgeLastDate < purgePeriod) return
     await this.set(RxCollectionEnum.META, {id: 'purgeLastDate', valueString: Date.now().toString()})
     let dump = await this.db.dump()
-    // await this.db.remove()
     await this.db.importDump(dump)
   }
 
   async init () {
-    const f = this.create
+    const f = this.init
+    logD(f, 'start')
     this.db = await createRxDatabase({
       name: 'rxdb',
       adapter: 'idb', // <- storage-adapter
@@ -81,7 +81,9 @@ class RxDBWrapper {
       name: 'meta',
       schema: schemaKeyValue
     })
+    logD(f, 'start2', this.db.meta)
     await this.purgeDb() // очистит бд от старых данных
+    logD(f, 'start3', this.db.meta)
 
     this.db.waitForLeadership().then(() => {
       logD(f, 'RXDB::LEADER!!!!')
@@ -99,7 +101,8 @@ class RxDBWrapper {
 
   // вызывать после логина
   async setUser (userOid) {
-    logD('init RXDB')
+    const f = this.setUser
+    logD(f, 'start')
     assert(this.created, '!created')
     await this.event.init()
     // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
@@ -125,9 +128,11 @@ class RxDBWrapper {
   }
 
   async clearAll () {
+    const f = this.clearAll
+    logD(f, 'start')
     for (let module in RxModuleEnum) await this.clearModule(module)
     await this.db.meta.remove()
-    await this.db.meta.destroy()
+    logD(f, 'complete')
   }
 
   async clearModule (rxModuleEnum) {
