@@ -40,9 +40,14 @@ div(
             @pageId="pageId = $event"
             :pages="pages" :pageId="pageId"
             @close="$emit('close')")
-    //- template(v-slot:footer)
-    //-   div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-px-sm.q-pb-sm.b-60
-    //-     kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event")
+    template(v-slot:footer)
+      div(
+        :style=`{
+          borderRadius: '10px',
+          overflow: 'hidden'
+        }`
+        ).row.full-width.justify-center.q-pb-sm
+        kalpa-buttons(:value="pages" :id="pageId" idKey="id" @id="pageId = $event").justify-center
 </template>
 
 <script>

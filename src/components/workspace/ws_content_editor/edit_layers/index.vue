@@ -1,25 +1,10 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
-  q-resize-observer(@resize="onResize")
-  //- layer from workspace
-  q-dialog(v-model="layersWorkspaceShow" position="bottom")
-    ws-content-list(
-      ctx="nodeEditor" @layer="layerFound"
-      :style=`{
-        maxWidth: $q.screen.xs ? $q.screen.width+'px' : 600+'px',
-        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
-        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
-      }`).b-30
-      template(v-slot:header)
-        div(:style=`{height: '60px', marginBottom: '20px'}`).row.full-width.items-center.content-center.q-px-sm
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="layersWorkspaceShow = false")
-          span.text-white.text-bold Find layer
   //- layer editor
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     layer-editor(
       v-if="layerEditing"
       v-bind="$props"
-      :width="width"
       @close="layerEditing = null"
       :style=`{
         position: 'absolute', zIndex: 2000,
@@ -28,49 +13,6 @@ div(:style=`{position: 'relative'}`).column.fit
   //- body
   .col.full-width
     layer-list(v-bind="$props" @layerId="layerClicked" :layerAdd="layerAdd")
-  composition-controller(
-    v-if="editorType === 'composition'"
-    v-bind="$props")
-  //- footer
-  transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      v-if="!layerEditing"
-      :style=`{
-        zIndex: 1000,
-        borderRadius: '10px',
-        overflow: 'hidden',
-      }`
-      ).row.full-width.items-end.content-end.justify-center.q-px-sm.q-pb-sm.b-50
-      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$emit('close')")
-      .col
-        kalpa-buttons(
-          :value="pages" :id="pageId" idKey="id"
-          screenSet="gt.xs"
-          @id="$emit('pageId', $event)").justify-center
-      q-btn(round flat dense color="white" icon="tune")
-  //-     //- q-btn(
-  //-     //-   round icon="edit" @click="layersEdit()"
-  //-     //-   :flat="!layersEditing"
-  //-     //-   :color="layersEditing ? 'green' : 'white'").b-90.q-mr-sm
-  //-     //- q-btn(
-  //-     //-   v-if="editorType === 'composition'"
-  //-     //-   round flat color="white" icon="play_arrow" @click="compositionPlay()"
-  //-     //-   ).b-90.q-mr-sm
-  //-     .col
-  //-     //- q-btn(
-  //-     //-   v-if="editorType === 'content'"
-  //-     //-   round flat color="white" icon="search").b-90.q-mr-sm
-  //-     //- q-btn(
-  //-     //-   v-if="editorType === 'content'"
-  //-     //-   round flat color="white" icon="sort" @click="layersSort()").b-90.q-mr-sm
-  //-     q-btn(
-  //-       v-if="editorType === 'composition'"
-  //-       flat color="white" icon="school" icon-right="add" @click="layerAddFromWorkspace()"
-  //-       :style=`{height: '42px'}`).b-90.q-mr-sm
-  //-     //- menu toggle
-  //-     //- q-btn(
-  //-     //-   round flat color="white" icon="menu_open"  @click="$emit('menuToggle')"
-  //-     //-   ).b-90
 </template>
 
 <script>
@@ -84,46 +26,11 @@ export default {
   props: ['editorType', 'player', 'meta', 'composition', 'pages', 'pageId'],
   data () {
     return {
-      width: 0,
-      layerEditing: null,
-      layersWorkspaceShow: false
     }
   },
   watch: {
-    layersEditing: {
-      handler (to, from) {
-        this.$log('layersEditing CHANGED', to)
-        if (to) {
-          this.$tween.to(this, 0.5, {layersEditingToolsWidth: 48})
-        }
-        else {
-          this.$tween.to(this, 0.5, {layersEditingToolsWidth: 0})
-        }
-      }
-    },
-    // 'meta.layerId': {
-    //   async handler (to, from) {
-    //     this.$log('meta.layerId CHANGED', to)
-    //     if (!to) return
-    //     // await this.$wait(100)
-    //     let ref = this.$refs[`layer-${to}`][0]
-    //     let scrollTop = ref.offsetTop - 4
-    //     this.$tween.to(this.$refs.extraLayersScrollArea, 0.5, {scrollTop: scrollTop})
-    //   }
-    // }
   },
   methods: {
-    compositionPlay () {
-      this.$log('compositionPlay')
-      if (this.meta.mode === 'composition') {
-        if (this.meta.playing) this.player.pause()
-        else this.player.play()
-      }
-      else {
-        this.player.meta(['mode', 'composition'])
-        this.player.play()
-      }
-    },
     layerClicked (id) {
       this.layerEditing = id
       this.player.meta(['mode', 'layer'])
@@ -206,10 +113,6 @@ export default {
         if (openEditor) this.layerEditing = layerId
       })
       this.$log('layerAdd done')
-    },
-    onResize (e) {
-      this.$log('onResize', e)
-      this.width = e.width
     }
   }
 }

@@ -3,7 +3,7 @@ div(
   :style=`{
     position: 'relative',
   }`).column.fit
-  //- item add
+  //- item add btn
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     q-btn(
       v-if="node.items.length > 0 && itemsSelected.length === 0 && !itemEditorOpened"
@@ -17,18 +17,18 @@ div(
       }`)
   //- item find
   q-dialog(v-model="itemFinderOpened" position="bottom")
-    ws-content-list(ctx="nodeEditor" @layer="layerFound"
+    ws-content-list(
+      ctx="nodeEditor" @content="contentFound"
       :style=`{
-        maxWidth: 600+'px',
-        maxHeight: 600+'px',
-        minHeight: 600+'px',
-        height: $q.screen.height+'px',
+        maxWidth: 800+'px',
+        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
+        minHeight: $q.screen.xs ? $q.screen.heigth-60+'px' : 800+'px',
         borderRadius: '10px',
-        overflow: 'hidden'
-      }`).b-30
+        overflow: 'hidden',
+      }`).fit.b-30
       template(v-slot:header)
-        div(:style=`{marginBottom: '20px'}`).row.full-width.items-center.content-center.q-pt-md.q-px-sm
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false")
+        div(:style=`{marginBottom: '20px'}`).row.full-width.items-center.content-center.q-pt-md
+          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false").q-mr-sm
           span(:style=`{fontSize: '16px'}`).text-white.text-bold Find item
   //- item edit
   q-dialog(v-model="itemEditorOpened" position="bottom")
@@ -181,8 +181,8 @@ export default {
       this.$log('itemAdd')
       this.itemFinderOpened = true
     },
-    contentFound () {
-      this.$log('contentFound')
+    contentFound (content) {
+      this.$log('contentFound', content)
     },
     layerFound (layer) {
       this.$log('layerFound', layer)

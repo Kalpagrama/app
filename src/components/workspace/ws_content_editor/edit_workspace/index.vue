@@ -22,11 +22,11 @@
         v-for="(l,li) in layers" :key="l.id"
         :style=`{borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.q-px-md.q-mb-xs.b-70
-  div().row.full-width.q-pa-sm
-    kalpa-buttons(
-        :value="pages" :id="pageId" idKey="id"
-        screenSet="gt.xs"
-        @id="$emit('pageId', $event)").full-width.justify-center
+  //- div().row.full-width.q-pa-sm
+  //-   kalpa-buttons(
+  //-       :value="pages" :id="pageId" idKey="id"
+  //-       screenSet="gt.xs"
+  //-       @id="$emit('pageId', $event)").full-width.justify-center
 </template>
 
 <script>

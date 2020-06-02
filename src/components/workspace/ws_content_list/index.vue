@@ -27,7 +27,7 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`)
   //- header
-  //- kalpa-debug(:options=`{ctx}`)
+  kalpa-debug(:options=`{ctx}`)
   div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
@@ -79,9 +79,10 @@ div(
               :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
               content-item-mini(
                 v-for="(c,ci) in items" :key="c.id"
-                @edit="contentChoose(c,ci)"
+                @pick="contentPicked(c,ci)"
                 @explore="contentExplore(c,ci)"
-                :content="c" :contentIndex="ci")
+                @delete="contentDelete(c,ci)"
+                :ctx="ctx" :content="c" :contentIndex="ci")
           //- nothing found
           div(
             v-else
@@ -91,16 +92,14 @@ div(
 </template>
 
 <script>
-import contentItem from './content_item'
-import contentItemMini from './content_item_mini'
-import contentItemMaxi from './content_item_maxi'
-
 import { ContentApi } from 'src/api/content'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import contentItem from './content_item'
+
 export default {
   name: 'wsContentList',
-  components: {contentItem, contentItemMini, contentItemMaxi},
+  components: {contentItem},
   props: {
     ctx: {
       type: String,
@@ -131,19 +130,6 @@ export default {
     }
   },
   computed: {
-    // composition () {
-    //   if (this.layer) {
-    //     return {
-    //       // contentOid: ,
-    //       preview: this.layer.content.thumbUrl,
-    //       contentType: 'VIDEO',
-    //       layers: [this.layer]
-    //     }
-    //   }
-    //   else {
-    //     return null
-    //   }
-    // },
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT}}
       // selector
@@ -165,24 +151,17 @@ export default {
         this.$log('searchString CHANGED', to)
         if (this.isURL(to)) {
           this.searchStringLoading = true
-          this.$q.loading.show({
-            delay: 2000
-          })
+          this.$q.loading.show()
           this.searchStringRaw = ''
           this.$refs.searchStringInput.blur()
-          await this.$wait(2000)
+          await this.$wait(1000)
           this.$q.loading.hide()
           this.searchStringLoading = false
-          this.contentChoose(await this.contentAdd(await this.contentFromURL(to)))
+          this.contentPick(await this.contentAdd(await this.contentFromURL(to)))
         }
         else {
           this.searchString = to
         }
-      }
-    },
-    contentEditorOpened: {
-      handler (to, from) {
-        this.$log('contentEditorOpened CHANGED', to)
       }
     }
   },
@@ -192,33 +171,26 @@ export default {
       a.href = str
       return (a.host && a.host !== window.location.host)
     },
-    contentChoose (content, ci) {
-      this.$log('contentChoose', content, ci)
-      // TODO depends on mode
-      this.content = content
-      this.contentEditorOpened = true
-      // this.$router.push('/workspace/content/' + content.id)
-      // this.$router.push({params: {id: content.id}})
+    contentPicked (content) {
+      this.$log('contentPicked')
+      if (this.ctx === 'workspace') {
+        this.content = content
+        this.$nextTick(() => {
+          this.contentEditorOpened = true
+        })
+      }
+      else {
+        this.$emit('content', JSON.parse(JSON.stringify(content)))
+      }
+    },
+    contentExplore (c, ci) {
+      this.$log('contentExplore', c, ci)
+      this.$router.push(`/content/${c.contentOid}`).catch(e => e)
     },
     async contentDelete (content, ci) {
       this.$log('contentDelete', content, ci)
       if (!confirm('Delete content ?!')) return
       await this.$rxdb.remove(content.id)
-    },
-    layerChoose ([content, li]) {
-      this.$log('layerChoose', content, li)
-      if (this.ctx === 'nodeEditor') {
-        this.$emit('layer', content.layers[li])
-      }
-    },
-    layerPreview ([content, li]) {
-      this.$log('layerPreview', content, li)
-      this.content = content
-      this.contentEditorOpened = true
-    },
-    contentExplore (c, ci) {
-      this.$log('contentExplore', c, ci)
-      this.$router.push(`/content/${c.contentOid}`).catch(e => e)
     },
     async contentAdd (content) {
       this.$log('contentAdd content', content)
@@ -266,6 +238,7 @@ export default {
     },
     async contentFromFILEStart () {
       this.$log('contentFromFILEStart')
+      // TODO: impl
     },
     async contentFromFILE () {
       try {

@@ -6,7 +6,7 @@
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit.b-40
+div(:style=`{position: 'relative'}`).row.fit
   //- footer: layersSelected
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(

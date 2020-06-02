@@ -10,7 +10,7 @@ div(
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   //- menu
   q-btn(
-    v-if="visible && active"
+    v-if="visible && active && ctx !== 'workspace'"
     round flat color="white" icon="more_vert"
     :style=`{position: 'absolute', top: '8px', right: '8px', zIndex: 10000, background: 'rgba(0,0,0,0.1)'}`)
     kalpa-menu-popup(:actions="actions")

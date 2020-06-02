@@ -39,6 +39,7 @@ div(
           div(v-if="items.length === 0").row.full-width.items-center.content-center.justify-center.q-pa-md
             //- span.text-white.q-mr-sm Create sphere
             q-btn(
+              v-if="searchString.length > 0"
               color="green" push no-caps @click="sphereCreate()"
               :style=`{minHeight: '50px'}`) Create sphere "{{ searchString }}"
           div(v-if="showItems && items.length > 0").row.full-width.q-py-sm

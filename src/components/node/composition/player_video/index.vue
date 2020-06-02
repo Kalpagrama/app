@@ -8,7 +8,7 @@ iframe[id$="_youtube_iframe"]
   width: 100%
   height: 100%
   z-index: 100
-  border-radius: 0px
+  border-radius: 10px
   overflow: hidden
   pointer-events: none
 @media (min-width: 600px)
@@ -18,7 +18,7 @@ iframe[id$="_youtube_iframe"]
     min-width: 1000%
     min-height: 1000%
     z-index: 100
-    border-radius: 1px
+    border-radius: 10px
     overflow: hidden
     transform: scale(0.1)
     transform-origin: top left

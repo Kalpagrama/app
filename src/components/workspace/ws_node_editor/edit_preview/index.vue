@@ -2,17 +2,17 @@
 .column.fit
   div().row.full-with.q-pa-md
   div(:style=`{position: 'relative'}`).col.full-width.scroll
-    .row.fit.q-px-sm
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`
-        ).row.fit.items-center.content-center.justify-center.b-70
-        q-spinner(size="50px" color="green")
-    //- node(
-    //-   :ctx="'workspace'"
-    //-   :node="nodePreview" :nodeFullReady="nodePreview"
-    //-   :visible="true" :active="true" :mini="false"
-    //-   :style=`{
-    //-     minHeight: '400px',
-    //-   }`).fit.br
+    //- .row.fit.q-px-sm
+    //-   div(:style=`{borderRadius: '10px', overflow: 'hidden'}`
+    //-     ).row.fit.items-center.content-center.justify-center.b-70
+    //-     q-spinner(size="50px" color="green")
+    node(
+      ctx="workspace"
+      :node="nodePreview" :nodeFullReady="nodePreview"
+      :visible="true" :active="true" :mini="false"
+      :style=`{
+        minHeight: '400px',
+      }`).fit
   .row.full-width.items-center.content-center.q-px-sm.q-py-md
     q-btn(
       flat color="white" no-caps icon-right="keyboard_arrow_down"

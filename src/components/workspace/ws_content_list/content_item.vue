@@ -1,84 +1,91 @@
 <template lang="pug">
-q-expansion-item(
-  @before-show="isOpened = true"
-  @after-hide="isOpened = false"
-  :label="contentName"
-  color="white" dark
-  :dense="false"
-  :group="contentIndex"
+div(
+  @mousenter="mouseIsOver = true"
+  @mouseleave="mouseIsOver = false"
   :style=`{
+    position: 'relative',
+    height: '100px',
     borderRadius: '10px',
-    overflow: 'hidden'
+    overflow: 'hidden',
   }`
-  ).full-width.b-70.q-mb-xs
+  ).row.full-width.items-center.content-center.q-mb-sm.b-60.content-item
+  //- thumb
   div(
-    v-if="isOpened"
-    :style=`{height: '330px'}`).column.full-width
-    //- header: actions for workspace
-    div(
-      v-if="ctx === 'workspace'"
-      ).row.full-width.q-pa-sm
-      q-btn(no-caps push color="green" @click="$emit('choose')") Edit content
-      .col
-      q-btn(no-caps flat color="red" @click="$emit('delete')").b-80 Delete
-    div(
-      v-if="ctx === 'nodeEditor'"
-      ).row.full-width.q-pa-sm
-      q-btn(no-caps flat color="white").b-80 Take only content
-      .col
-      q-btn(no-caps flat color="white").b-80 Take all layers
-    //- header: find layer
-    div().row.full-width.q-px-sm
-      q-input(
-        v-model="searchString"
-        filled dark dense color="grey-2" placeholder="Find layer"
-        :style=`{}`).full-width.b-90
-    //- body
-    .col.full-width.scroll
-      .row.full-width.items-start.content-start.q-pa-sm
-        layer-item(
-          v-for="(l,li) in contentLayers" :key="li"
-          :ctx="ctx" :content="content" :contentIndex="contentIndex"
-          :layer="l" :layerIndex="li"
-          @choose="$emit('layerChoose', [content, li])"
-          @preview="$emit('layerPreview', [content, li])")
+    @click="$emit('pick')"
+    :style=`{width: '180px', height: '100px', borderRadius: '10px', overflow: 'hidden'}`
+    ).row.items-center.content-center.justify-center.b-80
+    img(
+      v-if="!thumbErrored"
+      @error="thumbErrorHandle"
+      :src="content.thumbOid"
+      :style=`{objectFit: 'cover'}`).fit
+    q-icon(
+      v-if="thumbErrored"
+      name="photo" size="150px" :style=`{color: 'rgb(90,90,90)'}`).full-width
+  //- center name
+  div(
+    @click="$emit('pick')"
+    :style=`{position: 'relative'}`).col.full-height
+    .row.fit.items-start.content-start.q-pa-sm
+      span(:style=`{userSelect: 'none', lineHeight: 1.2}`).text-white.text-bold {{ contentName }}
+  //- stats
+  q-btn(
+    v-if="content.layers.length > 0"
+    flat dense color="grey-5"
+    icon-right="layers"
+    :style=`{
+      position: 'absolute', right: '3px', bottom: '0px', zIndex: 1000,
+    }`)
+    small {{ content.layers.length }}
+  //- right
+  div(
+    v-if="ctx === 'workspace'"
+    :style=`{width: '36px'}`).row.full-height.items-start.content-start.q-pt-sm
+    q-btn(round flat dense color="grey-6" icon="more_vert")
+      kalpa-menu-popup(:actions="actions")
 </template>
 
 <script>
-import layerItem from './layer_item'
-
 export default {
   name: 'contentItem',
-  props: ['ctx', 'content', 'contentIndex'],
-  components: {layerItem},
+  props: ['ctx', 'content'],
   data () {
     return {
-      isOpened: false,
-      searchString: ''
+      mouseIsOver: false,
+      thumbErrored: false
     }
   },
   computed: {
     contentName () {
-      if (this.$q.screen.xs) {
-        return this.content.name.slice(0, 40)
-      }
-      else {
-        return this.content.name
-      }
+      return this.content.name
     },
-    contentLayers () {
-      return this.content.layers.filter(l => {
-        if (l.spheres.length > 0) {
-          if (this.searchString.length > 0) {
-            let nameRegExp = new RegExp(this.searchString, 'i')
-            return nameRegExp.test(l.spheres[0].name)
+    actions () {
+      return {
+        edit: {
+          name: 'Edit',
+          fn: () => {
+            this.$emit('edit')
           }
-          else return true
+        },
+        explore: {
+          name: 'Explore',
+          fn: () => {
+            this.$emit('explore')
+          }
+        },
+        delete: {
+          name: 'Delete',
+          fn: async () => {
+            this.$emit('delete')
+          }
         }
-        else {
-          return false
-        }
-      })
+      }
+    }
+  },
+  methods: {
+    thumbErrorHandle () {
+      // this.$log('thumbErrorHandle')
+      this.thumbErrored = true
     }
   }
 }

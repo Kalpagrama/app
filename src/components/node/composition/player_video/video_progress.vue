@@ -6,28 +6,41 @@ div(
     background: meta.playing ? 'none' : ctx === 'workspace' ? 'rgb(0,0,0)' : 'none',
     background: meta.playing ? 'none' : ctx === 'workspace' ? 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)' : 'none',
   }`
-  ).row.full-width.q-pa-sm
+  ).row.full-width.q-pa-md
   //- actions
-  q-btn(
-    round flat color="white" @click="meta.playing ? player.pause() : player.play()"
-    :icon="meta.playing ? 'pause' : 'play_arrow'"
-    :style=`{zIndex: 1400}`)
-  q-btn(
-    round flat color="white" @click="mutedToggle()"
-    :icon="meta.muted ? 'volume_off' : 'volume_up'"
-    :style=`{zIndex: 1400}`)
-  q-btn(
-    round flat color="white" @click="videoForward(0)"
-    icon="fast_rewind"
-    )
-  q-btn(
-    round flat color="white" @click="videoForward(1)"
-    icon="fast_forward")
-  q-btn(
-    round flat color="white" @click="layerAgain()"
-    icon="refresh")
-  //- stats
-  q-btn(flat color="white") {{ $time(now) }}/{{ $time(duration) }}
+  div(
+    :style=`{
+      background: 'rgba(0,0,0,0.2)',
+      borderRadius: '10px',
+      overflow: 'hidden',
+    }`
+    ).row.br
+    q-btn(
+      round flat color="white" @click="meta.playing ? player.pause() : player.play()"
+      :icon="meta.playing ? 'pause' : 'play_arrow'"
+      :style=`{zIndex: 1400}`)
+    //- stats
+    q-btn(
+      flat color="white"
+      :style=`{
+      }`)
+      small.text-white.q-mr-sm {{ $time(now) }} /
+      small.text-white {{ $time(duration) }}
+    q-btn(
+      round flat color="white" @click="mutedToggle()"
+      :icon="meta.muted ? 'volume_off' : 'volume_up'"
+      :style=`{zIndex: 1400}`)
+    q-btn(
+      round flat color="white" @click="videoForward(0)"
+      icon="fast_rewind"
+      )
+    q-btn(
+      round flat color="white" @click="videoForward(1)"
+      icon="fast_forward")
+    q-btn(
+      round flat color="white" @click="layerAgain()"
+      icon="refresh"
+      :style=`{order: 1}`)
   //- bar
   div(
     @click="barClick"
