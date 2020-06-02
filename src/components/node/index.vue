@@ -59,8 +59,8 @@ export default {
     },
     async nodeDestroy () {
       // this.$log('nodeDestroy', this.node.oid)
-      if (!this.nodeFull) return
-      this.nodeFull = null
+      // if (!this.nodeFull) return
+      // this.nodeFull = null
     }
   }
 }

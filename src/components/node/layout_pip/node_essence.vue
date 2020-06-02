@@ -11,17 +11,15 @@ div(
     height: '70px'
   }`
   ).row.full-width
-  .col.br
+  .col
     .row.fit.items-center.content-center.q-py-sm.q-pl-md
       router-link(
         :to="'/node/'+node.oid"
-        :style=`{
-          height: '70px',
-        }`
         ).row.full-width.items-start.content-start.essence
         span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
   div(:style=`{}`).row.full-height.items-center.content-center.justify-center.q-px-sm
-    q-btn(round flat color="grey-6" icon="more_vert" @click="menuClick()")
+    q-btn(round flat color="grey-6" icon="more_vert")
+      kalpa-menu-popup(:actions="actions")
 </template>
 
 <script>
@@ -37,10 +35,66 @@ export default {
     return {
     }
   },
-  methods: {
-    menuClick () {
-      this.$log('menuClick')
+  computed: {
+    nodeIsMine () {
+      if (this.nodeFull) {
+        return this.nodeFull.author.oid === this.$store.getters.currentUser().oid
+      }
+      else {
+        return true
+      }
+    },
+    actions () {
+      let res = {
+        explore: {
+          name: 'Explore node',
+          fn: () => {
+            this.$log('Explore')
+            this.$router.push(`/node/${this.node.oid}`).catch(e => e)
+          }
+        },
+        share: {
+          name: 'Share node',
+          fn: () => {
+            this.$log('Share node')
+          }
+        },
+        subscribe: {
+          name: 'Subscribe',
+          fn: () => {
+            this.$log('Subscribe')
+            // TODO: subscribe to node.sphere?
+          }
+        },
+        save: {
+          name: 'Save to Workspace',
+          fn: () => {
+            this.$log('Save to Workspace')
+            // TODO: save node to WS
+            // need normalization, layer.id, content.id, ?
+            // this.$router.push('/workspace/share')
+          }
+        },
+        report: {
+          name: 'Report',
+          fn: () => {
+            this.$log('Report')
+            // TODO: report on the whole node
+          }
+        }
+      }
+      if (this.nodeIsMine) {
+        res.delete = {
+          name: 'Delete',
+          fn: () => {
+            this.$log('Delete')
+          }
+        }
+      }
+      return res
     }
+  },
+  methods: {
   }
 }
 </script>

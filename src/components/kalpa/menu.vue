@@ -77,7 +77,7 @@ div(:style=`{}`).column.fit.b-50
             span(:style=`{fontSize: '18px'}`).q-mx-lg Create node
         //- version
         .row.full-width.items-center.q-px-md.q-py-sm
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.0.2-28.05.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.9.3-02.06.2020
         //- slot(name="footer")
 </template>
 

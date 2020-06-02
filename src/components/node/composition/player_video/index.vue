@@ -30,16 +30,20 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden'}`).column.fit
+div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden', opacity: now < layerStart ? 0 : 1}`).column.fit
   video-controller(v-bind="$props" :player="player" :meta="meta")
-  slot(name="header")
-  div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden'}`).row.full-width.b-30
-    slot(name="video")
-    //- kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId}`)
-    q-spinner(
-      v-if="ctx === 'workspace' && !loaded"
-      size="50px" color="green"
-      :style=`{position: 'absolute', top: 'calc(50% - 25px)', left: 'calc(50% - 25px)'}`)
+  slot(name="header" :player="player" :meta="meta")
+  div(
+    :class=`{
+      'full-height': ctx !== 'workspace'
+    }`
+    :style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden'}`).row.full-width.b-50
+    slot(name="video" :player="player" :meta="meta")
+    //- kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId,layerStart,layerEnd}`)
+    //- q-spinner(
+    //-   v-if="ctx === 'workspace' && !loaded"
+    //-   size="50px" color="green"
+    //-   :style=`{position: 'absolute', top: 'calc(50% - 25px)', left: 'calc(50% - 25px)'}`)
     //- :src="videoSrc" :type="videoType"
     video(
       ref="videoRef"
@@ -52,8 +56,11 @@ div(:style=`{position: 'relative', borderRadius: '0px', overflow: 'hidden'}`).co
       @click="playing ? player.pause() : player.play()"
       @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
       @timeupdate="videoTimeupdate"
+      :class=`{
+        'full-height': ctx !== 'workspace'
+      }`
       :style=`{
-        position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '0px', overflow: 'hidden'
+        position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '0px', overflow: 'hidden',
       }`)
       //- source(:src="videoSrc" :type="videoType")
     video-progress(v-bind="$props" :player="player" :meta="meta")
@@ -108,13 +115,22 @@ export default {
       else return null
     },
     layerStart () {
-      return this?.layer?.figuresAbsolute[0].t
+      if (this.ctx === 'workspace') return this?.layer?.figuresAbsolute[0].t
+      else return this?.layer?.figuresRelative[0].t
     },
     layerEnd () {
-      return this?.layer?.figuresAbsolute[1].t
+      if (this.ctx === 'workspace') return this?.layer?.figuresAbsolute[1].t
+      else return this?.layer?.figuresRelative[1].t
     },
     videoSrc () {
-      return this.ctx === 'workspace' ? this.layerContent?.url : this.layer?.url
+      // return this.ctx === 'workspace' ? this.layerContent?.url : this.layer?.url
+      // #t=10,20
+      if (this.ctx === 'workspace') {
+        return this.layerContent?.url
+      }
+      else {
+        return `${this.layer?.url}#t=${this.layerStart},${this.layerEnd}`
+      }
     },
     videoType () {
       return this.ctx === 'workspace' ? 'video/youtube' : 'video/mp4'
@@ -274,7 +290,11 @@ export default {
         this.now = t || this.player.currentTime
       }
       else {
-        this.now = t || this.$refs.videoRef.currentTime
+        if (t) this.now = t
+        else {
+          if (this.$refs.videoRef) this.now = this.$refs.videoRef.currentTime
+        }
+        // this.now = t || this.$refs.videoRef.currentTime
       }
     }
   },

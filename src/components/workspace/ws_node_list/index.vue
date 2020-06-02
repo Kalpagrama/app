@@ -59,8 +59,8 @@ div(
     div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
-      q-btn(flat no-caps color="white").b-70 Filters
-      q-btn(push no-caps color="green" @click="nodeAdd()").q-ml-sm.gt-xs New
+      //- q-btn(flat no-caps color="white").b-70 Filters
+      //- q-btn(push no-caps color="green" @click="nodeAdd()").q-ml-sm.gt-xs New
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
@@ -70,7 +70,8 @@ div(
             node-item(
               v-for="(n,ni) in items" :key="ni"
               :node="n" :nodeIndex="ni"
-              @edit="nodeEdit(n,ni)")
+              @edit="nodeEdit(n,ni)"
+              @delete="nodeDelete(n,ni)")
           //- nothing found
           div(
             v-else

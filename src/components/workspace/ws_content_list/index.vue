@@ -62,12 +62,12 @@ div(
     div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
-      q-btn-group(flat :style=`{borderRadius: '10px'}`).b-70
-        q-btn(
-          v-for="(v,vi) in listViews" :key="v.id" @click="listView = v.id"
-          round dense flat
-          :icon="v.icon"
-          :color="listView === v.id ? 'green' : 'grey-6'")
+      //- q-btn-group(flat :style=`{borderRadius: '10px'}`).b-70
+      //-   q-btn(
+      //-     v-for="(v,vi) in listViews" :key="v.id" @click="listView = v.id"
+      //-     round dense flat
+      //-     :icon="v.icon"
+      //-     :color="listView === v.id ? 'green' : 'grey-6'")
       //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70 {{$q.screen.xs ? '' : 'Filters'}}
   //- body
   .col.full-width.scroll
@@ -76,25 +76,12 @@ div(
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
             div(
-              v-if="listView === 'mini'"
               :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
               content-item-mini(
-                v-for="(c,ci) in items" :key="c.id" @edit="contentChoose(c,ci)"
+                v-for="(c,ci) in items" :key="c.id"
+                @edit="contentChoose(c,ci)"
+                @explore="contentExplore(c,ci)"
                 :content="c" :contentIndex="ci")
-            div(
-              v-if="listView === 'maxi'"
-              :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
-              content-item-maxi(
-                v-for="(c,ci) in items" :key="c.id" @click="contentChoose(c,ci)"
-                :content="c" :contentIndex="ci")
-            //- div(v-if="ctx === 'nodeEditor'").row.full-width.items-start.content-start
-            //-   content-item(
-            //-     v-for="(c,ci) in items" :key="c.id"
-            //-     :ctx="ctx" :content="c" :contentIndex="ci"
-            //-     @choose="contentChoose(c,ci)"
-            //-     @delete="contentDelete(c,ci)"
-            //-     @layerChoose="layerChoose"
-            //-     @layerPreview="layerPreview")
           //- nothing found
           div(
             v-else
@@ -110,6 +97,7 @@ import contentItemMaxi from './content_item_maxi'
 
 import { ContentApi } from 'src/api/content'
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'wsContentList',
   components: {contentItem, contentItemMini, contentItemMaxi},
@@ -135,7 +123,7 @@ export default {
       searchStringLoading: false,
       content: null,
       contentEditorOpened: false,
-      listView: 'mini', // mini, maxi
+      listView: 'mini',
       listViews: [
         {id: 'mini', icon: 'view_list'},
         {id: 'maxi', icon: 'view_agenda'}
@@ -143,19 +131,19 @@ export default {
     }
   },
   computed: {
-    composition () {
-      if (this.layer) {
-        return {
-          // contentOid: ,
-          preview: this.layer.content.thumbUrl,
-          contentType: 'VIDEO',
-          layers: [this.layer]
-        }
-      }
-      else {
-        return null
-      }
-    },
+    // composition () {
+    //   if (this.layer) {
+    //     return {
+    //       // contentOid: ,
+    //       preview: this.layer.content.thumbUrl,
+    //       contentType: 'VIDEO',
+    //       layers: [this.layer]
+    //     }
+    //   }
+    //   else {
+    //     return null
+    //   }
+    // },
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT}}
       // selector
@@ -227,6 +215,10 @@ export default {
       this.$log('layerPreview', content, li)
       this.content = content
       this.contentEditorOpened = true
+    },
+    contentExplore (c, ci) {
+      this.$log('contentExplore', c, ci)
+      this.$router.push(`/content/${c.contentOid}`).catch(e => e)
     },
     async contentAdd (content) {
       this.$log('contentAdd content', content)

@@ -40,14 +40,7 @@ div(
   //- right
   div(:style=`{width: '36px'}`).row.full-height.items-start.content-start.q-pt-sm
     q-btn(round flat dense color="grey-6" icon="more_vert")
-      q-menu(cover auto-close anchor="top right")
-        div(:style=`{minWidth: '150px', maxWidth: '150px'}`).column.fit.b-70
-          .col.full-width
-            q-btn(
-              v-for="(a,aId) in contentActions" :key="aId"
-              @click="a.fn()"
-              flat no-caps color="white" align="left"
-              ).full-width {{a.name}}
+      kalpa-menu-popup(:actions="actions")
 </template>
 
 <script>
@@ -64,16 +57,18 @@ export default {
     contentName () {
       return this.content.name
     },
-    contentActions () {
+    actions () {
       return {
         edit: {
           name: 'Edit',
           fn: () => {
+            this.$emit('edit')
           }
         },
         explore: {
           name: 'Explore',
           fn: () => {
+            this.$emit('explore')
           }
         },
         delete: {

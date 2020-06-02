@@ -1,34 +1,40 @@
 <template lang="pug">
 div(
+  :class=`{
+    'full-height': ctx !== 'workspace'
+  }`
   :style=`{
     position: 'relative'
   }`
   ).row.full-width.items-start.content-start
-  kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
+  //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   //- menu
-  //- q-btn(
-  //-   v-if="visible && active"
-  //-   round flat color="white" icon="more_vert"
-  //-   :style=`{position: 'absolute', top: '8px', right: '8px', zIndex: 10000, background: 'rgba(0,0,0,0.1)'}`)
-  img(
-    v-if="preview"
-    :src="preview"
-    draggable="false"
-    @load="previewLoaded"
-    @error="previewErrored"
-    :style=`{
-      userSelect: 'none',
-      objectFit: 'contain'
-    }`
-    ).full-width
+  q-btn(
+    v-if="visible && active"
+    round flat color="white" icon="more_vert"
+    :style=`{position: 'absolute', top: '8px', right: '8px', zIndex: 10000, background: 'rgba(0,0,0,0.1)'}`)
+    kalpa-menu-popup(:actions="actions")
+  //- img(
+  //-   v-if="preview"
+  //-   :src="preview"
+  //-   draggable="false"
+  //-   @load="previewLoaded"
+  //-   @error="previewErrored"
+  //-   :style=`{
+  //-     userSelect: 'none',
+  //-     objectFit: 'contain'
+  //-   }`
+  //-   ).full-width
   player-video(
-    v-if="composition && active && ctx !== 'list'"
+    v-if="composition && active"
     :ctx="ctx" :composition="composition"
     :visible="visible" :active="active" :mini="mini")
     template(
       v-for="(_, scopedSlotName) in $scopedSlots"
       v-slot:[scopedSlotName]="slotData")
       slot(:name="scopedSlotName" v-bind="slotData")
+      //- div(v-if="scopedSlotName === 'video'" :style=`{position: 'absolute', zIndex: 10000, top: '0px', opacity: 0.5}`).row.full-width.q-pa-sm.bg-red
+      //-   span footer
 </template>
 
 <script>
@@ -63,6 +69,34 @@ export default {
     }
   },
   computed: {
+    actions () {
+      return {
+        explore: {
+          name: 'Explore content',
+          fn: () => {
+            this.$log('Explore')
+          }
+        },
+        saveComposition: {
+          name: 'Save composition to Workspace',
+          fn: () => {
+            this.$log('Save composition to Workspace')
+          }
+        },
+        saveContent: {
+          name: 'Save content to Workspace',
+          fn: () => {
+            this.$log('Save content to Workspace')
+          }
+        },
+        saveLayer: {
+          name: 'Save layer to Workspace',
+          fn: () => {
+            this.$log('Save later to Workspace')
+          }
+        }
+      }
+    }
   },
   watch: {
     visible: {
@@ -72,7 +106,7 @@ export default {
         if (to) {
           if (this.ctx !== 'workspace') {
             this.$log('visible TRUE => load composition')
-            this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.oid)
+            this.composition = this.compositionWs(await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.oid))
           }
         }
       }
@@ -83,7 +117,7 @@ export default {
         // this.$log('value CHANGED', to)
         if (to) {
           if (this.ctx === 'workspace') {
-            this.$log('value => load composition')
+            this.$log('value => load composition', to)
             this.composition = to
           }
           // else {
@@ -94,6 +128,13 @@ export default {
     },
   },
   methods: {
+    compositionWs (val) {
+      val.layers.map((l, li) => {
+        l.id = li
+        l.color = this.$randomColor(li)
+      })
+      return val
+    },
     previewLoaded () {
       // this.$log('previewLoaded')
     },

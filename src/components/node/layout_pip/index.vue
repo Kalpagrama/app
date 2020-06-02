@@ -2,7 +2,7 @@
 div(
   :class=`{
     'b-50': !active,
-    'b-60': active,
+    'b-70': active,
   }`
   :style=`{
     position: 'relative',
@@ -12,9 +12,10 @@ div(
   ).row.full-width.items-start.content-start
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 10000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   node-items(
-    v-if="false"
+    v-if="true"
     v-bind="$props" :meta="meta"
     :style=`{
+      transform: 'translate3d(0,0,0)',
       borderRadius: '10px',
       overflow: 'hidden',
     }`).b-60
@@ -34,7 +35,7 @@ div(
       order: 1
     }`)
   node-spheres(
-    v-if="nodeFull"
+    v-if="nodeFull && nodeFull.spheres.length > 0"
     v-bind="$props" :meta="meta"
     :style=`{
       order: 2

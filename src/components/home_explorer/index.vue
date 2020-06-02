@@ -1,7 +1,9 @@
 <template lang="pug">
 //- container :style=`{height: $q.screen.height+'px'}`
 q-layout(view="hHh lpR fFf").b-30
-  q-header(reveal :style=`{zIndex: 30000}`).row.full-width.justify-center
+  q-header(
+    v-if="true"
+    reveal :style=`{zIndex: 30000}`).row.full-width.justify-center
     div(
       :style=`{
         maxWidth: $store.state.ui.maxWidthPage+'px',
@@ -17,7 +19,11 @@ q-layout(view="hHh lpR fFf").b-30
     ).row.full-width.justify-center
     div(
       v-if="!$store.state.ui.appShowMenu"
-      :style=`{borderRadius: '10px 10px 0 0'}`
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+        zIndex: 30000,
+        borderRadius: '10px 10px 0 0'
+      }`
       ).row.full-width.items-center.content-center.q-pa-sm.b-50
       q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])").b-60
       .col.q-pb-sm.q-px-sm

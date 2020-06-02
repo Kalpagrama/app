@@ -104,10 +104,10 @@ export default {
     this.paddingTop = this.options.paddingTop
     // this.paddingTop = this.$q.screen.height / 2
     this.paddingBottom = this.$q.screen.height / 3
-    if (this.items && this.items.length > 0) {
-      await this.$wait(500)
-      this.itemInactiveClick(this.items[0], 0)
-    }
+    // if (this.items && this.items.length > 0) {
+    //   await this.$wait(500)
+    //   this.itemInactiveClick(this.items[0], 0)
+    // }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

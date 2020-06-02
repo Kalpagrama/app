@@ -3,8 +3,8 @@ div(
   :style=`{
     position: 'absolute', zIndex: 1000, bottom: '0px',
     borderRadius: '0px', overflow: 'hidden',
-    background: meta.playing ? 'none' : 'rgb(0,0,0)',
-    background: meta.playing ? 'none' : 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)',
+    background: meta.playing ? 'none' : ctx === 'workspace' ? 'rgb(0,0,0)' : 'none',
+    background: meta.playing ? 'none' : ctx === 'workspace' ? 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)' : 'none',
   }`
   ).row.full-width.q-pa-sm
   //- actions
@@ -23,6 +23,11 @@ div(
   q-btn(
     round flat color="white" @click="videoForward(1)"
     icon="fast_forward")
+  q-btn(
+    round flat color="white" @click="layerAgain()"
+    icon="refresh")
+  //- stats
+  q-btn(flat color="white") {{ $time(now) }}/{{ $time(duration) }}
   //- bar
   div(
     @click="barClick"
@@ -42,7 +47,7 @@ div(
       :style=`{
         position: 'absolute', zIndex: 1300,
         left: '0px', bottom: '0px',
-        width: barWidth ? barWidth+'%' : (meta.now/meta.duration)*100+'%',
+        width: barWidth ? barWidth+'%' : (now/duration)*100+'%',
         height: barHeight+'px',
         borderRadius: barHeight/2+'px',
         pointerEvents: 'none',
@@ -54,18 +59,35 @@ div(
 <script>
 export default {
   name: 'playerVideo-videoProgress',
-  props: ['visible', 'active', 'mini', 'player', 'meta'],
+  props: ['ctx', 'visible', 'active', 'mini', 'player', 'meta'],
   data () {
     return {
       mouseOverBar: false,
       barHeight: 4,
-      barHeightMax: 18,
+      barHeightMax: 14,
       barHeightMin: 4,
       barWidth: null,
       barDragging: false
     }
   },
-  computed: {},
+  computed: {
+    duration () {
+      if (this.ctx === 'workspace') {
+        return this.meta.duration
+      }
+      else {
+        return this.meta.layerEnd - this.meta.layerStart
+      }
+    },
+    now () {
+      if (this.ctx === 'workspace') {
+        return this.meta.now
+      }
+      else {
+        return this.meta.now - this.meta.layerStart
+      }
+    },
+  },
   watch: {
     // visible: {},
     // active: {},
@@ -78,31 +100,40 @@ export default {
     }
   },
   methods: {
+    layerAgain () {
+      this.$log('layerAgain')
+      this.player.setCurrentTime(this.meta.layerStart)
+      this.player.play()
+    },
+    setCurrentTime (t) {
+      t = this.ctx === 'workspace' ? t : t + this.meta.layerStart
+      this.player.setCurrentTime(t)
+      this.player.update(t)
+    },
     mutedToggle () {
       this.$log('mutedToggle')
     },
     videoForward (right) {
       // this.$log('videoForward', right)
-      let t = this.meta.now
+      let t = this.now
       if (right) {
         t += 10
-        if (t > this.meta.duration) t = this.meta.duration
+        if (t > this.duration) t = this.duration
       }
       else {
         t -= 10
         if (t < 0) t = 0
       }
-      this.player.setCurrentTime(t)
-      this.player.update(t)
+      this.setCurrentTime(t)
+      // this.player.update(t)
     },
     barDrag (e) {
       this.$log('barDrag', e)
       if (e.isFirst) {
         let left = e.evt.layerX || e.position.left
         // alert('barDrag first' + left)
-        this.player.meta(['mode', 'content'])
+        if (this.ctx === 'workspace') this.player.meta(['mode', 'content'])
         this.$tween.to(this, 0.3, {barHeight: this.barHeightMax})
-        // this.barWidth = (this.meta.now / this.meta.duration) * 100
         this.barWidth = (left / this.$el.clientWidth) * 100
       }
       if (e.isFinal) {
@@ -111,31 +142,31 @@ export default {
         this.barWidth = null
       }
       this.barWidth += (e.delta.x / this.$el.clientWidth) * 100
-      let t = (this.barWidth / 100) * this.meta.duration
+      let t = (this.barWidth / 100) * this.duration
       if (t > 0) {
-        this.player.setCurrentTime(t)
-        this.player.update(t)
+        this.setCurrentTime(t)
+        // this.player.update(t)
       }
       // this.$log('t', t)
       // this.player.setCurrentTime(t)
     },
     barClick (e) {
       // this.$log('barClick', e)
-      this.player.meta(['mode', 'content'])
+      if (this.ctx === 'workspace') this.player.meta(['mode', 'content'])
       let width = e.target.clientWidth
       let left = e.offsetX
-      let t = (this.meta.duration * left) / width
-      this.player.setCurrentTime(t)
+      let t = (this.duration * left) / width
+      this.setCurrentTime(t)
       // tween to
-      let tPercentNow = (this.meta.now / this.meta.duration) * 100
-      let tPercentNext = (t / this.meta.duration) * 100
+      let tPercentNow = (this.now / this.duration) * 100
+      let tPercentNext = (t / this.duration) * 100
       this.barWidth = tPercentNow
       this.$tween.to(this, 0.3, {
         barWidth: tPercentNext,
         barHeight: this.barHeightMin,
         onComplete: () => {
           this.barWidth = null
-          this.player.update(t)
+          // this.player.update(t)
         }
       })
     }

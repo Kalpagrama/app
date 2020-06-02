@@ -9,7 +9,7 @@ div(
     v-for="(s,si) in nodeFull.spheres" :key="si"
     :to="'/sphere/'+s.oid"
     :style=`{borderRadius: '10px', userSelect: 'none'}`
-    ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-70
+    ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-80
     small {{ s.name }}
 </template>
 

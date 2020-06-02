@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     loaded () {
-      this.$log('loaded')
+      // this.$log('loaded')
     },
     errored () {
       this.$log('errored')
