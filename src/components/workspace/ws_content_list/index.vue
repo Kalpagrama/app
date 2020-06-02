@@ -157,7 +157,7 @@ export default {
           await this.$wait(1000)
           this.$q.loading.hide()
           this.searchStringLoading = false
-          this.contentPick(await this.contentAdd(await this.contentFromURL(to)))
+          this.contentPicked(await this.contentAdd(await this.contentFromURL(to)))
         }
         else {
           this.searchString = to
