@@ -3,13 +3,14 @@ import { Workspace, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/wor
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { addRxPlugin } from 'rxdb'
+import { addRxPlugin, createRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, ReactiveListHolder } from 'src/system/rxdb/reactive'
 import { NodeApi } from 'src/api/node'
 import { ObjectsApi } from 'src/api/objects'
+import { schemaKeyValue } from 'src/system/rxdb/schemas'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
@@ -20,13 +21,15 @@ const RxCollectionEnum = Object.freeze({
   ...WsCollectionEnum, // списки мастерской
   ...LstCollectionEnum, // списки из objectShort
   OBJ: 'OBJ', // список закэшированных объектов
-  OTHER: 'OTHER' // иное
+  OTHER: 'OTHER', // иное
+  META: 'META'
 })
 const RxModuleEnum = Object.freeze({
   WS: 'WS',
   SETTINGS: 'SETTINGS',
   CACHE: 'CACHE'
 })
+const purgePeriod = 1000 // * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 
 function getRxCollectionEnumFromId (id) {
   assert(id, '!id')
@@ -37,7 +40,7 @@ function getRxCollectionEnumFromId (id) {
   return rxCollection
 }
 
-function makeId(rxCollectionEnum, rawId){
+function makeId (rxCollectionEnum, rawId) {
   assert(rawId, '!rawId')
   assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
   assert(!rawId.includes('::'), 'bad rawId' + rawId)
@@ -45,22 +48,57 @@ function makeId(rxCollectionEnum, rawId){
 }
 
 class RxDBWrapper {
-  async create () {
+  constructor () {
+    this.isLeader_ = false
     addRxPlugin(require('pouchdb-adapter-idb'))
     addRxPlugin(RxDBLeaderElectionPlugin)
-    this.workspace = new Workspace()
-    await this.workspace.create()
-    this.cache = new Cache()
-    await this.cache.create()
+    this.isLeader = () => this.isLeader_
+  }
+
+  // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
+  async purgeDb () {
+    let f = this.purgeDb
+    logD(f, 'purgeDb rxdb')
+    let purgeLastDateDoc = await this.get(RxCollectionEnum.META, 'purgeLastDate')
+    let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc) : 0
+    if (Date.now() - purgeLastDate < purgePeriod) return
+    await this.set(RxCollectionEnum.META, {id: 'purgeLastDate', valueString: Date.now().toString()})
+    let dump = await this.db.dump()
+    // await this.db.remove()
+    await this.db.importDump(dump)
+  }
+
+  async init () {
+    const f = this.create
+    this.db = await createRxDatabase({
+      name: 'rxdb',
+      adapter: 'idb', // <- storage-adapter
+      multiInstance: true, // <- multiInstance (optional, default: true)
+      eventReduce: true, // <- eventReduce (optional, default: true)
+      pouchSettings: { revs_limit: 1 }
+    })
+    await this.db.collection({
+      name: 'meta',
+      schema: schemaKeyValue
+    })
+    await this.purgeDb() // очистит бд от старых данных
+
+    this.db.waitForLeadership().then(() => {
+      logD(f, 'RXDB::LEADER!!!!')
+      this.isLeader_ = true
+    })
+    this.workspace = new Workspace(this.db)
+    this.cache = new Cache(this.db)
     this.objects = new Objects(this.cache)
     this.lists = new Lists(this.cache)
     this.event = new Event(this.workspace, this.objects, this.lists)
-
+    await this.workspace.create()
+    await this.cache.create()
     this.created = true
   }
 
   // вызывать после логина
-  async init (userOid) {
+  async setUser (userOid) {
     logD('init RXDB')
     assert(this.created, '!created')
     await this.event.init()
@@ -72,7 +110,7 @@ class RxDBWrapper {
         actualAge: 'day'
       }
     }
-    let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {fetchFunc: fetchCurrentUserFunc})
+    let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, { fetchFunc: fetchCurrentUserFunc })
     let fetchCategoriesFunc = async () => {
       return {
         notEvict: true, // живет вечно
@@ -80,7 +118,7 @@ class RxDBWrapper {
         actualAge: 'day'
       }
     }
-    let nodeCategories = await this.get(RxCollectionEnum.OTHER, 'nodeCategories', {fetchFunc: fetchCategoriesFunc})
+    let nodeCategories = await this.get(RxCollectionEnum.OTHER, 'nodeCategories', { fetchFunc: fetchCategoriesFunc })
     if (currentUser) { // синхронизация мастерской с сервером
       this.workspace.switchOnSynchro(currentUser)
     }
@@ -88,6 +126,8 @@ class RxDBWrapper {
 
   async clearAll () {
     for (let module in RxModuleEnum) await this.clearModule(module)
+    await this.db.meta.remove()
+    await this.db.meta.destroy()
   }
 
   async clearModule (rxModuleEnum) {
@@ -95,12 +135,12 @@ class RxDBWrapper {
     switch (rxModuleEnum) {
       case RxModuleEnum.WS:
         this.workspace.switchOffSynchro()
-        return await this.workspace.clear()
+        return await this.workspace.clearCollections()
       case RxModuleEnum.SETTINGS:
         // throw new Error('not impl' + rxModuleEnum)
         return
       case RxModuleEnum.CACHE:
-        return await this.cache.clear()
+        return await this.cache.clearCollections()
       default:
         throw new Error('bad module' + rxModuleEnum)
     }
@@ -120,13 +160,13 @@ class RxDBWrapper {
 
   // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
   async find (mangoQuery) {
-    assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query' + JSON.stringify(mangoQuery))
+    assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query: ' + JSON.stringify(mangoQuery))
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     if (rxCollectionEnum in WsCollectionEnum) {
       let rxQuery = await this.workspace.find(mangoQuery)
       let reactiveList = await (new ReactiveListHolder()).create(rxQuery)
-      return {items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
+      return { items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
     } else if (rxCollectionEnum in LstCollectionEnum) {
       let rxDoc = await this.lists.find(mangoQuery)
       return getReactive(rxDoc) // {items, count, totalCount, nextPageToken }
@@ -135,7 +175,7 @@ class RxDBWrapper {
     }
   }
 
-  async get (rxCollectionEnum, rawId, {fetchFunc, clientFirst = true, priority = 0} = {}) {
+  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0 } = {}) {
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     assert(!rawId.includes('::'), '')
     let id = makeId(rxCollectionEnum, rawId)
@@ -145,10 +185,11 @@ class RxDBWrapper {
     } else if (rxCollectionEnum in LstCollectionEnum ||
       rxCollectionEnum === RxCollectionEnum.OTHER) {
       rxDoc = await this.cache.get(id, fetchFunc, clientFirst)
-    } else if (rxCollectionEnum === RxCollectionEnum.OBJ){
-      return await this.objects.get(id, priority)
-    }
-    else {
+    } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
+      rxDoc = await this.objects.get(id, priority)
+    } else if (rxCollectionEnum === RxCollectionEnum.META) {
+      rxDoc = await this.db.meta.findOne(rawId).exec()
+    } else {
       throw new Error('bad collection' + rxCollectionEnum)
     }
     if (!rxDoc) return null
@@ -157,17 +198,20 @@ class RxDBWrapper {
 
   // withLock - см ReactiveItemHolder
   // actualAge - актуально только для кэша
-  async set (rxCollectionEnum, data, {actualAge, withLock = true, notEvict = false} = {}) {
+  async set (rxCollectionEnum, data, { actualAge, withLock = true, notEvict = false } = {}) {
     const f = this.set
     assert(data, '!data')
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-    logD(f, 'start', data, {actualAge, withLock, notEvict})
+    logD(f, 'start', data, { actualAge, withLock, notEvict })
     let rxDoc
     if (rxCollectionEnum in WsCollectionEnum) {
       rxDoc = await this.workspace.set(data, withLock)
     } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
       let id = makeId(rxCollectionEnum, data.oid)
       rxDoc = await this.cache.set(id, data, actualAge, notEvict, null)
+    } else if (rxCollectionEnum === RxCollectionEnum.META) {
+      assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
+      rxDoc = await this.db.meta.atomicUpsert({id: data.id, valueString: data.valueString})
     } else {
       throw new Error('bad collection' + rxCollectionEnum)
     }

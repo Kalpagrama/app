@@ -32,7 +32,7 @@ div(
           q-btn(v-if="searchString.length > 0" flat round dense icon="clear" color="white" @click="searchString = ''")
   //- body
   .col.full-width.scroll
-    kalpa-loader(type="WS_SPHERE" :variables="variables")
+    kalpa-loader(:mangoQuery="mangoQuery")
       template(v-slot=`{items}`)
         .row.full-width.items-start.content-start.q-px-sm
           slot(name="items" :searchString="searchString" :items="items")
@@ -81,9 +81,8 @@ export default {
     }
   },
   computed: {
-    variables () {
-      let res = {selector: {}}
-      // selector: name
+    mangoQuery () {
+      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE}}
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}

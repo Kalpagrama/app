@@ -52,7 +52,7 @@ q-layout(view="hHh lpR fFf")
   //- page
   q-page-conainter(:style=`{height: $q.screen.height-60+'px'}`)
     q-page(:style=`{height: $q.screen.height+'px'}`).row.full-width.justify-center
-      kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
+      kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
           list-masonry(
             ref="listMasonry" :items="items"
@@ -74,6 +74,8 @@ q-layout(view="hHh lpR fFf")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'sphereExplorer',
   props: ['mode', 'sphere'],
@@ -94,13 +96,19 @@ export default {
     sphereOid () {
       return this.sphere.oid
     },
-    variables () {
+    mangoQuery () {
       return {
-        oid: this.sphereOid,
-        pagination: { pageSize: 10 },
-        sortStrategy: 'HOT',
-        filter: { types: 'NODE' }
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oid: this.sphereOid
+        }
       }
+      // return {
+      //   oid: this.sphereOid,
+      //   pagination: { pageSize: 10 },
+      //   sortStrategy: 'HOT',
+      //   filter: { types: 'NODE' }
+      // }
     }
   },
   methods: {

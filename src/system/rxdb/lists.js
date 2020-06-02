@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { RxCollectionEnum } from 'src/system/rxdb/index'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_LST)
@@ -56,7 +56,7 @@ class Lists {
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
-    if (!this.cache.isLeader) return
+    assert(rxdb.isLeader(), 'rxdb.isLeader()')
     const f = this.processEvent
     logD(f, 'start')
     switch (event.type) {

@@ -29,7 +29,7 @@ q-layout(view="hHh lpR fFf").b-30
   //- page
   q-page-conainter
     q-page
-      kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
+      kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
           list-middle(:items="items" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`)
             template(v-slot:item=`{item, index, indexMiddle}`)
@@ -44,6 +44,7 @@ q-layout(view="hHh lpR fFf").b-30
 
 <script>
 import menuRight from './menu_right'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'homeExplorer',
@@ -56,13 +57,19 @@ export default {
     sphereOid () {
       return this.$store.getters.currentUser() ? this.$store.getters.currentUser().oid : null
     },
-    variables () {
+    mangoQuery () {
       return {
-        oid: this.sphereOid,
-        pagination: { pageSize: 100 },
-        sortStrategy: 'HOT',
-        filter: { types: 'NODE' }
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oid: this.sphereOid
+        }
       }
+      // return {
+      //   oid: this.sphereOid,
+      //   pagination: { pageSize: 100 },
+      //   sortStrategy: 'HOT',
+      //   filter: { types: 'NODE' }
+      // }
     }
   },
   methods: {

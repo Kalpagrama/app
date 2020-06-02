@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.q-pt-md
-  kalpa-loader(v-if="sphereOid" type="LST_SPHERE_NODES" :variables="variables")
+  kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
     template(v-slot=`{items}`)
       list-middle(:items="items" :options="{paddingTop: 0}")
         template(v-slot:item=`{item, index, indexMiddle}`)
@@ -14,6 +14,7 @@
 </template>
 
 <script>
+  import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'userExplorer-userVoted',
   components: {},
@@ -25,13 +26,19 @@ export default {
     sphereOid () {
       return this.$route.params.oid
     },
-    variables () {
+    mangoQuery () {
       return {
-        oid: this.sphereOid,
-        pagination: { pageSize: 100 },
-        sortStrategy: 'AGE',
-        filter: {types: ['NODE'], fastFilters: ['VOTED_BY_USER']}
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oid: this.sphereOid
+        }
       }
+      // return {
+      //   oid: this.sphereOid,
+      //   pagination: { pageSize: 100 },
+      //   sortStrategy: 'AGE',
+      //   filter: {types: ['NODE'], fastFilters: ['VOTED_BY_USER']}
+      // }
     }
   },
   methods: {

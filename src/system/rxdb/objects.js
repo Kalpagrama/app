@@ -3,7 +3,7 @@ import assert from 'assert'
 import { ObjectsApi } from 'src/api/objects'
 import { ReactiveItemHolder, getReactive } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { RxCollectionEnum } from 'src/system/rxdb/index'
+import { RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_OBJ)
@@ -264,14 +264,15 @@ class Objects {
     let rxDoc = await this.cache.get(id, fetchFunc)
     if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')
-    return getReactive(rxDoc)
+    return rxDoc
   }
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
+    assert(rxdb.isLeader(), 'rxdb.isLeader()')
     const f = this.processEvent
-    logD(f, 'start', this.cache.isLeader)
-    if (!this.cache.isLeader) return
+    logD(f, 'start', rxdb.isLeader())
+    if (!rxdb.isLeader()) return
     switch (event.type) {
       case 'OBJECT_CHANGED': {
         let rxDoc = await this.cache.get(makeObjectCacheId(event.object))

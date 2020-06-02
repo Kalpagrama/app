@@ -1,11 +1,12 @@
 import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 import LruCache from 'lru-cache'
 import assert from 'assert'
-import { schemaKeyValue, cacheSchema } from 'src/system/rxdb/schemas'
+import { cacheSchema } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Mutex } from 'src/system/rxdb/reactive'
 import debounce from 'lodash/debounce'
-import { getRxCollectionEnumFromId, RxCollectionEnum } from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { WsCollectionEnum } from 'src/system/rxdb/workspace'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_CACHE)
@@ -14,7 +15,6 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_CACHE)
 
 // const CachedTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST', OTHER: 'OTHER', ERROR: 'ERROR' })
 
-const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
 const debounceIntervalDumpLru = 1000 * 8 // сохраняем весь LRU в idb с дебаунсом 8 сек
 const defaultActualAge = 1000 * 60 * 60 // время жизни объекта в кэше (по умолчанию)
 const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить до 50 МБ после тестирования
@@ -24,60 +24,19 @@ const DEBUG_IGNORE_CACHE = false // если === true - брать из сети
 
 // класс для кэширования gql запросов
 class Cache {
-  async createDb () {
-    let f = this.createDb
-    this.isLeader = false
-    this.db = await createRxDatabase({
-      name: 'cache',
-      adapter: 'idb', // <- storage-adapter
-      multiInstance: true, // <- multiInstance (optional, default: true)
-      eventReduce: true, // <- eventReduce (optional, default: true)
-      pouchSettings: { revs_limit: 1 }
-    })
-    await this.db.collection({ name: 'cache', schema: cacheSchema })
-    await this.db.collection({ name: 'cache_meta', schema: schemaKeyValue })
-    this.db.waitForLeadership().then(() => {
-      logD(f, 'RXDB::CACHE::LEADER!!!!')
-      this.isLeader = true
-    })
-    // // хуки на измения элементов в кэше пользователем
-    // let onCachedObjectChangedByUser = async (id, operation) => {
-    //   const f = onCachedObjectChangedByUser
-    //   if (!this.isLeader) return
-    //   assert(id && operation && operation in CacheOperationEnum, 'bad params' + id + operation)
-    //   // todo пока что изменяется только currentUser (настройки, ленты и пр)
-    //   // assert(false, 'assert(false, todo! not impl!)')
-    //   logD(f, `complete. ${id}`)
-    // }
-    // this.db.cache_object.postInsert(async (plainData) => {
-    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.UPSERT)
-    // }, false)
-    // this.db.cache_object.postSave(async (plainData) => {
-    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.UPSERT)
-    // }, false)
-    // this.db.cache_object.postRemove(async (plainData) => {
-    //   await onCachedObjectChangedByUser(plainData.id, CacheOperationEnum.DELETE)
-    // }, false)
+  constructor (db) {
+    assert(db, '!rxdb')
+    this.db = db
   }
 
-  // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
-  async purgeDb () {
-    let f = this.purgeDb
-    logD(f, 'purgeDb cache_db')
-    let purgeLastDateDoc = await this.db.cache_meta.findOne('purgeLastDate').exec()
-    let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc.value) : 0
-    if (Date.now() - purgeLastDate < purgePeriod) return
-    await this.db.cache_meta.atomicUpsert({ id: 'purgeLastDate', value: Date.now().toString() })
-    let dump = await this.db.dump()
-    await this.db.remove()
-    await this.db.destroy()
-    await this.createDb()
-    await this.db.importDump(dump)
+  async createCollections () {
+    let f = this.createCollections
+    await this.db.collection({ name: 'cache', schema: cacheSchema })
   }
 
   // удалить все данные из кэша
-  async clear () {
-    const f = this.clear
+  async clearCollections () {
+    const f = this.clearCollections
     logD(f, 'start')
     await this.db.remove()
     try {
@@ -86,8 +45,11 @@ class Cache {
     } finally {
       this.lruResetInProgress = true
     }
-
-    await this.createDb()
+    if (this.db.cache) {
+      await this.db.cache.remove()
+      await this.db.cache.destroy()
+    }
+    await this.createCollections()
     logD(f, 'complete')
   }
 
@@ -97,8 +59,7 @@ class Cache {
     assert(!this.created, 'this.created')
     try {
       this.mutex = new Mutex()
-      await this.createDb()
-      await this.purgeDb()
+      await this.createCollections()
       // используется для контроля места
       this.cacheLru = new LruCache({
         max: defaultCacheSize,
@@ -126,10 +87,10 @@ class Cache {
       })
 
       // заполняем cacheLru из idb
-      let lruDump = await this.db.cache_meta.findOne('lruDump').exec()
+      let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump')
       if (lruDump) {
-        lruDump = JSON.parse(lruDump.value)
         logD(f, 'восстанавливаем Lru')
+        lruDump = JSON.parse(lruDump)
         this.cacheLru.load(lruDump)
       }
 
@@ -137,7 +98,7 @@ class Cache {
         const f = this.debouncedDumpLru
         logD(f, 'start. debouncedDumpLru')
         let lruDump = this.cacheLru.dump()
-        await this.db.cache_meta.atomicUpsert({ id: 'lruDump', value: JSON.stringify(lruDump) })
+        await rxdb.set(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
       }, debounceIntervalDumpLru)
 
       // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
@@ -154,7 +115,7 @@ class Cache {
       logD(f, 'complete')
     } catch (err) {
       logE(f, 'ошибка при создания CACHE! очищаем и пересоздаем!', err)
-      await this.clear()
+      await this.clearCollections()
       if (!recursive) await this.create(true)
     }
   }
@@ -179,6 +140,7 @@ class Cache {
     let rxCollectionEnum = getRxCollectionEnumFromId(id)
     let f = this.set
     logD(f, 'start', id)
+    actualAge = actualAge || 'stale'
     switch (actualAge) {
       case 'zero':
         actualAge = 0
@@ -208,9 +170,20 @@ class Cache {
         } else {
           actualAge = defaultActualAge
         }
-      }
         break
-      default: throw new Error('bad actualAge:' + actualAge)
+      }
+      case 'stale': {
+        // оставить как было
+        let current = this.cacheLru.get(id)
+        if (current) {
+          actualAge = Math.max(0, current.actualUntil - Date.now())
+        } else {
+          actualAge = this.defaultActualAge
+        }
+        break
+      }
+      default:
+        throw new Error('bad actualAge:' + actualAge)
     }
     if (DEBUG_IGNORE_CACHE) actualAge = 0 // игнорируем кэш
     assert(Number.isInteger(actualAge) && actualAge >= 0, `Number.isInteger(actualAge):${actualAge}`)
@@ -235,7 +208,7 @@ class Cache {
     assert(this.created, '!this.created')
     assert(id)
     let f = this.get
-    logD(f, 'start', id)
+    // logD(f, 'start', id)
     if (DEBUG_IGNORE_CACHE) logW(f, 'DEBUG_IGNORE_CACHE is ON!!!')
     let rxDoc = await this.db.cache.findOne(id).exec()
     let { actualUntil, actualAge, failReason } = this.cacheLru.get(id) || {}
@@ -248,7 +221,11 @@ class Cache {
           } else {
             logE('Данные не получены! Произошла ошибка. Через минуту  можно пробовать еще', err)
             const min = 1000 * 60
-            this.cacheLru.set(id, { actualUntil: Date.now() + min, actualAge: min, failReason: 'fetch error: ' + err.toString()})
+            this.cacheLru.set(id, {
+              actualUntil: Date.now() + min,
+              actualAge: min,
+              failReason: 'fetch error: ' + err.toString()
+            })
           }
         }
         let saveFunc = async (fetchRes) => {
@@ -281,13 +258,13 @@ class Cache {
       }
       return null
     }
-    logD(f, 'complete')
+    // logD(f, 'complete')
     return rxDoc
   }
 
-  expire(id){
+  expire (id) {
     let { actualUntil, actualAge } = this.cacheLru.get(id) || {}
-    if (actualUntil) this.cacheLru.set(id, { actualUntil: Date.now(), actualAge: 0})
+    if (actualUntil) this.cacheLru.set(id, { actualUntil: Date.now(), actualAge: 0 })
   }
 }
 

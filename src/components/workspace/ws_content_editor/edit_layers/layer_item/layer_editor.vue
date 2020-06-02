@@ -48,8 +48,7 @@ div(
         span.text-white {{ s.name }}
     div(v-else).row.full-width.items-start.content-start.q-pa-sm
       kalpa-loader(
-        type="WS_SPHERE"
-        :variables="variables"
+        :mangoQuery="mangoQuery"
         @itemsLength="spheresLengthChanged")
         template(v-slot=`{items}`)
           div(
@@ -78,8 +77,8 @@ export default {
     }
   },
   computed: {
-    variables () {
-      let res = {selector: {}}
+    mangoQuery () {
+      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_SPHERE}}
       if (this.sphereString.length > 0) {
         let nameRegExp = new RegExp(this.sphereString, 'i')
         res.selector.name = {$regex: nameRegExp}

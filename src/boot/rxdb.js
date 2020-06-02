@@ -5,7 +5,7 @@ import { rxdb } from 'src/system/rxdb'
 
 export default async ({ Vue, store, router: VueRouter }) => {
   try {
-    await rxdb.create()
+    await rxdb.init()
     Vue.prototype.$rxdb = rxdb // rxdbProxy
   } catch (err) {
     logE(err)

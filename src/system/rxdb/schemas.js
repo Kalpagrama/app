@@ -8,17 +8,17 @@ export const schemaKeyValue = {
       type: 'string',
       primary: true
     },
-    value: {
+    valueString: {
       type: 'string'
     }
   },
-  required: ['id', 'value']
+  required: ['id', 'valueString']
 }
 
-export const wsSchemaNode = {
-  title: 'wsSchemaNode',
+export const wsSchemaItem = {
+  title: 'wsSchemaItem',
   version: 0,
-  description: 'wsSchemaNode',
+  description: 'wsSchemaItem',
   type: 'object',
   properties: {
     id: {
@@ -39,10 +39,6 @@ export const wsSchemaNode = {
       type: 'integer',
       default: 0
     },
-    changedBy: {
-      type: 'string',
-      default: 'USER'
-    },
     createdAt: {
       type: 'integer',
       default: 0
@@ -54,6 +50,7 @@ export const wsSchemaNode = {
     deletedAt: {
       type: 'integer'
     },
+    // ---- node ----
     items: {
       type: 'array',
       maxItems: 88,
@@ -78,62 +75,12 @@ export const wsSchemaNode = {
     },
     stage: {
       type: 'string'
-    }
-  },
-  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
-  indexes: ['oid', 'name', 'createdAt', 'updatedAt']
-}
-export const wsSchemaContent = {
-  title: 'wsSchemaContent',
-  version: 0,
-  description: 'wsSchemaContent',
-  type: 'object',
-  properties: {
-    id: {
-      type: 'string',
-      primary: true
     },
-    oid: {
-      type: 'string'
-    },
-    wsItemType: {
-      type: 'string'
-    },
-    name: {
-      type: 'string',
-      default: '!_unnamed_!'
-    },
-    rev: {
-      type: 'integer',
-      default: 0
-    },
-    changedBy: {
-      type: 'string',
-      default: 'USER'
-    },
-    createdAt: {
-      type: 'integer',
-      default: 0
-    },
-    updatedAt: {
-      type: 'integer',
-      default: 0
-    },
-    deletedAt: {
-      type: 'integer'
-    },
+    // ---- content ----
     thumbOid: {
       type: 'string'
     },
     layers: {
-      type: 'array',
-      maxItems: 888,
-      uniqueItems: false,
-      items: {
-        type: 'object'
-      }
-    },
-    spheres: {
       type: 'array',
       maxItems: 888,
       uniqueItems: false,
@@ -149,100 +96,18 @@ export const wsSchemaContent = {
     },
     operation: {
       type: 'object'
-    }
-  },
-  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
-  indexes: ['oid', 'name', 'createdAt', 'updatedAt']
-}
-export const wsSchemaChain = {
-  title: 'wsSchemaChain',
-  version: 0,
-  description: 'wsSchemaChain',
-  type: 'object',
-  properties: {
-    id: {
-      type: 'string',
-      primary: true
     },
-    oid: {
-      type: 'string'
-    },
-    wsItemType: {
-      type: 'string'
-    },
-    name: {
-      type: 'string',
-      default: '!_unnamed_!'
-    },
-    rev: {
-      type: 'integer',
-      default: 0
-    },
-    changedBy: {
-      type: 'string',
-      default: 'USER'
-    },
-    createdAt: {
-      type: 'integer',
-      default: 0
-    },
-    updatedAt: {
-      type: 'integer',
-      default: 0
-    },
-    deletedAt: {
-      type: 'integer'
-    }
-  },
-  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
-  indexes: ['oid', 'name', 'createdAt', 'updatedAt']
-}
-export const wsSchemaSphere = {
-  title: 'wsSchemaSphere',
-  version: 0,
-  description: 'wsSchemaSphere',
-  type: 'object',
-  properties: {
-    id: {
-      type: 'string',
-      primary: true
-    },
-    oid: {
-      type: 'string'
-    },
-    wsItemType: {
-      type: 'string'
-    },
-    name: {
-      type: 'string',
-      default: '!_unnamed_!'
-    },
-    rev: {
-      type: 'integer',
-      default: 0
-    },
-    changedBy: {
-      type: 'string',
-      default: 'USER'
-    },
-    createdAt: {
-      type: 'integer',
-      default: 0
-    },
-    updatedAt: {
-      type: 'integer',
-      default: 0
-    },
-    deletedAt: {
-      type: 'integer'
-    },
+    // ---- chain ----
+    // todo
+    // ---- sphere ----
     color: {
       type: 'string'
     }
   },
-  required: ['id', 'wsItemType', 'rev', 'changedBy', 'createdAt', 'updatedAt'],
-  indexes: ['oid', 'name', 'createdAt', 'updatedAt']
+  required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt'],
+  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt']
 }
+
 export const wsSchemaLocalChanges = {
   title: 'wsSchemaLocalChanges',
   version: 0,
