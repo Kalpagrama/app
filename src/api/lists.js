@@ -9,6 +9,32 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
 
 class ListsApi {
+  // sphereItems query
+  static checkMangoQuery(mangoQuery){
+    const f = this.checkMangoQuery
+    logD(f, 'start', mangoQuery)
+    let ex = {
+      selector: {
+        oidSphere: 'AGKAwKuAwCU=',
+        objectTypeEnum: 'NODE',
+        oidAuthor: 'AF6H7dLAoAI=',
+        pageToken: null,
+        topStrategy: 'HOT'
+      },
+      limit: 8888
+    }
+    assert(mangoQuery, '!mangoQuery')
+    assert(mangoQuery.selector, '!mangoQuery.selector')
+    assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+    delete mangoQuery.selector.rxCollectionEnum
+    for (let key in mangoQuery){
+      assert(['selector', 'limit'].includes(key), '[selector, sort, limit].includes(key)')
+    }
+    for (let key in mangoQuery.selector){
+      assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'topStrategy'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
+    }
+  }
+
   static async getList (mangoQuery) {
     assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query' + JSON.stringify(mangoQuery))
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
@@ -20,21 +46,22 @@ class ListsApi {
         res = await ListsApi.feed(pagination)
         break
       case RxCollectionEnum.LST_SPHERE_SPHERES:
-        assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
-        res = await ListsApi.sphereSpheres(mangoQuery.selector.oid, pagination)
+        assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+        // res = await ListsApi.sphereSpheres(mangoQuery.selector.oidSphere, pagination)
+        res = await ListsApi.find(mangoQuery)
         break
       case RxCollectionEnum.LST_SPHERE_NODES:
-      case RxCollectionEnum.LST_NODE_NODES:
-        assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
-        res = await ListsApi.sphereNodes(mangoQuery.selector.oid, pagination)
+        assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+        // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
+        res = await ListsApi.find(mangoQuery)
         break
       case RxCollectionEnum.LST_USER_SUBSCRIBERS:
-        assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
-        res = await ListsApi.userSubscribers(mangoQuery.selector.oid, pagination)
+        assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+        res = await ListsApi.userSubscribers(mangoQuery.selector.oidSphere, pagination)
         break
       case RxCollectionEnum.LST_USER_SUBSCRIPTIONS:
-        assert(mangoQuery.selector.oid, '!mangoQuery.selector.oid')
-        res = await ListsApi.userSubscriptions(mangoQuery.selector.oid, pagination)
+        assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+        res = await ListsApi.userSubscriptions(mangoQuery.selector.oidSphere, pagination)
         break
       default:
         throw new Error('bad rxCollectionEnum: ' + rxCollectionEnum)
@@ -67,7 +94,7 @@ class ListsApi {
     //     return Infinity
     //   }
     //   let nodeList = res.items
-    //   let contentOid = mangoQuery.selector.oid
+    //   let contentOid = mangoQuery.selector.oidSphere
     //   res.getIdx = (t) => {
     //     // todo запрашивать новые порции данных
     //     for (let i = 0; i < nodeList.length; i++) {
@@ -86,6 +113,28 @@ class ListsApi {
     //   }
     // }
     return res
+  }
+
+  static async find (mangoQuery) {
+    ListsApi.checkMangoQuery(mangoQuery)
+    let f = this.find
+    logD(f, 'start')
+    let { data: { find: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+      query: gql`
+        ${fragments.objectShortWithMetaFragment}
+        query find ($mangoQuery: RawJSON!){
+          find (mangoQuery: $mangoQuery) {
+            count
+            totalCount
+            nextPageToken
+            items {... objectShortWithMetaFragment}
+          }
+        }
+      `,
+      variables: {mangoQuery }
+    })
+    logD(f, 'complete')
+    return { items, count, totalCount, nextPageToken }
   }
 
   static async sphereSpheres (oid, pagination, filter, sortStrategy) {

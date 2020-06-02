@@ -10,7 +10,6 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_LST)
 
 const LstCollectionEnum = Object.freeze({
   LST_SPHERE_NODES: 'LST_SPHERE_NODES',
-  LST_NODE_NODES: 'LST_NODE_NODES',
   LST_SPHERE_SPHERES: 'LST_SPHERE_SPHERES',
   LST_FEED: 'LST_FEED',
   LST_USER_SUBSCRIBERS: 'LST_USER_SUBSCRIBERS', // подписчики пользователя
@@ -137,20 +136,17 @@ class Lists {
         break
         }
       case 'NODE_CREATED':{
-        // добавим на все сферы (+ личная сфера)
+        assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
+        // добавим на все сферы
         let rxDocs = await this.cache.find({
           selector: {
-            'props.rxCollectionEnum': { $in: [
-              LstCollectionEnum.LST_SPHERE_NODES,
-              LstCollectionEnum.LST_NODE_NODES
-              ] }
+            'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
+              'props.oid': {$in: event.sphereOids}
           }
         })
         for (let rxDoc of rxDocs){
           let mangoQuery = getMangoQueryFromId(rxDoc.id)
           // todo проверить, что event.object isRestricted by mangoQuery
-          // либо - просто пометить списки устаревшими this.cache.expire(rxDoc.id)
-
           await rxDoc.atomicUpdate((oldData) => {
             assert(oldData.cached.data, '!rxDoc.cached')
             assert(event.object, '!event.object')
@@ -165,7 +161,23 @@ class Lists {
       case 'VOTED': {
         if (event.subject.oid === localStorage.getItem('k_user_oid')){
           // если голосовал текущий юзер - положить в список "проголосованные ядра"
-          // todo !
+          let rxDocs = await this.cache.find({
+            selector: {
+              'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
+              'props.oid': localStorage.getItem('k_user_oid')
+            }
+          })
+          for (let rxDoc of rxDocs){
+            let mangoQuery = getMangoQueryFromId(rxDoc.id)
+            // todo проверить, что event.object isRestricted by mangoQuery
+            await rxDoc.atomicUpdate((oldData) => {
+              assert(event.object, '!event.object')
+              oldData.cached.data.items.push(event.object)
+              oldData.cached.data.count++
+              oldData.cached.data.totalCount++
+              return oldData
+            })
+          }
         }
         break
       }
