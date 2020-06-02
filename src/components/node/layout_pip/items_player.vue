@@ -18,19 +18,18 @@
 div(
   :style=`{
     position: 'relative',
-    //- minHeight: '400px',
   }`
-  ).row.full-width.items-start.content-start.b-50
+  ).row.full-width.items-start.content-start.b-50.fit
   //- preview
   img(
     :src="preview" draggable="false"
     :style=`{
-      //- maxHeight: 500+'px',
-      userSelect: 'none', objectFit: 'contain', opacity: active ? 1 : 0.5}`).full-width
+      userSelect: 'none', objectFit: 'contain', opacity: 1
+    }`).full-width.full-height
   //- items wrapper
   div(
-    v-if="true"
-    :style=`{position: 'absolute'}`).row.fit.bg-black
+    v-if="false"
+    :style=`{position: 'absolute'}`).row.fit.items-start.content-start.bg-black
     //- items stats
     div(
       v-if="visible && active && items.length > 1"

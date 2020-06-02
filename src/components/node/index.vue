@@ -20,14 +20,17 @@ export default {
   },
   watch: {
     node: {
+      immediate: true,
       handler (to, from) {
         // this.$log('node CHANGED', to)
+        if (this.nodeFullReady) return
         this.nodeLoad()
       }
     },
     needFull: {
       immediate: true,
         async handler (to, from) {
+          // this.$log('nodeFull CHANGED to', to)
           if (this.nodeFullReady) return
           if (to) await this.nodeLoad()
           else await this.nodeDestroy()
@@ -50,13 +53,13 @@ export default {
       try {
         nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
       } catch (err) {
-        this.$emit('meta', ['error', 'nodeLoad'])
+        this.$emit('error')
       }
       this.nodeFull = nodeFull
     },
     async nodeDestroy () {
-      if (!this.nodeFull) return
       // this.$log('nodeDestroy', this.node.oid)
+      if (!this.nodeFull) return
       this.nodeFull = null
     }
   }

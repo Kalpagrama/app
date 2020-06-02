@@ -1,0 +1,28 @@
+<template lang="pug">
+div(
+  :style=`{
+    height: 50+'px',
+  }`).row.full-width.items-start.content-start.q-py-sm.q-px-md
+  //- div(:style=`{height: '100px', marginBottom: -openedHeight+'px'}`).row.full-width
+  //- target="_blank"
+  router-link(
+    v-for="(s,si) in nodeFull.spheres" :key="si"
+    :to="'/sphere/'+s.oid"
+    :style=`{borderRadius: '10px', userSelect: 'none'}`
+    ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-70
+    small {{ s.name }}
+</template>
+
+<script>
+// TODO: user wsSphere to render spheres...
+// false && opened && nodeFull && nodeFull.spheres.length > 9
+
+export default {
+  name: 'nodeLayoutPip-nodeSpheres',
+  props: ['nodeFull'],
+  data () {
+    return {
+    }
+  }
+}
+</script>
