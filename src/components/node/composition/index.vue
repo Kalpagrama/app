@@ -4,7 +4,7 @@ div(
     position: 'relative'
   }`
   ).row.full-width.items-start.content-start
-  //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
+  kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   //- menu
   //- q-btn(
   //-   v-if="visible && active"
@@ -65,17 +65,30 @@ export default {
   computed: {
   },
   watch: {
+    visible: {
+      immediate: true,
+      async handler (to, from) {
+        // this.$log('visible CHANGED', to)
+        if (to) {
+          if (this.ctx !== 'workspace') {
+            this.$log('visible TRUE => load composition')
+            this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.oid)
+          }
+        }
+      }
+    },
     value: {
       immediate: true,
       async handler (to, from) {
         // this.$log('value CHANGED', to)
         if (to) {
           if (this.ctx === 'workspace') {
+            this.$log('value => load composition')
             this.composition = to
           }
-          else {
-            this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
-          }
+          // else {
+          //   this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
+          // }
         }
       }
     },
