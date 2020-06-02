@@ -16,13 +16,15 @@ div(
         borderRadius: '50%'
       }`)
   //- item find
-  q-dialog(v-model="itemFinderOpened" position="bottom")
+  q-dialog(
+    v-model="itemFinderOpened" position="bottom"
+    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])")
     ws-content-list(
       ctx="nodeEditor" @content="contentFound"
       :style=`{
         maxWidth: 800+'px',
         maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
-        minHeight: $q.screen.xs ? $q.screen.heigth-60+'px' : 800+'px',
+        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
         borderRadius: '10px',
         overflow: 'hidden',
       }`).fit.b-30
@@ -31,7 +33,9 @@ div(
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false").q-mr-sm
           span(:style=`{fontSize: '16px'}`).text-white.text-bold Find item
   //- item edit
-  q-dialog(v-model="itemEditorOpened" position="bottom")
+  q-dialog(
+    v-model="itemEditorOpened" position="bottom"
+    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])")
     ws-content-editor(
       v-if="item"
       editorType="composition" :value="item"
@@ -99,16 +103,6 @@ div(
         div(:style=`{maxWidth: '700px', height: '400px', borderRadius: '10px'}`
           ).row.full-width.items-center.content-center.justify-center.b-60
           q-btn(round flat color="green" icon="add" size="xl" @click="itemAdd()")
-      //- ws-content-list(
-      //-   ctx="nodeEditor" @layer="layerFound"
-      //-   :style=`{
-      //-     borderRadius: '10px',
-      //-     overflow: 'hidden'
-      //-   }`).full-height.b-50
-      //-   template(v-slot:header)
-      //-     .row.full-width.q-pt-sm
-          //- div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-md
-          //-   span(:style=`{fontSize: '16px'}`).text-white.text-bold Add first item
     //- items selected
     transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
       div(
@@ -182,24 +176,20 @@ export default {
     },
     contentFound (content) {
       this.$log('contentFound', content)
-    },
-    layerFound (layer) {
-      this.$log('layerFound', layer)
+      // TODO: impl convert => content to composition => node.item
       let itemIndex = this.node.items.length
       let itemId = Date.now().toString()
       let itemInput = {
         id: itemId,
         name: '',
-        layers: [layer],
+        layers: [],
         spheres: [],
         contentType: 'VIDEO',
-        operation: {
-          items: null,
-          operations: null,
-          type: 'CONCAT'
-        }
+        contentOid: content.contentOid,
+        operation: {items: null, operations: null, type: 'CONCAT'}
       }
       this.$set(this.node.items, itemIndex, itemInput)
+      this.itemFinderOpened = false
     }
   },
   mounted () {

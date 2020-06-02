@@ -27,7 +27,9 @@ div(
   //-   ).full-width
   player-video(
     v-if="composition && active"
-    :ctx="ctx" :composition="composition"
+    :ctx="ctx"
+    :preview="preview"
+    :composition="composition"
     :visible="visible" :active="active" :mini="mini")
     template(
       v-for="(_, scopedSlotName) in $scopedSlots"

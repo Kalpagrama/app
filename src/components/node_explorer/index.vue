@@ -68,7 +68,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
             @meta="onNodeMeta"
             :visible="true" :active="true" :mini="false")
       //- body
-      div(v-if="$route.params.page === 'nodes'").row.full-width.justify-center
+      div(v-if="false && $route.params.page === 'nodes'").row.full-width.justify-center
         div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-py-md
           kalpa-loader(v-if="$q.screen.xs && sphereOid && node" :mangoQuery="mangoQuery")
             template(v-slot=`{items}`)

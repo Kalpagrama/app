@@ -41,7 +41,8 @@ div(
         //-   div(:style=`{height: '70px', borderRadius: '0 0 10px 10px'}`).row.full-width.b-60
         q-tab-panels(
           v-model="pageId" animated
-          keep-alive infinite swipeable
+          keep-alive infinite
+          :swipeable="pageId !== 'layers'"
           :style=`{background: 'none'}`
           ).col.full-width
           q-tab-panel(name="info")
@@ -113,7 +114,7 @@ export default {
       if (this.editorType === 'composition') {
         res.workspace = {name: 'Workspace'}
       }
-      res.workspace = {name: 'Workspace'}
+      // res.workspace = {name: 'Workspace'}
       return res
     },
     showHeader () {
@@ -137,6 +138,7 @@ export default {
       let ref = this.$refs.layersEditor
       this.$log('layerAdd ref', ref)
       if (ref) ref.layerAdd(val)
+      this.pageId = 'layers'
     }
   },
   mounted () {
