@@ -12,7 +12,7 @@ div(
   }`
   ).row.full-width
   .col
-    .row.fit.items-center.content-center.q-py-sm.q-pl-md
+    .row.fit.items-center.content-center.q-py-sm.q-pl-md.cursor-pointer
       router-link(
         :to="'/node/'+node.oid"
         ).row.full-width.items-start.content-start.essence

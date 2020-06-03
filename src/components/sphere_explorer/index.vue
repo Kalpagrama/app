@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf")
+q-layout(view="hHh lpR fFf").b-30
   //- menu
   kalpa-menu-right
     div(
@@ -7,7 +7,7 @@ q-layout(view="hHh lpR fFf")
         borderRadius: '10px', overflow: 'hidden',
         maxHeight: '70vh'
       }`
-      ).column.fit.bg-grey-9
+      ).column.fit.b-50
       div(:style=`{height: '70px'}`).row.full-width.items-center.q-px-md
         span.text-white.text-bold Related spheres
       .col.full-width.scroll
@@ -15,23 +15,19 @@ q-layout(view="hHh lpR fFf")
           sphere-spheres(v-if="true" :oid="sphereOid")
   //- header
   q-header(
-    reveal
-    :style=`{zIndex: 200}`).row.full-width.justify-center.bg-grey-9
-    .row.full-width.justify-center
-      div(
-        v-if="sphere"
-        :style=`{
-          height: '60px', background: 'rgba(33,33,33, 0.8)',
-          maxWidth: $store.state.ui.maxWidthPage+'px'
-        }`
-        ).row.full-width.items-center.content-center
-        //- div(:style=`{width: '60px', height: '60px'}`).row.items-center.content-center.justify-center
-        //-   q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-        .col.full-height
-          .row.fit.items-center.content-center.justify-center
-            span.text-white.text-bold {{ '#'+sphere.name }}
+    v-if="true"
+    reveal :style=`{zIndex: 30000}`).row.full-width.justify-center
+    div(
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+        zIndex: 30000,
+        borderRadius: '0 0 10px 10px', overflow: 'hidden'
+      }`
+      ).row.full-width.items-center.content-center.justify-start.b-50.q-py-md.q-px-sm
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
+      span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ '#'+sphere.name }}
   //- footer
-  kalpa-menu-footer
+  //- kalpa-menu-footer
   //- add node
   q-btn(
     v-if="!nodeEditorShow"
@@ -51,7 +47,7 @@ q-layout(view="hHh lpR fFf")
         :style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`)
   //- page
   q-page-conainter(:style=`{height: $q.screen.height-60+'px'}`)
-    q-page(:style=`{height: $q.screen.height+'px'}`).row.full-width.justify-center
+    q-page(:style=`{height: $q.screen.height+'px'}`).row.full-width.justify-center.q-pt-md
       kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
           list-masonry(
@@ -63,6 +59,7 @@ q-layout(view="hHh lpR fFf")
                 @click="$refs.listMasonry.itemClick(item, index)"
                 :style=`{position: 'absolute', zIndex: 300, borderRadius: '10px', overflow: 'hidden', opacity: 0}`).row.fit
               node(
+                ctx="list"
                 :node="item"
                 :index="index"
                 :needFull="isOpened ? true : isHovered"

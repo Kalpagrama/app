@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    minHeight: $q.screen.xs ? '200px' : '330px',
+    //- minHeight: $q.screen.xs ? '200px' : '330px',
   }`
   ).row.full-width.items-start.content-start
   //- items preview: first item from meta => shaping the size

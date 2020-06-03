@@ -23,13 +23,13 @@ div(
     v-if="false"
     v-bind="$props" :meta="meta")
   node-essence(
-    v-if="true"
+    v-if="ctx !== 'workspace'"
     v-bind="$props" :meta="meta"
     :style=`{
       order: -2
     }`)
   node-author(
-    v-if="nodeFull"
+    v-if="nodeFull && ctx  !== 'workspace'"
     v-bind="$props" :meta="meta"
     :style=`{
       order: 1

@@ -1,3 +1,10 @@
+<style lang="sass" scoped>
+.sphere
+  cursor: pointer
+  &:hover
+    background: rgb(90,90,90) !important
+</style>
+
 <template lang="pug">
 div(
   :style=`{
@@ -9,8 +16,8 @@ div(
     v-for="(s,si) in nodeFull.spheres" :key="si"
     :to="'/sphere/'+s.oid"
     :style=`{borderRadius: '10px', userSelect: 'none'}`
-    ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-80
-    small {{ s.name }}
+    ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-80.sphere
+    small {{ '# '+s.name }}
 </template>
 
 <script>

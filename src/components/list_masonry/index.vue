@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{}`
-  ).column.fit.items-center.content-center.justify-center.bg-grey-10
+  ).column.fit.items-center.content-center.justify-center
   //- tint
   //- div(
   //-   v-if="nodeOid"
@@ -37,12 +37,12 @@ div(
         //- div(:style=`{position: 'absolute', top: '8px', left: '8px', zIndex: 100}`).row.bg-red
         //-   small Lorem ipsum !!!
         //- copy
-        img(
-          @click="itemClick(null, null)"
-          :ref="`item-img-${i.oid}`"
-          draggable="false"
-          :src="i.meta.items[0].thumbUrl"
-          :style=`{opacity: 0.1, width: '100%', borderRadius: '10px', overflow: 'hidden'}`)
+        //- img(
+        //-   @click="itemClick(null, null)"
+        //-   :ref="`item-img-${i.oid}`"
+        //-   draggable="false"
+        //-   :src="i.meta.items[0].thumbUrl"
+        //-   :style=`{opacity: 0.1, width: '100%', borderRadius: '10px', overflow: 'hidden'}`)
         //- slot
         div(
           :ref="`item-${i.oid}`"

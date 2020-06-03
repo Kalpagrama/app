@@ -45,7 +45,7 @@ div(
     }`
     :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-50
     slot(name="video" :player="player" :meta="meta")
-    //- kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId,layerStart,layerEnd,videoMuted}`)
+    kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId,layerStart,layerEnd,videoMuted}`)
     q-spinner(
       v-if="ctx === 'workspace' && !loaded"
       size="50px" color="green"

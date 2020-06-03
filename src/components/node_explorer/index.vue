@@ -54,7 +54,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
       bottom: $q.screen.xs ? 60+8+'px' : 8+'px',
       height: '50px'
     }`
-    ).q-px-md Reply with node
+    ).q-px-md Reply to node
   //- page body
   q-page-container
     q-page
@@ -67,44 +67,46 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
             :essence="true" :opened="true"
             @meta="onNodeMeta"
             :visible="true" :active="true" :mini="false")
+      .row.full-width
+        node-nodes(:node="node")
       //- body
-      div(v-if="false && $route.params.page === 'nodes'").row.full-width.justify-center
-        div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-py-md
-          kalpa-loader(v-if="$q.screen.xs && sphereOid && node" :mangoQuery="mangoQuery")
-            template(v-slot=`{items}`)
-              list-middle(:items="items")
-                template(v-slot:item=`{item, index, indexMiddle}`)
-                  node(
-                    ctx="list" layout="PIP"
-                    :node="item" :index="index" :essence="true"
-                    :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
-                    :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
-                    :active="index === indexMiddle"
-                    :mini="false")
-          kalpa-loader(v-if="$q.screen.gt.xs && sphereOid && node" :mangoQuery="mangoQuery")
-            template(v-slot=`{items}`)
-              list-masonry(:items="items")
-                template(v-slot:item=`{item, index, isOpened, isHovered}`)
-                  div(:style=`{position: 'absolute', zIndex: 3000, opacity: 0.5}` @click="$router.push('/node/'+item.oid).catch(e => e)").row.fit.cursor-pointer
-                  node(
-                    ctx="list" layout="PIP"
-                    :node="item" :index="index" :needFull="true"
-                    :visible="isHovered" :active="isHovered" :mini="true")
-      //- contents
-      div(v-if="$route.params.page === 'contents'").row.full-width.q-pa-md
-        h6.text-white Contents
-      //- chains
-      div(v-if="$route.params.page === 'chaing'").row.full-width.q-pa-md
-        h6.text-white Chains
+      //- div(v-if="false && $route.params.page === 'nodes'").row.full-width.justify-center
+      //-   div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-py-md
+      //-     kalpa-loader(v-if="$q.screen.xs && sphereOid && node" :mangoQuery="mangoQuery")
+      //-       template(v-slot=`{items}`)
+      //-         list-middle(:items="items")
+      //-           template(v-slot:item=`{item, index, indexMiddle}`)
+      //-             node(
+      //-               ctx="list" layout="PIP"
+      //-               :node="item" :index="index" :essence="true"
+      //-               :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
+      //-               :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
+      //-               :active="index === indexMiddle"
+      //-               :mini="false")
+      //-     kalpa-loader(v-if="$q.screen.gt.xs && sphereOid && node" :mangoQuery="mangoQuery")
+      //-       template(v-slot=`{items}`)
+      //-         list-masonry(:items="items")
+      //-           template(v-slot:item=`{item, index, isOpened, isHovered}`)
+      //-             div(:style=`{position: 'absolute', zIndex: 3000, opacity: 0.5}` @click="$router.push('/node/'+item.oid).catch(e => e)").row.fit.cursor-pointer
+      //-             node(
+      //-               ctx="list" layout="PIP"
+      //-               :node="item" :index="index" :needFull="true"
+      //-               :visible="isHovered" :active="isHovered" :mini="true")
+      //- //- contents
+      //- div(v-if="$route.params.page === 'contents'").row.full-width.q-pa-md
+      //-   h6.text-white Contents
+      //- //- chains
+      //- div(v-if="$route.params.page === 'chaing'").row.full-width.q-pa-md
+      //-   h6.text-white Chains
 </template>
 
 <script>
 import menuRight from './menu_right'
-import { RxCollectionEnum } from 'src/system/rxdb'
+import nodeNodes from './node_nodes'
 
 export default {
   name: 'nodeExplorer',
-  components: {menuRight},
+  components: {menuRight, nodeNodes},
   props: ['node'],
   data () {
     return {
@@ -125,26 +127,8 @@ export default {
     }
   },
   computed: {
-    sphereOid () {
-      if (!this.node) return null
-      else return this.node.sphereFromName.oid
-    },
     pageId () {
       return this.$route.params.page
-    },
-    mangoQuery () {
-      return {
-        selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          oidSphere: this.sphereOid
-        }
-      }
-      // return {
-      //   oid: this.sphereOid,
-      //   pagination: { pageSize: 10 },
-      //   sortStrategy: 'HOT',
-      //   filter: { types: 'NODE' }
-      // }
     }
   },
   watch: {
@@ -161,16 +145,6 @@ export default {
     }
   },
   methods: {
-    nodeEssenceStickyClick () {
-      this.$log('nodeEssenceStickyClick', document)
-      // this.$tween.to(window, 0.5, {scrollTop: 0})
-      // this.$refs.nodeExplorerLayout.scroll.position = 0
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      })
-    },
     nodeAdd () {
       this.$log('nodeAdd')
       let nodeInput = {

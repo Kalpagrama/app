@@ -38,17 +38,21 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('$route CHANGED', to)
+        if (this.nodeCategories.length === 0) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
         if (to) {
           this.sphere = await this.sphereLoad(to)
         } else {
-          if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
-          // по-моему - что-то тут не так...
-          if (this.nodeCategories.length > 4 && this.$route.name === 'trends') {
+          if (this.$route.name === 'trends') {
             this.$router.replace({params: {oid: this.nodeCategories[4].sphere.oid}})
           }
-          else {
-            this.$router.replace({params: {oid: this.$store.getters.currentUser().oid}})
-          }
+          // if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
+          // по-моему - что-то тут не так...
+          // if (this.nodeCategories.length > 4 && this.$route.name === 'trends') {
+          //   this.$router.replace({params: {oid: this.nodeCategories[4].sphere.oid}})
+          // }
+          // else {
+          //   this.$router.replace({params: {oid: this.$store.getters.currentUser().oid}})
+          // }
         }
       }
     }
@@ -73,10 +77,14 @@ export default {
       }
     }
   },
-  async beforeCreate() {
-    this.$log('beforeCreate')
-    if (!this.nodeCategories.length) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
-  },
+  // async beforeCreate() {
+  //   this.$log('beforeCreate')
+  //   if (this.nodeCategories.length === 0) {
+  //     let nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
+  //     this.$log('nodeCategories', nodeCategories)
+  //     // this.nodeCategories
+  //   }
+  // },
   beforeDestroy () {
     this.$log('beforeDestroy')
   }

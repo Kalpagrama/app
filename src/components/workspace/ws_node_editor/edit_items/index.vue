@@ -190,10 +190,14 @@ export default {
       }
       this.$set(this.node.items, itemIndex, itemInput)
       this.itemFinderOpened = false
+      // set item, open editor
+      this.item = this.node.items[itemIndex]
+      this.itemEditorOpened = true
     }
   },
   mounted () {
     this.$log('mounted')
+    // AJ2Ri_fCwB8=
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

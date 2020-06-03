@@ -7,7 +7,7 @@ div(
     position: 'relative'
   }`
   ).row.full-width.items-start.content-start
-  //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
+  kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   //- menu
   q-btn(
     v-if="visible && active && ctx !== 'workspace'"
