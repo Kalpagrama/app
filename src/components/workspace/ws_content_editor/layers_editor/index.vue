@@ -1,11 +1,12 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
+  kalpa-debug(:options=`state`)
   //- layer editor
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     layer-editor(
-      v-if="layerEditing"
+      v-if="stateEditor.layerEditorOpened"
       v-bind="$props"
-      @close="layerEditing = null"
+      @close="stateEditor.set('layerEditorOpened', false)"
       @prev="layerForward(false)"
       @next="layerForward(true)"
       :style=`{
@@ -28,15 +29,13 @@ div(:style=`{position: 'relative'}`).column.fit
 <script>
 import layerList from '../layer_list'
 import layerEditor from './layer_editor'
-import compositionController from './composition_controller'
 
 export default {
   name: 'editLayers',
-  components: {layerList, layerEditor, compositionController},
-  props: ['editorType', 'player', 'meta', 'composition', 'pages', 'pageId'],
+  components: {layerList, layerEditor},
+  props: ['player', 'statePlayer', 'stateEditor'],
   data () {
     return {
-      layerEditing: null,
     }
   },
   computed: {
@@ -46,21 +45,27 @@ export default {
           name: 'Edit',
           fn: (layer) => {
             this.$log('Edit', layer)
+            this.layerEdit(layer)
           }
         },
         copy: {
           name: 'Copy',
           fn: (layer) => {
             this.$log('Copy', layer)
+            this.layerAdd(layer)
           }
         },
         createNode: {
-          name: 'Create node'
+          name: 'Create node',
+          fn: () => {
+            this.$log('create node')
+          }
         },
         delete: {
           name: 'Delete',
           fn: (layer) => {
             this.$log('Delete', layer)
+            // if (!confirm('Delete layer ?!')) return
           }
         }
       }
@@ -70,75 +75,41 @@ export default {
   watch: {
   },
   methods: {
+    // layers
+    layersSelectedCreateNode (arr) {
+      this.$log('layersSelectedCreateNode', arr)
+    },
+    layersSelectedDelete (arr) {
+      this.$log('layersSelectedDelete', arr)
+    },
+    // layer
     layerForward (isNext) {
       this.$log('layerForward', isNext)
     },
     layerPick (layer) {
       this.$log('layerPick', layer)
-      this.layerEditing = layer.id
+      this.statePlayer.set('layerId', layer.id)
+      this.statePlayer.set('mode', 'layer')
+      this.stateEditor.set('layerEditorOpened', true)
     },
-    layerClicked (id) {
-      this.layerEditing = id
-      this.player.meta(['mode', 'layer'])
-      this.player.meta(['layerId', id])
-    },
-    layersSort () {
-      this.$log('layersSort')
-      this.composition.layers.sort((a, b) => {
-        if (a.figuresAbsolute[0].t > b.figuresAbsolute[1].t) return 1
-        else return -1
-      })
-    },
-    layersEdit () {
-      this.$log('layersEdit')
-      if (this.layersView === 'line') this.layersView = 'normal'
-      this.layersEditing = !this.layersEditing
-    },
-    layerSelectedDelete (arr) {
-      this.$log('layersSelectedDelete', arr)
-    },
-    // layersDraggingMove (e, evt) {
-    //   this.$log('layersDraggingMove', e.draggedContext.futureIndex)
-    //   this.$set(this, 'layersDraggingFutureIndex', e.draggedContext.futureIndex + 1)
-    // },
-    // layersDraggingUpdate (e, evt) {
-    //   this.$log('layersDraggingUpdate', e, evt)
-    // },
-    layerEdit (l, li) {
-      this.$log('layerEdit', l, li)
-      // ???
-    },
-    layerCopy (l, li) {
-      this.$log('layerCopy', l, li)
-      this.layerAdd(l)
+    layerCopy (layer) {
+      this.$log('layerCopy', layer)
     },
     layerDelete (l, li) {
       this.$log('layerDelete', l, li)
-      let i = this.meta.layers.findIndex(layer => layer.id === l.id)
+      let i = this.statePlayer.layers.findIndex(layer => layer.id === l.id)
       if (i >= 0) {
         if (!confirm('Delete layer ?!')) return
-        this.$delete(this.meta.layers, i)
+        this.$delete(this.statePlayer.layers, i)
       }
     },
-    layerAddFromWorkspace () {
-      this.$log('layerAddFromWorkspace')
-      this.layersWorkspaceShow = true
-    },
-    layerFound (l, li) {
-      this.$log('layerFound', l, li)
-      this.layersWorkspaceShow = false
-      this.layerAdd(l)
-    },
-    layerAddFromContent () {
-      this.$log('layerAddFromContent')
-    },
-    async layerAdd (layerInput, openEditor = true) {
+    async layerAdd (layerInput, layerPick = true) {
       this.$log('layerAdd start', layerInput)
       if (!layerInput) {
-        let start = this.meta.now
-        let end = start + 10 > this.meta.duration ? this.meta.duration : start + 10
+        let start = this.statePlayer.now
+        let end = start + 10 > this.statePlayer.duration ? this.statePlayer.duration : start + 10
         layerInput = {
-          contentOid: this.meta.content.oid,
+          contentOid: this.statePlayer.content.oid,
           figuresAbsolute: [
             {t: start, points: []},
             {t: end, points: []}
@@ -147,20 +118,19 @@ export default {
           spheres: []
         }
       }
-      let layerIndex = this.meta.layers.length
+      // make layer input
+      let layerIndex = this.statePlayer.layers.length
       let layerId = Date.now().toString()
       layerInput.id = layerId
       layerInput.color = this.$randomColor(layerId)
       this.$log('layerAdd layerInput', layerInput)
-      // if (this.composition.layers.findIndex(layer => layer.id === layerId) >= 0) alert('DUPLICATE ID')
       // set layer
-      this.$set(this.composition.layers, layerIndex, layerInput)
-      // set meta
-      this.$nextTick(() => {
-        this.player.meta(['layerId', layerId])
-        this.player.meta(['mode', 'layer'])
-        if (openEditor) this.layerEditing = layerId
-      })
+      this.$set(this.statePlayer.composition.layers, layerIndex, layerInput)
+      if (layerPick) {
+        this.statePlayer.set('layerId', layerId)
+        this.statePlayer.set('mode', 'layer')
+        this.stateEditor.set('layerEditorOpened', true)
+      }
       this.$log('layerAdd done')
     }
   }

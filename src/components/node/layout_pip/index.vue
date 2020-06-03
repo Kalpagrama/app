@@ -13,7 +13,7 @@ div(
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 10000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   node-items(
     v-if="true"
-    v-bind="$props" :meta="meta"
+    v-bind="$props" :statePip="statePip"
     :style=`{
       transform: 'translate3d(0,0,0)',
       borderRadius: '10px',
@@ -21,22 +21,22 @@ div(
     }`).b-60
   node-vote(
     v-if="false"
-    v-bind="$props" :meta="meta")
+    v-bind="$props" :statePip="statePip")
   node-essence(
     v-if="ctx !== 'workspace'"
-    v-bind="$props" :meta="meta"
+    v-bind="$props" :statePip="statePip"
     :style=`{
       order: -2
     }`)
   node-author(
     v-if="nodeFull && ctx  !== 'workspace'"
-    v-bind="$props" :meta="meta"
+    v-bind="$props" :statePip="statePip"
     :style=`{
       order: 1
     }`)
   node-spheres(
     v-if="nodeFull && nodeFull.spheres.length > 0"
-    v-bind="$props" :meta="meta"
+    v-bind="$props" :statePip="statePip"
     :style=`{
       order: 2
     }`)
@@ -51,7 +51,7 @@ import nodeSpheres from './node_spheres'
 
 export default {
   name: 'nodeLayoutPip',
-  props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'essence', 'mini', 'opened', 'nodeLoad'],
+  props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'essence', 'mini', 'opened', 'stateNode'],
   components: {nodeItems, nodeVote, nodeEssence, nodeAuthor, nodeSpheres},
   data () {
     return {
@@ -59,9 +59,12 @@ export default {
     }
   },
   computed: {
-    meta () {
+    statePip () {
       return {
-        showVote: this.showVote
+        showVote: this.showVote,
+        set: (key, val) => {
+          this[key] = val
+        }
       }
     }
   },

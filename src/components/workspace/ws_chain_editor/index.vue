@@ -3,6 +3,7 @@
   div().row.full-width.q-pa-sm
     span.text-white.text-bold Chain editor
   .col.full-width
+    .row.full-width
 </template>
 
 <script>

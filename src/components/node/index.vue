@@ -1,7 +1,6 @@
 <template lang="pug">
 node-layout-pip(
-  v-bind="$props" :nodeFull="nodeFull"
-  @meta="$emit('meta', $event)")
+  v-bind="$props" :nodeFull="nodeFull" :stateNode="stateNode")
 </template>
 
 <script>
@@ -16,6 +15,15 @@ export default {
   data () {
     return {
       nodeFull: null
+    }
+  },
+  computed: {
+    stateNode () {
+      return {
+        set: (key, val) => {
+          this[key] = val
+        }
+      }
     }
   },
   watch: {

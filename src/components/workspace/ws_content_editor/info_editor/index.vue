@@ -7,7 +7,7 @@
     .row.full-width.items-start.content-start.q-pa-sm
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-60
         .row.full-width.q-pa-md
-          span.text-white.text-bold {{ composition.name }}
+          span.text-white.text-bold {{ statePlayer.composition.name }}
         .row.full-width.q-pa-md
           span.text-white Spheres
         .row.full-width.q-pa-md
@@ -17,7 +17,7 @@
 <script>
 export default {
   name: 'infoEditor',
-  props: ['composition'],
+  props: ['stateEditor', 'statePlayer', 'player'],
   data () {
     return {
     }

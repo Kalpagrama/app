@@ -3,8 +3,8 @@ div(
   :style=`{
     position: 'absolute', zIndex: 1000, bottom: '0px',
     borderRadius: '0px', overflow: 'hidden',
-    background: meta.playing ? 'none' : ctx === 'workspace' ? 'rgb(0,0,0)' : 'none',
-    background: meta.playing ? 'none' : ctx === 'workspace' ? 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)' : 'none',
+    background: statePlayer.playing ? 'none' : ctx === 'workspace' ? 'rgb(0,0,0)' : 'none',
+    background: statePlayer.playing ? 'none' : ctx === 'workspace' ? 'linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)' : 'none',
   }`
   ).row.full-width.q-pa-md
   //- actions
@@ -17,8 +17,8 @@ div(
     }`
     ).row
     q-btn(
-      round dense flat color="grey-4" @click="meta.playing ? player.pause() : player.play()"
-      :icon="meta.playing ? 'pause' : 'play_arrow'"
+      round dense flat color="grey-4" @click="statePlayer.playing ? player.pause() : player.play()"
+      :icon="statePlayer.playing ? 'pause' : 'play_arrow'"
       :style=`{zIndex: 1400}`)
     //- stats
     q-btn(
@@ -29,7 +29,7 @@ div(
       small.text-white {{ $time(duration) }}
     q-btn(
       round dense flat color="grey-4" @click="mutedToggle()"
-      :icon="meta.muted ? 'volume_off' : 'volume_up'"
+      :icon="statePlayer.muted ? 'volume_off' : 'volume_up'"
       :style=`{zIndex: 1400}`)
     q-btn(
       round dense flat color="grey-4" @click="videoForward(0)"
@@ -73,7 +73,7 @@ div(
 <script>
 export default {
   name: 'playerVideo-videoProgress',
-  props: ['ctx', 'visible', 'active', 'mini', 'player', 'meta'],
+  props: ['ctx', 'visible', 'active', 'mini', 'player', 'statePlayer'],
   data () {
     return {
       mouseOverBar: false,
@@ -87,18 +87,18 @@ export default {
   computed: {
     duration () {
       if (this.ctx === 'workspace') {
-        return this.meta.duration
+        return this.statePlayer.duration
       }
       else {
-        return this.meta.layerEnd - this.meta.layerStart
+        return this.statePlayer.layerEnd - this.statePlayer.layerStart
       }
     },
     now () {
       if (this.ctx === 'workspace') {
-        return this.meta.now
+        return this.statePlayer.now
       }
       else {
-        return this.meta.now - this.meta.layerStart
+        return this.statePlayer.now - this.statePlayer.layerStart
       }
     },
   },
@@ -116,11 +116,11 @@ export default {
   methods: {
     layerAgain () {
       this.$log('layerAgain')
-      this.player.setCurrentTime(this.meta.layerStart)
+      this.player.setCurrentTime(this.statePlayer.layerStart)
       this.player.play()
     },
     setCurrentTime (t) {
-      t = this.ctx === 'workspace' ? t : t + this.meta.layerStart
+      t = this.ctx === 'workspace' ? t : t + this.statePlayer.layerStart
       this.player.setCurrentTime(t)
       this.player.update(t)
     },
@@ -146,7 +146,7 @@ export default {
       if (e.isFirst) {
         let left = e.evt.layerX || e.position.left
         // alert('barDrag first' + left)
-        if (this.ctx === 'workspace') this.player.meta(['mode', 'content'])
+        if (this.ctx === 'workspace') this.statePlayer.set('mode', 'content')
         this.$tween.to(this, 0.3, {barHeight: this.barHeightMax})
         this.barWidth = (left / this.$el.clientWidth) * 100
       }
@@ -166,7 +166,7 @@ export default {
     },
     barClick (e) {
       // this.$log('barClick', e)
-      if (this.ctx === 'workspace') this.player.meta(['mode', 'content'])
+      if (this.ctx === 'workspace') this.statePlayer.set('mode', 'content')
       let width = e.target.clientWidth
       let left = e.offsetX
       let t = (this.duration * left) / width

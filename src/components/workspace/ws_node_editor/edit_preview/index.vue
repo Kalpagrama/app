@@ -39,7 +39,7 @@ export default {
       return {
         layout: 'PIP',
         name: this.node.name,
-        meta: this.node,
+        // meta: this.node,
         items: this.node.items,
         spheres: this.node.spheres,
         category: this.node.category,

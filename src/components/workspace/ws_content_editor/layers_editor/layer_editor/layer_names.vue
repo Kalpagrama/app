@@ -58,7 +58,7 @@ import layerSpheres from './layer_spheres'
 export default {
   name: 'layerNames',
   components: { layerSpheres },
-  props: ['player', 'meta', 'layer', 'mode', 'layerIndex'],
+  props: ['player', 'statePlayer', 'layer', 'mode', 'layerIndex'],
   data () {
     return {
       name: '',

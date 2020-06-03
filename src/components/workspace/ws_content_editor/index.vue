@@ -2,6 +2,8 @@
 .q-tab
   border-radius: 10px !important
   overflow: hidden
+.q-tab-panels
+  background: none !important
 .q-tab-panel
   padding: 0
   margin: 0
@@ -34,34 +36,41 @@ div(
           position: 'absolute', zIndex: 2000, bottom: '18px', right: '18px',
           borderRadius: '50%'
         }`)
-    template(v-slot:editor=`{player, meta}`)
+    template(v-slot:editor=`{player, statePlayer}`)
       .column.fit
         //- header bar
         //- div(:style=`{marginTop: '-20px', paddingTop: '20px'}`).row.full-width
         //-   div(:style=`{height: '70px', borderRadius: '0 0 10px 10px'}`).row.full-width.b-60
+        //- body
         q-tab-panels(
           v-model="pageId" animated
           keep-alive infinite
-          :swipeable="pageId !== 'layers'"
-          :style=`{background: 'none'}`
+          :swipeable="!layerEditorOpened"
           ).col.full-width
           q-tab-panel(name="info")
             info-editor(
               :editorType="editorType"
-              :composition="value"
-              :player="player" :meta="meta")
+              :composition="statePlayer.composition"
+              :player="player"
+              :statePlayer="statePlayer"
+              :stateEditor="stateEditor")
           q-tab-panel(name="layers")
             layers-editor(
               ref="layersEditor"
               :editorType="editorType"
-              :composition="value"
-              :player="player" :meta="meta")
+              :composition="statePlayer.composition"
+              :player="player"
+              :statePlayer="statePlayer"
+              :stateEditor="stateEditor")
           q-tab-panel(name="workspace")
             layers-workspace(
+              @pick="layerAdd"
               :editorType="editorType"
-              :composition="value"
-              :player="player" :meta="meta"
-              @pick="layerAdd")
+              :composition="statePlayer.composition"
+              :player="player"
+              :statePlayer="statePlayer"
+              :stateEditor="stateEditor")
+        //- footer
         .row.full-width.justify-between.q-pa-sm
           q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" @click="$emit('close')")
           q-tabs(
@@ -77,7 +86,7 @@ div(
               :label="p.name"
               no-caps content-class="text-white"
               :style=`{color: 'white'}`)
-          q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" :style=`{opacity: 0}`)
+          q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
 </template>
 
 <script>
@@ -102,10 +111,21 @@ export default {
   },
   data () {
     return {
-      pageId: 'layers'
+      pageId: 'layers',
+      layerEditorOpened: false
     }
   },
   computed: {
+    stateEditor () {
+      return {
+        pageId: this.pageId,
+        pages: this.pages,
+        layerEditorOpened: this.layerEditorOpened,
+        set: (key, val) => {
+          this[key] = val
+        }
+      }
+    },
     pages () {
       let res = {
         info: {name: 'Info'},

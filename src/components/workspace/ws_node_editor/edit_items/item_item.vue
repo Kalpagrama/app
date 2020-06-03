@@ -7,18 +7,36 @@
 
 <template lang="pug">
 div(
-  @click="itemClick()"
   :style=`{
     position: 'relative',
+    height: '100px',
     borderRadius: '10px',
     overflow: 'hidden'
   }`
-  ).row.full-width.items-center.content-center.b-70.q-pl-md.q-pr-sm.q-py-sm.q-mb-sm.item
-  span(:style=`{userSelect: 'none'}`).text-white {{ itemName }}
-  .col
-  q-btn(
-    flat dense icon-right="layers" color="white"
-    :style=`{pointerEvents: 'none'}`) {{ item.layers.length }}
+  ).row.full-width.items-center.content-center.item
+  img(
+    :src="item.thumbUrl"
+    :style=`{
+      width: '180px',
+      height: '100px',
+      borderRadius: '10px',
+      overflow: 'hidden',
+      objectFit: 'cover',
+    }`)
+  .col.full-height
+    div(
+      @click="itemClick()"
+      ).row.fit.items-start.content-start.q-pl-md.q-py-md
+      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ itemName }}
+  .row.full-height.items-start.content-start.q-pa-sm
+    //- q-btn(
+    //-   flat dense icon-right="layers" color="grey-5"
+    //-   :style=`{pointerEvents: 'none'}`) {{ item.layers.length }}
+    q-btn(
+      @click=""
+      flat dense icon="more_vert" color="grey-5"
+      :style=`{}`)
+      kalpa-menu-popup(:actions="actions")
 </template>
 
 <script>
@@ -41,6 +59,31 @@ export default {
       }
       else {
         return `Item ${this.itemIndex}`
+      }
+    },
+    actions () {
+      return {
+        edit: {
+          name: 'Edit',
+          fn: () => {
+            this.$log('Edit')
+            this.$emit('edit')
+          }
+        },
+        copy: {
+          name: 'Copy',
+          fn: () => {
+            this.$log('Copy')
+            this.$emit('copy')
+          }
+        },
+        delete: {
+          name: 'Delete',
+          fn: () => {
+            this.$log('Delete')
+            this.$emit('delete')
+          }
+        }
       }
     }
   },

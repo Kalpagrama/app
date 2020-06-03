@@ -12,11 +12,11 @@ div(:style=`{position: 'relative'}`).column.fit.b-50
       }`)
   //- header
   div.row.full-width
-    layer-frames(v-bind="$props" :layer="meta.layer")
-    layer-actions(v-bind="$props" :layer="meta.layer")
+    layer-frames(v-bind="$props" :layer="statePlayer.layer")
+    layer-actions(v-bind="$props" :layer="statePlayer.layer")
   //- body
   .col.full-width
-    layer-names(v-bind="$props" :layer="meta.layer")
+    layer-names(v-bind="$props" :layer="statePlayer.layer")
   //- footer
   div(
     :style=`{
@@ -42,7 +42,7 @@ import layerSpheres from './layer_spheres'
 export default {
   name: 'layerEditor',
   components: {layerNames, layerFrames, layerActions, layerSpheres},
-  props: ['editorType', 'player', 'meta', 'composition'],
+  props: ['stateEditor', 'player', 'statePlayer'],
   data () {
     return {
       layerSpheresEditorOpened: false
@@ -50,7 +50,7 @@ export default {
   },
   computed: {
     layer () {
-      return this.meta.layer
+      return this.statePlayer.layer
     },
     layerName () {
       if (this.layer.spheres.length > 0) return this.layer.spheres[0].name
@@ -60,14 +60,12 @@ export default {
   methods: {
     layerDelete () {
       this.$log('layerDelete')
-      if (!confirm('Delete layer ?!')) return
       this.$emit('delete')
     }
   },
   mounted () {
     this.$log('mounted')
-    this.player.meta(['mode', 'layer'])
-    // this.player.set
+    this.statePlayer.set('mode', 'layer')
     this.player.play()
   }
 }

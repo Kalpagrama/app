@@ -25,7 +25,7 @@ div(
       ).row.full-width.items-center.content-center.b-120.cursor-pointer
       //- progress
       div(
-        v-if="meta.now >= layerStart && meta.now <= layerEnd"
+        v-if="statePlayer.now >= layerStart && statePlayer.now <= layerEnd"
         :style=`{
           position: 'absolute', zIndex: 1000,
           left: '0px',
@@ -42,18 +42,18 @@ div(
           position: 'absolute', zIndex: 1100,
           bottom: '8px', pointerEvents: 'none',
         }`).row.full-width.q-px-xs
-        small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(meta.layerStart)}}
+        small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerStart)}}
         .col
           .row.full-width.justify-center
-            small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{ $time(meta.layerEnd - meta.layerStart) }}
-        small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(meta.layerEnd)}}
+            small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{ $time(statePlayer.layerEnd - statePlayer.layerStart) }}
+        small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerEnd)}}
   q-btn(round flat color="white" icon="refresh" @click="layerPlayAgain()").b-110
 </template>
 
 <script>
 export default {
   name: 'layerProgress',
-  props: ['meta', 'player', 'layer', 'layerIndex'],
+  props: ['player', 'statePlayer', 'layer', 'layerIndex'],
   data () {
     return {
       paddingX: 46,
@@ -65,7 +65,7 @@ export default {
   },
   computed: {
     progressPercent () {
-      return ((this.meta.now - this.layerStart) / this.layerDuration) * 100
+      return ((this.statePlayer.now - this.layerStart) / this.layerDuration) * 100
     },
     layerStart () {
       return this.layer.figuresAbsolute[0].t
@@ -77,18 +77,18 @@ export default {
       return this.layerEnd - this.layerStart
     },
     layerIsPlaying () {
-      return this.meta.playing
+      return this.statePlayer.playing
     },
   },
   methods: {
     layerPlay () {
       this.$log('layerPlay')
-      this.player.meta(['mode', 'layer'])
-      if (this.meta.playing) this.player.pause()
+      this.statePlayer.set('mode', 'layer')
+      if (this.statePlayer.playing) this.player.pause()
       else {
         if (!this.layerPlayStarted) {
-          this.player.meta(['mode', 'layer'])
-          this.player.meta(['layerId', this.layer.id])
+          this.statePlayer.set('mode', 'layer')
+          this.statePlayer.set('layerId', this.layer.id)
           this.player.setCurrentTime(this.layerStart)
           this.player.update(this.layerStart)
         }
@@ -111,7 +111,7 @@ export default {
       this.player.setCurrentTime(t)
       this.player.update(t)
       // tween to
-      let tPercentNow = ((this.meta.now - this.layerStart) / this.layerDuration) * 100
+      let tPercentNow = ((this.statePlayer.now - this.layerStart) / this.layerDuration) * 100
       let tPercentNext = ((t - this.layerStart) / this.layerDuration) * 100
       this.progressPercentRaw = tPercentNow
       this.$tween.to(this, 0.1, {

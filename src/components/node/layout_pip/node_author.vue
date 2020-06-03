@@ -27,7 +27,7 @@ div(
 // v-if="false && opened && nodeFull"
 export default {
   name: 'nodeLayoutPip-nodeAuthor',
-  props: ['node', 'nodeFull', 'meta'],
+  props: ['node', 'nodeFull', 'statePip'],
   data () {
     return {
     }

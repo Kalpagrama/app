@@ -86,17 +86,17 @@ export default {
     },
     async itemInactiveClick (i, ii) {
       this.$log('itemInactiveClick', i, ii)
-      let ref = this.$refs[`item-${i.oid}`][0]
-      // this.$log('ref', ref)
-      let offsetTop = ref.offsetTop
-      // this.$log('offsetTop', offsetTop)
-      let clientHeight = ref.clientHeight
-      // this.$log('clientHeight', clientHeight)
-      let scrollTop = offsetTop - ((this.clientHeight - clientHeight) / 2)
-      // this.$log('scrollTop', scrollTop)
-      // this.$log('this.scrollArea.scrollTop', this.scrollArea.scrollTop)
-      // this.indexMiddle = ii
-      this.$tween.to(this.scrollArea, 0.5, {scrollTop: scrollTop})
+      // let ref = this.$refs[`item-${i.oid}`][0]
+      // // this.$log('ref', ref)
+      // let offsetTop = ref.offsetTop
+      // // this.$log('offsetTop', offsetTop)
+      // let clientHeight = ref.clientHeight
+      // // this.$log('clientHeight', clientHeight)
+      // let scrollTop = offsetTop - ((this.clientHeight - clientHeight) / 2)
+      // // this.$log('scrollTop', scrollTop)
+      // // this.$log('this.scrollArea.scrollTop', this.scrollArea.scrollTop)
+      // // this.indexMiddle = ii
+      // this.$tween.to(this.scrollArea, 0.5, {scrollTop: scrollTop})
     }
   },
   async mounted () {
