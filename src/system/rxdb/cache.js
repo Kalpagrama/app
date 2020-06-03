@@ -191,7 +191,7 @@ class Cache {
       id,
       props: {
         notEvict,
-        oid: data && data.oid ? data.oid : undefined, // есть только у RxCollectionEnum.OBJ
+        oid: data && data.oid ? data.oid : undefined, // есть только у RxCollectionEnum.OBJ и RxCollectionEnum.LST_...
         rxCollectionEnum
       },
       cached: { data }
@@ -206,7 +206,7 @@ class Cache {
     assert(this.created, '!this.created')
     assert(id)
     let f = this.get
-    // logD(f, 'start', id)
+    logD(f, 'start', id)
     if (DEBUG_IGNORE_CACHE) logW(f, 'DEBUG_IGNORE_CACHE is ON!!!')
     let rxDoc = await this.db.cache.findOne(id).exec()
     let { actualUntil, actualAge, failReason } = this.cacheLru.get(id) || {}
@@ -256,7 +256,7 @@ class Cache {
       }
       return null
     }
-    // logD(f, 'complete')
+    logD(f, 'complete', rxDoc)
     return rxDoc
   }
 

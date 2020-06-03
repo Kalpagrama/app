@@ -32,6 +32,7 @@ export default {
   },
   computed: {
     sphereOid () {
+      this.$log('node_nodes: this.node=', this.node)
       return this.node.sphereFromName.oid
     },
     mangoQuery () {

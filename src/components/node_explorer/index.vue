@@ -67,7 +67,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
             :essence="true" :opened="true"
             @meta="onNodeMeta"
             :visible="true" :active="true" :mini="false")
-      .row.full-width
+      div(v-if="node").row.full-width
         node-nodes(:node="node")
       //- body
       //- div(v-if="false && $route.params.page === 'nodes'").row.full-width.justify-center

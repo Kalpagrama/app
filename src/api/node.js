@@ -47,7 +47,7 @@ class NodeApi {
       assert.ok(end > start, 'end > start')
       compositionLen += (end - start)
     }
-    assert(compositionLen <= 60, 'compositionLen <= 60')
+    assert(compositionLen <= 60, 'compositionLen <= 60 : ' + compositionLen)
     return {
       thumbUrl: composition.thumbUrl,
       spheres: composition.spheres ? composition.spheres.map(s => ({ name: s.name })) : [],
@@ -160,7 +160,7 @@ class NodeApi {
     assert(oid && rate, 'oid && rate')
     let { data: { nodeRate } } = await apollo.clients.api.mutate({
       mutation: gql`
-        mutation nodeRate ($oid: OID!, $rate: Float!) {
+        mutation nodeVote ($oid: OID!, $rate: Float!) {
           nodeRate (oid: $oid, rate: $rate){
             oid
             rate
@@ -185,7 +185,7 @@ class NodeApi {
     assert.ok(oid)
     let { data: { deleteObject } } = await apollo.clients.api.mutate({
       mutation: gql`
-        mutation deleteNode($oid: OID!) {
+        mutation nodeDelete($oid: OID!) {
           deleteObject (oid: $oid)
         }
       `,
@@ -204,7 +204,7 @@ class NodeApi {
     let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectFullFragment}
-        mutation ($node: NodeInput!) {
+        mutation nodeCreate($node: NodeInput!) {
           nodeCreate (node: $node){
             ...objectFullFragment
           }
@@ -227,7 +227,7 @@ class NodeApi {
     let { data: { chainCreate: createdChain } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectFullFragment}
-        mutation ($chain: ChainInput!) {
+        mutation chainCreate($chain: ChainInput!) {
           chainCreate (chain: $chain){
             ...objectFullFragment
           }

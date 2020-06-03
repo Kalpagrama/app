@@ -23,7 +23,7 @@ function makeListCacheId (mangoQuery) {
   return rxCollectionEnum + '::' + JSON.stringify(mangoQuery)
 }
 
-function getMangoQueryFromId(id){
+function getMangoQueryFromId (id) {
   let parts = id.split('::')
   assert(parts.length === 2, 'bad id ' + id)
   let collection = parts[0]
@@ -36,15 +36,29 @@ function getMangoQueryFromId(id){
 class Lists {
   constructor (cache) {
     this.cache = cache
+    // setTimeout(async () => {
+    //   let arr = ['AF6DVu7AMAY=', 'AHDF9_IAoIc=', 'AJ2jxUPCMc4=', 'AJ2V+LzCsEU=', 'AJxhm8MCcFo=']
+    //   logD('before frind...', arr)
+    //   let rxDocs = await this.cache.find({
+    //     selector: {
+    //       'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
+    //       'props.oid': { $in: arr }
+    //     }
+    //   })
+    //   logD('finded!!!!', rxDocs)
+    //   let rxDocsAll = await this.cache.find()
+    //   logD('finded!!!! rxDocsAll', rxDocsAll)
+    // }, 2000)
   }
 
   // вернет  список (из кэша или с сервера)
   async find (mangoQuery) {
-    let id = makeListCacheId(mangoQuery)
+    let id = makeListCacheId(mangoQuery) // запишется в cache.props.oid
     let fetchFunc = async () => {
+      let oid = mangoQuery && mangoQuery.selector.oidSphere ? mangoQuery.selector.oidSphere : null
       let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
       return {
-        item: { items, count, totalCount, nextPageToken },
+        item: { items, count, totalCount, nextPageToken, oid },
         actualAge: 'day'
       }
     }
@@ -134,23 +148,25 @@ class Lists {
           })
         }
         break
-        }
-      case 'NODE_CREATED':{
+      }
+      case 'NODE_CREATED': {
         assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
         // добавим на все сферы
         let rxDocs = await this.cache.find({
           selector: {
             'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
-              'props.oid': {$in: event.sphereOids}
+            'props.oid': { $in: event.sphereOids }
           }
         })
-        for (let rxDoc of rxDocs){
+        logD(f, 'finded lists: ', rxDocs)
+        for (let rxDoc of rxDocs) {
           let mangoQuery = getMangoQueryFromId(rxDoc.id)
           // todo проверить, что event.object isRestricted by mangoQuery
           await rxDoc.atomicUpdate((oldData) => {
             assert(oldData.cached.data, '!rxDoc.cached')
             assert(event.object, '!event.object')
-            oldData.cached.data.items.push(event.object)
+            let indx = oldData.cached.data.items.findIndex(el => el.oid === event.object.oid)
+            if (indx === -1) oldData.cached.data.items.splice(0, 0, event.object)
             oldData.cached.data.count++
             oldData.cached.data.totalCount++
             return oldData
@@ -159,7 +175,7 @@ class Lists {
         break
       }
       case 'VOTED': {
-        if (event.subject.oid === localStorage.getItem('k_user_oid')){
+        if (event.subject.oid === localStorage.getItem('k_user_oid')) {
           // если голосовал текущий юзер - положить в список "проголосованные ядра"
           let rxDocs = await this.cache.find({
             selector: {
@@ -167,12 +183,13 @@ class Lists {
               'props.oid': localStorage.getItem('k_user_oid')
             }
           })
-          for (let rxDoc of rxDocs){
+          for (let rxDoc of rxDocs) {
             let mangoQuery = getMangoQueryFromId(rxDoc.id)
             // todo проверить, что event.object isRestricted by mangoQuery
             await rxDoc.atomicUpdate((oldData) => {
               assert(event.object, '!event.object')
-              oldData.cached.data.items.push(event.object)
+              let indx = oldData.cached.data.items.findIndex(el => el.oid === event.object.oid)
+              if (indx === -1) oldData.cached.data.items.splice(0, 0, event.object)
               oldData.cached.data.count++
               oldData.cached.data.totalCount++
               return oldData
