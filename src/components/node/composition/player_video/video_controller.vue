@@ -1,7 +1,7 @@
 <script>
 export default {
   name: 'videoController',
-  props: ['ctx', 'composition', 'player', 'meta', 'visible', 'active', 'mini'],
+  props: ['ctx', 'visible', 'active', 'mini', 'player', 'statePlayer'],
   data () {
     return {
     }
@@ -17,73 +17,70 @@ export default {
         }
       }
     },
-    'meta.layerId': {
+    'statePlayer.layerId': {
       handler (to, from) {
-        this.$log('meta.layerId CHANGED', to)
+        this.$log('statePlayer.layerId CHANGED', to)
         if (to !== undefined) {
-          this.player.setCurrentTime(this.meta.layerStart)
+          this.player.setCurrentTime(this.statePlayer.layerStart)
           this.player.play()
         }
       }
     },
-    'meta.mode': {
+    'statePlayer.mode': {
       handler (to, from) {
-        this.$log('meta.mode CHANGED', to)
+        this.$log('statePlayer.mode CHANGED', to)
         if (to === 'layer') {
           // do noting?
         }
         else if (to === 'composition') {
-          if (this.ctx === 'workspace') this.player.meta(['mode', 'content'])
-          // set first layer? if from !== composition?
-          // this.meta.layerId = this.composition.layers[0].id
-          this.player.meta(['layerId', this.composition.layers[0].id])
-          // this.player.play()
+          if (this.ctx === 'workspace') this.statePlayer.set('mode', 'content')
+          this.statePlayer.set('layerId', this.statePlayer.layers[0].id)
         }
         else if (to === 'content') {
           // do nothing?
         }
       }
     },
-    'meta.now': {
+    'statePlayer.now': {
       handler (to, from) {
         // if (this.timeupdateStop) return
         // LAYER
-        if (this.meta.mode === 'layer') {
-          if (to >= this.meta.layerEnd) {
-            this.player.setCurrentTime(this.meta.layerStart)
+        if (this.statePlayer.mode === 'layer') {
+          if (to >= this.statePlayer.layerEnd) {
+            this.player.setCurrentTime(this.statePlayer.layerStart)
           }
-          if (to <= this.meta.layerStart) {
-            this.player.setCurrentTime(this.meta.layerStart)
+          if (to <= this.statePlayer.layerStart) {
+            this.player.setCurrentTime(this.statePlayer.layerStart)
           }
         }
         // COMPOSITION
-        else if (this.meta.mode === 'composition') {
-          if (to >= this.meta.layerEnd) {
+        else if (this.statePlayer.mode === 'composition') {
+          if (to >= this.statePlayer.layerEnd) {
             // this.player.pause()
             // find next layer or go to first one
-            // let layerIndex = this.meta.layers.findIndex(layer => layer.id === this.meta.layerId)
+            // let layerIndex = this.statePlayer.layers.findIndex(layer => layer.id === this.statePlayer.layerId)
             // this.$log('layerIndex', layerIndex)
             // let layerIndexNext = layerIndex + 1
-            // if (this.meta.layers[layerIndexNext]) {
+            // if (this.statePlayer.layers[layerIndexNext]) {
             //   // alert('layer END next')
-            //   // this.meta.layerId = this.layers[layerIndexNext].id
-            //   this.player.meta(['layerId', this.meta.layers[layerIndexNext].id])
+            //   // this.statePlayer.layerId = this.layers[layerIndexNext].id
+            //   this.player.statePlayer(['layerId', this.statePlayer.layers[layerIndexNext].id])
             // }
             // else {
             //   // alert('layer END, again')
-            //   this.player.meta(['layerId', this.meta.layers[0].id])
-            //   // this.meta.layerId = this.layers[0].id
+            //   this.player.statePlayer(['layerId', this.statePlayer.layers[0].id])
+            //   // this.statePlayer.layerId = this.layers[0].id
             //   // this.$emit('ended')
             // }
           }
-          if (to < this.meta.layerStart) {
-            // alert('to <= this.meta.layerStart')
+          if (to < this.statePlayer.layerStart) {
+            // alert('to <= this.statePlayer.layerStart')
             this.player.pause()
-            this.player.setCurrentTime(this.meta.layerStart)
+            this.player.setCurrentTime(this.statePlayer.layerStart)
           }
         }
         // CONTENT
-        else if (this.meta.mode === 'content') {
+        else if (this.statePlayer.mode === 'content') {
           // do nothing?
         }
       }

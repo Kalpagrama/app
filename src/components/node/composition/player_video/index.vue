@@ -37,14 +37,14 @@ div(
     overflow: 'hidden',
     opacity: opacity,
   }`).column.fit
-  video-controller(v-bind="$props" :player="player" :meta="meta")
-  slot(name="header" :player="player" :meta="meta")
+  video-controller(v-bind="$props" :player="player" :statePlayer="statePlayer")
+  slot(name="header" :player="player" :statePlayer="statePlayer")
   div(
     :class=`{
       'full-height': ctx !== 'workspace'
     }`
     :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-50
-    slot(name="video" :player="player" :meta="meta")
+    slot(name="video" :player="player" :statePlayer="statePlayer")
     kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId,layerStart,layerEnd,videoMuted}`)
     q-spinner(
       v-if="ctx === 'workspace' && !loaded"
@@ -67,9 +67,9 @@ div(
       :style=`{
         position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '0px', overflow: 'hidden',
       }`)
-    video-progress(v-bind="$props" :player="player" :meta="meta")
+    video-progress(v-bind="$props" :player="player" :statePlayer="statePlayer")
   .col.full-width
-    slot(name="editor" :player="player" :meta="meta")
+    slot(name="editor" :player="player" :statePlayer="statePlayer")
   slot(name="footer")
 </template>
 
@@ -79,12 +79,12 @@ import videoController from './video_controller'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'composition-playerVideo',
+  name: 'playerVideo',
   components: {videoProgress, videoController},
   props: ['ctx', 'preview', 'composition', 'visible', 'active', 'mini'],
   data () {
     return {
-      mode: 'content', // content, layer, composition
+      mode: 'composition', // content, layer, composition
       layerId: null,
       layerContent: null,
       now: 0,
@@ -104,7 +104,7 @@ export default {
         else return 1
       }
     },
-    meta () {
+    statePlayer () {
       return {
         mode: this.mode,
         now: this.now,
@@ -117,7 +117,11 @@ export default {
         layerId: this.layerId,
         layers: this.composition.layers,
         content: this.layerContent,
-        timeupdateStop: this.timeupdateStop
+        timeupdateStop: this.timeupdateStop,
+        composition: this.composition,
+        set: (key, val) => {
+          this[key] = val
+        }
       }
     },
     layer () {
@@ -258,10 +262,6 @@ export default {
       // set player defaults for all the players
       this.player.update = (to) => {
         this.videoTimeupdate(null, to)
-      }
-      this.player.meta = ([key, val]) => {
-        this.$log('player.meta()', key, val)
-        this[key] = val
       }
       if (this.ctx === 'workspace') {
         this.player.play()

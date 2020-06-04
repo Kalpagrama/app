@@ -4,6 +4,30 @@ div(
     position: 'relative'
   }`
   ).column.fit
+  //- chain add
+  q-btn(
+    @click="chainAdd()"
+    round push color="green" icon="add"
+    :size="$q.screen.xs ? 'md' : 'lg'"
+    :style=`{
+      position: 'absolute', zIndex: 2000,
+      bottom: '10px',
+      right: '10px',
+      borderRadius: '50%',
+    }`)
+  //- chain editor
+  q-dialog(
+    v-model="chainEditorOpened" persistent position="bottom"
+    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
+    @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
+    ws-chain-editor(
+      :value="chain"
+      @close="chainEditorOpened = false"
+      :style=`{
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+      }`)
   //- header
   div(
     :style=`{
@@ -35,11 +59,30 @@ div(
 </template>
 
 <script>
+import wsChainEditor from '../ws_chain_editor'
+
 export default {
   name: 'wsChainList',
+  components: {wsChainEditor},
   data () {
     return {
-      searchString: ''
+      searchString: '',
+      chain: null,
+      chainEditorOpened: false,
+    }
+  },
+  methods: {
+    chainAdd () {
+      this.$log('chainAdd')
+      let chainId = Date.now().toString()
+      let chainInput = {
+        id: chainId,
+        name: '',
+        left: null,
+        right: null
+      }
+      this.chain = chainInput
+      this.chainEditorOpened = true
     }
   },
   mounted () {

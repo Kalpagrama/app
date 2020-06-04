@@ -18,7 +18,7 @@ q-layout(view="hHh lpR fFf")
   //- page
   q-page-container
     q-page
-      .row.full-width.justify-center
+      div(v-if="false").row.full-width.justify-center
         div(
           :style=`{
             position: 'relative',

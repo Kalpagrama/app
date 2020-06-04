@@ -64,16 +64,16 @@ div(
             q-checkbox(v-model="layersSelected" :val="l.id" dark color="grey-6")
           .col.full-height
             div(
-              @click="layerClick(l,li)"
               :style=`{
                 borderRadius: '10px',
                 overflow: 'hidden',
-              }`).row.fit.items-center.content-center.q-pl-md.b-70.cursor-pointer.layer.layer-drag-handle
-              .col
-                span(
-                  v-if="l.spheres.length > 0"
-                  :style=`{userSelect: 'none'}`
-                  ).text-white.text-bold {{ l.spheres[0].name }}
+              }`).row.fit.items-center.content-center.q-pl-md.b-70.cursor-pointer.layer
+              div().col.full-height.layer-drag-handle
+                div(@click="layerClick(l,li)").row.fit.items-center.content-center
+                  span(
+                    v-if="l.spheres.length > 0"
+                    :style=`{userSelect: 'none'}`
+                    ).text-white.text-bold {{ l.spheres[0].name }}
               q-btn(round flat dense color="grey-6" icon="more_vert").q-mr-xs
                 kalpa-menu-popup(:value="l" :actions="layerActions")
 </template>

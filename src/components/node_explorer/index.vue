@@ -1,5 +1,5 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
+q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout").b-30
   //- actions
   //- dialogs
   //- node
@@ -65,7 +65,6 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout" @scroll="onScroll").b-30
             ctx="list"
             :node="node" :needFull="true"
             :essence="true" :opened="true"
-            @meta="onNodeMeta"
             :visible="true" :active="true" :mini="false")
       div(v-if="node").row.full-width
         node-nodes(:node="node")
@@ -157,35 +156,6 @@ export default {
       }
       this.nodeEditorItem = nodeInput
       this.nodeEditorOpened = true
-    },
-    onNodeMeta ([key, val]) {
-      this.$log('onNodeMeta', key, val)
-      switch (key) {
-        case 'height': {
-          this.nodeHeight = val
-          // this.nodeEssenceOffsetTop = this.$refs.nodeEssence.offsetTop
-          break
-        }
-      }
-    },
-    onScroll (e) {
-      // this.$log('onScroll', e)
-      if (e.position === 0) return
-      this.scrollTop = e.position
-      // set node essence sticky
-      if (e.position >= this.nodeEssenceOffsetTop) {
-        this.nodeEssenceStickyShow = true
-      }
-      else {
-        this.nodeEssenceStickyShow = false
-      }
-      // set node Active
-      if (e.position >= (this.nodeHeight / 2)) {
-        this.nodeActive = false
-      }
-      else {
-        this.nodeActive = true
-      }
     }
   },
   mounted () {
