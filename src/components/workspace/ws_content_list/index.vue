@@ -152,10 +152,10 @@ export default {
         this.$log('searchString CHANGED', to)
         if (this.isURL(to)) {
           this.searchStringLoading = true
-          this.$q.loading.show()
+          this.$q.loading.show({spinnerColor: 'green', message: 'Loading content...'})
           this.searchStringRaw = ''
           this.$refs.searchStringInput.blur()
-          await this.$wait(1000)
+          await this.$wait(2000)
           this.$q.loading.hide()
           this.searchStringLoading = false
           this.contentPicked(await this.contentAdd(await this.contentFromURL(to)))
