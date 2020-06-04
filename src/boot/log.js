@@ -45,7 +45,7 @@ const LogModulesEnum = Object.freeze({
 })
 Object.freeze(LogModulesEnum)
 
-const showAlert = false
+const showAlert = true
 
 class Logger {
   constructor (store) {
@@ -237,7 +237,11 @@ export default async ({ Vue, store, app }) => {
         error.processed = true
       }
       try {
-        logE('window.onerror', message, source, line, column, error)
+        if (error.message === 'Failed to execute \'getComputedStyle\' on \'Window\': parameter 1 is not of type \'Element\'.'){
+          logW('window.onerror', message, source, line, column, error)
+        } else {
+          logE('window.onerror', message, source, line, column, error)
+        }
         // const { clearCache } = require('src/system/services')
         // clearCache() нельзя очищать кэш просто на всякий случай! (там могут быть несохраненные изменения в мастерской)
       } catch (e) {
