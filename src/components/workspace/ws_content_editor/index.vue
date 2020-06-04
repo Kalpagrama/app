@@ -22,7 +22,7 @@ div(
     :visible="true" :active="true" :mini="false"
     :value="value").full-height
     template(v-if="showHeader" v-slot:header)
-      kalpa-debug(:options=`{editorType,pageId}`)
+      //- kalpa-debug(:options=`{editorType,pageId}`)
       div(:style=`{height: '70px'}`
         ).row.full-width.items-center.content-center.q-px-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
@@ -71,22 +71,23 @@ div(
               :statePlayer="statePlayer"
               :stateEditor="stateEditor")
         //- footer
-        .row.full-width.justify-between.q-pa-sm
-          q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" @click="$emit('close')")
-          q-tabs(
-            v-model="pageId"
-            align="center"
-            active-color="white"
-            active-bg-color="green"
-            dense color="white"
-            :style=`{borderRadius: '10px'}`).b-60
-            q-tab(
-              v-for="(p,pkey) in pages" :key="pkey"
-              :name="pkey"
-              :label="p.name"
-              no-caps content-class="text-white"
-              :style=`{color: 'white'}`)
-          q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
+        transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+          div(v-if="!layerEditorOpened").row.full-width.justify-between.q-pa-sm
+            q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" @click="$emit('close')")
+            q-tabs(
+              v-model="pageId"
+              align="center"
+              active-color="white"
+              active-bg-color="green"
+              dense color="white"
+              :style=`{borderRadius: '10px'}`).b-60
+              q-tab(
+                v-for="(p,pkey) in pages" :key="pkey"
+                :name="pkey"
+                :label="p.name"
+                no-caps content-class="text-white"
+                :style=`{color: 'white'}`)
+            q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
 </template>
 
 <script>
@@ -112,7 +113,8 @@ export default {
   data () {
     return {
       pageId: 'layers',
-      layerEditorOpened: false
+      layerEditorOpened: false,
+      layerNameFocused: false
     }
   },
   computed: {
@@ -121,6 +123,7 @@ export default {
         pageId: this.pageId,
         pages: this.pages,
         layerEditorOpened: this.layerEditorOpened,
+        layerNameFocused: this.layerNameFocused,
         set: (key, val) => {
           this[key] = val
         }

@@ -11,25 +11,30 @@ div(:style=`{position: 'relative'}`).column.fit.b-50
         minHeight: $q.screen.xs ? $q.screen.height-60+'px' : $q.screen.height*0.7+'px',
       }`)
   //- header
-  div.row.full-width
+  div(
+    v-if="true"
+    :style=`{maxHeight: stateEditor.layerNameFocused ? '0px' : '500px', overflow: 'hidden'}`
+    ).row.full-width
     layer-frames(v-bind="$props" :layer="statePlayer.layer")
     layer-actions(v-bind="$props" :layer="statePlayer.layer")
   //- body
-  .col.full-width
+  div(key="body").col.full-width
     layer-names(v-bind="$props" :layer="statePlayer.layer")
   //- footer
   div(
+    v-if="!stateEditor.layerNameFocused"
     :style=`{
       position: 'absolute', zIndex: 2000, bottom: '0px',
       borderRadius: '10px 10px 0 0', overflow: 'hidden'
     }`).row.full-width.items-start.content-start.b-90
     .row.full-width.q-pa-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('prev')").b-100
+      q-btn(flat round dense color="red" no-caps @click="$emit('delete')").q-px-sm
+        span.text-bold Delete
       .col
-      q-btn(round flat color="white" icon="keyboard_arrow_right" @click="$emit('next')").b-100
-    .row.full-width.q-pa-sm
-      q-btn(flat round dense color="red" no-caps icon="delete_outline" @click="$emit('delete')")
-      .col
+        .row.fit.items-center.content-center.justify-center.q-px-sm
+          q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$emit('prev')").b-100
+          q-btn(flat dense color="white" no-caps).b-100.q-mx-sm.q-px-md Play
+          q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="$emit('next')").b-100
       q-btn(push color="green" no-caps @click="$emit('close')").q-px-md Save
 </template>
 

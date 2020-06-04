@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    height: '120px'
+    height: '90px'
   }`).row.full-width.items-start.content-start
   layer-progress(:layer="layer" :layerIndex="layerIndex" :player="player" :statePlayer="statePlayer")
   div(
@@ -11,26 +11,15 @@ div(
       paddingLeft: '60px', paddingRight: '60px',
     }`
     ).row.full-width.items-center.content-center.q-py-xs
-    q-btn(round flat dense color="white" icon="first_page" @click="layerSet(0)").b-90.q-mr-xs
+    q-btn(round flat dense color="white" icon="first_page" @click="layerSet(0)").b-70.q-mr-xs
     q-btn-group(flat color="white" :style=`{borderRadius: '10px'}`)
-      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(0,0)").b-90
-      q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(0,1)").b-90
+      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(0,0)").b-70
+      q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(0,1)").b-70
     .col
     q-btn-group(flat color="white" :style=`{borderRadius: '10px'}`).q-mr-xs
-      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(1,0)").b-90
-      q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(1,1)").b-90
-    q-btn(round flat dense color="white" icon="last_page" @click="layerSet(1)").b-90
-  //- div(
-  //-   :style=`{paddingLeft: '60px', paddingRight: '60px'}`
-  //-   ).row.full-width.items-center.content-center
-  //-   q-btn(flat dense color="white").b-100.q-px-md {{$time(statePlayer.layerStart)}}
-  //-   .col
-  //-     .row.full-width.justify-center
-  //-       span.text-white {{ $time(statePlayer.layerEnd - statePlayer.layerStart) }}
-  //-   q-btn(flat dense color="white").b-100.q-px-md {{$time(statePlayer.layerEnd)}}
-  //-   q-btn(round flat color="white" icon="tune" @click="layerSpheresEditorOpened = !layerSpheresEditorOpened").b-110
-  //-   .col
-  //-   q-btn(round color="green" icon="check" @click="layerClose()").b-110
+      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(1,0)").b-70
+      q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(1,1)").b-70
+    q-btn(round flat dense color="white" icon="last_page" @click="layerSet(1)").b-70
 </template>
 
 <script>

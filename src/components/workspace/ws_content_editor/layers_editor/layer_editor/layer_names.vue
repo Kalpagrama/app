@@ -6,9 +6,9 @@ div(
     overflow: 'hidden',
   }`
   ).column.fit.q-pa-sm.b-70
-  //- layer name
+  //- layer name dialog editor for mobile only
   q-dialog(
-    v-model="opened" position="bottom")
+    v-model="layerNameEditorOpened" position="bottom")
     div(
       :style=`{
         minHeight: $q.screen.height-60+'px',
@@ -30,26 +30,58 @@ div(
         .col
         q-btn(round flat color="white" icon="check" @click="opened = false").b-80
       .col.full-width
-  //- layer spheres
-  q-dialog(
-    v-model="layerSpheresEditorOpened")
+  //- layer spheres editor
+  //- q-dialog(
+  //-   v-model="layerSpheresEditorOpened")
   div.row.full-width
+    q-input(
+      ref="layerNameInput"
+      :value="layerName" @input="layerNameChanged"
+      @focus="layerNameFocused"
+      @blur="layerNameBlurred"
+      filled dark dense color="grey-6"
+      autogrow
+      label="Notes"
+      :input-style=`{minHeight: '90px'}`
+      :style=`{
+        transform: 'translate3d(0,0,0)',
+        borderRadius: '10px',
+        overflow: 'hidden',
+      }`
+      ).full-width
+  div(v-if="stateEditor.layerNameFocused").row.full-width.q-py-sm
+    .col
     q-btn(
-      @click="opened = true"
-      flat no-caps color="white"
-      ).b-80.text-white.text-bold {{layerName}}
-  div.row.full-width.q-py-sm
-    q-btn(
-      v-if="true"
-      flat no-caps color="white"
-      ).b-80
-      q-icon(name="edit" color="white" size="18px").q-mr-sm
-      span Edit spheres
-  div.row.full-width
-    ws-sphere(
-      v-for="(s,si) in layer.spheres" :key="si"
-      v-if="si > 0"
-      :sphere="s" :sphereIndex="si")
+      push no-caps color="green" @click="stateEditor.set('layerNameFocused', false)").q-px-md Save
+  //- spheres
+  //- div.row.full-width.q-py-sm
+  //-   q-input(
+  //-     v-model="sphereName"
+  //-     filled dark dense color="grey-6"
+  //-     label="Add sphere or create").full-width
+  //- .col.full-width
+  //-   ws-sphere-list(
+  //-     :showHeader="false"
+  //-     :showItems="showSpheresFromWs"
+  //-     @sphereClick="sphereClickWs($event), showSpheresFromWs = false"
+  //-     @created="sphereCreated($event), showSpheresFromWs = false"
+  //-     @searchStarted="showSpheresFromWs = true"
+  //-     @searchEnded="showSpheresFromWs = false"
+  //-     :style=`{
+  //-       borderRadius: '10px',
+  //-       overflow: 'hidden',
+  //-     }`).full-height.b-50
+  //-     template(v-slot:header)
+  //-     //-   .row.full-width.q-px-sm.q-py-md
+  //-     //-     span.text-white.text-bold Spheres
+  //-     template(v-slot:items=`{items, searchString}`)
+  //-       div().row.full-width.items-start.content-start
+  //-         div(v-if="searchString.length === 0").row.full-width.q-py-sm
+  //-           ws-sphere(
+  //-             v-for="(s,si) in node.spheres" :key="si"
+  //-             :sphere="s"
+  //-             @sphereClick="sphereClick(s,si)"
+  //-             ).q-mr-sm.q-mb-sm
 </template>
 
 <script>
@@ -58,44 +90,59 @@ import layerSpheres from './layer_spheres'
 export default {
   name: 'layerNames',
   components: { layerSpheres },
-  props: ['player', 'statePlayer', 'layer', 'mode', 'layerIndex'],
+  props: ['stateEditor', 'player', 'statePlayer', 'layer', 'mode', 'layerIndex'],
   data () {
     return {
-      name: '',
-      opened: false,
-      layerSpheresEditorOpened: false
+      layerNameEditorOpened: false,
+      layerSpheresEditorOpened: false,
+      sphereName: '',
+      showSpheresFromWs: false
     }
   },
   computed: {
     layerName () {
       if (this.layer.spheres.length > 0) return this.layer.spheres[0].name
-      else return 'Set layer name'
+      else return ''
     }
   },
   watch: {
-    opened: {
-      async handler (to, from) {
-        this.$log('opened CHANGED', to)
-      }
-    }
   },
   methods: {
+    sphereClickWs (sphere) {
+      this.$log('sphereClickWs', sphere)
+    },
+    sphereClick (sphere) {
+      this.$log('sphereClick', sphere)
+    },
+    sphereCreated (sphere) {
+      this.$log('sphereCreated', sphere)
+    },
+    layerNameChanged (e) {
+      this.$log('layerNameChanged', e)
+      if (this.layer.spheres.length === 0) this.$set(this.layer.spheres, 0, {name: ''})
+      this.$set(this.layer.spheres[0], 'name', e)
+    },
+    async layerNameFocused () {
+      this.$log('layerNameFocused')
+      this.stateEditor.set('layerNameFocused', true)
+      // await this.$wait(1000)
+      // let ref = this.$refs.layerNameInput
+      // this.$log('ref', ref)
+      // ref.layerNameInput.focus()
+    },
+    layerNameBlurred () {
+      this.$log('layerNameBlurred')
+      this.stateEditor.set('layerNameFocused', false)
+    },
     inputFocused () {
       this.$log('inputFocused')
-      // this.opened = true
     },
     inputBlurred () {
       this.$log('inputBlurred')
-      // this.layer.spheres[0] = {name: this.name}
-      this.$set(this.layer.spheres, 0, {name: this.name})
-      this.opened = false
     }
   },
   mounted () {
     this.$log('mounted')
-    if (this.layer.spheres.length > 0) {
-      this.name = this.layer.spheres[0].name
-    }
   }
 }
 </script>

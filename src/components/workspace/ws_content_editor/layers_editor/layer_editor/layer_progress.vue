@@ -6,47 +6,49 @@ div(
     position: 'relative',
     borderRadius: '0px',
     overflow: 'hidden',
+    height: '42px',
   }`).row.full-width.items-center.content-center.q-px-sm
   q-btn(
     round @click="layerPlay()"
     :flat="!layerIsPlaying"
     :color="layerIsPlaying ? 'red' : 'white'"
     :icon="layerIsPlaying ? 'pause' : 'play_arrow'").b-110
-  .col.q-px-sm
-    div(
-      @click="progressClick"
-      v-touch-pan.mouse.left.right="progressDrag"
-      :style=`{
-        position: 'relative',
-        height: '42px',
-        borderRadius: '10px',
-        overflow: 'hidden',
-      }`
-      ).row.full-width.items-center.content-center.b-120.cursor-pointer
-      //- progress
+  div(:style=`{position: 'relative'}`).col.full-height.q-px-sm
+    div(:style=`{position: 'relative'}`).row.fit
       div(
-        v-if="statePlayer.now >= layerStart && statePlayer.now <= layerEnd"
+        @click="progressClick"
+        v-touch-pan.mouse.left.right="progressDrag"
         :style=`{
-          position: 'absolute', zIndex: 1000,
-          left: '0px',
-          width: progressPercentRaw ? progressPercentRaw+'%' : progressPercent+'%',
-          pointerEvents: 'none',
+          position: 'absolute', zIndex: 10000,
+          height: '42px',
           borderRadius: '10px',
           overflow: 'hidden',
-          background: 'white',
         }`
-      ).row.full-height
-      //- stats
-      div(
-        :style=`{
-          position: 'absolute', zIndex: 1100,
-          bottom: '8px', pointerEvents: 'none',
-        }`).row.full-width.q-px-xs
-        small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerStart)}}
-        .col
-          .row.full-width.justify-center
-            small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{ $time(statePlayer.layerEnd - statePlayer.layerStart) }}
-        small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerEnd)}}
+        ).row.full-width.items-center.content-center.b-120.cursor-pointer
+        //- progress
+        div(
+          v-if="statePlayer.now >= layerStart && statePlayer.now <= layerEnd"
+          :style=`{
+            position: 'absolute', zIndex: 1000,
+            left: '0px',
+            width: progressPercentRaw ? progressPercentRaw+'%' : progressPercent+'%',
+            pointerEvents: 'none',
+            borderRadius: '10px',
+            overflow: 'hidden',
+            background: 'white',
+          }`
+        ).row.full-height
+        //- stats
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 1100,
+            bottom: '8px', pointerEvents: 'none',
+          }`).row.full-width.q-px-xs
+          small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerStart)}}
+          .col
+            .row.full-width.justify-center
+              small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{ $time(statePlayer.layerEnd - statePlayer.layerStart) }}
+          small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerEnd)}}
   q-btn(round flat color="white" icon="refresh" @click="layerPlayAgain()").b-110
 </template>
 
@@ -103,7 +105,7 @@ export default {
       this.player.play()
     },
     progressClick (e) {
-      this.$log('progressClick')
+      // this.$log('progressClick', e)
       let width = e.target.clientWidth
       let left = e.offsetX
       let t = ((this.layerDuration * left) / width) + this.layerStart
@@ -123,18 +125,23 @@ export default {
       })
     },
     progressDrag (e) {
-      this.$log('progressDrag', e)
-      let width = this.$el.clientWidth - (this.paddingX * 2)
+      // this.$log('progressDrag', e)
+      let width = this.$el.clientWidth - (58 * 2)
       if (e.isFirst) {
-        // this.$tween.to(this, 0.3, {barHeight: this.barHeightMax})
-        this.progressPercentRaw = (e.evt.layerX / width) * 100
+        this.player.pause()
+        this.progressPercentRaw = ((this.statePlayer.now - this.statePlayer.layerStart) / this.layerDuration) * 100
       }
       if (e.isFinal) {
         // this.$tween.to(this, 0.3, {barHeight: this.barHeightMin})
+        // if (this.statePlayer.playing)
         this.progressPercentRaw = null
+        this.player.play()
       }
+      if (!this.progressPercentRaw) return
       this.progressPercentRaw += (e.delta.x / width) * 100
-      let t = (this.progressPercentRaw / 100) * this.layerDuration
+      let t = this.layerStart + (this.progressPercentRaw / 100) * this.layerDuration
+      // this.$log('t', t)
+      if (t < this.layerStart || t > this.layerEnd) return
       if (t > 0) {
         this.player.setCurrentTime(t)
         this.player.update(t)

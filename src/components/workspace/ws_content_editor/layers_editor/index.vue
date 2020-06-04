@@ -1,6 +1,6 @@
+  kalpa-debug(:options=`stateEditor`)
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
-  kalpa-debug(:options=`state`)
   //- layer editor
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     layer-editor(
@@ -17,6 +17,7 @@ div(:style=`{position: 'relative'}`).column.fit
   .col.full-width
     layer-list(
       v-bind="$props"
+      :composition="statePlayer.composition"
       mode="layers"
       @pick="layerPick"
       :actions=`layerActions`)
@@ -45,7 +46,7 @@ export default {
           name: 'Edit',
           fn: (layer) => {
             this.$log('Edit', layer)
-            this.layerEdit(layer)
+            this.layerPick(layer)
           }
         },
         copy: {
@@ -57,15 +58,16 @@ export default {
         },
         createNode: {
           name: 'Create node',
-          fn: () => {
+          fn: (layer) => {
             this.$log('create node')
+            this.layersSelectedCreateNode([layer.id])
           }
         },
         delete: {
           name: 'Delete',
           fn: (layer) => {
             this.$log('Delete', layer)
-            // if (!confirm('Delete layer ?!')) return
+            this.layerDelete(layer)
           }
         }
       }
@@ -78,9 +80,17 @@ export default {
     // layers
     layersSelectedCreateNode (arr) {
       this.$log('layersSelectedCreateNode', arr)
+      alert('layersSelectedCreateNode')
     },
     layersSelectedDelete (arr) {
       this.$log('layersSelectedDelete', arr)
+      if (!confirm('Delete selected layers ?!')) return
+      arr.map(id => {
+        let i = this.statePlayer.layers.findIndex(layer => layer.id === id)
+        if (i >= 0) {
+          this.$delete(this.statePlayer.layers, i)
+        }
+      })
     },
     // layer
     layerForward (isNext) {
@@ -97,9 +107,9 @@ export default {
     },
     layerDelete (l, li) {
       this.$log('layerDelete', l, li)
+      if (!confirm('Delete layer ?!')) return
       let i = this.statePlayer.layers.findIndex(layer => layer.id === l.id)
       if (i >= 0) {
-        if (!confirm('Delete layer ?!')) return
         this.$delete(this.statePlayer.layers, i)
       }
     },
@@ -126,12 +136,10 @@ export default {
       this.$log('layerAdd layerInput', layerInput)
       // set layer
       this.$set(this.statePlayer.composition.layers, layerIndex, layerInput)
-      if (layerPick) {
-        this.statePlayer.set('layerId', layerId)
-        this.statePlayer.set('mode', 'layer')
-        this.stateEditor.set('layerEditorOpened', true)
-      }
       this.$log('layerAdd done')
+      if (layerPick) {
+        this.layerPick(layerInput)
+      }
     }
   }
 }

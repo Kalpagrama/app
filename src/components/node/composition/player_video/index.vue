@@ -84,7 +84,7 @@ export default {
   props: ['ctx', 'preview', 'composition', 'visible', 'active', 'mini'],
   data () {
     return {
-      mode: 'content', // content, layer, composition
+      mode: 'composition', // content, layer, composition
       layerId: null,
       layerContent: null,
       now: 0,

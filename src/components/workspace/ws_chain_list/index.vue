@@ -17,7 +17,7 @@ div(
     }`)
   //- chain editor
   q-dialog(
-    v-model="chainEditor" position="bottom"
+    v-model="chainEditorOpened" persistent position="bottom"
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
     @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
     ws-chain-editor(
@@ -27,7 +27,7 @@ div(
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
         maxWidth: $store.state.ui.maxWidthPage+'px',
-      }`).b-50
+      }`)
   //- header
   div(
     :style=`{
@@ -81,6 +81,8 @@ export default {
         left: null,
         right: null
       }
+      this.chain = chainInput
+      this.chainEditorOpened = true
     }
   },
   mounted () {

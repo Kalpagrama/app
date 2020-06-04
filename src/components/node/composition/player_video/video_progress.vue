@@ -145,6 +145,7 @@ export default {
       // this.$log('barDrag', e)
       if (e.isFirst) {
         let left = e.evt.layerX || e.position.left
+        // this.$log('left', left)
         // alert('barDrag first' + left)
         if (this.ctx === 'workspace') this.statePlayer.set('mode', 'content')
         this.$tween.to(this, 0.3, {barHeight: this.barHeightMax})
@@ -155,6 +156,7 @@ export default {
         this.$tween.to(this, 0.3, {barHeight: this.barHeightMin})
         this.barWidth = null
       }
+      if (!this.barWidth) return
       this.barWidth += (e.delta.x / this.$el.clientWidth) * 100
       let t = (this.barWidth / 100) * this.duration
       if (t > 0) {
