@@ -38,7 +38,8 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          oidSphere: this.sphereOid
+          oidSphere: this.sphereOid,
+          topStrategy: 'AGE'
         }
       }
       // return {
