@@ -112,9 +112,10 @@ class Cache {
       this.created = true
       logD(f, 'complete')
     } catch (err) {
+      if (recursive) throw err
       logE(f, 'ошибка при создания CACHE! очищаем и пересоздаем!', err)
       await this.clearCollections()
-      if (!recursive) await this.create(true)
+      await this.create(true)
     }
   }
 

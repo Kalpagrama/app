@@ -3,7 +3,7 @@ import { Workspace, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/wor
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { addRxPlugin, createRxDatabase } from 'rxdb'
+import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
@@ -68,31 +68,43 @@ class RxDBWrapper {
     await this.db.importDump(dump)
   }
 
-  async init () {
+  async init (recursive = false) {
     const f = this.init
     logD(f, 'start')
-    this.db = await createRxDatabase({
-      name: 'rxdb',
-      adapter: 'idb', // <- storage-adapter
-      multiInstance: true, // <- multiInstance (optional, default: true)
-      eventReduce: true, // <- eventReduce (optional, default: true)
-      pouchSettings: { revs_limit: 1 }
-    })
-    await this.db.collection({ name: 'meta', schema: schemaKeyValue })
-    await this.purgeDb() // очистит бд от старых данных
+    try {
+      this.db = await createRxDatabase({
+        name: 'rxdb',
+        adapter: 'idb', // <- storage-adapter
+        multiInstance: true, // <- multiInstance (optional, default: true)
+        eventReduce: true, // <- eventReduce (optional, default: true)
+        pouchSettings: { revs_limit: 1 }
+      })
+      await this.db.collection({ name: 'meta', schema: schemaKeyValue })
+      await this.purgeDb() // очистит бд от старых данных
 
-    this.db.waitForLeadership().then(() => {
-      logD(f, 'RXDB::LEADER!!!!')
-      this.isLeader_ = true
-    })
-    this.workspace = new Workspace(this.db)
-    this.cache = new Cache(this.db)
-    this.objects = new Objects(this.cache)
-    this.lists = new Lists(this.cache)
-    this.event = new Event(this.workspace, this.objects, this.lists)
-    await this.workspace.create()
-    await this.cache.create()
-    this.created = true
+      this.db.waitForLeadership().then(() => {
+        logD(f, 'RXDB::LEADER!!!!')
+        this.isLeader_ = true
+      })
+      this.workspace = new Workspace(this.db)
+      this.cache = new Cache(this.db)
+      this.objects = new Objects(this.cache)
+      this.lists = new Lists(this.cache)
+      this.event = new Event(this.workspace, this.objects, this.lists)
+      await this.workspace.create()
+      await this.cache.create()
+      this.created = true
+    } catch (err) {
+      if (recursive) throw err
+      logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
+      if (this.db) {
+        await this.db.remove()
+      }// предпочтительно, тк removeRxDatabase иногда глючит
+      else {
+        await removeRxDatabase('rxdb', 'idb')
+      }
+      await this.init(true)
+    }
   }
 
   // вызывать после логина

@@ -9,7 +9,7 @@ import {
   wsSchemaLocalChanges, schemaKeyValue, wsSchemaItem
 } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { Mutex } from 'src/system/rxdb/reactive'
+import { getReactive, Mutex } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 
@@ -20,7 +20,7 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_WS)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-const synchroTimeMin = 1000 * 60 * 1 // раз в 1 минут шлем изменения на сервер
+const synchroTimeMin = 1000 * 5 // 60 * 1 // раз в 1 минут шлем изменения на сервер
 class WaitBreakable {
   constructor (ms) {
     assert(ms >= synchroTimeMin, 'bad ms')
@@ -130,9 +130,10 @@ class Workspace {
       await this.createCollections()
       this.created = true
     } catch (err) {
+      if (recursive) throw err
       logE(f, 'ошибка при создания Workspace! очищаем и пересоздаем!', err)
       await this.clearCollections()
-      if (!recursive) await this.create(true)
+      await this.create(true)
     }
   }
 
@@ -291,8 +292,8 @@ class Workspace {
       let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : 0 // версия локальной мастерской
       this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера
-      if (wsRevisionLocal + 1 !== wsRevision) {
-        logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${wsRevision}`)
+      if (wsRevisionLocal + 1 !== this.reactiveUser.wsRevision) {
+        logW(f, `WS expired! wsRevisionLocal=${wsRevisionLocal} wsRevisionServer=${this.reactiveUser.wsRevision}`)
         // здесь нельзя явно вызывать synchronizeWsWhole (только в рамках synchronize, тк оно работает параллельно)
         this.synchroLoopWaitObj.break()// форсировать синхронизацию (см synchroLoop)
         return
@@ -300,31 +301,37 @@ class Workspace {
       // ищем изменившейся item
       const rxDoc = await this.db.ws_items.findOne(itemServer.id).exec()
       // применим изменения
-      if (!rxDoc || rxDoc.rev + 1 < itemServer.rev || rxDoc.updatedAt < itemServer.updatedAt) {
-        logD(f, 'Берем изменения с сервера')
-        if (type !== 'WS_ITEM_DELETED') {
-          // delete itemServer._rev // иначе - постоянные конфликты внутри pouchdb
-          await this.db.ws_items.atomicUpsert(itemServer)
-        } else {
+      if (!rxDoc || type === 'WS_ITEM_DELETED' || rxDoc.rev + 1 < itemServer.rev || rxDoc.updatedAt < itemServer.updatedAt) {
+        logD(f, 'Берем изменения с сервера', type)
+        if (type === 'WS_ITEM_DELETED') {
+          // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
           await this.db.ws_items.find({ selector: { id: itemServer.id } }).remove()
+        } else {
+          // logD(f, 'try update ws item')
+          await this.db.ws_items.atomicUpsert(itemServer)
         }
         await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
       } else {
+        logD(f, `event проигнорирован (у нас актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
         let hasChanges = await this.db.ws_changes.findOne(itemServer.id).exec() // есть локальные изменения
         // просто возьмем ревизию с сервера
-        await rxDoc.atomicUpdate((oldData) => {
-          oldData.rev = itemServer.rev // ревизию назначает сервер
-          oldData.oid = itemServer.oid // oid генерируется на сервере
-          return oldData
-        })
-        // atomicSet мог добавить этот item в ws_changes! Приводим в исходное (см onCollectionUpdate)
+        // делаем через reactiveItem из-за дебаунса (если менять rxDoc напрямую - возможны потери введенных через дебаунс данных)
+        let reactiveItem = getReactive(rxDoc)
+        reactiveItem.rev = itemServer.rev // ревизию назначает сервер
+
+        // await rxDoc.atomicUpdate((oldData) => {
+        //   oldData.rev = itemServer.rev // ревизию назначает сервер
+        //   oldData.oid = itemServer.oid // oid генерируется на сервере
+        //   return oldData
+        // })
+
+        // изменение reactiveItem могло добавить этот item в ws_changes! Приводим в исходное (см onCollectionUpdate)
         if (!hasChanges) { // если до atomicSet изменений не было - удаляем
           await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove()
         }
-        logD(f, `event проигнорирован (у нас самая актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-      await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
+      await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: this.reactiveUser.wsRevision.toString() })
       logD(f, 'complete')
     } finally {
       this.release()

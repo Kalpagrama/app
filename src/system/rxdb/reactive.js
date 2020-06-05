@@ -72,9 +72,9 @@ class ReactiveItemHolder {
       try {
         await this.mutex.lock()
         this.itemUnsubscribe()
-        logD(f, `rxDoc changed. try to change reactiveItem. ${change.id}`)
+        logD(f, `rxDoc changed. try to change reactiveItem. ${change.id} ${change.name}`)
         this.reactiveItem = mergeReactiveItem(this.reactiveItem, change)
-        logD(f, 'reactiveItem changed')
+        logD(f, `reactiveItem changed ${this.reactiveItem.id} ${this.reactiveItem.name}`)
         // for (let key in change) this.reactiveItem[key] = change[key] // изменившиеся и добавившиеся
         // for (let key in this.reactiveItem) {
         //   if (!(key in change)) delete this.reactiveItem[key] // удалившиеся
@@ -98,7 +98,7 @@ class ReactiveItemHolder {
     if (this.itemUnsubscribeFunc) return
     this.itemUnsubscribeFunc = this.vm.$watch('reactiveItem', (newVal, oldVal) => {
       // reactiveItem изменилась (из UI)
-      // logD(f, 'reactiveItem changed from UI', newVal)
+      logD(f, `reactiveItem changed from UI ${newVal.id} ${newVal.name}`)
       if (!this.debouncedItemSave) {
         this.debouncedItemSave = debounce(async (newVal) => {
           // игнорируем newVal (берем из this.reactiveItem)!!! this.reactiveItem содержит самые актуальные данные!
@@ -108,9 +108,10 @@ class ReactiveItemHolder {
             await this.mutex.lock()
             await rxdb.lock() // необходимо заблокировать до вызова this.rxDocUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
             this.rxDocUnsubscribe()
-            logD(f, 'reactiveItem changed from UI (debounce)', this.reactiveItem)
+            logD(f, `reactiveItem changed from UI (debounce) ${this.reactiveItem.id} nm1:${this.reactiveItem.name} nm2:${newVal.name}`)
             assert(this.reactiveItem.id, '!this.reactiveItem.id')
-            await rxdb.set(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), { withLock: false }) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
+            let res = await rxdb.set(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), { withLock: false }) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
+            logD(f, `rxDoc changed ${res.id} ${res.name}`)
           } finally {
             this.rxDocSubscribe()
             await rxdb.release()
