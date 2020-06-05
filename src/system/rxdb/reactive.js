@@ -7,6 +7,7 @@ import { rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { getRxCollectionEnumFromId } from 'src/system/rxdb/index'
+import merge from 'lodash/merge'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_REACTIVE)
@@ -21,6 +22,20 @@ function getItemData (reactiveItem) {
   if (reactiveItem.valueString) return reactiveItem.valueString
   if (reactiveItem.cached) return reactiveItem.cached.data
   return reactiveItem
+}
+
+function mergeReactiveItem (reactiveItem, change) {
+  return merge(reactiveItem, change, (objValue, srcValue) => {
+    if (Array.isArray(objValue) && Array.isArray(srcValue)) {
+      objValue.splice(0, objValue.length(), ...srcValue)
+      return objValue
+    } else if (typeof objValue === 'object' && typeof srcValue === 'object'){
+      for (let key in objValue) {
+        if (!(key in srcValue)) delete objValue[key] // удаляем удалившиеся
+      }
+      return undefined // default behavior
+    } else return undefined // default behavior
+  })
 }
 
 const debounceIntervalItem = 2000
@@ -57,11 +72,13 @@ class ReactiveItemHolder {
       try {
         await this.mutex.lock()
         this.itemUnsubscribe()
-        logD(f, `rxDoc changed ${change.id} rev ${change.rev}`)
-        for (let key in change) this.reactiveItem[key] = change[key] // изменившиеся и добавившиеся
-        for (let key in this.reactiveItem) {
-          if (!(key in change)) delete this.reactiveItem[key] // удалившиеся
-        }
+        logD(f, `rxDoc changed. try to change reactiveItem. ${change.id}`)
+        this.reactiveItem = mergeReactiveItem(this.reactiveItem, change)
+        logD(f, 'reactiveItem changed')
+        // for (let key in change) this.reactiveItem[key] = change[key] // изменившиеся и добавившиеся
+        // for (let key in this.reactiveItem) {
+        //   if (!(key in change)) delete this.reactiveItem[key] // удалившиеся
+        // }
       } finally {
         this.itemSubscribe()
         this.mutex.release()
@@ -93,7 +110,7 @@ class ReactiveItemHolder {
             this.rxDocUnsubscribe()
             logD(f, 'reactiveItem changed from UI (debounce)', this.reactiveItem)
             assert(this.reactiveItem.id, '!this.reactiveItem.id')
-            await rxdb.setNoLock(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), { withLock: false }) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
+            await rxdb.set(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), { withLock: false }) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
           } finally {
             this.rxDocSubscribe()
             await rxdb.release()
@@ -138,8 +155,11 @@ class ReactiveListHolder {
         this.listSubscribe()
       }
     } finally {
-      if (rxQuery.reactiveListHolderMaster) rxQuery.reactiveListHolderMaster.mutex.release()
-      else this.mutex.release()
+      if (rxQuery.reactiveListHolderMaster) {
+        rxQuery.reactiveListHolderMaster.mutex.release()
+      } else {
+        this.mutex.release()
+      }
     }
 
     return this.reactiveList

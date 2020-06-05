@@ -175,7 +175,7 @@ class Workspace {
 
       try {
         this.synchronizeWsWholeInProgress = true
-        let wsRevisionLocalDoc = await rxdb.getNoLock(RxCollectionEnum.META, 'wsRevision')
+        let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
         let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : -1
         if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
           let wsServer = await WorkspaceApi.getWs()
@@ -193,7 +193,7 @@ class Workspace {
               }
             }
             // смотрим что есть у нас
-            for (let itemLocalDoc of await this.db.ws_items.find({selector: {wsItemType: wsItemTypeEnum}}).exec()) {
+            for (let itemLocalDoc of await this.db.ws_items.find({ selector: { wsItemType: wsItemTypeEnum } }).exec()) {
               if (!serverIds.has(itemLocalDoc.id)) { // есть у нас, но нет на сервере
                 let unsavedChanges = await this.db.ws_changes.findOne(itemLocalDoc.id).exec()
                 if (!unsavedChanges) { // есть у нас и мы ничего не меняли c момента последнего сохранения
@@ -204,7 +204,7 @@ class Workspace {
               }
             }
           }
-          await rxdb.setNoLock(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
+          await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
           this.reactiveUser.wsRevision = wsServer.rev // версия по мнению сервера
           logD(f, 'pull ws complete')
         }
@@ -278,7 +278,7 @@ class Workspace {
   async processEvent (event) {
     assert(rxdb.isLeader(), 'rxdb.isLeader()')
     try {
-      await this.mutex.lock()
+      await this.lock()
       const f = this.processEvent
       logD(f, 'start')
       if (!rxdb.isLeader()) return
@@ -288,7 +288,7 @@ class Workspace {
       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
       assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
 
-      let wsRevisionLocalDoc = await rxdb.getNoLock(RxCollectionEnum.META, 'wsRevision')
+      let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : 0 // версия локальной мастерской
       this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера
       if (wsRevisionLocal + 1 !== wsRevision) {
@@ -324,24 +324,16 @@ class Workspace {
         logD(f, `event проигнорирован (у нас самая актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-      await rxdb.setNoLock(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
+      await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
       logD(f, 'complete')
     } finally {
-      this.mutex.release()
+      this.release()
     }
-  }
-
-  getWsCollectionEnumByItem (item) {
-    assert(item && (item.id || item.wsItemType), 'bad item!' + JSON.stringify(item))
-    if (item.wsItemType) return item.wsItemType
-    let rxCollectionEnum = getRxCollectionEnumFromId(item.id)
-    assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
-    return rxCollectionEnum
   }
 
   async set (item, withLock = true) {
     try {
-      if (withLock) await this.mutex.lock()
+      if (withLock) await this.lock()
       const f = this.set
       assert(this.created, '!this.created')
       let itemCopy = JSON.parse(JSON.stringify(item))
@@ -355,32 +347,42 @@ class Workspace {
       logD(f, 'complete')
       return rxDoc
     } finally {
-      if (withLock) this.mutex.release()
+      if (withLock) this.release()
     }
   }
 
   async find (mangoQuery) {
-    assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
-    let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
-    assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-    delete mangoQuery.selector.rxCollectionEnum
-    mangoQuery.selector.wsItemType = rxCollectionEnum
-    let rxQuery = this.db.ws_items.find(mangoQuery)
-    return rxQuery
+    try {
+      await this.lock()
+      assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
+      let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+      assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+      delete mangoQuery.selector.rxCollectionEnum
+      mangoQuery.selector.wsItemType = rxCollectionEnum
+      let rxQuery = this.db.ws_items.find(mangoQuery)
+      return rxQuery
+    } finally {
+      this.release()
+    }
   }
 
   async get (id) {
-    let rxDoc = await this.db.ws_items.findOne(id).exec()
-    return rxDoc
+    try {
+      await this.lock()
+      let rxDoc = await this.db.ws_items.findOne(id).exec()
+      return rxDoc
+    } finally {
+      this.release()
+    }
   }
 
   async remove (id) {
     try {
-      await this.mutex.lock()
+      await this.lock()
       assert(this.created, '!this.created')
       await this.db.ws_items.find({ selector: { id: id } }).remove()
     } finally {
-      this.mutex.release()
+      this.release()
     }
   }
 

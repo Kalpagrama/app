@@ -174,7 +174,7 @@ class NodeApi {
       }
     })
     // надо запомнить сейчас, тк эвентом придет только общая оценка
-    let nodeFull = rxdb.getNoLock(RxCollectionEnum.OBJ, oid)
+    let nodeFull = rxdb.get(RxCollectionEnum.OBJ, oid)
     if (nodeFull) nodeFull.rateUser = rate // nodeFull реактивен!
     logD(f, 'done')
     return rate
@@ -214,7 +214,7 @@ class NodeApi {
         node: nodeInput
       }
     })
-    let reactiveNode = await rxdb.setNoLock(RxCollectionEnum.OBJ, createdNode, {actualAge: 'zero'}) // поместим ядро в кэш (на всяк случай)
+    let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, {actualAge: 'zero'}) // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdNode
   }
@@ -237,7 +237,7 @@ class NodeApi {
         chain: chainInput
       }
     })
-    let reactiveChain = await rxdb.setNoLock(RxCollectionEnum.OBJ, createdChain, {actualAge: 'zero'}) // поместим ядро в кэш (на всяк случай)
+    let reactiveChain = await rxdb.set(RxCollectionEnum.OBJ, createdChain, {actualAge: 'zero'}) // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdChain
   }

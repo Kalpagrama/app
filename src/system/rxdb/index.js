@@ -63,7 +63,7 @@ class RxDBWrapper {
     let purgeLastDateDoc = await this.get(RxCollectionEnum.META, 'purgeLastDate')
     let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc) : 0
     if (Date.now() - purgeLastDate < purgePeriod) return
-    await this.setNoLock(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
+    await this.set(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
     let dump = await this.db.dump()
     await this.db.importDump(dump)
   }
@@ -170,21 +170,16 @@ class RxDBWrapper {
     }
   }
 
-  async findNoLock (mangoQuery) {
-    mangoQuery = JSON.parse(JSON.stringify(mangoQuery)) // mangoQuery модифицируется внутри
-    // :::IMPORTANT:::
-    mangoQuery = JSON.parse(JSON.stringify(mangoQuery))
-    logD('*** ___ === mangoQuery ==' + JSON.stringify(mangoQuery))
+  // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
+  async find (mangoQuery) {
     assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + JSON.stringify(mangoQuery))
+    mangoQuery = JSON.parse(JSON.stringify(mangoQuery)) // mangoQuery модифицируется внутри
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     if (rxCollectionEnum in WsCollectionEnum) {
       let rxQuery = await this.workspace.find(mangoQuery)
       let reactiveList = await (new ReactiveListHolder()).create(rxQuery)
-      logD('*** reactiveList', reactiveList)
-      assert(reactiveList, '*** reactiveList')
-      // let reactive = []
-      // reactiveList = JSON.parse(JSON.stringify(reactiveList))
+      assert(reactiveList, '!reactiveList')
       return { items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
     } else if (rxCollectionEnum in LstCollectionEnum) {
       let rxDoc = await this.lists.find(mangoQuery)
@@ -194,17 +189,7 @@ class RxDBWrapper {
     }
   }
 
-  // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
-  async find (mangoQuery) {
-    try {
-      await this.lock()
-      return await this.findNoLock(mangoQuery)
-    } finally {
-      this.release()
-    }
-  }
-
-  async getNoLock (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
+  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     assert(!rawId.includes('::'), '')
     let id = makeId(rxCollectionEnum, rawId)
@@ -225,18 +210,9 @@ class RxDBWrapper {
     return getReactive(rxDoc)
   }
 
-  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
-    try {
-      await this.lock()
-      return await this.getNoLock(rxCollectionEnum, rawId, { fetchFunc, clientFirst, priority, force })
-    } finally {
-      this.release()
-    }
-  }
-
   // withLock - см ReactiveItemHolder
   // actualAge - актуально только для кэша
-  async setNoLock (rxCollectionEnum, data, { actualAge, withLock = true, notEvict = false } = {}) {
+  async set (rxCollectionEnum, data, { actualAge, withLock = true, notEvict = false } = {}) {
     const f = this.set
     assert(data, '!data')
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -257,30 +233,12 @@ class RxDBWrapper {
     return getReactive(rxDoc)
   }
 
-  async set (rxCollectionEnum, data, { actualAge, withLock = true, notEvict = false } = {}) {
-    try {
-      await this.lock()
-      return await this.setNoLock(rxCollectionEnum, data, { actualAge, withLock, notEvict })
-    } finally {
-      this.release()
-    }
-  }
-
-  async removeNoLock (id) {
+  async remove (id) {
     let collection = getRxCollectionEnumFromId(id)
     if (collection in WsCollectionEnum) {
       return await this.workspace.remove(id)
     } else {
       throw new Error('bad id!!' + id)
-    }
-  }
-
-  async remove (id) {
-    try {
-      await this.lock()
-      return await this.removeNoLock(id)
-    } finally {
-      this.release()
     }
   }
 }
