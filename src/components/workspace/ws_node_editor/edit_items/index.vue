@@ -21,6 +21,7 @@ div(
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])")
     ws-content-list(
       ctx="nodeEditor" @content="contentFound"
+      key="nodeEditor"
       :style=`{
         maxWidth: 800+'px',
         maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',

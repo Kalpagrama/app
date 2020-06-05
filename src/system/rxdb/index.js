@@ -172,12 +172,19 @@ class RxDBWrapper {
 
   async findNoLock (mangoQuery) {
     mangoQuery = JSON.parse(JSON.stringify(mangoQuery)) // mangoQuery модифицируется внутри
-    assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query: ' + JSON.stringify(mangoQuery))
+    // :::IMPORTANT:::
+    mangoQuery = JSON.parse(JSON.stringify(mangoQuery))
+    logD('*** ___ === mangoQuery ==' + JSON.stringify(mangoQuery))
+    assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + JSON.stringify(mangoQuery))
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     if (rxCollectionEnum in WsCollectionEnum) {
       let rxQuery = await this.workspace.find(mangoQuery)
       let reactiveList = await (new ReactiveListHolder()).create(rxQuery)
+      logD('*** reactiveList', reactiveList)
+      assert(reactiveList, '*** reactiveList')
+      // let reactive = []
+      // reactiveList = JSON.parse(JSON.stringify(reactiveList))
       return { items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
     } else if (rxCollectionEnum in LstCollectionEnum) {
       let rxDoc = await this.lists.find(mangoQuery)

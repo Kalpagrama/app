@@ -2,7 +2,7 @@
 export default {
   render () {
     return this.$scopedSlots.default({
-      items: this.items // this.query ? this.query.items : []
+      items: this.items
     })
   },
   name: 'kalpaLoader',
@@ -67,18 +67,18 @@ export default {
     },
     async itemsLoad (mangoQuery, append = false) {
       // this.$log('itemsLoad start', mangoQuery)
-      // get mangoQuery
-      // let { oid, pagination, filter, sortStrategy } = mangoQuery
-      // pagination = pagination || {pageSize: 30, pageToken: null}
-      // sortStrategy = sortStrategy || 'HOT'
-      // get res
-      let res
       mangoQuery = mangoQuery || {selector: {}}
-      let { items, count, totalCount, nextPageToken } = await this.$rxdb.find(mangoQuery)
-      this.items = items
-      this.nextPageToken = nextPageToken
-      this.totalCount = totalCount
-      this.itemsCount = items.length
+      try {
+        let { items, count, totalCount, nextPageToken } = await this.$rxdb.find(mangoQuery)
+        this.items = items
+        this.nextPageToken = nextPageToken
+        this.totalCount = totalCount
+        this.itemsCount = items.length
+      }
+      catch (e) {
+        this.$log('itemsLoad error', e)
+        alert('error')
+      }
     }
   }
 }

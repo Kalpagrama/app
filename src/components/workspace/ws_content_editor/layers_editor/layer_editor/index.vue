@@ -13,7 +13,7 @@ div(:style=`{position: 'relative'}`).column.fit.b-50
   //- header
   div(
     v-if="true"
-    :style=`{maxHeight: stateEditor.layerNameFocused ? '0px' : '500px', overflow: 'hidden'}`
+    :style=`{maxHeight: headerMaxHeight+'px', overflow: 'hidden'}`
     ).row.full-width
     layer-frames(v-bind="$props" :layer="statePlayer.layer")
     layer-actions(v-bind="$props" :layer="statePlayer.layer")
@@ -28,7 +28,7 @@ div(:style=`{position: 'relative'}`).column.fit.b-50
       borderRadius: '10px 10px 0 0', overflow: 'hidden'
     }`).row.full-width.items-start.content-start.b-90
     .row.full-width.q-pa-sm
-      q-btn(flat round dense color="red" no-caps @click="$emit('delete')").q-px-sm
+      q-btn(flat round dense color="red" no-caps @click="$emit('close'), $emit('delete')").q-px-sm
         span.text-bold Delete
       .col
         .row.fit.items-center.content-center.justify-center.q-px-sm
@@ -50,7 +50,8 @@ export default {
   props: ['stateEditor', 'player', 'statePlayer'],
   data () {
     return {
-      layerSpheresEditorOpened: false
+      layerSpheresEditorOpened: false,
+      headerMaxHeight: 500
     }
   },
   computed: {
@@ -60,6 +61,14 @@ export default {
     layerName () {
       if (this.layer.spheres.length > 0) return this.layer.spheres[0].name
       else return 'Set layer name'
+    }
+  },
+  watch: {
+    'stateEditor.layerNameFocused': {
+      handler (to, from) {
+        this.$log('stateEditor.layerNameFocused CHANGED', to)
+        this.$tween.to(this, 0.2, {headerMaxHeight: to ? 0 : 500})
+      }
     }
   },
   methods: {

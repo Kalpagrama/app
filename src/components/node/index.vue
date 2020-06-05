@@ -27,14 +27,14 @@ export default {
     }
   },
   watch: {
-    node: {
-      immediate: true,
-      handler (to, from) {
-        // this.$log('node CHANGED', to)
-        if (this.nodeFullReady) return
-        this.nodeLoad()
-      }
-    },
+    // node: {
+    //   immediate: false,
+    //   handler (to, from) {
+    //     // this.$log('node CHANGED', to)
+    //     // if (this.nodeFullReady) return
+    //     // this.nodeLoad()
+    //   }
+    // },
     needFull: {
       immediate: true,
         async handler (to, from) {
@@ -56,7 +56,7 @@ export default {
   },
   methods: {
     async nodeLoad () {
-      // this.$log('nodeLoad start', this.node.oid)
+      this.$log('*** nodeLoad start ===>', this.node.oid)
       let nodeFull = null
       try {
         nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)

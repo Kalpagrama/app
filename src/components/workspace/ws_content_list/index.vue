@@ -13,6 +13,17 @@ div(
     position: 'relative'
   }`
   ).column.full-width
+  q-dialog(
+    v-model="listShow" position="bottom")
+    ws-content-list(
+      ctx="workspace"
+      :style=`{
+        maxWidth: 800+'px',
+        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
+        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
+        borderRadius: '10px',
+        overflow: 'hidden',
+      }`).fit.b-30
   //- ws content editor
   q-dialog(
     v-model="contentEditorOpened" position="bottom"
@@ -62,6 +73,7 @@ div(
     div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
+      q-btn(round flat dense color="white" icon="menu" @click="listShow = true").b-70
       //- q-btn-group(flat :style=`{borderRadius: '10px'}`).b-70
       //-   q-btn(
       //-     v-for="(v,vi) in listViews" :key="v.id" @click="listView = v.id"
@@ -72,7 +84,7 @@ div(
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
-      kalpa-loader(:mangoQuery="mangoQuery")
+      kalpa-loader(:mangoQuery="mangoQuery" :key="i")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start
             div(
@@ -127,7 +139,8 @@ export default {
       listViews: [
         {id: 'mini', icon: 'view_list'},
         {id: 'maxi', icon: 'view_agenda'}
-      ]
+      ],
+      listShow: false
     }
   },
   computed: {

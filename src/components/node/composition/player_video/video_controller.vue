@@ -46,10 +46,10 @@ export default {
         // if (this.timeupdateStop) return
         // LAYER
         if (this.statePlayer.mode === 'layer') {
-          if (to >= this.statePlayer.layerEnd) {
+          if (to > this.statePlayer.layerEnd) {
             this.player.setCurrentTime(this.statePlayer.layerStart)
           }
-          if (to <= this.statePlayer.layerStart) {
+          if (to < this.statePlayer.layerStart) {
             this.player.setCurrentTime(this.statePlayer.layerStart)
           }
         }
