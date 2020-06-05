@@ -120,6 +120,7 @@ export default {
   computed: {
     stateEditor () {
       return {
+        editorType: this.editorType,
         pageId: this.pageId,
         pages: this.pages,
         layerEditorOpened: this.layerEditorOpened,

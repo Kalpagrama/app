@@ -9,6 +9,7 @@ div(:style=`{position: 'relative'}`).column.fit
       @close="stateEditor.set('layerEditorOpened', false)"
       @prev="layerForward(false)"
       @next="layerForward(true)"
+      @delete="layerDelete(statePlayer.layer)"
       :style=`{
         position: 'absolute', zIndex: 2000,
         borderRadius: '10px', overflow: 'hidden'
@@ -16,6 +17,7 @@ div(:style=`{position: 'relative'}`).column.fit
   //- body
   .col.full-width
     layer-list(
+      ref="layerList"
       v-bind="$props"
       :composition="statePlayer.composition"
       mode="layers"
@@ -53,7 +55,7 @@ export default {
           name: 'Copy',
           fn: (layer) => {
             this.$log('Copy', layer)
-            this.layerAdd(layer)
+            this.layerAdd(JSON.parse(JSON.stringify(layer)))
           }
         },
         createNode: {
@@ -91,6 +93,7 @@ export default {
           this.$delete(this.statePlayer.layers, i)
         }
       })
+      this.$refs.layerList.layersSelectedDrop()
     },
     // layer
     layerForward (isNext) {
@@ -140,6 +143,12 @@ export default {
       if (layerPick) {
         this.layerPick(layerInput)
       }
+    }
+  },
+  mounted () {
+    this.$log('mounted')
+    if (this.stateEditor.editorType === 'content') {
+      this.statePlayer.set('mode', 'content')
     }
   }
 }

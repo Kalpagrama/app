@@ -1,98 +1,102 @@
 <template lang="pug">
-div(
-  ref="layerItemFramesScrollArea"
-  :style=`{}`).row.full-width.scroll.q-py-md
+.row.full-width.items-start.content-start
   q-resize-observer(@resize="e => width = e.width")
-  .row.items-start.content-start.no-wrap
-    //- left margin width/2
-    div(:style=`{height: '50px', width: width/2+'px'}`)
-    //- center
-    div(
-      @click="framesClick"
-      v-touch-pan.left.right.prevent.mouse="$q.screen.width > 600 ? framesDrag : false"
-      accessKey="frames"
-      :style=`{
-        position: 'relative',
-        height: '50px',
-        borderRadius: '10px',
-      }`).row.no-wrap.items-center.content-center.justify-start.b-220
-      //- frames
+  kalpa-debug(:options=`{width,framesCount,framesWidth,frameWidth}`)
+  div(
+    ref="layerItemFramesScrollArea"
+    :style=`{}`).row.full-width.scroll.q-py-md
+    .row.items-start.content-start.no-wrap
+      //- left margin width/2
+      div(:style=`{height: '50px', width: width/2+'px'}`)
+      //- center
       div(
-        v-for="(f,fi) in frames" :key="fi"
+        @click="framesClick"
+        v-touch-pan.left.right.prevent.mouse="$q.screen.width > 600 ? framesDrag : false"
+        accessKey="frames"
         :style=`{
-          height: '50px', width: '50px', pointerEvents: 'none',
-          borderRight: fi === frames-1 ? 'none' : '1px solid rgb(120,120,120)',
-        }`
-        ).row.items-center.content-center.justify-center
-        span(:style=`{userSelect: 'none'}`).text-grey-8 {{ $time(((fi*frameWidth)/framesWidth)*statePlayer.duration) }}
-      //- now
-      div(
-        v-show="!poingDragging"
-        :style=`{
-          position: 'absolute', zIndex: 200,
-          left: 'calc('+(statePlayer.now/statePlayer.duration)*100+'% - 0px)',
-          top: '-16px',
-          height: 'calc(100% + 32px)',
-          width: '4px',
-          borderRadius: '4px', overflow: 'hidden',
-          pointerEvents: 'none'
-        }`
-        ).bg-grey-9
-      //- left tint
-      div(
-        :style=`{
-          position: 'absolute', zIndex: 100,
-          left: '0px',
-          width: 'calc('+(layer.figuresAbsolute[0].t/statePlayer.duration)*100+'% + 8px)',
-          height: '50px', background: 'rgba(0,0,0,0.3)',
-          pointerEvents: 'none',
+          position: 'relative',
+          height: '50px',
           borderRadius: '10px',
-        }`)
-      //- left drag
-      div(
-        v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
-        :style=`{
-          position: 'absolute', zIndex: 310, top: '0px',
-          left: 'calc('+(layer.figuresAbsolute[0].t/statePlayer.duration)*100+'% - 25px)',
-          height: '50px', width: '50px',
-          borderRadius: '50%',
-          opacity: 0.3,
-        }`
-        ).bg-green
-      //- right tint
-      div(
-        :style=`{
-          position: 'absolute', zIndex: 100,
-          left: 'calc('+(layer.figuresAbsolute[1].t/statePlayer.duration)*100+'% - 0px)',
-          width: 'calc('+((statePlayer.duration-layer.figuresAbsolute[1].t)/statePlayer.duration)*100+'% + 1px)',
-          height: '50px', background: 'rgba(0,0,0,0.3)',
-          pointerEvents: 'none',
-          borderRadius: '10px',
-        }`)
-      //- right drag
-      div(
-        v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
-        :style=`{
-          position: 'absolute', zIndex: 320, top: '0px',
-          left: 'calc('+(layer.figuresAbsolute[1].t/statePlayer.duration)*100+'% - 25px)',
-          height: '50px', width: '50px',
-          borderRadius: '50%',
-          opacity: 0.3,
-        }`
-        ).bg-green
-      //- rect
-      div(
-        :style=`{
-          position: 'absolute', zIndex: 300, top: '-8px',
-          left: (layer.figuresAbsolute[0].t/statePlayer.duration)*100+'%',
-          width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/statePlayer.duration)*100+'% + 8px)',
-          height: 50+8+8+'px',
-          borderRadius: '12px',
-          border: '8px solid '+layer.color,
-          pointerEvents: 'none',
-        }`)
-    //- right margin width/2
-    div(:style=`{height: '50px', width: width/2+'px'}`)
+        }`).row.no-wrap.items-center.content-center.justify-start.b-220
+        //- frames
+        div(:style=`{minWidth: framesWidth+'px', width: framesWidth+'px', height: '50px', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).row
+          div(
+            v-for="f in framesCount" :key="f"
+            :style=`{
+              height: '50px', width: frameWidth+'px', pointerEvents: 'none',
+              borderRight: f === framesCount+1 ? 'none' : '1px solid rgb(120,120,120)',
+            }`
+            ).row.items-center.content-center.justify-center
+            span {{ $time((f - 1)*10) }}
+            //- span(:style=`{userSelect: 'none'}`).text-grey-8 {{ $time(((fi*frameWidth)/framesWidth)*statePlayer.duration) }}
+        //- now
+        div(
+          v-show="!poingDragging"
+          :style=`{
+            position: 'absolute', zIndex: 200,
+            left: 'calc('+(statePlayer.now/statePlayer.duration)*100+'% - 0px)',
+            top: '-16px',
+            height: 'calc(100% + 32px)',
+            width: '4px',
+            borderRadius: '4px', overflow: 'hidden',
+            pointerEvents: 'none'
+          }`
+          ).bg-grey-8
+        //- left tint
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 100,
+            left: '0px',
+            width: 'calc('+(layer.figuresAbsolute[0].t/statePlayer.duration)*100+'% + 8px)',
+            height: '50px', background: 'rgba(0,0,0,0.3)',
+            pointerEvents: 'none',
+            borderRadius: '10px',
+          }`)
+        //- left drag
+        div(
+          v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
+          :style=`{
+            position: 'absolute', zIndex: 310, top: '0px',
+            left: 'calc('+(layer.figuresAbsolute[0].t/statePlayer.duration)*100+'% - 25px)',
+            height: '50px', width: '50px',
+            borderRadius: '50%',
+            opacity: 0.3,
+          }`
+          ).bg-green
+        //- right tint
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 100,
+            left: 'calc('+(layer.figuresAbsolute[1].t/statePlayer.duration)*100+'% - 0px)',
+            width: 'calc('+((statePlayer.duration-layer.figuresAbsolute[1].t)/statePlayer.duration)*100+'% + 1px)',
+            height: '50px', background: 'rgba(0,0,0,0.3)',
+            pointerEvents: 'none',
+            borderRadius: '10px',
+          }`)
+        //- right drag
+        div(
+          v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
+          :style=`{
+            position: 'absolute', zIndex: 320, top: '0px',
+            left: 'calc('+(layer.figuresAbsolute[1].t/statePlayer.duration)*100+'% - 25px)',
+            height: '50px', width: '50px',
+            borderRadius: '50%',
+            opacity: 0.3,
+          }`
+          ).bg-green
+        //- rect
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 300, top: '-8px',
+            left: (layer.figuresAbsolute[0].t/statePlayer.duration)*100+'%',
+            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/statePlayer.duration)*100+'% + 8px)',
+            height: 50+8+8+'px',
+            borderRadius: '12px',
+            border: '8px solid '+layer.color,
+            pointerEvents: 'none',
+          }`)
+      //- right margin width/2
+      div(:style=`{height: '50px', width: width/2+'px'}`)
 </template>
 
 <script>
@@ -102,41 +106,44 @@ export default {
   data () {
     return {
       width: 0,
-      frameWidth: 50,
       framesDragging: false,
       pointDragging: false,
       pointDraggingIndex: null,
       pointDraggingError: false,
-      screenDuration: 60
     }
   },
   computed: {
-    frames () {
-      // TODO: this.duration/10 ?
-      return Math.round((this.width * 2) / this.frameWidth)
+    durationScreen () {
+      let res
+      if (this.statePlayer.duration > 90) res = 60
+      else res = 10
+      return res
+    },
+    framesCount () {
+      return Math.round(this.statePlayer.duration / 10)
     },
     framesWidth () {
-      return this.frames * this.frameWidth
-      // return (this.statePlayer.duration * this.width) / this.screenDuration
+      let widthFrames
+      let widthScreen = this.width * 0.7
+      let durationScreen = this.durationScreen
+      let duration = this.statePlayer.duration
+      // durationScreen === widthScreen
+      // duration === x
+      widthFrames = (duration * widthScreen) / durationScreen
+      return widthFrames
     },
-    layerStart () {
-      return this.layer.figuresAbsolute[0].t
+    frameWidth () {
+      let widthFrame
+      let widthFrames = this.framesWidth
+      let durationFrame = 10
+      let duration = this.statePlayer.duration
+      // durationFrame === *widthFrame*
+      // duration == widthFrames
+      widthFrame = (widthFrames * durationFrame) / duration
+      return widthFrame
     },
-    layerEnd () {
-      return this.layer.figuresAbsolute[1].t
-    },
-    layerDuration () {
-      return this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t
-    }
   },
   watch: {
-    // mode: {
-    //   handler (to, from) {
-    //     if (to === 'edit') {
-    //       this.framesDragToLayer()
-    //     }
-    //   }
-    // }
   },
   methods: {
     async pointDrag (e, index) {
@@ -146,16 +153,14 @@ export default {
       if (t > this.statePlayer.duration || t < 0) return
       // this.$log('t', t)
       if (index === 0) {
-        if (t >= this.layerEnd) {
-          // alert('t >= this.layerEnd')
+        if (t >= this.statePlayer.layerEnd) {
           this.pointDraggingError = true
           return
         }
       }
       if (index === 1) {
-        if (t <= this.layerStart) {
+        if (t <= this.statePlayer.layerStart) {
           this.pointDraggingError = true
-          // alert('t <= this.layerStart')
           return
         }
       }
@@ -181,6 +186,17 @@ export default {
         this.pointDraggingError = false
       }
     },
+    framesClick (e) {
+      this.$log('framesClick', e.offsetX, e.target.accessKey)
+      if (e.target.accessKey !== 'frames') return
+      let t = e.offsetX / this.framesWidth * this.statePlayer.duration
+      this.$log('t', t)
+      this.player.setCurrentTime(t)
+      this.player.update(t)
+      if (t < this.statePlayer.layerStart || t > this.statePlayer.layerEnd) {
+        this.statePlayer.set('mode', 'content')
+      }
+    },
     framesDrag (e) {
       // this.$log('framesDrag', e)
       if (this.poingDragging) return
@@ -196,18 +212,7 @@ export default {
       let scrollLeft = layerLeft - (this.width - layerWidth) / 2
       this.$log('scrollLeft', scrollLeft)
       this.$tween.to(this.$refs.layerItemFramesScrollArea, 0.5, {scrollLeft: scrollLeft})
-    },
-    framesClick (e) {
-      this.$log('framesClick', e.offsetX)
-      if (e.target.accessKey !== 'frames') return
-      let t = e.offsetX / this.framesWidth * this.statePlayer.duration
-      this.$log('t', t)
-      this.player.setCurrentTime(t)
-      this.player.update(t)
-      if (t < this.statePlayer.layerStart || t > this.statePlayer.layerEnd) {
-        this.statePlayer.set('mode', 'content')
-      }
-    },
+    }
   },
   mounted () {
     this.$log('mounted')

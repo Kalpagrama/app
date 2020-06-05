@@ -26,19 +26,19 @@ div(
     v-if="ctx !== 'workspace'"
     v-bind="$props" :statePip="statePip"
     :style=`{
-      order: -2
+      order: 2
     }`)
   node-author(
     v-if="nodeFull && ctx  !== 'workspace'"
     v-bind="$props" :statePip="statePip"
     :style=`{
-      order: 1
+      order: 3
     }`)
   node-spheres(
     v-if="nodeFull && nodeFull.spheres.length > 0"
     v-bind="$props" :statePip="statePip"
     :style=`{
-      order: 2
+      order: 4
     }`)
 </template>
 

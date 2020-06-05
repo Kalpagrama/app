@@ -144,7 +144,9 @@ export default {
         return this.layerContent?.url
       }
       else {
-        return `${this.layer?.url}#t=${this.layerStart},${this.layerEnd}`
+        let layerSrc = `${this.layer?.url}#t=${this.layerStart},${this.layerEnd}`
+        // return this.composition ? this.composition.url : layerSrc
+        return layerSrc
       }
     },
     videoType () {

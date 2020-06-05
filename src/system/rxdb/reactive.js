@@ -116,12 +116,20 @@ class ReactiveListHolder {
   async create (rxQuery) {
     logD('ReactiveListHolder::constructor', rxQuery)
     assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
-    if (rxQuery.reactiveListHolderMaster) {
+    let x = false
+    if (x && rxQuery.reactiveListHolderMaster) {
+      await rxQuery.reactiveListHolderMaster.mutex.lock()
+      logD('rxQuery.reactiveListHolderMaster', rxQuery.reactiveListHolderMaster)
+      // alert('RLH if (rxQuery.reactiveListHolderMaster)')
       this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
+      rxQuery.reactiveListHolderMaster.mutex.release()
     } else {
+      // alert('RLH else')
+      this.mutex = new Mutex()
+      await this.mutex.lock()
       rxQuery.reactiveListHolderMaster = this
       this.rxQuery = rxQuery
-      this.mutex = new Mutex()
+      // this.mutex = new Mutex()
       let docs = await rxQuery.exec()
       assert(Array.isArray(docs), 'Array.isArray(docs)')
       this.vm = new Vue({
@@ -130,9 +138,12 @@ class ReactiveListHolder {
         }
       })
       this.reactiveList = this.vm.reactiveList
+      // alert('reactiveList', this.reactiveList)
+      // alert('reactiveList CHECK')
       assert(Array.isArray(this.vm.reactiveList), 'Array.isArray(this.vm.reactiveList)')
       this.rxQuerySubscribe()
       this.listSubscribe()
+      this.mutex.release()
     }
     return this.reactiveList
   }
