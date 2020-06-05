@@ -85,7 +85,7 @@ class Cache {
       })
 
       // заполняем cacheLru из idb
-      let lruDump = await rxdb.get(RxCollectionEnum.META, 'lruDump')
+      let lruDump = await rxdb.getNoLock(RxCollectionEnum.META, 'lruDump')
       if (lruDump) {
         logD(f, 'восстанавливаем Lru')
         lruDump = JSON.parse(lruDump)
@@ -96,7 +96,7 @@ class Cache {
         const f = this.debouncedDumpLru
         logD(f, 'start. debouncedDumpLru')
         let lruDump = this.cacheLru.dump()
-        await rxdb.set(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
+        await rxdb.setNoLock(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
       }, debounceIntervalDumpLru)
 
       // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!

@@ -175,7 +175,7 @@ class Workspace {
 
       try {
         this.synchronizeWsWholeInProgress = true
-        let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
+        let wsRevisionLocalDoc = await rxdb.getNoLock(RxCollectionEnum.META, 'wsRevision')
         let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : -1
         if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
           let wsServer = await WorkspaceApi.getWs()
@@ -204,7 +204,7 @@ class Workspace {
               }
             }
           }
-          await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
+          await rxdb.setNoLock(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
           this.reactiveUser.wsRevision = wsServer.rev // версия по мнению сервера
           logD(f, 'pull ws complete')
         }
@@ -288,7 +288,7 @@ class Workspace {
       assert(itemServer.id && itemServer.rev, 'assert itemServer !check')
       assert(type === 'WS_ITEM_CREATED' || type === 'WS_ITEM_DELETED' || type === 'WS_ITEM_UPDATED', 'bad ev type')
 
-      let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
+      let wsRevisionLocalDoc = await rxdb.getNoLock(RxCollectionEnum.META, 'wsRevision')
       let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : 0 // версия локальной мастерской
       this.reactiveUser.wsRevision = wsRevision // версия мастерской по мнению сервера
       if (wsRevisionLocal + 1 !== wsRevision) {
@@ -324,7 +324,7 @@ class Workspace {
         logD(f, `event проигнорирован (у нас самая актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
-      await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
+      await rxdb.setNoLock(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsRevision.toString() })
       logD(f, 'complete')
     } finally {
       this.mutex.release()

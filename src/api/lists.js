@@ -19,7 +19,7 @@ class ListsApi {
         objectTypeEnum: 'NODE',
         oidAuthor: 'AF6H7dLAoAI=',
         pageToken: null,
-        topStrategy: 'HOT'
+        sortStrategy: 'HOT'
       },
       limit: 8888
     }
@@ -31,7 +31,7 @@ class ListsApi {
       assert(['selector', 'limit'].includes(key), '[selector, sort, limit].includes(key)')
     }
     for (let key in mangoQuery.selector){
-      assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'topStrategy'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
+      assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'sortStrategy'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
     }
   }
 
@@ -137,46 +137,46 @@ class ListsApi {
     return { items, count, totalCount, nextPageToken }
   }
 
-  static async sphereSpheres (oid, pagination, filter, sortStrategy) {
-    let f = this.sphereSpheres
-    logD(f, 'start')
-    let { data: { sphereSpheres: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
-      query: gql`
-        query sphereSpheres ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum){
-          sphereSpheres (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            items {
-              oid
-              name
-            }
-          }
-        }
-      `,
-      variables: { oid, pagination, filter, sortStrategy }
-    })
-    logD(f, 'complete')
-    return { items, count, totalCount, nextPageToken }
-  }
+  // static async sphereSpheres (oid, pagination, filter, sortStrategy) {
+  //   let f = this.sphereSpheres
+  //   logD(f, 'start')
+  //   let { data: { sphereSpheres: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
+  //     query: gql`
+  //       query sphereSpheres ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum){
+  //         sphereSpheres (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+  //           items {
+  //             oid
+  //             name
+  //           }
+  //         }
+  //       }
+  //     `,
+  //     variables: { oid, pagination, filter, sortStrategy }
+  //   })
+  //   logD(f, 'complete')
+  //   return { items, count, totalCount, nextPageToken }
+  // }
 
-  static async sphereNodes (oid, pagination, filter, sortStrategy) {
-    let f = this.sphereNodes
-    logD(f, 'start')
-    let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
-      query: gql`
-        ${fragments.objectShortWithMetaFragment}
-        query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
-          sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
-            count
-            totalCount
-            nextPageToken
-            items {... objectShortWithMetaFragment}
-          }
-        }
-      `,
-      variables: { oid, pagination, filter, sortStrategy }
-    })
-    logD(f, 'complete')
-    return { items, count, totalCount, nextPageToken, prevPageToken }
-  }
+  // static async sphereNodes (oid, pagination, filter, sortStrategy) {
+  //   let f = this.sphereNodes
+  //   logD(f, 'start')
+  //   let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
+  //     query: gql`
+  //       ${fragments.objectShortWithMetaFragment}
+  //       query sphereNodes ($oid: OID!, $pagination: PaginationInput!, $filter: Filter, $sortStrategy: SortStrategyEnum) {
+  //         sphereItems (sphereOid: $oid, pagination: $pagination, filter: $filter, sortStrategy: $sortStrategy) {
+  //           count
+  //           totalCount
+  //           nextPageToken
+  //           items {... objectShortWithMetaFragment}
+  //         }
+  //       }
+  //     `,
+  //     variables: { oid, pagination, filter, sortStrategy }
+  //   })
+  //   logD(f, 'complete')
+  //   return { items, count, totalCount, nextPageToken, prevPageToken }
+  // }
 
   static async feed (pagination) {
     let f = this.feed
@@ -218,7 +218,7 @@ class ListsApi {
   }
 
   static async userSubscriptions (oid, pagination) {
-    let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
+    let user = await rxdb.getNoLock(RxCollectionEnum.OBJ, oid)
     assert(user && user.subscriptions, '!user')
     assert(Array.isArray(user.subscriptions), '!Array.isArray(user.subscriptions)')
     return {
@@ -230,7 +230,7 @@ class ListsApi {
   }
 
   static async userSubscribers (oid, pagination) {
-    let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
+    let user = await rxdb.getNoLock(RxCollectionEnum.OBJ, oid)
     assert(user && user.subscribers, '!user')
     assert(Array.isArray(user.subscribers), '!Array.isArray(user.subscribers)')
     return {
