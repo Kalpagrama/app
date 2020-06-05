@@ -9,6 +9,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
     ).row.full-width.items-start.content-start.justify-start
     div(
       v-for="(i,ii) in items" :key="i.oid" :accessKey="ii"
+      v-if="!itemsBan.includes(i.oid)"
       :ref="`item-${i.oid}`"
       :style=`{
         position: 'relative'
@@ -37,7 +38,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
 export default {
   name: 'listMiddle',
   props: {
-    items: {type: Array},
+    items: {type: Array, default () { return [] }},
+    itemsBan: {type: Array, default () { return [] }},
     scrollWrapper: {type: Object},
     options: {
       type: Object,

@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center
+.row.full-width.items-start.content-start.justify-center.br
   div(
     :style=`{
       maxWidth: $store.state.ui.maxWidthPage+'px',
@@ -9,7 +9,9 @@
       span(:style=`{fontSize: '18px'}`).text-white.text-bold Node nodes
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       template(v-slot=`{items}`)
-        list-middle(:items="items" :options=`{paddingTop: 0, paddingBottom: $q.screen.height/3}`)
+        list-middle(
+          :items="items" :itemsBan="itemsBan"
+          :options=`{paddingTop: 0, paddingBottom: $q.screen.height/3}`)
           template(v-slot:item=`{item, index, indexMiddle}`)
             node(
               ctx="list" layout="PIP"
@@ -31,6 +33,9 @@ export default {
     }
   },
   computed: {
+    itemsBan () {
+      return [this.node.oid]
+    },
     sphereOid () {
       this.$log('node_nodes: this.node=', this.node)
       return this.node.sphereFromName.oid
@@ -43,6 +48,8 @@ export default {
         }
       }
     }
+  },
+  methods: {
   }
 }
 </script>
