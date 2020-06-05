@@ -9,7 +9,7 @@ import {
   wsSchemaLocalChanges, schemaKeyValue, wsSchemaItem
 } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { getReactive, Mutex } from 'src/system/rxdb/reactive'
+import { getReactive, Mutex, ReactiveItemHolder } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 
@@ -315,16 +315,12 @@ class Workspace {
         logD(f, `event проигнорирован (у нас актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
         let hasChanges = await this.db.ws_changes.findOne(itemServer.id).exec() // есть локальные изменения
         // просто возьмем ревизию с сервера
-        // делаем через reactiveItem из-за дебаунса (если менять rxDoc напрямую - возможны потери введенных через дебаунс данных)
-        let reactiveItem = getReactive(rxDoc)
-        reactiveItem.rev = itemServer.rev // ревизию назначает сервер
-
-        // await rxDoc.atomicUpdate((oldData) => {
-        //   oldData.rev = itemServer.rev // ревизию назначает сервер
-        //   oldData.oid = itemServer.oid // oid генерируется на сервере
-        //   return oldData
-        // })
-
+        let actualData = JSON.parse(JSON.stringify(getReactive(rxDoc))) // из за дебаунса в rxDoc могли не попать самые актуальные данные
+        actualData.rev = itemServer.rev // ревизию назначает сервер
+        await rxDoc.atomicUpdate((oldData) => {
+          actualData._rev = oldData._rev
+          return actualData
+        })
         // изменение reactiveItem могло добавить этот item в ws_changes! Приводим в исходное (см onCollectionUpdate)
         if (!hasChanges) { // если до atomicSet изменений не было - удаляем
           await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove()

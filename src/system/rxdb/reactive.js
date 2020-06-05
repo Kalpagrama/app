@@ -48,6 +48,10 @@ class ReactiveItemHolder {
     // logD('ReactiveItemHolder::constructor', rxDoc.id)
     if (rxDoc.reactiveItemHolderMaster) {
       this.reactiveItem = rxDoc.reactiveItemHolderMaster.reactiveItem
+      this.itemSubscribe = rxDoc.reactiveItemHolderMaster.itemSubscribe // иногда надо временно отписаться
+      this.itemUnsubscribe = rxDoc.reactiveItemHolderMaster.itemUnsubscribe
+      this.rxDocSubscribe = rxDoc.reactiveItemHolderMaster.rxDocSubscribe // иногда надо временно отписаться
+      this.rxDocUnsubscribe = rxDoc.reactiveItemHolderMaster.rxDocUnsubscribe
     } else {
       this.rxDoc = rxDoc
       this.mutex = new Mutex()
@@ -57,6 +61,8 @@ class ReactiveItemHolder {
         }
       })
       this.reactiveItem = this.vm.reactiveItem
+      this.reactiveItem.itemSubscribe = this.itemSubscribe // иногда надо временно отписаться
+      this.reactiveItem.itemUnsubscribe = this.itemUnsubscribe
       rxDoc.reactiveItemHolderMaster = this
       this.rxDocSubscribe()
       this.itemSubscribe()
