@@ -93,7 +93,7 @@ class ReactiveItemHolder {
             this.rxDocUnsubscribe()
             logD(f, 'reactiveItem changed from UI (debounce)', this.reactiveItem)
             assert(this.reactiveItem.id, '!this.reactiveItem.id')
-            await rxdb.set(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), { withLock: false }) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
+            await rxdb.setNoLock(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), { withLock: false }) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
           } finally {
             this.rxDocSubscribe()
             await rxdb.release()
@@ -116,24 +116,32 @@ class ReactiveListHolder {
   async create (rxQuery) {
     logD('ReactiveListHolder::constructor', rxQuery)
     assert(isRxQuery(rxQuery), '!isRxQuery(rxQuery)')
-    if (rxQuery.reactiveListHolderMaster) {
-      this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
-    } else {
-      rxQuery.reactiveListHolderMaster = this
-      this.rxQuery = rxQuery
-      this.mutex = new Mutex()
-      let docs = await rxQuery.exec()
-      assert(Array.isArray(docs), 'Array.isArray(docs)')
-      this.vm = new Vue({
-        data: {
-          reactiveList: docs.map(rxDoc => getReactive(rxDoc))
-        }
-      })
-      this.reactiveList = this.vm.reactiveList
-      assert(Array.isArray(this.vm.reactiveList), 'Array.isArray(this.vm.reactiveList)')
-      this.rxQuerySubscribe()
-      this.listSubscribe()
+    try {
+      if (rxQuery.reactiveListHolderMaster) {
+        await rxQuery.reactiveListHolderMaster.mutex.lock()
+        this.reactiveList = rxQuery.reactiveListHolderMaster.reactiveList
+      } else {
+        this.mutex = new Mutex()
+        await this.mutex.lock()
+        rxQuery.reactiveListHolderMaster = this
+        this.rxQuery = rxQuery
+        let docs = await rxQuery.exec()
+        assert(Array.isArray(docs), 'Array.isArray(docs)')
+        this.vm = new Vue({
+          data: {
+            reactiveList: docs.map(rxDoc => getReactive(rxDoc))
+          }
+        })
+        this.reactiveList = this.vm.reactiveList
+        assert(Array.isArray(this.vm.reactiveList), 'Array.isArray(this.vm.reactiveList)')
+        this.rxQuerySubscribe()
+        this.listSubscribe()
+      }
+    } finally {
+      if (rxQuery.reactiveListHolderMaster) rxQuery.reactiveListHolderMaster.mutex.release()
+      else this.mutex.release()
     }
+
     return this.reactiveList
   }
 
