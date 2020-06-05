@@ -68,35 +68,6 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout").b-30
             :visible="true" :active="true" :mini="false")
       div(v-if="node").row.full-width
         node-nodes(:node="node")
-      //- body
-      //- div(v-if="false && $route.params.page === 'nodes'").row.full-width.justify-center
-      //-   div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-py-md
-      //-     kalpa-loader(v-if="$q.screen.xs && sphereOid && node" :mangoQuery="mangoQuery")
-      //-       template(v-slot=`{items}`)
-      //-         list-middle(:items="items")
-      //-           template(v-slot:item=`{item, index, indexMiddle}`)
-      //-             node(
-      //-               ctx="list" layout="PIP"
-      //-               :node="item" :index="index" :essence="true"
-      //-               :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
-      //-               :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
-      //-               :active="index === indexMiddle"
-      //-               :mini="false")
-      //-     kalpa-loader(v-if="$q.screen.gt.xs && sphereOid && node" :mangoQuery="mangoQuery")
-      //-       template(v-slot=`{items}`)
-      //-         list-masonry(:items="items")
-      //-           template(v-slot:item=`{item, index, isOpened, isHovered}`)
-      //-             div(:style=`{position: 'absolute', zIndex: 3000, opacity: 0.5}` @click="$router.push('/node/'+item.oid).catch(e => e)").row.fit.cursor-pointer
-      //-             node(
-      //-               ctx="list" layout="PIP"
-      //-               :node="item" :index="index" :needFull="true"
-      //-               :visible="isHovered" :active="isHovered" :mini="true")
-      //- //- contents
-      //- div(v-if="$route.params.page === 'contents'").row.full-width.q-pa-md
-      //-   h6.text-white Contents
-      //- //- chains
-      //- div(v-if="$route.params.page === 'chaing'").row.full-width.q-pa-md
-      //-   h6.text-white Chains
 </template>
 
 <script>
