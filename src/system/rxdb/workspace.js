@@ -2,10 +2,6 @@ import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 
 import assert from 'assert'
 import {
-  wsSchemaChain,
-  wsSchemaContent,
-  wsSchemaNode,
-  wsSchemaSphere,
   wsSchemaLocalChanges, schemaKeyValue, wsSchemaItem
 } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
