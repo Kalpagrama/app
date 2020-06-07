@@ -23,6 +23,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
       }`
       ).row.full-width.q-mb-xl
       //- img(:src="i.meta.items[0].thumbUrl" :style=`{}`).full-width
+      //- slot for the first element...
       //- inactive tint
       div(
         v-if="indexMiddle !== ii" @click="itemInactiveClick(i,ii)"
@@ -38,6 +39,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
 export default {
   name: 'listMiddle',
   props: {
+    active: {type: Boolean},
+    visible: {type: Boolean},
     items: {type: Array, default () { return [] }},
     itemsBan: {type: Array, default () { return [] }},
     scrollWrapper: {type: Object},
@@ -53,7 +56,7 @@ export default {
   },
   data () {
     return {
-      indexMiddle: 0,
+      indexMiddle: -1,
       scrollTop: 0,
       paddingTop: 0,
       paddingBottom: 0
@@ -79,11 +82,15 @@ export default {
     indexMiddleHandler (isVisible, entry, i) {
       // this.$log('itemMiddleHandler', isVisible, entry, i)
       if (isVisible) {
+        alert('isVisible: ' + entry.target.accessKey)
         let index
         if (i >= 0) index = i
         else index = parseInt(entry.target.accessKey)
         // this.$log('indexMiddleHandler index', index)
         this.indexMiddle = index
+      }
+      else {
+        alert('HIDDEN')
       }
     },
     async itemInactiveClick (i, ii) {
