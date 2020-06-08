@@ -2,6 +2,7 @@
 div(:style=`{}`).row.full-width.items-start.content-start.justify-center.b-30
   //- cover
   div(
+    v-if="false"
     :class=`{
       'q-mt-sm': $q.screen.width > 600
     }`
@@ -26,6 +27,7 @@ div(:style=`{}`).row.full-width.items-start.content-start.justify-center.b-30
         span.text-bold Follow
   //- status
   div(
+    v-if="false"
     :style=`{
       position: 'relative', zIndex: 100, borderRadius: '0 0 10px 10px', overflow: 'hidden',
       marginTop: '-20px', paddingTop: '30px'
@@ -35,9 +37,9 @@ div(:style=`{}`).row.full-width.items-start.content-start.justify-center.b-30
   //- tabs
   div(
     :style=`{
-      position: 'sticky', marginTop: '-20px', paddingTop: '20px',
+      position: 'sticky', marginTop: '-20px', paddingTop: '20px', top: '0px',
       borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
-    ).row.full-width.q-pa-sm.b-80
+    ).row.full-width.q-pa-sm.b-50
     kalpa-buttons(:value="pages" :id="$route.params.page" @id="$router.push({params: {page: $event}})").justify-start
 </template>
 

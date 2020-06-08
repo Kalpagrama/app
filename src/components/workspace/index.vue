@@ -1,45 +1,23 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
+  //- menu right drawer
+  q-drawer(
+    v-model="showMenuRight" side="right"
+    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
+    @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
+    menu-right(:stateWorkspace="stateWorkspace" :inDrawer="true").b-50
+  //- menu right panel
   div(
+    v-if="$route.name !== 'content-explorer'"
     :style=`{
-      position: 'absolute', zIndex: 1000, right: '-300px',
+      position: 'absolute', zIndex: 1000,
+      top: $store.state.ui.appFullscreen ? '8px' : '0px',
+      right: $store.state.ui.appFullscreen ? '8px' : '-300px',
       width: '300px', height: '300px',
     }`).row.q-pl-sm
-    .row.fit.bg-red
-  router-view
-//- kalpa-page
-  //- template(v-slot:panelLeft)
-  //-   kalpa-menu
-  //- template(v-slot:panelRight)
-  //-   menu-right(:pages="pages").b-50
-  //- template(v-slot:body)
-  //-   router-view
-//- div(
-//-   :style=`{
-//-     position: 'relative',
-//-     height: $q.screen.height+'px'
-//-   }`).row.full-width.items-start.content-start.justify-center
-  //- body
-  //- component(
-  //-   v-if="!$route.params.id"
-  //-   :is="page.comp"
-  //-   :style=`{
-  //-     maxWidth: $store.state.ui.maxWidthPage+'px',
-  //-   }`
-  //-   ).fit
-  //- ws-content-explorer(
-  //-   v-if="$route.params.id")
-  //- router-view
-  //- menu right mobile
-  //- q-drawer(
-  //-   v-model="showMenuRight" side="right"
-  //-   @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
-  //-   @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
-  //-   menu-right(:pages="pages" :inDrawer="true").b-50
-  //- menu right desktop
-  //- kalpa-menu-right
-  //-   menu-right(:pages="pages").b-50
-  //- menu mobile
+    .row.fit
+      menu-right(:stateWorkspace="stateWorkspace").b-50
+  //- menu mobile bottom
   //- transition(enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
   //-   div(
   //-     v-if="$q.screen.xs && $store.state.ui.wsShowMenu && !$store.state.ui.appShowMenu"
@@ -52,6 +30,7 @@ div(:style=`{position: 'relative'}`).row.fit
   //-         screenSet="gt.xs"
   //-         @id="$router.push({params: {page: $event}})").justify-center
   //-     q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = !showMenuRight").b-60
+  router-view
 </template>
 
 <script>
@@ -87,26 +66,24 @@ export default {
   computed: {
     page () {
       return this.pages.find(p => p.id === this.$route.params.page)
+    },
+    stateWorkspace () {
+      return {
+        showMenuRight: this.showMenuRight,
+        pages: this.pages,
+        pagesHot: this.pagesHot,
+        set: (key, val) => {
+          this[key] = val
+        }
+      }
     }
   },
   watch: {
-    // '$route.params.page': {
-    //   immediate: true,
-    //   handler (to, from) {
-    //     this.$log('$route.params.page CHANGED', to)
-    //     if (to) {
-    //     } else {
-    //       this.$router.replace({params: {page: 'content'}})
-    //     }
-    //   }
-    // }
   },
   methods: {
   },
   mounted () {
     this.$log('mounted')
-    // this.$q.addressbarColor.set('rgb(30,30,30)')
-    // document.body.style.background = 'rgb(30,30,30)'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

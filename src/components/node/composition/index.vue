@@ -1,75 +1,53 @@
 <template lang="pug">
-div(
-  :class=`{
-    'full-heights': ctx !== 'workspace'
-  }`
-  :style=`{
-    position: 'relative'
-  }`
-  ).row.full-width.items-start.content-start
-  //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
-  //- menu
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
   q-btn(
-    v-if="false && visible && active && ctx !== 'workspace'"
+    v-if="!mini"
     round flat color="white" icon="more_vert"
-    :style=`{position: 'absolute', top: '8px', right: '8px', zIndex: 10000, background: 'rgba(0,0,0,0.1)'}`)
-    kalpa-menu-popup(:actions="actions")
-  img(
-    v-if="ctx !== 'workspace' && preview && !active"
-    :src="preview"
-    draggable="false"
-    @load="previewLoaded"
-    @error="previewErrored"
     :style=`{
-      userSelect: 'none',
+      position: 'absolute', top: '8px', right: '8px', zIndex: 2000,
+      transform: 'translate3d(0,0,0)',
+      background: 'rgba(0,0,0,0.1)'
+    }`)
+  img(
+    :src="preview"
+    :style=`{
       objectFit: 'contain',
+      opacity: videoLoaded ? 0 : 1,
       maxHeight: $q.screen.height-120+'px',
     }`
     ).full-width
-  player-video(
-    v-if="composition && active"
-    :ctx="ctx"
-    :preview="preview"
-    :composition="composition"
-    :visible="visible" :active="active" :mini="mini")
-    template(
-      v-for="(_, scopedSlotName) in $scopedSlots"
-      v-slot:[scopedSlotName]="slotData")
-      slot(:name="scopedSlotName" v-bind="slotData")
-      img(
-        v-if="ctx !== 'workspace' && scopedSlotName === 'video' && !slotData.statePlayer.loaded"
-        @load="previewLoaded"
-        @error="previewErrored"
-        :src="preview"
-        draggable="false"
-        :style=`{
-          userSelect: 'none',
-          objectFit: 'contain',
-          maxHeight: $q.screen.height-120+'px',
-        }`
-        ).full-width
-      //- div(
-      //-   v-if="scopedSlotName === 'video'"
-      //-   :style=`{opacity: 0.5}`
-      //-   ).row.fit.bg-red
-      //-   h1.text-white {{ slotData.statePlayer.loaded }}
+  kalpa-debug(
+    v-if="composition && !mini && false"
+    :options=`{url: composition.url, videoLoaded,}`
+    :style=`{position: 'absolute', top: 0, zIndex: 1000,transform: 'translate3d(0,0,0)'}`)
+  video(
+    v-if="composition && composition.url.length > 0 && active"
+    ref="videoRef"
+    type="video/mp4"
+    :src="composition.url"
+    :autoplay="true"
+    :loop="true"
+    :muted="muted"
+    :controls="controls"
+    :playsinline="playsinline"
+    preload="auto"
+    @loadeddata="videoLoadeddata"
+    @play="playing = true"
+    @pause="playing = false"
+    @click="videoClick"
+    :style=`{
+      position: 'absolute', zIndex: 100,
+      objectFit: 'contain',
+    }`
+    ).fit.br
 </template>
 
 <script>
-import playerVideo from './player_video'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'composition',
-  components: {playerVideo},
   props: {
-    ctx: {
-      type: String,
-      required: true,
-      default () {
-        return 'workspace'
-      }
-    },
     preview: {
       type: String
     },
@@ -83,82 +61,60 @@ export default {
   },
   data () {
     return {
-      composition: null
-    }
-  },
-  computed: {
-    actions () {
-      return {
-        explore: {
-          name: 'Explore content',
-          fn: () => {
-            this.$log('Explore')
-            // this.$router.push(`/content/${}`)
-          }
-        },
-        saveComposition: {
-          name: 'Save composition to Workspace',
-          fn: () => {
-            this.$log('Save composition to Workspace')
-          }
-        },
-        saveContent: {
-          name: 'Save content to Workspace',
-          fn: () => {
-            this.$log('Save content to Workspace')
-          }
-        },
-        saveLayer: {
-          name: 'Save layer to Workspace',
-          fn: () => {
-            this.$log('Save later to Workspace')
-          }
-        }
-      }
+      composition: null,
+      videoLoaded: false,
+      playing: false,
+      playsinline: true,
+      muted: true
     }
   },
   watch: {
     visible: {
       immediate: true,
       async handler (to, from) {
-        // this.$log('visible CHANGED', to)
+        this.$log('visible TO', to)
         if (to) {
-          if (this.ctx !== 'workspace') {
-            this.$log('visible TRUE => load composition')
-            this.composition = this.compositionWs(await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.oid))
-          }
+          this.$log('visible TRUE => load composition')
+          this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.oid)
+        }
+        else {
+          this.videoLoaded = false
         }
       }
     },
-    value: {
+    active: {
       immediate: true,
-      async handler (to, from) {
-        // this.$log('value CHANGED', to)
+      handler (to, from) {
+        this.$log('active TO', to)
         if (to) {
-          if (this.ctx === 'workspace') {
-            this.$log('value => load composition', to)
-            this.composition = to
-          }
-          // else {
-          //   this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
-          // }
+          // if (this.$refs.videoRef) this.$refs.videoRef.play()
+        }
+        else {
+          // if (this.$refs.videoRef) this.$refs.videoRef.pause()
+          this.videoLoaded = false
         }
       }
-    },
+    }
   },
   methods: {
-    compositionWs (val) {
-      val.layers.map((l, li) => {
-        l.id = li
-        l.color = this.$randomColor(li)
-      })
-      return val
+    videoClick () {
+      this.$log('videoClick')
+      if (this.muted) {
+        this.muted = false
+      }
+      else {
+        if (this.playing) {
+          this.$refs.videoRef.pause()
+        }
+        else {
+          this.$refs.videoRef.play()
+        }
+      }
+      // this.muted = false
     },
-    previewLoaded () {
-      // this.$log('previewLoaded')
-    },
-    previewErrored () {
-      // this.$log('previewErrored')
+    videoLoadeddata () {
+      this.$log('videoLoadeddata')
+      this.videoLoaded = true
     }
   }
 }

@@ -34,7 +34,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     :src="stateExplorer.content.url"
     type="video/youtube"
     :playsinline="true"
-    autoplay loop
+    :autoplay="true"
+    :loop="true"
     :style=`{
       position: 'relative',
       width: '100%',
@@ -120,6 +121,7 @@ export default {
       this.stateExplorer.set('loadeddata', true)
       this.stateExplorer.set('duration', this.stateExplorer.player.duration)
       this.stateExplorer.set('currentTime', this.stateExplorer.player.currentTime)
+      this.stateExplorer.player.play()
     },
     playerTimeupdate () {
       // this.$log('playerTimeupdate', this.stateExplorer.player.currentTime)

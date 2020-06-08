@@ -20,10 +20,10 @@
     .col
     q-btn(round flat dense color="white" icon="tune")
     q-btn(
-      v-if="false"
-      @click="statePage.set('pageFullscreen', !statePage.pageFullscreen)"
+      v-if="true"
+      @click="$store.commit('ui/stateSet', ['appFullscreen', !$store.state.ui.appFullscreen])"
       round flat dense color="white"
-      :icon="statePage.pageFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+      :icon="$store.state.ui.appFullscreen ? 'fullscreen_exit' : 'fullscreen'"
       )
   div(
     @click="barClick"

@@ -7,10 +7,10 @@
 <template lang="pug">
 div(
   :style=`{
-    maxWidth: '300px',
+    width: width+'px',
     borderRadius: '10px',
     overflow: 'hidden',
-  }`).column.fit.b-50
+  }`).column.full-height.b-50
   //- header
   div(
     :style=`{height: '90px'}`
@@ -93,6 +93,7 @@ export default {
   name: 'kalpaMenu',
   data () {
     return {
+      width: 300,
       pages: [
         {id: 'home', name: 'Home', icon: 'home'},
         {id: 'trends', name: 'Trends', icon: 'whatshot'},

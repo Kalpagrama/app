@@ -1,27 +1,57 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf").b-30
-  kalpa-menu-right
-    menu-right(:user="user")
-  q-header(v-if="false" reveal)
-    .row.full-width.justify-center
-      div(
-        v-if="user"
-        :style=`{
-          height: '60px',
-          maxWidth: $store.state.ui.maxWidthPage+'px'
-        }`
-        ).row.full-width.items-center.content-center.justify-start.q-px-sm
-        span.text-bold.text-white {{ user.name }}
-        .row.full-width
-          small.text-white @{{ user.name }}
-  kalpa-menu-footer(:options=`{showMenuPage: true}`)
-    template(v-slot:menuRight)
-      menu-right(:user="user")
-  q-page-container
-    q-page.row.full-width.justify-center
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
-        user-info(v-if="user" :user="user")
-        component(:is="`user-${pageId}`")
+//- q-layout(
+//-   view="hHh lpR fFf"
+//-   container :style=`{height: $q.screen.height-20+'px'}`).b-30
+//-   kalpa-menu-right
+//-     menu-right(:user="user")
+//-   q-header(v-if="false" reveal)
+//-     .row.full-width.justify-center
+//-       div(
+//-         v-if="user"
+//-         :style=`{
+//-           height: '60px',
+//-           maxWidth: $store.state.ui.maxWidthPage+'px'
+//-         }`
+//-         ).row.full-width.items-center.content-center.justify-start.q-px-sm
+//-         span.text-bold.text-white {{ user.name }}
+//-         .row.full-width
+//-           small.text-white @{{ user.name }}
+//-   kalpa-menu-footer(:options=`{showMenuPage: true}`)
+//-     template(v-slot:menuRight)
+//-       menu-right(:user="user")
+//-   q-page-container
+//-     q-page.row.full-width.justify-center
+//-       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width
+//-         user-info(v-if="user" :user="user")
+//-         component(:is="`user-${pageId}`")
+div(:style=`{position: 'relative'}`).column.fit
+  //- div().row.full-width
+  //- menu right
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 1000,
+      right: '-300px', width: '300px', height: '300px',
+    }`).row
+    menu-right().b-50.fit
+  //- menu bottom
+  //- body
+  div(:style=`{position: 'relative'}`).col.full-width.scroll
+    //- user-info(v-if="user" :user="user")
+    div(:style=`{}`).row.full-width.q-px-sm.b-50
+      .row.full-width.items-center.content-center.q-py-sm
+        q-btn(round flat color="white" icon="keyboard_arrow_left")
+        .col.full-height
+          .row.fit.items-center.content-center
+            kalpa-avatar(:url="user.profile.photoUrl" :width="36" :height="36").q-mr-sm
+            span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ user.name }}
+        q-btn(round flat color="white" icon="tune")
+    div(
+      :style=`{
+        position: 'sticky', top: '0px', zIndex: 9999,
+        borderRadius: '0 0 10px 10px', overflow: 'hidden',
+      }`).row.full-width.b-50.q-px-sm.q-pb-sm
+      kalpa-buttons(:value="pages" :id="$route.name" @id="$router.push({name: $event})").justify-start
+    router-view
 </template>
 
 <script>
@@ -38,6 +68,12 @@ export default {
   props: ['user'],
   data () {
     return {
+      pages: [
+        {id: 'created', name: 'Created'},
+        {id: 'voted', name: 'Voted'},
+        {id: 'following', name: 'Following'},
+        {id: 'followers', name: 'Followers'}
+      ]
     }
   },
   computed: {
@@ -53,17 +89,6 @@ export default {
     }
   },
   watch: {
-    '$route.params.page': {
-      immediate: true,
-      handler (to, from) {
-        this.$log('$route.params.page CHANGED', to)
-        if (to) {
-        }
-        else {
-          this.$router.replace({params: {page: 'created'}})
-        }
-      }
-    }
   },
   methods: {
   },

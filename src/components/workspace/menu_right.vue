@@ -21,10 +21,7 @@ div(
     .row.full-width.items-start
       router-link(
         :to="p.id"
-        v-for="(p,pi) in pages" :key="pi"
-        :class=`{
-          'b-100': $route.params.page === p.id
-        }`
+        v-for="(p,pi) in stateWorkspace.pages" :key="pi"
         :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
         ).row.full-width.items-center.content-center.menu-item.q-px-md
         span(
@@ -40,7 +37,7 @@ div(
 <script>
 export default {
   name: 'workspace-menuRight',
-  props: ['pages', 'inDrawer'],
+  props: ['stateWorkspace', 'inDrawer'],
   data () {
     return {
     }

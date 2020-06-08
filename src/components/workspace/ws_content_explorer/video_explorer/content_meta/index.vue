@@ -1,22 +1,27 @@
 <template lang="pug">
 div(
+  @mouseenter="mouseIsOver = true"
+  @mouseleave="mouseIsOver = false"
   :style=`{
-    maxWidth: maxWidth+'px',
+    width: maxWidth+'px',
+    maxWidth: $store.state.ui.panelMaxWidth+'px',
+    background: 'rgba(50,50,50,0.9)',
     borderRadius: '10px',
     overflow: 'hidden',
   }`
-  ).row.fit.b-50
+  ).row.full-height
   div(
     :style=`{width: '50px'}`
     ).row.full-height.items-start.content-start.q-pa-sm
     q-btn(
-      v-if="false"
+      v-if="true"
       @click="opened = !opened"
-      round flat dense color="white" icon="keyboard_arrow_right"
+      round flat dense color="white"
+      :icon="opened ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
       )
     q-btn(
       v-for="(p,pi) in stateExplorer.pages" :key="p.id"
-      @click="stateExplorer.set('pageId', p.id)"
+      @click="stateExplorer.set('pageId', p.id), opened = true"
       round flat dense
       :color="p.id === stateExplorer.pageId ? 'green' : 'white'"
       :icon="p.icon"
@@ -37,11 +42,22 @@ export default {
   props: ['stateExplorer'],
   data () {
     return {
-      opened: true,
-      maxWidth: 500
+      mouseIsOver: false,
+      opened: false,
+      maxWidth: 50
     }
   },
   watch: {
+    mouseIsOver: {
+      handler (to, from) {
+        this.$log('mouseIsOver TO', to)
+        // if (to) {
+        //   if (!this.opened) {
+        //     this.opened = true
+        //   }
+        // }
+      }
+    },
     opened: {
       handler (to, from) {
         this.$log('opened TO', to)

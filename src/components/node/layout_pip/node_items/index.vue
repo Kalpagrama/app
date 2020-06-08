@@ -29,7 +29,7 @@ div(
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-120+'px',
-      opacity: itemIndex === 0 ? 1 : 0
+      opacity: itemIndex === 0 ? 0 : 0
     }`
     ).full-width
   //- items wrapper
@@ -44,6 +44,7 @@ div(
       v-if="visible && active && items.length > 1"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '0px',
+        transform: 'translate3d(0,0,0)',
         height: '4px'
       }`
       ).row.full-width.items-center.q-px-sm
@@ -61,11 +62,11 @@ div(
       :style=`{
         position: 'absolute', zIndex: 1000,
         left: '0px', top: '0px',
-        width: '25%',
-        height: '25%',
+        width: '20%',
+        height: '100%',
         borderRadius: '10px',
         overflow: 'hidden',
-        background: 'rgba(255,255,255,0.5)',
+        background: 'rgba(255,255,255,0)',
       }`
       ).row.cursor-pointer
     //- item last
@@ -78,7 +79,16 @@ div(
         maxWidth: itemIndex === ii ? nowMaxWidth+'%' : nextMaxWidth+'%',
         maxHeight: itemIndex === ii ? nowMaxHeight+'%' : nextMaxHeight+'%',
         opacity: itemIndex === ii ? 1 : (nextMaxWidth / 100) + 0.3,
+        transform: 'translate3d(0,0,0)',
       }`).row.full-width.items-start.content-start
+      //- //- item prev
+      //- div(
+      //-   :style=`{
+      //-     position: 'absolute', zIndex: 100+ii, left: '-58px',
+      //-     width: '50px', height: '100%',
+      //-   }`
+      //-   ).row.items-center.content-center.justify-center.br
+      //-   q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemsPrev()").fit.b-80
       //- item next
       div(v-if="ii === itemIndex+1" @click="itemsNext()" :style=`{position: 'absolute', zIndex: 20000}`).row.fit.cursor-pointer.item-next
       //- composition

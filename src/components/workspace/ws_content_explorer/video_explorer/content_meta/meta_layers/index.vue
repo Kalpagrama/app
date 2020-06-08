@@ -2,8 +2,8 @@
 .column.fit
   //- header
   .row.full-width.items-center.content-center.q-px-sm
-    .row.full-width.q-py-md
-      span.text-white.text-bold Layers
+    .row.full-width.q-py-md.q-px-sm
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Layers {{$store.state.ui.panelMaxWidth}}
     .row.full-width
       q-input(
         v-model="searchString"
@@ -31,7 +31,9 @@
           overflow: 'hidden',
         }
         ).row.full-width.b-60
-        q-btn(flat color="green" icon="add").fit
+        q-btn(
+          @click="stateExplorer.set('layerEditorOpened', true)"
+          flat color="green" icon="add").fit
 </template>
 
 <script>

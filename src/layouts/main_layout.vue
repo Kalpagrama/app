@@ -32,7 +32,8 @@
 <template lang="pug">
 q-layout(
   view="hHh Lpr lff"
-  container :style=`{height: $q.screen.height+'px',}`).bg-30
+  container :style=`{height: $q.screen.height+'px',}`
+  @resize="onResize").bg-30
   q-drawer(
     side="left" :value="$store.state.ui.appShowMenu" @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
@@ -42,19 +43,28 @@ q-layout(
       }`)
   q-page-container
     q-page(:style=`{height: $q.screen.height+'px'}`)
-      .row.fit.justify-center.q-pt-sm
+      div(
+        :class=`{
+          'q-pt-sm': false
+        }`
+        :style=`{}`).row.fit.justify-center
         div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).col.full-height
+          //- left panel menu
           div(
+            v-if="false"
             :style=`{
-              position: 'absolute', zIndex: 99999, left: '-300px',
-              width: '300px', height: '500px'
-            }`).row.q-pr-sm
+              position: 'absolute', zIndex: 99999,
+              top: $store.state.ui.appFullscreen ? '8px' : '0px',
+              left: $store.state.ui.appFullscreen ? '8px' : -($q.screen.width-maxWidth)/2+'px',
+              maxWidth: ($q.screen.width-maxWidth)/2+'px',
+              height: '500px'
+            }`).row.justify-end.br
             kalpa-menu
           router-view(
             v-if="!loading")
           div(
             v-else
-            ).row.full-width.window-height.items-center.content-center.justify-center.bg-black
+            ).row.full-width.window-height.items-center.content-center.justify-center
             q-spinner(color="green" size="50px")
 </template>
 
@@ -77,16 +87,21 @@ export default {
   meta: {
     title: 'Kalpagramma'
   },
+  watch: {
+    '$store.state.ui.appFullscreen': {
+      immediate: true,
+      handler (to, from) {
+        this.$log('$store.state.ui.appFullscreen TO', to)
+        // this.$tween.to(this, 0.3, {maxWidth: to ? this.$q.screen.width : 800})
+        this.maxWidth = to ? this.$q.screen.width : 800
+      }
+    }
+  },
   methods: {
-    // onResize (e) {
-    //   this.$log('onResize', e)
-    //   let vv = window.visualViewport
-    //   this.$log('vv', vv)
-    //   let height = vv.height
-    //   this.offsetTop = vv.offsetTop
-    //   this.$store.commit('ui/stateSet', ['height', height])
-    //   this.$store.commit('ui/stateSet', ['offsetTop', this.offsetTop])
-    // }
+    onResize (e) {
+      this.$log('onResize', e)
+      this.$store.commit('ui/stateSet', ['panelMaxWidth', (e.width - this.maxWidth) / 2])
+    }
   },
   async created () {
     this.$log('created')

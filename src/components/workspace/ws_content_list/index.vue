@@ -16,18 +16,6 @@ div(
     position: 'relative',
   }`
   ).column.full-width
-  q-dialog(
-    v-model="listShow" position="bottom")
-    ws-content-list(
-      ctx="workspace"
-      :inDialog="true"
-      :style=`{
-        maxHeight: 500+'px',
-        maxWidth: 800+'px',
-        width: 800+'px',
-        borderRadius: '10px',
-        overflow: 'hidden',
-      }`).b-30
   //- ws content editor
   q-dialog(
     v-model="contentEditorOpened" position="bottom"
@@ -77,14 +65,7 @@ div(
     div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
-      q-btn(round flat dense color="white" icon="menu" @click="listShow = true").b-70
-      //- q-btn-group(flat :style=`{borderRadius: '10px'}`).b-70
-      //-   q-btn(
-      //-     v-for="(v,vi) in listViews" :key="v.id" @click="listView = v.id"
-      //-     round dense flat
-      //-     :icon="v.icon"
-      //-     :color="listView === v.id ? 'green' : 'grey-6'")
-      //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70 {{$q.screen.xs ? '' : 'Filters'}}
+      //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
