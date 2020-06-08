@@ -30,36 +30,36 @@
 </style>
 
 <template lang="pug">
-q-layout(view="hHh Lpr lff").bg-30
-  //- menu
-  div(
-    v-if="$route.name !== 'welcome' && $q.screen.width > $store.state.ui.maxWidthPage+$store.state.ui.maxWidthMenu*2"
-    :style=`{
-      position: 'fixed',
-      zIndex: 1,
-      top: '0px',
-      width: $store.state.ui.maxWidthMenu+'px',
-      left: ($q.screen.width-$store.state.ui.maxWidthPage)/2-$store.state.ui.maxWidthMenu+'px'
-    }`).row.q-pa-sm
-    kalpa-menu(v-if="!loading" :style=`{borderRadius: '10px', overflow: 'hidden'}`)
-  q-page-container
-    q-page(:style=`{}`)
-      router-view(
-        v-if="!loading")
-      div(
-        v-else
-        ).row.full-width.window-height.items-center.content-center.justify-center.bg-black
-        q-spinner(color="green" size="50px")
-  q-drawer(side="left" :value="$store.state.ui.appShowMenu" @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
+q-layout(
+  view="hHh Lpr lff"
+  container :style=`{height: $q.screen.height+'px',}`).bg-30
+  q-drawer(
+    side="left" :value="$store.state.ui.appShowMenu" @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
       v-if="!loading"
       :style=`{
         borderRadius: '0 10px 10px 0'
       }`)
+  q-page-container
+    q-page(:style=`{height: $q.screen.height+'px'}`)
+      .row.fit.justify-center.q-pt-sm
+        div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).col.full-height
+          div(
+            :style=`{
+              position: 'absolute', zIndex: 99999, left: '-300px',
+              width: '300px', height: '500px'
+            }`).row.q-pr-sm
+            kalpa-menu
+          router-view(
+            v-if="!loading")
+          div(
+            v-else
+            ).row.full-width.window-height.items-center.content-center.justify-center.bg-black
+            q-spinner(color="green" size="50px")
 </template>
 
 <script>
-// import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
+import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 import assert from 'assert'
@@ -68,6 +68,7 @@ export default {
   name: 'mainLayout',
   data () {
     return {
+      maxWidth: 800,
       loading: true,
       offsetTop: null,
       showLeftDrawer: false
@@ -111,6 +112,7 @@ export default {
     this.loading = false
   },
   mounted () {
+    // disableBodyScroll(document.body)
     // window.visualViewport.addEventListener('resize', this.onResize)
     // this.onResize()
   },

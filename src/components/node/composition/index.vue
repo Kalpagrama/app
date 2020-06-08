@@ -1,30 +1,31 @@
 <template lang="pug">
 div(
   :class=`{
-    'full-height': ctx !== 'workspace'
+    'full-heights': ctx !== 'workspace'
   }`
   :style=`{
     position: 'relative'
   }`
   ).row.full-width.items-start.content-start
-  kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
+  //- kalpa-debug(:style=`{position: 'absolute', zIndex: 2000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
   //- menu
   q-btn(
-    v-if="visible && active && ctx !== 'workspace'"
+    v-if="false && visible && active && ctx !== 'workspace'"
     round flat color="white" icon="more_vert"
     :style=`{position: 'absolute', top: '8px', right: '8px', zIndex: 10000, background: 'rgba(0,0,0,0.1)'}`)
     kalpa-menu-popup(:actions="actions")
-  //- img(
-  //-   v-if="preview"
-  //-   :src="preview"
-  //-   draggable="false"
-  //-   @load="previewLoaded"
-  //-   @error="previewErrored"
-  //-   :style=`{
-  //-     userSelect: 'none',
-  //-     objectFit: 'contain'
-  //-   }`
-  //-   ).full-width
+  img(
+    v-if="ctx !== 'workspace' && preview && !active"
+    :src="preview"
+    draggable="false"
+    @load="previewLoaded"
+    @error="previewErrored"
+    :style=`{
+      userSelect: 'none',
+      objectFit: 'contain',
+      maxHeight: $q.screen.height-120+'px',
+    }`
+    ).full-width
   player-video(
     v-if="composition && active"
     :ctx="ctx"
@@ -35,6 +36,23 @@ div(
       v-for="(_, scopedSlotName) in $scopedSlots"
       v-slot:[scopedSlotName]="slotData")
       slot(:name="scopedSlotName" v-bind="slotData")
+      img(
+        v-if="ctx !== 'workspace' && scopedSlotName === 'video' && !slotData.statePlayer.loaded"
+        @load="previewLoaded"
+        @error="previewErrored"
+        :src="preview"
+        draggable="false"
+        :style=`{
+          userSelect: 'none',
+          objectFit: 'contain',
+          maxHeight: $q.screen.height-120+'px',
+        }`
+        ).full-width
+      //- div(
+      //-   v-if="scopedSlotName === 'video'"
+      //-   :style=`{opacity: 0.5}`
+      //-   ).row.fit.bg-red
+      //-   h1.text-white {{ slotData.statePlayer.loaded }}
 </template>
 
 <script>
@@ -75,6 +93,7 @@ export default {
           name: 'Explore content',
           fn: () => {
             this.$log('Explore')
+            // this.$router.push(`/content/${}`)
           }
         },
         saveComposition: {

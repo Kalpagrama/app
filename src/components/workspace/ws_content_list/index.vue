@@ -9,21 +9,25 @@
 
 <template lang="pug">
 div(
+  :class=`{
+    'full-height': !inDialog,
+  }`
   :style=`{
-    position: 'relative'
+    position: 'relative',
   }`
   ).column.full-width
   q-dialog(
     v-model="listShow" position="bottom")
     ws-content-list(
       ctx="workspace"
+      :inDialog="true"
       :style=`{
+        maxHeight: 500+'px',
         maxWidth: 800+'px',
-        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
-        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
+        width: 800+'px',
         borderRadius: '10px',
         overflow: 'hidden',
-      }`).fit.b-30
+      }`).b-30
   //- ws content editor
   q-dialog(
     v-model="contentEditorOpened" position="bottom"
@@ -38,7 +42,7 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`).b-50
   //- header
-  kalpa-debug(:options=`{ctx}`)
+  //- kalpa-debug(:options=`{ctx}`)
   div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
@@ -113,6 +117,12 @@ export default {
   name: 'wsContentList',
   components: {contentItem},
   props: {
+    inDialog: {
+      type: Boolean,
+      default () {
+        return false
+      }
+    },
     ctx: {
       type: String,
       default () {
@@ -187,13 +197,14 @@ export default {
     },
     contentPicked (content) {
       this.$log('contentPicked')
-      if (this.ctx === 'workspace') {
-        this.content = content
-        this.contentEditorOpened = true
-      }
-      else {
-        this.$emit('content', JSON.parse(JSON.stringify(content)))
-      }
+      // if (this.ctx === 'workspace') {
+      //   this.content = content
+      //   this.contentEditorOpened = true
+      // }
+      // else {
+      //   this.$emit('content', JSON.parse(JSON.stringify(content)))
+      // }
+      this.$router.push(`/workspace/content/${content.id}`)
     },
     contentExplore (c, ci) {
       this.$log('contentExplore', c, ci)

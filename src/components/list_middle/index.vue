@@ -77,12 +77,18 @@ export default {
     }
   },
   watch: {
+    indexMiddle: {
+      handler (to, from) {
+        this.$log('indexMiddle CHANGED', to)
+        this.$emit('indexMiddle', to)
+      }
+    },
   },
   methods: {
     indexMiddleHandler (isVisible, entry, i) {
       // this.$log('itemMiddleHandler', isVisible, entry, i)
       if (isVisible) {
-        alert('isVisible: ' + entry.target.accessKey)
+        // alert('VISIBLE: ' + entry.target.accessKey)
         let index
         if (i >= 0) index = i
         else index = parseInt(entry.target.accessKey)
@@ -90,7 +96,10 @@ export default {
         this.indexMiddle = index
       }
       else {
-        alert('HIDDEN')
+        if (parseInt(entry.target.accessKey) === this.indexMiddle) {
+          this.indexMiddle = -1
+          // alert('HIDDEN: ' + this.indexMiddle)
+        }
       }
     },
     async itemInactiveClick (i, ii) {

@@ -37,15 +37,20 @@ div(
     overflow: 'hidden',
     opacity: opacity,
   }`).column.fit
-  video-controller(v-bind="$props" :player="player" :statePlayer="statePlayer")
   slot(name="header" :player="player" :statePlayer="statePlayer")
   div(
     :class=`{
-      'full-height': ctx !== 'workspace'
+      'full-heights': ctx !== 'workspace'
     }`
-    :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-50
+    :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.b-50
+    q-btn(
+      round flat color="white" icon="more_vert"
+      :style=`{
+        position: 'absolute', zIndex: 4000, right: '8px', top: '8px'
+      }`)
+      kalpa-menu-popup(:actions="actions")
     slot(name="video" :player="player" :statePlayer="statePlayer")
-    kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId,layerStart,layerEnd,videoMuted}`)
+    //- kalpa-debug(:style=`{position: 'absolute', zIndex: 1000, top: '0px',}` :options=`{ctx,mode,now,duration,timeupdateStop,layerId,layerStart,layerEnd,videoMuted,compositionUrl:composition.url}`)
     q-spinner(
       v-if="ctx === 'workspace' && !loaded"
       size="50px" color="green"
@@ -62,12 +67,18 @@ div(
       @loadeddata="videoLoadeddata" @play="videoPlay" @pause="videoPause" @ended="$emit('ended')"
       @timeupdate="videoTimeupdate"
       :class=`{
-        'full-height': ctx !== 'workspace'
+        'full-heights': ctx !== 'workspace'
       }`
       :style=`{
         position: 'relative', width: '100%', objectFit: 'contain', borderRadius: '0px', overflow: 'hidden',
       }`)
-    video-progress(v-bind="$props" :player="player" :statePlayer="statePlayer")
+    video-controller(
+      v-if="active && loaded"
+      v-bind="$props" :player="player" :statePlayer="statePlayer"
+      )
+    video-progress(
+      v-if="active && !mini"
+      v-bind="$props" :player="player" :statePlayer="statePlayer")
   .col.full-width
     slot(name="editor" :player="player" :statePlayer="statePlayer")
   slot(name="footer")
@@ -102,6 +113,7 @@ export default {
       else {
         if (this.now < this.layerStart) return 0
         else return 1
+        // return 1
       }
     },
     statePlayer () {
@@ -112,6 +124,9 @@ export default {
         playing: this.playing,
         loaded: this.loaded,
         layer: this.layer,
+        layerIndex: this.layerIndex,
+        layerIsFirst: this.layerIsFirst,
+        layerIsLast: this.layerIsLast,
         layerStart: this.layerStart,
         layerEnd: this.layerEnd,
         layerId: this.layerId,
@@ -129,6 +144,15 @@ export default {
       if (layer) return layer
       else return null
     },
+    layerIndex () {
+      return this.composition.layers.findIndex(l => l.id === this.layerId)
+    },
+    layerIsFirst () {
+      return this.layerIndex === 0
+    },
+    layerIsLast () {
+      return !this.composition.layers[this.layerIndex + 1]
+    },
     layerStart () {
       if (this.ctx === 'workspace') return this?.layer?.figuresAbsolute[0].t
       else return this?.layer?.figuresRelative[0].t
@@ -144,9 +168,13 @@ export default {
         return this.layerContent?.url
       }
       else {
-        let layerSrc = `${this.layer?.url}#t=${this.layerStart},${this.layerEnd}`
-        // return this.composition ? this.composition.url : layerSrc
-        return layerSrc
+        // if (this.composition.url.length > 0) {
+        //   return this.composition.url
+        // }
+        // else {
+        //   return `${this.layer?.url}#t=${this.layerStart},${this.layerEnd}`
+        // }
+        return `${this.layer?.url}#t=${this.layerStart},${this.layerEnd}`
       }
     },
     videoType () {
@@ -171,25 +199,31 @@ export default {
     },
     videoAutoplay () {
       return true
+    },
+    actions () {
+      return {
+        exploreContent: {
+          name: 'Explore content',
+          fn: () => {
+            this.$log('exploreContent')
+            this.$router.push(`/content/${this.layerContent.oid}`)
+          }
+        }
+      }
     }
   },
   watch: {
-    composition: {
+    active: {
       immediate: true,
       async handler (to, from) {
-        this.$log('composition CHANGED', to)
-        if (to.layers.length > 0) {
-          if (!this.layerId) this.layerId = to.layers[0].id
-          if (!this.layerContent) this.layerContent = await this.$rxdb.get(RxCollectionEnum.OBJ, to.layers[0].contentOid)
-          // this.$nextTick(() => {
-          //   if (!this.player) {
-          //     alert('playerInit')
-          //     this.playerInit()
-          //   }
-          // })
+        this.$log('active CHANGED', to)
+        if (to) {
+          if (this.composition.layers.length > 0) {
+            if (!this.layerId) this.layerId = this.composition.layers[0].id
+            if (!this.layerContent) this.layerContent = await this.$rxdb.get(RxCollectionEnum.OBJ, this.composition.layers[0].contentOid)
+          }
+          if (this.composition.contentOid) this.layerContent = await this.$rxdb.get(RxCollectionEnum.OBJ, this.composition.contentOid)
         }
-        this.$log('to.contentOid', to.contentOid)
-        if (to.contentOid) this.layerContent = await this.$rxdb.get(RxCollectionEnum.OBJ, to.contentOid)
       }
     },
     layer: {
@@ -271,13 +305,18 @@ export default {
       this.$log('playerInit done')
     },
     videoLoadeddata (e) {
-      // this.$log('videoLoadeddata', e)
+      // alert('videoLoadeddata')
+      this.$log('videoLoadeddata', e)
+      this.$log('**** videoLoadeddata', this.$refs.videoRef)
       this.loaded = true
       if (this.ctx === 'workspace') {
         this.duration = this.player.duration
       }
       else {
-        this.duration = this.$refs.videoRef.duration
+        // this.duration = this.$refs.videoRef.duration
+        if (e.target) {
+          this.duration = e.target.duration
+        }
       }
     },
     videoPlay (e) {

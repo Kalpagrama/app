@@ -24,7 +24,9 @@ div(
   img(
     :src="preview" draggable="false"
     :style=`{
-      userSelect: 'none', objectFit: 'contain', opacity: 1
+      userSelect: 'none',
+      objectFit: 'contain',
+      opacity: 1,
     }`).full-width.full-height
   //- items wrapper
   div(

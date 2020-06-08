@@ -27,9 +27,14 @@ const routes = [
         name: 'workspace',
         path: 'workspace/:page?/:id?',
         component: () => import('components/workspace'),
-        // children: [
-        //   { path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') }
-        // ]
+        children: [
+          // { path: 'node/:id', component: () => import('') },
+          // { path: 'node/import', component: () => import('') },
+          { path: 'content', component: () => import('components/workspace/ws_content_list') },
+          { path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') },
+          { path: 'content/import', component: () => import('components/workspace/ws_content_import') },
+          // { path: 'sphere/:id', component: () => import('') }
+        ]
       },
     ]
   }

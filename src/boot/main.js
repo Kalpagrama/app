@@ -77,6 +77,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     // workspace
     Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
     Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
+    Vue.component('wsContentExplorer', () => import('components/workspace/ws_content_explorer'))
     Vue.component('wsChainList', () => import('components/workspace/ws_chain_list'))
     Vue.component('wsChainEditor', () => import('components/workspace/ws_chain_editor'))
     Vue.component('wsNodeList', () => import('components/workspace/ws_node_list'))
@@ -97,6 +98,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('listMiddle', () => import('components/list_middle'))
     Vue.component('listTable', () => import('components/list_table'))
     // kalpa
+    Vue.component('kalpaPage', () => import('components/kalpa/page'))
     Vue.component('kalpaDebug', () => import('components/kalpa/debug'))
     Vue.component('kalpaMenu', () => import('components/kalpa/menu'))
     Vue.component('kalpaMenuRight', () => import('components/kalpa/menu_right'))

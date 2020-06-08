@@ -1,5 +1,5 @@
 <template lang="pug">
-content-explorer(v-if="content" :content="content")
+ws-content-explorer(v-if="content" :content="content")
 </template>
 
 <script>

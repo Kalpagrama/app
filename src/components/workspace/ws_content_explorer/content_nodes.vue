@@ -1,12 +1,8 @@
 <template lang="pug">
-.row.full-width.items-start.content-start.justify-center
-  div(
-    :style=`{
-      maxWidth: $store.state.ui.maxWidthPage+'px',
-    }`).row.full-width.items-start.content-start
-    div(:style=`{height: '100px'}`
-      ).row.full-width.items-center.content-center.q-py-md.q-px-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Node nodes
+.column.fit
+  .row.full-width.q-pa-md
+    span(:style=`{fontSize: '18px'}`).text-white.text-bold Nodes
+  .col.full-width.scroll.q-pa-sm
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       template(v-slot=`{items}`)
         list-middle(
@@ -27,19 +23,16 @@
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'nodeExplorer-nodeNodes',
-  props: ['node', 'stateNodeExplorer'],
+  name: 'contentNodes',
+  props: ['stateExplorer'],
   data () {
     return {
+      itemsBan: []
     }
   },
   computed: {
-    itemsBan () {
-      return [this.node.oid]
-    },
     sphereOid () {
-      this.$log('node_nodes: this.node=', this.node)
-      return this.node.sphereFromName.oid
+      return this.stateExplorer.content.oid
     },
     mangoQuery () {
       return {
@@ -47,18 +40,6 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
           oidSphere: this.sphereOid
         }
-      }
-    }
-  },
-  methods: {
-    indexMiddleChanged (to) {
-      this.$log('indexMiddleChanged', to)
-      // alert('indexMiddleChanged: ' + to)
-      if (to >= 0) {
-        this.stateNodeExplorer.set('nodeActive', false)
-      }
-      else {
-        this.stateNodeExplorer.set('nodeActive', true)
       }
     }
   }

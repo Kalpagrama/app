@@ -171,9 +171,9 @@ class RxDBWrapper {
   }
 
   async findNoLock (mangoQuery) {
-    mangoQuery = JSON.parse(JSON.stringify(mangoQuery)) // mangoQuery модифицируется внутри
+    // mangoQuery = JSON.parse(JSON.stringify(mangoQuery)) // mangoQuery модифицируется внутри
     // :::IMPORTANT:::
-    mangoQuery = JSON.parse(JSON.stringify(mangoQuery))
+    // mangoQuery = JSON.parse(JSON.stringify(mangoQuery))
     logD('*** ___ === mangoQuery ==' + JSON.stringify(mangoQuery))
     assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + JSON.stringify(mangoQuery))
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
