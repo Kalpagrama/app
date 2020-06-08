@@ -76,8 +76,7 @@ export default {
         this.itemsCount = items.length
       }
       catch (e) {
-        this.$log('itemsLoad error', e)
-        alert('error')
+        this.$logE('itemsLoad error', e)
       }
     }
   }
