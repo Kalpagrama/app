@@ -29,7 +29,7 @@ div(
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-120+'px',
-      opacity: itemIndex === 0 ? 0 : 0
+      opacity: itemIndex === 0 ? 1 : 0
     }`
     ).full-width
   //- items wrapper

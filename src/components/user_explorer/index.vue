@@ -28,12 +28,23 @@ div(:style=`{position: 'relative'}`).column.fit
   //- div().row.full-width
   //- menu right
   div(
+    v-if="$q.screen.width > 1260"
     :style=`{
       position: 'absolute', zIndex: 1000,
-      right: '-300px', width: '300px', height: '300px',
-    }`).row
-    menu-right().b-50.fit
+      right: -$store.state.ui.panelMaxWidth+'px',
+      maxWidth: $store.state.ui.panelMaxWidth+'px',
+      height: '300px',
+    }`).row.full-width.justify-start.q-px-sm.q-pt-sm
+    menu-right(:style=`{maxWidth: '240px'}`).b-50.fit
   //- menu bottom
+  div(
+    v-if="$q.screen.width <= 1260"
+    :style=`{
+      position: 'absolute', zIndex: 9999, bottom: '0px',
+      borderRadius: '10px 10px 0 0', overflow: 'hidden'
+    }`
+    ).row.full-width.q-pa-sm.b-50
+    q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
   //- body
   div(:style=`{position: 'relative'}`).col.full-width.scroll
     //- user-info(v-if="user" :user="user")

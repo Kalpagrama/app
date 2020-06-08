@@ -4,7 +4,7 @@ div(
   :style=`{position: 'relative'}`).column.fit
   //- right panel
   div(
-    v-if="false"
+    v-if="true"
     :style=`{
       position: 'absolute', zIndex: 99999,
       top: $store.state.ui.appFullscreen ? '8px' : '0px',

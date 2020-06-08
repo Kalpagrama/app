@@ -13,7 +13,7 @@ q-menu(cover auto-close anchor="top right")
     .col.full-width
       q-btn(
         v-for="(a, akey) in actions" :key="akey"
-        @click="a.fn(value)"
+        @click="a.fn(value, akey)"
         flat no-caps color="white" align="left"
         ).full-width {{ a.name }}
 </template>

@@ -40,8 +40,8 @@ const routes = [
           // { path: 'node/:id', component: () => import('') },
           // { path: 'node/import', component: () => import('') },
           { name: 'content-list', path: 'content', component: () => import('components/workspace/ws_content_list') },
-          { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') },
           { name: 'content-importer', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
+          { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') },
           // { path: 'sphere/:id', component: () => import('') }
         ]
       },

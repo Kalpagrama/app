@@ -2,12 +2,14 @@
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
   q-btn(
     v-if="!mini"
+    @click="compositionMore()"
     round flat color="white" icon="more_vert"
     :style=`{
       position: 'absolute', top: '8px', right: '8px', zIndex: 2000,
       transform: 'translate3d(0,0,0)',
       background: 'rgba(0,0,0,0.1)'
     }`)
+    kalpa-menu-popup(:actions="actions")
   img(
     :src="preview"
     :style=`{
@@ -39,7 +41,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       position: 'absolute', zIndex: 100,
       objectFit: 'contain',
     }`
-    ).fit.br
+    ).fit
 </template>
 
 <script>
@@ -62,10 +64,26 @@ export default {
   data () {
     return {
       composition: null,
+      compositionContents: [],
       videoLoaded: false,
       playing: false,
       playsinline: true,
-      muted: true
+      muted: true,
+    }
+  },
+  computed: {
+    actions () {
+      let res = {}
+      this.compositionContents.map(c => {
+        res[`explore-${c.oid}`] = {
+          name: c.name,
+          fn: (_, ckey) => {
+            this.$log('explore content', _, ckey)
+            this.$router.push(`/workspace/content/import?url=${c.url}`).catch(e => e)
+          }
+        }
+      })
+      return res
     }
   },
   watch: {
@@ -97,6 +115,18 @@ export default {
     }
   },
   methods: {
+    async compositionMore () {
+      this.$log('compositionMore')
+      if (this.compositionContents.length === 0) {
+        let res = []
+        await Promise.all(this.composition.layers.map(async (l, li) => {
+          let content = await this.$rxdb.get(RxCollectionEnum.OBJ, l.contentOid)
+          res.push(content)
+        }))
+        this.$log('res', res)
+        this.compositionContents = res
+      }
+    },
     videoClick () {
       this.$log('videoClick')
       if (this.muted) {
