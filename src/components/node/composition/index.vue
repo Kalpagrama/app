@@ -22,7 +22,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     ).full-width
   //- debug
   kalpa-debug(
-    v-if="composition && !mini"
+    v-if="composition && !mini && false"
     :options=`{url: composition.url, videoLoaded,currentTime,duration}`
     :style=`{position: 'absolute', top: 0, zIndex: 1000,transform: 'translate3d(0,0,0)'}`)
   //- progress

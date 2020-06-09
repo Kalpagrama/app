@@ -3,18 +3,19 @@ div(
   @mouseenter="mouseIsOver = true"
   @mouseleave="mouseIsOver = false"
   :style=`{
-    width: maxWidth+'px',
-    maxWidth: $store.state.ui.appFullscreen ? '600px' : $store.state.ui.panelMaxWidth+'px',
+    width: resizable ? maxWidth+'px' : '100%',
+    maxWidth: resizable ? maxWidth+'px' : '100%',
     background: 'rgba(50,50,50,0.9)',
     borderRadius: '10px',
     overflow: 'hidden',
   }`
   ).row.full-height
+  //- left menu for resize
   div(
+    v-if="resizable"
     :style=`{width: '50px'}`
     ).row.full-height.items-start.content-start.q-pa-sm
     q-btn(
-      v-if="true"
       @click="opened = !opened"
       round flat dense color="white"
       :icon="opened ? 'keyboard_arrow_right' : 'keyboard_arrow_left'"
@@ -26,10 +27,27 @@ div(
       :color="p.id === stateExplorer.pageId ? 'green' : 'white'"
       :icon="p.icon"
       :style=`{}`).full-width
+  //- right body
   div(:style=`{overflow: 'hidden'}`).col.full-height
-    component(
-      :is="'meta-'+stateExplorer.pageId"
-      :stateExplorer="stateExplorer")
+    .column.fit
+      .col.full-width
+        component(
+          :is="'meta-'+stateExplorer.pageId"
+          :stateExplorer="stateExplorer"
+          :resizable="resizable")
+      //- footer
+      div(v-if="!resizable && !stateExplorer.layerSelected").row.full-width.justify-center
+        q-tabs(
+          :value="stateExplorer.pageId" @input="stateExplorer.set('pageId', $event)"
+          dense no-caps color="white"
+          active-color="green"
+          :style=`{}`
+          ).full-width
+          q-tab(
+            v-for="(p,pi) in stateExplorer.pages" :key="p.id"
+            :name="p.id" :label="p.name"
+            dense no-caps color="white"
+            :style=`{color: 'rgb(180,180,180)'}`)
 </template>
 
 <script>
@@ -42,23 +60,23 @@ import metaChat from './meta_chat'
 export default {
   name: 'contentMeta',
   components: {metaLayers, metaNodes, metaChat, metaPeople, metaSpheres},
-  props: ['stateExplorer'],
+  props: ['stateExplorer', 'resizable'],
   data () {
     return {
       mouseIsOver: false,
-      opened: false,
-      maxWidth: 50
+      opened: true,
+      maxWidth: 500
     }
   },
   watch: {
     mouseIsOver: {
       handler (to, from) {
-        this.$log('mouseIsOver TO', to)
-        // if (to) {
-        //   if (!this.opened) {
-        //     this.opened = true
-        //   }
-        // }
+      }
+    },
+    resizable: {
+      immediate: true,
+      handler (to, from) {
+        if (to) this.opened = true
       }
     },
     opened: {

@@ -1,19 +1,25 @@
 <template lang="pug">
-.column.fit
+div(:style=`{position: 'relative'}`).column.fit
   //- node editor
   q-dialog(
-    v-model="nodeEditorOpened" full-height position="left")
+    v-model="nodeEditorOpened" full-height position="bottom")
     ws-node-editor(
       @close="nodeEditorOpened = false"
       :node="node"
       :style=`{
-        maxWidth: '600px',
+        maxWidth: '800px',
+        maxHeight: '800px',
+        minHeight: '800px',
       }`).full-height
   //- header
-  .row.full-width.items-center.content-center.q-px-sm
-    .row.full-width.q-py-md.q-px-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Layers {{$store.state.ui.panelMaxWidth}}
-    .row.full-width
+  div(v-if="!stateExplorer.layerSelected").row.full-width.items-center.content-center.q-px-sm
+    //- header: name
+    div(v-if="resizable").row.full-width.q-py-md.q-px-sm
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Layers
+    //- search layers
+    div(
+      v-if="layersSelected.length === 0"
+      :style=`{height: '60px'}`).row.full-width.items-center.content-center
       q-input(
         v-model="searchString"
         label="Find layer..."
@@ -23,28 +29,25 @@
             v-if="searchString.length > 0"
             @click="searchString = ''"
             round flat dense icon="clear" color="grey-5")
-    //- tools
-    div(
-      v-if="layersSelected.length === 0"
-      :style=`{position: 'relative'}`).row.full-width.items-center.content-center.q-py-xs
-      q-btn(
-        @click="layersEditing = !layersEditing"
-        round flat dense color="white" icon="edit")
-      .col
-      q-btn(
-        round flat dense color="white" icon="sort"
-        )
-      //- tools selected
+    //- tools selected
     div(
       v-if="layersSelected.length > 0"
-      :style=`{position: 'relative'}`).row.full-width.items-center.content-center.q-py-xs
+      :style=`{height: '60px'}`).row.full-width.items-center.content-center.q-py-sm
       q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").b-60.q-mr-sm
       q-btn(round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
       .col
       q-btn(round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm.b-60 Delete
+  //- layer editor
+  layer-editor(
+    v-if="stateExplorer.layerSelected"
+    :stateExplorer="stateExplorer"
+    :style=`{
+      position: 'absolute', zIndex: 9999,
+    }`
+    ).full-height.b-50
   //- body
   .col.full-width.scroll
-    div(:style=`{paddingBottom: '200px'}`).row.full-width.items-start.content-start.q-pa-sm
+    div(:style=`{paddingBottom: '200px'}`).row.full-width.items-start.content-start.q-py-sm
       draggable(
         :list="layers" group="layers" handle=".layer-drag-handle"
         :sort="true"
@@ -57,13 +60,13 @@
             'q-my-md': stateExplorer.layerSelected === l.id,
           }`
           :style=`{
-            minHeight: '60px',
+            minHeight: '40px',
           }`
           ).row.full-width.items-start.content-start
           //- left select
           div(
             v-show="layersEditing"
-           ).row.full-height.items-start.content-start.q-pa-xs
+           ).row.full-height.items-start.content-start.q-pa-sm
             q-checkbox(v-model="layersSelected" :val="l.id" dark dense color="grey-6")
           //- middle layer
           .col.full-height
@@ -74,19 +77,9 @@
           div(
             v-show="layersEditing"
             ).row.full-height.items-start.content-start.layer-drag-handle
-            q-btn(round flat dense color="grey-6" icon="drag_indicator")
-      //- add layer
-      div(
-        v-if="false"
-        :style={
-          height: '60px',
-          borderRadius: '10px',
-          overflow: 'hidden',
-        }
-        ).row.full-width.b-70
-        q-btn(
-          @click="stateExplorer.set('layerEditorOpened', true)"
-          flat color="green" icon="add").fit
+            q-btn(
+              round flat dense color="grey-6" icon="drag_indicator"
+              :style=`{height: '40px', width: '40px'}`)
 </template>
 
 <script>
@@ -94,15 +87,16 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import draggable from 'vuedraggable'
 import layerItem from './layer_item'
+import layerEditor from '../../layer_editor'
 
 export default {
   name: 'metaLayers',
-  components: {draggable, layerItem},
-  props: ['stateExplorer'],
+  components: {draggable, layerItem, layerEditor},
+  props: ['stateExplorer', 'resizable'],
   data () {
     return {
       searchString: '',
-      layersEditing: false,
+      layersEditing: true,
       layersSelected: [],
       layersDragging: false,
       nodeEditorOpened: false,
@@ -129,7 +123,7 @@ export default {
         this.$delete(this.layers, i)
       })
       this.layersSelected = []
-      this.layersEditing = false
+      // this.layersEditing = false
     },
     async nodeAdd () {
       this.$log('nodeAdd start')
@@ -164,16 +158,9 @@ export default {
         operation: {items: null, operations: null, type: 'CONCAT'}
       }
       this.$set(this.node.items, itemIndex, itemInput)
-      this.layersEditing = false
+      // this.layersEditing = false
       this.layersSelected = []
       this.nodeEditorOpened = true
-    },
-    layerClick (l, li) {
-      this.$log('layerClick', l, li)
-      let layerStart = l.figuresAbsolute[0].t
-      this.$log('layerStart', layerStart)
-      this.stateExplorer.player.setCurrentTime(layerStart)
-      this.stateExplorer.set('currentTime', layerStart)
     }
   }
 }

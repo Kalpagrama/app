@@ -78,8 +78,8 @@ export default {
       pages: [
         {id: 'created', name: 'Created'},
         {id: 'voted', name: 'Voted'},
-        {id: 'following', name: 'Following'},
-        {id: 'followers', name: 'Followers'}
+        // {id: 'following', name: 'Following'},
+        // {id: 'followers', name: 'Followers'}
       ]
     }
   },

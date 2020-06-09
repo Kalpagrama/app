@@ -3,7 +3,7 @@ const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
 // import VueYandexMetrika from 'vue-yandex-metrika'
 
-import { LoadingBar, date } from 'quasar'
+import { LoadingBar, Screen, date } from 'quasar'
 import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
@@ -39,6 +39,8 @@ export default async ({ Vue, store, router: VueRouter }) => {
       // })
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+    // quasar stuff
+    // Screen.setSizes({ xs: 600, sm: 900, md: 1260, lg: 1600, xl: 1900 })
     LoadingBar.setDefaults({
       color: 'green',
       size: '4px',

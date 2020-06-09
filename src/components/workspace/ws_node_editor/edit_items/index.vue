@@ -17,7 +17,7 @@ div(
   //-     }`)
   //- item find
   q-dialog(
-    v-model="itemFinderOpened" full-height position="left"
+    v-model="itemFinderOpened" full-height position="bottom"
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])")
     ws-content-list(
       ctx="nodeEditor" @content="contentFound"

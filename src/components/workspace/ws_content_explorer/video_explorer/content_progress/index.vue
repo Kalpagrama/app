@@ -1,36 +1,37 @@
 <template lang="pug">
-.row.full-width
+.row.full-width.q-pb-sm
+  //- tools
   div(
     :style=`{
-      order: 2
+      order: -1
     }`
-    ).row.full-width.q-py-xs
+    ).row.full-width.q-py-sm
     q-btn(
       @click="stateExplorer.playing ? stateExplorer.player.pause() : stateExplorer.player.play()"
-      round flat dense color="white"
+      round flat dense color="grey-4"
       :icon="stateExplorer.playing ? 'pause' : 'play_arrow'")
-    q-btn(round flat dense color="white" icon="volume_up")
+    q-btn(round flat dense color="grey-4" icon="volume_up")
     .col
-    q-btn(round flat dense color="white" icon="fast_rewind" @click="fast(false)")
-    q-btn(flat dense color="white")
+    q-btn(round flat dense color="grey-4" icon="fast_rewind" @click="fast(false)")
+    q-btn(flat dense color="grey-4")
       span {{ $time(stateExplorer.currentTime) }}
       span.q-mx-xs /
       span {{ $time(stateExplorer.duration) }}
-    q-btn(round flat dense color="white" icon="fast_forward" @click="fast(true)")
+    q-btn(round flat dense color="grey-4" icon="fast_forward" @click="fast(true)")
     .col
-    q-btn(round flat dense color="white" icon="tune")
     q-btn(
-      v-if="true"
       @click="$store.commit('ui/stateSet', ['appFullscreen', !$store.state.ui.appFullscreen])"
-      round flat dense color="white"
+      round flat dense color="grey-4"
       :icon="$store.state.ui.appFullscreen ? 'fullscreen_exit' : 'fullscreen'"
       )
+    q-btn(round flat dense color="grey-4" icon="more_vert")
+  //- bar
   div(
     @click="barClick"
     v-touch-pan.mouse.left.right="barDrag"
     :style=`{
       position: 'relative',
-      height: '50px',
+      height: '40px',
       borderRadius: '10px',
       overflow: 'hidden',
     }`
@@ -46,7 +47,7 @@
         pointerEvents: 'none',
       }`
       ).row.full-height.bg-green
-    //- now left
+    //- now left WIDTH
     div(
       :style=`{
         position: 'absolute', zIndex: 100,
@@ -55,8 +56,8 @@
         pointerEvents: 'none',
         opacity: 0.8
       }`
-      ).row.full-height.b-100
-    //- layers
+      ).row.full-height.b-140
+    //- LAYERS on the BAR
     div(
       :style=`{
         position: 'absolute', zIndex: 200,

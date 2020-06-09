@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit
+div(:style=`{position: 'relative'}`).column.fit
   //- menu right
   div(
     v-if="$q.screen.width > 1260"
@@ -13,18 +13,20 @@ div(:style=`{position: 'relative'}`).row.fit
       :style=`{
         maxWidth: '300px',
       }`).b-50
-  q-layout(
-    view="hHh lpR fFf"
-    container :style=`{position: 'relative', height: $q.screen.height+'px', overflow: 'auto'}`).b-30
-    q-drawer(
-      v-model="showMenu" side="right"
-      @before-show="showFooter = false"
-      @before-hide="showFooter = true"
-      )
-      menu-right(:stateWorkspace="stateWorkspace").full-height.b-50
-    q-page-container
-      q-page(:style=`{height: $q.screen.height+'px'}`)
-        router-view
+  .col.full-width
+    router-view
+  //- q-layout(
+  //-   view="hHh lpR fFf"
+  //-   container :style=`{position: 'relative', height: $q.screen.height+'px', overflow: 'auto'}`).b-30
+  //-   q-drawer(
+  //-     v-model="showMenu" side="right"
+  //-     @before-show="showFooter = false"
+  //-     @before-hide="showFooter = true"
+  //-     )
+  //-     menu-right(:stateWorkspace="stateWorkspace").full-height.b-50
+  //-   q-page-container
+  //-     q-page(:style=`{height: $q.screen.height+'px'}`)
+  //-       router-view
 </template>
 
 <script>

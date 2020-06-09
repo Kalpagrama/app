@@ -13,7 +13,7 @@ div(
   }`
   :style=`{
     position: 'relative',
-    minHeight: '60px',
+    minHeight: '40px',
     borderRadius: '10px',
     overflow: 'hidden'
   }`
@@ -26,7 +26,7 @@ div(
     }`
     :style=`{
       position: 'relative',
-      height: '60px',
+      height: '40px',
       borderRadius: '10px',
       overflow: 'hidden'
     }`).row.full-width.q-pl-md.layer
@@ -48,11 +48,11 @@ div(
       @click="layerClick"
       ).col.q-py-sm
       span.text-white {{ layerName }}
-      .row.full-width.text-grey-4
+      div(v-if="false").row.full-width.text-grey-4
         small {{ $time(layerStart) }}
         small.q-mx-xs -
         small {{ $time(layerEnd) }}
-        small.q-mx-xs -
+        small.q-mx-xs /
         small {{ $time(layerDuration) }}
     //- layer actions and drag
     div().row.full-height.items-start.content-start.q-pa-xs

@@ -54,16 +54,16 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       }`
       ).row.full-width
   //- tint on pause bottom
-  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      v-if="showTint"
-      :style=`{
-        position: 'absolute', bottom: '0px', zIndex: 1000,
-        height: '20%',
-        background: 'rgb(0,0,0)',
-        background: 'linear-gradient(0deg, rgba(10,10,10,0.9) 0%, rgba(0,0,0,0) 100%)'
-      }`
-      ).row.full-width
+  //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  div(
+    v-if="showTint"
+    :style=`{
+      position: 'absolute', bottom: '0px', zIndex: 1000,
+      height: '20%',
+      background: 'rgb(0,0,0)',
+      background: 'linear-gradient(0deg, rgba(10,10,10,0.9) 0%, rgba(0,0,0,0) 100%)'
+    }`
+    ).row.full-width
 </template>
 
 <script>
