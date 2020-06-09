@@ -12,14 +12,14 @@ div(:style=`{position: 'relative'}`).column.fit
         minHeight: '800px',
       }`).full-height
   //- header
-  div(v-if="!stateExplorer.layerSelected").row.full-width.items-center.content-center.q-px-sm
+  div(v-if="!stateExplorer.layerEditing").row.full-width.items-center.content-center
     //- header: name
     div(v-if="resizable").row.full-width.q-py-md.q-px-sm
       span(:style=`{fontSize: '18px'}`).text-white.text-bold Layers
     //- search layers
     div(
       v-if="layersSelected.length === 0"
-      :style=`{height: '60px'}`).row.full-width.items-center.content-center
+      :style=`{height: '60px', paddingLeft: '40px', paddingRight: '40px'}`).row.full-width.items-center.content-center
       q-input(
         v-model="searchString"
         label="Find layer..."
@@ -29,17 +29,18 @@ div(:style=`{position: 'relative'}`).column.fit
             v-if="searchString.length > 0"
             @click="searchString = ''"
             round flat dense icon="clear" color="grey-5")
-    //- tools selected
+    //- tools when selected
     div(
       v-if="layersSelected.length > 0"
       :style=`{height: '60px'}`).row.full-width.items-center.content-center.q-py-sm
-      q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").b-60.q-mr-sm
-      q-btn(round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
-      .col
+      div(:style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center.q-mr-md
+        q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").b-60
+      q-btn(round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm.q-mr-md Create node
+      //- .col
       q-btn(round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm.b-60 Delete
   //- layer editor
   layer-editor(
-    v-if="stateExplorer.layerSelected"
+    v-if="stateExplorer.layerEditing"
     :stateExplorer="stateExplorer"
     :style=`{
       position: 'absolute', zIndex: 9999,
@@ -47,26 +48,22 @@ div(:style=`{position: 'relative'}`).column.fit
     ).full-height.b-50
   //- body
   .col.full-width.scroll
-    div(:style=`{paddingBottom: '200px'}`).row.full-width.items-start.content-start.q-py-sm
+    div(:style=`{paddingBottom: '200px'}`).row.full-width.items-start.content-start
       draggable(
         :list="layers" group="layers" handle=".layer-drag-handle"
         :sort="true"
         @start="layersDragging = true"
         @end="layersDragging = false").full-width
         div(
-          v-for="(l,li) in layers" :key="l.id"
-          :class=`{
-            'q-my-xs': stateExplorer.layerSelected !== l.id,
-            'q-my-md': stateExplorer.layerSelected === l.id,
-          }`
+          v-for="(l,li) in layersFiltered" :key="l.id"
           :style=`{
             minHeight: '40px',
           }`
-          ).row.full-width.items-start.content-start
+          ).row.full-width.items-start.content-start.q-mb-xs
           //- left select
           div(
-            v-show="layersEditing"
-           ).row.full-height.items-start.content-start.q-pa-sm
+            :style=`{width: '40px'}`
+           ).row.full-height.items-start.content-start.justify-center.q-pa-sm
             q-checkbox(v-model="layersSelected" :val="l.id" dark dense color="grey-6")
           //- middle layer
           .col.full-height
@@ -75,11 +72,11 @@ div(:style=`{position: 'relative'}`).column.fit
               :style=`{}`)
           //- right drag
           div(
-            v-show="layersEditing"
             ).row.full-height.items-start.content-start.layer-drag-handle
             q-btn(
               round flat dense color="grey-6" icon="drag_indicator"
               :style=`{height: '40px', width: '40px'}`)
+              kalpa-menu-popup(:actions="actions")
 </template>
 
 <script>
@@ -96,7 +93,6 @@ export default {
   data () {
     return {
       searchString: '',
-      layersEditing: true,
       layersSelected: [],
       layersDragging: false,
       nodeEditorOpened: false,
@@ -112,6 +108,46 @@ export default {
   computed: {
     layers () {
       return this.stateExplorer.contentWs?.layers
+    },
+    layersFiltered () {
+      return this.layers.filter((l, li) => {
+        if (l.spheres.length > 0) {
+          if (this.searchString.length > 0) {
+            let nameRegExp = new RegExp(this.searchString, 'i')
+            return nameRegExp.test(l.spheres[0].name)
+          }
+          else return true
+        }
+        return true
+      })
+    },
+    actions () {
+      return {
+        edit: {
+          name: 'Edit',
+          fn: () => {
+            this.$log('Edit')
+          }
+        },
+        createNode: {
+          name: 'Create node',
+          fn: () => {
+            this.$log('Create node')
+          }
+        },
+        copy: {
+          name: 'Copy',
+          fn: () => {
+            this.$log('Copy')
+          }
+        },
+        delete: {
+          name: 'Delete',
+          fn: () => {
+            this.$log('Delete')
+          }
+        }
+      }
     }
   },
   methods: {
@@ -123,7 +159,6 @@ export default {
         this.$delete(this.layers, i)
       })
       this.layersSelected = []
-      // this.layersEditing = false
     },
     async nodeAdd () {
       this.$log('nodeAdd start')
@@ -145,6 +180,8 @@ export default {
       this.node = await this.nodeAdd()
       let itemIndex = this.node.items.length
       let itemId = Date.now().toString()
+      // TODO: itemLayers or itemItems ???
+      // show action dialog here
       let itemLayers = this.layers.filter(layer => this.layersSelected.includes(layer.id))
       let itemName = ''
       let itemInput = {
@@ -153,12 +190,11 @@ export default {
         layers: itemLayers,
         spheres: [],
         contentType: 'VIDEO',
-        contentOid: '', // content.contentOid,
-        thumbUrl: '', // content.thumbOid,
+        contentOid: this.stateExplorer.content.oid,
+        thumbUrl: this.stateExplorer.content.thumbUrl,
         operation: {items: null, operations: null, type: 'CONCAT'}
       }
       this.$set(this.node.items, itemIndex, itemInput)
-      // this.layersEditing = false
       this.layersSelected = []
       this.nodeEditorOpened = true
     }

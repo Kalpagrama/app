@@ -101,6 +101,9 @@ export default {
     onResize (e) {
       // this.$log('onResize', e)
       this.$store.commit('ui/stateSet', ['panelMaxWidth', (e.width - this.maxWidth) / 2])
+      if (this.$store.state.ui.appFullscreen) {
+        this.maxWidth = e.width
+      }
     }
   },
   async created () {

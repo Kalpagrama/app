@@ -36,7 +36,7 @@ div(
           :stateExplorer="stateExplorer"
           :resizable="resizable")
       //- footer
-      div(v-if="!resizable && !stateExplorer.layerSelected").row.full-width.justify-center
+      div(v-if="!resizable && !stateExplorer.layerEditing").row.full-width.justify-center
         q-tabs(
           :value="stateExplorer.pageId" @input="stateExplorer.set('pageId', $event)"
           dense no-caps color="white"

@@ -27,8 +27,7 @@
               borderRight: f === framesCount+1 ? 'none' : '1px solid rgb(120,120,120)',
             }`
             ).row.items-center.content-center.justify-center
-            span {{ $time((f - 1)*10) }}
-            //- span(:style=`{userSelect: 'none'}`).text-grey-8 {{ $time(((fi*frameWidth)/framesWidth)*stateExplorer.duration) }}
+            span(:style=`{userSelect: 'none', pointerEvents: 'none'}`) {{ $time((f - 1)*10) }}
         //- currentTime
         div(
           v-show="!poingDragging"

@@ -32,39 +32,40 @@ div(
     }`).row.full-width.q-pl-md.layer
     //- progress tint
     div(
-      v-if="stateExplorer.layerSelected === layer.id && stateExplorer.currentTime >= layerStart && stateExplorer.currentTime <= layerEnd"
+      v-if="stateExplorer.layerSelected === layer.id"
+      @click="progressClick"
+      v-touch-pan.mouse.left.right="progressDrag"
       :style=`{
         position: 'absolute', zIndex: 100,
-        left: '0px',
-        width: ((stateExplorer.currentTime-layerStart)/layerDuration)*100+'%',
-        pointerEvents: 'none',
-        borderRadius: '10px',
-        overflow: 'hidden',
-        opacity: 0.5
+        left: 0, top: 0, bottom: 0, right: 0,
       }`
-      ).row.full-height.bg-white
+      ).row.fit
+      //- progress width
+      div(
+        v-if="stateExplorer.currentTime >= layerStart && stateExplorer.currentTime <= layerEnd"
+        :style=`{
+          position: 'absolute', zIndex: 200,
+          left: '0px',
+          width: progressPercentRaw ? progressPercentRaw+'%' : ((stateExplorer.currentTime-layerStart)/layerDuration)*100+'%',
+          pointerEvents: 'none',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          opacity: 0.5
+        }`
+        ).row.full-height.bg-white
     //- layer name
     div(
       @click="layerClick"
       ).col.q-py-sm
-      span.text-white {{ layerName }}
-      div(v-if="false").row.full-width.text-grey-4
-        small {{ $time(layerStart) }}
-        small.q-mx-xs -
-        small {{ $time(layerEnd) }}
-        small.q-mx-xs /
-        small {{ $time(layerDuration) }}
-    //- layer actions and drag
-    div().row.full-height.items-start.content-start.q-pa-xs
-      q-btn(round flat dense color="grey-5" icon="more_vert")
-        kalpa-menu-popup(:actions="actions")
-  //- tools
+      span(:style=`{userSelect: 'none'}`).text-white {{ layerName }}
+  //- tools on layerSelected
   div(
     v-if="stateExplorer.layerSelected === layer.id"
     ).row.full-width.items-center.content-center.q-pa-xs
     q-btn(round flat dense color="white" icon="edit" @click="layerEdit()")
     .col
     q-btn(round flat dense color="white" icon="refresh" @click="layerRefresh()")
+    q-btn(round flat dense color="green" icon="check" @click="stateExplorer.set('layerSelected', null)")
 </template>
 
 <script>
@@ -73,6 +74,7 @@ export default {
   props: ['stateExplorer', 'layer', 'layerIndex'],
   data () {
     return {
+      progressPercentRaw: null
     }
   },
   computed: {
@@ -89,42 +91,60 @@ export default {
     layerDuration () {
       return this.layerEnd - this.layerStart
     },
-    actions () {
-      return {
-        edit: {
-          name: 'Edit',
-          fn: () => {
-            this.$log('Edit')
-          }
-        },
-        createNode: {
-          name: 'Create node',
-          fn: () => {
-            this.$log('Create node')
-          }
-        },
-        copy: {
-          name: 'Copy',
-          fn: () => {
-            this.$log('Copy')
-          }
-        },
-        delete: {
-          name: 'Delete',
-          fn: () => {
-            this.$log('Delete')
-          }
-        }
-      }
-    }
   },
   watch: {
-    // 'stateExplorer.layerSelected': {
-    // }
   },
   methods: {
+    progressClick (e) {
+      this.$log('progressClick', e)
+      let width = e.target.clientWidth
+      let left = e.offsetX
+      let t = ((this.layerDuration * left) / width) + this.layerStart
+      this.$log('t', t)
+      this.stateExplorer.player.setCurrentTime(t)
+      this.stateExplorer.set('currentTime', t)
+      // tween to
+      let tPercentNow = ((this.stateExplorer.currentTime - this.layerStart) / this.layerDuration) * 100
+      let tPercentNext = ((t - this.layerStart) / this.layerDuration) * 100
+      this.progressPercentRaw = tPercentNow
+      this.$tween.to(this, 0.1, {
+        progressPercentRaw: tPercentNext,
+        onComplete: () => {
+          this.progressPercentRaw = null
+          this.stateExplorer.set('currentTime', t)
+        }
+      })
+    },
+    progressDrag (e) {
+      this.$log('progressDrag', e)
+      let width = this.$el.clientWidth
+      this.$log('width', width)
+      if (e.isFirst) {
+        let left = e.evt.layerX || e.position.left
+        // this.stateExplorer.player.pause()
+        // this.progressPercentRaw = ((this.stateExplorer.currentTime - this.layerStart) / this.layerDuration) * 100
+        this.progressPercentRaw = (left / width) * 100
+      }
+      if (e.isFinal) {
+        // this.$tween.to(this, 0.3, {barHeight: this.barHeightMin})
+        // if (this.statePlayer.playing)
+        this.progressPercentRaw = null
+        // this.stateExplorer.player.play()
+      }
+      if (!this.progressPercentRaw) return
+      this.progressPercentRaw += (e.delta.x / width) * 100
+      let t = this.layerStart + (this.progressPercentRaw / 100) * this.layerDuration
+      // this.$log('t', t)
+      if (t < this.layerStart || t > this.layerEnd) return
+      if (t > 0) {
+        this.stateExplorer.player.setCurrentTime(t)
+        this.stateExplorer.set('currentTime', t)
+      }
+    },
     layerEdit () {
       this.$log('layerEdit')
+      this.stateExplorer.set('layerSelected', this.layer.id)
+      this.stateExplorer.set('layerEditing', this.layer.id)
     },
     layerRefresh () {
       this.$log('layerRefresh')
