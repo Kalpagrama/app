@@ -20,13 +20,19 @@ div(
   .col.full-width.scroll
     .row.full-width.items-start
       router-link(
-        :to="p.id"
+        :to="{name: p.id}"
         v-for="(p,pi) in stateWorkspace.pages" :key="pi"
-        :style=`{height: '50px', borderRadius: '10px', overflow: 'hidden'}`
+        :class=`{
+            'b-70': $route.name === p.id,
+            'b-50': $route.name !== p.id,
+          }`
+        :style=`{
+          height: '50px',
+          borderRadius: '10px',
+          overflow: 'hidden'
+        }`
         ).row.full-width.items-center.content-center.menu-item.q-px-md
         span(
-          :class=`{
-          }`
           :style=`{
             fontSize: '16px',
             userSelect: 'none'

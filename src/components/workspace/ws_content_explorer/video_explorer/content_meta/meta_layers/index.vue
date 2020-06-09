@@ -2,11 +2,13 @@
 .column.fit
   //- node editor
   q-dialog(
-    v-model="nodeEditorOpened" position="left")
+    v-model="nodeEditorOpened" full-height position="left")
     ws-node-editor(
       @close="nodeEditorOpened = false"
       :node="node"
-      :style=`{}`)
+      :style=`{
+        maxWidth: '600px',
+      }`).full-height
   //- header
   .row.full-width.items-center.content-center.q-px-sm
     .row.full-width.q-py-md.q-px-sm
@@ -22,14 +24,27 @@
             @click="searchString = ''"
             round flat dense icon="clear" color="grey-5")
     //- tools
-    .row.full-width.items-center.content-center.q-pt-xs.br
+    div(
+      v-if="layersSelected.length === 0"
+      :style=`{position: 'relative'}`).row.full-width.items-center.content-center.q-py-xs
       q-btn(
         @click="layersEditing = !layersEditing"
         round flat dense color="white" icon="edit")
-      //- small.text-white {{layersSelected}}
+      .col
+      q-btn(
+        round flat dense color="white" icon="sort"
+        )
+      //- tools selected
+    div(
+      v-if="layersSelected.length > 0"
+      :style=`{position: 'relative'}`).row.full-width.items-center.content-center.q-py-xs
+      q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").b-60.q-mr-sm
+      q-btn(round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
+      .col
+      q-btn(round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm.b-60 Delete
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-pa-sm
+    div(:style=`{paddingBottom: '200px'}`).row.full-width.items-start.content-start.q-pa-sm
       draggable(
         :list="layers" group="layers" handle=".layer-drag-handle"
         :sort="true"
@@ -37,8 +52,14 @@
         @end="layersDragging = false").full-width
         div(
           v-for="(l,li) in layers" :key="l.id"
-          :style=`{minHeight: '60px',}`
-          ).row.full-width.items-start.content-start.q-mb-xs
+          :class=`{
+            'q-my-xs': stateExplorer.layerSelected !== l.id,
+            'q-my-md': stateExplorer.layerSelected === l.id,
+          }`
+          :style=`{
+            minHeight: '60px',
+          }`
+          ).row.full-width.items-start.content-start
           //- left select
           div(
             v-show="layersEditing"
@@ -56,6 +77,7 @@
             q-btn(round flat dense color="grey-6" icon="drag_indicator")
       //- add layer
       div(
+        v-if="false"
         :style={
           height: '60px',
           borderRadius: '10px',
@@ -68,6 +90,8 @@
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 import draggable from 'vuedraggable'
 import layerItem from './layer_item'
 
@@ -87,6 +111,7 @@ export default {
         name: '',
         items: [],
         spheres: [],
+        category: 'FUN'
       }
     }
   },
@@ -96,14 +121,59 @@ export default {
     }
   },
   methods: {
+    layersSelectedDelete () {
+      this.$log('layersSelectedDelete')
+      if (!confirm('Delete selectd layers ?')) return
+      this.layersSelected.map(id => {
+        let i = this.layers.findIndex(layer => layer.id === id)
+        this.$delete(this.layers, i)
+      })
+      this.layersSelected = []
+      this.layersEditing = false
+    },
+    async nodeAdd () {
+      this.$log('nodeAdd start')
+      let nodeInput = {
+        name: '',
+        wsItemType: 'WS_NODE',
+        items: [],
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP',
+        stage: 'draft'
+      }
+      let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeAdd done', node)
+      return node
+    },
+    async layersSelectedCreateNode () {
+      this.$log('layersSelectedCreateNode')
+      this.node = await this.nodeAdd()
+      let itemIndex = this.node.items.length
+      let itemId = Date.now().toString()
+      let itemLayers = this.layers.filter(layer => this.layersSelected.includes(layer.id))
+      let itemName = ''
+      let itemInput = {
+        id: itemId,
+        name: itemName,
+        layers: itemLayers,
+        spheres: [],
+        contentType: 'VIDEO',
+        contentOid: '', // content.contentOid,
+        thumbUrl: '', // content.thumbOid,
+        operation: {items: null, operations: null, type: 'CONCAT'}
+      }
+      this.$set(this.node.items, itemIndex, itemInput)
+      this.layersEditing = false
+      this.layersSelected = []
+      this.nodeEditorOpened = true
+    },
     layerClick (l, li) {
       this.$log('layerClick', l, li)
       let layerStart = l.figuresAbsolute[0].t
       this.$log('layerStart', layerStart)
       this.stateExplorer.player.setCurrentTime(layerStart)
       this.stateExplorer.set('currentTime', layerStart)
-      // this.node = JSON.parse(JSON.stringify(this.nodeNew))
-      // this.nodeEditorOpened = true
     }
   }
 }

@@ -7,21 +7,29 @@
 
 <template lang="pug">
 div(
+  :class=`{
+    'b-80': stateExplorer.layerSelected === layer.id,
+    'b-70': stateExplorer.layerSelected !== layer.id,
+  }`
   :style=`{
     position: 'relative',
     minHeight: '60px',
     borderRadius: '10px',
     overflow: 'hidden'
   }`
-  ).row.full-width.items-between.content-between.b-70
+  ).row.full-width.items-between.content-between
   //- header
   div(
+    :class=`{
+      'b-90': stateExplorer.layerSelected === layer.id,
+      'b-70': stateExplorer.layerSelected !== layer.id,
+    }`
     :style=`{
       position: 'relative',
       height: '60px',
       borderRadius: '10px',
       overflow: 'hidden'
-    }`).row.full-width.b-80.q-pl-md.layer
+    }`).row.full-width.q-pl-md.layer
     //- progress tint
     div(
       v-if="stateExplorer.layerSelected === layer.id && stateExplorer.currentTime >= layerStart && stateExplorer.currentTime <= layerEnd"

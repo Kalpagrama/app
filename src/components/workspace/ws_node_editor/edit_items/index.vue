@@ -17,18 +17,19 @@ div(
   //-     }`)
   //- item find
   q-dialog(
-    v-model="itemFinderOpened" position="bottom"
+    v-model="itemFinderOpened" full-height position="left"
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])")
     ws-content-list(
       ctx="nodeEditor" @content="contentFound"
+      :inDialog="true"
       key="nodeEditor"
       :style=`{
-        maxWidth: 800+'px',
-        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
-        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
+        maxWidth: 600+'px',
+        //- maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
+        //- height: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
         borderRadius: '10px',
         overflow: 'hidden',
-      }`).fit.b-30
+      }`).b-30
       template(v-slot:header)
         div(:style=`{marginBottom: '20px'}`).row.full-width.items-center.content-center.q-pt-md
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false").q-mr-sm

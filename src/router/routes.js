@@ -49,12 +49,17 @@ const routes = [
         redirect: 'workspace/content',
         component: () => import('components/workspace'),
         children: [
-          // { path: 'node/:id', component: () => import('') },
-          // { path: 'node/import', component: () => import('') },
+          { name: 'node-list', path: 'node', component: () => import('components/workspace/ws_node_list') },
+          { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
+          { name: 'node-editor', path: 'node/:id', component: () => import('components/workspace/ws_node_editor') },
           { name: 'content-list', path: 'content', component: () => import('components/workspace/ws_content_list') },
-          { name: 'content-importer', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
+          { name: 'content-import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
           { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') },
-          // { path: 'sphere/:id', component: () => import('') }
+          { name: 'chain-list', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
+          { name: 'chain-editor', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },
+          { name: 'sphere-list', path: 'sphere', component: () => import('components/workspace/ws_sphere_list') },
+          // { name: 'sphere-editor', path: 'sphere/:id', component: () => import('components/workspace/ws_sphere_editor') },
+          { name: 'ws-settings', path: 'settings', component: () => import('components/workspace/ws_settings') },
         ]
       },
     ]
