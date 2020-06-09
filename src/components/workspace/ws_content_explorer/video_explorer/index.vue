@@ -2,6 +2,18 @@
 div(
   v-if="contentKalpa"
   :style=`{position: 'relative'}`).column.fit
+  //- left panel
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 99999, top: '8px', left: '8px',
+      borderRadius: '10px', overflow: 'hidden',
+      background: 'rgba(0,0,0,0.5)',
+    }`).row.items-center.content-center.q-pr-sm
+    q-btn(
+      round flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
+      :style=`{
+      }`).q-mr-sm
+    span.text-white.text-bold {{ content.name }}
   //- right panel
   div(
     v-if="true"
@@ -70,6 +82,9 @@ export default {
       ],
       layerEditorOpened: false,
       layerId: null,
+      layerSelected: null,
+      layerEditing: null,
+      layersSelected: []
     }
   },
   computed: {
@@ -95,7 +110,9 @@ export default {
         playing: this.playing,
         layerEditorOpened: false,
         layerId: this.layerId,
-        // layer: this.contentWs?.layers.find(l => l.id === this.layerId),
+        layerSelected: this.layerSelected,
+        layerEditing: this.layerEditing,
+        layersSelected: this.layersSelected,
         set: (key, val) => {
           this[key] = val
         }

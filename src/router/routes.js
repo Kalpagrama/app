@@ -24,9 +24,21 @@ const routes = [
         children: [
           { name: 'created', path: 'created', component: () => import('components/user_explorer/user_created') },
           { name: 'voted', path: 'voted', component: () => import('components/user_explorer/user_voted') },
+          { name: 'following', path: 'following', component: () => import('components/user_explorer/user_following') },
+          { name: 'followers', path: 'followers', component: () => import('components/user_explorer/user_followers') },
         ]
       },
-      { name: 'node', path: 'node/:oid/:page?', component: () => import('pages/app/node') },
+      {
+        name: 'node',
+        path: 'node/:oid',
+        redirect: 'node/:oid/nodes',
+        component: () => import('pages/app/node'),
+        children: [
+          { name: 'nodes', path: 'nodes', component: () => import('components/node_explorer/node_nodes') },
+          { name: 'contents', path: 'contents', component: () => import('components/node_explorer/node_contents') },
+          { name: 'chains', path: 'chains', component: () => import('components/node_explorer/node_chains') },
+        ]
+      },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/sphere') },
       { name: 'content', path: 'content/:oid?/:page?', component: () => import('pages/app/content') },

@@ -1,5 +1,6 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+  //- menu
   q-btn(
     v-if="!mini"
     @click="compositionMore()"
@@ -10,6 +11,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       background: 'rgba(0,0,0,0.1)'
     }`)
     kalpa-menu-popup(:actions="actions")
+  //- preview
   img(
     :src="preview"
     :style=`{
@@ -18,10 +20,26 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       maxHeight: $q.screen.height-120+'px',
     }`
     ).full-width
+  //- debug
   kalpa-debug(
-    v-if="composition && !mini && false"
-    :options=`{url: composition.url, videoLoaded,}`
+    v-if="composition && !mini"
+    :options=`{url: composition.url, videoLoaded,currentTime,duration}`
     :style=`{position: 'absolute', top: 0, zIndex: 1000,transform: 'translate3d(0,0,0)'}`)
+  //- progress
+  div(
+    :style=`{
+      position: 'absolute', zIndex: 200, bottom: '0px',
+      height: '6px',
+    }`
+    ).row.full-width
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 300, left: '0px',
+        width: (currentTime/duration)*100+'%',
+        borderRadius: '3px', overflow: 'hidden',
+        pointerEvents: 'none',
+      }`
+      ).row.full-height.bg-green
   video(
     v-if="composition && composition.url.length > 0 && active"
     ref="videoRef"
@@ -36,6 +54,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     @loadeddata="videoLoadeddata"
     @play="playing = true"
     @pause="playing = false"
+    @timeupdate="videoTimeupdate"
     @click="videoClick"
     :style=`{
       position: 'absolute', zIndex: 100,
@@ -66,6 +85,8 @@ export default {
       composition: null,
       compositionContents: [],
       videoLoaded: false,
+      currentTime: 0,
+      duration: 0,
       playing: false,
       playsinline: true,
       muted: true,
@@ -76,7 +97,7 @@ export default {
       let res = {}
       this.compositionContents.map(c => {
         res[`explore-${c.oid}`] = {
-          name: c.name,
+          name: `Explore:  "${c.name}"`,
           fn: (_, ckey) => {
             this.$log('explore content', _, ckey)
             this.$router.push(`/workspace/content/import?url=${c.url}`).catch(e => e)
@@ -142,8 +163,13 @@ export default {
       }
       // this.muted = false
     },
-    videoLoadeddata () {
-      this.$log('videoLoadeddata')
+    videoTimeupdate (e) {
+      // this.$log('videoTimeupdate', e)
+      this.currentTime = e.target.currentTime
+    },
+    videoLoadeddata (e) {
+      // this.$log('videoLoadeddata', e)
+      this.duration = e.target.duration
       this.videoLoaded = true
     }
   }

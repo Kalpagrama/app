@@ -1,51 +1,31 @@
 <template lang="pug">
-q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout").b-30
-  //- actions
-  //- dialogs
-  //- node
-  q-dialog(v-model="nodeEditorOpened" persistent position="bottom")
-    node-editor(
-      ctx="workspace"
-      :node="nodeEditorItem"
-      @cancel="nodeEditorOpened = false"
-      :style=`{
-        maxWidth: $store.state.ui.maxWidthPage+'px',
-        minHeight: $q.screen.height+'px',
-        maxHeight: $q.screen.height+'px',
-        height: $q.screen.height+'px',
-      }`)
-  //- menu right desktop
-  kalpa-menu-right
-    div(
-      :style=`{
-        borderRadius: '10px', overflow: 'hidden',
-        maxHeight: '70vh'
-      }`
-      ).column.full-width
-      menu-right.b-50
+div(:style=`{position: 'relative'}`).column.fit
   //- header
-  q-header(reveal).row.full-width.justify-center
-    div(
-      :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`
-      ).row.full-width.q-pa-md.b-50
-      kalpa-debug(:options=`{nodeActive,nodeVisible,stateNodeExplorer}`)
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-      .col.full-height
-        .row.fit.items-center.content-center.q-px-sm
-          span(:style=`{fontSize: '16px'}`).text-white.text-bold Node explorer
-  //- footer
-  q-footer(reveal)
-    div(
-      v-if="$q.screen.xs && $store.state.ui.wsShowMenu && !$store.state.ui.appShowMenu"
-      :style=`{position: 'absolute', bottom: '0px', zIndex: 10000, borderRadius: '10px 10px 0 0'}`
-      ).row.full-width.items-center.content-center.q-px-sm.b-50
-      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])").b-60
-      .col.q-pb-sm.q-px-sm
-        //- kalpa-buttons(:value="pages" :id="$route.params.page" @id="$router.push({params: {page: $event}})").justify-center
-      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = !showMenuRight").b-60
-  //- kalpa-menu-footer(v-if="!nodeEditorOpened" :options=`{showMenuPage: true}`)
-  //-   template(v-slot:menuRight=`{inDrawer}`)
-  //-     menu-right(:inDrawer="inDrawer")
+  div(
+    :style=`{borderRadius: '0 0 10px 10px'}`
+    ).row.full-width.items-center.content-center.q-pa-md.b-50
+    //- kalpa-debug(:options=`{nodeActive,nodeVisible,stateNodeExplorer}`)
+    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
+    span(:style=`{fontSize: '18px'}`).text-white.text-bold Node explorer
+  //- menu right
+  div(
+    v-if="$q.screen.width > 1260"
+    :style=`{
+      position: 'absolute', zIndex: 1000,
+      right: -$store.state.ui.panelMaxWidth+'px',
+      maxWidth: $store.state.ui.panelMaxWidth+'px',
+      height: '300px',
+    }`).row.full-width.justify-start.q-px-sm.q-pt-sm
+    menu-right(:style=`{maxWidth: '240px'}`).b-50.fit
+  //- menu bottom
+  div(
+    v-if="$q.screen.width <= 1260"
+    :style=`{
+      position: 'absolute', zIndex: 9999, bottom: '0px',
+      borderRadius: '10px 10px 0 0', overflow: 'hidden'
+    }`
+    ).row.full-width.q-pa-sm.b-50
+    q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
   //- reply
   q-btn(
     v-if="true"
@@ -56,19 +36,18 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout").b-30
       height: '50px'
     }`
     ).q-px-md Reply to node
-  //- page body
-  q-page-container
-    q-page
-      .row.full-width.justify-center
+  //- body
+  .col.full-width.scroll
+    div(v-if="node").row.full-width.justify-center
         div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
           kalpa-debug(:options=`{nodeActive,nodeVisible,stateNodeExplorer}`)
           node(
-            v-if="node"
             ctx="list"
             :node="node" :needFull="true"
             :visible="nodeVisible" :active="nodeActive" :mini="nodeMini")
-      div(v-if="node").row.full-width
-        node-nodes(:node="node" :stateNodeExplorer="stateNodeExplorer")
+    div(v-if="node").row.full-width
+      //- node-nodes(:node="node" :stateNodeExplorer="stateNodeExplorer")
+      router-view(:node="node")
 </template>
 
 <script>

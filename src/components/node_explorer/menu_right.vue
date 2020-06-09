@@ -22,9 +22,9 @@ div(
     .row.full-width.items-start.content-start
       router-link(
         v-for="(p,pi) in pages" :key="p.id"
-        :to=`{params: {page: p.id}}`
+        :to=`{name: p.id}`
         :class=`{
-          'b-100': $route.params.page === p.id
+          'b-100': $route.name === p.id,
         }`
         :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
         span.text-white {{ p.name }}

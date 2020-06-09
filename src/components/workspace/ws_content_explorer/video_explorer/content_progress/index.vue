@@ -67,11 +67,12 @@
         v-for="(l,li) in layers" :key="li"
         :style=`{
           position: 'absolute', zIndex: 300+li,
-          width: '2px',
-          left: l.figuresAbsolute[0].t/stateExplorer.duration*100+'%',
-          opacity: 0.5
+          left: (l.figuresAbsolute[0].t/stateExplorer.duration)*100+'%',
+          width: stateExplorer.layerSelected === l.id ? ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/stateExplorer.duration)*100+'%' :'2px',
+          background: stateExplorer.layerSelected === l.id ? l.color : 'white',
+          opacity: stateExplorer.layerSelected === l.id ? 1 : 0.5,
         }`
-        ).row.full-height.bg-white
+        ).row.full-height
 </template>
 
 <script>

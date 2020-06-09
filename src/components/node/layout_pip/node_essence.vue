@@ -17,9 +17,9 @@ div(
         :to="'/node/'+node.oid"
         ).row.full-width.items-start.content-start.essence
         span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
-  div(:style=`{}`).row.full-height.items-center.content-center.justify-center.q-px-sm
-    q-btn(round flat color="grey-6" icon="more_vert")
-      kalpa-menu-popup(:actions="actions")
+  //- div(:style=`{}`).row.full-height.items-center.content-center.justify-center.q-px-sm
+  //-   q-btn(round flat color="grey-6" icon="more_vert")
+  //-     kalpa-menu-popup(:actions="actions")
 </template>
 
 <script>

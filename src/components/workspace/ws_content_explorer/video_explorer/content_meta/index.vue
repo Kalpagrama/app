@@ -4,7 +4,7 @@ div(
   @mouseleave="mouseIsOver = false"
   :style=`{
     width: maxWidth+'px',
-    maxWidth: $store.state.ui.panelMaxWidth+'px',
+    maxWidth: $store.state.ui.appFullscreen ? '600px' : $store.state.ui.panelMaxWidth+'px',
     background: 'rgba(50,50,50,0.9)',
     borderRadius: '10px',
     overflow: 'hidden',
@@ -33,12 +33,15 @@ div(
 </template>
 
 <script>
+import metaPeople from './meta_people'
 import metaLayers from './meta_layers'
+import metaSpheres from './meta_spheres'
 import metaNodes from './meta_nodes'
+import metaChat from './meta_chat'
 
 export default {
   name: 'contentMeta',
-  components: {metaLayers, metaNodes},
+  components: {metaLayers, metaNodes, metaChat, metaPeople, metaSpheres},
   props: ['stateExplorer'],
   data () {
     return {
