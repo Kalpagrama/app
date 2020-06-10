@@ -41,12 +41,12 @@
       :style=`{
         position: 'absolute',
         zIndex: 1000,
-        width: '2px',
+        width: '3px',
         borderRadius: '1px', overflow: 'hidden',
         left: stateExplorer.currentTime/stateExplorer.duration*100+'%',
         pointerEvents: 'none',
       }`
-      ).row.full-height.bg-green
+      ).row.full-height.bg-red
     //- now left WIDTH
     div(
       :style=`{

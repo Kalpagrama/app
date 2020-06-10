@@ -1,4 +1,5 @@
 <template lang="pug">
+//- .row.fit.q-pt-sm
 component(
   v-if="content"
   :is="component[content.contentType]"

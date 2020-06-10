@@ -13,6 +13,20 @@ div(:style=`{position: 'relative'}`).column.fit
       :style=`{
         maxWidth: '300px',
       }`).b-50
+  //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+  //-   div(
+  //-     v-if="$q.screen.width < 1260 && !$store.state.ui.appShowMenu"
+  //-     :style=`{
+  //-       position: 'absolute', zIndex: 9999,
+  //-       bottom: '0px',
+  //-       borderRadius: '10px 10px 0 0',
+  //-       transform: 'translate3d(0,0,0)',
+  //-       overflow: 'hidden',
+  //-     }`
+  //-     ).row.full-width.q-pa-sm.b-50
+  //-     q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
+  //-     .col
+  //-     q-btn(round flat dense color="white" icon="menu_open")
   .col.full-width
     router-view
   //- q-layout(

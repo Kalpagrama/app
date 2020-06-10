@@ -111,7 +111,7 @@ export default {
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, this.content.contentOid)
   }
 }

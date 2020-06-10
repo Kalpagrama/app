@@ -56,10 +56,11 @@ import metaLayers from './meta_layers'
 import metaSpheres from './meta_spheres'
 import metaNodes from './meta_nodes'
 import metaChat from './meta_chat'
+import metaInfo from './meta_info'
 
 export default {
   name: 'contentMeta',
-  components: {metaLayers, metaNodes, metaChat, metaPeople, metaSpheres},
+  components: {metaLayers, metaNodes, metaChat, metaPeople, metaSpheres, metaInfo},
   props: ['stateExplorer', 'resizable'],
   data () {
     return {

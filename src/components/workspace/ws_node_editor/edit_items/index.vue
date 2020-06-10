@@ -17,16 +17,16 @@ div(
   //-     }`)
   //- item find
   q-dialog(
-    v-model="itemFinderOpened" full-height position="bottom"
+    v-model="itemFinderOpened" position="bottom"
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])")
     ws-content-list(
       ctx="nodeEditor" @content="contentFound"
       :inDialog="true"
       key="nodeEditor"
       :style=`{
-        maxWidth: 600+'px',
-        //- maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
-        //- height: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
+        maxWidth: 800+'px',
+        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
+        height: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
         borderRadius: '10px',
         overflow: 'hidden',
       }`).b-30
@@ -38,9 +38,9 @@ div(
   q-dialog(
     v-model="itemEditorOpened" position="bottom"
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])")
-    ws-content-editor(
+    ws-composition-editor(
       v-if="item"
-      editorType="composition" :value="item"
+      :value="item"
       @close="itemEditorOpened = false"
       :style=`{
         height: $q.screen.height+'px',

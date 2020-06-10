@@ -13,7 +13,7 @@ div(
     borderRadius: '10px',
     overflow: 'hidden'
   }`
-  ).row.full-width.items-center.content-center.item
+  ).row.full-width.items-center.content-center.justify-between.item
   img(
     :src="item.thumbUrl"
     :style=`{
@@ -23,20 +23,27 @@ div(
       overflow: 'hidden',
       objectFit: 'cover',
     }`)
+  //- middle name
   .col.full-height
     div(
       @click="itemClick()"
       ).row.fit.items-start.content-start.q-pl-md.q-py-md
       span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ itemName }}
-  .row.full-height.items-start.content-start.q-pa-sm
-    //- q-btn(
-    //-   flat dense icon-right="layers" color="grey-5"
-    //-   :style=`{pointerEvents: 'none'}`) {{ item.layers.length }}
-    q-btn(
-      @click=""
-      flat dense icon="more_vert" color="grey-5"
-      :style=`{}`)
-      kalpa-menu-popup(:actions="actions")
+  //- right actions
+  .row.full-height.items-between.content-between.q-pa-xs
+      q-btn(
+        @click=""
+        flat dense icon="more_vert" color="grey-5"
+        :style=`{}`)
+        kalpa-menu-popup(:actions="actions")
+  //- stats absolute layers
+  q-btn(
+    flat dense icon-right="layers" color="grey-5"
+    :style=`{
+      position: 'absolute', zIndex: 200,
+      right: '4px', bottom: '4px',
+      pointerEvents: 'none'
+    }`) {{ item.layers.length }}
 </template>
 
 <script>

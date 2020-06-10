@@ -104,14 +104,17 @@ export default {
   computed: {
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE}}
+      // name
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
+      // type
       if (this.type !== 'all') {
         res.selector.stage = this.type
       }
-      // TODO: add spheres
+      // sort
+      res.sort = [{updatedAt: 'desc'}]
       return res
     }
   },

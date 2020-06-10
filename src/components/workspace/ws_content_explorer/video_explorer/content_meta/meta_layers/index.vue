@@ -64,7 +64,9 @@ div(:style=`{position: 'relative'}`).column.fit
           div(
             :style=`{width: '40px'}`
            ).row.full-height.items-start.content-start.justify-center.q-pa-sm
-            q-checkbox(v-model="layersSelected" :val="l.id" dark dense color="grey-6")
+            q-checkbox(
+              v-model="layersSelected" :val="l.id" dark dense color="grey-6"
+              :style=`{opacity: layersSelected.includes(l.id) ? 1 : 0.6}`)
           //- middle layer
           .col.full-height
             layer-item(

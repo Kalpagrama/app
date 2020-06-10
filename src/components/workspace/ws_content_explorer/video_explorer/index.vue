@@ -22,7 +22,7 @@ div(
           ).text-white.text-bold {{ content.name }}
   //- right panel
   div(
-    v-if="$store.state.ui.appFullscreen && $q.screen.gt.md"
+    v-if="$store.state.ui.appFullscreen && $q.screen.gt.sm"
     :style=`{
       position: 'absolute', zIndex: 99999,
       top: '8px',
@@ -97,6 +97,7 @@ export default {
       playing: false,
       pageId: 'layers',
       pages: [
+        {id: 'info', name: 'Info', icon: 'details'},
         {id: 'layers', name: 'Layers', icon: 'layers'},
         {id: 'nodes', name: 'Nodes', icon: 'hdr_strong'},
         {id: 'spheres', name: 'Spheres', icon: 'blur_on'},
@@ -125,6 +126,18 @@ export default {
       if (this.$q.screen.width > 600) return `calc(50% - ${this.footerWidth / 2}px)`
       else return `calc(50% - ${this.footerWidth / 2}px)`
     },
+    layer () {
+      return this.content.layers.find(layer => layer.id === this.layerSelected)
+    },
+    layerStart () {
+      return this.layer?.figuresAbsolute[0].t
+    },
+    layerEnd () {
+      return this.layer?.figuresAbsolute[1].t
+    },
+    layerDuration () {
+      return this.layerEnd - this.layerStart
+    },
     stateExplorer () {
       return {
         pageId: this.pageId,
@@ -136,7 +149,10 @@ export default {
         currentTime: this.currentTime,
         loadeddata: this.loadeddata,
         playing: this.playing,
-        layer: this.content.layers.find(layer => layer.id === this.layerSelected),
+        layer: this.layer,
+        layerStart: this.layerStart,
+        layerEnd: this.layerEnd,
+        layerDuration: this.layerDuration,
         layerEditorOpened: false,
         layerSelected: this.layerSelected,
         layerEditing: this.layerEditing,

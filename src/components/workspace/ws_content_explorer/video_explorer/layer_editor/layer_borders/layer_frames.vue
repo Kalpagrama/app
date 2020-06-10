@@ -40,13 +40,13 @@
             borderRadius: '4px', overflow: 'hidden',
             pointerEvents: 'none'
           }`
-          ).bg-grey-8
+          ).bg-red
         //- left tint
         div(
           :style=`{
             position: 'absolute', zIndex: 100,
             left: '0px',
-            width: 'calc('+(layer.figuresAbsolute[0].t/stateExplorer.duration)*100+'% + 8px)',
+            width: 'calc('+(stateExplorer.layer.figuresAbsolute[0].t/stateExplorer.duration)*100+'% + 8px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
             borderRadius: '10px',
@@ -56,7 +56,7 @@
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
           :style=`{
             position: 'absolute', zIndex: 310, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[0].t/stateExplorer.duration)*100+'% - 25px)',
+            left: 'calc('+(stateExplorer.layer.figuresAbsolute[0].t/stateExplorer.duration)*100+'% - 25px)',
             height: '50px', width: '50px',
             borderRadius: '50%',
             opacity: 0.3,
@@ -66,8 +66,8 @@
         div(
           :style=`{
             position: 'absolute', zIndex: 100,
-            left: 'calc('+(layer.figuresAbsolute[1].t/stateExplorer.duration)*100+'% - 0px)',
-            width: 'calc('+((stateExplorer.duration-layer.figuresAbsolute[1].t)/stateExplorer.duration)*100+'% + 1px)',
+            left: 'calc('+(stateExplorer.layer.figuresAbsolute[1].t/stateExplorer.duration)*100+'% - 0px)',
+            width: 'calc('+((stateExplorer.duration-stateExplorer.layer.figuresAbsolute[1].t)/stateExplorer.duration)*100+'% + 1px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
             borderRadius: '10px',
@@ -77,7 +77,7 @@
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
           :style=`{
             position: 'absolute', zIndex: 320, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[1].t/stateExplorer.duration)*100+'% - 25px)',
+            left: 'calc('+(stateExplorer.layer.figuresAbsolute[1].t/stateExplorer.duration)*100+'% - 25px)',
             height: '50px', width: '50px',
             borderRadius: '50%',
             opacity: 0.3,
@@ -87,11 +87,11 @@
         div(
           :style=`{
             position: 'absolute', zIndex: 300, top: '-8px',
-            left: (layer.figuresAbsolute[0].t/stateExplorer.duration)*100+'%',
-            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/stateExplorer.duration)*100+'% + 8px)',
+            left: (stateExplorer.layer.figuresAbsolute[0].t/stateExplorer.duration)*100+'%',
+            width: 'calc('+((stateExplorer.layer.figuresAbsolute[1].t-stateExplorer.layer.figuresAbsolute[0].t)/stateExplorer.duration)*100+'% + 8px)',
             height: 50+8+8+'px',
             borderRadius: '12px',
-            border: '8px solid '+layer.color,
+            border: '8px solid '+stateExplorer.layer.color,
             pointerEvents: 'none',
           }`)
       //- right margin width/2
@@ -101,7 +101,7 @@
 <script>
 export default {
   name: 'layerEditor-layerFrames',
-  props: ['stateExplorer', 'layer'],
+  props: ['stateExplorer', 'stateLayerEditor'],
   data () {
     return {
       width: 0,
@@ -148,7 +148,7 @@ export default {
     async pointDrag (e, index) {
       // if (this.pointDraggingError) return
       // this.$log('pointDrag', e, index)
-      let t = this.layer.figuresAbsolute[index].t + ((e.delta.x / this.framesWidth) * this.stateExplorer.duration)
+      let t = this.stateExplorer.layer.figuresAbsolute[index].t + ((e.delta.x / this.framesWidth) * this.stateExplorer.duration)
       if (t > this.stateExplorer.duration || t < 0) return
       // this.$log('t', t)
       if (index === 0) {
@@ -165,7 +165,7 @@ export default {
       }
       this.stateExplorer.player.setCurrentTime(t)
       this.stateExplorer.set('currentTime', t)
-      this.layer.figuresAbsolute[index].t = t
+      this.stateExplorer.layer.figuresAbsolute[index].t = t
       if (e.isFirst) {
         this.stateExplorer.set('timeupdateStop', true)
         this.pointDragging = true
@@ -177,7 +177,7 @@ export default {
         this.stateExplorer.set('timeupdateStop', false)
         this.pointDragging = false
         this.pointDraggingIndex = null
-        this.stateExplorer.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
+        this.stateExplorer.player.setCurrentTime(this.stateExplorer.layer.figuresAbsolute[0].t)
         this.stateExplorer.set('editing', false)
         // TODO: if layerwidth > this.width?
         await this.$wait(300)
@@ -206,8 +206,8 @@ export default {
     },
     framesDragToLayer () {
       this.$log('framesDragToLayer')
-      let layerLeft = ((this.layer.figuresAbsolute[0].t / this.stateExplorer.duration) * this.framesWidth) + (this.width / 2)
-      let layerWidth = ((this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t) / this.stateExplorer.duration) * this.framesWidth
+      let layerLeft = ((this.stateExplorer.layer.figuresAbsolute[0].t / this.stateExplorer.duration) * this.framesWidth) + (this.width / 2)
+      let layerWidth = ((this.stateExplorer.layer.figuresAbsolute[1].t - this.stateExplorer.layer.figuresAbsolute[0].t) / this.stateExplorer.duration) * this.framesWidth
       let scrollLeft = layerLeft - (this.width - layerWidth) / 2
       this.$log('scrollLeft', scrollLeft)
       this.$tween.to(this.$refs.layerItemFramesScrollArea, 0.5, {scrollLeft: scrollLeft})
