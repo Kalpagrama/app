@@ -28,6 +28,7 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout").b-30
     div(
       :style=`{maxWidth: $store.state.ui.maxWidthPage+'px', borderRadius: '0 0 10px 10px'}`
       ).row.full-width.q-pa-md.b-50
+      kalpa-debug(:options=`{nodeActive,nodeVisible,stateNodeExplorer}`)
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       .col.full-height
         .row.fit.items-center.content-center.q-px-sm
@@ -60,14 +61,14 @@ q-layout(view="hHh lpR fFf" ref="nodeExplorerLayout").b-30
     q-page
       .row.full-width.justify-center
         div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
+          kalpa-debug(:options=`{nodeActive,nodeVisible,stateNodeExplorer}`)
           node(
             v-if="node"
             ctx="list"
             :node="node" :needFull="true"
-            :essence="true" :opened="true"
-            :visible="true" :active="true" :mini="false")
+            :visible="nodeVisible" :active="nodeActive" :mini="nodeMini")
       div(v-if="node").row.full-width
-        node-nodes(:node="node")
+        node-nodes(:node="node" :stateNodeExplorer="stateNodeExplorer")
 </template>
 
 <script>
@@ -83,10 +84,6 @@ export default {
       nodeVisible: true,
       nodeActive: true,
       nodeMini: false,
-      nodeHeight: 0,
-      nodeEssenceOffsetTop: 0,
-      nodeEssenceStickyShow: false,
-      scrollTop: 0,
       nodeEditorOpened: false,
       nodeEditorItem: null,
       showMenuRight: false,
@@ -99,6 +96,15 @@ export default {
   computed: {
     pageId () {
       return this.$route.params.page
+    },
+    stateNodeExplorer () {
+      return {
+        nodeVisible: this.nodeVisible,
+        nodeActive: this.nodeActive,
+        set: (key, val) => {
+          this[key] = val
+        }
+      }
     }
   },
   watch: {

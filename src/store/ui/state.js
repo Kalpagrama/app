@@ -12,5 +12,7 @@ export default {
   iWantSound: false,
   showDrawerLeft: false,
   appShowMenu: false,
+  appFullscreen: false,
+  panelMaxWidth: 0,
   wsShowMenu: true
 }

@@ -7,10 +7,6 @@ import { LoadingBar, date } from 'quasar'
 import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueMasonry from 'vue-masonry-css'
-// import Vue from 'vue'
-// window.Vue = null
-// import VueRx from 'vue-rx'
-// Vue.use(VueRx)
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -35,7 +31,6 @@ export default async ({ Vue, store, router: VueRouter }) => {
   try {
     router = VueRouter
     Vue.use(VueMasonry)
-    // VueRx(Vue)
     // Vue.use(VueYandexMetrika, {
       //   id: 60818698,
       //   router: router,
@@ -44,11 +39,11 @@ export default async ({ Vue, store, router: VueRouter }) => {
       // })
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-    // LoadingBar.setDefaults({
-    //   color: 'purple',
-    //   size: '50px',
-    //   position: 'top'
-    // })
+    LoadingBar.setDefaults({
+      color: 'green',
+      size: '4px',
+      position: 'top'
+    })
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {
       return date.formatDate(ts, format || 'YYYY.MM.DD', {
@@ -77,6 +72,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     // workspace
     Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
     Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
+    Vue.component('wsContentExplorer', () => import('components/workspace/ws_content_explorer'))
     Vue.component('wsChainList', () => import('components/workspace/ws_chain_list'))
     Vue.component('wsChainEditor', () => import('components/workspace/ws_chain_editor'))
     Vue.component('wsNodeList', () => import('components/workspace/ws_node_list'))
@@ -97,6 +93,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('listMiddle', () => import('components/list_middle'))
     Vue.component('listTable', () => import('components/list_table'))
     // kalpa
+    Vue.component('kalpaPage', () => import('components/kalpa/page'))
     Vue.component('kalpaDebug', () => import('components/kalpa/debug'))
     Vue.component('kalpaMenu', () => import('components/kalpa/menu'))
     Vue.component('kalpaMenuRight', () => import('components/kalpa/menu_right'))

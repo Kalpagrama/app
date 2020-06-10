@@ -21,7 +21,7 @@ div(
     ctx="workspace"
     :visible="true" :active="true" :mini="false"
     :value="value").full-height
-    template(v-if="showHeader" v-slot:header)
+    template(v-if="true" v-slot:header)
       //- kalpa-debug(:options=`{editorType,pageId}`)
       div(:style=`{height: '70px'}`
         ).row.full-width.items-center.content-center.q-px-sm

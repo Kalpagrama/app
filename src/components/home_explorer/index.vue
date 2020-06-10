@@ -1,6 +1,8 @@
 <template lang="pug">
 //- container :style=`{height: $q.screen.height+'px'}`
-q-layout(view="hHh lpR fFf").b-30
+q-layout(
+  view="hHh lpR fFf"
+  container :style=`{height: $q.screen.height+'px'}`).b-30
   q-header(
     v-if="true"
     reveal :style=`{zIndex: 30000}`).row.full-width.justify-center

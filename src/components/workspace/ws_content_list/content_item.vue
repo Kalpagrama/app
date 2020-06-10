@@ -18,7 +18,8 @@ div(
       v-if="!thumbErrored"
       @error="thumbErrorHandle"
       :src="content.thumbOid"
-      :style=`{objectFit: 'cover'}`).fit
+      draggable="false"
+      :style=`{objectFit: 'cover', userSelect: 'none'}`).fit
     q-icon(
       v-if="thumbErrored"
       name="photo" size="150px" :style=`{color: 'rgb(90,90,90)'}`).full-width

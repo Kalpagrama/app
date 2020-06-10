@@ -5,7 +5,12 @@
 </style>
 
 <template lang="pug">
-div(:style=`{}`).column.fit.b-50
+div(
+  :style=`{
+    width: width+'px',
+    borderRadius: '10px',
+    overflow: 'hidden',
+  }`).column.full-height.b-50
   //- header
   div(
     :style=`{height: '90px'}`
@@ -68,7 +73,7 @@ div(:style=`{}`).column.fit.b-50
           span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Logout
         //- create node
         div(
-          v-if="true"
+          v-if="false"
           :style=`{}`
           ).row.full-width.items-center.content-center.q-px-md.q-py-sm
           q-btn(
@@ -88,6 +93,7 @@ export default {
   name: 'kalpaMenu',
   data () {
     return {
+      width: 300,
       pages: [
         {id: 'home', name: 'Home', icon: 'home'},
         {id: 'trends', name: 'Trends', icon: 'whatshot'},

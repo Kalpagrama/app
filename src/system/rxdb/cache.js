@@ -264,7 +264,7 @@ class Cache {
         }
         return null
       }
-      logD(f, 'complete', rxDoc)
+      // logD(f, 'complete', rxDoc)
       return rxDoc
     } finally {
       this.release()

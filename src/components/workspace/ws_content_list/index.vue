@@ -9,21 +9,13 @@
 
 <template lang="pug">
 div(
+  :class=`{
+    'full-height': !inDialog,
+  }`
   :style=`{
-    position: 'relative'
+    position: 'relative',
   }`
   ).column.full-width
-  q-dialog(
-    v-model="listShow" position="bottom")
-    ws-content-list(
-      ctx="workspace"
-      :style=`{
-        maxWidth: 800+'px',
-        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
-        minHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
-        borderRadius: '10px',
-        overflow: 'hidden',
-      }`).fit.b-30
   //- ws content editor
   q-dialog(
     v-model="contentEditorOpened" position="bottom"
@@ -38,7 +30,7 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`).b-50
   //- header
-  kalpa-debug(:options=`{ctx}`)
+  //- kalpa-debug(:options=`{ctx}`)
   div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
@@ -73,14 +65,7 @@ div(
     div(:style=`{}`).row.full-width.items-end.content-end
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
-      q-btn(round flat dense color="white" icon="menu" @click="listShow = true").b-70
-      //- q-btn-group(flat :style=`{borderRadius: '10px'}`).b-70
-      //-   q-btn(
-      //-     v-for="(v,vi) in listViews" :key="v.id" @click="listView = v.id"
-      //-     round dense flat
-      //-     :icon="v.icon"
-      //-     :color="listView === v.id ? 'green' : 'grey-6'")
-      //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70 {{$q.screen.xs ? '' : 'Filters'}}
+      //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
@@ -113,6 +98,12 @@ export default {
   name: 'wsContentList',
   components: {contentItem},
   props: {
+    inDialog: {
+      type: Boolean,
+      default () {
+        return false
+      }
+    },
     ctx: {
       type: String,
       default () {
@@ -187,13 +178,14 @@ export default {
     },
     contentPicked (content) {
       this.$log('contentPicked')
-      if (this.ctx === 'workspace') {
-        this.content = content
-        this.contentEditorOpened = true
-      }
-      else {
-        this.$emit('content', JSON.parse(JSON.stringify(content)))
-      }
+      // if (this.ctx === 'workspace') {
+      //   this.content = content
+      //   this.contentEditorOpened = true
+      // }
+      // else {
+      //   this.$emit('content', JSON.parse(JSON.stringify(content)))
+      // }
+      this.$router.push(`/workspace/content/${content.id}`)
     },
     contentExplore (c, ci) {
       this.$log('contentExplore', c, ci)

@@ -2,17 +2,17 @@
 .column.fit
   div().row.full-with.q-pa-md
   div(:style=`{position: 'relative'}`).col.full-width.scroll
-    //- .row.fit.q-px-sm
-    //-   div(:style=`{borderRadius: '10px', overflow: 'hidden'}`
-    //-     ).row.fit.items-center.content-center.justify-center.b-70
-    //-     q-spinner(size="50px" color="green")
-    node(
-      ctx="workspace"
-      :node="nodePreview" :nodeFullReady="nodePreview"
-      :visible="true" :active="true" :mini="false"
-      :style=`{
-        minHeight: '400px',
-      }`).fit
+    .row.fit.q-px-sm
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`
+        ).row.fit.items-center.content-center.justify-center.b-70
+        q-spinner(size="50px" color="green")
+    //- node(
+    //-   ctx="workspace"
+    //-   :node="nodePreview" :nodeFullReady="nodePreview"
+    //-   :visible="true" :active="true" :mini="false"
+    //-   :style=`{
+    //-     minHeight: '400px',
+    //-   }`).fit
   .row.full-width.items-center.content-center.q-px-sm.q-py-md
     q-btn(
       flat color="white" no-caps icon-right="keyboard_arrow_down"
@@ -52,16 +52,22 @@ export default {
       try {
         this.$log('nodePublish start')
         this.nodePublishing = true
-        // await this.$wait(2000)
-
+        // create
+        this.$q.loading.show({spinnerColor: 'green', message: 'Creating node...'})
+        await this.$wait(400)
         let res = await NodeApi.nodeCreate(this.node)
-        // let res = await this.$store.dispatch('node/nodeCreate', JSON.parse(JSON.stringify(this.node)))
-        this.$log('nodePublish res=', res)
-        // this.nodePublishing = false
-        // go to node
+        this.$log('nodePublish res', res)
+        // publish
+        this.$q.loading.show({spinnerColor: 'green', message: 'Publishing node...'})
+        await this.$wait(1000)
         this.node.stage = 'published'
+        // done
+        this.$q.loading.show({spinnerColor: 'green', message: 'Done !'})
+        await this.$wait(2000)
+        this.$q.loading.hide()
+        this.nodePublishing = false
+        this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
         this.$emit('close')
-        // this.$router.push('/account')
       } finally {
         this.nodePublishing = false
       }
