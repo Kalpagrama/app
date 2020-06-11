@@ -115,10 +115,11 @@ export default {
     return {
       type: 'VIDEO',
       types: [
-        {id: 'all', name: 'All'},
+        // {id: 'all', name: 'All'},
         {id: 'VIDEO', name: 'Video'},
         {id: 'IMAGE', name: 'Images'},
-        {id: 'BOOK', name: 'Books'}
+        {id: 'BOOK', name: 'Books'},
+        {id: 'WEB', name: 'Web'}
       ],
       searchString: '',
       searchStringRaw: '',

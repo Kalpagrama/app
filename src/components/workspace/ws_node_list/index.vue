@@ -89,9 +89,9 @@ export default {
   components: {nodeItem},
   data () {
     return {
-      type: 'all',
+      type: 'draft',
       types: [
-        {id: 'all', name: 'All'},
+        // {id: 'all', name: 'All'},
         {id: 'saved', name: 'Saved'},
         {id: 'draft', name: 'Drafts'},
         {id: 'published', name: 'Published'},

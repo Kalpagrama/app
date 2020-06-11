@@ -36,6 +36,7 @@ div(:style=`{position: 'relative'}`).column.fit
       div(:style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center.q-mr-md
         q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").b-60
       q-btn(round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm.q-mr-md Create node
+      q-btn(round dense color="green" no-caps @click="layersSelectedGroup()").q-px-sm.q-mr-md Group
       //- .col
       q-btn(round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm.b-60 Delete
   //- layer editor
@@ -69,7 +70,17 @@ div(:style=`{position: 'relative'}`).column.fit
               :style=`{opacity: layersSelected.includes(l.id) ? 1 : 0.6}`)
           //- middle layer
           .col.full-height
+            //- div(
+            //-   v-if="l.color.split('::')[0] === 'group'"
+            //-   :style=`{height: '60px'}`
+            //-   ).row.full-width.bg-red
+            //-   div(v-for="(p,pi) in l.color.")
+            layer-group(
+              v-if="l.color.split('::')[0] === 'group'"
+              :value="l"
+              :style=`{}`)
             layer-item(
+              v-else
               :stateExplorer="stateExplorer" :layer="l" :layerIndex="l"
               :style=`{}`)
           //- right drag
@@ -86,11 +97,12 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import draggable from 'vuedraggable'
 import layerItem from './layer_item'
+import layerGroup from './layer_group'
 import layerEditor from '../../layer_editor'
 
 export default {
   name: 'metaLayers',
-  components: {draggable, layerItem, layerEditor},
+  components: {draggable, layerItem, layerGroup, layerEditor},
   props: ['stateExplorer', 'resizable'],
   data () {
     return {
@@ -176,6 +188,21 @@ export default {
       let node = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeAdd done', node)
       return node
+    },
+    layersSelectedGroup () {
+      this.$log('layersSelectedGroup')
+      let layerIndex = this.stateExplorer.contentWs.layers.length
+      let layerInput = {
+        id: Date.now().toString(),
+        contentOid: this.stateExplorer.content.oid,
+        figuresAbsolute: [
+          {t: 0, points: []},
+          {t: this.stateExplorer.duration, points: []}
+        ],
+        spheres: [{name: 'Group: '}],
+        color: 'group::[]',
+      }
+      this.$set(this.stateExplorer.contentWs.layers, layerIndex, layerInput)
     },
     async layersSelectedCreateNode () {
       this.$log('layersSelectedCreateNode')

@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    height: '80px',
+    height: '60px',
   }`
   ).row.full-width.items-center.content-center.q-px-md.q-py-sm
   //- user avatar
@@ -24,7 +24,6 @@ div(
 </template>
 
 <script>
-// v-if="false && opened && nodeFull"
 export default {
   name: 'nodeLayoutPip-nodeAuthor',
   props: ['node', 'nodeFull', 'statePip'],

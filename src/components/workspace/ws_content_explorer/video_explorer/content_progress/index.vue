@@ -1,37 +1,44 @@
 <template lang="pug">
-.row.full-width.q-pb-sm
+.row.full-width
   //- tools
   div(
     :style=`{
-      order: -1
+      order: -1,
+      opacity: 0.9,
     }`
-    ).row.full-width.q-py-sm
+    ).row.full-width.q-pb-xs
     q-btn(
       @click="stateExplorer.playing ? stateExplorer.player.pause() : stateExplorer.player.play()"
-      round flat dense color="grey-4"
+      round flat dense color="grey-5"
       :icon="stateExplorer.playing ? 'pause' : 'play_arrow'")
-    q-btn(round flat dense color="grey-4" icon="volume_up")
+    q-btn(
+      v-if="stateExplorer.player"
+      @click="volumeToggle()"
+      round flat dense color="grey-5"
+      :icon="stateExplorer.player.muted ? 'volume_off' : 'volume_up'")
     .col
-    q-btn(round flat dense color="grey-4" icon="fast_rewind" @click="fast(false)")
-    q-btn(flat dense color="grey-4")
-      span {{ $time(stateExplorer.currentTime) }}
-      span.q-mx-xs /
-      span {{ $time(stateExplorer.duration) }}
-    q-btn(round flat dense color="grey-4" icon="fast_forward" @click="fast(true)")
+    q-btn(round flat dense color="grey-5" icon="fast_rewind" @click="fast(false)")
+    q-btn(flat dense color="grey-4").text-grey-5
+      small {{ $time(stateExplorer.currentTime) }}
+      small.q-mx-xs /
+      small {{ $time(stateExplorer.duration) }}
+    q-btn(round flat dense color="grey-5" icon="fast_forward" @click="fast(true)")
     .col
     q-btn(
       @click="$store.commit('ui/stateSet', ['appFullscreen', !$store.state.ui.appFullscreen])"
-      round flat dense color="grey-4"
+      round flat dense color="grey-5"
       :icon="$store.state.ui.appFullscreen ? 'fullscreen_exit' : 'fullscreen'"
       )
-    q-btn(round flat dense color="grey-4" icon="more_vert")
+    q-btn(round flat dense color="grey-5" icon="more_vert")
   //- bar
   div(
     @click="barClick"
     v-touch-pan.mouse.left.right="barDrag"
+    @mousemove="barMove"
+    @mouseleave="nowHover = null"
     :style=`{
       position: 'relative',
-      height: '40px',
+      height: '50px',
       borderRadius: '10px',
       overflow: 'hidden',
     }`
@@ -46,8 +53,24 @@
         left: stateExplorer.currentTime/stateExplorer.duration*100+'%',
         pointerEvents: 'none',
       }`
-      ).row.full-height.bg-red
-    //- now left WIDTH
+      ).row.full-height.bg-green
+    //- now HOVER
+    div(
+      v-if="nowHover"
+      :style=`{
+        position: 'absolute',
+        zIndex: 1100,
+        width: '3px',
+        left: nowHover+'%',
+        pointerEvents: 'none'
+      }`
+      ).row.full-height.bg-green
+      small(
+        :style=`{
+          position: 'absolute', zIndex: 1200,
+          top: '0px', left: '-15px',
+        }`).text-white {{ $time(nowHoverTime) }}
+    //- now WIDTH
     div(
       :style=`{
         position: 'absolute', zIndex: 100,
@@ -56,9 +79,11 @@
         pointerEvents: 'none',
         opacity: 0.8
       }`
-      ).row.full-height.b-140
+      ).row.full-height.b-100
+    //- COMPOSITIONS on th BAR
     //- LAYERS on the BAR
     div(
+      v-if="false"
       :style=`{
         position: 'absolute', zIndex: 200,
         top: '0px',
@@ -83,15 +108,22 @@ export default {
   data () {
     return {
       barWidth: null,
-      barDragging: false
+      barDragging: false,
+      nowHover: null,
+      nowHoverTime: 0
     }
   },
   computed: {
-    layers () {
-      return this.stateExplorer?.contentWs?.layers
-    }
+    // layers () {
+    //   return this.stateExplorer?.contentWs?.layers
+    // }
   },
   methods: {
+    volumeToggle () {
+      this.$log('volumeToggle')
+      if (this.stateExplorer.player.muted) this.stateExplorer.player.setMuted(false)
+      else this.stateExplorer.player.setMuted(true)
+    },
     fast (forward) {
       this.$log('fast', forward)
       let t = this.stateExplorer.currentTime
@@ -101,6 +133,13 @@ export default {
       if (t > this.stateExplorer.duration) t = this.stateExplorer.duration
       this.stateExplorer.set('currentTime', t)
       this.stateExplorer.player.setCurrentTime(t)
+    },
+    barMove (e) {
+      // this.$log('barMove', e.target.clientWidth)
+      let left = e.offsetX
+      let width = e.target.clientWidth
+      this.nowHover = (left / width) * 100
+      this.nowHoverTime = (left / width) * this.stateExplorer.duration
     },
     barClick (e) {
       this.$log('barClick', e)

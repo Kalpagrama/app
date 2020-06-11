@@ -41,7 +41,7 @@ div(
     ).row.fit.items-start.content-start
     //- items stats
     div(
-      v-if="visible && active && items.length > 1"
+      v-if="false && visible && active && items.length > 1"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '0px',
         transform: 'translate3d(0,0,0)',

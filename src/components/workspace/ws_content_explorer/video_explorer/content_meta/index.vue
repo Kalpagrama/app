@@ -36,7 +36,7 @@ div(
           :stateExplorer="stateExplorer"
           :resizable="resizable")
       //- footer
-      div(v-if="!resizable && !stateExplorer.layerEditing").row.full-width.justify-center
+      div(v-if="!resizable && !stateExplorer.compositionEditing").row.full-width.justify-center
         q-tabs(
           :value="stateExplorer.pageId" @input="stateExplorer.set('pageId', $event)"
           dense no-caps color="white"
@@ -54,13 +54,13 @@ div(
 import metaPeople from './meta_people'
 import metaLayers from './meta_layers'
 import metaSpheres from './meta_spheres'
-import metaNodes from './meta_nodes'
 import metaChat from './meta_chat'
 import metaInfo from './meta_info'
+import metaCompositions from './meta_compositions'
 
 export default {
   name: 'contentMeta',
-  components: {metaLayers, metaNodes, metaChat, metaPeople, metaSpheres, metaInfo},
+  components: {metaLayers, metaChat, metaPeople, metaSpheres, metaInfo, metaCompositions},
   props: ['stateExplorer', 'resizable'],
   data () {
     return {

@@ -36,7 +36,7 @@ div(
   div(:style=`{position: 'relative', height: videoHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
     //- layer ADD
     q-btn(
-      @click="layerAddBtnClick"
+      @click="compositionAddClick()"
       round push color="green" icon="add"
       :size="$q.screen.xs ? 'md' : 'lg'"
       :style=`{
@@ -51,7 +51,8 @@ div(
   //- bottom meta
   div(v-show="!$store.state.ui.appFullscreen").col.full-width
     .column.fit
-      div(:style=`{height: '50px'}`).row.full-width
+      div(:style=`{height: '26px'}`).row.full-width
+      //- kalpa-debug(:options=`{compositionSelected,compositionEditing}`)
       .col.full-width
         content-meta(
           :stateExplorer="stateExplorer"
@@ -81,11 +82,10 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 import contentPlayer from './content_player'
 import contentMeta from './content_meta'
 import contentProgress from './content_progress'
-import layerEditor from './layer_editor'
 
 export default {
   name: 'contentExplorer-video',
-  components: {contentPlayer, contentMeta, contentProgress, layerEditor},
+  components: {contentPlayer, contentMeta, contentProgress},
   props: ['content'],
   data () {
     return {
@@ -95,69 +95,54 @@ export default {
       duration: 0,
       loadeddata: false,
       playing: false,
-      pageId: 'layers',
+      pageId: 'compositions',
       pages: [
-        {id: 'info', name: 'Info', icon: 'details'},
-        {id: 'layers', name: 'Layers', icon: 'layers'},
-        {id: 'nodes', name: 'Nodes', icon: 'hdr_strong'},
-        {id: 'spheres', name: 'Spheres', icon: 'blur_on'},
-        {id: 'people', name: 'People', icon: 'perm_identity'},
-        {id: 'chat', name: 'Chat', icon: 'chat_bubble_outline'},
+        {id: 'info', name: 'Details', icon: 'details'},
+        {id: 'compositions', name: 'Fragments', icon: 'crop_free'},
+        {id: 'spheres', name: 'Explore', icon: 'language'},
+        // {id: 'people', name: 'People', icon: 'perm_identity'},
+        // {id: 'chat', name: 'Chat', icon: 'chat_bubble_outline'},
       ],
-      layerEditorOpened: false,
-      layerSelected: null,
-      layerEditing: null,
-      layersSelected: []
+      // composition
+      composition: null,
+      compositionSelected: null,
+      compositionEditing: null
     }
   },
   computed: {
     videoHeight () {
-      if (this.$store.state.ui.appFullscreen) return this.$q.screen.height - 53
+      if (this.$store.state.ui.appFullscreen) return this.$q.screen.height - 43
       else return this.$q.screen.height * 0.4
     },
     footerBottom () {
-      return this.$q.screen.height - this.videoHeight - 53
+      return this.$q.screen.height - this.videoHeight - 26
     },
     footerWidth () {
       if (this.$q.screen.width > 600) return 600
-      else return this.$q.screen.width - 50
+      else return this.$q.screen.width - 80
     },
     footerLeft () {
       if (this.$q.screen.width > 600) return `calc(50% - ${this.footerWidth / 2}px)`
       else return `calc(50% - ${this.footerWidth / 2}px)`
     },
-    layer () {
-      return this.content.layers.find(layer => layer.id === this.layerSelected)
-    },
-    layerStart () {
-      return this.layer?.figuresAbsolute[0].t
-    },
-    layerEnd () {
-      return this.layer?.figuresAbsolute[1].t
-    },
-    layerDuration () {
-      return this.layerEnd - this.layerStart
-    },
     stateExplorer () {
       return {
-        pageId: this.pageId,
         pages: this.pages,
+        pageId: this.pageId,
         content: this.contentKalpa,
         contentWs: this.content,
+        // player
         player: this.player,
         duration: this.duration,
         currentTime: this.currentTime,
         loadeddata: this.loadeddata,
         playing: this.playing,
-        layer: this.layer,
-        layerStart: this.layerStart,
-        layerEnd: this.layerEnd,
-        layerDuration: this.layerDuration,
-        layerEditorOpened: false,
-        layerSelected: this.layerSelected,
-        layerEditing: this.layerEditing,
-        layersSelected: this.layersSelected,
-        layerAdd: this.layerAdd,
+        // composition
+        composition: this.composition,
+        compositionSelected: this.compositionSelected,
+        compositionEditing: this.compositionEditing,
+        compositionAdd: this.compositionAdd,
+        compositionAddClick: this.compositionAddClick,
         set: (key, val) => {
           this[key] = val
         }
@@ -167,56 +152,52 @@ export default {
   watch: {
     'stateExplorer.currentTime': {
       handler (to, from) {
-        let layer = this.stateExplorer.layer
-        if (layer) {
-          if (to > layer.figuresAbsolute[1].t) {
-            this.stateExplorer.player.setCurrentTime(layer.figuresAbsolute[0].t)
-          }
-          if (to < layer.figuresAbsolute[0].t) {
-            this.stateExplorer.player.setCurrentTime(layer.figuresAbsolute[0].t)
-          }
-        }
       }
     }
   },
   methods: {
-    async layerAddBtnClick () {
-      this.$log('layerAddBtnClick')
-      let layerId = await this.stateExplorer.layerAdd()
-      this.stateExplorer.set('layerSelected', layerId)
-      this.stateExplorer.set('layerEditing', layerId)
+    async compositionAddClick () {
+      this.$log('compositionAddClick')
+      let composition = await this.compositionAdd()
+      this.stateExplorer.set('composition', composition)
+      this.stateExplorer.set('compositionSelected', composition.id)
+      this.stateExplorer.set('compositionEditing', composition.id)
     },
-    layerAdd (layerInput) {
-      this.$log('layerAdd')
-      if (!layerInput) {
-        let start = this.stateExplorer.currentTime
-        let end = start + 10 > this.stateExplorer.duration ? this.stateExplorer.duration : start + 10
-        layerInput = {
-          contentOid: this.stateExplorer.content.oid,
-          figuresAbsolute: [
-            {t: start, points: []},
-            {t: end, points: []}
-          ],
-          figuresRelative: [],
-          spheres: []
-        }
-      }
-      // make layer input
-      let layerIndex = this.stateExplorer.contentWs.layers.length
+    async compositionAdd () {
+      this.$log('nodeAdd')
       let layerId = Date.now().toString()
-      layerInput.id = layerId
-      layerInput.color = this.$randomColor(layerId)
-      this.$log('layerAdd layerInput', layerInput)
-      // set layer
-      this.$set(this.stateExplorer.contentWs.layers, layerIndex, layerInput)
-      this.$log('layerAdd done')
-      return layerId
+      let layerColor = this.$randomColor(layerId)
+      let compositionInput = {
+        wsItemType: 'WS_CONTENT',
+        contentOid: this.stateExplorer.content.oid,
+        contentType: 'COMPOSITION',
+        thumbOid: this.stateExplorer.content.thumbUrl,
+        name: '',
+        layers: [
+          {
+            id: layerId,
+            color: layerColor,
+            contentOid: this.stateExplorer.content.oid,
+            figuresAbsolute: [
+              {t: this.stateExplorer.currentTime, points: []},
+              {t: this.stateExplorer.currentTime + 10, points: []}
+            ],
+            figuresRelative: [],
+            spheres: []
+          }
+        ],
+        spheres: [],
+        operation: { items: null, operations: null, type: 'CONCAT' }
+      }
+      let res = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, compositionInput)
+      this.$log('res', res)
+      return res
     },
   },
   async mounted () {
     this.$log('mounted')
     this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, this.content.contentOid)
-    if (this.$q.screen.xs) this.$store.commit('ui/stateSet', ['appFullscreen', true])
+    // if (this.$q.screen.xs) this.$store.commit('ui/stateSet', ['appFullscreen', true])
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

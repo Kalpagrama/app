@@ -4,18 +4,11 @@ div(
     position: 'relative',
     borderRadius: '10px', overflow: 'hidden'
   }`
-  ).column.fit
-  .col.full-width
-    component(
-      :is="'layer-'+tabId"
-      :stateExplorer="stateExplorer" :stateLayerEditor="stateLayerEditor"
-      :style=`{}`
-      )
-  layer-tools(
-    :stateExplorer="stateExplorer" :stateLayerEditor="stateLayerEditor"
-    :style=`{
-      order: 1
-    }`)
+  ).row.full-width
+  layer-name(
+    @add="$emit('add')"
+    :stateExplorer="stateExplorer"
+    :stateLayerEditor="stateLayerEditor")
 </template>
 
 <script>
@@ -27,7 +20,7 @@ import layerTools from './layer_tools'
 export default {
   name: 'layerEditor',
   components: {layerName, layerBorders, layerSpheres, layerTools},
-  props: ['stateExplorer'],
+  props: ['stateExplorer', 'layer'],
   data () {
     return {
       tabId: 'name',
@@ -39,10 +32,20 @@ export default {
     }
   },
   computed: {
+    layerStart () {
+      return this.layer.figuresAbsolute[0].t
+    },
+    layerEnd () {
+      return this.layer.figuresAbsolute[1].t
+    },
+    layerDuration () {
+      return this.layerEnd - this.layerStart
+    },
     stateLayerEditor () {
       return {
-        tabId: this.tabId,
-        tabs: this.tabs,
+        layer: this.layer,
+        layerStart: this.layerStart,
+        layerEnd: this.layerEnd,
         set: (key, val) => {
           this[key] = val
         }

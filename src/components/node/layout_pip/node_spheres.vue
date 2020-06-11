@@ -8,8 +8,8 @@
 <template lang="pug">
 div(
   :style=`{
-    height: 50+'px',
-  }`).row.full-width.items-start.content-start.q-py-sm.q-px-md
+    height: 40+'px',
+  }`).row.full-width.items-center.content-center.q-px-md
   //- div(:style=`{height: '100px', marginBottom: -openedHeight+'px'}`).row.full-width
   //- target="_blank"
   router-link(
@@ -17,7 +17,7 @@ div(
     :to="'/sphere/'+s.oid"
     :style=`{borderRadius: '10px', userSelect: 'none'}`
     ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-80.sphere
-    small {{ '# '+s.name }}
+    small {{ s.name }}
 </template>
 
 <script>

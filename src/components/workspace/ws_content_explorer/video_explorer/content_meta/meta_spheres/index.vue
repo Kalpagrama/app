@@ -1,11 +1,12 @@
 <template lang="pug">
-.column.fit
-  //- header
-  .row.full-width.q-px-sm
-    .row.full-width.q-py-md
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Spheres
-  //- body
-  .col.full-width.scroll
+.row.fit.justify-center
+  div(:style=`{maxWidth: '600px'}`).column.fit
+    //- header
+    .row.full-width.q-px-sm
+      .row.full-width.q-py-md
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold Explore
+    //- body
+    .col.full-width.scroll
 </template>
 
 <script>

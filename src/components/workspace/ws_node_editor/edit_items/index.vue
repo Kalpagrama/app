@@ -3,18 +3,6 @@ div(
   :style=`{
     position: 'relative',
   }`).column.fit
-  //- item add btn
-  //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-  //-   q-btn(
-  //-     v-if="node.items.length > 0 && itemsSelected.length === 0 && !itemEditorOpened"
-  //-     push round color="green" icon="add" @click="itemAdd()"
-  //-     :size="$q.screen.gt.xs ? 'xl' : 'lg'"
-  //-     :style=`{
-  //-       position: 'absolute', zIndex: 1000,
-  //-       bottom: '10px',
-  //-       right: '10px',
-  //-       borderRadius: '50%'
-  //-     }`)
   //- item find
   q-dialog(
     v-model="itemFinderOpened" position="bottom"
@@ -47,78 +35,49 @@ div(
         minHeight: $q.screen.height+'px',
         maxWidth: $store.state.ui.maxWidthPage+'px'
       }`)
-  //- header
-  div(:style=`{position: 'relative', height: '50px'}`).row.full-width
-    .row.full-width.q-pa-sm
-      q-input(
-        v-model="searchString"
-        filled dark dense color="grey-6"
-        label="Find item..."
-        :style=`{}`).full-width
-        template(v-slot:prepend)
-          q-btn(
-            flat dense color="grey-6" icon="search")
-        template(v-slot:append)
-          q-btn(
-            v-if="searchString.length > 0"
-            flat dense color="grey-6" icon="clear" @click="searchString = ''")
-    //- header: selected
-    div(
-      v-if="itemsSelected.length > 0"
-      :style=`{
-        position: 'absolute', zIndex: 1000,
-      }`
-      ).row.full-width.q-pa-sm
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-50.q-pa-xs
-        q-btn(round flat dense color="white" icon="clear" @click="itemsSelectedDrop()").b-70.q-mr-sm.q-ml-sm
-        q-btn(flat color="white" no-caps @click="itemsSelectedDelete()").b-70 Delete
   //- body
   div(
     :style=`{
       position: 'relative',
       overflowX: 'hidden',
-    }`).col.full-width.scroll.q-py-md
-    //- items
-    div(v-if="node.items.length > 0").row.full-width.items-start.content-start.q-px-sm
-      draggable(
-        :list="node.items" group="items" handle=".item-drag-handle"
-        @start="itemsDragging = true"
-        @end="itemsDragging = false").full-width
-        div(
-          v-for="(i,ii) in items" :key="i.id"
-          ).row.full-width
-          //- left
+    }`).col.full-width.scroll.q-py-lg
+    .row.full-width.items-start.content-start.justify-center
+      div(:style=`{maxWidth: '600px'}`).row.full-width
+        draggable(
+          :list="node.items" group="items" handle=".item-drag-handle"
+          @start="itemsDragging = true"
+          @end="itemsDragging = false"
+          ).full-width
           div(
-            :style=`{
-              overflow: 'hidden',
-              width: '50px', height: '50px'
-            }`).row.items-start.content-start.justify-end
-            q-checkbox(v-model="itemsSelected" :val="i.id" dark color="grey-6")
-          //- center
-          .col.item-drag-handle
-            item-item(
-              @edit="itemEdit(i,ii)"
-              @copy="itemCopy(i,ii)"
-              @delete="itemDelete(i,ii)"
-              :item="i" :itemIndex="itemIndex"
-              :style=`{}`).q-mb-sm.b-70
-      //- add item
-      div(:style=`{paddingLeft: '50px'}`).row.full-width
-        q-btn(
-          @click="itemAdd()"
-          flat color="green" icon="add"
-          :style=`{height: '60px'}`
-          ).full-width.b-60
-    //- add first item
-    div(v-else).row.fit.items-start.content-start.justify-center.q-pa-sm
-      div(
-        :style=`{}`
-        ).row.full-width.justify-center.q-mb-sm
-        div(:style=`{maxWidth: '700px', height: '400px', borderRadius: '10px'}`
-          ).row.full-width.items-center.content-center.justify-center.b-60
-          q-btn(round flat color="green" icon="add" size="xl" @click="itemAdd()")
-          .row.full-width.justify-center
-            span(:style=`{fontSize: '15px'}`).text-white Add first item
+            v-for="(i,ii) in node.items" :key="i.id"
+            ).row.full-width.items-start.content-start
+            //- left
+            div(
+              :style=`{
+                overflow: 'hidden',
+                width: '40px', height: '40px'
+              }`).row.items-start.content-start.justify-center
+              q-checkbox(v-model="itemsSelected" :val="i.id" dark color="grey-6")
+            //- center
+            .col
+              item-item(
+                @edit="itemEdit(i,ii)"
+                @copy="itemCopy(i,ii)"
+                @delete="itemDelete(i,ii)"
+                :item="i" :itemIndex="itemIndex"
+                :style=`{}`).q-mb-sm.b-70
+            div(:style=`{width: '40px'}`)
+              q-btn(round flat dense color="grey-6" icon="drag_indicator").item-drag-handle
+                //- TODO: actions
+        //- add item
+        div(
+          v-if="node.items.length < 4"
+          ).row.full-width.q-mb-sm
+          q-btn(
+            @click="itemAdd()"
+            flat color="green" icon="add" size="lg"
+            :style=`{height: '280px'}`
+            ).full-width.b-60
 </template>
 
 <script>
@@ -134,56 +93,10 @@ export default {
       item: null,
       itemFinderOpened: false,
       itemEditorOpened: false,
-      itemsEditing: false,
-      itemsEditingToolsWidth: 0,
-      itemsSelected: [],
       itemsDragging: false,
-      searchString: ''
-    }
-  },
-  computed: {
-    items () {
-      return this.node.items.filter((i, ii) => {
-        if (this.searchString.length > 0) {
-          let nameRegExp = new RegExp(this.searchString, 'i')
-          // let name = i.layers[0].spheres[0].name
-          // return nameRegExp.test(l.layers[0].name)
-          return true
-        }
-        else {
-          return true
-        }
-      })
-    }
-  },
-  watch: {
-    itemsEditing: {
-      handler (to, from) {
-        // this.$log('itemsEditing CHANGED', to)
-        this.$tween.to(this, 0.3, {itemsEditingToolsWidth: to ? 50 : 0})
-      }
     }
   },
   methods: {
-    itemsSelectedDrop () {
-      this.$log('itemsSelectedDrop')
-      this.itemsSelected = []
-    },
-    itemsSelectedDelete () {
-      this.$log('itemsSelectedDelete start')
-      if (!confirm('Delete items ?!')) {
-        this.itemsSelectedDrop()
-        return
-      }
-      this.itemsSelected.map(id => {
-        let i = this.node.items.findIndex(item => item.id === id)
-        if (i >= 0) {
-          this.$delete(this.node.items, i)
-        }
-      })
-      this.$log('itemsSelectedDelete done')
-      this.itemsSelectedDrop()
-    },
     itemEdit (i, ii) {
       this.$log('itemEdit', i, ii)
       this.item = i

@@ -27,19 +27,19 @@ div(
     v-if="false"
     v-bind="$props" :stateNode="stateNode")
   node-essence(
-    v-if="ctx !== 'workspace'"
+    v-if="true && ctx !== 'workspace'"
     v-bind="$props" :stateNode="stateNode"
     :style=`{
       order: 2
     }`)
   node-author(
-    v-if="false && nodeFull && ctx  !== 'workspace'"
+    v-if="true && nodeFull && ctx  !== 'workspace'"
     v-bind="$props" :stateNode="stateNode"
     :style=`{
       order: 3
     }`)
   node-spheres(
-    v-if="false && nodeFull && nodeFull.spheres.length > 0"
+    v-if="true && nodeFull && nodeFull.spheres.length > 0"
     v-bind="$props" :stateNode="stateNode"
     :style=`{
       order: 4
