@@ -34,8 +34,9 @@ div(
       :resizable="true")
   //- body
   div(:style=`{position: 'relative', height: videoHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
-    //- layer ADD
+    //- composition ADD with currentTime
     q-btn(
+      v-if="!stateExplorer.compositionEditing"
       @click="compositionAddClick()"
       round push color="green" icon="add"
       :size="$q.screen.xs ? 'md' : 'lg'"

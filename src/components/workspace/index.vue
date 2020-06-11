@@ -2,7 +2,7 @@
 div(:style=`{position: 'relative'}`).column.fit
   //- menu right
   div(
-    v-if="$q.screen.width > 1260"
+    v-if="!$route.params.id && $q.screen.width > 1260"
     :style=`{
       position: 'absolute', zIndex: 9999,
       right: -$store.state.ui.panelMaxWidth+'px',
@@ -15,7 +15,7 @@ div(:style=`{position: 'relative'}`).column.fit
       }`).b-50
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
-      v-if="$q.screen.width < 1260 && !$store.state.ui.appShowMenu"
+      v-if="$route.params.id && $q.screen.width < 1260 && !$store.state.ui.appShowMenu"
       :style=`{
         position: 'absolute', zIndex: 9999,
         bottom: '0px',

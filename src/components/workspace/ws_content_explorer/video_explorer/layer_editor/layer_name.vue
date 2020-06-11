@@ -48,10 +48,10 @@ export default {
       this.$set(this.stateLayerEditor.layer.spheres, 0, {name: e})
     },
     async nameInputFocused () {
-      this.$log('nameInputFocused')
+      // this.$log('nameInputFocused')
     },
     nameInputBlurred () {
-      this.$log('nameInputBlurred')
+      // this.$log('nameInputBlurred')
     }
   }
 }

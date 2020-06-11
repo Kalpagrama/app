@@ -47,7 +47,7 @@ div(
 <script>
 export default {
   name: 'compositionProgress',
-  props: ['stateExplorer', 'value'],
+  props: ['stateExplorer', 'value', 'active'],
   data () {
     return {
       layerActive: 0,
@@ -98,7 +98,8 @@ export default {
     'stateExplorer.currentTime': {
       immediate: true,
       handler (to, from) {
-        this.$log('currentTime TO', to)
+        // this.$log('currentTime TO', to)
+        if (!this.active) return
         if (this.currentTimeStop) return
         if (to > this.layerActiveEnd) {
           // try to find next layerActive

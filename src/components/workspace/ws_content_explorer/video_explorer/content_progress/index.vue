@@ -18,17 +18,20 @@
       :icon="stateExplorer.player.muted ? 'volume_off' : 'volume_up'")
     .col
     q-btn(round flat dense color="grey-5" icon="fast_rewind" @click="fast(false)")
+      q-tooltip(anchor="top middle" self="center middle") - 5 sec
     q-btn(flat dense color="grey-4").text-grey-5
       small {{ $time(stateExplorer.currentTime) }}
       small.q-mx-xs /
       small {{ $time(stateExplorer.duration) }}
     q-btn(round flat dense color="grey-5" icon="fast_forward" @click="fast(true)")
+      q-tooltip(anchor="top middle" self="center middle") + 5 sec
     .col
     q-btn(
       @click="$store.commit('ui/stateSet', ['appFullscreen', !$store.state.ui.appFullscreen])"
       round flat dense color="grey-5"
       :icon="$store.state.ui.appFullscreen ? 'fullscreen_exit' : 'fullscreen'"
       )
+      q-tooltip(anchor="top middle" self="center middle") Fullscreen
     q-btn(round flat dense color="grey-5" icon="more_vert")
   //- bar
   div(
@@ -40,7 +43,7 @@
       position: 'relative',
       height: '50px',
       borderRadius: '10px',
-      overflow: 'hidden',
+      //- overflow: 'hidden',
     }`
     ).row.full-width.b-70.cursor-pointer
     //- now
@@ -68,7 +71,8 @@
       small(
         :style=`{
           position: 'absolute', zIndex: 1200,
-          top: '0px', left: '-15px',
+          top: '-15px', left: '-12px',
+          marginLeft: '-50%',
         }`).text-white {{ $time(nowHoverTime) }}
     //- now WIDTH
     div(
@@ -76,6 +80,8 @@
         position: 'absolute', zIndex: 100,
         left: '0px',
         width: barWidth ? barWidth+'%' : (stateExplorer.currentTime/stateExplorer.duration)*100+'%',
+        borderRadius: '10px 0 0 10px',
+        overflow: 'hidden',
         pointerEvents: 'none',
         opacity: 0.8
       }`

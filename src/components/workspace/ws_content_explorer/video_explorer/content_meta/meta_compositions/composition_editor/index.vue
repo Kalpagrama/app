@@ -42,12 +42,24 @@ div(
   //- tools selected
   div(
     v-if="layersSelected.length > 0"
-    :style=`{height: '50px'}`
-    ).row.full-width.items-center.content-center.q-px-sm.bg
-    q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []")
+    :style=`{position: 'absolute', zIndex: 1000, top: 0}`
+    ).row.full-width.items-center.content-center.q-pa-xs.b-50
+    q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").q-mr-xs
+    q-btn(
+      v-if="true"
+      round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
+    q-btn(round flat dense color="white" no-caps @click="layersSelectedMove()").q-px-sm Move
+    q-btn(
+      v-if="composition.layers.length > 1"
+      round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm Delete
   .col.full-width.scroll
     div(
-      ).row.full-width.items-start.content-start.q-pa-sm
+      :style=`{paddingBottom: '300px'}`
+      ).row.full-width.items-start.content-start
+      div(:style=`{paddingLeft: '40px', paddingRight: '40px'}`).row.full-width.q-py-xs
+        q-btn(round flat dense color="grey-6" icon="search")
+        .col
+        q-btn(round flat dense color="grey-6" icon="sort")
       draggable(
         :list="composition.layers" group="layers" handle=".layer-drag-handle"
         :sort="true"
@@ -60,33 +72,26 @@ div(
             overflow: 'hidden',
           }`
           ).row.full-width.items-start.content-start.q-mb-xs
+          //- left
           div(
             :style=`{width: '40px', height: '40px'}`
             ).row.items-center.content-center.justify-center
             q-checkbox(
               v-model="layersSelected" :val="l.id" dark dense color="grey-6"
               :style=`{opacity: layersSelected.includes(l.id) ? 1 : 0.6}`)
+          //- middle
           div(
             @click="layerClick(l,li)"
             ).col
-            //- div(
-            //-   :style=`{
-            //-     height: '40px',
-            //-     borderRadius: '10px',
-            //-     overflow: 'hidden',
-            //-   }`
-            //-   ).row.full-width.items-center.content-center.q-py-sm.q-px-md.b-70
-            //-   small.text-white {{ $time(l.figuresAbsolute[0].t) }}
-            //-   //- small.text-white {{ $time(l.figuresAbsolute[1].t) }}
-            //-   .col
-            //-   small.text-white {{ $time(l.figuresAbsolute[1].t - l.figuresAbsolute[0].t) }}
             layer-editor(
-              @add="layerAdd()"
-              :layer="l" :stateExplorer="stateExplorer")
+              :layer="l"
+              :stateExplorer="stateExplorer")
+          //- right
           div(
             :style=`{width: '40px', height: '40px'}`
             ).row.items-center.content-center.justify-center
             q-btn(round flat dense color="grey-6" icon="drag_indicator").layer-drag-handle
+              kalpa-menu-popup(:actions="layerActions" :value="l")
       //- layer add
       div(
         :style=`{
@@ -96,14 +101,41 @@ div(
         }`).row.full-width
         .row.fit
           q-btn(round flat color="green" icon="add" @click="layerAdd()").fit.b-60
+            q-tooltip(anchor="top middle" self="center middle") Add layer at: {{ $time(stateExplorer.currentTime) }}
+  //- progress
+  div(
+    :style=`{
+      position: 'relative',
+      height: '50px',
+      borderRadius: '10px',
+      overflow: 'hidden',
+    }`).row.full-width.b-60
+    composition-progress(
+      ref="compositionProgress"
+      :value="composition" :active="compositionPlaying"
+      :stateExplorer="stateExplorer").fit
   //- footer stats
   div(
     :style=`{
     }`
     ).row.full-width.items-center.content-center.q-py-xs
-    q-btn(round flat dense color="white" icon="play_arrow")
+    q-btn(
+      @click="compositionPlayPause()"
+      round flat dense
+      :color="stateExplorer.playing ? 'red' : 'grey-5'"
+      :icon="stateExplorer.playing ? 'pause' : 'play_arrow'")
+    q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" @click="layerPrev()")
+    q-btn(round flat dense color="grey-5" icon="keyboard_arrow_right" @click="layerNext()")
+    q-btn(round flat dense color="grey-5" icon="refresh" @click="compositionRefresh()")
     .col
-    small.text-white.q-mr-sm duration: {{ $time(compositionTotalTime) }}
+    small.text-grey-6.q-mr-sm [layers: {{ composition.layers.length }},
+    small(
+      :class=`{
+        'text-grey-6': compositionDuration < 60,
+        'text-red': compositionDuration > 60
+      }`
+      :style=`{}`
+      ).q-mr-sm duration: {{ $time(compositionDuration) }}]
   //- footer
   div(
     :style=`{
@@ -112,7 +144,7 @@ div(
       overflow: 'hidden',
     }`
     ).row.full-width.items-center.content-center.q-pa-sm
-    q-btn(round flat dense color="red" icon="delete_outline" @click="compositionDelete()"
+    q-btn(round flat dense color="red" icon="delete_outline" @click="$emit('delete')"
       :style=`{opacity: .6}`)
     .col
     q-btn(round flat dense color="green" icon="check" @click="done()")
@@ -120,11 +152,13 @@ div(
 
 <script>
 import draggable from 'vuedraggable'
-import layerEditor from '../../../layer_editor'
+
+import compositionProgress from '../composition_progress'
+import layerEditor from './layer_editor'
 
 export default {
   name: 'compostionEditor',
-  components: {draggable, layerEditor},
+  components: {draggable, compositionProgress, layerEditor},
   props: ['stateExplorer'],
   data () {
     return {
@@ -133,20 +167,60 @@ export default {
       layersDragging: false,
       layerSelected: null,
       layerEditing: null,
+      compositionPlaying: false
     }
   },
   computed: {
     composition () {
       return this.stateExplorer.composition
     },
-    compositionTotalTime () {
+    compositionDuration () {
       return this.composition.layers.reduce((acc, val) => {
         acc += (val.figuresAbsolute[1].t - val.figuresAbsolute[0].t)
         return acc
       }, 0)
+    },
+    layerActions () {
+      let res = {
+        edit: {
+          name: 'Edit',
+          fn: (layer) => this.layerEdit(layer)
+        },
+        // copy: {
+        //   name: 'Copy',
+        //   fn: (layer) => this.layerCopy(layer)
+        // },
+      }
+      if (this.composition.layers.length > 1) {
+        res.delete = {
+          name: 'Delete',
+          fn: (layer) => this.layerDelete(layer)
+        }
+      }
+      return res
     }
   },
   methods: {
+    compositionPlayPause () {
+      this.$log('compositionPlayPause')
+      if (this.stateExplorer.playing) {
+        this.stateExplorer.player.pause()
+        this.compositionPlaying = false
+      }
+      else {
+        this.stateExplorer.player.play()
+        this.compositionPlaying = true
+      }
+    },
+    layerPrev () {
+      this.$log('layerPrev')
+    },
+    layerNext () {
+      this.$log('layerNext')
+    },
+    compositionRefresh () {
+      this.$log('compositionRefresh')
+    },
     layerClick (l, li) {
       this.$log('layerClick', l, li)
     },
@@ -172,14 +246,43 @@ export default {
       this.$set(this.composition.layers, layerIndex, layerInput)
       return layerId
     },
+    layerEdit (l) {
+      this.$log('layerEdit', l)
+      // open layer editor...
+    },
+    layerCopy (l) {
+      this.$log('layerCopy', l)
+      // paste to the next position...
+    },
+    layerDelete (l, confirmed) {
+      this.$log('layerDelete', l)
+      if (this.composition.layers.length === 1) return
+      if (!confirmed && !confirm('Delete layer ?')) return
+      let i = this.composition.layers.findIndex(layer => layer.id === l.id)
+      this.$log('i', i)
+      if (i >= 0) this.$delete(this.composition.layers, i)
+    },
+    layersSelectedCreateNode () {
+      this.$log('layersSelectedCreateNode')
+      this.layersSelected = []
+    },
+    layersSelectedMove () {
+      this.$log('layersSelectedMove')
+      this.layersSelected = []
+    },
+    layersSelectedDelete () {
+      this.$log('layersSelectedDelete')
+      if (this.composition.layers.length === 1) return
+      if (!confirm('Delete selected ?')) return
+      this.layersSelected.map(l => {
+        this.layerDelete({id: l}, true)
+      })
+      this.layersSelected = []
+    },
     done () {
       this.$log('done')
-      // this.stateExplorer.set('composition', null)
       this.stateExplorer.set('compositionEditing', null)
     },
-    compositionDelete () {
-      this.$log('compositionDelete')
-    }
   },
   mounted () {
     this.$log('mounted')
