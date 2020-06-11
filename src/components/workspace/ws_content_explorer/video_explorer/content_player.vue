@@ -35,7 +35,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     type="video/youtube"
     :playsinline="true"
     :autoplay="true"
-    :loop="true"
+    :loop="false"
     :style=`{
       position: 'relative',
       width: '100%',
@@ -131,7 +131,7 @@ export default {
       this.$log('playerInit start', this.$refs.videoRef)
       // alert('player WORKSPACE start')
       let me = new window.MediaElementPlayer(this.$refs.videoRef, {
-        loop: true,
+        loop: false,
         autoplay: true,
         controls: true,
         features: [],

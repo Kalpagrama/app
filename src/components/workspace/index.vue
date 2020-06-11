@@ -29,7 +29,6 @@ div(:style=`{position: 'relative'}`).column.fit
       q-btn(round flat dense color="white" icon="menu_open")
   .col.full-width
     router-view(
-      v-if="item"
       :value="item")
   //- q-layout(
   //-   view="hHh lpR fFf"

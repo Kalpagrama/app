@@ -41,6 +41,7 @@ div(
       pointerEvents: 'none',
     }`
     ).row.full-height.bg-green
+    small {{ li }}
 </template>
 
 <script>
@@ -122,7 +123,7 @@ export default {
       this.stateExplorer.player.setCurrentTime(this.layerActiveStart)
     },
     async progressClick (e) {
-      this.$log('progressClick', e)
+      // this.$log('progressClick', e)
       let width = e.target.clientWidth
       let left = e.offsetX
       let p = left / width
@@ -134,10 +135,11 @@ export default {
       let layerDuration = layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t
       let layerDurationPercent = layerDuration / this.layersDuration
       this.$log('layerDurationPercent', layerDurationPercent)
-      let layerPercent = (p / layerDurationPercent) - i
-      this.$log('layerPercent', layerPercent)
-      let t = layerStart + (layerPercent * layerDuration)
+      let layerPercentStart = i === 0 ? 0 : this.layersStats[i - 1]
+      this.$log('layerPercent', layerPercentStart)
+      let t = layerStart + ((p - layerPercentStart) * this.layersDuration)
       this.$log('t', t)
+      // set
       this.layerActive = i
       this.currentTimeStop = true
       this.stateExplorer.set('currentTime', t)

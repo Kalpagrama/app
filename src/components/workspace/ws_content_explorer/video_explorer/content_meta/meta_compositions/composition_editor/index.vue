@@ -156,7 +156,8 @@ export default {
       let layerId = Date.now().toString()
       let layerColor = this.$randomColor(layerId)
       let layerStart = this.stateExplorer.currentTime
-      let layerEnd = layerStart + 10 > this.stateExplorer.duration ? this.stateExplorer.duration : layerStart + 10
+      let layerEnd = layerStart + 10 > this.stateExplorer.duration ? this.stateExplorer.duration - 0.5 : layerStart + 10
+      if (layerEnd > this.stateExplorer.duration) alert('layerEnd > this.stateExplorer.duration')
       let layerInput = {
         id: layerId,
         color: layerColor,
