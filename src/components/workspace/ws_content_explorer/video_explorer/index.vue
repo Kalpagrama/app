@@ -2,24 +2,7 @@
 div(
   v-if="contentKalpa"
   :style=`{position: 'relative', borderRadius: '10px'}`).column.fit.b-50
-  //- content name
-  div(
-    :style=`{
-      position: 'absolute', zIndex: 99999, top: '8px', left: '8px',
-      height: '60px',
-      borderRadius: '10px', overflow: 'hidden',
-      background: $q.screen.xs ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.5)',
-      maxWidth: 'calc(100% - 16px)',
-    }`).row.items-center.content-center
-    q-btn(
-      round flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
-      :style=`{
-      }`)
-    .col
-      .row.fit.items-center.q-px-sm
-        span(
-          v-if="true"
-          ).text-white.text-bold {{ content.name }}
+  content-header(:stateExplorer="stateExplorer")
   //- right panel
   div(
     v-if="$store.state.ui.appFullscreen && $q.screen.gt.sm"
@@ -29,11 +12,11 @@ div(
       right: '8px',
       height: $q.screen.height-120+'px',
     }`).row.justify-start
-    content-meta(
-      :stateExplorer="stateExplorer"
-      :resizable="true")
-  //- body
-  div(:style=`{position: 'relative', height: videoHeight+'px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+    content-meta(:stateExplorer="stateExplorer" :resizable="true")
+  //- ROW body
+  div(
+    :style=`{position: 'relative', height: videoHeight+'px', borderRadius: '10px', overflow: 'hidden'}`
+    ).row.full-width
     //- composition ADD with currentTime
     q-btn(
       v-if="!stateExplorer.compositionEditing"
@@ -45,57 +28,44 @@ div(
         right: $store.state.ui.appFullscreen ? 'calc(50% - 25px)' : '22px',
         borderRadius: '50%',
       }`)
-    content-player(
-      :stateExplorer="stateExplorer"
-      :style=`{
-      }`)
-  //- bottom meta
-  div(v-show="!$store.state.ui.appFullscreen").col.full-width
+    content-player(:stateExplorer="stateExplorer")
+  //- COL bottom meta
+  div(
+    v-show="!$store.state.ui.appFullscreen"
+    ).col.full-width
     .column.fit
-      div(:style=`{height: '26px'}`).row.full-width
-      //- kalpa-debug(:options=`{compositionSelected,compositionEditing}`)
+      //- div(:style=`{height: '26px'}`).row.full-width
       .col.full-width
-        content-meta(
-          :stateExplorer="stateExplorer"
-          :resizable="false"
-          )
+        content-meta(:stateExplorer="stateExplorer" :resizable="false")
   //- footer fixed
   div(
+    v-if="stateExplorer.pageId !== 'compositions'"
     :style=`{
       position: 'absolute', zIndex: 10000,
-      bottom: footerBottom+'px',
-      maxWidth: footerWidth+'px',
-      left: footerLeft,
+      bottom: this.$q.screen.height - this.videoHeight - 26+'px',
+      maxWidth: pageContentWidth-80+'px',
+      left: 'calc(50% - '+(pageContentWidth-80)/2+'px)',
     }`
     ).row.full-width
-    layer-editor(
-      v-if="false"
-      :stateExplorer="stateExplorer"
-      @close="layerEditorOpened = false")
-    content-progress(
-      :statePage="statePage"
-      :stateExplorer="stateExplorer")
+    content-progress(:stateExplorer="stateExplorer")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import contentHeader from './content_header'
 import contentPlayer from './content_player'
 import contentMeta from './content_meta'
 import contentProgress from './content_progress'
 
 export default {
   name: 'contentExplorer-video',
-  components: {contentPlayer, contentMeta, contentProgress},
+  components: {contentHeader, contentPlayer, contentMeta, contentProgress},
   props: ['content'],
   data () {
     return {
+      // layout
       contentKalpa: null,
-      player: null,
-      currentTime: 0,
-      duration: 0,
-      loadeddata: false,
-      playing: false,
       pageId: 'compositions',
       pages: [
         {id: 'info', name: 'Details', icon: 'details'},
@@ -104,6 +74,16 @@ export default {
         // {id: 'people', name: 'People', icon: 'perm_identity'},
         // {id: 'chat', name: 'Chat', icon: 'chat_bubble_outline'},
       ],
+      // screenWidth: 1200,
+      // videoHeight: 0,
+      // pageWidth: 800,
+      // pageContentWidth: 680,
+      // player
+      player: null,
+      currentTime: 0,
+      duration: 0,
+      loadeddata: false,
+      playing: false,
       // composition
       composition: null,
       compositionSelected: null,
@@ -115,23 +95,18 @@ export default {
       if (this.$store.state.ui.appFullscreen) return this.$q.screen.height - 43
       else return this.$q.screen.height * 0.4
     },
-    footerBottom () {
-      return this.$q.screen.height - this.videoHeight - 26
-    },
-    footerWidth () {
-      if (this.$q.screen.width > 600) return 600
-      else return this.$q.screen.width - 80
-    },
-    footerLeft () {
-      if (this.$q.screen.width > 600) return `calc(50% - ${this.footerWidth / 2}px)`
-      else return `calc(50% - ${this.footerWidth / 2}px)`
+    pageContentWidth () {
+      if (this.$q.screen.width > 680) return 680
+      else return this.$q.screen.width - 40 - 40
     },
     stateExplorer () {
       return {
+        // layout
         pages: this.pages,
         pageId: this.pageId,
         content: this.contentKalpa,
         contentWs: this.content,
+        pageContentWidth: this.pageContentWidth,
         // player
         player: this.player,
         duration: this.duration,
@@ -168,6 +143,8 @@ export default {
       this.$log('nodeAdd')
       let layerId = Date.now().toString()
       let layerColor = this.$randomColor(layerId)
+      let layerStart = this.stateExplorer.currentTime
+      let layerEnd = layerStart + 10 > this.stateExplorer.duration ? this.stateExplorer.duration : layerStart + 10
       let compositionInput = {
         wsItemType: 'WS_CONTENT',
         contentOid: this.stateExplorer.content.oid,
@@ -180,8 +157,8 @@ export default {
             color: layerColor,
             contentOid: this.stateExplorer.content.oid,
             figuresAbsolute: [
-              {t: this.stateExplorer.currentTime, points: []},
-              {t: this.stateExplorer.currentTime + 10, points: []}
+              {t: layerStart, points: []},
+              {t: layerEnd, points: []}
             ],
             figuresRelative: [],
             spheres: []

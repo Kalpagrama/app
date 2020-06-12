@@ -30,6 +30,7 @@
       @click="$store.commit('ui/stateSet', ['appFullscreen', !$store.state.ui.appFullscreen])"
       round flat dense color="grey-5"
       :icon="$store.state.ui.appFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+      :style=`{opacity: 0}`
       )
       q-tooltip(anchor="top middle" self="center middle") Fullscreen
     q-btn(round flat dense color="grey-5" icon="more_vert")
@@ -53,10 +54,12 @@
         zIndex: 1000,
         width: '3px',
         borderRadius: '1px', overflow: 'hidden',
+        top: '-8px',
+        height: 'calc(100% + 16px)',
         left: stateExplorer.currentTime/stateExplorer.duration*100+'%',
         pointerEvents: 'none',
       }`
-      ).row.full-height.bg-green
+      ).row.bg-red
     //- now HOVER
     div(
       v-if="nowHover"
@@ -67,7 +70,7 @@
         left: nowHover+'%',
         pointerEvents: 'none'
       }`
-      ).row.full-height.bg-green
+      ).row.full-height.bg-red
       small(
         :style=`{
           position: 'absolute', zIndex: 1200,
@@ -86,31 +89,13 @@
         opacity: 0.8
       }`
       ).row.full-height.b-100
-    //- COMPOSITIONS on th BAR
-    //- LAYERS on the BAR
-    div(
-      v-if="false"
-      :style=`{
-        position: 'absolute', zIndex: 200,
-        top: '0px',
-        pointerEvents: 'none',
-      }`).row.fit
-      div(
-        v-for="(l,li) in layers" :key="li"
-        :style=`{
-          position: 'absolute', zIndex: 300+li,
-          left: (l.figuresAbsolute[0].t/stateExplorer.duration)*100+'%',
-          width: stateExplorer.layerSelected === l.id ? ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/stateExplorer.duration)*100+'%' :'2px',
-          background: stateExplorer.layerSelected === l.id ? l.color : 'white',
-          opacity: stateExplorer.layerSelected === l.id ? 1 : 0.5,
-        }`
-        ).row.full-height
+    slot(name="meta")
 </template>
 
 <script>
 export default {
   name: 'contentProgress',
-  props: ['statePage', 'stateExplorer'],
+  props: ['stateExplorer'],
   data () {
     return {
       barWidth: null,
@@ -120,9 +105,6 @@ export default {
     }
   },
   computed: {
-    // layers () {
-    //   return this.stateExplorer?.contentWs?.layers
-    // }
   },
   methods: {
     volumeToggle () {

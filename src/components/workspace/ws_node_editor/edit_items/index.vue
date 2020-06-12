@@ -7,21 +7,14 @@ div(
   q-dialog(
     v-model="itemFinderOpened" position="bottom"
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])")
-    ws-content-list(
-      ctx="nodeEditor" @content="contentFound"
-      :inDialog="true"
-      key="nodeEditor"
+    item-finder(
+      @item="itemFound"
+      @close="itemFinderOpened = false"
       :style=`{
-        maxWidth: 800+'px',
-        maxHeight: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
-        height: $q.screen.xs ? $q.screen.height-60+'px' : 800+'px',
-        borderRadius: '10px',
-        overflow: 'hidden',
-      }`).b-30
-      template(v-slot:header)
-        div(:style=`{marginBottom: '20px'}`).row.full-width.items-center.content-center.q-pt-md
-          q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemFinderOpened = false").q-mr-sm
-          span(:style=`{fontSize: '16px'}`).text-white.text-bold Find item
+        height: $q.screen.height-60+'px',
+        minHeight: $q.screen.height-60+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+      }`)
   //- item edit
   q-dialog(
     v-model="itemEditorOpened" position="bottom"
@@ -51,42 +44,32 @@ div(
           div(
             v-for="(i,ii) in node.items" :key="i.id"
             ).row.full-width.items-start.content-start
-            //- left
-            div(
-              :style=`{
-                overflow: 'hidden',
-                width: '40px', height: '40px'
-              }`).row.items-start.content-start.justify-center
-              q-checkbox(v-model="itemsSelected" :val="i.id" dark color="grey-6")
-            //- center
-            .col
-              item-item(
-                @edit="itemEdit(i,ii)"
-                @copy="itemCopy(i,ii)"
-                @delete="itemDelete(i,ii)"
-                :item="i" :itemIndex="itemIndex"
-                :style=`{}`).q-mb-sm.b-70
-            div(:style=`{width: '40px'}`)
-              q-btn(round flat dense color="grey-6" icon="drag_indicator").item-drag-handle
-                //- TODO: actions
+            item-item(
+              @edit="itemEdit(i,ii)"
+              @copy="itemCopy(i,ii)"
+              @delete="itemDelete(i,ii)"
+              :item="i" :itemIndex="itemIndex"
+              :style=`{}`).q-mb-sm.b-70.item-drag-handle
         //- add item
         div(
-          v-if="node.items.length < 4"
+          v-if="node.items.length < 3"
           ).row.full-width.q-mb-sm
           q-btn(
             @click="itemAdd()"
             flat color="green" icon="add" size="lg"
-            :style=`{height: '280px'}`
+            :style=`{height: '300px'}`
             ).full-width.b-60
 </template>
 
 <script>
-import itemItem from './item_item'
 import draggable from 'vuedraggable'
+
+import itemFinder from './item_finder'
+import itemItem from './item_item'
 
 export default {
   name: 'editItems',
-  components: {itemItem, draggable},
+  components: {draggable, itemFinder, itemItem},
   props: ['node'],
   data () {
     return {
@@ -97,13 +80,15 @@ export default {
     }
   },
   methods: {
+    itemFound (item) {
+      this.$log('itemFound', item)
+      this.$set(this.node.items, this.node.items.length, item)
+      // open item editor ???
+    },
     itemEdit (i, ii) {
       this.$log('itemEdit', i, ii)
       this.item = i
       this.itemEditorOpened = true
-    },
-    itemCopy (i, ii) {
-      this.$log('itemCopy', i, ii)
     },
     itemAdd () {
       this.$log('itemAdd')
@@ -114,31 +99,9 @@ export default {
       if (!confirm('Delete node ?!')) return
       this.$delete(this.node.items, ii)
     },
-    contentFound (content) {
-      this.$log('contentFound', content)
-      // TODO: impl convert => content to composition => node.item
-      let itemIndex = this.node.items.length
-      let itemId = Date.now().toString()
-      let itemInput = {
-        id: itemId,
-        name: '',
-        layers: [],
-        spheres: [],
-        contentType: 'VIDEO',
-        contentOid: content.contentOid,
-        thumbUrl: content.thumbOid,
-        operation: {items: null, operations: null, type: 'CONCAT'}
-      }
-      this.$set(this.node.items, itemIndex, itemInput)
-      this.itemFinderOpened = false
-      // set item, open editor
-      this.item = this.node.items[itemIndex]
-      this.itemEditorOpened = true
-    }
   },
   mounted () {
     this.$log('mounted')
-    // AJ2Ri_fCwB8=
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

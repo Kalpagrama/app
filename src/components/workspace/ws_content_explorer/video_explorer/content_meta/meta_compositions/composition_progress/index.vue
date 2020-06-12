@@ -37,11 +37,11 @@ div(
       position: 'absolute', zIndex: 210,
       width: '2px',
       left: l*100+'%',
-      opacity: 0.5,
+      opacity: 0.3,
       pointerEvents: 'none',
     }`
-    ).row.full-height.bg-green
-    small {{ li }}
+    ).row.full-height.bg-white
+    //- small {{ li }}
 </template>
 
 <script>

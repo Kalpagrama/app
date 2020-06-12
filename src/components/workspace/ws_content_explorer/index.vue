@@ -2,8 +2,7 @@
 component(
   v-if="value"
   :is="component[value.contentType]"
-  :content="value"
-  )
+  :content="value")
 </template>
 
 <script>

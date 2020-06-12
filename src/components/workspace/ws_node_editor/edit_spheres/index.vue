@@ -6,46 +6,48 @@
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-  }`
-  ).column.fit.q-pt-sm
-  //- cateory
-  div().row.full-width.q-px-sm.q-mb-sm
-    q-select(
-      filled
-      dark color="white" label="Category"
-      :value="category(node.category)" @input="categorySelected"
-      :options="categories"
-      :style=`{
-        borderRadius: '10px', overflow: 'hidden',
-        minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
-      }`).full-width
-  //- spheres
-  .col.full-width.q-px-sm.q-pb-sm
-    ws-sphere-list(
-      :showHeader="false"
-      :showItems="showSpheresFromWs"
-      @sphereClick="sphereClickWs($event), showSpheresFromWs = false"
-      @created="sphereCreated($event), showSpheresFromWs = false"
-      @searchStarted="showSpheresFromWs = true"
-      @searchEnded="showSpheresFromWs = false"
-      :style=`{
-        borderRadius: '10px',
-        overflow: 'hidden',
-      }`).full-height.b-50
-      template(v-slot:header)
-        .row.full-width.q-px-sm.q-py-md
-          span.text-white.text-bold Spheres
-      template(v-slot:items=`{items, searchString}`)
-        div().row.full-width.items-start.content-start
-          div(v-if="searchString.length === 0").row.full-width.q-py-sm
-            ws-sphere(
-              v-for="(s,si) in node.spheres" :key="si"
-              :sphere="s"
-              @sphereClick="sphereClick(s,si)"
-              ).q-mr-sm.q-mb-sm
+.row.fit.justify-center
+  div(
+    :style=`{
+      position: 'relative',
+      maxWidth: '600px',
+    }`
+    ).column.fit.q-py-sm
+    //- cateory
+    div().row.full-width.q-mb-sm
+      q-select(
+        filled
+        dark color="white" label="Category"
+        :value="category(node.category)" @input="categorySelected"
+        :options="categories"
+        :style=`{
+          borderRadius: '10px', overflow: 'hidden',
+          minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
+        }`).full-width
+    //- spheres
+    .col.full-width.q-pb-sm
+      ws-sphere-list(
+        :showHeader="false"
+        :showItems="showSpheresFromWs"
+        @sphereClick="sphereClickWs($event), showSpheresFromWs = false"
+        @created="sphereCreated($event), showSpheresFromWs = false"
+        @searchStarted="showSpheresFromWs = true"
+        @searchEnded="showSpheresFromWs = false"
+        :style=`{
+          borderRadius: '10px',
+          overflow: 'hidden',
+        }`).full-height.b-50
+        template(v-slot:header)
+          .row.full-width.q-px-sm.q-py-md
+            span.text-white.text-bold Spheres
+        template(v-slot:items=`{items, searchString}`)
+          div().row.full-width.items-start.content-start
+            div(v-if="searchString.length === 0").row.full-width.q-py-sm
+              ws-sphere(
+                v-for="(s,si) in node.spheres" :key="si"
+                :sphere="s"
+                @sphereClick="sphereClick(s,si)"
+                ).q-mr-sm.q-mb-sm
 </template>
 
 <script>

@@ -2,7 +2,7 @@
 div(:style=`{position: 'relative'}`).column.fit
   //- menu right
   div(
-    v-if="!$route.params.id && $q.screen.width > 1260"
+    v-if="$q.screen.width > 1260"
     :style=`{
       position: 'absolute', zIndex: 9999,
       right: -$store.state.ui.panelMaxWidth+'px',
@@ -15,7 +15,7 @@ div(:style=`{position: 'relative'}`).column.fit
       }`).b-50
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
-      v-if="$route.params.id && $q.screen.width < 1260 && !$store.state.ui.appShowMenu"
+      v-if="!$route.params.id && $q.screen.width < 1260 && !$store.state.ui.appShowMenu"
       :style=`{
         position: 'absolute', zIndex: 9999,
         bottom: '0px',
@@ -29,19 +29,8 @@ div(:style=`{position: 'relative'}`).column.fit
       q-btn(round flat dense color="white" icon="menu_open")
   .col.full-width
     router-view(
+      ctx="workspace"
       :value="item")
-  //- q-layout(
-  //-   view="hHh lpR fFf"
-  //-   container :style=`{position: 'relative', height: $q.screen.height+'px', overflow: 'auto'}`).b-30
-  //-   q-drawer(
-  //-     v-model="showMenu" side="right"
-  //-     @before-show="showFooter = false"
-  //-     @before-hide="showFooter = true"
-  //-     )
-  //-     menu-right(:stateWorkspace="stateWorkspace").full-height.b-50
-  //-   q-page-container
-  //-     q-page(:style=`{height: $q.screen.height+'px'}`)
-  //-       router-view
 </template>
 
 <script>
@@ -57,11 +46,12 @@ export default {
       item: null,
       showMenuRight: false,
       pages: [
-        {id: 'content-list', name: 'Content', comp: 'ws-content-list'},
-        {id: 'node-list', name: 'Nodes', comp: 'ws-node-list'},
-        {id: 'chain-list', name: 'Chains', comp: 'ws-chain-list'},
-        {id: 'sphere', name: 'Spheres', comp: 'ws-sphere-list'},
-        {id: 'ws-settings', name: 'Settings', comp: 'ws-settings'}
+        {id: 'content-list', name: 'Contents'},
+        {id: 'composition-list', name: 'Compositions'},
+        {id: 'node-list', name: 'Nodes'},
+        {id: 'chain-list', name: 'Chains'},
+        {id: 'sphere', name: 'Spheres'},
+        {id: 'ws-settings', name: 'Settings'}
       ],
       pagesHot: [
         {id: 'content-list', name: 'Content'},

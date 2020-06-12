@@ -49,16 +49,23 @@ const routes = [
         redirect: 'workspace/content',
         component: () => import('components/workspace'),
         children: [
-          { name: 'node-list', path: 'node', component: () => import('components/workspace/ws_node_list') },
-          { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
-          { name: 'node-editor', path: 'node/:id', component: () => import('components/workspace/ws_node_editor') },
+          // content
           { name: 'content-list', path: 'content', component: () => import('components/workspace/ws_content_list') },
           { name: 'content-import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
           { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') },
+          // composition
+          { name: 'composition-list', path: 'composition', component: () => import('components/workspace/ws_composition_list') },
+          // node
+          { name: 'node-list', path: 'node', component: () => import('components/workspace/ws_node_list') },
+          { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
+          { name: 'node-editor', path: 'node/:id', component: () => import('components/workspace/ws_node_editor') },
+          // chain
           { name: 'chain-list', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
           { name: 'chain-editor', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },
+          // sphere
           { name: 'sphere-list', path: 'sphere', component: () => import('components/workspace/ws_sphere_list') },
           // { name: 'sphere-editor', path: 'sphere/:id', component: () => import('components/workspace/ws_sphere_editor') },
+          // other
           { name: 'ws-settings', path: 'settings', component: () => import('components/workspace/ws_settings') },
         ]
       },

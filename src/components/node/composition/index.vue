@@ -46,7 +46,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     type="video/mp4"
     :src="composition.url"
     :autoplay="true"
-    :loop="true"
+    :loop="false"
     :muted="muted"
     :controls="controls"
     :playsinline="playsinline"
@@ -56,6 +56,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     @pause="playing = false"
     @timeupdate="videoTimeupdate"
     @click="videoClick"
+    @ended="videoEnded"
     :style=`{
       position: 'absolute', zIndex: 100,
       objectFit: 'contain',
@@ -89,7 +90,7 @@ export default {
       duration: 0,
       playing: false,
       playsinline: true,
-      muted: true,
+      muted: false,
     }
   },
   computed: {
@@ -111,7 +112,7 @@ export default {
     visible: {
       immediate: true,
       async handler (to, from) {
-        this.$log('visible TO', to)
+        // this.$log('visible TO', to)
         if (to) {
           this.$log('visible TRUE => load composition')
           this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.oid)
@@ -136,6 +137,10 @@ export default {
     }
   },
   methods: {
+    videoEnded (e) {
+      this.$log('videoEnded', e)
+      this.$emit('ended')
+    },
     async compositionMore () {
       this.$log('compositionMore')
       if (this.compositionContents.length === 0) {

@@ -41,7 +41,7 @@ div(
     ).row.fit.items-start.content-start
     //- items stats
     div(
-      v-if="false && visible && active && items.length > 1"
+      v-if="true && visible && active && items.length > 1"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '0px',
         transform: 'translate3d(0,0,0)',
@@ -53,7 +53,7 @@ div(
           :style=`{height: '4px'}`).col.q-px-xs
             div(:style=`{
               borderRadius: '2px', overflow: 'hidden',
-              background: itemIndex === ii ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)'
+              background: itemIndex === ii ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)'
             }`).row.fit
     //- item prev
     div(
@@ -107,8 +107,6 @@ div(
           borderRadius: '10px',
           overflow: 'hidden',
         }`)
-        template(v-slot:video)
-          //- .row.full-width.q-pa-xs.bg-pink pink
 </template>
 
 <script>
@@ -167,6 +165,12 @@ export default {
     },
     itemEnded (itemIndex) {
       this.$log('itemEnded', itemIndex)
+      if (this.items[itemIndex + 1]) {
+        this.itemsNext()
+      }
+      else {
+        this.itemIndex = 0
+      }
     }
   }
 }

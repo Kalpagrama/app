@@ -12,21 +12,35 @@ div(
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
       overflow: 'hidden'
     }`
-    ).row.full-width.items-start.content-start.b-50.q-px-sm.q-pb-sm.q-mb-sm
+    ).row.full-width.items-start.content-start.b-50.q-px-sm.q-mb-sm
     slot(name="header")
     //- navigation
     div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.justify-between.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold Node editor
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Node editor
+      //- .col
       q-btn(
         @click="pageId === 'info' ? pageId = 'items' : pageId = 'info'"
-        round icon="tune"
+        round icon="settings"
         :color="pageId === 'info' ? 'green' : 'white'"
         :flat="pageId !== 'info'")
     //- essence
     edit-essence(v-if="pageId !== 'info'" :node="node")
     //- pages
-    kalpa-buttons(v-if="pageId !== 'info'" :value="pages" :id="pageId" idKey="id" screenSet="gt.xs" @id="pageChanged")
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '600px'}`).row.full-width.q-pt-sm
+        q-tabs(
+          :value="pageId" @input="pageId = $event"
+          dense no-caps color="white"
+          align="justify"
+          active-color="green"
+          :style=`{}`
+          ).full-width
+          q-tab(
+            v-for="(p,pi) in pages" :key="p.id"
+            :name="p.id" :label="p.name"
+            dense no-caps color="white"
+            :style=`{color: 'rgb(180,180,180)'}`)
   //- body
   .col.full-width
     component(:is="`edit-${pageId}`" :node="node" @close="$emit('close')")
@@ -48,9 +62,9 @@ export default {
       pageId: 'items',
       pages: [
         // {id: 'info', name: 'Info'},
-        {id: 'items', name: '1. Items'},
-        {id: 'spheres', name: '2. Spheres'},
-        {id: 'preview', name: '3. Preview'}
+        {id: 'items', name: 'Items'},
+        {id: 'spheres', name: 'Spheres'},
+        {id: 'preview', name: 'Preview'}
       ]
     }
   },

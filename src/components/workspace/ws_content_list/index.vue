@@ -178,15 +178,15 @@ export default {
       return (a.host && a.host !== window.location.host)
     },
     contentPicked (content) {
-      this.$log('contentPicked')
-      // if (this.ctx === 'workspace') {
-      //   this.content = content
-      //   this.contentEditorOpened = true
-      // }
-      // else {
-      //   this.$emit('content', JSON.parse(JSON.stringify(content)))
-      // }
-      this.$router.push(`/workspace/content/${content.id}`)
+      this.$log('contentPicked', this.ctx)
+      if (this.ctx === 'workspace') {
+        this.$router.push(`/workspace/content/${content.id}`)
+        // this.content = content
+        // this.contentEditorOpened = true
+      }
+      else {
+        this.$emit('content', JSON.parse(JSON.stringify(content)))
+      }
     },
     contentExplore (c, ci) {
       this.$log('contentExplore', c, ci)

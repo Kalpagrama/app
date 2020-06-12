@@ -21,7 +21,7 @@ div(
     }`)
   //- node editor
   q-dialog(
-    v-model="nodeEditorOpened" persistent position="bottom"
+    v-model="nodeEditorOpened" position="bottom"
     @before-show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
     @before-hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
     ws-node-editor(

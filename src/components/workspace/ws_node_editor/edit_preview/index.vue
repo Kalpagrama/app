@@ -1,26 +1,42 @@
 <template lang="pug">
-.column.fit
-  div().row.full-with.q-pa-md
-  div(:style=`{position: 'relative'}`).col.full-width.scroll
-    .row.fit.q-px-sm
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`
-        ).row.fit.items-center.content-center.justify-center.b-70
+.row.fit.justify-center
+  div(
+    :style=`{
+      maxWidth: '600px',
+    }`
+    ).column.fit.q-py-md
+    //- div().row.full-with.q-pa-md
+    div(:style=`{position: 'relative'}`).col.full-width.scroll
+      div(
+        :style=`{
+          height: '400px',
+          borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.content-center.justify-center.b-60
         q-spinner(size="50px" color="green")
-    //- node(
-    //-   ctx="workspace"
-    //-   :node="nodePreview" :nodeFullReady="nodePreview"
-    //-   :visible="true" :active="true" :mini="false"
-    //-   :style=`{
-    //-     minHeight: '400px',
-    //-   }`).fit
-  .row.full-width.items-center.content-center.q-px-sm.q-py-md
-    q-btn(
-      flat color="white" no-caps icon-right="keyboard_arrow_down"
-      :style=`{height: '50px'}`).b-70 Layout
-    .col
-    q-btn(
-      push color="green" no-caps @click="nodePublish()"
-      :style=`{height: '50px'}`).q-px-xl Publish node
+      //- node(
+      //-   ctx="workspace"
+      //-   :node="nodePreview" :nodeFullReady="nodePreview"
+      //-   :visible="true" :active="true" :mini="false"
+      //-   :style=`{
+      //-     minHeight: '400px',
+      //-   }`).fit
+      .row.full-width.items-center.content-center.q-py-sm
+        //- q-btn(
+        //-   flat color="white" no-caps icon-right="keyboard_arrow_down"
+        //-   :style=`{height: '40px'}`).b-70 Picture in picture
+        .col.q-pr-sm
+          q-select(
+            filled
+            dark color="white" label="Layout"
+            :value="layout(node.layout)" @input="layoutSelected"
+            :options="layouts"
+            :style=`{
+              borderRadius: '10px', overflow: 'hidden',
+              zIndex: 2000, transform: 'translate3d(0,0,0)',
+            }`).full-width
+        q-btn(
+          push color="green" no-caps @click="nodePublish()"
+          :style=`{height: '56px'}`).q-px-md Publish
 </template>
 
 <script>
@@ -31,7 +47,12 @@ export default {
   props: ['node'],
   data () {
     return {
-      nodePublishing: false
+      nodePublishing: false,
+      layouts: [
+        {value: 'PIP', label: 'Picture in picture'},
+        {value: 'HORIZONTAL', label: 'Compare'},
+        {value: 'SLIDER', label: 'Slider'}
+      ]
     }
   },
   computed: {
@@ -48,6 +69,13 @@ export default {
     }
   },
   methods: {
+    layout (val) {
+      return this.layouts.find(l => l.value === val)
+    },
+    layoutSelected (e) {
+      this.$log('layoutSelected', e)
+      this.node.layout = e.value
+    },
     async nodePublish () {
       try {
         this.$log('nodePublish start')

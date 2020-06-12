@@ -7,7 +7,7 @@ div(
     maxWidth: resizable ? maxWidth+'px' : '100%',
     background: 'rgba(50,50,50,0.9)',
     borderRadius: '10px',
-    overflow: 'hidden',
+    //- overflow: 'hidden',
   }`
   ).row.full-height
   //- left menu for resize
@@ -28,7 +28,7 @@ div(
       :icon="p.icon"
       :style=`{}`).full-width
   //- right body
-  div(:style=`{overflow: 'hidden'}`).col.full-height
+  div(:style=`{}`).col.full-height
     .column.fit
       .col.full-width
         component(

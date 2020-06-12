@@ -2,56 +2,46 @@
 div(
   :style=`{
     borderRadius: '10px',
-    overflow: 'hidden',
+    //- overflow: 'hidden',
   }`
   ).column.fit.b-50
-  div(:style=`{order: 2}`).row.full-width
-    q-input(
-      v-model="composition.name"
-      filled dark color="grey-5"
-      autogrow
-      autofocus
-      :input-style=`{
-        fontSize: '16px',
-      }`
-      :style=`{
-        transform: 'translate3d(0,0,0)',
-        borderRadius: '10px',
-        overflow: 'hidden',
-        fontSize: '18px',
-      }`
-      ).full-width.b-50
-  div(v-if="false").row.full-width.q-pt-md.q-px-md
-    span.text-white.text-bold Layers
-  //- tools
-  div(
-    v-if="false && !islayersSelected.length === 0"
-    :style=`{height: '50px'}`
-    ).row.full-width.items-center.content-center
-    .col.q-px-sm
-      q-input(
-        v-model="searchString"
-        filled dark dense color='grey-6'
-        label="Find layer"
-        ).full-width
-        template(v-slot:append)
-          q-btn(
-            v-if="searchString.length > 0"
-            round flat dense color="white" icon="clear" @click="searchString = ''")
-    q-btn(round flat dense color="white" icon="sort").q-mr-sm
+  //- content progress with layers on it
+  div(:style=`{position: 'absolute', zIndex: 9999, top: '-62px', left: 0}`).row.full-width.justify-center
+    content-progress(
+      :stateExplorer="stateExplorer"
+      :style=`{maxWidth: stateExplorer.pageContentWidth-80+'px'}`)
+      template(v-slot:meta)
+        div(
+          :style=`{
+            position: 'absolute', zIndex: 200,
+            top: '0px',
+            pointerEvents: 'none',
+          }`).row.fit
+          div(
+            v-for="(l,li) in composition.layers" :key="li"
+            :style=`{
+              position: 'absolute', zIndex: 300+li,
+              left: (l.figuresAbsolute[0].t/stateExplorer.duration)*100+'%',
+              width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/stateExplorer.duration)*100+'%',
+              background: l.color,
+              opacity: 0.9,
+            }`
+            ).row.full-height
   //- tools selected
   div(
     v-if="layersSelected.length > 0"
-    :style=`{position: 'absolute', zIndex: 1000, top: 0}`
-    ).row.full-width.items-center.content-center.q-pa-xs.b-50
-    q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").q-mr-xs
-    q-btn(
-      v-if="true"
-      round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
-    q-btn(round flat dense color="white" no-caps @click="layersSelectedMove()").q-px-sm Move
-    q-btn(
-      v-if="composition.layers.length > 1"
-      round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm Delete
+    :style=`{position: 'absolute', zIndex: 1000, left: 0, top: '24px',}`
+    ).row.full-width.justify-center
+    div(:style=`{maxWidth: stateExplorer.pageContentWidth-80+'px',}`).row.full-width.items-center.content-center.q-pa-xs
+      q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").q-mr-xs
+      q-btn(
+        v-if="true"
+        round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
+      q-btn(round flat dense color="white" no-caps @click="layersSelectedMove()").q-px-sm Move
+      q-btn(
+        v-if="composition.layers.length > 1"
+        round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm Delete
+  //- body
   .col.full-width.scroll
     div(
       :style=`{paddingBottom: '300px'}`
@@ -80,10 +70,9 @@ div(
               v-model="layersSelected" :val="l.id" dark dense color="grey-6"
               :style=`{opacity: layersSelected.includes(l.id) ? 1 : 0.6}`)
           //- middle
-          div(
-            @click="layerClick(l,li)"
-            ).col
+          .col
             layer-editor(
+              @add="layerAdd()"
               :layer="l"
               :stateExplorer="stateExplorer")
           //- right
@@ -136,10 +125,27 @@ div(
       }`
       :style=`{}`
       ).q-mr-sm duration: {{ $time(compositionDuration) }}]
+  //- composition name
+  div(:style=`{}`).row.full-width
+    q-input(
+      v-model="composition.name"
+      filled dark color="grey-5"
+      label="Composition name"
+      autogrow
+      autofocus
+      :input-style=`{
+        fontSize: '16px',
+      }`
+      :style=`{
+        transform: 'translate3d(0,0,0)',
+        borderRadius: '10px',
+        overflow: 'hidden',
+        fontSize: '18px',
+      }`
+      ).full-width.b-50
   //- footer
   div(
     :style=`{
-      order: 30,
       borderRadius: '10px',
       overflow: 'hidden',
     }`
@@ -153,12 +159,13 @@ div(
 <script>
 import draggable from 'vuedraggable'
 
+import contentProgress from '../../../content_progress'
 import compositionProgress from '../composition_progress'
 import layerEditor from './layer_editor'
 
 export default {
   name: 'compostionEditor',
-  components: {draggable, compositionProgress, layerEditor},
+  components: {draggable, contentProgress, compositionProgress, layerEditor},
   props: ['stateExplorer'],
   data () {
     return {
@@ -230,7 +237,7 @@ export default {
       let layerId = Date.now().toString()
       let layerColor = this.$randomColor(layerId)
       let layerStart = this.stateExplorer.currentTime
-      let layerEnd = layerStart + 10 > this.stateExplorer.duration ? this.stateExplorer.duration - 0.5 : layerStart + 10
+      let layerEnd = layerStart + 10 > this.stateExplorer.duration ? this.stateExplorer.duration : layerStart + 10
       if (layerEnd > this.stateExplorer.duration) alert('layerEnd > this.stateExplorer.duration')
       let layerInput = {
         id: layerId,

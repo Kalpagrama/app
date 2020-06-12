@@ -1,49 +1,51 @@
-<style lang="sass" scoped>
-.item
-  cursor: pointer
-  &:hover
-    background: rgb(90,90,90) !important
-</style>
-
 <template lang="pug">
 div(
   :style=`{
     position: 'relative',
-    height: '100px',
     borderRadius: '10px',
     overflow: 'hidden'
   }`
-  ).row.full-width.items-center.content-center.justify-between.item
+  ).row.full-width.items-center.content-center.justify-between
   img(
-    :src="item.thumbUrl"
+    @click="$emit('edit')"
+    :src="item.thumbOid"
+    draggable="false"
     :style=`{
-      width: '180px',
-      height: '100px',
+      userSelect: 'none',
+      pointerEvents: 'none',
+      maxHeight: '300px',
       borderRadius: '10px',
       overflow: 'hidden',
       objectFit: 'cover',
-    }`)
-  //- middle name
-  .col.full-height
-    div(
-      @click="itemClick()"
-      ).row.fit.items-start.content-start.q-pl-md.q-py-md
-      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ itemName }}
-  //- right actions
-  .row.full-height.items-between.content-between.q-pa-xs
-      q-btn(
-        @click=""
-        flat dense icon="more_vert" color="grey-5"
-        :style=`{}`)
-        kalpa-menu-popup(:actions="actions")
-  //- stats absolute layers
+    }`).full-width.cursor-pointer
+  //- item name
+  div(
+    @click="$emit('edit')"
+    :style=`{
+      position: 'absolute', zIndex: 100, left: '8px', bottom: '8px',
+      borderRadius: '10px', overflow: 'hidden',
+      background: 'rgba(0,0,0,0.9)',
+    }`
+    ).row.items-center.content-center.q-pa-sm.b-50
+    span.text-white.text-bold {{ itemName }}
+  //- item actions
   q-btn(
-    flat dense icon-right="layers" color="grey-5"
+    round flat icon="more_vert" color="white"
     :style=`{
       position: 'absolute', zIndex: 200,
-      right: '4px', bottom: '4px',
+      right: '8px', top: '8px',
+      cursor: 'pointer',
+      background: 'rgba(0,0,0,0.2)'
+    }`)
+    kalpa-menu-popup(:actions="actions")
+  //- stats absolute layers
+  q-btn(
+    dense flat color="grey-5" no-caps
+    :style=`{
+      position: 'absolute', zIndex: 200,
+      right: '16px', bottom: '8px',
       pointerEvents: 'none'
-    }`) {{ item.layers.length }}
+    }`) [layers:{{ item.layers.length }}, duration: {{ $time(compositionDuration) }}]
 </template>
 
 <script>
@@ -56,17 +58,7 @@ export default {
   },
   computed: {
     itemName () {
-      if (this.item.layers.length > 0) {
-        if (this.item.layers[0].spheres.length > 0) {
-          return this.item.layers[0].spheres[0].name
-        }
-        else {
-          return `Item ${this.itemIndex}`
-        }
-      }
-      else {
-        return `Item ${this.itemIndex}`
-      }
+      return this.item.name
     },
     actions () {
       return {
@@ -77,13 +69,6 @@ export default {
             this.$emit('edit')
           }
         },
-        copy: {
-          name: 'Copy',
-          fn: () => {
-            this.$log('Copy')
-            this.$emit('copy')
-          }
-        },
         delete: {
           name: 'Delete',
           fn: () => {
@@ -92,13 +77,15 @@ export default {
           }
         }
       }
+    },
+    compositionDuration () {
+      return this.item.layers.reduce((acc, layer) => {
+        acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
+        return acc
+      }, 0)
     }
   },
   methods: {
-    itemClick () {
-      this.$log('itemClick')
-      this.$emit('edit')
-    }
   }
 }
 </script>

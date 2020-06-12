@@ -4,12 +4,25 @@ div(
     position: 'relative'
   }`
   ).column.fit
+  //- node editor
+  q-dialog(
+    v-model="nodeEditorOpened" position="bottom"
+    )
+    ws-node-editor(
+      @close="nodeEditorOpened = false"
+      :node="node"
+      :style=`{
+        maxWidth: '800px',
+        maxHeight: $q.screen.height-60+'px',
+        minHeight: $q.screen.height-60+'px',
+      }`)
   //- composition editor
   div(
     v-if="stateExplorer.compositionEditing"
     :style=`{
       position: 'absolute', zIndex: 1000,
       top: 0, left: 0, right: 0, bottom: 0,
+      paddingTop: '24px',
     }`
     ).row.fit.justify-center.b-50
     composition-editor(
@@ -21,10 +34,10 @@ div(
   //- tools selected
   div(
     v-if="compositionsSelected.length > 0"
-    :style=`{position: 'absolute', top: 0, zIndex: 1000}`
+    :style=`{position: 'absolute', top: '26px', zIndex: 1000}`
     ).row.full-width.justify-center
     div(
-      :style=`{maxWidth: '680px',}`
+      :style=`{maxWidth: stateExplorer.pageContentWidth+'px',}`
       ).row.full-width.items-center.content-center.q-py-xs.b-50
       q-btn(round flat dense color="white" icon="clear" @click="compositionsSelected = []").b-50.q-ml-xs.q-mr-xs
         q-tooltip(anchor="top middle" self="center middle") Drop selection
@@ -38,10 +51,27 @@ div(
       q-btn(round flat dense color="red" no-caps @click="compositionsSelectedDelete()").q-px-sm.b-50 Delete
   //- body
   .col.full-width.scroll
-    div(v-if="contentOid").row.full-width.justify-center
+    div(v-if="contentOid" :style=`{paddingTop: '26px', paddingBottom: '200px'}`).row.full-width.justify-center
       kalpa-loader(:mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
-          div(:style=`{maxWidth: '680px', paddingBottom: '200px',}`).row.full-width
+          div(:style=`{maxWidth: stateExplorer.pageContentWidth+'px', paddingBottom: '200px',}`).row.full-width.justify-center
+            content-progress(
+              v-if="!stateExplorer.compositionEditing"
+              :stateExplorer="stateExplorer"
+              :style=`{
+                position: 'absolute', zIndex: 1000, top: '-62px',
+                maxWidth: stateExplorer.pageContentWidth-80+'px'}`)
+                template(v-slot:meta)
+                  div(
+                    v-for="(i,ii) in items" :key="i.id"
+                    :style=`{
+                      position: 'absolute', zIndex: 300+ii,
+                      left: i.layers[0].figuresAbsolute[0].t/stateExplorer.duration*100+'%',
+                      top: '0px',
+                      width: '2px',
+                      opacity: 0.5,
+                    }`
+                    ).row.full-height.bg-white
             //- header
             div(
               v-if="true"
@@ -87,13 +117,16 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import compositionItem from './composition_item'
 import compositionEditor from './composition_editor'
+import contentProgress from '../../content_progress'
 
 export default {
   name: 'metaCompositions',
-  components: {compositionItem, compositionEditor},
+  components: {contentProgress, compositionItem, compositionEditor},
   props: ['stateExplorer'],
   data () {
     return {
+      node: null,
+      nodeEditorOpened: false,
       compositionEditorOpened: false,
       compositionsSelected: [],
       contentOid: null,
@@ -121,8 +154,33 @@ export default {
       this.$log('compositionsSelectedMerge')
       this.compositionsSelected = []
     },
-    compositionsSelectedCreateNode () {
+    async compositionsSelectedCreateNode () {
       this.$log('compositionsSelectedCreateNode')
+      // get compositions
+      let compositions = []
+      await Promise.all(
+        this.compositionsSelected.map(async (id) => {
+          let {items: [composition]} = await this.$rxdb.find({selector: { rxCollectionEnum: RxCollectionEnum.WS_CONTENT, id: id }})
+          // TODO: save a connection to the composition, or create a copy for the special use after
+          if (composition) compositions.push(JSON.parse(JSON.stringify(composition)))
+        })
+      )
+      // node input
+      let nodeName = compositions[0].name
+      let nodeInput = {
+        name: nodeName,
+        wsItemType: 'WS_NODE',
+        items: compositions,
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP',
+        stage: 'draft'
+      }
+      this.$log('nodeInput', nodeInput)
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeAddStart item', item)
+      this.node = item
+      this.nodeEditorOpened = true
       this.compositionsSelected = []
     },
     async compositionsSelectedDelete () {
