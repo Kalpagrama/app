@@ -1,3 +1,9 @@
+<style lang="sass">
+.composition-item
+  &:hover
+    background: rgb(90,90,90)
+</style>
+
 <template lang="pug">
 div(
   :style=`{
@@ -10,7 +16,7 @@ div(
     )
     ws-node-editor(
       @close="nodeEditorOpened = false"
-      :node="node"
+      :value="node"
       :style=`{
         maxWidth: '800px',
         maxHeight: $q.screen.height-60+'px',
@@ -22,15 +28,23 @@ div(
     :style=`{
       position: 'absolute', zIndex: 1000,
       top: 0, left: 0, right: 0, bottom: 0,
-      paddingTop: '24px',
+      borderRadius: '0 0 10px 10px',
+      paddingTop: '0px',
     }`
     ).row.fit.justify-center.b-50
-    composition-editor(
+    ws-composition-editor(
+      @createNode="compositionCreateNode()"
+      @close="stateExplorer.set('compositionEditing', null)"
       @delete="compositionDelete(stateExplorer.composition)"
+      :value="stateExplorer.composition"
       :stateExplorer="stateExplorer"
+      :options=`{
+        usePlayer: false,
+        onlyProgress: false,
+      }`
       :style=`{
         maxWidth: '600px',
-      }`)
+      }`).fit
   //- tools selected
   div(
     v-if="compositionsSelected.length > 0"
@@ -55,7 +69,7 @@ div(
       kalpa-loader(:mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
           div(:style=`{maxWidth: stateExplorer.pageContentWidth+'px', paddingBottom: '200px',}`).row.full-width.justify-center
-            content-progress(
+            ws-content-video-progress(
               v-if="!stateExplorer.compositionEditing"
               :stateExplorer="stateExplorer"
               :style=`{
@@ -93,35 +107,31 @@ div(
             //- compositions
             div(
               v-for="(c,ci) in items" :key="c.id"
-              ).row.full-width.items-start.content-start
+              ).row.full-width.items-start.content-start.q-mb-sm
+              //- left
               div(
                 :style=`{width: '40px', height: '40px'}`
                 ).row.items-center.content-center.justify-center
                 q-checkbox(
                   v-model="compositionsSelected" :val="c.id" dark dense color="grey-6"
                   :style=`{opacity: compositionsSelected.includes(c.id) ? 1 : 0.4}`)
-              .col
+              //- middle
+              div(:style=`{position: 'relative'}`).col
                 composition-item(
-                  :value="c" :stateExplorer="stateExplorer"
-                  :style=`{}`
-                  ).q-mb-xs
+                  @edit="compositionEdit(c)"
+                  :composition="c"
+                  :stateExplorer="stateExplorer")
+              //- right fiction
               div(:style=`{width: '40px'}`).bg-red
-            div(
-              v-if="false"
-              :style=`{}`).row.full-width
-              div(v-for="i in 100" :key="i").row.full-width.br item {{i}}
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-
 import compositionItem from './composition_item'
-import compositionEditor from './composition_editor'
-import contentProgress from '../../content_progress'
 
 export default {
   name: 'metaCompositions',
-  components: {contentProgress, compositionItem, compositionEditor},
+  components: {compositionItem},
   props: ['stateExplorer'],
   data () {
     return {
@@ -198,6 +208,19 @@ export default {
       )
       this.$log('compositionsSelectedDelete done')
       this.compositionsSelected = []
+    },
+    compositionCreateNode () {
+      this.$log('compositionCreateNode')
+      let id = this.stateExplorer.composition.id
+      this.compositionDrop()
+      this.compositionsSelected = [id]
+      this.compositionsSelectedCreateNode()
+    },
+    compositionEdit (c) {
+      this.$log('compositionEdit', c)
+      // this.stateExplorer.set('composition', c)
+      this.stateExplorer.set('compositionEditing', c.id)
+      this.compositionEditorOpened = true
     },
     async compositionDelete (c) {
       this.$log('compositionDelete')

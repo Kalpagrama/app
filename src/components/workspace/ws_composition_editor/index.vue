@@ -1,36 +1,33 @@
 <template lang="pug">
-.column.fit.b-50
-  div(
-    :style=`{
-      position: 'relative',
-      height: videoHeight+'px',
-      borderRadius: '10px',
-      overflow: 'hidden',
-    }`).row.full-width.b-30
-    h1 video
-  .col.full-width
-    small.text-white {{ value }}
+video-editor(
+  v-if="content"
+  @createNode="$emit('createNode')"
+  @close="$emit('close')"
+  @delete="$emit('delete')"
+  :options="options"
+  :composition="value"
+  :contentKalpa="content"
+  :stateExplorerReady="stateExplorer")
+  template(v-slot:actions)
+    slot(name="actions")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+import videoEditor from './video_editor'
+
 export default {
   name: 'wsCompositionEditor',
-  props: ['value'],
+  components: {videoEditor},
+  props: ['value', 'options', 'stateExplorer'],
   data () {
     return {
+      content: null
     }
   },
-  computed: {
-    stateExplorer  () {
-      return {
-        set: (key, val) => {
-          this[key] = val
-        }
-      }
-    },
-    videoHeight () {
-      return this.$q.screen.height * 0.4
-    }
+  async mounted () {
+    this.$log('mounted')
+    this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.contentOid)
   }
 }
 </script>

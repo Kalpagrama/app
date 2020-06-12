@@ -16,7 +16,7 @@ div(
     slot(name="header")
     //- navigation
     div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.justify-between.q-py-md
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '18px'}`).text-white.text-bold Node editor
       //- .col
       q-btn(
@@ -56,7 +56,7 @@ import editPreview from './edit_preview'
 export default {
   name: 'wsNodeEditor',
   components: {editInfo, editEssence, editItems, editSpheres, editPreview},
-  props: ['node'],
+  props: ['value'],
   data () {
     return {
       pageId: 'items',
@@ -66,6 +66,11 @@ export default {
         {id: 'spheres', name: 'Spheres'},
         {id: 'preview', name: 'Preview'}
       ]
+    }
+  },
+  computed: {
+    node () {
+      return this.value
     }
   },
   methods: {

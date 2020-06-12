@@ -29,8 +29,10 @@ div(:style=`{position: 'relative'}`).column.fit
       q-btn(round flat dense color="white" icon="menu_open")
   .col.full-width
     router-view(
+      v-if="showView"
+      @close="$router.back()"
       ctx="workspace"
-      :value="item")
+      :value="item").full-height
 </template>
 
 <script>
@@ -60,6 +62,10 @@ export default {
     }
   },
   computed: {
+    showView () {
+      if (this.$route.params.id) return this.item
+      else return true
+    },
     stateWorkspace () {
       return {
         showMenuRight: this.showMenuRight,
@@ -77,8 +83,10 @@ export default {
       async handler (to, from) {
         this.$log('$route.params.id TO', to)
         if (to) {
+          this.item = null
           let rxCollectionEnumMap = {
             'content-explorer': RxCollectionEnum.WS_CONTENT,
+            'composition-editor': RxCollectionEnum.WS_CONTENT,
             'node-editor': RxCollectionEnum.WS_NODE,
             'chain-editor': RxCollectionEnum.WS_CHAIN
           }

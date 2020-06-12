@@ -71,12 +71,6 @@ export default {
           oidSphere: this.sphereOid
         }
       }
-      // return {
-      //   oid: this.sphereOid,
-      //   pagination: { pageSize: 100 },
-      //   sortStrategy: 'HOT',
-      //   filter: { types: 'NODE' }
-      // }
     }
   },
   methods: {

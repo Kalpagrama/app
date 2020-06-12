@@ -1,47 +1,66 @@
 <template lang="pug">
-div(
-  @click="progressClick"
-  :style=`{
-    position: 'absolute', zIndex: 200,
-    left: 0, right: 0, bottom: 0,
-  }`
-  ).row.full-width
-  //- progress
-  div(
-    v-if="true"
-    :style=`{
-      position: 'absolute', zIndex: 300,
-      pointerEvents: 'none',
-      userSelect: 'none',
-      left: '0px',
-      width: width+'%',
-      opacity: 0.5,
-    }`
-    ).row.full-height.bg-white
-  //- progress right border
-  div(
-    :style=`{
-      position: 'absolute', zIndex: 301,
-      left: width+'%',
-      width: '2px',
-      pointerEvents: 'none'
-    }`).row.full-height.bg-green
-  //- kalpa-debug(
-  //-   :options=`{layerActiveStart,layerActiveEnd}`
-  //-   :style=`{position: 'absolute', top: 0, zIndex: 9999, pointerEvents: 'none'}`)
-    //- kalpa-debug(:options=`{layersStats,width}`)
-  //- layers stats
-  div(
-    v-for="(l,li) in layersStats" :key="li"
-    :style=`{
-      position: 'absolute', zIndex: 210,
-      width: '2px',
-      left: l*100+'%',
-      opacity: 0.3,
-      pointerEvents: 'none',
-    }`
-    ).row.full-height.bg-white
-    //- small {{ li }}
+div(:style=`{position: 'relative'}`).row.ful-width.b-70
+  div(:style=`{position: 'relative', height: '40px'}`).row.full-width
+    div(
+      @click="progressClick"
+      :style=`{
+        position: 'absolute', zIndex: 200,
+        left: 0, right: 0, bottom: 0,
+        borderRadius: '10px',
+        overflow: 'hidden',
+      }`
+      ).row.fit.items-center.content-center.b-80
+      //- composition name
+      span(
+        :style=`{userSelect: 'none', pointerEvents: 'none'}`
+        ).text-white.text-bold.q-mx-md {{value.name}}
+      //- progress
+      div(
+        v-if="true"
+        :style=`{
+          position: 'absolute', zIndex: 300,
+          pointerEvents: 'none',
+          userSelect: 'none',
+          left: '0px',
+          width: width+'%',
+          opacity: 0.5,
+        }`
+        ).row.full-height.bg-white
+      //- progress right border
+      div(
+        :style=`{
+          position: 'absolute', zIndex: 301,
+          left: width+'%',
+          width: '2px',
+          pointerEvents: 'none'
+        }`).row.full-height.bg-green
+      //- kalpa-debug(
+      //-   :options=`{layerActiveStart,layerActiveEnd}`
+      //-   :style=`{position: 'absolute', top: 0, zIndex: 9999, pointerEvents: 'none'}`)
+        //- kalpa-debug(:options=`{layersStats,width}`)
+      //- layers stats
+      div(
+        v-for="(l,li) in layersStats" :key="li"
+        :style=`{
+          position: 'absolute', zIndex: 210,
+          width: '2px',
+          left: l*100+'%',
+          opacity: 0.3,
+          pointerEvents: 'none',
+        }`
+        ).row.full-height.bg-white
+        //- small {{ li }}
+  .row.full-width.q-pa-xs
+    q-btn(
+      @click="compositionPlayPause()"
+      round flat dense
+      :color="stateExplorer.playing ? 'red' : 'grey-5'"
+      :icon="stateExplorer.playing ? 'pause' : 'play_arrow'")
+    q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" @click="layerPrev()")
+    q-btn(round flat dense color="grey-5" icon="keyboard_arrow_right" @click="layerNext()")
+    q-btn(round flat dense color="grey-5" icon="refresh" @click="compositionRefresh()")
+    .col
+    slot(name="actions")
 </template>
 
 <script>
@@ -99,7 +118,8 @@ export default {
       immediate: true,
       handler (to, from) {
         // this.$log('currentTime TO', to)
-        if (!this.active) return
+        // if (!this.active) return
+        if (!this.compositionPlaying) return
         if (this.currentTimeStop) return
         if (to > this.layerActiveEnd) {
           // try to find next layerActive
@@ -117,6 +137,40 @@ export default {
     }
   },
   methods: {
+    compositionPlayPause () {
+      this.$log('compositionPlayPause')
+      if (this.stateExplorer.playing) {
+        this.stateExplorer.player.pause()
+        this.compositionPlaying = false
+      }
+      else {
+        this.stateExplorer.player.play()
+        this.compositionPlaying = true
+      }
+    },
+    layerPrev () {
+      this.$log('layerPrev')
+      if (this.value.layers[this.layerActive - 1]) {
+        this.layerActiveSet(this.layerActive - 1)
+      }
+      else {
+        this.layerActiveSet(0)
+      }
+    },
+    layerNext () {
+      this.$log('layerNext')
+      if (this.value.layers[this.layerActive + 1]) {
+        this.layerActiveSet(this.layerActive + 1)
+      }
+      else {
+        this.layerActiveSet(0)
+      }
+    },
+    compositionRefresh () {
+      this.$log('compositionRefresh')
+      this.layerActiveSet(0)
+      this.stateExplorer.player.play()
+    },
     layerActiveSet (index) {
       this.$log('layerActiveSet', index)
       this.layerActive = index
@@ -148,6 +202,10 @@ export default {
       await this.$wait(200)
       this.currentTimeStop = false
     }
+  },
+  mounted () {
+    this.$log('mounted')
+    this.compositionRefresh()
   }
 }
 </script>

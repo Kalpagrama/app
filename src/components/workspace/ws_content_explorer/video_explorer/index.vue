@@ -69,7 +69,7 @@ export default {
       pageId: 'compositions',
       pages: [
         {id: 'info', name: 'Details', icon: 'details'},
-        {id: 'compositions', name: 'Fragments', icon: 'crop_free'},
+        {id: 'compositions', name: 'Compositions', icon: 'crop_free'},
         {id: 'spheres', name: 'Explore', icon: 'language'},
         // {id: 'people', name: 'People', icon: 'perm_identity'},
         // {id: 'chat', name: 'Chat', icon: 'chat_bubble_outline'},

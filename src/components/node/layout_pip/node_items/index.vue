@@ -97,9 +97,11 @@ div(
       composition(
         :ctx="ctx" :preview="i.thumbUrl" :value="i"
         :visible="visible"
+        :loop="items.length === 1"
         :active="active && itemIndex === ii"
         :mini="mini || itemIndex !== ii || nextMaxWidth > 50"
         :itemsCount="items.length"
+        @save="nodeSave()"
         @started="itemStarted(ii)"
         @ended="itemEnded(ii)"
         :style=`{
@@ -110,6 +112,8 @@ div(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'nodeLayoutPip-nodeItems',
   props: ['ctx', 'node', 'nodeFull', 'visible', 'active', 'mini'],
@@ -171,7 +175,70 @@ export default {
       else {
         this.itemIndex = 0
       }
-    }
+    },
+    async nodeSave () {
+      this.$log('nodeSave')
+      let node = JSON.parse(JSON.stringify(this.nodeFull))
+      this.$log('node', node)
+      let compositions = []
+      await Promise.all(
+        node.items.map(async (item) => {
+          let composition = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
+          this.$log('composition', composition)
+          if (composition) {
+            let compositionInput = JSON.parse(JSON.stringify(composition))
+            // prepare composition
+            // add id to composition... or add it to workspace...
+            // TODO: save compositions to WORKSPACE as is? or only in the node...
+            // add id to every layer...
+            compositionInput.thumbOid = compositionInput.thumbUrl
+            compositionInput.layers.map((l, li) => {
+              l.id = `${Date.now().toString()}-${li}`
+              return l
+            })
+            compositions.push(compositionInput)
+          }
+        })
+      )
+      let nodeInput = {
+        wsItemType: 'WS_NODE',
+        thumbOid: this.previewUrl,
+        name: node.name,
+        layout: node.layout,
+        category: node.category,
+        items: compositions,
+        stage: 'saved',
+        spheres: []
+      }
+      this.$log('compositions', compositions)
+      this.$log('nodeInput', nodeInput)
+      // create node in ws
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeAddStart item', item)
+      if (!item) return
+      // notify and maybe show...
+      this.$q.notify({
+        type: 'positive',
+        message: 'Node saved!',
+        actions: [
+          {
+            label: 'Show',
+            color: 'white',
+            handler: () => {
+              this.$log('nodeShow start')
+              this.$router.push(`/workspace/node/${item.id}`)
+            }
+          },
+          {
+            label: 'Close',
+            color: 'white',
+            handler: () => {
+              this.$log('Close')
+            }
+          }
+        ]
+      })
+    },
   }
 }
 </script>

@@ -12,12 +12,11 @@ div(
     draggable="false"
     :style=`{
       userSelect: 'none',
-      pointerEvents: 'none',
       maxHeight: '300px',
       borderRadius: '10px',
       overflow: 'hidden',
       objectFit: 'cover',
-    }`).full-width.cursor-pointer
+    }`).full-width.cursor-pointer.br
   //- item name
   div(
     @click="$emit('edit')"

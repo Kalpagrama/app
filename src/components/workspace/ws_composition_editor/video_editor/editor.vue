@@ -7,7 +7,7 @@ div(
   ).column.fit.b-50
   //- content progress with layers on it
   div(:style=`{position: 'absolute', zIndex: 9999, top: '-62px', left: 0}`).row.full-width.justify-center
-    content-progress(
+    ws-content-video-progress(
       :stateExplorer="stateExplorer"
       :style=`{maxWidth: stateExplorer.pageContentWidth-80+'px'}`)
       template(v-slot:meta)
@@ -95,7 +95,6 @@ div(
   div(
     :style=`{
       position: 'relative',
-      height: '50px',
       borderRadius: '10px',
       overflow: 'hidden',
     }`).row.full-width.b-60
@@ -108,19 +107,11 @@ div(
     :style=`{
     }`
     ).row.full-width.items-center.content-center.q-py-xs
-    q-btn(
-      @click="compositionPlayPause()"
-      round flat dense
-      :color="stateExplorer.playing ? 'red' : 'grey-5'"
-      :icon="stateExplorer.playing ? 'pause' : 'play_arrow'")
-    q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" @click="layerPrev()")
-    q-btn(round flat dense color="grey-5" icon="keyboard_arrow_right" @click="layerNext()")
-    q-btn(round flat dense color="grey-5" icon="refresh" @click="compositionRefresh()")
     .col
     small.text-grey-6.q-mr-sm [layers: {{ composition.layers.length }},
     small(
       :class=`{
-        'text-grey-6': compositionDuration < 60,
+        'text-grey-6': compositionDuration <= 60,
         'text-red': compositionDuration > 60
       }`
       :style=`{}`
@@ -153,20 +144,21 @@ div(
     q-btn(round flat dense color="red" icon="delete_outline" @click="$emit('delete')"
       :style=`{opacity: .6}`)
     .col
-    q-btn(round flat dense color="green" icon="check" @click="done()")
+    q-btn(dense color="green" no-caps @click="$emit('createNode')").q-px-sm Create node
+    .col
+    q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
 </template>
 
 <script>
 import draggable from 'vuedraggable'
 
-import contentProgress from '../../../content_progress'
-import compositionProgress from '../composition_progress'
+import compositionProgress from './composition_progress'
 import layerEditor from './layer_editor'
 
 export default {
   name: 'compostionEditor',
-  components: {draggable, contentProgress, compositionProgress, layerEditor},
-  props: ['stateExplorer'],
+  components: {draggable, layerEditor, compositionProgress},
+  props: ['stateExplorer', 'options'],
   data () {
     return {
       searchString: '',
@@ -208,26 +200,6 @@ export default {
     }
   },
   methods: {
-    compositionPlayPause () {
-      this.$log('compositionPlayPause')
-      if (this.stateExplorer.playing) {
-        this.stateExplorer.player.pause()
-        this.compositionPlaying = false
-      }
-      else {
-        this.stateExplorer.player.play()
-        this.compositionPlaying = true
-      }
-    },
-    layerPrev () {
-      this.$log('layerPrev')
-    },
-    layerNext () {
-      this.$log('layerNext')
-    },
-    compositionRefresh () {
-      this.$log('compositionRefresh')
-    },
     layerClick (l, li) {
       this.$log('layerClick', l, li)
     },
@@ -285,10 +257,6 @@ export default {
         this.layerDelete({id: l}, true)
       })
       this.layersSelected = []
-    },
-    done () {
-      this.$log('done')
-      this.stateExplorer.set('compositionEditing', null)
     },
   },
   mounted () {

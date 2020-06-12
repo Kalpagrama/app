@@ -46,7 +46,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     type="video/mp4"
     :src="composition.url"
     :autoplay="true"
-    :loop="false"
+    :loop="loop"
     :muted="muted"
     :controls="controls"
     :playsinline="playsinline"
@@ -77,6 +77,7 @@ export default {
       type: Object,
       required: true
     },
+    loop: {type: Boolean},
     visible: {type: Boolean},
     active: {type: Boolean},
     mini: {type: Boolean}
@@ -95,7 +96,14 @@ export default {
   },
   computed: {
     actions () {
-      let res = {}
+      let res = {
+        save: {
+          name: 'Save',
+          fn: () => {
+            this.$emit('save')
+          }
+        }
+      }
       this.compositionContents.map(c => {
         res[`explore-${c.oid}`] = {
           name: `Explore:  "${c.name}"`,

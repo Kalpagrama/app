@@ -72,15 +72,22 @@ export default async ({ Vue, store, router: VueRouter }) => {
     Vue.component('composition', () => import('components/node/composition'))
     // Vue.component('sphere', () => import('components/sphere'))
     // workspace
+    // content
     Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
     Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
     Vue.component('wsContentExplorer', () => import('components/workspace/ws_content_explorer'))
+    Vue.component('wsContentVideoProgress', () => import('components/workspace/ws_content_explorer/video_explorer/content_progress'))
+    Vue.component('wsContentVideoPlayer', () => import('components/workspace/ws_content_explorer/video_explorer/content_player'))
+    // composition
     Vue.component('wsCompositionList', () => import('components/workspace/ws_composition_list'))
     Vue.component('wsCompositionEditor', () => import('components/workspace/ws_composition_editor'))
+    // chain
     Vue.component('wsChainList', () => import('components/workspace/ws_chain_list'))
     Vue.component('wsChainEditor', () => import('components/workspace/ws_chain_editor'))
+    // node
     Vue.component('wsNodeList', () => import('components/workspace/ws_node_list'))
     Vue.component('wsNodeEditor', () => import('components/workspace/ws_node_editor'))
+    // sphere
     Vue.component('wsSphereList', () => import('components/workspace/ws_sphere_list'))
     Vue.component('wsSphere', () => import('components/workspace/ws_sphere'))
     // explore

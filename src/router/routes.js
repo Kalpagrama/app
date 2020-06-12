@@ -55,6 +55,7 @@ const routes = [
           { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') },
           // composition
           { name: 'composition-list', path: 'composition', component: () => import('components/workspace/ws_composition_list') },
+          { name: 'composition-editor', path: 'composition/:id', component: () => import('components/workspace/ws_composition_editor') },
           // node
           { name: 'node-list', path: 'node', component: () => import('components/workspace/ws_node_list') },
           { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },

@@ -26,7 +26,7 @@ div(
     @before-hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
     ws-node-editor(
       ctx="workspace"
-      :node="node"
+      :value="node"
       @close="nodeEditorOpened = false"
       :style=`{
         maxWidth: $store.state.ui.maxWidthPage+'px',
@@ -128,8 +128,9 @@ export default {
   methods: {
     nodeEdit (node, ni) {
       this.$log('nodeEdit', node, ni)
-      this.node = node
-      this.nodeEditorOpened = true
+      // this.node = node
+      // this.nodeEditorOpened = true
+      this.$router.push(`/workspace/node/${node.id}`)
     },
     nodeChoose (node) {
       this.$log('nodeChoose', node)
