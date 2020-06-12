@@ -5,7 +5,6 @@
       maxWidth: '600px',
     }`
     ).column.fit.q-py-md
-    //- div().row.full-with.q-pa-md
     div(:style=`{position: 'relative'}`).col.full-width.scroll
       div(
         :style=`{
@@ -21,9 +20,6 @@
       //-     minHeight: '400px',
       //-   }`).fit
       .row.full-width.items-center.content-center.q-py-sm
-        //- q-btn(
-        //-   flat color="white" no-caps icon-right="keyboard_arrow_down"
-        //-   :style=`{height: '40px'}`).b-70 Picture in picture
         .col.q-pr-sm
           q-select(
             filled
@@ -35,16 +31,17 @@
               zIndex: 2000, transform: 'translate3d(0,0,0)',
             }`).full-width
         q-btn(
-          push color="green" no-caps @click="nodePublish()"
-          :style=`{height: '56px'}`).q-px-md Publish
+          @click="stateNodeEditor.nodePublish()"
+          push color="green" no-caps
+          :loading="stateNodeEditor.nodePublishing"
+          :style=`{height: '56px'}`).q-px-md
+          span.text-white.text-bold Publish
 </template>
 
 <script>
-import { NodeApi } from 'src/api/node'
-
 export default {
   name: 'editPreview',
-  props: ['node'],
+  props: ['node', 'stateNodeEditor'],
   data () {
     return {
       nodePublishing: false,
@@ -60,7 +57,6 @@ export default {
       return {
         layout: 'PIP',
         name: this.node.name,
-        // meta: this.node,
         items: this.node.items,
         spheres: this.node.spheres,
         category: this.node.category,
@@ -76,30 +72,6 @@ export default {
       this.$log('layoutSelected', e)
       this.node.layout = e.value
     },
-    async nodePublish () {
-      try {
-        this.$log('nodePublish start')
-        this.nodePublishing = true
-        // create
-        this.$q.loading.show({spinnerColor: 'green', message: 'Creating node...'})
-        await this.$wait(400)
-        let res = await NodeApi.nodeCreate(this.node)
-        this.$log('nodePublish res', res)
-        // publish
-        this.$q.loading.show({spinnerColor: 'green', message: 'Publishing node...'})
-        await this.$wait(1000)
-        this.node.stage = 'published'
-        // done
-        this.$q.loading.show({spinnerColor: 'green', message: 'Done !'})
-        await this.$wait(2000)
-        this.$q.loading.hide()
-        this.nodePublishing = false
-        this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
-        this.$emit('close')
-      } finally {
-        this.nodePublishing = false
-      }
-    }
   },
   mounted () {
     this.$log('mounted')

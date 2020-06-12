@@ -1,5 +1,17 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
+  //- node editor
+  q-dialog(
+    v-model="nodeEditorOpened" position="bottom")
+    ws-node-editor(
+      @published="nodePublished"
+      @close="nodeEditorOpened = false"
+      :value="nodeEditorItem"
+      :style=`{
+        maxWidth: '800px',
+        maxHeight: $q.screen.height-60+'px',
+        minHeight: $q.screen.height-60+'px',
+      }`)
   //- header
   div(
     :style=`{borderRadius: '0 0 10px 10px'}`
@@ -35,22 +47,26 @@ div(:style=`{position: 'relative'}`).column.fit
       bottom: $q.screen.xs ? 60+8+'px' : 8+'px',
       height: '50px'
     }`
-    ).q-px-md Reply to node
+    ).q-px-md
+    span.text-white.text-bold Добавить образ
   //- body
   .col.full-width.scroll
     div(v-if="node").row.full-width.justify-center
         div(:style=`{position: 'relative', maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.q-pt-sm
-          kalpa-debug(:options=`{nodeActive,nodeVisible,stateNodeExplorer}`)
+          //- kalpa-debug(:options=`{nodeActive,nodeVisible,stateNodeExplorer}`)
           node(
             ctx="list"
             :node="node" :needFull="true"
             :visible="nodeVisible" :active="nodeActive" :mini="nodeMini")
     div(v-if="node").row.full-width
-      //- node-nodes(:node="node" :stateNodeExplorer="stateNodeExplorer")
-      router-view(:node="node")
+      router-view(
+        :node="node"
+        :stateNodeExplorer="stateNodeExplorer")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 import menuRight from './menu_right'
 import nodeNodes from './node_nodes'
 
@@ -60,11 +76,11 @@ export default {
   props: ['node'],
   data () {
     return {
-      nodeVisible: true,
       nodeActive: true,
+      nodeVisible: true,
       nodeMini: false,
-      nodeEditorOpened: false,
       nodeEditorItem: null,
+      nodeEditorOpened: false,
       showMenuRight: false,
       pages: [
         {id: 'nodes', name: 'Nodes'},
@@ -78,8 +94,8 @@ export default {
     },
     stateNodeExplorer () {
       return {
-        nodeVisible: this.nodeVisible,
         nodeActive: this.nodeActive,
+        nodeVisible: this.nodeVisible,
         set: (key, val) => {
           this[key] = val
         }
@@ -87,31 +103,43 @@ export default {
     }
   },
   watch: {
-    '$router.params.page': {
-      immediate: true,
+    nodeEditorOpened: {
       handler (to, from) {
-        this.$log('$route.params.page CHANGED', to)
-        if (to) {
-        }
-        else {
-          this.$router.replace({params: {page: 'nodes'}}).catch(e => e)
+        this.$log('nodeEditorOpend', to)
+        if (to === false) {
+          this.stateNodeExplorer.set('nodeActive', true)
         }
       }
     }
   },
   methods: {
-    nodeAdd () {
-      this.$log('nodeAdd')
+    async nodeAdd () {
+      this.$log('nodeAdd', this.node)
+      // create nodeInput
       let nodeInput = {
         name: this.node.name,
         wsItemType: 'WS_NODE',
         items: [],
         spheres: [],
-        category: 'FUN',
-        layout: 'PIP'
+        category: this.node.category,
+        layout: this.node.layout,
       }
-      this.nodeEditorItem = nodeInput
+      this.$log('nodeInput', nodeInput)
+      // create item
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeAdd item', item)
+      // mute all
+      this.stateNodeExplorer.set('nodeActive', false)
+      // open editor
+      this.nodeEditorItem = item
       this.nodeEditorOpened = true
+    },
+    nodePublished () {
+      this.$log('nodePublished')
+      this.$q.notify({
+        type: 'positive',
+        message: 'Образ успешно добавлен!',
+      })
     }
   },
   mounted () {

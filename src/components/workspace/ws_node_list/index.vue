@@ -27,6 +27,7 @@ div(
     ws-node-editor(
       ctx="workspace"
       :value="node"
+      @published="nodePublished"
       @close="nodeEditorOpened = false"
       :style=`{
         maxWidth: $store.state.ui.maxWidthPage+'px',
@@ -71,7 +72,7 @@ div(
               v-for="(n,ni) in items" :key="ni"
               :node="n" :nodeIndex="ni"
               @edit="nodeEdit(n,ni)"
-              @delete="nodeDelete(n,ni)")
+              @delete="nodeDelete(n,ni)").q-mb-xs
           //- nothing found
           div(
             v-else
@@ -158,6 +159,10 @@ export default {
       this.$log('nodeAddStart item', item)
       this.searchString = ''
       this.nodeChoose(item)
+    },
+    nodePublished () {
+      this.$log('nodePublished')
+      this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
     }
   }
 }

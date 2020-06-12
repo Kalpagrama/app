@@ -108,7 +108,7 @@ div(
           position: 'relative',
           borderRadius: '10px',
           overflow: 'hidden',
-        }`)
+        }`).fit
 </template>
 
 <script>

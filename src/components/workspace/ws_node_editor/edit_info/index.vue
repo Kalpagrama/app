@@ -26,24 +26,22 @@
           .row.full-width.q-pa-sm
             span.text-white.text-bold Danger zone
           .row.full-width.q-px-sm
-            q-btn(color="red" no-caps @click="nodeDelete()") Delete node
+            q-btn(
+              @click="stateNodeEditor.nodeDelete()"
+              color="red" no-caps
+              :loading="stateNodeEditor.nodeDeleting"
+              ) Delete node
 </template>
 
 <script>
 export default {
   name: 'editInfo',
-  props: ['node'],
+  props: ['node', 'stateNodeEditor'],
   data () {
     return {
     }
   },
   methods: {
-    async nodeDelete () {
-      this.$log('nodeDelete')
-      if (!confirm('Delete node ?!')) return
-      await this.$rxdb.remove(this.node.id)
-      this.$emit('close')
-    }
   }
 }
 </script>

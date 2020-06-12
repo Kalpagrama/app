@@ -48,6 +48,8 @@ div(
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'itemFinder',
   data () {
@@ -65,28 +67,38 @@ export default {
       this.$emit('item', composition)
       this.$emit('close')
     },
-    contentFound (content) {
-      this.$log('contentFound')
-      // this.$emit('item', null)
-      // this.$log('contentFound', content)
-      // // TODO: impl convert => content to composition => node.item
-      // let itemIndex = this.node.items.length
-      // let itemId = Date.now().toString()
-      // let itemInput = {
-      //   id: itemId,
-      //   name: '',
-      //   layers: [],
-      //   spheres: [],
-      //   contentType: 'VIDEO',
-      //   contentOid: content.contentOid,
-      //   thumbUrl: content.thumbOid,
-      //   operation: {items: null, operations: null, type: 'CONCAT'}
-      // }
-      // this.$set(this.node.items, itemIndex, itemInput)
-      // this.itemFinderOpened = false
-      // // set item, open editor
-      // this.item = this.node.items[itemIndex]
-      // this.itemEditorOpened = true
+    async contentFound (content) {
+      this.$log('contentFound', content)
+      let layerId = Date.now().toString()
+      let layerColor = this.$randomColor(layerId)
+      let layerStart = 0
+      let layerEnd = layerStart + 10
+      let compositionInput = {
+        wsItemType: 'WS_CONTENT',
+        thumbOid: content.thumbOid,
+        contentOid: content.contentOid,
+        contentType: 'COMPOSITION',
+        name: '',
+        layers: [
+          {
+            id: layerId,
+            color: layerColor,
+            contentOid: content.contentOid,
+            figuresAbsolute: [
+              {t: layerStart, points: []},
+              {t: layerEnd, points: []}
+            ],
+            figuresRelative: [],
+            spheres: []
+          }
+        ],
+        spheres: [],
+        operation: { items: null, operations: null, type: 'CONCAT' }
+      }
+      this.$log('compositionInput', compositionInput)
+      let composition = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, compositionInput)
+      this.$log('composition', composition)
+      this.$emit('item', composition)
       this.$emit('close')
     }
   },

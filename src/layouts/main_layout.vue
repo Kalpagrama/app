@@ -59,7 +59,7 @@ q-layout(
               maxWidth: ($q.screen.width-maxWidth)/2+'px',
               height: '500px'
             }`).row.full-width.justify-end.q-pt-sm.q-px-sm
-            kalpa-menu
+            kalpa-menu(v-if="!loading")
           router-view(
             v-if="!loading")
           div(

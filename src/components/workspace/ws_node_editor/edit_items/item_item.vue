@@ -16,7 +16,7 @@ div(
       borderRadius: '10px',
       overflow: 'hidden',
       objectFit: 'cover',
-    }`).full-width.cursor-pointer.br
+    }`).full-width.cursor-pointer
   //- item name
   div(
     @click="$emit('edit')"

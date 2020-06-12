@@ -1,5 +1,15 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+  //- composition name
+  q-btn(
+    v-if="composition && composition.name.length > 0 && !mini"
+    flat color="white" no-caps
+    :style=`{
+      position: 'absolute', top: '8px', left: '8px', zIndex: 2000,
+      transform: 'translate3d(0,0,0)',
+      background: 'rgba(0,0,0,0.1)',
+    }`
+    ) {{ composition.name }}
   //- menu
   q-btn(
     v-if="!mini"
@@ -10,7 +20,11 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       transform: 'translate3d(0,0,0)',
       background: 'rgba(0,0,0,0.1)'
     }`)
-    kalpa-menu-popup(:actions="actions")
+    kalpa-menu-popup(
+      :actions="actions"
+      :style=`{
+        minWidth: '200px',
+      }`)
   //- preview
   img(
     :src="preview"
@@ -21,25 +35,16 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     }`
     ).full-width
   //- debug
-  kalpa-debug(
-    v-if="composition && !mini && false"
-    :options=`{url: composition.url, videoLoaded,currentTime,duration}`
-    :style=`{position: 'absolute', top: 0, zIndex: 1000,transform: 'translate3d(0,0,0)'}`)
-  //- progress
-  div(
-    :style=`{
-      position: 'absolute', zIndex: 200, bottom: '0px',
-      height: '6px',
-    }`
-    ).row.full-width
-    div(
-      :style=`{
-        position: 'absolute', zIndex: 300, left: '0px',
-        width: (currentTime/duration)*100+'%',
-        borderRadius: '3px', overflow: 'hidden',
-        pointerEvents: 'none',
-      }`
-      ).row.full-height.bg-green
+  //- kalpa-debug(
+  //-   v-if="composition && !mini && false"
+  //-   :options=`{url: composition.url, videoLoaded,currentTime,duration}`
+  //-   :style=`{position: 'absolute', top: 0, zIndex: 1000,transform: 'translate3d(0,0,0)'}`)
+  video-controls(
+    v-if="!mini && $refs.videoRef"
+    :currentTime="currentTime"
+    :duration="duration"
+    :player="$refs.videoRef"
+    :playing="playing")
   video(
     v-if="composition && composition.url.length > 0 && active"
     ref="videoRef"
@@ -67,8 +72,11 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+import videoControls from './video_controls'
+
 export default {
   name: 'composition',
+  components: {videoControls},
   props: {
     preview: {
       type: String

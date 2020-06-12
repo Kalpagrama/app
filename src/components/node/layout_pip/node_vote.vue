@@ -42,7 +42,7 @@ import { NodeApi } from 'src/api/node'
 
 export default {
   name: 'layoutPip-vote',
-  props: ['node'],
+  props: ['node', 'stateNode'],
   data () {
     return {
       voteOver: null,
@@ -60,6 +60,7 @@ export default {
       this.$log('voteEnd')
       let res = await NodeApi.nodeVote(this.node.oid, val)
       this.$log('voteEnd', res)
+      this.stateNode.set('showVote', false)
       this.$emit('end')
     }
   }
