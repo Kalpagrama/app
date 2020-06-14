@@ -16,7 +16,7 @@ div(
     :style=`{height: '90px'}`
     ).row.full-width.items-center.content-center
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-      q-btn(round flat color="white" @click="$router.push('/')")
+      q-btn(round flat color="white" @click="$router.push('/').catch(e => e)")
         q-icon(name="blur_on" size="36px" color="white")
     .col
       .row.fit.items-center.content-center
@@ -82,7 +82,7 @@ div(
             span(:style=`{fontSize: '18px'}`).q-mx-lg Create node
         //- version
         .row.full-width.items-center.q-px-md.q-py-sm
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.9.3-02.06.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.9.8-12.06.2020
         //- slot(name="footer")
 </template>
 

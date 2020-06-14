@@ -21,12 +21,13 @@ div(
     }`)
   //- node editor
   q-dialog(
-    v-model="nodeEditorOpened" persistent position="bottom"
+    v-model="nodeEditorOpened" position="bottom"
     @before-show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
     @before-hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
     ws-node-editor(
       ctx="workspace"
-      :node="node"
+      :value="node"
+      @published="nodePublished"
       @close="nodeEditorOpened = false"
       :style=`{
         maxWidth: $store.state.ui.maxWidthPage+'px',
@@ -71,7 +72,7 @@ div(
               v-for="(n,ni) in items" :key="ni"
               :node="n" :nodeIndex="ni"
               @edit="nodeEdit(n,ni)"
-              @delete="nodeDelete(n,ni)")
+              @delete="nodeDelete(n,ni)").q-mb-xs
           //- nothing found
           div(
             v-else
@@ -89,9 +90,9 @@ export default {
   components: {nodeItem},
   data () {
     return {
-      type: 'all',
+      type: 'draft',
       types: [
-        {id: 'all', name: 'All'},
+        // {id: 'all', name: 'All'},
         {id: 'saved', name: 'Saved'},
         {id: 'draft', name: 'Drafts'},
         {id: 'published', name: 'Published'},
@@ -104,14 +105,17 @@ export default {
   computed: {
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE}}
+      // name
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
+      // type
       if (this.type !== 'all') {
         res.selector.stage = this.type
       }
-      // TODO: add spheres
+      // sort
+      res.sort = [{updatedAt: 'desc'}]
       return res
     }
   },
@@ -125,8 +129,9 @@ export default {
   methods: {
     nodeEdit (node, ni) {
       this.$log('nodeEdit', node, ni)
-      this.node = node
-      this.nodeEditorOpened = true
+      // this.node = node
+      // this.nodeEditorOpened = true
+      this.$router.push(`/workspace/node/${node.id}`)
     },
     nodeChoose (node) {
       this.$log('nodeChoose', node)
@@ -154,6 +159,10 @@ export default {
       this.$log('nodeAddStart item', item)
       this.searchString = ''
       this.nodeChoose(item)
+    },
+    nodePublished () {
+      this.$log('nodePublished')
+      this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
     }
   }
 }

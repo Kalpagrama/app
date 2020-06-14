@@ -12,7 +12,10 @@ div(
   //- thumb
   div(
     @click="$emit('pick')"
-    :style=`{width: '180px', height: '100px', borderRadius: '10px', overflow: 'hidden'}`
+    :style=`{
+      position: 'relative',
+      width: '180px', height: '100px',
+      borderRadius: '10px', overflow: 'hidden'}`
     ).row.items-center.content-center.justify-center.b-80
     img(
       v-if="!thumbErrored"
@@ -23,6 +26,19 @@ div(
     q-icon(
       v-if="thumbErrored"
       name="photo" size="150px" :style=`{color: 'rgb(90,90,90)'}`).full-width
+    //- video stats duration
+    small(
+      v-if="contentKalpa"
+      :style=`{
+        position: 'absolute', zIndex: 200,
+        transform: 'translate3d(0,0,0)',
+        right: '4px', bottom: '4px',
+        borderRadius: '10px', overflow: 'hidden',
+        background: 'rgba(0,0,0,0.5)',
+        pointerEvents: 'none',
+        userSelect: 'none',
+      }`
+      ).q-px-sm.q-py-xs.text-white {{ $time(contentKalpa.duration) }}
   //- center name
   div(
     @click="$emit('pick')"
@@ -35,30 +51,35 @@ div(
     flat dense color="grey-5"
     icon-right="layers"
     :style=`{
-      position: 'absolute', right: '3px', bottom: '0px', zIndex: 1000,
+      position: 'absolute', right: '3px', bottom: '4px', zIndex: 1000,
     }`)
     small {{ content.layers.length }}
   //- right
   div(
     v-if="ctx === 'workspace'"
-    :style=`{width: '36px'}`).row.full-height.items-start.content-start.q-pt-sm
+    :style=`{}`).row.full-height.items-start.content-start.q-pa-xs
     q-btn(round flat dense color="grey-6" icon="more_vert")
       kalpa-menu-popup(:actions="actions")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+// TODO: different content types and items...
+
 export default {
   name: 'contentItem',
   props: ['ctx', 'content'],
   data () {
     return {
+      contentKalpa: null,
       mouseIsOver: false,
       thumbErrored: false
     }
   },
   computed: {
     contentName () {
-      return this.content.name
+      if (this.$q.screen.xs) return this.content.name.slice(0, 70)
+      else return this.content.name.slice(0, 200)
     },
     actions () {
       return {
@@ -88,6 +109,10 @@ export default {
       // this.$log('thumbErrorHandle')
       this.thumbErrored = true
     }
+  },
+  async mounted () {
+    // this.$log('mounted')
+    this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, this.content.contentOid)
   }
 }
 </script>

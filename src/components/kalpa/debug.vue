@@ -4,10 +4,10 @@ div(
     borderRadius: '10px', opacity: 0.8,
     pointerEvents: 'none',
     userSelect: 'none',
-  }`).row.full-width.bg-green.q-pa-xs
+  }`).row.full-width.bg-green.q-px-xs
   div(
     v-for="(o,okey) in options" :key="oi"
-    :style=`{fontSize: '11px', color: 'white'}`
+    :style=`{fontSize: '10px', color: 'white'}`
     ).row.full-width
     small {{okey}}: "{{o}}"
 </template>

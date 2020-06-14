@@ -6,26 +6,38 @@
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-    height: '50px',
-    borderRadius: '10px',
-    overflow: 'hidden',
-  }`
-  ).row.full-width.items-start.content-start.b-70.q-mb-xs.node
-  .col.full-height
-    div(
-      @click="nodeClick()"
-      ).row.fit.items-center.content-center.q-pl-md
-      span(
-        :style=`{
-          userSelect: 'none'
-        }`
-        ).text-white.text-bold {{ nodeName }}
-  div(:style=`{}`).row.full-height.items-center.content-center.justify-center.q-px-sm
-    q-btn(round flat dense color="grey-6" icon="more_vert")
-      kalpa-menu-popup(:actions="actions")
+div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.items-end.b-60
+  //- div(v-if="node.stage === 'saved'").row.full-width
+  //-   img(
+  //-     :src="node.thumbOid"
+  //-     :style=`{
+  //-       objectFit: 'cover',
+  //-       borderRadius: '10px',
+  //-       overflow: 'hidden',
+  //-       maxHeight: '100px',
+  //-       maxWidth: '100px',
+  //-     }`
+  //-     )
+  div(
+    :style=`{
+      position: 'relative',
+      height: '50px',
+      borderRadius: '10px',
+      overflow: 'hidden',
+    }`
+    ).row.full-width.items-start.content-start.b-70.node
+    .col.full-height
+      div(
+        @click="nodeClick()"
+        ).row.fit.items-center.content-center.q-pl-md
+        span(
+          :style=`{
+            userSelect: 'none'
+          }`
+          ).text-white.text-bold {{ nodeName }} {{node.stage}}
+    div(:style=`{}`).row.full-height.items-center.content-center.justify-center.q-px-sm
+      q-btn(round flat dense color="grey-6" icon="more_vert")
+        kalpa-menu-popup(:actions="actions")
 </template>
 
 <script>

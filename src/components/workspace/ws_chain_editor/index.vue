@@ -9,10 +9,24 @@ div(
     .row.full-width.items-center.content-center.q-px-sm.q-py-md.b-50
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
       span.text-white.text-bold Chain editor
+    .row.full-width.q-pa-sm
+      q-input(
+        v-model="name"
+        filled dark color="grey-5"
+        label="Chain name"
+        ).full-width
   //- body
-  .col.full-width
-    .row.full-width.q-pa-md
-      span.text-white {{ value }}
+  .col.full-width.q-pa-sm
+    div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.b-60
+  .col.full-width.q-pa-sm
+    div(
+      :style=`{borderRadius: '10px', overflow: 'hidden'}`
+      ).row.fit.items-center.content-center.justify-center.b-60
+      q-btn(
+        round flat color="green" icon="add"
+        size="lg")
+  div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-pa-sm.b-60
+    q-btn(round flat dense color="grey-5" icon="menu")
 </template>
 
 <script>
@@ -21,6 +35,7 @@ export default {
   props: ['value'],
   data () {
     return {
+      name: '',
     }
   },
   mounted () {

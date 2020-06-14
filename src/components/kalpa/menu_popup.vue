@@ -8,12 +8,12 @@ q-menu(cover auto-close anchor="top right")
   div(
     :style=`{
       minWidth: '150px',
-      maxWidth: '240px',
+      maxWidth: $q.screen.width-16 > 400 ? '400px' : $q.screen.width-16+'px',
     }`).column.fit.b-70
     .col.full-width
       q-btn(
         v-for="(a, akey) in actions" :key="akey"
-        @click="a.fn(value)"
+        @click="a.fn(value, akey)"
         flat no-caps color="white" align="left"
         ).full-width {{ a.name }}
 </template>

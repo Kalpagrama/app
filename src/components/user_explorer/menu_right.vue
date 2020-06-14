@@ -8,15 +8,14 @@
 div(
   :style=`{
     borderRadius: '10px', overflow: 'hidden',
-    maxHeight: '70vh'
   }`
   ).column.full-width.b-50
   //- pages
   router-link(
     v-for="(p,pi) in pages" :key="p.id"
-    :to=`{params: {page: p.id}}`
+    :to=`{name: p.id}`
     :class=`{
-      'b-100': $route.params.page === p.id
+      'b-100': $route.name === p.id
     }`
     :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
     span(:style=`{userSelect: 'none'}`).text-white {{ p.name }}

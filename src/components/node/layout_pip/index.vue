@@ -11,36 +11,37 @@ div(
   }`
   ).row.full-width.items-start.content-start
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 10000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
-  node-items(
-    v-if="true"
-    v-bind="$props" :stateNode="stateNode"
-    :style=`{
-      transform: 'translate3d(0,0,0)',
-      borderRadius: '10px',
-      overflow: 'hidden',
-    }`).b-60
-  node-tools(
-    v-if="false"
-    v-bind="$props" :stateNode="stateNode"
-    :style=`{}`)
-  node-vote(
-    v-if="false"
-    v-bind="$props" :stateNode="stateNode")
+  div(:style=`{position: 'relative'}`).row.full-width
+    node-items(
+      v-if="true"
+      v-bind="$props" :stateNode="stateNode"
+      :style=`{
+        transform: 'translate3d(0,0,0)',
+        borderRadius: '10px',
+        overflow: 'hidden',
+      }`).b-60
+    node-vote(
+      v-if="stateNode.showVote"
+      v-bind="$props"
+      :stateNode="stateNode")
   node-essence(
-    v-if="ctx !== 'workspace'"
-    v-bind="$props" :stateNode="stateNode"
+    v-if="true"
+    v-bind="$props"
+    :stateNode="stateNode"
     :style=`{
       order: 2
     }`)
   node-author(
-    v-if="nodeFull && ctx  !== 'workspace'"
-    v-bind="$props" :stateNode="stateNode"
+    v-if="true"
+    v-bind="$props"
+    :stateNode="stateNode"
     :style=`{
       order: 3
     }`)
   node-spheres(
-    v-if="nodeFull && nodeFull.spheres.length > 0"
-    v-bind="$props" :stateNode="stateNode"
+    v-if="$route.name === 'nodes' && nodeFull && nodeFull.spheres.length > 0"
+    v-bind="$props"
+    :stateNode="stateNode"
     :style=`{
       order: 4
     }`)

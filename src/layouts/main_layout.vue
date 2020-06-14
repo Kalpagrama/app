@@ -51,15 +51,15 @@ q-layout(
         div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).col.full-height
           //- left panel menu
           div(
-            v-if="false"
+            v-if="$q.screen.width > 1260"
             :style=`{
               position: 'absolute', zIndex: 99999,
               top: $store.state.ui.appFullscreen ? '8px' : '0px',
               left: $store.state.ui.appFullscreen ? '8px' : -($q.screen.width-maxWidth)/2+'px',
               maxWidth: ($q.screen.width-maxWidth)/2+'px',
               height: '500px'
-            }`).row.justify-end.br
-            kalpa-menu
+            }`).row.full-width.justify-end.q-pt-sm.q-px-sm
+            kalpa-menu(v-if="!loading")
           router-view(
             v-if="!loading")
           div(
@@ -99,8 +99,11 @@ export default {
   },
   methods: {
     onResize (e) {
-      this.$log('onResize', e)
+      // this.$log('onResize', e)
       this.$store.commit('ui/stateSet', ['panelMaxWidth', (e.width - this.maxWidth) / 2])
+      if (this.$store.state.ui.appFullscreen) {
+        this.maxWidth = e.width
+      }
     }
   },
   async created () {

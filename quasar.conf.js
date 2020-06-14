@@ -67,6 +67,7 @@ module.exports = function (ctx) {
       plugins: [
         'Meta',
         'Notify',
+        'Screen',
         'BottomSheet',
         'AppFullscreen',
         'AddressbarColor'

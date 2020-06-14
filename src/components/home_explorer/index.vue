@@ -1,5 +1,4 @@
 <template lang="pug">
-//- container :style=`{height: $q.screen.height+'px'}`
 q-layout(
   view="hHh lpR fFf"
   container :style=`{height: $q.screen.height+'px'}`).b-30
@@ -72,12 +71,6 @@ export default {
           oidSphere: this.sphereOid
         }
       }
-      // return {
-      //   oid: this.sphereOid,
-      //   pagination: { pageSize: 100 },
-      //   sortStrategy: 'HOT',
-      //   filter: { types: 'NODE' }
-      // }
     }
   },
   methods: {

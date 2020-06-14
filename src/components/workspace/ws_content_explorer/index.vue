@@ -1,14 +1,11 @@
 <template lang="pug">
 component(
-  v-if="content"
-  :is="component[content.contentType]"
-  :content="content"
-  )
+  v-if="value"
+  :is="component[value.contentType]"
+  :content="value")
 </template>
 
 <script>
-import { ContentApi } from 'src/api/content'
-import { RxCollectionEnum } from 'src/system/rxdb'
 
 import videoExplorer from './video_explorer'
 // import imageExplorer from './image_explorer'
@@ -16,10 +13,10 @@ import videoExplorer from './video_explorer'
 
 export default {
   name: 'wsContentExplorer',
+  props: ['value'],
   components: {videoExplorer},
   data () {
     return {
-      content: null,
       component: {
         VIDEO: 'video-explorer',
         IMAGE: 'image-explorer',
@@ -29,22 +26,10 @@ export default {
     }
   },
   watch: {
-    '$route.params.id': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('$route.params.id TO', to)
-        if (to) {
-          let {items: [content]} = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-              id: to
-            }
-          })
-          this.$log('content', content)
-          this.content = content
-        }
-      }
-    }
   },
+  mounted () {
+    this.$log('mounted')
+    this.$log('value', this.value)
+  }
 }
 </script>

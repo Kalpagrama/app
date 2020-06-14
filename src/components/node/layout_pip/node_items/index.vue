@@ -29,7 +29,7 @@ div(
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-120+'px',
-      opacity: itemIndex === 0 ? 0 : 0
+      opacity: itemIndex === 0 ? 1 : 0
     }`
     ).full-width
   //- items wrapper
@@ -41,7 +41,7 @@ div(
     ).row.fit.items-start.content-start
     //- items stats
     div(
-      v-if="visible && active && items.length > 1"
+      v-if="true && visible && active && items.length > 1"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '0px',
         transform: 'translate3d(0,0,0)',
@@ -53,7 +53,7 @@ div(
           :style=`{height: '4px'}`).col.q-px-xs
             div(:style=`{
               borderRadius: '2px', overflow: 'hidden',
-              background: itemIndex === ii ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.4)'
+              background: itemIndex === ii ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)'
             }`).row.fit
     //- item prev
     div(
@@ -97,21 +97,23 @@ div(
       composition(
         :ctx="ctx" :preview="i.thumbUrl" :value="i"
         :visible="visible"
+        :loop="items.length === 1"
         :active="active && itemIndex === ii"
         :mini="mini || itemIndex !== ii || nextMaxWidth > 50"
         :itemsCount="items.length"
+        @save="nodeSave()"
         @started="itemStarted(ii)"
         @ended="itemEnded(ii)"
         :style=`{
           position: 'relative',
           borderRadius: '10px',
           overflow: 'hidden',
-        }`)
-        template(v-slot:video)
-          //- .row.full-width.q-pa-xs.bg-pink pink
+        }`).fit
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'nodeLayoutPip-nodeItems',
   props: ['ctx', 'node', 'nodeFull', 'visible', 'active', 'mini'],
@@ -167,7 +169,76 @@ export default {
     },
     itemEnded (itemIndex) {
       this.$log('itemEnded', itemIndex)
-    }
+      if (this.items[itemIndex + 1]) {
+        this.itemsNext()
+      }
+      else {
+        this.itemIndex = 0
+      }
+    },
+    async nodeSave () {
+      this.$log('nodeSave')
+      let node = JSON.parse(JSON.stringify(this.nodeFull))
+      this.$log('node', node)
+      let compositions = []
+      await Promise.all(
+        node.items.map(async (item) => {
+          let composition = await this.$rxdb.get(RxCollectionEnum.OBJ, item.oid)
+          this.$log('composition', composition)
+          if (composition) {
+            let compositionInput = JSON.parse(JSON.stringify(composition))
+            // prepare composition
+            // add id to composition... or add it to workspace...
+            // TODO: save compositions to WORKSPACE as is? or only in the node...
+            // add id to every layer...
+            compositionInput.thumbOid = compositionInput.thumbUrl
+            compositionInput.layers.map((l, li) => {
+              l.id = `${Date.now().toString()}-${li}`
+              return l
+            })
+            compositions.push(compositionInput)
+          }
+        })
+      )
+      let nodeInput = {
+        wsItemType: 'WS_NODE',
+        thumbOid: this.previewUrl,
+        name: node.name,
+        layout: node.layout,
+        category: node.category,
+        items: compositions,
+        stage: 'saved',
+        spheres: []
+      }
+      this.$log('compositions', compositions)
+      this.$log('nodeInput', nodeInput)
+      // create node in ws
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeAddStart item', item)
+      if (!item) return
+      // notify and maybe show...
+      this.$q.notify({
+        type: 'positive',
+        message: 'Node saved!',
+        actions: [
+          {
+            label: 'Show',
+            color: 'white',
+            handler: () => {
+              this.$log('nodeShow start')
+              this.$router.push(`/workspace/node/${item.id}`)
+            }
+          },
+          {
+            label: 'Close',
+            color: 'white',
+            handler: () => {
+              this.$log('Close')
+            }
+          }
+        ]
+      })
+    },
   }
 }
 </script>
