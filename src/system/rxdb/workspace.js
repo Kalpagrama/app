@@ -87,7 +87,7 @@ class Workspace {
     // обработка события измения мастерской пользователем (запоминает измененные элементы)
     let onWsChangedByUser = async (id, operation) => {
       const f = onWsChangedByUser
-      if (this.synchronizeWsWholeInProgress || !rxdb.isLeader()) return
+      if (this.ignoreWsChanges || !rxdb.isLeader()) return
       assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
       await this.db.ws_changes.atomicUpsert({ id, operation })
       logD(f, `complete. ${id}`)
@@ -107,13 +107,21 @@ class Workspace {
   async clearCollections () {
     const f = this.clearCollections
     logD(f, 'start')
-    if (this.db.ws_items) {
-      await this.db.ws_items.remove()
+    assert(!this.ignoreWsChanges, 'ignoreWsChanges === true')
+    try {
+      await this.lock()
+      this.ignoreWsChanges = true
+      if (this.db.ws_items) {
+        await this.db.ws_items.remove()
+      }
+      if (this.db.ws_changes) {
+        await this.db.ws_changes.remove()
+      }
+      await this.createCollections()
+    } finally {
+      this.ignoreWsChanges = false
+      this.release()
     }
-    if (this.db.ws_changes) {
-      await this.db.ws_changes.remove()
-    }
-    await this.createCollections()
     logD(f, 'complete')
   }
 
@@ -144,13 +152,13 @@ class Workspace {
       while (this.reactiveUser) {
         logD(f, 'next loop...', this.synchroLoopWaitObj.getTimeOut())
         try {
-          await this.mutex.lock()
+          await this.lock()
           if (rxdb.isLeader()) await this.synchronize()
         } catch (err) {
           logE(f, 'не удалось синхронизировать мастерскую с сервером', err)
           this.synchroLoopWaitObj.setTimeout(Math.min(this.synchroLoopWaitObj.getTimeOut() * 2, synchroTimeMin * 10))
         } finally {
-          this.mutex.release()
+          this.release()
         }
         await this.synchroLoopWaitObj.wait()
       }
@@ -171,7 +179,7 @@ class Workspace {
       assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
 
       try {
-        this.synchronizeWsWholeInProgress = true
+        this.ignoreWsChanges = true
         let wsRevisionLocalDoc = await rxdb.get(RxCollectionEnum.META, 'wsRevision')
         let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : -1
         if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
@@ -206,7 +214,7 @@ class Workspace {
           logD(f, 'pull ws complete')
         }
       } finally {
-        this.synchronizeWsWholeInProgress = false
+        this.ignoreWsChanges = false
       }
     }
     // отправить изменения на сервер
@@ -276,6 +284,7 @@ class Workspace {
     assert(rxdb.isLeader(), 'rxdb.isLeader()')
     try {
       await this.lock()
+      this.ignoreWsChanges = true
       const f = this.processEvent
       logD(f, 'start')
       if (!rxdb.isLeader()) return
@@ -326,6 +335,7 @@ class Workspace {
       await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: this.reactiveUser.wsRevision.toString() })
       logD(f, 'complete')
     } finally {
+      this.ignoreWsChanges = false
       this.release()
     }
   }

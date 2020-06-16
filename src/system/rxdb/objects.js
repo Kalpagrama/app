@@ -12,7 +12,7 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_OBJ)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
-const QUEUE_MAX_SZ = 50 // todo change to 20
+const QUEUE_MAX_SZ = 20
 class QueryAccumulator {
   constructor () {
     this.queueMaster = []
