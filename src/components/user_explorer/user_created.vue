@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     progress () {
-      this.$logW('todo !!!!')
+      // this.$logW('todo !!!!')
       // return this.$store.state.events.progressCreateNode
       return 100
     },
