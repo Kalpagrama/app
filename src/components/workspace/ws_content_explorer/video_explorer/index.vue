@@ -42,12 +42,21 @@ div(
     v-if="stateExplorer.pageId !== 'compositions'"
     :style=`{
       position: 'absolute', zIndex: 10000,
-      bottom: this.$q.screen.height - this.videoHeight - 26+'px',
-      maxWidth: pageContentWidth-80+'px',
-      left: 'calc(50% - '+(pageContentWidth-80)/2+'px)',
+      bottom: $q.screen.height - videoHeight - 26+'px',
     }`
-    ).row.full-width
-    content-progress(:stateExplorer="stateExplorer")
+    ).row.full-width.justify-center
+    content-progress(
+      :stateExplorer="stateExplorer"
+      :style=`{
+        maxWidth: pageContentWidth-80+'px',
+      }`)
+    q-btn(
+      round flat dense color="white" icon="unfold_more"
+      :style=`{
+        position: 'absolute', right: '4px', zIndex: 12000,
+        top: '44px',
+      }`
+      )
 </template>
 
 <script>
@@ -97,7 +106,7 @@ export default {
     },
     pageContentWidth () {
       if (this.$q.screen.width > 680) return 680
-      else return this.$q.screen.width - 40 - 40
+      else return this.$q.screen.width
     },
     stateExplorer () {
       return {

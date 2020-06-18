@@ -11,6 +11,7 @@ import videoExplorer from './video_explorer'
 // import imageExplorer from './image_explorer'
 // import webExplorer from './web_explorer'
 
+// value is content ws
 export default {
   name: 'wsContentExplorer',
   props: ['value'],

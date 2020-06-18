@@ -33,12 +33,13 @@ export default {
   props: ['stateExplorer'],
   data () {
     return {
+      sphereOid: null
     }
   },
   computed: {
-    sphereOid () {
-      return this.stateExplorer.content.oid
-    },
+    // sphereOid () {
+    //   return this.stateExplorer.content.oid
+    // },
     mangoQuery () {
       return {
         selector: {
@@ -50,6 +51,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    this.sphereOid = this.stateExplorer.content.oid
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

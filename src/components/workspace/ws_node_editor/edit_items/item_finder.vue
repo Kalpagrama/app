@@ -50,6 +50,7 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
+// Emits "item" event
 export default {
   name: 'itemFinder',
   data () {

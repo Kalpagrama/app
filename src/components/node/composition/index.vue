@@ -5,7 +5,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     v-if="composition && composition.name.length > 0 && !mini"
     flat color="white" no-caps
     :style=`{
-      position: 'absolute', top: '8px', left: '8px', zIndex: 2000,
+      position: 'absolute', zIndex: 2000,
+      top: '8px', left: '8px',
       transform: 'translate3d(0,0,0)',
       background: 'rgba(0,0,0,0.1)',
     }`
@@ -16,7 +17,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     @click="compositionMore()"
     round flat color="white" icon="more_vert"
     :style=`{
-      position: 'absolute', top: '8px', right: '8px', zIndex: 2000,
+      position: 'absolute', zIndex: 2000,
+      top: '8px', right: '8px',
       transform: 'translate3d(0,0,0)',
       background: 'rgba(0,0,0,0.1)'
     }`)

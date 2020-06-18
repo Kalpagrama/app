@@ -9,7 +9,7 @@ div(:style=`{position: 'relative'}`).row.ful-width.b-70
         borderRadius: '10px',
         overflow: 'hidden',
       }`
-      ).row.fit.items-center.content-center.b-80
+      ).row.fit.items-center.content-center.b-80.cursor-pointer
       //- composition name
       span(
         :style=`{userSelect: 'none', pointerEvents: 'none'}`
@@ -114,27 +114,27 @@ export default {
     }
   },
   watch: {
-    'stateExplorer.currentTime': {
-      immediate: true,
-      handler (to, from) {
-        // this.$log('currentTime TO', to)
-        // if (!this.active) return
-        if (!this.compositionPlaying) return
-        if (this.currentTimeStop) return
-        if (to > this.layerActiveEnd) {
-          // try to find next layerActive
-          if (this.layersStats[this.layerActive + 1]) {
-            this.layerActiveSet(this.layerActive + 1)
-          }
-          else {
-            this.layerActiveSet(0)
-          }
-        }
-        if (to < this.layerActiveStart) {
-          this.layerActiveSet(this.layerActive)
-        }
-      }
-    }
+    // 'stateExplorer.currentTime': {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     // this.$log('currentTime TO', to)
+    //     // if (!this.active) return
+    //     if (!this.compositionPlaying) return
+    //     if (this.currentTimeStop) return
+    //     if (to > this.layerActiveEnd) {
+    //       // try to find next layerActive
+    //       if (this.layersStats[this.layerActive + 1]) {
+    //         this.layerActiveSet(this.layerActive + 1)
+    //       }
+    //       else {
+    //         this.layerActiveSet(0)
+    //       }
+    //     }
+    //     if (to < this.layerActiveStart) {
+    //       this.layerActiveSet(this.layerActive)
+    //     }
+    //   }
+    // }
   },
   methods: {
     compositionPlayPause () {

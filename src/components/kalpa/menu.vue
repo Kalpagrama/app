@@ -98,7 +98,7 @@ export default {
         {id: 'home', name: 'Home', icon: 'home'},
         {id: 'trends', name: 'Trends', icon: 'whatshot'},
         {id: 'workspace', name: 'Workspace', icon: 'school'},
-        // {id: 'settings', name: 'Settings', icon: 'tune'},
+        {id: 'settings', name: 'Settings', icon: 'tune'},
         // {id: 'report', name: 'Report a bug', icon: 'bug_report'}
       ],
       refreshLoading: false,

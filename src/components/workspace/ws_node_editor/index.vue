@@ -25,7 +25,7 @@ div(
         :color="pageId === 'info' ? 'green' : 'white'"
         :flat="pageId !== 'info'")
     //- essence
-    edit-essence(v-if="pageId !== 'info'" :node="node")
+    edit-essence(v-if="pageId !== 'info'" :node="node" :options="options")
     //- pages
     .row.full-width.justify-center
       div(:style=`{maxWidth: '600px'}`).row.full-width.q-pt-sm
@@ -47,7 +47,8 @@ div(
       @close="$emit('close')"
       :is="`edit-${pageId}`"
       :stateNodeEditor="stateNodeEditor"
-      :node="node")
+      :node="node"
+      :options="options")
 </template>
 
 <script>
@@ -62,7 +63,18 @@ import editPreview from './edit_preview'
 export default {
   name: 'wsNodeEditor',
   components: {editInfo, editEssence, editItems, editSpheres, editPreview},
-  props: ['value'],
+  // props: ['value', 'options'],
+  props: {
+    value: {type: Object},
+    options: {
+      type: Object,
+      default () {
+        return {
+          essenceEditable: true
+        }
+      }
+    }
+  },
   data () {
     return {
       pageId: 'items',

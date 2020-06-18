@@ -39,7 +39,7 @@ div(
       order: 3
     }`)
   node-spheres(
-    v-if="$route.name === 'nodes' && nodeFull && nodeFull.spheres.length > 0"
+    v-if="true"
     v-bind="$props"
     :stateNode="stateNode"
     :style=`{

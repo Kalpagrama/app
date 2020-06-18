@@ -23,12 +23,14 @@ div(
   //- items preview: first item from meta => shaping the size
   img(
     v-if="true"
+    @load="previewLoad"
+    @error="previewErrored"
     :src="previewUrl" draggable="false"
     :class=`{
     }`
     :style=`{
       userSelect: 'none', objectFit: 'contain',
-      maxHeight: $q.screen.height-120+'px',
+      maxHeight: $q.screen.height-200+'px',
       opacity: itemIndex === 0 ? 1 : 0
     }`
     ).full-width
@@ -41,7 +43,7 @@ div(
     ).row.fit.items-start.content-start
     //- items stats
     div(
-      v-if="true && visible && active && items.length > 1"
+      v-if="false && visible && active && items.length > 1"
       :style=`{
         position: 'absolute', zIndex: 20000, top: '0px',
         transform: 'translate3d(0,0,0)',
@@ -56,19 +58,24 @@ div(
               background: itemIndex === ii ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)'
             }`).row.fit
     //- item prev
-    div(
+    q-btn(
       v-if="visible && active && itemIndex !== 0 && items.length > 1"
       @click="itemsPrev()"
+      round flat
+      color="white"
       :style=`{
         position: 'absolute', zIndex: 1000,
         left: '0px', top: '0px',
-        width: '20%',
-        height: '100%',
+        width: '15%',
+        height: 'calc(100% - 60px)',
         borderRadius: '10px',
         overflow: 'hidden',
         background: 'rgba(255,255,255,0)',
       }`
-      ).row.cursor-pointer
+      )
+      q-icon(
+        name="keyboard_arrow_left" color="white" size="40px"
+        :style=`{marginTop: '60px', opacity: 0.8}`)
     //- item last
     //- item current
     div(
@@ -123,7 +130,10 @@ export default {
       nextMaxWidth: 25,
       nextMaxHeight: 50,
       nowMaxWidth: 100,
-      nowMaxHeight: 100
+      nowMaxHeight: 100,
+      // preview
+      previewLoaded: false,
+      previewError: null
     }
   },
   computed: {
@@ -144,6 +154,14 @@ export default {
     },
   },
   methods: {
+    previewLoad () {
+      // this.$log('previewLoad')
+      this.previewLoaded = true
+    },
+    previewErrored (e) {
+      this.$log('previewErrored', e)
+      this.previewError = e
+    },
     itemsPrev () {
       this.$log('itemsPrev')
       this.itemIndex -= 1

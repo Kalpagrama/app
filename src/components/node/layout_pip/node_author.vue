@@ -14,20 +14,31 @@ div(
           span(:style=`{lineHeight: 1.2}`).text-white.text-bold {{ nodeFull.author.name }}
           small(:style=`{lineHeight: 1, margin: 0, padding: 0}`).text-white.full-width {{ nodeFull.author.name }}
       //- center
-      .col
-        .row.fit.items-center.content-center.justify-end.q-px-sm
-          span(:style=`{fontSize: '24px', userSelect: 'none'}`).text-white.text-bold {{ nodeFull.rate }}
+      .col.full-height
+        .row.fit.items-end.content-end.justify-end
+          div(
+            v-for="r in 2" :key="r"
+            ).row.full-height.justify-center
+            kalpa-avatar(:url="nodeFull.author.thumbUrl" :width="22" :height="22" @click.native="$router.push('/user/'+nodeFull.author.oid)")
+            div(:style=`{order: -1}`).row.full-width.justify-center
+              span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ (nodeFull.rate * 100) / 2 }}
   //- DUMMY !nodeFull
   div(v-if="!nodeFull").row.fit.items-center.content-center.justify-start
     div(
       :style=`{height: '40px', width: '150px', borderRadius: '10px', overflow: 'hidden'}`
       ).row.b-80
   //- vote btn
+  //- icon="blur_on"
   q-btn(
     v-if="!nodeIsMine"
-    round push color="green" icon="blur_on" @click="voteStart()"
+    @click="voteStart()"
+    round push
+    color="green" size="lg"
     :loading="voteShow"
     :style=`{borderRadius: '50%'}`)
+      span(
+        v-if="nodeFull"
+        :style=`{fontSize: '30px', userSelect: 'none'}`).text-white.text-bold {{ nodeFull.rate * 100 }}
 </template>
 
 <script>

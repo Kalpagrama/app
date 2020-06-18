@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.fit.justify-center.q-py-md
+.row.fit.justify-center.q-pa-md
   div(
     :style=`{
       maxWidth: '600px',
@@ -7,7 +7,7 @@
       borderRadius: '10px',
       overflow: 'hidden',
     }`
-    ).column.fit.b-60
+    ).column.fit.b-60.q-mt-md
     .row.full-width.q-px-sm
       div(v-if="true").row.full-width.q-pt-md.q-px-md
         span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ stateExplorer.content.name }}

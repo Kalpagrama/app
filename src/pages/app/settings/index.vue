@@ -1,10 +1,10 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf" container :style=`{height: $q.screen.height+'px'}`).bg-grey-10
-  kalpa-menu-right
-    menu-right
-  kalpa-menu-footer
-    template(v-slot:menuRight)
-      menu-right
+  //- kalpa-menu-right
+  //-   menu-right
+  //- kalpa-menu-footer
+  //-   template(v-slot:menuRight)
+  //-     menu-right
   q-page-conainter
     q-page
       div(:style=`{height: '60px'}`).row.full-width.justify-center

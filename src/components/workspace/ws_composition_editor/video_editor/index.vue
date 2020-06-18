@@ -8,7 +8,7 @@ div(
     ).col.full-width
     ws-content-video-player(:stateExplorer="stateExplorer")
   //- editor tools
-  div(:style=`{position: 'relative'}`).col.full-width
+  div(:style=`{position: 'relative', maxHeight: options.useEditor ? '100%' : '0px'}`).col.full-width
     div(
       v-if="!options.onlyProgress"
       :style=`{paddingTop: '24px'}`).row.fit.justify-center
@@ -50,6 +50,7 @@ export default {
       default () {
         return {
           usePlayer: true,
+          useEditor: true,
           onlyProgress: false,
         }
       }
@@ -64,6 +65,10 @@ export default {
       duration: 0,
       loadeddata: false,
       playing: false,
+      // composition
+      compositionPlaying: false,
+      // layers
+      layerActive: null,
     }
   },
   computed: {
@@ -76,6 +81,9 @@ export default {
         return {
           // layout
           pageContentWidth: 680,
+          // content
+          content: this.contentKalpa,
+          contentWs: this.composition,
           // player
           player: this.player,
           duration: this.duration,
@@ -84,9 +92,11 @@ export default {
           playing: this.playing,
           // composition
           composition: this.composition,
-          // content
-          content: this.contentKalpa,
-          contentWs: this.composition,
+          compositionPlaying: this.compositionPlaying,
+          // layers
+          layerActive: this.layerActive,
+          // layerActiveStart: this.layerActiveStart,
+          // layerActiveEnd: this.layerActiveEnd,
           set: (key, val) => {
             this[key] = val
           }

@@ -47,7 +47,7 @@ div(:style=`{position: 'relative'}`).row.fit
               span.text-white.text-bold {{ user.name }}
           q-btn(
             v-if="itsMe"
-            round flat color="white" icon="tune")
+            round flat color="white" icon="settings")
         .row.full-width.items-end.content-end.justify-between
           kalpa-buttons(:value="pages" :id="$route.name" @id="$router.push({name: $event})").justify-start
           q-btn(

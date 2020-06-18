@@ -30,7 +30,7 @@
       @click="$store.commit('ui/stateSet', ['appFullscreen', !$store.state.ui.appFullscreen])"
       round flat dense color="grey-5"
       :icon="$store.state.ui.appFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-      :style=`{opacity: 1}`
+      :style=`{opacity: 0}`
       )
       q-tooltip(anchor="top middle" self="center middle") Fullscreen
     q-btn(round flat dense color="grey-5" icon="more_vert")

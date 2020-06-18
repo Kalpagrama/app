@@ -57,7 +57,7 @@ q-layout(
               top: $store.state.ui.appFullscreen ? '8px' : '0px',
               left: $store.state.ui.appFullscreen ? '8px' : -($q.screen.width-maxWidth)/2+'px',
               maxWidth: ($q.screen.width-maxWidth)/2+'px',
-              height: '500px'
+              height: '600px'
             }`).row.full-width.justify-end.q-pt-sm.q-px-sm
             kalpa-menu(v-if="!loading")
           router-view(

@@ -20,7 +20,7 @@ div
     div(
       v-if="compositionName.length > 0"
       :style=`{}`
-      ).row.full-width.q-pa-md
+      ).row.full-width.q-pa-md.br
       span.text-white.cursor-pointer {{ compositionName }}
 </template>
 

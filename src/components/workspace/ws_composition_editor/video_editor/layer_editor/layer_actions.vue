@@ -38,7 +38,24 @@ export default {
   methods: {
     layerSet (index) {
       this.$log('layerSet', index)
-      this.layer.figuresAbsolute[index].t = this.stateExplorer.currentTime
+      // check, t for layerStart and layerEnd
+      let t = this.stateExplorer.currentTime
+      if (index === 0) {
+        if (t >= this.stateLayerEditor.layerEnd) {
+          this.$q.notify({type: 'negative', message: 'Cant set t >= layer end !'})
+          return
+        }
+      }
+      else {
+        if (t <= this.stateLayerEditor.layerStart) {
+          this.$q.notify({type: 'negative', message: 'Cant set t <= layer start !'})
+          return
+        }
+      }
+      // set value
+      this.layer.figuresAbsolute[index].t = t
+      // center frames to the layer
+      this.stateLayerEditor.set('need_framesLayerCenter', true)
     },
     layerForward (index, isRight) {
       this.$log('layerForward', index, isRight)

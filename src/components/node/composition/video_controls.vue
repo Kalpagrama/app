@@ -1,7 +1,8 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'absolute', zIndex: 1000, bottom: '0px',
+    position: 'absolute', zIndex: 5000, bottom: '0px',
+    transform: 'translate3d(0,0,0)',
     borderRadius: '0px', overflow: 'hidden'
   }`
   ).row.full-width.q-pa-md
@@ -102,11 +103,11 @@ export default {
       // this.$log('videoForward', right)
       let t = this.currentTime
       if (right) {
-        t += 10
+        t += 5
         if (t > this.duration) t = this.duration
       }
       else {
-        t -= 10
+        t -= 5
         if (t < 0) t = 0
       }
       this.setCurrentTime(t)

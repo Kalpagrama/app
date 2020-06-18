@@ -51,6 +51,12 @@ div(
           q-btn(
             v-if="searchString.length > 0"
             flat dense color="grey-2" icon="clear" @click="searchString = ''")
+    //- tools
+    div(
+      :style=`{}`
+      ).row.full-width.q-pt-xs
+      .col
+      q-btn(round flat dense color="white" icon="edit")
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm

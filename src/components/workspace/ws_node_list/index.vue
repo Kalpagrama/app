@@ -64,21 +64,37 @@ div(
       //- q-btn(push no-caps color="green" @click="nodeAdd()").q-ml-sm.gt-xs New
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-py-md.q-px-sm
-      kalpa-loader(:mangoQuery="mangoQuery")
-        template(v-slot=`{items}`)
-          div(v-if="items.length > 0").row.full-width.items-start.content-start
-            node-item(
-              v-for="(n,ni) in items" :key="ni"
-              :node="n" :nodeIndex="ni"
-              @edit="nodeEdit(n,ni)"
-              @delete="nodeDelete(n,ni)").q-mb-xs
-          //- nothing found
-          div(
-            v-else
-            :style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
-            ).row.full-width.items-center.content-center.justify-center.b-50
-            span.text-white Nothing found :(
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start.q-py-md.q-px-sm
+        kalpa-loader(:mangoQuery="mangoQuery")
+          template(v-slot=`{items}`)
+            div(v-if="items.length > 0").row.full-width.items-start.content-start
+              //- div(
+              //-   v-for="(i,ii) in items" :key="i.id"
+              //-   ).col-6.q-pa-xs
+              //-   div(
+              //-     :style=`{borderRadius: '10px', oveflow: 'hidden'}`
+              //-     ).row.full-width.items-start.b-60
+              //-     img(
+              //-       :src="i.thumbOid"
+              //-       :style=`{
+              //-         borderRadius: '10px',
+              //-         overflow: 'hidden',
+              //-       }`
+              //-       ).full-width
+              //-     div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.q-px-md
+              //-       span.text-white.text-bold {{ i.name }}
+              node-item(
+                v-for="(n,ni) in items" :key="ni"
+                :node="n" :nodeIndex="ni"
+                @edit="nodeEdit(n,ni)"
+                @delete="nodeDelete(n,ni)").q-mb-md
+            //- nothing found
+            div(
+              v-else
+              :style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
+              ).row.full-width.items-center.content-center.justify-center.b-50
+              span.text-white Nothing found :(
 </template>
 
 <script>

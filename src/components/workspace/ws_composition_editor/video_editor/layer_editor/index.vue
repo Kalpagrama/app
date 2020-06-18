@@ -61,6 +61,7 @@ export default {
     return {
       active: false,
       layerId: null,
+      need_framesLayerCenter: false,
     }
   },
   computed: {
@@ -83,6 +84,8 @@ export default {
         layerStart: this.layerStart,
         layerEnd: this.layerEnd,
         layerDuration: this.layerDuration,
+        // fn
+        need_framesLayerCenter: this.need_framesLayerCenter,
         set: (key, val) => {
           this[key] = val
         }

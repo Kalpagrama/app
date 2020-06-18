@@ -8,16 +8,27 @@
 <template lang="pug">
 div(
   :style=`{
-    height: 40+'px',
-  }`).row.full-width.items-center.content-center.q-px-md
-  //- div(:style=`{height: '100px', marginBottom: -openedHeight+'px'}`).row.full-width
-  //- target="_blank"
-  router-link(
-    v-for="(s,si) in nodeFull.spheres" :key="si"
-    :to="'/sphere/'+s.oid"
-    :style=`{borderRadius: '10px', userSelect: 'none'}`
-    ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-80.sphere
-    small {{ s.name }}
+    height: 46+'px',
+  }`).row.full-width.items-center.content-center.q-px-md.scroll
+  //- spheres in nodeFull
+  div(
+    v-if="nodeFull"
+    ).row.items-center.content-center.no-wrap
+    router-link(
+      v-for="(s,si) in nodeFull.spheres" :key="si"
+      :to="'/sphere/'+s.oid"
+      :style=`{borderRadius: '10px', userSelect: 'none'}`
+      ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-80.sphere
+      small(:style=`{whiteSpace: 'nowrap'}`) {{ s.name }}
+  //- mock spheres
+  div(
+    v-if="!nodeFull"
+    ).row.items-center.content-center.no-wrap
+    div(
+      v-for="(s,si) in spheres" :key="si"
+      :style=`{borderRadius: '10px', overflow: 'hidden', userSelect: 'none'}`
+      ).q-py-xs.q-px-sm.b-80.q-mr-xs
+      small(:style=`{whiteSpace: 'nowrap', opacity: 0}`) {{ s.name }}
 </template>
 
 <script>
@@ -29,6 +40,13 @@ export default {
   props: ['nodeFull'],
   data () {
     return {
+      spheres: [
+        // {name: 'osodf sdf sdsd s sds'},
+        // {name: 'sdfsmdlfksdsdsd ds'},
+        {name: 'sdfksdf sdf sd'},
+        {name: 'sdfksdfsdkk'},
+        {name: 'sdkksl'}
+      ],
     }
   }
 }

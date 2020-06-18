@@ -1,6 +1,6 @@
 <style lang="sass">
-.q-menu
-  background: none !important
+// .q-menu
+//   background: none !important
 </style>
 
 <template lang="pug">

@@ -143,6 +143,15 @@ export default {
     },
   },
   watch: {
+    'stateLayerEditor.need_framesLayerCenter': {
+      handler (to, from) {
+        if (to) {
+          this.$log('stateLayerEditor.need_framesLayerCenter TO', to)
+          this.framesLayerCenter()
+          this.stateLayerEditor.set('need_framesLayerCenter', false)
+        }
+      }
+    }
   },
   methods: {
     async pointDrag (e, index) {
@@ -181,7 +190,7 @@ export default {
         // this.stateExplorer.set('editing', false)
         // TODO: if layerwidth > this.width?
         await this.$wait(300)
-        this.framesDragToLayer()
+        this.framesLayerCenter()
         this.pointDraggingError = false
       }
     },
@@ -204,8 +213,8 @@ export default {
       if (e.isFirst) this.framesDragging = true
       if (e.isFinal) this.framesDragging = false
     },
-    framesDragToLayer () {
-      this.$log('framesDragToLayer')
+    framesLayerCenter () {
+      this.$log('framesLayerCenter')
       let layerLeft = ((this.layer.figuresAbsolute[0].t / this.stateExplorer.duration) * this.framesWidth) + (this.width / 2)
       let layerWidth = ((this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t) / this.stateExplorer.duration) * this.framesWidth
       let scrollLeft = layerLeft - (this.width - layerWidth) / 2
@@ -215,7 +224,7 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.framesDragToLayer()
+    this.framesLayerCenter()
   }
 }
 </script>

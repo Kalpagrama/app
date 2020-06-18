@@ -6,7 +6,9 @@ div(
   }`
   ).column.fit.b-50
   //- content progress with layers on it
-  div(:style=`{position: 'absolute', zIndex: 9999, top: '-62px', left: 0}`).row.full-width.justify-center
+  div(
+    v-if="true"
+    :style=`{position: 'absolute', zIndex: 9999, top: '-62px', left: 0}`).row.full-width.justify-center
     ws-content-video-progress(
       :stateExplorer="stateExplorer"
       :style=`{maxWidth: stateExplorer.pageContentWidth-80+'px'}`)
@@ -35,14 +37,14 @@ div(
     div(:style=`{maxWidth: stateExplorer.pageContentWidth-80+'px',}`).row.full-width.items-center.content-center.q-pa-xs
       q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").q-mr-xs
       q-btn(
-        v-if="true"
+        v-if="false"
         round dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
       q-btn(round flat dense color="white" no-caps @click="layersSelectedMove()").q-px-sm Move
       q-btn(
         v-if="composition.layers.length > 1"
         round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm Delete
   //- body
-  .col.full-width.scroll
+  div(v-if="options.useEditor").col.full-width.scroll
     div(
       :style=`{paddingBottom: '300px'}`
       ).row.full-width.items-start.content-start
@@ -93,6 +95,7 @@ div(
             q-tooltip(anchor="top middle" self="center middle") Add layer at: {{ $time(stateExplorer.currentTime) }}
   //- progress
   div(
+    v-if="options.useEditor"
     :style=`{
       position: 'relative',
       borderRadius: '10px',
@@ -104,6 +107,7 @@ div(
       :stateExplorer="stateExplorer").fit
   //- footer stats
   div(
+    v-if="options.useEditor"
     :style=`{
     }`
     ).row.full-width.items-center.content-center.q-py-xs
@@ -117,7 +121,9 @@ div(
       :style=`{}`
       ).q-mr-sm duration: {{ $time(compositionDuration) }}]
   //- composition name
-  div(:style=`{}`).row.full-width
+  div(
+    v-if="options.useEditor"
+    :style=`{}`).row.full-width
     q-input(
       v-model="composition.name"
       filled dark color="grey-5"
@@ -136,6 +142,7 @@ div(
       ).full-width.b-50
   //- footer
   div(
+    v-if="options.useEditor"
     :style=`{
       borderRadius: '10px',
       overflow: 'hidden',
@@ -144,7 +151,10 @@ div(
     q-btn(round flat dense color="red" icon="delete_outline" @click="$emit('delete')"
       :style=`{opacity: .6}`)
     .col
-    q-btn(dense color="green" no-caps @click="$emit('createNode')").q-px-sm Create node
+    q-btn(
+      v-if="false"
+      @click="$emit('createNode')"
+      dense color="green" no-caps).q-px-sm Create node
     .col
     q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
 </template>

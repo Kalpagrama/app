@@ -21,6 +21,8 @@ export default {
       async handler (to, from) {
         this.$log('$route CHANGED', to)
         if (to) {
+          this.node = null
+          await this.$wait(200)
           this.node = await this.nodeLoad(to)
         }
       }

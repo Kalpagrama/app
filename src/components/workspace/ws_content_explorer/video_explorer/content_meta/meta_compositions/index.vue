@@ -40,6 +40,7 @@ div(
       :stateExplorer="stateExplorer"
       :options=`{
         usePlayer: false,
+        useEditor: true,
         onlyProgress: false,
       }`
       :style=`{

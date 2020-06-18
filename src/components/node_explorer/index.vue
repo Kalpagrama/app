@@ -7,6 +7,9 @@ div(:style=`{position: 'relative'}`).column.fit
       @published="nodePublished"
       @close="nodeEditorOpened = false"
       :value="nodeEditorItem"
+      :options=`{
+        essenceEditable: false,
+      }`
       :style=`{
         maxWidth: '800px',
         maxHeight: $q.screen.height-60+'px',

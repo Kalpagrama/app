@@ -6,12 +6,25 @@
     }`
     ).column.fit.q-py-md
     div(:style=`{position: 'relative'}`).col.full-width.scroll
-      div(
-        :style=`{
-          height: '400px',
-          borderRadius: '10px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.justify-center.b-60
-        q-spinner(size="50px" color="green")
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-60
+        ws-composition-editor(
+          v-for="(i,ii) in node.items" :key="ii"
+          :value="i"
+          :options=`{
+            usePlayer: true,
+            useEditor: false,
+            onlyProgress: false,
+          }`
+          :style=`{
+            height: 400+'px',
+            minHeight: 400+'px'
+          }`)
+      //- div(
+      //-   :style=`{
+      //-     height: '400px',
+      //-     borderRadius: '10px', overflow: 'hidden'}`
+      //-   ).row.full-width.items-center.content-center.justify-center.b-60
+      //-   q-spinner(size="50px" color="green")
       //- node(
       //-   ctx="workspace"
       //-   :node="nodePreview" :nodeFullReady="nodePreview"

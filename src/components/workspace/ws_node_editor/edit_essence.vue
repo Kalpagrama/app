@@ -6,6 +6,7 @@
     label="What's the essence?"
     filled dark
     autogrow
+    :readonly="!options.essenceEditable"
     :input-style=`{
       minHeight: '80px',
     }`
@@ -18,7 +19,7 @@
 <script>
 export default {
   name: 'editEssence',
-  props: ['node'],
+  props: ['node', 'options'],
   data () {
     return {
     }

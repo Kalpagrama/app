@@ -80,10 +80,12 @@ export default {
     }
   },
   methods: {
-    itemFound (item) {
+    async itemFound (item) {
       this.$log('itemFound', item)
-      this.$set(this.node.items, this.node.items.length, item)
-      // open item editor ???
+      let itemIndex = this.node.items.length
+      this.$set(this.node.items, itemIndex, item)
+      await this.$wait(300)
+      this.itemEdit(this.node.items[itemIndex], itemIndex)
     },
     itemEdit (i, ii) {
       this.$log('itemEdit', i, ii)
