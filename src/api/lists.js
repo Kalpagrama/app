@@ -218,7 +218,7 @@ class ListsApi {
   }
 
   static async userSubscriptions (oid, pagination) {
-    let user = await rxdb.getNoLock(RxCollectionEnum.OBJ, oid)
+    let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
     assert(user && user.subscriptions, '!user')
     assert(Array.isArray(user.subscriptions), '!Array.isArray(user.subscriptions)')
     return {
@@ -230,7 +230,7 @@ class ListsApi {
   }
 
   static async userSubscribers (oid, pagination) {
-    let user = await rxdb.getNoLock(RxCollectionEnum.OBJ, oid)
+    let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
     assert(user && user.subscribers, '!user')
     assert(Array.isArray(user.subscribers), '!Array.isArray(user.subscribers)')
     return {

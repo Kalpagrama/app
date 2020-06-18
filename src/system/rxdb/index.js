@@ -3,7 +3,7 @@ import { Workspace, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/wor
 import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { addRxPlugin, createRxDatabase } from 'rxdb'
+import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
@@ -63,36 +63,48 @@ class RxDBWrapper {
     let purgeLastDateDoc = await this.get(RxCollectionEnum.META, 'purgeLastDate')
     let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc) : 0
     if (Date.now() - purgeLastDate < purgePeriod) return
-    await this.setNoLock(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
+    await this.set(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
     let dump = await this.db.dump()
     await this.db.importDump(dump)
   }
 
-  async init () {
+  async init (recursive = false) {
     const f = this.init
     logD(f, 'start')
-    this.db = await createRxDatabase({
-      name: 'rxdb',
-      adapter: 'idb', // <- storage-adapter
-      multiInstance: true, // <- multiInstance (optional, default: true)
-      eventReduce: true, // <- eventReduce (optional, default: true)
-      pouchSettings: { revs_limit: 1 }
-    })
-    await this.db.collection({ name: 'meta', schema: schemaKeyValue })
-    await this.purgeDb() // очистит бд от старых данных
+    try {
+      this.db = await createRxDatabase({
+        name: 'rxdb',
+        adapter: 'idb', // <- storage-adapter
+        multiInstance: true, // <- multiInstance (optional, default: true)
+        eventReduce: true, // <- eventReduce (optional, default: true)
+        pouchSettings: { revs_limit: 1 }
+      })
+      await this.db.collection({ name: 'meta', schema: schemaKeyValue })
+      await this.purgeDb() // очистит бд от старых данных
 
-    this.db.waitForLeadership().then(() => {
-      logD(f, 'RXDB::LEADER!!!!')
-      this.isLeader_ = true
-    })
-    this.workspace = new Workspace(this.db)
-    this.cache = new Cache(this.db)
-    this.objects = new Objects(this.cache)
-    this.lists = new Lists(this.cache)
-    this.event = new Event(this.workspace, this.objects, this.lists)
-    await this.workspace.create()
-    await this.cache.create()
-    this.created = true
+      this.db.waitForLeadership().then(() => {
+        logD(f, 'RXDB::LEADER!!!!')
+        this.isLeader_ = true
+      })
+      this.workspace = new Workspace(this.db)
+      this.cache = new Cache(this.db)
+      this.objects = new Objects(this.cache)
+      this.lists = new Lists(this.cache)
+      this.event = new Event(this.workspace, this.objects, this.lists)
+      await this.workspace.create()
+      await this.cache.create()
+      this.created = true
+    } catch (err) {
+      if (recursive) throw err
+      logE(f, 'ошибка при создания RxDatabase! очищаем и пересоздаем!', err)
+      if (this.db) {
+        await this.db.remove()
+      }// предпочтительно, тк removeRxDatabase иногда глючит
+      else {
+        await removeRxDatabase('rxdb', 'idb')
+      }
+      await this.init(true)
+    }
   }
 
   // вызывать после логина
@@ -170,21 +182,16 @@ class RxDBWrapper {
     }
   }
 
-  async findNoLock (mangoQuery) {
-    // mangoQuery = JSON.parse(JSON.stringify(mangoQuery)) // mangoQuery модифицируется внутри
-    // :::IMPORTANT:::
-    // mangoQuery = JSON.parse(JSON.stringify(mangoQuery))
-    logD('*** ___ === mangoQuery ==' + JSON.stringify(mangoQuery))
+  // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
+  async find (mangoQuery) {
     assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + JSON.stringify(mangoQuery))
+    mangoQuery = JSON.parse(JSON.stringify(mangoQuery)) // mangoQuery модифицируется внутри
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     if (rxCollectionEnum in WsCollectionEnum) {
       let rxQuery = await this.workspace.find(mangoQuery)
       let reactiveList = await (new ReactiveListHolder()).create(rxQuery)
-      logD('*** reactiveList', reactiveList)
-      assert(reactiveList, '*** reactiveList')
-      // let reactive = []
-      // reactiveList = JSON.parse(JSON.stringify(reactiveList))
+      assert(reactiveList, '!reactiveList')
       return { items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
     } else if (rxCollectionEnum in LstCollectionEnum) {
       let rxDoc = await this.lists.find(mangoQuery)
@@ -194,17 +201,7 @@ class RxDBWrapper {
     }
   }
 
-  // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
-  async find (mangoQuery) {
-    try {
-      await this.lock()
-      return await this.findNoLock(mangoQuery)
-    } finally {
-      this.release()
-    }
-  }
-
-  async getNoLock (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
+  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     assert(!rawId.includes('::'), '')
     let id = makeId(rxCollectionEnum, rawId)
@@ -225,18 +222,9 @@ class RxDBWrapper {
     return getReactive(rxDoc)
   }
 
-  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
-    try {
-      await this.lock()
-      return await this.getNoLock(rxCollectionEnum, rawId, { fetchFunc, clientFirst, priority, force })
-    } finally {
-      this.release()
-    }
-  }
-
   // withLock - см ReactiveItemHolder
   // actualAge - актуально только для кэша
-  async setNoLock (rxCollectionEnum, data, { actualAge, withLock = true, notEvict = false } = {}) {
+  async set (rxCollectionEnum, data, { actualAge, withLock = true, notEvict = false } = {}) {
     const f = this.set
     assert(data, '!data')
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
@@ -257,30 +245,12 @@ class RxDBWrapper {
     return getReactive(rxDoc)
   }
 
-  async set (rxCollectionEnum, data, { actualAge, withLock = true, notEvict = false } = {}) {
-    try {
-      await this.lock()
-      return await this.setNoLock(rxCollectionEnum, data, { actualAge, withLock, notEvict })
-    } finally {
-      this.release()
-    }
-  }
-
-  async removeNoLock (id) {
+  async remove (id) {
     let collection = getRxCollectionEnumFromId(id)
     if (collection in WsCollectionEnum) {
       return await this.workspace.remove(id)
     } else {
       throw new Error('bad id!!' + id)
-    }
-  }
-
-  async remove (id) {
-    try {
-      await this.lock()
-      return await this.removeNoLock(id)
-    } finally {
-      this.release()
     }
   }
 }

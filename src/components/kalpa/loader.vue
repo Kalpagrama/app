@@ -42,7 +42,7 @@ export default {
       deep: false,
       immediate: false,
       handler(to, from){
-        // this.$log('items CHANGED', 'from=', from, ', to=', to)
+        this.$log('loader items CHANGED', 'from=', from, ', to=', to)
         this.$emit('itemsCount', to.length)
       }
     }
@@ -76,8 +76,7 @@ export default {
         this.itemsCount = items.length
       }
       catch (e) {
-        this.$log('itemsLoad error', e)
-        alert('error')
+        this.$logE('itemsLoad error', e)
       }
     }
   }
