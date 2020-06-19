@@ -174,9 +174,9 @@ class NodeApi {
       }
     })
     // надо запомнить сейчас, тк эвентом придет только общая оценка
-    let nodeFull = rxdb.get(RxCollectionEnum.OBJ, oid)
+    let nodeFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
     if (nodeFull) nodeFull.rateUser = rate // nodeFull реактивен!
-    logD(f, 'done')
+    logD(f, 'done', nodeFull)
     return rate
   }
 
