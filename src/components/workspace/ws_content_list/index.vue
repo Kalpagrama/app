@@ -116,7 +116,7 @@ export default {
       type: 'VIDEO',
       types: [
         // {id: 'all', name: 'All'},
-        {id: 'VIDEO', name: 'Video'},
+        {id: 'VIDEO', name: 'Videos'},
         {id: 'IMAGE', name: 'Images'},
         {id: 'BOOK', name: 'Books'},
         {id: 'WEB', name: 'Web'}

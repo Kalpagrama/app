@@ -30,10 +30,12 @@ div(:style=`{position: 'relative'}`).row.ful-width.b-70
       div(
         :style=`{
           position: 'absolute', zIndex: 301,
+          top: '-4px',
           left: width+'%',
-          width: '2px',
-          pointerEvents: 'none'
-        }`).row.full-height.bg-green
+          height: 'calc(100% + 8px)',
+          width: '3px',
+          pointerEvents: 'none',
+        }`).row.bg-red
       //- kalpa-debug(
       //-   :options=`{layerActiveStart,layerActiveEnd}`
       //-   :style=`{position: 'absolute', top: 0, zIndex: 9999, pointerEvents: 'none'}`)

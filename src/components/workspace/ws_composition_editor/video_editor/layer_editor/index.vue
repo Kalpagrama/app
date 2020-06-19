@@ -93,6 +93,14 @@ export default {
       }
     }
   },
+  watch: {
+    'stateExplorer.currentTime': {
+      handler (to, from) {
+        // if ()
+        // this.$log('stateExplorer.currentTime TO', to)
+      }
+    }
+  },
   methods: {
     nameInputFocused (e) {
       this.$log('nameInputFocused', e)
