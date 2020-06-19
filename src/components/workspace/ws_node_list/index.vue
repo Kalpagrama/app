@@ -56,6 +56,8 @@ div(
           q-btn(
             v-if="searchString.length > 0"
             flat dense color="grey-2" icon="clear" @click="searchString = ''")
+          q-btn(
+            flat dense color="grey-2" icon="label")
     //- actions
     div(:style=`{}`).row.full-width.items-end.content-end
       .col

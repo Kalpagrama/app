@@ -39,7 +39,7 @@ const routes = [
           { name: 'chains', path: 'chains', component: () => import('components/node_explorer/node_chains') },
         ]
       },
-      { name: 'sphere', path: 'sphere/:oid', component: () => import('pages/app/sphere') },
+      { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/trend') },
       { name: 'content', path: 'content/:oid?/:page?', component: () => import('pages/app/content') },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },

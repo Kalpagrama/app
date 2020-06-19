@@ -39,21 +39,31 @@ div(
       span(:style=`{fontSize: '20px'}`).text-white.text-bold Compositions
     //- search
     div.row.full-width
-      q-input(
-        v-model="searchString"
-        ref="searchStringInput"
-        filled dense dark color="grey-5"
-        :autofocus="ctx === 'workpsace'"
-        placeholder="Find composition"
-        @focus="searchStringFocused"
-        @blur="searchStringBlurred"
-        ).full-width
-        template(v-slot:append)
-          q-btn(
-            v-if="searchString.length > 0"
-            flat dense color="grey-2" icon="clear" @click="searchString = ''")
-    //- tools
+      .col
+        q-input(
+          v-model="searchString"
+          ref="searchStringInput"
+          filled dense dark color="grey-5"
+          :autofocus="ctx === 'workpsace'"
+          placeholder="Find composition"
+          @focus="searchStringFocused"
+          @blur="searchStringBlurred"
+          ).full-width
+          template(v-slot:append)
+            q-btn(
+              v-if="searchString.length > 0"
+              flat dense color="grey-2" icon="clear" @click="searchString = ''")
+            q-btn(
+              flat dense color="grey-2" icon="label")
+      q-btn(
+        v-for="(v,vi) in views" :key="v.id"
+        @click="view = v.id"
+        round flat dense no-caps
+        :icon="v.icon"
+        :color="view === v.id ? 'green' : 'white'")
+    //- tools: views
     div(
+      v-if="false"
       :style=`{}`
       ).row.full-width.q-pt-xs
       .col
@@ -61,8 +71,9 @@ div(
         v-for="(v,vi) in views" :key="v.id"
         @click="view = v.id"
         round flat dense no-caps
+        :icon="v.icon"
         :color="view === v.id ? 'green' : 'white'"
-        ).q-mx-xs.q-px-xs {{ v.name }}
+        )
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
@@ -114,11 +125,11 @@ export default {
       composition: null,
       compositionShow: false,
       compositionEditorOpened: false,
-      view: 'mini',
+      view: 'semi',
       views: [
-        {id: 'mini', name: 'Mini'},
-        {id: 'semi', name: 'Semi'},
-        {id: 'maxi', name: 'Maxi'},
+        {id: 'maxi', name: 'Maxi', icon: 'crop_din'},
+        {id: 'semi', name: 'Semi', icon: 'crop_5_4'},
+        {id: 'mini', name: 'Mini', icon: 'crop_7_5'},
       ]
     }
   },
