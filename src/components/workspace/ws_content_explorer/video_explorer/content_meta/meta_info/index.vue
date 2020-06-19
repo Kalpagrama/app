@@ -1,5 +1,7 @@
 <template lang="pug">
-.row.fit.justify-center.q-pa-md
+div(
+  :style=`{paddingTop: '44px'}`
+  ).row.fit.justify-center
   div(
     :style=`{
       maxWidth: '600px',
@@ -7,13 +9,18 @@
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
-    ).column.fit.b-60.q-mt-md
+    ).column.fit.b-60
     .row.full-width.q-px-sm
       div(v-if="true").row.full-width.q-pt-md.q-px-md
         span(:style=`{fontSize: '18px'}`).text-white.text-bold {{ stateExplorer.content.name }}
-    .row.full-width.q-px-md
-      small.text-grey-6.q-mx-sm [{{ stateExplorer.content.type }}]
-      small.text-grey-6 [{{ stateExplorer.content.url }}]
+    .row.full-width.items-center.content-center.q-px-md
+      //- small.text-grey-6.q-mx-sm [{{ stateExplorer.content.type }}]
+      a(
+        :href="stateExplorer.content.url"
+        target="_blank"
+        :style=`{}`
+        )
+        small.text-grey-6.q-mx-sm {{ stateExplorer.content.url }}
     .row.full-width.q-pt-md
       .row.full-width.q-px-md
         q-input(

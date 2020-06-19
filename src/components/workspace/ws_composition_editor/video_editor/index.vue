@@ -8,7 +8,7 @@ div(
     ).col.full-width
     ws-content-video-player(:stateExplorer="stateExplorer")
   //- editor tools
-  div(:style=`{position: 'relative', maxHeight: options.useEditor ? '100%' : '0px'}`).col.full-width
+  div(:style=`{position: 'relative'}`).col.full-width
     div(
       v-if="!options.onlyProgress"
       :style=`{paddingTop: '24px'}`).row.fit.justify-center

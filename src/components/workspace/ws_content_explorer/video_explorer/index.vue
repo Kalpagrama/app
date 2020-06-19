@@ -1,62 +1,86 @@
+<style lang="sass" scoped>
+.video-explorer
+  position: relative
+  max-width: 800px
+  width: 100%
+.video-explorer-fullscreen
+  position: fixed
+  z-index: 10000
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  width: 100vw
+  min-width: 100vw
+  height: 100vh
+</style>
+
 <template lang="pug">
 div(
   v-if="contentKalpa"
-  :style=`{position: 'relative', borderRadius: $store.state.ui.borderRadius+'px'}`).column.fit.b-50
-  content-header(:stateExplorer="stateExplorer")
+  :class=`{
+    'video-explorer': !stateExplorer.pageFullscreen,
+    'video-explorer-fullscreen': stateExplorer.pageFullscreen,
+  }`
+  :style=`{
+    borderRadius: $store.state.ui.borderRadius+'px'
+  }`
+  ).column.b-50
+  transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+    content-header(
+      v-if="!stateExplorer.playing"
+      @close="$emit('close')"
+      :stateExplorer="stateExplorer")
   //- right panel
-  div(
-    v-if="$store.state.ui.appFullscreen && $q.screen.gt.sm"
-    :style=`{
-      position: 'absolute', zIndex: 99999,
-      top: '8px',
-      right: '8px',
-      height: $q.screen.height-120+'px',
-    }`).row.justify-start
-    content-meta(:stateExplorer="stateExplorer" :resizable="true")
+  //- div(
+  //-   v-if="stateExplorer.pageFullscreen && $q.screen.gt.sm"
+  //-   :style=`{
+  //-     position: 'absolute', zIndex: 99999,
+  //-     top: '8px',
+  //-     right: '8px',
+  //-     height: $q.screen.height-120+'px',
+  //-   }`).row.justify-start
+  //-   content-meta(:stateExplorer="stateExplorer" :resizable="true")
   //- ROW body
   div(
     :style=`{position: 'relative', height: videoHeight+'px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
     ).row.full-width
-    //- composition ADD with currentTime
+    //- composition ADD at currentTime
     q-btn(
-      v-if="!stateExplorer.compositionEditing"
+      v-if="compositionAddBtnShow"
       @click="compositionAddClick()"
-      round push color="green" icon="add"
+      round flat color="green" icon="add"
       :size="$q.screen.xs ? 'md' : 'lg'"
       :style=`{
-        position: 'absolute', zIndex: 9999, bottom: '40px',
-        right: $store.state.ui.appFullscreen ? 'calc(50% - 25px)' : '22px',
+        position: 'absolute', zIndex: 9999, bottom: '60px',
+        right: 'calc(50% - 25px)',
         borderRadius: '50%',
       }`)
     content-player(:stateExplorer="stateExplorer")
   //- COL bottom meta
-  div(
-    v-show="!$store.state.ui.appFullscreen"
-    ).col.full-width
-    .column.fit
-      //- div(:style=`{height: '26px'}`).row.full-width
-      .col.full-width
-        content-meta(:stateExplorer="stateExplorer" :resizable="false")
+  .col.full-width
+    content-meta(:stateExplorer="stateExplorer" :resizable="false")
   //- footer fixed
   div(
-    v-if="stateExplorer.pageId !== 'compositions'"
     :style=`{
       position: 'absolute', zIndex: 10000,
       bottom: $q.screen.height - videoHeight - 26+'px',
     }`
-    ).row.full-width.justify-center
+    ).row.full-width.items-start.content-start.justify-center
     content-progress(
+      v-if="stateExplorer.pageId !== 'compositions'"
       :stateExplorer="stateExplorer"
       :style=`{
         maxWidth: pageContentWidth-80+'px',
       }`)
+    //- resize video height
     q-btn(
+      v-if="false"
       round flat dense color="white" icon="unfold_more"
       :style=`{
-        position: 'absolute', right: '4px', zIndex: 12000,
-        top: '44px',
-      }`
-      )
+        position: 'absolute', left: '4px', zIndex: 12000,
+        bottom: '6px',
+      }`)
 </template>
 
 <script>
@@ -70,12 +94,12 @@ import contentProgress from './content_progress'
 export default {
   name: 'contentExplorer-video',
   components: {contentHeader, contentPlayer, contentMeta, contentProgress},
-  props: ['content'],
+  props: ['ctx', 'content'],
   data () {
     return {
       // layout
       contentKalpa: null,
-      pageId: 'compositions',
+      pageId: null,
       pages: [
         {id: 'info', name: 'Details', icon: 'details'},
         {id: 'compositions', name: 'Compositions', icon: 'crop_free'},
@@ -83,16 +107,18 @@ export default {
         // {id: 'people', name: 'People', icon: 'perm_identity'},
         // {id: 'chat', name: 'Chat', icon: 'chat_bubble_outline'},
       ],
+      pageFullscreen: false,
+      videoHeight: 300,
       // screenWidth: 1200,
       // videoHeight: 0,
       // pageWidth: 800,
       // pageContentWidth: 680,
       // player
       player: null,
+      playing: false,
+      loadeddata: false,
       currentTime: 0,
       duration: 0,
-      loadeddata: false,
-      playing: false,
       // composition
       composition: null,
       compositionSelected: null,
@@ -100,13 +126,17 @@ export default {
     }
   },
   computed: {
-    videoHeight () {
-      if (this.$store.state.ui.appFullscreen) return this.$q.screen.height - 43
-      else return this.$q.screen.height * 0.4
-    },
+    // videoHeight () {
+    //   // if (this.$store.state.ui.appFullscreen) return this.$q.screen.height - 43
+    //   // else return this.$q.screen.height * 0.4
+    //   return this.$q.screen.height * 0.8
+    // },
     pageContentWidth () {
       if (this.$q.screen.width > 680) return 680
       else return this.$q.screen.width
+    },
+    compositionAddBtnShow () {
+      return !this.stateExplorer.compositionEditing
     },
     stateExplorer () {
       return {
@@ -116,6 +146,7 @@ export default {
         content: this.contentKalpa,
         contentWs: this.content,
         pageContentWidth: this.pageContentWidth,
+        pageFullscreen: this.pageFullscreen,
         // player
         player: this.player,
         duration: this.duration,
@@ -135,8 +166,14 @@ export default {
     }
   },
   watch: {
-    'stateExplorer.currentTime': {
+    pageId: {
+      immediate: true,
       handler (to, from) {
+        this.$log('pageId TO', to)
+        if (to === 'compositions') this.videoHeight = this.$q.screen.height * 0.4
+        else if (to === 'info') this.videoHeight = this.$q.screen.height * 0.3
+        else if (to === 'spheres') this.videoHeight = 200
+        else if (to === null) this.videoHeight = this.$q.screen.height - 60
       }
     }
   },
@@ -184,11 +221,10 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, this.content.contentOid)
-    // if (this.$q.screen.xs) this.$store.commit('ui/stateSet', ['appFullscreen', true])
+    // this.videoHeight = this.$q.screen.height - 60
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    this.$store.commit('ui/stateSet', ['appFullscreen', false])
   }
 }
 </script>

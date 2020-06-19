@@ -103,9 +103,9 @@ export default {
       this.$log('voteEnd')
       this.voteId = val
       await this.$wait(500)
-      // let res = await NodeApi.nodeVote(this.node.oid, val)
-      // this.$log('voteEnd', res)
-      // await this.$wait(200)
+      let res = await NodeApi.nodeVote(this.node.oid, val)
+      this.$log('voteEnd', res)
+      await this.$wait(200)
       this.stateNode.set('voteShow', false)
       this.voteId = null
     }

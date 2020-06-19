@@ -6,7 +6,7 @@
     @click="compositionSelect()"
     :style=`{height: '40px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
     ).row.full-width.items-center.content-center.q-px-md.b-60.cursor-pointer.composition-item
-    span(:style=`{userSelect: 'none'}`).text-bold.text-white {{ composition.name }}
+    span(:style=`{userSelect: 'none'}`).text-bold.text-white {{ compositionName }}
   //- editor with only progress
   ws-composition-editor(
     v-if="stateExplorer.compositionSelected === composition.id && !stateExplorer.compositionEditing"
@@ -33,6 +33,13 @@ export default {
   data () {
     return {
     }
+  },
+  computed: {
+    compositionName () {
+      let name = this.composition.name
+      if (name.length > 0) return name
+      else return `${this.$time(this.composition.layers[0].figuresAbsolute[0].t)} - ${this.$time(this.composition.layers[0].figuresAbsolute[1].t)}`
+    },
   },
   methods: {
     compositionSelect () {

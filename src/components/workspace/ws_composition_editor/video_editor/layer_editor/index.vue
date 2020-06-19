@@ -8,6 +8,7 @@ div(
     overflow: 'hidden',
   }`
   ).row.full-width.items-end
+  //- active layer editor
   div(
     v-if="active"
     ).row.full-width

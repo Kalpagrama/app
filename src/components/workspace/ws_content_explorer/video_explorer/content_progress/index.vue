@@ -27,13 +27,16 @@
       q-tooltip(anchor="top middle" self="center middle") + 5 sec
     .col
     q-btn(
-      @click="$store.commit('ui/stateSet', ['appFullscreen', !$store.state.ui.appFullscreen])"
+      @click="stateExplorer.set('pageFullscreen', !stateExplorer.pageFullscreen)"
       round flat dense color="grey-5"
-      :icon="$store.state.ui.appFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-      :style=`{opacity: 0}`
+      :icon="stateExplorer.pageFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+      :style=`{opacity: 1}`
       )
       q-tooltip(anchor="top middle" self="center middle") Fullscreen
-    q-btn(round flat dense color="grey-5" icon="more_vert")
+    q-btn(
+      @click="pageIdToggle()"
+      round flat dense color="grey-5"
+      :icon="stateExplorer.pageId ? 'keyboard_arrow_down' : 'keyboard_arrow_up'")
   //- bar
   div(
     @click="barClick"
@@ -101,12 +104,25 @@ export default {
       barWidth: null,
       barDragging: false,
       nowHover: null,
-      nowHoverTime: 0
+      nowHoverTime: 0,
+      pageIdLast: null
     }
   },
   computed: {
   },
   methods: {
+    pageIdToggle () {
+      this.$log('pageIdToggle', this.pageIdLast)
+      if (this.stateExplorer.pageId) {
+        this.pageIdLast = this.stateExplorer.pageId
+        this.stateExplorer.set('pageId', null)
+      }
+      else {
+        this.stateExplorer.set('pageId', 'compositions')
+        // this.stateExplorer.set('pageId', this.pageIdLast)
+        // this.pageIdLast = null
+      }
+    },
     volumeToggle () {
       this.$log('volumeToggle')
       if (this.stateExplorer.player.muted) this.stateExplorer.player.setMuted(false)

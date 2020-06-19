@@ -24,7 +24,7 @@ iframe[id$="_youtube_iframe"]
     transform-origin: top left
     pointer-events: none
 .mejs__overlay-button
-  // display: none
+  display: none
 </style>
 
 <template lang="pug">

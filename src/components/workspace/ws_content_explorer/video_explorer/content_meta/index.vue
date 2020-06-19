@@ -38,7 +38,7 @@ div(
       //- footer
       div(v-if="!resizable && !stateExplorer.compositionEditing").row.full-width.justify-center
         q-tabs(
-          :value="stateExplorer.pageId" @input="stateExplorer.set('pageId', $event)"
+          :value="stateExplorer.pageId" @input="pageIdChanged"
           dense no-caps color="white"
           active-color="green"
           :style=`{}`
@@ -52,7 +52,6 @@ div(
 
 <script>
 import metaPeople from './meta_people'
-import metaLayers from './meta_layers'
 import metaSpheres from './meta_spheres'
 import metaChat from './meta_chat'
 import metaInfo from './meta_info'
@@ -60,7 +59,7 @@ import metaCompositions from './meta_compositions'
 
 export default {
   name: 'contentMeta',
-  components: {metaLayers, metaChat, metaPeople, metaSpheres, metaInfo, metaCompositions},
+  components: {metaChat, metaPeople, metaSpheres, metaInfo, metaCompositions},
   props: ['stateExplorer', 'resizable'],
   data () {
     return {
@@ -87,6 +86,11 @@ export default {
       }
     }
   },
-  methods: {}
+  methods: {
+    pageIdChanged (e) {
+      this.$log('pageIdChanged', e)
+      this.stateExplorer.set('pageId', e)
+    }
+  }
 }
 </script>

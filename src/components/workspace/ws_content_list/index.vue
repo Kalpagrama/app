@@ -21,13 +21,13 @@ div(
     v-model="contentEditorOpened" position="bottom"
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
     @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
-    ws-content-editor(
+    ws-content-explorer(
       v-if="content" :value="content"
       @close="contentEditorOpened = false"
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
-        maxWidth: $store.state.ui.maxWidthPage+'px',
+        //- maxWidth: $store.state.ui.maxWidthPage+'px',
       }`).b-50
   //- header
   //- kalpa-debug(:options=`{ctx}`)
@@ -180,9 +180,9 @@ export default {
     contentPicked (content) {
       this.$log('contentPicked', this.ctx)
       if (this.ctx === 'workspace') {
-        this.$router.push(`/workspace/content/${content.id}`)
-        // this.content = content
-        // this.contentEditorOpened = true
+        // this.$router.push(`/workspace/content/${content.id}`)
+        this.content = content
+        this.contentEditorOpened = true
       }
       else {
         this.$emit('content', JSON.parse(JSON.stringify(content)))

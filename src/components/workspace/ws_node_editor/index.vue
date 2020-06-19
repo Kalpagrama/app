@@ -30,7 +30,7 @@ div(
     .row.full-width.justify-center
       div(:style=`{maxWidth: '600px'}`).row.full-width.q-pt-sm
         q-tabs(
-          :value="pageId" @input="pageId = $event"
+          :value="pageId" @input="pageChanged($event)"
           dense no-caps color="white"
           align="justify"
           active-color="green"
@@ -43,12 +43,37 @@ div(
             :style=`{color: 'rgb(180,180,180)'}`)
   //- body
   .col.full-width
-    component(
-      @close="$emit('close')"
-      :is="`edit-${pageId}`"
-      :stateNodeEditor="stateNodeEditor"
-      :node="node"
-      :options="options")
+    .row.fit.justify-center
+      component(
+        @close="$emit('close')"
+        :is="`edit-${pageId}`"
+        :stateNodeEditor="stateNodeEditor"
+        :node="node"
+        :options="options"
+        :style=`{
+          maxWidth: '600px',
+        }`)
+  //- footer
+  div(:style=`{}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '600px'}`).row.full-width.q-py-sm
+      q-btn(
+        @click="pagePrev()"
+        round flat color="white"
+        icon="keyboard_arrow_left"
+        :style=`{opacity: pageId === 'items' ? 0 : 1}`)
+      .col
+      q-btn(
+        v-if="pageId !== 'preview'"
+        @click="pageNext()"
+        push color="green" no-caps
+        ).q-px-md Next
+      q-btn(
+        v-if="pageId === 'preview'"
+        @click="stateNodeEditor.nodePublish()"
+        push color="green" no-caps
+        :loading="stateNodeEditor.nodePublishing"
+        ).q-px-md
+        span.text-white.text-bold Publish
 </template>
 
 <script>
@@ -101,6 +126,16 @@ export default {
     }
   },
   methods: {
+    pagePrev () {
+      this.$log('pagePrev')
+      if (this.pageId === 'spheres') this.pageChanged('items')
+      else if (this.pageId === 'preview') this.pageChanged('spheres')
+    },
+    pageNext () {
+      this.$log('pageNext')
+      if (this.pageId === 'items') this.pageChanged('spheres')
+      else if (this.pageId === 'spheres') this.pageChanged('preview')
+    },
     pageChanged (id) {
       this.$log('pageChanged', id)
       // check node.items for preview page

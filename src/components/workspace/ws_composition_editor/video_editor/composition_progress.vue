@@ -13,7 +13,7 @@ div(:style=`{position: 'relative'}`).row.ful-width.b-70
       //- composition name
       span(
         :style=`{userSelect: 'none', pointerEvents: 'none'}`
-        ).text-white.text-bold.q-mx-md {{value.name}}
+        ).text-white.text-bold.q-mx-md {{ compositionName }}
       //- progress
       div(
         v-if="true"
@@ -75,6 +75,11 @@ export default {
     }
   },
   computed: {
+    compositionName () {
+      let name = this.value.name
+      if (name.length > 0) return name
+      else return `${this.$time(this.value.layers[0].figuresAbsolute[0].t)} - ${this.$time(this.value.layers[0].figuresAbsolute[1].t)}`
+    },
     layersDuration () {
       return this.value.layers.reduce((acc, layer) => {
         let layerDuration = layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t
@@ -114,27 +119,27 @@ export default {
     }
   },
   watch: {
-    // 'stateExplorer.currentTime': {
-    //   immediate: true,
-    //   handler (to, from) {
-    //     // this.$log('currentTime TO', to)
-    //     // if (!this.active) return
-    //     if (!this.compositionPlaying) return
-    //     if (this.currentTimeStop) return
-    //     if (to > this.layerActiveEnd) {
-    //       // try to find next layerActive
-    //       if (this.layersStats[this.layerActive + 1]) {
-    //         this.layerActiveSet(this.layerActive + 1)
-    //       }
-    //       else {
-    //         this.layerActiveSet(0)
-    //       }
-    //     }
-    //     if (to < this.layerActiveStart) {
-    //       this.layerActiveSet(this.layerActive)
-    //     }
-    //   }
-    // }
+    'stateExplorer.currentTime': {
+      immediate: true,
+      handler (to, from) {
+        // this.$log('currentTime TO', to)
+        // if (!this.active) return
+        if (!this.compositionPlaying) return
+        if (this.currentTimeStop) return
+        if (to > this.layerActiveEnd) {
+          // try to find next layerActive
+          if (this.layersStats[this.layerActive + 1]) {
+            this.layerActiveSet(this.layerActive + 1)
+          }
+          else {
+            this.layerActiveSet(0)
+          }
+        }
+        if (to < this.layerActiveStart) {
+          this.layerActiveSet(this.layerActive)
+        }
+      }
+    }
   },
   methods: {
     compositionPlayPause () {

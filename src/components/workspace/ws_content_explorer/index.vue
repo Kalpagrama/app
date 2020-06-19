@@ -1,7 +1,9 @@
 <template lang="pug">
 component(
   v-if="value"
+  @close="$emit('close')"
   :is="component[value.contentType]"
+  :ctx="ctx"
   :content="value")
 </template>
 
@@ -14,8 +16,16 @@ import videoExplorer from './video_explorer'
 // value is content ws
 export default {
   name: 'wsContentExplorer',
-  props: ['value'],
   components: {videoExplorer},
+  props: {
+    value: {type: Object},
+    ctx: {
+      type: String,
+      default () {
+        return 'workspace'
+      }
+    }
+  },
   data () {
     return {
       component: {

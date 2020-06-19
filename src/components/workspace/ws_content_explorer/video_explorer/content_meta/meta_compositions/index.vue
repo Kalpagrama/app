@@ -163,10 +163,12 @@ export default {
   methods: {
     compositionsSelectedMerge () {
       this.$log('compositionsSelectedMerge')
+      this.stateExplorer.player.pause()
       this.compositionsSelected = []
     },
     async compositionsSelectedCreateNode () {
       this.$log('compositionsSelectedCreateNode')
+      this.stateExplorer.player.pause()
       // get compositions
       let compositions = []
       await Promise.all(
