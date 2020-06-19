@@ -39,6 +39,7 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
           oidSphere: this.sphereOid,
+          oidAuthor: {$eq: this.sphereOid},
           sortStrategy: 'AGE'
         }
       }
