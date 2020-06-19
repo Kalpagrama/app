@@ -11,7 +11,7 @@ div(
   }`
   :style=`{
     position: 'relative',
-    borderRadius: '10px', overflow: 'hidden'
+    borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
   }`
   ).column.full-width.q-pt-sm
   div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
@@ -28,7 +28,7 @@ div(
           }`
         :style=`{
           height: '50px',
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden'
         }`
         ).row.full-width.items-center.content-center.menu-item.q-px-md

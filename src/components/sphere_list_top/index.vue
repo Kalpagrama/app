@@ -13,7 +13,7 @@
         :class=`{
           'b-100': oid === c.oid
         }`
-        :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`
+        :style=`{height: '40px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
         ).row.full-width.items-center.q-px-md.cursor-pointer.sphere-item
         span(:style=`{userSelect: 'none', textTransform: 'capitalize'}`).text-white {{'# '+c.name}}
 </template>

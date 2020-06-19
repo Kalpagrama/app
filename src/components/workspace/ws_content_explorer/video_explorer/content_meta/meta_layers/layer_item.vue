@@ -14,7 +14,7 @@ div(
   :style=`{
     position: 'relative',
     minHeight: '40px',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden'
   }`
   ).row.full-width.items-between.content-between
@@ -27,7 +27,7 @@ div(
     :style=`{
       position: 'relative',
       height: '40px',
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden'
     }`).row.full-width.q-pl-md.layer
     //- progress tint
@@ -48,7 +48,7 @@ div(
           left: '0px',
           width: progressPercentRaw ? progressPercentRaw+'%' : ((stateExplorer.currentTime-layerStart)/layerDuration)*100+'%',
           pointerEvents: 'none',
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden',
           opacity: 0.5
         }`

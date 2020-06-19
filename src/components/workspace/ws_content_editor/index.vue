@@ -80,7 +80,7 @@ div(
               active-color="white"
               active-bg-color="green"
               dense color="white"
-              :style=`{borderRadius: '10px'}`).b-60
+              :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`).b-60
               q-tab(
                 v-for="(p,pkey) in pages" :key="pkey"
                 :name="pkey"

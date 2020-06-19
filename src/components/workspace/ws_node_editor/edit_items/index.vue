@@ -59,6 +59,11 @@ div(
             flat color="green" icon="add" size="lg"
             :style=`{height: '300px'}`
             ).full-width.b-60
+  //- footer
+  .row.full-width.justify-center.br
+    div(:style=`{maxWidth: '600px'}`).row.full-width.q-py-sm
+      .col
+      q-btn(push color="green" no-caps @click="stateNodeEditor.set('pageId', 'spheres')") Next
 </template>
 
 <script>
@@ -70,7 +75,7 @@ import itemItem from './item_item'
 export default {
   name: 'editItems',
   components: {draggable, itemFinder, itemItem},
-  props: ['node'],
+  props: ['stateNodeEditor', 'node'],
   data () {
     return {
       item: null,

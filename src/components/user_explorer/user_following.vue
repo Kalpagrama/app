@@ -3,7 +3,7 @@
 //-   div(
 //-     @click="subjectClick(s, ss)"
 //-     v-for="(s, ss) in subscriptions" :key="ss"
-//-     :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+//-     :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
 //-     ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
 //-     div(@click="" :style=`{height: '40px', width: '40px'}`).row.items-center.justify-center
 //-       img(@click="" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)

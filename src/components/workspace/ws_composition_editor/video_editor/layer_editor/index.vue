@@ -4,7 +4,7 @@ div(
     'b-70': active,
   }`
   :style=`{
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`
   ).row.full-width.items-end

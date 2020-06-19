@@ -6,7 +6,7 @@ div(
   }`
   :style=`{
     position: 'relative',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden'
   }`
   ).row.full-width.items-start.content-start
@@ -17,11 +17,11 @@ div(
       v-bind="$props" :stateNode="stateNode"
       :style=`{
         transform: 'translate3d(0,0,0)',
-        borderRadius: '10px',
+        borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
       }`).b-60
     node-vote(
-      v-if="stateNode.showVote"
+      v-if="stateNode.voteShow"
       v-bind="$props"
       :stateNode="stateNode")
   node-essence(
@@ -61,13 +61,22 @@ export default {
   components: {nodeTools, nodeItems, nodeVote, nodeEssence, nodeAuthor, nodeSpheres},
   data () {
     return {
-      showVote: false
+      voteShow: false
     }
   },
   computed: {
+    nodeIsMine () {
+      if (this.nodeFull) {
+        return this.nodeFull.author.oid === this.$store.getters.currentUser().oid
+      }
+      else {
+        return true
+      }
+    },
     stateNode () {
       return {
-        showVote: this.showVote,
+        voteShow: this.voteShow,
+        nodeIsMine: this.nodeIsMine,
         set: (key, val) => {
           this[key] = val
         }

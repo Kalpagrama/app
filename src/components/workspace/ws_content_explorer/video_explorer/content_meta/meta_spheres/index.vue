@@ -10,7 +10,7 @@
       //- div(:style=`{paddingTop: '46px', paddingBottom: '200px',}`).row.full-width.items-start.content-start.q-py-md
         //- div(
         //-   v-for="i in 10" :key="i"
-        //-   :style=`{height: '300px', borderRadius: '10px', overflow: 'hidden'}`
+        //-   :style=`{height: '300px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
         //-   ).row.full-width.q-mb-lg.b-60
       kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
         template(v-slot=`{items}`)

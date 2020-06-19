@@ -23,7 +23,7 @@
           'bg-grey-6': ii === nodeIndex,
           'bg-grey-9': ii !== nodeIndex
         }`
-        :style=`{height: '40px', borderRadius: '10px'}`
+        :style=`{height: '40px', borderRadius: $store.state.ui.borderRadius+'px'}`
         ).row.full-width.items-center.q-px-md.q-mb-sm.q-py-sm.note-item
         span.text-white {{ i.name }}
         .col

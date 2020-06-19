@@ -4,7 +4,7 @@
     .col.full-width.scroll.q-px-sm
       div(
         :style=`{
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden'
         }`).row.full-width.items-start.content-start.q-pa-md.b-50
         .row.full-width.q-py-md

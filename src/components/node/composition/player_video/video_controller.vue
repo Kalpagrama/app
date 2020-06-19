@@ -3,7 +3,7 @@ div(
   v-if="!mini"
   :style=`{
     position: 'absolute', zIndex: 10000, left: '16px', bottom: '58px',
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
     background: 'rgba(0,0,0,0.3)',
   }`
   ).row.items-center.content-center.q-px-sm.q-py-xs

@@ -4,7 +4,7 @@ div(
   :style=`{
     position: 'absolute', zIndex: 99999, top: '0px', left: '0px',
     height: '60px',
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
     background: $q.screen.xs ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.2)',
     maxWidth: 'calc(100% - 0px)',
   }`).row.full-width.items-center.content-center.q-pa-sm

@@ -5,7 +5,7 @@ div(
   :style=`{
     position: 'relative',
     height: '100px',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`
   ).row.full-width.items-center.content-center.q-mb-sm.b-60.content-item
@@ -15,7 +15,7 @@ div(
     :style=`{
       position: 'relative',
       width: '180px', height: '100px',
-      borderRadius: '10px', overflow: 'hidden'}`
+      borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
     ).row.items-center.content-center.justify-center.b-80
     img(
       v-if="!thumbErrored"
@@ -33,7 +33,7 @@ div(
         position: 'absolute', zIndex: 200,
         transform: 'translate3d(0,0,0)',
         right: '4px', bottom: '4px',
-        borderRadius: '10px', overflow: 'hidden',
+        borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
         background: 'rgba(0,0,0,0.5)',
         pointerEvents: 'none',
         userSelect: 'none',

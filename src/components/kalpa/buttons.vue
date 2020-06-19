@@ -9,14 +9,14 @@ div(:style=`{}`).row.items-center.content-center.q-pt-sm
   //- TODO create CSS variable for #4caf50 color...
   div(
     v-if="screenSet ? screenSet === 'gt.xs' : $q.screen.gt.xs"
-    :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.no-wrap.b-70
+    :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.no-wrap.b-70
     div(
       v-for="(i, ii) in value" :key="i[idKey]" @click="$emit('id', i[idKey])"
       :class=`{
         'bg-green': id === i[idKey]
       }`
       :style=`{
-        position: 'relative', borderRadius: '10px', overflow: 'hidden', userSelect: 'none',
+        position: 'relative', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', userSelect: 'none',
         height: '34px',
         minWidth: '50px',
         color: id === i[idKey] ? 'white !important' : '#4caf50',}`

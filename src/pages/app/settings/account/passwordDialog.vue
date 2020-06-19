@@ -22,7 +22,7 @@
         q-btn(
           v-if="newPas === repPas && newPas"
           push no-caps dense color="accent" @click="changePassword()"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width {{ $t('Change password') }}
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width {{ $t('Change password') }}
         .row.full-width.q-py-sm
           small.text-grey-8.q-px-xs.q-mt-sm {{$t('Пароль должен состоять не менее чем из 6 символов, включающих буквы разных регистров, цифр и спецсимволов!')}}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePassword.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr

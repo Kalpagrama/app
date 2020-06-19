@@ -1,6 +1,6 @@
 <template lang="pug">
 div(
-  :style=`{borderRadius: '10px', overflow: 'hidden'}`
+  :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
   ).column.full-width.b-30
   //- header
   div(
@@ -17,15 +17,15 @@ div(
         ).full-width
   //- body
   .col.full-width.q-pa-sm
-    div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.fit.b-60
+    div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.fit.b-60
   .col.full-width.q-pa-sm
     div(
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`
+      :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
       ).row.fit.items-center.content-center.justify-center.b-60
       q-btn(
         round flat color="green" icon="add"
         size="lg")
-  div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.q-pa-sm.b-60
+  div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.q-pa-sm.b-60
     q-btn(round flat dense color="grey-5" icon="menu")
 </template>
 

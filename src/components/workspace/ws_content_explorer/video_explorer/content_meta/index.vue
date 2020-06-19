@@ -6,7 +6,7 @@ div(
     width: resizable ? maxWidth+'px' : '100%',
     maxWidth: resizable ? maxWidth+'px' : '100%',
     background: 'rgba(50,50,50,0.9)',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     //- overflow: 'hidden',
   }`
   ).row.full-height

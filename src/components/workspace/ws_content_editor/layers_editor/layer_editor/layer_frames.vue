@@ -16,10 +16,10 @@
         :style=`{
           position: 'relative',
           height: '50px',
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
         }`).row.no-wrap.items-center.content-center.justify-start.b-220
         //- frames
-        div(:style=`{minWidth: framesWidth+'px', width: framesWidth+'px', height: '50px', pointerEvents: 'none', borderRadius: '10px', overflow: 'hidden'}`).row
+        div(:style=`{minWidth: framesWidth+'px', width: framesWidth+'px', height: '50px', pointerEvents: 'none', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row
           div(
             v-for="f in framesCount" :key="f"
             :style=`{
@@ -50,7 +50,7 @@
             width: 'calc('+(layer.figuresAbsolute[0].t/statePlayer.duration)*100+'% + 8px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
-            borderRadius: '10px',
+            borderRadius: $store.state.ui.borderRadius+'px',
           }`)
         //- left drag
         div(
@@ -71,7 +71,7 @@
             width: 'calc('+((statePlayer.duration-layer.figuresAbsolute[1].t)/statePlayer.duration)*100+'% + 1px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
-            borderRadius: '10px',
+            borderRadius: $store.state.ui.borderRadius+'px',
           }`)
         //- right drag
         div(

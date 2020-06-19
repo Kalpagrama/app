@@ -79,9 +79,9 @@ export default {
     return {
       pageId: 'items',
       pages: [
-        {id: 'items', name: 'Items'},
-        {id: 'spheres', name: 'Spheres'},
-        {id: 'preview', name: 'Preview'}
+        {id: 'items', name: '1. Items'},
+        {id: 'spheres', name: '2. Spheres'},
+        {id: 'preview', name: '3. Preview'}
       ]
     }
   },

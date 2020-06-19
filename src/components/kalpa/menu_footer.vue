@@ -13,7 +13,7 @@ q-footer(
       //- left menu
       q-btn(round flat color="white" icon="menu" @click="menuClick()")
         //- q-menu(anchor="top left" self="bottom left" :offset="[0, 20]" max-height="100vh" :style=`{zIndex: 40000}`)
-        //-   div(:style=`{width: $q.screen.width-19+'px', zIndex: 40000, borderRadius: '10px', overflow: 'hidden'}`).row.b-40
+        //-   div(:style=`{width: $q.screen.width-19+'px', zIndex: 40000, borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.b-40
         //-     kalpa-menu
       .col
         .row.fit.items-center.content-center.justify-center
@@ -26,7 +26,7 @@ q-footer(
         v-if="options.showMenuPage" @click="menuRightClick()"
         round flat color="white" icon="menu_open")
         //- q-menu(anchor="top left" self="bottom left" :offset="[0, 20]")
-        //-   div(:style=`{width: $q.screen.width-19+'px', borderRadius: '10px', overflow: 'hidden'}`).row.b-40
+        //-   div(:style=`{width: $q.screen.width-19+'px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.b-40
         //-     slot(name="menuRight")
   q-drawer(v-model="showDrawerRight" side="right")
     slot(name="menuRight" :inDrawer="true")

@@ -10,18 +10,18 @@
     q-input(
       v-model="user.profile.about"
       filled dark color="green" label="Set your status"
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
+      :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
     //- name
     q-input(
       v-model="user.name"
       filled dark color="green" label="Set your name"
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
+      :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
     //- set about
     q-input(
       v-model="user.profile.about"
       type="textarea"
       filled dark color="green" label="Tell about youtself"
-      :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
+      :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).full-width.bg-grey-9.q-mb-md
     //- login
     //- password
     //- email

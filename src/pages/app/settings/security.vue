@@ -11,7 +11,7 @@
         div(
           v-for="(s, si) in sessions" :key="si"
           v-if="s.token !== mytoken"
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`
+          :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
           ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
           .col
             span {{s.ip}}
@@ -27,7 +27,7 @@
         .row.full-width.items-center.justify-center.q-my-sm
           q-btn(
             push color="accent" no-caps @click="deleteSession(null)"
-            :style=`{height: '50px', borderRadius: '10px'}`)
+            :style=`{height: '50px', borderRadius: $store.state.ui.borderRadius+'px'}`)
             span.text-bold.q-ml-md {{ $t('Delete all sessions exept yours') }}
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}` @click="$refs.sessions.show()").row.full-width.justify-start.items-center.q-px-md
     span {{$t('Sessions')}}

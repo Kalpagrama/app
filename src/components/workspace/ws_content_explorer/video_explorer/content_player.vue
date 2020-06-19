@@ -28,7 +28,7 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-60.fit
+div(:style=`{position: 'relative', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.b-60.fit
   video(
     ref="videoRef"
     :src="stateExplorer.content.url"
@@ -136,7 +136,7 @@ export default {
         controls: true,
         features: [],
         // enableAutosize: true,
-        stretching: 'fill',
+        // stretching: 'fill',
         pauseOtherPlayers: true,
         clickToPlayPause: true,
         // plugins: ['youtube'],
@@ -167,6 +167,9 @@ export default {
     this.stateExplorer.player.removeEventListener('pause', this.playerPause)
     this.stateExplorer.player.removeEventListener('loadeddata', this.playerLoadeddata)
     // this.stateExplorer.player.removeEventListener('timeupdate', this.playerTimeupdate)
+    // destroy player
+    this.stateExplorer.player.pause()
+    this.stateExplorer.player.remove()
   }
 }
 </script>

@@ -21,7 +21,7 @@ div(
         :style=`{
           position: 'absolute', zIndex: 10000,
           height: '42px',
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden',
         }`
         ).row.full-width.items-center.content-center.b-120.cursor-pointer
@@ -33,7 +33,7 @@ div(
             left: '0px',
             width: progressPercentRaw ? progressPercentRaw+'%' : progressPercent+'%',
             pointerEvents: 'none',
-            borderRadius: '10px',
+            borderRadius: $store.state.ui.borderRadius+'px',
             overflow: 'hidden',
             background: 'white',
           }`
@@ -44,11 +44,11 @@ div(
             position: 'absolute', zIndex: 1100,
             bottom: '8px', pointerEvents: 'none',
           }`).row.full-width.q-px-xs
-          small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerStart)}}
+          small(:style=`{borderRadius: $store.state.ui.borderRadius+'px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerStart)}}
           .col
             .row.full-width.justify-center
-              small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{ $time(statePlayer.layerEnd - statePlayer.layerStart) }}
-          small(:style=`{borderRadius: '10px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerEnd)}}
+              small(:style=`{borderRadius: $store.state.ui.borderRadius+'px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{ $time(statePlayer.layerEnd - statePlayer.layerStart) }}
+          small(:style=`{borderRadius: $store.state.ui.borderRadius+'px', background: 'rgba(0,0,0,0.0)'}`).q-pa-xs {{$time(statePlayer.layerEnd)}}
   q-btn(round flat color="white" icon="refresh" @click="layerPlayAgain()").b-110
 </template>
 

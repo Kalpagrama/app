@@ -2,7 +2,7 @@
 .column.fit
   div(
     v-for="(b, bi) in blacklist" :key="bi"
-    :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+    :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
     ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
     div(:style=`{height: '40px', width: '40px'}`).row.items-center.justify-center
       //- subClick(s, si)

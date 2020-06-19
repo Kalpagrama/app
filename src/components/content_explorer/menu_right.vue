@@ -10,7 +10,7 @@ div(
     'full-height': inDrawer
   }`
   :style=`{
-    borderRadius: '10px'
+    borderRadius: $store.state.ui.borderRadius+'px'
   }`
   ).column.full-width.b-50
   div(
@@ -27,7 +27,7 @@ div(
           'b-100': $route.params.page === p.id
         }`
         :style=`{
-          height: '50px', borderRadius: '10px', overflow: 'hidden'
+          height: '50px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
         }`
         ).row.full-width.items-center.content-center.menu-item.q-px-md
         span(

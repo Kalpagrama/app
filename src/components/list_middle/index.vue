@@ -27,7 +27,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
       //- inactive tint
       div(
         v-if="indexMiddle !== ii" @click="itemInactiveClick(i,ii)"
-        :style=`{position: 'absolute', zIndex: 1500, borderRadius: '10px', overflow: 'hidden', opacity: 0.25}`).row.fit.b-30
+        :style=`{position: 'absolute', zIndex: 1500, borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', opacity: 0.25}`).row.fit.b-30
       slot(
         name="item"
         :item="i"

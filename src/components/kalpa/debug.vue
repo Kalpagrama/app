@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    borderRadius: '10px', opacity: 0.8,
+    borderRadius: $store.state.ui.borderRadius+'px', opacity: 0.8,
     pointerEvents: 'none',
     userSelect: 'none',
   }`).row.full-width.bg-green.q-px-xs

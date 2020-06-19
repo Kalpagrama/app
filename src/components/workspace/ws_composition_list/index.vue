@@ -56,7 +56,12 @@ div(
       :style=`{}`
       ).row.full-width.q-pt-xs
       .col
-      q-btn(round flat dense color="white" icon="edit")
+      q-btn(
+        v-for="(v,vi) in views" :key="v.id"
+        @click="view = v.id"
+        round flat dense no-caps
+        :color="view === v.id ? 'green' : 'white'"
+        ).q-mx-xs.q-px-xs {{ v.name }}
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
@@ -67,14 +72,15 @@ div(
               :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
               composition-item(
                 v-for="(c,ci) in items" :key="c.id"
+                :view="view"
                 @pick="compositionPicked(c,ci)"
                 @explore="compositionExplore(c,ci)"
                 @delete="compositionDelete(c,ci)"
-                :ctx="ctx" :composition="c").col-6.q-pa-xs
+                :ctx="ctx" :composition="c")
           //- nothing found
           div(
             v-else
-            :style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{height: '200px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
             ).row.full-width.items-center.content-center.justify-center.b-50
             span.text-white Nothing found :(
 </template>
@@ -108,6 +114,12 @@ export default {
       composition: null,
       compositionShow: false,
       compositionEditorOpened: false,
+      view: 'mini',
+      views: [
+        {id: 'mini', name: 'Mini'},
+        {id: 'semi', name: 'Semi'},
+        {id: 'maxi', name: 'Maxi'},
+      ]
     }
   },
   computed: {

@@ -12,7 +12,7 @@
       position: 'relative',
       maxWidth: '600px',
     }`
-    ).column.fit.q-py-sm
+    ).column.fit.q-pt-sm
     //- cateory
     div().row.full-width.q-mb-sm
       q-select(
@@ -21,7 +21,7 @@
         :value="category(node.category)" @input="categorySelected"
         :options="categories"
         :style=`{
-          borderRadius: '10px', overflow: 'hidden',
+          borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
           minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
         }`).full-width
     //- spheres
@@ -34,7 +34,7 @@
         @searchStarted="showSpheresFromWs = true"
         @searchEnded="showSpheresFromWs = false"
         :style=`{
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden',
         }`).full-height.b-50
         template(v-slot:header)
@@ -48,6 +48,15 @@
                 :sphere="s"
                 @sphereClick="sphereClick(s,si)"
                 ).q-mr-sm.q-mb-sm
+    //- footer
+    .row.full-width.justify-center.br
+      div(:style=`{maxWidth: '600px'}`).row.full-width.q-py-sm
+        q-btn(
+          round flat color="white"
+          icon="keyboard_arrow_left"
+          @click="stateNodeEditor.set('pageId', 'items')")
+        .col
+        q-btn(push color="green" no-caps @click="stateNodeEditor.set('pageId', 'preview')") Next
 </template>
 
 <script>
@@ -56,7 +65,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'editSpheres',
-  props: ['node'],
+  props: ['stateNodeEditor', 'node'],
   data () {
     return {
       nodeCategories: [],

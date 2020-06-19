@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   v-if="contentKalpa"
-  :style=`{position: 'relative', borderRadius: '10px'}`).column.fit.b-50
+  :style=`{position: 'relative', borderRadius: $store.state.ui.borderRadius+'px'}`).column.fit.b-50
   content-header(:stateExplorer="stateExplorer")
   //- right panel
   div(
@@ -15,7 +15,7 @@ div(
     content-meta(:stateExplorer="stateExplorer" :resizable="true")
   //- ROW body
   div(
-    :style=`{position: 'relative', height: videoHeight+'px', borderRadius: '10px', overflow: 'hidden'}`
+    :style=`{position: 'relative', height: videoHeight+'px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
     ).row.full-width
     //- composition ADD with currentTime
     q-btn(

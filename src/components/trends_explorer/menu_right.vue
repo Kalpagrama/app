@@ -4,7 +4,7 @@ div(
     'full-height': inDrawer
   }`
   :style=`{
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`
   ).column.full-width.b-50

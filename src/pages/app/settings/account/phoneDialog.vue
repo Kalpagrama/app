@@ -15,7 +15,7 @@
         q-input(v-model="newPhone" unmasked-value mask="(###)-###-##-##" stack-label :label="$t('New number')" prefix="+7" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changePhone()"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get code') }}
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-mb-sm {{ $t('Get code') }}
         .row.full-width.justify-start
           small.text-grey {{ $t('Example for Russia')}} +7 (921)-000-00-07
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePhone.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr

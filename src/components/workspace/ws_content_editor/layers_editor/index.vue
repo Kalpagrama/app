@@ -12,7 +12,7 @@ div(:style=`{position: 'relative'}`).column.fit
       @delete="layerDelete(statePlayer.layer)"
       :style=`{
         position: 'absolute', zIndex: 2000,
-        borderRadius: '10px', overflow: 'hidden'
+        borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
       }`)
   //- body
   .col.full-width

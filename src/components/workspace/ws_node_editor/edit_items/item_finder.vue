@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`
   ).column.full-width.b-50
@@ -33,7 +33,7 @@ div(
         ctx="itemFinder"
         :style=`{
           maxWidth: 600+'px',
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden',
         }`)
       ws-composition-list(
@@ -42,7 +42,7 @@ div(
         ctx="itemFinder"
         :style=`{
           maxWidth: 600+'px',
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden',
         }`)
 </template>

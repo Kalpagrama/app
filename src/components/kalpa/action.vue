@@ -5,7 +5,7 @@ q-dialog(
   div(
     v-if="options"
     @click.self="$refs.actionDialog.hide()"
-    :style=`{borderRadius: '10px', overflow: 'hidden'}`
+    :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
     ).row.items-center.justify-center.bg-grey-10.q-pa-sm
     //- header
     div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-py-sm.q-px-md
@@ -24,7 +24,7 @@ q-dialog(
       //- div(v-if="options && options.actions.confirm").row.full-width.q-mt-sm
       //-   q-btn(
       //-     push no-caps color="green" @click="action('confirm')"
-      //-     :style=`{height: '60px', borderRadius: '10px'}`).full-width
+      //-     :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width
       //-     span.text-bold {{ options.actions.confirm.name || $t('Confirm') }}
 </template>
 

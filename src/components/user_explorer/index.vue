@@ -1,3 +1,9 @@
+<style lang="sass">
+.q-tab
+  border-radius: 8px !important
+  overflow: hidden !important
+</style>
+
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit
   //- menu right
@@ -26,33 +32,43 @@ div(:style=`{position: 'relative'}`).row.fit
       reveal
       :style=`{
         zIndex: 9999,
-        borderRadius: '10px 10px 0 0', overflow: 'hidden'
+        borderRadius: '8px 8px 0 0', overflow: 'hidden'
       }`
       ).row.full-width
       .row.full-width.q-pa-sm.b-50
-        q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
+        q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
         .col
-        q-btn(round flat dense color="white" icon="menu_open" @click="showMenu = !showMenu")
+        q-btn(round flat color="white" icon="menu_open" @click="showMenu = !showMenu")
     q-header(
       v-if="true"
       v-model="showHeader"
       reveal
       ).row.full-width
-      div(:style=`{borderRadius: '0 0 10px 10px'}`).row.full-width.items-center.content-center.q-px-sm.q-pb-sm.b-50
-        .row.full-width.items-center.content-center.q-py-md
+      div(:style=`{borderRadius: '0 0 8px 8px'}`).row.full-width.items-center.content-center.b-50
+        .row.full-width.items-center.content-center.q-py-md.q-px-sm
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
           .col.full-height
             .row.fit.items-center.content-center
-              kalpa-avatar(:url="user.profile.photoUrl" :width="36" :height="36").q-mr-sm
-              span.text-white.text-bold {{ user.name }}
-          q-btn(
-            v-if="itsMe"
-            round flat color="white" icon="settings")
-        .row.full-width.items-end.content-end.justify-between
-          kalpa-buttons(:value="pages" :id="$route.name" @id="$router.push({name: $event})").justify-start
+              kalpa-avatar(:url="user.profile.photoUrl" :width="36" :height="36")
+              span.text-white.text-bold.q-ml-sm {{ user.name }}
           q-btn(
             v-if="!itsMe"
-            no-caps dense color="green").q-px-md Follow
+            push color="green" no-caps
+            ) Follow
+        .row.full-width.items-end.content-end.justify-between
+          //- kalpa-buttons(:value="pages" :id="$route.name" @id="$router.push({name: $event})").justify-start
+          q-tabs(
+            :value="$route.name" @input="pageChanged"
+            align="justify"
+            active-color="green"
+            dense color="white"
+            :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`).full-width
+            q-tab(
+              v-for="(p,pkey) in pages" :key="pkey"
+              :name="p.id"
+              :label="p.name"
+              no-caps content-class="text-white"
+              :style=`{color: 'white'}`)
     q-page-container
       q-page
         router-view
@@ -78,8 +94,8 @@ export default {
       pages: [
         {id: 'created', name: 'Created'},
         {id: 'voted', name: 'Voted'},
-        // {id: 'following', name: 'Following'},
-        // {id: 'followers', name: 'Followers'}
+        {id: 'following', name: 'Following'},
+        {id: 'followers', name: 'Followers'},
       ]
     }
   },
@@ -101,6 +117,10 @@ export default {
   watch: {
   },
   methods: {
+    pageChanged (e) {
+      this.$log('pageChanged', e)
+      this.$router.push({name: e}).catch(e => e)
+    }
   },
   mounted () {
     this.$log('mounted')

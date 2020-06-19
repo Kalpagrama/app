@@ -7,7 +7,7 @@
 <template lang="pug">
 q-layout(view="hHh lpR fFf")
   kalpa-menu-right
-    menu-right(:style=`{borderRadius: '10px', overflow: 'hidden'}`)
+    menu-right(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
   kalpa-menu-footer(:options=`{showMenuPage: true}`)
     template(v-slot:menuRight=`{inDrawer}`)
       //- div(:style=`{minHeight: '60px'}`).row.full-width.items-center.content-center.q-pa-md
@@ -30,7 +30,7 @@ q-layout(view="hHh lpR fFf")
             q-btn(round flat color="grey-2" icon="keyboard_arrow_left" @click="$router.back()")
             .col.full-height
               .row.fit.items-center.content-center.q-px-sm
-                span(:style=`{minHeight: '42px', borderRadius: '10px'}`).text-bold.text-white.q-pa-sm {{ contentName }}
+                span(:style=`{minHeight: '42px', borderRadius: $store.state.ui.borderRadius+'px'}`).text-bold.text-white.q-pa-sm {{ contentName }}
             q-btn(round flat color="grey-2" icon="more_vert")
           //- body
           composition(

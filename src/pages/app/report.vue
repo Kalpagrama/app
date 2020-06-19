@@ -13,7 +13,7 @@ q-layout(
         div(
           :style=`{
             maxWidth: $store.state.ui.maxWidthPage+'px',
-            borderRadius: '10px', overflow: 'hidden',
+            borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
             minHeight: $q.screen.width > $store.state.ui.maxWidthPage ? $store.state.ui.maxWidthPage+'px' : $q.screen.width+'px'
           }`).row.full-width.bg-grey-9.q-pa-md
 </template>

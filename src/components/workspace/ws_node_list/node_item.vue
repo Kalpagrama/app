@@ -6,13 +6,13 @@
 </style>
 
 <template lang="pug">
-div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.items-end.b-60
+div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',}`).row.full-width.items-end.b-60
   div(v-if="node.stage === 'saved'").row.full-width
     img(
       :src="node.thumbOid"
       :style=`{
         objectFit: 'cover',
-        borderRadius: '10px',
+        borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
         maxHeight: '100px',
         maxWidth: '100px',
@@ -23,7 +23,7 @@ div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.items-e
     :style=`{
       position: 'relative',
       minHeight: '50px',
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
     ).row.full-width.items-start.content-start.b-70.node
@@ -31,7 +31,7 @@ div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.items-e
       @click="nodeClick()"
       v-if="node.items.length > 0"
       :style=`{
-        borderRadius: '10px',
+        borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
       }`
       ).row.full-width

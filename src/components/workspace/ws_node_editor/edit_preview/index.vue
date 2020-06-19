@@ -6,7 +6,7 @@
     }`
     ).column.fit.q-py-md
     div(:style=`{position: 'relative'}`).col.full-width.scroll
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-60
+      div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.b-60
         ws-composition-editor(
           v-for="(i,ii) in node.items" :key="ii"
           :value="i"
@@ -22,7 +22,7 @@
       //- div(
       //-   :style=`{
       //-     height: '400px',
-      //-     borderRadius: '10px', overflow: 'hidden'}`
+      //-     borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
       //-   ).row.full-width.items-center.content-center.justify-center.b-60
       //-   q-spinner(size="50px" color="green")
       //- node(
@@ -33,21 +33,28 @@
       //-     minHeight: '400px',
       //-   }`).fit
       .row.full-width.items-center.content-center.q-py-sm
-        .col.q-pr-sm
-          q-select(
-            filled
-            dark color="white" label="Layout"
-            :value="layout(node.layout)" @input="layoutSelected"
-            :options="layouts"
-            :style=`{
-              borderRadius: '10px', overflow: 'hidden',
-              zIndex: 2000, transform: 'translate3d(0,0,0)',
-            }`).full-width
+        q-select(
+          filled
+          dark color="white" label="Layout"
+          :value="layout(node.layout)" @input="layoutSelected"
+          :options="layouts"
+          :style=`{
+            borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
+            zIndex: 2000, transform: 'translate3d(0,0,0)',
+          }`).full-width
+    //- footer
+    div(:style=`{}`).row.full-width.justify-center.br
+      div(:style=`{maxWidth: '600px'}`).row.full-width.q-py-sm
+        q-btn(
+          round flat color="white"
+          icon="keyboard_arrow_left"
+          @click="stateNodeEditor.set('pageId', 'spheres')")
+        .col
         q-btn(
           @click="stateNodeEditor.nodePublish()"
           push color="green" no-caps
           :loading="stateNodeEditor.nodePublishing"
-          :style=`{height: '56px'}`).q-px-md
+          :style=`{height: '50px'}`).q-px-md
           span.text-white.text-bold Publish
 </template>
 

@@ -1,15 +1,28 @@
 <template lang="pug">
-div(:style=`{position: 'relative', height: height+'px', width: width+'px'}`).row.items-center.justify-center
+div(
+  :style=`{
+    position: 'relative', height: height+'px', width: width+'px',
+    margin: 0, padding: 0,
+  }`
+  ).row.items-start.content-start.justify-start
   img(
     v-show="!error"
     @load="loaded" @error="errored" draggable="false"
     :src="url"
-    :style=`{width: '90%', height: '90%', borderRadius: '50%', overflow: 'hidden', userSelect: 'none'}`).cursor-pointer
+    :style=`{
+      opacity: opacity,
+      width: '100%', height: '100%',
+      margin: 0, padding: 0,
+      borderRadius: '50%', overflow: 'hidden',
+      userSelect: 'none'
+    }`).cursor-pointer
   div(
     v-if="error"
     :style=`{width: '90%', height: '90%', borderRadius: '50%', overflow: 'hidden'}`
     ).row.items-center.content-center.justify-center.bg-grey-3.cursor-pointer
     q-icon(color="green" name="face" size="25px")
+  slot()
+  //- div(:style=`{position}`)
 </template>
 
 <script>
@@ -29,6 +42,12 @@ export default {
       type: Number,
       default () {
         return 60
+      }
+    },
+    opacity: {
+      type: Number,
+      default () {
+        return 1
       }
     }
   },

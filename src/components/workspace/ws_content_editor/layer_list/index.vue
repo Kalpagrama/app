@@ -18,7 +18,7 @@ div(
         v-model="searchString"
         label="Find layer..."
         filled dark dense color="grey-5"
-        :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
+        :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).full-width
         template(v-slot:prepend)
           q-btn(
             flat dense color="grey-5"
@@ -33,7 +33,7 @@ div(
     div(
       v-if="layersSelected.length > 0"
       :style=`{position: 'absolute', zIndex: 1000}`).row.fit.q-pa-sm
-      div(:style=`{borderRadius: '10px'}`).row.full-width.items-center.q-px-xs.b-80
+      div(:style=`{borderRadius: $store.state.ui.borderRadius+'px'}`).row.full-width.items-center.q-px-xs.b-80
         q-btn(flat dense color="white" icon="clear" @click="layersSelectedDrop()").b-90.q-mr-sm
         slot(
           name="headerSelected"
@@ -57,7 +57,7 @@ div(
           v-for="(l,li) in layersFiltered" :key="l.id"
           :style=`{
             height: '40px',
-            borderRadius: '10px', overflow: 'hidden'
+            borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
           }`
           ).row.full-width.items-center.content-center.q-mb-xs
           div(:style=`{width: '40px'}`).row.full-height
@@ -65,7 +65,7 @@ div(
           .col.full-height
             div(
               :style=`{
-                borderRadius: '10px',
+                borderRadius: $store.state.ui.borderRadius+'px',
                 overflow: 'hidden',
               }`).row.fit.items-center.content-center.q-pl-md.b-70.cursor-pointer.layer
               div().col.full-height.layer-drag-handle

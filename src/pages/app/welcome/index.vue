@@ -3,33 +3,33 @@ q-layout(
   view="hhh lpR fFf"
   :style=`{height: $q.screen.height+'px'}`)
   q-page-container.row.full-width.justify-center
-    .row.full-width.justify-center.q-py-xl
+    .row.full-width.justify-center.q-py-md.br
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.justify-center
         span(:style=`{fontSize: '30px'}`).text-white.q-mr-sm Welcome to
-        span(:style=`{fontSize: '30px'}`).text-green Kalpa
+        span(:style=`{fontSize: '30px'}`).text-green Kalpagramma
     //- wrapper
     div(
       :style=`{
         maxWidth: $store.state.ui.maxWidthPage+'px',
-        borderRadius: '10px'
+        borderRadius: $store.state.ui.borderRadius+'px'
       }`
-      ).row.full-width.bg-grey-10.q-pa-md
+      ).row.full-width.bg-grey-10.q-pa-md.br
       like(v-show="page === 'like'" @types="types = $event")
-      div(v-show="page === 'who'").row.full-width
+      div(v-show="page === 'who'").row.full-width.br
         //- user-settings(:value="$store.getters.currentUser")
     //- actions
-    .row.full-width.justify-center
+    .row.full-width.justify-center.br
       div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.justify-start.q-py-md.q-px-sm
         q-btn(v-if="page === 'who'" outline color="green" no-caps @click="page = 'like'" icon="keyboard_arrow_left"
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`)
+          :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
           span Back to categories
         .col
         q-btn(v-if="page === 'who'" push color="green" no-caps @click="welcomeDone()"
           :loading="loading"
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`)
+          :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
           span Done
         q-btn(v-if="page === 'like'" push color="green" no-caps @click="page = 'who'"
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`)
+          :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
           span Next
 </template>
 

@@ -10,7 +10,7 @@ div(
   @click="sphereClick"
   :style=`{
     position: 'relative',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`
   ).row.items-center.content-center.justify-center.q-pa-sm.b-60.sphere

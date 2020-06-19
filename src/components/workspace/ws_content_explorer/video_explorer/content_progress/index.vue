@@ -43,7 +43,7 @@
     :style=`{
       position: 'relative',
       height: '50px',
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       //- overflow: 'hidden',
     }`
     ).row.full-width.b-70.cursor-pointer

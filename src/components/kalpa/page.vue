@@ -29,7 +29,7 @@ div(
       position: 'fixed', top: '8px', left: '8px', zIndex: 10000,
       maxWidth: panelLeftMaxWidth+'px',
       maxHeight: panelLeftMaxHeight+'px',
-      borderRadius: '10px', overflow: 'hidden',
+      borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
     }`).row.items-start.content-start.justify-center.b-50
     div(:style=`{height: 50+'px'}`).row.full-width.items-center.content-center.justify-end.q-px-sm
       q-btn(round flat dense icon="menu" color="white" @click="panelLeftToggle()")
@@ -42,7 +42,7 @@ div(
       position: 'fixed', top: '8px', right: '8px', zIndex: 10000,
       maxWidth: panelRightMaxWidth+'px',
       maxHeight: panelRightMaxHeight+'px',
-      borderRadius: '10px', overflow: 'hidden',
+      borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
     }`).row.items-start.content-start.justify-center.b-50
     div(:style=`{height: 50+'px'}`).row.full-width.items-center.content-center.justify-start.q-px-sm
       q-btn(round flat dense icon="menu" color="white" @click="panelRightToggle()")

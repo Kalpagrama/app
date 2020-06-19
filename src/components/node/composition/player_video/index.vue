@@ -33,7 +33,7 @@ iframe[id$="_youtube_iframe"]
 div(
   :style=`{
     position: 'relative',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
     opacity: opacity,
   }`).column.fit
@@ -42,7 +42,7 @@ div(
     :class=`{
       'full-heights': ctx !== 'workspace'
     }`
-    :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-start.content-start.b-50
+    :style=`{position: 'relative', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.items-start.content-start.b-50
     q-btn(
       round flat color="white" icon="more_vert"
       :style=`{

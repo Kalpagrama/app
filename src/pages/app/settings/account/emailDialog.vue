@@ -15,12 +15,12 @@
             q-input(v-model="newEmail" @keyup.enter="emailSend()" stack-label :label="$t('New email')" filled).full-width.q-mb-md
             q-btn(
               push no-caps dense color="accent" @click=""
-              :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Get the code', 'Получить код') }}
+              :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-mb-sm {{ $t('Get the code', 'Получить код') }}
           div(v-else).row.full-width
             q-input(v-model="newEmail" stack-label :label="$t('Code')" filled).full-width.q-mb-md
             q-btn(
               push no-caps dense color="accent" @click="changeEmail()"
-              :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-mb-sm {{ $t('Change', 'Сменить') }}
+              :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-mb-sm {{ $t('Change', 'Сменить') }}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeEmail.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
       span {{$t('Email')}}

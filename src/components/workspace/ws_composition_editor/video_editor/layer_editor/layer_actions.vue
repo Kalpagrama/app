@@ -12,11 +12,11 @@ div(
     }`
     ).row.full-width.items-center.content-center.q-py-xs
     q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)").b-70.q-mr-xs.rotate-180
-    q-btn-group(flat color="white" :style=`{borderRadius: '10px'}`)
+    q-btn-group(flat color="white" :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`)
       q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(0,0)").b-70
       q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(0,1)").b-70
     .col
-    q-btn-group(flat color="white" :style=`{borderRadius: '10px'}`).q-mr-xs
+    q-btn-group(flat color="white" :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`).q-mr-xs
       q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(1,0)").b-70
       q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(1,1)").b-70
     q-btn(round flat dense color="white" icon="flip" @click="layerSet(1)").b-70

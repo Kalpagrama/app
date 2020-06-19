@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   div(:style=`{height: '40px'}`).row.full-width.q-px-sm
-    span.text-white.text-bold Choose categories
+    span.text-white.text-bold What are u interested in?
   .row.full-width
     span(
       v-for="(c,ci) in categories" @click="categoryClick(c, ci)"
@@ -15,7 +15,7 @@
         fontSize: '20px',
         textTransform: 'capitalize',
         userSelect: 'none',
-        borderRadius: '10px',
+        borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden'
       }`
       ).q-pa-sm.q-mr-md.q-mb-sm.cursor-pointer {{ c.name }}

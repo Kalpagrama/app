@@ -11,7 +11,7 @@ div(
   }`
   :style=`{
     position: 'relative',
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
   }`
   ).column.full-width.b-50
   //- header
@@ -26,7 +26,7 @@ div(
         :class=`{
           'b-100': $route.name === p.id,
         }`
-        :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
+        :style=`{height: '50px', borderRadius: $store.state.ui.borderRadius+'px'}`).row.full-width.items-center.content-center.q-px-md.page-item
         span.text-white {{ p.name }}
 </template>
 

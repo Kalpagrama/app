@@ -16,33 +16,25 @@ div(
       router-link(
         :to="'/node/'+node.oid"
         ).row.full-width.items-start.content-start.essence
-        span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ node.name }}
-  //- div(:style=`{}`).row.full-height.items-center.content-center.justify-center.q-px-sm
-  //-   q-btn(round flat color="grey-6" icon="more_vert")
-  //-     kalpa-menu-popup(:actions="actions")
+        span(
+          :style=`{
+            fontSize: '16px',
+            userSelect: 'none'
+          }`
+          ).text-white.text-bold {{ nodeName }}
 </template>
 
 <script>
-// :class=`{
-//   'b-50': !visible && !active,
-//   'b-70': visible && !active,
-//   'b-90': visible && active
-// }`
 export default {
   name: 'nodeLayoutPip-nodeEssence',
-  props: ['node', 'nodeFull', 'visible', 'active', 'mini'],
+  props: ['node', 'nodeFull', 'visible', 'active', 'mini', 'stateNode'],
   data () {
     return {
     }
   },
   computed: {
-    nodeIsMine () {
-      if (this.nodeFull) {
-        return this.nodeFull.author.oid === this.$store.getters.currentUser().oid
-      }
-      else {
-        return true
-      }
+    nodeName () {
+      return this.node.name
     },
     actions () {
       let res = {
@@ -83,7 +75,7 @@ export default {
           }
         }
       }
-      if (this.nodeIsMine) {
+      if (this.stateNode.nodeIsMine) {
         res.delete = {
           name: 'Delete',
           fn: () => {

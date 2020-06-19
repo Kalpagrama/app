@@ -42,7 +42,7 @@ div(
         //-   :ref="`item-img-${i.oid}`"
         //-   draggable="false"
         //-   :src="i.meta.items[0].thumbUrl"
-        //-   :style=`{opacity: 0.1, width: '100%', borderRadius: '10px', overflow: 'hidden'}`)
+        //-   :style=`{opacity: 0.1, width: '100%', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
         //- slot
         div(
           :ref="`item-${i.oid}`"
@@ -128,7 +128,7 @@ export default {
           top: m.top + 'px',
           maxWidth: width + 'px',
           maxHeight: height + 'px',
-          borderRadius: '10px',
+          borderRadius: this.$store.state.ui.borderRadius + 'px',
           oveflow: 'hidden'
         }
       }

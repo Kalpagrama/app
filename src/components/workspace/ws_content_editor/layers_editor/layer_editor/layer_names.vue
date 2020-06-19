@@ -22,7 +22,7 @@ div(
       :input-style=`{minHeight: '90px'}`
       :style=`{
         transform: 'translate3d(0,0,0)',
-        borderRadius: '10px',
+        borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
       }`
       ).full-width

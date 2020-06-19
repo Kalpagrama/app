@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     //- overflow: 'hidden',
   }`
   ).column.fit.b-50
@@ -60,7 +60,7 @@ div(
         div(
           v-for="(l,li) in composition.layers" :key="li"
           :style=`{
-            borderRadius: '10px',
+            borderRadius: $store.state.ui.borderRadius+'px',
             overflow: 'hidden',
           }`
           ).row.full-width.items-start.content-start.q-mb-xs
@@ -98,7 +98,7 @@ div(
     v-if="options.useEditor"
     :style=`{
       position: 'relative',
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`).row.full-width.b-60
     composition-progress(
@@ -135,7 +135,7 @@ div(
       }`
       :style=`{
         transform: 'translate3d(0,0,0)',
-        borderRadius: '10px',
+        borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
         fontSize: '18px',
       }`
@@ -144,7 +144,7 @@ div(
   div(
     v-if="options.useEditor"
     :style=`{
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
     ).row.full-width.items-center.content-center.q-pa-sm

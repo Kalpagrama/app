@@ -4,7 +4,7 @@
     :style=`{
       maxWidth: '600px',
       position: 'relative',
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
     ).column.fit.b-60.q-mt-md

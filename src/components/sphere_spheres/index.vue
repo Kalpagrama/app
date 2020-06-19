@@ -10,7 +10,7 @@ div(:style=`{height: height || '120px'}`
     v-for="(s,si) in spheres" :key="s.oid"
     :to="'/sphere/'+s.oid"
     v-if="s.name !== '*unnamed*'"
-    :style=`{borderRadius: '10px'}`
+    :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`
     ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.b-80.sphere-item
     small(:style=`{userSelect: 'none'}`) {{ '#'+s.name }}
 </template>

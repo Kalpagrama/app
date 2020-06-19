@@ -7,7 +7,7 @@
 <template lang="pug">
 div(
   :style=`{
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
   }`
   ).column.full-width.b-50
   //- pages
@@ -17,14 +17,8 @@ div(
     :class=`{
       'b-100': $route.name === p.id
     }`
-    :style=`{height: '50px', borderRadius: '10px'}`).row.full-width.items-center.content-center.q-px-md.page-item
+    :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).row.full-width.items-center.content-center.q-px-md.page-item
     span(:style=`{userSelect: 'none'}`).text-white {{ p.name }}
-  //- //- spheres
-  //- div(:style=`{height: '50px'}`).row.full-width.items-center.q-px-md
-  //-   span.text-white Related spheres
-  //- .col.full-width.scroll
-  //-   .row.full-width.q-pa-sm
-  //-     sphere-spheres(v-if="user" :oid="user.oid")
 </template>
 
 <script>

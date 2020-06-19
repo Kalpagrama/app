@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    borderRadius: '10px', overflow: 'hidden'
+    borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
   }`
   ).row.full-width
   layer-name(

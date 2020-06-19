@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden'
   }`
   ).row.full-width.items-center.content-center.justify-between
@@ -13,7 +13,7 @@ div(
     :style=`{
       userSelect: 'none',
       maxHeight: '300px',
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
       objectFit: 'cover',
     }`).full-width.cursor-pointer
@@ -22,7 +22,7 @@ div(
     @click="$emit('edit')"
     :style=`{
       position: 'absolute', zIndex: 100, left: '8px', bottom: '8px',
-      borderRadius: '10px', overflow: 'hidden',
+      borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
       background: 'rgba(0,0,0,0.9)',
     }`
     ).row.items-center.content-center.q-pa-sm.b-50

@@ -32,7 +32,7 @@ export default {
 //     transition-prev="scale"
 //     transition-next="scale"
 //     animated
-//     :style=`{minHeight: $q.screen.gt.xs ? '70%' : '100%', maxWidth: '500px', borderRadius: '10px'}`
+//     :style=`{minHeight: $q.screen.gt.xs ? '70%' : '100%', maxWidth: '500px', borderRadius: $store.state.ui.borderRadius+'px'}`
 //     control-color="white"
 //     padding
 //     class="bg-primary text-white")
@@ -58,7 +58,7 @@ export default {
 //           div(style=`maxWidth: 300px`).row.full-width
 //             .row.full-width.justify-start.q-mt-md
 //               span {{$t('Enter your First name'), ('Введите свое имя')}}
-//             div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mt-sm.bg-white
+//             div(:style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.content-end.q-mt-sm.bg-white
 //               input(v-model="nameFirst").full-width.kinput.br
 //           div(v-if="nameFirst" :style=`{position: 'absolute', bottom: '0px'}`).row.full-width.justify-end.q-pa-md
 //             q-btn(v-model="slide" style=`height: 40px` @click="ndForm()" color="accent" :label="$t('Next')")
@@ -66,7 +66,7 @@ export default {
 //           div(style=`maxWidth: 300px`).row.full-width
 //             .row.full-width.justify-start.q-mt-md
 //               span {{$t('Enter your Second name'), ('Введите свою фамилию')}}
-//             div(:style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.content-end.q-mt-sm.bg-white
+//             div(:style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.content-end.q-mt-sm.bg-white
 //               input(v-model="nameSecond").full-width.kinput
 //           div(v-if="nameSecond && side === 'nameSecond'" :style=`{position: 'absolute', bottom: '0px'}`).row.full-width.justify-end.q-pa-md
 //             q-btn(v-model="slide" style=`height: 40px` @click="rdForm()" color="accent" :label="$t('Next')")
@@ -103,7 +103,7 @@ export default {
 //       div(style=`height: 70%`).row.full-width.justify-center.scroll
 //         div(
 //           v-for="(c, ci) in categories" :key="ci" @click="categoriesToAdd.includes(c.type) ? catDeleteClick(c, ci) : catAddClick(c, ci)"
-//           :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+//           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
 //           ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
 //           .col.full-height.q-ml-sm
 //             .row.fit.items-center

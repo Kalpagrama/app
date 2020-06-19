@@ -2,7 +2,7 @@
 div(
   :style=`{
     height: '60px',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`
   ).row.full-width.b-70

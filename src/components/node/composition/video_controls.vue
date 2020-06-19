@@ -11,7 +11,7 @@ div(
     :style=`{
       opacity: 0.8,
       background: 'rgba(0,0,0,0.4)',
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
     ).row

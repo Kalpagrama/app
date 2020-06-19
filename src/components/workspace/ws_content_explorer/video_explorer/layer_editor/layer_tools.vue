@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
   }`
   ).row.full-width.q-px-xs
   //- left

@@ -5,7 +5,7 @@
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-pa-sm
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-60
+      div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.b-60
         .row.full-width.q-pa-md
           span.text-white.text-bold {{ name }}
         .row.full-width.q-pa-md

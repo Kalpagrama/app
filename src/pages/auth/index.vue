@@ -20,7 +20,7 @@ input
         span(:style=`{fontSize: '24px'}`).text-bold.text-white Kalpagramma
     //- form
     div(:style=`{maxWidth: '350px'}`).row.full-width.justify-center.q-pa-sm
-      div(:style=`{borderRadius: '10px', oveflow: 'hidden'}`).row.fit.items-end.q-pa-sm.q-mb-sm
+      div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', oveflow: 'hidden'}`).row.fit.items-end.q-pa-sm.q-mb-sm
         //- get started
         div(v-if="!userIdentified").row.full-width.items-end.content-end.justify-center
           span(:style=`{fontSize: '18px'}`).text-white.q-mr-sm Welcome, identify yourself
@@ -35,13 +35,13 @@ input
           @keyup.enter="userIdentify()"
           :style=`{
             fontSize: '20px',
-            borderRadius: '10px', overflow: 'hidden',
+            borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
             transform: 'translate3d(0,0,0)',
           }`).full-width.q-mb-sm.bg-grey-9
         q-btn(
           push no-caps color="green" @click="userIdentify()"
           :loading="userIdentifying" :disable="login.length < 4"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-my-sm
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-my-sm
             span.text-bold.text-white Continue
       //- IDENTIFIED
       div(v-if="userIdentified").row.full-width
@@ -51,7 +51,7 @@ input
             span.text-grey-3 {{$t('Need invite code (beta testing in progress...)')}}
           q-input(
             v-model="inviteCode" dark color="green" filled label="Enter invite code" autofocus
-            :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
+            :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
             ).full-width.q-mb-sm.bg-grey-9
         //- email
         div(v-if="loginType && loginType === 'EMAIL'").row.full-width
@@ -80,7 +80,7 @@ input
           //- q-input(
           //-   v-model="password" autofocus dark color="green" filled label="Enter code" type="tel"
           //-   @keyup.enter="userAuthenticate()"
-          //-   :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
+          //-   :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).full-width.q-mb-sm.bg-grey-9
         //- phone
         div(v-if="loginType && loginType === 'PHONE'").row.full-width
           .row.full-width.justify-start.q-py-sm.q-px-md
@@ -90,7 +90,7 @@ input
           q-input(
             v-model="password" autofocus dark color="green" filled label="Enter code" type="tel"
             @keyup.enter="userAuthenticate()"
-            :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
+            :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
         //- password
         div(v-if="loginType && loginType === 'USERNAME'").row.full-width
           div(:style=`{height: '60px'}`
@@ -102,7 +102,7 @@ input
             v-model="password" autofocus dark color="green" filled label="Enter password"
             :type="passwordShow ? 'text' : 'password'"
             @keyup.enter="userAuthenticate()"
-            :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
+            :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
             template(v-slot:append)
               q-icon(
                 size="22px" color="white" @click="passwordShow = !passwordShow"
@@ -112,7 +112,7 @@ input
             v-model="passwordSecond" dark color="green" filled label="Confirm password"
             :type="passwordSecondShow ? 'text' : 'password'"
             @keyup.enter="userAuthenticate()"
-            :style=`{borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
+            :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
             template(v-slot:append)
               q-icon(
                 size="22px" color="white" @click="passwordSecondShow = !passwordSecondShow"
@@ -122,7 +122,7 @@ input
           push no-caps color="green" @click="userAuthenticate()" label="Enter kalpa"
           :disable="loginType === 'USERNAME' && !userExist ? password !== passwordSecond : false"
           :loading="userAuthenticating"
-          :style=`{height: '60px', borderRadius: '10px'}`).full-width.q-my-md
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-my-md
       //- help/policy
       .row.full-width.justify-center.q-pb-sm.q-px-md.text-center
         //- router-link(to="/help/policy")

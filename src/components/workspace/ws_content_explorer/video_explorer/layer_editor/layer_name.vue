@@ -11,7 +11,7 @@
     @blur="nameInputBlurred"
     @keydown.enter="nameInputEntered"
     :style=`{
-      borderRadius: '10px', overflow: 'hidden', transform: 'translate3d(0,0,0)',
+      borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)',
     }`
     ).full-width
     template(v-slot:prepend)

@@ -4,7 +4,7 @@
   div(
     v-if="stateExplorer.compositionSelected !== composition.id"
     @click="compositionSelect()"
-    :style=`{height: '40px', borderRadius: '10px', overflow: 'hidden'}`
+    :style=`{height: '40px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
     ).row.full-width.items-center.content-center.q-px-md.b-60.cursor-pointer.composition-item
     span(:style=`{userSelect: 'none'}`).text-bold.text-white {{ composition.name }}
   //- editor with only progress
@@ -17,7 +17,7 @@
       onlyProgress: true,
     }`
     :style=`{
-      borderRadius: '10px',
+      borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`).b-60
     template(v-slot:actions)

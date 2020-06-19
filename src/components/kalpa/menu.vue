@@ -8,7 +8,7 @@
 div(
   :style=`{
     width: width+'px',
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`).column.full-height.b-50
   //- header
@@ -16,18 +16,17 @@ div(
     :style=`{height: '90px'}`
     ).row.full-width.items-center.content-center
     div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-      q-btn(round flat color="white" @click="$router.push('/').catch(e => e)")
-        q-icon(name="blur_on" size="36px" color="white")
+      kalpa-logo(:width="40" :height="40")
     .col
       .row.fit.items-center.content-center
         span(:style=`{fontSize: '18px'}`).text-white.text-bold Kalpagramma
         .row.full-width
-          small.text-white Up the essence!
+          small.text-white Find the essence!
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width.q-pt-sm
     div(
       :style=`{
-        borderRadius: '10px', overflow: 'hidden'
+        borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
       }`
       ).column.full-width.b-50
         router-link(
@@ -36,7 +35,7 @@ div(
           :class=`{
             'b-100': $route.name === 'user'
           }`
-          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}`
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
           ).row.full-width.items-center.content-center.menu-item
           div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
             kalpa-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
@@ -51,7 +50,7 @@ div(
             'b-100': $route.name === p.id
           }`
           :style=`{
-            height: '60px', borderRadius: '10px', overflow: 'hidden'
+            height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
           }`
           ).row.full-width.items-center.menu-item
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
@@ -59,14 +58,14 @@ div(
           span(:style=`{fontSize: '18px'}`).text-white {{ p.name }}
         //- refresh
         div(
-          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="refresh()"
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="refresh()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
           span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Refresh
         //- logout
         div(
-          :style=`{height: '60px', borderRadius: '10px', overflow: 'hidden'}` @click="logout()"
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")

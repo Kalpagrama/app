@@ -6,7 +6,7 @@ ws-sphere-list(
   @sphereClick="sphereClickWs"
   @created="sphereCreatedWs"
   :style=`{
-    borderRadius: '10px',
+    borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`
   ).full-height.b-40
@@ -28,7 +28,7 @@ ws-sphere-list(
             :style=`{
               position: 'relative',
               height: '40px',
-              borderRadius: '10px',
+              borderRadius: $store.state.ui.borderRadius+'px',
               overflow: 'hidden',
             }`
             ).row.full-width.items-center.content-center.q-mb-xs.q-px-md.b-70.sphere-drag-handle

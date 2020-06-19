@@ -4,7 +4,7 @@ q-layout(view="hHh lpR fFf").b-30
   kalpa-menu-right
     div(
       :style=`{
-        borderRadius: '10px', overflow: 'hidden',
+        borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
         maxHeight: '70vh'
       }`
       ).column.fit.b-50
@@ -57,7 +57,7 @@ q-layout(view="hHh lpR fFf").b-30
               div(
                 v-if="!isOpened"
                 @click="$refs.listMasonry.itemClick(item, index)"
-                :style=`{position: 'absolute', zIndex: 300, borderRadius: '10px', overflow: 'hidden', opacity: 0}`).row.fit
+                :style=`{position: 'absolute', zIndex: 300, borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', opacity: 0}`).row.fit
               node(
                 ctx="list"
                 :node="item"

@@ -83,7 +83,7 @@ div(
           //- nothing found
           div(
             v-else
-            :style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
+            :style=`{height: '200px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
             ).row.full-width.items-center.content-center.justify-center.b-50
             span.text-white Nothing found :(
 </template>

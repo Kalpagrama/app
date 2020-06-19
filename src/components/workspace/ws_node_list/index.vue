@@ -69,21 +69,6 @@ div(
         kalpa-loader(:mangoQuery="mangoQuery")
           template(v-slot=`{items}`)
             div(v-if="items.length > 0").row.full-width.items-start.content-start
-              //- div(
-              //-   v-for="(i,ii) in items" :key="i.id"
-              //-   ).col-6.q-pa-xs
-              //-   div(
-              //-     :style=`{borderRadius: '10px', oveflow: 'hidden'}`
-              //-     ).row.full-width.items-start.b-60
-              //-     img(
-              //-       :src="i.thumbOid"
-              //-       :style=`{
-              //-         borderRadius: '10px',
-              //-         overflow: 'hidden',
-              //-       }`
-              //-       ).full-width
-              //-     div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.q-px-md
-              //-       span.text-white.text-bold {{ i.name }}
               node-item(
                 v-for="(n,ni) in items" :key="ni"
                 :node="n" :nodeIndex="ni"
@@ -92,7 +77,7 @@ div(
             //- nothing found
             div(
               v-else
-              :style=`{height: '200px', borderRadius: '10px', overflow: 'hidden'}`
+              :style=`{height: '200px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
               ).row.full-width.items-center.content-center.justify-center.b-50
               span.text-white Nothing found :(
 </template>
@@ -145,9 +130,9 @@ export default {
   methods: {
     nodeEdit (node, ni) {
       this.$log('nodeEdit', node, ni)
-      // this.node = node
-      // this.nodeEditorOpened = true
-      this.$router.push(`/workspace/node/${node.id}`)
+      this.node = node
+      this.nodeEditorOpened = true
+      // this.$router.push(`/workspace/node/${node.id}`)
     },
     nodeChoose (node) {
       this.$log('nodeChoose', node)

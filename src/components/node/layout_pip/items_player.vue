@@ -62,7 +62,7 @@ div(
       :style=`{
         position: 'absolute', zIndex: 20000, right: '0px', bottom: '0px',
         maxWidth: '60px', height: '60px',
-        borderRadius: '10px', overflow: 'hidden',
+        borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
         background: 'rgba(255,255,255,0.1)',
       }`
       ).row.full-width.items-center.content-center.justify-center.cursor-pointer.item-again

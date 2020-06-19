@@ -129,7 +129,7 @@ class Event {
       'info',
       eventMessage,
       {
-        avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
+        // avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
         actions: [
           {
             label: i18n.t('GO'),

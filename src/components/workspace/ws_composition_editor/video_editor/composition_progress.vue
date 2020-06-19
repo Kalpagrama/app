@@ -6,7 +6,7 @@ div(:style=`{position: 'relative'}`).row.ful-width.b-70
       :style=`{
         position: 'absolute', zIndex: 200,
         left: 0, right: 0, bottom: 0,
-        borderRadius: '10px',
+        borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
       }`
       ).row.fit.items-center.content-center.b-80.cursor-pointer

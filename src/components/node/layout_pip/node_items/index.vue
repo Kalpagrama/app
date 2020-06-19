@@ -67,12 +67,11 @@ div(
         position: 'absolute', zIndex: 1000,
         left: '0px', top: '0px',
         width: '15%',
-        height: 'calc(100% - 60px)',
-        borderRadius: '10px',
+        height: 'calc(100% - 66px)',
+        borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
         background: 'rgba(255,255,255,0)',
-      }`
-      )
+      }`)
       q-icon(
         name="keyboard_arrow_left" color="white" size="40px"
         :style=`{marginTop: '60px', opacity: 0.8}`)
@@ -97,7 +96,7 @@ div(
       //-   ).row.items-center.content-center.justify-center.br
       //-   q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemsPrev()").fit.b-80
       //- item next
-      div(v-if="ii === itemIndex+1" @click="itemsNext()" :style=`{position: 'absolute', zIndex: 20000}`).row.fit.cursor-pointer.item-next
+      div(v-if="ii === itemIndex+1" @click="itemsNext()" :style=`{position: 'absolute', zIndex: 20000, borderRadius: $store.state.ui.borderRadius+'px'}`).row.fit.cursor-pointer.item-next
       //- composition
       //- TODO composition, chain, another shit?
       //- :active="visible && active && itemIndex === ii || visible && active && nextMaxWidth > 25"
@@ -113,7 +112,7 @@ div(
         @ended="itemEnded(ii)"
         :style=`{
           position: 'relative',
-          borderRadius: '10px',
+          borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden',
         }`).fit
 </template>

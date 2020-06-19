@@ -20,7 +20,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       position: 'absolute', zIndex: 2000,
       top: '8px', right: '8px',
       transform: 'translate3d(0,0,0)',
-      background: 'rgba(0,0,0,0.1)'
+      background: 'rgba(0,0,0,0.1)',
+      borderRadius: $store.state.ui.borderRadius+'px',
     }`)
     kalpa-menu-popup(
       :actions="actions"
