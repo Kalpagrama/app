@@ -40,15 +40,9 @@ export default {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
           oidSphere: this.sphereOid,
           oidAuthor: {$eq: this.sphereOid},
-          sortStrategy: 'AGE'
+          sortStrategy: 'AGE',
         }
       }
-      // return {
-      //   oid: this.sphereOid,
-      //   pagination: { pageSize: 100 },
-      //   sortStrategy: 'AGE',
-      //   filter: {types: ['NODE'], fastFilters: ['CREATED_BY_USER']}
-      // }
     }
   },
   watch: {

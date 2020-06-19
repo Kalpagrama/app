@@ -31,15 +31,10 @@ export default {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
           oidAuthor: {$ne: this.sphereOid},
-          oidSphere: this.sphereOid
+          oidSphere: this.sphereOid,
+          sortStrategy: 'AGE',
         }
       }
-      // return {
-      //   oid: this.sphereOid,
-      //   pagination: { pageSize: 100 },
-      //   sortStrategy: 'AGE',
-      //   filter: {types: ['NODE'], fastFilters: ['VOTED_BY_USER']}
-      // }
     }
   },
   methods: {
