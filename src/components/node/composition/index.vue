@@ -24,6 +24,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
       borderRadius: $store.state.ui.borderRadius+'px',
     }`)
     kalpa-menu-popup(
+      v-if="true"
       :actions="actions"
       :style=`{
         minWidth: '200px',

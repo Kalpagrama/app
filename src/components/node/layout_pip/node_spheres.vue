@@ -17,7 +17,7 @@ div(
     router-link(
       v-for="(s,si) in nodeFull.spheres" :key="si"
       :to="'/sphere/'+s.oid"
-      :style=`{borderRadius: $store.state.ui.borderRadius+'px', userSelect: 'none'}`
+      :style=`{borderRadius: 30+'px', userSelect: 'none'}`
       ).text-white.q-px-sm.q-py-xs.q-mr-xs.q-mb-xs.cursor-pointer.b-80.sphere
       small(:style=`{whiteSpace: 'nowrap'}`) {{ s.name }}
   //- mock spheres DUMMY
@@ -26,7 +26,7 @@ div(
     ).row.items-center.content-center.no-wrap
     div(
       v-for="(s,si) in spheres" :key="si"
-      :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', userSelect: 'none'}`
+      :style=`{borderRadius: 30+'px', overflow: 'hidden', userSelect: 'none'}`
       ).q-py-xs.q-px-sm.b-80.q-mr-xs
       small(:style=`{whiteSpace: 'nowrap', opacity: 0}`) {{ s.name }}
 </template>

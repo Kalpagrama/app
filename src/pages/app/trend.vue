@@ -1,16 +1,15 @@
 <template lang="pug">
-component(
+trends-explorer(
   v-if="sphere"
-  :is="`${$route.name}-explorer`"
   :sphere="sphere"
-  :loading="sphereLoading")
+  )
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'pageApp-sphere',
+  name: 'pageApp--trend',
   data () {
     return {
       nodeCategories: [],
@@ -20,6 +19,17 @@ export default {
     }
   },
   computed: {
+     spheresTop () {
+      return this.nodeCategories.reduce((acc, val) => {
+        if (val.type !== 'ALL') {
+          acc.push({
+            oid: val.sphere.oid,
+            name: val.sphere.name
+          })
+        }
+        return acc
+      }, [])
+    }
   },
   watch: {
     '$route.params.oid': {
@@ -27,8 +37,11 @@ export default {
       immediate: true,
       async handler (to, from) {
         this.$log('$route CHANGED', to)
+        if (this.nodeCategories.length === 0) this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
         if (to) {
           this.sphere = await this.sphereLoad(to)
+        } else {
+          this.$router.replace({params: {oid: this.nodeCategories[4].sphere.oid}})
         }
       }
     }

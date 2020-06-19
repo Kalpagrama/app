@@ -21,7 +21,7 @@ div(
       .row.fit.items-center.content-center
         span(:style=`{fontSize: '18px'}`).text-white.text-bold Kalpagramma
         .row.full-width
-          small.text-white Find the essence!
+          small.text-white Up the essence!
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width.q-pt-sm
     div(
