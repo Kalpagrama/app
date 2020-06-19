@@ -16,8 +16,9 @@ div(
     @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
     @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
     ws-composition-editor(
-      v-if="composition" :value="composition"
+      v-if="composition"
       @close="compositionEditorOpened = false"
+      :value="composition"
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
@@ -74,7 +75,6 @@ div(
                 v-for="(c,ci) in items" :key="c.id"
                 :view="view"
                 @pick="compositionPicked(c,ci)"
-                @explore="compositionExplore(c,ci)"
                 @delete="compositionDelete(c,ci)"
                 :ctx="ctx" :composition="c")
           //- nothing found
@@ -142,17 +142,13 @@ export default {
     compositionPicked (composition) {
       this.$log('compositionPicked', this.ctx)
       if (this.ctx === 'workspace') {
-        // this.content = content
-        // this.contentEditorOpened = true
-        this.$router.push(`/workspace/composition/${composition.id}`)
+        this.composition = composition
+        this.compositionEditorOpened = true
+        // this.$router.push(`/workspace/composition/${composition.id}`)
       }
       else {
         this.$emit('composition', JSON.parse(JSON.stringify(composition)))
       }
-    },
-    compositionExplore (c, ci) {
-      this.$log('contentExplore', c, ci)
-      // this.$router.push(`/content/${c.contentOid}`).catch(e => e)
     },
     async compositionDelete (composition, ci) {
       this.$log('compositionDelete', composition, ci)

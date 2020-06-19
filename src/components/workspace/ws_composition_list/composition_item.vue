@@ -17,24 +17,35 @@ div(
   //- maxi
   div(
     v-if="view === 'maxi'"
-    @click="$emit('pick')"
     :style=`{
       position: 'relative',
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
     ).row.full-width.items-start.content-start.cursor-pointer.b-70.composition
+    //- actions
+    q-btn(
+      round flat dense color="white" icon="more_vert"
+      :style=`{
+        position: 'absolute', zIndex: 1000, top: 0, right: 0,
+        background: 'rgba(0,0,0,0.5)',
+      }`).bg
+      kalpa-menu-popup(:actions="actions")
+    //- preview
     img(
+      @click="$emit('pick')"
       :src="composition.thumbOid"
       draggable="false"
       ).full-width
+    //- name
     span(
       :style=`{
         position: 'absolute', zIndex: 1000,
         bottom: '0px', left: '0px',
         borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
-        background: 'rgba(0,0,0,0.4)'
+        background: 'rgba(0,0,0,0.4)',
+        pointerEvents: 'none',
       }`
       ).text-white.text-bold.q-pa-sm {{ compositionName }}
   //- semi
@@ -50,7 +61,7 @@ div(
       :src="composition.thumbOid"
       draggable="false"
       :style=`{
-        height: '70px',
+        height: '100px',
         borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
       }`)
@@ -60,7 +71,7 @@ div(
         div(
           v-if="contentKalpa"
           ).row.full-width
-          small.text-grey-5 {{ contentKalpa.name.slice(0, 50) }}
+          small.text-grey-5 {{ contentKalpa.name.slice(0, 100) }}
   //- mini
   div(
     v-if="view === 'mini'"
@@ -75,7 +86,7 @@ div(
     div(
       v-if="contentKalpa"
       ).row.full-width
-      small.text-grey-5 {{ contentKalpa.name.slice(0, 50) }}
+      small.text-grey-5 {{ contentKalpa.name.slice(0, 100) }}
 </template>
 
 <script>
@@ -100,10 +111,22 @@ export default {
         acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
         return acc
       }, 0)
+    },
+    actions () {
+      return {
+        edit: {
+          name: 'Edit',
+          fn: () => this.$emit('pick')
+        },
+        delete: {
+          name: 'Delete',
+          fn: () => this.$emit('delete')
+        }
+      }
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     this.contentKalpa = await this.$rxdb.get(RxCollectionEnum.OBJ, this.composition.contentOid)
   }
 }
