@@ -1,40 +1,41 @@
 <template lang="pug">
 div(
   :style=`{
-    borderRadius: $store.state.ui.borderRadius+'px',
-    //- overflow: 'hidden',
+    borderRadius: $store.state.ui.borderRadius+'px'
   }`
   ).column.fit.b-50
+  //- span.text-white {{ stateEditor }}
   //- content progress with layers on it
-  div(
-    v-if="true"
-    :style=`{position: 'absolute', zIndex: 9999, top: '-62px', left: 0}`).row.full-width.justify-center
-    ws-content-video-progress(
-      :stateExplorer="stateExplorer"
-      :style=`{maxWidth: stateExplorer.pageContentWidth-80+'px'}`)
-      template(v-slot:meta)
-        div(
-          :style=`{
-            position: 'absolute', zIndex: 200,
-            top: '0px',
-            pointerEvents: 'none',
-          }`).row.fit
-          div(
-            v-for="(l,li) in composition.layers" :key="li"
-            :style=`{
-              position: 'absolute', zIndex: 300+li,
-              left: (l.figuresAbsolute[0].t/stateExplorer.duration)*100+'%',
-              width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/stateExplorer.duration)*100+'%',
-              background: l.color,
-              opacity: 0.9,
-            }`
-            ).row.full-height
+  //- div(
+  //-   v-if="true"
+  //-   :style=`{position: 'absolute', zIndex: 9999, top: '-62px', left: 0}`).row.full-width.justify-center
+  //-   ws-content-video-progress(
+  //-     :stateEditor="stateEditor"
+  //-     :style=`{maxWidth: stateEditor.pageContentWidth-80+'px'}`)
+  //-     template(v-slot:meta)
+  //- div(:style=`{position: 'absolute', zIndex: 99999, top: '-62px', height: '60px',}`).row.full-width.bg
+  //-       div(
+  //-         :style=`{
+  //-           position: 'absolute', zIndex: 200,
+  //-           top: '0px',
+  //-           pointerEvents: 'none',
+  //-         }`).row.fit
+  //-         div(
+  //-           v-for="(l,li) in composition.layers" :key="li"
+  //-           :style=`{
+  //-             position: 'absolute', zIndex: 300+li,
+  //-             left: (l.figuresAbsolute[0].t/stateEditor.statePlayer.duration)*100+'%',
+  //-             width: ((l.figuresAbsolute[1].t-l.figuresAbsolute[0].t)/stateEditor.statePlayer.duration)*100+'%',
+  //-             background: l.color,
+  //-             opacity: 0.9,
+  //-           }`
+  //-           ).row.full-height
   //- tools selected
   div(
     v-if="layersSelected.length > 0"
     :style=`{position: 'absolute', zIndex: 1000, left: 0, top: '24px',}`
     ).row.full-width.justify-center
-    div(:style=`{maxWidth: stateExplorer.pageContentWidth-80+'px',}`).row.full-width.items-center.content-center.q-pa-xs
+    div(:style=`{maxWidth: stateEditor.pageContentWidth-80+'px',}`).row.full-width.items-center.content-center.q-pa-xs
       q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []").q-mr-xs
       q-btn(
         v-if="false"
@@ -44,7 +45,7 @@ div(
         v-if="composition.layers.length > 1"
         round flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm Delete
   //- body
-  div(v-if="options.useEditor").col.full-width.scroll
+  div(v-if="true").col.full-width.scroll
     div(
       :style=`{paddingBottom: '300px'}`
       ).row.full-width.items-start.content-start
@@ -74,9 +75,8 @@ div(
           //- middle
           .col
             layer-editor(
-              @add="layerAdd()"
               :layer="l"
-              :stateExplorer="stateExplorer")
+              :stateEditor="stateEditor")
           //- right
           div(
             :style=`{width: '40px', height: '40px'}`
@@ -92,22 +92,23 @@ div(
         }`).row.full-width
         .row.fit
           q-btn(round flat color="green" icon="add" @click="layerAdd()").fit.b-60
-            q-tooltip(anchor="top middle" self="center middle") Add layer at: {{ $time(stateExplorer.currentTime) }}
+            q-tooltip(anchor="top middle" self="center middle") Add layer at: {{ $time(stateEditor.currentTime) }}
   //- progress
   div(
-    v-if="options.useEditor"
+    v-if="stateEditor"
     :style=`{
       position: 'relative',
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
-    }`).row.full-width.b-60
+    }`).row.full-width.b-60.br
     composition-progress(
       ref="compositionProgress"
-      :value="composition" :active="compositionPlaying"
-      :stateExplorer="stateExplorer").fit
+      :composition="composition"
+      :stateEditor="stateEditor"
+      :statePlayer="statePlayer").fit
   //- footer stats
   div(
-    v-if="options.useEditor"
+    v-if="true"
     :style=`{
     }`
     ).row.full-width.items-center.content-center.q-py-xs
@@ -122,7 +123,7 @@ div(
       ).q-mr-sm duration: {{ $time(compositionDuration) }}]
   //- composition name
   div(
-    v-if="options.useEditor"
+    v-if="true"
     :style=`{}`).row.full-width
     q-input(
       v-model="composition.name"
@@ -142,12 +143,12 @@ div(
       ).full-width.b-50
   //- footer
   div(
-    v-if="options.useEditor"
+    v-if="true"
     :style=`{
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
-    ).row.full-width.items-center.content-center.q-pa-sm
+    ).row.full-width.items-center.content-center.q-pa-sm.br
     q-btn(round flat dense color="red" icon="delete_outline" @click="$emit('delete')"
       :style=`{opacity: .6}`)
     .col
@@ -162,13 +163,14 @@ div(
 <script>
 import draggable from 'vuedraggable'
 
-import compositionProgress from './composition_progress'
-import layerEditor from './layer_editor'
+import compositionProgress from '../composition_progress'
+import layerEditor from '../layer_editor'
 
 export default {
-  name: 'compostionEditor',
+  name: 'videoEditor-pageEditor',
   components: {draggable, layerEditor, compositionProgress},
-  props: ['stateExplorer', 'options'],
+  props: ['stateEditor', 'statePlayer', 'composition', 'options'],
+  // inject: ['stateEditor'],
   data () {
     return {
       searchString: '',
@@ -180,9 +182,9 @@ export default {
     }
   },
   computed: {
-    composition () {
-      return this.stateExplorer.composition
-    },
+    // composition () {
+    //   return this.stateEditor.composition
+    // },
     compositionDuration () {
       return this.composition.layers.reduce((acc, val) => {
         acc += (val.figuresAbsolute[1].t - val.figuresAbsolute[0].t)
@@ -218,13 +220,13 @@ export default {
       let layerIndex = this.composition.layers.length
       let layerId = Date.now().toString()
       let layerColor = this.$randomColor(layerId)
-      let layerStart = this.stateExplorer.currentTime
-      let layerEnd = layerStart + 10 > this.stateExplorer.duration ? this.stateExplorer.duration : layerStart + 10
-      if (layerEnd > this.stateExplorer.duration) alert('layerEnd > this.stateExplorer.duration')
+      let layerStart = this.stateEditor.currentTime
+      let layerEnd = layerStart + 10 > this.stateEditor.duration ? this.stateEditor.duration : layerStart + 10
+      if (layerEnd > this.stateEditor.duration) alert('layerEnd > this.stateEditor.duration')
       let layerInput = {
         id: layerId,
         color: layerColor,
-        contentOid: this.stateExplorer.content.oid,
+        contentOid: this.stateEditor.content.oid,
         figuresAbsolute: [
           {t: layerStart, points: []},
           {t: layerEnd, points: []},

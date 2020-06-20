@@ -88,6 +88,7 @@ export default async ({ Vue, store, router: VueRouter }) => {
     // Vue.component('sphere', () => import('components/sphere'))
     // workspace
     // content
+    Vue.component('wsContentPlayer', () => import('components/workspace/ws_content_player'))
     Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
     Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
     Vue.component('wsContentExplorer', () => import('components/workspace/ws_content_explorer'))

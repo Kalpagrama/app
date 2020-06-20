@@ -1,0 +1,182 @@
+<template lang="pug">
+.row.full-width
+  //- tools
+  div(
+    :style=`{
+      order: -1,
+      opacity: 0.9,
+    }`
+    ).row.full-width.q-pb-xs
+    q-btn(
+      @click="statePlayer.playing ? statePlayer.player.pause() : statePlayer.player.play()"
+      round flat dense color="grey-5"
+      :icon="statePlayer.playing ? 'pause' : 'play_arrow'")
+    q-btn(
+      v-if="statePlayer.player"
+      @click="volumeToggle()"
+      round flat dense color="grey-5"
+      :icon="statePlayer.player.muted ? 'volume_off' : 'volume_up'")
+    .col
+    q-btn(round flat dense color="grey-5" icon="fast_rewind" @click="fast(false)")
+      q-tooltip(anchor="top middle" self="center middle") - 5 sec
+    q-btn(flat dense color="grey-4").text-grey-5
+      small {{ $time(statePlayer.currentTime) }}
+      small.q-mx-xs /
+      small {{ $time(statePlayer.duration) }}
+    q-btn(round flat dense color="grey-5" icon="fast_forward" @click="fast(true)")
+      q-tooltip(anchor="top middle" self="center middle") + 5 sec
+    .col
+    q-btn(
+      @click="statePlayer.set('fullscreen', !statePlayer.fullscreen)"
+      round flat dense color="grey-5"
+      :icon="statePlayer.fullscreen ? 'fullscreen_exit' : 'fullscreen'"
+      :style=`{opacity: 1}`
+      )
+      q-tooltip(anchor="top middle" self="center middle") Fullscreen
+    //- q-btn(
+    //-   @click="pageIdToggle()"
+    //-   round flat dense color="grey-5"
+    //-   :icon="statePlayer.pageId ? 'keyboard_arrow_down' : 'keyboard_arrow_up'")
+  //- bar
+  div(
+    @click="barClick"
+    v-touch-pan.mouse.left.right="barDrag"
+    @mousemove="barMove"
+    @mouseleave="nowHover = null"
+    :style=`{
+      position: 'relative',
+      height: '50px',
+      borderRadius: $store.state.ui.borderRadius+'px',
+      //- overflow: 'hidden',
+    }`
+    ).row.full-width.b-70.cursor-pointer
+    //- now
+    div(
+      :style=`{
+        position: 'absolute',
+        zIndex: 1000,
+        width: '3px',
+        borderRadius: '1px', overflow: 'hidden',
+        top: '-8px',
+        height: 'calc(100% + 16px)',
+        left: statePlayer.currentTime/statePlayer.duration*100+'%',
+        pointerEvents: 'none',
+      }`
+      ).row.bg-red
+    //- now HOVER
+    div(
+      v-if="nowHover"
+      :style=`{
+        position: 'absolute',
+        zIndex: 1100,
+        width: '3px',
+        left: nowHover+'%',
+        pointerEvents: 'none'
+      }`
+      ).row.full-height.bg-red
+      small(
+        :style=`{
+          position: 'absolute', zIndex: 1200,
+          top: '-15px', left: '-12px',
+          marginLeft: '-50%',
+        }`).text-white {{ $time(nowHoverTime) }}
+    //- now WIDTH
+    div(
+      :style=`{
+        position: 'absolute', zIndex: 100,
+        left: '0px',
+        width: barWidth ? barWidth+'%' : (statePlayer.currentTime/statePlayer.duration)*100+'%',
+        borderRadius: '10px 0 0 10px',
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        opacity: 0.8
+      }`
+      ).row.full-height.b-100
+    slot(name="meta")
+</template>
+
+<script>
+export default {
+  name: 'videoPlayer-controls',
+  props: ['statePlayer'],
+  data () {
+    return {
+      barWidth: null,
+      barDragging: false,
+      nowHover: null,
+      nowHoverTime: 0,
+      pageIdLast: null
+    }
+  },
+  computed: {
+  },
+  methods: {
+    pageIdToggle () {
+      this.$log('pageIdToggle', this.pageIdLast)
+      if (this.statePlayer.pageId) {
+        this.pageIdLast = this.statePlayer.pageId
+        this.statePlayer.set('pageId', null)
+      }
+      else {
+        this.statePlayer.set('pageId', 'compositions')
+        // this.statePlayer.set('pageId', this.pageIdLast)
+        // this.pageIdLast = null
+      }
+    },
+    volumeToggle () {
+      this.$log('volumeToggle')
+      if (this.statePlayer.player.muted) this.statePlayer.player.setMuted(false)
+      else this.statePlayer.player.setMuted(true)
+    },
+    fast (forward) {
+      this.$log('fast', forward)
+      let t = this.statePlayer.currentTime
+      if (forward) t += 5
+      else t -= 5
+      if (t < 0) t = 0
+      if (t > this.statePlayer.duration) t = this.statePlayer.duration
+      this.statePlayer.set('currentTime', t)
+      this.statePlayer.player.setCurrentTime(t)
+    },
+    barMove (e) {
+      // this.$log('barMove', e.target.clientWidth)
+      let left = e.offsetX
+      let width = e.target.clientWidth
+      this.nowHover = (left / width) * 100
+      this.nowHoverTime = (left / width) * this.statePlayer.duration
+    },
+    barClick (e) {
+      this.$log('barClick', e)
+      let width = e.target.clientWidth
+      this.$log('width', width)
+      let left = e.offsetX
+      this.$log('left', left)
+      let t = (left / width) * this.statePlayer.duration
+      this.$log('t', t)
+      this.statePlayer.set('currentTime', t)
+      this.statePlayer.player.setCurrentTime(t)
+    },
+    barDrag (e) {
+      // this.$log('barDrag', e)
+      if (e.isFirst) {
+        this.barDragging = true
+        let left = e.evt.layerX || e.position.left
+        // this.$log('left', left)
+        this.barWidth = (left / this.$el.clientWidth) * 100
+      }
+      if (e.isFinal) {
+        this.barDragging = false
+        this.barWidth = null
+      }
+      if (!this.barWidth) return
+      this.barWidth += (e.delta.x / this.$el.clientWidth) * 100
+      let t = (this.barWidth / 100) * this.statePlayer.duration
+      // this.$log('t', t)
+      if (t >= 0 && t <= this.statePlayer.duration) {
+        this.statePlayer.set('currentTime', t)
+        this.statePlayer.player.setCurrentTime(t)
+      }
+    }
+  }
+}
+</script>

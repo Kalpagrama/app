@@ -56,8 +56,8 @@ div(:style=`{position: 'relative'}`).row.ful-width.b-70
     q-btn(
       @click="compositionPlayPause()"
       round flat dense
-      :color="stateExplorer.playing ? 'red' : 'grey-5'"
-      :icon="stateExplorer.playing ? 'pause' : 'play_arrow'")
+      :color="statePlayer.playing ? 'red' : 'grey-5'"
+      :icon="statePlayer.playing ? 'pause' : 'play_arrow'")
     q-btn(round flat dense color="grey-5" icon="keyboard_arrow_left" @click="layerPrev()")
     q-btn(round flat dense color="grey-5" icon="keyboard_arrow_right" @click="layerNext()")
     q-btn(round flat dense color="grey-5" icon="refresh" @click="compositionRefresh()")
@@ -68,7 +68,7 @@ div(:style=`{position: 'relative'}`).row.ful-width.b-70
 <script>
 export default {
   name: 'compositionProgress',
-  props: ['stateExplorer', 'value', 'active'],
+  props: ['statePlayer', 'composition'],
   data () {
     return {
       layerActive: 0,
@@ -78,26 +78,26 @@ export default {
   },
   computed: {
     compositionName () {
-      let name = this.value.name
+      let name = this.composition.name
       if (name.length > 0) return name
-      else return `${this.$time(this.value.layers[0].figuresAbsolute[0].t)} - ${this.$time(this.value.layers[0].figuresAbsolute[1].t)}`
+      else return `${this.$time(this.composition.layers[0].figuresAbsolute[0].t)} - ${this.$time(this.composition.layers[0].figuresAbsolute[1].t)}`
     },
     layersDuration () {
-      return this.value.layers.reduce((acc, layer) => {
+      return this.composition.layers.reduce((acc, layer) => {
         let layerDuration = layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t
         acc += layerDuration
         return acc
       }, 0)
     },
     layersPercents () {
-      return this.value.layers.reduce((acc, layer) => {
+      return this.composition.layers.reduce((acc, layer) => {
         let layerDuration = layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t
         acc.push(layerDuration / this.layersDuration)
         return acc
       }, [])
     },
     layersStats () {
-      return this.value.layers.reduce((acc, layer) => {
+      return this.composition.layers.reduce((acc, layer) => {
         let layerDuration = layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t
         let prev = acc.length > 0 ? acc[acc.length - 1] : 0
         acc.push(prev + (layerDuration / this.layersDuration))
@@ -105,59 +105,59 @@ export default {
       }, [])
     },
     layerActiveStart () {
-      return this.value.layers[this.layerActive].figuresAbsolute[0].t
+      return this.composition.layers[this.layerActive].figuresAbsolute[0].t
     },
     layerActiveEnd () {
-      return this.value.layers[this.layerActive].figuresAbsolute[1].t
+      return this.composition.layers[this.layerActive].figuresAbsolute[1].t
     },
     layerActiveDuration () {
       return this.layerActiveEnd - this.layerActiveStart
     },
     width () {
-      let layerPercentGone = (this.stateExplorer.currentTime - this.layerActiveStart) / this.layerActiveDuration
+      let layerPercentGone = (this.statePlayer.currentTime - this.layerActiveStart) / this.layerActiveDuration
       let x = layerPercentGone * this.layersPercents[this.layerActive]
       let add = this.layersStats[this.layerActive] - this.layersPercents[this.layerActive]
       return (add + x) * 100
     }
   },
   watch: {
-    'stateExplorer.currentTime': {
-      immediate: true,
-      handler (to, from) {
-        // this.$log('currentTime TO', to)
-        // if (!this.active) return
-        if (!this.compositionPlaying) return
-        if (this.currentTimeStop) return
-        if (to > this.layerActiveEnd) {
-          // try to find next layerActive
-          if (this.layersStats[this.layerActive + 1]) {
-            this.layerActiveSet(this.layerActive + 1)
-          }
-          else {
-            this.layerActiveSet(0)
-          }
-        }
-        if (to < this.layerActiveStart) {
-          this.layerActiveSet(this.layerActive)
-        }
-      }
-    }
+    // 'statePlayer.currentTime': {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     // this.$log('currentTime TO', to)
+    //     // if (!this.active) return
+    //     if (!this.compositionPlaying) return
+    //     if (this.currentTimeStop) return
+    //     if (to > this.layerActiveEnd) {
+    //       // try to find next layerActive
+    //       if (this.layersStats[this.layerActive + 1]) {
+    //         this.layerActiveSet(this.layerActive + 1)
+    //       }
+    //       else {
+    //         this.layerActiveSet(0)
+    //       }
+    //     }
+    //     if (to < this.layerActiveStart) {
+    //       this.layerActiveSet(this.layerActive)
+    //     }
+    //   }
+    // }
   },
   methods: {
     compositionPlayPause () {
       this.$log('compositionPlayPause')
-      if (this.stateExplorer.playing) {
-        this.stateExplorer.player.pause()
+      if (this.statePlayer.playing) {
+        this.statePlayer.player.pause()
         this.compositionPlaying = false
       }
       else {
-        this.stateExplorer.player.play()
+        this.statePlayer.player.play()
         this.compositionPlaying = true
       }
     },
     layerPrev () {
       this.$log('layerPrev')
-      if (this.value.layers[this.layerActive - 1]) {
+      if (this.composition.layers[this.layerActive - 1]) {
         this.layerActiveSet(this.layerActive - 1)
       }
       else {
@@ -166,7 +166,7 @@ export default {
     },
     layerNext () {
       this.$log('layerNext')
-      if (this.value.layers[this.layerActive + 1]) {
+      if (this.composition.layers[this.layerActive + 1]) {
         this.layerActiveSet(this.layerActive + 1)
       }
       else {
@@ -176,13 +176,13 @@ export default {
     compositionRefresh () {
       this.$log('compositionRefresh')
       this.layerActiveSet(0)
-      this.stateExplorer.player.play()
+      this.statePlayer.player.play()
     },
     layerActiveSet (index) {
       this.$log('layerActiveSet', index)
       this.layerActive = index
-      this.stateExplorer.set('currentTime', this.layerActiveStart)
-      this.stateExplorer.player.setCurrentTime(this.layerActiveStart)
+      this.statePlayer.set('currentTime', this.layerActiveStart)
+      this.statePlayer.player.setCurrentTime(this.layerActiveStart)
     },
     async progressClick (e) {
       // this.$log('progressClick', e)
@@ -192,7 +192,7 @@ export default {
       this.$log('p', p)
       let i = this.layersStats.findIndex(l => l > p)
       this.$log('i', i)
-      let layer = this.value.layers[i]
+      let layer = this.composition.layers[i]
       let layerStart = layer.figuresAbsolute[0].t
       let layerDuration = layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t
       let layerDurationPercent = layerDuration / this.layersDuration
@@ -204,8 +204,8 @@ export default {
       // set
       this.layerActive = i
       this.currentTimeStop = true
-      this.stateExplorer.set('currentTime', t)
-      this.stateExplorer.player.setCurrentTime(t)
+      this.statePlayer.set('currentTime', t)
+      this.statePlayer.player.setCurrentTime(t)
       await this.$wait(200)
       this.currentTimeStop = false
     }

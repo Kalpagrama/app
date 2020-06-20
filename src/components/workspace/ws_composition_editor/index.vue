@@ -1,13 +1,14 @@
 <template lang="pug">
-video-editor(
+component(
   v-if="content"
+  :is="component[content.type]"
   @createNode="$emit('createNode')"
   @close="$emit('close')"
   @delete="$emit('delete')"
-  :options="options"
   :composition="value"
-  :contentKalpa="content"
-  :stateExplorerReady="stateExplorer")
+  :content="content"
+  :options="options"
+  :statePlayer="statePlayer")
   template(v-slot:actions)
     slot(name="actions")
 </template>
@@ -15,14 +16,21 @@ video-editor(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import videoEditor from './video_editor'
+// import imageEditor from './image_editor'
 
 export default {
   name: 'wsCompositionEditor',
   components: {videoEditor},
-  props: ['value', 'options', 'stateExplorer'],
+  props: ['value', 'statePlayer', 'options'],
   data () {
     return {
-      content: null
+      content: null,
+      component: {
+        VIDEO: 'video-editor',
+        IMAGE: 'image-editor',
+        BOOK: 'book-editor',
+        WEB: 'web-editor',
+      }
     }
   },
   async mounted () {
