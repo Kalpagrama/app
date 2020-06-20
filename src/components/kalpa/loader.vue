@@ -74,6 +74,7 @@ export default {
         this.nextPageToken = nextPageToken
         this.totalCount = totalCount
         this.itemsCount = items.length
+        // this.$log('this.$rxdb.find = ', items)
       }
       catch (e) {
         this.$logE('itemsLoad error', e)

@@ -11,6 +11,7 @@ import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive
 import { NodeApi } from 'src/api/node'
 import { ObjectsApi } from 'src/api/objects'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
+import cloneDeep from 'lodash/cloneDeep'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
@@ -76,7 +77,7 @@ class RxDBWrapper {
         name: 'rxdb',
         adapter: 'idb', // <- storage-adapter
         multiInstance: true, // <- multiInstance (optional, default: true)
-        eventReduce: true, // <- eventReduce (optional, default: true)
+        eventReduce: false, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
         pouchSettings: { revs_limit: 1 }
       })
       await this.db.collection({ name: 'meta', schema: schemaKeyValue })
@@ -185,7 +186,7 @@ class RxDBWrapper {
   // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
   async find (mangoQuery) {
     assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + JSON.stringify(mangoQuery))
-    mangoQuery = JSON.parse(JSON.stringify(mangoQuery)) // mangoQuery модифицируется внутри
+    mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     if (rxCollectionEnum in WsCollectionEnum) {
