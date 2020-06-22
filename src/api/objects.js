@@ -41,8 +41,8 @@ class ObjectsApi {
     let { data: { objectChange } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectFullFragment}
-        mutation objectChange ($oid: OID!, $path: String!, $newValue: RawJSON!, $revision: Int!) {
-          objectChange (oid: $oid, path: $path, newValue: $newValue, rev: $revision){
+        mutation objectChange ($oid: OID!, $path: String!, $newValue: RawJSON!, $rev: Int!) {
+          objectChange (oid: $oid, path: $path, newValue: $newValue, rev: $rev){
             ...objectFullFragment
           }
         }

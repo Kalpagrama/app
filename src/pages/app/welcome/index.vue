@@ -36,6 +36,7 @@ q-layout(
 <script>
 import like from './like'
 import { UserApi } from 'src/api/user'
+import { ObjectsApi } from 'src/api/objects'
 // import userSettings from 'pages/app/user/user_settings'
 
 export default {
@@ -59,7 +60,9 @@ export default {
       //   path: 'profile.tutorial',
       //   newValue: false
       // })
-      await this.$wait(1000)
+      let currentUser = this.$store.getters.currentUser()
+      await ObjectsApi.update(currentUser.oid, 'profile.tutorial', false, currentUser.rev)
+      currentUser.profile.tutorial = false // currentUser реактивен
       // TODO some account shit
       this.loading = false
       this.$router.push('/')
