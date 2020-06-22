@@ -55,11 +55,11 @@ class ListsApi {
         // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
         res = await ListsApi.find(mangoQuery)
         break
-      case RxCollectionEnum.LST_USER_SUBSCRIBERS:
+      case RxCollectionEnum.LST_SUBSCRIBERS:
         assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
-        res = await ListsApi.userSubscribers(mangoQuery.selector.oidSphere, pagination)
+        res = await ListsApi.objSubscribers(mangoQuery.selector.oidSphere, pagination)
         break
-      case RxCollectionEnum.LST_USER_SUBSCRIPTIONS:
+      case RxCollectionEnum.LST_SUBSCRIPTIONS:
         assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
         res = await ListsApi.userSubscriptions(mangoQuery.selector.oidSphere, pagination)
         break
@@ -229,14 +229,14 @@ class ListsApi {
     }
   }
 
-  static async userSubscribers (oid, pagination) {
-    let user = await rxdb.get(RxCollectionEnum.OBJ, oid)
-    assert(user && user.subscribers, '!user')
-    assert(Array.isArray(user.subscribers), '!Array.isArray(user.subscribers)')
+  static async objSubscribers (oid, pagination) {
+    let obj = await rxdb.get(RxCollectionEnum.OBJ, oid)
+    assert(obj && obj.subscribers, '!obj')
+    assert(Array.isArray(obj.subscribers), '!Array.isArray(obj.subscribers)')
     return {
-      items: user.subscribers,
-      count: user.subscribers.length,
-      totalCount: user.subscribers.length,
+      items: obj.subscribers,
+      count: obj.subscribers.length,
+      totalCount: obj.subscribers.length,
       nextPageToken: null
     }
   }
