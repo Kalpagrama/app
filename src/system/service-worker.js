@@ -2,7 +2,7 @@ const swVer = 2
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
-  cacheVideo
+  cacheVideo, messaging
 let webPushToken = 'empty'
 
 function sendMsg (type, msgData) {
@@ -35,14 +35,15 @@ function sendMsg (type, msgData) {
   /* global idbKeyval, MD5 */
   importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
   importScripts('/statics/scripts/md5.js')
-  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js')
-  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-messaging.js')
+  importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-app.js')
+  importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-messaging.js')
   logDebug('swVer=', swVer)
   logDebug('init idb')
   swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
   videoStore = new idbKeyval.Store('sw-cache-video', 'video-responses')
   logDebug('init idb ok')
-  function initWebPush(){
+
+  function initWebPush () {
     logDebug('try init web push with firebase...')
     /* global firebase */
     firebase.initializeApp({
@@ -59,12 +60,8 @@ function sendMsg (type, msgData) {
     let i = 0
     if (firebase.messaging.isSupported()) {
       try {
-        const messaging = firebase.messaging()
+        messaging = firebase.messaging()
         // messaging.useServiceWorker(self.registration)
-        messaging.getToken().then(token => {
-          logDebug('messaging.getToken() = ', token)
-          webPushToken = token
-        })
         messaging.setBackgroundMessageHandler(function (payload) {
           logDebug('[firebase-messaging-sw.js] Received background message ', payload)
 
@@ -85,20 +82,14 @@ function sendMsg (type, msgData) {
             ]
           }
           return self.registration.showNotification(notificationTitle, notificationOptions)
-
-          //   const notificationOptions = {
-          //     body: 'Background Message body.',
-          //     icon: '/firebase-logo.png'
-          //   }
-          //   return self.registration.showNotification(notificationTitle,
-          //     notificationOptions);
         })
-      } catch (err){
+      } catch (err) {
         logCritical('firebase init error!', err)
       }
     }
   }
 
+  initWebPush()
   // workbox init
   {
     /* global workbox */
@@ -150,107 +141,110 @@ function sendMsg (type, msgData) {
     )
   }
   // listeners
-  {
-    self.addEventListener('install', event => {
-      logDebug('installed!', swVer)
-      // event.registerForeignFetch({
-      //   scopes: ['/'],
-      //   origins: ['*'] // or ['https://example.com']
-      // })
-    })
-    self.addEventListener('activate', event => {
-      logDebug('activated!', swVer)
-      initWebPush()
-    })
-    self.addEventListener('fetch', async event => {
-      // logDebug('ready to handle fetches! request=', event.request)
-    })
-    self.addEventListener('updatefound', event => {
-      logDebug('ready to update!', swVer)
-      self.registration.showNotification('new version available')
-    })
-    self.addEventListener('error', function (e) {
-      logCritical(e)
-    })
-    self.addEventListener('message', function handler (event) {
-      logDebug('message!', event.data)
-      if (event.data) {
-        switch (event.data.type) {
-          case 'logInit':
-            logModulesBlackList = event.data.logModulesBlackList
-            logLevel = event.data.logLevel
-            logLevelSentry = event.data.logLevelSentry
-            try {
-              if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
-            } catch (err) {
-              logDebug('error on setConfig', err)
-            }
-            break
-          case 'skipWaiting':
-            self.skipWaiting()
-            break
-          case 'sendVersion':
-            sendMsg('swVer', swVer)
-            break
-          case 'sendWebPushToken':
-            sendMsg('webPushToken', webPushToken)
-            break
-          default:
-            logCritical('bad event.data.type', event.data.type)
-        }
-      } else {
-        logCritical('event.data is null')
+  self.addEventListener('install', event => {
+    logDebug('installed!', swVer)
+    // event.registerForeignFetch({
+    //   scopes: ['/'],
+    //   origins: ['*'] // or ['https://example.com']
+    // })
+  })
+  self.addEventListener('activate', event => {
+    logDebug('activated!', swVer)
+    if (messaging) {
+      messaging.getToken().then(token => {
+        logDebug('messaging.getToken() = ', token)
+        webPushToken = token
+      })
+    }
+  })
+  self.addEventListener('fetch', async event => {
+    // logDebug('ready to handle fetches! request=', event.request)
+  })
+  self.addEventListener('updatefound', event => {
+    logDebug('ready to update!', swVer)
+    self.registration.showNotification('new version available')
+  })
+  self.addEventListener('error', function (e) {
+    logCritical(e)
+  })
+  self.addEventListener('message', function handler (event) {
+    logDebug('message!', event.data)
+    if (event.data) {
+      switch (event.data.type) {
+        case 'logInit':
+          logModulesBlackList = event.data.logModulesBlackList
+          logLevel = event.data.logLevel
+          logLevelSentry = event.data.logLevelSentry
+          try {
+            if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
+          } catch (err) {
+            logDebug('error on setConfig', err)
+          }
+          break
+        case 'skipWaiting':
+          self.skipWaiting()
+          break
+        case 'sendVersion':
+          sendMsg('swVer', swVer)
+          break
+        case 'sendWebPushToken':
+          sendMsg('webPushToken', webPushToken)
+          break
+        default:
+          logCritical('bad event.data.type', event.data.type)
       }
-    })
-    self.addEventListener('notificationclick', function (event) {
-      event.notification.close()
-      logDebug('notificationclick')
-      event.waitUntil(
-        // Получаем список клиентов SW.
-        self.clients.matchAll().then(function(clientList) {
-          // Если есть хотя бы один клиент, фокусируем его.
-          if (clientList.length > 0) {
-            return clientList[0].focus();
-          }
-          // В противном случае открываем новую страницу.
-          return self.clients.openWindow('/');
-        })
-      )
-    }, false)
-    self.addEventListener('push', function (event) {
-      logDebug('push event recieved = ', event)
-      let payload = event.data ? event.data.text() : 'Alohomora'
+    } else {
+      logCritical('event.data is null')
+    }
+  })
+  self.addEventListener('notificationclick', function (event) {
+    event.notification.close()
+    logDebug('notificationclick')
+    event.waitUntil(
+      // Получаем список клиентов SW.
+      self.clients.matchAll().then(function (clientList) {
+        // Если есть хотя бы один клиент, фокусируем его.
+        if (clientList.length > 0) {
+          return clientList[0].focus()
+        }
+        // В противном случае открываем новую страницу.
+        return self.clients.openWindow('/')
+      })
+    )
+  }, false)
+  self.addEventListener('push', function (event) {
+    logDebug('push event recieved = ', event)
+    let payload = event.data ? event.data.text() : 'Alohomora'
 
-      event.waitUntil(
-        // Получить список клиентов для SW
-        self.clients.matchAll().then(function (clientList) {
-          // Проверяем, есть ли хотя бы один сфокусированный клиент.
-          var focused = clientList.some(function (client) {
-            return client.focused
-          })
-
-          var notificationMessage
-          if (focused) {
-            notificationMessage = 'Imperio! You\'re still here, thanks!'
-          } else if (clientList.length > 0) {
-            notificationMessage = 'Imperio! You haven\'t closed the page, ' +
-              'click here to focus it!'
-          } else {
-            notificationMessage = 'Imperio! You have closed the page, ' +
-              'click here to re-open it!'
-          }
-          // Показывать уведомление с заголовком «Unforgiveable Curses»
-          // и телом в зависимости от состоянию клиентов SW
-          // * 1, страница сфокусирована;
-          // * 2, страница по-прежнему открыта, но не сфокусирована;
-          // * 3, страница закрыта).
-          return self.registration.showNotification('Unforgiveable Curses', {
-            body: notificationMessage
-          })
+    event.waitUntil(
+      // Получить список клиентов для SW
+      self.clients.matchAll().then(function (clientList) {
+        // Проверяем, есть ли хотя бы один сфокусированный клиент.
+        var focused = clientList.some(function (client) {
+          return client.focused
         })
-      )
-    })
-  }
+
+        var notificationMessage
+        if (focused) {
+          notificationMessage = 'Imperio! You\'re still here, thanks!'
+        } else if (clientList.length > 0) {
+          notificationMessage = 'Imperio! You haven\'t closed the page, ' +
+            'click here to focus it!'
+        } else {
+          notificationMessage = 'Imperio! You have closed the page, ' +
+            'click here to re-open it!'
+        }
+        // Показывать уведомление с заголовком «Unforgiveable Curses»
+        // и телом в зависимости от состоянию клиентов SW
+        // * 1, страница сфокусирована;
+        // * 2, страница по-прежнему открыта, но не сфокусирована;
+        // * 3, страница закрыта).
+        return self.registration.showNotification('Unforgiveable Curses', {
+          body: notificationMessage
+        })
+      })
+    )
+  })
 }
 
 if (useCache) {

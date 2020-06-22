@@ -14,7 +14,7 @@ module.exports = function (ctx) {
       'notify',
       'i18n',
       'apollo',
-      'services',
+      'system',
       'main',
       'filters'
     ],
@@ -159,8 +159,8 @@ module.exports = function (ctx) {
       // },
       // https: true,
       port: ctx.mode.capacitor ? 8484 : ctx.mode.pwa ? 8383 : 8282,
-      // host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
-      // https: true,
+      host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
+      // https: false,
       https: ctx.mode.capacitor || ctx.mode.spa ? false : {
         key: fs.readFileSync('deploy/dev_server_cert/private.key'),
         cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
