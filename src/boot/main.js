@@ -47,9 +47,28 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
       position: 'top'
     })
     let stores = {}
+    //   if (module.hot) {
+    //     const modules = Object.keys(stores)
+    //     module.hot.accept(modules, () => {
+    //         const items = {}
+    //         modules.map(mod => {
+    //             items[mod] = require("./modules/" + mod).default
+    //         })
+    //         store.hotUpdate({
+    //             modules: items
+    //         })
+    //     })
+    // }
+    // alert('main.js')
     Vue.prototype.$stores = stores
     Vue.prototype.$storesAdd = (sid, store = {}) => {
       logD('storesAdd', sid, store)
+      if (storeVue.hasModule(sid) || stores[sid]) {
+        // alert('storesAdd DUP: ' + sid)
+        storeVue.unregisterModule(sid)
+        // delete stores[sid]
+        return stores[sid]
+      }
       // TODO: check for module
       // add defaults
       if (!store.state) store.state = {}
@@ -82,14 +101,28 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
           return storeVue.getters[`${sid}/${getter}`]
         },
       }
+      logD('storesAdd done', stores[sid])
       return stores[sid]
     }
     Vue.prototype.$storesRemove = (sid) => {
       logD('storeRemove', sid)
+      // alert('$storesRemove', sid)
       // TODO: check for module
       storeVue.unregisterModule(sid)
       // storeVue.commit('ui/storeRemove', sid)
       delete stores[sid]
+    }
+    let ctore = {}
+    Vue.prototype.$ctore = ctore
+    Vue.prototype.$ctoreAdd = (sid, store) => {
+      ctore[sid] = {
+        state: store.state,
+        commit () {
+        }
+      }
+    }
+    Vue.prototype.$ctoreRemove = (sid) => {
+      delete ctore[sid]
     }
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {

@@ -104,7 +104,7 @@ class ReactiveItemHolder {
     if (this.itemUnsubscribeFunc) return
     this.itemUnsubscribeFunc = this.vm.$watch('reactiveItem', (newVal, oldVal) => {
       // reactiveItem изменилась (из UI)
-      logD(f, `reactiveItem changed from UI ${newVal.id} ${newVal.name}`)
+      // logD(f, `reactiveItem changed from UI ${newVal.id} ${newVal.name}`)
       if (!this.debouncedItemSave) {
         this.debouncedItemSave = debounce(async (newVal) => {
           // игнорируем newVal (берем из this.reactiveItem)!!! this.reactiveItem содержит самые актуальные данные!

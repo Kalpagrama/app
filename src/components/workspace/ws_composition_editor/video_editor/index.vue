@@ -2,7 +2,7 @@
 div(
   :style=`{
     position: 'relative',
-    minWidth: pageFullscreen ? $q.screen.width+'px' : 800+'px',
+    minWidth: pageFullscreen ? $q.screen.width+'px' : $q.screen.width+'px',
   }`
   ).column.full-width.b-50
   q-btn(
@@ -10,14 +10,19 @@ div(
     :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
   .col.full-width
     ws-content-player(
-      sid="storePlayer"
+      :sid="sidPlayer"
       :content="content")
+      template(v-slot:controlsTools)
+        q-btn(
+          @click="storeEditor.stateSet('pageFullscreen', !storeEditor.getter('pageFullscreen'))"
+          round flat dense color="white"
+          :icon="storeEditor.getter('pageFullscreen') ? 'fullscreen_exit' : 'fullscreen'")
       template(v-slot:controls)
         div(
-          v-if="false"
+          v-if="true"
           :style=`{}`).row.full-width.q-pt-xs
           q-input(
-            v-model="name"
+            v-model="composition.name"
             filled dense dark color="white"
             label="What do you see?"
             :style=`{
@@ -27,10 +32,10 @@ div(
               kalpa-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="20" :height="20")
             template(v-slot:append)
               q-btn(
-                v-if="name.length > 0"
-                @click="pageFullscreen = false, pageHeight = 500"
+                v-if="composition.name.length > 0"
+                @click="toggleEdit"
                 round flat dense color="grey-5"
-                :icon="pageFullscreen ? 'check' : 'edit'")
+                :icon="pageFullscreen ? 'check' : 'keyboard_arrow_down'")
       //- template(v-slot:video)
       //-   div(:style=`{position: 'absolute', zIndex: 1000, bottom: '0px'}`).row.full-width.justify-center.q-pa-sm
       //-     div(
@@ -75,18 +80,17 @@ div(
   //-   :composition="composition")
   //- editor tools
   div(
-    :style=`{position: 'relative', height: 500+'px'}`).row.full-width.justify-center
-    div(v-if="storeEditor").row.full-width
-       h3.text-white {{storeEditor.getter('pageId')}}
-    //- page-details(
-    //-   v-if="storeEditor && storeEditor.state.pageId === 'details'"
-    //-   :composition="composition"
-    //-   :content="content"
-    //-   :style=`{maxWidth: '600px'}`)
-    //- page-edit(
-    //-   v-if="storeEditor.state.pageId === 'edit'"
-    //-   :composition="composition"
-    //-   :content="content")
+    :style=`{position: 'relative', overflow: 'hidden', height: pageHeight+'px'}`).row.full-width.justify-center
+    page-details(
+      v-if="storeEditor.getter('pageId') === 'details'"
+      :storeEditor="storeEditor"
+      :composition="composition"
+      :content="content"
+      :style=`{maxWidth: '600px', overflow: 'hidden'}`)
+    page-edit(
+      v-if="storeEditor.getter('pageId') === 'edit'"
+      :composition="composition"
+      :content="content")
     //- div(:style=`{position: 'relative', maxWidth: '600px', overflow: 'hidden'}`).column.fit
     //-   h1.text-white details
     //- div(:style=`{position: 'absolute', maxWidth: '600px', overflow: 'hidden'}`).column.fit
@@ -135,7 +139,7 @@ div(
     //-     template(v-slot:actions)
     //-       slot(name="actions")
   pages-controller(
-    v-if="storeEditor"
+    v-if="storeEditor && pageHeight > 40"
     :storeEditor="storeEditor")
 </template>
 
@@ -164,27 +168,45 @@ export default {
   },
   data () {
     return {
-      // storeEditor: null,
+      pageHeight: 0,
+      compositionName: '',
     }
   },
   provide () {
     return {
       sidEditor: this.sid,
-      sidPlayer: `${this.sid}-storePlayer`,
+      sidPlayer: this.sidPlayer
     }
   },
   computed: {
+    sidPlayer () {
+      return `${this.sid}-storePlayer`
+    },
     storeEditor () {
       return this.$stores[this.sid]
-    }
+    },
   },
   watch: {
   },
-  async created () {
+  methods: {
+    toggleEdit () {
+      this.$log('toggleEdit')
+      if (this.pageHeight === 500) {
+        this.pageHeight = 0
+      }
+      else {
+        this.pageHeight = 500
+        this.storeEditor.stateSet('pageId', 'edit')
+        this.storeEditor.stateSet('pageFullscreen', false)
+      }
+    }
+  },
+  created () {
     this.$log('created')
     let _this = this
     this.$storesAdd(this.sid, {
       state: {
+        pageFullscreen: false,
         pageId: 'details',
         pages: [
           {id: 'details', name: 'Details'},
@@ -197,7 +219,8 @@ export default {
         }
       },
       getters: {
-        pageId: state => state.pageId
+        pageId: state => state.pageId,
+        pageFullscreen: state => state.pageFullscreen
       }
     })
   },

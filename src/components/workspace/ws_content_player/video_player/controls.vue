@@ -22,9 +22,10 @@ div(
     q-btn(round flat dense color="white" icon="fast_forward" @click="fast(true)")
       q-tooltip(anchor="top middle" self="center middle") + 5 sec
     .col
-    q-btn(
-      round flat dense color="white"
-      icon="fullscreen")
+    slot(name="controlsTools")
+    //- q-btn(
+    //-   round flat dense color="white"
+    //-   icon="fullscreen")
   //- bar
   div(:style=`{position: 'relative', zIndex: 300}`).row.full-width.q-pt-xs
     div(

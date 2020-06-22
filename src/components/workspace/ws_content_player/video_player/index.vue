@@ -45,7 +45,7 @@ div(:style=`{position: 'relative'}`).row.fit.b-60
       }`
       ).fit
     video-controls(
-      v-if="storePlayer.state"
+      v-if="storePlayer && storePlayer.state"
       :storePlayer="storePlayer"
       :style=`{
         position: 'absolute', zIndex: 2000, bottom: '4px',
@@ -57,6 +57,8 @@ div(:style=`{position: 'relative'}`).row.fit.b-60
       ).row.full-width
       template(v-slot:controls)
         slot(name="controls")
+      template(v-slot:controlsTools)
+        slot(name="controlsTools")
   //- tint on pause top
   transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
     div(
@@ -99,37 +101,23 @@ export default {
   },
   computed: {
     storePlayer () {
-      return {
-        state: this.$store.state[this.sid],
-        stateSet: (key, val) => {
-          this.$store.commit(`${this.sid}/stateSet`, [key, val])
-        },
-        commit: (mutation, val) => {
-          this.$store.commit(`${this.sid}/${mutation}`, val)
-        },
-        dispatch: (action, val) => {
-          return this.$store.dispatch(`${this.sid}/action`, val)
-        },
-        getter (getter) {
-          return this.$store.getters[`${this.sid}/getter`]
-        }
-      }
+      return this.$stores[this.sid]
     }
   },
   watch: {
-    'storePlayer.state.playing': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('storePlayer.playing CHANGED', to)
-        if (to) {
-          await this.$wait(200)
-          this.showTint = false
-        }
-        else {
-          this.showTint = true
-        }
-      }
-    },
+    // 'storePlayer.state.playing': {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     this.$log('storePlayer.playing CHANGED', to)
+    //     if (to) {
+    //       await this.$wait(200)
+    //       this.showTint = false
+    //     }
+    //     else {
+    //       this.showTint = true
+    //     }
+    //   }
+    // },
   },
   methods: {
     playPause () {
@@ -155,7 +143,7 @@ export default {
       this.playingInterval = null
     },
     playerLoadeddata () {
-      this.$log('playerLoadeddata')
+      this.$log('playerLoadeddata', this.storePlayer)
       this.storePlayer.stateSet('playing', false)
       this.storePlayer.stateSet('loadeddata', true)
       this.storePlayer.stateSet('duration', this.player.duration)
@@ -195,25 +183,17 @@ export default {
     }
   },
   created () {
-    this.$log('created')
-    if (this.$store.hasModule(this.sid)) this.$store.unregisterModule(this.sid)
+    this.$log('created', this.sid)
+    // if (this.$store.hasModule(this.sid)) this.$store.unregisterModule(this.sid)
     let _this = this
-    this.$store.registerModule(this.sid, {
-      namespaced: true,
-      state: () => {
-        return {
-          sid: _this.sid,
-          duration: 0,
-          currentTime: 0,
-          playing: false,
-          loadeddata: false,
-        }
+    this.$storesAdd(this.sid, {
+      state: {
+        duration: 0,
+        currentTime: 0,
+        playing: false,
+        loadeddata: false,
       },
       mutations: {
-        stateSet (state, [key, val]) {
-          // _this.$log('stateSet', key, val)
-          state[key] = val
-        },
         play () {
           _this.player.play()
         },
@@ -226,24 +206,34 @@ export default {
           _this.player.setCurrentTime(val)
         },
       },
-      // getters: {
-      // }
     })
   },
   async mounted () {
-    // this.$log('mounted')
+    this.$log('mounted', this.storePlayer)
+    // await this.$wait(2000)
     this.playerInit()
+    this.$watch('storePlayer.state.playing', async (to, from) => {
+      this.$log('storePlayer.playing CHANGED', to)
+      if (to) {
+        await this.$wait(200)
+        this.showTint = false
+      }
+      else {
+        this.showTint = true
+      }
+    }, {deep: true})
   },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
+  destroyed () {
+    this.$log('destroyed')
     if (this.playingInterval) this.playerIntervalStop()
-    this.player.removeEventListener('play', this.playerPlay)
-    this.player.removeEventListener('pause', this.playerPause)
-    this.player.removeEventListener('loadeddata', this.playerLoadeddata)
-    this.player.pause()
-    this.player.remove()
-    // alert('unregisterModule...')
-    this.$store.unregisterModule(this.sid)
+    if (this.player) {
+      this.player.removeEventListener('play', this.playerPlay)
+      this.player.removeEventListener('pause', this.playerPause)
+      this.player.removeEventListener('loadeddata', this.playerLoadeddata)
+      this.player.pause()
+      this.player.remove()
+    }
+    this.$storesRemove(this.sid)
   }
 }
 </script>

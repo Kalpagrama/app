@@ -1,10 +1,13 @@
 <template lang="pug">
 component(
   v-if="content"
-  v-bind="$props"
-  :is="component[content.type]")
+  :is="component[content.type]"
+  :sid="sid"
+  :content="content")
   template(v-slot:controls)
     slot(name="controls")
+  template(v-slot:controlsTools)
+    slot(name="controlsTools")
 </template>
 
 <script>
