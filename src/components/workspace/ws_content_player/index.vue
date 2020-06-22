@@ -3,6 +3,8 @@ component(
   v-if="content"
   v-bind="$props"
   :is="component[content.type]")
+  //- template(v-slot:bar)
+  //-   slot(name="bar")
 </template>
 
 <script>
@@ -13,7 +15,7 @@ export default {
   name: 'wsContentPlayer',
   components: {videoPlayer},
   props: {
-    id: {
+    sid: {
       type: String,
       default () {
         return 'wcp'
