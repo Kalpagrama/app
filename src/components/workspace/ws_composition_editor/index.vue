@@ -2,13 +2,9 @@
 component(
   v-if="content"
   :is="component[content.type]"
-  @createNode="$emit('createNode')"
-  @close="$emit('close')"
-  @delete="$emit('delete')"
   :composition="value"
   :content="content"
-  :options="options"
-  :statePlayer="statePlayer")
+  :storePlayer="storePlayer")
   template(v-slot:actions)
     slot(name="actions")
 </template>
@@ -21,7 +17,7 @@ import videoEditor from './video_editor'
 export default {
   name: 'wsCompositionEditor',
   components: {videoEditor},
-  props: ['value', 'statePlayer', 'options'],
+  props: ['value', 'storePlayer'],
   data () {
     return {
       content: null,

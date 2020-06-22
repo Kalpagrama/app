@@ -3,8 +3,8 @@ component(
   v-if="content"
   v-bind="$props"
   :is="component[content.type]")
-  //- template(v-slot:bar)
-  //-   slot(name="bar")
+  template(v-slot:controls)
+    slot(name="controls")
 </template>
 
 <script>

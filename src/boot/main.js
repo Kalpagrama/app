@@ -27,7 +27,7 @@ const time = (sec) => {
 
 var router
 
-export default async ({ Vue, store, router: VueRouter }) => {
+export default async ({ Vue, store: storeVue, router: VueRouter }) => {
   try {
     router = VueRouter
     Vue.use(VueMasonry)
@@ -46,6 +46,51 @@ export default async ({ Vue, store, router: VueRouter }) => {
       size: '4px',
       position: 'top'
     })
+    let stores = {}
+    Vue.prototype.$stores = stores
+    Vue.prototype.$storesAdd = (sid, store = {}) => {
+      logD('storesAdd', sid, store)
+      // TODO: check for module
+      // add defaults
+      if (!store.state) store.state = {}
+      if (!store.mutations) store.mutations = {}
+      if (!store.actions) store.actions = {}
+      if (!store.getters) store.getters = {}
+      store.state.sid = sid
+      store.mutations.stateSet = (state, [key, val]) => { state[key] = val }
+      // reg
+      storeVue.registerModule(sid, {
+        namespaced: true,
+        state: () => store.state,
+        actions: store.actions,
+        mutations: store.mutations,
+        getters: store.getters,
+      })
+      // add to Map
+      stores[sid] = {
+        state: storeVue.state[sid],
+        stateSet: (key, val) => {
+          storeVue.commit(`${sid}/stateSet`, [key, val])
+        },
+        commit: (mutation, val) => {
+          storeVue.commit(`${sid}/${mutation}`, val)
+        },
+        dispatch: (action, val) => {
+          return storeVue.dispatch(`${sid}/${action}`, val)
+        },
+        getter (getter) {
+          return storeVue.getters[`${sid}/${getter}`]
+        },
+      }
+      return stores[sid]
+    }
+    Vue.prototype.$storesRemove = (sid) => {
+      logD('storeRemove', sid)
+      // TODO: check for module
+      storeVue.unregisterModule(sid)
+      // storeVue.commit('ui/storeRemove', sid)
+      delete stores[sid]
+    }
     Vue.prototype.$tween = TweenMax
     Vue.prototype.$date = (ts, format) => {
       return date.formatDate(ts, format || 'YYYY.MM.DD', {

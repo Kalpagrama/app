@@ -45,89 +45,41 @@ div(:style=`{position: 'relative'}`).row.fit.b-60
       }`
       ).fit
     video-controls(
-      :statePlayer="statePlayer"
+      v-if="storePlayer.state"
+      :storePlayer="storePlayer"
       :style=`{
-        position: 'absolute', zIndex: 2000, bottom: '0px',
+        position: 'absolute', zIndex: 2000, bottom: '4px',
         left: '50%',
         marginRight: '-50%',
         transform: 'translate(-50%, 0)',
         maxWidth: '600px',
       }`
-      ).row.full-width.q-py-sm
-  //-     //- bar tools
-  //-     div(
-  //-       :style=`{
-  //-         position: 'relative',
-  //-         borderRadius: '10px', overflow: 'hidden',
-  //-         background: 'rgba(0,0,0,0.1)',
-  //-       }`).row.full-width.q-mb-xs
-  //-       q-btn(
-  //-         round flat dense color="white"
-  //-         icon="play_arrow")
-  //-       q-btn(
-  //-         round flat dense color="white"
-  //-         icon="volume_up")
-  //-       .col
-  //-       q-btn(flat dense color="white")
-  //-         small {{ $time(state.currentTime) }}
-  //-         small.q-mx-xs /
-  //-         small {{ $time(state.duration) }}
-  //-       .col
-  //-       q-btn(
-  //-         round flat dense color="white"
-  //-         icon="fullscreen")
-  //-       q-btn(
-  //-         round flat dense color="white"
-  //-         icon="more_vert")
-  //-     //- bar
-  //-     div(
-  //-       v-if="state"
-  //-       :style=`{
-  //-         position: 'relative',
-  //-         height: '50px',
-  //-         borderRadius: '10px',
-  //-         background: 'rgba(60,60,60,0.5)',
-  //-       }`).row.full-width.q-mb-sm
-  //-       div(
-  //-         :style=`{
-  //-           position: 'absolute', zIndex: 1000,
-  //-           top: '-4px',
-  //-           left: state.currentTime/state.duration*100+'%',
-  //-           height: 'calc(100% + 8px)',
-  //-           width: '4px',
-  //-           borderRadius: '2px',
-  //-           overflow: 'hidden',
-  //-         }`).bg-green
-  //-     slot(name="bar")
-  //- video-controls(
-  //-   :style=`{
-  //-     position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-  //-     bottom: '-26px',
-  //-     left: 'calc(50% - 300px)',
-  //-     maxWidth: '600px',
-  //-   }`)
+      ).row.full-width
+      template(v-slot:controls)
+        slot(name="controls")
   //- tint on pause top
-  //- transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
-  //-   div(
-  //-     v-if="showTint"
-  //-     :style=`{
-  //-       position: 'absolute', top: '0px', zIndex: 1000,
-  //-       height: '5%',
-  //-       background: 'rgb(0,0,0)',
-  //-       background: 'linear-gradient(0deg, rgba(0,0,0,0) 100%, rgba(10,10,10,0.9) 0%)'
-  //-     }`
-  //-     ).row.full-width
+  transition(appear enter-active-class="animated slideInDown" leave-active-class="animated slideOutUp")
+    div(
+      v-if="showTint"
+      :style=`{
+        position: 'absolute', top: '0px', zIndex: 1000,
+        height: '5%',
+        background: 'rgb(0,0,0)',
+        background: 'linear-gradient(0deg, rgba(0,0,0,0) 100%, rgba(10,10,10,0.9) 0%)',
+        transform: 'translate3d(0,0,0)',
+      }`
+      ).row.full-width
   //- tint on pause bottom
-  //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-  //- div(
-  //-   v-if="showTint"
-  //-   :style=`{
-  //-     position: 'absolute', bottom: '0px', zIndex: 1000,
-  //-     height: '20%',
-  //-     background: 'rgb(0,0,0)',
-  //-     background: 'linear-gradient(0deg, rgba(10,10,10,0.9) 0%, rgba(0,0,0,0) 100%)'
-  //-   }`
-  //-   ).row.full-width
+  div(
+    v-if="showTint"
+    :style=`{
+      position: 'absolute', bottom: '0px', zIndex: 1000,
+      height: '20%',
+      background: 'rgb(0,0,0)',
+      background: 'linear-gradient(0deg, rgba(10,10,10,0.9) 0%, rgba(0,0,0,0) 100%)',
+      transform: 'translate3d(0,0,0)',
+    }`
+    ).row.full-width
 </template>
 
 <script>
@@ -146,7 +98,7 @@ export default {
     }
   },
   computed: {
-    statePlayer () {
+    storePlayer () {
       return {
         state: this.$store.state[this.sid],
         stateSet: (key, val) => {
@@ -164,28 +116,37 @@ export default {
       }
     }
   },
-  provide () {
-    return {
-      statePlayer: this.statePlayer
-    }
+  watch: {
+    'storePlayer.state.playing': {
+      immediate: true,
+      async handler (to, from) {
+        this.$log('storePlayer.playing CHANGED', to)
+        if (to) {
+          await this.$wait(200)
+          this.showTint = false
+        }
+        else {
+          this.showTint = true
+        }
+      }
+    },
   },
   methods: {
     playPause () {
       this.$log('playPause')
-      if (this.statePlayer.state.playing) this.player.pause()
+      if (this.storePlayer.state.playing) this.player.pause()
       else this.player.play()
     },
     playerPlay () {
       this.$log('playerPlay')
       // this.$store.commit(`${this.storeKey}/stateSet`, ['playing', true])
-      this.statePlayer.stateSet('playing', true)
+      this.storePlayer.stateSet('playing', true)
       if (this.playingInterval) this.playerIntervalStop()
       this.playingInterval = setInterval(this.playerTimeupdate, 50)
     },
     playerPause () {
       this.$log('playerPause')
-      // this.$store.commit(`${this.storeKey}/stateSet`, ['playing', false])
-      this.statePlayer.stateSet('playing', false)
+      this.storePlayer.stateSet('playing', false)
       this.playerIntervalStop()
     },
     playerIntervalStop () {
@@ -195,15 +156,15 @@ export default {
     },
     playerLoadeddata () {
       this.$log('playerLoadeddata')
-      this.statePlayer.stateSet('playing', false)
-      this.statePlayer.stateSet('loadeddata', true)
-      this.statePlayer.stateSet('duration', this.player.duration)
-      this.statePlayer.stateSet('currentTime', this.player.currentTime)
+      this.storePlayer.stateSet('playing', false)
+      this.storePlayer.stateSet('loadeddata', true)
+      this.storePlayer.stateSet('duration', this.player.duration)
+      this.storePlayer.stateSet('currentTime', this.player.currentTime)
       this.player.play()
     },
     playerTimeupdate () {
-      // this.$log('playerTimeupdate', this.statePlayer.player.currentTime)
-      this.statePlayer.stateSet('currentTime', this.player.currentTime)
+      // this.$log('playerTimeupdate', this.storePlayer.player.currentTime)
+      this.storePlayer.stateSet('currentTime', this.player.currentTime)
     },
     playerInit () {
       this.$log('playerInit start')
@@ -235,6 +196,7 @@ export default {
   },
   created () {
     this.$log('created')
+    if (this.$store.hasModule(this.sid)) this.$store.unregisterModule(this.sid)
     let _this = this
     this.$store.registerModule(this.sid, {
       namespaced: true,
@@ -259,7 +221,7 @@ export default {
           _this.player.pause()
         },
         setCurrentTime (state, val) {
-          _this.$log('setCurrentTime', state, val)
+          // _this.$log('setCurrentTime', state, val)
           state.currentTime = val
           _this.player.setCurrentTime(val)
         },
@@ -269,7 +231,7 @@ export default {
     })
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     this.playerInit()
   },
   beforeDestroy () {
@@ -280,6 +242,7 @@ export default {
     this.player.removeEventListener('loadeddata', this.playerLoadeddata)
     this.player.pause()
     this.player.remove()
+    // alert('unregisterModule...')
     this.$store.unregisterModule(this.sid)
   }
 }

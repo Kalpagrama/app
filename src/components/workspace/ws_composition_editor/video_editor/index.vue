@@ -10,27 +10,27 @@ div(
     :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
   .col.full-width
     ws-content-player(
-      sid="statePlayer"
+      sid="storePlayer"
       :content="content")
-      //- template(v-slot:bar)
-      //-   div(
-      //-     v-if="true"
-      //-     :style=`{}`).row.full-width
-      //-     q-input(
-      //-       v-model="name"
-      //-       filled dense dark color="green"
-      //-       label="What do you see?"
-      //-       :style=`{
-      //-         background: 'rgba(60,60,60,0.2)',
-      //-       }`).full-width
-      //-       template(v-slot:prepend)
-      //-         kalpa-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="20" :height="20")
-      //-       template(v-slot:append)
-      //-         q-btn(
-      //-           v-if="name.length > 0"
-      //-           @click="pageFullscreen = false, pageHeight = 500"
-      //-           round flat dense color="grey-5"
-      //-           :icon="pageFullscreen ? 'check' : 'edit'")
+      template(v-slot:controls)
+        div(
+          v-if="false"
+          :style=`{}`).row.full-width.q-pt-xs
+          q-input(
+            v-model="name"
+            filled dense dark color="white"
+            label="What do you see?"
+            :style=`{
+              background: 'rgba(60,60,60,0.5)',
+            }`).full-width
+            template(v-slot:prepend)
+              kalpa-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="20" :height="20")
+            template(v-slot:append)
+              q-btn(
+                v-if="name.length > 0"
+                @click="pageFullscreen = false, pageHeight = 500"
+                round flat dense color="grey-5"
+                :icon="pageFullscreen ? 'check' : 'edit'")
       //- template(v-slot:video)
       //-   div(:style=`{position: 'absolute', zIndex: 1000, bottom: '0px'}`).row.full-width.justify-center.q-pa-sm
       //-     div(
@@ -39,7 +39,7 @@ div(
       //-       }`).row.full-width
       //-       div(:style=`{}`).row.full-width.q-mb-sm
               //- composition-progress(
-              //-   :statePlayer="$store.state.statePlayer"
+              //-   :storePlayer="$store.state.storePlayer"
               //-   :composition="composition")
               //- div().row.full-width
               //-   //- span.text-white toolsn
@@ -76,6 +76,17 @@ div(
   //- editor tools
   div(
     :style=`{position: 'relative', height: 500+'px'}`).row.full-width.justify-center
+    div(v-if="storeEditor").row.full-width
+       h3.text-white {{storeEditor.getter('pageId')}}
+    //- page-details(
+    //-   v-if="storeEditor && storeEditor.state.pageId === 'details'"
+    //-   :composition="composition"
+    //-   :content="content"
+    //-   :style=`{maxWidth: '600px'}`)
+    //- page-edit(
+    //-   v-if="storeEditor.state.pageId === 'edit'"
+    //-   :composition="composition"
+    //-   :content="content")
     //- div(:style=`{position: 'relative', maxWidth: '600px', overflow: 'hidden'}`).column.fit
     //-   h1.text-white details
     //- div(:style=`{position: 'absolute', maxWidth: '600px', overflow: 'hidden'}`).column.fit
@@ -123,14 +134,15 @@ div(
     //-     ).fit
     //-     template(v-slot:actions)
     //-       slot(name="actions")
-  //- pages-controller(
-  //-   v-show="!pageFullscreen"
-  //-   )
+  pages-controller(
+    v-if="storeEditor"
+    :storeEditor="storeEditor")
 </template>
 
 <script>
 import pageDetails from './page_details'
-import pageEditor from './page_editor'
+// import pageEditor from './page_editor'
+import pageEdit from './page_edit'
 import pagesController from './pages_controller'
 import compositionController from './composition_controller'
 import compositionProgress from './composition_progress'
@@ -139,119 +151,53 @@ export default {
   name: 'videoEditor',
   components: {
     pageDetails,
-    pageEditor,
+    pageEdit,
     pagesController,
     compositionController,
     compositionProgress
   },
   props: {
-    key: {type: String, default () { return 'default' }},
+    sid: {type: String, default () { return 'wce' }},
     composition: {type: Object},
     content: {type: Object},
-    // statePlayer: {type: Object},
-    options: {
-      type: Object,
-      default () {
-        return {
-          usePlayer: true,
-          useEditor: true,
-          onlyProgress: false,
-        }
-      }
-    }
+    storePlayer: {type: Object}
   },
-  // inject: ['store'],
   data () {
     return {
-      name: '',
-      pageHeight: 0,
-      pageFullscreen: false,
-      showPagesController: false,
-      // pageId: 'details',
-      // // layer
-      // layerSelected: null,
-      // layerEditing: null,
-      // // composition
-      // compositionPlaying: false
+      // storeEditor: null,
+    }
+  },
+  provide () {
+    return {
+      sidEditor: this.sid,
+      sidPlayer: `${this.sid}-storePlayer`,
     }
   },
   computed: {
-    storeKey () {
-      return `wsce-${this.key}`
-    },
-    state () {
-      return this.$store.state[this.storeKey]
-    },
-    // stateEditor () {
-    //   return {
-    //     // layout
-    //     // pageId: 'details',
-    //     pageId: this.pageId,
-    //     pages: [
-    //       {id: 'details', name: 'Details', icon: 'details'},
-    //       {id: 'editor', name: 'Editor', icon: 'edit'},
-    //     ],
-    //     pageFullscreen: false,
-    //     pageWidth: 600,
-    //     pageHeight: 400,
-    //     // states
-    //     statePlayer: this.store.state.statePlayer,
-    //     compositionPlaying: this.compositionPlaying,
-    //     // layer
-    //     layerPlaying: null,
-    //     layerEditing: null,
-    //     set: (key, val) => {
-    //       this[key] = val
-    //     }
-    //   }
-    // }
-  },
-  // provide () {
-  //   return {
-  //     stateEditor: this.stateEditor
-  //   }
-  // },
-  provide () {
-    return {
-      storeKey: this.storeKey
+    storeEditor () {
+      return this.$stores[this.sid]
     }
   },
   watch: {
-    // 'stateEditor.statePlayer.fullscreen': {
-    //   handler (to, from) {
-    //     this.$log('stateEditor.statePlayer.fullscreen TO', to)
-    //     if (to) {
-    //       this.pageWidth = this.$q.screen.width
-    //       this.pageHeight = 60
-    //     }
-    //     else {
-    //       this.pageWidth = 600
-    //       this.pageHeight = 400
-    //     }
-    //   }
-    // }
   },
-  created () {
+  async created () {
     this.$log('created')
     let _this = this
-    this.$store.registerModule(this.storeKey, {
-      namespaced: true,
-      state: () => {
-        return {
-          pageId: 'details',
-          pages: [
-            {id: 'details', name: 'Details', icon: 'details'},
-            {id: 'editor', name: 'Editor', icon: 'edit'},
-          ],
-        }
+    this.$storesAdd(this.sid, {
+      state: {
+        pageId: 'details',
+        pages: [
+          {id: 'details', name: 'Details'},
+          {id: 'edit', name: 'Edit'},
+        ]
       },
       mutations: {
-        stateSet (state, [key, val]) {
-          _this.$log('stateSet', key, val)
-          state[key] = val
-        },
+        fuckYou (state, val) {
+          _this.$log('fuckYou', val)
+        }
       },
       getters: {
+        pageId: state => state.pageId
       }
     })
   },
@@ -259,7 +205,7 @@ export default {
     this.$log('mounted')
   },
   beforeDestroy () {
-    this.$store.unregisterModule(this.storeKey)
+    this.$storesRemove(this.sid)
   }
 }
 </script>
