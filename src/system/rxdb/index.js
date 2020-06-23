@@ -6,6 +6,8 @@ import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
+import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
+import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump';
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive'
 import { NodeApi } from 'src/api/node'
@@ -54,24 +56,30 @@ class RxDBWrapper {
     this.mutex = new Mutex()
     addRxPlugin(require('pouchdb-adapter-idb'))
     addRxPlugin(RxDBLeaderElectionPlugin)
+    addRxPlugin(RxDBValidatePlugin)
+    addRxPlugin(RxDBJsonDumpPlugin)
     this.isLeader = () => this.isLeader_
   }
 
   // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
   async purgeDb () {
     let f = this.purgeDb
-    logD(f, 'purgeDb rxdb')
+    logD(f, 'start')
     let purgeLastDateDoc = await this.get(RxCollectionEnum.META, 'purgeLastDate')
     let purgeLastDate = purgeLastDateDoc ? parseInt(purgeLastDateDoc) : 0
-    if (Date.now() - purgeLastDate < purgePeriod) return
+    if (Date.now() - purgeLastDate < purgePeriod) {
+      logD(f, 'skip.')
+      return
+    }
     await this.set(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
     let dump = await this.db.dump()
     await this.db.importDump(dump)
+    logD(f, 'complete.')
   }
 
   async init (recursive = false) {
     const f = this.init
-    logD(f, 'start')
+    logD(f, 'start.....')
     try {
       this.db = await createRxDatabase({
         name: 'rxdb',
@@ -82,7 +90,6 @@ class RxDBWrapper {
       })
       await this.db.collection({ name: 'meta', schema: schemaKeyValue })
       await this.purgeDb() // очистит бд от старых данных
-
       this.db.waitForLeadership().then(() => {
         logD(f, 'RXDB::LEADER!!!!')
         this.isLeader_ = true
@@ -235,7 +242,7 @@ class RxDBWrapper {
       rxDoc = await this.workspace.set(data, withLock)
     } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
       let id = makeId(rxCollectionEnum, data.oid)
-      rxDoc = await this.cache.set(id, data, actualAge, notEvict, null)
+      rxDoc = await this.cache.set(id, data, actualAge, notEvict)
     } else if (rxCollectionEnum === RxCollectionEnum.META) {
       assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
       rxDoc = await this.db.meta.atomicUpsert({ id: data.id, valueString: data.valueString })

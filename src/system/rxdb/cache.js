@@ -1,4 +1,3 @@
-import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 import LruCache from 'lru-cache'
 import assert from 'assert'
 import { cacheSchema } from 'src/system/rxdb/schemas'
@@ -6,7 +5,6 @@ import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { Mutex } from 'src/system/rxdb/reactive'
 import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
-import { WsCollectionEnum } from 'src/system/rxdb/workspace'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_CACHE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_CACHE)
@@ -109,6 +107,32 @@ class Cache {
         }
       }
 
+      let ttt = Date.now()
+      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
+        .then(rxDoc => {
+          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+        })
+      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
+        .then(rxDoc => {
+          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+        })
+      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
+        .then(rxDoc => {
+          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+        })
+      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
+        .then(rxDoc => {
+          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+        })
+      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
+        .then(rxDoc => {
+          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+        })
+      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
+        .then(rxDoc => {
+          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+        })
+
       this.created = true
       logD(f, 'complete')
     } catch (err) {
@@ -210,15 +234,13 @@ class Cache {
   // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null
   async get (id, fetchFunc, clientFirst = true, force = false) {
     try {
-      await this.lock()
+      // await this.lock() ! нельзя тк необходимо чтобы запросы выполнялись параллельно (см QueryAccumulator)
       assert(this.created, '!this.created')
       assert(id)
       let f = this.get
-      logD(f, 'start', id)
+      // logD(f, 'start', id)
       if (DEBUG_IGNORE_CACHE) logW(f, 'DEBUG_IGNORE_CACHE is ON!!!')
-      let rxDoc = await this.db.cache.findOne(id).exec()
       let { actualUntil, actualAge, failReason } = this.cacheLru.get(id) || {}
-      // logD(f, 'start2', force, new Date(actualUntil), new Date(Date.now()), Date.now() > actualUntil)
       if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
         if (fetchFunc) {
           let processFetchErrorFunc = async (err) => {
@@ -239,22 +261,25 @@ class Cache {
             assert(fetchRes, '!fetchRes')
             assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
             let notEvict = fetchRes.notEvict || false
-            let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, false)
+            let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict)
             logD(f, 'записаны в кэш')
             return res
           }
           logD(f, 'запрашиваем данные с сервера...')
-          if (rxDoc && clientFirst) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
+          if (clientFirst && (actualUntil && !failReason)) { // если данные есть - не ждем ответа сервера (вернуть то что есть) Потом данные реактивно обновятся
             fetchFunc().then(saveFunc).catch(processFetchErrorFunc)
           } else { // ждем ответа сервра
             try {
-              rxDoc = await saveFunc(await fetchFunc())
+              await saveFunc(await fetchFunc())
             } catch (err) {
               await processFetchErrorFunc(err)
             }
           }
         }
       }
+      let ttt = Date.now()
+      let rxDoc = await this.db.cache.findOne(id).exec() // после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
+      // logD(f, `findOne(${id}) time = ${(Date.now() - ttt) / 1000}`)
       if (!rxDoc) {
         logD(f, 'not found', rxDoc, failReason)
         if (failReason) {
@@ -264,10 +289,10 @@ class Cache {
         }
         return null
       }
-      // logD(f, 'complete', rxDoc)
+      // logD(f, 'complete', id)
       return rxDoc
     } finally {
-      this.release()
+      // this.release()
     }
   }
 

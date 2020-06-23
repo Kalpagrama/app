@@ -60,6 +60,7 @@ async function initPWA (store) {
         registration.addEventListener('updatefound', () => {
           // If updatefound is fired, it means that there's
           // a new service worker being installed.
+          logD('updatefound...')
           let newSW = registration.installing
           newSW.addEventListener('statechange', (event) => {
             if (event.target.state === 'installed') {

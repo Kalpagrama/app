@@ -238,7 +238,7 @@ export default async ({ Vue, store, app }) => {
         error.processed = true
       }
       try {
-        if (error.message === 'Failed to execute \'getComputedStyle\' on \'Window\': parameter 1 is not of type \'Element\'.'){
+        if (error && error.message === 'Failed to execute \'getComputedStyle\' on \'Window\': parameter 1 is not of type \'Element\'.'){
           logW('window.onerror', message, source, line, column, error)
         } else {
           logE('window.onerror', message, source, line, column, error)

@@ -1,4 +1,4 @@
-const swVer = 2
+const swVer = 1
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
@@ -32,6 +32,7 @@ function sendMsg (type, msgData) {
 }
 // common init sw
 {
+  logDebug('common init sw', swVer)
   /* global idbKeyval, MD5 */
   importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
   importScripts('/statics/scripts/md5.js')
@@ -98,8 +99,12 @@ function sendMsg (type, msgData) {
     workbox.core.setCacheNameDetails({
       prefix: 'kalpa'
     })
-    // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/service_worker/index.js
-    workbox.core.clientsClaim()
+    // force update sw
+    {
+      // если необходимо немедленно обновить sw (иначе - зависнет в waiting до закрытия всех страниц) - раскомментировать строки ниже (не рекомендуется)
+      // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
+      // workbox.core.clientsClaim()
+    }
     self.__precacheManifest = [].concat(self.__precacheManifest || [])
     // порядок вызовов precacheAndRoute и registerRoute имеет значение
     // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
@@ -141,110 +146,112 @@ function sendMsg (type, msgData) {
     )
   }
   // listeners
-  self.addEventListener('install', event => {
-    logDebug('installed!', swVer)
-    // event.registerForeignFetch({
-    //   scopes: ['/'],
-    //   origins: ['*'] // or ['https://example.com']
-    // })
-  })
-  self.addEventListener('activate', event => {
-    logDebug('activated!', swVer)
-    if (messaging) {
-      messaging.getToken().then(token => {
-        logDebug('messaging.getToken() = ', token)
-        webPushToken = token
-      })
-    }
-  })
-  self.addEventListener('fetch', async event => {
-    // logDebug('ready to handle fetches! request=', event.request)
-  })
-  self.addEventListener('updatefound', event => {
-    logDebug('ready to update!', swVer)
-    self.registration.showNotification('new version available')
-  })
-  self.addEventListener('error', function (e) {
-    logCritical(e)
-  })
-  self.addEventListener('message', function handler (event) {
-    logDebug('message!', event.data)
-    if (event.data) {
-      switch (event.data.type) {
-        case 'logInit':
-          logModulesBlackList = event.data.logModulesBlackList
-          logLevel = event.data.logLevel
-          logLevelSentry = event.data.logLevelSentry
-          try {
-            if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
-          } catch (err) {
-            logDebug('error on setConfig', err)
-          }
-          break
-        case 'skipWaiting':
-          self.skipWaiting()
-          break
-        case 'sendVersion':
-          sendMsg('swVer', swVer)
-          break
-        case 'sendWebPushToken':
-          sendMsg('webPushToken', webPushToken)
-          break
-        default:
-          logCritical('bad event.data.type', event.data.type)
+  {
+    self.addEventListener('install', event => {
+      logDebug('installed!', swVer)
+      // event.registerForeignFetch({
+      //   scopes: ['/'],
+      //   origins: ['*'] // or ['https://example.com']
+      // })
+    })
+    self.addEventListener('activate', event => {
+      logDebug('activated!', swVer)
+      if (messaging) {
+        messaging.getToken().then(token => {
+          logDebug('messaging.getToken() = ', token)
+          webPushToken = token
+        })
       }
-    } else {
-      logCritical('event.data is null')
-    }
-  })
-  self.addEventListener('notificationclick', function (event) {
-    event.notification.close()
-    logDebug('notificationclick')
-    event.waitUntil(
-      // Получаем список клиентов SW.
-      self.clients.matchAll().then(function (clientList) {
-        // Если есть хотя бы один клиент, фокусируем его.
-        if (clientList.length > 0) {
-          return clientList[0].focus()
+    })
+    self.addEventListener('fetch', async event => {
+      // logDebug('ready to handle fetches! request=', event.request)
+    })
+    self.addEventListener('updatefound', event => {
+      logDebug('ready to update!', swVer)
+      self.registration.showNotification('new version available')
+    })
+    self.addEventListener('error', function (e) {
+      logCritical(e)
+    })
+    self.addEventListener('message', function handler (event) {
+      logDebug('message!', event.data)
+      if (event.data) {
+        switch (event.data.type) {
+          case 'logInit':
+            logModulesBlackList = event.data.logModulesBlackList
+            logLevel = event.data.logLevel
+            logLevelSentry = event.data.logLevelSentry
+            try {
+              if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
+            } catch (err) {
+              logDebug('error on setConfig', err)
+            }
+            break
+          case 'skipWaiting':
+            self.skipWaiting()
+            break
+          case 'sendVersion':
+            sendMsg('swVer', swVer)
+            break
+          case 'sendWebPushToken':
+            sendMsg('webPushToken', webPushToken)
+            break
+          default:
+            logCritical('bad event.data.type', event.data.type)
         }
-        // В противном случае открываем новую страницу.
-        return self.clients.openWindow('/')
-      })
-    )
-  }, false)
-  self.addEventListener('push', function (event) {
-    logDebug('push event recieved = ', event)
-    let payload = event.data ? event.data.text() : 'Alohomora'
-
-    event.waitUntil(
-      // Получить список клиентов для SW
-      self.clients.matchAll().then(function (clientList) {
-        // Проверяем, есть ли хотя бы один сфокусированный клиент.
-        var focused = clientList.some(function (client) {
-          return client.focused
+      } else {
+        logCritical('event.data is null')
+      }
+    })
+    self.addEventListener('notificationclick', function (event) {
+      event.notification.close()
+      logDebug('notificationclick')
+      event.waitUntil(
+        // Получаем список клиентов SW.
+        self.clients.matchAll().then(function (clientList) {
+          // Если есть хотя бы один клиент, фокусируем его.
+          if (clientList.length > 0) {
+            return clientList[0].focus()
+          }
+          // В противном случае открываем новую страницу.
+          return self.clients.openWindow('/')
         })
+      )
+    }, false)
+    self.addEventListener('push', function (event) {
+      logDebug('push event recieved = ', event)
+      let payload = event.data ? event.data.text() : 'Alohomora'
 
-        var notificationMessage
-        if (focused) {
-          notificationMessage = 'Imperio! You\'re still here, thanks!'
-        } else if (clientList.length > 0) {
-          notificationMessage = 'Imperio! You haven\'t closed the page, ' +
-            'click here to focus it!'
-        } else {
-          notificationMessage = 'Imperio! You have closed the page, ' +
-            'click here to re-open it!'
-        }
-        // Показывать уведомление с заголовком «Unforgiveable Curses»
-        // и телом в зависимости от состоянию клиентов SW
-        // * 1, страница сфокусирована;
-        // * 2, страница по-прежнему открыта, но не сфокусирована;
-        // * 3, страница закрыта).
-        return self.registration.showNotification('Unforgiveable Curses', {
-          body: notificationMessage
+      event.waitUntil(
+        // Получить список клиентов для SW
+        self.clients.matchAll().then(function (clientList) {
+          // Проверяем, есть ли хотя бы один сфокусированный клиент.
+          var focused = clientList.some(function (client) {
+            return client.focused
+          })
+
+          var notificationMessage
+          if (focused) {
+            notificationMessage = 'Imperio! You\'re still here, thanks!'
+          } else if (clientList.length > 0) {
+            notificationMessage = 'Imperio! You haven\'t closed the page, ' +
+              'click here to focus it!'
+          } else {
+            notificationMessage = 'Imperio! You have closed the page, ' +
+              'click here to re-open it!'
+          }
+          // Показывать уведомление с заголовком «Unforgiveable Curses»
+          // и телом в зависимости от состоянию клиентов SW
+          // * 1, страница сфокусирована;
+          // * 2, страница по-прежнему открыта, но не сфокусирована;
+          // * 3, страница закрыта).
+          return self.registration.showNotification('Unforgiveable Curses', {
+            body: notificationMessage
+          })
         })
-      })
-    )
-  })
+      )
+    })
+  }
 }
 
 if (useCache) {

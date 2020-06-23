@@ -134,7 +134,7 @@ export default {
       async handler (to, from) {
         // this.$log('visible TO', to)
         if (to) {
-          this.$log('visible TRUE => load composition')
+          this.$log('visible TRUE => load composition: ', this.value.oid)
           this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.oid)
         }
         else {
