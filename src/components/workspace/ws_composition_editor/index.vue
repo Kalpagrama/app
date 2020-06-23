@@ -4,6 +4,7 @@ component(
   :is="component[content.type]"
   :composition="value"
   :content="content"
+  :options="options"
   :sidPlayerReady="sidPlayer"
   @close="$emit('close')")
   template(v-slot:actions)
@@ -19,7 +20,7 @@ import videoEditor from './video_editor'
 export default {
   name: 'wsCompositionEditor',
   components: {videoEditor},
-  props: ['value', 'sidPlayer'],
+  props: ['value', 'sidPlayer', 'options'],
   data () {
     return {
       content: null,

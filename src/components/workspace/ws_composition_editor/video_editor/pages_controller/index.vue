@@ -5,17 +5,18 @@
       maxWidth: 600+'px',
     }`
     ).row.full-width
-    q-tabs(
-      :value="storeEditor.pageId" @input="storeEditor.pageId = $event"
-      dense no-caps color="white"
-      active-color="green"
-      :style=`{}`
-      ).full-width
-      q-tab(
-        v-for="(p,pi) in storeEditor.pages" :key="p.id"
-        :name="p.id" :label="p.name"
+    .col
+      q-tabs(
+        :value="storeEditor.pageId" @input="storeEditor.pageId = $event"
         dense no-caps color="white"
-        :style=`{color: 'rgb(180,180,180)'}`)
+        active-color="green"
+        :style=`{}`
+        ).full-width
+        q-tab(
+          v-for="(p,pi) in storeEditor.pages" :key="p.id"
+          :name="p.id" :label="p.name"
+          dense no-caps color="white"
+          :style=`{color: 'rgb(180,180,180)'}`)
 </template>
 
 <script>

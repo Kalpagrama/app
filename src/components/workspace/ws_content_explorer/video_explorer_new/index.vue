@@ -4,7 +4,7 @@ div(
     position: 'relative',
     minWidth: pageFullscreen ? $q.screen.width+'px' : pageMinWidth+'px',
   }`
-  ).column.full-width
+  ).column.full-width.b-50
   //- close btn
   q-btn(
     @click="$emit('close')"
@@ -45,7 +45,8 @@ div(
         :style=`{maxWidth: '600px', overflow: 'hidden'}`)
   //- footer
   pages-controller(
-    v-show="!pageFullscreen")
+    v-show="!pageFullscreen"
+    @close="$emit('close')")
 </template>
 
 <script>

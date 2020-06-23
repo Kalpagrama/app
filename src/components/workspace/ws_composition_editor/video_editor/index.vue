@@ -15,7 +15,7 @@ div(
     :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
   //- header
   div(
-    v-show="!pageFullscreen"
+    v-show="!options.isPreview && !pageFullscreen"
     :style=`{}`).row.full-width.b-60
     q-input(
       v-model="composition.name"
@@ -46,7 +46,9 @@ div(
   //-     position: 'relative', overflow: 'hidden',
   //-     height: pageHeight+'px',
   //-   }`).row.full-width.justify-center
-  div(:style=`{position: 'relative', maxHeight: sidPlayerReady ? '100%' : pageHeight+'px',}`).col.full-width
+  div(
+    v-show="!options.isPreview"
+    :style=`{position: 'relative', maxHeight: sidPlayerReady ? '100%' : pageHeight+'px',}`).col.full-width
     div(v-if="sidPlayerReady ? true : storePlayer && storePlayer.loadeddata").row.fit.justify-center
       page-details(
         v-if="pageId === 'details'"
@@ -59,6 +61,8 @@ div(
         :content="content")
   pages-controller(
     v-if="pageHeight > 40"
+    v-show="!options.isPreview"
+    @close="$emit('close')"
     :style=`{opacity: layerEditing ? 0 : 1}`)
 </template>
 
@@ -83,7 +87,15 @@ export default {
     sid: {type: String, default () { return 'wce' }},
     composition: {type: Object},
     content: {type: Object},
-    sidPlayerReady: {type: Object}
+    sidPlayerReady: {type: Object},
+    options: {
+      type: Object,
+      default () {
+        return {
+          isPreview: false,
+        }
+      }
+    },
   },
   data () {
     return {
