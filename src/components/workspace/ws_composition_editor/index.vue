@@ -4,9 +4,11 @@ component(
   :is="component[content.type]"
   :composition="value"
   :content="content"
-  :storePlayerRaw="storePlayer")
+  :sidPlayerReady="sidPlayer"
+  @close="$emit('close')")
   template(v-slot:actions)
     slot(name="actions")
+//- .column.fit.bg-blue
 </template>
 
 <script>
@@ -17,7 +19,7 @@ import videoEditor from './video_editor'
 export default {
   name: 'wsCompositionEditor',
   components: {videoEditor},
-  props: ['value', 'storePlayer'],
+  props: ['value', 'sidPlayer'],
   data () {
     return {
       content: null,

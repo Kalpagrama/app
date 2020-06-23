@@ -37,7 +37,7 @@ div(:style=`{position: 'relative'}`).column.fit
                   layer-editor(
                     @delete="layerDelete(l)"
                     @createNode="layersSelectedCreateNode([l.id])"
-                    :layer="l")
+                    :layer="l" :layerIndex="li")
                 //- right: drag
                 div(
                   v-if="!storeEditor.layerEditing"
@@ -49,7 +49,7 @@ div(:style=`{position: 'relative'}`).column.fit
             div(
               v-if="!storeEditor.layerEditing"
               :style=`{}`).row.full-width.justify-center
-              div(:style=`{maxWidth: '600px'}`).row.full-width
+              div(:style=`{maxWidth: '680px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
                 q-btn(
                   @click="layerAdd()"
                   flat color="green" icon="add"
@@ -76,7 +76,7 @@ div(:style=`{position: 'relative'}`).column.fit
     v-if="!storeEditor.layerEditing"
     :style=`{}`).row.full-width.justify-center
     div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
-      .row.full-width.q-py-sm
+      div(v-if="false").row.full-width.q-py-sm
         q-input(
           v-model="composition.name"
           filled dark color="white"

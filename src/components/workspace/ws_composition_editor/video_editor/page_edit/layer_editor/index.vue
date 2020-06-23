@@ -37,7 +37,7 @@ div(
           :color="storeEditor.layerEditing === layer.id ? 'green' : 'grey-6'"
           :icon="storeEditor.layerEditing === layer.id ? 'check' : 'edit'")
     layer-progress-mini(
-      v-if="storeEditor.layerEditing !== layer.id"
+      v-if="layerProgressMiniShow"
       :layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
   //- footer
   div(v-if="storeEditor.layerEditing === layer.id").row.full-width.q-pa-xs
@@ -57,7 +57,7 @@ import layerProgressMini from './layer_progress_mini'
 export default {
   name: 'layerEditor',
   components: {layerFrames, layerActions, layerProgress, layerProgressMini},
-  props: ['layer'],
+  props: ['layer', 'layerIndex'],
   inject: ['sidEditor', 'sidPlayer'],
   data () {
     return {
@@ -86,6 +86,14 @@ export default {
     layerDuration () {
       return this.layerEnd - this.layerStart
     },
+    layerProgressMiniShow () {
+      if (this.storeEditor.compositionPlaying) {
+        return this.layerIndex === this.storeEditor.layerActive
+      }
+      else {
+        return this.storeEditor.layerPlaying === this.layer.id && !this.storeEditor.layerEditing
+      }
+    },
     storeLayerEditor () {
       return {
         layerDuration: this.layerDuration,
@@ -105,6 +113,7 @@ export default {
         if (to === this.layer.id) {
           // alert('START WATCH: ' + this.layer.id)
           this.watcherCurrentTime = this.$watch('storePlayer.currentTime', (to, from) => {
+            if (this.storeEditor.compositionPlaying) return
             this.$log('storePlayer.currentTime TO', to)
             if (to > this.layerEnd || to < this.layerStart) {
               this.storePlayer.setCurrentTime(this.layerStart)
@@ -131,12 +140,14 @@ export default {
     },
     layerNameFocused (e) {
       // this.$log('layerNameFocused', e)
+      this.storeEditor.compositionPlaying = false
       this.storeEditor.layerPlaying = this.layer.id
       this.storePlayer.setCurrentTime(this.layerStart)
       this.storePlayer.player.play()
     },
     layerNameBlurred (e) {
       // this.$log('layerNameBlurred', e)
+      // this.storeEditor.compositionPlaying = true
     },
     layerEditingToggle (e) {
       this.$log('layerEditingToggle', e)

@@ -1,6 +1,5 @@
 <template lang="pug">
 div(
-  v-if="storeEditor.layerPlaying === layer.id"
   :style=`{
     position: 'absolute', zIndex: 1000, bottom: '0px', left: '0px', width: 'calc(100% - 0px)',
     pointerEvents: 'none',

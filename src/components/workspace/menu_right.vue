@@ -15,8 +15,7 @@ div(
   }`
   ).column.full-width.q-pt-sm
   div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
-    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Workspace
-    //- span.text-white inDrawer {{inDrawer}}
+    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Мастерская
   .col.full-width.scroll
     .row.full-width.items-start
       router-link(

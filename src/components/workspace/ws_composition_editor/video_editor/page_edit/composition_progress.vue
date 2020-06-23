@@ -37,10 +37,6 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           width: '3px',
           pointerEvents: 'none',
         }`).row.bg-green
-      //- kalpa-debug(
-      //-   :options=`{layerActiveStart,layerActiveEnd}`
-      //-   :style=`{position: 'absolute', top: 0, zIndex: 9999, pointerEvents: 'none'}`)
-        //- kalpa-debug(:options=`{layersStats,width}`)
       //- layers stats
       div(
         v-for="(l,li) in layersStats" :key="li"
@@ -73,7 +69,7 @@ export default {
   props: ['storeEditor', 'storePlayer', 'composition'],
   data () {
     return {
-      layerActive: 0,
+      // layerActive: 0,
       widthRaw: null,
       currentTimeStop: false
     }
@@ -105,6 +101,9 @@ export default {
         acc.push(prev + (layerDuration / this.layersDuration))
         return acc
       }, [])
+    },
+    layerActive () {
+      return this.storeEditor.layerActive
     },
     layerActiveStart () {
       return this.composition.layers[this.layerActive].figuresAbsolute[0].t
@@ -150,11 +149,11 @@ export default {
       this.$log('compositionPlayPause')
       if (this.storePlayer.playing) {
         this.storePlayer.player.pause()
-        this.compositionPlaying = false
+        this.storeEditor.compositionPlaying = false
       }
       else {
         this.storePlayer.player.play()
-        this.compositionPlaying = true
+        this.storeEditor.compositionPlaying = true
       }
     },
     layerPrev () {
@@ -182,7 +181,7 @@ export default {
     },
     layerActiveSet (index) {
       this.$log('layerActiveSet', index)
-      this.layerActive = index
+      this.storeEditor.layerActive = index
       this.storePlayer.setCurrentTime(this.layerActiveStart)
     },
     async progressClick (e) {
@@ -203,7 +202,7 @@ export default {
       let t = layerStart + ((p - layerPercentStart) * this.layersDuration)
       this.$log('t', t)
       // set
-      this.layerActive = i
+      this.layerActiveSet(i)
       this.currentTimeStop = true
       this.storePlayer.setCurrentTime(t)
       await this.$wait(200)

@@ -2,46 +2,52 @@
 div(
   :style=`{
     position: 'relative',
-    minWidth: pageFullscreen ? $q.screen.width+'px' : pageMinWidth+'px',
+    //- minWidth: pageFullscreen ? $q.screen.width+'px' : pageMinWidth+'px',
     borderRadius: '10px', overflow: 'hidden',
   }`
   ).column.full-width.b-50
+  q-resize-observer(@resize="height = $event.height")
+  //- close btn
   q-btn(
+    v-if="false"
+    @click="$emit('close')"
     round flat color="white" icon="keyboard_arrow_left"
     :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
-  .col.full-width
+  //- header
+  div(
+    v-show="!pageFullscreen"
+    :style=`{}`).row.full-width.b-60
+    q-input(
+      v-model="composition.name"
+      filled dark color="grey-2"
+      :input-style=`{fontWeight: 'bold'}`
+      :style=`{fontWeight: 'bold'}`
+      @focus="pageHeight = 0"
+      @blur="pageHeight = $q.screen.height * 0.5"
+      ).full-width.text-bold
+      template(v-slot:prepend)
+        q-btn(
+          @click="$emit('close')"
+          round flat color="white" icon="keyboard_arrow_left")
+  //- body
+  div(v-if="!sidPlayerReady").col.full-width
     ws-content-player(
       @ready="storePlayerReady"
       :sid="sidPlayer"
       :content="content")
       template(v-slot:controlsTools)
-        q-btn(
-          @click="pageFullscreen = !pageFullscreen"
-          round flat dense color="white"
-          :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
-      //- template(v-slot:controls)
-      //-   div(
-      //-     v-if="false"
-      //-     :style=`{}`).row.full-width.q-pt-xs
-      //-     q-input(
-      //-       v-model="composition.name"
-      //-       filled dense dark color="white"
-      //-       label="What do you see?"
-      //-       :style=`{
-      //-         background: 'rgba(60,60,60,0.5)',
-      //-       }`).full-width
-      //-       template(v-slot:prepend)
-      //-         kalpa-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="20" :height="20")
-      //-       template(v-slot:append)
-      //-         q-btn(
-      //-           v-if="composition.name.length > 0"
-      //-           @click="toggleEdit"
-      //-           round flat dense color="grey-5"
-      //-           :icon="pageFullscreen ? 'check' : 'keyboard_arrow_down'")
+        //- q-btn(
+        //-   @click="pageFullscreen = !pageFullscreen"
+        //-   round flat dense color="white"
+        //-   :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
   //- editor tools
-  div(
-    :style=`{position: 'relative', overflow: 'hidden', height: pageHeight+'px'}`).row.full-width.justify-center
-    div(v-if="storePlayer && storePlayer.loadeddata").row.fit.justify-center
+  //- div(
+  //-   :style=`{
+  //-     position: 'relative', overflow: 'hidden',
+  //-     height: pageHeight+'px',
+  //-   }`).row.full-width.justify-center
+  div(:style=`{position: 'relative', maxHeight: sidPlayerReady ? '100%' : pageHeight+'px',}`).col.full-width
+    div(v-if="sidPlayerReady ? true : storePlayer && storePlayer.loadeddata").row.fit.justify-center
       page-details(
         v-if="pageId === 'details'"
         :composition="composition"
@@ -51,53 +57,6 @@ div(
         v-if="pageId === 'edit'"
         :composition="composition"
         :content="content")
-    //- div(:style=`{position: 'relative', maxWidth: '600px', overflow: 'hidden'}`).column.fit
-    //-   h1.text-white details
-    //- div(:style=`{position: 'absolute', maxWidth: '600px', overflow: 'hidden'}`).column.fit
-    //-   .col.full-width.scorll
-    //-     div(v-for="(l,li) in 10" :key="li").row.full-width
-    //-   .row.full-width.bg
-    //-     .col
-    //-     q-btn(round flat dense color="green" icon="check" @click="pageFullscreen = true")
-    //- page-details(
-    //-   v-if="state.pageId === 'details'"
-    //-   :composition="composition"
-    //-   :content="content"
-    //-   :style=`{maxWidth: 600+'px'}`)
-    //- page-editor(
-    //-   v-if="stateEditor.pageId === 'editor'"
-    //-   @createNode="$emit('createNode')"
-    //-   @close="$emit('close')"
-    //-   @delete="$emit('delete')"
-    //-   :composition="composition"
-    //-   :options="options"
-    //-   :style=`{maxWidth: stateEditor.pageWidth+'px'}`)
-    //- //- all components
-    //- div(
-    //-   v-if="!options.onlyProgress"
-    //-   :style=`{paddingTop: '24px'}`).row.fit.justify-center
-    //-   editor(
-    //-     v-if="stateExplorer.player"
-    //-     @createNode="$emit('createNode')"
-    //-     @close="$emit('close')"
-    //-     @delete="$emit('delete')"
-    //-     :options="options"
-    //-     :stateExplorer="stateExplorer"
-    //-     :style=`{maxWidth: '600px'}`)
-    //- //- only progress
-    //- div(
-    //-   v-if="options.onlyProgress"
-    //-   :style=`{
-    //-     position: 'relative',
-    //-     minHeight: '40px',
-    //-   }`
-    //-   ).row.full-width
-    //-   composition-progress(
-    //-     :value="composition" :active="false"
-    //-     :stateExplorer="stateExplorer"
-    //-     ).fit
-    //-     template(v-slot:actions)
-    //-       slot(name="actions")
   pages-controller(
     v-if="pageHeight > 40"
     :style=`{opacity: layerEditing ? 0 : 1}`)
@@ -124,10 +83,11 @@ export default {
     sid: {type: String, default () { return 'wce' }},
     composition: {type: Object},
     content: {type: Object},
-    storePlayerRaw: {type: Object}
+    sidPlayerReady: {type: Object}
   },
   data () {
     return {
+      height: 0,
       pageHeight: 0,
       pageFullscreen: false,
       pageId: 'edit',
@@ -137,7 +97,8 @@ export default {
       ],
       compositionName: '',
       storePlayer: null,
-      compositionPlaying: false,
+      compositionPlaying: true,
+      layerActive: 0,
       layerPlaying: null,
       layerEditing: null,
     }
@@ -150,29 +111,31 @@ export default {
   },
   computed: {
     sidPlayer () {
-      return `${this.sid}-storePlayer`
-    },
-    storeApp () {
-      return window.stores.storeApp
+      if (this.sidPlayerReady) return this.sidPlayerReady
+      else return `${this.sid}-storePlayer`
     },
     pageMinWidth () {
-      if (this.$q.screen.width > 800) return 800
-      else return this.$q.screen.width
+      // if (this.$q.screen.width > 800) return 800
+      // else return this.$q.screen.width
+      // if (this.$el.clientWidth > 800) return 800
+      // else return this.$el.clientWidth
+      return this.$q.screen.width
     },
   },
   watch: {
     pageId: {
       immediate: true,
       handler (to, from) {
-        if (to === 'details') this.pageHeight = this.$q.screen.height * 0.5
-        else if (to === 'edit') this.pageHeight = this.$q.screen.height * 0.5
+        if (to === 'details') this.pageHeight = this.height * 0.5
+        else if (to === 'edit') this.pageHeight = this.height * 0.5
         else this.pageHeight = 0
       }
     },
     pageFullscreen: {
+      immediate: false,
       handler (to, from) {
         if (to) this.pageHeight = 0
-        else this.pageHeight = this.$q.screen.height * 0.5
+        else this.pageHeight = this.height * 0.5
       }
     },
     'storePlayer.playing': {
@@ -224,9 +187,13 @@ export default {
     this.$log('created')
     this.$log('created window.stores', window.stores)
     window.stores[this.sid] = this
+    if (this.sidPlayerReady) {
+      this.storePlayerReady()
+    }
   },
   async mounted () {
-    this.$log('mounted')
+    this.$log('mounted', this.$el.clientHeight)
+    this.pageHeight = this.height * 0.5
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

@@ -1,5 +1,10 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
+  q-drawer(v-model="showMenuRight" side="right")
+    menu-right(
+      :stateWorkspace="stateWorkspace"
+      :inDrawer="true"
+      :style=`{}`).b-50
   //- menu right
   div(
     v-if="$q.screen.width > 1260"
@@ -15,7 +20,7 @@ div(:style=`{position: 'relative'}`).column.fit
       }`).b-50
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
-      v-if="!$route.params.id && $q.screen.width < 1260 && !$store.state.ui.appShowMenu"
+      v-if="!$route.params.id && $q.screen.width < 1260 && !$store.state.ui.appShowMenu && !showMenuRight"
       :style=`{
         position: 'absolute', zIndex: 9999,
         bottom: '0px',
@@ -26,7 +31,7 @@ div(:style=`{position: 'relative'}`).column.fit
       ).row.full-width.q-pa-sm.b-50
       q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
       .col
-      q-btn(round flat dense color="white" icon="menu_open")
+      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = true")
   .col.full-width
     router-view(
       v-if="showView"
@@ -48,16 +53,17 @@ export default {
       item: null,
       showMenuRight: false,
       pages: [
-        {id: 'content-list', name: 'Contents'},
-        {id: 'composition-list', name: 'Compositions'},
-        {id: 'node-list', name: 'Nodes'},
-        {id: 'chain-list', name: 'Chains'},
-        {id: 'sphere', name: 'Spheres'},
-        {id: 'ws-settings', name: 'Settings'}
+        {id: 'content-list', name: 'Контент'},
+        {id: 'composition-list', name: 'Образы'},
+        {id: 'node-list', name: 'Ядра'},
+        {id: 'chain-list', name: 'Цепочки'},
+        {id: 'sphere', name: 'Сферы'},
+        {id: 'ws-settings', name: 'Настройки'}
       ],
       pagesHot: [
-        {id: 'content-list', name: 'Content'},
-        {id: 'node-list', name: 'Nodes'},
+        {id: 'content-list', name: 'Контент'},
+        {id: 'composition-list', name: 'Образы'},
+        {id: 'node-list', name: 'Ядра'},
       ]
     }
   },

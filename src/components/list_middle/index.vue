@@ -44,6 +44,7 @@ export default {
     items: {type: Array, default () { return [] }},
     itemsBan: {type: Array, default () { return [] }},
     scrollWrapper: {type: Object},
+    height: {type: Number},
     options: {
       type: Object,
       default () {
@@ -72,8 +73,8 @@ export default {
       }
     },
     clientHeight () {
-      return this.$q.screen.height
-      // return this.$el.clientHeight
+      // return this.$q.screen.height
+      return this.$el.clientHeight
     }
   },
   watch: {
