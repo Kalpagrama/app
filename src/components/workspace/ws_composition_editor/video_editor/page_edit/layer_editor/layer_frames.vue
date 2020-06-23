@@ -101,7 +101,7 @@
 <script>
 export default {
   name: 'layerEditor-layerFrames',
-  props: ['storePlayer', 'stateLayerEditor', 'layer'],
+  props: ['storePlayer', 'storeLayerEditor', 'layer'],
   data () {
     return {
       width: 0,
@@ -143,12 +143,12 @@ export default {
     },
   },
   watch: {
-    // 'stateLayerEditor.need_framesLayerCenter': {
+    // 'storeLayerEditor.need_framesLayerCenter': {
     //   handler (to, from) {
     //     if (to) {
-    //       this.$log('stateLayerEditor.need_framesLayerCenter TO', to)
+    //       this.$log('storeLayerEditor.need_framesLayerCenter TO', to)
     //       this.framesLayerCenter()
-    //       this.stateLayerEditor.set('need_framesLayerCenter', false)
+    //       this.storeLayerEditor.set('need_framesLayerCenter', false)
     //     }
     //   }
     // }
@@ -161,13 +161,13 @@ export default {
       if (t > this.storePlayer.duration || t < 0) return
       // this.$log('t', t)
       if (index === 0) {
-        if (t >= this.stateLayerEditor.layerEnd) {
+        if (t >= this.storeLayerEditor.layerEnd) {
           this.pointDraggingError = true
           return
         }
       }
       if (index === 1) {
-        if (t <= this.stateLayerEditor.layerStart) {
+        if (t <= this.storeLayerEditor.layerStart) {
           this.pointDraggingError = true
           return
         }
@@ -200,7 +200,7 @@ export default {
       let t = e.offsetX / this.framesWidth * this.storePlayer.duration
       this.$log('t', t)
       this.storePlayer.setCurrentTime(t)
-      // if (t < this.stateLayerEditor.layerStart || t > this.stateLayerEditor.layerEnd) {
+      // if (t < this.storeLayerEditor.layerStart || t > this.storeLayerEditor.layerEnd) {
       //   this.stateExplorer.set('mode', 'content')
       // }
     },

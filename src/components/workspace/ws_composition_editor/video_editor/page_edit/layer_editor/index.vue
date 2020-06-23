@@ -4,33 +4,14 @@ div(
     'b-60': true,
   }`
   :style=`{
-    border: storeEditor.layerEditing === layer.id ? 'none' : storeEditor.layerPlaying === layer.id ? '2px solid green' : 'none',
+    //- border: storeEditor.layerEditing === layer.id ? 'none' : storeEditor.layerPlaying === layer.id ? '2px solid green' : 'none',
     borderRadius: '10px',
+    overflow: 'hidden',
   }`).row.full-width
   div(v-if="storeEditor.layerEditing === layer.id").row.full-width
-    layer-frames(:storePlayer="storePlayer" :stateLayerEditor="stateLayerEditor" :layer="layer")
-    //- layer-progress
-    div(:style=`{position: 'relative',}`).row.full-width.q-px-sm
-      //- tools
-      div(:style=`{}`).row.full-width
-        q-btn(round flat dense color="white" icon="play_arrow")
-        .col
-        q-btn(round flat dense color="white" icon="refresh")
-      //- bar
-      div(:style=`{position: 'relative'}`).row.full-width.q-py-xs
-        div(
-          :style=`{
-            position: 'relative',
-            height: '40px', borderRadius: '10px', overflow: 'hidden'
-          }`).row.full-width.b-70
-        div(
-          :style=`{
-            position: 'absolute', zIndex: 1000,
-            left: '33%',
-            top: '0px',
-            height: 'calc(100%)',
-            width: '4px', borderRadius: '2px',
-          }`).row.bg-green
+    layer-frames(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+    .row.full-width.q-px-sm
+      layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
     //- layer-actions
     div.row.full-width
       div(
@@ -49,6 +30,7 @@ div(
   //- name editor
   div(
     :style=`{
+      position: 'relative',
     }`).row.full-width.justify-center
     q-input(
       :value="layerName"
@@ -66,19 +48,23 @@ div(
           flat dense
           :color="storeEditor.layerEditing === layer.id ? 'green' : 'grey-6'"
           :icon="storeEditor.layerEditing === layer.id ? 'check' : 'edit'")
+    layer-progress-mini(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
 </template>
 
 <script>
 import layerFrames from './layer_frames'
+import layerProgress from './layer_progress'
+import layerProgressMini from './layer_progress_mini'
 
 export default {
   name: 'layerEditor',
-  components: {layerFrames},
+  components: {layerFrames, layerProgress, layerProgressMini},
   props: ['layer'],
   inject: ['sidEditor', 'sidPlayer'],
   data () {
     return {
-      watcherCurrentTime: null
+      watcherCurrentTime: null,
+      progressPercentRaw: null
     }
   },
   computed: {
@@ -98,8 +84,12 @@ export default {
     layerEnd () {
       return this.layer.figuresAbsolute[1].t
     },
-    stateLayerEditor () {
+    layerDuration () {
+      return this.layerEnd - this.layerStart
+    },
+    storeLayerEditor () {
       return {
+        layerDuration: this.layerDuration,
         layerStart: this.layerStart,
         layerEnd: this.layerEnd
       }

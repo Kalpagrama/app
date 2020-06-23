@@ -25,8 +25,7 @@ div(:style=`{position: 'relative'}`).column.fit
                 :style=`{}`
                 ).row.full-width.items-start.content-start.q-mb-xs
                 //- left: select
-                div(
-                  :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
+                div(:style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
                   q-checkbox(
                     v-if="!storeEditor.layerEditing"
                     v-model="layersSelected" :val="l.id"
@@ -34,22 +33,20 @@ div(:style=`{position: 'relative'}`).column.fit
                     :style=`{opacity: layersSelected.includes(l.id) ? 1 : 0.6}`)
                 //- middle: input name, layer editor...
                 .col.full-height
-                  layer-editor(
-                    :layer="l")
+                  layer-editor(:layer="l")
                 //- right: drag
-                div(
-                  :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
-                  //- !storeEditor.layerEditing
+                div(:style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
                   q-btn(
-                    v-if="true"
+                    v-if="!storeEditor.layerEditing"
                     round flat dense color="grey-6" icon="drag_indicator").layer-drag-handle
+                    kalpa-menu-popup(:actions="layerActions" :value="l")
             //- layer ADD
             div(
               v-if="!storeEditor.layerEditing"
               :style=`{}`).row.full-width.justify-center
               div(:style=`{maxWidth: '600px'}`).row.full-width
                 q-btn(
-                  @click="storeEditor.layerAdd()"
+                  @click="layerAdd()"
                   flat color="green" icon="add"
                   :style=`{height: '40px'}`
                   ).full-width.b-60
@@ -82,9 +79,48 @@ export default {
     storePlayer () {
       return window.stores[this.sidPlayer]
     },
+    layerActions () {
+      let res = {
+        edit: {
+          name: 'Edit',
+          fn: (layer) => this.layerEdit(layer)
+        },
+        // copy: {
+        //   name: 'Copy',
+        //   fn: (layer) => this.layerCopy(layer)
+        // },
+      }
+      if (this.composition.layers.length > 1) {
+        res.delete = {
+          name: 'Delete',
+          fn: (layer) => this.layerDelete(layer)
+        }
+      }
+      return res
+    }
+  },
+  methods: {
+    layerEdit (layer) {
+      this.$log('layerEdit', layer)
+      this.storeEditor.layerPlaying = layer.id
+      this.storeEditor.layerEditing = layer.id
+    },
+    layerDelete (layer) {
+      this.$log('layerDelete', layer)
+      if (this.composition.layers.length === 1) return
+      if (!confirm('Delete layer ?')) return
+      let i = this.composition.layers.findIndex(l => l.id === layer.id)
+      this.$log('i', i)
+      if (i >= 0) this.$delete(this.composition.layers, i)
+    },
+    layerAdd () {
+      this.$log('layerAdd')
+      let id = this.storeEditor.layerAdd()
+      this.layerEdit({id})
+    }
   },
   mounted () {
     this.$log('mounted')
-  }
+  },
 }
 </script>
