@@ -11,9 +11,7 @@ div(
         v-for="(i,ii) in node.items" :key="ii"
         :value="i"
         :options=`{
-          usePlayer: true,
-          useEditor: false,
-          onlyProgress: false,
+          isPreview: true,
         }`
         :style=`{
           height: 400+'px',

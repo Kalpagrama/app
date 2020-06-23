@@ -1,111 +1,215 @@
 <template lang="pug">
 div(
-  :style=`{position: 'relative'}`
+  :style=`{
+    position: 'relative',
+    //- minWidth: pageFullscreen ? $q.screen.width+'px' : pageMinWidth+'px',
+    borderRadius: '10px', overflow: 'hidden',
+  }`
   ).column.full-width.b-50
-  //- video wrapper
+  q-resize-observer(@resize="height = $event.height")
+  //- close btn
+  q-btn(
+    v-if="false"
+    @click="$emit('close')"
+    round flat color="white" icon="keyboard_arrow_left"
+    :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
+  //- header
   div(
-    v-if="options.usePlayer"
-    ).col.full-width
-    ws-content-video-player(:stateExplorer="stateExplorer")
+    v-show="!options.isPreview && !pageFullscreen"
+    :style=`{}`).row.full-width.b-60
+    q-input(
+      v-model="composition.name"
+      filled dark color="grey-2"
+      :input-style=`{fontWeight: 'bold'}`
+      :style=`{fontWeight: 'bold'}`
+      @focus="pageHeight = 0"
+      @blur="pageHeight = $q.screen.height * 0.5"
+      ).full-width.text-bold
+      template(v-slot:prepend)
+        q-btn(
+          @click="$emit('close')"
+          round flat color="white" icon="keyboard_arrow_left")
+  //- body
+  div(v-if="!sidPlayerReady").col.full-width
+    ws-content-player(
+      @ready="storePlayerReady"
+      :sid="sidPlayer"
+      :content="content")
+      template(v-slot:controlsTools)
+        //- q-btn(
+        //-   @click="pageFullscreen = !pageFullscreen"
+        //-   round flat dense color="white"
+        //-   :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
   //- editor tools
-  div(:style=`{position: 'relative'}`).col.full-width
-    div(
-      v-if="!options.onlyProgress"
-      :style=`{paddingTop: '24px'}`).row.fit.justify-center
-      editor(
-        v-if="stateExplorer.player"
-        @createNode="$emit('createNode')"
-        @close="$emit('close')"
-        @delete="$emit('delete')"
-        :options="options"
-        :stateExplorer="stateExplorer"
-        :style=`{maxWidth: '600px'}`)
-    div(
-      v-if="options.onlyProgress"
-      :style=`{
-        position: 'relative',
-        minHeight: '40px',
-      }`
-      ).row.full-width
-      composition-progress(
-        :value="composition" :active="false"
-        :stateExplorer="stateExplorer"
-        ).fit
-        template(v-slot:actions)
-          slot(name="actions")
+  //- div(
+  //-   :style=`{
+  //-     position: 'relative', overflow: 'hidden',
+  //-     height: pageHeight+'px',
+  //-   }`).row.full-width.justify-center
+  div(
+    v-show="!options.isPreview"
+    :style=`{position: 'relative', maxHeight: sidPlayerReady ? '100%' : pageHeight+'px',}`).col.full-width
+    div(v-if="sidPlayerReady ? true : storePlayer && storePlayer.loadeddata").row.fit.justify-center
+      page-details(
+        v-if="pageId === 'details'"
+        :composition="composition"
+        :content="content"
+        :style=`{maxWidth: '600px', overflow: 'hidden'}`)
+      page-edit(
+        v-if="pageId === 'edit'"
+        :composition="composition"
+        :content="content")
+  pages-controller(
+    v-if="pageHeight > 40"
+    v-show="!options.isPreview"
+    @close="$emit('close')"
+    :style=`{opacity: layerEditing ? 0 : 1}`)
 </template>
 
 <script>
-import editor from './editor'
+import pageDetails from './page_details'
+// import pageEditor from './page_editor'
+import pageEdit from './page_edit'
+import pagesController from './pages_controller'
+import compositionController from './composition_controller'
 import compositionProgress from './composition_progress'
 
 export default {
   name: 'videoEditor',
+  components: {
+    pageDetails,
+    pageEdit,
+    pagesController,
+    compositionController,
+    compositionProgress
+  },
   props: {
-    stateExplorerReady: {type: Object},
+    sid: {type: String, default () { return 'wce' }},
     composition: {type: Object},
-    contentKalpa: {type: Object},
+    content: {type: Object},
+    sidPlayerReady: {type: Object},
     options: {
       type: Object,
       default () {
         return {
-          usePlayer: true,
-          useEditor: true,
-          onlyProgress: false,
+          isPreview: false,
         }
       }
-    }
+    },
   },
-  components: {editor, compositionProgress},
   data () {
     return {
-      // player
-      player: null,
-      currentTime: 0,
-      duration: 0,
-      loadeddata: false,
-      playing: false,
-      // composition
-      compositionPlaying: false,
-      // layers
-      layerActive: null,
+      height: 0,
+      pageHeight: 0,
+      pageFullscreen: false,
+      pageId: 'edit',
+      pages: [
+        {id: 'details', name: 'Details'},
+        {id: 'edit', name: 'Edit'},
+      ],
+      compositionName: '',
+      storePlayer: null,
+      compositionPlaying: true,
+      layerActive: 0,
+      layerPlaying: null,
+      layerEditing: null,
+    }
+  },
+  provide () {
+    return {
+      sidEditor: this.sid,
+      sidPlayer: this.sidPlayer
     }
   },
   computed: {
-    videoHeight () {
-      return this.$q.screen.height * 0.4
+    sidPlayer () {
+      if (this.sidPlayerReady) return this.sidPlayerReady
+      else return `${this.sid}-storePlayer`
     },
-    stateExplorer () {
-      if (this.stateExplorerReady) return this.stateExplorerReady
-      else {
-        return {
-          // layout
-          pageContentWidth: 680,
-          // content
-          content: this.contentKalpa,
-          contentWs: this.composition,
-          // player
-          player: this.player,
-          duration: this.duration,
-          currentTime: this.currentTime,
-          loadeddata: this.loadeddata,
-          playing: this.playing,
-          // composition
-          composition: this.composition,
-          compositionPlaying: this.compositionPlaying,
-          // layers
-          layerActive: this.layerActive,
-          // layerActiveStart: this.layerActiveStart,
-          // layerActiveEnd: this.layerActiveEnd,
-          set: (key, val) => {
-            this[key] = val
-          }
-        }
+    pageMinWidth () {
+      // if (this.$q.screen.width > 800) return 800
+      // else return this.$q.screen.width
+      // if (this.$el.clientWidth > 800) return 800
+      // else return this.$el.clientWidth
+      return this.$q.screen.width
+    },
+  },
+  watch: {
+    pageId: {
+      immediate: true,
+      handler (to, from) {
+        if (to === 'details') this.pageHeight = this.height * 0.5
+        else if (to === 'edit') this.pageHeight = this.height * 0.5
+        else this.pageHeight = 0
       }
+    },
+    pageFullscreen: {
+      immediate: false,
+      handler (to, from) {
+        if (to) this.pageHeight = 0
+        else this.pageHeight = this.height * 0.5
+      }
+    },
+    'storePlayer.playing': {
+      handler (to, from) {
+        this.$log('storePlayer.playing TO', to)
+      }
+    },
+  },
+  methods: {
+    storePlayerReady () {
+      this.$log('storePlayerReady')
+      this.storePlayer = window.stores[this.sidPlayer]
+    },
+    toggleEdit () {
+      this.$log('toggleEdit')
+      if (this.pageHeight === 500) {
+        this.pageHeight = 0
+      }
+      else {
+        this.pageHeight = 500
+        this.pageId = 'edit'
+        this.pageFullscreen = false
+      }
+    },
+    layerAdd () {
+      this.$log('layerAdd')
+      let layerIndex = this.composition.layers.length
+      let layerId = Date.now().toString()
+      let layerColor = this.$randomColor(layerId)
+      let layerStart = this.storePlayer.currentTime
+      let layerEnd = layerStart + 10 > this.storePlayer.duration ? this.storePlayer.duration : layerStart + 10
+      if (layerEnd > this.storePlayer.duration) alert('layerEnd > this.stateEditor.duration')
+      let layerInput = {
+        id: layerId,
+        color: layerColor,
+        contentOid: this.content.oid,
+        figuresAbsolute: [
+          {t: layerStart, points: []},
+          {t: layerEnd, points: []},
+        ],
+        figuresRelative: [],
+        spheres: []
+      }
+      this.$set(this.composition.layers, layerIndex, layerInput)
+      return layerId
+    },
+  },
+  created () {
+    this.$log('created')
+    this.$log('created window.stores', window.stores)
+    window.stores[this.sid] = this
+    if (this.sidPlayerReady) {
+      this.storePlayerReady()
     }
   },
-  mounted () {
-    this.$log('mounted')
+  async mounted () {
+    this.$log('mounted', this.$el.clientHeight)
+    this.pageHeight = this.height * 0.5
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    if (!module.hot) delete window.stores[this.sid]
   }
 }
 </script>

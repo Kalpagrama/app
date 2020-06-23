@@ -14,15 +14,15 @@ div(
     ).row.full-width
     layer-frames(
       :layer="layer"
-      :stateExplorer="stateExplorer"
+      :statePlayer="statePlayer"
       :stateLayerEditor="stateLayerEditor")
     layer-progress(
       :layer="layer"
-      :stateExplorer="stateExplorer"
+      :statePlayer="statePlayer"
       :stateLayerEditor="stateLayerEditor")
     layer-actions(
       :layer="layer"
-      :stateExplorer="stateExplorer"
+      :statePlayer="statePlayer"
       :stateLayerEditor="stateLayerEditor")
   //- name
   div(
@@ -43,10 +43,10 @@ div(
           ) {{ $time(layerStart) }}
       template(v-slot:append)
         q-btn(
-          @click="active = !active"
+          @click="stateEditor.set('layerEditing', stateEditor.layerEditing ? null : this.layer.id)"
           round flat dense
-          :color="active ? 'green' : 'grey-6'"
-          :icon="active ? 'check' : 'edit'")
+          :color="stateEditor.layerEditing === layer.id ? 'green' : 'grey-6'"
+          :icon="stateEditor.layerEditing === layer.id ? 'check' : 'edit'")
 </template>
 
 <script>
@@ -57,7 +57,8 @@ import layerActions from './layer_actions'
 export default {
   name: 'layerEditor',
   components: {layerFrames, layerProgress, layerActions},
-  props: ['stateExplorer', 'layer'],
+  props: ['layer'],
+  inject: ['stateEditor'],
   data () {
     return {
       active: false,
@@ -93,12 +94,20 @@ export default {
       }
     }
   },
+  watch: {
+    'statePlayer.currentTime': {
+      handler (to, from) {
+        // if ()
+        // this.$log('statePlayer.currentTime TO', to)
+      }
+    }
+  },
   methods: {
     nameInputFocused (e) {
       this.$log('nameInputFocused', e)
-      this.stateExplorer.set('currentTime', this.stateLayerEditor.layerStart)
-      this.stateExplorer.player.setCurrentTime(this.stateLayerEditor.layerStart)
-      this.stateExplorer.player.play()
+      this.statePlayer.set('currentTime', this.stateLayerEditor.layerStart)
+      this.statePlayer.player.setCurrentTime(this.stateLayerEditor.layerStart)
+      this.statePlayer.player.play()
     },
     nameInputBlurred (e) {
       this.$log('nameInputBlurred', e)

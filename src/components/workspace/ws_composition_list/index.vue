@@ -36,7 +36,7 @@ div(
       v-if="ctx === 'workspace'"
       :style=`{}`).row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold Compositions
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold Образы
     //- search
     div.row.full-width
       .col
@@ -45,7 +45,7 @@ div(
           ref="searchStringInput"
           filled dense dark color="grey-5"
           :autofocus="ctx === 'workpsace'"
-          placeholder="Find composition"
+          placeholder="Найти образ"
           @focus="searchStringFocused"
           @blur="searchStringBlurred"
           ).full-width

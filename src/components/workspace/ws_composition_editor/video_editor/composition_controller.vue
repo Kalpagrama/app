@@ -1,16 +1,16 @@
 <script>
 export default {
   name: 'compositionController',
-  props: ['stateExplorer'],
+  props: ['statePlayer'],
   data () {
     return {
     }
   },
   watch: {
-    'stateExplorer.currentTime': {
+    'statePlayer.currentTime': {
       immediate: true,
       handler (to, from) {
-        // this.$log('currentTime TO', to)
+        // this.$log('statePlayer.currentTime TO', to)
         // if (!this.active) return
         // if (!this.compositionPlaying) return
         // if (this.currentTimeStop) return

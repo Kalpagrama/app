@@ -1,19 +1,17 @@
 <template lang="pug">
 component(
-  v-if="value"
+  v-if="value && content"
   @close="$emit('close')"
   :is="component[value.contentType]"
   :ctx="ctx"
-  :content="value")
+  :content="content"
+  :value="value")
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+import videoExplorer from './video_explorer_new'
 
-import videoExplorer from './video_explorer'
-// import imageExplorer from './image_explorer'
-// import webExplorer from './web_explorer'
-
-// value is content ws
 export default {
   name: 'wsContentExplorer',
   components: {videoExplorer},
@@ -28,6 +26,7 @@ export default {
   },
   data () {
     return {
+      content: null,
       component: {
         VIDEO: 'video-explorer',
         IMAGE: 'image-explorer',
@@ -36,11 +35,10 @@ export default {
       }
     }
   },
-  watch: {
-  },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
     this.$log('value', this.value)
+    this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.contentOid)
   }
 }
 </script>

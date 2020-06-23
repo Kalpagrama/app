@@ -5,7 +5,7 @@
   width: 100%
 .video-explorer-fullscreen
   position: fixed
-  z-index: 10000
+  z-index: 999999
   top: 0
   left: 0
   right: 0
@@ -172,7 +172,7 @@ export default {
         this.$log('pageId TO', to)
         if (to === 'compositions') this.videoHeight = this.$q.screen.height * 0.4
         else if (to === 'info') this.videoHeight = this.$q.screen.height * 0.3
-        else if (to === 'spheres') this.videoHeight = 200
+        else if (to === 'spheres') this.videoHeight = this.$q.screen.height * 0.3
         else if (to === null) this.videoHeight = this.$q.screen.height - 60
       }
     }
@@ -181,6 +181,7 @@ export default {
     async compositionAddClick () {
       this.$log('compositionAddClick')
       let composition = await this.compositionAdd()
+      this.stateExplorer.set('pageId', 'compositions')
       this.stateExplorer.set('composition', composition)
       this.stateExplorer.set('compositionSelected', composition.id)
       this.stateExplorer.set('compositionEditing', composition.id)

@@ -14,5 +14,6 @@ export default {
   appShowMenu: false,
   appFullscreen: false,
   panelMaxWidth: 0,
-  wsShowMenu: true
+  wsShowMenu: true,
+  stores: {}
 }

@@ -41,7 +41,7 @@ div(
       v-if="ctx === 'workspace'"
       :style=`{}`).row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold Content
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold Контент
     //- search
     div.row.full-width
       q-input(
@@ -116,7 +116,7 @@ export default {
       type: 'VIDEO',
       types: [
         // {id: 'all', name: 'All'},
-        {id: 'VIDEO', name: 'Video'},
+        {id: 'VIDEO', name: 'Videos'},
         {id: 'IMAGE', name: 'Images'},
         {id: 'BOOK', name: 'Books'},
         {id: 'WEB', name: 'Web'}

@@ -1,28 +1,35 @@
 <template lang="pug">
-video-editor(
+component(
   v-if="content"
-  @createNode="$emit('createNode')"
-  @close="$emit('close')"
-  @delete="$emit('delete')"
-  :options="options"
+  :is="component[content.type]"
   :composition="value"
-  :contentKalpa="content"
-  :stateExplorerReady="stateExplorer")
+  :content="content"
+  :options="options"
+  :sidPlayerReady="sidPlayer"
+  @close="$emit('close')")
   template(v-slot:actions)
     slot(name="actions")
+//- .column.fit.bg-blue
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import videoEditor from './video_editor'
+// import imageEditor from './image_editor'
 
 export default {
   name: 'wsCompositionEditor',
   components: {videoEditor},
-  props: ['value', 'options', 'stateExplorer'],
+  props: ['value', 'sidPlayer', 'options'],
   data () {
     return {
-      content: null
+      content: null,
+      component: {
+        VIDEO: 'video-editor',
+        IMAGE: 'image-editor',
+        BOOK: 'book-editor',
+        WEB: 'web-editor',
+      }
     }
   },
   async mounted () {
