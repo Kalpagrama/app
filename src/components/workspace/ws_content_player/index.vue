@@ -3,7 +3,8 @@ component(
   v-if="content"
   :is="component[content.type]"
   :sid="sid"
-  :content="content")
+  :content="content"
+  @ready="$emit('ready')")
   template(v-slot:controls)
     slot(name="controls")
   template(v-slot:controlsTools)

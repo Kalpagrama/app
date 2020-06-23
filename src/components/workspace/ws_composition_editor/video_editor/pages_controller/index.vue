@@ -6,13 +6,13 @@
     }`
     ).row.full-width
     q-tabs(
-      :value="storeEditor.getter('pageId')" @input="storeEditor.stateSet('pageId', $event)"
+      :value="storeEditor.pageId" @input="storeEditor.pageId = $event"
       dense no-caps color="white"
       active-color="green"
       :style=`{}`
       ).full-width
       q-tab(
-        v-for="(p,pi) in storeEditor.state.pages" :key="p.id"
+        v-for="(p,pi) in storeEditor.pages" :key="p.id"
         :name="p.id" :label="p.name"
         dense no-caps color="white"
         :style=`{color: 'rgb(180,180,180)'}`)
@@ -21,9 +21,10 @@
 <script>
 export default {
   name: 'pagesController',
-  props: ['storeEditor'],
-  data () {
-    return {
+  inject: ['sidEditor'],
+  computed: {
+    storeEditor () {
+      return window.stores[this.sidEditor]
     }
   }
 }

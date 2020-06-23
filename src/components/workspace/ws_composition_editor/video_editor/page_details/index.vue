@@ -26,10 +26,11 @@
 <script>
 export default {
   name: 'videoEditor-pageDetails',
-  props: ['composition', 'content', 'storeEditor'],
+  props: ['composition', 'content'],
   inject: ['sidEditor', 'sidPlayer'],
-  data () {
-    return {
+  computed: {
+    storeEditor () {
+      return window.stores[this.sidEditor]
     }
   }
 }

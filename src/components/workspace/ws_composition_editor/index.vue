@@ -4,7 +4,7 @@ component(
   :is="component[content.type]"
   :composition="value"
   :content="content"
-  :storePlayer="storePlayer")
+  :storePlayerRaw="storePlayer")
   template(v-slot:actions)
     slot(name="actions")
 </template>

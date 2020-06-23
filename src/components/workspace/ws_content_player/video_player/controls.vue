@@ -9,16 +9,16 @@ div(
     :style=`{
     }`).row.full-width
     q-btn(
-      @click="storePlayer.state.playing ? storePlayer.commit('pause') : storePlayer.commit('play')"
+      @click="storePlayer.playPause()"
       round flat dense color="white"
-      :icon="storePlayer.state.playing ? 'pause' : 'play_arrow'")
+      :icon="storePlayer.playing ? 'pause' : 'play_arrow'")
     .col
     q-btn(round flat dense color="white" icon="fast_rewind" @click="fast(false)")
       q-tooltip(anchor="top middle" self="center middle") - 5 sec
     q-btn(flat dense color="white")
-      small {{ $time(storePlayer.state.currentTime) }}
+      small {{ $time(storePlayer.currentTime) }}
       small.q-mx-xs /
-      small {{ $time(storePlayer.state.duration) }}
+      small {{ $time(storePlayer.duration) }}
     q-btn(round flat dense color="white" icon="fast_forward" @click="fast(true)")
       q-tooltip(anchor="top middle" self="center middle") + 5 sec
     .col
@@ -43,7 +43,7 @@ div(
       div(
         :style=`{
           position: 'absolute', zIndex: 1000, top: '0px', left: '0px',
-          width: storePlayer.state.currentTime/storePlayer.state.duration*100+'%',
+          width: storePlayer.currentTime/storePlayer.duration*100+'%',
           pointerEvents: 'none', userSelect: 'none',
           background: 'rgba(255,255,255,0.4)',
         }`).row.full-height
@@ -61,7 +61,7 @@ div(
     div(
       :style=`{
         position: 'absolute', zIndex: 1100, top: '0px', height: 'calc(50px + 8px)',
-        left: storePlayer.state.currentTime/storePlayer.state.duration*100+'%',
+        left: storePlayer.currentTime/storePlayer.duration*100+'%',
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',
       }`).bg-green
@@ -72,7 +72,7 @@ div(
 <script>
 export default {
   name: 'videoPlayer-controls',
-  props: ['storePlayer'],
+  inject: ['sidPlayer'],
   data () {
     return {
       barClientWidth: 0,
@@ -83,19 +83,12 @@ export default {
       // nowHoverTime: 0,
     }
   },
+  computed: {
+    storePlayer () {
+      return window.stores[this.sidPlayer]
+    }
+  },
   methods: {
-    pageIdToggle () {
-      this.$log('pageIdToggle', this.pageIdLast)
-      if (this.storePlayer.pageId) {
-        this.pageIdLast = this.storePlayer.pageId
-        this.storePlayer.set('pageId', null)
-      }
-      else {
-        this.storePlayer.set('pageId', 'compositions')
-        // this.storePlayer.set('pageId', this.pageIdLast)
-        // this.pageIdLast = null
-      }
-    },
     volumeToggle () {
       this.$log('volumeToggle')
       if (this.storePlayer.player.muted) this.storePlayer.player.setMuted(false)
@@ -103,12 +96,12 @@ export default {
     },
     fast (forward) {
       // this.$log('fast', forward)
-      let t = this.storePlayer.state.currentTime
+      let t = this.storePlayer.currentTime
       if (forward) t += 5
       else t -= 5
       if (t < 0) t = 0
-      if (t > this.storePlayer.state.duration) t = this.storePlayer.state.duration
-      this.storePlayer.commit('setCurrentTime', t)
+      if (t > this.storePlayer.duration) t = this.storePlayer.duration
+      this.storePlayer.setCurrentTime(t)
     },
     barMove (e) {
       // this.$log('barMove', e)
@@ -126,9 +119,9 @@ export default {
       // this.$log('width', width)
       let left = e.offsetX
       // this.$log('left', left)
-      let t = (left / width) * this.storePlayer.state.duration
+      let t = (left / width) * this.storePlayer.duration
       // this.$log('t', t)
-      this.storePlayer.commit('setCurrentTime', t)
+      this.storePlayer.setCurrentTime(t)
     },
     barDrag (e) {
       // this.$log('barDrag', e)
@@ -143,10 +136,10 @@ export default {
       }
       if (!this.barWidth) return
       this.barWidth += (e.delta.x / this.$el.clientWidth) * 100
-      let t = (this.barWidth / 100) * this.storePlayer.state.duration
+      let t = (this.barWidth / 100) * this.storePlayer.duration
       // this.$log('t', t)
-      if (t >= 0 && t <= this.storePlayer.state.duration) {
-        this.storePlayer.commit('setCurrentTime', t)
+      if (t >= 0 && t <= this.storePlayer.duration) {
+        this.storePlayer.setCurrentTime(t)
       }
     }
   }

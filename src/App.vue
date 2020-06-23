@@ -4,22 +4,24 @@ div(id="q-app")
 </template>
 
 <script>
+import Vue from 'vue'
+
 export default {
   name: 'App',
-  // data () {
-  //   return {
-  //     store: {
-  //       state: {},
-  //       stateSet (key, val) {
-  //         this.state[key] = val
-  //       }
-  //     }
-  //   }
-  // },
-  // provide () {
-  //   return {
-  //     store: this.store
-  //   }
-  // }
+  data () {
+    return {
+      name: 'kalpagramma',
+      height: 100,
+    }
+  },
+  created () {
+    window.stores.storeApp = this
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    delete window.stores.storeApp
+  }
 }
 </script>

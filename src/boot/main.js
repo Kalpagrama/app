@@ -60,14 +60,17 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     //     })
     // }
     // alert('main.js')
-    Vue.prototype.$stores = stores
+    // Vue.prototype.$stores = stores
     Vue.prototype.$storesAdd = (sid, store = {}) => {
       logD('storesAdd', sid, store)
-      if (storeVue.hasModule(sid) || stores[sid]) {
-        // alert('storesAdd DUP: ' + sid)
-        storeVue.unregisterModule(sid)
-        // delete stores[sid]
-        return stores[sid]
+      // if (storeVue.hasModule(sid) || stores[sid]) {
+      //   // alert('storesAdd DUP: ' + sid)
+      //   storeVue.unregisterModule(sid)
+      //   // delete stores[sid]
+      //   return stores[sid]
+      // }
+      if (module.hot) {
+        alert('storesAdd: module.hot!' + sid)
       }
       // TODO: check for module
       // add defaults
@@ -86,7 +89,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         getters: store.getters,
       })
       // add to Map
-      stores[sid] = {
+      Vue.set(stores, sid, {
         state: storeVue.state[sid],
         stateSet: (key, val) => {
           storeVue.commit(`${sid}/stateSet`, [key, val])
@@ -100,17 +103,64 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
         getter (getter) {
           return storeVue.getters[`${sid}/${getter}`]
         },
-      }
+      })
       logD('storesAdd done', stores[sid])
       return stores[sid]
     }
+    // Vue.mixin({
+    //   data: {}
+    //   // created: function () {
+    //   //   var myOption = this.$options.myOption
+    //   //   if (myOption) {
+    //   //     console.log(myOption)
+    //   //   }
+    //   // }
+    // })
+    let storesVm = new Vue({
+      // data () {
+      //   return {
+      //     stores: {}
+      //   }
+      // },
+      data: {
+        stores: {}
+      },
+      computed: {
+        storesComputed () {
+          return this.stores
+        }
+      },
+      methods: {
+        storesGet (sid) {
+          alert('storesGet', sid)
+          return this.stores[sid]
+        }
+      }
+    })
+    let stores_ = {}
+    if (!window.stores) window.stores = {}
+    Vue.prototype.$stores = window.stores
+    Vue.prototype.$storesSet = (sid, store) => {
+      // stores_[sid] = new Vue({data: {store}})
+      window.stores[sid] = store
+    }
+    Vue.prototype.$storesDelete = (sid) => {
+      delete window.stores[sid]
+      // storesVm.$delete('stores', sid)
+      // Vue.delete(storesVm.stores, sid)
+      // delete stores[sid]
+      // storeVue.commit('ui/storesDelete', sid)
+    }
     Vue.prototype.$storesRemove = (sid) => {
-      logD('storeRemove', sid)
-      // alert('$storesRemove', sid)
-      // TODO: check for module
-      storeVue.unregisterModule(sid)
-      // storeVue.commit('ui/storeRemove', sid)
-      delete stores[sid]
+      logD('storesRemove', sid)
+      if (module.hot) {
+        alert('storesRemove: module.hot!' + sid)
+      }
+      else {
+        storeVue.unregisterModule(sid)
+        Vue.delete(stores, sid)
+        // delete stores[sid]
+      }
     }
     let ctore = {}
     Vue.prototype.$ctore = ctore

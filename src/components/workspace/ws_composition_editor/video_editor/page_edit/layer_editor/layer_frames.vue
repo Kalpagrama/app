@@ -33,20 +33,20 @@
           v-show="!poingDragging"
           :style=`{
             position: 'absolute', zIndex: 200,
-            left: 'calc('+(storePlayer.state.currentTime/storePlayer.state.duration)*100+'% - 0px)',
+            left: 'calc('+(storePlayer.currentTime/storePlayer.duration)*100+'% - 0px)',
             top: '-16px',
             height: 'calc(100% + 32px)',
             width: '4px',
-            borderRadius: '4px', overflow: 'hidden',
+            borderRadius: '2px', overflow: 'hidden',
             pointerEvents: 'none'
           }`
-          ).bg-red
+          ).bg-green
         //- left tint
         div(
           :style=`{
             position: 'absolute', zIndex: 100,
             left: '0px',
-            width: 'calc('+(layer.figuresAbsolute[0].t/storePlayer.state.duration)*100+'% + 8px)',
+            width: 'calc('+(layer.figuresAbsolute[0].t/storePlayer.duration)*100+'% + 8px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
             borderRadius: $store.state.ui.borderRadius+'px',
@@ -56,7 +56,7 @@
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 0)"
           :style=`{
             position: 'absolute', zIndex: 310, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[0].t/storePlayer.state.duration)*100+'% - 25px)',
+            left: 'calc('+(layer.figuresAbsolute[0].t/storePlayer.duration)*100+'% - 25px)',
             height: '50px', width: '50px',
             borderRadius: '50%',
             opacity: 0.3,
@@ -66,8 +66,8 @@
         div(
           :style=`{
             position: 'absolute', zIndex: 100,
-            left: 'calc('+(layer.figuresAbsolute[1].t/storePlayer.state.duration)*100+'% - 0px)',
-            width: 'calc('+((storePlayer.state.duration-layer.figuresAbsolute[1].t)/storePlayer.state.duration)*100+'% + 1px)',
+            left: 'calc('+(layer.figuresAbsolute[1].t/storePlayer.duration)*100+'% - 0px)',
+            width: 'calc('+((storePlayer.duration-layer.figuresAbsolute[1].t)/storePlayer.duration)*100+'% + 1px)',
             height: '50px', background: 'rgba(0,0,0,0.3)',
             pointerEvents: 'none',
             borderRadius: $store.state.ui.borderRadius+'px',
@@ -77,7 +77,7 @@
           v-touch-pan.left.right.prevent.mouse="e => pointDrag(e, 1)"
           :style=`{
             position: 'absolute', zIndex: 320, top: '0px',
-            left: 'calc('+(layer.figuresAbsolute[1].t/storePlayer.state.duration)*100+'% - 25px)',
+            left: 'calc('+(layer.figuresAbsolute[1].t/storePlayer.duration)*100+'% - 25px)',
             height: '50px', width: '50px',
             borderRadius: '50%',
             opacity: 0.3,
@@ -87,8 +87,8 @@
         div(
           :style=`{
             position: 'absolute', zIndex: 300, top: '-8px',
-            left: (layer.figuresAbsolute[0].t/storePlayer.state.duration)*100+'%',
-            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/storePlayer.state.duration)*100+'% + 8px)',
+            left: (layer.figuresAbsolute[0].t/storePlayer.duration)*100+'%',
+            width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/storePlayer.duration)*100+'% + 8px)',
             height: 50+8+8+'px',
             borderRadius: '12px',
             border: '8px solid '+layer.color,
@@ -114,18 +114,18 @@ export default {
   computed: {
     durationScreen () {
       let res
-      if (this.storePlayer.state.duration > 90) res = 60
+      if (this.storePlayer.duration > 90) res = 60
       else res = 10
       return res
     },
     framesCount () {
-      return Math.round(this.storePlayer.state.duration / 10)
+      return Math.round(this.storePlayer.duration / 10)
     },
     framesWidth () {
       let widthFrames
       let widthScreen = this.width * 0.7
       let durationScreen = this.durationScreen
-      let duration = this.storePlayer.state.duration
+      let duration = this.storePlayer.duration
       // durationScreen === widthScreen
       // duration === x
       widthFrames = (duration * widthScreen) / durationScreen
@@ -135,7 +135,7 @@ export default {
       let widthFrame
       let widthFrames = this.framesWidth
       let durationFrame = 10
-      let duration = this.storePlayer.state.duration
+      let duration = this.storePlayer.duration
       // durationFrame === *widthFrame*
       // duration == widthFrames
       widthFrame = (widthFrames * durationFrame) / duration
@@ -157,8 +157,8 @@ export default {
     async pointDrag (e, index) {
       // if (this.pointDraggingError) return
       // this.$log('pointDrag', e, index)
-      let t = this.layer.figuresAbsolute[index].t + ((e.delta.x / this.framesWidth) * this.storePlayer.state.duration)
-      if (t > this.storePlayer.state.duration || t < 0) return
+      let t = this.layer.figuresAbsolute[index].t + ((e.delta.x / this.framesWidth) * this.storePlayer.duration)
+      if (t > this.storePlayer.duration || t < 0) return
       // this.$log('t', t)
       if (index === 0) {
         if (t >= this.stateLayerEditor.layerEnd) {
@@ -172,13 +172,13 @@ export default {
           return
         }
       }
-      this.storePlayer.commit('setCurrentTime', t)
+      this.storePlayer.setCurrentTime(t)
       this.layer.figuresAbsolute[index].t = t
       if (e.isFirst) {
         // this.stateExplorer.set('timeupdateStop', true)
         this.pointDragging = true
         this.pointDraggingIndex = index
-        this.storePlayer.commit('pause')
+        this.storePlayer.playPause()
         // this.stateExplorer.player.pause()
         // this.stateExplorer.set('editing', true)
       }
@@ -197,9 +197,9 @@ export default {
     framesClick (e) {
       this.$log('framesClick', e.offsetX, e.target.accessKey)
       if (e.target.accessKey !== 'frames') return
-      let t = e.offsetX / this.framesWidth * this.storePlayer.state.duration
+      let t = e.offsetX / this.framesWidth * this.storePlayer.duration
       this.$log('t', t)
-      this.storePlayer.commit('setCurrentTime', t)
+      this.storePlayer.setCurrentTime(t)
       // if (t < this.stateLayerEditor.layerStart || t > this.stateLayerEditor.layerEnd) {
       //   this.stateExplorer.set('mode', 'content')
       // }
@@ -214,8 +214,8 @@ export default {
     },
     framesLayerCenter () {
       this.$log('framesLayerCenter')
-      let layerLeft = ((this.layer.figuresAbsolute[0].t / this.storePlayer.state.duration) * this.framesWidth) + (this.width / 2)
-      let layerWidth = ((this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t) / this.storePlayer.state.duration) * this.framesWidth
+      let layerLeft = ((this.layer.figuresAbsolute[0].t / this.storePlayer.duration) * this.framesWidth) + (this.width / 2)
+      let layerWidth = ((this.layer.figuresAbsolute[1].t - this.layer.figuresAbsolute[0].t) / this.storePlayer.duration) * this.framesWidth
       let scrollLeft = layerLeft - (this.width - layerWidth) / 2
       this.$log('scrollLeft', scrollLeft)
       this.$tween.to(this.$refs.layerItemFramesScrollArea, 0.5, {scrollLeft: scrollLeft})
