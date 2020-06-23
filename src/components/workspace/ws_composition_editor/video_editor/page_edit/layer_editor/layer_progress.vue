@@ -1,10 +1,19 @@
 <template lang="pug">
 div(:style=`{position: 'relative',}`).row.full-width
   //- tools
-  div(:style=`{}`).row.full-width
-    q-btn(round flat dense color="white" icon="play_arrow")
-    .col
-    q-btn(round flat dense color="white" icon="refresh")
+  div(:style=`{}`).row.full-width.items-center.content-center
+    q-btn(
+      @click="layerPlayingToggle()"
+      :color="layerPlaying ? 'red' : 'white'"
+      :icon="layerPlaying ? 'pause' : 'play_arrow'"
+      round flat dense)
+    .col.q-px-sm
+      span(
+        v-if="storeEditor.layerPlaying === layer.id"
+        ).text-white.text-bold Playing
+    q-btn(
+      @click="layerRefresh()"
+      round flat dense color="white" icon="refresh")
   //- bar
   div(:style=`{position: 'relative'}`).row.full-width.q-py-xs
     div(
@@ -16,6 +25,7 @@ div(:style=`{position: 'relative',}`).row.full-width
       }`).row.full-width.b-70
       //- bar: left
       div(
+        v-if="showBar"
         :style=`{
           position: 'absolute', zIndex: 1100,
           left: '0px',
@@ -24,6 +34,7 @@ div(:style=`{position: 'relative',}`).row.full-width
         }`).row.full-height.b-90
     //- bar: currentTime
     div(
+      v-if="showBar"
       :style=`{
         position: 'absolute', zIndex: 1200,
         left: (storePlayer.currentTime-storeLayerEditor.layerStart)/storeLayerEditor.layerDuration*100+'%',
@@ -37,13 +48,31 @@ div(:style=`{position: 'relative',}`).row.full-width
 <script>
 export default {
   name: 'layerProgress',
-  props: ['storePlayer', 'storeLayerEditor', 'storeEditor'],
+  props: ['layer', 'storePlayer', 'storeLayerEditor', 'storeEditor'],
   data () {
     return {
       progressPercentRaw: null,
     }
   },
+  computed: {
+    layerPlaying () {
+      return this.storeEditor.layerPlaying && this.storePlayer.playing
+    },
+    showBar () {
+      return this.storePlayer.currentTime > this.storeLayerEditor.layerStart &&
+        this.storePlayer.currentTime < this.storeLayerEditor.layerEnd
+    }
+  },
   methods: {
+    layerPlayingToggle () {
+      this.$log('layerPlayingToggle')
+      this.storeEditor.layerPlaying = this.layer.id
+      this.storePlayer.playPause()
+    },
+    layerRefresh () {
+      this.$log('layerRefresh')
+      this.storePlayer.setCurrentTime(this.storeLayerEditor.layerStart)
+    },
     progressClick (e) {
       // this.$log('progressClick', e)
       let width = e.target.clientWidth
@@ -68,7 +97,6 @@ export default {
       if (e.isFirst) {
         this.$log('progressDrag isFirst', e)
         this.storePlayer.player.pause()
-        // this.progressPercentRaw = ((this.storePlayer.currentTime - this.storeLayerEditor.layerStart) / this.storeLayerEditor.layerDuration) * 100
         let left = e.position.left - this.$el.getBoundingClientRect().left
         this.progressPercentRaw = (left / this.$el.clientWidth) * 100
       }

@@ -99,7 +99,8 @@ div(
     //-     template(v-slot:actions)
     //-       slot(name="actions")
   pages-controller(
-    v-if="pageHeight > 40")
+    v-if="pageHeight > 40"
+    :style=`{opacity: layerEditing ? 0 : 1}`)
 </template>
 
 <script>

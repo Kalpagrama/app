@@ -51,7 +51,7 @@ div(:style=`{position: 'relative'}`).row.fit.b-60
         left: '50%',
         marginRight: '-50%',
         transform: 'translate(-50%, 0)',
-        maxWidth: '600px',
+        maxWidth: videoControlsMaxWidth+'px',
       }`
       ).row.full-width
       template(v-slot:controls)
@@ -110,6 +110,10 @@ export default {
     }
   },
   computed: {
+    videoControlsMaxWidth () {
+      if (this.$q.screen.width > 600) return 600
+      else return this.$q.screen.width - 80
+    }
   },
   watch: {
     playing: {

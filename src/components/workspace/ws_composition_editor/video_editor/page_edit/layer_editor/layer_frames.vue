@@ -101,7 +101,7 @@
 <script>
 export default {
   name: 'layerEditor-layerFrames',
-  props: ['storePlayer', 'storeLayerEditor', 'layer'],
+  props: ['storeEditor', 'storePlayer', 'storeLayerEditor', 'layer'],
   data () {
     return {
       width: 0,
@@ -143,15 +143,15 @@ export default {
     },
   },
   watch: {
-    // 'storeLayerEditor.need_framesLayerCenter': {
-    //   handler (to, from) {
-    //     if (to) {
-    //       this.$log('storeLayerEditor.need_framesLayerCenter TO', to)
-    //       this.framesLayerCenter()
-    //       this.storeLayerEditor.set('need_framesLayerCenter', false)
-    //     }
-    //   }
-    // }
+    'storeLayerEditor.need_framesLayerCenter': {
+      handler (to, from) {
+        if (to) {
+          this.$log('storeLayerEditor.need_framesLayerCenter TO', to)
+          this.framesLayerCenter()
+          this.storeLayerEditor.set('need_framesLayerCenter', false)
+        }
+      }
+    }
   },
   methods: {
     async pointDrag (e, index) {
@@ -176,6 +176,7 @@ export default {
       this.layer.figuresAbsolute[index].t = t
       if (e.isFirst) {
         // this.stateExplorer.set('timeupdateStop', true)
+        this.storeEditor.layerPlaying = null
         this.pointDragging = true
         this.pointDraggingIndex = index
         this.storePlayer.playPause()
@@ -189,6 +190,7 @@ export default {
         // this.stateExplorer.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
         // this.stateExplorer.set('editing', false)
         // TODO: if layerwidth > this.width?
+        this.storeEditor.layerPlaying = this.layer.id
         await this.$wait(300)
         this.framesLayerCenter()
         this.pointDraggingError = false
@@ -197,6 +199,7 @@ export default {
     framesClick (e) {
       this.$log('framesClick', e.offsetX, e.target.accessKey)
       if (e.target.accessKey !== 'frames') return
+      this.storeEditor.layerPlaying = null
       let t = e.offsetX / this.framesWidth * this.storePlayer.duration
       this.$log('t', t)
       this.storePlayer.setCurrentTime(t)

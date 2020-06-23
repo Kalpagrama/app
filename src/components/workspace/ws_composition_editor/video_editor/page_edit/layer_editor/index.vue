@@ -4,7 +4,6 @@ div(
     'b-60': true,
   }`
   :style=`{
-    //- border: storeEditor.layerEditing === layer.id ? 'none' : storeEditor.layerPlaying === layer.id ? '2px solid green' : 'none',
     borderRadius: '10px',
     overflow: 'hidden',
   }`).row.full-width
@@ -12,21 +11,7 @@ div(
     layer-frames(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
     .row.full-width.q-px-sm
       layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-    //- layer-actions
-    div.row.full-width
-      div(
-        :style=`{
-        }`
-        ).row.full-width.items-center.content-center.q-pa-sm
-        q-btn(round flat dense color="white" icon="flip" @click="layerSet(0)").b-70.q-mr-xs.rotate-180
-        q-btn-group(flat color="white" :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`)
-          q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(0,0)").b-70
-          q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(0,1)").b-70
-        .col
-        q-btn-group(flat color="white" :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`).q-mr-xs
-          q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(1,0)").b-70
-          q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(1,1)").b-70
-        q-btn(round flat dense color="white" icon="flip" @click="layerSet(1)").b-70
+    layer-actions(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
   //- name editor
   div(
     :style=`{
@@ -42,29 +27,43 @@ div(
       template(v-slot:prepend)
         small(:style=`{fontSize: '12px'}`).text-grey-5 {{ $time(layer.figuresAbsolute[0].t) }}
       template(v-slot:append)
-        //- small(:style=`{fontSize: '12px'}`).text-grey-5 {{ $time(layer.figuresAbsolute[1].t) }}
+        small(
+          v-if="storeEditor.layerEditing === layer.id"
+          :style=`{fontSize: '12px'}`).text-grey-5 {{ $time(layer.figuresAbsolute[1].t) }}
         q-btn(
+          v-if="storeEditor.layerEditing !== layer.id"
           @click="layerEditingToggle()"
           flat dense
           :color="storeEditor.layerEditing === layer.id ? 'green' : 'grey-6'"
           :icon="storeEditor.layerEditing === layer.id ? 'check' : 'edit'")
-    layer-progress-mini(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+    layer-progress-mini(
+      v-if="storeEditor.layerEditing !== layer.id"
+      :layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+  //- footer
+  div(v-if="storeEditor.layerEditing === layer.id").row.full-width.q-pa-xs
+    q-btn(round flat dense color="red-5" icon="delete_outline" @click="$emit('delete')")
+    .col
+    q-btn(round flat dense color="grey-3" no-caps @click="$emit('createNode')").q-px-sm Create node
+    .col
+    q-btn(round flat dense color="green" icon="check" @click="layerEditingToggle()")
 </template>
 
 <script>
 import layerFrames from './layer_frames'
+import layerActions from './layer_actions'
 import layerProgress from './layer_progress'
 import layerProgressMini from './layer_progress_mini'
 
 export default {
   name: 'layerEditor',
-  components: {layerFrames, layerProgress, layerProgressMini},
+  components: {layerFrames, layerActions, layerProgress, layerProgressMini},
   props: ['layer'],
   inject: ['sidEditor', 'sidPlayer'],
   data () {
     return {
       watcherCurrentTime: null,
-      progressPercentRaw: null
+      progressPercentRaw: null,
+      need_framesLayerCenter: false,
     }
   },
   computed: {
@@ -91,7 +90,12 @@ export default {
       return {
         layerDuration: this.layerDuration,
         layerStart: this.layerStart,
-        layerEnd: this.layerEnd
+        layerEnd: this.layerEnd,
+        // fn
+        need_framesLayerCenter: this.need_framesLayerCenter,
+        set: (key, val) => {
+          this[key] = val
+        }
       }
     }
   },
@@ -115,6 +119,12 @@ export default {
     },
   },
   methods: {
+    layerCreateNode () {
+      this.$log('layerCreateNode')
+    },
+    layerDelete () {
+      this.$log('layerDelete')
+    },
     layerNameChanged (e) {
       // this.$log('layerNameChanged', e)
       this.$set(this.layer.spheres, 0, {name: e})
@@ -139,34 +149,6 @@ export default {
         this.storeEditor.layerPlaying = this.layer.id
       }
     },
-    layerSet (index) {
-      this.$log('layerSet', index)
-      // check, t for layerStart and layerEnd
-      let t = this.storePlayer.currentTime
-      if (index === 0) {
-        if (t >= this.layerEnd) {
-          this.$q.notify({type: 'negative', message: 'Cant set t >= layer end !'})
-          return
-        }
-      }
-      else {
-        if (t <= this.layerStart) {
-          this.$q.notify({type: 'negative', message: 'Cant set t <= layer start !'})
-          return
-        }
-      }
-      // set value
-      this.layer.figuresAbsolute[index].t = t
-      // center frames to the layer
-      // this.stateLayerEditor.set('need_framesLayerCenter', true)
-    },
-    layerForward (index, isRight) {
-      this.$log('layerForward', index, isRight)
-      let t = this.layer.figuresAbsolute[index].t + (isRight ? 0.1 : -0.1)
-      this.layer.figuresAbsolute[index].t = t
-      this.storePlayer.playPause()
-      this.storePlayer.setCurrentTime(t)
-    }
   },
   mounted () {
     this.$log('mounted')
