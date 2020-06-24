@@ -52,14 +52,15 @@ div(:style=`{position: 'relative'}`).column.fit
               div(:style=`{maxWidth: '680px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
                 q-btn(
                   @click="layerAdd()"
-                  flat color="green" icon="add"
+                  flat color="green" icon-right="add" no-caps
                   :style=`{height: '40px'}`
-                  ).full-width.b-60
+                  ).full-width.b-70
+                  span.text-bold.q-mx-sm Добавить слой
       //- footer: layers selected
       div(
         v-if="layersSelected.length > 0"
         :style=`{
-          position: 'absolute', zIndex: 1000, bottom: '0px',
+          position: 'absolute', zIndex: 1000, bottom: '8px',
         }`).row.full-width.justify-center
         div(
           :style=`{
@@ -68,20 +69,32 @@ div(:style=`{position: 'relative'}`).column.fit
           }`
           ).row.full-width.items-center.content-center.q-pa-sm.b-70
           q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []")
-          q-btn(flat dense color="red" no-caps).q-px-sm Delete
+          q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm Delete
           .col
-          q-btn(flat dense color="green" no-caps).q-px-sm Create node
+          q-btn(dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
   //- footer: something
+  //- !storeEditor.layerEditing
   div(
-    v-if="!storeEditor.layerEditing"
+    v-if="true"
     :style=`{}`).row.full-width.justify-center
     div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
-      div(v-if="false").row.full-width.q-py-sm
+      //- name editor
+      div(v-if="true").row.full-width.q-py-sm
         q-input(
           v-model="composition.name"
+          label="Что ты видишь?"
           filled dark color="white"
           ).full-width
-      composition-progress(:composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
+      //- stats
+      div(
+        v-if="!storeEditor.layerEditing && composition.layers.length > 0"
+        ).row.full-width.text-grey-4.q-pa-sm
+        span(:class=`{}`) Layers: {{ composition.layers.length }}
+        .col
+        span(:class=`{'text-red': layersDuration > 60}`) Duration: {{ $time(layersDuration) }}
+      composition-progress(
+        v-if="!storeEditor.layerEditing && composition.layers.length > 0"
+        :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
 </template>
 
 <script>
@@ -125,7 +138,14 @@ export default {
         }
       }
       return res
-    }
+    },
+    layersDuration () {
+      return this.composition.layers.reduce((acc, layer) => {
+        let layerDuration = layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t
+        acc += layerDuration
+        return acc
+      }, 0)
+    },
   },
   methods: {
     layerEdit (layer) {
@@ -153,12 +173,16 @@ export default {
     layersSelectedCreateNode (arr) {
       this.$log('layersSelectedCreateNode', arr)
     },
-    layersSelectedDelele () {
+    layersSelectedDelete () {
       this.$log('layersSelectedDelete')
     },
   },
   mounted () {
     this.$log('mounted')
+    if (this.composition.layers.length === 1) {
+      // alert('layerEdit FIRST')
+      this.layerEdit(this.composition.layers[0])
+    }
   },
 }
 </script>

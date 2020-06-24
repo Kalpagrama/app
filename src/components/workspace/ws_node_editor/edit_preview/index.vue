@@ -7,9 +7,10 @@ div(
   //- body
   div(:style=`{position: 'relative'}`).col.full-width.scroll
     div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.b-60
+      //- v-for="(i,ii) in node.items" :key="ii"
       ws-composition-editor(
-        v-for="(i,ii) in node.items" :key="ii"
-        :value="i"
+        v-if="node.items.length > 0"
+        :value="node.items[0]"
         :options=`{
           isPreview: true,
           mode: 'player',
@@ -18,6 +19,10 @@ div(
           height: 400+'px',
           minHeight: 400+'px'
         }`)
+      div(
+        v-else
+        :style=`{height: '400px'}`).row.full-width.items-center.content-center.justify-center
+        q-spinner(color="green" size="50px")
     .row.full-width.items-center.content-center.q-py-sm
       q-select(
         filled

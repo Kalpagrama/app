@@ -179,8 +179,8 @@ export default {
         this.storeEditor.layerPlaying = null
         this.pointDragging = true
         this.pointDraggingIndex = index
-        this.storePlayer.playPause()
-        // this.stateExplorer.player.pause()
+        // this.storePlayer.playPause()
+        this.storePlayer.player.pause()
         // this.stateExplorer.set('editing', true)
       }
       if (e.isFinal) {

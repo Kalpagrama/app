@@ -185,7 +185,7 @@ export default {
           type: 'positive',
           message: 'Node published!'
         })
-        this.$emit('published', this.node.id)
+        this.$emit('published', res.oid)
         this.$emit('close')
       }
       catch (e) {

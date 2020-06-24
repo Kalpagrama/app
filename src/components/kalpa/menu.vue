@@ -13,9 +13,11 @@ div(
   }`).column.full-height.b-50
   //- node editor
   q-dialog(
-    v-model="nodeEditorOpened" position="bottom")
+    v-model="nodeEditorOpened" position="bottom"
+    @hide="nodeEdited")
     ws-node-editor(
-      @close="nodeEditorOpened = false, node = null"
+      @close="nodeEdited"
+      @published="nodePublished"
       :value="node"
       :style=`{
         maxWidth: '800px',
@@ -140,6 +142,7 @@ export default {
     },
     async createNodeStart () {
       this.$log('createNodeStart')
+      this.$store.commit('ui/stateSet', ['active', false])
       let nodeInput = {
         name: '',
         wsItemType: 'WS_NODE',
@@ -154,6 +157,18 @@ export default {
       this.$log('nodeAddStart item', item)
       this.node = item
       this.nodeEditorOpened = true
+    },
+    nodeEdited () {
+      this.$log('nodeEdited')
+      this.$store.commit('ui/stateSet', ['active', true])
+      this.nodeEditorOpened = false
+      this.node = null
+    },
+    async nodePublished () {
+      this.$log('nodePublished')
+      this.nodeEdited()
+      await this.$wait(200)
+      this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
     }
   },
 }

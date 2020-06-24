@@ -22,7 +22,7 @@ div(:style=`{position: 'relative'}`).column.fit
             ).row.full-width.items-start.content-start
             div(:style=`{width: '50px', height: '50px',}`).row.items-center.content-center.justify-center
               q-checkbox(
-                v-model="compositionsSelected" :val="i.id"
+                v-model="storeExplorer.compositionsSelected" :val="i.id"
                 dark color="grey-6"
                 :style=`{opacity: 0.9}`)
             .col
@@ -40,14 +40,14 @@ div(:style=`{position: 'relative'}`).column.fit
         @close="compositionEdited").full-height.b-60
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
-      v-if="compositionsSelected.length > 0"
+      v-if="storeExplorer.compositionsSelected.length > 0"
       :style=`{
         position: 'absolute', zIndex: 1000,
         bottom: '0px',
         borderRadius: '10px', overflow: 'hidden',
       }`
       ).row.full-width.items-center.content-center.q-pa-sm.b-60
-      q-btn(round flat color="white" icon="clear" @click="compositionsSelected = []").q-mr-sm
+      q-btn(round flat color="white" icon="clear" @click="storeExplorer.compositionsSelected = []").q-mr-sm
       q-btn(flat color="red-5" no-caps @click="compositionsSelectedDelete()") Delete
       .col
       q-btn(color="green" no-caps @click="compositionsSelectedCreateNode()") Create node
@@ -65,7 +65,7 @@ export default {
   data () {
     return {
       composition: null,
-      compositionsSelected: [],
+      // compositionsSelected: [],
       node: null,
       nodeEditorOpened: false,
     }
@@ -91,14 +91,30 @@ export default {
       return res
     }
   },
-  // watch: {},
+  watch: {
+    'storeExplorer.compositionEditing': {
+      async handler (to, from) {
+        this.$log('storeExplorer.compositionEditing TO', to)
+        if (to) {
+          let {items: [item]} = await this.$rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+              id: to
+            }
+          })
+          this.$log('item', item)
+          this.composition = item
+        }
+      }
+    }
+  },
   methods: {
     compositionEdit (c) {
       this.$log('compositionEdit', c)
       this.composition = null
       this.$nextTick(() => {
         this.storeExplorer.compositionEditing = c.id
-        this.composition = c
+        // this.composition = c
       })
     },
     compositionEdited (c) {
@@ -127,7 +143,7 @@ export default {
       // get compositions
       let compositions = []
       await Promise.all(
-        this.compositionsSelected.map(async (id) => {
+        this.storeExplorer.compositionsSelected.map(async (id) => {
           let {items: [composition]} = await this.$rxdb.find({selector: { rxCollectionEnum: RxCollectionEnum.WS_CONTENT, id: id }})
           // TODO: save a connection to the composition, or create a copy for the special use after
           if (composition) compositions.push(JSON.parse(JSON.stringify(composition)))
@@ -149,23 +165,23 @@ export default {
       this.$log('nodeAddStart item', item)
       this.node = item
       this.nodeEditorOpened = true
-      this.compositionsSelected = []
+      this.storeExplorer.compositionsSelected = []
     },
     async compositionsSelectedDelete () {
       this.$log('compositionsSelectedDelete start')
       if (!confirm('Delete selected ?')) return
       // find current comp in selected
-      if (this.compositionsSelected.includes(this.storeExplorer.compositionPlaying)) {
+      if (this.storeExplorer.compositionsSelected.includes(this.storeExplorer.compositionPlaying)) {
         this.compositionDrop()
       }
       // delete compositions
       await Promise.all(
-        this.compositionsSelected.map(async (id) => {
+        this.storeExplorer.compositionsSelected.map(async (id) => {
           await this.$rxdb.remove(id)
         })
       )
       this.$log('compositionsSelectedDelete done')
-      this.compositionsSelected = []
+      this.storeExplorer.compositionsSelected = []
     },
   }
 }

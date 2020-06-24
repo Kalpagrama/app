@@ -7,8 +7,10 @@ component(
   :options="options"
   :sidPlayerReady="sidPlayer"
   @close="$emit('close')")
-  template(v-slot:actions)
-    slot(name="actions")
+  template(v-slot:progressActions)
+    slot(name="progressActions")
+  template(v-slot:progressBar)
+    slot(name="progressBar")
 </template>
 
 <script>

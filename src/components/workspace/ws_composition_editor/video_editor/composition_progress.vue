@@ -10,6 +10,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         overflow: 'hidden',
       }`
       ).row.fit.items-center.content-center.b-80.cursor-pointer
+      slot(name="progressBar")
       //- composition name
       span(
         v-if="false"
@@ -60,7 +61,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
     q-btn(round flat dense color="grey-5" icon="keyboard_arrow_right" @click="layerNext()")
     q-btn(round flat dense color="grey-5" icon="refresh" @click="compositionRefresh()")
     .col
-    slot(name="actions")
+    slot(name="progressActions")
 </template>
 
 <script>

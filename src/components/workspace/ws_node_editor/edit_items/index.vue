@@ -84,7 +84,7 @@ export default {
       this.$log('itemFound', item)
       let itemIndex = this.node.items.length
       this.$set(this.node.items, itemIndex, item)
-      await this.$wait(300)
+      await this.$wait(500)
       this.itemEdit(this.node.items[itemIndex], itemIndex)
     },
     itemEdit (i, ii) {
@@ -98,7 +98,7 @@ export default {
     },
     itemDelete (i, ii) {
       this.$log('itemDelete', i, ii)
-      if (!confirm('Delete node ?!')) return
+      if (!confirm('Delete item ?!')) return
       this.$delete(this.node.items, ii)
     },
   },

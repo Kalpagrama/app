@@ -154,6 +154,12 @@ export default {
           this.videoLoaded = false
         }
       }
+    },
+    '$store.state.ui.active': {
+      handler (to, from) {
+        this.$log('$store.state.ui.active TO',)
+        if (to === false && this.$refs.videoRef) this.$refs.videoRef.pause()
+      }
     }
   },
   methods: {
