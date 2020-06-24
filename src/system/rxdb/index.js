@@ -212,7 +212,9 @@ class RxDBWrapper {
   async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
     assert(!rawId.includes('::'), '')
+    let f = this.get
     let id = makeId(rxCollectionEnum, rawId)
+    logD(f, 'start', id)
     let rxDoc
     if (rxCollectionEnum in WsCollectionEnum) {
       rxDoc = await this.workspace.get(id)

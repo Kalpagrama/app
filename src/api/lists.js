@@ -134,7 +134,7 @@ class ListsApi {
       variables: {mangoQuery }
     })
     logD(f, 'complete')
-    return { items, count, totalCount, nextPageToken }
+    return { items/* : items.filter(item => item.oid !== 'AKCmbRKCwHc=' && item.oid !== 'AKCl7kYCwHY=') */, count, totalCount, nextPageToken }
   }
 
   // static async sphereSpheres (oid, pagination, filter, sortStrategy) {
