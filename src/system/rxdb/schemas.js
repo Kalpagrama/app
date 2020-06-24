@@ -26,7 +26,7 @@ export const wsSchemaItem = {
       primary: true
     },
     oid: {
-      type: 'string'
+      type: 'string' // присваивается после публикации
     },
     wsItemType: {
       type: 'string'

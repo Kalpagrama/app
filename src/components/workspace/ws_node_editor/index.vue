@@ -167,15 +167,15 @@ export default {
         this.$log('nodePublish start')
         this.stateNodeEditor.set('nodePublishing', true)
         this.nodeCheck()
-        // create
+        // publish
         this.$q.loading.show({spinnerColor: 'green', message: 'Creating node...'})
-        await this.$wait(400)
-        let res = await NodeApi.nodeCreate(this.node)
-        this.$log('nodePublish res', res)
+        let createdNode = await NodeApi.nodeCreate(this.node)
+        this.$log('nodePublish res', createdNode)
         // publish
         this.$q.loading.show({spinnerColor: 'green', message: 'Publishing node...'})
         await this.$wait(1000)
         this.node.stage = 'published'
+        this.node.oid = createdNode.oid // нужно при снятии с публикации
         // done
         this.$q.loading.show({spinnerColor: 'green', message: 'Done !'})
         await this.$wait(2000)

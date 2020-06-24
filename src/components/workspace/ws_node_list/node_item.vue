@@ -95,9 +95,18 @@ export default {
         },
         delete: {
           name: 'Delete',
+          visible: this.node.stage !== 'published',
           fn: () => {
             this.$log('Delete')
             this.$emit('delete')
+          }
+        },
+        cancelPublish: {
+          name: 'Cancel Publish',
+          visible: this.node.stage === 'published',
+          fn: () => {
+            this.$log('cancelPublish')
+            this.$emit('cancelPublish')
           }
         }
       }

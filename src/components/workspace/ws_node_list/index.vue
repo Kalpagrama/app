@@ -75,7 +75,9 @@ div(
                 v-for="(n,ni) in items" :key="ni"
                 :node="n" :nodeIndex="ni"
                 @edit="nodeEdit(n,ni)"
-                @delete="nodeDelete(n,ni)").q-mb-md
+                @delete="nodeDelete(n,ni)"
+                @cancelPublish="nodeCancelPublish(n,ni)"
+                ).q-mb-md
             //- nothing found
             div(
               v-else
@@ -87,6 +89,8 @@ div(
 <script>
 import nodeItem from './node_item'
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { NodeApi } from 'src/api/node'
+import assert from 'assert'
 
 export default {
   name: 'wsNodeLsit',
@@ -147,6 +151,13 @@ export default {
       this.$log('nodeDelete', node)
       if (!confirm('Delete node ?!')) return
       await this.$rxdb.remove(node.id)
+    },
+    async nodeCancelPublish (node) {
+      this.$log('cancelPublish', node)
+      if (!confirm('cancel publish ?!')) return
+      assert(node.oid, '!node.oid')
+      await NodeApi.nodeDelete(node.oid)
+      node.stage = 'draft'
     },
     async nodeAdd (nodeInput) {
       this.$log('nodeAdd start')

@@ -107,7 +107,7 @@ class QueryAccumulator {
       for (let item of itemsForQuery) {
         let object = objectList.find(obj => obj.oid === item.oid)
         // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
-        if (object && !object.deletedAt) {
+        if (object /* && !object.deletedAt */) {
           this.resolveItem(object)
         } else if (object && !object.deletedAt) {
           this.rejectItem(item.oid, 'deleted')
@@ -288,6 +288,13 @@ class Objects {
         let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
         if (rxDoc) {
           await rxDoc.atomicSet('cached.data.rate', event.rate)
+        }
+        break
+      }
+      case 'OBJECT_DELETED': {
+        let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
+        if (rxDoc) {
+          await rxDoc.atomicSet('cached.data.deletedAt', new Date())
         }
         break
       }

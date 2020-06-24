@@ -30,6 +30,15 @@ class Cache {
   async createCollections () {
     let f = this.createCollections
     await this.db.collection({ name: 'cache', schema: cacheSchema })
+    this.db.cache.postInsert(async (plainData) => {
+      await this.debouncedDumpLru()
+    }, false)
+    this.db.cache.postSave(async (plainData) => {
+      await this.debouncedDumpLru()
+    }, false)
+    this.db.cache.postRemove(async (plainData) => {
+      await this.debouncedDumpLru()
+    }, false)
   }
 
   // удалить все данные из кэша
@@ -92,7 +101,8 @@ class Cache {
 
       this.debouncedDumpLru = debounce(async () => {
         const f = this.debouncedDumpLru
-        logD(f, 'start. debouncedDumpLru')
+        logD(f, 'start. debouncedDumpLru. rxdb.isLeader()=', rxdb.isLeader())
+        if (!rxdb.isLeader()) return
         let lruDump = this.cacheLru.dump()
         await rxdb.set(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
       }, debounceIntervalDumpLru)
@@ -235,7 +245,6 @@ class Cache {
         },
         cached: { data }
       }) // сохраняем в rxdb
-      await this.debouncedDumpLru()
       logD(f, 'complete')
       return rxDoc
     } finally {

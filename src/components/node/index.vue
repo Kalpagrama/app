@@ -1,5 +1,6 @@
 <template lang="pug">
 node-layout-pip(
+  v-if="!nodeFull || !nodeFull.deletedAt"
   v-bind="$props" :nodeFull="nodeFull")
 </template>
 
