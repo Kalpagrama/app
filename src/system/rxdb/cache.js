@@ -107,31 +107,43 @@ class Cache {
         }
       }
 
-      let ttt = Date.now()
-      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
-        .then(rxDoc => {
-          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-        })
-      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
-        .then(rxDoc => {
-          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-        })
-      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
-        .then(rxDoc => {
-          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-        })
-      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
-        .then(rxDoc => {
-          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-        })
-      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
-        .then(rxDoc => {
-          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-        })
-      this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
-        .then(rxDoc => {
-          logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-        })
+      // let ttt = Date.now()
+      // this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
+      // this.db.cache.findOne('OBJ::AHySHGyAwDc=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
+      // this.db.cache.findOne('OBJ::AI6sdVNAwDo=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
+      // this.db.cache.findOne('OBJ::AIAn6pTAwDk=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
+      // this.db.cache.findOne('OBJ::AIWMe06CsDA=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
+      // this.db.cache.findOne('OBJ::AIWOeBTCwBM=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
+      // this.db.cache.findOne('OBJ::AKDBaYeCwHw=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
+      // this.db.cache.findOne('OBJ::AKVqFMPCsIE=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
+      // this.db.cache.findOne('OBJ::AK_nDlZCsMI=').exec()
+      //   .then(rxDoc => {
+      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
+      //   })
 
       this.created = true
       logD(f, 'complete')
@@ -279,7 +291,7 @@ class Cache {
       }
       let ttt = Date.now()
       let rxDoc = await this.db.cache.findOne(id).exec() // после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
-      // logD(f, `findOne(${id}) time = ${(Date.now() - ttt) / 1000}`)
+      logD(f, `findOne(${id}) time = ${(Date.now() - ttt) / 1000}`)
       if (!rxDoc) {
         logD(f, 'not found', rxDoc, failReason)
         if (failReason) {
