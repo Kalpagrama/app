@@ -137,12 +137,14 @@ export default {
       this.nodeEditorItem = item
       this.nodeEditorOpened = true
     },
-    nodePublished () {
-      this.$log('nodePublished')
+    async nodePublished (oid) {
+      this.$log('nodePublished', oid)
       this.$q.notify({
         type: 'positive',
         message: 'Образ успешно добавлен!',
       })
+      // await this.$wait(200)
+      // this.$router.push(`/node/${oid}`).catch(e => e)
     }
   },
   mounted () {

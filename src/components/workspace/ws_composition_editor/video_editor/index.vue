@@ -6,28 +6,28 @@ div(
   }`
   ).column.full-width.b-50
   q-resize-observer(@resize="height = $event.height")
-  //- editor
-  //- player
-  //- progress
+  //- mode: EDITOR
   div(v-if="options.mode === 'editor'" :style=`{position: 'relative'}`).column.fit
-    //- close btn
-    q-btn(
-      v-if="false"
-      @click="$emit('close')"
-      round flat color="white" icon="keyboard_arrow_left"
-      :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
     //- body
-    div(v-if="!sidPlayerReady").col.full-width
+    div(v-if="!sidPlayerReady" :style=`{position: 'relative'}`).col.full-width
+      //- close btn
+      q-btn(
+        v-if="true"
+        @click="close()"
+        round flat color="white" icon="keyboard_arrow_left"
+        :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
       ws-content-player(@ready="storePlayerReady" :sid="sidPlayer" :content="content")
         template(v-slot:controlsTools)
           //- q-btn(
           //-   @click="pageFullscreen = !pageFullscreen"
           //-   round flat dense color="white"
           //-   :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
-    //- pages
+    //- body: pages
     div(
-      v-show="!options.isPreview"
-      :style=`{position: 'relative', maxHeight: sidPlayerReady ? '100%' : pageHeight+'px',}`).col.full-width
+      :style=`{
+        position: 'relative', maxHeight: sidPlayerReady ? '100%' : pageHeight+'px',
+        paddingBottom: layerEditing ? '0px' : '60px',
+      }`).col.full-width
       div(v-if="sidPlayerReady ? true : storePlayer && storePlayer.loadeddata").row.fit.justify-center
         page-details(
           v-if="pageId === 'details'"
@@ -38,24 +38,30 @@ div(
           v-if="pageId === 'edit'"
           :composition="composition"
           :content="content")
-    pages-controller(
-      v-if="pageHeight > 40"
-      v-show="!options.isPreview"
-      @close="$emit('close')"
-      :style=`{opacity: layerEditing ? 0 : 1}`)
+    //- footer: pages control
+    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+      pages-controller(
+        v-if="pageHeight > 40 && !layerEditing"
+        @close="close()"
+        :style=`{
+          position: 'absolute', zIndex: 1000, bottom: '0px',
+        }`)
+  //- mode: PLAYER
   div(v-if="options.mode === 'player'" :style=`{position: 'relative'}`).row.fit
     ws-content-player(@ready="storePlayerReady" :sid="sidPlayer" :content="content" :options=`{controls: false}`)
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata"
       :composition="composition"
       :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', opacity: 0.6}`)
+  //- mode: PROGRESS
   div(v-if="options.mode === 'progress'").row.full-width
-    //- div(v-if="storePlayer && storePlayer.loadeddata").row.full-width.justify-center
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata"
       :composition="composition" :style=`{maxWidth: '600px'}`)
-      template(v-slot:actions)
-        slot(name="actions")
+      template(v-slot:progressActions)
+        slot(name="progressActions")
+      template(v-slot:progressBar)
+        slot(name="progressBar")
   //- header
   //- div(
   //-   v-show="!options.isPreview && !pageFullscreen"
@@ -199,6 +205,15 @@ export default {
       }
       this.$set(this.composition.layers, layerIndex, layerInput)
       return layerId
+    },
+    close () {
+      this.$log('close')
+      if (this.composition.layers.length === 0) {
+        if (confirm('Вы не добавили ни одного образа, закрыть?')) {
+          this.$emit('close')
+        }
+      }
+      this.$emit('close')
     },
   },
   created () {

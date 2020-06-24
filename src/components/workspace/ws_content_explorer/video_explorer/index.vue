@@ -18,6 +18,7 @@ div(
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width
     q-btn(
+      v-if="!compositionEditing"
       @click="compositionAddStart()"
       round push color="green" icon="add" size="lg"
       :style=`{position: 'absolute', zIndex: 99999, bottom: '90px', left: 'calc(50% - 25px)', borderRadius: '50%'}`)
@@ -48,10 +49,13 @@ div(
         :content="content"
         :style=`{maxWidth: '600px', overflow: 'hidden'}`)
   //- footer
-  pages-controller(
-    v-show="!pageFullscreen"
-    :style=`{opacity: compositionEditing ? 0 : 1}`
-    @close="$emit('close')")
+  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    pages-controller(
+      v-show="!pageFullscreen && compositionsSelected.length === 0 && !compositionEditing"
+      :style=`{
+        position: 'absolute', zIndex: 1000, bottom: '0px',
+      }`
+      @close="$emit('close')")
 </template>
 
 <script>
@@ -99,6 +103,7 @@ export default {
       storePlayer: null,
       compositionPlaying: null,
       compositionEditing: null,
+      compositionsSelected: [],
     }
   },
   computed: {
@@ -143,8 +148,8 @@ export default {
       let composition = await this.compositionAdd()
       this.$log('composition', composition)
       this.pageId = 'compositions'
-      this.compositionPlaying = composition.id
-      // this.compositionEditing = composition.id
+      // this.compositionPlaying = composition.id
+      this.compositionEditing = composition.id
       this.$log('compositionAddStart done')
     },
     async compositionAdd () {

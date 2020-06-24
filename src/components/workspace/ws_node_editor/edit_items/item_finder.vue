@@ -9,7 +9,7 @@ div(
   .row.full-width.q-px-sm
     .row.full-width.items-center.content-center.justify-between.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Item finder
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Поиск образа
       q-btn(round flat color="white" icon="more_vert")
     .row.full-width.justify-center
       div(:style=`{maxWidth: '600px'}`).row.full-width.q-px-md
@@ -57,8 +57,8 @@ export default {
     return {
       type: 'composition',
       types: [
-        {id: 'composition', name: 'Compositions'},
-        {id: 'content', name: 'Contents'},
+        {id: 'composition', name: 'Образы'},
+        {id: 'content', name: 'Контент'},
       ]
     }
   },
@@ -81,17 +81,17 @@ export default {
         contentType: 'COMPOSITION',
         name: '',
         layers: [
-          {
-            id: layerId,
-            color: layerColor,
-            contentOid: content.contentOid,
-            figuresAbsolute: [
-              {t: layerStart, points: []},
-              {t: layerEnd, points: []}
-            ],
-            figuresRelative: [],
-            spheres: []
-          }
+          // {
+          //   id: layerId,
+          //   color: layerColor,
+          //   contentOid: content.contentOid,
+          //   figuresAbsolute: [
+          //     {t: layerStart, points: []},
+          //     {t: layerEnd, points: []}
+          //   ],
+          //   figuresRelative: [],
+          //   spheres: []
+          // }
         ],
         spheres: [],
         operation: { items: null, operations: null, type: 'CONCAT' }

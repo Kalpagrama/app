@@ -4,7 +4,7 @@
   &:hover
     background: rgb(80,80,80)
 .q-menu
-  background: none !important
+  // background: none !important
 </style>
 
 <template lang="pug">

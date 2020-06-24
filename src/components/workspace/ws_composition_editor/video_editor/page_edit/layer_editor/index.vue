@@ -15,7 +15,7 @@ div(
   //- name editor
   div(
     :style=`{
-      position: 'relative',
+      position: 'relative', borderRadius: '10px', overflow: 'hidden',
     }`).row.full-width.justify-center
     q-input(
       :value="layerName"
@@ -43,9 +43,12 @@ div(
   div(v-if="storeEditor.layerEditing === layer.id").row.full-width.q-pa-xs
     q-btn(round flat dense color="red-5" icon="delete_outline" @click="$emit('delete')")
     .col
-    q-btn(round flat dense color="grey-3" no-caps @click="$emit('createNode')").q-px-sm Create node
+    //- q-btn(round flat dense color="grey-3" no-caps @click="$emit('createNode')").q-px-sm Create node
     .col
-    q-btn(round flat dense color="green" icon="check" @click="layerEditingToggle()")
+    q-btn(
+      @click="layerEditingToggle()"
+      flat dense color="green" icon-right="check" no-caps).q-px-sm
+      span.q-mr-sm Save
 </template>
 
 <script>
@@ -109,6 +112,7 @@ export default {
   },
   watch: {
     'storeEditor.layerPlaying': {
+      immediate: true,
       handler (to, from) {
         if (to === this.layer.id) {
           // alert('START WATCH: ' + this.layer.id)

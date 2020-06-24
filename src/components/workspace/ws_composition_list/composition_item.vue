@@ -128,7 +128,12 @@ export default {
     compositionName () {
       let name = this.composition.name
       if (name.length > 0) return name.slice(0, 40)
-      else return `${this.$time(this.composition.layers[0].figuresAbsolute[0].t)} - ${this.$time(this.composition.layers[0].figuresAbsolute[1].t)}`
+      else if (this.composition.layers.length > 0) {
+        return `${this.$time(this.composition.layers[0].figuresAbsolute[0].t)} - ${this.$time(this.composition.layers[0].figuresAbsolute[1].t)}`
+      }
+      else {
+        return '-'
+      }
     },
     compositionDuration () {
       return this.composition.layers.reduce((acc, layer) => {

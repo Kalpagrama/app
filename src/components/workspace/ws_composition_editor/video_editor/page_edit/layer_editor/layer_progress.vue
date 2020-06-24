@@ -4,18 +4,28 @@ div(:style=`{position: 'relative',}`).row.full-width
   div(:style=`{}`).row.full-width.items-center.content-center
     q-btn(
       @click="layerPlayingToggle()"
-      :color="layerPlaying ? 'red' : 'white'"
+      :color="layerPlaying ? 'red' : 'green'"
       :icon="layerPlaying ? 'pause' : 'play_arrow'"
-      round flat dense)
-    .col.q-px-sm
+      :flat="!layerPlaying"
+      round dense no-caps)
       span(
-        v-if="storeEditor.layerPlaying === layer.id"
-        ).text-white.text-bold Playing
+        ).text-bold.q-mx-sm {{ layerPlaying ? 'Playing' : 'Play layer' }}
+    .col.q-px-sm
     q-btn(
       @click="layerRefresh()"
       round flat dense color="white" icon="refresh")
   //- bar
   div(:style=`{position: 'relative'}`).row.full-width.q-py-xs
+    //- times
+    div(
+      :style=`{
+        position: 'absolute', pointerEvents: 'none', zIndex: 1500,
+        height: 'calc(100% - 8px)',
+      }`
+      ).row.full-width.justify-between.items-center.content-center.text-grey-4.q-px-sm
+      small {{ $time(storeLayerEditor.layerStart) }}
+      small(:class=`{'text-red': storeLayerEditor.layerDuration > 60}`) {{ $time(storeLayerEditor.layerDuration) }}
+      small {{ $time(storeLayerEditor.layerEnd) }}
     div(
       @click="progressClick"
       v-touch-pan.mouse.left.right="progressDrag"
@@ -36,7 +46,7 @@ div(:style=`{position: 'relative',}`).row.full-width
     div(
       v-if="showBar"
       :style=`{
-        position: 'absolute', zIndex: 1200,
+        position: 'absolute', zIndex: 1600,
         left: (storePlayer.currentTime-storeLayerEditor.layerStart)/storeLayerEditor.layerDuration*100+'%',
         top: '0px',
         height: 'calc(100%)',
@@ -66,6 +76,7 @@ export default {
   methods: {
     layerPlayingToggle () {
       this.$log('layerPlayingToggle')
+      this.storeEditor.compositionPlaying = false
       this.storeEditor.layerPlaying = this.layer.id
       this.storePlayer.playPause()
     },

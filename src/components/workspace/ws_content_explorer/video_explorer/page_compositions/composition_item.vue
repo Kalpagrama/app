@@ -32,9 +32,14 @@ div(
       mode: 'progress',
     }`
     ).b-60
-    template(v-slot:actions)
+    template(v-slot:progressActions)
       q-btn(flat dense color="white" icon="edit" @click="$emit('edit')")
       q-btn(flat dense color="green" icon="check" @click="storeExplorer.compositionPlaying = null")
+    template(v-slot:progressBar)
+      div(
+        :style=`{position: 'absolute', zIndex: 900, pointerEvents: 'none'}`
+        ).row.fit.items-center.content-center.q-px-md
+        span.text-bold.text-white {{ compositionName }}
 </template>
 
 <script>
