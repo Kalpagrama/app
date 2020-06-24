@@ -54,6 +54,8 @@ div(
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata"
       :composition="composition" :style=`{maxWidth: '600px'}`)
+      template(v-slot:actions)
+        slot(name="actions")
   //- header
   //- div(
   //-   v-show="!options.isPreview && !pageFullscreen"

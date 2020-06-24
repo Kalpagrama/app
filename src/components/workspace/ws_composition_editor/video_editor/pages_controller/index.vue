@@ -5,6 +5,7 @@
       maxWidth: 600+'px',
     }`
     ).row.full-width
+    q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$emit('close')")
     .col
       q-tabs(
         :value="storeEditor.pageId" @input="storeEditor.pageId = $event"
@@ -17,6 +18,7 @@
           :name="p.id" :label="p.name"
           dense no-caps color="white"
           :style=`{color: 'rgb(180,180,180)'}`)
+    q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
 </template>
 
 <script>

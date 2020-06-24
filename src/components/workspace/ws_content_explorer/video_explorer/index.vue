@@ -16,7 +16,11 @@ div(
     :style=`{height: '60px', paddingLeft: '60px',}`).row.full-width.items-center.content-center.b-60
     span.text-white.text-bold {{ value.name }}
   //- content player
-  .col.full-width
+  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width
+    q-btn(
+      @click="compositionAddStart()"
+      round push color="green" icon="add" size="lg"
+      :style=`{position: 'absolute', zIndex: 99999, bottom: '90px', left: 'calc(50% - 25px)', borderRadius: '50%'}`)
     ws-content-player(
       @ready="storePlayerReady"
       :sid="sidPlayer"
@@ -26,8 +30,8 @@ div(
           @click="pageFullscreen = !pageFullscreen"
           round flat dense color="white"
           :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
-      template(v-slot:controls)
-        composition-name-init(v-if="pageId === 'compositions'")
+      //- template(v-slot:controls)
+      //-   composition-name-init(v-if="pageId === 'compositions'")
   //- page
   div(:style=`{height: pageHeight+'px'}`).row.full-width
     div(v-if="storePlayer && storePlayer.loadeddata").row.fit.justify-center
@@ -46,6 +50,7 @@ div(
   //- footer
   pages-controller(
     v-show="!pageFullscreen"
+    :style=`{opacity: compositionEditing ? 0 : 1}`
     @close="$emit('close')")
 </template>
 
@@ -91,7 +96,9 @@ export default {
         {id: 'compositions', name: 'Образы'},
         {id: 'explore', name: 'Поиск'},
       ],
-      storePlayer: null
+      storePlayer: null,
+      compositionPlaying: null,
+      compositionEditing: null,
     }
   },
   computed: {
@@ -130,6 +137,15 @@ export default {
     storePlayerReady () {
       this.$log('storePlayerReady')
       this.storePlayer = window.stores[this.sidPlayer]
+    },
+    async compositionAddStart () {
+      this.$log('compositoinAddStart start')
+      let composition = await this.compositionAdd()
+      this.$log('composition', composition)
+      this.pageId = 'compositions'
+      this.compositionPlaying = composition.id
+      // this.compositionEditing = composition.id
+      this.$log('compositionAddStart done')
     },
     async compositionAdd () {
       this.$log('nodeAdd')
