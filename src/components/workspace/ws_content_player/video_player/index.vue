@@ -45,7 +45,7 @@ div(:style=`{position: 'relative'}`).row.fit.b-60
       }`
       ).fit
     video-controls(
-      v-if="loadeddata"
+      v-if="options.controls && loadeddata"
       :style=`{
         position: 'absolute', zIndex: 2000, bottom: '8px',
         left: '50%',
@@ -92,7 +92,19 @@ import videoControls from './controls'
 export default {
   name: 'wsContentPlayer-videoPlayer',
   components: {videoControls},
-  props: ['sid', 'content'],
+  // props: ['sid', 'content', 'options'],
+  props: {
+    sid: {type: String},
+    content: {type: Object},
+    options: {
+      type: Object,
+      default () {
+        return {
+          controls: true
+        }
+      }
+    }
+  },
   data () {
     return {
       player: null,

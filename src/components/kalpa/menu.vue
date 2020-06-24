@@ -11,6 +11,17 @@ div(
     borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`).column.full-height.b-50
+  //- node editor
+  q-dialog(
+    v-model="nodeEditorOpened" position="bottom")
+    ws-node-editor(
+      @close="nodeEditorOpened = false, node = null"
+      :value="node"
+      :style=`{
+        maxWidth: '800px',
+        maxHeight: $q.screen.height-60+'px',
+        minHeight: $q.screen.height-60+'px',
+      }`)
   //- header
   div(
     :style=`{height: '90px'}`
@@ -72,21 +83,23 @@ div(
           span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Logout
         //- create node
         div(
-          v-if="false"
+          v-if="true"
           :style=`{}`
           ).row.full-width.items-center.content-center.q-px-md.q-py-sm
           q-btn(
+            @click="createNodeStart()"
             push color="green" no-caps align="left"
             :style=`{height: '50px'}`)
             span(:style=`{fontSize: '18px'}`).q-mx-lg Create node
         //- version
         .row.full-width.items-center.q-px-md.q-py-sm
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.9.8-12.06.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.9.9-24.06.2020
         //- slot(name="footer")
 </template>
 
 <script>
-  import { AuthApi } from 'src/api/auth'
+import { RxCollectionEnum } from 'src/system/rxdb'
+import { AuthApi } from 'src/api/auth'
 
 export default {
   name: 'kalpaMenu',
@@ -101,7 +114,9 @@ export default {
         // {id: 'report', name: 'Report a bug', icon: 'bug_report'}
       ],
       refreshLoading: false,
-      logoutLoading: false
+      logoutLoading: false,
+      nodeEditorOpened: false,
+      node: null,
     }
   },
   computed: {
@@ -122,7 +137,24 @@ export default {
       await this.$wait(500)
       await AuthApi.logout()
       this.logoutLoading = false
+    },
+    async createNodeStart () {
+      this.$log('createNodeStart')
+      let nodeInput = {
+        name: '',
+        wsItemType: 'WS_NODE',
+        items: [],
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP',
+        stage: 'draft'
+      }
+      this.$log('nodeInput', nodeInput)
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeAddStart item', item)
+      this.node = item
+      this.nodeEditorOpened = true
     }
-  }
+  },
 }
 </script>

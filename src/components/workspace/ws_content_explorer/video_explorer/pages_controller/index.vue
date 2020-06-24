@@ -4,7 +4,7 @@
     :style=`{
       maxWidth: 600+'px',
     }`
-    ).row.full-width.q-px-sm.q-pt-sm
+    ).row.full-width.items-end.content-end.q-pt-sm
     q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
     .col
       q-tabs(

@@ -4,6 +4,7 @@ component(
   :is="component[content.type]"
   :sid="sid"
   :content="content"
+  :options="options"
   @ready="$emit('ready')")
   template(v-slot:controls)
     slot(name="controls")
@@ -25,7 +26,8 @@ export default {
         return 'wcp'
       }
     },
-    content: {type: Object}
+    content: {type: Object},
+    options: {type: Object},
   },
   data () {
     return {

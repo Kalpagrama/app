@@ -3,27 +3,19 @@ component(
   v-if="value && content"
   @close="$emit('close')"
   :is="component[value.contentType]"
-  :ctx="ctx"
   :content="content"
-  :value="value")
+  :value="value"
+  :options="options")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
-import videoExplorer from './video_explorer_new'
+import videoExplorer from './video_explorer'
 
 export default {
   name: 'wsContentExplorer',
   components: {videoExplorer},
-  props: {
-    value: {type: Object},
-    ctx: {
-      type: String,
-      default () {
-        return 'workspace'
-      }
-    }
-  },
+  props: ['value', 'options'],
   data () {
     return {
       content: null,

@@ -7,7 +7,8 @@ div(
   :style=`{
     position: 'relative',
     borderRadius: $store.state.ui.borderRadius+'px',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    marginBottom: '50px',
   }`
   ).row.full-width.items-start.content-start
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 10000, top: '240px'}` :options=`{ctx,visible,active,mini}`)

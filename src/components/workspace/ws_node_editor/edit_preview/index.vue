@@ -12,6 +12,7 @@ div(
         :value="i"
         :options=`{
           isPreview: true,
+          mode: 'player',
         }`
         :style=`{
           height: 400+'px',
@@ -37,9 +38,9 @@ export default {
     return {
       nodePublishing: false,
       layouts: [
-        {value: 'PIP', label: 'Picture in picture'},
-        {value: 'HORIZONTAL', label: 'Compare'},
-        {value: 'SLIDER', label: 'Slider'}
+        {value: 'PIP', label: 'Картинка в картинке'},
+        {value: 'HORIZONTAL', label: 'Сравнение'},
+        {value: 'SLIDER', label: 'Карусель'}
       ]
     }
   },

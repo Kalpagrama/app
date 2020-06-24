@@ -220,8 +220,8 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
     Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
     Vue.component('wsContentExplorer', () => import('components/workspace/ws_content_explorer'))
-    Vue.component('wsContentVideoProgress', () => import('components/workspace/ws_content_explorer/video_explorer/content_progress'))
-    Vue.component('wsContentVideoPlayer', () => import('components/workspace/ws_content_explorer/video_explorer/content_player'))
+    // Vue.component('wsContentVideoProgress', () => import('components/workspace/ws_content_explorer/video_explorer/content_progress'))
+    // Vue.component('wsContentVideoPlayer', () => import('components/workspace/ws_content_explorer/video_explorer/content_player'))
     // composition
     Vue.component('wsCompositionList', () => import('components/workspace/ws_composition_list'))
     Vue.component('wsCompositionEditor', () => import('components/workspace/ws_composition_editor'))
