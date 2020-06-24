@@ -32,7 +32,7 @@ div(
     :style=`{
       order: 2
     }`)
-  span.text-white.full-width {{nodeFull? nodeFull.deletedAt : null}}
+  //- span.text-white.full-width {{nodeFull? nodeFull.deletedAt : null}}
   node-author(
     v-if="true"
     v-bind="$props"
