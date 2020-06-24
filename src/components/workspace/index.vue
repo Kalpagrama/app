@@ -37,7 +37,8 @@ div(:style=`{position: 'relative'}`).column.fit
       v-if="showView"
       @close="$router.back()"
       ctx="workspace"
-      :value="item").full-height
+      :value="item"
+      :options="{ctx: 'explorer'}").full-height
 </template>
 
 <script>

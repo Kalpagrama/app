@@ -3,7 +3,7 @@
   q-input(
     v-model="node.name"
     color="white"
-    label="What's the essence?"
+    label="В чем суть?"
     filled dark
     autogrow
     :readonly="!options.essenceEditable"

@@ -81,7 +81,7 @@ div(
             span(:style=`{fontSize: '18px'}`).q-mx-lg Create node
         //- version
         .row.full-width.items-center.q-px-md.q-py-sm
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.9.8-12.06.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.9.9-24.06.2020
         //- slot(name="footer")
 </template>
 

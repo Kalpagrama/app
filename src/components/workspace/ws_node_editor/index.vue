@@ -17,7 +17,7 @@ div(
     //- navigation
     div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.justify-between.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Node editor
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Редактор ядра
       //- .col
       q-btn(
         @click="pageId === 'info' ? pageId = 'items' : pageId = 'info'"
@@ -104,9 +104,9 @@ export default {
     return {
       pageId: 'items',
       pages: [
-        {id: 'items', name: '1. Items'},
-        {id: 'spheres', name: '2. Spheres'},
-        {id: 'preview', name: '3. Preview'}
+        {id: 'items', name: '1. Образы'},
+        {id: 'spheres', name: '2. Сфера'},
+        {id: 'preview', name: '3. Предосмотр'}
       ]
     }
   },

@@ -88,7 +88,6 @@ div(:style=`{position: 'relative'}`).column.fit
 import draggable from 'vuedraggable'
 import layerEditor from './layer_editor'
 import compositionProgress from './composition_progress'
-// import compositionController from './composition_controller'
 
 export default {
   name: 'pageEdit',

@@ -31,7 +31,7 @@ div(:style=`{position: 'relative',}`).row.full-width
           left: '0px',
           width: progressPercentRaw ? progressPercentRaw+'%' : (storePlayer.currentTime-storeLayerEditor.layerStart)/storeLayerEditor.layerDuration*100+'%',
           pointerEvents: 'none',
-        }`).row.full-height.b-90
+        }`).row.full-height.b-120
     //- bar: currentTime
     div(
       v-if="showBar"

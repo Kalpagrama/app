@@ -9,7 +9,6 @@ component(
   @close="$emit('close')")
   template(v-slot:actions)
     slot(name="actions")
-//- .column.fit.bg-blue
 </template>
 
 <script>

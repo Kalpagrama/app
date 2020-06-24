@@ -6,13 +6,18 @@
         kalpa-loader(:mangoQuery="mangoQuery")
           template(v-slot=`{items}`)
             .row.full-width.items-start.content-start.q-py-sm
-              div(
+              composition-item(
                 v-for="(i,ii) in items" :key="i.id"
-                @click="composition = i"
-                :style=`{height: '50px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
-                ).row.full-width.items-center.content-center.q-mb-sm.q-px-md.b-60
-                span.text-white {{i.name}}
-  .col.full-height
+                @edit="compositionEdit(i)"
+                @delete="compositionDelete(i)"
+                :composition="i" :compositionIndex="ii").q-mb-sm
+              //- div(
+              //-   v-for="(i,ii) in items" :key="i.id"
+              //-   @click="composition = i"
+              //-   :style=`{height: '50px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
+              //-   ).row.full-width.items-center.content-center.q-mb-sm.q-px-md.b-60
+              //-   span.text-white {{i.name}}
+  div(v-if="composition").col.full-height
     .row.fit.q-pa-sm
       ws-composition-editor(
         v-if="composition"
@@ -23,9 +28,11 @@
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import compositionItem from './composition_item'
 
 export default {
   name: 'pageCompositions',
+  components: {compositionItem},
   props: ['content'],
   inject: ['sidPlayer'],
   data () {
@@ -47,6 +54,18 @@ export default {
       res.sort = [{updatedAt: 'desc'}]
       return res
     }
+  },
+  methods: {
+    compositionEdit (c) {
+      this.$log('compositionEdit', c)
+      this.composition = null
+      this.$nextTick(() => {
+        this.composition = c
+      })
+    },
+    async compositionDelete (c) {
+      this.$log('compositionDelete', c)
+    },
   }
 }
 </script>
