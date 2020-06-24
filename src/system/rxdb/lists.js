@@ -12,8 +12,8 @@ const LstCollectionEnum = Object.freeze({
   LST_SPHERE_NODES: 'LST_SPHERE_NODES',
   LST_SPHERE_SPHERES: 'LST_SPHERE_SPHERES',
   LST_FEED: 'LST_FEED',
-  LST_USER_SUBSCRIBERS: 'LST_USER_SUBSCRIBERS', // подписчики пользователя
-  LST_USER_SUBSCRIPTIONS: 'LST_USER_SUBSCRIPTIONS' // подписки пользователя
+  LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
+  LST_SUBSCRIPTIONS: 'LST_SUBSCRIPTIONS' // подписки пользователя
 })
 
 function makeListCacheId (mangoQuery) {
@@ -77,14 +77,14 @@ class Lists {
         // списки: подписчики этого объекта
         let rxDocsSubscribers = await this.cache.find({
           selector: {
-            'props.rxCollectionEnum': RxCollectionEnum.LST_USER_SUBSCRIBERS,
+            'props.rxCollectionEnum': RxCollectionEnum.LST_SUBSCRIBERS,
             'props.oid': event.object.oid
           }
         })
         // списки: подписки этого пользователя
         let rxDocsSubscriptions = await this.cache.find({
           selector: {
-            'props.rxCollectionEnum': RxCollectionEnum.LST_USER_SUBSCRIPTIONS,
+            'props.rxCollectionEnum': RxCollectionEnum.LST_SUBSCRIPTIONS,
             'props.oid': event.subject.oid
           }
         })
@@ -113,14 +113,14 @@ class Lists {
         // списки: подписчики этого объекта
         let rxDocsSubscribers = await this.cache.find({
           selector: {
-            'props.rxCollectionEnum': RxCollectionEnum.LST_USER_SUBSCRIBERS,
+            'props.rxCollectionEnum': RxCollectionEnum.LST_SUBSCRIBERS,
             'props.oid': event.object.oid
           }
         })
         // списки: подписки этого пользователя
         let rxDocsSubscriptions = await this.cache.find({
           selector: {
-            'props.rxCollectionEnum': RxCollectionEnum.LST_USER_SUBSCRIPTIONS,
+            'props.rxCollectionEnum': RxCollectionEnum.LST_SUBSCRIPTIONS,
             'props.oid': event.subject.oid
           }
         })

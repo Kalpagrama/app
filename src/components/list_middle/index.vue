@@ -16,12 +16,14 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
       }`
       v-observe-visibility=`{
         callback: indexMiddleHandler,
-        throttle: 200,
+        // throttle: 200,
         intersection: {
-          rootMargin: -($q.screen.height/2-10)+'px 0px'
+          // rootMargin: -($q.screen.height/2-50)+'px 0px'
+          rootMargin: -($q.screen.height/2-1)+'px 0px'
         }
       }`
-      ).row.full-width.q-mb-xl
+      ).row.full-width
+      //-.q-mb-xl
       //- img(:src="i.meta.items[0].thumbUrl" :style=`{}`).full-width
       //- slot for the first element...
       //- inactive tint
@@ -36,6 +38,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
 </template>
 
 <script>
+  import debounce from 'lodash/debounce'
+  import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'listMiddle',
   props: {
@@ -57,7 +61,8 @@ export default {
   },
   data () {
     return {
-      indexMiddle: -1,
+      indexMiddle: -1, // меняется по дебаунсу
+      indexMiddleInstant: -1, // меняется мгновенно
       scrollTop: 0,
       paddingTop: 0,
       paddingBottom: 0
@@ -82,24 +87,39 @@ export default {
       handler (to, from) {
         this.$log('indexMiddle CHANGED', to)
         this.$emit('indexMiddle', to)
+        // прогружаем вверх и вниз от indexMiddle на упреждение
+        if (to >= 0){
+          let firstIndx = Math.max(0, to - 2)
+          let lastIndx = Math.min(this.items.length, to + 2)
+          for (let i = firstIndx; i <= lastIndx; i++){
+            let item = this.items[i]
+            if (item){
+              this.$rxdb.get(RxCollectionEnum.OBJ, this.items[i].oid, {priority: 1}).catch(err => this.$log('ошибка упреждающей прогрузки списка', err))
+            }
+          }
+        }
       }
     },
   },
   methods: {
     indexMiddleHandler (isVisible, entry, i) {
-      // this.$log('itemMiddleHandler', isVisible, entry, i)
+      let f = this.indexMiddleHandler
+      let index
+      if (i >= 0) index = i
+      else index = parseInt(entry.target.accessKey)
+      // this.$log(f, 'start. index=', index)
       if (isVisible) {
-        // alert('VISIBLE: ' + entry.target.accessKey)
-        let index
-        if (i >= 0) index = i
-        else index = parseInt(entry.target.accessKey)
-        // this.$log('indexMiddleHandler index', index)
-        this.indexMiddle = index
+        // this.$log(f, 'indexMiddle (VISIBLE) ', index)
+        this.indexMiddleInstant = index
+        this.debouncedSetIndexMiddle(index)
       }
       else {
-        if (parseInt(entry.target.accessKey) === this.indexMiddle) {
-          this.indexMiddle = -1
-          // alert('HIDDEN: ' + this.indexMiddle)
+        if (index === this.indexMiddleInstant) {
+          // this.$log(f, 'indexMiddle == -1', index)
+          this.indexMiddleInstant = -1
+          this.debouncedSetIndexMiddle(-1)
+        } else {
+          // this.$log(f, 'indexMiddle = skip', index)
         }
       }
     },
@@ -123,6 +143,9 @@ export default {
     this.paddingTop = this.options.paddingTop
     // this.paddingTop = this.$q.screen.height / 2
     this.paddingBottom = this.$q.screen.height / 3
+    this.debouncedSetIndexMiddle = debounce((index) => {
+      this.indexMiddle = index
+    }, 500)
     // if (this.items && this.items.length > 0) {
     //   await this.$wait(500)
     //   this.itemInactiveClick(this.items[0], 0)

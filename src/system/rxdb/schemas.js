@@ -105,7 +105,7 @@ export const wsSchemaItem = {
     }
   },
   required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt'],
-  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt']
+  indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt', 'stage']
 }
 
 export const wsSchemaLocalChanges = {

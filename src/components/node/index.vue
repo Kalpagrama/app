@@ -56,7 +56,8 @@ export default {
   },
   methods: {
     async nodeLoad () {
-      this.$log('*** nodeLoad start ===>', this.node.oid)
+      let f = this.nodeLoad
+      this.$log(f, 'start', this.node.oid)
       let nodeFull = null
       try {
         nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)

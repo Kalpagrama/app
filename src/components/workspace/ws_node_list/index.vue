@@ -132,6 +132,9 @@ export default {
   methods: {
     nodeEdit (node, ni) {
       this.$log('nodeEdit', node, ni)
+      // node.stage = (node.stage === 'draft' ? 'published' : 'draft')
+      // return
+      // // eslint-disable-next-line no-unreachable
       this.node = node
       this.nodeEditorOpened = true
       // this.$router.push(`/workspace/node/${node.id}`)

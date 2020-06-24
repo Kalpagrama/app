@@ -42,7 +42,7 @@ class QueryAccumulator {
         reject('queued item was evicted legally')
       }
       // ждем, параллельных вызовов(чтобы выполнить пачкой). Иначе, первый запрос пойдет отдельно, а остальные - пачкой
-      wait(100).then(() => this.next()).catch(reject)
+      wait(500).then(() => this.next()).catch(reject)
     })
   }
 
@@ -258,9 +258,11 @@ class Objects {
   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
   async get (id, priority, clientFirst, force) {
     const fetchFunc = async () => {
+      logD('objects::get::fetchFunc start')
       let promise = this.queryAccumulator.push(getOidFromId(id), priority)
       return await promise
     }
+    logD('objects::get start')
     let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force)
     if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')

@@ -67,7 +67,7 @@ export default {
     mangoQuery () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          rxCollectionEnum: RxCollectionEnum.LST_FEED,
           oidSphere: this.sphereOid
         }
       }

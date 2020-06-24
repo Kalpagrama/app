@@ -15,7 +15,7 @@ export default async ({ app, store, Vue }) => {
   try {
     await initServices(store)
   } catch (err) {
-    logE('error on init serviceworker', err)
+    logE('error on system init', err)
   }
 }
 

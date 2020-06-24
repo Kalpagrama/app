@@ -1,8 +1,8 @@
-const swVer = 2
+const swVer = 1
 const useCache = true
 let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
-  cacheVideo
+  cacheVideo, messaging
 let webPushToken = 'empty'
 
 function sendMsg (type, msgData) {
@@ -32,17 +32,19 @@ function sendMsg (type, msgData) {
 }
 // common init sw
 {
+  logDebug('common init sw', swVer)
   /* global idbKeyval, MD5 */
   importScripts('/statics/scripts/idb-keyval/idb-keyval-iife.min.js')
   importScripts('/statics/scripts/md5.js')
-  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-app.js')
-  importScripts('https://www.gstatic.com/firebasejs/7.14.0/firebase-messaging.js')
+  importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-app.js')
+  importScripts('https://www.gstatic.com/firebasejs/7.15.4/firebase-messaging.js')
   logDebug('swVer=', swVer)
   logDebug('init idb')
   swShareStore = new idbKeyval.Store('sw-share', 'request-formData')
   videoStore = new idbKeyval.Store('sw-cache-video', 'video-responses')
   logDebug('init idb ok')
-  function initWebPush(){
+
+  function initWebPush () {
     logDebug('try init web push with firebase...')
     /* global firebase */
     firebase.initializeApp({
@@ -59,12 +61,8 @@ function sendMsg (type, msgData) {
     let i = 0
     if (firebase.messaging.isSupported()) {
       try {
-        const messaging = firebase.messaging()
+        messaging = firebase.messaging()
         // messaging.useServiceWorker(self.registration)
-        messaging.getToken().then(token => {
-          logDebug('messaging.getToken() = ', token)
-          webPushToken = token
-        })
         messaging.setBackgroundMessageHandler(function (payload) {
           logDebug('[firebase-messaging-sw.js] Received background message ', payload)
 
@@ -85,20 +83,14 @@ function sendMsg (type, msgData) {
             ]
           }
           return self.registration.showNotification(notificationTitle, notificationOptions)
-
-          //   const notificationOptions = {
-          //     body: 'Background Message body.',
-          //     icon: '/firebase-logo.png'
-          //   }
-          //   return self.registration.showNotification(notificationTitle,
-          //     notificationOptions);
         })
-      } catch (err){
+      } catch (err) {
         logCritical('firebase init error!', err)
       }
     }
   }
 
+  initWebPush()
   // workbox init
   {
     /* global workbox */
@@ -107,8 +99,12 @@ function sendMsg (type, msgData) {
     workbox.core.setCacheNameDetails({
       prefix: 'kalpa'
     })
-    // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/service_worker/index.js
-    workbox.core.clientsClaim()
+    // force update sw
+    {
+      // если необходимо немедленно обновить sw (иначе - зависнет в waiting до закрытия всех страниц) - раскомментировать строки ниже (не рекомендуется)
+      // workbox.core.skipWaiting() // небезопасно!!! может смешаться старый и новый код. Сделалано по-правильному см. src/system/pwa.js
+      // workbox.core.clientsClaim()
+    }
     self.__precacheManifest = [].concat(self.__precacheManifest || [])
     // порядок вызовов precacheAndRoute и registerRoute имеет значение
     // precacheAndRoute позволяет предварительно закэшировать весь сайт при первой установке (хорошо для PWA)
@@ -160,7 +156,12 @@ function sendMsg (type, msgData) {
     })
     self.addEventListener('activate', event => {
       logDebug('activated!', swVer)
-      initWebPush()
+      if (messaging) {
+        messaging.getToken().then(token => {
+          logDebug('messaging.getToken() = ', token)
+          webPushToken = token
+        })
+      }
     })
     self.addEventListener('fetch', async event => {
       // logDebug('ready to handle fetches! request=', event.request)
@@ -207,13 +208,13 @@ function sendMsg (type, msgData) {
       logDebug('notificationclick')
       event.waitUntil(
         // Получаем список клиентов SW.
-        self.clients.matchAll().then(function(clientList) {
+        self.clients.matchAll().then(function (clientList) {
           // Если есть хотя бы один клиент, фокусируем его.
           if (clientList.length > 0) {
-            return clientList[0].focus();
+            return clientList[0].focus()
           }
           // В противном случае открываем новую страницу.
-          return self.clients.openWindow('/');
+          return self.clients.openWindow('/')
         })
       )
     }, false)

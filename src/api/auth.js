@@ -1,7 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { router } from 'src/boot/main'
-import { checkUpdate, clearCache } from 'src/system/services'
+import { systemReset } from 'src/system/services'
 import assert from 'assert'
 import { rxdb } from 'src/system/rxdb'
 
@@ -61,8 +61,7 @@ class AuthApi {
         localStorage.removeItem('k_token_expires')
         localStorage.removeItem('k_user_oid')
         localStorage.removeItem('k_user_role')
-        await clearCache()
-        await checkUpdate()
+        await systemReset()
         await router.push('/auth')
       }
     }
