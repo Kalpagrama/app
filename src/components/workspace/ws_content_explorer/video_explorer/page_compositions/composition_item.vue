@@ -59,14 +59,20 @@ export default {
       return this.composition.name
     },
     compositionStart () {
-      return this.$time(this.composition.layers[0].figuresAbsolute[0].t)
+      if (this.composition.layers.length > 0) return this.$time(this.composition.layers[0].figuresAbsolute[0].t)
+      else return '-'
     },
     compositionDuration () {
-      let t = this.composition.layers.reduce((acc, layer) => {
-        acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
-        return acc
-      }, 0)
-      return t
+      if (this.composition.layers.length > 0) {
+        let t = this.composition.layers.reduce((acc, layer) => {
+          acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
+          return acc
+        }, 0)
+        return t
+      }
+      else {
+        return '-'
+      }
     }
   }
 }

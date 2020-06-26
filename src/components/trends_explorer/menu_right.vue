@@ -9,7 +9,7 @@ div(
   }`
   ).column.full-width.b-50
   //- header
-  div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
+  div(:style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-md
     span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Trends
   //- body
   .col.full-width.scroll

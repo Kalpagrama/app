@@ -164,6 +164,7 @@ export default {
     password: {
       handler (to, from) {
         this.$log('password CHANGED', to)
+        if (this.loginType && this.loginType === 'USERNAME') return
         if (to) {
           if (to.length === 4) {
             this.userAuthenticate()

@@ -1,11 +1,14 @@
 <template lang="pug">
 div(
+  :class=`{
+    'q-pl-xs': nodeFull && nodeFull.rateUser,
+  }`
   :style=`{
     position: 'relative',
     borderRadius: 30+'px',
     overflow: 'hidden',
   }`
-  ).row.items-center.content-center.b-80.q-pl-xs
+  ).row.items-center.content-center.b-80
   //- rateUser
   div(
     v-if="nodeFull && nodeFull.rateUser"
@@ -18,7 +21,7 @@ div(
       :opacity="0.5 + (0.1*i)"
       :style=`{
         marginRight: '-25px',
-        zIndex: 100+i,
+        zIndex: 10+i,
       }`).cursor-pointer
       div(
         :style=`{
@@ -39,7 +42,7 @@ div(
     color="green"
     :loading="stateNode.voteShow"
     :style=`{
-      zIndex: 1000,
+      zIndex: 300,
       width: '60px',
       height: '60px',
       borderRadius: '50%'

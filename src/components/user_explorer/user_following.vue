@@ -1,20 +1,31 @@
+<style lang="sass" scoped>
+.subscription
+  &:hover
+    background: rgb(90,90,90)
+</style>
+
 <template lang="pug">
-//- .col.fit.bg-grey-3.q-px-sm.q-py-sm
-//-   div(
-//-     @click="subjectClick(s, ss)"
-//-     v-for="(s, ss) in subscriptions" :key="ss"
-//-     :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
-//-     ).row.full-width.items-center.q-mb-sm.bg-white.cursor-pointer.q-px-sm
-//-     div(@click="" :style=`{height: '40px', width: '40px'}`).row.items-center.justify-center
-//-       img(@click="" :src="s.thumbUrl" :style=`{height: '40px', width: '40px', borderRadius: '50%'}`)
-//-     div(@click="").col.full-height.q-ml-sm
-//-       .row.fit.items-center
-//-         span.text-caption {{ s.name | cut(50) }}
-//-   div(v-if="countSubsсriptions === 0").row.full-width
-//-     div(style=`border-radius: 10px`).row.full-width.justify-center.items-center.bg-grey-1.q-pa-lg
-//-       span.text-bold Following no one
+kalpa-loader(:mangoQuery="mangoQuery")
+  template(v-slot=`{items, itemsMore}`)
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '600px', paddingTop: '110px',}`).row.full-width.items-start.content-start
+        div(
+          v-for="(s,si) in items" :key="s.oid"
+          :style=`{
+            position: 'relative',
+            height: '40px',
+            borderRadius: $store.state.ui.borderRadius+'px'
+          }`
+          ).row.full-width.items-center.content-center.q-px-md.cursor-pointer.subscription.b-50.q-mb-xs
+          img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
+          div(@click="subscriptionClick(s,si)").col.q-px-sm
+            span.text-white {{ s.name }}
 </template>
+
 <script>
+import { UserApi } from 'src/api/user'
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'userExplorer-userFollowing',
   props: ['subscriptions', 'oid'],
@@ -23,12 +34,23 @@ export default {
     }
   },
   computed: {
-    // countSubsсriptions () {
-    //   if (this.subscriptions === null) return 0
-    //   return this.subscriptions.length
-    // }
+    sphereOid () {
+      return this.$route.params.oid
+    },
+    mangoQuery () {
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
+          oidSphere: this.sphereOid,
+        }
+      }
+    }
   },
   methods: {
+    async subscriptionClick (s, si) {
+      this.$log('subscriptionClick', s, si)
+      this.$router.push('/user/' + s.oid)
+    },
     subjectClick (s) {
       this.$logD('subjectClick')
       switch (s.type) {

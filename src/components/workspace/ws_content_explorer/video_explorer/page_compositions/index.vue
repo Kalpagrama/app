@@ -18,6 +18,7 @@ div(:style=`{position: 'relative'}`).column.fit
         .row.full-width.items-start.content-start.q-py-sm
           div(
             v-for="(i,ii) in items" :key="i.id"
+            v-if="i.layers.length > 0"
             :style=`{}`
             ).row.full-width.items-start.content-start
             div(:style=`{width: '50px', height: '50px',}`).row.items-center.content-center.justify-center

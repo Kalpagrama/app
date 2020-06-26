@@ -1,16 +1,17 @@
 <template lang="pug">
-.row.full-width.q-pt-md
-  kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-    template(v-slot=`{items}`)
-      list-middle(:items="items" :options="{paddingTop: 0}")
-        template(v-slot:item=`{item, index, indexMiddle}`)
-          node(
-            ctx="list" layout="PIP"
-            :node="item" :index="index" :essence="true"
-            :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
-            :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
-            :active="index === indexMiddle"
-            :mini="false")
+kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
+  template(v-slot=`{items}`)
+    list-middle(:items="items")
+      template(v-slot:itemFirst)
+        div(:style=`{height: '110px'}`).row.full-width
+      template(v-slot:item=`{item, index, indexMiddle}`)
+        node(
+          ctx="list" layout="PIP"
+          :node="item" :index="index" :essence="true"
+          :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
+          :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
+          :active="index === indexMiddle"
+          :mini="false")
 </template>
 
 <script>

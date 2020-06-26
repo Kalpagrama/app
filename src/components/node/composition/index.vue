@@ -14,7 +14,6 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
   //- menu
   q-btn(
     v-if="!mini"
-    @click="compositionMore()"
     round flat color="white" icon="more_vert"
     :style=`{
       position: 'absolute', zIndex: 2000,
@@ -148,6 +147,7 @@ export default {
         this.$log('active TO', to)
         if (to) {
           // if (this.$refs.videoRef) this.$refs.videoRef.play()
+          this.compositionMore()
         }
         else {
           // if (this.$refs.videoRef) this.$refs.videoRef.pause()
@@ -169,15 +169,14 @@ export default {
     },
     async compositionMore () {
       this.$log('compositionMore')
-      if (this.compositionContents.length === 0) {
-        let res = []
-        await Promise.all(this.composition.layers.map(async (l, li) => {
-          let content = await this.$rxdb.get(RxCollectionEnum.OBJ, l.contentOid)
-          res.push(content)
-        }))
-        this.$log('res', res)
-        this.compositionContents = res
-      }
+      if (!this.composition) return
+      let res = []
+      await Promise.all(this.composition.layers.map(async (l, li) => {
+        let content = await this.$rxdb.get(RxCollectionEnum.OBJ, l.contentOid)
+        res.push(content)
+      }))
+      this.$log('res', res)
+      this.compositionContents = res
     },
     videoClick () {
       this.$log('videoClick')
@@ -203,6 +202,10 @@ export default {
       this.duration = e.target.duration
       this.videoLoaded = true
     }
+  },
+  mounted () {
+    // this.$log('mounted')
+    // this.composition
   }
 }
 </script>

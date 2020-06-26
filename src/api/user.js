@@ -43,7 +43,12 @@ class UserApi {
     return subscribe
   }
 
-// Отписаться от сущности. Мутация будет вызвана по приходу эвента
+  // check subscription
+  static async isSubscribed (oid) {
+    return false
+  }
+
+  // Отписаться от сущности. Мутация будет вызвана по приходу эвента
   static async unSubscribe (oid) {
     logD('subscriptions', 'unSubscribe', oid)
     let { data: { unSubscribe } } = await apollo.clients.api.mutate({

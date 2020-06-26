@@ -48,18 +48,16 @@ q-layout(
           'q-pt-sm': false
         }`
         :style=`{}`).row.fit.justify-center
-        div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).col.full-height
+          //- div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).col.full-height
           //- left panel menu
           div(
             v-if="$q.screen.width > 1260"
+            @wheel="onWheel"
             :style=`{
-              position: 'absolute', zIndex: 99999,
-              top: $store.state.ui.appFullscreen ? '8px' : '0px',
-              left: $store.state.ui.appFullscreen ? '8px' : -($q.screen.width-maxWidth)/2+'px',
-              maxWidth: ($q.screen.width-maxWidth)/2+'px',
-              height: '600px'
-            }`).row.full-width.justify-end.q-pt-sm.q-px-sm
-            kalpa-menu(v-if="!loading")
+              position: 'fixed', zIndex: 100, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
+              pointerEvents: pointerEvents,
+            }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
+            kalpa-menu(v-if="!loading" :style=`{maxWidth: '300px'}`)
           router-view(
             v-if="!loading")
           div(
@@ -70,8 +68,8 @@ q-layout(
 
 <script>
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
-import 'mediaelement/build/mediaelementplayer.min.css'
-import 'mediaelement/full'
+// import 'mediaelement/build/mediaelementplayer.min.css'
+// import 'mediaelement/full'
 import assert from 'assert'
 
 export default {
@@ -81,7 +79,9 @@ export default {
       maxWidth: 800,
       loading: true,
       offsetTop: null,
-      showLeftDrawer: false
+      showLeftDrawer: false,
+      pointerEventsTimeout: null,
+      pointerEvents: false,
     }
   },
   meta: {
@@ -98,6 +98,14 @@ export default {
     }
   },
   methods: {
+    onWheel (e) {
+      // this.$log('onWheel', e)
+      if (this.pointerEventsTimeout !== undefined) clearTimeout(this.pointerEventsTimeout)
+      this.pointerEvents = 'none'
+      this.pointerEventsTimeout = setTimeout(() => {
+        this.pointerEvents = 'auto'
+      }, 100)
+    },
     onResize (e) {
       // this.$log('onResize', e)
       this.$store.commit('ui/stateSet', ['panelMaxWidth', (e.width - this.maxWidth) / 2])

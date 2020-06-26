@@ -16,12 +16,17 @@ div(
     :style=`{height: '60px', paddingLeft: '60px',}`).row.full-width.items-center.content-center.b-60
     span.text-white.text-bold {{ value.name }}
   //- content player
-  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width
+  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width.br
     q-btn(
       v-if="!compositionEditing"
       @click="compositionAddStart()"
-      round push color="green" icon="add" size="lg"
-      :style=`{position: 'absolute', zIndex: 99999, bottom: '90px', left: 'calc(50% - 25px)', borderRadius: '50%'}`)
+      round push color="green" icon="add" size="md"
+      :style=`{
+        position: 'absolute', zIndex: 99999,
+        bottom: '12px',
+        right: '12px',
+        borderRadius: '50%',
+      }`)
     ws-content-player(
       @ready="storePlayerReady"
       :sid="sidPlayer"
