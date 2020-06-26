@@ -19,7 +19,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.ju
         // throttle: 200,
         intersection: {
           // rootMargin: -($q.screen.height/2-50)+'px 0px'
-          rootMargin: -($q.screen.height/2-1)+'px 0px'
+          // rootMargin: -($q.screen.height/2-1)+'px 0px'
+          rootMargin: '-50% 0px'
         }
       }`
       ).row.full-width

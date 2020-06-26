@@ -101,8 +101,8 @@ class Cache {
 
       this.debouncedDumpLru = debounce(async () => {
         const f = this.debouncedDumpLru
-        logD(f, 'start. debouncedDumpLru. rxdb.isLeader()=', rxdb.isLeader())
         if (!rxdb.isLeader()) return
+        logD(f, 'start. debouncedDumpLru.')
         let lruDump = this.cacheLru.dump()
         await rxdb.set(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
       }, debounceIntervalDumpLru)

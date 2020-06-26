@@ -4,6 +4,7 @@ import { ObjectsApi } from 'src/api/objects'
 import { ReactiveItemHolder, getReactive } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import set from 'lodash/set'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_OBJ)
@@ -277,24 +278,25 @@ class Objects {
     if (!rxdb.isLeader()) return
     switch (event.type) {
       case 'OBJECT_CHANGED': {
-        let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
-        if (rxDoc) {
-          const path = event.path ? 'cached.data.' + event.path : 'cached.data'
-          await rxDoc.atomicSet(path, event.value)
+        let objectFullReactive = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid)
+        if (objectFullReactive) {
+          set(objectFullReactive, event.path, event.value)
         }
         break
       }
       case 'VOTED': {
-        let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
-        if (rxDoc) {
-          await rxDoc.atomicSet('cached.data.rate', event.rate)
+        let objectFullReactive = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid)
+        if (objectFullReactive) {
+          logD(f, `try edit rate. rateUser= ${objectFullReactive.rateUser}`)
+          objectFullReactive.rate = event.rate
+          logD(f, `try edit rate complete. rateUser= ${objectFullReactive.rateUser}`)
         }
         break
       }
       case 'OBJECT_DELETED': {
-        let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
-        if (rxDoc) {
-          await rxDoc.atomicSet('cached.data.deletedAt', new Date())
+        let objectFullReactive = await rxdb.get(RxCollectionEnum.OBJ, event.object.oid)
+        if (objectFullReactive) {
+          objectFullReactive.deletedAt = new Date()
         }
         break
       }
