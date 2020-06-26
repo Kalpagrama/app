@@ -16,7 +16,7 @@ div(
     :style=`{height: '60px', paddingLeft: '60px',}`).row.full-width.items-center.content-center.b-60
     span.text-white.text-bold {{ value.name }}
   //- content player
-  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width.br
+  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width
     q-btn(
       v-if="!compositionEditing"
       @click="compositionAddStart()"

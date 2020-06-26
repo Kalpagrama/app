@@ -75,7 +75,7 @@ div(
                 v-for="(n,ni) in items" :key="ni"
                 :node="n" :nodeIndex="ni"
                 @edit="nodeEdit(n,ni)"
-                @delete="nodeDelete(n,ni)").q-mb-md
+                @delete="nodeDelete(n,ni)").q-mb-sm
             //- nothing found
             div(
               v-else

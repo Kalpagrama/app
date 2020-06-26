@@ -30,7 +30,7 @@ div(
       kalpa-logo(:width="40" :height="40")
     .col
       .row.fit.items-center.content-center
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold Kalpagramma
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold Кальпаграмма
         .row.full-width
           small.text-white Up the essence!
   //- body
@@ -73,14 +73,14 @@ div(
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Refresh
+          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Обновить
         //- logout
         div(
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Logout
+          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Выйти
         //- create node
         div(
           v-if="true"
@@ -90,10 +90,10 @@ div(
             @click="createNodeStart()"
             color="green" no-caps align="left" icon="add"
             :style=`{height: '50px'}`).full-width
-            span(:style=`{fontSize: '18px'}`).q-ml-md Create node
+            span(:style=`{fontSize: '18px'}`).q-ml-md Создать ядро
         //- version
         div(v-if="true").row.full-width.items-center.q-pa-md
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 Version: 0.9.9-26.06.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 Версия: 0.9.9-26.06.2020
         //- slot(name="footer")
 </template>
 
@@ -108,10 +108,9 @@ export default {
       width: 300,
       pages: [
         {id: 'home', name: 'Home', icon: 'home'},
-        {id: 'trends', name: 'Trends', icon: 'whatshot'},
-        {id: 'workspace', name: 'Workspace', icon: 'school'},
-        {id: 'settings', name: 'Settings', icon: 'tune'},
-        // {id: 'report', name: 'Report a bug', icon: 'bug_report'}
+        {id: 'trends', name: 'Тренды', icon: 'whatshot'},
+        {id: 'workspace', name: 'Мастерская', icon: 'school'},
+        {id: 'settings', name: 'Настройки', icon: 'tune'},
       ],
       refreshLoading: false,
       logoutLoading: false,

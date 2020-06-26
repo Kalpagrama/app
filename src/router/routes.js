@@ -14,7 +14,16 @@ const routes = [
       { name: 'welcome', path: 'welcome', component: () => import('pages/app/welcome') },
       { name: 'home', path: '', component: () => import('components/home_explorer') },
       // { name: ''}
-      { name: 'settings', path: 'settings/:page?', component: () => import('pages/app/settings') },
+      {
+        name: 'settings',
+        path: 'settings/:page?',
+        redirect: 'settings/account',
+        component: () => import('pages/app/settings'),
+        children: [
+          { name: 'account', path: 'account', component: () => import('pages/app/settings/page_account') },
+          // {}
+        ]
+      },
       { name: 'report', path: 'report', component: () => import('pages/app/report') },
       // items
       { name: 'user',

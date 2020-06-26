@@ -40,7 +40,7 @@ q-layout(
       v-if="!loading"
       :style=`{
         borderRadius: '0 10px 10px 0'
-      }`)
+      }`).full-height
   q-page-container
     q-page(:style=`{height: $q.screen.height+'px'}`)
       div(
@@ -68,8 +68,8 @@ q-layout(
 
 <script>
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
-// import 'mediaelement/build/mediaelementplayer.min.css'
-// import 'mediaelement/full'
+import 'mediaelement/build/mediaelementplayer.min.css'
+import 'mediaelement/full'
 import assert from 'assert'
 
 export default {

@@ -55,10 +55,15 @@ kalpa-layout(:style=`{height: $q.screen.height+'px'}` :rightDrawerScroll="true")
         zIndex: 30000,
         borderRadius: '0 0 10px 10px', overflow: 'hidden'
       }`
-      ).row.full-width.items-center.content-center.justify-start.b-50.q-pa-sm
+      ).row.full-width.items-center.content-center.justify-start.b-60.q-pa-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       .col.q-px-sm
         span(:style=`{fontSize: '18px'}`).text-white.text-bold Home
+  template(v-slot:footer)
+    div(:style=`{maxWidth: '800px', borderRadius: '10px 10px 0 0',}`).row.full-width.items-center.content-center.b-60.q-pa-sm
+      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
+      .col
+      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = true")
   template(v-slot:drawerRight)
     menu-right(:style=`{maxWidth: '400px'}`)
   template(v-slot:page)
@@ -66,7 +71,7 @@ kalpa-layout(:style=`{height: $q.screen.height+'px'}` :rightDrawerScroll="true")
       template(v-slot=`{items}`)
         list-middle(:items="items" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`)
           template(v-slot:itemFirst)
-            div(:style=`{height: '100px'}`).row.full-width
+            div(:style=`{height: '70px'}`).row.full-width
           template(v-slot:item=`{item, index, indexMiddle}`)
             node(
               ctx="list" layout="PIP"

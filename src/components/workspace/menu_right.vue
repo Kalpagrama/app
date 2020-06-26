@@ -14,8 +14,8 @@ div(
     borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
   }`
   ).column.full-width.q-pt-sm
-  div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
-    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Мастерская
+  div(:style=`{height: '100px'}`).row.full-width.items-center.content-center.q-px-md
+    span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white.text-bold Мастерская
   .col.full-width.scroll
     .row.full-width.items-start
       router-link(

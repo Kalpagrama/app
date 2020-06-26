@@ -99,9 +99,9 @@ kalpa-layout(:style=`{height: $q.screen.height+'px'}`)
             :style=`{color: 'white'}`)
   template(v-slot:footer)
     div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center
-      q-btn(round flat color="white" icon="menu")
+      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
       .col
-      q-btn(round flat color="white" icon="menu_open")
+      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = true")
   template(v-slot:drawerRight)
     menu-right(:style=`{maxWidth: '250px',}` :pages="pages")
   template(v-slot:page)

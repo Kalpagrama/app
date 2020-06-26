@@ -56,12 +56,12 @@
 kalpa-layout(:style=`{height: $q.screen.height+'px',}`)
   template(v-slot:footer)
     div(:style=`{maxWidth: '800px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width.q-pa-sm.b-60
-      q-btn(round flat color="white" icon="menu")
+      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
       .col
-      q-btn(round flat color="white" icon="menu_open")
+      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = true")
   template(v-slot:header)
     div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.q-pa-sm.b-60
-      q-btn(round flat color="white" icon="keyboard_arrow_left")
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       .col.q-px-sm
         span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ '# ' + sphere.name}}
   template(v-slot:drawerRight)
@@ -73,6 +73,8 @@ kalpa-layout(:style=`{height: $q.screen.height+'px',}`)
           :root="$refs.kBox"
           :items="items" :more="itemsMore" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`
           :style=`{}`)
+          template(v-slot:itemFirst)
+            div(:style=`{height: '70px'}`).row.full-width
           template(v-slot:item=`{item, index, indexMiddle}`)
             node(
               ctx="list" layout="PIP"
