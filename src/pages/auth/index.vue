@@ -102,6 +102,7 @@ input
             v-model="password" autofocus dark color="green" filled label="Enter password"
             :type="passwordShow ? 'text' : 'password'"
             @keyup.enter="userAuthenticate()"
+            autocomplete
             :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
             template(v-slot:append)
               q-icon(
