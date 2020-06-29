@@ -23,7 +23,7 @@ div(
         v-else
         :style=`{height: '400px'}`).row.full-width.items-center.content-center.justify-center
         q-spinner(color="green" size="50px")
-    .row.full-width.items-center.content-center.q-py-sm
+    div(v-if="false").row.full-width.items-center.content-center.q-py-sm
       q-select(
         filled
         dark color="white" label="Layout"

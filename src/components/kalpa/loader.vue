@@ -54,23 +54,28 @@ export default {
       handler(to, from){
         this.$log('loader items CHANGED', 'from=', from, ', to=', to)
         this.$emit('itemsCount', to.length)
+        this.itemsSlice = 1
+        this.itemsSliced = to.slice(0, this.sliceSize)
       }
     }
   },
   methods: {
     async itemsMore () {
-      this.$log('itemsMore')
       if (this.itemsSlicing) return
+      this.$log('itemsMore')
       this.itemsSlicing = true
-      this.itemsSlice += 1
-      this.$q.notify('Loading... ' + this.itemsSlice)
+      // check
       let start = this.itemsSliced.length - 1
-      let end = this.itemsSlice * this.sliceSize
+      let end = (this.itemsSlice + 1) * this.sliceSize
       this.$log('start/end', start, end)
+      if (end > this.items.length) return
       let arr = this.items.slice(start, end)
       this.$log('arr', arr)
+      // set
       this.itemsSliced.splice(start, 0, ...arr)
-      await this.$wait(1000)
+      this.itemsSlice += 1
+      this.$q.notify('Loading... ' + this.itemsSlice)
+      await this.$wait(1500)
       this.itemsSlicing = false
     },
     async itemsLoad (mangoQuery, append = false) {

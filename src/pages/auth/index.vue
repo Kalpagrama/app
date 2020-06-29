@@ -19,7 +19,7 @@ input
       .row.full-width.justify-center
         span(:style=`{fontSize: '24px'}`).text-bold.text-white Kalpagramma
     //- form
-    div(:style=`{maxWidth: '350px'}`).row.full-width.justify-center.q-pa-sm
+    form(:style=`{maxWidth: '350px'}` @submit="$event.preventDefault()").row.full-width.justify-center.q-pa-sm
       div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', oveflow: 'hidden'}`).row.fit.items-end.q-pa-sm.q-mb-sm
         //- get started
         div(v-if="!userIdentified").row.full-width.items-end.content-end.justify-center

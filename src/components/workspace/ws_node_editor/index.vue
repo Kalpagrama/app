@@ -95,7 +95,8 @@ export default {
       type: Object,
       default () {
         return {
-          essenceEditable: true
+          essenceEditable: true,
+          itemAdd: false,
         }
       }
     }
@@ -105,7 +106,7 @@ export default {
       pageId: 'items',
       pages: [
         {id: 'items', name: '1. Образы'},
-        {id: 'spheres', name: '2. Сфера'},
+        {id: 'spheres', name: '2. Сферы'},
         {id: 'preview', name: '3. Предосмотр'}
       ]
     }

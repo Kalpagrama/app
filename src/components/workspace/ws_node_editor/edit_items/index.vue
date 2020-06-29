@@ -70,7 +70,7 @@ import itemItem from './item_item'
 export default {
   name: 'editItems',
   components: {draggable, itemFinder, itemItem},
-  props: ['stateNodeEditor', 'node'],
+  props: ['stateNodeEditor', 'node', 'options'],
   data () {
     return {
       item: null,
@@ -104,6 +104,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    if (this.node.items.length === 0) {
+      if (this.options.itemAdd) {
+        this.itemAdd()
+      }
+    }
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

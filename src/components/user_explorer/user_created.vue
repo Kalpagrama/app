@@ -4,6 +4,36 @@ kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
     list-middle(:items="items")
       template(v-slot:itemFirst)
         div(:style=`{height: '110px'}`).row.full-width
+        //- create node if items.length === 0
+        //- node editor
+        q-dialog(
+          v-model="nodeEditorOpened" position="bottom"
+          @hide="nodeEdited")
+          ws-node-editor(
+            @close="nodeEdited"
+            @published="nodePublished"
+            :value="node"
+            :style=`{
+              maxWidth: '800px',
+              maxHeight: $q.screen.height-60+'px',
+              minHeight: $q.screen.height-60+'px',
+            }`)
+        div(
+          v-if="itsMe && items.length === 0"
+          :style=`{
+            height: '400px',
+            borderRadius: $store.state.ui.borderRadius+'px',
+            overflow: 'hidden',
+            marginBottom: '40px',
+          }`
+          ).row.full-width.items-center.content-center.justify-center.b-60
+          span.text-white Вы еще не создали ни одного ядра
+          .row.full-width.items-center.content-center.justify-center.q-py-sm
+            q-btn(
+              @click="createNodeStart()"
+              color="green" no-caps
+              :style=`{height: '50px', width: '240px',}`)
+              span(:style=`{fontSize: '18px'}`).q-ml-md Создать ядро
       template(v-slot:item=`{item, index, indexMiddle}`)
         node(
           ctx="list" layout="PIP"
@@ -15,7 +45,8 @@ kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
 </template>
 
 <script>
-import { LstCollectionEnum as RxCollectionEnum } from 'src/system/rxdb/lists'
+// import { LstCollectionEnum as RxCollectionEnum } from 'src/system/rxdb/lists'
+import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'userCreated',
@@ -23,9 +54,14 @@ export default {
   },
   data () {
     return {
+      nodeEditorOpened: false,
+      node: null,
     }
   },
   computed: {
+    itsMe () {
+      return this.$route.params.oid === this.$store.getters.currentUser().oid
+    },
     progress () {
       // this.$logW('todo !!!!')
       // return this.$store.state.events.progressCreateNode
@@ -58,10 +94,36 @@ export default {
     // }
   },
   methods: {
-    // nodeClick (val) {
-    //   this.$log('nodeClick', val)
-    //   this.$router.push('/node/' + val[0].oid)
-    // }
+    async createNodeStart () {
+      this.$log('createNodeStart')
+      this.$store.commit('ui/stateSet', ['active', false])
+      let nodeInput = {
+        name: '',
+        wsItemType: 'WS_NODE',
+        items: [],
+        spheres: [],
+        category: 'FUN',
+        layout: 'PIP',
+        stage: 'draft'
+      }
+      this.$log('nodeInput', nodeInput)
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeAddStart item', item)
+      this.node = item
+      this.nodeEditorOpened = true
+    },
+    nodeEdited () {
+      this.$log('nodeEdited')
+      this.$store.commit('ui/stateSet', ['active', true])
+      this.nodeEditorOpened = false
+      this.node = null
+    },
+    async nodePublished () {
+      this.$log('nodePublished')
+      this.nodeEdited()
+      // await this.$wait(200)
+      // this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
+    }
   },
   mounted () {
     this.$log('mounted')
