@@ -36,9 +36,16 @@ div(
                 borderRadius: $store.state.ui.borderRadius+'px'
               }`
               ).row.full-width.items-center.content-center.q-px-md.cursor-pointer.subscription
-              img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
-              div(@click="subscriptionClick(s,si)").col.q-px-sm
-                span.text-white {{ s.name }}
+              .col.full-height
+                div(v-if="s.type === 'SENTENCE'").row.fit.items-center.content-center
+                  //- div(:style=`{}`)
+                  q-btn(round flat dense color="white" no-caps) #
+                  div(@click="subscriptionClick(s,si)").col.q-px-sm
+                    span.text-white {{ s.name }}
+                div(v-if="s.type === 'USER'").row.items-center.content-center.fit
+                  img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
+                  div(@click="subscriptionClick(s,si)").col.q-px-sm
+                    span.text-white {{ s.name }}
               q-btn(
                 v-if="editing"
                 @click="subscriptionDelete(s,si)"

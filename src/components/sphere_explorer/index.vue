@@ -1,5 +1,7 @@
 <template lang="pug">
-kalpa-layout(:style=`{height: $q.screen.height+'px'}`)
+kalpa-layout(
+  :title="sphere ? sphere.name : ''"
+  :style=`{height: $q.screen.height+'px'}`)
   template(v-slot:header)
     .row.full-width.justify-center
       div(

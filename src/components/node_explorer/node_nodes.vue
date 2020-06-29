@@ -5,7 +5,7 @@ div(:style=`{position: 'relative'}`).column.fit
     @click="nodeAddStart()"
     push color="green" no-caps
     :style=`{
-      position: 'fixed', zIndex: 10000,
+      position: 'fixed', zIndex: 5555,
       bottom: $q.screen.width > 1260 ? '10px' : '70px',
       left: 'calc(50% - 150px)',
       height: '50px',

@@ -47,11 +47,13 @@ div(:style=`{position: 'relative',}`).row.full-width.justify-center
           }`
           ).column.full-width
           //- header
-          div(:style=`{height: '100px'}`).row.full-width.items-center.content-center.q-px-md
+          div(
+            v-if="title"
+            :style=`{height: '100px'}`).row.full-width.items-center.content-center.q-px-md
             span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white.text-bold {{ title }}
           //- body
           .col.full-width.scroll
-            .row.full-width.items-start
+            div(v-if="pages").row.full-width.items-start
               div(
                 v-for="(p,pi) in pages" :key="pi"
                 @click="$emit('pageId', p.id), pageMenuShow = false"
@@ -74,7 +76,7 @@ div(:style=`{position: 'relative',}`).row.full-width.justify-center
         .row.full-width.b-60
           q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
           .col
-            div.row.fit.items-end.content-end.justify-center
+            div(v-if="pagesHot").row.fit.items-end.content-end.justify-center
               q-tabs(
                 :value="pageId" @input="$emit('pageId', $event)"
                 no-caps dense
@@ -84,7 +86,7 @@ div(:style=`{position: 'relative',}`).row.full-width.justify-center
           q-btn(
             @click="pageMenuShow = !pageMenuShow"
             round flat color="white"
-            :icon="pageMenuShow ? 'keyboard_arrow_down' : 'menu_open'")
+            :icon="pageMenuShow ? 'keyboard_arrow_down' : 'keyboard_arrow_up'")
   //- header
   div(
     v-if="$slots.header"
@@ -94,6 +96,12 @@ div(:style=`{position: 'relative',}`).row.full-width.justify-center
       pointerEvents: pointerEvents,
     }`).row.full-width.justify-center
     slot(name="header")
+  transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="pageMenuShow === true"
+      @click="pageMenuShow = false"
+      :style=`{position: 'absolute', zIndex: 6666, top: 0, bottom: 0, left: 0, right: 0,
+      background: 'rgba(0,0,0,0.4)'}`).row.fit
   slot(name="page")
 </template>
 
@@ -115,7 +123,7 @@ export default {
       handler (to, from) {
         this.$log('pageMenuShow TO', to)
         this.pageMenuBlock = true
-        this.$tween.to(this, 0.3, {
+        this.$tween.to(this, 0.2, {
           pageMenuHeight: to ? this.$q.screen.height / 2 : 0,
           onComplete: () => {
             this.pageMenuBlock = false

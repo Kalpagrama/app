@@ -1,5 +1,7 @@
 <template lang="pug">
-kalpa-layout(:style=`{height: $q.screen.height+'px'}`)
+kalpa-layout(
+  title="Settings"
+  :style=`{height: $q.screen.height+'px'}`)
   template(v-slot:header)
     div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px',}`).row.full-width.items-center.content-center.q-pa-sm.b-60
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
