@@ -35,6 +35,7 @@ q-layout(
   container :style=`{height: $q.screen.height+'px',}`
   @resize="onResize").bg-30
   q-drawer(
+    behavior="mobile"
     side="left" :value="$store.state.ui.appShowMenu" @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
       v-if="!loading"

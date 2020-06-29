@@ -16,7 +16,7 @@ div(
     :size="$q.screen.gt.xs ? 'xl' : 'lg'"
     :style=`{
       position: 'absolute', zIndex: 1000, right: '10px',
-      bottom: $q.screen.gt.xs ? 10+'px' : 60+10+'px',
+      bottom: $q.screen.width > 1260 ? 10+'px' : 60+10+'px',
       borderRadius: '50%'
     }`)
   //- node editor

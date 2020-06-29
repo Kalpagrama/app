@@ -6,9 +6,6 @@
 
 <template lang="pug">
 div(
-  :class=`{
-    'full-height': inDrawer
-  }`
   :style=`{
     position: 'relative',
     borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
@@ -20,10 +17,9 @@ div(
     .row.full-width.items-start
       router-link(
         :to="{name: p.id}"
-        v-for="(p,pi) in stateWorkspace.pages" :key="pi"
+        v-for="(p,pi) in storeWorkspace.pages" :key="pi"
         :class=`{
             'b-70': $route.name === p.id,
-            'b-50': $route.name !== p.id,
           }`
         :style=`{
           height: '50px',
@@ -42,9 +38,10 @@ div(
 <script>
 export default {
   name: 'workspace-menuRight',
-  props: ['stateWorkspace', 'inDrawer'],
-  data () {
-    return {
+  inject: ['sidWorkspace'],
+  computed: {
+    storeWorkspace () {
+      return window.stores[this.sidWorkspace]
     }
   }
 }

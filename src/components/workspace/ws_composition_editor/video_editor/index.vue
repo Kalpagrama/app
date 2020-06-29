@@ -2,10 +2,10 @@
 div(
   :style=`{
     position: 'relative',
-    minWidth: pageFullscreen ? $q.screen.width+'px' : 800+'px',
+    //- minWidth: pageFullscreen ? $q.screen.width+'px' : 800+'px',
     borderRadius: '10px', overflow: 'hidden',
   }`
-  ).column.full-width.b-50
+  ).row.full-width.b-50
   q-resize-observer(@resize="height = $event.height")
   //- mode: EDITOR
   div(v-if="options.mode === 'editor'" :style=`{position: 'relative'}`).column.fit
@@ -19,10 +19,10 @@ div(
         :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
       ws-content-player(@ready="storePlayerReady" :sid="sidPlayer" :content="content")
         template(v-slot:controlsTools)
-          q-btn(
-            @click="pageFullscreen = !pageFullscreen"
-            round flat dense color="white"
-            :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
+          //- q-btn(
+          //-   @click="pageFullscreen = !pageFullscreen"
+          //-   round flat dense color="white"
+          //-   :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
     //- body: pages
     div(
       :style=`{
@@ -58,7 +58,7 @@ div(
   div(v-if="options.mode === 'progress'").row.full-width
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata"
-      :composition="composition" :style=`{maxWidth: '600px'}`)
+      :composition="composition" :style=`{maxWidth: '600px'}`).full-width
       template(v-slot:progressActions)
         slot(name="progressActions")
       template(v-slot:progressBar)

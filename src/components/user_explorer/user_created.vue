@@ -34,14 +34,18 @@ kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
               color="green" no-caps
               :style=`{height: '50px', width: '240px',}`)
               span(:style=`{fontSize: '18px'}`).q-ml-md Создать ядро
+      //- nodes
       template(v-slot:item=`{item, index, indexMiddle}`)
         node(
           ctx="list" layout="PIP"
           :node="item" :index="index" :essence="true"
           :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
           :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
-          :active="index === indexMiddle"
+          :active="nodeListActive && index === indexMiddle"
           :mini="false")
+      //- item last for padding
+      template(v-slot:itemLast)
+        div(:style=`{height: '400px'}`).row.full-width
 </template>
 
 <script>
@@ -56,6 +60,7 @@ export default {
     return {
       nodeEditorOpened: false,
       node: null,
+      nodeListActive: true,
     }
   },
   computed: {
@@ -92,6 +97,13 @@ export default {
     //     }
     //   }
     // }
+    nodeEditorOpened: {
+      handler (to, from) {
+        this.$log('nodeEditorOpened TO', to)
+        if (to) this.nodeListActive = false
+        else this.nodeListActive = true
+      }
+    }
   },
   methods: {
     async createNodeStart () {
