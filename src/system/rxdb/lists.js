@@ -1,7 +1,8 @@
 import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
+import { updateRxDoc } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_LST)
@@ -59,7 +60,8 @@ class Lists {
       let { items, count, totalCount, nextPageToken } = await ListApi.getList(mangoQuery)
       return {
         item: { items, count, totalCount, nextPageToken, oid },
-        actualAge: 'day'
+        actualAge: 'day',
+        mangoQuery
       }
     }
     let rxDoc = await this.cache.get(id, fetchFunc)
@@ -90,22 +92,34 @@ class Lists {
         })
         // меняем списки
         for (let rxDoc of rxDocsSubscribers) {
-          await rxDoc.atomicUpdate((oldData) => {
-            assert(oldData.cached, '!rxDoc.cached')
-            oldData.cached.data.items.push(event.subject)
-            oldData.cached.data.count++
-            oldData.cached.data.totalCount++
-            return oldData
-          })
+          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
+          let data = rxDoc.toJSON().cached.data
+          data.items.push(event.subject)
+          data.count++
+          data.totalCount++
+          await updateRxDoc(rxDoc, 'cached.data', data, false)
+          // await rxDoc.atomicUpdate((oldData) => {
+          //   assert(oldData.cached, '!rxDoc.cached')
+          //   oldData.cached.data.items.push(event.subject)
+          //   oldData.cached.data.count++
+          //   oldData.cached.data.totalCount++
+          //   return oldData
+          // })
         }
         for (let rxDoc of rxDocsSubscriptions) {
-          await rxDoc.atomicUpdate((oldData) => {
-            assert(oldData.cached.data, '!rxDoc.cached')
-            oldData.cached.data.items.push(event.object)
-            oldData.cached.data.count++
-            oldData.cached.data.totalCount++
-            return oldData
-          })
+          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
+          let data = rxDoc.toJSON().cached.data
+          data.items.push(event.object)
+          data.count++
+          data.totalCount++
+          await updateRxDoc(rxDoc, 'cached.data', data, false)
+          // await rxDoc.atomicUpdate((oldData) => {
+          //   assert(oldData.cached.data, '!rxDoc.cached')
+          //   oldData.cached.data.items.push(event.object)
+          //   oldData.cached.data.count++
+          //   oldData.cached.data.totalCount++
+          //   return oldData
+          // })
         }
         break
       }
@@ -126,26 +140,44 @@ class Lists {
         })
         // меняем списки
         for (let rxDoc of rxDocsSubscribers) {
-          await rxDoc.atomicUpdate((oldData) => {
-            assert(oldData.cached.data, '!rxDoc.cached')
-            let indx = oldData.cached.data.items.findIndex(s => s.oid === event.subject.oid)
-            if (indx === -1) return oldData
-            oldData.cached.data.items.splice(indx, 1)
-            oldData.cached.data.count--
-            oldData.cached.data.totalCount--
-            return oldData
-          })
+          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
+          let indx = rxDoc.cached.data.items.findIndex(s => s.oid === event.subject.oid)
+          if (indx >= 0){
+            let data = rxDoc.toJSON().cached.data
+            data.items.splice(indx, 1)
+            data.count--
+            data.totalCount--
+            await updateRxDoc(rxDoc, 'cached.data', data, false)
+          }
+          // await rxDoc.atomicUpdate((oldData) => {
+          //   assert(oldData.cached.data, '!rxDoc.cached')
+          //   let indx = oldData.cached.data.items.findIndex(s => s.oid === event.subject.oid)
+          //   if (indx === -1) return oldData
+          //   oldData.cached.data.items.splice(indx, 1)
+          //   oldData.cached.data.count--
+          //   oldData.cached.data.totalCount--
+          //   return oldData
+          // })
         }
         for (let rxDoc of rxDocsSubscriptions) {
-          await rxDoc.atomicUpdate((oldData) => {
-            assert(oldData.cached.data, '!rxDoc.cached')
-            let indx = oldData.cached.data.items.findIndex(s => s.oid === event.object.oid)
-            if (indx === -1) return oldData
-            oldData.cached.data.items.splice(indx, 1)
-            oldData.cached.data.count--
-            oldData.cached.data.totalCount--
-            return oldData
-          })
+          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
+          let indx = rxDoc.cached.data.items.findIndex(s => s.oid === event.object.oid)
+          if (indx >= 0){
+            let data = rxDoc.toJSON().cached.data
+            data.items.splice(indx, 1)
+            data.count--
+            data.totalCount--
+            await updateRxDoc(rxDoc, 'cached.data', data, false)
+          }
+          // await rxDoc.atomicUpdate((oldData) => {
+          //   assert(oldData.cached.data, '!rxDoc.cached')
+          //   let indx = oldData.cached.data.items.findIndex(s => s.oid === event.object.oid)
+          //   if (indx === -1) return oldData
+          //   oldData.cached.data.items.splice(indx, 1)
+          //   oldData.cached.data.count--
+          //   oldData.cached.data.totalCount--
+          //   return oldData
+          // })
         }
         break
       }
@@ -162,38 +194,66 @@ class Lists {
         for (let rxDoc of rxDocs) {
           let mangoQuery = getMangoQueryFromId(rxDoc.id)
           // todo проверить, что event.object isRestricted by mangoQuery
-          await rxDoc.atomicUpdate((oldData) => {
-            assert(oldData.cached.data, '!rxDoc.cached')
-            assert(event.object, '!event.object')
-            let indx = oldData.cached.data.items.findIndex(el => el.oid === event.object.oid)
-            if (indx === -1) oldData.cached.data.items.splice(0, 0, event.object)
-            oldData.cached.data.count++
-            oldData.cached.data.totalCount++
-            return oldData
-          })
+          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
+          assert(event.object, '!event.object')
+          let data = rxDoc.toJSON().cached.data
+          let indx = data.items.findIndex(el => el.oid === event.object.oid)
+          if (indx === -1) {
+            data.items.splice(0, 0, event.object)
+            data.count++
+            data.totalCount++
+            await updateRxDoc(rxDoc, 'cached.data', data, false)
+          }
+          // await rxDoc.atomicUpdate((oldData) => {
+          //   assert(oldData.cached.data, '!rxDoc.cached')
+          //   assert(event.object, '!event.object')
+          //   let indx = oldData.cached.data.items.findIndex(el => el.oid === event.object.oid)
+          //   if (indx === -1) oldData.cached.data.items.splice(0, 0, event.object)
+          //   oldData.cached.data.count++
+          //   oldData.cached.data.totalCount++
+          //   return oldData
+          // })
         }
         break
       }
       case 'VOTED': {
         if (event.subject.oid === localStorage.getItem('k_user_oid')) {
           // если голосовал текущий юзер - положить в список "проголосованные ядра"
+          logD(f, 'find voted nodes start')
           let rxDocs = await this.cache.find({
             selector: {
               'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
-              'props.oid': localStorage.getItem('k_user_oid')
+              'props.oid': localStorage.getItem('k_user_oid'),
+              'props.mangoQuery.selector.oidAuthor.$ne': localStorage.getItem('k_user_oid')
             }
           })
+          logD(f, 'find voted nodes complete', rxDocs)
           for (let rxDoc of rxDocs) {
-            let mangoQuery = getMangoQueryFromId(rxDoc.id)
+            // let mangoQuery = getMangoQueryFromId(rxDoc.id)
             // todo проверить, что event.object isRestricted by mangoQuery
-            await rxDoc.atomicUpdate((oldData) => {
-              assert(event.object, '!event.object')
-              let indx = oldData.cached.data.items.findIndex(el => el.oid === event.object.oid)
-              if (indx === -1) oldData.cached.data.items.splice(0, 0, event.object)
-              oldData.cached.data.count++
-              oldData.cached.data.totalCount++
-              return oldData
-            })
+
+            assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
+            assert(event.object, '!event.object')
+            let data = rxDoc.toJSON().cached.data
+            let indx = data.items.findIndex(el => el.oid === event.object.oid)
+            if (indx === -1) {
+              logD(f, 'data 1', data)
+              data.items.splice(0, 0, event.object)
+              data.count++
+              data.totalCount++
+              logD(f, 'data 2', data)
+              await updateRxDoc(rxDoc, 'cached.data', data, false)
+              logD(f, 'change rxDoc rxDocUpdated')
+            }
+            logD(f, 'change rxDoc complete')
+            // await rxDoc.atomicUpdate((oldData) => {
+            //   assert(event.object, '!event.object')
+            //   let indx = oldData.cached.data.items.findIndex(el => el.oid === event.object.oid)
+            //   if (indx === -1) oldData.cached.data.items.splice(0, 0, event.object)
+            //   oldData.cached.data.count++
+            //   oldData.cached.data.totalCount++
+            //   return oldData
+            // })
           }
         }
         break

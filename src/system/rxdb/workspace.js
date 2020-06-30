@@ -1,12 +1,12 @@
 import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 
 import assert from 'assert'
-import {
-  wsSchemaLocalChanges, schemaKeyValue, wsSchemaItem
-} from 'src/system/rxdb/schemas'
+import { wsSchemaLocalChanges, wsSchemaItem } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { getReactive, Mutex, ReactiveItemHolder } from 'src/system/rxdb/reactive'
+import { getReactive, Mutex, ReactiveItemHolder, updateRxDoc } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
+import isEqual from 'lodash/isEqual'
+import cloneDeep from 'lodash/cloneDeep'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
@@ -90,12 +90,30 @@ class Workspace {
       if (this.ignoreWsChanges || !rxdb.isLeader()) return
       assert(id && operation && operation in WsOperationEnum, 'bad params' + id + operation)
       await this.db.ws_changes.atomicUpsert({ id, operation })
-      logD(f, `complete. ${id}`)
+      // logD(f, `complete. ${id}`)
     }
-    this.db.ws_items.postInsert(async (plainData) => {
-      await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
+    this.db.ws_items.preSave(async (plainData, rxDoc) => {
+      plainData.ignoreChanges = false
+      let plainDataCopy = cloneDeep(plainData) // newVal
+      delete plainDataCopy._rev // внутреннее св-во rxdb (мешает при сравненении)
+      let rxDocCopy = rxDoc.toJSON() // oldVal
+      // rev - присваивается сервером (не реагируем на изменения rev (это происходит в processEvent))
+      delete plainDataCopy.rev
+      delete rxDocCopy.rev
+      // logD(f, 'preSave', rxDocCopy, plainDataCopy, isEqual(plainDataCopy, rxDocCopy))
+      if (isEqual(plainDataCopy, rxDocCopy)) {
+        // изменена ТОЛЬКО ревизия. На сервер ничего слать не надо (иначе будет бесконечный цикл)
+        logD(f, ' ignoreChanges', rxDocCopy, plainDataCopy)
+        plainData.ignoreChanges = true // будет проверено в this.db.ws_items.postSave
+      }
     }, false)
-    this.db.ws_items.postSave(async (plainData) => {
+    this.db.ws_items.postSave(async (plainData, rxDoc) => {
+      // logD(f, `postSave rxDoc:${rxDoc.toJSON().ignoreChanges} plainData:${plainData.ignoreChanges}`, rxDoc.toJSON(), plainData)
+      if (!plainData.ignoreChanges) {
+        await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
+      }
+    }, false)
+    this.db.ws_items.postInsert(async (plainData) => {
       await onWsChangedByUser(plainData.id, WsOperationEnum.UPSERT)
     }, false)
     this.db.ws_items.postRemove(async (plainData) => {
@@ -318,18 +336,8 @@ class Workspace {
         await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
       } else {
         logD(f, `event проигнорирован (у нас актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
-        let hasChanges = await this.db.ws_changes.findOne(itemServer.id).exec() // есть локальные изменения
         // просто возьмем ревизию с сервера
-        let actualData = JSON.parse(JSON.stringify(getReactive(rxDoc))) // из за дебаунса в rxDoc могли не попать самые актуальные данные
-        actualData.rev = itemServer.rev // ревизию назначает сервер
-        await rxDoc.atomicUpdate((oldData) => {
-          actualData._rev = oldData._rev
-          return actualData
-        })
-        // изменение reactiveItem могло добавить этот item в ws_changes! Приводим в исходное (см onCollectionUpdate)
-        if (!hasChanges) { // если до atomicSet изменений не было - удаляем
-          await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove()
-        }
+        await updateRxDoc(rxDoc, 'rev', itemServer.rev, false)// ревизию назначает сервер. это изменение не попадает в ws_changes (см. this.db.ws_items.preSave)
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
       await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: this.reactiveUser.wsRevision.toString() })
@@ -340,9 +348,9 @@ class Workspace {
     }
   }
 
-  async set (item, withLock = true) {
+  async set (item) {
     try {
-      if (withLock) await this.lock()
+      await this.lock()
       const f = this.set
       assert(this.created, '!this.created')
       let itemCopy = JSON.parse(JSON.stringify(item))
@@ -356,7 +364,7 @@ class Workspace {
       logD(f, 'complete')
       return rxDoc
     } finally {
-      if (withLock) this.release()
+      this.release()
     }
   }
 

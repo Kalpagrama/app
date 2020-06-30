@@ -42,6 +42,14 @@ function getRxCollectionEnumFromId (id) {
   assert(rxCollection in RxCollectionEnum, 'bad rxCollection' + rxCollection)
   return rxCollection
 }
+function getRawIdFromId (id) {
+  assert(id, '!id')
+  let parts = id.split('::')
+  assert(parts.length === 2, 'bad id!' + id)
+  let rawId = parts[1]
+  assert(rawId, 'bad id' + id)
+  return rawId
+}
 
 function makeId (rxCollectionEnum, rawId) {
   assert(rawId, '!rawId')
@@ -209,12 +217,9 @@ class RxDBWrapper {
     }
   }
 
-  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
-    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-    assert(!rawId.includes('::'), '')
-    let f = this.get
-    let id = makeId(rxCollectionEnum, rawId)
-    logD(f, 'start', id)
+  async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
+    let rxCollectionEnum = getRxCollectionEnumFromId(id)
+    let rawId = getRawIdFromId(id)
     let rxDoc
     if (rxCollectionEnum in WsCollectionEnum) {
       rxDoc = await this.workspace.get(id)
@@ -228,20 +233,29 @@ class RxDBWrapper {
     } else {
       throw new Error('bad collection' + rxCollectionEnum)
     }
+    return rxDoc
+  }
+
+  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false } = {}) {
+    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+    assert(!rawId.includes('::'), '')
+    let f = this.get
+    let id = makeId(rxCollectionEnum, rawId)
+    logD(f, 'start', id)
+    let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force })
     if (!rxDoc) return null
     return getReactive(rxDoc)
   }
 
-  // withLock - см ReactiveItemHolder
   // actualAge - актуально только для кэша
-  async set (rxCollectionEnum, data, { actualAge, withLock = true, notEvict = false } = {}) {
+  async set (rxCollectionEnum, data, { actualAge, notEvict = false } = {}) {
     const f = this.set
     assert(data, '!data')
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-    logD(f, 'start', data, { actualAge, withLock, notEvict })
+    logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
     let rxDoc
     if (rxCollectionEnum in WsCollectionEnum) {
-      rxDoc = await this.workspace.set(data, withLock)
+      rxDoc = await this.workspace.set(data)
     } else if (rxCollectionEnum === RxCollectionEnum.OBJ) {
       let id = makeId(rxCollectionEnum, data.oid)
       rxDoc = await this.cache.set(id, data, actualAge, notEvict)
@@ -284,4 +298,4 @@ const rxdbWrapper = new RxDBWrapper()
 //   }
 // })
 
-export { rxdbWrapper as rxdb, RxModuleEnum, RxCollectionEnum, getRxCollectionEnumFromId, getReactive }
+export { rxdbWrapper as rxdb, RxModuleEnum, RxCollectionEnum, getRxCollectionEnumFromId, getRawIdFromId, getReactive, makeId }

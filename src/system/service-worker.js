@@ -160,7 +160,7 @@ function sendMsg (type, msgData) {
         messaging.getToken().then(token => {
           logDebug('messaging.getToken() = ', token)
           webPushToken = token
-        })
+        }).catch(err => logCritical('error on messaging.getToken(): ', err))
       }
     })
     self.addEventListener('fetch', async event => {
