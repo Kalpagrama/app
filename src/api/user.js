@@ -1,6 +1,7 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
@@ -25,7 +26,8 @@ class UserApi {
 
   // Подписаться на сущность. Мутация будет вызвана по приходу эвента
   static async subscribe (oid) {
-    logD('subscriptions', 'subscribe', oid)
+    let f = UserApi.subscribe
+    logD(f, 'start', oid)
     let { data: { subscribe } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectShortFragment}
@@ -39,13 +41,25 @@ class UserApi {
         oid
       }
     })
-    logD('subscriptions', 'subscribe OK', oid)
+    logD(f, 'complete', subscribe)
     return subscribe
   }
 
   // check subscription
   static async isSubscribed (oid) {
-    return false
+    let f = UserApi.isSubscribed
+    logD(f, 'start', oid)
+    let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
+    let { items } = await rxdb.find({
+      selector: {
+        rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIBERS,
+        oidSphere: oid
+      }
+    })
+    let currentUserOid = localStorage.getItem('k_user_oid')
+    let res = items.find(item => item.oid === currentUserOid) ? true : false
+    logD(f, 'complete', res)
+    return res
   }
 
   // Отписаться от сущности. Мутация будет вызвана по приходу эвента
@@ -69,4 +83,4 @@ class UserApi {
   }
 }
 
-export {UserApi}
+export { UserApi }

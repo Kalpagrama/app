@@ -2,7 +2,7 @@ import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
-import { updateRxDoc } from 'src/system/rxdb/reactive'
+import { getReactive } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_LST)
@@ -92,34 +92,18 @@ class Lists {
         })
         // меняем списки
         for (let rxDoc of rxDocsSubscribers) {
-          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
-          let data = rxDoc.toJSON().cached.data
-          data.items.push(event.subject)
-          data.count++
-          data.totalCount++
-          await updateRxDoc(rxDoc, 'cached.data', data, false)
-          // await rxDoc.atomicUpdate((oldData) => {
-          //   assert(oldData.cached, '!rxDoc.cached')
-          //   oldData.cached.data.items.push(event.subject)
-          //   oldData.cached.data.count++
-          //   oldData.cached.data.totalCount++
-          //   return oldData
-          // })
+          let reactiveItem = getReactive(rxDoc)
+          assert(reactiveItem.items, '!reactiveItem.items')
+          reactiveItem.items.push(event.subject)
+          reactiveItem.count++
+          reactiveItem.totalCount++
         }
         for (let rxDoc of rxDocsSubscriptions) {
-          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
-          let data = rxDoc.toJSON().cached.data
-          data.items.push(event.object)
-          data.count++
-          data.totalCount++
-          await updateRxDoc(rxDoc, 'cached.data', data, false)
-          // await rxDoc.atomicUpdate((oldData) => {
-          //   assert(oldData.cached.data, '!rxDoc.cached')
-          //   oldData.cached.data.items.push(event.object)
-          //   oldData.cached.data.count++
-          //   oldData.cached.data.totalCount++
-          //   return oldData
-          // })
+          let reactiveItem = getReactive(rxDoc)
+          assert(reactiveItem.items, '!reactiveItem.items')
+          reactiveItem.items.push(event.object)
+          reactiveItem.count++
+          reactiveItem.totalCount++
         }
         break
       }
@@ -140,50 +124,30 @@ class Lists {
         })
         // меняем списки
         for (let rxDoc of rxDocsSubscribers) {
-          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
-          let indx = rxDoc.cached.data.items.findIndex(s => s.oid === event.subject.oid)
+          let reactiveItem = getReactive(rxDoc)
+          assert(reactiveItem.items, '!reactiveItem.items')
+          let indx = reactiveItem.items.findIndex(s => s.oid === event.subject.oid)
           if (indx >= 0){
-            let data = rxDoc.toJSON().cached.data
-            data.items.splice(indx, 1)
-            data.count--
-            data.totalCount--
-            await updateRxDoc(rxDoc, 'cached.data', data, false)
+            reactiveItem.items.splice(indx, 1)
+            reactiveItem.count--
+            reactiveItem.totalCount--
           }
-          // await rxDoc.atomicUpdate((oldData) => {
-          //   assert(oldData.cached.data, '!rxDoc.cached')
-          //   let indx = oldData.cached.data.items.findIndex(s => s.oid === event.subject.oid)
-          //   if (indx === -1) return oldData
-          //   oldData.cached.data.items.splice(indx, 1)
-          //   oldData.cached.data.count--
-          //   oldData.cached.data.totalCount--
-          //   return oldData
-          // })
         }
         for (let rxDoc of rxDocsSubscriptions) {
-          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
-          let indx = rxDoc.cached.data.items.findIndex(s => s.oid === event.object.oid)
+          let reactiveItem = getReactive(rxDoc)
+          assert(reactiveItem.items, '!reactiveItem.items')
+          let indx = reactiveItem.items.findIndex(s => s.oid === event.object.oid)
           if (indx >= 0){
-            let data = rxDoc.toJSON().cached.data
-            data.items.splice(indx, 1)
-            data.count--
-            data.totalCount--
-            await updateRxDoc(rxDoc, 'cached.data', data, false)
+            reactiveItem.items.splice(indx, 1)
+            reactiveItem.count--
+            reactiveItem.totalCount--
           }
-          // await rxDoc.atomicUpdate((oldData) => {
-          //   assert(oldData.cached.data, '!rxDoc.cached')
-          //   let indx = oldData.cached.data.items.findIndex(s => s.oid === event.object.oid)
-          //   if (indx === -1) return oldData
-          //   oldData.cached.data.items.splice(indx, 1)
-          //   oldData.cached.data.count--
-          //   oldData.cached.data.totalCount--
-          //   return oldData
-          // })
         }
         break
       }
       case 'NODE_CREATED': {
         assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
-        // добавим на все сферы
+        // добавим на все сферы (event.sphereOids)
         let rxDocs = await this.cache.find({
           selector: {
             'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
@@ -192,27 +156,15 @@ class Lists {
         })
         logD(f, 'finded lists: ', rxDocs)
         for (let rxDoc of rxDocs) {
-          let mangoQuery = getMangoQueryFromId(rxDoc.id)
-          // todo проверить, что event.object isRestricted by mangoQuery
-          assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
+          let reactiveItem = getReactive(rxDoc)
+          assert(reactiveItem.items, '!reactiveItem.items')
           assert(event.object, '!event.object')
-          let data = rxDoc.toJSON().cached.data
-          let indx = data.items.findIndex(el => el.oid === event.object.oid)
+          let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
           if (indx === -1) {
-            data.items.splice(0, 0, event.object)
-            data.count++
-            data.totalCount++
-            await updateRxDoc(rxDoc, 'cached.data', data, false)
+            reactiveItem.items.splice(0, 0, event.object)
+            reactiveItem.count++
+            reactiveItem.totalCount++
           }
-          // await rxDoc.atomicUpdate((oldData) => {
-          //   assert(oldData.cached.data, '!rxDoc.cached')
-          //   assert(event.object, '!event.object')
-          //   let indx = oldData.cached.data.items.findIndex(el => el.oid === event.object.oid)
-          //   if (indx === -1) oldData.cached.data.items.splice(0, 0, event.object)
-          //   oldData.cached.data.count++
-          //   oldData.cached.data.totalCount++
-          //   return oldData
-          // })
         }
         break
       }
@@ -229,31 +181,15 @@ class Lists {
           })
           logD(f, 'find voted nodes complete', rxDocs)
           for (let rxDoc of rxDocs) {
-            // let mangoQuery = getMangoQueryFromId(rxDoc.id)
-            // todo проверить, что event.object isRestricted by mangoQuery
-
-            assert(rxDoc.cached && rxDoc.cached.data, '!rxDoc.cached')
+            let reactiveItem = getReactive(rxDoc)
+            assert(reactiveItem.items, '!reactiveItem.items')
             assert(event.object, '!event.object')
-            let data = rxDoc.toJSON().cached.data
-            let indx = data.items.findIndex(el => el.oid === event.object.oid)
+            let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
             if (indx === -1) {
-              logD(f, 'data 1', data)
-              data.items.splice(0, 0, event.object)
-              data.count++
-              data.totalCount++
-              logD(f, 'data 2', data)
-              await updateRxDoc(rxDoc, 'cached.data', data, false)
-              logD(f, 'change rxDoc rxDocUpdated')
+              reactiveItem.items.splice(0, 0, event.object)
+              reactiveItem.count++
+              reactiveItem.totalCount++
             }
-            logD(f, 'change rxDoc complete')
-            // await rxDoc.atomicUpdate((oldData) => {
-            //   assert(event.object, '!event.object')
-            //   let indx = oldData.cached.data.items.findIndex(el => el.oid === event.object.oid)
-            //   if (indx === -1) oldData.cached.data.items.splice(0, 0, event.object)
-            //   oldData.cached.data.count++
-            //   oldData.cached.data.totalCount++
-            //   return oldData
-            // })
           }
         }
         break

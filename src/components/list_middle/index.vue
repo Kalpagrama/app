@@ -93,16 +93,16 @@ export default {
         this.$log('indexMiddle CHANGED', to)
         this.$emit('indexMiddle', to)
         // прогружаем вверх и вниз от indexMiddle на упреждение
-        // if (to >= 0){
-        //   let firstIndx = Math.max(0, to - 2)
-        //   let lastIndx = Math.min(this.items.length, to + 2)
-        //   for (let i = firstIndx; i <= lastIndx; i++){
-        //     let item = this.items[i]
-        //     if (item){
-        //       this.$rxdb.get(RxCollectionEnum.OBJ, this.items[i].oid, {priority: 1}).catch(err => this.$log('ошибка упреждающей прогрузки списка', err))
-        //     }
-        //   }
-        // }
+        if (to >= 0){
+          let firstIndx = Math.max(0, to - 2)
+          let lastIndx = Math.min(this.items.length, to + 2)
+          for (let i = firstIndx; i <= lastIndx; i++){
+            let item = this.items[i]
+            if (item){
+              this.$rxdb.get(RxCollectionEnum.OBJ, this.items[i].oid, {priority: 1}).catch(err => this.$log('ошибка упреждающей прогрузки списка', err))
+            }
+          }
+        }
       }
     },
   },
