@@ -48,7 +48,7 @@ div(
     q-btn(
       @click="layerEditingToggle()"
       flat dense color="green" icon-right="check" no-caps).q-px-sm
-      span.q-mr-sm Save
+      span.q-mr-sm {{$t('Save')}}
 </template>
 
 <script>

@@ -17,13 +17,13 @@ input
     div().row.full-width.justify-center.q-my-md
       q-icon(name="blur_on" color="white" size="100px" @click="$router.replace('/auth').catch(e => e)").cursor-pointer
       .row.full-width.justify-center
-        span(:style=`{fontSize: '24px'}`).text-bold.text-white Kalpagramma
+        span(:style=`{fontSize: '24px'}`).text-bold.text-white {{$t('Kalpagramma')}}
     //- form
     form(:style=`{maxWidth: '350px'}` @submit="$event.preventDefault()").row.full-width.justify-center.q-pa-sm
       div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', oveflow: 'hidden'}`).row.fit.items-end.q-pa-sm.q-mb-sm
         //- get started
         div(v-if="!userIdentified").row.full-width.items-end.content-end.justify-center
-          span(:style=`{fontSize: '18px'}`).text-white.q-mr-sm Welcome, identify yourself
+          span(:style=`{fontSize: '18px'}`).text-white.q-mr-sm {{$t('Welcome, identify yourself')}}
           //- span(:style=`{fontSize: '20px'}`).text-green Kalpa
       //- socials
       with-socials(v-if="!userIdentified")
@@ -42,7 +42,7 @@ input
           push no-caps color="green" @click="userIdentify()"
           :loading="userIdentifying" :disable="login.length < 4"
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-my-sm
-            span.text-bold.text-white Continue
+            span.text-bold.text-white {{$t('Continue')}}
       //- IDENTIFIED
       div(v-if="userIdentified").row.full-width
         //- userExist & needInvite
@@ -50,7 +50,7 @@ input
           .row.full-width.justify-start.q-py-sm.q-px-md
             span.text-grey-3 {{$t('Need invite code (beta testing in progress...)')}}
           q-input(
-            v-model="inviteCode" dark color="green" filled label="Enter invite code" autofocus
+            v-model="inviteCode" dark color="green" filled :label="$t('Enter invite code')" autofocus
             :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`
             ).full-width.q-mb-sm.bg-grey-9
         //- email
@@ -74,7 +74,7 @@ input
               }`).text-bold.text-white
           .row.full-width.items-center.content-center.justify-center.q-py-sm.q-px-md
             //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="reset()")
-            span(:style=`{fontSize: '14px'}`).text-grey-2 Enter confirmation code, we sent you to:
+            span(:style=`{fontSize: '14px'}`).text-grey-2 {{$t('Enter confirmation code, we sent you to:')}}
           .row.full-width.justify-center
             span(:style=`{fontSize: '14px'}`).text-white.text-bold {{ login }}
           //- q-input(
@@ -85,7 +85,7 @@ input
         div(v-if="loginType && loginType === 'PHONE'").row.full-width
           .row.full-width.justify-start.q-py-sm.q-px-md
             q-btn(round flat color="white" icon="keyboard_arrow_left" @click="reset()")
-            span(:style=`{fontSize: '20px'}`).text-white.q-mr-sm Enter code, we sent you to:
+            span(:style=`{fontSize: '20px'}`).text-white.q-mr-sm {{$t('Enter code, we sent you to')}}:
             span(:style=`{fontSize: '20px'}`).text-green {{ login }}
           q-input(
             v-model="password" autofocus dark color="green" filled label="Enter code" type="tel"
@@ -96,10 +96,10 @@ input
           div(:style=`{height: '60px'}`
             ).row.full-width.items-center.content-center.text-center.justify-start.q-py-sm
             q-btn(round flat color="white" icon="keyboard_arrow_left" @click="reset()")
-            span.text-grey-3.text-bold Enter with login:
+            span.text-grey-3.text-bold {{$t('Enter with login')}}:
             span.text-grey-3.text-bold.q-ml-sm {{login}}
           q-input(
-            v-model="password" autofocus dark color="green" filled label="Enter password"
+            v-model="password" autofocus dark color="green" filled :label="$t('Enter password')"
             :type="passwordShow ? 'text' : 'password'"
             @keyup.enter="userAuthenticate()"
             autocomplete
@@ -110,7 +110,7 @@ input
                 :name="passwordShow ? 'visibility' : 'visibility_off'")
           q-input(
             v-if="!userExist"
-            v-model="passwordSecond" dark color="green" filled label="Confirm password"
+            v-model="passwordSecond" dark color="green" filled :label="$t('Confirm password')"
             :type="passwordSecondShow ? 'text' : 'password'"
             @keyup.enter="userAuthenticate()"
             :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
@@ -120,14 +120,14 @@ input
                 :name="passwordSecondShow ? 'visibility' : 'visibility_off'")
         //- confirm
         q-btn(
-          push no-caps color="green" @click="userAuthenticate()" label="Enter kalpa"
+          push no-caps color="green" @click="userAuthenticate()" :label="$t('Enter kalpa')"
           :disable="loginType === 'USERNAME' && !userExist ? password !== passwordSecond : false"
           :loading="userAuthenticating"
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-my-md
       //- help/policy
       .row.full-width.justify-center.q-pb-sm.q-px-md.text-center
         //- router-link(to="/help/policy")
-        small.text-grey-8.text-center By clicking "Continue", you agree to the terms of the Privacy Policy.
+        small.text-grey-8.text-center {{$t('By clicking "Continue", you agree to the terms of the Privacy Policy.')}}
 </template>
 
 <script>

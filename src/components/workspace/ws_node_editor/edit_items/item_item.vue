@@ -44,7 +44,7 @@ div(
       position: 'absolute', zIndex: 200,
       right: '16px', bottom: '8px',
       pointerEvents: 'none'
-    }`) [layers:{{ item.layers.length }}, duration: {{ $time(compositionDuration) }}]
+    }`) [{{$t('layers')}}:{{ item.layers.length }}, {{$t('duration')}}: {{ $time(compositionDuration) }}]
 </template>
 
 <script>

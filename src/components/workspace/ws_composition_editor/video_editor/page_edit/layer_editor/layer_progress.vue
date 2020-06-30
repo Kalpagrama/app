@@ -9,7 +9,7 @@ div(:style=`{position: 'relative',}`).row.full-width
       :flat="!layerPlaying"
       round dense no-caps)
       span(
-        ).text-bold.q-mx-sm {{ layerPlaying ? 'Playing' : 'Play layer' }}
+        ).text-bold.q-mx-sm {{ layerPlaying ? $t('Playing') : $t('Play layer') }}
     .col.q-px-sm
     q-btn(
       @click="layerRefresh()"

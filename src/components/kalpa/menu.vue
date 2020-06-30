@@ -30,9 +30,9 @@ div(
       kalpa-logo(:width="40" :height="40")
     .col
       .row.fit.items-center.content-center
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold Кальпаграмма
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Кальпаграмма')}}
         .row.full-width
-          small.text-white Up the essence!
+          small.text-white {{$t('Up the essence!')}}
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width
     div(
@@ -73,14 +73,14 @@ div(
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Обновить
+          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('Обновить')}}
         //- logout
         div(
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white Выйти
+          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('Выйти')}}
         //- create node
         div(
           v-if="true"
@@ -90,10 +90,10 @@ div(
             @click="createNodeStart()"
             color="green" no-caps align="left" icon="add"
             :style=`{height: '50px'}`).full-width
-            span(:style=`{fontSize: '18px'}`).q-ml-md Создать ядро
+            span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('Создать ядро')}}
         //- version
         div(v-if="true").row.full-width.items-center.q-pa-md
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 Версия: 0.9.9-26.06.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('Версия')}} 0.9.9-26.06.2020
         //- slot(name="footer")
 </template>
 

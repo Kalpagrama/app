@@ -18,8 +18,8 @@ kalpa-layout(
           .row.fit.items-center.content-center
             kalpa-avatar(:url="user.profile.photoUrl" :width="36" :height="36")
             span.text-white.text-bold.q-ml-sm {{ user.name }}
-        q-btn(v-if="!itsMe && !isSubscribed" push color="green" no-caps @click="userFollow()") Follow
-        q-btn(v-if="!itsMe && isSubscribed" flat color="green" no-caps @click="userUnfollow()") Following
+        q-btn(v-if="!itsMe && !isSubscribed" push color="green" no-caps @click="userFollow()") {{$t('Follow')}}
+        q-btn(v-if="!itsMe && isSubscribed" flat color="green" no-caps @click="userUnfollow()") {{$t('Following')}}
       .row.full-width.items-end.content-end
         q-tabs(
           :value="$route.name" @input="pageChanged"

@@ -16,7 +16,7 @@ div(
   div(:style=`{height: '100px'}`).row.full-width.items-center.content-center.q-px-md
     .col
       .row.fit.items-center.content-center.q-px-sm
-        span(:style=`{fontSize: '16px',}`).text-white.text-bold Subscriptions
+        span(:style=`{fontSize: '16px',}`).text-white.text-bold {{$t('Subscriptions')}}
     q-btn(
       @click="editing = !editing"
       round flat

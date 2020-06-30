@@ -1,5 +1,5 @@
 <template lang="pug">
-span chain explorer
+span {{$t('chain explorer')}}
 </template>
 
 <script>

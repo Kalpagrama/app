@@ -24,7 +24,7 @@ div(:style=`{}`).row.full-width.items-start.content-start.justify-center.b-30
       q-btn(
         v-if="false || !userIsMe"
         push no-caps color="green" @click="userFollow()").q-px-sm
-        span.text-bold Follow
+        span.text-bold {{$t('Follow')}}
   //- status
   div(
     v-if="false"

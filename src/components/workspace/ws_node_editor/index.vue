@@ -17,7 +17,7 @@ div(
     //- navigation
     div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.justify-between.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold Редактор ядра
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Редактор ядра')}}
       //- .col
       q-btn(
         @click="pageId === 'info' ? pageId = 'items' : pageId = 'info'"
@@ -73,7 +73,7 @@ div(
         push color="green" no-caps
         :loading="stateNodeEditor.nodePublishing"
         ).q-px-md
-        span.text-white.text-bold Publish
+        span.text-white.text-bold {{$t('Publish')}}
 </template>
 
 <script>

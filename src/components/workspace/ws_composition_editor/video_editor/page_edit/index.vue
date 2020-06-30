@@ -55,7 +55,7 @@ div(:style=`{position: 'relative'}`).column.fit
                   flat color="green" icon-right="add" no-caps
                   :style=`{height: '40px'}`
                   ).full-width.b-70
-                  span.text-bold.q-mx-sm Добавить слой
+                  span.text-bold.q-mx-sm {{$t('Добавить слой')}}
       //- footer: layers selected
       div(
         v-if="layersSelected.length > 0"
@@ -69,9 +69,9 @@ div(:style=`{position: 'relative'}`).column.fit
           }`
           ).row.full-width.items-center.content-center.q-pa-sm.b-70
           q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []")
-          q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm Delete
+          q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$('Delete')}}
           .col
-          q-btn(dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
+          q-btn(dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm {{$t('Create node')}}
   //- footer: something
   //- !storeEditor.layerEditing
   div(
@@ -82,16 +82,16 @@ div(:style=`{position: 'relative'}`).column.fit
       div(v-if="true").row.full-width.q-py-sm
         q-input(
           v-model="composition.name"
-          label="Что ты видишь?"
+          :label="$t('Что ты видишь?')"
           filled dark color="white"
           ).full-width
       //- stats
       div(
         v-if="!storeEditor.layerEditing && composition.layers.length > 0"
         ).row.full-width.text-grey-4.q-pa-sm
-        span(:class=`{}`) Layers: {{ composition.layers.length }}
+        span(:class=`{}`) {{$t('Layers')}}: {{ composition.layers.length }}
         .col
-        span(:class=`{'text-red': layersDuration > 60}`) Duration: {{ $time(layersDuration) }}
+        span(:class=`{'text-red': layersDuration > 60}`) {{$t('Duration')}}: {{ $time(layersDuration) }}
       composition-progress(
         v-if="!storeEditor.layerEditing && composition.layers.length > 0"
         :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")

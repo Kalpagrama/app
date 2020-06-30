@@ -16,7 +16,7 @@ div(
     div(
       v-if="!$slots.header").row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold Spheres
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Spheres')}}
     //- search
     div(
       v-if="showSearch"
@@ -41,7 +41,7 @@ div(
             q-btn(
               v-if="searchString.length > 0"
               color="green" push no-caps @click="sphereCreate()"
-              :style=`{minHeight: '50px'}`) Create sphere "{{ searchString }}"
+              :style=`{minHeight: '50px'}`) {{$t('Create sphere')}} "{{ searchString }}"
           div(v-if="showItems && items.length > 0").row.full-width.q-py-sm
             ws-sphere(
               v-for="(s, si) in items" :key="s.id"

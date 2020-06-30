@@ -9,7 +9,7 @@
 div(:style=`{position: 'relative',}`).column.fit
   //- header
   div().row.full-width.q-pa-md
-    span(:style=`{fontSize: '16px',}`).text-white.text-bold Pick someting you like
+    span(:style=`{fontSize: '16px',}`).text-white.text-bold {{$t('Pick someting you like')}}
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.justify-center.q-px-md
@@ -33,7 +33,7 @@ div(:style=`{position: 'relative',}`).column.fit
       @click="next()"
       round color="green" no-caps
       :disabled="types.length === 0"
-      :loading="loading").q-px-md Next
+      :loading="loading").q-px-md {{$t('Next')}}
 </template>
 
 <script>

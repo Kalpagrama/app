@@ -15,8 +15,8 @@ kalpa-layout(
         .col.full-height
           .row.fit.items-center.content-center
             span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ '#'+sphere.name }}
-        q-btn(v-if="!isSubscribed" push color="green" no-caps @click="sphereFollow()") Follow
-        q-btn(v-if="isSubscribed" flat color="green" no-caps @click="sphereUnfollow()") Following
+        q-btn(v-if="!isSubscribed" push color="green" no-caps @click="sphereFollow()") {{$t('Follow')}}
+        q-btn(v-if="isSubscribed" flat color="green" no-caps @click="sphereUnfollow()") {{$t('Following')}}
   template(v-slot:footer)
     div(:style=`{maxWidth: '800px', borderRadius: '10px 10px 0 0',}`).row.full-width.q-pa-sm.b-60
       q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
@@ -32,7 +32,7 @@ kalpa-layout(
         left: 'calc(50% - 150px)',
         height: '50px',
         width: '300px',
-      }`) Добавить образ
+      }`) {{$t('Добавить образ')}}
     //- node editor
     q-dialog(
       v-model="nodeEditorOpened" position="bottom")

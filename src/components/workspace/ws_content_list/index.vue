@@ -41,7 +41,7 @@ div(
       v-if="ctx === 'workspace'"
       :style=`{}`).row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold Контент
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Контент')}}
     //- search
     div.row.full-width
       q-input(
@@ -85,7 +85,7 @@ div(
             v-else
             :style=`{height: '200px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
             ).row.full-width.items-center.content-center.justify-center.b-50
-            span.text-white Nothing found :(
+            span.text-white {{$t('Nothing found :(')}}
 </template>
 
 <script>

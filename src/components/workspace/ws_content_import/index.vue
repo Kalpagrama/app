@@ -5,7 +5,7 @@
     span.text-white {{ url }}
   //- invalid URL
   div(v-else).row.full-width.justify-center
-    span.text-green URL is invalid
+    span.text-green {{$t('URL is invalid')}}
     //- q-btn(round flat color="green")
 </template>
 

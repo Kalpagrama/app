@@ -32,7 +32,6 @@ div(
     :style=`{
       order: 2
     }`)
-  //- span.text-white.full-width {{index}}
   node-author(
     v-if="true"
     v-bind="$props"
