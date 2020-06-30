@@ -68,10 +68,10 @@ div(
       //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-py-md.q-px-sm
+    .row.full-width.items-start.content-start.justify-center.q-py-md.q-px-sm
       kalpa-loader(:mangoQuery="mangoQuery" :key="i")
         template(v-slot=`{items}`)
-          div(v-if="items.length > 0").row.full-width.items-start.content-start
+          div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start.justify-center
             div(
               :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
               content-item(

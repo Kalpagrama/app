@@ -2,9 +2,10 @@
 div(
   :style=`{
     position: 'relative',
+    //- minWidth: pageFullscreen ? $q.screen.width+'px' : 800+'px',
     borderRadius: '10px', overflow: 'hidden',
   }`
-  ).column.full-width.b-50
+  ).row.full-width.b-50
   q-resize-observer(@resize="height = $event.height")
   //- mode: EDITOR
   div(v-if="options.mode === 'editor'" :style=`{position: 'relative'}`).column.fit
@@ -57,7 +58,7 @@ div(
   div(v-if="options.mode === 'progress'").row.full-width
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata"
-      :composition="composition" :style=`{maxWidth: '600px'}`)
+      :composition="composition" :style=`{maxWidth: '600px'}`).full-width
       template(v-slot:progressActions)
         slot(name="progressActions")
       template(v-slot:progressBar)

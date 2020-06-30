@@ -43,7 +43,7 @@ div(
       :style=`{
         height: '60px',
         width: '170px',
-        borderRadius: $store.state.ui.borderRadius+'px',
+        borderRadius: '30px',
         overflow: 'hidden',
       }`
       ).row.items-center.content-center.justify-start.b-80.author-area

@@ -22,7 +22,7 @@ div(
       small(:style=`{whiteSpace: 'nowrap'}`) {{ s.name }}
   //- mock spheres DUMMY
   div(
-    v-if="!nodeFull"
+    v-if="false && !nodeFull"
     ).row.items-center.content-center.no-wrap
     div(
       v-for="(s,si) in spheres" :key="si"

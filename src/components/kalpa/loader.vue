@@ -2,11 +2,18 @@
 export default {
   render () {
     return this.$scopedSlots.default({
-      items: this.items
+      items: this.itemsSliced,
+      itemsMore: this.itemsMore,
     })
   },
   name: 'kalpaLoader',
   props: {
+    sliceSize: {
+      type: Number,
+      default () {
+        return 10
+      }
+    },
     mangoQuery: {
       type: Object,
       default () {
@@ -19,6 +26,9 @@ export default {
       loaded: false,
       query: null,
       items: [],
+      itemsSlice: 1,
+      itemsSliced: [],
+      itemsSlicing: false,
       itemsLoading: false,
       itemsMoreLoading: false,
       pageToken: null,
@@ -44,26 +54,29 @@ export default {
       handler(to, from){
         this.$log('loader items CHANGED', 'from=', from, ', to=', to)
         this.$emit('itemsCount', to.length)
+        this.itemsSlice = 1
+        this.itemsSliced = to.slice(0, this.sliceSize)
       }
     }
   },
   methods: {
     async itemsMore () {
-      // todo переделать variables на mangoQuery
-      // try {
-      //   this.$log('itemsMore start')
-      //   // checks
-      //   if (this.itemsCount >= this.totalCount) return
-      //   this.itemsMoreLoading = true
-      //   // TODO: do not mutate pageToken... in variables
-      //   // сработает вотчер и запросит новые данные
-      //   this.variables.pagination.pageToken = this.nextPageToken
-      //   this.$log('itemsMore done')
-      //   this.itemsMoreLoading = false
-      // } catch (e) {
-      //   this.$log('itemsMore error', e)
-      //   this.itemsMoreLoading = false
-      // }
+      if (this.itemsSlicing) return
+      this.$log('itemsMore')
+      this.itemsSlicing = true
+      // check
+      let start = this.itemsSliced.length - 1
+      let end = (this.itemsSlice + 1) * this.sliceSize
+      this.$log('start/end', start, end)
+      if (end > this.items.length) return
+      let arr = this.items.slice(start, end)
+      this.$log('arr', arr)
+      // set
+      this.itemsSliced.splice(start, 0, ...arr)
+      this.itemsSlice += 1
+      this.$q.notify('Loading... ' + this.itemsSlice)
+      await this.$wait(1500)
+      this.itemsSlicing = false
     },
     async itemsLoad (mangoQuery, append = false) {
       // this.$log('itemsLoad start', mangoQuery)
@@ -71,6 +84,7 @@ export default {
       try {
         let { items, count, totalCount, nextPageToken } = await this.$rxdb.find(mangoQuery)
         this.items = items
+        this.itemsSliced = items.slice(0, this.sliceSize)
         this.nextPageToken = nextPageToken
         this.totalCount = totalCount
         this.itemsCount = items.length

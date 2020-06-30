@@ -22,19 +22,11 @@ div(
 </template>
 
 <script>
-// created, voted, contents, spheres, people following, followers
 export default {
   name: 'userExplorer-menuRight',
-  props: ['user'],
+  props: ['user', 'pages'],
   data () {
     return {
-      pages: [
-        {id: 'created', name: 'Created'},
-        {id: 'voted', name: 'Voted'},
-        {id: 'followers', name: 'Followers'},
-        {id: 'following', name: 'Following'},
-        // {id: 'spheres', name: 'Spheres'}
-      ]
     }
   }
 }

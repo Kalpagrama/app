@@ -19,7 +19,7 @@ input
       .row.full-width.justify-center
         span(:style=`{fontSize: '24px'}`).text-bold.text-white Kalpagramma
     //- form
-    div(:style=`{maxWidth: '350px'}`).row.full-width.justify-center.q-pa-sm
+    form(:style=`{maxWidth: '350px'}` @submit="$event.preventDefault()").row.full-width.justify-center.q-pa-sm
       div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', oveflow: 'hidden'}`).row.fit.items-end.q-pa-sm.q-mb-sm
         //- get started
         div(v-if="!userIdentified").row.full-width.items-end.content-end.justify-center
@@ -102,6 +102,7 @@ input
             v-model="password" autofocus dark color="green" filled label="Enter password"
             :type="passwordShow ? 'text' : 'password'"
             @keyup.enter="userAuthenticate()"
+            autocomplete
             :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)'}`).full-width.q-mb-sm.bg-grey-9
             template(v-slot:append)
               q-icon(
@@ -164,6 +165,7 @@ export default {
     password: {
       handler (to, from) {
         this.$log('password CHANGED', to)
+        if (this.loginType && this.loginType === 'USERNAME') return
         if (to) {
           if (to.length === 4) {
             this.userAuthenticate()

@@ -1,44 +1,19 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
-  q-drawer(v-model="showMenuRight" side="right")
-    menu-right(
-      :stateWorkspace="stateWorkspace"
-      :inDrawer="true"
-      :style=`{}`).b-50
-  //- menu right
-  div(
-    v-if="$q.screen.width > 1260"
-    :style=`{
-      position: 'absolute', zIndex: 9999,
-      right: -$store.state.ui.panelMaxWidth+'px',
-      maxWidth: $store.state.ui.panelMaxWidth+'px',
-    }`).row.full-width.justify-start.q-px-sm.q-pt-sm
-    menu-right(
-      :stateWorkspace="stateWorkspace"
-      :style=`{
-        maxWidth: '300px',
-      }`).b-50
-  transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-    div(
-      v-if="!$route.params.id && $q.screen.width < 1260 && !$store.state.ui.appShowMenu && !showMenuRight"
-      :style=`{
-        position: 'absolute', zIndex: 9999,
-        bottom: '0px',
-        borderRadius: '10px 10px 0 0',
-        transform: 'translate3d(0,0,0)',
-        overflow: 'hidden',
-      }`
-      ).row.full-width.q-pa-sm.b-50
-      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
-      .col
-      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = true")
-  .col.full-width
+kalpa-layout(
+  title="Мастерская"
+  @pageId="$router.push({name: $event})"
+  :pages="pages" :pagesHot="pagesHot" :pageId="$route.name"
+  :style=`{height: $q.screen.height+'px'}`)
+  template(v-slot:drawerRight)
+    menu-right.b-50
+  template(v-slot:page)
     router-view(
       v-if="showView"
       @close="$router.back()"
       ctx="workspace"
       :value="item"
-      :options="{ctx: 'explorer'}").full-height
+      :options="{ctx: 'explorer'}"
+      :style=`{maxWidth: '800px',}`).full-height
 </template>
 
 <script>
@@ -49,10 +24,12 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'workspaceIndex',
   components: {menuRight},
+  props: {
+    sid: {type: String, default () { return 'workspace' }},
+  },
   data () {
     return {
       item: null,
-      showMenuRight: false,
       pages: [
         {id: 'content-list', name: 'Контент'},
         {id: 'composition-list', name: 'Образы'},
@@ -66,6 +43,11 @@ export default {
         {id: 'composition-list', name: 'Образы'},
         {id: 'node-list', name: 'Ядра'},
       ]
+    }
+  },
+  provide () {
+    return {
+      sidWorkspace: this.sid,
     }
   },
   computed: {
@@ -113,11 +95,16 @@ export default {
   },
   methods: {
   },
+  created () {
+    this.$log('created')
+    window.stores[this.sid] = this
+  },
   mounted () {
     this.$log('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
+    if (!module.hot) delete window.stores[this.sid]
   }
 }
 </script>

@@ -1,20 +1,37 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+  q-dialog(
+    v-model="compositionEditorOpened" position="bottom"
+    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
+    @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
+    ws-composition-editor(
+      v-if="compositionWorkspace"
+      @close="compositionEditorOpened = false"
+      :value="compositionWorkspace"
+      :style=`{
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+      }`).b-50
   //- composition name
   q-btn(
-    v-if="composition && composition.name.length > 0 && !mini"
+    v-if="compositionContents.length > 0 && !mini"
+    @click="compositionContentNameClick()"
     flat color="white" no-caps
     :style=`{
       position: 'absolute', zIndex: 2000,
       top: '8px', left: '8px',
       transform: 'translate3d(0,0,0)',
-      background: 'rgba(0,0,0,0.1)',
+      background: 'rgba(0,0,0,0.3)',
     }`
-    ) {{ composition.name }}
+    ).row.justify-start
+    //- .row.full-width.justify-start
+    //-   small.text-grey-2 from:
+    //- .row.full-width
+    span.text-white {{ compositionContents[0].name }}
   //- menu
   q-btn(
     v-if="!mini"
-    @click="compositionMore()"
     round flat color="white" icon="more_vert"
     :style=`{
       position: 'absolute', zIndex: 2000,
@@ -98,12 +115,14 @@ export default {
     return {
       composition: null,
       compositionContents: [],
+      compositionWorkspace: null,
       videoLoaded: false,
       currentTime: 0,
       duration: 0,
       playing: false,
       playsinline: true,
       muted: false,
+      compositionEditorOpened: false,
     }
   },
   computed: {
@@ -148,6 +167,7 @@ export default {
         this.$log('active TO', to)
         if (to) {
           // if (this.$refs.videoRef) this.$refs.videoRef.play()
+          this.compositionMore()
         }
         else {
           // if (this.$refs.videoRef) this.$refs.videoRef.pause()
@@ -163,21 +183,52 @@ export default {
     }
   },
   methods: {
+    async compositionContentNameClick () {
+      this.$log('compositionContentNameClick')
+      if (this.$refs.videoRef) this.$refs.videoRef.pause()
+      let composition = await this.compositionWs(this.compositionContents[0])
+      this.$log('composition', composition)
+      this.compositionWorkspace = composition
+      this.compositionEditorOpened = true
+    },
+    async compositionWs (content) {
+      let compositionInput = {
+        wsItemType: 'WS_CONTENT',
+        thumbOid: content.thumbUrl,
+        contentOid: content.oid,
+        contentType: 'COMPOSITION',
+        name: this.composition.name,
+        layers: this.composition.layers.map((l, li) => {
+          return {
+            id: `${Date.now()}::${li}`,
+            color: this.$randomColor(`${Date.now()}::${li}`),
+            contentOid: content.oid,
+            figuresAbsolute: l.figuresAbsolute,
+            figuresRelative: [],
+            spheres: [{name: ''}],
+          }
+        }),
+        spheres: [],
+        operation: { items: null, operations: null, type: 'CONCAT' }
+      }
+      this.$log('compositionInput', compositionInput)
+      let composition = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, compositionInput)
+      return composition
+    },
     videoEnded (e) {
       this.$log('videoEnded', e)
       this.$emit('ended')
     },
     async compositionMore () {
       this.$log('compositionMore')
-      if (this.compositionContents.length === 0) {
-        let res = []
-        await Promise.all(this.composition.layers.map(async (l, li) => {
-          let content = await this.$rxdb.get(RxCollectionEnum.OBJ, l.contentOid)
-          res.push(content)
-        }))
-        this.$log('res', res)
-        this.compositionContents = res
-      }
+      if (!this.composition) return
+      let res = []
+      await Promise.all(this.composition.layers.map(async (l, li) => {
+        let content = await this.$rxdb.get(RxCollectionEnum.OBJ, l.contentOid)
+        res.push(content)
+      }))
+      this.$log('res', res)
+      this.compositionContents = res
     },
     videoClick () {
       this.$log('videoClick')
@@ -203,6 +254,10 @@ export default {
       this.duration = e.target.duration
       this.videoLoaded = true
     }
+  },
+  mounted () {
+    // this.$log('mounted')
+    // this.composition
   }
 }
 </script>

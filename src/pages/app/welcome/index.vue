@@ -1,70 +1,58 @@
 <template lang="pug">
-q-layout(
-  view="hhh lpR fFf"
-  :style=`{height: $q.screen.height+'px'}`)
-  q-page-container.row.full-width.justify-center
-    .row.full-width.justify-center.q-py-md.br
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.justify-center
-        span(:style=`{fontSize: '30px'}`).text-white.q-mr-sm Welcome to
-        span(:style=`{fontSize: '30px'}`).text-green Kalpagramma
-    //- wrapper
+div(
+  :style=`{
+    height: $q.screen.height+'px',
+  }`
+  ).column.full-width
+  //- header
+  .row.full-width.justify-center.q-pt-sm
     div(
       :style=`{
+        height: '100px',
         maxWidth: $store.state.ui.maxWidthPage+'px',
-        borderRadius: $store.state.ui.borderRadius+'px'
-      }`
-      ).row.full-width.bg-grey-10.q-pa-md.br
-      like(v-show="page === 'like'" @types="types = $event")
-      div(v-show="page === 'who'").row.full-width.br
-        //- user-settings(:value="$store.getters.currentUser")
-    //- actions
-    .row.full-width.justify-center.br
-      div(:style=`{maxWidth: $store.state.ui.maxWidthPage+'px'}`).row.full-width.justify-start.q-py-md.q-px-sm
-        q-btn(v-if="page === 'who'" outline color="green" no-caps @click="page = 'like'" icon="keyboard_arrow_left"
-          :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
-          span Back to categories
-        .col
-        q-btn(v-if="page === 'who'" push color="green" no-caps @click="welcomeDone()"
-          :loading="loading"
-          :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
-          span Done
-        q-btn(v-if="page === 'like'" push color="green" no-caps @click="page = 'who'"
-          :style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
-          span Next
+        borderRadius: '10px', overflow: 'hidden',
+      }`).row.full-width.items-center.content-center.q-px-md.b-50
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold Welcome to Kalpagramma
+  //- body: wrapper
+  .col.full-width.q-py-md
+    .row.fit.justify-center
+      div(
+        :style=`{
+          maxWidth: $store.state.ui.maxWidthPage+'px',
+          borderRadius: $store.state.ui.borderRadius+'px'
+        }`
+        ).row.fit.b-50
+        edit-categories(v-if="pageId === 'categories'" @next="pageId = 'profile'")
+        edit-profile(v-if="pageId === 'profile'" @prev="pageId = 'categories'" @next="welcomeDone()")
+        //- edit-welcome(@prev="pageId = 'profile'" @next="welcomeDone()")
 </template>
 
 <script>
-import like from './like'
-import { UserApi } from 'src/api/user'
 import { ObjectsApi } from 'src/api/objects'
-// import userSettings from 'pages/app/user/user_settings'
+
+import editCategories from './edit_categories'
+import editProfile from './edit_profile'
+import editWelcome from './edit_welcome'
 
 export default {
   name: 'pageAppWelcome',
-  components: {like},
+  components: {editCategories, editProfile, editWelcome},
   data () {
     return {
-      page: 'like',
-      types: [],
-      loading: false
+      pageId: 'categories',
     }
   },
   methods: {
     async welcomeDone () {
       this.$log('welcomeDone')
-      this.loading = true
-      await UserApi.setFavouriteCategories(this.types)
-      // todo
-      // await this.$store.dispatch('objects/update', {
-      //   oid: this.$store.getters.currentUser.oid,
-      //   path: 'profile.tutorial',
-      //   newValue: false
-      // })
+      this.$q.loading.show({spinnerColor: 'green', message: 'Aligning sattelites...'})
       let currentUser = this.$store.getters.currentUser()
       await ObjectsApi.update(currentUser.oid, 'profile.tutorial', false, currentUser.rev)
       currentUser.profile.tutorial = false // currentUser реактивен
-      // TODO some account shit
-      this.loading = false
+      // done
+      await this.$wait(1000)
+      this.$q.loading.hide()
+      this.$q.notify({type: 'positive', message: 'Welcome !'})
       this.$router.push('/')
     }
   },

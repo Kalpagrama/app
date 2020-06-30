@@ -1,30 +1,98 @@
+<style lang="sass" scoped>
+.subscription
+  &:hover
+    background: rgb(90,90,90)
+</style>
+
 <template lang="pug">
-div(:style=`{height: '500px'}`).column.full-width
+div(
+  :style=`{
+    position: 'relative',
+    borderRadius: '10px',
+    overflow: 'hidden',
+  }`
+  ).column.full-width.fit.b-50
   //- header
-  div(:style=`{height: '60px'}`).row.full-width.q-px-sm
+  div(:style=`{height: '100px'}`).row.full-width.items-center.content-center.q-px-md
     .col
       .row.fit.items-center.content-center.q-px-sm
-        span.text-white.text-bold Subscriptions
-    q-btn(round flat color="grey-3" icon="edit" @click="subscriptionsEdit")
+        span(:style=`{fontSize: '16px',}`).text-white.text-bold Subscriptions
+    q-btn(
+      @click="editing = !editing"
+      round flat
+      :color="editing ? 'green' : 'grey-6'"
+      :icon="editing ? 'check' : 'edit'")
   //- body
   .col.full-width.scroll
-    div(
-      v-for="(s,si) in 30" :key="si" @click="subscriptionClick(s,si)"
-      :style=`{height: '40px'}`
-      ).row.full-width.items-center.content-center.q-px-md
-      span.text-white subscription {{si}}
+    .row.full-width.items-start.content-start
+      kalpa-loader(:mangoQuery="mangoQuery")
+        template(v-slot=`{items,itemsMore}`)
+          .row.full-width.items-start.content-start
+            div(
+              v-for="(s,si) in items" :key="s.oid"
+              :style=`{
+                position: 'relative',
+                height: '40px',
+                borderRadius: $store.state.ui.borderRadius+'px'
+              }`
+              ).row.full-width.items-center.content-center.q-px-md.cursor-pointer.subscription
+              .col.full-height
+                div(v-if="s.type === 'SENTENCE'").row.fit.items-center.content-center
+                  //- div(:style=`{}`)
+                  q-btn(round flat dense color="white" no-caps) #
+                  div(@click="subscriptionClick(s,si)").col.q-px-sm
+                    span.text-white {{ s.name }}
+                div(v-if="s.type === 'USER'").row.items-center.content-center.fit
+                  img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
+                  div(@click="subscriptionClick(s,si)").col.q-px-sm
+                    span.text-white {{ s.name }}
+              q-btn(
+                v-if="editing"
+                @click="subscriptionDelete(s,si)"
+                round flat dense color="white" icon="clear"
+                :style=`{}`).q-mr-xs
 </template>
 
 <script>
+import { UserApi } from 'src/api/user'
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
   name: 'homeExplorer-menuRight',
   data () {
     return {
+      editing: false,
+    }
+  },
+  computed: {
+    mangoQuery () {
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
+          oidSphere: this.$store.getters.currentUser().oid,
+        }
+      }
     }
   },
   methods: {
-    subscriptionClick (s, si) {
+    async subscriptionClick (s, si) {
       this.$log('subscriptionClick', s, si)
+      this.$router.push('/user/' + s.oid)
+      // let res = await UserApi.unSubscribe(s.oid)
+      // this.$log('res', res)
+    },
+    async subscriptionDelete (s, si) {
+      this.$log('subscriptionDelete', s, si)
+      if (!confirm(`Unsubscribe from ${s.name} ?`)) return
+      try {
+        let res = await UserApi.unSubscribe(s.oid)
+        this.$log('subscriptionDelete res', res)
+        this.$q.notify({message: 'Unsubscribed', type: 'negative'})
+      }
+      catch (e) {
+        this.$log('subscriptionDelete error', e)
+        this.$q.notify({message: e.message || 'ERROR', type: 'negative'})
+      }
     },
     subscriptionsEdit () {
       this.$log('subscriptionsEdit')
