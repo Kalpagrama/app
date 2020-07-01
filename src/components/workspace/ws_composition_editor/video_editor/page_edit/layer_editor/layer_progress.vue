@@ -1,7 +1,7 @@
 <template lang="pug">
 div(:style=`{position: 'relative',}`).row.full-width
   //- tools
-  div(:style=`{}`).row.full-width.items-center.content-center
+  div(:style=`{}`).row.full-width.items-center.content-center.q-pa-sm
     q-btn(
       @click="layerPlayingToggle()"
       :color="layerPlaying ? 'red' : 'green'"
@@ -32,7 +32,7 @@ div(:style=`{position: 'relative',}`).row.full-width
       :style=`{
         position: 'relative',
         height: '40px', borderRadius: '10px', overflow: 'hidden'
-      }`).row.full-width.b-70
+      }`).row.full-width.b-90
       //- bar: left
       div(
         v-if="showBar"

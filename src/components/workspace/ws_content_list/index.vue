@@ -41,7 +41,7 @@ div(
       v-if="ctx === 'workspace'"
       :style=`{}`).row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Контент')}}
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('content', 'Контент')}}
     //- search
     div.row.full-width
       .col.q-pr-xs
@@ -50,7 +50,7 @@ div(
           ref="searchStringInput"
           filled dense dark color="white"
           :autofocus="ctx === 'workpsace'"
-          :placeholder="$t('Найди контент или вставь ссылку')"
+          :placeholder="$t('find_content_or_paste_url', 'Найди контент или вставь ссылку')"
           :loading="searchStringLoading"
           @focus="searchStringFocused"
           @blur="searchStringBlurred"
@@ -85,7 +85,7 @@ div(
             v-else
             :style=`{height: '200px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
             ).row.full-width.items-center.content-center.justify-center.b-50
-            span.text-white {{ $t('Ничего не найдено :(') }}
+            span.text-white {{ $t('nothing_found', 'Ничего не найдено :(') }}
 </template>
 
 <script>

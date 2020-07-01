@@ -33,8 +33,9 @@ div(
     }`
     ).b-60
     template(v-slot:progressActions)
-      q-btn(flat dense color="white" icon="edit" @click="$emit('edit')")
-      q-btn(flat dense color="green" icon="check" @click="storeExplorer.compositionPlaying = null")
+      q-btn(round flat dense color="grey-4" @click="$emit('edit')")
+        q-icon(name="edit" color="grey-4" size="18px")
+      q-btn(flat dense color="grey-4" icon="keyboard_arrow_up" @click="storeExplorer.compositionPlaying = null").q-mr-xs
     template(v-slot:progressBar)
       div(
         :style=`{position: 'absolute', zIndex: 900, pointerEvents: 'none'}`

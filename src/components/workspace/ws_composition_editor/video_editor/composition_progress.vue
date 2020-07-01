@@ -1,6 +1,13 @@
 <template lang="pug">
 div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70
+  //- bar
   div(:style=`{position: 'relative', height: '40px'}`).row.full-width
+    //- stats
+    div(:style=`{position: 'absolute', zIndex: 210, pointerEvents: 'none'}`
+      ).row.fit.items-center.content-center.q-px-md
+      .col
+      small(:class=`{'text-red': layersDuration > 60}`).text-white.text-bold ~ {{ $time(layersDuration) }}
+    //- bar
     div(
       @click="progressClick"
       :style=`{
@@ -50,7 +57,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         }`
         ).row.full-height.bg-white
         //- small {{ li }}
-  //- actions
+  //- bar actions
   .row.full-width.q-pa-xs
     q-btn(
       @click="compositionPlayPause()"

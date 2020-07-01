@@ -7,18 +7,23 @@ div(
     borderRadius: '10px',
     overflow: 'hidden',
   }`).row.full-width
+  //- frames: mini editing...
   div(v-if="storeEditor.layerEditing === layer.id").row.full-width
     layer-frames(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-    .row.full-width.q-px-sm
-      layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-    layer-actions(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+    //- editing
+    div(v-if="editing" :style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70
+        layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+        layer-actions(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
   //- name editor
   div(
+    v-if="storeEditor.layerEditing !== layer.id"
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden',
     }`).row.full-width.justify-center
     q-input(
       :value="layerName"
+      @click="layerNameClick"
       @input="layerNameChanged"
       @focus="layerNameFocused"
       @blur="layerNameBlurred"
@@ -40,15 +45,19 @@ div(
       v-if="layerProgressMiniShow"
       :layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
   //- footer
-  div(v-if="storeEditor.layerEditing === layer.id").row.full-width.q-pa-xs
-    q-btn(round flat dense color="red-5" icon="delete_outline" @click="$emit('delete')")
+  div(
+    v-if="storeEditor.layerEditing === layer.id"
+    :style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width.q-pa-xs
+    //- q-btn(round flat dense color="red-5" icon="delete_outline" @click="$emit('delete')")
+    q-btn(round flat dense color="white" icon="tune" no-caps @click="editing = !editing")
+      //- span.text-white.q-mx-xs {{ $t('editor', 'Редактор')}}
     .col
     //- q-btn(round flat dense color="grey-3" no-caps @click="$emit('createNode')").q-px-sm Create node
     .col
     q-btn(
       @click="layerEditingToggle()"
-      flat dense color="green" icon-right="check" no-caps).q-px-sm
-      span.q-mr-sm {{$t('Save')}}
+      flat dense color="green" no-caps)
+      span {{$t('save', 'Сохранить')}}
 </template>
 
 <script>
@@ -67,6 +76,7 @@ export default {
       watcherCurrentTime: null,
       progressPercentRaw: null,
       need_framesLayerCenter: false,
+      editing: false,
     }
   },
   computed: {
@@ -141,6 +151,9 @@ export default {
     layerNameChanged (e) {
       // this.$log('layerNameChanged', e)
       this.$set(this.layer.spheres, 0, {name: e})
+    },
+    layerNameClick (e) {
+      this.$log('layerNameClick', e)
     },
     layerNameFocused (e) {
       // this.$log('layerNameFocused', e)

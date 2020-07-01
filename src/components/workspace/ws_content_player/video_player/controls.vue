@@ -1,8 +1,6 @@
 <template lang="pug">
 div(
   :style=`{
-    //- borderRadius: '10px', overflow: 'hidden',
-    //- background: 'rgba(0,0,0,0.1)',
   }`).row.full-width.items-start.content-start
   //- tools
   div(
@@ -12,6 +10,8 @@ div(
       @click="storePlayer.playPause()"
       round flat dense color="white"
       :icon="storePlayer.playing ? 'pause' : 'play_arrow'")
+    q-btn(
+      round flat dense color="grey-2" icon="volume_up")
     .col
     q-btn(round flat dense color="white" icon="fast_rewind" @click="fast(false)")
       q-tooltip(anchor="top middle" self="center middle") - 5 sec
@@ -23,9 +23,6 @@ div(
       q-tooltip(anchor="top middle" self="center middle") + 5 sec
     .col
     slot(name="controlsTools")
-    //- q-btn(
-    //-   round flat dense color="white"
-    //-   icon="fullscreen")
   //- bar
   div(:style=`{position: 'relative', zIndex: 300}`).row.full-width.q-pt-xs
     div(
@@ -35,7 +32,7 @@ div(
       @mouseenter="barOver = true"
       @mouseleave="barOver = null, barDragging ? null : barWidth = null"
       :style=`{
-        position: 'relative', height: '50px',
+        position: 'relative', height: '30px',
         borderRadius: '10px', overflow: 'hidden',
         background: 'rgba(60,60,60,0.5)',
       }`).row.full-width
@@ -60,7 +57,7 @@ div(
     //- bar: currentTime
     div(
       :style=`{
-        position: 'absolute', zIndex: 1100, top: '0px', height: 'calc(50px + 8px)',
+        position: 'absolute', zIndex: 1100, top: '0px', height: 'calc(30px + 8px)',
         left: storePlayer.currentTime/storePlayer.duration*100+'%',
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',

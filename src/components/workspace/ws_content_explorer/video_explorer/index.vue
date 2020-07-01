@@ -18,7 +18,7 @@ div(
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width
     q-btn(
-      v-if="!compositionEditing"
+      v-if="false && !compositionEditing"
       @click="compositionAddStart()"
       round push color="green" icon="add" size="md"
       :style=`{
@@ -36,6 +36,10 @@ div(
           @click="pageFullscreen = !pageFullscreen"
           round flat dense color="white"
           :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
+        q-btn(
+          @click="compositionAddStart()"
+          round push dense color="green" icon="add"
+          :style=`{borderRadius: '50%',}`)
       //- template(v-slot:controls)
       //-   composition-name-init(v-if="pageId === 'compositions'")
   //- page
@@ -100,11 +104,6 @@ export default {
       pageHeight: 0,
       pageFullscreen: false,
       pageId: 'compositions',
-      pages: [
-        {id: 'details', name: 'Детали'},
-        {id: 'compositions', name: 'Образы'},
-        {id: 'explore', name: 'Поиск'},
-      ],
       storePlayer: null,
       compositionPlaying: null,
       compositionEditing: null,
@@ -112,6 +111,13 @@ export default {
     }
   },
   computed: {
+    pages () {
+      return [
+        {id: 'details', name: this.$t('Детали')},
+        {id: 'compositions', name: this.$t('Мои Образы')},
+        {id: 'explore', name: this.$t('Ядра')},
+      ]
+    },
     sidPlayer () {
       return `${this.sid}-storePlayer`
     },

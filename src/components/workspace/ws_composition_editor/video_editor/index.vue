@@ -27,7 +27,7 @@ div(
     div(
       :style=`{
         position: 'relative', maxHeight: sidPlayerReady ? '100%' : pageHeight+'px',
-        paddingBottom: layerEditing ? '0px' : '60px',
+        paddingBottom: layerEditing ? '0px' : '0px',
       }`).col.full-width
       div(v-if="sidPlayerReady ? true : storePlayer && storePlayer.loadeddata").row.fit.justify-center
         page-details(
@@ -38,15 +38,16 @@ div(
         page-edit(
           v-if="pageId === 'edit'"
           :composition="composition"
-          :content="content")
+          :content="content"
+          @close="close()")
     //- footer: pages control
-    transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
-      pages-controller(
-        v-if="pageHeight > 40 && !layerEditing"
-        @close="close()"
-        :style=`{
-          position: 'absolute', zIndex: 1000, bottom: '0px',
-        }`)
+    //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
+    //-   pages-controller(
+    //-     v-if="pageHeight > 40 && !layerEditing"
+    //-     @close="close()"
+    //-     :style=`{
+    //-       position: 'absolute', zIndex: 1000, bottom: '0px',
+    //-     }`)
   //- mode: PLAYER
   div(v-if="options.mode === 'player'" :style=`{position: 'relative'}`).row.fit
     ws-content-player(@ready="storePlayerReady" :sid="sidPlayer" :content="content" :options=`{controls: false}`)

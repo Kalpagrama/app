@@ -10,7 +10,8 @@ import VueVirtualScroller from 'vue-virtual-scroller'
 import VueMasonry from 'vue-masonry-css'
 import 'viewerjs/dist/viewer.css'
 import Viewer from 'v-viewer'
-
+// https://github.com/Norserium/vue-advanced-cropper
+// https://github.com/anvaka/panzoom
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
   let mins = ~~((sec % 3600) / 60)
