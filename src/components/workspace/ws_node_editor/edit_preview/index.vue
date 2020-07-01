@@ -23,10 +23,11 @@ div(
         v-else
         :style=`{height: '400px'}`).row.full-width.items-center.content-center.justify-center
         q-spinner(color="green" size="50px")
-    div(v-if="false").row.full-width.items-center.content-center.q-py-sm
+    div(v-if="true").row.full-width.items-center.content-center.q-py-sm
       q-select(
         filled
-        dark color="white" label="Layout"
+        dark color="white"
+        :label="$t('Выберите шаблон')"
         :value="layout(node.layout)" @input="layoutSelected"
         :options="layouts"
         :style=`{

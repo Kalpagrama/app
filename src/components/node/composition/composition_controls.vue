@@ -66,7 +66,7 @@ div(
 
 <script>
 export default {
-  name: 'videoControls',
+  name: 'compositionControls',
   props: ['ctx', 'visible', 'active', 'mini', 'player', 'playing', 'currentTime', 'duration'],
   data () {
     return {

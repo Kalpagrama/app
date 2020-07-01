@@ -90,7 +90,7 @@ div(
             @click="createNodeStart()"
             color="green" no-caps align="left" icon="add"
             :style=`{height: '50px'}`).full-width
-            span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('Создать ядро')}}
+            span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('Собрать ядро')}}
         //- version
         div(v-if="true").row.full-width.items-center.q-pa-md
           small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('Версия')}} 0.9.9-26.06.2020

@@ -1,7 +1,7 @@
 <style lang="sass">
-.q-tab
-  border-radius: 8px !important
-  overflow: hidden !important
+// .q-tab
+//   border-radius: 8px !important
+//   overflow: hidden !important
 </style>
 
 <template lang="pug">
@@ -20,7 +20,7 @@ kalpa-layout(
             span.text-white.text-bold.q-ml-sm {{ user.name }}
         q-btn(v-if="!itsMe && !isSubscribed" push color="green" no-caps @click="userFollow()") {{$t('Follow')}}
         q-btn(v-if="!itsMe && isSubscribed" flat color="green" no-caps @click="userUnfollow()") {{$t('Following')}}
-      .row.full-width.items-end.content-end
+      div(v-if="false").row.full-width.items-end.content-end
         q-tabs(
           :value="$route.name" @input="pageChanged"
           align="justify"
@@ -58,22 +58,23 @@ export default {
       showMenu: false,
       showFooter: true,
       showHeader: true,
-      pages: [
-        {id: 'created', name: 'Created'},
-        {id: 'voted', name: 'Voted'},
-        {id: 'following', name: 'Following'},
-        {id: 'followers', name: 'Followers'},
-      ],
-      pagesHot: [
-        {id: 'created', name: 'Created'},
-        {id: 'voted', name: 'Voted'},
-      ],
       isSubscribed: false,
     }
   },
   computed: {
     pageId () {
       return this.$route.params.page
+    },
+    pages () {
+      return [
+        {id: 'created', name: this.$t('Ядра')},
+        {id: 'voted', name: this.$t('Голоса')},
+        {id: 'following', name: this.$t('Подписки')},
+        {id: 'followers', name: this.$t('Подписчики')},
+      ]
+    },
+    pagesHot () {
+      return this.pages.filter(p => ['created', 'voted'].includes(p.id))
     },
     itsMe () {
       return this.$route.params.oid === this.$store.getters.currentUser().oid

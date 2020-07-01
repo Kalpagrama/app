@@ -2,8 +2,9 @@
 div(
   :style=`{
     position: 'relative',
+    height: '100px',
     borderRadius: $store.state.ui.borderRadius+'px',
-    overflow: 'hidden'
+    overflow: 'hidden',
   }`
   ).row.full-width.items-center.content-center.justify-between
   img(
@@ -12,39 +13,44 @@ div(
     draggable="false"
     :style=`{
       userSelect: 'none',
-      maxHeight: '300px',
+      maxHeight: '100px',
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
       objectFit: 'cover',
-    }`).full-width.cursor-pointer
-  //- item name
-  div(
-    @click="$emit('edit')"
-    :style=`{
-      position: 'absolute', zIndex: 100, left: '8px', bottom: '8px',
-      borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
-      background: 'rgba(0,0,0,0.9)',
-    }`
-    ).row.items-center.content-center.q-pa-sm.b-50
-    span.text-white.text-bold {{ itemName }}
+    }`).cursor-pointer
+  .col.full-height
+    .row.fit.items-start.content-start.q-pa-sm
+      span.text-white.text-bold {{ itemName }}
+  //- //- item name
+  //- div(
+  //-   @click="$emit('edit')"
+  //-   :style=`{
+  //-     position: 'absolute', zIndex: 100, left: '8px', bottom: '8px',
+  //-     borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
+  //-     background: 'rgba(0,0,0,0.9)',
+  //-   }`
+  //-   ).row.items-center.content-center.q-pa-sm.b-50
+  //-   span.text-white.text-bold {{ itemName }}
   //- item actions
   q-btn(
+    v-if="false"
     round flat icon="more_vert" color="white"
     :style=`{
       position: 'absolute', zIndex: 200,
       right: '8px', top: '8px',
       cursor: 'pointer',
       background: 'rgba(0,0,0,0.2)'
-    }`)
+    }`).br
     kalpa-menu-popup(:actions="actions")
   //- stats absolute layers
   q-btn(
+    v-if="false"
     dense flat color="grey-5" no-caps
     :style=`{
       position: 'absolute', zIndex: 200,
       right: '16px', bottom: '8px',
       pointerEvents: 'none'
-    }`) [{{$t('layers')}}:{{ item.layers.length }}, {{$t('duration')}}: {{ $time(compositionDuration) }}]
+    }`).br [{{$t('layers')}}:{{ item.layers.length }}, {{$t('duration')}}: {{ $time(compositionDuration) }}]
 </template>
 
 <script>

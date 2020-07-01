@@ -1,0 +1,41 @@
+<template lang="pug">
+div()
+  q-btn(
+    @click="start()"
+    flat color="grey-2" icon="attach_file"
+    :style=`{
+      width: '40px',
+    }`).full-height
+  input(ref="inputFile" type="file" @input="fileChanged" :style=`{display: 'none',}`)
+</template>
+
+<script>
+import { ContentApi } from 'src/api/content'
+
+export default {
+  name: 'contentFromFile',
+  data () {
+    return {
+      file: null,
+    }
+  },
+  methods: {
+    start () {
+      this.$log('start', this.$refs.inputFile)
+      this.$refs.inputFile.click()
+    },
+    async fileChanged (e) {
+      this.$log('fileChanged', e)
+      this.file = e.target.files[0]
+      // this.avatarUrl = URL.createObjectURL(this.avatarFile)
+      let content = await ContentApi.contentCreateFromFile(this.file)
+      this.$log('content', content)
+      // add content to ws...
+      this.$emit('content', content)
+    },
+  },
+  // mounted () {
+  //   this.$log('mounted')
+  // }
+}
+</script>

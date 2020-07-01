@@ -17,7 +17,7 @@ div(
     //- navigation
     div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.justify-between.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Редактор ядра')}}
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Сборка ядра')}}
       //- .col
       q-btn(
         @click="pageId === 'info' ? pageId = 'items' : pageId = 'info'"
@@ -25,9 +25,9 @@ div(
         :color="pageId === 'info' ? 'green' : 'white'"
         :flat="pageId !== 'info'")
     //- essence
-    edit-essence(v-if="pageId !== 'info'" :node="node" :options="options")
+    edit-essence(v-if="pageId !== 'info'" :node="node" :options="options").q-pb-sm
     //- pages
-    .row.full-width.justify-center
+    div(v-if="false").row.full-width.justify-center
       div(:style=`{maxWidth: '600px'}`).row.full-width.q-pt-sm
         q-tabs(
           :value="pageId" @input="pageChanged($event)"
@@ -54,7 +54,21 @@ div(
           maxWidth: '600px',
         }`)
   //- footer
-  div(:style=`{}`).row.full-width.justify-center
+  div(:style=`{order: 1}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '600px'}`).row.full-width
+      q-tabs(
+        :value="pageId" @input="pageChanged($event)"
+        dense no-caps color="white"
+        align="justify"
+        active-color="green"
+        :style=`{}`
+        ).full-width
+        q-tab(
+          v-for="(p,pi) in pages" :key="p.id"
+          :name="p.id" :label="p.name"
+          dense no-caps color="white"
+          :style=`{color: 'rgb(180,180,180)'}`)
+  div(v-if="true" :style=`{}`).row.full-width.justify-center
     div(:style=`{maxWidth: '600px'}`).row.full-width.q-py-sm
       q-btn(
         @click="pagePrev()"
@@ -66,7 +80,7 @@ div(
         v-if="pageId !== 'preview'"
         @click="pageNext()"
         push color="green" no-caps
-        ).q-px-md Next
+        ).q-px-md {{$t('Next')}}
       q-btn(
         v-if="pageId === 'preview'"
         @click="stateNodeEditor.nodePublish()"
@@ -148,6 +162,7 @@ export default {
     nodeCheck () {
       this.$log('nodeCheck')
       if (!this.node.category) throw new Error('No node.category !')
+      if (this.node.name.length === 0) throw new Error('No node.essence !')
       if (this.node.layout !== 'PIP') throw new Error('Only PIP layout for now !')
       if (this.node.items.length > 3) throw new Error('3 compositions maximum !')
       if (this.node.spheres.length > 5) throw new Error('5 spheres maximum !')

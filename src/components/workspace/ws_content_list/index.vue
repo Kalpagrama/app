@@ -44,27 +44,27 @@ div(
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Контент')}}
     //- search
     div.row.full-width
-      q-input(
-        v-model="searchStringRaw"
-        ref="searchStringInput"
-        filled dense dark color="white"
-        :autofocus="ctx === 'workpsace'"
-        placeholder="Search or paste URL"
-        :loading="searchStringLoading"
-        @focus="searchStringFocused"
-        @blur="searchStringBlurred"
-        ).full-width
-        template(v-slot:append)
-          q-btn(
-            v-if="searchStringRaw.length > 0"
-            flat dense color="grey-2" icon="clear" @click="searchStringRaw = ''")
-          q-btn(
-            v-else
-            flat dense color="grey-2" icon="attach_file" @click="contentFromFILEStart()")
+      .col.q-pr-xs
+        q-input(
+          v-model="searchStringRaw"
+          ref="searchStringInput"
+          filled dense dark color="white"
+          :autofocus="ctx === 'workpsace'"
+          :placeholder="$t('Найди контент или вставь ссылку')"
+          :loading="searchStringLoading"
+          @focus="searchStringFocused"
+          @blur="searchStringBlurred"
+          ).full-width
+          template(v-slot:append)
+            q-btn(
+              v-if="searchStringRaw.length > 0"
+              @click="searchStringRaw = ''"
+              flat dense color="grey-2" icon="clear")
+      content-from-file(@content="contentAdd")
     //- actions
     div(:style=`{}`).row.full-width.items-end.content-end
       .col
-        kalpa-buttons(:value="types" :id="type" @id="type = $event" wrapperBg="b-70").justify-start
+        kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start
       //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70
   //- body
   .col.full-width.scroll
@@ -85,7 +85,7 @@ div(
             v-else
             :style=`{height: '200px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
             ).row.full-width.items-center.content-center.justify-center.b-50
-            span.text-white {{$t('Nothing found :(')}}
+            span.text-white {{ $t('Ничего не найдено :(') }}
 </template>
 
 <script>
@@ -93,10 +93,11 @@ import { ContentApi } from 'src/api/content'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentItem from './content_item'
+import contentFromFile from './content_from_file'
 
 export default {
   name: 'wsContentList',
-  components: {contentItem},
+  components: {contentItem, contentFromFile},
   props: {
     inDialog: {
       type: Boolean,
@@ -114,19 +115,13 @@ export default {
   data () {
     return {
       type: 'VIDEO',
-      types: [
-        // {id: 'all', name: 'All'},
-        {id: 'VIDEO', name: 'Videos'},
-        {id: 'IMAGE', name: 'Images'},
-        {id: 'BOOK', name: 'Books'},
-        {id: 'WEB', name: 'Web'}
-      ],
       searchString: '',
       searchStringRaw: '',
       searchStringLoading: false,
       content: null,
       contentShow: false,
       contentEditorOpened: false,
+      contentFile: null,
       listView: 'mini',
       listViews: [
         {id: 'mini', icon: 'view_list'},
@@ -136,6 +131,14 @@ export default {
     }
   },
   computed: {
+    types () {
+      return [
+        {id: 'VIDEO', name: this.$t('Видео')},
+        {id: 'IMAGE', name: this.$t('Картинки')},
+        {id: 'BOOK', name: this.$t('Книги')},
+        {id: 'WEB', name: this.$t('Веб')}
+      ]
+    },
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_CONTENT}}
       // selector
@@ -239,20 +242,6 @@ export default {
         return content
       } catch (e) {
         this.$log('contentFromURL error', e)
-      }
-    },
-    async contentFromFILEStart () {
-      this.$log('contentFromFILEStart')
-      // TODO: impl
-    },
-    async contentFromFILE () {
-      try {
-        this.$log('contentFromFILE start')
-        let content = null
-        this.$log('contentFromFILE done')
-        return content
-      } catch (e) {
-        this.$log('contentFromFILE error', e)
       }
     },
     searchStringFocused () {

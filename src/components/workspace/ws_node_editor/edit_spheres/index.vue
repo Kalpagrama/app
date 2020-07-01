@@ -15,7 +15,8 @@ div(
   div().row.full-width.q-mb-sm
     q-select(
       filled
-      dark color="white" label="Category"
+      dark color="white"
+      :label="$t('Выбери категорию')"
       :value="category(node.category)" @input="categorySelected"
       :options="categories"
       :style=`{

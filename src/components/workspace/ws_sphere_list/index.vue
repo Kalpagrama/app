@@ -24,7 +24,7 @@ div(
       q-input(
         v-model="searchString"
         filled dense dark color="grey-6"
-        label="Find or create sphere"
+        :label="$t('Найди или создай сферу')"
         @focus="searchStringFocused"
         @blur="searchStringBlurred"
         @keyup.enter="searchStringEnter()").full-width

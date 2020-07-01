@@ -15,12 +15,13 @@ component(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 import videoEditor from './video_editor'
-// import imageEditor from './image_editor'
+import imageEditor from './image_editor'
 
 export default {
   name: 'wsCompositionEditor',
-  components: {videoEditor},
+  components: {videoEditor, imageEditor},
   props: ['value', 'sidPlayer', 'options'],
   data () {
     return {

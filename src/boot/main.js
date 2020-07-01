@@ -8,6 +8,8 @@ import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import VueMasonry from 'vue-masonry-css'
+import 'viewerjs/dist/viewer.css'
+import Viewer from 'v-viewer'
 
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
@@ -34,11 +36,12 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     router = VueRouter
     Vue.use(VueMasonry)
     // Vue.use(VueYandexMetrika, {
-      //   id: 60818698,
-      //   router: router,
-      //   // env: process.env.NODE_ENV
-      //   // other options
-      // })
+    //   id: 60818698,
+    //   router: router,
+    //   // env: process.env.NODE_ENV
+    //   // other options
+    // })
+    Vue.use(Viewer)
     Vue.use(VueVirtualScroller)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
