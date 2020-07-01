@@ -44,7 +44,7 @@
     "apollo-link-error": "^1.1.12",
     "apollo-link-http": "^1.5.16",
     "apollo-link-ws": "^1.0.19",
-    "apollo-upload-client": "^12.1.0",
+    "apollo-upload-client": "^13.0.0",
     "axios": "^0.19.2",
     "body-scroll-lock": "^2.7.1",
     "connect-history-api-fallback": "^1.6.0",
