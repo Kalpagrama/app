@@ -8,7 +8,7 @@ q-layout(
       div(:style=`{height: '60px'}`).row.full-width.justify-center
         div(:style=`{height: '60px', maxWidth: $store.state.ui.maxWidthPage+'px'}`
           ).row.full-width.items-center.q-px-sm
-          span(:style=`{fontSize: '30px'}`).text-white Report a bug
+          span(:style=`{fontSize: '30px'}`).text-white {{$t('Report a bug')}}
       .row.full-width.justify-center.q-pt-sm
         div(
           :style=`{

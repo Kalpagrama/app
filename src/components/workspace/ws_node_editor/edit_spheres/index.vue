@@ -15,7 +15,8 @@ div(
   div().row.full-width.q-mb-sm
     q-select(
       filled
-      dark color="white" label="Category"
+      dark color="white"
+      :label="$t('Выбери категорию')"
       :value="category(node.category)" @input="categorySelected"
       :options="categories"
       :style=`{
@@ -37,7 +38,7 @@ div(
       }`).full-height.b-50
       template(v-slot:header)
         .row.full-width.q-px-sm.q-py-md
-          span.text-white.text-bold Spheres
+          span.text-white.text-bold {{$t('Spheres')}}
       template(v-slot:items=`{items, searchString}`)
         div().row.full-width.items-start.content-start
           div(v-if="searchString.length === 0").row.full-width.q-py-sm

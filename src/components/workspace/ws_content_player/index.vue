@@ -14,11 +14,11 @@ component(
 
 <script>
 import videoPlayer from './video_player'
-// import imagePlayer from './image_player'
+import imagePlayer from './image_player'
 
 export default {
   name: 'wsContentPlayer',
-  components: {videoPlayer},
+  components: {videoPlayer, imagePlayer},
   props: {
     sid: {
       type: String,

@@ -16,7 +16,7 @@ div(
   ).column.full-width.b-50
   //- header
   div(:style=`{height: '70px'}`).row.full-width.items-center.content-center.q-px-md
-    span.text-white.text-bold Node explorer
+    span.text-white.text-bold {{$t('Node explorer')}}
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start
@@ -27,7 +27,7 @@ div(
           'b-100': $route.name === p.id,
         }`
         :style=`{height: '50px', borderRadius: $store.state.ui.borderRadius+'px'}`).row.full-width.items-center.content-center.q-px-md.page-item
-        span.text-white {{ p.name }}
+        span.text-white {{ $t(p.name) }}
 </template>
 
 <script>

@@ -39,13 +39,13 @@ div(
     //- navigation
     div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold Chains
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Chains')}}
     //- search
     div(v-if="true").row.full-width
       q-input(
         v-model="searchString"
         filled dense dark color="white"
-        label="Search..."
+        :label="$t('Search...')"
         ).full-width
   //- body
   .col.full-width.scroll

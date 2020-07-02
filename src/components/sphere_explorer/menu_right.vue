@@ -10,7 +10,7 @@ div(
   ).column.full-width.b-50
   //- header
   div(:style=`{}`).row.full-width.items-center.content-center.q-pa-md
-    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Trends
+    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold {{$t('Trends')}}
   //- body
   .col.full-width.scroll
     sphere-list-top(:oid="$route.params.oid" @oid="$router.push({params: {oid: $event}})")

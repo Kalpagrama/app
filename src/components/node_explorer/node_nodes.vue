@@ -42,7 +42,7 @@ div(:style=`{position: 'relative'}`).column.fit
               :style=`{maxWidth: '800px', marginTop: '70px'}`)
             //- node add
             .row.full-width.justify-start.q-pa-md
-              span(:style=`{fontSize: '16px',}`).text-white.text-bold Образы ядра
+              span(:style=`{fontSize: '16px',}`).text-white.text-bold {{$t('Образы ядра')}}
           //- node nodes
           template(v-slot:item=`{item, index, indexMiddle}`)
             node(

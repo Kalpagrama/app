@@ -1,19 +1,36 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
+  //- header: composition.name, check:close
+  .row.full-width.justify-center
+    name-editor(
+      :composition="composition" @close="$emit('close')"
+      :style=`{maxWidth: '600px'}`)
   //- layers list
   div(v-if="storePlayer").col.full-width
     div(:style=`{position: 'relative'}`).column.fit
-      //- header
+      //- header: actions, layersSelected
       div(
-        v-if="false"
-        :style=`{}`).row.full-width.justify-center
-        div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center.q-py-xs
+        v-if="!storeEditor.layerEditing"
+        :style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width.justify-center
+        div(:style=`{position: 'relative', maxWidth: '600px'}`).row.full-width.items-center.content-center.q-py-xs
           q-btn(round flat dense color="grey-4" icon="search")
           .col
           q-btn(round flat dense color="grey-4" icon="sort")
-      //- body
+          //- header: layersSelected
+          div(
+            v-if="layersSelected.length > 0"
+            :style=`{
+              position: 'absolute', zIndex: 1000,
+              borderRadius: '10px', overflow: 'hidden',
+            }`).row.full-width.justify-center.b-60
+            q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []")
+            q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('delete', 'Удалить')}}
+            .col
+            q-btn(dense color="white" flat no-caps @click="layersSelectedMove()") {{$t('move', 'Перенести')}}
+            q-btn(dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm {{$t('create_node', 'Собрать ядро')}}
+      //- body: layers, dragging
       .col.full-width.scroll
-        .row.full-width.justify-center.q-py-sm
+        .row.full-width.justify-center
           div(:style=`{maxWidth: storeEditor.layerEditing ? '600px' : '680px'}`).row.full-width.justify-center
             draggable(
               :list="composition.layers" group="layers" :sort="true" handle=".layer-drag-handle"
@@ -55,56 +72,32 @@ div(:style=`{position: 'relative'}`).column.fit
                   flat color="green" icon-right="add" no-caps
                   :style=`{height: '40px'}`
                   ).full-width.b-70
-                  span.text-bold.q-mx-sm Добавить слой
-      //- footer: layers selected
-      div(
-        v-if="layersSelected.length > 0"
-        :style=`{
-          position: 'absolute', zIndex: 1000, bottom: '8px',
-        }`).row.full-width.justify-center
-        div(
-          :style=`{
-            height: '50px', maxWidth: '680px',
-            borderRadius: '10px', overflow: 'hidden'
-          }`
-          ).row.full-width.items-center.content-center.q-pa-sm.b-70
-          q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []")
-          q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm Delete
-          .col
-          q-btn(dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm Create node
-  //- footer: something
-  //- !storeEditor.layerEditing
+                  span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить слой')}}
+  //- footer: progress, actions: delete,create_node
   div(
     v-if="true"
-    :style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '600px'}`).row.full-width.items-center.content-center
-      //- name editor
-      div(v-if="true").row.full-width.q-py-sm
-        q-input(
-          v-model="composition.name"
-          label="Что ты видишь?"
-          filled dark color="white"
-          ).full-width
-      //- stats
-      div(
-        v-if="!storeEditor.layerEditing && composition.layers.length > 0"
-        ).row.full-width.text-grey-4.q-pa-sm
-        span(:class=`{}`) Layers: {{ composition.layers.length }}
-        .col
-        span(:class=`{'text-red': layersDuration > 60}`) Duration: {{ $time(layersDuration) }}
-      composition-progress(
-        v-if="!storeEditor.layerEditing && composition.layers.length > 0"
-        :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
+    :style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
+    composition-progress(
+      v-if="composition.layers.length > 0"
+      :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
+    //- actions
+    div().row.full-width.items-center.content-center.q-py-xs
+      q-btn(flat dense color="red" no-caps) {{$t('delete', 'Удалить')}}
+      .col
+      node-creator(:composition="composition")
 </template>
 
 <script>
 import draggable from 'vuedraggable'
+
+import nameEditor from './name_editor'
 import layerEditor from './layer_editor'
-import compositionProgress from './composition_progress'
+import compositionProgress from '../composition_progress'
+import nodeCreator from './node_creator'
 
 export default {
   name: 'pageEdit',
-  components: {draggable, layerEditor, compositionProgress},
+  components: {draggable, nameEditor, layerEditor, compositionProgress, nodeCreator},
   props: ['composition'],
   inject: ['sidPlayer', 'sidEditor'],
   data () {
@@ -172,9 +165,15 @@ export default {
     },
     layersSelectedCreateNode (arr) {
       this.$log('layersSelectedCreateNode', arr)
+      this.layersSelected = []
     },
     layersSelectedDelete () {
       this.$log('layersSelectedDelete')
+      this.layersSelected = []
+    },
+    layersSelectedMove () {
+      this.$log('layersSelectedMove')
+      this.layersSelected = []
     },
   },
   mounted () {

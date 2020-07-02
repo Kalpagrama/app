@@ -8,7 +8,10 @@ import { TweenMax } from 'gsap'
 import VueObserveVisibility from 'vue-observe-visibility'
 import VueVirtualScroller from 'vue-virtual-scroller'
 import VueMasonry from 'vue-masonry-css'
-
+import 'viewerjs/dist/viewer.css'
+import Viewer from 'v-viewer'
+// https://github.com/Norserium/vue-advanced-cropper
+// https://github.com/anvaka/panzoom
 const time = (sec) => {
   let hrs = ~~(sec / 3600)
   let mins = ~~((sec % 3600) / 60)
@@ -34,11 +37,12 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     router = VueRouter
     Vue.use(VueMasonry)
     // Vue.use(VueYandexMetrika, {
-      //   id: 60818698,
-      //   router: router,
-      //   // env: process.env.NODE_ENV
-      //   // other options
-      // })
+    //   id: 60818698,
+    //   router: router,
+    //   // env: process.env.NODE_ENV
+    //   // other options
+    // })
+    Vue.use(Viewer)
     Vue.use(VueVirtualScroller)
     Vue.use(VueObserveVisibility)
     Vue.prototype.$wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
@@ -93,10 +97,8 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     // content
     Vue.component('wsContentPlayer', () => import('components/workspace/ws_content_player'))
     Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
-    Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
+    // Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
     Vue.component('wsContentExplorer', () => import('components/workspace/ws_content_explorer'))
-    // Vue.component('wsContentVideoProgress', () => import('components/workspace/ws_content_explorer/video_explorer/content_progress'))
-    // Vue.component('wsContentVideoPlayer', () => import('components/workspace/ws_content_explorer/video_explorer/content_player'))
     // composition
     Vue.component('wsCompositionList', () => import('components/workspace/ws_composition_list'))
     Vue.component('wsCompositionEditor', () => import('components/workspace/ws_composition_editor'))
@@ -116,7 +118,6 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('sphereExplorer', () => import('components/sphere_explorer'))
     Vue.component('sphereSpheres', () => import('components/sphere_spheres'))
     Vue.component('sphereListTop', () => import('components/sphere_list_top'))
-    Vue.component('contentExplorer', () => import('components/content_explorer'))
     Vue.component('chainExplorer', () => import('components/chain_explorer'))
     // lists
     Vue.component('listMasonry', () => import('components/list_masonry'))
@@ -128,11 +129,10 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('kalpaMenu', () => import('components/kalpa/menu'))
     Vue.component('kalpaMenuRight', () => import('components/kalpa/menu_right'))
     Vue.component('kalpaMenuFooter', () => import('components/kalpa/menu_footer'))
-    // Vue.component('kalpaAction', () => import('components/kalpa/action'))
     Vue.component('kalpaAvatar', () => import('components/kalpa/avatar'))
     Vue.component('kalpaButtons', () => import('components/kalpa/buttons'))
     Vue.component('kalpaLogo', () => import('components/kalpa/logo'))
-    Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))
+    // Vue.component('kalpaWelcome', () => import('components/kalpa/welcome'))
     Vue.component('kalpaLoader', () => import('components/kalpa/loader'))
     Vue.component('kalpaKeyboardEvents', () => import('components/kalpa/keyboard_events'))
     Vue.component('kalpaMenuPopup', () => import('components/kalpa/menu_popup'))

@@ -10,11 +10,13 @@ component(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 import videoExplorer from './video_explorer'
+import imageExplorer from './image_explorer'
 
 export default {
   name: 'wsContentExplorer',
-  components: {videoExplorer},
+  components: {videoExplorer, imageExplorer},
   props: ['value', 'options'],
   data () {
     return {

@@ -12,7 +12,7 @@ div(
     //- navigation
     .row.full-width.items-center.content-center.q-py-md.b-50
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold Notes
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Notes')}}
     //- search
     .row.full-width
       q-input(

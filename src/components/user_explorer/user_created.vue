@@ -27,13 +27,13 @@ kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
             marginBottom: '40px',
           }`
           ).row.full-width.items-center.content-center.justify-center.b-60
-          span.text-white Вы еще не создали ни одного ядра
+          span.text-white {{$t('Вы еще не создали ни одного ядра')}}
           .row.full-width.items-center.content-center.justify-center.q-py-sm
             q-btn(
               @click="createNodeStart()"
               color="green" no-caps
               :style=`{height: '50px', width: '240px',}`)
-              span(:style=`{fontSize: '18px'}`).q-ml-md Создать ядро
+              span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('Создать ядро')}}
       //- nodes
       template(v-slot:item=`{item, index, indexMiddle}`)
         node(

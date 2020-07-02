@@ -18,7 +18,7 @@ div(
       'b-100': $route.name === p.id
     }`
     :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).row.full-width.items-center.content-center.q-px-md.page-item
-    span(:style=`{userSelect: 'none'}`).text-white {{ p.name }}
+    span(:style=`{userSelect: 'none'}`).text-white {{ $t(p.name) }}
 </template>
 
 <script>

@@ -6,16 +6,27 @@
       kalpa-loader(v-if="content.oid" :mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
           list-middle(
-            :items="items"
-            :options=`{paddingTop: 50, paddingBottom: $q.screen.height/3}`)
+            :items="items")
+            template(v-slot:itemFirst)
+              div(:style=`{height: '16px'}`).row.full-width
             template(v-slot:item=`{item, index, indexMiddle}`)
-              node(
-                ctx="list" layout="PIP"
-                :node="item" :index="index" :essence="true"
-                :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
-                :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
-                :active="listActive && index === indexMiddle"
-                :mini="false")
+              //- node(
+              //-   ctx="list" layout="PIP"
+              //-   :node="item" :index="index" :essence="true"
+              //-   :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
+              //-   :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
+              //-   :active="listActive && index === indexMiddle"
+              //-   :mini="false")
+              div(:style=`{height: '100px',borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70.q-mb-sm
+                img(
+                  :src="item.meta.items[0].thumbUrl"
+                  draggable="false"
+                  :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden',}`)
+                .col.full-height
+                  .row.fit.items-stat.content-start.q-pa-md
+                    span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ item.name }}
+            template(v-slot:itemLast)
+              div(:style=`{height: '400px'}`).row.full-width
 </template>
 
 <script>
@@ -27,6 +38,7 @@ export default {
   inject: ['sidPlayer'],
   data () {
     return {
+      mode: 'mini', // maxi, mini
     }
   },
   computed: {

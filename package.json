@@ -60,6 +60,7 @@
     "lodash": "^4.17.15",
     "lru-cache": "^5.1.1",
     "mediaelement": "^4.2.14",
+    "panzoom": "^9.2.5",
     "pouchdb-adapter-idb": "^7.2.1",
     "pug": "^2.0.4",
     "pug-loader": "^2.4.0",
