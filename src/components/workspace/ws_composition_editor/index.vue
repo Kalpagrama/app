@@ -1,6 +1,7 @@
 <template lang="pug">
 component(
   v-if="content"
+  :sid="sid"
   :is="component[content.type]"
   :composition="value"
   :content="content"
@@ -22,7 +23,7 @@ import imageEditor from './image_editor'
 export default {
   name: 'wsCompositionEditor',
   components: {videoEditor, imageEditor},
-  props: ['value', 'sidPlayer', 'options'],
+  props: ['value', 'sid', 'sidPlayer', 'options'],
   data () {
     return {
       content: null,

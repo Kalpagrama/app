@@ -1,16 +1,17 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
   composition-explorer(v-if="composition" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
   composition-menu(v-if="composition" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
   //- preview
   img(
+    @click="$emit('previewClick')"
     :src="preview"
     :style=`{
       objectFit: 'contain',
-      opacity: loaded ? 0 : 1,
+      opacity: loaded ? 1 : 1,
       maxHeight: $q.screen.height-120+'px',
     }`
-    ).full-width
+    ).fit.cursor-pointer
   //- debug
   //- kalpa-debug(
   //-   v-if="composition && !mini && false"

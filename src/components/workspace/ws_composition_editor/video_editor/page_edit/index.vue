@@ -72,7 +72,7 @@ div(:style=`{position: 'relative'}`).column.fit
                   flat color="green" icon-right="add" no-caps
                   :style=`{height: '40px'}`
                   ).full-width.b-70
-                  span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить слой')}}
+                  span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить фрагмент')}}
   //- footer: progress, actions: delete,create_node
   div(
     v-if="true"

@@ -71,15 +71,21 @@ div(
     .row.full-width.items-start.content-start.justify-center.q-py-md.q-px-sm
       kalpa-loader(:mangoQuery="mangoQuery" :key="i")
         template(v-slot=`{items}`)
-          div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start.justify-center
-            div(
-              :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
-              content-item(
-                v-for="(c,ci) in items" :key="c.id"
-                @pick="contentPicked(c,ci)"
-                @explore="contentExplore(c,ci)"
-                @delete="contentDelete(c,ci)"
-                :ctx="ctx" :content="c" :contentIndex="ci")
+          //- div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start.justify-center
+          //-   div(
+          //-     :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
+          //-     content-item(
+          //-       v-for="(c,ci) in items" :key="c.id"
+          //-       @pick="contentPicked(c,ci)"
+          //-       @explore="contentExplore(c,ci)"
+          //-       @delete="contentDelete(c,ci)"
+          //-       :ctx="ctx" :content="c" :contentIndex="ci")
+          div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width
+            div(v-if="type === 'VIDEO'")
+              content-item(v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c")
+            div(v-if="type === 'IMAGE'")
+              masonry(:cols="3" :gutter="0")
+                content-item(v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c" @pick="contentPicked(c,ci)")
           //- nothing found
           div(
             v-else
@@ -94,10 +100,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentItem from './content_item'
 import contentFromFile from './content_from_file'
+import itemImage from './item_image'
 
 export default {
   name: 'wsContentList',
-  components: {contentItem, contentFromFile},
+  components: {contentItem, contentFromFile, itemImage},
   props: {
     inDialog: {
       type: Boolean,

@@ -49,9 +49,9 @@ div(:style=`{position: 'relative'}`).column.fit
       }`
       ).row.full-width.items-center.content-center.q-pa-sm.b-60
       q-btn(round flat color="white" icon="clear" @click="storeExplorer.compositionsSelected = []").q-mr-sm
-      q-btn(flat color="red-5" no-caps @click="compositionsSelectedDelete()") Delete
+      q-btn(flat color="red-5" no-caps @click="compositionsSelectedDelete()") {{ $t('delete', 'Удалить') }}
       .col
-      q-btn(color="green" no-caps @click="compositionsSelectedCreateNode()") Create node
+      q-btn(color="green" no-caps @click="compositionsSelectedCreateNode()") {{ $t('create_node', 'Собрать ядро') }}
 </template>
 
 <script>

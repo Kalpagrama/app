@@ -19,7 +19,7 @@ div(
       :style=`{
         transform: 'translate3d(0,0,0)',
         borderRadius: $store.state.ui.borderRadius+'px',
-        overflow: 'hidden',
+        //- overflow: 'hidden',
       }`).b-60
     node-vote(
       v-if="stateNode.voteShow"

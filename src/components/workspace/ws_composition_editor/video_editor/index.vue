@@ -52,8 +52,8 @@ div(
   div(v-if="options.mode === 'player'" :style=`{position: 'relative'}`).row.fit
     ws-content-player(@ready="storePlayerReady" :sid="sidPlayer" :content="content" :options=`{controls: false}`)
     composition-progress(
-      v-if="storePlayer && storePlayer.loadeddata"
-      :composition="composition"
+      v-if="!options.mini && storePlayer && storePlayer.loadeddata"
+      :composition="composition" :options="options"
       :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', opacity: 0.6}`)
   //- mode: PROGRESS
   div(v-if="options.mode === 'progress'").row.full-width
@@ -107,6 +107,8 @@ export default {
         return {
           mode: 'editor',
           isPreview: false,
+          active: true,
+          mini: false,
         }
       }
     },

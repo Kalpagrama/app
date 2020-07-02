@@ -55,7 +55,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'editSpheres',
-  props: ['stateNodeEditor', 'node'],
+  props: ['storeNodeEditor', 'node'],
   data () {
     return {
       nodeCategories: [],

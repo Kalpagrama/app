@@ -1,120 +1,38 @@
-<style lang="sass" scoped>
-.item-prev
-  opacity: 0
-  &:hover
-    opacity: 1
-    background: rgba(255,255,255,0.2) !important
-.item-next
-  cursor: pointer
-  border-radius: 10px
-  &:hover
-    background: rgba(255,255,255,0.1) !important
-.item-again
-  &:hover
-    background: rgba(255,255,255,0.2) !important
-</style>
-
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-  }`
-  ).row.full-width.items-start.content-start
+div(:style=`{position: 'relative',}`).row.full-width
   //- items preview: first item from meta => shaping the size
   img(
     v-if="true"
     @load="previewLoad"
     @error="previewErrored"
     :src="previewUrl" draggable="false"
-    :class=`{
-    }`
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-200+'px',
-      opacity: itemIndex === 0 ? 1 : 0
+      opacity: 1,
     }`
     ).full-width
-  //- items wrapper
-  div(
-    :style=`{
-      position: 'absolute',
-      zIndex: 1000,
-    }`
-    ).row.fit.items-start.content-start
-    //- items stats
-    div(
-      v-if="false && visible && active && items.length > 1"
-      :style=`{
-        position: 'absolute', zIndex: 20000, top: '0px',
-        transform: 'translate3d(0,0,0)',
-        height: '4px'
-      }`
-      ).row.full-width.items-center.q-px-sm
-        div(
-          v-for="(i,ii) in items" :key="ii"
-          :style=`{height: '4px'}`).col.q-px-xs
-            div(:style=`{
-              borderRadius: '2px', overflow: 'hidden',
-              background: itemIndex === ii ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.2)'
-            }`).row.fit
-    //- item prev
-    q-btn(
-      v-if="visible && active && itemIndex !== 0 && items.length > 1"
-      @click="itemsPrev()"
-      round flat
-      color="white"
-      :style=`{
-        position: 'absolute', zIndex: 1000,
-        left: '0px', top: '0px',
-        width: '15%',
-        height: 'calc(100% - 66px)',
-        borderRadius: $store.state.ui.borderRadius+'px',
-        overflow: 'hidden',
-        background: 'rgba(255,255,255,0)',
-      }`)
-      q-icon(
-        name="keyboard_arrow_left" color="white" size="40px"
-        :style=`{marginTop: '60px', opacity: 0.8}`)
-    //- item last
-    //- item current
-    div(
-      v-for="(i,ii) in items" :key="i.oid+'-'+ii"
-      v-if="ii >= itemIndex && ii <= itemIndex+1"
-      :style=`{
-        position: 'absolute', zIndex: 100+ii, right: '0px', bottom: '-0.5px',
-        maxWidth: itemIndex === ii ? nowMaxWidth+'%' : nextMaxWidth+'%',
-        maxHeight: itemIndex === ii ? nowMaxHeight+'%' : nextMaxHeight+'%',
-        opacity: itemIndex === ii ? 1 : (nextMaxWidth / 100) + 0.3,
-        transform: 'translate3d(0,0,0)',
-      }`).row.full-width.items-start.content-start
-      //- //- item prev
-      //- div(
-      //-   :style=`{
-      //-     position: 'absolute', zIndex: 100+ii, left: '-58px',
-      //-     width: '50px', height: '100%',
-      //-   }`
-      //-   ).row.items-center.content-center.justify-center.br
-      //-   q-btn(round flat color="white" icon="keyboard_arrow_left" @click="itemsPrev()").fit.b-80
-      //- item next
-      div(v-if="ii === itemIndex+1" @click="itemsNext()" :style=`{position: 'absolute', zIndex: 20000, borderRadius: $store.state.ui.borderRadius+'px'}`).row.fit.cursor-pointer.item-next
-      //- composition
-      //- TODO composition, chain, another shit?
-      //- :active="visible && active && itemIndex === ii || visible && active && nextMaxWidth > 25"
+  //- items in pip
+  list-pip(:items="items" :prevBtnShow="active")
+    template(v-slot:item=`{item,itemIsFirst,itemIsLast,itemIndex,itemActive,itemNexting,next,prev,started,ended}`)
       composition(
-        :ctx="ctx" :preview="i.thumbUrl" :value="i"
+        :ctx="ctx" :preview="item.thumbUrl" :value="item"
         :visible="visible"
-        :loop="items.length === 1"
-        :active="active && itemIndex === ii"
-        :mini="mini || itemIndex !== ii || nextMaxWidth > 50"
+        :loop="itemIsFirst && itemIsLast"
+        :active="active && itemActive"
+        :mini="mini || !itemActive || itemNexting"
         :itemsCount="items.length"
-        @save="nodeSave()"
-        @started="itemStarted(ii)"
-        @ended="itemEnded(ii)"
+        :class=`{
+          'full-height': itemActive || itemNexting,
+        }`
+        @previewClick="next()"
+        @started="started(ii)"
+        @ended="ended(ii)"
         :style=`{
           position: 'relative',
           borderRadius: $store.state.ui.borderRadius+'px',
           overflow: 'hidden',
-        }`).fit
+        }`)
 </template>
 
 <script>
@@ -160,38 +78,6 @@ export default {
     previewErrored (e) {
       this.$log('previewErrored', e)
       this.previewError = e
-    },
-    itemsPrev () {
-      this.$log('itemsPrev')
-      this.itemIndex -= 1
-    },
-    itemsNext () {
-      this.$log('itemsNext')
-      this.$tween.to(
-        this,
-        0.5,
-        {
-          nextMaxWidth: 100,
-          nextMaxHeight: 100,
-          onComplete: () => {
-            this.itemIndex += 1
-            this.nextMaxWidth = 25
-            this.nextMaxHeight = 50
-          }
-        }
-      )
-    },
-    itemStarted (itemIndex) {
-      this.$log('itemStarted', itemIndex)
-    },
-    itemEnded (itemIndex) {
-      this.$log('itemEnded', itemIndex)
-      if (this.items[itemIndex + 1]) {
-        this.itemsNext()
-      }
-      else {
-        this.itemIndex = 0
-      }
     },
     async nodeSave () {
       this.$log('nodeSave')
