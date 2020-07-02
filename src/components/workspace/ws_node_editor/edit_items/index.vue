@@ -28,7 +28,8 @@ div(
         minHeight: $q.screen.height+'px',
         maxWidth: $store.state.ui.maxWidthPage+'px'
       }`)
-  .row.ful-width.justify-center
+  //- modes
+  div(v-if="false").row.ful-width.justify-center
     q-btn(
       v-for="m in modes" :key="m.id"
       @click="mode = m.id"
@@ -176,7 +177,7 @@ export default {
   props: ['storeNodeEditor', 'node', 'options'],
   data () {
     return {
-      mode: 'mini', // mini/medi/maxi
+      mode: 'maxi', // mini/medi/maxi
       modes: [
         {id: 'mini', icon: 'menu'},
         {id: 'medi', icon: 'view_week'},

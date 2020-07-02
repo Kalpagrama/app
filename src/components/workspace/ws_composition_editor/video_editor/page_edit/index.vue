@@ -8,37 +8,17 @@ div(:style=`{position: 'relative'}`).column.fit
   //- layers list
   div(v-if="storePlayer").col.full-width
     div(:style=`{position: 'relative'}`).column.fit
-      //- header: actions, layersSelected
-      div(
-        v-if="!storeEditor.layerEditing"
-        :style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width.justify-center
-        div(:style=`{position: 'relative', maxWidth: '600px'}`).row.full-width.items-center.content-center.q-py-xs
-          q-btn(round flat dense color="grey-4" icon="search")
-          .col
-          q-btn(round flat dense color="grey-4" icon="sort")
-          //- header: layersSelected
-          div(
-            v-if="layersSelected.length > 0"
-            :style=`{
-              position: 'absolute', zIndex: 1000,
-              borderRadius: '10px', overflow: 'hidden',
-            }`).row.full-width.justify-center.b-60
-            q-btn(round flat dense color="white" icon="clear" @click="layersSelected = []")
-            q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('delete', 'Удалить')}}
-            .col
-            q-btn(dense color="white" flat no-caps @click="layersSelectedMove()") {{$t('move', 'Перенести')}}
-            q-btn(dense color="green" no-caps @click="layersSelectedCreateNode()").q-px-sm {{$t('create_node', 'Собрать ядро')}}
       //- body: layers, dragging
       .col.full-width.scroll
         .row.full-width.justify-center
-          div(:style=`{maxWidth: storeEditor.layerEditing ? '600px' : '680px'}`).row.full-width.justify-center
+          div(:style=`{maxWidth: storeEditor.layerEditing ? '600px' : '680px'}`).row.full-width.justify-center.q-pt-sm
             draggable(
               :list="composition.layers" group="layers" :sort="true" handle=".layer-drag-handle"
               @start="layersDragging = true"
               @end="layersDragging = false").full-width
+              //- v-show="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
               div(
                 v-for="(l,li) in composition.layers" :key="li"
-                v-show="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
                 :style=`{}`
                 ).row.full-width.items-start.content-start.q-mb-xs
                 //- left: select
@@ -64,7 +44,7 @@ div(:style=`{position: 'relative'}`).column.fit
                     kalpa-menu-popup(:actions="layerActions" :value="l")
             //- layer ADD
             div(
-              v-if="!storeEditor.layerEditing"
+              v-if="true"
               :style=`{}`).row.full-width.justify-center
               div(:style=`{maxWidth: '680px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
                 q-btn(
@@ -73,18 +53,35 @@ div(:style=`{position: 'relative'}`).column.fit
                   :style=`{height: '40px'}`
                   ).full-width.b-70
                   span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить фрагмент')}}
-  //- footer: progress, actions: delete,create_node
+  //- footer: layersSelected
   div(
-    v-if="true"
-    :style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
-    composition-progress(
-      v-if="composition.layers.length > 0"
-      :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
-    //- actions
-    div().row.full-width.items-center.content-center.q-py-xs
-      q-btn(flat dense color="red" no-caps) {{$t('delete', 'Удалить')}}
-      .col
-      node-creator(:composition="composition")
+    v-if="layersSelected.length > 0"
+    :style=`{
+      position: 'absolute', bottom: 0, zIndex: 1000,
+      borderRadius: '10px', overflow: 'hidden',
+      paddingLeft: '40px', paddingRight: '40px',
+    }`).row.full-width.justify-center.q-py-sm.b-70
+    q-btn(flat dense color="white" no-caps @click="layersSelected = []") {{$t('cancel', 'Отмена')}}
+    q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('layers_delete', 'Удалить слои')}}
+    .col
+  //- footer: progress, actions: delete,create_node
+  .row.full-width.justify-center
+    div(
+      v-if="layersSelected.length === 0"
+      :style=`{
+        maxWidth: '680px',
+        paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
+      composition-progress(
+        v-if="composition.layers.length > 0"
+        v-show="composition.layers.length > 1 && !storeEditor.layerEditing"
+        :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
+      //- actions
+      div(v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true").row.full-width.items-center.content-center.q-py-xs
+        q-btn(round flat dense color="red" icon="delete_outline" :style=`{opacity: 0.7}` @click="$emit('delete')")
+        .col
+        node-creator(:composition="composition")
+        .col
+        q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
 </template>
 
 <script>
@@ -179,7 +176,6 @@ export default {
   mounted () {
     this.$log('mounted')
     if (this.composition.layers.length === 1) {
-      // alert('layerEdit FIRST')
       this.layerEdit(this.composition.layers[0])
     }
   },

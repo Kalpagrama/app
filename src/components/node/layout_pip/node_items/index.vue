@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative',}`).row.full-width
+div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width
   //- items preview: first item from meta => shaping the size
   img(
     v-if="true"
@@ -13,10 +13,11 @@ div(:style=`{position: 'relative',}`).row.full-width
     }`
     ).full-width
   //- items in pip
+  //- list-horizontal(:items="items")
   list-pip(:items="items" :prevBtnShow="active")
     template(v-slot:item=`{item,itemIsFirst,itemIsLast,itemIndex,itemActive,itemNexting,next,prev,started,ended}`)
       composition(
-        :ctx="ctx" :preview="item.thumbUrl" :value="item"
+        :ctx="ctx" :preview="node.meta.items[itemIndex].thumbUrl" :value="item"
         :visible="visible"
         :loop="itemIsFirst && itemIsLast"
         :active="active && itemActive"
@@ -26,8 +27,8 @@ div(:style=`{position: 'relative',}`).row.full-width
           'full-height': itemActive || itemNexting,
         }`
         @previewClick="next()"
-        @started="started(ii)"
-        @ended="ended(ii)"
+        @started="started(itemIndex)"
+        @ended="ended(itemIndex)"
         :style=`{
           position: 'relative',
           borderRadius: $store.state.ui.borderRadius+'px',

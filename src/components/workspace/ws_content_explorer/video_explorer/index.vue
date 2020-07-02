@@ -29,6 +29,7 @@ div(
       }`)
     ws-content-player(
       @ready="storePlayerReady"
+      @seeked="compositionPlaying = null"
       :sid="sidPlayer"
       :content="content")
       template(v-slot:controlsTools)

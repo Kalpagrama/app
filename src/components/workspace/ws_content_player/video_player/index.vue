@@ -46,6 +46,7 @@ div(:style=`{position: 'relative'}`).row.fit.b-60
       ).fit
     video-controls(
       v-if="options.controls && loadeddata"
+      @seeked="$emit('seeked')"
       :style=`{
         position: 'absolute', zIndex: 2000, bottom: '8px',
         left: '50%',

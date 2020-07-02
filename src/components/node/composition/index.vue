@@ -5,6 +5,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
   //- preview
   img(
     @click="$emit('previewClick')"
+    draggable="false"
     :src="preview"
     :style=`{
       objectFit: 'contain',
@@ -93,7 +94,14 @@ export default {
         }
       }
     },
-    // active: {},
+    active: {
+      handler (to, from) {
+        this.$log('active TO', to)
+        if (!this.$refs.videoRef) return
+        if (to) this.$refs.videoRef.play()
+        else this.$refs.videoRef.pause()
+      }
+    },
     '$store.state.ui.active': {
       handler (to, from) {
         this.$log('$store.state.ui.active TO',)

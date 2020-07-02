@@ -18,7 +18,7 @@ div(
           div(:style=`{position: 'relative'}`).row.fit
             div(
               v-if="!itemActive"
-              :style=`{position: 'absolute', zIndex: 999, opacity: 0.5}` @click="next()").row.fit.bg-red
+              :style=`{position: 'absolute', zIndex: 999, borderRadius: '10px', overflow: 'hidden', opacity: 0.2}` @click="next()").row.fit.cursor-pointer.bg-green
             ws-composition-editor(
               :sid="`wce-${itemIndex}`"
               :value="item"
