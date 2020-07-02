@@ -45,7 +45,7 @@ function mergeReactiveItem (reactiveItem, change) {
 async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
   let f = updateRxDoc
   logD(f, 'start')
-  logD(f, 'start2', rxDocOrId, path, value)
+  // logD(f, 'start2', rxDocOrId, path, value)
   if (!rxDocOrId) return
   let rxDoc
   if (isRxDocument(rxDocOrId)) {

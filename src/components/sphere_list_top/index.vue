@@ -35,7 +35,7 @@ export default {
         if (val.type !== 'ALL') {
           acc.push({
             oid: val.sphere.oid,
-            name: val.sphere.name
+            name: val.alias // val.sphere.name
           })
         }
         return acc
