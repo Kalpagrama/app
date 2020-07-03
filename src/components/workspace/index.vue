@@ -5,7 +5,7 @@ kalpa-layout(
   :pages="pages" :pagesHot="pagesHot" :pageId="$route.name"
   :style=`{height: $q.screen.height+'px'}`)
   template(v-slot:drawerRight)
-    menu-right.b-50
+    menu-right(:style=`{maxWidth: '250px',}`).b-50
   template(v-slot:page)
     router-view(
       v-if="showView"

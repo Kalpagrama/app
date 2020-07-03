@@ -14,7 +14,7 @@ div(
   }`).column.full-width.b-50
   //- header
   div(:style=`{height: '100px'}`).row.full-width.items-center.content-center.q-px-md
-    span(:style=`{fontSize: '16px'}`).text-white.text-bold {{$t('Настройки')}}
+    span(:style=`{fontSize: '16px'}`).text-white.text-bold {{$t('settings', 'Настройки')}}
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start

@@ -12,10 +12,20 @@ div(:style=`{position: 'relative'}`).column.fit
         maxHeight: $q.screen.height-60+'px',
         minHeight: $q.screen.height-60+'px',
       }`)
-  .col.full-width.scroll
+  div(:style=`{}`).col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery")
       template(v-slot=`{items}`)
-        .row.full-width.items-start.content-start.q-py-sm
+        .row.fit.items-start.content-start.q-py-sm
+          //- nodes on content bar
+          div(:style=`{position: 'absolute', zIndex: 99999, left: 0, top: '-38px', height: '30px', transform: 'translate3d(0,0,0)',}`
+            ).row.full-width.justify-center
+            div(:style=`{position: 'relative', maxWidth: '600px',}`).row.fit
+              div(
+                v-for="(i,ii) in items" :key="i.id"
+                :style=`{
+                  position: 'absolute', zIndex: 100+ii,
+                  left: i.layers[0].figuresAbsolute[0].t/content.duration*100+'%',
+                  width: '3px',}`).row.full-height.bg-grey-2
           div(
             v-for="(i,ii) in items" :key="i.id"
             v-if="i.layers.length > 0"

@@ -1,32 +1,38 @@
 <template lang="pug">
-.row.fit.justify-center
+div(:style=`{}`).row.fit.justify-center
   .column.fit
     //- body
     .col.full-width.scroll
       kalpa-loader(v-if="content.oid" :mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
-          list-middle(
-            :items="items")
-            template(v-slot:itemFirst)
-              div(:style=`{height: '16px'}`).row.full-width
-            template(v-slot:item=`{item, index, indexMiddle}`)
-              //- node(
-              //-   ctx="list" layout="PIP"
-              //-   :node="item" :index="index" :essence="true"
-              //-   :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
-              //-   :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
-              //-   :active="listActive && index === indexMiddle"
-              //-   :mini="false")
-              div(:style=`{height: '100px',borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70.q-mb-sm
-                img(
-                  :src="item.meta.items[0].thumbUrl"
-                  draggable="false"
-                  :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden',}`)
-                .col.full-height
-                  .row.fit.items-stat.content-start.q-pa-md
-                    span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ item.name }}
-            template(v-slot:itemLast)
-              div(:style=`{height: '400px'}`).row.full-width
+          .row.fit
+            //- nodes on content bar
+            div(:style=`{position: 'absolute', zIndex: 99999, left: 0, top: '-38px', height: '30px', transform: 'translate3d(0,0,0)',}`
+              ).row.full-width.justify-center
+              div(:style=`{position: 'relative', maxWidth: '600px',}`).row.fit
+                div(
+                  v-for="(i,ii) in items" :key="i.id"
+                  :style=`{
+                    position: 'absolute', zIndex: 100+ii,
+                    left: nodeStart(i)/content.duration*100+'%',
+                    width: '3px',}`).row.full-height.bg-grey-2
+            list-middle(
+              :items="items")
+              template(v-slot:itemFirst)
+                div(:style=`{height: '16px'}`).row.full-width
+              template(v-slot:item=`{item, index, indexMiddle}`)
+                div(
+                  @click="nodeClick(item)"
+                  :style=`{height: '100px',borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70.q-mb-sm
+                  img(
+                    :src="item.meta.items[0].thumbUrl"
+                    draggable="false"
+                    :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden',}`)
+                  .col.full-height
+                    .row.fit.items-stat.content-start.q-pa-md
+                      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ item.name }}
+              template(v-slot:itemLast)
+                div(:style=`{height: '400px'}`).row.full-width
 </template>
 
 <script>
@@ -55,6 +61,22 @@ export default {
     },
     listActive () {
       return !this.storePlayer.playing
+    }
+  },
+  methods: {
+    nodeClick (n) {
+      this.$log('nodeClick', n)
+      let t = this.nodeStart(n)
+      this.storePlayer.setCurrentTime(t)
+    },
+    nodeStart (n) {
+      let item = n.meta.items.find(i => {
+        return i.layers[0].contentOid === this.content.oid
+      })
+      if (!item) return 0
+      this.$log('item', item)
+      let t = item.layers[0].figuresAbsolute[0].t
+      return t
     }
   },
   mounted () {

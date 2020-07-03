@@ -34,7 +34,7 @@ div(
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
       background: 'rgba(255,255,255,0)',
-    }`).br
+    }`)
     q-icon(
       name="keyboard_arrow_left" color="white" size="40px"
       :style=`{marginTop: '60px', opacity: 0.8}`)

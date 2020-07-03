@@ -16,17 +16,7 @@ div(
     :style=`{height: '60px', paddingLeft: '60px',}`).row.full-width.items-center.content-center.b-60
     span.text-white.text-bold {{ value.name }}
   //- content player
-  div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).col.full-width
-    q-btn(
-      v-if="false && !compositionEditing"
-      @click="compositionAddStart()"
-      round push color="green" icon="add" size="md"
-      :style=`{
-        position: 'absolute', zIndex: 99999,
-        bottom: '12px',
-        right: '12px',
-        borderRadius: '50%',
-      }`)
+  div(:style=`{position: 'relative', borderRadius: '10px',}`).col.full-width
     ws-content-player(
       @ready="storePlayerReady"
       @seeked="compositionPlaying = null"
@@ -44,7 +34,7 @@ div(
       //- template(v-slot:controls)
       //-   composition-name-init(v-if="pageId === 'compositions'")
   //- page
-  div(:style=`{height: pageHeight+'px'}`).row.full-width
+  div(:style=`{height: pageHeight+'px',position: 'relative',}`).row.full-width
     div(v-if="storePlayer && storePlayer.loadeddata").row.fit.justify-center
       page-details(
         v-if="pageId === 'details'"
@@ -137,16 +127,17 @@ export default {
     pageId: {
       immediate: true,
       handler (to, from) {
-        if (to === 'details') this.pageHeight = this.$q.screen.height * 0.5
-        else if (to === 'explore') this.pageHeight = this.$q.screen.height * 0.7
-        else if (to === 'compositions') this.pageHeight = this.$q.screen.height * 0.6
-        else this.pageHeight = 0
+        this.pageHeight = this.$q.screen.height * 0.6
+        // if (to === 'details') this.pageHeight = this.$q.screen.height * 0.5
+        // else if (to === 'explore') this.pageHeight = this.$q.screen.height * 0.7
+        // else if (to === 'compositions') this.pageHeight = this.$q.screen.height * 0.6
+        // else this.pageHeight = 0
       }
     },
     pageFullscreen: {
       handler (to, from) {
         if (to) this.pageHeight = 0
-        else this.pageHeight = this.$q.screen.height * 0.5
+        else this.pageHeight = this.$q.screen.height * 0.6
       }
     },
   },

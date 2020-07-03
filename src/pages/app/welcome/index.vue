@@ -23,7 +23,18 @@ div(
         }`
         ).row.fit.b-50
         edit-categories(v-if="pageId === 'categories'" @next="pageId = 'profile'")
-        edit-profile(v-if="pageId === 'profile'" @prev="pageId = 'categories'" @next="welcomeDone()")
+        //- edit-profile(v-if="pageId === 'profile'" @prev="pageId = 'categories'" @next="welcomeDone()")
+        kalpa-profile(v-if="pageId === 'profile'")
+          template(v-slot:footer)
+            .row.full-width.items-center.content-center.q-pa-md
+              q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('prev')")
+              .col
+              q-btn(
+                @click="welcomeDone()"
+                color="green" no-caps
+                :disabled="nextDisabled"
+                :loading="loading"
+                ).q-px-md Ready
         //- edit-welcome(@prev="pageId = 'profile'" @next="welcomeDone()")
 </template>
 

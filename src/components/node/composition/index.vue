@@ -1,7 +1,7 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
   composition-explorer(v-if="composition" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
-  composition-menu(v-if="composition" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
+  //- composition-menu(v-if="composition && active && !mini" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
   //- preview
   img(
     @click="$emit('previewClick')"

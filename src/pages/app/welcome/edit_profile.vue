@@ -45,15 +45,7 @@
               minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
             }`).full-width
   //- footer
-  .row.full-width.items-center.content-center.q-pa-md
-    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('prev')")
-    .col
-    q-btn(
-      @click="next()"
-      color="green" no-caps
-      :disabled="nextDisabled"
-      :loading="loading"
-      ).q-px-md Ready
+  slot(name="footer")
 </template>
 
 <script>

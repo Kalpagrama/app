@@ -71,15 +71,6 @@ div(
     .row.full-width.items-start.content-start.justify-center.q-py-md.q-px-sm
       kalpa-loader(:mangoQuery="mangoQuery" :key="i")
         template(v-slot=`{items}`)
-          //- div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start.justify-center
-          //-   div(
-          //-     :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
-          //-     content-item(
-          //-       v-for="(c,ci) in items" :key="c.id"
-          //-       @pick="contentPicked(c,ci)"
-          //-       @explore="contentExplore(c,ci)"
-          //-       @delete="contentDelete(c,ci)"
-          //-       :ctx="ctx" :content="c" :contentIndex="ci")
           div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width
             div(v-if="type === 'VIDEO'")
               content-item(v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c" @pick="contentPicked(c,ci)")
