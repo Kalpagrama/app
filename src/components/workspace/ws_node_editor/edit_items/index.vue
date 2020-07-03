@@ -133,7 +133,7 @@ div(
           ).row.full-width.cursor-pointer.q-mb-sm
           img(
             @click="itemEdit(i,ii)"
-            :src="i.thumbOid" :style=`{height: '250px', objectFit: 'cover'}`).full-width
+            :src="i.thumbOid" :style=`{height: $q.screen.width < 800 ? '180px' : '250px', objectFit: 'cover'}`).full-width
           //- delete
           q-btn(
             @click="itemDelete(i,ii)"
@@ -162,6 +162,7 @@ div(
               userSelect: 'none',
             }`
             ).text-white.text-bold.q-pa-sm {{ i.name }}
+      //- item add
       q-btn(flat color="green" icon="add" no-caps :style=`{height: '50px',}` @click="itemAdd").full-width {{$t('add_item', 'Добавить образ')}}
 </template>
 

@@ -9,7 +9,7 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-200+'px',
-      opacity: 1,
+      opacity: started ? 0 : 1,
     }`
     ).full-width
   //- items in pip
@@ -27,7 +27,7 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width
           'full-height': itemActive || itemNexting,
         }`
         @previewClick="next()"
-        @started="started(itemIndex)"
+        @started="started(itemIndex), started = true"
         @ended="ended(itemIndex)"
         :style=`{
           position: 'relative',
@@ -45,6 +45,7 @@ export default {
   data () {
     return {
       itemIndex: 0,
+      started: false,
       nextMaxWidth: 25,
       nextMaxHeight: 50,
       nowMaxWidth: 100,

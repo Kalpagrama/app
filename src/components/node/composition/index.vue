@@ -9,7 +9,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
     :src="preview"
     :style=`{
       objectFit: 'contain',
-      opacity: loaded ? 1 : 1,
+      opacity: loaded ? 0 : 1,
       maxHeight: $q.screen.height-120+'px',
     }`
     ).fit.cursor-pointer
@@ -144,6 +144,7 @@ export default {
       this.$log('onLoadeddata', e)
       this.duration = e.target.duration
       this.loaded = true
+      this.$emit('started')
     }
   }
 }
