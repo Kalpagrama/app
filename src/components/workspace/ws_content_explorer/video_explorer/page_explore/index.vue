@@ -1,21 +1,35 @@
+<style lang="sass" scoped>
+.node-item
+  cursor: pointer
+  &:hover
+    background: rgb(90,90,90)
+</style>
+
 <template lang="pug">
-div(:style=`{}`).row.fit.justify-center
+div(:style=`{position: 'relative'}`).row.fit.justify-center
   .column.fit
     //- body
     .col.full-width.scroll
       kalpa-loader(v-if="content.oid" :mangoQuery="mangoQuery")
         template(v-slot=`{items}`)
-          .row.fit
+          .row.fit.justify-center
+            //- div(:style=`{position: 'absolute', zIndex: 9999, top: '-50px', left: '0px', height: '100px',}`).row.full-width.bg-red.bg
             //- nodes on content bar
-            div(:style=`{position: 'absolute', zIndex: 99999, left: 0, top: '-38px', height: '30px', transform: 'translate3d(0,0,0)',}`
+            div(
+              :style=`{
+                position: 'absolute', zIndex: 99999, left: 0, top: '-38px', transform: 'translate3d(0,0,0)',
+                height: '30px', pointerEvents: 'none',
+              }`
               ).row.full-width.justify-center
-              div(:style=`{position: 'relative', maxWidth: '600px',}`).row.fit
+              div(:style=`{position: 'relative', maxWidth: barWidth+'px',}`).row.fit
                 div(
                   v-for="(i,ii) in items" :key="i.id"
                   :style=`{
                     position: 'absolute', zIndex: 100+ii,
                     left: nodeStart(i)/content.duration*100+'%',
-                    width: '3px',}`).row.full-height.bg-grey-2
+                    width: '2px',
+                  }`
+                  ).row.full-height.bg-grey-4
             list-middle(
               :items="items")
               template(v-slot:itemFirst)
@@ -23,11 +37,12 @@ div(:style=`{}`).row.fit.justify-center
               template(v-slot:item=`{item, index, indexMiddle}`)
                 div(
                   @click="nodeClick(item)"
-                  :style=`{height: '100px',borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70.q-mb-sm
+                  :style=`{height: '100px',borderRadius: '10px', overflow: 'hidden'}`
+                  ).row.full-width.b-70.q-mb-sm.node-item
                   img(
                     :src="item.meta.items[0].thumbUrl"
                     draggable="false"
-                    :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden',}`)
+                    :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden',userSelect: 'none'}`)
                   .col.full-height
                     .row.fit.items-stat.content-start.q-pa-md
                       span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ item.name }}
@@ -61,6 +76,10 @@ export default {
     },
     listActive () {
       return !this.storePlayer.playing
+    },
+    barWidth () {
+      if (this.$q.screen.width > 600) return 600
+      else return this.$q.screen.width - 80
     }
   },
   methods: {

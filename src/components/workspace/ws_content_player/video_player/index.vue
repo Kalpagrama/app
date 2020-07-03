@@ -28,7 +28,7 @@ iframe[id$="_youtube_iframe"]
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit.b-60
+div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.fit.b-60
   slot(name="video")
   div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.fit
     video(
@@ -87,13 +87,11 @@ div(:style=`{position: 'relative'}`).row.fit.b-60
 </template>
 
 <script>
-// import { mapMutations } from 'vuex'
 import videoControls from './controls'
 
 export default {
   name: 'wsContentPlayer-videoPlayer',
   components: {videoControls},
-  // props: ['sid', 'content', 'options'],
   props: {
     sid: {type: String},
     content: {type: Object},
@@ -112,9 +110,9 @@ export default {
       playingInterval: null,
       showTint: true,
       duration: 0,
-        currentTime: 0,
-        playing: false,
-        loadeddata: false,
+      currentTime: 0,
+      playing: false,
+      loadeddata: false,
     }
   },
   provide () {
@@ -214,12 +212,10 @@ export default {
   created () {
     this.$log('created', this.sid)
     window.stores[this.sid] = this
-    // this.$set(window.stores, this.sid, this)
   },
   async mounted () {
     this.$log('mounted')
     this.playerInit()
-    // window.stores[this.sid] = this
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

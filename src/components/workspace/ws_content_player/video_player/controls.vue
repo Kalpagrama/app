@@ -10,8 +10,8 @@ div(
       @click="storePlayer.playPause()"
       round flat dense color="white"
       :icon="storePlayer.playing ? 'pause' : 'play_arrow'")
-    q-btn(
-      round flat dense color="grey-2" icon="volume_up")
+    //- q-btn(
+    //-   round flat dense color="grey-2" icon="volume_up")
     .col
     q-btn(
       v-if="$q.screen.width > 370"

@@ -33,7 +33,8 @@ div(:style=`{position: 'relative'}`).column.fit
         .row.full-width.justify-center.q-pa-sm
           q-btn(
             @click="nodeFork()"
-            push color="green" no-caps :style=`{height: '50px',maxWidth: '600px'}`).full-width {{$t('node_fork', 'Изменить')}}
+            push color="green" no-caps icon="photo_filter"
+            :style=`{height: '50px',maxWidth: '600px'}`).full-width {{$t('node_fork', 'Взять и изменить')}}
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.q-py-sm

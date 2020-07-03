@@ -4,17 +4,12 @@ div(
     position: 'relative',
     minWidth: pageFullscreen ? $q.screen.width+'px' : pageMinWidth+'px',
   }`
-  ).column.full-width.b-50
+  ).column.full-width.items-center.b-50
   //- close btn
   q-btn(
     @click="$emit('close')"
     round flat color="white" icon="keyboard_arrow_left"
-    :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
-  //- header
-  div(
-    v-show="false && !pageFullscreen"
-    :style=`{height: '60px', paddingLeft: '60px',}`).row.full-width.items-center.content-center.b-60
-    span.text-white.text-bold {{ value.name }}
+    :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.1)'}`)
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px',}`).col.full-width
     ws-content-player(
@@ -23,39 +18,28 @@ div(
       :sid="sidPlayer"
       :content="content")
       template(v-slot:controlsTools)
-        q-btn(
-          @click="pageFullscreen = !pageFullscreen"
-          round flat dense color="white"
-          :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
+        //- q-btn(
+        //-   @click="pageFullscreen = !pageFullscreen"
+        //-   round flat dense color="white"
+        //-   :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
         q-btn(
           @click="compositionAddStart()"
           round push dense color="green" icon="add"
           :style=`{borderRadius: '50%',}`)
       //- template(v-slot:controls)
       //-   composition-name-init(v-if="pageId === 'compositions'")
-  //- page
-  div(:style=`{height: pageHeight+'px',position: 'relative',}`).row.full-width
-    div(v-if="storePlayer && storePlayer.loadeddata").row.fit.justify-center
-      page-details(
-        v-if="pageId === 'details'"
-        :content="content"
-        :style=`{maxWidth: '600px', overflow: 'hidden'}`)
-      page-explore(
-        v-if="pageId === 'explore'"
-        :content="content"
-        :style=`{maxWidth: '600px', overflow: 'hidden'}`)
-      page-compositions(
-        v-if="pageId === 'compositions'"
-        :content="content"
-        :style=`{maxWidth: '600px', overflow: 'hidden'}`)
+  //- pages:
+  component(
+    v-if="storePlayer && storePlayer.loadeddata"
+    :is="`page-${pageId}`"
+    :content="content"
+    :style=`{ maxWidth: '600px', maxHeight: pageHeight+'px', }`)
   //- footer
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     pages-controller(
       v-show="!pageFullscreen && compositionsSelected.length === 0 && !compositionEditing"
-      :style=`{
-        position: 'absolute', zIndex: 1000, bottom: '0px',
-      }`
-      @close="$emit('close')")
+      @close="$emit('close')"
+      :style=`{position: 'absolute', zIndex: 1000, bottom: '0px',}`)
 </template>
 
 <script>
