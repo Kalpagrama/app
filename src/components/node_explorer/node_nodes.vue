@@ -114,7 +114,7 @@ export default {
         layout: this.node.layout,
       }
       this.$log('nodeInput', nodeInput)
-      // create item
+      // create wsItem
       let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeAdd item', item)
       // mute all

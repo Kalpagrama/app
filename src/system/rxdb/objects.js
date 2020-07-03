@@ -1,9 +1,10 @@
 // сцепляет запросы и отправляет пачкой
 import assert from 'assert'
 import { ObjectsApi } from 'src/api/objects'
-import { ReactiveItemHolder, getReactive } from 'src/system/rxdb/reactive'
+import { updateRxDoc } from 'src/system/rxdb/reactive'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { RxCollectionEnum, rxdb, makeId } from 'src/system/rxdb/index'
+import set from 'lodash/set'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_OBJ)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_OBJ)
@@ -107,7 +108,7 @@ class QueryAccumulator {
       for (let item of itemsForQuery) {
         let object = objectList.find(obj => obj.oid === item.oid)
         // объект был только что получен. надо его разрезолвить и удалить из всех очередей (кроме того он мог попасть дважды в одну и ту же очередь)
-        if (object && !object.deletedAt) {
+        if (object /* && !object.deletedAt */) {
           this.resolveItem(object)
         } else if (object && !object.deletedAt) {
           this.rejectItem(item.oid, 'deleted')
@@ -258,11 +259,11 @@ class Objects {
   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
   async get (id, priority, clientFirst, force) {
     const fetchFunc = async () => {
-      logD('objects::get::fetchFunc start')
+      // logD('objects::get::fetchFunc start')
       let promise = this.queryAccumulator.push(getOidFromId(id), priority)
       return await promise
     }
-    logD('objects::get start')
+    // logD('objects::get start')
     let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force)
     if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')
@@ -277,18 +278,15 @@ class Objects {
     if (!rxdb.isLeader()) return
     switch (event.type) {
       case 'OBJECT_CHANGED': {
-        let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
-        if (rxDoc) {
-          const path = event.path ? 'cached.data.' + event.path : 'cached.data'
-          await rxDoc.atomicSet(path, event.value)
-        }
+        await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data' + event.path ? '.' : '' + event.path, event.value, false)
         break
       }
       case 'VOTED': {
-        let rxDoc = await this.cache.get(makeObjectCacheId(event.object))
-        if (rxDoc) {
-          await rxDoc.atomicSet('cached.data.rate', event.rate)
-        }
+        await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data.rate', event.rate, false)
+        break
+      }
+      case 'OBJECT_DELETED': {
+        await updateRxDoc(makeId(RxCollectionEnum.OBJ, event.object.oid), 'cached.data.deletedAt', new Date(), false)
         break
       }
       default:

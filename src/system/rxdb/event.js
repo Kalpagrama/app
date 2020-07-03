@@ -70,8 +70,9 @@ class Event {
         await this.objects.processEvent(event) // обновить ядро
         await this.lists.processEvent(event) // обновить личную сферу юзера (если голосовал текущий пользователь)
         break
-      case 'NODE_DELETED':
+      case 'OBJECT_DELETED':
         this.notifyUserActionComplete(event.type, event.object)
+        await this.objects.processEvent(event) // обновить ядро
         break
       case 'USER_SUBSCRIBED':
         this.notifyUserActionComplete(event.type, event.object)
@@ -103,7 +104,7 @@ class Event {
       case 'CHAIN_CREATED':
         eventMessage = i18n.t('chain created')
         break
-      case 'NODE_DELETED':
+      case 'OBJECT_DELETED':
         eventMessage = i18n.t('node deleted')
         break
       case 'VOTED':

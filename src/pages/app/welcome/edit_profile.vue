@@ -49,7 +49,7 @@
     q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('prev')")
     .col
     q-btn(
-      @click="$emit('next')"
+      @click="next()"
       color="green" no-caps
       :disabled="nextDisabled"
       :loading="loading"
@@ -57,6 +57,8 @@
 </template>
 
 <script>
+import { ObjectsApi } from 'src/api/objects'
+
 export default {
   name: 'editProfile',
   data () {
@@ -66,7 +68,7 @@ export default {
       lang: null,
       langs: [
         {value: 'ENG', label: 'English'},
-        {value: 'РУС', label: 'Русский'},
+        {value: 'RUS', label: 'Русский'},
       ],
       avatarFile: null,
       avatarUrl: null,
@@ -78,10 +80,13 @@ export default {
     }
   },
   methods: {
-    avatarChanged (e) {
+    async avatarChanged (e) {
       this.$log('avatarChanged', e)
       this.avatarFile = e.target.files[0]
       this.avatarUrl = URL.createObjectURL(this.avatarFile)
+      // this.avatarDataUrl = await ObjectsApi.fileToDataUrl(this.avatarFile)
+      // this.$log('avatarFile=', this.avatarFile)
+      // this.$log('this.avatarFile instanceof File=', this.avatarFile instanceof File)
     },
     langSelected (l) {
       this.$log('langSelected', l)
@@ -94,11 +99,11 @@ export default {
       this.$log('next')
       this.loading = true
       await this.$wait(1000)
-      let oid = this.$store.getters.currentUser().oid
+      let oid = localStorage.getItem('k_user_oid')
       // set avatar,name,lang
-      await this.$store.dispatch('objects/update', {oid, path: 'profile.avatar', newValue: this.avatarFile})
-      await this.$store.dispatch('objects/update', {oid, path: 'profile.lang', newValue: this.lang})
-      await this.$store.dispatch('objects/update', {oid, path: 'profile.name', newValue: this.name})
+      if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
+      if (this.lang) await ObjectsApi.update(oid, 'profile.lang', this.lang.value)
+      await ObjectsApi.update(oid, 'profile.name', this.name)
       // done
       this.loading = false
       this.$emit('next')

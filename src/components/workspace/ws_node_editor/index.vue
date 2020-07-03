@@ -185,18 +185,18 @@ export default {
     },
     async publish () {
       try {
-        this.$log('publish start')
+        this.$log('nodePublish start')
         this.storeNodeEditor.set('publishing', true)
         this.check()
-        // create
-        this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_building', 'Собираем ядро...')})
-        await this.$wait(1000)
-        let res = await NodeApi.nodeCreate(this.node)
-        this.$log('nodePublish res', res)
+        // publish
+        this.$q.loading.show({spinnerColor: 'green', message: 'Creating node...'})
+        let createdNode = await NodeApi.nodeCreate(this.node)
+        this.$log('nodePublish res', createdNode)
         // publish
         this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_publishing', 'Публикуем ядро...')})
         await this.$wait(1000)
         this.node.stage = 'published'
+        this.node.oid = createdNode.oid // нужно при снятии с публикации
         // done
         this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
         await this.$wait(1000)
@@ -206,7 +206,7 @@ export default {
           type: 'positive',
           message: this.$t('node_published', 'Ядро опубликовано!')
         })
-        this.$emit('published', res.oid)
+        this.$emit('published', createdNode.oid)
         this.$emit('close')
       }
       catch (e) {

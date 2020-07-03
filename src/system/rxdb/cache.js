@@ -30,6 +30,15 @@ class Cache {
   async createCollections () {
     let f = this.createCollections
     await this.db.collection({ name: 'cache', schema: cacheSchema })
+    this.db.cache.postInsert(async (plainData) => {
+      await this.debouncedDumpLru()
+    }, false)
+    this.db.cache.postSave(async (plainData) => {
+      await this.debouncedDumpLru()
+    }, false)
+    this.db.cache.postRemove(async (plainData) => {
+      await this.debouncedDumpLru()
+    }, false)
   }
 
   // удалить все данные из кэша
@@ -92,7 +101,8 @@ class Cache {
 
       this.debouncedDumpLru = debounce(async () => {
         const f = this.debouncedDumpLru
-        logD(f, 'start. debouncedDumpLru')
+        if (!rxdb.isLeader()) return
+        logD(f, 'start. debouncedDumpLru.')
         let lruDump = this.cacheLru.dump()
         await rxdb.set(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
       }, debounceIntervalDumpLru)
@@ -106,45 +116,6 @@ class Cache {
           })
         }
       }
-
-      // let ttt = Date.now()
-      // this.db.cache.findOne('OBJ::AGKBIqmAwCg=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-      // this.db.cache.findOne('OBJ::AHySHGyAwDc=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-      // this.db.cache.findOne('OBJ::AI6sdVNAwDo=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-      // this.db.cache.findOne('OBJ::AIAn6pTAwDk=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-      // this.db.cache.findOne('OBJ::AIWMe06CsDA=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-      // this.db.cache.findOne('OBJ::AIWOeBTCwBM=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-      // this.db.cache.findOne('OBJ::AKDBaYeCwHw=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-      // this.db.cache.findOne('OBJ::AKVqFMPCsIE=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-      // this.db.cache.findOne('OBJ::AK_nDlZCsMI=').exec()
-      //   .then(rxDoc => {
-      //     logD(f, 'findOne(id) time = ' + (Date.now() - ttt) / 1000, rxDoc.id)
-      //   })
-
       this.created = true
       logD(f, 'complete')
     } catch (err) {
@@ -169,9 +140,9 @@ class Cache {
 
   // actualAge - сколько времени сущность актуальна (при первышении - будет попытка обновиться с сервера в первую очередь, а потом брать из кэша)
   //   cached: {data} data может быть как объектом, так и любым другим типом
-  async set (id, data, actualAge, notEvict, withLock = true) {
+  async set (id, data, actualAge, notEvict, mangoQuery = {}) {
     try {
-      if (withLock) await this.lock()
+      await this.lock()
       assert(this.created, '!this.created')
       assert(id && data, '!id && data' + id + JSON.stringify(data))
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
@@ -231,15 +202,15 @@ class Cache {
         props: {
           notEvict,
           oid: data && data.oid ? data.oid : undefined, // есть только у RxCollectionEnum.OBJ и RxCollectionEnum.LST_...
-          rxCollectionEnum
+          rxCollectionEnum,
+          mangoQuery
         },
         cached: { data }
       }) // сохраняем в rxdb
-      await this.debouncedDumpLru()
       logD(f, 'complete')
       return rxDoc
     } finally {
-      if (withLock) this.release()
+      this.release()
     }
   }
 
@@ -273,7 +244,7 @@ class Cache {
             assert(fetchRes, '!fetchRes')
             assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
             let notEvict = fetchRes.notEvict || false
-            let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict)
+            let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, fetchRes.mangoQuery)
             logD(f, 'записаны в кэш')
             return res
           }

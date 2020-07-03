@@ -26,7 +26,7 @@ export const wsSchemaItem = {
       primary: true
     },
     oid: {
-      type: 'string'
+      type: 'string' // присваивается после публикации
     },
     wsItemType: {
       type: 'string'
@@ -102,7 +102,12 @@ export const wsSchemaItem = {
     // ---- sphere ----
     color: {
       type: 'string'
-    }
+    },
+    // ------ system -----
+    ignoreChanges: {
+      type: 'boolean',
+      default: false
+    },
   },
   required: ['id', 'wsItemType', 'rev', 'createdAt', 'updatedAt'],
   indexes: ['oid', 'wsItemType', 'name', 'createdAt', 'updatedAt', 'stage']
@@ -147,6 +152,9 @@ export const cacheSchema = {
         },
         rxCollectionEnum: {
           type: 'string'
+        },
+        mangoQuery: { // актуально для списков см Lists::find
+          type: 'object'
         }
       }
     },

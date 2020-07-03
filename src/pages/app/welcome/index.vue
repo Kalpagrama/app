@@ -47,7 +47,7 @@ export default {
       this.$log('welcomeDone')
       this.$q.loading.show({spinnerColor: 'green', message: 'Aligning sattelites...'})
       let currentUser = this.$store.getters.currentUser()
-      await ObjectsApi.update(currentUser.oid, 'profile.tutorial', false, currentUser.rev)
+      await ObjectsApi.update(currentUser.oid, 'profile.tutorial', false)
       currentUser.profile.tutorial = false // currentUser реактивен
       // done
       await this.$wait(1000)

@@ -6,8 +6,8 @@ import { skip } from 'rxjs/operators'
 import { rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { getRxCollectionEnumFromId } from 'src/system/rxdb/index'
 import merge from 'lodash/merge'
+import set from 'lodash/set'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_REACTIVE)
@@ -18,10 +18,10 @@ function getReactive (rxDoc) {
   return getItemData(reactiveItemHolder.reactiveItem)
 }
 
-function getItemData (reactiveItem) {
-  if (reactiveItem.valueString) return reactiveItem.valueString
-  if (reactiveItem.cached) return reactiveItem.cached.data
-  return reactiveItem
+function getItemData (item) {
+  if (item.valueString) return item.valueString
+  if (item.cached) return item.cached.data
+  return item
 }
 
 function mergeReactiveItem (reactiveItem, change) {
@@ -29,13 +29,44 @@ function mergeReactiveItem (reactiveItem, change) {
     if (Array.isArray(objValue) && Array.isArray(srcValue)) {
       objValue.splice(0, objValue.length(), ...srcValue)
       return objValue
-    } else if (typeof objValue === 'object' && typeof srcValue === 'object'){
+    } else if (typeof objValue === 'object' && typeof srcValue === 'object') {
       for (let key in objValue) {
         if (!(key in srcValue)) delete objValue[key] // удаляем удалившиеся
       }
       return undefined // default behavior
-    } else return undefined // default behavior
+    } else {
+      return undefined
+    } // default behavior
   })
+}
+
+// все измененеия - только через эту ф-ю. Иначе - возможны гонки (из-за debounce)
+// либо - менять непосредственно reactiveItem
+async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
+  let f = updateRxDoc
+  logD(f, 'start')
+  // logD(f, 'start2', rxDocOrId, path, value)
+  if (!rxDocOrId) return
+  let rxDoc
+  if (isRxDocument(rxDocOrId)) {
+    rxDoc = rxDocOrId
+  } else {
+    rxDoc = await rxdb.getRxDoc(rxDocOrId)
+  }
+  if (rxDoc) {
+    let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
+    let originalDebouncedSave = reactiveItemHolder.debouncedSave
+    try {
+      reactiveItemHolder.debouncedSaveSet(debouncedSave)
+      // logD(f, 'start2', reactiveItemHolder.reactiveItem, path, value)
+      set(reactiveItemHolder.reactiveItem, path, value)
+      // logD(f, 'complete', reactiveItemHolder.reactiveItem)
+    }
+    finally {
+      reactiveItemHolder.debouncedSaveSet(originalDebouncedSave)
+    }
+  }
+  logD(f, 'complete')
 }
 
 const debounceIntervalItem = 2000
@@ -46,12 +77,15 @@ class ReactiveItemHolder {
     assert(isRxDocument(rxDoc), '!isRxDocument(rxDoc)')
     assert(rxDoc.id, '!rxDoc.id')
     // logD('ReactiveItemHolder::constructor', rxDoc.id)
+    this.rxDoc = rxDoc
     if (rxDoc.reactiveItemHolderMaster) {
       this.reactiveItem = rxDoc.reactiveItemHolderMaster.reactiveItem
       this.itemSubscribe = rxDoc.reactiveItemHolderMaster.itemSubscribe // иногда надо временно отписаться
       this.itemUnsubscribe = rxDoc.reactiveItemHolderMaster.itemUnsubscribe
       this.rxDocSubscribe = rxDoc.reactiveItemHolderMaster.rxDocSubscribe // иногда надо временно отписаться
       this.rxDocUnsubscribe = rxDoc.reactiveItemHolderMaster.rxDocUnsubscribe
+      this.debouncedSave = rxDoc.reactiveItemHolderMaster.debouncedSave
+      this.debouncedSaveSet = rxDoc.reactiveItemHolderMaster.debouncedSaveSet
     } else {
       this.rxDoc = rxDoc
       this.mutex = new Mutex()
@@ -64,9 +98,14 @@ class ReactiveItemHolder {
       this.reactiveItem.itemSubscribe = this.itemSubscribe // иногда надо временно отписаться
       this.reactiveItem.itemUnsubscribe = this.itemUnsubscribe
       rxDoc.reactiveItemHolderMaster = this
+      this.debouncedSaveSet(true)
       this.rxDocSubscribe()
       this.itemSubscribe()
     }
+  }
+
+  debouncedSaveSet (flag) {
+    this.debouncedSave = flag
   }
 
   rxDocSubscribe () {
@@ -78,13 +117,9 @@ class ReactiveItemHolder {
       try {
         await this.mutex.lock()
         this.itemUnsubscribe()
-        logD(f, `rxDoc changed. try to change reactiveItem. ${change.id} ${change.name}`)
+        // logD(f, `rxDoc changed. try to change reactiveItem. ${change.id}`)
         this.reactiveItem = mergeReactiveItem(this.reactiveItem, change)
-        logD(f, `reactiveItem changed ${this.reactiveItem.id} ${this.reactiveItem.name}`)
-        // for (let key in change) this.reactiveItem[key] = change[key] // изменившиеся и добавившиеся
-        // for (let key in this.reactiveItem) {
-        //   if (!(key in change)) delete this.reactiveItem[key] // удалившиеся
-        // }
+        // logD(f, `reactiveItem changed ${this.reactiveItem.id}`)
       } finally {
         this.itemSubscribe()
         this.mutex.release()
@@ -94,7 +129,7 @@ class ReactiveItemHolder {
 
   rxDocUnsubscribe () {
     const f = this.rxDocUnsubscribe
-    logD(f, `rxDoc unsubscribe ${this.rxDoc.id} rev: ${this.rxDoc.rev}`)
+    // logD(f, `rxDoc unsubscribe ${this.rxDoc.id} rev: ${this.rxDoc.rev}`)
     if (this.rxDocSubscription) this.rxDocSubscription.unsubscribe()
     delete this.rxDocSubscription
   }
@@ -102,30 +137,39 @@ class ReactiveItemHolder {
   itemSubscribe () {
     const f = this.itemSubscribe
     if (this.itemUnsubscribeFunc) return
-    this.itemUnsubscribeFunc = this.vm.$watch('reactiveItem', (newVal, oldVal) => {
-      // reactiveItem изменилась (из UI)
-      // logD(f, `reactiveItem changed from UI ${newVal.id} ${newVal.name}`)
-      if (!this.debouncedItemSave) {
-        this.debouncedItemSave = debounce(async (newVal) => {
+    this.itemUnsubscribeFunc = this.vm.$watch('reactiveItem', async (newVal, oldVal) => {
+      // reactiveItem изменилась (обычно из UI)
+      if (!this.debouncedItemSaveFunc) {
+        this.itemSaveFunc = async (newVal) => {
           // игнорируем newVal (берем из this.reactiveItem)!!! this.reactiveItem содержит самые актуальные данные!
-          let f = this.debouncedItemSave
+          let f = this.itemSaveFunc
           if (this.rxDoc.deleted) return // на всякий случай
           try {
             await this.mutex.lock()
-            await rxdb.lock() // необходимо заблокировать до вызова this.rxDocUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)
             this.rxDocUnsubscribe()
-            logD(f, `reactiveItem changed from UI (debounce) ${this.reactiveItem.id} nm1:${this.reactiveItem.name} nm2:${newVal.name}`)
+            // logD(f, `try to change rxDoc ${this.reactiveItem.id}`)
             assert(this.reactiveItem.id, '!this.reactiveItem.id')
-            let res = await rxdb.set(getRxCollectionEnumFromId(this.reactiveItem.id), getItemData(this.reactiveItem), { withLock: false }) // выполняем без блокировки (делаем ее тут - await rxdb.lock())
-            logD(f, `rxDoc changed ${res.id} ${res.name}`)
+            let updatedRxDoc = await this.rxDoc.atomicUpdate((oldData) => {
+              let actualData = JSON.parse(JSON.stringify(this.reactiveItem))
+              actualData._rev = oldData._rev // ревизия от rxdb (иначе - ошибки)
+              // logD(f, 'actualData', actualData)
+              return actualData
+            })
+            logD(f, `rxDoc changed ${updatedRxDoc.id}`)
           } finally {
             this.rxDocSubscribe()
-            await rxdb.release()
             this.mutex.release()
           }
-        }, debounceIntervalItem)
+        }
+        this.debouncedItemSaveFunc = debounce(this.itemSaveFunc, debounceIntervalItem)
       }
-      this.debouncedItemSave(newVal)
+      if (this.debouncedSave) {
+        logD(f, `reactiveItem changed (rxDoc will change via debounce later) ${this.reactiveItem.id}`)
+        this.debouncedItemSaveFunc(newVal)
+      } else {
+        logD(f, `reactiveItem changed ${this.reactiveItem.id}`)
+        await this.itemSaveFunc(newVal)
+      }
     }, { deep: true, immediate: false })
   }
 
@@ -278,4 +322,4 @@ class Mutex {
   }
 }
 
-export { ReactiveItemHolder, ReactiveListHolder, Mutex, getReactive }
+export { ReactiveItemHolder, ReactiveListHolder, Mutex, getReactive, updateRxDoc }

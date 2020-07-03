@@ -89,6 +89,7 @@ export default {
   methods: {
   },
   mounted () {
+    // this.$log('mounted. nodeFull=', this.nodeFull)
   },
   beforeDestroy () {
   }
