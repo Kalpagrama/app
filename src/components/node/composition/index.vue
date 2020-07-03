@@ -24,6 +24,17 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
     :duration="duration"
     :player="$refs.videoRef"
     :playing="playing")
+  //- pause arrow
+  q-btn(
+    v-if="active && !mini && !playing && loaded"
+    @click="onClick()"
+    round flat color="white"
+    :style=`{
+      position: 'absolute', zIndex: 1000,
+      top: 'calc(50% - 50px)', left: 'calc(50% - 50px)',
+      width: '100px', height:'100px', borderRadius:'50%',
+    }`)
+    q-icon(name="play_arrow" size="100px" color="white")
   video(
     v-if="composition && composition.url.length > 0 && active"
     ref="videoRef"

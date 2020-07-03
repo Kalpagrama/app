@@ -31,22 +31,22 @@ div(
               :style=`{
                 height: '100%',
               }`)
-      list-horizontal(
-        v-if="node.layout === 'HORIZONTAL'"
-        :items="node.items")
-        template(v-slot:item=`{item,itemIndex,itemActive}`)
-          ws-composition-editor(
-            :sid="`wce-${itemIndex}`"
-            :value="item"
-            :options=`{
-              isPreview: true,
-              mode: 'player',
-              mini: !itemActive,
-              active: itemActive,
-            }`
-            :style=`{
-              height: '100%',
-            }`)
+      //- list-horizontal(
+      //-   v-if="node.layout === 'HORIZONTAL'"
+      //-   :items="node.items")
+      //-   template(v-slot:item=`{item,itemIndex,itemActive}`)
+      //-     ws-composition-editor(
+      //-       :sid="`wce-${itemIndex}`"
+      //-       :value="item"
+      //-       :options=`{
+      //-         isPreview: true,
+      //-         mode: 'player',
+      //-         mini: !itemActive,
+      //-         active: itemActive,
+      //-       }`
+      //-       :style=`{
+      //-         height: '100%',
+      //-       }`)
     //- layout
     div(v-if="true").row.full-width.items-center.content-center.q-py-sm
       q-select(

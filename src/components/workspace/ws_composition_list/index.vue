@@ -1,20 +1,14 @@
-<style lang="sass">
-</style>
-
 <template lang="pug">
 div(
   :class=`{
-    'full-height': !inDialog,
+    'q-pt-sm': $q.screen.gt.xs,
   }`
   :style=`{
     position: 'relative',
   }`
   ).column.full-width
   //- ws composition editor
-  q-dialog(
-    v-model="compositionEditorOpened" position="bottom"
-    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
-    @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
+  q-dialog(v-model="compositionEditorOpened" position="bottom")
     ws-composition-editor(
       v-if="composition"
       @close="compositionEditorOpened = false"
@@ -25,36 +19,33 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`).b-50
   //- header
-  //- kalpa-debug(:options=`{ctx}`)
   div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
-    }`).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
-    //- slot(name="header")
+    }`).row.full-width.items-start.content-start.b-50
     //- navigation
     div(
       v-if="ctx === 'workspace'"
-      :style=`{}`).row.full-width.items-center.content-center.q-py-md
+      :style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Образы')}}
     //- search
-    div.row.full-width
+    div.row.full-width.q-px-sm.q-pb-sm
       .col
         q-input(
           v-model="searchString"
           ref="searchStringInput"
-          filled dense dark color="grey-5"
-          :autofocus="ctx === 'workpsace'"
-          placeholder="Найти образ"
+          filled dense dark color="white"
+          :placeholder="$t('placeholder_search', 'Поиск')"
           @focus="searchStringFocused"
           @blur="searchStringBlurred"
           ).full-width
           template(v-slot:append)
             q-btn(
               v-if="searchString.length > 0"
-              flat dense color="grey-2" icon="clear" @click="searchString = ''")
+              flat dense color="white" icon="clear" @click="searchString = ''")
             q-btn(
-              flat dense color="grey-2" icon="label")
+            flat dense color="white" icon="filter_list")
       q-btn(
         v-for="(v,vi) in views" :key="v.id"
         @click="view = v.id"

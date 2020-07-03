@@ -1,7 +1,7 @@
 <template lang="pug">
 transition(appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
   div(
-    v-click-outside="voteOutsideClick"
+    v-kalpa-click-outside="voteOutsideClick"
     :style=`{
       position: 'absolute', zIndex: 20000, top: '0px',
       borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
@@ -102,7 +102,7 @@ export default {
     async voteEnd (val) {
       this.$log('voteEnd')
       this.voteId = val
-      await this.$wait(500)
+      await this.$wait(200)
       let res = await NodeApi.nodeVote(this.node.oid, val)
       this.$log('voteEnd', res)
       await this.$wait(200)

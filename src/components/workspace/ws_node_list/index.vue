@@ -1,8 +1,3 @@
-<style lang="sass">
-.q-dialog
-  border-radius: 0px !important
-</style>
-
 <template lang="pug">
 div(
   :class=`{
@@ -17,13 +12,13 @@ div(
     :style=`{
       borderRadius: $q.screen.gt.xs ? '10px' : '0 0 10px 10px',
     }`
-    ).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
-    //- header
-    div(:style=`{height: '100px',}`).row.full-width.items-center.content-center
+    ).row.full-width.items-start.content-start.b-50
+    //- navigation
+    div(:style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('ws_nodes', 'Ядра')}}
     //- search
-    div().row.full-width
+    div().row.full-width.q-px-sm
       q-input(
         v-model="searchString"
         filled dark dense color="white"
@@ -32,11 +27,11 @@ div(
         template(v-slot:append)
           q-btn(
             v-if="searchString.length > 0"
-            flat dense color="grey-2" icon="clear" @click="searchString = ''")
+            flat dense color="white" icon="clear" @click="searchString = ''")
           q-btn(
-            flat dense color="grey-2" icon="filter_list")
+            flat dense color="white" icon="filter_list")
     //- actions
-    .row.full-width.items-end.content-end
+    .row.full-width.items-end.content-end.q-px-sm.q-pb-sm
       kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start
   //- body
   .col.full-width

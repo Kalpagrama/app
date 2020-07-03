@@ -1,5 +1,8 @@
 <template lang="pug">
 div(
+  :class=`{
+    'q-pt-sm': $q.screen.gt.xs,
+  }`
   :style=`{
     position: 'relative'
   }`
@@ -7,36 +10,28 @@ div(
   //- header
   div(
     :style=`{
-      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
+      borderRadius: $q.screen.gt.xs ? '10px' : '0 0 10px 10px',
     }`
-    ).row.full-width.items-center.content-center.b-50.q-px-sm
-    .row.full-width.items-center.content-center.q-py-md
+    ).row.full-width.items-start.content-start.b-50
+    //- navigation
+    div(:style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Settings')}}
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('ws_page_settings', 'Настройки')}}
   //- body
   .col.full-width.scroll
-    .row.full-width.justify-center.q-px-sm.q-py-md
-      div(:style=`{borderRadius: $store.state.ui.borderRadius+'px'}`).row.full-width.items-start.content-start.b-50
-        //- .row.full-width.q-pa-md
-        //-   span(:style=`{fontSize: '30px'}`).text-white.text-bold {{$t('Settings')}}
-        //- export import
-        //- .row.full-width.q-px-md
-        //-   span(:style=`{fontSize: '20px'}`).text-white {{$t('Portability')}}
-        //- .row.full-width.q-px-md.q-py-sm
-        //-   q-btn(outline color='green' no-caps @click="wsExport()").q-mr-sm {{$t('Import')}}
-        //-   q-btn(outline color='green' no-caps @click="wsExport()") {{$t('Export')}}
+    .row.full-width.justify-center.q-py-sm
+      div(
+        :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`
+        ).row.full-width.items-start.content-start.b-50.q-pa-md
         //- something
         div(:style=`{height: '300px'}`).row.full-width.q-px-md
-          //- span(:style=`{fontSize: '20px'}`).text-white Something
-        //- danger
-        .row.full-width.q-px-md.q-py-sm
-          span(:style=`{fontSize: '20px'}`).text-red {{$t('Danger zone')}}
-        .row.full-width.q-px-md
+        //- danger zone
+        .row.full-width.q-py-md
+          span(:style=`{fontSize: '20px'}`).text-red {{$t('danger_zone', 'Опасная зона')}}
+        .row.full-width
           q-btn(
             color="red" no-caps @click="wsClear()")
-            span.text-bold {{$t('Delete my workspace')}}
-          .row.full-width.q-py-sm.q-mb-md
-            //- small.text-white Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s
+            span.text-bold {{$t('delete_my_workspace', 'Удалить мою мастерскую')}}
 </template>
 
 <script>
@@ -50,11 +45,11 @@ export default {
   },
   methods: {
     async wsClear () {
-      if (!confirm('Do really want to clear your workspace?')) return
+      if (!confirm(this.$t('confirm_ws_delete', 'Удалить мастерскую? Потеряешь все ядра...'))) return
       this.$log('wsClear start')
       let wsClear = await WorkspaceApi.wsClear()
       this.$log('wsClear done', wsClear)
-      // window.location.reload()
+      window.location.reload()
     },
     wsExport () {
       this.$log('wsExport')

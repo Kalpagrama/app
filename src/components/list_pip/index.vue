@@ -28,16 +28,16 @@ div(
     color="white"
     :style=`{
       position: 'absolute', zIndex: 1000,
-      left: '0px', top: '0px',
+      left: '0px', top: '60px',
       width: '15%',
-      height: 'calc(100% - 66px)',
+      height: 'calc(100% - 120px)',
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
       background: 'rgba(255,255,255,0)',
     }`)
     q-icon(
       name="keyboard_arrow_left" color="white" size="40px"
-      :style=`{marginTop: '60px', opacity: 0.8}`)
+      :style=`{opacity: 0.8}`)
   //- items wrapper
   div(
     v-for="(i,ii) in items" :key="ii"
