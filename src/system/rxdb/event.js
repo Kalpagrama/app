@@ -4,7 +4,7 @@ import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { router } from 'src/boot/main'
 import { EventApi } from 'src/api/event'
-import {rxdb} from 'src/system/rxdb'
+import { rxdb } from 'src/system/rxdb'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_EVENT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_EVENT)
@@ -17,6 +17,7 @@ let reactiveProgress = {
   progressUpload: 0,
   progressCreateNode: 0
 }
+
 class Event {
   constructor (workspace, objects, lists) {
     this.workspace = workspace
@@ -24,11 +25,16 @@ class Event {
     this.lists = lists
   }
 
-  async init () {
-    await EventApi.init()
+  init () {
+    EventApi.init()
   }
 
-  async clear(){}
+  deInit () {
+    EventApi.deInit()
+  }
+
+  async clear () {
+  }
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {

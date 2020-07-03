@@ -11,7 +11,7 @@ import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
 import assert from 'assert'
-import { rxdb, RxCollectionEnum} from 'src/system/rxdb'
+import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { cache } from 'src/boot/cache'
@@ -33,11 +33,16 @@ export default async ({ Vue, store, app }) => {
         for (let err of graphQLErrors) {
           logE('gql error', err)
           err.message = err.code + ':' + err.message
-          if (err.code === 'USER_NOT_AUTH') AuthApi.logout(localStorage.getItem('k_token'))
+          if (err.code === 'USER_NOT_AUTH' || err.code === 'BAD_SESSION') {
+            AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
+          }
         }
       }
       if (networkError) {
         logE('gql network error', networkError)
+        if (networkError.message === 'bad auth token!') {
+          AuthApi.logout().catch(err => logE('AuthApi.logout error', err))
+        }
       }
     })
 
@@ -94,7 +99,7 @@ export default async ({ Vue, store, app }) => {
       }
     }
 
-    let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', {fetchFunc, clientFirst: false, force: true})
+    let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', { fetchFunc, clientFirst: false, force: true })
 
     logD('services', services)
     let linkAuth = services.authUrl

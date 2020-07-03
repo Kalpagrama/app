@@ -180,7 +180,7 @@ class ListsApi {
 
   static async feed (pagination) {
     let f = this.feed
-    logD(f, 'start')
+    // logD(f, 'start')
     let { data: { feed: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectShortWithMetaFragment}
@@ -195,7 +195,7 @@ class ListsApi {
       `,
       variables: { pagination }
     })
-    logD(f, 'complete')
+    // logD(f, 'complete')
     return { items, count, totalCount, nextPageToken }
   }
 

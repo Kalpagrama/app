@@ -3,6 +3,7 @@ import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { rxdb } from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset } from 'src/system/pwa'
+import { router } from 'src/boot/main'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
@@ -45,11 +46,16 @@ function initOfflineEvents (store) {
 }
 
 // очистить кэш сервис-воркера
-async function systemReset (force = false) {
+async function systemReset (force = false, logout = false) {
   let f = systemReset
   logD(f, 'start')
   if (process.env.MODE === 'pwa') await pwaReset(force)
-  await rxdb.clearAll()
+  if (logout) {
+    await rxdb.clearAll()
+    await rxdb.setUser(null)
+    window.location.reload()
+  }
+  else await rxdb.clearAll()
   logD(f, 'complete')
 }
 
