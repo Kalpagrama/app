@@ -34,7 +34,7 @@ div(:style=`{position: 'relative'}`).column.fit
                   layer-editor(
                     @delete="layerDelete(l)"
                     @createNode="layersSelectedCreateNode([l.id])"
-                    :layer="l" :layerIndex="li")
+                    :composition="composition" :layer="l" :layerIndex="li")
                 //- right: drag
                 div(
                   v-if="!storeEditor.layerEditing"
@@ -64,6 +64,8 @@ div(:style=`{position: 'relative'}`).column.fit
     q-btn(flat dense color="white" no-caps @click="layersSelected = []") {{$t('cancel', 'Отмена')}}
     q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('layers_delete', 'Удалить слои')}}
     .col
+    //- layer-mover(:composition="composition" :layersSelected="layersSelected")
+    //- q-btn(flat dense color="green" no-caps @click="")
   //- footer: progress, actions: delete,create_node
   .row.full-width.justify-center
     div(
@@ -89,12 +91,13 @@ import draggable from 'vuedraggable'
 
 import nameEditor from './name_editor'
 import layerEditor from './layer_editor'
+import layerMover from './layer_mover'
 import compositionProgress from '../composition_progress'
 import nodeCreator from './node_creator'
 
 export default {
   name: 'pageEdit',
-  components: {draggable, nameEditor, layerEditor, compositionProgress, nodeCreator},
+  components: {draggable, nameEditor, layerEditor, layerMover, compositionProgress, nodeCreator},
   props: ['composition'],
   inject: ['sidPlayer', 'sidEditor'],
   data () {
@@ -146,32 +149,44 @@ export default {
     layerDelete (layer) {
       this.$log('layerDelete', layer)
       if (this.composition.layers.length === 1) return
-      if (!confirm('Delete layer ?')) return
+      if (!confirm(this.$t('layer_delete', 'Удалить слой?'))) return
       // unset in storeEditor
-      this.storeEditor.layerPlaying = null
-      this.storeEditor.layerEditing = null
+      this.layerDrop()
       // delete from composition
       let i = this.composition.layers.findIndex(l => l.id === layer.id)
       this.$log('i', i)
       if (i >= 0) this.$delete(this.composition.layers, i)
     },
+    layerDrop () {
+      this.$log('layerDrop')
+      this.storeEditor.layerPlaying = null
+      this.storeEditor.layerEditing = null
+    },
     layerAdd () {
       this.$log('layerAdd')
+      this.layerDrop()
       let id = this.storeEditor.layerAdd()
       this.layerEdit({id})
     },
-    layersSelectedCreateNode (arr) {
-      this.$log('layersSelectedCreateNode', arr)
-      this.layersSelected = []
-    },
     layersSelectedDelete () {
       this.$log('layersSelectedDelete')
+      if (!confirm(this.$t('layers_delete', 'Удалить выбранные слои?'))) this.layerSelected = []
+      this.layersSelected.map(id => {
+        // drop playing/editing layer
+        if (this.storeEditor.layerPlaying === id || this.storeEditor.layerEditing === id) this.layerDrop()
+        // delete layer one by one...
+        let i = this.composition.layers.findIndex(l => l.id === id)
+        if (i >= 0) this.$delete(this.composition.layers, i)
+      })
       this.layersSelected = []
     },
     layersSelectedMove () {
       this.$log('layersSelectedMove')
+      // find the composition layers to move to?
+      this.layersSelectedMoveOpened = true
       this.layersSelected = []
     },
+    layersSelectedMoveDone () {},
   },
   mounted () {
     this.$log('mounted')

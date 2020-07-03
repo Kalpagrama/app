@@ -5,10 +5,13 @@
 
 <template lang="pug">
 div(
+  :class=`{
+    'q-pt-sm': $q.screen.gt.xs,
+  }`
   :style=`{
     position: 'relative'
   }`
-  ).column.fit.q-pt-sm
+  ).column.fit
   //- header
   div(
     :style=`{
@@ -18,13 +21,13 @@ div(
     //- header
     div(:style=`{height: '100px',}`).row.full-width.items-center.content-center
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Nodes')}}
+      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('ws_nodes', 'Ядра')}}
     //- search
     div().row.full-width
       q-input(
         v-model="searchString"
         filled dark dense color="white"
-        placeholder="Search..."
+        :placeholder="$t('search_placeholder', 'Поиск')"
         ).full-width
         template(v-slot:append)
           q-btn(

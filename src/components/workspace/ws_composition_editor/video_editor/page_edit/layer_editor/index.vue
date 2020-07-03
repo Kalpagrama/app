@@ -8,11 +8,13 @@ div(
     borderRadius: '10px',
     overflow: 'hidden',
   }`).row.full-width.b-70
+  //- layer close
   q-btn(
-    v-if="storeEditor.layerEditing === layer.id"
+    v-if="storeEditor.layerEditing === layer.id && composition.layers.length > 1"
     @click="storeEditor.layerEditing = null"
     round flat dense color="green" icon="check"
     :style=`{position: 'absolute', right: '4px', bottom: 0, zIndex: 1000,}`)
+  //- layer tune
   q-btn(
     v-if="storeEditor.layerEditing === layer.id"
     @click="editing = !editing"
@@ -82,7 +84,7 @@ import layerProgressMini from './layer_progress_mini'
 export default {
   name: 'layerEditor',
   components: {layerFrames, layerActions, layerProgress, layerProgressMini},
-  props: ['layer', 'layerIndex'],
+  props: ['composition', 'layer', 'layerIndex'],
   inject: ['sidEditor', 'sidPlayer'],
   data () {
     return {

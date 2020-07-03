@@ -11,6 +11,7 @@
 div(
   :class=`{
     'full-height': !inDialog,
+    'q-pt-sm': $q.screen.gt.xs
   }`
   :style=`{
     position: 'relative',
@@ -33,13 +34,14 @@ div(
   //- kalpa-debug(:options=`{ctx}`)
   div(
     :style=`{
-      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
-    }`).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
+      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
+    }`
+    ).row.full-width.items-center.content-center.b-50.q-pa-sm
     slot(name="header")
     //- navigation
     div(
       v-if="ctx === 'workspace'"
-      :style=`{}`).row.full-width.items-center.content-center.q-py-md
+      :style=`{}`).row.full-width.items-center.content-center
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('content', 'Контент')}}
     //- search
