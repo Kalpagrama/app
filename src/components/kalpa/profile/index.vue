@@ -29,7 +29,7 @@
       .col-xs-12.col-sm-8.q-pa-sm
         .row.full-width.q-pa-xs
           q-input(
-            v-model="name"
+            v-model="currentUser.name"
             label="Whats your name?"
             filled dark color="white").full-width
         .row.full-width.q-pa-xs
@@ -44,7 +44,15 @@
               borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
               minWidth: '300px', zIndex: 2000, transform: 'translate3d(0,0,0)',
             }`).full-width
-  //- footer
+    //- save
+    .row.full-width.q-pa-sm
+      .col
+      q-btn(
+        @click="save()"
+        color="green" no-caps
+        :disabled="nextDisabled"
+        :loading="loading"
+        ).q-px-md {{$t('save', 'Сохранить')}}
   slot(name="footer")
 </template>
 
@@ -64,12 +72,12 @@ export default {
       ],
       avatarFile: null,
       avatarUrl: null,
+      currentUser: {
+        name: '',
+      }
     }
   },
   computed: {
-    nextDisabled () {
-      return this.name.length === 0 || this.lang === null || this.avatarFile === null
-    }
   },
   methods: {
     async avatarChanged (e) {
@@ -87,19 +95,31 @@ export default {
     langLabel (lang) {
       return this.langs.find(l => l.value === lang)[0].label
     },
-    async next () {
-      this.$log('next')
-      this.loading = true
-      await this.$wait(1000)
-      let oid = localStorage.getItem('k_user_oid')
-      // set avatar,name,lang
-      if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
-      if (this.lang) await ObjectsApi.update(oid, 'profile.lang', this.lang.value)
-      await ObjectsApi.update(oid, 'profile.name', this.name)
-      // done
-      this.loading = false
-      this.$emit('next')
+    async save () {
+      this.$log('save')
+      try {
+        this.loading = true
+        await this.$wait(1000)
+        let oid = localStorage.getItem('k_user_oid')
+        // set avatar,name,lang
+        if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
+        if (this.lang) await ObjectsApi.update(oid, 'profile.lang', this.lang.value)
+        if (this.name.length > 0) await ObjectsApi.update(oid, 'profile.name', this.name)
+        // done
+        this.loading = false
+        this.$emit('next')
+      }
+      catch (e) {
+        this.$log('save e', e)
+        this.loading = false
+      }
     }
+  },
+  async mounted () {
+    this.$log('mounted')
+    this.currentUser = this.$store.getters.currentUser()
+    this.lang = this.currentUser.profile.lang
+    this.avatarUrl = this.currentUser.thumbUrl
   }
 }
 </script>

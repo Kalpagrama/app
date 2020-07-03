@@ -7,7 +7,7 @@ q-btn(
   icon="select_all"
   :round="$q.screen.xs"
   :style=`{
-    position: 'absolute', zIndex: 2000,
+    position: 'absolute', zIndex: 9999,
     top: '8px', left: '8px',
     transform: 'translate3d(0,0,0)',
     background: 'rgba(0,0,0,0.2)',
@@ -20,8 +20,8 @@ q-btn(
       @close="compositionEditorOpened = false"
       :value="compositionTemp"
       :style=`{
-        height: $q.screen.height-60+'px',
-        minHeight: $q.screen.height-60+'px',
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`).b-50
 </template>

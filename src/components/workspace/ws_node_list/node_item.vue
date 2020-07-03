@@ -7,17 +7,18 @@
 
 <template lang="pug">
 div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',}`).row.full-width.items-end.b-60
-  div(v-if="node.stage === 'saved'").row.full-width
+  div(v-if="node.stage === 'saved'" :style=`{height: '100px',}`).row.full-width.cursor-pointer
     img(
       :src="node.thumbOid"
       :style=`{
         objectFit: 'cover',
         borderRadius: $store.state.ui.borderRadius+'px',
         overflow: 'hidden',
-        maxHeight: '100px',
-        maxWidth: '100px',
       }`
-      )
+      ).full-height
+    .col.full-height
+      .row.fit.items-start.content-start.q-pa-sm
+        span.text-white.text-bold {{ node.name }}
   div(
     v-else
     :style=`{

@@ -1,5 +1,4 @@
 <template lang="pug">
-//- layer-actions
 div.row.full-width
   div(
     :style=`{
@@ -14,6 +13,7 @@ div.row.full-width
       q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="layerForward(1,0)").b-70
       q-btn(round flat dense color="white" icon="keyboard_arrow_right" @click="layerForward(1,1)").b-70
     q-btn(round flat dense color="white" icon="flip" @click="layerSet(1)").b-70
+    q-btn(round flat dense color="green" icon="check")
 </template>
 
 <script>

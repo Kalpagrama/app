@@ -1,26 +1,14 @@
-<style lang="sass">
-.content-item
-  cursor: pointer
-  &:hover
-    background: rgb(80,80,80)
-.q-menu
-  // background: none !important
-</style>
-
 <template lang="pug">
 div(
   :class=`{
-    'full-height': !inDialog,
+    'q-pt-sm': $q.screen.gt.xs
   }`
   :style=`{
     position: 'relative',
   }`
   ).column.full-width
   //- ws content editor
-  q-dialog(
-    v-model="contentEditorOpened" position="bottom"
-    @show="$store.commit('ui/stateSet', ['wsShowMenu', false])"
-    @hide="$store.commit('ui/stateSet', ['wsShowMenu', true])")
+  q-dialog(v-model="contentEditorOpened" position="bottom")
     ws-content-explorer(
       v-if="content" :value="content"
       @close="contentEditorOpened = false"
@@ -30,26 +18,25 @@ div(
         //- maxWidth: $store.state.ui.maxWidthPage+'px',
       }`).b-50
   //- header
-  //- kalpa-debug(:options=`{ctx}`)
   div(
     :style=`{
-      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
-    }`).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
+      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
+    }`
+    ).row.full-width.items-center.content-center.b-50
     slot(name="header")
     //- navigation
     div(
       v-if="ctx === 'workspace'"
-      :style=`{}`).row.full-width.items-center.content-center.q-py-md
+      :style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('content', 'Контент')}}
     //- search
-    div.row.full-width
+    div.row.full-width.q-px-sm
       .col.q-pr-xs
         q-input(
           v-model="searchStringRaw"
           ref="searchStringInput"
           filled dense dark color="white"
-          :autofocus="ctx === 'workpsace'"
           :placeholder="$t('find_content_or_paste_url', 'Найди контент или вставь ссылку')"
           :loading="searchStringLoading"
           @focus="searchStringFocused"
@@ -59,27 +46,25 @@ div(
             q-btn(
               v-if="searchStringRaw.length > 0"
               @click="searchStringRaw = ''"
-              flat dense color="grey-2" icon="clear")
+              flat dense color="white" icon="clear")
+            q-btn(
+              flat dense color="white" icon="filter_list")
       content-from-file(@content="contentAdd")
     //- actions
-    div(:style=`{}`).row.full-width.items-end.content-end
+    div(:style=`{}`).row.full-width.items-end.content-end.q-px-sm.q-pb-sm
       .col
         kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start
-      //- q-btn(round dense flat no-caps color="white" icon="filter_list").b-70
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start.justify-center.q-py-md.q-px-sm
       kalpa-loader(:mangoQuery="mangoQuery" :key="i")
         template(v-slot=`{items}`)
-          div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start.justify-center
-            div(
-              :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
-              content-item(
-                v-for="(c,ci) in items" :key="c.id"
-                @pick="contentPicked(c,ci)"
-                @explore="contentExplore(c,ci)"
-                @delete="contentDelete(c,ci)"
-                :ctx="ctx" :content="c" :contentIndex="ci")
+          div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width
+            div(v-if="type === 'VIDEO'")
+              content-item(v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c" @pick="contentPicked(c,ci)")
+            div(v-if="type === 'IMAGE'")
+              masonry(:cols="3" :gutter="0")
+                content-item(v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c" @pick="contentPicked(c,ci)")
           //- nothing found
           div(
             v-else
@@ -94,10 +79,11 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 import contentItem from './content_item'
 import contentFromFile from './content_from_file'
+import itemImage from './item_image'
 
 export default {
   name: 'wsContentList',
-  components: {contentItem, contentFromFile},
+  components: {contentItem, contentFromFile, itemImage},
   props: {
     inDialog: {
       type: Boolean,

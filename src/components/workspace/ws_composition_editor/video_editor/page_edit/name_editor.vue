@@ -8,7 +8,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
   q-dialog(v-model="interceptorDialogOpened" position="bottom")
     //- @submit.prevent="onSubmit"
     div(
-      :style=`{height: $q.screen.height-60+'px',borderRadius: '10px', overflow: 'hidden',}`).column.full-width.b-50
+      :style=`{height: $q.screen.height-60+'px', minHeight: $q.screen.height-60+'px', borderRadius: '10px', overflow: 'hidden',}`).column.full-width.b-50
       //- @blur="interceptorDialogOpened = false"
       //- @enter="interceptorDialogOpened = false"
       q-input(
@@ -28,8 +28,8 @@ div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
     @focus="onFocus"
     @blur="onBlur"
     ).full-width
-    template(v-slot:append)
-      q-btn(round flat color="green" icon="check" @click="$emit('close')")
+    //- template(v-slot:append)
+    //-   q-btn(round flat color="green" icon="check" @click="$emit('close')")
 </template>
 
 <script>

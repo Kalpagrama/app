@@ -4,7 +4,7 @@
   //- kalpa-debug(:options=`{width,framesCount,framesWidth,frameWidth}`)
   div(
     ref="layerItemFramesScrollArea"
-    :style=`{}`).row.full-width.scroll.q-py-lg
+    :style=`{}`).row.full-width.scroll.q-py-md
     .row.items-start.content-start.no-wrap
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)
@@ -40,7 +40,7 @@
             borderRadius: '2px', overflow: 'hidden',
             pointerEvents: 'none'
           }`
-          ).bg-green
+          ).bg-red
         //- left tint
         div(
           :style=`{
@@ -91,7 +91,8 @@
             width: 'calc('+((layer.figuresAbsolute[1].t-layer.figuresAbsolute[0].t)/storePlayer.duration)*100+'% + 8px)',
             height: 50+8+8+'px',
             borderRadius: '12px',
-            border: '8px solid '+layer.color,
+            //- border: '8px solid '+layer.color,
+            border: '8px solid rgb(76,175,80)',
             pointerEvents: 'none',
           }`)
       //- right margin width/2

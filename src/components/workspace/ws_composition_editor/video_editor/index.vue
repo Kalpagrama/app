@@ -17,7 +17,10 @@ div(
         @click="close()"
         round flat color="white" icon="keyboard_arrow_left"
         :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
-      ws-content-player(@ready="storePlayerReady" :sid="sidPlayer" :content="content")
+      ws-content-player(
+        :sid="sidPlayer" :content="content"
+        @seeked="storeEditor.compositionPlaying = false"
+        @ready="storePlayerReady")
         template(v-slot:controlsTools)
           //- q-btn(
           //-   @click="pageFullscreen = !pageFullscreen"
@@ -53,7 +56,8 @@ div(
     ws-content-player(@ready="storePlayerReady" :sid="sidPlayer" :content="content" :options=`{controls: false}`)
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata"
-      :composition="composition"
+      v-show="!options.mini && false"
+      :composition="composition" :options="options"
       :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', opacity: 0.6}`)
   //- mode: PROGRESS
   div(v-if="options.mode === 'progress'").row.full-width
@@ -107,6 +111,8 @@ export default {
         return {
           mode: 'editor',
           isPreview: false,
+          active: true,
+          mini: false,
         }
       }
     },

@@ -1,7 +1,9 @@
 <template lang="pug">
 div(:style=`{position: 'relative',}`).row.full-width
   //- tools
-  div(:style=`{}`).row.full-width.items-center.content-center.q-pa-sm
+  div(
+    v-if="false"
+    :style=`{}`).row.full-width.items-center.content-center.q-pa-sm
     q-btn(
       @click="layerPlayingToggle()"
       :color="layerPlaying ? 'red' : 'green'"
@@ -31,8 +33,8 @@ div(:style=`{position: 'relative',}`).row.full-width
       v-touch-pan.mouse.left.right="progressDrag"
       :style=`{
         position: 'relative',
-        height: '40px', borderRadius: '10px', overflow: 'hidden'
-      }`).row.full-width.b-90
+        height: '34px', borderRadius: '10px', overflow: 'hidden'
+      }`).row.full-width.b-100
       //- bar: left
       div(
         v-if="showBar"
@@ -41,7 +43,7 @@ div(:style=`{position: 'relative',}`).row.full-width
           left: '0px',
           width: progressPercentRaw ? progressPercentRaw+'%' : (storePlayer.currentTime-storeLayerEditor.layerStart)/storeLayerEditor.layerDuration*100+'%',
           pointerEvents: 'none',
-        }`).row.full-height.b-120
+        }`).row.full-height.b-140
     //- bar: currentTime
     div(
       v-if="showBar"
@@ -52,7 +54,7 @@ div(:style=`{position: 'relative',}`).row.full-width
         height: 'calc(100%)',
         width: '4px', borderRadius: '2px',
         pointerEvents: 'none',
-      }`).row.bg-green
+      }`).row.bg-red
 </template>
 
 <script>

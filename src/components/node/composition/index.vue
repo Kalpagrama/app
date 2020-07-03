@@ -1,16 +1,18 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
   composition-explorer(v-if="composition" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
-  composition-menu(v-if="composition" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
+  //- composition-menu(v-if="composition && active && !mini" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
   //- preview
   img(
+    @click="$emit('previewClick')"
+    draggable="false"
     :src="preview"
     :style=`{
       objectFit: 'contain',
       opacity: loaded ? 0 : 1,
       maxHeight: $q.screen.height-120+'px',
     }`
-    ).full-width
+    ).fit.cursor-pointer
   //- debug
   //- kalpa-debug(
   //-   v-if="composition && !mini && false"
@@ -22,6 +24,17 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
     :duration="duration"
     :player="$refs.videoRef"
     :playing="playing")
+  //- pause arrow
+  q-btn(
+    v-if="active && !mini && !playing && loaded"
+    @click="onClick()"
+    round flat color="white"
+    :style=`{
+      position: 'absolute', zIndex: 1000,
+      top: 'calc(50% - 50px)', left: 'calc(50% - 50px)',
+      width: '100px', height:'100px', borderRadius:'50%',
+    }`)
+    q-icon(name="play_arrow" size="100px" color="white")
   video(
     v-if="composition && composition.url.length > 0 && active"
     ref="videoRef"
@@ -92,7 +105,14 @@ export default {
         }
       }
     },
-    // active: {},
+    active: {
+      handler (to, from) {
+        this.$log('active TO', to)
+        if (!this.$refs.videoRef) return
+        if (to) this.$refs.videoRef.play()
+        else this.$refs.videoRef.pause()
+      }
+    },
     '$store.state.ui.active': {
       handler (to, from) {
         this.$log('$store.state.ui.active TO',)
@@ -135,6 +155,7 @@ export default {
       this.$log('onLoadeddata', e)
       this.duration = e.target.duration
       this.loaded = true
+      this.$emit('started')
     }
   }
 }

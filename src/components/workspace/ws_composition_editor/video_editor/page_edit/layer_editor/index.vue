@@ -4,17 +4,46 @@ div(
     'b-60': true,
   }`
   :style=`{
+    position: 'relative',
     borderRadius: '10px',
     overflow: 'hidden',
-  }`).row.full-width
+  }`).row.full-width.b-70
+  //- layer close
+  q-btn(
+    v-if="storeEditor.layerEditing === layer.id && composition.layers.length > 1"
+    @click="storeEditor.layerEditing = null"
+    round flat dense color="green" icon="check"
+    :style=`{position: 'absolute', right: '4px', bottom: 0, zIndex: 1000,}`)
+  //- layer tune
+  q-btn(
+    v-if="storeEditor.layerEditing === layer.id"
+    @click="editing = !editing"
+    round dense flat icon="tune"
+    :color="editing ? 'green' : 'grey-2'"
+    :style=`{position: 'absolute', left: '4px', bottom: 0, zIndex: 1000,}`)
   //- frames: mini editing...
   div(v-if="storeEditor.layerEditing === layer.id").row.full-width
     layer-frames(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
     //- editing
-    div(v-if="editing" :style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
+    div(:style=`{opacity: editing ? 1 : 0}`).row.full-width
       div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70
-        layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-        layer-actions(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.b-80.q-px-xs
+          q-btn(round flat dense color="white" icon="play_arrow")
+          .col.q-px-xs
+            layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+          q-btn(round flat dense color="white" icon="refresh")
+        //- layer-actions(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+        div().row.full-width
+          div(:style=`{paddingLeft: '40px', paddingRight: '40px'}`).row.full-width
+            q-btn(round flat dense color="grey-6" icon="flip").q-mr-xs.rotate-180
+            q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left")
+            q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right")
+            .col
+            q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left")
+            q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right")
+            q-btn(round flat dense color="grey-6" icon="flip")
+            div(:style=`{}`)
+          //- q-btn(round flat dense color="green" icon="check")
   //- name editor
   div(
     v-if="storeEditor.layerEditing !== layer.id"
@@ -44,20 +73,6 @@ div(
     layer-progress-mini(
       v-if="layerProgressMiniShow"
       :layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-  //- footer
-  div(
-    v-if="storeEditor.layerEditing === layer.id"
-    :style=`{paddingLeft: '40px', paddingRight: '40px',}`).row.full-width.q-pa-xs
-    //- q-btn(round flat dense color="red-5" icon="delete_outline" @click="$emit('delete')")
-    q-btn(round flat dense color="white" icon="tune" no-caps @click="editing = !editing")
-      //- span.text-white.q-mx-xs {{ $t('editor', 'Редактор')}}
-    .col
-    //- q-btn(round flat dense color="grey-3" no-caps @click="$emit('createNode')").q-px-sm Create node
-    .col
-    q-btn(
-      @click="layerEditingToggle()"
-      flat dense color="green" no-caps)
-      span {{$t('save', 'Сохранить')}}
 </template>
 
 <script>
@@ -69,7 +84,7 @@ import layerProgressMini from './layer_progress_mini'
 export default {
   name: 'layerEditor',
   components: {layerFrames, layerActions, layerProgress, layerProgressMini},
-  props: ['layer', 'layerIndex'],
+  props: ['composition', 'layer', 'layerIndex'],
   inject: ['sidEditor', 'sidPlayer'],
   data () {
     return {
@@ -124,20 +139,20 @@ export default {
     'storeEditor.layerPlaying': {
       immediate: true,
       handler (to, from) {
-        if (to === this.layer.id) {
-          // alert('START WATCH: ' + this.layer.id)
-          this.watcherCurrentTime = this.$watch('storePlayer.currentTime', (to, from) => {
-            if (this.storeEditor.compositionPlaying) return
-            this.$log('storePlayer.currentTime TO', to)
-            if (to > this.layerEnd || to < this.layerStart) {
-              this.storePlayer.setCurrentTime(this.layerStart)
-            }
-          })
-        }
-        else {
-          // alert('UNWATCH: ' + this.layer.id)
-          if (this.watcherCurrentTime) this.watcherCurrentTime()
-        }
+        // if (to === this.layer.id) {
+        //   // alert('START WATCH: ' + this.layer.id)
+        //   this.watcherCurrentTime = this.$watch('storePlayer.currentTime', (to, from) => {
+        //     if (this.storeEditor.compositionPlaying) return
+        //     this.$log('storePlayer.currentTime TO', to)
+        //     if (to > this.layerEnd || to < this.layerStart) {
+        //       this.storePlayer.setCurrentTime(this.layerStart)
+        //     }
+        //   })
+        // }
+        // else {
+        //   // alert('UNWATCH: ' + this.layer.id)
+        //   if (this.watcherCurrentTime) this.watcherCurrentTime()
+        // }
       }
     },
   },

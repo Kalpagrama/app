@@ -2,8 +2,10 @@
 div(
   :style=`{
     position: 'absolute', zIndex: 5000, bottom: '0px',
-    transform: 'translate3d(0,0,0)',
-    borderRadius: '0px', overflow: 'hidden'
+    left: '50%',
+    marginRight: '-50%',
+    transform: 'translate(-50%, 0)',
+    borderRadius: '0px', overflow: 'hidden',
   }`
   ).row.full-width.q-pa-md
   //- actions

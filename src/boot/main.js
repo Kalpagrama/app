@@ -123,7 +123,10 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     Vue.component('listMasonry', () => import('components/list_masonry'))
     Vue.component('listMiddle', () => import('components/list_middle'))
     Vue.component('listTable', () => import('components/list_table'))
+    Vue.component('listPip', () => import('components/list_pip'))
+    Vue.component('listHorizontal', () => import('components/list_horizontal'))
     // kalpa
+    Vue.component('kalpaProfile', () => import('components/kalpa/profile'))
     Vue.component('kalpaLayout', () => import('components/kalpa/layout'))
     Vue.component('kalpaDebug', () => import('components/kalpa/debug'))
     Vue.component('kalpaMenu', () => import('components/kalpa/menu'))

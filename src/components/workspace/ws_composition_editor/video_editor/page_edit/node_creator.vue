@@ -1,7 +1,10 @@
 <template lang="pug">
 q-btn(
-  dense color="green" no-caps
+  dense flat color="green" no-caps
   @click="start()"
+  :style=`{
+    //- borderBottom: '2px solid green',
+  }`
   ).q-px-sm {{ $t('create_node', 'Собрать ядро') }}
   q-dialog(v-model="nodeEditorOpened" position="bottom")
     ws-node-editor(

@@ -93,7 +93,7 @@ div(
             span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('Собрать ядро')}}
         //- version
         div(v-if="true").row.full-width.items-center.q-pa-md
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('Версия')}} 0.9.9-26.06.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('Версия')}} 0.9.99-03.07.2020
         //- slot(name="footer")
 </template>
 

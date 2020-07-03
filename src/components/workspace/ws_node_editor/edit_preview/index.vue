@@ -6,23 +6,48 @@ div(
   //- header
   //- body
   div(:style=`{position: 'relative'}`).col.full-width.scroll
-    div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`).row.full-width.b-60
-      //- v-for="(i,ii) in node.items" :key="ii"
-      ws-composition-editor(
-        v-if="node.items.length > 0"
-        :value="node.items[0]"
-        :options=`{
-          isPreview: true,
-          mode: 'player',
-        }`
-        :style=`{
-          height: 400+'px',
-          minHeight: 400+'px'
-        }`)
-      div(
-        v-else
-        :style=`{height: '400px'}`).row.full-width.items-center.content-center.justify-center
-        q-spinner(color="green" size="50px")
+    div(
+      :style=`{
+        position: 'relative', height: '400px',
+        borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
+      ).row.full-width.b-60
+      list-pip(
+        v-if="node.layout === 'PIP'"
+        :items="node.items")
+        template(v-slot:item=`{item,itemIsFirst,itemIsLast,itemIndex,itemActive,itemNexting,next,prev,started,ended}`)
+          div(:style=`{position: 'relative'}`).row.fit
+            div(
+              v-if="!itemActive"
+              :style=`{position: 'absolute', zIndex: 999, borderRadius: '10px', overflow: 'hidden', opacity: 0.2}` @click="next()").row.fit.cursor-pointer.bg-green
+            ws-composition-editor(
+              :sid="`wce-${itemIndex}`"
+              :value="item"
+              :options=`{
+                isPreview: true,
+                mode: 'player',
+                mini: !itemActive,
+                active: itemActive,
+              }`
+              :style=`{
+                height: '100%',
+              }`)
+      //- list-horizontal(
+      //-   v-if="node.layout === 'HORIZONTAL'"
+      //-   :items="node.items")
+      //-   template(v-slot:item=`{item,itemIndex,itemActive}`)
+      //-     ws-composition-editor(
+      //-       :sid="`wce-${itemIndex}`"
+      //-       :value="item"
+      //-       :options=`{
+      //-         isPreview: true,
+      //-         mode: 'player',
+      //-         mini: !itemActive,
+      //-         active: itemActive,
+      //-       }`
+      //-       :style=`{
+      //-         height: '100%',
+      //-       }`)
+    //- layout
     div(v-if="true").row.full-width.items-center.content-center.q-py-sm
       q-select(
         filled
@@ -34,12 +59,20 @@ div(
           borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',
           zIndex: 2000, transform: 'translate3d(0,0,0)',
         }`).full-width
+    //- actions
+    .row.full-width
+      q-btn(
+        @click="storeNodeEditor.publish()"
+        push no-caps color="green"
+        :loading="storeNodeEditor.publishing"
+        :style=`{height: '60px'}`
+        ).full-width {{ $t('node_publish', 'Опубликовать')}}
 </template>
 
 <script>
 export default {
   name: 'editPreview',
-  props: ['node', 'stateNodeEditor'],
+  props: ['node', 'storeNodeEditor'],
   data () {
     return {
       nodePublishing: false,

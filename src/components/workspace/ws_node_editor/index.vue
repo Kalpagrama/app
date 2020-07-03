@@ -47,7 +47,7 @@ div(
       component(
         @close="$emit('close')"
         :is="`edit-${pageId}`"
-        :stateNodeEditor="stateNodeEditor"
+        :storeNodeEditor="storeNodeEditor"
         :node="node"
         :options="options"
         :style=`{
@@ -68,7 +68,7 @@ div(
           :name="p.id" :label="p.name"
           dense no-caps color="white"
           :style=`{color: 'rgb(180,180,180)'}`)
-  div(v-if="true" :style=`{}`).row.full-width.justify-center
+  div(v-if="false" :style=`{}`).row.full-width.justify-center
     div(:style=`{maxWidth: '600px'}`).row.full-width.q-py-sm
       q-btn(
         @click="pagePrev()"
@@ -83,9 +83,9 @@ div(
         ).q-px-md {{$t('Next')}}
       q-btn(
         v-if="pageId === 'preview'"
-        @click="stateNodeEditor.nodePublish()"
+        @click="storeNodeEditor.nodePublish()"
         push color="green" no-caps
-        :loading="stateNodeEditor.nodePublishing"
+        :loading="storeNodeEditor.nodePublishing"
         ).q-px-md
         span.text-white.text-bold {{$t('Publish')}}
 </template>
@@ -102,7 +102,6 @@ import editPreview from './edit_preview'
 export default {
   name: 'wsNodeEditor',
   components: {editInfo, editEssence, editItems, editSpheres, editPreview},
-  // props: ['value', 'options'],
   props: {
     value: {type: Object},
     options: {
@@ -118,22 +117,28 @@ export default {
   data () {
     return {
       pageId: 'items',
-      pages: [
-        {id: 'items', name: '1. Образы'},
-        {id: 'spheres', name: '2. Сферы'},
-        {id: 'preview', name: '3. Предосмотр'}
-      ]
+      publishing: false,
+      deleting: false,
     }
   },
   computed: {
+    pages () {
+      return [
+        {id: 'items', name: this.$t('compositions', '1. Образы')},
+        {id: 'spheres', name: this.$t('spheres', '2. Сферы')},
+        {id: 'preview', name: this.$t('preview', '3. Предосмотр')}
+      ]
+    },
     node () {
       return this.value
     },
-    stateNodeEditor () {
+    storeNodeEditor () {
       return {
         pageId: this.pageId,
         pages: this.pages,
-        nodePublish: this.nodePublish,
+        publish: this.publish,
+        publishing: this.publishing,
+        deleting: this.deleting,
         set: (key, val) => {
           this[key] = val
         }
@@ -159,8 +164,8 @@ export default {
       }
       this.pageId = id
     },
-    nodeCheck () {
-      this.$log('nodeCheck')
+    check () {
+      this.$log('check')
       if (!this.node.category) throw new Error('No node.category !')
       if (this.node.name.length === 0) throw new Error('No node.essence !')
       if (this.node.layout !== 'PIP') throw new Error('Only PIP layout for now !')
@@ -178,28 +183,28 @@ export default {
       })
       // throw new Error('Fuck you, very much !')
     },
-    async nodePublish () {
+    async publish () {
       try {
         this.$log('nodePublish start')
-        this.stateNodeEditor.set('nodePublishing', true)
-        this.nodeCheck()
+        this.storeNodeEditor.set('publishing', true)
+        this.check()
         // publish
         this.$q.loading.show({spinnerColor: 'green', message: 'Creating node...'})
         let createdNode = await NodeApi.nodeCreate(this.node)
         this.$log('nodePublish res', createdNode)
         // publish
-        this.$q.loading.show({spinnerColor: 'green', message: 'Publishing node...'})
+        this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_publishing', 'Публикуем ядро...')})
         await this.$wait(1000)
         this.node.stage = 'published'
         this.node.oid = createdNode.oid // нужно при снятии с публикации
         // done
-        this.$q.loading.show({spinnerColor: 'green', message: 'Done !'})
-        await this.$wait(2000)
+        this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
+        await this.$wait(1000)
         this.$q.loading.hide()
-        this.stateNodeEditor.set('nodePublishing', false)
+        this.storeNodeEditor.set('publishing', false)
         this.$q.notify({
           type: 'positive',
-          message: 'Node published!'
+          message: this.$t('node_published', 'Ядро опубликовано!')
         })
         this.$emit('published', createdNode.oid)
         this.$emit('close')
@@ -212,16 +217,16 @@ export default {
           type: 'negative',
           message: errorMessage,
         })
-        this.stateNodeEditor.set('nodePublishing', false)
+        this.storeNodeEditor.set('publishing', false)
       }
     },
     async nodeDelete () {
       this.$log('nodeDelete')
       if (!confirm('Delete node ?!')) return
-      this.stateNodeEditor.set('nodeDeleting', true)
+      this.storeNodeEditor.set('deleting', true)
       await this.$wait(1000)
       await this.$rxdb.remove(this.node.id)
-      this.stateNodeEditor.set('nodeDeleting', true)
+      this.storeNodeEditor.set('deleting', true)
       await this.$wait(200)
       this.$emit('close')
     }

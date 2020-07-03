@@ -1,9 +1,7 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
+div(:style=`{position: 'relative',}`).column.fit
   //- node editor
-  q-dialog(
-    v-model="nodeEditorOpened" position="bottom"
-    )
+  q-dialog(v-model="nodeEditorOpened" position="bottom")
     ws-node-editor(
       @close="nodeEditorOpened = false"
       :value="node"
@@ -12,25 +10,44 @@ div(:style=`{position: 'relative'}`).column.fit
         maxHeight: $q.screen.height-60+'px',
         minHeight: $q.screen.height-60+'px',
       }`)
+  //- body
   .col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery")
       template(v-slot=`{items}`)
-        .row.full-width.items-start.content-start.q-py-sm
+        .row.fit.items-start.content-start.justify-center.q-py-md
+          //- compositions on content bar
+          div(
+            :style=`{
+              position: 'absolute', zIndex: 99999, left: 0, top: '-38px', transform: 'translate3d(0,0,0)',
+              height: '30px', pointerEvents: 'none',
+            }`
+            ).row.full-width.justify-center
+            div(:style=`{position: 'relative', maxWidth: barWidth+'px',}`).row.fit
+              div(
+                v-for="(i,ii) in items" :key="i.id"
+                :style=`{
+                  position: 'absolute', zIndex: 100+ii,
+                  left: i.layers[0].figuresAbsolute[0].t/content.duration*100+'%',
+                  width: '2px',
+                }`
+                ).row.full-height.bg-grey-2
+          //- compositions list
           div(
             v-for="(i,ii) in items" :key="i.id"
             v-if="i.layers.length > 0"
             :style=`{}`
-            ).row.full-width.items-start.content-start
+            ).row.full-width.items-start.content-start.q-pr-sm
             div(:style=`{width: '50px', height: '50px',}`).row.items-center.content-center.justify-center
               q-checkbox(
                 v-model="storeExplorer.compositionsSelected" :val="i.id"
                 dark color="grey-6"
-                :style=`{opacity: 0.9}`)
+                :style=`{opacity: storeExplorer.compositionsSelected.includes(i.id) ? 1 : 0.5}`)
             .col
               composition-item(
                 @edit="compositionEdit(i)"
                 @delete="compositionDelete(i)"
                 :composition="i" :compositionIndex="ii").q-mb-sm
+  //- composition editor
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="composition"
@@ -39,6 +56,7 @@ div(:style=`{position: 'relative'}`).column.fit
         :value="composition"
         :sidPlayer="sidPlayer"
         @close="compositionEdited").full-height.b-60
+  //- compositions selected
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="storeExplorer.compositionsSelected.length > 0"
@@ -49,9 +67,9 @@ div(:style=`{position: 'relative'}`).column.fit
       }`
       ).row.full-width.items-center.content-center.q-pa-sm.b-60
       q-btn(round flat color="white" icon="clear" @click="storeExplorer.compositionsSelected = []").q-mr-sm
-      q-btn(flat color="red-5" no-caps @click="compositionsSelectedDelete()") Delete
+      q-btn(flat color="red-5" no-caps @click="compositionsSelectedDelete()") {{ $t('delete', 'Удалить') }}
       .col
-      q-btn(color="green" no-caps @click="compositionsSelectedCreateNode()") Create node
+      q-btn(color="green" no-caps @click="compositionsSelectedCreateNode()") {{ $t('create_node', 'Собрать ядро') }}
 </template>
 
 <script>
@@ -90,6 +108,10 @@ export default {
       // sort
       res.sort = [{updatedAt: 'desc'}]
       return res
+    },
+    barWidth () {
+      if (this.$q.screen.width > 600) return 600
+      else return this.$q.screen.width - 80
     }
   },
   watch: {

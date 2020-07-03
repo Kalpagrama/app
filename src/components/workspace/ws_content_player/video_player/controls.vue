@@ -10,16 +10,20 @@ div(
       @click="storePlayer.playPause()"
       round flat dense color="white"
       :icon="storePlayer.playing ? 'pause' : 'play_arrow'")
-    q-btn(
-      round flat dense color="grey-2" icon="volume_up")
+    //- q-btn(
+    //-   round flat dense color="grey-2" icon="volume_up")
     .col
-    q-btn(round flat dense color="white" icon="fast_rewind" @click="fast(false)")
+    q-btn(
+      v-if="$q.screen.width > 370"
+      round flat dense color="white" icon="fast_rewind" @click="fast(false)")
       q-tooltip(anchor="top middle" self="center middle") - 5 sec
     q-btn(flat dense color="white")
       small {{ $time(storePlayer.currentTime) }}
       small.q-mx-xs /
       small {{ $time(storePlayer.duration) }}
-    q-btn(round flat dense color="white" icon="fast_forward" @click="fast(true)")
+    q-btn(
+      v-if="$q.screen.width > 370"
+      round flat dense color="white" icon="fast_forward" @click="fast(true)")
       q-tooltip(anchor="top middle" self="center middle") + 5 sec
     .col
     slot(name="controlsTools")
@@ -61,7 +65,7 @@ div(
         left: storePlayer.currentTime/storePlayer.duration*100+'%',
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',
-      }`).bg-green
+      }`).bg-red
     //- TODO: bar: curerntTime OVER
     slot(name="controls")
 </template>
@@ -99,6 +103,7 @@ export default {
       if (t < 0) t = 0
       if (t > this.storePlayer.duration) t = this.storePlayer.duration
       this.storePlayer.setCurrentTime(t)
+      this.$emit('seeked')
     },
     barMove (e) {
       // this.$log('barMove', e)
@@ -119,6 +124,7 @@ export default {
       let t = (left / width) * this.storePlayer.duration
       // this.$log('t', t)
       this.storePlayer.setCurrentTime(t)
+      this.$emit('seeked')
     },
     barDrag (e) {
       // this.$log('barDrag', e)
@@ -130,6 +136,7 @@ export default {
       if (e.isFinal) {
         this.barDragging = false
         this.barWidth = null
+        this.$emit('seeked')
       }
       if (!this.barWidth) return
       this.barWidth += (e.delta.x / this.$el.clientWidth) * 100

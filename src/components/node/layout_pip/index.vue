@@ -19,12 +19,19 @@ div(
       :style=`{
         transform: 'translate3d(0,0,0)',
         borderRadius: $store.state.ui.borderRadius+'px',
-        overflow: 'hidden',
+        //- overflow: 'hidden',
       }`).b-60
     node-vote(
       v-if="stateNode.voteShow"
       v-bind="$props"
       :stateNode="stateNode")
+    node-bookmark(
+      v-if="node && nodeFull && active"
+      v-show="!mini"
+      :node="node" :nodeFull="nodeFull"
+      :style=`{
+        position: 'absolute', zIndex: 3000, right: '8px', top: '8px',
+      }`)
   node-essence(
     v-if="true"
     v-bind="$props"
@@ -55,11 +62,12 @@ import nodeVote from './node_vote'
 import nodeEssence from './node_essence'
 import nodeAuthor from './node_author'
 import nodeSpheres from './node_spheres'
+import nodeBookmark from './node_bookmark'
 
 export default {
   name: 'nodeLayoutPip',
   props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'essence', 'mini', 'opened'],
-  components: {nodeTools, nodeItems, nodeVote, nodeEssence, nodeAuthor, nodeSpheres},
+  components: {nodeTools, nodeItems, nodeVote, nodeEssence, nodeAuthor, nodeSpheres, nodeBookmark},
   data () {
     return {
       voteShow: false

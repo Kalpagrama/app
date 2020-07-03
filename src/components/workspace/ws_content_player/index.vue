@@ -5,7 +5,8 @@ component(
   :sid="sid"
   :content="content"
   :options="options"
-  @ready="$emit('ready')")
+  @ready="$emit('ready')"
+  @seeked="$emit('seeked')")
   template(v-slot:controls)
     slot(name="controls")
   template(v-slot:controlsTools)

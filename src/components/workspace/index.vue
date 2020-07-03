@@ -1,11 +1,11 @@
 <template lang="pug">
 kalpa-layout(
-  title="Мастерская"
+  :title="$t('ws_page_workspace', 'Мастерская')"
   @pageId="$router.push({name: $event})"
   :pages="pages" :pagesHot="pagesHot" :pageId="$route.name"
   :style=`{height: $q.screen.height+'px'}`)
   template(v-slot:drawerRight)
-    menu-right.b-50
+    menu-right(:style=`{maxWidth: '250px',}`).b-50
   template(v-slot:page)
     router-view(
       v-if="showView"
@@ -17,9 +17,9 @@ kalpa-layout(
 </template>
 
 <script>
-import menuRight from './menu_right'
 import { RxCollectionEnum } from 'src/system/rxdb'
-// import { ContentApi } from 'src/api/content'
+
+import menuRight from './menu_right'
 
 export default {
   name: 'workspaceIndex',
@@ -30,19 +30,6 @@ export default {
   data () {
     return {
       item: null,
-      pages: [
-        {id: 'content-list', name: 'Контент'},
-        {id: 'composition-list', name: 'Образы'},
-        {id: 'node-list', name: 'Ядра'},
-        {id: 'chain-list', name: 'Цепочки'},
-        {id: 'sphere', name: 'Сферы'},
-        {id: 'ws-settings', name: 'Настройки'}
-      ],
-      pagesHot: [
-        {id: 'content-list', name: 'Контент'},
-        {id: 'composition-list', name: 'Образы'},
-        {id: 'node-list', name: 'Ядра'},
-      ]
     }
   },
   provide () {
@@ -51,19 +38,22 @@ export default {
     }
   },
   computed: {
+    pages () {
+      return [
+        {id: 'content-list', name: this.$t('ws_page_content', 'Контент')},
+        {id: 'composition-list', name: this.$t('ws_page_compositions', 'Образы')},
+        {id: 'node-list', name: this.$t('ws_page_nodes', 'Ядра')},
+        // {id: 'chain-list', name: this.$t('ws_page_chains', 'Цепочки')},
+        // {id: 'sphere', name: this.$t('ws_page_spheres', 'Сферы')},
+        {id: 'ws-settings', name: this.$t('ws_page_settings', 'Настройки')}
+      ]
+    },
+    pagesHot () {
+      return this.pages.filter(p => ['content-list', 'composition-list', 'node-list'].includes(p.id))
+    },
     showView () {
       if (this.$route.params.id) return this.item
       else return true
-    },
-    stateWorkspace () {
-      return {
-        showMenuRight: this.showMenuRight,
-        pages: this.pages,
-        pagesHot: this.pagesHot,
-        set: (key, val) => {
-          this[key] = val
-        }
-      }
     }
   },
   watch: {

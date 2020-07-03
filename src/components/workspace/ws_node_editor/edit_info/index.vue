@@ -27,16 +27,16 @@
             span.text-white.text-bold {{$t('Danger zone')}}
           .row.full-width.q-px-sm
             q-btn(
-              @click="stateNodeEditor.nodeDelete()"
+              @click="storeNodeEditor.nodeDelete()"
               color="red" no-caps
-              :loading="stateNodeEditor.nodeDeleting"
+              :loading="storeNodeEditor.nodeDeleting"
               ) {{$t('Delete node')}}
 </template>
 
 <script>
 export default {
   name: 'editInfo',
-  props: ['node', 'stateNodeEditor'],
+  props: ['node', 'storeNodeEditor'],
   data () {
     return {
     }

@@ -28,13 +28,22 @@ div(
         minHeight: $q.screen.height+'px',
         maxWidth: $store.state.ui.maxWidthPage+'px'
       }`)
+  //- modes
+  div(v-if="false").row.ful-width.justify-center
+    q-btn(
+      v-for="m in modes" :key="m.id"
+      @click="mode = m.id"
+      round flat dense
+      :color="m.id === mode ? 'green' : 'white'"
+      :icon="m.icon")
   //- body
   div(
     :style=`{
       position: 'relative',
       overflowX: 'hidden',
     }`).col.full-width.scroll.q-py-lg
-    div(v-if="true").row.full-width.items-start.content-start.justify-center
+    //- mini
+    div(v-if="mode === 'mini'").row.full-width.items-start.content-start.justify-center
       div(:style=`{maxWidth: '600px'}`).row.full-width.q-px-sm
         draggable(
           :list="node.items" group="items" handle=".item-drag-handle"
@@ -64,7 +73,8 @@ div(
             flat color="green" icon="add" size="md" no-caps
             :style=`{height: '60px'}`
             ).full-width.b-60 {{$t('Добавить образ')}}
-    div(v-if="true").row.full-width.items-start.justify-center.q-px-xs
+    //- medi
+    div(v-if="mode === 'medi'").row.full-width.items-start.justify-center.q-px-xs.br
       draggable(
         :list="node.items" group="items" handle=".item-drag-handle"
         @start="itemsDragging = true"
@@ -110,6 +120,50 @@ div(
                 pointerEvents: 'none',
               }`).text-white.q-px-md.q-py-sm.full-width {{ i.name }}
             img(:src="node.items[ii].thumbOid" :style=`{objectFit: 'cover'}`).fit
+    //- maxi
+    div(v-if="mode === 'maxi'").row.full-width
+      draggable(
+        :list="node.items" group="items" handle=".item-drag-handle"
+        @start="itemsDragging = true"
+        @end="itemsDragging = false"
+        ).row.full-width
+        div(
+          v-for="(i,ii) in node.items" :key="i.id"
+          :style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden',}`
+          ).row.full-width.cursor-pointer.q-mb-sm
+          img(
+            @click="itemEdit(i,ii)"
+            :src="i.thumbOid" :style=`{height: $q.screen.width < 800 ? '180px' : '250px', objectFit: 'cover'}`).full-width
+          //- delete
+          q-btn(
+            @click="itemDelete(i,ii)"
+            round flat color="red" icon="delete_outline"
+            :style=`{
+              position: 'absolute', zIndex: 1000, top: 0, left: 0,
+              background: 'rgba(0,0,0,0.1)',
+            }`)
+          //- drag
+          q-btn(
+            flat color="white" icon="drag_indicator"
+            :style=`{
+              position: 'absolute', zIndex: 1000, right: 0,
+              width: '70px', height: '100%',
+              background: 'rgba(0,0,0,0.1)',
+              cursor: 'grabbing',
+            }`
+            ).item-drag-handle
+          //- name
+          span(
+            v-if="i.name && i.name.length > 0"
+            @click="itemEdit(i,ii)"
+            :style=`{
+              position: 'absolute', zIndex: 1000, bottom: 0, left: 0,
+              background: 'rgba(0,0,0,0.2)', borderRadius: '10px', overflow: 'hidden',
+              userSelect: 'none',
+            }`
+            ).text-white.text-bold.q-pa-sm {{ i.name }}
+      //- item add
+      q-btn(flat color="green" icon="add" no-caps :style=`{height: '50px',}` @click="itemAdd").full-width {{$t('add_item', 'Добавить образ')}}
 </template>
 
 <script>
@@ -121,9 +175,15 @@ import itemItem from './item_item'
 export default {
   name: 'editItems',
   components: {draggable, itemFinder, itemItem},
-  props: ['stateNodeEditor', 'node', 'options'],
+  props: ['storeNodeEditor', 'node', 'options'],
   data () {
     return {
+      mode: 'maxi', // mini/medi/maxi
+      modes: [
+        {id: 'mini', icon: 'menu'},
+        {id: 'medi', icon: 'view_week'},
+        {id: 'maxi', icon: 'view_day'},
+      ],
       item: null,
       itemSelected: null,
       itemFinderOpened: false,
