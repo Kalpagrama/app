@@ -55,7 +55,7 @@ class Event {
       case 'OBJECT_CHANGED':
         await this.objects.processEvent(event)
         break
-      case 'NODE_CREATED':
+      case 'OBJECT_CREATED':
         if (event.subject.oid === localStorage.getItem('k_user_oid')) {
           this.notifyUserActionComplete(event.type, event.object)
         }
@@ -104,7 +104,7 @@ class Event {
     assert.ok(eventType && object)
     let eventMessage = ''
     switch (eventType) {
-      case 'NODE_CREATED':
+      case 'OBJECT_CREATED':
         eventMessage = i18n.t('node created')
         break
       case 'CHAIN_CREATED':

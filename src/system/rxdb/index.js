@@ -4,6 +4,7 @@ import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
+import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
@@ -67,6 +68,7 @@ class RxDBWrapper {
     addRxPlugin(RxDBLeaderElectionPlugin)
     addRxPlugin(RxDBValidatePlugin)
     addRxPlugin(RxDBJsonDumpPlugin)
+    if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
     this.isLeader = () => this.isLeader_
   }
 

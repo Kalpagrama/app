@@ -2,7 +2,7 @@ import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
-import { getReactive } from 'src/system/rxdb/reactive'
+import { getReactive, updateRxDoc } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_LST)
@@ -72,7 +72,7 @@ class Lists {
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
     assert(rxdb.isLeader(), 'rxdb.isLeader()')
-    const f = this.processEvent
+    const f = this.processEventz
     logD(f, 'start')
     switch (event.type) {
       case 'USER_SUBSCRIBED': {
@@ -145,7 +145,7 @@ class Lists {
         }
         break
       }
-      case 'NODE_CREATED': {
+      case 'OBJECT_CREATED': {
         assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
         // добавим на все сферы (event.sphereOids)
         let rxDocs = await this.cache.find({
@@ -192,6 +192,9 @@ class Lists {
             }
           }
         }
+        break
+      }
+      case 'OBJECT_DELETED': {
         break
       }
       default:
