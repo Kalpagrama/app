@@ -31,28 +31,28 @@ div(
               :style=`{
                 height: '100%',
               }`)
-      //- list-horizontal(
-      //-   v-if="node.layout === 'HORIZONTAL'"
-      //-   :items="node.items")
-      //-   template(v-slot:item=`{item,itemIndex,itemActive}`)
-      //-     ws-composition-editor(
-      //-       :sid="`wce-${itemIndex}`"
-      //-       :value="item"
-      //-       :options=`{
-      //-         isPreview: true,
-      //-         mode: 'player',
-      //-         mini: !itemActive,
-      //-         active: itemActive,
-      //-       }`
-      //-       :style=`{
-      //-         height: '100%',
-      //-       }`)
+      list-horizontal(
+        v-if="node.layout === 'HORIZONTAL'"
+        :items="node.items")
+        template(v-slot:item=`{item,itemIndex,itemActive}`)
+          ws-composition-editor(
+            :sid="`wce-${itemIndex}`"
+            :value="item"
+            :options=`{
+              isPreview: true,
+              mode: 'player',
+              mini: !itemActive,
+              active: itemActive,
+            }`
+            :style=`{
+              height: '100%',
+            }`)
     //- layout
     div(v-if="true").row.full-width.items-center.content-center.q-py-sm
       q-select(
         filled
         dark color="white"
-        :label="$t('Выберите шаблон')"
+        :label="$t('node_editor_choose_layout', 'Выбери шаблон')"
         :value="layout(node.layout)" @input="layoutSelected"
         :options="layouts"
         :style=`{

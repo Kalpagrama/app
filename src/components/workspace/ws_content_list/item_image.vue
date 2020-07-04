@@ -1,8 +1,8 @@
 <template lang="pug">
-div.col-xs-6.col-sm-4.q-pa-xs
+div.row.q-pa-xs
   div(
     @click="$emit('pick')"
-    :style=`{position: 'relative', borderRadius: '10px',}`).cursor-pointer.b-60
+    :style=`{position: 'relative', borderRadius: '10px',}`).row.full-width.cursor-pointer.b-60
     q-btn(
       round flat color="white" icon="more_vert"
       :style=`{
@@ -16,8 +16,11 @@ div.col-xs-6.col-sm-4.q-pa-xs
       :style=`{
         borderRadius: '10px',
       }`).full-width
-    div().row.full-width.q-pa-sm
-      small(:style=`{userSelect: 'none'}`).text-white {{ content.name }}
+    //- item name
+    div(
+      v-if="false"
+      :style=`{overflow: 'hidden',}`).row.full-width.q-pa-sm
+      small(:style=`{whiteSpace: 'nowrap', userSelect: 'none'}`).text-white {{ content.name }}
 </template>
 
 <script>

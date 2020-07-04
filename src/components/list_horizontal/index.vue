@@ -21,6 +21,7 @@ div(
       :started="itemStarted" :ended="itemEnded")
   //- resizer wrapper
   div(
+    v-if="items[1]"
     :style=`{
       position: 'absolute', zIndex: 2000,
       left: left+'px',
@@ -102,7 +103,10 @@ export default {
         this.resizerPanning = false
         this.resizerBarOver = false
       }
-      this.left += e.delta.x
+      let to = this.left + e.delta.x
+      if (to >= this.resizerBarWidth / 2 && to <= this.width - this.resizerBarWidth / 2) {
+        this.left = to
+      }
     },
     next () {
       this.$log('next')

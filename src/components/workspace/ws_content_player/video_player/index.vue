@@ -44,9 +44,20 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         objectFit: 'contain',
       }`
       ).fit
+    //- pause arrow
+    q-btn(
+      v-if="!playing && loadeddata"
+      @click="play()"
+      round flat color="white"
+      :style=`{
+        position: 'absolute', zIndex: 1000,
+        top: 'calc(50% - 50px)', left: 'calc(50% - 50px)',
+        width: '100px', height:'100px', borderRadius:'50%',
+      }`)
+      q-icon(name="play_arrow" size="100px" color="white")
     video-controls(
       v-if="options.controls && loadeddata"
-      @seeked="$emit('seeked')"
+      @seeked="$emit('seeked'), focused = true"
       :style=`{
         position: 'absolute', zIndex: 2000, bottom: '8px',
         left: '50%',
@@ -113,6 +124,7 @@ export default {
       currentTime: 0,
       playing: false,
       loadeddata: false,
+      focused: false,
     }
   },
   provide () {
@@ -147,6 +159,14 @@ export default {
       if (this.playing) this.player.pause()
       else this.player.play()
     },
+    play () {
+      this.$log('play')
+      this.player.play()
+    },
+    pause () {
+      this.$log('pause')
+      this.player.pause()
+    },
     playerPlay () {
       this.$log('playerPlay')
       this.playing = true
@@ -180,6 +200,7 @@ export default {
       // this.$log('setCurrentTime', t)
       this.currentTime = t
       this.player.currentTime = t
+      this.focused = false
     },
     playerInit () {
       this.$log('playerInit start')

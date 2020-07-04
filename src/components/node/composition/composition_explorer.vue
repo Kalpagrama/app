@@ -13,16 +13,15 @@ q-btn(
     background: 'rgba(0,0,0,0.2)',
   }`)
   span(v-if="!$q.screen.xs").q-ml-xs.text-white {{ contentName }}
-  //- composition editor
-  q-dialog(v-model="compositionEditorOpened" position="bottom")
-    ws-composition-editor(
-      v-if="compositionTemp"
-      @close="compositionEditorOpened = false"
-      :value="compositionTemp"
+  //- content explorer
+  q-dialog(v-model="contentExplorerOpened" position="bottom")
+    ws-content-explorer(
+      v-if="contentExplorerItem"
+      :value="contentExplorerItem"
+      @close="contentExplorerOpened = false"
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
-        maxWidth: $store.state.ui.maxWidthPage+'px',
       }`).b-50
 </template>
 
@@ -37,6 +36,8 @@ export default {
       compositionTemp: null,
       compositoinChanged: false,
       compositionEditorOpened: false,
+      contentExplorerItem: null,
+      contentExplorerOpened: false,
     }
   },
   computed: {
@@ -45,22 +46,27 @@ export default {
     }
   },
   watch: {
-    compositionTemp: {
-      deep: true,
-      async handler (to, from) {
-        this.$log('compositionTemp TO', to)
-        if (this.compositionChanged) return
-        this.compositionChanged = true
-        this.compositionTemp = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, this.compositionTemp)
-      }
-    }
   },
   methods: {
     async contentClick () {
       this.$log('contentClick')
       if (this.player) this.player.pause()
-      this.compositionTemp = await this.compositionInput(this.content)
-      this.compositionEditorOpened = true
+      this.contentExplorerItem = this.contentInput(this.content)
+      this.contentExplorerOpened = true
+    },
+    contentInput (content) {
+      this.$log('contentInput', content)
+      let input = {
+        wsItemType: 'WS_CONTENT',
+        thumbOid: content.thumbUrl,
+        contentOid: content.oid,
+        contentType: content.type,
+        name: content.name,
+        layers: [],
+        spheres: [],
+        operation: { items: null, operations: null, type: 'CONCAT' }
+      }
+      return input
     },
     async compositionInput (content) {
       this.$log('compositionInput content', content)

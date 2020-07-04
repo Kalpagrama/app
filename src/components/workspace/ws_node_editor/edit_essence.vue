@@ -8,7 +8,7 @@
     autogrow
     :readonly="!options.essenceEditable"
     :input-style=`{
-      minHeight: '80px',
+      minHeight: '60px',
     }`
     :style=`{
       maxWidth: '600px',

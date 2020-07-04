@@ -37,7 +37,7 @@ div(:style=`{position: 'relative'}`).column.fit
             :style=`{height: '50px',maxWidth: '600px'}`).full-width {{$t('node_fork', 'Взять и изменить')}}
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-py-sm
+    div(:style=`{paddinBottom: '400px',}`).row.full-width.items-start.content-start.q-py-sm
       div(
         v-for="(i,ii) in items" :key="i"
         :style=`{

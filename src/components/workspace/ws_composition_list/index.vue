@@ -1,6 +1,7 @@
 <template lang="pug">
 div(
   :class=`{
+    'full-height': !inDialog,
     'q-pt-sm': $q.screen.gt.xs,
   }`
   :style=`{
@@ -67,7 +68,7 @@ div(
         )
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-py-md.q-px-sm
+    .row.full-width.items-start.content-start.q-py-md
       kalpa-loader(:mangoQuery="mangoQuery" :key="i")
         template(v-slot=`{items}`)
           div(v-if="items.length > 0").row.full-width.items-start.content-start

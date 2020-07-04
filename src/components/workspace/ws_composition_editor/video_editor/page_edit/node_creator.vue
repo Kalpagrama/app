@@ -3,9 +3,9 @@ q-btn(
   dense flat color="green" no-caps
   @click="start()"
   :style=`{
-    //- borderBottom: '2px solid green',
   }`
-  ).q-px-sm {{ $t('create_node', 'Собрать ядро') }}
+  ).q-px-sm
+  span.text-bold.text-green {{ $t('create_node', 'Собрать ядро') }}
   q-dialog(v-model="nodeEditorOpened" position="bottom")
     ws-node-editor(
       @close="nodeEditorOpened = false"

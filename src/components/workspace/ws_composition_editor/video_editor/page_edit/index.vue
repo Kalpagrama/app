@@ -1,7 +1,10 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
   //- header: composition.name, check:close
-  .row.full-width.justify-center
+  //- composition.layers.length > 1 ? !storeEditor.layerEditing : true
+  div(
+    v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
+    ).row.full-width.justify-center
     name-editor(
       :composition="composition" @close="$emit('close')"
       :style=`{maxWidth: '600px'}`)
@@ -11,19 +14,21 @@ div(:style=`{position: 'relative'}`).column.fit
       //- body: layers, dragging
       .col.full-width.scroll
         .row.full-width.justify-center
-          div(:style=`{maxWidth: storeEditor.layerEditing ? '600px' : '680px'}`).row.full-width.justify-center.q-pt-sm
+          div(:style=`{maxWidth: storeEditor.layerEditing ? '680px' : '680px'}`).row.full-width.justify-center.q-pt-sm
             draggable(
               :list="composition.layers" group="layers" :sort="true" handle=".layer-drag-handle"
               @start="layersDragging = true"
               @end="layersDragging = false").full-width
               //- v-show="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
+              //- v-if="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
               div(
                 v-for="(l,li) in composition.layers" :key="li"
+                v-show="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
                 :style=`{}`
                 ).row.full-width.items-start.content-start.q-mb-xs
                 //- left: select
                 div(
-                  v-if="!storeEditor.layerEditing"
+                  v-if="composition.layers.length > 1 ? !storeEditor.layerEditing : false"
                   :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
                   q-checkbox(
                     v-model="layersSelected" :val="l.id"
@@ -37,21 +42,21 @@ div(:style=`{position: 'relative'}`).column.fit
                     :composition="composition" :layer="l" :layerIndex="li")
                 //- right: drag
                 div(
-                  v-if="!storeEditor.layerEditing"
+                  v-if="composition.layers.length > 1 ? !storeEditor.layerEditing : false"
                   :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
                   q-btn(
                     round flat dense color="grey-6" icon="drag_indicator").layer-drag-handle
                     kalpa-menu-popup(:actions="layerActions" :value="l")
             //- layer ADD
             div(
-              v-if="true"
+              v-show="true"
               :style=`{}`).row.full-width.justify-center
               div(:style=`{maxWidth: '680px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
                 q-btn(
                   @click="layerAdd()"
                   flat color="green" icon-right="add" no-caps
                   :style=`{height: '40px'}`
-                  ).full-width.b-70
+                  ).full-width
                   span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить фрагмент')}}
   //- footer: layersSelected
   div(
@@ -62,7 +67,7 @@ div(:style=`{position: 'relative'}`).column.fit
       paddingLeft: '40px', paddingRight: '40px',
     }`).row.full-width.justify-center.q-py-sm.b-70
     q-btn(flat dense color="white" no-caps @click="layersSelected = []") {{$t('cancel', 'Отмена')}}
-    q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('layers_delete', 'Удалить слои')}}
+    q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('layer_editor_layers_delete', 'Удалить фрагменты')}}
     .col
     //- layer-mover(:composition="composition" :layersSelected="layersSelected")
     //- q-btn(flat dense color="green" no-caps @click="")
@@ -73,12 +78,14 @@ div(:style=`{position: 'relative'}`).column.fit
       :style=`{
         maxWidth: '680px',
         paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
+      //- v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : false"
       composition-progress(
         v-if="composition.layers.length > 0"
-        v-show="composition.layers.length > 1 && !storeEditor.layerEditing"
+        v-show="!storeEditor.layerEditing"
         :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
       //- actions
-      div(v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true").row.full-width.items-center.content-center.q-py-xs
+      //- v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
+      div().row.full-width.items-center.content-center.q-py-xs
         q-btn(round flat dense color="red" icon="delete_outline" :style=`{opacity: 0.7}` @click="$emit('delete')")
         .col
         node-creator(:composition="composition")
@@ -156,6 +163,14 @@ export default {
       let i = this.composition.layers.findIndex(l => l.id === layer.id)
       this.$log('i', i)
       if (i >= 0) this.$delete(this.composition.layers, i)
+      this.layerDeleteAfter()
+    },
+    layerDeleteAfter () {
+      this.$log('layerDeleteAfter')
+      if (this.composition.layers.length === 1) {
+        alert('layerDeleteAfter')
+        this.layerEdit({id: this.composition.layers[0].id})
+      }
     },
     layerDrop () {
       this.$log('layerDrop')
@@ -166,7 +181,8 @@ export default {
       this.$log('layerAdd')
       this.layerDrop()
       let id = this.storeEditor.layerAdd()
-      this.layerEdit({id})
+      this.storeEditor.layerPlaying = id
+      // this.layerEdit({id})
     },
     layersSelectedDelete () {
       this.$log('layersSelectedDelete')
@@ -178,8 +194,10 @@ export default {
         let i = this.composition.layers.findIndex(l => l.id === id)
         if (i >= 0) this.$delete(this.composition.layers, i)
       })
+      this.layerDeleteAfter()
       this.layersSelected = []
     },
+    // move to layer mover
     layersSelectedMove () {
       this.$log('layersSelectedMove')
       // find the composition layers to move to?

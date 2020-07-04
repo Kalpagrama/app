@@ -68,7 +68,7 @@ const routes = [
           // node
           { name: 'node-list', path: 'node', component: () => import('components/workspace/ws_node_list') },
           { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
-          { name: 'node-editor', path: 'node/:id', component: () => import('components/workspace/ws_node_editor') },
+          { name: 'node-editor', path: 'node/:id', component: () => import('components/workspace/ws_node_editor_new') },
           // chain
           { name: 'chain-list', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
           { name: 'chain-editor', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },

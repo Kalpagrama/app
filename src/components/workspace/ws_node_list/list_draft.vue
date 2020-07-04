@@ -34,7 +34,8 @@ div(:style=`{position: 'relative'}`).column.fit
   .col.full-width.scroll
     .row.fit.items-start.content-start.justify-center.q-py-sm
       div(
-        v-if="items.length > 0").row.full-width.items-start.content-start
+        v-if="items.length > 0"
+        :style=`{paddingBottom: '400px'}`).row.full-width.items-start.content-start
         div(
           v-for="(i,ii) in items" :key="i"
           :style=`{
@@ -46,12 +47,14 @@ div(:style=`{position: 'relative'}`).column.fit
           ).row.full-width.node-saved.b-60.q-mb-sm
           img(
             @click="nodeEdit(i,ii)"
-            :src="i.thumbOid" :style=`{height: '100%',borderRadius: '10px',overflow: 'hidden',}`)
+            :src="i.items.thumbOid" :style=`{height: '100%',borderRadius: '10px',overflow: 'hidden',}`)
           div(
             @click="nodeEdit(i,ii)"
             ).col.full-height
             .row.fit.items-start.content-start.q-pa-md
               span.text-white.text-bold {{ i.name }}
+              .row.full-width
+                small.text-white items: {{ i.items.length }}
           .row.full-height.items-start.content-start
             q-btn(round flat dense color="red" icon="delete_outline" @click="nodeDelete(i,ii)")
 </template>

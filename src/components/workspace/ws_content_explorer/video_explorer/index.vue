@@ -3,6 +3,7 @@ div(
   :style=`{
     position: 'relative',
     minWidth: pageFullscreen ? $q.screen.width+'px' : pageMinWidth+'px',
+    borderRadius: '10px', overflow: 'hidden',
   }`
   ).column.full-width.items-center.b-50
   //- close btn
@@ -28,6 +29,7 @@ div(
           :style=`{borderRadius: '50%',}`)
       //- template(v-slot:controls)
       //-   composition-name-init(v-if="pageId === 'compositions'")
+  //- kalpa-debug(:options=`{compositionPlaying,compositionEditing}`)
   //- pages:
   component(
     v-if="storePlayer && storePlayer.loadeddata"

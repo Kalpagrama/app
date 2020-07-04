@@ -17,6 +17,7 @@ div(:style=`{position: 'relative',}`).column.fit
         .row.fit.items-start.content-start.justify-center.q-py-md
           //- compositions on content bar
           div(
+            v-if="!storeExplorer.compositionEditing"
             :style=`{
               position: 'absolute', zIndex: 99999, left: 0, top: '-38px', transform: 'translate3d(0,0,0)',
               height: '30px', pointerEvents: 'none',
@@ -149,9 +150,7 @@ export default {
     async compositionDelete (c) {
       this.$log('compositionDelete')
       if (!confirm('Delete composition ?')) return
-      if (this.storeExplorer.compositionPlaying === c.id) {
-        this.compositionDrop()
-      }
+      if (this.storeExplorer.compositionPlaying === c.id || this.storeExplorer.compositionEditing === c.id) this.compositionDrop()
       await this.$rxdb.remove(c.id)
       this.$log('compositionDelete done')
     },
@@ -192,14 +191,13 @@ export default {
     },
     async compositionsSelectedDelete () {
       this.$log('compositionsSelectedDelete start')
-      if (!confirm('Delete selected ?')) return
-      // find current comp in selected
-      if (this.storeExplorer.compositionsSelected.includes(this.storeExplorer.compositionPlaying)) {
-        this.compositionDrop()
-      }
+      if (!confirm(this.$t('confirm_delete_compositions', 'Удалить образы?'))) return
       // delete compositions
       await Promise.all(
         this.storeExplorer.compositionsSelected.map(async (id) => {
+          // find current comp in selected
+          if (this.storeExplorer.compositionPlaying === id || this.storeExplorer.compositionEditing === id) this.compositionDrop()
+          this.$log('compositionsSelectedDelete id', id)
           await this.$rxdb.remove(id)
         })
       )

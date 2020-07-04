@@ -1,13 +1,17 @@
 <template lang="pug">
 div(
   :class=`{
-    'b-60': true,
+    'b-90': storeEditor.layerEditing === layer.id,
   }`
   :style=`{
     position: 'relative',
     borderRadius: '10px',
     overflow: 'hidden',
-  }`).row.full-width.b-70
+  }`).row.full-width.b-60
+  //- debug
+  //- kalpa-debug(
+  //-   :options=`{layerPlaying:storeEditor.layerPlaying}`
+  //-   :style=`{order: -2}`)
   //- layer close
   q-btn(
     v-if="storeEditor.layerEditing === layer.id && composition.layers.length > 1"
@@ -16,39 +20,39 @@ div(
     :style=`{position: 'absolute', right: '4px', bottom: 0, zIndex: 1000,}`)
   //- layer tune
   q-btn(
-    v-if="storeEditor.layerEditing === layer.id"
+    v-if="storeEditor.layerEditing === layer.id && true"
     @click="editing = !editing"
     round dense flat icon="tune"
     :color="editing ? 'green' : 'grey-2'"
     :style=`{position: 'absolute', left: '4px', bottom: 0, zIndex: 1000,}`)
   //- frames: mini editing...
-  div(v-if="storeEditor.layerEditing === layer.id").row.full-width
-    layer-frames(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-    //- editing
-    div(:style=`{opacity: editing ? 1 : 0}`).row.full-width
-      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70
-        div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.b-80.q-px-xs
-          q-btn(round flat dense color="white" icon="play_arrow")
-          .col.q-px-xs
-            layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-          q-btn(round flat dense color="white" icon="refresh")
-        //- layer-actions(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-        div().row.full-width
-          div(:style=`{paddingLeft: '40px', paddingRight: '40px'}`).row.full-width
-            q-btn(round flat dense color="grey-6" icon="flip").q-mr-xs.rotate-180
-            q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left")
-            q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right")
-            .col
-            q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left")
-            q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right")
-            q-btn(round flat dense color="grey-6" icon="flip")
-            div(:style=`{}`)
-          //- q-btn(round flat dense color="green" icon="check")
+  div(:style=`{position: 'relative', overflow: 'hidden',}`).row.full-width
+    transition(appear enter-active-class="animated slideInDown")
+      div(v-if="storeEditor.layerEditing === layer.id").row.full-width
+        layer-frames(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+        //- editing
+        div(:style=`{opacity: editing ? 1 : 0}`).row.full-width
+          div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70
+            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.b-80.q-px-xs
+              q-btn(round flat dense color="white" icon="play_arrow")
+              .col.q-px-xs
+                layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+              q-btn(round flat dense color="white" icon="refresh")
+            //- layer-actions(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+            div().row.full-width
+              div(:style=`{paddingLeft: '40px', paddingRight: '40px'}`).row.full-width
+                q-btn(round flat dense color="grey-6" icon="flip").q-mr-xs.rotate-180
+                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left")
+                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right")
+                .col
+                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left")
+                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right")
+                q-btn(round flat dense color="grey-6" icon="flip")
   //- name editor
   div(
-    v-if="storeEditor.layerEditing !== layer.id"
+    v-if="composition.layers.length > 1"
     :style=`{
-      position: 'relative', borderRadius: '10px', overflow: 'hidden',
+      position: 'relative', borderRadius: '10px', overflow: 'hidden', order: -1,
     }`).row.full-width.justify-center
     q-input(
       :value="layerName"
@@ -136,23 +140,30 @@ export default {
     }
   },
   watch: {
+    'storePlayer.focused': {
+      handler (to, from) {
+        this.$log('storePlayer.focused TO', to)
+        this.storeEditor.layerPlaying = null
+        // alert('storePlayer.focused TO: ' + to)
+      }
+    },
     'storeEditor.layerPlaying': {
       immediate: true,
       handler (to, from) {
-        // if (to === this.layer.id) {
-        //   // alert('START WATCH: ' + this.layer.id)
-        //   this.watcherCurrentTime = this.$watch('storePlayer.currentTime', (to, from) => {
-        //     if (this.storeEditor.compositionPlaying) return
-        //     this.$log('storePlayer.currentTime TO', to)
-        //     if (to > this.layerEnd || to < this.layerStart) {
-        //       this.storePlayer.setCurrentTime(this.layerStart)
-        //     }
-        //   })
-        // }
-        // else {
-        //   // alert('UNWATCH: ' + this.layer.id)
-        //   if (this.watcherCurrentTime) this.watcherCurrentTime()
-        // }
+        if (to === this.layer.id) {
+          // alert('START WATCH: ' + this.layer.id)
+          this.watcherCurrentTime = this.$watch('storePlayer.currentTime', (to, from) => {
+            // if (this.storeEditor.compositionPlaying) return
+            this.$log('storePlayer.currentTime TO', to)
+            if (to > this.layerEnd || to < this.layerStart) {
+              this.storePlayer.setCurrentTime(this.layerStart)
+            }
+          })
+        }
+        else {
+          // alert('UNWATCH: ' + this.layer.id)
+          if (this.watcherCurrentTime) this.watcherCurrentTime()
+        }
       }
     },
   },

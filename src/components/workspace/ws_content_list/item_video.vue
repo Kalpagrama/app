@@ -24,9 +24,9 @@ div(
     }`)
   .col.full-height
     .row.fit.items-between.content-between.q-pa-sm
-      span.text-white.text-bold {{ content.name }}
+      span(:style=`{fontSize: $q.screen.width > 600 ? '14px' : '12px'}`).text-white.text-bold {{ contentName }}
       .row.full-width
-        small.text-grey-5 {{ contentKalpa.name }}
+        small(:style=`{fontSize: $q.screen.width > 600 ? '12px' : '10px'}`).text-grey-5 {{ contentKalpaName }}
 </template>
 
 <script>
@@ -35,6 +35,14 @@ export default {
   props: ['content', 'contentKalpa'],
   data () {
     return {
+    }
+  },
+  computed: {
+    contentName () {
+      return this.content.name.slice(0, 50)
+    },
+    contentKalpaName () {
+      return this.contentKalpa.name.slice(0, 50)
     }
   }
 }

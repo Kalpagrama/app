@@ -117,7 +117,8 @@ export default {
       let {items: nodeFind} = await this.$rxdb.find({
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          oid: this.node.oid
+          oid: this.node.oid,
+          stage: 'saved',
         }
       })
       this.$log('nodeFind', nodeFind)

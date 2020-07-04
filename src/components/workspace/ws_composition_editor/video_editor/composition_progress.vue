@@ -1,5 +1,10 @@
 <template lang="pug">
-div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70
+div(
+  :style=`{
+    position: 'relative',
+    borderRadius: '10px',
+    overflow: 'hidden'
+  }`).row.full-width.b-70
   //- bar
   div(:style=`{position: 'relative', height: '40px'}`).row.full-width
     //- stats
@@ -44,7 +49,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           height: 'calc(100% + 8px)',
           width: '3px',
           pointerEvents: 'none',
-        }`).row.bg-green
+        }`).row.bg-red
       //- layers stats
       div(
         v-for="(l,li) in layersStats" :key="li"
@@ -56,7 +61,6 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
           pointerEvents: 'none',
         }`
         ).row.full-height.bg-white
-        //- small {{ li }}
   //- bar actions
   .row.full-width.q-pa-xs
     q-btn(
@@ -142,7 +146,8 @@ export default {
       handler (to, from) {
         // this.$log('currentTime TO', to)
         // if (!this.active) return
-        if (!this.storeEditor.compositionPlaying) return
+        // if (!this.storeEditor.compositionPlaying) return
+        if (this.storeEditor.layerEditing) return
         if (this.currentTimeStop) return
         if (to > this.layerActiveEnd) {
           // try to find next layerActive
@@ -171,8 +176,15 @@ export default {
         this.storeEditor.compositionPlaying = true
       }
     },
+    compositionRefresh () {
+      this.$log('compositionRefresh')
+      this.layerActiveSet(0)
+      this.storePlayer.player.play()
+    },
+    // layer
     layerPrev () {
       this.$log('layerPrev')
+      this.storePlayer.pause()
       if (this.composition.layers[this.layerActive - 1]) {
         this.layerActiveSet(this.layerActive - 1)
       }
@@ -182,17 +194,13 @@ export default {
     },
     layerNext () {
       this.$log('layerNext')
+      this.storePlayer.pause()
       if (this.composition.layers[this.layerActive + 1]) {
         this.layerActiveSet(this.layerActive + 1)
       }
       else {
         this.layerActiveSet(0)
       }
-    },
-    compositionRefresh () {
-      this.$log('compositionRefresh')
-      this.layerActiveSet(0)
-      this.storePlayer.player.play()
     },
     layerActiveSet (index) {
       this.$log('layerActiveSet', index)
@@ -226,7 +234,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    this.compositionRefresh()
+    this.layerActiveSet(0)
+    this.storePlayer.play()
+    // this.compositionRefresh()
   }
 }
 </script>

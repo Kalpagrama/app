@@ -1,6 +1,7 @@
 <template lang="pug">
 div(
   :class=`{
+    'full-height': !inDialog,
     'q-pt-sm': $q.screen.gt.xs
   }`
   :style=`{
@@ -56,14 +57,14 @@ div(
         kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.justify-center.q-py-md.q-px-sm
+    .row.full-width.items-start.content-start.justify-center.q-py-md
       kalpa-loader(:mangoQuery="mangoQuery" :key="i")
         template(v-slot=`{items}`)
-          div(v-if="items.length > 0" :style=`{maxWidth: '800px'}`).row.full-width
-            div(v-if="type === 'VIDEO'")
+          div(v-if="items.length > 0" :style=`{maxWidth: '800px', paddingBottom: '400px',}`).row.full-width
+            div(v-if="type === 'VIDEO'").row.full-width
               content-item(v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c" @pick="contentPicked(c,ci)")
-            div(v-if="type === 'IMAGE'")
-              masonry(:cols="3" :gutter="0")
+            div(v-if="type === 'IMAGE'").row.full-width
+              masonry(:cols="$q.screen.width < 600 ?  2 : 3" :gutter="0").full-width
                 content-item(v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c" @pick="contentPicked(c,ci)")
           //- nothing found
           div(
