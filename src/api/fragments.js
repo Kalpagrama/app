@@ -244,7 +244,7 @@ const eventFragment = gql`
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
     }
-    ... on EventNodeCreate{
+    ... on EventObjectCreateDelete{
       subject{... objectShortFragment}
       object{... objectShortWithMetaFragment}
       sphereOids

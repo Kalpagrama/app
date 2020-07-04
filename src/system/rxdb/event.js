@@ -59,8 +59,12 @@ class Event {
         if (event.subject.oid === localStorage.getItem('k_user_oid')) {
           this.notifyUserActionComplete(event.type, event.object)
         }
-        // поместить ядро во все ленты
-        await this.lists.processEvent(event)
+        await this.lists.processEvent(event) // поместить объект во все ленты
+        break
+      case 'OBJECT_DELETED':
+        this.notifyUserActionComplete(event.type, event.object)
+        await this.objects.processEvent(event) // обновить ядро
+        await this.lists.processEvent(event) // удалить объект из всех лент
         break
       case 'CHAIN_CREATED':
         if (event.subject.oid === rxdb.currentUser().oid) {
@@ -75,10 +79,6 @@ class Event {
         }
         await this.objects.processEvent(event) // обновить ядро
         await this.lists.processEvent(event) // обновить личную сферу юзера (если голосовал текущий пользователь)
-        break
-      case 'OBJECT_DELETED':
-        this.notifyUserActionComplete(event.type, event.object)
-        await this.objects.processEvent(event) // обновить ядро
         break
       case 'USER_SUBSCRIBED':
         this.notifyUserActionComplete(event.type, event.object)
