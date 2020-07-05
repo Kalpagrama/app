@@ -1,7 +1,7 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'relative',
+    position: 'relative', zIndex: 99999,
     borderRadius: $q.screen.gt.xs ? '10px' : 'none',
     overflow: 'hidden',
   }`
@@ -57,7 +57,7 @@ div(
         edit-spheres(:node="node")
   //- publish
   .row.full-width.justify-center
-    div(:style=`{maxWidth: '600px', paddingBottom: '60px',}`).row.full-width.q-pb-sm
+    div(:style=`{maxWidth: '600px'}`).row.full-width.q-pb-sm
       q-btn(
         @click="publish"
         push color="green" no-caps

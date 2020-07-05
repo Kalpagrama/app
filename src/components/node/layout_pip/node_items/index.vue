@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width
+div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-start.content-start
   //- items preview: first item from meta => shaping the size
   img(
     @load="previewLoad"
@@ -7,7 +7,7 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width
     :src="previewUrl" draggable="false"
     :style=`{
       userSelect: 'none', objectFit: 'contain',
-      maxHeight: $q.screen.height-200+'px',
+      maxHeight: $q.screen.height-300+'px',
       opacity: started ? 0 : 1,
     }`
     ).full-width

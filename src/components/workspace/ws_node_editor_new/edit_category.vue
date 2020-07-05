@@ -42,6 +42,10 @@ export default {
     category (val) {
       return this.categories.find(c => c.value === val)
     },
+    categorySelected (val) {
+      this.$log('categorySelected', val)
+      this.node.category = val.value
+    }
   },
   async beforeCreate () {
     this.$log('beforeCreate')

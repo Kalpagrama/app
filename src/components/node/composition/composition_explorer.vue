@@ -19,6 +19,9 @@ q-btn(
       v-if="contentExplorerItem"
       :value="contentExplorerItem"
       @close="contentExplorerOpened = false"
+      :options=`{
+        ctx: 'explorer',
+      }`
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',

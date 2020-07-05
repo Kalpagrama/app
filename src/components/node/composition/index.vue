@@ -10,7 +10,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
     :style=`{
       objectFit: 'contain',
       opacity: loaded ? 0 : 1,
-      maxHeight: $q.screen.height-120+'px',
+      maxHeight: $q.screen.height-300+'px',
     }`
     ).fit.cursor-pointer
   //- debug
@@ -87,7 +87,7 @@ export default {
       duration: 0,
       playing: false,
       playsinline: true,
-      muted: false,
+      muted: true,
     }
   },
   watch: {

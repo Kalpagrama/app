@@ -1,69 +1,66 @@
 <style lang="sass" scoped>
-.node
+.node-saved
   cursor: pointer
   &:hover
-    background: rgb(90,90,90)
+    background: rgb(60,60,60)
 </style>
 
 <template lang="pug">
-div(:style=`{borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden',}`).row.full-width.items-end.b-60
-  div(v-if="node.stage === 'saved'" :style=`{height: '100px',}`).row.full-width.cursor-pointer
-    img(
-      :src="node.thumbOid"
-      :style=`{
-        objectFit: 'cover',
-        borderRadius: $store.state.ui.borderRadius+'px',
-        overflow: 'hidden',
-      }`
-      ).full-height
-    .col.full-height
-      .row.fit.items-start.content-start.q-pa-sm
-        span.text-white.text-bold {{ node.name }}
+.col-xs-12.col-sm-6.q-pa-sm
   div(
-    v-else
+    @click.self="onClick()"
     :style=`{
       position: 'relative',
-      minHeight: '50px',
-      borderRadius: $store.state.ui.borderRadius+'px',
-      overflow: 'hidden',
+      minHeight: '100px',
+      borderRadius: '10px',
     }`
-    ).row.full-width.items-start.content-start.b-70.node
-    div(
-      @click="nodeClick()"
-      v-if="node.items.length > 0"
+    ).row.full-width.node-saved.q-pa-sm.b-50
+    //- actions
+    q-btn(
+      round flat dense color="grey-7" icon="more_vert"
       :style=`{
-        borderRadius: $store.state.ui.borderRadius+'px',
-        overflow: 'hidden',
-      }`
-      ).row.full-width
-      div(
-        v-for="(i,ii) in node.items" :key="ii"
-        :style=`{height: 150+'px'}`
-        ).col.bg-black
-        img(
-          :src="i.thumbOid"
-          :style=`{objectFit: 'contain'}`
-          ).fit.cursor-pointer
+        position: 'absolute', zIndex: 999, top: '4px', right: 0,
+      }`)
+      kalpa-menu-popup(:actions="actions")
+    //- previews
     div(
-      v-if="true"
-      :style=`{height: '50px'}`).row.full-width
-      .col.full-height
-        div(
-          @click="nodeClick()"
-          ).row.fit.items-center.content-center.q-pl-md
-          span(
-            :style=`{
-              userSelect: 'none'
-            }`
-            ).text-white.text-bold {{ nodeName }}
-      div(:style=`{}`).row.full-height.items-center.content-center.justify-center.q-px-sm
-        q-btn(round flat dense color="grey-6" icon="more_vert")
-          kalpa-menu-popup(:actions="actions")
+      v-if="node.items[0]"
+      @click="onClick()"
+      :style=`{position: 'relative',}`).row.full-height
+      img(
+        :src="node.items[0].thumbOid"
+        draggable="false"
+        :style=`{
+          zIndex: 100,
+          height: '100px',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          userSelect: 'none',
+        }`).shadow-10
+      img(
+        v-for="(i,ii) in node.items" :key="ii"
+        v-if="ii > 0"
+        :src="i.thumbOid"
+        draggable="false"
+        :style=`{
+          position: 'absolute', zIndex: 100-ii,
+          left: (33*ii)+'%',
+          top: (5*ii)+'px',
+          height: 100-(10*ii)+'%',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          opacity: 1-(0.1*ii),
+          userSelect: 'none',
+        }`).shadow-5
+    div(
+      @click="$emit('preview')"
+      ).row.full-width.q-pa-sm
+      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{nodeName }}
 </template>
 
 <script>
 export default {
-  name: 'wsNodeList-nodeItem',
+  name: 'nodeItem',
   props: ['node', 'nodeIndex'],
   data () {
     return {
@@ -74,50 +71,34 @@ export default {
       return this.node.name
     },
     actions () {
-      let res = {
-        edit: {
-          name: 'Edit',
-          fn: () => {
-            this.$log('Edit')
-            this.$emit('edit')
-          }
-        },
-        preview: {
-          name: 'Preview',
-          fn: () => {
-            this.$log('Preview')
-          }
-        },
-        share: {
-          name: 'Share',
-          fn: () => {
-            this.$log('Share')
-          }
-        },
-        delete: {
-          name: 'Delete',
-          visible: this.node.stage !== 'published',
-          fn: () => {
-            this.$log('Delete')
-            this.$emit('delete')
-          }
-        },
-        cancelPublish: {
-          name: 'Cancel Publish',
-          visible: this.node.stage === 'published',
-          fn: () => {
-            this.$log('cancelPublish')
-            this.$emit('cancelPublish')
-          }
+      if (this.node.stage === 'draft') {
+        return {
+          edit: {name: this.$t('nodeItemAction_edit', 'Редактировать'), fn: () => { this.$emit('edit') }},
+          delete: {name: this.$t('nodeItemAction_delete', 'Удалить'), fn: () => { this.$emit('delete') }}
         }
       }
-      return res
+      else if (this.node.stage === 'saved') {
+        return {
+          fork: {name: this.$t('nodeItemAction_fork', 'Форкнуть'), fn: () => { this.$emit('fork') }},
+          unSave: {name: this.$t('nodeItemAction', 'Удалить из сохраненных'), fn: () => { this.$emit('unSave') }},
+        }
+      }
+      else if (this.node.stage === 'published') {
+        return {
+          fork: {name: this.$t('nodeItemAction_fork', 'Форкнуть'), fn: () => { this.$emit('fork') }},
+          unPublish: {name: this.$t('nodeItemAction_upPublish', 'Снять с публикации'), fn: () => { this.$emit('upPublish') }}
+        }
+      }
+      else {
+        return {}
+      }
     }
   },
   methods: {
-    nodeClick () {
-      this.$log('nodeClick')
-      this.$emit('edit')
+    onClick () {
+      this.$log('onClick')
+      if (this.node.stage === 'draft') this.$emit('edit')
+      else this.$emit('preview')
     }
   }
 }

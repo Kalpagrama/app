@@ -11,6 +11,7 @@ div(
     @click="$emit('close')"
     round flat color="white" icon="keyboard_arrow_left"
     :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.1)'}`)
+  kalpa-debug(:options=`{options}` :style=`{position: 'absolute', zIndex: 2000, top: '60px', left: '0px',}`)
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px',}`).col.full-width
     ws-content-player(
@@ -29,7 +30,6 @@ div(
           :style=`{borderRadius: '50%',}`)
       //- template(v-slot:controls)
       //-   composition-name-init(v-if="pageId === 'compositions'")
-  //- kalpa-debug(:options=`{compositionPlaying,compositionEditing}`)
   //- pages:
   component(
     v-if="storePlayer && storePlayer.loadeddata"

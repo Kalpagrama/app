@@ -7,6 +7,50 @@ div(
     position: 'relative'
   }`
   ).column.fit
+  //- node ADD
+  q-btn(
+    @click="nodeAddBtn()"
+    push round color="green" icon="add"
+    :size="$q.screen.gt.xs ? 'xl' : 'lg'"
+    :style=`{
+      position: 'absolute', zIndex: 1000, right: '10px',
+      bottom: $q.screen.width > 1260 ? 10+'px' : 60+10+'px',
+      borderRadius: '50%'
+    }`)
+  //- node EDITOR
+  q-dialog(v-model="nodeEditorOpened" position="bottom")
+    ws-node-editor(
+      ctx="workspace"
+      :value="nodeEditorItem"
+      @published="nodePublished"
+      @close="nodeEditorOpened = false"
+      :style=`{
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+        minHeight: $q.screen.height+'px',
+        maxHeight: $q.screen.height+'px',
+        height: $q.screen.height+'px',
+      }`)
+  //- node PREVIEW
+  q-dialog(v-model="nodePreviewOpened" position="bottom")
+    div(
+      :style=`{
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+        maxWidth: '800px',
+        borderRadius: '10px',overflow: 'hidden',
+      }`).column.b-50
+      //- body
+      .col.full-width
+        node(:node="nodePreviewItem" :nodeFullReady="nodePreviewItem" :active="true" :visible="true" :mini="false")
+      //- footer
+      .row.full-width.items-center.content-center.q-pa-sm
+        q-btn(
+          round flat color="white" icon="keyboard_arrow_left" @click="nodePreviewOpened = false")
+        .col.q-pl-sm
+          q-btn(
+            @click="nodeFork(nodeEditorItem)"
+            push color="green" no-caps icon="photo_filter"
+            :style=`{height: '42px',}`).full-width {{$t('node_fork', 'Взять и изменить')}}
   //- header
   div(
     :style=`{
@@ -31,16 +75,23 @@ div(
           q-btn(
             flat dense color="white" icon="filter_list")
     //- actions
-    .row.full-width.items-end.content-end.q-px-sm.q-pb-sm
-      kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start
+    div(:style=`{}`).row.full-width.items-end.content-end.q-px-sm.q-pb-sm.scroll
+      .row.no-wrap
+        kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start
   //- body
-  .col.full-width
+  .col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery")
       template(v-slot=`{items}`)
         .row.fit.items-start.content-start
-          list-published(v-if="type === 'saved'" :items="items")
-          list-draft(v-if="type === 'draft'" :items="items")
-          list-published(v-if="type === 'published'" :items="items")
+          node-item(
+            v-for="(i,ii) in items" :key="i"
+            :node="i" :nodeIndex="ii"
+            @preview="nodePreview(i)"
+            @delete="nodeDelete(i)"
+            @edit="nodeEdit(i)"
+            @unSave="nodeUnSave(i)"
+            @unPublish="nodeUnPublish(i)"
+            @fork="nodeFork(i)")
 </template>
 
 <script>
@@ -48,16 +99,19 @@ import assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { NodeApi } from 'src/api/node'
 
-import listDraft from './list_draft'
-import listPublished from './list_published'
+import nodeItem from './node_item'
 
 export default {
   name: 'wsNodeLsit',
-  components: {listDraft, listPublished},
+  components: {nodeItem},
   data () {
     return {
       type: 'draft',
       searchString: '',
+      nodeEditorItem: null,
+      nodeEditorOpened: false,
+      nodePreviewItem: null,
+      nodePreviewOpened: false,
     }
   },
   computed: {
@@ -87,6 +141,68 @@ export default {
   watch: {
   },
   methods: {
+    async nodePreview (n) {
+      this.$log('nodePreview', n)
+      this.nodeEditorItem = n
+      this.nodePreviewItem = await this.$rxdb.get(RxCollectionEnum.OBJ, n.oid)
+      this.nodePreviewOpened = true
+    },
+    nodeEdit (n) {
+      this.$log('nodeEdit', n)
+      this.nodeEditorItem = n
+      this.nodeEditorOpened = true
+    },
+    async nodeFork (n) {
+      this.$log('nodeFork', n)
+      this.nodePreviewOpened = false
+      await this.nodeEdit(await this.nodeAdd(JSON.parse(JSON.stringify(n))))
+    },
+    async nodeDelete (n) {
+      this.$log('nodeDelete', n)
+      if (!confirm(this.$t('delete_node?', 'Удалить ядро?'))) return
+      await this.$rxdb.remove(n.id)
+    },
+    async nodeAddBtn () {
+      this.$log('nodeAddBtn')
+      this.nodeEdit(await this.nodeAdd())
+    },
+    async nodeAdd (nodeInput) {
+      this.$log('nodeAdd start')
+      if (!nodeInput) {
+        nodeInput = {
+          name: '',
+          wsItemType: 'WS_NODE',
+          items: [],
+          spheres: [],
+          category: 'FUN',
+          layout: 'PIP',
+          stage: 'draft'
+        }
+      }
+      delete nodeInput.id
+      delete nodeInput.oid
+      // set defaults
+      nodeInput.stage = 'draft'
+      nodeInput.wsItemType = 'WS_NODE'
+      let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('nodeAddStart item', item)
+      return item
+    },
+    async nodeUnPublish (node) {
+      this.$log('nodeUnPublish', node)
+      // TODO: impl
+    },
+    async nodeUnSave (node) {
+      this.$log('nodeUnSave', node)
+      await this.nodeDelete(node)
+    },
+    async nodePublished (oid) {
+      this.$log('nodePublished')
+      // TODO: go to node page and see loader...
+      // this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
+      await this.$wait(300)
+      this.$router.push(`/node/${oid}`)
+    },
   }
 }
 </script>
