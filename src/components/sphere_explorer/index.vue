@@ -1,6 +1,6 @@
 <template lang="pug">
 kalpa-layout(
-  :title="sphere ? '🔆 ' + sphere.name : ''"
+  :title="sphere ? '🔆 '+sphere.name : ''"
   :style=`{height: $q.screen.height+'px'}`)
   template(v-slot:header)
     .row.full-width.justify-center
