@@ -14,13 +14,15 @@ div(:style=`{position: 'relative'}`).column.fit
       //- body: layers, dragging
       .col.full-width.scroll
         .row.full-width.justify-center
-          div(:style=`{maxWidth: storeEditor.layerEditing ? '680px' : '680px'}`).row.full-width.justify-center.q-pt-sm
+          div(
+            :class=`{
+              'q-pt-sm': !storeEditor.layerEditing,
+            }`
+            :style=`{maxWidth: storeEditor.layerEditing ? '680px' : '680px'}`).row.full-width.justify-center
             draggable(
               :list="composition.layers" group="layers" :sort="true" handle=".layer-drag-handle"
               @start="layersDragging = true"
               @end="layersDragging = false").full-width
-              //- v-show="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
-              //- v-if="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
               div(
                 v-for="(l,li) in composition.layers" :key="li"
                 v-show="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
@@ -49,15 +51,22 @@ div(:style=`{position: 'relative'}`).column.fit
                     kalpa-menu-popup(:actions="layerActions" :value="l")
             //- layer ADD
             div(
-              v-show="true"
               :style=`{}`).row.full-width.justify-center
               div(:style=`{maxWidth: '680px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
                 q-btn(
+                  v-if="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
                   @click="layerAdd()"
                   flat color="green" icon-right="add" no-caps
                   :style=`{height: '40px'}`
                   ).full-width
                   span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить фрагмент')}}
+                q-btn(
+                  v-if="composition.layers.length > 1 ? storeEditor.layerEditing : false"
+                  @click="storeEditor.layerEditing = null, storeEditor.layerPlaying = null"
+                  flat color="green" icon-right="check" no-caps
+                  :style=`{height: '40px'}`
+                  ).full-width
+                  span.text-bold.q-mx-sm {{$t('layer_drop', 'Готово')}}
   //- footer: layersSelected
   div(
     v-if="layersSelected.length > 0"
@@ -74,21 +83,23 @@ div(:style=`{position: 'relative'}`).column.fit
   //- footer: progress, actions: delete,create_node
   .row.full-width.justify-center
     div(
-      v-if="layersSelected.length === 0"
+      v-show="layersSelected.length === 0"
       :style=`{
         maxWidth: '680px',
         paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
-      //- v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : false"
       composition-progress(
         v-if="composition.layers.length > 0"
         v-show="!storeEditor.layerEditing"
         :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
       //- actions
-      //- v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
-      div().row.full-width.items-center.content-center.q-py-xs
+      div(
+        v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
+        ).row.full-width.items-center.content-center.q-py-xs
         q-btn(round flat dense color="red" icon="delete_outline" :style=`{opacity: 0.7}` @click="$emit('delete')")
         .col
-        node-creator(:composition="composition")
+        node-creator(
+          v-show="composition.layers.length > 0"
+          :composition="composition")
         .col
         q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
 </template>
@@ -168,7 +179,7 @@ export default {
     layerDeleteAfter () {
       this.$log('layerDeleteAfter')
       if (this.composition.layers.length === 1) {
-        alert('layerDeleteAfter')
+        // alert('layerDeleteAfter')
         this.layerEdit({id: this.composition.layers[0].id})
       }
     },

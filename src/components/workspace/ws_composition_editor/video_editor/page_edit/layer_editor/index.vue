@@ -14,13 +14,13 @@ div(
   //-   :style=`{order: -2}`)
   //- layer close
   q-btn(
-    v-if="storeEditor.layerEditing === layer.id && composition.layers.length > 1"
+    v-if="false && storeEditor.layerEditing === layer.id && composition.layers.length > 1"
     @click="storeEditor.layerEditing = null"
     round flat dense color="green" icon="check"
     :style=`{position: 'absolute', right: '4px', bottom: 0, zIndex: 1000,}`)
   //- layer tune
   q-btn(
-    v-if="storeEditor.layerEditing === layer.id && true"
+    v-if="false && storeEditor.layerEditing === layer.id && true"
     @click="editing = !editing"
     round dense flat icon="tune"
     :color="editing ? 'green' : 'grey-2'"
@@ -31,7 +31,7 @@ div(
       div(v-if="storeEditor.layerEditing === layer.id").row.full-width
         layer-frames(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
         //- editing
-        div(:style=`{opacity: editing ? 1 : 0}`).row.full-width
+        div(:style=`{opacity: editing ? 1 : 1}`).row.full-width
           div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70
             div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.b-80.q-px-xs
               q-btn(round flat dense color="white" icon="play_arrow")
