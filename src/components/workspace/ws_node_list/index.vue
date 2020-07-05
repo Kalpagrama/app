@@ -182,6 +182,7 @@ export default {
       }
       delete nodeInput.id
       delete nodeInput.oid
+      delete nodeInput.rev
       // set defaults
       nodeInput.stage = 'draft'
       nodeInput.wsItemType = 'WS_NODE'
