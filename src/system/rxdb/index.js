@@ -4,10 +4,11 @@ import { Cache } from 'src/system/rxdb/cache'
 import { Objects } from 'src/system/rxdb/objects'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
+import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
 import { Event } from 'src/system/rxdb/event'
 import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
 import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
-import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump';
+import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
 import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
 import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive'
 import { NodeApi } from 'src/api/node'
@@ -42,6 +43,7 @@ function getRxCollectionEnumFromId (id) {
   assert(rxCollection in RxCollectionEnum, 'bad rxCollection' + rxCollection)
   return rxCollection
 }
+
 function getRawIdFromId (id) {
   assert(id, '!id')
   let parts = id.split('::')
@@ -66,6 +68,7 @@ class RxDBWrapper {
     addRxPlugin(RxDBLeaderElectionPlugin)
     addRxPlugin(RxDBValidatePlugin)
     addRxPlugin(RxDBJsonDumpPlugin)
+    if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
     this.isLeader = () => this.isLeader_
   }
 
@@ -128,41 +131,51 @@ class RxDBWrapper {
     const f = this.setUser
     logD(f, 'start')
     assert(this.created, '!created')
-    await this.event.init()
-    // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
-    let fetchCurrentUserFunc = async () => {
-      return {
-        notEvict: true, // живет вечно
-        item: await ObjectsApi.objectFull(userOid),
-        actualAge: 'day'
+    if (userOid) { // инициализируем
+      this.event.init()
+      // запрашиваем необходимые для работы данные (currentUser, nodeCategories, etc)
+      let fetchCurrentUserFunc = async () => {
+        return {
+          notEvict: true, // живет вечно
+          item: await ObjectsApi.objectFull(userOid),
+          actualAge: 'day'
+        }
       }
-    }
-    // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
-    let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
-      fetchFunc: fetchCurrentUserFunc,
-      force: true,
-      clientFirst: false
-    })
-    let fetchCategoriesFunc = async () => {
-      return {
-        notEvict: true, // живет вечно
-        item: await NodeApi.nodeCategories(),
-        actualAge: 'day'
+      // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
+      let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
+        fetchFunc: fetchCurrentUserFunc,
+        force: true,
+        clientFirst: false
+      })
+      let fetchCategoriesFunc = async () => {
+        return {
+          notEvict: true, // живет вечно
+          item: await NodeApi.nodeCategories(),
+          actualAge: 'day'
+        }
       }
-    }
-    let nodeCategories = await this.get(RxCollectionEnum.OTHER, 'nodeCategories', { fetchFunc: fetchCategoriesFunc })
-    if (currentUser) { // синхронизация мастерской с сервером
-      this.workspace.switchOnSynchro(currentUser)
+      let nodeCategories = await this.get(RxCollectionEnum.OTHER, 'nodeCategories', { fetchFunc: fetchCategoriesFunc })
+      if (currentUser) { // синхронизация мастерской с сервером
+        this.workspace.switchOnSynchro(currentUser)
+      }
+    } else { // деинициализируем
+      this.event.deInit()
+      this.workspace.switchOffSynchro()
     }
   }
 
   async clearAll () {
-    const f = this.clearAll
-    logD(f, 'start')
-    for (let module in RxModuleEnum) await this.clearModule(module)
-    await this.db.meta.remove()
-    await this.db.collection({ name: 'meta', schema: schemaKeyValue })
-    logD(f, 'complete')
+    try {
+      await this.lock()
+      const f = this.clearAll
+      logD(f, 'start')
+      for (let module in RxModuleEnum) await this.clearModule(module)
+      await this.db.meta.remove()
+      await this.db.collection({ name: 'meta', schema: schemaKeyValue })
+      logD(f, 'complete')
+    } finally {
+      this.release()
+    }
   }
 
   async clearModule (rxModuleEnum) {
@@ -298,4 +311,12 @@ const rxdbWrapper = new RxDBWrapper()
 //   }
 // })
 
-export { rxdbWrapper as rxdb, RxModuleEnum, RxCollectionEnum, getRxCollectionEnumFromId, getRawIdFromId, getReactive, makeId }
+export {
+  rxdbWrapper as rxdb,
+  RxModuleEnum,
+  RxCollectionEnum,
+  getRxCollectionEnumFromId,
+  getRawIdFromId,
+  getReactive,
+  makeId
+}

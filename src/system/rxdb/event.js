@@ -4,7 +4,7 @@ import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { router } from 'src/boot/main'
 import { EventApi } from 'src/api/event'
-import {rxdb} from 'src/system/rxdb'
+import { rxdb } from 'src/system/rxdb'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_EVENT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_EVENT)
@@ -17,6 +17,7 @@ let reactiveProgress = {
   progressUpload: 0,
   progressCreateNode: 0
 }
+
 class Event {
   constructor (workspace, objects, lists) {
     this.workspace = workspace
@@ -24,11 +25,16 @@ class Event {
     this.lists = lists
   }
 
-  async init () {
-    await EventApi.init()
+  init () {
+    EventApi.init()
   }
 
-  async clear(){}
+  deInit () {
+    EventApi.deInit()
+  }
+
+  async clear () {
+  }
 
   // от сервера прилетел эвент (поправим данные в кэше)
   async processEvent (event) {
@@ -49,12 +55,16 @@ class Event {
       case 'OBJECT_CHANGED':
         await this.objects.processEvent(event)
         break
-      case 'NODE_CREATED':
+      case 'OBJECT_CREATED':
         if (event.subject.oid === localStorage.getItem('k_user_oid')) {
           this.notifyUserActionComplete(event.type, event.object)
         }
-        // поместить ядро во все ленты
-        await this.lists.processEvent(event)
+        await this.lists.processEvent(event) // поместить объект во все ленты
+        break
+      case 'OBJECT_DELETED':
+        this.notifyUserActionComplete(event.type, event.object)
+        await this.objects.processEvent(event) // обновить ядро
+        await this.lists.processEvent(event) // удалить объект из всех лент
         break
       case 'CHAIN_CREATED':
         if (event.subject.oid === rxdb.currentUser().oid) {
@@ -69,10 +79,6 @@ class Event {
         }
         await this.objects.processEvent(event) // обновить ядро
         await this.lists.processEvent(event) // обновить личную сферу юзера (если голосовал текущий пользователь)
-        break
-      case 'OBJECT_DELETED':
-        this.notifyUserActionComplete(event.type, event.object)
-        await this.objects.processEvent(event) // обновить ядро
         break
       case 'USER_SUBSCRIBED':
         this.notifyUserActionComplete(event.type, event.object)
@@ -98,7 +104,7 @@ class Event {
     assert.ok(eventType && object)
     let eventMessage = ''
     switch (eventType) {
-      case 'NODE_CREATED':
+      case 'OBJECT_CREATED':
         eventMessage = i18n.t('node created')
         break
       case 'CHAIN_CREATED':

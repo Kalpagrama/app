@@ -119,13 +119,17 @@ class Workspace {
     this.db.ws_items.postRemove(async (plainData) => {
       await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE)
     }, false)
+    logD(f, 'complete')
   }
 
   // удалить все данные из мастерской
   async clearCollections () {
     const f = this.clearCollections
     logD(f, 'start')
-    assert(!this.ignoreWsChanges, 'ignoreWsChanges === true')
+    // assert(!this.ignoreWsChanges, 'ignoreWsChanges === true')
+    while (this.ignoreWsChanges){ // подождем пока отработают synchronize и processEvent
+      await wait(100)
+    }
     try {
       await this.lock()
       this.ignoreWsChanges = true
@@ -188,6 +192,7 @@ class Workspace {
     delete this.reactiveUser
   }
 
+  // запускается по мере необходимости см ( switchOnSynchro )
   async synchronize () {
     const f = this.synchronize
     assert(rxdb.isLeader(), '!isLeader')

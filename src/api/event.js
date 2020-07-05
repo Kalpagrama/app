@@ -9,7 +9,7 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
 
 class EventApi{
-  static async init(){
+  static init(){
     const observerEvent = apollo.clients.ws.subscribe({
       client: 'wsApollo',
       query: gql`
@@ -20,15 +20,20 @@ class EventApi{
       `
     })
 
-    observerEvent.subscribe({
+    EventApi.subscription = observerEvent.subscribe({
       next: async ({ data: { event } }) => {
         logD(`EVENT received ${event.type}`, event)
         await rxdb.processEvent(event)
       },
       error: (error) => {
-        logE('EVENT error', error)
+        logE('apollo subscribe (websocket) error', error)
       }
     })
+    return true
+  }
+
+  static deInit(){
+    if (EventApi.subscription) EventApi.subscription.unsubscribe()
     return true
   }
 }

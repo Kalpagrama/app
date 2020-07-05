@@ -47,7 +47,7 @@ class Cache {
     logD(f, 'start')
     try {
       this.lruResetInProgress = true
-      this.cacheLru.reset()
+      if (this.cacheLru) this.cacheLru.reset()
     } finally {
       this.lruResetInProgress = true
     }

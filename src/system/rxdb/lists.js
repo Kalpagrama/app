@@ -2,7 +2,7 @@ import assert from 'assert'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
-import { getReactive } from 'src/system/rxdb/reactive'
+import { getReactive, updateRxDoc } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_LST)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_LST)
@@ -127,7 +127,7 @@ class Lists {
           let reactiveItem = getReactive(rxDoc)
           assert(reactiveItem.items, '!reactiveItem.items')
           let indx = reactiveItem.items.findIndex(s => s.oid === event.subject.oid)
-          if (indx >= 0){
+          if (indx >= 0) {
             reactiveItem.items.splice(indx, 1)
             reactiveItem.count--
             reactiveItem.totalCount--
@@ -137,7 +137,7 @@ class Lists {
           let reactiveItem = getReactive(rxDoc)
           assert(reactiveItem.items, '!reactiveItem.items')
           let indx = reactiveItem.items.findIndex(s => s.oid === event.object.oid)
-          if (indx >= 0){
+          if (indx >= 0) {
             reactiveItem.items.splice(indx, 1)
             reactiveItem.count--
             reactiveItem.totalCount--
@@ -145,7 +145,8 @@ class Lists {
         }
         break
       }
-      case 'NODE_CREATED': {
+      case 'OBJECT_CREATED':
+      case 'OBJECT_DELETED': {
         assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
         // добавим на все сферы (event.sphereOids)
         let rxDocs = await this.cache.find({
@@ -154,16 +155,33 @@ class Lists {
             'props.oid': { $in: event.sphereOids }
           }
         })
+        if (event.type === 'OBJECT_DELETED'){ // удаленный объект может быть на домашней странице
+          let rxDocsFeed = await this.cache.find({
+            selector: {
+              'props.rxCollectionEnum': LstCollectionEnum.LST_FEED,
+            }
+          })
+          rxDocs = [...rxDocs, ...rxDocsFeed]
+        }
         logD(f, 'finded lists: ', rxDocs)
         for (let rxDoc of rxDocs) {
           let reactiveItem = getReactive(rxDoc)
           assert(reactiveItem.items, '!reactiveItem.items')
           assert(event.object, '!event.object')
           let indx = reactiveItem.items.findIndex(el => el.oid === event.object.oid)
-          if (indx === -1) {
-            reactiveItem.items.splice(0, 0, event.object)
-            reactiveItem.count++
-            reactiveItem.totalCount++
+          if (event.type === 'OBJECT_CREATED') {
+            if (indx === -1) {
+              reactiveItem.items.splice(0, 0, event.object)
+              reactiveItem.count++
+              reactiveItem.totalCount++
+            }
+          } else if (event.type === 'OBJECT_DELETED') {
+            logD(f, 'delete object indx=', indx)
+            if (indx >= 0) {
+              reactiveItem.items.splice(indx, 1)
+              reactiveItem.count--
+              reactiveItem.totalCount--
+            }
           }
         }
         break

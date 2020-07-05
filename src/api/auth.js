@@ -4,12 +4,14 @@ import { router } from 'src/boot/main'
 import { systemReset } from 'src/system/services'
 import assert from 'assert'
 import { rxdb } from 'src/system/rxdb'
+import { Mutex } from 'src/system/rxdb/reactive'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.AUTH)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.AUTH)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.AUTH)
 
 let currentWebPushToken
+const apiMutex = new Mutex()
 
 class AuthApi {
   static async checkExpire () {
@@ -41,28 +43,34 @@ class AuthApi {
   // если токен не указан - выйдет из всех сессий
   static async logout (token) {
     let f = this.logout
-    logD(f, ' start')
     try {
-      let { data: { logout } } = await apollo.clients.auth.query({
-        query: gql`
-          query ($token: String) {
-            logout(token: $token)
+      await apiMutex.lock()
+      logD(f, ' start')
+      if (token){
+        let { data: { logout } } = await apollo.clients.auth.query({
+          query: gql`
+            query ($token: String) {
+              logout(token: $token)
+            }
+          `,
+          variables: {
+            token
           }
-        `,
-        variables: {
-          token
-        }
-      })
+        })
+      }
     } catch (err) {
       logE('error on logout! err=', err)
     } finally {
-      if (!token || token === localStorage.getItem('k_token')) {
-        localStorage.removeItem('k_token')
-        localStorage.removeItem('k_token_expires')
-        localStorage.removeItem('k_user_oid')
-        localStorage.removeItem('k_user_role')
-        await systemReset()
-        await router.push('/auth')
+      try {
+        if (!token || token === localStorage.getItem('k_token')) {
+          localStorage.removeItem('k_token')
+          localStorage.removeItem('k_token_expires')
+          localStorage.removeItem('k_user_oid')
+          localStorage.removeItem('k_user_role')
+          await systemReset(true, true)
+        }
+      } finally {
+        apiMutex.release()
       }
     }
     logD(f, 'logout done')
