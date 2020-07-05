@@ -65,15 +65,7 @@ export default {
   },
   computed: {
     categories () {
-      return this.nodeCategories.reduce((acc, val) => {
-        if (val.type !== 'ALL') {
-          acc.push({
-            value: val.type,
-            label: val.alias // val.sphere.name.charAt(0).toUpperCase() + val.sphere.name.slice(1)
-          })
-        }
-        return acc
-      }, [])
+      return this.nodeCategories.filter(c => c.type !== 'ALL').map(c => { return {value: c.type, label: '❉ ' + c.alias} })
     }
   },
   methods: {

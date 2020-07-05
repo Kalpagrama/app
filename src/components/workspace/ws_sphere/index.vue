@@ -16,7 +16,7 @@ div(
   ).row.items-center.content-center.justify-center.q-pa-sm.b-60.sphere
   span(
     :style=`{userSelect: 'none'}`
-    ).text-white {{ '# '+sphere.name }}
+    ).text-white {{ '❉ '+sphere.name }}
 </template>
 
 <script>
