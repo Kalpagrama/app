@@ -33,21 +33,32 @@ div(
         //- editing
         div(:style=`{opacity: editing ? 1 : 1}`).row.full-width
           div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-70
-            div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.b-80.q-px-xs
-              q-btn(round flat dense color="white" icon="play_arrow")
+            div(
+              :class=`{
+                'bg-green': storeEditor.layerPlaying === layer.id,
+                'b-80': storeEditor.layerPlaying !== layer.id,
+              }`
+              :style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.q-px-xs
+              q-btn(
+                @click="layerPlay()"
+                round flat dense
+                :icon="storePlayer.playing ? 'pause' : 'play_arrow'"
+                :color="storePlayer.playing ? 'red' : 'white'")
               .col.q-px-xs
                 layer-progress(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
-              q-btn(round flat dense color="white" icon="refresh")
-            //- layer-actions(:layer="layer" :storePlayer="storePlayer" :storeLayerEditor="storeLayerEditor" :storeEditor="storeEditor")
+              q-btn(
+                @click="layerRefresh()"
+                round flat dense icon="refresh"
+                color="white")
             div().row.full-width
               div(:style=`{paddingLeft: '40px', paddingRight: '40px'}`).row.full-width
-                q-btn(round flat dense color="grey-6" icon="flip").q-mr-xs.rotate-180
-                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left")
-                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right")
+                q-btn(round flat dense color="grey-6" icon="flip" @click="layerSet(0)").q-mr-xs.rotate-180
+                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="layerForward(0,0)")
+                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right" @click="layerForward(0,1)")
                 .col
-                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left")
-                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right")
-                q-btn(round flat dense color="grey-6" icon="flip")
+                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_left" @click="layerForward(1,0)")
+                q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right" @click="layerForward(1,1)")
+                q-btn(round flat dense color="grey-6" icon="flip" @click="layerSet(1)")
   //- name editor
   div(
     v-if="composition.layers.length > 1"
@@ -168,6 +179,45 @@ export default {
     },
   },
   methods: {
+    layerPlay () {
+      this.$log('layerPlay')
+      this.storeEditor.layerPlaying = this.layer.id
+      this.storePlayer.playPause()
+    },
+    layerRefresh () {
+      this.$log('layerRefresh')
+      this.storeEditor.layerPlaying = this.layer.id
+      this.storePlayer.setCurrentTime(this.layerStart)
+      this.storePlayer.play()
+    },
+    layerSet (index) {
+      this.$log('layerSet', index)
+      // check, t for layerStart and layerEnd
+      let t = this.storePlayer.currentTime
+      if (index === 0) {
+        if (t >= this.storeLayerEditor.layerEnd) {
+          this.$q.notify({type: 'negative', message: 'Cant set t >= layer end !'})
+          return
+        }
+      }
+      else {
+        if (t <= this.storeLayerEditor.layerStart) {
+          this.$q.notify({type: 'negative', message: 'Cant set t <= layer start !'})
+          return
+        }
+      }
+      // set value
+      this.layer.figuresAbsolute[index].t = t
+      // center frames to the layer
+      this.storeLayerEditor.set('need_framesLayerCenter', true)
+    },
+    layerForward (index, isRight) {
+      this.$log('layerForward', index, isRight)
+      let t = this.layer.figuresAbsolute[index].t + (isRight ? 0.1 : -0.1)
+      this.layer.figuresAbsolute[index].t = t
+      this.storePlayer.playPause()
+      this.storePlayer.setCurrentTime(t)
+    },
     layerCreateNode () {
       this.$log('layerCreateNode')
     },

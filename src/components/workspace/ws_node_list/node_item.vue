@@ -53,7 +53,7 @@
           userSelect: 'none',
         }`).shadow-5
     div(
-      @click="$emit('preview')"
+      @click="onClick()"
       ).row.full-width.q-pa-sm
       span(:style=`{userSelect: 'none'}`).text-white.text-bold {{nodeName }}
 </template>

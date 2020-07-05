@@ -8,6 +8,29 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.fit.justify-center
   .column.fit
+    //- node PREVIEW
+    q-dialog(
+      v-model="nodePreviewOpened" position="bottom"
+      @hide="nodePreviewed")
+      div(
+        :style=`{
+          height: $q.screen.height+'px',
+          minHeight: $q.screen.height+'px',
+          maxWidth: '800px',
+          borderRadius: '10px',overflow: 'hidden',
+        }`).column.b-50
+        //- body
+        .col.full-width
+          node(:node="nodePreviewItem" :nodeFullReady="nodePreviewItem" :active="true" :visible="true" :mini="false")
+        //- footer
+        div(v-if="false").row.full-width.items-center.content-center.q-pa-sm
+          q-btn(
+            round flat color="white" icon="keyboard_arrow_left" @click="nodePreviewOpened = false")
+          .col.q-pl-sm
+            q-btn(
+              @click="nodeFork(nodeEditorItem)"
+              push color="green" no-caps icon="photo_filter"
+              :style=`{height: '42px',}`).full-width {{$t('node_fork', 'Взять и изменить')}}
     //- body
     .col.full-width.scroll
       kalpa-loader(v-if="content.oid" :mangoQuery="mangoQuery")
@@ -36,7 +59,7 @@ div(:style=`{position: 'relative'}`).row.fit.justify-center
                 div(:style=`{height: '16px'}`).row.full-width
               template(v-slot:item=`{item, index, indexMiddle}`)
                 div(
-                  @click="nodeClick(item)"
+                  @click="nodePreview(item)"
                   :style=`{height: '100px',borderRadius: '10px', overflow: 'hidden'}`
                   ).row.full-width.b-70.q-mb-sm.node-item
                   img(
@@ -60,6 +83,7 @@ export default {
   data () {
     return {
       mode: 'mini', // maxi, mini
+      nodePreviewOpened: false,
     }
   },
   computed: {
@@ -83,6 +107,17 @@ export default {
     }
   },
   methods: {
+    async nodePreview (n) {
+      this.$log('nodePreview', n)
+      this.nodeClick(n)
+      this.storePlayer.pause()
+      this.nodePreviewItem = await this.$rxdb.get(RxCollectionEnum.OBJ, n.oid)
+      this.nodePreviewOpened = true
+    },
+    nodePreviewed () {
+      this.$log('nodePreviewed')
+      this.storePlayer.play()
+    },
     nodeClick (n) {
       this.$log('nodeClick', n)
       let t = this.nodeStart(n)

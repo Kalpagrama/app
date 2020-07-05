@@ -143,6 +143,7 @@ export default {
   methods: {
     async nodePreview (n) {
       this.$log('nodePreview', n)
+      if (n.stage === 'draft') return
       this.nodeEditorItem = n
       this.nodePreviewItem = await this.$rxdb.get(RxCollectionEnum.OBJ, n.oid)
       this.nodePreviewOpened = true

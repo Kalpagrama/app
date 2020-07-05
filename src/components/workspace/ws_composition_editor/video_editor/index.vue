@@ -18,7 +18,11 @@ div(
         round flat color="white" icon="keyboard_arrow_left"
         :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
       ws-content-player(
-        :sid="sidPlayer" :content="content"
+        v-if="options.active"
+        :sid="sidPlayer"
+        :content="content"
+        :active="options.active"
+        :mini="options.mini"
         @seeked="storeEditor.compositionPlaying = false"
         @ready="storePlayerReady")
         template(v-slot:controlsTools)
@@ -42,6 +46,7 @@ div(
           v-if="pageId === 'edit'"
           :composition="composition"
           :content="content"
+          :options="options"
           @close="close()")
     //- footer: pages control
     //- transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
@@ -53,17 +58,22 @@ div(
     //-     }`)
   //- mode: PLAYER
   div(v-if="options.mode === 'player'" :style=`{position: 'relative'}`).row.fit
-    ws-content-player(@ready="storePlayerReady" :sid="sidPlayer" :content="content" :options=`{controls: false}`)
+    ws-content-player(
+      v-if="options.active"
+      @ready="storePlayerReady" :sid="sidPlayer" :content="content" :active="options.active" :mini="options.mini" :options=`{controls: false}`)
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata"
       v-show="!options.mini && false"
-      :composition="composition" :options="options"
+      :composition="composition"
+      :options="options"
       :style=`{position: 'absolute', zIndex: 1000, bottom: '0px', opacity: 0.6}`)
   //- mode: PROGRESS
   div(v-if="options.mode === 'progress'").row.full-width
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata"
-      :composition="composition" :style=`{maxWidth: '600px'}`).full-width
+      :composition="composition"
+      :options="options"
+      :style=`{maxWidth: '600px'}`).full-width
       template(v-slot:progressActions)
         slot(name="progressActions")
       template(v-slot:progressBar)

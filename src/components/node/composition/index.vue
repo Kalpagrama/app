@@ -87,7 +87,7 @@ export default {
       duration: 0,
       playing: false,
       playsinline: true,
-      muted: true,
+      muted: false,
     }
   },
   watch: {

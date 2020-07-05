@@ -21,6 +21,7 @@ div(
   //-     img(:src="content.url" :style=`{height: '40px', objectFit: 'contain'}`)
   //- header
   div(
+    v-if="true"
     :style=`{
       position: 'absolute', zIndex: 1000, top: '0px',
       borderRadius: '10px', overflow: 'hidden',

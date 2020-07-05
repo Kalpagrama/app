@@ -78,7 +78,7 @@ div(
 <script>
 export default {
   name: 'compositionProgress',
-  props: ['composition'],
+  props: ['composition', 'options'],
   inject: ['sidEditor', 'sidPlayer'],
   data () {
     return {
@@ -141,6 +141,12 @@ export default {
     }
   },
   watch: {
+    active: {
+      handler (to, from) {
+        if (to) this.storePlayer.play()
+        else this.storePlayer.pause()
+      }
+    },
     'storePlayer.currentTime': {
       immediate: true,
       handler (to, from) {
@@ -235,7 +241,7 @@ export default {
   mounted () {
     this.$log('mounted')
     this.layerActiveSet(0)
-    this.storePlayer.play()
+    // this.storePlayer.play()
     // this.compositionRefresh()
   }
 }

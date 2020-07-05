@@ -36,7 +36,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       :src="content.url"
       type="video/youtube"
       :playsinline="true"
-      :autoplay="true"
+      :autoplay="false"
       :loop="false"
       :style=`{
         position: 'relative',
@@ -44,9 +44,10 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
         objectFit: 'contain',
       }`
       ).fit
+    //- span(:style=`{position:'absolute',zIndex:99999,top:'50%',left:'50%'}`).text-white.bg-red {{active}}
     //- pause arrow
     q-btn(
-      v-if="!playing && loadeddata"
+      v-if="!playing && loadeddata && !mini"
       @click="play()"
       round flat color="white"
       :style=`{
@@ -56,7 +57,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       }`)
       q-icon(name="play_arrow" size="100px" color="white")
     video-controls(
-      v-if="options.controls && loadeddata"
+      v-if="options.controls && loadeddata && !mini"
       @seeked="$emit('seeked'), focused = true"
       :style=`{
         position: 'absolute', zIndex: 2000, bottom: '8px',
@@ -106,6 +107,8 @@ export default {
   props: {
     sid: {type: String},
     content: {type: Object},
+    active: {type: Boolean, default () { return true }},
+    mini: {type: Boolean, default () { return false }},
     options: {
       type: Object,
       default () {
@@ -139,6 +142,16 @@ export default {
     }
   },
   watch: {
+    active: {
+      immediate: false,
+      handler (to, from) {
+        if (this.player) {
+          // alert('ACTIVE ' + to)
+          if (to) this.play()
+          else this.pause()
+        }
+      }
+    },
     playing: {
       immediate: true,
       async handler (to, from) {
@@ -191,10 +204,13 @@ export default {
       this.currentTime = this.player.currentTime
       this.player.play()
       this.$emit('ready')
+      // if (this.active) this.play()
+      // else this.pause()
     },
     playerTimeupdate () {
       // this.$log('playerTimeupdate', this.player.currentTime)
       this.currentTime = this.player.currentTime
+      // if (!this.active) this.pause()
     },
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
@@ -207,12 +223,12 @@ export default {
       // this.$log('playerInit videoRef', this.$refs.videoRef)
       let me = new window.MediaElementPlayer(this.$refs.videoRef, {
         loop: false,
-        autoplay: true,
+        autoplay: false,
         controls: true,
         features: [],
         // enableAutosize: true,
         // stretching: 'fill',
-        pauseOtherPlayers: true,
+        pauseOtherPlayers: false,
         clickToPlayPause: true,
         // plugins: ['youtube'],
         success: async (mediaElement, originalNode, instance) => {
@@ -223,6 +239,8 @@ export default {
             this.player.addEventListener('pause', this.playerPause)
             this.player.addEventListener('loadeddata', this.playerLoadeddata)
           })
+          // if (this.active) this.play()
+          // else this.pause()
         },
         error: async (mediaElement, originalNode, instance) => {
           this.$log('playerInit error')
@@ -237,6 +255,8 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.playerInit()
+    // if (this.active) this.play()
+    // else this.pause()
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

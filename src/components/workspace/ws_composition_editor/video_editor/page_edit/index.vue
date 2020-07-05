@@ -90,6 +90,7 @@ div(:style=`{position: 'relative'}`).column.fit
       composition-progress(
         v-if="composition.layers.length > 0"
         v-show="!storeEditor.layerEditing"
+        :options="options"
         :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
       //- actions
       div(
@@ -116,7 +117,7 @@ import nodeCreator from './node_creator'
 export default {
   name: 'pageEdit',
   components: {draggable, nameEditor, layerEditor, layerMover, compositionProgress, nodeCreator},
-  props: ['composition'],
+  props: ['composition', 'options'],
   inject: ['sidPlayer', 'sidEditor'],
   data () {
     return {

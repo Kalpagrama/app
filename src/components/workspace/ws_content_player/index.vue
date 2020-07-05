@@ -5,6 +5,8 @@ component(
   :sid="sid"
   :content="content"
   :options="options"
+  :active="active"
+  :mini="mini"
   @ready="$emit('ready')"
   @seeked="$emit('seeked')")
   template(v-slot:controls)
@@ -29,6 +31,8 @@ export default {
     },
     content: {type: Object},
     options: {type: Object},
+    active: {type: Boolean},
+    mini: {type: Boolean},
   },
   data () {
     return {

@@ -15,7 +15,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
         ref="interceptorInput"
         v-model="composition.name"
         filled dark color="white"
-        :label="$t('what_form_do_u_see', 'Какой образ ты видишь?')"
+        :label="$t('wsCompositionEditor_videoEditor_whatDoYouSee', 'Что ты видишь?')"
         @blur="interceptorDialogOpened = false"
         ).full-width
   //- input
@@ -23,7 +23,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
     v-model="composition.name"
     ref="compositionNameInput"
     filled dark color="white"
-    :label="$t('what_form_do_u_see', 'Какой образ ты видишь?')"
+    :label="$t('wsCompositionEditor_videoEditor_whatDoYouSee', 'Что ты видишь?')"
     @click="onClick"
     @focus="onFocus"
     @blur="onBlur"
