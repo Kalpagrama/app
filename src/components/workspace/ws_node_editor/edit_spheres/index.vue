@@ -69,7 +69,7 @@ export default {
         if (val.type !== 'ALL') {
           acc.push({
             value: val.type,
-            label: val.alias // val.sphere.name.charAt(0).toUpperCase() + val.sphere.name.slice(1)
+            label: val.alias // val.sphere.name.charAt(0).toUpperCase() + val.sphere.name.slice(1) //  ???
           })
         }
         return acc

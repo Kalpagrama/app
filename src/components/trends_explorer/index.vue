@@ -18,7 +18,7 @@ kalpa-layout(
     div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.q-pa-sm.b-60
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
       .col.q-px-sm
-        span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ '# ' + sphere.name}}
+        span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ '❉ ' + category.alias}}
   template(v-slot:drawerRight)
     menu-right(:style=`{maxWidth: '260px',}`)
   template(v-slot:page)
@@ -47,7 +47,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 export default {
   name: 'trendsExplorer',
   components: {menuRight},
-  props: ['sphere'],
+  props: ['category'],
   data () {
     return {
       showMenuRight: false,
@@ -57,7 +57,7 @@ export default {
   },
   computed: {
     sphereOid () {
-      return this.sphere.oid
+      return this.category.sphere.oid
     },
     mangoQuery () {
       return {

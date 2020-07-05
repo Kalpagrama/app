@@ -9,13 +9,13 @@
   .col.full-width.scroll
     .row.full-width.items-start.content-start
       div(
-        v-for="(c,ci) in categories" :key="c.oid" @click="$emit('oid', c.oid)"
+        v-for="(c,ci) in nodeCategories" :key="c.sphere.oid" @click="$emit('oid', c.sphere.oid)"
         :class=`{
-          'b-100': oid === c.oid
+          'b-100': oid === c.sphere.oid
         }`
         :style=`{height: '40px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
         ).row.full-width.items-center.q-px-md.cursor-pointer.sphere-item
-        span(:style=`{userSelect: 'none', textTransform: 'capitalize'}`).text-white {{'# '+c.name}}
+        span(:style=`{userSelect: 'none'}`).text-white {{'❉ '+c.alias}}
 </template>
 
 <script>
@@ -29,19 +29,19 @@ export default {
     }
   },
   props: ['oid'],
-  computed: {
-    categories () {
-      return this.nodeCategories.reduce((acc, val) => {
-        if (val.type !== 'ALL') {
-          acc.push({
-            oid: val.sphere.oid,
-            name: val.alias // val.sphere.name
-          })
-        }
-        return acc
-      }, [])
-    }
-  },
+  // computed: {
+  //   categories () {
+  //     return this.nodeCategories.reduce((acc, val) => {
+  //       if (val.type !== 'ALL') {
+  //         acc.push({
+  //           oid: val.sphere.oid,
+  //           name: val.sphere.name // val.alias ???
+  //         })
+  //       }
+  //       return acc
+  //     }, [])
+  //   }
+  // },
   async beforeCreate () {
     this.$log('beforeCreate')
     this.nodeCategories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
