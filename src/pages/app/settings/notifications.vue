@@ -6,31 +6,31 @@
   //-   q-toggle(v-model="n.model" color="accent")
   //-   span {{n.model}}
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-    span {{$t('Pause all')}}
+    span {{$t('Pause all', 'Остановить все')}}
     .col
     q-toggle(v-model="pauseAllNotifications" @input="save(pauseAllNotifications)" color="accent")
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-    span {{$t('Assessments')}}
+    span {{$t('Assessments', 'Оценки')}}
     .col
     q-toggle(v-model="assessmentsNotifications" @input="save(assessmentsNotifications)" color="accent")
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-    span {{$t('Subscriptions')}}
+    span {{$t('Subscriptions', 'Подписки')}}
     .col
     q-toggle(v-model="subscriptionsNotifications" @input="save(subscriptionsNotifications)" color="accent")
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-    span {{$t('Mentions')}}
+    span {{$t('subscriptionsNotifications', 'subscriptionsNotifications')}}
     .col
     q-toggle(v-model="mentionsNotifications" @input="save(mentionsNotifications)" color="accent")
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-    span {{$t('Shared')}}
+    span {{$t('mentionsNotifications', 'mentionsNotifications')}}
     .col
     q-toggle(v-model="sharedNotifications" @input="save(sharedNotifications)" color="accent")
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-    span {{$t('The kernel is added to your content')}}
+    span {{$t('sharedNotifications', 'sharedNotifications')}}
     .col
     q-toggle(v-model="nodeCreatedNotifications" @input="save(nodeCreatedNotifications)" color="accent")
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-    span {{$t('The kernel is added to the chain')}}
+    span {{$t('nodeCreatedNotifications', 'nodeCreatedNotifications')}}
     .col
     div(@click="save()")
       q-toggle(v-model="nodeAddedNotifications" @input="save(nodeAddedNotifications)" color="accent")

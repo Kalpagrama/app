@@ -7,7 +7,7 @@
         div(style=`height: 60px; width: 60px`).row.justify-center.items-center
           q-btn(round flat icon="arrow_back" color="primary" @click="closing()")
         .col.row.justify-start.items-center.q-px-sm
-          span.text-bold {{$t('Changing password')}}
+          span.text-bold {{$t('Changing password', 'Changing password')}}
           .col
         div(style=`height: 60px; width: 60px`).row.items-center.justify-center
           q-icon(
@@ -17,19 +17,19 @@
             @click="isPwd = !isPwd")
       .row.content-start.justify-center
         //- q-input(v-model="currentPas" stack-label label="Current password" filled).full-width.q-my-md
-        q-input(v-model="newPas" ref="password" stack-label :label="$t('New password')" filled :type="isPwd ? 'password' : 'text'").full-width.q-my-md
-        q-input(v-model="repPas" ref="password" stack-label :label="$t('Repeat password')" lazy-rules filled :type="isPwd ? 'password' : 'text'" :rules="[val => !!val || '* Required', val => val === newPas || 'Please enter correct password',]").full-width
+        q-input(v-model="newPas" ref="password" stack-label :label="$t('New password', 'New password')" filled :type="isPwd ? 'password' : 'text'").full-width.q-my-md
+        q-input(v-model="repPas" ref="password" stack-label :label="$t('Repeat password', 'Repeat password')" lazy-rules filled :type="isPwd ? 'password' : 'text'" :rules="[val => !!val || '* Required', val => val === newPas || 'Please enter correct password',]").full-width
         q-btn(
           v-if="newPas === repPas && newPas"
           push no-caps dense color="accent" @click="changePassword()"
-          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width {{ $t('Change password') }}
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width {{ $t('Change password', 'Change password') }}
         .row.full-width.q-py-sm
-          small.text-grey-8.q-px-xs.q-mt-sm {{$t('Пароль должен состоять не менее чем из 6 символов, включающих буквы разных регистров, цифр и спецсимволов!')}}
+          small.text-grey-8.q-px-xs.q-mt-sm {{$t('password_warning', 'Пароль должен состоять не менее чем из 6 символов, включающих буквы разных регистров, цифр и спецсимволов!')}}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePassword.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
-      span {{$t('Change password')}}
+      span {{$t('Change password', 'Change password')}}
       div(v-if="!currentPassword").row.full-width.items-center
-        small.text-grey {{$t('Add password')}}
+        small.text-grey {{$t('Add password', 'Add password')}}
         q-icon(name="warning" color="accent" size="20px").q-ml-xs
 </template>
 <script>

@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.full-width
   div(:style=`{height: '40px'}`).row.full-width.items-start.content-start.q-px-sm
-    span.text-bold.text-white {{$t('User settings')}}
+    span.text-bold.text-white {{$t('User settings', 'Настройки пользователя')}}
     .col
   .row.full-width.items-start.content-start
     //- cover
@@ -29,7 +29,7 @@
     //- span {{ user }}
   div(:style=`{height: '70px'}`).row.full-width.q-py-sm
     q-btn(push no-caps color="green" @click="save()").fit
-      span.text-bold {{$t('Save settings')}}
+      span.text-bold {{$t('Save settings', 'Сохранить настройки')}}
 </template>
 
 <script>

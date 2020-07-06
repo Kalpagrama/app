@@ -38,7 +38,7 @@ div(
       //- navigation
       div(v-if="true").row.full-width.items-center.content-center.justify-between.q-py-md
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('ws_node_editor', 'Сборка ядра')}}
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Node creation', 'Создание ядра')}}
         q-btn(round flat color="red" icon="delete_outline" @click="nodeDelete()")
     .row.full-width.justify-center
       div(
@@ -130,7 +130,7 @@ export default {
     },
     itemDelete (index) {
       this.$log('itemDelete', index)
-      if (!confirm(this.$t('delete_item', 'Удалить элемент?'))) return
+      if (!confirm(this.$t('Delete item?', 'Удалить элемент?'))) return
       this.$delete(this.node.items, index)
     },
     check () {
@@ -163,19 +163,19 @@ export default {
         let createdNode = await NodeApi.nodeCreate(this.node)
         this.$log('nodePublish res', createdNode)
         // publish
-        this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_publishing', 'Публикуем ядро...')})
+        this.$q.loading.show({spinnerColor: 'green', message: this.$t('Node publishing...', 'Публикуем ядро...')})
         await this.$wait(1000)
         this.node.stage = 'published'
         this.node.oid = createdNode.oid // нужно при снятии с публикации
         // done
-        this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
+        this.$q.loading.show({spinnerColor: 'green', message: this.$t('Done!', 'Готово!')})
         await this.$wait(1000)
         this.$q.loading.hide()
         // this.storeNodeEditor.set('publishing', false)
         this.publishing = false
         this.$q.notify({
           type: 'positive',
-          message: this.$t('node_published', 'Ядро опубликовано!')
+          message: this.$t('Node published!', 'Ядро опубликовано!')
         })
         this.$emit('published', createdNode.oid)
         this.$emit('close')

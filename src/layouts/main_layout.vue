@@ -86,7 +86,7 @@ export default {
     }
   },
   meta: {
-    title: 'Kalpagramma'
+    title: 'Kalpagrama'
   },
   watch: {
     '$store.state.ui.appFullscreen': {

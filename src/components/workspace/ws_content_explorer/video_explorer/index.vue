@@ -90,9 +90,9 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'details', name: this.$t('Детали')},
-        {id: 'compositions', name: this.$t('Мои Образы')},
-        {id: 'explore', name: this.$t('Ядра')},
+        {id: 'details', name: this.$t('Details', 'Детали')},
+        {id: 'compositions', name: this.$t('My compositions', 'Мои образы')},
+        {id: 'explore', name: this.$t('Nodes', 'Ядра')},
       ]
     },
     sidPlayer () {

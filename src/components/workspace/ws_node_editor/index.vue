@@ -17,7 +17,7 @@ div(
     //- navigation
     div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.justify-between.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Сборка ядра')}}
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Node creation', 'Сборка ядра')}}
       //- .col
       q-btn(
         @click="pageId === 'info' ? pageId = 'items' : pageId = 'info'"
@@ -80,14 +80,14 @@ div(
         v-if="pageId !== 'preview'"
         @click="pageNext()"
         push color="green" no-caps
-        ).q-px-md {{$t('Next')}}
+        ).q-px-md {{$t('Next', 'Далее')}}
       q-btn(
         v-if="pageId === 'preview'"
         @click="storeNodeEditor.nodePublish()"
         push color="green" no-caps
         :loading="storeNodeEditor.nodePublishing"
         ).q-px-md
-        span.text-white.text-bold {{$t('Publish')}}
+        span.text-white.text-bold {{$t('Publish', 'Опубликовать')}}
 </template>
 
 <script>

@@ -16,7 +16,7 @@ div(
   ).column.full-width.b-50
   //- header
   div(:style=`{height: '70px'}`).row.full-width.items-center.content-center.q-px-md
-    span.text-white.text-bold {{$t('Node explorer')}}
+    span.text-white.text-bold {{$t('Node explorer', 'Node explorer')}}
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start

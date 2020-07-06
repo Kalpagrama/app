@@ -50,7 +50,7 @@ div(
       position: 'absolute', zIndex: 200,
       right: '16px', bottom: '8px',
       pointerEvents: 'none'
-    }`).br [{{$t('layers')}}:{{ item.layers.length }}, {{$t('duration')}}: {{ $time(compositionDuration) }}]
+    }`).br [{{$t('Layers', 'Слои')}}:{{ item.layers.length }}, {{$t('Duration', 'Длительность')}}: {{ $time(compositionDuration) }}]
 </template>
 
 <script>

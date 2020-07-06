@@ -3,7 +3,7 @@
   q-select(
     filled
     dark color="white"
-    :label="$t('Выбери категорию')"
+    :label="$t('Choose category', 'Выбери категорию')"
     :value="category(node.category)" @input="categorySelected"
     :options="categories"
     :style=`{

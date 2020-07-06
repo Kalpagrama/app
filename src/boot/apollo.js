@@ -83,7 +83,7 @@ export default async ({ Vue, store, app }) => {
         uri: SERVICES_URL,
         fetch (uri, options) {
           const d = localStorage.getItem('k_debug')
-          if (d) options.headers['X-Kalpagramma-debug'] = d
+          if (d) options.headers['X-Kalpagrama-debug'] = d
           return fetch(uri, options)
         }
       }),
@@ -116,7 +116,7 @@ export default async ({ Vue, store, app }) => {
             const token = localStorage.getItem('k_token')
             const d = localStorage.getItem('k_debug')
             if (token) options.headers.Authorization = token
-            if (d) options.headers['X-Kalpagramma-debug'] = d
+            if (d) options.headers['X-Kalpagrama-debug'] = d
             return fetch(uri, options)
           }
           // useGETForQueries: true
@@ -134,7 +134,7 @@ export default async ({ Vue, store, app }) => {
             const token = localStorage.getItem('k_token')
             const d = localStorage.getItem('k_debug')
             if (token) options.headers.Authorization = token
-            if (d) options.headers['X-Kalpagramma-debug'] = d
+            if (d) options.headers['X-Kalpagrama-debug'] = d
             return fetch(uri, options)
           }
           // useGETForQueries: true
@@ -156,7 +156,7 @@ export default async ({ Vue, store, app }) => {
             connectionParams: () => {
               return {
                 Authorization: localStorage.getItem('k_token'),
-                'X-Kalpagramma-debug': localStorage.getItem('k_debug')
+                'X-Kalpagrama-debug': localStorage.getItem('k_debug')
               }
             }
           }
@@ -174,7 +174,7 @@ export default async ({ Vue, store, app }) => {
             const token = localStorage.getItem('k_token')
             const d = localStorage.getItem('k_debug')
             if (token) options.headers.Authorization = token
-            if (d) options.headers['X-Kalpagramma-debug'] = d
+            if (d) options.headers['X-Kalpagrama-debug'] = d
             return fetch(uri, options)
           }
         })

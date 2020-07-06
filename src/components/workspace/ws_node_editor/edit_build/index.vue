@@ -28,9 +28,9 @@
         q-input(
           v-model="node.name"
           filled dark color="white"
-          :label="$t('what_the_essence', 'В чем суть?')").full-width
+          :label="$t('What the essence', 'В чем суть?')").full-width
     div(v-if="true && node.items.length > 0").row.full-width.q-py-xs
-        
+
     div(v-if="true && node.items.length > 0").row.full-width
       //- span(v-for="s in 5" :key="s").row.full-width.q-pa-sm.b-60.q-mr-sm sphere: {{s}}
       q-btn(flat color="green" icon="add" no-caps).full-width Добавить сферу
@@ -46,12 +46,12 @@ export default {
   props: ['node'],
   data () {
     return {
-      
+
     }
   },
   computed: {
-    
+
   },
-  
+
 }
 </script>

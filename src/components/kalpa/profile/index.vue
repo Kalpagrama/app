@@ -29,8 +29,8 @@
       .col-xs-12.col-sm-8.q-pa-sm
         .row.full-width.q-pa-xs
           q-input(
-            v-model="currentUser.name"
-            label="Whats your name?"
+            v-model="name"
+            :label="$t('Whats your name?', 'Введите ваше имя')"
             filled dark color="white").full-width
         .row.full-width.q-pa-xs
           q-select(
@@ -96,15 +96,21 @@ export default {
       return this.langs.find(l => l.value === lang)[0].label
     },
     async save () {
-      this.$log('save')
+      this.$log('save1: ', this.name, this.lang.value)
+      this.$log('save2: ', this.currentUser.profile.lang)
+      this.$log('save3: ', this.currentUser.name)
       try {
         this.loading = true
         await this.$wait(1000)
         let oid = localStorage.getItem('k_user_oid')
         // set avatar,name,lang
         if (this.avatarFile) await ObjectsApi.update(oid, 'profile.photo', this.avatarFile)
-        if (this.lang) await ObjectsApi.update(oid, 'profile.lang', this.lang.value)
-        if (this.name.length > 0) await ObjectsApi.update(oid, 'profile.name', this.name)
+        if (this.lang.value && this.lang.value !== this.currentUser.profile.lang) {
+          this.$logD('change lang from: ', this.$i18n.i18next.language, 'to: ', this.lang.value)
+          this.$i18n.i18next.changeLanguage(this.lang.value).catch(err => this.$logE(err))
+          await ObjectsApi.update(oid, 'profile.lang', this.lang.value)
+        }
+        if (this.name.length > 0 && this.name !== this.currentUser.name) await ObjectsApi.update(oid, 'profile.name', this.name)
         // done
         this.loading = false
         this.$emit('next')
@@ -118,7 +124,8 @@ export default {
   async mounted () {
     this.$log('mounted')
     this.currentUser = this.$store.getters.currentUser()
-    this.lang = this.currentUser.profile.lang
+    this.lang = this.langs.find(l => l.value === this.currentUser.profile.lang) //
+    this.name = this.currentUser.name
     this.avatarUrl = this.currentUser.thumbUrl
   }
 }

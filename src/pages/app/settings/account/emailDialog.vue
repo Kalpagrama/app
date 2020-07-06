@@ -7,27 +7,27 @@
         div(style=`height: 60px; width: 60px`).row.justify-center.items-center
           q-btn(round flat icon="arrow_back" color="white" @click="closing()")
         .col.row.justify-start.items-center.q-px-sm
-          span.text-bold.text-white {{$t('Changing email')}}
+          span.text-bold.text-white {{$t('Changing email', 'Changing email')}}
       .column.bg-white.q-px-md
         .row.content-start.justify-center
-          q-input(v-model="$store.getters.currentUser().profile.email" standout disable readonly stack-label :label="$t('Current email')").full-width.q-my-md.text-black
+          q-input(v-model="$store.getters.currentUser().profile.email" standout disable readonly stack-label :label="$t('Current email', 'Current email')").full-width.q-my-md.text-black
           div(v-if="!waitingCode").row.full-width
-            q-input(v-model="newEmail" @keyup.enter="emailSend()" stack-label :label="$t('New email')" filled).full-width.q-mb-md
+            q-input(v-model="newEmail" @keyup.enter="emailSend()" stack-label :label="$t('New email', 'New email')" filled).full-width.q-mb-md
             q-btn(
               push no-caps dense color="accent" @click=""
               :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-mb-sm {{ $t('Get the code', 'Получить код') }}
           div(v-else).row.full-width
-            q-input(v-model="newEmail" stack-label :label="$t('Code')" filled).full-width.q-mb-md
+            q-input(v-model="newEmail" stack-label :label="$t('Code', 'Код')" filled).full-width.q-mb-md
             q-btn(
               push no-caps dense color="accent" @click="changeEmail()"
               :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-mb-sm {{ $t('Change', 'Сменить') }}
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changeEmail.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
-      span {{$t('Email')}}
+      span {{$t('Email', 'Емайл')}}
     .row.full-width
       small.text-grey {{ currentEmail }}
       div(v-if="!currentEmail").row.full-width.items-center
-        small.text-grey {{$t('Add your email')}}
+        small.text-grey {{$t('Add your email', 'Add your email')}}
         q-icon(name="warning" color="accent" size="20px").q-ml-xs
 </template>
 <script>

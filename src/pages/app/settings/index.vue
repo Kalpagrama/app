@@ -13,7 +13,7 @@ kalpa-layout(
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
         .col
           .row.fit.items-center.content-center.q-px-sm
-            span(:style=`{fontSize: '16px'}`).text-white.text-bold {{$t('settings', 'Настройки')}}
+            span(:style=`{fontSize: '16px'}`).text-white.text-bold {{$t('Settings', 'Настройки')}}
   template(v-slot:drawerRight)
     menu-right(:style=`{maxWidth: '260px'}`)
   template(v-slot:page)

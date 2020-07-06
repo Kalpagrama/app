@@ -5,7 +5,7 @@
       div(style=`height: 60px; width: 60px`).row.justify-center.items-center
         q-btn(round flat icon="arrow_back" color="white" @click="$refs.sessions.toggle()")
       .col.row.justify-start.items-center.q-px-sm
-        span.text-bold.text-white {{$t('Sessions')}}
+        span.text-bold.text-white {{$t('Sessions', 'Сессии')}}
     .column.bg-grey-3.q-px-md
       .row.content-start.justify-center.q-pt-md
         div(
@@ -28,9 +28,9 @@
           q-btn(
             push color="accent" no-caps @click="deleteSession(null)"
             :style=`{height: '50px', borderRadius: $store.state.ui.borderRadius+'px'}`)
-            span.text-bold.q-ml-md {{ $t('Delete all sessions exept yours') }}
+            span.text-bold.q-ml-md {{ $t('Delete all sessions exept yours', 'Удалить все сессии кроме текущих') }}
   div(:style=`{height: '50px', borderBottom: '1px solid #eee'}` @click="$refs.sessions.show()").row.full-width.justify-start.items-center.q-px-md
-    span {{$t('Sessions')}}
+    span {{$t('Sessions', 'Сессии')}}
 </template>
 
 <script>

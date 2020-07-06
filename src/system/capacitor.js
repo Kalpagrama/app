@@ -110,10 +110,10 @@ async function initCapacitorPushPlugin (store) {
 async function capacitorShowShareDialog () {
   assert(Share)
   let shareRet = await Share.share({
-    title: 'title kalpagramma share data',
-    text: 'text kalpagramma share data',
+    title: 'title kalpagrama share data',
+    text: 'text kalpagrama share data',
     url: 'https://kalpa.app/#OID',
-    dialogTitle: 'dialogTitle kalpagramma share' // Android only
+    dialogTitle: 'dialogTitle kalpagrama share' // Android only
   })
 }
 

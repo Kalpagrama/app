@@ -72,7 +72,7 @@ div(
             @click="itemAdd()"
             flat color="green" icon="add" size="md" no-caps
             :style=`{height: '60px'}`
-            ).full-width.b-60 {{$t('Добавить образ')}}
+            ).full-width.b-60 {{$t('Add composition', 'Добавить образ')}}
     //- medi
     div(v-if="mode === 'medi'").row.full-width.items-start.justify-center.q-px-xs.br
       draggable(
@@ -163,7 +163,7 @@ div(
             }`
             ).text-white.text-bold.q-pa-sm {{ i.name }}
       //- item add
-      q-btn(flat color="green" icon="add" no-caps :style=`{height: '50px',}` @click="itemAdd").full-width {{$t('add_item', 'Добавить образ')}}
+      q-btn(flat color="green" icon="add" no-caps :style=`{height: '50px',}` @click="itemAdd").full-width {{$t('Add composition', 'Добавить образ')}}
 </template>
 
 <script>

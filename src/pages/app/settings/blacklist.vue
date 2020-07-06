@@ -14,7 +14,7 @@
     div(:style=`{}`).row.items-center.justify-center
       q-btn(icon="clear" round flat @click="userDelete()")
   div(v-if="!blacklist" style=`height: 100px`).row.full-width.justify-center.items-center
-    span {{$t('No one in your blacklist')}}
+    span {{$t('No one in your blacklist', 'No one in your blacklist')}}
 </template>
 
 <script>

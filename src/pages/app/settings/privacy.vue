@@ -3,16 +3,16 @@
   q-dialog(ref="whocould")
     div(style=`border-radius: 10px; overflow: hidden`).row.full-width.justify-center.bg-white
       div(:style=`{borderBottom: '1px solid #eee'}`).row.justify-left.items-center.q-px-md
-        q-radio(v-model="show" color="accent" val="all" :label="$t('all')").row.full-width
-        q-radio(v-model="show" color="accent" val="important" :label="$t('important')").row.full-width
-        q-radio(v-model="show" color="accent" val="neither" :label="$t('neither')").row.full-width
+        q-radio(v-model="show" color="accent" val="all" :label="$t('All', 'Все')").row.full-width
+        q-radio(v-model="show" color="accent" val="important" :label="$t('Important', 'Важное')").row.full-width
+        q-radio(v-model="show" color="accent" val="neither" :label="$t('Neither', 'Ничего')").row.full-width
   .row.full-width.items-center
     div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-      span {{$t('Allow people to find me')}}
+      span {{$t('Allow people to find me', 'Позволить людям находить меня')}}
       .col
       q-toggle(v-model="find" color="accent")
     div(:style=`{height: '50px', borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-center.q-px-md
-      span {{$t('Closed account')}}
+      span {{$t('Closed account', 'Закрытый аккаунт')}}
       .col
       q-toggle(v-model="closedAc" color="accent")
     div(:style=`{borderBottom: '1px solid #eee'}`).row.full-width.justify-center.items-start
@@ -26,13 +26,13 @@
               :style=`{height: '50px'}`).row.items-center.bg-grey-1
                 span {{$t(s.name)}}
     div(:style=`{height: '50px', borderBottom: '1px solid #eee'}` @click="$refs.whocould.show()").row.full-width.justify-start.items-center.q-px-md
-      span {{$t('Who can send me messages')}}
+      span {{$t('Who can send me messages', 'Who can send me messages')}}
     div(:style=`{height: '50px', borderBottom: '1px solid #eee'}` @click="$refs.whocould.show()").row.full-width.justify-start.items-center.q-px-md
-      span {{$t('Who can bind nuclei to me')}}
+      span {{$t('Who can bind node to me', 'Who can bind node to me')}}
     div(:style=`{height: '50px', borderBottom: '1px solid #eee'}` @click="$refs.whocould.show()").row.full-width.justify-start.items-center.q-px-md
-      span {{$t('Who can find me in import contacts')}}
+      span {{$t('Who can find me in import contacts', 'Who can find me in import contacts')}}
     div(:style=`{height: '50px', borderBottom: '1px solid #eee'}` @click="$refs.whocould.show()").row.full-width.justify-start.items-center.q-px-md
-      span {{$t('Blocked')}}
+      span {{$t('Blocked', 'Заблокировано')}}
 </template>
 
 <script>

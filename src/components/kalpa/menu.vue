@@ -30,9 +30,9 @@ div(
       kalpa-logo(:width="40" :height="40")
     .col
       .row.fit.items-center.content-center
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Кальпаграмма')}}
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Kalpagrama', 'Кальпаграма')}}
         .row.full-width
-          small.text-white {{$t('Up the essence!')}}
+          small.text-white {{$t('Up the essence!', 'Продвигай суть!')}}
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width
     div(
@@ -53,7 +53,7 @@ div(
           .col.full-height
             .row.fit.items-center.content-center
               span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
-              small.text-white.full-width {{ '@'+$store.getters.currentUser().name }}
+              small.text-white.full-width {{ '@'+$store.getters.currentUser().username }}
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
           :to="{name: p.id}"
@@ -73,14 +73,14 @@ div(
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('Обновить')}}
+          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('Refresh', 'Обновить')}}
         //- logout
         div(
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('Выйти')}}
+          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('Logout', 'Выйти')}}
         //- create node
         div(
           v-if="true"
@@ -90,16 +90,17 @@ div(
             @click="createNodeStart()"
             color="green" no-caps align="left" icon="add"
             :style=`{height: '50px'}`).full-width
-            span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('Собрать ядро')}}
+            span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('Create node', 'Создать ядро')}}
         //- version
         div(v-if="true").row.full-width.items-center.q-pa-md
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('Версия')}} 0.9.99-03.07.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('Version', 'Версия')}} 0.9.99-03.07.2020
         //- slot(name="footer")
 </template>
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { AuthApi } from 'src/api/auth'
+import { i18n } from 'src/boot/i18n'
 
 export default {
   name: 'kalpaMenu',
@@ -107,10 +108,10 @@ export default {
     return {
       width: 300,
       pages: [
-        {id: 'home', name: 'Home', icon: 'home'},
-        {id: 'trends', name: 'Тренды', icon: 'whatshot'},
-        {id: 'workspace', name: 'Мастерская', icon: 'school'},
-        {id: 'settings', name: 'Настройки', icon: 'tune'},
+        {id: 'home', name: i18n.t('Home', 'Домашняя страница'), icon: 'home'},
+        {id: 'trends', name: i18n.t('Trends', 'Тренды'), icon: 'whatshot'},
+        {id: 'workspace', name: i18n.t('Workspace', 'Мастерская'), icon: 'school'},
+        {id: 'settings', name: i18n.t('Settings', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,
       logoutLoading: false,

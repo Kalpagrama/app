@@ -120,10 +120,10 @@ export default {
   computed: {
     types () {
       return [
-        {id: 'VIDEO', name: this.$t('Видео')},
-        {id: 'IMAGE', name: this.$t('Картинки')},
-        {id: 'BOOK', name: this.$t('Книги')},
-        {id: 'WEB', name: this.$t('Веб')}
+        {id: 'VIDEO', name: this.$t('Video', 'Видео')},
+        {id: 'IMAGE', name: this.$t('Images', 'Картинки')},
+        {id: 'BOOK', name: this.$t('Books', 'Книги')},
+        {id: 'WEB', name: this.$t('Web', 'Веб')}
       ]
     },
     mangoQuery () {

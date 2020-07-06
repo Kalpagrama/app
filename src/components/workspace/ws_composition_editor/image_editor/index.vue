@@ -34,7 +34,7 @@ div(
     .col
       q-input(
         v-model="composition.name"
-        :label="$t('Что ты видишь?')"
+        :label="$t('whatDoYouSee', 'Что ты видишь?')"
         filled dark color="white").full-width
         template(v-slot:prepend)
           q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
