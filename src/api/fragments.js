@@ -260,6 +260,7 @@ const userFragment = gql`
   ${objectShortFragment} ${nodeFragment} ${objectFragment}
   fragment userFragment on User {
     ...objectFragment
+    username
     weightVal
     settings
     wsRevision

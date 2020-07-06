@@ -88,7 +88,8 @@ class NodeApi {
     }
     let nodeInput = {}
     nodeInput.layout = node.layout
-    nodeInput.name = node.name
+    nodeInput.name = node.name || node.spheres.length ? node.spheres[0].name : null
+    assert(nodeInput.name, '!nodeInput.name')
     nodeInput.category = node.category || 'FUN'
     nodeInput.spheres = node.spheres.map(s => {
       return { name: s.name, oid: s.oid }
