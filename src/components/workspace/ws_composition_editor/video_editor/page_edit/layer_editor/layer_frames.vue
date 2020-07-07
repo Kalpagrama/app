@@ -204,9 +204,13 @@ export default {
       let t = e.offsetX / this.framesWidth * this.storePlayer.duration
       this.$log('t', t)
       this.storePlayer.setCurrentTime(t)
-      // if (t < this.storeLayerEditor.layerStart || t > this.storeLayerEditor.layerEnd) {
-      //   this.stateExplorer.set('mode', 'content')
-      // }
+      // play layer if got this frames...
+      if (t < this.storeLayerEditor.layerStart || t > this.storeLayerEditor.layerEnd) {
+        this.storeEditor.layerPlaying = null
+      }
+      else {
+        this.storeEditor.layerPlaying = this.layer.id
+      }
     },
     framesDrag (e) {
       // this.$log('framesDrag', e)

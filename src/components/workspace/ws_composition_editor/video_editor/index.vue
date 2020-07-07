@@ -13,10 +13,11 @@ div(
     div(
       v-if="options.ctx === 'workspace'"
       ).row.full-width.items-center.content-center.q-pa-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left")
+      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
       .col.q-px-sm
         span.text-white.text-bold {{ $t('wsCompositionEditor_title', 'Редактор образа') }}
       node-creator(
+        v-if="options.ctx === 'workspace'"
         v-show="composition.layers.length > 0"
         :composition="composition")
     //- body

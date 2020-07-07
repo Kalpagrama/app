@@ -149,6 +149,7 @@ export default {
     },
     async compositionAdd () {
       this.$log('nodeAdd')
+      this.storePlayer.pause()
       let layerId = Date.now().toString()
       let layerColor = this.$randomColor(layerId)
       let layerStart = this.storePlayer.currentTime

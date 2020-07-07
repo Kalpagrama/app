@@ -9,7 +9,8 @@ div(
   //- item find
   q-dialog(v-model="itemFinderOpened" position="bottom")
     item-finder(
-      @item="itemFound"
+      @content="contentFound"
+      @composition="compositionFound"
       @close="itemFinderOpened = false"
       :style=`{
         height: $q.screen.height-60+'px',
@@ -17,11 +18,19 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`)
   //- item edit
-  q-dialog(v-model="itemEditorOpened" position="bottom")
+  q-dialog(
+    v-model="itemEditorOpened" position="bottom"
+    @hide="itemEdited")
     ws-composition-editor(
       v-if="item"
       :value="item"
       @close="itemEditorOpened = false"
+      :options=`{
+        ctx: 'nodeEditor',
+        mode: 'editor',
+        mini: false,
+        active: true,
+      }`
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
@@ -57,7 +66,7 @@ div(
               q-btn(ref="nextBtn" round flat color="red" icon="add" @click="next()" :style=`{display: 'none'}`)
           edit-essence(:node="node")
         edit-category(:node="node")
-        edit-spheres(:node="node")
+        edit-spheres(:node="node" :sphereFirstEditable="ctx === 'workspace'")
   //- publish
   .row.full-width.justify-center
     div(:style=`{maxWidth: '600px'}`).row.full-width.q-pb-sm
@@ -90,8 +99,7 @@ export default {
       type: Object,
       default () {
         return {
-          essenceEditable: true,
-          itemAdd: false,
+          ctx: 'workspace',
         }
       }
     }
@@ -120,30 +128,48 @@ export default {
     },
   },
   methods: {
+    // get item
     itemFind () {
       this.$log('itemFind')
       this.itemFinderOpened = true
     },
-    async itemFound (item) {
-      this.$log('itemFound', item)
+    compositionFound (composition) {
+      this.$log('compositionFound', composition)
       let itemIndex = this.node.items.length
-      this.$set(this.node.items, itemIndex, item)
-      // after set next item...
-      this.$refs.nextBtn.click()
-      // TODO: open editor if only it was content...
-      // await this.$wait(500)
-      // this.itemEdit(this.node.items[itemIndex], itemIndex)
+      this.$set(this.node.items, itemIndex, composition)
+      if (this.node.items.length > 1) this.$refs.nextBtn.click()
+      // set node name from the composition.name
+      if (this.node.name.length === 0) {
+        this.node.name = composition.name
+      }
     },
+    contentFound (content) {
+      this.$log('contentFound', content)
+      this.compositionFound(content)
+      this.$nextTick(() => {
+        this.itemEdit(this.node.items[this.node.items.length - 1])
+      })
+    },
+    // edit item
     itemEdit (item) {
       this.$log('itemEdit', item)
       this.item = item
       this.itemEditorOpened = true
+    },
+    itemEdited () {
+      this.$log('itemEdited', this.item)
+      if (this.node.name.length === 0) {
+        if (this.item.name.length > 0) {
+          this.node.name = this.item.name
+        }
+      }
     },
     itemDelete (index) {
       this.$log('itemDelete', index)
       if (!confirm(this.$t('delete_item', 'Удалить элемент?'))) return
       this.$delete(this.node.items, index)
     },
+    // node
     check () {
       this.$log('check')
       if (!this.node.category) throw new Error('No node.category !')
@@ -163,12 +189,24 @@ export default {
       })
       // throw new Error('Fuck you, very much !')
     },
+    checkExtend () {
+      this.$log('checkExtend')
+      if (this.node.name.length === 0) {
+        if (this.node.spheres[0]) {
+          this.node.name = this.node.spheres[0].name
+        }
+        else {
+          throw new Error('Essence or one sphere!')
+        }
+      }
+    },
     async publish () {
       try {
         this.$log('nodePublish start')
         // this.storeNodeEditor.set('publishing', true)
         this.publishing = true
         this.check()
+        this.checkExtend()
         // publish
         this.$q.loading.show({spinnerColor: 'green', message: 'Creating node...'})
         let createdNode = await NodeApi.nodeCreate(this.node)
@@ -188,6 +226,7 @@ export default {
           type: 'positive',
           message: this.$t('node_published', 'Ядро опубликовано!')
         })
+        // this.$store.commit('core/processEvent', {type: 'PROGRESS', action: 'CREATE', progress: 1})
         this.$emit('published', createdNode.oid)
         this.$emit('close')
       }

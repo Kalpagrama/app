@@ -10,7 +10,7 @@ div(:style=`{position: 'relative'}`).column.fit
       left: 'calc(50% - 150px)',
       height: '50px',
       width: '300px',
-    }`) Добавить образ
+    }`) {{ $t('nodeExplorer_nodeNodes_Add composition', 'Добавить образ') }}
   //- node editor
   q-dialog(
     v-model="nodeEditorOpened" position="bottom")
@@ -19,13 +19,12 @@ div(:style=`{position: 'relative'}`).column.fit
       @close="nodeEditorOpened = false"
       :value="nodeEditorItem"
       :options=`{
-        essenceEditable: false,
-        itemAdd: true,
+        ctx: 'extend',
       }`
       :style=`{
         maxWidth: '800px',
-        maxHeight: $q.screen.height-60+'px',
-        minHeight: $q.screen.height-60+'px',
+        maxHeight: $q.screen.height-0+'px',
+        minHeight: $q.screen.height-0+'px',
       }`)
   //- body
   .col.full-width
@@ -42,7 +41,7 @@ div(:style=`{position: 'relative'}`).column.fit
               :style=`{maxWidth: '800px', marginTop: '70px'}`)
             //- node add
             .row.full-width.justify-start.q-pa-md
-              span(:style=`{fontSize: '16px',}`).text-white.text-bold {{$t('Node compositions', 'Образы ядра')}}
+              span(:style=`{fontSize: '16px',}`).text-white.text-bold {{$t('nodeExplorer_nodeNodes_Node compositions', 'Образы ядра')}}
           //- node nodes
           template(v-slot:item=`{item, index, indexMiddle}`)
             node(
@@ -106,12 +105,14 @@ export default {
       this.$log('nodeAddStart', this.node)
       // create nodeInput
       let nodeInput = {
-        name: this.node.name,
+        name: '',
         wsItemType: 'WS_NODE',
         items: [],
-        spheres: [],
         category: this.node.category,
         layout: this.node.layout,
+        spheres: [
+          {name: this.node.name}
+        ],
       }
       this.$log('nodeInput', nodeInput)
       // create wsItem
@@ -130,7 +131,6 @@ export default {
         type: 'positive',
         message: 'Образ успешно добавлен!',
       })
-      // await this.$wait(200)
       // this.$router.push(`/node/${oid}`).catch(e => e)
     }
   }

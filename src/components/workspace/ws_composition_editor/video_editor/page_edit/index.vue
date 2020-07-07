@@ -1,105 +1,128 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
-  //- header: composition.name, check:close
-  div(
-    v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
-    ).row.full-width.justify-center
-    name-editor(
-      :composition="composition" @close="$emit('close')"
-      :style=`{maxWidth: '600px'}`)
-  //- layers list
-  div(v-if="storePlayer").col.full-width
-    div(:style=`{position: 'relative'}`).column.fit
-      //- body: layers, dragging
-      .col.full-width.scroll
-        .row.full-width.justify-center
-          div(
-            :class=`{
-              'q-pt-sm': !storeEditor.layerEditing,
-            }`
-            :style=`{maxWidth: storeEditor.layerEditing ? '680px' : '680px'}`).row.full-width.justify-center
-            draggable(
-              :list="composition.layers" group="layers" :sort="true" handle=".layer-drag-handle"
-              @start="layersDragging = true"
-              @end="layersDragging = false").full-width
-              div(
-                v-for="(l,li) in composition.layers" :key="li"
-                v-show="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
-                :style=`{}`
-                ).row.full-width.items-start.content-start.q-mb-xs
-                //- left: select
-                div(
-                  v-if="composition.layers.length > 1 ? !storeEditor.layerEditing : false"
-                  :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
-                  q-checkbox(
-                    v-model="layersSelected" :val="l.id"
-                    dark dense color="grey-6"
-                    :style=`{opacity: layersSelected.includes(l.id) ? 1 : 0.6}`)
-                //- middle: input name, layer editor...
-                .col.full-height
-                  layer-editor(
-                    @delete="layerDelete(l)"
-                    @createNode="layersSelectedCreateNode([l.id])"
-                    :composition="composition" :layer="l" :layerIndex="li")
-                //- right: drag
-                div(
-                  v-if="composition.layers.length > 1 ? !storeEditor.layerEditing : false"
-                  :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
-                  q-btn(
-                    round flat dense color="grey-6" icon="drag_indicator").layer-drag-handle
-                    kalpa-menu-popup(:actions="layerActions" :value="l")
-            //- layer ADD
-            div(
-              v-if="false"
-              :style=`{}`).row.full-width.justify-center
-              div(:style=`{maxWidth: '680px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
-                q-btn(
-                  v-if="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
-                  @click="layerAdd()"
-                  flat color="green" icon-right="add" no-caps
-                  :style=`{height: '40px'}`
-                  ).full-width
-                  span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить фрагмент')}}
-                q-btn(
-                  v-if="composition.layers.length > 1 ? storeEditor.layerEditing : false"
-                  @click="storeEditor.layerEditing = null, storeEditor.layerPlaying = null"
-                  flat color="green" icon-right="check" no-caps
-                  :style=`{height: '40px'}`
-                  ).full-width
-                  span.text-bold.q-mx-sm {{$t('layer_drop', 'Готово')}}
-  //- footer: layersSelected
-  div(
-    v-if="layersSelected.length > 0"
-    :style=`{
-      position: 'absolute', bottom: 0, zIndex: 1000,
-      borderRadius: '10px', overflow: 'hidden',
-      paddingLeft: '40px', paddingRight: '40px',
-    }`).row.full-width.justify-center.q-py-sm.b-70
-    q-btn(flat dense color="white" no-caps @click="layersSelected = []") {{$t('cancel', 'Отмена')}}
-    q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('layer_editor_layers_delete', 'Удалить фрагменты')}}
-    .col
-    //- layer-mover(:composition="composition" :layersSelected="layersSelected")
-  .row.full-width.justify-center
-    div(
-      v-show="layersSelected.length === 0"
-      :style=`{
-        maxWidth: '680px',
-      }`).row.full-width
-      composition-progress(
-        v-if="composition.layers.length > 0"
-        v-show="!storeEditor.layerEditing"
-        :options="options"
-        :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
-      //- actions
-      div(
-        v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
-        ).row.full-width.items-center.content-center.q-pa-xs
-        q-btn(flat dense color="white" no-caps icon="content_cut")
+  //- mode EMPTY
+  div(v-if="mode === 'empty'").row.fit.items-start.content-start.justify-center.q-py-md
+    q-btn(
+      @click="layerFirstAdd()"
+      flat color="green" icon="add" no-caps
+      ) {{$t('wsCompositionEditor_Add first fragment!', 'Добавить первый фрагмент!')}}
+  //- mode MINI
+  div(v-if="mode === 'mini'").column.fit
+    //- header
+    .row.full-width.justify-center
+      name-editor(
+        :composition="composition"
+        :style=`{maxWidth: '600px'}`)
+    //- body
+    .col.full-width
+      div(v-if="storePlayer").row.full-width.justify-center
+        layer-editor(
+          @delete="layerDelete(l)"
+          @createNode="layersSelectedCreateNode([l.id])"
+          :composition="composition" :layer="composition.layers[0]" :layerIndex="0"
+          :style=`{
+            maxWidth: '600px',
+          }`)
+    //- footer
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '600px',}`).row.full-width.items-center.content-center.q-pa-sm
+        q-btn(flat dense color="white" no-caps icon="content_cut" @click="modeMiniToMaxi()")
           span.text-white.text-bold.q-mx-sm {{$t('pageEdit_montage', 'Монтаж')}}
         .col
-        q-btn(flat dense color="grey-5" no-caps).q-px-sm.q-mr-sm {{$t('pageEdit_cancel', 'Отмена')}}
+        q-btn(flat dense color="grey-5" no-caps @click="$emit('close')").q-px-sm.q-mr-sm {{$t('pageEdit_cancel', 'Отмена')}}
         q-btn(dense color="green" icon-right="check" no-caps @click="$emit('close')")
           span.text-bold.text-white.q-mx-xs {{$t('pageEdit_save', 'Сохранить')}}
+  //- mode MAXI
+  div(v-if="mode === 'maxi'").column.fit.br
+    //- header
+    .row.full-width.justify-center
+      name-editor(
+        :composition="composition"
+        :style=`{maxWidth: '600px'}`)
+    //- layers list
+    div(v-if="storePlayer").col.full-width
+      div(:style=`{position: 'relative'}`).column.fit
+        //- body: layers, dragging
+        .col.full-width.scroll
+          .row.full-width.justify-center
+            div(
+              :class=`{
+              }`
+              :style=`{maxWidth: '600px',}`).row.full-width.justify-center
+              draggable(
+                :list="composition.layers" group="layers" :sort="true" handle=".layer-drag-handle"
+                @start="layersDragging = true"
+                @end="layersDragging = false").full-width
+                div(
+                  v-for="(l,li) in composition.layers" :key="li"
+                  v-if="true"
+                  :style=`{}`
+                  ).row.full-width.items-start.content-start.q-mb-xs
+                  //- left: select
+                  div(
+                    :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
+                    q-checkbox(
+                      v-model="layersSelected" :val="l.id"
+                      dark dense color="grey-6"
+                      :style=`{opacity: layersSelected.includes(l.id) ? 1 : 0.6}`)
+                  //- middle: input name, layer editor...
+                  .col.full-height
+                    layer-editor(
+                      @delete="layerDelete(l)"
+                      @createNode="layersSelectedCreateNode([l.id])"
+                      :composition="composition" :layer="l" :layerIndex="li")
+                  //- right: drag
+                  div(
+                    :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
+                    q-btn(
+                      round flat dense color="grey-6" icon="drag_indicator").layer-drag-handle
+                      kalpa-menu-popup(:actions="layerActions" :value="l")
+              //- layer ADD
+              div(
+                :style=`{}`).row.full-width.justify-center
+                div(:style=`{maxWidth: '600px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
+                  q-btn(
+                    @click="layerAdd()"
+                    flat color="green" icon-right="add" no-caps
+                    :style=`{height: '40px'}`
+                    ).full-width
+                    span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить фрагмент')}}
+    //- footer: layersSelected
+    div(
+      v-if="layersSelected.length > 0"
+      :style=`{
+        position: 'absolute', bottom: 0, zIndex: 1000,
+        borderRadius: '10px', overflow: 'hidden',
+        paddingLeft: '40px', paddingRight: '40px',
+      }`).row.full-width.justify-center.q-py-sm.b-70
+      q-btn(flat dense color="white" no-caps @click="layersSelected = []") {{$t('cancel', 'Отмена')}}
+      q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('layer_editor_layers_delete', 'Удалить фрагменты')}}
+      .col
+      //- layer-mover(:composition="composition" :layersSelected="layersSelected")
+    //- footer
+    .row.full-width.justify-center
+      div(
+        v-show="layersSelected.length === 0"
+        :style=`{
+          maxWidth: '600px',
+        }`).row.full-width
+        composition-progress(
+          v-if="composition.layers.length > 0"
+          v-show="!storeEditor.layerEditing"
+          :options="options"
+          :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
+        //- actions
+        div(
+          v-show="!storeEditor.layerEditing"
+          ).row.full-width.items-center.content-center.q-pa-xs
+          q-btn(
+            v-if="composition.layers.length === 1"
+            flat dense color="white" no-caps icon="content_cut" @click="modeMaxiToMini()")
+            span.text-white.text-bold.q-mx-sm {{$t('pageEdit_maxiToMini', 'К мини-версии')}}
+          .col
+          q-btn(flat dense color="grey-5" no-caps @click="$emit('close')").q-px-sm.q-mr-sm {{$t('pageEdit_cancel', 'Отмена')}}
+          q-btn(dense color="green" icon-right="check" no-caps @click="$emit('close')")
+            span.text-bold.text-white.q-mx-xs {{$t('pageEdit_save', 'Сохранить')}}
 </template>
 
 <script>
@@ -117,6 +140,7 @@ export default {
   inject: ['sidPlayer', 'sidEditor'],
   data () {
     return {
+      mode: 'mini', // empty, mini, maxi
       layersSelected: [],
       layerDragging: false,
     }
@@ -155,7 +179,29 @@ export default {
       }, 0)
     },
   },
+  watch: {
+    composition: {
+      immediate: true,
+      handler (to, from) {
+        if (to.layers.length === 0) this.mode = 'empty'
+      }
+    }
+  },
   methods: {
+    modeMiniToMaxi () {
+      this.$log('modeMiniToMaxi')
+      this.mode = 'maxi'
+      // if layers > 1 ? animation?
+    },
+    modeMaxiToMini () {
+      this.$log('modeMaxiToMini')
+      // cant go if layers > 1 ?
+    },
+    layerFirstAdd () {
+      this.$log('layerFirstAdd')
+      this.layerAdd()
+      this.mode = 'mini'
+    },
     layerEdit (layer) {
       this.$log('layerEdit', layer)
       this.storeEditor.layerPlaying = layer.id
@@ -190,7 +236,7 @@ export default {
       this.layerDrop()
       let id = this.storeEditor.layerAdd()
       this.storeEditor.layerPlaying = id
-      // this.layerEdit({id})
+      this.storeEditor.layerEditing = id
     },
     layersSelectedDelete () {
       this.$log('layersSelectedDelete')

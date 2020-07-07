@@ -32,18 +32,21 @@ div(
               v-for="(s,si) in items" :key="s.oid"
               :style=`{
                 position: 'relative',
-                height: '40px',
+                height: '50px',
                 borderRadius: $store.state.ui.borderRadius+'px'
               }`
               ).row.full-width.items-center.content-center.q-px-md.cursor-pointer.subscription
               .col.full-height
-                div(v-if="s.type === 'SENTENCE'").row.fit.items-center.content-center
+                div(v-if="s.type === 'SENTENCE' || s.type === 'WORD'").row.fit.items-center.content-center
                   //- div(:style=`{}`)
-                  q-btn(round flat dense color="white" no-caps) #
+                  q-btn(
+                    round flat dense color="white"
+                    :style=`{borderRadius: '50%',}`)
+                    q-icon(name="blur_on" color="white" size="30px")
                   div(@click="subscriptionClick(s,si)").col.q-px-sm
                     span.text-white {{ s.name }}
-                div(v-if="s.type === 'USER'").row.items-center.content-center.fit
-                  img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
+                div(v-if="s.type === 'USER'").row.fit.items-center.content-center
+                  img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '36px', height: '36px', borderRadius: '50%',}`)
                   div(@click="subscriptionClick(s,si)").col.q-px-sm
                     span.text-white {{ s.name }}
               q-btn(
@@ -77,9 +80,14 @@ export default {
   methods: {
     async subscriptionClick (s, si) {
       this.$log('subscriptionClick', s, si)
-      this.$router.push('/user/' + s.oid)
-      // let res = await UserApi.unSubscribe(s.oid)
-      // this.$log('res', res)
+      let typesMap = {
+        USER: '/user/',
+        SENTENCE: '/sphere/',
+        WORD: '/sphere/',
+        NODE: '/node/'
+      }
+      if (!typesMap[s.type]) return
+      this.$router.push(typesMap[s.type] + s.oid).catch(e => e)
     },
     async subscriptionDelete (s, si) {
       this.$log('subscriptionDelete', s, si)

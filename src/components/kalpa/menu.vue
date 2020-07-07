@@ -30,9 +30,9 @@ div(
       kalpa-logo(:width="40" :height="40")
     .col
       .row.fit.items-center.content-center
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Kalpagrama', 'Кальпаграма')}}
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpaMenu_kalpagrama', 'Кальпаграма')}}
         .row.full-width
-          small.text-white {{$t('Up the essence!', 'Продвигай суть!')}}
+          small.text-white {{$t('kalpaMenu_title', 'Продвигай суть!')}}
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width
     div(
@@ -108,7 +108,7 @@ export default {
     return {
       width: 300,
       pages: [
-        {id: 'home', name: i18n.t('Home', 'Домашняя страница'), icon: 'home'},
+        {id: 'home', name: i18n.t('pageHome', 'Домашняя'), icon: 'home'},
         {id: 'trends', name: i18n.t('Trends', 'Тренды'), icon: 'whatshot'},
         {id: 'workspace', name: i18n.t('Workspace', 'Мастерская'), icon: 'school'},
         {id: 'settings', name: i18n.t('Settings', 'Настройки'), icon: 'tune'},

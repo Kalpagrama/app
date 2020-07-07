@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center.q-px-sm
+div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
   //- interceptor tint
   div(
     @click="interceptorClick"

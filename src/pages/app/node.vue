@@ -1,5 +1,5 @@
 <template lang="pug">
-node-explorer(:node="node")
+node-explorer(:node="node" :nodeProgress="nodeProgress")
 </template>
 
 <script>
@@ -11,7 +11,16 @@ export default {
     return {
       node: null,
       nodeLoading: false,
-      nodeLoadingError: null
+      nodeLoadingError: null,
+      nodeProgress: null,
+    }
+  },
+  computed: {
+    oid () {
+      return this.$route.params.oid
+    },
+    createProgress () {
+      return this.$store.state.core.progressInfo.CREATE
     }
   },
   watch: {
@@ -19,14 +28,42 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        this.$log('$route CHANGED', to)
+        this.$log('$route CHANGED', this.$store.state.core.progressInfo.CREATE)
         if (to) {
           this.node = null
           await this.$wait(200)
-          this.node = await this.nodeLoad(to)
+          if (!this.nodeProgress) {
+            this.node = await this.nodeLoad(to)
+          }
         }
       }
-    }
+    },
+    '$store.state.core.progressInfo.CREATE': {
+      deep: true,
+      immediate: true,
+      async handler (to, from) {
+        this.$log('*** CREATE', to)
+        if (to && to[this.oid]) {
+          this.nodeProgress = to[this.oid]
+          this.$log('*** nodeProgress ***' + this[this.oid])
+          if (to[this.oid] === 100) {
+            this.node = await this.nodeLoad(this.oid)
+          }
+        }
+      }
+    },
+    // createProgress: {
+    //   async handler (to, from) {
+    //     this.$log('*** CREATE ***', to)
+    //     // if (to && to[this.oid]) {
+    //     //   this.nodeProgress = to[this.oid]
+    //     //   this.$log('*** nodeProgress *** ', to[this.oid])
+    //     //   if (to[this.oid] === 100) {
+    //     //     this.node = await this.nodeLoad()
+    //     //   }
+    //     // }
+    //   }
+    // }
   },
   methods: {
     async nodeLoad (oid) {
@@ -50,6 +87,11 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    // let count = 1
+    // setInterval(() => {
+    //   count += 1
+    //   this.$store.commit('core/processEvent', {type: 'PROGRESS', action: 'CREATE', progress: count, oid: this.oid})
+    // }, 500)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

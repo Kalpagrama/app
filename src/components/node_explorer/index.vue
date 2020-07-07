@@ -11,12 +11,24 @@ kalpa-layout(
         .row.fit.items-center.content-center.q-px-sm
           span(v-if="node" :style=`{fontSize: '16px',}`).text-white.text-bold {{ node.name }}
   template(v-slot:drawerRight)
-    menu-right(:style=`{maxWidth: '300px'}`)
+    menu-right(
+      v-if="node"
+      :style=`{maxWidth: '300px'}`)
   template(v-slot:page)
     router-view(
       v-if="node"
       :node="node"
       :stateNodeExplorer="stateNodeExplorer")
+    div(v-if="!node && nodeProgress").row.full-width.justify-center
+      div(
+        :style=`{
+          marginTop: '70px',
+          maxWidth: '800px', height: '500px',
+          borderRadius: '10px', overflow: 'hidden'
+        }`).row.full-width.justify-center.items-center.content-center.b-70
+        h1(v-if="nodeProgress").text-white {{nodeProgress}}
+        .row.full-width.justify-center
+          q-spinner(size="50px" color="green")
 </template>
 
 <script>
@@ -28,7 +40,7 @@ import nodeNodes from './node_nodes'
 export default {
   name: 'nodeExplorer',
   components: {menuRight, nodeNodes},
-  props: ['node'],
+  props: ['node', 'nodeProgress'],
   data () {
     return {
       nodeActive: true,
@@ -53,7 +65,10 @@ export default {
           this[key] = val
         }
       }
-    }
+    },
+    // nodeInProgress () {
+    //   return this.$store.state.core.progressInfo.CREATE[this.node.oid]
+    // }
   },
   methods: {
   },

@@ -1,4 +1,5 @@
 import {LogLevelEnum, LogModulesEnum} from 'src/boot/log'
+
 export default {
   initialized: false,
   name: 'Kalpagrama',
@@ -13,6 +14,7 @@ export default {
   colors: {
     hello: 'goodbye'
   },
+  count: 0,
   progressInfo: {
     UPLOAD: {}, // {oid: progress, oid: progress}
     CREATE: {}, // {oid: progress, oid: progress}

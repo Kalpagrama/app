@@ -6,11 +6,14 @@ div(
     overflow: 'hidden',
   }`
   ).column.full-width.b-50
+  //- header
   .row.full-width.q-px-sm
+    //- navigation
     .row.full-width.items-center.content-center.justify-between.q-py-md
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
       span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('find_node_item', 'Найди элемент для ядра')}}
       q-btn(round flat color="white" icon="more_vert" :style=`{opacity: 0}`)
+    //- types
     .row.full-width.justify-center
       div(:style=`{maxWidth: '600px'}`).row.full-width.q-px-md
         q-tabs(
@@ -25,6 +28,7 @@ div(
             :name="p.id" :label="p.name"
             dense no-caps color="white"
             :style=`{color: 'rgb(180,180,180)'}`)
+  //- body
   .col.full-width
     .row.fit.justify-center
       ws-content-list(
@@ -50,22 +54,22 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-// Emits "item" event
+// emits content/composition event
 export default {
   name: 'itemFinder',
   data () {
     return {
       type: 'composition',
       types: [
-        {id: 'composition', name: 'Образы'},
-        {id: 'content', name: 'Контент'},
+        {id: 'composition', name: this.$t('itemFinder_compositions', 'Образы')},
+        {id: 'content', name: this.$t('itemFinder_content', 'Контент')},
       ]
     }
   },
   methods: {
     compositionFound (composition) {
       this.$log('compositionFound', composition)
-      this.$emit('item', composition)
+      this.$emit('composition', composition)
       this.$emit('close')
     },
     async contentFound (content) {
@@ -74,37 +78,22 @@ export default {
       let layerColor = this.$randomColor(layerId)
       let layerStart = 0
       let layerEnd = layerStart + 10
-      let compositionInput = {
+      let input = {
         wsItemType: 'WS_CONTENT',
         thumbOid: content.thumbOid,
         contentOid: content.contentOid,
         contentType: 'COMPOSITION',
         name: '',
-        layers: [
-          // {
-          //   id: layerId,
-          //   color: layerColor,
-          //   contentOid: content.contentOid,
-          //   figuresAbsolute: [
-          //     {t: layerStart, points: []},
-          //     {t: layerEnd, points: []}
-          //   ],
-          //   figuresRelative: [],
-          //   spheres: []
-          // }
-        ],
+        layers: [],
         spheres: [],
         operation: { items: null, operations: null, type: 'CONCAT' }
       }
-      this.$log('compositionInput', compositionInput)
-      let composition = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, compositionInput)
-      this.$log('composition', composition)
-      this.$emit('item', composition)
+      this.$log('input', input)
+      let composition = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, input)
+      this.$log('contentFound done', composition)
+      this.$emit('content', composition)
       this.$emit('close')
     }
-  },
-  mounted () {
-    this.$log('mounted')
   }
 }
 </script>
