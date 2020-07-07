@@ -4,7 +4,7 @@
     :style=`{
     }`
     ).row.full-width.items-end.content-end.q-pt-sm
-    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
+    //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
     .col
       .row.fit.justify-center
         q-tabs(
@@ -20,7 +20,7 @@
             :name="p.id" :label="p.name"
             no-caps color="white"
             :style=`{color: 'rgb(180,180,180)'}`)
-    q-btn(round flat color="green" icon="check" @click="$emit('close')")
+    //- q-btn(round flat color="green" icon="check" @click="$emit('close')")
 </template>
 
 <script>

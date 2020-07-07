@@ -30,6 +30,7 @@ div(
     :sidPlayer="sidPlayer"
     :options=`{
       mode: 'progress',
+      ctx: 'explorer',
     }`
     ).b-60
     template(v-slot:progressActions)

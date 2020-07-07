@@ -210,13 +210,20 @@ export default {
       this.layer.figuresAbsolute[index].t = t
       // center frames to the layer
       this.storeLayerEditor.set('need_framesLayerCenter', true)
+      this.storeEditor.layerPlaying = this.layer.id
     },
     layerForward (index, isRight) {
       this.$log('layerForward', index, isRight)
+      this.storePlayer.pause()
       let t = this.layer.figuresAbsolute[index].t + (isRight ? 0.1 : -0.1)
+      // if end changed go 1.5 sec before
+      // if (index === 1) t -= 1.5
+      // set t
       this.layer.figuresAbsolute[index].t = t
-      this.storePlayer.playPause()
+      // this.storePlayer.playPause()
       this.storePlayer.setCurrentTime(t)
+      // play this layer anyway
+      this.storeEditor.layerPlaying = this.layer.id
     },
     layerCreateNode () {
       this.$log('layerCreateNode')

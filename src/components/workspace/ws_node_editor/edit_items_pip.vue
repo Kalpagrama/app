@@ -69,10 +69,10 @@ div(
           v-if="itemActive"
           :style=`{position: 'absolute', zIndex: 999, top: 'calc(50% - 70px)', right: 0,width: '40px',}`).row.justify-center
           q-btn(
-            @click="$emit('itemDelete', itemIndex)"
+            @click="$emit('itemDelete', itemIndex), itemsActive = true"
             round flat dense color="grey-5" icon="delete_outline").full-width
           q-btn(
-            @click="$emit('itemEdit', item)"
+            @click="$emit('itemEdit', item), itemsActive = true"
             color="green" icon="edit").full-width.q-py-md
           q-btn(
             @click="settingsDialogOpened = true"
@@ -86,7 +86,7 @@ div(
           :options=`{
             isPreview: true,
             mode: 'player',
-            active: itemActive,
+            active: true && itemActive,
             mini: !itemActive,
           }`
           :style=`{
@@ -94,12 +94,16 @@ div(
           }`)
         //- next item
         q-btn(
-          v-if="itemActive && itemIsLast"
-          round push color="green" icon="add" @click="$emit('itemFind')"
+          v-if="itemActive && itemIsLast && node.items.length < 5"
+          @click="$emit('itemFind'), itemsActive = true"
+          color="green" icon="add" size="lg"
           :style=`{
-            position: 'absolute', zIndex: 99999, right: '40px', bottom: '40px',
-            borderRadius: '50%',
+            position: 'absolute', zIndex: 9999, right: 0, bottom: 0,
+            width: '25%', height: '25%',
+            opacity: 0.9,
+            //- borderRadius: '10px',
           }`)
+          slot(name="next" :next="next")
   //- //- set next item
   //- q-btn(
   //-   v-if="true && node.items.length > 0"
@@ -121,6 +125,7 @@ export default {
   data () {
     return {
       settingsDialogOpened: false,
+      itemsActive: true,
     }
   },
 }

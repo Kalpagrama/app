@@ -26,6 +26,7 @@ div(:style=`{position: 'relative',}`).column.fit
             div(:style=`{position: 'relative', maxWidth: barWidth+'px',}`).row.fit
               div(
                 v-for="(i,ii) in items" :key="i.id"
+                v-if="i.layers.length > 0"
                 :style=`{
                   position: 'absolute', zIndex: 100+ii,
                   left: i.layers[0].figuresAbsolute[0].t/content.duration*100+'%',
@@ -56,6 +57,12 @@ div(:style=`{position: 'relative',}`).column.fit
       ws-composition-editor(
         :value="composition"
         :sidPlayer="sidPlayer"
+        :options=`{
+          active: true,
+          mini: false,
+          mode: 'editor',
+          ctx: 'explorer',
+        }`
         @close="compositionEdited").full-height.b-60
   //- compositions selected
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")

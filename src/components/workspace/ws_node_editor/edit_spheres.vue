@@ -55,7 +55,7 @@
   .row.full-width.items-start.content-start
     div(
       v-for="(s,si) in node.spheres" :key="si"
-      @click="sphereSelectedClick(s)"
+      @click="sphereDelete(s,si)"
       :style=`{
         height: '40px', borderRadius: '10px', overflow: 'hidden',
       }`
@@ -74,7 +74,10 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'editSpheres',
-  props: ['node'],
+  props: {
+    node: {type: Object},
+    sphereFirstEditable: {type: Boolean, default () { return true }},
+  },
   data () {
     return {
       sphere: '',
@@ -93,8 +96,12 @@ export default {
     }
   },
   methods: {
-    sphereSelectedClick (s) {
-      this.$log('sphereSelectedClick', s)
+    sphereDelete (s, si) {
+      this.$log('sphereDelete', s)
+      if (si === 0 && !this.sphereFirstEditable) {
+        this.$q.notify({type: 'negative', message: 'Нельзя удалить свзующую сферу при расширении образа!'})
+        return
+      }
       this.node.spheres = this.node.spheres.filter(val => val.name !== s.name)
     },
     sphereAddStart (s) {

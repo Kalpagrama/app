@@ -1,169 +1,175 @@
 <template lang="pug">
 div(
   :style=`{
-    position: 'relative',
+    position: 'relative', zIndex: 99999,
     borderRadius: $q.screen.gt.xs ? '10px' : 'none',
     overflow: 'hidden',
   }`
-  ).column.full-width.b-40
-  //- header
-  div(
-    :style=`{
-      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
-      overflow: 'hidden'
-    }`
-    ).row.full-width.items-start.content-start.b-50.q-px-sm.q-mb-sm
-    slot(name="header")
-    //- navigation
-    div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.justify-between.q-py-md
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Node creation', 'Сборка ядра')}}
-      //- .col
+  ).column.full-width.b-50
+  //- item find
+  q-dialog(v-model="itemFinderOpened" position="bottom")
+    item-finder(
+      @content="contentFound"
+      @composition="compositionFound"
+      @close="itemFinderOpened = false"
+      :style=`{
+        height: $q.screen.height-60+'px',
+        minHeight: $q.screen.height-60+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px',
+      }`)
+  //- item edit
+  q-dialog(
+    v-model="itemEditorOpened" position="bottom"
+    @hide="itemEdited")
+    ws-composition-editor(
+      v-if="item"
+      :value="item"
+      @close="itemEditorOpened = false"
+      :options=`{
+        ctx: 'nodeEditor',
+        mode: 'editor',
+        mini: false,
+        active: true,
+      }`
+      :style=`{
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+        maxWidth: $store.state.ui.maxWidthPage+'px'
+      }`)
+  .col.full-width.scroll
+    //- header
+    div(
+      :style=`{
+        borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
+        overflow: 'hidden'
+      }`
+      ).row.full-width.items-start.content-start.b-50.q-px-md.q-mb-sm
+      //- navigation
+      div(v-if="true").row.full-width.items-center.content-center.justify-between.q-py-md
+        q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('wsNodeEditor_title', 'Редактор ядра')}}
+        q-btn(round flat color="red-5" icon="delete_outline" @click="nodeDelete()")
+    .row.full-width.justify-center
+      div(
+        :style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
+        //- node wrapper
+        //- TODO: add after compare done...
+        //- edit-layout(:node="node")
+        div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-70.q-mb-sm
+          component(
+            :is="component[node.layout]"
+            :node="node"
+            @itemFind="itemFind"
+            @itemEdit="itemEdit"
+            @itemDelete="itemDelete")
+            template(v-slot:next=`{next}`)
+              q-btn(ref="nextBtn" round flat color="red" icon="add" @click="next()" :style=`{display: 'none'}`)
+          edit-essence(:node="node")
+        edit-category(:node="node")
+        edit-spheres(:node="node" :sphereFirstEditable="ctx === 'workspace'")
+  //- publish
+  .row.full-width.justify-center
+    div(:style=`{maxWidth: '600px'}`).row.full-width.q-pb-sm
       q-btn(
-        @click="pageId === 'info' ? pageId = 'items' : pageId = 'info'"
-        round icon="settings"
-        :color="pageId === 'info' ? 'green' : 'white'"
-        :flat="pageId !== 'info'")
-    //- essence
-    edit-essence(v-if="pageId !== 'info'" :node="node" :options="options").q-pb-sm
-    //- pages
-    div(v-if="false").row.full-width.justify-center
-      div(:style=`{maxWidth: '600px'}`).row.full-width.q-pt-sm
-        q-tabs(
-          :value="pageId" @input="pageChanged($event)"
-          dense no-caps color="white"
-          align="justify"
-          active-color="green"
-          :style=`{}`
-          ).full-width
-          q-tab(
-            v-for="(p,pi) in pages" :key="p.id"
-            :name="p.id" :label="p.name"
-            dense no-caps color="white"
-            :style=`{color: 'rgb(180,180,180)'}`)
-  //- body
-  .col.full-width
-    .row.fit.justify-center
-      component(
-        @close="$emit('close')"
-        :is="`edit-${pageId}`"
-        :storeNodeEditor="storeNodeEditor"
-        :node="node"
-        :options="options"
-        :style=`{
-          maxWidth: '600px',
-        }`)
-  //- footer
-  div(:style=`{order: 1}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '600px'}`).row.full-width
-      q-tabs(
-        :value="pageId" @input="pageChanged($event)"
-        dense no-caps color="white"
-        align="justify"
-        active-color="green"
-        :style=`{}`
-        ).full-width
-        q-tab(
-          v-for="(p,pi) in pages" :key="p.id"
-          :name="p.id" :label="p.name"
-          dense no-caps color="white"
-          :style=`{color: 'rgb(180,180,180)'}`)
-  div(v-if="false" :style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '600px'}`).row.full-width.q-py-sm
-      q-btn(
-        @click="pagePrev()"
-        round flat color="white"
-        icon="keyboard_arrow_left"
-        :style=`{opacity: pageId === 'items' ? 0 : 1}`)
-      .col
-      q-btn(
-        v-if="pageId !== 'preview'"
-        @click="pageNext()"
+        @click="publish"
         push color="green" no-caps
-        ).q-px-md {{$t('Next', 'Далее')}}
-      q-btn(
-        v-if="pageId === 'preview'"
-        @click="storeNodeEditor.nodePublish()"
-        push color="green" no-caps
-        :loading="storeNodeEditor.nodePublishing"
-        ).q-px-md
-        span.text-white.text-bold {{$t('Publish', 'Опубликовать')}}
+        :loading="publishing"
+        :style=`{height: '50px',}`
+        ).full-width {{$t('ws_node_editor_publish', 'Опубликовать')}}
 </template>
 
 <script>
 import { NodeApi } from 'src/api/node'
 
-import editEssence from './edit_essence'
-import editInfo from './edit_info'
-import editItems from './edit_items'
+import editLayout from './edit_layout'
+import editCategory from './edit_category'
 import editSpheres from './edit_spheres'
-import editPreview from './edit_preview'
+import editEssence from './edit_essence'
+import editItemsPip from './edit_items_pip'
+import editItemsCompare from './edit_items_compare'
+import itemFinder from './item_finder'
 
 export default {
   name: 'wsNodeEditor',
-  components: {editInfo, editEssence, editItems, editSpheres, editPreview},
+  components: {editLayout, editCategory, editSpheres, editEssence, editItemsPip, editItemsCompare, itemFinder},
   props: {
+    sid: {type: String, default () { return 'wsNodeEditor' }},
     value: {type: Object},
     options: {
       type: Object,
       default () {
         return {
-          essenceEditable: true,
-          itemAdd: false,
+          ctx: 'workspace',
         }
       }
     }
   },
   data () {
     return {
-      pageId: 'items',
       publishing: false,
       deleting: false,
+      item: null,
+      itemFinderOpened: false,
+      itemEditorOpened: false,
+      component: {
+        PIP: 'edit-items-pip',
+        HORIZONTAL: 'edit-items-compare',
+      }
+    }
+  },
+  provide () {
+    return {
+      sidNodeEditor: this.sid
     }
   },
   computed: {
-    pages () {
-      return [
-        {id: 'items', name: this.$t('compositions', '1. Образы')},
-        {id: 'spheres', name: this.$t('spheres', '2. Сферы')},
-        {id: 'preview', name: this.$t('preview', '3. Предосмотр')}
-      ]
-    },
     node () {
       return this.value
     },
-    storeNodeEditor () {
-      return {
-        pageId: this.pageId,
-        pages: this.pages,
-        publish: this.publish,
-        publishing: this.publishing,
-        deleting: this.deleting,
-        set: (key, val) => {
-          this[key] = val
-        }
-      }
-    }
   },
   methods: {
-    pagePrev () {
-      this.$log('pagePrev')
-      if (this.pageId === 'spheres') this.pageChanged('items')
-      else if (this.pageId === 'preview') this.pageChanged('spheres')
+    // get item
+    itemFind () {
+      this.$log('itemFind')
+      this.itemFinderOpened = true
     },
-    pageNext () {
-      this.$log('pageNext')
-      if (this.pageId === 'items') this.pageChanged('spheres')
-      else if (this.pageId === 'spheres') this.pageChanged('preview')
-    },
-    pageChanged (id) {
-      this.$log('pageChanged', id)
-      // check node.items for preview page
-      if (id === 'preview') {
-        if (this.node.items.length === 0) return
+    compositionFound (composition) {
+      this.$log('compositionFound', composition)
+      let itemIndex = this.node.items.length
+      this.$set(this.node.items, itemIndex, composition)
+      if (this.node.items.length > 1) this.$refs.nextBtn.click()
+      // set node name from the composition.name
+      if (this.node.name.length === 0) {
+        this.node.name = composition.name
       }
-      this.pageId = id
     },
+    contentFound (content) {
+      this.$log('contentFound', content)
+      this.compositionFound(content)
+      this.$nextTick(() => {
+        this.itemEdit(this.node.items[this.node.items.length - 1])
+      })
+    },
+    // edit item
+    itemEdit (item) {
+      this.$log('itemEdit', item)
+      this.item = item
+      this.itemEditorOpened = true
+    },
+    itemEdited () {
+      this.$log('itemEdited', this.item)
+      if (this.node.name.length === 0) {
+        if (this.item.name.length > 0) {
+          this.node.name = this.item.name
+        }
+      }
+    },
+    itemDelete (index) {
+      this.$log('itemDelete', index)
+      if (!confirm(this.$t('delete_item', 'Удалить элемент?'))) return
+      this.$delete(this.node.items, index)
+    },
+    // node
     // TODO Эти проверки могут находится в UI коде - только если это валидация (но это вроде не валидация, поэтому надо перенести в NodeApi)
     check () {
       this.$log('check')
@@ -184,11 +190,24 @@ export default {
       //   if (layersDuration === 0) throw new Error('Layers durtion === 0 !')
       // })
     },
+    checkExtend () {
+      this.$log('checkExtend')
+      if (this.node.name.length === 0) {
+        if (this.node.spheres[0]) {
+          this.node.name = this.node.spheres[0].name
+        }
+        else {
+          throw new Error('Essence or one sphere!')
+        }
+      }
+    },
     async publish () {
       try {
         this.$log('nodePublish start')
-        this.storeNodeEditor.set('publishing', true)
+        // this.storeNodeEditor.set('publishing', true)
+        this.publishing = true
         this.check()
+        this.checkExtend()
         // publish
         this.$q.loading.show({spinnerColor: 'green', message: 'Creating node...'})
         let createdNode = await NodeApi.nodeCreate(this.node)
@@ -202,11 +221,13 @@ export default {
         this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
         await this.$wait(1000)
         this.$q.loading.hide()
-        this.storeNodeEditor.set('publishing', false)
+        // this.storeNodeEditor.set('publishing', false)
+        this.publishing = false
         this.$q.notify({
           type: 'positive',
           message: this.$t('node_published', 'Ядро опубликовано!')
         })
+        // this.$store.commit('core/processEvent', {type: 'PROGRESS', action: 'CREATE', progress: 1})
         this.$emit('published', createdNode.oid)
         this.$emit('close')
       }
@@ -218,7 +239,8 @@ export default {
           type: 'negative',
           message: errorMessage,
         })
-        this.storeNodeEditor.set('publishing', false)
+        // this.storeNodeEditor.set('publishing', false)
+        this.publishing = false
       }
     },
     async nodeDelete () {
@@ -230,7 +252,29 @@ export default {
       this.storeNodeEditor.set('deleting', true)
       await this.$wait(200)
       this.$emit('close')
+    },
+    nodeIsEmpty () {
+      this.$log('nodeIsEmpty')
+      if (this.node.name.length === 0 &&
+        this.node.spheres.length === 0 &&
+        this.node.items.length === 0) {
+        return true
+      }
+      else {
+        return false
+      }
     }
+  },
+  created () {
+    this.$log('created', this.sid)
+    window.stores[this.sid] = this
+  },
+  async beforeDestroy () {
+    this.$log('beforeDestroy')
+    if (this.nodeIsEmpty()) {
+      await this.$rxdb.remove(this.node.id)
+    }
+    if (!module.hot) delete window.stores[this.sid]
   }
 }
 </script>

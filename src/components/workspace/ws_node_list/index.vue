@@ -182,6 +182,7 @@ export default {
       }
       delete nodeInput.id
       delete nodeInput.oid
+      delete nodeInput.rev
       // set defaults
       nodeInput.stage = 'draft'
       nodeInput.wsItemType = 'WS_NODE'
@@ -201,10 +202,7 @@ export default {
     },
     async nodePublished (oid) {
       this.$log('nodePublished')
-      // TODO: go to node page and see loader...
-      // this.$router.push(`/user/${this.$store.getters.currentUser().oid}`).catch(e => e)
-      await this.$wait(300)
-      this.$router.push(`/node/${oid}`)
+      this.$router.push(`/node/${oid}`).catch(e => e)
     },
   }
 }

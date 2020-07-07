@@ -1,16 +1,19 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg-black
-  composition-explorer(v-if="composition" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
+  composition-explorer(
+    v-if="composition"
+    v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
   //- composition-menu(v-if="composition && active && !mini" v-bind="$props" :composition="composition" :content="content" :player="$refs.videoRef")
   //- preview
   img(
     @click="$emit('previewClick')"
+    @error="previewOnError"
     draggable="false"
     :src="preview"
     :style=`{
       objectFit: 'contain',
-      opacity: loaded ? 0 : 1,
-      maxHeight: $q.screen.height-300+'px',
+      opacity: active ? loaded ? 0 : 1 : 1,
+      maxHeight: $q.screen.height-300+'px'
     }`
     ).fit.cursor-pointer
   //- debug
@@ -19,14 +22,27 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
   //-   :options=`{url: composition.url, videoLoaded,currentTime,duration}`
   //-   :style=`{position: 'absolute', top: 0, zIndex: 1000,transform: 'translate3d(0,0,0)'}`)
   composition-controls(
-    v-if="!mini && $refs.videoRef"
-    :currentTime="currentTime"
-    :duration="duration"
+    v-if="active && !mini && $refs.videoRef"
     :player="$refs.videoRef"
-    :playing="playing")
+    :playing="playing"
+    :currentTime="currentTime"
+    :duration="duration")
+  //- controls
+  q-btn(
+    v-if="active && !mini && loadedFinal"
+    @click="volumeToggle()"
+    flat dense
+    :color="muted ? 'red' : 'white'"
+    :icon="muted ? 'volume_off' : 'volume_up'"
+    :style=`{
+      position: 'absolute', zIndex: 2100,
+      left: '16px', bottom: '16px',
+      background: 'rgba(0,0,0,0.1)',
+    }`)
+    small.text-white.text-bold.q-ml-sm {{$time(duration-currentTime)}}
   //- pause arrow
   q-btn(
-    v-if="active && !mini && !playing && loaded"
+    v-if="active && !mini && !playing && loadedFinal"
     @click="onClick()"
     round flat color="white"
     :style=`{
@@ -83,11 +99,13 @@ export default {
       composition: null,
       // player
       loaded: false,
+      loadedFinal: false,
       currentTime: 0,
       duration: 0,
       playing: false,
+      // settings
       playsinline: true,
-      muted: false,
+      muted: true,
     }
   },
   watch: {
@@ -102,6 +120,10 @@ export default {
         }
         else {
           this.loaded = false
+          this.loadedFinal = false
+          this.currentTime = 0
+          this.duration = 0
+          this.playing = false
         }
       }
     },
@@ -109,8 +131,18 @@ export default {
       handler (to, from) {
         this.$log('active TO', to)
         if (!this.$refs.videoRef) return
-        if (to) this.$refs.videoRef.play()
-        else this.$refs.videoRef.pause()
+        this.muted = localStorage.getItem('k_muted') === 'true' ? true : false
+        if (to) {
+          this.$refs.videoRef.play()
+        }
+        else {
+          this.$refs.videoRef.pause()
+          this.loaded = false
+          this.loadedFinal = false
+          this.currentTime = 0
+          this.duration = 0
+          this.playing = false
+        }
       }
     },
     '$store.state.ui.active': {
@@ -121,19 +153,26 @@ export default {
     }
   },
   methods: {
+    previewOnError () {
+      this.$log('previewOnError')
+    },
+    volumeToggle () {
+      this.$log('volumeToggle', this.muted)
+      let muted = !this.muted
+      this.muted = muted
+      localStorage.setItem('k_muted', muted)
+    },
     onClick () {
       this.$log('onClick')
-      if (this.muted) {
+      // muted on IOS
+      if (this.$q.platform.mobile) {
         this.muted = false
+        localStorage.setItem('k_muted', false)
       }
-      else {
-        if (this.playing) {
-          if (this.$refs.videoRef) this.$refs.videoRef.pause()
-        }
-        else {
-          if (this.$refs.videoRef) this.$refs.videoRef.play()
-        }
-      }
+      // play / pause action
+      if (!this.$refs.videoRef) return
+      if (this.playing) this.$refs.videoRef.pause()
+      else this.$refs.videoRef.play()
     },
     onPlay () {
       this.$log('onPlay')
@@ -151,11 +190,14 @@ export default {
       // this.$log('onTimeupdate', e)
       this.currentTime = e.target.currentTime
     },
-    onLoadeddata (e) {
+    async onLoadeddata (e) {
       this.$log('onLoadeddata', e)
       this.duration = e.target.duration
       this.loaded = true
+      this.muted = localStorage.getItem('k_muted') === 'true' ? true : false
       this.$emit('started')
+      await this.$wait(500)
+      this.loadedFinal = true
     }
   }
 }

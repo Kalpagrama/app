@@ -1,52 +1,19 @@
 <template lang="pug">
 div(
+  @mouseenter="mouseOverBar = true"
+  @mouseleave="mouseOverBar = false"
   :style=`{
-    position: 'absolute', zIndex: 5000, bottom: '0px',
+    position: 'absolute', zIndex: 2000, bottom: '0px',
     left: '50%',
     marginRight: '-50%',
     transform: 'translate(-50%, 0)',
     borderRadius: '0px', overflow: 'hidden',
   }`
   ).row.full-width.q-pa-md
-  //- actions
-  div(
-    :style=`{
-      opacity: 0.8,
-      background: 'rgba(0,0,0,0.4)',
-      borderRadius: $store.state.ui.borderRadius+'px',
-      overflow: 'hidden',
-    }`
-    ).row
-    q-btn(
-      round dense flat color="grey-4" @click="playing ? player.pause() : player.play()"
-      :icon="playing ? 'pause' : 'play_arrow'"
-      :style=`{zIndex: 1400}`)
-    q-btn(
-      round dense flat color="grey-4" @click="videoForward(0)"
-      icon="fast_rewind"
-      )
-    q-btn(
-      flat dense color="grey-4"
-      :style=`{
-      }`)
-      small.text-white.q-mr-sm {{ $time(currentTime) }} /
-      small.text-white {{ $time(duration) }}
-    q-btn(
-      round dense flat color="white" @click="videoForward(1)"
-      icon="fast_forward")
-    q-btn(
-      round dense flat color="grey-4" @click="mutedToggle()"
-      :icon="player.muted ? 'volume_off' : 'volume_up'"
-      :style=`{zIndex: 1400}`)
   //- bar
   div(
     @click="barClick"
-    @mouseenter="mouseOverBar = true"
-    @mouseleave="mouseOverBar = false"
     v-touch-pan.mouse.left.right="barDrag"
-    :class=`{
-      //- 'b-30': mouseOverBar
-    }`
     :style=`{
       position: 'absolute', zIndex: 1200, bottom: '0px', left: '0px', height: '17px',
       borderRadius: '0px', overflow: 'hidden',
@@ -97,10 +64,12 @@ export default {
     setCurrentTime (t) {
       this.player.currentTime = t
     },
-    mutedToggle () {
-      this.$log('mutedToggle')
-      this.player.muted = !this.player.muted
-    },
+    // mutedToggle () {
+    //   this.$log('mutedToggle')
+    //   let m = !this.player.muted
+    //   this.player.muted = m
+    //   localStorage.setItem('k_muted', m)
+    // },
     videoForward (right) {
       // this.$log('videoForward', right)
       let t = this.currentTime
@@ -155,11 +124,12 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    let kalpaSound = localStorage.getItem('kalpa_sound')
-    this.$log('kalpaSound', kalpaSound)
-    if (kalpaSound === true) {
-      this.player.muted = false
-    }
+    // let kMuted = localStorage.getItem('k_muted')
+    // this.$log('kMuted', kMuted)
+    // if (kMuted !== undefined) {
+    //   alert('kMuted' + kMuted)
+    //   this.player.muted = kMuted
+    // }
   },
   beforeDestroy () {
     // this.$log('beforeDestroy')

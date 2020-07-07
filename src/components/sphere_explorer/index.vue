@@ -1,6 +1,6 @@
 <template lang="pug">
 kalpa-layout(
-  :title="sphere ? '🔆 '+sphere.name : ''"
+  :title="sphere ? sphere.name : ''"
   :style=`{height: $q.screen.height+'px'}`)
   template(v-slot:header)
     .row.full-width.justify-center
@@ -14,7 +14,9 @@ kalpa-layout(
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
         .col.full-height
           .row.fit.items-center.content-center
-            span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ '🔆 '+sphere.name }}
+            //- q-btn(round flat color="white" icon="blur_on")
+            q-icon(name="blur_on" color="white" size="34px").q-mr-sm
+            span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ sphere.name }}
         q-btn(v-if="!isSubscribed" push color="green" no-caps @click="sphereFollow()") {{$t('Subscribe', 'Подписаться')}}
         q-btn(v-if="isSubscribed" flat color="green" no-caps @click="sphereUnfollow()") {{$t('UnSubscribe', 'Отписаться')}}
   template(v-slot:footer)
