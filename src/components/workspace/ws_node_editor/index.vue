@@ -164,6 +164,7 @@ export default {
       }
       this.pageId = id
     },
+    // TODO Эти проверки могут находится в UI коде - только если это валидация (но это вроде не валидация, поэтому надо перенести в NodeApi)
     check () {
       this.$log('check')
       if (!this.node.category) throw new Error('No node.category !')
@@ -171,17 +172,17 @@ export default {
       if (this.node.layout !== 'PIP') throw new Error('Only PIP layout for now !')
       if (this.node.items.length > 3) throw new Error('3 compositions maximum !')
       if (this.node.spheres.length > 5) throw new Error('5 spheres maximum !')
-      this.node.items.map((i, ii) => {
-        if (i.layers.length === 0) throw new Error(`No layers in item: ${ii} !`)
-        let layersDuration = i.layers.reduce((acc, layer) => {
-          acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
-          return acc
-        }, 0)
-        this.$log('layersDuration', layersDuration)
-        if (layersDuration > 60) throw new Error('Too looong composition, 1 min maximum !')
-        if (layersDuration === 0) throw new Error('Layers durtion === 0 !')
-      })
-      // throw new Error('Fuck you, very much !')
+      // PPV закомментил из-за картинок
+      // this.node.items.map((i, ii) => {
+      //   if (i.layers.length === 0) throw new Error(`No layers in item: ${ii} !`)
+      //   let layersDuration = i.layers.reduce((acc, layer) => {
+      //     acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
+      //     return acc
+      //   }, 0)
+      //   this.$log('layersDuration', layersDuration)
+      //   if (layersDuration > 60) throw new Error('Too looong composition, 1 min maximum !')
+      //   if (layersDuration === 0) throw new Error('Layers durtion === 0 !')
+      // })
     },
     async publish () {
       try {

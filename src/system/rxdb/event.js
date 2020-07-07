@@ -57,13 +57,6 @@ class Event {
         await this.objects.processEvent(event) // обновить ядро
         await this.lists.processEvent(event) // удалить объект из всех лент
         break
-      case 'CHAIN_CREATED':
-        if (event.subject.oid === rxdb.currentUser().oid) {
-          this.notifyUserActionComplete(event.type, event.object)
-        }
-        // поместить цепочку во все ленты
-        await this.lists.processEvent(event)
-        break
       case 'VOTED':
         if (event.subject.oid === localStorage.getItem('k_user_oid')) {
           this.notifyUserActionComplete(event.type, event.object)
@@ -96,16 +89,13 @@ class Event {
     let eventMessage = ''
     switch (eventType) {
       case 'OBJECT_CREATED':
-        eventMessage = i18n.t('node created', 'ядро создано')
-        break
-      case 'CHAIN_CREATED':
-        eventMessage = i18n.t('chain created', 'цепочка создана')
+        eventMessage = i18n.t('object created', 'объект создан')
         break
       case 'OBJECT_DELETED':
-        eventMessage = i18n.t('node deleted', 'ядро удалено')
+        eventMessage = i18n.t('object deleted', 'объект удален')
         break
       case 'VOTED':
-        eventMessage = i18n.t('node rated', 'ядро оценено')
+        eventMessage = i18n.t('объект rated', 'объект оценен')
         break
       case 'USER_SUBSCRIBED':
         eventMessage = i18n.t('user subscribed', 'пользователь подписался')
