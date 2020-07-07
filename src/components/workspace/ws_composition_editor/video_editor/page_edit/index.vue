@@ -1,7 +1,6 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
   //- header: composition.name, check:close
-  //- composition.layers.length > 1 ? !storeEditor.layerEditing : true
   div(
     v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
     ).row.full-width.justify-center
@@ -51,6 +50,7 @@ div(:style=`{position: 'relative'}`).column.fit
                     kalpa-menu-popup(:actions="layerActions" :value="l")
             //- layer ADD
             div(
+              v-if="false"
               :style=`{}`).row.full-width.justify-center
               div(:style=`{maxWidth: '680px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
                 q-btn(
@@ -79,14 +79,12 @@ div(:style=`{position: 'relative'}`).column.fit
     q-btn(flat dense color="red" no-caps @click="layersSelectedDelete()").q-px-sm {{$t('layer_editor_layers_delete', 'Удалить фрагменты')}}
     .col
     //- layer-mover(:composition="composition" :layersSelected="layersSelected")
-    //- q-btn(flat dense color="green" no-caps @click="")
-  //- footer: progress, actions: delete,create_node
   .row.full-width.justify-center
     div(
       v-show="layersSelected.length === 0"
       :style=`{
         maxWidth: '680px',
-        paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
+      }`).row.full-width
       composition-progress(
         v-if="composition.layers.length > 0"
         v-show="!storeEditor.layerEditing"
@@ -95,14 +93,13 @@ div(:style=`{position: 'relative'}`).column.fit
       //- actions
       div(
         v-show="composition.layers.length > 1 ? !storeEditor.layerEditing : true"
-        ).row.full-width.items-center.content-center.q-py-xs
-        q-btn(round flat dense color="red" icon="delete_outline" :style=`{opacity: 0.7}` @click="$emit('delete')")
+        ).row.full-width.items-center.content-center.q-pa-xs
+        q-btn(flat dense color="white" no-caps icon="content_cut")
+          span.text-white.text-bold.q-mx-sm {{$t('pageEdit_montage', 'Монтаж')}}
         .col
-        node-creator(
-          v-show="composition.layers.length > 0"
-          :composition="composition")
-        .col
-        q-btn(round flat dense color="green" icon="check" @click="$emit('close')")
+        q-btn(flat dense color="grey-5" no-caps).q-px-sm.q-mr-sm {{$t('pageEdit_cancel', 'Отмена')}}
+        q-btn(dense color="green" icon-right="check" no-caps @click="$emit('close')")
+          span.text-bold.text-white.q-mx-xs {{$t('pageEdit_save', 'Сохранить')}}
 </template>
 
 <script>
@@ -112,11 +109,10 @@ import nameEditor from './name_editor'
 import layerEditor from './layer_editor'
 import layerMover from './layer_mover'
 import compositionProgress from '../composition_progress'
-import nodeCreator from './node_creator'
 
 export default {
   name: 'pageEdit',
-  components: {draggable, nameEditor, layerEditor, layerMover, compositionProgress, nodeCreator},
+  components: {draggable, nameEditor, layerEditor, layerMover, compositionProgress},
   props: ['composition', 'options'],
   inject: ['sidPlayer', 'sidEditor'],
   data () {

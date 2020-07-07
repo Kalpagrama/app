@@ -73,14 +73,14 @@ div(
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('Обновить')}}
+          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_refresh', 'Обновить')}}
         //- logout
         div(
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('Выйти')}}
+          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_logout', 'Выйти')}}
         //- create node
         div(
           v-if="true"
@@ -90,10 +90,10 @@ div(
             @click="createNodeStart()"
             color="green" no-caps align="left" icon="add"
             :style=`{height: '50px'}`).full-width
-            span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('Собрать ядро')}}
+            span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
         //- version
         div(v-if="true").row.full-width.items-center.q-pa-md
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('Версия')}} 0.9.99-03.07.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия')}} 0.9.99-03.07.2020
         //- slot(name="footer")
 </template>
 

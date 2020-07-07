@@ -90,9 +90,8 @@ export default {
       this.itemIndex -= 1
     },
     next () {
-      this.$log('next')
       let i = this.itemIndex + 1
-      this.$log('next', i)
+      this.$log('next start', i)
       // check
       if (!this.items[i]) return
       // set itemNexting for full-height prop
@@ -105,6 +104,7 @@ export default {
           nextMaxWidth: 100,
           nextMaxHeight: 100,
           onComplete: () => {
+            this.$log('next done', i)
             this.itemIndex = i
             this.itemNexting = null
             this.nextMaxWidth = 25

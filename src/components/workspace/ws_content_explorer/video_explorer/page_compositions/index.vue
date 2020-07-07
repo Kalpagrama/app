@@ -56,6 +56,12 @@ div(:style=`{position: 'relative',}`).column.fit
       ws-composition-editor(
         :value="composition"
         :sidPlayer="sidPlayer"
+        :options=`{
+          active: true,
+          mini: false,
+          mode: 'editor',
+          ctx: 'explorer',
+        }`
         @close="compositionEdited").full-height.b-60
   //- compositions selected
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")

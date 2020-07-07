@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
+div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center.q-px-sm
   //- interceptor tint
   div(
     @click="interceptorClick"
@@ -22,7 +22,7 @@ div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
   q-input(
     v-model="composition.name"
     ref="compositionNameInput"
-    filled dark color="white"
+    dark color="green"
     :label="$t('wsCompositionEditor_videoEditor_whatDoYouSee', 'Что ты видишь?')"
     @click="onClick"
     @focus="onFocus"

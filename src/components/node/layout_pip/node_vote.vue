@@ -46,7 +46,7 @@ transition(appear enter-active-class="animated fadeIn" leave-active-class="anima
                   userSelect: 'none',
                   fontSize: voteOver === v.id ? 50+(votes.length-vi*5)+'px' : 30+(votes.length-vi*5)+'px'
                 }`
-                ).text-bold {{ v.id * 100 }}
+                ).text-bold {{ v.value }}
 </template>
 
 <script>
@@ -61,11 +61,11 @@ export default {
       voteOver: null,
       voteShow: false,
       votes: [
-        {id: 0.9, name: 'Прямо в точку!'},
-        {id: 0.7, name: 'Скорее да'},
-        {id: 0.5, name: 'Может быть'},
-        {id: 0.3, name: 'Ну такое..'},
-        {id: 0.1, name: 'Нет'}
+        {id: 0.9, name: 'Прямо в точку!', value: 100},
+        {id: 0.7, name: 'Скорее да', value: 70},
+        {id: 0.5, name: 'Может быть', value: 50},
+        {id: 0.3, name: 'Ну такое..', value: 30},
+        {id: 0.1, name: 'Нет', value: 0},
       ]
     }
   },

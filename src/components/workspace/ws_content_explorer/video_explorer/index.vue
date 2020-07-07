@@ -6,12 +6,18 @@ div(
     borderRadius: '10px', overflow: 'hidden',
   }`
   ).column.full-width.items-center.b-50
-  //- close btn
-  q-btn(
-    @click="$emit('close')"
-    round flat color="white" icon="keyboard_arrow_left"
-    :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.1)'}`)
+  //- //- close btn
+  //- q-btn(
+  //-   @click="$emit('close')"
+  //-   round flat color="white" icon="keyboard_arrow_left"
+  //-   :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.1)'}`)
   //- kalpa-debug(:options=`{options}` :style=`{position: 'absolute', zIndex: 2000, top: '60px', left: '0px',}`)
+  //- header
+  .row.full-width.items-center.content-center.q-pa-sm
+    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
+    .col
+      span.text-white.text-bold {{ content.name }}
+    q-btn(round flat color="white" icon="more_vert")
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px',}`).col.full-width
     ws-content-player(
@@ -90,7 +96,7 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'details', name: this.$t('Детали')},
+        // {id: 'details', name: this.$t('Детали')},
         {id: 'compositions', name: this.$t('Мои Образы')},
         {id: 'explore', name: this.$t('Ядра')},
       ]
@@ -113,7 +119,7 @@ export default {
     pageId: {
       immediate: true,
       handler (to, from) {
-        this.pageHeight = this.$q.screen.height * 0.6
+        this.pageHeight = this.$q.screen.height * 0.5
         // if (to === 'details') this.pageHeight = this.$q.screen.height * 0.5
         // else if (to === 'explore') this.pageHeight = this.$q.screen.height * 0.7
         // else if (to === 'compositions') this.pageHeight = this.$q.screen.height * 0.6
@@ -123,7 +129,7 @@ export default {
     pageFullscreen: {
       handler (to, from) {
         if (to) this.pageHeight = 0
-        else this.pageHeight = this.$q.screen.height * 0.6
+        else this.pageHeight = this.$q.screen.height * 0.5
       }
     },
   },

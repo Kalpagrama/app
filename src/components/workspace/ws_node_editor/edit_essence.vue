@@ -1,25 +1,26 @@
 <template lang="pug">
-.row.full-width.justify-center
+div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width
   q-input(
     v-model="node.name"
-    color="white"
-    label="В чем суть?"
-    filled dark
+    dark color="white"
+    :placeholder="$t('what_the_essence', 'В чем суть?')"
     autogrow
-    :readonly="!options.essenceEditable"
     :input-style=`{
       minHeight: '60px',
+      padding: '10px',
+      fontSize: '16px',
+      fontWeight: 'bold',
     }`
     :style=`{
-      maxWidth: '600px',
-      borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden', transform: 'translate3d(0,0,0)',
-    }`).full-width
+      borderRadius: '10px', overflow: 'hidden',
+    }`
+    ).full-width.text-bold
 </template>
 
 <script>
 export default {
   name: 'editEssence',
-  props: ['node', 'options'],
+  props: ['node'],
   data () {
     return {
     }

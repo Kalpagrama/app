@@ -9,11 +9,21 @@ div(
   q-resize-observer(@resize="height = $event.height")
   //- mode: EDITOR
   div(v-if="options.mode === 'editor'" :style=`{position: 'relative'}`).column.fit
+    //- header
+    div(
+      v-if="options.ctx === 'workspace'"
+      ).row.full-width.items-center.content-center.q-pa-sm
+      q-btn(round flat color="white" icon="keyboard_arrow_left")
+      .col.q-px-sm
+        span.text-white.text-bold {{ $t('wsCompositionEditor_title', 'Редактор образа') }}
+      node-creator(
+        v-show="composition.layers.length > 0"
+        :composition="composition")
     //- body
     div(v-if="!sidPlayerReady" :style=`{position: 'relative'}`).col.full-width
       //- close btn
       q-btn(
-        v-if="true"
+        v-if="false"
         @click="close()"
         round flat color="white" icon="keyboard_arrow_left"
         :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
@@ -23,7 +33,7 @@ div(
         :content="content"
         :active="options.active"
         :mini="options.mini"
-        @seeked="storeEditor.compositionPlaying = false"
+        @seeked="compositionPlaying = false"
         @ready="storePlayerReady")
         template(v-slot:controlsTools)
           //- q-btn(
@@ -62,7 +72,7 @@ div(
       v-if="options.active"
       @ready="storePlayerReady" :sid="sidPlayer" :content="content" :active="options.active" :mini="options.mini" :options=`{controls: false}`)
     composition-progress(
-      v-if="storePlayer && storePlayer.loadeddata"
+      v-if="storePlayer && storePlayer.loadeddata && composition.layers.length > 0"
       v-show="!options.mini && false"
       :composition="composition"
       :options="options"
@@ -70,7 +80,7 @@ div(
   //- mode: PROGRESS
   div(v-if="options.mode === 'progress'").row.full-width
     composition-progress(
-      v-if="storePlayer && storePlayer.loadeddata"
+      v-if="storePlayer && storePlayer.loadeddata && composition.layers.length > 0"
       :composition="composition"
       :options="options"
       :style=`{maxWidth: '600px'}`).full-width
@@ -101,6 +111,7 @@ import pageDetails from './page_details'
 import pageEdit from './page_edit'
 import pagesController from './pages_controller'
 import compositionProgress from './composition_progress'
+import nodeCreator from './node_creator'
 
 export default {
   name: 'videoEditor',
@@ -108,7 +119,8 @@ export default {
     pageDetails,
     pageEdit,
     pagesController,
-    compositionProgress
+    compositionProgress,
+    nodeCreator,
   },
   props: {
     sid: {type: String, default () { return 'wce' }},
@@ -119,6 +131,7 @@ export default {
       type: Object,
       default () {
         return {
+          ctx: 'workspace',
           mode: 'editor',
           isPreview: false,
           active: true,

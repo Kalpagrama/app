@@ -105,7 +105,7 @@ export default {
   name: 'wsContentPlayer-videoPlayer',
   components: {videoControls},
   props: {
-    sid: {type: String},
+    sid: {type: String, default () { return 'wcp' }},
     content: {type: Object},
     active: {type: Boolean, default () { return true }},
     mini: {type: Boolean, default () { return false }},
