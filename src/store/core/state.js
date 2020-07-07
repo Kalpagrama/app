@@ -12,5 +12,9 @@ export default {
   logModulesBlackList: [], // LogModulesEnum.ML, LogModulesEnum.VUEX, ...
   colors: {
     hello: 'goodbye'
+  },
+  progressInfo: {
+    UPLOAD: {}, // {oid: progress, oid: progress}
+    CREATE: {}, // {oid: progress, oid: progress}
   }
 }

@@ -91,7 +91,7 @@ export default {
     // '$store.state.events.progressCreateNode': {
     //   handler (to, from) {
     //     this.$log('progressCreateNode CHANGED', to)
-    //     if (to && to.progress === 100 && to.action === 'CREATE_NODE' && to.oid) {
+    //     if (to && to.progress === 100 && to.action === 'CREATE' && to.oid) {
     //       // this.$router.push({params: {oid: to.oid}}).catch(e => e)
     //       this.$store.commit('events/stateSet', ['progressCreateNode', null])
     //     }

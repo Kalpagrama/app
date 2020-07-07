@@ -79,6 +79,7 @@ class NodeApi {
   }
 
   static makeNodeInput (node) {
+    let f = NodeApi.makeNodeInput
     {
       // checks
       assert.ok(node.category, 'node.category')
@@ -88,7 +89,8 @@ class NodeApi {
     }
     let nodeInput = {}
     nodeInput.layout = node.layout
-    nodeInput.name = node.name || node.spheres.length ? node.spheres[0].name : null
+    // logD(f, nodeInput, node.spheres, node.spheres.length)
+    nodeInput.name = node.name || (node.spheres.length ? node.spheres[0].name : null)
     assert(nodeInput.name, '!nodeInput.name')
     nodeInput.category = node.category || 'FUN'
     nodeInput.spheres = node.spheres.map(s => {

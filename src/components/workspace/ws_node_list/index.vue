@@ -191,7 +191,9 @@ export default {
     },
     async nodeUnPublish (node) {
       this.$log('nodeUnPublish', node)
-      // TODO: impl
+      if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
+      await NodeApi.nodeDelete(node.oid)
+      node.stage = 'draft'
     },
     async nodeUnSave (node) {
       this.$log('nodeUnSave', node)

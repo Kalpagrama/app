@@ -11,13 +11,6 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_EVENT)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_EVENT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_EVENT)
 
-// todo make reactive!
-let reactiveProgress = {
-  progress: 0,
-  progressUpload: 0,
-  progressCreateNode: 0
-}
-
 class Event {
   constructor (workspace, objects, lists) {
     this.workspace = workspace
@@ -46,9 +39,7 @@ class Event {
         this.notifyError(event)
         break
       case 'PROGRESS':
-        reactiveProgress.progress = event.progress
-        if (event.action === 'UPLOAD') reactiveProgress.progressUpload = event.progress
-        if (event.action === 'CREATE_NODE') reactiveProgress.progressCreateNode = event.progress
+        // обрабатывается во вьюикс
         break
       case 'NOTICE':
         break
