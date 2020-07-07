@@ -78,7 +78,7 @@ function sendMsg (type, msgData) {
               {
                 action: 'test',
                 title: 'action-test',
-                icon: '/statics/kalpagramma-logo.png'
+                icon: '/statics/logo.png'
               }
             ]
           }

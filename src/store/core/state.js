@@ -1,7 +1,7 @@
 import {LogLevelEnum, LogModulesEnum} from 'src/boot/log'
 export default {
   initialized: false,
-  name: 'Kalpagramma',
+  name: 'Kalpagrama',
   version: '2.0.0',
   online: true, // если сеть недоступна - присваивается false
   shareData: null, // данные от меню "поделиться в приложение"
@@ -12,5 +12,9 @@ export default {
   logModulesBlackList: [], // LogModulesEnum.ML, LogModulesEnum.VUEX, ...
   colors: {
     hello: 'goodbye'
+  },
+  progressInfo: {
+    UPLOAD: {}, // {oid: progress, oid: progress}
+    CREATE: {}, // {oid: progress, oid: progress}
   }
 }

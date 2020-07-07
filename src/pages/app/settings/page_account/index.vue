@@ -5,7 +5,7 @@ div(
   }`
   ).column.fit
   div().row.full-width.q-pa-md
-    span.text-white.text-bold {{$t('Account')}}
+    span.text-white.text-bold {{$t('Account', 'Аккаунт')}}
   .col.full-width.scroll
     .row.full-width.text-white.q-pa-md
       span name

@@ -4,12 +4,12 @@
 .column.bg-white.fit
   .row.full-width.q-px-sm
     span(v-if="role === 'MEMBER'").text-grey {{currentRole}}
-    q-input(v-model="nameFirst" stack-label :label="$t('First name')").full-width.q-mt-sm
-    q-input(v-model="nameSecond" stack-label :label="$t('Second name')").full-width
-    q-select( v-model="country" :options="countries" :label="$t('Country')").full-width
+    q-input(v-model="nameFirst" stack-label :label="$t('First name', 'Имя')").full-width.q-mt-sm
+    q-input(v-model="nameSecond" stack-label :label="$t('Second name', 'Фамилия')").full-width
+    q-select( v-model="country" :options="countries" :label="$t('Country', 'Страна')").full-width
     q-input(v-model="city" stack-label :label="$t('City', 'Город')").full-width
-    q-select( v-model="gender" :options="genders" :label="$t('Gender')").full-width
-    q-select( v-model="lang" :options="langs" :label="$t('Lang')").full-width
+    q-select( v-model="gender" :options="genders" :label="$t('Gender', 'Пол')").full-width
+    q-select( v-model="lang" :options="langs" :label="$t('Language', 'Язык')").full-width
     q-input( v-model="date" mask="date" :label="$t('Date of birth', 'Дата рождения')" :rules="['date']").full-width
       template(v-slot:append)
         q-icon(name="event" class="cursor-pointer")
@@ -20,7 +20,7 @@
     //- passwordDialog
   div(:style=`{height: '60px'}`).row.full-width.justify-end.items-center.content-center.q-px-md
     q-btn(@click="save()" push no-caps  :color="buttonColor")
-      span.text-bold {{ $t('Save') }}
+      span.text-bold {{ $t('Save', 'Сохранить') }}
 </template>
 
 <script>

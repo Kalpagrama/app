@@ -86,7 +86,7 @@ export default {
       else if (this.node.stage === 'published') {
         return {
           fork: {name: this.$t('nodeItemAction_fork', 'Форкнуть'), fn: () => { this.$emit('fork') }},
-          unPublish: {name: this.$t('nodeItemAction_upPublish', 'Снять с публикации'), fn: () => { this.$emit('upPublish') }}
+          unPublish: {name: this.$t('nodeItemAction_upPublish', 'Снять с публикации'), fn: () => { this.$emit('unPublish') }}
         }
       }
       else {

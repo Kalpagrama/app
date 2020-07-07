@@ -33,7 +33,7 @@ div(:style=`{position: 'relative',}`).column.fit
       @click="next()"
       round color="green" no-caps
       :disabled="types.length === 0"
-      :loading="loading").q-px-md {{$t('next', 'Далее')}}
+      :loading="loading").q-px-md {{$t('Next', 'Далее')}}
 </template>
 
 <script>

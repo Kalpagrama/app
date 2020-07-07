@@ -64,6 +64,7 @@ class RxDBWrapper {
   constructor () {
     this.isLeader_ = false
     this.mutex = new Mutex()
+    this.store = null // vuex
     addRxPlugin(require('pouchdb-adapter-idb'))
     addRxPlugin(RxDBLeaderElectionPlugin)
     addRxPlugin(RxDBValidatePlugin)
@@ -88,10 +89,11 @@ class RxDBWrapper {
     logD(f, 'complete.')
   }
 
-  async init (recursive = false) {
+  async init (store, recursive = false) {
     const f = this.init
     logD(f, 'start.....')
     try {
+      this.store = store
       this.db = await createRxDatabase({
         name: 'rxdb',
         adapter: 'idb', // <- storage-adapter
@@ -122,7 +124,7 @@ class RxDBWrapper {
       else {
         await removeRxDatabase('rxdb', 'idb')
       }
-      await this.init(true)
+      await this.init(store, true)
     }
   }
 
@@ -205,6 +207,8 @@ class RxDBWrapper {
   async processEvent (event) {
     try {
       await this.lock()
+      assert(this.store, '!this.store')
+      this.store.commit('core/processEvent', event)
       await this.event.processEvent(event)
     } finally {
       this.release()

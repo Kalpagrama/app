@@ -97,8 +97,8 @@ export default {
     pages () {
       return [
         // {id: 'details', name: this.$t('Детали')},
-        {id: 'compositions', name: this.$t('Мои Образы')},
-        {id: 'explore', name: this.$t('Ядра')},
+        {id: 'compositions', name: this.$t('videoExplorer_My compositions', 'Мои Образы')},
+        {id: 'explore', name: this.$t('videoExplorer_Nodes', 'Ядра')},
       ]
     },
     sidPlayer () {

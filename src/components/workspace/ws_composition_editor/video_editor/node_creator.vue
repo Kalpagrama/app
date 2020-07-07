@@ -5,7 +5,7 @@ q-btn(
   :style=`{
   }`
   ).q-px-sm
-  span.text-bold.text-green {{ $t('create_node', 'Собрать ядро') }}
+  span.text-bold.text-green {{ $t('Create node', 'Создать ядро') }}
   q-dialog(v-model="nodeEditorOpened" position="bottom")
     ws-node-editor(
       @close="nodeEditorOpened = false"

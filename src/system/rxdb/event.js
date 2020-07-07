@@ -11,13 +11,6 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_EVENT)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_EVENT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_EVENT)
 
-// todo make reactive!
-let reactiveProgress = {
-  progress: 0,
-  progressUpload: 0,
-  progressCreateNode: 0
-}
-
 class Event {
   constructor (workspace, objects, lists) {
     this.workspace = workspace
@@ -46,9 +39,7 @@ class Event {
         this.notifyError(event)
         break
       case 'PROGRESS':
-        reactiveProgress.progress = event.progress
-        if (event.action === 'UPLOAD') reactiveProgress.progressUpload = event.progress
-        if (event.action === 'CREATE_NODE') reactiveProgress.progressCreateNode = event.progress
+        // обрабатывается во вьюикс
         break
       case 'NOTICE':
         break
@@ -105,31 +96,31 @@ class Event {
     let eventMessage = ''
     switch (eventType) {
       case 'OBJECT_CREATED':
-        eventMessage = i18n.t('node created')
+        eventMessage = i18n.t('node created', 'ядро создано')
         break
       case 'CHAIN_CREATED':
-        eventMessage = i18n.t('chain created')
+        eventMessage = i18n.t('chain created', 'цепочка создана')
         break
       case 'OBJECT_DELETED':
-        eventMessage = i18n.t('node deleted')
+        eventMessage = i18n.t('node deleted', 'ядро удалено')
         break
       case 'VOTED':
-        eventMessage = i18n.t('node rated')
+        eventMessage = i18n.t('node rated', 'ядро оценено')
         break
       case 'USER_SUBSCRIBED':
-        eventMessage = i18n.t('user subscribed')
+        eventMessage = i18n.t('user subscribed', 'пользователь подписался')
         break
       case 'USER_UNSUBSCRIBED':
-        eventMessage = i18n.t('user unsubscribed')
+        eventMessage = i18n.t('user unsubscribed', 'пользователь отписался')
         break
       case 'WS_ITEM_CREATED':
-        eventMessage = i18n.t('ws element created')
+        eventMessage = i18n.t('ws element created', 'элемент создан')
         break
       case 'WS_ITEM_DELETED':
-        eventMessage = i18n.t('ws element deleted')
+        eventMessage = i18n.t('ws element deleted', 'элемент удален')
         break
       case 'WS_ITEM_UPDATED':
-        eventMessage = i18n.t('ws element updated')
+        eventMessage = i18n.t('ws element updated', 'элемент изменен')
         break
     }
     notify(
@@ -139,7 +130,7 @@ class Event {
         // avatar: eventType.startsWith('WS_ITEM') ? null : object.thumbUrl,
         actions: [
           {
-            label: i18n.t('GO'),
+            label: i18n.t('Go', 'Перейти'),
             noDismiss: true,
             color: 'green',
             handler: async () => {

@@ -6,25 +6,25 @@
       div(style=`height: 60px; width: 60px`).row.justify-center.items-center
         q-btn(round flat icon="arrow_back" color="white" @click="closing()")
       .col.row.justify-start.items-center.q-px-sm
-        span.text-bold.text-white {{$t('Changing phone number')}}
+        span.text-bold.text-white {{$t('Changing phone number', 'Changing phone number')}}
     .column.bg-white.q-px-md
       .row.full-width.justify-left.q-my-md
         span {{$t('You can attach your personal phone number to the page. This will protect your page.')}}
       div(style=`border-radius: 10px;`).row.content-start.justify-center
-        q-input(v-if="currentPhone" v-model="currentPhone" readonly disable stack-label :label="$t('Current number')" filled).full-width.q-mb-md
-        q-input(v-model="newPhone" unmasked-value mask="(###)-###-##-##" stack-label :label="$t('New number')" prefix="+7" filled).full-width.q-mb-md
+        q-input(v-if="currentPhone" v-model="currentPhone" readonly disable stack-label :label="$t('Current number', 'Current number')" filled).full-width.q-mb-md
+        q-input(v-model="newPhone" unmasked-value mask="(###)-###-##-##" stack-label :label="$t('New number', 'New number')" prefix="+7" filled).full-width.q-mb-md
         q-btn(
           push no-caps dense color="accent" @click="changePhone()"
-          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-mb-sm {{ $t('Get code') }}
+          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px'}`).full-width.q-mb-sm {{ $t('Get code', 'Get code') }}
         .row.full-width.justify-start
-          small.text-grey {{ $t('Example for Russia')}} +7 (921)-000-00-07
+          small.text-grey {{ $t('Example for Russia', 'Example for Russia')}} +7 (921)-000-00-07
   div(:style=`{height: '60px', borderBottom: '1px solid #eee'}` @click="$refs.changePhone.show()").row.full-width.justify-left.items-center.q-py-sm.cursor-pointer.hr
     .row.full-width
-      span {{$t("Phone number")}}
+      span {{$t('Phone number', 'Телефон')}}
     .row.full-width
       small.text-grey  {{ currentPhone }}
       div(v-if="!currentPhone").row.full-width.items-center
-        small.text-grey {{$t('Add your phone number')}}
+        small.text-grey {{$t('Add your phone number', 'Add your phone number')}}
         q-icon(name="warning" color="accent" size="20px").q-ml-xs
 </template>
 <script>

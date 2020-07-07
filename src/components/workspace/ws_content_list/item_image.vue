@@ -35,21 +35,21 @@ export default {
     actions () {
       return {
         explore: {
-          name: this.$t('Посмотреть'),
+          name: this.$t('Explore', 'Посмотреть'),
           fn: () => {
             this.$log('explore')
             this.$emit('pick')
           }
         },
         rename: {
-          name: this.$t('Переименовать'),
+          name: this.$t('Rename', 'Переименовать'),
           fn: () => {
             this.$log('rename')
             this.$emit('rename')
           }
         },
         delete: {
-          name: this.$t('Удалить'),
+          name: this.$t('delete', 'Удалить'),
           fn: () => {
             this.$log('delete')
             this.$emit('delete')

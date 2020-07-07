@@ -18,8 +18,8 @@ kalpa-layout(
           .row.fit.items-center.content-center
             kalpa-avatar(:url="user.profile.photoUrl" :width="36" :height="36")
             span.text-white.text-bold.q-ml-sm {{ user.name }}
-        q-btn(v-if="!itsMe && !isSubscribed" push color="green" no-caps @click="userFollow()") {{$t('Follow')}}
-        q-btn(v-if="!itsMe && isSubscribed" flat color="green" no-caps @click="userUnfollow()") {{$t('Following')}}
+        q-btn(v-if="!itsMe && !isSubscribed" push color="green" no-caps @click="userFollow()") {{$t('Subscribe', 'Подписаться')}}
+        q-btn(v-if="!itsMe && isSubscribed" flat color="green" no-caps @click="userUnfollow()") {{$t('Unsubscribe', 'Отписаться')}}
       div(v-if="false").row.full-width.items-end.content-end
         q-tabs(
           :value="$route.name" @input="pageChanged"
@@ -67,10 +67,10 @@ export default {
     },
     pages () {
       return [
-        {id: 'created', name: this.$t('Ядра')},
-        {id: 'voted', name: this.$t('Голоса')},
-        {id: 'following', name: this.$t('Подписки')},
-        {id: 'followers', name: this.$t('Подписчики')},
+        {id: 'created', name: this.$t('Nodes', 'Ядра')},
+        {id: 'voted', name: this.$t('Votes', 'Голоса')},
+        {id: 'following', name: this.$t('Subscriptions', 'Подписки')},
+        {id: 'followers', name: this.$t('Subscribers', 'Подписчики')},
       ]
     },
     pagesHot () {

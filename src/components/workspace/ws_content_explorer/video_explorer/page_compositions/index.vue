@@ -76,7 +76,7 @@ div(:style=`{position: 'relative',}`).column.fit
       q-btn(round flat color="white" icon="clear" @click="storeExplorer.compositionsSelected = []").q-mr-sm
       q-btn(flat color="red-5" no-caps @click="compositionsSelectedDelete()") {{ $t('delete', 'Удалить') }}
       .col
-      q-btn(color="green" no-caps @click="compositionsSelectedCreateNode()") {{ $t('create_node', 'Собрать ядро') }}
+      q-btn(color="green" no-caps @click="compositionsSelectedCreateNode()") {{ $t('Create node', 'Создать ядро') }}
 </template>
 
 <script>

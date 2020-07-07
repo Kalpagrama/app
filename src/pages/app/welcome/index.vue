@@ -12,7 +12,7 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
         borderRadius: '10px', overflow: 'hidden',
       }`).row.full-width.items-center.content-center.q-px-md.b-50
-      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('welcome_to_kalpagramma', 'Добро пожаловать в Кальпаграмму')}}
+      span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('welcome_to_kalpagrama', 'Добро пожаловать!')}}
   //- body: wrapper
   .col.full-width.q-py-md
     .row.fit.justify-center

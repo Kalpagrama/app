@@ -1,6 +1,6 @@
 <template lang="pug">
 kalpa-layout(
-  :title="$t('ws_page_workspace', 'Мастерская')"
+  :title="$t('Workspace', 'Мастерская')"
   @pageId="$router.push({name: $event})"
   :pages="pages" :pagesHot="pagesHot" :pageId="$route.name"
   :style=`{height: $q.screen.height+'px'}`)
@@ -40,12 +40,12 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'content-list', name: this.$t('ws_page_content', 'Контент')},
-        {id: 'composition-list', name: this.$t('ws_page_compositions', 'Образы')},
-        {id: 'node-list', name: this.$t('ws_page_nodes', 'Ядра')},
-        // {id: 'chain-list', name: this.$t('ws_page_chains', 'Цепочки')},
-        // {id: 'sphere', name: this.$t('ws_page_spheres', 'Сферы')},
-        {id: 'ws-settings', name: this.$t('ws_page_settings', 'Настройки')}
+        {id: 'content-list', name: this.$t('Content', 'Контент')},
+        {id: 'composition-list', name: this.$t('Compositions', 'Образы')},
+        {id: 'node-list', name: this.$t('Nodes', 'Ядра')},
+        // {id: 'chain-list', name: this.$t('Chains', 'Цепочки')},
+        // {id: 'sphere', name: this.$t('Spheres', 'Сферы')},
+        {id: 'ws-settings', name: this.$t('Settings', 'Настройки')}
       ]
     },
     pagesHot () {

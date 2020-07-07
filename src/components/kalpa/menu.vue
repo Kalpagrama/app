@@ -30,9 +30,9 @@ div(
       kalpa-logo(:width="40" :height="40")
     .col
       .row.fit.items-center.content-center
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Кальпаграмма')}}
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Kalpagrama', 'Кальпаграма')}}
         .row.full-width
-          small.text-white {{$t('Up the essence!')}}
+          small.text-white {{$t('Up the essence!', 'Продвигай суть!')}}
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width
     div(
@@ -53,7 +53,7 @@ div(
           .col.full-height
             .row.fit.items-center.content-center
               span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
-              small.text-white.full-width {{ '@'+$store.getters.currentUser().name }}
+              small.text-white.full-width {{ '@'+$store.getters.currentUser().username }}
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
           :to="{name: p.id}"
@@ -100,6 +100,7 @@ div(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { AuthApi } from 'src/api/auth'
+import { i18n } from 'src/boot/i18n'
 
 export default {
   name: 'kalpaMenu',
@@ -107,10 +108,10 @@ export default {
     return {
       width: 300,
       pages: [
-        {id: 'home', name: 'Home', icon: 'home'},
-        {id: 'trends', name: 'Тренды', icon: 'whatshot'},
-        {id: 'workspace', name: 'Мастерская', icon: 'school'},
-        {id: 'settings', name: 'Настройки', icon: 'tune'},
+        {id: 'home', name: i18n.t('Home', 'Домашняя страница'), icon: 'home'},
+        {id: 'trends', name: i18n.t('Trends', 'Тренды'), icon: 'whatshot'},
+        {id: 'workspace', name: i18n.t('Workspace', 'Мастерская'), icon: 'school'},
+        {id: 'settings', name: i18n.t('Settings', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,
       logoutLoading: false,

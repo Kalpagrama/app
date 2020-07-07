@@ -33,6 +33,7 @@ const LogModulesEnum = Object.freeze({
   GQL: 'gql',
   VUEX: 'vx',
   VUEX_CACHE: 'vx_cache',
+  VUEX_CORE: 'vx_core',
   RXDB: 'rxdb',
   RXDB_REACTIVE: 'rxdb_reactive',
   RXDB_WS: 'rxdb_ws',

@@ -10,7 +10,7 @@ export default {
   name: 'App',
   data () {
     return {
-      name: 'kalpagramma',
+      name: 'kalpagrama',
       height: 100,
     }
   },

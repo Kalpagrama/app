@@ -12,7 +12,7 @@ kalpa-layout(
       ).row.full-width.items-center.content-center.justify-start.b-60.q-pa-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       .col.q-px-sm
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Home')}}
+        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Home', 'Домашняя страница')}}
   template(v-slot:drawerRight)
     menu-right(:style=`{maxWidth: '400px'}`)
   template(v-slot:page)

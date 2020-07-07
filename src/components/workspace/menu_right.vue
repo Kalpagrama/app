@@ -12,7 +12,7 @@ div(
   }`
   ).column.full-width.q-pt-sm
   div(:style=`{height: '100px'}`).row.full-width.items-center.content-center.q-px-md
-    span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white.text-bold {{$t('Мастерская')}}
+    span(:style=`{fontSize: '16px', userSelect: 'none'}`).text-white.text-bold {{$t('Workspace', 'Мастерская')}}
   .col.full-width.scroll
     .row.full-width.items-start
       router-link(

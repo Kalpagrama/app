@@ -8,12 +8,12 @@ div(
     ).row.full-width.items-start.content-start
     .row.full-width.items-center.content-center.q-px-sm.q-py-md.b-50
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-      span.text-white.text-bold {{$t('Chain editor')}}
+      span.text-white.text-bold {{$t('Chain editor', 'Редактор цепочек')}}
     .row.full-width.q-pa-sm
       q-input(
         v-model="name"
         filled dark color="grey-5"
-        :label="$t('Chain name')"
+        :label="$t('Chain name', 'Имя цепочки')"
         ).full-width
   //- body
   .col.full-width.q-pa-sm

@@ -15,7 +15,7 @@ div(:style=`{paddingBottom: '50px',}`).row.fit.q-pt-md
     //- body: spheres
     .col.full-width.scroll
       .row.fit.q-pa-md
-        //- span.text-white {{$t('Spheres')}}
+        //- span.text-white {{$t('Spheres', 'Сферы')}}
     //- footer: delete, share
     .row.full-width.q-pa-sm
       q-btn(round flat dense color="red" icon="delete_outline" @click="deleteStart()")
