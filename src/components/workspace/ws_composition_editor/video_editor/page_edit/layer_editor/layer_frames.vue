@@ -4,7 +4,7 @@
   //- kalpa-debug(:options=`{width,framesCount,framesWidth,frameWidth}`)
   div(
     ref="layerItemFramesScrollArea"
-    :style=`{}`).row.full-width.scroll.q-py-xl
+    :style=`{overflowY: 'hidden',}`).row.full-width.scroll.q-py-md
     .row.items-start.content-start.no-wrap
       //- left margin width/2
       div(:style=`{height: '50px', width: width/2+'px'}`)

@@ -27,6 +27,10 @@ div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
     @click="onClick"
     @focus="onFocus"
     @blur="onBlur"
+    :style=`{
+      paddingLeft: '10px',
+      paddingRight: '10px',
+    }`
     ).full-width
     //- template(v-slot:append)
     //-   q-btn(round flat color="green" icon="check" @click="$emit('close')")

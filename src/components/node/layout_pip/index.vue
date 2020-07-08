@@ -2,7 +2,7 @@
 div(
   :class=`{
     'b-50': !active,
-    'b-70': active,
+    'b-60': active,
   }`
   :style=`{
     position: 'relative',
@@ -30,7 +30,7 @@ div(
       v-show="!mini"
       :node="node" :nodeFull="nodeFull"
       :style=`{
-        position: 'absolute', zIndex: 3000, right: '8px', top: '8px',
+        position: 'absolute', zIndex: 3000, transform: 'translate3d(0,0,0)', right: '8px', top: '8px',
       }`)
   node-essence(
     v-if="true"
@@ -66,7 +66,7 @@ import nodeBookmark from './node_bookmark'
 
 export default {
   name: 'nodeLayoutPip',
-  props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'essence', 'mini', 'opened'],
+  props: ['ctx', 'index', 'node', 'nodeFull', 'visible', 'active', 'essence', 'mini', 'opened', 'onlyItems'],
   components: {nodeTools, nodeItems, nodeVote, nodeEssence, nodeAuthor, nodeSpheres, nodeBookmark},
   data () {
     return {

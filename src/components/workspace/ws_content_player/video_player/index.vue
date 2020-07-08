@@ -36,8 +36,8 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       :src="content.url"
       type="video/youtube"
       :playsinline="true"
-      :autoplay="false"
-      :loop="false"
+      :autoplay="true"
+      :loop="true"
       :style=`{
         position: 'relative',
         width: '100%',
@@ -60,11 +60,12 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       v-if="options.controls && loadeddata && !mini"
       @seeked="$emit('seeked'), focused = true"
       :style=`{
-        position: 'absolute', zIndex: 2000, bottom: '8px',
+        position: 'absolute', zIndex: 9999, bottom: '8px',
         left: '50%',
         marginRight: '-50%',
         transform: 'translate(-50%, 0)',
         maxWidth: videoControlsMaxWidth+'px',
+        //- transform: 'translate3d(0,0,0)',
       }`
       ).row.full-width
       template(v-slot:controls)

@@ -2,7 +2,8 @@
 div(
   :style=`{
     position: 'relative',
-    height: '400px', borderRadius: '10px', overflow: 'hidden',
+    height: height+'px',
+    borderRadius: '10px', overflow: 'hidden',
   }`).row.full-width.b-80
   //- items settings reorder dialog
   q-dialog(v-model="settingsDialogOpened" position="bottom")
@@ -128,5 +129,11 @@ export default {
       itemsActive: true,
     }
   },
+  computed: {
+    height () {
+      if (this.$q.screen.width < 800) return this.$q.screen.width / 2
+      else return 400
+    }
+  }
 }
 </script>

@@ -73,7 +73,7 @@ div(:style=`{position: 'relative',}`).row.full-width.justify-center
                   }`
                   ).text-white {{ p.name }}
         //- footer bottom
-        .row.full-width.b-60
+        div(:style=`{zIndex: 999999, transform: 'translate3d(0,0,0)'}`).row.full-width.b-60
           q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
           .col
             div(v-if="pagesHot").row.fit.items-end.content-end.justify-center

@@ -106,14 +106,14 @@ div(:style=`{position: 'relative'}`).column.fit
         :style=`{
           maxWidth: '600px',
         }`).row.full-width
+        //- v-show="!storeEditor.layerEditing"
         composition-progress(
           v-if="composition.layers.length > 0"
-          v-show="!storeEditor.layerEditing"
           :options="options"
           :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
         //- actions
+        //- v-show="!storeEditor.layerEditing"
         div(
-          v-show="!storeEditor.layerEditing"
           ).row.full-width.items-center.content-center.q-pa-xs
           q-btn(
             v-if="composition.layers.length === 1"
@@ -180,12 +180,12 @@ export default {
     },
   },
   watch: {
-    composition: {
-      immediate: true,
-      handler (to, from) {
-        if (to.layers.length === 0) this.mode = 'empty'
-      }
-    }
+    // composition: {
+    //   immediate: true,
+    //   handler (to, from) {
+    //     if (to.layers.length === 0) this.mode = 'empty'
+    //   }
+    // }
   },
   methods: {
     modeMiniToMaxi () {
@@ -262,7 +262,9 @@ export default {
   },
   mounted () {
     this.$log('mounted')
+    // if (this.composition.la)
     if (this.composition.layers.length === 1) {
+      this.mode = 'mini'
       this.layerEdit(this.composition.layers[0])
     }
   },

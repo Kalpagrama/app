@@ -14,8 +14,12 @@
           'b-100': oid === c.sphere.oid
         }`
         :style=`{height: '40px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
-        ).row.full-width.items-center.q-px-md.cursor-pointer.sphere-item
-        span(:style=`{userSelect: 'none'}`).text-white {{'🔆 '+ c.alias}}
+        ).row.full-width.items-center.q-px-sm.cursor-pointer.sphere-item
+        q-icon(
+          name="blur_on" size="24px"
+          :color="oid === c.sphere.oid ? 'white' : 'grey-6'"
+          ).q-mr-sm
+        span(:style=`{userSelect: 'none'}`).text-white {{ c.alias }}
 </template>
 
 <script>

@@ -36,7 +36,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
     :icon="muted ? 'volume_off' : 'volume_up'"
     :style=`{
       position: 'absolute', zIndex: 2100,
-      left: '16px', bottom: '16px',
+      left: '8px', bottom: '16px',
       background: 'rgba(0,0,0,0.1)',
     }`)
     small.text-white.text-bold.q-ml-sm {{$time(duration-currentTime)}}
