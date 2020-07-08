@@ -8,7 +8,7 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-st
     :style=`{
       userSelect: 'none', objectFit: 'contain',
       maxHeight: $q.screen.height-300+'px',
-      minHeight: '300px',
+      //- minHeight: '300px',
       opacity: started ? 0 : 1,
     }`
     ).full-width
@@ -19,7 +19,7 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-st
       composition(
         :ctx="ctx" :preview="node.meta.items[itemIndex].thumbUrl" :value="item"
         :visible="visible"
-        :loop="itemIsFirst && itemIsLast"
+        :loop="false"
         :active="active && itemActive"
         :mini="mini || !itemActive || itemNexting"
         :itemsCount="items.length"
@@ -28,7 +28,7 @@ div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-st
         }`
         @previewClick="next()"
         @started="started(itemIndex), itemsStarted()"
-        @ended="ended(itemIndex)"
+        @ended="itemEnded(itemIndex, ended)"
         :style=`{
           position: 'relative',
           borderRadius: $store.state.ui.borderRadius+'px',
@@ -47,7 +47,8 @@ export default {
       started: false,
       // preview
       previewLoaded: false,
-      previewError: null
+      previewError: null,
+      itemsEnded: false,
     }
   },
   computed: {
@@ -68,6 +69,17 @@ export default {
     },
   },
   methods: {
+    itemEnded (i, cb) {
+      this.$log('itemEnded', i, cb)
+      if (this.nodeFull.items.length - 1 === i) {
+        this.itemsEnded = true
+        let index = 0
+        cb(index)
+      }
+      else {
+        cb(i)
+      }
+    },
     itemsStarted () {
       this.$log('itemsStarted')
       this.started = true

@@ -13,8 +13,8 @@ div(
       @composition="compositionFound"
       @close="itemFinderOpened = false"
       :style=`{
-        height: $q.screen.height-60+'px',
-        minHeight: $q.screen.height-60+'px',
+        height: $q.screen.height-0+'px',
+        minHeight: $q.screen.height-0+'px',
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`)
   //- item edit
@@ -39,6 +39,7 @@ div(
   .col.full-width.scroll
     //- header
     div(
+      v-if="!$slots.header"
       :style=`{
         borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
         overflow: 'hidden'
@@ -49,9 +50,10 @@ div(
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
         span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('wsNodeEditor_title', 'Редактор ядра')}}
         q-btn(round flat color="red-5" icon="delete_outline" @click="nodeDelete()")
+    slot(name="header")
     .row.full-width.justify-center
       div(
-        :style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start
+        :style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start.q-px-sm
         //- node wrapper
         //- TODO: add after compare done...
         //- edit-layout(:node="node")
@@ -69,13 +71,14 @@ div(
         edit-spheres(:node="node" :sphereFirstEditable="ctx === 'workspace'")
   //- publish
   .row.full-width.justify-center
-    div(:style=`{maxWidth: '600px'}`).row.full-width.q-pb-sm
+    div(:style=`{maxWidth: '600px'}`).row.full-width.q-pa-sm
       q-btn(
         @click="publish"
         push color="green" no-caps
         :loading="publishing"
         :style=`{height: '50px',}`
-        ).full-width {{$t('ws_node_editor_publish', 'Опубликовать')}}
+        ).full-width
+        span.text-white.text-bold {{$t('ws_node_editor_publish', 'Опубликовать')}}
 </template>
 
 <script>
@@ -173,9 +176,9 @@ export default {
     check () {
       this.$log('check')
       if (!this.node.category) throw new Error('No node.category !')
-      if (this.node.name.length === 0) throw new Error('No node.essence !')
+      // if (this.node.name.length === 0) throw new Error('No node.essence !')
       if (this.node.layout !== 'PIP') throw new Error('Only PIP layout for now !')
-      if (this.node.items.length > 3) throw new Error('3 compositions maximum !')
+      if (this.node.items.length > 5) throw new Error('5 items maximum !')
       if (this.node.spheres.length > 5) throw new Error('5 spheres maximum !')
       this.node.items.map((i, ii) => {
         if (i.layers.length === 0) throw new Error(`No layers in item: ${ii} !`)

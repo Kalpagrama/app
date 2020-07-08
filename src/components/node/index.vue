@@ -10,7 +10,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeIndex',
-  props: ['ctx', 'index', 'node', 'needFull', 'nodeFullReady', 'visible', 'active', 'mini', 'layout', 'opened', 'essence'],
+  props: ['ctx', 'index', 'node', 'needFull', 'nodeFullReady', 'visible', 'active', 'mini', 'layout', 'opened', 'essence', 'onlyItems'],
   components: {nodeLayoutPip},
   data () {
     return {

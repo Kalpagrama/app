@@ -49,7 +49,7 @@ div(
               q-btn(
                 @click="layerRefresh()"
                 round flat dense icon="refresh"
-                color="white")
+                :color="loop ? 'white' : 'grey-8'")
             div().row.full-width
               div(:style=`{paddingLeft: '40px', paddingRight: '40px'}`).row.full-width
                 q-btn(round flat dense color="grey-6" icon="flip" @click="layerSet(0)").q-mr-xs.rotate-180
@@ -107,6 +107,10 @@ export default {
       progressPercentRaw: null,
       need_framesLayerCenter: false,
       editing: false,
+      seekTimeout: null,
+      startForwardTimeout: null,
+      endForwardTimeout: null,
+      loop: true,
     }
   },
   computed: {
@@ -165,9 +169,28 @@ export default {
           // alert('START WATCH: ' + this.layer.id)
           this.watcherCurrentTime = this.$watch('storePlayer.currentTime', (to, from) => {
             // if (this.storeEditor.compositionPlaying) return
-            this.$log('storePlayer.currentTime TO', to)
             if (to > this.layerEnd || to < this.layerStart) {
-              this.storePlayer.setCurrentTime(this.layerStart)
+              if (this.seekTimeout) {
+                clearTimeout(this.seekTimeout)
+                this.seekTimeout = null
+              }
+              else {
+                // this.$q.notify('OUTSIDE=' + this.layerStart)
+                if (to > this.layerEnd) {
+                  if (this.loop) this.storePlayer.setCurrentTime(this.layerStart)
+                  else {
+                    this.storePlayer.pause()
+                    this.loop = true
+                  }
+                }
+                else {
+                  this.storePlayer.setCurrentTime(this.layerStart)
+                }
+              }
+              this.seekTimeout = setTimeout(() => {
+                clearTimeout(this.seekTimeout)
+                this.seekTimeout = null
+              }, 1000)
             }
           })
         }
@@ -181,17 +204,22 @@ export default {
   methods: {
     layerPlay () {
       this.$log('layerPlay')
+      // this.loop = true
       this.storeEditor.layerPlaying = this.layer.id
       this.storePlayer.playPause()
     },
     layerRefresh () {
       this.$log('layerRefresh')
+      // this.loop = true
       this.storeEditor.layerPlaying = this.layer.id
+      // this.$q.notify('REFRESH===' + this.layerStart)
       this.storePlayer.setCurrentTime(this.layerStart)
       this.storePlayer.play()
+      this.storeLayerEditor.set('need_framesLayerCenter', true)
     },
     layerSet (index) {
       this.$log('layerSet', index)
+      // this.loop = true
       // check, t for layerStart and layerEnd
       let t = this.storePlayer.currentTime
       if (index === 0) {
@@ -212,18 +240,37 @@ export default {
       this.storeLayerEditor.set('need_framesLayerCenter', true)
       this.storeEditor.layerPlaying = this.layer.id
     },
-    layerForward (index, isRight) {
+    async layerForward (index, isRight) {
       this.$log('layerForward', index, isRight)
-      this.storePlayer.pause()
-      let t = this.layer.figuresAbsolute[index].t + (isRight ? 0.1 : -0.1)
-      // if end changed go 1.5 sec before
-      // if (index === 1) t -= 1.5
-      // set t
-      this.layer.figuresAbsolute[index].t = t
-      // this.storePlayer.playPause()
-      this.storePlayer.setCurrentTime(t)
       // play this layer anyway
+      this.storePlayer.pause()
       this.storeEditor.layerPlaying = this.layer.id
+      // t
+      let t = this.layer.figuresAbsolute[index].t + (isRight ? 0.1 : -0.1)
+      this.layer.figuresAbsolute[index].t = t
+      this.storePlayer.setCurrentTime(t)
+      // start: play after editing
+      if (index === 0) {
+        if (this.startForwardTimeout) {
+          clearTimeout(this.startForwardTimeout)
+          this.startForwardTimeout = null
+        }
+        this.startForwardTimeout = setTimeout(async () => {
+          this.storePlayer.play()
+        }, 1000)
+      }
+      // end: go 1.5 sec before start, prevent loop, stop at the end,
+      if (index === 1) {
+        if (this.endForwardTimeout) {
+          clearTimeout(this.endForwardTimeout)
+          this.endForwardTimeout = null
+        }
+        this.endForwardTimeout = setTimeout(async () => {
+          this.loop = false
+          this.storePlayer.setCurrentTime(t - 1.5)
+          this.storePlayer.play()
+        }, 1000)
+      }
     },
     layerCreateNode () {
       this.$log('layerCreateNode')

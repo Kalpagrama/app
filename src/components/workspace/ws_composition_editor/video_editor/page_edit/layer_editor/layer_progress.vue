@@ -88,6 +88,7 @@ export default {
     },
     progressClick (e) {
       // this.$log('progressClick', e)
+      this.storeEditor.layerPlaying = this.layer.id
       let width = e.target.clientWidth
       let left = e.offsetX
       let t = ((this.storeLayerEditor.layerDuration * left) / width) + this.storeLayerEditor.layerStart
@@ -118,6 +119,7 @@ export default {
         // if (this.stateExplorer.playing)
         this.progressPercentRaw = null
         // this.storePlayer.player.play()
+        this.storeEditor.layerPlaying = this.layer.id
       }
       if (!this.progressPercentRaw) return
       this.progressPercentRaw += (e.delta.x / this.$el.clientWidth) * 100
