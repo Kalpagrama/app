@@ -12,6 +12,7 @@ import set from 'lodash/set'
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_REACTIVE)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_REACTIVE)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_REACTIVE)
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function getReactive (rxDoc) {
   let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
@@ -40,8 +41,9 @@ function mergeReactiveItem (reactiveItem, change) {
   })
 }
 
+let id = 0
 // все измененеия - только через эту ф-ю. Иначе - возможны гонки (из-за debounce)
-// либо - менять непосредственно reactiveItem
+// либо - менять непосредственно reactiveItem (либо через updateExtended)
 async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
   let f = updateRxDoc
   logD(f, 'start')
@@ -55,18 +57,18 @@ async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
   }
   if (rxDoc) {
     let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
-    let originalDebouncedSave = reactiveItemHolder.debouncedSave
     try {
-      reactiveItemHolder.debouncedSaveSet(debouncedSave)
+      reactiveItemHolder.setDebouncedSave(debouncedSave)
       // logD(f, 'start2', reactiveItemHolder.reactiveItem, path, value)
       set(reactiveItemHolder.reactiveItem, path, value)
       // logD(f, 'complete', reactiveItemHolder.reactiveItem)
-    }
-    finally {
-      reactiveItemHolder.debouncedSaveSet(originalDebouncedSave)
+    } finally {
+      wait(0).then(() => { // нужно чтобы setDebouncedSave сработала после эвентов itemSubscribe
+        reactiveItemHolder.setDebouncedSave(true)
+      })
     }
   }
-  logD(f, 'complete')
+  // logD(f, 'complete')
 }
 
 const debounceIntervalItem = 2000
@@ -79,14 +81,16 @@ class ReactiveItemHolder {
     // logD('ReactiveItemHolder::constructor', rxDoc.id)
     this.rxDoc = rxDoc
     if (rxDoc.reactiveItemHolderMaster) {
+      this.id = rxDoc.reactiveItemHolderMaster.id
       this.reactiveItem = rxDoc.reactiveItemHolderMaster.reactiveItem
       this.itemSubscribe = rxDoc.reactiveItemHolderMaster.itemSubscribe // иногда надо временно отписаться
       this.itemUnsubscribe = rxDoc.reactiveItemHolderMaster.itemUnsubscribe
       this.rxDocSubscribe = rxDoc.reactiveItemHolderMaster.rxDocSubscribe // иногда надо временно отписаться
       this.rxDocUnsubscribe = rxDoc.reactiveItemHolderMaster.rxDocUnsubscribe
-      this.debouncedSave = rxDoc.reactiveItemHolderMaster.debouncedSave
-      this.debouncedSaveSet = rxDoc.reactiveItemHolderMaster.debouncedSaveSet
+      this.getDebouncedSave = rxDoc.reactiveItemHolderMaster.getDebouncedSave
+      this.setDebouncedSave = rxDoc.reactiveItemHolderMaster.setDebouncedSave
     } else {
+      this.id = id++
       this.rxDoc = rxDoc
       this.mutex = new Mutex()
       this.vm = new Vue({
@@ -97,15 +101,22 @@ class ReactiveItemHolder {
       this.reactiveItem = this.vm.reactiveItem
       this.reactiveItem.itemSubscribe = this.itemSubscribe // иногда надо временно отписаться
       this.reactiveItem.itemUnsubscribe = this.itemUnsubscribe
-      rxDoc.reactiveItemHolderMaster = this
-      this.debouncedSaveSet(true)
+      this.debouncedSave = true
       this.rxDocSubscribe()
       this.itemSubscribe()
+      this.reactiveItem.updateExtended = async (path, value, debouncedSave = true) => {
+        await updateRxDoc(this.rxDoc, path, value, debouncedSave)
+      }
+      this.getDebouncedSave = () => {
+        return this.debouncedSave
+      }
+      this.setDebouncedSave = (flag) => {
+        let f = this.setDebouncedSave
+        // logD(f, 'start', flag, this.id)
+        this.debouncedSave = flag
+      }
+      rxDoc.reactiveItemHolderMaster = this
     }
-  }
-
-  debouncedSaveSet (flag) {
-    this.debouncedSave = flag
   }
 
   rxDocSubscribe () {
@@ -163,11 +174,11 @@ class ReactiveItemHolder {
         }
         this.debouncedItemSaveFunc = debounce(this.itemSaveFunc, debounceIntervalItem)
       }
-      if (this.debouncedSave) {
+      if (this.getDebouncedSave()) {
         logD(f, `reactiveItem changed (rxDoc will change via debounce later) ${this.reactiveItem.id}`)
         this.debouncedItemSaveFunc(newVal)
       } else {
-        logD(f, `reactiveItem changed ${this.reactiveItem.id}`)
+        logD(f, `reactiveItem changed without debounce ${this.reactiveItem.id}`)
         await this.itemSaveFunc(newVal)
       }
     }, { deep: true, immediate: false })
@@ -235,7 +246,7 @@ class ReactiveListHolder {
           }
           if (!arrayChanged) return // если список не изменился - просто выходим
         }
-        logD(f, 'rxQuery changed', results)
+        // logD(f, 'rxQuery changed', results)
         let items = results.map(rxDoc => {
           let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
           return reactiveItemHolder.reactiveItem

@@ -213,21 +213,20 @@ export default {
         let createdNode = await NodeApi.nodeCreate(this.node)
         this.$log('nodePublish res', createdNode)
         // publish
-        this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_publishing', 'Публикуем ядро...')})
-        await this.$wait(1000)
-        this.node.stage = 'published'
-        this.node.oid = createdNode.oid // нужно при снятии с публикации
+        // this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_publishing', 'Публикуем ядро...')})
+        // await this.$wait(1000)
+        await this.node.updateExtended('stage', 'published', false)// без debounce
+        await this.node.updateExtended('oid', createdNode.oid, false)// без debounce // oid нужно при снятии с публикации
         // done
-        this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
+        // this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
         await this.$wait(1000)
         this.$q.loading.hide()
         // this.storeNodeEditor.set('publishing', false)
         this.publishing = false
-        this.$q.notify({
-          type: 'positive',
-          message: this.$t('node_published', 'Ядро опубликовано!')
-        })
-        // this.$store.commit('core/processEvent', {type: 'PROGRESS', action: 'CREATE', progress: 1})
+        // this.$q.notify({
+        //   type: 'positive',
+        //   message: this.$t('node_published', 'Ядро опубликовано!')
+        // })
         this.$emit('published', createdNode.oid)
         this.$emit('close')
       }

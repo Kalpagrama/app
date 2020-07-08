@@ -159,6 +159,9 @@ export default {
       await this.nodeEdit(await this.nodeAdd(JSON.parse(JSON.stringify(n))))
     },
     async nodeDelete (n) {
+      // await n.updateExtended('stage', 'published', false)// без debounce
+      // return
+      // eslint-disable-next-line no-unreachable
       this.$log('nodeDelete', n)
       if (!confirm(this.$t('delete_node?', 'Удалить ядро?'))) return
       await this.$rxdb.remove(n.id)
@@ -194,7 +197,8 @@ export default {
       this.$log('nodeUnPublish', node)
       if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
       await NodeApi.nodeDelete(node.oid)
-      node.stage = 'draft'
+      await node.updateExtended('stage', 'draft', false)// без debounce
+      await node.updateExtended('oid', node.oid, false)// без debounce
     },
     async nodeUnSave (node) {
       this.$log('nodeUnSave', node)

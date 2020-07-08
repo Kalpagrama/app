@@ -5,11 +5,13 @@ import { notify } from 'src/boot/notify'
 import { router } from 'src/boot/main'
 import { EventApi } from 'src/api/event'
 import { rxdb } from 'src/system/rxdb'
+import { RxCollectionEnum } from 'src/system/rxdb/index'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_EVENT)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_EVENT)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_EVENT)
 const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_EVENT)
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 class Event {
   constructor (workspace, objects, lists) {
@@ -30,16 +32,45 @@ class Event {
   }
 
   // от сервера прилетел эвент (поправим данные в кэше)
-  async processEvent (event) {
+  async processEvent (event, store) {
+    assert(event && store, 'event && store')
     const f = this.processEvent
     logD(f, 'start', rxdb.isLeader())
     if (!rxdb.isLeader()) return
     switch (event.type) {
       case 'ERROR':
+        if (event.operation === 'OBJECT_CREATE') { // не удалось создать ядро!
+          logD(f, 'снимаем с публикации')
+          // обнулим прогресс
+          let fakeProgressEvent = { type: 'PROGRESS', action: 'CREATE', oid: event.object.oid, progress: -1 }
+          store.commit('core/processEvent', fakeProgressEvent)
+          let { items: createdWsNodes } = await rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_NODE,
+              stage: 'published',
+              oid: event.object.oid
+            }
+          })
+          // переместим ядро в черновики
+          for (let wsNode of createdWsNodes) {
+            // logD(f, 'change wsNode...', wsNode)
+            await wsNode.updateExtended('stage', 'draft', false)// без debounce
+            delete wsNode.oid
+          }
+          await wait(3000)
+          let { items: createdWsNodes2 } = await rxdb.find({
+            selector: {
+              rxCollectionEnum: RxCollectionEnum.WS_NODE,
+              stage: 'published',
+              oid: event.object.oid
+            }
+          })
+          logD(f, 'createdWsNodes2=', createdWsNodes2)
+        }
         this.notifyError(event)
         break
       case 'PROGRESS':
-        // обрабатывается во вьюикс
+        store.commit('core/processEvent', event)
         break
       case 'NOTICE':
         break

@@ -42,7 +42,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (to, from) {
-        this.$log('mangoQuery CHANGED', 'from=', from, ', to=', to)
+        // this.$log('mangoQuery CHANGED', 'from=', from, ', to=', to)
         if (to) {
           this.itemsLoad(to)
         }
@@ -52,7 +52,7 @@ export default {
       deep: false,
       immediate: false,
       handler(to, from){
-        this.$log('loader items CHANGED', 'from=', from, ', to=', to)
+        // this.$log('loader items CHANGED', 'from=', from, ', to=', to)
         this.$emit('itemsCount', to.length)
         this.itemsSlice = 1
         this.itemsSliced = to.slice(0, this.sliceSize)

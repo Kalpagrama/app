@@ -17,21 +17,11 @@ export function stateSet (state, [key, val]) {
 export function processEvent (state, event){
   switch (event.type){
     case 'PROGRESS':
-      // // logD('progress event received!', event)
-      // assert(event.action, '')
-      // // if (!state.progressInfo[event.action]) state.progressInfo[event.action] = {}
       if (state.progressInfo[event.action] === undefined) {
         Vue.set(state.progressInfo, event.action, {})
-        // Vue.set(state.progressInfo[event.action], event.oid, 0)
       }
-      // Vue.set(state.progressInfo[event.action], event.oid, 0)
-      // state.progressInfo[event.action][event.oid] = event.progress
       Vue.set(state.progressInfo[event.action], event.oid, event.progress)
       logD('progress event! progressInfo===' + state.progressInfo[event.action][event.oid])
-      // logD('progress' + state.progressInfo.shit.xxx)
-      // if (state.processInfo.shit)
-      // state.progressInfo.shit.xxx = event.progress
-      // // state.count = event.progress
       break
     default:
       break

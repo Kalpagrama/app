@@ -208,8 +208,7 @@ class RxDBWrapper {
     try {
       await this.lock()
       assert(this.store, '!this.store')
-      this.store.commit('core/processEvent', event)
-      await this.event.processEvent(event)
+      await this.event.processEvent(event, this.store)
     } finally {
       this.release()
     }

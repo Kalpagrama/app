@@ -93,7 +93,7 @@ div(
             span(:style=`{fontSize: '18px'}`).q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
         //- version
         div(v-if="true").row.full-width.items-center.q-pa-md
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия')}} 0.9.99-03.07.2020
+          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
         //- slot(name="footer")
 </template>
 

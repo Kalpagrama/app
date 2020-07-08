@@ -4,6 +4,8 @@ const webpack = require('webpack')
 require('dotenv').config()
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// const packageJson = fs.readFileSync('./package.json')
+// const version = JSON.parse(packageJson).version || 0
 
 module.exports = function (ctx) {
   return {
@@ -77,7 +79,9 @@ module.exports = function (ctx) {
     build: {
       env: {
         SERVICES_URL: JSON.stringify(process.env.AUTH_URL) || JSON.stringify(process.env.SERVICES_URL),
-        SERVICES_URL_DEBUG: JSON.stringify(process.env.SERVICES_URL_DEBUG)
+        SERVICES_URL_DEBUG: JSON.stringify(process.env.SERVICES_URL_DEBUG),
+        BUILD_DATE: JSON.stringify((new Date().toISOString()).split('T')[0]),
+        BUILD_VERSION: JSON.stringify(require('./package.json').version)
       },
       scopeHoisting: true,
       vueRouterMode: 'history',

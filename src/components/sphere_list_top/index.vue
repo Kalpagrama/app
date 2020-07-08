@@ -15,7 +15,7 @@
         }`
         :style=`{height: '40px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
         ).row.full-width.items-center.q-px-md.cursor-pointer.sphere-item
-        span(:style=`{userSelect: 'none'}`).text-white {{'🔆 '+c.alias}}
+        span(:style=`{userSelect: 'none'}`).text-white {{'🔆 '+ c.alias}}
 </template>
 
 <script>

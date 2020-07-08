@@ -220,6 +220,8 @@ const eventFragment = gql`
       operation
       code
       message
+      subject{... objectShortFragment}
+      object{... objectShortFragment}
     }
     ... on EventProgress{
       oid
