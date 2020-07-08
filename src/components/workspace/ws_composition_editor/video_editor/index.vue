@@ -3,12 +3,17 @@ div(
   :style=`{
     position: 'relative',
     //- minWidth: pageFullscreen ? $q.screen.width+'px' : 800+'px',
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: '10px',
+    //- overflow: 'hidden',
   }`
   ).row.full-width.b-50
   q-resize-observer(@resize="height = $event.height")
   //- mode: EDITOR
   div(v-if="options.mode === 'editor'" :style=`{position: 'relative'}`).column.fit
+    layers-on-bar(
+      v-if="storePlayer"
+      :layers="composition.layers" :layerId="layerEditing"
+      :currentTime="storePlayer.currentTime" :duration="storePlayer.duration")
     //- header
     div(
       v-if="options.ctx === 'workspace'"
@@ -113,6 +118,7 @@ import pageEdit from './page_edit'
 import pagesController from './pages_controller'
 import compositionProgress from './composition_progress'
 import nodeCreator from './node_creator'
+import layersOnBar from './layers_on_bar'
 
 export default {
   name: 'videoEditor',
@@ -122,6 +128,7 @@ export default {
     pagesController,
     compositionProgress,
     nodeCreator,
+    layersOnBar,
   },
   props: {
     sid: {type: String, default () { return 'wce' }},

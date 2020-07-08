@@ -6,12 +6,17 @@ div()
     :style=`{
       width: '40px',
     }`).full-height
-  input(ref="inputFile" type="file" @input="fileChanged" :style=`{display: 'none',}`)
+  input(
+    ref="inputFile" type="file"
+    @input="fileChanged"
+    accept="image/*"
+    :style=`{display: 'none',}`
+    )
 </template>
 
 <script>
 import { ContentApi } from 'src/api/content'
-
+// TODO: go to this type of content of change it before upload...
 export default {
   name: 'contentFromFile',
   data () {

@@ -8,6 +8,8 @@ div(
     borderRadius: '10px',
     overflow: 'hidden',
   }`).row.full-width.b-60
+  //- layers on progress bar
+  //- div(:style=`{position: 'absolute', zIndex: 99999, top: '-50px', height: '100px'}`).row.full-width.bg-red.bg
   //- debug
   //- kalpa-debug(
   //-   :options=`{layerPlaying:storeEditor.layerPlaying}`

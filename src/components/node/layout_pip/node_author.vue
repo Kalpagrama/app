@@ -7,7 +7,7 @@
 <template lang="pug">
 div(
   :style=`{
-    height: '60px',
+    height: '40px',
   }`
   ).row.full-width.items-center.content-center.q-px-sm
   //- author width nodeFull
@@ -20,7 +20,7 @@ div(
         :to="'/user/'+nodeFull.author.oid"
         :style=`{
           padding: '0px', margin: '0px',
-          height: '60px',
+          height: '40px',
           position: 'relative',
           borderRadius: 30+'px',
           overflow: 'hidden',
@@ -28,7 +28,7 @@ div(
         ).row.b-80.author-area
         //- user avatar
         kalpa-avatar(
-          :url="nodeFull.author.thumbUrl" :width="58" :height="58")
+          :url="nodeFull.author.thumbUrl" :width="38" :height="38")
         //- user name
         .col.full-height
           .row.fit.items-center.content-center.justify-start.q-pl-sm

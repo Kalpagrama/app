@@ -7,8 +7,8 @@ div(:style=`{position: 'relative',}`).column.fit
       :value="node"
       :style=`{
         maxWidth: '800px',
-        maxHeight: $q.screen.height-60+'px',
-        minHeight: $q.screen.height-60+'px',
+        maxHeight: $q.screen.height-0+'px',
+        minHeight: $q.screen.height-0+'px',
       }`)
   //- body
   .col.full-width.scroll

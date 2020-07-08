@@ -71,7 +71,7 @@ div(
     .row.full-width.items-start.content-start.q-py-md
       kalpa-loader(:mangoQuery="mangoQuery" :key="i")
         template(v-slot=`{items}`)
-          div(v-if="items.length > 0").row.full-width.items-start.content-start
+          div(v-if="items.length > 0").row.full-width.items-start.content-start.q-px-sm
             div(
               :style=`{paddingBottom: '100px'}`).row.full-width.items-start.content-start
               composition-item(

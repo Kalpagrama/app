@@ -61,11 +61,11 @@ export default {
       voteOver: null,
       voteShow: false,
       votes: [
-        {id: 0.9, name: 'Прямо в точку!', value: 100},
-        {id: 0.7, name: 'Скорее да', value: 70},
-        {id: 0.5, name: 'Может быть', value: 50},
-        {id: 0.3, name: 'Ну такое..', value: 30},
-        {id: 0.1, name: 'Нет', value: 0},
+        {id: 1, name: this.$t('nodeVote100', 'Прямо в точку!'), value: 100},
+        {id: 0.7, name: this.$t('nodeVote70', 'Близко'), value: 70},
+        {id: 0.5, name: this.$t('nodeVote50', 'Где-то рядом'), value: 50},
+        {id: 0.3, name: this.$t('nodeVote30', 'Ну такое...'), value: 30},
+        {id: 0, name: this.$t('nodeVote0', 'Очень далеко'), value: 0},
       ]
     }
   },

@@ -77,7 +77,7 @@ div(
     //- actions
     div(:style=`{}`).row.full-width.items-end.content-end.q-px-sm.q-pb-sm.scroll
       .row.no-wrap
-        kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start
+        kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start.q-mr-sm
   //- body
   .col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery")

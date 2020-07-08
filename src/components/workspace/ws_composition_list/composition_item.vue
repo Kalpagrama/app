@@ -1,7 +1,7 @@
 <style lang="sass" scoped>
 .composition
   &:hover
-    background: rgb(90,90,90)
+    background: rgb(70,70,70)
 </style>
 
 <template lang="pug">
@@ -22,7 +22,7 @@ div(
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
-    ).row.full-width.items-start.content-start.cursor-pointer.b-70.composition
+    ).row.full-width.items-start.content-start.cursor-pointer.b-60.composition
     //- actions
     q-btn(
       round flat dense color="grey-5" icon="more_vert"
@@ -56,10 +56,10 @@ div(
       borderRadius: $store.state.ui.borderRadius+'px',
       overflow: 'hidden',
     }`
-    ).row.full-width.cursor-pointer.b-70.q-mb-sm.composition
+    ).row.full-width.cursor-pointer.b-60.q-mb-sm.composition
     //- actions
     q-btn(
-      round flat dense color="grey-5" icon="more_vert"
+      round flat dense color="grey-7" icon="more_vert"
       :style=`{
         position: 'absolute', zIndex: 1000, top: 0, right: 0,
       }`)

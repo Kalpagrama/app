@@ -2,7 +2,7 @@
 div(
   :class=`{
     'b-50': !active,
-    'b-70': active,
+    'b-60': active,
   }`
   :style=`{
     position: 'relative',

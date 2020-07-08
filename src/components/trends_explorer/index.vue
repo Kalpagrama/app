@@ -7,7 +7,7 @@
 
 <template lang="pug">
 kalpa-layout(
-  title="Trends"
+  :title="$t('pageTrends', 'Тренды')"
   :style=`{height: $q.screen.height+'px',}`)
   template(v-slot:footer)
     div(:style=`{maxWidth: '800px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width.q-pa-sm.b-60
@@ -17,8 +17,10 @@ kalpa-layout(
   template(v-slot:header)
     div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.q-pa-sm.b-60
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-      .col.q-px-sm
-        span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ '🔆 ' + category.alias}}
+      .col
+        .row.fit.items-center.content-center.q-px-sm
+          q-icon(name="blur_on" color="white" size="34px").q-mr-sm
+          span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ category.alias }}
   template(v-slot:drawerRight)
     menu-right(:style=`{maxWidth: '260px',}`)
   template(v-slot:page)

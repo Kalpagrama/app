@@ -6,18 +6,30 @@ div(
     borderRadius: '10px', overflow: 'hidden',
   }`
   ).column.full-width.items-center.b-50
-  //- //- close btn
-  //- q-btn(
-  //-   @click="$emit('close')"
-  //-   round flat color="white" icon="keyboard_arrow_left"
-  //-   :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.1)'}`)
+  //- close btn
+  q-btn(
+    v-show="pageFullscreen"
+    @click="$emit('close')"
+    round flat color="white" icon="keyboard_arrow_left"
+    :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.1)'}`)
   //- kalpa-debug(:options=`{options}` :style=`{position: 'absolute', zIndex: 2000, top: '60px', left: '0px',}`)
   //- header
-  .row.full-width.items-center.content-center.q-pa-sm
-    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')").q-mr-sm
-    .col
-      span.text-white.text-bold {{ content.name }}
-    q-btn(round flat color="white" icon="more_vert")
+  div(
+    v-show="!pageFullscreen"
+    :class=`{
+      'q-pa-xs': $q.screen.width < 600,
+      'q-pa-sm': $q.screen.width >= 600,
+    }`
+    ).row.full-width.items-center.content-center
+    q-btn(
+      @click="$emit('close')"
+      round flat color="white" icon="keyboard_arrow_left"
+      :dense="$q.screen.width < 600").q-mr-sm
+    div(:style=`{overflow: 'hidden',}`).col
+      span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ content.name }}
+    q-btn(
+      round flat color="white" icon="more_vert"
+      :dense="$q.screen.width < 600")
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px',}`).col.full-width
     ws-content-player(
@@ -26,10 +38,10 @@ div(
       :sid="sidPlayer"
       :content="content")
       template(v-slot:controlsTools)
-        //- q-btn(
-        //-   @click="pageFullscreen = !pageFullscreen"
-        //-   round flat dense color="white"
-        //-   :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
+        q-btn(
+          @click="pageFullscreen = !pageFullscreen, pageId = null"
+          round flat dense color="white"
+          :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
         q-btn(
           @click="compositionAddStart()"
           round push dense color="green" icon="add"
@@ -37,11 +49,13 @@ div(
       //- template(v-slot:controls)
       //-   composition-name-init(v-if="pageId === 'compositions'")
   //- pages:
-  component(
-    v-if="storePlayer && storePlayer.loadeddata"
-    :is="`page-${pageId}`"
-    :content="content"
-    :style=`{ maxWidth: '600px', maxHeight: pageHeight+'px', }`)
+  div(:style=`{maxHeight: pageHeight+'px',}`).col.full-width
+    .row.fit.items-start.content-start.justify-center
+      component(
+        v-if="storePlayer && storePlayer.loadeddata"
+        :is="`page-${pageId}`"
+        :content="content"
+        :style=`{ maxWidth: '600px', maxHeight: pageHeight+'px',}`)
   //- footer
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     pages-controller(
@@ -84,9 +98,9 @@ export default {
   data () {
     return {
       name: '',
-      pageHeight: 0,
+      pageHeight: 40,
       pageFullscreen: false,
-      pageId: 'compositions',
+      pageId: null, // 'compositions',
       storePlayer: null,
       compositionPlaying: null,
       compositionEditing: null,
@@ -117,9 +131,9 @@ export default {
   },
   watch: {
     pageId: {
-      immediate: true,
+      immediate: false,
       handler (to, from) {
-        this.pageHeight = this.$q.screen.height * 0.5
+        this.pageHeight = this.$q.screen.height * 0.55
         // if (to === 'details') this.pageHeight = this.$q.screen.height * 0.5
         // else if (to === 'explore') this.pageHeight = this.$q.screen.height * 0.7
         // else if (to === 'compositions') this.pageHeight = this.$q.screen.height * 0.6
@@ -129,7 +143,7 @@ export default {
     pageFullscreen: {
       handler (to, from) {
         if (to) this.pageHeight = 0
-        else this.pageHeight = this.$q.screen.height * 0.5
+        else this.pageHeight = this.$q.screen.height * 0.55
       }
     },
   },
@@ -178,6 +192,7 @@ export default {
       }
       let res = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, compositionInput)
       this.$log('res', res)
+      this.$emit('compositionAdded', res)
       return res
     },
   },
@@ -188,7 +203,7 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    if (this.options.ctx === 'explorer') this.pageId = 'explore'
+    // if (this.options.ctx === 'explorer') this.pageId = 'explore'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

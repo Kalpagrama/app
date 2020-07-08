@@ -19,6 +19,7 @@ q-btn(
       v-if="contentExplorerItem"
       :value="contentExplorerItem"
       @close="contentExplorerOpened = false"
+      @compositionAdded="compositionAdded"
       :options=`{
         ctx: 'explorer',
       }`
@@ -41,6 +42,7 @@ export default {
       compositionEditorOpened: false,
       contentExplorerItem: null,
       contentExplorerOpened: false,
+      compositionAddedCount: 0,
     }
   },
   computed: {
@@ -70,6 +72,38 @@ export default {
         operation: { items: null, operations: null, type: 'CONCAT' }
       }
       return input
+    },
+    async compositionAdded (composition) {
+      this.$log('compositionAdded', composition)
+      this.compositionAddedCount += 1
+      if (this.compositionAddedCount === 1) {
+        this.$log('ADD CONTENT TO WS ON FIRST COMPOSITION ADDED')
+        let {items: contentFind} = await this.$rxdb.find({
+          selector: {
+            rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+            contentOid: this.content.oid,
+            contentType: {$ne: 'COMPOSITION'}
+          }
+        })
+        this.$log('contentFind', contentFind)
+        if (contentFind.length === 0) {
+          let contentInput = {
+            wsItemType: 'WS_CONTENT',
+            thumbOid: this.content.thumbUrl,
+            name: this.content.name,
+            layers: [],
+            spheres: [],
+            contentOid: this.content.oid,
+            contentType: this.content.type,
+            operation: {items: null, operations: null, type: 'CONCAT'}
+          }
+          this.$log('contentAdd contentInput', contentInput)
+          let res = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
+        }
+      }
+      else {
+        this.$q.notify('Good added: ' + this.compositionAddedCount)
+      }
     },
     async compositionInput (content) {
       this.$log('compositionInput content', content)

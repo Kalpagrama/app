@@ -61,7 +61,8 @@ div(
             'b-100': $route.path.split('/')[1] === p.id
           }`
           :style=`{
-            height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
+            height: $q.screen.width > 320 ? '60px' : '40px',
+            borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
           }`
           ).row.full-width.items-center.menu-item
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center

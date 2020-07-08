@@ -5,7 +5,7 @@ div(
   }`
   :style=`{
     position: 'relative',
-    borderRadius: 30+'px',
+    borderRadius: 20+'px',
     overflow: 'hidden',
   }`
   ).row.items-center.content-center.b-80
@@ -17,10 +17,10 @@ div(
       v-for="i in 1" :key="i"
       @click.native="$router.push('/user/'+nodeFull.author.oid)"
       :url="$store.getters.currentUser().profile.photoUrl"
-      :width="54" :height="54"
+      :width="34" :height="34"
       :opacity="0.5 + (0.1*i)"
       :style=`{
-        marginRight: '-25px',
+        marginRight: '-10px',
         zIndex: 10+i,
       }`).cursor-pointer
       div(
@@ -38,25 +38,25 @@ div(
   //- vote start btn
   q-btn(
     @click="voteStart()"
-    round push
+    push
     color="green"
     :loading="stateNode.voteShow"
     :style=`{
       zIndex: 300,
-      width: '60px',
-      height: '60px',
-      borderRadius: '50%'
-    }`).row.items-center.content-center.q-pa-xs
+      //- width: '40px',
+      height: '40px',
+      borderRadius: '20px'
+    }`).row.items-center.content-center
     span(
       v-if="nodeFull"
       :style=`{
-        fontSize: '20px', userSelect: 'none',
+        fontSize: '22px', userSelect: 'none',
         userSelect: 'none',
       }`
-      ).text-white.text-bold.q-mt-xs {{ Math.round(nodeFull.rate * 100) }}
-    .row.full-width.justify-center
-      q-icon(
-        color="white" name="emoji_people" size="22px")
+      ).text-white.text-bold {{ Math.round(nodeFull.rate * 100) }}
+      //- .row.full-width.justify-center
+    q-icon(
+      color="white" name="emoji_people" size="22px").q-mt-xs
 </template>
 
 <script>

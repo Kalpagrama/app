@@ -10,8 +10,11 @@ div(
       @click="storePlayer.playPause()"
       round flat dense color="white"
       :icon="storePlayer.playing ? 'pause' : 'play_arrow'")
-    //- q-btn(
-    //-   round flat dense color="grey-2" icon="volume_up")
+    q-btn(
+      @click="volumeToggle()"
+      round flat dense
+      :color="storePlayer.player.muted ? 'red' : 'grey-2'"
+      :icon="storePlayer.player.muted ? 'volume_off' : 'volume_up'")
     .col
     q-btn(
       v-if="$q.screen.width > 370"
@@ -28,7 +31,7 @@ div(
     .col
     slot(name="controlsTools")
   //- bar
-  div(:style=`{position: 'relative', zIndex: 300}`).row.full-width.q-pt-xs
+  div(:style=`{position: 'relative', zIndex: 99999}`).row.full-width.q-pt-xs
     div(
       @click="barClick"
       v-touch-pan.mouse.left.right="barDrag"
@@ -61,7 +64,7 @@ div(
     //- bar: currentTime
     div(
       :style=`{
-        position: 'absolute', zIndex: 1100, top: '0px', height: 'calc(30px + 8px)',
+        position: 'absolute', zIndex: 99999, top: '0px', height: 'calc(30px + 8px)', transform: 'translate3d(0,0,0)',
         left: storePlayer.currentTime/storePlayer.duration*100+'%',
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',
