@@ -62,8 +62,9 @@ div(
                 q-btn(round flat dense color="grey-6" icon="keyboard_arrow_right" @click="layerForward(1,1)")
                 q-btn(round flat dense color="grey-6" icon="flip" @click="layerSet(1)")
   //- name editor
+  //- v-if="composition.layers.length > 1"
   div(
-    v-if="composition.layers.length > 1"
+    v-if="storeEditor.layerEditing === layer.id ? composition.layers.length > 1 : true"
     :style=`{
       position: 'relative', borderRadius: '10px', overflow: 'hidden', order: -1,
     }`).row.full-width.justify-center

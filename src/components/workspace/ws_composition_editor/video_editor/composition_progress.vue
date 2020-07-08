@@ -152,7 +152,8 @@ export default {
       handler (to, from) {
         // this.$log('currentTime TO', to)
         // if (!this.active) return
-        // if (!this.storeEditor.compositionPlaying) return
+        // TODO: solve this shit!!!
+        if (!this.storeEditor.compositionPlaying) return
         if (this.storeEditor.layerEditing) return
         if (this.currentTimeStop) return
         if (to > this.layerActiveEnd) {

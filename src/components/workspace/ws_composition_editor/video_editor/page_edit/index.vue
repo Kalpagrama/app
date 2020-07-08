@@ -33,9 +33,11 @@ div(:style=`{position: 'relative'}`).column.fit
         q-btn(dense color="green" icon-right="check" no-caps @click="$emit('close')")
           span.text-bold.text-white.q-mx-xs {{$t('pageEdit_save', 'Сохранить')}}
   //- mode MAXI
-  div(v-if="mode === 'maxi'").column.fit.br
+  div(v-if="mode === 'maxi'" :style=`{position: 'relative',}`).column.fit
+    //- layer
+    //- div(v-if="")
     //- header
-    .row.full-width.justify-center
+    div(v-show="!storeEditor.layerEditing").row.full-width.justify-center
       name-editor(
         :composition="composition"
         :style=`{maxWidth: '600px'}`)
@@ -54,12 +56,13 @@ div(:style=`{position: 'relative'}`).column.fit
                 @start="layersDragging = true"
                 @end="layersDragging = false").full-width
                 div(
-                  v-for="(l,li) in composition.layers" :key="li"
-                  v-if="true"
+                  v-for="(l,li) in composition.layers" :key="l.id"
+                  v-if="storeEditor.layerEditing ? storeEditor.layerEditing === l.id : true"
                   :style=`{}`
                   ).row.full-width.items-start.content-start.q-mb-xs
                   //- left: select
                   div(
+                    v-show="!storeEditor.layerEditing"
                     :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
                     q-checkbox(
                       v-model="layersSelected" :val="l.id"
@@ -73,23 +76,33 @@ div(:style=`{position: 'relative'}`).column.fit
                       :composition="composition" :layer="l" :layerIndex="li")
                   //- right: drag
                   div(
+                    v-show="!storeEditor.layerEditing"
                     :style=`{width: '40px', height: '40px'}`).row.items-center.content-center.justify-center
                     q-btn(
                       round flat dense color="grey-6" icon="drag_indicator").layer-drag-handle
                       kalpa-menu-popup(:actions="layerActions" :value="l")
-              //- layer ADD
+              //- layer ADD/SAVE
               div(
                 :style=`{}`).row.full-width.justify-center
                 div(:style=`{maxWidth: '600px', paddingLeft: '40px', paddingRight: '40px',}`).row.full-width
                   q-btn(
+                    v-show="!storeEditor.layerEditing"
                     @click="layerAdd()"
                     flat color="green" icon-right="add" no-caps
                     :style=`{height: '40px'}`
                     ).full-width
                     span.text-bold.q-mx-sm {{$t('layer_add', 'Добавить фрагмент')}}
+                  q-btn(
+                    v-show="storeEditor.layerEditing"
+                    @click="storeEditor.layerEditing = null, storeEditor.layerPlaying = null"
+                    flat color="green" icon-right="check" no-caps
+                    :style=`{height: '40px'}`
+                    ).full-width
+                    span.text-bold.q-mx-sm {{$t('wsCompositionEditor_layerSave', 'Сохранить')}}
     //- footer: layersSelected
     div(
       v-if="layersSelected.length > 0"
+      v-show="!storeEditor.layerEditing"
       :style=`{
         position: 'absolute', bottom: 0, zIndex: 1000,
         borderRadius: '10px', overflow: 'hidden',
@@ -109,11 +122,13 @@ div(:style=`{position: 'relative'}`).column.fit
         //- v-show="!storeEditor.layerEditing"
         composition-progress(
           v-if="composition.layers.length > 0"
+          v-show="!storeEditor.layerEditing"
           :options="options"
           :composition="composition" :storeEditor="storeEditor" :storePlayer="storePlayer")
         //- actions
         //- v-show="!storeEditor.layerEditing"
         div(
+          v-show="!storeEditor.layerEditing"
           ).row.full-width.items-center.content-center.q-pa-xs
           q-btn(
             v-if="composition.layers.length === 1"
@@ -180,22 +195,29 @@ export default {
     },
   },
   watch: {
-    // composition: {
-    //   immediate: true,
-    //   handler (to, from) {
-    //     if (to.layers.length === 0) this.mode = 'empty'
-    //   }
-    // }
+    composition: {
+      immediate: true,
+      handler (to, from) {
+        if (to.layers.length === 0) this.mode = 'empty'
+      }
+    }
   },
   methods: {
     modeMiniToMaxi () {
       this.$log('modeMiniToMaxi')
       this.mode = 'maxi'
-      // if layers > 1 ? animation?
+      this.storeEditor.layerEditing = null
+      this.storeEditor.layerPlaying = null
     },
     modeMaxiToMini () {
       this.$log('modeMaxiToMini')
-      // cant go if layers > 1 ?
+      if (this.composition.layers.length === 1) {
+        this.mode = 'mini'
+        this.storeEditor.layerEditing = this.composition.layers[0].id
+      }
+      else {
+        this.$q.notify('Mini mode is possible with only with 1 fragment!')
+      }
     },
     layerFirstAdd () {
       this.$log('layerFirstAdd')
@@ -221,10 +243,10 @@ export default {
     },
     layerDeleteAfter () {
       this.$log('layerDeleteAfter')
-      if (this.composition.layers.length === 1) {
-        // alert('layerDeleteAfter')
-        this.layerEdit({id: this.composition.layers[0].id})
-      }
+      // if (this.composition.layers.length === 1) {
+      //   // alert('layerDeleteAfter')
+      //   this.layerEdit({id: this.composition.layers[0].id})
+      // }
     },
     layerDrop () {
       this.$log('layerDrop')
@@ -262,10 +284,12 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // if (this.composition.la)
     if (this.composition.layers.length === 1) {
       this.mode = 'mini'
       this.layerEdit(this.composition.layers[0])
+    }
+    else if (this.composition.layers.length > 1) {
+      this.mode = 'maxi'
     }
   },
 }
