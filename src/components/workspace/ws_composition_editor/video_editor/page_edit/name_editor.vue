@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
+div(:style=`{position: 'relative',overflow: 'hidden',}`).row.full-width.items-center.content-center
   //- interceptor tint
   div(
     @click="interceptorClick"
@@ -23,13 +23,15 @@ div(:style=`{position: 'relative',}`).row.full-width.items-center.content-center
     v-model="composition.name"
     ref="compositionNameInput"
     dark color="green"
-    :label="$t('wsCompositionEditor_videoEditor_whatDoYouSee', 'Что ты видишь?')"
+    :label="$t('wsCompositionEditor_videoEditor_inputLabel', 'Имя образа')"
+    :placeholder="$t('wsCompositionEditor_videoEditor_whatDoYouSee', 'Что ты видишь?')"
     @click="onClick"
     @focus="onFocus"
     @blur="onBlur"
     :style=`{
       paddingLeft: '10px',
       paddingRight: '10px',
+      marginBottom: '-2px',
     }`
     ).full-width
     //- template(v-slot:append)
