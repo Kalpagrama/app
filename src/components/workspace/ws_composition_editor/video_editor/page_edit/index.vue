@@ -27,7 +27,7 @@ div(:style=`{position: 'relative'}`).column.fit
     .row.full-width.justify-center
       div(:style=`{maxWidth: '600px',}`).row.full-width.items-center.content-center.q-pa-sm
         q-btn(flat dense color="white" no-caps icon="content_cut" @click="modeMiniToMaxi()")
-          span.text-white.text-bold.q-mx-sm {{$t('pageEdit_montage', 'Монтаж')}}
+          span(v-if="$q.screen.width > 400").text-white.text-bold.q-mx-sm {{$t('pageEdit_montage', 'Монтаж')}}
         .col
         q-btn(flat dense color="grey-5" no-caps @click="$emit('close')").q-px-sm.q-mr-sm {{$t('pageEdit_cancel', 'Отмена')}}
         q-btn(dense color="green" icon-right="check" no-caps @click="$emit('close')")
@@ -98,7 +98,7 @@ div(:style=`{position: 'relative'}`).column.fit
                     flat color="green" icon-right="check" no-caps
                     :style=`{height: '40px'}`
                     ).full-width
-                    span.text-bold.q-mx-sm {{$t('wsCompositionEditor_layerSave', 'Сохранить')}}
+                    span.text-bold.q-mx-sm {{$t('wsCompositionEditor_layerSaves', 'Сохранить фрагмент')}}
     //- footer: layersSelected
     div(
       v-if="layersSelected.length > 0"
