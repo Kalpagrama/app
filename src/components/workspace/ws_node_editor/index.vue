@@ -173,6 +173,7 @@ export default {
       this.$delete(this.node.items, index)
     },
     // node
+    // TODO Эти проверки могут находится в UI коде - только если это валидация (но это вроде не валидация, поэтому надо перенести в NodeApi)
     check () {
       this.$log('check')
       if (!this.node.category) throw new Error('No node.category !')
@@ -180,17 +181,17 @@ export default {
       if (this.node.layout !== 'PIP') throw new Error('Only PIP layout for now !')
       if (this.node.items.length > 5) throw new Error('5 items maximum !')
       if (this.node.spheres.length > 5) throw new Error('5 spheres maximum !')
-      this.node.items.map((i, ii) => {
-        if (i.layers.length === 0) throw new Error(`No layers in item: ${ii} !`)
-        let layersDuration = i.layers.reduce((acc, layer) => {
-          acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
-          return acc
-        }, 0)
-        this.$log('layersDuration', layersDuration)
-        if (layersDuration > 60) throw new Error('Too looong composition, 1 min maximum !')
-        if (layersDuration === 0) throw new Error('Layers durtion === 0 !')
-      })
-      // throw new Error('Fuck you, very much !')
+      // PPV закомментил из-за картинок
+      // this.node.items.map((i, ii) => {
+      //   if (i.layers.length === 0) throw new Error(`No layers in item: ${ii} !`)
+      //   let layersDuration = i.layers.reduce((acc, layer) => {
+      //     acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
+      //     return acc
+      //   }, 0)
+      //   this.$log('layersDuration', layersDuration)
+      //   if (layersDuration > 60) throw new Error('Too looong composition, 1 min maximum !')
+      //   if (layersDuration === 0) throw new Error('Layers durtion === 0 !')
+      // })
     },
     checkExtend () {
       this.$log('checkExtend')
@@ -215,21 +216,20 @@ export default {
         let createdNode = await NodeApi.nodeCreate(this.node)
         this.$log('nodePublish res', createdNode)
         // publish
-        this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_publishing', 'Публикуем ядро...')})
-        await this.$wait(1000)
-        this.node.stage = 'published'
-        this.node.oid = createdNode.oid // нужно при снятии с публикации
+        // this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_publishing', 'Публикуем ядро...')})
+        // await this.$wait(1000)
+        await this.node.updateExtended('stage', 'published', false)// без debounce
+        await this.node.updateExtended('oid', createdNode.oid, false)// без debounce // oid нужно при снятии с публикации
         // done
-        this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
+        // this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
         await this.$wait(1000)
         this.$q.loading.hide()
         // this.storeNodeEditor.set('publishing', false)
         this.publishing = false
-        this.$q.notify({
-          type: 'positive',
-          message: this.$t('node_published', 'Ядро опубликовано!')
-        })
-        // this.$store.commit('core/processEvent', {type: 'PROGRESS', action: 'CREATE', progress: 1})
+        // this.$q.notify({
+        //   type: 'positive',
+        //   message: this.$t('node_published', 'Ядро опубликовано!')
+        // })
         this.$emit('published', createdNode.oid)
         this.$emit('close')
       }

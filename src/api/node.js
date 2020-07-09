@@ -3,6 +3,7 @@ import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
 import { fragments } from 'src/api/fragments'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
+import cloneDeep from 'lodash/cloneDeep'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
@@ -34,18 +35,35 @@ class NodeApi {
   }
 
   static makeCompositionInput (composition) {
-    assert.ok(composition.layers.length > 0, 'composition.layers.length > 0')
+    assert.ok(Array.isArray(composition.layers), '!composition.layers')
     assert(composition.operation, 'operation')
+    // todo временное решение!!!!
+    if (composition.layers.length === 0) {
+      logW('todo ! слать реальные данные по composition.layers!')
+      assert(composition.contentOid)
+      composition.layers.push(
+        {
+          contentOid: composition.contentOid,
+          figuresAbsolute: [{
+            points: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }], // квадрат 1х1 пиксель
+          }], // весь контент
+          spheres: []
+        }
+      )
+    }
     let compositionLen = 0
     for (let l of composition.layers) {
       // assert.ok(l.content && l.content.oid, 'l.content && l.content.oid')
       assert(l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10, 'l.spheres && l.spheres.length >= 0 && l.spheres.length <= 10')
-      assert.ok(l.figuresAbsolute && l.figuresAbsolute.length === 2, 'l.figuresAbsolute && l.figuresAbsolute.length === 2')
-      let start = l.figuresAbsolute[0].t
-      let end = l.figuresAbsolute[1].t
-      assert.ok(start >= 0 && end > 0, 'start >= 0 && end > 0')
-      assert.ok(end > start, 'end > start')
-      compositionLen += (end - start)
+      assert(Array.isArray(l.figuresAbsolute))
+      if (l.figuresAbsolute.length > 1) {
+        assert.ok(l.figuresAbsolute.length === 2, 'l.figuresAbsolute && l.figuresAbsolute.length === 2')
+        let start = l.figuresAbsolute[0].t
+        let end = l.figuresAbsolute[1].t
+        assert.ok(start >= 0 && end > 0, 'start >= 0 && end > 0')
+        assert.ok(end > start, 'end > start')
+        compositionLen += (end - start)
+      }
     }
     assert(compositionLen <= 60, 'compositionLen <= 60 : ' + compositionLen)
     return {
@@ -80,6 +98,7 @@ class NodeApi {
 
   static makeNodeInput (node) {
     let f = NodeApi.makeNodeInput
+    node = cloneDeep(node) // makeNodeInput меняет node
     {
       // checks
       assert.ok(node.category, 'node.category')
@@ -220,7 +239,7 @@ class NodeApi {
         node: nodeInput
       }
     })
-    let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, {actualAge: 'zero'}) // поместим ядро в кэш (на всяк случай)
+    let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdNode
   }
@@ -243,7 +262,7 @@ class NodeApi {
         chain: chainInput
       }
     })
-    let reactiveChain = await rxdb.set(RxCollectionEnum.OBJ, createdChain, {actualAge: 'zero'}) // поместим ядро в кэш (на всяк случай)
+    let reactiveChain = await rxdb.set(RxCollectionEnum.OBJ, createdChain, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdChain
   }

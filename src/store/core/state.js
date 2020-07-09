@@ -3,7 +3,8 @@ import {LogLevelEnum, LogModulesEnum} from 'src/boot/log'
 export default {
   initialized: false,
   name: 'Kalpagrama',
-  version: '2.0.0',
+  version: process.env.BUILD_VERSION,
+  buildDate: process.env.BUILD_DATE,
   online: true, // если сеть недоступна - присваивается false
   shareData: null, // данные от меню "поделиться в приложение"
   newVersionAvailable: false,

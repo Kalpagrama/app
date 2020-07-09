@@ -24,7 +24,7 @@ div(:style=`{position: 'relative',}`).column.fit
           height: '52px', borderRadius: '10px',
         }`
         ).row.full-width.items-center.content-center.q-mb-xs.q-px-md.category.b-60
-        span(:style=`{textTransform: 'capitalize'}`).text-white.text-bold {{ c.name }}
+        span.text-white.text-bold {{ '🔆 '+ c.alias }}
   //- footer
   //- kalpa-debug(:options=`{types}`)
   .row.full-width.q-pa-md
