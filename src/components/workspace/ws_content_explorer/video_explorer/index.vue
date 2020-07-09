@@ -178,9 +178,11 @@ export default {
       let composition = await this.compositionAdd()
       this.$log('composition', composition)
       this.pageId = 'compositions'
-      // this.compositionPlaying = composition.id
-      this.compositionEditing = composition.id
-      this.$log('compositionAddStart done')
+      this.$nextTick(() => {
+        this.compositionEditing = composition.id
+        // this.compositionPlaying = composition.id
+        this.$log('compositionAddStart done')
+      })
     },
     async compositionAdd () {
       this.$log('nodeAdd')
