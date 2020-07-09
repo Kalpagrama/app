@@ -65,10 +65,10 @@ export default {
       this.$log('itemsMore')
       this.itemsSlicing = true
       // check
-      let start = this.itemsSliced.length - 1
+      let start = this.itemsSliced.length
       let end = (this.itemsSlice + 1) * this.sliceSize
       this.$log('start/end', start, end)
-      if (end > this.items.length) return
+      if (end > this.items.length) end = this.items.length
       let arr = this.items.slice(start, end)
       this.$log('arr', arr)
       // set

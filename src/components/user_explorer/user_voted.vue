@@ -1,7 +1,7 @@
 <template lang="pug">
 kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-  template(v-slot=`{items}`)
-    list-middle(:items="items" :options="{paddingTop: 0}")
+  template(v-slot=`{items, itemsMore}`)
+    list-middle(:items="items" :more="itemsMore")
       //- item first for padding
       template(v-slot:itemFirst)
         div(:style=`{height: '110px'}`).row.full-width

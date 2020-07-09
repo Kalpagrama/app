@@ -55,7 +55,7 @@ q-layout(
             v-if="$q.screen.width > 1260"
             @wheel="onWheel"
             :style=`{
-              position: 'fixed', zIndex: 100, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
+              position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
               pointerEvents: pointerEvents,
             }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
             kalpa-menu(v-if="!loading && $route.name !== 'welcome'" :style=`{maxWidth: '300px'}`)

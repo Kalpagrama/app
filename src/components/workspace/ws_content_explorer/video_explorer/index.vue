@@ -3,7 +3,8 @@ div(
   :style=`{
     position: 'relative',
     minWidth: pageFullscreen ? $q.screen.width+'px' : pageMinWidth+'px',
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: $q.screen.xs ? '0px' : '10px',
+    overflow: 'hidden',
   }`
   ).column.full-width.items-center.b-50
   //- close btn
@@ -27,8 +28,11 @@ div(
       :dense="$q.screen.width < 600").q-mr-sm
     div(:style=`{overflow: 'hidden',}`).col
       span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ content.name }}
+    //- open content in page
     q-btn(
-      round flat color="white" icon="more_vert"
+      v-if="$route.name !== 'content-explorer'"
+      @click="$emit('open')"
+      round flat color="white" icon="open_in_new"
       :dense="$q.screen.width < 600")
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px',}`).col.full-width
@@ -98,7 +102,7 @@ export default {
   data () {
     return {
       name: '',
-      pageHeight: 40,
+      pageHeight: 36,
       pageFullscreen: false,
       pageId: null, // 'compositions',
       storePlayer: null,
@@ -143,7 +147,8 @@ export default {
     pageFullscreen: {
       handler (to, from) {
         if (to) this.pageHeight = 0
-        else this.pageHeight = this.$q.screen.height * 0.55
+        else this.pageHeight = 38 // this.$q.screen.height * 0.55
+        this.pageId = null
       }
     },
   },

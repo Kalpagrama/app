@@ -23,18 +23,18 @@ div(:style=`{position: 'relative'}`).row.fit.justify-center
         .col.full-width
           node(:node="nodePreviewItem" :nodeFullReady="nodePreviewItem" :active="true" :visible="true" :mini="false")
         //- footer
-        div(v-if="false").row.full-width.items-center.content-center.q-pa-sm
+        div(v-if="true").row.full-width.items-center.content-center.q-pa-sm
           q-btn(
             round flat color="white" icon="keyboard_arrow_left" @click="nodePreviewOpened = false")
           .col.q-pl-sm
-            q-btn(
-              @click="nodeFork(nodeEditorItem)"
-              push color="green" no-caps icon="photo_filter"
-              :style=`{height: '42px',}`).full-width {{$t('node_fork', 'Взять и изменить')}}
+            //- q-btn(
+            //-   @click="nodeFork(nodeEditorItem)"
+            //-   push color="green" no-caps icon="photo_filter"
+            //-   :style=`{height: '42px',}`).full-width {{$t('node_fork', 'Взять и изменить')}}
     //- body
     .col.full-width.scroll
       kalpa-loader(v-if="content.oid" :mangoQuery="mangoQuery")
-        template(v-slot=`{items}`)
+        template(v-slot=`{items, itemsMore}`)
           .row.fit.justify-center
             //- div(:style=`{position: 'absolute', zIndex: 9999, top: '-50px', left: '0px', height: '100px',}`).row.full-width.bg-red.bg
             //- nodes on content bar
@@ -53,8 +53,9 @@ div(:style=`{position: 'relative'}`).row.fit.justify-center
                     width: '2px',
                   }`
                   ).row.full-height.bg-grey-4
+            //- list of nodes
             list-middle(
-              :items="items")
+              :items="items" :more="itemsMore")
               template(v-slot:itemFirst)
                 div(:style=`{height: '16px'}`).row.full-width
               template(v-slot:item=`{item, index, indexMiddle}`)

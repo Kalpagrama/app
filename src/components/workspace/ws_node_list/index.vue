@@ -80,7 +80,7 @@ div(
         kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start.q-mr-sm
   //- body
   .col.full-width.scroll
-    kalpa-loader(:mangoQuery="mangoQuery")
+    kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
       template(v-slot=`{items}`)
         .row.fit.items-start.content-start
           node-item(

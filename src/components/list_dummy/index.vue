@@ -16,12 +16,6 @@ export default {
     }
   },
   methods: {
-    async itemsMore () {
-      if (this.itemsLoading) return
-      this.$log('itemsMore')
-      this.itemsPage += 1
-      this.items = [...this.items, ...await this.itemsLoad(this.itemsPage)]
-    },
     async itemsLoad (page = 1) {
       try {
         this.$log('itemsLoad start')

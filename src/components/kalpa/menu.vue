@@ -26,10 +26,15 @@ div(
   div(
     :style=`{height: '100px'}`
     ).row.full-width.items-center.content-center
-    div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+    div(
+      @click="$router.push('/').catch(e => e)"
+      :style=`{height: '60px', width: '60px'}`
+      ).row.items-center.content-center.justify-center.cursor-pointer
       kalpa-logo(:width="40" :height="40")
     .col
-      .row.fit.items-center.content-center
+      div(
+        @click="$router.push('/').catch(e => e)"
+        ).row.fit.items-center.content-center.cursor-pointer
         span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpaMenu_kalpagrama', 'Кальпаграма')}}
         .row.full-width
           small.text-white {{$t('kalpaMenu_title', 'Продвигай суть!')}}
@@ -109,10 +114,10 @@ export default {
     return {
       width: 300,
       pages: [
-        {id: 'home', name: i18n.t('pageHome', 'Домашняя'), icon: 'home'},
-        {id: 'trends', name: i18n.t('Trends', 'Тренды'), icon: 'whatshot'},
-        {id: 'workspace', name: i18n.t('Workspace', 'Мастерская'), icon: 'school'},
-        {id: 'settings', name: i18n.t('Settings', 'Настройки'), icon: 'tune'},
+        {id: 'home', name: i18n.t('pageFeed', 'Лента'), icon: 'home'},
+        {id: 'trends', name: i18n.t('pageTop', 'Топ'), icon: 'whatshot'},
+        {id: 'workspace', name: i18n.t('pageWorkspace', 'Мастерская'), icon: 'school'},
+        {id: 'settings', name: i18n.t('pageSettings', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,
       logoutLoading: false,

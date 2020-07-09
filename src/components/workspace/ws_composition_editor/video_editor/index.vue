@@ -34,7 +34,7 @@ div(
         round flat color="white" icon="keyboard_arrow_left"
         :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px'}`)
       ws-content-player(
-        v-if="options.active"
+        v-if="true"
         :sid="sidPlayer"
         :content="content"
         :active="options.active"
@@ -75,8 +75,9 @@ div(
   //- mode: PLAYER
   div(v-if="options.mode === 'player'" :style=`{position: 'relative'}`).row.fit
     ws-content-player(
-      v-if="options.active"
-      @ready="storePlayerReady" :sid="sidPlayer" :content="content" :active="options.active" :mini="options.mini" :options=`{controls: false}`)
+      v-if="true"
+      @ready="storePlayerReady" :sid="sidPlayer" :content="content"
+      :active="options.active" :mini="options.mini" :options=`{controls: false}`)
     composition-progress(
       v-if="storePlayer && storePlayer.loadeddata && composition.layers.length > 0"
       v-show="!options.mini && false"

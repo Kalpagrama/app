@@ -25,7 +25,7 @@ div(
   //- body
   .col.full-width.scroll
     .row.full-width.items-start.content-start
-      kalpa-loader(:mangoQuery="mangoQuery")
+      kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
         template(v-slot=`{items,itemsMore}`)
           .row.full-width.items-start.content-start
             div(

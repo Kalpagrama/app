@@ -52,8 +52,8 @@ kalpa-layout(
         }`)
     //- nodes
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-      template(v-slot=`{items}`)
-        list-middle(:items="items" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`)
+      template(v-slot=`{items,itemMore}`)
+        list-middle(:items="items" :more="itemsMore")
           template(v-slot:itemFirst)
             div(:style=`{height: '70px'}`).row.full-width
           template(v-slot:item=`{item, index, indexMiddle}`)
@@ -65,7 +65,7 @@ kalpa-layout(
               :active="nodeListActive && index === indexMiddle"
               :mini="false")
           template(v-slot:itemLast)
-            div(:style=`{height: '70px'}`).row.full-width
+            div(:style=`{height: '400px'}`).row.full-width
 </template>
 
 <script>

@@ -15,15 +15,18 @@ div(
   div(
     v-if="storeExplorer.compositionPlaying !== composition.id"
     @click="storeExplorer.compositionPlaying = composition.id"
-    :style=`{position: 'relative', height: '50px'}`).row.full-width.items-center.contetn-center.q-px-md
-    span.text-white.text-bold {{ compositionName }}
-    .row.full-width.text-grey-5
-      small {{ compositionStart }}
-      small.q-mx-sm /
-      small(:class=`{'text-red': compositionDuration > 60}`) {{ $time(compositionDuration) }}
-    q-btn(
-      round flat color="grey-6" icon="keyboard_arrow_down"
-      :style=`{position: 'absolute', top: '4px', right: '4px',}`)
+    :style=`{position: 'relative', height: '50px',overflow: 'hidden',}`).row.full-width.items-center.contetn-center
+    .col.full-height
+      div(:style=`{overflow: 'hidden',}`).row.fit.items-center.content-center.q-px-md
+        span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ compositionName }}
+        .row.full-width.text-grey-5
+          small {{ compositionStart }}
+          small.q-mx-sm /
+          small(:class=`{'text-red': compositionDuration > 60}`) {{ $time(compositionDuration) }}
+    .row.full-height
+      q-btn(
+        round flat color="grey-6" icon="keyboard_arrow_down"
+        :style=`{}`)
   ws-composition-editor(
     v-if="storeExplorer.compositionPlaying === composition.id && !storeExplorer.compositionEditing"
     :value="composition"
@@ -39,9 +42,9 @@ div(
       q-btn(flat dense color="grey-4" icon="keyboard_arrow_up" @click="storeExplorer.compositionPlaying = null").q-mr-xs
     template(v-slot:progressBar)
       div(
-        :style=`{position: 'absolute', zIndex: 900, pointerEvents: 'none'}`
+        :style=`{position: 'absolute', zIndex: 900, pointerEvents: 'none', overflow: 'hidden'}`
         ).row.fit.items-center.content-center.q-px-md
-        span.text-bold.text-white {{ compositionName }}
+        span(:style=`{whiteSpace: 'nowrap'}`).text-bold.text-white {{ compositionName.slice(0,35) }}
 </template>
 
 <script>
