@@ -28,7 +28,7 @@ kalpa-layout(
       template(v-slot=`{items, itemsMore}`)
         list-middle(
           :root="$refs.kBox"
-          :items="items" :more="itemsMore" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`
+          :items="items" :more="itemsMore"
           :style=`{}`)
           template(v-slot:itemFirst)
             div(:style=`{height: '70px'}`).row.full-width
@@ -40,6 +40,8 @@ kalpa-layout(
               :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
               :active="index === indexMiddle"
               :mini="false")
+          template(v-slot:itemLast)
+            div(:style=`{height: '400px'}`).row.full-width
 </template>
 
 <script>

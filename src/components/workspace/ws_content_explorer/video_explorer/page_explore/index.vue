@@ -53,8 +53,9 @@ div(:style=`{position: 'relative'}`).row.fit.justify-center
                     width: '2px',
                   }`
                   ).row.full-height.bg-grey-4
+            //- list of nodes
             list-middle(
-              :items="items" :more="itemsMore").br
+              :items="items" :more="itemsMore")
               template(v-slot:itemFirst)
                 div(:style=`{height: '16px'}`).row.full-width
               template(v-slot:item=`{item, index, indexMiddle}`)

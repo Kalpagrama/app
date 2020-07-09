@@ -3,6 +3,7 @@ component(
   v-if="value && content"
   @close="$emit('close')"
   @compositionAdded="$emit('compositionAdded', $event)"
+  @open="$emit('open')"
   :is="component[value.contentType]"
   :content="content"
   :value="value"

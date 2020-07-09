@@ -12,8 +12,8 @@ div(:style=`{position: 'relative',}`).column.fit
       }`)
   //- body
   .col.full-width.scroll
-    kalpa-loader(:mangoQuery="mangoQuery")
-      template(v-slot=`{items}`)
+    kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
+      template(v-slot=`{items,itemsMore}`)
         .row.fit.items-start.content-start.justify-center.q-py-md
           //- compositions on content bar
           div(

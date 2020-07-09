@@ -84,7 +84,6 @@ export default {
       handler (to, from) {
         if (this.scrollHeight === 0) return
         if (this.scrollHeight - to < this.$el.clientHeight * 2) {
-          alert('more')
           this.more()
         }
       }
@@ -94,7 +93,7 @@ export default {
         this.$log('indexMiddle CHANGED', to)
         this.$emit('indexMiddle', to)
         // прогружаем вверх и вниз от indexMiddle на упреждение
-        if (to >= 0){
+        if (to >= 0) {
           let firstIndx = Math.max(0, to - 2)
           let lastIndx = Math.min(this.items.length, to + 2)
           for (let i = firstIndx; i <= lastIndx; i++){

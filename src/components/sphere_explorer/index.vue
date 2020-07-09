@@ -65,7 +65,7 @@ kalpa-layout(
               :active="nodeListActive && index === indexMiddle"
               :mini="false")
           template(v-slot:itemLast)
-            div(:style=`{height: '70px'}`).row.full-width
+            div(:style=`{height: '400px'}`).row.full-width
 </template>
 
 <script>

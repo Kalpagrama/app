@@ -13,13 +13,14 @@ q-btn(
     background: 'rgba(0,0,0,0.2)',
   }`)
   span(v-if="!$q.screen.xs").q-ml-xs.text-white {{ contentName }}
-  //- content explorer
+  //- composition.content explorer
   q-dialog(v-model="contentExplorerOpened" position="bottom")
     ws-content-explorer(
       v-if="contentExplorerItem"
       :value="contentExplorerItem"
       @close="contentExplorerOpened = false"
       @compositionAdded="compositionAdded"
+      @open="contentOpen"
       :options=`{
         ctx: 'explorer',
       }`
@@ -33,7 +34,7 @@ q-btn(
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
-  name: 'contentClick',
+  name: 'compositionExplorer',
   props: ['visible', 'active', 'mini', 'composition', 'content', 'player'],
   data () {
     return {
@@ -73,67 +74,48 @@ export default {
       }
       return input
     },
+    async contentOpen () {
+      this.$log('contentOpen')
+      let content = await this.contentAddToWorkspace(this.content)
+      this.$router.push(`/workspace/content/${content.id}`)
+    },
+    async contentAddToWorkspace (content) {
+      this.$log('contentAddToWorkspace start')
+      let {items: contentFind} = await this.$rxdb.find({
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
+          contentOid: content.oid,
+          contentType: {$ne: 'COMPOSITION'}
+        }
+      })
+      this.$log('contentFind', contentFind)
+      if (contentFind.length === 0) {
+        let contentInput = {
+          wsItemType: 'WS_CONTENT',
+          thumbOid: content.thumbUrl,
+          name: content.name,
+          layers: [],
+          spheres: [],
+          contentOid: content.oid,
+          contentType: content.type,
+          operation: {items: null, operations: null, type: 'CONCAT'}
+        }
+        this.$log('contentAddToWorkspace contentInput', contentInput)
+        let res = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
+        this.$log('contentAddToWorkspace done', res)
+        return res
+      }
+      else {
+        return contentFind[0]
+      }
+    },
     async compositionAdded (composition) {
       this.$log('compositionAdded', composition)
       this.compositionAddedCount += 1
       if (this.compositionAddedCount === 1) {
-        this.$log('ADD CONTENT TO WS ON FIRST COMPOSITION ADDED')
-        let {items: contentFind} = await this.$rxdb.find({
-          selector: {
-            rxCollectionEnum: RxCollectionEnum.WS_CONTENT,
-            contentOid: this.content.oid,
-            contentType: {$ne: 'COMPOSITION'}
-          }
-        })
-        this.$log('contentFind', contentFind)
-        if (contentFind.length === 0) {
-          let contentInput = {
-            wsItemType: 'WS_CONTENT',
-            thumbOid: this.content.thumbUrl,
-            name: this.content.name,
-            layers: [],
-            spheres: [],
-            contentOid: this.content.oid,
-            contentType: this.content.type,
-            operation: {items: null, operations: null, type: 'CONCAT'}
-          }
-          this.$log('contentAdd contentInput', contentInput)
-          let res = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, contentInput)
-        }
-      }
-      else {
-        this.$q.notify('Good added: ' + this.compositionAddedCount)
+        this.contentAddToWorkspace(this.content)
       }
     },
-    async compositionInput (content) {
-      this.$log('compositionInput content', content)
-      let compositionInput = {
-        wsItemType: 'WS_CONTENT',
-        thumbOid: content.thumbUrl,
-        contentOid: content.oid,
-        contentType: 'COMPOSITION',
-        name: this.composition.name,
-        layers: this.composition.layers.map((l, li) => {
-          return {
-            id: `${Date.now()}::${li}`,
-            color: this.$randomColor(`${Date.now()}::${li}`),
-            contentOid: content.oid,
-            figuresAbsolute: l.figuresAbsolute,
-            figuresRelative: [],
-            // spheres: [{name: ''}],
-            spheres: []
-          }
-        }),
-        spheres: [],
-        operation: { items: null, operations: null, type: 'CONCAT' }
-      }
-      this.$log('compositionInput done', compositionInput)
-      // let composition = await this.$rxdb.set(RxCollectionEnum.WS_CONTENT, compositionInput)
-      return compositionInput
-    },
-    compositionSave () {
-      this.$log('compositionSave')
-    }
   }
 }
 </script>

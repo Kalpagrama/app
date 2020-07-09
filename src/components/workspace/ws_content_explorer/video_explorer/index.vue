@@ -28,8 +28,11 @@ div(
       :dense="$q.screen.width < 600").q-mr-sm
     div(:style=`{overflow: 'hidden',}`).col
       span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ content.name }}
+    //- open content in page
     q-btn(
-      round flat color="white" icon="more_vert"
+      v-if="$route.name !== 'content-explorer'"
+      @click="$emit('open')"
+      round flat color="white" icon="open_in_new"
       :dense="$q.screen.width < 600")
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px',}`).col.full-width

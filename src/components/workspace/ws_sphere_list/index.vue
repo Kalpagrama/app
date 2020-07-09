@@ -32,7 +32,7 @@ div(
           q-btn(v-if="searchString.length > 0" flat round dense icon="clear" color="white" @click="searchString = ''")
   //- body
   .col.full-width.scroll
-    kalpa-loader(:mangoQuery="mangoQuery")
+    kalpa-loader(:mangoQuery="mangoQuery" :sliseSize="1000")
       template(v-slot=`{items}`)
         .row.full-width.items-start.content-start.q-px-sm
           slot(name="items" :searchString="searchString" :items="items")

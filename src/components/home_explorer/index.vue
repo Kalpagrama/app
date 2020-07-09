@@ -29,6 +29,8 @@ kalpa-layout(
               :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
               :active="index === indexMiddle"
               :mini="false")
+          template(v-slot:itemLast)
+            div(:style=`{height: '400px'}`).row.full-width
 </template>
 
 <script>
