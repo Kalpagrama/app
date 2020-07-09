@@ -5,7 +5,7 @@ import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 import { LstCollectionEnum } from 'src/system/rxdb/lists'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
-constlogE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
 
 class UserApi {
