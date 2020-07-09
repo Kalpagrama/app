@@ -1,7 +1,8 @@
 <template lang="pug">
 q-btn(
   @click="bookmarkStart()"
-  round flat color="white"
+  round flat
+  :color="deleting ? 'red' : 'white'"
   :icon="bookmarked ? 'bookmark' : 'bookmark_outline'"
   :loading="loading"
   :style=`{
@@ -19,24 +20,42 @@ export default {
   data () {
     return {
       loading: false,
-      bookmarked: false,
+      deleting: false,
+      bookmarked: null,
+      color: 'white',
     }
   },
   methods: {
     async bookmarkStart () {
       try {
         this.$log('bookmarkStart')
+        this.$log('bookmarkStart bookmarked', this.bookmarked)
         this.loading = true
-        let input = await this.bookmarkCreate()
-        await this.$wait(1000)
-        let item = await this.bookmarkSave(input)
-        this.bookmarkNotify(item.id)
-        this.bookmarked = true
+        await this.$wait(400)
+        // delete from saved if we got it already
+        if (this.bookmarked) {
+          this.deleting = true
+          await this.bookmarkDelete(this.bookmarked)
+          await this.$wait(400)
+          this.$q.notify({type: 'negative', message: this.$t('nodeBookmark_Deleted', 'Ядро удалено')})
+          await this.bookmarkVerify()
+        }
+        // add to saved nodes
+        else {
+          let input = await this.bookmarkCreate()
+          let item = await this.bookmarkSave(input)
+          this.bookmarkNotify(item.id)
+          await this.$wait(400)
+          await this.bookmarkVerify()
+        }
+        // done
         this.loading = false
+        this.deleting = false
       }
       catch (e) {
         this.$log('bookmarkStart error', e)
         this.loading = false
+        this.deleting = false
       }
     },
     async bookmarkCreate () {
@@ -73,7 +92,9 @@ export default {
         category: node.category,
         items: compositions,
         stage: 'saved',
-        spheres: []
+        spheres: node.spheres.map(s => {
+          return {name: s.name}
+        })
       }
       this.$log('bookmarkCreate compositions', compositions)
       this.$log('bookmarkCreate input', input)
@@ -85,6 +106,11 @@ export default {
       let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, input)
       this.$log('bookmarkSave item', item)
       return item
+    },
+    async bookmarkDelete (id) {
+      this.$log('bookmarkDelete start', id)
+      await this.$rxdb.remove(id)
+      this.$log('bookmarkDelete done')
     },
     bookmarkNotify (id) {
       this.$log('bookmarkNotify', id)
@@ -113,7 +139,7 @@ export default {
       })
     },
     async bookmarkVerify () {
-      this.$log('bookmarkVerify')
+      this.$log('bookmarkVerify start')
       let {items: nodeFind} = await this.$rxdb.find({
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
@@ -121,8 +147,15 @@ export default {
           stage: 'saved',
         }
       })
-      this.$log('nodeFind', nodeFind)
-      if (nodeFind.length > 0) this.bookmarked = true
+      this.$log('bookmarkVerify nodeFind', nodeFind.length)
+      if (nodeFind.length > 0) {
+        this.$log('bookmarkVerify FOUND', nodeFind[0].id)
+        this.bookmarked = nodeFind[0].id
+      }
+      else {
+        this.bookmarked = null
+      }
+      this.$log('bookmarkVerify done', this.bookmarked)
     }
   },
   async mounted () {
