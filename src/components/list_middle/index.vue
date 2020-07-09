@@ -84,6 +84,7 @@ export default {
       handler (to, from) {
         if (this.scrollHeight === 0) return
         if (this.scrollHeight - to < this.$el.clientHeight * 2) {
+          alert('more')
           this.more()
         }
       }

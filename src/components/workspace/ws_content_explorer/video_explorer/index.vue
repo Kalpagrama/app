@@ -3,7 +3,8 @@ div(
   :style=`{
     position: 'relative',
     minWidth: pageFullscreen ? $q.screen.width+'px' : pageMinWidth+'px',
-    borderRadius: '10px', overflow: 'hidden',
+    borderRadius: $q.screen.xs ? '0px' : '10px',
+    overflow: 'hidden',
   }`
   ).column.full-width.items-center.b-50
   //- close btn
@@ -98,7 +99,7 @@ export default {
   data () {
     return {
       name: '',
-      pageHeight: 40,
+      pageHeight: 36,
       pageFullscreen: false,
       pageId: null, // 'compositions',
       storePlayer: null,
@@ -143,7 +144,8 @@ export default {
     pageFullscreen: {
       handler (to, from) {
         if (to) this.pageHeight = 0
-        else this.pageHeight = this.$q.screen.height * 0.55
+        else this.pageHeight = 38 // this.$q.screen.height * 0.55
+        this.pageId = null
       }
     },
   },

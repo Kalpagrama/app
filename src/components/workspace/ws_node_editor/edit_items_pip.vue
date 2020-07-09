@@ -15,7 +15,7 @@ div(
       //- header
       .row.full-width.items-center.content-center.justify-between.q-pa-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="settingsDialogOpened = false")
-        span(:style=`{fontSize: '16px'}`).text-white.text-bold Reorder elements
+        span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ $t('wsNodeEditor_editItemPip_itemsEditorTitle','Элементы ядра') }}
         q-btn(round flat color="white" icon="more_vert")
       //- body
       .col.full-width.scroll
@@ -47,6 +47,8 @@ div(
       position: 'absolute', zIndex: 900,
     }`
     ).fit
+  //- kalpa-debug(:options=`{itemsActive}`)
+  //- .row.full-width.q-pa-sm.bg-red
   //- list pip
   list-pip(
     v-if="node.items.length > 0"
@@ -70,10 +72,10 @@ div(
           v-if="itemActive"
           :style=`{position: 'absolute', zIndex: 999, top: 'calc(50% - 70px)', right: 0,width: '40px',}`).row.justify-center
           q-btn(
-            @click="$emit('itemDelete', itemIndex), itemsActive = true"
+            @click="$emit('itemDelete', itemIndex), itemsActive = false"
             round flat dense color="grey-5" icon="delete_outline").full-width
           q-btn(
-            @click="$emit('itemEdit', item), itemsActive = true"
+            @click="$emit('itemEdit', item), itemsActive = false"
             color="green" icon="edit").full-width.q-py-md
           q-btn(
             @click="settingsDialogOpened = true"
@@ -87,7 +89,7 @@ div(
           :options=`{
             isPreview: true,
             mode: 'player',
-            active: true && itemActive,
+            active: itemsActive && itemActive,
             mini: !itemActive,
           }`
           :style=`{
@@ -96,24 +98,14 @@ div(
         //- next item
         q-btn(
           v-if="itemActive && itemIsLast && node.items.length < 5"
-          @click="$emit('itemFind'), itemsActive = true"
+          @click="$emit('itemFind'), itemsActive = false"
           color="green" icon="add" size="lg"
           :style=`{
             position: 'absolute', zIndex: 9999, right: 0, bottom: 0,
             width: '25%', height: '25%',
             opacity: 0.9,
-            //- borderRadius: '10px',
           }`)
           slot(name="next" :next="next")
-  //- //- set next item
-  //- q-btn(
-  //-   v-if="true && node.items.length > 0"
-  //-   @click="$emit('itemFind')"
-  //-   flat color="green" icon="add"
-  //-   :style=`{
-  //-     position: 'absolute', zIndex: 1000, right: 0, bottom: 0, width: '25%', height: '25%',
-  //-     borderRadius: '10px',
-  //-   }`).b-90
 </template>
 
 <script>
@@ -123,15 +115,24 @@ export default {
   name: 'editItemsPip',
   components: {draggable},
   props: ['node'],
+  inject: ['sidNodeEditor'],
   data () {
     return {
       settingsDialogOpened: false,
-      itemsActive: true,
+      // itemsActive: true,
     }
   },
   computed: {
+    nodeEditor () {
+      return window.stores[this.sidNodeEditor]
+    },
+    itemsActive () {
+      return !this.nodeEditor.itemEditorOpened &&
+        !this.nodeEditor.itemFinderOpened &&
+        !this.settingsDialogOpened
+    },
     height () {
-      if (this.$q.screen.width < 800) return this.$q.screen.width / 2
+      if (this.$q.screen.width < 800) return this.$q.screen.width * 0.6
       else return 400
     }
   }

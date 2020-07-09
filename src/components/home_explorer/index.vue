@@ -17,8 +17,8 @@ kalpa-layout(
     menu-right(:style=`{maxWidth: '400px'}`)
   template(v-slot:page)
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-      template(v-slot=`{items}`)
-        list-middle(:items="items" :options=`{paddingTop: 86, paddingBottom: $q.screen.height/3}`)
+      template(v-slot=`{items,itemsMore}`)
+        list-middle(:items="items" :more="itemsMore")
           template(v-slot:itemFirst)
             div(:style=`{height: '70px'}`).row.full-width
           template(v-slot:item=`{item, index, indexMiddle}`)
