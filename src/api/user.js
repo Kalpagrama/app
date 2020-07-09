@@ -2,9 +2,10 @@ import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
+import { LstCollectionEnum } from 'src/system/rxdb/lists'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
+constlogE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
 
 class UserApi {
@@ -20,6 +21,15 @@ class UserApi {
         categories: categoryTypes
       }
     })
+    let rxDocs = await rxdb.cache.find({
+      selector: {
+        'props.rxCollectionEnum': LstCollectionEnum.LST_FEED,
+      }
+    })
+    logD('setFavouriteCategories::lists =', rxDocs)
+    for (let rxDoc of rxDocs){
+      await rxdb.cache.expire(rxDoc.id)
+    }
     logD('setFavouriteCategories::complete')
     return setFavouriteCategories
   }
