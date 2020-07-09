@@ -23,6 +23,7 @@ q-btn(
       @open="contentOpen"
       :options=`{
         ctx: 'explorer',
+        startAt: compositionStart,
       }`
       :style=`{
         height: $q.screen.height+'px',
@@ -44,6 +45,7 @@ export default {
       contentExplorerItem: null,
       contentExplorerOpened: false,
       compositionAddedCount: 0,
+      compositionStart: null
     }
   },
   computed: {
@@ -57,6 +59,8 @@ export default {
     async contentClick () {
       this.$log('contentClick')
       if (this.player) this.player.pause()
+      // get composition start
+      this.compositionStart = this.getCompositionStart()
       this.contentExplorerItem = this.contentInput(this.content)
       this.contentExplorerOpened = true
     },
@@ -116,6 +120,9 @@ export default {
         this.contentAddToWorkspace(this.content)
       }
     },
+    getCompositionStart () {
+      return this.composition.layers[0].figuresAbsolute[0].t
+    }
   }
 }
 </script>

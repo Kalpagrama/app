@@ -36,7 +36,7 @@ div(:style=`{position: 'relative',}`).row.full-width.justify-center
         position: 'fixed', zIndex: 7777, bottom: '0px',
         pointerEvents: pointerEvents,
       }`).row.full-width.justify-center
-      div(:style=`{maxWidth: 800+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden',}`).row.full-width.b-60
+      div(:style=`{maxWidth: 800+'px', borderRadius: '10px 10px 0 0', overflow: 'hidden',transform: 'translate3d(0,0,0)'}`).row.full-width.b-60
         //- page menu
         div(
           v-kalpa-click-outside="pageMenuClickOutside"
@@ -73,7 +73,7 @@ div(:style=`{position: 'relative',}`).row.full-width.justify-center
                   }`
                   ).text-white {{ p.name }}
         //- footer bottom
-        div(:style=`{zIndex: 999999, transform: 'translate3d(0,0,0)'}`).row.full-width.b-60
+        div(:style=`{zIndex: 999999}`).row.full-width.b-60
           q-btn(round flat color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
           .col
             div(v-if="pagesHot").row.fit.items-end.content-end.justify-center

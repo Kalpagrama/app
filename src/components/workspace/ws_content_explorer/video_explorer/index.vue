@@ -43,7 +43,7 @@ div(
       :content="content")
       template(v-slot:controlsTools)
         q-btn(
-          @click="pageFullscreen = !pageFullscreen, pageId = null"
+          @click="pageFullscreen = !pageFullscreen"
           round flat dense color="white"
           :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
         q-btn(
@@ -95,6 +95,7 @@ export default {
       default () {
         return {
           ctx: 'workspace',
+          startAt: null,
         }
       }
     }
@@ -105,6 +106,7 @@ export default {
       pageHeight: 36,
       pageFullscreen: false,
       pageId: null, // 'compositions',
+      pageIdLast: null,
       storePlayer: null,
       compositionPlaying: null,
       compositionEditing: null,
@@ -137,18 +139,27 @@ export default {
     pageId: {
       immediate: false,
       handler (to, from) {
-        this.pageHeight = this.$q.screen.height * 0.55
-        // if (to === 'details') this.pageHeight = this.$q.screen.height * 0.5
-        // else if (to === 'explore') this.pageHeight = this.$q.screen.height * 0.7
-        // else if (to === 'compositions') this.pageHeight = this.$q.screen.height * 0.6
-        // else this.pageHeight = 0
+        if (to) {
+          this.pageHeight = this.$q.screen.height * 0.55
+        }
+        else {
+          // this.pageHeight = 36
+        }
       }
     },
     pageFullscreen: {
       handler (to, from) {
-        if (to) this.pageHeight = 0
-        else this.pageHeight = 38 // this.$q.screen.height * 0.55
-        this.pageId = null
+        if (to) {
+          this.$log('pageFullscreen ON', this.pageId, this.pageIdLast)
+          this.pageIdLast = this.pageId
+          this.pageId = null
+          this.pageHeight = 0
+        }
+        else {
+          this.$log('pageFullscreen OFF', this.pageId, this.pageIdLast)
+          if (this.pageIdLast) this.pageId = this.pageIdLast
+          else this.pageHeight = 36
+        }
       }
     },
   },
@@ -156,15 +167,22 @@ export default {
     storePlayerReady () {
       this.$log('storePlayerReady')
       this.storePlayer = window.stores[this.sidPlayer]
+      // start at when exploring composition.content...
+      if (this.options && this.options.startAt) {
+        this.$log('this.options.startAt', this.options.startAt)
+        this.storePlayer.setCurrentTime(this.options.startAt)
+      }
     },
     async compositionAddStart () {
       this.$log('compositoinAddStart start')
       let composition = await this.compositionAdd()
       this.$log('composition', composition)
       this.pageId = 'compositions'
-      // this.compositionPlaying = composition.id
-      this.compositionEditing = composition.id
-      this.$log('compositionAddStart done')
+      this.$nextTick(() => {
+        this.compositionEditing = composition.id
+        // this.compositionPlaying = composition.id
+        this.$log('compositionAddStart done')
+      })
     },
     async compositionAdd () {
       this.$log('nodeAdd')
