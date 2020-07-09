@@ -8,16 +8,21 @@
 <template lang="pug">
 .row.full-width.q-py-sm
   //- sphere dialog
-  q-dialog(v-model="sphereDialogOpened")
+  q-dialog(
+    v-model="sphereDialogOpened"
+    :position="$q.screen.xs ? 'bottom' : 'standard'")
     div(
       :style=`{
         position: 'relative',borderRadius: '10px', overflow: 'hidden',
-        minHeight: '500px',
+        minWidth: width+'px',
+        maxWidth: width+'px',
+        minHeight: height+'px',
+        maxHeight: height+'px',
       }`).column.full-width.b-50
       //- header
       .row.full-width.items-center.content-center.justify-between.q-pa-sm
         q-btn(round flat color="white" icon="keyboard_arrow_left" @click="sphereDialogOpened = false")
-        span(:style=`{fontSize: '16px'}`).text-white.text-bold {{$t('wsNodeEditor_sphereDialogTitle', 'Добавить сферу')}}
+        span(:style=`{fontSize: '16px'}`).text-white.text-bold {{ $t('wsNodeEditor_sphereDialogAddTitle', 'Добавить сферу сути') }}
         q-btn(round flat color="white" icon="more_vert")
       //- input
       div().row.full-width
@@ -45,11 +50,12 @@
                     height: '40px', borderRadius: '10px', overflow: 'hidden',
                   }`
                   ).row.full-width.items-center.content-center.sphere-item.q-px-md.b-60.q-mb-xs
-                  span.text-white 🔆 {{ s.name }}
+                  q-icon(name="blur_on" color="grey-6" size="20px").q-mr-sm
+                  span.text-white {{ s.name }}
               div(v-else).row.full-width.justify-center.items-center.content-center
                 q-btn(
                   @click="sphereCreate()"
-                  no-caps color="green") {{$t('ws_node_editor_sphereCreate', 'Создать сферу')}}: 🔆 {{ sphere }}
+                  no-caps color="green") {{$t('ws_node_editor_sphereCreate', 'Создать сферу')}}: {{ sphere }}
   //- sphere adding
   //- spheres list
   .row.full-width.items-start.content-start
@@ -60,13 +66,14 @@
         height: '40px', borderRadius: '10px', overflow: 'hidden',
       }`
       ).row.full-width.items-center.content-center.sphere-item.q-px-md.b-60.q-mb-xs
-      span.text-white 🔆 {{ s.name }}
+      q-icon(name="blur_on" color="grey-6" size="20px").q-mr-sm
+      span.text-white {{ s.name }}
     //- sphere add btn
     q-btn(
       v-if="node.spheres.length < 6"
       @click="sphereAddStart()"
       flat color="green" icon="add" no-caps
-      :style=`{height: '40px',}`).full-width {{$t('ws_node_editor_add_sphere', 'Добавить сферу')}}
+      :style=`{height: '40px',}`).full-width {{$t('wsNodeEditor_Add sphere', 'Добавить сферу сути')}}
 </template>
 
 <script>
@@ -93,6 +100,14 @@ export default {
         res.selector.name = {$regex: nameRegExp}
       }
       return res
+    },
+    width () {
+      if (this.$q.screen.xs) return this.$q.screen.width
+      else return 400
+    },
+    height () {
+      if (this.$q.screen.xs) return this.$q.screen.height
+      else return 600
     }
   },
   methods: {
@@ -112,6 +127,7 @@ export default {
       this.$log('sphereAdd', s)
       this.node.spheres.push(s)
       this.sphereDialogOpened = false
+      this.sphere = ''
     },
     async sphereCreate () {
       this.$log('sphereCreate')

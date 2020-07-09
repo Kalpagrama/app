@@ -25,6 +25,7 @@ div(
       v-if="item"
       :value="item"
       @close="itemEditorOpened = false"
+      @delete="itemDelete(node.items.findIndex(i => i.id === item.id))"
       :options=`{
         ctx: 'nodeEditor',
         mode: 'editor',
@@ -68,7 +69,7 @@ div(
               q-btn(ref="nextBtn" round flat color="red" icon="add" @click="next()" :style=`{display: 'none'}`)
           edit-essence(:node="node")
         edit-category(:node="node")
-        edit-spheres(:node="node" :sphereFirstEditable="ctx === 'workspace'")
+        edit-spheres(:node="node" :sphereFirstEditable="options.ctx === 'workspace'")
   //- publish
   .row.full-width.justify-center
     div(:style=`{maxWidth: '600px'}`).row.full-width.q-pa-sm
@@ -146,12 +147,11 @@ export default {
         this.node.name = composition.name
       }
     },
-    contentFound (content) {
+    async contentFound (content) {
       this.$log('contentFound', content)
       this.compositionFound(content)
-      this.$nextTick(() => {
-        this.itemEdit(this.node.items[this.node.items.length - 1])
-      })
+      await this.$wait(1000)
+      this.itemEdit(this.node.items[this.node.items.length - 1])
     },
     // edit item
     itemEdit (item) {

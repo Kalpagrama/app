@@ -84,6 +84,7 @@ div(
             ).full-width
         //- editor
         ws-composition-editor(
+          @delete="$emit('itemDelete', itemIndex)"
           :sid="`wce-${itemIndex}`"
           :value="item"
           :options=`{

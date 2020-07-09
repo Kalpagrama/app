@@ -1,11 +1,19 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
   //- mode EMPTY
-  div(v-if="mode === 'empty'").row.fit.items-start.content-start.justify-center.q-py-md
+  div(v-if="mode === 'empty'").row.fit.items-between.content-between.justify-center.q-py-md
     q-btn(
       @click="layerFirstAdd()"
       flat color="green" icon="add" no-caps
       ) {{$t('wsCompositionEditor_Add first fragment!', 'Добавить первый фрагмент!')}}
+    .row.full-width.justify-center
+      q-btn(
+        @click="$emit('close')"
+        flat color="white" icon="clear" no-caps
+        :style=`{}`
+        )
+        .row.full-width.justify-center
+          span.text-white {{ $t('wsCompositionEditor_Cancel firsty', 'Отмена') }}
   //- mode MINI
   div(v-if="mode === 'mini'").column.fit
     //- header
