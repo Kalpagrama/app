@@ -60,7 +60,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden'}`).r
       v-if="options.controls && loadeddata && !mini"
       @seeked="$emit('seeked'), focused = true"
       :style=`{
-        position: 'absolute', zIndex: 1000, bottom: '8px',
+        position: 'absolute', zIndex: 2000, bottom: '8px',
         left: '50%',
         marginRight: '-50%',
         transform: 'translate(-50%, 0)',

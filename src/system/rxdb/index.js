@@ -257,7 +257,7 @@ class RxDBWrapper {
     assert(!rawId.includes('::'), '')
     let f = this.get
     let id = makeId(rxCollectionEnum, rawId)
-    logD(f, 'start', id)
+    // logD(f, 'start', id)
     let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force })
     if (!rxDoc) return null
     return getReactive(rxDoc)

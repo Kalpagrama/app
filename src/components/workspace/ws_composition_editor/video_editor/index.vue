@@ -75,7 +75,7 @@ div(
   //- mode: PLAYER
   div(v-if="options.mode === 'player'" :style=`{position: 'relative'}`).row.fit
     ws-content-player(
-      v-if="true"
+      v-if="options.active"
       @ready="storePlayerReady" :sid="sidPlayer" :content="content"
       :active="options.active" :mini="options.mini" :options=`{controls: false}`)
     composition-progress(
@@ -249,8 +249,8 @@ export default {
     close () {
       this.$log('close')
       if (this.composition.layers.length === 0) {
-        if (confirm('Вы не добавили ни одного образа, закрыть?')) {
-          this.$emit('close')
+        if (confirm('Вы не добавили ни одного образа, удалить образ?')) {
+          this.$emit('delete')
         }
       }
       this.$emit('close')

@@ -262,7 +262,7 @@ class Cache {
       }
       let ttt = Date.now()
       let rxDoc = await this.db.cache.findOne(id).exec() // после fetchFunc!!! (findOne может выполняться очень долго(ломается логика QueryAccumulator))
-      logD(f, `findOne(${id}) time = ${(Date.now() - ttt) / 1000}`)
+      // logD(f, `findOne(${id}) time = ${(Date.now() - ttt) / 1000}`)
       if (!rxDoc) {
         logD(f, 'not found', rxDoc, failReason)
         if (failReason) {

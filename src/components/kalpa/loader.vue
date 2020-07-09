@@ -49,11 +49,12 @@ export default {
       }
     },
     items: {
-      deep: false,
+      deep: true,
       immediate: false,
       handler(to, from){
         // this.$log('loader items CHANGED', 'from=', from, ', to=', to)
         this.$emit('itemsCount', to.length)
+        // alert('item CHANGED: ' + to.length)
         this.itemsSlice = 1
         this.itemsSliced = to.slice(0, this.sliceSize)
       }
