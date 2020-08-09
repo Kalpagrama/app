@@ -214,12 +214,12 @@ export default {
         // publish
         this.$q.loading.show({spinnerColor: 'green', message: 'Creating node...'})
         let createdNode = await NodeApi.nodeCreate(this.node)
+        await this.node.updateExtended('stage', 'published', false)// без debounce.
+        await this.node.updateExtended('oid', createdNode.oid, false)// без debounce // oid нужно при снятии с публикации
         this.$log('nodePublish res', createdNode)
         // publish
         // this.$q.loading.show({spinnerColor: 'green', message: this.$t('node_publishing', 'Публикуем ядро...')})
         // await this.$wait(1000)
-        await this.node.updateExtended('stage', 'published', false)// без debounce
-        await this.node.updateExtended('oid', createdNode.oid, false)// без debounce // oid нужно при снятии с публикации
         // done
         // this.$q.loading.show({spinnerColor: 'green', message: this.$t('done', 'Готово!')})
         await this.$wait(1000)
@@ -230,6 +230,7 @@ export default {
         //   type: 'positive',
         //   message: this.$t('node_published', 'Ядро опубликовано!')
         // })
+        this.$log('nodePublish complete')
         this.$emit('published', createdNode.oid)
         this.$emit('close')
       }
