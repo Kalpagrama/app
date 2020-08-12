@@ -1,5 +1,9 @@
 <template lang="pug">
 div(
+  :class=`{
+    'full-height': !inDialog,
+    'q-pt-sm': $q.screen.gt.xs,
+  }`
   :style=`{
     position: 'relative'
   }`
@@ -35,9 +39,9 @@ div(
       overflow: 'hidden',
     }`
     ).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
-    slot(name="header")
+    //- slot(name="header")
     //- navigation
-    div(v-if="$slot ? !$slot.header : true").row.full-width.items-center.content-center.q-py-md
+    div(:style=`{height: '100px',}`).row.full-width.items-center.content-center
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Chains', 'Цепочки')}}
     //- search
@@ -52,6 +56,7 @@ div(
     .row.full-width.items-start.content-start.q-py-md.q-px-sm
       div(
         v-for="c in 3" :key="c"
+        @click="chainClick(c)"
         :style=`{height: '100px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
         ).row.full-width.b-50.q-mb-md
   //- footer
@@ -72,6 +77,9 @@ export default {
     }
   },
   methods: {
+    chainClick (chain) {
+      this.$log('chainClick', chain)
+    },
     chainAdd () {
       this.$log('chainAdd')
       let chainId = Date.now().toString()

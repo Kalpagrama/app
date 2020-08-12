@@ -30,7 +30,7 @@ div(:style=`{position: 'relative',}`).row.full-width.justify-center
   //- footer
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
-      v-if="$q.screen.width  < 1260 && !$store.state.ui.appShowMenu"
+      v-if="false && $q.screen.width  < 1260 && !$store.state.ui.appShowMenu"
       @wheel="onWheel"
       :style=`{
         position: 'fixed', zIndex: 7777, bottom: '0px',
@@ -148,6 +148,13 @@ export default {
         this.pointerEvents = 'auto'
       }, 100)
     },
-  }
+  },
+  // beforeUpdate() {
+  //   console.log('*** BEFORE UPDATE ***')
+  //   this.$slots.default = this.$slots.default.map((node, index) => {
+  //     node.key = `${node.tag}-${index}`
+  //     return node
+  //   })
+  // }
 }
 </script>

@@ -40,11 +40,10 @@ const routes = [
       {
         name: 'node',
         path: 'node/:oid',
-        redirect: 'node/:oid/nodes',
+        redirect: 'node/:oid/chains',
         component: () => import('pages/app/node'),
         children: [
           { name: 'nodes', path: 'nodes', component: () => import('components/node_explorer/node_nodes') },
-          { name: 'contents', path: 'contents', component: () => import('components/node_explorer/node_contents') },
           { name: 'chains', path: 'chains', component: () => import('components/node_explorer/node_chains') },
         ]
       },

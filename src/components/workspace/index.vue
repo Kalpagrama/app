@@ -43,7 +43,7 @@ export default {
         {id: 'content-list', name: this.$t('Content', 'Контент')},
         {id: 'composition-list', name: this.$t('Compositions', 'Образы')},
         {id: 'node-list', name: this.$t('Nodes', 'Ядра')},
-        // {id: 'chain-list', name: this.$t('Chains', 'Цепочки')},
+        {id: 'chain-list', name: this.$t('Chains', 'Цепочки')},
         // {id: 'sphere', name: this.$t('Spheres', 'Сферы')},
         {id: 'ws-settings', name: this.$t('Settings', 'Настройки')}
       ]

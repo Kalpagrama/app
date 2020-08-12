@@ -56,9 +56,11 @@ div(
     :style=`{
       borderRadius: $q.screen.gt.xs ? '10px' : '0 0 10px 10px',
     }`
-    ).row.full-width.items-start.content-start.b-50
+    ).row.full-width.items-start.content-start
     //- navigation
-    div(:style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
+    div(
+      v-if="ctx !== 'finder'"
+      :style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('ws_nodes', 'Ядра')}}
     //- search
@@ -75,9 +77,11 @@ div(
           q-btn(
             flat dense color="white" icon="filter_list")
     //- actions
-    div(:style=`{}`).row.full-width.items-end.content-end.q-px-sm.q-pb-sm.scroll
-      .row.no-wrap
-        kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start.q-mr-sm
+    div(:style=`{}`).row.full-width.items-end.content-end.q-px-md
+      //- .row.no-wrap
+        //- kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start.q-mr-sm
+      q-tabs(dense v-model="type" no-caps active-color="green" switch-indicator).full-width.text-white
+        q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   //- body
   .col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
@@ -104,6 +108,14 @@ import nodeItem from './node_item'
 export default {
   name: 'wsNodeLsit',
   components: {nodeItem},
+  props: {
+    ctx: {
+      type: String,
+      default () {
+        return 'workspace'
+      }
+    }
+  },
   data () {
     return {
       type: 'draft',
