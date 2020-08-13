@@ -8,7 +8,7 @@ div(
     position: 'relative',
     borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
-    marginBottom: '50px',
+    //- marginBottom: '50px',
   }`
   ).row.full-width.items-start.content-start
   //- kalpa-debug(:style=`{position: 'absolute', zIndex: 10000, top: '240px'}` :options=`{ctx,visible,active,mini}`)
@@ -39,20 +39,20 @@ div(
     :style=`{
       order: 2
     }`)
-  node-author(
-    v-if="true"
-    v-bind="$props"
-    :stateNode="stateNode"
-    :style=`{
-      order: 3
-    }`)
-  node-spheres(
-    v-if="true"
-    v-bind="$props"
-    :stateNode="stateNode"
-    :style=`{
-      order: 4
-    }`)
+  //- node-author(
+  //-   v-if="true"
+  //-   v-bind="$props"
+  //-   :stateNode="stateNode"
+  //-   :style=`{
+  //-     order: 3
+  //-   }`)
+  //- node-spheres(
+  //-   v-if="true"
+  //-   v-bind="$props"
+  //-   :stateNode="stateNode"
+  //-   :style=`{
+  //-     order: 4
+  //-   }`)
 </template>
 
 <script>

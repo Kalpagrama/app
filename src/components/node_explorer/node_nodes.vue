@@ -59,7 +59,7 @@ div(:style=`{position: 'relative'}`).column.fit
           template(v-slot:itemFirst)
             node(
               v-if="node" ctx="list" :node="node" :needFull="true" :visible="true" :active="nodeActive" :mini="false"
-              :style=`{maxWidth: '800px', marginTop: '70px'}`)
+              :style=`{maxWidth: '800px', marginTop: '0px'}`)
             //- node add
             .row.full-width.justify-start.q-pa-md
               span(:style=`{fontSize: '16px',}`).text-white.text-bold {{$t('nodeExplorer_nodeNodes_Node compositions', 'Образы ядра')}}

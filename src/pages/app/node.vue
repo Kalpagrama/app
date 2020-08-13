@@ -30,6 +30,7 @@ export default {
       async handler (to, from) {
         this.$log('$route CHANGED', this.$store.state.core.progressInfo.CREATE)
         if (to) {
+          if (this.node && this.node.oid === to) return
           this.node = null
           await this.$wait(200)
           if (!this.nodeProgress) {
@@ -52,18 +53,6 @@ export default {
         }
       }
     },
-    // createProgress: {
-    //   async handler (to, from) {
-    //     this.$log('*** CREATE ***', to)
-    //     // if (to && to[this.oid]) {
-    //     //   this.nodeProgress = to[this.oid]
-    //     //   this.$log('*** nodeProgress *** ', to[this.oid])
-    //     //   if (to[this.oid] === 100) {
-    //     //     this.node = await this.nodeLoad()
-    //     //   }
-    //     // }
-    //   }
-    // }
   },
   methods: {
     async nodeLoad (oid) {
@@ -87,11 +76,6 @@ export default {
   },
   mounted () {
     this.$log('mounted')
-    // let count = 1
-    // setInterval(() => {
-    //   count += 1
-    //   this.$store.commit('core/processEvent', {type: 'PROGRESS', action: 'CREATE', progress: count, oid: this.oid})
-    // }, 500)
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
