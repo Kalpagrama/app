@@ -11,6 +11,7 @@ const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_LST)
 
 const LstCollectionEnum = Object.freeze({
   LST_SPHERE_NODES: 'LST_SPHERE_NODES',
+  LST_SPHERE_CHAINS: 'LST_SPHERE_CHAINS',
   LST_SPHERE_SPHERES: 'LST_SPHERE_SPHERES',
   LST_FEED: 'LST_FEED',
   LST_SUBSCRIBERS: 'LST_SUBSCRIBERS', // подписчики на какой-либо объект
