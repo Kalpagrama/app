@@ -8,7 +8,7 @@ div(
   //- header: navigation back, and tabs
   div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.justify-between
     q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mx-xs
-    span.text-white.text-bold Node
+    span.text-white.text-bold {{$t('nodeExplorer_title', 'Ядро')}}
     .col
       .row.fit.justify-end
         q-tabs(
@@ -16,8 +16,8 @@ div(
           dense active-color="green" switch-indicator
           no-caps align="right" :breakpoint="300"
           ).text-white
-          q-tab(name="nodes" label="Sphere")
-          q-tab(name="chains" label="Chains")
+          q-tab(name="nodes" :label="$t('nodeExplorer_nodeSphere', 'Сфера')")
+          q-tab(name="chains" :label="$t('nodeExplorer_nodeChains', 'Связи')")
   //- body
   q-tab-panels(
     :value="$route.name" @input="$router.push('/node/'+node.oid+'/'+$event)"

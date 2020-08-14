@@ -112,6 +112,8 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     // sphere
     Vue.component('wsSphereList', () => import('components/workspace/ws_sphere_list'))
     Vue.component('wsSphere', () => import('components/workspace/ws_sphere'))
+    // ws
+    Vue.component('wsItemPicker', () => import('components/workspace/ws_item_picker'))
     // explore
     Vue.component('userExplorer', () => import('components/user_explorer'))
     Vue.component('nodeExplorer', () => import('components/node_explorer'))

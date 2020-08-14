@@ -9,6 +9,7 @@ div(
   ).column.fit
   //- node ADD
   q-btn(
+    v-if="mode === 'standalone'"
     @click="nodeAddBtn()"
     push round color="green" icon="add"
     :size="$q.screen.gt.xs ? 'xl' : 'lg'"
@@ -18,7 +19,9 @@ div(
       borderRadius: '50%'
     }`)
   //- node EDITOR
-  q-dialog(v-model="nodeEditorOpened" position="bottom")
+  q-dialog(
+    v-if="mode === 'standalone'"
+    v-model="nodeEditorOpened" position="bottom")
     ws-node-editor(
       ctx="workspace"
       :value="nodeEditorItem"
@@ -30,8 +33,10 @@ div(
         maxHeight: $q.screen.height+'px',
         height: $q.screen.height+'px',
       }`)
-  //- node PREVIEW
-  q-dialog(v-model="nodePreviewOpened" position="bottom")
+  //- node PREVIEW: for saved or published nodes...
+  q-dialog(
+    v-if="mode === 'standalone'"
+    v-model="nodePreviewOpened" position="bottom")
     div(
       :style=`{
         height: $q.screen.height+'px',
@@ -59,7 +64,7 @@ div(
     ).row.full-width.items-start.content-start
     //- navigation
     div(
-      v-if="ctx !== 'finder'"
+      v-if="mode === 'standalone'"
       :style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('ws_nodes', 'Ядра')}}
@@ -81,7 +86,7 @@ div(
       //- .row.no-wrap
         //- kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start.q-mr-sm
       q-tabs(dense v-model="type" no-caps active-color="green" switch-indicator).full-width.text-white
-        q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
+        q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name" dense)
   //- body
   .col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
@@ -109,10 +114,10 @@ export default {
   name: 'wsNodeLsit',
   components: {nodeItem},
   props: {
-    ctx: {
+    mode: {
       type: String,
       default () {
-        return 'workspace'
+        return 'standalone' // standalone, picker, readonly, etc...
       }
     }
   },
@@ -155,15 +160,31 @@ export default {
   methods: {
     async nodePreview (n) {
       this.$log('nodePreview', n)
-      if (n.stage === 'draft') return
-      this.nodeEditorItem = n
-      this.nodePreviewItem = await this.$rxdb.get(RxCollectionEnum.OBJ, n.oid)
-      this.nodePreviewOpened = true
+      if (this.mode === 'standalone') {
+        if (n.stage === 'draft') return
+        this.nodeEditorItem = n
+        this.nodePreviewItem = await this.$rxdb.get(RxCollectionEnum.OBJ, n.oid)
+        this.nodePreviewOpened = true
+      }
+      else if (this.mode === 'picker') {
+        this.$emit('node', JSON.parse(JSON.stringify(n)))
+      }
+      else {
+        this.$q.notify({type: 'negative', message: 'No Action!'})
+      }
     },
     nodeEdit (n) {
       this.$log('nodeEdit', n)
-      this.nodeEditorItem = n
-      this.nodeEditorOpened = true
+      if (this.mode === 'standalone') {
+        this.nodeEditorItem = n
+        this.nodeEditorOpened = true
+      }
+      else if (this.mode === 'picker') {
+        this.$emit('node', JSON.parse(JSON.stringify(n)))
+      }
+      else {
+        this.$q.notify({type: 'negative', message: 'No action!'})
+      }
     },
     async nodeFork (n) {
       this.$log('nodeFork', n)

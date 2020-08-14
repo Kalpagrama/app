@@ -1,21 +1,15 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
   //- left line, like metropolitan
-  div(:style=`{position: 'absolute', zIndex: 100, left: '10px',}`).column.full-height.q-px-sm.q-py-sm
+  div(:style=`{position: 'absolute', zIndex: 100, left: '10px',}`).column.full-height.q-px-sm.q-pt-md
     div(:style=`{position: 'relative', width: '6px', borderRadius: '3px',}`).row.full-height.bg-grey-4
-  //- chain add btn
-  q-btn(
-    round push dense color="green" icon="add"
-    :style=`{
-      position: 'absolute', zIndex: 500, left: '4px', bottom: '4px',
-      borderRadius: '50%',
-    }`)
+  chain-creator(:node="node")
   //- chain top
   div(:style=`{position: 'relative', zIndex: 100, paddingLeft: '40px', paddingTop: '0px',}`).row.full-width
     //- chain point
     div(
       :style=`{
-        position: 'absolute', zIndex: 100, left: '1px', top: '10px',
+        position: 'absolute', zIndex: 100, left: '1px', top: '8px',
         width: '40px', height: '40px',
       }`
       ).row.items-center.content-center.justify-center
@@ -34,40 +28,43 @@ div(:style=`{position: 'relative'}`).column.fit
   div.col.full-width
     .column.fit
       .col.full-width.scroll.q-pt-sm
-        div(
-          v-for="n in 100" :key="n"
-          :style=`{
-            height: 'calc(120%)', borderRadius: '10px',
-            paddingLeft: '40px',
-          }`
-          ).row.full-width.items-start.content-start
-          node(v-if="node" ctx="list" :node="node" :needFull="false" :visible="true" :active="false" :mini="false")
-          //- chain vote, point
-          div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
-            //- chain point
-            div(
-              :style=`{
-                position: 'absolute', zIndex: 100, left: '-40px', top: '-8px',
-                width: '40px', height: '40px',
-              }`
-              ).row.items-center.content-center.justify-center
-              div(
-                :style=`{
-                  width: '26px', height: '26px',
-                  borderRadius: '50%', overflow: 'hidden',
-                }`
-                ).row.bg-grey-2
-            //- chain label
-            div(:style=`{height: '40px',}`).row.full-width.items-start.content-start
-              span.text-white.text-bold Следствие
+        //- kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
+        //-   template(v-slot=`{items, itemsMore}`)
+        //- div(
+        //-   v-for="n in 100" :key="n"
+        //-   :style=`{
+        //-     height: 'calc(120%)', borderRadius: '10px',
+        //-     paddingLeft: '40px',
+        //-   }`
+        //-   ).row.full-width.items-start.content-start
+        //-   node(v-if="node" ctx="list" :node="node" :needFull="false" :visible="true" :active="false" :mini="false")
+        //-   //- chain vote, point
+        //-   div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start
+        //-     //- chain point
+        //-     div(
+        //-       :style=`{
+        //-         position: 'absolute', zIndex: 100, left: '-39px', top: '-8px',
+        //-         width: '40px', height: '40px',
+        //-       }`
+        //-       ).row.items-center.content-center.justify-center
+        //-       div(
+        //-         :style=`{
+        //-           width: '26px', height: '26px',
+        //-           borderRadius: '50%', overflow: 'hidden',
+        //-         }`
+        //-         ).row.bg-grey-2
+        //-     //- chain label
+        //-     div(:style=`{height: '40px',}`).row.full-width.items-start.content-start
+        //-       span.text-white.text-bold Следствие
 </template>
 
 <script>
-// import chainFinder from './chain_finder'
+import { RxCollectionEnum } from 'src/system/rxdb'
+import chainCreator from './chain_creator'
 
 export default {
   name: 'nodeExplorer_nodeChains',
-  // components: {chainFinder},
+  components: {chainCreator},
   props: ['node'],
   data () {
     return {
@@ -78,6 +75,16 @@ export default {
       chainFinderOpened: false,
     }
   },
+  computed: {
+    mangoQuery () {
+      return {
+        selector: {
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
+          oidSphere: this.sphereOid
+        }
+      }
+    }
+  },
   watch: {
   },
   methods: {
@@ -85,7 +92,7 @@ export default {
       this.$log('chainClick', chain)
       this.chain = chain
       this.chainExplorerOpened = true
-    }
+    },
   },
   mounted () {
     this.$log('mounted')

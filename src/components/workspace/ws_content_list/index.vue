@@ -27,7 +27,7 @@ div(
     slot(name="header")
     //- navigation
     div(
-      v-if="ctx === 'workspace'"
+      v-if="mode === 'standalone'"
       :style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('content', 'Контент')}}
@@ -63,13 +63,13 @@ div(
           div(v-if="items.length > 0" :style=`{maxWidth: '800px', paddingBottom: '400px',}`).row.full-width.q-px-sm
             div(v-if="type === 'VIDEO'").row.full-width
               content-item(
-                v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c"
+                v-for="(c,ci) in items" :key="c.id" :ctx="'workspace'" :content="c"
                 @pick="contentPicked(c,ci)"
                 @delete="contentDelete(c)")
             div(v-if="type === 'IMAGE'").row.full-width
               masonry(:cols="$q.screen.width < 600 ?  2 : 3" :gutter="0").full-width
                 content-item(
-                  v-for="(c,ci) in items" :key="c.id" :ctx="ctx" :content="c"
+                  v-for="(c,ci) in items" :key="c.id" :ctx="'workspace'" :content="c"
                   @pick="contentPicked(c,ci)"
                   @delete="contentDelete(c)")
           //- nothing found
@@ -98,10 +98,10 @@ export default {
         return false
       }
     },
-    ctx: {
+    model: {
       type: String,
       default () {
-        return 'workspace'
+        return 'standalone' // standalone, picker, readonly, etc
       }
     }
   },
@@ -175,13 +175,16 @@ export default {
     },
     contentPicked (content) {
       this.$log('contentPicked', this.ctx)
-      if (this.ctx === 'workspace') {
-        // this.$router.push(`/workspace/content/${content.id}`)
+      if (this.mode === 'standalone') {
         this.content = content
         this.contentEditorOpened = true
+        // this.$router.push(`/workspace/content/${content.id}`)
+      }
+      else if (this.mode === 'picker') {
+        this.$emit('content', JSON.parse(JSON.stringify(content)))
       }
       else {
-        this.$emit('content', JSON.parse(JSON.stringify(content)))
+        this.$q.notify({type: 'negative', message: 'No action!'})
       }
     },
     contentExplore (c, ci) {

@@ -23,10 +23,10 @@ div(
   div(
     :style=`{
       borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px'
-    }`).row.full-width.items-start.content-start.b-50
+    }`).row.full-width.items-start.content-start
     //- navigation
     div(
-      v-if="ctx === 'workspace'"
+      v-if="mode === 'standalone'"
       :style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
       q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Compositions', 'Образы')}}
@@ -79,7 +79,7 @@ div(
                 :view="view"
                 @pick="compositionPicked(c,ci)"
                 @delete="compositionDelete(c,ci)"
-                :ctx="ctx" :composition="c")
+                :ctx="'workspace'" :composition="c")
           //- nothing found
           div(
             v-else
@@ -104,10 +104,10 @@ export default {
         return false
       }
     },
-    ctx: {
+    mode: {
       type: String,
       default () {
-        return 'workspace'
+        return 'standalone' // standalone, picker
       }
     }
   },
@@ -143,14 +143,16 @@ export default {
   },
   methods: {
     compositionPicked (composition) {
-      this.$log('compositionPicked', this.ctx)
-      if (this.ctx === 'workspace') {
+      this.$log('compositionPicked mode', this.mode)
+      if (this.mode === 'standalone') {
         this.composition = composition
         this.compositionEditorOpened = true
-        // this.$router.push(`/workspace/composition/${composition.id}`)
+      }
+      else if (this.mode === 'picker') {
+        this.$emit('composition', JSON.parse(JSON.stringify(composition)))
       }
       else {
-        this.$emit('composition', JSON.parse(JSON.stringify(composition)))
+        this.$q.notify({type: 'negative', message: 'No action!'})
       }
     },
     async compositionDelete (composition, ci) {
