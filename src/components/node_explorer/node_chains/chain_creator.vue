@@ -27,7 +27,9 @@ q-btn(
   q-dialog(v-model="itemPickerOpened" position="bottom")
     ws-item-picker(
       @item="itemPicked"
-      :title="$t('chainCreator_wsItemPicker_title', 'Выбери элемент')"
+      @close="itemPickerOpened = false"
+      :title="wsItemPickerTitle"
+      :types="{node: {types: ['saved', 'published']}}"
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
@@ -59,6 +61,10 @@ export default {
         {id: 'from', key: 'leftItem', name: this.$t('chainType_from', 'Причина'), type: 'FROM_TO'},
         {id: 'to', key: 'rightItem', name: this.$t('chainType_to', 'Следствие'), type: 'FROM_TO'},
       ]
+    },
+    wsItemPickerTitle () {
+      if (!this.type) return ''
+      return 'Pick node' + this.type.name
     }
   },
   methods: {

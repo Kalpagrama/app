@@ -86,7 +86,7 @@ div(
       //- .row.no-wrap
         //- kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start.q-mr-sm
       q-tabs(dense v-model="type" no-caps active-color="green" switch-indicator).full-width.text-white
-        q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name" dense)
+        q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name" dense)
   //- body
   .col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
@@ -119,11 +119,17 @@ export default {
       default () {
         return 'standalone' // standalone, picker, readonly, etc...
       }
+    },
+    types: {
+      type: Array,
+      default () {
+        return ['saved', 'draft', 'published']
+      }
     }
   },
   data () {
     return {
-      type: 'draft',
+      type: 'saved',
       searchString: '',
       nodeEditorItem: null,
       nodeEditorOpened: false,
@@ -132,12 +138,13 @@ export default {
     }
   },
   computed: {
-    types () {
-      return [
+    typesFiltered () {
+      let arr = [
         {id: 'saved', name: this.$t('nodes_saved', 'Сохраненные')},
         {id: 'draft', name: this.$t('nodes_drafts', 'Черновики')},
         {id: 'published', name: this.$t('nodes_published', 'Опубликованные')},
       ]
+      return arr.filter(i => this.types.includes(i.id))
     },
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE}}

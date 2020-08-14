@@ -30,8 +30,12 @@ div(:style=`{position: 'relative'}`).column.fit
       .col.full-width.scroll.q-pt-sm
         kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
           template(v-slot=`{items, itemsMore}`)
-            div(v-for="(i,ii) in items" :key="ii").row.full-width
-              span.text-white {{ i }}
+            .row.fit.items-start.content-start
+              chain-item(
+                v-for="(i,ii) in items" :key="i.oid"
+                :nodeOid="node.oid" :chain="i")
+              //- div(v-for="(i,ii) in items" :key="ii").row.full-width.br
+              //-   span.text-white {{ i }}
         //- div(
         //-   v-for="n in 100" :key="n"
         //-   :style=`{
@@ -62,11 +66,13 @@ div(:style=`{position: 'relative'}`).column.fit
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+
 import chainCreator from './chain_creator'
+import chainItem from './chain_item'
 
 export default {
   name: 'nodeExplorer_nodeChains',
-  components: {chainCreator},
+  components: {chainCreator, chainItem},
   props: ['node'],
   data () {
     return {
