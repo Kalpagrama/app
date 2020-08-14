@@ -28,8 +28,10 @@ div(:style=`{position: 'relative'}`).column.fit
   div.col.full-width
     .column.fit
       .col.full-width.scroll.q-pt-sm
-        //- kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-        //-   template(v-slot=`{items, itemsMore}`)
+        kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
+          template(v-slot=`{items, itemsMore}`)
+            div(v-for="(i,ii) in items" :key="ii").row.full-width
+              span.text-white {{ i }}
         //- div(
         //-   v-for="n in 100" :key="n"
         //-   :style=`{
@@ -76,11 +78,15 @@ export default {
     }
   },
   computed: {
+    sphereOid () {
+      return this.node.sphereFromName.oid
+    },
     mangoQuery () {
       return {
         selector: {
-          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_NODES,
-          oidSphere: this.sphereOid
+          rxCollectionEnum: RxCollectionEnum.LST_SPHERE_CHAINS,
+          oidSphere: this.sphereOid,
+          // OBJECT_TYPE_ENUM: 'SPHERE'
         }
       }
     }

@@ -95,7 +95,6 @@ export default {
       return [this.node.oid]
     },
     sphereOid () {
-      this.$log('node_nodes: this.node=', this.node)
       return this.node.sphereFromName.oid
     },
     mangoQuery () {

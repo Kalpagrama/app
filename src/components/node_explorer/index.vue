@@ -23,9 +23,9 @@ div(
     :value="$route.name" @input="$router.push('/node/'+node.oid+'/'+$event)"
     swipeable infinite animated :style=`{background: 'none !important'}`).col.full-width
     q-tab-panel(name="nodes" :style=`{padding: 0, margin: 0, background: 'none !important'}`).fit
-      node-nodes(:node="node")
+      node-nodes(v-if="node" :node="node")
     q-tab-panel(name="chains" :style=`{padding: 0, margin: 0, background: 'none !important'}`).fit
-      node-chains(:node="node")
+      node-chains(v-if="node" :node="node")
 </template>
 
 <script>
