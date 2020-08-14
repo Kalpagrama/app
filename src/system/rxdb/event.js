@@ -47,13 +47,13 @@ class Event {
           let { items: createdWsNodes } = await rxdb.find({
             selector: {
               rxCollectionEnum: RxCollectionEnum.WS_NODE,
-              stage: 'published',
-              oid: event.object.oid
+              $or: [{ oid: event.object.oid }, { oid: null }]
             }
           })
+          logD(f, 'move createdWsNodes to draft. createdWsNodes.len = ' + createdWsNodes.length)
           // переместим ядро в черновики
           for (let wsNode of createdWsNodes) {
-            // logD(f, 'change wsNode...', wsNode)
+            logD(f, 'move wsNode to draft', wsNode.oid)
             await wsNode.updateExtended('stage', 'draft', false)// без debounce
             delete wsNode.oid
           }

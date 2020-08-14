@@ -227,11 +227,12 @@ export default {
       return item
     },
     async nodeUnPublish (node) {
-      this.$log('nodeUnPublish', node)
+      this.$log('nodeUnPublish start')
       if (!confirm(this.$t('Unpublish node?', 'Снять с публикации?'))) return
-      await NodeApi.nodeDelete(node.oid)
       await node.updateExtended('stage', 'draft', false)// без debounce
       await node.updateExtended('oid', node.oid, false)// без debounce
+      await NodeApi.nodeDelete(node.oid)
+      this.$log('nodeUnPublish complete')
     },
     async nodeUnSave (node) {
       this.$log('nodeUnSave', node)

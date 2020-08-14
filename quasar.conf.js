@@ -116,7 +116,7 @@ module.exports = function (ctx) {
             new webpack.IgnorePlugin(/@capacitor\/core/)
           )
         }
-        if (ctx.mode.spa){
+        if (ctx.mode.spa) {
           cfg.plugins.push(
             new BundleAnalyzerPlugin()
           )
