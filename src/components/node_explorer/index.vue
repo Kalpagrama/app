@@ -6,26 +6,27 @@ div(
   }`
   ).column.full-width
   //- header: navigation back, and tabs
-  div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.justify-between
-    q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mx-xs
-    span.text-white.text-bold {{$t('nodeExplorer_title', 'Ядро')}}
-    .col
-      .row.fit.justify-end
-        q-tabs(
-          :value="$route.name" @input="$router.push('/node/'+node.oid+'/'+$event)"
-          dense active-color="green" switch-indicator
-          no-caps align="right" :breakpoint="300"
-          ).text-white
-          q-tab(name="nodes" :label="$t('nodeExplorer_nodeSphere', 'Сфера')")
-          q-tab(name="chains" :label="$t('nodeExplorer_nodeChains', 'Связи')")
+  div(:style=`{}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '800px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.justify-between
+      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mx-xs
+      span.text-white.text-bold {{$t('nodeExplorer_title', 'Ядро')}}
+      .col
+        .row.fit.justify-end
+          q-tabs(
+            :value="$route.name" @input="$router.push('/node/'+node.oid+'/'+$event)"
+            dense active-color="green" switch-indicator
+            no-caps align="right" :breakpoint="300"
+            ).text-white
+            q-tab(name="nodes" :label="$t('nodeExplorer_nodeClips', 'Образы')")
+            q-tab(name="chains" :label="$t('nodeExplorer_nodeChains', 'Связи')")
   //- body
   q-tab-panels(
     :value="$route.name" @input="$router.push('/node/'+node.oid+'/'+$event)"
     swipeable infinite animated :style=`{background: 'none !important'}`).col.full-width
-    q-tab-panel(name="nodes" :style=`{padding: 0, margin: 0, background: 'none !important'}`).fit
-      node-nodes(v-if="node" :node="node")
-    q-tab-panel(name="chains" :style=`{padding: 0, margin: 0, background: 'none !important'}`).fit
-      node-chains(v-if="node" :node="node")
+    q-tab-panel(name="nodes" :style=`{padding: 0, margin: 0, background: 'none !important'}`).row.fit.justify-center
+      node-nodes(v-if="node" :node="node" :style=`{maxWidth: '800px'}`)
+    q-tab-panel(name="chains" :style=`{padding: 0, margin: 0, background: 'none !important'}`).row.fit.justify-center
+      node-chains(v-if="node" :node="node" :style=`{maxWidth: '800px'}`)
 </template>
 
 <script>

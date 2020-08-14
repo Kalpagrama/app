@@ -6,12 +6,12 @@ div(:style=`{position: 'relative'}`).column.fit
     push color="green" no-caps
     :style=`{
       position: 'fixed', zIndex: 5555,
-      bottom: $q.screen.width > 1260 ? '10px' : '70px',
-      left: 'calc(50% - 150px)',
+      bottom: '20px',
+      left: 'calc(50% - 100px)',
       height: '50px',
-      width: '300px',
+      width: '200px',
     }`)
-    span.text-white.text-bold {{ $t('nodeExplorer_nodeNodes_Extend this node', 'Расширить ядро') }}
+    span.text-white.text-bold {{ $t('nodeExplorer_nodeNodes_addClip', 'Добавить образ') }}
   //- node editor
   q-dialog(
     v-model="nodeEditorOpened" position="bottom")
@@ -47,34 +47,45 @@ div(:style=`{position: 'relative'}`).column.fit
                     div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.b-60.q-pa-xs
                       img(:src="node.author.thumbUrl" :style=`{width: '20px', height: '20px', borderRadius: '50%',}`).q-mr-sm
                       span.text-grey-5 {{ node.author.name }}
+  //- node
+  node(
+    v-if="node" ctx="list" :node="node" :needFull="true" :visible="true" :active="nodeActive" :mini="false"
+    :style=`{maxWidth: '800px', marginTop: '0px'}`)
   //- body
   .col.full-width
-    kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
-      template(v-slot=`{items, itemsMore}`)
-        list-middle(
-          @indexMiddle="indexMiddleChanged"
-          :items="items" :itemsBan="itemsBan" :more="itemsMore"
-          :options=`{paddingTop: 0, paddingBottom: $q.screen.height/3}`)
-          //- node, nodeAdd
-          template(v-slot:itemFirst)
-            node(
-              v-if="node" ctx="list" :node="node" :needFull="true" :visible="true" :active="nodeActive" :mini="false"
-              :style=`{maxWidth: '800px', marginTop: '0px'}`)
-            //- node add
-            .row.full-width.justify-start.q-pa-md
-              span(:style=`{fontSize: '16px',}`).text-white.text-bold {{$t('nodeExplorer_nodeNodes_Node compositions', 'Образы ядра')}}
-          //- node nodes
-          template(v-slot:item=`{item, index, indexMiddle}`)
-            node(
-              ctx="list" layout="PIP"
-              :node="item" :index="index" :essence="true"
-              :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
-              :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
-              :active="!nodeActive && index === indexMiddle"
-              :mini="false")
-          //- footer for padding
-          template(v-slot:itemLast)
-            div(:style=`{height: '400px'}`).row.full-width
+    //- kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
+    //-   template(v-slot=`{items, itemsMore}`)
+    //-     list-middle(
+    //-       @indexMiddle="indexMiddleChanged"
+    //-       :items="items" :itemsBan="itemsBan" :more="itemsMore"
+    //-       :options=`{paddingTop: 0, paddingBottom: $q.screen.height/3}`)
+    //-       //- node, nodeAdd
+    //-       template(v-slot:itemFirst)
+    //-         node(
+    //-           v-if="node" ctx="list" :node="node" :needFull="true" :visible="true" :active="nodeActive" :mini="false"
+    //-           :style=`{maxWidth: '800px', marginTop: '0px'}`)
+    //-         //- //- node add
+    //-         //- .row.full-width.justify-start.q-pa-md
+    //-         //-   span(:style=`{fontSize: '16px',}`).text-white.text-bold {{$t('nodeExplorer_nodeNodes_Node compositions', 'Образы ядра')}}
+    //-       //- node nodes
+    //-       template(v-slot:item=`{item, index, indexMiddle}`)
+    //-         node(
+    //-           ctx="list" layout="PIP"
+    //-           :node="item" :index="index" :essence="true"
+    //-           :needFull="index >= indexMiddle-1 && index <= indexMiddle+1"
+    //-           :visible="index >= indexMiddle-1 && index <= indexMiddle+1"
+    //-           :active="!nodeActive && index === indexMiddle"
+    //-           :mini="false")
+    //-       //- footer for padding
+    //-       template(v-slot:itemLast)
+    //-         div(:style=`{height: '400px'}`).row.full-width
+    div(:style=`{}`).row.full-width.items-start.content-start.q-py-sm
+      div(
+        v-for="i in 4" :key="i"
+        :style=`{height: $q.screen.width < 800 ? $q.screen.width/2+'px' : 800/2+'px',}`).col-6.q-pa-xs
+        div(
+          :style=`{borderRadius: '10px', overflow: 'hidden'}`
+          ).row.fit.items-center.content-center.justify-center.b-50
 </template>
 
 <script>
@@ -139,7 +150,7 @@ export default {
       let item = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
       this.$log('nodeAdd item', item)
       // mute all
-      this.stateNodeExplorer.set('nodeActive', false)
+      // this.stateNodeExplorer.set('nodeActive', false)
       this.$log('nodeAddStart done')
       // open editor
       this.nodeEditorItem = item
