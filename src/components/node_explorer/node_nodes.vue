@@ -2,7 +2,7 @@
 div(:style=`{position: 'relative'}`).column.fit
   //- node add
   q-btn(
-    @click="nodeAddStart()"
+    @click="clipAddStart()"
     push color="green" no-caps
     :style=`{
       position: 'fixed', zIndex: 5555,
@@ -12,6 +12,17 @@ div(:style=`{position: 'relative'}`).column.fit
       width: '200px',
     }`)
     span.text-white.text-bold {{ $t('nodeExplorer_nodeNodes_addClip', 'Добавить образ') }}
+  //- wsItemPicker
+  q-dialog(v-model="itemPickerOpened" position="bottom")
+    ws-item-picker(
+      @item="itemPicked"
+      @close="itemPickerOpened = false"
+      :title="itemPickerTitle"
+      :types="{content: {types: []}, composition: {types: ['video', 'image']}}"
+      :style=`{
+        height: $q.screen.height+'px',
+        minHeight: $q.screen.height+'px',
+      }`)
   //- node editor
   q-dialog(
     v-model="nodeEditorOpened" position="bottom")
@@ -53,6 +64,27 @@ div(:style=`{position: 'relative'}`).column.fit
     :style=`{maxWidth: '800px', marginTop: '0px'}`)
   //- body
   .col.full-width
+    //- *** gallery of clips
+    kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
+      template(v-slot=`{items, itemsMore}`)
+        //- got 1 > items
+        div(v-if="items.length > 1").row.fit.items-start.content-start.q-px-sm.q-pt-sm
+          list-masonry(:items="items.filter(i => i.oid !== node.oid)")
+            template(v-slot:item=`{item}`)
+              div(
+                @click="nodeClick(item)"
+                ).row.full-width.item-start.content-start
+                img(:src="item.meta.items[0].thumbUrl" :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
+        //- no items
+        div(v-else).row.full-width.items-start.content-start.q-pa-sm
+          div(
+            v-for="i in 4" :key="i"
+            :style=`{height: $q.screen.width < 800 ? $q.screen.width/2+'px' : 800/2+'px',}`
+            ).col-6.q-pa-xs.br
+    //-     div(
+    //-       :style=`{borderRadius: '10px', overflow: 'hidden'}`
+    //-       ).row.fit.items-center.content-center.justify-center.b-50
+    //- *** simple feed of nodes
     //- kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
     //-   template(v-slot=`{items, itemsMore}`)
     //-     list-middle(
@@ -79,16 +111,10 @@ div(:style=`{position: 'relative'}`).column.fit
     //-       //- footer for padding
     //-       template(v-slot:itemLast)
     //-         div(:style=`{height: '400px'}`).row.full-width
-    div(:style=`{}`).row.full-width.items-start.content-start.q-py-sm
-      div(
-        v-for="i in 4" :key="i"
-        :style=`{height: $q.screen.width < 800 ? $q.screen.width/2+'px' : 800/2+'px',}`).col-6.q-pa-xs
-        div(
-          :style=`{borderRadius: '10px', overflow: 'hidden'}`
-          ).row.fit.items-center.content-center.justify-center.b-50
 </template>
 
 <script>
+import { NodeApi } from 'src/api/node'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
@@ -99,6 +125,7 @@ export default {
       nodeEditorOpened: false,
       nodeEditorItem: null,
       nodeActive: true,
+      itemPickerOpened: false,
     }
   },
   computed: {
@@ -115,6 +142,9 @@ export default {
           oidSphere: this.sphereOid
         }
       }
+    },
+    itemPickerTitle () {
+      return 'Найди образ в мастерской'
     }
   },
   watch: {
@@ -127,10 +157,38 @@ export default {
     }
   },
   methods: {
+    nodeClick (n, ni) {
+      this.$log('nodeClick', n, ni)
+      this.$router.push(`/node/${n.oid}/nodes`)
+    },
     indexMiddleChanged (to) {
       this.$log('indexMiddleChanged', to)
       if (to >= 0) this.nodeActive = false
       else this.nodeActive = true
+    },
+    clipAddStart () {
+      this.$log('clipAddStart')
+      this.itemPickerOpened = true
+    },
+    async itemPicked ({item}) {
+      this.$log('itemPicked', item)
+      this.itemPickerOpened = false
+      let nodeInput = {
+        name: this.node.name,
+        wsItemType: 'WS_NODE',
+        category: this.node.category,
+        layout: this.node.layout,
+        spheres: [],
+        stage: 'draft',
+        items: []
+      }
+      nodeInput.items[0] = item
+      this.$log('itemPicked nodeInput', nodeInput)
+      let nodeWs = await this.$rxdb.set(RxCollectionEnum.WS_NODE, nodeInput)
+      this.$log('itemPicked nodeWs', nodeWs)
+      let nodePublished = await NodeApi.nodeCreate(nodeWs)
+      await nodeWs.updateExtended('stage', 'published', false) // без debounce.
+      await nodeWs.updateExtended('oid', nodePublished.oid, false) // без debounce // oid нужно при снятии с публикации
     },
     async nodeAddStart () {
       this.$log('nodeAddStart', this.node)

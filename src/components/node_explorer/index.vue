@@ -7,7 +7,7 @@ div(
   ).column.full-width
   //- header: navigation back, and tabs
   div(:style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px', borderRadius: '10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.justify-between
+    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
       q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mx-xs
       span.text-white.text-bold {{$t('nodeExplorer_title', 'Ядро')}}
       .col

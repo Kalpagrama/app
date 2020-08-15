@@ -52,7 +52,7 @@ export default {
   },
   data () {
     return {
-      tab: 'node',
+      tab: null,
       tabs: [
         {id: 'node', name: 'Nodes', component: 'ws-node-list'},
         {id: 'composition', name: 'Clips', component: 'ws-composition-list'},
@@ -63,6 +63,14 @@ export default {
   computed: {
     tabsFiltered () {
       return this.tabs.filter(tab => this.types[tab.id])
+    }
+  },
+  watch: {
+    tabsFiltered: {
+      immediate: true,
+      handler (to, from) {
+        if (to && to.length > 0) this.tab = to[0].id
+      }
     }
   },
   methods: {

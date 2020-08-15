@@ -44,14 +44,17 @@ div(
         //-   :src="i.meta.items[0].thumbUrl"
         //-   :style=`{opacity: 0.1, width: '100%', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
         //- slot
-        div(
-          :ref="`item-${i.oid}`"
-          :class=`{
-            'shadow-20': i.oid === itemOid
-          }`
-          :style="itemStyles(i.oid)"
-          ).row.fit
-          slot(name="item" :item="i" :index="ii" :isOpened="i.oid === itemOid" :isHovered="i.oid === itemOidHovered")
+        //- div(
+        //-   ).row.full-width
+        //- div(
+        //-   :ref="`item-${i.oid}`"
+        //-   :class=`{
+        //-     'shadow-20': i.oid === itemOid
+        //-   }`
+        //-   :style="itemStyles(i.oid)"
+        //-   ).row.fit
+        //-   slot(name="item" :item="i" :index="ii" :isOpened="i.oid === itemOid" :isHovered="i.oid === itemOidHovered")
+        slot(name="item" :item="i")
 </template>
 
 <script>
