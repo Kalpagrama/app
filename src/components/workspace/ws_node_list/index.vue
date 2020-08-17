@@ -120,12 +120,15 @@ export default {
         return 'standalone' // standalone, picker, readonly, etc...
       }
     },
-    types: {
-      type: Array,
+    options: {
+      type: Object,
       default () {
-        return ['saved', 'draft', 'published']
+        return {
+          types: [],
+          typesAll: true
+        }
       }
-    }
+    },
   },
   data () {
     return {
@@ -144,7 +147,8 @@ export default {
         {id: 'draft', name: this.$t('nodes_drafts', 'Черновики')},
         {id: 'published', name: this.$t('nodes_published', 'Опубликованные')},
       ]
-      return arr.filter(i => this.types.includes(i.id))
+      if (this.options.typesAll) return this.arr
+      else return arr.filter(i => this.options.types.includes(i.id))
     },
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE}}

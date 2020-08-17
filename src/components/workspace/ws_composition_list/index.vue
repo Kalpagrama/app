@@ -109,6 +109,15 @@ export default {
       default () {
         return 'standalone' // standalone, picker
       }
+    },
+    options: {
+      type: Object,
+      default () {
+        return {
+          types: [],
+          typesAll: true
+        }
+      }
     }
   },
   data () {
@@ -149,6 +158,7 @@ export default {
         this.compositionEditorOpened = true
       }
       else if (this.mode === 'picker') {
+        this.$log('compositionPicked', composition)
         this.$emit('composition', JSON.parse(JSON.stringify(composition)))
       }
       else {

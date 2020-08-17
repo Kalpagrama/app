@@ -10,7 +10,7 @@ div(
     :style=`{borderRadius: '10px', overflow: 'hidden',}`
     ).row.full-width.items-start.content-start.b-50
     img(
-      :src="nodeFull.items[0].thumbUrl"
+      :src="nodeFull.items[0].thumbUrl" draggable="false"
       :style=`{borderRadius: '10px', overflow: 'hidden',}`).full-width
     .row.full-width.q-pa-sm
       span.text-white.text-bold {{ nodeFull.name }}

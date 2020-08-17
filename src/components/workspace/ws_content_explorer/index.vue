@@ -1,12 +1,14 @@
 <template lang="pug">
 component(
   v-if="value && content"
-  @close="$emit('close')"
   @compositionAdded="$emit('compositionAdded', $event)"
+  @compositionPicked="$emit('compositionPicked', $event)"
+  @close="$emit('close')"
   @open="$emit('open')"
   :is="component[value.contentType]"
   :content="content"
   :value="value"
+  :mode="mode"
   :options="options")
 </template>
 
@@ -19,7 +21,7 @@ import imageExplorer from './image_explorer'
 export default {
   name: 'wsContentExplorer',
   components: {videoExplorer, imageExplorer},
-  props: ['value', 'options'],
+  props: ['mode', 'value', 'options'],
   data () {
     return {
       content: null,

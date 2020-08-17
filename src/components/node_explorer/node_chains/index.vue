@@ -9,7 +9,7 @@ div(:style=`{position: 'relative'}`).column.fit
     //- chain point
     div(
       :style=`{
-        position: 'absolute', zIndex: 100, left: '1px', top: '8px',
+        position: 'absolute', zIndex: 100, left: '1px', top: '0px',
         width: '40px', height: '40px',
       }`
       ).row.items-center.content-center.justify-center
@@ -20,7 +20,7 @@ div(:style=`{position: 'relative'}`).column.fit
         }`
         ).row.bg-grey-2
     //- chain top label
-    div(:style=`{height: '40px',}`).row.full-width.items-end.content-end
+    div(:style=`{height: '30px',}`).row.full-width.items-end.content-end
       span.text-white.text-bold Причина
     //- chain top node wrapper
     node(v-if="node" ctx="list" :node="node" :needFull="false" :visible="true" :active="false" :mini="false")

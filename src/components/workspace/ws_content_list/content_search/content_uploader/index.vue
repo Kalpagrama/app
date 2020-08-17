@@ -16,9 +16,13 @@ div()
 
 <script>
 import { ContentApi } from 'src/api/content'
+
 // TODO: go to this type of content of change it before upload...
+// prepare video,image,book,web BEFORE UPLOAD TO SERVER
+// set name, description, make adjustments, crop, filter?
+
 export default {
-  name: 'contentFromFile',
+  name: 'wsContentList_contentSearch_contentUploader',
   data () {
     return {
       file: null,

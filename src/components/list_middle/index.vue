@@ -28,7 +28,7 @@ div(
               rootMargin: '-50% 0px'
             }
           }`
-          ).row.full-width
+          ).row.full-width.q-mb-xl
           slot(
             name="item"
             :item="i"

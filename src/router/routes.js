@@ -40,12 +40,12 @@ const routes = [
       {
         name: 'node',
         path: 'node/:oid',
-        redirect: 'node/:oid/chains',
+        // redirect: 'node/:oid',
         component: () => import('pages/app/node'),
-        children: [
-          { name: 'nodes', path: 'nodes', component: () => import('components/node_explorer/node_nodes') },
-          { name: 'chains', path: 'chains', component: () => import('components/node_explorer/node_chains') },
-        ]
+        // children: [
+        //   { name: 'nodes', path: 'nodes', component: () => import('components/node_explorer/node_nodes') },
+        //   { name: 'chains', path: 'chains', component: () => import('components/node_explorer/node_chains') },
+        // ]
       },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/trend') },

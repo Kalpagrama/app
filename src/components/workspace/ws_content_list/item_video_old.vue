@@ -27,8 +27,8 @@ div(
     ).col.full-height
     .row.fit.items-between.content-between.q-pa-sm
       span(:style=`{fontSize: $q.screen.width > 600 ? '14px' : '12px'}`).text-white.text-bold {{ contentName }}
-      .row.full-width
-        small(:style=`{fontSize: $q.screen.width > 600 ? '12px' : '10px'}`).text-grey-5 {{ contentKalpaName }}
+      //- .row.full-width
+      //-   small(:style=`{fontSize: $q.screen.width > 600 ? '12px' : '10px'}`).text-grey-5 {{ contentKalpaName }}
   //- actions
   .row.full-height.items-start.content-start.q-pa-xs
     q-btn(round flat dense color="grey-6" icon="more_vert")

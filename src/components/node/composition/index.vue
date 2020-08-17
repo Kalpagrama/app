@@ -71,6 +71,7 @@ div(:style=`{position: 'relative'}`).row.full-width.items-start.content-start.bg
     :style=`{
       position: 'absolute', zIndex: 100,
       objectFit: 'contain',
+      willChange: 'scroll-position'
     }`
     ).fit
 </template>

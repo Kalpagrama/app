@@ -1,26 +1,25 @@
 <template lang="pug">
-kalpa-layout(
-  title="Home"
-  :style=`{height: $q.screen.height+'px'}` :rightDrawerScroll="true")
-  template(v-slot:header)
-    div(
-      :style=`{
-        maxWidth: '800px',
-        zIndex: 30000,
-        borderRadius: '0 0 10px 10px', overflow: 'hidden'
-      }`
-      ).row.full-width.items-center.content-center.justify-start.b-60.q-pa-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      .col.q-px-sm
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('Home', 'Домашняя страница')}}
-  template(v-slot:drawerRight)
-    menu-right(:style=`{maxWidth: '400px'}`)
-  template(v-slot:page)
+div(:style=`{position: 'relative'}`).column.fit
+  //- navigation
+  q-btn(
+    @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
+    round flat color="white" icon="menu"
+    :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', right: '24px',}`)
+  q-btn(
+    @click="$router.back()"
+    round flat color="white" icon="keyboard_arrow_left"
+    :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', left: '24px',}`)
+  div(:style=`{}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+      .col
+        span.text-white.text-bold.q-mx-md Домашняя
+      q-btn(round flat color="white" icon="menu_open")
+  .col.full-width
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       template(v-slot=`{items,itemsMore}`)
         list-middle(:items="items" :more="itemsMore")
-          template(v-slot:itemFirst)
-            div(:style=`{height: '70px'}`).row.full-width
+          //- template(v-slot:itemFirst)
+          //-   div(:style=`{height: '70px'}`).row.full-width
           template(v-slot:item=`{item, index, indexMiddle}`)
             node(
               ctx="list" layout="PIP"

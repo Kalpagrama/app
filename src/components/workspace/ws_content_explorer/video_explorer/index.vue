@@ -59,7 +59,9 @@ div(
         v-if="storePlayer && storePlayer.loadeddata"
         :is="`page-${pageId}`"
         :content="content"
-        :style=`{ maxWidth: '600px', maxHeight: pageHeight+'px',}`)
+        :mode="mode"
+        :style=`{ maxWidth: '600px', maxHeight: pageHeight+'px',}`
+        @compositionPicked="$emit('compositionPicked', $event), $emit('close')")
   //- footer
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     pages-controller(
@@ -90,6 +92,7 @@ export default {
     sid: {type: String, default () { return 'videoExplorer' }},
     content: {type: Object},
     value: {type: Object},
+    mode: {type: String, default () { return 'standalone' }},
     options: {
       type: Object,
       default () {

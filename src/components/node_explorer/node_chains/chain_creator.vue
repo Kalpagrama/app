@@ -3,7 +3,7 @@ q-btn(
   @click="start()"
   round push color="green" icon="add"
   :style=`{
-    position: 'absolute', zIndex: 500, left: 'calc(50% - 20px)', bottom: '10px',
+    position: 'absolute', zIndex: 500, left: 'calc(50% - 20px)', bottom: '22px',
     borderRadius: '50%',
   }`)
   //- typePicker dialog

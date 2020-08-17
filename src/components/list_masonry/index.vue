@@ -2,14 +2,7 @@
 div(
   :style=`{}`
   ).column.fit.items-center.content-center.justify-center
-  //- tint
-  //- div(
-  //-   v-if="nodeOid"
-  //-   :style=`{
-  //-     position: 'fixed', top: '0px', zIndex: 200, transform: 'translate3d(0,0,0)', background: 'rgba(0,0,0,'+0.9+')',
-  //-     pointerEvents: 'none'
-  //-   }`
-  //-   ).row.fit
+  slot(name="header")
   //- body items
   div(
     ref="scrollWrapper"
@@ -19,7 +12,7 @@ div(
       overflow: scrollOverflow
     }`
     ).col.full-width.scroll
-    //- TODO justify-center/justify-start depends on items count? more that 3 => justify-center else justify-start
+    slot(name="itemFirst")
     masonry(
       :cols="{default: $q.screen.width > 600 ? 2 : 2}"
       :gutter="{default: 10}"
@@ -34,27 +27,10 @@ div(
           position: 'relative'
         }`
         ).row.full-width.items-start.content-start.q-mb-sm
-        //- div(:style=`{position: 'absolute', top: '8px', left: '8px', zIndex: 100}`).row.bg-red
-        //-   small Lorem ipsum !!!
-        //- copy
-        //- img(
-        //-   @click="itemClick(null, null)"
-        //-   :ref="`item-img-${i.oid}`"
-        //-   draggable="false"
-        //-   :src="i.meta.items[0].thumbUrl"
-        //-   :style=`{opacity: 0.1, width: '100%', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`)
-        //- slot
-        //- div(
-        //-   ).row.full-width
-        //- div(
-        //-   :ref="`item-${i.oid}`"
-        //-   :class=`{
-        //-     'shadow-20': i.oid === itemOid
-        //-   }`
-        //-   :style="itemStyles(i.oid)"
-        //-   ).row.fit
-        //-   slot(name="item" :item="i" :index="ii" :isOpened="i.oid === itemOid" :isHovered="i.oid === itemOidHovered")
         slot(name="item" :item="i")
+    slot(name="itemLast")
+  .row.full-width
+    slot(name="footer")
 </template>
 
 <script>

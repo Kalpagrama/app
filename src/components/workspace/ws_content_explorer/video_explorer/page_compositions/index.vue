@@ -65,6 +65,7 @@ div(:style=`{position: 'relative',}`).column.fit
         }`
         @close="compositionEdited").full-height.b-60
   //- compositions selected
+  //- createNode for standalone, pickComposition for picker MODE
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     div(
       v-if="storeExplorer.compositionsSelected.length > 0"
@@ -77,7 +78,13 @@ div(:style=`{position: 'relative',}`).column.fit
       q-btn(round flat color="white" icon="clear" @click="storeExplorer.compositionsSelected = []").q-mr-sm
       q-btn(flat color="red-5" no-caps @click="compositionsSelectedDelete()") {{ $t('delete', 'Удалить') }}
       .col
-      q-btn(color="green" no-caps @click="compositionsSelectedCreateNode()") {{ $t('Create node', 'Создать ядро') }}
+      //- span.text-red {{ mode }}
+      q-btn(
+        v-if="mode === 'standalone'"
+        color="green" no-caps @click="compositionsSelectedCreateNode()") {{ $t('Create node', 'Создать ядро') }}
+      q-btn(
+        v-if="mode === 'picker'"
+        color="green" no-caps @click="compositionsSelectedPick()") {{ $t('pickComposition', 'Выбрать образ') }}
 </template>
 
 <script>
@@ -87,7 +94,18 @@ import compositionItem from './composition_item'
 export default {
   name: 'pageCompositions',
   components: {compositionItem},
-  props: ['content'],
+  props: {
+    mode: {
+      type: String,
+      default () {
+        return 'standalone' // standalone, picker, etc
+      }
+    },
+    content: {
+      type: Object,
+      required: true
+    }
+  },
   inject: ['sidPlayer', 'sidExplorer'],
   data () {
     return {
@@ -165,6 +183,18 @@ export default {
       this.$log('compositionDrop')
       this.storeExplorer.compositionSelected = null
       this.storeExplorer.compositionEditing = null
+    },
+    async compositionsSelectedPick () {
+      this.$log('compositionsSelectedPick')
+      if (this.storeExplorer.compositionsSelected.length > 1) {
+        this.$q.notify({type: 'negative', message: 'You can pick only one clip!'})
+        return
+      }
+      let id = this.storeExplorer.compositionsSelected[0]
+      let {items: [composition]} = await this.$rxdb.find({selector: { rxCollectionEnum: RxCollectionEnum.WS_CONTENT, id: id }})
+      if (composition) {
+        this.$emit('compositionPicked', composition)
+      }
     },
     async compositionsSelectedCreateNode () {
       this.$log('compositionsSelectedCreateNode')

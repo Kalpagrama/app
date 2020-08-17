@@ -5,15 +5,23 @@ div(
     height: $q.screen.height+'px',
   }`
   ).column.full-width
+  q-btn(
+    @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
+    round flat color="white" icon="menu"
+    :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', right: '24px',}`)
+  q-btn(
+    @click="$router.back()"
+    round flat color="white" icon="keyboard_arrow_left"
+    :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', left: '24px',}`)
   //- header: navigation back, and tabs
   div(:style=`{}`).row.full-width.justify-center
     div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
-      q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mx-xs
-      span.text-white.text-bold {{$t('nodeExplorer_title', 'Ядро')}}
+      //- q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$router.back()")
+      span.text-white.text-bold.q-mx-md {{$t('nodeExplorer_title', 'Ядро')}}
       .col
         .row.fit.justify-end
           q-tabs(
-            :value="$route.name" @input="$router.push('/node/'+node.oid+'/'+$event)"
+            v-model="tab"
             dense active-color="green" switch-indicator
             no-caps align="right" :breakpoint="300"
             ).text-white
@@ -21,7 +29,7 @@ div(
             q-tab(name="chains" :label="$t('nodeExplorer_nodeChains', 'Связи')")
   //- body
   q-tab-panels(
-    :value="$route.name" @input="$router.push('/node/'+node.oid+'/'+$event)"
+    v-model="tab"
     swipeable infinite animated :style=`{background: 'none !important'}`).col.full-width
     q-tab-panel(name="nodes" :style=`{padding: 0, margin: 0, background: 'none !important'}`).row.fit.justify-center
       node-nodes(v-if="node" :node="node" :style=`{maxWidth: '800px'}`)
@@ -45,6 +53,7 @@ export default {
       nodeVisible: true,
       nodeMini: false,
       showMenuRight: false,
+      tab: 'nodes'
     }
   },
   computed: {

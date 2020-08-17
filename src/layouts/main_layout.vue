@@ -36,11 +36,11 @@ q-layout(
   @resize="onResize").bg-30
   q-drawer(
     behavior="mobile"
-    side="left" :value="$store.state.ui.appShowMenu" @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
+    side="right" :value="$store.state.ui.appShowMenu" @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
       v-if="!loading"
       :style=`{
-        borderRadius: '0 10px 10px 0'
+        borderRadius: '10px 0 0 10px'
       }`).full-height
   q-page-container
     q-page(:style=`{height: $q.screen.height+'px'}`)
