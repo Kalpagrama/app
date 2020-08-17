@@ -114,9 +114,11 @@ export default {
     return {
       width: 300,
       pages: [
-        {id: 'home', name: i18n.t('pageFeed', 'Лента'), icon: 'home'},
+        {id: 'home', name: i18n.t('pageApp_home_title', 'Домашняя'), icon: 'home'},
         {id: 'trends', name: i18n.t('pageTop', 'Топ'), icon: 'whatshot'},
         {id: 'workspace', name: i18n.t('pageWorkspace', 'Мастерская'), icon: 'school'},
+        {id: 'subscriptions', name: i18n.t('pageSubscriptions_title', 'Подписки'), icon: 'waves'},
+        {id: 'notifications', name: i18n.t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
         {id: 'settings', name: i18n.t('pageSettings', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,

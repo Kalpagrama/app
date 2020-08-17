@@ -16,8 +16,8 @@ div(:style=`{position: 'relative'}`).column.fit
     //- navigation
     div(
       v-if="mode === 'standalone'"
-      :style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
+      :style=`{height: 'auto',}`).row.full-width.items-center.content-center.q-px-md.q-py-xs
+      //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
       span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('content', 'Контент')}}
     content-search(
       @searchString="searchString = $event"

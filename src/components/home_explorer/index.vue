@@ -9,11 +9,16 @@ div(:style=`{position: 'relative'}`).column.fit
     @click="$router.back()"
     round flat color="white" icon="keyboard_arrow_left"
     :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', left: '24px',}`)
-  div(:style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
-      .col
-        span.text-white.text-bold.q-mx-md Домашняя
-      q-btn(round flat color="white" icon="menu_open")
+  //- header
+  //- header
+  div(:style=`{position: 'absolute', zIndex: 10000, top: '0px',}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.justify-between.b-60
+      .row.full-width.items-center.content-center.q-px-md.q-py-sm
+        .col
+          q-icon(name="home" color="white" size="25px").q-mb-xs
+          span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-md Домашняя
+        q-btn(round flat color="white" icon="settings")
+  //- body
   .col.full-width
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       template(v-slot=`{items,itemsMore}`)

@@ -78,6 +78,8 @@ const routes = [
           { name: 'ws-settings', path: 'settings', component: () => import('components/workspace/ws_settings') },
         ]
       },
+      { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
+      { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
     ]
   }
 ]

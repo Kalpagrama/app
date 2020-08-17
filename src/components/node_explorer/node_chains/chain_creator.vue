@@ -29,7 +29,9 @@ q-btn(
       @item="itemPicked"
       @close="itemPickerOpened = false"
       :title="wsItemPickerTitle"
-      :types="{node: {types: ['saved', 'published']}}"
+      :options=`{
+        node: {typesAll: false, types: ['saved', 'published']}
+      }`
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',

@@ -9,8 +9,9 @@ div(
   }`
   ).column.full-width.b-50
   //- header
-  div(:style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-md
-    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold {{$t('Trends', 'Тренды')}}
+  div(:style=`{height: 'auto',}`).row.full-width.items-center.content-center.q-px-sm.q-py-md
+    q-icon(name="whatshot" color="white" size="30px").q-mr-sm
+    span(:style=`{fontSize: '20px', userSelect: 'none'}`).text-white.text-bold Горячие сферы сути
   //- body
   .col.full-width.scroll
     sphere-list-top(:oid="$route.params.oid" @oid="$router.push({params: {oid: $event}})")

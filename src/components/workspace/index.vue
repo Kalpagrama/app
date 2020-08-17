@@ -1,12 +1,50 @@
 <template lang="pug">
-kalpa-layout(
-  :title="$t('Workspace', 'Мастерская')"
-  @pageId="$router.push({name: $event})"
-  :pages="pages" :pagesHot="pagesHot" :pageId="$route.name"
-  :style=`{height: $q.screen.height+'px'}`)
-  template(v-slot:drawerRight)
-    menu-right(:style=`{maxWidth: '250px',}`).b-50
-  template(v-slot:page)
+//- kalpa-layout(
+//-   :title="$t('Workspace', 'Мастерская')"
+//-   @pageId="$router.push({name: $event})"
+//-   :pages="pages" :pagesHot="pagesHot" :pageId="$route.name"
+//-   :style=`{height: $q.screen.height+'px'}`)
+//-   template(v-slot:drawerRight)
+//-     menu-right(:style=`{maxWidth: '250px',}`).b-50
+//-   template(v-slot:page)
+//-     router-view(
+//-       v-if="showView"
+//-       @close="$router.back()"
+//-       ctx="workspace"
+//-       :value="item"
+//-       :options="{ctx: 'explorer'}"
+//-       :style=`{maxWidth: '800px',}`).full-height
+div(:style=`{position: 'relative', height: $q.screen.height+'px',}`).column.full-width
+  //- navigation
+  q-btn(
+    @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
+    round flat color="white" icon="menu"
+    :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', right: '24px',}`)
+  q-btn(
+    @click="$router.back()"
+    round flat color="white" icon="keyboard_arrow_left"
+    :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', left: '24px',}`)
+  //- type picker
+  q-btn(
+    @click="typePicking = true"
+    no-caps color="green" icon-right="keyboard_arrow_down"
+    :style=`{
+      position: 'absolute', zIndex: 1000, bottom: '24px',
+      left: '50%',
+      marginRight: '-50%',
+      transform: 'translate(-50%, 0)',
+    }`
+    ).q-px-sm Контент
+    q-menu(cover anchor="bottom middle" max-width="200px")
+      div(v-if="typePicking").row.b-80
+        .row.full-width.items-center.content-center.justify-center.q-pa-md
+          span(:style=`{fontSize: '20px'}`).text-white.text-bold {{ $t('pageApp_workspace_title', 'Мастерская') }}
+        router-link(
+          v-for="p in pages" :key="p.id" :to="'/workspace/'+p.path"
+          ).row.full-width.items-center.content-center.justify-center.q-pa-md
+          span.text-white.text-bold {{ p.name }}
+  //- body
+  .col.full-width
     router-view(
       v-if="showView"
       @close="$router.back()"
@@ -30,6 +68,7 @@ export default {
   data () {
     return {
       item: null,
+      typePicking: false,
     }
   },
   provide () {
@@ -40,12 +79,12 @@ export default {
   computed: {
     pages () {
       return [
-        {id: 'content-list', name: this.$t('Content', 'Контент')},
-        {id: 'composition-list', name: this.$t('Compositions', 'Образы')},
-        {id: 'node-list', name: this.$t('Nodes', 'Ядра')},
-        {id: 'chain-list', name: this.$t('Chains', 'Цепочки')},
+        {id: 'content-list', path: 'content', name: this.$t('Content', 'Контент')},
+        {id: 'composition-list', path: 'composition', name: this.$t('Compositions', 'Образы')},
+        {id: 'node-list', path: 'node', name: this.$t('Nodes', 'Ядра')},
+        {id: 'chain-list', path: 'chain', name: this.$t('Chains', 'Цепочки')},
         // {id: 'sphere', name: this.$t('Spheres', 'Сферы')},
-        {id: 'ws-settings', name: this.$t('Settings', 'Настройки')}
+        {id: 'ws-settings', path: 'settings', name: this.$t('Settings', 'Настройки')}
       ]
     },
     pagesHot () {
