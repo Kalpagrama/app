@@ -66,12 +66,12 @@ div(
             'b-100': $route.path.split('/')[1] === p.id
           }`
           :style=`{
-            height: $q.screen.width > 320 ? '60px' : '40px',
+            height: $q.screen.width > 600 ? '60px' : '40px',
             borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
           }`
           ).row.full-width.items-center.menu-item
-          div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
-            q-btn(round dense flat :icon="p.icon" color="white")
+          div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
+            q-icon(size="22px" :name="p.icon" color="white")
           span(:style=`{fontSize: '18px'}`).text-white {{ p.name }}
         //- refresh
         div(

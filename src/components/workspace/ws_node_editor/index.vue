@@ -57,7 +57,7 @@ div(
         :style=`{maxWidth: '600px'}`).row.full-width.items-start.content-start.q-px-sm
         //- node wrapper
         //- TODO: add after compare done...
-        edit-layout(:node="node")
+        //- edit-layout(:node="node")
         div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-70.q-mb-sm
           component(
             :is="component[node.layout]"

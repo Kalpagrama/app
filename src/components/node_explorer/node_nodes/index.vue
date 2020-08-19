@@ -49,10 +49,14 @@ div(:style=`{position: 'relative'}`).column.fit
               template(v-slot:item=`{item}`)
                 div(
                   @click="nodeClick(item)"
-                  ).row.full-width.item-start.content-start
+                  :style=`{borderRadius: '10px', overflow: 'hidden',}`
+                  ).row.full-width.items-start.content-start.b-50
                   img(
                     :src="item.meta.items[0].thumbUrl" draggable="false"
                     :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
+                  //- node name if there is not the same...
+                  div(v-if="item.name !== node.name").row.full-width.q-px-sm.q-py-xs
+                    small.text-white {{ item.name }}
               template(v-slot:itemLast)
                 div(:style=`{height: '400px'}`).row.full-width
           //- no items

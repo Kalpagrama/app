@@ -1,4 +1,6 @@
 <style lang="sass">
+html, body
+  overflow: hidden
 .q-menu
   border-radius: 10px !important
   background: none !important
@@ -71,7 +73,7 @@ q-layout(
       div(
         v-else
         ).row.full-width.window-height.items-center.content-center.justify-center
-        q-spinner(color="green" size="100px" :thickness="2")
+        q-spinner(color="green" size="100px" :thickness="4")
 </template>
 
 <script>
