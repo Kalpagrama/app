@@ -5,7 +5,7 @@ div(
     borderRadius: '10px', overflow: 'hidden',
     cursor: 'pointer',
   }`
-  ).row.full-width.q-mb-sm.b-60
+  ).row.full-width.q-mb-sm.b-50
   img(
     :src="content.thumbOid"
     draggable="false"

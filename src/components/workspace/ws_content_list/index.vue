@@ -12,18 +12,15 @@ div(:style=`{position: 'relative'}`).column.fit
       :options=`{}`
       :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px',}`).b-50
   //- header
-  .row.full-width.items-center.content-center
-    //- navigation
-    div(
-      v-if="mode === 'standalone'"
-      :style=`{height: 'auto',}`).row.full-width.items-center.content-center.q-px-md.q-py-xs
-      //- q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('content', 'Контент')}}
+  div(:style=`{}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md.br
+        span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsContentList_title', 'Контент')}}
     content-search(
-      @searchString="searchString = $event"
-      )
+      @content="contentPicked"
+      @searchString="searchString = $event")
     //- content type picker
-    .row.full-width.justify-start
+    .row.full-width.justify-start.q-px-md
       q-tabs(v-model="type" no-caps dense active-color="green" align="left").text-white
         q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   //- body
@@ -31,13 +28,12 @@ div(:style=`{position: 'relative'}`).column.fit
     .row.fit.items-start.content-start.justify-center
       kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
         template(v-slot=`{items, itemsMore}`)
-          //- div(v-if="items.length > 0" :style=`{maxWidth: '800px', paddingBottom: '400px',}`).row.full-width.q-px-sm
           list-masonry(
             v-if="type === 'IMAGE'" :items="items")
             template(v-slot:item=`{item}`)
               content-item(:content="item" @pick="contentPicked(item)")
           div(
-            v-else).row.full-width.q-pt-md
+            v-else).row.full-width.q-pa-sm
             content-item(
               v-for="(c,ci) in items" :key="c.id" :content="c"
               @pick="contentPicked(c)")

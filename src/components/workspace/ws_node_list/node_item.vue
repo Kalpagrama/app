@@ -6,7 +6,7 @@
 </style>
 
 <template lang="pug">
-.col-xs-12.col-sm-6.q-pa-sm
+.col-xs-12.col-sm-6.q-pb-sm
   div(
     @click.self="onClick()"
     :style=`{

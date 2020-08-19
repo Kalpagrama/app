@@ -1,23 +1,14 @@
 <template lang="pug">
-div(
-  :class=`{
-    'full-height': !inDialog,
-    'q-pt-sm': $q.screen.gt.xs,
-  }`
-  :style=`{
-    position: 'relative'
-  }`
-  ).column.fit
+div(:style=`{position: 'relative'}`).column.fit
   //- chain add
   q-btn(
     @click="chainAdd()"
     round push color="green" icon="add"
     :size="$q.screen.xs ? 'md' : 'lg'"
     :style=`{
-      position: 'absolute', zIndex: 2000,
-      bottom: '10px',
-      right: '10px',
-      borderRadius: '50%',
+      position: 'absolute', zIndex: 1000, bottom: 70+'px',
+      left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',
+      borderRadius: '50%'
     }`)
   //- chain editor
   q-dialog(
@@ -33,34 +24,31 @@ div(
         maxWidth: $store.state.ui.maxWidthPage+'px',
       }`)
   //- header
-  div(
-    :style=`{
-      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
-      overflow: 'hidden',
-    }`
-    ).row.full-width.items-start.content-start.b-50.q-pb-sm.q-px-sm
-    //- slot(name="header")
-    //- navigation
-    div(:style=`{height: '100px',}`).row.full-width.items-center.content-center
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Chains', 'Цепочки')}}
+  div(:style=`{}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
+        span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsChainList_title', 'Цепочки')}}
     //- search
-    div(v-if="true").row.full-width
+    .row.full-width.q-pa-sm
       q-input(
         v-model="searchString"
         filled dense dark color="white"
-        :label="$t('Search...', 'Поиск...')"
+        :label="$t('wsChainList_searchPlaceholder', 'Найти цепочку')"
         ).full-width
+        template(v-slot:append)
+          q-btn(
+            v-if="searchString.length > 0"
+            flat dense color="white" icon="clear" @click="searchString = ''")
+          q-btn(
+            flat dense color="white" icon="filter_list")
   //- body
   .col.full-width.scroll
-    .row.full-width.items-start.content-start.q-py-md.q-px-sm
+    .row.full-width.items-start.content-start.q-px-sm
       div(
         v-for="c in 3" :key="c"
         @click="chainClick(c)"
         :style=`{height: '100px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
-        ).row.full-width.b-50.q-mb-md
-  //- footer
-  div.row.full-width
+        ).row.full-width.b-50.q-mb-sm
 </template>
 
 <script>

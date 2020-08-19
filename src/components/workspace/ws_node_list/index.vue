@@ -1,21 +1,14 @@
 <template lang="pug">
-div(
-  :class=`{
-    'q-pt-sm': $q.screen.gt.xs,
-  }`
-  :style=`{
-    position: 'relative'
-  }`
-  ).column.fit
+div(:style=`{position: 'relative'}`).column.fit
   //- node ADD
   q-btn(
     v-if="mode === 'standalone'"
     @click="nodeAddBtn()"
     push round color="green" icon="add"
-    :size="$q.screen.gt.xs ? 'xl' : 'lg'"
+    :size="$q.screen.xs ? 'md' : 'lg'"
     :style=`{
-      position: 'absolute', zIndex: 1000, right: '10px',
-      bottom: $q.screen.width > 1260 ? 10+'px' : 60+10+'px',
+      position: 'absolute', zIndex: 1000, bottom: 70+'px',
+      left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',
       borderRadius: '50%'
     }`)
   //- node EDITOR
@@ -33,47 +26,17 @@ div(
         maxHeight: $q.screen.height+'px',
         height: $q.screen.height+'px',
       }`)
-  //- node PREVIEW: for saved or published nodes...
-  q-dialog(
-    v-if="mode === 'standalone'"
-    v-model="nodePreviewOpened" position="bottom")
-    div(
-      :style=`{
-        height: $q.screen.height+'px',
-        minHeight: $q.screen.height+'px',
-        maxWidth: '800px',
-        borderRadius: '10px',overflow: 'hidden',
-      }`).column.b-50
-      //- body
-      .col.full-width
-        node(:node="nodePreviewItem" :nodeFullReady="nodePreviewItem" :active="true" :visible="true" :mini="false")
-      //- footer
-      .row.full-width.items-center.content-center.q-pa-sm
-        q-btn(
-          round flat color="white" icon="keyboard_arrow_left" @click="nodePreviewOpened = false")
-        .col.q-pl-sm
-          q-btn(
-            @click="nodeFork(nodeEditorItem)"
-            push color="green" no-caps icon="photo_filter"
-            :style=`{height: '42px',}`).full-width {{$t('node_fork', 'Взять и изменить')}}
   //- header
-  div(
-    :style=`{
-      borderRadius: $q.screen.gt.xs ? '10px' : '0 0 10px 10px',
-    }`
-    ).row.full-width.items-start.content-start
-    //- navigation
-    div(
-      v-if="mode === 'standalone'"
-      :style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('ws_nodes', 'Ядра')}}
+  div(:style=`{}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
+        span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsNodeList_title', 'Ядра')}}
     //- search
-    div().row.full-width.q-px-sm
+    div().row.full-width.q-pa-sm
       q-input(
         v-model="searchString"
         filled dark dense color="white"
-        :placeholder="$t('search_placeholder', 'Поиск')"
+        :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
         ).full-width
         template(v-slot:append)
           q-btn(
@@ -81,17 +44,15 @@ div(
             flat dense color="white" icon="clear" @click="searchString = ''")
           q-btn(
             flat dense color="white" icon="filter_list")
-    //- actions
-    div(:style=`{}`).row.full-width.items-end.content-end.q-px-md
-      //- .row.no-wrap
-        //- kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start.q-mr-sm
+    //- node.stage picker
+    .row.full-width.items-end.content-end.q-px-md
       q-tabs(dense v-model="type" no-caps active-color="green" switch-indicator).full-width.text-white
-        q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name" dense)
+        q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
   //- body
   .col.full-width.scroll
     kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
-      template(v-slot=`{items}`)
-        .row.fit.items-start.content-start
+      template(v-slot=`{items, itemsMore}`)
+        .row.fit.items-start.content-start.q-px-sm
           node-item(
             v-for="(i,ii) in items" :key="i"
             :node="i" :nodeIndex="ii"
@@ -172,10 +133,15 @@ export default {
     async nodePreview (n) {
       this.$log('nodePreview', n)
       if (this.mode === 'standalone') {
-        if (n.stage === 'draft') return
-        this.nodeEditorItem = n
-        this.nodePreviewItem = await this.$rxdb.get(RxCollectionEnum.OBJ, n.oid)
-        this.nodePreviewOpened = true
+        if (n.stage === 'draft') {
+          this.$q.notify({type: 'negative', message: 'Publish draft to explore!'})
+          return
+        }
+        if (!n.oid) {
+          this.$q.notify({type: 'negative', message: 'No node OID !'})
+          return
+        }
+        this.$router.push('/node/' + n.oid).catch(e => e)
       }
       else if (this.mode === 'picker') {
         this.$emit('node', JSON.parse(JSON.stringify(n)))

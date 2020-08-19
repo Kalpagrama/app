@@ -1,5 +1,5 @@
 <template lang="pug">
-.row.full-width.q-px-sm
+.row.full-width.q-pa-sm
   .col.q-pr-xs
     q-input(
       v-model="searchStringRaw"
@@ -49,11 +49,17 @@ export default {
           await this.$wait(2000)
           this.$q.loading.hide()
           this.searchStringLoading = false
-          this.contentPicked(await this.contentAdd(await this.contentFromURL(to)))
+          this.$emit('content', await this.contentAdd(await this.contentFromURL(to)))
         }
         else {
           this.searchString = to
         }
+      }
+    },
+    searchString: {
+      handler (to, from) {
+        this.$log('searchString TO', to)
+        this.$emit('searchString', to)
       }
     }
   },

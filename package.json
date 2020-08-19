@@ -1,8 +1,8 @@
 {
-  "name": "kalpagramma",
+  "name": "kalpa",
   "version": "3.0.13",
-  "description": "Kalpagramma application",
-  "productName": "Kalpagramma",
+  "description": "Kalpa",
+  "productName": "Kalpa",
   "cordovaId": "app.kalpa",
   "capacitorId": "app.kalpa",
   "author": "kalpagramma <info@kalpagramma.ru>",

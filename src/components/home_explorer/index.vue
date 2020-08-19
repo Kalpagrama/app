@@ -1,30 +1,23 @@
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
-  //- navigation
-  q-btn(
-    @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
-    round flat color="white" icon="menu"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', right: '24px',}`)
-  q-btn(
-    @click="$router.back()"
-    round flat color="white" icon="keyboard_arrow_left"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '24px', left: '24px',}`)
-  //- header
   //- header
   div(:style=`{position: 'absolute', zIndex: 10000, top: '0px',}`).row.full-width.justify-center
     div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.justify-between.b-60
       .row.full-width.items-center.content-center.q-px-md.q-py-sm
         .col
           q-icon(name="home" color="white" size="25px").q-mb-xs
-          span(:style=`{fontSize: '18px',}`).text-white.text-bold.q-mx-md Домашняя
-        q-btn(round flat color="white" icon="settings")
+          span(:style=`{fontSize: '19px',}`).text-white.text-bold.q-mx-md {{ $t('pageApp_home_title', 'Домашняя') }}
+        //- go to page subscriptions to configure them
+        q-btn(
+          @click="$router.push('/subscriptions').catch(e => e)"
+          round flat color="white" icon="settings")
   //- body
   .col.full-width
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       template(v-slot=`{items,itemsMore}`)
         list-middle(:items="items" :more="itemsMore")
-          //- template(v-slot:itemFirst)
-          //-   div(:style=`{height: '70px'}`).row.full-width
+          template(v-slot:itemFirst)
+            div(:style=`{height: '70px'}`).row.full-width
           template(v-slot:item=`{item, index, indexMiddle}`)
             node(
               ctx="list" layout="PIP"
@@ -38,12 +31,10 @@ div(:style=`{position: 'relative'}`).column.fit
 </template>
 
 <script>
-import menuRight from './menu_right'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'homeExplorer',
-  components: {menuRight},
   data () {
     return {
     }

@@ -7,16 +7,16 @@
 
 <template lang="pug">
 div(
-  @click="sphereClick"
+  @click="sphereClick()"
   :style=`{
     position: 'relative',
     borderRadius: $store.state.ui.borderRadius+'px',
     overflow: 'hidden',
   }`
-  ).row.items-center.content-center.justify-center.q-pa-sm.b-60.sphere
+  ).row.items-center.content-center.justify-center.q-pa-sm.b-50.sphere
   span(
     :style=`{userSelect: 'none'}`
-    ).text-white {{ '❉ '+sphere.name }}
+    ).text-white {{ sphere.name }}
 </template>
 
 <script>

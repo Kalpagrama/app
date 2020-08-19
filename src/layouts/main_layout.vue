@@ -1,7 +1,7 @@
 <style lang="sass">
 .q-menu
   border-radius: 10px !important
-  // background: none !important
+  background: none !important
 .q-drawer
   z-index: 100000
   // border-radius: 10px 10px 0 0 !important
@@ -35,36 +35,43 @@ q-layout(
   container :style=`{height: $q.screen.height+'px',}`
   @resize="onResize").bg-30
   q-drawer(
-    behavior="mobile"
-    side="right" :value="$store.state.ui.appShowMenu" @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
+    behavior="mobile" side="left"
+    :value="$store.state.ui.appShowMenu"
+    @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(
       v-if="!loading"
       :style=`{
-        borderRadius: '10px 0 0 10px'
+        borderRadius: '0 10px 10px 0'
       }`).full-height
   q-page-container
-    q-page(:style=`{height: $q.screen.height+'px'}`)
+    q-page(:style=`{position: 'relative', height: $q.screen.height+'px'}`).row.justify-center
+      //- left panel menu
       div(
-        :class=`{
-          'q-pt-sm': false
-        }`
-        :style=`{}`).row.fit.justify-center
-          //- div(:style=`{position: 'relative', maxWidth: maxWidth+'px'}`).col.full-height
-          //- left panel menu
-          div(
-            v-if="$q.screen.width > 1260"
-            @wheel="onWheel"
-            :style=`{
-              position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
-              pointerEvents: pointerEvents,
-            }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
-            kalpa-menu(v-if="!loading && $route.name !== 'welcome'" :style=`{maxWidth: '300px'}`)
-          router-view(
-            v-if="!loading")
-          div(
-            v-else
-            ).row.full-width.window-height.items-center.content-center.justify-center
-            q-spinner(color="green" size="50px")
+        v-if="$q.screen.width > 1260"
+        @wheel="onWheel"
+        :style=`{
+          position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
+          pointerEvents: pointerEvents,
+        }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
+        kalpa-menu(v-if="!loading && $route.name !== 'welcome'" :style=`{maxWidth: '300px'}`)
+      //- navigation mobile: where/when to show it?
+      q-btn(
+        @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
+        round flat color="white"
+        :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'"
+        :style=`{position: 'fixed', zIndex: 1000, bottom: '12px', right: '12px', transform: 'translate3d(0,0,0)',}`)
+      q-btn(
+        @click="$router.back()"
+        round flat color="white"
+        icon="keyboard_arrow_left"
+        :style=`{position: 'fixed', zIndex: 1000, bottom: '12px', left: '12px', transform: 'translate3d(0,0,0)',}`)
+      router-view(
+        v-if="!loading")
+      //- loading state: spinner... if not a robot here... and not an iframe
+      div(
+        v-else
+        ).row.full-width.window-height.items-center.content-center.justify-center
+        q-spinner(color="green" size="100px" :thickness="2")
 </template>
 
 <script>
@@ -86,7 +93,7 @@ export default {
     }
   },
   meta: {
-    title: 'Kalpagrama'
+    title: 'Kalpa'
   },
   watch: {
     '$store.state.ui.appFullscreen': {

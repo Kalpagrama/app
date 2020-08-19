@@ -1,30 +1,16 @@
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-  }`
-  ).column.full-width
+div(:style=`{position: 'relative'}`).column.fit
   //- header
-  div(
-    :style=`{
-      borderRadius: $q.screen.xs ? '0 0 10px 10px' : '10px',
-      overflow: 'hidden',
-    }`
-    ).row.full-width.items-start.content-start.b-50.q-px-sm.q-pb-sm.q-mb-sm
-    slot(name="header")
-    //- navigation
-    div(
-      v-if="!$slots.header").row.full-width.items-center.content-center.q-py-md
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('Spheres', 'Сферы')}}
+  div(:style=`{}`).row.full-width.justify-center
+    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
+        span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsSphereList_title', 'Сферы')}}
     //- search
-    div(
-      v-if="showSearch"
-      ).row.full-width
+    .row.full-width.q-pa-sm
       q-input(
         v-model="searchString"
-        filled dense dark color="grey-6"
-        :label="$t('Find or create sphere', 'Найди или создай сферу')"
+        filled dense dark color="white"
+        :label="$t('wsSphereList_searchPlaceholder', 'Найди или создай сферу')"
         @focus="searchStringFocused"
         @blur="searchStringBlurred"
         @keyup.enter="searchStringEnter()").full-width
@@ -42,7 +28,7 @@ div(
               v-if="searchString.length > 0"
               color="green" push no-caps @click="sphereCreate()"
               :style=`{minHeight: '50px'}`) {{$t('Create sphere', 'Создать сферу')}} "{{ searchString }}"
-          div(v-if="showItems && items.length > 0").row.full-width.q-py-sm
+          div(v-if="showItems && items.length > 0").row.full-width
             ws-sphere(
               v-for="(s, si) in items" :key="s.id"
               @sphereClick="searchString = '', $emit('sphereClick', s)"

@@ -2,9 +2,8 @@
 div()
   q-btn(
     @click="start()"
-    flat color="grey-2" icon="attach_file"
+    round flat color="grey-2" icon="attach_file"
     :style=`{
-      width: '40px',
     }`).full-height
   input(
     ref="inputFile" type="file"
