@@ -13,15 +13,17 @@ div(:style=`{position: 'relative'}`).column.fit
       :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px',}`).b-50
   //- header
   div(:style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
-      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md.br
+    div(
+      v-if="mode === 'standalone'"
+      :style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
         span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsContentList_title', 'Контент')}}
     content-search(
       @content="contentPicked"
       @searchString="searchString = $event")
     //- content type picker
     .row.full-width.justify-start.q-px-md
-      q-tabs(v-model="type" no-caps dense active-color="green" align="left").text-white
+      q-tabs(v-model="type" no-caps dense active-color="green" align="left").text-grey-4
         q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   //- body
   .col.full-width.scroll
@@ -33,7 +35,7 @@ div(:style=`{position: 'relative'}`).column.fit
             template(v-slot:item=`{item}`)
               content-item(:content="item" @pick="contentPicked(item)")
           div(
-            v-else).row.full-width.q-pa-sm
+            v-else).row.full-width.q-px-sm
             content-item(
               v-for="(c,ci) in items" :key="c.id" :content="c"
               @pick="contentPicked(c)")

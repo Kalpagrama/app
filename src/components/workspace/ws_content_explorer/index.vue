@@ -35,7 +35,6 @@ export default {
   },
   async mounted () {
     this.$log('mounted')
-    this.$log('value', this.value)
     this.content = await this.$rxdb.get(RxCollectionEnum.OBJ, this.value.contentOid)
   }
 }

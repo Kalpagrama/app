@@ -6,10 +6,15 @@ div(
     overflow: 'hidden',
   }`
   ).column.full-width.b-30
+  //- close btn
+  q-btn(
+    @click="$emit('close')"
+    round flat color="white" icon="keyboard_arrow_left"
+    :style=`{position: 'absolute', zIndex: 1000, bottom: '12px', left: '12px', transform: 'translate3d(0,0,0)',}`)
   //- header: navigation
-  .row.full-width.items-center.content-center.q-pa-xs
-    q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")
-    span.text-white.text-bold {{ title }}
+  .row.full-width.items-center.content-center.q-px-md.q-pb-sm.q-pt-md
+    //- q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$emit('close')")
+    span(:style=`{fontSize: '19px'}`).text-white.text-bold {{ title }}
   //- body
   .col.full-width
     q-tab-panels(
@@ -73,11 +78,11 @@ export default {
   computed: {
     tabs () {
       return [
-        {id: 'sphere', name: this.$t('wsItemPicker_sphereList', 'Сферы'), component: 'ws-sphere-list'},
-        {id: 'content', name: this.$t('wsItemPicker_contentList', 'Контент'), component: 'ws-content-list'},
-        {id: 'composition', name: this.$t('wsItemPicker_compositionList', 'Образы'), component: 'ws-composition-list'},
+        // {id: 'composition', name: this.$t('wsItemPicker_compositionList', 'Образы'), component: 'ws-composition-list'},
         {id: 'node', name: this.$t('wsItemPicker_nodeList', 'Ядра'), component: 'ws-node-list'},
+        {id: 'content', name: this.$t('wsItemPicker_contentList', 'Контент'), component: 'ws-content-list'},
         {id: 'chain', name: this.$t('wsItemPicker_chainList', 'Цепочки'), component: 'ws-chain-list'},
+        {id: 'sphere', name: this.$t('wsItemPicker_sphereList', 'Сферы'), component: 'ws-sphere-list'},
       ]
     },
     tabsFiltered () {

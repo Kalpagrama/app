@@ -23,8 +23,9 @@ div(:style=`{position: 'relative'}`).column.fit
         menu-right(:style=`{minHeight: '500px',}`)
   //- header
   div(:style=`{position: 'absolute', zIndex: 10000, top: '0px',}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.justify-between.b-60
-      .row.full-width.items-center.content-center.q-px-md.q-py-sm
+    div(:style=`{height: '60px', maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.justify-between.b-60
+      .row.full-width.items-center.content-center.q-px-sm
         q-icon(name="whatshot" color="white" size="30px").q-mr-sm
         span(:style=`{fontSize: '20px',}`).text-bold.text-white {{ category.alias }}
   //- body

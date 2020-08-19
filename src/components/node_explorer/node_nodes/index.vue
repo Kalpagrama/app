@@ -1,19 +1,14 @@
 <template lang="pug">
-div(
-  ref="nodeExplorerNodeNodes"
-  :style=`{position: 'relative'}`).column.fit
-  //- clip add start, open item picker to find composition in workspace
+div(:style=`{position: 'relative'}`).column.fit
+  //- node add start, open item picker to find composition in workspace
   q-btn(
     @click="itemPickerOpened = true"
-    push color="green" no-caps
+    color="green" no-caps
     :style=`{
-      position: 'fixed', zIndex: 5555,
-      bottom: '20px',
-      left: 'calc(50% - 100px)',
-      height: '50px',
-      width: '200px',
+      position: 'fixed', zIndex: 5555, bottom: '14px',
+      left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',
     }`)
-    span.text-white.text-bold {{ $t('nodeExplorer_nodeNodes_addClip', 'Добавить образ') }}
+    span.text-white.text-bold {{ $t('nodeExplorer_nodeNodes_addNodeSame', 'Добавить похожее ядро') }}
   //- ws item picker
   q-dialog(
     v-model="itemPickerOpened" position="bottom"
@@ -23,14 +18,13 @@ div(
       @close="itemPickerOpened = false"
       :title="itemPickerTitle"
       :options=`{
-        composition: {typesAll: true, types: []},
+        node: {typesAll: true, types: []},
         content: {typesAll: true, types: [], needComposition: true}
       }`
       :style=`{
         height: $q.screen.height+'px',
         minHeight: $q.screen.height+'px',
       }`)
-  //- node
   //- body
   .col.full-width
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
@@ -102,7 +96,7 @@ export default {
       }
     },
     itemPickerTitle () {
-      return 'Найди образ в мастерской'
+      return 'Поиск ядра'
     }
   },
   watch: {

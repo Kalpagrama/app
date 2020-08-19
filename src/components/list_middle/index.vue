@@ -20,6 +20,7 @@ div(
           :ref="`item-${i.oid}`"
           :style=`{
             position: 'relative',
+            marginBottom: options.itemMarginBottom+'px',
           }`
           v-observe-visibility=`{
             callback: indexMiddleHandler,
@@ -28,7 +29,7 @@ div(
               rootMargin: '-50% 0px'
             }
           }`
-          ).row.full-width.q-mb-xl
+          ).row.full-width
           slot(
             name="item"
             :item="i"
@@ -61,8 +62,9 @@ export default {
       type: Object,
       default () {
         return {
-          paddingTop: 0,
-          paddingBottom: 0
+          // paddingTop: 0,
+          // paddingBottom: 0,
+          itemMarginBottom: 50,
         }
       }
     }

@@ -39,20 +39,20 @@ div(
     :style=`{
       order: 2
     }`)
-  node-author(
-    v-if="true"
-    v-bind="$props"
-    :stateNode="stateNode"
-    :style=`{
-      order: 3
-    }`)
-  node-spheres(
-    v-if="true"
-    v-bind="$props"
-    :stateNode="stateNode"
-    :style=`{
-      order: 4
-    }`)
+  //- node-author(
+  //-   v-if="true"
+  //-   v-bind="$props"
+  //-   :stateNode="stateNode"
+  //-   :style=`{
+  //-     order: 3
+  //-   }`)
+  //- node-spheres(
+  //-   v-if="true"
+  //-   v-bind="$props"
+  //-   :stateNode="stateNode"
+  //-   :style=`{
+  //-     order: 4
+  //-   }`)
 </template>
 
 <script>

@@ -28,7 +28,9 @@ div(:style=`{position: 'relative'}`).column.fit
       }`)
   //- header
   div(:style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+    div(
+      v-if="mode === 'standalone'"
+      :style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
       .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
         span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsNodeList_title', 'Ядра')}}
     //- search

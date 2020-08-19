@@ -55,23 +55,23 @@ div(:style=`{position: 'relative'}`).row.fit.justify-center
                   ).row.full-height.bg-grey-4
             //- list of nodes
             list-middle(
-              :items="items" :more="itemsMore")
+              :items="items" :more="itemsMore" :options=`{itemMarginBottom: 8}`).q-px-sm
               template(v-slot:itemFirst)
-                div(:style=`{height: '16px'}`).row.full-width
+                div(:style=`{height: '8px'}`).row.full-width
               template(v-slot:item=`{item, index, indexMiddle}`)
                 div(
-                  @click="nodePreview(item)"
+                  @click="nodeClick(item)"
                   :style=`{height: '100px',borderRadius: '10px', overflow: 'hidden'}`
-                  ).row.full-width.b-70.q-mb-sm.node-item
+                  ).row.full-width.b-70.node-item
                   img(
                     :src="item.meta.items[0].thumbUrl"
                     draggable="false"
                     :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden',userSelect: 'none'}`)
                   .col.full-height
-                    .row.fit.items-stat.content-start.q-pa-md
+                    .row.fit.items-stat.content-start.q-pa-sm
                       span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ item.name }}
               template(v-slot:itemLast)
-                div(:style=`{height: '400px'}`).row.full-width
+                div(:style=`{height: '200px'}`).row.full-width
 </template>
 
 <script>

@@ -75,7 +75,7 @@ export default {
       // set
       this.itemsSliced.splice(start, 0, ...arr)
       this.itemsSlice += 1
-      this.$q.notify('Loading... ' + this.itemsSlice)
+      // this.$q.notify('Loading... ' + this.itemsSlice)
       await this.$wait(1500)
       this.itemsSlicing = false
     },

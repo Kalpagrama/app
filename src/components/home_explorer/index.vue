@@ -2,8 +2,9 @@
 div(:style=`{position: 'relative'}`).column.fit
   //- header
   div(:style=`{position: 'absolute', zIndex: 10000, top: '0px',}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.justify-between.b-60
-      .row.full-width.items-center.content-center.q-px-md.q-py-sm
+    div(:style=`{height: '60px', maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.justify-between.b-60
+      .row.full-width.items-center.content-center.q-px-sm
         .col
           q-icon(name="home" color="white" size="25px").q-mb-xs
           span(:style=`{fontSize: '19px',}`).text-white.text-bold.q-mx-md {{ $t('pageApp_home_title', 'Домашняя') }}
@@ -15,7 +16,7 @@ div(:style=`{position: 'relative'}`).column.fit
   .col.full-width
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       template(v-slot=`{items,itemsMore}`)
-        list-middle(:items="items" :more="itemsMore")
+        list-middle(:items="items" :more="itemsMore" :options="{itemMarginBottom: 80}")
           template(v-slot:itemFirst)
             div(:style=`{height: '70px'}`).row.full-width
           template(v-slot:item=`{item, index, indexMiddle}`)

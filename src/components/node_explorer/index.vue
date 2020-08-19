@@ -1,32 +1,19 @@
 <template lang="pug">
-div(
-  :style=`{
-    position: 'relative',
-    height: $q.screen.height+'px',
-  }`
-  ).column.full-width
-  q-btn(
-    @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
-    round flat color="white" icon="menu"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '10px', right: '10px',}`)
-  q-btn(
-    @click="$router.back()"
-    round flat color="white" icon="keyboard_arrow_left"
-    :style=`{position: 'absolute', zIndex: 1000, bottom: '10px', left: '10px',}`)
-  //- header: navigation back, and tabs
+div(:style=`{position: 'relative', height: $q.screen.height+'px',}`).column.full-width
+  //- header
   div(:style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between.q-pl-md
-      //- q-btn(round flat dense color="white" icon="keyboard_arrow_left" @click="$router.back()")
-      span.text-white.text-bold.q-mx-md {{$t('nodeExplorer_title', 'Ядро')}}
-      .col
-        .row.fit.justify-end
-          q-tabs(
-            v-model="tab"
-            dense active-color="green" switch-indicator
-            no-caps align="right" :breakpoint="300"
-            ).text-white
-            q-tab(name="nodes" :label="$t('nodeExplorer_nodeClips', 'Образы')")
-            q-tab(name="chains" :label="$t('nodeExplorer_nodeChains', 'Связи')")
+    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+      .row.full-width.items-center.q-px-md.q-pt-md
+        span(:style=`{fontSize: '19px'}`).text-white.text-bold.q-mx-md {{$t('nodeExplorer_title', 'Ядро')}}
+        .col
+          .row.fit.justify-end.q-pr-sm
+            q-tabs(
+              v-model="tab"
+              dense active-color="white"
+              no-caps align="right" :breakpoint="300"
+              ).text-grey-4
+              q-tab(name="nodes" :label="$t('nodeExplorer_nodeSame', 'Похожие')")
+              q-tab(name="chains" :label="$t('nodeExplorer_nodeChains', 'Связи')")
   //- body
   q-tab-panels(
     v-model="tab"

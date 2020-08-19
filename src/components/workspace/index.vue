@@ -6,9 +6,7 @@ div(:style=`{position: 'relative', height: $q.screen.height+'px',}`).column.full
     no-caps color="green" icon-right="keyboard_arrow_down"
     :style=`{
       position: 'absolute', zIndex: 1000, bottom: '14px',
-      left: '50%',
-      marginRight: '-50%',
-      transform: 'translate(-50%, 0)',
+      left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',
     }`).q-px-sm
     span(v-if="page").text-bold.text-white {{ page.name }}
     q-menu(cover anchor="bottom middle" max-width="200px")
