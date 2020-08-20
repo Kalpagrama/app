@@ -37,17 +37,15 @@ class NodeApi {
   static makeCompositionInput (composition) {
     assert.ok(Array.isArray(composition.layers), '!composition.layers')
     assert(composition.operation, 'operation')
-    // todo временное решение!!!!
-    if (composition.layers.length === 0) {
-      logW('todo ! слать реальные данные по composition.layers!')
+    if (composition.layers.length === 0) { // если ничего не выделено - считаем что выделен весь контент
       assert(composition.contentOid)
       composition.layers.push(
         {
+          name: '',
           contentOid: composition.contentOid,
           figuresAbsolute: [{
             points: [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: 0 }], // квадрат 1х1 пиксель
-          }], // весь контент
-          spheres: []
+          }] // весь контент
         }
       )
     }
@@ -68,9 +66,9 @@ class NodeApi {
     assert(compositionLen <= 60, 'compositionLen <= 60 : ' + compositionLen)
     return {
       thumbUrl: composition.thumbUrl,
-      spheres: composition.spheres ? composition.spheres.map(s => ({ name: s.name })) : [],
       layers: composition.layers.map(l => {
         return {
+          name: '',
           contentOid: l.contentOid || l.content.oid,
           speed: l.speed,
           figuresAbsolute: l.figuresAbsolute.map(f => {
@@ -80,9 +78,6 @@ class NodeApi {
                 return { x: p.x, y: p.y }
               })
             }
-          }),
-          spheres: l.spheres.map(s => {
-            return { name: s.name }
           }),
           color: l.color,
           thumbUrl: l.thumbUrl
@@ -121,35 +116,6 @@ class NodeApi {
       }
     })
     return nodeInput
-  }
-
-  static makeChainInput (chain) {
-    {
-      // checks
-      assert.ok(chain.spheres.length >= 0 && chain.spheres.length <= 10, 'chain spheres')
-      assert.ok(chain.links.length > 0, 'chain.links.length > 0')
-    }
-    let chainInput = {}
-    chainInput.name = chain.name
-    chainInput.spheres = chain.spheres.map(s => {
-      return { name: s.name, oid: s.oid }
-    })
-    chainInput.links = chain.links.map(link => {
-      assert(link.leftOid || link.leftSphere || link.leftNode || link.leftComposition, '!link.leftOid')
-      assert(link.rightOid || link.rightSphere || link.rightNode || link.rightComposition, 'link.rightOid')
-      assert(link.type, '!link.type')
-      let resultLink = { name: link.name, type: link.type }
-      if (link.leftOid) resultLink.leftOid = link.leftOid
-      if (link.leftSphere) resultLink.leftSphere = link.leftSphere
-      if (link.leftNode) resultLink.leftNode = NodeApi.makeNodeInput(link.leftNode)
-      if (link.leftComposition) resultLink.leftComposition = NodeApi.makeCompositionInput(link.leftComposition)
-      if (link.rightOid) resultLink.rightOid = link.rightOid
-      if (link.rightSphere) resultLink.rightSphere = link.rightSphere
-      if (link.rightNode) resultLink.rightNode = NodeApi.makeNodeInput(link.rightNode)
-      if (link.rightComposition) resultLink.rightComposition = NodeApi.makeCompositionInput(link.rightComposition)
-      return resultLink
-    })
-    return chainInput
   }
 
   static async nodeUnrate (oid) {
@@ -242,6 +208,38 @@ class NodeApi {
     let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
     logD(f, 'done')
     return createdNode
+  }
+
+  // chains
+  static makeChainInput (chain) {
+    {
+      // checks
+      // assert.ok(chain.spheres.length >= 0 && chain.spheres.length <= 10, 'chain spheres')
+      assert.ok(chain.links.length > 0, 'chain.links.length > 0')
+      // assert.ok(chain.category, '!chain.category')
+    }
+    let chainInput = {}
+    // chainInput.name = chain.name
+    // chainInput.spheres = chain.spheres.map(s => {
+    //   return { name: s.name, oid: s.oid }
+    // })
+    // chainInput.category = chain.category
+    chainInput.links = chain.links.map(link => {
+      assert(link.leftItem.oid, '!link.leftItem.oid')
+      assert(link.rightItem.oid, '!link.rightItem.oid')
+      assert(link.type, '!link.type')
+      // let resultLink = { name: link.name, type: link.type }
+      // if (link.leftOid) resultLink.leftOid = link.leftOid
+      // if (link.leftSphere) resultLink.leftSphere = link.leftSphere
+      // if (link.leftNode) resultLink.leftNode = NodeApi.makeNodeInput(link.leftNode)
+      // if (link.leftComposition) resultLink.leftComposition = NodeApi.makeCompositionInput(link.leftComposition)
+      // if (link.rightOid) resultLink.rightOid = link.rightOid
+      // if (link.rightSphere) resultLink.rightSphere = link.rightSphere
+      // if (link.rightNode) resultLink.rightNode = NodeApi.makeNodeInput(link.rightNode)
+      // if (link.rightComposition) resultLink.rightComposition = NodeApi.makeCompositionInput(link.rightComposition)
+      return link
+    })
+    return chainInput
   }
 
   static async chainCreate (chain) {

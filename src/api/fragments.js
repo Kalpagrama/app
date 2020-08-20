@@ -140,7 +140,6 @@ const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${video
   }
   fragment compositionFragment on Composition {
     ...objectFragment
-    spheres {...objectShortFragment}
     operation {
       type
       operations {
@@ -153,7 +152,7 @@ const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${video
       figuresAbsolute{...figureFragment}
       figuresRelative {...figureFragment}
       speed
-      spheres {...objectShortFragment}
+      name
       thumbUrl(preferWidth: 600)
       url
       contentSource
@@ -167,7 +166,6 @@ const compositionFragment = gql`${objectFragment} ${objectShortFragment} ${video
 const chainFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${objectShortFragment}
   fragment chainFragment on Chain {
     ...objectFragment
-    sphereFromName{...objectShortFragment}
     rate
     rateUser
     viewCnt
@@ -177,12 +175,7 @@ const chainFragment = gql`${videoFragment} ${imageFragment} ${objectFragment} ${
       name
       thumbUrl(preferWidth: 50)
     }
-    spheres {
-      oid
-      name
-    }
     links{
-      name
       leftItem{...objectShortFragment}
       rightItem{...objectShortFragment}
       type

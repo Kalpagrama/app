@@ -166,8 +166,8 @@ module.exports = function (ctx) {
       host: ctx.mode.capacitor || ctx.mode.spa ? null : 'mac.kalpa.app',
       // https: false,
       https: ctx.mode.capacitor || ctx.mode.spa ? false : {
-        key: fs.readFileSync('deploy/dev_server_cert/private.key'),
-        cert: fs.readFileSync('deploy/dev_server_cert/certificate.crt')
+        key: fs.readFileSync('deploy/dev_server_cert/privkey.pem'),
+        cert: fs.readFileSync('deploy/dev_server_cert/cert.pem')
       },
       open: true // opens browser window automatically
     },

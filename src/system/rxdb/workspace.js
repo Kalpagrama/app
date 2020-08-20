@@ -359,14 +359,19 @@ class Workspace {
       const f = this.set
       assert(this.created, '!this.created')
       let itemCopy = JSON.parse(JSON.stringify(item))
-      logD(f, `start. item ${item.id}, ${item.rev}`)
+      logD(f, `start. item: ${JSON.stringify(item)}`)
       assert(itemCopy.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + itemCopy.g)
       itemCopy.updatedAt = Date.now()
       if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
       if (!itemCopy.id) itemCopy.id = `${itemCopy.wsItemType}::${Date.now()}` // генерируем id для нового элемента
+      // const queryXxx = this.db.ws_items.find()
+      // const queryRes = await queryXxx.exec()
+      // logD(f, 'before upsert. query_res.length', queryRes.length)
       let rxDoc = await this.db.ws_items.atomicUpsert(itemCopy)
       assert(isRxDocument(rxDoc), '!isRxDocument' + JSON.stringify(rxDoc))
-      logD(f, 'complete')
+      // const queryXxx2 = this.db.ws_items.find()
+      // const queryRes2 = await queryXxx2.exec()
+      // logD(f, `complete. queryRes2.length=${queryRes2.length} rxDoc = ${JSON.stringify(rxDoc)}`)
       return rxDoc
     } finally {
       this.release()

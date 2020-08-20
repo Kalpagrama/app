@@ -236,6 +236,7 @@ class ReactiveListHolder {
         await this.mutex.lock()
         this.listUnsubscribe()
         // rxQuery дергается даже когда поменялся его итем ( даже если это не влияет на рез-тат!!!)
+        // logD(f, 'rxQuery changed 1', results)
         if (this.vm.reactiveList.length === results.length) {
           let arrayChanged = false
           for (let i = 0; i < results.length; i++) {
@@ -246,7 +247,7 @@ class ReactiveListHolder {
           }
           if (!arrayChanged) return // если список не изменился - просто выходим
         }
-        // logD(f, 'rxQuery changed', results)
+        // logD(f, 'rxQuery changed 2', results)
         let items = results.map(rxDoc => {
           let reactiveItemHolder = new ReactiveItemHolder(rxDoc)
           return reactiveItemHolder.reactiveItem

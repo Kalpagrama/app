@@ -55,6 +55,12 @@ class ListsApi {
         // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
         res = await ListsApi.find(mangoQuery)
         break
+      case RxCollectionEnum.LST_SPHERE_CHAINS:
+        assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
+        mangoQuery.selector.objectTypeEnum = 'CHAIN'
+        // res = await ListsApi.sphereNodes(mangoQuery.selector.oidSphere, pagination)
+        res = await ListsApi.find(mangoQuery)
+        break
       case RxCollectionEnum.LST_SUBSCRIBERS:
         assert(mangoQuery.selector.oidSphere, '!mangoQuery.selector.oidSphere')
         res = await ListsApi.objSubscribers(mangoQuery.selector.oidSphere, pagination)
