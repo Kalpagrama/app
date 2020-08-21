@@ -82,8 +82,7 @@ export default async ({ Vue, store, app }) => {
       link: createHttpLink({
         uri: SERVICES_URL,
         fetch (uri, options) {
-          const d = localStorage.getItem('k_debug')
-          if (d) options.headers['X-Kalpagrama-debug'] = d
+          if (localStorage.getItem('k_debug') != null) options.headers['X-Kalpagrama-debug'] = 'k_debug'
           return fetch(uri, options)
         }
       }),
@@ -114,9 +113,8 @@ export default async ({ Vue, store, app }) => {
           fetch (uri, options) {
             // logD('authApollo::fetch', localStorage.getItem('k_token'))
             const token = localStorage.getItem('k_token')
-            const d = localStorage.getItem('k_debug')
             if (token) options.headers.Authorization = token
-            if (d) options.headers['X-Kalpagrama-debug'] = d
+            if (localStorage.getItem('k_debug') != null) options.headers['X-Kalpagrama-debug'] = 'k_debug'
             return fetch(uri, options)
           }
           // useGETForQueries: true
@@ -132,9 +130,8 @@ export default async ({ Vue, store, app }) => {
           uri: linkApi,
           fetch (uri, options) {
             const token = localStorage.getItem('k_token')
-            const d = localStorage.getItem('k_debug')
             if (token) options.headers.Authorization = token
-            if (d) options.headers['X-Kalpagrama-debug'] = d
+            if (localStorage.getItem('k_debug') != null) options.headers['X-Kalpagrama-debug'] = 'k_debug'
             return fetch(uri, options)
           }
           // useGETForQueries: true
@@ -156,7 +153,7 @@ export default async ({ Vue, store, app }) => {
             connectionParams: () => {
               return {
                 Authorization: localStorage.getItem('k_token'),
-                'X-Kalpagrama-debug': localStorage.getItem('k_debug')
+                'X-Kalpagrama-debug': localStorage.getItem('k_debug') != null ? 'k_debug' : ''
               }
             }
           }
@@ -172,9 +169,8 @@ export default async ({ Vue, store, app }) => {
           uri: linkUpload,
           fetch (uri, options) {
             const token = localStorage.getItem('k_token')
-            const d = localStorage.getItem('k_debug')
             if (token) options.headers.Authorization = token
-            if (d) options.headers['X-Kalpagrama-debug'] = d
+            if (localStorage.getItem('k_debug') != null) options.headers['X-Kalpagrama-debug'] = 'k_debug'
             return fetch(uri, options)
           }
         })
