@@ -1,10 +1,10 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
-    .row.full-width.justify-center.b-30.br
+    .row.full-width.justify-center.b-30
       div(
         :style=`{maxWidth: '800px', height: '50px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.q-px-md.b-30.br
+        ).row.full-width.items-center.content-center.q-px-md.b-30
         span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspaceName }}
   q-page-container
     q-page
@@ -14,7 +14,7 @@ q-layout(view="hHh Lpr lff")
           div(
             :style=`{position: 'relative'}`
             v-observe-visibility=`{
-              callback: null,
+              callback: contentVisibilityCallback,
               intersection: {
                 threshold: 0.8
               }
@@ -24,7 +24,8 @@ q-layout(view="hHh Lpr lff")
             img(
               :src="contentKalpa.thumbUrl" draggable="false"
               :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
-            content-player(
+            component(
+              :is="playerComponent[contentKalpa.contentSource]"
               ref="contentPlayer" :url="contentKalpa.url" @player="player = $event"
               :style=`{
                 position: 'absolute', top: '0px',
@@ -56,11 +57,11 @@ q-layout(view="hHh Lpr lff")
               @bars="bars = $event")
       //- footer: page control
       q-page-sticky(expand position="bottom")
-        .row.full-width.justify-center.b-30.br
+        .row.full-width.justify-center.b-30
           div(:style=`{maxWidth: '800px', height: '50px',}`
-            ).row.full-width.items-center.content-center.b-30.br
+            ).row.full-width.items-center.content-center.b-30
             q-btn(
-              @click="$emit('close')"
+              @click="$emit('back')"
               round flat color="white" icon="keyboard_arrow_left").q-ml-xs
             .col.full-height
               q-tabs(v-model="pageId" no-caps active-color="white").fit.text-grey-6
@@ -70,24 +71,32 @@ q-layout(view="hHh Lpr lff")
 </template>
 
 <script>
+// api
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { NodeApi } from 'src/api/node'
-
-import contentPlayer from './content_player/index.vue'
-import contentBar from './content_bar/index.vue'
+// players
+import playerYoutube from './player_youtube/index.vue'
+import playerKalpa from './player_kalpa/index.vue'
+// pages
 import pageDetails from './page_details/index.vue'
 import pageDrafts from './page_drafts/index.vue'
 import pageNodes from './page_nodes/index.vue'
+// content
+import contentBar from './content_bar/index.vue'
 
 export default {
-  name: 'wsContentExplorer_youtubeExplorer',
-  components: {contentPlayer, contentBar, pageDetails, pageDrafts, pageNodes},
-  props: ['mode', 'contentWorkspace', 'contentKalpa'],
+  name: 'wsVideoExplorer',
+  components: {playerYoutube, playerKalpa, pageDetails, pageDrafts, pageNodes, contentBar},
+  props: ['contentKalpa', 'contentWorkspace'],
   data () {
     return {
       pageId: 'drafts',
       contentHeight: 0,
       player: null,
+      playerComponent: {
+        YOUTUBE: 'player-youtube',
+        KALPA: 'player-kalpa',
+      },
       bars: [],
     }
   },
@@ -113,6 +122,7 @@ export default {
       this.$log('nodeAdd')
       // take current second and create node...
       let t = this.$refs.contentPlayer.currentTime
+      // TODO: start/end for TTT
       let nodeInput = {
         name: '',
         spheres: [],
@@ -125,14 +135,14 @@ export default {
           {
             // composition: {
             //   layers: [
-            //     {figuresAbsolute: [{t: t}]}
+            //     {figuresAbsolute: [{t: t}, {t: t + 10}]}
             //   ],
             //   operation: { items: null, operations: null, type: 'CONCAT'},
             //   spheres: []
             // },
             contentOid: this.contentKalpa.oid,
             layers: [
-              {contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: t}]}
+              {contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: t}, {t: t + 10}]},
             ],
             operation: { items: null, operations: null, type: 'CONCAT'},
             spheres: []

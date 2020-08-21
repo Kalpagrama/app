@@ -4,12 +4,11 @@ div(
   :style=`{
     position: 'relative',
     borderRadius: '10px', overflow: 'hidden',
-    cursor: 'pointer'
+    cursor: 'pointer',
   }`
-  ).row.full-width.items-start.content-start
+  ).row.full-width
   img(
     :src="content.thumbOid"
-    draggable="false"
     :style=`{
       borderRadius: '10px', overflow: 'hidden',
       pointerEvents: 'none',
@@ -19,7 +18,7 @@ div(
 
 <script>
 export default {
-  name: 'contentItem_typeImage',
+  name: 'contentItem_typeWeb',
   props: ['content', 'contentKalpa'],
   data () {
     return {

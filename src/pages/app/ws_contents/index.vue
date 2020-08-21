@@ -47,7 +47,7 @@ import contentSearch from './content_search'
 import contentItem from './content_item'
 
 export default {
-  name: 'wsContentList',
+  name: 'pageApp_wsContents',
   components: {contentSearch, contentItem},
   props: {
     mode: {

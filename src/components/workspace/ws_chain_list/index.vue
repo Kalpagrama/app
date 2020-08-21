@@ -45,7 +45,7 @@
         @click="chainClick(c)"
         :style=`{height: '100px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
         ).row.full-width.b-50.q-mb-sm
-div(:style=`{position: 'relative'}`).column.fit
+//- div(:style=`{position: 'relative'}`).column.fit
   //- .col.full-width
   //- .row.full-width.q-pa-sm
   //-   span.text-white.text-bold Уолден или жизнь в лесу.

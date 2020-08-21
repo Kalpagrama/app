@@ -96,10 +96,10 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     // Vue.component('sphere', () => import('components/sphere'))
     // workspace
     // content
-    Vue.component('wsContentPlayer', () => import('components/workspace/ws_content_player'))
+    // Vue.component('wsContentPlayer', () => import('components/workspace/ws_content_player'))
     Vue.component('wsContentList', () => import('components/workspace/ws_content_list'))
     // Vue.component('wsContentEditor', () => import('components/workspace/ws_content_editor'))
-    Vue.component('wsContentExplorer', () => import('components/workspace/ws_content_explorer'))
+    // Vue.component('wsContentExplorer', () => import('components/workspace/ws_content_explorer'))
     // composition
     Vue.component('wsCompositionList', () => import('components/workspace/ws_composition_list'))
     Vue.component('wsCompositionEditor', () => import('components/workspace/ws_composition_editor'))
@@ -126,9 +126,9 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     // lists
     Vue.component('listMasonry', () => import('components/list_masonry'))
     Vue.component('listMiddle', () => import('components/list_middle'))
-    Vue.component('listTable', () => import('components/list_table'))
-    Vue.component('listPip', () => import('components/list_pip'))
-    Vue.component('listHorizontal', () => import('components/list_horizontal'))
+    // Vue.component('listTable', () => import('components/list_table'))
+    // Vue.component('listPip', () => import('components/list_pip'))
+    // Vue.component('listHorizontal', () => import('components/list_horizontal'))
     // kalpa
     Vue.component('kalpaProfile', () => import('components/kalpa/profile'))
     Vue.component('kalpaLayout', () => import('components/kalpa/layout'))

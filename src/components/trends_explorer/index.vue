@@ -1,8 +1,8 @@
 <style lang="sass">
-.q-header
-  background: none !important
-.q-footer
-  background: none !important
+// .q-header
+//   background: none !important
+// .q-footer
+//   background: none !important
 </style>
 
 <template lang="pug">

@@ -32,10 +32,13 @@ html, body
 </style>
 
 <template lang="pug">
-q-layout(
-  view="hHh Lpr lff"
-  container :style=`{height: $q.screen.height+'px',}`
-  @resize="onResize").bg-30
+router-view(
+  v-if="!loading")
+//- q-layout(
+//-   view="hHh Lpr lff"
+//-   container :style=`{height: $q.screen.height+'px',}`
+//-   @resize="onResize").bg-30
+//- q-layout(view="hHh Lpr lff" @resize="onResize")
   q-drawer(
     behavior="mobile" side="left"
     :value="$store.state.ui.appShowMenu"
@@ -46,7 +49,8 @@ q-layout(
         borderRadius: '0 10px 10px 0'
       }`).full-height
   q-page-container
-    q-page(:style=`{position: 'relative', height: $q.screen.height+'px'}`).row.justify-center
+    //- height: $q.screen.height+'px'
+    q-page(:style=`{position: 'relative',}`)
       //- left panel menu
       div(
         v-if="$q.screen.width > 1260"

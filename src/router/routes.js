@@ -54,25 +54,22 @@ const routes = [
       {
         name: 'workspace',
         path: 'workspace',
-        redirect: 'workspace/content',
+        redirect: 'workspace/contents',
         component: () => import('components/workspace'),
         children: [
           // content
-          { name: 'content-list', path: 'content', component: () => import('components/workspace/ws_content_list') },
-          { name: 'content-import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
-          { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_page') },
-          // composition
-          // { name: 'composition-list', path: 'composition', component: () => import('components/workspace/ws_composition_list') },
-          // { name: 'composition-editor', path: 'composition/:id', component: () => import('components/workspace/ws_composition_editor') },
+          { name: 'content-list', path: 'contents', component: () => import('pages/app/ws_contents/index.vue') },
+          { name: 'content-explorer', path: 'content/:id', component: () => import('pages/app/ws_content/index.vue') },
+          // { name: 'content-import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
           // node
-          { name: 'node-list', path: 'node', component: () => import('components/workspace/ws_node_list') },
-          { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
-          { name: 'node-editor', path: 'node/:id', component: () => import('components/workspace/ws_node_editor') },
+          { name: 'node-list', path: 'nodes', component: () => import('pages/app/ws_nodes/index.vue') },
+          { name: 'node-editor', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
+          // { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
           // chain
-          { name: 'chain-list', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
-          { name: 'chain-editor', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },
+          // { name: 'chain-list', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
+          // { name: 'chain-editor', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },
           // sphere
-          { name: 'sphere-list', path: 'sphere', component: () => import('components/workspace/ws_sphere_list') },
+          // { name: 'sphere-list', path: 'sphere', component: () => import('components/workspace/ws_sphere_list') },
           // { name: 'sphere-editor', path: 'sphere/:id', component: () => import('components/workspace/ws_sphere_editor') },
           // other
           { name: 'ws-settings', path: 'settings', component: () => import('components/workspace/ws_settings') },

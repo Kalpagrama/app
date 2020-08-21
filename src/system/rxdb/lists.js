@@ -150,9 +150,13 @@ class Lists {
       case 'OBJECT_DELETED': {
         assert(event.sphereOids && Array.isArray(event.sphereOids), 'event.sphereOids')
         // добавим на все сферы (event.sphereOids)
+        let rxCollectionEnum
+        if (event.object.type === 'NODE') rxCollectionEnum = LstCollectionEnum.LST_SPHERE_NODES
+        else if (event.object.type === 'CHAIN') rxCollectionEnum = LstCollectionEnum.LST_SPHERE_CHAINS
+        else throw new Error('bad event.object.type:' + event.object.type)
         let rxDocs = await this.cache.find({
           selector: {
-            'props.rxCollectionEnum': LstCollectionEnum.LST_SPHERE_NODES,
+            'props.rxCollectionEnum': rxCollectionEnum,
             'props.oid': { $in: event.sphereOids }
           }
         })

@@ -1,5 +1,21 @@
 <template lang="pug">
-.column.fit.items-start.content-start.justify-center
+.row.full-width.items-start.content-start
+  masonry(
+    :cols="2"
+    :gutter="{default: 10}"
+    :style=`{position: 'relative',}`).row.full-width.justify-start
+    div(
+      v-for="(i, ii) in items" :key="i.oid || i.id"
+      @mouseenter="itemEnter(i, ii)"
+      @mouseleave="itemLeave(i, ii)"
+      :class=`{
+      }`
+      :style=`{
+        position: 'relative'
+      }`
+      ).row.items-start.content-start.q-mb-sm
+      slot(name="item" :item="i")
+//- .column.fit.items-start.content-start.justify-center
   //- slot(name="header")
   //- body items
   div(
@@ -12,7 +28,7 @@
     ).col.full-width.scroll
     slot(name="itemFirst")
     masonry(
-      :cols="{default: $q.screen.width > 600 ? 2 : 2}"
+      :cols="2"
       :gutter="{default: 10}"
       :style=`{position: 'relative', width: 'calc(100% + 8px)', marginBottom: '80px'}`).row.justify-start.q-mt-sm
       div(

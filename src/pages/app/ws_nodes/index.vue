@@ -1,5 +1,19 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
+  //- q-dialog(
+  //-   v-if="mode === 'standalone'"
+  //-   v-model="nodeEditorOpened" position="bottom")
+  //-   ws-node-editor(
+  //-     ctx="workspace"
+  //-     :value="nodeEditorItem"
+  //-     @published="nodePublished"
+  //-     @close="nodeEditorOpened = false"
+  //-     :style=`{
+  //-       maxWidth: $store.state.ui.maxWidthPage+'px',
+  //-       minHeight: $q.screen.height+'px',
+  //-       maxHeight: $q.screen.height+'px',
+  //-       height: $q.screen.height+'px',
+  //-     }`)
   q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
@@ -47,6 +61,60 @@ q-layout(view="hHh Lpr lff")
           @click="nodeAddBtn()"
           push round color="green" icon="add"
           :style=`{borderRadius: '50%'}`)
+//- div(:style=`{position: 'relative'}`).column.fit
+  //- node ADD
+  q-btn(
+    v-if="mode === 'standalone'"
+    @click="nodeAddBtn()"
+    push round color="green" icon="add"
+    :style=`{
+      position: 'absolute', zIndex: 1000, bottom: '70px', right: '30px', tranform: 'translate3d(0,0,0)',
+      borderRadius: '50%',
+    }`)
+  //- header
+  .row.full-width.items-start.content-start.justify-center
+    div(
+      v-if="mode === 'standalone'"
+      :style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
+        span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsNodeList_title', 'Ядра')}}
+  //- search
+  .row.full-width.justify-center
+    div(
+      :style=`{maxWidth: '800px',}`).row.full-width.q-pa-sm
+      q-input(
+        v-model="searchString"
+        filled dark dense color="white"
+        :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
+        ).full-width
+        template(v-slot:append)
+          q-btn(
+            v-if="searchString.length > 0"
+            flat dense color="white" icon="clear" @click="searchString = ''")
+          q-btn(
+            flat dense color="white" icon="filter_list")
+    //- node.stage picker
+  .row.full-width.justify-center
+    div(
+      :style=`{maxWidth: '800px',}`
+      ).row.full-width.items-end.content-end.q-px-md
+      q-tabs(dense v-model="type" no-caps active-color="green" switch-indicator).full-width.text-white
+        q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
+  //- body
+  .col.full-width.scroll
+    kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
+      template(v-slot=`{items, itemsMore}`)
+        .row.fit.items-start.content-start.justify-center
+          div(:style=`{maxWidth: '800px',}`).row.fit.items-start.content-start.q-px-sm.br
+            node-item(
+              v-for="(i,ii) in items" :key="i"
+              :node="i" :nodeIndex="ii"
+              @preview="nodePreview(i)"
+              @delete="nodeDelete(i)"
+              @edit="nodeEdit(i)"
+              @unSave="nodeUnSave(i)"
+              @unPublish="nodeUnPublish(i)"
+              @fork="nodeFork(i)")
 </template>
 
 <script>
@@ -57,7 +125,7 @@ import { NodeApi } from 'src/api/node'
 import nodeItem from './node_item'
 
 export default {
-  name: 'wsNodeLsit',
+  name: 'pageApp_wsNodes',
   components: {nodeItem},
   props: {
     mode: {

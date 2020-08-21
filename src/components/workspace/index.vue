@@ -1,24 +1,17 @@
 <template lang="pug">
-div(:style=`{position: 'relative', height: $q.screen.height+'px',}`).column.full-width
-  div(
-    v-if="$store.state.ui.showMobileNavigation"
-    :style=`{
-      position: 'absolute', zIndex: 1000, width: 'calc(100% - 100px)', left: '50px', bottom: '0px',
-      height: '50px',
-      }`).row
-    q-tabs(
-      :value="$route.name" @input="tabsChanged"
-      no-caps dense active-color="white").full-width.text-white
-      q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
-  //- body
-  .col.full-width
-    .row.fit.items-start.content-start.justify-center
-      //- v-if="showView"
-      router-view(
-        @close="$router.back()"
-        mode="standalone"
-        :value="item"
-        :style=`{}`).full-height
+q-layout(view="hHh Lpr lff")
+  q-page-container
+    q-page
+      router-view
+      q-page-sticky(
+        v-if="!$route.params.id"
+        expand position="bottom")
+        .row.full-width.justify-center.b-30
+          div(:style=`{maxWidth: '800px', height: '50px', paddingLeft: '50px', paddingRight: '50px',}`).row.full-width
+            q-tabs(
+              :value="$route.name" @input="tabsChanged"
+              no-caps dense active-color="white").fit.text-grey-8
+              q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
 </template>
 
 <script>
@@ -49,10 +42,10 @@ export default {
     },
     pages () {
       return [
-        {id: 'content-list', path: 'content', name: this.$t('pageWs_content', 'Контент')},
-        {id: 'node-list', path: 'node', name: this.$t('pageWs_nodes', 'Ядра')},
-        {id: 'chain-list', path: 'chain', name: this.$t('pageWs_chains', 'Цепочки')},
-        {id: 'sphere-list', path: 'sphere', name: this.$t('pageWs_spheres', 'Сферы')},
+        {id: 'content-list', path: 'contents', name: this.$t('pageWs_content', 'Контент')},
+        {id: 'node-list', path: 'nodes', name: this.$t('pageWs_nodes', 'Ядра')},
+        {id: 'chain-list', path: 'chains', name: this.$t('pageWs_chains', 'Цепочки')},
+        {id: 'sphere-list', path: 'spheres', name: this.$t('pageWs_spheres', 'Сферы')},
         {id: 'ws-settings', path: 'settings', name: this.$t('pageWs_settings', 'Настройки')}
       ]
     },
@@ -65,31 +58,31 @@ export default {
     }
   },
   watch: {
-    '$route.params.id': {
-      immediate: true,
-      async handler (to, from) {
-        this.$log('$route.params.id TO', to)
-        if (to) {
-          this.item = null
-          let rxCollectionEnumMap = {
-            'content-explorer': RxCollectionEnum.WS_CONTENT,
-            'composition-editor': RxCollectionEnum.WS_CONTENT,
-            'node-editor': RxCollectionEnum.WS_NODE,
-            'chain-editor': RxCollectionEnum.WS_CHAIN
-          }
-          let rxCollectionEnum = rxCollectionEnumMap[this.$route.name]
-          if (!rxCollectionEnum) return
-          let {items: [item]} = await this.$rxdb.find({
-            selector: {
-              rxCollectionEnum,
-              id: to
-            }
-          })
-          this.$log('item', item)
-          this.item = item
-        }
-      }
-    }
+    // '$route.params.id': {
+    //   immediate: true,
+    //   async handler (to, from) {
+    //     this.$log('$route.params.id TO', to)
+    //     if (to) {
+    //       this.item = null
+    //       let rxCollectionEnumMap = {
+    //         'content-explorer': RxCollectionEnum.WS_CONTENT,
+    //         'composition-editor': RxCollectionEnum.WS_CONTENT,
+    //         'node-editor': RxCollectionEnum.WS_NODE,
+    //         'chain-editor': RxCollectionEnum.WS_CHAIN
+    //       }
+    //       let rxCollectionEnum = rxCollectionEnumMap[this.$route.name]
+    //       if (!rxCollectionEnum) return
+    //       let {items: [item]} = await this.$rxdb.find({
+    //         selector: {
+    //           rxCollectionEnum,
+    //           id: to
+    //         }
+    //       })
+    //       this.$log('item', item)
+    //       this.item = item
+    //     }
+    //   }
+    // }
   },
   methods: {
     tabsChanged (val) {
@@ -99,14 +92,14 @@ export default {
   },
   created () {
     this.$log('created')
-    window.stores[this.sid] = this
+    // window.stores[this.sid] = this
   },
   mounted () {
     this.$log('mounted')
   },
   beforeDestroy () {
     this.$log('beforeDestroy')
-    if (!module.hot) delete window.stores[this.sid]
+    // if (!module.hot) delete window.stores[this.sid]
   }
 }
 </script>
