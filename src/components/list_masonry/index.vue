@@ -1,8 +1,6 @@
 <template lang="pug">
-div(
-  :style=`{}`
-  ).column.fit.items-center.content-center.justify-center
-  slot(name="header")
+.column.fit.items-start.content-start.justify-center
+  //- slot(name="header")
   //- body items
   div(
     ref="scrollWrapper"

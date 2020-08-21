@@ -5,11 +5,9 @@ div(:style=`{position: 'relative'}`).column.fit
     v-if="mode === 'standalone'"
     @click="nodeAddBtn()"
     push round color="green" icon="add"
-    :size="$q.screen.xs ? 'md' : 'lg'"
     :style=`{
-      position: 'absolute', zIndex: 1000, bottom: 70+'px',
-      left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',
-      borderRadius: '50%'
+      position: 'absolute', zIndex: 1000, bottom: '70px', right: '30px', tranform: 'translate3d(0,0,0)',
+      borderRadius: '50%',
     }`)
   //- node EDITOR
   q-dialog(

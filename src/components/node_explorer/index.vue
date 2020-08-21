@@ -2,18 +2,15 @@
 div(:style=`{position: 'relative', height: $q.screen.height+'px',}`).column.full-width
   //- header
   div(:style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
-      .row.full-width.items-center.q-px-md.q-pt-md
-        span(:style=`{fontSize: '19px'}`).text-white.text-bold.q-mx-md {{$t('nodeExplorer_title', 'Ядро')}}
-        .col
-          .row.fit.justify-end.q-pr-sm
-            q-tabs(
-              v-model="tab"
-              dense active-color="white"
-              no-caps align="right" :breakpoint="300"
-              ).text-grey-4
-              q-tab(name="nodes" :label="$t('nodeExplorer_nodeSame', 'Похожие')")
-              q-tab(name="chains" :label="$t('nodeExplorer_nodeChains', 'Связи')")
+    div(:style=`{height: '50px', maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
+        .row.fit.justify-end.q-pr-lg
+          q-tabs(
+            v-model="tab"
+            dense active-color="white"
+            no-caps align="right" :breakpoint="300"
+            ).text-grey-4
+            q-tab(name="nodes" :label="$t('nodeExplorer_nodeNodes', 'Ядра')")
+            q-tab(name="chains" :label="$t('nodeExplorer_nodeChains', 'Связи')")
   //- body
   q-tab-panels(
     v-model="tab"

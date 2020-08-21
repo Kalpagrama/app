@@ -7,28 +7,29 @@ div(:style=`{position: 'relative'}`).column.fit
         span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsSettings_title', 'Настройки')}}
   //- body
   .col.full-width.scroll
-    .row.full-width.justify-center.q-px-sm.q-pt-sm
-      div(
-        :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`
-        ).row.full-width.items-start.content-start.b-50
-        //- something
-        div(:style=`{height: '300px'}`).row.full-width.q-px-md
-        //- other
-        .row.full-width.q-py-sm
-          q-toggle(
-            v-model="nodePreparation"
-            label="Разлагать сохраненные ядра на косточки?"
-            color="white").full-width.text-white
-        .row.full-width.q-py-sm
-          q-toggle(
-            v-model="nodePreparation"
-            label="Включить поиск по сферам"
-            color="white").full-width.text-white
-        //- danger zone
-        .row.full-width.q-pa-sm
-          q-btn(
-            color="red" no-caps @click="wsClear()")
-            span.text-bold {{$t('delete_my_workspace', 'Удалить мою мастерскую')}}
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '800px',}`).row.full-width.justify-center.q-px-sm.q-pt-sm
+        div(
+          :style=`{borderRadius: $store.state.ui.borderRadius+'px'}`
+          ).row.full-width.items-start.content-start.b-50
+          //- something
+          div(:style=`{height: '300px'}`).row.full-width.q-px-md
+          //- other
+          .row.full-width.q-py-sm
+            q-toggle(
+              v-model="nodePreparation"
+              label="Разлагать сохраненные ядра на косточки?"
+              color="white").full-width.text-white
+          .row.full-width.q-py-sm
+            q-toggle(
+              v-model="nodePreparation"
+              label="Включить поиск по сферам"
+              color="white").full-width.text-white
+          //- danger zone
+          .row.full-width.q-pa-sm
+            q-btn(
+              color="red" no-caps @click="wsClear()")
+              span.text-bold {{$t('delete_my_workspace', 'Удалить мою мастерскую')}}
 </template>
 
 <script>

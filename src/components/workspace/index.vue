@@ -1,37 +1,24 @@
 <template lang="pug">
 div(:style=`{position: 'relative', height: $q.screen.height+'px',}`).column.full-width
-  //- type picker
-  q-btn(
-    @click="typePicking = true"
-    no-caps color="green" icon-right="keyboard_arrow_down"
+  div(
+    v-if="$store.state.ui.showMobileNavigation"
     :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '14px',
-      left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',
-    }`).q-px-sm
-    span(v-if="page").text-bold.text-white {{ page.name }}
-    q-menu(cover anchor="bottom middle" max-width="200px")
-      div(v-if="typePicking").row.b-30
-        .row.full-width.items-center.content-center.justify-center.q-pa-md
-          span(:style=`{fontSize: '20px'}`).text-white.text-bold {{ $t('pageApp_workspace_title', 'Мастерская') }}
-        router-link(
-          v-for="p in pages" :key="p.id" :to="'/workspace/'+p.path"
-          :style=`{
-            cursor: 'pointer',
-            borderRadius: '10px', overflow: 'hidden',
-          }`
-          :class=`{
-            'b-60': p.id === $route.name,
-          }`
-          ).row.full-width.items-center.content-center.justify-center.q-pa-md
-          span(:style=`{fontSize: '16px'}`).text-white {{ p.name }}
+      position: 'absolute', zIndex: 1000, width: 'calc(100% - 100px)', left: '50px', bottom: '0px',
+      height: '50px',
+      }`).row
+    q-tabs(
+      :value="$route.name" @input="tabsChanged"
+      no-caps dense active-color="white").full-width.text-white
+      q-tab(v-for="p in pages" :key="p.id" :name="p.id" :label="p.name")
   //- body
   .col.full-width
-    //- v-if="showView"
-    router-view(
-      @close="$router.back()"
-      ctx="workspace"
-      :value="item"
-      :style=`{maxWidth: '800px',}`).full-height
+    .row.fit.items-start.content-start.justify-center
+      //- v-if="showView"
+      router-view(
+        @close="$router.back()"
+        mode="standalone"
+        :value="item"
+        :style=`{}`).full-height
 </template>
 
 <script>
@@ -105,6 +92,10 @@ export default {
     }
   },
   methods: {
+    tabsChanged (val) {
+      this.$log('tabsChanged', val)
+      this.$router.push({name: val})
+    }
   },
   created () {
     this.$log('created')

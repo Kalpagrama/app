@@ -1,6 +1,6 @@
 <style lang="sass">
 html, body
-  overflow: hidden
+  // overflow: hidden
 .q-menu
   border-radius: 10px !important
   background: none !important
@@ -57,16 +57,21 @@ q-layout(
         }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
         kalpa-menu(v-if="!loading && $route.name !== 'welcome'" :style=`{maxWidth: '300px'}`)
       //- navigation mobile: where/when to show it?
-      q-btn(
-        @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
-        round flat color="white"
-        :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'"
-        :style=`{position: 'fixed', zIndex: 1000, bottom: '12px', right: '12px', transform: 'translate3d(0,0,0)',}`)
-      q-btn(
-        @click="$router.back()"
-        round flat color="white"
-        icon="keyboard_arrow_left"
-        :style=`{position: 'fixed', zIndex: 1000, bottom: '12px', left: '12px', transform: 'translate3d(0,0,0)',}`)
+      div(
+        v-if="$q.screen.width < 800 && $store.state.ui.showMobileNavigation"
+        :style=`{
+          position: 'fixed', zIndex: 1000, bottom: '0px', transform: 'translate3d(0,0,0)',
+          height: '50px', borderRadius: '10px 10px 0 0', overflow: 'hidden',
+        }`).row.full-width.q-px-sm.b-30
+        q-btn(
+          @click="$router.back()"
+          round flat color="white"
+          icon="keyboard_arrow_left")
+        .col
+        q-btn(
+          @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
+          round flat color="white"
+          :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'")
       router-view(
         v-if="!loading")
       //- loading state: spinner... if not a robot here... and not an iframe

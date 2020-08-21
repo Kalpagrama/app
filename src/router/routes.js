@@ -28,14 +28,14 @@ const routes = [
       // items
       { name: 'user',
         path: 'user/:oid',
-        redirect: 'user/:oid/created',
+        // redirect: 'user/:oid/created',
         component: () => import('pages/app/user'),
-        children: [
-          { name: 'created', path: 'created', component: () => import('components/user_explorer/user_created') },
-          { name: 'voted', path: 'voted', component: () => import('components/user_explorer/user_voted') },
-          { name: 'following', path: 'following', component: () => import('components/user_explorer/user_following') },
-          { name: 'followers', path: 'followers', component: () => import('components/user_explorer/user_followers') },
-        ]
+        // children: [
+        //   { name: 'created', path: 'created', component: () => import('components/user_explorer/user_created') },
+        //   { name: 'voted', path: 'voted', component: () => import('components/user_explorer/user_voted') },
+        //   { name: 'following', path: 'following', component: () => import('components/user_explorer/user_following') },
+        //   { name: 'followers', path: 'followers', component: () => import('components/user_explorer/user_followers') },
+        // ]
       },
       {
         name: 'node',
@@ -60,10 +60,10 @@ const routes = [
           // content
           { name: 'content-list', path: 'content', component: () => import('components/workspace/ws_content_list') },
           { name: 'content-import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
-          { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') },
+          { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_page') },
           // composition
-          { name: 'composition-list', path: 'composition', component: () => import('components/workspace/ws_composition_list') },
-          { name: 'composition-editor', path: 'composition/:id', component: () => import('components/workspace/ws_composition_editor') },
+          // { name: 'composition-list', path: 'composition', component: () => import('components/workspace/ws_composition_list') },
+          // { name: 'composition-editor', path: 'composition/:id', component: () => import('components/workspace/ws_composition_editor') },
           // node
           { name: 'node-list', path: 'node', component: () => import('components/workspace/ws_node_list') },
           { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },

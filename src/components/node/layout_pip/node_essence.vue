@@ -8,7 +8,7 @@
 <template lang="pug">
 div(
   :style=`{
-    minHeight: '50px'
+    minHeight: '60px'
   }`
   ).row.full-width
   .col

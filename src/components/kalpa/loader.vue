@@ -51,9 +51,10 @@ export default {
     items: {
       deep: true,
       immediate: false,
-      handler(to, from){
-        // this.$log('loader items CHANGED', 'from=', from, ', to=', to)
+      handler (to, from) {
+        this.$log('items TO', to)
         this.$emit('itemsCount', to.length)
+        this.$emit('items', to)
         // alert('item CHANGED: ' + to.length)
         this.itemsSlice = 1
         this.itemsSliced = to.slice(0, this.sliceSize)
@@ -80,21 +81,29 @@ export default {
       this.itemsSlicing = false
     },
     async itemsLoad (mangoQuery, append = false) {
-      // this.$log('itemsLoad start', mangoQuery)
+      this.$log('itemsLoad start', mangoQuery)
       mangoQuery = mangoQuery || {selector: {}}
       try {
         let { items, count, totalCount, nextPageToken } = await this.$rxdb.find(mangoQuery)
         this.items = items
         this.itemsSliced = items.slice(0, this.sliceSize)
+        this.$emit('items', items)
         this.nextPageToken = nextPageToken
         this.totalCount = totalCount
         this.itemsCount = items.length
-        // this.$log('this.$rxdb.find = ', items)
+        this.$log('this.$rxdb.find = ', items)
       }
       catch (e) {
         this.$logE('itemsLoad error', e)
       }
     }
+  },
+  mounted () {
+    this.$log('mounted')
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    // alert('loader.beforeDestroy')
   }
 }
 </script>

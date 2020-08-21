@@ -8,7 +8,7 @@
 div(
   :style=`{
     borderRadius: $store.state.ui.borderRadius+'px',
-  }`).column.full-width.b-50
+  }`).column.full-width.b-40
   //- node editor
   q-dialog(
     v-model="nodeEditorOpened" position="bottom"
@@ -44,12 +44,12 @@ div(
       :style=`{
         borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
       }`
-      ).column.full-width.b-50
+      ).column.full-width.b-40
         router-link(
           v-if="$store.getters.currentUser()"
           :to="'/user/'+$store.getters.currentUser().oid"
           :class=`{
-            'b-100': $route.path.split('/')[1] === 'user'
+            'b-60': $route.path.split('/')[1] === 'user'
           }`
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
           ).row.full-width.items-center.content-center.menu-item
@@ -63,7 +63,7 @@ div(
           v-for="(p,pi) in pages" :key="p.id"
           :to="{name: p.id}"
           :class=`{
-            'b-100': $route.path.split('/')[1] === p.id
+            'b-60': $route.path.split('/')[1] === p.id
           }`
           :style=`{
             height: $q.screen.width > 600 ? '60px' : '40px',
@@ -115,7 +115,7 @@ export default {
       width: 300,
       pages: [
         {id: 'home', name: i18n.t('pageApp_home_title', 'Домашняя'), icon: 'home'},
-        {id: 'trends', name: i18n.t('pageTop', 'Топ'), icon: 'whatshot'},
+        {id: 'trends', name: i18n.t('pageCategories', 'Категории'), icon: 'whatshot'},
         {id: 'workspace', name: i18n.t('pageWorkspace', 'Мастерская'), icon: 'school'},
         {id: 'subscriptions', name: i18n.t('pageSubscriptions_title', 'Подписки'), icon: 'waves'},
         {id: 'notifications', name: i18n.t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},

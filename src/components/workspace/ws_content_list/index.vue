@@ -13,32 +13,38 @@ div(:style=`{position: 'relative'}`).column.fit
       :style=`{height: $q.screen.height+'px', minHeight: $q.screen.height+'px',}`).b-50
   //- header
   div(:style=`{}`).row.full-width.justify-center
+    //- standalone header for navigation
     div(
       v-if="mode === 'standalone'"
       :style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
       .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
         span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsContentList_title', 'Контент')}}
-    content-search(
-      @content="contentPicked"
-      @searchString="searchString = $event")
+    .row.full-width.justify-center
+      content-search(
+        @content="contentPicked"
+        @searchString="searchString = $event"
+        :style=`{maxWidth: '800px',}`)
     //- content type picker
-    .row.full-width.justify-start.q-px-md
-      q-tabs(v-model="type" no-caps dense active-color="green" align="left").text-grey-4
-        q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
+    .row.full-width.justify-center
+      div(:style=`{maxWidth: '800px',}`).row.full-width.justify-start.q-px-md
+        q-tabs(v-model="type" no-caps dense active-color="white" align="left").text-grey-4
+          q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   //- body
-  .col.full-width.scroll
-    .row.fit.items-start.content-start.justify-center
-      kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
-        template(v-slot=`{items, itemsMore}`)
-          list-masonry(
-            v-if="type === 'IMAGE'" :items="items")
-            template(v-slot:item=`{item}`)
-              content-item(:content="item" @pick="contentPicked(item)")
-          div(
-            v-else).row.full-width.q-px-sm
-            content-item(
-              v-for="(c,ci) in items" :key="c.id" :content="c"
-              @pick="contentPicked(c)")
+  div(:style=`{}`).col.full-width.scroll
+    .row.fit.justify-center
+      div(:style=`{maxWidth: '800px',}`).row.fit.items-start.content-start.justify-center
+        kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
+          template(v-slot=`{items, itemsMore}`)
+            list-masonry(
+              v-if="type === 'IMAGE'" :items="items")
+              template(v-slot:item=`{item}`)
+                content-item(:content="item" @pick="contentPicked(item)")
+            div(
+              v-else).row.full-width.q-px-sm
+              content-item(
+                v-for="(c,ci) in items" :key="c.id" :content="c"
+                @pick="contentPicked(c)")
+      div(:style=`{height: '200px',}`).row.full-width
 </template>
 
 <script>
@@ -107,8 +113,13 @@ export default {
   methods: {
     contentPicked (content) {
       this.$log('contentPicked', this.mode, content)
-      this.content = content
-      this.contentExplorerOpened = true
+      if (this.mode === 'standalone') {
+        this.$router.push(`/workspace/content/${content.id}`).catch(e => e)
+      }
+      else {
+        this.content = content
+        this.contentExplorerOpened = true
+      }
     },
     compositionPicked (composition) {
       this.$log('compositionPicked', composition)

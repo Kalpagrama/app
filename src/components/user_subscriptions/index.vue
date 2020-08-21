@@ -63,6 +63,9 @@ export default {
   props: {
     mode: {
       type: String, default () { return 'standalone' },
+    },
+    oid: {
+      type: String
     }
   },
   data () {
@@ -76,7 +79,7 @@ export default {
       return {
         selector: {
           rxCollectionEnum: RxCollectionEnum.LST_SUBSCRIPTIONS,
-          oidSphere: this.$store.getters.currentUser().oid,
+          oidSphere: this.oid || this.$store.getters.currentUser().oid,
         }
       }
     }

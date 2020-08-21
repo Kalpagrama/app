@@ -2,7 +2,7 @@
 .row.full-width.justify-center
   div(
     :style=`{
-      height: '58px',
+      height: '50px',
     }`
     ).row.full-width.items-center.content-center.q-px-sm
     q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$emit('close')")

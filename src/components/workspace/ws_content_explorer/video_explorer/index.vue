@@ -47,7 +47,7 @@ div(
     pages-controller(
       v-show="!pageFullscreen && compositionsSelected.length === 0 && !compositionEditing"
       @close="$emit('close')"
-      :style=`{position: 'absolute', zIndex: 1000, bottom: '0px',}`)
+      :style=`{position: 'absolute', zIndex: 1000, bottom: '0px',}`).b-40
 </template>
 
 <script>
@@ -84,8 +84,8 @@ export default {
   data () {
     return {
       name: '',
-      pageHeight: 58,
-      pageHeightMini: 58,
+      pageHeight: 50,
+      pageHeightMini: 50,
       pageHeightMaxi: 500,
       pageFullscreen: false,
       pageId: null, // 'compositions',
@@ -100,8 +100,8 @@ export default {
     pages () {
       return [
         // {id: 'details', name: this.$t('Детали')},
-        {id: 'compositions', name: this.$t('videoExplorer_nodesMine', 'Мои ядра')},
-        {id: 'explore', name: this.$t('videoExplorer_nodesKalpa', 'Ядра')},
+        {id: 'compositions', name: this.$t('videoExplorer_nodesMineDrafts', 'Мои заготовки')},
+        {id: 'explore', name: this.$t('videoExplorer_nodesPublished', 'Ядра')},
       ]
     },
     sidPlayer () {
@@ -126,7 +126,7 @@ export default {
       immediate: false,
       handler (to, from) {
         if (to) {
-          this.pageHeight = this.$q.screen.height * 0.55
+          this.pageHeight = this.$q.screen.height * 0.8
         }
         else {
           // this.pageHeight = 36

@@ -5,7 +5,8 @@
 </style>
 
 <template lang="pug">
-kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
+user-subscriptions().br
+//- kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
   template(v-slot=`{items, itemsMore}`)
     .row.full-width.justify-center
       div(:style=`{maxWidth: '600px', paddingTop: '110px',}`).row.full-width.items-start.content-start
@@ -28,6 +29,7 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'userExplorer-userFollowing',
+  // components: {userSubscriptions},
   props: ['subscriptions', 'oid'],
   data () {
     return {

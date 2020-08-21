@@ -7,27 +7,15 @@
 
 <template lang="pug">
 div(:style=`{position: 'relative'}`).column.fit
-  //- category picker
-  q-btn(
-    @click="categoryPicking = true"
-    no-caps color="green" icon-right="keyboard_arrow_down"
-    :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '14px',
-      left: '50%',
-      marginRight: '-50%',
-      transform: 'translate(-50%, 0)',
-    }`
-    ).q-px-sm {{ category.alias }}
-    q-menu(cover anchor="bottom middle" max-width="300px")
-      div(v-if="categoryPicking").row.b-80
-        menu-right(:style=`{minHeight: '500px',}`)
   //- header
   div(:style=`{position: 'absolute', zIndex: 10000, top: '0px',}`).row.full-width.justify-center
-    div(:style=`{height: '60px', maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
-      ).row.full-width.items-center.content-center.justify-between.b-60
-      .row.full-width.items-center.content-center.q-px-sm
-        q-icon(name="whatshot" color="white" size="30px").q-mr-sm
-        span(:style=`{fontSize: '20px',}`).text-bold.text-white {{ category.alias }}
+    div(:style=`{height: '50px', maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.justify-between.b-40
+      q-tabs(
+        :value="$route.params.oid" @input="$router.push({params: {oid: $event}})"
+        no-caps active-color="white"
+        ).fit.text-white
+        q-tab(v-for="c in categories" :key="c.sphere.oid" :name="c.sphere.oid" :label="c.alias")
   //- body
   .col.full-width
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
@@ -51,12 +39,12 @@ div(:style=`{position: 'relative'}`).column.fit
 </template>
 
 <script>
-import menuRight from './menu_right'
+// import menuRight from './menu_right'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'trendsExplorer',
-  components: {menuRight},
+  // components: {menuRight},
   props: ['category'],
   data () {
     return {
@@ -64,6 +52,7 @@ export default {
       pointerEventsTimeout: null,
       pointerEvents: false,
       categoryPicking: false,
+      categories: []
     }
   },
   computed: {
@@ -79,5 +68,9 @@ export default {
       }
     }
   },
+  async mounted () {
+    this.$log('mounted')
+    this.categories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
+  }
 }
 </script>

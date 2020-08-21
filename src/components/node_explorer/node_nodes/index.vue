@@ -5,10 +5,10 @@ div(:style=`{position: 'relative'}`).column.fit
     @click="itemPickerOpened = true"
     color="green" no-caps
     :style=`{
-      position: 'fixed', zIndex: 5555, bottom: '14px',
+      position: 'fixed', zIndex: 5555, bottom: '8px',
       left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',
     }`)
-    span.text-white.text-bold {{ $t('nodeExplorer_nodeNodes_addNodeSame', 'Добавить похожее ядро') }}
+    span.text-white.text-bold {{ $t('nodeExplorer_nodeNodes_addNodeSame_', 'Добавить похожее') }}
   //- ws item picker
   q-dialog(
     v-model="itemPickerOpened" position="bottom"

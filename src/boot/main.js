@@ -91,6 +91,7 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
     // node
     Vue.component('chain', () => import('components/chain/index.vue'))
     Vue.component('node', () => import('components/node/index.vue'))
+    Vue.component('nodeLite', () => import('components/node_lite/index.vue'))
     Vue.component('composition', () => import('components/node/composition'))
     // Vue.component('sphere', () => import('components/sphere'))
     // workspace

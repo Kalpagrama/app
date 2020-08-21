@@ -8,13 +8,13 @@
 kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
   template(v-slot=`{items, itemsMore}`)
     .row.full-width.justify-center
-      div(:style=`{maxWidth: '600px', paddingTop: '110px',}`).row.full-width.items-start.content-start
+      div(:style=`{maxWidth: '600px', paddingTop: '110px',}`).row.full-width.items-start.content-start.q-px-sm
         div(
           v-for="(s,si) in items" :key="s.oid"
           :style=`{
             position: 'relative',
-            height: '40px',
-            borderRadius: $store.state.ui.borderRadius+'px'
+            height: '50px',
+            borderRadius: '10px', overflow: 'hidden',
           }`
           ).row.full-width.items-center.content-center.q-px-md.cursor-pointer.subscription.b-50.q-mb-xs
           img(@click="subscriptionClick(s,si)" :src="s.thumbUrl" :style=`{width: '30px', height: '30px', borderRadius: '50%',}`)
@@ -51,32 +51,6 @@ export default {
       this.$log('subscriptionClick', s, si)
       this.$router.push('/user/' + s.oid)
     },
-    subjectClick (s) {
-      this.$logD('subjectClick')
-      switch (s.type) {
-        case 'VIDEO':
-        case 'AUDIO':
-        case 'BOOK':
-        case 'IMAGE': {
-          this.$router.push(`/content/${s.oid}`)
-          break
-        }
-        case 'USER': {
-          if (this.oid === s.oid) break
-          else this.$router.push(`/user/${s.oid}`)
-          this.$log('!!!', this.path)
-          break
-        }
-        case 'SPHERE': {
-          this.$router.push(`/sphere/${s.oid}`)
-          break
-        }
-        case 'NODE': {
-          this.$router.push(`/node/${s.oid}`)
-          break
-        }
-      }
-    }
   }
 }
 </script>
