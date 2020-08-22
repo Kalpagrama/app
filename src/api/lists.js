@@ -13,6 +13,7 @@ class ListsApi {
   static checkMangoQuery(mangoQuery){
     const f = this.checkMangoQuery
     logD(f, 'start', mangoQuery)
+    const t1 = performance.now()
     let ex = {
       selector: {
         oidSphere: 'AGKAwKuAwCU=',
@@ -33,6 +34,7 @@ class ListsApi {
     for (let key in mangoQuery.selector){
       assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'sortStrategy'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
     }
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
   static async getList (mangoQuery) {
@@ -123,8 +125,9 @@ class ListsApi {
 
   static async find (mangoQuery) {
     ListsApi.checkMangoQuery(mangoQuery)
-    let f = this.find
+    const f = this.find
     logD(f, 'start')
+    const t1 = performance.now()
     let { data: { find: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectShortWithMetaFragment}
@@ -139,12 +142,12 @@ class ListsApi {
       `,
       variables: {mangoQuery }
     })
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return { items/* : items.filter(item => item.oid !== 'AKCmbRKCwHc=' && item.oid !== 'AKCl7kYCwHY=') */, count, totalCount, nextPageToken }
   }
 
   // static async sphereSpheres (oid, pagination, filter, sortStrategy) {
-  //   let f = this.sphereSpheres
+  //   const f = this.sphereSpheres
   //   logD(f, 'start')
   //   let { data: { sphereSpheres: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
   //     query: gql`
@@ -159,12 +162,12 @@ class ListsApi {
   //     `,
   //     variables: { oid, pagination, filter, sortStrategy }
   //   })
-  //   logD(f, 'complete')
+  //   logD(f, `complete: ${performance.now() - t1} msec`)
   //   return { items, count, totalCount, nextPageToken }
   // }
 
   // static async sphereNodes (oid, pagination, filter, sortStrategy) {
-  //   let f = this.sphereNodes
+  //   const f = this.sphereNodes
   //   logD(f, 'start')
   //   let { data: { sphereItems: { items, count, totalCount, nextPageToken, prevPageToken } } } = await apollo.clients.api.query({
   //     query: gql`
@@ -180,13 +183,14 @@ class ListsApi {
   //     `,
   //     variables: { oid, pagination, filter, sortStrategy }
   //   })
-  //   logD(f, 'complete')
+  //   logD(f, `complete: ${performance.now() - t1} msec`)
   //   return { items, count, totalCount, nextPageToken, prevPageToken }
   // }
 
   static async feed (pagination) {
-    let f = this.feed
+    const f = this.feed
     // logD(f, 'start')
+    // const t1 = performance.now()
     let { data: { feed: { items, count, totalCount, nextPageToken } } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectShortWithMetaFragment}
@@ -201,7 +205,7 @@ class ListsApi {
       `,
       variables: { pagination }
     })
-    // logD(f, 'complete')
+    // logD(f, `complete: ${performance.now() - t1} msec`)
     return { items, count, totalCount, nextPageToken }
   }
 

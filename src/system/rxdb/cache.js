@@ -28,7 +28,9 @@ class Cache {
   }
 
   async createCollections () {
-    let f = this.createCollections
+    const f = this.createCollections
+    logD(f, 'start')
+    const t1 = performance.now()
     await this.db.collection({ name: 'cache', schema: cacheSchema })
     this.db.cache.postInsert(async (plainData) => {
       await this.debouncedDumpLru()
@@ -39,12 +41,14 @@ class Cache {
     this.db.cache.postRemove(async (plainData) => {
       await this.debouncedDumpLru()
     }, false)
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
   // удалить все данные из кэша
   async clearCollections () {
     const f = this.clearCollections
     logD(f, 'start')
+    const t1 = performance.now()
     try {
       this.lruResetInProgress = true
       if (this.cacheLru) this.cacheLru.reset()
@@ -55,12 +59,13 @@ class Cache {
       await this.db.cache.remove()
     }
     await this.createCollections()
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
   async create (recursive = false) {
     const f = this.create
     logD(f, 'start')
+    const t1 = performance.now()
     assert(!this.created, 'this.created')
     try {
       this.mutex = new Mutex()
@@ -102,9 +107,11 @@ class Cache {
       this.debouncedDumpLru = debounce(async () => {
         const f = this.debouncedDumpLru
         if (!rxdb.isLeader()) return
-        logD(f, 'start. debouncedDumpLru.')
+        logD(f, 'start')
+        const t1 = performance.now()
         let lruDump = this.cacheLru.dump()
         await rxdb.set(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
+        logD(f, `complete: ${performance.now() - t1} msec`)
       }, debounceIntervalDumpLru)
 
       // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
@@ -117,7 +124,7 @@ class Cache {
         }
       }
       this.created = true
-      logD(f, 'complete')
+      logD(f, `complete: ${performance.now() - t1} msec`)
     } catch (err) {
       if (recursive) throw err
       logE(f, 'ошибка при создания CACHE! очищаем и пересоздаем!', err)
@@ -146,8 +153,9 @@ class Cache {
       assert(this.created, '!this.created')
       assert(id && data, '!id && data' + id + JSON.stringify(data))
       let rxCollectionEnum = getRxCollectionEnumFromId(id)
-      let f = this.set
+      const f = this.set
       logD(f, 'start', id)
+      const t1 = performance.now()
       actualAge = actualAge || 'stale'
       switch (actualAge) {
         case 'zero':
@@ -207,7 +215,7 @@ class Cache {
         },
         cached: { data }
       }) // сохраняем в rxdb
-      logD(f, 'complete')
+      logD(f, `complete: ${performance.now() - t1} msec`)
       return rxDoc
     } finally {
       this.release()
@@ -215,13 +223,14 @@ class Cache {
   }
 
   // вернет из кэша, в фоне запросит данные через fetchFunc. может вернуть null
-  async get (id, fetchFunc, clientFirst = true, force = false) {
+  async get (id, fetchFunc, clientFirst = true, force = false, onFetchFunc = null) {
     try {
       // await this.lock() ! нельзя тк необходимо чтобы запросы выполнялись параллельно (см QueryAccumulator)
       assert(this.created, '!this.created')
       assert(id)
-      let f = this.get
+      const f = this.get
       // logD(f, 'start', id)
+      // const t1 = performance.now()
       if (DEBUG_IGNORE_CACHE) logW(f, 'DEBUG_IGNORE_CACHE is ON!!!')
       let { actualUntil, actualAge, failReason } = this.cacheLru.get(id) || {}
       if (force || !actualUntil || Date.now() > actualUntil) { // данные отсутствуют в кэше, либо устарели
@@ -246,6 +255,7 @@ class Cache {
             let notEvict = fetchRes.notEvict || false
             let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, fetchRes.mangoQuery)
             logD(f, 'записаны в кэш')
+            if (onFetchFunc) await onFetchFunc()
             return res
           }
           logD(f, 'запрашиваем данные с сервера...')
@@ -272,7 +282,7 @@ class Cache {
         }
         return null
       }
-      // logD(f, 'complete', id)
+      // logD(f, `complete: ${performance.now() - t1} msec`)
       return rxDoc
     } finally {
       // this.release()

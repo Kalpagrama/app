@@ -75,6 +75,7 @@ class Lists {
     assert(rxdb.isLeader(), 'rxdb.isLeader()')
     const f = this.processEvent
     logD(f, 'start')
+    const t1 = performance.now()
     switch (event.type) {
       case 'USER_SUBSCRIBED': {
         // списки: подписчики этого объекта
@@ -221,7 +222,7 @@ class Lists {
         throw new Error(`unsupported Event ${event.type}`)
     }
     let { type, wsItem: itemServer, wsRevision } = event
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
   // подходит ли object под этот фильтр

@@ -3022,51 +3022,6 @@
             "deprecationReason": null
           },
           {
-            "name": "nodeRate",
-            "description": null,
-            "args": [
-              {
-                "name": "oid",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "OID",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              },
-              {
-                "name": "rate",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "Float",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Node",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "unrate",
             "description": "снять голос",
             "args": [
@@ -3091,37 +3046,6 @@
               "ofType": {
                 "kind": "INTERFACE",
                 "name": "Object",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "nodeUnrate",
-            "description": null,
-            "args": [
-              {
-                "name": "oid",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "OID",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "Node",
                 "ofType": null
               }
             },
@@ -3632,24 +3556,14 @@
             "description": "ядро,которое надо создать",
             "type": {
               "kind": "INPUT_OBJECT",
-              "name": "NodeItemInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "chain",
-            "description": "цепочка, которую надо создать",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ChainInput",
+              "name": "NodeInput",
               "ofType": null
             },
             "defaultValue": null
           },
           {
             "name": "oid",
-            "description": "ссылка на существующие ядра/цепочки/композиции",
+            "description": "ссылка на существующие ядра/композиции",
             "type": {
               "kind": "SCALAR",
               "name": "OID",
@@ -3675,28 +3589,6 @@
               "kind": "SCALAR",
               "name": "String",
               "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "spheres",
-            "description": "хэштеги (запоминаются на ядре и в мастерской). учитываются при голосовании зя ядро. ",
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ObjectShortInput",
-                    "ofType": null
-                  }
-                }
-              }
             },
             "defaultValue": null
           },
@@ -3780,24 +3672,12 @@
             "defaultValue": null
           },
           {
-            "name": "spheres",
-            "description": "хэштеги (запоминаются на ядре и в мастерской). учитываются при голосовании зя ядро.",
+            "name": "name",
+            "description": "имя слоя нужно только в редакторе. на суть не влияет!",
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ObjectShortInput",
-                    "ofType": null
-                  }
-                }
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "defaultValue": null
           },
@@ -3991,228 +3871,6 @@
           },
           {
             "name": "OVERLAY",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ChainInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "name",
-            "description": "если не указать - то у цепочки появляется суть",
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "links",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ChainLinkInput",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "category",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "CategoryEnum",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "spheres",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "ObjectShortInput",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "rev",
-            "description": "версия объекта по мнению клиента (нужно при апдейте)",
-            "type": {
-              "kind": "SCALAR",
-              "name": "Int",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "ChainLinkInput",
-        "description": "в звене может быть ядро либо другая цепочка",
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "leftItem",
-            "description": "можно не указывать. тогда - плэйсхолдер",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "LinkItemInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "rightItem",
-            "description": null,
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "LinkItemInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "type",
-            "description": null,
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "RelationTypeEnum",
-                "ofType": null
-              }
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "LinkItemInput",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "node",
-            "description": "ядро,которое надо создать",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "NodeItemInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "chain",
-            "description": "цепочка, которую надо создать",
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "ChainInput",
-              "ofType": null
-            },
-            "defaultValue": null
-          },
-          {
-            "name": "oid",
-            "description": "ссылка на существующие ядра/цепочки",
-            "type": {
-              "kind": "SCALAR",
-              "name": "OID",
-              "ofType": null
-            },
-            "defaultValue": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "ENUM",
-        "name": "RelationTypeEnum",
-        "description": null,
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
-        "enumValues": [
-          {
-            "name": "ESSENCE",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "ASSOCIATIVE",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "CAUSE_EFFECT",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "PROBLEM_SOLUTION",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "FALSE_TRUE",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "FROM_TO",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -4434,7 +4092,7 @@
           },
           {
             "name": "items",
-            "description": "Пересечение 2х Composition - есть это ядро.",
+            "description": "композиции либо ядра",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -4582,6 +4240,182 @@
           }
         ],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ChainInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "name",
+            "description": "если не указать - то у цепочки появляется суть",
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "links",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "INPUT_OBJECT",
+                    "name": "ChainLinkInput",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "rev",
+            "description": "версия объекта по мнению клиента (нужно при апдейте)",
+            "type": {
+              "kind": "SCALAR",
+              "name": "Int",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "ChainLinkInput",
+        "description": "в звене может быть ядро либо другая цепочка",
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "leftItem",
+            "description": "можно не указывать. тогда - плэйсхолдер",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "LinkItemInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "rightItem",
+            "description": null,
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "LinkItemInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "type",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "ENUM",
+                "name": "RelationTypeEnum",
+                "ofType": null
+              }
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "LinkItemInput",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "node",
+            "description": "ядро,которое надо создать",
+            "type": {
+              "kind": "INPUT_OBJECT",
+              "name": "NodeItemInput",
+              "ofType": null
+            },
+            "defaultValue": null
+          },
+          {
+            "name": "oid",
+            "description": "ссылка на существующие ядра/цепочки",
+            "type": {
+              "kind": "SCALAR",
+              "name": "OID",
+              "ofType": null
+            },
+            "defaultValue": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "RelationTypeEnum",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "ESSENCE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ASSOCIATIVE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CAUSE_EFFECT",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PROBLEM_SOLUTION",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "FALSE_TRUE",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "FROM_TO",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -4805,46 +4639,6 @@
             "deprecationReason": null
           },
           {
-            "name": "spheres",
-            "description": "хэштеги",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ObjectShort",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "category",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "ENUM",
-                "name": "CategoryEnum",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "rate",
             "description": "рейтинг цепочки",
             "args": [],
@@ -4921,18 +4715,6 @@
         "name": "ChainLink",
         "description": null,
         "fields": [
-          {
-            "name": "name",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "leftItem",
             "description": "ядро или цепочка",
@@ -6053,30 +5835,6 @@
             "deprecationReason": null
           },
           {
-            "name": "spheres",
-            "description": "хэштеги, назначенные фрагменту в рамках какой-то конкретной сущности(ядра или\nмастерской). можно посмотреть все сферы, связанные с фрагментом (см sphereSpheres)",
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ObjectShort",
-                    "ofType": null
-                  }
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "layers",
             "description": "кусочки контентов, из которых собирается фрагмент",
             "args": [],
@@ -6298,25 +6056,13 @@
             "deprecationReason": null
           },
           {
-            "name": "spheres",
-            "description": "хэштеги, назначенные кату в рамках какой-то конкретной сущности(ядра или мастерской).",
+            "name": "name",
+            "description": "имя слоя нужно только в редакторе. на суть не влияет!",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INTERFACE",
-                    "name": "ObjectShort",
-                    "ofType": null
-                  }
-                }
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null

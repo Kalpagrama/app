@@ -26,6 +26,7 @@ class WaitBreakable {
   }
 
   break () {
+    logD('форсированная синхронизация мастерской... ')
     this.waitUntil = Date.now()
   }
 
@@ -66,8 +67,9 @@ class Workspace {
   }
 
   async createCollections () {
-    let f = this.createCollections
+    const f = this.createCollections
     logD(f, 'start')
+    const t1 = performance.now()
     // добавлет дефолтный вариант для пропущенных стратегий
     const migrationProxy = (migrationStrategies) => {
       return new Proxy(migrationStrategies, {
@@ -121,13 +123,14 @@ class Workspace {
     this.db.ws_items.postRemove(async (plainData) => {
       await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE)
     }, false)
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
   // удалить все данные из мастерской
   async clearCollections () {
     const f = this.clearCollections
     logD(f, 'start')
+    const t1 = performance.now()
     // assert(!this.ignoreWsChanges, 'ignoreWsChanges === true')
     while (this.ignoreWsChanges) { // подождем пока отработают synchronize и processEvent
       await wait(100)
@@ -146,7 +149,7 @@ class Workspace {
       this.ignoreWsChanges = false
       this.release()
     }
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
   async create (recursive = false) {
@@ -197,10 +200,14 @@ class Workspace {
   // запускается по мере необходимости см ( switchOnSynchro )
   async synchronize () {
     const f = this.synchronize
+    logD(f, 'start')
+    const t1 = performance.now()
     assert(rxdb.isLeader(), '!isLeader')
     // запросит при необходимости данные и сольет с локальными изменениями
     const synchronizeWsWhole = async (forceMerge = false) => {
       const f = synchronizeWsWhole
+      logD(f, 'start')
+      const t1 = performance.now()
       assert(this.reactiveUser && this.reactiveUser.wsRevision >= 0, '!wsRevision')
 
       try {
@@ -209,15 +216,13 @@ class Workspace {
         let wsRevisionLocal = wsRevisionLocalDoc ? parseInt(wsRevisionLocalDoc) : -1
         if (forceMerge || wsRevisionLocal !== this.reactiveUser.wsRevision) { // ревизия мастерской на сервере отличается (this.reactiveUser.wsRevision меняется в processEvent)
           let wsServer = await WorkspaceApi.getWs()
-          logD(f, 'try merge ws')
-          console.time('tm merge ws')
+          logD(f, 'try merge ws...')
+          // console.time('tm merge ws')
           let itemsServer = []
           for (let wsItemTypeEnum in WsItemTypeEnum) {
             if (wsServer[wsItemTypeEnum])itemsServer.push(...wsServer[wsItemTypeEnum])
           }
           let itemsLocal = await this.db.ws_items.find().exec()
-          let serverIds = new Set(itemsServer.map(item => item.id))
-          let localIds = new Set(itemsLocal.map(item => item.id))
           let unsavedIds = new Set((await this.db.ws_changes.find().exec()).map(item => item.id))
 
           // есть на сервере, но нет у нас (эти надо вставить!)
@@ -236,7 +241,8 @@ class Workspace {
           await this.db.ws_items.bulkInsert(newItems)
           for (let outdated of outdatedItems) await this.db.ws_items.atomicUpsert(outdated)
           await this.db.ws_items.find({ selector: { id: { $in: extraItems.map(item => item.id) } } }).remove() // удаялем те, которых нет на сервере
-          console.timeEnd('tm merge ws')
+          // console.timeEnd('tm merge ws')
+
           // !!!!так очень долго! один запрос к rxdb ~ 100 ms
           // for (let wsItemTypeEnum in WsItemTypeEnum) {
           //   for (let itemServer of itemsServer) {
@@ -270,7 +276,7 @@ class Workspace {
           // }
           await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
           this.reactiveUser.wsRevision = wsServer.rev // версия по мнению сервера
-          logD(f, 'pull ws complete')
+          logD(f, `complete: ${performance.now() - t1} msec`)
         }
       } finally {
         this.ignoreWsChanges = false
@@ -281,6 +287,7 @@ class Workspace {
       const f = saveToServer
       assert(item, '!item')
       logD(f, `start ${item.id} rev:${item.rev}`)
+      const t1 = performance.now()
       assert(rxdb.isLeader(), '!this.isLeader')
       assert(this.created, '!this.created')
       assert(item && item.id, '!item')
@@ -291,7 +298,7 @@ class Workspace {
       } else {
         wsItemDelete = await WorkspaceApi.wsItemDelete(item)
       }
-      logD(f, 'complete')
+      logD(f, `complete: ${performance.now() - t1} msec`)
       return { wsItemUpsert, wsItemDelete }
     }
 
@@ -336,6 +343,7 @@ class Workspace {
         }
       }
     }
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
   // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
@@ -346,6 +354,7 @@ class Workspace {
       this.ignoreWsChanges = true
       const f = this.processEvent
       logD(f, 'start')
+      const t1 = performance.now()
       if (!rxdb.isLeader()) return
       let { type, wsItem: itemServer, wsRevision } = event
       assert(this.created, '!this.created')
@@ -382,7 +391,7 @@ class Workspace {
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
       await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: this.reactiveUser.wsRevision.toString() })
-      logD(f, 'complete')
+      logD(f, `complete: ${performance.now() - t1} msec`)
     } finally {
       this.ignoreWsChanges = false
       this.release()
@@ -396,6 +405,7 @@ class Workspace {
       assert(this.created, '!this.created')
       let itemCopy = JSON.parse(JSON.stringify(item))
       logD(f, `start. item: ${JSON.stringify(item)}`)
+      const t1 = performance.now()
       assert(itemCopy.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + itemCopy.g)
       itemCopy.updatedAt = Date.now()
       if (!itemCopy.createdAt) itemCopy.createdAt = Date.now()
@@ -407,7 +417,7 @@ class Workspace {
       assert(isRxDocument(rxDoc), '!isRxDocument' + JSON.stringify(rxDoc))
       // const queryXxx2 = this.db.ws_items.find()
       // const queryRes2 = await queryXxx2.exec()
-      // logD(f, `complete. queryRes2.length=${queryRes2.length} rxDoc = ${JSON.stringify(rxDoc)}`)
+      logD(f, `complete: ${performance.now() - t1} msec`)
       return rxDoc
     } finally {
       this.release()

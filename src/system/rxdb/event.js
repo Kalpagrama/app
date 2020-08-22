@@ -36,6 +36,7 @@ class Event {
     assert(event && store, 'event && store')
     const f = this.processEvent
     logD(f, 'start', rxdb.isLeader())
+    const t1 = performance.now()
     if (!rxdb.isLeader()) return
     switch (event.type) {
       case 'ERROR':
@@ -111,7 +112,7 @@ class Event {
       default:
         throw new Error(`unsupported Event ${event.type}`)
     }
-    logD('processEvent done')
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
 // вывести уведомление о действии пользователя

@@ -10,8 +10,9 @@ const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
 const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.SW)
 
 async function initServices (store) {
-  let f = initServices
+  const f = initServices
   logD(f, 'start', Platform.is, process.env.MODE)
+  const t1 = performance.now()
   if (process.env.MODE === 'pwa') {
     await initPWA(store)
   } else if (Platform.is.capacitor) {
@@ -24,7 +25,7 @@ async function initServices (store) {
   initOfflineEvents(store)
   // todo запрашивать тольько когда юзер первый раз ставит приложение и из настроек!!!
   const hasPerm = await askForWebPushPerm(store)
-  logD(f, 'complete! notification permission = ', hasPerm)
+  logD(f, `complete: ${performance.now() - t1} msec`, hasPerm)
 }
 
 function initOfflineEvents (store) {
@@ -46,17 +47,14 @@ function initOfflineEvents (store) {
 }
 
 // очистить кэш сервис-воркера
-async function systemReset (force = false, logout = false) {
-  let f = systemReset
+async function systemReset (force = false) {
+  const f = systemReset
   logD(f, 'start')
+  const t1 = performance.now()
   if (process.env.MODE === 'pwa') await pwaReset(force)
-  if (logout) {
-    await rxdb.clearAll()
-    await rxdb.setUser(null)
-    window.location.reload()
-  }
-  else await rxdb.clearAll()
-  logD(f, 'complete')
+  await rxdb.clearAll()
+  await rxdb.stopBackgroundProcesses()
+  logD(f, `complete: ${performance.now() - t1} msec`)
 }
 
 async function askForWebPushPerm (store) {

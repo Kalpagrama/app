@@ -36,8 +36,9 @@ class UserApi {
 
   // Подписаться на сущность. Мутация будет вызвана по приходу эвента
   static async subscribe (oid) {
-    let f = UserApi.subscribe
+    const f = UserApi.subscribe
     logD(f, 'start', oid)
+    const t1 = performance.now()
     let { data: { subscribe } } = await apollo.clients.api.mutate({
       mutation: gql`
         ${fragments.objectShortFragment}
@@ -51,14 +52,15 @@ class UserApi {
         oid
       }
     })
-    logD(f, 'complete', subscribe)
+    logD(f, `complete: ${performance.now() - t1} msec`, subscribe)
     return subscribe
   }
 
   // check subscription
   static async isSubscribed (oid) {
-    let f = UserApi.isSubscribed
+    const f = UserApi.isSubscribed
     logD(f, 'start', oid)
+    const t1 = performance.now()
     let objectFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
     let { items } = await rxdb.find({
       selector: {
@@ -68,7 +70,7 @@ class UserApi {
     })
     let currentUserOid = localStorage.getItem('k_user_oid')
     let res = items.find(item => item.oid === currentUserOid) ? true : false
-    logD(f, 'complete', res)
+    logD(f, `complete: ${performance.now() - t1} msec`, res)
     return res
   }
 

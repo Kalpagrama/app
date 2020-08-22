@@ -56,8 +56,9 @@ export default {
   },
   methods: {
     async nodeLoad () {
-      let f = this.nodeLoad
+      const f = this.nodeLoad
       this.$log(f, 'start', this.node.oid)
+      const t1 = performance.now()
       let nodeFull = null
       try {
         nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
@@ -65,6 +66,7 @@ export default {
         this.$emit('error')
       }
       this.nodeFull = nodeFull
+      this.$log(f, `complete: ${performance.now() - t1} msec`)
     },
     async nodeDestroy () {
       // this.$log('nodeDestroy', this.node.oid)

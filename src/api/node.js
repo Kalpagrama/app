@@ -11,8 +11,9 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
 
 class NodeApi {
   static async nodeCategories () {
-    let f = this.nodeCategories
+    const f = this.nodeCategories
     logD(f, 'start')
+    const t1 = performance.now()
     let { data: { categories } } = await apollo.clients.auth.query({
       query: gql`
         query {
@@ -30,7 +31,7 @@ class NodeApi {
         }
       `
     })
-    logD(f, 'done')
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return categories
   }
 
@@ -92,7 +93,7 @@ class NodeApi {
   }
 
   static makeNodeInput (node) {
-    let f = NodeApi.makeNodeInput
+    const f = NodeApi.makeNodeInput
     node = cloneDeep(node) // makeNodeInput меняет node
     {
       // checks
@@ -119,8 +120,9 @@ class NodeApi {
   }
 
   static async nodeUnrate (oid) {
-    let f = this.nodeUnrate
+    const f = this.nodeUnrate
     logD(f, 'start')
+    const t1 = performance.now()
     if (!oid) return
     let { data: { nodeUnrate } } = await apollo.clients.api.mutate({
       mutation: gql`
@@ -136,23 +138,23 @@ class NodeApi {
         oid: oid
       }
     })
-    logD(f, 'start')
     // todo update node in apollo cache
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return nodeUnrate
   }
 
   // общая оценка ядра придет с эвентом
   static async nodeVote (oid, rate) {
-    let f = this.nodeVote
+    const f = this.nodeVote
     logD(f, 'start')
+    const t1 = performance.now()
     assert(oid && rate, 'oid && rate')
     let { data: { nodeRate } } = await apollo.clients.api.mutate({
       mutation: gql`
-        mutation nodeVote ($oid: OID!, $rate: Float!) {
-          nodeRate (oid: $oid, rate: $rate){
-            oid
-            rate
-            rateUser
+        ${fragments.objectFullFragment}
+        mutation rate ($oid: OID!, $rate: Float!) {
+          rate (oid: $oid, rate: $rate){
+            ...objectFullFragment
           }
         }
       `,
@@ -168,6 +170,7 @@ class NodeApi {
       nodeFull.rateUser = rate // nodeFull реактивен!
       logD(f, `done rateUser=${nodeFull.rateUser}`)
     }
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return rate
   }
 
@@ -189,8 +192,9 @@ class NodeApi {
   }
 
   static async nodeCreate (node) {
-    let f = this.nodeCreate
+    const f = this.nodeCreate
     logD(f, 'start', node)
+    const t1 = performance.now()
     let nodeInput = NodeApi.makeNodeInput(node)
     let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
       mutation: gql`
@@ -206,7 +210,7 @@ class NodeApi {
       }
     })
     let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-    logD(f, 'done')
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return createdNode
   }
 
@@ -243,8 +247,9 @@ class NodeApi {
   }
 
   static async chainCreate (chain) {
-    let f = this.chainCreate
+    const f = this.chainCreate
     logD(f, 'start')
+    const t1 = performance.now()
     let chainInput = NodeApi.makeChainInput(chain)
     logD('chainCreate chainInput', chainInput)
     let { data: { chainCreate: createdChain } } = await apollo.clients.api.mutate({
@@ -261,7 +266,7 @@ class NodeApi {
       }
     })
     let reactiveChain = await rxdb.set(RxCollectionEnum.OBJ, createdChain, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-    logD(f, 'done')
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return createdChain
   }
 }

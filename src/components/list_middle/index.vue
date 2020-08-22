@@ -113,7 +113,7 @@ export default {
       this.scrollHeight = e.target.scrollHeight
     },
     indexMiddleHandler (isVisible, entry, i) {
-      let f = this.indexMiddleHandler
+      const f = this.indexMiddleHandler
       let index
       if (i >= 0) index = i
       else index = parseInt(entry.target.accessKey)

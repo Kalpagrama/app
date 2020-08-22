@@ -14,8 +14,9 @@ const forceUpdatePWA = true // обновлять приложение без р
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 async function initPWA (store) {
-  let f = initPWA
+  const f = initPWA
   logD(f, 'start')
+  const t1 = performance.now()
   window.addEventListener('beforeinstallprompt', (e) => {
     // Prevent the mini-info bar from appearing.
     logD('beforeinstallprompt')
@@ -35,7 +36,7 @@ async function initPWA (store) {
       // sw уже зарегистрирован. ф-ей register можно пользоваться для получения текущей регистрации
       registration = await navigator.serviceWorker.register('/service-worker.js')
       let sw = registration.installing || registration.active
-      for (let sw of [registration.installing, registration.waiting, registration.active]){
+      for (let sw of [registration.installing, registration.waiting, registration.active]) {
         if (sw) {
           sw.postMessage({
             type: 'logInit',
@@ -118,32 +119,40 @@ async function initPWA (store) {
   } else {
     logW('serviceWorker disabled!')
   }
-  logD(f, 'complete')
+  logD(f, `complete: ${performance.now() - t1} msec`)
 }
 
 async function pwaReset (force = false) {
-  let f = pwaReset
+  const f = pwaReset
   logD(f, 'start')
+  const t1 = performance.now()
   if (registration && registration.waiting) { // если есть новый ожидающий SW - активируем его
     registration.waiting.postMessage({ type: 'skipWaiting' })
   }
   if (registration) {
-    caches.keys().then(cacheNames => {
-      cacheNames.forEach(cacheName => { // прекэш сам обновляется( + у файлов уникальный префикс). Если удалить, то в след раз он заполнится только при инсталляции воркера!
-        if (force || !cacheName.startsWith('kalpa-precache')) {
-          logD(f, 'clear cacheDb. cacheName=', cacheName)
-          caches.delete(cacheName)
-          logD(f, 'clear cacheDb. Ok!', cacheName)
-        }
-      })
+    logD(f, 'try registration.unregister...')
+    registration.unregister().then(() => {
+      logD(f, 'registration.unregister success')
+    }).catch((err) => {
+      logD(f, 'registration.unregister err', err)
     })
+    // вызывает проблемы (кэш самостоятельно не запрашивается после этого)
+    // caches.keys().then(cacheNames => {
+    //   cacheNames.forEach(cacheName => { // прекэш сам обновляется( + у файлов уникальный префикс). Если удалить, то в след раз он заполнится только при инсталляции воркера!
+    //     if (force || !cacheName.startsWith('kalpa-precache')) {
+    //       logD(f, 'clear cacheDb. cacheName=', cacheName)
+    //       caches.delete(cacheName)
+    //       logD(f, 'clear cacheDb. Ok!', cacheName)
+    //     }
+    //   })
+    // })
   }
   logD(f, 'try clear sw Idb')
   const swShareStore = new Store('sw-share', 'request-formData')
   const videoStore = new Store('sw-cache-video', 'video-responses')
   await clear(swShareStore)
   await clear(videoStore)
-  logD(f, 'complete')
+  logD(f, `complete: ${performance.now() - t1} msec`)
 }
 
 function showNotifyNewVer () {

@@ -13,6 +13,14 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.AUTH)
 let currentWebPushToken
 const apiMutex = new Mutex()
 
+async function resetAuthData() {
+  localStorage.removeItem('k_token')
+  localStorage.removeItem('k_token_expires')
+  localStorage.removeItem('k_user_oid')
+  localStorage.removeItem('k_user_role')
+  await systemReset(true)
+}
+
 class AuthApi {
   static async checkExpire () {
     if (localStorage.getItem('k_token_expires')) {
@@ -42,10 +50,11 @@ class AuthApi {
 
   // если токен не указан - выйдет из всех сессий
   static async logout (token) {
-    let f = this.logout
+    const f = this.logout
+    logD(f, 'start')
+    const t1 = performance.now()
     try {
       await apiMutex.lock()
-      logD(f, ' start')
       if (token){
         let { data: { logout } } = await apollo.clients.auth.query({
           query: gql`
@@ -63,23 +72,22 @@ class AuthApi {
     } finally {
       try {
         if (!token || token === localStorage.getItem('k_token')) {
-          localStorage.removeItem('k_token')
-          localStorage.removeItem('k_token_expires')
-          localStorage.removeItem('k_user_oid')
-          localStorage.removeItem('k_user_role')
-          await systemReset(true, true)
+          await resetAuthData()
+          window.location.reload()
         }
       } finally {
         apiMutex.release()
       }
     }
-    logD(f, 'logout done')
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
   static async userIdentify (userId_) {
-    let f = this.userIdentify
+    const f = this.userIdentify
     logD(f, 'start. userId=', userId_)
+    const t1 = performance.now()
     assert(userId_)
+    await resetAuthData()
     let { data: { userIdentify: { userId, loginType, userExist, needInvite, token, expires } } } = await apollo.clients.auth.query({
       query: gql`
         query  ($userId: String!){
@@ -101,13 +109,14 @@ class AuthApi {
     localStorage.setItem('k_token_expires', expires)
     // setWebPushToken мог быть вызван до userIdentify
     if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
-    logD(f, 'done')
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return { userId, loginType, userExist, needInvite, token, expires }
   }
 
   static async userAuthenticate (password, inviteCode) {
-    let f = this.userAuthenticate
+    const f = this.userAuthenticate
     logD(f, 'start')
+    const t1 = performance.now()
     let { data: { userAuthenticate: { result, role, oid, nextAttemptDate, attempts, failReason } } } = await apollo.clients.auth.query({
       query: gql`
         query ($password: String!, $inviteCode: String) {
@@ -125,7 +134,7 @@ class AuthApi {
     })
     localStorage.setItem('k_user_role', role)
     if (oid) localStorage.setItem('k_user_oid', oid)
-    logD(f, 'done', { result, role, oid, nextAttemptDate, attempts, failReason })
+    logD(f, `complete: ${performance.now() - t1} msec`, { result, role, oid, nextAttemptDate, attempts, failReason })
     return { result, role, nextAttemptDate, attempts, failReason }
   }
 
@@ -174,8 +183,9 @@ class AuthApi {
 
   // сообщит токен на сервер (при условии что тот еще не был сообщен)
   static async setWebPushToken (token) {
-    let f = this.setWebPushToken
+    const f = this.setWebPushToken
     logD(f, 'start', token)
+    const t1 = performance.now()
     assert(token)
     currentWebPushToken = token
     if (!localStorage.getItem('k_token')) return
@@ -189,7 +199,7 @@ class AuthApi {
       variables: { token }
     })
     localStorage.setItem('kweb_push_token', token)
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 }
 

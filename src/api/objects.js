@@ -19,6 +19,9 @@ class ObjectsApi {
   }
 
   static async objectList (oids) {
+    const f = ObjectsApi.objectFull
+    logD(f, 'start')
+    const t1 = performance.now()
     let { data: { objectList } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectFullFragment}
@@ -30,10 +33,14 @@ class ObjectsApi {
       `,
       variables: { oids }
     })
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return objectList
   }
 
   static async objectFull (oid) {
+    const f = ObjectsApi.objectFull
+    logD(f, 'start')
+    const t1 = performance.now()
     let { data: { objectFull } } = await apollo.clients.api.query({
       query: gql`
         ${fragments.objectFullFragment}
@@ -45,11 +52,12 @@ class ObjectsApi {
       `,
       variables: { oid }
     })
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return objectFull
   }
 
   static async update (oid, path, newValue) {
-    let f = ObjectsApi.update
+    const f = ObjectsApi.update
     let objFull = await rxdb.get(RxCollectionEnum.OBJ, oid)
     let rev = objFull.rev
     if (path.startsWith('settings.')) rev = objFull.settings.rev

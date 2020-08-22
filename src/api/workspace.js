@@ -9,8 +9,9 @@ const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
 class WorkspaceApi {
   // очистить мастерскую на сервере
   static async wsClear () {
-    let f = this.wsClear
+    const f = this.wsClear
     logD(f, 'start')
+    const t1 = performance.now()
     let { data: { wsClear } } = await apollo.clients.api.mutate({
       mutation: gql`
         mutation wsClear {
@@ -19,36 +20,39 @@ class WorkspaceApi {
       `
     })
     await rxdb.clearModule(RxModuleEnum.WS)
-    logD(f, 'done', wsClear)
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return wsClear
   }
 
   static async getWs () {
-    let f = this.getWs
+    const f = this.getWs
     logD(f, 'start')
+    const t1 = performance.now()
     let { data: { ws } } = await apollo.clients.api.query({
       query: gql`query{ws}`
     })
-    logD(f, 'complete', ws)
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return ws
   }
 
   static async wsItemUpsert (item) {
-    let f = this.wsItemUpsert
+    const f = this.wsItemUpsert
     logD(f, 'start')
+    const t1 = performance.now()
     let { data: { wsItemUpsert } } = await apollo.clients.api.mutate({
       mutation: gql`mutation wsItemUpsert($item: RawJSON!) {
         wsItemUpsert (item: $item)
       }`,
       variables: { item }
     })
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return wsItemUpsert
   }
 
   static async wsItemDelete (item) {
-    let f = this.wsItemDelete
+    const f = this.wsItemDelete
     logD(f, 'start')
+    const t1 = performance.now()
     let { data: { wsItemUpsert, wsItemDelete } } = await apollo.clients.api.mutate({
       mutation: gql`
         mutation wsItemDelete($item: RawJSON!) {
@@ -56,7 +60,7 @@ class WorkspaceApi {
         }`,
       variables: { item }
     })
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
     return wsItemUpsert
   }
 }

@@ -45,8 +45,9 @@ let id = 0
 // все измененеия - только через эту ф-ю. Иначе - возможны гонки (из-за debounce)
 // либо - менять непосредственно reactiveItem (либо через updateExtended)
 async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
-  let f = updateRxDoc
+  const f = updateRxDoc
   logD(f, 'start')
+  const t1 = performance.now()
   // logD(f, 'start2', rxDocOrId, path, value)
   if (!rxDocOrId) return
   let rxDoc
@@ -68,7 +69,7 @@ async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
       })
     }
   }
-  // logD(f, 'complete')
+  logD(f, `complete: ${performance.now() - t1} msec`)
 }
 
 const debounceIntervalItem = 2000
@@ -111,7 +112,7 @@ class ReactiveItemHolder {
         return this.debouncedSave
       }
       this.setDebouncedSave = (flag) => {
-        let f = this.setDebouncedSave
+        const f = this.setDebouncedSave
         // logD(f, 'start', flag, this.id)
         this.debouncedSave = flag
       }
@@ -153,7 +154,7 @@ class ReactiveItemHolder {
       if (!this.debouncedItemSaveFunc) {
         this.itemSaveFunc = async (newVal) => {
           // игнорируем newVal (берем из this.reactiveItem)!!! this.reactiveItem содержит самые актуальные данные!
-          let f = this.itemSaveFunc
+          const f = this.itemSaveFunc
           if (this.rxDoc.deleted) return // на всякий случай
           try {
             await this.mutex.lock()
@@ -273,7 +274,7 @@ class ReactiveListHolder {
       // // reactiveList изменился (из UI)
       // if (!this.debouncedListSave) {
       //   this.debouncedListSave = debounce(async (newVal, oldVal) => {
-      //     let f = this.debouncedListSave
+      //     const f = this.debouncedListSave
       //     try {
       //       await this.mutex.lock()
       //       await rxdb.lock() // необходимо заблокировать до вызова this.rxQueryUnsubscribe() (иначе могут быть пропущены эвенты изменения rxDoc из сети)

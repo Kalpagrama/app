@@ -257,14 +257,14 @@ class Objects {
   // Если в данный момент какой-либо запрос уже выполняется, то поставит в очередь.
   // priority 0 - будут выполнены QUEUE_MAX_SZ последних запросов. Запрашиваются пачками по 5 штук. Последние запрошенные - в первую очередь
   // priority 1 - только если очередь priority 0 пуста. будут выполнены последние 4 запроса
-  async get (id, priority, clientFirst, force) {
+  async get (id, priority, clientFirst, force, onFetchFunc = null) {
     const fetchFunc = async () => {
       // logD('objects::get::fetchFunc start')
       let promise = this.queryAccumulator.push(getOidFromId(id), priority)
       return await promise
     }
     // logD('objects::get start')
-    let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force)
+    let rxDoc = await this.cache.get(id, fetchFunc, clientFirst, force, onFetchFunc)
     if (!rxDoc) return null // см "queued item was evicted legally"
     assert(rxDoc.cached, '!rxDoc.cached')
     return rxDoc
@@ -275,6 +275,7 @@ class Objects {
     assert(rxdb.isLeader(), 'rxdb.isLeader()')
     const f = this.processEvent
     logD(f, 'start', rxdb.isLeader())
+    const t1 = performance.now()
     if (!rxdb.isLeader()) return
     switch (event.type) {
       case 'OBJECT_CHANGED': {
@@ -293,7 +294,7 @@ class Objects {
         throw new Error(`unsupported Event ${event.type}`)
     }
     let { type, wsItem: itemServer, wsRevision } = event
-    logD(f, 'complete')
+    logD(f, `complete: ${performance.now() - t1} msec`)
   }
 }
 
