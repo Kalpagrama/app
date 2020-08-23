@@ -5,12 +5,9 @@
 </style>
 
 <template lang="pug">
-div(
-  :style=`{
-    borderRadius: $store.state.ui.borderRadius+'px',
-  }`).column.full-width.b-40
+div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
   //- node editor
-  q-dialog(
+  //- q-dialog(
     v-model="nodeEditorOpened" position="bottom"
     @hide="nodeEdited")
     ws-node-editor(

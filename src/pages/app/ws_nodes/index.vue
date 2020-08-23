@@ -4,21 +4,21 @@ q-layout(view="hHh Lpr lff")
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
         div(
-          v-if="mode === 'standalone'"
           :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
           span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsNodeList_title', 'Ядра')}}
-        .row.full-width.q-px-sm.q-pt-sm
-          q-input(
-            v-model="searchString"
-            filled dark dense color="white"
-            :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
-            ).full-width
-            template(v-slot:append)
-              q-btn(
-                v-if="searchString.length > 0"
-                flat dense color="white" icon="clear" @click="searchString = ''")
-              q-btn(
-                flat dense color="white" icon="filter_list")
+        div().row.full-width.q-px-sm.q-pt-sm
+          div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).row.full-width
+            q-input(
+              v-model="searchString"
+              filled dark dense color="white"
+              :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
+              ).full-width
+              template(v-slot:append)
+                q-btn(
+                  v-if="searchString.length > 0"
+                  flat dense color="white" icon="clear" @click="searchString = ''")
+                q-btn(
+                  flat dense color="white" icon="filter_list")
   q-page-container
     q-page(style="padding-top: 60px")
       .row.full-width.justify-center

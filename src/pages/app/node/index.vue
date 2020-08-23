@@ -44,7 +44,7 @@ q-layout(view="hHh Lpr lff")
               ).text-white.text-bold.q-px-sm {{ categoryName }}
           .col
           span.text-white.q-mx-sm {{ createdAt }}
-          q-btn(v-if="node" dense no-caps :to="`/user/${node.author.oid}`").q-px-sm
+          q-btn(v-if="node" dense flat no-caps :to="`/user/${node.author.oid}`").q-px-sm
             span.text-white.text-bold.q-mx-sm {{ node.author.name }}
             user-avatar(:url="node.author.thumbUrl" :width="36" :height="36")
   q-page-container
@@ -59,6 +59,15 @@ q-layout(view="hHh Lpr lff")
                 threshold: 0.8
               }
             }`)
+          div(v-if="node").row.full-width.q-pa-sm
+            .row.full-width.items-center.content-center.q-pa-sm
+              span.text-bold.text-grey-7 Сферы сути
+            router-link(
+              v-for="(s,si) in node.spheres" :key="s.oid" :to="'/sphere/'+s.oid"
+              :style=`{height: '40px',borderRadius: '10px'}`
+              ).row.full-width.items-center.content-center.q-px-sm.b-50
+              q-icon(name="blur_on" color="white" size="20px").q-mr-xs
+              span.text-white {{ s.name }}
           router-view(v-if="node" :node="node")
       q-page-sticky(position="bottom" :offset="[0, 60]")
         q-btn(
@@ -66,15 +75,15 @@ q-layout(view="hHh Lpr lff")
           no-caps color="green" icon="add"
           ) Добавить ядро
       q-page-sticky(
-        expand position="bottom" :style=`{zIndex: 1000}`)
+        expand position="bottom" :style=`{zIndex: 100}`)
         .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px', height: '50px',}`).row.full-width
+          div(:style=`{maxWidth: '800px', height: '50px', paddingLeft: '50px', paddingRight: '50px',}`).row.full-width
             q-tabs(
-              :value="$route.name" @input="$router.push({name: $event})"
+              :value="$route.name" @input="$router.replace({name: $event})"
               no-caps active-color="white"
               ).fit.text-grey-8
-              q-tab(name="nodes" label="Nodes")
-              q-tab(name="chains" label="Chains")
+              q-tab(name="nodes" label="Ядра")
+              q-tab(name="chains" label="Связи")
 </template>
 
 <script>
@@ -84,6 +93,11 @@ import { date } from 'quasar'
 
 export default {
   name: 'pageApp__node',
+  meta () {
+    return {
+      title: this.node.name,
+    }
+  },
   data () {
     return {
       node: null,

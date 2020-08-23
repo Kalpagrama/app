@@ -1,13 +1,16 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).column.fit
-  //- header
-  div(:style=`{}`).row.full-width.justify-center
-    div(:style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
-      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
-        span(:style=`{fontSize: '19px',}`).text-bold.text-white {{ $t('pageApp_subscriptions_title', 'Подписки') }}
-  //- body
-  .col.full-width
-    user-subscriptions()
+q-layout(view="hHh Lpr lff")
+  q-header(reveal)
+    .row.full-width.justify-center.b-30
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
+        div(
+          :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
+          span(:style=`{fontSize: '19px'}`).text-white.text-bold {{ $t('pageApp_subscriptions_title', 'Подписки') }}
+  q-page-container
+    q-page(style="padding-top: 0px")
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: '800px', paddingBottom: '1000px',}`).row.full-width.items-start.content-start.q-px-sm
+          user-subscriptions()
 </template>
 
 <script>

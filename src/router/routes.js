@@ -5,7 +5,6 @@ const routes = [
     redirect: '/auth/sign-in',
     component: () => import('layouts/auth_layout.vue'),
     children: [
-      // { name: 'index', path: '', component: () => import('pages/auth/index.vue') },
       { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in') },
       { name: 'signUp', path: 'sign-up', component: () => import('pages/auth/sign_up') },
     ]
@@ -15,8 +14,7 @@ const routes = [
     component: () => import('layouts/main_layout'),
     children: [
       { name: 'home', path: '', component: () => import('pages/app/home/index.vue') },
-      { name: 'welcome', path: 'welcome', component: () => import('pages/app/welcome') },
-      // { name: ''}
+      // { name: 'welcome', path: 'welcome', component: () => import('pages/app/welcome') },
       {
         name: 'settings',
         path: 'settings/:page?',
@@ -27,7 +25,7 @@ const routes = [
           // {}
         ]
       },
-      { name: 'report', path: 'report', component: () => import('pages/app/report') },
+      // { name: 'report', path: 'report', component: () => import('pages/app/report') },
       // items
       { name: 'user',
         path: 'user/:oid',
@@ -52,7 +50,16 @@ const routes = [
       },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
       { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/trends/index.vue') },
-      { name: 'content', path: 'content/:oid?/:page?', component: () => import('pages/app/content') },
+      {
+        name: 'content',
+        path: 'content/:oid',
+        redirect: 'content/:oid/nodes',
+        component: () => import('pages/app/content/index.vue'),
+        children: [
+          { name: 'content-details', path: 'details', component: () => import('pages/app/content/content_details.vue') },
+          { name: 'content-nodes', path: 'nodes', component: () => import('pages/app/content/content_nodes.vue') },
+        ]
+      },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       {
         name: 'workspace',
@@ -75,7 +82,7 @@ const routes = [
           // { name: 'sphere-list', path: 'sphere', component: () => import('components/workspace/ws_sphere_list') },
           // { name: 'sphere-editor', path: 'sphere/:id', component: () => import('components/workspace/ws_sphere_editor') },
           // other
-          { name: 'ws-settings', path: 'settings', component: () => import('components/workspace/ws_settings') },
+          { name: 'ws-settings', path: 'settings', component: () => import('pages/app/ws_settings/index.vue') },
         ]
       },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },

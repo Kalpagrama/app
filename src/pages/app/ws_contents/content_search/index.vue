@@ -1,6 +1,6 @@
 <template lang="pug">
 .row.full-width.q-px-sm.q-pt-sm
-  .col.q-pr-xs
+  div(:style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden'}`).col
     q-input(
       v-model="searchStringRaw"
       ref="searchStringInput"
@@ -9,8 +9,12 @@
       :loading="searchStringLoading"
       @focus="searchStringFocused"
       @blur="searchStringBlurred"
+      :input-style=`{
+        paddingRight: '0px',
+      }`
       :style=`{
-        margin: 0
+        margin: 0,
+        paddingRight: '0px',
       }`
       ).full-width
       template(v-slot:append)

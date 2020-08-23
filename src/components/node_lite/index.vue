@@ -8,7 +8,7 @@ div(
     //- minHeight: '200px',
   }`
   ).row.full-width.items-start.content-start.b-50
-  div(:style=`{position: 'absolute',zIndex: 1000, transform: 'translate3d(0,0,0)', top: '0px', opacity: 0.5}`).row.full-width.q-pa-sm.b-40
+  //- div(:style=`{position: 'absolute',zIndex: 1000, transform: 'translate3d(0,0,0)', top: '0px', opacity: 0.5}`).row.full-width.q-pa-sm.b-40
     small.text-white.full-width isActive: {{isActive}}
     small.text-white.full-width isVisible: {{isVisible}}
   .row.full-width
@@ -20,6 +20,27 @@ div(
       cursor: 'pointer',
     }`
     ).row.full-width.items-start.content-start
+    //- content
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      q-btn(
+        v-if="composition && isActive"
+        @click="$router.push('/content/'+composition.layers[0].contentOid)"
+        round flat color="grey-2" icon="select_all"
+        :style=`{
+          position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
+          top: '0px', left: '0px',
+          background: 'rgba(0,0,0,0.2)',
+        }`)
+    //- bookmark
+    transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+      q-btn(
+        v-if="isActive"
+        round flat color="grey-2" icon="bookmark_outline"
+        :style=`{
+          position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
+          top: '0px', right: '0px',
+          background: 'rgba(0,0,0,0.2)',
+        }`)
     img(
       :src="thumbUrl" draggable="false"
       :style=`{borderRadius: '10px', overflow: 'hidden', userSelect: 'none'}`
@@ -42,14 +63,12 @@ div(
           borderRadius: '10px', overflow: 'hidden',
         }`
         ).fit
-  //- essence
-  div(
-    @click="nodeEssenceClick()"
+  //- essence link...
+  router-link(
+    :to="'/node/'+node.oid"
     :class=`{
-      //- 'bg-green': isActive,
     }`
     :style=`{
-      //- minHeight: '60px',
       cursor: 'pointer'
     }`
     ).row.full-width.items-center.q-py-sm.q-px-md

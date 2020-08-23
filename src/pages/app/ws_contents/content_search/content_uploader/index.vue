@@ -1,10 +1,10 @@
 <template lang="pug">
-div().row.items-center.content-center
+div().row.items-center.content-center.justify-center.q-px-xs
   q-btn(
-    @click="start()"
+    @click.native="start()"
     round flat dense color="grey-2" icon="attach_file"
     :style=`{
-    }`).full-height.q-px-sm
+    }`).full-height.q-px-xs
   input(
     ref="inputFile" type="file"
     @input="fileChanged"

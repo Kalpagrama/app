@@ -4,7 +4,8 @@ q-layout(view="lHh lpR lFf")
     side="left"
     :value="$store.state.ui.appShowMenu"
     behavior="mobile" no-swipe-open
-    @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
+    @before-show="$store.commit('ui/stateSet', ['showMobileNavigation', false])"
+    @before-hide="$store.commit('ui/stateSet', ['showMobileNavigation', true]), $store.commit('ui/stateSet', ['appShowMenu', false])")
     kalpa-menu(v-if="!loading && $route.name !== 'welcome'").full-height
   div(
     v-if="$q.screen.width > 1260"
