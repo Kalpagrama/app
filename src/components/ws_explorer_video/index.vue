@@ -21,49 +21,23 @@ q-layout(view="hHh Lpr lff")
             }`
             ).row.full-width.items-start.content-start
             q-resize-observer(@resize="contentHeight = $event.height")
-            //- content preview
+            //- content preview image
             img(
               :src="contentKalpa.thumbUrl" draggable="false"
               :style=`{borderRadius: '10px', overflow: 'hidden'}`).full-width
-            //- content player, depends on contentKalpa.contentSouce, $emits itself...
-            component(
-              :is="playerComponent[contentKalpa.contentSource]"
-              :url="contentKalpa.url"
+            ws-content-player(
+              :contentKalpa="contentKalpa" :contentWorkspace="contentWorkspace"
+              :bars="bars" :barsShow="!nodeSelectedId"
               @player="player = $event"
               @error="playerErrorHandle"
               :style=`{
                 position: 'absolute', top: '0px',
                 borderRadius: '10px', overflow: 'hidden',}`).fit
-            //- bar
-            div(
-              v-if="player"
-              :style=`{position: 'absolute', zIndex: 1000, bottom: '0px',}`).row.full-width.justify-center
-              content-bar(
-                :player="player"
-                :bars="bars" :barsShow="!nodeSelectedId"
-                :style=`{
-                  maxWidth: '600px',
-                }`)
-                template(v-slot:header)
-                  .row.full-width.justify-between.q-py-xs
-                    q-btn(
-                      @click="player.playing ? player.pause() : player.play()"
-                      round flat dense
-                      :color="player.playing ? 'red' : 'white'"
-                      :icon="player.playing ? 'pause' : 'play_arrow'"
-                      :style=`{borderRadius: '50%', background: 'rgba(0,0,0,0.5)'}`)
-                    div(:style=`{background: 'rgba(0,0,0,0.5)', borderRadius: '10px', overflow: 'hidden',}`).row.full-height.items-center.content-center
-                      q-btn(round flat dense color="white" icon="volume_off")
-                      q-btn(
-                        flat dense color="white"
-                        :style=`{}`
-                        )
-                        small.text-white {{$time(player.currentTime)}} / {{$time(player.duration)}}
-                      q-btn(round flat dense color="white" icon="fullscreen")
-                    q-btn(
-                      @click="nodeAdd()"
-                      round push color="green" dense icon="add"
-                      :style=`{borderRadius: '50%'}`)
+                template(v-slot:actions)
+                  q-btn(
+                    @click="nodeAddStart()"
+                    round push color="green" dense icon="add"
+                    :style=`{borderRadius: '50%'}`)
           //- page wrapper
           div(v-if="player").row.full-width.items-start.content-start
             component(
@@ -94,21 +68,16 @@ q-layout(view="hHh Lpr lff")
 // api
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { NodeApi } from 'src/api/node'
-// players: youtube,kalpa(html5),vimeo,vk,fb
-// import playerYoutube from './player_youtube/index.vue'
-import playerKalpa from './player_kalpa/index.vue'
 // pages
 import pageDetails from './page_details/index.vue'
 import pageDrafts from './page_drafts/index.vue'
 import pageNodes from './page_nodes/index.vue'
 import pageRelated from './page_related/index.vue'
-// content
-import contentBar from './content_bar/index.vue'
 
 export default {
   name: 'wsVideoExplorer',
   components: {
-    pageDetails, pageDrafts, pageNodes, pageRelated, contentBar, playerKalpa, playerYoutube: () => import('./player_youtube/index.vue')
+    pageDetails, pageDrafts, pageNodes, pageRelated, wsContentPlayer: () => import('components/ws_content_player/index.vue')
   },
   props: ['contentKalpa', 'contentWorkspace'],
   data () {
@@ -162,13 +131,7 @@ export default {
     async nodeAddStart () {
       this.$log('nodeAddStart')
       let node = await this.nodeAdd()
-      await this.$wait(200)
-      this.nodeSelectedId = null
-      this.nodeEditingId = null
-      this.$nextTick(() => {
-        this.nodeSelectedId = node.id
-        this.nodeEditingId = node.id
-      })
+      this.nodeSelectedId = node.id
     },
     async nodeAdd () {
       this.$log('nodeAdd')

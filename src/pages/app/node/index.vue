@@ -95,7 +95,7 @@ export default {
   name: 'pageApp__node',
   meta () {
     return {
-      title: this.node.name,
+      title: this.node?.name,
     }
   },
   data () {

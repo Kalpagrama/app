@@ -37,7 +37,7 @@ q-layout(view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
         :style=`{maxWidth: maxWidth+'px', height: '50px', overflow: 'hidden'}`
         ).row.full-width.items-center.content-center.q-px-md.b-30
         .col
-          span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Node editor/creator
+          span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ title }}
         q-btn(round flat color="red-5" icon="delete_outline" @click="nodeDelete()")
   q-page-container
     q-page(:style=`{paddingBottom: '200px'}`)
@@ -84,6 +84,7 @@ export default {
   components: {editLayout, editCategory, editSpheres, editEssence, editItemsPip, editItemsCompare, itemFinder},
   props: {
     node: {type: Object},
+    title: {type: String},
   },
   data () {
     return {

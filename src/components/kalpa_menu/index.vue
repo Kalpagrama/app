@@ -1,61 +1,52 @@
 <style lang="sass">
 .menu-item
   &:hover
-    background: rgb(70,70,70)
+    background: rgb(40,40,40)
 </style>
 
 <template lang="pug">
-div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
-  //- node editor
-  //- q-dialog(
-    v-model="nodeEditorOpened" position="bottom"
-    @hide="nodeEdited")
-    ws-node-editor(
-      @close="nodeEdited"
-      @published="nodePublished"
-      :value="node"
-      :style=`{
-        maxWidth: '800px',
-        maxHeight: $q.screen.height-60+'px',
-        minHeight: $q.screen.height-60+'px',
-      }`)
+div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width
   //- header
   div(
-    :style=`{height: '100px'}`
-    ).row.full-width.items-center.content-center
-    div(
-      @click="$router.push('/').catch(e => e)"
-      :style=`{height: '60px', width: '60px'}`
-      ).row.items-center.content-center.justify-center.cursor-pointer
-      kalpa-logo(:width="40" :height="40")
-    .col
+    :style=`{borderRadius: '10px',}`
+    ).row.full-width.items-center.content-center.b-40.q-pt-md
+    //- home
+    router-link(
+      :to="'/'"
+      ).row.full-width
       div(
-        @click="$router.push('/').catch(e => e)"
-        ).row.fit.items-center.content-center.cursor-pointer
-        span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpaMenu_kalpagrama', 'Кальпаграма')}}
-        .row.full-width
-          small.text-white {{$t('kalpaMenu_title', 'Продвигай суть!')}}
+        :style=`{height: '60px', width: '60px'}`
+        ).row.items-center.content-center.justify-center.cursor-pointer
+        kalpa-logo(:width="40" :height="40")
+      .col
+        div(
+          @click="$router.push('/').catch(e => e)"
+          ).row.fit.items-center.content-center.cursor-pointer
+          span(:style=`{fontSize: '18px'}`).text-white.text-bold {{$t('kalpaMenu_kalpagrama', 'Кальпаграма')}}
+          .row.full-width
+            small.text-white {{$t('kalpaMenu_title', 'Продвигай суть!')}}
+    //- user
+    router-link(
+      v-if="$store.getters.currentUser()"
+      :to="'/user/'+$store.getters.currentUser().oid"
+      :class=`{
+        'b-60': $route.path.split('/')[1] === 'user'
+      }`
+      :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.menu-item
+      div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
+        user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
+      .col.full-height
+        .row.fit.items-center.content-center
+          span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
+          small.text-white.full-width {{ '@'+$store.getters.currentUser().username }}
   //- body
   div(:style=`{overflowX: 'hidden'}`).col.full-width
     div(
       :style=`{
-        borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
+        borderRadius: '10px', overflow: 'hidden'
       }`
-      ).column.full-width.b-40
-        router-link(
-          v-if="$store.getters.currentUser()"
-          :to="'/user/'+$store.getters.currentUser().oid"
-          :class=`{
-            'b-60': $route.path.split('/')[1] === 'user'
-          }`
-          :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}`
-          ).row.full-width.items-center.content-center.menu-item
-          div(:style=`{height: '60px', width: '60px'}`).row.items-center.content-center.justify-center
-            user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="40" :height="40")
-          .col.full-height
-            .row.fit.items-center.content-center
-              span(:style=`{lineHeight: 1.1}`).text-white.text-bold {{$store.getters.currentUser().name}}
-              small.text-white.full-width {{ '@'+$store.getters.currentUser().username }}
+      ).column.full-width.q-pt-sm
         router-link(
           v-for="(p,pi) in pages" :key="p.id"
           :to="{name: p.id}"
@@ -63,41 +54,37 @@ div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
             'b-60': $route.path.split('/')[1] === p.id
           }`
           :style=`{
-            height: $q.screen.width > 600 ? '60px' : '40px',
+            height: $q.screen.width > 600 ? '55px' : '40px',
             borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'
           }`
           ).row.full-width.items-center.menu-item
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
             q-icon(size="22px" :name="p.icon" color="white")
-          span(:style=`{fontSize: '18px'}`).text-white {{ p.name }}
+          span(:style=`{fontSize: '16px'}`).text-white {{ p.name }}
         //- refresh
         div(
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="refresh()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="refresh" color="white" :loading="refreshLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_refresh', 'Обновить')}}
+          span(:style=`{fontSize: '16px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_refresh', 'Обновить')}}
         //- logout
         div(
           :style=`{height: '60px', borderRadius: $store.state.ui.borderRadius+'px', overflow: 'hidden'}` @click="logout()"
           ).row.full-width.items-center.content-center.menu-item.cursor-pointer
           div(:style=`{height: '50px', width: '60px'}`).row.items-center.content-center.justify-center
             q-btn(round dense flat icon="power_off" color="white" :loading="logoutLoading")
-          span(:style=`{fontSize: '18px', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_logout', 'Выйти')}}
+          span(:style=`{fontSize: '16x', userSelect: 'none', pointerEvents: 'none'}`).text-white {{$t('kalpaMenu_logout', 'Выйти')}}
         //- create node
-        div(
-          v-if="true"
-          :style=`{}`
-          ).row.full-width.items-center.content-center
+        .row.full-width.items-center.content-center
           q-btn(
-            @click="createNodeStart()"
+            :to="'/workspace/node/new'"
             flat color="green" no-caps align="left" icon="add" size="md"
             :style=`{height: '50px'}`).full-width
-            span(:style=`{fontSize: '18px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
+            span(:style=`{fontSize: '16px'}`).text-bold.q-ml-md {{$t('kalpaMenu_createNode', 'Создать ядро')}}
         //- version
         div(v-if="true").row.full-width.items-center.q-pa-md
-          small(:style=`{marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
-        //- slot(name="footer")
+          small(:style=`{userSelect: 'none', marginLeft: '6px'}`).text-grey-6 {{$t('kalpaMenu_version', 'Версия') + ': ' + $store.state.core.version + ' - ' + $store.state.core.buildDate}}
 </template>
 
 <script>

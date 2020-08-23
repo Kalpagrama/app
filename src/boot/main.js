@@ -90,13 +90,14 @@ export default async ({ Vue, store: storeVue, router: VueRouter }) => {
       },
     })
     Vue.component('nodeLite', () => import('components/node_lite/index.vue'))
-    Vue.component('wsNodeEditor', () => import('components/workspace/ws_node_editor'))
     Vue.component('listMasonry', () => import('components/list_masonry'))
     Vue.component('listMiddle', () => import('components/list_middle'))
     Vue.component('kalpaLogo', () => import('components/kalpa_logo/index.vue'))
     Vue.component('kalpaMenu', () => import('components/kalpa_menu/index.vue'))
     Vue.component('kalpaLoader', () => import('components/kalpa_loader/index.vue'))
     Vue.component('userAvatar', () => import('components/user_avatar/index.vue'))
+    Vue.component('wsNodeEditor', () => import('components/workspace/ws_node_editor'))
+    // Vue.component('wsContentPlayer')
   } catch (err) {
     logE(err)
   }

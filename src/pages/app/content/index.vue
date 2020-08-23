@@ -14,12 +14,23 @@ q-layout(view="hHh Lpr lff")
     q-page(:style=`{paddingTop: '0px', paddingBottom: '400px'}`)
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
-          div(v-if="content").row.full-width.items-start.content-start
+          div(v-if="content" :style=`{position: 'relative'}`).row.full-width.items-start.content-start
             img(
               :src="content.thumbUrl" draggable="false"
               :style=`{borderRadius: '10px', overflow: 'hidden',}`
               ).full-width
-          small.text-white {{content}}
+            ws-content-player(
+              :contentKalpa="content" :contentWorkspace="null"
+              @player="player = $event"
+              :style=`{position: 'absolute', zIndex: 100}`).fit
+              template(v-slot:actions)
+                q-btn(
+                  round dense color="green" icon="add"
+                  :style=`{borderRadius: '50%'}`)
+          //- small.text-white {{content}}
+          div(v-if="player").row.full-width
+            span {{ player.currentTime }}
+          router-view
       q-page-sticky(
         expand position="bottom" :style=`{zIndex: 100}`)
         .row.full-width.justify-center.b-30
@@ -32,17 +43,20 @@ q-layout(view="hHh Lpr lff")
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import wsContentPlayer from 'components/ws_content_player/index.vue'
 
 export default {
   name: 'pageApp__content',
+  components: {wsContentPlayer},
   meta () {
     return {
-      title: 'Content...'
+      title: this.content?.name
     }
   },
   data () {
     return {
-      content: null
+      content: null,
+      player: null
     }
   },
   computed: {

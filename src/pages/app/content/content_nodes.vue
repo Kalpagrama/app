@@ -1,6 +1,9 @@
 <template lang="pug">
-.row.full-width
-  h1.text-white Nodes
+.row.full-width.q-px-sm
+  .row.full-width.q-pa-sm
+    span.text-grey-7 Ядра
+  .row.full-width.items-start.content
+    //- h1.text-white Nodes
 </template>
 
 <script>

@@ -30,8 +30,9 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIn
     :src="url"
     type="video/youtube"
     :playsinline="true"
-    :autoplay="true"
-    :loop="true"
+    :autoplay="autoplay"
+    :muted="mutedLocal"
+    :loop="loop"
     :style=`{}`
     ).fit
   //- tint on top
@@ -48,6 +49,7 @@ div(:style=`{position: 'relative', borderRadius: '10px', overflow: 'hidden', zIn
       background: 'rgb(0,0,0)', background: 'linear-gradient(0deg, rgba(10,10,10,0.9) 0%, rgba(0,0,0,0) 100%)',
       borderRadius: '10px 10px 0 0', overflow: 'hidden', pointerEvents: 'none',
     }`).row.full-width
+  slot
 </template>
 
 <script>
@@ -55,17 +57,36 @@ import 'mediaelement/build/mediaelementplayer.min.css'
 import 'mediaelement/full'
 
 export default {
-  name: 'wsVideoExplorer_playerYoutube',
-  props: ['url'],
+  name: 'playerVideo__playerYoutube',
+  props: {
+    url: {type: String, required: true},
+    muted: {type: Boolean, default () { return false }},
+    loop: {type: Boolean, default () { return true }},
+    autoplay: {type: Boolean, default () { return true }}
+  },
   data () {
     return {
       player: null,
       playing: false,
       currentTime: 0,
       duration: 0,
+      mutedLocal: false,
+    }
+  },
+  watch: {
+    muted: {
+      immediate: true,
+      handler (to, from) {
+        this.mutedLocal = to
+      }
     }
   },
   methods: {
+    volumeToggle () {
+      this.$log('volumeToggle')
+      this.mutedLocal = !this.mutedLocal
+      this.player.setMuted(this.mutedLocal)
+    },
     play () {
       // this.$log('play')
       this.player.play()
@@ -99,8 +120,9 @@ export default {
       this.$log('init start')
       // this.$log('playerInit videoRef', this.$refs.videoRef)
       let me = new window.MediaElementPlayer(this.$refs.videoRef, {
-        loop: true,
-        autoplay: true,
+        loop: this.loop,
+        muted: this.muted,
+        autoplay: this.autoplay,
         controls: true,
         features: [],
         // enableAutosize: true,
@@ -111,7 +133,6 @@ export default {
         success: async (mediaElement, originalNode, instance) => {
           this.$log('init done')
           this.player = mediaElement
-          // this.$emit('player', this.player)
           // this.$nextTick(() => {
           this.player.addEventListener('loadeddata', this.loadeddataHandle)
           this.player.addEventListener('timeupdate', this.timeupdateHandle, false)
