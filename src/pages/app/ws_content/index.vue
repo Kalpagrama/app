@@ -10,13 +10,18 @@ component(
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
 
-import videoExplorer from 'components/ws_video_explorer/index.vue'
-// import imageExplorer from 'components/ws_image_explorer/index.vue'
+import videoExplorer from 'components/ws_explorer_video/index.vue'
+import imageExplorer from 'components/ws_explorer_image/index.vue'
 // import bookExplorer from 'components/ws_book_explorer/index.vue'
 
 export default {
   name: 'pageApp_wsContent',
-  components: {videoExplorer},
+  components: {videoExplorer, imageExplorer},
+  meta () {
+    return {
+      title: this.contentWorkspace ? this.contentWorkspace.name : ''
+    }
+  },
   data () {
     return {
       contentWorkspace: null,
@@ -48,5 +53,13 @@ export default {
       }
     }
   },
+  mounted () {
+    this.$log('mounted')
+    this.$store.commit('ui/stateSet', ['showMobileNavigation', false])
+  },
+  beforeDestroy () {
+    this.$log('beforeDestroy')
+    this.$store.commit('ui/stateSet', ['showMobileNavigation', true])
+  }
 }
 </script>

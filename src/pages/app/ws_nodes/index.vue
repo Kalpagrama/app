@@ -1,19 +1,5 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
-  //- q-dialog(
-  //-   v-if="mode === 'standalone'"
-  //-   v-model="nodeEditorOpened" position="bottom")
-  //-   ws-node-editor(
-  //-     ctx="workspace"
-  //-     :value="nodeEditorItem"
-  //-     @published="nodePublished"
-  //-     @close="nodeEditorOpened = false"
-  //-     :style=`{
-  //-       maxWidth: $store.state.ui.maxWidthPage+'px',
-  //-       minHeight: $q.screen.height+'px',
-  //-       maxHeight: $q.screen.height+'px',
-  //-       height: $q.screen.height+'px',
-  //-     }`)
   q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
@@ -49,7 +35,8 @@ q-layout(view="hHh Lpr lff")
                     node-item(
                       v-for="(i,ii) in items" :key="i"
                       :node="i" :nodeIndex="ii"
-                      @pick="nodePicked(i)")
+                      @edit="nodeEdit(i)"
+                      @remove="nodeRemove(i)").q-mb-sm
       q-page-sticky(expand position="top")
         .row.full-width.justify-center.b-30
           div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
@@ -61,60 +48,6 @@ q-layout(view="hHh Lpr lff")
           @click="nodeAddBtn()"
           push round color="green" icon="add"
           :style=`{borderRadius: '50%'}`)
-//- div(:style=`{position: 'relative'}`).column.fit
-  //- node ADD
-  q-btn(
-    v-if="mode === 'standalone'"
-    @click="nodeAddBtn()"
-    push round color="green" icon="add"
-    :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '70px', right: '30px', tranform: 'translate3d(0,0,0)',
-      borderRadius: '50%',
-    }`)
-  //- header
-  .row.full-width.items-start.content-start.justify-center
-    div(
-      v-if="mode === 'standalone'"
-      :style=`{maxWidth: '800px'}`).row.full-width.items-center.content-center.justify-between
-      .row.full-width.items-center.q-px-md.q-pb-sm.q-pt-md
-        span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsNodeList_title', 'Ядра')}}
-  //- search
-  .row.full-width.justify-center
-    div(
-      :style=`{maxWidth: '800px',}`).row.full-width.q-pa-sm
-      q-input(
-        v-model="searchString"
-        filled dark dense color="white"
-        :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
-        ).full-width
-        template(v-slot:append)
-          q-btn(
-            v-if="searchString.length > 0"
-            flat dense color="white" icon="clear" @click="searchString = ''")
-          q-btn(
-            flat dense color="white" icon="filter_list")
-    //- node.stage picker
-  .row.full-width.justify-center
-    div(
-      :style=`{maxWidth: '800px',}`
-      ).row.full-width.items-end.content-end.q-px-md
-      q-tabs(dense v-model="type" no-caps active-color="green" switch-indicator).full-width.text-white
-        q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
-  //- body
-  .col.full-width.scroll
-    kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
-      template(v-slot=`{items, itemsMore}`)
-        .row.fit.items-start.content-start.justify-center
-          div(:style=`{maxWidth: '800px',}`).row.fit.items-start.content-start.q-px-sm.br
-            node-item(
-              v-for="(i,ii) in items" :key="i"
-              :node="i" :nodeIndex="ii"
-              @preview="nodePreview(i)"
-              @delete="nodeDelete(i)"
-              @edit="nodeEdit(i)"
-              @unSave="nodeUnSave(i)"
-              @unPublish="nodeUnPublish(i)"
-              @fork="nodeFork(i)")
 </template>
 
 <script>
@@ -184,59 +117,19 @@ export default {
   watch: {
   },
   methods: {
-    nodePicked (node) {
-      this.$log('nodePicked', node)
-      this.$router.push(`/workspace/node/${node.id}`)
+    nodeEdit (node) {
+      this.$log('nodeEdit', node)
+      this.$router.push(`/workspace/node/${node.id}`).catch(e => e)
     },
-    async nodePreview (n) {
-      this.$log('nodePreview', n)
-      if (this.mode === 'standalone') {
-        if (n.stage === 'draft') {
-          this.$q.notify({type: 'negative', message: 'Publish draft to explore!'})
-          return
-        }
-        if (!n.oid) {
-          this.$q.notify({type: 'negative', message: 'No node OID !'})
-          return
-        }
-        this.$router.push('/node/' + n.oid).catch(e => e)
-      }
-      else if (this.mode === 'picker') {
-        this.$emit('node', JSON.parse(JSON.stringify(n)))
-      }
-      else {
-        this.$q.notify({type: 'negative', message: 'No Action!'})
-      }
-    },
-    nodeEdit (n) {
-      this.$log('nodeEdit', n)
-      if (this.mode === 'standalone') {
-        this.nodeEditorItem = n
-        this.nodeEditorOpened = true
-      }
-      else if (this.mode === 'picker') {
-        this.$emit('node', JSON.parse(JSON.stringify(n)))
-      }
-      else {
-        this.$q.notify({type: 'negative', message: 'No action!'})
-      }
-    },
-    async nodeFork (n) {
-      this.$log('nodeFork', n)
-      this.nodePreviewOpened = false
-      await this.nodeEdit(await this.nodeAdd(JSON.parse(JSON.stringify(n))))
-    },
-    async nodeDelete (n) {
-      // await n.updateExtended('stage', 'published', false)// без debounce
-      // return
-      // eslint-disable-next-line no-unreachable
-      this.$log('nodeDelete', n)
+    async nodeRemove (node) {
+      this.$log('nodeRemove', node)
       if (!confirm(this.$t('delete_node?', 'Удалить ядро?'))) return
-      await this.$rxdb.remove(n.id)
+      await this.$rxdb.remove(node.id)
     },
     async nodeAddBtn () {
       this.$log('nodeAddBtn')
-      this.nodeEdit(await this.nodeAdd())
+      // open editor? open something..
+      // this.nodeEdit(await this.nodeAdd())
     },
     async nodeAdd (nodeInput) {
       this.$log('nodeAdd start')
@@ -272,10 +165,6 @@ export default {
     async nodeUnSave (node) {
       this.$log('nodeUnSave', node)
       await this.nodeDelete(node)
-    },
-    async nodePublished (oid) {
-      this.$log('nodePublished')
-      this.$router.push(`/node/${oid}`).catch(e => e)
     },
   }
 }

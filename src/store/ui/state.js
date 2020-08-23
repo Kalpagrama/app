@@ -20,4 +20,6 @@ export default {
   active: true,
   // new
   showMobileNavigation: true,
+  showLeftDrawer: false,
+  isTyping: false
 }

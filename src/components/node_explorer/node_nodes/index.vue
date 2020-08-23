@@ -41,7 +41,7 @@ div(:style=`{position: 'relative'}`).column.fit
             ).row.full-width
             node(
               v-if="node" ctx="list" :node="node" :needFull="true"
-              :visible="true" :active="nodeActive" :mini="false"
+              :visible="true" :active="true" :mini="false"
               :style=`{maxWidth: '800px', marginTop: '0px'}`)
           //- got 1 > items
           div(v-if="items.length > 1").row.fit.items-start.content-start.q-px-sm

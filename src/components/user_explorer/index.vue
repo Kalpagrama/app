@@ -13,7 +13,7 @@ div(:style=`{position: 'relative',}`).column.fit
     }`).row.full-width.justify-center
     div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.b-50
       .row.full-width.items-center.content-center.q-pt-sm.q-px-sm
-        kalpa-avatar(:url="user.profile.photoUrl" :width="36" :height="36")
+        user-avatar(:url="user.profile.photoUrl" :width="36" :height="36")
         .col
           span.text-white.text-bold.q-ml-sm {{ user.name }}
         q-btn(v-if="!itsMe && !isSubscribed" color="green" no-caps @click="userFollow()") {{$t('Subscribe', 'Подписаться')}}

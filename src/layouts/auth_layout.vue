@@ -1,25 +1,25 @@
+
 <template lang="pug">
-.row.full-width.justify-center
-  router-view
+q-layout(view="hHh lpR fFf").b-30
+  q-page-container
+    div(:style=`{height: '200px', overflow: 'hidden',}`).row.full-width.items-center.content-center.justify-center.b-30
+      kalpa-logo(:width="100" :height="100").q-mb-md
+      h5.text-white.text-bold.q-ma-xs.q-pa-xs Kalpagramma
+    router-view
 </template>
 
 <script>
 export default {
   name: 'authLayout',
+  meta: {
+    title: 'Kalpa - Authentication'
+  },
   data () {
     return {
     }
   },
   mounted () {
     this.$log('mounted')
-    let bg
-    if (this.$q.screen.width > 600) {
-      bg = 'rgb(30,30,30)'
-    }
-    else {
-      bg = 'rgb(70,70,70)'
-    }
-    document.body.style.background = 'red'
   },
   beforeDestroy () {
     this.$log('beforeDestroy')

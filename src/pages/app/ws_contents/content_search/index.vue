@@ -123,6 +123,23 @@ export default {
     searchStringFocused () {
       this.$log('searchStringFocused')
       // this.$store.commit('ui/stateSet', ['wsShowMenu', false])
+      this.$log('FOCUS', document.hasFocus())
+      navigator.permissions.query({name: 'clipboard-read'}).then(async (result) => {
+        if (result.state === 'granted' || result.state === 'prompt') {
+          // navigator.clipboard.read().then(({ items }) => {
+          //   items.forEach(item => {
+          //     console.log(item.type)
+          //     // do something with the data item
+          //   })
+          // })
+          let text = await navigator.clipboard.readText()
+          if (this.isURL(text)) {
+            this.$emit('content', await this.contentAdd(await this.contentFromURL(text)))
+            // this.contentFromURL(text)
+          }
+          this.$log('text', text)
+        }
+      })
     },
     searchStringBlurred () {
       this.$log('searchStringBlurred')

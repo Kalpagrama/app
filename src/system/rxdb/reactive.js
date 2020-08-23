@@ -175,10 +175,10 @@ class ReactiveItemHolder {
         this.debouncedItemSaveFunc = debounce(this.itemSaveFunc, debounceIntervalItem)
       }
       if (this.getDebouncedSave()) {
-        logD(f, `reactiveItem changed (rxDoc will change via debounce later) ${this.reactiveItem.id}`)
+        // logD(f, `reactiveItem changed (rxDoc will change via debounce later) ${this.reactiveItem.id}`)
         this.debouncedItemSaveFunc(newVal)
       } else {
-        logD(f, `reactiveItem changed without debounce ${this.reactiveItem.id}`)
+        // logD(f, `reactiveItem changed without debounce ${this.reactiveItem.id}`)
         await this.itemSaveFunc(newVal)
       }
     }, { deep: true, immediate: false })

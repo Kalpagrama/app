@@ -1,5 +1,5 @@
 <template lang="pug">
-node-explorer(:node="node" :nodeProgress="nodeProgress")
+//- node-explorer(:node="node" :nodeProgress="nodeProgress")
 </template>
 
 <script>

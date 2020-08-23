@@ -13,7 +13,7 @@ div(
   div(
     v-if="nodeFull && nodeFull.rateUser"
     ).row.full-height.items-center.content-center
-    kalpa-avatar(
+    user-avatar(
       v-for="i in 1" :key="i"
       @click.native="$router.push('/user/'+nodeFull.author.oid)"
       :url="$store.getters.currentUser().profile.photoUrl"

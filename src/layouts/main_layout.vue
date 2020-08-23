@@ -1,141 +1,55 @@
-<style lang="sass">
-html, body
-  // overflow: hidden
-.q-menu
-  border-radius: 10px !important
-  background: none !important
-.q-drawer
-  z-index: 100000
-  // border-radius: 10px 10px 0 0 !important
-  border-radius: 10px !important
-  background: none !important
-.q-input
-  z-index: 100
-  border-radius: 10px !important
-  overflow: hidden !important
-  transform: translate3d(0,0,0)
-.q-dialog__backdrop
-  background: rgba(0,0,0,0.8) !important
-.k-input
-  border: none
-  border-radius: 10px
-  overflow: hidden
-  padding-left: 16px
-  padding-right: 16px
-  color: white
-  height: 42px
-  &:focus
-    outline: none
-    border: 1px solid rgb(150,150,150)
-// *
-//   outline: 0.5px solid red
-</style>
-
 <template lang="pug">
-router-view(
-  v-if="!loading")
-//- q-layout(
-//-   view="hHh Lpr lff"
-//-   container :style=`{height: $q.screen.height+'px',}`
-//-   @resize="onResize").bg-30
-//- q-layout(view="hHh Lpr lff" @resize="onResize")
+q-layout(view="lHh lpR lFf")
   q-drawer(
-    behavior="mobile" side="left"
+    side="left"
     :value="$store.state.ui.appShowMenu"
+    behavior="mobile" no-swipe-open
     @hide="$store.commit('ui/stateSet', ['appShowMenu', false])")
-    kalpa-menu(
-      v-if="!loading"
-      :style=`{
-        borderRadius: '0 10px 10px 0'
-      }`).full-height
+    kalpa-menu(v-if="!loading && $route.name !== 'welcome'").full-height
+  div(
+    v-if="$q.screen.width > 1260"
+    :style=`{
+      position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
+    }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
+    kalpa-menu(v-if="!loading && $route.name !== 'welcome'" :style=`{maxWidth: '300px'}`)
+  q-btn(
+    v-if="$store.state.ui.showMobileNavigation"
+    @click="$router.back()"
+    round flat color="white"
+    icon="keyboard_arrow_left"
+    :style=`{position: 'fixed', zIndex: 9999, bottom: '4px', left: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
+  q-btn(
+    v-if="$store.state.ui.showMobileNavigation"
+    @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
+    round flat color="white"
+    :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'"
+    :style=`{position: 'fixed', zIndex: 9999, bottom: '4px', right: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
   q-page-container
-    //- height: $q.screen.height+'px'
-    q-page(:style=`{position: 'relative',}`)
-      //- left panel menu
-      div(
-        v-if="$q.screen.width > 1260"
-        @wheel="onWheel"
-        :style=`{
-          position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
-          pointerEvents: pointerEvents,
-        }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
-        kalpa-menu(v-if="!loading && $route.name !== 'welcome'" :style=`{maxWidth: '300px'}`)
-      //- navigation mobile: where/when to show it?
-      div(
-        v-if="$q.screen.width < 800 && $store.state.ui.showMobileNavigation"
-        :style=`{
-          position: 'fixed', zIndex: 1000, bottom: '0px', transform: 'translate3d(0,0,0)',
-          height: '50px', borderRadius: '10px 10px 0 0', overflow: 'hidden',
-        }`).row.full-width.q-px-sm.b-30
-        q-btn(
-          @click="$router.back()"
-          round flat color="white"
-          icon="keyboard_arrow_left")
-        .col
-        q-btn(
-          @click="$store.commit('ui/stateSet', ['appShowMenu', true])"
-          round flat color="white"
-          :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'")
-      router-view(
-        v-if="!loading")
-      //- loading state: spinner... if not a robot here... and not an iframe
-      div(
-        v-else
-        ).row.full-width.window-height.items-center.content-center.justify-center
-        q-spinner(color="green" size="100px" :thickness="4")
+    router-view(v-if="!loading")
+    div(
+      v-else
+      ).row.full-width.window-height.items-center.content-center.justify-center
+      q-spinner(color="green" size="100px" :thickness="4")
 </template>
 
 <script>
-import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
-import 'mediaelement/build/mediaelementplayer.min.css'
-import 'mediaelement/full'
-import assert from 'assert'
-
 export default {
   name: 'mainLayout',
   data () {
     return {
-      maxWidth: 800,
       loading: true,
-      offsetTop: null,
-      showLeftDrawer: false,
-      pointerEventsTimeout: null,
-      pointerEvents: false,
     }
-  },
-  meta: {
-    title: 'Kalpa'
   },
   watch: {
-    '$store.state.ui.appFullscreen': {
+    '$q.appVisible': {
       immediate: true,
-      handler (to, from) {
-        this.$log('$store.state.ui.appFullscreen TO', to)
-        // this.$tween.to(this, 0.3, {maxWidth: to ? this.$q.screen.width : 800})
-        this.maxWidth = to ? this.$q.screen.width : 800
-      }
-    }
-  },
-  methods: {
-    onWheel (e) {
-      // this.$log('onWheel', e)
-      if (this.pointerEventsTimeout !== undefined) clearTimeout(this.pointerEventsTimeout)
-      this.pointerEvents = 'none'
-      this.pointerEventsTimeout = setTimeout(() => {
-        this.pointerEvents = 'auto'
-      }, 100)
-    },
-    onResize (e) {
-      // this.$log('onResize', e)
-      this.$store.commit('ui/stateSet', ['panelMaxWidth', (e.width - this.maxWidth) / 2])
-      if (this.$store.state.ui.appFullscreen) {
-        this.maxWidth = e.width
+      async handler (to, from) {
+        this.$log('appVisible TO', to)
       }
     }
   },
   async created () {
     this.$log('created')
-    // alert('created')
     this.loading = true
     this.$q.addressbarColor.set('#424242')
     // take token from redirect url
@@ -148,22 +62,13 @@ export default {
     }
     if (!await this.$store.dispatch('init')) {
       this.$log('GO LOGIN')
-      // alert('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
-    } else { // залогинились
-      // go to welcome...
-      this.$log('this.$store.getters.currentUser()=', this.$store.getters.currentUser())
-      if (this.$store.getters.currentUser().profile.tutorial) this.$router.replace('/welcome').catch(e => e)
+    }
+    else {
+      // check welcomepage
+      // if (this.$store.getters.currentUser().profile.tutorial) this.$router.replace('/welcome').catch(e => e)
     }
     this.loading = false
-  },
-  mounted () {
-    // disableBodyScroll(document.body)
-    // window.visualViewport.addEventListener('resize', this.onResize)
-    // this.onResize()
-  },
-  beforeDestroy () {
-    // window.visualViewport.removeEventListener('resize', this.onResize)
   }
 }
 </script>

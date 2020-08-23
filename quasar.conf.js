@@ -72,7 +72,8 @@ module.exports = function (ctx) {
         'Screen',
         'BottomSheet',
         'AppFullscreen',
-        'AddressbarColor'
+        'AddressbarColor',
+        'AppVisibility'
       ]
     },
     supportIE: false,

@@ -32,10 +32,10 @@ q-layout(view="hHh Lpr lff")
                     content-item(
                       v-for="(c,ci) in items" :key="c.id" :content="c"
                       @pick="contentPicked(c)")
-      q-page-sticky(expand position="top")
+      q-page-sticky(expand position="top" :style=`{zIndex: 1000}`)
         .row.full-width.justify-center.b-30
           div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
-            q-tabs(v-model="type" no-caps dense active-color="white" align="left" switch-indicator).text-grey-4
+            q-tabs(v-model="type" no-caps dense active-color="white" align="left" switch-indicator).text-grey-8
               q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
 </template>
 

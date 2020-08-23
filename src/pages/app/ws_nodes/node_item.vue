@@ -1,107 +1,102 @@
 <style lang="sass" scoped>
-.node-saved
+.node
   cursor: pointer
   &:hover
     background: rgb(60,60,60)
 </style>
 
 <template lang="pug">
-//- .col-xs-12.col-sm-6.q-pb-sm
-.row.full-width
+div(
+  :style=`{
+    position: 'relative',
+    borderRadius: '10px', overflow: 'hidden',
+  }`
+  ).row.full-width.items-start.content-start
+  //- default state
   div(
-    @click.self="onClick()"
+    @click="onClick"
     :style=`{
       position: 'relative',
-      minHeight: '100px',
-      borderRadius: '10px',
+      height: '100px',
+      borderRadius: '10px', overflow: 'hidden',
     }`
-    ).row.full-width.node-saved.q-pa-sm.b-50
-    //- actions
-    q-btn(
-      round flat dense color="grey-7" icon="more_vert"
+    ).row.full-width.items-start.content-start.node.b-50
+    //- different previews for different stages?
+    img(
+      :src="preview" draggable="false"
       :style=`{
-        position: 'absolute', zIndex: 999, top: '4px', right: 0,
-      }`)
-      kalpa-menu-popup(:actions="actions")
-    //- previews
-    div(
-      v-if="node.items[0]"
-      @click="onClick()"
-      :style=`{position: 'relative',}`).row.full-height
-      img(
-        :src="node.items[0].thumbOid"
-        draggable="false"
-        :style=`{
-          zIndex: 100,
-          height: '100px',
-          borderRadius: '10px',
-          overflow: 'hidden',
-          userSelect: 'none',
-        }`).shadow-10
-      img(
-        v-for="(i,ii) in node.items" :key="ii"
-        v-if="ii > 0"
-        :src="i.thumbOid"
-        draggable="false"
-        :style=`{
-          position: 'absolute', zIndex: 100-ii,
-          left: (33*ii)+'%',
-          top: (5*ii)+'px',
-          height: 100-(10*ii)+'%',
-          borderRadius: '10px',
-          overflow: 'hidden',
-          opacity: 1-(0.1*ii),
-          userSelect: 'none',
-        }`).shadow-5
-    div(
-      @click="onClick()"
-      ).row.full-width.q-pa-sm
-      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{nodeName }}
+        height: '100px',
+        borderRadius: '10px', overflow: 'hidden',
+      }`
+      )
+    .col.full-height
+      .row.full-width.q-pa-sm
+        span.text-white {{ node.name || node.items }}
+  //- opened
+  div(
+    v-if="opened"
+    :style=`{
+      height: '60px',
+      marginTop: '-10px',
+    }`
+    ).row.full-width.items-center.content-center.bg-green.q-px-sm.q-pt-md.q-pb-sm
+    //- draft
+    div(v-if="node.stage === 'draft'").row.full-width
+      q-btn(flat dense no-caps color="red" @click="$emit('remove')")
+        span.text-bold Delete
+      .col
+      q-btn(flat no-caps color="white" @click="$emit('edit')").q-px-sm
+        span.text-white.text-bold Edit
+    //- published
+    div(v-else-if="node.stage === 'published'").row.full-width
+      q-btn(flat dense no-caps color="red" @click="$emit('upPublish')")
+        span.text-bold Unpublish
+      .col
+      q-btn(flat no-caps color="white" @click="$router.push('/node/'+node.oid)").q-px-sm
+        span.text-white.text-bold Explore
+    //- saved
+    div(v-else-if="node.stage === 'saved'").row.full-width
+      q-btn(flat dense no-caps color="red" @click="$emit('upPublish')")
+        span.text-bold Remove
+      .col
+      q-btn(flat no-caps color="white" @click="$router.push('/node/'+node.oid)").q-px-sm
+        span.text-white.text-bold Explore
 </template>
 
 <script>
+import { RxCollectionEnum } from 'src/system/rxdb'
+
 export default {
-  name: 'nodeItem',
+  name: 'wsNodes__nodeItem',
   props: ['node', 'nodeIndex'],
   data () {
     return {
+      opened: false,
+      preview: '',
+      nodeFull: null
     }
   },
   computed: {
-    nodeName () {
-      return this.node.name
-    },
-    actions () {
-      if (this.node.stage === 'draft') {
-        return {
-          edit: {name: this.$t('nodeItemAction_edit', 'Редактировать'), fn: () => { this.$emit('edit') }},
-          delete: {name: this.$t('nodeItemAction_delete', 'Удалить'), fn: () => { this.$emit('delete') }}
+  },
+  watch: {
+    node: {
+      immediate: true,
+      async handler (to, from) {
+        if (to.stage !== 'draft') {
+          this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
+          this.preview = this.nodeFull.meta.items[0].thumbUrl
         }
-      }
-      else if (this.node.stage === 'saved') {
-        return {
-          fork: {name: this.$t('nodeItemAction_fork', 'Форкнуть'), fn: () => { this.$emit('fork') }},
-          unSave: {name: this.$t('nodeItemAction', 'Удалить из сохраненных'), fn: () => { this.$emit('unSave') }},
+        else {
+          this.preview = to.color
         }
-      }
-      else if (this.node.stage === 'published') {
-        return {
-          fork: {name: this.$t('nodeItemAction_fork', 'Форкнуть'), fn: () => { this.$emit('fork') }},
-          unPublish: {name: this.$t('nodeItemAction_upPublish', 'Снять с публикации'), fn: () => { this.$emit('unPublish') }}
-        }
-      }
-      else {
-        return {}
       }
     }
   },
   methods: {
     onClick () {
       this.$log('onClick')
-      this.$emit('pick')
-      // if (this.node.stage === 'draft') this.$emit('edit')
-      // else this.$emit('preview')
-    }
-  }
+      this.opened = !this.opened
+    },
+  },
 }
 </script>

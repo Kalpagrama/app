@@ -27,7 +27,7 @@ div(
         }`
         ).row.b-80.author-area
         //- user avatar
-        kalpa-avatar(
+        user-avatar(
           :url="nodeFull.author.thumbUrl" :width="38" :height="38")
         //- user name
         .col.full-height

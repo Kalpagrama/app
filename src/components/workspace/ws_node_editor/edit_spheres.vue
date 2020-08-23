@@ -73,7 +73,7 @@
       v-if="node.spheres.length < 6"
       @click="sphereAddStart()"
       flat color="green" icon="add" no-caps
-      :style=`{height: '40px',}`).full-width {{$t('wsNodeEditor_Add sphere', 'Добавить сферу сути')}}
+      :style=`{height: '40px',}`).full-width {{$t('wsNodeEditor_sphereAddFirst', 'Добавь сферу сути')}}
 </template>
 
 <script>
