@@ -140,7 +140,7 @@ export default {
       this.currentTimeMove = t
     },
     barPan (e) {
-      this.$log('barPan', e)
+      // this.$log('barPan', e)
       if (e.isFirst) {
         this.panning = true
         // this.player.pause()

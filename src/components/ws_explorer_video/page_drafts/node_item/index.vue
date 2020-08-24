@@ -50,8 +50,10 @@
     }`
     ).row.full-width.items-center.content-center.justify-between.q-px-sm.bg-green
     q-btn(round flat dense no-caps color="red" icon="delete_outline" @click="$emit('remove')")
-    q-btn(round flat dense color="white" icon="keyboard_arrow_up" @click="$emit('unselect')")
-    q-btn(flat dense color="white" no-caps icon-right="launch" @click="goToEditor()").q-px-sm Editor
+    q-btn(round flat dense color="white" icon="keyboard_arrow_up" @click="$emit('unselect')"
+      :style=`{position: 'absolute', left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',}`)
+    q-btn(flat dense color="white" no-caps icon-right="launch" @click="goToEditor()")
+      span.text-white.text-bold.q-mt-xs Editor
 </template>
 
 <script>

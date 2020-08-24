@@ -102,7 +102,7 @@
 <script>
 export default {
   name: 'layerEditor__layerFrames',
-  props: ['player', 'layer', 'layerStart', 'layerEnd', 'layerDuration'],
+  props: ['player', 'layer', 'layerStart', 'layerEnd', 'layerDuration', 'tickFramesLayerCenter'],
   data () {
     return {
       width: 0,
@@ -144,19 +144,17 @@ export default {
     },
   },
   watch: {
-    // 'storeLayerEditor.need_framesLayerCenter': {
-    //   handler (to, from) {
-    //     if (to) {
-    //       this.$log('storeLayerEditor.need_framesLayerCenter TO', to)
-    //       this.framesLayerCenter()
-    //       this.storeLayerEditor.set('need_framesLayerCenter', false)
-    //     }
-    //   }
-    // }
+    tickFramesLayerCenter: {
+      handler (to, from) {
+        if (to) {
+          this.$log('tickFramesLayerCenter TO', to)
+          this.framesLayerCenter()
+        }
+      }
+    }
   },
   methods: {
     async pointDrag (e, index) {
-      // if (this.pointDraggingError) return
       // this.$log('pointDrag', e, index)
       let t = this.layer.figuresAbsolute[index].t + ((e.delta.x / this.framesWidth) * this.player.duration)
       if (t > this.player.duration || t < 0) return
@@ -176,22 +174,13 @@ export default {
       this.player.setCurrentTime(t)
       this.layer.figuresAbsolute[index].t = t
       if (e.isFirst) {
-        // this.stateExplorer.set('timeupdateStop', true)
-        // this.storeEditor.layerPlaying = null
         this.pointDragging = true
         this.pointDraggingIndex = index
-        // this.player.playPause()
-        this.player.player.pause()
-        // this.stateExplorer.set('editing', true)
+        // this.player.pause()
       }
       if (e.isFinal) {
-        // this.stateExplorer.set('timeupdateStop', false)
         this.pointDragging = false
         this.pointDraggingIndex = null
-        // this.stateExplorer.player.setCurrentTime(this.layer.figuresAbsolute[0].t)
-        // this.stateExplorer.set('editing', false)
-        // TODO: if layerwidth > this.width?
-        // this.storeEditor.layerPlaying = this.layer.id
         await this.$wait(300)
         this.framesLayerCenter()
         this.pointDraggingError = false
@@ -200,16 +189,15 @@ export default {
     framesClick (e) {
       this.$log('framesClick', e.offsetX, e.target.accessKey)
       if (e.target.accessKey !== 'frames') return
-      // this.storeEditor.layerPlaying = null
       let t = e.offsetX / this.framesWidth * this.player.duration
       this.$log('t', t)
       this.player.setCurrentTime(t)
       // play layer if got this frames...
-      if (t < this.layerStart || t > this.layerEnd) {
-        this.$emit('unfocus')
+      if (t > this.layerStart && t < this.layerEnd) {
+        this.$emit('clickInside')
       }
       else {
-        this.$emit('focus')
+        this.$emit('clickOutside')
       }
     },
     framesDrag (e) {
