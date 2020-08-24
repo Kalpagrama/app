@@ -74,7 +74,8 @@ div(:style=`{borderTop: '1px solid rgb(50,50,50)'}`).row.full-width.items-start.
             q-icon(name="thumb_up" :color="voteColor")
       //- footer: explore chain node
       .row.full-width.q-pb-lg
-        q-btn(flat dense no-caps color="green").q-px-sm
+        q-btn(
+          flat dense no-caps color="green" :to="'/twitter/node/'+node.oid").q-px-sm
           span.text-bold Explore chain
 </template>
 

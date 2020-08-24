@@ -17,11 +17,25 @@ import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'nodeLite__nodeBookmark',
-  props: ['oid', 'type', 'name'],
+  props: ['oid', 'type', 'name', 'isActive'],
   data () {
     return {
       loading: false,
       bookmarked: false,
+    }
+  },
+  watch: {
+    isActive: {
+      immediate: true,
+      async handler (to, from) {
+        // this.$log('isActive TO', to)
+        if (to) {
+          let bookmark = await this.bookmarkFind()
+          if (bookmark) {
+            this.bookmarked = true
+          }
+        }
+      }
     }
   },
   methods: {
@@ -66,12 +80,5 @@ export default {
       }
     },
   },
-  async mounted () {
-    this.$log('mounted')
-    let bookmark = await this.bookmarkFind()
-    if (bookmark) {
-      this.bookmarked = true
-    }
-  }
 }
 </script>

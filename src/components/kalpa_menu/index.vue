@@ -1,11 +1,11 @@
 <style lang="sass">
 .menu-item
   &:hover
-    background: rgb(40,40,40)
+    background: rgb(50,50,50)
 </style>
 
 <template lang="pug">
-div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width
+div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
   //- header
   div(
     :style=`{borderRadius: '10px',}`
@@ -59,7 +59,7 @@ div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width
           }`
           ).row.full-width.items-center.menu-item
           div(:style=`{width: '60px'}`).row.full-height.items-center.content-center.justify-center
-            q-icon(size="22px" :name="p.icon" color="white")
+            q-icon(size="22px" :name="p.icon" :color="p.color || 'white'")
           span(:style=`{fontSize: '16px'}`).text-white {{ p.name }}
         //- refresh
         div(
@@ -100,7 +100,7 @@ export default {
       pages: [
         {id: 'home', name: i18n.t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
         {id: 'trends', name: i18n.t('pageCategories', 'Категории'), icon: 'whatshot'},
-        {id: 'twitter', name: this.$t('pageApp_twitter', 'Твиттер'), icon: 'fab fa-twitter'},
+        {id: 'twitter', name: this.$t('pageApp_twitter', 'Твиттер'), icon: 'fab fa-twitter', color: 'blue-5'},
         {id: 'workspace', name: i18n.t('pageWorkspace', 'Мастерская'), icon: 'school'},
         {id: 'subscriptions', name: i18n.t('pageSubscriptions_title', 'Подписки'), icon: 'waves'},
         {id: 'notifications', name: i18n.t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},

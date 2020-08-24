@@ -29,13 +29,13 @@ const routes = [
       // items
       { name: 'user',
         path: 'user/:oid',
-        // redirect: 'user/:oid/created',
+        redirect: 'user/:oid/created',
         component: () => import('pages/app/user/index.vue'),
         children: [
-          // { name: 'created', path: 'created', component: () => import('components/user_explorer/user_created') },
-          // { name: 'voted', path: 'voted', component: () => import('components/user_explorer/user_voted') },
-          // { name: 'following', path: 'following', component: () => import('components/user_explorer/user_following') },
-          // { name: 'followers', path: 'followers', component: () => import('components/user_explorer/user_followers') },
+          { path: 'created', component: () => import('pages/app/user/user_created.vue') },
+          { path: 'voted', component: () => import('pages/app/user/user_voted.vue') },
+          { path: 'following', component: () => import('pages/app/user/user_following.vue') },
+          { path: 'followers', component: () => import('pages/app/user/user_followers.vue') },
         ]
       },
       {
@@ -87,7 +87,15 @@ const routes = [
       },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
-      { name: 'twitter', path: 'twitter', component: () => import('pages/app/twitter/index.vue') },
+      {
+        name: 'twitter',
+        path: 'twitter',
+        component: () => import('pages/app/twitter/index.vue'),
+        children: [
+          { path: '', component: () => import('pages/app/twitter/home.vue') },
+          { path: 'node/:oid', component: () => import('pages/app/twitter/node_chain.vue') },
+        ]
+      },
       // { name: 'feeds', path: 'feeds', component: () => import('pages/app/feeds/index.vue') },
       {
         name: 'feeds',

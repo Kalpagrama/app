@@ -1,6 +1,17 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
+    .row.full-width.justify-center
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.q-pt-sm
+        div(:style=`{height: '50px', borderRadius: '10px',}`
+          ).row.full-width.items-center.content-center.justify-between.q-pl-md.q-pr-xs.b-40
+          //- q-icon(name="fab fa-twitter" color="blue-5" size="30px").q-mr-sm
+          //- span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white Это клон твиттора
+          //- .col
+          user-avatar(v-if="user" :url="user.profile.photoUrl" :width="36" :height="36")
+          .col
+            span(v-if="user").text-white.text-bold.q-ml-sm {{ user.name }}
+  //- q-header(reveal)
     .row.full-width.justify-center.b-30
       div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
         div(:style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
@@ -13,19 +24,31 @@ q-layout(view="hHh Lpr lff")
     q-page(:style=`{paddingTop: '50px', paddingBottom: '200px'}`)
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
-          q-tab-panels(
+          //- q-tab-panels(
             v-model="pageId"
             swipeable infinite animated
             :style=`{padding: 0, margin: 0, background: 'none', minHeight: '100vh'}`).full-width
             q-tab-panel(
               v-for="p in pages" :key="p.id" :name="p.id" :style=`{padding: 0, margin: 0, background: 'none', minHeight: '100vh'}`)
-              component(:is="`user-${p.id}`" :oid="$route.params.oid")
+          //- component(:is="`user-${p.id}`" :oid="$route.params.oid")
+          router-view(:oid="$route.params.oid")
       //- pages navigation top
-      q-page-sticky(expand position="top" :style=`{zIndex: 1000}`)
-        .row.full-width.justify-center.b-30
-          div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
-            q-tabs(v-model="pageId" no-caps dense active-color="white" align="left" switch-indicator).text-grey-8
-              q-tab(v-for="t in pages" :key="t.id" :name="t.id" :label="t.name")
+      q-page-sticky(
+        v-if="$q.screen.width > 1260"
+        expand position="top" :style=`{zIndex: 1000}`)
+        div(:style=`{}`).row.full-width.justify-center
+          div(:style=`{maxWidth: '800px', height: '50px', borderRadius: '0 0 10px 10px', marginTop: '-10px', paddingTop:'10px',}`).row.full-width.q-px-md.b-30
+            q-tabs(
+              no-caps dense active-color="white" switch-indicator).text-grey-8
+              q-route-tab(v-for="t in pages" :key="t.id" :to="t.id" :name="t.id" :label="t.name")
+      q-page-sticky(
+        v-if="$q.screen.width <= 1260"
+        expand position="bottom" :style=`{zIndex: 1000}`)
+        div(:style=`{paddingLeft: '50px', paddingRight: '50px', borderRadius: '10px 10px 0 0'}`).row.full-width.justify-center.b-30
+          div(:style=`{maxWidth: '800px', height: '50px'}`).row.full-width
+            q-tabs(
+              no-caps dense active-color="white" :switch-indicator="false").full-width.text-grey-8
+              q-route-tab(v-for="t in pages" :key="t.id" :to="t.id" :name="t.id" :label="t.name")
 </template>
 
 <script>
