@@ -87,6 +87,18 @@ const routes = [
       },
       { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
       { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
+      { name: 'twitter', path: 'twitter', component: () => import('pages/app/twitter/index.vue') },
+      // { name: 'feeds', path: 'feeds', component: () => import('pages/app/feeds/index.vue') },
+      {
+        name: 'feeds',
+        path: 'feeds',
+        component: () => import('pages/app/feeds/index.vue'),
+        children: [
+          { path: '', component: () => import('pages/app/feeds/home.vue') },
+          { path: 'feed/:oid', component: () => import('pages/app/feeds/feed.vue') },
+          { path: 'add', component: () => import('pages/app/feeds/add.vue') }
+        ]
+      },
     ]
   }
 ]

@@ -98,8 +98,9 @@ export default {
     return {
       width: 300,
       pages: [
-        {id: 'home', name: i18n.t('pageApp_feedMine_title', 'Моя лента'), icon: 'view_agenda'},
+        {id: 'home', name: i18n.t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
         {id: 'trends', name: i18n.t('pageCategories', 'Категории'), icon: 'whatshot'},
+        {id: 'twitter', name: this.$t('pageApp_twitter', 'Твиттер'), icon: 'fab fa-twitter'},
         {id: 'workspace', name: i18n.t('pageWorkspace', 'Мастерская'), icon: 'school'},
         {id: 'subscriptions', name: i18n.t('pageSubscriptions_title', 'Подписки'), icon: 'waves'},
         {id: 'notifications', name: i18n.t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},

@@ -23,6 +23,12 @@ const metaFragment = gql`
         }
       }
       layout
+      author {
+        oid
+        type
+        name
+        thumbUrl(preferWidth: 50)
+      }
     }
     ...on MetaContent{
       type
@@ -37,6 +43,7 @@ const objectShortFragment = gql`
     oid
     name
     thumbUrl(preferWidth: 600)
+    createdAt
   }
 `
 
@@ -47,6 +54,7 @@ const objectShortWithMetaFragment = gql`
     oid
     name
     thumbUrl(preferWidth: 600)
+    createdAt
     meta{...metaFragment}
   }
 `

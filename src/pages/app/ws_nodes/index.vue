@@ -33,15 +33,6 @@ q-layout(view="hHh Lpr lff")
                     node-bookmark(
                       v-for="(i,ii) in items" :key="i.id"
                       :node="i" :nodeIndex="ii")
-            q-tab-panel(name="published" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
-              kalpa-loader(:mangoQuery="queryPublishedNodes" :sliceSize="1000")
-                template(v-slot=`{items, itemsMore}`)
-                  .row.full-width.items-start.content-start.justify-center.q-px-sm
-                    node-item(
-                      v-for="(i,ii) in items" :key="i.id"
-                      :node="i" :nodeIndex="ii"
-                      @edit="nodeEdit(i)"
-                      @remove="nodeRemove(i)").q-mb-sm
             q-tab-panel(name="draft" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               kalpa-loader(:mangoQuery="queryDraftNodes" :sliceSize="1000")
                 template(v-slot=`{items, itemsMore}`)
@@ -51,14 +42,12 @@ q-layout(view="hHh Lpr lff")
                       :node="i" :nodeIndex="ii"
                       @edit="nodeEdit(i)"
                       @remove="nodeRemove(i)").q-mb-sm
-            //- q-tab-panel(
-              v-for="t in typesFiltered" :key="t.id" :name="t.id"
-              :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
-              kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
+            q-tab-panel(name="published" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
+              kalpa-loader(:mangoQuery="queryPublishedNodes" :sliceSize="1000")
                 template(v-slot=`{items, itemsMore}`)
                   .row.full-width.items-start.content-start.justify-center.q-px-sm
                     node-item(
-                      v-for="(i,ii) in items" :key="i"
+                      v-for="(i,ii) in items" :key="i.id"
                       :node="i" :nodeIndex="ii"
                       @edit="nodeEdit(i)"
                       @remove="nodeRemove(i)").q-mb-sm

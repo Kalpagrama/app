@@ -13,18 +13,25 @@ q-layout(view="lHh lpR lFf")
       position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
     }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
     kalpa-menu(v-if="!loading && $route.name !== 'welcome'" :style=`{maxWidth: '300px'}`)
-  q-btn(
-    v-if="$store.state.ui.showMobileNavigation"
-    @click="$router.back()"
-    round flat color="white"
-    icon="keyboard_arrow_left"
-    :style=`{position: 'fixed', zIndex: 9999, bottom: '4px', left: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
-  q-btn(
-    v-if="$store.state.ui.showMobileNavigation"
-    @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
-    round flat color="white"
-    :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'"
-    :style=`{position: 'fixed', zIndex: 9999, bottom: '4px', right: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
+  //- mobile navigation
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    div(
+      v-if="$q.screen.width <= 1260 && $store.state.ui.showMobileNavigation"
+      :style=`{
+        position: 'fixed', zIndex: 9999, bottom: '0px',
+      }`
+      ).row.full-width.b-30.q-pa-xs
+      q-btn(
+        @click="$router.back()"
+        round flat color="white"
+        icon="keyboard_arrow_left"
+        :style=`{marginLeft: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
+      .col
+      q-btn(
+        @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
+        round flat color="white"
+        :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'"
+        :style=`{marginRight: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
   q-page-container
     router-view(v-if="!loading")
     div(
