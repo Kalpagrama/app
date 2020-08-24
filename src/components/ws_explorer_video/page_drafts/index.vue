@@ -35,8 +35,10 @@ export default {
       let res = {
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
-          contentOid: this.contentKalpa.oid,
-          stage: 'draft', // published? saved?
+          // contentOid: this.contentKalpa.oid,
+          // stage: 'draft', // published? saved?
+          contentOids: {$elemMatch: {$eq: this.contentKalpa.oid}},
+          stage: 'draft',
         },
         sort: [{updatedAt: 'desc'}],
       }

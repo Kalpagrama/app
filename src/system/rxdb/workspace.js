@@ -47,7 +47,8 @@ const WsItemTypeEnum = Object.freeze({
   WS_NODE: 'WS_NODE',
   WS_CONTENT: 'WS_CONTENT',
   WS_CHAIN: 'WS_CHAIN',
-  WS_SPHERE: 'WS_SPHERE'
+  WS_SPHERE: 'WS_SPHERE',
+  WS_BOOKMARK: 'WS_BOOKMARK',
 })
 const WsCollectionEnum = Object.freeze({
   ...WsItemTypeEnum,
@@ -359,6 +360,17 @@ class Workspace {
       const f = this.set
       assert(this.created, '!this.created')
       let itemCopy = JSON.parse(JSON.stringify(item))
+      if (itemCopy.wsItemType === 'WS_NODE') {
+        itemCopy.contentOids = itemCopy.items.reduce((acc, val) => {
+          val.layers.map(l => {
+            acc.push(l.contentOid)
+          })
+          return acc
+        }, [])
+        // if (itemCopy.stage === 'draft') {
+        //   itemCopy.thumbUrl
+        // }
+      }
       logD(f, `start. item: ${JSON.stringify(item)}`)
       assert(itemCopy.wsItemType in WsItemTypeEnum, 'bad wsItemType:' + itemCopy.g)
       itemCopy.updatedAt = Date.now()

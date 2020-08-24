@@ -1,43 +1,12 @@
 <template lang="pug">
-q-layout(view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
-  //- item find
-  //- q-dialog(v-model="itemFinderOpened" position="bottom")
-    item-finder(
-      @content="contentFound"
-      @composition="compositionFound"
-      @close="itemFinderOpened = false"
-      :style=`{
-        height: $q.screen.height-0+'px',
-        minHeight: $q.screen.height-0+'px',
-        maxWidth: $store.state.ui.maxWidthPage+'px',
-      }`)
-  //- item edit
-  //- q-dialog(
-    v-model="itemEditorOpened" position="bottom"
-    @hide="itemEdited")
-    ws-composition-editor(
-      v-if="item"
-      :value="item"
-      @close="itemEditorOpened = false"
-      @delete="itemDelete(node.items.findIndex(i => i.id === item.id))"
-      :options=`{
-        ctx: 'nodeEditor',
-        mode: 'editor',
-        mini: false,
-        active: true,
-      }`
-      :style=`{
-        height: $q.screen.height+'px',
-        minHeight: $q.screen.height+'px',
-        maxWidth: $store.state.ui.maxWidthPage+'px'
-      }`)
+q-layout(view="hHh Lpr lff")
   q-header(reveal)
     .row.full-width.justify-center.b-30
       div(
         :style=`{maxWidth: maxWidth+'px', height: '50px', overflow: 'hidden'}`
         ).row.full-width.items-center.content-center.q-px-md.b-30
         .col
-          span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ title }}
+          span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold Редактора ядра
         q-btn(round flat color="red-5" icon="delete_outline" @click="nodeDelete()")
   q-page-container
     q-page(:style=`{paddingBottom: '200px'}`)
@@ -45,14 +14,7 @@ q-layout(view="hHh Lpr lff" container :style=`{height: $q.screen.height+'px'}`)
         div(:style=`{maxWidth: maxWidth+'px',}`).row.full-width
           //- edit-layout(:node="node")
           div(:style=`{borderRadius: '10px', overflow: 'hidden',}`).row.full-width.b-70.q-mb-sm
-            //- component(
-              :is="component[node.layout]"
-              :node="node"
-              @itemFind="itemFind"
-              @itemEdit="itemEdit"
-              @itemDelete="itemDelete")
-              template(v-slot:next=`{next}`)
-                q-btn(ref="nextBtn" round flat color="red" icon="add" @click="next()" :style=`{display: 'none'}`)
+            edit-items(:node="node")
             edit-essence(:node="node")
           edit-category(:node="node")
           edit-spheres(:node="node")
@@ -75,69 +37,22 @@ import editLayout from './edit_layout'
 import editCategory from './edit_category'
 import editSpheres from './edit_spheres'
 import editEssence from './edit_essence'
-import editItemsPip from './edit_items_pip'
-import editItemsCompare from './edit_items_compare'
-import itemFinder from './item_finder'
+import editItems from './edit_items'
 
 export default {
   name: 'wsNodeEditor',
-  components: {editLayout, editCategory, editSpheres, editEssence, editItemsPip, editItemsCompare, itemFinder},
+  components: {editLayout, editCategory, editSpheres, editEssence, editItems},
   props: {
     node: {type: Object},
     title: {type: String},
   },
   data () {
     return {
-      maxWidth: 600,
+      maxWidth: 700,
       publishing: false,
-      item: null,
-      itemFinderOpened: false,
-      itemEditorOpened: false,
-      component: {
-        PIP: 'edit-items-pip',
-        HORIZONTAL: 'edit-items-compare',
-      }
     }
   },
   methods: {
-    itemFind () {
-      this.$log('itemFind')
-      this.itemFinderOpened = true
-    },
-    compositionFound (composition) {
-      this.$log('compositionFound', composition)
-      let itemIndex = this.node.items.length
-      this.$set(this.node.items, itemIndex, composition)
-      if (this.node.items.length > 1) this.$refs.nextBtn.click()
-      // set node name from the composition.name
-      if (this.node.name.length === 0) {
-        this.node.name = composition.name
-      }
-    },
-    async contentFound (content) {
-      this.$log('contentFound', content)
-      this.compositionFound(content)
-      await this.$wait(1000)
-      this.itemEdit(this.node.items[this.node.items.length - 1])
-    },
-    itemEdit (item) {
-      this.$log('itemEdit', item)
-      this.item = item
-      this.itemEditorOpened = true
-    },
-    itemEdited () {
-      this.$log('itemEdited', this.item)
-      if (this.node.name.length === 0) {
-        if (this.item.name.length > 0) {
-          this.node.name = this.item.name
-        }
-      }
-    },
-    itemDelete (index) {
-      this.$log('itemDelete', index)
-      if (!confirm(this.$t('wsNodeEditor_deleteItemConfirm', 'Удалить элемент?'))) return
-      this.$delete(this.node.items, index)
-    },
     // node
     // TODO Эти проверки могут находится в UI коде - только если это валидация (но это вроде не валидация, поэтому надо перенести в NodeApi)
     check () {
@@ -147,18 +62,20 @@ export default {
       if (this.node.layout !== 'PIP') throw new Error('Only PIP layout for now !')
       if (this.node.items.length > 5) throw new Error('5 items maximum !')
       if (this.node.spheres.length > 5) throw new Error('5 spheres maximum !')
-      // TODO: optimize for IMAGE content
-      // check layers length
-      // this.node.items.map((i, ii) => {
-      //   if (i.layers.length === 0) throw new Error(`No layers in item: ${ii} !`)
-      //   let layersDuration = i.layers.reduce((acc, layer) => {
-      //     acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
-      //     return acc
-      //   }, 0)
-      //   this.$log('layersDuration', layersDuration)
-      //   if (layersDuration > 60) throw new Error('Too looong composition, 1 min maximum !')
-      //   if (layersDuration === 0) throw new Error('Layers durtion === 0 !')
-      // })
+      // check items
+      this.node.items.map((i, ii) => {
+        if (i.layers.length === 0) throw new Error(`No layers in item: ${ii} !`)
+        if (i.outputType === 'VIDEO') {
+          // check layers duration
+          let layersDuration = i.layers.reduce((acc, layer) => {
+            acc += (layer.figuresAbsolute[1].t - layer.figuresAbsolute[0].t)
+            return acc
+          }, 0)
+          this.$log('layersDuration', layersDuration)
+          if (layersDuration > 60) throw new Error('Too looong composition, 1 min maximum !')
+          if (layersDuration === 0) throw new Error('Layers durtion === 0 !')
+        }
+      })
     },
     checkExtend () {
       this.$log('checkExtend')
@@ -176,12 +93,17 @@ export default {
         this.$log('publish start')
         this.publishing = true
         this.check()
-        this.checkExtend()
+        // this.checkExtend()
         // publish
         let createdNode = await NodeApi.nodeCreate(this.node)
+        this.$log('publish createdNode', createdNode)
+        // update this node: stage, oid, thumbUrls from all the items
         await this.node.updateExtended('stage', 'published', false)
         await this.node.updateExtended('oid', createdNode.oid, false)
-        this.$log('publisg res', createdNode)
+        createdNode.items.map((i, ii) => {
+          this.node.items[ii].thumbUrl = i.thumbUrl
+        })
+        // this.$log('publisg res', createdNode)
         this.publishing = false
         this.$q.notify({
           type: 'positive',

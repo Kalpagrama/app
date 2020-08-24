@@ -14,7 +14,7 @@ export default {
   components: {nodeItem},
   meta () {
     return {
-      title: this.node ? this.node.name : ''
+      title: 'Ядро' + this.node ? this.node.name : ''
     }
   },
   data () {

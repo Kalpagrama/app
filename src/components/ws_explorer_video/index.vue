@@ -145,16 +145,15 @@ export default {
         layout: 'PIP',
         stage: 'draft',
         wsItemType: 'WS_NODE',
-        contentOid: this.contentKalpa.oid,
-        color: this.contentKalpa.thumbUrl,
         items: [
           {
-            contentOid: this.contentKalpa.oid,
+            id: Date.now().toString(),
+            thumbUrl: this.contentKalpa.thumbUrl,
+            outputType: 'VIDEO',
             layers: [
-              {contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}], spheres: []},
+              {contentOid: this.contentKalpa.oid, figuresAbsolute: [{t: start, points: []}, {t: end, points: []}]},
             ],
             operation: { items: null, operations: null, type: 'CONCAT'},
-            spheres: []
           }
         ]
       }

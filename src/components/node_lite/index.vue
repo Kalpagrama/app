@@ -23,8 +23,8 @@ div(
     //- content
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
       q-btn(
-        v-if="composition && isActive"
-        @click="$router.push('/content/'+composition.layers[0].contentOid)"
+        v-if="isActive"
+        @click="$router.push('/content/'+node.meta.items[0].layers[0].contentOid)"
         round flat color="grey-2" icon="select_all"
         :style=`{
           position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
@@ -33,29 +33,22 @@ div(
         }`)
     //- bookmark
     transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-      q-btn(
-        v-if="isActive"
-        round flat color="grey-2" icon="bookmark_outline"
-        :style=`{
-          position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-          top: '0px', right: '0px',
-          background: 'rgba(0,0,0,0.2)',
-        }`)
+      node-bookmark(v-show="isActive" :oid="oid" type="NODE" :name="node.name")
     img(
       :src="thumbUrl" draggable="false"
       :style=`{borderRadius: '10px', overflow: 'hidden', userSelect: 'none'}`
       ).full-width
     div(
-      v-if="composition"
+      v-if="isActive && isVisible"
       :style=`{
         position: 'absolute', zIndex: 200, transform: 'translate3d(0,0,0)',
       }`
-      ).row.fit
+      ).row.fit.br
       video(
-        v-if="composition.outputType === 'VIDEO'"
+        v-if="itemType === 'VIDEO'"
         @click="videoClicked"
         @loadedmetadata="videoLoadedmetadata"
-        ref="nodeLiteVideoRef" :src="composition.url"
+        ref="nodeLiteVideoRef" :src="itemSrc"
         :muted="muted"
         playsinline loop
         :style=`{
@@ -79,9 +72,11 @@ div(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import nodeBookmark from './node_bookmark.vue'
 
 export default {
   name: 'nodeLite',
+  components: {nodeBookmark},
   props: ['node', 'isActive', 'isVisible'],
   data () {
     return {
@@ -93,12 +88,18 @@ export default {
   computed: {
     thumbUrl () {
       return this.node.meta.items[0].thumbUrl
+    },
+    itemType () {
+      return this.node.meta.items[0].outputType
+    },
+    itemSrc () {
+      return this.node.meta.items[0].url
     }
   },
   watch: {
     isActive: {
       handler (to, from) {
-        this.$log('isActive TO', to, this.node.name)
+        // this.$log('isActive TO', to, this.node.name)
         if (!this.$refs.nodeLiteVideoRef) return
         if (to) {
           this.$refs.nodeLiteVideoRef.play()
@@ -111,10 +112,10 @@ export default {
     isVisible: {
       immediate: true,
       async handler (to, from) {
-        this.$log('isVisible TO', to, this.node.name)
+        // this.$log('isVisible TO', to, this.node.name)
         if (to) {
-          if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
-          if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
+          // if (!this.nodeFull) this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, this.node.oid)
+          // if (!this.composition) this.composition = await this.$rxdb.get(RxCollectionEnum.OBJ, this.nodeFull.items[0].oid)
         }
       }
     },

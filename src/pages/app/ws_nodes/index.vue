@@ -26,7 +26,32 @@ q-layout(view="hHh Lpr lff")
           q-tab-panels(
             v-model="type" swipeable infinite animated
             :style=`{margin: 0, padding: 0, background: 'none'}`).full-width
-            q-tab-panel(
+            q-tab-panel(name="saved" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
+              kalpa-loader(:mangoQuery="querySavedNodes" :sliceSize="1000")
+                template(v-slot=`{items, itemsMore}`)
+                  .row.full-width.items-start.content-start.justify-center.q-px-sm
+                    node-bookmark(
+                      v-for="(i,ii) in items" :key="i.id"
+                      :node="i" :nodeIndex="ii")
+            q-tab-panel(name="published" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
+              kalpa-loader(:mangoQuery="queryPublishedNodes" :sliceSize="1000")
+                template(v-slot=`{items, itemsMore}`)
+                  .row.full-width.items-start.content-start.justify-center.q-px-sm
+                    node-item(
+                      v-for="(i,ii) in items" :key="i.id"
+                      :node="i" :nodeIndex="ii"
+                      @edit="nodeEdit(i)"
+                      @remove="nodeRemove(i)").q-mb-sm
+            q-tab-panel(name="draft" :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
+              kalpa-loader(:mangoQuery="queryDraftNodes" :sliceSize="1000")
+                template(v-slot=`{items, itemsMore}`)
+                  .row.full-width.items-start.content-start.justify-center.q-px-sm
+                    node-item(
+                      v-for="(i,ii) in items" :key="i.id"
+                      :node="i" :nodeIndex="ii"
+                      @edit="nodeEdit(i)"
+                      @remove="nodeRemove(i)").q-mb-sm
+            //- q-tab-panel(
               v-for="t in typesFiltered" :key="t.id" :name="t.id"
               :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
               kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
@@ -55,11 +80,12 @@ import assert from 'assert'
 import { RxCollectionEnum } from 'src/system/rxdb'
 import { NodeApi } from 'src/api/node'
 
-import nodeItem from './node_item'
+import nodeItem from './node_item.vue'
+import nodeBookmark from './node_bookmark.vue'
 
 export default {
-  name: 'pageApp_wsNodes',
-  components: {nodeItem},
+  name: 'pageApp__wsNodes',
+  components: {nodeItem, nodeBookmark},
   props: {
     mode: {
       type: String,
@@ -98,21 +124,36 @@ export default {
       // else return arr.filter(i => this.options.types.includes(i.id))
       return arr
     },
-    mangoQuery () {
-      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE}}
+    querySavedNodes () {
+      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_BOOKMARK}}
       // name
       if (this.searchString.length > 0) {
         let nameRegExp = new RegExp(this.searchString, 'i')
         res.selector.name = {$regex: nameRegExp}
       }
-      // type
-      if (this.type !== 'all') {
-        res.selector.stage = this.type
-      }
-      // sort
       res.sort = [{updatedAt: 'desc'}]
       return res
-    }
+    },
+    queryDraftNodes () {
+      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE}, stage: 'draft'}
+      // name
+      if (this.searchString.length > 0) {
+        let nameRegExp = new RegExp(this.searchString, 'i')
+        res.selector.name = {$regex: nameRegExp}
+      }
+      res.sort = [{updatedAt: 'desc'}]
+      return res
+    },
+    queryPublishedNodes () {
+      let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE, stage: 'published'}}
+      // name
+      if (this.searchString.length > 0) {
+        let nameRegExp = new RegExp(this.searchString, 'i')
+        res.selector.name = {$regex: nameRegExp}
+      }
+      res.sort = [{updatedAt: 'desc'}]
+      return res
+    },
   },
   watch: {
   },

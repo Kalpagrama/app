@@ -31,7 +31,7 @@ div(
       )
     .col.full-height
       .row.full-width.q-pa-sm
-        span.text-white {{ node.name || node.items }}
+        span.text-white {{ nodeTitle }}
   //- opened
   div(
     v-if="opened"
@@ -65,6 +65,7 @@ div(
 
 <script>
 import { RxCollectionEnum } from 'src/system/rxdb'
+import { date } from 'quasar'
 
 export default {
   name: 'wsNodes__nodeItem',
@@ -72,25 +73,27 @@ export default {
   data () {
     return {
       opened: false,
-      preview: '',
-      nodeFull: null
     }
   },
   computed: {
-  },
-  watch: {
-    node: {
-      immediate: true,
-      async handler (to, from) {
-        if (to.stage !== 'draft') {
-          this.nodeFull = await this.$rxdb.get(RxCollectionEnum.OBJ, to.oid)
-          this.preview = this.nodeFull.meta.items[0].thumbUrl
+    preview () {
+      if (this.node.items[0]) return this.node.items[0].thumbUrl
+      else return ''
+    },
+    nodeTitle () {
+      if (this.node.name.length > 0) return this.node.name
+      else {
+        if (this.node.items[0]) {
+          if (this.node.items[0].layers[0]) return this.$time(this.node.items[0].layers[0].figuresAbsolute[0].t)
+          else return date.formatDate(this.node.createdAt, 'DD.MM.YYYY')
         }
         else {
-          this.preview = to.color
+          return date.formatDate(this.node.createdAt, 'DD.MM.YYYY')
         }
       }
     }
+  },
+  watch: {
   },
   methods: {
     onClick () {
