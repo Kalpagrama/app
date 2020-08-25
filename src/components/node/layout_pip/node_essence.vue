@@ -8,7 +8,7 @@
 <template lang="pug">
 div(
   :style=`{
-    minHeight: '70px'
+    minHeight: '60px'
   }`
   ).row.full-width
   .col
@@ -18,7 +18,7 @@ div(
         ).row.full-width.items-start.content-start.essence
         span(
           :style=`{
-            fontSize: '16px',
+            fontSize: '14px',
             userSelect: 'none'
           }`
           ).text-white.text-bold {{ nodeName }}

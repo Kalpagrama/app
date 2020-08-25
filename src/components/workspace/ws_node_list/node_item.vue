@@ -6,7 +6,8 @@
 </style>
 
 <template lang="pug">
-.col-xs-12.col-sm-6.q-pa-sm
+//- .col-xs-12.col-sm-6.q-pb-sm
+.row.full-width
   div(
     @click.self="onClick()"
     :style=`{
@@ -97,8 +98,9 @@ export default {
   methods: {
     onClick () {
       this.$log('onClick')
-      if (this.node.stage === 'draft') this.$emit('edit')
-      else this.$emit('preview')
+      this.$emit('pick')
+      // if (this.node.stage === 'draft') this.$emit('edit')
+      // else this.$emit('preview')
     }
   }
 }

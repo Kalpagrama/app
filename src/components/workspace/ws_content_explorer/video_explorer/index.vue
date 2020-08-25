@@ -7,33 +7,15 @@ div(
     overflow: 'hidden',
   }`
   ).column.full-width.items-center.b-50
-  //- close btn
-  q-btn(
-    v-show="pageFullscreen"
-    @click="$emit('close')"
-    round flat color="white" icon="keyboard_arrow_left"
-    :style=`{position: 'absolute', zIndex: 1000, top: '8px', left: '8px', background: 'rgba(0,0,0,0.1)'}`)
-  //- kalpa-debug(:options=`{options}` :style=`{position: 'absolute', zIndex: 2000, top: '60px', left: '0px',}`)
   //- header
   div(
     v-show="!pageFullscreen"
-    :class=`{
-      'q-pa-xs': $q.screen.width < 600,
-      'q-pa-sm': $q.screen.width >= 600,
-    }`
-    ).row.full-width.items-center.content-center
+    ).row.full-width.items-center.content-center.q-pa-xs
+    div(:style=`{overflow: 'hidden',}`).col.q-px-sm
+      span(:style=`{whiteSpace: 'nowrap'}`).text-white {{ contentName }}
+    //- TODO: open content info: go to original, get name, and some shit
     q-btn(
-      @click="$emit('close')"
-      round flat color="white" icon="keyboard_arrow_left"
-      :dense="$q.screen.width < 600").q-mr-sm
-    div(:style=`{overflow: 'hidden',}`).col
-      span(:style=`{whiteSpace: 'nowrap'}`).text-white.text-bold {{ content.name }}
-    //- open content in page
-    q-btn(
-      v-if="$route.name !== 'content-explorer'"
-      @click="$emit('open')"
-      round flat color="white" icon="open_in_new"
-      :dense="$q.screen.width < 600")
+      round flat dense color="white" icon="more_vert")
   //- content player
   div(:style=`{position: 'relative', borderRadius: '10px',}`).col.full-width
     ws-content-player(
@@ -48,24 +30,24 @@ div(
           :icon="pageFullscreen ? 'fullscreen_exit' : 'fullscreen'")
         q-btn(
           @click="compositionAddStart()"
-          round push dense color="green" icon="add"
+          round dense color="green" icon="add"
           :style=`{borderRadius: '50%',}`)
-      //- template(v-slot:controls)
-      //-   composition-name-init(v-if="pageId === 'compositions'")
-  //- pages:
+  //- page wrapper
   div(:style=`{maxHeight: pageHeight+'px',}`).col.full-width
     .row.fit.items-start.content-start.justify-center
       component(
         v-if="storePlayer && storePlayer.loadeddata"
         :is="`page-${pageId}`"
         :content="content"
-        :style=`{ maxWidth: '600px', maxHeight: pageHeight+'px',}`)
-  //- footer
+        :mode="mode"
+        :style=`{ maxWidth: '600px', maxHeight: pageHeight+'px',}`
+        @compositionPicked="$emit('compositionPicked', $event), $emit('close')")
+  //- footer: pagesController, back, appMenu
   transition(appear enter-active-class="animated slideInUp" leave-active-class="animated slideOutDown")
     pages-controller(
       v-show="!pageFullscreen && compositionsSelected.length === 0 && !compositionEditing"
       @close="$emit('close')"
-      :style=`{position: 'absolute', zIndex: 1000, bottom: '0px',}`)
+      :style=`{position: 'absolute', zIndex: 1000, bottom: '0px',}`).b-40
 </template>
 
 <script>
@@ -75,7 +57,6 @@ import pagesController from './pages_controller'
 import pageDetails from './page_details'
 import pageExplore from './page_explore'
 import pageCompositions from './page_compositions'
-import compositionNameInit from './composition_name_init'
 
 export default {
   name: 'videoExplorer',
@@ -84,12 +65,12 @@ export default {
     pageDetails,
     pageExplore,
     pageCompositions,
-    compositionNameInit
   },
   props: {
     sid: {type: String, default () { return 'videoExplorer' }},
     content: {type: Object},
     value: {type: Object},
+    mode: {type: String, default () { return 'standalone' }},
     options: {
       type: Object,
       default () {
@@ -103,7 +84,9 @@ export default {
   data () {
     return {
       name: '',
-      pageHeight: 36,
+      pageHeight: 50,
+      pageHeightMini: 50,
+      pageHeightMaxi: 500,
       pageFullscreen: false,
       pageId: null, // 'compositions',
       pageIdLast: null,
@@ -117,8 +100,8 @@ export default {
     pages () {
       return [
         // {id: 'details', name: this.$t('Детали')},
-        {id: 'compositions', name: this.$t('videoExplorer_My compositions', 'Мои Образы')},
-        {id: 'explore', name: this.$t('videoExplorer_Nodes', 'Ядра')},
+        {id: 'compositions', name: this.$t('videoExplorer_nodesMineDrafts', 'Мои заготовки')},
+        {id: 'explore', name: this.$t('videoExplorer_nodesPublished', 'Ядра')},
       ]
     },
     sidPlayer () {
@@ -128,6 +111,9 @@ export default {
       if (this.$q.screen.width > 800) return 800
       else return this.$q.screen.width
     },
+    contentName () {
+      return this.content.name.slice(0, 40)
+    }
   },
   provide () {
     return {
@@ -140,7 +126,7 @@ export default {
       immediate: false,
       handler (to, from) {
         if (to) {
-          this.pageHeight = this.$q.screen.height * 0.55
+          this.pageHeight = this.$q.screen.height * 0.8
         }
         else {
           // this.pageHeight = 36
@@ -158,7 +144,7 @@ export default {
         else {
           this.$log('pageFullscreen OFF', this.pageId, this.pageIdLast)
           if (this.pageIdLast) this.pageId = this.pageIdLast
-          else this.pageHeight = 36
+          else this.pageHeight = this.pageHeightMini
         }
       }
     },

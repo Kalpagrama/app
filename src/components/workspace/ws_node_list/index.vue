@@ -1,97 +1,52 @@
 <template lang="pug">
-div(
-  :class=`{
-    'q-pt-sm': $q.screen.gt.xs,
-  }`
-  :style=`{
-    position: 'relative'
-  }`
-  ).column.fit
-  //- node ADD
-  q-btn(
-    @click="nodeAddBtn()"
-    push round color="green" icon="add"
-    :size="$q.screen.gt.xs ? 'xl' : 'lg'"
-    :style=`{
-      position: 'absolute', zIndex: 1000, right: '10px',
-      bottom: $q.screen.width > 1260 ? 10+'px' : 60+10+'px',
-      borderRadius: '50%'
-    }`)
-  //- node EDITOR
-  q-dialog(v-model="nodeEditorOpened" position="bottom")
-    ws-node-editor(
-      ctx="workspace"
-      :value="nodeEditorItem"
-      @published="nodePublished"
-      @close="nodeEditorOpened = false"
-      :style=`{
-        maxWidth: $store.state.ui.maxWidthPage+'px',
-        minHeight: $q.screen.height+'px',
-        maxHeight: $q.screen.height+'px',
-        height: $q.screen.height+'px',
-      }`)
-  //- node PREVIEW
-  q-dialog(v-model="nodePreviewOpened" position="bottom")
-    div(
-      :style=`{
-        height: $q.screen.height+'px',
-        minHeight: $q.screen.height+'px',
-        maxWidth: '800px',
-        borderRadius: '10px',overflow: 'hidden',
-      }`).column.b-50
-      //- body
-      .col.full-width
-        node(:node="nodePreviewItem" :nodeFullReady="nodePreviewItem" :active="true" :visible="true" :mini="false")
-      //- footer
-      .row.full-width.items-center.content-center.q-pa-sm
+q-layout(view="hHh Lpr lff")
+  q-header(reveal)
+    .row.full-width.justify-center.b-30
+      div(:style=`{position: 'relative', maxWidth: '800px'}`).row.full-width.b-30
+        div(
+          v-if="mode === 'standalone'"
+          :style=`{height: '50px'}`).row.full-width.items-center.content-center.justify-between.q-px-md
+          span(:style=`{fontSize: '19px'}`).text-white.text-bold {{$t('wsNodeList_title', 'Ядра')}}
+        .row.full-width.q-px-sm.q-pt-sm
+          q-input(
+            v-model="searchString"
+            filled dark dense color="white"
+            :placeholder="$t('wsNodeList_searchPlaceholder', 'Найти ядро')"
+            ).full-width
+            template(v-slot:append)
+              q-btn(
+                v-if="searchString.length > 0"
+                flat dense color="white" icon="clear" @click="searchString = ''")
+              q-btn(
+                flat dense color="white" icon="filter_list")
+  q-page-container
+    q-page(style="padding-top: 60px")
+      .row.full-width.justify-center
+        div(:style=`{maxWidth: '800px', paddingBottom: '1000px',}`).row.full-width.items-start.content-start
+          q-tab-panels(
+            v-model="type" swipeable infinite animated
+            :style=`{margin: 0, padding: 0, background: 'none'}`).full-width
+            q-tab-panel(
+              v-for="t in typesFiltered" :key="t.id" :name="t.id"
+              :style=`{margin: 0, padding: 0, background: 'none', minHeight: '100vh'}`)
+              kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
+                template(v-slot=`{items, itemsMore}`)
+                  .row.full-width.items-start.content-start.justify-center.q-px-sm
+                    node-item(
+                      v-for="(i,ii) in items" :key="i"
+                      :node="i" :nodeIndex="ii"
+                      @pick="nodePicked(i)")
+      q-page-sticky(expand position="top")
+        .row.full-width.justify-center.b-30
+          div(:style=`{maxWidth: '800px'}`).row.full-width.q-px-md
+            q-tabs(v-model="type" dense no-caps active-color="white" align="left" switch-indicator).full-width.text-grey-8
+              q-tab(v-for="t in typesFiltered" :key="t.id" :name="t.id" :label="t.name")
+      q-page-sticky(position="bottom" :offset="[0, 60]")
         q-btn(
-          round flat color="white" icon="keyboard_arrow_left" @click="nodePreviewOpened = false")
-        .col.q-pl-sm
-          q-btn(
-            @click="nodeFork(nodeEditorItem)"
-            push color="green" no-caps icon="photo_filter"
-            :style=`{height: '42px',}`).full-width {{$t('node_fork', 'Взять и изменить')}}
-  //- header
-  div(
-    :style=`{
-      borderRadius: $q.screen.gt.xs ? '10px' : '0 0 10px 10px',
-    }`
-    ).row.full-width.items-start.content-start.b-50
-    //- navigation
-    div(:style=`{height: '100px',}`).row.full-width.items-center.content-center.q-px-sm
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()").q-mr-sm
-      span(:style=`{fontSize: '20px'}`).text-white.text-bold {{$t('ws_nodes', 'Ядра')}}
-    //- search
-    div().row.full-width.q-px-sm
-      q-input(
-        v-model="searchString"
-        filled dark dense color="white"
-        :placeholder="$t('search_placeholder', 'Поиск')"
-        ).full-width
-        template(v-slot:append)
-          q-btn(
-            v-if="searchString.length > 0"
-            flat dense color="white" icon="clear" @click="searchString = ''")
-          q-btn(
-            flat dense color="white" icon="filter_list")
-    //- actions
-    div(:style=`{}`).row.full-width.items-end.content-end.q-px-sm.q-pb-sm.scroll
-      .row.no-wrap
-        kalpa-buttons(:value="types" :id="type" @id="type = $event" screenSet="gt.xs" wrapperBg="b-70").justify-start.q-mr-sm
-  //- body
-  .col.full-width.scroll
-    kalpa-loader(:mangoQuery="mangoQuery" :sliceSize="1000")
-      template(v-slot=`{items}`)
-        .row.fit.items-start.content-start
-          node-item(
-            v-for="(i,ii) in items" :key="i"
-            :node="i" :nodeIndex="ii"
-            @preview="nodePreview(i)"
-            @delete="nodeDelete(i)"
-            @edit="nodeEdit(i)"
-            @unSave="nodeUnSave(i)"
-            @unPublish="nodeUnPublish(i)"
-            @fork="nodeFork(i)")
+          v-if="mode === 'standalone'"
+          @click="nodeAddBtn()"
+          push round color="green" icon="add"
+          :style=`{borderRadius: '50%'}`)
 </template>
 
 <script>
@@ -104,6 +59,23 @@ import nodeItem from './node_item'
 export default {
   name: 'wsNodeLsit',
   components: {nodeItem},
+  props: {
+    mode: {
+      type: String,
+      default () {
+        return 'standalone' // standalone, picker, readonly, etc...
+      }
+    },
+    options: {
+      type: Object,
+      default () {
+        return {
+          types: [],
+          typesAll: true
+        }
+      }
+    },
+  },
   data () {
     return {
       type: 'draft',
@@ -115,12 +87,15 @@ export default {
     }
   },
   computed: {
-    types () {
-      return [
+    typesFiltered () {
+      let arr = [
         {id: 'saved', name: this.$t('nodes_saved', 'Сохраненные')},
         {id: 'draft', name: this.$t('nodes_drafts', 'Черновики')},
         {id: 'published', name: this.$t('nodes_published', 'Опубликованные')},
       ]
+      // if (this.options.typesAll) return this.arr
+      // else return arr.filter(i => this.options.types.includes(i.id))
+      return arr
     },
     mangoQuery () {
       let res = {selector: {rxCollectionEnum: RxCollectionEnum.WS_NODE}}
@@ -141,17 +116,42 @@ export default {
   watch: {
   },
   methods: {
+    nodePicked (node) {
+      this.$log('nodePicked', node)
+      this.$router.push(`/workspace/node/${node.id}`)
+    },
     async nodePreview (n) {
       this.$log('nodePreview', n)
-      if (n.stage === 'draft') return
-      this.nodeEditorItem = n
-      this.nodePreviewItem = await this.$rxdb.get(RxCollectionEnum.OBJ, n.oid)
-      this.nodePreviewOpened = true
+      if (this.mode === 'standalone') {
+        if (n.stage === 'draft') {
+          this.$q.notify({type: 'negative', message: 'Publish draft to explore!'})
+          return
+        }
+        if (!n.oid) {
+          this.$q.notify({type: 'negative', message: 'No node OID !'})
+          return
+        }
+        this.$router.push('/node/' + n.oid).catch(e => e)
+      }
+      else if (this.mode === 'picker') {
+        this.$emit('node', JSON.parse(JSON.stringify(n)))
+      }
+      else {
+        this.$q.notify({type: 'negative', message: 'No Action!'})
+      }
     },
     nodeEdit (n) {
       this.$log('nodeEdit', n)
-      this.nodeEditorItem = n
-      this.nodeEditorOpened = true
+      if (this.mode === 'standalone') {
+        this.nodeEditorItem = n
+        this.nodeEditorOpened = true
+      }
+      else if (this.mode === 'picker') {
+        this.$emit('node', JSON.parse(JSON.stringify(n)))
+      }
+      else {
+        this.$q.notify({type: 'negative', message: 'No action!'})
+      }
     },
     async nodeFork (n) {
       this.$log('nodeFork', n)

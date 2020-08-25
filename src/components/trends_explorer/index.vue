@@ -1,29 +1,23 @@
 <style lang="sass">
-.q-header
-  background: none !important
-.q-footer
-  background: none !important
+// .q-header
+//   background: none !important
+// .q-footer
+//   background: none !important
 </style>
 
 <template lang="pug">
-kalpa-layout(
-  :title="$t('pageTrends', 'Тренды')"
-  :style=`{height: $q.screen.height+'px',}`)
-  template(v-slot:footer)
-    div(:style=`{maxWidth: '800px', borderRadius: '10px 10px 0 0', overflow: 'hidden'}`).row.full-width.q-pa-sm.b-60
-      q-btn(round flat dense color="white" icon="menu" @click="$store.commit('ui/stateSet', ['appShowMenu', true])")
-      .col
-      q-btn(round flat dense color="white" icon="menu_open" @click="showMenuRight = true")
-  template(v-slot:header)
-    div(:style=`{maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`).row.full-width.items-center.content-center.q-pa-sm.b-60
-      q-btn(round flat color="white" icon="keyboard_arrow_left" @click="$router.back()")
-      .col
-        .row.fit.items-center.content-center.q-px-sm
-          q-icon(name="blur_on" color="white" size="34px").q-mr-sm
-          span(:style=`{fontSize: '18px',}`).text-white.text-bold {{ category.alias }}
-  template(v-slot:drawerRight)
-    menu-right(:style=`{maxWidth: '260px',}`)
-  template(v-slot:page)
+div(:style=`{position: 'relative'}`).column.fit
+  //- header
+  div(:style=`{position: 'absolute', zIndex: 10000, top: '0px',}`).row.full-width.justify-center
+    div(:style=`{height: '50px', maxWidth: '800px', borderRadius: '0 0 10px 10px', overflow: 'hidden'}`
+      ).row.full-width.items-center.content-center.justify-between.b-40
+      q-tabs(
+        :value="$route.params.oid" @input="$router.push({params: {oid: $event}})"
+        no-caps active-color="white"
+        ).fit.text-white
+        q-tab(v-for="c in categories" :key="c.sphere.oid" :name="c.sphere.oid" :label="c.alias")
+  //- body
+  .col.full-width
     kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
       template(v-slot=`{items, itemsMore}`)
         list-middle(
@@ -45,18 +39,20 @@ kalpa-layout(
 </template>
 
 <script>
-import menuRight from './menu_right'
+// import menuRight from './menu_right'
 import { RxCollectionEnum } from 'src/system/rxdb'
 
 export default {
   name: 'trendsExplorer',
-  components: {menuRight},
+  // components: {menuRight},
   props: ['category'],
   data () {
     return {
       showMenuRight: false,
       pointerEventsTimeout: null,
       pointerEvents: false,
+      categoryPicking: false,
+      categories: []
     }
   },
   computed: {
@@ -72,25 +68,9 @@ export default {
       }
     }
   },
-  watch: {
-  },
-  methods: {
-    onWheel (e) {
-      // this.$log('onWheel', e)
-      if (this.pointerEventsTimeout !== undefined) clearTimeout(this.pointerEventsTimeout)
-      this.pointerEvents = 'none'
-      this.pointerEventsTimeout = setTimeout(() => {
-        this.pointerEvents = 'auto'
-      }, 100)
-    }
-  },
-  mounted () {
+  async mounted () {
     this.$log('mounted')
-    this.$q.addressbarColor.set('rgb(30,30,30)')
-    document.body.style.background = 'rgb(30,30,30)'
-  },
-  beforeDestroy () {
-    this.$log('beforeDestroy')
+    this.categories = await this.$rxdb.get(RxCollectionEnum.OTHER, 'nodeCategories')
   }
 }
 </script>

@@ -17,7 +17,7 @@ div(:style=`{}`).row.full-width.items-start.content-start.justify-center.b-30
       round flat color="white" icon="keyboard_arrow_left" @click="$router.back()"
       :style=`{position: 'absolute', zIndex: 2000, top: '8px', left: '8px'}`).b-40
     div(:style=`{height: '60px'}`).row.full-width.items-center.content-center.q-px-sm
-      kalpa-avatar(v-if="user" :url="user.profile.photoUrl" :width="40" :height="40" @click.native="userAvatarClick()")
+      user-avatar(v-if="user" :url="user.profile.photoUrl" :width="40" :height="40" @click.native="userAvatarClick()")
       .col.full-height
         .row.fit.items-center.content-center.q-px-sm
           span(:style=`{fontSize: '25px', lineHeight: 0.9}` @click="userNameClick()").text-white.text-bold {{user.name}}

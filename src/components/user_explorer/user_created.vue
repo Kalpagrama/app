@@ -19,7 +19,7 @@ kalpa-loader(v-if="sphereOid" :mangoQuery="mangoQuery")
               minHeight: $q.screen.height-60+'px',
             }`)
         div(
-          v-if="itsMe && items.length === 0"
+          v-if="false && itsMe && items.length === 0"
           :style=`{
             height: '400px',
             borderRadius: $store.state.ui.borderRadius+'px',

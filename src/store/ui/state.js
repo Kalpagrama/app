@@ -12,9 +12,14 @@ export default {
   iWantSound: false,
   showDrawerLeft: false,
   appShowMenu: false,
+  appShowMobileNavigation: false,
   appFullscreen: false,
   panelMaxWidth: 0,
   wsShowMenu: true,
   stores: {},
   active: true,
+  // new
+  showMobileNavigation: true,
+  showLeftDrawer: false,
+  isTyping: false
 }

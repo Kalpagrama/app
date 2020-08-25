@@ -2,18 +2,19 @@
 const routes = [
   {
     path: '/auth',
+    redirect: '/auth/sign-in',
     component: () => import('layouts/auth_layout.vue'),
     children: [
-      { name: 'index', path: '', component: () => import('pages/auth/index.vue') }
+      { name: 'signIn', path: 'sign-in', component: () => import('pages/auth/sign_in') },
+      { name: 'signUp', path: 'sign-up', component: () => import('pages/auth/sign_up') },
     ]
   },
   {
     path: '/',
     component: () => import('layouts/main_layout'),
     children: [
-      { name: 'welcome', path: 'welcome', component: () => import('pages/app/welcome') },
-      { name: 'home', path: '', component: () => import('components/home_explorer') },
-      // { name: ''}
+      { name: 'home', path: '', component: () => import('pages/app/home/index.vue') },
+      // { name: 'welcome', path: 'welcome', component: () => import('pages/app/welcome') },
       {
         name: 'settings',
         path: 'settings/:page?',
@@ -24,59 +25,86 @@ const routes = [
           // {}
         ]
       },
-      { name: 'report', path: 'report', component: () => import('pages/app/report') },
+      // { name: 'report', path: 'report', component: () => import('pages/app/report') },
       // items
       { name: 'user',
         path: 'user/:oid',
         redirect: 'user/:oid/created',
-        component: () => import('pages/app/user'),
+        component: () => import('pages/app/user/index.vue'),
         children: [
-          { name: 'created', path: 'created', component: () => import('components/user_explorer/user_created') },
-          { name: 'voted', path: 'voted', component: () => import('components/user_explorer/user_voted') },
-          { name: 'following', path: 'following', component: () => import('components/user_explorer/user_following') },
-          { name: 'followers', path: 'followers', component: () => import('components/user_explorer/user_followers') },
+          { path: 'created', component: () => import('pages/app/user/user_created.vue') },
+          { path: 'voted', component: () => import('pages/app/user/user_voted.vue') },
+          { path: 'following', component: () => import('pages/app/user/user_following.vue') },
+          { path: 'followers', component: () => import('pages/app/user/user_followers.vue') },
         ]
       },
       {
         name: 'node',
         path: 'node/:oid',
         redirect: 'node/:oid/nodes',
-        component: () => import('pages/app/node'),
+        component: () => import('pages/app/node/index.vue'),
         children: [
-          { name: 'nodes', path: 'nodes', component: () => import('components/node_explorer/node_nodes') },
-          { name: 'contents', path: 'contents', component: () => import('components/node_explorer/node_contents') },
-          { name: 'chains', path: 'chains', component: () => import('components/node_explorer/node_chains') },
+          { name: 'nodes', path: 'nodes', component: () => import('pages/app/node/node_nodes/index.vue') },
+          { name: 'chains', path: 'chains', component: () => import('pages/app/node/node_chains/index.vue') },
         ]
       },
       { name: 'sphere', path: 'sphere/:oid?', component: () => import('pages/app/sphere') },
-      { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/trend') },
-      { name: 'content', path: 'content/:oid?/:page?', component: () => import('pages/app/content') },
+      { name: 'trends', path: 'trends/:oid?', component: () => import('pages/app/trends/index.vue') },
+      {
+        name: 'content',
+        path: 'content/:oid',
+        redirect: 'content/:oid/nodes',
+        component: () => import('pages/app/content/index.vue'),
+        children: [
+          { name: 'content-details', path: 'details', component: () => import('pages/app/content/content_details.vue') },
+          { name: 'content-nodes', path: 'nodes', component: () => import('pages/app/content/content_nodes.vue') },
+        ]
+      },
       { name: 'chain', path: 'chain/:oid?', component: () => import('pages/app/chain') },
       {
         name: 'workspace',
         path: 'workspace',
-        redirect: 'workspace/content',
-        component: () => import('components/workspace'),
+        redirect: 'workspace/contents',
+        component: () => import('pages/app/ws_index/index.vue'),
         children: [
           // content
-          { name: 'content-list', path: 'content', component: () => import('components/workspace/ws_content_list') },
-          { name: 'content-import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
-          { name: 'content-explorer', path: 'content/:id', component: () => import('components/workspace/ws_content_explorer') },
-          // composition
-          { name: 'composition-list', path: 'composition', component: () => import('components/workspace/ws_composition_list') },
-          { name: 'composition-editor', path: 'composition/:id', component: () => import('components/workspace/ws_composition_editor') },
+          { name: 'content-list', path: 'contents', component: () => import('pages/app/ws_contents/index.vue') },
+          { name: 'content-explorer', path: 'content/:id', component: () => import('pages/app/ws_content/index.vue') },
+          // { name: 'content-import', path: 'content/import', component: () => import('components/workspace/ws_content_import') },
           // node
-          { name: 'node-list', path: 'node', component: () => import('components/workspace/ws_node_list') },
-          { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
-          { name: 'node-editor', path: 'node/:id', component: () => import('components/workspace/ws_node_editor') },
+          { name: 'node-list', path: 'nodes', component: () => import('pages/app/ws_nodes/index.vue') },
+          { name: 'node-editor', path: 'node/:id', component: () => import('pages/app/ws_node/index.vue') },
+          // { name: 'node-import', path: 'node/import', component: () => import('components/workspace/ws_node_import') },
           // chain
-          { name: 'chain-list', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
-          { name: 'chain-editor', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },
+          // { name: 'chain-list', path: 'chain', component: () => import('components/workspace/ws_chain_list') },
+          // { name: 'chain-editor', path: 'chain/:id', component: () => import('components/workspace/ws_chain_editor') },
           // sphere
-          { name: 'sphere-list', path: 'sphere', component: () => import('components/workspace/ws_sphere_list') },
+          // { name: 'sphere-list', path: 'sphere', component: () => import('components/workspace/ws_sphere_list') },
           // { name: 'sphere-editor', path: 'sphere/:id', component: () => import('components/workspace/ws_sphere_editor') },
           // other
-          { name: 'ws-settings', path: 'settings', component: () => import('components/workspace/ws_settings') },
+          { name: 'ws-settings', path: 'settings', component: () => import('pages/app/ws_settings/index.vue') },
+        ]
+      },
+      { name: 'subscriptions', path: 'subscriptions', component: () => import('pages/app/subscriptions') },
+      { name: 'notifications', path: 'notifications', component: () => import('pages/app/notifications') },
+      {
+        name: 'twitter',
+        path: 'twitter',
+        component: () => import('pages/app/twitter/index.vue'),
+        children: [
+          { path: '', component: () => import('pages/app/twitter/home.vue') },
+          { path: 'node/:oid', component: () => import('pages/app/twitter/node_chain.vue') },
+        ]
+      },
+      // { name: 'feeds', path: 'feeds', component: () => import('pages/app/feeds/index.vue') },
+      {
+        name: 'feeds',
+        path: 'feeds',
+        component: () => import('pages/app/feeds/index.vue'),
+        children: [
+          { path: '', component: () => import('pages/app/feeds/home.vue') },
+          { path: 'feed/:oid', component: () => import('pages/app/feeds/feed.vue') },
+          { path: 'add', component: () => import('pages/app/feeds/add.vue') }
         ]
       },
     ]

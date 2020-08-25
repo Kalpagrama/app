@@ -55,6 +55,8 @@ module.exports = function (ctx) {
         // 'QItem',
         // 'QAvatar',
         // 'QVideo',
+        'QCarousel',
+        'QCarouselSlide',
         'QResizeObserver',
         'QInput',
         'QDialog',
@@ -72,7 +74,8 @@ module.exports = function (ctx) {
         'Screen',
         'BottomSheet',
         'AppFullscreen',
-        'AddressbarColor'
+        'AddressbarColor',
+        'AppVisibility'
       ]
     },
     supportIE: false,

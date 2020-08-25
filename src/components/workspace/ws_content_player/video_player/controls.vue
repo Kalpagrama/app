@@ -68,7 +68,7 @@ div(
         left: storePlayer.currentTime/storePlayer.duration*100+'%',
         width: '4px', borderRadius: '2px', overflow: 'hidden',
         pointerEvents: 'none',
-      }`).bg-red
+      }`).bg-green
     //- TODO: bar: curerntTime OVER
     slot(name="controls")
 </template>

@@ -1,0 +1,94 @@
+<template lang="pug">
+q-page(:style=`{paddingBottom: '200px',}`)
+  .row.full-width.items-start.content-start.justify-center
+    div(:style=`{maxWidth: '300px'}`).row.full-width.items-start.content-start
+      div(:style=`{borderRadius: '10px', overflow: 'hidden'}`).row.full-width.b-40
+        .row.full-width.q-pa-md
+          .row.full-width.justify-center.q-py-md.q-px-sm
+            span().text-white Sign in with username/password
+          //- form
+          form().full-width.q-py-md
+            //- username
+            div(
+              :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden', transform: 'translate'}`
+              ).row.full-width.items-center.content-center.q-mb-xs
+              q-input(
+                v-model="login"
+                placeholder="Username"
+                filled dark color="white" name="username"
+                type="text" required
+                :style=`{}`
+                ).full-width
+            //- password
+            div(
+              :style=`{position: 'relative', zIndex: 200, borderRadius: '10px', overflow: 'hidden', transform: 'translate'}`
+              ).row.full-width.items-center.content-center.q-mb-xs
+              q-input(
+                v-model="password"
+                placeholder="Create password"
+                autocomplete="new-password"
+                type="password" required name="password"
+                filled dark color="white"
+                @keyup.enter="signIn()").full-width
+          //- submit
+          q-btn(
+            @click="signIn()"
+            color="green" no-caps
+            :loading="loading"
+            :style=`{
+              height: '60px',
+            }`
+            ).full-width
+            span(:style=`{fontSize: '18px',}`).text-white.text-bold Enter kalpa
+      .row.full-width.items-center.content-center.q-pa-md
+        q-btn(
+          color="green" outline dense no-caps
+          @click="$router.push('/auth/sign-up')").full-width Sign up
+        .row.full-width.justify-center.q-pa-xs
+          small.text-green No account?
+</template>
+
+<script>
+import { AuthApi } from 'src/api/auth'
+
+export default {
+  name: 'pageAuth__signIn',
+  data () {
+    return {
+      login: '',
+      password: '',
+      loading: false,
+    }
+  },
+  methods: {
+    check () {
+      this.$log('check')
+      if (this.login.length === 0) throw new Error('Login is empty!')
+      if (this.password.length === 0) throw new Error('Password is empty!')
+    },
+    async signIn () {
+      try {
+        this.$log('signIn start')
+        await this.$wait(500)
+        this.check()
+        this.loading = true
+        // await this.$wait(1000)
+        let {userExist, userId, needInvite, loginType} = await AuthApi.userIdentify(this.login)
+        if (!userExist) throw new Error('No such user!')
+        if (loginType !== 'USERNAME') throw new Error('Invalid login type!')
+        let {result, failReason, oid} = await AuthApi.userAuthenticate(this.password)
+        if (result === false) throw new Error(`Error: ${failReason}`)
+        this.$log('signIn done', oid)
+        this.loading = false
+        this.$q.notify({type: 'positive', position: 'top', message: 'Welcome!'})
+        this.$router.replace('/')
+      }
+      catch (e) {
+        this.$log('signIn error', e)
+        this.$q.notify({type: 'negative', position: 'top', message: e.toString()})
+        this.loading = false
+      }
+    }
+  }
+}
+</script>

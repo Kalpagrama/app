@@ -214,6 +214,26 @@ class NodeApi {
     return createdNode
   }
 
+  static async nodeCreateMulti (nodeInput) {
+    logD('nodeCreateMulti start')
+    let { data: { nodeCreate: createdNode } } = await apollo.clients.api.mutate({
+      mutation: gql`
+        ${fragments.objectFullFragment}
+        mutation nodeCreateMulti($node: NodeInput!) {
+          nodeCreate (node: $node){
+            ...objectFullFragment
+          }
+        }
+      `,
+      variables: {
+        node: nodeInput
+      }
+    })
+    let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
+    logD('nodeCreateMulti done')
+    return createdNode
+  }
+
   // chains
   static makeChainInput (chain) {
     {

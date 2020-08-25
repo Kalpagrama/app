@@ -96,8 +96,8 @@ export default {
           return {name: s.name}
         })
       }
-      this.$log('bookmarkCreate compositions', compositions)
-      this.$log('bookmarkCreate input', input)
+      // this.$log('bookmarkCreate compositions', compositions)
+      // this.$log('bookmarkCreate input', input)
       return input
     },
     async bookmarkSave (input) {
@@ -139,7 +139,7 @@ export default {
       })
     },
     async bookmarkVerify () {
-      this.$log('bookmarkVerify start')
+      // this.$log('bookmarkVerify start')
       let {items: nodeFind} = await this.$rxdb.find({
         selector: {
           rxCollectionEnum: RxCollectionEnum.WS_NODE,
@@ -147,19 +147,19 @@ export default {
           stage: 'saved',
         }
       })
-      this.$log('bookmarkVerify nodeFind', nodeFind.length)
+      // this.$log('bookmarkVerify nodeFind', nodeFind.length)
       if (nodeFind.length > 0) {
-        this.$log('bookmarkVerify FOUND', nodeFind[0].id)
+        // this.$log('bookmarkVerify FOUND', nodeFind[0].id)
         this.bookmarked = nodeFind[0].id
       }
       else {
         this.bookmarked = null
       }
-      this.$log('bookmarkVerify done', this.bookmarked)
+      // this.$log('bookmarkVerify done', this.bookmarked)
     }
   },
   async mounted () {
-    this.$log('mounted')
+    // this.$log('mounted')
     this.bookmarkVerify()
   }
 }

@@ -6,7 +6,7 @@
 </style>
 
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.fit.justify-center
+div(:style=`{position: 'relative'}`).row.fit.justify-center.b-30
   .column.fit
     //- node PREVIEW
     q-dialog(
@@ -54,24 +54,30 @@ div(:style=`{position: 'relative'}`).row.fit.justify-center
                   }`
                   ).row.full-height.bg-grey-4
             //- list of nodes
-            list-middle(
-              :items="items" :more="itemsMore")
-              template(v-slot:itemFirst)
-                div(:style=`{height: '16px'}`).row.full-width
-              template(v-slot:item=`{item, index, indexMiddle}`)
+            list-masonry(:items="items").q-px-sm
+              template(v-slot:item=`{item}`)
                 div(
-                  @click="nodePreview(item)"
-                  :style=`{height: '100px',borderRadius: '10px', overflow: 'hidden'}`
-                  ).row.full-width.b-70.q-mb-sm.node-item
+                  @click="nodeClick(item)"
+                  :class=`{
+                    'b-50': nodeSelectedOid !== item.oid,
+                    'bg-green': nodeSelectedOid === item.oid,
+                  }`
+                  :style=`{borderRadius: '10px', overflow: 'hidden'}`
+                  ).row.full-width.items-start.content-start
                   img(
-                    :src="item.meta.items[0].thumbUrl"
-                    draggable="false"
-                    :style=`{height: '100px', borderRadius: '10px', overflow: 'hidden',userSelect: 'none'}`)
-                  .col.full-height
-                    .row.fit.items-stat.content-start.q-pa-md
-                      span(:style=`{userSelect: 'none'}`).text-white.text-bold {{ item.name }}
-              template(v-slot:itemLast)
-                div(:style=`{height: '400px'}`).row.full-width
+                    :src="item.meta.items[0].thumbUrl" draggable="false"
+                    :style=`{borderRadius: '10px', overflow: 'hidden', pointerEvents: 'none'}`).full-width
+                  .row.full-width.q-px-sm.q-py-xs
+                    small.text-white {{ item.name }}
+                  div(
+                    v-if="nodeSelectedOid === item.oid"
+                    :style=`{height: '50px'}`
+                    ).row.full-width.items-center.content-center.justify-center.q-px-xs
+                    //- .col
+                    q-btn(
+                      @click="nodeExplore(item)"
+                      flat icon-right="open_in_new" no-caps color="white")
+                      span.text-white.text-bold.q-mr-sm Explore
 </template>
 
 <script>
@@ -85,6 +91,7 @@ export default {
     return {
       mode: 'mini', // maxi, mini
       nodePreviewOpened: false,
+      nodeSelectedOid: null
     }
   },
   computed: {
@@ -119,10 +126,15 @@ export default {
       this.$log('nodePreviewed')
       this.storePlayer.play()
     },
+    nodeExplore (item) {
+      this.$log('nodeExplore')
+      this.$router.push(`/node/${item.oid}`)
+    },
     nodeClick (n) {
       this.$log('nodeClick', n)
       let t = this.nodeStart(n)
       this.storePlayer.setCurrentTime(t)
+      this.nodeSelectedOid = n.oid
     },
     nodeStart (n) {
       let item = n.meta.items.find(i => {

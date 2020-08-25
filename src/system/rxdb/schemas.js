@@ -28,6 +28,9 @@ export const wsSchemaItem = {
     oid: {
       type: 'string' // присваивается после публикации
     },
+    type: {
+      type: 'string'
+    },
     wsItemType: {
       type: 'string'
     },
@@ -51,6 +54,13 @@ export const wsSchemaItem = {
       type: 'integer'
     },
     // ---- node ----
+    contentOids: {
+      type: 'array',
+      maxItems: 88,
+      items: {
+        type: 'string'
+      }
+    },
     items: {
       type: 'array',
       maxItems: 88,
