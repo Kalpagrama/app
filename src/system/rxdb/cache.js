@@ -1,15 +1,15 @@
 import LruCache from 'lru-cache'
 import assert from 'assert'
 import { cacheSchema } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { Mutex } from 'src/system/rxdb/reactive'
 import debounce from 'lodash/debounce'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_CACHE)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_CACHE)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_CACHE)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_CACHE)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_CACHE)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_CACHE)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_CACHE)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_CACHE)
 
 // const CachedTypeEnum = Object.freeze({ OBJ: 'OBJ', LST: 'LST', OTHER: 'OTHER', ERROR: 'ERROR' })
 
@@ -42,7 +42,7 @@ class Cache {
       await this.debouncedDumpLru()
       rxdb.onRxDocDelete(plainData.id)
     }, false)
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   // удалить все данные из кэша
@@ -60,7 +60,7 @@ class Cache {
       await this.db.cache.remove()
     }
     await this.createCollections()
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   async create (recursive = false) {
@@ -113,7 +113,7 @@ class Cache {
         const t1 = performance.now()
         let lruDump = this.cacheLru.dump()
         await rxdb.set(RxCollectionEnum.META, { id: 'lruDump', valueString: JSON.stringify(lruDump) })
-        logD(f, `complete: ${performance.now() - t1} msec`)
+        logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       }, debounceIntervalDumpLru)
 
       // из-за debounce сохранения - на старте может оказаться, что в rxdb запись есть, а в lru - нет!
@@ -126,7 +126,7 @@ class Cache {
         }
       }
       this.created = true
-      logD(f, `complete: ${performance.now() - t1} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     } catch (err) {
       if (recursive) throw err
       logE(f, 'ошибка при создания CACHE! очищаем и пересоздаем!', err)
@@ -217,7 +217,7 @@ class Cache {
         },
         cached: { data }
       }) // сохраняем в rxdb
-      logD(f, `complete: ${performance.now() - t1} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return rxDoc
     } finally {
       this.release()
@@ -255,9 +255,11 @@ class Cache {
             assert(fetchRes, '!fetchRes')
             assert('item' in fetchRes && 'actualAge' in fetchRes, 'bad fetchRes: ' + JSON.stringify(fetchRes))
             let notEvict = fetchRes.notEvict || false
+            let existing = await this.db.cache.findOne(id).exec()
+            if (existing) existing = existing.toJSON().cached.data
             let res = await this.set(id, fetchRes.item, fetchRes.actualAge, notEvict, fetchRes.mangoQuery)
             logD(f, 'записаны в кэш')
-            if (onFetchFunc) await onFetchFunc()
+            if (onFetchFunc) await onFetchFunc(existing, fetchRes.item)
             return res
           }
           logD(f, 'запрашиваем данные с сервера...')
@@ -284,7 +286,7 @@ class Cache {
         }
         return null
       }
-      // logD(f, `complete: ${performance.now() - t1} msec`)
+      // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return rxDoc
     } finally {
       // this.release()

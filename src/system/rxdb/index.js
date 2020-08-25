@@ -2,7 +2,7 @@ import assert from 'assert'
 import {Workspace, WsCollectionEnum, WsItemTypeEnum} from 'src/system/rxdb/workspace'
 import {Cache} from 'src/system/rxdb/cache'
 import {Objects} from 'src/system/rxdb/objects'
-import {getLogFunc, LogLevelEnum, LogModulesEnum} from 'src/boot/log'
+import {getLogFunc, LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
 import {addRxPlugin, createRxDatabase, removeRxDatabase} from 'rxdb'
 import {RxDBDevModePlugin} from 'rxdb/plugins/dev-mode'
 import {Event} from 'src/system/rxdb/event'
@@ -17,9 +17,9 @@ import {schemaKeyValue} from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB)
 
 // id: RxCollectionEnum::rawId
 const RxCollectionEnum = Object.freeze({
@@ -129,11 +129,11 @@ class RxDBWrapper {
     await this.set(RxCollectionEnum.META, {id: 'purgeLastDate', valueString: Date.now().toString()})
     let dump = await this.db.dump()
     await this.db.importDump(dump)
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
-  async init(store, recursive = false) {
-    const f = this.init
+  async create(store, recursive = false) {
+    const f = this.create
     logD(f, 'start')
     const t1 = performance.now()
     try {
@@ -181,12 +181,12 @@ class RxDBWrapper {
       }
       await this.init(store, true)
     }
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
-  // вызывать после логина (запустит обработку эвентов и синхронмзацию мастерской)
-  async startBackgroundProcesses(userOid) {
-    const f = this.startBackgroundProcesses
+  // получит юзера, запустит обработку эвентов и синхронмзацию мастерской)
+  async init(userOid) {
+    const f = this.init
     logD(f, 'start')
     const t1 = performance.now()
     assert(userOid)
@@ -200,41 +200,44 @@ class RxDBWrapper {
         actualAge: 'day'
       }
     }
-    console.time('get user from server')
+    // console.time('get user from server')
     // юзера запрашиваем каждый раз (для проверки актуальной версии мастерской). Если будет недоступно - возмется из кэша
     let currentUser = await this.get(RxCollectionEnum.OBJ, userOid, {
       fetchFunc: fetchCurrentUserFunc,
       force: true, // данные будут запрошены всегда (даже если еще не истек их срок хранения)
-      clientFirst: true, // если в кэше есть данные - то они вернутся моментально (даже если устарели)
-      onFetchFunc: async () => { // будет вызвана при получении данных от сервера
-        this.workspace.synchroLoopWaitObj.break()// форсировать синхронизацию мастерской (могла измениться ревизия мастерской) (см synchroLoop)
+      clientFirst: true, // если в кэше есть данные - то они вернутся моментально (и обновятся в фоне)
+      onFetchFunc: async (oldVal, newVal) => { // будет вызвана при получении данных от сервера
+        assert(newVal.wsRevision)
+        if (oldVal && oldVal.wsRevision !== newVal.wsRevision) { // форсировать синхронизацию мастерской (могла измениться ревизия мастерской) (см synchroLoop)
+          this.workspace.synchroLoopWaitObj.break()
+        }
       }
     })
-    console.timeEnd('get user from server')
+    // console.timeEnd('get user from server')
     let fetchCategoriesFunc = async () => {
       return {
-        notEvict: true, // живет вечно
+        notEvict: true, // живет в кэше вечно
         item: await NodeApi.nodeCategories(),
-        actualAge: 'day'
+        actualAge: 'day' // обновляется раз в день
       }
     }
-    console.time('get categories from server')
+    // console.time('get categories from server')
     let nodeCategories = await this.get(RxCollectionEnum.OTHER, 'nodeCategories', {fetchFunc: fetchCategoriesFunc})
-    console.timeEnd('get categories from server')
+    // console.timeEnd('get categories from server')
     if (currentUser) { // синхронизация мастерской с сервером
       this.workspace.switchOnSynchro(currentUser)
     }
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
-  async stopBackgroundProcesses() {
-    const f = this.stopBackgroundProcesses
+  async deinit() {
+    const f = this.deinit
     logD(f, 'start')
     const t1 = performance.now()
     assert(this.created, '!created')
     this.event.deInit()
     this.workspace.switchOffSynchro()
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   async clearAll() {
@@ -246,7 +249,7 @@ class RxDBWrapper {
       for (let module in RxModuleEnum) await this.clearModule(module)
       await this.db.meta.remove()
       await this.db.collection({name: 'meta', schema: schemaKeyValue})
-      logD(f, `complete: ${performance.now() - t1} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     } finally {
       this.release()
     }

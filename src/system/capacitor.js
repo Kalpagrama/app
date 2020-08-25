@@ -1,4 +1,4 @@
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import assert from 'assert'
 import { router } from 'boot/main'
 import {
@@ -11,9 +11,9 @@ import { AuthApi } from 'src/api/auth'
 
 const { PushNotifications, Share, App } = Plugins
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.CP)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.CP)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.CP)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.CP)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.CP)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
 
 // let PushNotifications, Share
 

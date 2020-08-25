@@ -1,12 +1,12 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import assert from 'assert'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
 
 class ListsApi {
   // sphereItems query
@@ -34,7 +34,7 @@ class ListsApi {
     for (let key in mangoQuery.selector){
       assert(['objectTypeEnum', 'oidSphere', 'oidAuthor', 'pageToken', 'sortStrategy'].includes(key), '[objectTypeEnum, oidSphere, oidAuthor].includes(key)')
     }
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   static async getList (mangoQuery) {
@@ -142,7 +142,7 @@ class ListsApi {
       `,
       variables: {mangoQuery }
     })
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return { items/* : items.filter(item => item.oid !== 'AKCmbRKCwHc=' && item.oid !== 'AKCl7kYCwHY=') */, count, totalCount, nextPageToken }
   }
 
@@ -162,7 +162,7 @@ class ListsApi {
   //     `,
   //     variables: { oid, pagination, filter, sortStrategy }
   //   })
-  //   logD(f, `complete: ${performance.now() - t1} msec`)
+  //   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   //   return { items, count, totalCount, nextPageToken }
   // }
 
@@ -183,7 +183,7 @@ class ListsApi {
   //     `,
   //     variables: { oid, pagination, filter, sortStrategy }
   //   })
-  //   logD(f, `complete: ${performance.now() - t1} msec`)
+  //   logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   //   return { items, count, totalCount, nextPageToken, prevPageToken }
   // }
 
@@ -205,7 +205,7 @@ class ListsApi {
       `,
       variables: { pagination }
     })
-    // logD(f, `complete: ${performance.now() - t1} msec`)
+    // logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return { items, count, totalCount, nextPageToken }
   }
 

@@ -1,14 +1,14 @@
 import { apollo } from 'src/boot/apollo'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { router } from 'src/boot/main'
 import { systemReset } from 'src/system/services'
 import assert from 'assert'
 import { rxdb } from 'src/system/rxdb'
 import { Mutex } from 'src/system/rxdb/reactive'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.AUTH)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.AUTH)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.AUTH)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.AUTH)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.AUTH)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.AUTH)
 
 let currentWebPushToken
 const apiMutex = new Mutex()
@@ -18,7 +18,7 @@ async function resetAuthData() {
   localStorage.removeItem('k_token_expires')
   localStorage.removeItem('k_user_oid')
   localStorage.removeItem('k_user_role')
-  await systemReset(true)
+  await systemReset()
 }
 
 class AuthApi {
@@ -79,7 +79,7 @@ class AuthApi {
         apiMutex.release()
       }
     }
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   static async userIdentify (userId_) {
@@ -109,7 +109,7 @@ class AuthApi {
     localStorage.setItem('k_token_expires', expires)
     // setWebPushToken мог быть вызван до userIdentify
     if (currentWebPushToken) await AuthApi.setWebPushToken(currentWebPushToken)
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return { userId, loginType, userExist, needInvite, token, expires }
   }
 
@@ -198,8 +198,8 @@ class AuthApi {
       }`,
       variables: { token }
     })
-    localStorage.setItem('kweb_push_token', token)
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    localStorage.setItem('k_web_push_token', token)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 }
 

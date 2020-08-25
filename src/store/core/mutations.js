@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX_CORE)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.VUEX_CORE)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.VUEX_CORE)
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX_CORE)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.VUEX_CORE)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.VUEX_CORE)
 
 export function init (state) {
   state.initialized = true

@@ -1,9 +1,9 @@
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import assert from 'assert'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.CP)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.CP)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.CP)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.CP)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.CP)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.CP)
 
 async function initCordova (store) {
   assert(store)

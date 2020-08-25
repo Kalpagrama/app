@@ -1,9 +1,9 @@
-const swVer = 4
+const swVer = 5
 const useCache = true
-let logDebug, logCritical, logModulesBlackList, logLevel, logLevelSentry, videoStore, swShareStore,
+let logDebug, logCritical, logDbgFilter, logLevel, logLevelSentry, videoStore, swShareStore,
   cacheGraphQl,
   cacheVideo, messaging
-let webPushToken = 'empty'
+// let webPushToken = 'empty'
 
 function sendMsg (type, msgData) {
   self.clients.matchAll().then(all => all.map(client => client.postMessage({ type, msgData })))
@@ -11,7 +11,7 @@ function sendMsg (type, msgData) {
 
 // log
 {
-  logModulesBlackList = []
+  logDbgFilter = 'gui'
   logLevel = 0
   logLevelSentry = 3
   /* global importScripts */
@@ -20,7 +20,7 @@ function sendMsg (type, msgData) {
   // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
 
   logDebug = (...msg) => {
-    if (logModulesBlackList.includes('sw')) return
+    if (logDbgFilter === 'gui') return
     if (logLevel <= 2) console.log('SW: ', swVer, ...msg)
     // if (logLevelSentry <= 2) Sentry.captureMessage(JSON.stringify(msg), Sentry.Severity.Debug)
   }
@@ -156,12 +156,12 @@ function sendMsg (type, msgData) {
     })
     self.addEventListener('activate', event => {
       logDebug('activated!', swVer)
-      if (messaging) {
-        messaging.getToken().then(token => {
-          logDebug('messaging.getToken() = ', token)
-          webPushToken = token
-        }).catch(err => logCritical('error on messaging.getToken(): ', err))
-      }
+      // if (messaging) {
+      //   messaging.getToken().then(token => {
+      //     logDebug('messaging.getToken() = ', token)
+      //     webPushToken = token
+      //   }).catch(err => logCritical('error on messaging.getToken(): ', err))
+      // }
     })
     self.addEventListener('fetch', async event => {
       // logDebug('ready to handle fetches! request=', event.request)
@@ -178,11 +178,11 @@ function sendMsg (type, msgData) {
       if (event.data) {
         switch (event.data.type) {
           case 'logInit':
-            logModulesBlackList = event.data.logModulesBlackList
+            logDbgFilter = event.data.logDbgFilter
             logLevel = event.data.logLevel
             logLevelSentry = event.data.logLevelSentry
             try {
-              if (logModulesBlackList.includes('sw')) workbox.setConfig({ debug: false })
+              if (logDbgFilter !== 'gui') workbox.setConfig({ debug: true })
             } catch (err) {
               logDebug('error on setConfig', err)
             }
@@ -194,7 +194,13 @@ function sendMsg (type, msgData) {
             sendMsg('swVer', swVer)
             break
           case 'sendWebPushToken':
-            sendMsg('webPushToken', webPushToken)
+            if (messaging) {
+              messaging.getToken().then(token => {
+                logDebug('messaging.getToken() = ', token)
+                sendMsg('webPushToken', token)
+              }).catch(err => logCritical('error on messaging.getToken(): ', err))
+            }
+            // sendMsg('webPushToken', webPushToken)
             break
           default:
             logCritical('bad event.data.type', event.data.type)

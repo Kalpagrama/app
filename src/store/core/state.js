@@ -1,4 +1,4 @@
-import {LogLevelEnum, LogModulesEnum} from 'src/boot/log'
+import {LogLevelEnum, LogSystemModulesEnum} from 'src/boot/log'
 
 export default {
   initialized: false,
@@ -11,7 +11,7 @@ export default {
   installPrompt: null, // ф-я вызова диалога "установить приложение"
   logLevel: LogLevelEnum.DEBUG,
   logLevelSentry: LogLevelEnum.CRITICAL,
-  logModulesBlackList: [], // LogModulesEnum.ML, LogModulesEnum.VUEX, ...
+  logDbgFilter: 'any', // gui | system | any
   colors: {
     hello: 'goodbye'
   },

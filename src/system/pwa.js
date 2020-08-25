@@ -1,13 +1,13 @@
 import { notify } from 'src/boot/notify'
 import { AuthApi } from 'src/api/auth'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
 import { Store, get, clear } from 'src/statics/scripts/idb-keyval/idb-keyval.mjs'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.PWA)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.PWA)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.PWA)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.PWA)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.PWA)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.PWA)
 
 let registration = null // ServiceWorkerRegistration
 const forceUpdatePWA = true // обновлять приложение без разрешения прользователя
@@ -40,7 +40,7 @@ async function initPWA (store) {
         if (sw) {
           sw.postMessage({
             type: 'logInit',
-            logModulesBlackList: store.state.core.logModulesBlackList,
+            logDbgFilter: store.state.core.logDbgFilter,
             logLevel: store.state.core.logLevel,
             logLevelSentry: store.state.core.logLevelSentry
           })
@@ -119,10 +119,10 @@ async function initPWA (store) {
   } else {
     logW('serviceWorker disabled!')
   }
-  logD(f, `complete: ${performance.now() - t1} msec`)
+  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
-async function pwaReset (force = false) {
+async function pwaReset () {
   const f = pwaReset
   logD(f, 'start')
   const t1 = performance.now()
@@ -152,7 +152,7 @@ async function pwaReset (force = false) {
   const videoStore = new Store('sw-cache-video', 'video-responses')
   await clear(swShareStore)
   await clear(videoStore)
-  logD(f, `complete: ${performance.now() - t1} msec`)
+  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
 function showNotifyNewVer () {

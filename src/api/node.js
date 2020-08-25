@@ -1,13 +1,13 @@
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { apollo } from 'src/boot/apollo'
 import assert from 'assert'
 import { fragments } from 'src/api/fragments'
 import { RxCollectionEnum, rxdb } from 'src/system/rxdb'
 import cloneDeep from 'lodash/cloneDeep'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
 
 class NodeApi {
   static async nodeCategories () {
@@ -31,7 +31,7 @@ class NodeApi {
         }
       `
     })
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return categories
   }
 
@@ -126,11 +126,10 @@ class NodeApi {
     if (!oid) return
     let { data: { nodeUnrate } } = await apollo.clients.api.mutate({
       mutation: gql`
+        ${fragments.objectFullFragment}
         mutation nodeUnrate ($oid: OID!) {
-          nodeUnrate (oid: $oid){
-            oid
-            rate
-            rateUser
+          unrate (oid: $oid){
+            ...objectFullFragment
           }
         }
       `,
@@ -139,7 +138,7 @@ class NodeApi {
       }
     })
     // todo update node in apollo cache
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return nodeUnrate
   }
 
@@ -170,7 +169,7 @@ class NodeApi {
       nodeFull.rateUser = rate // nodeFull реактивен!
       logD(f, `done rateUser=${nodeFull.rateUser}`)
     }
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return rate
   }
 
@@ -210,7 +209,7 @@ class NodeApi {
       }
     })
     let reactiveNode = await rxdb.set(RxCollectionEnum.OBJ, createdNode, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return createdNode
   }
 
@@ -286,7 +285,7 @@ class NodeApi {
       }
     })
     let reactiveChain = await rxdb.set(RxCollectionEnum.OBJ, createdChain, { actualAge: 'zero' }) // поместим ядро в кэш (на всяк случай)
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return createdChain
   }
 }

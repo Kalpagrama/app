@@ -11,14 +11,15 @@ import { WebSocketLink } from 'apollo-link-ws'
 import { createUploadLink } from 'apollo-upload-client'
 import possibleTypes from 'src/statics/scripts/possibleTypes.json'
 import assert from 'assert'
+import isEqual from 'lodash/isEqual'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { cache } from 'src/boot/cache'
 import { AuthApi } from 'src/api/auth'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 
 let apollo
 
@@ -97,8 +98,15 @@ export default async ({ Vue, store, app }) => {
         actualAge: 'day'
       }
     }
+    const onFetchFunc = async (oldVal, newVal) => {
+      logD(' services onFetchFunc...')
+      if (oldVal && !isEqual(oldVal, newVal)){
+        logD('new services received! try reload page...')
+        window.location.reload() // новые данные будут подхвачены после перезагрузки
+      }
+    }
 
-    let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', { fetchFunc, clientFirst: false, force: true })
+    let services = await rxdb.get(RxCollectionEnum.OTHER, 'services', { fetchFunc, clientFirst: true, force: true, onFetchFunc })
 
     logD('services', services)
     let linkAuth = services.authUrl

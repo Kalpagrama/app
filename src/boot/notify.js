@@ -1,7 +1,7 @@
 import { Notify } from 'quasar'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 
 let notify = null
 // TODO: max count on screen

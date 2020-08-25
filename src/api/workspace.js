@@ -1,10 +1,10 @@
 import { apollo } from 'src/boot/apollo'
 import { rxdb, RxModuleEnum } from 'src/system/rxdb'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
 
 class WorkspaceApi {
   // очистить мастерскую на сервере
@@ -20,7 +20,7 @@ class WorkspaceApi {
       `
     })
     await rxdb.clearModule(RxModuleEnum.WS)
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return wsClear
   }
 
@@ -31,7 +31,7 @@ class WorkspaceApi {
     let { data: { ws } } = await apollo.clients.api.query({
       query: gql`query{ws}`
     })
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return ws
   }
 
@@ -45,7 +45,7 @@ class WorkspaceApi {
       }`,
       variables: { item }
     })
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return wsItemUpsert
   }
 
@@ -60,7 +60,7 @@ class WorkspaceApi {
         }`,
       variables: { item }
     })
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return wsItemUpsert
   }
 }

@@ -1,13 +1,15 @@
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { Notify, Platform } from 'quasar'
 import { i18n } from 'src/boot/i18n'
-import { rxdb } from 'src/system/rxdb'
+import {RxCollectionEnum, rxdb} from 'src/system/rxdb'
 import { askForPwaWebPushPerm, initPWA, pwaReset } from 'src/system/pwa'
 import { router } from 'src/boot/main'
+import assert from 'assert';
+import i18next from 'i18next'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.SW)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.SW)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.SW)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.SW)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.SW)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.SW)
 
 async function initServices (store) {
   const f = initServices
@@ -47,14 +49,14 @@ function initOfflineEvents (store) {
 }
 
 // очистить кэш сервис-воркера
-async function systemReset (force = false) {
+async function systemReset () {
   const f = systemReset
   logD(f, 'start')
   const t1 = performance.now()
-  if (process.env.MODE === 'pwa') await pwaReset(force)
+  if (process.env.MODE === 'pwa') await pwaReset()
   await rxdb.clearAll()
-  await rxdb.stopBackgroundProcesses()
-  logD(f, `complete: ${performance.now() - t1} msec`)
+  await rxdb.deinit()
+  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
 async function askForWebPushPerm (store) {
@@ -71,4 +73,28 @@ async function askForWebPushPerm (store) {
   }
 }
 
-export { initServices, systemReset }
+async function systemInit(store){
+  const f = systemInit
+  logD(f, 'start')
+  const t1 = performance.now()
+  let res = {authenticated: false}
+  let userOid = localStorage.getItem('k_user_oid')
+  if (userOid) {
+    try {
+      await rxdb.init(userOid)
+      let currentUser = await rxdb.get(RxCollectionEnum.OBJ, userOid)
+      assert(currentUser, 'currentUser обязан быть после rxdb.init')
+      await store.dispatch('init', currentUser)
+      await i18next.changeLanguage(currentUser.profile.lang)
+      res.authenticated = true
+    } catch (err){
+      logE('error on systemInit!', err)
+      await systemReset()
+      throw err
+    }
+  }
+  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
+  return res
+}
+
+export { initServices, systemReset, systemInit }

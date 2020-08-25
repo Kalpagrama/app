@@ -1,13 +1,13 @@
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { makeId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
 import { ListsApi as ListApi, ListsApi } from 'src/api/lists'
 import { getReactive, updateRxDoc } from 'src/system/rxdb/reactive'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_LST)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_LST)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_LST)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_LST)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_LST)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_LST)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_LST)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_LST)
 
 const LstCollectionEnum = Object.freeze({
   LST_SPHERE_NODES: 'LST_SPHERE_NODES',
@@ -222,7 +222,7 @@ class Lists {
         throw new Error(`unsupported Event ${event.type}`)
     }
     let { type, wsItem: itemServer, wsRevision } = event
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   // подходит ли object под этот фильтр

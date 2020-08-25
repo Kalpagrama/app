@@ -5,13 +5,13 @@ import { isRxDocument, isRxQuery } from 'rxdb'
 import { skip } from 'rxjs/operators'
 import { rxdb } from 'src/system/rxdb'
 import debounce from 'lodash/debounce'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import merge from 'lodash/merge'
 import set from 'lodash/set'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_REACTIVE)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_REACTIVE)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_REACTIVE)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_REACTIVE)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_REACTIVE)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_REACTIVE)
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 function getReactive (rxDoc) {
@@ -69,7 +69,7 @@ async function updateRxDoc (rxDocOrId, path, value, debouncedSave = true) {
       })
     }
   }
-  logD(f, `complete: ${performance.now() - t1} msec`)
+  logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
 }
 
 const debounceIntervalItem = 2000

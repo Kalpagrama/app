@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { i18n } from 'src/boot/i18n'
 import { notify } from 'src/boot/notify'
 import { router } from 'src/boot/main'
@@ -7,10 +7,10 @@ import { EventApi } from 'src/api/event'
 import { rxdb } from 'src/system/rxdb'
 import { RxCollectionEnum } from 'src/system/rxdb/index'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_EVENT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_EVENT)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_EVENT)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_EVENT)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_EVENT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_EVENT)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_EVENT)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_EVENT)
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
 class Event {
@@ -112,7 +112,7 @@ class Event {
       default:
         throw new Error(`unsupported Event ${event.type}`)
     }
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
 // вывести уведомление о действии пользователя

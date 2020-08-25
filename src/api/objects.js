@@ -1,12 +1,12 @@
 import { apollo } from 'src/boot/apollo'
 import { fragments } from 'src/api/fragments'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { rxdb, RxCollectionEnum } from 'src/system/rxdb'
 import assert from 'assert'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.GQL)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.GQL)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.GQL)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.GQL)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.GQL)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.GQL)
 
 class ObjectsApi {
   static fileToDataUrl (file) {
@@ -33,7 +33,7 @@ class ObjectsApi {
       `,
       variables: { oids }
     })
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return objectList
   }
 
@@ -52,7 +52,7 @@ class ObjectsApi {
       `,
       variables: { oid }
     })
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     return objectFull
   }
 

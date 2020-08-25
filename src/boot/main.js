@@ -1,6 +1,6 @@
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.BOOT)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.BOOT)
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.BOOT)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.BOOT)
 // import VueYandexMetrika from 'vue-yandex-metrika'
 
 import { LoadingBar, Screen, date } from 'quasar'

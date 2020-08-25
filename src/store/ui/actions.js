@@ -1,7 +1,7 @@
 import assert from 'assert'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.VUEX)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.VUEX)
 
 export const action = async (context, [options, cb]) => {
   logD('@action start', options)

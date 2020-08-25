@@ -55,6 +55,7 @@ q-layout(view="lHh lpR lFf")
 </template>
 
 <script>
+import {systemInit} from 'src/system/services'
 export default {
   name: 'mainLayout',
   data () {
@@ -82,14 +83,19 @@ export default {
       localStorage.setItem('ktokenExpires', expires)
       await this.$router.push('/').catch(e => e)
     }
-    if (!await this.$store.dispatch('init')) {
+    let res = await systemInit(this.$store)
+    if (!res.authenticated){
       this.$log('GO LOGIN')
       await this.$router.push('/auth').catch(e => e)
     }
-    else {
-      // check welcomepage
-      // if (this.$store.getters.currentUser().profile.tutorial) this.$router.replace('/welcome').catch(e => e)
-    }
+    // if (!await this.$store.dispatch('init')) {
+    //   this.$log('GO LOGIN')
+    //   await this.$router.push('/auth').catch(e => e)
+    // }
+    // else {
+    //   // check welcomepage
+    //   // if (this.$store.getters.currentUser().profile.tutorial) this.$router.replace('/welcome').catch(e => e)
+    // }
     this.loading = false
   }
 }

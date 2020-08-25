@@ -1,4 +1,3 @@
-
 import assert from 'assert'
 // чтобы JSON.stringify() нормально ошибки переваривал (stringify понимает только enumerable props)
 if (!('toJSON' in Error.prototype)) {
@@ -26,7 +25,7 @@ const LogLevelEnum = Object.freeze({
   CRITICAL: 4
 })
 Object.freeze(LogLevelEnum)
-const LogModulesEnum = Object.freeze({
+const LogSystemModulesEnum = Object.freeze({
   SW: 'sw',
   PWA: 'pwa',
   AUTH: 'auth',
@@ -42,18 +41,33 @@ const LogModulesEnum = Object.freeze({
   RXDB_LST: 'rxdb_lst',
   RXDB_EVENT: 'rxdb_ev',
   BOOT: 'boot',
-  ML: 'mainLayout',
   CP: 'capacitor'
 })
-Object.freeze(LogModulesEnum)
+let logSystemModulesValueSet = new Set(Object.values(LogSystemModulesEnum))
+Object.freeze(LogSystemModulesEnum)
 
 const showAlert = false
 
 class Logger {
-  constructor (store) {
+  constructor(store) {
     this.store = store
     this.loggerFuncs = {}
     // Sentry.init({ dsn: 'https://63df77b22474455a8b54c63682fcaf61@sentry.io/1838536' })
+
+    let logLevel = localStorage.getItem('k_log_level')
+    if (!logLevel) {
+      if (process.env.NODE_ENV === 'development') logLevel = LogLevelEnum.DEBUG
+      else logLevel = LogLevelEnum.WARNING
+      localStorage.setItem('k_log_level', logLevel)
+    }
+    this.store.commit('core/stateSet', ['logLevel', logLevel])
+
+    let logDbgFilter = localStorage.getItem('k_log_filter')
+    if (!logDbgFilter) {
+      logDbgFilter = 'gui'
+      localStorage.setItem('k_log_filter', logDbgFilter)
+    }
+    this.store.commit('core/stateSet', ['logDbgFilter', logDbgFilter])
   }
 
   randomInteger(min, max) {
@@ -63,7 +77,7 @@ class Logger {
   }
 
   // создаст для каждого модуля свою ф-ю
-  getLoggerFunc (module) {
+  getLoggerFunc(module) {
     let loggerModule
     loggerModule = this.loggerFuncs[module]
     if (!loggerModule) {
@@ -74,18 +88,18 @@ class Logger {
     return loggerModule
   }
 
-  prepareParams(msg, highlightColor, textColor){ // #69f542
+  prepareParams(msg, highlightColor, textColor) { // #69f542
     let func = null
     if (msg.length && typeof msg[0] === 'function') {
       func = msg[0]
-      if (highlightColor)msg.splice(0, 1, `%c[${func.name}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
+      if (highlightColor) msg.splice(0, 1, `%c[${func.name}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
       else msg.splice(0, 1, `%c[${func.name}]`, 'color: #bada55')
     } else if (highlightColor) {
       msg.splice(0, 0, `%c[${'______'}]`, `background: ${highlightColor}; color: ${textColor}`, (new Date()).toLocaleTimeString())
     }
   }
 
-  showAlert(msg){
+  showAlert(msg) {
     let func = null
     let message = msg[0]
     if (msg.length && typeof msg[0] === 'function') {
@@ -94,8 +108,10 @@ class Logger {
     alert('ERR! \n' + JSON.stringify(message))
   }
 
-  debug (module, ...msg) {
-    if (this.store.state.core.logModulesBlackList.includes(module)) return
+  debug(module, ...msg) {
+    assert(['gui', 'any', 'system'].includes(this.store.state.core.logDbgFilter))
+    if (this.store.state.core.logDbgFilter === 'gui' && logSystemModulesValueSet.has(module)) return
+    if (this.store.state.core.logDbgFilter === 'system' && !logSystemModulesValueSet.has(module)) return
     if (LogLevelEnum.DEBUG >= this.store.state.core.logLevel) {
       this.prepareParams(msg)
       this.getLoggerFunc(module, null)(...msg)
@@ -105,8 +121,7 @@ class Logger {
     }
   }
 
-  info (module, ...msg) {
-    if (this.store.state.core.logModulesBlackList.includes(module)) return
+  info(module, ...msg) {
     if (LogLevelEnum.INFO >= this.store.state.core.logLevel) {
       this.prepareParams(msg)
       this.getLoggerFunc(module)(...msg)
@@ -116,8 +131,7 @@ class Logger {
     }
   }
 
-  warn (module, ...msg) {
-    if (this.store.state.core.logModulesBlackList.includes(module)) return
+  warn(module, ...msg) {
     if (LogLevelEnum.WARNING >= this.store.state.core.logLevel) {
       this.prepareParams(msg, 'Yellow', 'Black')
       this.getLoggerFunc(module)(...msg)
@@ -127,7 +141,7 @@ class Logger {
     }
   }
 
-  error (module, ...msg) {
+  error(module, ...msg) {
     try {
       if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.ERROR >= this.store.state.core.logLevel) {
@@ -143,7 +157,7 @@ class Logger {
     }
   }
 
-  critical (module, ...msg) {
+  critical(module, ...msg) {
     try {
       if (showAlert) this.showAlert(msg)
       if (LogLevelEnum.CRITICAL >= this.store.state.core.logLevel) {
@@ -166,24 +180,24 @@ let logW = (...msg) => console.warn(...msg)
 let logE = (...msg) => console.error(...msg)
 let logC = (...msg) => console.error(...msg)
 
-function getLogFunc (level, module) {
+function getLogFunc(level, module) {
   switch (level) {
     case LogLevelEnum.DEBUG:
-      return (...args) => logD.call({ logModuleName: module }, ...args)
+      return (...args) => logD.call({logModuleName: module}, ...args)
     case LogLevelEnum.INFO:
-      return (...args) => logI.call({ logModuleName: module }, ...args)
+      return (...args) => logI.call({logModuleName: module}, ...args)
     case LogLevelEnum.WARNING:
-      return (...args) => logW.call({ logModuleName: module }, ...args)
+      return (...args) => logW.call({logModuleName: module}, ...args)
     case LogLevelEnum.ERROR:
-      return (...args) => logE.call({ logModuleName: module }, ...args)
+      return (...args) => logE.call({logModuleName: module}, ...args)
     case LogLevelEnum.CRITICAL:
-      return (...args) => logC.call({ logModuleName: module }, ...args)
+      return (...args) => logC.call({logModuleName: module}, ...args)
     default:
-      return (...args) => logD.call({ logModuleName: module }, ...args)
+      return (...args) => logD.call({logModuleName: module}, ...args)
   }
 }
 
-export default async ({ Vue, store, app }) => {
+export default async ({Vue, store, app}) => {
   try {
     const detectModuleName = (thiz) => {
       if (thiz && thiz.logModuleName) {
@@ -239,7 +253,7 @@ export default async ({ Vue, store, app }) => {
         error.processed = true
       }
       try {
-        if (error && error.message === 'Failed to execute \'getComputedStyle\' on \'Window\': parameter 1 is not of type \'Element\'.'){
+        if (error && error.message === 'Failed to execute \'getComputedStyle\' on \'Window\': parameter 1 is not of type \'Element\'.') {
           logW('window.onerror', message, source, line, column, error)
         } else {
           logE('window.onerror', message, source, line, column, error)
@@ -255,4 +269,4 @@ export default async ({ Vue, store, app }) => {
   }
 }
 
-export { getLogFunc, LogLevelEnum, LogModulesEnum }
+export {getLogFunc, LogLevelEnum, LogSystemModulesEnum}

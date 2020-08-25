@@ -2,14 +2,14 @@
 import assert from 'assert'
 import { ObjectsApi } from 'src/api/objects'
 import { updateRxDoc } from 'src/system/rxdb/reactive'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { RxCollectionEnum, rxdb, makeId } from 'src/system/rxdb/index'
 import set from 'lodash/set'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_OBJ)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_OBJ)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_OBJ)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_OBJ)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_OBJ)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_OBJ)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_OBJ)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_OBJ)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -294,7 +294,7 @@ class Objects {
         throw new Error(`unsupported Event ${event.type}`)
     }
     let { type, wsItem: itemServer, wsRevision } = event
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 }
 

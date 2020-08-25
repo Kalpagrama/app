@@ -2,7 +2,7 @@ import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 
 import assert from 'assert'
 import { wsSchemaLocalChanges, wsSchemaItem } from 'src/system/rxdb/schemas'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
+import { getLogFunc, LogLevelEnum, LogSystemModulesEnum } from 'src/boot/log'
 import { getReactive, Mutex, updateRxDoc } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
 import isEqual from 'lodash/isEqual'
@@ -12,10 +12,10 @@ import intersectionWith from 'lodash/intersectionWith'
 import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb, getRawIdFromId } from 'src/system/rxdb/index'
 import LruCache from 'lru-cache'
 
-const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
-const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_WS)
-const logW = getLogFunc(LogLevelEnum.WARNING, LogModulesEnum.RXDB_WS)
-const logC = getLogFunc(LogLevelEnum.CRITICAL, LogModulesEnum.RXDB_WS)
+const logD = getLogFunc(LogLevelEnum.DEBUG, LogSystemModulesEnum.RXDB_WS)
+const logE = getLogFunc(LogLevelEnum.ERROR, LogSystemModulesEnum.RXDB_WS)
+const logW = getLogFunc(LogLevelEnum.WARNING, LogSystemModulesEnum.RXDB_WS)
+const logC = getLogFunc(LogLevelEnum.CRITICAL, LogSystemModulesEnum.RXDB_WS)
 
 const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -126,7 +126,7 @@ class Workspace {
       await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE)
       rxdb.onRxDocDelete(plainData.id)
     }, false)
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   // удалить все данные из мастерской
@@ -152,7 +152,7 @@ class Workspace {
       this.ignoreWsChanges = false
       this.release()
     }
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   async create (recursive = false) {
@@ -279,7 +279,7 @@ class Workspace {
           // }
           await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: wsServer.rev.toString() })
           this.reactiveUser.wsRevision = wsServer.rev // версия по мнению сервера
-          logD(f, `complete: ${performance.now() - t1} msec`)
+          logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
         }
       } finally {
         this.ignoreWsChanges = false
@@ -301,7 +301,7 @@ class Workspace {
       } else {
         wsItemDelete = await WorkspaceApi.wsItemDelete(item)
       }
-      logD(f, `complete: ${performance.now() - t1} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return { wsItemUpsert, wsItemDelete }
     }
 
@@ -346,7 +346,7 @@ class Workspace {
         }
       }
     }
-    logD(f, `complete: ${performance.now() - t1} msec`)
+    logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
   }
 
   // от сервера прилетел эвент об изменении в мастерской (скорей всего - ответ на наши действия)
@@ -397,7 +397,7 @@ class Workspace {
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
       await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: this.reactiveUser.wsRevision.toString() })
-      logD(f, `complete: ${performance.now() - t1} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
     } finally {
       this.ignoreWsChanges = false
       this.release()
@@ -450,7 +450,7 @@ class Workspace {
       assert(isRxDocument(rxDoc), '!isRxDocument' + JSON.stringify(rxDoc))
       // const queryXxx2 = this.db.ws_items.find()
       // const queryRes2 = await queryXxx2.exec()
-      logD(f, `complete: ${performance.now() - t1} msec`)
+      logD(f, `complete: ${Math.floor(performance.now() - t1)} msec`)
       return rxDoc
     } finally {
       this.release()
