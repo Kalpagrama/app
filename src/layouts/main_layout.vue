@@ -6,13 +6,18 @@ q-layout(view="lHh lpR lFf")
     behavior="mobile" no-swipe-open
     @before-show="$store.commit('ui/stateSet', ['showMobileNavigation', false])"
     @before-hide="$store.commit('ui/stateSet', ['showMobileNavigation', true]), $store.commit('ui/stateSet', ['appShowMenu', false])")
-    kalpa-menu(v-if="!loading && $route.name !== 'welcome'").full-height.b-40
+    kalpa-menu(
+      v-if="!loading && $route.name !== 'welcome'"
+      :style=`{borderRadius: '0 10px 10px 0'}`
+      ).full-height.b-40
   div(
     v-if="$q.screen.width > 1260"
     :style=`{
       position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
     }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
-    kalpa-menu(v-if="!loading && $route.name !== 'welcome'" :style=`{maxWidth: '300px'}`)
+    kalpa-menu(
+      v-if="!loading && $route.name !== 'welcome'"
+      :style=`{borderRadius: '10px', maxWidth: '300px'}`).b-40
   //- mobile navigation
   //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(

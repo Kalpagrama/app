@@ -97,8 +97,10 @@ export default {
     },
     setCurrentTime (t) {
       // this.$log('setCurrentTime', t)
+      // set currentTime for fast Resonse?
+      // TODO: bug with real currentTime...
+      this.currentTime = t
       this.player.setCurrentTime(t)
-      this.curerntTime = t
     },
     loadeddataHandle (e) {
       this.$log('loadeddataHandle', e)

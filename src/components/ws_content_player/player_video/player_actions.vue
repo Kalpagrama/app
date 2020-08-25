@@ -1,5 +1,5 @@
 <template lang="pug">
-div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.justify-between.q-py-xs
+div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.justify-between.q-pa-xs
   //- play/pause
   q-btn(
     @click="player.playing ? player.pause() : player.play()"
@@ -11,7 +11,8 @@ div(:style=`{position: 'relative'}`).row.full-width.items-center.content-center.
   div(
     :style=`{
       position: 'absolute', left: '50%', marginRight: '-50%', transform: 'translate(-50%, 0)',
-      background: 'rgba(0,0,0,0.5)', borderRadius: '10px', overflow: 'hidden',}`).row.full-height.items-center.content-center
+      background: 'rgba(0,0,0,0.5)', borderRadius: '10px', overflow: 'hidden',}`
+    ).row.items-center.content-center
     q-btn(round flat dense :color="color" icon="fast_rewind" @click="backward()")
     q-btn(round flat dense :color="color")
       q-icon(

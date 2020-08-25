@@ -5,7 +5,7 @@
 </style>
 
 <template lang="pug">
-div(:style=`{borderRadius: '0 10px 10px 0'}`).column.full-width.b-40
+.column.full-width
   //- header
   div(
     :style=`{borderRadius: '10px',}`
@@ -98,13 +98,13 @@ export default {
     return {
       width: 300,
       pages: [
-        {id: 'home', name: i18n.t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
-        {id: 'trends', name: i18n.t('pageCategories', 'Категории'), icon: 'whatshot'},
-        {id: 'twitter', name: this.$t('pageApp_twitter', 'Твиттер'), icon: 'fab fa-twitter', color: 'blue-5'},
-        {id: 'workspace', name: i18n.t('pageWorkspace', 'Мастерская'), icon: 'school'},
-        {id: 'subscriptions', name: i18n.t('pageSubscriptions_title', 'Подписки'), icon: 'waves'},
-        {id: 'notifications', name: i18n.t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
-        {id: 'settings', name: i18n.t('pageSettings', 'Настройки'), icon: 'tune'},
+        {id: 'home', name: this.$t('pageApp_MyFeeds_title', 'Мои ленты'), icon: 'view_week'},
+        {id: 'trends', name: this.$t('pageCategories', 'Категории'), icon: 'whatshot'},
+        // {id: 'twitter', name: this.$t('pageApp_twitter', 'Твиттер'), icon: 'fab fa-twitter', color: 'blue-5'},
+        {id: 'workspace', name: this.$t('pageWorkspace', 'Мастерская'), icon: 'school'},
+        // {id: 'subscriptions', name: this.$t('pageSubscriptions_title', 'Подписки'), icon: 'waves'},
+        {id: 'notifications', name: this.$t('pageNotifications_title', 'Уведомления'), icon: 'notifications_none'},
+        {id: 'settings', name: this.$t('pageSettings', 'Настройки'), icon: 'tune'},
       ],
       refreshLoading: false,
       logoutLoading: false,

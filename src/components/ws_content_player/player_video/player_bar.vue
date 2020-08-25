@@ -6,8 +6,8 @@ div(
   @mouseenter="barMouseenter"
   v-touch-pan.left.right.prevent.mouse="barPan"
   :style=`{
-    position: 'relative', height: '40px', borderRadius: '10px',
-  }`).row.full-width.b-50.shadow-20
+    position: 'relative', height: '20px', borderRadius: '10px',
+  }`).row.full-width.b-50
   //- currentTime width/line
   div(
     :style=`{

@@ -8,8 +8,8 @@ q-layout(view="hHh Lpr lff")
           q-icon(name="view_week" color="white" size="30px").q-mr-sm
           span(:style=`{fontSize: '18px', userSelect: 'none'}`).text-bold.text-white {{$t('pageApp_MyFeeds_title', 'Мои ленты')}}
           .col
-          q-btn(round flat color="green" icon="add" to="/feeds/add")
-          q-btn(round flat color="white" icon="settings" to="/feeds")
+          q-btn(round flat color="green" icon="add" to="/settings/feeds")
+          q-btn(round flat color="white" icon="settings" to="/settings/feeds")
   q-page-container
     q-page(:style=`{paddingTop: '50px', paddingBottom: '200px'}`)
       .row.full-width.items-start.content-start.justify-center

@@ -6,7 +6,7 @@ component(
   div(
     v-if="player"
     :style=`{
-      position: 'absolute', zIndex: 1000, bottom: '4px',
+      position: 'absolute', zIndex: 1000, bottom: '6px',
     }`
     ).row.full-width.justify-center.q-px-lg
     player-actions(v-if="player" :player="player" :style=`{maxWidth: '600px'}`)

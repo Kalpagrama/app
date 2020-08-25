@@ -1,13 +1,14 @@
 <template lang="pug">
 q-layout(view="hHh Lpr lff")
   q-header(reveal)
-    .row.full-width.justify-center.b-30
+    .row.full-width.justify-center.q-pt-sm
       div(
-        :style=`{maxWidth: '800px', height: '50px', overflow: 'hidden'}`
-        ).row.full-width.items-center.content-center.q-px-md.b-30
-        span(:style=`{fontSize: '18px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspaceName }}
+        :style=`{maxWidth: '800px', height: '50px', borderRadius: '10px', overflow: 'hidden'}`
+        ).row.full-width.items-center.content-center.q-px-md.b-40
+        q-icon(name="select_all" color="white" size="30px").q-mr-sm
+        span(:style=`{fontSize: '16px', whiteSpace: 'nowrap'}`).text-white.text-bold {{ contentWorkspaceName }}
   q-page-container
-    q-page(:style=`{paddingBottom: '200px',}`)
+    q-page(:style=`{paddingTop: '8px', paddingBottom: '50px',}`)
       .row.full-width.items-start.content-start.justify-center
         div(:style=`{maxWidth: '800px'}`).row.full-width.items-start.content-start
           //- content wrapper
@@ -99,7 +100,7 @@ export default {
       return this.contentWorkspace.name.slice(0, 100)
     },
     pageHeight () {
-      return this.$q.screen.height - 50 - 50 - this.contentHeight
+      return this.$q.screen.height - 60 - 60 - this.contentHeight
     },
   },
   watch: {
@@ -107,7 +108,7 @@ export default {
       handler (to, from) {
         this.$log('$q.appVisible TO', to)
         if (to) {
-          if (this.playerVisible) this.player.play()
+          // if (this.playerVisible) this.player.play()
         }
         else {
           this.player.pause()

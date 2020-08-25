@@ -2,13 +2,13 @@
 q-btn(
   @click="bookmarked ? bookmarkDelete() : bookmarkCreate()"
   round flat
-  :color="bookmarked ? 'white' : 'grey-2'"
+  color="white"
   :icon="bookmarked ? 'bookmark' : 'bookmark_outline'"
   :loading="loading"
   :style=`{
     position: 'absolute', zIndex: 1000, transform: 'translate3d(0,0,0)',
-    top: '0px', right: '0px',
-    background: 'rgba(0,0,0,0.2)',
+    top: '8px', right: '8px',
+    background: 'rgba(0,0,0,0.15)',
   }`)
 </template>
 

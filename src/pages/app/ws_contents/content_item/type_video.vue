@@ -16,7 +16,7 @@ div(
     :src="content.thumbOid"
     draggable="false"
     :style=`{
-      height: '100px',
+      height: '100px', width: '180px', objectFit: 'cover',
       borderRadius: '10px', overflow: 'hidden',
       pointerEvents: 'none',
     }`
