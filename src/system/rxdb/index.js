@@ -15,6 +15,7 @@ import { NodeApi } from 'src/api/node'
 import { ObjectsApi } from 'src/api/objects'
 import { schemaKeyValue } from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
+import LruCache from 'lru-cache'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB)
@@ -34,6 +35,41 @@ const RxModuleEnum = Object.freeze({
   CACHE: 'CACHE'
 })
 const purgePeriod = 1000 * 60 * 60 * 24 // раз в сутки очищать бд от мертвых строк
+
+const defaultCacheSize = 1 * 1024 * 1024 // 1Mb // todo увеличить до 10 МБ после тестирования
+if (defaultCacheSize < 10 * 1024 * 1024) logW('TODO увеличить rxDbMemCache до 10 МБ после тестирования')
+
+// кээширование объектов перед rxDb (rxDb  очень медленная)
+class ReactiveItemDbMemCache {
+  constructor () {
+    this.cacheLru = new LruCache({
+      max: defaultCacheSize,
+      length: function (n, id) {
+        return JSON.stringify(n).length + id.length
+      },
+      maxAge: 0 // не удаляем объекты по возрасту (для того чтобы при неудачной попытке взять с сервера - вернуть из кэша)
+    })
+  }
+
+  get (id) {
+    return this.cacheLru.get(id)
+  }
+
+  set (id, reactiveItem) {
+    assert(id, '!id')
+    assert(reactiveItem, '!reactiveItem')
+    assert(!this.cacheLru.has(id), '!this.cacheLru.has(id)')
+    this.cacheLru.set(id, reactiveItem)
+  }
+
+  del (id) {
+    this.cacheLru.del(id)
+  }
+
+  reset () {
+    this.cacheLru.reset()
+  }
+}
 
 function getRxCollectionEnumFromId (id) {
   assert(id, '!id')
@@ -65,12 +101,18 @@ class RxDBWrapper {
     this.isLeader_ = false
     this.mutex = new Mutex()
     this.store = null // vuex
+    this.reactiveItemDbMemCache = new ReactiveItemDbMemCache()
     addRxPlugin(require('pouchdb-adapter-idb'))
     addRxPlugin(RxDBLeaderElectionPlugin)
     addRxPlugin(RxDBValidatePlugin)
     addRxPlugin(RxDBJsonDumpPlugin)
     if (process.env.NODE_ENV === 'development') addRxPlugin(RxDBDevModePlugin)
     this.isLeader = () => this.isLeader_
+  }
+
+  onRxDocDelete(id){
+    assert(id)
+    this.reactiveItemDbMemCache.del(id)
   }
 
   // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
@@ -111,6 +153,7 @@ class RxDBWrapper {
       // console.time('purgeDb')
       await this.purgeDb() // очистит бд от старых данных
       // console.timeEnd('purgeDb')
+      this.reactiveItemDbMemCache.reset()
       this.db.waitForLeadership().then(() => {
         logD(f, 'RXDB::LEADER!!!!')
         this.isLeader_ = true
@@ -288,9 +331,13 @@ class RxDBWrapper {
     assert(!rawId.includes('::'), '')
     const f = this.get
     let id = makeId(rxCollectionEnum, rawId)
+    let cachedReactiveItem = this.reactiveItemDbMemCache.get(id)
+    if (cachedReactiveItem) return cachedReactiveItem
     let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc })
     if (!rxDoc) return null
-    return getReactive(rxDoc)
+    let reactiveItem = getReactive(rxDoc)
+    this.reactiveItemDbMemCache.set(id, reactiveItem)
+    return reactiveItem
   }
 
   // actualAge - актуально только для кэша

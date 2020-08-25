@@ -3,13 +3,14 @@ import { createRxDatabase, isRxDocument, removeRxDatabase } from 'rxdb'
 import assert from 'assert'
 import { wsSchemaLocalChanges, wsSchemaItem } from 'src/system/rxdb/schemas'
 import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { getReactive, Mutex, ReactiveItemHolder, updateRxDoc } from 'src/system/rxdb/reactive'
+import { getReactive, Mutex, updateRxDoc } from 'src/system/rxdb/reactive'
 import { WorkspaceApi } from 'src/api/workspace'
 import isEqual from 'lodash/isEqual'
 import cloneDeep from 'lodash/cloneDeep'
 import differenceWith from 'lodash/differenceWith'
 import intersectionWith from 'lodash/intersectionWith'
-import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb } from 'src/system/rxdb/index'
+import { getRxCollectionEnumFromId, RxCollectionEnum, rxdb, getRawIdFromId } from 'src/system/rxdb/index'
+import LruCache from 'lru-cache'
 
 const logD = getLogFunc(LogLevelEnum.DEBUG, LogModulesEnum.RXDB_WS)
 const logE = getLogFunc(LogLevelEnum.ERROR, LogModulesEnum.RXDB_WS)
@@ -122,6 +123,7 @@ class Workspace {
     }, false)
     this.db.ws_items.postRemove(async (plainData) => {
       await onWsChangedByUser(plainData.id, WsOperationEnum.DELETE)
+      rxdb.onRxDocDelete(plainData.id)
     }, false)
     logD(f, `complete: ${performance.now() - t1} msec`)
   }
@@ -372,9 +374,11 @@ class Workspace {
         return
       }
       // ищем изменившейся item
-      const rxDoc = await this.db.ws_items.findOne(itemServer.id).exec()
+      // const rxDoc = await this.db.ws_items.findOne(itemServer.id).exec()
+      assert(itemServer.wsItemType in RxCollectionEnum, 'itemServer.wsItemType in RxCollectionEnum)')
+      let reactiveItem = await rxdb.get(itemServer.wsItemType, getRawIdFromId(itemServer.id))
       // применим изменения
-      if (!rxDoc || type === 'WS_ITEM_DELETED' || rxDoc.rev + 1 < itemServer.rev || rxDoc.updatedAt < itemServer.updatedAt) {
+      if (!reactiveItem || type === 'WS_ITEM_DELETED' || reactiveItem.rev + 1 < itemServer.rev || reactiveItem.updatedAt < itemServer.updatedAt) {
         logD(f, 'Берем изменения с сервера', type)
         if (type === 'WS_ITEM_DELETED') {
           // logD('try remove ws item', await this.db.ws_items.find({ selector: { id: itemServer.id } }).exec())
@@ -385,15 +389,32 @@ class Workspace {
         }
         await this.db.ws_changes.find({ selector: { id: itemServer.id } }).remove() // см onCollectionUpdate
       } else {
-        logD(f, `event проигнорирован (у нас актуальная версия) ${rxDoc.id} rev: ${rxDoc.rev}`)
+        logD(f, `event проигнорирован (у нас актуальная версия) ${reactiveItem.id} rev: ${reactiveItem.rev}`)
         // просто возьмем ревизию с сервера
-        await updateRxDoc(rxDoc, 'rev', itemServer.rev, false)// ревизию назначает сервер. это изменение не попадает в ws_changes (см. this.db.ws_items.preSave)
+        await reactiveItem.updateExtended('rev', itemServer.rev, false)// ревизию назначает сервер. это изменение не попадает в ws_changes (см. this.db.ws_items.preSave)
+        // await updateRxDoc(rxDoc, 'rev', itemServer.rev, false)// ревизию назначает сервер. это изменение не попадает в ws_changes (см. this.db.ws_items.preSave)
       }
       // все пришедшие изменения применены. Актуализируем версию локальной мастерской (см synchronizeWsWhole)
       await rxdb.set(RxCollectionEnum.META, { id: 'wsRevision', valueString: this.reactiveUser.wsRevision.toString() })
       logD(f, `complete: ${performance.now() - t1} msec`)
     } finally {
       this.ignoreWsChanges = false
+      this.release()
+    }
+  }
+
+  async find (mangoQuery) {
+    try {
+      await this.lock()
+      const f = this.find
+      assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
+      let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
+      assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+      delete mangoQuery.selector.rxCollectionEnum
+      mangoQuery.selector.wsItemType = rxCollectionEnum
+      let rxQuery = this.db.ws_items.find(mangoQuery)
+      return rxQuery
+    } finally {
       this.release()
     }
   }
@@ -419,22 +440,6 @@ class Workspace {
       // const queryRes2 = await queryXxx2.exec()
       logD(f, `complete: ${performance.now() - t1} msec`)
       return rxDoc
-    } finally {
-      this.release()
-    }
-  }
-
-  async find (mangoQuery) {
-    try {
-      await this.lock()
-      const f = this.find
-      assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 2' + JSON.stringify(mangoQuery))
-      let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
-      assert(rxCollectionEnum in WsCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-      delete mangoQuery.selector.rxCollectionEnum
-      mangoQuery.selector.wsItemType = rxCollectionEnum
-      let rxQuery = this.db.ws_items.find(mangoQuery)
-      return rxQuery
     } finally {
       this.release()
     }
