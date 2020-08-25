@@ -1,19 +1,19 @@
 import assert from 'assert'
-import { Workspace, WsCollectionEnum, WsItemTypeEnum } from 'src/system/rxdb/workspace'
-import { Cache } from 'src/system/rxdb/cache'
-import { Objects } from 'src/system/rxdb/objects'
-import { getLogFunc, LogLevelEnum, LogModulesEnum } from 'src/boot/log'
-import { addRxPlugin, createRxDatabase, removeRxDatabase } from 'rxdb'
-import { RxDBDevModePlugin } from 'rxdb/plugins/dev-mode'
-import { Event } from 'src/system/rxdb/event'
-import { RxDBLeaderElectionPlugin } from 'rxdb/plugins/leader-election'
-import { RxDBValidatePlugin } from 'rxdb/plugins/validate'
-import { RxDBJsonDumpPlugin } from 'rxdb/plugins/json-dump'
-import { Lists, LstCollectionEnum } from 'src/system/rxdb/lists'
-import { getReactive, Mutex, ReactiveListHolder } from 'src/system/rxdb/reactive'
-import { NodeApi } from 'src/api/node'
-import { ObjectsApi } from 'src/api/objects'
-import { schemaKeyValue } from 'src/system/rxdb/schemas'
+import {Workspace, WsCollectionEnum, WsItemTypeEnum} from 'src/system/rxdb/workspace'
+import {Cache} from 'src/system/rxdb/cache'
+import {Objects} from 'src/system/rxdb/objects'
+import {getLogFunc, LogLevelEnum, LogModulesEnum} from 'src/boot/log'
+import {addRxPlugin, createRxDatabase, removeRxDatabase} from 'rxdb'
+import {RxDBDevModePlugin} from 'rxdb/plugins/dev-mode'
+import {Event} from 'src/system/rxdb/event'
+import {RxDBLeaderElectionPlugin} from 'rxdb/plugins/leader-election'
+import {RxDBValidatePlugin} from 'rxdb/plugins/validate'
+import {RxDBJsonDumpPlugin} from 'rxdb/plugins/json-dump'
+import {Lists, LstCollectionEnum} from 'src/system/rxdb/lists'
+import {getReactive, Mutex, ReactiveListHolder} from 'src/system/rxdb/reactive'
+import {NodeApi} from 'src/api/node'
+import {ObjectsApi} from 'src/api/objects'
+import {schemaKeyValue} from 'src/system/rxdb/schemas'
 import cloneDeep from 'lodash/cloneDeep'
 import LruCache from 'lru-cache'
 
@@ -41,7 +41,7 @@ if (defaultCacheSize < 10 * 1024 * 1024) logW('TODO увеличить rxDbMemCa
 
 // кээширование объектов перед rxDb (rxDb  очень медленная)
 class ReactiveItemDbMemCache {
-  constructor () {
+  constructor() {
     this.cacheLru = new LruCache({
       max: defaultCacheSize,
       length: function (n, id) {
@@ -51,27 +51,27 @@ class ReactiveItemDbMemCache {
     })
   }
 
-  get (id) {
+  get(id) {
     return this.cacheLru.get(id)
   }
 
-  set (id, reactiveItem) {
+  set(id, reactiveItem) {
     assert(id, '!id')
     assert(reactiveItem, '!reactiveItem')
     assert(!this.cacheLru.has(id), '!this.cacheLru.has(id)')
     this.cacheLru.set(id, reactiveItem)
   }
 
-  del (id) {
+  del(id) {
     this.cacheLru.del(id)
   }
 
-  reset () {
+  reset() {
     this.cacheLru.reset()
   }
 }
 
-function getRxCollectionEnumFromId (id) {
+function getRxCollectionEnumFromId(id) {
   assert(id, '!id')
   let parts = id.split('::')
   assert(parts.length === 2, 'bad id!' + id)
@@ -80,7 +80,7 @@ function getRxCollectionEnumFromId (id) {
   return rxCollection
 }
 
-function getRawIdFromId (id) {
+function getRawIdFromId(id) {
   assert(id, '!id')
   let parts = id.split('::')
   assert(parts.length === 2, 'bad id!' + id)
@@ -89,7 +89,7 @@ function getRawIdFromId (id) {
   return rawId
 }
 
-function makeId (rxCollectionEnum, rawId) {
+function makeId(rxCollectionEnum, rawId) {
   assert(rawId, '!rawId')
   assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum' + rxCollectionEnum)
   assert(!rawId.includes('::'), 'bad rawId' + rawId)
@@ -97,7 +97,7 @@ function makeId (rxCollectionEnum, rawId) {
 }
 
 class RxDBWrapper {
-  constructor () {
+  constructor() {
     this.isLeader_ = false
     this.mutex = new Mutex()
     this.store = null // vuex
@@ -110,13 +110,13 @@ class RxDBWrapper {
     this.isLeader = () => this.isLeader_
   }
 
-  onRxDocDelete(id){
+  onRxDocDelete(id) {
     assert(id)
     this.reactiveItemDbMemCache.del(id)
   }
 
   // rxdb не удаляет элементы, а помечает удаленными! purgeDb - очистит помеченные удаленными
-  async purgeDb () {
+  async purgeDb() {
     const f = this.purgeDb
     logD(f, 'start')
     const t1 = performance.now()
@@ -126,13 +126,13 @@ class RxDBWrapper {
       logD(f, 'skip.')
       return
     }
-    await this.set(RxCollectionEnum.META, { id: 'purgeLastDate', valueString: Date.now().toString() })
+    await this.set(RxCollectionEnum.META, {id: 'purgeLastDate', valueString: Date.now().toString()})
     let dump = await this.db.dump()
     await this.db.importDump(dump)
     logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
-  async init (store, recursive = false) {
+  async init(store, recursive = false) {
     const f = this.init
     logD(f, 'start')
     const t1 = performance.now()
@@ -144,11 +144,11 @@ class RxDBWrapper {
         adapter: 'idb', // <- storage-adapter
         multiInstance: true, // <- multiInstance (optional, default: true)
         eventReduce: false, // если поставить true - будут теряться события об обновлении (по всей видимости - это баг)<- eventReduce (optional, default: true)
-        pouchSettings: { revs_limit: 1 }
+        pouchSettings: {revs_limit: 1}
       })
       // console.timeEnd('createRxDatabase')
       // console.time('await this.db.collection')
-      await this.db.collection({ name: 'meta', schema: schemaKeyValue })
+      await this.db.collection({name: 'meta', schema: schemaKeyValue})
       // console.timeEnd('await this.db.collection')
       // console.time('purgeDb')
       await this.purgeDb() // очистит бд от старых данных
@@ -185,7 +185,7 @@ class RxDBWrapper {
   }
 
   // вызывать после логина (запустит обработку эвентов и синхронмзацию мастерской)
-  async startBackgroundProcesses (userOid) {
+  async startBackgroundProcesses(userOid) {
     const f = this.startBackgroundProcesses
     logD(f, 'start')
     const t1 = performance.now()
@@ -219,7 +219,7 @@ class RxDBWrapper {
       }
     }
     console.time('get categories from server')
-    let nodeCategories = await this.get(RxCollectionEnum.OTHER, 'nodeCategories', { fetchFunc: fetchCategoriesFunc })
+    let nodeCategories = await this.get(RxCollectionEnum.OTHER, 'nodeCategories', {fetchFunc: fetchCategoriesFunc})
     console.timeEnd('get categories from server')
     if (currentUser) { // синхронизация мастерской с сервером
       this.workspace.switchOnSynchro(currentUser)
@@ -227,7 +227,7 @@ class RxDBWrapper {
     logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
-  async stopBackgroundProcesses () {
+  async stopBackgroundProcesses() {
     const f = this.stopBackgroundProcesses
     logD(f, 'start')
     const t1 = performance.now()
@@ -237,7 +237,7 @@ class RxDBWrapper {
     logD(f, `complete: ${performance.now() - t1} msec`)
   }
 
-  async clearAll () {
+  async clearAll() {
     try {
       await this.lock()
       const f = this.clearAll
@@ -245,14 +245,14 @@ class RxDBWrapper {
       const t1 = performance.now()
       for (let module in RxModuleEnum) await this.clearModule(module)
       await this.db.meta.remove()
-      await this.db.collection({ name: 'meta', schema: schemaKeyValue })
+      await this.db.collection({name: 'meta', schema: schemaKeyValue})
       logD(f, `complete: ${performance.now() - t1} msec`)
     } finally {
       this.release()
     }
   }
 
-  async clearModule (rxModuleEnum) {
+  async clearModule(rxModuleEnum) {
     assert(rxModuleEnum in RxModuleEnum, 'bad rxModuleEnum')
     switch (rxModuleEnum) {
       case RxModuleEnum.WS:
@@ -268,15 +268,15 @@ class RxDBWrapper {
     }
   }
 
-  async lock () {
+  async lock() {
     await this.mutex.lock()
   }
 
-  release () {
+  release() {
     this.mutex.release()
   }
 
-  async processEvent (event) {
+  async processEvent(event) {
     try {
       await this.lock()
       assert(this.store, '!this.store')
@@ -287,7 +287,7 @@ class RxDBWrapper {
   }
 
   // поищет в rxdb (если надо - запросит с сервера) Вернет {items, count, totalCount, nextPageToken }
-  async find (mangoQuery) {
+  async find(mangoQuery) {
     assert(mangoQuery && mangoQuery.selector && mangoQuery.selector.rxCollectionEnum, 'bad query 1: ' + JSON.stringify(mangoQuery))
     mangoQuery = cloneDeep(mangoQuery) // mangoQuery модифицируется внутри (JSON.parse не пойдет из-за того, что в mangoQuery есть regexp)
     let rxCollectionEnum = mangoQuery.selector.rxCollectionEnum
@@ -296,7 +296,7 @@ class RxDBWrapper {
       let rxQuery = await this.workspace.find(mangoQuery)
       let reactiveList = await (new ReactiveListHolder()).create(rxQuery)
       assert(reactiveList, '!reactiveList')
-      return { items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null }
+      return {items: reactiveList, count: reactiveList.length, totalCount: reactiveList.length, nextPageToken: null}
     } else if (rxCollectionEnum in LstCollectionEnum) {
       let rxDoc = await this.lists.find(mangoQuery)
       return getReactive(rxDoc) // {items, count, totalCount, nextPageToken }
@@ -305,7 +305,7 @@ class RxDBWrapper {
     }
   }
 
-  async getRxDoc (id, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null } = {}) {
+  async getRxDoc(id, {fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null} = {}) {
     let rxCollectionEnum = getRxCollectionEnumFromId(id)
     let rawId = getRawIdFromId(id)
     let rxDoc
@@ -326,14 +326,21 @@ class RxDBWrapper {
 
   // clientFirst - вернуть данные из кэша (даже если они устарели), а потом в фоне реактивно обновить
   // onFetchFunc - коллбэк, который будет вызван, когда данные будут получены с сервера
-  async get (rxCollectionEnum, rawId, { fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null } = {}) {
-    assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-    assert(!rawId.includes('::'), '')
+  async get(rxCollectionEnum, rawId, {id = null, fetchFunc, clientFirst = true, priority = 0, force = false, onFetchFunc = null} = {}) {
     const f = this.get
-    let id = makeId(rxCollectionEnum, rawId)
+    if (rawId) {
+      assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
+      assert(!rawId.includes('::'), '')
+      assert(!id)
+      id = makeId(rxCollectionEnum, rawId)
+    } else {
+      assert(!rxCollectionEnum)
+      assert(id)
+      assert(id.includes('::'))
+    }
     let cachedReactiveItem = this.reactiveItemDbMemCache.get(id)
     if (cachedReactiveItem) return cachedReactiveItem
-    let rxDoc = await this.getRxDoc(id, { fetchFunc, clientFirst, priority, force, onFetchFunc })
+    let rxDoc = await this.getRxDoc(id, {fetchFunc, clientFirst, priority, force, onFetchFunc})
     if (!rxDoc) return null
     let reactiveItem = getReactive(rxDoc)
     this.reactiveItemDbMemCache.set(id, reactiveItem)
@@ -341,11 +348,11 @@ class RxDBWrapper {
   }
 
   // actualAge - актуально только для кэша
-  async set (rxCollectionEnum, data, { actualAge, notEvict = false } = {}) {
+  async set(rxCollectionEnum, data, {actualAge, notEvict = false} = {}) {
     const f = this.set
     assert(data, '!data')
     assert(rxCollectionEnum in RxCollectionEnum, 'bad rxCollectionEnum:' + rxCollectionEnum)
-    logD(f, 'start', rxCollectionEnum, data, { actualAge, notEvict })
+    logD(f, 'start', rxCollectionEnum, data, {actualAge, notEvict})
     let rxDoc
     if (rxCollectionEnum in WsCollectionEnum) {
       rxDoc = await this.workspace.set(data)
@@ -354,7 +361,7 @@ class RxDBWrapper {
       rxDoc = await this.cache.set(id, data, actualAge, notEvict)
     } else if (rxCollectionEnum === RxCollectionEnum.META) {
       assert(data.id && data.valueString, 'bad data' + JSON.stringify(data))
-      rxDoc = await this.db.meta.atomicUpsert({ id: data.id, valueString: data.valueString })
+      rxDoc = await this.db.meta.atomicUpsert({id: data.id, valueString: data.valueString})
     } else {
       throw new Error('bad collection' + rxCollectionEnum)
     }
@@ -362,7 +369,7 @@ class RxDBWrapper {
     return getReactive(rxDoc)
   }
 
-  async remove (id) {
+  async remove(id) {
     let collection = getRxCollectionEnumFromId(id)
     if (collection in WsCollectionEnum) {
       return await this.workspace.remove(id)

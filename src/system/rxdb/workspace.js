@@ -376,7 +376,7 @@ class Workspace {
       // ищем изменившейся item
       // const rxDoc = await this.db.ws_items.findOne(itemServer.id).exec()
       assert(itemServer.wsItemType in RxCollectionEnum, 'itemServer.wsItemType in RxCollectionEnum)')
-      let reactiveItem = await rxdb.get(itemServer.wsItemType, getRawIdFromId(itemServer.id))
+      let reactiveItem = await rxdb.get(null, null, {id: itemServer.id})
       // применим изменения
       if (!reactiveItem || type === 'WS_ITEM_DELETED' || reactiveItem.rev + 1 < itemServer.rev || reactiveItem.updatedAt < itemServer.updatedAt) {
         logD(f, 'Берем изменения с сервера', type)
