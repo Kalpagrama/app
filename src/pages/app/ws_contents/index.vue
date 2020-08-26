@@ -9,7 +9,7 @@ q-layout(view="hHh Lpr lff")
           @searchString="searchString = $event"
           :style=`{}`)
         .row.full-width.q-px-md
-          q-tabs(v-model="type" no-caps dense active-color="white" align="left" switch-indicator).text-grey-8
+          q-tabs(v-model="type" no-caps dense active-color="white" align="left" switch-indicator).full-width.text-grey-8
             q-tab(v-for="t in types" :key="t.id" :name="t.id" :label="t.name")
   q-page-container
     q-page(style="padding-top: 8px")

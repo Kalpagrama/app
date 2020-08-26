@@ -12,86 +12,57 @@ q-layout(view="lHh lpR lFf")
       :inDrawer="true"
       :style=`{borderRadius: '0 10px 10px 0'}`
       ).full-height.b-40
-  div(
-    v-if="$q.screen.width > 960"
-    :style=`{
-      position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
-    }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
-    kalpa-menu(
-      v-if="!loading && $route.name !== 'welcome'"
-      :inDrawer="false"
-      :style=`{
-        borderRadius: '10px',
-        maxWidth: $q.screen.width < 1260 ? '60px' : '300px',
-      }`).b-40
-  //- mobile navigation
-  q-footer(v-if="$q.screen.width < 960")
-    .row.full-width.justify-center
-      div(
-        :style=`{maxWidth: '800px', borderRadius: '10px 10px 0 0'}`
-        ).row.full-width.items-center.content-center.justify-between.q-pa-sm.b-40
-        q-btn(
-          @click="$router.back()"
-          round flat dense color="white" icon="keyboard_arrow_left")
-        q-btn(
-          :to="{name: 'home'}"
-          round flat dense icon="view_week"
-          :color="$route.name.split('.')[0] === 'home' ? 'green' : 'grey-4'")
-        //- router-link(
-          v-if="$store.getters.currentUser()"
-          :to="'/user/'+$store.getters.currentUser().oid"
-          :style=`{
-            border: $route.name.split('.')[0] === 'user' ? '3px solid #4caf50' : 'none',
-            borderRadius: '50%', overflow: 'hidden',
-          }`)
-          user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="25" :height="25")
-        q-btn(
-          :to="'/workspace/node/new'"
-          round dense color="green" icon="add"
-          :style=`{borderRadius: '50%'}`)
-        q-btn(
-          :to="{name: 'workspace'}"
-          round flat dense icon="school"
-          :color="$route.name.split('.')[0] === 'workspace' ? 'green' : 'grey-4'")
-        q-btn(
-          @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
-          round flat dense color='white' icon="menu")
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     div(
-      v-if="$store.state.ui.showMobileNavigation"
+      v-if="$q.screen.width > 960"
       :style=`{
-        position: 'fixed', zIndex: 9999, bottom: '0px',
-      }`
-      ).row.full-width.b-30.q-pa-sm
-      q-btn(
-        @click="$router.back()"
-        round flat color="white"
-        icon="keyboard_arrow_left"
-        :style=`{marginLeft: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
-      .col
-      q-btn(
-        @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
-        round flat color="white"
-        :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'"
-        :style=`{marginRight: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-btn(
-      v-if="$store.state.ui.showMobileNavigation"
-      @click="$router.back()"
-      round flat color="white"
-      icon="keyboard_arrow_left"
-      :style=`{position: 'fixed', zIndex: 9999, bottom: '4px', left: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
-  //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
-    q-btn(
-      v-if="$store.state.ui.showMobileNavigation"
-      @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
-      round flat color="white"
-      :icon="$store.state.ui.appShowMenu ? 'clear' : 'menu'"
-      :style=`{position: 'fixed', zIndex: 9999, bottom: '4px', right: $q.screen.width < 800 ? '0px' : ($q.screen.width-800)/2+0+'px'}`)
+        position: 'fixed', zIndex: 9999, left: '0px', top: '0px', width: ($q.screen.width-800)/2+'px',
+      }`).row.full-height.items-start.content-start.justify-end.q-pa-sm
+      kalpa-menu(
+        v-if="!loading && $route.name !== 'welcome'"
+        :inDrawer="false"
+        :style=`{
+          borderRadius: '10px',
+          maxWidth: $q.screen.width < 1260 ? '60px' : '300px',
+        }`).b-40
+  //- mobile navigation
+  transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
+    q-footer(v-if="$store.state.ui.showMobileNavigation && $q.screen.width < 960")
+      .row.full-width.justify-center
+        div(
+          :style=`{maxWidth: '800px', borderRadius: '10px 10px 0 0'}`
+          ).row.full-width.items-center.content-center.justify-between.q-pa-sm.b-40
+          q-btn(
+            @click="$router.back()"
+            round flat dense color="white" icon="keyboard_arrow_left")
+          q-btn(
+            :to="{name: 'home'}"
+            round flat dense icon="view_week"
+            :color="$route.name.split('.')[0] === 'home' ? 'green' : 'grey-4'")
+          //- router-link(
+            v-if="$store.getters.currentUser()"
+            :to="'/user/'+$store.getters.currentUser().oid"
+            :style=`{
+              border: $route.name.split('.')[0] === 'user' ? '3px solid #4caf50' : 'none',
+              borderRadius: '50%', overflow: 'hidden',
+            }`)
+            user-avatar(:url="$store.getters.currentUser().profile.photoUrl" :width="25" :height="25")
+          q-btn(
+            :to="'/workspace/node/new'"
+            round dense color="green" icon="add"
+            :style=`{borderRadius: '50%'}`)
+          q-btn(
+            :to="{name: 'workspace'}"
+            round flat dense icon="school"
+            :color="$route.name.split('.')[0] === 'workspace' ? 'green' : 'grey-4'")
+          q-btn(
+            @click="$store.commit('ui/stateSet', ['appShowMenu', !$store.state.ui.appShowMenu])"
+            round flat dense color='white' icon="menu")
   q-page-container
+    //- transition(enter-active-class="animated fadeIn" leave-active-class="animated fadeOut")
     router-view(v-if="!loading")
     div(
-      v-else
+      v-if="loading"
       ).row.full-width.window-height.items-center.content-center.justify-center
       q-spinner(color="green" size="100px" :thickness="4")
 </template>

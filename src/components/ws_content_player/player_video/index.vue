@@ -9,10 +9,12 @@ component(
       position: 'absolute', zIndex: 1000, bottom: '6px',
     }`
     ).row.full-width.justify-center.q-px-lg
-    player-actions(v-if="player" :player="player" :style=`{maxWidth: '600px'}`)
-      template(v-slot)
-        slot(name="actions")
-    player-bar(v-if="player" :player="player" :bars="bars" :style=`{maxWidth: '600px'}`)
+    .row.full-width.justify-center
+      player-actions(v-if="player" :player="player" :style=`{maxWidth: '600px'}`)
+        template(v-slot)
+          slot(name="actions")
+    .row.full-width.justify-center
+      player-bar(v-if="player" :player="player" :bars="bars" :style=`{maxWidth: '600px'}`)
 </template>
 
 <script>

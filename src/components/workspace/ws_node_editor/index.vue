@@ -103,13 +103,13 @@ export default {
         createdNode.items.map((i, ii) => {
           this.node.items[ii].thumbUrl = i.thumbUrl
         })
-        // this.$log('publisg res', createdNode)
         this.publishing = false
         this.$q.notify({
           type: 'positive',
           position: 'top',
           message: this.$t('wsNodeEditor_nodeSendToPublication', 'Ядро отправлено на публикацию!')
         })
+        this.$router.push(`/node/${createdNode.oid}?creating=true`)
       }
       catch (e) {
         this.$log('publish error', e)
